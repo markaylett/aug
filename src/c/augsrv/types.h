@@ -4,20 +4,22 @@
 #ifndef AUGSRV_TYPES_H
 #define AUGSRV_TYPES_H
 
-#define AUG_FOREGROUND   1
+#define AUG_FOREGROUND 1
+
+#define AUG_SIGNONE   0
+#define AUG_SIGRECONF 1
+#define AUG_SIGSTATUS 2
+#define AUG_SIGSTOP   3
+
+/* Base value for user-defined signals. */
+
+#define AUG_SIGUSER   4
+
+typedef unsigned char aug_sig_t;
 
 enum aug_option {
     AUG_OPTCONFFILE = 1,
     AUG_OPTPIDFILE
-};
-
-enum aug_signal {
-    AUG_SIGOTHER,
-    AUG_SIGALARM,
-    AUG_SIGCHILD,
-    AUG_SIGRECONF,
-    AUG_SIGSTATUS,
-    AUG_SIGSTOP
 };
 
 struct aug_service {

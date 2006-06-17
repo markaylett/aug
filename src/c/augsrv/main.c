@@ -114,7 +114,7 @@ start_(const struct aug_service* service)
 #endif /* _WIN32 */
 
 static void
-control_(const struct aug_service* service, enum aug_signal sig)
+control_(const struct aug_service* service, aug_sig_t sig)
 {
     switch (aug_control(service, sig)) {
     case 0:

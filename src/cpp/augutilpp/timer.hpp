@@ -28,22 +28,33 @@ namespace aug {
 
         timers();
 
-        void
-        process(bool force)
+        operator struct aug_timers&()
         {
-            if (-1 == aug_processtimers(&timers_, force ? 1 : 0, 0))
-                error("aug_processtimers() failed");
+            return timers_;
         }
-        void
-        process(bool force, struct timeval& next)
+        struct aug_timers&
+        get()
         {
-            if (-1 == aug_processtimers(&timers_, force ? 1 : 0, &next))
-                error("aug_processtimers() failed");
+            return timers_;
         }
 
         bool
         empty() const;
     };
+
+    inline void
+    process(struct aug_timers& timers, bool force)
+    {
+        if (-1 == aug_processtimers(&timers, force ? 1 : 0, 0))
+            error("aug_processtimers() failed");
+    }
+
+    inline void
+    process(struct aug_timers& timers, bool force, struct timeval& next)
+    {
+        if (-1 == aug_processtimers(&timers, force ? 1 : 0, &next))
+            error("aug_processtimers() failed");
+    }
 
     class AUGUTILPP_API expire_base {
 

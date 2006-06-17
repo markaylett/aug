@@ -10,8 +10,6 @@
 # include "augsrv/win32/signal.c"
 # define SIGHUP  1
 # define SIGUSR1 10
-# define SIGALRM 14
-# define SIGCHLD 17
 #endif /* _WIN32 */
 
 #include "augsrv/global.h"
@@ -19,17 +17,11 @@
 #include "augsys/errno.h"
 #include "augsys/unistd.h"
 
-AUGSRV_API enum aug_signal
+AUGSRV_API aug_sig_t
 aug_tosignal(int i)
 {
-    enum aug_signal sig;
+    aug_sig_t sig;
     switch (i) {
-    case SIGCHLD:
-        sig = AUG_SIGCHILD;
-        break;
-    case SIGALRM:
-        sig = AUG_SIGALARM;
-        break;
     case SIGHUP:
         sig = AUG_SIGRECONF;
         break;
@@ -41,14 +33,13 @@ aug_tosignal(int i)
         sig = AUG_SIGSTOP;
         break;
     default:
-        sig = AUG_SIGOTHER;
-        break;
+        sig = AUG_SIGNONE;
     }
     return sig;
 }
 
 AUGSRV_API int
-aug_readsig(enum aug_signal* sig)
+aug_readsig(aug_sig_t* sig)
 {
     char ch;
     int ret = aug_read(aug_sigin(), &ch, sizeof(ch));
@@ -66,7 +57,7 @@ aug_readsig(enum aug_signal* sig)
 }
 
 AUGSRV_API int
-aug_writesig(enum aug_signal sig)
+aug_writesig(aug_sig_t sig)
 {
     char ch = sig;
     int ret = aug_write(aug_sigout(), &ch, sizeof(ch));

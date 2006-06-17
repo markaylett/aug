@@ -42,15 +42,15 @@ conns::conns()
     AUG_INIT(&conns_);
 }
 
-AUGNETPP_API void
-conns::insert(fdref ref, poll_base& action)
-{
-    if (-1 == aug_insertconn(&conns_, ref.get(), poll_, &action))
-        error("aug_insertconn() failed");
-}
-
 AUGNETPP_API bool
 conns::empty() const
 {
     return AUG_EMPTY(&conns_);
+}
+
+AUGNETPP_API void
+aug::insertconn(struct aug_conns& conns, fdref ref, poll_base& action)
+{
+    if (-1 == aug_insertconn(&conns, ref.get(), poll_, &action))
+        error("aug_insertconn() failed");
 }

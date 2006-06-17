@@ -29,27 +29,37 @@ namespace aug {
             if (!mplexer_)
                 error("aug_createmplexer() failed");
         }
-        void
-        seteventmask(fdref ref, unsigned short mask)
+        operator aug_mplexer_t()
         {
-            if (-1 == aug_seteventmask(mplexer_, ref.get(), mask))
-                error("aug_seteventmask() failed");
+            return mplexer_;
         }
-
-        // Returns AUG_EINTR if the system call was interrupted.
-
-        int
-        waitevents(const struct timeval& timeout);
-
-        int
-        waitevents();
-
-        unsigned short
-        eventmask(fdref ref);
-
-        unsigned short
-        events(fdref ref);
+        aug_mplexer_t
+        get()
+        {
+            return mplexer_;
+        }
     };
+
+    inline void
+    seteventmask(aug_mplexer_t mplexer, fdref ref, unsigned short mask)
+    {
+        if (-1 == aug_seteventmask(mplexer, ref.get(), mask))
+            error("aug_seteventmask() failed");
+    }
+
+    // Returns AUG_EINTR if the system call was interrupted.
+
+    int
+    waitevents(aug_mplexer_t mplexer, const struct timeval& timeout);
+
+    int
+    waitevents(aug_mplexer_t mplexer);
+
+    unsigned short
+    eventmask(aug_mplexer_t mplexer, fdref ref);
+
+    unsigned short
+    events(aug_mplexer_t mplexer, fdref ref);
 
     std::pair<smartfd, smartfd>
     mplexerpipe();

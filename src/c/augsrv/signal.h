@@ -5,7 +5,7 @@
 #define AUGSRV_SIGNAL_H
 
 #include "augsrv/config.h"
-#include "augsrv/types.h" /* enum aug_signal */
+#include "augsrv/types.h" /* enum aug_sig_t */
 
 AUGSRV_API int
 aug_sigactions(void (*handler)(int));
@@ -16,13 +16,13 @@ aug_sigblock(void);
 AUGSRV_API int
 aug_sigunblock(void);
 
-AUGSRV_API enum aug_signal
+AUGSRV_API aug_sig_t
 aug_tosignal(int i);
 
 AUGSRV_API int
-aug_readsig(enum aug_signal* sig);
+aug_readsig(aug_sig_t* sig);
 
 AUGSRV_API int
-aug_writesig(enum aug_signal sig);
+aug_writesig(aug_sig_t sig);
 
 #endif /* AUGSRV_SIGNAL_H */

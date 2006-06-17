@@ -20,7 +20,7 @@ namespace aug {
 		}
 	};
 
-    bool
+    inline bool
     nocase_compare(const std::string& lhs, const std::string& rhs)
     {
         return std::lexicographical_compare(lhs.begin(), lhs.end(),

@@ -6,7 +6,9 @@
 
 #include "augsys/config.h"
 
-#define _REENTRANT
+#if !defined(_REENTRANT)
+# define _REENTRANT
+#endif /* _REENTRANT */
 #include <time.h>
 
 #if !defined(_WIN32)

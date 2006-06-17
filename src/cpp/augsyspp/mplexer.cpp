@@ -19,27 +19,27 @@ mplexer::~mplexer() NOTHROW
 }
 
 AUGSYSPP_API int
-mplexer::waitevents(const struct timeval& timeout)
+aug::waitevents(aug_mplexer_t mplexer, const struct timeval& timeout)
 {
-    int ret(aug_waitevents(mplexer_, &timeout));
+    int ret(aug_waitevents(mplexer, &timeout));
     if (-1 == ret)
         error("aug_waitevents() failed");
     return ret;
 }
 
 AUGSYSPP_API int
-mplexer::waitevents()
+aug::waitevents(aug_mplexer_t mplexer)
 {
-    int ret(aug_waitevents(mplexer_, 0));
+    int ret(aug_waitevents(mplexer, 0));
     if (-1 == ret)
         error("aug_waitevents() failed");
     return ret;
 }
 
 AUGSYSPP_API unsigned short
-mplexer::eventmask(fdref ref)
+aug::eventmask(aug_mplexer_t mplexer, fdref ref)
 {
-    int ret(aug_eventmask(mplexer_, ref.get()));
+    int ret(aug_eventmask(mplexer, ref.get()));
     if (-1 == ret)
         error("aug_eventmask() failed");
 
@@ -47,9 +47,9 @@ mplexer::eventmask(fdref ref)
 }
 
 AUGSYSPP_API unsigned short
-mplexer::events(fdref ref)
+aug::events(aug_mplexer_t mplexer, fdref ref)
 {
-    int ret(aug_events(mplexer_, ref.get()));
+    int ret(aug_events(mplexer, ref.get()));
     if (-1 == ret)
         error("aug_events() failed");
 

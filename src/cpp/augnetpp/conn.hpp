@@ -45,26 +45,36 @@ namespace aug {
 
         conns();
 
-        void
-        insert(fdref ref, poll_base& action);
-
-        void
-        remove(fdref ref)
+        operator struct aug_conns&()
         {
-            if (-1 == aug_removeconn(&conns_, ref.get()))
-                error("aug_removeconn() failed");
+            return conns_;
         }
-
-        void
-        process()
+        struct aug_conns&
+        get()
         {
-            if (-1 == aug_processconns(&conns_))
-                error("aug_processconns() failed");
+            return conns_;
         }
 
         bool
         empty() const;
     };
+
+    AUGNETPP_API void
+    insertconn(struct aug_conns& conns, fdref ref, poll_base& action);
+
+    inline void
+    removeconn(struct aug_conns& conns, fdref ref)
+    {
+        if (-1 == aug_removeconn(&conns, ref.get()))
+            error("aug_removeconn() failed");
+    }
+
+    inline void
+    processconns(struct aug_conns& conns)
+    {
+        if (-1 == aug_processconns(&conns))
+            error("aug_processconns() failed");
+    }
 }
 
 #endif // AUGNETPP_CONN_HPP

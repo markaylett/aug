@@ -5,13 +5,13 @@
 #define AUGSRV_CONTROL_H
 
 #include "augsrv/config.h"
-#include "augsrv/types.h" /* enum aug_signal */
+#include "augsrv/types.h" /* enum aug_sig_t */
 
 AUGSRV_API int
 aug_start(const struct aug_service* service);
 
 AUGSRV_API int
-aug_control(const struct aug_service* service, enum aug_signal sig);
+aug_control(const struct aug_service* service, aug_sig_t sig);
 
 AUGSRV_API int
 aug_install(const struct aug_service* service);

@@ -27,3 +27,5 @@ Add ability to change user and group.
 Choose consistent callback naming convention.
 
 Null-terminate field values.
+
+Determine ignorable Winsock non-blocking accept() errors.

@@ -1,0 +1,29 @@
+/* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
+   See the file COPYING for copying permission.
+*/
+#ifndef AUGSYS_H
+#define AUGSYS_H
+
+#include "augsys/base.h"
+#include "augsys/debug.h"
+#include "augsys/defs.h"
+#include "augsys/errno.h"
+#include "augsys/inet.h"
+#include "augsys/limits.h"
+#include "augsys/lock.h"
+#include "augsys/log.h"
+#include "augsys/mmap.h"
+#include "augsys/mplexer.h"
+#include "augsys/mutex.h"
+#include "augsys/queue.h"
+#include "augsys/socket.h"
+#include "augsys/string.h"
+#include "augsys/time.h"
+#include "augsys/types.h"
+#include "augsys/uio.h"
+#include "augsys/unistd.h"
+#include "augsys/utility.h"
+#include "augsys/windows.h"
+
+#endif /* AUGSYS_H */
+

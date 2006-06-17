@@ -1,26 +1,12 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsrvpp/main.hpp"
-#include "augsrvpp/signal.hpp"
+#include "augsrvpp.hpp"
+#include "augsyspp.hpp"
+#include "augutilpp.hpp"
 
-#include "augsyspp/base.hpp"
-#include "augsyspp/mplexer.hpp"
-
-#include "augutilpp/conv.hpp"
-#include "augutilpp/file.hpp"
-#include "augutilpp/timer.hpp"
-
-#include "augsrv/global.h"
-#include "augsrv/log.h"
-
-#include "augutil/path.h"
-
-#include "augsys/errno.h"
-#include "augsys/limits.h"
-#include "augsys/log.h"
-#include "augsys/string.h"
-#include "augsys/unistd.h"
+#include "augsrv.h"
+#include "augsys.h"
 
 #include <memory>
 #include <time.h>
@@ -94,21 +80,12 @@ namespace test {
 
             AUG_DEBUG("checking signal pipe '%d'", fd);
 
-            if (!state_->mplexer_.events(fd))
+            if (!events(state_->mplexer_, fd))
                 return;
 
             AUG_DEBUG("reading signal action");
 
             switch (readsig()) {
-            case AUG_SIGOTHER:
-                aug_info("received AUG_SIGOTHER");
-                break;
-            case AUG_SIGALARM:
-                aug_info("received AUG_SIGALARM");
-                break;
-            case AUG_SIGCHILD:
-                aug_info("received AUG_SIGCHILD");
-                break;
             case AUG_SIGRECONF:
                 aug_info("received AUG_SIGRECONF");
                 config(daemon_);
@@ -178,7 +155,7 @@ namespace test {
                 error("aug_setsrvlogger() failed");
 
             auto_ptr<state> ptr(new state(*this));
-            ptr->mplexer_.seteventmask(aug_sigin(), AUG_EVENTRD);
+            seteventmask(ptr->mplexer_, aug_sigin(), AUG_EVENTRD);
             state_ = ptr;
         }
 
@@ -196,14 +173,14 @@ namespace test {
 
                 if (state_->timers_.empty()) {
 
-                    while (AUG_EINTR == (ret = state_->mplexer_.waitevents()))
+                    while (AUG_EINTR == (ret = waitevents(state_->mplexer_)))
                         ;
 
                 } else {
 
-                    state_->timers_.process(0 == ret, tv);
-                    while (AUG_EINTR == (ret = state_->mplexer_
-                                         .waitevents(tv)))
+                    process(state_->timers_, 0 == ret, tv);
+                    while (AUG_EINTR == (ret = waitevents(state_
+                                                          ->mplexer_, tv)))
                         ;
                 }
 

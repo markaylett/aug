@@ -31,7 +31,7 @@ flock_(struct flock* fl, int fd, int cmd, int type)
 }
 
 static int
-send_(int fd, pid_t pid, enum aug_signal sig)
+send_(int fd, pid_t pid, aug_sig_t sig)
 {
     struct flock fl;
 
@@ -74,7 +74,7 @@ aug_start(const struct aug_service* service)
 }
 
 AUGSRV_API int
-aug_control(const struct aug_service* service, enum aug_signal sig)
+aug_control(const struct aug_service* service, aug_sig_t sig)
 {
     const char* path;
     struct flock fl;

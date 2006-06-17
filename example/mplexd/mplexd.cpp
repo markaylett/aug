@@ -1,34 +1,13 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augnetpp/conn.hpp"
-#include "augnetpp/inet.hpp"
+#include "augnetpp.hpp"
+#include "augsrvpp.hpp"
+#include "augsyspp.hpp"
+#include "augutilpp.hpp"
 
-#include "augsrvpp/log.hpp"
-#include "augsrvpp/main.hpp"
-#include "augsrvpp/signal.hpp"
-
-#include "augsyspp/base.hpp"
-#include "augsyspp/mplexer.hpp"
-#include "augsyspp/socket.hpp"
-#include "augsyspp/unistd.hpp"
-#include "augsyspp/utility.hpp"
-
-#include "augutilpp/conv.hpp"
-#include "augutilpp/file.hpp"
-#include "augutilpp/path.hpp"
-#include "augutilpp/timer.hpp"
-
-#include "augsrv/global.h"
-#include "augsrv/log.h"
-
-#include "augutil/path.h"
-
-#include "augsys/errno.h"
-#include "augsys/limits.h"
-#include "augsys/log.h"
-#include "augsys/string.h"
-#include "augsys/unistd.h"
+#include "augsrv.h"
+#include "augsys.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -131,7 +110,7 @@ namespace test {
     {
         try {
             mplexer* mp(static_cast<mplexer*>(data));
-            mp->seteventmask(fd, 0);
+            seteventmask(*mp, fd, 0);
         }
         AUG_CATCHRETURN;
     }
@@ -199,7 +178,7 @@ namespace test {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
                 mplexer* mp(static_cast<mplexer*>(fddata(sfd_)));
-                mp->seteventmask(sfd_, AUG_EVENTRDWR);
+                seteventmask(*mp, sfd_, AUG_EVENTRDWR);
             } else
                 shutdown(sfd_, SHUT_RDWR);
         }
@@ -232,11 +211,11 @@ namespace test {
             struct sockaddr_in addr;
             smartfd sfd(openpassive(parseinet(addr, address_)));
 
-            conns_.insert(aug_sigin(), poll);
-            mplexer_.seteventmask(aug_sigin(), AUG_EVENTRD);
+            insertconn(conns_, aug_sigin(), poll);
+            seteventmask(mplexer_, aug_sigin(), AUG_EVENTRD);
 
-            conns_.insert(sfd, poll);
-            mplexer_.seteventmask(sfd, AUG_EVENTRD);
+            insertconn(conns_, sfd, poll);
+            seteventmask(mplexer_, sfd, AUG_EVENTRD);
 
             sfd_ = sfd;
         }
@@ -249,12 +228,12 @@ namespace test {
         void
         setfdhook(fdref ref, unsigned short mask)
         {
-            state_->conns_.insert(ref, *this);
+            insertconn(state_->conns_, ref, *this);
             try {
                 aug::setfdhook(ref, hook, &state_->mplexer_);
-                state_->mplexer_.seteventmask(ref, mask);
+                seteventmask(state_->mplexer_, ref, mask);
             } catch (...) {
-                state_->conns_.remove(ref);
+                removeconn(state_->conns_, ref);
             }
         }
 
@@ -264,15 +243,6 @@ namespace test {
             AUG_DEBUG("reading signal action");
 
             switch (readsig()) {
-            case AUG_SIGOTHER:
-                aug_info("received AUG_SIGOTHER");
-                break;
-            case AUG_SIGALARM:
-                aug_info("received AUG_SIGALARM");
-                break;
-            case AUG_SIGCHILD:
-                aug_info("received AUG_SIGCHILD");
-                break;
             case AUG_SIGRECONF:
                 aug_info("received AUG_SIGRECONF");
                 config(daemon_);
@@ -312,9 +282,9 @@ namespace test {
         connection(int fd, struct aug_conns& conns)
         {
             cstateptr ptr(state_->sfds_[fd]);
-            unsigned short events(state_->mplexer_.events(fd));
+            unsigned short bits(events(state_->mplexer_, fd));
 
-            if (events & AUG_EVENTRD) {
+            if (bits & AUG_EVENTRD) {
 
                 AUG_DEBUG("handling read event '%d'", fd);
 
@@ -325,15 +295,15 @@ namespace test {
                     return false;
                 }
 
-                state_->mplexer_.seteventmask(fd, AUG_EVENTRDWR);
+                seteventmask(state_->mplexer_, fd, AUG_EVENTRDWR);
                 ptr->timer_.cancel();
                 ptr->heartbeats_ = 0;
             }
 
-            if (events & AUG_EVENTWR) {
+            if (bits & AUG_EVENTWR) {
 
                 if (!ptr->buffer_.writesome(fd)) {
-                    state_->mplexer_.seteventmask(fd, AUG_EVENTRD);
+                    seteventmask(state_->mplexer_, fd, AUG_EVENTRD);
                     ptr->timer_.reset(5000);
                 }
             }
@@ -344,7 +314,7 @@ namespace test {
         bool
         do_poll(int fd, struct aug_conns& conns)
         {
-            if (!state_->mplexer_.events(fd))
+            if (!events(state_->mplexer_, fd))
                 return true;
 
             if (fd == aug_sigin())
@@ -405,22 +375,22 @@ namespace test {
                 if (state_->timers_.empty()) {
 
                     sigunblock();
-                    while (AUG_EINTR == (ret = state_->mplexer_.waitevents()))
+                    while (AUG_EINTR == (ret = waitevents(state_->mplexer_)))
                         ;
                     sigblock();
 
                 } else {
 
-                    state_->timers_.process(0 == ret, tv);
+                    process(state_->timers_, 0 == ret, tv);
 
                     sigunblock();
-                    while (AUG_EINTR == (ret = state_->mplexer_
-                                         .waitevents(tv)))
+                    while (AUG_EINTR == (ret = waitevents(state_
+                                                          ->mplexer_, tv)))
                         ;
                     sigblock();
                 }
 
-                state_->conns_.process();
+                processconns(state_->conns_);
             }
 
             aug_info("stopping daemon process");
@@ -795,8 +765,8 @@ pipe_(void* arg, int fd, struct aug_conns* conns)
     AUG_VERIFY(aug_readsig(&sig), "aug_readsig() failed");
 
     switch (sig) {
-    case AUG_SIGOTHER:
-        aug_info("received AUG_SIGOTHER");
+    case AUG_SIGSYSTEM:
+        aug_info("received AUG_SIGSYSTEM");
         break;
     case AUG_SIGALARM:
         aug_info("received AUG_SIGALARM");
@@ -814,6 +784,9 @@ pipe_(void* arg, int fd, struct aug_conns* conns)
     case AUG_SIGSTOP:
         aug_info("received AUG_SIGSTOP");
         quit_ = 1;
+        break;
+    case AUG_SIGUSER:
+        aug_info("received AUG_SIGUSER");
         break;
     }
     return 1;

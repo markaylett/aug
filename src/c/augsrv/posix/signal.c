@@ -16,11 +16,8 @@ aug_sigactions(void (*handler)(int))
         { SIGHUP, handler },
         { SIGINT, handler },
         { SIGUSR1, handler },
-        { SIGUSR2, SIG_DFL },
         { SIGPIPE, SIG_DFL },
-        { SIGALRM, handler },
-        { SIGTERM, handler },
-        { SIGCHLD, handler }
+        { SIGTERM, handler }
     };
 
     int i;

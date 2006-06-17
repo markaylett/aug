@@ -4,37 +4,10 @@
 #include "message.h"
 #include "state.h"
 
-#include "augsrv/control.h"
-#include "augsrv/daemon.h"
-#include "augsrv/global.h"
-#include "augsrv/log.h"
-#include "augsrv/main.h"
-#include "augsrv/options.h"
-#include "augsrv/signal.h"
-#include "augsrv/types.h"
-
-#include "augnet/conn.h"
-#include "augnet/inet.h"
-#include "augnet/parser.h"
-
-#include "augutil/conv.h"
-#include "augutil/file.h"
-#include "augutil/path.h"
-#include "augutil/timer.h"
-
-#include "augmar/mar.h"
-
-#include "augsys/base.h"
-#include "augsys/defs.h"
-#include "augsys/errno.h"
-#include "augsys/inet.h"
-#include "augsys/limits.h"
-#include "augsys/log.h"
-#include "augsys/mplexer.h"
-#include "augsys/socket.h"
-#include "augsys/string.h"
-#include "augsys/unistd.h"
-#include "augsys/utility.h"
+#include "augsrv.h"
+#include "augnet.h"
+#include "augutil.h"
+#include "augsys.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -311,7 +284,7 @@ config_(void* arg, int daemon)
 static int
 pipe_(void* arg, int fd, struct aug_conns* conns)
 {
-    enum aug_signal sig = AUG_SIGSTOP;
+    aug_sig_t sig;
 
     AUG_DEBUG("checking signal pipe '%d'", fd);
 
@@ -322,15 +295,6 @@ pipe_(void* arg, int fd, struct aug_conns* conns)
     AUG_VERIFY(aug_readsig(&sig), "aug_readsig() failed");
 
     switch (sig) {
-    case AUG_SIGOTHER:
-        aug_info("received AUG_SIGOTHER");
-        break;
-    case AUG_SIGALARM:
-        aug_info("received AUG_SIGALARM");
-        break;
-    case AUG_SIGCHILD:
-        aug_info("received AUG_SIGCHILD");
-        break;
     case AUG_SIGRECONF:
         aug_info("received AUG_SIGRECONF");
         AUG_VERIFY(config_(arg, daemon_), "failed to re-configure daemon");
