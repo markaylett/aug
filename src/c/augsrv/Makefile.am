@@ -45,4 +45,4 @@ TESTS = $(check_PROGRAMS)
 augsrv_test_SOURCES = test.c
 augsrv_test_LDADD = \
 	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-	$(EXTRALIBS)
+	$(EXTRA_LIBS)

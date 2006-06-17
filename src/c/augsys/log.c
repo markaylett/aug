@@ -2,8 +2,11 @@
    See the file COPYING for copying permission.
 */
 #define AUGSYS_BUILD
-#include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/log.h"
+
+static const char rcsid[] = "$Id:$";
+
+#include "augsys/defs.h" /* AUG_MAXLINE */
 
 #include <assert.h>
 #include <errno.h>

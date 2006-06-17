@@ -4,6 +4,8 @@
 #define AUGSRV_BUILD
 #include "augsrv/global.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include <stdlib.h> /* NULL */
 
 /* No protection is required around these statics: they are only set once,

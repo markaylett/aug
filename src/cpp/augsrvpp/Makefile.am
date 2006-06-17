@@ -7,7 +7,9 @@ modinclude_HEADERS = \
 	main.hpp \
 	signal.hpp
 
-lib_LTLIBRARIES = libaugsrvpp.la
+if ENABLE_CPPLIBS
+
+noinst_LTLIBRARIES = libaugsrvpp.la
 
 libaugsrvpp_la_SOURCES = \
 	config.cpp \
@@ -37,4 +39,6 @@ augsrvpp_test_LDADD = \
 	$(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la \
-	$(EXTRALIBS)
+	$(EXTRA_LIBS)
+
+endif

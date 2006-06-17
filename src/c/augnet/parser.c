@@ -4,6 +4,8 @@
 #define AUGNET_BUILD
 #include "augnet/parser.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augutil/conv.h"
 #include "augutil/lexer.h"
 

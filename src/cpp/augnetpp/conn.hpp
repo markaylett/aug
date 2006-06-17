@@ -11,6 +11,12 @@
 
 #include "augnet/conn.h"
 
+#include "augutil/list.h"
+
+#include "augsys/errno.h"
+#include "augsys/log.h"
+#include "augsys/string.h" // aug_perror()
+
 namespace aug {
 
     class AUGNETPP_API poll_base {
@@ -20,7 +26,9 @@ namespace aug {
 
     public:
         virtual
-        ~poll_base() NOTHROW;
+        ~poll_base() NOTHROW
+        {
+        }
 
         bool
         poll(int fd, struct aug_conns& conns)
@@ -41,14 +49,22 @@ namespace aug {
         operator =(const conns&);
 
     public:
-        ~conns() NOTHROW;
+        ~conns() NOTHROW
+        {
+            if (-1 == aug_freeconns(&conns_))
+                aug_perror("aug_freeconns() failed");
+        }
 
-        conns();
+        conns()
+        {
+            AUG_INIT(&conns_);
+        }
 
         operator struct aug_conns&()
         {
             return conns_;
         }
+
         struct aug_conns&
         get()
         {
@@ -56,11 +72,30 @@ namespace aug {
         }
 
         bool
-        empty() const;
+        empty() const
+        {
+            return AUG_EMPTY(&conns_);
+        }
     };
 
-    AUGNETPP_API void
-    insertconn(struct aug_conns& conns, fdref ref, poll_base& action);
+    namespace detail {
+
+        inline int
+        poll(void* arg, int id, struct aug_conns* conns)
+        {
+            try {
+                poll_base* ptr = static_cast<poll_base*>(arg);
+                return ptr->poll(id, *conns) ? 1 : 0;
+            } AUG_CATCHRETURN 0; /* false */
+        }
+    }
+
+    inline void
+    insertconn(struct aug_conns& conns, fdref ref, poll_base& action)
+    {
+        if (-1 == aug_insertconn(&conns, ref.get(), detail::poll, &action))
+            error("aug_insertconn() failed");
+    }
 
     inline void
     removeconn(struct aug_conns& conns, fdref ref)

@@ -10,6 +10,8 @@
 
 #include "augutil/path.h"
 
+#include "augsys/limits.h"
+
 #include <string>
 
 namespace aug {
@@ -22,8 +24,15 @@ namespace aug {
         return dst;
     }
 
-    AUGUTILPP_API std::string
-    realpath(const char* path);
+    inline std::string
+    realpath(const char* path)
+    {
+        char buf[AUG_PATH_MAX + 1];
+        if (!aug_realpath(buf, path, sizeof(buf)))
+            error("aug_realpath() failed");
+
+        return buf;
+    }
 }
 
 #endif // AUGUTILPP_PATH_HPP

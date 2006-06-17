@@ -4,6 +4,8 @@
 #define AUGUTIL_BUILD
 #include "augutil/log.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/defs.h"   /* AUG_MAXLINE */
 #include "augsys/time.h"
 #include "augsys/unistd.h" /* write() */
@@ -27,11 +29,7 @@
 /* The time format can defined by the build process if required. */
 
 #if !defined(AUG_TIMEFORMAT)
-# if !defined(_WIN32)
-#  define AUG_TIMEFORMAT "%h %e %T"
-# else /* WIN32 */
-#  define AUG_TIMEFORMAT "%c"
-# endif /* WIN32 */
+# define AUG_TIMEFORMAT "%b %d %H:%M:%S"
 #endif /* !AUG_TIMEFORMAT */
 
 static const char LABELS_[][7] = {

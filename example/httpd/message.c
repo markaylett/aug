@@ -3,13 +3,15 @@
 */
 #include "message.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/errno.h"
 #include "augsys/lock.h"
 
 #include <stdlib.h>
 
 static struct aug_messages free_ = AUG_HEAD_INITIALIZER(free_);
-AUG_ALLOCATOR(allocate_, &free_, aug_message, 64);
+AUG_ALLOCATOR(allocate_, &free_, aug_message, 64)
 
 struct aug_message*
 aug_createmessage(aug_dstr_t initial, aug_mar_t mar)

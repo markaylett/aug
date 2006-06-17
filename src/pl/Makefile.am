@@ -1,4 +1,4 @@
-AUG_MAR = Aug-Mar-0.1
+AUG_MAR = Aug-Mar-0.01
 
 EXTRA_DIST = \
 	$(AUG_MAR).tar.gz \
@@ -6,9 +6,9 @@ EXTRA_DIST = \
 
 dist-hook:
 	if test -d $(AUG_MAR); then \
-      (cd $(AUG_MAR) \
-        && AUG_HOME=$(prefix) perl Makefile.PL \
-        && rm -f $(AUG_MAR).tar.gz \
-        && make dist \
-        && mv $(AUG_MAR).tar.gz ../); \
-    fi
+		(cd $(AUG_MAR) \
+			&& AUG_HOME=$(prefix) perl Makefile.PL \
+			&& rm -f $(AUG_MAR).tar.gz \
+			&& make dist) \
+		&& mv $(AUG_MAR)/$(AUG_MAR).tar.gz ./; \
+	fi

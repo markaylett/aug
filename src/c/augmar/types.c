@@ -3,3 +3,5 @@
 */
 #define AUGMAR_BUILD
 #include "augmar/types.h"
+
+static const char rcsid[] = "$Id:$";

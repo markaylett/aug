@@ -14,7 +14,9 @@ modinclude_HEADERS = \
 	unistd.hpp \
 	utility.hpp
 
-lib_LTLIBRARIES = libaugsyspp.la
+if ENABLE_CPPLIBS
+
+noinst_LTLIBRARIES = libaugsyspp.la
 
 libaugsyspp_la_SOURCES = \
 	base.cpp \
@@ -43,3 +45,5 @@ augsyspp_test_SOURCES = test.cpp
 augsyspp_test_LDADD = \
 	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+endif

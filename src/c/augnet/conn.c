@@ -4,6 +4,8 @@
 #define AUGNET_BUILD
 #include "augnet/conn.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/errno.h"
 #include "augsys/lock.h"
 
@@ -17,7 +19,7 @@ struct aug_conn_ {
 };
 
 static struct aug_conns free_ = AUG_HEAD_INITIALIZER(free_);
-AUG_ALLOCATOR(allocate_, &free_, aug_conn_, 64);
+AUG_ALLOCATOR(allocate_, &free_, aug_conn_, 64)
 
 AUGNET_API int
 aug_freeconns(struct aug_conns* conns)
@@ -78,7 +80,8 @@ AUGNET_API int
 aug_processconns(struct aug_conns* conns)
 {
     struct aug_conn_* it, ** prev;
-    struct aug_conns tail = AUG_HEAD_INITIALIZER(tail);
+    struct aug_conns tail;
+    AUG_INIT(&tail);
 
     prev = &AUG_FIRST(conns);
     while ((it = *prev)) {

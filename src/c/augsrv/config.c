@@ -3,3 +3,5 @@
 */
 #define AUGSRV_BUILD
 #include "augsrv/config.h"
+
+static const char rcsid[] = "$Id:$";

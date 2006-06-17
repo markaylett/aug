@@ -4,6 +4,8 @@
 #define AUGSRV_BUILD
 #include "augsrv/main.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsrv/control.h"
 #include "augsrv/daemon.h"
 #include "augsrv/global.h"

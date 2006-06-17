@@ -4,6 +4,8 @@
 #define AUGNET_BUILD
 #include "augnet/inet.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augutil/conv.h"
 
 #include "augsys/inet.h"   /* aug_inetaton() */
@@ -13,6 +15,8 @@
 #if !defined(_WIN32)
 # include <alloca.h>
 # include <netdb.h>        /* gethostbyname() */
+# include <netinet/in.h>
+# include <netinet/tcp.h>
 #else /* _WIN32 */
 # include <malloc.h>
 #endif /* _WIN32 */
@@ -21,7 +25,7 @@
 #include <string.h>        /* strchr() */
 
 AUGNET_API int
-aug_openpassive(const struct sockaddr_in* addr)
+aug_tcplisten(const struct sockaddr_in* addr)
 {
     static const int ON = 1;
 
@@ -99,4 +103,10 @@ aug_parseinet(struct sockaddr_in* dst, const char* src)
  fail:
 	errno = EINVAL;
 	return NULL;
+}
+
+AUGNET_API int
+aug_setnodelay(int fd, int on)
+{
+    return aug_setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
 }

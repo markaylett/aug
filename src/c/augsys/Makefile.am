@@ -66,4 +66,4 @@ TESTS = $(check_PROGRAMS)
 augsys_test_SOURCES = test.c
 augsys_test_LDADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la \
-	$(EXTRALIBS)
+	$(EXTRA_LIBS)

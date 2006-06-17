@@ -4,6 +4,8 @@
 #define AUGUTIL_BUILD
 #include "augutil/file.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/defs.h"
 
 #include <ctype.h>

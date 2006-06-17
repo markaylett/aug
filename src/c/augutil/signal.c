@@ -4,6 +4,8 @@
 #define AUGUTIL_BUILD
 #include "augutil/signal.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/errno.h"
 #include "augsys/unistd.h"
 

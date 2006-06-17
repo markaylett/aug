@@ -4,6 +4,8 @@
 #define AUGSRV_BUILD
 #include "augsrv/log.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if !defined(_WIN32)
 # include "augsrv/posix/log.c"
 #else /* _WIN32 */

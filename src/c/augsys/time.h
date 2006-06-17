@@ -13,13 +13,13 @@
 
 #if !defined(_WIN32)
 # include <sys/time.h>
-#else // _WIN32
+#else /* _WIN32 */
 # include <winsock2.h>
 struct timezone {
     int tz_minuteswest;
     int tz_dsttime;
 };
-#endif // _WIN32
+#endif /* _WIN32 */
 
 AUGSYS_API int
 aug_gettimeofday(struct timeval* tv, struct timezone* tz);

@@ -4,6 +4,8 @@
 #define AUGSYS_BUILD
 #include "augsys/time.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if HAVE_CONFIG_H
 # include <config.h>
 #endif /* HAVE_CONFIG_H */

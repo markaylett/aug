@@ -3,3 +3,5 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/windows.h"
+
+static const char rcsid[] = "$Id:$";

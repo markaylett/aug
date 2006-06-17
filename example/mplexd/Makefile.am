@@ -1,15 +1,13 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
+if ENABLE_CPPLIBS
+
 EXTRA_DIST = test.pl
 
 bin_PROGRAMS = mplexd
 
 mplexd_SOURCES = \
-	message.cpp \
-	message.hpp \
-	mplexd.cpp \
-	state.cpp \
-	state.hpp
+	mplexd.cpp
 
 mplexd_LDADD = \
 	$(top_srcdir)/src/cpp/augnetpp/libaugnetpp.la \
@@ -21,4 +19,6 @@ mplexd_LDADD = \
 	$(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la \
-	$(EXTRALIBS)
+	$(EXTRA_LIBS)
+
+endif

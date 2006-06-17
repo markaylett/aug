@@ -6,20 +6,40 @@
 
 #include "augutilpp/config.hpp"
 
+#include "augsyspp/exception.hpp"
+
 #include "augutil/conv.h"
 
 #include <string>
 
 namespace aug {
 
-    AUGUTILPP_API unsigned long
-    strtoul(const char* src, int base);
+    inline unsigned long
+    strtoul(const char* src, int base)
+    {
+        unsigned long ul;
+        if (-1 == aug_strtoul(&ul, src, base))
+            error("aug_strtoul() failed");
+        return ul;
+    }
 
-    AUGUTILPP_API unsigned int
-    strtoui(const char* src, int base);
+    inline unsigned int
+    strtoui(const char* src, int base)
+    {
+        unsigned int ui;
+        if (-1 == aug_strtoui(&ui, src, base))
+            error("aug_strtoui() failed");
+        return ui;
+    }
 
-    AUGUTILPP_API unsigned short
-    strtous(const char* src, int base);
+    inline unsigned short
+    strtous(const char* src, int base)
+    {
+        unsigned short us;
+        if (-1 == aug_strtous(&us, src, base))
+            error("aug_strtous() failed");
+        return us;
+    }
 }
 
 #endif // AUGUTILPP_CONV_HPP

@@ -4,6 +4,8 @@
 #define AUGMAR_BUILD
 #include "augmar/format_.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if !defined(_WIN32)
 
 # include <string.h>

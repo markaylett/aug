@@ -6,7 +6,9 @@ modinclude_HEADERS = \
 	conn.hpp \
 	inet.hpp
 
-lib_LTLIBRARIES = libaugnetpp.la
+if ENABLE_CPPLIBS
+
+noinst_LTLIBRARIES = libaugnetpp.la
 
 libaugnetpp_la_SOURCES = \
 	config.cpp \
@@ -36,4 +38,6 @@ augnetpp_test_LDADD = \
 	$(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la \
-	$(EXTRALIBS)
+	$(EXTRA_LIBS)
+
+endif

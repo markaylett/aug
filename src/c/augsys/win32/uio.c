@@ -13,7 +13,8 @@ aug_readv(int fd, const struct iovec* iov, int size)
 {
     HANDLE h = (HANDLE)_get_osfhandle(fd);
     WSABUF* buf;
-    ssize_t i, num;
+    int i;
+    DWORD num;
 
 #if defined(_MSC_VER)
 	__try {
@@ -37,7 +38,7 @@ aug_readv(int fd, const struct iovec* iov, int size)
         return -1;
     }
 
-    return num;
+    return (ssize_t)num;
 }
 
 AUGSYS_API ssize_t
@@ -45,7 +46,8 @@ aug_writev(int fd, const struct iovec* iov, int size)
 {
     HANDLE h = (HANDLE)_get_osfhandle(fd);
     WSABUF* buf;
-    ssize_t i, num;
+    int i;
+    DWORD num;
 
 #if defined(_MSC_VER)
 	__try {
@@ -69,5 +71,5 @@ aug_writev(int fd, const struct iovec* iov, int size)
         return -1;
     }
 
-    return num;
+    return (ssize_t)num;
 }

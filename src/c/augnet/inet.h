@@ -9,9 +9,12 @@
 struct sockaddr_in;
 
 AUGNET_API int
-aug_openpassive(const struct sockaddr_in* addr);
+aug_tcplisten(const struct sockaddr_in* addr);
 
 AUGNET_API struct sockaddr_in*
 aug_parseinet(struct sockaddr_in* dst, const char* src);
+
+AUGNET_API int
+aug_setnodelay(int fd, int on);
 
 #endif /* AUGNET_INET_H */

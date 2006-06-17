@@ -4,6 +4,8 @@
 #define AUGUTIL_BUILD
 #include "augutil/lexer.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/defs.h" /* AUG_MAXLINE */
 
 #include <ctype.h>       /* isspace() */

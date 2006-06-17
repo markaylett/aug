@@ -4,6 +4,8 @@
 #define AUGUTIL_BUILD
 #include "augutil/timer.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/errno.h"
 #include "augsys/lock.h"
 #include "augsys/time.h"
@@ -20,7 +22,7 @@ struct aug_timer_ {
 };
 
 static struct aug_timers free_ = AUG_HEAD_INITIALIZER(free_);
-AUG_ALLOCATOR(allocate_, &free_, aug_timer_, 64);
+AUG_ALLOCATOR(allocate_, &free_, aug_timer_, 64)
 
 static int
 expiry_(struct timeval* tv, unsigned int ms)

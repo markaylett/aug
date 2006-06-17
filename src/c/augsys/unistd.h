@@ -9,12 +9,12 @@
 
 #if !defined(_WIN32)
 # include <unistd.h>
-#else // _WIN32
+#else /* _WIN32 */
 # include <direct.h>
 # include <io.h>
 # define ftruncate _chsize
 # define fsync _commit
-#endif // _WIN32
+#endif /* _WIN32 */
 
 AUGSYS_API int
 aug_close(int fd);

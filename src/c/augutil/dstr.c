@@ -4,6 +4,8 @@
 #define AUGUTIL_BUILD
 #include "augutil/dstr.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/defs.h" /* AUG_MAX */
 
 #include <stdlib.h>      /* malloc() */

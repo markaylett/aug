@@ -4,6 +4,8 @@
 #define AUGSYS_BUILD
 #include "augsys/lock.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/errno.h"
 #include "augsys/mutex.h"
 

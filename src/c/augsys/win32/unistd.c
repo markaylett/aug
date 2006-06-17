@@ -33,7 +33,7 @@ aug_read(int fd, void* buf, size_t size)
 {
     HANDLE h = (HANDLE)_get_osfhandle(fd);
     int type;
-    ssize_t num;
+    DWORD num;
 
     if (-1 == (type = aug_fdtype(fd)))
         return -1;
@@ -51,7 +51,7 @@ aug_read(int fd, void* buf, size_t size)
             return -1;
         }
     }
-    return num;
+    return (ssize_t)num;
 }
 
 AUGSYS_API ssize_t
@@ -59,7 +59,7 @@ aug_write(int fd, const void* buf, size_t size)
 {
     HANDLE h = (HANDLE)_get_osfhandle(fd);
     int type;
-    ssize_t num;
+    DWORD num;
 
     if (-1 == (type = aug_fdtype(fd)))
         return -1;
@@ -77,5 +77,5 @@ aug_write(int fd, const void* buf, size_t size)
             return -1;
         }
     }
-    return num;
+    return (ssize_t)num;
 }

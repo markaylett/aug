@@ -6,7 +6,13 @@
 
 #include "augsrvpp/config.hpp"
 
+#include "augsyspp/exception.hpp"
+
+#include "augsrv/main.h"
 #include "augsrv/types.h"
+
+#include "augsys/errno.h"
+#include "augsys/log.h"
 
 namespace aug {
 
@@ -26,7 +32,9 @@ namespace aug {
 
     public:
         virtual
-        ~service_base() NOTHROW;
+        ~service_base() NOTHROW
+        {
+        }
 
         const char*
         getopt(enum aug_option opt)
@@ -53,9 +61,66 @@ namespace aug {
         }
     };
 
-    AUGSRVPP_API void
+    namespace detail {
+
+        inline const char*
+        getopt(void* arg, enum aug_option opt)
+        {
+            try {
+                service_base* ptr = static_cast<service_base*>(arg);
+                return ptr->getopt(opt);
+            } AUG_CATCHRETURN 0;
+        }
+
+        inline int
+        config(void* arg, const char* conffile, int daemon)
+        {
+            try {
+                service_base* ptr = static_cast<service_base*>(arg);
+                ptr->config(conffile, daemon ? true : false);
+                return 0;
+            } AUG_CATCHRETURN -1;
+        }
+
+        inline int
+        init(void* arg)
+        {
+            try {
+                service_base* ptr = static_cast<service_base*>(arg);
+                ptr->init();
+                return 0;
+            } AUG_CATCHRETURN -1;
+        }
+
+        inline int
+        run(void* arg)
+        {
+            try {
+                service_base* ptr = static_cast<service_base*>(arg);
+                ptr->run();
+                return 0;
+            } AUG_CATCHRETURN -1;
+        }
+    }
+
+    inline void
     main(service_base& service, const char* program, const char* lname,
-         const char* sname, const char* admin, int argc, char* argv[]);
+         const char* sname, const char* admin, int argc, char* argv[])
+    {
+        struct aug_service s = {
+            detail::getopt,
+            detail::config,
+            detail::init,
+            detail::run,
+            program,
+            lname,
+            sname,
+            admin,
+            &service
+        };
+
+        aug_main(&s, argc, argv);
+    }
 }
 
 #endif // AUGSRVPP_MAIN_HPP

@@ -4,6 +4,8 @@
 #define AUGMAR_BUILD
 #include "augmar/flags_.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augmar/types.h"
 
 #include "augsys/log.h"

@@ -9,9 +9,9 @@
 #if !defined(_WIN32)
 # include <netinet/in.h>
 # include <arpa/inet.h>
-#else // _WIN32
+#else /* _WIN32 */
 # include <winsock2.h>
-#endif // _WIN32
+#endif /* _WIN32 */
 
 AUGSYS_API int
 aug_inetaton(const char *cp, struct in_addr *addr);

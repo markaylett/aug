@@ -3,3 +3,5 @@
 */
 #define AUGNET_BUILD
 #include "augnet/config.h"
+
+static const char rcsid[] = "$Id:$";

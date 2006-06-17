@@ -1,6 +1,9 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+
+static const char rcsid[] = "$Id:$";
+
 #include "message.h"
 #include "state.h"
 
@@ -142,7 +145,7 @@ conn_(void* arg, int fd, struct aug_conns* conns)
         if (!aug_pending(state)) {
             aug_seteventmask(mplexer_, fd, AUG_EVENTRD);
 
-            // For HTTP test.
+            /* For HTTP test. */
             goto fail;
         }
     }
@@ -321,7 +324,7 @@ init_(void* arg)
     if (!aug_parseinet(&addr, address_))
         goto fail1;
 
-    if (-1 == (fd_ = aug_openpassive(&addr)))
+    if (-1 == (fd_ = aug_tcplisten(&addr)))
         goto fail1;
 
     if (-1 == aug_insertconn(&conns_, fd_, listener_, mplexer_))
@@ -386,16 +389,19 @@ term_(void)
 int
 main(int argc, char* argv[])
 {
-    struct aug_service service = {
+    static struct aug_service service = {
         getopt_,
         config_,
         init_,
         run_,
-        argv[0],
+        NULL,
         "HTTP Daemon",
         "httpd",
-        "Mark Aylett <mark@emantic.co.uk>"
+        "Mark Aylett <mark@emantic.co.uk>",
+        NULL
     };
+
+    service.program_ = argv[0];
 
     aug_init();
     atexit(term_);

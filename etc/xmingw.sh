@@ -1,12 +1,14 @@
 #!/bin/sh
 
-PATH=/opt/xmingw/bin:$PATH; export PATH
+CC='i586-mingw32msvc-gcc'; export CC
+CFLAGS='-O2 -Wall -pedantic'; export CFLAGS
 
-CFLAGS='-O2 -Wall'; export CFLAGS
+CXX='i586-mingw32msvc-g++'; export CXX
 CXXFLAGS="$CFLAGS -Wno-deprecated"; export CXXFLAGS
 
 rm -f config.cache && sh ./configure \
     --enable-maintainer-mode \
-    --prefix=$HOME/i386-mingw32msvc \
-    --host=i386-mingw32msvc \
-    --build=i686-pc-linux-gnu
+    --build=i586-pc-linux-gnu \
+    --host=i586-pc-mingw32msvc \
+    --target=i586-pc-mingw32msvc \
+    --prefix=$HOME/i586-mingw32msvc

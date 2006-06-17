@@ -4,6 +4,8 @@
 #define AUGUTIL_BUILD
 #include "augutil/conv.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include <errno.h>
 #include <limits.h> /* UINT_MAX */
 #include <stdlib.h> /* strtoul() */

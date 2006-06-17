@@ -3,3 +3,5 @@
 */
 #define AUGUTIL_BUILD
 #include "augutil/list.h"
+
+static const char rcsid[] = "$Id:$";

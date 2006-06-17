@@ -10,8 +10,8 @@
 #if defined(_WIN32)
 # if defined(_MSC_VER)
 typedef int ssize_t;
-# endif /* _MSC_VER */
 typedef void* caddr_t;
+# endif /* _MSC_VER */
 #endif /* _WIN32 */
 
 enum aug_loglevel {

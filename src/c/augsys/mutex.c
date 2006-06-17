@@ -4,6 +4,8 @@
 #define AUGSYS_BUILD
 #include "augsys/mutex.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if !defined(_MT)
 
 struct aug_mutex_ { char dummy_; };

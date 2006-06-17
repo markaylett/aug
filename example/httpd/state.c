@@ -3,6 +3,8 @@
 */
 #include "state.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "message.h"
 
 #include "augnet/parser.h"
@@ -108,7 +110,12 @@ static int
 setfield_(void* arg, const char* name, const char* value)
 {
     aug_state_t state = arg;
-    struct aug_field field = { name, value, strlen(value) };
+    struct aug_field field;
+
+    field.name_ = name;
+    field.value_ = value;
+    field.size_ = strlen(value);
+
     if (!state->in_.mar_)
         state->in_.mar_ = aug_createmar();
     aug_setfield(state->in_.mar_, &field, NULL);

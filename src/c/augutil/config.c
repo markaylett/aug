@@ -3,3 +3,5 @@
 */
 #define AUGUTIL_BUILD
 #include "augutil/config.h"
+
+static const char rcsid[] = "$Id:$";

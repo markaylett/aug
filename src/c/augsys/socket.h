@@ -9,15 +9,15 @@
 
 #if !defined(_WIN32)
 # include <sys/socket.h>
-#else // _WIN32
+#else /* _WIN32 */
 # include <winsock2.h>
 # if !defined(SHUT_RD)
 #  define SHUT_RD SD_RECV
 #  define SHUT_WR SD_SEND
 #  define SHUT_RDWR SD_BOTH
-# endif // !SHUT_RD
-typedef unsigned int socklen_t;
-#endif // _WIN32
+# endif /* !SHUT_RD */
+typedef int socklen_t;
+#endif /* _WIN32 */
 
 AUGSYS_API int
 aug_socket(int domain, int type, int protocol);

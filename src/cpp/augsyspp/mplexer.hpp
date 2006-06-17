@@ -8,6 +8,9 @@
 #include "augsyspp/smartfd.hpp"
 
 #include "augsys/mplexer.h"
+#include "augsys/string.h" // aug_perror()
+
+#include <cerrno>
 
 namespace aug {
 
@@ -21,7 +24,11 @@ namespace aug {
         operator =(const mplexer&);
 
     public:
-        ~mplexer() NOTHROW;
+        ~mplexer() NOTHROW
+        {
+            if (-1 == aug_freemplexer(mplexer_))
+                aug_perror("aug_freemplexer() failed");
+        }
 
         mplexer()
             : mplexer_(aug_createmplexer())
@@ -29,10 +36,12 @@ namespace aug {
             if (!mplexer_)
                 error("aug_createmplexer() failed");
         }
+
         operator aug_mplexer_t()
         {
             return mplexer_;
         }
+
         aug_mplexer_t
         get()
         {
@@ -49,20 +58,54 @@ namespace aug {
 
     // Returns AUG_EINTR if the system call was interrupted.
 
-    int
-    waitevents(aug_mplexer_t mplexer, const struct timeval& timeout);
+    inline int
+    waitevents(aug_mplexer_t mplexer, const struct timeval& timeout)
+    {
+        int ret(aug_waitevents(mplexer, &timeout));
+        if (-1 == ret)
+            error("aug_waitevents() failed");
+        return ret;
+    }
 
-    int
-    waitevents(aug_mplexer_t mplexer);
+    inline int
+    waitevents(aug_mplexer_t mplexer)
+    {
+        int ret(aug_waitevents(mplexer, 0));
+        if (-1 == ret)
+            error("aug_waitevents() failed");
+        return ret;
+    }
 
-    unsigned short
-    eventmask(aug_mplexer_t mplexer, fdref ref);
+    inline unsigned short
+    eventmask(aug_mplexer_t mplexer, fdref ref)
+    {
+        int ret(aug_eventmask(mplexer, ref.get()));
+        if (-1 == ret)
+            error("aug_eventmask() failed");
 
-    unsigned short
-    events(aug_mplexer_t mplexer, fdref ref);
+        return ret;
+    }
 
-    std::pair<smartfd, smartfd>
-    mplexerpipe();
+    inline unsigned short
+    events(aug_mplexer_t mplexer, fdref ref)
+    {
+        int ret(aug_events(mplexer, ref.get()));
+        if (-1 == ret)
+            error("aug_events() failed");
+
+        return ret;
+    }
+
+    inline std::pair<smartfd, smartfd>
+    mplexerpipe()
+    {
+        int fds[2];
+        if (-1 == aug_mplexerpipe(fds))
+            error("aug_mplexerpipe() failed");
+
+        return std::make_pair(smartfd::attach(fds[0]),
+                              smartfd::attach(fds[1]));
+    }
 }
 
 #endif // AUGSYSPP_MPLEXER_HPP

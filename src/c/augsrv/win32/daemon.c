@@ -123,9 +123,11 @@ aug_daemonise(const struct aug_service* service)
 {
     int ret = 0;
     SERVICE_TABLE_ENTRY table[] = {
-        { (char*)service->sname_,  start_ },
+        { NULL,  start_ },
         { NULL, NULL }
     };
+
+    table[0].lpServiceName = (char*)service->sname_;
 
     if (!StartServiceCtrlDispatcher(table)) {
 

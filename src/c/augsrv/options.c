@@ -4,6 +4,8 @@
 #define AUGSRV_BUILD
 #include "augsrv/options.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsrv/types.h"  /* struct aug_service */
 
 #include "augutil/path.h"  /* aug_basename() */

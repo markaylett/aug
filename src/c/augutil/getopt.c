@@ -15,6 +15,9 @@
 
 #define AUGUTIL_BUILD
 #include "augutil/getopt.h"
+
+static const char rcsid[] = "$Id:$";
+
 #include <stdio.h>
 
 #ifdef    lint

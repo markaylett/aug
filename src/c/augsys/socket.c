@@ -4,6 +4,8 @@
 #define AUGSYS_BUILD
 #include "augsys/socket.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if !defined(_WIN32)
 # include "augsys/posix/socket.c"
 #else /* _WIN32 */

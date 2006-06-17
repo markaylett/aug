@@ -8,6 +8,7 @@
 #include "augsyspp/types.hpp"
 
 #include "augsys/base.h"
+#include "augsys/string.h" // aug_perror()
 
 namespace aug {
 
@@ -85,9 +86,16 @@ namespace aug {
         operator =(const initialiser& rhs);
 
     public:
-        ~initialiser() NOTHROW;
+        ~initialiser() NOTHROW
+        {
+            if (-1 == aug_term())
+                aug_perror("aug_term() failed");
+        }
 
-        initialiser();
+        initialiser()
+        {
+            init();
+        }
     };
 }
 

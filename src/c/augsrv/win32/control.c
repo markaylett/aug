@@ -67,11 +67,13 @@ static int
 start_(SC_HANDLE scm, const struct aug_service* service)
 {
     SC_HANDLE serv;
-    const char* argv[] = {
-        "-f", (*service->getopt_)(service->arg_, AUG_OPTCONFFILE)
-    };
     BOOL b;
     int ret = 0;
+    const char* argv[] = {
+        "-f", NULL
+    };
+
+    argv[1] = (*service->getopt_)(service->arg_, AUG_OPTCONFFILE);
 
     if (!(serv = OpenService(scm, service->sname_, SERVICE_START))) {
 

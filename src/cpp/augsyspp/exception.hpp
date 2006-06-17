@@ -6,17 +6,39 @@
 
 #include "augsyspp/config.hpp"
 
+#include "augsys/string.h" // aug_strerror()
+
+#include <cerrno>
 #include <stdexcept>
 
 namespace aug {
 
+    namespace detail {
+
+        inline std::string
+        makewhat(const std::string& s, int num)
+        {
+            std::string what(s);
+            what += ": ";
+            what += aug_strerror(num);
+            return what;
+        }
+    }
+
     class AUGSYSPP_API posix_error : public std::runtime_error {
         const int num_;
     public:
-        explicit
-        posix_error(const std::string& s);
+        posix_error(const std::string& s)
+            : std::runtime_error(detail::makewhat(s, errno)),
+              num_(errno)
+        {
+        }
 
-        posix_error(const std::string& s, int num);
+        posix_error(const std::string& s, int num)
+            : std::runtime_error(detail::makewhat(s, num)),
+              num_(num)
+        {
+        }
 
         int
         num() const NOTHROW
@@ -27,27 +49,44 @@ namespace aug {
 
     class AUGSYSPP_API intr_error : public posix_error {
     public:
-        explicit
-        intr_error(const std::string& s);
+        intr_error(const std::string& s)
+            : posix_error(s, EINTR)
+        {
+        }
     };
 
     class AUGSYSPP_API null_error : public std::exception {
     public:
         const char*
-        what() const NOTHROW;
+        what() const NOTHROW
+        {
+            return "null exception";
+        }
     };
 
     class AUGSYSPP_API timeout_error : public std::exception {
     public:
         const char*
-        what() const NOTHROW;
+        what() const NOTHROW
+        {
+            return "timeout exception";
+        }
     };
 
-    AUGSYSPP_API void
-    error(const std::string& s);
+    inline void
+    error(const std::string& s, int num)
+    {
+        if (EINTR == num)
+            throw intr_error(s);
 
-    AUGSYSPP_API void
-    error(const std::string& s, int num);
+        throw posix_error(s, num);
+    }
+
+    inline void
+    error(const std::string& s)
+    {
+        error(s, errno);
+    }
 }
 
 #define AUG_CATCHRETURN \

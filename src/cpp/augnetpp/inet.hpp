@@ -13,8 +13,23 @@
 
 namespace aug {
 
-    AUGNETPP_API smartfd
-    openpassive(const struct sockaddr_in& addr);
+    inline smartfd
+    tcplisten(const struct sockaddr_in& addr)
+    {
+        smartfd sfd(smartfd::attach(aug_tcplisten(&addr)));
+        if (null == sfd)
+            error("aug_tcplisten() failed");
+
+        return sfd;
+    }
+
+    inline void
+    setnodelay(fdref ref, bool on)
+    {
+        int value(on ? 1 : 0);
+        if (-1 == aug_setnodelay(ref.get(), value))
+            error("aug_setnodelay() failed");
+    }
 
     inline struct sockaddr_in&
     parseinet(struct sockaddr_in& dst, const char* src)

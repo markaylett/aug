@@ -4,6 +4,8 @@
 #define AUGSYS_BUILD
 #include "augsys/unistd.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if !defined(_WIN32)
 # include "augsys/posix/unistd.c"
 #else /* _WIN32 */

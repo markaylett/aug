@@ -3,16 +3,3 @@
 */
 #define AUGNETPP_BUILD
 #include "augnetpp/inet.hpp"
-
-using namespace aug;
-using namespace std;
-
-AUGNETPP_API smartfd
-aug::openpassive(const struct sockaddr_in& addr)
-{
-    smartfd sfd(smartfd::attach(aug_openpassive(&addr)));
-    if (null == sfd)
-        error("aug_openpassive() failed");
-
-    return sfd;
-}

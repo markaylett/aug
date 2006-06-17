@@ -3,6 +3,8 @@
 */
 #include "mar/utility.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/errno.h"
 

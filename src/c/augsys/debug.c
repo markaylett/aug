@@ -4,6 +4,8 @@
 #define AUGSYS_BUILD
 #include "augsys/debug.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/log.h"
 
 #if defined(_MSC_VER) && !defined(NDEBUG)

@@ -10,7 +10,9 @@ modinclude_HEADERS = \
 	signal.hpp \
 	timer.hpp
 
-lib_LTLIBRARIES = libaugutilpp.la
+if ENABLE_CPPLIBS
+
+noinst_LTLIBRARIES = libaugutilpp.la
 
 libaugutilpp_la_SOURCES = \
 	config.cpp \
@@ -42,4 +44,6 @@ augutilpp_test_LDADD = \
 	$(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la \
-	$(EXTRALIBS)
+	$(EXTRA_LIBS)
+
+endif

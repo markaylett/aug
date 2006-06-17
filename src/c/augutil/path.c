@@ -4,6 +4,8 @@
 #define AUGUTIL_BUILD
 #include "augutil/path.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augsys/limits.h" /* AUG_PATH_MAX */
 #include "augsys/string.h"
 #include "augsys/unistd.h"

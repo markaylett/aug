@@ -4,6 +4,8 @@
 #define AUGMAR_BUILD
 #include "augmar/mfile_.h"
 
+static const char rcsid[] = "$Id:$";
+
 #include "augmar/file_.h"
 #include "augmar/format_.h"
 

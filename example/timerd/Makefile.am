@@ -1,5 +1,7 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
+if ENABLE_CPPLIBS
+
 bin_PROGRAMS = timerd
 
 timerd_SOURCES = \
@@ -14,4 +16,6 @@ timerd_LDADD = \
 	$(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la \
-	$(EXTRALIBS)
+	$(EXTRA_LIBS)
+
+endif

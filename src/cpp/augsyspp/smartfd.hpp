@@ -4,34 +4,67 @@
 #ifndef AUGSYSPP_SMARTFD_HPP
 #define AUGSYSPP_SMARTFD_HPP
 
+#include "augsyspp/base.hpp"
 #include "augsyspp/types.hpp"
+
+#include "augsys/string.h" // aug_perror()
+
+#include <algorithm>       // swap()
 
 namespace aug {
 
     class AUGSYSPP_API smartfd {
         fdref ref_;
 
-        explicit
-        smartfd(fdref ref, bool retain) NOTHROW;
+        smartfd(fdref ref, bool retain) NOTHROW
+        : ref_(ref)
+        {
+            if (retain && null != ref)
+                retainfd(ref.get());
+        }
 
     public:
-        ~smartfd() NOTHROW;
+        ~smartfd() NOTHROW
+        {
+            if (null != ref_ && -1 == aug_releasefd(ref_.get()))
+                aug_perror("aug_releasefd() failed");
+        }
 
         smartfd(const null_&) NOTHROW
             : ref_(null)
         {
         }
 
-        smartfd(const smartfd& rhs);
+        smartfd(const smartfd& rhs)
+            : ref_(rhs.ref_)
+        {
+            if (null != ref_)
+                retainfd(ref_.get());
+        }
 
         smartfd&
-        operator =(const smartfd& rhs);
+        operator =(const smartfd& rhs)
+        {
+            smartfd tmp(rhs);
+            swap(tmp);
+            return *this;
+        }
 
         void
-        swap(smartfd& rhs) NOTHROW;
+        swap(smartfd& rhs) NOTHROW
+        {
+            std::swap(ref_, rhs.ref_);
+        }
 
         void
-        release();
+        release()
+        {
+            if (null != ref_) {
+                fdref ref(ref_);
+                ref_ = null;
+                releasefd(ref.get());
+            }
+        }
 
         static smartfd
         attach(int fd)
@@ -49,6 +82,7 @@ namespace aug {
         {
             return ref_;
         }
+
         int
         get() const
         {

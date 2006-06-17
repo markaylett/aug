@@ -6,7 +6,12 @@
 
 #include "augutilpp/config.hpp"
 
+#include "augsyspp/exception.hpp"
+
 #include "augutil/file.h"
+
+#include "augsys/errno.h"
+#include "augsys/log.h"
 
 namespace aug {
 
@@ -17,7 +22,9 @@ namespace aug {
 
     public:
         virtual
-        ~setopt_base() NOTHROW;
+        ~setopt_base() NOTHROW
+        {
+        }
 
         void
         setopt(const char* name, const char* value)
@@ -26,8 +33,25 @@ namespace aug {
         }
     };
 
-    AUGUTILPP_API void
-    readconf(const char* path, setopt_base& action);
+    namespace detail {
+
+        inline int
+        setopt(void* arg, const char* name, const char* value)
+        {
+            try {
+                setopt_base* ptr = static_cast<setopt_base*>(arg);
+                ptr->setopt(name, value);
+                return 0;
+            } AUG_CATCHRETURN -1;
+        }
+    }
+
+    inline void
+    readconf(const char* path, setopt_base& action)
+    {
+        if (-1 == aug_readconf(path, detail::setopt, &action))
+            error("aug_readconf() failed");
+    }
 }
 
 #endif // AUGUTILPP_FILE_HPP

@@ -8,7 +8,12 @@
 
 #include "augsyspp/exception.hpp"
 
+#include "augutil/list.h"
 #include "augutil/timer.h"
+
+#include "augsys/errno.h"
+#include "augsys/log.h"
+#include "augsys/string.h" // aug_perror()
 
 namespace aug {
 
@@ -24,14 +29,22 @@ namespace aug {
         operator =(const timers&);
 
     public:
-        ~timers() NOTHROW;
+        ~timers() NOTHROW
+        {
+            if (-1 == aug_freetimers(&timers_))
+                aug_perror("aug_freetimers() failed");
+        }
 
-        timers();
+        timers()
+        {
+            AUG_INIT(&timers_);
+        }
 
         operator struct aug_timers&()
         {
             return timers_;
         }
+
         struct aug_timers&
         get()
         {
@@ -39,7 +52,10 @@ namespace aug {
         }
 
         bool
-        empty() const;
+        empty() const
+        {
+            return AUG_EMPTY(&timers_);
+        }
     };
 
     inline void
@@ -63,7 +79,9 @@ namespace aug {
 
     public:
         virtual
-        ~expire_base() NOTHROW;
+        ~expire_base() NOTHROW
+        {
+        }
 
         void
         expire(int id)
@@ -85,10 +103,21 @@ namespace aug {
         operator =(const timer&);
 
         static void
-        expire_(void* arg, int id);
+        expire_(void* arg, int id)
+        {
+            try {
+                timer* ptr = static_cast<timer*>(arg);
+                ptr->pending_ = false;
+                ptr->action_.expire(id);
+            } AUG_CATCHRETURN;
+        }
 
     public:
-        ~timer() NOTHROW;
+        ~timer() NOTHROW
+        {
+            if (pending() && -1 == aug_canceltimer(&timers_, id_))
+                aug_perror("aug_canceltimer() failed");
+        }
 
         timer(timers& timers, expire_base& action)
             : timers_(timers.timers_),
@@ -108,10 +137,29 @@ namespace aug {
         }
 
         void
-        cancel();
+        cancel()
+        {
+            if (pending()) {
+
+                int id(id_);
+                id_ = -1;
+                pending_ = false;
+
+                if (-1 == aug_canceltimer(&timers_, id))
+                    error("aug_canceltimer() failed");
+            }
+        }
 
         void
-        reset(unsigned int ms);
+        reset(unsigned int ms)
+        {
+            cancel();
+            int id(aug_settimer(&timers_, ms, expire_, this));
+            if (-1 == id)
+                error("aug_settimer() failed");
+            id_ = id;
+            pending_ = true;
+        }
 
         int
         get() const

@@ -4,6 +4,8 @@
 #define AUGSYS_BUILD
 #include "augsys/uio.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if !defined(_WIN32)
 # include "augsys/posix/uio.c"
 #else /* _WIN32 */

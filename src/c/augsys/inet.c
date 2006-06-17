@@ -50,6 +50,8 @@
 #define AUGSYS_BUILD
 #include "augsys/inet.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if !defined(_WIN32)
 # include <sys/types.h>
 # include <sys/param.h>

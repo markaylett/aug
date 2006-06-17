@@ -4,6 +4,8 @@
 #define AUGSYS_BUILD
 #include "augsys/mplexer.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if !defined(_WIN32)
 # include "augsys/posix/mplexer.c"
 #else /* _WIN32 */

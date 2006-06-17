@@ -1,6 +1,9 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+
+static const char rcsid[] = "$Id:$";
+
 #include "mar/getopt.h"
 #include "mar/utility.h"
 
@@ -93,24 +96,29 @@ extract_(aug_mar_t mar, const char* filename)
 static void
 help_(void)
 {
+    /* Help text is split to avoid compiler warnings regarding length of
+       string constant. */
+
+    static const char OPTIONHELP_[] =
+        "  -c           " COMPACTTEXT_ "\n"
+        "  -f           " FORCETEXT_ "\n"
+        "  -g name      " GETTEXT_ "\n"
+        "  -h           " HELPTEXT_ "\n"
+        "  -i filename  " INSERTTEXT_ "\n"
+        "  -l           " NAMESTEXT_ "\n"
+        "  -n           " SIZETEXT_ "\n"
+        "  -r           " REMOVETEXT_ "\n"
+        "  -s source    " SETTEXT_ "\n"
+        "  -t           " LISTTEXT_ "\n"
+        "  -u name      " UNSETTEXT_ "\n"
+        "  -x filename  " EXTRACTTEXT_ "\n"
+        "  -z           " ZEROTEXT_ "\n";
+
     printf("Message Archive Utility\n"
            "\nusage:\n"
            "  mar option... archivename\n"
-           "\noptions:\n"
-           "  -c           " COMPACTTEXT_ "\n"
-           "  -f           " FORCETEXT_ "\n"
-           "  -g name      " GETTEXT_ "\n"
-           "  -h           " HELPTEXT_ "\n"
-           "  -i filename  " INSERTTEXT_ "\n"
-           "  -l           " NAMESTEXT_ "\n"
-           "  -n           " SIZETEXT_ "\n"
-           "  -r           " REMOVETEXT_ "\n"
-           "  -s source    " SETTEXT_ "\n"
-           "  -t           " LISTTEXT_ "\n"
-           "  -u name      " UNSETTEXT_ "\n"
-           "  -x filename  " EXTRACTTEXT_ "\n"
-           "  -z           " ZEROTEXT_ "\n"
-           "\nreport bugs to <mark@emantic.co.uk>\n");
+           "\noptions:\n%s"
+           "\nreport bugs to <mark@emantic.co.uk>\n", OPTIONHELP_);
 }
 
 

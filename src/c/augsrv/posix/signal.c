@@ -9,30 +9,29 @@
 # include <pthread.h>
 #endif /* _MT */
 
+static const struct {
+    int sig_;
+    int dfl_;
+} handlers_[] = {
+    { SIGHUP, 0 },
+    { SIGINT, 0 },
+    { SIGUSR1, 0 },
+    { SIGPIPE, 1 },
+    { SIGTERM, 0 }
+};
+
 AUGSRV_API int
 aug_signalhandler(void (*handler)(int))
 {
-    const struct {
-        int sig_;
-        void (*handler_)(int);
-    }
-    handlers[] = {
-        { SIGHUP, handler },
-        { SIGINT, handler },
-        { SIGUSR1, handler },
-        { SIGPIPE, SIG_DFL },
-        { SIGTERM, handler }
-    };
-
     int i;
     struct sigaction sa;
     bzero(&sa, sizeof(sa));
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
 
-    for (i = 0; i < sizeof(handlers) / sizeof(handlers[0]); ++i) {
-        sa.sa_handler = handlers[i].handler_;
-        if (-1 == sigaction(handlers[i].sig_, &sa, NULL))
+    for (i = 0; i < sizeof(handlers_) / sizeof(handlers_[0]); ++i) {
+        sa.sa_handler = handlers_[i].dfl_ ? SIG_DFL : handler;
+        if (-1 == sigaction(handlers_[i].sig_, &sa, NULL))
             return -1;
     }
     return 0;

@@ -13,7 +13,9 @@ modinclude_HEADERS = \
 	swapfile.hpp \
 	types.hpp
 
-lib_LTLIBRARIES = libaugmarpp.la
+if ENABLE_CPPLIBS
+
+noinst_LTLIBRARIES = libaugmarpp.la
 
 libaugmarpp_la_SOURCES = \
 	mar.cpp \
@@ -43,3 +45,5 @@ augmarpp_test_SOURCES = test.cpp
 augmarpp_test_LDADD = \
 	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
 	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
+
+endif

@@ -4,6 +4,8 @@
 #define AUGSYS_BUILD
 #include "augsys/errno.h"
 
+static const char rcsid[] = "$Id:$";
+
 #if defined(_WIN32)
 
 #include <winsock2.h>
