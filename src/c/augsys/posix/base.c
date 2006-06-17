@@ -5,7 +5,6 @@
 #include "augsys/lock.h"
 #include "augsys/log.h"
 
-#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -89,6 +88,10 @@ static struct aug_fddriver driver_ = {
 AUGSYS_API int
 aug_init(struct aug_errinfo* errinfo)
 {
+    int ret = retain_();
+    if (PROCEED_ != ret)
+        return ret;
+
     if (-1 == aug_initlock_())
         return -1;
 
@@ -103,6 +106,10 @@ aug_init(struct aug_errinfo* errinfo)
 AUGSYS_API int
 aug_term(void)
 {
+    int ret = release_();
+    if (PROCEED_ != ret)
+        return ret;
+
     aug_setlogger(NULL);
 
     if (-1 == aug_termerrinfo_()) {

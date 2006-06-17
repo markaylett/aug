@@ -275,6 +275,3 @@ aug_perrinfo(const char* s)
     return aug_error("%s: %d: %s: %s", file, errinfo->line_,
                      s, errinfo->desc_);
 }
-
-
-

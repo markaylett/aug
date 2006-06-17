@@ -2,7 +2,6 @@
    See the file COPYING for copying permission.
 */
 #include "augsys/errinfo.h"
-#include "augsys/errno.h"
 #include "augsys/lock.h"
 #include "augsys/log.h"
 
@@ -60,7 +59,9 @@ AUGSYS_API int
 aug_init(struct aug_errinfo* errinfo)
 {
     WSADATA data;
-    int err;
+    int err, ret = retain_();
+    if (PROCEED_ != ret)
+        return ret;
 
     if (-1 == aug_initlock_())
         return -1;
@@ -83,6 +84,10 @@ aug_init(struct aug_errinfo* errinfo)
 AUGSYS_API int
 aug_term(void)
 {
+    int ret = release_();
+    if (PROCEED_ != ret)
+        return ret;
+
     aug_setlogger(NULL);
 
     if (SOCKET_ERROR == WSACleanup()) {

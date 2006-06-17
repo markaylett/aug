@@ -66,7 +66,7 @@ init_(aug_seq_t seq, struct aug_info_* info)
         if (VERNO != info->verno_) {
 
             aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                           AUG_MSG("invalid archive version number '%d'"),
+                           AUG_MSG("invalid version number '%d'"),
                            info->verno_);
             return -1;
         }

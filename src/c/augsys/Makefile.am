@@ -63,9 +63,21 @@ libaugsys_la_LDFLAGS = \
 
 libaugsys_la_LIBADD =
 
-check_PROGRAMS = augsys-test
+check_PROGRAMS = \
+	augsys-basetest \
+	augsys-errinfotest \
+	augsys-sockettest
+
 TESTS = $(check_PROGRAMS)
 
-augsys_test_SOURCES = test.c
-augsys_test_LDADD = \
+augsys_basetest_SOURCES = basetest.c
+augsys_basetest_LDADD = \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+augsys_errinfotest_SOURCES = errinfotest.c
+augsys_errinfotest_LDADD = \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+augsys_sockettest_SOURCES = sockettest.c
+augsys_sockettest_LDADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la

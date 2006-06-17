@@ -78,7 +78,7 @@ aug_closemfile_(aug_mfile_t mfile)
     free(mfile);
     return ret;
 }
-
+#include <stdio.h>
 AUGMAR_EXTERN aug_mfile_t
 aug_openmfile_(const char* path, int flags, mode_t mode,
                size_t tail)

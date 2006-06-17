@@ -30,16 +30,16 @@ aug_closefile_(int fd)
 AUGMAR_EXTERN int
 aug_openfile_(const char* path, int flags, mode_t mode)
 {
-    int local;
+    int fd, local;
     if (-1 == aug_toflags_(&local, flags))
         return -1;
 
-    if (-1 == open(path, local, mode)) {
+    if (-1 == (fd = open(path, local, mode))) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
     }
 
-    return 0;
+    return fd;
 }
 
 AUGMAR_EXTERN int
@@ -72,13 +72,17 @@ aug_extendfile_(int fd, size_t size)
         return -1;
     }
 
-    if (1 != write(fd, &ZERO, 1))
+    if (1 != write(fd, &ZERO, 1)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
         goto fail;
+    }
 
     /* Ensure that gap is filled with zeros. */
 
-    if (-1 == fsync(fd))
+    if (-1 == fsync(fd)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
         goto fail;
+    }
 
     /* Restore original file pointer. */
 
@@ -90,7 +94,6 @@ aug_extendfile_(int fd, size_t size)
     return 0;
 
  fail:
-    aug_setposixerrinfo(__FILE__, __LINE__, errno);
     lseek(fd, cur, SEEK_SET);
     return -1;
 }

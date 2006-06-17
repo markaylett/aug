@@ -16,19 +16,31 @@ namespace aug {
     init(struct aug_errinfo& errinfo)
     {
         if (-1 == aug_init(&errinfo))
-            throwerror("aug_init() failed");
+            throw posix_error("aug_init() failed");
     }
     inline void
     term()
     {
         if (-1 == aug_term())
-            throwerror("aug_term() failed");
+            throw posix_error("aug_term() failed");
+    }
+    inline void
+    atexitinit(struct aug_errinfo& errinfo)
+    {
+        if (-1 == aug_atexitinit(&errinfo))
+            throw posix_error("aug_atexitinit() failed");
     }
     inline void
     openfd(int fd, const struct aug_fddriver* driver)
     {
         if (-1 == aug_openfd(fd, driver))
             throwerror("aug_openfd() failed");
+    }
+    inline void
+    openfds(int fds[2], const struct aug_fddriver* driver)
+    {
+        if (-1 == aug_openfds(fds, driver))
+            throwerror("aug_openfds() failed");
     }
     inline void
     releasefd(int fd)

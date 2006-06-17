@@ -19,7 +19,13 @@ struct aug_fddriver {
     int (*setnonblock_)(int, int);
 };
 
-/** Sets errno, and not errinfo. */
+/** The aug_init(), aug_term() and aug_atexitinit() functions return errno,
+    and not errinfo, on failure.  These functions must be called from the main
+    (primary) thread of the process.  They maintain an internal reference
+    count that allows them to be called multiple times.  All but the first
+    call to aug_init() will simply update the internal reference count.  These
+    semantics have been formalised to facilitate initialisation from functions
+    such as DllMain. */
 
 AUGSYS_API int
 aug_init(struct aug_errinfo* errinfo);
@@ -31,13 +37,16 @@ aug_init(struct aug_errinfo* errinfo);
 AUGSYS_API int
 aug_term(void);
 
+AUGSYS_API int
+aug_atexitinit(struct aug_errinfo* errinfo);
+
 /** The remaining functions will set errinfo on failure. */
 
 AUGSYS_API int
 aug_openfd(int fd, const struct aug_fddriver* driver);
 
 AUGSYS_API int
-aug_openfds(int fd[2], const struct aug_fddriver* driver);
+aug_openfds(int fds[2], const struct aug_fddriver* driver);
 
 AUGSYS_API int
 aug_releasefd(int fd);

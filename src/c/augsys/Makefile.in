@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 
-SOURCES = $(libaugsys_la_SOURCES) $(augsys_test_SOURCES)
+SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) $(augsys_errinfotest_SOURCES) $(augsys_sockettest_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -42,7 +42,8 @@ host_triplet = @host@
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = augsys-test$(EXEEXT)
+check_PROGRAMS = augsys-basetest$(EXEEXT) augsys-errinfotest$(EXEEXT) \
+	augsys-sockettest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -66,9 +67,18 @@ am_libaugsys_la_OBJECTS = base.lo config.lo debug.lo defs.lo \
 	mplexer.lo mutex.lo socket.lo string.lo time.lo types.lo \
 	uio.lo unistd.lo utility.lo windows.lo tls_.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
-am_augsys_test_OBJECTS = test.$(OBJEXT)
-augsys_test_OBJECTS = $(am_augsys_test_OBJECTS)
-augsys_test_DEPENDENCIES = $(top_srcdir)/src/c/augsys/libaugsys.la
+am_augsys_basetest_OBJECTS = basetest.$(OBJEXT)
+augsys_basetest_OBJECTS = $(am_augsys_basetest_OBJECTS)
+augsys_basetest_DEPENDENCIES =  \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+am_augsys_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
+augsys_errinfotest_OBJECTS = $(am_augsys_errinfotest_OBJECTS)
+augsys_errinfotest_DEPENDENCIES =  \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+am_augsys_sockettest_OBJECTS = sockettest.$(OBJEXT)
+augsys_sockettest_OBJECTS = $(am_augsys_sockettest_OBJECTS)
+augsys_sockettest_DEPENDENCIES =  \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -79,8 +89,10 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugsys_la_SOURCES) $(augsys_test_SOURCES)
-DIST_SOURCES = $(libaugsys_la_SOURCES) $(augsys_test_SOURCES)
+SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
+	$(augsys_errinfotest_SOURCES) $(augsys_sockettest_SOURCES)
+DIST_SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
+	$(augsys_errinfotest_SOURCES) $(augsys_sockettest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -272,8 +284,16 @@ libaugsys_la_LDFLAGS = \
 
 libaugsys_la_LIBADD = 
 TESTS = $(check_PROGRAMS)
-augsys_test_SOURCES = test.c
-augsys_test_LDADD = \
+augsys_basetest_SOURCES = basetest.c
+augsys_basetest_LDADD = \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+augsys_errinfotest_SOURCES = errinfotest.c
+augsys_errinfotest_LDADD = \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+augsys_sockettest_SOURCES = sockettest.c
+augsys_sockettest_LDADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 all: all-recursive
@@ -345,9 +365,15 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augsys-test$(EXEEXT): $(augsys_test_OBJECTS) $(augsys_test_DEPENDENCIES) 
-	@rm -f augsys-test$(EXEEXT)
-	$(LINK) $(augsys_test_LDFLAGS) $(augsys_test_OBJECTS) $(augsys_test_LDADD) $(LIBS)
+augsys-basetest$(EXEEXT): $(augsys_basetest_OBJECTS) $(augsys_basetest_DEPENDENCIES) 
+	@rm -f augsys-basetest$(EXEEXT)
+	$(LINK) $(augsys_basetest_LDFLAGS) $(augsys_basetest_OBJECTS) $(augsys_basetest_LDADD) $(LIBS)
+augsys-errinfotest$(EXEEXT): $(augsys_errinfotest_OBJECTS) $(augsys_errinfotest_DEPENDENCIES) 
+	@rm -f augsys-errinfotest$(EXEEXT)
+	$(LINK) $(augsys_errinfotest_LDFLAGS) $(augsys_errinfotest_OBJECTS) $(augsys_errinfotest_LDADD) $(LIBS)
+augsys-sockettest$(EXEEXT): $(augsys_sockettest_OBJECTS) $(augsys_sockettest_DEPENDENCIES) 
+	@rm -f augsys-sockettest$(EXEEXT)
+	$(LINK) $(augsys_sockettest_LDFLAGS) $(augsys_sockettest_OBJECTS) $(augsys_sockettest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -356,10 +382,12 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/basetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errno.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
@@ -369,8 +397,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockettest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tls_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@

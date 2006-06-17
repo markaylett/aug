@@ -56,11 +56,12 @@ namespace aug {
     {
         return lhs.get() < rhs.get();
     }
-    inline bool
-    isnull(fdref ref)
-    {
-        return -1 == ref.get();
-    }
+}
+
+inline bool
+isnull(aug::fdref ref)
+{
+    return -1 == ref.get();
 }
 
 #endif // AUGSYSPP_TYPES_HPP

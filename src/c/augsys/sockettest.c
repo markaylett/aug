@@ -1,28 +1,12 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/base.h"
-#include "augsys/defs.h"
-#include "augsys/errinfo.h"
-#include "augsys/log.h"
-#include "augsys/socket.h"
-#include "augsys/string.h"
-#include "augsys/uio.h"
-#include "augsys/unistd.h"
-#include "augsys/utility.h"
-
-#include <errno.h>
-#include <stdio.h>  /* printf() */
-#include <stdlib.h> /* atexit() */
+#include "augsys.h"
 
 #define MSG1_ "first chunk, "
 #define MSG2_ "second chunk"
 
-static void
-term_(void)
-{
-    aug_term();
-}
+#include <stdio.h>
 
 int
 main(int argc, char* argv[])
@@ -32,8 +16,7 @@ main(int argc, char* argv[])
     struct aug_errinfo errinfo;
     struct iovec iov[2];
 
-    aug_init(&errinfo);
-    atexit(term_);
+    aug_atexitinit(&errinfo);
 
     if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {
         aug_perrinfo("aug_socketpair() failed");
@@ -59,7 +42,11 @@ main(int argc, char* argv[])
         aug_perrinfo("aug_read() failed");
         return 1;
     }
-    aug_info("received: %s", buf);
+
+    if (0 != strcmp(buf, MSG1_ MSG2_)) {
+       fprintf(stderr, "unexpected buffer contents: %s\n", buf);
+       return 1;
+    }
 
     aug_close(sv[0]);
     aug_close(sv[1]);

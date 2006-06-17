@@ -1,11 +1,9 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augmarpp/header.hpp"
-#include "augmarpp/stream.hpp"
-#include "augmarpp/swapfile.hpp"
+#include "augmarpp.hpp"
 
-#include "augsys/unistd.h"
+#include "augsys.h"
 
 #include <fstream>
 #include <string>
@@ -343,13 +341,18 @@ namespace {
             cout << "testing " << t.name_ << "... ";
             (*t.test_)(dst, src);
             cout << "ok\n";
+        } catch (const aug::error& e) {
+            aug_perrinfo(e.what());
+            result = false;
         } catch (const exception& e) {
-            cout << "error: " << e.what() << endl;
+            cerr << "error: " << e.what() << endl;
             result = false;
         } catch (...) {
-            cout << "error: unknown exception\n";
+            cerr << "error: unknown exception\n";
             result = false;
         }
+        if (!result)
+            cout << "fail\n";
         unlink(dst);
         unlink(src);
         return result;
@@ -361,8 +364,14 @@ main(int argc, char* argv[])
 {
     static const size_t TOTAL(sizeof(tests) / sizeof(tests[0]));
 
+    struct aug_errinfo errinfo;
     char dst[] = "dst.XXXXXX";
     char src[] = "src.XXXXXX";
+
+    if (-1 == aug_atexitinit(&errinfo)) {
+        cerr << "aug_atexitinit() failed\n";
+        return 1;
+    }
 
     if (!mktemp(dst) || !mktemp(src)) {
         cerr << "mktemp() failed\n";

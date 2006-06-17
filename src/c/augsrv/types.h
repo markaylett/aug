@@ -4,7 +4,7 @@
 #ifndef AUGSRV_TYPES_H
 #define AUGSRV_TYPES_H
 
-#define AUG_RETNODAEMON 1
+#define AUG_RETNODAEMON (-2)
 
 enum aug_option {
 

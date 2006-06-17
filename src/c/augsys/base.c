@@ -3,8 +3,38 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/base.h"
+#include "augsys/errno.h"
 
 static const char rcsid[] = "$Id:$";
+
+#define PROCEED_ 1
+
+static unsigned int refs_ = 0;
+
+static int
+release_(void)
+{
+    switch (refs_) {
+    case 0:
+
+        /* Pairing mismatch with aug_init(). */
+
+        errno = EINVAL;
+        return -1;
+
+    case 1:
+        refs_ = 0;
+        return PROCEED_;
+    }
+    --refs_;
+    return 0;
+}
+
+static int
+retain_(void)
+{
+    return 1 == ++refs_ ? PROCEED_ : 0;
+}
 
 #if !defined(_WIN32)
 # include "augsys/posix/base.c"
@@ -15,8 +45,7 @@ static const char rcsid[] = "$Id:$";
 #include "augsys/defs.h"
 #include "augsys/errno.h"
 
-#include <assert.h>
-#include <stdlib.h> /* NULL */
+#include <stdlib.h> /* atexit() */
 #include <string.h> /* memcpy() */
 
 #define BLOCKSIZE_ 256
@@ -32,6 +61,12 @@ struct file_ {
 
 static struct file_* files_ = NULL;
 static size_t size_ = 0;
+
+static void
+term_(void)
+{
+    aug_term();
+}
 
 static void
 setalreadyreg_(const char* file, int line, int fd)
@@ -99,7 +134,6 @@ static int
 openfd_(int fd, const struct aug_fddriver* driver)
 {
     struct file_* file;
-    assert(driver);
 
     if (size_ <= (size_t)fd) {
 
@@ -124,31 +158,31 @@ openfd_(int fd, const struct aug_fddriver* driver)
 }
 
 static int
-openfds_(int fd[2], const struct aug_fddriver* driver)
+openfds_(int fds[2], const struct aug_fddriver* driver)
 {
     struct file_* first, * second;
-    int maxfd = AUG_MAX(fd[0], fd[1]);
+    int maxfd = AUG_MAX(fds[0], fds[1]);
 
     if (size_ <= (size_t)maxfd) {
 
         if (-1 == growfiles_(maxfd + 1))
             return -1;
 
-        first = files_ + fd[0];
-        second = files_ + fd[1];
+        first = files_ + fds[0];
+        second = files_ + fds[1];
 
     } else {
 
-        first = files_ + fd[0];
-        second = files_ + fd[1];
+        first = files_ + fds[0];
+        second = files_ + fds[1];
 
         if (0 < first->refs_) {
-            setalreadyreg_(__FILE__, __LINE__, fd[0]);
+            setalreadyreg_(__FILE__, __LINE__, fds[0]);
             return -1;
         }
 
         if (0 < second->refs_) {
-            setalreadyreg_(__FILE__, __LINE__, fd[1]);
+            setalreadyreg_(__FILE__, __LINE__, fds[1]);
             return -1;
         }
     }
@@ -215,6 +249,20 @@ fddriver_(int fd)
 }
 
 AUGSYS_API int
+aug_atexitinit(struct aug_errinfo* errinfo)
+{
+    if (-1 == aug_init(errinfo))
+        return -1;
+
+    if (-1 == atexit(term_)) {
+        aug_term();
+        return -1;
+    }
+
+    return 0;
+}
+
+AUGSYS_API int
 aug_openfd(int fd, const struct aug_fddriver* driver)
 {
     int ret;
@@ -223,6 +271,9 @@ aug_openfd(int fd, const struct aug_fddriver* driver)
         setbadfd_(__FILE__, __LINE__);
         return -1;
     }
+
+    if (!driver)
+        driver = aug_posixdriver();
 
     aug_lock();
     ret = openfd_(fd, driver);
@@ -240,6 +291,9 @@ aug_openfds(int fds[2], const struct aug_fddriver* driver)
         setbadfd_(__FILE__, __LINE__);
         return -1;
     }
+
+    if (!driver)
+        driver = aug_posixdriver();
 
     aug_lock();
     ret = openfds_(fds, driver);
@@ -295,6 +349,9 @@ AUGSYS_API struct aug_fddriver*
 aug_extenddriver(struct aug_fddriver* derived,
                  const struct aug_fddriver* base)
 {
+    if (!base)
+        base = aug_posixdriver();
+
     if (!derived->close_)
         derived->close_ = base->close_;
 
@@ -320,12 +377,14 @@ AUGSYS_API int
 aug_setfddriver(int fd, const struct aug_fddriver* driver)
 {
     int ret;
-    assert(driver);
 
     if (-1 == fd) {
         setbadfd_(__FILE__, __LINE__);
         return -1;
     }
+
+    if (!driver)
+        driver = aug_posixdriver();
 
     aug_lock();
     ret = setfddriver_(fd, driver);

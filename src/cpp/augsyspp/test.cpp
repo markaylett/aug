@@ -16,26 +16,30 @@ using namespace std;
 
 namespace {
 
+    int
+    close_(int fd)
+    {
+        aug_info("closing fd: %d", fd);
+        return aug_posixdriver()->close_(fd);
+    }
+
+    struct aug_fddriver driver_ = {
+        close_, 0, 0, 0, 0, 0
+    };
+
     smartfd
     open()
     {
-        int fd(::open("/dev/null", O_RDONLY));
+        int fd(::open("Makefile", O_RDONLY));
         if (-1 != fd)
             try {
-
-                openfd(fd, AUG_FDFILE);
+                openfd(fd, &driver_);
                 return smartfd::attach(fd);
             } catch (...) {
                 close(fd);
                 throw;
             }
         return null;
-    }
-
-    void
-    hook_(int fd, int type, void* data)
-    {
-        aug_info("closing type: %d", type);
     }
 }
 
@@ -44,14 +48,11 @@ main(int argc, char* argv[])
 {
     try {
 
-        aug_errinfo errinfo;
+        struct aug_errinfo errinfo;
         initialiser init(errinfo);
-        smartfd sfd1(open());
-        setfdhook(sfd1, hook_, 0);
 
-        openfd(101, AUG_FDUSER);
-        smartfd sfd2(smartfd::attach(101));
-        setfdhook(sfd2, hook_, 0);
+        aug_extenddriver(&driver_, 0);
+        smartfd sfd1(open());
 
     } catch (const exception& e) {
 

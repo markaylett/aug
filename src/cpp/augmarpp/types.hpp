@@ -48,11 +48,6 @@ namespace aug {
     {
         return lhs.get() != rhs.get();
     }
-    inline bool
-    isnull(marref ref)
-    {
-        return 0 == ref.get();
-    }
 
     class AUGMARPP_API field {
         struct aug_field field_;
@@ -137,12 +132,18 @@ namespace aug {
             return field_;
         }
     };
+}
 
-    inline bool
-    isnull(const field& f)
-    {
-        return 0 == f.name();
-    }
+inline bool
+isnull(const aug::field& f)
+{
+    return 0 == f.name();
+}
+
+inline bool
+isnull(aug::marref ref)
+{
+    return 0 == ref.get();
 }
 
 #endif // AUGMARPP_TYPES_HPP

@@ -10,7 +10,7 @@
 #define AUG_EVENTWR   0x2
 #define AUG_EVENTRDWR (AUG_EVENTRD | AUG_EVENTWR)
 
-#define AUG_RETINTR   1
+#define AUG_RETINTR   (-2)
 
 struct timeval;
 
