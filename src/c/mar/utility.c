@@ -3,7 +3,7 @@
 */
 #include "mar/utility.h"
 
-#include "augsys/defs.h" /* AUG_BUFSIZE */
+#include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/errno.h"
 
 #include <string.h>
@@ -59,7 +59,7 @@ aug_confirm_(const char* prompt)
 MAR_EXTERN int
 aug_insertstream_(aug_mar_t mar, FILE* stream)
 {
-    char buf[AUG_BUFSIZE];
+    char buf[AUG_MAXLINE];
     while (!feof(stream)) {
 
         size_t size = fread(buf, 1, sizeof(buf), stdin);
@@ -94,7 +94,7 @@ aug_readline_(char* buf, size_t size, FILE* stream)
 MAR_EXTERN int
 aug_streamset_(aug_mar_t mar, FILE* stream)
 {
-    char buf[AUG_BUFSIZE];
+    char buf[AUG_MAXLINE];
     struct aug_field field;
 
     for (;;) {

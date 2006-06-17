@@ -5,9 +5,6 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "augsrv.h"
-#include "augsys.h"
-
 #include <memory>
 #include <time.h>
 
@@ -76,7 +73,7 @@ namespace test {
         void
         checkpipe()
         {
-            int fd(aug_sigin());
+            int fd(aug_signalin());
 
             AUG_DEBUG("checking signal pipe '%d'", fd);
 
@@ -85,10 +82,10 @@ namespace test {
 
             AUG_DEBUG("reading signal action");
 
-            switch (readsig()) {
+            switch (readsignal(aug_signalin())) {
             case AUG_SIGRECONF:
                 aug_info("received AUG_SIGRECONF");
-                config(daemon_);
+                reconfig();
                 break;
             case AUG_SIGSTATUS:
                 aug_info("received AUG_SIGSTATUS");
@@ -101,12 +98,26 @@ namespace test {
         }
 
         void
-        do_setopt(enum aug_option opt, const char* value)
+        reconfig()
         {
-            if (AUG_OPTCONFFILE != opt)
-                error("unsupported option", EINVAL);
+            if (*conffile_) {
 
-            aug_strlcpy(conffile_, value, sizeof(conffile_));
+                aug_info("reading: %s", conffile_);
+
+                test::setopt action;
+                readconf(conffile_, action);
+            }
+
+            if (-1 == chdir(rundir_))
+                error("chdir() failed");
+
+            if (daemon_ && -1 == aug_openlog(logfile_))
+                error("aug_openlog() failed");
+
+            aug_info("run directory: %s", rundir_);
+            aug_info("pid file: %s", pidfile_);
+            aug_info("log file: %s", logfile_);
+            aug_info("log level: %d", aug_loglevel());
         }
 
         const char*
@@ -122,28 +133,14 @@ namespace test {
         }
 
         void
-        do_config(bool daemon)
+        do_config(const char* conffile, bool daemon)
         {
+            if (conffile && !aug_realpath(conffile_, conffile,
+                                          sizeof(conffile_)))
+                error("aug_realpath() failed");
+
             daemon_ = daemon;
-
-            if (*conffile_) {
-
-                aug_info("reading: %s", conffile_);
-
-                test::setopt action;
-                readconf(conffile_, action);
-            }
-
-            if (-1 == chdir(rundir_))
-                error("chdir() failed");
-
-            if (daemon && -1 == aug_openlog(logfile_))
-                error("aug_openlog() failed");
-
-            aug_info("run directory: %s", rundir_);
-            aug_info("pid file: %s", pidfile_);
-            aug_info("log file: %s", logfile_);
-            aug_info("log level: %d", aug_loglevel());
+            reconfig();
         }
 
         void
@@ -155,7 +152,7 @@ namespace test {
                 error("aug_setsrvlogger() failed");
 
             auto_ptr<state> ptr(new state(*this));
-            seteventmask(ptr->mplexer_, aug_sigin(), AUG_EVENTRD);
+            seteventmask(ptr->mplexer_, aug_signalin(), AUG_EVENTRD);
             state_ = ptr;
         }
 

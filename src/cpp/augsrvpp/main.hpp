@@ -12,14 +12,11 @@ namespace aug {
 
     class AUGSRVPP_API service_base {
 
-        virtual void
-        do_setopt(enum aug_option opt, const char* value) = 0;
-
         virtual const char*
         do_getopt(enum aug_option opt) = 0;
 
         virtual void
-        do_config(bool daemon) = 0;
+        do_config(const char* conffile, bool daemon) = 0;
 
         virtual void
         do_init() = 0;
@@ -31,12 +28,6 @@ namespace aug {
         virtual
         ~service_base() NOTHROW;
 
-        void
-        setopt(enum aug_option opt, const char* value)
-        {
-            do_setopt(opt, value);
-        }
-
         const char*
         getopt(enum aug_option opt)
         {
@@ -44,9 +35,9 @@ namespace aug {
         }
 
         void
-        config(bool daemon)
+        config(const char* conffile, bool daemon)
         {
-            do_config(daemon);
+            do_config(conffile, daemon);
         }
 
         void

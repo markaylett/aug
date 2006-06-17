@@ -29,3 +29,5 @@ Choose consistent callback naming convention.
 Null-terminate field values.
 
 Determine ignorable Winsock non-blocking accept() errors.
+
+Add support for config environment variable.

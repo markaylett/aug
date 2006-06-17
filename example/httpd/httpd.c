@@ -231,18 +231,6 @@ setconfopt_(void* arg, const char* name, const char* value)
     return 0;
 }
 
-static int
-setopt_(void* arg, enum aug_option opt, const char* value)
-{
-    if (AUG_OPTCONFFILE != opt) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    aug_strlcpy(conffile_, value, sizeof(conffile_));
-    return 0;
-}
-
 static const char*
 getopt_(void* arg, enum aug_option opt)
 {
@@ -256,10 +244,8 @@ getopt_(void* arg, enum aug_option opt)
 }
 
 static int
-config_(void* arg, int daemon)
+reconfig_(void)
 {
-    daemon_ = daemon;
-
     if (*conffile_) {
 
         aug_info("reading: %s", conffile_);
@@ -270,7 +256,7 @@ config_(void* arg, int daemon)
 
     AUG_VERIFY(chdir(rundir_), "chdir() failed");
 
-    if (daemon)
+    if (daemon_)
         AUG_VERIFY(aug_openlog(logfile_), "aug_openlog() failed");
 
     aug_info("run directory: %s", rundir_);
@@ -282,9 +268,19 @@ config_(void* arg, int daemon)
 }
 
 static int
+config_(void* arg, const char* conffile, int daemon)
+{
+    if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
+        return -1;
+
+    daemon_ = daemon;
+    return reconfig_();
+}
+
+static int
 pipe_(void* arg, int fd, struct aug_conns* conns)
 {
-    aug_sig_t sig;
+    aug_signal_t sig;
 
     AUG_DEBUG("checking signal pipe '%d'", fd);
 
@@ -292,12 +288,13 @@ pipe_(void* arg, int fd, struct aug_conns* conns)
         return 1;
 
     AUG_DEBUG("reading signal action");
-    AUG_VERIFY(aug_readsig(&sig), "aug_readsig() failed");
+    AUG_VERIFY(aug_readsignal(aug_signalin(), &sig),
+               "aug_readsignal() failed");
 
     switch (sig) {
     case AUG_SIGRECONF:
         aug_info("received AUG_SIGRECONF");
-        AUG_VERIFY(config_(arg, daemon_), "failed to re-configure daemon");
+        AUG_VERIFY(reconfig_(), "failed to re-configure daemon");
         break;
     case AUG_SIGSTATUS:
         aug_info("received AUG_SIGSTATUS");
@@ -330,9 +327,9 @@ init_(void* arg)
     if (-1 == aug_insertconn(&conns_, fd_, listener_, mplexer_))
         goto fail2;
 
-    if (-1 == aug_insertconn(&conns_, aug_sigin(), pipe_, mplexer_)
+    if (-1 == aug_insertconn(&conns_, aug_signalin(), pipe_, mplexer_)
         || -1 == aug_seteventmask(mplexer_, fd_, AUG_EVENTRD)
-        || -1 == aug_seteventmask(mplexer_, aug_sigin(), AUG_EVENTRD))
+        || -1 == aug_seteventmask(mplexer_, aug_signalin(), AUG_EVENTRD))
         goto fail3;
 
     return 0;
@@ -390,7 +387,6 @@ int
 main(int argc, char* argv[])
 {
     struct aug_service service = {
-        setopt_,
         getopt_,
         config_,
         init_,

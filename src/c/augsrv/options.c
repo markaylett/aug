@@ -10,8 +10,6 @@
 #include "augutil/getopt.h"
 
 #include "augsys/defs.h"   /* AUG_MKSTR */
-#include "augsys/limits.h" /* AUG_PATH_MAX */
-#include "augsys/lock.h"
 #include "augsys/log.h"
 #include "augsys/string.h"
 
@@ -78,10 +76,11 @@ aug_tocommand(const char* s)
 }
 
 AUGSRV_API int
-aug_readopts(const struct aug_service* service, int argc, char* argv[])
+aug_readopts(const struct aug_service* service, struct aug_options* options,
+             int argc, char* argv[])
 {
-    const char* path = NULL;
-    int ch, ret = AUG_CMDDEFAULT;
+    int ch, ret;
+    options->conffile_ = NULL;
 
     aug_optind = 1; /* Skip program name. */
     aug_opterr = 0;
@@ -90,7 +89,7 @@ aug_readopts(const struct aug_service* service, int argc, char* argv[])
         switch (ch) {
         case 'f':
             if (aug_optind == argc
-                || !*(path = argv[aug_optind++])) {
+                || !*(options->conffile_ = argv[aug_optind++])) {
 
                 usage_(service);
                 aug_error("missing path argument");
@@ -98,8 +97,9 @@ aug_readopts(const struct aug_service* service, int argc, char* argv[])
             }
             break;
         case 'h':
+            options->command_ = AUG_CMDEXIT;
             usage_(service);
-            return AUG_CMDNONE;
+            return 0;
         case '?':
         default:
 
@@ -110,6 +110,7 @@ aug_readopts(const struct aug_service* service, int argc, char* argv[])
 
     switch (argc - aug_optind) {
     case 0:
+        options->command_ = AUG_CMDDEFAULT;
         break;
     case 1:
         if (-1 == (ret = aug_tocommand(argv[aug_optind]))) {
@@ -118,6 +119,7 @@ aug_readopts(const struct aug_service* service, int argc, char* argv[])
             aug_error("invalid command '%s'", argv[aug_optind]);
             return -1;
         }
+        options->command_ = ret;
         break;
     default:
 
@@ -126,19 +128,5 @@ aug_readopts(const struct aug_service* service, int argc, char* argv[])
         return -1;
     }
 
-    if (path) {
-
-        char buf[AUG_PATH_MAX + 1];
-        if (!aug_realpath(buf, path, sizeof(buf))) {
-            aug_perror("aug_realpath() failed");
-            return -1;
-        }
-
-        if (-1 == (*service->setopt_)(service->arg_, AUG_OPTCONFFILE, buf)) {
-            aug_perror("failed to set configuration option");
-            return -1;
-        }
-    }
-
-    return ret;
+    return 0;
 }

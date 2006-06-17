@@ -11,6 +11,7 @@ modinclude_HEADERS = \
 	list.h \
 	log.h \
 	path.h \
+	signal.h \
 	timer.h
 
 noinst_HEADERS =
@@ -27,6 +28,7 @@ libaugutil_la_SOURCES = \
 	list.c \
 	log.c \
 	path.c \
+	signal.c \
 	timer.c
 
 libaugutil_la_LDFLAGS = \

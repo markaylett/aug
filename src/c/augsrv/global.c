@@ -19,7 +19,7 @@ aug_setservice_(const struct aug_service* service)
 }
 
 AUGSRV_EXTERN void
-aug_setsigpipe_(int fds[2])
+aug_setsignalpipe_(int fds[2])
 {
     fds_[0] = fds[0];
     fds_[1] = fds[1];
@@ -32,13 +32,13 @@ aug_service(void)
 }
 
 AUGSRV_API int
-aug_sigin(void)
+aug_signalin(void)
 {
     return fds_[0];
 }
 
 AUGSRV_API int
-aug_sigout(void)
+aug_signalout(void)
 {
     return fds_[1];
 }

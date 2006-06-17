@@ -3,6 +3,8 @@
 */
 #include "augsrv/options.h"
 
+#include "augsrv/types.h"  /* struct aug_service */
+
 #include "augsys/defs.h"
 #include "augsys/errno.h"
 #include "augsys/log.h"
@@ -31,7 +33,7 @@ flock_(struct flock* fl, int fd, int cmd, int type)
 }
 
 static int
-send_(int fd, pid_t pid, aug_sig_t sig)
+send_(int fd, pid_t pid, aug_signal_t sig)
 {
     struct flock fl;
 
@@ -74,7 +76,7 @@ aug_start(const struct aug_service* service)
 }
 
 AUGSRV_API int
-aug_control(const struct aug_service* service, aug_sig_t sig)
+aug_control(const struct aug_service* service, aug_signal_t sig)
 {
     const char* path;
     struct flock fl;

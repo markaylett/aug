@@ -48,7 +48,7 @@ aug_openpassive(const struct sockaddr_in* addr)
 AUGNET_API struct sockaddr_in*
 aug_parseinet(struct sockaddr_in* dst, const char* src)
 {
-	int len;
+	size_t len;
     unsigned short nport;
 	char* host;
 

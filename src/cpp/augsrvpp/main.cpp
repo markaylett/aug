@@ -15,16 +15,6 @@ using namespace aug;
 
 namespace {
 
-    int
-    setopt_(void* arg, enum aug_option opt, const char* value)
-    {
-        try {
-            service_base* ptr = static_cast<service_base*>(arg);
-            ptr->setopt(opt, value);
-            return 0;
-        } AUG_CATCHRETURN -1;
-    }
-
     const char*
     getopt_(void* arg, enum aug_option opt)
     {
@@ -35,11 +25,11 @@ namespace {
     }
 
     int
-    config_(void* arg, int daemon)
+    config_(void* arg, const char* conffile, int daemon)
     {
         try {
             service_base* ptr = static_cast<service_base*>(arg);
-            ptr->config(daemon ? true : false);
+            ptr->config(conffile, daemon ? true : false);
             return 0;
         } AUG_CATCHRETURN -1;
     }
@@ -75,8 +65,7 @@ aug::main(service_base& service, const char* program, const char* lname,
           const char* sname, const char* admin, int argc, char* argv[])
 {
     struct aug_service local = {
-        setopt_,
-        getopt_,
+        getopt_, 
         config_,
         init_,
         run_,

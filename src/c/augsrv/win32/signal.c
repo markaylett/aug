@@ -4,7 +4,7 @@
 #include <signal.h>
 
 AUGSRV_API int
-aug_sigactions(void (*handler)(int))
+aug_signalhandler(void (*handler)(int))
 {
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
@@ -12,13 +12,13 @@ aug_sigactions(void (*handler)(int))
 }
 
 AUGSRV_API int
-aug_sigblock(void)
+aug_blocksignals(void)
 {
     return 0;
 }
 
 AUGSRV_API int
-aug_sigunblock(void)
+aug_unblocksignals(void)
 {
     return 0;
 }

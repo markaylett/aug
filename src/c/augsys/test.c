@@ -25,7 +25,7 @@ int
 main(int argc, char* argv[])
 {
     int sv[2];
-    char buf[AUG_BUFSIZE];
+    char buf[AUG_MAXLINE];
     struct iovec iov[2];
 
     aug_init();

@@ -35,15 +35,15 @@ static void
 handler_(int i)
 {
     aug_info("handling interrupt");
-    if (-1 == aug_writesig(aug_tosignal(i)))
-        aug_perror("aug_writesig() failed");
+    if (-1 == aug_writesignal(aug_signalout(), aug_tosignal(i)))
+        aug_perror("aug_writesignal() failed");
 }
 
 static void
 closepipe_(void)
 {
-    AUG_VERIFY(aug_close(aug_sigin()), "aug_close() failed");
-    AUG_VERIFY(aug_close(aug_sigout()), "aug_close() failed");
+    AUG_VERIFY(aug_close(aug_signalin()), "aug_close() failed");
+    AUG_VERIFY(aug_close(aug_signalout()), "aug_close() failed");
 }
 
 static void
@@ -54,12 +54,12 @@ openpipe_(void)
     if (-1 == aug_mplexerpipe(fds))
         die_("aug_mplexerpipe() failed");
 
-    aug_setsigpipe_(fds);
+    aug_setsignalpipe_(fds);
     if (-1 == atexit(closepipe_))
         die_("atexit() failed");
 
-    if (-1 == aug_sigactions(handler_))
-        die_("aug_sigactions() failed");
+    if (-1 == aug_signalhandler(handler_))
+        die_("aug_signalhandler() failed");
 }
 
 static void
@@ -114,7 +114,7 @@ start_(const struct aug_service* service)
 #endif /* _WIN32 */
 
 static void
-control_(const struct aug_service* service, aug_sig_t sig)
+control_(const struct aug_service* service, aug_signal_t sig)
 {
     switch (aug_control(service, sig)) {
     case 0:
@@ -167,22 +167,20 @@ uninstall_(const struct aug_service* service)
 AUGSRV_API void
 aug_main(const struct aug_service* service, int argc, char* argv[])
 {
-    int daemon, ret;
-    aug_setservice_(service);
+    int daemon;
+    struct aug_options options;
 
-    switch (ret = aug_readopts(service, argc, argv)) {
-    case AUG_CMDNONE:
-        exit(0);
-    case -1:
+    aug_setservice_(service);
+    if (-1 == aug_readopts(service, &options, argc, argv))
         exit(1);
-    default:
-        break;
-    }
+
+    if (AUG_CMDEXIT == options.command_)
+        exit(0);
 
 #if !defined(_WIN32)
-    daemon = AUG_CMDSTART == ret;
+    daemon = AUG_CMDSTART == options.command_;
 #else /* _WIN32 */
-    daemon = AUG_CMDDEFAULT == ret;
+    daemon = AUG_CMDDEFAULT == options.command_;
 #endif /* !_WIN32 */
 
     /* Install daemon logger prior to opening log file. */
@@ -190,10 +188,10 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
     if (daemon)
         aug_setlogger(aug_daemonlogger);
 
-    if (-1 == (*service->config_)(service->arg_, daemon))
+    if (-1 == (*service->config_)(service->arg_, options.conffile_, daemon))
         die_("failed to read configuration");
 
-    switch (ret) {
+    switch (options.command_) {
     case AUG_CMDDEFAULT:
         openpipe_();
 #if !defined(_WIN32)
@@ -202,6 +200,8 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
         daemonise_(service);
 #endif /* !_WIN32 */
         break;
+    case AUG_CMDEXIT:
+        assert(0);
     case AUG_CMDINSTALL:
         aug_info("installing daemon process");
         install_(service);

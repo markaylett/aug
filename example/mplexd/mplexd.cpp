@@ -6,9 +6,6 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "augsrv.h"
-#include "augsys.h"
-
 #include <boost/shared_ptr.hpp>
 
 #include <map>
@@ -81,10 +78,8 @@ namespace test {
     bool quit_(false);
 
     void
-    config(bool daemon)
+    reconfig()
     {
-        daemon_ = daemon;
-
         if (*conffile_) {
 
             aug_info("reading: %s", conffile_);
@@ -96,13 +91,23 @@ namespace test {
         if (-1 == chdir(rundir_))
             error("chdir() failed");
 
-        if (daemon)
+        if (daemon_)
             openlog(logfile_);
 
         aug_info("run directory: %s", rundir_);
         aug_info("pid file: %s", pidfile_);
         aug_info("log file: %s", logfile_);
         aug_info("log level: %d", aug_loglevel());
+    }
+
+    void
+    config(const char* conffile, bool daemon)
+    {
+        if (conffile)
+            realpath(conffile_, conffile, sizeof(conffile_));
+
+        daemon_ = daemon;
+        reconfig();
     }
 
     void
@@ -211,8 +216,8 @@ namespace test {
             struct sockaddr_in addr;
             smartfd sfd(openpassive(parseinet(addr, address_)));
 
-            insertconn(conns_, aug_sigin(), poll);
-            seteventmask(mplexer_, aug_sigin(), AUG_EVENTRD);
+            insertconn(conns_, aug_signalin(), poll);
+            seteventmask(mplexer_, aug_signalin(), AUG_EVENTRD);
 
             insertconn(conns_, sfd, poll);
             seteventmask(mplexer_, sfd, AUG_EVENTRD);
@@ -242,10 +247,10 @@ namespace test {
         {
             AUG_DEBUG("reading signal action");
 
-            switch (readsig()) {
+            switch (readsignal(aug_signalin())) {
             case AUG_SIGRECONF:
                 aug_info("received AUG_SIGRECONF");
-                config(daemon_);
+                reconfig();
                 break;
             case AUG_SIGSTATUS:
                 aug_info("received AUG_SIGSTATUS");
@@ -317,7 +322,7 @@ namespace test {
             if (!events(state_->mplexer_, fd))
                 return true;
 
-            if (fd == aug_sigin())
+            if (fd == aug_signalin())
                 return signaller(fd, conns);
 
             if (fd == state_->sfd_)
@@ -348,9 +353,9 @@ namespace test {
         }
 
         void
-        do_config(bool daemon)
+        do_config(const char* conffile, bool daemon)
         {
-            test::config(daemon);
+            test::config(conffile, daemon);
         }
 
         void
@@ -374,20 +379,20 @@ namespace test {
 
                 if (state_->timers_.empty()) {
 
-                    sigunblock();
+                    unblocksignals();
                     while (AUG_EINTR == (ret = waitevents(state_->mplexer_)))
                         ;
-                    sigblock();
+                    blocksignals();
 
                 } else {
 
                     process(state_->timers_, 0 == ret, tv);
 
-                    sigunblock();
+                    unblocksignals();
                     while (AUG_EINTR == (ret = waitevents(state_
                                                           ->mplexer_, tv)))
                         ;
-                    sigblock();
+                    blocksignals();
                 }
 
                 processconns(state_->conns_);
@@ -426,7 +431,7 @@ main(int argc, char* argv[])
         initialiser init;
 
         aug_setloglevel(AUG_LOGINFO);
-        sigblock();
+        blocksignals();
         service s;
 
         if (!getcwd(rundir_, sizeof(rundir_)))
@@ -698,18 +703,6 @@ setconfopt_(void* arg, const char* name, const char* value)
         return -1;
     }
 
-    return 0;
-}
-
-static int
-setopt_(void* arg, enum aug_option opt, const char* value)
-{
-    if (AUG_OPTCONFFILE != opt) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    aug_strlcpy(conffile_, value, sizeof(conffile_));
     return 0;
 }
 

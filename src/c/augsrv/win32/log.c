@@ -17,7 +17,7 @@ static HANDLE eventlog_ = NULL;
 static void
 report_(WORD type, const char* format, va_list args)
 {
-    char msg[AUG_BUFSIZE];
+    char msg[AUG_MAXLINE];
     const char* msgs[1] = { msg };
 
     _vsnprintf(msg, sizeof(msg), format, args);

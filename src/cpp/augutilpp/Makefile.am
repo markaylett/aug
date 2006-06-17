@@ -7,6 +7,7 @@ modinclude_HEADERS = \
 	file.hpp \
 	log.hpp \
 	path.hpp \
+	signal.hpp \
 	timer.hpp
 
 lib_LTLIBRARIES = libaugutilpp.la
@@ -17,6 +18,7 @@ libaugutilpp_la_SOURCES = \
 	file.cpp \
 	log.cpp \
 	path.cpp \
+	signal.cpp \
 	timer.cpp
 
 libaugutilpp_la_LDFLAGS = \

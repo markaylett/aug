@@ -4,6 +4,8 @@
 #ifndef AUGSYSPP_HPP
 #define AUGSYSPP_HPP
 
+#include "augsys.h"
+
 #include "augsyspp/base.hpp"
 #include "augsyspp/exception.hpp"
 #include "augsyspp/mplexer.hpp"

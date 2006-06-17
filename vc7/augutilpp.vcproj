@@ -12,8 +12,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="lib"
+			IntermediateDirectory="debug/augutilpp"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
@@ -23,12 +23,13 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -55,15 +56,16 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory="lib"
+			IntermediateDirectory="release/augutilpp"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../src/c, ../src/cpp"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="4"
+				RuntimeLibrary="2"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="TRUE"
@@ -95,6 +97,9 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{B21A518A-F567-4619-9A4F-2FFF73F380BA}"
+			Name="augmarpp"/>
 	</References>
 	<Files>
 		<Filter
@@ -115,6 +120,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\path.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augutilpp\signal.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\timer.cpp">
@@ -138,6 +146,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\path.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augutilpp\signal.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\timer.hpp">

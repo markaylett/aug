@@ -7,7 +7,7 @@
 #include "augutil/conv.h"
 #include "augutil/lexer.h"
 
-#include "augsys/defs.h" /* AUG_BUFSIZE */
+#include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/string.h"
 
 #include <errno.h>
@@ -23,7 +23,7 @@ struct aug_parser_ {
         VALUE_,
         BODY_
     } state_;
-    char name_[AUG_BUFSIZE];
+    char name_[AUG_MAXLINE];
     size_t csize_;
 };
 
@@ -167,7 +167,7 @@ header_(aug_parser_t parser, const char* ptr, size_t size)
     }
 
  done:
-    return i;
+    return (ssize_t)i;
 }
 
 static ssize_t
@@ -184,7 +184,7 @@ body_(aug_parser_t parser, const char* buf, size_t size)
 
         /* Entire buffer consumed. */
 
-        return size;
+        return (ssize_t)size;
     }
 
     /* Consume enough of the buffer to fulfil content. */
@@ -198,7 +198,7 @@ body_(aug_parser_t parser, const char* buf, size_t size)
     if (-1 == end_(parser, 1))
         return -1;
 
-    return size;
+    return (ssize_t)size;
 }
 
 AUGNET_API aug_parser_t

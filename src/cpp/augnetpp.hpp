@@ -4,6 +4,8 @@
 #ifndef AUGNETPP_HPP
 #define AUGNETPP_HPP
 
+#include "augnet.h"
+
 #include "augnetpp/conn.hpp"
 #include "augnetpp/inet.hpp"
 

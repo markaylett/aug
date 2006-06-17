@@ -2,11 +2,16 @@
    See the file COPYING for copying permission.
 */
 #define AUGSYS_BUILD
+#include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/log.h"
 
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
+
+#if defined(_WIN32)
+# define vsnprintf _vsnprintf
+#endif /* _WIN32 */
 
 /* No synchronisation exists around these variables.  Each logger is
    responsible for checking its integrity before logging. */
@@ -24,9 +29,15 @@ static volatile aug_logger_t logger_ = aug_stdiologger;
 AUGSYS_API int
 aug_stdiologger(int loglevel, const char* format, va_list args)
 {
+    char buf[AUG_MAXLINE];
     FILE* file = loglevel > AUG_LOGWARN ? stdout : stderr;
-    vfprintf(file, format, args);
-    putc('\n', file);
+
+    if (0 > vsnprintf(buf, sizeof(buf), format, args)) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    fprintf(file, "%s\n", buf);
     return 0;
 }
 

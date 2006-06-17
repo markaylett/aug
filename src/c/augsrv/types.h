@@ -6,26 +6,14 @@
 
 #define AUG_FOREGROUND 1
 
-#define AUG_SIGNONE   0
-#define AUG_SIGRECONF 1
-#define AUG_SIGSTATUS 2
-#define AUG_SIGSTOP   3
-
-/* Base value for user-defined signals. */
-
-#define AUG_SIGUSER   4
-
-typedef unsigned char aug_sig_t;
-
 enum aug_option {
     AUG_OPTCONFFILE = 1,
     AUG_OPTPIDFILE
 };
 
 struct aug_service {
-    int (*setopt_)(void*, enum aug_option, const char*);
     const char* (*getopt_)(void*, enum aug_option);
-    int (*config_)(void*, int);
+    int (*config_)(void*, const char*, int);
     int (*init_)(void*);
     int (*run_)(void*);
     const char* program_;

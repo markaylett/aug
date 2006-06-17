@@ -12,6 +12,7 @@
 #include "augutil/list.h"
 #include "augutil/log.h"
 #include "augutil/path.h"
+#include "augutil/signal.h"
 #include "augutil/timer.h"
 
 #endif /* AUGUTIL_H */

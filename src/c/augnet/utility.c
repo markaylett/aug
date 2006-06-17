@@ -17,7 +17,7 @@ aug_addbuf(struct aug_buf* buf, size_t num)
     if (buf->size_ && num) {
 
         buf->iov_->iov_base = (char*)buf->iov_->iov_base + num;
-        buf->iov_->iov_len -= num;
+        buf->iov_->iov_len -= (int)num;
         num = 0;
     }
 }

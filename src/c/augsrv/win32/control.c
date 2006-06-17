@@ -3,6 +3,8 @@
 */
 #include "augsrv/options.h"
 
+#include "augsrv/types.h"  /* struct aug_service */
+
 #include "augutil/dstr.h"
 #include "augutil/path.h"
 
@@ -113,7 +115,7 @@ fail:
 }
 
 static int
-control_(SC_HANDLE scm, const struct aug_service* service, aug_sig_t sig)
+control_(SC_HANDLE scm, const struct aug_service* service, aug_signal_t sig)
 {
     SC_HANDLE serv;
     SERVICE_STATUS status;
@@ -236,7 +238,7 @@ aug_start(const struct aug_service* service)
 }
 
 AUGSRV_API int
-aug_control(const struct aug_service* service, aug_sig_t sig)
+aug_control(const struct aug_service* service, aug_signal_t sig)
 {
     int ret;
     SC_HANDLE scm;

@@ -6,7 +6,7 @@
 
 #include "augsyspp/exception.hpp"
 
-#include "augsys/defs.h" /* AUG_BUFSIZE */
+#include "augsys/defs.h" /* AUG_MAXLINE */
 
 using namespace aug;
 using namespace std;
@@ -33,7 +33,7 @@ aug::formatlog(char* buf, size_t& n, int logLevel, const char* format, ...)
 AUGUTILPP_API string
 aug::vformatlog(int logLevel, const char* format, va_list args)
 {
-    char buf[AUG_BUFSIZE];
+    char buf[AUG_MAXLINE];
     size_t n(sizeof(buf));
     vformatlog(buf, n, logLevel, format, args);
     return string(buf, n);
@@ -42,7 +42,7 @@ aug::vformatlog(int logLevel, const char* format, va_list args)
 AUGUTILPP_API string
 aug::formatlog(int logLevel, const char* format, ...)
 {
-    char buf[AUG_BUFSIZE];
+    char buf[AUG_MAXLINE];
     size_t n(sizeof(buf));
 
     va_list args;

@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/lexer.h"
 
-#include "augsys/defs.h" /* AUG_BUFSIZE */
+#include "augsys/defs.h" /* AUG_MAXLINE */
 
 #include <ctype.h>       /* isspace() */
 #include <errno.h>
@@ -104,7 +104,7 @@ aug_createlexer(size_t size, aug_isdelim_t isdelim)
     /* Use default size when size has not been specified. */
 
     if (0 == size)
-        size = AUG_BUFSIZE;
+        size = AUG_MAXLINE;
 
     if (!(lexer = malloc(sizeof(struct aug_lexer_) + size)))
         return NULL;

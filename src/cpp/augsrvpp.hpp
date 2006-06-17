@@ -4,6 +4,8 @@
 #ifndef AUGSRVPP_HPP
 #define AUGSRVPP_HPP
 
+#include "augsrv.h"
+
 #include "augsrvpp/log.hpp"
 #include "augsrvpp/main.hpp"
 #include "augsrvpp/signal.hpp"

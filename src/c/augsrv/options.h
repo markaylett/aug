@@ -6,21 +6,28 @@
 
 #include "augsrv/config.h"
 
-#define AUG_CMDNONE      0
-#define AUG_CMDDEFAULT   1
-#define AUG_CMDINSTALL   2
-#define AUG_CMDRECONF    3
-#define AUG_CMDSTART     4
-#define AUG_CMDSTATUS    5
-#define AUG_CMDSTOP      6
-#define AUG_CMDTEST      7
-#define AUG_CMDUNINSTALL 8
+enum aug_command {
+
+    AUG_CMDDEFAULT,
+    AUG_CMDEXIT,
+    AUG_CMDINSTALL,
+    AUG_CMDRECONF,
+    AUG_CMDSTART,
+    AUG_CMDSTATUS,
+    AUG_CMDSTOP,
+    AUG_CMDTEST,
+    AUG_CMDUNINSTALL
+};
+
+struct aug_options {
+    const char* conffile_;
+    enum aug_command command_;
+};
 
 struct aug_service;
 
-/* On success, returns one of the above commands. */
-
 AUGSRV_API int
-aug_readopts(const struct aug_service* service, int argc, char* argv[]);
+aug_readopts(const struct aug_service* service, struct aug_options* options,
+             int argc, char* argv[]);
 
 #endif /* AUGSRV_OPTIONS_H */

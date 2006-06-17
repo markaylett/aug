@@ -6,7 +6,7 @@
 
 #include <stddef.h>
 
-#define AUG_BUFSIZE 1024
+#define AUG_MAXLINE 1024
 
 #define AUG_MIN(a, b) ((a) <= (b) ? (a) : (b))
 #define AUG_MAX(a, b) ((a) >= (b) ? (a) : (b))

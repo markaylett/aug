@@ -9,7 +9,7 @@
 #include "augnet/types.h"
 #include "augnet/utility.h"
 
-#include "augsys/defs.h" /* AUG_BUFSIZE */
+#include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/log.h"
 #include "augsys/uio.h"
 #include "augsys/unistd.h"
@@ -99,7 +99,7 @@ setinitial_(void* arg, const char* initial)
 {
     aug_state_t state = (aug_state_t)arg;
     if (!state->in_.initial_)
-        state->in_.initial_ = aug_createdstr(AUG_BUFSIZE);
+        state->in_.initial_ = aug_createdstr(AUG_MAXLINE);
     aug_dstrsets(&state->in_.initial_, initial);
     return 0;
 }
@@ -184,7 +184,7 @@ aug_createstate(aug_request_t request, void* arg)
 
     state->request_ = request;
     state->arg_ = arg;
-    if (!(state->in_.parser_ = aug_createparser(AUG_BUFSIZE, &handlers_,
+    if (!(state->in_.parser_ = aug_createparser(AUG_MAXLINE, &handlers_,
                                                 state)))
         goto fail;
 

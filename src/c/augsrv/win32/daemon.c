@@ -3,7 +3,9 @@
 */
 #include "augsrv/global.h"
 #include "augsrv/options.h"
-#include "augsrv/signal.h"
+#include "augsrv/types.h" /* struct aug_service */
+
+#include "augutil/signal.h"
 
 #include "augsys/errno.h"
 #include "augsys/log.h"
@@ -49,18 +51,18 @@ handler_(DWORD code)
 
     switch (code) {
     case RECONF_:
-        if (-1 == aug_writesig(AUG_SIGRECONF))
+        if (-1 == aug_writesignal(aug_signalout(), AUG_SIGRECONF))
             aug_perror("failed to re-configure daemon");
         break;
     case STATUS_:
-        if (-1 == aug_writesig(AUG_SIGSTATUS))
+        if (-1 == aug_writesignal(aug_signalout(), AUG_SIGSTATUS))
             aug_perror("failed to get daemon status");
         break;
     case STOP_:
     case SERVICE_CONTROL_STOP:
     case SERVICE_CONTROL_SHUTDOWN:
         setstatus_(SERVICE_STOP_PENDING);
-        if (-1 == aug_writesig(AUG_SIGSTOP)) {
+        if (-1 == aug_writesignal(aug_signalout(), AUG_SIGSTOP)) {
             aug_perror("failed to stop daemon");
             setstatus_(SERVICE_RUNNING);
         }
@@ -72,13 +74,12 @@ static void WINAPI
 start_(DWORD argc, char** argv)
 {
     const struct aug_service* service = aug_service();
+    struct aug_options options;
 
-    switch (aug_readopts(service, argc, argv)) {
-    case AUG_CMDDEFAULT:
-        break;
-    case -1:
+    if (-1 == aug_readopts(service, &options, argc, argv))
         return;
-    default:
+
+    if (AUG_CMDDEFAULT != options.command_) {
 
         /* Commands other than AUG_CMDDEFAULT are invalid in this context. */
 
@@ -86,7 +87,7 @@ start_(DWORD argc, char** argv)
         return;
     }
 
-    if (-1 == (*service->config_)(service->arg_, 1)) {
+    if (-1 == (*service->config_)(service->arg_, options.conffile_, 1)) {
         aug_perror("failed to configure daemon");
         return;
     }

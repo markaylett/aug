@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/log.h"
 
-#include "augsys/defs.h"   /* AUG_BUFSIZE */
+#include "augsys/defs.h"   /* AUG_MAXLINE */
 #include "augsys/time.h"
 #include "augsys/unistd.h" /* write() */
 
@@ -34,13 +34,13 @@
 # endif /* WIN32 */
 #endif /* !AUG_TIMEFORMAT */
 
-static const char* LABELS_[] = {
-    "CRIT",
-    "ERROR",
-    "WARN",
+static const char LABELS_[][7] = {
+    "CRIT  ",
+    "ERROR ",
+    "WARN  ",
     "NOTICE",
-    "INFO",
-    "DEBUG"
+    "INFO  ",
+    "DEBUG "
 };
 
 static int
@@ -113,7 +113,7 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
        characters required, excluding the null terminator, or b) a negative
        value, indicating an error. */
 
-    if (0 > (ret = snprintf(buf, size, " %s: ", aug_loglabel(loglevel)))) {
+    if (0 > (ret = snprintf(buf, size, " %s ", aug_loglabel(loglevel)))) {
         errno = EINVAL;
         return -1;
     }
@@ -166,7 +166,7 @@ aug_formatlog(char* buf, size_t* n, int loglevel, const char* format, ...)
 AUGUTIL_API int
 aug_daemonlogger(int loglevel, const char* format, va_list args)
 {
-    char buf[AUG_BUFSIZE];
+    char buf[AUG_MAXLINE];
     size_t n = sizeof(buf);
 
     if (-1 == aug_vformatlog(buf, &n, loglevel, format, args))

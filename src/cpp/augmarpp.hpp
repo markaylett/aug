@@ -4,6 +4,8 @@
 #ifndef AUGMARPP_HPP
 #define AUGMARPP_HPP
 
+#include "augmar.h"
+
 #include "augmarpp/compat.hpp"
 #include "augmarpp/header.hpp"
 #include "augmarpp/iterator.hpp"
