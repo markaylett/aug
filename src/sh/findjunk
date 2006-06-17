@@ -1,0 +1,17 @@
+#!/bin/sh
+
+DIR=${1:-'.'}
+
+find $DIR \( \
+    -name a.out \
+    -o -name core \
+    -o -name '*~' \
+    -o -name '.*~' \
+    -o -name '#*' \
+    -o -name '.#*' \
+    -o -name '*.old' \
+    -o -name '*.bak' \
+    -o -name '*.BAK' \
+    -o -name '*.keep' \
+    -o -name '*.contrib' \) \
+    -type f -print

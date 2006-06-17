@@ -1,0 +1,21 @@
+--- ltmain.sh.orig	2006-01-14 14:57:06.000000000 +0000
++++ ltmain.sh	2006-01-20 21:30:01.000000000 +0000
+@@ -4989,6 +4989,18 @@
+ # endif
+ #endif
+ 
++#if defined (_WIN32)
++# ifndef S_IXOTH
++#  define S_IXOTH _S_IEXEC
++# endif
++# ifndef S_IXGRP
++#  define S_IXGRP _S_IEXEC
++# endif
++# ifndef S_IXUSR
++#  define S_IXUSR _S_IEXEC
++# endif
++#endif
++
+ #ifndef DIR_SEPARATOR_2
+ # define IS_DIR_SEPARATOR(ch) ((ch) == DIR_SEPARATOR)
+ #else /* DIR_SEPARATOR_2 */

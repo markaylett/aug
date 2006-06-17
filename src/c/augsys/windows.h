@@ -1,0 +1,17 @@
+/* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
+   See the file COPYING for copying permission.
+*/
+#ifndef AUGSYS_WINDOWS_H
+#define AUGSYS_WINDOWS_H
+
+#include "augsys/config.h"
+
+#if defined(_WIN32)
+# if !defined(WIN32_LEAN_AND_MEAN)
+#  define WIN32_LEAN_AND_MEAN
+# endif /* !WIN32_LEAN_AND_MEAN */
+# include <windows.h>
+# define bzero ZeroMemory
+#endif /* _WIN32 */
+
+#endif /* AUGSYS_WINDOWS_H */

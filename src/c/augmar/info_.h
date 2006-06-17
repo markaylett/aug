@@ -1,0 +1,25 @@
+/* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
+   See the file COPYING for copying permission.
+*/
+/**
+ * \file info.h
+ * \brief TODO
+ */
+
+#ifndef AUGMAR_INFO_H
+#define AUGMAR_INFO_H
+
+#include "augmar/format_.h"
+#include "augmar/seq_.h"
+
+struct aug_info_ {
+    size_t verno_, fields_, hsize_, bsize_;
+};
+
+AUGMAR_EXTERN int
+aug_setinfo_(aug_seq_t seq, const struct aug_info_* info);
+
+AUGMAR_EXTERN int
+aug_info_(aug_seq_t seq, struct aug_info_* info);
+
+#endif /* AUGMAR_INFO_H */

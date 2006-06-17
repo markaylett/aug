@@ -1,0 +1,138 @@
+#!/usr/bin/perl -w
+use strict;
+
+# Example usage: dotdepend -I. src/*.c | dot -Tgif >depend.gif
+
+my $MAKEDEPEND = 'gcc -MM -MG';
+my $TRED = 'tred';
+
+sub ltrim {
+    $_[0] =~ s/^\s+//;
+}
+
+sub rtrim {
+    $_[0] =~ s/\s+$//;
+}
+
+sub trim {
+    ltrim $_[0];
+    rtrim $_[0];
+}
+
+sub basename {
+    my $path = shift;
+    my $i = rindex $path, '/';
+    $path = substr($path, $i + 1)
+        unless $i == -1;
+    return $path;
+}
+
+sub compname {
+    my $path = shift;
+
+    # Remove any directory prefix and file extension.
+
+    $path = basename $path;
+    $path =~ s/\.\w+$//;
+    return $path;
+}
+
+my (%comps, $comp);
+my $cont = 0;
+
+foreach (`$MAKEDEPEND @ARGV 2>/dev/null`) {
+
+    chomp;
+
+    my $deps;
+    if ($cont) {
+
+        # The dependency list is being continued from the previous line.
+
+        $deps = $_;
+    }
+    else {
+
+        # The dependency list is separated from the object file by the colon
+        # character.
+
+        ($comp, $deps) = split /:/;
+
+        # The output of makedepend may lead with a blank line.
+
+        next unless $comp;
+
+        trim $comp;
+        $comp = compname $comp;
+
+        $comps{$comp} = []
+            unless defined $comps{$comp};
+    }
+
+    trim $deps;
+    $cont = 0;
+
+    foreach (split /\s+/, $deps) {
+
+        trim $_;
+
+        # A backslash encountered at the end of a line signifies a line
+        # continuation.
+
+        if ($_ eq '\\') {
+            $cont = 1;
+        }
+        else {
+
+            # Do not add dependency to self.  This occurs as a result of
+            # including the header file associated with a component's source
+            # file.
+
+            $_ = compname $_;
+            push @{$comps{$comp}}, $_
+                unless $comp eq $_;
+        }
+    }
+}
+
+# The dot-file is piped through tred in order to remove transitive
+# dependencies.
+
+open(PIPE, "|$TRED")
+    or die "Failed to open tred pipe: $!";
+
+print PIPE "digraph G {\n";
+print PIPE "\tedge [style=dashed];\n";
+print PIPE "\tnode [shape=box];\n";
+
+my $deps;
+while (($comp, $deps) = each %comps) {
+
+    $comp =~ s/[.-]//g;
+
+    my $i = 0;
+    if (@$deps > 1) {
+
+        # If component has dependencies, then list each dependency.
+
+        foreach (@$deps) {
+
+            # Filter out any dependencies that are not within the list of
+            # known components.
+
+            if (exists $comps{$_}) {
+                $_ =~ s/[.-]//g;
+                print PIPE "\t$comp -> $_;\n";
+                ++$i;
+            }
+        }
+    }
+
+    # Print lone component if no component dependencies have been printed.
+
+    print PIPE "\t$comp;\n"
+        unless $i;
+}
+
+print PIPE "}\n";
+close PIPE;

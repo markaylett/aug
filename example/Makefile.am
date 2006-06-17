@@ -1,0 +1,4 @@
+SUBDIRS = \
+	httpd \
+	mplexd \
+	timerd

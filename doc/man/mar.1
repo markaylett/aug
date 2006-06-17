@@ -1,0 +1,160 @@
+.\" Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
+.\" See the file COPYING for copying permission.
+.\"
+.TH MAR 1 "December 2004" "mar 0.5" "User Commands"
+.SH NAME
+mar \- utility for manipulating mar files
+.SH SYNOPSIS
+.B mar
+option... archive
+.SH DESCRIPTION
+
+The \fBmar\fR utility uses the \fBmar\fR library to provide a convenient tool
+for manipulating \fBmar\fR files from the command line.
+
+.SH OPTIONS
+.TP
+\fB\-c\fR
+
+Compact the message archive.
+
+.TP
+\fB\-f\fR
+
+Do not prompt for confirmation when using one of the following delete-like
+operations; \fB-r\fR, \fB-u\fR or \fB-z\fR.
+
+.TP
+\fB\-g\fR \fIname\fR
+
+Given the \fIname\fR of a field, print the field's value to stdout.
+
+.TP
+\fB\-h\fR
+
+Display a brief help summary and then exit.
+
+.TP
+\fB\-i\fR \fIfilename\fR
+
+Insert the contents of the file specified by \fIfilename\fR, into the
+archive's body-content section.  If the \fIfilename\fR specified is "-" then
+stdin will be used as the input stream.
+
+.TP
+\fB\-l\fR
+
+List the name of each field contained within the archive to stdout: each of
+the resulting names will be followed by a newline.
+
+.TP
+\fB\-n\fR
+
+Print the total length (in bytes) of the archive's body-content to stdout.
+
+.TP
+\fB\-r\fR
+
+Remove (delete) all fields, including the names, from the archive.  Use the
+\fB-f\fR option to suppress the confirmation prompt.
+
+.TP
+\fB\-s\fR \fIsource\fR
+
+Fields are set by specifying one of more name/value pairs.  Each name/value
+pair should be specified in the format "name=value", where the name and value
+part of the pair are delimited using the "=" character.  Any whitespace
+characters occurring either side of the delimiter are significant, and will
+not therefore be stripped when the pair is split.  The \fIsource\fR can
+either be a single name/value pair specified on the command line, or a
+filename.  If a filename is specified then name/value pairs will be read (one
+pair per line) from the file specified by filename.  If the filename
+specified is "-" then stdin will be used as the input stream.
+
+.TP
+\fB\-t\fR
+
+List each field contained within the archive to stdout.  Each field is
+displayed as a name/value pair in the format "name=value", where the name and
+value part of the pair are delimited using the "=" character.  Each
+name/value pair will be followed by a newline.
+
+.TP
+\fB\-u\fR \fIname\fR
+
+Unset (delete) the field specified by \fIname\fR from the archive.  Use the
+\fB-f\fR option to suppress the confirmation prompt.
+
+.TP
+\fB\-x\fR \fIfilename\fR
+
+Extract (a copy of) the archive's body-content into the file specified by
+\fIfilename\fR.  If the \fIfilename\fR specified is "-" then stdout will be
+used as the output stream.
+
+.TP
+\fB\-z\fR
+
+Zero truncate (delete) the archive's body-content.  Use the \fB-f\fR option
+to suppress the confirmation prompt.
+
+.SH EXAMPLES
+.PP
+
+Insert the contents of "input.txt" into the archive's body-content section,
+and then print the number of bytes stored to stdout:
+
+.ft B
+.nf
+
+    mar -i input.txt -l archive.mar
+.fi
+.ft R
+.PP
+
+Extract (a copy of) the the archive's body-content, and then zero truncate
+the body-content without prompting for confirmation:
+
+.ft B
+.nf
+
+    mar -x - -f -z archive.mar
+.fi
+.ft R
+.PP
+
+Set two fields (with names "familyname" and "givenname") and then list all
+fields to stdout:
+
+.ft B
+.nf
+
+    mar -s familyname=Aylett -s givenname=Mark -t archive.mar
+.fi
+.ft R
+.PP
+
+Unset the field (with name "familyname") without prompting for confirmation,
+and then list all remaining field names within the archive to stdout:
+
+.ft B
+.nf
+
+    mar -f -u familyname -n archive.mar
+.fi
+.ft R
+.PP
+
+Print the field value (for the field with name "givenname") to stdout, and
+then remove (delete) all fields without prompting for confirmation:
+
+.ft B
+.nf
+
+    mar -g givenname -f -r archive.mar
+.fi
+.ft R
+.SH AUTHOR
+Written by Mark Aylett.
+.SH REPORTING BUGS
+Report bugs to <mark@emantic.co.uk>.

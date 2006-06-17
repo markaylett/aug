@@ -1,0 +1,48 @@
+include $(top_srcdir)/src/c/lang.mk
+
+modincludedir = $(includedir)/augmar
+modinclude_HEADERS = \
+	config.h \
+	mar.h \
+	types.h
+
+noinst_HEADERS = \
+	body_.h \
+	file_.h \
+	flags_.h \
+	format_.h \
+	header_.h \
+	info_.h \
+	mfile_.h \
+	seq_.h
+
+lib_LTLIBRARIES = libaugmar.la
+
+libaugmar_la_SOURCES = \
+	config.c \
+	mar.c \
+	types.c \
+	body_.c \
+	file_.c \
+	flags_.c \
+	format_.c \
+	header_.c \
+	info_.c \
+	mfile_.c \
+	seq_.c
+
+libaugmar_la_LDFLAGS = \
+	-no-undefined \
+	-version-info 0:0:0
+
+libaugmar_la_LIBADD = \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+check_PROGRAMS = augmar-test
+TESTS = $(check_PROGRAMS)
+
+augmar_test_SOURCES = test.c
+augmar_test_LDADD = \
+	$(top_srcdir)/src/c/augmar/libaugmar.la \
+	$(WINSOCK) \
+	-lm

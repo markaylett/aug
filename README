@@ -1,0 +1,98 @@
+The Aug Project
+
+Aug consists of a set of libraries:
+
+ augsys  - Portable abstraction over system interface.
+
+ augmar  - Library for manipulating message archives.
+
+ augutil - Provides various utility functions.
+
+ augsrv  - Provides native platform daemonisation.
+
+ augnet  - Provides common networking functions.
+
+The etc/mingw.sh file provides an example of how to configure for a mingw
+build using cygwin.
+
+The Windows version can also be built using a cross-compiler, etc/xmingw.sh
+provides an example.
+
+When debugging using GCC, change the -O2 flag to -ggdb, and add
+--disable-shared to the configure arguments.
+
+And remember:
+
+ "As personal choice, we tend not to use debuggers beyond getting a stack
+ trace or the value of a variable or two.  One reason is that it is easy to
+ get lost in details of complicated data structures and control flow; we find
+ stepping through a program less productive than thinking harder and adding
+ output statements and self-checking code at critical places.  Clicking over
+ statements takes longer than scanning the output of judiciously-placed
+ displays.  It takes less time to decide where to put print statements than to
+ single-step to the critical section of code, even assuming we know where that
+ is.  More important, debugging statements stay with the program; debugging
+ sessions are transient." - Brian W. Kernighan and Rob Pike.
+
+The c libraries are currently the main focus of development.  The c++ wrapper
+libraries are incomplete.  Many of the unit tests are probably broken due to
+recent re-structuring.
+
+There is a demo project that provides a good starting point.
+
+The mkconf.sh script in the demo directory will create skeleton etc, log and
+run directories.
+
+Install the project: on Windows, this registers the daemon with the Service
+Manager:
+
+ $ demo.exe -f etc/demo.conf install
+
+The daemon can then either be run from the Service Manager, or the shell as
+follows:
+
+ $ demo.exe -f etc/demo.conf start
+
+Other examples follow:
+
+ $ demo.exe -f etc/demo.conf refresh
+ $ demo.exe -f etc/demo.conf stop
+ $ demo.exe -f etc/demo.conf uninstall
+
+Dependency diagrams can be re-created by running "make depend" in the doc
+directory.  However, you will need both GCC and GraphViz to be installed for
+this to work.
+
+For bugs and feature enhancements, please e-mail me with the patches.  I can
+then review and apply as required.
+
+Prior to creating a patch:
+
+ $ cd aug
+ $ etc/findjunk.sh | xargs rm
+ $ make distclean
+
+Create a patch:
+
+ $ diff -Nur aug-0.1.1 aug >aug.patch
+
+Or, the CVS equivalent:
+
+ $ cvs diff -Nu >aug.patch
+
+Apply a patch:
+
+ $ cd aug
+ $ patch -p1 <../aug.patch
+
+Expect bugs; early days.
+
+Aug because:
+
+ It combines the meaning of August and Augment.
+
+ Provides a short, pronounceable prefix for mangling library names.
+
+ There was slot available in Sourceforge for Aug.
+
+ It is does not constrain the scope of the project.

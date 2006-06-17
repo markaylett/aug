@@ -1,0 +1,89 @@
+# -*- m4 -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.59)
+AC_INIT([src/config.h.in])
+AM_INIT_AUTOMAKE([aug], [0.2.0], [mark@emantic.co.uk])
+AC_CONFIG_HEADER([src/config.h])
+
+AM_MAINTAINER_MODE
+
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+AC_LIBTOOL_WIN32_DLL
+AM_PROG_LIBTOOL
+
+AC_PROG_LEX
+AC_PROG_YACC
+
+BOOST_ROOT=${BOOST_ROOT:-/usr/include}
+AC_SUBST(BOOST_ROOT)
+
+# Checks for libraries.
+
+case $host in
+*-*-mingw32*)
+    WINSOCK="-lws2_32"
+    LIBS="$LIBS -Wl,-lws2_32"
+    ;;
+*)
+    WINSOCK=""
+    AC_SEARCH_LIBS(gethostbyname, nsl)
+    AC_SEARCH_LIBS(gethostname, nsl)
+    AC_SEARCH_LIBS(socket, socket)
+    ;;
+esac
+AC_SUBST(WINSOCK)
+
+# Checks for header files.
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+# Checks for library functions.
+
+AC_CHECK_FUNCS([localtime_r])
+
+AC_CHECK_FUNC(strlcpy,
+    [AC_DEFINE(HAVE_STRLCPY, 1,
+        [Define to 1 if you have the `strlcpy' function.])
+    ])
+
+AC_CONFIG_FILES([Makefile
+    doc/Makefile
+    doc/man/Makefile
+    doc/www/Makefile
+    etc/Makefile
+    example/Makefile
+    example/httpd/Makefile
+    example/mplexd/Makefile
+    example/timerd/Makefile
+    src/Makefile
+    src/c/Makefile
+    src/c/augmar/Makefile
+    src/c/augnet/Makefile
+    src/c/augsrv/Makefile
+    src/c/augsrv/posix/Makefile
+    src/c/augsrv/win32/Makefile
+    src/c/augsys/Makefile
+    src/c/augsys/posix/Makefile
+    src/c/augsys/win32/Makefile
+    src/c/augutil/Makefile
+    src/c/mar/Makefile
+    src/cpp/Makefile
+    src/cpp/augmarpp/Makefile
+    src/cpp/augnetpp/Makefile
+    src/cpp/augsrvpp/Makefile
+    src/cpp/augsyspp/Makefile
+    src/cpp/augutilpp/Makefile
+    src/pl/Makefile
+    src/sh/Makefile
+    vc7/Makefile
+    ])
+AC_OUTPUT

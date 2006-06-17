@@ -1,0 +1,148 @@
+/* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
+   See the file COPYING for copying permission.
+*/
+/**
+ * \file types.hpp
+ * \brief TODO
+ */
+
+#ifndef AUGMARPP_TYPES_HPP
+#define AUGMARPP_TYPES_HPP
+
+#include "augmarpp/config.hpp"
+
+#include "augsyspp/null.hpp"
+
+#include "augmar/mar.h"
+#include "augmar/types.h"
+
+#include <cstring> // strlen
+
+namespace aug {
+
+    class AUGMARPP_API marref {
+        aug_mar_t mar_;
+    public:
+        marref(const null_&) NOTHROW
+            : mar_(0)
+        {
+        }
+        marref(aug_mar_t mar) NOTHROW
+            : mar_(mar)
+        {
+        }
+        aug_mar_t
+        get() const NOTHROW
+        {
+            return mar_;
+        }
+    };
+
+    inline bool
+    operator ==(marref lhs, marref rhs)
+    {
+        return lhs.get() == rhs.get();
+    }
+    inline bool
+    operator !=(marref lhs, marref rhs)
+    {
+        return lhs.get() != rhs.get();
+    }
+    inline bool
+    isnull(marref ref)
+    {
+        return 0 == ref.get();
+    }
+
+    class AUGMARPP_API field {
+        struct aug_field field_;
+        void
+        clear()
+        {
+            field_.name_ = 0;
+            field_.value_ = 0;
+            field_.size_ = 0;
+        }
+    public:
+        field(const null_&) NOTHROW
+        {
+            clear();
+        }
+        explicit
+        field(const struct aug_field& f)
+            : field_(f)
+        {
+        }
+        explicit
+        field(const char* s)
+        {
+            setname(s);
+            field_.value_ = 0;
+            field_.size_ = 0;
+        }
+        field(const char* s, const void* v, size_t n)
+        {
+            setname(s);
+            setvalue(v, n);
+        }
+        field(const char* s, const char* v)
+        {
+            setname(s);
+            setvalue(v);
+        }
+        field&
+        operator =(const null_&)
+        {
+            clear();
+            return *this;
+        }
+        void
+        setname(const char* s)
+        {
+            field_.name_ = s;
+        }
+        void
+        setvalue(const void* v, size_t n)
+        {
+            field_.value_ = v;
+            field_.size_ = n;
+        }
+        void
+        setvalue(const char* v)
+        {
+            field_.value_ = v;
+            field_.size_ = strlen(v);
+        }
+        operator struct aug_field&()
+        {
+            return field_;
+        }
+        const char*
+        name() const
+        {
+            return field_.name_;
+        }
+        const void*
+        value() const
+        {
+            return field_.value_;
+        }
+        size_t
+        size() const
+        {
+            return field_.size_;
+        }
+        operator const struct aug_field&() const
+        {
+            return field_;
+        }
+    };
+
+    inline bool
+    isnull(const field& f)
+    {
+        return 0 == f.name();
+    }
+}
+
+#endif // AUGMARPP_TYPES_HPP

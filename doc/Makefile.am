@@ -1,0 +1,19 @@
+SUBDIRS = \
+	man \
+	www
+
+EXTRA_DIST = \
+	augsys.gif \
+	augmar.gif \
+	augutil.gif \
+	augsrv.gif \
+	augnet.gif \
+	cvs-policy.txt \
+	Doxyfile
+
+depend:
+	for l in augsys augmar augutil augsrv augnet; do \
+		(cd $(top_srcdir)/src/c && \
+			../pl/dotdepend -I. `find $$l -name "*.c"`) \
+			| dot -Tgif >$$l.gif; \
+	done

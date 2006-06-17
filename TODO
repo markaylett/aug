@@ -1,0 +1,29 @@
+Fix broken unit-tests.
+
+Write maintainer guidelines.
+
+Create resource file for ReportError().
+
+Add OutputDebugString() support to logger.
+
+Add clean hook for vc7 directories.
+
+Tidy-up aug_releasefd().
+
+Ensure use of detail namespace.
+
+Ensure all statics are locked.
+
+Add txt2mar and mar2txt tools.
+
+Add auglangpp library.
+
+Ensure correct use of size_t for 64 bit arch.
+
+Write pid file on Windows.
+
+Add ability to change user and group.
+
+Choose consistent callback naming convention.
+
+Null-terminate field values.
