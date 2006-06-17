@@ -8,7 +8,6 @@
 #include "augsyspp/smartfd.hpp"
 
 #include "augsys/mplexer.h"
-#include "augsys/string.h" // aug_perror()
 
 #include <cerrno>
 
@@ -27,14 +26,14 @@ namespace aug {
         ~mplexer() NOTHROW
         {
             if (-1 == aug_freemplexer(mplexer_))
-                aug_perror("aug_freemplexer() failed");
+                aug_perrinfo("aug_freemplexer() failed");
         }
 
         mplexer()
             : mplexer_(aug_createmplexer())
         {
             if (!mplexer_)
-                throwerror("aug_createmplexer() failed");
+                throwerrinfo("aug_createmplexer() failed");
         }
 
         operator aug_mplexer_t()
@@ -53,7 +52,7 @@ namespace aug {
     seteventmask(aug_mplexer_t mplexer, fdref ref, unsigned short mask)
     {
         if (-1 == aug_seteventmask(mplexer, ref.get(), mask))
-            throwerror("aug_seteventmask() failed");
+            throwerrinfo("aug_seteventmask() failed");
     }
 
     /** Returns AUG_RETINTR if the system call was interrupted. */
@@ -63,7 +62,7 @@ namespace aug {
     {
         int ret(aug_waitevents(mplexer, &timeout));
         if (-1 == ret)
-            throwerror("aug_waitevents() failed");
+            throwerrinfo("aug_waitevents() failed");
         return ret;
     }
 
@@ -72,7 +71,7 @@ namespace aug {
     {
         int ret(aug_waitevents(mplexer, 0));
         if (-1 == ret)
-            throwerror("aug_waitevents() failed");
+            throwerrinfo("aug_waitevents() failed");
         return ret;
     }
 
@@ -81,7 +80,7 @@ namespace aug {
     {
         int ret(aug_eventmask(mplexer, ref.get()));
         if (-1 == ret)
-            throwerror("aug_eventmask() failed");
+            throwerrinfo("aug_eventmask() failed");
 
         return ret;
     }
@@ -91,7 +90,7 @@ namespace aug {
     {
         int ret(aug_events(mplexer, ref.get()));
         if (-1 == ret)
-            throwerror("aug_events() failed");
+            throwerrinfo("aug_events() failed");
 
         return ret;
     }
@@ -101,7 +100,7 @@ namespace aug {
     {
         int fds[2];
         if (-1 == aug_mplexerpipe(fds))
-            throwerror("aug_mplexerpipe() failed");
+            throwerrinfo("aug_mplexerpipe() failed");
 
         return std::make_pair(smartfd::attach(fds[0]),
                               smartfd::attach(fds[1]));

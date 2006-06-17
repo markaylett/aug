@@ -7,8 +7,6 @@
 #include "augsyspp/base.hpp"
 #include "augsyspp/types.hpp"
 
-#include "augsys/string.h" // aug_perror()
-
 #include <algorithm>       // swap()
 
 namespace aug {
@@ -27,7 +25,7 @@ namespace aug {
         ~smartfd() NOTHROW
         {
             if (null != ref_ && -1 == aug_releasefd(ref_.get()))
-                aug_perror("aug_releasefd() failed");
+                aug_perrinfo("aug_releasefd() failed");
         }
 
         smartfd(const null_&) NOTHROW

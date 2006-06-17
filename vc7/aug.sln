@@ -39,10 +39,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augutilpp", "augutilpp.vcpr
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timerd", "timerd.vcproj", "{A7DBB843-10DC-4407-B710-F5BA402DB8E5}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -89,10 +85,6 @@ Global
 		{91B6CDD3-4C09-428D-BBC8-09FCC9A4AAC4}.Debug.Build.0 = Debug|Win32
 		{91B6CDD3-4C09-428D-BBC8-09FCC9A4AAC4}.Release.ActiveCfg = Release|Win32
 		{91B6CDD3-4C09-428D-BBC8-09FCC9A4AAC4}.Release.Build.0 = Release|Win32
-		{A7DBB843-10DC-4407-B710-F5BA402DB8E5}.Debug.ActiveCfg = Debug|Win32
-		{A7DBB843-10DC-4407-B710-F5BA402DB8E5}.Debug.Build.0 = Debug|Win32
-		{A7DBB843-10DC-4407-B710-F5BA402DB8E5}.Release.ActiveCfg = Release|Win32
-		{A7DBB843-10DC-4407-B710-F5BA402DB8E5}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

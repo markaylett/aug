@@ -113,9 +113,6 @@
 				RelativePath="..\src\c\augutil\conv.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augutil\dstr.c">
-			</File>
-			<File
 				RelativePath="..\src\c\augutil\file.c">
 			</File>
 			<File
@@ -137,6 +134,9 @@
 				RelativePath="..\src\c\augutil\signal.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augutil\strbuf.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augutil\timer.c">
 			</File>
 		</Filter>
@@ -149,9 +149,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\conv.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augutil\dstr.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\file.h">
@@ -173,6 +170,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\signal.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augutil\strbuf.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\timer.h">

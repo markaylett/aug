@@ -13,9 +13,7 @@
 
 #include "augsyspp/exception.hpp"
 
-#include "augsys/string.h" // aug_perror()
-
-#include <algorithm>       // swap()
+#include <algorithm> // swap()
 
 namespace aug {
 
@@ -28,7 +26,7 @@ namespace aug {
             if (retain && null != ref) {
 
                 if (-1 == aug_retainmar(ref.get()))
-                    throwerror("aug_retainmar() failed");
+                    throwerrinfo("aug_retainmar() failed");
             }
         }
 
@@ -39,7 +37,7 @@ namespace aug {
                 return;
 
             if (null != ref_ && -1 == aug_releasemar(ref_.get()))
-                aug_perror("aug_releasemar() failed");
+                aug_perrinfo("aug_releasemar() failed");
         }
 
         smartmar(const null_&) NOTHROW
@@ -51,7 +49,7 @@ namespace aug {
             : ref_(rhs.ref_)
         {
             if (null != ref_ && -1 == aug_retainmar(ref_.get()))
-                throwerror("aug_retainmar() failed");
+                throwerrinfo("aug_retainmar() failed");
         }
 
         smartmar&
@@ -75,7 +73,7 @@ namespace aug {
                 marref ref(ref_);
                 ref_ = null;
                 if (-1 == aug_releasemar(ref.get()))
-                    throwerror("aug_releasemar() failed");
+                    throwerrinfo("aug_releasemar() failed");
             }
         }
 

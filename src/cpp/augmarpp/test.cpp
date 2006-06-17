@@ -341,7 +341,7 @@ namespace {
             cout << "testing " << t.name_ << "... ";
             (*t.test_)(dst, src);
             cout << "ok\n";
-        } catch (const aug::error& e) {
+        } catch (const aug::errinfo_error& e) {
             aug_perrinfo(e.what());
             result = false;
         } catch (const exception& e) {

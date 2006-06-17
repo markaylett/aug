@@ -7,7 +7,7 @@ static const char rcsid[] = "$Id:$";
 
 #include "message.h"
 
-#include "augnet/parser.h"
+#include "augnet/http.h"
 #include "augnet/types.h"
 #include "augnet/utility.h"
 
@@ -28,42 +28,42 @@ struct aug_state_ {
     aug_request_t request_;
     void* arg_;
     struct {
-        aug_parser_t parser_;
-        aug_dstr_t initial_;
+        aug_httpparser_t parser_;
+        aug_strbuf_t initial_;
         aug_mar_t mar_;
     } in_;
     struct {
         struct aug_messages pending_;
-        aug_dstr_t header_;     /* Current, formatted header. */
+        aug_strbuf_t header_;     /* Current, formatted header. */
         struct iovec iovec_[2]; /* Header and body. */
         struct aug_buf buf_;
     } out_;
 };
 
 static int
-format_(aug_dstr_t* header, const char* initial, aug_mar_t mar)
+format_(aug_strbuf_t* header, const char* initial, aug_mar_t mar)
 {
     struct aug_field field;
     size_t ord = 0;
 
-    aug_dstrsets(header, initial);
-    aug_dstrcats(header, "\r\n");
+    aug_setstrbufs(header, initial);
+    aug_catstrbufs(header, "\r\n");
 
     if (mar) {
 
         while (AUG_RETNOMATCH != aug_field(mar, &field, ord++)) {
 
-            aug_dstrcats(header, field.name_);
+            aug_catstrbufs(header, field.name_);
             if (0 < field.size_) {
-                aug_dstrcatsn(header, ": ", 2);
-                aug_dstrcatsn(header, field.value_, field.size_);
-                aug_dstrcatsn(header, "\r\n", 2);
+                aug_catstrbufsn(header, ": ", 2);
+                aug_catstrbufsn(header, field.value_, field.size_);
+                aug_catstrbufsn(header, "\r\n", 2);
             } else
-                aug_dstrcatsn(header, ":\r\n", 3);
+                aug_catstrbufsn(header, ":\r\n", 3);
         }
     }
 
-    aug_dstrcatsn(header, "\r\n", 2);
+    aug_catstrbufsn(header, "\r\n", 2);
     return 0;
 }
 
@@ -74,17 +74,17 @@ prepare_(aug_state_t state)
     assert(next);
 
     if (!state->out_.header_)
-        state->out_.header_ = aug_createdstr(0);
+        state->out_.header_ = aug_createstrbuf(0);
 
-    format_(&state->out_.header_, aug_dstr(next->initial_), next->mar_);
+    format_(&state->out_.header_, aug_getstr(next->initial_), next->mar_);
 
-    AUG_DEBUG("response: [%s]", aug_dstr(state->out_.header_));
+    AUG_DEBUG("response: [%s]", aug_getstr(state->out_.header_));
 
     state->out_.buf_.iov_ = state->out_.iovec_;
     state->out_.buf_.size_ = 1;
 
-    state->out_.iovec_[0].iov_base = (void*)aug_dstr(state->out_.header_);
-    state->out_.iovec_[0].iov_len = aug_dstrlen(state->out_.header_);
+    state->out_.iovec_[0].iov_base = (void*)aug_getstr(state->out_.header_);
+    state->out_.iovec_[0].iov_len = aug_strbuflen(state->out_.header_);
 
     if (next->mar_) {
         size_t size;
@@ -103,8 +103,8 @@ setinitial_(void* arg, const char* initial)
 {
     aug_state_t state = arg;
     if (!state->in_.initial_)
-        state->in_.initial_ = aug_createdstr(AUG_MAXLINE);
-    aug_dstrsets(&state->in_.initial_, initial);
+        state->in_.initial_ = aug_createstrbuf(AUG_MAXLINE);
+    aug_setstrbufs(&state->in_.initial_, initial);
     return 0;
 }
 
@@ -159,13 +159,13 @@ end_(void* arg, int commit)
         if (!state->in_.initial_)
             return 0; /* Blank line. */
 
-        (*state->request_)(state->arg_, aug_dstr(state->in_.initial_),
+        (*state->request_)(state->arg_, aug_getstr(state->in_.initial_),
                            state->in_.mar_, &messages);
         AUG_CONCAT(&state->out_.pending_, &messages);
     }
 
     if (state->in_.initial_) {
-        aug_freedstr(state->in_.initial_);
+        aug_freestrbuf(state->in_.initial_);
         state->in_.initial_ = NULL;
     }
 
@@ -195,8 +195,8 @@ aug_createstate(aug_request_t request, void* arg)
 
     state->request_ = request;
     state->arg_ = arg;
-    if (!(state->in_.parser_ = aug_createparser(AUG_MAXLINE, &handlers_,
-                                                state)))
+    if (!(state->in_.parser_ = aug_createhttpparser(AUG_MAXLINE, &handlers_,
+                                                    state)))
         goto fail;
 
     state->in_.initial_ = NULL;
@@ -215,10 +215,10 @@ aug_freestate(aug_state_t state)
 {
     struct aug_message* it;
 
-    aug_freeparser(state->in_.parser_);
+    aug_freehttpparser(state->in_.parser_);
 
     if (state->in_.initial_)
-        aug_freedstr(state->in_.initial_);
+        aug_freestrbuf(state->in_.initial_);
 
     if (state->in_.mar_)
         aug_releasemar(state->in_.mar_);
@@ -228,7 +228,7 @@ aug_freestate(aug_state_t state)
         /* An initial line will always be present. */
 
         assert(it->initial_);
-        aug_freedstr(it->initial_);
+        aug_freestrbuf(it->initial_);
 
         if (it->mar_)
             aug_releasemar(it->mar_);
@@ -237,7 +237,7 @@ aug_freestate(aug_state_t state)
     aug_freemessages(&state->out_.pending_);
 
     if (state->out_.header_)
-        aug_freedstr(state->out_.header_);
+        aug_freestrbuf(state->out_.header_);
 
     free(state);
     return 0;
@@ -272,7 +272,7 @@ aug_readsome(aug_state_t state, int fd)
 
         pending = !AUG_EMPTY(&state->out_.pending_);
 
-        if (-1 == aug_parse(state->in_.parser_, buf, ret))
+        if (-1 == aug_parsehttp(state->in_.parser_, buf, ret))
             return -1;
 
         if (!pending && !AUG_EMPTY(&state->out_.pending_))
@@ -296,7 +296,7 @@ aug_writesome(aug_state_t state, int fd)
             struct aug_message* message = AUG_FIRST(&state->out_.pending_);
             AUG_REMOVE_HEAD(&state->out_.pending_);
 
-            aug_freedstr(message->initial_);
+            aug_freestrbuf(message->initial_);
             if (message->mar_)
                 aug_releasemar(message->mar_);
 

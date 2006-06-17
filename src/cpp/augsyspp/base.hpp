@@ -8,82 +8,98 @@
 #include "augsyspp/types.hpp"
 
 #include "augsys/base.h"
+#include "augsys/errno.h"
 #include "augsys/string.h" // aug_perror()
 
 namespace aug {
+
+    namespace detail {
+
+        inline std::string
+        join(const std::string& lhs, const std::string& rhs)
+        {
+            std::string s(lhs);
+            s += ": ";
+            s += rhs;
+            return s;
+        }
+    }
 
     inline void
     init(struct aug_errinfo& errinfo)
     {
         if (-1 == aug_init(&errinfo))
-            throw posix_error("aug_init() failed");
+            throw std::runtime_error(detail::join("aug_init() failed",
+                                                  aug_strerror(errno)));
     }
     inline void
     term()
     {
         if (-1 == aug_term())
-            throw posix_error("aug_term() failed");
+            throw std::runtime_error(detail::join("aug_term() failed",
+                                                  aug_strerror(errno)));
     }
     inline void
     atexitinit(struct aug_errinfo& errinfo)
     {
         if (-1 == aug_atexitinit(&errinfo))
-            throw posix_error("aug_atexitinit() failed");
+            throw std::runtime_error(detail::join("aug_atexitinit() failed",
+                                                  aug_strerror(errno)));
     }
     inline void
     openfd(int fd, const struct aug_fddriver* driver)
     {
         if (-1 == aug_openfd(fd, driver))
-            throwerror("aug_openfd() failed");
+            throwerrinfo("aug_openfd() failed");
     }
     inline void
     openfds(int fds[2], const struct aug_fddriver* driver)
     {
         if (-1 == aug_openfds(fds, driver))
-            throwerror("aug_openfds() failed");
+            throwerrinfo("aug_openfds() failed");
     }
     inline void
     releasefd(int fd)
     {
         if (-1 == aug_releasefd(fd))
-            throwerror("aug_releasefd() failed");
+            throwerrinfo("aug_releasefd() failed");
     }
     inline void
     retainfd(int fd)
     {
         if (-1 == aug_retainfd(fd))
-            throwerror("aug_retainfd() failed");
+            throwerrinfo("aug_retainfd() failed");
     }
     inline void
     setfddriver(fdref ref, const struct aug_fddriver* driver)
     {
         if (-1 == aug_setfddriver(ref.get(), driver))
-            throwerror("aug_setfddriver() failed");
+            throwerrinfo("aug_setfddriver() failed");
     }
     inline const struct aug_fddriver*
     fddriver(fdref ref)
     {
         const struct aug_fddriver* driver = aug_fddriver(ref.get());
         if (!driver)
-            throwerror("aug_fddriver() failed");
+            throwerrinfo("aug_fddriver() failed");
         return driver;
     }
 
-    class AUGSYSPP_API initialiser {
+    class AUGSYSPP_API scoped_init {
 
-        initialiser(const initialiser& rhs);
+        scoped_init(const scoped_init& rhs);
 
-        initialiser&
-        operator =(const initialiser& rhs);
+        scoped_init&
+        operator =(const scoped_init& rhs);
 
     public:
-        ~initialiser() NOTHROW
+        ~scoped_init() NOTHROW
         {
             if (-1 == aug_term())
                 aug_perror("aug_term() failed");
         }
 
-        initialiser(struct aug_errinfo& errinfo)
+        scoped_init(struct aug_errinfo& errinfo)
         {
             init(errinfo);
         }

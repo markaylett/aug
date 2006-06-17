@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGNET_BUILD
-#include "augnet/parser.h"
+#include "augnet/http.h"
 
 static const char rcsid[] = "$Id:$";
 
@@ -16,7 +16,7 @@ static const char rcsid[] = "$Id:$";
 #include <errno.h>       /* ENOMEM */
 #include <stdlib.h>      /* malloc() */
 
-struct aug_parser_ {
+struct aug_httpparser_ {
     const struct aug_handlers* handlers_;
     void* arg_;
     aug_lexer_t lexer_;
@@ -37,14 +37,14 @@ iscolon_(char ch)
 }
 
 static int
-setinitial_(aug_parser_t parser)
+setinitial_(aug_httpparser_t parser)
 {
     return (*parser->handlers_->setinitial_)(parser->arg_,
                                              aug_token(parser->lexer_));
 }
 
 static int
-setname_(aug_parser_t parser)
+setname_(aug_httpparser_t parser)
 {
     aug_strlcpy(parser->name_, aug_token(parser->lexer_),
                 sizeof(parser->name_));
@@ -52,7 +52,7 @@ setname_(aug_parser_t parser)
 }
 
 static int
-setvalue_(aug_parser_t parser)
+setvalue_(aug_httpparser_t parser)
 {
     size_t csize;
 
@@ -79,7 +79,7 @@ setvalue_(aug_parser_t parser)
 }
 
 static int
-end_(aug_parser_t parser, int commit)
+end_(aug_httpparser_t parser, int commit)
 {
     parser->state_ = INITIAL_;
     parser->csize_ = 0;
@@ -87,7 +87,7 @@ end_(aug_parser_t parser, int commit)
 }
 
 static int
-tail_(aug_parser_t parser)
+tail_(aug_httpparser_t parser)
 {
     switch (parser->state_) {
     case INITIAL_:
@@ -127,7 +127,7 @@ tail_(aug_parser_t parser)
 }
 
 static ssize_t
-header_(aug_parser_t parser, const char* ptr, size_t size)
+header_(aug_httpparser_t parser, const char* ptr, size_t size)
 {
     size_t i = 0;
     while (i < size) {
@@ -176,7 +176,7 @@ header_(aug_parser_t parser, const char* ptr, size_t size)
 }
 
 static ssize_t
-body_(aug_parser_t parser, const char* buf, size_t size)
+body_(aug_httpparser_t parser, const char* buf, size_t size)
 {
     if (size < parser->csize_) {
 
@@ -206,10 +206,11 @@ body_(aug_parser_t parser, const char* buf, size_t size)
     return (ssize_t)size;
 }
 
-AUGNET_API aug_parser_t
-aug_createparser(size_t size, const struct aug_handlers* handlers, void* arg)
+AUGNET_API aug_httpparser_t
+aug_createhttpparser(size_t size, const struct aug_handlers* handlers,
+                     void* arg)
 {
-    aug_parser_t parser = malloc(sizeof(struct aug_parser_));
+    aug_httpparser_t parser = malloc(sizeof(struct aug_httpparser_));
     if (!parser) {
         aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return NULL;
@@ -228,7 +229,7 @@ aug_createparser(size_t size, const struct aug_handlers* handlers, void* arg)
 }
 
 AUGNET_API int
-aug_freeparser(aug_parser_t parser)
+aug_freehttpparser(aug_httpparser_t parser)
 {
     int ret = aug_freelexer(parser->lexer_);
     free(parser);
@@ -236,7 +237,7 @@ aug_freeparser(aug_parser_t parser)
 }
 
 AUGNET_API int
-aug_parse(aug_parser_t parser, const char* buf, size_t size)
+aug_parsehttp(aug_httpparser_t parser, const char* buf, size_t size)
 {
     ssize_t ret;
 
@@ -275,7 +276,7 @@ aug_parse(aug_parser_t parser, const char* buf, size_t size)
 }
 
 AUGNET_API int
-aug_parseend(aug_parser_t parser)
+aug_endhttp(aug_httpparser_t parser)
 {
     if (-1 == aug_lexend(&parser->lexer_))
         goto fail;

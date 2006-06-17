@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsrv/global.h"
+#include "augsrv/base.h"
 #include "augsrv/options.h"
 #include "augsrv/types.h" /* struct aug_service */
 

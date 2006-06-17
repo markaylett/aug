@@ -4,9 +4,9 @@
 #ifndef AUGSRV_H
 #define AUGSRV_H
 
+#include "augsrv/base.h"
 #include "augsrv/control.h"
 #include "augsrv/daemon.h"
-#include "augsrv/global.h"
 #include "augsrv/log.h"
 #include "augsrv/main.h"
 #include "augsrv/options.h"

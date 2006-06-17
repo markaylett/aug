@@ -4,7 +4,6 @@ modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
 	config.h \
 	conv.h \
-	dstr.h \
 	file.h \
 	getopt.h \
 	lexer.h \
@@ -12,6 +11,7 @@ modinclude_HEADERS = \
 	log.h \
 	path.h \
 	signal.h \
+	strbuf.h \
 	timer.h
 
 noinst_HEADERS =
@@ -21,7 +21,6 @@ lib_LTLIBRARIES = libaugutil.la
 libaugutil_la_SOURCES = \
 	config.c \
 	conv.c \
-	dstr.c \
 	file.c \
 	getopt.c \
 	lexer.c \
@@ -29,6 +28,7 @@ libaugutil_la_SOURCES = \
 	log.c \
 	path.c \
 	signal.c \
+	strbuf.c \
 	timer.c
 
 libaugutil_la_LDFLAGS = \

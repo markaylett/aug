@@ -11,10 +11,6 @@ static const char rcsid[] = "$Id:$";
 #include <memory>
 #include <time.h>
 
-#if defined(_MSC_VER)
-# pragma comment(lib, "ws2_32.lib")
-#endif /* _MSC_VER */
-
 using namespace aug;
 using namespace std;
 
@@ -47,8 +43,10 @@ namespace test {
 
             } else if (0 == aug_strcasecmp(name, "rundir")) {
 
-                if (!aug_realpath(rundir_, value, sizeof(rundir_)))
-                    error("aug_realpath() failed");
+                if (!aug_realpath(rundir_, value, sizeof(rundir_))) {
+                    aug_setposixerrinfo(__FILE__, __LINE__, errno);
+                    throwerrinfo("aug_realpath() failed");
+                }
 
             } else {
 
@@ -113,11 +111,15 @@ namespace test {
                 readconf(conffile_, action);
             }
 
-            if (-1 == chdir(rundir_))
-                error("chdir() failed");
+            if (-1 == chdir(rundir_)) {
+                aug_setposixerrinfo(__FILE__, __LINE__, errno);
+                throwerrinfo("chdir() failed");
+            }
 
-            if (daemon_ && -1 == aug_openlog(logfile_))
-                error("aug_openlog() failed");
+            if (daemon_ && -1 == aug_openlog(logfile_)) {
+                aug_setposixerrinfo(__FILE__, __LINE__, errno);
+                throwerrinfo("aug_openlog() failed");
+            }
 
             aug_info("run directory: %s", rundir_);
             aug_info("pid file: %s", pidfile_);
@@ -149,8 +151,10 @@ namespace test {
         do_config(const char* conffile, bool daemon)
         {
             if (conffile && !aug_realpath(conffile_, conffile,
-                                          sizeof(conffile_)))
-                error("aug_realpath() failed");
+                                          sizeof(conffile_))) {
+                aug_setposixerrinfo(__FILE__, __LINE__, errno);
+                throwerrinfo("aug_realpath() failed");
+            }
 
             daemon_ = daemon;
             reconfig();
@@ -161,8 +165,10 @@ namespace test {
         {
             aug_info("initialising daemon process");
 
-            if (-1 == aug_setsrvlogger("timerd"))
-                error("aug_setsrvlogger() failed");
+            if (-1 == aug_setsrvlogger("timerd")) {
+                aug_setposixerrinfo(__FILE__, __LINE__, errno);
+                throwerrinfo("aug_setsrvlogger() failed");
+            }
 
             auto_ptr<state> ptr(new state(*this));
             seteventmask(ptr->mplexer_, aug_signalin(), AUG_EVENTRD);
@@ -225,8 +231,10 @@ namespace test {
     getcwd()
     {
         char buf[AUG_PATH_MAX + 1];
-        if (!::getcwd(buf, sizeof(buf)))
-            error("getcwd() failed");
+        if (!::getcwd(buf, sizeof(buf))) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            throwerrinfo("getcwd() failed");
+        }
 
         return buf;
     }
@@ -240,12 +248,14 @@ main(int argc, char* argv[])
     try {
 
         struct aug_errinfo errinfo;
-        initialiser init(errinfo);
+        scoped_init init(errinfo);
 
         program_ = argv[0];
 
-        if (!getcwd(rundir_, sizeof(rundir_)))
-            error("getcwd() failed");
+        if (!getcwd(rundir_, sizeof(rundir_))) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            throwerrinfo("getcwd() failed");
+        }
 
         main(service_, argc, argv);
 

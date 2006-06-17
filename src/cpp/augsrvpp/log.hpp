@@ -16,21 +16,21 @@ namespace aug {
     openlog(const char* path)
     {
         if (-1 == aug_openlog(path))
-            throwerror("aug_openlog() failed");
+            throwerrinfo("aug_openlog() failed");
     }
 
     inline void
     setsrvlogger(const char* sname)
     {
         if (-1 == aug_setsrvlogger(sname))
-            throwerror("aug_setsrvlogger() failed");
+            throwerrinfo("aug_setsrvlogger() failed");
     }
 
     inline void
     unsetsrvlogger()
     {
         if (-1 == aug_unsetsrvlogger())
-            throwerror("aug_unsetsrvlogger() failed");
+            throwerrinfo("aug_unsetsrvlogger() failed");
     }
 }
 

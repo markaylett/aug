@@ -16,7 +16,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_socket(domain, type, protocol)));
         if (null == sfd)
-            throwerror("aug_socket() failed");
+            throwerrinfo("aug_socket() failed");
 
         return sfd;
     }
@@ -26,7 +26,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_accept(ref.get(), &addr, &addrlen)));
         if (null == sfd)
-            throwerror("aug_accept() failed");
+            throwerrinfo("aug_accept() failed");
 
         return sfd;
     }
@@ -35,35 +35,35 @@ namespace aug {
     bind(fdref ref, const struct sockaddr& addr, socklen_t addrlen)
     {
         if (-1 == aug_bind(ref.get(), &addr, addrlen))
-            throwerror("aug_bind() failed");
+            throwerrinfo("aug_bind() failed");
     }
 
     inline void
     connect(fdref ref, const struct sockaddr& addr, socklen_t addrlen)
     {
         if (-1 == aug_connect(ref.get(), &addr, addrlen))
-            throwerror("aug_connect() failed");
+            throwerrinfo("aug_connect() failed");
     }
 
     inline void
     getpeername(fdref ref, struct sockaddr& addr, socklen_t& addrlen)
     {
         if (-1 == aug_getpeername(ref.get(), &addr, &addrlen))
-            throwerror("aug_getpeername() failed");
+            throwerrinfo("aug_getpeername() failed");
     }
 
     inline void
     getsockname(fdref ref, struct sockaddr& addr, socklen_t& addrlen)
     {
         if (-1 == aug_getsockname(ref.get(), &addr, &addrlen))
-            throwerror("aug_getsockname() failed");
+            throwerrinfo("aug_getsockname() failed");
     }
 
     inline void
     listen(fdref ref, int backlog)
     {
         if (-1 == aug_listen(ref.get(), backlog))
-            throwerror("aug_listen() failed");
+            throwerrinfo("aug_listen() failed");
     }
 
     inline size_t
@@ -71,7 +71,7 @@ namespace aug {
     {
         ssize_t ret(aug_recv(ref.get(), buf, len, flags));
         if (-1 == ret)
-            throwerror("aug_recv() failed");
+            throwerrinfo("aug_recv() failed");
         return ret;
     }
 
@@ -82,7 +82,7 @@ namespace aug {
         ssize_t ret(aug_recvfrom(ref.get(), buf, len, flags, &from,
                                  &fromlen));
         if (-1 == ret)
-            throwerror("aug_recvfrom() failed");
+            throwerrinfo("aug_recvfrom() failed");
         return ret;
     }
 
@@ -91,7 +91,7 @@ namespace aug {
     {
         ssize_t ret(aug_send(ref.get(), buf, len, flags));
         if (-1 == ret)
-            throwerror("aug_send() failed");
+            throwerrinfo("aug_send() failed");
         return ret;
     }
 
@@ -101,7 +101,7 @@ namespace aug {
     {
         ssize_t ret(aug_sendto(ref.get(), buf, len, flags, &to, tolen));
         if (-1 == ret)
-            throwerror("aug_sendto() failed");
+            throwerrinfo("aug_sendto() failed");
         return ret;
     }
 
@@ -110,7 +110,7 @@ namespace aug {
                socklen_t& optlen)
     {
         if (-1 == aug_getsockopt(ref.get(), level, optname, optval, &optlen))
-            throwerror("aug_getsockopt() failed");
+            throwerrinfo("aug_getsockopt() failed");
     }
 
     inline void
@@ -118,14 +118,14 @@ namespace aug {
                socklen_t optlen)
     {
         if (-1 == aug_setsockopt(ref.get(), level, optname, optval, optlen))
-            throwerror("aug_setsockopt() failed");
+            throwerrinfo("aug_setsockopt() failed");
     }
 
     inline void
     shutdown(fdref ref, int how)
     {
         if (-1 == aug_shutdown(ref.get(), how))
-            throwerror("aug_shutdown() failed");
+            throwerrinfo("aug_shutdown() failed");
     }
 
     inline std::pair<smartfd, smartfd>
@@ -133,7 +133,7 @@ namespace aug {
     {
         int sv[2];
         if (-1 == aug_socketpair(domain, type, protocol, sv))
-            throwerror("aug_socketpair() failed");
+            throwerrinfo("aug_socketpair() failed");
 
         return std::make_pair(smartfd::attach(sv[0]), smartfd::attach(sv[1]));
     }

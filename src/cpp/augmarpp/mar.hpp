@@ -21,21 +21,21 @@ namespace aug {
     result(int ret, const char* s)
     {
         if (-1 == ret)
-            throwerror(s);
+            throwerrinfo(s);
         return AUG_RETNOMATCH != ret;
     }
     inline void
     copymar(marref dst, marref src)
     {
         if (-1 == aug_copymar(dst.get(), src.get()))
-            throwerror("aug_copymar() failed");
+            throwerrinfo("aug_copymar() failed");
     }
     inline smartmar
     createmar()
     {
         aug_mar_t m(aug_createmar());
         if (!m)
-            throwerror("aug_createmar() failed");
+            throwerrinfo("aug_createmar() failed");
 
         return smartmar::attach(m);
     }
@@ -44,7 +44,7 @@ namespace aug {
     {
         aug_mar_t m(aug_openmar(path, flags));
         if (!m)
-            throwerror("aug_openmar() failed");
+            throwerrinfo("aug_openmar() failed");
         return smartmar::attach(m);
     }
     inline smartmar
@@ -52,46 +52,46 @@ namespace aug {
     {
         aug_mar_t m(aug_openmar(path, flags, mode));
         if (!m)
-            throwerror("aug_openmar() failed");
+            throwerrinfo("aug_openmar() failed");
         return smartmar::attach(m);
     }
     inline void
     releasemar(aug_mar_t m)
     {
         if (-1 == aug_releasemar(m))
-            throwerror("aug_releasemar() failed");
+            throwerrinfo("aug_releasemar() failed");
     }
     inline void
     retainmar(aug_mar_t m)
     {
         if (-1 == aug_retainmar(m))
-            throwerror("aug_retainmar() failed");
+            throwerrinfo("aug_retainmar() failed");
     }
     inline void
     compactmar(marref ref)
     {
         if (-1 == aug_compactmar(ref.get()))
-            throwerror("aug_compactmar() failed");
+            throwerrinfo("aug_compactmar() failed");
     }
     inline void
     removefields(marref ref)
     {
         if (-1 == aug_removefields(ref.get()))
-            throwerror("aug_removefields() failed");
+            throwerrinfo("aug_removefields() failed");
     }
     inline size_t
     setfield(marref ref, const struct aug_field& f)
     {
         size_t ord;
         if (-1 == aug_setfield(ref.get(), &f, &ord))
-            throwerror("aug_setfield() failed");
+            throwerrinfo("aug_setfield() failed");
         return ord;
     }
     inline void
     setfield(marref ref, size_t ord, const void* cdata, size_t size)
     {
         if (-1 == aug_setvalue(ref.get(), ord, cdata, size))
-            throwerror("aug_setvalue() failed");
+            throwerrinfo("aug_setvalue() failed");
     }
     inline void
     setfield(marref ref, size_t ord, const char* cdata)
@@ -117,7 +117,7 @@ namespace aug {
     {
         const void* ret = aug_valuebyname(ref.get(), name, NULL);
         if (!ret)
-            throwerror("aug_valuebyname() failed");
+            throwerrinfo("aug_valuebyname() failed");
         return ret;
     }
     inline const void*
@@ -125,7 +125,7 @@ namespace aug {
     {
         const void* ret = aug_valuebyname(ref.get(), name, &size);
         if (!ret)
-            throwerror("aug_valuebyname() failed");
+            throwerrinfo("aug_valuebyname() failed");
         return ret;
     }
     inline const void*
@@ -133,7 +133,7 @@ namespace aug {
     {
         const void* ret = aug_valuebyord(ref.get(), ord, &size);
         if (!ret)
-            throwerror("aug_valuebyord() failed");
+            throwerrinfo("aug_valuebyord() failed");
         return ret;
     }
     inline const void*
@@ -141,7 +141,7 @@ namespace aug {
     {
         const void* ret = aug_valuebyord(ref.get(), ord, NULL);
         if (!ret)
-            throwerror("aug_valuebyord() failed");
+            throwerrinfo("aug_valuebyord() failed");
         return ret;
     }
     inline bool
@@ -155,7 +155,7 @@ namespace aug {
     {
         size_t size;
         if (-1 == aug_fields(ref.get(), &size))
-            throwerror("aug_fields() failed");
+            throwerrinfo("aug_fields() failed");
         return size;
     }
     inline bool
@@ -176,21 +176,21 @@ namespace aug {
     insertmar(marref ref, const char* path)
     {
         if (-1 == aug_insertmar(ref.get(), path))
-            throwerror("aug_insertmar() failed");
+            throwerrinfo("aug_insertmar() failed");
     }
     inline off_t
     seekmar(marref ref, off_t offset, int whence)
     {
         off_t ret(aug_seekmar(ref.get(), offset, whence));
         if (-1 == ret)
-            throwerror("aug_seekmar() failed");
+            throwerrinfo("aug_seekmar() failed");
         return ret;
     }
     inline void
     setcontent(marref ref, const void* cdata, size_t size)
     {
         if (-1 == aug_setcontent(ref.get(), cdata, size))
-            throwerror("aug_setcontent() failed");
+            throwerrinfo("aug_setcontent() failed");
     }
     inline void
     setcontent(marref ref, const char* data)
@@ -201,34 +201,34 @@ namespace aug {
     syncmar(marref ref)
     {
         if (-1 == aug_syncmar(ref.get()))
-            throwerror("aug_syncmar() failed");
+            throwerrinfo("aug_syncmar() failed");
     }
     inline void
     truncatemar(marref ref, size_t size)
     {
         if (-1 == aug_truncatemar(ref.get(), size))
-            throwerror("aug_truncatemar() failed");
+            throwerrinfo("aug_truncatemar() failed");
     }
     inline size_t
     writemar(marref ref, const void* buf, size_t size)
     {
         ssize_t ret(aug_writemar(ref.get(), buf, size));
         if (-1 == ret)
-            throwerror("aug_writemar() failed");
+            throwerrinfo("aug_writemar() failed");
         return ret;
     }
     inline void
     extractmar(marref ref, const char* path)
     {
         if (-1 == aug_extractmar(ref.get(), path))
-            throwerror("aug_extractmar() failed");
+            throwerrinfo("aug_extractmar() failed");
     }
     inline const void*
     content(marref ref, size_t& size)
     {
         const void* ret = aug_content(ref.get(), &size);
         if (!ret)
-            throwerror("aug_content() failed");
+            throwerrinfo("aug_content() failed");
         return ret;
     }
     inline const void*
@@ -236,7 +236,7 @@ namespace aug {
     {
         const void* ret = aug_content(ref.get(), NULL);
         if (!ret)
-            throwerror("aug_content() failed");
+            throwerrinfo("aug_content() failed");
         return ret;
     }
     inline size_t
@@ -244,7 +244,7 @@ namespace aug {
     {
         ssize_t ret(aug_readmar(ref.get(), buf, size));
         if (-1 == ret)
-            throwerror("aug_readmar() failed");
+            throwerrinfo("aug_readmar() failed");
         return ret;
     }
     inline size_t
@@ -252,7 +252,7 @@ namespace aug {
     {
         size_t size;
         if (-1 == aug_contentsize(ref.get(), &size))
-            throwerror("aug_contentsize() failed");
+            throwerrinfo("aug_contentsize() failed");
         return size;
     }
 }

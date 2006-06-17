@@ -5,10 +5,10 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augsrv
 modinclude_HEADERS = \
+	base.h \
 	config.h \
 	control.h \
 	daemon.h \
-	global.h \
 	log.h \
 	main.h \
 	options.h \
@@ -18,10 +18,10 @@ modinclude_HEADERS = \
 lib_LTLIBRARIES = libaugsrv.la
 
 libaugsrv_la_SOURCES = \
+	base.c \
 	config.c \
 	control.c \
 	daemon.c \
-	global.c \
 	log.c \
 	main.c \
 	options.c \

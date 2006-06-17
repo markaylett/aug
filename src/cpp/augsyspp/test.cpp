@@ -49,7 +49,7 @@ main(int argc, char* argv[])
     try {
 
         struct aug_errinfo errinfo;
-        initialiser init(errinfo);
+        scoped_init init(errinfo);
 
         aug_extenddriver(&driver_, 0);
         smartfd sfd1(open());

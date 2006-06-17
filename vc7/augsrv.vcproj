@@ -107,6 +107,9 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath="..\src\c\augsrv\base.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augsrv\config.c">
 			</File>
 			<File
@@ -114,9 +117,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsrv\daemon.c">
-			</File>
-			<File
-				RelativePath="..\src\c\augsrv\global.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augsrv\log.c">
@@ -139,6 +139,9 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath="..\src\c\augsrv\base.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augsrv\config.h">
 			</File>
 			<File
@@ -146,9 +149,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsrv\daemon.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augsrv\global.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsrv\log.h">

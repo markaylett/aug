@@ -15,7 +15,6 @@
 
 #include "augsys/errno.h"
 #include "augsys/log.h"
-#include "augsys/string.h" // aug_perror()
 
 namespace aug {
 
@@ -52,7 +51,7 @@ namespace aug {
         ~conns() NOTHROW
         {
             if (-1 == aug_freeconns(&conns_))
-                aug_perror("aug_freeconns() failed");
+                aug_perrinfo("aug_freeconns() failed");
         }
 
         conns()
@@ -86,7 +85,8 @@ namespace aug {
             try {
                 poll_base* ptr = static_cast<poll_base*>(arg);
                 return ptr->poll(id, *conns) ? 1 : 0;
-            } AUG_CATCHRETURN 0; /* false */
+            } AUG_SETERRINFOCATCH;
+            return 0; /* false */
         }
     }
 
@@ -94,21 +94,21 @@ namespace aug {
     insertconn(struct aug_conns& conns, fdref ref, poll_base& action)
     {
         if (-1 == aug_insertconn(&conns, ref.get(), detail::poll, &action))
-            throwerror("aug_insertconn() failed");
+            throwerrinfo("aug_insertconn() failed");
     }
 
     inline void
     removeconn(struct aug_conns& conns, fdref ref)
     {
         if (-1 == aug_removeconn(&conns, ref.get()))
-            throwerror("aug_removeconn() failed");
+            throwerrinfo("aug_removeconn() failed");
     }
 
     inline void
     processconns(struct aug_conns& conns)
     {
         if (-1 == aug_processconns(&conns))
-            throwerror("aug_processconns() failed");
+            throwerrinfo("aug_processconns() failed");
     }
 }
 

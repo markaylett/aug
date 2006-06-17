@@ -5,8 +5,8 @@
 
 #include "augsrv/types.h"  /* struct aug_service */
 
-#include "augutil/dstr.h"
 #include "augutil/path.h"
+#include "augutil/strbuf.h"
 
 #include "augsys/errinfo.h"
 #include "augsys/limits.h" /* AUG_PATH_MAX */
@@ -18,12 +18,12 @@
 
 #define OFFSET_ 128
 
-static aug_dstr_t
+static aug_strbuf_t
 makepath_(const struct aug_service* service)
 {
     const char* program, * conffile;
     char buf[AUG_PATH_MAX + 1];
-    aug_dstr_t s;
+    aug_strbuf_t s;
 
     if (!(program = service->getopt_(service->arg_, AUG_OPTPROGRAM))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
@@ -31,14 +31,14 @@ makepath_(const struct aug_service* service)
         return NULL;
     }
 
-    if (!(s = aug_createdstr(sizeof(buf))))
+    if (!(s = aug_createstrbuf(sizeof(buf))))
         return NULL;
 
     if (!aug_realpath(buf, program, sizeof(buf)))
         goto fail;
 
-    if (-1 == aug_dstrcatc(&s, '"') || -1 == aug_dstrcats(&s, buf)
-        || -1 == aug_dstrcatc(&s, '"'))
+    if (-1 == aug_catstrbufc(&s, '"') || -1 == aug_catstrbufs(&s, buf)
+        || -1 == aug_catstrbufc(&s, '"'))
         goto fail;
 
     if ((conffile = service->getopt_(service->arg_, AUG_OPTCONFFILE))) {
@@ -46,15 +46,16 @@ makepath_(const struct aug_service* service)
         if (!aug_realpath(buf, conffile, sizeof(buf)))
             goto fail;
 
-        if (-1 == aug_dstrcats(&s, " -f \"") || -1 == aug_dstrcats(&s, buf)
-            || -1 == aug_dstrcatc(&s, '"'))
+        if (-1 == aug_catstrbufs(&s, " -f \"")
+            || -1 == aug_catstrbufs(&s, buf)
+            || -1 == aug_catstrbufc(&s, '"'))
             goto fail;
     }
 
     return s;
 
  fail:
-    aug_freedstr(s);
+    aug_freestrbuf(s);
     return NULL;
 }
 
@@ -141,7 +142,7 @@ static int
 install_(SC_HANDLE scm, const struct aug_service* service)
 {
     const char* lname, * sname;
-    aug_dstr_t path;
+    aug_strbuf_t path;
     SC_HANDLE serv;
     int ret = -1;
 
@@ -162,7 +163,7 @@ install_(SC_HANDLE scm, const struct aug_service* service)
 
     if (!(serv = CreateService(scm, sname, lname, SERVICE_ALL_ACCESS,
                                SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START,
-                               SERVICE_ERROR_NORMAL, aug_dstr(path), NULL,
+                               SERVICE_ERROR_NORMAL, aug_getstr(path), NULL,
                                NULL, NULL, NULL, NULL))) {
 
         aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
@@ -173,7 +174,7 @@ install_(SC_HANDLE scm, const struct aug_service* service)
     ret = 0;
 
  done:
-    aug_freedstr(path);
+    aug_freestrbuf(path);
     return ret;
 }
 

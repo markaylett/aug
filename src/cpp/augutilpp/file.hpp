@@ -42,7 +42,8 @@ namespace aug {
                 setopt_base* ptr = static_cast<setopt_base*>(arg);
                 ptr->setopt(name, value);
                 return 0;
-            } AUG_CATCHRETURN -1;
+            } AUG_SETERRINFOCATCH;
+            return -1;
         }
     }
 
@@ -50,7 +51,7 @@ namespace aug {
     readconf(const char* path, setopt_base& action)
     {
         if (-1 == aug_readconf(path, detail::setopt, &action))
-            throwerror("aug_readconf() failed");
+            throwerrinfo("aug_readconf() failed");
     }
 }
 

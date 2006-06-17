@@ -5,3 +5,7 @@
 #include "augnet/config.h"
 
 static const char rcsid[] = "$Id:$";
+
+#if defined(_MSC_VER)
+# pragma comment(lib, "libaugutil.lib")
+#endif /* _MSC_VER */

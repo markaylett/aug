@@ -5,7 +5,6 @@
 #define AUGUTIL_H
 
 #include "augutil/conv.h"
-#include "augutil/dstr.h"
 #include "augutil/file.h"
 #include "augutil/getopt.h"
 #include "augutil/lexer.h"
@@ -13,6 +12,7 @@
 #include "augutil/log.h"
 #include "augutil/path.h"
 #include "augutil/signal.h"
+#include "augutil/strbuf.h"
 #include "augutil/timer.h"
 
 #endif /* AUGUTIL_H */

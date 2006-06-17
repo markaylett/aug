@@ -19,7 +19,7 @@ namespace aug {
     {
         unsigned long ul;
         if (-1 == aug_strtoul(&ul, src, base))
-            throwerror("aug_strtoul() failed");
+            throwerrinfo("aug_strtoul() failed");
         return ul;
     }
 
@@ -28,7 +28,7 @@ namespace aug {
     {
         unsigned int ui;
         if (-1 == aug_strtoui(&ui, src, base))
-            throwerror("aug_strtoui() failed");
+            throwerrinfo("aug_strtoui() failed");
         return ui;
     }
 
@@ -37,7 +37,7 @@ namespace aug {
     {
         unsigned short us;
         if (-1 == aug_strtous(&us, src, base))
-            throwerror("aug_strtous() failed");
+            throwerrinfo("aug_strtous() failed");
         return us;
     }
 }

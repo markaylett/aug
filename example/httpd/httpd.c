@@ -22,10 +22,6 @@ static const char rcsid[] = "$Id:$";
 # define snprintf _snprintf
 #endif /* _WIN32 */
 
-#if defined(_MSC_VER)
-# pragma comment(lib, "ws2_32.lib")
-#endif /* _MSC_VER */
-
 #define PORT_ 8080
 
 static const char* program_;
@@ -52,9 +48,9 @@ request_(void* arg, const char* initial, aug_mar_t mar,
     char buf[64];
     time_t t;
     struct aug_field f;
-    aug_dstr_t s = aug_createdstr(0);
+    aug_strbuf_t s = aug_createstrbuf(0);
     struct aug_message* message;
-    aug_dstrsets(&s, "HTTP/1.0 200 OK");
+    aug_setstrbufs(&s, "HTTP/1.0 200 OK");
 
     mar = aug_createmar();
 

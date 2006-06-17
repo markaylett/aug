@@ -5,19 +5,20 @@
 #define HTTPD_MESSAGE_H
 
 #include "augutil/list.h"
-#include "augutil/dstr.h"
+#include "augutil/strbuf.h"
+
 #include "augmar/mar.h"
 
 struct aug_message {
     AUG_ENTRY(aug_message);
-    aug_dstr_t initial_;
+    aug_strbuf_t initial_;
     aug_mar_t mar_;
 };
 
 AUG_HEAD(aug_messages, aug_message);
 
 struct aug_message*
-aug_createmessage(aug_dstr_t initial, aug_mar_t mar);
+aug_createmessage(aug_strbuf_t initial, aug_mar_t mar);
 
 int
 aug_freemessages(struct aug_messages* messages);

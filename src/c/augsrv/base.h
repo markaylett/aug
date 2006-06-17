@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGSRV_GLOBAL_H
-#define AUGSRV_GLOBAL_H
+#ifndef AUGSRV_BASE_H
+#define AUGSRV_BASE_H
 
 #include "augsrv/config.h"
 
@@ -25,4 +25,4 @@ aug_signalin(void);
 AUGSRV_API int
 aug_signalout(void);
 
-#endif /* AUGSRV_GLOBAL_H */
+#endif /* AUGSRV_BASE_H */

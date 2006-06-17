@@ -195,7 +195,7 @@ aug_lexchar(aug_lexer_t* lexer, char ch)
     case CR_:
 
         /* Solitary carriage-return characters, that are not part of a
-           carriage-return/linefeed pair, are treated as errors: Not doing so
+           carriage-return/linefeed pair, are treated as errors: not doing so
            would lead to ambiguities where a blank line is used to separate
            the header and body sections of a message. */
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BOOST_ROOT='C:\\boost'; export BOOST_ROOT
+BOOST_HOME='C:\\boost'; export BOOST_HOME
 
 CC='gcc -mno-cygwin'; export CC
 CFLAGS='-O2 -Wall -Werror -pedantic'; export CFLAGS

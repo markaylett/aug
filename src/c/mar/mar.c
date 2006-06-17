@@ -14,10 +14,6 @@ static const char rcsid[] = "$Id:$";
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(_MSC_VER)
-# pragma comment(lib, "ws2_32.lib")
-#endif /* _MSC_VER */
-
 #define CREATEOPT_ 0x01
 #define FORCEOPT_ 0x02
 #define READOPT_ 0x04

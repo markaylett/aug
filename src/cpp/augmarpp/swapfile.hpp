@@ -38,11 +38,7 @@ namespace aug {
         {
             try {
                 close(false);
-            } catch (const std::exception& e) {
-                aug_error("failed to close swapfile: %s", e.what());
-            } catch (...) {
-                aug_error("failed to close swapfile");
-            }
+            } AUG_PERRINFOCATCH;
         }
         swapfile(const char* swap, const char* master)
             : mar_(openmar(swap, AUG_RDWR | AUG_CREAT | AUG_EXCL)),

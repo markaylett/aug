@@ -12,29 +12,29 @@
 
 namespace aug {
 
-    class AUGSYSPP_API error : public std::runtime_error {
+    class AUGSYSPP_API errinfo_error : public std::runtime_error {
     public:
         explicit
-        error(const std::string& s)
+        errinfo_error(const std::string& s)
             : std::runtime_error(s)
         {
         }
     };
 
-    class AUGSYSPP_API local_error : public error {
+    class AUGSYSPP_API local_error : public errinfo_error {
     public:
         explicit
         local_error(const std::string& s)
-            : error(s)
+            : errinfo_error(s)
         {
         }
     };
 
-    class AUGSYSPP_API system_error : public error {
+    class AUGSYSPP_API system_error : public errinfo_error {
     public:
         explicit
         system_error(const std::string& s)
-            : error(s)
+            : errinfo_error(s)
         {
         }
     };
@@ -58,7 +58,7 @@ namespace aug {
     };
 
     inline void
-    throwerror(const std::string& s)
+    throwerrinfo(const std::string& s)
     {
         switch (aug_errsrc) {
         case AUG_SRCLOCAL:
@@ -68,13 +68,29 @@ namespace aug {
         case AUG_SRCWIN32:
             throw win32_error(s);
         default:
-            throw error(s);
+            throw errinfo_error(s);
         }
     }
 }
 
-#define AUG_CATCHRETURN \
-catch (const aug::error& e) { \
+/** The following series of catch blocks would typically be used to contain
+    exceptions from within functions that cannot throw. */
+
+#define AUG_PERRINFOCATCH \
+catch (const aug::errinfo_error& e) { \
+    aug_perrinfo(e.what()); \
+} catch (const std::exception& e) { \
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXCEPT, \
+                   e.what()); \
+    aug_perrinfo("std::exception"); \
+} catch (...) { \
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXCEPT, \
+                   "unknown error"); \
+    aug_perrinfo("c++ exception"); \
+} do { } while (0)
+
+#define AUG_SETERRINFOCATCH \
+catch (const aug::errinfo_error& e) { \
     aug_error(e.what()); \
 } catch (const std::exception& e) { \
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXCEPT, \
@@ -82,7 +98,6 @@ catch (const aug::error& e) { \
 } catch (...) { \
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXCEPT, \
                    "unknown error"); \
-} \
-return
+} do { } while (0)
 
 #endif // AUGSYSPP_EXCEPTION_HPP

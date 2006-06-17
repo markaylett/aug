@@ -13,7 +13,6 @@
 
 #include "augsys/errno.h"
 #include "augsys/log.h"
-#include "augsys/string.h" // aug_perror()
 
 namespace aug {
 
@@ -32,7 +31,7 @@ namespace aug {
         ~timers() NOTHROW
         {
             if (-1 == aug_freetimers(&timers_))
-                aug_perror("aug_freetimers() failed");
+                aug_perrinfo("aug_freetimers() failed");
         }
 
         timers()
@@ -62,14 +61,14 @@ namespace aug {
     processtimers(struct aug_timers& timers, bool force)
     {
         if (-1 == aug_processtimers(&timers, force ? 1 : 0, 0))
-            throwerror("aug_processtimers() failed");
+            throwerrinfo("aug_processtimers() failed");
     }
 
     inline void
     processtimers(struct aug_timers& timers, bool force, struct timeval& next)
     {
         if (-1 == aug_processtimers(&timers, force ? 1 : 0, &next))
-            throwerror("aug_processtimers() failed");
+            throwerrinfo("aug_processtimers() failed");
     }
 
     class AUGUTILPP_API expire_base {
@@ -109,14 +108,14 @@ namespace aug {
                 timer* ptr = static_cast<timer*>(arg);
                 ptr->pending_ = false;
                 ptr->action_.expire(id);
-            } AUG_CATCHRETURN;
+            } AUG_SETERRINFOCATCH;
         }
 
     public:
         ~timer() NOTHROW
         {
             if (pending() && -1 == aug_canceltimer(&timers_, id_))
-                aug_perror("aug_canceltimer() failed");
+                aug_perrinfo("aug_canceltimer() failed");
         }
 
         timer(timers& timers, expire_base& action)
@@ -146,7 +145,7 @@ namespace aug {
                 pending_ = false;
 
                 if (-1 == aug_canceltimer(&timers_, id))
-                    throwerror("aug_canceltimer() failed");
+                    throwerrinfo("aug_canceltimer() failed");
             }
         }
 
@@ -156,7 +155,7 @@ namespace aug {
             cancel();
             int id(aug_settimer(&timers_, ms, expire_, this));
             if (-1 == id)
-                throwerror("aug_settimer() failed");
+                throwerrinfo("aug_settimer() failed");
             id_ = id;
             pending_ = true;
         }

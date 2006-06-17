@@ -9,5 +9,4 @@ EXTRA_DIST = \
 	augsyspp.vcproj \
 	augsys.vcproj \
 	augutilpp.vcproj \
-	augutil.vcproj \
-	timerd.vcproj
+	augutil.vcproj

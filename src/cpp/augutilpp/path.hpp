@@ -20,7 +20,7 @@ namespace aug {
     realpath(char* dst, const char* src, size_t size)
     {
         if (!aug_realpath(dst, src, size))
-            throwerror("aug_realpath() failed");
+            throwerrinfo("aug_realpath() failed");
         return dst;
     }
 
@@ -29,7 +29,7 @@ namespace aug {
     {
         char buf[AUG_PATH_MAX + 1];
         if (!aug_realpath(buf, path, sizeof(buf)))
-            throwerror("aug_realpath() failed");
+            throwerrinfo("aug_realpath() failed");
 
         return buf;
     }

@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGSRV_BUILD
-#include "augsrv/global.h"
+#include "augsrv/base.h"
 
 static const char rcsid[] = "$Id:$";
 

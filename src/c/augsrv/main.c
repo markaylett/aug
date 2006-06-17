@@ -6,9 +6,9 @@
 
 static const char rcsid[] = "$Id:$";
 
+#include "augsrv/base.h"
 #include "augsrv/control.h"
 #include "augsrv/daemon.h"
-#include "augsrv/global.h"
 #include "augsrv/options.h"
 #include "augsrv/signal.h"
 #include "augsrv/types.h"

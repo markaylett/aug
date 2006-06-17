@@ -21,7 +21,7 @@ namespace aug {
                va_list args)
     {
         if (-1 == aug_vformatlog(buf, &n, logLevel, format, args))
-            throwerror("aug_vformatlog() failed");
+            throwerrinfo("aug_vformatlog() failed");
     }
 
     inline void
@@ -32,7 +32,7 @@ namespace aug {
         int ret(aug_vformatlog(buf, &n, logLevel, format, args));
         va_end(args);
         if (-1 == ret)
-            throwerror("aug_vformatlog() failed");
+            throwerrinfo("aug_vformatlog() failed");
     }
 
     inline std::string
@@ -55,7 +55,7 @@ namespace aug {
         int ret(aug_vformatlog(buf, &n, logLevel, format, args));
         va_end(args);
         if (-1 == ret)
-            throwerror("aug_vformatlog() failed");
+            throwerrinfo("aug_vformatlog() failed");
 
         return std::string(buf, n);
     }

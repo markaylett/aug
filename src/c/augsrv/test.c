@@ -7,10 +7,6 @@
 
 #include <stdio.h>
 
-#if defined(_MSC_VER)
-# pragma comment(lib, "ws2_32.lib")
-#endif /* _MSC_VER */
-
 static const char* program_;
 static char conffile_[AUG_PATH_MAX + 1] = "";
 static int daemon_ = 0;

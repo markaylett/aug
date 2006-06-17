@@ -18,7 +18,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_tcplisten(&addr)));
         if (null == sfd)
-            throwerror("aug_tcplisten() failed");
+            throwerrinfo("aug_tcplisten() failed");
 
         return sfd;
     }
@@ -28,14 +28,14 @@ namespace aug {
     {
         int value(on ? 1 : 0);
         if (-1 == aug_setnodelay(ref.get(), value))
-            throwerror("aug_setnodelay() failed");
+            throwerrinfo("aug_setnodelay() failed");
     }
 
     inline struct sockaddr_in&
     parseinet(struct sockaddr_in& dst, const char* src)
     {
         if (!aug_parseinet(&dst, src))
-            throwerror("aug_parseinet() failed");
+            throwerrinfo("aug_parseinet() failed");
         return dst;
     }
 }

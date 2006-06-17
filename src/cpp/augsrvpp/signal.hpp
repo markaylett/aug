@@ -16,22 +16,42 @@ namespace aug {
     signalhandler(void (*handler)(int))
     {
         if (-1 == aug_signalhandler(handler))
-            throwerror("aug_signalhandler() failed");
+            throwerrinfo("aug_signalhandler() failed");
     }
 
     inline void
     blocksignals()
     {
         if (-1 == aug_blocksignals())
-            throwerror("aug_blocksignals() failed");
+            throwerrinfo("aug_blocksignals() failed");
     }
 
     inline void
     unblocksignals()
     {
         if (-1 == aug_unblocksignals())
-            throwerror("aug_unblocksignals() failed");
+            throwerrinfo("aug_unblocksignals() failed");
     }
+
+    class AUGSYSPP_API scoped_unblock {
+
+        scoped_unblock(const scoped_unblock& rhs);
+
+        scoped_unblock&
+        operator =(const scoped_unblock& rhs);
+
+    public:
+        ~scoped_unblock() NOTHROW
+        {
+            if (-1 == aug_blocksignals())
+                aug_perrinfo("aug_blocksignals() failed");
+        }
+
+        scoped_unblock()
+        {
+            unblocksignals();
+        }
+    };
 }
 
 #endif // AUGSRVPP_SIGNAL_HPP

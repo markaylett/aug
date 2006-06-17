@@ -4,8 +4,6 @@
 #ifndef HTTPD_STATE_H
 #define HTTPD_STATE_H
 
-#include "augutil/dstr.h"
-
 #include "augsys/types.h"
 
 #include "augmar/mar.h"

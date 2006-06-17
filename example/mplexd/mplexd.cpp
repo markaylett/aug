@@ -16,10 +16,6 @@ static const char rcsid[] = "$Id:$";
 
 #include <time.h>
 
-#if defined(_MSC_VER)
-# pragma comment(lib, "ws2_32.lib")
-#endif /* _MSC_VER */
-
 using namespace aug;
 using namespace boost;
 using namespace std;
@@ -85,8 +81,10 @@ namespace test {
             readconf(conffile_, action);
         }
 
-        if (-1 == chdir(rundir_))
-            error("chdir() failed");
+        if (-1 == chdir(rundir_)) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            throwerrinfo("chdir() failed");
+        }
 
         if (daemon_)
             openlog(logfile_);
@@ -105,16 +103,6 @@ namespace test {
 
         daemon_ = daemon;
         reconfig();
-    }
-
-    void
-    hook(int fd, int type, void* data)
-    {
-        try {
-            mplexer* mp(static_cast<mplexer*>(data));
-            seteventmask(*mp, fd, 0);
-        }
-        AUG_CATCHRETURN;
     }
 
     class buffer {
@@ -188,8 +176,7 @@ namespace test {
         {
             try {
                 seteventmask(mplexer_, sfd_, 0);
-            }
-            AUG_CATCHRETURN;
+            } AUG_PERRINFOCATCH;
         }
         cstate(mplexer& mplexer, const smartfd& sfd, timers& timers)
             : mplexer_(mplexer),
@@ -282,7 +269,7 @@ namespace test {
                 sfd = accept(state_->sfd_,
                              *reinterpret_cast<sockaddr*>(&addr), len);
 
-            } catch (const error& e) {
+            } catch (const errinfo_error& e) {
 
                 if (AUG_SRCPOSIX == aug_errsrc)
                     switch (aug_errnum) {
@@ -406,21 +393,19 @@ namespace test {
 
                 if (state_->timers_.empty()) {
 
-                    unblocksignals();
+                    scoped_unblock unblock;
                     while (AUG_RETINTR == (ret = waitevents(state_
                                                             ->mplexer_)))
                         ;
-                    blocksignals();
 
                 } else {
 
                     processtimers(state_->timers_, 0 == ret, tv);
 
-                    unblocksignals();
+                    scoped_unblock unblock;
                     while (AUG_RETINTR == (ret = waitevents(state_->mplexer_,
                                                             tv)))
                         ;
-                    blocksignals();
                 }
 
                 processconns(state_->conns_);
@@ -442,8 +427,10 @@ namespace test {
     getcwd()
     {
         cstring buf;
-        if (!::getcwd(buf, sizeof(buf)))
-            error("getcwd() failed");
+        if (!::getcwd(buf, sizeof(buf))) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            throwerrinfo("getcwd() failed");
+        }
 
         return buf;
     }
@@ -457,15 +444,17 @@ main(int argc, char* argv[])
     try {
 
         struct aug_errinfo errinfo;
-        initialiser init(errinfo);
+        scoped_init init(errinfo);
 
         program_ = argv[0];
 
         blocksignals();
         aug_setloglevel(AUG_LOGINFO);
 
-        if (!getcwd(rundir_, sizeof(rundir_)))
-            error("getcwd() failed");
+        if (!getcwd(rundir_, sizeof(rundir_))) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            throwerrinfo("getcwd() failed");
+        }
 
         main(service_, argc, argv);
 

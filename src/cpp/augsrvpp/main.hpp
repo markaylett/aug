@@ -69,7 +69,8 @@ namespace aug {
             try {
                 service_base* ptr = static_cast<service_base*>(arg);
                 return ptr->getopt(opt);
-            } AUG_CATCHRETURN 0;
+            } AUG_SETERRINFOCATCH;
+            return 0;
         }
 
         inline int
@@ -79,7 +80,8 @@ namespace aug {
                 service_base* ptr = static_cast<service_base*>(arg);
                 ptr->config(conffile, daemon ? true : false);
                 return 0;
-            } AUG_CATCHRETURN -1;
+            } AUG_SETERRINFOCATCH;
+            return -1;
         }
 
         inline int
@@ -89,7 +91,8 @@ namespace aug {
                 service_base* ptr = static_cast<service_base*>(arg);
                 ptr->init();
                 return 0;
-            } AUG_CATCHRETURN -1;
+            } AUG_SETERRINFOCATCH;
+            return -1;
         }
 
         inline int
@@ -99,7 +102,8 @@ namespace aug {
                 service_base* ptr = static_cast<service_base*>(arg);
                 ptr->run();
                 return 0;
-            } AUG_CATCHRETURN -1;
+            } AUG_SETERRINFOCATCH;
+            return -1;
         }
     }
 

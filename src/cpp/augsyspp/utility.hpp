@@ -16,7 +16,7 @@ namespace aug {
     {
         size_t size;
         if (-1 == aug_filesize(ref.get(), &size))
-            throwerror("aug_filesize() failed");
+            throwerrinfo("aug_filesize() failed");
         return size;
     }
 
@@ -24,7 +24,7 @@ namespace aug {
     setnonblock(fdref ref, bool on)
     {
         if (-1 == aug_setnonblock(ref.get(), on ? 1 : 0))
-            throwerror("aug_setnonblock() failed");
+            throwerrinfo("aug_setnonblock() failed");
     }
 }
 
