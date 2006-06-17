@@ -281,7 +281,9 @@ namespace test {
 
                 switch (e.num()) {
                 case ECONNABORTED:
+#if !defined(_WIN32)
                 case EPROTO:
+#endif // !_WIN32
                 case EWOULDBLOCK:
                     aug_warn("accept() failed: %s", e.what());
                     return true;
@@ -427,7 +429,7 @@ namespace test {
         service()
         {
         }
-    };
+    } service_;
 
     string
     getcwd()
@@ -451,12 +453,11 @@ main(int argc, char* argv[])
 
         blocksignals();
         aug_setloglevel(AUG_LOGINFO);
-        service s;
 
         if (!getcwd(rundir_, sizeof(rundir_)))
             error("getcwd() failed");
 
-        main(s, argv[0], "Multiplexer Daemon", "mplexd",
+        main(service_, argv[0], "Multiplexer Daemon", "mplexd",
              "Mark Aylett <mark@emantic.co.uk>", argc, argv);
 
     } catch (const exception& e) {

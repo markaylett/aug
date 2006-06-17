@@ -41,32 +41,32 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-@ENABLE_CPPLIBS_TRUE@check_PROGRAMS = augsyspp-test$(EXEEXT)
+@ENABLE_CPPBUILD_TRUE@check_PROGRAMS = augsyspp-test$(EXEEXT)
 subdir = src/cpp/augsyspp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(install_sh) -d
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-@ENABLE_CPPLIBS_TRUE@libaugsyspp_la_DEPENDENCIES =  \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@libaugsyspp_la_DEPENDENCIES =  \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 am__libaugsyspp_la_SOURCES_DIST = base.cpp config.cpp exception.cpp \
 	mplexer.cpp null.cpp smartfd.cpp socket.cpp string.cpp \
 	types.cpp unistd.cpp utility.cpp
-@ENABLE_CPPLIBS_TRUE@am_libaugsyspp_la_OBJECTS = base.lo config.lo \
-@ENABLE_CPPLIBS_TRUE@	exception.lo mplexer.lo null.lo \
-@ENABLE_CPPLIBS_TRUE@	smartfd.lo socket.lo string.lo types.lo \
-@ENABLE_CPPLIBS_TRUE@	unistd.lo utility.lo
+@ENABLE_CPPBUILD_TRUE@am_libaugsyspp_la_OBJECTS = base.lo config.lo \
+@ENABLE_CPPBUILD_TRUE@	exception.lo mplexer.lo null.lo \
+@ENABLE_CPPBUILD_TRUE@	smartfd.lo socket.lo string.lo types.lo \
+@ENABLE_CPPBUILD_TRUE@	unistd.lo utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
-@ENABLE_CPPLIBS_TRUE@am_libaugsyspp_la_rpath =
+@ENABLE_CPPBUILD_TRUE@am_libaugsyspp_la_rpath =
 am__augsyspp_test_SOURCES_DIST = test.cpp
-@ENABLE_CPPLIBS_TRUE@am_augsyspp_test_OBJECTS = test.$(OBJEXT)
+@ENABLE_CPPBUILD_TRUE@am_augsyspp_test_OBJECTS = test.$(OBJEXT)
 augsyspp_test_OBJECTS = $(am_augsyspp_test_OBJECTS)
-@ENABLE_CPPLIBS_TRUE@augsyspp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@augsyspp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -121,10 +121,9 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ENABLE_CPPLIBS_FALSE = @ENABLE_CPPLIBS_FALSE@
-ENABLE_CPPLIBS_TRUE = @ENABLE_CPPLIBS_TRUE@
+ENABLE_CPPBUILD_FALSE = @ENABLE_CPPBUILD_FALSE@
+ENABLE_CPPBUILD_TRUE = @ENABLE_CPPBUILD_TRUE@
 EXEEXT = @EXEEXT@
-EXTRA_LIBS = @EXTRA_LIBS@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
@@ -226,32 +225,32 @@ modinclude_HEADERS = \
 	unistd.hpp \
 	utility.hpp
 
-@ENABLE_CPPLIBS_TRUE@noinst_LTLIBRARIES = libaugsyspp.la
-@ENABLE_CPPLIBS_TRUE@libaugsyspp_la_SOURCES = \
-@ENABLE_CPPLIBS_TRUE@	base.cpp \
-@ENABLE_CPPLIBS_TRUE@	config.cpp \
-@ENABLE_CPPLIBS_TRUE@	exception.cpp \
-@ENABLE_CPPLIBS_TRUE@	mplexer.cpp \
-@ENABLE_CPPLIBS_TRUE@	null.cpp \
-@ENABLE_CPPLIBS_TRUE@	smartfd.cpp \
-@ENABLE_CPPLIBS_TRUE@	socket.cpp \
-@ENABLE_CPPLIBS_TRUE@	string.cpp \
-@ENABLE_CPPLIBS_TRUE@	types.cpp \
-@ENABLE_CPPLIBS_TRUE@	unistd.cpp \
-@ENABLE_CPPLIBS_TRUE@	utility.cpp
+@ENABLE_CPPBUILD_TRUE@noinst_LTLIBRARIES = libaugsyspp.la
+@ENABLE_CPPBUILD_TRUE@libaugsyspp_la_SOURCES = \
+@ENABLE_CPPBUILD_TRUE@	base.cpp \
+@ENABLE_CPPBUILD_TRUE@	config.cpp \
+@ENABLE_CPPBUILD_TRUE@	exception.cpp \
+@ENABLE_CPPBUILD_TRUE@	mplexer.cpp \
+@ENABLE_CPPBUILD_TRUE@	null.cpp \
+@ENABLE_CPPBUILD_TRUE@	smartfd.cpp \
+@ENABLE_CPPBUILD_TRUE@	socket.cpp \
+@ENABLE_CPPBUILD_TRUE@	string.cpp \
+@ENABLE_CPPBUILD_TRUE@	types.cpp \
+@ENABLE_CPPBUILD_TRUE@	unistd.cpp \
+@ENABLE_CPPBUILD_TRUE@	utility.cpp
 
-@ENABLE_CPPLIBS_TRUE@libaugsyspp_la_LDFLAGS = \
-@ENABLE_CPPLIBS_TRUE@	-no-undefined \
-@ENABLE_CPPLIBS_TRUE@	-version-info 0:0:0
+@ENABLE_CPPBUILD_TRUE@libaugsyspp_la_LDFLAGS = \
+@ENABLE_CPPBUILD_TRUE@	-no-undefined \
+@ENABLE_CPPBUILD_TRUE@	-version-info 0:0:0
 
-@ENABLE_CPPLIBS_TRUE@libaugsyspp_la_LIBADD = \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@libaugsyspp_la_LIBADD = \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@ENABLE_CPPLIBS_TRUE@TESTS = $(check_PROGRAMS)
-@ENABLE_CPPLIBS_TRUE@augsyspp_test_SOURCES = test.cpp
-@ENABLE_CPPLIBS_TRUE@augsyspp_test_LDADD = \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@TESTS = $(check_PROGRAMS)
+@ENABLE_CPPBUILD_TRUE@augsyspp_test_SOURCES = test.cpp
+@ENABLE_CPPBUILD_TRUE@augsyspp_test_LDADD = \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 all: all-am
 

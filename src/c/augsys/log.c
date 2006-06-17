@@ -41,6 +41,7 @@ aug_stdiologger(int loglevel, const char* format, va_list args)
     }
 
     fprintf(file, "%s\n", buf);
+    fflush(file);
     return 0;
 }
 

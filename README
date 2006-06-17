@@ -53,6 +53,9 @@ follows:
 
  $ demo.exe -f etc/demo.conf start
 
+Note: If running the service as the local system account (the default), ensure
+that any DLL's are placed in the system PATH.
+
 Other examples follow:
 
  $ demo.exe -f etc/demo.conf refresh

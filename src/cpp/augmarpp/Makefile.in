@@ -41,33 +41,33 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-@ENABLE_CPPLIBS_TRUE@check_PROGRAMS = augmarpp-test$(EXEEXT)
+@ENABLE_CPPBUILD_TRUE@check_PROGRAMS = augmarpp-test$(EXEEXT)
 subdir = src/cpp/augmarpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(install_sh) -d
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-@ENABLE_CPPLIBS_TRUE@libaugmarpp_la_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@libaugmarpp_la_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 am__libaugmarpp_la_SOURCES_DIST = mar.cpp compat.cpp config.cpp \
 	header.cpp iterator.cpp smartmar.cpp stream.cpp streambuf.cpp \
 	swapfile.cpp types.cpp
-@ENABLE_CPPLIBS_TRUE@am_libaugmarpp_la_OBJECTS = mar.lo compat.lo \
-@ENABLE_CPPLIBS_TRUE@	config.lo header.lo iterator.lo \
-@ENABLE_CPPLIBS_TRUE@	smartmar.lo stream.lo streambuf.lo \
-@ENABLE_CPPLIBS_TRUE@	swapfile.lo types.lo
+@ENABLE_CPPBUILD_TRUE@am_libaugmarpp_la_OBJECTS = mar.lo compat.lo \
+@ENABLE_CPPBUILD_TRUE@	config.lo header.lo iterator.lo \
+@ENABLE_CPPBUILD_TRUE@	smartmar.lo stream.lo streambuf.lo \
+@ENABLE_CPPBUILD_TRUE@	swapfile.lo types.lo
 libaugmarpp_la_OBJECTS = $(am_libaugmarpp_la_OBJECTS)
-@ENABLE_CPPLIBS_TRUE@am_libaugmarpp_la_rpath =
+@ENABLE_CPPBUILD_TRUE@am_libaugmarpp_la_rpath =
 am__augmarpp_test_SOURCES_DIST = test.cpp
-@ENABLE_CPPLIBS_TRUE@am_augmarpp_test_OBJECTS = test.$(OBJEXT)
+@ENABLE_CPPBUILD_TRUE@am_augmarpp_test_OBJECTS = test.$(OBJEXT)
 augmarpp_test_OBJECTS = $(am_augmarpp_test_OBJECTS)
-@ENABLE_CPPLIBS_TRUE@augmarpp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
+@ENABLE_CPPBUILD_TRUE@augmarpp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -122,10 +122,9 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ENABLE_CPPLIBS_FALSE = @ENABLE_CPPLIBS_FALSE@
-ENABLE_CPPLIBS_TRUE = @ENABLE_CPPLIBS_TRUE@
+ENABLE_CPPBUILD_FALSE = @ENABLE_CPPBUILD_FALSE@
+ENABLE_CPPBUILD_TRUE = @ENABLE_CPPBUILD_TRUE@
 EXEEXT = @EXEEXT@
-EXTRA_LIBS = @EXTRA_LIBS@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
@@ -226,33 +225,33 @@ modinclude_HEADERS = \
 	swapfile.hpp \
 	types.hpp
 
-@ENABLE_CPPLIBS_TRUE@noinst_LTLIBRARIES = libaugmarpp.la
-@ENABLE_CPPLIBS_TRUE@libaugmarpp_la_SOURCES = \
-@ENABLE_CPPLIBS_TRUE@	mar.cpp \
-@ENABLE_CPPLIBS_TRUE@	compat.cpp \
-@ENABLE_CPPLIBS_TRUE@	config.cpp \
-@ENABLE_CPPLIBS_TRUE@	header.cpp \
-@ENABLE_CPPLIBS_TRUE@	iterator.cpp \
-@ENABLE_CPPLIBS_TRUE@	smartmar.cpp \
-@ENABLE_CPPLIBS_TRUE@	stream.cpp \
-@ENABLE_CPPLIBS_TRUE@	streambuf.cpp \
-@ENABLE_CPPLIBS_TRUE@	swapfile.cpp \
-@ENABLE_CPPLIBS_TRUE@	types.cpp
+@ENABLE_CPPBUILD_TRUE@noinst_LTLIBRARIES = libaugmarpp.la
+@ENABLE_CPPBUILD_TRUE@libaugmarpp_la_SOURCES = \
+@ENABLE_CPPBUILD_TRUE@	mar.cpp \
+@ENABLE_CPPBUILD_TRUE@	compat.cpp \
+@ENABLE_CPPBUILD_TRUE@	config.cpp \
+@ENABLE_CPPBUILD_TRUE@	header.cpp \
+@ENABLE_CPPBUILD_TRUE@	iterator.cpp \
+@ENABLE_CPPBUILD_TRUE@	smartmar.cpp \
+@ENABLE_CPPBUILD_TRUE@	stream.cpp \
+@ENABLE_CPPBUILD_TRUE@	streambuf.cpp \
+@ENABLE_CPPBUILD_TRUE@	swapfile.cpp \
+@ENABLE_CPPBUILD_TRUE@	types.cpp
 
-@ENABLE_CPPLIBS_TRUE@libaugmarpp_la_LDFLAGS = \
-@ENABLE_CPPLIBS_TRUE@	-no-undefined \
-@ENABLE_CPPLIBS_TRUE@	-version-info 0:0:0
+@ENABLE_CPPBUILD_TRUE@libaugmarpp_la_LDFLAGS = \
+@ENABLE_CPPBUILD_TRUE@	-no-undefined \
+@ENABLE_CPPBUILD_TRUE@	-version-info 0:0:0
 
-@ENABLE_CPPLIBS_TRUE@libaugmarpp_la_LIBADD = \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@libaugmarpp_la_LIBADD = \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@ENABLE_CPPLIBS_TRUE@TESTS = $(check_PROGRAMS)
-@ENABLE_CPPLIBS_TRUE@augmarpp_test_SOURCES = test.cpp
-@ENABLE_CPPLIBS_TRUE@augmarpp_test_LDADD = \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
+@ENABLE_CPPBUILD_TRUE@TESTS = $(check_PROGRAMS)
+@ENABLE_CPPBUILD_TRUE@augmarpp_test_SOURCES = test.cpp
+@ENABLE_CPPBUILD_TRUE@augmarpp_test_LDADD = \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
 
 all: all-am
 

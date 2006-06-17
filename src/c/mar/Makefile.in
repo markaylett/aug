@@ -46,7 +46,7 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(install_sh) -d
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
@@ -55,9 +55,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_mar_OBJECTS = config.$(OBJEXT) getopt.$(OBJEXT) mar.$(OBJEXT) \
 	utility.$(OBJEXT)
 mar_OBJECTS = $(am_mar_OBJECTS)
-am__DEPENDENCIES_1 =
-mar_DEPENDENCIES = $(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(am__DEPENDENCIES_1)
+mar_DEPENDENCIES = $(top_srcdir)/src/c/augmar/libaugmar.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -102,10 +100,9 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ENABLE_CPPLIBS_FALSE = @ENABLE_CPPLIBS_FALSE@
-ENABLE_CPPLIBS_TRUE = @ENABLE_CPPLIBS_TRUE@
+ENABLE_CPPBUILD_FALSE = @ENABLE_CPPBUILD_FALSE@
+ENABLE_CPPBUILD_TRUE = @ENABLE_CPPBUILD_TRUE@
 EXEEXT = @EXEEXT@
-EXTRA_LIBS = @EXTRA_LIBS@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
@@ -200,8 +197,7 @@ mar_SOURCES = \
 	utility.h
 
 mar_LDADD = \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(EXTRA_LIBS)
+	$(top_srcdir)/src/c/augmar/libaugmar.la
 
 all: all-am
 

@@ -166,7 +166,7 @@ namespace test {
 
             aug_info("running daemon process");
 
-            state_->timer_.reset(500);
+            state_->timer_.reset(5000);
 
             int ret(!0);
             while (0 < remain_) {
@@ -195,7 +195,7 @@ namespace test {
         {
             aug_info("timer fired");
             --remain_;
-            state_->timer_.reset(500);
+            state_->timer_.reset(5000);
         }
 
     public:
@@ -205,10 +205,10 @@ namespace test {
 
         service()
             : daemon_(false),
-              remain_(5)
+              remain_(10)
         {
         }
-    };
+    } service_;
 
     string
     getcwd()
@@ -230,11 +230,10 @@ main(int argc, char* argv[])
 
         initialiser init;
 
-        service s;
         if (!getcwd(rundir_, sizeof(rundir_)))
             error("getcwd() failed");
 
-        main(s, argv[0], "Timer Daemon", "timerd",
+        main(service_, argv[0], "Timer Daemon", "timerd",
              "Mark Aylett <mark@emantic.co.uk>", argc, argv);
 
     } catch (const exception& e) {

@@ -35,5 +35,4 @@ TESTS = $(check_PROGRAMS)
 
 augnet_test_SOURCES = test.c
 augnet_test_LDADD = \
-	$(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(EXTRA_LIBS)
+	$(top_srcdir)/src/c/augnet/libaugnet.la

@@ -4,5 +4,4 @@ EXTRA_DIST = \
 	linux.sh \
 	ltmain.sh.patch \
 	mingw.sh \
-	unix.sh \
 	xmingw.sh

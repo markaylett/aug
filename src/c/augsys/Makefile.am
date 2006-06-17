@@ -3,9 +3,6 @@ SUBDIRS = \
 	posix \
 	win32
 
-AM_CFLAGS = -D_MT
-#AM_LDFLAGS = -Wl,-lws2_32
-
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
 	base.h \
@@ -65,5 +62,4 @@ TESTS = $(check_PROGRAMS)
 
 augsys_test_SOURCES = test.c
 augsys_test_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la \
-	$(EXTRA_LIBS)
+	$(top_srcdir)/src/c/augsys/libaugsys.la

@@ -48,7 +48,7 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(install_sh) -d
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -68,9 +68,7 @@ am_libaugnet_la_OBJECTS = config.lo conn.lo inet.lo parser.lo types.lo \
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_augnet_test_OBJECTS = test.$(OBJEXT)
 augnet_test_OBJECTS = $(am_augnet_test_OBJECTS)
-am__DEPENDENCIES_1 =
-augnet_test_DEPENDENCIES = $(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(am__DEPENDENCIES_1)
+augnet_test_DEPENDENCIES = $(top_srcdir)/src/c/augnet/libaugnet.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -117,10 +115,9 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ENABLE_CPPLIBS_FALSE = @ENABLE_CPPLIBS_FALSE@
-ENABLE_CPPLIBS_TRUE = @ENABLE_CPPLIBS_TRUE@
+ENABLE_CPPBUILD_FALSE = @ENABLE_CPPBUILD_FALSE@
+ENABLE_CPPBUILD_TRUE = @ENABLE_CPPBUILD_TRUE@
 EXEEXT = @EXEEXT@
-EXTRA_LIBS = @EXTRA_LIBS@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
@@ -236,8 +233,7 @@ libaugnet_la_LIBADD = \
 TESTS = $(check_PROGRAMS)
 augnet_test_SOURCES = test.c
 augnet_test_LDADD = \
-	$(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(EXTRA_LIBS)
+	$(top_srcdir)/src/c/augnet/libaugnet.la
 
 all: all-am
 

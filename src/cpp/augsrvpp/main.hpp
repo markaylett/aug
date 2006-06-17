@@ -103,6 +103,11 @@ namespace aug {
         }
     }
 
+    // On Windows, the Service Manager calls the service entry point on a
+    // separate thread - automatic variables on the main thread's stack will
+    // not be visible from the service thread.  A shallow copy of the service
+    // structure will be performed by aug_main().
+
     inline void
     main(service_base& service, const char* program, const char* lname,
          const char* sname, const char* admin, int argc, char* argv[])

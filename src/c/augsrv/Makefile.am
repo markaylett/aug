@@ -3,9 +3,6 @@ SUBDIRS = \
 	posix \
 	win32
 
-AM_CFLAGS = -D_MT
-#AM_LDFLAGS = -Wl,-lws2_32
-
 modincludedir = $(includedir)/augsrv
 modinclude_HEADERS = \
 	config.h \
@@ -44,5 +41,4 @@ TESTS = $(check_PROGRAMS)
 
 augsrv_test_SOURCES = test.c
 augsrv_test_LDADD = \
-	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-	$(EXTRA_LIBS)
+	$(top_srcdir)/src/c/augsrv/libaugsrv.la

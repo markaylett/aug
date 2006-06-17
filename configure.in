@@ -1,9 +1,9 @@
 # -*- m4 -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.56)
 AC_INIT([src/config.h.in])
-AM_INIT_AUTOMAKE([aug], [0.2.4], [mark@emantic.co.uk])
+AM_INIT_AUTOMAKE([aug], [0.2.5], [mark@emantic.co.uk])
 AC_CONFIG_HEADER([src/config.h])
 
 AM_MAINTAINER_MODE
@@ -26,27 +26,44 @@ AC_PROG_YACC
 BOOST_ROOT=${BOOST_ROOT:-/usr/include}
 AC_SUBST(BOOST_ROOT)
 
-AC_ARG_ENABLE(cpplibs,
-    [  --enable-cpplibs       build cpp stub libraries @<:@default=no@:>@],
-    cpplibs=$enableval)
+AC_ARG_ENABLE(cppbuild,
+    [  --enable-cppbuild       enable cpp build @<:@default=yes@:>@],
+    cppbuild=$enableval)
 
-AM_CONDITIONAL(ENABLE_CPPLIBS, test "$cpplibs" = "yes")
+AC_ARG_ENABLE(threads,
+    [  --enable-threads        enable thread support @<:@default=yes@:>@],
+    threads=$enableval)
+
+AM_CONDITIONAL(ENABLE_CPPBUILD, test "$cppbuild" != "no")
 
 # Checks for libraries.
 
+LDFLAGS="-lm $LDFLAGS"
+
 case $host in
-*-*-mingw32*)
-    EXTRA_LIBS="-lws2_32 -lm"
+*-*-cygwin* | *-*-mingw*)
+
+    LDFLAGS="-lws2_32 $LDFLAGS"
     LIBS="$LIBS -Wl,-lws2_32"
+
+    if test "$threads" != "no"; then
+        CFLAGS="-mthreads -D_MT $CFLAGS"
+        CXXFLAGS="-mthreads -D_MT $CXXFLAGS"
+        LDFLAGS="-mthreads $LDFLAGS"
+    fi
     ;;
 *)
-    EXTRA_LIBS="-lpthread -lm"
     AC_SEARCH_LIBS(gethostbyname, nsl)
     AC_SEARCH_LIBS(gethostname, nsl)
     AC_SEARCH_LIBS(socket, socket)
+
+    if test "$threads" != "no"; then
+        CFLAGS="-pthread -D_MT $CFLAGS"
+        CXXFLAGS="-pthread -D_MT $CXXFLAGS"
+        LDFLAGS="-pthread $LDFLAGS"
+    fi
     ;;
 esac
-AC_SUBST(EXTRA_LIBS)
 
 # Checks for header files.
 

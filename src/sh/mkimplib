@@ -1,0 +1,13 @@
+#!/bin/sh
+
+for path in $*; do
+
+    name=`basename $path | cut -d. -f1 | cut -d- -f1`
+
+    echo "LIBRARY $name-0.dll" >$name.def
+    echo 'EXPORTS' >>$name.def
+    dumpbin -EXPORTS $path \
+        | awk '{ if ($4 ~ /^aug/) print "\t", $4; }' >>$name.def
+    lib /DEF:$name.def /MACHINE:X86
+
+done

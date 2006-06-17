@@ -14,7 +14,7 @@ modinclude_HEADERS = \
 	unistd.hpp \
 	utility.hpp
 
-if ENABLE_CPPLIBS
+if ENABLE_CPPBUILD
 
 noinst_LTLIBRARIES = libaugsyspp.la
 

@@ -41,38 +41,36 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-@ENABLE_CPPLIBS_TRUE@check_PROGRAMS = augsrvpp-test$(EXEEXT)
+@ENABLE_CPPBUILD_TRUE@check_PROGRAMS = augsrvpp-test$(EXEEXT)
 subdir = src/cpp/augsrvpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(install_sh) -d
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-@ENABLE_CPPLIBS_TRUE@libaugsrvpp_la_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@libaugsrvpp_la_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 am__libaugsrvpp_la_SOURCES_DIST = config.cpp log.cpp main.cpp \
 	signal.cpp
-@ENABLE_CPPLIBS_TRUE@am_libaugsrvpp_la_OBJECTS = config.lo log.lo \
-@ENABLE_CPPLIBS_TRUE@	main.lo signal.lo
+@ENABLE_CPPBUILD_TRUE@am_libaugsrvpp_la_OBJECTS = config.lo log.lo \
+@ENABLE_CPPBUILD_TRUE@	main.lo signal.lo
 libaugsrvpp_la_OBJECTS = $(am_libaugsrvpp_la_OBJECTS)
-@ENABLE_CPPLIBS_TRUE@am_libaugsrvpp_la_rpath =
+@ENABLE_CPPBUILD_TRUE@am_libaugsrvpp_la_rpath =
 am__augsrvpp_test_SOURCES_DIST = test.cpp
-@ENABLE_CPPLIBS_TRUE@am_augsrvpp_test_OBJECTS = test.$(OBJEXT)
+@ENABLE_CPPBUILD_TRUE@am_augsrvpp_test_OBJECTS = test.$(OBJEXT)
 augsrvpp_test_OBJECTS = $(am_augsrvpp_test_OBJECTS)
-am__DEPENDENCIES_1 =
-@ENABLE_CPPLIBS_TRUE@augsrvpp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la \
-@ENABLE_CPPLIBS_TRUE@	$(am__DEPENDENCIES_1)
+@ENABLE_CPPBUILD_TRUE@augsrvpp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -127,10 +125,9 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ENABLE_CPPLIBS_FALSE = @ENABLE_CPPLIBS_FALSE@
-ENABLE_CPPLIBS_TRUE = @ENABLE_CPPLIBS_TRUE@
+ENABLE_CPPBUILD_FALSE = @ENABLE_CPPBUILD_FALSE@
+ENABLE_CPPBUILD_TRUE = @ENABLE_CPPBUILD_TRUE@
 EXEEXT = @EXEEXT@
-EXTRA_LIBS = @EXTRA_LIBS@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
@@ -225,34 +222,33 @@ modinclude_HEADERS = \
 	main.hpp \
 	signal.hpp
 
-@ENABLE_CPPLIBS_TRUE@noinst_LTLIBRARIES = libaugsrvpp.la
-@ENABLE_CPPLIBS_TRUE@libaugsrvpp_la_SOURCES = \
-@ENABLE_CPPLIBS_TRUE@	config.cpp \
-@ENABLE_CPPLIBS_TRUE@	log.cpp \
-@ENABLE_CPPLIBS_TRUE@	main.cpp \
-@ENABLE_CPPLIBS_TRUE@	signal.cpp
+@ENABLE_CPPBUILD_TRUE@noinst_LTLIBRARIES = libaugsrvpp.la
+@ENABLE_CPPBUILD_TRUE@libaugsrvpp_la_SOURCES = \
+@ENABLE_CPPBUILD_TRUE@	config.cpp \
+@ENABLE_CPPBUILD_TRUE@	log.cpp \
+@ENABLE_CPPBUILD_TRUE@	main.cpp \
+@ENABLE_CPPBUILD_TRUE@	signal.cpp
 
-@ENABLE_CPPLIBS_TRUE@libaugsrvpp_la_LDFLAGS = \
-@ENABLE_CPPLIBS_TRUE@	-no-undefined \
-@ENABLE_CPPLIBS_TRUE@	-version-info 0:0:0
+@ENABLE_CPPBUILD_TRUE@libaugsrvpp_la_LDFLAGS = \
+@ENABLE_CPPBUILD_TRUE@	-no-undefined \
+@ENABLE_CPPBUILD_TRUE@	-version-info 0:0:0
 
-@ENABLE_CPPLIBS_TRUE@libaugsrvpp_la_LIBADD = \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@libaugsrvpp_la_LIBADD = \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@ENABLE_CPPLIBS_TRUE@TESTS = $(check_PROGRAMS)
-@ENABLE_CPPLIBS_TRUE@augsrvpp_test_SOURCES = test.cpp
-@ENABLE_CPPLIBS_TRUE@augsrvpp_test_LDADD = \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPLIBS_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la \
-@ENABLE_CPPLIBS_TRUE@	$(EXTRA_LIBS)
+@ENABLE_CPPBUILD_TRUE@TESTS = $(check_PROGRAMS)
+@ENABLE_CPPBUILD_TRUE@augsrvpp_test_SOURCES = test.cpp
+@ENABLE_CPPBUILD_TRUE@augsrvpp_test_LDADD = \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 all: all-am
 

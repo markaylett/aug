@@ -1,6 +1,6 @@
 include $(top_srcdir)/src/c/lang.mk
 
-bin_PROGRAMS = httpd
+noinst_PROGRAMS = httpd
 
 httpd_SOURCES = \
 	message.c \
@@ -14,5 +14,4 @@ httpd_LDADD = \
 	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
 	$(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la \
-	$(EXTRA_LIBS)
+	$(top_srcdir)/src/c/augsys/libaugsys.la

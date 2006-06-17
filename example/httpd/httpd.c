@@ -389,7 +389,7 @@ term_(void)
 int
 main(int argc, char* argv[])
 {
-    static struct aug_service service = {
+    struct aug_service service = {
         getopt_,
         config_,
         init_,

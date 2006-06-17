@@ -43,5 +43,4 @@ TESTS = $(check_PROGRAMS)
 
 augutil_test_SOURCES = test.c
 augutil_test_LDADD = \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(EXTRA_LIBS)
+	$(top_srcdir)/src/c/augutil/libaugutil.la

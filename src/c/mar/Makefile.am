@@ -12,5 +12,4 @@ mar_SOURCES = \
 	utility.h
 
 mar_LDADD = \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(EXTRA_LIBS)
+	$(top_srcdir)/src/c/augmar/libaugmar.la
