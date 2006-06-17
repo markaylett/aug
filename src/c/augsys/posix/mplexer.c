@@ -3,12 +3,12 @@
 */
 #include "augsys/errno.h"
 
-#include "augsys/base.h" /* aug_openfd() */
-#include "augsys/defs.h" /* AUG_MAX */
+#include "augsys/defs.h"   /* AUG_MAX */
+#include "augsys/time.h"   /* aug_tvtoms() */
+#include "augsys/unistd.h" /* aug_pipe() */
 
-#include <stdlib.h>      /* malloc() */
+#include <stdlib.h>        /* malloc() */
 
-#include <unistd.h>      /* pipe() */
 #include <sys/poll.h>
 
 #define INIT_SIZE_ 64
@@ -72,33 +72,6 @@ resize_(aug_mplexer_t mplexer, size_t size)
     initpollfds_(ptr + mplexer->size_, size - mplexer->size_);
     mplexer->pollfds_ = ptr;
     mplexer->size_ = size;
-    return 0;
-}
-
-static int
-tofd_(int fd)
-{
-    if (-1 == aug_openfd(fd, AUG_FDPIPE)) {
-        close(fd);
-        return -1;
-    }
-
-    return fd;
-}
-
-static int
-tofds_(int fds[2])
-{
-    if (-1 == tofd_(fds[0])) {
-        close(fds[1]);
-        return -1;
-    }
-
-    if (-1 == tofd_(fds[1])) {
-        aug_releasefd(fds[0]);
-        return -1;
-    }
-
     return 0;
 }
 
@@ -169,11 +142,8 @@ AUGSYS_API int
 aug_waitevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 {
     int ms, ret;
-    if (timeout) {
-        ms = timeout->tv_sec * 1000;
-        ms += (timeout->tv_usec + 500) / 1000;
-    } else
-        ms = -1;
+
+    ms = timeout ? aug_tvtoms(timeout) : -1;
 
     if (-1 == (ret = poll(mplexer->pollfds_, mplexer->nfds_, ms))) {
 
@@ -198,8 +168,5 @@ aug_events(aug_mplexer_t mplexer, int fd)
 AUGSYS_API int
 aug_mplexerpipe(int fds[2])
 {
-    if (-1 == pipe(fds))
-        return -1;
-
-    return tofds_(fds);
+    return aug_pipe(fds);
 }

@@ -4,12 +4,28 @@
 #include "augsys/base.h"
 #include "augsys/errno.h"
 
+#include <fcntl.h> /* O_BINARY */
 #include <winsock2.h>
 
 AUGSYS_API int
 aug_close(int fd)
 {
     return aug_releasefd(fd);
+}
+
+AUGSYS_API int
+aug_pipe(int fds[2])
+{
+    if (-1 == _pipe(fds, 1024, O_BINARY))
+        return -1;
+
+    if (-1 == aug_openfds(fds, AUG_FDPIPE)) {
+        close(fds[0]);
+        close(fds[1]);
+        return -1;
+    }
+
+    return 0;
 }
 
 AUGSYS_API ssize_t

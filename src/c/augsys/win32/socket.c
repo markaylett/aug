@@ -17,7 +17,7 @@ tofd_(SOCKET h)
     }
 
     if (-1 == aug_openfd(fd, AUG_FDSOCK)) {
-        close(fd);
+        aug_closesocket_(fd);
         return -1;
     }
 
@@ -25,21 +25,32 @@ tofd_(SOCKET h)
 }
 
 static int
-tofds_(SOCKET hs, SOCKET hc, int sv[2])
+tofds_(SOCKET rd, SOCKET wr, int sv[2])
 {
-    int s, c;
-    if (-1 == (s = tofd_(hs))) {
-        closesocket(hc);
+    int local[2];
+
+    if (-1 == (local[0] = _open_osfhandle(rd, 0))) {
+        errno = EINVAL;
+        closesocket(rd);
+        closesocket(wr);
         return -1;
     }
 
-    if (-1 == (c = tofd_(hc))) {
-        aug_releasefd(s);
+    if (-1 == (local[1] = _open_osfhandle(wr, 0))) {
+        errno = EINVAL;
+        aug_closesocket_(local[0]);
+        closesocket(wr);
         return -1;
     }
 
-	sv[0] = s;
-	sv[1] = c;
+    if (-1 == aug_openfds(local, AUG_FDSOCK)) {
+        aug_closesocket_(local[0]);
+        aug_closesocket_(local[1]);
+        return -1;
+    }
+
+	sv[0] = local[0];
+	sv[1] = local[1];
     return 0;
 }
 
@@ -212,8 +223,8 @@ AUGSYS_API ssize_t
 aug_recvfrom(int s, void* buf, size_t len, int flags, struct sockaddr* from,
              socklen_t* fromlen)
 {
-    if (SOCKET_ERROR == recvfrom(_get_osfhandle(s), buf, (int)len, flags, from,
-                                 fromlen))
+    if (SOCKET_ERROR == recvfrom(_get_osfhandle(s), buf, (int)len, flags,
+                                 from, fromlen))
         return toerror_();
 
     return 0;

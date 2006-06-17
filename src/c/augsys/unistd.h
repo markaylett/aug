@@ -19,6 +19,9 @@
 AUGSYS_API int
 aug_close(int fd);
 
+AUGSYS_API int
+aug_pipe(int fds[2]);
+
 AUGSYS_API ssize_t
 aug_read(int fd, void* buf, size_t size);
 

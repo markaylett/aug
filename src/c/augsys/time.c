@@ -54,3 +54,45 @@ aug_localtime(const time_t* clock, struct tm* res)
 
     return NULL;
 }
+
+AUGSYS_API struct timeval*
+aug_mstotv(struct timeval* tv, unsigned int ms)
+{
+    tv->tv_sec = ms / 1000;
+    tv->tv_usec = (ms % 1000) * 1000;
+    return tv;
+}
+
+AUGSYS_API unsigned int
+aug_tvtoms(const struct timeval* tv)
+{
+    unsigned int ms = tv->tv_sec * 1000;
+    ms += (tv->tv_usec + 500) / 1000;
+    return ms;
+}
+
+AUGSYS_API struct timeval*
+aug_tvadd(struct timeval* dst, const struct timeval* src)
+{
+    dst->tv_sec += src->tv_sec;
+    dst->tv_usec += src->tv_usec;
+
+    if (1000000 < dst->tv_usec) {
+        ++dst->tv_sec;
+        dst->tv_usec -= 1000000;
+    }
+    return dst;
+}
+
+AUGSYS_API struct timeval*
+aug_tvsub(struct timeval* dst, const struct timeval* src)
+{
+    dst->tv_sec -= src->tv_sec;
+    dst->tv_usec -= src->tv_usec;
+
+    if (dst->tv_usec < 0) {
+        --dst->tv_sec;
+        dst->tv_usec += 1000000;
+    }
+    return dst;
+}

@@ -12,6 +12,7 @@
 # include <io.h>     /* close() */
 #endif /* _WIN32 */
 
+#include "augsys/defs.h"
 #include "augsys/errno.h"
 
 #include <stdlib.h> /* NULL */
@@ -48,28 +49,11 @@ close_(int fd, struct file_* file)
 
 #if defined(_WIN32)
     if (AUG_FDSOCK == file->type_) {
-
-        /* The _open_osfhandle() function allocates a C run-time file handle
-           and sets it to point to the operating-system file handle.  When
-           _open_osfhandle() function is used on a socket descriptor, both
-           _close() and closesocket() should be called before exiting.
-           However, on Windows NT 4.0 Service Pack 3, closesocket() after
-           _close() returns 10038. */
-
-        closesocket(_get_osfhandle(fd));
-# if defined(_MSC_VER)
-        __try {
-# endif /* _MSC_VER */
-# if !defined(_MT)
-            _free_osfhnd(fd);
-# endif /* !_MT */
-            close(fd);
-# if defined(_MSC_VER)
-        } __except (EXCEPTION_EXECUTE_HANDLER) { }
-# endif /* _MSC_VER */
+        aug_closesocket_(fd);
         return 0;
     }
 #endif /* _WIN32 */
+
     return close(fd);
 }
 
@@ -129,6 +113,7 @@ openfd_(int fd, int type)
     } else {
 
         file = files_ + fd;
+
         if (0 < file->refs_) {
             errno = EBADF;
             return -1;
@@ -139,6 +124,43 @@ openfd_(int fd, int type)
     file->fdhook_ = NULL;
     file->type_ = type;
     file->data_ = NULL;
+    return 0;
+}
+
+static int
+openfds_(int fd[2], int type)
+{
+    struct file_* first, * second;
+    int maxfd = AUG_MAX(fd[0], fd[1]);
+
+    if (size_ <= (size_t)maxfd) {
+
+        if (-1 == growfiles_(maxfd + 1))
+            return -1;
+
+        first = files_ + fd[0];
+        second = files_ + fd[1];
+
+    } else {
+
+        first = files_ + fd[0];
+        second = files_ + fd[1];
+
+        if (0 < first->refs_ || 0 < second->refs_) {
+            errno = EBADF;
+            return -1;
+        }
+    }
+
+    first->refs_ = 1;
+    first->fdhook_ = NULL;
+    first->type_ = type;
+    first->data_ = NULL;
+
+    second->refs_ = 1;
+    second->fdhook_ = NULL;
+    second->type_ = type;
+    second->data_ = NULL;
     return 0;
 }
 
@@ -238,6 +260,31 @@ fddata_(int fd, void** data)
     return 0;
 }
 
+#if defined(_WIN32)
+AUGSYS_EXTERN void
+aug_closesocket_(int fd)
+{
+    /* The _open_osfhandle() function allocates a C run-time file handle and
+       sets it to point to the operating-system file handle.  When
+       _open_osfhandle() function is used on a socket descriptor, both
+       _close() and closesocket() should be called before exiting.  However,
+       on Windows NT 4.0 Service Pack 3, closesocket() after _close() returns
+       10038. */
+
+    closesocket(_get_osfhandle(fd));
+# if defined(_MSC_VER)
+    __try {
+# endif /* _MSC_VER */
+# if !defined(_MT)
+        _free_osfhnd(fd);
+# endif /* !_MT */
+        close(fd);
+# if defined(_MSC_VER)
+    } __except (EXCEPTION_EXECUTE_HANDLER) { }
+# endif /* _MSC_VER */
+}
+#endif /* _WIN32 */
+
 AUGSYS_API int
 aug_openfd(int fd, int type)
 {
@@ -250,6 +297,23 @@ aug_openfd(int fd, int type)
 
     aug_lock();
     ret = openfd_(fd, type);
+    aug_unlock();
+
+    return ret;
+}
+
+AUGSYS_API int
+aug_openfds(int fds[2], int type)
+{
+    int ret;
+
+    if (-1 == fds[0] || -1 == fds[1]) {
+        errno = EBADF;
+        return -1;
+    }
+
+    aug_lock();
+    ret = openfds_(fds, type);
     aug_unlock();
 
     return ret;

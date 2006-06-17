@@ -25,11 +25,11 @@ AUG_ALLOCATOR(allocate_, &free_, aug_timer_, 64);
 static int
 expiry_(struct timeval* tv, unsigned int ms)
 {
+    struct timeval local;
     if (-1 == aug_gettimeofday(tv, NULL))
         return -1;
 
-    tv->tv_sec += ms / 1000;
-    tv->tv_usec += (ms % 1000) * 1000;
+    aug_tvadd(tv, aug_mstotv(&local, ms));
     return 0;
 }
 
@@ -171,13 +171,9 @@ aug_processtimers(struct aug_timers* timers, int force, struct timeval* next)
             next->tv_sec = next->tv_usec = 0; /* Forever. */
         else {
 
-            next->tv_sec = it->tv_.tv_sec - now.tv_sec;
-            next->tv_usec = it->tv_.tv_usec - now.tv_usec;
-
-            if (next->tv_usec < 0) {
-                next->tv_usec += 1000000;
-                --next->tv_sec;
-            }
+            next->tv_sec = it->tv_.tv_sec;
+            next->tv_usec = it->tv_.tv_usec;
+            aug_tvsub(next, &now);
         }
     }
     return 0;

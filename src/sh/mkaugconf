@@ -1,9 +1,9 @@
 #!/bin/sh
 name=${1:-'demo'}
 mkdir -p etc log run && cat >etc/$name.conf <<EOF
-loglevel = 5
-rundir = `pwd`
-logfile = log/$name.log
-pidfile = run/$name.pid
-address = `hostname`:8080
+loglevel: 5
+rundir: `pwd`
+logfile: log/$name.log
+pidfile: run/$name.pid
+address: `hostname`:8080
 EOF

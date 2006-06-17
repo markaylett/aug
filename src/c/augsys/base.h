@@ -13,6 +13,11 @@ typedef void (*aug_fdhook_t)(int, int, void*);
 #define AUG_FDSOCK 3
 #define AUG_FDUSER 4
 
+#if defined(_WIN32) && defined(AUGSYS_BUILD)
+AUGSYS_EXTERN void
+aug_closesocket_(int fd);
+#endif /* _WIN32 && AUGSYS_BUILD */
+
 AUGSYS_API int
 aug_init(void);
 
@@ -25,6 +30,9 @@ aug_term(void);
 
 AUGSYS_API int
 aug_openfd(int fd, int type);
+
+AUGSYS_API int
+aug_openfds(int fd[2], int type);
 
 AUGSYS_API int
 aug_releasefd(int fd);

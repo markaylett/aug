@@ -4,11 +4,12 @@
 #include "augsys/base.h"
 #include "augsys/errno.h"
 #include "augsys/socket.h"
+#include "augsys/time.h" /* aug_tvtoms() */
 #include "augsys/unistd.h"
 
-#include <winsock2.h> /* select() */
+#include <winsock2.h>    /* select() */
 
-#include <stdlib.h>   /* malloc() */
+#include <stdlib.h>      /* malloc() */
 
 struct set_ {
     fd_set rd_, wr_;
@@ -112,14 +113,7 @@ aug_waitevents(aug_mplexer_t mplexer, const struct timeval* timeout)
     mplexer->out_ = mplexer->in_;
 
     if (0 == mplexer->bits_) {
-
-        if (timeout) {
-            int ms = timeout->tv_sec * 1000;
-            ms += (timeout->tv_usec + 500) / 1000;
-            Sleep(ms);
-        } else
-            Sleep(INFINITE);
-
+        Sleep(timeout ? aug_tvtoms(timeout) : INFINITE);
         return 0;
     }
 

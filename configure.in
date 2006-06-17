@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.59)
 AC_INIT([src/config.h.in])
-AM_INIT_AUTOMAKE([aug], [0.2.2], [mark@emantic.co.uk])
+AM_INIT_AUTOMAKE([aug], [0.2.3], [mark@emantic.co.uk])
 AC_CONFIG_HEADER([src/config.h])
 
 AM_MAINTAINER_MODE
@@ -30,17 +30,17 @@ AC_SUBST(BOOST_ROOT)
 
 case $host in
 *-*-mingw32*)
-    WINSOCK="-lws2_32"
+    EXTRALIBS="-lws2_32 -lm"
     LIBS="$LIBS -Wl,-lws2_32"
     ;;
 *)
-    WINSOCK=""
+    EXTRALIBS="-lpthread -lm"
     AC_SEARCH_LIBS(gethostbyname, nsl)
     AC_SEARCH_LIBS(gethostname, nsl)
     AC_SEARCH_LIBS(socket, socket)
     ;;
 esac
-AC_SUBST(WINSOCK)
+AC_SUBST(EXTRALIBS)
 
 # Checks for header files.
 

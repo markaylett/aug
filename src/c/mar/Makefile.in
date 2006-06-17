@@ -103,6 +103,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+EXTRALIBS = @EXTRALIBS@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
@@ -136,7 +137,6 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-WINSOCK = @WINSOCK@
 YACC = @YACC@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_AS = @ac_ct_AS@
@@ -199,8 +199,7 @@ mar_SOURCES = \
 
 mar_LDADD = \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(WINSOCK) \
-	-lm
+	$(EXTRALIBS)
 
 all: all-am
 

@@ -44,5 +44,4 @@ TESTS = $(check_PROGRAMS)
 augmar_test_SOURCES = test.c
 augmar_test_LDADD = \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(WINSOCK) \
-	-lm
+	$(EXTRALIBS)

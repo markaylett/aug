@@ -16,22 +16,6 @@ tofd_(int fd)
     return fd;
 }
 
-static int
-tofds_(int sv[2])
-{
-    if (-1 == tofd_(sv[0])) {
-        close(sv[1]);
-        return -1;
-    }
-
-    if (-1 == tofd_(sv[1])) {
-        aug_releasefd(sv[0]);
-        return -1;
-    }
-
-    return 0;
-}
-
 AUGSYS_API int
 aug_socket(int domain, int type, int protocol)
 {
@@ -133,5 +117,11 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
     if (-1 == socketpair(domain, type, protocol, sv))
         return -1;
 
-    return tofds_(sv);
+    if (-1 == aug_openfds(sv, AUG_FDSOCK)) {
+        close(sv[0]);
+        close(sv[1]);
+        return -1;
+    }
+
+    return 0;
 }

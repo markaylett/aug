@@ -43,14 +43,14 @@ namespace aug {
     };
 
     inline void
-    process(struct aug_timers& timers, bool force)
+    processtimers(struct aug_timers& timers, bool force)
     {
         if (-1 == aug_processtimers(&timers, force ? 1 : 0, 0))
             error("aug_processtimers() failed");
     }
 
     inline void
-    process(struct aug_timers& timers, bool force, struct timeval& next)
+    processtimers(struct aug_timers& timers, bool force, struct timeval& next)
     {
         if (-1 == aug_processtimers(&timers, force ? 1 : 0, &next))
             error("aug_processtimers() failed");

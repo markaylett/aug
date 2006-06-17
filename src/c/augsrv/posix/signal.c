@@ -5,6 +5,10 @@
 #include <stdlib.h>  /* NULL */
 #include <strings.h> /* bzero() */
 
+#if defined(_MT)
+# include <pthread.h>
+#endif /* _MT */
+
 AUGSRV_API int
 aug_signalhandler(void (*handler)(int))
 {
@@ -39,7 +43,11 @@ aug_blocksignals(void)
 {
     sigset_t set;
     sigfillset(&set);
-    return sigprocmask(SIG_SETMASK, &set, 0);
+#if !defined(_MT)
+    return sigprocmask(SIG_SETMASK, &set, NULL);
+#else /* _MT */
+    return pthread_sigmask(SIG_SETMASK, &set, NULL);
+#endif /* _MT */
 }
 
 AUGSRV_API int
@@ -47,5 +55,9 @@ aug_unblocksignals(void)
 {
     sigset_t set;
     sigemptyset(&set);
-    return sigprocmask(SIG_SETMASK, &set, 0);
+#if !defined(_MT)
+    return sigprocmask(SIG_SETMASK, &set, NULL);
+#else /* _MT */
+    return pthread_sigmask(SIG_SETMASK, &set, NULL);
+#endif /* _MT */
 }

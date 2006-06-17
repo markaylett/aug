@@ -4,8 +4,8 @@
 #ifndef AUGMAR_H
 #define AUGMAR_H
 
-#include "augmar/mar.h
-#include "augmar/types.h
+#include "augmar/mar.h"
+#include "augmar/types.h"
 
 #endif /* AUGMAR_H */
 

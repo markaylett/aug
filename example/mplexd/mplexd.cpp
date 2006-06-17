@@ -386,7 +386,7 @@ namespace test {
 
                 } else {
 
-                    process(state_->timers_, 0 == ret, tv);
+                    processtimers(state_->timers_, 0 == ret, tv);
 
                     unblocksignals();
                     while (AUG_EINTR == (ret = waitevents(state_

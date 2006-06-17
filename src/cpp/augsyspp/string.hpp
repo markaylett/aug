@@ -6,9 +6,8 @@
 
 #include "augsys/string.h"
 
-#include <algorithm>
+#include <cctype>
 #include <functional>
-#include <string>
 
 namespace aug {
 
@@ -19,14 +18,6 @@ namespace aug {
 			return tolower(lhs) < tolower(rhs);
 		}
 	};
-
-    inline bool
-    nocase_compare(const std::string& lhs, const std::string& rhs)
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            nocase_less());
-    }
 }
 
 #endif // AUGSYSPP_STRING_HPP

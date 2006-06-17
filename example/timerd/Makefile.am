@@ -14,5 +14,4 @@ timerd_LDADD = \
 	$(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la \
-	$(WINSOCK) \
-	-lm
+	$(EXTRALIBS)

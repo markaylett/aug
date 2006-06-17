@@ -27,4 +27,16 @@ aug_gettimeofday(struct timeval* tv, struct timezone* tz);
 AUGSYS_API struct tm*
 aug_localtime(const time_t* clock, struct tm* res);
 
+AUGSYS_API struct timeval*
+aug_mstotv(struct timeval* tv, unsigned int ms);
+
+AUGSYS_API unsigned int
+aug_tvtoms(const struct timeval* tv);
+
+AUGSYS_API struct timeval*
+aug_tvadd(struct timeval* dst, const struct timeval* src);
+
+AUGSYS_API struct timeval*
+aug_tvsub(struct timeval* dst, const struct timeval* src);
+
 #endif /* AUGSYS_TIME_H */

@@ -13,5 +13,4 @@ mar_SOURCES = \
 
 mar_LDADD = \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(WINSOCK) \
-	-lm
+	$(EXTRALIBS)

@@ -5,11 +5,22 @@
 #define AUGSYSPP_UNISTD_HPP
 
 #include "augsyspp/exception.hpp"
-#include "augsyspp/types.hpp"
+#include "augsyspp/smartfd.hpp"
 
 #include "augsys/unistd.h"
 
 namespace aug {
+
+    inline std::pair<smartfd, smartfd>
+    pipe()
+    {
+        int fds[2];
+        if (-1 == aug_pipe(fds))
+            error("aug_pipe() failed");
+
+        return std::make_pair(smartfd::attach(fds[0]),
+                              smartfd::attach(fds[1]));
+    }
 
     inline size_t
     read(fdref ref, void* buf, size_t size)

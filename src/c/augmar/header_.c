@@ -112,7 +112,7 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
               const struct aug_field* field, size_t* ord)
 {
     aug_byte_t* ptr;
-    size_t nsize, fsize, inout, offset, orig;
+    size_t nsize, vsize, fsize, inout, offset, orig;
     assert(seq && info && field);
 
     if (!field->name_) {
@@ -123,6 +123,7 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
     }
 
     nsize = strlen(field->name_) + 1;
+    vsize = field->size_ + 1; /* Add null terminator. */
 
     if (AUG_NSIZE_MAX < nsize) {
 
@@ -131,14 +132,14 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
         return -1;
     }
 
-    if (AUG_VSIZE_MAX < field->size_) {
+    if (AUG_VSIZE_MAX < vsize) {
 
         errno = EINVAL;
         aug_error("maximum field value size exceeded");
         return -1;
     }
 
-    fsize = AUG_FIELD_SIZE(nsize, field->size_);
+    fsize = AUG_FIELD_SIZE(nsize, vsize);
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))
         return -1;
@@ -166,9 +167,13 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     /* Set field value */
 
-    setvsize_(ptr, (aug_vsize_t)field->size_);
+    setvsize_(ptr, (aug_vsize_t)vsize);
     if (field->size_)
         memcpy(ptr + AUG_VALUE_OFFSET(nsize), field->value_, field->size_);
+
+    /* Always null terminate. */
+
+    ptr[AUG_VALUE_OFFSET(nsize) + field->size_] = '\0';
 
     /* If new field then increment field count. */
 
@@ -192,7 +197,7 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, size_t ord,
               const void* value, size_t size)
 {
     aug_byte_t* ptr;
-    size_t offset, nsize, orig;
+    size_t offset, nsize, vsize, orig;
     assert(seq && info);
 
     if (ord >= info->fields_) {
@@ -202,7 +207,11 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, size_t ord,
         return -1;
     }
 
-    if (AUG_VSIZE_MAX < size) {
+    /* Add null terminator. */
+
+    vsize = size + 1;
+
+    if (AUG_VSIZE_MAX < vsize) {
 
         errno = EINVAL;
         aug_error("maximum field value size exceeded");
@@ -225,18 +234,22 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, size_t ord,
                              AUG_FIELD_SIZE(nsize, orig)))
         return -1;
 
-    if (!(ptr = aug_resizeseq_(seq, AUG_FIELD_SIZE(nsize, size))))
+    if (!(ptr = aug_resizeseq_(seq, AUG_FIELD_SIZE(nsize, vsize))))
         return -1;
 
     /* Set field value. */
 
-    setvsize_(ptr, (aug_vsize_t)size);
+    setvsize_(ptr, (aug_vsize_t)vsize);
     if (size)
         memcpy(ptr + AUG_VALUE_OFFSET(nsize), value, size);
 
+    /* Always null terminate. */
+
+    ptr[AUG_VALUE_OFFSET(nsize) + size] = '\0';
+
     /* Add difference between old and new value size to header size. */
 
-    info->hsize_ += (ssize_t)size - (ssize_t)orig;
+    info->hsize_ += (ssize_t)vsize - (ssize_t)orig;
     return 0;
 }
 
@@ -337,10 +350,10 @@ aug_valuebyname_(aug_seq_t seq, const struct aug_info_* info,
         return NULL;
     }
 
-    /* Set optional output parameter. */
+    /* Set optional output parameter: minus null terminator. */
 
     if (size)
-        *size = vsize_(ptr);
+        *size = vsize_(ptr) - 1;
 
     return value_(ptr, nsize_(ptr));
 }
@@ -369,10 +382,10 @@ aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, size_t ord,
 
     ptr += offsetbyord_(ptr, ord);
 
-    /* Set optional output parameter. */
+    /* Set optional output parameter: minus null terminator. */
 
     if (size)
-        *size = vsize_(ptr);
+        *size = vsize_(ptr) - 1;
 
     return value_(ptr, nsize_(ptr));
 }
@@ -405,7 +418,7 @@ aug_field_(aug_seq_t seq, const struct aug_info_* info,
 
     field->name_ = name_(ptr);
     field->value_ = value_(ptr, nsize_(ptr));
-    field->size_ = vsize_(ptr);
+    field->size_ = vsize_(ptr) - 1; /* Minus null terminator. */
     return 0;
 }
 
