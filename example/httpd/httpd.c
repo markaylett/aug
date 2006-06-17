@@ -323,8 +323,7 @@ init_(void* arg)
 
     aug_info("initialising daemon process");
 
-    if (-1 == aug_setsrvlogger("httpd")
-        || !(mplexer_ = aug_createmplexer()))
+    if (-1 == aug_setsrvlogger("aug") || !(mplexer_ = aug_createmplexer()))
         return -1;
 
     if (!aug_parseinet(&addr, address_))

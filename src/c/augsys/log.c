@@ -7,6 +7,11 @@
 static const char rcsid[] = "$Id:$";
 
 #include "augsys/defs.h" /* AUG_MAXLINE */
+#include "augsys/lock.h"
+
+#if defined(_WIN32)
+# include "augsys/windows.h"
+#endif /* _WIN32 */
 
 #include <assert.h>
 #include <errno.h>
@@ -39,6 +44,13 @@ aug_stdiologger(int loglevel, const char* format, va_list args)
         errno = EINVAL;
         return -1;
     }
+
+#if defined(_WIN32) && !defined(NDEBUG)
+    aug_lock();
+    OutputDebugString(buf);
+    OutputDebugString("\n");
+    aug_unlock();
+#endif /* _WIN32 && !NDEBUG */
 
     fprintf(file, "%s\n", buf);
     fflush(file);

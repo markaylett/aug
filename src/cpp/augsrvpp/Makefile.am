@@ -18,8 +18,7 @@ libaugsrvpp_la_SOURCES = \
 	signal.cpp
 
 libaugsrvpp_la_LDFLAGS = \
-	-no-undefined \
-	-version-info 0:0:0
+	-no-undefined
 
 libaugsrvpp_la_LIBADD = \
 	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \

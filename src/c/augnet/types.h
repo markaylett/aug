@@ -13,12 +13,4 @@ struct aug_buf {
     size_t size_;
 };
 
-struct aug_handlers {
-    int (*setinitial_)(void*, const char*);
-    int (*setfield_)(void*, const char*, const char*);
-    int (*setcsize_)(void*, size_t);
-    int (*cdata_)(void*, const void*, size_t);
-    int (*end_)(void*, int);
-};
-
 #endif /* AUGNET_TYPES_H */

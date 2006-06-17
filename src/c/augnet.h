@@ -5,6 +5,7 @@
 #define AUGNET_H
 
 #include "augnet/conn.h"
+#include "augnet/fix.h"
 #include "augnet/http.h"
 #include "augnet/inet.h"
 #include "augnet/types.h"

@@ -16,8 +16,7 @@ libaugnetpp_la_SOURCES = \
 	inet.cpp
 
 libaugnetpp_la_LDFLAGS = \
-	-no-undefined \
-	-version-info 0:0:0
+	-no-undefined
 
 libaugnetpp_la_LIBADD = \
 	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \

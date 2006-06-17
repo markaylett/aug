@@ -238,8 +238,7 @@ modinclude_HEADERS = \
 @ENABLE_CPPBUILD_TRUE@	types.cpp
 
 @ENABLE_CPPBUILD_TRUE@libaugmarpp_la_LDFLAGS = \
-@ENABLE_CPPBUILD_TRUE@	-no-undefined \
-@ENABLE_CPPBUILD_TRUE@	-version-info 0:0:0
+@ENABLE_CPPBUILD_TRUE@	-no-undefined
 
 @ENABLE_CPPBUILD_TRUE@libaugmarpp_la_LIBADD = \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \

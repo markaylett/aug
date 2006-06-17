@@ -6,6 +6,7 @@ modinclude_HEADERS = \
 	config.hpp \
 	exception.hpp \
 	mplexer.hpp \
+	mutex.hpp \
 	null.hpp \
 	smartfd.hpp \
 	socket.hpp \
@@ -23,6 +24,7 @@ libaugsyspp_la_SOURCES = \
 	config.cpp \
 	exception.cpp \
 	mplexer.cpp \
+	mutex.cpp \
 	null.cpp \
 	smartfd.cpp \
 	socket.cpp \
@@ -32,8 +34,7 @@ libaugsyspp_la_SOURCES = \
 	utility.cpp
 
 libaugsyspp_la_LDFLAGS = \
-	-no-undefined \
-	-version-info 0:0:0
+	-no-undefined
 
 libaugsyspp_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la

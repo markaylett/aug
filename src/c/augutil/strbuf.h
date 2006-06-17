@@ -43,6 +43,9 @@ aug_catstrbufcn(aug_strbuf_t* strbuf, char ch, size_t num);
 AUGUTIL_API int
 aug_catstrbufc(aug_strbuf_t* strbuf, char ch);
 
+AUGUTIL_API ssize_t
+aug_readstrbuf(int fd, aug_strbuf_t* strbuf, size_t size);
+
 AUGUTIL_API int
 aug_setstrbufcn(aug_strbuf_t* strbuf, char ch, size_t num);
 

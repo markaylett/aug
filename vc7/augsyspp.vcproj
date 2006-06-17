@@ -119,6 +119,9 @@
 				RelativePath="..\src\cpp\augsyspp\mplexer.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augsyspp\mutex.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsyspp\null.cpp">
 			</File>
 			<File
@@ -155,6 +158,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\mplexer.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsyspp\mutex.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\null.hpp">

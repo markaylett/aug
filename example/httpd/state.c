@@ -98,17 +98,16 @@ prepare_(aug_state_t state)
     return 0;
 }
 
-static int
+static void
 setinitial_(void* arg, const char* initial)
 {
     aug_state_t state = arg;
     if (!state->in_.initial_)
         state->in_.initial_ = aug_createstrbuf(AUG_MAXLINE);
     aug_setstrbufs(&state->in_.initial_, initial);
-    return 0;
 }
 
-static int
+static void
 setfield_(void* arg, const char* name, const char* value)
 {
     aug_state_t state = arg;
@@ -121,10 +120,9 @@ setfield_(void* arg, const char* name, const char* value)
     if (!state->in_.mar_)
         state->in_.mar_ = aug_createmar();
     aug_setfield(state->in_.mar_, &field, NULL);
-    return 0;
 }
 
-static int
+static void
 setcsize_(void* arg, size_t csize)
 {
     aug_state_t state = arg;
@@ -132,20 +130,18 @@ setcsize_(void* arg, size_t csize)
         state->in_.mar_ = aug_createmar();
     aug_truncatemar(state->in_.mar_, csize);
     aug_seekmar(state->in_.mar_, AUG_SET, 0);
-    return 0;
 }
 
-static int
+static void
 cdata_(void* arg, const void* buf, size_t size)
 {
     aug_state_t state = arg;
     if (!state->in_.mar_)
         state->in_.mar_ = aug_createmar();
     aug_writemar(state->in_.mar_, buf, size);
-    return 0;
 }
 
-static int
+static void
 end_(void* arg, int commit)
 {
     aug_state_t state = arg;
@@ -157,7 +153,7 @@ end_(void* arg, int commit)
         AUG_DEBUG("request received");
 
         if (!state->in_.initial_)
-            return 0; /* Blank line. */
+            return; /* Blank line. */
 
         (*state->request_)(state->arg_, aug_getstr(state->in_.initial_),
                            state->in_.mar_, &messages);
@@ -173,10 +169,9 @@ end_(void* arg, int commit)
         aug_releasemar(state->in_.mar_);
         state->in_.mar_ = NULL;
     }
-    return 0;
 }
 
-const struct aug_handlers handlers_ = {
+const struct aug_httphandlers handlers_ = {
     setinitial_,
     setfield_,
     setcsize_,

@@ -6,12 +6,13 @@
 
 static const char rcsid[] = "$Id:$";
 
-#include "augsys/defs.h" /* AUG_MAX */
+#include "augsys/defs.h"   /* AUG_MAX */
 #include "augsys/errinfo.h"
+#include "augsys/unistd.h" /* aug_read() */
 
-#include <errno.h>       /* ENOMEM */
-#include <stdlib.h>      /* malloc() */
-#include <string.h>      /* memcpy() */
+#include <errno.h>         /* ENOMEM */
+#include <stdlib.h>        /* malloc() */
+#include <string.h>        /* memmove() */
 
 /* The character that forms part of the string's header is used to ensure
    that there is always enough room for the null-terminating character. */
@@ -95,7 +96,9 @@ aug_catstrbufsn(aug_strbuf_t* strbuf, const char* src, size_t len)
 	if (-1 == reserve_(strbuf, (*strbuf)->len_ + len))
 		return -1;
 
-	memcpy((*strbuf)->data_ + (*strbuf)->len_, src, len);
+    /* Allow copy from overlapping region. */
+
+	memmove((*strbuf)->data_ + (*strbuf)->len_, src, len);
 	(*strbuf)->len_ += len;
 	return 0;
 }
@@ -152,6 +155,20 @@ AUGUTIL_API int
 aug_catstrbufc(aug_strbuf_t* strbuf, char ch)
 {
 	return aug_catstrbufcn(strbuf, ch, 1);
+}
+
+AUGUTIL_API ssize_t
+aug_readstrbuf(int fd, aug_strbuf_t* strbuf, size_t size)
+{
+    ssize_t ret;
+	if (-1 == reserve_(strbuf, (*strbuf)->len_ + size))
+		return -1;
+
+    if (-1 == (ret = aug_read(fd, (*strbuf)->data_ + (*strbuf)->len_, size)))
+        return -1;
+
+	(*strbuf)->len_ += ret;
+	return ret;
 }
 
 AUGUTIL_API int

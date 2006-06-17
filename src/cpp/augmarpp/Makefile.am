@@ -30,8 +30,7 @@ libaugmarpp_la_SOURCES = \
 	types.cpp
 
 libaugmarpp_la_LDFLAGS = \
-	-no-undefined \
-	-version-info 0:0:0
+	-no-undefined
 
 libaugmarpp_la_LIBADD = \
 	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \

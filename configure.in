@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.56)
 AC_INIT([src/config.h.in])
-AM_INIT_AUTOMAKE([aug], [0.3.2], [mark@emantic.co.uk])
+AM_INIT_AUTOMAKE([aug], [dev], [mark@emantic.co.uk])
 AC_CONFIG_HEADER([src/config.h])
 
 AM_MAINTAINER_MODE
@@ -23,7 +23,7 @@ AM_PROG_LIBTOOL
 AC_PROG_LEX
 AC_PROG_YACC
 
-BOOST_ROOT=${BOOST_HOME:-/usr}
+BOOST_HOME=${BOOST_HOME:-/usr}
 AC_SUBST(BOOST_HOME)
 
 AC_ARG_ENABLE(cppbuild,
@@ -91,6 +91,7 @@ AC_CONFIG_FILES([Makefile
     src/c/Makefile
     src/c/augmar/Makefile
     src/c/augnet/Makefile
+    src/c/augres/Makefile
     src/c/augsrv/Makefile
     src/c/augsrv/posix/Makefile
     src/c/augsrv/win32/Makefile

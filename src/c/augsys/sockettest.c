@@ -11,10 +11,11 @@
 int
 main(int argc, char* argv[])
 {
-    int sv[2];
-    char buf[AUG_MAXLINE];
     struct aug_errinfo errinfo;
+
+    int sv[2];
     struct iovec iov[2];
+    char buf[AUG_MAXLINE];
 
     aug_atexitinit(&errinfo);
 

@@ -24,8 +24,7 @@ libaugutilpp_la_SOURCES = \
 	timer.cpp
 
 libaugutilpp_la_LDFLAGS = \
-	-no-undefined \
-	-version-info 0:0:0
+	-no-undefined
 
 libaugutilpp_la_LIBADD = \
 	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \

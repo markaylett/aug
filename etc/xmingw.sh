@@ -7,4 +7,4 @@ rm -f config.cache && sh ./configure \
     --enable-maintainer-mode \
     --build=i586-pc-linux-gnu \
     --host=i586-mingw32msvc \
-    --prefix=$HOME/i586-mingw32msvc
+    --prefix=$AUG_HOME/i586-mingw32msvc

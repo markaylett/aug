@@ -1,9 +1,5 @@
 Write maintainer guidelines.
 
-Create resource file for ReportError().
-
-Add OutputDebugString() support to logger.
-
 Add clean hook for vc7 directories.
 
 Ensure use of detail namespace.
@@ -29,3 +25,7 @@ Determine ignorable Winsock non-blocking accept() errors.
 Add support for config environment variable.
 
 Add FIX parser.
+
+Add auto registration of event source.
+
+Add fd-based and string-based parsing functions.

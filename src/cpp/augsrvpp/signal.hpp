@@ -33,6 +33,26 @@ namespace aug {
             throwerrinfo("aug_unblocksignals() failed");
     }
 
+    class AUGSYSPP_API scoped_block {
+
+        scoped_block(const scoped_block& rhs);
+
+        scoped_block&
+        operator =(const scoped_block& rhs);
+
+    public:
+        ~scoped_block() NOTHROW
+        {
+            if (-1 == aug_unblocksignals())
+                aug_perrinfo("aug_unblocksignals() failed");
+        }
+
+        scoped_block()
+        {
+            blocksignals();
+        }
+    };
+
     class AUGSYSPP_API scoped_unblock {
 
         scoped_unblock(const scoped_unblock& rhs);

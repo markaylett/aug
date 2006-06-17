@@ -14,6 +14,8 @@ typedef void* caddr_t;
 # endif /* _MSC_VER */
 #endif /* _WIN32 */
 
+typedef unsigned int aug_len_t;
+
 enum aug_loglevel {
     AUG_LOGCRIT,
     AUG_LOGERROR,

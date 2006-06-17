@@ -377,7 +377,7 @@ namespace test {
         {
             aug_info("initialising daemon process");
 
-            setsrvlogger("mplexd");
+            setsrvlogger("aug");
             state_.reset(new sstate(*this));
         }
 

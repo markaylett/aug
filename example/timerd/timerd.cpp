@@ -165,7 +165,7 @@ namespace test {
         {
             aug_info("initialising daemon process");
 
-            if (-1 == aug_setsrvlogger("timerd")) {
+            if (-1 == aug_setsrvlogger("aug")) {
                 aug_setposixerrinfo(__FILE__, __LINE__, errno);
                 throwerrinfo("aug_setsrvlogger() failed");
             }

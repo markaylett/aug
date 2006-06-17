@@ -8,12 +8,11 @@
 
 #include <stdio.h>       /* _vsnprintf() */
 
-#define EVENTLOG_ 1
+#define AUG_MSGID 1
 
 static aug_logger_t orig_;
 static HANDLE eventlog_ = NULL;
 
-#if EVENTLOG_
 static void
 report_(WORD type, const char* format, va_list args)
 {
@@ -24,15 +23,13 @@ report_(WORD type, const char* format, va_list args)
     _vsnprintf(msg, sizeof(msg), format, args);
     msg[sizeof(msg) - 1] = '\0';
 
-    ReportEvent(eventlog_, type, 0, 0, NULL, 1, 0, (const char**)&msgs[0],
-                NULL);
+    ReportEvent(eventlog_, type, 0, AUG_MSGID, NULL, 1, 0,
+                (const char**)&msgs[0], NULL);
 }
-#endif /* EVENTLOG_ */
 
 static int
 logger_(int loglevel, const char* format, va_list args)
 {
-#if EVENTLOG_
     switch (loglevel) {
     case AUG_LOGCRIT:
     case AUG_LOGERROR:
@@ -45,7 +42,6 @@ logger_(int loglevel, const char* format, va_list args)
         report_(EVENTLOG_INFORMATION_TYPE, format, args);
         break;
     }
-#endif /* EVENTLOG_ */
     return (*orig_)(loglevel, format, args);
 }
 

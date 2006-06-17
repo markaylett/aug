@@ -4,6 +4,7 @@ modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
 	config.h \
 	conn.h \
+	fix.h \
 	http.h \
 	inet.h \
 	types.h \
@@ -16,6 +17,7 @@ lib_LTLIBRARIES = libaugnet.la
 libaugnet_la_SOURCES = \
 	config.c \
 	conn.c \
+	fix.c \
 	http.c \
 	inet.c \
 	types.c \

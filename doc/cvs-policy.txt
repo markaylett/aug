@@ -1,133 +1,76 @@
-Branches are named in lower-case, and underscores used as separators.
+This guide is based on the aug project:
 
-Branch names consist of a version part, and a role/user part.
+ $ mkdir -p aug
+ $ echo "The first line." >aug/README
 
-A common role would be that of the release engineer; which may be abbreviated
-to 'releng'.
+Create a CVS repository:
 
-The following identifiers are examples of branch names:
+ $ export CVSROOT="`pwd`/src"
+ $ cvs init
 
-v0r1_releng
-v1r2_marayl
+Import the project:
 
-The trunk of the version tree is referred to as main.
+ $ cd aug
+ $ cvs import -m "Package import." aug vendor REL_0_1_0
 
-Labels are named in upper-case, and underscores used as separators.
+Checkout the project:
 
-Preview release
-PR1,PR2...PRn
-RC1,RC2...RCn
-SR1,SR2...SRn
+ $ cvs checkout aug
 
-BP
-V0R1_RELENG_TO_V1R2_MARAYL
-D20051101
+Develop on trunk:
 
---
+ $ cd aug
+ $ echo "The second line." >README
 
-1. Introduction
+ $ cvs commit -m "Some changes."
 
-The following tutorial will assume the following snakeoil project:
+Create a branch-point:
 
-$ mkdir -p snakeoil/src
-$ echo "The first line." > snakeoil/src/README
+ $ cvs rtag RELENG_1_0 aug
 
-2. Creating the Project
+Create a release branch:
 
-The snakeoil project can be added to cvs as follows:
+ $ cvs rtag -b -r RELENG_1_0 releng_1_0 aug
+ $ cvs rtag -r releng_1_0 MERGED_1_0 aug
 
-$ cd snakeoil/src
-$ cvs import -m "Initial import" snakeoil/src import IMPORT_20050628
+Fix bugs on the release branch:
 
-Once imported, the local directory can be removed:
+ $ cvs update -r releng_1_0
+ $ echo "A bug fix." >>README
+ $ cvs commit -m "Some changes."
 
-$ cd ../../
-$ rm -fR snakeoil/src
+More trunk development:
 
-The snakeoil project can then be checked out as follows:
+ $ cvs update -A
+ $ echo "The third line." >>README
+ $ cvs commit -m "Some changes."
 
-$ cvs checkout snakeoil/src
+Tag a release:
 
-Any new development should then occur on the main trunk:
+ $ cvs rtag -r releng_1_0 REL_1_0_RC1 aug
 
-$ cd snakeoil/src
-$ echo "The second line." > README
-$ cvs commit -m "Some changes."
+Export a release:
 
-3. Making a Release
+ $ cvs export -r REL_1_0_RC1 -d aug-1.0.rc1-src aug
 
-Before a release is made the main trunk should be tagged as follows:
+Create patches:
 
-$ cvs tag REL_0_1
-$ cvs tag REL_0_1_MERGED
+ $ cvs rdiff -r RELENG_1_0 -r REL_1_0_RC1 aug >aug-1.0.rc1.patch
 
-And, a branch created from the tagged release for bugfixes:
+Merge bug fixes into trunk:
 
-$ cvs tag -b rel_0_1_patches
+ $ cvs update -A
+ $ cvs update -j MERGED_1_0 -j releng_1_0
 
-A release can then be made as follows:
+Resolve any conflicts:
 
-$ cvs export -r REL_0_1 -d REL_0_1
+ $ vi README
+ $ cvs commit -m "Some changes."
 
-Development on the main trunk can then continue:
+Move the MERGED tag:
 
-$ echo "The third line." >> README
-$ cvs commit -m "Some changes."
+ $ cvs rtag -F -r releng_1_0 MERGED_1_0 aug
 
-4. Bug Fixing
+Delete a tag:
 
-To add a bugfix, the sticky tag should be updated to the patches branch:
-
-$ cvs update -r rel_0_1_patches
-
-Bugs can then be fixed on the patches branch:
-
-$ echo "A bug fix." >> README
-$ cvs commit -m "Some changes."
-
-Return to the main trunk as follows:
-
-$ cvs update -A
-
-5. Patch Releases
-
-The sticky tag should be updated to the patches branch:
-
-$ cvs update -r rel_0_1_patches
-
-A patch release can then be created as follows:
-
-$ cvs tag REL_0_1_1
-$ cvs rdiff -r REL_0_1 -r REL_0_1_1 snakeoil/src > snakeoil-0.1.1.patch
-
-The main trunk must then be merged with the patch release as follows:
-
-$ cvs update -A
-$ cvs update -j REL_0_1_MERGED -j REL_0_1_1
-
-Resolve any conflicts using an editor and then commit:
-
-$ vi snakeoil.txt
-$ cvs commit -m "Some changes."
-
-Once the merge is complete, the merged tag should be updated:
-
-$ cvs rtag -F -r REL_0_1_1 REL_0_1_merged snakeoil/src
-
-6. Deleting Tags
-
-If need be, a tag can be deleted as follows:
-
-$ cvs rtag -d current snakeoil/src
-
-7. Moving Tags
-
-An existing tag can be moved as follows:
-
-$ cvs tag -F current snakeoil/src
-
-8. Diffing Changes
-
-To view differences between the latest version:
-
-$ cvs diff -r HEAD
+ $ cvs rtag -d OOPS_1_0_0 aug

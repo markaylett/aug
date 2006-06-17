@@ -491,7 +491,7 @@ uninstall-info: uninstall-info-recursive
 	uninstall uninstall-am uninstall-info-am
 
 
-depend:
+build:
 	for l in augsys augmar augutil augsrv augnet; do \
 		(cd $(top_srcdir)/src/c && \
 			../pl/dotdepend -I. `find $$l -name "*.c"`) \

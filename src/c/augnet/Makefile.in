@@ -62,8 +62,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugnet_la_DEPENDENCIES = $(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
-am_libaugnet_la_OBJECTS = config.lo conn.lo http.lo inet.lo types.lo \
-	utility.lo
+am_libaugnet_la_OBJECTS = config.lo conn.lo fix.lo http.lo inet.lo \
+	types.lo utility.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_augnet_test_OBJECTS = test.$(OBJEXT)
 augnet_test_OBJECTS = $(am_augnet_test_OBJECTS)
@@ -205,6 +205,7 @@ modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
 	config.h \
 	conn.h \
+	fix.h \
 	http.h \
 	inet.h \
 	types.h \
@@ -215,6 +216,7 @@ lib_LTLIBRARIES = libaugnet.la
 libaugnet_la_SOURCES = \
 	config.c \
 	conn.c \
+	fix.c \
 	http.c \
 	inet.c \
 	types.c \
@@ -315,6 +317,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@

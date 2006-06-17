@@ -52,10 +52,7 @@ PROGRAMS = $(noinst_PROGRAMS)
 am__mplexd_SOURCES_DIST = mplexd.cpp
 @ENABLE_CPPBUILD_TRUE@am_mplexd_OBJECTS = mplexd.$(OBJEXT)
 mplexd_OBJECTS = $(am_mplexd_OBJECTS)
-@ENABLE_CPPBUILD_TRUE@mplexd_DEPENDENCIES = $(top_srcdir)/src/cpp/augnetpp/libaugnetpp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsrvpp/libaugsrvpp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@mplexd_DEPENDENCIES =  \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
@@ -199,10 +196,6 @@ DEFAULT_INCLUDES = \
 @ENABLE_CPPBUILD_TRUE@	mplexd.cpp
 
 @ENABLE_CPPBUILD_TRUE@mplexd_LDADD = \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augnetpp/libaugnetpp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsrvpp/libaugsrvpp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \

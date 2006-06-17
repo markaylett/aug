@@ -8,6 +8,7 @@ static const char rcsid[] = "$Id:$";
 
 #include "augsys/defs.h"   /* AUG_MAXLINE */
 #include "augsys/errinfo.h"
+#include "augsys/lock.h"
 #include "augsys/time.h"
 #include "augsys/unistd.h" /* write() */
 
@@ -175,11 +176,14 @@ aug_daemonlogger(int loglevel, const char* format, va_list args)
     if (-1 == aug_vformatlog(buf, &n, loglevel, format, args))
         return -1;
 
-    buf[n] = '\n';
+#if defined(_WIN32) && !defined(NDEBUG)
+    aug_lock();
+    OutputDebugString(buf);
+    OutputDebugString("\n");
+    aug_unlock();
+#endif /* _WIN32 && !NDEBUG */
 
-#if 0 && defined(_WIN32)
-    OutputDebugString(buf); /* needs nullterm */
-#endif /* _WIN32 */
+    buf[n] = '\n';
     return writeall_(loglevel > AUG_LOGWARN ? STDOUT_FILENO : STDERR_FILENO,
                      buf, n + 1);
 }
