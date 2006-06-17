@@ -18,7 +18,7 @@ namespace aug {
     {
         aug_signal_t sig;
         if (-1 == aug_readsignal(ref.get(), &sig))
-            error("aug_readsignal() failed");
+            throwerror("aug_readsignal() failed");
         return sig;
     }
 
@@ -26,7 +26,7 @@ namespace aug {
     writesignal(fdref ref, aug_signal_t sig)
     {
         if (-1 == aug_writesignal(ref.get(), sig))
-            error("aug_writesignal() failed");
+            throwerror("aug_writesignal() failed");
     }
 }
 

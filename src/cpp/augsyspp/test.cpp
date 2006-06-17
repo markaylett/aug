@@ -5,6 +5,7 @@
 #include "augsyspp/base.hpp"
 #include "augsyspp/smartfd.hpp"
 
+#include "augsys/errinfo.h"
 #include "augsys/log.h"
 
 #include <fcntl.h>
@@ -43,7 +44,8 @@ main(int argc, char* argv[])
 {
     try {
 
-        initialiser init;
+        aug_errinfo errinfo;
+        initialiser init(errinfo);
         smartfd sfd1(open());
         setfdhook(sfd1, hook_, 0);
 
@@ -53,7 +55,7 @@ main(int argc, char* argv[])
 
     } catch (const exception& e) {
 
-        aug_error("%s", e.what());
+        aug_perrinfo("error");
         return 1;
     }
 

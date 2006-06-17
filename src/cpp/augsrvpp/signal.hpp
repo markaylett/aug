@@ -16,21 +16,21 @@ namespace aug {
     signalhandler(void (*handler)(int))
     {
         if (-1 == aug_signalhandler(handler))
-            error("aug_signalhandler() failed");
+            throwerror("aug_signalhandler() failed");
     }
 
     inline void
     blocksignals()
     {
         if (-1 == aug_blocksignals())
-            error("aug_blocksignals() failed");
+            throwerror("aug_blocksignals() failed");
     }
 
     inline void
     unblocksignals()
     {
         if (-1 == aug_unblocksignals())
-            error("aug_unblocksignals() failed");
+            throwerror("aug_unblocksignals() failed");
     }
 }
 

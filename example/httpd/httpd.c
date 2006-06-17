@@ -28,6 +28,8 @@ static const char rcsid[] = "$Id:$";
 
 #define PORT_ 8080
 
+static const char* program_;
+
 static int daemon_ = 0;
 static int quit_ = 0;
 
@@ -120,7 +122,7 @@ conn_(void* arg, int fd, struct aug_conns* conns)
         AUG_DEBUG("handling read event");
 
         if (-1 == (ret = aug_readsome(state, fd))) {
-            aug_perror("aug_readsome() failed");
+            aug_perrinfo("aug_readsome() failed");
             goto fail;
         }
 
@@ -138,7 +140,7 @@ conn_(void* arg, int fd, struct aug_conns* conns)
         AUG_DEBUG("handling write event");
 
         if (-1 == (ret = aug_writesome(state, fd))) {
-            aug_perror("aug_writesome() failed");
+            aug_perrinfo("aug_writesome() failed");
             goto fail;
         }
 
@@ -174,20 +176,20 @@ listener_(void* arg, int fd, struct aug_conns* conns)
 
     len = sizeof(addr);
     if (-1 == (conn = aug_accept(fd, (struct sockaddr*)&addr, &len))) {
-        aug_perror("aug_accept() failed");
+        aug_perrinfo("aug_accept() failed");
         return 1;
     }
 
     aug_info("initialising new connection '%d'", conn);
 
     if (-1 == aug_setnonblock(conn, 1)) {
-        aug_perror("aug_setnonblock() failed");
+        aug_perrinfo("aug_setnonblock() failed");
         aug_close(conn);
         return 1;
     }
 
     if (!(arg = createconn_(mplexer_, conn))) {
-        aug_perror("failed to create connection");
+        aug_perrinfo("failed to create connection");
         aug_close(conn);
         return 1;
     }
@@ -238,10 +240,18 @@ static const char*
 getopt_(void* arg, enum aug_option opt)
 {
     switch (opt) {
+    case AUG_OPTADMIN:
+        return "Mark Aylett <mark@emantic.co.uk>";
     case AUG_OPTCONFFILE:
         return *conffile_ ? conffile_ : NULL;
+    case AUG_OPTLONGNAME:
+        return "HTTP Daemon";
     case AUG_OPTPIDFILE:
         return pidfile_;
+    case AUG_OPTPROGRAM:
+        return program_;
+    case AUG_OPTSHORTNAME:
+        return "httpd";
     }
     return NULL;
 }
@@ -257,10 +267,10 @@ reconfig_(void)
             return -1;
     }
 
-    AUG_VERIFY(chdir(rundir_), "chdir() failed");
+    AUG_PERROR(chdir(rundir_), "chdir() failed");
 
     if (daemon_)
-        AUG_VERIFY(aug_openlog(logfile_), "aug_openlog() failed");
+        AUG_PERRINFO(aug_openlog(logfile_), "aug_openlog() failed");
 
     aug_info("run directory: %s", rundir_);
     aug_info("pid file: %s", pidfile_);
@@ -291,13 +301,13 @@ pipe_(void* arg, int fd, struct aug_conns* conns)
         return 1;
 
     AUG_DEBUG("reading signal action");
-    AUG_VERIFY(aug_readsignal(aug_signalin(), &sig),
-               "aug_readsignal() failed");
+    AUG_PERRINFO(aug_readsignal(aug_signalin(), &sig),
+                 "aug_readsignal() failed");
 
     switch (sig) {
     case AUG_SIGRECONF:
         aug_info("received AUG_SIGRECONF");
-        AUG_VERIFY(reconfig_(), "failed to re-configure daemon");
+        AUG_PERRINFO(reconfig_(), "failed to re-configure daemon");
         break;
     case AUG_SIGSTATUS:
         aug_info("received AUG_SIGSTATUS");
@@ -356,8 +366,8 @@ run_(void* arg)
     while (!AUG_EMPTY(&conns_) && !quit_) {
 
         if (!AUG_EMPTY(&timers_))
-            AUG_VERIFY(aug_processtimers(&timers_, 0, &timeout),
-                       "aug_processtimers() failed");
+            AUG_PERRINFO(aug_processtimers(&timers_, 0, &timeout),
+                         "aug_processtimers() failed");
 
         /* If SA_RESTART has been set for an interrupting signal, it is
            implementation dependant whether select/poll restart or return with
@@ -365,18 +375,18 @@ run_(void* arg)
 
         while (-1 == aug_waitevents(mplexer_, !AUG_EMPTY(&timers_)
                                     ? &timeout : NULL))
-            aug_perror("aug_waitevents() failed");
+            aug_perrinfo("aug_waitevents() failed");
 
-        AUG_VERIFY(aug_processconns(&conns_),
-                   "aug_processconns() failed");
+        AUG_PERRINFO(aug_processconns(&conns_),
+                     "aug_processconns() failed");
     }
 
     aug_info("stopping daemon process");
 
-    AUG_VERIFY(aug_freetimers(&timers_), "aug_freetimers() failed");
-    AUG_VERIFY(aug_freeconns(&conns_), "aug_freeconns() failed");
-    AUG_VERIFY(aug_close(fd_), "aug_close() failed");
-    AUG_VERIFY(aug_freemplexer(mplexer_), "aug_freemplexer() failed");
+    AUG_PERRINFO(aug_freetimers(&timers_), "aug_freetimers() failed");
+    AUG_PERRINFO(aug_freeconns(&conns_), "aug_freeconns() failed");
+    AUG_PERRINFO(aug_close(fd_), "aug_close() failed");
+    AUG_PERRINFO(aug_freemplexer(mplexer_), "aug_freemplexer() failed");
     return 0;
 }
 
@@ -389,21 +399,18 @@ term_(void)
 int
 main(int argc, char* argv[])
 {
+    struct aug_errinfo errinfo;
     struct aug_service service = {
         getopt_,
         config_,
         init_,
         run_,
-        NULL,
-        "HTTP Daemon",
-        "httpd",
-        "Mark Aylett <mark@emantic.co.uk>",
         NULL
     };
 
-    service.program_ = argv[0];
+    program_ = argv[0];
 
-    aug_init();
+    aug_init(&errinfo);
     atexit(term_);
 
     service_ = &service;

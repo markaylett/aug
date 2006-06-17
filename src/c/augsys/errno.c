@@ -128,36 +128,29 @@ static const struct errormap_ ERRORMAP_[] = {
 #define EACCES_BEGIN_ ERROR_WRITE_PROTECT
 #define EACCES_END_ ERROR_SHARING_BUFFER_EXCEEDED
 
-AUGSYS_API void
-aug_maperror(unsigned long win32)
+AUGSYS_API int
+aug_setwin32errno(unsigned long err)
 {
     int i;
     for (i = 0; ERRORMAP_SIZE_ > i; ++i)
-        if (win32 == ERRORMAP_[i].win32_) {
-            errno = ERRORMAP_[i].errno_;
-            return;
-        }
+        if (err == ERRORMAP_[i].win32_)
+            return errno = ERRORMAP_[i].errno_;
 
-    if (EACCES_BEGIN_ <= win32 && EACCES_END_ >= win32) {
-        errno = EACCES;
-        return;
-    }
+    if (EACCES_BEGIN_ <= err && EACCES_END_ >= err)
+        return errno = EACCES;
 
-    if (ENOEXEC_BEGIN_ <= win32 && ENOEXEC_END_ >= win32) {
-        errno = ENOEXEC;
-        return;
-    }
+    if (ENOEXEC_BEGIN_ <= err && ENOEXEC_END_ >= err)
+        return errno = ENOEXEC;
 
-    errno = EINVAL;
-    SetLastError(win32);
+    return errno = EINVAL;
 }
 
 #endif /* _WIN32 */
 
 AUGSYS_API void
-aug_seterrno(int num)
+aug_seterrno(int err)
 {
-    errno = num;
+    errno = err;
 }
 
 AUGSYS_API int

@@ -94,21 +94,21 @@ namespace aug {
     insertconn(struct aug_conns& conns, fdref ref, poll_base& action)
     {
         if (-1 == aug_insertconn(&conns, ref.get(), detail::poll, &action))
-            error("aug_insertconn() failed");
+            throwerror("aug_insertconn() failed");
     }
 
     inline void
     removeconn(struct aug_conns& conns, fdref ref)
     {
         if (-1 == aug_removeconn(&conns, ref.get()))
-            error("aug_removeconn() failed");
+            throwerror("aug_removeconn() failed");
     }
 
     inline void
     processconns(struct aug_conns& conns)
     {
         if (-1 == aug_processconns(&conns))
-            error("aug_processconns() failed");
+            throwerror("aug_processconns() failed");
     }
 }
 

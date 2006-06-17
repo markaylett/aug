@@ -11,7 +11,7 @@
 #define AUG_SIGSTATUS 2
 #define AUG_SIGSTOP   3
 
-/* Base value for user-defined signals. */
+/** Base value for user-defined signals. */
 
 #define AUG_SIGUSER   4
 

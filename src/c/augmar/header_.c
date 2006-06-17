@@ -9,11 +9,10 @@ static const char rcsid[] = "$Id:$";
 #include "augmar/format_.h"
 #include "augmar/info_.h"
 
-#include "augsys/log.h"
+#include "augsys/errinfo.h"
 #include "augsys/string.h"
 
 #include <assert.h>
-#include <errno.h>
 #include <string.h>
 
 static void
@@ -119,8 +118,8 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     if (!field->name_) {
 
-        errno = EINVAL;
-        aug_error("null field name");
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+                       AUG_MSG("null field name"));
         return -1;
     }
 
@@ -129,15 +128,15 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     if (AUG_NSIZE_MAX < nsize) {
 
-        errno = EINVAL;
-        aug_error("maximum field name size exceeded");
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                       AUG_MSG("maximum field-name size exceeded"));
         return -1;
     }
 
     if (AUG_VSIZE_MAX < vsize) {
 
-        errno = EINVAL;
-        aug_error("maximum field value size exceeded");
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                       AUG_MSG("maximum field-value size exceeded"));
         return -1;
     }
 
@@ -204,8 +203,8 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, size_t ord,
 
     if (ord >= info->fields_) {
 
-        errno = EINVAL;
-        aug_error("field '%d' does not exist", ord);
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+                       AUG_MSG("field '%d' does not exist"), ord);
         return -1;
     }
 
@@ -215,8 +214,8 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, size_t ord,
 
     if (AUG_VSIZE_MAX < vsize) {
 
-        errno = EINVAL;
-        aug_error("maximum field value size exceeded");
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                       AUG_MSG("maximum field-value size exceeded"));
         return -1;
     }
 
@@ -276,7 +275,7 @@ aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
 
         if (ord)
             *ord = inout;
-        return AUG_NOMATCH;
+        return AUG_RETNOMATCH;
     }
 
     orig = fieldsize_(ptr + offset);
@@ -304,7 +303,7 @@ aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, size_t ord)
     size_t offset, orig;
 
     if (ord >= info->fields_)
-        return AUG_NOMATCH;
+        return AUG_RETNOMATCH;
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))
         return -1;
@@ -347,8 +346,8 @@ aug_valuebyname_(aug_seq_t seq, const struct aug_info_* info,
 
     if (inout == info->fields_) {
 
-        errno = EINVAL;
-        aug_error("field '%s' does not exist", name);
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+                       AUG_MSG("field '%s' does not exist"), name);
         return NULL;
     }
 
@@ -369,8 +368,8 @@ aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, size_t ord,
 
     if (ord >= info->fields_) {
 
-        errno = EINVAL;
-        aug_error("field '%d' does not exist", ord);
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+                       AUG_MSG("field '%d' does not exist"), ord);
         return NULL;
     }
 
@@ -405,7 +404,7 @@ aug_field_(aug_seq_t seq, const struct aug_info_* info,
         field->name_ = NULL;
         field->value_ = NULL;
         field->size_ = 0;
-        return AUG_NOMATCH;
+        return AUG_RETNOMATCH;
     }
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))
@@ -433,7 +432,7 @@ aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
 
     if (ord >= info->fields_) {
         *name = NULL;
-        return AUG_NOMATCH;
+        return AUG_RETNOMATCH;
     }
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))
@@ -468,5 +467,5 @@ aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, size_t* ord,
     if (ord)
         *ord = inout;
 
-    return inout == info->fields_ ? AUG_NOMATCH : 0;
+    return inout == info->fields_ ? AUG_RETNOMATCH : 0;
 }

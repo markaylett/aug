@@ -6,8 +6,8 @@
  * \brief TODO
  */
 
-#ifndef AUGMAR_FILE_H
-#define AUGMAR_FILE_H
+#ifndef AUGMAR_FILE_H_
+#define AUGMAR_FILE_H_
 
 #include "augmar/config.h"
 #include "augmar/types.h"
@@ -27,4 +27,4 @@ aug_syncfile_(int fd);
 AUGMAR_EXTERN int
 aug_truncatefile_(int fd, off_t size);
 
-#endif /* AUGMAR_FILE_H */
+#endif /* AUGMAR_FILE_H_ */

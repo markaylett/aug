@@ -6,8 +6,8 @@
  * \brief TODO
  */
 
-#ifndef AUGMAR_FORMAT_H
-#define AUGMAR_FORMAT_H
+#ifndef AUGMAR_FORMAT_H_
+#define AUGMAR_FORMAT_H_
 
 #include "augmar/config.h"
 #include "augmar/types.h"
@@ -89,4 +89,4 @@ aug_encode16_(aug_byte_t* ptr, aug_uint16_t i);
 AUGMAR_EXTERN void
 aug_encode32_(aug_byte_t* ptr, aug_uint32_t i);
 
-#endif /* AUGMAR_FORMAT_H */
+#endif /* AUGMAR_FORMAT_H_ */

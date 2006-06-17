@@ -6,15 +6,17 @@
 
 static const char rcsid[] = "$Id:$";
 
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif /* HAVE_CONFIG_H */
+#include "augsys/errinfo.h"
 
 #if !defined(_WIN32)
 # include "augsys/posix/time.c"
 #else /* _WIN32 */
 # include "augsys/win32/time.c"
 #endif /* _WIN32 */
+
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
 
@@ -24,8 +26,8 @@ aug_localtime(const time_t* clock, struct tm* res)
     struct tm* ret;
 
     /* Although there is no documented failure condition for the localtime_r
-       function, provisions are made for interpreting a NULL return as an error
-       condition. */
+       function, provisions are made for interpreting a NULL return as an
+       error condition. */
 
     errno = 0;
 
@@ -51,9 +53,7 @@ aug_localtime(const time_t* clock, struct tm* res)
     return ret;
 
  fail:
-    if (0 == errno)
-        errno = EINVAL;
-
+    aug_setposixerrinfo(__FILE__, __LINE__, 0 == errno ? EINVAL : errno);
     return NULL;
 }
 

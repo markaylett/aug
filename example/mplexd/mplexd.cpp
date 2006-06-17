@@ -28,6 +28,8 @@ namespace test {
 
     typedef char cstring[AUG_PATH_MAX + 1];
 
+    const char* program_;
+
     cstring conffile_= "";
     cstring rundir_;
     cstring pidfile_ = "mplexd.pid";
@@ -64,7 +66,7 @@ namespace test {
 
                 string s("option not supported: ");
                 s += name;
-                error(s, EINVAL);
+                throw runtime_error("option not supported");
             }
         }
     };
@@ -165,6 +167,7 @@ namespace test {
 
     struct cstate : public expire_base {
 
+        mplexer& mplexer_;
         smartfd sfd_;
         timer timer_;
         buffer buffer_;
@@ -177,17 +180,20 @@ namespace test {
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
-                mplexer* mp(static_cast<mplexer*>(fddata(sfd_)));
-                seteventmask(*mp, sfd_, AUG_EVENTRDWR);
+                seteventmask(mplexer_, sfd_, AUG_EVENTRDWR);
             } else
                 shutdown(sfd_, SHUT_RDWR);
         }
         ~cstate() NOTHROW
         {
+            try {
+                seteventmask(mplexer_, sfd_, 0);
+            }
+            AUG_CATCHRETURN;
         }
-        explicit
-        cstate(const smartfd& sfd, timers& timers)
-            : sfd_(sfd),
+        cstate(mplexer& mplexer, const smartfd& sfd, timers& timers)
+            : mplexer_(mplexer),
+              sfd_(sfd),
               timer_(timers, 5000, *this),
               heartbeats_(0)
         {
@@ -230,7 +236,6 @@ namespace test {
         {
             insertconn(state_->conns_, ref, *this);
             try {
-                aug::setfdhook(ref, hook, &state_->mplexer_);
                 seteventmask(state_->mplexer_, ref, mask);
             } catch (...) {
                 removeconn(state_->conns_, ref);
@@ -277,19 +282,20 @@ namespace test {
                 sfd = accept(state_->sfd_,
                              *reinterpret_cast<sockaddr*>(&addr), len);
 
-            } catch (const posix_error& e) {
+            } catch (const error& e) {
 
-                switch (e.num()) {
-                case ECONNABORTED:
+                if (AUG_SRCPOSIX == aug_errsrc)
+                    switch (aug_errnum) {
+                    case ECONNABORTED:
 #if !defined(_WIN32)
-                case EPROTO:
+                    case EPROTO:
 #endif // !_WIN32
-                case EWOULDBLOCK:
-                    aug_warn("accept() failed: %s", e.what());
-                    return true;
-                default:
-                    throw;
-                }
+                    case EWOULDBLOCK:
+                        aug_warn("accept() failed: %s", e.what());
+                        return true;
+                    }
+
+                throw;
             }
 
             aug_info("initialising connection '%d'", sfd.get());
@@ -300,7 +306,8 @@ namespace test {
 
             state_->sfds_.insert(make_pair
                                  (sfd.get(), cstateptr
-                                  (new cstate(sfd, state_->timers_))));
+                                  (new cstate(state_->mplexer_, sfd,
+                                              state_->timers_))));
             return true;
         }
 
@@ -352,23 +359,22 @@ namespace test {
             return connection(fd, conns);
         }
 
-        void
-        do_setopt(enum aug_option opt, const char* value)
-        {
-            if (AUG_OPTCONFFILE != opt)
-                error("unsupported option", EINVAL);
-
-            aug_strlcpy(conffile_, value, sizeof(conffile_));
-        }
-
         const char*
         do_getopt(enum aug_option opt)
         {
             switch (opt) {
+            case AUG_OPTADMIN:
+                return "Mark Aylett <mark@emantic.co.uk>";
             case AUG_OPTCONFFILE:
                 return *conffile_ ? conffile_ : 0;
+            case AUG_OPTLONGNAME:
+                return "Multiplexer Daemon";
             case AUG_OPTPIDFILE:
                 return pidfile_;
+            case AUG_OPTPROGRAM:
+                return program_;
+            case AUG_OPTSHORTNAME:
+                return "mplexd";
             }
             return 0;
         }
@@ -401,7 +407,8 @@ namespace test {
                 if (state_->timers_.empty()) {
 
                     unblocksignals();
-                    while (AUG_EINTR == (ret = waitevents(state_->mplexer_)))
+                    while (AUG_RETINTR == (ret = waitevents(state_
+                                                            ->mplexer_)))
                         ;
                     blocksignals();
 
@@ -410,8 +417,8 @@ namespace test {
                     processtimers(state_->timers_, 0 == ret, tv);
 
                     unblocksignals();
-                    while (AUG_EINTR == (ret = waitevents(state_->mplexer_,
-                                                          tv)))
+                    while (AUG_RETINTR == (ret = waitevents(state_->mplexer_,
+                                                            tv)))
                         ;
                     blocksignals();
                 }
@@ -449,7 +456,10 @@ main(int argc, char* argv[])
 
     try {
 
-        initialiser init;
+        struct aug_errinfo errinfo;
+        initialiser init(errinfo);
+
+        program_ = argv[0];
 
         blocksignals();
         aug_setloglevel(AUG_LOGINFO);
@@ -457,8 +467,7 @@ main(int argc, char* argv[])
         if (!getcwd(rundir_, sizeof(rundir_)))
             error("getcwd() failed");
 
-        main(service_, argv[0], "Multiplexer Daemon", "mplexd",
-             "Mark Aylett <mark@emantic.co.uk>", argc, argv);
+        main(service_, argc, argv);
 
     } catch (const exception& e) {
 

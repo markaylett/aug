@@ -28,9 +28,9 @@ aug_accept(int s, struct sockaddr* addr, socklen_t* addrlen);
 AUGSYS_API int
 aug_bind(int s, const struct sockaddr* addr, socklen_t addrlen);
 
-/* Remember that, for non-blocking sockets, [connect] can fail with
-   [EINPROGRESS].  Use [poll/select] on write-status to determine
-   completion. */
+/** Remember that, for non-blocking sockets, connect() can fail with
+    EINPROGRESS.  Use poll() or select() on write-status to determine
+    completion. */
 
 AUGSYS_API int
 aug_connect(int s, const struct sockaddr* addr, socklen_t addrlen);

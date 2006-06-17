@@ -6,8 +6,8 @@
  * \brief TODO
  */
 
-#ifndef AUGMAR_MFILE_H
-#define AUGMAR_MFILE_H
+#ifndef AUGMAR_MFILE_H_
+#define AUGMAR_MFILE_H_
 
 #include "augmar/config.h"
 #include "augmar/types.h"
@@ -41,4 +41,4 @@ aug_mfilesize_(aug_mfile_t mfile);
 AUGMAR_EXTERN void*
 aug_mfiletail_(aug_mfile_t mfile);
 
-#endif /* AUGMAR_MFILE_H */
+#endif /* AUGMAR_MFILE_H_ */

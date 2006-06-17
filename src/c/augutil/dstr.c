@@ -7,7 +7,9 @@
 static const char rcsid[] = "$Id:$";
 
 #include "augsys/defs.h" /* AUG_MAX */
+#include "augsys/errinfo.h"
 
+#include <errno.h>       /* ENOMEM */
 #include <stdlib.h>      /* malloc() */
 #include <string.h>      /* memcpy() */
 
@@ -27,8 +29,10 @@ static int
 resize_(aug_dstr_t* dstr, size_t size)
 {
 	aug_dstr_t local = realloc(*dstr, sizeof(struct aug_dstr_) + size);
-    if (!local)
+    if (!local) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return -1;
+    }
 
 	local->size_ = size;
 	*dstr = local;
@@ -56,8 +60,10 @@ aug_createdstr(size_t size)
 
 	size = AUG_MAX(MINSIZE_, size);
 
-	if (!(dstr = malloc(sizeof(struct aug_dstr_) + size)))
+	if (!(dstr = malloc(sizeof(struct aug_dstr_) + size))) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
 		return NULL;
+    }
 
 	dstr->size_ = size;
 	dstr->len_ = 0;

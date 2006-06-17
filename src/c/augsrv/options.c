@@ -21,24 +21,31 @@ static const char rcsid[] = "$Id:$";
 static void
 usage_(const struct aug_service* service)
 {
-    static const char USAGE[] = "%s\n"
-        "\nusage:\n"
-        "  %s [options] command\n"
-        "\noptions:\n"
-        "  -f <conf>  specify path to configuration file\n"
-        "  -h         display this usage summary and exit\n"
-        "\ncommands:\n"
-        "  install    install program\n"
-        "  reconf     re-configure daemon\n"
-        "  start      start daemon\n"
-        "  status     obtain daemon's status\n"
-        "  stop       stop daemon\n"
-        "  test       run interactively\n"
-        "  uninstall  uninstall program\n"
-        "\nreport bugs to: %s\n";
+    const char* lname = service->getopt_(service->arg_, AUG_OPTLONGNAME);
+    const char* program = service->getopt_(service->arg_, AUG_OPTPROGRAM);
+    const char* admin = service->getopt_(service->arg_, AUG_OPTADMIN);
 
-    aug_info(USAGE, service->lname_, aug_basename(service->program_),
-             service->admin_);
+    if (lname)
+        aug_info("%s\n", lname);
+
+    if (program)
+        aug_info("usage:\n"
+                 "  %s [options] command\n", aug_basename(program));
+
+    aug_info("options:\n"
+             "  -f <conf>  specify path to configuration file\n"
+             "  -h         display this usage summary and exit\n"
+             "\ncommands:\n"
+             "  install    install program\n"
+             "  reconf     re-configure daemon\n"
+             "  start      start daemon\n"
+             "  status     obtain daemon's status\n"
+             "  stop       stop daemon\n"
+             "  test       run interactively\n"
+             "  uninstall  uninstall program\n");
+
+    if (admin)
+        aug_info("report bugs to: %s\n", admin);
 }
 
 AUGSRV_API int

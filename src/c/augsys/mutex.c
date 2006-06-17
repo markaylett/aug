@@ -4,40 +4,45 @@
 #define AUGSYS_BUILD
 #include "augsys/mutex.h"
 
+#include "augsys/errinfo.h"
+#include "augsys/lock.h"
+
+#include <errno.h>
+
 static const char rcsid[] = "$Id:$";
-
-#if !defined(_MT)
-
-struct aug_mutex_ { char dummy_; };
 
 AUGSYS_API aug_mutex_t
 aug_createmutex(void)
 {
-	return (aug_mutex_t)~0;
+    aug_mutex_t mutex = aug_createmutex_();
+    if (!mutex)
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+    return mutex;
 }
 
 AUGSYS_API int
 aug_freemutex(aug_mutex_t mutex)
 {
-    return 0;
+    int ret = aug_freemutex_(mutex);
+    if (-1 == ret)
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+    return ret;
 }
 
 AUGSYS_API int
 aug_lockmutex(aug_mutex_t mutex)
 {
-	return 0;
+    int ret = aug_lockmutex_(mutex);
+    if (-1 == ret)
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+    return ret;
 }
 
 AUGSYS_API int
 aug_unlockmutex(aug_mutex_t mutex)
 {
-	return 0;
+    int ret = aug_unlockmutex_(mutex);
+    if (-1 == ret)
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+    return ret;
 }
-
-#else /* _MT */
-# if !defined(_WIN32)
-#  include "augsys/posix/mutex.c"
-# else /* _WIN32 */
-#  include "augsys/win32/mutex.c"
-# endif /* _WIN32 */
-#endif /* _MT */

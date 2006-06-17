@@ -6,8 +6,8 @@
  * \brief TODO
  */
 
-#ifndef AUGMAR_INFO_H
-#define AUGMAR_INFO_H
+#ifndef AUGMAR_INFO_H_
+#define AUGMAR_INFO_H_
 
 #include "augmar/format_.h"
 #include "augmar/seq_.h"
@@ -22,4 +22,4 @@ aug_setinfo_(aug_seq_t seq, const struct aug_info_* info);
 AUGMAR_EXTERN int
 aug_info_(aug_seq_t seq, struct aug_info_* info);
 
-#endif /* AUGMAR_INFO_H */
+#endif /* AUGMAR_INFO_H_ */

@@ -8,55 +8,50 @@ static const char rcsid[] = "$Id:$";
 
 #if !defined(_WIN32)
 # include "augsys/posix/base.c"
-# include <unistd.h> /* close() */
 #else /* _WIN32 */
 # include "augsys/win32/base.c"
-# include <io.h>     /* close() */
 #endif /* _WIN32 */
 
 #include "augsys/defs.h"
 #include "augsys/errno.h"
 
+#include <assert.h>
 #include <stdlib.h> /* NULL */
 #include <string.h> /* memcpy() */
 
 #define BLOCKSIZE_ 256
 
-#if defined(_WIN32) && !defined(_MT)
+#if defined(_MSC_VER) && !defined(_MT)
 _CRTIMP int __cdecl _free_osfhnd(int);
-#endif /* _WIN32 && !_MT */
+#endif /* _MSC_VER && !_MT */
 
 struct file_ {
     size_t refs_;
-    aug_fdhook_t fdhook_;
-    int type_;
-    void* data_;
+    const struct aug_fddriver* driver_;
 };
 
 static struct file_* files_ = NULL;
 static size_t size_ = 0;
 
-static int
-close_(int fd, struct file_* file)
+static void
+setalreadyreg_(const char* file, int line, int fd)
 {
-    /* The hook function should only be called once the lock has been
-       released, this allows application functions to be called from the hook
-       function without causing a deadlock. */
+    aug_seterrinfo(file, line, AUG_SRCLOCAL, AUG_EEXIST,
+                   AUG_MSG("descriptor '%d' already registered"), fd);
+}
 
-    if (file->fdhook_)
-        (*file->fdhook_)(fd, file->type_, file->data_);
+static void
+setbadfd_(const char* file, int line)
+{
+    aug_seterrinfo(file, line, AUG_SRCLOCAL, AUG_EINVAL,
+                   AUG_MSG("invalid file descriptor"));
+}
 
-    if (AUG_FDUSER == file->type_)
-        return 0;
-
-#if defined(_WIN32)
-    if (AUG_FDSOCK == file->type_) {
-        aug_closesocket_(fd);
-        return 0;
-    }
-#endif /* _WIN32 */
-
-    return close(fd);
+static void
+setnotreg_(const char* file, int line, int fd)
+{
+    aug_seterrinfo(file, line, AUG_SRCLOCAL, AUG_EEXIST,
+                   AUG_MSG("descriptor '%d' not registered"), fd);
 }
 
 static void
@@ -65,9 +60,7 @@ zerofiles_(struct file_* begin, size_t n)
     size_t i;
     for (i = 0; n > i; ++i) {
         begin[i].refs_ = 0;
-        begin[i].fdhook_ = NULL;
-        begin[i].type_ = 0;
-        begin[i].data_ = NULL;
+        begin[i].driver_ = NULL;
     }
 }
 
@@ -88,8 +81,10 @@ growfiles_(size_t size)
     else
         files = malloc(size * sizeof(struct file_));
 
-    if (!files)
+    if (!files) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return -1;
+    }
 
     /* Initialise new file records. */
 
@@ -101,9 +96,10 @@ growfiles_(size_t size)
 }
 
 static int
-openfd_(int fd, int type)
+openfd_(int fd, const struct aug_fddriver* driver)
 {
     struct file_* file;
+    assert(driver);
 
     if (size_ <= (size_t)fd) {
 
@@ -117,20 +113,18 @@ openfd_(int fd, int type)
         file = files_ + fd;
 
         if (0 < file->refs_) {
-            errno = EBADF;
+            setalreadyreg_(__FILE__, __LINE__, fd);
             return -1;
         }
     }
 
     file->refs_ = 1;
-    file->fdhook_ = NULL;
-    file->type_ = type;
-    file->data_ = NULL;
+    file->driver_ = driver;
     return 0;
 }
 
 static int
-openfds_(int fd[2], int type)
+openfds_(int fd[2], const struct aug_fddriver* driver)
 {
     struct file_* first, * second;
     int maxfd = AUG_MAX(fd[0], fd[1]);
@@ -148,21 +142,22 @@ openfds_(int fd[2], int type)
         first = files_ + fd[0];
         second = files_ + fd[1];
 
-        if (0 < first->refs_ || 0 < second->refs_) {
-            errno = EBADF;
+        if (0 < first->refs_) {
+            setalreadyreg_(__FILE__, __LINE__, fd[0]);
+            return -1;
+        }
+
+        if (0 < second->refs_) {
+            setalreadyreg_(__FILE__, __LINE__, fd[1]);
             return -1;
         }
     }
 
     first->refs_ = 1;
-    first->fdhook_ = NULL;
-    first->type_ = type;
-    first->data_ = NULL;
+    first->driver_ = driver;
 
     second->refs_ = 1;
-    second->fdhook_ = NULL;
-    second->type_ = type;
-    second->data_ = NULL;
+    second->driver_ = driver;
     return 0;
 }
 
@@ -172,18 +167,15 @@ releasefd_(int fd, struct file_* current)
     struct file_* file = files_ + fd;
 
     if (size_ <= (size_t)fd || files_[fd].refs_ == 0) {
-        errno = EBADF;
+        setnotreg_(__FILE__, __LINE__, fd);
         return -1;
     }
 
     memcpy(current, file, sizeof(*current));
 
-    if (--file->refs_ == 0) {
+    if (--file->refs_ == 0)
+        file->driver_ = NULL;
 
-        file->fdhook_ = NULL;
-        file->type_ = 0;
-        file->data_ = NULL;
-    }
     return 0;
 }
 
@@ -191,7 +183,7 @@ static int
 retainfd_(int fd)
 {
     if (size_ <= (size_t)fd || files_[fd].refs_ == 0) {
-        errno = EBADF;
+        setnotreg_(__FILE__, __LINE__, fd);
         return -1;
     }
 
@@ -200,122 +192,57 @@ retainfd_(int fd)
 }
 
 static int
-setfdhook_(int fd, aug_fdhook_t* fn, void* data)
+setfddriver_(int fd, const struct aug_fddriver* driver)
 {
-    aug_fdhook_t old;
     if (size_ <= (size_t)fd || files_[fd].refs_ == 0) {
-        errno = EBADF;
+        setnotreg_(__FILE__, __LINE__, fd);
         return -1;
     }
 
-    old = files_[fd].fdhook_;
-    files_[fd].fdhook_ = *fn;
-    files_[fd].data_ = data;
-    *fn = old;
+    files_[fd].driver_ = driver;
     return 0;
 }
 
-static int
-setfdtype_(int fd, int type)
-{
-    if (size_ <= (size_t)fd || files_[fd].refs_ == 0) {
-        errno = EBADF;
-        return -1;
-    }
-
-    files_[fd].type_ = type;
-    return 0;
-}
-
-static int
-setfddata_(int fd, void* data)
-{
-    if (size_ <= (size_t)fd || files_[fd].refs_ == 0) {
-        errno = EBADF;
-        return -1;
-    }
-
-    files_[fd].data_ = data;
-    return 0;
-}
-
-static int
-fdtype_(int fd)
+static const struct aug_fddriver*
+fddriver_(int fd)
 {
     if (size_ <= (size_t)fd || 0 == files_[fd].refs_) {
-        errno = EBADF;
-        return -1;
+        setnotreg_(__FILE__, __LINE__, fd);
+        return NULL;
     }
 
-    return files_[fd].type_;
+    return files_[fd].driver_;
 }
-
-static int
-fddata_(int fd, void** data)
-{
-    if (size_ <= (size_t)fd || 0 == files_[fd].refs_) {
-        errno = EBADF;
-        return -1;
-    }
-
-    *data = files_[fd].data_;
-    return 0;
-}
-
-#if defined(_WIN32)
-AUGSYS_EXTERN void
-aug_closesocket_(int fd)
-{
-    /* The _open_osfhandle() function allocates a C run-time file handle and
-       sets it to point to the operating-system file handle.  When
-       _open_osfhandle() function is used on a socket descriptor, both
-       _close() and closesocket() should be called before exiting.  However,
-       on Windows NT 4.0 Service Pack 3, closesocket() after _close() returns
-       10038. */
-
-    closesocket(_get_osfhandle(fd));
-# if defined(_MSC_VER)
-    __try {
-# endif /* _MSC_VER */
-# if !defined(_MT)
-        _free_osfhnd(fd);
-# endif /* !_MT */
-        close(fd);
-# if defined(_MSC_VER)
-    } __except (EXCEPTION_EXECUTE_HANDLER) { }
-# endif /* _MSC_VER */
-}
-#endif /* _WIN32 */
 
 AUGSYS_API int
-aug_openfd(int fd, int type)
+aug_openfd(int fd, const struct aug_fddriver* driver)
 {
     int ret;
 
     if (-1 == fd) {
-        errno = EBADF;
+        setbadfd_(__FILE__, __LINE__);
         return -1;
     }
 
     aug_lock();
-    ret = openfd_(fd, type);
+    ret = openfd_(fd, driver);
     aug_unlock();
 
     return ret;
 }
 
 AUGSYS_API int
-aug_openfds(int fds[2], int type)
+aug_openfds(int fds[2], const struct aug_fddriver* driver)
 {
     int ret;
 
     if (-1 == fds[0] || -1 == fds[1]) {
-        errno = EBADF;
+        setbadfd_(__FILE__, __LINE__);
         return -1;
     }
 
     aug_lock();
-    ret = openfds_(fds, type);
+    ret = openfds_(fds, driver);
     aug_unlock();
 
     return ret;
@@ -327,7 +254,7 @@ aug_releasefd(int fd)
     struct file_ file;
 
     if (-1 == fd) {
-        errno = EBADF;
+        setbadfd_(__FILE__, __LINE__);
         return -1;
     }
 
@@ -339,9 +266,12 @@ aug_releasefd(int fd)
     aug_unlock();
 
     /* The file structure now contains the state of the file prior to the
-       release operation. */
+       release operation (including ref count). */
 
-    return 1 < file.refs_ ? 0 : close_(fd, &file);
+    if (1 < file.refs_ || !file.driver_->close_)
+        return  0;
+
+    return file.driver_->close_(fd);
 }
 
 AUGSYS_API int
@@ -350,7 +280,7 @@ aug_retainfd(int fd)
     int ret;
 
     if (-1 == fd) {
-        errno = EBADF;
+        setbadfd_(__FILE__, __LINE__);
         return -1;
     }
 
@@ -361,87 +291,62 @@ aug_retainfd(int fd)
     return ret;
 }
 
+AUGSYS_API struct aug_fddriver*
+aug_extenddriver(struct aug_fddriver* derived,
+                 const struct aug_fddriver* base)
+{
+    if (!derived->close_)
+        derived->close_ = base->close_;
+
+    if (!derived->read_)
+        derived->read_ = base->read_;
+
+    if (!derived->readv_)
+        derived->readv_ = base->readv_;
+
+    if (!derived->write_)
+        derived->write_ = base->write_;
+
+    if (!derived->writev_)
+        derived->writev_ = base->writev_;
+
+    if (!derived->setnonblock_)
+        derived->setnonblock_ = base->setnonblock_;
+
+    return derived;
+}
+
 AUGSYS_API int
-aug_setfdhook(int fd, aug_fdhook_t* fn, void* data)
+aug_setfddriver(int fd, const struct aug_fddriver* driver)
 {
     int ret;
+    assert(driver);
 
     if (-1 == fd) {
-        errno = EBADF;
+        setbadfd_(__FILE__, __LINE__);
         return -1;
     }
 
     aug_lock();
-    ret = setfdhook_(fd, fn, data);
+    ret = setfddriver_(fd, driver);
     aug_unlock();
 
     return ret;
 }
 
-AUGSYS_API int
-aug_setfdtype(int fd, int type)
+AUGSYS_API const struct aug_fddriver*
+aug_fddriver(int fd)
 {
-    int ret;
+    const struct aug_fddriver* driver;
 
     if (-1 == fd) {
-        errno = EBADF;
-        return -1;
+        setbadfd_(__FILE__, __LINE__);
+        return NULL;
     }
 
     aug_lock();
-    ret = setfdtype_(fd, type);
+    driver = fddriver_(fd);
     aug_unlock();
 
-    return ret;
-}
-
-AUGSYS_API int
-aug_setfddata(int fd, void* data)
-{
-    int ret;
-
-    if (-1 == fd) {
-        errno = EBADF;
-        return -1;
-    }
-
-    aug_lock();
-    ret = setfddata_(fd, data);
-    aug_unlock();
-
-    return ret;
-}
-
-AUGSYS_API int
-aug_fdtype(int fd)
-{
-    int ret;
-
-    if (-1 == fd) {
-        errno = EBADF;
-        return -1;
-    }
-
-    aug_lock();
-    ret = fdtype_(fd);
-    aug_unlock();
-
-    return ret;
-}
-
-AUGSYS_API int
-aug_fddata(int fd, void** data)
-{
-    int ret;
-
-    if (-1 == fd) {
-        errno = EBADF;
-        return -1;
-    }
-
-    aug_lock();
-    ret = fddata_(fd, data);
-    aug_unlock();
-
-    return ret;
+    return driver;
 }

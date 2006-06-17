@@ -11,14 +11,16 @@ static const char rcsid[] = "$Id:$";
 #include "augnet/types.h"
 #include "augnet/utility.h"
 
-#include "augsys/defs.h" /* AUG_MAXLINE */
+#include "augsys/defs.h"  /* AUG_MAXLINE */
+#include "augsys/errinfo.h"
+#include "augsys/errno.h" /* ENOMEM */
 #include "augsys/log.h"
 #include "augsys/uio.h"
 #include "augsys/unistd.h"
 
 #include <assert.h>
-#include <stdlib.h>      /* malloc() */
-#include <string.h>      /* strlen() */
+#include <stdlib.h>       /* malloc() */
+#include <string.h>       /* strlen() */
 
 #define BUFSIZE_ 4096
 
@@ -49,7 +51,7 @@ format_(aug_dstr_t* header, const char* initial, aug_mar_t mar)
 
     if (mar) {
 
-        while (AUG_NOMATCH != aug_field(mar, &field, ord++)) {
+        while (AUG_RETNOMATCH != aug_field(mar, &field, ord++)) {
 
             aug_dstrcats(header, field.name_);
             if (0 < field.size_) {
@@ -186,8 +188,10 @@ aug_state_t
 aug_createstate(aug_request_t request, void* arg)
 {
     aug_state_t state = malloc(sizeof(struct aug_state_));
-    if (!state)
+    if (!state) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return NULL;
+    }
 
     state->request_ = request;
     state->arg_ = arg;

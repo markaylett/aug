@@ -10,9 +10,10 @@ static const char rcsid[] = "$Id:$";
 #include "augutil/lexer.h"
 
 #include "augsys/defs.h" /* AUG_MAXLINE */
+#include "augsys/errinfo.h"
 #include "augsys/string.h"
 
-#include <errno.h>
+#include <errno.h>       /* ENOMEM */
 #include <stdlib.h>      /* malloc() */
 
 struct aug_parser_ {
@@ -99,10 +100,11 @@ tail_(aug_parser_t parser)
 
     case NAME_:
 
-        /* Ignore empty line in the name phase of the parse. */
+        /* Empty line in the name phase of the parse. */
 
         if ('\0' != *aug_token(parser->lexer_)) {
-            errno = EINVAL;
+            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                           AUG_MSG("failed to parse name"));
             return -1;
         }
         break;
@@ -116,7 +118,8 @@ tail_(aug_parser_t parser)
         /* Check to ensure that the entire body has been parsed. */
 
         if (0 < parser->csize_) {
-            errno = EINVAL;
+            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                           AUG_MSG("failed to parse body"));
             return -1;
         }
     }
@@ -207,8 +210,10 @@ AUGNET_API aug_parser_t
 aug_createparser(size_t size, const struct aug_handlers* handlers, void* arg)
 {
     aug_parser_t parser = malloc(sizeof(struct aug_parser_));
-    if (!parser)
+    if (!parser) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return NULL;
+    }
 
     if (!(parser->lexer_ = aug_createlexer(size, NULL))) {
         free(parser);

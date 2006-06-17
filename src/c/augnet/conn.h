@@ -11,8 +11,8 @@
 struct aug_conn_;
 AUG_HEAD(aug_conns, aug_conn_);
 
-/* The callback function has a boolean return value: returning false removes
-   the connection. */
+/** The callback function has a boolean return value: returning false removes
+    the connection. */
 
 typedef int (*aug_poll_t)(void*, int, struct aug_conns*);
 

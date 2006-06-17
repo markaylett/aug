@@ -6,6 +6,7 @@
 
 static const char rcsid[] = "$Id:$";
 
+#include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/lock.h"
 #include "augsys/time.h"
@@ -131,7 +132,8 @@ aug_canceltimer(struct aug_timers* timers, int id)
             prev = &AUG_NEXT(it);
     }
 
-    errno = EINVAL;
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+                   AUG_MSG("no timer with descriptor '%d'"), id);
     return -1;
 }
 

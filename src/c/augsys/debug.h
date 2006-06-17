@@ -21,7 +21,7 @@
 # define AUG_INITLEAKDUMP() (void)0
 # define AUG_DUMPLEAKS() (void)0
 
-#else /* _MSC_VER && !NDEBUG */
+#else /* !_MSC_VER || NDEBUG */
 
 AUGSYS_EXTERN void
 aug_initleakdump_(void);
@@ -32,6 +32,6 @@ aug_dumpleaks_(void);
 # define AUG_INITLEAKDUMP() aug_initleakdump_()
 # define AUG_DUMPLEAKS() aug_dumpleaks_()
 
-#endif /* _MSC_VER && !NDEBUG */
+#endif /* !_MSC_VER || NDEBUG */
 
 #endif /* AUGSYS_DEBUG_H */

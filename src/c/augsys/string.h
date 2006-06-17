@@ -8,6 +8,8 @@
 
 #include <string.h>
 
+/** All functions in this module set errno, and not errinfo. */
+
 AUGSYS_API const char*
 aug_strerror(int errnum);
 
@@ -22,5 +24,11 @@ aug_strcasecmp(const char* lhs, const char* rhs);
 
 AUGSYS_API int
 aug_strncasecmp(const char* lhs, const char* rhs, size_t size);
+
+#define AUG_PERROR(x, s) \
+do { \
+    if (-1 == x) \
+        aug_perror(s); \
+} while (0)
 
 #endif /* AUGSYS_STRING_H */

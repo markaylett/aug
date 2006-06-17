@@ -8,14 +8,6 @@
 
 #include <errno.h>
 
-#define AUG_SUCCESS      0
-#define AUG_ESYSTEM    (-1)
-#define AUG_EENDOF     (-2)
-#define AUG_EEXISTS    (-3)
-#define AUG_EINTR      (-4)
-#define AUG_ENOTEXISTS (-5)
-#define AUG_ETIMEOUT   (-6)
-
 #if defined(_WIN32)
 
 # define AUG_ERRNOBASE 100
@@ -68,16 +60,16 @@
 # define EIOPENDING (AUG_ERRNOBASE + 109)
 # define EOPERATIONABORTED (AUG_ERRNOBASE + 110)
 
-AUGSYS_API void
-aug_maperror(unsigned long err);
+AUGSYS_API int
+aug_setwin32errno(unsigned long err);
 
 #endif /* _WIN32 */
 
-/* This function may be necessary in the, undesirable, situation where a client
-   is using different versions of the c-runtime. */
+/** This function may be necessary in the, undesirable, situation where a
+    client is using different versions of the c-runtime. */
 
 AUGSYS_API void
-aug_seterrno(int num);
+aug_seterrno(int err);
 
 AUGSYS_API int
 aug_errno(void);

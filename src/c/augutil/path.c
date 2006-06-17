@@ -6,6 +6,7 @@
 
 static const char rcsid[] = "$Id:$";
 
+#include "augsys/errinfo.h"
 #include "augsys/limits.h" /* AUG_PATH_MAX */
 #include "augsys/string.h"
 #include "augsys/unistd.h"
@@ -59,7 +60,8 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
             --dirlen;
 
         if (size < dirlen + namelen + extlen + 3) {
-            errno = ENAMETOOLONG;
+            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                           AUG_MSG("buffer size exceeded"));
             return NULL;
         }
 
@@ -70,7 +72,8 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
         dst += dirlen + 1;
 
     } else if (size < namelen + extlen + 2) {
-        errno = ENAMETOOLONG;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                       AUG_MSG("buffer size exceeded"));
         return NULL;
     }
 
@@ -96,23 +99,34 @@ aug_realpath(char* dst, const char* src, size_t size)
     /* TODO: The following sequence attempts to provide a safe implementation
        of realpath().  Verify that this is indeed the case. */
 
-    if (-1 == (pathmax = pathconf(src, _PC_PATH_MAX)))
+    if (-1 == (pathmax = pathconf(src, _PC_PATH_MAX))) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return NULL;
+    }
 
-    if (!(buf = alloca(pathmax + 1)))
+    if (!(buf = alloca(pathmax + 1))) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return NULL;
+    }
 
-    if (!realpath(src, buf))
+    if (!realpath(src, buf)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return NULL;
+    }
 
     if (size <= strlen(buf)) {
-        errno = ENAMETOOLONG;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                       AUG_MSG("buffer size exceeded"));
         return NULL;
     }
 
     aug_strlcpy(dst, buf, size);
     return dst;
 #else /* _WIN32 */
-    return _fullpath(dst, src, size);
+    if (!_fullpath(dst, src, size)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return NULL;
+    }
+    return dst;
 #endif /* _WIN32 */
 }

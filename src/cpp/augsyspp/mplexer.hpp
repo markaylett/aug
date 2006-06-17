@@ -34,7 +34,7 @@ namespace aug {
             : mplexer_(aug_createmplexer())
         {
             if (!mplexer_)
-                error("aug_createmplexer() failed");
+                throwerror("aug_createmplexer() failed");
         }
 
         operator aug_mplexer_t()
@@ -53,17 +53,17 @@ namespace aug {
     seteventmask(aug_mplexer_t mplexer, fdref ref, unsigned short mask)
     {
         if (-1 == aug_seteventmask(mplexer, ref.get(), mask))
-            error("aug_seteventmask() failed");
+            throwerror("aug_seteventmask() failed");
     }
 
-    // Returns AUG_EINTR if the system call was interrupted.
+    /** Returns AUG_RETINTR if the system call was interrupted. */
 
     inline int
     waitevents(aug_mplexer_t mplexer, const struct timeval& timeout)
     {
         int ret(aug_waitevents(mplexer, &timeout));
         if (-1 == ret)
-            error("aug_waitevents() failed");
+            throwerror("aug_waitevents() failed");
         return ret;
     }
 
@@ -72,7 +72,7 @@ namespace aug {
     {
         int ret(aug_waitevents(mplexer, 0));
         if (-1 == ret)
-            error("aug_waitevents() failed");
+            throwerror("aug_waitevents() failed");
         return ret;
     }
 
@@ -81,7 +81,7 @@ namespace aug {
     {
         int ret(aug_eventmask(mplexer, ref.get()));
         if (-1 == ret)
-            error("aug_eventmask() failed");
+            throwerror("aug_eventmask() failed");
 
         return ret;
     }
@@ -91,7 +91,7 @@ namespace aug {
     {
         int ret(aug_events(mplexer, ref.get()));
         if (-1 == ret)
-            error("aug_events() failed");
+            throwerror("aug_events() failed");
 
         return ret;
     }
@@ -101,7 +101,7 @@ namespace aug {
     {
         int fds[2];
         if (-1 == aug_mplexerpipe(fds))
-            error("aug_mplexerpipe() failed");
+            throwerror("aug_mplexerpipe() failed");
 
         return std::make_pair(smartfd::attach(fds[0]),
                               smartfd::attach(fds[1]));

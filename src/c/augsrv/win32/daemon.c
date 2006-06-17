@@ -7,9 +7,8 @@
 
 #include "augutil/signal.h"
 
-#include "augsys/errno.h"
+#include "augsys/errinfo.h"
 #include "augsys/log.h"
-#include "augsys/string.h"
 #include "augsys/windows.h"
 
 #include <assert.h>
@@ -38,7 +37,7 @@ setstatus_(DWORD state)
     status.dwWaitHint = 0;
 
     if (!SetServiceStatus(ssh_, &status)) {
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
     return 0;
@@ -52,18 +51,18 @@ handler_(DWORD code)
     switch (code) {
     case RECONF_:
         if (-1 == aug_writesignal(aug_signalout(), AUG_SIGRECONF))
-            aug_perror("failed to re-configure daemon");
+            aug_perrinfo("failed to re-configure daemon");
         break;
     case STATUS_:
         if (-1 == aug_writesignal(aug_signalout(), AUG_SIGSTATUS))
-            aug_perror("failed to get daemon status");
+            aug_perrinfo("failed to get daemon status");
         break;
     case STOP_:
     case SERVICE_CONTROL_STOP:
     case SERVICE_CONTROL_SHUTDOWN:
         setstatus_(SERVICE_STOP_PENDING);
         if (-1 == aug_writesignal(aug_signalout(), AUG_SIGSTOP)) {
-            aug_perror("failed to stop daemon");
+            aug_perrinfo("failed to stop daemon");
             setstatus_(SERVICE_RUNNING);
         }
         break;
@@ -74,7 +73,14 @@ static void WINAPI
 start_(DWORD argc, char** argv)
 {
     const struct aug_service* service = aug_service();
+    const char* sname;
     struct aug_options options;
+
+    if (!(sname = service->getopt_(service->arg_, AUG_OPTSHORTNAME))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+        return;
+    }
 
     if (-1 == aug_readopts(service, &options, argc, argv))
         return;
@@ -83,27 +89,29 @@ start_(DWORD argc, char** argv)
 
         /* Commands other than AUG_CMDDEFAULT are invalid in this context. */
 
-        aug_error("invalid argument(s)");
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid argument(s)"));
+        aug_perrinfo("failed to read options");
         return;
     }
 
-    if (-1 == (*service->config_)(service->arg_, options.conffile_, 1)) {
-        aug_perror("failed to configure daemon");
+    if (-1 == service->config_(service->arg_, options.conffile_, 1)) {
+        aug_perrinfo("failed to configure daemon");
         return;
     }
 
-    if (!(ssh_ = RegisterServiceCtrlHandler(service->sname_, handler_))) {
+    if (!(ssh_ = RegisterServiceCtrlHandler(sname, handler_))) {
 
-        aug_maperror(GetLastError());
-        aug_perror("failed to register handler");
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_perrinfo("failed to register handler");
         return;
     }
 
     setstatus_(SERVICE_START_PENDING);
 
-    if (-1 == (*service->init_)(service->arg_)) {
+    if (-1 == service->init_(service->arg_)) {
 
-        aug_perror("failed to initialise daemon");
+        aug_perrinfo("failed to initialise daemon");
         setstatus_(SERVICE_STOPPED);
         return;
     }
@@ -111,8 +119,8 @@ start_(DWORD argc, char** argv)
     aug_notice("daemon started");
     setstatus_(SERVICE_RUNNING);
 
-    if (-1 == (*service->run_)(service->arg_))
-        aug_perror("error running daemon");
+    if (-1 == service->run_(service->arg_))
+        aug_perrinfo("error running daemon");
 
     aug_notice("daemon stopped");
     setstatus_(SERVICE_STOPPED);
@@ -122,20 +130,27 @@ AUGSRV_API int
 aug_daemonise(const struct aug_service* service)
 {
     int ret = 0;
+    const char* sname;
     SERVICE_TABLE_ENTRY table[] = {
         { NULL,  start_ },
         { NULL, NULL }
     };
 
-    table[0].lpServiceName = (char*)service->sname_;
+    if (!(sname = service->getopt_(service->arg_, AUG_OPTSHORTNAME))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+        return -1;
+    }
+
+    table[0].lpServiceName = (char*)sname;
 
     if (!StartServiceCtrlDispatcher(table)) {
 
         DWORD err = GetLastError();
         if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == err)
-            ret = AUG_FOREGROUND;
+            ret = AUG_RETNODAEMON;
         else {
-            aug_maperror(err);
+            aug_setwin32errinfo(__FILE__, __LINE__, err);
             ret = -1;
         }
     }

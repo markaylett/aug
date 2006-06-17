@@ -13,69 +13,48 @@
 namespace aug {
 
     inline void
-    init()
+    init(struct aug_errinfo& errinfo)
     {
-        if (-1 == aug_init())
-            error("aug_init() failed");
+        if (-1 == aug_init(&errinfo))
+            throwerror("aug_init() failed");
     }
     inline void
     term()
     {
         if (-1 == aug_term())
-            error("aug_term() failed");
+            throwerror("aug_term() failed");
     }
     inline void
-    openfd(int fd, int type)
+    openfd(int fd, const struct aug_fddriver* driver)
     {
-        if (-1 == aug_openfd(fd, type))
-            error("aug_openfd() failed");
+        if (-1 == aug_openfd(fd, driver))
+            throwerror("aug_openfd() failed");
     }
     inline void
     releasefd(int fd)
     {
         if (-1 == aug_releasefd(fd))
-            error("aug_releasefd() failed");
+            throwerror("aug_releasefd() failed");
     }
     inline void
     retainfd(int fd)
     {
         if (-1 == aug_retainfd(fd))
-            error("aug_retainfd() failed");
-    }
-    inline aug_fdhook_t
-    setfdhook(fdref ref, aug_fdhook_t hook, void* data)
-    {
-        if (-1 == aug_setfdhook(ref.get(), &hook, data))
-            error("aug_setfdhook() failed");
-        return hook;
+            throwerror("aug_retainfd() failed");
     }
     inline void
-    setfdtype(fdref ref, int type)
+    setfddriver(fdref ref, const struct aug_fddriver* driver)
     {
-        if (-1 == aug_setfdtype(ref.get(), type))
-            error("aug_setfdtype() failed");
+        if (-1 == aug_setfddriver(ref.get(), driver))
+            throwerror("aug_setfddriver() failed");
     }
-    inline void
-    setfddata(fdref ref, void* data)
+    inline const struct aug_fddriver*
+    fddriver(fdref ref)
     {
-        if (-1 == aug_setfddata(ref.get(), data))
-            error("aug_setfddata() failed");
-    }
-    inline int
-    fdtype(fdref ref)
-    {
-        int ret;
-        if (-1 == (ret = aug_fdtype(ref.get())))
-            error("aug_fdtype() failed");
-        return ret;
-    }
-    inline void*
-    fddata(fdref ref)
-    {
-        void* ret;
-        if (-1 == aug_fddata(ref.get(), &ret))
-            error("aug_fddata() failed");
-        return ret;
+        const struct aug_fddriver* driver = aug_fddriver(ref.get());
+        if (!driver)
+            throwerror("aug_fddriver() failed");
+        return driver;
     }
 
     class AUGSYSPP_API initialiser {
@@ -92,9 +71,9 @@ namespace aug {
                 aug_perror("aug_term() failed");
         }
 
-        initialiser()
+        initialiser(struct aug_errinfo& errinfo)
         {
-            init();
+            init(errinfo);
         }
     };
 }

@@ -1,6 +1,7 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/utility.h" /* aug_filesize() */
 #include "augsys/windows.h"
@@ -35,7 +36,8 @@ toaccess_(DWORD* to, int from)
     return 0;
 
  fail:
-    errno = EINVAL;
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                   AUG_MSG("invalid access flags '%d'"), from);
     return -1;
 }
 
@@ -58,7 +60,8 @@ toprot_(DWORD* to, int from)
     return 0;
 
  fail:
-    errno = EINVAL;
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                   AUG_MSG("invalid protection flags '%d'"), from);
     return -1;
 }
 
@@ -69,14 +72,16 @@ verify_(size_t size, size_t offset, size_t len)
        should not be greater than the file size. */
 
     if (!size || size < (offset + len)) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid file map size '%d'"), size);
         return -1;
     }
 
     /* The offset, if specified, must occur on an allocation size boundary. */
 
     if (offset && (offset % aug_granularity())) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid file map offset '%d'"), offset);
         return -1;
     }
 
@@ -92,7 +97,7 @@ createmmap_(impl_t impl, size_t offset, size_t len)
     intptr_t file = _get_osfhandle(impl->fd_);
 
     if (-1 == file) {
-        errno = EINVAL;
+        aug_setposixerrinfo(__FILE__, __LINE__, EBADF);
         return -1;
     }
 
@@ -110,7 +115,8 @@ createmmap_(impl_t impl, size_t offset, size_t len)
         }
     }
 
-    if (!(addr = MapViewOfFile(mapping, impl->access_, 0, (DWORD)offset, len))) {
+    if (!(addr = MapViewOfFile(mapping, impl->access_, 0,
+                               (DWORD)offset, len))) {
         err = GetLastError();
         goto fail2;
     }
@@ -124,7 +130,7 @@ createmmap_(impl_t impl, size_t offset, size_t len)
     if (INVALID_HANDLE_VALUE == impl->mapping_)
         CloseHandle(mapping);
  fail1:
-    aug_maperror(err);
+    aug_setwin32errinfo(__FILE__, __LINE__, err);
     return -1;
 }
 
@@ -141,7 +147,7 @@ freemmap_(impl_t impl)
         err = GetLastError();
 
     if (err) {
-        aug_maperror(err);
+        aug_setwin32errinfo(__FILE__, __LINE__, err);
         return -1;
     }
     return 0;
@@ -176,6 +182,7 @@ aug_createmmap(int fd, size_t offset, size_t len, int flags)
         return NULL;
 
     if (!(impl = (impl_t)malloc(sizeof(struct impl_)))) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -202,7 +209,7 @@ aug_remmap(struct aug_mmap_* mmap_, size_t offset, size_t len)
     impl->mmap_.addr_ = NULL;
 
     if (addr && !UnmapViewOfFile(addr)) {
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -212,7 +219,7 @@ aug_remmap(struct aug_mmap_* mmap_, size_t offset, size_t len)
         impl->mapping_ = INVALID_HANDLE_VALUE;
 
         if (INVALID_HANDLE_VALUE != mapping && !CloseHandle(mapping)) {
-            aug_maperror(GetLastError());
+            aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
             return -1;
         }
 
@@ -232,7 +239,7 @@ aug_syncmmap(struct aug_mmap_* mmap_)
     impl_t impl = (impl_t)mmap_;
 
     if (!FlushViewOfFile(impl->mmap_.addr_, impl->mmap_.len_)) {
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
     return 0;

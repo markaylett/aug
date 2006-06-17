@@ -6,8 +6,8 @@
 
 #include "augsys/queue.h"
 
-/* By convention, "entries_" is used as the field name.  This somewhat
-   simplifies the interface. */
+/** By convention, 'entries_' is used as the field name.  This somewhat
+    simplifies the interface. */
 
 #define AUG_HEAD(name, type) \
 STAILQ_HEAD(name, type)
@@ -67,8 +67,10 @@ name(void) \
     struct type* it; \
     if (AUG_EMPTY((head))) { \
         struct type* end; \
-        if (!(it = (struct type*)malloc(sizeof(struct type) * (bsize)))) \
+        if (!(it = (struct type*)malloc(sizeof(struct type) * (bsize)))) { \
+            aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM); \
             return NULL; \
+        } \
         for (end = it + (bsize); it < end; ++it) \
             AUG_INSERT_TAIL((head), it); \
     } \

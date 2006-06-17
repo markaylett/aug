@@ -6,7 +6,7 @@
 
 static const char rcsid[] = "$Id:$";
 
-#include "augsys/errno.h"
+#include "augsys/errinfo.h"
 #include "augsys/unistd.h"
 
 #include <signal.h>
@@ -50,7 +50,8 @@ aug_readsignal(int fd, aug_signal_t* sig)
     /* Set errno for partial read and graceful shutdown. */
 
     if (-1 != ret)
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
+                       AUG_MSG("failed to read signal"));
 
     return -1;
 }
@@ -66,7 +67,8 @@ aug_writesignal(int fd, aug_signal_t sig)
     /* Set errno for partial write. */
 
     if (-1 != ret)
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
+                       AUG_MSG("failed to write signal"));
 
     return -1;
 }

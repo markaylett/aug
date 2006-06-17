@@ -6,12 +6,12 @@
  * \brief TODO
  */
 
-#ifndef AUGMAR_FLAGS_H
-#define AUGMAR_FLAGS_H
+#ifndef AUGMAR_FLAGS_H_
+#define AUGMAR_FLAGS_H_
 
 #include "augmar/config.h"
 
 AUGMAR_EXTERN int
 aug_toflags_(int* to, int from);
 
-#endif /* AUGMAR_FLAGS_H */
+#endif /* AUGMAR_FLAGS_H_ */

@@ -8,10 +8,10 @@ static const char rcsid[] = "$Id:$";
 
 #include "augmar/types.h"
 
+#include "augsys/errinfo.h"
 #include "augsys/log.h"
 
 #include <assert.h>
-#include <errno.h>
 
 #define FLAGMASK_ (AUG_RDONLY | AUG_WRONLY | AUG_RDWR \
     | AUG_APPEND | AUG_CREAT | AUG_TRUNC | AUG_EXCL)
@@ -60,7 +60,7 @@ aug_toflags_(int* to, int from)
     return 0;
 
  fail:
-    errno = EINVAL;
-    aug_error("invalid open flags");
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                   AUG_MSG("invalid open flags"));
     return -1;
 }

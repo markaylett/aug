@@ -28,7 +28,7 @@ namespace aug {
             if (retain && null != ref) {
 
                 if (-1 == aug_retainmar(ref.get()))
-                    error("aug_retainmar() failed");
+                    throwerror("aug_retainmar() failed");
             }
         }
 
@@ -51,7 +51,7 @@ namespace aug {
             : ref_(rhs.ref_)
         {
             if (null != ref_ && -1 == aug_retainmar(ref_.get()))
-                error("aug_retainmar() failed");
+                throwerror("aug_retainmar() failed");
         }
 
         smartmar&
@@ -75,7 +75,7 @@ namespace aug {
                 marref ref(ref_);
                 ref_ = null;
                 if (-1 == aug_releasemar(ref.get()))
-                    error("aug_releasemar() failed");
+                    throwerror("aug_releasemar() failed");
             }
         }
 

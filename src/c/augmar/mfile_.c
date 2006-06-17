@@ -9,12 +9,13 @@ static const char rcsid[] = "$Id:$";
 #include "augmar/file_.h"
 #include "augmar/format_.h"
 
+#include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/mmap.h"
 #include "augsys/utility.h" /* aug_filesize() */
 
 #include <assert.h>
-#include <errno.h>
+#include <errno.h>          /* ENOMEM */
 #include <stdlib.h>
 
 struct aug_mfile_ {
@@ -56,31 +57,26 @@ reserve_(size_t size)
 AUGMAR_EXTERN int
 aug_closemfile_(aug_mfile_t mfile)
 {
-    int err = 0;
+    int ret = 0;
     assert(mfile);
 
     if (mfile->mmap_) {
 
         if (-1 == aug_freemmap(mfile->mmap_))
-            err = errno;
+            ret = -1;
 
         if (mfile->resvd_ > mfile->size_) {
 
-            if (-1 == aug_truncatefile_(mfile->fd_, (off_t)mfile->size_)
-                && !err)
-                err = errno;
+            if (-1 == aug_truncatefile_(mfile->fd_, (off_t)mfile->size_))
+                ret = -1;
         }
     }
 
-    if (-1 == aug_closefile_(mfile->fd_) && !err)
-        err = errno;
+    if (-1 == aug_closefile_(mfile->fd_))
+        ret = -1;
 
     free(mfile);
-    if (!err)
-        return 0;
-
-    errno = err;
-    return -1;
+    return ret;
 }
 
 AUGMAR_EXTERN aug_mfile_t
@@ -103,8 +99,10 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
     if (-1 == aug_filesize(fd, &size))
         return NULL;
 
-    if (!(mfile = (aug_mfile_t)malloc(sizeof(struct aug_mfile_) + tail)))
+    if (!(mfile = (aug_mfile_t)malloc(sizeof(struct aug_mfile_) + tail))) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         goto fail;
+    }
 
     mfile->fd_ = fd;
     mfile->flags_ = toflags_(flags);
@@ -136,8 +134,8 @@ aug_mapmfile_(aug_mfile_t mfile, size_t size)
 
         if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-            errno = EINVAL;
-            aug_error("file is not writable");
+            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EACCES,
+                           AUG_MSG("file is not writable"));
             return NULL;
         }
 
@@ -152,9 +150,7 @@ aug_mapmfile_(aug_mfile_t mfile, size_t size)
 
         if (-1 == aug_remmap(mfile->mmap_, 0, size)) {
 
-            int err = errno;
             aug_freemmap(mfile->mmap_);
-            errno = err;
             mfile->mmap_ = NULL;
             return NULL;
         }
@@ -188,8 +184,8 @@ aug_truncatemfile_(aug_mfile_t mfile, size_t size)
     assert(mfile);
     if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-        errno = EINVAL;
-        aug_error("file is not writable");
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EACCES,
+                       AUG_MSG("file is not writable"));
         return -1;
     }
     mfile->size_ = size;

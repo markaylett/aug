@@ -6,6 +6,8 @@
 
 static const char rcsid[] = "$Id:$";
 
+#include "augsys/errinfo.h"
+
 #include <errno.h>
 #include <limits.h> /* UINT_MAX */
 #include <stdlib.h> /* strtoul() */
@@ -20,13 +22,17 @@ aug_strtoul(unsigned long* dst, const char* src, int base)
     errno = 0;
     ul = strtoul(src, &end, base);
 
-    if (0 != errno)
+    if (0 != errno) {
+
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
         ret = -1;
-    else if ('\0' != *end) {
+
+    } else if ('\0' != *end) {
 
         /* The string was only partially processed. */
 
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                       AUG_MSG("partial conversion"));
         ret = -1;
 
     } else {
@@ -50,7 +56,8 @@ aug_strtoui(unsigned int* dst, const char* src, int base)
 
         /* Bounds exceeded for target type. */
 
-        errno = ERANGE;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                       AUG_MSG("max integer value exceeded"));
         return -1;
     }
 
@@ -69,7 +76,8 @@ aug_strtous(unsigned short* dst, const char* src, int base)
 
         /* Bounds exceeded for target type. */
 
-        errno = ERANGE;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                       AUG_MSG("max integer value exceeded"));
         return -1;
     }
 

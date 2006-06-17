@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/defs.h" /* AUG_BUFIZE */
-#include "augsys/errno.h"
+#include "augsys/defs.h" /* AUG_MAXLINE */
+#include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/windows.h"
 
@@ -58,7 +58,7 @@ aug_setsrvlogger(const char* sname)
         aug_unsetsrvlogger();
 
     if (!(eventlog_ = RegisterEventSource(NULL, sname))) {
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -79,7 +79,7 @@ aug_unsetsrvlogger(void)
         aug_setlogger(orig_);
 
         if (!DeregisterEventSource(eventlog)) {
-            aug_maperror(GetLastError());
+            aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
             return -1;
         }
     }

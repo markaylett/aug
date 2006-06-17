@@ -1,11 +1,10 @@
 EXTRA_DIST = \
 	base.c \
+	lock.c \
 	mplexer.c \
 	mmap.c \
-	mutex.c \
 	socket.c \
 	string.c \
 	time.c \
-	uio.c \
-	unistd.c \
+	tls.c \
 	utility.c

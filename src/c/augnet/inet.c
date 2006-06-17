@@ -8,6 +8,7 @@ static const char rcsid[] = "$Id:$";
 
 #include "augutil/conv.h"
 
+#include "augsys/errinfo.h"
 #include "augsys/inet.h"   /* aug_inetaton() */
 #include "augsys/socket.h"
 #include "augsys/unistd.h" /* aug_close() */
@@ -21,7 +22,6 @@ static const char rcsid[] = "$Id:$";
 # include <malloc.h>
 #endif /* _WIN32 */
 
-#include <errno.h>
 #include <string.h>        /* strchr() */
 
 AUGNET_API int
@@ -89,8 +89,12 @@ aug_parseinet(struct sockaddr_in* dst, const char* src)
 		/* Attempt to resolve host using DNS. */
 
 		struct hostent* answ = gethostbyname(host);
-		if (!answ || !answ->h_addr_list[0])
-			goto fail;
+		if (!answ || !answ->h_addr_list[0]) {
+
+            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+                           AUG_MSG("failed to resolve address '%s'"), src);
+            return NULL;
+        }
 
 		memcpy(&dst->sin_addr, answ->h_addr_list[0],
                sizeof(dst->sin_addr));
@@ -101,7 +105,8 @@ aug_parseinet(struct sockaddr_in* dst, const char* src)
 	return dst;
 
  fail:
-	errno = EINVAL;
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                   AUG_MSG("invalid address '%s'"), src);
 	return NULL;
 }
 

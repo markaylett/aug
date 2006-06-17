@@ -16,7 +16,7 @@ namespace aug {
     {
         int fds[2];
         if (-1 == aug_pipe(fds))
-            error("aug_pipe() failed");
+            throwerror("aug_pipe() failed");
 
         return std::make_pair(smartfd::attach(fds[0]),
                               smartfd::attach(fds[1]));
@@ -27,7 +27,7 @@ namespace aug {
     {
         ssize_t ret(aug_read(ref.get(), buf, size));
         if (-1 == ret)
-            error("aug_read() failed");
+            throwerror("aug_read() failed");
         return ret;
     }
 
@@ -36,7 +36,7 @@ namespace aug {
     {
         ssize_t ret(aug_write(ref.get(), buf, size));
         if (-1 == ret)
-            error("aug_write() failed");
+            throwerror("aug_write() failed");
         return ret;
     }
 }

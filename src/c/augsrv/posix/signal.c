@@ -1,6 +1,9 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#include "augsys/errinfo.h"
+#include "augsys/errno.h"
+
 #include <signal.h>
 #include <stdlib.h>  /* NULL */
 #include <strings.h> /* bzero() */
@@ -31,8 +34,10 @@ aug_signalhandler(void (*handler)(int))
 
     for (i = 0; i < sizeof(handlers_) / sizeof(handlers_[0]); ++i) {
         sa.sa_handler = handlers_[i].dfl_ ? SIG_DFL : handler;
-        if (-1 == sigaction(handlers_[i].sig_, &sa, NULL))
+        if (-1 == sigaction(handlers_[i].sig_, &sa, NULL)) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;
+        }
     }
     return 0;
 }
@@ -43,10 +48,17 @@ aug_blocksignals(void)
     sigset_t set;
     sigfillset(&set);
 #if !defined(_MT)
-    return sigprocmask(SIG_SETMASK, &set, NULL);
+    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return -1;
+    }
 #else /* _MT */
-    return pthread_sigmask(SIG_SETMASK, &set, NULL);
+    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return -1;
+    }
 #endif /* _MT */
+    return 0;
 }
 
 AUGSRV_API int
@@ -55,8 +67,15 @@ aug_unblocksignals(void)
     sigset_t set;
     sigemptyset(&set);
 #if !defined(_MT)
-    return sigprocmask(SIG_SETMASK, &set, NULL);
+    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return -1;
+    }
 #else /* _MT */
-    return pthread_sigmask(SIG_SETMASK, &set, NULL);
+    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return -1;
+    }
 #endif /* _MT */
+    return 0;
 }

@@ -4,10 +4,26 @@
 #ifndef AUGSRV_TYPES_H
 #define AUGSRV_TYPES_H
 
-#define AUG_FOREGROUND 1
+#define AUG_RETNODAEMON 1
 
 enum aug_option {
-    AUG_OPTCONFFILE = 1,
+
+    /* The following options are required and should remain constant during
+       the call to aug_main(). */
+
+    AUG_OPTLONGNAME = 1,
+    AUG_OPTSHORTNAME,
+    AUG_OPTPROGRAM,
+    AUG_OPTADMIN,
+
+    /* The following option is optional (may be null) but should remain
+       constant after the call to aug_service.config_(). */
+
+    AUG_OPTCONFFILE,
+
+    /* The following option is required and should remain constant during the
+       call to aug_service.config_(). */
+
     AUG_OPTPIDFILE
 };
 
@@ -16,10 +32,6 @@ struct aug_service {
     int (*config_)(void*, const char*, int);
     int (*init_)(void*);
     int (*run_)(void*);
-    const char* program_;
-    const char* lname_;
-    const char* sname_;
-    const char* admin_;
     void* arg_;
 };
 

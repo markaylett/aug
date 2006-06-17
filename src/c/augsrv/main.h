@@ -8,10 +8,10 @@
 
 struct aug_service;
 
-/* On Windows, the Service Manager calls the service entry point on a separate
-   thread - automatic variables on the main thread's stack will not be visible
-   from the service thread.  A shallow copy of the service structure will be
-   performed. */
+/** On Windows, the Service Manager calls the service entry point on a
+    separate thread - automatic variables on the main thread's stack will not
+    be visible from the service thread.  A shallow copy of the service
+    structure will be performed. */
 
 AUGSRV_API void
 aug_main(const struct aug_service* service, int argc, char* argv[]);

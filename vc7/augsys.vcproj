@@ -116,6 +116,9 @@
 				RelativePath="..\src\c\augsys\defs.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\errinfo.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\errno.c">
 			</File>
 			<File
@@ -149,6 +152,9 @@
 				RelativePath="..\src\c\augsys\time.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\tls_.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\types.c">
 			</File>
 			<File
@@ -179,6 +185,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\defs.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augsys\errinfo.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\errno.h">
@@ -215,6 +224,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\time.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augsys\tls_.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\types.h">

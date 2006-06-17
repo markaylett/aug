@@ -11,15 +11,9 @@
 #define AUG_MIN(a, b) ((a) <= (b) ? (a) : (b))
 #define AUG_MAX(a, b) ((a) >= (b) ? (a) : (b))
 
+#define AUG_MSG(x) x
+
 #define AUG_MKSTR_(x) #x
 #define AUG_MKSTR(x) AUG_MKSTR_(x)
-
-#define AUG_VERIFY(x, s) \
-do { \
-    int err = errno; \
-    if (-1 == x) \
-        aug_perror(s); \
-    errno = err; \
-} while (0)
 
 #endif /* AUGSYS_DEFS_H */

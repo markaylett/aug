@@ -39,8 +39,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
+DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/src/c/lang.mk
 check_PROGRAMS = augsys-test$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -60,10 +61,10 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES =
-am_libaugsys_la_OBJECTS = base.lo config.lo debug.lo defs.lo errno.lo \
-	inet.lo limits.lo lock.lo log.lo mmap.lo mplexer.lo mutex.lo \
-	socket.lo string.lo time.lo types.lo uio.lo unistd.lo \
-	utility.lo windows.lo
+am_libaugsys_la_OBJECTS = base.lo config.lo debug.lo defs.lo \
+	errinfo.lo errno.lo inet.lo limits.lo lock.lo log.lo mmap.lo \
+	mplexer.lo mutex.lo socket.lo string.lo time.lo types.lo \
+	uio.lo unistd.lo utility.lo windows.lo tls_.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_augsys_test_OBJECTS = test.$(OBJEXT)
 augsys_test_OBJECTS = $(am_augsys_test_OBJECTS)
@@ -87,7 +88,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	pdf-recursive ps-recursive uninstall-info-recursive \
 	uninstall-recursive
 modincludeHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(modinclude_HEADERS)
+HEADERS = $(modinclude_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
@@ -218,6 +219,7 @@ modinclude_HEADERS = \
 	config.h \
 	debug.h \
 	defs.h \
+	errinfo.h \
 	errno.h \
 	inet.h \
 	limits.h \
@@ -236,12 +238,16 @@ modinclude_HEADERS = \
 	utility.h \
 	windows.h
 
+noinst_HEADERS = \
+	tls_.h
+
 lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
 	base.c \
 	config.c \
 	debug.c \
 	defs.c \
+	errinfo.c \
 	errno.c \
 	inet.c \
 	limits.c \
@@ -257,7 +263,8 @@ libaugsys_la_SOURCES = \
 	uio.c \
 	unistd.c \
 	utility.c \
-	windows.c
+	windows.c \
+	tls_.c
 
 libaugsys_la_LDFLAGS = \
 	-no-undefined \
@@ -352,6 +359,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errno.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
@@ -364,6 +372,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tls_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unistd.Plo@am__quote@

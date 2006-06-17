@@ -50,7 +50,7 @@ namespace aug {
     readconf(const char* path, setopt_base& action)
     {
         if (-1 == aug_readconf(path, detail::setopt, &action))
-            error("aug_readconf() failed");
+            throwerror("aug_readconf() failed");
     }
 }
 

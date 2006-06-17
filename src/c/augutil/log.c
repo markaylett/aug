@@ -7,10 +7,11 @@
 static const char rcsid[] = "$Id:$";
 
 #include "augsys/defs.h"   /* AUG_MAXLINE */
+#include "augsys/errinfo.h"
 #include "augsys/time.h"
 #include "augsys/unistd.h" /* write() */
 
-#include <errno.h>
+#include <errno.h>         /* EINTR */
 #include <stdio.h>
 
 #if defined(_WIN32)
@@ -45,7 +46,7 @@ static int
 localtime_(struct tm* res)
 {
     time_t clock = time(NULL);
-    return -1 == clock || !aug_localtime(&clock, res) ? -1 : 0;
+    return !aug_localtime(&clock, res) ? -1 : 0;
 }
 
 static int
@@ -64,6 +65,7 @@ writeall_(int fd, const char* buf, size_t n)
             if (EINTR == errno)
                 continue;
 
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;
         }
         buf += ret, n -= ret;
@@ -91,7 +93,8 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
     /* At least one character is needed for the null-terminator. */
 
     if (0 == size) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                       AUG_MSG("size cannot be zero"));
         return -1;
     }
 
@@ -112,7 +115,8 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
        value, indicating an error. */
 
     if (0 > (ret = snprintf(buf, size, " %s ", aug_loglabel(loglevel)))) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
+                       AUG_MSG("broken format specification"));
         return -1;
     }
 
@@ -127,7 +131,8 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
     buf += ret, size -= ret;
 
     if (0 > (ret = vsnprintf(buf, size, format, args))) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
+                       AUG_MSG("broken format specification '%s'"), format);
         return -1;
     }
 

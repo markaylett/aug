@@ -5,34 +5,39 @@
 #define AUGSYS_BASE_H
 
 #include "augsys/config.h"
+#include "augsys/types.h"
 
-typedef void (*aug_fdhook_t)(int, int, void*);
+struct iovec;
+struct aug_errinfo;
 
-#define AUG_FDFILE 1
-#define AUG_FDPIPE 2
-#define AUG_FDSOCK 3
-#define AUG_FDUSER 4
+struct aug_fddriver {
+    int (*close_)(int);
+    ssize_t (*read_)(int, void*, size_t);
+    ssize_t (*readv_)(int, const struct iovec*, int);
+    ssize_t (*write_)(int, const void*, size_t);
+    ssize_t (*writev_)(int, const struct iovec*, int);
+    int (*setnonblock_)(int, int);
+};
 
-#if defined(_WIN32) && defined(AUGSYS_BUILD)
-AUGSYS_EXTERN void
-aug_closesocket_(int fd);
-#endif /* _WIN32 && AUGSYS_BUILD */
+/** Sets errno, and not errinfo. */
 
 AUGSYS_API int
-aug_init(void);
+aug_init(struct aug_errinfo* errinfo);
 
-/* For reasons of safety, aug_term() will re-install the default logger.  The
-   default logger is garaunteed to be safe even if aug_init() has not been
-   called. */
+/** For reasons of safety, aug_term() will re-install the default logger.  The
+    default logger is garaunteed to be safe even if aug_init() has not been
+    called.  Sets errno, and not errinfo. */
 
 AUGSYS_API int
 aug_term(void);
 
-AUGSYS_API int
-aug_openfd(int fd, int type);
+/** The remaining functions will set errinfo on failure. */
 
 AUGSYS_API int
-aug_openfds(int fd[2], int type);
+aug_openfd(int fd, const struct aug_fddriver* driver);
+
+AUGSYS_API int
+aug_openfds(int fd[2], const struct aug_fddriver* driver);
 
 AUGSYS_API int
 aug_releasefd(int fd);
@@ -40,19 +45,17 @@ aug_releasefd(int fd);
 AUGSYS_API int
 aug_retainfd(int fd);
 
-AUGSYS_API int
-aug_setfdhook(int fd, aug_fdhook_t* fn, void* data);
+AUGSYS_API struct aug_fddriver*
+aug_extenddriver(struct aug_fddriver* derived,
+                 const struct aug_fddriver* base);
 
 AUGSYS_API int
-aug_setfdtype(int fd, int type);
+aug_setfddriver(int fd, const struct aug_fddriver* driver);
 
-AUGSYS_API int
-aug_setfddata(int fd, void* data);
+AUGSYS_API const struct aug_fddriver*
+aug_fddriver(int fd);
 
-AUGSYS_API int
-aug_fdtype(int fd);
-
-AUGSYS_API int
-aug_fddata(int fd, void**);
+AUGSYS_API const struct aug_fddriver*
+aug_posixdriver(void);
 
 #endif /* AUGSYS_BASE_H */

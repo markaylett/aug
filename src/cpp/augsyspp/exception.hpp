@@ -6,99 +6,82 @@
 
 #include "augsyspp/config.hpp"
 
-#include "augsys/errno.h"  // aug_errno()
-#include "augsys/string.h" // aug_strerror()
+#include "augsys/errinfo.h"
 
 #include <stdexcept>
 
 namespace aug {
 
-    namespace detail {
-
-        inline std::string
-        makewhat(const std::string& s, int num)
-        {
-            std::string what(s);
-            what += ": ";
-            what += aug_strerror(num);
-            return what;
-        }
-    }
-
-    class AUGSYSPP_API posix_error : public std::runtime_error {
-        const int num_;
+    class AUGSYSPP_API error : public std::runtime_error {
     public:
+        explicit
+        error(const std::string& s)
+            : std::runtime_error(s)
+        {
+        }
+    };
+
+    class AUGSYSPP_API local_error : public error {
+    public:
+        explicit
+        local_error(const std::string& s)
+            : error(s)
+        {
+        }
+    };
+
+    class AUGSYSPP_API system_error : public error {
+    public:
+        explicit
+        system_error(const std::string& s)
+            : error(s)
+        {
+        }
+    };
+
+    class AUGSYSPP_API posix_error : public system_error {
+    public:
+        explicit
         posix_error(const std::string& s)
-            : std::runtime_error(detail::makewhat(s, aug_errno())),
-              num_(aug_errno())
-        {
-        }
-
-        posix_error(const std::string& s, int num)
-            : std::runtime_error(detail::makewhat(s, num)),
-              num_(num)
-        {
-        }
-
-        int
-        num() const NOTHROW
-        {
-            return num_;
-        }
-    };
-
-    class AUGSYSPP_API intr_error : public posix_error {
-    public:
-        intr_error(const std::string& s)
-            : posix_error(s, EINTR)
+            : system_error(s)
         {
         }
     };
 
-    class AUGSYSPP_API null_error : public std::exception {
+    class AUGSYSPP_API win32_error : public system_error {
     public:
-        const char*
-        what() const NOTHROW
+        explicit
+        win32_error(const std::string& s)
+            : system_error(s)
         {
-            return "null exception";
-        }
-    };
-
-    class AUGSYSPP_API timeout_error : public std::exception {
-    public:
-        const char*
-        what() const NOTHROW
-        {
-            return "timeout exception";
         }
     };
 
     inline void
-    error(const std::string& s, int num)
+    throwerror(const std::string& s)
     {
-        if (EINTR == num)
-            throw intr_error(s);
-
-        throw posix_error(s, num);
-    }
-
-    inline void
-    error(const std::string& s)
-    {
-        error(s, aug_errno());
+        switch (aug_errsrc) {
+        case AUG_SRCLOCAL:
+            throw local_error(s);
+        case AUG_SRCPOSIX:
+            throw posix_error(s);
+        case AUG_SRCWIN32:
+            throw win32_error(s);
+        default:
+            throw error(s);
+        }
     }
 }
 
 #define AUG_CATCHRETURN \
-catch (const aug::posix_error& e) { \
+catch (const aug::error& e) { \
     aug_error(e.what()); \
-    aug_seterrno(e.num()); \
 } catch (const std::exception& e) { \
-    aug_error(e.what()); \
-    aug_seterrno(EINVAL); \
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXCEPT, \
+                   e.what()); \
 } catch (...) { \
-    aug_error("unknown error"); \
-    aug_seterrno(EINVAL); \
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXCEPT, \
+                   "unknown error"); \
 } \
 return
 

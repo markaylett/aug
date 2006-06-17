@@ -6,8 +6,8 @@
  * \brief TODO
  */
 
-#ifndef AUGMAR_HEADER_H
-#define AUGMAR_HEADER_H
+#ifndef AUGMAR_HEADER_H_
+#define AUGMAR_HEADER_H_
 
 #include "augmar/seq_.h"
 
@@ -51,4 +51,4 @@ AUGMAR_EXTERN int
 aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, size_t* ord,
                const char* name);
 
-#endif /* AUGMAR_HEADER_H */
+#endif /* AUGMAR_HEADER_H_ */

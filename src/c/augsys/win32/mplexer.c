@@ -2,6 +2,7 @@
    See the file COPYING for copying permission.
 */
 #include "augsys/base.h"
+#include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/socket.h"
 #include "augsys/time.h" /* aug_tvtoms() */
@@ -78,8 +79,10 @@ AUGSYS_API aug_mplexer_t
 aug_createmplexer(void)
 {
     aug_mplexer_t mplexer = malloc(sizeof(struct aug_mplexer_));
-    if (!mplexer)
+    if (!mplexer) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return NULL;
+    }
 
     zeroset_(&mplexer->in_);
     zeroset_(&mplexer->out_);
@@ -98,7 +101,8 @@ AUGSYS_API int
 aug_seteventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 {
     if (mask & ~(AUG_EVENTRD | AUG_EVENTWR)) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid event mask"));
         return -1;
     }
 
@@ -123,9 +127,9 @@ aug_waitevents(aug_mplexer_t mplexer, const struct timeval* timeout)
         (ret = select(-1, &mplexer->out_.rd_, &mplexer->out_.wr_,
                       NULL, timeout))) {
 
-        aug_maperror(WSAGetLastError());
-        if (EINTR == errno)
-            ret = AUG_EINTR;
+        if (WSAEINTR == aug_setwin32errinfo(__FILE__, __LINE__,
+                                            WSAGetLastError()))
+            ret = AUG_RETINTR;
     }
     return ret;
 }

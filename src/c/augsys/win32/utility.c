@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/errno.h"
+#include "augsys/errinfo.h"
 
 #include <io.h>
 #include <winsock2.h>
@@ -13,34 +13,24 @@ aug_filesize(int fd, size_t* size)
     intptr_t file;
 
     if (-1 == (file = _get_osfhandle(fd))) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid file descriptor"));
         return -1;
     }
 
     low = GetFileSize((HANDLE)file, &high);
 
     if (-1 == low && NO_ERROR != GetLastError()) {
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
+
     if (high) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("file too large"));
         return -1;
     }
+
     *size = low;
-    return 0;
-}
-
-AUGSYS_API int
-aug_setnonblock(int fd, int on)
-{
-    HANDLE h = (HANDLE)_get_osfhandle(fd);
-    unsigned long arg = (unsigned long)on;
-
-    if (SOCKET_ERROR == ioctlsocket((SOCKET)h, FIONBIO, &arg)) {
-        aug_maperror(WSAGetLastError());
-        return -1;
-    }
-
     return 0;
 }

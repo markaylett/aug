@@ -9,9 +9,10 @@ static const char rcsid[] = "$Id:$";
 #include "augmar/format_.h"
 #include "augmar/mfile_.h"
 
+#include "augsys/errinfo.h"
 #include "augsys/log.h"
 
-#include <errno.h>
+#include <errno.h> /* ENOMEM */
 #include <stdlib.h>
 #include <string.h>
 
@@ -64,16 +65,20 @@ resizemem_(aug_seq_t seq, size_t size, size_t tail)
 
     if (!memseq->addr_) {
 
-        if (!(addr = calloc(size, 1)))
+        if (!(addr = calloc(size, 1))) {
+            aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
             return NULL;
+        }
 
         memseq->addr_ = addr;
         memseq->len_ = size;
 
     } else if (size > memseq->len_) {
 
-        if (!(addr = realloc(memseq->addr_, size)))
+        if (!(addr = realloc(memseq->addr_, size))) {
+            aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
             return NULL;
+        }
 
         bzero((aug_byte_t*)addr + memseq->len_, size - memseq->len_);
         memmove((aug_byte_t*)addr + (size - tail),
@@ -232,8 +237,10 @@ AUGMAR_EXTERN aug_seq_t
 aug_createseq_(size_t tail)
 {
     struct memseq_* memseq;
-    if (!(memseq = (struct memseq_*)malloc(sizeof(struct memseq_) + tail)))
+    if (!(memseq = (struct memseq_*)malloc(sizeof(struct memseq_) + tail))) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return NULL;
+    }
 
     memseq->seq_.offset_ = 0;
     memseq->seq_.len_ = 0;
@@ -250,7 +257,8 @@ aug_openseq_(const char* path, int flags, mode_t mode,
     size_t size;
     struct mfileseq_* mfileseq;
     struct aug_mfile_* mfile = aug_openmfile_(path, flags, mode,
-                                              sizeof(struct mfileseq_) + tail);
+                                              sizeof(struct mfileseq_)
+                                              + tail);
     if (!mfile)
         return NULL;
 
@@ -295,8 +303,9 @@ aug_setregion_(aug_seq_t seq, size_t offset, size_t len)
     size_t total = (*seq->impl_->size_)(seq);
     if (total < (offset + len)) {
 
-        errno = EINVAL;
-        aug_error("sequence overrun by %d bytes", (offset + len) - total);
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+                       AUG_MSG("sequence overrun by %d bytes"),
+                       (offset + len) - total);
         return -1;
     }
     seq->offset_ = offset;

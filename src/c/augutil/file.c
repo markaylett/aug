@@ -7,9 +7,10 @@
 static const char rcsid[] = "$Id:$";
 
 #include "augsys/defs.h"
+#include "augsys/errinfo.h"
+#include "augsys/errno.h"
 
 #include <ctype.h>
-#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -32,8 +33,10 @@ aug_readconf(const char* path, aug_setopt_t setopt, void* arg)
     int ret = 0;
 
     FILE* fp = fopen(path, "r");
-    if (!fp)
+    if (!fp) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
+    }
 
     while (fgets(buf, sizeof(buf), fp)) {
 
@@ -55,7 +58,9 @@ aug_readconf(const char* path, aug_setopt_t setopt, void* arg)
         /* Find the token separating the name and value - this is required. */
 
         if (!(value = strchr(name, '='))) {
-            errno = EINVAL;
+
+            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                           AUG_MSG("missing token separator"));
             ret = -1;
             break;
         }
@@ -65,7 +70,8 @@ aug_readconf(const char* path, aug_setopt_t setopt, void* arg)
 
         name[rtrim_(name, value - name)] = '\0';
         if ('\0' == *name) {
-            errno = EINVAL;
+            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                           AUG_MSG("missing name part"));
             ret = -1;
             break;
         }

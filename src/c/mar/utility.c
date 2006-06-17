@@ -6,8 +6,9 @@
 static const char rcsid[] = "$Id:$";
 
 #include "augsys/defs.h" /* AUG_MAXLINE */
-#include "augsys/errno.h"
+#include "augsys/errinfo.h"
 
+#include <errno.h>
 #include <string.h>
 
 static const char NL_ = '\n';
@@ -22,7 +23,8 @@ aug_atofield_(struct aug_field* field, char* src)
 
     if (NULL == value) {
 
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                       AUG_MSG("empty value part"));
         return -1;
     }
 
@@ -80,12 +82,14 @@ aug_readline_(char* buf, size_t size, FILE* stream)
         if (feof(stream))
             return -2;
 
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
     }
 
     if (!(p = strchr(buf, '\n'))) {
 
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                       AUG_MSG("newline character expected"));
         return -1;
     }
 
@@ -121,11 +125,12 @@ aug_streamset_(aug_mar_t mar, FILE* stream)
 MAR_EXTERN int
 aug_writevalue_(FILE* stream, const void* value, size_t size)
 {
-    if (size != fwrite(value, 1, size, stream))
-        return -1;
+    if (size != fwrite(value, 1, size, stream)
+        || 1 != fwrite(&NL_, 1, 1, stream)) {
 
-    if (1 != fwrite(&NL_, 1, 1, stream))
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
+    }
 
     return 0;
 }

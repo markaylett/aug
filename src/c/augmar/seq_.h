@@ -6,8 +6,8 @@
  * \brief TODO
  */
 
-#ifndef AUGMAR_SEQ_H
-#define AUGMAR_SEQ_H
+#ifndef AUGMAR_SEQ_H_
+#define AUGMAR_SEQ_H_
 
 #include "augmar/config.h"
 #include "augmar/types.h"
@@ -44,4 +44,4 @@ aug_seqsize_(aug_seq_t seq);
 AUGMAR_EXTERN void*
 aug_seqtail_(aug_seq_t seq);
 
-#endif /* AUGMAR_SEQ_H */
+#endif /* AUGMAR_SEQ_H_ */

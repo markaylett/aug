@@ -6,6 +6,7 @@
 
 static const char rcsid[] = "$Id:$";
 
+#include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/lock.h"
 
@@ -63,7 +64,8 @@ aug_removeconn(struct aug_conns* conns, int fd)
             break;
 
     if (!it) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+                       AUG_MSG("no connection for descriptor '%d'"), fd);
         return -1;
     }
 

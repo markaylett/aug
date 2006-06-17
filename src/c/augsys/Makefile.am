@@ -9,6 +9,7 @@ modinclude_HEADERS = \
 	config.h \
 	debug.h \
 	defs.h \
+	errinfo.h \
 	errno.h \
 	inet.h \
 	limits.h \
@@ -27,6 +28,9 @@ modinclude_HEADERS = \
 	utility.h \
 	windows.h
 
+noinst_HEADERS = \
+	tls_.h
+
 lib_LTLIBRARIES = libaugsys.la
 
 libaugsys_la_SOURCES = \
@@ -34,6 +38,7 @@ libaugsys_la_SOURCES = \
 	config.c \
 	debug.c \
 	defs.c \
+	errinfo.c \
 	errno.c \
 	inet.c \
 	limits.c \
@@ -49,7 +54,8 @@ libaugsys_la_SOURCES = \
 	uio.c \
 	unistd.c \
 	utility.c \
-	windows.c
+	windows.c \
+	tls_.c
 
 libaugsys_la_LDFLAGS = \
 	-no-undefined \

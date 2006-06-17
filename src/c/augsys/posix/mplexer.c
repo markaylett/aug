@@ -1,12 +1,12 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/errno.h"
-
 #include "augsys/defs.h"   /* AUG_MAX */
+#include "augsys/errinfo.h"
 #include "augsys/time.h"   /* aug_tvtoms() */
 #include "augsys/unistd.h" /* aug_pipe() */
 
+#include <errno.h>
 #include <stdlib.h>        /* malloc() */
 
 #include <sys/poll.h>
@@ -66,8 +66,10 @@ resize_(aug_mplexer_t mplexer, size_t size)
 {
     struct pollfd* ptr = realloc(mplexer->pollfds_,
                                  sizeof(struct pollfd) * size);
-    if (!ptr)
+    if (!ptr) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return -1;
+    }
 
     initpollfds_(ptr + mplexer->size_, size - mplexer->size_);
     mplexer->pollfds_ = ptr;
@@ -79,8 +81,10 @@ AUGSYS_API aug_mplexer_t
 aug_createmplexer(void)
 {
     aug_mplexer_t mplexer = malloc(sizeof(struct aug_mplexer_));
-    if (!mplexer)
+    if (!mplexer) {
+        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return NULL;
+    }
 
     mplexer->pollfds_ = NULL;
     mplexer->nfds_ = mplexer->size_ = 0;
@@ -107,7 +111,8 @@ aug_seteventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
     struct pollfd* ptr;
 
     if (mask & ~(AUG_EVENTRD | AUG_EVENTWR)) {
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid event mask '%d'"), mask);
         return -1;
     }
 
@@ -147,8 +152,8 @@ aug_waitevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 
     if (-1 == (ret = poll(mplexer->pollfds_, mplexer->nfds_, ms))) {
 
-        if (EINTR == errno)
-            ret = AUG_EINTR;
+        if (EINTR == aug_setposixerrinfo(__FILE__, __LINE__, errno))
+            ret = AUG_RETINTR;
     }
     return ret;
 }

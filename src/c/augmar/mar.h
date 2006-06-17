@@ -175,8 +175,8 @@ aug_setvalue(aug_mar_t mar, size_t ord, const void* value, size_t size);
  * \param ord An optional output parameter, in which, the ordinal position of
  * the field is set.
  *
- * \return zero on success, #AUG_NOMATCH if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * \return zero on success, #AUG_RETNOMATCH if there is no matching field, or
+ * -1 on failure, in which case errno can be used to determine the error.
  *
  * \sa #aug_removefields, #aug_unsetbyord and #aug_ordtoname.
  */
@@ -191,8 +191,8 @@ aug_unsetbyname(aug_mar_t mar, const char* name, size_t* ord);
  *
  * \param ord The ordinal position of the field.
  *
- * \return zero on success, #AUG_NOMATCH if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * \return zero on success, #AUG_RETNOMATCH if there is no matching field, or
+ * -1 on failure, in which case errno can be used to determine the error.
  *
  * \sa #aug_removefields, #aug_unsetbyname and #aug_nametoord.
  */
@@ -247,8 +247,8 @@ aug_valuebyord(aug_mar_t mar, size_t ord, size_t* size);
  *
  * \param ord The zero-based ordinal position of the field.
  *
- * \return zero on success, #AUG_NOMATCH if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * \return zero on success, #AUG_RETNOMATCH if there is no matching field, or
+ * -1 on failure, in which case errno can be used to determine the error.
  *
  * \sa #aug_valuebyname, #aug_valuebyord and #aug_fields.
  */
@@ -282,8 +282,8 @@ aug_fields(aug_mar_t mar, size_t* size);
  *
  * \param ord The zero-based ordinal position of the name to be returned.
  *
- * \return zero on success, #AUG_NOMATCH if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * \return zero on success, #AUG_RETNOMATCH if there is no matching field, or
+ * -1 on failure, in which case errno can be used to determine the error.
  *
  * \sa #aug_unsetbyname, #aug_valuebyname and #aug_nametoord.
  */
@@ -301,8 +301,8 @@ aug_ordtoname(aug_mar_t mar, const char** name, size_t ord);
  *
  * \param name The name of the field.
  *
- * \return zero on success, #AUG_NOMATCH if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * \return zero on success, #AUG_RETNOMATCH if there is no matching field, or
+ * -1 on failure, in which case errno can be used to determine the error.
  *
  * \sa #aug_unsetbyord, #aug_valuebyord and #aug_ordtoname.
  */

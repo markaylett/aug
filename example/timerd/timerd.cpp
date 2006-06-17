@@ -20,6 +20,8 @@ using namespace std;
 
 namespace test {
 
+    const char* program_;
+
     char conffile_[AUG_PATH_MAX + 1] = "";
     char rundir_[AUG_PATH_MAX + 1];
     char pidfile_[AUG_PATH_MAX + 1] = "timerd.pid";
@@ -50,7 +52,7 @@ namespace test {
 
             } else {
 
-                error("option not supported", EINVAL);
+                throw runtime_error("option not supported");
             }
         }
     };
@@ -127,10 +129,18 @@ namespace test {
         do_getopt(enum aug_option opt)
         {
             switch (opt) {
+            case AUG_OPTADMIN:
+                return "Mark Aylett <mark@emantic.co.uk>";
             case AUG_OPTCONFFILE:
                 return *conffile_ ? conffile_ : 0;
+            case AUG_OPTLONGNAME:
+                return "Timer Daemon";
             case AUG_OPTPIDFILE:
                 return pidfile_;
+            case AUG_OPTPROGRAM:
+                return program_;
+            case AUG_OPTSHORTNAME:
+                return "timerd";
             }
             return 0;
         }
@@ -173,14 +183,15 @@ namespace test {
 
                 if (state_->timers_.empty()) {
 
-                    while (AUG_EINTR == (ret = waitevents(state_->mplexer_)))
+                    while (AUG_RETINTR == (ret = waitevents(state_
+                                                            ->mplexer_)))
                         ;
 
                 } else {
 
                     processtimers(state_->timers_, 0 == ret, tv);
-                    while (AUG_EINTR == (ret = waitevents(state_
-                                                          ->mplexer_, tv)))
+                    while (AUG_RETINTR == (ret = waitevents(state_
+                                                            ->mplexer_, tv)))
                         ;
                 }
 
@@ -228,13 +239,15 @@ main(int argc, char* argv[])
 
     try {
 
-        initialiser init;
+        struct aug_errinfo errinfo;
+        initialiser init(errinfo);
+
+        program_ = argv[0];
 
         if (!getcwd(rundir_, sizeof(rundir_)))
             error("getcwd() failed");
 
-        main(service_, argv[0], "Timer Daemon", "timerd",
-             "Mark Aylett <mark@emantic.co.uk>", argc, argv);
+        main(service_, argc, argv);
 
     } catch (const exception& e) {
 

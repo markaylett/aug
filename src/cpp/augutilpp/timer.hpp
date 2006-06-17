@@ -62,14 +62,14 @@ namespace aug {
     processtimers(struct aug_timers& timers, bool force)
     {
         if (-1 == aug_processtimers(&timers, force ? 1 : 0, 0))
-            error("aug_processtimers() failed");
+            throwerror("aug_processtimers() failed");
     }
 
     inline void
     processtimers(struct aug_timers& timers, bool force, struct timeval& next)
     {
         if (-1 == aug_processtimers(&timers, force ? 1 : 0, &next))
-            error("aug_processtimers() failed");
+            throwerror("aug_processtimers() failed");
     }
 
     class AUGUTILPP_API expire_base {
@@ -146,7 +146,7 @@ namespace aug {
                 pending_ = false;
 
                 if (-1 == aug_canceltimer(&timers_, id))
-                    error("aug_canceltimer() failed");
+                    throwerror("aug_canceltimer() failed");
             }
         }
 
@@ -156,7 +156,7 @@ namespace aug {
             cancel();
             int id(aug_settimer(&timers_, ms, expire_, this));
             if (-1 == id)
-                error("aug_settimer() failed");
+                throwerror("aug_settimer() failed");
             id_ = id;
             pending_ = true;
         }

@@ -6,18 +6,19 @@
 #include "augsrv/types.h"  /* struct aug_service */
 
 #include "augsys/defs.h"
-#include "augsys/errno.h"
+#include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/string.h"
 
 #include <sys/types.h>
+#include <errno.h>
 #include <fcntl.h>         /* struct flock */
 #include <signal.h>        /* kill() */
 #include <strings.h>       /* bzero() */
 #include <unistd.h>
 
 #define VERIFYCLOSE_(x) \
-    AUG_VERIFY(close(x), "close() failed")
+    AUG_PERROR(close(x), "close() failed")
 
 static int
 flock_(struct flock* fl, int fd, int cmd, int type)
@@ -29,7 +30,12 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_start = 0;
     fl->l_len = 0;
 
-    return fcntl(fd, cmd, fl);
+    if (-1 == fcntl(fd, cmd, fl)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return -1;
+    }
+
+    return 0;
 }
 
 static int
@@ -39,21 +45,29 @@ send_(int fd, pid_t pid, aug_signal_t sig)
 
     switch (sig) {
     case AUG_SIGRECONF:
-        if (-1 == kill(pid, SIGHUP))
+        if (-1 == kill(pid, SIGHUP)) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;
+        }
         break;
     case AUG_SIGSTATUS:
-        if (-1 == kill(pid, SIGUSR1))
+        if (-1 == kill(pid, SIGUSR1)) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;
+        }
         break;
     case AUG_SIGSTOP:
-        if (-1 == kill(pid, SIGTERM))
+        if (-1 == kill(pid, SIGTERM)) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;
+        }
 
         /* Wait for daemon process to release lock. */
 
-        if (-1 == flock_(&fl, fd, F_SETLKW, F_RDLCK))
+        if (-1 == flock_(&fl, fd, F_SETLKW, F_RDLCK)) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;
+        }
 
         /* The lock has been obtained; daemon process must have stopped. */
 
@@ -62,7 +76,8 @@ send_(int fd, pid_t pid, aug_signal_t sig)
 
         /* Invalid command. */
 
-        errno = EINVAL;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid control command '%d'"), sig);
         return -1;
     }
     return 0;
@@ -71,27 +86,36 @@ send_(int fd, pid_t pid, aug_signal_t sig)
 AUGSRV_API int
 aug_start(const struct aug_service* service)
 {
-    errno = EINVAL;
+    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+                   AUG_MSG("aug_start() not supported"));
     return -1;
 }
 
 AUGSRV_API int
 aug_control(const struct aug_service* service, aug_signal_t sig)
 {
-    const char* path;
+    const char* pidfile;
     struct flock fl;
     int fd, ret = -1;
 
-    if (!(path = (*service->getopt_)(service->arg_, AUG_OPTPIDFILE)))
+    if (!(pidfile = service->getopt_(service->arg_, AUG_OPTPIDFILE))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return -1;
+    }
 
     /* Check for existence of file. */
 
-    if (-1 == access(path, F_OK))
-        return AUG_ENOTEXISTS;
-
-	if (-1 == (fd = open(path, O_RDONLY)))
+    if (-1 == access(pidfile, F_OK)) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+                       AUG_MSG("pidfile does not exist: %s"), pidfile);
         return -1;
+    }
+
+	if (-1 == (fd = open(pidfile, O_RDONLY))) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return -1;
+    }
 
     /* Attempt to obtain shared lock. */
 
@@ -108,8 +132,8 @@ aug_control(const struct aug_service* service, aug_signal_t sig)
            another node. */
 
         if (0 == fl.l_pid) {
-            aug_warn("lockfile stored on NFS mounted filesystem");
-            errno = EINVAL;
+            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
+                           AUG_MSG("lockfile on NFS mount: %s"), pidfile);
             return -1;
         }
 
@@ -120,13 +144,17 @@ aug_control(const struct aug_service* service, aug_signal_t sig)
 
     } else {
 
-        /* No lock was obtained, therefore, the daemon process cannot be
+        /* The lock was obtained, therefore, the daemon process cannot be
            running. */
 
-        if (-1 == unlink(path))
+        if (-1 == unlink(pidfile)) {
+            aug_setposixerrinfo(__FILE__, __LINE__, errno);
             goto done;
+        }
 
-        ret = AUG_ENOTEXISTS;
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+                       AUG_MSG("server process is not running"));
+        ret = -1;
     }
 
  done:

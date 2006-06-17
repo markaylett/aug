@@ -43,7 +43,7 @@ struct aug_field {
  * Return code used by some functions to indicate that no matching item could
  * be found.
  */
-#define AUG_NOMATCH (-2)
+#define AUG_RETNOMATCH 1
 
 /**
  * \defgroup OpenFlags Open Flags

@@ -8,7 +8,7 @@
 #include "augutil/dstr.h"
 #include "augutil/path.h"
 
-#include "augsys/errno.h"
+#include "augsys/errinfo.h"
 #include "augsys/limits.h" /* AUG_PATH_MAX */
 #include "augsys/windows.h"
 
@@ -21,23 +21,29 @@
 static aug_dstr_t
 makepath_(const struct aug_service* service)
 {
+    const char* program, * conffile;
     char buf[AUG_PATH_MAX + 1];
     aug_dstr_t s;
-    const char* path;
+
+    if (!(program = service->getopt_(service->arg_, AUG_OPTPROGRAM))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTPROGRAM' not set"));
+        return NULL;
+    }
 
     if (!(s = aug_createdstr(sizeof(buf))))
         return NULL;
 
-    if (!aug_realpath(buf, service->program_, sizeof(buf)))
+    if (!aug_realpath(buf, program, sizeof(buf)))
         goto fail;
 
     if (-1 == aug_dstrcatc(&s, '"') || -1 == aug_dstrcats(&s, buf)
         || -1 == aug_dstrcatc(&s, '"'))
         goto fail;
 
-    if ((path = (*service->getopt_)(service->arg_, AUG_OPTCONFFILE))) {
+    if ((conffile = service->getopt_(service->arg_, AUG_OPTCONFFILE))) {
 
-        if (!aug_realpath(buf, path, sizeof(buf)))
+        if (!aug_realpath(buf, conffile, sizeof(buf)))
             goto fail;
 
         if (-1 == aug_dstrcats(&s, " -f \"") || -1 == aug_dstrcats(&s, buf)
@@ -53,19 +59,9 @@ makepath_(const struct aug_service* service)
 }
 
 static int
-installed_(SC_HANDLE scm, const struct aug_service* service)
-{
-    SC_HANDLE serv = OpenService(scm, service->sname_, SERVICE_QUERY_CONFIG);
-    if (!serv)
-        return 0;
-
-    CloseServiceHandle(serv);
-    return 1;
-}
-
-static int
 start_(SC_HANDLE scm, const struct aug_service* service)
 {
+    const char* sname;
     SC_HANDLE serv;
     BOOL b;
     int ret = 0;
@@ -73,15 +69,16 @@ start_(SC_HANDLE scm, const struct aug_service* service)
         "-f", NULL
     };
 
-    argv[1] = (*service->getopt_)(service->arg_, AUG_OPTCONFFILE);
+    if (!(sname = service->getopt_(service->arg_, AUG_OPTSHORTNAME))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+        return -1;
+    }
 
-    if (!(serv = OpenService(scm, service->sname_, SERVICE_START))) {
+    argv[1] = service->getopt_(service->arg_, AUG_OPTCONFFILE);
 
-        DWORD err = GetLastError();
-        if (ERROR_SERVICE_DOES_NOT_EXIST == err)
-            return AUG_ENOTEXISTS;
-
-        aug_maperror(err);
+    if (!(serv = OpenService(scm, sname, SERVICE_START))) {
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -101,14 +98,8 @@ start_(SC_HANDLE scm, const struct aug_service* service)
         b = StartService(serv, 0, NULL);
 
     if (!b) {
-
-        DWORD err = GetLastError();
-        if (ERROR_SERVICE_ALREADY_RUNNING == err)
-            ret = AUG_EEXISTS;
-        else {
-            aug_maperror(err);
-            ret = -1;
-        }
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        ret = -1;
     }
 
 fail:
@@ -119,32 +110,27 @@ fail:
 static int
 control_(SC_HANDLE scm, const struct aug_service* service, aug_signal_t sig)
 {
+    const char* sname;
     SC_HANDLE serv;
     SERVICE_STATUS status;
     int ret = 0;
 
-    if (!(serv = OpenService(scm, service->sname_,
-                             SERVICE_USER_DEFINED_CONTROL))) {
-        DWORD err = GetLastError();
-        if (ERROR_SERVICE_DOES_NOT_EXIST == err)
-            return AUG_ENOTEXISTS;
+    if (!(sname = service->getopt_(service->arg_, AUG_OPTSHORTNAME))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+        return -1;
+    }
 
-        aug_maperror(err);
+    if (!(serv = OpenService(scm, sname, SERVICE_USER_DEFINED_CONTROL))) {
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
 
     if (!ControlService(serv, OFFSET_ + sig, &status)) {
 
         DWORD err = GetLastError();
-        if (ERROR_SERVICE_NOT_ACTIVE == err)
-            ret = AUG_ENOTEXISTS;
-        else if (ERROR_SERVICE_CANNOT_ACCEPT_CTRL == err) {
-            errno = EBUSY;
-            ret = -1;
-        } else {
-            aug_maperror(err);
-            ret = -1;
-        }
+        aug_setwin32errinfo(__FILE__, __LINE__, err);
+        ret = -1;
     }
 
     CloseServiceHandle(serv);
@@ -154,23 +140,32 @@ control_(SC_HANDLE scm, const struct aug_service* service, aug_signal_t sig)
 static int
 install_(SC_HANDLE scm, const struct aug_service* service)
 {
+    const char* lname, * sname;
     aug_dstr_t path;
     SC_HANDLE serv;
     int ret = -1;
 
-    if (installed_(scm, service))
-        return AUG_EEXISTS;
+    if (!(lname = service->getopt_(service->arg_, AUG_OPTLONGNAME))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTLONGNAME' not set"));
+        return -1;
+    }
+
+    if (!(sname = service->getopt_(service->arg_, AUG_OPTSHORTNAME))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+        return -1;
+    }
 
     if (!(path = makepath_(service)))
         return -1;
 
-    if (!(serv = CreateService(scm, service->sname_, service->lname_,
-                               SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
-                               SERVICE_AUTO_START, SERVICE_ERROR_NORMAL,
-                               aug_dstr(path), NULL, NULL, NULL, NULL,
-                               NULL))) {
+    if (!(serv = CreateService(scm, sname, lname, SERVICE_ALL_ACCESS,
+                               SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START,
+                               SERVICE_ERROR_NORMAL, aug_dstr(path), NULL,
+                               NULL, NULL, NULL, NULL))) {
 
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         goto done;
     }
 
@@ -185,38 +180,33 @@ install_(SC_HANDLE scm, const struct aug_service* service)
 static int
 uninstall_(SC_HANDLE scm, const struct aug_service* service)
 {
+    const char* sname;
     SC_HANDLE serv;
     SERVICE_STATUS status;
     int ret = 0;
 
-    if (!installed_(scm, service))
-        return AUG_ENOTEXISTS;
+    if (!(sname = service->getopt_(service->arg_, AUG_OPTSHORTNAME))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+        return -1;
+    }
 
-    if (!(serv = OpenService(scm, service->sname_, SERVICE_STOP | DELETE))) {
-        DWORD err = GetLastError();
-        if (ERROR_SERVICE_DOES_NOT_EXIST == err)
-            return AUG_ENOTEXISTS;
-
-        aug_maperror(err);
+    if (!(serv = OpenService(scm, sname, SERVICE_STOP | DELETE))) {
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
 
     if (!ControlService(serv, SERVICE_CONTROL_STOP, &status)) {
-
         DWORD err = GetLastError();
         if (ERROR_SERVICE_NOT_ACTIVE != err) {
-            aug_maperror(err);
+            aug_setwin32errinfo(__FILE__, __LINE__, err);
             ret = -1;
         }
     }
 
     if (!DeleteService(serv) && -1 != ret) {
-
-        DWORD err = GetLastError();
-        if (ERROR_SERVICE_MARKED_FOR_DELETE != err) {
-            aug_maperror(err);
-            ret = -1;
-        }
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        ret = -1;
     }
 
     CloseServiceHandle(serv);
@@ -230,7 +220,7 @@ aug_start(const struct aug_service* service)
     SC_HANDLE scm;
 
     if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -246,7 +236,7 @@ aug_control(const struct aug_service* service, aug_signal_t sig)
     SC_HANDLE scm;
 
     if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -262,7 +252,7 @@ aug_install(const struct aug_service* service)
     SC_HANDLE scm;
 
     if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -278,7 +268,7 @@ aug_uninstall(const struct aug_service* service)
     SC_HANDLE scm;
 
     if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
-        aug_maperror(GetLastError());
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return -1;
     }
 
