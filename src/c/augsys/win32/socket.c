@@ -213,40 +213,45 @@ aug_listen(int s, int backlog)
 AUGSYS_API ssize_t
 aug_recv(int s, void* buf, size_t len, int flags)
 {
-    if (SOCKET_ERROR == recv(_get_osfhandle(s), buf, (int)len, flags))
+    ssize_t num;
+    if (SOCKET_ERROR == (num = recv(_get_osfhandle(s), buf, (int)len, flags)))
         return toerror_();
 
-    return 0;
+    return num;
 }
 
 AUGSYS_API ssize_t
 aug_recvfrom(int s, void* buf, size_t len, int flags, struct sockaddr* from,
              socklen_t* fromlen)
 {
-    if (SOCKET_ERROR == recvfrom(_get_osfhandle(s), buf, (int)len, flags,
-                                 from, fromlen))
+    ssize_t num;
+    if (SOCKET_ERROR == (num = recvfrom(_get_osfhandle(s), buf, (int)len,
+                                        flags, from, fromlen)))
         return toerror_();
 
-    return 0;
+    return num;
 }
 
 AUGSYS_API ssize_t
 aug_send(int s, const void* buf, size_t len, int flags)
 {
-    if (SOCKET_ERROR == send(_get_osfhandle(s), buf, (int)len, flags))
+    ssize_t num;
+    if (SOCKET_ERROR == (num = send(_get_osfhandle(s), buf, (int)len, flags)))
         return toerror_();
 
-    return 0;
+    return num;
 }
 
 AUGSYS_API ssize_t
 aug_sendto(int s, const void* buf, size_t len, int flags,
            const struct sockaddr* to, socklen_t tolen)
 {
-    if (SOCKET_ERROR == sendto(_get_osfhandle(s), buf, (int)len, flags, to, tolen))
+    ssize_t num;
+    if (SOCKET_ERROR == (num = sendto(_get_osfhandle(s), buf, (int)len,
+                                      flags, to, tolen)))
         return toerror_();
 
-    return 0;
+    return num;
 }
 
 AUGSYS_API int

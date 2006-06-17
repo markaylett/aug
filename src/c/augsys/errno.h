@@ -76,6 +76,9 @@ aug_maperror(unsigned long err);
 /* This function may be necessary in the, undesirable, situation where a client
    is using different versions of the c-runtime. */
 
+AUGSYS_API void
+aug_seterrno(int num);
+
 AUGSYS_API int
 aug_errno(void);
 

@@ -6,9 +6,9 @@
 
 #include "augsyspp/config.hpp"
 
+#include "augsys/errno.h"  // aug_errno()
 #include "augsys/string.h" // aug_strerror()
 
-#include <cerrno>
 #include <stdexcept>
 
 namespace aug {
@@ -29,8 +29,8 @@ namespace aug {
         const int num_;
     public:
         posix_error(const std::string& s)
-            : std::runtime_error(detail::makewhat(s, errno)),
-              num_(errno)
+            : std::runtime_error(detail::makewhat(s, aug_errno())),
+              num_(aug_errno())
         {
         }
 
@@ -85,20 +85,20 @@ namespace aug {
     inline void
     error(const std::string& s)
     {
-        error(s, errno);
+        error(s, aug_errno());
     }
 }
 
 #define AUG_CATCHRETURN \
 catch (const aug::posix_error& e) { \
     aug_error(e.what()); \
-    errno = e.num(); \
+    aug_seterrno(e.num()); \
 } catch (const std::exception& e) { \
     aug_error(e.what()); \
-    errno = EINVAL; \
+    aug_seterrno(EINVAL); \
 } catch (...) { \
     aug_error("unknown error"); \
-    errno = EINVAL; \
+    aug_seterrno(EINVAL); \
 } \
 return
 

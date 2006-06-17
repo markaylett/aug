@@ -154,6 +154,12 @@ aug_maperror(unsigned long win32)
 
 #endif /* _WIN32 */
 
+AUGSYS_API void
+aug_seterrno(int num)
+{
+    errno = num;
+}
+
 AUGSYS_API int
 aug_errno(void)
 {
