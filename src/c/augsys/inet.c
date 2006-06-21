@@ -48,6 +48,8 @@
  */
 
 #define AUGSYS_BUILD
+/* isascii() */
+#undef __STRICT_ANSI__
 #include "augsys/inet.h"
 
 static const char rcsid[] = "$Id:$";

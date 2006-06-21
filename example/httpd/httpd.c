@@ -385,12 +385,6 @@ run_(void* arg)
     return 0;
 }
 
-static void
-term_(void)
-{
-    aug_term();
-}
-
 int
 main(int argc, char* argv[])
 {
@@ -404,9 +398,7 @@ main(int argc, char* argv[])
     };
 
     program_ = argv[0];
-
-    aug_init(&errinfo);
-    atexit(term_);
+    aug_atexitinit(&errinfo);
 
     service_ = &service;
     if (!getcwd(rundir_, sizeof(rundir_))) {

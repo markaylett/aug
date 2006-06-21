@@ -2,6 +2,8 @@
    See the file COPYING for copying permission.
 */
 #define AUGUTIL_BUILD
+/* _fullpath() */
+#undef __STRICT_ANSI__
 #include "augutil/path.h"
 
 static const char rcsid[] = "$Id:$";

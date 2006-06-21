@@ -2,6 +2,8 @@
    See the file COPYING for copying permission.
 */
 #define AUGSYS_BUILD
+/* _stricmp(), _strnicmp() */
+#undef __STRICT_ANSI__
 #include "augsys/string.h"
 
 static const char rcsid[] = "$Id:$";
