@@ -245,7 +245,7 @@ modinclude_HEADERS = \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@ENABLE_CPPBUILD_TRUE@TESTS = $(check_PROGRAMS)
+@ENABLE_CPPBUILD_TRUE@TESTS = augmarpp-test
 @ENABLE_CPPBUILD_TRUE@augmarpp_test_SOURCES = test.cpp
 @ENABLE_CPPBUILD_TRUE@augmarpp_test_LDADD = \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \

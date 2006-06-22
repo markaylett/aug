@@ -32,7 +32,7 @@ libaugutilpp_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augutilpp-test
-TESTS = $(check_PROGRAMS)
+TESTS = augutilpp-test
 
 augutilpp_test_SOURCES = test.cpp
 augutilpp_test_LDADD = \

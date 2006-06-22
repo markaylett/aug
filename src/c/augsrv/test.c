@@ -82,7 +82,11 @@ main(int argc, char* argv[])
 
     program_ = argv[0];
 
-    aug_atexitinit(&errinfo);
+    if (-1 == aug_atexitinit(&errinfo)) {
+        aug_perror("aug_atexitinit() failed");
+        return 1;
+    }
+
     aug_main(&service, argc, argv);
     return 1;
 }

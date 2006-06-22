@@ -39,7 +39,7 @@ libaugutil_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augutil-test
-TESTS = $(check_PROGRAMS)
+TESTS = augutil-test
 
 augutil_test_SOURCES = test.c
 augutil_test_LDADD = \

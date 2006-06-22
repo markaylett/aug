@@ -68,7 +68,10 @@ check_PROGRAMS = \
 	augsys-errinfotest \
 	augsys-sockettest
 
-TESTS = $(check_PROGRAMS)
+TESTS = \
+	augsys-basetest \
+	augsys-errinfotest \
+	augsys-sockettest
 
 augsys_basetest_SOURCES = basetest.c
 augsys_basetest_LDADD = \

@@ -235,7 +235,7 @@ libaugutil_la_LDFLAGS = \
 libaugutil_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-TESTS = $(check_PROGRAMS)
+TESTS = augutil-test
 augutil_test_SOURCES = test.c
 augutil_test_LDADD = \
 	$(top_srcdir)/src/c/augutil/libaugutil.la

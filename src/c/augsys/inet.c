@@ -47,9 +47,11 @@
  * --Copyright--
  */
 
+#if defined(__MINGW32__)
+# undef __STRICT_ANSI__
+#endif
+
 #define AUGSYS_BUILD
-/* isascii() */
-#undef __STRICT_ANSI__
 #include "augsys/inet.h"
 
 static const char rcsid[] = "$Id:$";

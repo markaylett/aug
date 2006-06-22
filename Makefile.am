@@ -6,5 +6,4 @@ SUBDIRS = \
 	vc7
 
 EXTRA_DIST = \
-	ltmain.sh.orig \
 	TODO

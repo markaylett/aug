@@ -1,9 +1,12 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+
+#if defined(__MINGW32__)
+# undef __STRICT_ANSI__
+#endif
+
 #define AUGSYS_BUILD
-/* _stricmp(), _strnicmp() */
-#undef __STRICT_ANSI__
 #include "augsys/string.h"
 
 static const char rcsid[] = "$Id:$";

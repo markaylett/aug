@@ -6,5 +6,4 @@ rm -fR autom4te.cache \
     && aclocal \
     && autoconf \
     && autoheader \
-    && automake --add-missing --foreign --copy \
-    && patch <etc/ltmain.sh.patch
+    && automake --add-missing --foreign --copy

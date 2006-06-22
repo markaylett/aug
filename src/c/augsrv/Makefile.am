@@ -37,7 +37,7 @@ libaugsrv_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augsrv-test
-TESTS = $(check_PROGRAMS)
+TESTS = augsrv-test
 
 augsrv_test_SOURCES = test.c
 augsrv_test_LDADD = \

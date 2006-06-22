@@ -40,7 +40,7 @@ libaugsyspp_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augsyspp-test
-TESTS = $(check_PROGRAMS)
+TESTS = augsyspp-test
 
 augsyspp_test_SOURCES = test.cpp
 augsyspp_test_LDADD = \

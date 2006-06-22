@@ -39,7 +39,7 @@ libaugmar_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augmar-test
-TESTS = $(check_PROGRAMS)
+TESTS = augmar-test
 
 augmar_test_SOURCES = test.c
 augmar_test_LDADD = \

@@ -246,7 +246,7 @@ modinclude_HEADERS = \
 @ENABLE_CPPBUILD_TRUE@libaugsyspp_la_LIBADD = \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@ENABLE_CPPBUILD_TRUE@TESTS = $(check_PROGRAMS)
+@ENABLE_CPPBUILD_TRUE@TESTS = augsyspp-test
 @ENABLE_CPPBUILD_TRUE@augsyspp_test_SOURCES = test.cpp
 @ENABLE_CPPBUILD_TRUE@augsyspp_test_LDADD = \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \

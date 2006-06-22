@@ -4935,18 +4935,6 @@ EOF
 # endif
 #endif
 
-#if defined (_WIN32)
-# ifndef S_IXOTH
-#  define S_IXOTH _S_IEXEC
-# endif
-# ifndef S_IXGRP
-#  define S_IXGRP _S_IEXEC
-# endif
-# ifndef S_IXUSR
-#  define S_IXUSR _S_IEXEC
-# endif
-#endif
-
 #ifndef DIR_SEPARATOR_2
 # define IS_DIR_SEPARATOR(ch) ((ch) == DIR_SEPARATOR)
 #else /* DIR_SEPARATOR_2 */

@@ -231,7 +231,7 @@ libaugnet_la_LIBADD = \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-TESTS = $(check_PROGRAMS)
+TESTS = augnet-test
 augnet_test_SOURCES = test.c
 augnet_test_LDADD = \
 	$(top_srcdir)/src/c/augnet/libaugnet.la

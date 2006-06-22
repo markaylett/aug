@@ -25,7 +25,7 @@ libaugnetpp_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augnetpp-test
-TESTS = $(check_PROGRAMS)
+TESTS = augnetpp-test
 
 augnetpp_test_SOURCES = test.cpp
 augnetpp_test_LDADD = \

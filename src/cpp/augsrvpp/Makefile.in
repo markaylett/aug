@@ -237,7 +237,7 @@ modinclude_HEADERS = \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@ENABLE_CPPBUILD_TRUE@TESTS = $(check_PROGRAMS)
+@ENABLE_CPPBUILD_TRUE@TESTS = augsrvpp-test
 @ENABLE_CPPBUILD_TRUE@augsrvpp_test_SOURCES = test.cpp
 @ENABLE_CPPBUILD_TRUE@augsrvpp_test_LDADD = \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \

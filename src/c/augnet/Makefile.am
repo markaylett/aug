@@ -33,7 +33,7 @@ libaugnet_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augnet-test
-TESTS = $(check_PROGRAMS)
+TESTS = augnet-test
 
 augnet_test_SOURCES = test.c
 augnet_test_LDADD = \

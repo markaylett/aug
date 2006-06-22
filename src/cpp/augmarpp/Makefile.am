@@ -38,7 +38,7 @@ libaugmarpp_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augmarpp-test
-TESTS = $(check_PROGRAMS)
+TESTS = augmarpp-test
 
 augmarpp_test_SOURCES = test.cpp
 augmarpp_test_LDADD = \

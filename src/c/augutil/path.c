@@ -1,9 +1,12 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+
+#if defined(__MINGW32__)
+# undef __STRICT_ANSI__
+#endif
+
 #define AUGUTIL_BUILD
-/* _fullpath() */
-#undef __STRICT_ANSI__
 #include "augutil/path.h"
 
 static const char rcsid[] = "$Id:$";

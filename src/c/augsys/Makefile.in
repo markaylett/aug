@@ -282,7 +282,11 @@ libaugsys_la_LDFLAGS = \
 	-version-info 0:0:0
 
 libaugsys_la_LIBADD = 
-TESTS = $(check_PROGRAMS)
+TESTS = \
+	augsys-basetest \
+	augsys-errinfotest \
+	augsys-sockettest
+
 augsys_basetest_SOURCES = basetest.c
 augsys_basetest_LDADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
