@@ -25,10 +25,22 @@ static const char rcsid[] = "$Id:$";
 #include <assert.h>
 #include <stdlib.h>        /* exit() */
 
+/* closepipe_() should not be called from an atexit() handler: on Windows, the
+   pipe is implemented as a socket pair.  The c-runtime may terminate the
+   Winsock layer prior to calling the cleanup function. */
+
+static void
+closepipe_(void)
+{
+    AUG_PERRINFO(aug_close(aug_signalin()), "aug_close() failed");
+    AUG_PERRINFO(aug_close(aug_signalout()), "aug_close() failed");
+}
+
 static void
 die_(const char* s)
 {
     aug_perrinfo(s);
+    closepipe_();
     exit(1);
 }
 
@@ -41,13 +53,6 @@ handler_(int i)
 }
 
 static void
-closepipe_(void)
-{
-    AUG_PERRINFO(aug_close(aug_signalin()), "aug_close() failed");
-    AUG_PERRINFO(aug_close(aug_signalout()), "aug_close() failed");
-}
-
-static void
 openpipe_(void)
 {
     int fds[2];
@@ -56,10 +61,6 @@ openpipe_(void)
         die_("aug_mplexerpipe() failed");
 
     aug_setsignalpipe_(fds);
-    if (-1 == atexit(closepipe_)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
-        die_("atexit() failed");
-    }
 
     if (-1 == aug_signalhandler(handler_))
         die_("aug_signalhandler() failed");
@@ -154,11 +155,15 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
     struct aug_options options;
 
     aug_setservice_(service);
-    if (-1 == aug_readopts(service, &options, argc, argv))
+    if (-1 == aug_readopts(service, &options, argc, argv)) {
+        closepipe_();
         exit(1);
+    }
 
-    if (AUG_CMDEXIT == options.command_)
+    if (AUG_CMDEXIT == options.command_) {
+        closepipe_();
         exit(0);
+    }
 
 #if !defined(_WIN32)
     daemon = AUG_CMDSTART == options.command_;
@@ -218,5 +223,6 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
         uninstall_(service);
         break;
     }
+    closepipe_();
     exit(0);
 }

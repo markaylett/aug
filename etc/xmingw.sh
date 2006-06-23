@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BASEFLAGS='-O2 -Wall -Werror -pedantic -D_POSIX_SOURCE -D_BSD_SOURCE'
+BASEFLAGS='-O2 -Wall -Werror -pedantic'
 CFLAGS="-std=c99 $BASEFLAGS"; export CFLAGS
 CXXFLAGS="-std=c++98 $BASEFLAGS -Wno-deprecated"; export CXXFLAGS
 

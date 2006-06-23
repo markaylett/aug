@@ -19672,6 +19672,8 @@ fi
     ;;
 esac
 
+CFLAGS="$CFLAGS -D_POSIX_SOURCE -D_BSD_SOURCE"
+
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.

@@ -39,6 +39,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augutilpp", "augutilpp.vcpr
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test.vcproj", "{E905FF28-F95F-4125-B153-C67B96CD0C65}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9C66FA8-7D39-4496-AA2A-AA52BF2B7650} = {D9C66FA8-7D39-4496-AA2A-AA52BF2B7650}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -85,6 +90,10 @@ Global
 		{91B6CDD3-4C09-428D-BBC8-09FCC9A4AAC4}.Debug.Build.0 = Debug|Win32
 		{91B6CDD3-4C09-428D-BBC8-09FCC9A4AAC4}.Release.ActiveCfg = Release|Win32
 		{91B6CDD3-4C09-428D-BBC8-09FCC9A4AAC4}.Release.Build.0 = Release|Win32
+		{E905FF28-F95F-4125-B153-C67B96CD0C65}.Debug.ActiveCfg = Debug|Win32
+		{E905FF28-F95F-4125-B153-C67B96CD0C65}.Debug.Build.0 = Debug|Win32
+		{E905FF28-F95F-4125-B153-C67B96CD0C65}.Release.ActiveCfg = Release|Win32
+		{E905FF28-F95F-4125-B153-C67B96CD0C65}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
