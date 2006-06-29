@@ -3,9 +3,9 @@
 
 AC_PREREQ(2.56)
 AC_INIT([src/config.h.in])
-AM_INIT_AUTOMAKE([aug], [dev], [mark@emantic.co.uk])
-AC_CONFIG_HEADER([src/config.h])
 
+AM_INIT_AUTOMAKE([aug], [trunk], [mark@emantic.co.uk])
+AC_CONFIG_HEADER([src/config.h])
 AM_MAINTAINER_MODE
 
 # Checks for programs.
@@ -83,8 +83,6 @@ AC_CHECK_FUNC(strlcpy,
 AC_CONFIG_FILES([Makefile
     doc/Makefile
     doc/man/Makefile
-    doc/www/Makefile
-    etc/Makefile
     example/Makefile
     example/httpd/Makefile
     example/mplexd/Makefile

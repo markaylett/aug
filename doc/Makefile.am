@@ -1,6 +1,5 @@
 SUBDIRS = \
-	man \
-	www
+	man
 
 EXTRA_DIST = \
 	augsys.gif \

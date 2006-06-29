@@ -1498,6 +1498,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
 am__api_version="1.9"
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
@@ -1805,7 +1806,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=aug
- VERSION=dev
+ VERSION=trunk
 
 
 # Some tools Automake needs.
@@ -1927,7 +1928,6 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
           ac_config_headers="$ac_config_headers src/config.h"
-
 
 echo "$as_me:$LINENO: checking whether to enable maintainer-specific portions of Makefiles" >&5
 echo $ECHO_N "checking whether to enable maintainer-specific portions of Makefiles... $ECHO_C" >&6
@@ -19883,7 +19883,7 @@ _ACEOF
 fi
 
 
-                                                                                                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile doc/www/Makefile etc/Makefile example/Makefile example/httpd/Makefile example/mplexd/Makefile example/timerd/Makefile src/Makefile src/c/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augres/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/pl/Makefile src/sh/Makefile vc7/Makefile"
+                                                                                                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile example/Makefile example/httpd/Makefile example/mplexd/Makefile example/timerd/Makefile src/Makefile src/c/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augres/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/pl/Makefile src/sh/Makefile vc7/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20459,8 +20459,6 @@ do
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "doc/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
   "doc/man/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/man/Makefile" ;;
-  "doc/www/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/www/Makefile" ;;
-  "etc/Makefile" ) CONFIG_FILES="$CONFIG_FILES etc/Makefile" ;;
   "example/Makefile" ) CONFIG_FILES="$CONFIG_FILES example/Makefile" ;;
   "example/httpd/Makefile" ) CONFIG_FILES="$CONFIG_FILES example/httpd/Makefile" ;;
   "example/mplexd/Makefile" ) CONFIG_FILES="$CONFIG_FILES example/mplexd/Makefile" ;;

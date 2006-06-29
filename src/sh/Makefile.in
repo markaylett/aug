@@ -161,6 +161,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
+	autoinit \
 	findjunk \
 	mkaugconf \
 	mkimplib

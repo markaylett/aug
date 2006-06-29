@@ -186,12 +186,12 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 SUBDIRS = \
 	doc \
-	etc \
 	src \
 	example \
 	vc7
 
 EXTRA_DIST = \
+	config.pl \
 	TODO
 
 all: all-recursive
