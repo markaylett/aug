@@ -83,7 +83,7 @@ my (
     $libtype
     );
 
-$win32 = ($ENV{OS} =~ /windows/i);
+$win32 = (exists $ENV{OS} && $ENV{OS} =~ /windows/i);
 
 if (defined $ENV{AUG_HOME}) {
     $prefix = $ENV{AUG_HOME};

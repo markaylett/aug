@@ -62,7 +62,7 @@ Other examples follow:
  $ demo.exe -f etc/demo.conf stop
  $ demo.exe -f etc/demo.conf uninstall
 
-Dependency diagrams can be re-created by running "make depend" in the doc
+Dependency diagrams can be re-created by running "make build" in the doc
 directory.  However, you will need both GCC and GraphViz to be installed for
 this to work.
 
