@@ -12,6 +12,7 @@
 #include "augnet/conn.h"
 
 #include "augutil/list.h"
+#include "augutil/var.h"
 
 #include "augsys/errno.h"
 #include "augsys/log.h"
@@ -80,10 +81,10 @@ namespace aug {
     namespace detail {
 
         inline int
-        poll(void* arg, int id, struct aug_conns* conns)
+        poll(const struct aug_var* arg, int id, struct aug_conns* conns)
         {
             try {
-                poll_base* ptr = static_cast<poll_base*>(arg);
+                poll_base* ptr = static_cast<poll_base*>(aug_varp(arg));
                 return ptr->poll(id, *conns) ? 1 : 0;
             } AUG_SETERRINFOCATCH;
             return 0; /* false */
@@ -93,7 +94,9 @@ namespace aug {
     inline void
     insertconn(struct aug_conns& conns, fdref ref, poll_base& action)
     {
-        if (-1 == aug_insertconn(&conns, ref.get(), detail::poll, &action))
+        struct aug_var arg;
+        if (-1 == aug_insertconn(&conns, ref.get(), detail::poll,
+                                 aug_setvarp(&arg, &action)))
             throwerrinfo("aug_insertconn() failed");
     }
 

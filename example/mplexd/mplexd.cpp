@@ -168,14 +168,14 @@ namespace test {
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
-                seteventmask(mplexer_, sfd_, AUG_EVENTRDWR);
+                setioeventmask(mplexer_, sfd_, AUG_IOEVENTRDWR);
             } else
                 shutdown(sfd_, SHUT_RDWR);
         }
         ~cstate() NOTHROW
         {
             try {
-                seteventmask(mplexer_, sfd_, 0);
+                setioeventmask(mplexer_, sfd_, 0);
             } AUG_PERRINFOCATCH;
         }
         cstate(mplexer& mplexer, const smartfd& sfd, timers& timers)
@@ -204,11 +204,11 @@ namespace test {
             struct sockaddr_in addr;
             smartfd sfd(tcplisten(parseinet(addr, address_)));
 
-            insertconn(conns_, aug_signalin(), poll);
-            seteventmask(mplexer_, aug_signalin(), AUG_EVENTRD);
+            insertconn(conns_, aug_eventin(), poll);
+            setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
 
             insertconn(conns_, sfd, poll);
-            seteventmask(mplexer_, sfd, AUG_EVENTRD);
+            setioeventmask(mplexer_, sfd, AUG_IOEVENTRD);
 
             sfd_ = sfd;
         }
@@ -223,27 +223,28 @@ namespace test {
         {
             insertconn(state_->conns_, ref, *this);
             try {
-                seteventmask(state_->mplexer_, ref, mask);
+                setioeventmask(state_->mplexer_, ref, mask);
             } catch (...) {
                 removeconn(state_->conns_, ref);
             }
         }
 
         bool
-        signaller(int fd, struct aug_conns& conns)
+        readevent(int fd, struct aug_conns& conns)
         {
-            AUG_DEBUG("reading signal action");
+            struct aug_event event;
+            AUG_DEBUG("reading event");
 
-            switch (readsignal(aug_signalin())) {
-            case AUG_SIGRECONF:
-                aug_info("received AUG_SIGRECONF");
+            switch (aug::readevent(aug_eventin(), event).type_) {
+            case AUG_EVENTRECONF:
+                aug_info("received AUG_EVENTRECONF");
                 reconfig();
                 break;
-            case AUG_SIGSTATUS:
-                aug_info("received AUG_SIGSTATUS");
+            case AUG_EVENTSTATUS:
+                aug_info("received AUG_EVENTSTATUS");
                 break;
-            case AUG_SIGSTOP:
-                aug_info("received AUG_SIGSTOP");
+            case AUG_EVENTSTOP:
+                aug_info("received AUG_EVENTSTOP");
                 quit_ = true;
                 break;
             }
@@ -289,7 +290,7 @@ namespace test {
 
             setnodelay(sfd, true);
             setnonblock(sfd, true);
-            setfdhook(sfd, AUG_EVENTRD);
+            setfdhook(sfd, AUG_IOEVENTRD);
 
             state_->sfds_.insert(make_pair
                                  (sfd.get(), cstateptr
@@ -302,9 +303,9 @@ namespace test {
         connection(int fd, struct aug_conns& conns)
         {
             cstateptr ptr(state_->sfds_[fd]);
-            unsigned short bits(events(state_->mplexer_, fd));
+            unsigned short bits(ioevents(state_->mplexer_, fd));
 
-            if (bits & AUG_EVENTRD) {
+            if (bits & AUG_IOEVENTRD) {
 
                 AUG_DEBUG("handling read event '%d'", fd);
 
@@ -315,15 +316,15 @@ namespace test {
                     return false;
                 }
 
-                seteventmask(state_->mplexer_, fd, AUG_EVENTRDWR);
+                setioeventmask(state_->mplexer_, fd, AUG_IOEVENTRDWR);
                 ptr->timer_.cancel();
                 ptr->heartbeats_ = 0;
             }
 
-            if (bits & AUG_EVENTWR) {
+            if (bits & AUG_IOEVENTWR) {
 
                 if (!ptr->buffer_.writesome(fd)) {
-                    seteventmask(state_->mplexer_, fd, AUG_EVENTRD);
+                    setioeventmask(state_->mplexer_, fd, AUG_IOEVENTRD);
                     ptr->timer_.reset(5000);
                 }
             }
@@ -334,11 +335,11 @@ namespace test {
         bool
         do_poll(int fd, struct aug_conns& conns)
         {
-            if (!events(state_->mplexer_, fd))
+            if (!ioevents(state_->mplexer_, fd))
                 return true;
 
-            if (fd == aug_signalin())
-                return signaller(fd, conns);
+            if (fd == aug_eventin())
+                return readevent(fd, conns);
 
             if (fd == state_->sfd_)
                 return listener(fd, conns);
@@ -394,8 +395,8 @@ namespace test {
                 if (state_->timers_.empty()) {
 
                     scoped_unblock unblock;
-                    while (AUG_RETINTR == (ret = waitevents(state_
-                                                            ->mplexer_)))
+                    while (AUG_RETINTR == (ret = waitioevents(state_
+                                                              ->mplexer_)))
                         ;
 
                 } else {
@@ -403,8 +404,9 @@ namespace test {
                     processtimers(state_->timers_, 0 == ret, tv);
 
                     scoped_unblock unblock;
-                    while (AUG_RETINTR == (ret = waitevents(state_->mplexer_,
-                                                            tv)))
+                    while (AUG_RETINTR == (ret = waitioevents(state_
+                                                              ->mplexer_,
+                                                              tv)))
                         ;
                 }
 

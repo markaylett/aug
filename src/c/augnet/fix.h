@@ -9,6 +9,8 @@
 
 #define AUG_FIXVERLEN  7  /* FIX.x.y */
 
+struct aug_var;
+
 typedef char aug_fixver_t[AUG_FIXVERLEN + 1];
 typedef unsigned int aug_fixtag_t;
 
@@ -24,12 +26,13 @@ struct aug_fixstd_ {
     size_t size_;
 };
 
-typedef void (*aug_fixhandler_t)(void*, const char*, size_t);
+typedef void (*aug_fixhandler_t)(const struct aug_var*, const char*, size_t);
 
 typedef struct aug_fixstream_* aug_fixstream_t;
 
 AUGNET_API aug_fixstream_t
-aug_createfixstream(size_t size, aug_fixhandler_t handler, void* arg);
+aug_createfixstream(size_t size, aug_fixhandler_t handler,
+                    const struct aug_var* arg);
 
 AUGNET_API int
 aug_freefixstream(aug_fixstream_t stream);

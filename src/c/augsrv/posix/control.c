@@ -39,24 +39,24 @@ flock_(struct flock* fl, int fd, int cmd, int type)
 }
 
 static int
-send_(int fd, pid_t pid, aug_signal_t sig)
+send_(int fd, pid_t pid, int event)
 {
     struct flock fl;
 
-    switch (sig) {
-    case AUG_SIGRECONF:
+    switch (event) {
+    case AUG_EVENTRECONF:
         if (-1 == kill(pid, SIGHUP)) {
             aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;
         }
         break;
-    case AUG_SIGSTATUS:
+    case AUG_EVENTSTATUS:
         if (-1 == kill(pid, SIGUSR1)) {
             aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;
         }
         break;
-    case AUG_SIGSTOP:
+    case AUG_EVENTSTOP:
         if (-1 == kill(pid, SIGTERM)) {
             aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;
@@ -77,7 +77,7 @@ send_(int fd, pid_t pid, aug_signal_t sig)
         /* Invalid command. */
 
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("invalid control command '%d'"), sig);
+                       AUG_MSG("invalid control command '%d'"), event);
         return -1;
     }
     return 0;
@@ -92,13 +92,13 @@ aug_start(const struct aug_service* service)
 }
 
 AUGSRV_API int
-aug_control(const struct aug_service* service, aug_signal_t sig)
+aug_control(const struct aug_service* service, int event)
 {
     const char* pidfile;
     struct flock fl;
     int fd, ret = -1;
 
-    if (!(pidfile = service->getopt_(service->arg_, AUG_OPTPIDFILE))) {
+    if (!(pidfile = service->getopt_(&service->arg_, AUG_OPTPIDFILE))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return -1;
@@ -137,7 +137,7 @@ aug_control(const struct aug_service* service, aug_signal_t sig)
             return -1;
         }
 
-        if (-1 == send_(fd, fl.l_pid, sig))
+        if (-1 == send_(fd, fl.l_pid, event))
             goto done;
 
         ret = 0;

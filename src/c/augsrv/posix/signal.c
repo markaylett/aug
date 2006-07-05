@@ -23,6 +23,17 @@ static const struct {
     { SIGTERM, 0 }
 };
 
+static void
+sethandler_(struct sigaction* sa, void (*handler)(int))
+{
+#if !defined(__CYGWIN__)
+    sa->sa_handler = handler;
+#else /* __CYGWIN__ */
+    /* sa_handler is not defined when using -std=c99.  Cygwin bug? */
+    *(void (**)(int))sa = handler;
+#endif
+}
+
 AUGSRV_API int
 aug_signalhandler(void (*handler)(int))
 {
@@ -33,7 +44,7 @@ aug_signalhandler(void (*handler)(int))
     sa.sa_flags = SA_RESTART;
 
     for (i = 0; i < sizeof(handlers_) / sizeof(handlers_[0]); ++i) {
-        sa.sa_handler = handlers_[i].dfl_ ? SIG_DFL : handler;
+        sethandler_(&sa, handlers_[i].dfl_ ? SIG_DFL : handler);
         if (-1 == sigaction(handlers_[i].sig_, &sa, NULL)) {
             aug_setposixerrinfo(__FILE__, __LINE__, errno);
             return -1;

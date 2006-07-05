@@ -4,11 +4,12 @@
 #ifndef AUGUTIL_FILE_H
 #define AUGUTIL_FILE_H
 
-#include "augutil/config.h"
+#include "augutil/var.h"
 
-typedef int (*aug_setopt_t)(void*, const char*, const char*);
+typedef int (*aug_setopt_t)(const struct aug_var*, const char*, const char*);
 
 AUGUTIL_API int
-aug_readconf(const char* path, aug_setopt_t setopt, void* arg);
+aug_readconf(const char* path, aug_setopt_t setopt,
+             const struct aug_var* arg);
 
 #endif /* AUGUTIL_FILE_H */

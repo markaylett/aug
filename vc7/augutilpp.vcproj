@@ -113,6 +113,9 @@
 				RelativePath="..\src\cpp\augutilpp\conv.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augutilpp\event.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augutilpp\file.cpp">
 			</File>
 			<File
@@ -122,10 +125,10 @@
 				RelativePath="..\src\cpp\augutilpp\path.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augutilpp\signal.cpp">
+				RelativePath="..\src\cpp\augutilpp\timer.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augutilpp\timer.cpp">
+				RelativePath="..\src\cpp\augutilpp\var.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -139,6 +142,9 @@
 				RelativePath="..\src\cpp\augutilpp\conv.hpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augutilpp\event.hpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augutilpp\file.hpp">
 			</File>
 			<File
@@ -148,10 +154,10 @@
 				RelativePath="..\src\cpp\augutilpp\path.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augutilpp\signal.hpp">
+				RelativePath="..\src\cpp\augutilpp\timer.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augutilpp\timer.hpp">
+				RelativePath="..\src\cpp\augutilpp\var.hpp">
 			</File>
 		</Filter>
 		<Filter

@@ -11,7 +11,7 @@ main(int argc, char* argv[])
 {
     struct aug_errinfo errinfo;
     int fds[2];
-    aug_signal_t in = 1, out = !1;
+    struct aug_event in = { 1, AUG_VARNULL }, out = { !1, AUG_VARNULL };
 
     aug_atexitinit(&errinfo);
 
@@ -20,18 +20,18 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_writesignal(fds[1], in)) {
-        aug_perrinfo("aug_writesignal() failed");
+    if (!aug_writeevent(fds[1], &in)) {
+        aug_perrinfo("aug_writeevent() failed");
         goto fail;
     }
 
-    if (-1 == aug_readsignal(fds[0], &out)) {
-        aug_perrinfo("aug_readsignal() failed");
+    if (!aug_readevent(fds[0], &out)) {
+        aug_perrinfo("aug_readevent() failed");
         goto fail;
     }
 
-    if (in != out) {
-        fprintf(stderr, "unexpected signal value from aug_readsignal()\n");
+    if (in.type_ != out.type_) {
+        fprintf(stderr, "unexpected event type from aug_readevent()\n");
         goto fail;
     }
 

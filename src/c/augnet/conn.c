@@ -6,6 +6,8 @@
 
 static const char rcsid[] = "$Id:$";
 
+#include "augutil/var.h"
+
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/lock.h"
@@ -16,7 +18,7 @@ struct aug_conn_ {
     AUG_ENTRY(aug_conn_);
     int fd_;
     aug_poll_t fn_;
-    void* arg_;
+    struct aug_var arg_;
 };
 
 static struct aug_conns free_ = AUG_HEAD_INITIALIZER(free_);
@@ -35,7 +37,8 @@ aug_freeconns(struct aug_conns* conns)
 }
 
 AUGNET_API int
-aug_insertconn(struct aug_conns* conns, int fd, aug_poll_t fn, void* arg)
+aug_insertconn(struct aug_conns* conns, int fd, aug_poll_t fn,
+               const struct aug_var* arg)
 {
     struct aug_conn_* conn;
 
@@ -48,7 +51,7 @@ aug_insertconn(struct aug_conns* conns, int fd, aug_poll_t fn, void* arg)
 
     conn->fd_ = fd;
     conn->fn_ = fn;
-    conn->arg_ = arg;
+    aug_setvar(&conn->arg_, arg);
 
     AUG_INSERT_TAIL(conns, conn);
     return 0;
@@ -88,7 +91,7 @@ aug_processconns(struct aug_conns* conns)
     prev = &AUG_FIRST(conns);
     while ((it = *prev)) {
 
-        if (!(it->fn_(it->arg_, it->fd_, &tail))) {
+        if (!(it->fn_(&it->arg_, it->fd_, &tail))) {
 
             AUG_REMOVE_PREVPTR(it, prev, conns);
 

@@ -49,48 +49,48 @@ namespace aug {
     };
 
     inline void
-    seteventmask(aug_mplexer_t mplexer, fdref ref, unsigned short mask)
+    setioeventmask(aug_mplexer_t mplexer, fdref ref, unsigned short mask)
     {
-        if (-1 == aug_seteventmask(mplexer, ref.get(), mask))
-            throwerrinfo("aug_seteventmask() failed");
+        if (-1 == aug_setioeventmask(mplexer, ref.get(), mask))
+            throwerrinfo("aug_setioeventmask() failed");
     }
 
     /** Returns AUG_RETINTR if the system call was interrupted. */
 
     inline int
-    waitevents(aug_mplexer_t mplexer, const struct timeval& timeout)
+    waitioevents(aug_mplexer_t mplexer, const struct timeval& timeout)
     {
-        int ret(aug_waitevents(mplexer, &timeout));
+        int ret(aug_waitioevents(mplexer, &timeout));
         if (-1 == ret)
-            throwerrinfo("aug_waitevents() failed");
+            throwerrinfo("aug_waitioevents() failed");
         return ret;
     }
 
     inline int
-    waitevents(aug_mplexer_t mplexer)
+    waitioevents(aug_mplexer_t mplexer)
     {
-        int ret(aug_waitevents(mplexer, 0));
+        int ret(aug_waitioevents(mplexer, 0));
         if (-1 == ret)
-            throwerrinfo("aug_waitevents() failed");
+            throwerrinfo("aug_waitioevents() failed");
         return ret;
     }
 
     inline unsigned short
-    eventmask(aug_mplexer_t mplexer, fdref ref)
+    ioeventmask(aug_mplexer_t mplexer, fdref ref)
     {
-        int ret(aug_eventmask(mplexer, ref.get()));
+        int ret(aug_ioeventmask(mplexer, ref.get()));
         if (-1 == ret)
-            throwerrinfo("aug_eventmask() failed");
+            throwerrinfo("aug_ioeventmask() failed");
 
         return ret;
     }
 
     inline unsigned short
-    events(aug_mplexer_t mplexer, fdref ref)
+    ioevents(aug_mplexer_t mplexer, fdref ref)
     {
-        int ret(aug_events(mplexer, ref.get()));
+        int ret(aug_ioevents(mplexer, ref.get()));
         if (-1 == ret)
-            throwerrinfo("aug_events() failed");
+            throwerrinfo("aug_ioevents() failed");
 
         return ret;
     }

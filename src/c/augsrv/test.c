@@ -12,7 +12,7 @@ static char conffile_[AUG_PATH_MAX + 1] = "";
 static int daemon_ = 0;
 
 static const char*
-getopt_(void* arg, enum aug_option opt)
+getopt_(const struct aug_var* arg, enum aug_option opt)
 {
     switch (opt) {
     case AUG_OPTADMIN:
@@ -32,7 +32,7 @@ getopt_(void* arg, enum aug_option opt)
 }
 
 static int
-config_(void* arg, const char* conffile, int daemon)
+config_(const struct aug_var* arg, const char* conffile, int daemon)
 {
     if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
         return -1;
@@ -42,26 +42,26 @@ config_(void* arg, const char* conffile, int daemon)
 }
 
 static int
-init_(void* arg)
+init_(const struct aug_var* arg)
 {
     return 0;
 }
 
 static int
-run_(void* arg)
+run_(const struct aug_var* arg)
 {
-    aug_signal_t in = 1, out = !1;
+    struct aug_event in = { 1, AUG_VARNULL }, out = { !1, AUG_VARNULL };
 
-    if (-1 == aug_writesignal(aug_signalout(), in))
+    if (!aug_writeevent(aug_eventout(), &in))
         return -1;
 
-    if (-1 == aug_readsignal(aug_signalin(), &out))
+    if (!aug_readevent(aug_eventin(), &out))
         return -1;
 
-    if (in != out) {
+    if (in.type_ != out.type_) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
-                       AUG_MSG("unexpected signal value from"
-                               " aug_readsignal()"));
+                       AUG_MSG("unexpected event type from"
+                               " aug_readevent()"));
         return -1;
     }
 
@@ -77,7 +77,7 @@ main(int argc, char* argv[])
         config_,
         init_,
         run_,
-        NULL
+        AUG_VARNULL
     };
 
     program_ = argv[0];

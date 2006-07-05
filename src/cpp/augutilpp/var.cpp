@@ -2,4 +2,4 @@
    See the file COPYING for copying permission.
 */
 #define AUGUTILPP_BUILD
-#include "augutilpp/signal.hpp"
+#include "augutilpp/var.hpp"

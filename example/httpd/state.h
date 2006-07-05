@@ -10,13 +10,14 @@
 
 struct aug_message;
 struct aug_messages;
+struct aug_var;
 
 typedef struct aug_state_* aug_state_t;
-typedef int (*aug_request_t)(void*, const char*, aug_mar_t,
+typedef int (*aug_request_t)(const struct aug_var*, const char*, aug_mar_t,
                              struct aug_messages*);
 
 aug_state_t
-aug_createstate(aug_request_t request, void* arg);
+aug_createstate(aug_request_t request, const struct aug_var* arg);
 
 int
 aug_freestate(aug_state_t state);

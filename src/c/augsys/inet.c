@@ -47,10 +47,7 @@
  * --Copyright--
  */
 
-#if defined(__MINGW32__)
-# undef __STRICT_ANSI__
-#endif
-
+#undef __STRICT_ANSI__ /* isascii() */
 #define AUGSYS_BUILD
 #include "augsys/inet.h"
 

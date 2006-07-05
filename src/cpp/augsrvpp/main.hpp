@@ -64,20 +64,20 @@ namespace aug {
     namespace detail {
 
         inline const char*
-        getopt(void* arg, enum aug_option opt)
+        getopt(const struct aug_var* arg, enum aug_option opt)
         {
             try {
-                service_base* ptr = static_cast<service_base*>(arg);
+                service_base* ptr = static_cast<service_base*>(aug_varp(arg));
                 return ptr->getopt(opt);
             } AUG_SETERRINFOCATCH;
             return 0;
         }
 
         inline int
-        config(void* arg, const char* conffile, int daemon)
+        config(const struct aug_var* arg, const char* conffile, int daemon)
         {
             try {
-                service_base* ptr = static_cast<service_base*>(arg);
+                service_base* ptr = static_cast<service_base*>(aug_varp(arg));
                 ptr->config(conffile, daemon ? true : false);
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -85,10 +85,10 @@ namespace aug {
         }
 
         inline int
-        init(void* arg)
+        init(const struct aug_var* arg)
         {
             try {
-                service_base* ptr = static_cast<service_base*>(arg);
+                service_base* ptr = static_cast<service_base*>(aug_varp(arg));
                 ptr->init();
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -96,10 +96,10 @@ namespace aug {
         }
 
         inline int
-        run(void* arg)
+        run(const struct aug_var* arg)
         {
             try {
-                service_base* ptr = static_cast<service_base*>(arg);
+                service_base* ptr = static_cast<service_base*>(aug_varp(arg));
                 ptr->run();
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -120,9 +120,9 @@ namespace aug {
             detail::config,
             detail::init,
             detail::run,
-            &service
+            { AUG_VTNULL }
         };
-
+        aug_setvarp(&s.arg_, &service);
         aug_main(&s, argc, argv);
     }
 }

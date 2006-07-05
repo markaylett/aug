@@ -13,16 +13,16 @@ AUGSRV_EXTERN void
 aug_setservice_(const struct aug_service* service);
 
 AUGSRV_EXTERN void
-aug_setsignalpipe_(int fds[2]);
+aug_seteventpipe_(int fds[2]);
 #endif /* AUGSRV_BUILD */
 
 AUGSRV_API const struct aug_service*
 aug_service(void);
 
 AUGSRV_API int
-aug_signalin(void);
+aug_eventin(void);
 
 AUGSRV_API int
-aug_signalout(void);
+aug_eventout(void);
 
 #endif /* AUGSRV_BASE_H */

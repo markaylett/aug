@@ -8,6 +8,7 @@ static const char rcsid[] = "$Id:$";
 
 #include "augutil/conv.h"
 #include "augutil/lexer.h"
+#include "augutil/var.h"
 
 #include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/errinfo.h"
@@ -18,7 +19,7 @@ static const char rcsid[] = "$Id:$";
 
 struct aug_httpparser_ {
     const struct aug_httphandlers* handlers_;
-    void* arg_;
+    struct aug_var arg_;
     aug_lexer_t lexer_;
     enum {
         INITIAL_,
@@ -39,7 +40,7 @@ iscolon_(char ch)
 static void
 setinitial_(aug_httpparser_t parser)
 {
-    parser->handlers_->setinitial_(parser->arg_,
+    parser->handlers_->setinitial_(&parser->arg_,
                                    aug_token(parser->lexer_));
 }
 
@@ -66,13 +67,13 @@ setvalue_(aug_httpparser_t parser)
             if (-1 == aug_strtoui(&csize, aug_token(parser->lexer_), 10))
                 return -1;
 
-            parser->handlers_->setcsize_(parser->arg_, csize);
+            parser->handlers_->setcsize_(&parser->arg_, csize);
             parser->csize_ = csize;
             return 0;
         }
     }
 
-    parser->handlers_->setfield_(parser->arg_, parser->name_,
+    parser->handlers_->setfield_(&parser->arg_, parser->name_,
                                  aug_token(parser->lexer_));
     return 0;
 }
@@ -82,7 +83,7 @@ end_(aug_httpparser_t parser, int commit)
 {
     parser->state_ = INITIAL_;
     parser->csize_ = 0;
-    parser->handlers_->end_(parser->arg_, commit);
+    parser->handlers_->end_(&parser->arg_, commit);
 }
 
 static int
@@ -180,7 +181,7 @@ body_(aug_httpparser_t parser, const char* buf, size_t size)
 
         /* Not enough data to fulfil the content. */
 
-        parser->handlers_->cdata_(parser->arg_, buf, size);
+        parser->handlers_->cdata_(&parser->arg_, buf, size);
         parser->csize_ -= size;
 
         /* Entire buffer consumed. */
@@ -191,7 +192,7 @@ body_(aug_httpparser_t parser, const char* buf, size_t size)
     /* Consume enough of the buffer to fulfil content. */
 
     size = parser->csize_;
-    parser->handlers_->cdata_(parser->arg_, buf, size);
+    parser->handlers_->cdata_(&parser->arg_, buf, size);
 
     /* End of message (with commit). */
 
@@ -201,7 +202,7 @@ body_(aug_httpparser_t parser, const char* buf, size_t size)
 
 AUGNET_API aug_httpparser_t
 aug_createhttpparser(size_t size, const struct aug_httphandlers* handlers,
-                     void* arg)
+                     const struct aug_var* arg)
 {
     aug_httpparser_t parser = malloc(sizeof(struct aug_httpparser_));
     aug_lexer_t lexer;
@@ -217,7 +218,7 @@ aug_createhttpparser(size_t size, const struct aug_httphandlers* handlers,
     }
 
     parser->handlers_ = handlers;
-    parser->arg_ = arg;
+    aug_setvar(&parser->arg_, arg);
     parser->lexer_ = lexer;
     parser->state_ = INITIAL_;
     parser->csize_ = 0;

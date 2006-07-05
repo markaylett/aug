@@ -4,22 +4,22 @@
 #ifndef AUGUTIL_TIMER_H
 #define AUGUTIL_TIMER_H
 
-#include "augutil/config.h"
 #include "augutil/list.h"
+#include "augutil/var.h"
 
 struct timeval;
 
 struct aug_timer_;
 AUG_HEAD(aug_timers, aug_timer_);
 
-typedef void (*aug_expire_t)(void*, int);
+typedef void (*aug_expire_t)(const struct aug_var*, int);
 
 AUGUTIL_API int
 aug_freetimers(struct aug_timers* timers);
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, unsigned int ms, aug_expire_t fn,
-             void* arg);
+             const struct aug_var* arg);
 
 AUGUTIL_API int
 aug_canceltimer(struct aug_timers* timers, int id);

@@ -34,39 +34,39 @@ external_(struct set_* p, SOCKET h)
     unsigned short dst = 0;
 
     if (FD_ISSET(h, &p->rd_))
-        dst |= AUG_EVENTRD;
+        dst |= AUG_IOEVENTRD;
 
     if (FD_ISSET(h, &p->wr_))
-        dst |= AUG_EVENTWR;
+        dst |= AUG_IOEVENTWR;
 
     return dst;
 }
 
 static int
-setevents_(struct set_* p, SOCKET h, unsigned short mask)
+setioevents_(struct set_* p, SOCKET h, unsigned short mask)
 {
     unsigned short cur = external_(p, h);
     unsigned short set = ~cur & mask;
     unsigned short unset = cur & ~mask;
     int bits = 0;
 
-    if (set & AUG_EVENTRD) {
+    if (set & AUG_IOEVENTRD) {
 
         FD_SET(h, &p->rd_);
         ++bits;
 
-    } else if (unset & AUG_EVENTRD) {
+    } else if (unset & AUG_IOEVENTRD) {
 
         FD_CLR(h, &p->rd_);
         --bits;
     }
 
-    if (set & AUG_EVENTWR) {
+    if (set & AUG_IOEVENTWR) {
 
         FD_SET(h, &p->wr_);
         ++bits;
 
-    } else if (unset & AUG_EVENTWR) {
+    } else if (unset & AUG_IOEVENTWR) {
 
         FD_CLR(h, &p->wr_);
         --bits;
@@ -98,20 +98,20 @@ aug_freemplexer(aug_mplexer_t mplexer)
 }
 
 AUGSYS_API int
-aug_seteventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
+aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 {
-    if (mask & ~(AUG_EVENTRD | AUG_EVENTWR)) {
+    if (mask & ~(AUG_IOEVENTRD | AUG_IOEVENTWR)) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("invalid event mask"));
+                       AUG_MSG("invalid ioevent mask"));
         return -1;
     }
 
-    mplexer->bits_ += setevents_(&mplexer->in_, _get_osfhandle(fd), mask);
+    mplexer->bits_ += setioevents_(&mplexer->in_, _get_osfhandle(fd), mask);
     return 0;
 }
 
 AUGSYS_API int
-aug_waitevents(aug_mplexer_t mplexer, const struct timeval* timeout)
+aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 {
     int ret;
     mplexer->out_ = mplexer->in_;
@@ -135,13 +135,13 @@ aug_waitevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 }
 
 AUGSYS_API int
-aug_eventmask(aug_mplexer_t mplexer, int fd)
+aug_ioeventmask(aug_mplexer_t mplexer, int fd)
 {
     return external_(&mplexer->in_, _get_osfhandle(fd));
 }
 
 AUGSYS_API int
-aug_events(aug_mplexer_t mplexer, int fd)
+aug_ioevents(aug_mplexer_t mplexer, int fd)
 {
     return external_(&mplexer->out_, _get_osfhandle(fd));
 }

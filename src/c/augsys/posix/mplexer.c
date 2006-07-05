@@ -24,10 +24,10 @@ external_(short src)
     unsigned short dst = 0;
 
     if (src & (POLLHUP | POLLIN))
-        dst |= AUG_EVENTRD;
+        dst |= AUG_IOEVENTRD;
 
     if (src & POLLOUT)
-        dst |= AUG_EVENTWR;
+        dst |= AUG_IOEVENTWR;
 
     return dst;
 }
@@ -37,10 +37,10 @@ internal_(unsigned short src)
 {
     short dst = 0;
 
-    if (src & AUG_EVENTRD)
+    if (src & AUG_IOEVENTRD)
         dst |= (POLLHUP | POLLIN);
 
-    if (src & AUG_EVENTWR)
+    if (src & AUG_IOEVENTWR)
         dst |= POLLOUT;
 
     return dst;
@@ -106,13 +106,13 @@ aug_freemplexer(aug_mplexer_t mplexer)
 }
 
 AUGSYS_API int
-aug_seteventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
+aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 {
     struct pollfd* ptr;
 
-    if (mask & ~(AUG_EVENTRD | AUG_EVENTWR)) {
+    if (mask & ~(AUG_IOEVENTRD | AUG_IOEVENTWR)) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("invalid event mask '%d'"), mask);
+                       AUG_MSG("invalid ioevent mask '%d'"), mask);
         return -1;
     }
 
@@ -144,7 +144,7 @@ aug_seteventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 }
 
 AUGSYS_API int
-aug_waitevents(aug_mplexer_t mplexer, const struct timeval* timeout)
+aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 {
     int ms, ret;
 
@@ -159,13 +159,13 @@ aug_waitevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 }
 
 AUGSYS_API int
-aug_eventmask(aug_mplexer_t mplexer, int fd)
+aug_ioeventmask(aug_mplexer_t mplexer, int fd)
 {
     return external_(mplexer->pollfds_[fd].events);
 }
 
 AUGSYS_API int
-aug_events(aug_mplexer_t mplexer, int fd)
+aug_ioevents(aug_mplexer_t mplexer, int fd)
 {
     return external_(mplexer->pollfds_[fd].revents);
 }

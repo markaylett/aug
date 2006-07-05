@@ -4,6 +4,7 @@
 
 static const char rcsid[] = "$Id:$";
 
+#undef __STRICT_ANSI__ /* snprintf() */
 #include "message.h"
 #include "state.h"
 
@@ -42,7 +43,7 @@ static struct aug_conns conns_ = AUG_HEAD_INITIALIZER(conns_);
 static struct aug_timers timers_ = AUG_HEAD_INITIALIZER(timers_);
 
 static int
-request_(void* arg, const char* initial, aug_mar_t mar,
+request_(const struct aug_var* arg, const char* initial, aug_mar_t mar,
          struct aug_messages* messages)
 {
     char buf[64];
@@ -88,7 +89,7 @@ createconn_(aug_mplexer_t mplexer, int fd)
     if (!state)
         return NULL;
 
-    if (-1 == aug_seteventmask(mplexer, fd, AUG_EVENTRD)) {
+    if (-1 == aug_setioeventmask(mplexer, fd, AUG_IOEVENTRD)) {
         aug_freestate(state);
         return NULL;
     }
@@ -99,21 +100,21 @@ createconn_(aug_mplexer_t mplexer, int fd)
 static int
 freeconn_(aug_state_t state, aug_mplexer_t mplexer, int fd)
 {
-    aug_seteventmask(mplexer, fd, 0);
+    aug_setioeventmask(mplexer, fd, 0);
     aug_freestate(state);
     return 0;
 }
 
 static int
-conn_(void* arg, int fd, struct aug_conns* conns)
+conn_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 {
     ssize_t ret;
     aug_state_t state = (aug_state_t)arg;
-    int events = aug_events(mplexer_, fd);
+    int events = aug_ioevents(mplexer_, fd);
 
     AUG_DEBUG("checking connection '%d'", fd);
 
-    if (events & AUG_EVENTRD) {
+    if (events & AUG_IOEVENTRD) {
 
         AUG_DEBUG("handling read event");
 
@@ -128,10 +129,10 @@ conn_(void* arg, int fd, struct aug_conns* conns)
         }
 
         if (aug_pending(state))
-            aug_seteventmask(mplexer_, fd, AUG_EVENTRD | AUG_EVENTWR);
+            aug_setioeventmask(mplexer_, fd, AUG_IOEVENTRD | AUG_IOEVENTWR);
     }
 
-    if (events & AUG_EVENTWR) {
+    if (events & AUG_IOEVENTWR) {
 
         AUG_DEBUG("handling write event");
 
@@ -141,7 +142,7 @@ conn_(void* arg, int fd, struct aug_conns* conns)
         }
 
         if (!aug_pending(state)) {
-            aug_seteventmask(mplexer_, fd, AUG_EVENTRD);
+            aug_setioeventmask(mplexer_, fd, AUG_IOEVENTRD);
 
             /* For HTTP test. */
             goto fail;
@@ -151,13 +152,13 @@ conn_(void* arg, int fd, struct aug_conns* conns)
     return 1;
 
  fail:
-    freeconn_(arg, mplexer_, fd);
+    freeconn_(aug_varp(arg), mplexer_, fd);
     aug_close(fd);
     return 0;
 }
 
 static int
-listener_(void* arg, int fd, struct aug_conns* conns)
+listener_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 {
     struct sockaddr_in addr;
     socklen_t len;
@@ -165,7 +166,7 @@ listener_(void* arg, int fd, struct aug_conns* conns)
 
     AUG_DEBUG("checking listener '%d'", fd);
 
-    if (!aug_events(mplexer_, fd))
+    if (!aug_ioevents(mplexer_, fd))
         return 1;
 
     AUG_DEBUG("accepting new connection");
@@ -195,7 +196,7 @@ listener_(void* arg, int fd, struct aug_conns* conns)
 }
 
 static int
-setconfopt_(void* arg, const char* name, const char* value)
+setconfopt_(const struct aug_var* arg, const char* name, const char* value)
 {
     if (0 == aug_strcasecmp(name, "address")) {
 
@@ -233,7 +234,7 @@ setconfopt_(void* arg, const char* name, const char* value)
 }
 
 static const char*
-getopt_(void* arg, enum aug_option opt)
+getopt_(const struct aug_var* arg, enum aug_option opt)
 {
     switch (opt) {
     case AUG_OPTADMIN:
@@ -277,7 +278,7 @@ reconfig_(void)
 }
 
 static int
-config_(void* arg, const char* conffile, int daemon)
+config_(const struct aug_var* arg, const char* conffile, int daemon)
 {
     if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
         return -1;
@@ -287,29 +288,29 @@ config_(void* arg, const char* conffile, int daemon)
 }
 
 static int
-pipe_(void* arg, int fd, struct aug_conns* conns)
+readevent_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 {
-    aug_signal_t sig;
+    struct aug_event event;
 
-    AUG_DEBUG("checking signal pipe '%d'", fd);
+    AUG_DEBUG("checking event pipe '%d'", fd);
 
-    if (!aug_events(mplexer_, fd))
+    if (!aug_ioevents(mplexer_, fd))
         return 1;
 
-    AUG_DEBUG("reading signal action");
-    AUG_PERRINFO(aug_readsignal(aug_signalin(), &sig),
-                 "aug_readsignal() failed");
+    AUG_DEBUG("reading event");
+    if (!aug_readevent(aug_eventin(), &event))
+        aug_perrinfo("aug_readevent() failed");
 
-    switch (sig) {
-    case AUG_SIGRECONF:
-        aug_info("received AUG_SIGRECONF");
+    switch (event.type_) {
+    case AUG_EVENTRECONF:
+        aug_info("received AUG_EVENTRECONF");
         AUG_PERRINFO(reconfig_(), "failed to re-configure daemon");
         break;
-    case AUG_SIGSTATUS:
-        aug_info("received AUG_SIGSTATUS");
+    case AUG_EVENTSTATUS:
+        aug_info("received AUG_EVENTSTATUS");
         break;
-    case AUG_SIGSTOP:
-        aug_info("received AUG_SIGSTOP");
+    case AUG_EVENTSTOP:
+        aug_info("received AUG_EVENTSTOP");
         quit_ = 1;
         break;
     }
@@ -317,9 +318,10 @@ pipe_(void* arg, int fd, struct aug_conns* conns)
 }
 
 static int
-init_(void* arg)
+init_(const struct aug_var* arg)
 {
     struct sockaddr_in addr;
+    struct aug_var ptr;
 
     aug_info("initialising daemon process");
 
@@ -332,12 +334,13 @@ init_(void* arg)
     if (-1 == (fd_ = aug_tcplisten(&addr)))
         goto fail1;
 
-    if (-1 == aug_insertconn(&conns_, fd_, listener_, mplexer_))
+    if (-1 == aug_insertconn(&conns_, fd_, listener_,
+                             aug_setvarp(&ptr, &mplexer_)))
         goto fail2;
 
-    if (-1 == aug_insertconn(&conns_, aug_signalin(), pipe_, mplexer_)
-        || -1 == aug_seteventmask(mplexer_, fd_, AUG_EVENTRD)
-        || -1 == aug_seteventmask(mplexer_, aug_signalin(), AUG_EVENTRD))
+    if (-1 == aug_insertconn(&conns_, aug_eventin(), readevent_, &ptr)
+        || -1 == aug_setioeventmask(mplexer_, fd_, AUG_IOEVENTRD)
+        || -1 == aug_setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD))
         goto fail3;
 
     return 0;
@@ -352,7 +355,7 @@ init_(void* arg)
 }
 
 static int
-run_(void* arg)
+run_(const struct aug_var* arg)
 {
     struct timeval timeout;
 
@@ -368,8 +371,8 @@ run_(void* arg)
            implementation dependant whether select/poll restart or return with
            EINTR set. */
 
-        while (-1 == aug_waitevents(mplexer_, !AUG_EMPTY(&timers_)
-                                    ? &timeout : NULL))
+        while (-1 == aug_waitioevents(mplexer_, !AUG_EMPTY(&timers_)
+                                      ? &timeout : NULL))
             aug_perrinfo("aug_waitevents() failed");
 
         AUG_PERRINFO(aug_processconns(&conns_),
@@ -394,7 +397,7 @@ main(int argc, char* argv[])
         config_,
         init_,
         run_,
-        NULL
+        AUG_VARNULL
     };
 
     program_ = argv[0];

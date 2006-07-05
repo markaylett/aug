@@ -2,10 +2,7 @@
    See the file COPYING for copying permission.
 */
 
-#if defined(__MINGW32__)
-# undef __STRICT_ANSI__
-#endif
-
+#undef __STRICT_ANSI__
 #define AUGUTIL_BUILD
 #include "augutil/path.h"
 

@@ -210,7 +210,7 @@ AUGSRV_API int
 aug_daemonise(const struct aug_service* service)
 {
     const char* pidfile;
-    if (!(pidfile = service->getopt_(service->arg_, AUG_OPTPIDFILE))) {
+    if (!(pidfile = service->getopt_(&service->arg_, AUG_OPTPIDFILE))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return -1;
@@ -225,7 +225,7 @@ aug_daemonise(const struct aug_service* service)
     if (-1 == closein_())
         return -1;
 
-    return -1 == service->init_(service->arg_)
-        || -1 == service->run_(service->arg_)
+    return -1 == service->init_(&service->arg_)
+        || -1 == service->run_(&service->arg_)
         ? -1 : 0;
 }

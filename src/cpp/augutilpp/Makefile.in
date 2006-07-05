@@ -53,11 +53,11 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 @ENABLE_CPPBUILD_TRUE@libaugutilpp_la_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-am__libaugutilpp_la_SOURCES_DIST = config.cpp conv.cpp file.cpp \
-	log.cpp path.cpp signal.cpp timer.cpp
+am__libaugutilpp_la_SOURCES_DIST = config.cpp conv.cpp event.cpp \
+	file.cpp log.cpp path.cpp timer.cpp var.cpp
 @ENABLE_CPPBUILD_TRUE@am_libaugutilpp_la_OBJECTS = config.lo conv.lo \
-@ENABLE_CPPBUILD_TRUE@	file.lo log.lo path.lo signal.lo \
-@ENABLE_CPPBUILD_TRUE@	timer.lo
+@ENABLE_CPPBUILD_TRUE@	event.lo file.lo log.lo path.lo timer.lo \
+@ENABLE_CPPBUILD_TRUE@	var.lo
 libaugutilpp_la_OBJECTS = $(am_libaugutilpp_la_OBJECTS)
 @ENABLE_CPPBUILD_TRUE@am_libaugutilpp_la_rpath =
 am__augutilpp_test_SOURCES_DIST = test.cpp
@@ -218,21 +218,23 @@ modincludedir = $(includedir)/augutilpp
 modinclude_HEADERS = \
 	config.hpp \
 	conv.hpp \
+	event.hpp \
 	file.hpp \
 	log.hpp \
 	path.hpp \
-	signal.hpp \
-	timer.hpp
+	timer.hpp \
+	var.hpp
 
 @ENABLE_CPPBUILD_TRUE@noinst_LTLIBRARIES = libaugutilpp.la
 @ENABLE_CPPBUILD_TRUE@libaugutilpp_la_SOURCES = \
 @ENABLE_CPPBUILD_TRUE@	config.cpp \
 @ENABLE_CPPBUILD_TRUE@	conv.cpp \
+@ENABLE_CPPBUILD_TRUE@	event.cpp \
 @ENABLE_CPPBUILD_TRUE@	file.cpp \
 @ENABLE_CPPBUILD_TRUE@	log.cpp \
 @ENABLE_CPPBUILD_TRUE@	path.cpp \
-@ENABLE_CPPBUILD_TRUE@	signal.cpp \
-@ENABLE_CPPBUILD_TRUE@	timer.cpp
+@ENABLE_CPPBUILD_TRUE@	timer.cpp \
+@ENABLE_CPPBUILD_TRUE@	var.cpp
 
 @ENABLE_CPPBUILD_TRUE@libaugutilpp_la_LDFLAGS = \
 @ENABLE_CPPBUILD_TRUE@	-no-undefined
@@ -316,12 +318,13 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/var.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

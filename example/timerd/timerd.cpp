@@ -74,27 +74,28 @@ namespace test {
         auto_ptr<state> state_;
 
         void
-        checkpipe()
+        readevent()
         {
-            int fd(aug_signalin());
+            int fd(aug_eventin());
+            struct aug_event event;
 
-            AUG_DEBUG("checking signal pipe '%d'", fd);
+            AUG_DEBUG("checking event pipe '%d'", fd);
 
-            if (!events(state_->mplexer_, fd))
+            if (!ioevents(state_->mplexer_, fd))
                 return;
 
-            AUG_DEBUG("reading signal action");
+            AUG_DEBUG("reading event");
 
-            switch (readsignal(aug_signalin())) {
-            case AUG_SIGRECONF:
-                aug_info("received AUG_SIGRECONF");
+            switch (aug::readevent(aug_eventin(), event).type_) {
+            case AUG_EVENTRECONF:
+                aug_info("received AUG_EVENTRECONF");
                 reconfig();
                 break;
-            case AUG_SIGSTATUS:
-                aug_info("received AUG_SIGSTATUS");
+            case AUG_EVENTSTATUS:
+                aug_info("received AUG_EVENTSTATUS");
                 break;
-            case AUG_SIGSTOP:
-                aug_info("received AUG_SIGSTOP");
+            case AUG_EVENTSTOP:
+                aug_info("received AUG_EVENTSTOP");
                 remain_ = 0;
                 break;
             }
@@ -171,7 +172,7 @@ namespace test {
             }
 
             auto_ptr<state> ptr(new state(*this));
-            seteventmask(ptr->mplexer_, aug_signalin(), AUG_EVENTRD);
+            setioeventmask(ptr->mplexer_, aug_eventin(), AUG_IOEVENTRD);
             state_ = ptr;
         }
 
@@ -189,19 +190,20 @@ namespace test {
 
                 if (state_->timers_.empty()) {
 
-                    while (AUG_RETINTR == (ret = waitevents(state_
-                                                            ->mplexer_)))
+                    while (AUG_RETINTR == (ret = waitioevents(state_
+                                                              ->mplexer_)))
                         ;
 
                 } else {
 
                     processtimers(state_->timers_, 0 == ret, tv);
-                    while (AUG_RETINTR == (ret = waitevents(state_
-                                                            ->mplexer_, tv)))
+                    while (AUG_RETINTR == (ret = waitioevents(state_
+                                                              ->mplexer_,
+                                                              tv)))
                         ;
                 }
 
-                checkpipe();
+                readevent();
             }
 
             aug_info("stopping daemon process");

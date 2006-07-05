@@ -4,11 +4,12 @@ modincludedir = $(includedir)/augutilpp
 modinclude_HEADERS = \
 	config.hpp \
 	conv.hpp \
+	event.hpp \
 	file.hpp \
 	log.hpp \
 	path.hpp \
-	signal.hpp \
-	timer.hpp
+	timer.hpp \
+	var.hpp
 
 if ENABLE_CPPBUILD
 
@@ -17,11 +18,12 @@ noinst_LTLIBRARIES = libaugutilpp.la
 libaugutilpp_la_SOURCES = \
 	config.cpp \
 	conv.cpp \
+	event.cpp \
 	file.cpp \
 	log.cpp \
 	path.cpp \
-	signal.cpp \
-	timer.cpp
+	timer.cpp \
+	var.cpp
 
 libaugutilpp_la_LDFLAGS = \
 	-no-undefined

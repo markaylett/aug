@@ -19,7 +19,7 @@ struct aug_timer_ {
     int id_;
     struct timeval tv_;
     aug_expire_t fn_;
-    void* arg_;
+    struct aug_var arg_;
 };
 
 static struct aug_timers free_ = AUG_HEAD_INITIALIZER(free_);
@@ -85,7 +85,7 @@ aug_freetimers(struct aug_timers* timers)
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, unsigned int ms, aug_expire_t fn,
-             void* arg)
+             const struct aug_var* arg)
 {
     struct timeval tv;
     struct aug_timer_* timer;
@@ -105,7 +105,7 @@ aug_settimer(struct aug_timers* timers, unsigned int ms, aug_expire_t fn,
     timer->tv_.tv_sec = tv.tv_sec;
     timer->tv_.tv_usec = tv.tv_usec;
     timer->fn_ = fn;
-    timer->arg_ = arg;
+    aug_setvar(&timer->arg_, arg);
     insert_(timers, timer);
 
     return timer->id_;
@@ -158,7 +158,7 @@ aug_processtimers(struct aug_timers* timers, int force, struct timeval* next)
             if (timercmp(&now, &it->tv_, <))
                 break;
 
-            (*it->fn_)(it->arg_, it->id_);
+            (*it->fn_)(&it->arg_, it->id_);
 
             AUG_REMOVE_HEAD(timers);
 

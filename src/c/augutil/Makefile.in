@@ -60,8 +60,9 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugutil_la_DEPENDENCIES = $(top_srcdir)/src/c/augsys/libaugsys.la
-am_libaugutil_la_OBJECTS = config.lo conv.lo file.lo getopt.lo \
-	lexer.lo list.lo log.lo path.lo signal.lo strbuf.lo timer.lo
+am_libaugutil_la_OBJECTS = config.lo conv.lo event.lo file.lo \
+	getopt.lo lexer.lo list.lo log.lo path.lo strbuf.lo timer.lo \
+	var.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
 am_augutil_test_OBJECTS = test.$(OBJEXT)
 augutil_test_OBJECTS = $(am_augutil_test_OBJECTS)
@@ -203,30 +204,32 @@ modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
 	config.h \
 	conv.h \
+	event.h \
 	file.h \
 	getopt.h \
 	lexer.h \
 	list.h \
 	log.h \
 	path.h \
-	signal.h \
 	strbuf.h \
-	timer.h
+	timer.h \
+	var.h
 
 noinst_HEADERS = 
 lib_LTLIBRARIES = libaugutil.la
 libaugutil_la_SOURCES = \
 	config.c \
 	conv.c \
+	event.c \
 	file.c \
 	getopt.c \
 	lexer.c \
 	list.c \
 	log.c \
 	path.c \
-	signal.c \
 	strbuf.c \
-	timer.c
+	timer.c \
+	var.c
 
 libaugutil_la_LDFLAGS = \
 	-no-undefined \
@@ -321,16 +324,17 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strbuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/var.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

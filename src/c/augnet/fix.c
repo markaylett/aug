@@ -7,6 +7,7 @@
 static const char rcsid[] = "$Id:$";
 
 #include "augutil/strbuf.h"
+#include "augutil/var.h"
 
 #include "augsys/errinfo.h"
 #include "augsys/string.h"
@@ -64,7 +65,7 @@ static const char rcsid[] = "$Id:$";
 
 struct aug_fixstream_ {
     aug_fixhandler_t handler_;
-    void* arg_;
+    struct aug_var arg_;
     aug_strbuf_t strbuf_;
     size_t mlen_;
 };
@@ -167,7 +168,8 @@ getsum_(const char* buf, size_t size)
 }
 
 AUGNET_API aug_fixstream_t
-aug_createfixstream(size_t size, aug_fixhandler_t handler, void* arg)
+aug_createfixstream(size_t size, aug_fixhandler_t handler,
+                    const struct aug_var* arg)
 {
     aug_fixstream_t stream = malloc(sizeof(struct aug_fixstream_));
     aug_strbuf_t strbuf;
@@ -183,7 +185,7 @@ aug_createfixstream(size_t size, aug_fixhandler_t handler, void* arg)
     }
 
     stream->handler_ = handler;
-    stream->arg_ = arg;
+    aug_setvar(&stream->arg_, arg);
     stream->strbuf_ = strbuf;
     stream->mlen_ = 0;
     return stream;
@@ -238,7 +240,7 @@ aug_readfix(aug_fixstream_t stream, int fd, size_t size)
         if (blen < stream->mlen_)
             break;
 
-        stream->handler_(stream->arg_, ptr, stream->mlen_);
+        stream->handler_(&stream->arg_, ptr, stream->mlen_);
         blen -= stream->mlen_;
         stream->mlen_ = 0;
 

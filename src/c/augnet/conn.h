@@ -8,19 +8,22 @@
 
 #include "augutil/list.h"
 
+struct aug_var;
+
 struct aug_conn_;
 AUG_HEAD(aug_conns, aug_conn_);
 
 /** The callback function has a boolean return value: returning false removes
     the connection. */
 
-typedef int (*aug_poll_t)(void*, int, struct aug_conns*);
+typedef int (*aug_poll_t)(const struct aug_var*, int, struct aug_conns*);
 
 AUGNET_API int
 aug_freeconns(struct aug_conns* conns);
 
 AUGNET_API int
-aug_insertconn(struct aug_conns* conns, int fd, aug_poll_t fn, void* arg);
+aug_insertconn(struct aug_conns* conns, int fd, aug_poll_t fn,
+               const struct aug_var* arg);
 
 AUGNET_API int
 aug_removeconn(struct aug_conns* conns, int fd);

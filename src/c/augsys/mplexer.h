@@ -6,11 +6,11 @@
 
 #include "augsys/config.h"
 
-#define AUG_EVENTRD   0x1
-#define AUG_EVENTWR   0x2
-#define AUG_EVENTRDWR (AUG_EVENTRD | AUG_EVENTWR)
+#define AUG_IOEVENTRD    0x1
+#define AUG_IOEVENTWR    0x2
+#define AUG_IOEVENTRDWR (AUG_IOEVENTRD | AUG_IOEVENTWR)
 
-#define AUG_RETINTR   (-2)
+#define AUG_RETINTR     (-2)
 
 struct timeval;
 
@@ -23,7 +23,7 @@ AUGSYS_API int
 aug_freemplexer(aug_mplexer_t mplexer);
 
 AUGSYS_API int
-aug_seteventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
+aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
 
 /** Returns either the total number of descriptors set, zero on timeout, or a
     negative value on error.
@@ -33,13 +33,13 @@ aug_seteventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
     set. */
 
 AUGSYS_API int
-aug_waitevents(aug_mplexer_t mplexer, const struct timeval* timeout);
+aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout);
 
 AUGSYS_API int
-aug_eventmask(aug_mplexer_t mplexer, int fd);
+aug_ioeventmask(aug_mplexer_t mplexer, int fd);
 
 AUGSYS_API int
-aug_events(aug_mplexer_t mplexer, int fd);
+aug_ioevents(aug_mplexer_t mplexer, int fd);
 
 AUGSYS_API int
 aug_mplexerpipe(int fds[2]);

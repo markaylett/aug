@@ -79,7 +79,8 @@ name(void) \
     return it; \
 }
 
-#define	AUG_REMOVE_PREVPTR(var, varp, head) do { \
+#define	AUG_REMOVE_PREVPTR(var, varp, head) \
+do { \
     if (!AUG_NEXT((var))) \
         (head)->stqh_last = (varp); \
     *(varp) = AUG_NEXT((var)); \

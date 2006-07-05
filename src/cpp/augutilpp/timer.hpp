@@ -102,10 +102,10 @@ namespace aug {
         operator =(const timer&);
 
         static void
-        expire_(void* arg, int id)
+        expire_(const struct aug_var* arg, int id)
         {
             try {
-                timer* ptr = static_cast<timer*>(arg);
+                timer* ptr = static_cast<timer*>(aug_varp(arg));
                 ptr->pending_ = false;
                 ptr->action_.expire(id);
             } AUG_SETERRINFOCATCH;
@@ -153,7 +153,9 @@ namespace aug {
         reset(unsigned int ms)
         {
             cancel();
-            int id(aug_settimer(&timers_, ms, expire_, this));
+            aug_var arg;
+            int id(aug_settimer(&timers_, ms, expire_,
+                                aug_setvarp(&arg, this)));
             if (-1 == id)
                 throwerrinfo("aug_settimer() failed");
             id_ = id;

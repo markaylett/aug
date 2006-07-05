@@ -6,7 +6,7 @@
 
 #include "augsrv/config.h"
 
-#include "augutil/signal.h" /* enum aug_signal_t */
+#include "augutil/event.h"
 
 struct aug_service;
 
@@ -14,7 +14,7 @@ AUGSRV_API int
 aug_start(const struct aug_service* service);
 
 AUGSRV_API int
-aug_control(const struct aug_service* service, aug_signal_t sig);
+aug_control(const struct aug_service* service, int event);
 
 AUGSRV_API int
 aug_install(const struct aug_service* service);

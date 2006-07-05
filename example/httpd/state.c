@@ -11,6 +11,8 @@ static const char rcsid[] = "$Id:$";
 #include "augnet/types.h"
 #include "augnet/utility.h"
 
+#include "augutil/var.h"
+
 #include "augsys/defs.h"  /* AUG_MAXLINE */
 #include "augsys/errinfo.h"
 #include "augsys/errno.h" /* ENOMEM */
@@ -26,7 +28,7 @@ static const char rcsid[] = "$Id:$";
 
 struct aug_state_ {
     aug_request_t request_;
-    void* arg_;
+    struct aug_var arg_;
     struct {
         aug_httpparser_t parser_;
         aug_strbuf_t initial_;
@@ -99,18 +101,18 @@ prepare_(aug_state_t state)
 }
 
 static void
-setinitial_(void* arg, const char* initial)
+setinitial_(const struct aug_var* arg, const char* initial)
 {
-    aug_state_t state = arg;
+    aug_state_t state = aug_varp(arg);
     if (!state->in_.initial_)
         state->in_.initial_ = aug_createstrbuf(AUG_MAXLINE);
     aug_setstrbufs(&state->in_.initial_, initial);
 }
 
 static void
-setfield_(void* arg, const char* name, const char* value)
+setfield_(const struct aug_var* arg, const char* name, const char* value)
 {
-    aug_state_t state = arg;
+    aug_state_t state = aug_varp(arg);
     struct aug_field field;
 
     field.name_ = name;
@@ -123,9 +125,9 @@ setfield_(void* arg, const char* name, const char* value)
 }
 
 static void
-setcsize_(void* arg, size_t csize)
+setcsize_(const struct aug_var* arg, size_t csize)
 {
-    aug_state_t state = arg;
+    aug_state_t state = aug_varp(arg);
     if (!state->in_.mar_)
         state->in_.mar_ = aug_createmar();
     aug_truncatemar(state->in_.mar_, csize);
@@ -133,19 +135,19 @@ setcsize_(void* arg, size_t csize)
 }
 
 static void
-cdata_(void* arg, const void* buf, size_t size)
+cdata_(const struct aug_var* arg, const void* buf, size_t size)
 {
-    aug_state_t state = arg;
+    aug_state_t state = aug_varp(arg);
     if (!state->in_.mar_)
         state->in_.mar_ = aug_createmar();
     aug_writemar(state->in_.mar_, buf, size);
 }
 
 static void
-end_(void* arg, int commit)
+end_(const struct aug_var* arg, int commit)
 {
-    aug_state_t state = arg;
-
+    aug_state_t state = aug_varp
+(arg);
     if (commit) {
 
         static struct aug_messages messages = AUG_HEAD_INITIALIZER(messages);
@@ -155,7 +157,7 @@ end_(void* arg, int commit)
         if (!state->in_.initial_)
             return; /* Blank line. */
 
-        (*state->request_)(state->arg_, aug_getstr(state->in_.initial_),
+        (*state->request_)(&state->arg_, aug_getstr(state->in_.initial_),
                            state->in_.mar_, &messages);
         AUG_CONCAT(&state->out_.pending_, &messages);
     }
@@ -180,18 +182,21 @@ const struct aug_httphandlers handlers_ = {
 };
 
 aug_state_t
-aug_createstate(aug_request_t request, void* arg)
+aug_createstate(aug_request_t request, const struct aug_var* arg)
 {
     aug_state_t state = malloc(sizeof(struct aug_state_));
+    struct aug_var local;
+
     if (!state) {
         aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
     state->request_ = request;
-    state->arg_ = arg;
+    aug_setvar(&state->arg_, arg);
     if (!(state->in_.parser_ = aug_createhttpparser(AUG_MAXLINE, &handlers_,
-                                                    state)))
+                                                    aug_setvarp(&local,
+                                                                state))))
         goto fail;
 
     state->in_.initial_ = NULL;

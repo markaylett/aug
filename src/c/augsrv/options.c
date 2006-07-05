@@ -21,9 +21,9 @@ static const char rcsid[] = "$Id:$";
 static void
 usage_(const struct aug_service* service)
 {
-    const char* lname = service->getopt_(service->arg_, AUG_OPTLONGNAME);
-    const char* program = service->getopt_(service->arg_, AUG_OPTPROGRAM);
-    const char* admin = service->getopt_(service->arg_, AUG_OPTADMIN);
+    const char* lname = service->getopt_(&service->arg_, AUG_OPTLONGNAME);
+    const char* program = service->getopt_(&service->arg_, AUG_OPTPROGRAM);
+    const char* admin = service->getopt_(&service->arg_, AUG_OPTADMIN);
 
     if (lname)
         aug_info("%s\n", lname);

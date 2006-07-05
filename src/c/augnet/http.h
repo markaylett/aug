@@ -8,19 +8,21 @@
 
 #include "augsys/types.h"
 
+struct aug_var;
+
 struct aug_httphandlers {
-    void (*setinitial_)(void*, const char*);
-    void (*setfield_)(void*, const char*, const char*);
-    void (*setcsize_)(void*, size_t);
-    void (*cdata_)(void*, const void*, size_t);
-    void (*end_)(void*, int);
+    void (*setinitial_)(const struct aug_var*, const char*);
+    void (*setfield_)(const struct aug_var*, const char*, const char*);
+    void (*setcsize_)(const struct aug_var*, size_t);
+    void (*cdata_)(const struct aug_var*, const void*, size_t);
+    void (*end_)(const struct aug_var*, int);
 };
 
 typedef struct aug_httpparser_* aug_httpparser_t;
 
 AUGNET_API aug_httpparser_t
 aug_createhttpparser(size_t size, const struct aug_httphandlers* handlers,
-                     void* arg);
+                     const struct aug_var* arg);
 
 AUGNET_API int
 aug_freehttpparser(aug_httpparser_t parser);

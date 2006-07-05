@@ -4,15 +4,16 @@ modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
 	config.h \
 	conv.h \
+	event.h \
 	file.h \
 	getopt.h \
 	lexer.h \
 	list.h \
 	log.h \
 	path.h \
-	signal.h \
 	strbuf.h \
-	timer.h
+	timer.h \
+	var.h
 
 noinst_HEADERS =
 
@@ -21,15 +22,16 @@ lib_LTLIBRARIES = libaugutil.la
 libaugutil_la_SOURCES = \
 	config.c \
 	conv.c \
+	event.c \
 	file.c \
 	getopt.c \
 	lexer.c \
 	list.c \
 	log.c \
 	path.c \
-	signal.c \
 	strbuf.c \
-	timer.c
+	timer.c \
+	var.c
 
 libaugutil_la_LDFLAGS = \
 	-no-undefined \

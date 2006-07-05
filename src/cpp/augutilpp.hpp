@@ -7,10 +7,11 @@
 #include "augutil.h"
 
 #include "augutilpp/conv.hpp"
+#include "augutilpp/event.hpp"
 #include "augutilpp/file.hpp"
 #include "augutilpp/log.hpp"
 #include "augutilpp/path.hpp"
-#include "augutilpp/signal.hpp"
 #include "augutilpp/timer.hpp"
+#include "augutilpp/var.hpp"
 
 #endif // AUGUTILPP_HPP

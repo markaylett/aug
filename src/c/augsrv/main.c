@@ -32,8 +32,8 @@ static const char rcsid[] = "$Id:$";
 static void
 closepipe_(void)
 {
-    AUG_PERRINFO(aug_close(aug_signalin()), "aug_close() failed");
-    AUG_PERRINFO(aug_close(aug_signalout()), "aug_close() failed");
+    AUG_PERRINFO(aug_close(aug_eventin()), "aug_close() failed");
+    AUG_PERRINFO(aug_close(aug_eventout()), "aug_close() failed");
 }
 
 static void
@@ -45,11 +45,12 @@ die_(const char* s)
 }
 
 static void
-handler_(int i)
+handler_(int sig)
 {
+    struct aug_event event;
     aug_info("handling interrupt");
-    if (-1 == aug_writesignal(aug_signalout(), aug_tosignal(i)))
-        aug_perrinfo("aug_writesignal() failed");
+    if (!aug_writeevent(aug_eventout(), aug_setsigevent(&event, sig)))
+        aug_perrinfo("aug_writeevent() failed");
 }
 
 static void
@@ -60,7 +61,7 @@ openpipe_(void)
     if (-1 == aug_mplexerpipe(fds))
         die_("aug_mplexerpipe() failed");
 
-    aug_setsignalpipe_(fds);
+    aug_seteventpipe_(fds);
 
     if (-1 == aug_signalhandler(handler_))
         die_("aug_signalhandler() failed");
@@ -69,10 +70,10 @@ openpipe_(void)
 static void
 foreground_(const struct aug_service* service)
 {
-    if (-1 == service->init_(service->arg_))
+    if (-1 == service->init_(&service->arg_))
         die_("failed to initialise daemon");
 
-    if (-1 == service->run_(service->arg_))
+    if (-1 == service->run_(&service->arg_))
         die_("failed to run daemon");
 }
 
@@ -110,9 +111,9 @@ start_(const struct aug_service* service)
 #endif /* _WIN32 */
 
 static void
-control_(const struct aug_service* service, aug_signal_t sig)
+control_(const struct aug_service* service, int sigtype)
 {
-    switch (aug_control(service, sig)) {
+    switch (aug_control(service, sigtype)) {
     case -1:
         die_("failed to control daemon process");
     case 0:
@@ -176,7 +177,7 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
     if (daemon)
         aug_setlogger(aug_daemonlogger);
 
-    if (-1 == service->config_(service->arg_, options.conffile_, daemon))
+    if (-1 == service->config_(&service->arg_, options.conffile_, daemon))
         die_("failed to read configuration");
 
     switch (options.command_) {
@@ -196,7 +197,7 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
         break;
     case AUG_CMDRECONF:
         aug_info("re-configuring daemon process");
-        control_(service, AUG_SIGRECONF);
+        control_(service, AUG_EVENTRECONF);
         break;
     case AUG_CMDSTART:
 #if !defined(_WIN32)
@@ -208,11 +209,11 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
         break;
     case AUG_CMDSTATUS:
         aug_info("getting status of daemon process");
-        control_(service, AUG_SIGSTATUS);
+        control_(service, AUG_EVENTSTATUS);
         break;
     case AUG_CMDSTOP:
         aug_info("stopping daemon process");
-        control_(service, AUG_SIGSTOP);
+        control_(service, AUG_EVENTSTOP);
         break;
     case AUG_CMDTEST:
         openpipe_();
