@@ -52,7 +52,7 @@ namespace aug {
         };
     }
 
-    aug_var&
+    inline aug_var&
     clearvar(struct aug_var& v)
     {
         return *aug_clearvar(&v);
@@ -136,20 +136,20 @@ namespace aug {
     inline bool
     operator ==(const var& lhs, const var& rhs)
     {
-        return aug_equalvar(cptr(lhs), cptr(rhs));
+        return 0 != aug_equalvar(cptr(lhs), cptr(rhs)) ? true : false;
     }
 
     inline bool
     operator !=(const var& lhs, const var& rhs)
     {
-        return !aug_equalvar(cptr(lhs), cptr(rhs));
+        return 0 == aug_equalvar(cptr(lhs), cptr(rhs)) ? true : false;
     }
 }
 
 inline bool
 isnull(const aug::var& v)
 {
-    return aug_isnull(cptr(v));
+    return 0 != aug_isnull(cptr(v)) ? true : false;
 }
 
 #endif // AUGUTILPP_VAR_HPP
