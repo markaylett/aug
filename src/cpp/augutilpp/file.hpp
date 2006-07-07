@@ -51,7 +51,8 @@ namespace aug {
     inline void
     readconf(const char* path, setopt_base& action)
     {
-        if (-1 == aug_readconf(path, detail::setopt, var(&action)))
+        var v(&action);
+        if (-1 == aug_readconf(path, detail::setopt, cptr(v)))
             throwerrinfo("aug_readconf() failed");
     }
 }

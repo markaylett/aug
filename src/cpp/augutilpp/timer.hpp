@@ -17,6 +17,9 @@
 namespace aug {
 
     class AUGUTILPP_API timers {
+    public:
+        typedef struct aug_timers ctype;
+    private:
 
         friend class timer;
 
@@ -44,8 +47,7 @@ namespace aug {
             return timers_;
         }
 
-        struct aug_timers&
-        get()
+        operator const struct aug_timers&() const
         {
             return timers_;
         }
@@ -154,7 +156,8 @@ namespace aug {
         reset(unsigned int ms)
         {
             cancel();
-            int id(aug_settimer(&timers_, ms, expire_, var(this)));
+            var v(this);
+            int id(aug_settimer(&timers_, ms, expire_, cptr(v)));
             if (-1 == id)
                 throwerrinfo("aug_settimer() failed");
             id_ = id;

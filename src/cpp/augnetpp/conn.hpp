@@ -39,6 +39,9 @@ namespace aug {
     };
 
     class AUGNETPP_API conns {
+    public:
+        typedef struct aug_conns ctype;
+    private:
 
         friend class conn;
 
@@ -66,8 +69,7 @@ namespace aug {
             return conns_;
         }
 
-        struct aug_conns&
-        get()
+        operator const struct aug_conns&() const
         {
             return conns_;
         }
@@ -95,8 +97,8 @@ namespace aug {
     inline void
     insertconn(struct aug_conns& conns, fdref ref, poll_base& action)
     {
-        if (-1 == aug_insertconn(&conns, ref.get(), detail::poll,
-                                 var(&action)))
+        var v(&action);
+        if (-1 == aug_insertconn(&conns, ref.get(), detail::poll, cptr(v)))
             throwerrinfo("aug_insertconn() failed");
     }
 

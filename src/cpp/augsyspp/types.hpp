@@ -8,6 +8,8 @@
 
 namespace aug {
 
+    // Helper functions for types that encapsulate c value types.
+
     template <typename T>
     const typename T::ctype&
     cref(const T& x)
@@ -26,14 +28,14 @@ namespace aug {
     const typename T::ctype*
     cptr(const T& x)
     {
-        return static_cast<const typename T::ctype*>(x);
+        return &static_cast<const typename T::ctype&>(x);
     }
 
     template <typename T>
     typename T::ctype*
     cptr(T& x)
     {
-        return static_cast<typename T::ctype*>(x);
+        return &static_cast<typename T::ctype&>(x);
     }
 
     class AUGSYSPP_API fdref {

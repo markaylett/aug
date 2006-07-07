@@ -6,7 +6,7 @@
 
 #include "augutilpp/config.hpp"
 
-#include "augsyspp/null.hpp"
+#include "augsyspp/types.hpp"
 
 #include "augutil/var.h"
 
@@ -73,7 +73,9 @@ namespace aug {
     }
 
     class AUGUTILPP_API var {
-
+    public:
+        typedef struct aug_var ctype;
+    private:
         struct aug_var var_;
 
         var(const var&);
@@ -119,21 +121,9 @@ namespace aug {
             return var_;
         }
 
-        operator struct aug_var*()
-        {
-            return &var_;
-        }
-
-        struct aug_var&
-        ref()
+        operator const struct aug_var&() const
         {
             return var_;
-        }
-
-        struct aug_var*
-        ptr()
-        {
-            return &var_;
         }
 
         aug_vartype
@@ -141,47 +131,25 @@ namespace aug {
         {
             return var_.type_;
         }
-
-        operator const struct aug_var&() const
-        {
-            return var_;
-        }
-
-        operator const struct aug_var*() const
-        {
-            return &var_;
-        }
-
-        const struct aug_var&
-        ref() const
-        {
-            return var_;
-        }
-
-        const struct aug_var*
-        ptr() const
-        {
-            return &var_;
-        }
     };
 
     inline bool
     operator ==(const var& lhs, const var& rhs)
     {
-        return aug_equalvar(lhs, rhs);
+        return aug_equalvar(cptr(lhs), cptr(rhs));
     }
 
     inline bool
     operator !=(const var& lhs, const var& rhs)
     {
-        return !aug_equalvar(lhs, rhs);
+        return !aug_equalvar(cptr(lhs), cptr(rhs));
     }
 }
 
 inline bool
 isnull(const aug::var& v)
 {
-    return aug_isnull(v);
+    return aug_isnull(cptr(v));
 }
 
 #endif // AUGUTILPP_VAR_HPP
