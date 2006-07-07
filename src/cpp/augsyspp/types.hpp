@@ -8,6 +8,34 @@
 
 namespace aug {
 
+    template <typename T>
+    const typename T::ctype&
+    cref(const T& x)
+    {
+        return static_cast<const typename T::ctype&>(x);
+    }
+
+    template <typename T>
+    typename T::ctype&
+    cref(T& x)
+    {
+        return static_cast<typename T::ctype&>(x);
+    }
+
+    template <typename T>
+    const typename T::ctype*
+    cptr(const T& x)
+    {
+        return static_cast<const typename T::ctype*>(x);
+    }
+
+    template <typename T>
+    typename T::ctype*
+    cptr(T& x)
+    {
+        return static_cast<typename T::ctype*>(x);
+    }
+
     class AUGSYSPP_API fdref {
         int fd_;
     public:

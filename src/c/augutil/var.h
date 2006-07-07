@@ -34,13 +34,16 @@ aug_setvarp(struct aug_var* v, void* p);
 AUGUTIL_API struct aug_var*
 aug_setvar(struct aug_var* v, const struct aug_var* w);
 
-AUGUTIL_API int
-aug_isnull(const struct aug_var* v);
-
 AUGUTIL_API long
-aug_varl(const struct aug_var* v);
+aug_getvarl(const struct aug_var* v);
 
 AUGUTIL_API void*
-aug_varp(const struct aug_var* v);
+aug_getvarp(const struct aug_var* v);
+
+AUGUTIL_API int
+aug_equalvar(const struct aug_var* v, const struct aug_var* w);
+
+AUGUTIL_API int
+aug_isnull(const struct aug_var* v);
 
 #endif /* AUGUTIL_VAR_H */

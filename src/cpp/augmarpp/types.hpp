@@ -16,7 +16,7 @@
 #include "augmar/mar.h"
 #include "augmar/types.h"
 
-#include <cstring> // strlen
+#include <cstring> // strlen()
 
 namespace aug {
 

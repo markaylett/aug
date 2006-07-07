@@ -47,21 +47,31 @@ aug_setvar(struct aug_var* v, const struct aug_var* w)
     return v;
 }
 
-AUGUTIL_API int
-aug_isnull(const struct aug_var* v)
-{
-    return !v || AUG_VTNULL == v->type_
-        || (AUG_VTPTR == v->type_ && !v->u_.ptr_);
-}
-
 AUGUTIL_API long
-aug_varl(const struct aug_var* v)
+aug_getvarl(const struct aug_var* v)
 {
     return v && AUG_VTLONG == v->type_ ? v->u_.long_ : 0;
 }
 
 AUGUTIL_API void*
-aug_varp(const struct aug_var* v)
+aug_getvarp(const struct aug_var* v)
 {
     return v && AUG_VTPTR == v->type_ ? v->u_.ptr_ : NULL;
+}
+
+AUGUTIL_API int
+aug_equalvar(const struct aug_var* v, const struct aug_var* w)
+{
+    if (AUG_VTLONG == v->type_)
+        return AUG_VTLONG == w->type_
+            && v->u_.long_ == w->u_.long_;
+
+    return v->u_.ptr_ == w->u_.ptr_;
+}
+
+AUGUTIL_API int
+aug_isnull(const struct aug_var* v)
+{
+    return !v || AUG_VTNULL == v->type_
+        || (AUG_VTPTR == v->type_ && !v->u_.ptr_);
 }

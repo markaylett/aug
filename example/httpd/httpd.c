@@ -152,7 +152,7 @@ conn_(const struct aug_var* arg, int fd, struct aug_conns* conns)
     return 1;
 
  fail:
-    freeconn_(aug_varp(arg), mplexer_, fd);
+    freeconn_(aug_getvarp(arg), mplexer_, fd);
     aug_close(fd);
     return 0;
 }

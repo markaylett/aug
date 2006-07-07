@@ -6,13 +6,14 @@
 
 #include "augnetpp/config.hpp"
 
+#include "augutilpp/var.hpp"
+
 #include "augsyspp/exception.hpp"
 #include "augsyspp/smartfd.hpp"
 
 #include "augnet/conn.h"
 
 #include "augutil/list.h"
-#include "augutil/var.h"
 
 #include "augsys/errno.h"
 #include "augsys/log.h"
@@ -84,7 +85,7 @@ namespace aug {
         poll(const struct aug_var* arg, int id, struct aug_conns* conns)
         {
             try {
-                poll_base* ptr = static_cast<poll_base*>(aug_varp(arg));
+                poll_base* ptr = static_cast<poll_base*>(aug_getvarp(arg));
                 return ptr->poll(id, *conns) ? 1 : 0;
             } AUG_SETERRINFOCATCH;
             return 0; /* false */
@@ -94,9 +95,8 @@ namespace aug {
     inline void
     insertconn(struct aug_conns& conns, fdref ref, poll_base& action)
     {
-        struct aug_var arg;
         if (-1 == aug_insertconn(&conns, ref.get(), detail::poll,
-                                 aug_setvarp(&arg, &action)))
+                                 var(&action)))
             throwerrinfo("aug_insertconn() failed");
     }
 

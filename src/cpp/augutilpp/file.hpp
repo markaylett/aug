@@ -4,7 +4,7 @@
 #ifndef AUGUTILPP_FILE_HPP
 #define AUGUTILPP_FILE_HPP
 
-#include "augutilpp/config.hpp"
+#include "augutilpp/var.hpp"
 
 #include "augsyspp/exception.hpp"
 
@@ -39,7 +39,8 @@ namespace aug {
         setopt(const struct aug_var* arg, const char* name, const char* value)
         {
             try {
-                setopt_base* ptr = static_cast<setopt_base*>(aug_varp(arg));
+                setopt_base* ptr = static_cast<
+                    setopt_base*>(aug_getvarp(arg));
                 ptr->setopt(name, value);
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -50,9 +51,7 @@ namespace aug {
     inline void
     readconf(const char* path, setopt_base& action)
     {
-        struct aug_var arg;
-        if (-1 == aug_readconf(path, detail::setopt,
-                               aug_setvarp(&arg, &action)))
+        if (-1 == aug_readconf(path, detail::setopt, var(&action)))
             throwerrinfo("aug_readconf() failed");
     }
 }

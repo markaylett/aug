@@ -103,7 +103,7 @@ prepare_(aug_state_t state)
 static void
 setinitial_(const struct aug_var* arg, const char* initial)
 {
-    aug_state_t state = aug_varp(arg);
+    aug_state_t state = aug_getvarp(arg);
     if (!state->in_.initial_)
         state->in_.initial_ = aug_createstrbuf(AUG_MAXLINE);
     aug_setstrbufs(&state->in_.initial_, initial);
@@ -112,7 +112,7 @@ setinitial_(const struct aug_var* arg, const char* initial)
 static void
 setfield_(const struct aug_var* arg, const char* name, const char* value)
 {
-    aug_state_t state = aug_varp(arg);
+    aug_state_t state = aug_getvarp(arg);
     struct aug_field field;
 
     field.name_ = name;
@@ -127,7 +127,7 @@ setfield_(const struct aug_var* arg, const char* name, const char* value)
 static void
 setcsize_(const struct aug_var* arg, size_t csize)
 {
-    aug_state_t state = aug_varp(arg);
+    aug_state_t state = aug_getvarp(arg);
     if (!state->in_.mar_)
         state->in_.mar_ = aug_createmar();
     aug_truncatemar(state->in_.mar_, csize);
@@ -137,7 +137,7 @@ setcsize_(const struct aug_var* arg, size_t csize)
 static void
 cdata_(const struct aug_var* arg, const void* buf, size_t size)
 {
-    aug_state_t state = aug_varp(arg);
+    aug_state_t state = aug_getvarp(arg);
     if (!state->in_.mar_)
         state->in_.mar_ = aug_createmar();
     aug_writemar(state->in_.mar_, buf, size);
@@ -146,8 +146,7 @@ cdata_(const struct aug_var* arg, const void* buf, size_t size)
 static void
 end_(const struct aug_var* arg, int commit)
 {
-    aug_state_t state = aug_varp
-(arg);
+    aug_state_t state = aug_getvarp(arg);
     if (commit) {
 
         static struct aug_messages messages = AUG_HEAD_INITIALIZER(messages);

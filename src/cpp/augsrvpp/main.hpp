@@ -67,7 +67,8 @@ namespace aug {
         getopt(const struct aug_var* arg, enum aug_option opt)
         {
             try {
-                service_base* ptr = static_cast<service_base*>(aug_varp(arg));
+                service_base* ptr = static_cast<
+                    service_base*>(aug_getvarp(arg));
                 return ptr->getopt(opt);
             } AUG_SETERRINFOCATCH;
             return 0;
@@ -77,7 +78,8 @@ namespace aug {
         config(const struct aug_var* arg, const char* conffile, int daemon)
         {
             try {
-                service_base* ptr = static_cast<service_base*>(aug_varp(arg));
+                service_base* ptr = static_cast<
+                    service_base*>(aug_getvarp(arg));
                 ptr->config(conffile, daemon ? true : false);
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -88,7 +90,8 @@ namespace aug {
         init(const struct aug_var* arg)
         {
             try {
-                service_base* ptr = static_cast<service_base*>(aug_varp(arg));
+                service_base* ptr = static_cast<
+                    service_base*>(aug_getvarp(arg));
                 ptr->init();
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -99,7 +102,8 @@ namespace aug {
         run(const struct aug_var* arg)
         {
             try {
-                service_base* ptr = static_cast<service_base*>(aug_varp(arg));
+                service_base* ptr = static_cast<
+                    service_base*>(aug_getvarp(arg));
                 ptr->run();
                 return 0;
             } AUG_SETERRINFOCATCH;

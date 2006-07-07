@@ -4,7 +4,7 @@
 #ifndef AUGUTILPP_TIMER_HPP
 #define AUGUTILPP_TIMER_HPP
 
-#include "augutilpp/config.hpp"
+#include "augutilpp/var.hpp"
 
 #include "augsyspp/exception.hpp"
 
@@ -105,7 +105,8 @@ namespace aug {
         expire_(const struct aug_var* arg, int id)
         {
             try {
-                timer* ptr = static_cast<timer*>(aug_varp(arg));
+                timer* ptr = static_cast<
+                    timer*>(aug_getvarp(arg));
                 ptr->pending_ = false;
                 ptr->action_.expire(id);
             } AUG_SETERRINFOCATCH;
@@ -153,9 +154,7 @@ namespace aug {
         reset(unsigned int ms)
         {
             cancel();
-            aug_var arg;
-            int id(aug_settimer(&timers_, ms, expire_,
-                                aug_setvarp(&arg, this)));
+            int id(aug_settimer(&timers_, ms, expire_, var(this)));
             if (-1 == id)
                 throwerrinfo("aug_settimer() failed");
             id_ = id;
