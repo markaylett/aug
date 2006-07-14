@@ -116,6 +116,9 @@
 				RelativePath="..\src\c\augsys\defs.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\endian.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\errinfo.c">
 			</File>
 			<File
@@ -132,6 +135,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\log.c">
+			</File>
+			<File
+				RelativePath="..\src\c\augsys\mcast.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\mmap.c">
@@ -187,6 +193,9 @@
 				RelativePath="..\src\c\augsys\defs.h">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\endian.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\errinfo.h">
 			</File>
 			<File
@@ -203,6 +212,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\log.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augsys\mcast.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\mmap.h">

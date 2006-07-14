@@ -220,6 +220,6 @@ AUGMAR_EXTERN void*
 aug_mfiletail_(aug_mfile_t mfile)
 {
     assert(mfile);
-    return (aug_byte_t*)mfile + sizeof(struct aug_mfile_);
+    return (char*)mfile + sizeof(struct aug_mfile_);
 }
 

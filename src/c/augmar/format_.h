@@ -12,52 +12,38 @@
 #include "augmar/config.h"
 #include "augmar/types.h"
 
-#if !defined(_MSC_VER)
-
-# include <inttypes.h>
-
-#else /* _MSC_VER */
-
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
-
-#endif /* _MSC_VER */
-
-typedef uint8_t aug_byte_t;
-typedef uint16_t aug_uint16_t;
-typedef uint32_t aug_uint32_t;
+#include "augsys/endian.h"
 
 #define AUG_UINT16_MAX 0xffffU
 #define AUG_UINT32_MAX 0xffffffffU
 
-typedef aug_uint16_t aug_verno_t;
-#define aug_encodeverno_ aug_encode16_
-#define aug_decodeverno_ aug_decode16_
+typedef uint16_t aug_verno_t;
+#define aug_encodeverno aug_encode16
+#define aug_decodeverno aug_decode16
 
-typedef aug_uint16_t aug_fields_t;
-#define aug_encodefields_ aug_encode16_
-#define aug_decodefields_ aug_decode16_
+typedef uint16_t aug_fields_t;
+#define aug_encodefields aug_encode16
+#define aug_decodefields aug_decode16
 #define AUG_FIELDS_MAX AUG_UINT16_MAX
 
-typedef aug_uint32_t aug_hsize_t;
-#define aug_encodehsize_ aug_encode32_
-#define aug_decodehsize_ aug_decode32_
+typedef uint32_t aug_hsize_t;
+#define aug_encodehsize aug_encode32
+#define aug_decodehsize aug_decode32
 #define AUG_HSIZE_MAX AUG_UINT32_MAX
 
-typedef aug_uint32_t aug_bsize_t;
-#define aug_encodebsize_ aug_encode32_
-#define aug_decodebsize_ aug_decode32_
+typedef uint32_t aug_bsize_t;
+#define aug_encodebsize aug_encode32
+#define aug_decodebsize aug_decode32
 #define AUG_BSIZE_MAX AUG_UINT32_MAX
 
-typedef aug_uint16_t aug_nsize_t;
-#define aug_encodensize_ aug_encode16_
-#define aug_decodensize_ aug_decode16_
+typedef uint16_t aug_nsize_t;
+#define aug_encodensize aug_encode16
+#define aug_decodensize aug_decode16
 #define AUG_NSIZE_MAX AUG_UINT16_MAX
 
-typedef aug_uint16_t aug_vsize_t;
-#define aug_encodevsize_ aug_encode16_
-#define aug_decodevsize_ aug_decode16_
+typedef uint16_t aug_vsize_t;
+#define aug_encodevsize aug_encode16
+#define aug_decodevsize aug_decode16
 #define AUG_VSIZE_MAX AUG_UINT16_MAX
 
 #define AUG_LEADER 0
@@ -76,17 +62,5 @@ typedef aug_uint16_t aug_vsize_t;
 #define AUG_FIELD_SIZE(nsize, vsize) (AUG_VALUE_OFFSET(nsize) + (vsize))
 
 #define AUG_BODY(hsize) (AUG_HEADER + hsize)
-
-AUGMAR_EXTERN aug_uint16_t
-aug_decode16_(const aug_byte_t* ptr);
-
-AUGMAR_EXTERN aug_uint32_t
-aug_decode32_(const aug_byte_t* ptr);
-
-AUGMAR_EXTERN void
-aug_encode16_(aug_byte_t* ptr, aug_uint16_t i);
-
-AUGMAR_EXTERN void
-aug_encode32_(aug_byte_t* ptr, aug_uint32_t i);
 
 #endif /* AUGMAR_FORMAT_H_ */

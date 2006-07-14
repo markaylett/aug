@@ -153,7 +153,7 @@ namespace test {
         }
     };
 
-    struct cstate : public expire_base {
+    struct session : public expire_base {
 
         mplexer& mplexer_;
         smartfd sfd_;
@@ -172,13 +172,13 @@ namespace test {
             } else
                 shutdown(sfd_, SHUT_RDWR);
         }
-        ~cstate() NOTHROW
+        ~session() NOTHROW
         {
             try {
                 setioeventmask(mplexer_, sfd_, 0);
             } AUG_PERRINFOCATCH;
         }
-        cstate(mplexer& mplexer, const smartfd& sfd, timers& timers)
+        session(mplexer& mplexer, const smartfd& sfd, timers& timers)
             : mplexer_(mplexer),
               sfd_(sfd),
               timer_(timers, 5000, *this),
@@ -187,18 +187,18 @@ namespace test {
         }
     };
 
-    typedef shared_ptr<cstate> cstateptr;
+    typedef shared_ptr<session> sessionptr;
 
-    struct sstate {
+    struct state {
 
         conns conns_;
         timers timers_;
         mplexer mplexer_;
         smartfd sfd_;
-        map<int, cstateptr> sfds_;
+        map<int, sessionptr> sfds_;
 
         explicit
-        sstate(poll_base& poll)
+        state(poll_base& poll)
             : sfd_(null)
         {
             struct sockaddr_in addr;
@@ -216,7 +216,7 @@ namespace test {
 
     class service : public poll_base, public service_base {
 
-        auto_ptr<sstate> state_;
+        auto_ptr<state> state_;
 
         void
         setfdhook(fdref ref, unsigned short mask)
@@ -293,16 +293,16 @@ namespace test {
             setfdhook(sfd, AUG_IOEVENTRD);
 
             state_->sfds_.insert(make_pair
-                                 (sfd.get(), cstateptr
-                                  (new cstate(state_->mplexer_, sfd,
-                                              state_->timers_))));
+                                 (sfd.get(), sessionptr
+                                  (new session(state_->mplexer_, sfd,
+                                               state_->timers_))));
             return true;
         }
 
         bool
         connection(int fd, struct aug_conns& conns)
         {
-            cstateptr ptr(state_->sfds_[fd]);
+            sessionptr ptr(state_->sfds_[fd]);
             unsigned short bits(ioevents(state_->mplexer_, fd));
 
             if (bits & AUG_IOEVENTRD) {
@@ -379,7 +379,7 @@ namespace test {
             aug_info("initialising daemon process");
 
             setsrvlogger("aug");
-            state_.reset(new sstate(*this));
+            state_.reset(new state(*this));
         }
 
         void

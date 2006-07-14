@@ -72,4 +72,7 @@ aug_shutdown(int s, int how);
 AUGSYS_API int
 aug_socketpair(int domain, int type, int protocol, int sv[2]);
 
+AUGSYS_API int
+aug_setreuseaddr(int s, int on);
+
 #endif /* AUGSYS_SOCKET_H */

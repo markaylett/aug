@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "docbook/dtd/xml/4.4/docbookx.dtd">
+<article lang="en">
+  <articleinfo>
+    <title>Aug</title>
+  </articleinfo>
+  <section>
+    <title>Introduction</title>
+    <para>TODO</para>
+    <section>
+      <title>What is Aug?</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Aug's History</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Aug's Features</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Aug's Architecture</title>
+      <para>TODO</para>
+    </section>
+  </section>
+  <section>
+    <title>License</title>
+    <para>TODO</para>
+  </section>
+  <section>
+    <title>Getting Started</title>
+    <para>TODO</para>
+    <section>
+      <title>Download</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Dependencies</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Supported Platforms</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Configuration</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Build and Install</title>
+      <para>TODO</para>
+    </section>
+  </section>
+  <section>
+    <title>Tutorial and Examples</title>
+    <para>TODO</para>
+  </section>
+  <section>
+    <title>Design Principles</title>
+    <para>TODO</para>
+    <section>
+      <title>Efficiency</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Error Handling</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Event Multiplexing</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Portability</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Multi-Threading</title>
+      <para>TODO</para>
+    </section>
+  </section>
+  <section>
+    <title>Developer Information</title>
+    <para>TODO</para>
+    <section>
+      <title>Configuration</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Version Control</title>
+      <para>TODO</para>
+    </section>
+    <section>
+      <title>Release Strategy</title>
+
+      <para>Cut release branch.</para>
+
+<programlisting>
+$ svn copy &#45;-username marayl \
+   https://svn.sourceforge.net/svnroot/aug/trunk \
+   https://svn.sourceforge.net/svnroot/aug/branches/releng-0.5
+</programlisting>
+
+      <para>Check-out release branch.</para>
+
+<programlisting>
+$ svn checkout &#45;-username marayl \
+   https://svn.sourceforge.net/svnroot/aug/branches/releng-0.5 \
+   aug
+</programlisting>
+
+      <para>Bump version number in <filename>configure.in</filename> and
+      <filename>Doxyfile</filename>.</para>
+
+      <para>Configure using maintainer mode.</para>
+
+      <para>Build with checks.</para>
+
+      <para>Update images.</para>
+
+      <para>Tag release, e.g. rel-0.5.rc1</para>
+
+<programlisting>
+$ svn copy &#45;-username marayl \
+   https://svn.sourceforge.net/svnroot/aug/branches/releng-0.5 \
+   https://svn.sourceforge.net/svnroot/aug/tags/rel-0.5.rc1
+</programlisting>
+
+      <para>Build source distribution using the <command>make dist</command>
+      command.</para>
+
+      <para>Build binaries and documentation from source.</para>
+
+      <para>Release files to sourceforge.</para>
+
+      <para>Tag release, e.g. rel-0.5.0</para>      
+
+<programlisting>
+$ svn copy &#45;-username marayl \
+   https://svn.sourceforge.net/svnroot/aug/tags/rel-0.5.rc1 \
+   https://svn.sourceforge.net/svnroot/aug/tags/rel-0.5.0
+</programlisting>
+
+    </section>
+    <section>
+      <title>Making a Release</title>
+      <para>TODO</para>
+    </section>
+  </section>
+</article>

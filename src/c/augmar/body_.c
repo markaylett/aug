@@ -20,7 +20,7 @@ static const char rcsid[] = "$Id:$";
 static void*
 resize_(aug_seq_t seq, struct aug_info_* info, size_t bsize, int trunct)
 {
-    aug_byte_t* addr;
+    char* addr;
     if (-1 == aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_))
         return NULL;
 
@@ -41,7 +41,7 @@ AUGMAR_EXTERN int
 aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
                 size_t size)
 {
-    aug_byte_t* addr = resize_(seq, info, size, 1);
+    char* addr = resize_(seq, info, size, 1);
     if (!addr)
         return -1;
 
@@ -59,7 +59,7 @@ AUGMAR_EXTERN ssize_t
 aug_write_(aug_seq_t seq, struct aug_info_* info, size_t offset,
            const void* buf, size_t size)
 {
-    aug_byte_t* addr = resize_(seq, info, offset + size, 0);
+    char* addr = resize_(seq, info, offset + size, 0);
     if (!addr)
         return -1;
 
@@ -81,7 +81,7 @@ aug_read_(aug_seq_t seq, const struct aug_info_* info, size_t offset,
           void* buf, size_t size)
 {
     size_t bsize = info->bsize_;
-    const aug_byte_t* addr;
+    const char* addr;
 
     /* If there are no bytes to read, or the offset is either at, or passed the
        end of file. */

@@ -11,9 +11,14 @@
 # include <arpa/inet.h>
 #else /* _WIN32 */
 # include <winsock2.h>
+# include <ws2tcpip.h>
 #endif /* _WIN32 */
 
+#define AUG_INETLEN(x) (AF_INET6 == x \
+                        ? sizeof(struct sockaddr_in6) \
+                        : sizeof(struct sockaddr_in))
+
 AUGSYS_API int
-aug_inetaton(const char *cp, struct in_addr *addr);
+aug_inetpton(int af, const char* src, void* dst);
 
 #endif /* AUGSYS_INET_H */

@@ -189,3 +189,9 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 
     return 0;
 }
+
+AUGSYS_API int
+aug_setreuseaddr(int s, int on)
+{
+    return aug_setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+}

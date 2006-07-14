@@ -47,7 +47,7 @@ aug_localtime(const time_t* clock, struct tm* res)
     memcpy(res, ret, sizeof(*res));
 
 #else /* !HAVE_LOCALTIME_R && !_WIN32 */
-# error localtime_r is required for non-Windows platform
+# error "localtime_r is required on non-Windows platform"
 #endif /* !HAVE_LOCALTIME_R && !_WIN32 */
 
     return ret;

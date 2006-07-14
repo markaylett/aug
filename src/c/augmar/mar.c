@@ -72,21 +72,21 @@ init_(aug_seq_t seq, struct aug_info_* info)
         }
     } else {
 
-        aug_byte_t* ptr;
+        char* ptr;
         if (-1 == aug_setregion_(seq, 0, size))
             return -1;
 
         if (!(ptr = aug_resizeseq_(seq, AUG_LEADER_SIZE)))
             return -1;
 
-        aug_encodeverno_(ptr + AUG_VERNO_OFFSET,
-                         (aug_verno_t)(info->verno_ = VERNO));
-        aug_encodefields_(ptr + AUG_FIELDS_OFFSET,
-                          (aug_fields_t)(info->fields_ = 0));
-        aug_encodehsize_(ptr + AUG_HSIZE_OFFSET,
-                         (aug_hsize_t)(info->hsize_ = 0));
-        aug_encodebsize_(ptr + AUG_BSIZE_OFFSET,
-                         (aug_bsize_t)(info->bsize_ = 0));
+        aug_encodeverno(ptr + AUG_VERNO_OFFSET,
+                        (aug_verno_t)(info->verno_ = VERNO));
+        aug_encodefields(ptr + AUG_FIELDS_OFFSET,
+                         (aug_fields_t)(info->fields_ = 0));
+        aug_encodehsize(ptr + AUG_HSIZE_OFFSET,
+                        (aug_hsize_t)(info->hsize_ = 0));
+        aug_encodebsize(ptr + AUG_BSIZE_OFFSET,
+                        (aug_bsize_t)(info->bsize_ = 0));
     }
 
     return 0;

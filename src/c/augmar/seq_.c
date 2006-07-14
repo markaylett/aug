@@ -81,17 +81,17 @@ resizemem_(aug_seq_t seq, size_t size, size_t tail)
             return NULL;
         }
 
-        bzero((aug_byte_t*)addr + memseq->len_, size - memseq->len_);
-        memmove((aug_byte_t*)addr + (size - tail),
-                (aug_byte_t*)addr + (memseq->len_ - tail), tail);
+        bzero((char*)addr + memseq->len_, size - memseq->len_);
+        memmove((char*)addr + (size - tail),
+                (char*)addr + (memseq->len_ - tail), tail);
 
         memseq->addr_ = addr;
         memseq->len_ = size;
 
     } else if (size < memseq->len_) {
 
-        memmove((aug_byte_t*)memseq->addr_ + (size - tail),
-                (aug_byte_t*)memseq->addr_ + (memseq->len_ - tail), tail);
+        memmove((char*)memseq->addr_ + (size - tail),
+                (char*)memseq->addr_ + (memseq->len_ - tail), tail);
 
         memseq->len_ = size;
     }
@@ -122,7 +122,7 @@ static void*
 memtail_(aug_seq_t seq)
 {
     struct memseq_* memseq = (struct memseq_*)seq;
-    return (aug_byte_t*)memseq + sizeof(struct memseq_);
+    return (char*)memseq + sizeof(struct memseq_);
 }
 
 static const struct impl_ memimpl_ = {
@@ -153,8 +153,8 @@ resizemfile_(aug_seq_t seq, size_t size, size_t tail)
         if (!(addr = aug_mapmfile_(mfileseq->mfile_, size)))
             return NULL;
 
-        memmove((aug_byte_t*)addr + (size - tail),
-                (aug_byte_t*)addr + (len - tail), tail);
+        memmove((char*)addr + (size - tail),
+                (char*)addr + (len - tail), tail);
 
         return addr;
     }
@@ -162,8 +162,8 @@ resizemfile_(aug_seq_t seq, size_t size, size_t tail)
     addr = aug_mfileaddr_(mfileseq->mfile_);
     if (size < len) {
 
-        memmove((aug_byte_t*)addr + (size - tail),
-                (aug_byte_t*)addr + (len - tail), tail);
+        memmove((char*)addr + (size - tail),
+                (char*)addr + (len - tail), tail);
 
         if (-1 == aug_truncatemfile_(mfileseq->mfile_, size))
             return NULL;
@@ -196,8 +196,7 @@ static void*
 mfiletail_(aug_seq_t seq)
 {
     struct mfileseq_* mfileseq = (struct mfileseq_*)seq;
-    return (aug_byte_t*)aug_mfiletail_(mfileseq->mfile_)
-        + sizeof(struct mfileseq_);
+    return (char*)aug_mfiletail_(mfileseq->mfile_) + sizeof(struct mfileseq_);
 }
 
 static const struct impl_ mfileimpl_ = {
@@ -252,8 +251,7 @@ aug_createseq_(size_t tail)
 }
 
 AUGMAR_EXTERN aug_seq_t
-aug_openseq_(const char* path, int flags, mode_t mode,
-             size_t tail)
+aug_openseq_(const char* path, int flags, mode_t mode, size_t tail)
 {
     size_t size;
     struct mfileseq_* mfileseq;
@@ -295,7 +293,7 @@ aug_resizeseq_(aug_seq_t seq, size_t size)
         return NULL;
 
     seq->len_ = size;
-    return (aug_byte_t*)addr + seq->offset_;
+    return (char*)addr + seq->offset_;
 }
 
 AUGMAR_EXTERN int
@@ -323,8 +321,7 @@ aug_syncseq_(aug_seq_t seq)
 AUGMAR_EXTERN void*
 aug_seqaddr_(aug_seq_t seq)
 {
-    return (aug_byte_t*)(*seq->impl_->addr_)(seq)
-        + seq->offset_;
+    return (char*)(*seq->impl_->addr_)(seq) + seq->offset_;
 }
 
 AUGMAR_EXTERN size_t

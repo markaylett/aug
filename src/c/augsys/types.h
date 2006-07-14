@@ -7,12 +7,18 @@
 #include <stddef.h> /* size_t */
 #include <sys/types.h>
 
-#if defined(_WIN32)
-# if defined(_MSC_VER)
+#if !defined(_MSC_VER)
+# include <inttypes.h>
+#else /* _MSC_VER */
+
 typedef int ssize_t;
 typedef void* caddr_t;
-# endif /* _MSC_VER */
-#endif /* _WIN32 */
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned __int64 uint64_t;
+
+#endif /* _MSC_VER */
 
 typedef unsigned int aug_len_t;
 

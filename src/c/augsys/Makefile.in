@@ -42,7 +42,7 @@ DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
 check_PROGRAMS = augsys-basetest$(EXEEXT) augsys-errinfotest$(EXEEXT) \
-	augsys-sockettest$(EXEEXT)
+	augsys-mcasttest$(EXEEXT) augsys-sockettest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -61,10 +61,10 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES =
-am_libaugsys_la_OBJECTS = base.lo config.lo debug.lo defs.lo \
-	errinfo.lo errno.lo inet.lo limits.lo lock.lo log.lo mmap.lo \
-	mplexer.lo mutex.lo socket.lo string.lo time.lo types.lo \
-	uio.lo unistd.lo utility.lo windows.lo tls_.lo
+am_libaugsys_la_OBJECTS = base.lo config.lo debug.lo defs.lo endian.lo \
+	errinfo.lo errno.lo inet.lo limits.lo lock.lo log.lo mcast.lo \
+	mmap.lo mplexer.lo mutex.lo socket.lo string.lo time.lo \
+	types.lo uio.lo unistd.lo utility.lo windows.lo tls_.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_augsys_basetest_OBJECTS = basetest.$(OBJEXT)
 augsys_basetest_OBJECTS = $(am_augsys_basetest_OBJECTS)
@@ -73,6 +73,10 @@ augsys_basetest_DEPENDENCIES =  \
 am_augsys_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
 augsys_errinfotest_OBJECTS = $(am_augsys_errinfotest_OBJECTS)
 augsys_errinfotest_DEPENDENCIES =  \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+am_augsys_mcasttest_OBJECTS = mcasttest.$(OBJEXT)
+augsys_mcasttest_OBJECTS = $(am_augsys_mcasttest_OBJECTS)
+augsys_mcasttest_DEPENDENCIES =  \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 am_augsys_sockettest_OBJECTS = sockettest.$(OBJEXT)
 augsys_sockettest_OBJECTS = $(am_augsys_sockettest_OBJECTS)
@@ -89,9 +93,11 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
-	$(augsys_errinfotest_SOURCES) $(augsys_sockettest_SOURCES)
+	$(augsys_errinfotest_SOURCES) $(augsys_mcasttest_SOURCES) \
+	$(augsys_sockettest_SOURCES)
 DIST_SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
-	$(augsys_errinfotest_SOURCES) $(augsys_sockettest_SOURCES)
+	$(augsys_errinfotest_SOURCES) $(augsys_mcasttest_SOURCES) \
+	$(augsys_sockettest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -230,12 +236,14 @@ modinclude_HEADERS = \
 	config.h \
 	debug.h \
 	defs.h \
+	endian.h \
 	errinfo.h \
 	errno.h \
 	inet.h \
 	limits.h \
 	lock.h \
 	log.h \
+	mcast.h \
 	mmap.h \
 	mplexer.h \
 	mutex.h \
@@ -258,12 +266,14 @@ libaugsys_la_SOURCES = \
 	config.c \
 	debug.c \
 	defs.c \
+	endian.c \
 	errinfo.c \
 	errno.c \
 	inet.c \
 	limits.c \
 	lock.c \
 	log.c \
+	mcast.c \
 	mmap.c \
 	mplexer.c \
 	mutex.c \
@@ -285,6 +295,7 @@ libaugsys_la_LIBADD =
 TESTS = \
 	augsys-basetest \
 	augsys-errinfotest \
+	augsys-mcasttest \
 	augsys-sockettest
 
 augsys_basetest_SOURCES = basetest.c
@@ -293,6 +304,10 @@ augsys_basetest_LDADD = \
 
 augsys_errinfotest_SOURCES = errinfotest.c
 augsys_errinfotest_LDADD = \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+augsys_mcasttest_SOURCES = mcasttest.c
+augsys_mcasttest_LDADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 augsys_sockettest_SOURCES = sockettest.c
@@ -374,6 +389,9 @@ augsys-basetest$(EXEEXT): $(augsys_basetest_OBJECTS) $(augsys_basetest_DEPENDENC
 augsys-errinfotest$(EXEEXT): $(augsys_errinfotest_OBJECTS) $(augsys_errinfotest_DEPENDENCIES) 
 	@rm -f augsys-errinfotest$(EXEEXT)
 	$(LINK) $(augsys_errinfotest_LDFLAGS) $(augsys_errinfotest_OBJECTS) $(augsys_errinfotest_LDADD) $(LIBS)
+augsys-mcasttest$(EXEEXT): $(augsys_mcasttest_OBJECTS) $(augsys_mcasttest_DEPENDENCIES) 
+	@rm -f augsys-mcasttest$(EXEEXT)
+	$(LINK) $(augsys_mcasttest_LDFLAGS) $(augsys_mcasttest_OBJECTS) $(augsys_mcasttest_LDADD) $(LIBS)
 augsys-sockettest$(EXEEXT): $(augsys_sockettest_OBJECTS) $(augsys_sockettest_DEPENDENCIES) 
 	@rm -f augsys-sockettest$(EXEEXT)
 	$(LINK) $(augsys_sockettest_LDFLAGS) $(augsys_sockettest_OBJECTS) $(augsys_sockettest_LDADD) $(LIBS)
@@ -389,6 +407,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endian.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errno.Plo@am__quote@
@@ -396,6 +415,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcasttest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@

@@ -9,12 +9,14 @@ modinclude_HEADERS = \
 	config.h \
 	debug.h \
 	defs.h \
+	endian.h \
 	errinfo.h \
 	errno.h \
 	inet.h \
 	limits.h \
 	lock.h \
 	log.h \
+	mcast.h \
 	mmap.h \
 	mplexer.h \
 	mutex.h \
@@ -38,12 +40,14 @@ libaugsys_la_SOURCES = \
 	config.c \
 	debug.c \
 	defs.c \
+	endian.c \
 	errinfo.c \
 	errno.c \
 	inet.c \
 	limits.c \
 	lock.c \
 	log.c \
+	mcast.c \
 	mmap.c \
 	mplexer.c \
 	mutex.c \
@@ -66,11 +70,13 @@ libaugsys_la_LIBADD =
 check_PROGRAMS = \
 	augsys-basetest \
 	augsys-errinfotest \
+	augsys-mcasttest \
 	augsys-sockettest
 
 TESTS = \
 	augsys-basetest \
 	augsys-errinfotest \
+	augsys-mcasttest \
 	augsys-sockettest
 
 augsys_basetest_SOURCES = basetest.c
@@ -79,6 +85,10 @@ augsys_basetest_LDADD = \
 
 augsys_errinfotest_SOURCES = errinfotest.c
 augsys_errinfotest_LDADD = \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+augsys_mcasttest_SOURCES = mcasttest.c
+augsys_mcasttest_LDADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 augsys_sockettest_SOURCES = sockettest.c

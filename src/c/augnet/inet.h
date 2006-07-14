@@ -6,13 +6,19 @@
 
 #include "augnet/config.h"
 
-struct sockaddr_in;
+#include "augsys/inet.h"
+
+union aug_sockunion {
+	struct sockaddr sa_;
+	struct sockaddr_in sin_;
+	struct sockaddr_in6 sin6_;
+};
 
 AUGNET_API int
-aug_tcplisten(const struct sockaddr_in* addr);
+aug_tcplisten(const struct sockaddr* addr);
 
-AUGNET_API struct sockaddr_in*
-aug_parseinet(struct sockaddr_in* dst, const char* src);
+AUGNET_API struct sockaddr*
+aug_parseinet(union aug_sockunion* dst, const char* src);
 
 AUGNET_API int
 aug_setnodelay(int fd, int on);

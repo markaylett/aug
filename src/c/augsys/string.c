@@ -40,19 +40,16 @@ aug_strlcpy(char* dst, const char* src, size_t size)
 
 #else /* !HAVE_STRLCPY */
 
-    char ch;
-    size_t len;
+    /* Thanks to Dan Cross for this public domain implementation of
+       strlcpy(). */
 
-    for (len = 0; '\0' != (ch = src[len]); ++len)
-        if (len < size)
-            dst[len] = ch;
-
-    if (len < size)
-        dst[len] = '\0';
-    else if (0 < size)
-        dst[size - 1] = '\0';
-
-    return len;
+    size_t len, srclen;
+    srclen = strlen(src);
+    if (--size <= 0) return(srclen);
+    len = (size < srclen) ? size : srclen;
+    memmove(dst, src, len);
+    dst[len] = '\0';
+    return(srclen);
 
 #endif /* !HAVE_STRLCPY */
 }

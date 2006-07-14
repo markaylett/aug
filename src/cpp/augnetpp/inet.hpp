@@ -14,7 +14,7 @@
 namespace aug {
 
     inline smartfd
-    tcplisten(const struct sockaddr_in& addr)
+    tcplisten(const struct sockaddr& addr)
     {
         smartfd sfd(smartfd::attach(aug_tcplisten(&addr)));
         if (null == sfd)
@@ -31,12 +31,12 @@ namespace aug {
             throwerrinfo("aug_setnodelay() failed");
     }
 
-    inline struct sockaddr_in&
-    parseinet(struct sockaddr_in& dst, const char* src)
+    inline struct sockaddr&
+    parseinet(union aug_sockunion& dst, const char* src)
     {
         if (!aug_parseinet(&dst, src))
             throwerrinfo("aug_parseinet() failed");
-        return dst;
+        return dst.sa_;
     }
 }
 

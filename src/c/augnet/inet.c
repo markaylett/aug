@@ -28,18 +28,16 @@ static const char rcsid[] = "$Id:$";
 #include <string.h>        /* strchr() */
 
 AUGNET_API int
-aug_tcplisten(const struct sockaddr_in* addr)
+aug_tcplisten(const struct sockaddr* addr)
 {
-    static const int ON = 1;
-
-    int fd = aug_socket(AF_INET, SOCK_STREAM, 0);
+    int fd = aug_socket(addr->sa_family, SOCK_STREAM, 0);
     if (-1 == fd)
         return -1;
 
-    if (-1 == aug_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &ON, sizeof(ON)))
+    if (-1 == aug_setreuseaddr(fd, 1))
         goto fail;
 
-    if (-1 == aug_bind(fd, (const struct sockaddr*)addr, sizeof(*addr)))
+    if (-1 == aug_bind(fd, addr, AUG_INETLEN(addr->sa_family)))
         goto fail;
 
     if (-1 == aug_listen(fd, SOMAXCONN))
@@ -52,65 +50,65 @@ aug_tcplisten(const struct sockaddr_in* addr)
     return -1;
 }
 
-AUGNET_API struct sockaddr_in*
-aug_parseinet(struct sockaddr_in* dst, const char* src)
+AUGNET_API struct sockaddr*
+aug_parseinet(union aug_sockunion* dst, const char* src)
 {
-	size_t len;
+    size_t len;
     unsigned short nport;
-	char* host;
+    char* host;
 
-	/* Locate host and port separator. */
+    /* Locate host and port separator. */
 
-	const char* port = strchr(src, ':');
-	if (NULL == port)
-		goto fail;
+    const char* port = strchr(src, ':');
+    if (NULL == port)
+        goto fail;
 
-	/* Calculate length of host part. */
+    /* Calculate length of host part. */
 
-	len = port - src;
+    len = port - src;
 
-	/* Ensure host and port parts exists. */
+    /* Ensure host and port parts exists. */
 
-	if (1 > len || '\0' == *++port)
-		goto fail;
+    if (1 > len || '\0' == *++port)
+        goto fail;
 
     /* Parse port value. */
 
     if (-1 == aug_strtous(&nport, port, 10))
         goto fail;
 
-	/* Create null-terminated host string. */
+    /* Create null-terminated host string. */
 
-	host = alloca(len + 1);
-	memcpy(host, src, len);
-	host[len] = '\0';
+    host = alloca(len + 1);
+    memcpy(host, src, len);
+    host[len] = '\0';
 
-	/* Try to resolve dotted addresss notation first. */
+    /* Try to resolve dotted addresss notation first. */
 
-	if (!aug_inetaton(host, &dst->sin_addr)) {
+    if (!aug_inetpton(AF_INET, host, &dst->sin_.sin_addr)) {
 
-		/* Attempt to resolve host using DNS. */
+        /* Attempt to resolve host using DNS. */
 
-		struct hostent* answ = gethostbyname(host);
-		if (!answ || !answ->h_addr_list[0]) {
+        struct hostent* answ = gethostbyname(host);
+        if (!answ || !answ->h_addr_list[0]) {
 
             aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
                            AUG_MSG("failed to resolve address '%s'"), src);
             return NULL;
         }
 
-		memcpy(&dst->sin_addr, answ->h_addr_list[0],
-               sizeof(dst->sin_addr));
-	}
+        memcpy(&dst->sin_.sin_addr, answ->h_addr_list[0],
+               sizeof(dst->sin_.sin_addr));
+    }
 
-	dst->sin_family = AF_INET;
-	dst->sin_port = htons(nport);
-	return dst;
+    dst->sin_.sin_family = AF_INET;
+    dst->sin_.sin_port = htons(nport);
+    return &dst->sa_;
 
  fail:
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                    AUG_MSG("invalid address '%s'"), src);
-	return NULL;
+    return NULL;
 }
 
 AUGNET_API int

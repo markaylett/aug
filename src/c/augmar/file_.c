@@ -53,7 +53,7 @@ aug_extendfile_(int fd, size_t size)
        Bug: On Windows 95/98 the gap is filled with garbage instead of
        zeros. */
 
-    static const aug_byte_t ZERO = 0;
+    static const char ZERO = 0;
 
     off_t cur;
 
