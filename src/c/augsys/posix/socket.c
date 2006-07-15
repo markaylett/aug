@@ -189,24 +189,3 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 
     return 0;
 }
-
-AUGSYS_API int
-aug_setreuseaddr(int s, int on)
-{
-    return aug_setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
-}
-
-AUGSYS_API int
-aug_getsockaf(int s)
-{
-    union {
-        struct sockaddr sa;
-        char data[AUG_MAXSOCKADDR];
-    } u;
-
-    socklen_t len = AUG_MAXSOCKADDR;
-    if (-1 == getsockname(s, &u.sa, &len))
-        return -1;
-
-    return u.sa.sa_family;
-}

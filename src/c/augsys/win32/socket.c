@@ -459,9 +459,3 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 	aug_setwin32errinfo(__FILE__, __LINE__, WSAESOCKTNOSUPPORT);
 	return -1;
 }
-
-AUGSYS_API int
-aug_setreuseaddr(int s, int on)
-{
-    return aug_setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
-}
