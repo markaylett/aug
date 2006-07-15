@@ -320,7 +320,7 @@ readevent_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 static int
 init_(const struct aug_var* arg)
 {
-    struct sockaddr_in addr;
+    union aug_sockunion addr;
     struct aug_var ptr;
 
     aug_info("initialising daemon process");
@@ -331,7 +331,7 @@ init_(const struct aug_var* arg)
     if (!aug_parseinet(&addr, address_))
         goto fail1;
 
-    if (-1 == (fd_ = aug_tcplisten(&addr)))
+    if (-1 == (fd_ = aug_tcplisten(&addr.sa_)))
         goto fail1;
 
     if (-1 == aug_insertconn(&conns_, fd_, listener_,

@@ -201,7 +201,7 @@ namespace test {
         state(poll_base& poll)
             : sfd_(null)
         {
-            struct sockaddr_in addr;
+            union aug_sockunion addr;
             smartfd sfd(tcplisten(parseinet(addr, address_)));
 
             insertconn(conns_, aug_eventin(), poll);

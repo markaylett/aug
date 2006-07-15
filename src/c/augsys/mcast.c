@@ -6,7 +6,9 @@
 
 static const char rcsid[] = "$Id:$";
 
-#if defined(_WIN32)
+#if !defined(_WIN32)
+# include <netinet/in.h>
+#else /* _WIN32 */
 # include <ws2tcpip.h>
 #endif /* _WIN32 */
 
