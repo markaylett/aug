@@ -19,6 +19,8 @@
 typedef int socklen_t;
 #endif /* _WIN32 */
 
+#define AUG_MAXSOCKADDR 128
+
 AUGSYS_API int
 aug_socket(int domain, int type, int protocol);
 
@@ -74,5 +76,8 @@ aug_socketpair(int domain, int type, int protocol, int sv[2]);
 
 AUGSYS_API int
 aug_setreuseaddr(int s, int on);
+
+AUGSYS_API int
+aug_getsockaf(int s);
 
 #endif /* AUGSYS_SOCKET_H */
