@@ -10,7 +10,6 @@
 #include "augsys/endian.h"
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
-#include "augsys/inet.h"
 #include "augsys/limits.h"
 #include "augsys/lock.h"
 #include "augsys/log.h"

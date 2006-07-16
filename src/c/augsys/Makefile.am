@@ -12,7 +12,6 @@ modinclude_HEADERS = \
 	endian.h \
 	errinfo.h \
 	errno.h \
-	inet.h \
 	limits.h \
 	lock.h \
 	log.h \
@@ -43,7 +42,6 @@ libaugsys_la_SOURCES = \
 	endian.c \
 	errinfo.c \
 	errno.c \
-	inet.c \
 	limits.c \
 	lock.c \
 	log.c \

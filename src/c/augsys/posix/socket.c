@@ -189,3 +189,40 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 
     return 0;
 }
+
+AUGSYS_API const char*
+aug_inetntop(int af, const char* src, char* dst, socklen_t size)
+{
+    const char* ret = inet_ntop(af, src, dst, size);
+    if (!ret)
+      aug_setposixerrinfo(__FILE__, __LINE__, errno);
+    return ret;
+}
+
+AUGSYS_API int
+aug_inetpton(int af, const char* src, void* dst)
+{
+    int ret = inet_pton(af, src, dst);
+    if (-1 == ret)
+      aug_setposixerrinfo(__FILE__, __LINE__, errno);
+    return ret;
+}
+
+AUGSYS_API void
+aug_freeaddrinfo(struct addrinfo* res)
+{
+    freeaddrinfo(res);
+}
+
+AUGSYS_API int
+aug_getaddrinfo(const char* host, const char* serv,
+                const struct addrinfo* hints, struct addrinfo** res)
+{
+    int ret = getaddrinfo(host, serv, hints, res);
+    if (0 != ret) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCPOSIX, ret,
+                       gai_strerror(ret));
+        return -1;
+    }
+    return 0;
+}

@@ -125,9 +125,6 @@
 				RelativePath="..\src\c\augsys\errno.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augsys\inet.c">
-			</File>
-			<File
 				RelativePath="..\src\c\augsys\limits.c">
 			</File>
 			<File
@@ -200,9 +197,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\errno.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augsys\inet.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\limits.h">

@@ -9,8 +9,14 @@
 
 #if !defined(_WIN32)
 # include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
 #else /* _WIN32 */
 # include <winsock2.h>
+# include <ws2tcpip.h>
+# if !defined(bzero)
+#  define bzero ZeroMemory
+# endif /* !bzero */
 # if !defined(SHUT_RD)
 #  define SHUT_RD SD_RECV
 #  define SHUT_WR SD_SEND
@@ -18,6 +24,10 @@
 # endif /* !SHUT_RD */
 typedef int socklen_t;
 #endif /* _WIN32 */
+
+#define AUG_INETLEN(x) (AF_INET6 == x \
+                        ? sizeof(struct sockaddr_in6) \
+                        : sizeof(struct sockaddr_in))
 
 #define AUG_MAXSOCKADDR 128
 
@@ -73,6 +83,23 @@ aug_shutdown(int s, int how);
 
 AUGSYS_API int
 aug_socketpair(int domain, int type, int protocol, int sv[2]);
+
+#define AUG_INETLEN(x) (AF_INET6 == x \
+                        ? sizeof(struct sockaddr_in6) \
+                        : sizeof(struct sockaddr_in))
+
+AUGSYS_API const char*
+aug_inetntop(int af, const char* src, char* dst, socklen_t size);
+
+AUGSYS_API int
+aug_inetpton(int af, const char* src, void* dst);
+
+AUGSYS_API void
+aug_freeaddrinfo(struct addrinfo* res);
+
+AUGSYS_API int
+aug_getaddrinfo(const char* host, const char* serv,
+                const struct addrinfo* hints, struct addrinfo** res);
 
 AUGSYS_API int
 aug_setreuseaddr(int s, int on);

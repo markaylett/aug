@@ -17,7 +17,7 @@ struct aug_var {
     union {
         long long_;
         void* ptr_;
-    } u_;
+    } un_;
 };
 
 #define AUG_VARNULL { AUG_VTNULL }

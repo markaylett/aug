@@ -6,19 +6,37 @@
 
 #include "augnet/config.h"
 
-#include "augsys/inet.h"
+#include "augsys/socket.h"
 
-union aug_sockunion {
-	struct sockaddr sa_;
-	struct sockaddr_in sin_;
-	struct sockaddr_in6 sin6_;
+struct aug_sockaddr {
+    socklen_t addrlen_;
+    union {
+        struct sockaddr sa_;
+        struct sockaddr_in sin_;
+        struct sockaddr_in6 sin6_;
+        char data_[AUG_MAXSOCKADDR];
+    } un_;
 };
 
+/* Implementations of the original, classic functions by Richard Stevens. */
+
 AUGNET_API int
-aug_tcplisten(const struct sockaddr* addr);
+aug_tcpconnect(const char* host, const char* serv, struct aug_sockaddr* addr);
+
+AUGNET_API int
+aug_tcplisten(const char* host, const char* serv, struct aug_sockaddr* addr);
+
+AUGNET_API int
+aug_udpclient(const char* host, const char* serv, struct aug_sockaddr* addr);
+
+AUGNET_API int
+aug_udpconnect(const char* host, const char* serv, struct aug_sockaddr* addr);
+
+AUGNET_API int
+aug_udpserver(const char* host, const char* serv, struct aug_sockaddr* addr);
 
 AUGNET_API struct sockaddr*
-aug_parseinet(union aug_sockunion* dst, const char* src);
+aug_parseinet(struct aug_sockaddr* dst, const char* src);
 
 AUGNET_API int
 aug_setnodelay(int fd, int on);

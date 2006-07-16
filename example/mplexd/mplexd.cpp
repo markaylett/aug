@@ -201,8 +201,8 @@ namespace test {
         state(poll_base& poll)
             : sfd_(null)
         {
-            union aug_sockunion addr;
-            smartfd sfd(tcplisten(parseinet(addr, address_)));
+            struct aug_sockaddr addr;
+            smartfd sfd(tcplisten("127.0.0.1", "8080", addr));
 
             insertconn(conns_, aug_eventin(), poll);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);

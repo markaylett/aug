@@ -62,9 +62,9 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES =
 am_libaugsys_la_OBJECTS = base.lo config.lo debug.lo defs.lo endian.lo \
-	errinfo.lo errno.lo inet.lo limits.lo lock.lo log.lo mcast.lo \
-	mmap.lo mplexer.lo mutex.lo socket.lo string.lo time.lo \
-	types.lo uio.lo unistd.lo utility.lo windows.lo tls_.lo
+	errinfo.lo errno.lo limits.lo lock.lo log.lo mcast.lo mmap.lo \
+	mplexer.lo mutex.lo socket.lo string.lo time.lo types.lo \
+	uio.lo unistd.lo utility.lo windows.lo tls_.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_augsys_basetest_OBJECTS = basetest.$(OBJEXT)
 augsys_basetest_OBJECTS = $(am_augsys_basetest_OBJECTS)
@@ -239,7 +239,6 @@ modinclude_HEADERS = \
 	endian.h \
 	errinfo.h \
 	errno.h \
-	inet.h \
 	limits.h \
 	lock.h \
 	log.h \
@@ -269,7 +268,6 @@ libaugsys_la_SOURCES = \
 	endian.c \
 	errinfo.c \
 	errno.c \
-	inet.c \
 	limits.c \
 	lock.c \
 	log.c \
@@ -411,7 +409,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errno.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@

@@ -12,7 +12,6 @@ static const char rcsid[] = "$Id:$";
 #include "augutil/conv.h"
 
 #include "augsys/errinfo.h"
-#include "augsys/inet.h"   /* aug_inetaton() */
 #include "augsys/socket.h"
 #include "augsys/unistd.h" /* aug_close() */
 
@@ -28,30 +27,222 @@ static const char rcsid[] = "$Id:$";
 #include <string.h>        /* strchr() */
 
 AUGNET_API int
-aug_tcplisten(const struct sockaddr* addr)
+aug_tcpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
 {
-    int fd = aug_socket(addr->sa_family, SOCK_STREAM, 0);
-    if (-1 == fd)
+    int fd;
+    struct addrinfo hints, * res, * save;
+
+    bzero(&hints, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
         return -1;
 
-    if (-1 == aug_setreuseaddr(fd, 1))
+    save = res;
+
+    do {
+        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (-1 == fd)
+            continue; /* Ignore this one. */
+
+        if (0 == aug_connect(fd, res->ai_addr, res->ai_addrlen))
+            break; /* Success. */
+
+        if (-1 == aug_close(fd)) /* Ignore this one. */
+            goto fail;
+
+    } while ((res = res->ai_next));
+
+    if (!res) /* errno set from final aug_connect(). */
         goto fail;
 
-    if (-1 == aug_bind(fd, addr, AUG_INETLEN(addr->sa_family)))
-        goto fail;
+    addr->addrlen_ = res->ai_addrlen;
+    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
 
-    if (-1 == aug_listen(fd, SOMAXCONN))
-        goto fail;
-
+    aug_freeaddrinfo(save);
     return fd;
 
  fail:
+    aug_freeaddrinfo(save);
+    return -1;
+}
+
+AUGNET_API int
+aug_tcplisten(const char* host, const char* serv, struct aug_sockaddr* addr)
+{
+    int fd;
+    struct addrinfo hints, * res, * save;
+
+    bzero(&hints, sizeof(hints));
+    hints.ai_flags = AI_PASSIVE;
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
+        return -1;
+
+    save = res;
+
+    do {
+        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (-1 == fd)
+            continue; /* Error, try next one. */
+
+        if (-1 == aug_setreuseaddr(fd, 1))
+            goto fail2;
+
+        if (0 == aug_bind(fd, res->ai_addr, res->ai_addrlen))
+            break; /* Success. */
+
+        if (-1 == aug_close(fd)) /* Bind error, close and try next one. */
+            goto fail1;
+
+    } while ((res = res->ai_next));
+
+    if (!res) /* errno from final aug_socket() or aug_bind(). */
+        goto fail1;
+
+    if (-1 == aug_listen(fd, SOMAXCONN))
+        goto fail2;
+
+    addr->addrlen_ = res->ai_addrlen;
+    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
+
+    aug_freeaddrinfo(save);
+    return fd;
+
+ fail2:
     aug_close(fd);
+
+ fail1:
+    aug_freeaddrinfo(save);
+    return -1;
+}
+
+AUGNET_API int
+aug_udpclient(const char* host, const char* serv, struct aug_sockaddr* addr)
+{
+    int fd;
+    struct addrinfo hints, * res, * save;
+
+    bzero(&hints, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
+        return -1;
+
+    save = res;
+
+    do {
+        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (-1 != fd)
+            break; /* Success. */
+
+    } while ((res = res->ai_next));
+
+    if (!res) /* errno set from final aug_socket(). */
+        goto fail;
+
+    addr->addrlen_ = res->ai_addrlen;
+    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
+
+    aug_freeaddrinfo(save);
+    return fd;
+
+ fail:
+    aug_freeaddrinfo(save);
+    return -1;
+}
+
+AUGNET_API int
+aug_udpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
+{
+    int fd;
+    struct addrinfo hints, * res, * save;
+
+    bzero(&hints, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
+        return -1;
+
+    save = res;
+
+    do {
+        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (-1 == fd)
+            continue; /* Ignore this one. */
+
+        if (0 == aug_connect(fd, res->ai_addr, res->ai_addrlen))
+            break; /* Success. */
+
+        if (-1 == aug_close(fd)) /* Ignore this one. */
+            goto fail;
+
+    } while ((res = res->ai_next));
+
+    if (!res) /* errno set from final aug_connect() */
+        return -1;
+
+    addr->addrlen_ = res->ai_addrlen;
+    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
+
+    aug_freeaddrinfo(save);
+    return fd;
+
+ fail:
+    aug_freeaddrinfo(save);
+    return -1;
+}
+
+AUGNET_API int
+aug_udpserver(const char* host, const char* serv, struct aug_sockaddr* addr)
+{
+    int fd;
+    struct addrinfo hints, * res, * save;
+
+    bzero(&hints, sizeof(hints));
+    hints.ai_flags = AI_PASSIVE;
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
+        return -1;
+
+    save = res;
+
+    do {
+        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (-1 == fd)
+            continue; /* Error, try next one. */
+
+        if (0 == aug_bind(fd, res->ai_addr, res->ai_addrlen))
+            break; /* Success. */
+
+        if (-1 == aug_close(fd)) /* bind error, close and try next one */
+            goto fail;
+
+    } while ((res = res->ai_next));
+
+    if (!res) /* errno from final aug_socket() or aug_bind(). */
+        return -1;
+
+    addr->addrlen_ = res->ai_addrlen;
+    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
+
+    aug_freeaddrinfo(save);
+    return fd;
+
+ fail:
+    aug_freeaddrinfo(save);
     return -1;
 }
 
 AUGNET_API struct sockaddr*
-aug_parseinet(union aug_sockunion* dst, const char* src)
+aug_parseinet(struct aug_sockaddr* dst, const char* src)
 {
     size_t len;
     unsigned short nport;
@@ -85,7 +276,7 @@ aug_parseinet(union aug_sockunion* dst, const char* src)
 
     /* Try to resolve dotted addresss notation first. */
 
-    if (!aug_inetpton(AF_INET, host, &dst->sin_.sin_addr)) {
+    if (!aug_inetpton(AF_INET, host, &dst->un_.sin_.sin_addr)) {
 
         /* Attempt to resolve host using DNS. */
 
@@ -97,13 +288,14 @@ aug_parseinet(union aug_sockunion* dst, const char* src)
             return NULL;
         }
 
-        memcpy(&dst->sin_.sin_addr, answ->h_addr_list[0],
-               sizeof(dst->sin_.sin_addr));
+        dst->addrlen_ = sizeof(dst->un_.sin_.sin_addr);
+        memcpy(&dst->un_.sin_.sin_addr, answ->h_addr_list[0],
+               sizeof(dst->un_.sin_.sin_addr));
     }
 
-    dst->sin_.sin_family = AF_INET;
-    dst->sin_.sin_port = htons(nport);
-    return &dst->sa_;
+    dst->un_.sin_.sin_family = AF_INET;
+    dst->un_.sin_.sin_port = htons(nport);
+    return &dst->un_.sa_;
 
  fail:
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,

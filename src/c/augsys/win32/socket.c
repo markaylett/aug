@@ -8,6 +8,13 @@
 #include <io.h>
 #include <malloc.h> /* _alloca() */
 
+void WSAAPI
+freeaddrinfo(struct addrinfo*);
+
+int WSAAPI
+getaddrinfo(const char*, const char*, const struct addrinfo*,
+            struct addrinfo**);
+
 static void
 setbadfd_(const char* file, int line)
 {
@@ -458,4 +465,94 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 
 	aug_setwin32errinfo(__FILE__, __LINE__, WSAESOCKTNOSUPPORT);
 	return -1;
+}
+
+AUGSYS_API const char*
+aug_inetntop(int af, const char* src, char* dst, socklen_t size)
+{
+    union {
+        struct sockaddr sa_;
+        struct sockaddr_in sin_;
+        struct sockaddr_in6 sin6_;
+    } un;
+    DWORD dstlen = size;
+    DWORD srclen;
+    bzero(&un, sizeof(un));
+
+    switch (af) {
+    case AF_INET:
+		srclen = sizeof(un.sin_);
+        un.sa_.sa_family = AF_INET;
+        memcpy(&un.sin_.sin_addr, src, srclen);
+        break;
+    case AF_INET6:
+		srclen = sizeof(un.sin6_);
+        un.sa_.sa_family = AF_INET6;
+        memcpy(&un.sin6_.sin6_addr, src, srclen);
+        break;
+    default:
+        aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
+        return NULL;
+    }
+
+    if (SOCKET_ERROR == WSAAddressToString(&un.sa_, srclen, NULL, dst,
+                                           &dstlen)) {
+        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        return NULL;
+    }
+
+    return dst;
+}
+
+AUGSYS_API int
+aug_inetpton(int af, const char* src, void* dst)
+{
+    union {
+        struct sockaddr sa_;
+        struct sockaddr_in sin_;
+        struct sockaddr_in6 sin6_;
+    } un;
+    INT len;
+    bzero(&un, sizeof(un));
+
+    switch (af) {
+    case AF_INET:
+		len = sizeof(un.sin_);
+        un.sa_.sa_family = AF_INET;
+        break;
+    case AF_INET6:
+		len = sizeof(un.sin6_);
+        un.sa_.sa_family = AF_INET6;
+        break;
+    default:
+        aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
+        return -1;
+    }
+
+    if (SOCKET_ERROR == WSAStringToAddress((LPTSTR)src, af, NULL, &un.sa_,
+                                           &len)) {
+        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        return -1;
+    }
+
+    memcpy(dst, &un.sa_, len);
+    return 0;
+}
+
+AUGSYS_API void
+aug_freeaddrinfo(struct addrinfo* res)
+{
+    freeaddrinfo(res);
+}
+
+AUGSYS_API int
+aug_getaddrinfo(const char* host, const char* serv,
+                const struct addrinfo* hints, struct addrinfo** res)
+{
+    int ret = getaddrinfo(host, serv, hints, res);
+    if (0 != ret) {
+        aug_setwin32errinfo(__FILE__, __LINE__, ret);
+        return -1;
+    }
+    return 0;
 }

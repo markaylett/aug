@@ -11,7 +11,9 @@
 #  define WIN32_LEAN_AND_MEAN
 # endif /* !WIN32_LEAN_AND_MEAN */
 # include <windows.h>
-# define bzero ZeroMemory
+# if !defined(bzero)
+#  define bzero ZeroMemory
+# endif /* !bzero */
 #endif /* _WIN32 */
 
 #endif /* AUGSYS_WINDOWS_H */
