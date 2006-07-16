@@ -18,6 +18,11 @@ struct aug_sockaddr {
     } un_;
 };
 
+struct aug_sockaddrp {
+    char* host_, * serv_;
+    char data_[AUG_MAXSOCKADDR];
+};
+
 /* Implementations of the original, classic functions by Richard Stevens. */
 
 AUGNET_API int
@@ -35,8 +40,8 @@ aug_udpconnect(const char* host, const char* serv, struct aug_sockaddr* addr);
 AUGNET_API int
 aug_udpserver(const char* host, const char* serv, struct aug_sockaddr* addr);
 
-AUGNET_API struct sockaddr*
-aug_parseinet(struct aug_sockaddr* dst, const char* src);
+AUGNET_API struct aug_sockaddrp*
+aug_parseinet(struct aug_sockaddrp* addr, const char* src);
 
 AUGNET_API int
 aug_setnodelay(int fd, int on);

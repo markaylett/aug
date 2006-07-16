@@ -9,16 +9,13 @@
 
 static const char rcsid[] = "$Id:$";
 
-#include "augutil/conv.h"
-
 #include "augsys/errinfo.h"
 #include "augsys/socket.h"
+#include "augsys/string.h" /* aug_strlcpy() */
 #include "augsys/unistd.h" /* aug_close() */
 
 #if !defined(_WIN32)
 # include <alloca.h>
-# include <netdb.h>        /* gethostbyname() */
-# include <netinet/in.h>
 # include <netinet/tcp.h>
 #else /* _WIN32 */
 # include <malloc.h>
@@ -241,66 +238,60 @@ aug_udpserver(const char* host, const char* serv, struct aug_sockaddr* addr)
     return -1;
 }
 
-AUGNET_API struct sockaddr*
-aug_parseinet(struct aug_sockaddr* dst, const char* src)
+AUGNET_API struct aug_sockaddrp*
+aug_parseinet(struct aug_sockaddrp* addr, const char* src)
 {
     size_t len;
-    unsigned short nport;
-    char* host;
+    char* serv;
 
-    /* Locate host and port separator. */
+    aug_strlcpy(addr->data_, src, sizeof(addr->data_));
 
-    const char* port = strchr(src, ':');
-    if (NULL == port)
-        goto fail;
+    /* Locate host and serv separator. */
+
+    if (!(serv = strrchr(addr->data_, ':'))) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                       AUG_MSG("missing separator '%s'"), src);
+        return NULL;
+    }
 
     /* Calculate length of host part. */
 
-    len = port - src;
+    len = serv - addr->data_;
 
-    /* Ensure host and port parts exists. */
+    /* Ensure host and serv parts exists. */
 
-    if (1 > len || '\0' == *++port)
-        goto fail;
+    if (!len) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                       AUG_MSG("missing host part '%s'"), src);
+        return NULL;
+    }
 
-    /* Parse port value. */
+    if ('\0' == *++serv) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                       AUG_MSG("missing service part '%s'"), src);
+        return NULL;
+    }
 
-    if (-1 == aug_strtous(&nport, port, 10))
-        goto fail;
+    /* The host part of an ipv6 address may be contained within square
+       brackets. */
 
-    /* Create null-terminated host string. */
+    if ('[' == addr->data_[0]) {
 
-    host = alloca(len + 1);
-    memcpy(host, src, len);
-    host[len] = '\0';
-
-    /* Try to resolve dotted addresss notation first. */
-
-    if (!aug_inetpton(AF_INET, host, &dst->un_.sin_.sin_addr)) {
-
-        /* Attempt to resolve host using DNS. */
-
-        struct hostent* answ = gethostbyname(host);
-        if (!answ || !answ->h_addr_list[0]) {
-
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
-                           AUG_MSG("failed to resolve address '%s'"), src);
+        if (']' != addr->data_[len - 1]) {
+            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                           AUG_MSG("unmatched brackets '%s'"), src);
             return NULL;
         }
 
-        dst->addrlen_ = sizeof(dst->un_.sin_.sin_addr);
-        memcpy(&dst->un_.sin_.sin_addr, answ->h_addr_list[0],
-               sizeof(dst->un_.sin_.sin_addr));
+        len -= 2;
+        addr->host_ = addr->data_ + 1;
     }
+    else
+        addr->host_ = addr->data_;
 
-    dst->un_.sin_.sin_family = AF_INET;
-    dst->un_.sin_.sin_port = htons(nport);
-    return &dst->un_.sa_;
-
- fail:
-    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
-                   AUG_MSG("invalid address '%s'"), src);
-    return NULL;
+    addr->host_[len] = '\0';
+    addr->serv_ = serv;
+    return addr;
 }
 
 AUGNET_API int

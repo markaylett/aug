@@ -71,12 +71,12 @@ namespace aug {
             throwerrinfo("aug_setnodelay() failed");
     }
 
-    inline struct sockaddr&
-    parseinet(struct aug_sockaddr& dst, const char* src)
+    inline struct aug_sockaddrp&
+    parseinet(struct aug_sockaddrp& dst, const char* src)
     {
         if (!aug_parseinet(&dst, src))
             throwerrinfo("aug_parseinet() failed");
-        return dst.un_.sa_;
+        return dst;
     }
 }
 
