@@ -13,7 +13,7 @@
 
 namespace aug {
 
-    class AUGMARPP_API header {
+    class header {
     public:
         typedef aug::const_iterator const_iterator;
         typedef aug::const_reverse_iterator const_reverse_iterator;

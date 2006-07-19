@@ -14,9 +14,9 @@
 namespace aug {
 
     inline smartfd
-    tcpconnect(const char* host, const char* serv, struct aug_sockaddr& addr)
+    tcpconnect(const char* host, const char* serv, struct aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_tcpconnect(host, serv, &addr)));
+        smartfd sfd(smartfd::attach(aug_tcpconnect(host, serv, &ep)));
         if (null == sfd)
             throwerrinfo("aug_tcpconnect() failed");
 
@@ -24,9 +24,9 @@ namespace aug {
     }
 
     inline smartfd
-    tcplisten(const char* host, const char* serv, struct aug_sockaddr& addr)
+    tcplisten(const char* host, const char* serv, struct aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_tcplisten(host, serv, &addr)));
+        smartfd sfd(smartfd::attach(aug_tcplisten(host, serv, &ep)));
         if (null == sfd)
             throwerrinfo("aug_tcplisten() failed");
 
@@ -34,9 +34,9 @@ namespace aug {
     }
 
     inline smartfd
-    udpclient(const char* host, const char* serv, struct aug_sockaddr& addr)
+    udpclient(const char* host, const char* serv, struct aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_udpclient(host, serv, &addr)));
+        smartfd sfd(smartfd::attach(aug_udpclient(host, serv, &ep)));
         if (null == sfd)
             throwerrinfo("aug_udpclient() failed");
 
@@ -44,9 +44,9 @@ namespace aug {
     }
 
     inline smartfd
-    udpconnect(const char* host, const char* serv, struct aug_sockaddr& addr)
+    udpconnect(const char* host, const char* serv, struct aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_udpconnect(host, serv, &addr)));
+        smartfd sfd(smartfd::attach(aug_udpconnect(host, serv, &ep)));
         if (null == sfd)
             throwerrinfo("aug_udpconnect() failed");
 
@@ -54,9 +54,9 @@ namespace aug {
     }
 
     inline smartfd
-    udpserver(const char* host, const char* serv, struct aug_sockaddr& addr)
+    udpserver(const char* host, const char* serv, struct aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_udpserver(host, serv, &addr)));
+        smartfd sfd(smartfd::attach(aug_udpserver(host, serv, &ep)));
         if (null == sfd)
             throwerrinfo("aug_udpserver() failed");
 
@@ -71,8 +71,8 @@ namespace aug {
             throwerrinfo("aug_setnodelay() failed");
     }
 
-    inline struct aug_sockaddrp&
-    parseinet(struct aug_sockaddrp& dst, const char* src)
+    inline struct aug_endpointp&
+    parseinet(struct aug_endpointp& dst, const char* src)
     {
         if (!aug_parseinet(&dst, src))
             throwerrinfo("aug_parseinet() failed");

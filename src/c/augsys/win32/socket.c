@@ -8,13 +8,6 @@
 #include <io.h>
 #include <malloc.h> /* _alloca() */
 
-void WSAAPI
-freeaddrinfo(struct addrinfo*);
-
-int WSAAPI
-getaddrinfo(const char*, const char*, const struct addrinfo*,
-            struct addrinfo**);
-
 static void
 setbadfd_(const char* file, int line)
 {
@@ -303,9 +296,11 @@ aug_socket(int domain, int type, int protocol)
 }
 
 AUGSYS_API int
-aug_accept(int s, struct sockaddr* addr, socklen_t* addrlen)
+aug_accept(int s, struct aug_endpoint* ep)
 {
-    SOCKET h = accept(_get_osfhandle(s), addr, addrlen);
+    SOCKET h;
+    ep->len_ = AUG_MAXADDRLEN;
+    h = accept(_get_osfhandle(s), &ep->un_.sa_, &ep->len_);
     if (INVALID_SOCKET == h) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return -1;
@@ -315,9 +310,9 @@ aug_accept(int s, struct sockaddr* addr, socklen_t* addrlen)
 }
 
 AUGSYS_API int
-aug_bind(int s, const struct sockaddr* addr, socklen_t addrlen)
+aug_bind(int s, const struct aug_endpoint* ep)
 {
-    if (SOCKET_ERROR == bind(_get_osfhandle(s), addr, addrlen)) {
+    if (SOCKET_ERROR == bind(_get_osfhandle(s), &ep->un_.sa_, ep->len_)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
@@ -326,9 +321,9 @@ aug_bind(int s, const struct sockaddr* addr, socklen_t addrlen)
 }
 
 AUGSYS_API int
-aug_connect(int s, const struct sockaddr* addr, socklen_t addrlen)
+aug_connect(int s, const struct aug_endpoint* ep)
 {
-    if (SOCKET_ERROR == connect(_get_osfhandle(s), addr, addrlen)) {
+    if (SOCKET_ERROR == connect(_get_osfhandle(s), &ep->un_.sa_, ep->len_)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
@@ -337,9 +332,11 @@ aug_connect(int s, const struct sockaddr* addr, socklen_t addrlen)
 }
 
 AUGSYS_API int
-aug_getpeername(int s, struct sockaddr* addr, socklen_t* addrlen)
+aug_getpeername(int s, struct aug_endpoint* ep)
 {
-    if (SOCKET_ERROR == getpeername(_get_osfhandle(s), addr, addrlen)) {
+    ep->len_ = AUG_MAXADDRLEN;
+    if (SOCKET_ERROR == getpeername(_get_osfhandle(s), &ep->un_.sa_,
+                                    &ep->len_)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
@@ -348,9 +345,11 @@ aug_getpeername(int s, struct sockaddr* addr, socklen_t* addrlen)
 }
 
 AUGSYS_API int
-aug_getsockname(int s, struct sockaddr* addr, socklen_t* addrlen)
+aug_getsockname(int s, struct aug_endpoint* ep)
 {
-    if (SOCKET_ERROR == getsockname(_get_osfhandle(s), addr, addrlen)) {
+    ep->len_ = AUG_MAXADDRLEN;
+    if (SOCKET_ERROR == getsockname(_get_osfhandle(s), &ep->un_.sa_,
+                                    &ep->len_)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
@@ -380,11 +379,12 @@ aug_recv(int s, void* buf, size_t len, int flags)
 }
 
 AUGSYS_API ssize_t
-aug_recvfrom(int s, void* buf, size_t len, int flags, struct sockaddr* from,
-             socklen_t* fromlen)
+aug_recvfrom(int s, void* buf, size_t len, int flags, struct aug_endpoint* ep)
 {
-    ssize_t ret = recvfrom(_get_osfhandle(s), buf, (int)len, flags, from,
-                           fromlen);
+    ssize_t ret;
+    ep->len_ = AUG_MAXADDRLEN;
+    ret = recvfrom(_get_osfhandle(s), buf, (int)len, flags, &ep->un_.sa_,
+                   &ep->len_);
     if (SOCKET_ERROR == ret)
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
 
@@ -403,9 +403,10 @@ aug_send(int s, const void* buf, size_t len, int flags)
 
 AUGSYS_API ssize_t
 aug_sendto(int s, const void* buf, size_t len, int flags,
-           const struct sockaddr* to, socklen_t tolen)
+           const struct aug_endpoint* ep)
 {
-    ssize_t ret = sendto(_get_osfhandle(s), buf, (int)len, flags, to, tolen);
+    ssize_t ret = sendto(_get_osfhandle(s), buf, (int)len, flags,
+                         &ep->un_.sa_, ep->len_);
     if (SOCKET_ERROR == ret)
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
 
@@ -467,19 +468,19 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 	return -1;
 }
 
-AUGSYS_API const char*
-aug_inetntop(int af, const char* src, char* dst, socklen_t size)
+AUGSYS_API char*
+aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
 {
+    DWORD dstlen = size;
+    DWORD srclen;
     union {
         struct sockaddr sa_;
         struct sockaddr_in sin_;
         struct sockaddr_in6 sin6_;
     } un;
-    DWORD dstlen = size;
-    DWORD srclen;
     bzero(&un, sizeof(un));
 
-    switch (af) {
+    switch (src->family_) {
     case AF_INET:
 		srclen = sizeof(un.sin_);
         un.sa_.sa_family = AF_INET;
@@ -504,15 +505,15 @@ aug_inetntop(int af, const char* src, char* dst, socklen_t size)
     return dst;
 }
 
-AUGSYS_API int
-aug_inetpton(int af, const char* src, void* dst)
+AUGSYS_API struct aug_ipaddr*
+aug_inetpton(int af, const char* src, struct aug_ipaddr* dst)
 {
+    INT len;
     union {
         struct sockaddr sa_;
         struct sockaddr_in sin_;
         struct sockaddr_in6 sin6_;
     } un;
-    INT len;
     bzero(&un, sizeof(un));
 
     switch (af) {
@@ -526,17 +527,21 @@ aug_inetpton(int af, const char* src, void* dst)
         break;
     default:
         aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
-        return -1;
+        return NULL;
     }
 
     if (SOCKET_ERROR == WSAStringToAddress((LPTSTR)src, af, NULL, &un.sa_,
                                            &len)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
-        return -1;
+        return NULL;
     }
 
-    memcpy(dst, &un.sa_, len);
-    return 0;
+    if (AF_INET == (dst->family_ = af))
+        memcpy(&dst->un_.in_, &un.sin_.sin_addr, sizeof(un.sin_.sin_addr));
+    else
+        memcpy(&dst->un_.in6_, &un.sin6_.sin6_addr,
+               sizeof(un.sin6_.sin6_addr));
+    return dst;
 }
 
 AUGSYS_API void

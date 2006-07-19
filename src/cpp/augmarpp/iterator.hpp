@@ -15,7 +15,7 @@
 
 namespace aug {
 
-    class AUGMARPP_API const_iterator {
+    class const_iterator {
 
         friend size_t
         toord(const const_iterator&);

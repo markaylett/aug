@@ -13,7 +13,7 @@
 
 namespace aug {
 
-    class AUGSYSPP_API mplexer {
+    class mplexer {
 
         aug_mplexer_t mplexer_;
 

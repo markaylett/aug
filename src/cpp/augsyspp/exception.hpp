@@ -12,7 +12,7 @@
 
 namespace aug {
 
-    class AUGSYSPP_API errinfo_error : public std::runtime_error {
+    class errinfo_error : public std::runtime_error {
     public:
         explicit
         errinfo_error(const std::string& s)
@@ -21,7 +21,7 @@ namespace aug {
         }
     };
 
-    class AUGSYSPP_API local_error : public errinfo_error {
+    class local_error : public errinfo_error {
     public:
         explicit
         local_error(const std::string& s)
@@ -30,7 +30,7 @@ namespace aug {
         }
     };
 
-    class AUGSYSPP_API system_error : public errinfo_error {
+    class system_error : public errinfo_error {
     public:
         explicit
         system_error(const std::string& s)
@@ -39,7 +39,7 @@ namespace aug {
         }
     };
 
-    class AUGSYSPP_API posix_error : public system_error {
+    class posix_error : public system_error {
     public:
         explicit
         posix_error(const std::string& s)
@@ -48,7 +48,7 @@ namespace aug {
         }
     };
 
-    class AUGSYSPP_API win32_error : public system_error {
+    class win32_error : public system_error {
     public:
         explicit
         win32_error(const std::string& s)

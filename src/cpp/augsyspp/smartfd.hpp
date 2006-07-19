@@ -11,7 +11,7 @@
 
 namespace aug {
 
-    class AUGSYSPP_API smartfd {
+    class smartfd {
         fdref ref_;
 
         smartfd(fdref ref, bool retain) NOTHROW

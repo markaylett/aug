@@ -190,8 +190,8 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
     return 0;
 }
 
-AUGSYS_API const char*
-aug_inetntop(int af, const char* src, char* dst, socklen_t size)
+AUGSYS_API char*
+aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
 {
     const char* ret = inet_ntop(af, src, dst, size);
     if (!ret)
@@ -199,8 +199,8 @@ aug_inetntop(int af, const char* src, char* dst, socklen_t size)
     return ret;
 }
 
-AUGSYS_API int
-aug_inetpton(int af, const char* src, void* dst)
+AUGSYS_API struct aug_ipaddr*
+aug_inetpton(int af, const char* src, struct aug_ipaddr* dst)
 {
     int ret = inet_pton(af, src, dst);
     if (-1 == ret)

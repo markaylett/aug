@@ -17,7 +17,7 @@
 
 namespace aug {
 
-    class AUGMARPP_API smartmar {
+    class smartmar {
         marref ref_;
 
         smartmar(marref ref, bool retain)

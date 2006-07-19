@@ -16,7 +16,7 @@
 
 namespace aug {
 
-    class AUGSRVPP_API service_base {
+    class service_base {
 
         virtual const char*
         do_getopt(enum aug_option opt) = 0;

@@ -24,7 +24,7 @@ namespace aug {
             throwerrinfo("aug_unlockmutex() failed");
     }
 
-    class AUGSYSPP_API mutex {
+    class mutex {
 
         aug_mutex_t mutex_;
 
@@ -59,7 +59,7 @@ namespace aug {
         }
     };
 
-    class AUGSYSPP_API scoped_lock {
+    class scoped_lock {
 
         aug_mutex_t mutex_;
 
@@ -83,7 +83,7 @@ namespace aug {
         }
     };
 
-    class AUGSYSPP_API scoped_unlock {
+    class scoped_unlock {
 
         aug_mutex_t mutex_;
 

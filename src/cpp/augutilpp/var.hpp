@@ -72,7 +72,7 @@ namespace aug {
         return detail::var_traits<T>::get(v);
     }
 
-    class AUGUTILPP_API var {
+    class var {
     public:
         typedef struct aug_var ctype;
     private:

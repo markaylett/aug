@@ -38,7 +38,7 @@ namespace aug {
         return &static_cast<typename T::ctype&>(x);
     }
 
-    class AUGSYSPP_API fdref {
+    class fdref {
         int fd_;
     public:
         fdref(const null_&) NOTHROW

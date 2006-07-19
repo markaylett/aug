@@ -201,8 +201,8 @@ namespace test {
         state(poll_base& poll)
             : sfd_(null)
         {
-            struct aug_sockaddr addr;
-            smartfd sfd(tcplisten("127.0.0.1", "8080", addr));
+            struct aug_endpoint ep;
+            smartfd sfd(tcplisten("127.0.0.1", "8080", ep));
 
             insertconn(conns_, aug_eventin(), poll);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
@@ -254,8 +254,7 @@ namespace test {
         bool
         listener(int fd, struct aug_conns& conns)
         {
-            struct sockaddr_in addr;
-            socklen_t len(sizeof(addr));
+            struct aug_endpoint ep;
 
             AUG_DEBUG("accepting connection");
 
@@ -267,8 +266,7 @@ namespace test {
                 // the situation where a client closes before the server has
                 // had a chance to accept.
 
-                sfd = accept(state_->sfd_,
-                             *reinterpret_cast<sockaddr*>(&addr), len);
+                sfd = accept(state_->sfd_, ep);
 
             } catch (const errinfo_error& e) {
 

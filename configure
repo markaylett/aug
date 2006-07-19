@@ -19283,6 +19283,9 @@ case $host in
         CXXFLAGS="-mthreads -D_MT $CXXFLAGS"
         LDFLAGS="-mthreads $LDFLAGS"
     fi
+
+    CFLAGS="$CFLAGS -DWINVER=0x0501"
+    CXXFLAGS="$CXXFLAGS -DWINVER=0x0501"
     ;;
 *)
     echo "$as_me:$LINENO: checking for library containing gethostbyname" >&5

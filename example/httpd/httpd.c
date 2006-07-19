@@ -160,8 +160,7 @@ conn_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 static int
 listener_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 {
-    struct sockaddr_in addr;
-    socklen_t len;
+    struct aug_endpoint ep;
     int conn;
 
     AUG_DEBUG("checking listener '%d'", fd);
@@ -171,8 +170,7 @@ listener_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 
     AUG_DEBUG("accepting new connection");
 
-    len = sizeof(addr);
-    if (-1 == (conn = aug_accept(fd, (struct sockaddr*)&addr, &len))) {
+    if (-1 == (conn = aug_accept(fd, &ep))) {
         aug_perrinfo("aug_accept() failed");
         return 1;
     }
@@ -320,8 +318,8 @@ readevent_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 static int
 init_(const struct aug_var* arg)
 {
-    struct aug_sockaddrp addrp;
-    struct aug_sockaddr addr;
+    struct aug_endpointp epp;
+    struct aug_endpoint ep;
     struct aug_var ptr;
 
     aug_info("initialising daemon process");
@@ -329,10 +327,10 @@ init_(const struct aug_var* arg)
     if (-1 == aug_setsrvlogger("aug") || !(mplexer_ = aug_createmplexer()))
         return -1;
 
-    if (!aug_parseinet(&addrp, address_))
+    if (!aug_parseinet(&epp, address_))
         goto fail1;
 
-    if (-1 == (fd_ = aug_tcplisten(addrp.host_, addrp.serv_, &addr)))
+    if (-1 == (fd_ = aug_tcplisten(epp.host_, epp.serv_, &ep)))
         goto fail1;
 
     if (-1 == aug_insertconn(&conns_, fd_, listener_,

@@ -20,7 +20,7 @@ namespace aug {
 
     namespace detail {
 
-        class AUGMARPP_API state {
+        class state {
         public:
             enum which { neutral, get, put };
 

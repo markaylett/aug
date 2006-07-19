@@ -20,7 +20,7 @@
 
 namespace aug {
 
-    class AUGNETPP_API poll_base {
+    class poll_base {
 
         virtual bool
         do_poll(int fd, struct aug_conns& conns) = 0;
@@ -38,7 +38,7 @@ namespace aug {
         }
     };
 
-    class AUGNETPP_API conns {
+    class conns {
     public:
         typedef struct aug_conns ctype;
     private:

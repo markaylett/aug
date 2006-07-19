@@ -16,7 +16,7 @@
 
 namespace aug {
 
-    class AUGUTILPP_API timers {
+    class timers {
     public:
         typedef struct aug_timers ctype;
     private:
@@ -73,7 +73,7 @@ namespace aug {
             throwerrinfo("aug_processtimers() failed");
     }
 
-    class AUGUTILPP_API expire_base {
+    class expire_base {
 
         virtual void
         do_expire(int id) = 0;
@@ -91,7 +91,7 @@ namespace aug {
         }
     };
 
-    class AUGUTILPP_API timer {
+    class timer {
 
         struct aug_timers& timers_;
         expire_base& action_;

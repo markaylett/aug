@@ -85,7 +85,7 @@ namespace aug {
         return driver;
     }
 
-    class AUGSYSPP_API scoped_init {
+    class scoped_init {
 
         scoped_init(const scoped_init& rhs);
 

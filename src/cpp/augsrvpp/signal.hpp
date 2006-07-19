@@ -33,7 +33,7 @@ namespace aug {
             throwerrinfo("aug_unblocksignals() failed");
     }
 
-    class AUGSYSPP_API scoped_block {
+    class scoped_block {
 
         scoped_block(const scoped_block& rhs);
 
@@ -53,7 +53,7 @@ namespace aug {
         }
     };
 
-    class AUGSYSPP_API scoped_unblock {
+    class scoped_unblock {
 
         scoped_unblock(const scoped_unblock& rhs);
 

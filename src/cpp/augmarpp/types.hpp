@@ -20,7 +20,7 @@
 
 namespace aug {
 
-    class AUGMARPP_API marref {
+    class marref {
         aug_mar_t mar_;
     public:
         marref(const null_&) NOTHROW
@@ -49,7 +49,7 @@ namespace aug {
         return lhs.get() != rhs.get();
     }
 
-    class AUGMARPP_API field {
+    class field {
         struct aug_field field_;
         void
         clear()

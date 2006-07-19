@@ -19,16 +19,11 @@ aug_setreuseaddr(int s, int on)
 }
 
 AUGSYS_API int
-aug_getsockaf(int s)
+aug_getfamily(int s)
 {
-    union {
-        struct sockaddr sa;
-        char data[AUG_MAXSOCKADDR];
-    } u;
-
-    socklen_t len = AUG_MAXSOCKADDR;
-    if (-1 == aug_getsockname(s, &u.sa, &len))
+    struct aug_endpoint ep;
+    if (-1 == aug_getsockname(s, &ep))
         return -1;
 
-    return u.sa.sa_family;
+    return ep.un_.family_;
 }

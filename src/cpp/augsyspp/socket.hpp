@@ -22,9 +22,9 @@ namespace aug {
     }
 
     inline smartfd
-    accept(fdref ref, struct sockaddr& addr, socklen_t& addrlen)
+    accept(fdref ref, struct aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_accept(ref.get(), &addr, &addrlen)));
+        smartfd sfd(smartfd::attach(aug_accept(ref.get(), &ep)));
         if (null == sfd)
             throwerrinfo("aug_accept() failed");
 
@@ -32,31 +32,33 @@ namespace aug {
     }
 
     inline void
-    bind(fdref ref, const struct sockaddr& addr, socklen_t addrlen)
+    bind(fdref ref, const struct aug_endpoint& ep)
     {
-        if (-1 == aug_bind(ref.get(), &addr, addrlen))
+        if (-1 == aug_bind(ref.get(), &ep))
             throwerrinfo("aug_bind() failed");
     }
 
     inline void
-    connect(fdref ref, const struct sockaddr& addr, socklen_t addrlen)
+    connect(fdref ref, const struct aug_endpoint& ep)
     {
-        if (-1 == aug_connect(ref.get(), &addr, addrlen))
+        if (-1 == aug_connect(ref.get(), &ep))
             throwerrinfo("aug_connect() failed");
     }
 
-    inline void
-    getpeername(fdref ref, struct sockaddr& addr, socklen_t& addrlen)
+    inline struct aug_endpoint&
+    getpeername(fdref ref, struct aug_endpoint& ep)
     {
-        if (-1 == aug_getpeername(ref.get(), &addr, &addrlen))
+        if (-1 == aug_getpeername(ref.get(), &ep))
             throwerrinfo("aug_getpeername() failed");
+        return ep;
     }
 
-    inline void
-    getsockname(fdref ref, struct sockaddr& addr, socklen_t& addrlen)
+    inline const struct aug_endpoint&
+    getsockname(fdref ref, struct aug_endpoint& ep)
     {
-        if (-1 == aug_getsockname(ref.get(), &addr, &addrlen))
+        if (-1 == aug_getsockname(ref.get(), &ep))
             throwerrinfo("aug_getsockname() failed");
+        return ep;
     }
 
     inline void
@@ -77,10 +79,9 @@ namespace aug {
 
     inline size_t
     recvfrom(fdref ref, void* buf, size_t len, int flags,
-             struct sockaddr& from, socklen_t& fromlen)
+             struct aug_endpoint& ep)
     {
-        ssize_t ret(aug_recvfrom(ref.get(), buf, len, flags, &from,
-                                 &fromlen));
+        ssize_t ret(aug_recvfrom(ref.get(), buf, len, flags, &ep));
         if (-1 == ret)
             throwerrinfo("aug_recvfrom() failed");
         return ret;
@@ -97,9 +98,9 @@ namespace aug {
 
     inline size_t
     sendto(fdref ref, const void* buf, size_t len, int flags,
-           const struct sockaddr& to, socklen_t tolen)
+           const struct aug_endpoint& ep)
     {
-        ssize_t ret(aug_sendto(ref.get(), buf, len, flags, &to, tolen));
+        ssize_t ret(aug_sendto(ref.get(), buf, len, flags, &ep));
         if (-1 == ret)
             throwerrinfo("aug_sendto() failed");
         return ret;
@@ -136,6 +137,40 @@ namespace aug {
             throwerrinfo("aug_socketpair() failed");
 
         return std::make_pair(smartfd::attach(sv[0]), smartfd::attach(sv[1]));
+    }
+
+    inline std::string
+    inetntop(const struct aug_ipaddr& src)
+    {
+        char buf[AUG_MAXADDRLEN];
+        if (!aug_inetntop(&src, buf, sizeof(buf)))
+            throwerrinfo("aug_inetntop() failed");
+        return buf;
+    }
+
+    inline struct aug_ipaddr&
+    inetpton(int af, const char* src, struct aug_ipaddr& dst)
+    {
+        if (!aug_inetpton(af, src, &dst))
+            throwerrinfo("aug_inetpton() failed");
+        return dst;
+    }
+
+    inline void
+    setreuseaddr(fdref ref, bool on)
+    {
+        int value(on ? 1 : 0);
+        if (-1 == aug_setreuseaddr(ref.get(), value))
+            throwerrinfo("aug_setreuseaddr() failed");
+    }
+
+    inline int
+    getfamily(fdref ref)
+    {
+        int ret(aug_getfamily(ref.get()));
+        if (-1 == ret)
+            throwerrinfo("aug_getfamily() failed");
+        return ret;
     }
 }
 

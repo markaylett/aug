@@ -163,6 +163,7 @@ target_alias = @target_alias@
 EXTRA_DIST = \
 	base.c \
 	lock.c \
+	mcast.c \
 	mplexer.c \
 	mmap.c \
 	socket.c \

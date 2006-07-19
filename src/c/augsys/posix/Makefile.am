@@ -1,6 +1,7 @@
 EXTRA_DIST = \
 	base.c \
 	lock.c \
+	mcast.c \
 	mplexer.c \
 	mmap.c \
 	socket.c \

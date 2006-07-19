@@ -24,7 +24,7 @@ static const char rcsid[] = "$Id:$";
 #include <string.h>        /* strchr() */
 
 AUGNET_API int
-aug_tcpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
+aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     int fd;
     struct addrinfo hints, * res, * save;
@@ -43,7 +43,10 @@ aug_tcpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
         if (-1 == fd)
             continue; /* Ignore this one. */
 
-        if (0 == aug_connect(fd, res->ai_addr, res->ai_addrlen))
+        ep->len_ = res->ai_addrlen;
+        memcpy(ep->un_.data_, res->ai_addr, res->ai_addrlen);
+
+        if (0 == aug_connect(fd, ep))
             break; /* Success. */
 
         if (-1 == aug_close(fd)) /* Ignore this one. */
@@ -54,9 +57,6 @@ aug_tcpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
     if (!res) /* errno set from final aug_connect(). */
         goto fail;
 
-    addr->addrlen_ = res->ai_addrlen;
-    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
-
     aug_freeaddrinfo(save);
     return fd;
 
@@ -66,7 +66,7 @@ aug_tcpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
 }
 
 AUGNET_API int
-aug_tcplisten(const char* host, const char* serv, struct aug_sockaddr* addr)
+aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     int fd;
     struct addrinfo hints, * res, * save;
@@ -89,7 +89,10 @@ aug_tcplisten(const char* host, const char* serv, struct aug_sockaddr* addr)
         if (-1 == aug_setreuseaddr(fd, 1))
             goto fail2;
 
-        if (0 == aug_bind(fd, res->ai_addr, res->ai_addrlen))
+        ep->len_ = res->ai_addrlen;
+        memcpy(ep->un_.data_, res->ai_addr, res->ai_addrlen);
+
+        if (0 == aug_bind(fd, ep))
             break; /* Success. */
 
         if (-1 == aug_close(fd)) /* Bind error, close and try next one. */
@@ -103,9 +106,6 @@ aug_tcplisten(const char* host, const char* serv, struct aug_sockaddr* addr)
     if (-1 == aug_listen(fd, SOMAXCONN))
         goto fail2;
 
-    addr->addrlen_ = res->ai_addrlen;
-    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
-
     aug_freeaddrinfo(save);
     return fd;
 
@@ -118,7 +118,7 @@ aug_tcplisten(const char* host, const char* serv, struct aug_sockaddr* addr)
 }
 
 AUGNET_API int
-aug_udpclient(const char* host, const char* serv, struct aug_sockaddr* addr)
+aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     int fd;
     struct addrinfo hints, * res, * save;
@@ -142,8 +142,8 @@ aug_udpclient(const char* host, const char* serv, struct aug_sockaddr* addr)
     if (!res) /* errno set from final aug_socket(). */
         goto fail;
 
-    addr->addrlen_ = res->ai_addrlen;
-    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
+    ep->len_ = res->ai_addrlen;
+    memcpy(ep->un_.data_, res->ai_addr, res->ai_addrlen);
 
     aug_freeaddrinfo(save);
     return fd;
@@ -154,7 +154,7 @@ aug_udpclient(const char* host, const char* serv, struct aug_sockaddr* addr)
 }
 
 AUGNET_API int
-aug_udpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
+aug_udpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     int fd;
     struct addrinfo hints, * res, * save;
@@ -173,7 +173,10 @@ aug_udpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
         if (-1 == fd)
             continue; /* Ignore this one. */
 
-        if (0 == aug_connect(fd, res->ai_addr, res->ai_addrlen))
+        ep->len_ = res->ai_addrlen;
+        memcpy(ep->un_.data_, res->ai_addr, res->ai_addrlen);
+
+        if (0 == aug_connect(fd, ep))
             break; /* Success. */
 
         if (-1 == aug_close(fd)) /* Ignore this one. */
@@ -184,9 +187,6 @@ aug_udpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
     if (!res) /* errno set from final aug_connect() */
         return -1;
 
-    addr->addrlen_ = res->ai_addrlen;
-    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
-
     aug_freeaddrinfo(save);
     return fd;
 
@@ -196,7 +196,7 @@ aug_udpconnect(const char* host, const char* serv, struct aug_sockaddr* addr)
 }
 
 AUGNET_API int
-aug_udpserver(const char* host, const char* serv, struct aug_sockaddr* addr)
+aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 {
     int fd;
     struct addrinfo hints, * res, * save;
@@ -216,7 +216,10 @@ aug_udpserver(const char* host, const char* serv, struct aug_sockaddr* addr)
         if (-1 == fd)
             continue; /* Error, try next one. */
 
-        if (0 == aug_bind(fd, res->ai_addr, res->ai_addrlen))
+        ep->len_ = res->ai_addrlen;
+        memcpy(ep->un_.data_, res->ai_addr, res->ai_addrlen);
+
+        if (0 == aug_bind(fd, ep))
             break; /* Success. */
 
         if (-1 == aug_close(fd)) /* bind error, close and try next one */
@@ -227,9 +230,6 @@ aug_udpserver(const char* host, const char* serv, struct aug_sockaddr* addr)
     if (!res) /* errno from final aug_socket() or aug_bind(). */
         return -1;
 
-    addr->addrlen_ = res->ai_addrlen;
-    memcpy(addr->un_.data_, res->ai_addr, res->ai_addrlen);
-
     aug_freeaddrinfo(save);
     return fd;
 
@@ -238,17 +238,17 @@ aug_udpserver(const char* host, const char* serv, struct aug_sockaddr* addr)
     return -1;
 }
 
-AUGNET_API struct aug_sockaddrp*
-aug_parseinet(struct aug_sockaddrp* addr, const char* src)
+AUGNET_API struct aug_endpointp*
+aug_parseinet(struct aug_endpointp* dst, const char* src)
 {
     size_t len;
     char* serv;
 
-    aug_strlcpy(addr->data_, src, sizeof(addr->data_));
+    aug_strlcpy(dst->data_, src, sizeof(dst->data_));
 
     /* Locate host and serv separator. */
 
-    if (!(serv = strrchr(addr->data_, ':'))) {
+    if (!(serv = strrchr(dst->data_, ':'))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                        AUG_MSG("missing separator '%s'"), src);
         return NULL;
@@ -256,7 +256,7 @@ aug_parseinet(struct aug_sockaddrp* addr, const char* src)
 
     /* Calculate length of host part. */
 
-    len = serv - addr->data_;
+    len = serv - dst->data_;
 
     /* Ensure host and serv parts exists. */
 
@@ -275,23 +275,23 @@ aug_parseinet(struct aug_sockaddrp* addr, const char* src)
     /* The host part of an ipv6 address may be contained within square
        brackets. */
 
-    if ('[' == addr->data_[0]) {
+    if ('[' == dst->data_[0]) {
 
-        if (']' != addr->data_[len - 1]) {
+        if (']' != dst->data_[len - 1]) {
             aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("unmatched brackets '%s'"), src);
             return NULL;
         }
 
         len -= 2;
-        addr->host_ = addr->data_ + 1;
+        dst->host_ = dst->data_ + 1;
     }
     else
-        addr->host_ = addr->data_;
+        dst->host_ = dst->data_;
 
-    addr->host_[len] = '\0';
-    addr->serv_ = serv;
-    return addr;
+    dst->host_[len] = '\0';
+    dst->serv_ = serv;
+    return dst;
 }
 
 AUGNET_API int

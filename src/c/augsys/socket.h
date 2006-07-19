@@ -26,33 +26,48 @@
 typedef int socklen_t;
 #endif /* _WIN32 */
 
-#define AUG_INETLEN(x) (AF_INET6 == x \
-                        ? sizeof(struct sockaddr_in6) \
-                        : sizeof(struct sockaddr_in))
+#define AUG_MAXADDRLEN 128
 
-#define AUG_MAXSOCKADDR 128
+struct aug_endpoint {
+    socklen_t len_;
+    union {
+        short family_;
+        struct sockaddr sa_;
+        struct sockaddr_in sin_;
+        struct sockaddr_in6 sin6_;
+        char data_[AUG_MAXADDRLEN];
+    } un_;
+};
+
+struct aug_ipaddr {
+    short family_;
+    union {
+        struct in_addr in_;
+        struct in6_addr in6_;
+    } un_;
+};
 
 AUGSYS_API int
 aug_socket(int domain, int type, int protocol);
 
 AUGSYS_API int
-aug_accept(int s, struct sockaddr* addr, socklen_t* addrlen);
+aug_accept(int s, struct aug_endpoint* ep);
 
 AUGSYS_API int
-aug_bind(int s, const struct sockaddr* addr, socklen_t addrlen);
+aug_bind(int s, const struct aug_endpoint* ep);
 
 /** Remember that, for non-blocking sockets, connect() can fail with
     EINPROGRESS.  Use poll() or select() on write-status to determine
     completion. */
 
 AUGSYS_API int
-aug_connect(int s, const struct sockaddr* addr, socklen_t addrlen);
+aug_connect(int s, const struct aug_endpoint* ep);
 
 AUGSYS_API int
-aug_getpeername(int s, struct sockaddr* addr, socklen_t* addrlen);
+aug_getpeername(int s, struct aug_endpoint* ep);
 
 AUGSYS_API int
-aug_getsockname(int s, struct sockaddr* addr, socklen_t* addrlen);
+aug_getsockname(int s, struct aug_endpoint* ep);
 
 AUGSYS_API int
 aug_listen(int s, int backlog);
@@ -61,15 +76,15 @@ AUGSYS_API ssize_t
 aug_recv(int s, void* buf, size_t len, int flags);
 
 AUGSYS_API ssize_t
-aug_recvfrom(int s, void* buf, size_t len, int flags, struct sockaddr* from,
-             socklen_t* fromlen);
+aug_recvfrom(int s, void* buf, size_t len, int flags,
+             struct aug_endpoint* ep);
 
 AUGSYS_API ssize_t
 aug_send(int s, const void* buf, size_t len, int flags);
 
 AUGSYS_API ssize_t
 aug_sendto(int s, const void* buf, size_t len, int flags,
-           const struct sockaddr* to, socklen_t tolen);
+           const struct aug_endpoint* ep);
 
 AUGSYS_API int
 aug_getsockopt(int s, int level, int optname, void* optval,
@@ -85,15 +100,11 @@ aug_shutdown(int s, int how);
 AUGSYS_API int
 aug_socketpair(int domain, int type, int protocol, int sv[2]);
 
-#define AUG_INETLEN(x) (AF_INET6 == x \
-                        ? sizeof(struct sockaddr_in6) \
-                        : sizeof(struct sockaddr_in))
+AUGSYS_API char*
+aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size);
 
-AUGSYS_API const char*
-aug_inetntop(int af, const char* src, char* dst, socklen_t size);
-
-AUGSYS_API int
-aug_inetpton(int af, const char* src, void* dst);
+AUGSYS_API struct aug_ipaddr*
+aug_inetpton(int af, const char* src, struct aug_ipaddr* dst);
 
 AUGSYS_API void
 aug_freeaddrinfo(struct addrinfo* res);
@@ -106,6 +117,6 @@ AUGSYS_API int
 aug_setreuseaddr(int s, int on);
 
 AUGSYS_API int
-aug_getsockaf(int s);
+aug_getfamily(int s);
 
 #endif /* AUGSYS_SOCKET_H */

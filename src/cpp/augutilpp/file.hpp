@@ -15,7 +15,7 @@
 
 namespace aug {
 
-    class AUGUTILPP_API setopt_base {
+    class setopt_base {
 
         virtual void
         do_setopt(const char* name, const char* value) = 0;
