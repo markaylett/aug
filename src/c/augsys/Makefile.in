@@ -306,7 +306,7 @@ augsys_errinfotest_LDADD = \
 
 augsys_mcasttest_SOURCES = mcasttest.c
 augsys_mcasttest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la -liphlpapi
+	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 augsys_sockettest_SOURCES = sockettest.c
 augsys_sockettest_LDADD = \

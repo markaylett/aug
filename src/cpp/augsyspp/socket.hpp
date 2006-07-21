@@ -48,7 +48,7 @@ namespace aug {
     inline struct aug_endpoint&
     getpeername(fdref ref, struct aug_endpoint& ep)
     {
-        if (-1 == aug_getpeername(ref.get(), &ep))
+        if (!aug_getpeername(ref.get(), &ep))
             throwerrinfo("aug_getpeername() failed");
         return ep;
     }
@@ -56,7 +56,7 @@ namespace aug {
     inline const struct aug_endpoint&
     getsockname(fdref ref, struct aug_endpoint& ep)
     {
-        if (-1 == aug_getsockname(ref.get(), &ep))
+        if (!aug_getsockname(ref.get(), &ep))
             throwerrinfo("aug_getsockname() failed");
         return ep;
     }

@@ -43,8 +43,8 @@ LDFLAGS="-lm $LDFLAGS"
 case $host in
 *-*-cygwin* | *-*-mingw*)
 
-    LDFLAGS="-lws2_32 $LDFLAGS"
-    LIBS="$LIBS -Wl,-lws2_32"
+    LDFLAGS="-lws2_32 -liphlpapi $LDFLAGS"
+    LIBS="$LIBS -Wl,-lws2_32 -Wl,-liphlpapi"
 
     if test "$threads" != "no"; then
         CFLAGS="-mthreads -D_MT $CFLAGS"
@@ -87,9 +87,8 @@ AC_CONFIG_FILES([Makefile
     doc/Makefile
     doc/man/Makefile
     example/Makefile
+    example/cpp/Makefile
     example/httpd/Makefile
-    example/mplexd/Makefile
-    example/timerd/Makefile
     src/Makefile
     src/c/Makefile
     src/c/augmar/Makefile

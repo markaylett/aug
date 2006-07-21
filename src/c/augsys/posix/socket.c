@@ -31,9 +31,11 @@ aug_socket(int domain, int type, int protocol)
 }
 
 AUGSYS_API int
-aug_accept(int s, struct sockaddr* addr, socklen_t* addrlen)
+aug_accept(int s, struct aug_endpoint* ep)
 {
-    int fd = accept(s, addr, addrlen);
+    int fd;
+    ep->len_ = AUG_MAXADDRLEN;
+    fd = accept(s,  &ep->un_.all_, &ep->len_);
     if (-1 == fd) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
@@ -43,9 +45,9 @@ aug_accept(int s, struct sockaddr* addr, socklen_t* addrlen)
 }
 
 AUGSYS_API int
-aug_bind(int s, const struct sockaddr* addr, socklen_t addrlen)
+aug_bind(int s, const struct aug_endpoint* ep)
 {
-    if (-1 == bind(s, addr, addrlen)) {
+    if (-1 == bind(s, &ep->un_.all_, ep->len_)) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
     }
@@ -54,9 +56,9 @@ aug_bind(int s, const struct sockaddr* addr, socklen_t addrlen)
 }
 
 AUGSYS_API int
-aug_connect(int s, const struct sockaddr* addr, socklen_t addrlen)
+aug_connect(int s, const struct aug_endpoint* ep)
 {
-    if (-1 == connect(s, addr, addrlen)) {
+    if (-1 == connect(s, &ep->un_.all_, ep->len_)) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
     }
@@ -64,26 +66,26 @@ aug_connect(int s, const struct sockaddr* addr, socklen_t addrlen)
     return 0;
 }
 
-AUGSYS_API int
-aug_getpeername(int s, struct sockaddr* addr, socklen_t* addrlen)
+AUGSYS_API struct aug_endpoint*
+aug_getpeername(int s, struct aug_endpoint* ep)
 {
-    if (-1 == getpeername(s, addr, addrlen)) {
+    if (-1 == getpeername(s, &ep->un_.all_, &ep->len_)) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
-        return -1;
+        return NULL;
     }
 
-    return 0;
+    return ep;
 }
 
-AUGSYS_API int
-aug_getsockname(int s, struct sockaddr* addr, socklen_t* addrlen)
+AUGSYS_API struct aug_endpoint*
+aug_getsockname(int s, struct aug_endpoint* ep)
 {
-    if (-1 == getsockname(s, addr, addrlen)) {
+    if (-1 == getsockname(s, &ep->un_.all_, &ep->len_)) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
-        return -1;
+        return NULL;
     }
 
-    return 0;
+    return ep;
 }
 
 AUGSYS_API int
@@ -108,11 +110,11 @@ aug_recv(int s, void* buf, size_t len, int flags)
 }
 
 AUGSYS_API ssize_t
-aug_recvfrom(int s, void* buf, size_t len, int flags, struct sockaddr* from,
-             socklen_t* fromlen)
+aug_recvfrom(int s, void* buf, size_t len, int flags, struct aug_endpoint* ep)
 {
     ssize_t ret;
-    if (-1 == (ret = recvfrom(s, buf, len, flags, from, fromlen)))
+    ep->len_ = AUG_MAXADDRLEN;
+    if (-1 == (ret = recvfrom(s, buf, len, flags, &ep->un_.all_, &ep->len_)))
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
 
     return ret;
@@ -130,10 +132,10 @@ aug_send(int s, const void* buf, size_t len, int flags)
 
 AUGSYS_API ssize_t
 aug_sendto(int s, const void* buf, size_t len, int flags,
-           const struct sockaddr* to, socklen_t tolen)
+           const struct aug_endpoint* ep)
 {
     ssize_t ret;
-    if (-1 == (ret = sendto(s, buf, len, flags, to, tolen)))
+    if (-1 == (ret = sendto(s, buf, len, flags, &ep->un_.all_, ep->len_)))
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
 
     return ret;
@@ -193,19 +195,21 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 AUGSYS_API char*
 aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
 {
-    const char* ret = inet_ntop(af, src, dst, size);
+    const char* ret = inet_ntop(src->family_, &src->un_, dst, size);
     if (!ret)
       aug_setposixerrinfo(__FILE__, __LINE__, errno);
-    return ret;
+    return dst;
 }
 
 AUGSYS_API struct aug_ipaddr*
 aug_inetpton(int af, const char* src, struct aug_ipaddr* dst)
 {
-    int ret = inet_pton(af, src, dst);
-    if (-1 == ret)
-      aug_setposixerrinfo(__FILE__, __LINE__, errno);
-    return ret;
+    if (-1 == inet_pton(af, src, &dst->un_)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return NULL;
+    }
+    dst->family_ = af;
+    return dst;
 }
 
 AUGSYS_API void

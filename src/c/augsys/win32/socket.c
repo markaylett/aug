@@ -300,7 +300,7 @@ aug_accept(int s, struct aug_endpoint* ep)
 {
     SOCKET h;
     ep->len_ = AUG_MAXADDRLEN;
-    h = accept(_get_osfhandle(s), &ep->un_.sa_, &ep->len_);
+    h = accept(_get_osfhandle(s), &ep->un_.all_, &ep->len_);
     if (INVALID_SOCKET == h) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return -1;
@@ -312,7 +312,7 @@ aug_accept(int s, struct aug_endpoint* ep)
 AUGSYS_API int
 aug_bind(int s, const struct aug_endpoint* ep)
 {
-    if (SOCKET_ERROR == bind(_get_osfhandle(s), &ep->un_.sa_, ep->len_)) {
+    if (SOCKET_ERROR == bind(_get_osfhandle(s), &ep->un_.all_, ep->len_)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
@@ -323,7 +323,7 @@ aug_bind(int s, const struct aug_endpoint* ep)
 AUGSYS_API int
 aug_connect(int s, const struct aug_endpoint* ep)
 {
-    if (SOCKET_ERROR == connect(_get_osfhandle(s), &ep->un_.sa_, ep->len_)) {
+    if (SOCKET_ERROR == connect(_get_osfhandle(s), &ep->un_.all_, ep->len_)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
@@ -331,30 +331,30 @@ aug_connect(int s, const struct aug_endpoint* ep)
     return 0;
 }
 
-AUGSYS_API int
+AUGSYS_API struct aug_endpoint*
 aug_getpeername(int s, struct aug_endpoint* ep)
 {
     ep->len_ = AUG_MAXADDRLEN;
-    if (SOCKET_ERROR == getpeername(_get_osfhandle(s), &ep->un_.sa_,
+    if (SOCKET_ERROR == getpeername(_get_osfhandle(s), &ep->un_.all_,
                                     &ep->len_)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
-        return -1;
+        return NULL;
     }
 
-    return 0;
+    return ep;
 }
 
-AUGSYS_API int
+AUGSYS_API struct aug_endpoint*
 aug_getsockname(int s, struct aug_endpoint* ep)
 {
     ep->len_ = AUG_MAXADDRLEN;
-    if (SOCKET_ERROR == getsockname(_get_osfhandle(s), &ep->un_.sa_,
+    if (SOCKET_ERROR == getsockname(_get_osfhandle(s), &ep->un_.all_,
                                     &ep->len_)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
-        return -1;
+        return NULL;
     }
 
-    return 0;
+    return ep;
 }
 
 AUGSYS_API int
@@ -383,7 +383,7 @@ aug_recvfrom(int s, void* buf, size_t len, int flags, struct aug_endpoint* ep)
 {
     ssize_t ret;
     ep->len_ = AUG_MAXADDRLEN;
-    ret = recvfrom(_get_osfhandle(s), buf, (int)len, flags, &ep->un_.sa_,
+    ret = recvfrom(_get_osfhandle(s), buf, (int)len, flags, &ep->un_.all_,
                    &ep->len_);
     if (SOCKET_ERROR == ret)
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
@@ -406,7 +406,7 @@ aug_sendto(int s, const void* buf, size_t len, int flags,
            const struct aug_endpoint* ep)
 {
     ssize_t ret = sendto(_get_osfhandle(s), buf, (int)len, flags,
-                         &ep->un_.sa_, ep->len_);
+                         &ep->un_.all_, ep->len_);
     if (SOCKET_ERROR == ret)
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
 
@@ -474,29 +474,30 @@ aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
     DWORD dstlen = size;
     DWORD srclen;
     union {
-        struct sockaddr sa_;
-        struct sockaddr_in sin_;
-        struct sockaddr_in6 sin6_;
+        short family_;
+        struct sockaddr all_;
+        struct sockaddr_in ipv4_;
+        struct sockaddr_in6 ipv6_;
     } un;
     bzero(&un, sizeof(un));
 
     switch (src->family_) {
     case AF_INET:
-		srclen = sizeof(un.sin_);
-        un.sa_.sa_family = AF_INET;
-        memcpy(&un.sin_.sin_addr, src, srclen);
+		srclen = sizeof(un.ipv4_);
+        un.family_ = AF_INET;
+        memcpy(&un.ipv4_.sin_addr, src, srclen);
         break;
     case AF_INET6:
-		srclen = sizeof(un.sin6_);
-        un.sa_.sa_family = AF_INET6;
-        memcpy(&un.sin6_.sin6_addr, src, srclen);
+		srclen = sizeof(un.ipv6_);
+        un.family_ = AF_INET6;
+        memcpy(&un.ipv6_.sin6_addr, src, srclen);
         break;
     default:
         aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
         return NULL;
     }
 
-    if (SOCKET_ERROR == WSAAddressToString(&un.sa_, srclen, NULL, dst,
+    if (SOCKET_ERROR == WSAAddressToString(&un.all_, srclen, NULL, dst,
                                            &dstlen)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return NULL;
@@ -510,37 +511,39 @@ aug_inetpton(int af, const char* src, struct aug_ipaddr* dst)
 {
     INT len;
     union {
-        struct sockaddr sa_;
-        struct sockaddr_in sin_;
-        struct sockaddr_in6 sin6_;
+        short family_;
+        struct sockaddr all_;
+        struct sockaddr_in ipv4_;
+        struct sockaddr_in6 ipv6_;
     } un;
     bzero(&un, sizeof(un));
 
     switch (af) {
     case AF_INET:
-		len = sizeof(un.sin_);
-        un.sa_.sa_family = AF_INET;
+		len = sizeof(un.ipv4_);
+        un.family_ = AF_INET;
         break;
     case AF_INET6:
-		len = sizeof(un.sin6_);
-        un.sa_.sa_family = AF_INET6;
+		len = sizeof(un.ipv6_);
+        un.family_ = AF_INET6;
         break;
     default:
         aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
         return NULL;
     }
 
-    if (SOCKET_ERROR == WSAStringToAddress((LPTSTR)src, af, NULL, &un.sa_,
+    if (SOCKET_ERROR == WSAStringToAddress((LPTSTR)src, af, NULL, &un.all_,
                                            &len)) {
         aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
         return NULL;
     }
 
     if (AF_INET == (dst->family_ = af))
-        memcpy(&dst->un_.in_, &un.sin_.sin_addr, sizeof(un.sin_.sin_addr));
+        memcpy(&dst->un_.ipv4_, &un.ipv4_.sin_addr,
+               sizeof(un.ipv4_.sin_addr));
     else
-        memcpy(&dst->un_.in6_, &un.sin6_.sin6_addr,
-               sizeof(un.sin6_.sin6_addr));
+        memcpy(&dst->un_.ipv6_, &un.ipv6_.sin6_addr,
+               sizeof(un.ipv6_.sin6_addr));
     return dst;
 }
 

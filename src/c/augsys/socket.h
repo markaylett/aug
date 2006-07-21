@@ -32,18 +32,18 @@ struct aug_endpoint {
     socklen_t len_;
     union {
         short family_;
-        struct sockaddr sa_;
-        struct sockaddr_in sin_;
-        struct sockaddr_in6 sin6_;
-        char data_[AUG_MAXADDRLEN];
+        struct sockaddr all_;
+        struct sockaddr_in ipv4_;
+        struct sockaddr_in6 ipv6_;
+        char pad_[AUG_MAXADDRLEN];
     } un_;
 };
 
 struct aug_ipaddr {
     short family_;
     union {
-        struct in_addr in_;
-        struct in6_addr in6_;
+        struct in_addr ipv4_;
+        struct in6_addr ipv6_;
     } un_;
 };
 
@@ -63,10 +63,10 @@ aug_bind(int s, const struct aug_endpoint* ep);
 AUGSYS_API int
 aug_connect(int s, const struct aug_endpoint* ep);
 
-AUGSYS_API int
+AUGSYS_API struct aug_endpoint*
 aug_getpeername(int s, struct aug_endpoint* ep);
 
-AUGSYS_API int
+AUGSYS_API struct aug_endpoint*
 aug_getsockname(int s, struct aug_endpoint* ep);
 
 AUGSYS_API int

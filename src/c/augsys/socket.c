@@ -22,7 +22,7 @@ AUGSYS_API int
 aug_getfamily(int s)
 {
     struct aug_endpoint ep;
-    if (-1 == aug_getsockname(s, &ep))
+    if (!aug_getsockname(s, &ep))
         return -1;
 
     return ep.un_.family_;

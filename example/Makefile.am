@@ -1,4 +1,3 @@
 SUBDIRS = \
-	httpd \
-	mplexd \
-	timerd
+	cpp \
+	httpd

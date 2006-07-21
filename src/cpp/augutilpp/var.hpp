@@ -43,7 +43,7 @@ namespace aug {
         };
 
         template <>
-        struct var_traits<struct aug_var> {
+        struct var_traits<aug_var> {
             static struct aug_var&
             set(struct aug_var& v, const struct aug_var& w)
             {

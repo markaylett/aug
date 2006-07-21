@@ -170,9 +170,8 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 SUBDIRS = \
-	httpd \
-	mplexd \
-	timerd
+	cpp \
+	httpd
 
 all: all-recursive
 
