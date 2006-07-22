@@ -116,6 +116,9 @@
 				RelativePath="..\src\cpp\augsyspp\exception.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augsyspp\mcast.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsyspp\mplexer.cpp">
 			</File>
 			<File
@@ -155,6 +158,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\exception.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsyspp\mcast.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\mplexer.hpp">

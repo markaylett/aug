@@ -5,6 +5,7 @@ modinclude_HEADERS = \
 	base.hpp \
 	config.hpp \
 	exception.hpp \
+	mcast.hpp \
 	mplexer.hpp \
 	mutex.hpp \
 	null.hpp \
@@ -23,6 +24,7 @@ libaugsyspp_la_SOURCES = \
 	base.cpp \
 	config.cpp \
 	exception.cpp \
+	mcast.cpp \
 	mplexer.cpp \
 	mutex.cpp \
 	null.cpp \

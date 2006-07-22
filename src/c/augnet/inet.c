@@ -285,8 +285,7 @@ aug_parseinet(struct aug_endpointp* dst, const char* src)
 
         len -= 2;
         dst->host_ = dst->data_ + 1;
-    }
-    else
+    } else
         dst->host_ = dst->data_;
 
     dst->host_[len] = '\0';

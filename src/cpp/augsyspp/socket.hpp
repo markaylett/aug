@@ -156,6 +156,15 @@ namespace aug {
         return dst;
     }
 
+    inline struct aug_ipaddr&
+    inetpton(const char* src, struct aug_ipaddr& dst)
+    {
+        if (!aug_inetpton(AF_INET, src, &dst)
+            && !aug_inetpton(AF_INET6, src, &dst))
+            throwerrinfo("aug_inetpton() failed");
+        return dst;
+    }
+
     inline void
     setreuseaddr(fdref ref, bool on)
     {

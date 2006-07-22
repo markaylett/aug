@@ -53,10 +53,10 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 @ENABLE_CPPBUILD_TRUE@libaugsyspp_la_DEPENDENCIES =  \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 am__libaugsyspp_la_SOURCES_DIST = base.cpp config.cpp exception.cpp \
-	mplexer.cpp mutex.cpp null.cpp smartfd.cpp socket.cpp \
+	mcast.cpp mplexer.cpp mutex.cpp null.cpp smartfd.cpp socket.cpp \
 	string.cpp types.cpp unistd.cpp utility.cpp
 @ENABLE_CPPBUILD_TRUE@am_libaugsyspp_la_OBJECTS = base.lo config.lo \
-@ENABLE_CPPBUILD_TRUE@	exception.lo mplexer.lo mutex.lo null.lo \
+@ENABLE_CPPBUILD_TRUE@	exception.lo mcast.lo mplexer.lo mutex.lo null.lo \
 @ENABLE_CPPBUILD_TRUE@	smartfd.lo socket.lo string.lo types.lo \
 @ENABLE_CPPBUILD_TRUE@	unistd.lo utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
@@ -215,6 +215,7 @@ modinclude_HEADERS = \
 	base.hpp \
 	config.hpp \
 	exception.hpp \
+	mcast.hpp \
 	mplexer.hpp \
 	mutex.hpp \
 	null.hpp \
@@ -230,6 +231,7 @@ modinclude_HEADERS = \
 @ENABLE_CPPBUILD_TRUE@	base.cpp \
 @ENABLE_CPPBUILD_TRUE@	config.cpp \
 @ENABLE_CPPBUILD_TRUE@	exception.cpp \
+@ENABLE_CPPBUILD_TRUE@	mcast.cpp \
 @ENABLE_CPPBUILD_TRUE@	mplexer.cpp \
 @ENABLE_CPPBUILD_TRUE@	mutex.cpp \
 @ENABLE_CPPBUILD_TRUE@	null.cpp \
@@ -316,6 +318,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/null.Plo@am__quote@
