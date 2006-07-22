@@ -196,18 +196,26 @@ AUGSYS_API char*
 aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
 {
     const char* ret = inet_ntop(src->family_, &src->un_, dst, size);
-    if (!ret)
+    if (!ret) {
       aug_setposixerrinfo(__FILE__, __LINE__, errno);
+      return NULL;
+    }
     return dst;
 }
 
 AUGSYS_API struct aug_ipaddr*
 aug_inetpton(int af, const char* src, struct aug_ipaddr* dst)
 {
-    if (-1 == inet_pton(af, src, &dst->un_)) {
+    int ret = inet_pton(af, src, &dst->un_);
+    if (ret < 0) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return NULL;
+    } else if (0 == ret) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid address: %s"), src);
+        return NULL;
     }
+
     dst->family_ = af;
     return dst;
 }
