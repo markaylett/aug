@@ -140,28 +140,36 @@ namespace aug {
     }
 
     inline std::string
-    inetntop(const struct aug_ipaddr& src)
+    inetntoa(const struct aug_inetaddr& src)
     {
         char buf[AUG_MAXADDRLEN];
-        if (!aug_inetntop(&src, buf, sizeof(buf)))
-            throwerrinfo("aug_inetntop() failed");
+        if (!aug_inetntoa(buf, &src, sizeof(buf)))
+            throwerrinfo("aug_inetntoa() failed");
         return buf;
     }
 
-    inline struct aug_ipaddr&
-    inetpton(int af, const char* src, struct aug_ipaddr& dst)
+    inline struct aug_inetaddr&
+    inetaton(int af, struct aug_inetaddr& dst, const char* src)
     {
-        if (!aug_inetpton(af, src, &dst))
-            throwerrinfo("aug_inetpton() failed");
+        if (!aug_inetaton(af, &dst, src))
+            throwerrinfo("aug_inetaton() failed");
         return dst;
     }
 
-    inline struct aug_ipaddr&
-    inetpton(const char* src, struct aug_ipaddr& dst)
+    inline struct aug_inetaddr&
+    inetaton(struct aug_inetaddr& dst, const char* src)
     {
-        if (!aug_inetpton(AF_INET, src, &dst)
-            && !aug_inetpton(AF_INET6, src, &dst))
-            throwerrinfo("aug_inetpton() failed");
+        if (!aug_inetaton(AF_INET, &dst, src)
+            && !aug_inetaton(AF_INET6, &dst, src))
+            throwerrinfo("aug_inetaton() failed");
+        return dst;
+    }
+
+    inline struct aug_inetaddr&
+    getinetaddr(struct aug_inetaddr& dst, const struct aug_endpoint& src)
+    {
+        if (!aug_getinetaddr(&dst, &src))
+            throwerrinfo("aug_getinetaddr() failed");
         return dst;
     }
 

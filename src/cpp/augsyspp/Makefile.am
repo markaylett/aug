@@ -4,7 +4,9 @@ modincludedir = $(includedir)/augsyspp
 modinclude_HEADERS = \
 	base.hpp \
 	config.hpp \
+	endpoint.hpp \
 	exception.hpp \
+	inetaddr.hpp \
 	mcast.hpp \
 	mplexer.hpp \
 	mutex.hpp \
@@ -23,7 +25,9 @@ noinst_LTLIBRARIES = libaugsyspp.la
 libaugsyspp_la_SOURCES = \
 	base.cpp \
 	config.cpp \
+	endpoint.cpp \
 	exception.cpp \
+	inetaddr.cpp \
 	mcast.cpp \
 	mplexer.cpp \
 	mutex.cpp \

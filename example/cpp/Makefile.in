@@ -39,8 +39,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/cpp/lang.mk
-@ENABLE_CPPBUILD_TRUE@noinst_PROGRAMS = mplexd$(EXEEXT) \
-@ENABLE_CPPBUILD_TRUE@	timerd$(EXEEXT)
+@ENABLE_CPPBUILD_TRUE@noinst_PROGRAMS = mcastsend$(EXEEXT) \
+@ENABLE_CPPBUILD_TRUE@	mplexd$(EXEEXT) timerd$(EXEEXT)
 subdir = example/cpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -50,6 +50,15 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
+am__mcastsend_SOURCES_DIST = mcastsend.cpp
+@ENABLE_CPPBUILD_TRUE@am_mcastsend_OBJECTS = mcastsend.$(OBJEXT)
+mcastsend_OBJECTS = $(am_mcastsend_OBJECTS)
+@ENABLE_CPPBUILD_TRUE@mcastsend_DEPENDENCIES =  \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 am__mplexd_SOURCES_DIST = mplexd.cpp
 @ENABLE_CPPBUILD_TRUE@am_mplexd_OBJECTS = mplexd.$(OBJEXT)
 mplexd_OBJECTS = $(am_mplexd_OBJECTS)
@@ -78,8 +87,9 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(mplexd_SOURCES) $(timerd_SOURCES)
-DIST_SOURCES = $(am__mplexd_SOURCES_DIST) $(am__timerd_SOURCES_DIST)
+SOURCES = $(mcastsend_SOURCES) $(mplexd_SOURCES) $(timerd_SOURCES)
+DIST_SOURCES = $(am__mcastsend_SOURCES_DIST) \
+	$(am__mplexd_SOURCES_DIST) $(am__timerd_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -202,6 +212,16 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/cpp \
 	-I$(BOOST_HOME)
 
+@ENABLE_CPPBUILD_TRUE@mcastsend_SOURCES = \
+@ENABLE_CPPBUILD_TRUE@	mcastsend.cpp
+
+@ENABLE_CPPBUILD_TRUE@mcastsend_LDADD = \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+
 @ENABLE_CPPBUILD_TRUE@mplexd_SOURCES = \
 @ENABLE_CPPBUILD_TRUE@	mplexd.cpp
 
@@ -262,6 +282,9 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+mcastsend$(EXEEXT): $(mcastsend_OBJECTS) $(mcastsend_DEPENDENCIES) 
+	@rm -f mcastsend$(EXEEXT)
+	$(CXXLINK) $(mcastsend_LDFLAGS) $(mcastsend_OBJECTS) $(mcastsend_LDADD) $(LIBS)
 mplexd$(EXEEXT): $(mplexd_OBJECTS) $(mplexd_DEPENDENCIES) 
 	@rm -f mplexd$(EXEEXT)
 	$(CXXLINK) $(mplexd_LDFLAGS) $(mplexd_OBJECTS) $(mplexd_LDADD) $(LIBS)
@@ -275,6 +298,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastsend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timerd.Po@am__quote@
 

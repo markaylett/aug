@@ -469,9 +469,9 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 }
 
 AUGSYS_API char*
-aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
+aug_inetntoa(char* dst, const struct aug_inetaddr* src, socklen_t len)
 {
-    DWORD dstlen = size;
+    DWORD dstlen = len;
     DWORD srclen;
     union {
         short family_;
@@ -483,14 +483,14 @@ aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
 
     switch (src->family_) {
     case AF_INET:
-		srclen = sizeof(un.ipv4_);
         un.family_ = AF_INET;
-        memcpy(&un.ipv4_.sin_addr, src, srclen);
+        un.ipv4_.sin_addr.s_addr = src->un_.ipv4_.s_addr;
+		srclen = sizeof(un.ipv4_);
         break;
     case AF_INET6:
-		srclen = sizeof(un.ipv6_);
         un.family_ = AF_INET6;
-        memcpy(&un.ipv6_.sin6_addr, src, srclen);
+        memcpy(&un.ipv6_.sin6_addr, &src->un_, sizeof(src->un_.ipv6_));
+		srclen = sizeof(un.ipv6_);
         break;
     default:
         aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
@@ -506,8 +506,8 @@ aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
     return dst;
 }
 
-AUGSYS_API struct aug_ipaddr*
-aug_inetpton(int af, const char* src, struct aug_ipaddr* dst)
+AUGSYS_API struct aug_inetaddr*
+aug_inetaton(int af, struct aug_inetaddr* dst, const char* src)
 {
     INT len;
     union {
@@ -539,11 +539,9 @@ aug_inetpton(int af, const char* src, struct aug_ipaddr* dst)
     }
 
     if (AF_INET == (dst->family_ = af))
-        memcpy(&dst->un_.ipv4_, &un.ipv4_.sin_addr,
-               sizeof(un.ipv4_.sin_addr));
+        dst->un_.ipv4_.s_addr = un.ipv4_.sin_addr.s_addr;
     else
-        memcpy(&dst->un_.ipv6_, &un.ipv6_.sin6_addr,
-               sizeof(un.ipv6_.sin6_addr));
+        memcpy(&dst->un_, &un.ipv6_.sin6_addr, sizeof(dst->un_.ipv6_));
     return dst;
 }
 
@@ -563,4 +561,22 @@ aug_getaddrinfo(const char* host, const char* serv,
         return -1;
     }
     return 0;
+}
+
+AUGSYS_API struct aug_inetaddr*
+aug_getinetaddr(struct aug_inetaddr* dst, const struct aug_endpoint* src)
+{
+    switch (dst->family_ = src->un_.family_) {
+    case AF_INET:
+        dst->un_.ipv4_.s_addr = src->un_.ipv4_.sin_addr.s_addr;
+        break;
+    case AF_INET6:
+        memcpy(&dst->un_, &src->un_.ipv6_.sin6_addr,
+               sizeof(src->un_.ipv6_.sin6_addr));
+        break;
+    default:
+        aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
+        return NULL;
+    }
+    return dst;
 }

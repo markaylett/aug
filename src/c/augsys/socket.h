@@ -39,7 +39,7 @@ struct aug_endpoint {
     } un_;
 };
 
-struct aug_ipaddr {
+struct aug_inetaddr {
     short family_;
     union {
         struct in_addr ipv4_;
@@ -101,10 +101,10 @@ AUGSYS_API int
 aug_socketpair(int domain, int type, int protocol, int sv[2]);
 
 AUGSYS_API char*
-aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size);
+aug_inetntoa(char* dst, const struct aug_inetaddr* src, socklen_t len);
 
-AUGSYS_API struct aug_ipaddr*
-aug_inetpton(int af, const char* src, struct aug_ipaddr* dst);
+AUGSYS_API struct aug_inetaddr*
+aug_inetaton(int af, struct aug_inetaddr* dst, const char* src);
 
 AUGSYS_API void
 aug_freeaddrinfo(struct addrinfo* res);
@@ -112,6 +112,9 @@ aug_freeaddrinfo(struct addrinfo* res);
 AUGSYS_API int
 aug_getaddrinfo(const char* host, const char* serv,
                 const struct addrinfo* hints, struct addrinfo** res);
+
+AUGSYS_API struct aug_inetaddr*
+aug_getinetaddr(struct aug_inetaddr* dst, const struct aug_endpoint* src);
 
 AUGSYS_API int
 aug_setreuseaddr(int s, int on);

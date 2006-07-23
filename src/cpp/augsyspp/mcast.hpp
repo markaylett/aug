@@ -12,14 +12,16 @@
 namespace aug {
 
     inline void
-    joinmcast(fdref ref, const struct aug_ipaddr& addr, unsigned int ifindex)
+    joinmcast(fdref ref, const struct aug_inetaddr& addr,
+              unsigned int ifindex)
     {
         if (-1 == aug_joinmcast(ref.get(), &addr, ifindex))
             throwerrinfo("aug_joinmcast() failed");
     }
 
     inline void
-    leavemcast(fdref ref, const struct aug_ipaddr& addr, unsigned int ifindex)
+    leavemcast(fdref ref, const struct aug_inetaddr& addr,
+               unsigned int ifindex)
     {
         if (-1 == aug_leavemcast(ref.get(), &addr, ifindex))
             throwerrinfo("aug_leavemcast() failed");

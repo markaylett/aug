@@ -30,7 +30,7 @@ getifaddr_(int s, struct in_addr* addr, unsigned int ifindex)
 }
 
 AUGSYS_API int
-aug_joinmcast(int s, const struct aug_ipaddr* addr, unsigned int ifindex)
+aug_joinmcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 {
     union {
         struct ip_mreq ipv4_;
@@ -68,7 +68,7 @@ aug_joinmcast(int s, const struct aug_ipaddr* addr, unsigned int ifindex)
 }
 
 AUGSYS_API int
-aug_leavemcast(int s, const struct aug_ipaddr* addr, unsigned int ifindex)
+aug_leavemcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 {
     union {
         struct ip_mreq ipv4_;

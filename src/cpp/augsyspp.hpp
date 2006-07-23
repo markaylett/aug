@@ -7,7 +7,9 @@
 #include "augsys.h"
 
 #include "augsyspp/base.hpp"
+#include "augsyspp/endpoint.hpp"
 #include "augsyspp/exception.hpp"
+#include "augsyspp/inetaddr.hpp"
 #include "augsyspp/mplexer.hpp"
 #include "augsyspp/null.hpp"
 #include "augsyspp/smartfd.hpp"

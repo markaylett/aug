@@ -4,7 +4,9 @@
 
 #include "augsys/errinfo.h"
 
-#include "iptypes_.h"
+#if defined(__GNUC__)
+# include "iptypes_.h"
+#endif /* __GNUC__ */
 #include <iphlpapi.h>
 
 static int
@@ -40,7 +42,7 @@ findif_(int af, unsigned int ifindex,
     if (NO_ERROR == ret) {
 
         PIP_ADAPTER_ADDRESSES it = list;
-        for (i = 0; it && i < ifindex; it = it->Next, ++i)
+        for (i = 0; it && i < (int)ifindex; it = it->Next, ++i)
             ;
 
         if (it)
@@ -115,7 +117,7 @@ getifindex_(DWORD* index, unsigned int ifindex)
 }
 
 AUGSYS_API int
-aug_joinmcast(int s, const struct aug_ipaddr* addr, unsigned int ifindex)
+aug_joinmcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 {
     union {
         struct ip_mreq ipv4_;
@@ -147,11 +149,11 @@ aug_joinmcast(int s, const struct aug_ipaddr* addr, unsigned int ifindex)
 
         if (ifindex) {
 
-            DWORD ifindex;
-            if (-1 == getifindex_(&ifindex, ifindex))
+            DWORD i;
+            if (-1 == getifindex_(&i, ifindex))
                 return -1;
 
-			un.ipv6_.ipv6mr_interface = ifindex;
+			un.ipv6_.ipv6mr_interface = i;
         } else
 			un.ipv6_.ipv6mr_interface = 0;
 
@@ -164,7 +166,7 @@ aug_joinmcast(int s, const struct aug_ipaddr* addr, unsigned int ifindex)
 }
 
 AUGSYS_API int
-aug_leavemcast(int s, const struct aug_ipaddr* addr, unsigned int ifindex)
+aug_leavemcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 {
     union {
         struct ip_mreq ipv4_;
@@ -196,11 +198,11 @@ aug_leavemcast(int s, const struct aug_ipaddr* addr, unsigned int ifindex)
 
         if (ifindex) {
 
-            DWORD ifindex;
-            if (-1 == getifindex_(&ifindex, ifindex))
+            DWORD i;
+            if (-1 == getifindex_(&i, ifindex))
                 return -1;
 
-			un.ipv6_.ipv6mr_interface = ifindex;
+			un.ipv6_.ipv6mr_interface = i;
         } else
 			un.ipv6_.ipv6mr_interface = 0;
 

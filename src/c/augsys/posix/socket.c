@@ -192,10 +192,11 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
     return 0;
 }
 
+
 AUGSYS_API char*
-aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
+aug_inetntoa(char* dst, const struct aug_inetaddr* src, socklen_t len)
 {
-    const char* ret = inet_ntop(src->family_, &src->un_, dst, size);
+    const char* ret = inet_ntop(src->family_, &src->un_, dst, len);
     if (!ret) {
       aug_setposixerrinfo(__FILE__, __LINE__, errno);
       return NULL;
@@ -203,8 +204,8 @@ aug_inetntop(const struct aug_ipaddr* src, char* dst, socklen_t size)
     return dst;
 }
 
-AUGSYS_API struct aug_ipaddr*
-aug_inetpton(int af, const char* src, struct aug_ipaddr* dst)
+AUGSYS_API struct aug_inetaddr*
+aug_inetaton(int af, struct aug_inetaddr* dst, const char* src)
 {
     int ret = inet_pton(af, src, &dst->un_);
     if (ret < 0) {
@@ -237,4 +238,22 @@ aug_getaddrinfo(const char* host, const char* serv,
         return -1;
     }
     return 0;
+}
+
+AUGSYS_API struct aug_inetaddr*
+aug_getinetaddr(struct aug_inetaddr* dst, const struct aug_endpoint* src)
+{
+    switch (dst->family_ = src->un_.family_) {
+    case AF_INET:
+        dst->un_.ipv4_.s_addr = src->un_.ipv4_.sin_addr.s_addr;
+        break;
+    case AF_INET6:
+        memcpy(&dst->un_, &src->un_.ipv6_.sin6_addr,
+               sizeof(src->un_.ipv6_.sin6_addr));
+        break;
+    default:
+        aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
+        return NULL;
+    }
+    return dst;
 }

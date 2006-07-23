@@ -52,11 +52,13 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 @ENABLE_CPPBUILD_TRUE@libaugsyspp_la_DEPENDENCIES =  \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-am__libaugsyspp_la_SOURCES_DIST = base.cpp config.cpp exception.cpp \
-	mcast.cpp mplexer.cpp mutex.cpp null.cpp smartfd.cpp socket.cpp \
-	string.cpp types.cpp unistd.cpp utility.cpp
+am__libaugsyspp_la_SOURCES_DIST = base.cpp config.cpp endpoint.cpp \
+	exception.cpp inetaddr.cpp mcast.cpp mplexer.cpp mutex.cpp \
+	null.cpp smartfd.cpp socket.cpp string.cpp types.cpp \
+	unistd.cpp utility.cpp
 @ENABLE_CPPBUILD_TRUE@am_libaugsyspp_la_OBJECTS = base.lo config.lo \
-@ENABLE_CPPBUILD_TRUE@	exception.lo mcast.lo mplexer.lo mutex.lo null.lo \
+@ENABLE_CPPBUILD_TRUE@	endpoint.lo exception.lo inetaddr.lo \
+@ENABLE_CPPBUILD_TRUE@	mcast.lo mplexer.lo mutex.lo null.lo \
 @ENABLE_CPPBUILD_TRUE@	smartfd.lo socket.lo string.lo types.lo \
 @ENABLE_CPPBUILD_TRUE@	unistd.lo utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
@@ -214,7 +216,9 @@ modincludedir = $(includedir)/augsyspp
 modinclude_HEADERS = \
 	base.hpp \
 	config.hpp \
+	endpoint.hpp \
 	exception.hpp \
+	inetaddr.hpp \
 	mcast.hpp \
 	mplexer.hpp \
 	mutex.hpp \
@@ -230,7 +234,9 @@ modinclude_HEADERS = \
 @ENABLE_CPPBUILD_TRUE@libaugsyspp_la_SOURCES = \
 @ENABLE_CPPBUILD_TRUE@	base.cpp \
 @ENABLE_CPPBUILD_TRUE@	config.cpp \
+@ENABLE_CPPBUILD_TRUE@	endpoint.cpp \
 @ENABLE_CPPBUILD_TRUE@	exception.cpp \
+@ENABLE_CPPBUILD_TRUE@	inetaddr.cpp \
 @ENABLE_CPPBUILD_TRUE@	mcast.cpp \
 @ENABLE_CPPBUILD_TRUE@	mplexer.cpp \
 @ENABLE_CPPBUILD_TRUE@	mutex.cpp \
@@ -317,7 +323,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endpoint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inetaddr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@

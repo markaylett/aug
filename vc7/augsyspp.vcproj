@@ -113,7 +113,13 @@
 				RelativePath="..\src\cpp\augsyspp\config.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augsyspp\endpoint.hpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsyspp\exception.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsyspp\inetaddr.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\mcast.cpp">
@@ -157,7 +163,13 @@
 				RelativePath="..\src\cpp\augsyspp\config.hpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augsyspp\endpoint.hpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsyspp\exception.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsyspp\inetaddr.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\mcast.hpp">
