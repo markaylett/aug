@@ -12,25 +12,23 @@
 namespace aug {
 
     inline void
-    joinmcast(fdref ref, const struct aug_inetaddr& addr,
-              unsigned int ifindex)
+    joinmcast(fdref ref, const struct aug_inetaddr& addr, const char* ifname)
     {
-        if (-1 == aug_joinmcast(ref.get(), &addr, ifindex))
+        if (-1 == aug_joinmcast(ref.get(), &addr, ifname))
             throwerrinfo("aug_joinmcast() failed");
     }
 
     inline void
-    leavemcast(fdref ref, const struct aug_inetaddr& addr,
-               unsigned int ifindex)
+    leavemcast(fdref ref, const struct aug_inetaddr& addr, const char* ifname)
     {
-        if (-1 == aug_leavemcast(ref.get(), &addr, ifindex))
+        if (-1 == aug_leavemcast(ref.get(), &addr, ifname))
             throwerrinfo("aug_leavemcast() failed");
     }
 
     inline void
-    setmcastif(fdref ref, unsigned int ifindex)
+    setmcastif(fdref ref, const char* ifname)
     {
-        if (-1 == aug_setmcastif(ref.get(), ifindex))
+        if (-1 == aug_setmcastif(ref.get(), ifname))
             throwerrinfo("aug_setmcastif() failed");
     }
 

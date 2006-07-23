@@ -7,13 +7,13 @@
 #include "augsys/socket.h"
 
 AUGSYS_API int
-aug_joinmcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex);
+aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname);
 
 AUGSYS_API int
-aug_leavemcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex);
+aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname);
 
 AUGSYS_API int
-aug_setmcastif(int s, unsigned int ifindex);
+aug_setmcastif(int s, const char* ifname);
 
 AUGSYS_API int
 aug_setmcastloop(int s, int on);

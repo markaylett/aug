@@ -10,6 +10,7 @@
 #include "augsyspp/endpoint.hpp"
 #include "augsyspp/exception.hpp"
 #include "augsyspp/inetaddr.hpp"
+#include "augsyspp/mcast.hpp"
 #include "augsyspp/mplexer.hpp"
 #include "augsyspp/null.hpp"
 #include "augsyspp/smartfd.hpp"

@@ -101,10 +101,10 @@ AUGSYS_API int
 aug_socketpair(int domain, int type, int protocol, int sv[2]);
 
 AUGSYS_API char*
-aug_inetntoa(char* dst, const struct aug_inetaddr* src, socklen_t len);
+aug_inetntoa(const struct aug_inetaddr* src, char* dst, socklen_t len);
 
 AUGSYS_API struct aug_inetaddr*
-aug_inetaton(int af, struct aug_inetaddr* dst, const char* src);
+aug_inetaton(int af, const char* src, struct aug_inetaddr* dst);
 
 AUGSYS_API void
 aug_freeaddrinfo(struct addrinfo* res);
@@ -113,8 +113,12 @@ AUGSYS_API int
 aug_getaddrinfo(const char* host, const char* serv,
                 const struct addrinfo* hints, struct addrinfo** res);
 
+AUGSYS_API struct aug_endpoint*
+aug_getendpoint(const struct aug_inetaddr* src, struct aug_endpoint* dst,
+                unsigned short port);
+
 AUGSYS_API struct aug_inetaddr*
-aug_getinetaddr(struct aug_inetaddr* dst, const struct aug_endpoint* src);
+aug_getinetaddr(const struct aug_endpoint* src, struct aug_inetaddr* dst);
 
 AUGSYS_API int
 aug_setreuseaddr(int s, int on);

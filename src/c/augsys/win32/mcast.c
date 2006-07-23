@@ -105,19 +105,21 @@ ifindex_(void* arg, unsigned int ifindex, PIP_ADAPTER_ADDRESSES adapter)
 }
 
 static int
-getifaddr_(struct in_addr* addr, unsigned int ifindex)
+getifaddr_(struct in_addr* addr, const char* ifname)
 {
+    unsigned int ifindex = atoi(ifname);
     return findif_(AF_INET, ifindex, ifaddr_, &addr);
 }
 
 static int
-getifindex_(DWORD* index, unsigned int ifindex)
+getifindex_(DWORD* index, const char* ifname)
 {
+    unsigned int ifindex = atoi(ifname);
     return findif_(AF_INET6, ifindex, ifindex_, &index);
 }
 
 AUGSYS_API int
-aug_joinmcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
+aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
@@ -129,10 +131,10 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 
         un.ipv4_.imr_multiaddr.s_addr = addr->un_.ipv4_.s_addr;
 
-        if (ifindex) {
+        if (ifname) {
 
             struct in_addr ifaddr;
-            if (-1 == getifaddr_(&ifaddr, ifindex))
+            if (-1 == getifaddr_(&ifaddr, ifname))
                 return -1;
 
             un.ipv4_.imr_interface.s_addr = ifaddr.s_addr;
@@ -147,10 +149,10 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 		memcpy(&un.ipv6_.ipv6mr_multiaddr, &addr->un_.ipv6_,
 			   sizeof(addr->un_.ipv6_));
 
-        if (ifindex) {
+        if (ifname) {
 
             DWORD i;
-            if (-1 == getifindex_(&i, ifindex))
+            if (-1 == getifindex_(&i, ifname))
                 return -1;
 
 			un.ipv6_.ipv6mr_interface = i;
@@ -166,7 +168,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 }
 
 AUGSYS_API int
-aug_leavemcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
+aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
@@ -178,10 +180,10 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 
         un.ipv4_.imr_multiaddr.s_addr = addr->un_.ipv4_.s_addr;
 
-        if (ifindex) {
+        if (ifname) {
 
             struct in_addr ifaddr;
-            if (-1 == getifaddr_(&ifaddr, ifindex))
+            if (-1 == getifaddr_(&ifaddr, ifname))
                 return -1;
 
             un.ipv4_.imr_interface.s_addr = ifaddr.s_addr;
@@ -196,10 +198,10 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 		memcpy(&un.ipv6_.ipv6mr_multiaddr, &addr->un_.ipv6_,
 			   sizeof(addr->un_.ipv6_));
 
-        if (ifindex) {
+        if (ifname) {
 
             DWORD i;
-            if (-1 == getifindex_(&i, ifindex))
+            if (-1 == getifindex_(&i, ifname))
                 return -1;
 
 			un.ipv6_.ipv6mr_interface = i;
@@ -215,7 +217,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, unsigned int ifindex)
 }
 
 AUGSYS_API int
-aug_setmcastif(int s, unsigned int ifindex)
+aug_setmcastif(int s, const char* ifname)
 {
     int af;
     union {
@@ -229,7 +231,7 @@ aug_setmcastif(int s, unsigned int ifindex)
     switch (af) {
     case AF_INET:
 
-        if (-1 == getifaddr_(&un.ipv4_, ifindex))
+        if (-1 == getifaddr_(&un.ipv4_, ifname))
             return -1;
 
         return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_IF, &un.ipv4_,
@@ -237,7 +239,7 @@ aug_setmcastif(int s, unsigned int ifindex)
 
     case AF_INET6:
 
-        if (-1 == getifindex_(&un.ipv6_, ifindex))
+        if (-1 == getifindex_(&un.ipv6_, ifname))
             return -1;
 
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_IF,

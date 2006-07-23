@@ -318,7 +318,7 @@ readevent_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 static int
 init_(const struct aug_var* arg)
 {
-    struct aug_endpointp epp;
+    struct aug_hostserv hs;
     struct aug_endpoint ep;
     struct aug_var ptr;
 
@@ -327,10 +327,10 @@ init_(const struct aug_var* arg)
     if (-1 == aug_setsrvlogger("aug") || !(mplexer_ = aug_createmplexer()))
         return -1;
 
-    if (!aug_parseinet(&epp, address_))
+    if (!aug_parsehostserv(&hs, address_))
         goto fail1;
 
-    if (-1 == (fd_ = aug_tcplisten(epp.host_, epp.serv_, &ep)))
+    if (-1 == (fd_ = aug_tcplisten(hs.host_, hs.serv_, &ep)))
         goto fail1;
 
     if (-1 == aug_insertconn(&conns_, fd_, listener_,

@@ -238,8 +238,8 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
     return -1;
 }
 
-AUGNET_API struct aug_endpointp*
-aug_parseinet(struct aug_endpointp* dst, const char* src)
+AUGNET_API struct aug_hostserv*
+aug_parsehostserv(struct aug_hostserv* dst, const char* src)
 {
     size_t len;
     char* serv;

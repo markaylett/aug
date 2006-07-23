@@ -5,6 +5,7 @@
 #include "augsys/errinfo.h"
 
 #include <errno.h>
+#include <string.h> /* memcpy() */
 #include <unistd.h>
 
 static int
@@ -194,7 +195,7 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 
 
 AUGSYS_API char*
-aug_inetntoa(char* dst, const struct aug_inetaddr* src, socklen_t len)
+aug_inetntoa(const struct aug_inetaddr* src, char* dst, socklen_t len)
 {
     const char* ret = inet_ntop(src->family_, &src->un_, dst, len);
     if (!ret) {
@@ -205,7 +206,7 @@ aug_inetntoa(char* dst, const struct aug_inetaddr* src, socklen_t len)
 }
 
 AUGSYS_API struct aug_inetaddr*
-aug_inetaton(int af, struct aug_inetaddr* dst, const char* src)
+aug_inetaton(int af, const char* src, struct aug_inetaddr* dst)
 {
     int ret = inet_pton(af, src, &dst->un_);
     if (ret < 0) {
@@ -240,8 +241,31 @@ aug_getaddrinfo(const char* host, const char* serv,
     return 0;
 }
 
+AUGSYS_API struct aug_endpoint*
+aug_getendpoint(const struct aug_inetaddr* src, struct aug_endpoint* dst,
+                unsigned short port)
+{
+    switch (dst->un_.family_ = src->family_) {
+    case AF_INET:
+        dst->len_ = sizeof(dst->un_.ipv4_);
+        dst->un_.ipv4_.sin_port = htons(port);
+        dst->un_.ipv4_.sin_addr.s_addr = src->un_.ipv4_.s_addr;
+        break;
+    case AF_INET6:
+        dst->len_ = sizeof(dst->un_.ipv6_);
+        dst->un_.ipv6_.sin6_port = htons(port);
+        memcpy(&dst->un_.ipv6_.sin6_addr, &src->un_.ipv6_,
+               sizeof(src->un_.ipv6_));
+        break;
+    default:
+        aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
+        return NULL;
+    }
+    return dst;
+}
+
 AUGSYS_API struct aug_inetaddr*
-aug_getinetaddr(struct aug_inetaddr* dst, const struct aug_endpoint* src)
+aug_getinetaddr(const struct aug_endpoint* src, struct aug_inetaddr* dst)
 {
     switch (dst->family_ = src->un_.family_) {
     case AF_INET:

@@ -71,11 +71,11 @@ namespace aug {
             throwerrinfo("aug_setnodelay() failed");
     }
 
-    inline struct aug_endpointp&
-    parseinet(struct aug_endpointp& dst, const char* src)
+    inline struct aug_hostserv&
+    parsehostserv(struct aug_hostserv& dst, const char* src)
     {
-        if (!aug_parseinet(&dst, src))
-            throwerrinfo("aug_parseinet() failed");
+        if (!aug_parsehostserv(&dst, src))
+            throwerrinfo("aug_parsehostserv() failed");
         return dst;
     }
 }
