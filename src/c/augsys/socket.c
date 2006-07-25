@@ -16,34 +16,42 @@ static const char rcsid[] = "$Id:$";
 # include "augsys/win32/socket.c"
 #endif /* _WIN32 */
 
-typedef struct aug_inetaddr ipv4first_;
-
-static const ipv4first_ ipv4any_ = {
-    AF_INET,
-    { { { { 0, 0, 0, 0 } } } }
-};
-
-static const ipv4first_ ipv4loopback_ = {
-    AF_INET,
-    { { { { 127, 0, 0, 1 } } } }
-};
-
-typedef struct {
+struct ipv4_ {
     short family_;
     union {
-        struct in6_addr ipv6_;
+        unsigned char data_[4];
         struct in_addr ipv4_;
+        struct in6_addr ipv6_;
     } un_;
-} ipv6first_;
-
-static const ipv6first_ ipv6any_ = {
-    AF_INET6,
-    { { { IN6ADDR_ANY_INIT } } }
 };
 
-static const ipv6first_ ipv6loopback_ = {
+static const struct ipv4_ ipv4any_ = {
+    AF_INET,
+    { { 0, 0, 0, 0 } }
+};
+
+static const struct ipv4_ ipv4loopback_ = {
+    AF_INET,
+    { { 127, 0, 0, 1 } }
+};
+
+struct ipv6_ {
+    short family_;
+    union {
+        unsigned char data_[16];
+        struct in_addr ipv4_;
+        struct in6_addr ipv6_;
+    } un_;
+};
+
+static const struct ipv6_ ipv6any_ = {
     AF_INET6,
-    { { { IN6ADDR_LOOPBACK_INIT }  } }
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
+};
+
+static const struct ipv6_ ipv6loopback_ = {
+    AF_INET6,
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } }
 };
 
 AUGSYS_API int
