@@ -53,7 +53,7 @@ namespace aug {
     }
 
     inline aug_var&
-    clearvar(struct aug_var& v)
+    clear(struct aug_var& v)
     {
         return *aug_clearvar(&v);
     }
@@ -72,6 +72,12 @@ namespace aug {
         return detail::var_traits<T>::get(v);
     }
 
+    inline aug_vartype
+    type(const struct aug_var& v)
+    {
+        return v.type_;
+    }
+
     class var {
     public:
         typedef struct aug_var ctype;
@@ -86,12 +92,12 @@ namespace aug {
     public:
         var()
         {
-            clearvar(var_);
+            clear(var_);
         }
 
         var(const null_&)
         {
-            clearvar(var_);
+            clear(var_);
         }
 
         template <typename T>
@@ -104,7 +110,7 @@ namespace aug {
         var&
         operator =(const null_&)
         {
-            clearvar(var_);
+            clear(var_);
             return *this;
         }
 
@@ -124,12 +130,6 @@ namespace aug {
         operator const struct aug_var&() const
         {
             return var_;
-        }
-
-        aug_vartype
-        type() const
-        {
-            return var_.type_;
         }
     };
 

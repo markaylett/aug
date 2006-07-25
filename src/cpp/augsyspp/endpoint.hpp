@@ -4,6 +4,108 @@
 #ifndef AUGSYSPP_ENDPOINT_HPP
 #define AUGSYSPP_ENDPOINT_HPP
 
-#include "augsyspp/config.hpp"
+#include "augsyspp/socket.hpp"
+
+namespace aug {
+
+    inline aug_endpoint&
+    clear(struct aug_endpoint& ep)
+    {
+        bzero(&ep, sizeof(struct aug_endpoint));
+        return ep;
+    }
+
+    inline aug_endpoint&
+    setfamily(struct aug_endpoint& ep, short family)
+    {
+        switch (ep.un_.family_ = family) {
+        case AF_INET:
+            ep.len_ = sizeof(struct sockaddr_in);
+            break;
+        case AF_INET6:
+            ep.len_ = sizeof(struct sockaddr_in6);
+            break;
+        default:
+            ep.len_ = AUG_MAXADDRLEN;
+        }
+        return ep;
+    }
+
+    inline aug_endpoint&
+    setport(struct aug_endpoint& ep, unsigned short port)
+    {
+        ep.un_.all_.port_ = port;
+        return ep;
+    }
+
+    inline aug_endpoint&
+    setsockaddr(struct aug_endpoint& ep, const struct sockaddr_in& ipv4)
+    {
+        ep.len_ = sizeof(struct sockaddr_in);
+        memcpy(&ep.un_.ipv4_, &ipv4, sizeof(ep.un_.ipv4_));
+        return ep;
+    }
+
+    inline aug_endpoint&
+    setsockaddr(struct aug_endpoint& ep, const struct sockaddr_in6& ipv6)
+    {
+        ep.len_ = sizeof(struct sockaddr_in6);
+        memcpy(&ep.un_.ipv6_, &ipv6, sizeof(ep.un_.ipv6_));
+        return ep;
+    }
+
+    inline short
+    family(const struct aug_endpoint& ep)
+    {
+        return ep.un_.family_;
+    }
+
+    class endpoint {
+    public:
+        typedef struct aug_endpoint ctype;
+    private:
+        struct aug_endpoint ep_;
+
+        endpoint(const endpoint&);
+
+        endpoint&
+        operator =(const endpoint&);
+
+    public:
+        endpoint()
+        {
+            clear(ep_);
+        }
+
+        endpoint(const null_&)
+        {
+            clear(ep_);
+        }
+
+        explicit
+        endpoint(const struct aug_inetaddr& addr, unsigned short port = 0)
+        {
+            setport(ep_, port);
+            setinetaddr(ep_, addr);
+        }
+
+        endpoint&
+        operator =(const null_&)
+        {
+            clear(ep_);
+            return *this;
+        }
+
+        operator struct aug_endpoint&()
+        {
+            return ep_;
+        }
+
+        operator const struct aug_endpoint&() const
+        {
+            return ep_;
+        }
+    };
+}
 
 #endif // AUGSYSPP_ENDPOINT_HPP

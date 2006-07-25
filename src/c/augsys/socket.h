@@ -32,7 +32,11 @@ struct aug_endpoint {
     socklen_t len_;
     union {
         short family_;
-        struct sockaddr all_;
+        struct {
+            short family_;
+            unsigned short port_;
+        } all_;
+        struct sockaddr sa_;
         struct sockaddr_in ipv4_;
         struct sockaddr_in6 ipv6_;
         char pad_[AUG_MAXADDRLEN];
@@ -101,10 +105,10 @@ AUGSYS_API int
 aug_socketpair(int domain, int type, int protocol, int sv[2]);
 
 AUGSYS_API char*
-aug_inetntoa(const struct aug_inetaddr* src, char* dst, socklen_t len);
+aug_inetntop(const struct aug_inetaddr* src, char* dst, socklen_t len);
 
 AUGSYS_API struct aug_inetaddr*
-aug_inetaton(int af, const char* src, struct aug_inetaddr* dst);
+aug_inetpton(int af, const char* src, struct aug_inetaddr* dst);
 
 AUGSYS_API void
 aug_freeaddrinfo(struct addrinfo* res);
@@ -113,17 +117,22 @@ AUGSYS_API int
 aug_getaddrinfo(const char* host, const char* serv,
                 const struct addrinfo* hints, struct addrinfo** res);
 
-AUGSYS_API struct aug_endpoint*
-aug_getendpoint(const struct aug_inetaddr* src, struct aug_endpoint* dst,
-                unsigned short port);
-
-AUGSYS_API struct aug_inetaddr*
-aug_getinetaddr(const struct aug_endpoint* src, struct aug_inetaddr* dst);
-
 AUGSYS_API int
 aug_setreuseaddr(int s, int on);
 
 AUGSYS_API int
 aug_getfamily(int s);
+
+AUGSYS_API struct aug_endpoint*
+aug_setinetaddr(struct aug_endpoint* ep, const struct aug_inetaddr* addr);
+
+AUGSYS_API struct aug_inetaddr*
+aug_getinetaddr(const struct aug_endpoint* ep, struct aug_inetaddr* addr);
+
+AUGSYS_API const struct aug_inetaddr*
+aug_inetany(int af);
+
+AUGSYS_API const struct aug_inetaddr*
+aug_inetloopback(int af);
 
 #endif /* AUGSYS_SOCKET_H */

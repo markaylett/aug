@@ -12,7 +12,7 @@
 namespace aug {
 
     inline smartfd
-    socket(int domain, int type, int protocol)
+    socket(int domain, int type, int protocol = 0)
     {
         smartfd sfd(smartfd::attach(aug_socket(domain, type, protocol)));
         if (null == sfd)
@@ -140,45 +140,28 @@ namespace aug {
     }
 
     inline std::string
-    inetntoa(const struct aug_inetaddr& src)
+    inetntop(const struct aug_inetaddr& src)
     {
         char buf[AUG_MAXADDRLEN];
-        if (!aug_inetntoa(&src, buf, sizeof(buf)))
-            throwerrinfo("aug_inetntoa() failed");
+        if (!aug_inetntop(&src, buf, sizeof(buf)))
+            throwerrinfo("aug_inetntop() failed");
         return buf;
     }
 
     inline struct aug_inetaddr&
-    inetaton(int af, const char* src, struct aug_inetaddr& dst)
+    inetpton(int af, const char* src, struct aug_inetaddr& dst)
     {
-        if (!aug_inetaton(af, src, &dst))
-            throwerrinfo("aug_inetaton() failed");
+        if (!aug_inetpton(af, src, &dst))
+            throwerrinfo("aug_inetpton() failed");
         return dst;
     }
 
     inline struct aug_inetaddr&
-    inetaton(const char* src, struct aug_inetaddr& dst)
+    inetpton(const char* src, struct aug_inetaddr& dst)
     {
-        if (!aug_inetaton(AF_INET, src, &dst)
-            && !aug_inetaton(AF_INET6, src, &dst))
-            throwerrinfo("aug_inetaton() failed");
-        return dst;
-    }
-
-    inline struct aug_inetaddr&
-    getinetaddr(const struct aug_endpoint& src, struct aug_inetaddr& dst)
-    {
-        if (!aug_getinetaddr(&src, &dst))
-            throwerrinfo("aug_getinetaddr() failed");
-        return dst;
-    }
-
-    inline struct aug_endpoint&
-    getendpoint(const struct aug_inetaddr& src, struct aug_endpoint& dst,
-                unsigned int port)
-    {
-        if (!aug_getendpoint(&src, &dst, port))
-            throwerrinfo("aug_getendpoint() failed");
+        if (!aug_inetpton(AF_INET, src, &dst)
+            && !aug_inetpton(AF_INET6, src, &dst))
+            throwerrinfo("aug_inetpton() failed");
         return dst;
     }
 
@@ -197,6 +180,40 @@ namespace aug {
         if (-1 == ret)
             throwerrinfo("aug_getfamily() failed");
         return ret;
+    }
+
+    inline struct aug_endpoint&
+    setinetaddr(struct aug_endpoint& ep, const struct aug_inetaddr& addr)
+    {
+        if (!aug_setinetaddr(&ep, &addr))
+            throwerrinfo("aug_setinetaddr() failed");
+        return ep;
+    }
+
+    inline struct aug_inetaddr&
+    getinetaddr(const struct aug_endpoint& ep, struct aug_inetaddr& addr)
+    {
+        if (!aug_getinetaddr(&ep, &addr))
+            throwerrinfo("aug_getinetaddr() failed");
+        return addr;
+    }
+
+    inline const struct aug_inetaddr&
+    inetany(int af)
+    {
+        const struct aug_inetaddr* ret(aug_inetany(af));
+        if (!ret)
+            throwerrinfo("aug_inetany() failed");
+        return *ret;
+    }
+
+    inline const struct aug_inetaddr&
+    inetloopback(int af)
+    {
+        const struct aug_inetaddr* ret(aug_inetloopback(af));
+        if (!ret)
+            throwerrinfo("aug_inetloopback() failed");
+        return *ret;
     }
 }
 

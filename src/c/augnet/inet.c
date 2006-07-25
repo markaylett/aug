@@ -44,7 +44,7 @@ aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
             continue; /* Ignore this one. */
 
         ep->len_ = (socklen_t)res->ai_addrlen;
-        memcpy(&ep->un_.all_, res->ai_addr, res->ai_addrlen);
+        memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
 
         if (0 == aug_connect(fd, ep))
             break; /* Success. */
@@ -90,7 +90,7 @@ aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep)
             goto fail2;
 
         ep->len_ = (socklen_t)res->ai_addrlen;
-        memcpy(&ep->un_.all_, res->ai_addr, res->ai_addrlen);
+        memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
 
         if (0 == aug_bind(fd, ep))
             break; /* Success. */
@@ -143,7 +143,7 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep)
         goto fail;
 
     ep->len_ = (socklen_t)res->ai_addrlen;
-    memcpy(&ep->un_.all_, res->ai_addr, res->ai_addrlen);
+    memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
 
     aug_freeaddrinfo(save);
     return fd;
@@ -174,7 +174,7 @@ aug_udpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
             continue; /* Ignore this one. */
 
         ep->len_ = (socklen_t)res->ai_addrlen;
-        memcpy(&ep->un_.all_, res->ai_addr, res->ai_addrlen);
+        memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
 
         if (0 == aug_connect(fd, ep))
             break; /* Success. */
@@ -217,7 +217,7 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
             continue; /* Error, try next one. */
 
         ep->len_ = (socklen_t)res->ai_addrlen;
-        memcpy(&ep->un_.all_, res->ai_addr, res->ai_addrlen);
+        memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
 
         if (0 == aug_bind(fd, ep))
             break; /* Success. */
@@ -239,7 +239,7 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 }
 
 AUGNET_API struct aug_hostserv*
-aug_parsehostserv(struct aug_hostserv* dst, const char* src)
+aug_parsehostserv(const char* src, struct aug_hostserv* dst)
 {
     size_t len;
     char* serv;

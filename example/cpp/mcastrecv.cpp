@@ -19,21 +19,18 @@ main(int argc, char* argv[])
         try {
 
             if (4 != argc) {
-                aug_error("usage: mcastsend <hostserv> <mcast> <ifname>");
+                aug_error("usage: mcastsend <mcast> <serv> <ifname>");
                 return 1;
             }
 
-            struct aug_hostserv hs;
-            parsehostserv(argv[1], hs);
+            inetaddr in(argv[1]);
+            smartfd sfd(aug::socket(family(in), SOCK_DGRAM));
+            setreuseaddr(sfd, true);
 
-            struct endpoint ep;
-            smartfd sfd(udpserver(hs.host_, hs.serv_, ep));
+            endpoint ep(inetany(family(in)));
+            setport(ep, htons(atoi(argv[2])));
+            aug::bind(sfd, ep);
 
-            struct inetaddr in;
-            getinetaddr(ep, in);
-            cout << inetntop(in) << endl;
-
-            inetpton(argv[2], in);
             joinmcast(sfd, in, argv[3]);
 
         } catch (const std::exception& e) {

@@ -201,7 +201,7 @@ namespace test {
         state(poll_base& poll)
             : sfd_(null)
         {
-            struct aug_endpoint ep;
+            struct endpoint ep;
             smartfd sfd(tcplisten("127.0.0.1", "8080", ep));
 
             insertconn(conns_, aug_eventin(), poll);

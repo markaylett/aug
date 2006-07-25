@@ -327,7 +327,7 @@ init_(const struct aug_var* arg)
     if (-1 == aug_setsrvlogger("aug") || !(mplexer_ = aug_createmplexer()))
         return -1;
 
-    if (!aug_parsehostserv(&hs, address_))
+    if (!aug_parsehostserv(address_, &hs))
         goto fail1;
 
     if (-1 == (fd_ = aug_tcplisten(hs.host_, hs.serv_, &ep)))

@@ -72,9 +72,9 @@ namespace aug {
     }
 
     inline struct aug_hostserv&
-    parsehostserv(struct aug_hostserv& dst, const char* src)
+    parsehostserv(const char* src, struct aug_hostserv& dst)
     {
-        if (!aug_parsehostserv(&dst, src))
+        if (!aug_parsehostserv(src, &dst))
             throwerrinfo("aug_parsehostserv() failed");
         return dst;
     }

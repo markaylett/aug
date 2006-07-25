@@ -36,7 +36,7 @@ aug_accept(int s, struct aug_endpoint* ep)
 {
     int fd;
     ep->len_ = AUG_MAXADDRLEN;
-    fd = accept(s,  &ep->un_.all_, &ep->len_);
+    fd = accept(s,  &ep->un_.sa_, &ep->len_);
     if (-1 == fd) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
@@ -48,7 +48,7 @@ aug_accept(int s, struct aug_endpoint* ep)
 AUGSYS_API int
 aug_bind(int s, const struct aug_endpoint* ep)
 {
-    if (-1 == bind(s, &ep->un_.all_, ep->len_)) {
+    if (-1 == bind(s, &ep->un_.sa_, ep->len_)) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
     }
@@ -59,7 +59,7 @@ aug_bind(int s, const struct aug_endpoint* ep)
 AUGSYS_API int
 aug_connect(int s, const struct aug_endpoint* ep)
 {
-    if (-1 == connect(s, &ep->un_.all_, ep->len_)) {
+    if (-1 == connect(s, &ep->un_.sa_, ep->len_)) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return -1;
     }
@@ -70,7 +70,7 @@ aug_connect(int s, const struct aug_endpoint* ep)
 AUGSYS_API struct aug_endpoint*
 aug_getpeername(int s, struct aug_endpoint* ep)
 {
-    if (-1 == getpeername(s, &ep->un_.all_, &ep->len_)) {
+    if (-1 == getpeername(s, &ep->un_.sa_, &ep->len_)) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return NULL;
     }
@@ -81,7 +81,7 @@ aug_getpeername(int s, struct aug_endpoint* ep)
 AUGSYS_API struct aug_endpoint*
 aug_getsockname(int s, struct aug_endpoint* ep)
 {
-    if (-1 == getsockname(s, &ep->un_.all_, &ep->len_)) {
+    if (-1 == getsockname(s, &ep->un_.sa_, &ep->len_)) {
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
         return NULL;
     }
@@ -115,7 +115,7 @@ aug_recvfrom(int s, void* buf, size_t len, int flags, struct aug_endpoint* ep)
 {
     ssize_t ret;
     ep->len_ = AUG_MAXADDRLEN;
-    if (-1 == (ret = recvfrom(s, buf, len, flags, &ep->un_.all_, &ep->len_)))
+    if (-1 == (ret = recvfrom(s, buf, len, flags, &ep->un_.sa_, &ep->len_)))
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
 
     return ret;
@@ -136,7 +136,7 @@ aug_sendto(int s, const void* buf, size_t len, int flags,
            const struct aug_endpoint* ep)
 {
     ssize_t ret;
-    if (-1 == (ret = sendto(s, buf, len, flags, &ep->un_.all_, ep->len_)))
+    if (-1 == (ret = sendto(s, buf, len, flags, &ep->un_.sa_, ep->len_)))
         aug_setposixerrinfo(__FILE__, __LINE__, errno);
 
     return ret;
@@ -195,7 +195,7 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 
 
 AUGSYS_API char*
-aug_inetntoa(const struct aug_inetaddr* src, char* dst, socklen_t len)
+aug_inetntop(const struct aug_inetaddr* src, char* dst, socklen_t len)
 {
     const char* ret = inet_ntop(src->family_, &src->un_, dst, len);
     if (!ret) {
@@ -206,7 +206,7 @@ aug_inetntoa(const struct aug_inetaddr* src, char* dst, socklen_t len)
 }
 
 AUGSYS_API struct aug_inetaddr*
-aug_inetaton(int af, const char* src, struct aug_inetaddr* dst)
+aug_inetpton(int af, const char* src, struct aug_inetaddr* dst)
 {
     int ret = inet_pton(af, src, &dst->un_);
     if (ret < 0) {
@@ -239,45 +239,4 @@ aug_getaddrinfo(const char* host, const char* serv,
         return -1;
     }
     return 0;
-}
-
-AUGSYS_API struct aug_endpoint*
-aug_getendpoint(const struct aug_inetaddr* src, struct aug_endpoint* dst,
-                unsigned short port)
-{
-    switch (dst->un_.family_ = src->family_) {
-    case AF_INET:
-        dst->len_ = sizeof(dst->un_.ipv4_);
-        dst->un_.ipv4_.sin_port = htons(port);
-        dst->un_.ipv4_.sin_addr.s_addr = src->un_.ipv4_.s_addr;
-        break;
-    case AF_INET6:
-        dst->len_ = sizeof(dst->un_.ipv6_);
-        dst->un_.ipv6_.sin6_port = htons(port);
-        memcpy(&dst->un_.ipv6_.sin6_addr, &src->un_.ipv6_,
-               sizeof(src->un_.ipv6_));
-        break;
-    default:
-        aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
-        return NULL;
-    }
-    return dst;
-}
-
-AUGSYS_API struct aug_inetaddr*
-aug_getinetaddr(const struct aug_endpoint* src, struct aug_inetaddr* dst)
-{
-    switch (dst->family_ = src->un_.family_) {
-    case AF_INET:
-        dst->un_.ipv4_.s_addr = src->un_.ipv4_.sin_addr.s_addr;
-        break;
-    case AF_INET6:
-        memcpy(&dst->un_, &src->un_.ipv6_.sin6_addr,
-               sizeof(src->un_.ipv6_.sin6_addr));
-        break;
-    default:
-        aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
-        return NULL;
-    }
-    return dst;
 }

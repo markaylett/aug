@@ -8,4 +8,5 @@ static const char rcsid[] = "$Id:$";
 
 #if defined(_MSC_VER)
 # pragma comment(lib, "ws2_32.lib")
+# pragma comment(lib, "iphlpapi.lib")
 #endif /* _MSC_VER */

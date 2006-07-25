@@ -108,6 +108,11 @@ static int
 getifaddr_(struct in_addr* addr, const char* ifname)
 {
     unsigned int ifindex = atoi(ifname);
+    if (0 == ifindex) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid interface index '%s'"), ifname);
+        return -1;
+    }
     return findif_(AF_INET, ifindex, ifaddr_, &addr);
 }
 
@@ -115,6 +120,11 @@ static int
 getifindex_(DWORD* index, const char* ifname)
 {
     unsigned int ifindex = atoi(ifname);
+    if (0 == ifindex) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid interface index '%s'"), ifname);
+        return -1;
+    }
     return findif_(AF_INET6, ifindex, ifindex_, &index);
 }
 
