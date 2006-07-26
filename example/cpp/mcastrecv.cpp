@@ -18,8 +18,8 @@ main(int argc, char* argv[])
 
         try {
 
-            if (4 != argc) {
-                aug_error("usage: mcastsend <mcast> <serv> <ifname>");
+            if (argc < 3) {
+                aug_error("usage: mcastsend <mcast> <serv> [ifname]");
                 return 1;
             }
 
@@ -31,7 +31,7 @@ main(int argc, char* argv[])
             setport(ep, htons(atoi(argv[2])));
             aug::bind(sfd, ep);
 
-            joinmcast(sfd, in, argv[3]);
+            joinmcast(sfd, in, 4 == argc ? argv[3] : 0);
 
         } catch (const std::exception& e) {
             aug_perrinfo(e.what());

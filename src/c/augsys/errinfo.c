@@ -273,7 +273,7 @@ aug_perrinfo(const char* s)
             goto done;
         }
  done:
-    return aug_error("%s: [src=%d, num=0x%.8X (%d)] %s at %s line %d.", s,
+    return aug_error("%s: [src=%d, num=0x%.8x (%d)] %s at %s line %d.", s,
                      errinfo->src_, errinfo->num_, errinfo->num_,
                      errinfo->desc_, file, errinfo->line_);
 }

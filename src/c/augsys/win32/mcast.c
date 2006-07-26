@@ -42,8 +42,9 @@ findif_(int af, unsigned int ifindex,
     if (NO_ERROR == ret) {
 
         PIP_ADAPTER_ADDRESSES it = list;
-        for (i = 0; it && i < (int)ifindex; it = it->Next, ++i)
-            ;
+        for (i = 1; it; ++i, it = it->Next)
+            if (i == (int)ifindex)
+                break;
 
         if (it)
             i = fn(arg, ifindex, it);
@@ -74,8 +75,9 @@ ifaddr_(void* arg, unsigned int ifindex, PIP_ADAPTER_ADDRESSES adapter)
 
     for (; it ; it = it->Next)
         if (AF_INET == it->Address.lpSockaddr->sa_family) {
-            out->s_addr = ((struct sockaddr_in*)it->Address.lpSockaddr)
-                ->sin_addr.s_addr;
+            const struct sockaddr_in* addr = (const struct sockaddr_in*)it
+                ->Address.lpSockaddr;
+            out->s_addr = addr->sin_addr.s_addr;
             return 0;
         }
 
@@ -113,7 +115,7 @@ getifaddr_(struct in_addr* addr, const char* ifname)
                        AUG_MSG("invalid interface index '%s'"), ifname);
         return -1;
     }
-    return findif_(AF_INET, ifindex, ifaddr_, &addr);
+    return findif_(AF_INET, ifindex, ifaddr_, addr);
 }
 
 static int
@@ -125,7 +127,7 @@ getifindex_(DWORD* index, const char* ifname)
                        AUG_MSG("invalid interface index '%s'"), ifname);
         return -1;
     }
-    return findif_(AF_INET6, ifindex, ifindex_, &index);
+    return findif_(AF_INET6, ifindex, ifindex_, index);
 }
 
 AUGSYS_API int
