@@ -240,3 +240,13 @@ aug_getaddrinfo(const char* host, const char* serv,
     }
     return 0;
 }
+
+AUGSYS_API int
+aug_getfamily(int s)
+{
+    struct aug_endpoint ep;
+    if (!aug_getsockname(s, &ep))
+        return -1;
+
+    return ep.un_.family_;
+}

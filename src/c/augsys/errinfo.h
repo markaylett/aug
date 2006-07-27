@@ -16,22 +16,22 @@
 /** These error constants may also be used as return codes for communicating
     exceptional conditions. */
 
-#define AUG_SUCCESS      0
-#define AUG_ESYSTEM    (-1)
+#define AUG_NOERROR  0
+#define AUG_ESYSTEM  1
 
-#define AUG_EACCES     (-2)
-#define AUG_EAUTH      (-3)
-#define AUG_EBOUND     (-4)
-#define AUG_EENDOF     (-5)
-#define AUG_EEXCEPT    (-6)
-#define AUG_EEXIST     (-7)
-#define AUG_EFORMAT    (-8)
-#define AUG_EINVAL     (-9)
-#define AUG_EIO       (-10)
-#define AUG_ENULL     (-11)
-#define AUG_EPARSE    (-12)
-#define AUG_ESUPPORT  (-13)
-#define AUG_ETIMEOUT  (-14)
+#define AUG_EACCES   2
+#define AUG_EAUTH    3
+#define AUG_EBOUND   4
+#define AUG_EENDOF   5
+#define AUG_EEXCEPT  6
+#define AUG_EEXIST   7
+#define AUG_EFORMAT  8
+#define AUG_EINVAL   9
+#define AUG_EIO      10
+#define AUG_ENULL    11
+#define AUG_EPARSE   12
+#define AUG_ESUPPORT 13
+#define AUG_ETIMEOUT 14
 
 struct aug_errinfo {
     char file_[AUG_MAXLINE];

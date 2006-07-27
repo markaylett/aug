@@ -286,7 +286,7 @@ aug_setmcastloop(int s, int on)
 }
 
 AUGSYS_API int
-aug_setmcasthops(int s, int hops)
+aug_setmcastttl(int s, int ttl)
 {
     int af = aug_getfamily(s);
     if (-1 == af)
@@ -296,12 +296,12 @@ aug_setmcasthops(int s, int hops)
 
     switch (af) {
     case AF_INET:
-        return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &hops,
-                              sizeof(hops));
+        return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
+                              sizeof(ttl));
 
     case AF_INET6:
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
-                              &hops, sizeof(hops));
+                              &ttl, sizeof(ttl));
     }
 
     aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);

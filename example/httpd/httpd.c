@@ -109,7 +109,7 @@ static int
 conn_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 {
     ssize_t ret;
-    aug_state_t state = (aug_state_t)arg;
+    aug_state_t state = aug_getvarp(arg);
     int events = aug_ioevents(mplexer_, fd);
 
     AUG_DEBUG("checking connection '%d'", fd);
@@ -162,6 +162,7 @@ listener_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 {
     struct aug_endpoint ep;
     int conn;
+    struct aug_var var;
 
     AUG_DEBUG("checking listener '%d'", fd);
 
@@ -183,13 +184,14 @@ listener_(const struct aug_var* arg, int fd, struct aug_conns* conns)
         return 1;
     }
 
-    if (!(arg = createconn_(mplexer_, conn))) {
+    aug_setvarp(&var, createconn_(mplexer_, conn));
+    if (aug_isnull(&var)) {
         aug_perrinfo("failed to create connection");
         aug_close(conn);
         return 1;
     }
 
-    aug_insertconn(conns, conn, conn_, arg);
+    aug_insertconn(conns, conn, conn_, &var);
     return 1;
 }
 

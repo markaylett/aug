@@ -20,7 +20,7 @@ struct aug_var {
     } un_;
 };
 
-#define AUG_VARNULL { AUG_VTNULL }
+#define AUG_VARNULL { AUG_VTNULL, { 0 } }
 
 AUGUTIL_API struct aug_var*
 aug_clearvar(struct aug_var* v);

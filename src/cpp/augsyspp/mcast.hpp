@@ -40,10 +40,10 @@ namespace aug {
     }
 
     inline void
-    setmcasthops(fdref ref, int hops)
+    setmcastttl(fdref ref, int ttl)
     {
-        if (-1 == aug_setmcasthops(ref.get(), hops))
-            throwerrinfo("aug_setmcasthops() failed");
+        if (-1 == aug_setmcastttl(ref.get(), ttl))
+            throwerrinfo("aug_setmcastttl() failed");
     }
 }
 

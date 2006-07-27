@@ -19,7 +19,7 @@ main(int argc, char* argv[])
         try {
 
             if (argc < 3) {
-                aug_error("usage: mcastsend <mcast> <serv> [ifname]");
+                aug_error("usage: mcastrecv <mcast> <serv> [ifname]");
                 return 1;
             }
 
@@ -32,6 +32,19 @@ main(int argc, char* argv[])
             aug::bind(sfd, ep);
 
             joinmcast(sfd, in, 4 == argc ? argv[3] : 0);
+
+            mplexer mp;
+            setioeventmask(mp, sfd, AUG_IOEVENTRD);
+
+            for (;;) {
+                while (AUG_RETINTR == waitioevents(mp))
+                    ;
+
+                char buf[1024];
+                size_t size(read(sfd, buf, sizeof(buf)));
+                buf[size] = '\0';
+                aug_info("recv: [%s]", buf);
+            }
 
         } catch (const std::exception& e) {
             aug_perrinfo(e.what());

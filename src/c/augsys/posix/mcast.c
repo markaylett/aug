@@ -183,7 +183,7 @@ aug_setmcastloop(int s, int on)
 }
 
 AUGSYS_API int
-aug_setmcasthops(int s, int hops)
+aug_setmcastttl(int s, int ttl)
 {
     int af;
     union {
@@ -196,12 +196,12 @@ aug_setmcasthops(int s, int hops)
 
     switch (af) {
     case AF_INET:
-        un.ipv4_ = hops;
+        un.ipv4_ = ttl;
         return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &un.ipv4_,
                               sizeof(un.ipv4_));
 
     case AF_INET6:
-        un.ipv6_ = hops;
+        un.ipv6_ = ttl;
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
                               &un.ipv6_, sizeof(un.ipv6_));
     }

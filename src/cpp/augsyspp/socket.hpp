@@ -165,14 +165,6 @@ namespace aug {
         return dst;
     }
 
-    inline void
-    setreuseaddr(fdref ref, bool on)
-    {
-        int value(on ? 1 : 0);
-        if (-1 == aug_setreuseaddr(ref.get(), value))
-            throwerrinfo("aug_setreuseaddr() failed");
-    }
-
     inline int
     getfamily(fdref ref)
     {
@@ -180,6 +172,14 @@ namespace aug {
         if (-1 == ret)
             throwerrinfo("aug_getfamily() failed");
         return ret;
+    }
+
+    inline void
+    setreuseaddr(fdref ref, bool on)
+    {
+        int value(on ? 1 : 0);
+        if (-1 == aug_setreuseaddr(ref.get(), value))
+            throwerrinfo("aug_setreuseaddr() failed");
     }
 
     inline struct aug_endpoint&

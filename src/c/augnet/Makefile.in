@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = augnet-test$(EXEEXT)
+check_PROGRAMS = augnet-fixtest$(EXEEXT) augnet-httptest$(EXEEXT)
 subdir = src/c/augnet
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -65,9 +65,13 @@ libaugnet_la_DEPENDENCIES = $(top_srcdir)/src/c/augutil/libaugutil.la \
 am_libaugnet_la_OBJECTS = config.lo conn.lo fix.lo http.lo inet.lo \
 	types.lo utility.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
-am_augnet_test_OBJECTS = test.$(OBJEXT)
-augnet_test_OBJECTS = $(am_augnet_test_OBJECTS)
-augnet_test_DEPENDENCIES = $(top_srcdir)/src/c/augnet/libaugnet.la
+am_augnet_fixtest_OBJECTS = fixtest.$(OBJEXT)
+augnet_fixtest_OBJECTS = $(am_augnet_fixtest_OBJECTS)
+augnet_fixtest_DEPENDENCIES = $(top_srcdir)/src/c/augnet/libaugnet.la
+am_augnet_httptest_OBJECTS = httptest.$(OBJEXT)
+augnet_httptest_OBJECTS = $(am_augnet_httptest_OBJECTS)
+augnet_httptest_DEPENDENCIES =  \
+	$(top_srcdir)/src/c/augnet/libaugnet.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -78,8 +82,10 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugnet_la_SOURCES) $(augnet_test_SOURCES)
-DIST_SOURCES = $(libaugnet_la_SOURCES) $(augnet_test_SOURCES)
+SOURCES = $(libaugnet_la_SOURCES) $(augnet_fixtest_SOURCES) \
+	$(augnet_httptest_SOURCES)
+DIST_SOURCES = $(libaugnet_la_SOURCES) $(augnet_fixtest_SOURCES) \
+	$(augnet_httptest_SOURCES)
 modincludeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(modinclude_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
@@ -231,9 +237,13 @@ libaugnet_la_LIBADD = \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-TESTS = augnet-test
-augnet_test_SOURCES = test.c
-augnet_test_LDADD = \
+TESTS = augnet-fixtest augnet-httptest
+augnet_fixtest_SOURCES = fixtest.c
+augnet_fixtest_LDADD = \
+	$(top_srcdir)/src/c/augnet/libaugnet.la
+
+augnet_httptest_SOURCES = httptest.c
+augnet_httptest_LDADD = \
 	$(top_srcdir)/src/c/augnet/libaugnet.la
 
 all: all-am
@@ -305,9 +315,12 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augnet-test$(EXEEXT): $(augnet_test_OBJECTS) $(augnet_test_DEPENDENCIES) 
-	@rm -f augnet-test$(EXEEXT)
-	$(LINK) $(augnet_test_LDFLAGS) $(augnet_test_OBJECTS) $(augnet_test_LDADD) $(LIBS)
+augnet-fixtest$(EXEEXT): $(augnet_fixtest_OBJECTS) $(augnet_fixtest_DEPENDENCIES) 
+	@rm -f augnet-fixtest$(EXEEXT)
+	$(LINK) $(augnet_fixtest_LDFLAGS) $(augnet_fixtest_OBJECTS) $(augnet_fixtest_LDADD) $(LIBS)
+augnet-httptest$(EXEEXT): $(augnet_httptest_OBJECTS) $(augnet_httptest_DEPENDENCIES) 
+	@rm -f augnet-httptest$(EXEEXT)
+	$(LINK) $(augnet_httptest_LDFLAGS) $(augnet_httptest_OBJECTS) $(augnet_httptest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -318,9 +331,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/httptest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Plo@am__quote@
 

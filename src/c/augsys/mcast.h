@@ -19,6 +19,6 @@ AUGSYS_API int
 aug_setmcastloop(int s, int on);
 
 AUGSYS_API int
-aug_setmcasthops(int s, int hops);
+aug_setmcastttl(int s, int ttl);
 
 #endif /* AUGSYS_MCAST_H */

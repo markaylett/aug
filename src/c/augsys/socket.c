@@ -60,16 +60,6 @@ aug_setreuseaddr(int s, int on)
     return aug_setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 }
 
-AUGSYS_API int
-aug_getfamily(int s)
-{
-    struct aug_endpoint ep;
-    if (!aug_getsockname(s, &ep))
-        return -1;
-
-    return ep.un_.family_;
-}
-
 AUGSYS_API struct aug_endpoint*
 aug_setinetaddr(struct aug_endpoint* ep, const struct aug_inetaddr* addr)
 {

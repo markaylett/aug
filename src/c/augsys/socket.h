@@ -118,10 +118,10 @@ aug_getaddrinfo(const char* host, const char* serv,
                 const struct addrinfo* hints, struct addrinfo** res);
 
 AUGSYS_API int
-aug_setreuseaddr(int s, int on);
+aug_getfamily(int s);
 
 AUGSYS_API int
-aug_getfamily(int s);
+aug_setreuseaddr(int s, int on);
 
 AUGSYS_API struct aug_endpoint*
 aug_setinetaddr(struct aug_endpoint* ep, const struct aug_inetaddr* addr);

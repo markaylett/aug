@@ -562,3 +562,14 @@ aug_getaddrinfo(const char* host, const char* serv,
     }
     return 0;
 }
+
+AUGSYS_API int
+aug_getfamily(int s)
+{
+    WSAPROTOCOL_INFO info = { 0 };
+    socklen_t len = sizeof(info);
+    if (-1 == aug_getsockopt(s, SOL_SOCKET, SO_PROTOCOL_INFO, &info, &len))
+        return -1;
+
+    return info.iAddressFamily;
+}

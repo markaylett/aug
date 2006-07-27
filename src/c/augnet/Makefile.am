@@ -32,9 +32,13 @@ libaugnet_la_LIBADD = \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = augnet-test
-TESTS = augnet-test
+check_PROGRAMS = augnet-fixtest augnet-httptest
+TESTS = augnet-fixtest augnet-httptest
 
-augnet_test_SOURCES = test.c
-augnet_test_LDADD = \
+augnet_fixtest_SOURCES = fixtest.c
+augnet_fixtest_LDADD = \
+	$(top_srcdir)/src/c/augnet/libaugnet.la
+
+augnet_httptest_SOURCES = httptest.c
+augnet_httptest_LDADD = \
 	$(top_srcdir)/src/c/augnet/libaugnet.la
