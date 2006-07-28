@@ -17,25 +17,25 @@ main(int argc, char* argv[])
 
         var v(null);
 
-        if (AUG_VTNULL != v.type() || 0 != getvar<long>(v)
+        if (AUG_VTNULL != type(v) || 0 != getvar<long>(v)
             || 0 != getvar<void*>(v))
             throw logic_error("null constructor failed");
 
         v = 101;
 
-        if (AUG_VTLONG != v.type() || 101 != getvar<long>(v)
+        if (AUG_VTLONG != type(v) || 101 != getvar<long>(v)
             || 0 != getvar<void*>(v))
             throw logic_error("long assignment failed");
 
         v = &argc;
 
-        if (AUG_VTPTR != v.type() || 0 != getvar<long>(v)
+        if (AUG_VTPTR != type(v) || 0 != getvar<long>(v)
             || &argc != getvar<void*>(v))
             throw logic_error("pointer assignment failed");
 
         v = null;
 
-        if (AUG_VTNULL != v.type() || 0 != getvar<long>(v)
+        if (AUG_VTNULL != type(v) || 0 != getvar<long>(v)
             || 0 != getvar<void*>(v))
             throw logic_error("null assignment failed");
 
