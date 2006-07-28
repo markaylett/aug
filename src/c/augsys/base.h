@@ -40,6 +40,9 @@ aug_term(void);
 AUGSYS_API int
 aug_atexitinit(struct aug_errinfo* errinfo);
 
+AUGSYS_API void
+aug_exit(int status);
+
 /** The remaining functions will set errinfo on failure. */
 
 AUGSYS_API int

@@ -16,17 +16,16 @@ release_(void)
 {
     switch (refs_) {
     case 0:
-
-        /* Pairing mismatch with aug_init(). */
-
-        errno = EINVAL;
-        return -1;
+        // Already released: do nothing.
+        break;
 
     case 1:
         refs_ = 0;
         return PROCEED_;
+
+    default: // 1 < refs_
+        --refs_;
     }
-    --refs_;
     return 0;
 }
 
@@ -260,6 +259,19 @@ aug_atexitinit(struct aug_errinfo* errinfo)
     }
 
     return 0;
+}
+
+AUGSYS_API void
+aug_exit(int status)
+{
+    /* If initialised, terminate now. */
+
+    if (0 < refs_) {
+        refs_ = 1;
+        aug_term();
+    }
+
+    exit(status);
 }
 
 AUGSYS_API int

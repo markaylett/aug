@@ -13,8 +13,8 @@ main(int argc, char* argv[])
     /** Ensure that the initialisation functions can be called multiple
         times. */
 
-    if (-1 != aug_term()) {
-        fprintf(stderr, "unexpected success of aug_term()\n");
+    if (-1 == aug_term()) {
+        aug_perror("aug_term() failed");
         return 1;
     }
 
@@ -33,8 +33,10 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 != aug_term()) {
-        fprintf(stderr, "unexpected success of aug_term()\n");
+    /* One too many: should be ignored. */
+
+    if (-1 == aug_term()) {
+        aug_perror("aug_term() failed");
         return 1;
     }
 

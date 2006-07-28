@@ -16,6 +16,7 @@ static const char rcsid[] = "$Id:$";
 #include "augutil/getopt.h"
 #include "augutil/log.h"
 
+#include "augsys/base.h"   /* aug_exit() */
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/log.h"
@@ -23,7 +24,6 @@ static const char rcsid[] = "$Id:$";
 #include "augsys/unistd.h" /* aug_close() */
 
 #include <assert.h>
-#include <stdlib.h>        /* exit() */
 
 /* closepipe_() should not be called from an atexit() handler: on Windows, the
    pipe is implemented as a socket pair.  The c-runtime may terminate the
@@ -32,8 +32,11 @@ static const char rcsid[] = "$Id:$";
 static void
 closepipe_(void)
 {
-    AUG_PERRINFO(aug_close(aug_eventin()), "aug_close() failed");
-    AUG_PERRINFO(aug_close(aug_eventout()), "aug_close() failed");
+    int in = aug_eventin(), out = aug_eventout();
+    if (-1 != in)
+        AUG_PERRINFO(aug_close(in), "aug_close() failed");
+    if (-1 != out)
+        AUG_PERRINFO(aug_close(out), "aug_close() failed");
 }
 
 static void
@@ -41,7 +44,7 @@ die_(const char* s)
 {
     aug_perrinfo(s);
     closepipe_();
-    exit(1);
+    aug_exit(1);
 }
 
 static void
@@ -94,19 +97,17 @@ daemonise_(const struct aug_service* service)
 }
 
 #if defined(_WIN32)
-static int
+static void
 start_(const struct aug_service* service)
 {
     switch (aug_start(service)) {
     case -1:
-        aug_perrinfo("failed to control daemon process");
-        return -1;
+        die_("failed to control daemon process");
     case 0:
         break;
     default:
         assert(0);
     }
-    return 0;
 }
 #endif /* _WIN32 */
 
@@ -156,15 +157,11 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
     struct aug_options options;
 
     aug_setservice_(service);
-    if (-1 == aug_readopts(service, &options, argc, argv)) {
-        closepipe_();
-        exit(1);
-    }
+    if (-1 == aug_readopts(service, &options, argc, argv))
+        aug_exit(1);
 
-    if (AUG_CMDEXIT == options.command_) {
-        closepipe_();
-        exit(0);
-    }
+    if (AUG_CMDEXIT == options.command_)
+        aug_exit(0);
 
 #if !defined(_WIN32)
     daemon = AUG_CMDSTART == options.command_;
@@ -225,5 +222,5 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
         break;
     }
     closepipe_();
-    exit(0);
+    aug_exit(0);
 }
