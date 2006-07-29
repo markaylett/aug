@@ -8,8 +8,7 @@ EXTRA_DIST = \
 	augsrv.gif \
 	augnet.gif \
 	cvs-policy.txt \
-	Doxyfile \
-	manual.xml
+	Doxyfile
 
 build:
 	for l in augsys augmar augutil augsrv augnet; do \
