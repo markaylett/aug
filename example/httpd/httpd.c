@@ -69,7 +69,7 @@ request_(const struct aug_var* arg, const char* initial, aug_mar_t mar,
 
 #define MSG "<html><body><h1>Test Message</h1></body></html>"
 
-    snprintf(buf, sizeof(buf), "%d", strlen(MSG));
+    snprintf(buf, sizeof(buf), "%ld", strlen(MSG));
     f.name_ = "Content-Length";
     f.value_ = buf;
     f.size_ = strlen(buf);
