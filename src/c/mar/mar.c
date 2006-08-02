@@ -171,7 +171,7 @@ size_(aug_mar_t mar)
     if (-1 == aug_contentsize(mar, &size))
         return -1;
 
-    printf("%d\n", size);
+    printf("%d\n", (int)size);
     return 0;
 }
 

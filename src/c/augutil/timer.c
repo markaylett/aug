@@ -133,7 +133,7 @@ aug_canceltimer(struct aug_timers* timers, int id)
     }
 
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
-                   AUG_MSG("no timer with descriptor '%d'"), id);
+                   AUG_MSG("no timer with descriptor '%d'"), (int)id);
     return -1;
 }
 

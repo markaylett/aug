@@ -14,9 +14,6 @@
 
 #include "augsys/endian.h"
 
-#define AUG_UINT16_MAX 0xffffU
-#define AUG_UINT32_MAX 0xffffffffU
-
 typedef uint16_t aug_verno_t;
 #define aug_encodeverno aug_encode16
 #define aug_decodeverno aug_decode16

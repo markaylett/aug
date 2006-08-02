@@ -304,7 +304,7 @@ aug_setregion_(aug_seq_t seq, size_t offset, size_t len)
 
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                        AUG_MSG("sequence overrun by %d bytes"),
-                       (offset + len) - total);
+                       (int)((offset + len) - total));
         return -1;
     }
     seq->offset_ = offset;

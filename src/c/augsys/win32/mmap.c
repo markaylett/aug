@@ -37,7 +37,7 @@ toaccess_(DWORD* to, int from)
 
  fail:
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                   AUG_MSG("invalid access flags '%d'"), from);
+                   AUG_MSG("invalid access flags '%d'"), (int)from);
     return -1;
 }
 
@@ -61,7 +61,7 @@ toprot_(DWORD* to, int from)
 
  fail:
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                   AUG_MSG("invalid protection flags '%d'"), from);
+                   AUG_MSG("invalid protection flags '%d'"), (int)from);
     return -1;
 }
 
@@ -73,7 +73,7 @@ verify_(size_t size, size_t offset, size_t len)
 
     if (!size || size < (offset + len)) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("invalid file map size '%d'"), size);
+                       AUG_MSG("invalid file map size '%d'"), (int)size);
         return -1;
     }
 
@@ -81,7 +81,7 @@ verify_(size_t size, size_t offset, size_t len)
 
     if (offset && (offset % aug_granularity())) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("invalid file map offset '%d'"), offset);
+                       AUG_MSG("invalid file map offset '%d'"), (int)offset);
         return -1;
     }
 

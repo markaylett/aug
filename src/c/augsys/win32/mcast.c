@@ -50,7 +50,8 @@ findif_(int af, unsigned int ifindex,
             i = fn(arg, ifindex, it);
         else {
             aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
-                           AUG_MSG("interface '%d' does not exist"), ifindex);
+                           AUG_MSG("interface '%d' does not exist"),
+                           (int)ifindex);
             i = -1;
         }
 
@@ -82,7 +83,7 @@ ifaddr_(void* arg, unsigned int ifindex, PIP_ADAPTER_ADDRESSES adapter)
         }
 
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
-                   AUG_MSG("no address for interface '%d'"), ifindex);
+                   AUG_MSG("no address for interface '%d'"), (int)ifindex);
     return -1;
 }
 
@@ -102,7 +103,7 @@ ifindex_(void* arg, unsigned int ifindex, PIP_ADAPTER_ADDRESSES adapter)
         }
 
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
-                   AUG_MSG("no address for interface '%d'"), ifindex);
+                   AUG_MSG("no address for interface '%d'"), (int)ifindex);
     return -1;
 }
 

@@ -112,7 +112,7 @@ aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 
     if (mask & ~(AUG_IOEVENTRD | AUG_IOEVENTWR)) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("invalid ioevent mask '%d'"), mask);
+                       AUG_MSG("invalid ioevent mask '%d'"), (int)mask);
         return -1;
     }
 

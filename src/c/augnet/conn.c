@@ -68,7 +68,7 @@ aug_removeconn(struct aug_conns* conns, int fd)
 
     if (!it) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
-                       AUG_MSG("no connection for descriptor '%d'"), fd);
+                       AUG_MSG("no connection for descriptor '%d'"), (int)fd);
         return -1;
     }
 

@@ -19,7 +19,7 @@ namespace {
     int
     close_(int fd)
     {
-        aug_info("closing fd: %d", fd);
+        aug_info("closing fd: %d", (int)fd);
         return aug_posixdriver()->close_(fd);
     }
 

@@ -67,7 +67,7 @@ init_(aug_seq_t seq, struct aug_info_* info)
 
             aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                            AUG_MSG("invalid version number '%d'"),
-                           info->verno_);
+                           (int)info->verno_);
             return -1;
         }
     } else {
@@ -432,13 +432,13 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
         break;
     default:
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("invalid whence value '%d'"), whence);
+                       AUG_MSG("invalid whence value '%d'"), (int)whence);
         return -1;
     }
     if (local < 0) {
 
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
-                       AUG_MSG("negative file position '%d'"), local);
+                       AUG_MSG("negative file position '%d'"), (int)local);
         return -1;
     }
 

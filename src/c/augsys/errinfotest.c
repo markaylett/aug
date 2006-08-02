@@ -19,12 +19,13 @@ main(int argc, char* argv[])
     }
 
     if (101 != aug_errline) {
-        fprintf(stderr, "unexpected aug_errline value: %d\n", aug_errline);
+        fprintf(stderr, "unexpected aug_errline value: %d\n",
+                (int)aug_errline);
         return 1;
     }
 
     if (AUG_SRCPOSIX != aug_errsrc) {
-        fprintf(stderr, "unexpected aug_errsrc value: %d\n", aug_errsrc);
+        fprintf(stderr, "unexpected aug_errsrc value: %d\n", (int)aug_errsrc);
         return 1;
     }
 

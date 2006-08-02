@@ -31,7 +31,7 @@ setfield_(const struct aug_var* arg, const char* name, const char* value)
 static void
 setcsize_(const struct aug_var* arg, size_t size)
 {
-    aug_info("size: %d", size);
+    aug_info("size: %d", (int)size);
 }
 
 static void

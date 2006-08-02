@@ -7,6 +7,9 @@
 #include <stddef.h> /* size_t */
 #include <sys/types.h>
 
+#define AUG_UINT16_MAX 0xffffU
+#define AUG_UINT32_MAX 0xffffffffU
+
 #if !defined(_MSC_VER)
 # include <inttypes.h>
 #else /* _MSC_VER */

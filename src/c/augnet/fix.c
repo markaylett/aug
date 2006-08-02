@@ -91,7 +91,7 @@ fixtoui_(unsigned int* dst, const char* buf, size_t size, char delim)
     if (MAX_DIGITS_ < digits) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                        AUG_MSG("too many integer digits '%d'"),
-                       digits);
+                       (int)digits);
         return -1;
     }
 
@@ -268,7 +268,7 @@ aug_endfix(aug_fixstream_t stream)
         aug_clearstrbuf(&stream->strbuf_);
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
                        AUG_MSG("fix stream not empty, '%d' bytes"),
-                       size);
+                       (int)size);
         ret = -1;
 
     } else
@@ -430,7 +430,7 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
 
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                    AUG_MSG("field '%d' delimiter not found"),
-                   field->tag_);
+                   (int)field->tag_);
     return -1;
  found:
 

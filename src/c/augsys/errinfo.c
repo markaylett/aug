@@ -50,7 +50,7 @@ vwritelog_(const char* file, int line, int src, int num, const char* format,
         aug_strlcpy(errinfo.desc_, "no message: bad format",
                     sizeof(errinfo.desc_));
 
-    aug_error("%s: %d: %s", errinfo.file_, errinfo.line_, errinfo.desc_);
+    aug_error("%s: %d: %s", errinfo.file_, (int)errinfo.line_, errinfo.desc_);
 }
 
 #if !defined(_MT)
@@ -274,6 +274,6 @@ aug_perrinfo(const char* s)
         }
  done:
     return aug_error("%s: [src=%d, num=0x%.8x (%d)] %s at %s line %d.", s,
-                     errinfo->src_, errinfo->num_, errinfo->num_,
-                     errinfo->desc_, file, errinfo->line_);
+                     errinfo->src_, (int)errinfo->num_, (int)errinfo->num_,
+                     errinfo->desc_, file, (int)errinfo->line_);
 }

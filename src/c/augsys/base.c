@@ -71,7 +71,7 @@ static void
 setalreadyreg_(const char* file, int line, int fd)
 {
     aug_seterrinfo(file, line, AUG_SRCLOCAL, AUG_EEXIST,
-                   AUG_MSG("descriptor '%d' already registered"), fd);
+                   AUG_MSG("descriptor '%d' already registered"), (int)fd);
 }
 
 static void
@@ -85,7 +85,7 @@ static void
 setnotreg_(const char* file, int line, int fd)
 {
     aug_seterrinfo(file, line, AUG_SRCLOCAL, AUG_EEXIST,
-                   AUG_MSG("descriptor '%d' not registered"), fd);
+                   AUG_MSG("descriptor '%d' not registered"), (int)fd);
 }
 
 static void

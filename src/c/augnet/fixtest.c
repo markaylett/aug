@@ -30,8 +30,8 @@ handler_(const struct aug_var* arg, const char* buf, size_t size)
     struct aug_fixstd_ fixstd;
 
     if (TESTLEN_ != size) {
-        fprintf(stderr, "invalid buffer size '%d', expected '%d'\n", size,
-                TESTLEN_);
+        fprintf(stderr, "invalid buffer size '%d', expected '%d'\n",
+                (int)size, (int)TESTLEN_);
         exit(1);
     }
 
@@ -98,7 +98,7 @@ main(int argc, char* argv[])
     }
 
     if (1 != received_) {
-        fprintf(stderr, "unexpected message count: %d\n", received_);
+        fprintf(stderr, "unexpected message count: %d\n", (int)received_);
         return 1;
     }
 
@@ -118,7 +118,7 @@ main(int argc, char* argv[])
     }
 
     if (3 != received_) {
-        fprintf(stderr, "unexpected message count: %d\n", received_);
+        fprintf(stderr, "unexpected message count: %d\n", (int)received_);
         return 1;
     }
 
