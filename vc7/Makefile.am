@@ -10,5 +10,5 @@ EXTRA_DIST = \
 	augsys.vcproj \
 	augutilpp.vcproj \
 	augutil.vcproj \
-	test.c \
+	test.cpp \
 	test.vcproj

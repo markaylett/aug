@@ -59,6 +59,76 @@ namespace aug {
         }
     };
 
+    class timercb_base {
+
+        virtual void
+        do_callback(idref ref, unsigned int& ms,
+                    struct aug_timers& timers) = 0;
+
+    public:
+        virtual
+        ~timercb_base() NOTHROW
+        {
+        }
+
+        void
+        callback(idref ref, unsigned int& ms, struct aug_timers& timers)
+        {
+            return do_callback(ref.get(), ms,timers);
+        }
+
+        void
+        operator ()(idref ref, unsigned int& ms, struct aug_timers& timers)
+        {
+            return do_callback(ref.get(), ms, timers);
+        }
+    };
+
+    namespace detail {
+
+        inline void
+        timercb(const struct aug_var* arg, int id, unsigned int* ms,
+                struct aug_timers* timers)
+        {
+            try {
+                timercb_base* ptr = static_cast<
+                    timercb_base*>(aug_getvarp(arg));
+                ptr->callback(id, *ms, *timers);
+            } AUG_SETERRINFOCATCH;
+        }
+    }
+
+    inline int
+    settimer(struct aug_timers& timers, idref ref, unsigned int ms,
+             timercb_base& cb)
+    {
+        var v(&cb);
+        int ret(aug_settimer(&timers, ref.get(), ms, detail::timercb,
+                             cptr(v)));
+        if (-1 == ret)
+            throwerrinfo("aug_settimer() failed");
+        return ret;
+    }
+
+    inline void
+    resettimer(struct aug_timers& timers, idref ref, unsigned int ms)
+    {
+        if (-1 == aug_resettimer(&timers, ref.get(), ms))
+            throwerrinfo("aug_resettimer() failed");
+    }
+
+    inline bool
+    canceltimer(struct aug_timers& timers, idref ref)
+    {
+        return aug_canceltimer(&timers, ref.get()) ? true : false;
+    }
+
+    inline bool
+    expired(struct aug_timers& timers, idref ref)
+    {
+        return aug_expired(&timers, ref.get()) ? true : false;
+    }
+
     inline void
     processtimers(struct aug_timers& timers, bool force)
     {
@@ -73,107 +143,62 @@ namespace aug {
             throwerrinfo("aug_processtimers() failed");
     }
 
-    class expire_base {
-
-        virtual void
-        do_expire(int id) = 0;
-
-    public:
-        virtual
-        ~expire_base() NOTHROW
-        {
-        }
-
-        void
-        expire(int id)
-        {
-            do_expire(id);
-        }
-    };
-
     class timer {
 
         struct aug_timers& timers_;
-        expire_base& action_;
-        int id_;
-        bool pending_;
+        idref ref_;
 
-        timer(const timer&);
+        timer(const timer& rhs);
 
         timer&
-        operator =(const timer&);
-
-        static void
-        expire_(const struct aug_var* arg, int id)
-        {
-            try {
-                timer* ptr = static_cast<
-                    timer*>(aug_getvarp(arg));
-                ptr->pending_ = false;
-                ptr->action_.expire(id);
-            } AUG_SETERRINFOCATCH;
-        }
+        operator =(const timer& rhs);
 
     public:
         ~timer() NOTHROW
         {
-            if (pending() && -1 == aug_canceltimer(&timers_, id_))
-                aug_perrinfo("aug_canceltimer() failed");
+            if (null != ref_)
+                canceltimer(timers_, ref_);
         }
 
-        timer(timers& timers, expire_base& action)
-            : timers_(timers.timers_),
-              action_(action),
-              id_(-1),
-              pending_(false)
+        timer(struct aug_timers& timers, idref ref)
+            : timers_(timers),
+              ref_(ref)
         {
-        }
-
-        timer(timers& timers, unsigned int ms, expire_base& action)
-            : timers_(timers.timers_),
-              action_(action),
-              id_(-1),
-              pending_(false)
-        {
-            reset(ms);
         }
 
         void
-        cancel()
+        set(unsigned int ms, timercb_base& cb)
         {
-            if (pending()) {
-
-                int id(id_);
-                id_ = -1;
-                pending_ = false;
-
-                if (-1 == aug_canceltimer(&timers_, id))
-                    throwerrinfo("aug_canceltimer() failed");
-            }
+            ref_ = settimer(timers_, ref_, ms, cb);
         }
 
         void
         reset(unsigned int ms)
         {
-            cancel();
-            var v(this);
-            int id(aug_settimer(&timers_, ms, expire_, cptr(v)));
-            if (-1 == id)
-                throwerrinfo("aug_settimer() failed");
-            id_ = id;
-            pending_ = true;
+            resettimer(timers_, ref_, ms);
+        }
+
+        bool
+        cancel()
+        {
+            return canceltimer(timers_, ref_);
+        }
+
+        bool
+        expired() const
+        {
+            return aug::expired(timers_, ref_);
+        }
+
+        operator idref() const
+        {
+            return ref_;
         }
 
         int
         get() const
         {
-            return id_;
-        }
-
-        bool
-        pending() const
-        {
-            return -1 != id_ && pending_;
+            return ref_.get();
         }
     };
 }

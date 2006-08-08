@@ -38,14 +38,14 @@ namespace aug {
         return &static_cast<typename T::ctype&>(x);
     }
 
-    class fdref {
+    class idref {
         int fd_;
     public:
-        fdref(const null_&) NOTHROW
+        idref(const null_&) NOTHROW
         : fd_(-1)
         {
         }
-        fdref(int fd) NOTHROW
+        idref(int fd) NOTHROW
         : fd_(fd)
         {
         }
@@ -57,39 +57,41 @@ namespace aug {
     };
 
     inline bool
-    operator ==(fdref lhs, fdref rhs)
+    operator ==(idref lhs, idref rhs)
     {
         return lhs.get() == rhs.get();
     }
     inline bool
-    operator !=(fdref lhs, fdref rhs)
+    operator !=(idref lhs, idref rhs)
     {
         return lhs.get() != rhs.get();
     }
     inline bool
-    operator >=(fdref lhs, fdref rhs)
+    operator >=(idref lhs, idref rhs)
     {
         return lhs.get() >= rhs.get();
     }
     inline bool
-    operator >(fdref lhs, fdref rhs)
+    operator >(idref lhs, idref rhs)
     {
         return lhs.get() > rhs.get();
     }
     inline bool
-    operator <=(fdref lhs, fdref rhs)
+    operator <=(idref lhs, idref rhs)
     {
         return lhs.get() <= rhs.get();
     }
     inline bool
-    operator <(fdref lhs, fdref rhs)
+    operator <(idref lhs, idref rhs)
     {
         return lhs.get() < rhs.get();
     }
+
+    typedef idref fdref;
 }
 
 inline bool
-isnull(aug::fdref ref)
+isnull(aug::idref ref)
 {
     return -1 == ref.get();
 }

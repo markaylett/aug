@@ -64,7 +64,7 @@ static const char rcsid[] = "$Id:$";
 #define MAX_DIGITS_ 10
 
 struct aug_fixstream_ {
-    aug_fixhandler_t handler_;
+    aug_fixcb_t cb_;
     struct aug_var arg_;
     aug_strbuf_t strbuf_;
     size_t mlen_;
@@ -168,8 +168,7 @@ getsum_(const char* buf, size_t size)
 }
 
 AUGNET_API aug_fixstream_t
-aug_createfixstream(size_t size, aug_fixhandler_t handler,
-                    const struct aug_var* arg)
+aug_createfixstream(size_t size, aug_fixcb_t cb, const struct aug_var* arg)
 {
     aug_fixstream_t stream = malloc(sizeof(struct aug_fixstream_));
     aug_strbuf_t strbuf;
@@ -184,7 +183,7 @@ aug_createfixstream(size_t size, aug_fixhandler_t handler,
         return NULL;
     }
 
-    stream->handler_ = handler;
+    stream->cb_ = cb;
     aug_setvar(&stream->arg_, arg);
     stream->strbuf_ = strbuf;
     stream->mlen_ = 0;
@@ -240,7 +239,7 @@ aug_readfix(aug_fixstream_t stream, int fd, size_t size)
         if (blen < stream->mlen_)
             break;
 
-        stream->handler_(&stream->arg_, ptr, stream->mlen_);
+        stream->cb_(&stream->arg_, ptr, stream->mlen_);
         blen -= stream->mlen_;
         stream->mlen_ = 0;
 

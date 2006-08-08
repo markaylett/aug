@@ -23,9 +23,9 @@ namespace test {
     char pidfile_[AUG_PATH_MAX + 1] = "timerd.pid";
     char logfile_[AUG_PATH_MAX + 1] = "timerd.log";
 
-    class setopt : public setopt_base {
+    class confcb : public confcb_base {
         void
-        do_setopt(const char* name, const char* value)
+        do_callback(const char* name, const char* value)
         {
             if (0 == aug_strcasecmp(name, "loglevel")) {
 
@@ -55,16 +55,15 @@ namespace test {
         }
     };
 
-    class service : public service_base, public expire_base {
+    class service : public service_base, public timercb_base {
 
         struct state {
             mplexer mplexer_;
             timers timers_;
             timer timer_;
         public:
-            explicit
-            state(expire_base& expire)
-                : timer_(timers_, expire)
+            state()
+                : timer_(timers_, null)
             {
             }
         };
@@ -108,8 +107,8 @@ namespace test {
 
                 aug_info("reading: %s", conffile_);
 
-                test::setopt action;
-                readconf(conffile_, action);
+                test::confcb cb;
+                readconf(conffile_, cb);
             }
 
             if (-1 == chdir(rundir_)) {
@@ -171,7 +170,7 @@ namespace test {
                 throwerrinfo("aug_setsrvlogger() failed");
             }
 
-            auto_ptr<state> ptr(new state(*this));
+            auto_ptr<state> ptr(new state());
             setioeventmask(ptr->mplexer_, aug_eventin(), AUG_IOEVENTRD);
             state_ = ptr;
         }
@@ -183,7 +182,7 @@ namespace test {
 
             aug_info("running daemon process");
 
-            state_->timer_.reset(5000);
+            state_->timer_.set(5000, *this);
 
             int ret(!0);
             while (0 < remain_) {
@@ -210,11 +209,10 @@ namespace test {
         }
 
         void
-        do_expire(int id)
+        do_callback(idref ref, unsigned int& ms, struct aug_timers& timers)
         {
             aug_info("timer fired");
             --remain_;
-            state_->timer_.reset(5000);
         }
 
     public:
@@ -224,10 +222,10 @@ namespace test {
 
         service()
             : daemon_(false),
-              remain_(10)
+              remain_(5)
         {
         }
-    } service_;
+    };
 
     string
     getcwd()
@@ -251,6 +249,7 @@ main(int argc, char* argv[])
 
         struct aug_errinfo errinfo;
         scoped_init init(errinfo);
+		service serv;
 
         program_ = argv[0];
 
@@ -259,7 +258,7 @@ main(int argc, char* argv[])
             throwerrinfo("getcwd() failed");
         }
 
-        main(service_, argc, argv);
+        main(serv, argc, argv);
 
     } catch (const exception& e) {
 

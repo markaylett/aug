@@ -26,13 +26,12 @@ struct aug_fixstd_ {
     size_t size_;
 };
 
-typedef void (*aug_fixhandler_t)(const struct aug_var*, const char*, size_t);
+typedef void (*aug_fixcb_t)(const struct aug_var*, const char*, size_t);
 
 typedef struct aug_fixstream_* aug_fixstream_t;
 
 AUGNET_API aug_fixstream_t
-aug_createfixstream(size_t size, aug_fixhandler_t handler,
-                    const struct aug_var* arg);
+aug_createfixstream(size_t size, aug_fixcb_t cb, const struct aug_var* arg);
 
 AUGNET_API int
 aug_freefixstream(aug_fixstream_t stream);

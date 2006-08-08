@@ -39,9 +39,9 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/cpp/lang.mk
-@ENABLE_CPPBUILD_TRUE@noinst_PROGRAMS = mcastrecv$(EXEEXT) \
-@ENABLE_CPPBUILD_TRUE@	mcastsend$(EXEEXT) mplexd$(EXEEXT) \
-@ENABLE_CPPBUILD_TRUE@	timerd$(EXEEXT)
+@ENABLE_CPPBUILD_TRUE@noinst_PROGRAMS = heartbeat$(EXEEXT) \
+@ENABLE_CPPBUILD_TRUE@	mcastrecv$(EXEEXT) mcastsend$(EXEEXT) \
+@ENABLE_CPPBUILD_TRUE@	mplexd$(EXEEXT) timerd$(EXEEXT)
 subdir = example/cpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -51,42 +51,32 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
+am__heartbeat_SOURCES_DIST = heartbeat.cpp
+@ENABLE_CPPBUILD_TRUE@am_heartbeat_OBJECTS = heartbeat.$(OBJEXT)
+heartbeat_OBJECTS = $(am_heartbeat_OBJECTS)
+@ENABLE_CPPBUILD_TRUE@am__DEPENDENCIES_1 =  \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@heartbeat_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__mcastrecv_SOURCES_DIST = mcastrecv.cpp
 @ENABLE_CPPBUILD_TRUE@am_mcastrecv_OBJECTS = mcastrecv.$(OBJEXT)
 mcastrecv_OBJECTS = $(am_mcastrecv_OBJECTS)
-@ENABLE_CPPBUILD_TRUE@mcastrecv_DEPENDENCIES =  \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@mcastrecv_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__mcastsend_SOURCES_DIST = mcastsend.cpp
 @ENABLE_CPPBUILD_TRUE@am_mcastsend_OBJECTS = mcastsend.$(OBJEXT)
 mcastsend_OBJECTS = $(am_mcastsend_OBJECTS)
-@ENABLE_CPPBUILD_TRUE@mcastsend_DEPENDENCIES =  \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@mcastsend_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__mplexd_SOURCES_DIST = mplexd.cpp
 @ENABLE_CPPBUILD_TRUE@am_mplexd_OBJECTS = mplexd.$(OBJEXT)
 mplexd_OBJECTS = $(am_mplexd_OBJECTS)
-@ENABLE_CPPBUILD_TRUE@mplexd_DEPENDENCIES =  \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@mplexd_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__timerd_SOURCES_DIST = timerd.cpp
 @ENABLE_CPPBUILD_TRUE@am_timerd_OBJECTS = timerd.$(OBJEXT)
 timerd_OBJECTS = $(am_timerd_OBJECTS)
-@ENABLE_CPPBUILD_TRUE@timerd_DEPENDENCIES =  \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@ENABLE_CPPBUILD_TRUE@timerd_DEPENDENCIES = $(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -97,11 +87,11 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(mcastrecv_SOURCES) $(mcastsend_SOURCES) $(mplexd_SOURCES) \
-	$(timerd_SOURCES)
-DIST_SOURCES = $(am__mcastrecv_SOURCES_DIST) \
-	$(am__mcastsend_SOURCES_DIST) $(am__mplexd_SOURCES_DIST) \
-	$(am__timerd_SOURCES_DIST)
+SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
+	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(timerd_SOURCES)
+DIST_SOURCES = $(am__heartbeat_SOURCES_DIST) \
+	$(am__mcastrecv_SOURCES_DIST) $(am__mcastsend_SOURCES_DIST) \
+	$(am__mplexd_SOURCES_DIST) $(am__timerd_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -224,46 +214,33 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/cpp \
 	-I$(BOOST_HOME)
 
+@ENABLE_CPPBUILD_TRUE@AUGLIBS = \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+@ENABLE_CPPBUILD_TRUE@heartbeat_SOURCES = \
+@ENABLE_CPPBUILD_TRUE@	heartbeat.cpp
+
+@ENABLE_CPPBUILD_TRUE@heartbeat_LDADD = $(AUGLIBS)
 @ENABLE_CPPBUILD_TRUE@mcastrecv_SOURCES = \
 @ENABLE_CPPBUILD_TRUE@	mcastrecv.cpp
 
-@ENABLE_CPPBUILD_TRUE@mcastrecv_LDADD = \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-
+@ENABLE_CPPBUILD_TRUE@mcastrecv_LDADD = $(AUGLIBS)
 @ENABLE_CPPBUILD_TRUE@mcastsend_SOURCES = \
 @ENABLE_CPPBUILD_TRUE@	mcastsend.cpp
 
-@ENABLE_CPPBUILD_TRUE@mcastsend_LDADD = \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-
+@ENABLE_CPPBUILD_TRUE@mcastsend_LDADD = $(AUGLIBS)
 @ENABLE_CPPBUILD_TRUE@mplexd_SOURCES = \
 @ENABLE_CPPBUILD_TRUE@	mplexd.cpp
 
-@ENABLE_CPPBUILD_TRUE@mplexd_LDADD = \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-
+@ENABLE_CPPBUILD_TRUE@mplexd_LDADD = $(AUGLIBS)
 @ENABLE_CPPBUILD_TRUE@timerd_SOURCES = \
 @ENABLE_CPPBUILD_TRUE@	timerd.cpp
 
-@ENABLE_CPPBUILD_TRUE@timerd_LDADD = \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-
+@ENABLE_CPPBUILD_TRUE@timerd_LDADD = $(AUGLIBS)
 all: all-am
 
 .SUFFIXES:
@@ -304,6 +281,9 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+heartbeat$(EXEEXT): $(heartbeat_OBJECTS) $(heartbeat_DEPENDENCIES) 
+	@rm -f heartbeat$(EXEEXT)
+	$(CXXLINK) $(heartbeat_LDFLAGS) $(heartbeat_OBJECTS) $(heartbeat_LDADD) $(LIBS)
 mcastrecv$(EXEEXT): $(mcastrecv_OBJECTS) $(mcastrecv_DEPENDENCIES) 
 	@rm -f mcastrecv$(EXEEXT)
 	$(CXXLINK) $(mcastrecv_LDFLAGS) $(mcastrecv_OBJECTS) $(mcastrecv_LDADD) $(LIBS)
@@ -323,6 +303,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/heartbeat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastrecv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastsend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexd.Po@am__quote@

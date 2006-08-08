@@ -32,9 +32,9 @@ namespace test {
     cstring logfile_ = "mplexd.log";
     cstring address_ = "127.0.0.1:8080";
 
-    class setopt : public setopt_base {
+    class confcb : public confcb_base {
         void
-        do_setopt(const char* name, const char* value)
+        do_callback(const char* name, const char* value)
         {
             if (0 == aug_strcasecmp(name, "address")) {
 
@@ -77,8 +77,8 @@ namespace test {
 
             aug_info("reading: %s", conffile_);
 
-            test::setopt action;
-            readconf(conffile_, action);
+            test::confcb cb;
+            readconf(conffile_, cb);
         }
 
         if (-1 == chdir(rundir_)) {
@@ -153,7 +153,7 @@ namespace test {
         }
     };
 
-    struct session : public expire_base {
+    struct session : public timercb_base {
 
         mplexer& mplexer_;
         smartfd sfd_;
@@ -162,8 +162,10 @@ namespace test {
         int heartbeats_;
 
         void
-        do_expire(int id)
+        do_callback(idref ref, unsigned int& ms, struct aug_timers& timers)
         {
+            ms = 0; // Cancel.
+
             aug_info("timeout");
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
@@ -181,9 +183,10 @@ namespace test {
         session(mplexer& mplexer, const smartfd& sfd, timers& timers)
             : mplexer_(mplexer),
               sfd_(sfd),
-              timer_(timers, 5000, *this),
+              timer_(timers, null),
               heartbeats_(0)
         {
+            timer_.set(5000, *this);
         }
     };
 
@@ -198,23 +201,23 @@ namespace test {
         map<int, sessionptr> sfds_;
 
         explicit
-        state(poll_base& poll)
+        state(conncb_base& cb)
             : sfd_(null)
         {
             struct endpoint ep;
             smartfd sfd(tcplisten("127.0.0.1", "8080", ep));
 
-            insertconn(conns_, aug_eventin(), poll);
+            insertconn(conns_, aug_eventin(), cb);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
 
-            insertconn(conns_, sfd, poll);
+            insertconn(conns_, sfd, cb);
             setioeventmask(mplexer_, sfd, AUG_IOEVENTRD);
 
             sfd_ = sfd;
         }
     };
 
-    class service : public poll_base, public service_base {
+    class service : public conncb_base, public service_base {
 
         auto_ptr<state> state_;
 
@@ -331,7 +334,7 @@ namespace test {
         }
 
         bool
-        do_poll(int fd, struct aug_conns& conns)
+        do_callback(int fd, struct aug_conns& conns)
         {
             if (!ioevents(state_->mplexer_, fd))
                 return true;
@@ -421,7 +424,7 @@ namespace test {
         service()
         {
         }
-    } service_;
+    };
 
     string
     getcwd()
@@ -445,6 +448,7 @@ main(int argc, char* argv[])
 
         struct aug_errinfo errinfo;
         scoped_init init(errinfo);
+        service serv;
 
         program_ = argv[0];
 
@@ -456,7 +460,7 @@ main(int argc, char* argv[])
             throwerrinfo("getcwd() failed");
         }
 
-        main(service_, argc, argv);
+        main(serv, argc, argv);
 
     } catch (const exception& e) {
 

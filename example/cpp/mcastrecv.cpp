@@ -27,8 +27,7 @@ main(int argc, char* argv[])
             smartfd sfd(aug::socket(family(in), SOCK_DGRAM));
             setreuseaddr(sfd, true);
 
-            endpoint ep(inetany(family(in)));
-            setport(ep, htons(atoi(argv[2])));
+            endpoint ep(inetany(family(in)), htons(atoi(argv[2])));
             aug::bind(sfd, ep);
 
             joinmcast(sfd, in, 4 == argc ? argv[3] : 0);

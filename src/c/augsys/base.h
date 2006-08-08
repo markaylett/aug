@@ -46,6 +46,9 @@ aug_exit(int status);
 /** The remaining functions will set errinfo on failure. */
 
 AUGSYS_API int
+aug_nextid(void);
+
+AUGSYS_API int
 aug_openfd(int fd, const struct aug_fddriver* driver);
 
 AUGSYS_API int

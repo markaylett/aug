@@ -25,7 +25,7 @@ rtrim_(const char* s, size_t n)
 }
 
 AUGUTIL_API int
-aug_readconf(const char* path, aug_setopt_t setopt, const struct aug_var* arg)
+aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg)
 {
     char buf[AUG_MAXLINE];
     char* name;
@@ -84,7 +84,7 @@ aug_readconf(const char* path, aug_setopt_t setopt, const struct aug_var* arg)
 
         value += strspn(value, SPACE_);
 
-        if (-1 == (*setopt)(arg, name, value)) {
+        if (-1 == (*cb)(arg, name, value)) {
             ret = -1;
             break;
         }

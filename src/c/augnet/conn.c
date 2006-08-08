@@ -17,7 +17,7 @@ static const char rcsid[] = "$Id:$";
 struct aug_conn_ {
     AUG_ENTRY(aug_conn_);
     int fd_;
-    aug_poll_t fn_;
+    aug_conncb_t cb_;
     struct aug_var arg_;
 };
 
@@ -37,7 +37,7 @@ aug_freeconns(struct aug_conns* conns)
 }
 
 AUGNET_API int
-aug_insertconn(struct aug_conns* conns, int fd, aug_poll_t fn,
+aug_insertconn(struct aug_conns* conns, int fd, aug_conncb_t cb,
                const struct aug_var* arg)
 {
     struct aug_conn_* conn;
@@ -50,7 +50,7 @@ aug_insertconn(struct aug_conns* conns, int fd, aug_poll_t fn,
     aug_unlock();
 
     conn->fd_ = fd;
-    conn->fn_ = fn;
+    conn->cb_ = cb;
     aug_setvar(&conn->arg_, arg);
 
     AUG_INSERT_TAIL(conns, conn);
@@ -91,7 +91,7 @@ aug_processconns(struct aug_conns* conns)
     prev = &AUG_FIRST(conns);
     while ((it = *prev)) {
 
-        if (!(it->fn_(&it->arg_, it->fd_, &tail))) {
+        if (!(it->cb_(&it->arg_, it->fd_, &tail))) {
 
             AUG_REMOVE_PREVPTR(it, prev, conns);
 

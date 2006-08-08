@@ -5,6 +5,8 @@
 #include "augsys/base.h"
 #include "augsys/errno.h"
 
+#include <limits.h> /* INT_MAX */
+
 static const char rcsid[] = "$Id:$";
 
 #define PROCEED_ 1
@@ -16,14 +18,14 @@ release_(void)
 {
     switch (refs_) {
     case 0:
-        // Already released: do nothing.
+        /* Already released: do nothing. */
         break;
 
     case 1:
         refs_ = 0;
         return PROCEED_;
 
-    default: // 1 < refs_
+    default: /* 1 < refs_ */
         --refs_;
     }
     return 0;
@@ -272,6 +274,19 @@ aug_exit(int status)
     }
 
     exit(status);
+}
+
+AUGSYS_API int
+aug_nextid(void)
+{
+    static int id_ = 0;
+
+    if (id_ == INT_MAX) {
+        id_ = 0;
+        return INT_MAX;
+    }
+
+    return id_++;
 }
 
 AUGSYS_API int

@@ -16,13 +16,13 @@ AUG_HEAD(aug_conns, aug_conn_);
 /** The callback function has a boolean return value: returning false removes
     the connection. */
 
-typedef int (*aug_poll_t)(const struct aug_var*, int, struct aug_conns*);
+typedef int (*aug_conncb_t)(const struct aug_var*, int, struct aug_conns*);
 
 AUGNET_API int
 aug_freeconns(struct aug_conns* conns);
 
 AUGNET_API int
-aug_insertconn(struct aug_conns* conns, int fd, aug_poll_t fn,
+aug_insertconn(struct aug_conns* conns, int fd, aug_conncb_t cb,
                const struct aug_var* arg);
 
 AUGNET_API int

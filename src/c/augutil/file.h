@@ -6,10 +6,9 @@
 
 #include "augutil/var.h"
 
-typedef int (*aug_setopt_t)(const struct aug_var*, const char*, const char*);
+typedef int (*aug_confcb_t)(const struct aug_var*, const char*, const char*);
 
 AUGUTIL_API int
-aug_readconf(const char* path, aug_setopt_t setopt,
-             const struct aug_var* arg);
+aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg);
 
 #endif /* AUGUTIL_FILE_H */

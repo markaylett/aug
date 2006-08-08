@@ -20,21 +20,27 @@
 
 namespace aug {
 
-    class poll_base {
+    class conncb_base {
 
         virtual bool
-        do_poll(int fd, struct aug_conns& conns) = 0;
+        do_callback(int fd, struct aug_conns& conns) = 0;
 
     public:
         virtual
-        ~poll_base() NOTHROW
+        ~conncb_base() NOTHROW
         {
         }
 
         bool
-        poll(int fd, struct aug_conns& conns)
+        callback(int fd, struct aug_conns& conns)
         {
-            return do_poll(fd, conns);
+            return do_callback(fd, conns);
+        }
+
+        bool
+        operator ()(int fd, struct aug_conns& conns)
+        {
+            return do_callback(fd, conns);
         }
     };
 
@@ -84,21 +90,22 @@ namespace aug {
     namespace detail {
 
         inline int
-        poll(const struct aug_var* arg, int id, struct aug_conns* conns)
+        conncb(const struct aug_var* arg, int id, struct aug_conns* conns)
         {
             try {
-                poll_base* ptr = static_cast<poll_base*>(aug_getvarp(arg));
-                return ptr->poll(id, *conns) ? 1 : 0;
+                conncb_base* ptr = static_cast<
+                    conncb_base*>(aug_getvarp(arg));
+                return ptr->callback(id, *conns) ? 1 : 0;
             } AUG_SETERRINFOCATCH;
             return 0; /* false */
         }
     }
 
     inline void
-    insertconn(struct aug_conns& conns, fdref ref, poll_base& action)
+    insertconn(struct aug_conns& conns, fdref ref, conncb_base& cb)
     {
-        var v(&action);
-        if (-1 == aug_insertconn(&conns, ref.get(), detail::poll, cptr(v)))
+        var v(&cb);
+        if (-1 == aug_insertconn(&conns, ref.get(), detail::conncb, cptr(v)))
             throwerrinfo("aug_insertconn() failed");
     }
 

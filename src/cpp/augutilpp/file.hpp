@@ -15,33 +15,39 @@
 
 namespace aug {
 
-    class setopt_base {
+    class confcb_base {
 
         virtual void
-        do_setopt(const char* name, const char* value) = 0;
+        do_callback(const char* name, const char* value) = 0;
 
     public:
         virtual
-        ~setopt_base() NOTHROW
+        ~confcb_base() NOTHROW
         {
         }
 
         void
-        setopt(const char* name, const char* value)
+        callback(const char* name, const char* value)
         {
-            do_setopt(name, value);
+            do_callback(name, value);
+        }
+
+        void
+        operator ()(const char* name, const char* value)
+        {
+            do_callback(name, value);
         }
     };
 
     namespace detail {
 
         inline int
-        setopt(const struct aug_var* arg, const char* name, const char* value)
+        confcb(const struct aug_var* arg, const char* name, const char* value)
         {
             try {
-                setopt_base* ptr = static_cast<
-                    setopt_base*>(aug_getvarp(arg));
-                ptr->setopt(name, value);
+                confcb_base* ptr = static_cast<
+                    confcb_base*>(aug_getvarp(arg));
+                ptr->callback(name, value);
                 return 0;
             } AUG_SETERRINFOCATCH;
             return -1;
@@ -49,10 +55,10 @@ namespace aug {
     }
 
     inline void
-    readconf(const char* path, setopt_base& action)
+    readconf(const char* path, confcb_base& cb)
     {
-        var v(&action);
-        if (-1 == aug_readconf(path, detail::setopt, cptr(v)))
+        var v(&cb);
+        if (-1 == aug_readconf(path, detail::confcb, cptr(v)))
             throwerrinfo("aug_readconf() failed");
     }
 }
