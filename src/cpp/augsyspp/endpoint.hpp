@@ -60,24 +60,20 @@ namespace aug {
         return ep.un_.family_;
     }
 
+    inline socklen_t
+    len(const struct aug_endpoint& ep)
+    {
+        return ep.len_;
+    }
+
     class endpoint {
     public:
         typedef struct aug_endpoint ctype;
     private:
         struct aug_endpoint ep_;
 
-        endpoint(const endpoint&);
-
-        endpoint&
-        operator =(const endpoint&);
-
     public:
-        endpoint()
-        {
-            clear(ep_);
-        }
-
-        endpoint(const null_&)
+        endpoint(const null_&) NOTHROW
         {
             clear(ep_);
         }
@@ -106,6 +102,12 @@ namespace aug {
             return ep_;
         }
     };
+}
+
+inline bool
+isnull(const struct aug_endpoint& ep)
+{
+    return 0 == ep.un_.family_;
 }
 
 #endif // AUGSYSPP_ENDPOINT_HPP

@@ -50,18 +50,8 @@ namespace aug {
     private:
         struct aug_inetaddr addr_;
 
-        inetaddr(const inetaddr&);
-
-        inetaddr&
-        operator =(const inetaddr&);
-
     public:
-        inetaddr()
-        {
-            clear(addr_);
-        }
-
-        inetaddr(const null_&)
+        inetaddr(const null_&) NOTHROW
         {
             clear(addr_);
         }
@@ -94,6 +84,12 @@ namespace aug {
             return addr_;
         }
     };
+}
+
+inline bool
+isnull(const struct aug_inetaddr& addr)
+{
+    return 0 == addr.family_;
 }
 
 #endif // AUGSYSPP_INETADDR_HPP

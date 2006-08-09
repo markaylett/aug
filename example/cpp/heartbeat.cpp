@@ -12,6 +12,7 @@ namespace {
 
     enum msgtype {
         CANDIDUP = 1,
+        HANDOVER,
         MASTERHB,
         MASTERUP,
         STANDDOWN,
@@ -33,6 +34,9 @@ namespace {
         switch (src) {
         case CANDIDUP:
             s = "CANDIDUP";
+            break;
+        case HANDOVER:
+            s = "HANDOVER";
             break;
         case MASTERHB:
             s = "MASTERHB";
@@ -93,19 +97,22 @@ namespace {
         fdref ref_;
         const endpoint& ep_;
         state state_;
+        bool mseen_;
+        struct timeval mlast_;
+        endpoint slave_;
 
         void
-        sendup()
+        sendup(const endpoint& ep)
         {
             switch (state_) {
             case MASTER:
-                sendto(ref_, MASTERUP, ep_);
+                sendto(ref_, MASTERUP, ep);
                 break;
             case CANDID:
-                sendto(ref_, CANDIDUP, ep_);
+                sendto(ref_, CANDIDUP, ep);
                 break;
             case SLAVE:
-                sendto(ref_, SLAVEUP, ep_);
+                sendto(ref_, SLAVEUP, ep);
                 break;
             }
         }
@@ -131,13 +138,26 @@ namespace {
     public:
         ~session() NOTHROW
         {
+            // When a master shutsdown, if should send a handover message to
+            // the last known slave.
+
+            if (MASTER == state_ && null != slave_) {
+                try {
+                    sendto(ref_, HANDOVER, slave_);
+                } AUG_PERRINFOCATCH;
+            }
         }
         session(fdref ref, const endpoint& ep)
             : ref_(ref),
               ep_(ep),
-              state_(CANDID)
+              state_(CANDID),
+              mseen_(false),
+              slave_(null)
         {
-            sendto(ref, CANDIDUP, ep);
+            // When a node starts, it sends a query to determine the current
+            // master (if any).
+
+            sendto(ref, QUERY, ep);
         }
         void
         recv()
@@ -147,22 +167,49 @@ namespace {
             aug_info("message received: msgtype='%s', current state='%s'",
                      tostring(t), tostring(state_));
 
-            // The following message types can be handled uniformly,
-            // regardless of state.
+            // The following message types can be handled in a uniform manner,
+            // regardless of the current state.
 
             switch (t) {
+            case HANDOVER:
+
+                // Any node that receives a handover should instantly become a
+                // master.  As an optimisation, a master node need not send an
+                // up message.
+
+                if (MASTER == state_) {
+                    state_ = MASTER;
+                    sendto(ref_, MASTERUP, ep_);
+                }
+                return;
+
             case SLAVEHB:
             case SLAVEUP:
 
-                // No state change.
-                break;
+                // Whenever a node receives a packet from a slave, the address
+                // is stored so that a handover can be performed if need be.
+
+                slave_ = from;
+                return;
+
+            case MASTERHB:
+            case MASTERUP:
+
+                // Whenever a node receives a packet from a master, the time
+                // is recorded.
+
+                mseen_ = true;
+                aug::gettimeofday(mlast_);
+
+                break; // Other actions may still need to be performed.
 
             case QUERY:
 
-                // All nodes should respond to a query with an up message.
+                // All nodes should respond to a query by sending an up
+                // message to the sender.
 
-                sendup();
-                break;
+                sendup(from);
+                return; // Done.
 
             default:
                 break;
@@ -170,59 +217,72 @@ namespace {
 
             // Handle the other permutations.
 
-            switch (t | state_) {
+            switch (state_ | t) {
 
                 // CANDID:
                 // ------
 
-            case CANDIDUP | CANDID:
+            case CANDID | CANDIDUP:
 
-                // Another candidate exists; ask them to stand-down.
+                // When a candidate detects another candidate, it asks them to
+                // stand-down.
 
-                sendto(ref_, STANDDOWN, ep_);
+                sendto(ref_, STANDDOWN, from);
                 break;
 
-            case MASTERHB | CANDID:
-            case MASTERUP | CANDID:
-            case STANDDOWN | CANDID:
+            case CANDID | MASTERHB:
+            case CANDID | MASTERUP:
+            case CANDID | STANDDOWN:
 
-                // Become a slave if a master already exists, or a stand-down
-                // is received.
+                // A candidate becomes a slave either when it detects a master
+                // or a stand-down is received.
 
+                state_ = SLAVE;
                 sendto(ref_, SLAVEUP, ep_);
                 break;
 
                 // MASTER:
                 // ------
 
-            case CANDIDUP | MASTER:
-            case MASTERHB | MASTER:
-            case MASTERUP | MASTER:
+            case MASTER | CANDIDUP:
+            case MASTER | MASTERHB:
+            case MASTER | MASTERUP:
 
-                // Send a stand-down to the other master or candidate.
+                // When a master detects either a candidate or another master,
+                // it asks them to stand-down.
 
-                sendto(ref_, STANDDOWN, ep_);
+                sendto(ref_, STANDDOWN, from);
                 break;
 
-            case STANDDOWN | MASTER:
+            case MASTER | STANDDOWN:
 
                 // A master should become a slave if it is asked to
                 // stand-down.
 
+                state_ = SLAVE;
                 sendto(ref_, SLAVEUP, ep_);
                 break;
 
                 // SLAVE:
                 // -----
 
-            case CANDIDUP | SLAVE:
+            case SLAVE | CANDIDUP:
 
-                // Possible stand-down.
+                // If a slave detects a candidate, but is aware of a master,
+                // it should ask the candidate to stand-down.
+
+                if (mseen_) {
+                    struct timeval tv;
+                    gettimeofday(tv);
+                    unsigned int ms(tvtoms(tvsub(tv, mlast_)));
+                    if (ms < 2000)
+                        sendto(ref_, STANDDOWN, from);
+                }
                 break;
 
-            case MASTERHB | SLAVE:
-            case MASTERUP | SLAVE:
-            case STANDDOWN | SLAVE:
+            case SLAVE | MASTERHB:
+            case SLAVE | MASTERUP:
+            case SLAVE | STANDDOWN:
 
                 // No state change.
                 break;

@@ -21,6 +21,9 @@ struct timezone {
 };
 #endif /* _WIN32 */
 
+/** Gets the current time in UTC.  tz is optional, if set, details of the
+    local timezone are returned. */
+
 AUGSYS_API int
 aug_gettimeofday(struct timeval* tv, struct timezone* tz);
 

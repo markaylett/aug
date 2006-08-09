@@ -204,7 +204,7 @@ namespace test {
         state(conncb_base& cb)
             : sfd_(null)
         {
-            struct endpoint ep;
+            endpoint ep(null);
             smartfd sfd(tcplisten("127.0.0.1", "8080", ep));
 
             insertconn(conns_, aug_eventin(), cb);

@@ -16,6 +16,7 @@
 #include "augsyspp/smartfd.hpp"
 #include "augsyspp/socket.hpp"
 #include "augsyspp/string.hpp"
+#include "augsyspp/time.hpp"
 #include "augsyspp/types.hpp"
 #include "augsyspp/unistd.hpp"
 #include "augsyspp/utility.hpp"
