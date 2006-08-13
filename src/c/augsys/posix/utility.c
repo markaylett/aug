@@ -4,6 +4,7 @@
 #include "augsys/errinfo.h"
 
 #include <errno.h>
+#include <stdlib.h> /* random(), srandom() */
 #include <sys/stat.h>
 
 AUGSYS_API int
