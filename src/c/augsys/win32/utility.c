@@ -34,3 +34,15 @@ aug_filesize(int fd, size_t* size)
     *size = low;
     return 0;
 }
+
+AUGSYS_API long
+aug_rand(void)
+{
+    return (long)rand();
+}
+
+AUGSYS_API void
+aug_srand(unsigned int seed)
+{
+    srand(seed);
+}

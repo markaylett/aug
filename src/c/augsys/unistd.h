@@ -12,6 +12,7 @@
 #else /* _WIN32 */
 # include <direct.h>
 # include <io.h>
+# include <process.h>
 # define ftruncate _chsize
 # define fsync _commit
 #endif /* _WIN32 */
@@ -27,5 +28,8 @@ aug_read(int fd, void* buf, size_t size);
 
 AUGSYS_API ssize_t
 aug_write(int fd, const void* buf, size_t size);
+
+AUGSYS_API void
+aug_sleep(unsigned int ms);
 
 #endif /* AUGSYS_UNISTD_H */

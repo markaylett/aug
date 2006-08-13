@@ -11,6 +11,13 @@
 
 namespace aug {
 
+    inline void
+    close(int fd)
+    {
+        if (-1 == aug_close(fd))
+            throwerrinfo("aug_close() failed");
+    }
+
     inline std::pair<smartfd, smartfd>
     pipe()
     {
@@ -38,6 +45,12 @@ namespace aug {
         if (-1 == ret)
             throwerrinfo("aug_write() failed");
         return ret;
+    }
+
+    inline void
+    sleep(unsigned int ms)
+    {
+        return aug_sleep(ms);
     }
 }
 

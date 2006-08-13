@@ -20,6 +20,18 @@ namespace aug {
         return size;
     }
 
+    inline long
+    rand(void)
+    {
+        return aug_rand();
+    }
+
+    inline void
+    srand(unsigned int seed)
+    {
+        aug_srand(seed);
+    }
+
     inline void
     setnonblock(fdref ref, bool on)
     {

@@ -328,6 +328,13 @@ main(int argc, char* argv[])
 
         try {
 
+//             struct timeval tv;
+//             for (int i(0); i < 1000; ++i) {
+//                 aug::gettimeofday(tv);
+//                 aug_info("%d", (int)(getpid() ^ tv.tv_sec ^ tv.tv_usec));
+//             }
+//             return 0;
+
             if (argc < 3) {
                 aug_error("usage: heartbeat <mcast> <serv> [ifname]");
                 return 1;

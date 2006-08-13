@@ -10,6 +10,12 @@
 AUGSYS_API int
 aug_filesize(int fd, size_t* size);
 
+AUGSYS_API long
+aug_rand(void);
+
+AUGSYS_API void
+aug_srand(unsigned int seed);
+
 AUGSYS_API int
 aug_setnonblock(int fd, int on);
 

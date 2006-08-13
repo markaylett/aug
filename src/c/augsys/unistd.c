@@ -8,9 +8,12 @@ static const char rcsid[] = "$Id:$";
 
 #include "augsys/base.h"
 #include "augsys/errinfo.h"
+#if defined(_WIN32)
+# include "augsys/windows.h" /* Sleep() */
+#endif /* _WIN32 */
 
 #include <errno.h>
-#include <fcntl.h> /* O_BINARY */
+#include <fcntl.h>           /* O_BINARY */
 
 AUGSYS_API int
 aug_close(int fd)
@@ -69,4 +72,14 @@ aug_write(int fd, const void* buf, size_t size)
     }
 
     return driver->write_(fd, buf, size);
+}
+
+AUGSYS_API void
+aug_sleep(unsigned int ms)
+{
+#if !defined(_WIN32)
+    usleep(ms * 1000);
+#else /* _WIN32 */
+    Sleep(ms);
+#endif /* _WIN32 */
 }

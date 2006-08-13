@@ -18,3 +18,15 @@ aug_filesize(int fd, size_t* size)
     *size = s.st_size;
     return 0;
 }
+
+AUGSYS_API long
+aug_rand(void)
+{
+    return (long)random();
+}
+
+AUGSYS_API void
+aug_srand(unsigned int seed)
+{
+    srandom(seed);
+}
