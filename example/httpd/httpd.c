@@ -204,7 +204,7 @@ setconfopt_(const struct aug_var* arg, const char* name, const char* value)
 
     } else if (0 == aug_strcasecmp(name, "loglevel")) {
 
-        unsigned int level;
+        unsigned level;
         if (-1 == aug_strtoui(&level, value, 10))
             return -1;
 

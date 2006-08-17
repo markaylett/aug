@@ -27,7 +27,7 @@ namespace aug {
     }
 
     inline void
-    srand(unsigned int seed)
+    srand(unsigned seed)
     {
         aug_srand(seed);
     }

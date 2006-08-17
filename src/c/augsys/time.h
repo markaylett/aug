@@ -31,9 +31,9 @@ AUGSYS_API struct tm*
 aug_localtime(const time_t* clock, struct tm* res);
 
 AUGSYS_API struct timeval*
-aug_mstotv(struct timeval* tv, unsigned int ms);
+aug_mstotv(struct timeval* tv, unsigned ms);
 
-AUGSYS_API unsigned int
+AUGSYS_API unsigned
 aug_tvtoms(const struct timeval* tv);
 
 AUGSYS_API struct timeval*

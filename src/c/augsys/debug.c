@@ -15,8 +15,7 @@ dumpclient_(void* userdata, size_t size)
 {
     char* file;
     int line;
-    _ASSERTE(_CrtIsMemoryBlock(userdata, (unsigned int)size, NULL, &file,
-                               &line));
+    _ASSERTE(_CrtIsMemoryBlock(userdata, (unsigned)size, NULL, &file, &line));
     aug_warn("%s(%d) : Memory leak detected at 0x%p, %d byes long",
              file, (int)line, userdata, (int)size);
 }

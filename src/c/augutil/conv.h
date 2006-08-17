@@ -10,7 +10,7 @@ AUGUTIL_API int
 aug_strtoul(unsigned long* dst, const char* src, int base);
 
 AUGUTIL_API int
-aug_strtoui(unsigned int* dst, const char* src, int base);
+aug_strtoui(unsigned* dst, const char* src, int base);
 
 AUGUTIL_API int
 aug_strtous(unsigned short* dst, const char* src, int base);

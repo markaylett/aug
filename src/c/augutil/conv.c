@@ -46,7 +46,7 @@ aug_strtoul(unsigned long* dst, const char* src, int base)
 }
 
 AUGUTIL_API int
-aug_strtoui(unsigned int* dst, const char* src, int base)
+aug_strtoui(unsigned* dst, const char* src, int base)
 {
     unsigned long ul;
     if (-1 == aug_strtoul(&ul, src, base))
@@ -61,7 +61,7 @@ aug_strtoui(unsigned int* dst, const char* src, int base)
         return -1;
     }
 
-    *dst = (unsigned int)ul;
+    *dst = (unsigned)ul;
     return 0;
 }
 

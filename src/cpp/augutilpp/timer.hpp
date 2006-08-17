@@ -62,8 +62,7 @@ namespace aug {
     class timercb_base {
 
         virtual void
-        do_callback(idref ref, unsigned int& ms,
-                    struct aug_timers& timers) = 0;
+        do_callback(idref ref, unsigned& ms, struct aug_timers& timers) = 0;
 
     public:
         virtual
@@ -72,13 +71,13 @@ namespace aug {
         }
 
         void
-        callback(idref ref, unsigned int& ms, struct aug_timers& timers)
+        callback(idref ref, unsigned& ms, struct aug_timers& timers)
         {
             return do_callback(ref.get(), ms,timers);
         }
 
         void
-        operator ()(idref ref, unsigned int& ms, struct aug_timers& timers)
+        operator ()(idref ref, unsigned& ms, struct aug_timers& timers)
         {
             return do_callback(ref.get(), ms, timers);
         }
@@ -87,7 +86,7 @@ namespace aug {
     namespace detail {
 
         inline void
-        timercb(const struct aug_var* arg, int id, unsigned int* ms,
+        timercb(const struct aug_var* arg, int id, unsigned* ms,
                 struct aug_timers* timers)
         {
             try {
@@ -99,7 +98,7 @@ namespace aug {
     }
 
     inline int
-    settimer(struct aug_timers& timers, idref ref, unsigned int ms,
+    settimer(struct aug_timers& timers, idref ref, unsigned ms,
              timercb_base& cb)
     {
         var v(&cb);
@@ -111,7 +110,7 @@ namespace aug {
     }
 
     inline void
-    resettimer(struct aug_timers& timers, idref ref, unsigned int ms)
+    resettimer(struct aug_timers& timers, idref ref, unsigned ms)
     {
         if (-1 == aug_resettimer(&timers, ref.get(), ms))
             throwerrinfo("aug_resettimer() failed");
@@ -167,13 +166,13 @@ namespace aug {
         }
 
         void
-        set(unsigned int ms, timercb_base& cb)
+        set(unsigned ms, timercb_base& cb)
         {
             ref_ = settimer(timers_, ref_, ms, cb);
         }
 
         void
-        reset(unsigned int ms)
+        reset(unsigned ms)
         {
             resettimer(timers_, ref_, ms);
         }

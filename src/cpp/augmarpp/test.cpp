@@ -42,7 +42,7 @@ namespace {
         char line_[5 + 10 + 1];
     public:
         explicit
-        error(unsigned int l)
+        error(unsigned l)
         {
             strstream s(line_, sizeof(line_));
             s << "line " << l << ends;

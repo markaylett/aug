@@ -12,7 +12,7 @@
 struct aug_var;
 
 typedef char aug_fixver_t[AUG_FIXVERLEN + 1];
-typedef unsigned int aug_fixtag_t;
+typedef unsigned aug_fixtag_t;
 
 struct aug_fixfield_ {
     aug_fixtag_t tag_;

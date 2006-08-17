@@ -38,7 +38,7 @@ static const char rcsid[] = "$Id:$";
 
 #define FORCE_ (FORCEOPT_ & options_)
 
-static unsigned int options_ = 0;
+static unsigned options_ = 0;
 
 static int
 fileset_(aug_mar_t mar, const char* filename)

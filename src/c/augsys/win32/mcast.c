@@ -10,8 +10,8 @@
 #include <iphlpapi.h>
 
 static int
-findif_(int af, unsigned int ifindex,
-        int (*fn)(void*, unsigned int, PIP_ADAPTER_ADDRESSES), void* arg)
+findif_(int af, unsigned ifindex,
+        int (*fn)(void*, unsigned, PIP_ADAPTER_ADDRESSES), void* arg)
 {
     PIP_ADAPTER_ADDRESSES list = NULL;
     ULONG len = 0, ret = 0;
@@ -66,7 +66,7 @@ findif_(int af, unsigned int ifindex,
 }
 
 static int
-ifaddr_(void* arg, unsigned int ifindex, PIP_ADAPTER_ADDRESSES adapter)
+ifaddr_(void* arg, unsigned ifindex, PIP_ADAPTER_ADDRESSES adapter)
 {
     struct in_addr* out = arg;
     PIP_ADAPTER_UNICAST_ADDRESS it = adapter->FirstUnicastAddress;
@@ -88,7 +88,7 @@ ifaddr_(void* arg, unsigned int ifindex, PIP_ADAPTER_ADDRESSES adapter)
 }
 
 static int
-ifindex_(void* arg, unsigned int ifindex, PIP_ADAPTER_ADDRESSES adapter)
+ifindex_(void* arg, unsigned ifindex, PIP_ADAPTER_ADDRESSES adapter)
 {
     DWORD* out = arg;
     PIP_ADAPTER_UNICAST_ADDRESS it = adapter->FirstUnicastAddress;
@@ -110,7 +110,7 @@ ifindex_(void* arg, unsigned int ifindex, PIP_ADAPTER_ADDRESSES adapter)
 static int
 getifaddr_(struct in_addr* addr, const char* ifname)
 {
-    unsigned int ifindex = atoi(ifname);
+    unsigned ifindex = atoi(ifname);
     if (0 == ifindex) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid interface index '%s'"), ifname);
@@ -122,7 +122,7 @@ getifaddr_(struct in_addr* addr, const char* ifname)
 static int
 getifindex_(DWORD* index, const char* ifname)
 {
-    unsigned int ifindex = atoi(ifname);
+    unsigned ifindex = atoi(ifname);
     if (0 == ifindex) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid interface index '%s'"), ifname);

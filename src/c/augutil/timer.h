@@ -12,7 +12,7 @@ struct timeval;
 struct aug_timer_;
 AUG_HEAD(aug_timers, aug_timer_);
 
-typedef void (*aug_timercb_t)(const struct aug_var*, int, unsigned int*,
+typedef void (*aug_timercb_t)(const struct aug_var*, int, unsigned*,
                               struct aug_timers*);
 
 AUGUTIL_API int
@@ -23,11 +23,11 @@ aug_freetimers(struct aug_timers* timers);
     cancelled prior to setting the new timer. */
 
 AUGUTIL_API int
-aug_settimer(struct aug_timers* timers, int id, unsigned int ms,
+aug_settimer(struct aug_timers* timers, int id, unsigned ms,
              aug_timercb_t cb, const struct aug_var* arg);
 
 AUGUTIL_API int
-aug_resettimer(struct aug_timers* timers, int id, unsigned int ms);
+aug_resettimer(struct aug_timers* timers, int id, unsigned ms);
 
 /** Returns false if timer did not exist. */
 

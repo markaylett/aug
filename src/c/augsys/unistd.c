@@ -75,7 +75,7 @@ aug_write(int fd, const void* buf, size_t size)
 }
 
 AUGSYS_API void
-aug_sleep(unsigned int ms)
+aug_sleep(unsigned ms)
 {
 #if !defined(_WIN32)
     usleep(ms * 1000);

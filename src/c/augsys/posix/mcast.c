@@ -27,7 +27,7 @@ getifaddr_(int s, struct in_addr* addr, const char* ifname)
 }
 
 static int
-getifindex_(unsigned int* index, const char* ifname)
+getifindex_(unsigned* index, const char* ifname)
 {
     if (!(*index = if_nametoindex(ifname))) {
         aug_setposixerrinfo(__FILE__, __LINE__, ENODEV);

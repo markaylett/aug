@@ -17,7 +17,7 @@ static const char rcsid[] = "$Id:$";
 struct aug_timer_ {
     AUG_ENTRY(aug_timer_);
     int id_;
-    unsigned int ms_;
+    unsigned ms_;
     struct timeval tv_;
     aug_timercb_t cb_;
     struct aug_var arg_;
@@ -27,7 +27,7 @@ static struct aug_timers free_ = AUG_HEAD_INITIALIZER(free_);
 AUG_ALLOCATOR(allocate_, &free_, aug_timer_, 64)
 
 static int
-expiry_(struct timeval* tv, unsigned int ms)
+expiry_(struct timeval* tv, unsigned ms)
 {
     struct timeval local;
     if (-1 == aug_gettimeofday(tv, NULL))
@@ -72,7 +72,7 @@ aug_freetimers(struct aug_timers* timers)
 }
 
 AUGUTIL_API int
-aug_settimer(struct aug_timers* timers, int id, unsigned int ms,
+aug_settimer(struct aug_timers* timers, int id, unsigned ms,
              aug_timercb_t cb, const struct aug_var* arg)
 {
     struct timeval tv;
@@ -105,7 +105,7 @@ aug_settimer(struct aug_timers* timers, int id, unsigned int ms,
 }
 
 AUGUTIL_API int
-aug_resettimer(struct aug_timers* timers, int id, unsigned int ms)
+aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
 {
     struct aug_timer_* it, ** prev;
 

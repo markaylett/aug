@@ -71,11 +71,11 @@ struct aug_fixstream_ {
 };
 
 static int
-fixtoui_(unsigned int* dst, const char* buf, size_t size, char delim)
+fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
 {
     const char* it, * end = buf + size;
     int digits;
-    unsigned int fact, value;
+    unsigned fact, value;
 
     for (it = buf; it != end; ++it)
         if (*it == delim)
@@ -116,14 +116,14 @@ fixtoui_(unsigned int* dst, const char* buf, size_t size, char delim)
     return digits;
 }
 
-static unsigned int
+static unsigned
 getsize_(const char* buf, size_t size)
 {
     /* TODO: Alter the fix parsing logic so that it does not assume a
        static header with a constant begin string value. */
 
     int digits;
-    unsigned int value;
+    unsigned value;
 
     /* In order for the buffer to contain the body length, it must be able
        to hold, at least, the standard leader, a single digit and a
@@ -403,7 +403,7 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
 {
     const char* it, * end = buf + size;
     int digits;
-    unsigned int tag;
+    unsigned tag;
 
     /* Extract tag value from buffer. */
 

@@ -34,7 +34,7 @@ struct aug_mar_ {
     size_t offset_, refs_;
 };
 
-static unsigned int
+static unsigned
 torw_(int from)
 {
     switch (from & (AUG_RDONLY | AUG_WRONLY | AUG_RDWR)) {

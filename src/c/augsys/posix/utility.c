@@ -27,7 +27,7 @@ aug_rand(void)
 }
 
 AUGSYS_API void
-aug_srand(unsigned int seed)
+aug_srand(unsigned seed)
 {
     srandom(seed);
 }

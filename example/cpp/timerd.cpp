@@ -29,7 +29,7 @@ namespace test {
         {
             if (0 == aug_strcasecmp(name, "loglevel")) {
 
-                unsigned int level(strtoui(value, 10));
+                unsigned level(strtoui(value, 10));
                 aug_info("setting log level: %d", level);
                 aug_setloglevel(level);
 
@@ -209,7 +209,7 @@ namespace test {
         }
 
         void
-        do_callback(idref ref, unsigned int& ms, struct aug_timers& timers)
+        do_callback(idref ref, unsigned& ms, struct aug_timers& timers)
         {
             aug_info("timer fired");
             --remain_;

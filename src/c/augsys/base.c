@@ -11,7 +11,7 @@ static const char rcsid[] = "$Id:$";
 
 #define PROCEED_ 1
 
-static unsigned int refs_ = 0;
+static unsigned refs_ = 0;
 
 static int
 release_(void)

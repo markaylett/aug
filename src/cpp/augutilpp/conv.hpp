@@ -23,10 +23,10 @@ namespace aug {
         return ul;
     }
 
-    inline unsigned int
+    inline unsigned
     strtoui(const char* src, int base)
     {
-        unsigned int ui;
+        unsigned ui;
         if (-1 == aug_strtoui(&ui, src, base))
             throwerrinfo("aug_strtoui() failed");
         return ui;

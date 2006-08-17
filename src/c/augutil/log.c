@@ -61,7 +61,7 @@ writeall_(int fd, const char* buf, size_t n)
 #if !defined(_WIN32)
         int ret = write(fd, buf, n);
 #else /* _WIN32 */
-        int ret = write(fd, buf, (unsigned int)n);
+        int ret = write(fd, buf, (unsigned)n);
 #endif /* _WIN32 */
         if (-1 == ret) {
             if (EINTR == errno)

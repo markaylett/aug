@@ -30,6 +30,6 @@ AUGSYS_API ssize_t
 aug_write(int fd, const void* buf, size_t size);
 
 AUGSYS_API void
-aug_sleep(unsigned int ms);
+aug_sleep(unsigned ms);
 
 #endif /* AUGSYS_UNISTD_H */

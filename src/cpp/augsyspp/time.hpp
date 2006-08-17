@@ -33,12 +33,12 @@ namespace aug {
     }
 
     inline struct timeval&
-    mstotv(struct timeval& tv, unsigned int ms)
+    mstotv(struct timeval& tv, unsigned ms)
     {
         return *aug_mstotv(&tv, ms);
     }
 
-    inline unsigned int
+    inline unsigned
     tvtoms(const struct timeval& tv)
     {
         return aug_tvtoms(&tv);
