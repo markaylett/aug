@@ -3,6 +3,7 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
+#include <csignal>
 #include <iostream>
 
 using namespace aug;
@@ -16,6 +17,109 @@ namespace {
     const unsigned RAND_MS(1000);
     const unsigned MAX_NAME(32);
 
+    /*
+    LEAD 0x001
+    CAND 0x002
+    MEMB 0x004
+
+    ELCT 0x010
+    JOIN 0x020
+    LEAV 0x040
+    STDN 0x080
+    STAT 0x100
+    LIST 0x200
+    */
+
+    void
+    leadelct()
+    {
+    }
+
+    void
+    leadjoin()
+    {
+    }
+
+    void
+    leadleav()
+    {
+    }
+
+    void
+    leadstdn()
+    {
+    }
+
+    void
+    leadstat()
+    {
+    }
+
+    void
+    leadlist()
+    {
+    }
+
+    void
+    candelct()
+    {
+    }
+
+    void
+    candjoin()
+    {
+    }
+
+    void
+    candleav()
+    {
+    }
+
+    void
+    candstdn()
+    {
+    }
+
+    void
+    candstat()
+    {
+    }
+
+    void
+    candlist()
+    {
+    }
+
+    void
+    membelct()
+    {
+    }
+
+    void
+    membjoin()
+    {
+    }
+
+    void
+    membleav()
+    {
+    }
+
+    void
+    membstdn()
+    {
+    }
+
+    void
+    membstat()
+    {
+    }
+
+    void
+    memblist()
+    {
+    }
+
     enum msgtype {
         CANDIDUP = 1,
         HANDOVER,
@@ -25,7 +129,8 @@ namespace {
         SLAVEHB,
         SLAVEUP,
         QUERY,
-        SHUTDOWN
+        NODEUP,
+        NODEDOWN
     };
 
     enum state {
@@ -35,9 +140,17 @@ namespace {
     };
 
     struct packet {
-        char name_[MAX_NAME];
+        char node_[MAX_NAME];
         msgtype type_;
     };
+
+    volatile bool stop_ = false;
+
+    void
+    sigcatch(int sig)
+    {
+        stop_ = true;
+    }
 
     void
     fixedcpy(char* dst, const char* src, size_t size)
@@ -82,8 +195,11 @@ namespace {
         case QUERY:
             s = "QUERY";
             break;
-        case SHUTDOWN:
-            s = "SHUTDOWN";
+        case NODEUP:
+            s = "NODEUP";
+            break;
+        case NODEDOWN:
+            s = "NODEDOWN";
             break;
         }
         return s;
@@ -112,21 +228,21 @@ namespace {
     {
         char buf[MAX_NAME + 1];
         aug::recvfrom(ref, buf, sizeof(buf), 0, ep);
-        aug_strlcpy(p.name_, buf, sizeof(p.name_));
+        aug_strlcpy(p.node_, buf, sizeof(p.node_));
         p.type_ = (msgtype)buf[MAX_NAME];
     }
 
     size_t
-    sendto(fdref ref, const char* name, msgtype type, const endpoint& ep)
+    sendto(fdref ref, const char* node, msgtype type, const endpoint& ep)
     {
         char buf[MAX_NAME + 1];
-        fixedcpy(buf, name, MAX_NAME);
+        fixedcpy(buf, node, MAX_NAME);
         buf[MAX_NAME] = (char)type;
         return aug::sendto(ref, buf, sizeof(buf), 0, ep);
     }
 
     class session : private timercb_base {
-        const char* const name_;
+        const char* const node_;
         fdref ref_;
         const endpoint& ep_;
         state state_;
@@ -143,7 +259,7 @@ namespace {
             aug_info("becoming slave");
             state_ = SLAVE;
             mwait_.reset(mwaitms_ = mwaitms());
-            sendto(ref_, name_, SLAVEUP, ep_);
+            sendto(ref_, node_, SLAVEUP, ep_);
         }
 
         void
@@ -152,15 +268,15 @@ namespace {
             switch (state_) {
             case MASTER:
                 aug_info("broadcasting or sending master-up");
-                sendto(ref_, name_, MASTERUP, ep);
+                sendto(ref_, node_, MASTERUP, ep);
                 break;
             case CANDID:
                 aug_info("broadcasting or sending candidate-up");
-                sendto(ref_, name_, CANDIDUP, ep);
+                sendto(ref_, node_, CANDIDUP, ep);
                 break;
             case SLAVE:
                 aug_info("broadcasting or sending slave-up");
-                sendto(ref_, name_, SLAVEUP, ep);
+                sendto(ref_, node_, SLAVEUP, ep);
                 break;
             }
         }
@@ -176,10 +292,10 @@ namespace {
 
                 if (MASTER == state_) {
                     aug_info("broadcasting master hb");
-                    sendto(ref_, name_, MASTERHB, ep_);
+                    sendto(ref_, node_, MASTERHB, ep_);
                 } else {
                     aug_info("broadcasting slave hb");
-                    sendto(ref_, name_, SLAVEHB, ep_);
+                    sendto(ref_, node_, SLAVEHB, ep_);
                 }
 
             } else if (ref == mwait_) {
@@ -190,12 +306,12 @@ namespace {
                     aug_info("becoming master");
                     ms = 0; // Cancel timer.
                     state_ = MASTER;
-                    sendto(ref_, name_, MASTERUP, ep_);
+                    sendto(ref_, node_, MASTERUP, ep_);
                 } else {
                     aug_info("becoming candidate");
                     ms = RESPONSE_MS;
                     state_ = CANDID;
-                    sendto(ref_, name_, CANDIDUP, ep_);
+                    sendto(ref_, node_, CANDIDUP, ep_);
                 }
             }
         }
@@ -209,14 +325,15 @@ namespace {
             if (MASTER == state_ && null != slave_) {
                 try {
                     aug_info("sending handover");
-                    sendto(ref_, name_, HANDOVER, slave_);
+                    sendto(ref_, node_, HANDOVER, slave_);
                 } AUG_PERRINFOCATCH;
             }
 
-            sendto(ref_, name_, SHUTDOWN, slave_);
+            aug_info("broadcasting node down");
+            sendto(ref_, node_, NODEDOWN, ep_);
         }
-        session(const char* name, fdref ref, const endpoint& ep, timers& ts)
-            : name_(name),
+        session(const char* node, fdref ref, const endpoint& ep, timers& ts)
+            : node_(node),
               ref_(ref),
               ep_(ep),
               state_(SLAVE),
@@ -230,21 +347,15 @@ namespace {
             // master (if any).
 
             aug_info("broadcasting slave-up and query");
-            sendto(ref, name_, SLAVEUP, ep);
-            sendto(ref, name_, QUERY, ep);
+            sendto(ref, node_, SLAVEUP, ep);
+            sendto(ref, node_, QUERY, ep);
 
             hbwait_.set(HB_MS, *this);
             mwait_.set(mwaitms_, *this);
         }
         void
-        recv()
+        recv(const packet& p, const endpoint& from)
         {
-            packet p;
-            endpoint from(null);
-            recvfrom(ref_, p, from);
-            if (0 == strcmp(name_, p.name_))
-                return;
-
             aug_info("received: msgtype='%s', state='%s'", tostring(p.type_),
                      tostring(state_));
 
@@ -261,7 +372,7 @@ namespace {
                 if (MASTER == state_) {
                     aug_info("becoming master");
                     state_ = MASTER;
-                    sendto(ref_, name_, MASTERUP, ep_);
+                    sendto(ref_, node_, MASTERUP, ep_);
                 }
                 return;
 
@@ -291,14 +402,16 @@ namespace {
                 break; // Other actions may still need to be performed.
 
             case QUERY:
+            case NODEUP:
 
                 // All nodes should respond to a query by sending an up
                 // message to the sender.
 
-                aug_info("responding to query");
+                aug_info("responding to nodeup/query");
                 sendup(from);
                 return; // Done.
 
+            case NODEDOWN:
             default:
                 break;
             }
@@ -316,12 +429,11 @@ namespace {
                 // stand-down.
 
                 aug_info("sending stand-down");
-                sendto(ref_, name_, STANDDOWN, from);
+                sendto(ref_, node_, STANDDOWN, from);
                 break;
 
             case CANDID | MASTERHB:
             case CANDID | MASTERUP:
-                //            case CANDID | SHUTDOWN:
             case CANDID | STANDDOWN:
 
                 // A candidate becomes a slave either when it detects a master
@@ -341,10 +453,9 @@ namespace {
                 // it asks them to stand-down.
 
                 aug_info("sending stand-down");
-                sendto(ref_, name_, STANDDOWN, from);
+                sendto(ref_, node_, STANDDOWN, from);
                 break;
 
-                //            case MASTER | SHUTDOWN:
             case MASTER | STANDDOWN:
 
                 // A master should become a slave if it is asked to
@@ -367,14 +478,13 @@ namespace {
                     unsigned ms(tvtoms(tvsub(tv, mlast_)));
                     if (ms < HB_MS) {
                         aug_info("sending stand-down");
-                        sendto(ref_, name_, STANDDOWN, from);
+                        sendto(ref_, node_, STANDDOWN, from);
                     }
                 }
                 break;
 
             case SLAVE | MASTERHB:
             case SLAVE | MASTERUP:
-                //            case SLAVE | SHUTDOWN:
             case SLAVE | STANDDOWN:
 
                 // No state change.
@@ -384,26 +494,35 @@ namespace {
     };
 
     void
-    run(const char* name, fdref ref, const endpoint& ep)
+    run(const char* node, fdref ref, const endpoint& ep)
     {
         mplexer mp;
         timers ts;
-        session s(name, ref, ep, ts);
+        session s(node, ref, ep, ts);
         setioeventmask(mp, ref, AUG_IOEVENTRD);
 
         struct timeval tv;
         int ret(!0);
-        for (;;) {
+        while (!stop_) {
 
             processtimers(ts, 0 == ret, tv);
-            aug_info("tv_sec=%d, tv_usec=%d", (int)tv.tv_sec,
+            aug_info("timeout in: tv_sec=%d, tv_usec=%d", (int)tv.tv_sec,
                      (int)tv.tv_usec);
 
             while (AUG_RETINTR == (ret = waitioevents(mp, tv)))
                 ;
 
-            if (0 < ret)
-                s.recv();
+            aug_info("waitioevents: %d", ret);
+
+            if (0 < ret) {
+                packet p;
+                endpoint from(null);
+                recvfrom(ref, p, from);
+                if (0 != strcmp(node, p.node_))
+                    s.recv(p, from);
+                else
+                    aug_info("ignoring packet from self");
+            }
         }
     }
 }
@@ -411,10 +530,13 @@ namespace {
 int
 main(int argc, char* argv[])
 {
+    signal(SIGINT, sigcatch);
+
     try {
 
         struct aug_errinfo errinfo;
         scoped_init init(errinfo);
+        aug_setlogger(aug_daemonlogger);
 
         try {
 
@@ -423,7 +545,7 @@ main(int argc, char* argv[])
             aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
 
             if (argc < 4) {
-                aug_error("usage: heartbeat <name> <mcast> <serv> [ifname]");
+                aug_error("usage: heartbeat <node> <mcast> <serv> [ifname]");
                 return 1;
             }
 
@@ -438,8 +560,6 @@ main(int argc, char* argv[])
 
             // Don't receive packets from self.
 
-            //setmcastloop(sfd, false);
-
             endpoint ep(inetany(family(in)), htons(atoi(argv[3])));
             aug::bind(sfd, ep);
 
@@ -447,12 +567,12 @@ main(int argc, char* argv[])
             setinetaddr(ep, in);
             run(argv[1], sfd, ep);
 
-        } catch (const std::exception& e) {
+        } catch (const exception& e) {
             aug_perrinfo(e.what());
             return 1;
         }
 
-    } catch (const std::exception& e) {
+    } catch (const exception& e) {
         cerr << e.what() << endl;
         return 1;
     }
