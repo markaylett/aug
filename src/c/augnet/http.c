@@ -4,7 +4,7 @@
 #define AUGNET_BUILD
 #include "augnet/http.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augutil/conv.h"
 #include "augutil/lexer.h"
@@ -28,7 +28,7 @@ struct aug_httpparser_ {
         BODY_
     } state_;
     char name_[AUG_MAXLINE];
-    size_t csize_;
+    unsigned csize_;
 };
 
 static int
@@ -55,7 +55,7 @@ setname_(aug_httpparser_t parser)
 static int
 setvalue_(aug_httpparser_t parser)
 {
-    size_t csize;
+    unsigned csize;
 
     /* Intercept and handler any fields that affect the parsing phase. */
 

@@ -13,8 +13,8 @@ struct aug_var;
 struct aug_httphandlers {
     void (*setinitial_)(const struct aug_var*, const char*);
     void (*setfield_)(const struct aug_var*, const char*, const char*);
-    void (*setcsize_)(const struct aug_var*, size_t);
-    void (*cdata_)(const struct aug_var*, const void*, size_t);
+    void (*setcsize_)(const struct aug_var*, unsigned);
+    void (*cdata_)(const struct aug_var*, const void*, unsigned);
     void (*end_)(const struct aug_var*, int);
 };
 

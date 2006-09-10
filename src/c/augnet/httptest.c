@@ -29,13 +29,13 @@ setfield_(const struct aug_var* arg, const char* name, const char* value)
 }
 
 static void
-setcsize_(const struct aug_var* arg, size_t size)
+setcsize_(const struct aug_var* arg, unsigned size)
 {
     aug_info("size: %d", (int)size);
 }
 
 static void
-cdata_(const struct aug_var* arg, const void* buf, size_t size)
+cdata_(const struct aug_var* arg, const void* buf, unsigned size)
 {
 }
 

@@ -3,7 +3,7 @@
 */
 #include "state.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "message.h"
 
@@ -125,7 +125,7 @@ setfield_(const struct aug_var* arg, const char* name, const char* value)
 }
 
 static void
-setcsize_(const struct aug_var* arg, size_t csize)
+setcsize_(const struct aug_var* arg, unsigned csize)
 {
     aug_state_t state = aug_getvarp(arg);
     if (!state->in_.mar_)
@@ -135,7 +135,7 @@ setcsize_(const struct aug_var* arg, size_t csize)
 }
 
 static void
-cdata_(const struct aug_var* arg, const void* buf, size_t size)
+cdata_(const struct aug_var* arg, const void* buf, unsigned size)
 {
     aug_state_t state = aug_getvarp(arg);
     if (!state->in_.mar_)
