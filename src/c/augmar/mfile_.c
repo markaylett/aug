@@ -78,13 +78,13 @@ aug_closemfile_(aug_mfile_t mfile)
     free(mfile);
     return ret;
 }
-#include <stdio.h>
+
 AUGMAR_EXTERN aug_mfile_t
 aug_openmfile_(const char* path, int flags, mode_t mode,
                unsigned tail)
 {
     int fd;
-    unsigned size;
+    size_t size;
     aug_mfile_t mfile;
     assert(path);
 
@@ -106,7 +106,7 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
 
     mfile->fd_ = fd;
     mfile->flags_ = toflags_(flags);
-    mfile->resvd_ = mfile->size_ = size;
+    mfile->resvd_ = mfile->size_ = (unsigned)size;
     mfile->mmap_ = NULL;
     return mfile;
 

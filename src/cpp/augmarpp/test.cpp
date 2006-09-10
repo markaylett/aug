@@ -25,10 +25,10 @@ using namespace std;
 namespace {
 
     const char STR1[] = STR1_;
-    const size_t STRLEN1(sizeof(STR1_) - 1);
+    const unsigned STRLEN1(sizeof(STR1_) - 1);
 
     const char STR2[] = STR2_;
-    const size_t STRLEN2(sizeof(STR2_) - 1);
+    const unsigned STRLEN2(sizeof(STR2_) - 1);
 
     const struct aug_field FIELDS[] = {
         FIELD_("familyname", "Aylett"),
@@ -36,7 +36,7 @@ namespace {
         FIELD_("gender", "Male")
     };
 
-    const size_t FIELDS_SIZE(sizeof(FIELDS) / sizeof(FIELDS[0]));
+    const unsigned FIELDS_SIZE(sizeof(FIELDS) / sizeof(FIELDS[0]));
 
     class error : public exception {
         char line_[5 + 10 + 1];
@@ -66,7 +66,7 @@ namespace {
         if (FIELDS_SIZE != aug::fields(ref))
             throw error(__LINE__);
 
-        size_t i;
+        unsigned i;
         for (i = 0; FIELDS_SIZE > i; ++i) {
 
             aug::field field(null);
@@ -84,7 +84,7 @@ namespace {
 
         for (i = 0; FIELDS_SIZE > i; ++i) {
 
-            size_t size;
+            unsigned size;
             const char* value = static_cast<
                 const char*>(aug::getfield(ref, FIELDS[i].name_, size));
 
@@ -108,12 +108,12 @@ namespace {
     void
     headertest(marref ref)
     {
-        for (size_t i(0); FIELDS_SIZE > i; ++i)
+        for (unsigned i(0); FIELDS_SIZE > i; ++i)
             aug::setfield(ref, aug::field(FIELDS[i]));
 
         checkheader(ref);
 
-        size_t ord(aug::unsetfield(ref, FIELDS[1].name_).first);
+        unsigned ord(aug::unsetfield(ref, FIELDS[1].name_).first);
         if (1 != ord)
             throw error(__LINE__);
         try {
@@ -139,7 +139,7 @@ namespace {
     {
         aug::setcontent(ref, STR1);
 
-        size_t size;
+        unsigned size;
         const char* content = static_cast<
             const char*>(aug::content(ref, size));
 
@@ -160,7 +160,7 @@ namespace {
     inserttest(marref ref, const char* src)
     {
         aug::insertmar(ref, src);
-        size_t size;
+        unsigned size;
         const char* content = static_cast<
             const char*>(aug::content(ref, size));
 
@@ -213,7 +213,7 @@ namespace {
         aug::smartmar dst(aug::createmar());
         aug::copymar(dst, ref);
 
-        size_t size;
+        unsigned size;
         const char* content = static_cast<
             const char*>(aug::content(dst, size));
 
@@ -238,7 +238,7 @@ namespace {
         smartmar to(aug::openmar(dst, AUG_RDWR | AUG_CREAT, 0664));
         aug::copymar(to, from);
 
-        size_t size;
+        unsigned size;
         const char* content = static_cast<
             const char*>(aug::content(to, size));
 
@@ -253,15 +253,15 @@ namespace {
     iteratortest(marref ref)
     {
         aug::header header(ref);
-        for (size_t i(0); FIELDS_SIZE > i; ++i)
+        for (unsigned i(0); FIELDS_SIZE > i; ++i)
             header.setfield(aug::field(FIELDS[i]));
 
         checkheader(ref);
 
-        if ((size_t)(header.end() - header.begin()) != FIELDS_SIZE)
+        if ((unsigned)(header.end() - header.begin()) != FIELDS_SIZE)
             throw error(__LINE__);
 
-        for (size_t j(0); FIELDS_SIZE > j; ++j)
+        for (unsigned j(0); FIELDS_SIZE > j; ++j)
             if (!iequal(header.begin()[j], FIELDS[j].name_))
                 throw error(__LINE__);
 
@@ -269,7 +269,7 @@ namespace {
             endR(header.rend());
         for (; itR != endR; ++itR) {
 
-            size_t ord(aug::toord(itR));
+            unsigned ord(aug::toord(itR));
             if (!iequal(*itR, FIELDS[ord].name_))
                 throw error(__LINE__);
 
@@ -362,7 +362,7 @@ namespace {
 int
 main(int argc, char* argv[])
 {
-    static const size_t TOTAL(sizeof(tests) / sizeof(tests[0]));
+    static const unsigned TOTAL(sizeof(tests) / sizeof(tests[0]));
 
     struct aug_errinfo errinfo;
     char dst[] = "dst.XXXXXX";
@@ -378,8 +378,8 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    size_t failed(0);
-    for (size_t i(0); TOTAL > i; ++i)
+    unsigned failed(0);
+    for (unsigned i(0); TOTAL > i; ++i)
         if (!run(tests[i], dst, src))
             ++failed;
 

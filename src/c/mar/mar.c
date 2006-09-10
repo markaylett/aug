@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "mar/getopt.h"
 #include "mar/utility.h"
@@ -78,7 +78,7 @@ extract_(aug_mar_t mar, const char* filename)
     if (0 == strcmp(filename, "-")) {
 
         const void* body;
-        size_t size;
+        unsigned size;
 
         if (!(body = aug_content(mar, &size)))
             return -1;
@@ -167,7 +167,7 @@ names_(aug_mar_t mar)
 static int
 size_(aug_mar_t mar)
 {
-    size_t size;
+    unsigned size;
     if (-1 == aug_contentsize(mar, &size))
         return -1;
 
@@ -205,7 +205,7 @@ static int
 get_(aug_mar_t mar, const char* name)
 {
     const void* value;
-    size_t size;
+    unsigned size;
 
     if (!(value = aug_valuebyname(mar, name, &size)))
         return -1;

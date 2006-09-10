@@ -89,7 +89,7 @@ prepare_(aug_state_t state)
     state->out_.iovec_[0].iov_len = aug_strbuflen(state->out_.header_);
 
     if (next->mar_) {
-        size_t size;
+        unsigned size;
         state->out_.iovec_[1].iov_base
             = (void*)aug_content(next->mar_, &size);
         if (size) {
