@@ -21,16 +21,16 @@ AUGMAR_EXTERN int
 aug_copyseq_(aug_seq_t dst, aug_seq_t src);
 
 AUGMAR_EXTERN aug_seq_t
-aug_createseq_(size_t tail);
+aug_createseq_(unsigned tail);
 
 AUGMAR_EXTERN aug_seq_t
-aug_openseq_(const char* path, int flags, mode_t mode, size_t tail);
+aug_openseq_(const char* path, int flags, mode_t mode, unsigned tail);
 
 AUGMAR_EXTERN void*
-aug_resizeseq_(aug_seq_t seq, size_t size);
+aug_resizeseq_(aug_seq_t seq, unsigned size);
 
 AUGMAR_EXTERN int
-aug_setregion_(aug_seq_t seq, size_t offset, size_t len);
+aug_setregion_(aug_seq_t seq, unsigned offset, unsigned len);
 
 AUGMAR_EXTERN int
 aug_syncseq_(aug_seq_t seq);
@@ -38,7 +38,7 @@ aug_syncseq_(aug_seq_t seq);
 AUGMAR_EXTERN void*
 aug_seqaddr_(aug_seq_t seq);
 
-AUGMAR_EXTERN size_t
+AUGMAR_EXTERN unsigned
 aug_seqsize_(aug_seq_t seq);
 
 AUGMAR_EXTERN void*

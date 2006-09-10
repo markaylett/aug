@@ -4,7 +4,7 @@
 #define AUGMAR_BUILD
 #include "augmar/file_.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augmar/flags_.h"
 #include "augmar/format_.h"
@@ -43,7 +43,7 @@ aug_openfile_(const char* path, int flags, mode_t mode)
 }
 
 AUGMAR_EXTERN int
-aug_extendfile_(int fd, size_t size)
+aug_extendfile_(int fd, unsigned size)
 {
     /* The lseek function can be used to move the file pointer beyond the end
        of the file, in which case, any subsequent write operation should fill

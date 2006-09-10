@@ -4,7 +4,7 @@
 #define AUGMAR_BUILD
 #include "augmar/mfile_.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augmar/file_.h"
 #include "augmar/format_.h"
@@ -20,7 +20,7 @@ static const char rcsid[] = "$Id:$";
 
 struct aug_mfile_ {
     int fd_, flags_;
-    size_t resvd_, size_;
+    unsigned resvd_, size_;
     struct aug_mmap_* mmap_;
 };
 
@@ -42,13 +42,13 @@ toflags_(int from)
     return flags;
 }
 
-static size_t
-reserve_(size_t size)
+static unsigned
+reserve_(unsigned size)
 {
     /* Given the size to be reserved, round up to the nearest page size. */
 
-    size_t pagesize = aug_pagesize();
-    size_t pages = size / pagesize;
+    unsigned pagesize = aug_pagesize();
+    unsigned pages = size / pagesize;
     if (size % pagesize)
         ++pages;
     return pages * pagesize;
@@ -81,10 +81,10 @@ aug_closemfile_(aug_mfile_t mfile)
 #include <stdio.h>
 AUGMAR_EXTERN aug_mfile_t
 aug_openmfile_(const char* path, int flags, mode_t mode,
-               size_t tail)
+               unsigned tail)
 {
     int fd;
-    size_t size;
+    unsigned size;
     aug_mfile_t mfile;
     assert(path);
 
@@ -116,7 +116,7 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
 }
 
 AUGMAR_EXTERN void*
-aug_mapmfile_(aug_mfile_t mfile, size_t size)
+aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 {
     assert(mfile);
 
@@ -127,7 +127,7 @@ aug_mapmfile_(aug_mfile_t mfile, size_t size)
 
     if (mfile->resvd_ < size) {
 
-        size_t resvd;
+        unsigned resvd;
 
         /* If file has not been opened for writing, then the file cannot be
            extended. */
@@ -179,7 +179,7 @@ aug_syncmfile_(aug_mfile_t mfile)
 }
 
 AUGMAR_EXTERN int
-aug_truncatemfile_(aug_mfile_t mfile, size_t size)
+aug_truncatemfile_(aug_mfile_t mfile, unsigned size)
 {
     assert(mfile);
     if (!(mfile->flags_ & AUG_MMAPWR)) {
@@ -202,14 +202,14 @@ aug_mfileaddr_(aug_mfile_t mfile)
     return mfile->mmap_->addr_;
 }
 
-AUGMAR_EXTERN size_t
+AUGMAR_EXTERN unsigned
 aug_mfileresvd_(aug_mfile_t mfile)
 {
     assert(mfile);
     return mfile->resvd_;
 }
 
-AUGMAR_EXTERN size_t
+AUGMAR_EXTERN unsigned
 aug_mfilesize_(aug_mfile_t mfile)
 {
     assert(mfile);

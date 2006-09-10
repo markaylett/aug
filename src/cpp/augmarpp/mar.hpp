@@ -79,35 +79,35 @@ namespace aug {
         if (-1 == aug_removefields(ref.get()))
             throwerrinfo("aug_removefields() failed");
     }
-    inline size_t
+    inline unsigned
     setfield(marref ref, const struct aug_field& f)
     {
-        size_t ord;
+        unsigned ord;
         if (-1 == aug_setfield(ref.get(), &f, &ord))
             throwerrinfo("aug_setfield() failed");
         return ord;
     }
     inline void
-    setfield(marref ref, size_t ord, const void* cdata, size_t size)
+    setfield(marref ref, unsigned ord, const void* cdata, unsigned size)
     {
         if (-1 == aug_setvalue(ref.get(), ord, cdata, size))
             throwerrinfo("aug_setvalue() failed");
     }
     inline void
-    setfield(marref ref, size_t ord, const char* cdata)
+    setfield(marref ref, unsigned ord, const char* cdata)
     {
         setfield(ref, ord, cdata, strlen(cdata));
     }
-    inline std::pair<size_t, bool>
+    inline std::pair<unsigned, bool>
     unsetfield(marref ref, const char* name)
     {
-        size_t ord;
+        unsigned ord;
         bool match(result(aug_unsetbyname(ref.get(), name, &ord),
                           "aug_unsetbyname() failed"));
         return std::make_pair(ord, match);
     }
     inline bool
-    unsetfield(marref ref, size_t ord)
+    unsetfield(marref ref, unsigned ord)
     {
         return result(aug_unsetbyord(ref.get(), ord),
                       "aug_unsetbyord() failed");
@@ -121,7 +121,7 @@ namespace aug {
         return ret;
     }
     inline const void*
-    getfield(marref ref, const char* name, size_t& size)
+    getfield(marref ref, const char* name, unsigned& size)
     {
         const void* ret = aug_valuebyname(ref.get(), name, &size);
         if (!ret)
@@ -129,7 +129,7 @@ namespace aug {
         return ret;
     }
     inline const void*
-    getfield(marref ref, size_t ord, size_t& size)
+    getfield(marref ref, unsigned ord, unsigned& size)
     {
         const void* ret = aug_valuebyord(ref.get(), ord, &size);
         if (!ret)
@@ -137,7 +137,7 @@ namespace aug {
         return ret;
     }
     inline const void*
-    getfield(marref ref, size_t ord)
+    getfield(marref ref, unsigned ord)
     {
         const void* ret = aug_valuebyord(ref.get(), ord, NULL);
         if (!ret)
@@ -145,29 +145,29 @@ namespace aug {
         return ret;
     }
     inline bool
-    getfield(marref ref, struct aug_field& f, size_t ord)
+    getfield(marref ref, struct aug_field& f, unsigned ord)
     {
         return result(aug_field(ref.get(), &f, ord),
                       "aug_field() failed");
     }
-    inline size_t
+    inline unsigned
     fields(marref ref)
     {
-        size_t size;
+        unsigned size;
         if (-1 == aug_fields(ref.get(), &size))
             throwerrinfo("aug_fields() failed");
         return size;
     }
     inline bool
-    toname(marref ref, const char*& s, size_t ord)
+    toname(marref ref, const char*& s, unsigned ord)
     {
         return result(aug_ordtoname(ref.get(), &s, ord),
                       "aug_ordtoname() failed");
     }
-    inline std::pair<size_t, bool>
+    inline std::pair<unsigned, bool>
     toord(marref ref, const char* name)
     {
-        size_t ord;
+        unsigned ord;
         bool match(result(aug_nametoord(ref.get(), &ord, name),
                           "aug_nametoord() failed"));
         return std::make_pair(ord, match);
@@ -187,7 +187,7 @@ namespace aug {
         return ret;
     }
     inline void
-    setcontent(marref ref, const void* cdata, size_t size)
+    setcontent(marref ref, const void* cdata, unsigned size)
     {
         if (-1 == aug_setcontent(ref.get(), cdata, size))
             throwerrinfo("aug_setcontent() failed");
@@ -204,15 +204,15 @@ namespace aug {
             throwerrinfo("aug_syncmar() failed");
     }
     inline void
-    truncatemar(marref ref, size_t size)
+    truncatemar(marref ref, unsigned size)
     {
         if (-1 == aug_truncatemar(ref.get(), size))
             throwerrinfo("aug_truncatemar() failed");
     }
-    inline size_t
-    writemar(marref ref, const void* buf, size_t size)
+    inline unsigned
+    writemar(marref ref, const void* buf, unsigned size)
     {
-        ssize_t ret(aug_writemar(ref.get(), buf, size));
+        int ret(aug_writemar(ref.get(), buf, size));
         if (-1 == ret)
             throwerrinfo("aug_writemar() failed");
         return ret;
@@ -224,7 +224,7 @@ namespace aug {
             throwerrinfo("aug_extractmar() failed");
     }
     inline const void*
-    content(marref ref, size_t& size)
+    content(marref ref, unsigned& size)
     {
         const void* ret = aug_content(ref.get(), &size);
         if (!ret)
@@ -239,18 +239,18 @@ namespace aug {
             throwerrinfo("aug_content() failed");
         return ret;
     }
-    inline size_t
-    readmar(marref ref, void* buf, size_t size)
+    inline unsigned
+    readmar(marref ref, void* buf, unsigned size)
     {
-        ssize_t ret(aug_readmar(ref.get(), buf, size));
+        int ret(aug_readmar(ref.get(), buf, size));
         if (-1 == ret)
             throwerrinfo("aug_readmar() failed");
         return ret;
     }
-    inline size_t
+    inline unsigned
     contentsize(marref ref)
     {
-        size_t size;
+        unsigned size;
         if (-1 == aug_contentsize(ref.get(), &size))
             throwerrinfo("aug_contentsize() failed");
         return size;

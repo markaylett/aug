@@ -17,16 +17,16 @@ namespace aug {
 
     class const_iterator {
 
-        friend size_t
+        friend unsigned
         toord(const const_iterator&);
 
     public:
-        typedef ssize_t difference_type;
+        typedef int difference_type;
         typedef const char* value_type;
         typedef value_type pointer;
         typedef value_type reference;
         typedef std::random_access_iterator_tag iterator_category;
-        typedef size_t size_type;
+        typedef unsigned size_type;
 #if defined(_MSC_VER) && _MSC_VER < 1310
         typedef difference_type distance_type;
 #endif // _MSC_VER < 1310
@@ -41,7 +41,7 @@ namespace aug {
             ord_ += diff;
         }
     public:
-        const_iterator(marref ref, size_type ord)
+        const_iterator(marref ref, unsigned ord)
             : ref_(ref),
               ord_(static_cast<difference_type>(ord))
         {
@@ -136,12 +136,12 @@ namespace aug {
 
 #endif // _MSC_VER < 1310
 
-    inline size_t
+    inline unsigned
     toord(const const_iterator& it)
     {
         return it.ord_;
     }
-    inline size_t
+    inline unsigned
     toord(const const_reverse_iterator& it)
     {
         return toord(it.base()) - 1;

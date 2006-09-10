@@ -5,7 +5,7 @@
 #define AUGMAR_BUILD
 #include "augmar/seq_.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augmar/format_.h"
 #include "augmar/mfile_.h"
@@ -25,22 +25,22 @@ static const char rcsid[] = "$Id:$";
 
 struct impl_ {
     int (*free_)(aug_seq_t);
-    void* (*resize_)(aug_seq_t, size_t, size_t);
+    void* (*resize_)(aug_seq_t, unsigned, unsigned);
     int (*sync_)(aug_seq_t);
     void* (*addr_)(aug_seq_t);
-    size_t (*size_)(aug_seq_t);
+    unsigned (*size_)(aug_seq_t);
     void* (*tail_)(aug_seq_t);
 };
 
 struct aug_seq_ {
-    size_t offset_, len_;
+    unsigned offset_, len_;
     const struct impl_* impl_;
 };
 
 struct memseq_ {
     struct aug_seq_ seq_;
     void* addr_;
-    size_t len_;
+    unsigned len_;
 };
 
 struct mfileseq_ {
@@ -59,7 +59,7 @@ freemem_(aug_seq_t seq)
 }
 
 static void*
-resizemem_(aug_seq_t seq, size_t size, size_t tail)
+resizemem_(aug_seq_t seq, unsigned size, unsigned tail)
 {
     struct memseq_* memseq = (struct memseq_*)seq;
     void* addr;
@@ -111,7 +111,7 @@ memaddr_(aug_seq_t seq)
     return memseq->addr_;
 }
 
-static size_t
+static unsigned
 memsize_(aug_seq_t seq)
 {
     struct memseq_* memseq = (struct memseq_*)seq;
@@ -142,10 +142,10 @@ freemfile_(aug_seq_t seq)
 }
 
 static void*
-resizemfile_(aug_seq_t seq, size_t size, size_t tail)
+resizemfile_(aug_seq_t seq, unsigned size, unsigned tail)
 {
     struct mfileseq_* mfileseq = (struct mfileseq_*)seq;
-    size_t len = aug_mfilesize_(mfileseq->mfile_);
+    unsigned len = aug_mfilesize_(mfileseq->mfile_);
     void* addr;
 
     if (size > len) {
@@ -185,7 +185,7 @@ mfileaddr_(aug_seq_t seq)
     return aug_mfileaddr_(mfileseq->mfile_);
 }
 
-static size_t
+static unsigned
 mfilesize_(aug_seq_t seq)
 {
     struct mfileseq_* mfileseq = (struct mfileseq_*)seq;
@@ -217,7 +217,7 @@ aug_freeseq_(aug_seq_t seq)
 AUGMAR_EXTERN int
 aug_copyseq_(aug_seq_t dst, aug_seq_t src)
 {
-    size_t size = aug_seqsize_(src);
+    unsigned size = aug_seqsize_(src);
     void* addr;
 
     if (-1 == aug_setregion_(src, 0, size))
@@ -234,7 +234,7 @@ aug_copyseq_(aug_seq_t dst, aug_seq_t src)
 }
 
 AUGMAR_EXTERN aug_seq_t
-aug_createseq_(size_t tail)
+aug_createseq_(unsigned tail)
 {
     struct memseq_* memseq;
     if (!(memseq = (struct memseq_*)malloc(sizeof(struct memseq_) + tail))) {
@@ -251,9 +251,9 @@ aug_createseq_(size_t tail)
 }
 
 AUGMAR_EXTERN aug_seq_t
-aug_openseq_(const char* path, int flags, mode_t mode, size_t tail)
+aug_openseq_(const char* path, int flags, mode_t mode, unsigned tail)
 {
-    size_t size;
+    unsigned size;
     struct mfileseq_* mfileseq;
     struct aug_mfile_* mfile = aug_openmfile_(path, flags, mode,
                                               sizeof(struct mfileseq_)
@@ -279,10 +279,10 @@ aug_openseq_(const char* path, int flags, mode_t mode, size_t tail)
 }
 
 AUGMAR_EXTERN void*
-aug_resizeseq_(aug_seq_t seq, size_t size)
+aug_resizeseq_(aug_seq_t seq, unsigned size)
 {
     void* addr;
-    size_t total, tail;
+    unsigned total, tail;
 
     total = (*seq->impl_->size_)(seq);
     tail = total - (seq->offset_ + seq->len_);
@@ -297,9 +297,9 @@ aug_resizeseq_(aug_seq_t seq, size_t size)
 }
 
 AUGMAR_EXTERN int
-aug_setregion_(aug_seq_t seq, size_t offset, size_t len)
+aug_setregion_(aug_seq_t seq, unsigned offset, unsigned len)
 {
-    size_t total = (*seq->impl_->size_)(seq);
+    unsigned total = (*seq->impl_->size_)(seq);
     if (total < (offset + len)) {
 
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
@@ -324,7 +324,7 @@ aug_seqaddr_(aug_seq_t seq)
     return (char*)(*seq->impl_->addr_)(seq) + seq->offset_;
 }
 
-AUGMAR_EXTERN size_t
+AUGMAR_EXTERN unsigned
 aug_seqsize_(aug_seq_t seq)
 {
     return (*seq->impl_->size_)(seq);

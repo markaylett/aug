@@ -4,7 +4,7 @@
 #define AUGMAR_BUILD
 #include "augmar/header_.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augmar/format_.h"
 #include "augmar/info_.h"
@@ -21,7 +21,7 @@ setnsize_(const void* field, aug_nsize_t nsize)
     aug_encodensize((char*)field + AUG_NSIZE_OFFSET, nsize);
 }
 
-static size_t
+static unsigned
 nsize_(const void* field)
 {
     return aug_decodensize((char*)field + AUG_NSIZE_OFFSET);
@@ -33,7 +33,7 @@ setvsize_(const void* field, aug_vsize_t vsize)
     aug_encodevsize((char*)field + AUG_VSIZE_OFFSET, vsize);
 }
 
-static size_t
+static unsigned
 vsize_(const void* field)
 {
     return aug_decodevsize((char*)field + AUG_VSIZE_OFFSET);
@@ -46,21 +46,21 @@ name_(void* field)
 }
 
 static void*
-value_(void* field, size_t nsize)
+value_(void* field, unsigned nsize)
 {
     return (char*)field + AUG_VALUE_OFFSET(nsize);
 }
 
-static size_t
+static unsigned
 fieldsize_(const void* field)
 {
-    size_t nsize = nsize_(field);
-    size_t vsize = vsize_(field);
+    unsigned nsize = nsize_(field);
+    unsigned vsize = vsize_(field);
     return AUG_FIELD_SIZE(nsize, vsize);
 }
 
-static size_t
-offsetbyord_(void* begin, size_t ord)
+static unsigned
+offsetbyord_(void* begin, unsigned ord)
 {
     char* ptr = begin;
     while (ord--)
@@ -69,18 +69,18 @@ offsetbyord_(void* begin, size_t ord)
     return ptr - (char*)begin;
 }
 
-static size_t
-offsetbyname_(void* begin, const char* name, size_t* inout)
+static unsigned
+offsetbyname_(void* begin, const char* name, unsigned* inout)
 {
     /* The inout parameter contains the number of fields on input, and the
        matching ordinal on output. */
 
     char* ptr = begin;
-    size_t ord;
+    unsigned ord;
 
     for (ord = 0; ord < *inout; ++ord) {
 
-        size_t nsize = nsize_(ptr);
+        unsigned nsize = nsize_(ptr);
         if (0 == aug_strncasecmp(name, name_(ptr), nsize)) {
             *inout = ord;
             break;
@@ -110,10 +110,10 @@ aug_removefields_(aug_seq_t seq, struct aug_info_* info)
 
 AUGMAR_EXTERN int
 aug_setfield_(aug_seq_t seq, struct aug_info_* info,
-              const struct aug_field* field, size_t* ord)
+              const struct aug_field* field, unsigned* ord)
 {
     char* ptr;
-    size_t nsize, vsize, fsize, inout, offset, orig;
+    unsigned nsize, vsize, fsize, inout, offset, orig;
     assert(seq && info && field);
 
     if (!field->name_) {
@@ -183,7 +183,7 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     /* Add difference between old and new field size to header size. */
 
-    info->hsize_ += (ssize_t)fsize - (ssize_t)orig;
+    info->hsize_ += (int)fsize - (int)orig;
 
     /* Set optional output parameter. */
 
@@ -194,11 +194,11 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 }
 
 AUGMAR_EXTERN int
-aug_setvalue_(aug_seq_t seq, struct aug_info_* info, size_t ord,
-              const void* value, size_t size)
+aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
+              const void* value, unsigned size)
 {
     char* ptr;
-    size_t offset, nsize, vsize, orig;
+    unsigned offset, nsize, vsize, orig;
     assert(seq && info);
 
     if (ord >= info->fields_) {
@@ -250,16 +250,16 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, size_t ord,
 
     /* Add difference between old and new value size to header size. */
 
-    info->hsize_ += (ssize_t)vsize - (ssize_t)orig;
+    info->hsize_ += (int)vsize - (int)orig;
     return 0;
 }
 
 AUGMAR_EXTERN int
 aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
-                 size_t* ord)
+                 unsigned* ord)
 {
     char* ptr;
-    size_t inout, offset, orig;
+    unsigned inout, offset, orig;
     assert(seq && info && name);
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))
@@ -297,10 +297,10 @@ aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
 }
 
 AUGMAR_EXTERN int
-aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, size_t ord)
+aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, unsigned ord)
 {
     char* ptr;
-    size_t offset, orig;
+    unsigned offset, orig;
 
     if (ord >= info->fields_)
         return AUG_RETNOMATCH;
@@ -327,10 +327,10 @@ aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, size_t ord)
 
 AUGMAR_EXTERN const void*
 aug_valuebyname_(aug_seq_t seq, const struct aug_info_* info,
-                 const char* name, size_t* size)
+                 const char* name, unsigned* size)
 {
     char* ptr;
-    size_t inout;
+    unsigned inout;
     assert(seq && info && name);
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))
@@ -360,8 +360,8 @@ aug_valuebyname_(aug_seq_t seq, const struct aug_info_* info,
 }
 
 AUGMAR_EXTERN const void*
-aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, size_t ord,
-                size_t* size)
+aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, unsigned ord,
+                unsigned* size)
 {
     char* ptr;
     assert(seq && info);
@@ -393,7 +393,7 @@ aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, size_t ord,
 
 AUGMAR_EXTERN int
 aug_field_(aug_seq_t seq, const struct aug_info_* info,
-           struct aug_field* field, size_t ord)
+           struct aug_field* field, unsigned ord)
 {
     char* ptr;
 
@@ -425,7 +425,7 @@ aug_field_(aug_seq_t seq, const struct aug_info_* info,
 
 AUGMAR_EXTERN int
 aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
-               size_t ord)
+               unsigned ord)
 {
     char* ptr;
     assert(seq && info && name);
@@ -446,11 +446,11 @@ aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
 }
 
 AUGMAR_EXTERN int
-aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, size_t* ord,
+aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, unsigned* ord,
                const char* name)
 {
     char* ptr;
-    size_t inout;
+    unsigned inout;
     assert(seq && info && name);
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))

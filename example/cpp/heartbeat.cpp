@@ -31,93 +31,201 @@ namespace {
     */
 
     void
+    ldwait()
+    {
+        /*
+          LEAD: none - already leader
+          CAND: become leader
+          MEMB: become candidate: set RESPONSE_MS
+         */
+    }
+
+    void
+    hbwait()
+    {
+        /*
+          ALL: broadcast status
+         */
+    }
+
+    void
     leadelct()
     {
+        /*
+          LEAD: none - already leader
+          CAND: become leader
+          MEMB: become leader
+         */
     }
 
     void
     leadjoin()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     leadleav()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     leadstdn()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     leadstat()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     leadlist()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     candelct()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     candjoin()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     candleav()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     candstdn()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     candstat()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     candlist()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     membelct()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     membjoin()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     membleav()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     membstdn()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     membstat()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     void
     memblist()
     {
+        /*
+          LEAD:
+          CAND:
+          MEMB:
+         */
     }
 
     enum msgtype {

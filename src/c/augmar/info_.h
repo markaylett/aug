@@ -13,7 +13,7 @@
 #include "augmar/seq_.h"
 
 struct aug_info_ {
-    size_t verno_, fields_, hsize_, bsize_;
+    unsigned verno_, fields_, hsize_, bsize_;
 };
 
 AUGMAR_EXTERN int

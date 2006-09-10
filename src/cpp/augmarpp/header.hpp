@@ -41,7 +41,7 @@ namespace aug {
             return const_iterator(mar_, aug::setfield(mar_, f));
         }
         const_iterator
-        setfield(const const_iterator& it, const void* cdata, size_t n)
+        setfield(const const_iterator& it, const void* cdata, unsigned n)
         {
             aug::setfield(mar_, toord(it), cdata, n);
             return it;
@@ -69,7 +69,7 @@ namespace aug {
             return aug::getfield(mar_, name);
         }
         const void*
-        getfield(const char* name, size_t& n) const
+        getfield(const char* name, unsigned& n) const
         {
             return aug::getfield(mar_, name, n);
         }
@@ -79,7 +79,7 @@ namespace aug {
             return aug::getfield(mar_, toord(it));
         }
         const void*
-        getfield(const const_iterator& it, size_t& n) const
+        getfield(const const_iterator& it, unsigned& n) const
         {
             return aug::getfield(mar_, toord(it), n);
         }
@@ -89,7 +89,7 @@ namespace aug {
             return aug::getfield(mar_, toord(it));
         }
         const void*
-        getfield(const const_reverse_iterator& it, size_t& s) const
+        getfield(const const_reverse_iterator& it, unsigned& s) const
         {
             return aug::getfield(mar_, toord(it), s);
         }

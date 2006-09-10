@@ -18,24 +18,24 @@ AUGMAR_EXTERN int
 aug_closemfile_(aug_mfile_t mfile);
 
 AUGMAR_EXTERN aug_mfile_t
-aug_openmfile_(const char* path, int flags, mode_t mode, size_t tail);
+aug_openmfile_(const char* path, int flags, mode_t mode, unsigned tail);
 
 AUGMAR_EXTERN void*
-aug_mapmfile_(aug_mfile_t mfile, size_t size);
+aug_mapmfile_(aug_mfile_t mfile, unsigned size);
 
 AUGMAR_EXTERN int
 aug_syncmfile_(aug_mfile_t mfile);
 
 AUGMAR_EXTERN int
-aug_truncatemfile_(aug_mfile_t mfile, size_t size);
+aug_truncatemfile_(aug_mfile_t mfile, unsigned size);
 
 AUGMAR_EXTERN void*
 aug_mfileaddr_(aug_mfile_t mfile);
 
-AUGMAR_EXTERN size_t
+AUGMAR_EXTERN unsigned
 aug_mfileresvd_(aug_mfile_t mfile);
 
-AUGMAR_EXTERN size_t
+AUGMAR_EXTERN unsigned
 aug_mfilesize_(aug_mfile_t mfile);
 
 AUGMAR_EXTERN void*

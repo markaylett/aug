@@ -19,7 +19,7 @@ AUGMAR_EXTERN int
 aug_openfile_(const char* path, int flags, mode_t mode);
 
 AUGMAR_EXTERN int
-aug_extendfile_(int fd, size_t size);
+aug_extendfile_(int fd, unsigned size);
 
 AUGMAR_EXTERN int
 aug_syncfile_(int fd);

@@ -15,20 +15,20 @@ struct aug_info_;
 
 AUGMAR_EXTERN int
 aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
-                size_t size);
+                unsigned size);
 
 AUGMAR_EXTERN int
-aug_truncate_(aug_seq_t seq, struct aug_info_* info, size_t size);
+aug_truncate_(aug_seq_t seq, struct aug_info_* info, unsigned size);
 
-AUGMAR_EXTERN ssize_t
-aug_write_(aug_seq_t seq, struct aug_info_* info, size_t offset,
-           const void* buf, size_t size);
+AUGMAR_EXTERN int
+aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
+           const void* buf, unsigned size);
 
 AUGMAR_EXTERN const void*
 aug_content_(aug_seq_t seq, const struct aug_info_* info);
 
-AUGMAR_EXTERN ssize_t
-aug_read_(aug_seq_t seq, const struct aug_info_* info, size_t offset,
-          void* buf, size_t size);
+AUGMAR_EXTERN int
+aug_read_(aug_seq_t seq, const struct aug_info_* info, unsigned offset,
+          void* buf, unsigned size);
 
 #endif /* AUGMAR_BODY_H_ */

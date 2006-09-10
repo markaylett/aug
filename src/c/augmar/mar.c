@@ -4,7 +4,7 @@
 #define AUGMAR_BUILD
 #include "augmar/mar.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augmar/body_.h"
 #include "augmar/format_.h"
@@ -31,7 +31,7 @@ struct aug_mar_ {
     aug_seq_t seq_;
     struct aug_info_ info_;
     int flags_;
-    size_t offset_, refs_;
+    unsigned offset_, refs_;
 };
 
 static unsigned
@@ -52,7 +52,7 @@ static int
 init_(aug_seq_t seq, struct aug_info_* info)
 {
     static const aug_verno_t VERNO = 2U;
-    size_t size = aug_seqsize_(seq);
+    unsigned size = aug_seqsize_(seq);
 
     /* An existing archive will be at least as big as the minimum size. */
 
@@ -257,7 +257,7 @@ aug_removefields(aug_mar_t mar)
 }
 
 AUGMAR_API int
-aug_setfield(aug_mar_t mar, const struct aug_field* field, size_t* ord)
+aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord)
 {
     if (!WRITABLE_(mar)) {
 
@@ -269,7 +269,7 @@ aug_setfield(aug_mar_t mar, const struct aug_field* field, size_t* ord)
 }
 
 AUGMAR_API int
-aug_setvalue(aug_mar_t mar, size_t ord, const void* value, size_t size)
+aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size)
 {
     if (!WRITABLE_(mar)) {
 
@@ -281,7 +281,7 @@ aug_setvalue(aug_mar_t mar, size_t ord, const void* value, size_t size)
 }
 
 AUGMAR_API int
-aug_unsetbyname(aug_mar_t mar, const char* name, size_t* ord)
+aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord)
 {
     if (!WRITABLE_(mar)) {
 
@@ -293,7 +293,7 @@ aug_unsetbyname(aug_mar_t mar, const char* name, size_t* ord)
 }
 
 AUGMAR_API int
-aug_unsetbyord(aug_mar_t mar, size_t ord)
+aug_unsetbyord(aug_mar_t mar, unsigned ord)
 {
     if (!WRITABLE_(mar)) {
 
@@ -305,7 +305,7 @@ aug_unsetbyord(aug_mar_t mar, size_t ord)
 }
 
 AUGMAR_API const void*
-aug_valuebyname(aug_mar_t mar, const char* name, size_t* size)
+aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size)
 {
     if (!READABLE_(mar)) {
 
@@ -317,7 +317,7 @@ aug_valuebyname(aug_mar_t mar, const char* name, size_t* size)
 }
 
 AUGMAR_API const void*
-aug_valuebyord(aug_mar_t mar, size_t ord, size_t* size)
+aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size)
 {
     if (!READABLE_(mar)) {
 
@@ -329,7 +329,7 @@ aug_valuebyord(aug_mar_t mar, size_t ord, size_t* size)
 }
 
 AUGMAR_API int
-aug_field(aug_mar_t mar, struct aug_field* field, size_t ord)
+aug_field(aug_mar_t mar, struct aug_field* field, unsigned ord)
 {
     if (!READABLE_(mar)) {
 
@@ -341,7 +341,7 @@ aug_field(aug_mar_t mar, struct aug_field* field, size_t ord)
 }
 
 AUGMAR_API int
-aug_fields(aug_mar_t mar, size_t* size)
+aug_fields(aug_mar_t mar, unsigned* size)
 {
     if (!mar) {
 
@@ -360,7 +360,7 @@ aug_fields(aug_mar_t mar, size_t* size)
 }
 
 AUGMAR_API int
-aug_ordtoname(aug_mar_t mar, const char** name, size_t ord)
+aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord)
 {
     if (!READABLE_(mar)) {
 
@@ -372,7 +372,7 @@ aug_ordtoname(aug_mar_t mar, const char** name, size_t ord)
 }
 
 AUGMAR_API int
-aug_nametoord(aug_mar_t mar, size_t* ord, const char* name)
+aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name)
 {
     if (!READABLE_(mar)) {
 
@@ -388,7 +388,7 @@ aug_insertmar(aug_mar_t mar, const char* path)
 {
     aug_mfile_t mfile;
     const void* addr;
-    size_t size;
+    unsigned size;
 
     if (!(mfile = aug_openmfile_(path, AUG_RDONLY, 0, 0)))
         return -1;
@@ -447,7 +447,7 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
 }
 
 AUGMAR_API int
-aug_setcontent(aug_mar_t mar, const void* cdata, size_t size)
+aug_setcontent(aug_mar_t mar, const void* cdata, unsigned size)
 {
     if (!WRITABLE_(mar)) {
 
@@ -471,7 +471,7 @@ aug_syncmar(aug_mar_t mar)
 }
 
 AUGMAR_API int
-aug_truncatemar(aug_mar_t mar, size_t size)
+aug_truncatemar(aug_mar_t mar, unsigned size)
 {
     if (!WRITABLE_(mar)) {
 
@@ -486,10 +486,10 @@ aug_truncatemar(aug_mar_t mar, size_t size)
     return aug_truncate_(mar->seq_, &mar->info_, size);
 }
 
-AUGMAR_API ssize_t
-aug_writemar(aug_mar_t mar, const void* buf, size_t size)
+AUGMAR_API int
+aug_writemar(aug_mar_t mar, const void* buf, unsigned size)
 {
-    ssize_t ret;
+    int ret;
 
     if (!WRITABLE_(mar)) {
 
@@ -518,7 +518,7 @@ aug_extractmar(aug_mar_t mar, const char* path)
     aug_mfile_t mfile;
     void* dst;
     const void* src;
-    size_t size;
+    unsigned size;
 
     if (!(src = aug_content(mar, &size)))
         return -1;
@@ -543,7 +543,7 @@ aug_extractmar(aug_mar_t mar, const char* path)
 }
 
 AUGMAR_API const void*
-aug_content(aug_mar_t mar, size_t* size)
+aug_content(aug_mar_t mar, unsigned* size)
 {
     if (!READABLE_(mar)) {
 
@@ -556,10 +556,10 @@ aug_content(aug_mar_t mar, size_t* size)
     return aug_content_(mar->seq_, &mar->info_);
 }
 
-AUGMAR_API ssize_t
-aug_readmar(aug_mar_t mar, void* buf, size_t size)
+AUGMAR_API int
+aug_readmar(aug_mar_t mar, void* buf, unsigned size)
 {
-    ssize_t ret;
+    int ret;
 
     if (!READABLE_(mar)) {
 
@@ -577,7 +577,7 @@ aug_readmar(aug_mar_t mar, void* buf, size_t size)
 }
 
 AUGMAR_API int
-aug_contentsize(aug_mar_t mar, size_t* size)
+aug_contentsize(aug_mar_t mar, unsigned* size)
 {
     if (!mar) {
 

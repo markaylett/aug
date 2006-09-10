@@ -75,7 +75,7 @@ namespace aug {
             field_.value_ = 0;
             field_.size_ = 0;
         }
-        field(const char* s, const void* v, size_t n)
+        field(const char* s, const void* v, unsigned n)
         {
             setname(s);
             setvalue(v, n);
@@ -97,7 +97,7 @@ namespace aug {
             field_.name_ = s;
         }
         void
-        setvalue(const void* v, size_t n)
+        setvalue(const void* v, unsigned n)
         {
             field_.value_ = v;
             field_.size_ = n;
@@ -122,7 +122,7 @@ namespace aug {
         {
             return field_.value_;
         }
-        size_t
+        unsigned
         size() const
         {
             return field_.size_;

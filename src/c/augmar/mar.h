@@ -143,7 +143,7 @@ aug_removefields(aug_mar_t mar);
  */
 
 AUGMAR_API int
-aug_setfield(aug_mar_t mar, const struct aug_field* field, size_t* ord);
+aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord);
 
 /**
  * \brief Set field value within message archive.
@@ -163,7 +163,7 @@ aug_setfield(aug_mar_t mar, const struct aug_field* field, size_t* ord);
  */
 
 AUGMAR_API int
-aug_setvalue(aug_mar_t mar, size_t ord, const void* value, size_t size);
+aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size);
 
 /**
  * \brief Unset field (by name) within message archive.
@@ -182,7 +182,7 @@ aug_setvalue(aug_mar_t mar, size_t ord, const void* value, size_t size);
  */
 
 AUGMAR_API int
-aug_unsetbyname(aug_mar_t mar, const char* name, size_t* ord);
+aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord);
 
 /**
  * \brief Unset field (by ordinal) within message archive.
@@ -198,7 +198,7 @@ aug_unsetbyname(aug_mar_t mar, const char* name, size_t* ord);
  */
 
 AUGMAR_API int
-aug_unsetbyord(aug_mar_t mar, size_t ord);
+aug_unsetbyord(aug_mar_t mar, unsigned ord);
 
 /**
  * \brief Obtain field value (by name) from message archive.
@@ -217,7 +217,7 @@ aug_unsetbyord(aug_mar_t mar, size_t ord);
  */
 
 AUGMAR_API const void*
-aug_valuebyname(aug_mar_t mar, const char* name, size_t* size);
+aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size);
 
 /**
  * \brief Obtain field value (by ordinal) from message archive.
@@ -236,7 +236,7 @@ aug_valuebyname(aug_mar_t mar, const char* name, size_t* size);
  */
 
 AUGMAR_API const void*
-aug_valuebyord(aug_mar_t mar, size_t ord, size_t* size);
+aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size);
 
 /**
  * \brief Obtain field from message archive.
@@ -254,7 +254,7 @@ aug_valuebyord(aug_mar_t mar, size_t ord, size_t* size);
  */
 
 AUGMAR_API int
-aug_field(aug_mar_t mar, struct aug_field* field, size_t ord);
+aug_field(aug_mar_t mar, struct aug_field* field, unsigned ord);
 
 /**
  * \brief Obtain the number of fields contained within message archive.
@@ -271,7 +271,7 @@ aug_field(aug_mar_t mar, struct aug_field* field, size_t ord);
  */
 
 AUGMAR_API int
-aug_fields(aug_mar_t mar, size_t* size);
+aug_fields(aug_mar_t mar, unsigned* size);
 
 /**
  * \brief Obtain field name from ordinal position in message archive.
@@ -289,7 +289,7 @@ aug_fields(aug_mar_t mar, size_t* size);
  */
 
 AUGMAR_API int
-aug_ordtoname(aug_mar_t mar, const char** name, size_t ord);
+aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord);
 
 /**
  * \brief Obtain ordinal position from field name in message archive.
@@ -308,7 +308,7 @@ aug_ordtoname(aug_mar_t mar, const char** name, size_t ord);
  */
 
 AUGMAR_API int
-aug_nametoord(aug_mar_t mar, size_t* ord, const char* name);
+aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name);
 
 /**
  * \brief Insert file into body content of message archive.
@@ -362,7 +362,7 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence);
  */
 
 AUGMAR_API int
-aug_setcontent(aug_mar_t mar, const void* cdata, size_t size);
+aug_setcontent(aug_mar_t mar, const void* cdata, unsigned size);
 
 /**
  * \brief Flush message archive buffers.
@@ -388,7 +388,7 @@ aug_syncmar(aug_mar_t mar);
  */
 
 AUGMAR_API int
-aug_truncatemar(aug_mar_t mar, size_t size);
+aug_truncatemar(aug_mar_t mar, unsigned size);
 
 /**
  * \brief Write content to message archive.
@@ -405,8 +405,8 @@ aug_truncatemar(aug_mar_t mar, size_t size);
  * \sa #aug_insertmar, #aug_seekmar and #aug_setcontent.
  */
 
-AUGMAR_API ssize_t
-aug_writemar(aug_mar_t mar, const void* buf, size_t size);
+AUGMAR_API int
+aug_writemar(aug_mar_t mar, const void* buf, unsigned size);
 
 /**
  * \brief Extract content from message archive into file.
@@ -439,7 +439,7 @@ aug_extractmar(aug_mar_t mar, const char* path);
  */
 
 AUGMAR_API const void*
-aug_content(aug_mar_t mar, size_t* size);
+aug_content(aug_mar_t mar, unsigned* size);
 
 /**
  * \brief Read content from message archive.
@@ -457,8 +457,8 @@ aug_content(aug_mar_t mar, size_t* size);
  * \sa #aug_seekmar, #aug_extractmar and #aug_content.
  */
 
-AUGMAR_API ssize_t
-aug_readmar(aug_mar_t mar, void* buf, size_t size);
+AUGMAR_API int
+aug_readmar(aug_mar_t mar, void* buf, unsigned size);
 
 /**
  * \brief Obtain size of content within message archive.
@@ -475,6 +475,6 @@ aug_readmar(aug_mar_t mar, void* buf, size_t size);
  */
 
 AUGMAR_API int
-aug_contentsize(aug_mar_t mar, size_t* size);
+aug_contentsize(aug_mar_t mar, unsigned* size);
 
 #endif /* AUGMAR_MAR_H */

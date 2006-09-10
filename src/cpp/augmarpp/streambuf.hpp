@@ -144,8 +144,8 @@ namespace aug {
     public:
         typedef charT char_type;
 
-        typedef size_t size_type;
-        typedef ssize_t ssize_type;
+        typedef unsigned size_type;
+        typedef int ssize_type;
 
         typedef char_traitsT char_traits_type;
         typedef typename char_traits_type::int_type int_type;
