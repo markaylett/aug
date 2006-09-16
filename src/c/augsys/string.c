@@ -6,10 +6,10 @@
 #define AUGSYS_BUILD
 #include "augsys/string.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "augconfig.h"
 #endif /* HAVE_CONFIG_H */
 
 #if !defined(_WIN32)

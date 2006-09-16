@@ -3,3 +3,6 @@ SUBDIRS = \
 	cpp \
 	pl \
 	sh
+
+include_HEADERS = \
+	augconfig.h

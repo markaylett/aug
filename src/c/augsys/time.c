@@ -4,7 +4,7 @@
 #define AUGSYS_BUILD
 #include "augsys/time.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/errinfo.h"
 
@@ -15,7 +15,7 @@ static const char rcsid[] = "$Id:$";
 #endif /* _WIN32 */
 
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "augconfig.h"
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>

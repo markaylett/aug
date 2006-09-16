@@ -2,10 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.56)
-AC_INIT([src/config.h.in])
+AC_INIT([src/augconfig.h.in])
 
 AM_INIT_AUTOMAKE([aug], [trunk], [mark@emantic.co.uk])
-AC_CONFIG_HEADER([src/config.h])
+AC_CONFIG_HEADER([src/augconfig.h])
 AM_MAINTAINER_MODE
 
 # Checks for programs.
