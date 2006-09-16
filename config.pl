@@ -74,7 +74,6 @@ sub listask {
 my (
     $win32,
     $prefix,
-    $boost,
     $toolset,
     $maintainer,
     $gcc,
@@ -90,13 +89,6 @@ if (defined $ENV{AUG_HOME}) {
     $prefix =~ s!\\!/!g;
 } else {
     $prefix = $win32 ? 'c:/aug' : $ENV{HOME};
-}
-
-if (defined $ENV{BOOST_HOME}) {
-    $boost = $ENV{BOOST_HOME};
-    $boost =~ s!\\!/!g;
-} else {
-    $boost = $win32 ? 'c:/boost' : '/usr/include';
 }
 
 if ($win32) {
@@ -118,7 +110,6 @@ $| = 1;
 # Collect the input.
 
 $prefix = valueask ("prefix directory", $prefix);
-$boost = valueask ("boost directory", $boost);
 $toolset = listask ("compiler toolset", $toolset, \%TOOLSET);
 $maintainer = valueask ("maintainer mode", 'n');
 if ($CYGWIN_MINGW == $toolset) {
@@ -155,7 +146,6 @@ open (FILE, ">$CONFIG")
 
 print FILE "#!/bin/sh\n\n";
 print FILE "AUG_HOME='$prefix'; export AUG_HOME\n";
-print FILE "BOOST_HOME='$boost'; export BOOST_HOME\n";
 
 $options = "--prefix=\$AUG_HOME";
 $options .= " \\\n\t--enable-maintainer-mode"
