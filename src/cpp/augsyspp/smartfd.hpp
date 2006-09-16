@@ -7,7 +7,7 @@
 #include "augsyspp/base.hpp"
 #include "augsyspp/types.hpp"
 
-#include <algorithm>       // swap()
+#include <algorithm> // swap()
 
 namespace aug {
 
@@ -94,6 +94,12 @@ namespace aug {
             return ref_.get();
         }
     };
+}
+
+inline bool
+isnull(const aug::smartfd& sfd)
+{
+    return -1 == sfd.get();
 }
 
 #endif // AUGSYSPP_SMARTFD_HPP

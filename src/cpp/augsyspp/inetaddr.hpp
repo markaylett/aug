@@ -92,4 +92,10 @@ isnull(const struct aug_inetaddr& addr)
     return 0 == addr.family_;
 }
 
+inline bool
+isnull(const aug::inetaddr& addr)
+{
+    return 0 == aug::family(addr);
+}
+
 #endif // AUGSYSPP_INETADDR_HPP

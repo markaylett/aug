@@ -110,4 +110,10 @@ isnull(const struct aug_endpoint& ep)
     return 0 == ep.un_.family_;
 }
 
+inline bool
+isnull(const aug::endpoint& ep)
+{
+    return 0 == aug::family(ep);
+}
+
 #endif // AUGSYSPP_ENDPOINT_HPP
