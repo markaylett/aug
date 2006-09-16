@@ -4,7 +4,7 @@
 #define AUGSYS_BUILD
 #include "augsys/unistd.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/base.h"
 #include "augsys/errinfo.h"
@@ -45,7 +45,7 @@ aug_pipe(int fds[2])
 AUGSYS_API ssize_t
 aug_read(int fd, void* buf, size_t size)
 {
-    const struct aug_fddriver* driver = aug_fddriver(fd);
+    const struct aug_driver* driver = aug_getdriver(fd);
     if (!driver)
         return -1;
 
@@ -61,7 +61,7 @@ aug_read(int fd, void* buf, size_t size)
 AUGSYS_API ssize_t
 aug_write(int fd, const void* buf, size_t size)
 {
-    const struct aug_fddriver* driver = aug_fddriver(fd);
+    const struct aug_driver* driver = aug_getdriver(fd);
     if (!driver)
         return -1;
 

@@ -23,7 +23,7 @@ namespace {
         return aug_posixdriver()->close_(fd);
     }
 
-    struct aug_fddriver driver_ = {
+    struct aug_driver driver_ = {
         close_, 0, 0, 0, 0, 0
     };
 

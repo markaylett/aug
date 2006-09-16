@@ -131,7 +131,7 @@ namespace aug {
         size_type
         size() const
         {
-            return fields(mar_);
+            return getfields(mar_);
         }
     };
 }

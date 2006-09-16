@@ -329,7 +329,7 @@ aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size)
 }
 
 AUGMAR_API int
-aug_field(aug_mar_t mar, struct aug_field* field, unsigned ord)
+aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord)
 {
     if (!READABLE_(mar)) {
 
@@ -337,11 +337,11 @@ aug_field(aug_mar_t mar, struct aug_field* field, unsigned ord)
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
-    return aug_field_(mar->seq_, &mar->info_, field, ord);
+    return aug_getfield_(mar->seq_, &mar->info_, field, ord);
 }
 
 AUGMAR_API int
-aug_fields(aug_mar_t mar, unsigned* size)
+aug_getfields(aug_mar_t mar, unsigned* size)
 {
     if (!mar) {
 

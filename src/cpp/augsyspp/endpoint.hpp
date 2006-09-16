@@ -86,7 +86,7 @@ namespace aug {
         }
 
         endpoint&
-        operator =(const null_&)
+        operator =(const null_&) NOTHROW
         {
             clear(ep_);
             return *this;

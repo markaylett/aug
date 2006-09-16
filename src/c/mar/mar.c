@@ -182,7 +182,7 @@ list_(aug_mar_t mar)
     for (i = 0; ; ++i) {
 
         struct aug_field field;
-        if (-1 == aug_field(mar, &field, i))
+        if (-1 == aug_getfield(mar, &field, i))
             return -1;
 
         if (!field.value_)

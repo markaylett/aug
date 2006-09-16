@@ -41,6 +41,13 @@ namespace aug {
         }
 
         smartfd&
+        operator =(const null_&) NOTHROW
+        {
+            ref_ = null;
+            return *this;
+        }
+
+        smartfd&
         operator =(const smartfd& rhs)
         {
             smartfd tmp(rhs);

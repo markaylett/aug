@@ -11,8 +11,6 @@
 
 #if defined(__GNUC__) && __GNUC__ < 3
 
-#include "augmarpp/defs.hpp"
-
 #include <cstring>
 #include <iostream>
 

@@ -47,13 +47,13 @@ namespace aug {
                                                   aug_strerror(errno)));
     }
     inline void
-    openfd(int fd, const struct aug_fddriver* driver)
+    openfd(int fd, const struct aug_driver* driver)
     {
         if (-1 == aug_openfd(fd, driver))
             throwerrinfo("aug_openfd() failed");
     }
     inline void
-    openfds(int fds[2], const struct aug_fddriver* driver)
+    openfds(int fds[2], const struct aug_driver* driver)
     {
         if (-1 == aug_openfds(fds, driver))
             throwerrinfo("aug_openfds() failed");
@@ -71,17 +71,17 @@ namespace aug {
             throwerrinfo("aug_retainfd() failed");
     }
     inline void
-    setfddriver(fdref ref, const struct aug_fddriver* driver)
+    setdriver(fdref ref, const struct aug_driver* driver)
     {
-        if (-1 == aug_setfddriver(ref.get(), driver))
-            throwerrinfo("aug_setfddriver() failed");
+        if (-1 == aug_setdriver(ref.get(), driver))
+            throwerrinfo("aug_setdriver() failed");
     }
-    inline const struct aug_fddriver*
-    fddriver(fdref ref)
+    inline const struct aug_driver*
+    getdriver(fdref ref)
     {
-        const struct aug_fddriver* driver = aug_fddriver(ref.get());
+        const struct aug_driver* driver(aug_getdriver(ref.get()));
         if (!driver)
-            throwerrinfo("aug_fddriver() failed");
+            throwerrinfo("aug_driver() failed");
         return driver;
     }
 

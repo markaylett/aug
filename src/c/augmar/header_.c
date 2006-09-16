@@ -392,8 +392,8 @@ aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, unsigned ord,
 }
 
 AUGMAR_EXTERN int
-aug_field_(aug_seq_t seq, const struct aug_info_* info,
-           struct aug_field* field, unsigned ord)
+aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
+              struct aug_field* field, unsigned ord)
 {
     char* ptr;
 

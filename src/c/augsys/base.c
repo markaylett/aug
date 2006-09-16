@@ -7,7 +7,7 @@
 
 #include <limits.h> /* INT_MAX */
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #define PROCEED_ 1
 
@@ -57,7 +57,7 @@ _CRTIMP int __cdecl _free_osfhnd(int);
 
 struct file_ {
     size_t refs_;
-    const struct aug_fddriver* driver_;
+    const struct aug_driver* driver_;
 };
 
 static struct file_* files_ = NULL;
@@ -132,7 +132,7 @@ growfiles_(size_t size)
 }
 
 static int
-openfd_(int fd, const struct aug_fddriver* driver)
+openfd_(int fd, const struct aug_driver* driver)
 {
     struct file_* file;
 
@@ -159,7 +159,7 @@ openfd_(int fd, const struct aug_fddriver* driver)
 }
 
 static int
-openfds_(int fds[2], const struct aug_fddriver* driver)
+openfds_(int fds[2], const struct aug_driver* driver)
 {
     struct file_* first, * second;
     int maxfd = AUG_MAX(fds[0], fds[1]);
@@ -227,7 +227,7 @@ retainfd_(int fd)
 }
 
 static int
-setfddriver_(int fd, const struct aug_fddriver* driver)
+setdriver_(int fd, const struct aug_driver* driver)
 {
     if (size_ <= (size_t)fd || files_[fd].refs_ == 0) {
         setnotreg_(__FILE__, __LINE__, fd);
@@ -238,8 +238,8 @@ setfddriver_(int fd, const struct aug_fddriver* driver)
     return 0;
 }
 
-static const struct aug_fddriver*
-fddriver_(int fd)
+static const struct aug_driver*
+getdriver_(int fd)
 {
     if (size_ <= (size_t)fd || 0 == files_[fd].refs_) {
         setnotreg_(__FILE__, __LINE__, fd);
@@ -290,7 +290,7 @@ aug_nextid(void)
 }
 
 AUGSYS_API int
-aug_openfd(int fd, const struct aug_fddriver* driver)
+aug_openfd(int fd, const struct aug_driver* driver)
 {
     int ret;
 
@@ -310,7 +310,7 @@ aug_openfd(int fd, const struct aug_fddriver* driver)
 }
 
 AUGSYS_API int
-aug_openfds(int fds[2], const struct aug_fddriver* driver)
+aug_openfds(int fds[2], const struct aug_driver* driver)
 {
     int ret;
 
@@ -372,9 +372,8 @@ aug_retainfd(int fd)
     return ret;
 }
 
-AUGSYS_API struct aug_fddriver*
-aug_extenddriver(struct aug_fddriver* derived,
-                 const struct aug_fddriver* base)
+AUGSYS_API struct aug_driver*
+aug_extenddriver(struct aug_driver* derived, const struct aug_driver* base)
 {
     if (!base)
         base = aug_posixdriver();
@@ -401,7 +400,7 @@ aug_extenddriver(struct aug_fddriver* derived,
 }
 
 AUGSYS_API int
-aug_setfddriver(int fd, const struct aug_fddriver* driver)
+aug_setdriver(int fd, const struct aug_driver* driver)
 {
     int ret;
 
@@ -414,16 +413,16 @@ aug_setfddriver(int fd, const struct aug_fddriver* driver)
         driver = aug_posixdriver();
 
     aug_lock();
-    ret = setfddriver_(fd, driver);
+    ret = setdriver_(fd, driver);
     aug_unlock();
 
     return ret;
 }
 
-AUGSYS_API const struct aug_fddriver*
-aug_fddriver(int fd)
+AUGSYS_API const struct aug_driver*
+aug_getdriver(int fd)
 {
-    const struct aug_fddriver* driver;
+    const struct aug_driver* driver;
 
     if (-1 == fd) {
         setbadfd_(__FILE__, __LINE__);
@@ -431,7 +430,7 @@ aug_fddriver(int fd)
     }
 
     aug_lock();
-    driver = fddriver_(fd);
+    driver = getdriver_(fd);
     aug_unlock();
 
     return driver;

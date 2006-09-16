@@ -39,20 +39,20 @@ namespace aug {
     }
 
     class idref {
-        int fd_;
+        int id_;
     public:
         idref(const null_&) NOTHROW
-        : fd_(-1)
+        : id_(-1)
         {
         }
-        idref(int fd) NOTHROW
-        : fd_(fd)
+        idref(int id) NOTHROW
+        : id_(id)
         {
         }
         int
         get() const NOTHROW
         {
-            return fd_;
+            return id_;
         }
     };
 

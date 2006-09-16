@@ -142,7 +142,7 @@ setnonblock_(int fd, int on)
     return 0;
 }
 
-static struct aug_fddriver driver_ = {
+static struct aug_driver driver_ = {
     close_,
     read_,
     readv_,

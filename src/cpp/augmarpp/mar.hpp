@@ -147,15 +147,15 @@ namespace aug {
     inline bool
     getfield(marref ref, struct aug_field& f, unsigned ord)
     {
-        return result(aug_field(ref.get(), &f, ord),
-                      "aug_field() failed");
+        return result(aug_getfield(ref.get(), &f, ord),
+                      "aug_getfield() failed");
     }
     inline unsigned
-    fields(marref ref)
+    getfields(marref ref)
     {
         unsigned size;
-        if (-1 == aug_fields(ref.get(), &size))
-            throwerrinfo("aug_fields() failed");
+        if (-1 == aug_getfields(ref.get(), &size))
+            throwerrinfo("aug_getfields() failed");
         return size;
     }
     inline bool

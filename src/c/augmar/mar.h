@@ -213,7 +213,7 @@ aug_unsetbyord(aug_mar_t mar, unsigned ord);
  * \return A pointer to the field value or NULL on failure, in which case
  * errno can be used to determine the error.
  *
- * \sa #aug_valuebyord, #aug_field and #aug_ordtoname.
+ * \sa #aug_valuebyord, #aug_getfield and #aug_ordtoname.
  */
 
 AUGMAR_API const void*
@@ -232,7 +232,7 @@ aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size);
  * \return A pointer to the field value or NULL on failure, in which case
  * errno can be used to determine the error.
  *
- * \sa #aug_valuebyname, #aug_field and #aug_nametoord.
+ * \sa #aug_valuebyname, #aug_getfield and #aug_nametoord.
  */
 
 AUGMAR_API const void*
@@ -250,11 +250,11 @@ aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size);
  * \return zero on success, #AUG_RETNOMATCH if there is no matching field, or
  * -1 on failure, in which case errno can be used to determine the error.
  *
- * \sa #aug_valuebyname, #aug_valuebyord and #aug_fields.
+ * \sa #aug_valuebyname, #aug_valuebyord and #aug_getfields.
  */
 
 AUGMAR_API int
-aug_field(aug_mar_t mar, struct aug_field* field, unsigned ord);
+aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord);
 
 /**
  * \brief Obtain the number of fields contained within message archive.
@@ -267,11 +267,11 @@ aug_field(aug_mar_t mar, struct aug_field* field, unsigned ord);
  * \return zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * \sa #aug_field.
+ * \sa #aug_getfield.
  */
 
 AUGMAR_API int
-aug_fields(aug_mar_t mar, unsigned* size);
+aug_getfields(aug_mar_t mar, unsigned* size);
 
 /**
  * \brief Obtain field name from ordinal position in message archive.

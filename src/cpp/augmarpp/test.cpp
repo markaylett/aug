@@ -63,7 +63,7 @@ namespace {
     void
     checkheader(marref ref)
     {
-        if (FIELDS_SIZE != aug::fields(ref))
+        if (FIELDS_SIZE != aug::getfields(ref))
             throw error(__LINE__);
 
         unsigned i;
@@ -123,7 +123,7 @@ namespace {
         }
 
         aug::removefields(ref);
-        if (0 != aug::fields(ref))
+        if (0 != aug::getfields(ref))
             throw error(__LINE__);
     }
 

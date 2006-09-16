@@ -68,7 +68,7 @@ namespace aug {
         }
 
         inetaddr&
-        operator =(const null_&)
+        operator =(const null_&) NOTHROW
         {
             clear(addr_);
             return *this;

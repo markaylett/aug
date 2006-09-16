@@ -86,7 +86,7 @@ namespace aug {
             setvalue(v);
         }
         field&
-        operator =(const null_&)
+        operator =(const null_&) NOTHROW
         {
             clear();
             return *this;

@@ -46,7 +46,7 @@ write_(int fd, const void* buf, size_t size)
     return (ssize_t)ret;
 }
 
-static struct aug_fddriver driver_ = {
+static struct aug_driver driver_ = {
     close_,
     read_,
     NULL,
@@ -105,7 +105,7 @@ aug_term(void)
     return aug_termlock_();
 }
 
-AUGSYS_API const struct aug_fddriver*
+AUGSYS_API const struct aug_driver*
 aug_posixdriver(void)
 {
     return &driver_;

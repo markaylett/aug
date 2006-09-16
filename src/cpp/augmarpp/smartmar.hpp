@@ -53,6 +53,13 @@ namespace aug {
         }
 
         smartmar&
+        operator =(const null_& rhs) NOTHROW
+        {
+            ref_ = null;
+            return *this;
+        }
+
+        smartmar&
         operator =(const smartmar& rhs)
         {
             smartmar tmp(rhs);

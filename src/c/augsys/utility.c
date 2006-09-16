@@ -5,7 +5,7 @@
 #define AUGSYS_BUILD
 #include "augsys/utility.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #if !defined(_WIN32)
 # include "augsys/posix/utility.c"
@@ -18,7 +18,7 @@ static const char rcsid[] = "$Id:$";
 AUGSYS_API int
 aug_setnonblock(int fd, int on)
 {
-    const struct aug_fddriver* driver = aug_fddriver(fd);
+    const struct aug_driver* driver = aug_getdriver(fd);
     if (!driver)
         return -1;
 

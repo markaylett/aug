@@ -53,7 +53,7 @@ format_(aug_strbuf_t* header, const char* initial, aug_mar_t mar)
 
     if (mar) {
 
-        while (AUG_RETNOMATCH != aug_field(mar, &field, ord++)) {
+        while (AUG_RETNOMATCH != aug_getfield(mar, &field, ord++)) {
 
             aug_catstrbufs(header, field.name_);
             if (0 < field.size_) {
