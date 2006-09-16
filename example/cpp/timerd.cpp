@@ -2,8 +2,6 @@
    See the file COPYING for copying permission.
 */
 
-static const char rcsid[] = "$Id:$";
-
 #include "augsrvpp.hpp"
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"

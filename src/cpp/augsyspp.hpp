@@ -14,6 +14,7 @@
 #include "augsyspp/mplexer.hpp"
 #include "augsyspp/null.hpp"
 #include "augsyspp/smartfd.hpp"
+#include "augsyspp/smartptr.hpp"
 #include "augsyspp/socket.hpp"
 #include "augsyspp/string.hpp"
 #include "augsyspp/time.hpp"

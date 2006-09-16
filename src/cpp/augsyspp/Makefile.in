@@ -40,7 +40,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-@ENABLE_CPPBUILD_TRUE@check_PROGRAMS = augsyspp-test$(EXEEXT)
+@ENABLE_CPPBUILD_TRUE@check_PROGRAMS = augsyspp-test$(EXEEXT) \
+@ENABLE_CPPBUILD_TRUE@	augsyspp-smartptrtest$(EXEEXT)
 subdir = src/cpp/augsyspp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -54,15 +55,22 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 am__libaugsyspp_la_SOURCES_DIST = base.cpp config.cpp endpoint.cpp \
 	exception.cpp inetaddr.cpp mcast.cpp mplexer.cpp mutex.cpp \
-	null.cpp smartfd.cpp socket.cpp string.cpp time.cpp types.cpp \
-	unistd.cpp utility.cpp
+	null.cpp smartfd.cpp smartptr.cpp socket.cpp string.cpp \
+	time.cpp types.cpp unistd.cpp utility.cpp
 @ENABLE_CPPBUILD_TRUE@am_libaugsyspp_la_OBJECTS = base.lo config.lo \
 @ENABLE_CPPBUILD_TRUE@	endpoint.lo exception.lo inetaddr.lo \
 @ENABLE_CPPBUILD_TRUE@	mcast.lo mplexer.lo mutex.lo null.lo \
-@ENABLE_CPPBUILD_TRUE@	smartfd.lo socket.lo string.lo time.lo \
-@ENABLE_CPPBUILD_TRUE@	types.lo unistd.lo utility.lo
+@ENABLE_CPPBUILD_TRUE@	smartfd.lo smartptr.lo socket.lo \
+@ENABLE_CPPBUILD_TRUE@	string.lo time.lo types.lo unistd.lo \
+@ENABLE_CPPBUILD_TRUE@	utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
 @ENABLE_CPPBUILD_TRUE@am_libaugsyspp_la_rpath =
+am__augsyspp_smartptrtest_SOURCES_DIST = smartptrtest.cpp
+@ENABLE_CPPBUILD_TRUE@am_augsyspp_smartptrtest_OBJECTS =  \
+@ENABLE_CPPBUILD_TRUE@	smartptrtest.$(OBJEXT)
+augsyspp_smartptrtest_OBJECTS = $(am_augsyspp_smartptrtest_OBJECTS)
+@ENABLE_CPPBUILD_TRUE@augsyspp_smartptrtest_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 am__augsyspp_test_SOURCES_DIST = test.cpp
 @ENABLE_CPPBUILD_TRUE@am_augsyspp_test_OBJECTS = test.$(OBJEXT)
 augsyspp_test_OBJECTS = $(am_augsyspp_test_OBJECTS)
@@ -78,8 +86,10 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugsyspp_la_SOURCES) $(augsyspp_test_SOURCES)
+SOURCES = $(libaugsyspp_la_SOURCES) $(augsyspp_smartptrtest_SOURCES) \
+	$(augsyspp_test_SOURCES)
 DIST_SOURCES = $(am__libaugsyspp_la_SOURCES_DIST) \
+	$(am__augsyspp_smartptrtest_SOURCES_DIST) \
 	$(am__augsyspp_test_SOURCES_DIST)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -224,6 +234,7 @@ modinclude_HEADERS = \
 	mutex.hpp \
 	null.hpp \
 	smartfd.hpp \
+	smartptr.hpp \
 	socket.hpp \
 	string.hpp \
 	time.hpp \
@@ -243,6 +254,7 @@ modinclude_HEADERS = \
 @ENABLE_CPPBUILD_TRUE@	mutex.cpp \
 @ENABLE_CPPBUILD_TRUE@	null.cpp \
 @ENABLE_CPPBUILD_TRUE@	smartfd.cpp \
+@ENABLE_CPPBUILD_TRUE@	smartptr.cpp \
 @ENABLE_CPPBUILD_TRUE@	socket.cpp \
 @ENABLE_CPPBUILD_TRUE@	string.cpp \
 @ENABLE_CPPBUILD_TRUE@	time.cpp \
@@ -256,9 +268,17 @@ modinclude_HEADERS = \
 @ENABLE_CPPBUILD_TRUE@libaugsyspp_la_LIBADD = \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@ENABLE_CPPBUILD_TRUE@TESTS = augsyspp-test
+@ENABLE_CPPBUILD_TRUE@TESTS = \
+@ENABLE_CPPBUILD_TRUE@	augsyspp-test \
+@ENABLE_CPPBUILD_TRUE@	augsyspp-smartptrtest
+
 @ENABLE_CPPBUILD_TRUE@augsyspp_test_SOURCES = test.cpp
 @ENABLE_CPPBUILD_TRUE@augsyspp_test_LDADD = \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+@ENABLE_CPPBUILD_TRUE@augsyspp_smartptrtest_SOURCES = smartptrtest.cpp
+@ENABLE_CPPBUILD_TRUE@augsyspp_smartptrtest_LDADD = \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
 @ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
@@ -313,6 +333,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+augsyspp-smartptrtest$(EXEEXT): $(augsyspp_smartptrtest_OBJECTS) $(augsyspp_smartptrtest_DEPENDENCIES) 
+	@rm -f augsyspp-smartptrtest$(EXEEXT)
+	$(CXXLINK) $(augsyspp_smartptrtest_LDFLAGS) $(augsyspp_smartptrtest_OBJECTS) $(augsyspp_smartptrtest_LDADD) $(LIBS)
 augsyspp-test$(EXEEXT): $(augsyspp_test_OBJECTS) $(augsyspp_test_DEPENDENCIES) 
 	@rm -f augsyspp-test$(EXEEXT)
 	$(CXXLINK) $(augsyspp_test_LDFLAGS) $(augsyspp_test_OBJECTS) $(augsyspp_test_LDADD) $(LIBS)
@@ -333,6 +356,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/null.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartfd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartptr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartptrtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@

@@ -12,6 +12,7 @@ modinclude_HEADERS = \
 	mutex.hpp \
 	null.hpp \
 	smartfd.hpp \
+	smartptr.hpp \
 	socket.hpp \
 	string.hpp \
 	time.hpp \
@@ -34,6 +35,7 @@ libaugsyspp_la_SOURCES = \
 	mutex.cpp \
 	null.cpp \
 	smartfd.cpp \
+	smartptr.cpp \
 	socket.cpp \
 	string.cpp \
 	time.cpp \
@@ -47,11 +49,21 @@ libaugsyspp_la_LDFLAGS = \
 libaugsyspp_la_LIBADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = augsyspp-test
-TESTS = augsyspp-test
+check_PROGRAMS = \
+	augsyspp-test \
+	augsyspp-smartptrtest
+
+TESTS = \
+	augsyspp-test \
+	augsyspp-smartptrtest
 
 augsyspp_test_SOURCES = test.cpp
 augsyspp_test_LDADD = \
+	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+augsyspp_smartptrtest_SOURCES = smartptrtest.cpp
+augsyspp_smartptrtest_LDADD = \
 	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 

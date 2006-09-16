@@ -142,6 +142,12 @@ namespace aug {
 }
 
 inline bool
+isnull(const aug_var& v)
+{
+    return 0 != aug_isnull(&v) ? true : false;
+}
+
+inline bool
 isnull(const aug::var& v)
 {
     return 0 != aug_isnull(cptr(v)) ? true : false;

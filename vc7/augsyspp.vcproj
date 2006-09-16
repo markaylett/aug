@@ -137,6 +137,9 @@
 				RelativePath="..\src\cpp\augsyspp\smartfd.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augsyspp\smartptr.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsyspp\socket.cpp">
 			</File>
 			<File

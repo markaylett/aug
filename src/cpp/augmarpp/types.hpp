@@ -135,15 +135,21 @@ namespace aug {
 }
 
 inline bool
-isnull(const aug::field& f)
+isnull(aug_mar_t mar)
 {
-    return 0 == f.name();
+    return 0 == mar;
 }
 
 inline bool
 isnull(aug::marref ref)
 {
     return 0 == ref.get();
+}
+
+inline bool
+isnull(const aug::field& f)
+{
+    return 0 == f.name();
 }
 
 #endif // AUGMARPP_TYPES_HPP

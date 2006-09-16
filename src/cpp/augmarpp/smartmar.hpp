@@ -109,4 +109,10 @@ namespace aug {
     };
 }
 
+inline bool
+isnull(const aug::smartmar& mar)
+{
+    return 0 == mar.get();
+}
+
 #endif // AUGMARPP_SMARTMAR_HPP

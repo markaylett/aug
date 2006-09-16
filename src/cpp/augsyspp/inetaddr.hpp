@@ -89,7 +89,7 @@ namespace aug {
 inline bool
 isnull(const struct aug_inetaddr& addr)
 {
-    return 0 == addr.family_;
+    return 0 == aug::family(addr);
 }
 
 inline bool

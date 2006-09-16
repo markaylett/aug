@@ -2,14 +2,10 @@
    See the file COPYING for copying permission.
 */
 
-static const char rcsid[] = "$Id:$";
-
 #include "augnetpp.hpp"
 #include "augsrvpp.hpp"
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
-
-#include <boost/shared_ptr.hpp>
 
 #include <map>
 #include <vector>
@@ -17,7 +13,6 @@ static const char rcsid[] = "$Id:$";
 #include <time.h>
 
 using namespace aug;
-using namespace boost;
 using namespace std;
 
 namespace test {
@@ -190,7 +185,7 @@ namespace test {
         }
     };
 
-    typedef shared_ptr<session> sessionptr;
+    typedef smartptr<session> sessionptr;
 
     struct state {
 

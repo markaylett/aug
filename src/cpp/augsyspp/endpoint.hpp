@@ -107,7 +107,7 @@ namespace aug {
 inline bool
 isnull(const struct aug_endpoint& ep)
 {
-    return 0 == ep.un_.family_;
+    return 0 == aug::family(ep);
 }
 
 inline bool
