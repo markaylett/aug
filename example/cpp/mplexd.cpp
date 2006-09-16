@@ -8,6 +8,7 @@
 #include "augutilpp.hpp"
 
 #include <map>
+#include <memory> // auto_ptr<>
 #include <vector>
 
 #include <time.h>
@@ -337,7 +338,7 @@ namespace test {
             if (fd == aug_eventin())
                 return readevent(fd, conns);
 
-            if (fd == state_->sfd_)
+            if (fd == state_->sfd_.get())
                 return listener(fd, conns);
 
             return connection(fd, conns);

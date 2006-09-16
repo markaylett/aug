@@ -10,20 +10,20 @@
 #if !defined(_MSC_VER)
 # include <sys/param.h>
 #elif defined(_M_IX86)
-# define BYTE_ORDER 1234
+# define _BYTE_ORDER 1234
 #endif /* _MSC_VER && _M_IX86 */
 
-#if !defined(BIG_ENDIAN)
-# define BIG_ENDIAN 4321
-#endif /* !BIG_ENDIAN */
+#if !defined(_BIG_ENDIAN)
+# define _BIG_ENDIAN 4321
+#endif /* !_BIG_ENDIAN */
 
-#if !defined(LITTLE_ENDIAN)
-# define LITTLE_ENDIAN 1234
-#endif /* !LITTLE_ENDIAN */
+#if !defined(_LITTLE_ENDIAN)
+# define _LITTLE_ENDIAN 1234
+#endif /* !_LITTLE_ENDIAN */
 
-#if !defined(BYTE_ORDER)
-# error "BYTE_ORDER not defined"
-#endif /* !BYTE_ORDER */
+#if !defined(_BYTE_ORDER)
+# error "_BYTE_ORDER not defined"
+#endif /* !_BYTE_ORDER */
 
 AUGSYS_API uint16_t
 aug_swap16(uint16_t i);

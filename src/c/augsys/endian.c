@@ -4,7 +4,7 @@
 #define AUGSYS_BUILD
 #include "augsys/endian.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include <string.h> /* memcpy() */
 AUGSYS_API uint16_t
@@ -47,7 +47,7 @@ aug_swap64(uint64_t i)
 #endif /* __GNUC__ */
 }
 
-#if BYTE_ORDER == BIG_ENDIAN
+#if _BYTE_ORDER == _BIG_ENDIAN
 AUGSYS_API uint16_t
 aug_ntoh16(uint16_t i)
 {
@@ -84,7 +84,7 @@ aug_hton64(uint64_t i)
     return i;
 }
 
-#else /* BYTE_ORDER == LITTLE_ENDIAN */
+#else /* _BYTE_ORDER == _LITTLE_ENDIAN */
 
 AUGSYS_API uint16_t
 aug_ntoh16(uint16_t i)
@@ -122,7 +122,7 @@ aug_hton64(uint64_t i)
     return aug_swap64(i);
 }
 
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+#endif /* _BYTE_ORDER == _LITTLE_ENDIAN */
 
 AUGSYS_API uint16_t
 aug_decode16(const char* ptr)
