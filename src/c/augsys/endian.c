@@ -6,7 +6,12 @@
 
 static const char rcsid[] = "$Id$";
 
+#if HAVE_CONFIG_H
+# include "augconfig.h"
+#endif /* HAVE_CONFIG_H */
+
 #include <string.h> /* memcpy() */
+
 AUGSYS_API uint16_t
 aug_swap16(uint16_t i)
 {
@@ -47,7 +52,8 @@ aug_swap64(uint64_t i)
 #endif /* __GNUC__ */
 }
 
-#if BYTE_ORDER == BIG_ENDIAN
+#if WORDS_BIGENDIAN
+
 AUGSYS_API uint16_t
 aug_ntoh16(uint16_t i)
 {
@@ -84,7 +90,7 @@ aug_hton64(uint64_t i)
     return i;
 }
 
-#else /* BYTE_ORDER == LITTLE_ENDIAN */
+#else /* !WORDS_BIGENDIAN */
 
 AUGSYS_API uint16_t
 aug_ntoh16(uint16_t i)
@@ -122,7 +128,7 @@ aug_hton64(uint64_t i)
     return aug_swap64(i);
 }
 
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+#endif /* !WORDS_BIGENDIAN */
 
 AUGSYS_API uint16_t
 aug_decode16(const char* ptr)
