@@ -7,7 +7,7 @@ modinclude_HEADERS = \
 	main.hpp \
 	signal.hpp
 
-if ENABLE_CPPBUILD
+if AUG_CPPBUILD
 
 noinst_LTLIBRARIES = libaugsrvpp.la
 

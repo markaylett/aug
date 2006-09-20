@@ -4,7 +4,7 @@
 #define AUGSYS_BUILD
 #include "augsys/socket.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #if !defined(_WIN32)
 # define SETAFNOSUPPORT_() \
@@ -21,7 +21,10 @@ struct ipv4_ {
     union {
         unsigned char data_[4];
         struct in_addr ipv4_;
-        struct in6_addr ipv6_;
+#if !defined(AUG_NOIPV6)
+        struct sockaddr_in6 ipv6_;
+#endif /* !AUG_NOIPV6 */
+        char pad_[16];
     } un_;
 };
 
@@ -35,12 +38,14 @@ static const struct ipv4_ ipv4loopback_ = {
     { { 127, 0, 0, 1 } }
 };
 
+#if !defined(AUG_NOIPV6)
 struct ipv6_ {
     short family_;
     union {
         unsigned char data_[16];
         struct in_addr ipv4_;
         struct in6_addr ipv6_;
+        char pad_[16];
     } un_;
 };
 
@@ -53,6 +58,7 @@ static const struct ipv6_ ipv6loopback_ = {
     AF_INET6,
     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } }
 };
+#endif /* !AUG_NOIPV6 */
 
 AUGSYS_API int
 aug_setreuseaddr(int s, int on)
@@ -68,11 +74,13 @@ aug_setinetaddr(struct aug_endpoint* ep, const struct aug_inetaddr* addr)
         ep->len_ = sizeof(ep->un_.ipv4_);
         ep->un_.ipv4_.sin_addr.s_addr = addr->un_.ipv4_.s_addr;
         break;
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
         ep->len_ = sizeof(ep->un_.ipv6_);
         memcpy(&ep->un_.ipv6_.sin6_addr, &addr->un_.ipv6_,
                sizeof(addr->un_.ipv6_));
         break;
+#endif /* !AUG_NOIPV6 */
     default:
         SETAFNOSUPPORT_();
         return NULL;
@@ -87,10 +95,12 @@ aug_getinetaddr(const struct aug_endpoint* ep, struct aug_inetaddr* addr)
     case AF_INET:
         addr->un_.ipv4_.s_addr = ep->un_.ipv4_.sin_addr.s_addr;
         break;
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
         memcpy(&addr->un_, &ep->un_.ipv6_.sin6_addr,
                sizeof(ep->un_.ipv6_.sin6_addr));
         break;
+#endif /* !AUG_NOIPV6 */
     default:
         SETAFNOSUPPORT_();
         return NULL;
@@ -106,9 +116,11 @@ aug_inetany(int af)
     case AF_INET:
         addr = &ipv4any_;
         break;
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
         addr = &ipv6any_;
         break;
+#endif /* !AUG_NOIPV6 */
     default:
         SETAFNOSUPPORT_();
         return NULL;
@@ -124,9 +136,11 @@ aug_inetloopback(int af)
     case AF_INET:
         addr = &ipv4loopback_;
         break;
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
         addr = &ipv6loopback_;
         break;
+#endif /* !AUG_NOIPV6 */
     default:
         SETAFNOSUPPORT_();
         return NULL;

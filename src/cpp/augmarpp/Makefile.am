@@ -13,7 +13,7 @@ modinclude_HEADERS = \
 	swapfile.hpp \
 	types.hpp
 
-if ENABLE_CPPBUILD
+if AUG_CPPBUILD
 
 noinst_LTLIBRARIES = libaugmarpp.la
 

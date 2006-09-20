@@ -87,6 +87,7 @@ ifaddr_(void* arg, unsigned ifindex, PIP_ADAPTER_ADDRESSES adapter)
     return -1;
 }
 
+#if !defined(AUG_NOIPV6)
 static int
 ifindex_(void* arg, unsigned ifindex, PIP_ADAPTER_ADDRESSES adapter)
 {
@@ -106,6 +107,7 @@ ifindex_(void* arg, unsigned ifindex, PIP_ADAPTER_ADDRESSES adapter)
                    AUG_MSG("no address for interface '%d'"), (int)ifindex);
     return -1;
 }
+#endif /* !AUG_NOIPV6 */
 
 static int
 getifaddr_(struct in_addr* addr, const char* ifname)
@@ -119,6 +121,7 @@ getifaddr_(struct in_addr* addr, const char* ifname)
     return findif_(AF_INET, ifindex, ifaddr_, addr);
 }
 
+#if !defined(AUG_NOIPV6)
 static int
 getifindex_(DWORD* index, const char* ifname)
 {
@@ -130,13 +133,16 @@ getifindex_(DWORD* index, const char* ifname)
     }
     return findif_(AF_INET6, ifindex, ifindex_, index);
 }
+#endif /* !AUG_NOIPV6 */
 
 AUGSYS_API int
 aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
+#if !defined(AUG_NOIPV6)
         struct ipv6_mreq ipv6_;
+#endif /* !AUG_NOIPV6 */
     } un;
 
     switch (addr->family_) {
@@ -156,7 +162,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 
         return aug_setsockopt(s, IPPROTO_IP, IP_ADD_MEMBERSHIP, &un.ipv4_,
                               sizeof(un.ipv4_));
-
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
 
 		memcpy(&un.ipv6_.ipv6mr_multiaddr, &addr->un_.ipv6_,
@@ -174,6 +180,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,
                               &un.ipv6_, sizeof(un.ipv6_));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
@@ -185,7 +192,9 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
+#if !defined(AUG_NOIPV6)
         struct ipv6_mreq ipv6_;
+#endif /* !AUG_NOIPV6 */
     } un;
 
     switch (addr->family_) {
@@ -205,7 +214,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 
         return aug_setsockopt(s, IPPROTO_IP, IP_DROP_MEMBERSHIP, &un.ipv4_,
                               sizeof(un.ipv4_));
-
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
 
 		memcpy(&un.ipv6_.ipv6mr_multiaddr, &addr->un_.ipv6_,
@@ -223,6 +232,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
                               &un.ipv6_, sizeof(un.ipv6_));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
@@ -235,7 +245,9 @@ aug_setmcastif(int s, const char* ifname)
     int af;
     union {
         struct in_addr ipv4_;
+#if !defined(AUG_NOIPV6)
         DWORD ipv6_;
+#endif /* !AUG_NOIPV6 */
     } un;
 
     if (-1 == (af = aug_getfamily(s)))
@@ -249,7 +261,7 @@ aug_setmcastif(int s, const char* ifname)
 
         return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_IF, &un.ipv4_,
                               sizeof(un.ipv4_));
-
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
 
         if (-1 == getifindex_(&un.ipv6_, ifname))
@@ -257,6 +269,7 @@ aug_setmcastif(int s, const char* ifname)
 
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_IF,
                               &un.ipv6_, sizeof(un.ipv6_));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
@@ -276,10 +289,11 @@ aug_setmcastloop(int s, int on)
     case AF_INET:
         return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_LOOP, &on,
                               sizeof(on));
-
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
                               &on, sizeof(on));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);
@@ -299,10 +313,11 @@ aug_setmcastttl(int s, int ttl)
     case AF_INET:
         return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
                               sizeof(ttl));
-
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
                               &ttl, sizeof(ttl));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT);

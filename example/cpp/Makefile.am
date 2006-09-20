@@ -1,6 +1,6 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
-if ENABLE_CPPBUILD
+if AUG_CPPBUILD
 
 noinst_PROGRAMS = \
 	heartbeat \

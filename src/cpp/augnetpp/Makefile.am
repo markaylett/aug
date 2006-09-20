@@ -6,7 +6,7 @@ modinclude_HEADERS = \
 	conn.hpp \
 	inet.hpp
 
-if ENABLE_CPPBUILD
+if AUG_CPPBUILD
 
 noinst_LTLIBRARIES = libaugnetpp.la
 

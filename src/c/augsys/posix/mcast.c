@@ -41,7 +41,9 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
+#if !defined(AUG_NOIPV6)
         struct ipv6_mreq ipv6_;
+#endif /* !AUG_NOIPV6 */
     } un;
 
     switch (addr->family_) {
@@ -59,6 +61,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
         return aug_setsockopt(s, IPPROTO_IP, IP_ADD_MEMBERSHIP, &un.ipv4_,
                               sizeof(un.ipv4_));
 
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
 
 		memcpy(&un.ipv6_.ipv6mr_multiaddr, &addr->un_.ipv6_,
@@ -72,6 +75,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,
                               &un.ipv6_, sizeof(un.ipv6_));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
@@ -83,7 +87,9 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
+#if !defined(AUG_NOIPV6)
         struct ipv6_mreq ipv6_;
+#endif /* !AUG_NOIPV6 */
     } un;
 
     switch (addr->family_) {
@@ -101,6 +107,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
         return aug_setsockopt(s, IPPROTO_IP, IP_DROP_MEMBERSHIP, &un.ipv4_,
                               sizeof(un.ipv4_));
 
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
 
 		memcpy(&un.ipv6_.ipv6mr_multiaddr, &addr->un_.ipv6_,
@@ -114,6 +121,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
                               &un.ipv6_, sizeof(un.ipv6_));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
@@ -126,7 +134,9 @@ aug_setmcastif(int s, const char* ifname)
     int af;
     union {
         struct in_addr ipv4_;
+#if !defined(AUG_NOIPV6)
         u_int ipv6_;
+#endif /* !AUG_NOIPV6 */
     } un;
 
     if (-1 == (af = aug_getfamily(s)))
@@ -141,6 +151,7 @@ aug_setmcastif(int s, const char* ifname)
         return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_IF, &un.ipv4_,
                               sizeof(un.ipv4_));
 
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
 
         if (-1 == getifindex_(&un.ipv6_, ifname))
@@ -148,6 +159,7 @@ aug_setmcastif(int s, const char* ifname)
 
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_IF,
                               &un.ipv6_, sizeof(un.ipv6_));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
@@ -160,7 +172,9 @@ aug_setmcastloop(int s, int on)
     int af;
     union {
         u_char ipv4_;
+#if !defined(AUG_NOIPV6)
         u_int ipv6_;
+#endif /* !AUG_NOIPV6 */
     } un;
 
     if (-1 == (af = aug_getfamily(s)))
@@ -171,11 +185,12 @@ aug_setmcastloop(int s, int on)
         un.ipv4_ = on;
         return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_LOOP, &un.ipv4_,
                               sizeof(un.ipv4_));
-
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
         un.ipv6_ = on;
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
                               &un.ipv6_, sizeof(un.ipv6_));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
@@ -188,7 +203,9 @@ aug_setmcastttl(int s, int ttl)
     int af;
     union {
         u_char ipv4_;
+#if !defined(AUG_NOIPV6)
         int ipv6_;
+#endif /* !AUG_NOIPV6 */
     } un;
 
     if (-1 == (af = aug_getfamily(s)))
@@ -199,11 +216,12 @@ aug_setmcastttl(int s, int ttl)
         un.ipv4_ = ttl;
         return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &un.ipv4_,
                               sizeof(un.ipv4_));
-
+#if !defined(AUG_NOIPV6)
     case AF_INET6:
         un.ipv6_ = ttl;
         return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
                               &un.ipv6_, sizeof(un.ipv6_));
+#endif /* !AUG_NOIPV6 */
     }
 
     aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);

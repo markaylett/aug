@@ -46,6 +46,7 @@ namespace aug {
         return ep;
     }
 
+#if !defined(AUG_NOIPV6)
     inline aug_endpoint&
     setsockaddr(struct aug_endpoint& ep, const struct sockaddr_in6& ipv6)
     {
@@ -53,6 +54,7 @@ namespace aug {
         memcpy(&ep.un_.ipv6_, &ipv6, sizeof(ep.un_.ipv6_));
         return ep;
     }
+#endif // !AUG_NOIPV6
 
     inline short
     family(const struct aug_endpoint& ep)

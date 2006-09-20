@@ -11,7 +11,7 @@ modinclude_HEADERS = \
 	timer.hpp \
 	var.hpp
 
-if ENABLE_CPPBUILD
+if AUG_CPPBUILD
 
 noinst_LTLIBRARIES = libaugutilpp.la
 

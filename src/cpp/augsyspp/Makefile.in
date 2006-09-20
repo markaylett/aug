@@ -40,8 +40,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-@ENABLE_CPPBUILD_TRUE@check_PROGRAMS = augsyspp-test$(EXEEXT) \
-@ENABLE_CPPBUILD_TRUE@	augsyspp-smartptrtest$(EXEEXT)
+@AUG_CPPBUILD_TRUE@check_PROGRAMS = augsyspp-test$(EXEEXT) \
+@AUG_CPPBUILD_TRUE@	augsyspp-smartptrtest$(EXEEXT)
 subdir = src/cpp/augsyspp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -51,31 +51,30 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/augconfig.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-@ENABLE_CPPBUILD_TRUE@libaugsyspp_la_DEPENDENCIES =  \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@AUG_CPPBUILD_TRUE@libaugsyspp_la_DEPENDENCIES =  \
+@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 am__libaugsyspp_la_SOURCES_DIST = base.cpp config.cpp endpoint.cpp \
 	exception.cpp inetaddr.cpp mcast.cpp mplexer.cpp mutex.cpp \
 	null.cpp smartfd.cpp smartptr.cpp socket.cpp string.cpp \
 	time.cpp types.cpp unistd.cpp utility.cpp
-@ENABLE_CPPBUILD_TRUE@am_libaugsyspp_la_OBJECTS = base.lo config.lo \
-@ENABLE_CPPBUILD_TRUE@	endpoint.lo exception.lo inetaddr.lo \
-@ENABLE_CPPBUILD_TRUE@	mcast.lo mplexer.lo mutex.lo null.lo \
-@ENABLE_CPPBUILD_TRUE@	smartfd.lo smartptr.lo socket.lo \
-@ENABLE_CPPBUILD_TRUE@	string.lo time.lo types.lo unistd.lo \
-@ENABLE_CPPBUILD_TRUE@	utility.lo
+@AUG_CPPBUILD_TRUE@am_libaugsyspp_la_OBJECTS = base.lo config.lo \
+@AUG_CPPBUILD_TRUE@	endpoint.lo exception.lo inetaddr.lo \
+@AUG_CPPBUILD_TRUE@	mcast.lo mplexer.lo mutex.lo null.lo \
+@AUG_CPPBUILD_TRUE@	smartfd.lo smartptr.lo socket.lo string.lo \
+@AUG_CPPBUILD_TRUE@	time.lo types.lo unistd.lo utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
-@ENABLE_CPPBUILD_TRUE@am_libaugsyspp_la_rpath =
+@AUG_CPPBUILD_TRUE@am_libaugsyspp_la_rpath =
 am__augsyspp_smartptrtest_SOURCES_DIST = smartptrtest.cpp
-@ENABLE_CPPBUILD_TRUE@am_augsyspp_smartptrtest_OBJECTS =  \
-@ENABLE_CPPBUILD_TRUE@	smartptrtest.$(OBJEXT)
+@AUG_CPPBUILD_TRUE@am_augsyspp_smartptrtest_OBJECTS =  \
+@AUG_CPPBUILD_TRUE@	smartptrtest.$(OBJEXT)
 augsyspp_smartptrtest_OBJECTS = $(am_augsyspp_smartptrtest_OBJECTS)
-@ENABLE_CPPBUILD_TRUE@augsyspp_smartptrtest_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@AUG_CPPBUILD_TRUE@augsyspp_smartptrtest_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 am__augsyspp_test_SOURCES_DIST = test.cpp
-@ENABLE_CPPBUILD_TRUE@am_augsyspp_test_OBJECTS = test.$(OBJEXT)
+@AUG_CPPBUILD_TRUE@am_augsyspp_test_OBJECTS = test.$(OBJEXT)
 augsyspp_test_OBJECTS = $(am_augsyspp_test_OBJECTS)
-@ENABLE_CPPBUILD_TRUE@augsyspp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@AUG_CPPBUILD_TRUE@augsyspp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -110,6 +109,10 @@ AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
 AS = @AS@
+AUG_CPPBUILD_FALSE = @AUG_CPPBUILD_FALSE@
+AUG_CPPBUILD_TRUE = @AUG_CPPBUILD_TRUE@
+AUG_NOIPV6_FALSE = @AUG_NOIPV6_FALSE@
+AUG_NOIPV6_TRUE = @AUG_NOIPV6_TRUE@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -132,8 +135,6 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ENABLE_CPPBUILD_FALSE = @ENABLE_CPPBUILD_FALSE@
-ENABLE_CPPBUILD_TRUE = @ENABLE_CPPBUILD_TRUE@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
@@ -237,45 +238,45 @@ modinclude_HEADERS = \
 	unistd.hpp \
 	utility.hpp
 
-@ENABLE_CPPBUILD_TRUE@noinst_LTLIBRARIES = libaugsyspp.la
-@ENABLE_CPPBUILD_TRUE@libaugsyspp_la_SOURCES = \
-@ENABLE_CPPBUILD_TRUE@	base.cpp \
-@ENABLE_CPPBUILD_TRUE@	config.cpp \
-@ENABLE_CPPBUILD_TRUE@	endpoint.cpp \
-@ENABLE_CPPBUILD_TRUE@	exception.cpp \
-@ENABLE_CPPBUILD_TRUE@	inetaddr.cpp \
-@ENABLE_CPPBUILD_TRUE@	mcast.cpp \
-@ENABLE_CPPBUILD_TRUE@	mplexer.cpp \
-@ENABLE_CPPBUILD_TRUE@	mutex.cpp \
-@ENABLE_CPPBUILD_TRUE@	null.cpp \
-@ENABLE_CPPBUILD_TRUE@	smartfd.cpp \
-@ENABLE_CPPBUILD_TRUE@	smartptr.cpp \
-@ENABLE_CPPBUILD_TRUE@	socket.cpp \
-@ENABLE_CPPBUILD_TRUE@	string.cpp \
-@ENABLE_CPPBUILD_TRUE@	time.cpp \
-@ENABLE_CPPBUILD_TRUE@	types.cpp \
-@ENABLE_CPPBUILD_TRUE@	unistd.cpp \
-@ENABLE_CPPBUILD_TRUE@	utility.cpp
+@AUG_CPPBUILD_TRUE@noinst_LTLIBRARIES = libaugsyspp.la
+@AUG_CPPBUILD_TRUE@libaugsyspp_la_SOURCES = \
+@AUG_CPPBUILD_TRUE@	base.cpp \
+@AUG_CPPBUILD_TRUE@	config.cpp \
+@AUG_CPPBUILD_TRUE@	endpoint.cpp \
+@AUG_CPPBUILD_TRUE@	exception.cpp \
+@AUG_CPPBUILD_TRUE@	inetaddr.cpp \
+@AUG_CPPBUILD_TRUE@	mcast.cpp \
+@AUG_CPPBUILD_TRUE@	mplexer.cpp \
+@AUG_CPPBUILD_TRUE@	mutex.cpp \
+@AUG_CPPBUILD_TRUE@	null.cpp \
+@AUG_CPPBUILD_TRUE@	smartfd.cpp \
+@AUG_CPPBUILD_TRUE@	smartptr.cpp \
+@AUG_CPPBUILD_TRUE@	socket.cpp \
+@AUG_CPPBUILD_TRUE@	string.cpp \
+@AUG_CPPBUILD_TRUE@	time.cpp \
+@AUG_CPPBUILD_TRUE@	types.cpp \
+@AUG_CPPBUILD_TRUE@	unistd.cpp \
+@AUG_CPPBUILD_TRUE@	utility.cpp
 
-@ENABLE_CPPBUILD_TRUE@libaugsyspp_la_LDFLAGS = \
-@ENABLE_CPPBUILD_TRUE@	-no-undefined
+@AUG_CPPBUILD_TRUE@libaugsyspp_la_LDFLAGS = \
+@AUG_CPPBUILD_TRUE@	-no-undefined
 
-@ENABLE_CPPBUILD_TRUE@libaugsyspp_la_LIBADD = \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@AUG_CPPBUILD_TRUE@libaugsyspp_la_LIBADD = \
+@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@ENABLE_CPPBUILD_TRUE@TESTS = \
-@ENABLE_CPPBUILD_TRUE@	augsyspp-test \
-@ENABLE_CPPBUILD_TRUE@	augsyspp-smartptrtest
+@AUG_CPPBUILD_TRUE@TESTS = \
+@AUG_CPPBUILD_TRUE@	augsyspp-test \
+@AUG_CPPBUILD_TRUE@	augsyspp-smartptrtest
 
-@ENABLE_CPPBUILD_TRUE@augsyspp_test_SOURCES = test.cpp
-@ENABLE_CPPBUILD_TRUE@augsyspp_test_LDADD = \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@AUG_CPPBUILD_TRUE@augsyspp_test_SOURCES = test.cpp
+@AUG_CPPBUILD_TRUE@augsyspp_test_LDADD = \
+@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@ENABLE_CPPBUILD_TRUE@augsyspp_smartptrtest_SOURCES = smartptrtest.cpp
-@ENABLE_CPPBUILD_TRUE@augsyspp_smartptrtest_LDADD = \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@ENABLE_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+@AUG_CPPBUILD_TRUE@augsyspp_smartptrtest_SOURCES = smartptrtest.cpp
+@AUG_CPPBUILD_TRUE@augsyspp_smartptrtest_LDADD = \
+@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 all: all-am
 
