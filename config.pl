@@ -77,8 +77,10 @@ my (
     $toolset,
     $maintainer,
     $gcc,
+    $strict,
     $debug,
     $mt,
+    $ipv6,
     $libtype
     );
 
@@ -117,8 +119,10 @@ if ($CYGWIN_MINGW == $toolset) {
 } else {
     $gcc = valueask ("GCC compiler", 'y');
 }
+$strict = valueask ("strict build", 'n');
 $debug = valueask ("debug build", 'n');
 $mt = valueask ("multi-threaded", 'y');
+$ipv6 = valueask ("ipv6 support", 'y');
 $libtype = listask ("library type", $BOTH, \%LIBTYPE);
 
 my (
@@ -130,9 +134,14 @@ my (
 
 if (is $gcc) {
     $flags .= (is $debug) ? '-ggdb' : '-O3';
-    $flags .= ' -Wall -Werror -pedantic';
-    $cflags = "-std=c99 $flags";
-    $cxxflags = "-std=c++98 $flags -Wno-deprecated";
+    if (is $strict) {
+        $flags .= ' -Wall -Werror -pedantic';
+        $cflags = "-std=c99 $flags";
+        $cxxflags = "-std=c++98 $flags -Wno-deprecated";
+    } else {
+        $cflags = $flags;
+        $cxxflags = $flags;
+    }
 } else {
     $flags .= (is $debug) ? '-g' : '-O';
     $cflags = $flags;
@@ -152,6 +161,8 @@ $options .= " \\\n\t--enable-maintainer-mode"
     if is $maintainer;
 $options .= " \\\n\t--disable-threads"
     unless is $mt;
+$options .= " \\\n\t--disable-ipv6"
+    unless is $ipv6;
 
 if ($SHARED_ONLY == $libtype) {
     $options .= " \\\n\t--disable-static";
