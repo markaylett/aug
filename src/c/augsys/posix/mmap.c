@@ -181,7 +181,7 @@ aug_mmapsize(struct aug_mmap_* mmap_)
     return impl->size_;
 }
 
-AUGSYS_EXTERN size_t
+AUGSYS_EXTERN unsigned
 aug_granularity(void)
 {
     /* Not documented to return an error. */
@@ -189,7 +189,7 @@ aug_granularity(void)
     return getpagesize();
 }
 
-AUGSYS_EXTERN size_t
+AUGSYS_EXTERN unsigned
 aug_pagesize(void)
 {
     /* Not documented to return an error. */

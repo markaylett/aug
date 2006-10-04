@@ -66,7 +66,7 @@ offsetbyord_(void* begin, unsigned ord)
     while (ord--)
         ptr += fieldsize_(ptr);
 
-    return ptr - (char*)begin;
+    return (unsigned)(ptr - (char*)begin);
 }
 
 static unsigned
@@ -89,7 +89,7 @@ offsetbyname_(void* begin, const char* name, unsigned* inout)
         ptr += fieldsize_(ptr);
     }
 
-    return ptr - (char*)begin;
+    return (unsigned)(ptr - (char*)begin);
 }
 
 AUGMAR_EXTERN int
@@ -123,7 +123,7 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
         return -1;
     }
 
-    nsize = strlen(field->name_) + 1;
+    nsize = (unsigned)strlen(field->name_) + 1;
     vsize = field->size_ + 1; /* Add null terminator. */
 
     if (AUG_NSIZE_MAX < nsize) {

@@ -252,7 +252,7 @@ aug_mmapsize(struct aug_mmap_* mmap_)
     return impl->size_;
 }
 
-AUGSYS_EXTERN size_t
+AUGSYS_EXTERN unsigned
 aug_granularity(void)
 {
     SYSTEM_INFO info;
@@ -260,7 +260,7 @@ aug_granularity(void)
     return info.dwAllocationGranularity;
 }
 
-AUGSYS_EXTERN size_t
+AUGSYS_EXTERN unsigned
 aug_pagesize(void)
 {
     SYSTEM_INFO info;

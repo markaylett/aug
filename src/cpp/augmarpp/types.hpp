@@ -106,7 +106,7 @@ namespace aug {
         setvalue(const char* v)
         {
             field_.value_ = v;
-            field_.size_ = strlen(v);
+            field_.size_ = (unsigned)strlen(v);
         }
         operator struct aug_field&()
         {

@@ -96,7 +96,7 @@ namespace aug {
     inline void
     setfield(marref ref, unsigned ord, const char* cdata)
     {
-        setfield(ref, ord, cdata, strlen(cdata));
+        setfield(ref, ord, cdata, (unsigned)strlen(cdata));
     }
     inline std::pair<unsigned, bool>
     unsetfield(marref ref, const char* name)
@@ -195,7 +195,7 @@ namespace aug {
     inline void
     setcontent(marref ref, const char* data)
     {
-        setcontent(ref, data, strlen(data));
+        setcontent(ref, data, (unsigned)strlen(data));
     }
     inline void
     syncmar(marref ref)

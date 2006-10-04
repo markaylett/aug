@@ -126,10 +126,10 @@ tail_(aug_httpparser_t parser)
     return 0;
 }
 
-static ssize_t
-header_(aug_httpparser_t parser, const char* ptr, size_t size)
+static int
+header_(aug_httpparser_t parser, const char* ptr, unsigned size)
 {
-    size_t i = 0;
+    unsigned i = 0;
     while (i < size) {
 
         switch (aug_lexchar(&parser->lexer_, ptr[i++])) {
@@ -171,11 +171,11 @@ header_(aug_httpparser_t parser, const char* ptr, size_t size)
     }
 
  done:
-    return (ssize_t)i;
+    return (int)i;
 }
 
-static ssize_t
-body_(aug_httpparser_t parser, const char* buf, size_t size)
+static int
+body_(aug_httpparser_t parser, const char* buf, unsigned size)
 {
     if (size < parser->csize_) {
 
@@ -186,7 +186,7 @@ body_(aug_httpparser_t parser, const char* buf, size_t size)
 
         /* Entire buffer consumed. */
 
-        return (ssize_t)size;
+        return size;
     }
 
     /* Consume enough of the buffer to fulfil content. */
@@ -197,11 +197,11 @@ body_(aug_httpparser_t parser, const char* buf, size_t size)
     /* End of message (with commit). */
 
     end_(parser, 1);
-    return (ssize_t)size;
+    return size;
 }
 
 AUGNET_API aug_httpparser_t
-aug_createhttpparser(size_t size, const struct aug_httphandlers* handlers,
+aug_createhttpparser(unsigned size, const struct aug_httphandlers* handlers,
                      const struct aug_var* arg)
 {
     aug_httpparser_t parser = malloc(sizeof(struct aug_httpparser_));
@@ -234,9 +234,9 @@ aug_freehttpparser(aug_httpparser_t parser)
 }
 
 AUGNET_API int
-aug_parsehttp(aug_httpparser_t parser, const char* buf, size_t size)
+aug_parsehttp(aug_httpparser_t parser, const char* buf, unsigned size)
 {
-    ssize_t ret;
+    int ret;
 
     if (BODY_ == parser->state_)
         goto body;
@@ -249,7 +249,7 @@ aug_parsehttp(aug_httpparser_t parser, const char* buf, size_t size)
         if (-1 == (ret = header_(parser, buf, size)))
             break;
 
-        if ((size_t)ret == size)
+        if (ret == size)
             return 0;
 
         buf += ret;
@@ -259,7 +259,7 @@ aug_parsehttp(aug_httpparser_t parser, const char* buf, size_t size)
         if (-1 == (ret = body_(parser, buf, size)))
             break;
 
-        if ((size_t)ret == size)
+        if (ret == size)
             return 0;
 
         buf += ret;

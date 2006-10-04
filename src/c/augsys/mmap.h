@@ -30,10 +30,10 @@ aug_syncmmap(struct aug_mmap_* mmap_);
 AUGSYS_API size_t
 aug_mmapsize(struct aug_mmap_* mmap_);
 
-AUGSYS_API size_t
+AUGSYS_API unsigned
 aug_granularity(void);
 
-AUGSYS_API size_t
+AUGSYS_API unsigned
 aug_pagesize(void);
 
 #endif /* AUGSYS_MMAP_H */
