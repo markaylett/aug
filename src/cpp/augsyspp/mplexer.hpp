@@ -55,7 +55,9 @@ namespace aug {
             throwerrinfo("aug_setioeventmask() failed");
     }
 
-    /** Returns AUG_RETINTR if the system call was interrupted. */
+    /**
+       Returns #AUG_RETINTR if the system call was interrupted.
+    */
 
     inline int
     waitioevents(aug_mplexer_t mplexer, const struct timeval& timeout)

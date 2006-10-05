@@ -105,8 +105,9 @@ namespace test {
         vector<char> vec_;
         size_t begin_, end_;
     public:
-        buffer()
-            : vec_(1024),
+        explicit
+        buffer(unsigned size = 4096)
+            : vec_(size),
               begin_(0),
               end_(0)
         {
@@ -260,26 +261,14 @@ namespace test {
             smartfd sfd(null);
             try {
 
-                // As prescribed by Stevens: the passive socket is
-                // non-blocking and certain errors ignored.  This is to handle
-                // the situation where a client closes before the server has
-                // had a chance to accept.
-
                 sfd = accept(state_->sfd_, ep);
 
             } catch (const errinfo_error& e) {
 
-                if (AUG_SRCPOSIX == aug_errsrc)
-                    switch (aug_errnum) {
-                    case ECONNABORTED:
-#if !defined(_WIN32)
-                    case EPROTO:
-#endif // !_WIN32
-                    case EWOULDBLOCK:
-                        aug_warn("accept() failed: %s", e.what());
-                        return true;
-                    }
-
+                if (aug_acceptlost()) {
+                    aug_warn("accept() failed: %s", e.what());
+                    return true;
+                }
                 throw;
             }
 

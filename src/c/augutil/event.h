@@ -11,7 +11,9 @@
 #define AUG_EVENTSTOP   3
 #define AUG_EVENTSIGNAL 4
 
-/** Base value for user-defined events. */
+/**
+   Base value for user-defined events.
+*/
 
 #define AUG_EVENTUSER   32
 

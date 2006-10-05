@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
- * \file swapfile.hpp
- * \brief TODO
+   \file swapfile.hpp
+   \brief TODO
  */
 
 #ifndef AUGMARPP_SWAPFILE_HPP

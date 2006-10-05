@@ -6,8 +6,10 @@
 
 #include "augsys/queue.h"
 
-/** By convention, 'entries_' is used as the field name.  This somewhat
-    simplifies the interface. */
+/**
+   By convention, 'entries_' is used as the field name.  This somewhat
+   simplifies the interface.
+*/
 
 #define AUG_HEAD(name, type) \
 STAILQ_HEAD(name, type)

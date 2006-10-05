@@ -10,8 +10,9 @@ main(int argc, char* argv[])
 {
     struct aug_errinfo a, b, c;
 
-    /** Ensure that the initialisation functions can be called multiple
-        times. */
+    /**
+       Ensure that the initialisation functions can be called multiple times.
+    */
 
     if (-1 == aug_term()) {
         aug_perror("aug_term() failed");

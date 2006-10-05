@@ -9,7 +9,9 @@
 
 #include <stdarg.h>
 
-/** All functions in this module set errno, and not errinfo. */
+/**
+   All functions in this module set errno, and not errinfo.
+*/
 
 typedef int (*aug_logger_t)(int, const char*, va_list);
 
@@ -19,7 +21,9 @@ aug_stdiologger(int loglevel, const char* format, va_list args);
 AUGSYS_API void
 aug_setloglevel(int loglevel);
 
-/** If the logger argument is NULL, the default logger is re-installed. */
+/**
+   If the logger argument is NULL, the default logger is re-installed.
+*/
 
 AUGSYS_API aug_logger_t
 aug_setlogger(aug_logger_t logger);
@@ -33,8 +37,10 @@ aug_vwritelog(int loglevel, const char* format, va_list args);
 AUGSYS_API int
 aug_writelog(int loglevel, const char* format, ...);
 
-/** The following functions are essentially convenience wrappers around
-    aug_vwritelog(). */
+/**
+   The following functions are essentially convenience wrappers around
+   aug_vwritelog().
+*/
 
 AUGSYS_API int
 aug_crit(const char* format, ...);

@@ -13,8 +13,10 @@
 #define AUG_SRCPOSIX 2
 #define AUG_SRCWIN32 3
 
-/** These error constants may also be used as return codes for communicating
-    exceptional conditions. */
+/**
+   These error constants may also be used as return codes for communicating
+   exceptional conditions.
+*/
 
 #define AUG_NOERROR  0
 #define AUG_ESYSTEM  1
@@ -39,15 +41,16 @@ struct aug_errinfo {
     char desc_[AUG_MAXLINE];
 };
 
-/** Due to the boostrapping process implemented by aug_init(), the errinfo
-    facility is not used by the following modules:
+/**
+   Due to the boostrapping process implemented by aug_init(), the errinfo
+   facility is not used by the following modules:
 
-    aug_lock
-    aug_string
-    aug_tls_
-    aug_log
+   aug_lock
+   aug_string
+   aug_tls_
+   aug_log
 
-    All functions in this module set errno, and not errinfo.
+   All functions in this module set errno, and not errinfo.
 */
 
 #if defined(AUGSYS_BUILD)

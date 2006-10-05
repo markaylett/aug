@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
- * \file types.hpp
- * \brief TODO
+   \file types.hpp
+   \brief TODO
  */
 
 #ifndef AUGMARPP_TYPES_HPP

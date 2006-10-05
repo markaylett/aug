@@ -19,20 +19,24 @@ struct aug_driver {
     int (*setnonblock_)(int, int);
 };
 
-/** The aug_init(), aug_term() and aug_atexitinit() functions return errno,
-    and not errinfo, on failure.  These functions must be called from the main
-    (primary) thread of the process.  They maintain an internal reference
-    count that allows them to be called multiple times.  All but the first
-    call to aug_init() will simply update the internal reference count.  These
-    semantics have been formalised to facilitate initialisation from functions
-    such as DllMain. */
+/**
+   The aug_init(), aug_term() and aug_atexitinit() functions set errno, and
+   not #aug_errinfo, on failure.  These functions must be called from the main
+   (primary) thread of the process.  They maintain an internal reference count
+   that allows them to be called multiple times.  All but the first call to
+   aug_init() will simply update the internal reference count.  These
+   semantics have been formalised to facilitate initialisation from functions
+   such as DllMain.
+*/
 
 AUGSYS_API int
 aug_init(struct aug_errinfo* errinfo);
 
-/** For reasons of safety, aug_term() will re-install the default logger.  The
-    default logger is garaunteed to be safe even if aug_init() has not been
-    called.  Sets errno, and not errinfo. */
+/**
+   For reasons of safety, aug_term() will re-install the default logger.  The
+   default logger is garaunteed to be safe even if aug_init() has not been
+   called.  Sets errno, and not errinfo.
+*/
 
 AUGSYS_API int
 aug_term(void);
@@ -43,7 +47,9 @@ aug_atexitinit(struct aug_errinfo* errinfo);
 AUGSYS_API void
 aug_exit(int status);
 
-/** The remaining functions will set errinfo on failure. */
+/**
+   The remaining functions will set errinfo on failure.
+*/
 
 AUGSYS_API int
 aug_nextid(void);

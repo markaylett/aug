@@ -25,12 +25,14 @@ aug_freemplexer(aug_mplexer_t mplexer);
 AUGSYS_API int
 aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
 
-/** Returns either the total number of descriptors set, zero on timeout, or a
-    negative value on error.
+/**
+   Returns either the total number of descriptors set, zero on timeout, or a
+   negative value on error.
 
-    If SA_RESTART has been set for an interrupting signal, it is
-    implementation dependant whether select/poll restart or return with EINTR
-    set. */
+   If #SA_RESTART has been set for an interrupting signal, it is
+   implementation dependant whether select()/poll() restart or return with
+   #EINTR set.
+*/
 
 AUGSYS_API int
 aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout);

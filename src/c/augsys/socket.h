@@ -65,9 +65,11 @@ aug_accept(int s, struct aug_endpoint* ep);
 AUGSYS_API int
 aug_bind(int s, const struct aug_endpoint* ep);
 
-/** Remember that, for non-blocking sockets, connect() can fail with
-    EINPROGRESS.  Use poll() or select() on write-status to determine
-    completion. */
+/**
+   Remember that, for non-blocking sockets, connect() may fail with
+   #EINPROGRESS.  Use poll() or select() on write-status to determine
+   completion.
+*/
 
 AUGSYS_API int
 aug_connect(int s, const struct aug_endpoint* ep);
@@ -139,5 +141,14 @@ aug_inetany(int af);
 
 AUGSYS_API const struct aug_inetaddr*
 aug_inetloopback(int af);
+
+/**
+   After a failed call to aug_accept(), this function can be used to determine
+   whether the error was a result of the peer closing the connection.  This
+   can occur when the passive socket is non-blocking.
+*/
+
+AUGSYS_API int
+aug_acceptlost(void);
 
 #endif /* AUGSYS_SOCKET_H */

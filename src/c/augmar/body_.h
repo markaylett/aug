@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
- * \file body.h
- * \brief TODO
+   \file body.h
+   \brief TODO
  */
 
 #ifndef AUGMAR_BODY_H_

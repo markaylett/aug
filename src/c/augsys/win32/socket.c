@@ -18,12 +18,14 @@ setbadfd_(const char* file, int line)
 static int
 close_(int fd)
 {
-    /* The _open_osfhandle() function allocates a C run-time file handle and
+    /**
+       The _open_osfhandle() function allocates a C run-time file handle and
        sets it to point to the operating-system file handle.  When
        _open_osfhandle() function is used on a socket descriptor, both
        _close() and closesocket() should be called before exiting.  However,
        on Windows NT 4.0 Service Pack 3, closesocket() after _close() returns
-       10038. */
+       10038.
+    */
 
     int ret = closesocket(_get_osfhandle(fd));
     if (SOCKET_ERROR == ret)

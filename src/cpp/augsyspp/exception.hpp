@@ -73,8 +73,10 @@ namespace aug {
     }
 }
 
-/** The following series of catch blocks would typically be used to contain
-    exceptions from within functions that cannot throw. */
+/**
+   The following series of catch blocks would typically be used to contain
+   exceptions from within functions that cannot throw.
+*/
 
 #define AUG_PERRINFOCATCH \
 catch (const aug::errinfo_error& e) { \

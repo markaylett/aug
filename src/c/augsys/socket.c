@@ -7,14 +7,16 @@
 static const char rcsid[] = "$Id$";
 
 #if !defined(_WIN32)
-# define SETAFNOSUPPORT_() \
+# define SETAFNOSUPPORT_()                                  \
     aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT)
 # include "augsys/posix/socket.c"
 #else /* _WIN32 */
-# define SETAFNOSUPPORT_() \
+# define SETAFNOSUPPORT_()                                      \
     aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT)
 # include "augsys/win32/socket.c"
 #endif /* _WIN32 */
+
+#include "augsys/errno.h"
 
 struct ipv4_ {
     short family_;
@@ -146,4 +148,20 @@ aug_inetloopback(int af)
         return NULL;
     }
     return addr;
+}
+
+AUGSYS_API int
+aug_acceptlost(void)
+{
+    if (AUG_SRCPOSIX == aug_errsrc)
+        switch (aug_errnum) {
+        case ECONNABORTED:
+#if !defined(_WIN32)
+        case EPROTO:
+#endif // !_WIN32
+        case EWOULDBLOCK:
+            return 1;
+        }
+
+    return 0;
 }

@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
- * \file format.h
- * \brief TODO
+   \file format.h
+   \brief TODO
  */
 
 #ifndef AUGMAR_FORMAT_H_

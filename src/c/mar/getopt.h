@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
- * \file getopt.h
- * \brief TODO
+   \file getopt.h
+   \brief TODO
  */
 
 #ifndef MAR_GETOPT_H
