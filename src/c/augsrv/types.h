@@ -6,25 +6,29 @@
 
 #include "augutil/var.h"
 
-#define AUG_RETNODAEMON (-2)
-
 enum aug_option {
 
-    /* The following options are required and should remain constant during
-       the call to aug_main(). */
+    /**
+       The following options are required and should remain constant during
+       the call to aug_main().
+    */
 
     AUG_OPTLONGNAME = 1,
     AUG_OPTSHORTNAME,
     AUG_OPTPROGRAM,
-    AUG_OPTADMIN,
+    AUG_OPTEMAIL,
 
-    /* The following option is optional (may be null) but should remain
-       constant after the call to aug_service.config_(). */
+    /**
+       The following option is optional (may be null) but should remain
+       constant after the call to aug_service.config_().
+    */
 
     AUG_OPTCONFFILE,
 
-    /* The following option is required and should remain constant during the
-       call to aug_service.config_(). */
+    /**
+       The following option is required and should remain constant during the
+       call to aug_service.config_().
+    */
 
     AUG_OPTPIDFILE
 };

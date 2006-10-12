@@ -25,6 +25,8 @@ typedef unsigned __int64 uint64_t;
 
 typedef unsigned aug_len_t;
 
+#ifndef AUG_LOGLEVEL
+#define AUG_LOGLEVEL
 enum aug_loglevel {
     AUG_LOGCRIT,
     AUG_LOGERROR,
@@ -33,5 +35,6 @@ enum aug_loglevel {
     AUG_LOGINFO,
     AUG_LOGDEBUG
 };
+#endif /* AUG_LOGLEVEL */
 
 #endif /* AUGSYS_TYPES_H */

@@ -4,7 +4,7 @@
 #define AUGSRV_BUILD
 #include "augsrv/options.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsrv/types.h"  /* struct aug_service */
 
@@ -23,7 +23,7 @@ usage_(const struct aug_service* service)
 {
     const char* lname = service->getopt_(&service->arg_, AUG_OPTLONGNAME);
     const char* program = service->getopt_(&service->arg_, AUG_OPTPROGRAM);
-    const char* admin = service->getopt_(&service->arg_, AUG_OPTADMIN);
+    const char* email = service->getopt_(&service->arg_, AUG_OPTEMAIL);
 
     if (lname)
         aug_info("%s\n", lname);
@@ -44,8 +44,8 @@ usage_(const struct aug_service* service)
              "  test       run interactively\n"
              "  uninstall  uninstall program\n");
 
-    if (admin)
-        aug_info("report bugs to: %s\n", admin);
+    if (email)
+        aug_info("report bugs to: %s\n", email);
 }
 
 AUGSRV_API int

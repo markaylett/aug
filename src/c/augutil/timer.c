@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/timer.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
@@ -78,7 +78,7 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
     struct timeval tv;
     struct aug_timer_* timer;
 
-    if (-1 == id)
+    if (id <= 0)
         id = aug_nextid();
     else
         aug_canceltimer(timers, id);
@@ -115,7 +115,9 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
         if (it->id_ == id) {
 
             AUG_REMOVE_PREVPTR(it, prev, timers);
-            if (-1 == expiry_(&it->tv_, it->ms_ = ms))
+            if (ms) /* May be zero. */
+                it->ms_ = ms;
+            if (-1 == expiry_(&it->tv_, it->ms_))
                 return -1;
 
             insert_(timers, it);
@@ -125,9 +127,7 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
             prev = &AUG_NEXT(it);
     }
 
-    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
-                   AUG_MSG("no timer with descriptor '%d'"), (int)id);
-    return -1;
+    return AUG_RETNONE;
 }
 
 AUGUTIL_API int

@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #undef __STRICT_ANSI__ /* snprintf() */
 #include "message.h"
@@ -237,10 +237,10 @@ static const char*
 getopt_(const struct aug_var* arg, enum aug_option opt)
 {
     switch (opt) {
-    case AUG_OPTADMIN:
-        return "Mark Aylett <mark@emantic.co.uk>";
     case AUG_OPTCONFFILE:
         return *conffile_ ? conffile_ : NULL;
+    case AUG_OPTEMAIL:
+        return "Mark Aylett <mark@emantic.co.uk>";
     case AUG_OPTLONGNAME:
         return "HTTP Daemon";
     case AUG_OPTPIDFILE:

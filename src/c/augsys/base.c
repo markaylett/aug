@@ -279,10 +279,10 @@ aug_exit(int status)
 AUGSYS_API int
 aug_nextid(void)
 {
-    static int id_ = 0;
+    static int id_ = 1;
 
     if (id_ == INT_MAX) {
-        id_ = 0;
+        id_ = 1;
         return INT_MAX;
     }
 

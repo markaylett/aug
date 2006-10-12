@@ -8,6 +8,10 @@
 
 struct aug_service;
 
+/**
+   \return on Windows, #AUG_RETNONE if the service has not been installed.
+*/
+
 AUGSRV_API int
 aug_daemonise(const struct aug_service* service);
 

@@ -109,11 +109,14 @@ namespace aug {
         return ret;
     }
 
-    inline void
-    resettimer(struct aug_timers& timers, idref ref, unsigned ms)
+    inline bool
+    resettimer(struct aug_timers& timers, idref ref, unsigned ms = 0)
     {
-        if (-1 == aug_resettimer(&timers, ref.get(), ms))
+        int ret(aug_resettimer(&timers, ref.get(), ms));
+        if (-1 == ret)
             throwerrinfo("aug_resettimer() failed");
+
+        return AUG_RETNONE == ret ? false : true;
     }
 
     inline bool
@@ -165,16 +168,24 @@ namespace aug {
         {
         }
 
+        timer&
+        operator =(const null_&)
+        {
+            cancel();
+            ref_ = null;
+            return *this;
+        }
+
         void
         set(unsigned ms, timercb_base& cb)
         {
             ref_ = settimer(timers_, ref_, ms, cb);
         }
 
-        void
-        reset(unsigned ms)
+        bool
+        reset(unsigned ms = 0)
         {
-            resettimer(timers_, ref_, ms);
+            return resettimer(timers_, ref_, ms);
         }
 
         bool

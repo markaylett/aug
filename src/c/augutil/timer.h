@@ -19,14 +19,23 @@ AUGUTIL_API int
 aug_freetimers(struct aug_timers* timers);
 
 /**
-   If an id of -1 is specified, a new id will be allocated.  Otherwise, if a
-   timer with a matching id exists in the list of timers, it will be
-   cancelled prior to setting the new timer.
+   If id <= 0, a new id will be allocated.  Alternatively, a previously
+   allocated timer id can be specified.  In which case, any timer with a
+   matching id will be cancelled prior to setting the new timer.
+
+   \return the timer id.
 */
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
              aug_timercb_t cb, const struct aug_var* arg);
+
+/**
+   \param ms may be zero, it which case the previous timeout value will be
+   used.
+
+   \return #AUG_RETNONE if the timer does not exist.
+*/
 
 AUGUTIL_API int
 aug_resettimer(struct aug_timers* timers, int id, unsigned ms);

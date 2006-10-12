@@ -201,8 +201,11 @@ namespace test {
         state(conncb_base& cb)
             : sfd_(null)
         {
+            aug_hostserv hostserv;
+            parsehostserv(address_, hostserv);
+
             endpoint ep(null);
-            smartfd sfd(tcplisten("127.0.0.1", "8080", ep));
+            smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
 
             insertconn(conns_, aug_eventin(), cb);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
@@ -337,10 +340,10 @@ namespace test {
         do_getopt(enum aug_option opt)
         {
             switch (opt) {
-            case AUG_OPTADMIN:
-                return "Mark Aylett <mark@emantic.co.uk>";
             case AUG_OPTCONFFILE:
                 return *conffile_ ? conffile_ : 0;
+            case AUG_OPTEMAIL:
+                return "Mark Aylett <mark@emantic.co.uk>";
             case AUG_OPTLONGNAME:
                 return "Multiplexer Daemon";
             case AUG_OPTPIDFILE:

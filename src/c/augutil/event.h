@@ -22,6 +22,13 @@ struct aug_event {
     struct aug_var arg_;
 };
 
+/**
+   This function simplifies the mapping of signals to events.  Some signals
+   have cannonical mappings to specific events types.  For example, #SIGHUP
+   maps to the #AUG_EVENTRECONF event type.  Others may get mapped to the more
+   general #AUG_EVENTSIGNAL type.
+*/
+
 AUGUTIL_API struct aug_event*
 aug_setsigevent(struct aug_event* event, int sig);
 

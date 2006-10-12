@@ -4,7 +4,7 @@
 #define AUGSRV_BUILD
 #include "augsrv/main.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsrv/base.h"
 #include "augsrv/control.h"
@@ -88,7 +88,7 @@ daemonise_(const struct aug_service* service)
         die_("failed to daemonise process");
     case 0:
         break;
-    case AUG_RETNODAEMON:
+    case AUG_RETNONE:
         foreground_(service);
         break;
     default:

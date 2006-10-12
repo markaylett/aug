@@ -10,8 +10,6 @@
 #define AUG_IOEVENTWR    0x2
 #define AUG_IOEVENTRDWR (AUG_IOEVENTRD | AUG_IOEVENTWR)
 
-#define AUG_RETINTR     (-2)
-
 struct timeval;
 
 typedef struct aug_mplexer_* aug_mplexer_t;

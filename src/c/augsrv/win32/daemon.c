@@ -152,7 +152,7 @@ aug_daemonise(const struct aug_service* service)
 
         DWORD err = GetLastError();
         if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == err)
-            ret = AUG_RETNODAEMON;
+            ret = AUG_RETNONE;
         else {
             aug_setwin32errinfo(__FILE__, __LINE__, err);
             ret = -1;
