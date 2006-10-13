@@ -53,7 +53,7 @@ namespace aug {
         struct aug_inetaddr addr_;
 
     public:
-        inetaddr(const null_&) NOTHROW
+        inetaddr(const null_&) AUG_NOTHROW
         {
             clear(addr_);
         }
@@ -70,7 +70,7 @@ namespace aug {
         }
 
         inetaddr&
-        operator =(const null_&) NOTHROW
+        operator =(const null_&) AUG_NOTHROW
         {
             clear(addr_);
             return *this;

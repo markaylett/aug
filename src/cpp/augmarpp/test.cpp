@@ -48,7 +48,7 @@ namespace {
             s << "line " << l << ends;
         }
         const char*
-        what() const NOTHROW
+        what() const AUG_NOTHROW
         {
             return line_;
         }

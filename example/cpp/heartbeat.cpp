@@ -425,7 +425,7 @@ namespace {
         }
 
     public:
-        ~session() NOTHROW
+        ~session() AUG_NOTHROW
         {
             // When a master shutsdown, if should send a handover message to
             // the last known slave.

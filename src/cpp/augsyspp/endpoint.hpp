@@ -75,7 +75,7 @@ namespace aug {
         struct aug_endpoint ep_;
 
     public:
-        endpoint(const null_&) NOTHROW
+        endpoint(const null_&) AUG_NOTHROW
         {
             clear(ep_);
         }
@@ -88,7 +88,7 @@ namespace aug {
         }
 
         endpoint&
-        operator =(const null_&) NOTHROW
+        operator =(const null_&) AUG_NOTHROW
         {
             clear(ep_);
             return *this;

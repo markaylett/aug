@@ -23,16 +23,16 @@ namespace aug {
     class marref {
         aug_mar_t mar_;
     public:
-        marref(const null_&) NOTHROW
+        marref(const null_&) AUG_NOTHROW
             : mar_(0)
         {
         }
-        marref(aug_mar_t mar) NOTHROW
+        marref(aug_mar_t mar) AUG_NOTHROW
             : mar_(mar)
         {
         }
         aug_mar_t
-        get() const NOTHROW
+        get() const AUG_NOTHROW
         {
             return mar_;
         }
@@ -59,7 +59,7 @@ namespace aug {
             field_.size_ = 0;
         }
     public:
-        field(const null_&) NOTHROW
+        field(const null_&) AUG_NOTHROW
         {
             clear();
         }
@@ -86,7 +86,7 @@ namespace aug {
             setvalue(v);
         }
         field&
-        operator =(const null_&) NOTHROW
+        operator =(const null_&) AUG_NOTHROW
         {
             clear();
             return *this;

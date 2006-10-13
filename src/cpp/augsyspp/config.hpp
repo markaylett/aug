@@ -26,8 +26,8 @@
 # endif // AUGSYSPP_BUILD
 #endif // AUGSYSPP_SHARED
 
-#if !defined(NOTHROW)
-# define NOTHROW throw()
-#endif // !NOTHROW
+#if !defined(AUG_NOTHROW)
+# define AUG_NOTHROW throw()
+#endif // !AUG_NOTHROW
 
 #endif // AUGSYSPP_CONFIG_HPP

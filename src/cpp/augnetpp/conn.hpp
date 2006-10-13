@@ -27,7 +27,7 @@ namespace aug {
 
     public:
         virtual
-        ~conncb_base() NOTHROW
+        ~conncb_base() AUG_NOTHROW
         {
         }
 
@@ -59,7 +59,7 @@ namespace aug {
         operator =(const conns&);
 
     public:
-        ~conns() NOTHROW
+        ~conns() AUG_NOTHROW
         {
             if (-1 == aug_freeconns(&conns_))
                 aug_perrinfo("aug_freeconns() failed");

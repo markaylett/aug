@@ -90,7 +90,7 @@ namespace aug {
         operator =(const var&);
 
     public:
-        var(const null_&) NOTHROW
+        var(const null_&) AUG_NOTHROW
         {
             clear(var_);
         }
@@ -103,7 +103,7 @@ namespace aug {
         }
 
         var&
-        operator =(const null_&) NOTHROW
+        operator =(const null_&) AUG_NOTHROW
         {
             clear(var_);
             return *this;

@@ -32,7 +32,7 @@ namespace aug {
 
     public:
         virtual
-        ~service_base() NOTHROW
+        ~service_base() AUG_NOTHROW
         {
         }
 

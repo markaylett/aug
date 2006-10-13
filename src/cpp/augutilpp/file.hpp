@@ -22,7 +22,7 @@ namespace aug {
 
     public:
         virtual
-        ~confcb_base() NOTHROW
+        ~confcb_base() AUG_NOTHROW
         {
         }
 

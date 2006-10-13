@@ -214,7 +214,7 @@ namespace test {
         }
 
     public:
-        ~service() NOTHROW
+        ~service() AUG_NOTHROW
         {
         }
 

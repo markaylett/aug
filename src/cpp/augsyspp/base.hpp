@@ -93,7 +93,7 @@ namespace aug {
         operator =(const scoped_init& rhs);
 
     public:
-        ~scoped_init() NOTHROW
+        ~scoped_init() AUG_NOTHROW
         {
             if (-1 == aug_term())
                 aug_perror("aug_term() failed");

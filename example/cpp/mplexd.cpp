@@ -171,7 +171,7 @@ namespace test {
             } else
                 shutdown(sfd_, SHUT_RDWR);
         }
-        ~session() NOTHROW
+        ~session() AUG_NOTHROW
         {
             try {
                 setioeventmask(mplexer_, sfd_, 0);
@@ -406,7 +406,7 @@ namespace test {
         }
 
     public:
-        ~service() NOTHROW
+        ~service() AUG_NOTHROW
         {
         }
         service()

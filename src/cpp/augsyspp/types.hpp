@@ -41,16 +41,16 @@ namespace aug {
     class idref {
         int id_;
     public:
-        idref(const null_&) NOTHROW
+        idref(const null_&) AUG_NOTHROW
         : id_(-1)
         {
         }
-        idref(int id) NOTHROW
+        idref(int id) AUG_NOTHROW
         : id_(id)
         {
         }
         int
-        get() const NOTHROW
+        get() const AUG_NOTHROW
         {
             return id_;
         }

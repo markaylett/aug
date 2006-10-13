@@ -31,7 +31,7 @@ namespace aug {
         operator =(const timers&);
 
     public:
-        ~timers() NOTHROW
+        ~timers() AUG_NOTHROW
         {
             if (-1 == aug_freetimers(&timers_))
                 aug_perrinfo("aug_freetimers() failed");
@@ -66,7 +66,7 @@ namespace aug {
 
     public:
         virtual
-        ~timercb_base() NOTHROW
+        ~timercb_base() AUG_NOTHROW
         {
         }
 
@@ -156,7 +156,7 @@ namespace aug {
         operator =(const timer& rhs);
 
     public:
-        ~timer() NOTHROW
+        ~timer() AUG_NOTHROW
         {
             if (null != ref_)
                 canceltimer(timers_, ref_);

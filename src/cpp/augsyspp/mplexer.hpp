@@ -23,7 +23,7 @@ namespace aug {
         operator =(const mplexer&);
 
     public:
-        ~mplexer() NOTHROW
+        ~mplexer() AUG_NOTHROW
         {
             if (-1 == aug_freemplexer(mplexer_))
                 aug_perrinfo("aug_freemplexer() failed");

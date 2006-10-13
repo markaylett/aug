@@ -26,8 +26,8 @@
 # endif // AUGMARPP_BUILD
 #endif // AUGMARPP_SHARED
 
-#if !defined(NOTHROW)
-# define NOTHROW throw()
-#endif // !NOTHROW
+#if !defined(AUG_NOTHROW)
+# define AUG_NOTHROW throw()
+#endif // !AUG_NOTHROW
 
 #endif // AUGMARPP_CONFIG_HPP

@@ -70,7 +70,7 @@ namespace aug {
             operator =(const buffer& rhs);
 
         public:
-            ~buffer() NOTHROW
+            ~buffer() AUG_NOTHROW
             {
                 if (buffer_)
                     delete[] buffer_;
@@ -467,7 +467,7 @@ namespace aug {
         }
 
     public:
-        ~basic_marstreambuf() NOTHROW
+        ~basic_marstreambuf() AUG_NOTHROW
         {
             if (is_open())
                 close();

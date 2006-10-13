@@ -26,8 +26,8 @@
 # endif // AUGNETPP_BUILD
 #endif // AUGNETPP_SHARED
 
-#if !defined(NOTHROW)
-# define NOTHROW throw()
-#endif // !NOTHROW
+#if !defined(AUG_NOTHROW)
+# define AUG_NOTHROW throw()
+#endif // !AUG_NOTHROW
 
 #endif // AUGNETPP_CONFIG_HPP

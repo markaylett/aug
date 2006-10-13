@@ -34,7 +34,7 @@ namespace aug {
         operator =(const mutex&);
 
     public:
-        ~mutex() NOTHROW
+        ~mutex() AUG_NOTHROW
         {
             if (-1 == aug_freemutex(mutex_))
                 aug_perrinfo("aug_freemutex() failed");
@@ -69,7 +69,7 @@ namespace aug {
         operator =(const scoped_lock& rhs);
 
     public:
-        ~scoped_lock() NOTHROW
+        ~scoped_lock() AUG_NOTHROW
         {
             if (-1 == aug_unlockmutex(mutex_))
                 aug_perrinfo("aug_unlockmutex() failed");
@@ -93,7 +93,7 @@ namespace aug {
         operator =(const scoped_unlock& rhs);
 
     public:
-        ~scoped_unlock() NOTHROW
+        ~scoped_unlock() AUG_NOTHROW
         {
             if (-1 == aug_lockmutex(mutex_))
                 aug_perrinfo("aug_lockmutex() failed");

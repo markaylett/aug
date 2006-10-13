@@ -26,8 +26,8 @@
 # endif // AUGSRVPP_BUILD
 #endif // AUGSRVPP_SHARED
 
-#if !defined(NOTHROW)
-# define NOTHROW throw()
-#endif // !NOTHROW
+#if !defined(AUG_NOTHROW)
+# define AUG_NOTHROW throw()
+#endif // !AUG_NOTHROW
 
 #endif // AUGSRVPP_CONFIG_HPP

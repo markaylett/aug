@@ -31,7 +31,7 @@ namespace aug {
         }
 
     public:
-        ~smartmar() NOTHROW
+        ~smartmar() AUG_NOTHROW
         {
             if (null == ref_)
                 return;
@@ -40,7 +40,7 @@ namespace aug {
                 aug_perrinfo("aug_releasemar() failed");
         }
 
-        smartmar(const null_&) NOTHROW
+        smartmar(const null_&) AUG_NOTHROW
         : ref_(null)
         {
         }
@@ -53,7 +53,7 @@ namespace aug {
         }
 
         smartmar&
-        operator =(const null_& rhs) NOTHROW
+        operator =(const null_& rhs) AUG_NOTHROW
         {
             ref_ = null;
             return *this;
@@ -68,7 +68,7 @@ namespace aug {
         }
 
         void
-        swap(smartmar& rhs) NOTHROW
+        swap(smartmar& rhs) AUG_NOTHROW
         {
             std::swap(ref_, rhs.ref_);
         }

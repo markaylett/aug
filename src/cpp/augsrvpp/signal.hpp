@@ -41,7 +41,7 @@ namespace aug {
         operator =(const scoped_block& rhs);
 
     public:
-        ~scoped_block() NOTHROW
+        ~scoped_block() AUG_NOTHROW
         {
             if (-1 == aug_unblocksignals())
                 aug_perrinfo("aug_unblocksignals() failed");
@@ -61,7 +61,7 @@ namespace aug {
         operator =(const scoped_unblock& rhs);
 
     public:
-        ~scoped_unblock() NOTHROW
+        ~scoped_unblock() AUG_NOTHROW
         {
             if (-1 == aug_blocksignals())
                 aug_perrinfo("aug_blocksignals() failed");

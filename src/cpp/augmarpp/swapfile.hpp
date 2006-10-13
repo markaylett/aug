@@ -34,7 +34,7 @@ namespace aug {
         operator =(const swapfile& rhs);
 
     public:
-        ~swapfile() NOTHROW
+        ~swapfile() AUG_NOTHROW
         {
             try {
                 close(false);

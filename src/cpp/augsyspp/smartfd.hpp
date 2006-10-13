@@ -14,7 +14,7 @@ namespace aug {
     class smartfd {
         fdref ref_;
 
-        smartfd(fdref ref, bool retain) NOTHROW
+        smartfd(fdref ref, bool retain) AUG_NOTHROW
         : ref_(ref)
         {
             if (retain && null != ref)
@@ -22,13 +22,13 @@ namespace aug {
         }
 
     public:
-        ~smartfd() NOTHROW
+        ~smartfd() AUG_NOTHROW
         {
             if (null != ref_ && -1 == aug_releasefd(ref_.get()))
                 aug_perrinfo("aug_releasefd() failed");
         }
 
-        smartfd(const null_&) NOTHROW
+        smartfd(const null_&) AUG_NOTHROW
             : ref_(null)
         {
         }
@@ -41,7 +41,7 @@ namespace aug {
         }
 
         smartfd&
-        operator =(const null_&) NOTHROW
+        operator =(const null_&) AUG_NOTHROW
         {
             ref_ = null;
             return *this;
@@ -56,7 +56,7 @@ namespace aug {
         }
 
         void
-        swap(smartfd& rhs) NOTHROW
+        swap(smartfd& rhs) AUG_NOTHROW
         {
             std::swap(ref_, rhs.ref_);
         }
