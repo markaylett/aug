@@ -97,7 +97,10 @@ namespace aug {
                     conncb_base*>(aug_getvarp(arg));
                 return ptr->callback(id, *conns) ? 1 : 0;
             } AUG_SETERRINFOCATCH;
-            return 0; /* false */
+
+            // Do not remove the connection unless explicitly asked to.
+
+            return 1;
         }
     }
 
