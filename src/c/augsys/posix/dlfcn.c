@@ -23,7 +23,7 @@ aug_dlclose(aug_dlib_t dlib)
     void* handle = dlib->handle_;
     free(dlib);
     if (0 != dlclose(handle)) {
-        seterrinfo(__FILE__, __LINE__);
+        seterrinfo_(__FILE__, __LINE__);
         return -1;
     }
     return 0;
@@ -40,7 +40,7 @@ aug_dlopen(const char* path)
 
     if (!(dlib->handle_ = dlopen(path, RTLD_LAZY))) {
         free(dlib);
-        seterrinfo(__FILE__, __LINE__);
+        seterrinfo_(__FILE__, __LINE__);
         return NULL;
     }
     return dlib;
@@ -51,7 +51,7 @@ aug_dlsym(aug_dlib_t dlib, const char* symbol)
 {
     void* fn = dlsym(dlib->handle_, symbol);
     if (!fn) {
-        seterrinfo(__FILE__, __LINE__);
+        seterrinfo_(__FILE__, __LINE__);
         return NULL;
     }
     return fn;
