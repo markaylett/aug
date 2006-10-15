@@ -63,6 +63,7 @@ case $host in
     AC_SEARCH_LIBS(gethostbyname, nsl)
     AC_SEARCH_LIBS(gethostname, nsl)
     AC_SEARCH_LIBS(socket, socket)
+    AC_SEARCH_LIBS(dlopen, [dl])
 
     if test "$threads" != "no"; then
         CFLAGS="-pthread -D_MT $CFLAGS"

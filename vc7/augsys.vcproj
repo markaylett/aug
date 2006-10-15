@@ -116,6 +116,9 @@
 				RelativePath="..\src\c\augsys\defs.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\dlfcn.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\endian.c">
 			</File>
 			<File
@@ -188,6 +191,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\defs.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augsys\dlfcn.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\endian.h">

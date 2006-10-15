@@ -113,6 +113,9 @@
 				RelativePath="..\src\cpp\augsyspp\config.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augsyspp\dlfcn.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsyspp\endpoint.hpp">
 			</File>
 			<File
@@ -167,6 +170,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\config.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsyspp\dlfcn.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\endpoint.hpp">
