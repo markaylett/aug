@@ -12,6 +12,7 @@
 #define AUG_SRCLOCAL 1
 #define AUG_SRCPOSIX 2
 #define AUG_SRCWIN32 3
+#define AUG_SRCDLFCN 4
 
 /**
    These error constants may also be used as return codes for communicating

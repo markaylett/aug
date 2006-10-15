@@ -53,15 +53,16 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 @AUG_CPPBUILD_TRUE@libaugsyspp_la_DEPENDENCIES =  \
 @AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-am__libaugsyspp_la_SOURCES_DIST = base.cpp config.cpp endpoint.cpp \
-	exception.cpp inetaddr.cpp mcast.cpp mplexer.cpp mutex.cpp \
-	null.cpp smartfd.cpp smartptr.cpp socket.cpp string.cpp \
-	time.cpp types.cpp unistd.cpp utility.cpp
+am__libaugsyspp_la_SOURCES_DIST = base.cpp config.cpp dlfcn.cpp \
+	endpoint.cpp exception.cpp inetaddr.cpp mcast.cpp mplexer.cpp \
+	mutex.cpp null.cpp smartfd.cpp smartptr.cpp socket.cpp \
+	string.cpp time.cpp types.cpp unistd.cpp utility.cpp
 @AUG_CPPBUILD_TRUE@am_libaugsyspp_la_OBJECTS = base.lo config.lo \
-@AUG_CPPBUILD_TRUE@	endpoint.lo exception.lo inetaddr.lo \
-@AUG_CPPBUILD_TRUE@	mcast.lo mplexer.lo mutex.lo null.lo \
-@AUG_CPPBUILD_TRUE@	smartfd.lo smartptr.lo socket.lo string.lo \
-@AUG_CPPBUILD_TRUE@	time.lo types.lo unistd.lo utility.lo
+@AUG_CPPBUILD_TRUE@	dlfcn.lo endpoint.lo exception.lo \
+@AUG_CPPBUILD_TRUE@	inetaddr.lo mcast.lo mplexer.lo mutex.lo \
+@AUG_CPPBUILD_TRUE@	null.lo smartfd.lo smartptr.lo socket.lo \
+@AUG_CPPBUILD_TRUE@	string.lo time.lo types.lo unistd.lo \
+@AUG_CPPBUILD_TRUE@	utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
 @AUG_CPPBUILD_TRUE@am_libaugsyspp_la_rpath =
 am__augsyspp_smartptrtest_SOURCES_DIST = smartptrtest.cpp
@@ -222,6 +223,7 @@ modincludedir = $(includedir)/augsyspp
 modinclude_HEADERS = \
 	base.hpp \
 	config.hpp \
+	dlfcn.hpp \
 	endpoint.hpp \
 	exception.hpp \
 	inetaddr.hpp \
@@ -242,6 +244,7 @@ modinclude_HEADERS = \
 @AUG_CPPBUILD_TRUE@libaugsyspp_la_SOURCES = \
 @AUG_CPPBUILD_TRUE@	base.cpp \
 @AUG_CPPBUILD_TRUE@	config.cpp \
+@AUG_CPPBUILD_TRUE@	dlfcn.cpp \
 @AUG_CPPBUILD_TRUE@	endpoint.cpp \
 @AUG_CPPBUILD_TRUE@	exception.cpp \
 @AUG_CPPBUILD_TRUE@	inetaddr.cpp \
@@ -344,6 +347,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlfcn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endpoint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inetaddr.Plo@am__quote@

@@ -7,6 +7,7 @@
 #include "augsys/base.h"
 #include "augsys/debug.h"
 #include "augsys/defs.h"
+#include "augsys/dlfcn.h"
 #include "augsys/endian.h"
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"

@@ -9,6 +9,7 @@ modinclude_HEADERS = \
 	config.h \
 	debug.h \
 	defs.h \
+	dlfcn.h \
 	endian.h \
 	errinfo.h \
 	errno.h \
@@ -39,6 +40,7 @@ libaugsys_la_SOURCES = \
 	config.c \
 	debug.c \
 	defs.c \
+	dlfcn.c \
 	endian.c \
 	errinfo.c \
 	errno.c \

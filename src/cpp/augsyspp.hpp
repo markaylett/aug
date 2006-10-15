@@ -7,6 +7,7 @@
 #include "augsys.h"
 
 #include "augsyspp/base.hpp"
+#include "augsyspp/dlfcn.hpp"
 #include "augsyspp/endpoint.hpp"
 #include "augsyspp/exception.hpp"
 #include "augsyspp/inetaddr.hpp"
