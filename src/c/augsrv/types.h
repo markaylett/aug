@@ -35,9 +35,10 @@ enum aug_option {
 
 struct aug_service {
     const char* (*getopt_)(const struct aug_var*, enum aug_option);
-    int (*config_)(const struct aug_var*, const char*, int);
+    int (*readconf_)(const struct aug_var*, const char*, int);
     int (*init_)(const struct aug_var*);
     int (*run_)(const struct aug_var*);
+    void (*term_)(const struct aug_var*);
     struct aug_var arg_;
 };
 

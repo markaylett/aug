@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#include "augsrv/base.h"
 #include "augsrv/options.h"
-#include "augsrv/types.h"
 
 #include "augutil/log.h"
 
@@ -207,10 +207,10 @@ closein_(void)
 }
 
 AUGSRV_API int
-aug_daemonise(const struct aug_service* service)
+aug_daemonise(void)
 {
     const char* pidfile;
-    if (!(pidfile = service->getopt_(&service->arg_, AUG_OPTPIDFILE))) {
+    if (!(pidfile = aug_getserviceopt(AUG_OPTPIDFILE))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return -1;
@@ -225,7 +225,5 @@ aug_daemonise(const struct aug_service* service)
     if (-1 == closein_())
         return -1;
 
-    return -1 == service->init_(&service->arg_)
-        || -1 == service->run_(&service->arg_)
-        ? -1 : 0;
+    return -1 == aug_initservice() || -1 == aug_runservice() ? -1 : 0;
 }

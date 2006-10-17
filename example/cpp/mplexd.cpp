@@ -22,7 +22,7 @@ namespace test {
 
     const char* program_;
 
-    cstring conffile_= "";
+    cstring confpath_= "";
     cstring rundir_;
     cstring pidfile_ = "mplexd.pid";
     cstring logfile_ = "mplexd.log";
@@ -67,14 +67,14 @@ namespace test {
     bool quit_(false);
 
     void
-    reconfig()
+    reconf()
     {
-        if (*conffile_) {
+        if (*confpath_) {
 
-            aug_info("reading: %s", conffile_);
+            aug_info("reading: %s", confpath_);
 
             test::confcb cb;
-            readconf(conffile_, cb);
+            readconf(confpath_, cb);
         }
 
         if (-1 == chdir(rundir_)) {
@@ -92,13 +92,13 @@ namespace test {
     }
 
     void
-    config(const char* conffile, bool daemon)
+    readconf(const char* confpath, bool daemon)
     {
-        if (conffile)
-            realpath(conffile_, conffile, sizeof(conffile_));
+        if (confpath)
+            realpath(confpath_, confpath, sizeof(confpath_));
 
         daemon_ = daemon;
-        reconfig();
+        reconf();
     }
 
     class buffer {
@@ -241,7 +241,7 @@ namespace test {
             switch (aug::readevent(aug_eventin(), event).type_) {
             case AUG_EVENTRECONF:
                 aug_info("received AUG_EVENTRECONF");
-                reconfig();
+                reconf();
                 break;
             case AUG_EVENTSTATUS:
                 aug_info("received AUG_EVENTSTATUS");
@@ -341,7 +341,7 @@ namespace test {
         {
             switch (opt) {
             case AUG_OPTCONFFILE:
-                return *conffile_ ? conffile_ : 0;
+                return *confpath_ ? confpath_ : 0;
             case AUG_OPTEMAIL:
                 return "Mark Aylett <mark@emantic.co.uk>";
             case AUG_OPTLONGNAME:
@@ -357,9 +357,9 @@ namespace test {
         }
 
         void
-        do_config(const char* conffile, bool daemon)
+        do_readconf(const char* confpath, bool daemon)
         {
-            test::config(conffile, daemon);
+            test::readconf(confpath, daemon);
         }
 
         void
@@ -401,15 +401,17 @@ namespace test {
 
                 processconns(state_->conns_);
             }
+        }
 
-            aug_info("stopping daemon process");
+        void
+        do_term()
+        {
+            aug_info("terminating daemon process");
+            state_.reset();
         }
 
     public:
         ~service() AUG_NOTHROW
-        {
-        }
-        service()
         {
         }
     };

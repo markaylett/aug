@@ -6,7 +6,7 @@
 
 static const char rcsid[] = "$Id$";
 
-#include "augsrv/types.h"  /* struct aug_service */
+#include "augsrv/base.h"   /* aug_basename() */
 
 #include "augutil/path.h"  /* aug_basename() */
 #include "augutil/getopt.h"
@@ -19,11 +19,11 @@ static const char rcsid[] = "$Id$";
 #include <string.h>
 
 static void
-usage_(const struct aug_service* service)
+usage_(void)
 {
-    const char* lname = service->getopt_(&service->arg_, AUG_OPTLONGNAME);
-    const char* program = service->getopt_(&service->arg_, AUG_OPTPROGRAM);
-    const char* email = service->getopt_(&service->arg_, AUG_OPTEMAIL);
+    const char* lname = aug_getserviceopt(AUG_OPTLONGNAME);
+    const char* program = aug_getserviceopt(AUG_OPTPROGRAM);
+    const char* email = aug_getserviceopt(AUG_OPTEMAIL);
 
     if (lname)
         aug_info("%s\n", lname);
@@ -85,11 +85,10 @@ aug_tocommand(const char* s)
 }
 
 AUGSRV_API int
-aug_readopts(const struct aug_service* service, struct aug_options* options,
-             int argc, char* argv[])
+aug_readopts(struct aug_options* options, int argc, char* argv[])
 {
     int ch, ret;
-    options->conffile_ = NULL;
+    options->confpath_ = NULL;
 
     aug_optind = 1; /* Skip program name. */
     aug_opterr = 0;
@@ -98,21 +97,21 @@ aug_readopts(const struct aug_service* service, struct aug_options* options,
         switch (ch) {
         case 'f':
             if (aug_optind == argc
-                || !*(options->conffile_ = argv[aug_optind++])) {
+                || !*(options->confpath_ = argv[aug_optind++])) {
 
-                usage_(service);
+                usage_();
                 aug_error("missing path argument");
                 return -1;
             }
             break;
         case 'h':
             options->command_ = AUG_CMDEXIT;
-            usage_(service);
+            usage_();
             return 0;
         case '?':
         default:
 
-            usage_(service);
+            usage_();
             aug_error("unknown option '%c'", aug_optopt);
             return -1;
         }
@@ -124,7 +123,7 @@ aug_readopts(const struct aug_service* service, struct aug_options* options,
     case 1:
         if (-1 == (ret = aug_tocommand(argv[aug_optind]))) {
 
-            usage_(service);
+            usage_();
             aug_error("invalid command '%s'", argv[aug_optind]);
             return -1;
         }
@@ -132,7 +131,7 @@ aug_readopts(const struct aug_service* service, struct aug_options* options,
         break;
     default:
 
-        usage_(service);
+        usage_();
         aug_error("too many arguments");
         return -1;
     }

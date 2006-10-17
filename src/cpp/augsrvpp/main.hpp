@@ -22,13 +22,16 @@ namespace aug {
         do_getopt(enum aug_option opt) = 0;
 
         virtual void
-        do_config(const char* conffile, bool daemon) = 0;
+        do_readconf(const char* confpath, bool daemon) = 0;
 
         virtual void
         do_init() = 0;
 
         virtual void
         do_run() = 0;
+
+        virtual void
+        do_term() = 0;
 
     public:
         virtual
@@ -43,9 +46,9 @@ namespace aug {
         }
 
         void
-        config(const char* conffile, bool daemon)
+        readconf(const char* confpath, bool daemon)
         {
-            do_config(conffile, daemon);
+            do_readconf(confpath, daemon);
         }
 
         void
@@ -56,6 +59,12 @@ namespace aug {
 
         void
         run()
+        {
+            do_run();
+        }
+
+        void
+        term()
         {
             do_run();
         }
@@ -75,12 +84,12 @@ namespace aug {
         }
 
         inline int
-        config(const struct aug_var* arg, const char* conffile, int daemon)
+        readconf(const struct aug_var* arg, const char* confpath, int daemon)
         {
             try {
                 service_base* ptr = static_cast<
                     service_base*>(aug_getvarp(arg));
-                ptr->config(conffile, daemon ? true : false);
+                ptr->readconf(confpath, daemon ? true : false);
                 return 0;
             } AUG_SETERRINFOCATCH;
             return -1;
@@ -109,6 +118,16 @@ namespace aug {
             } AUG_SETERRINFOCATCH;
             return -1;
         }
+
+        inline void
+        term(const struct aug_var* arg)
+        {
+            try {
+                service_base* ptr = static_cast<
+                    service_base*>(aug_getvarp(arg));
+                ptr->term();
+            } AUG_PERRINFOCATCH;
+        }
     }
 
     /**
@@ -123,9 +142,10 @@ namespace aug {
     {
         struct aug_service s = {
             detail::getopt,
-            detail::config,
+            detail::readconf,
             detail::init,
             detail::run,
+            detail::term,
             { AUG_VTNULL }
         };
         aug_setvarp(&s.arg_, &service);

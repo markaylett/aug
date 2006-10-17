@@ -5,19 +5,27 @@
 #define AUGSRV_BASE_H
 
 #include "augsrv/config.h"
-
-struct aug_service;
+#include "augsrv/types.h"
 
 #if defined(AUGSRV_BUILD)
 AUGSRV_EXTERN void
 aug_setservice_(const struct aug_service* service);
-
-AUGSRV_EXTERN void
-aug_seteventpipe_(int fds[2]);
 #endif /* AUGSRV_BUILD */
 
-AUGSRV_API const struct aug_service*
-aug_service(void);
+AUGSRV_API const char*
+aug_getserviceopt(enum aug_option opt);
+
+AUGSRV_API int
+aug_readserviceconf(const char* confpath, int daemon);
+
+AUGSRV_API int
+aug_initservice(void);
+
+AUGSRV_API int
+aug_runservice(void);
+
+AUGSRV_API void
+aug_exitservice(int status);
 
 AUGSRV_API int
 aug_eventin(void);

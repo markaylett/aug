@@ -16,7 +16,7 @@ namespace test {
 
     const char* program_;
 
-    char conffile_[AUG_PATH_MAX + 1] = "";
+    char confpath_[AUG_PATH_MAX + 1] = "";
     char rundir_[AUG_PATH_MAX + 1];
     char pidfile_[AUG_PATH_MAX + 1] = "timerd.pid";
     char logfile_[AUG_PATH_MAX + 1] = "timerd.log";
@@ -86,7 +86,7 @@ namespace test {
             switch (aug::readevent(aug_eventin(), event).type_) {
             case AUG_EVENTRECONF:
                 aug_info("received AUG_EVENTRECONF");
-                reconfig();
+                reconf();
                 break;
             case AUG_EVENTSTATUS:
                 aug_info("received AUG_EVENTSTATUS");
@@ -99,14 +99,14 @@ namespace test {
         }
 
         void
-        reconfig()
+        reconf()
         {
-            if (*conffile_) {
+            if (*confpath_) {
 
-                aug_info("reading: %s", conffile_);
+                aug_info("reading: %s", confpath_);
 
                 test::confcb cb;
-                readconf(conffile_, cb);
+                aug::readconf(confpath_, cb);
             }
 
             if (-1 == chdir(rundir_)) {
@@ -130,7 +130,7 @@ namespace test {
         {
             switch (opt) {
             case AUG_OPTCONFFILE:
-                return *conffile_ ? conffile_ : 0;
+                return *confpath_ ? confpath_ : 0;
             case AUG_OPTEMAIL:
                 return "Mark Aylett <mark@emantic.co.uk>";
             case AUG_OPTLONGNAME:
@@ -146,16 +146,16 @@ namespace test {
         }
 
         void
-        do_config(const char* conffile, bool daemon)
+        do_readconf(const char* confpath, bool daemon)
         {
-            if (conffile && !aug_realpath(conffile_, conffile,
-                                          sizeof(conffile_))) {
+            if (confpath && !aug_realpath(confpath_, confpath,
+                                          sizeof(confpath_))) {
                 aug_setposixerrinfo(__FILE__, __LINE__, errno);
                 throwerrinfo("aug_realpath() failed");
             }
 
             daemon_ = daemon;
-            reconfig();
+            reconf();
         }
 
         void
@@ -202,8 +202,13 @@ namespace test {
 
                 readevent();
             }
+        }
 
-            aug_info("stopping daemon process");
+        void
+        do_term()
+        {
+            aug_info("terminating daemon process");
+            state_.reset();
         }
 
         void

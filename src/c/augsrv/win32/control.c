@@ -1,9 +1,8 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#include "augsrv/base.h"
 #include "augsrv/options.h"
-
-#include "augsrv/types.h"  /* struct aug_service */
 
 #include "augutil/path.h"
 #include "augutil/strbuf.h"
@@ -19,13 +18,13 @@
 #define OFFSET_ 128
 
 static aug_strbuf_t
-makepath_(const struct aug_service* service)
+makepath_(void)
 {
-    const char* program, * conffile;
+    const char* program, * confpath;
     char buf[AUG_PATH_MAX + 1];
     aug_strbuf_t s;
 
-    if (!(program = service->getopt_(&service->arg_, AUG_OPTPROGRAM))) {
+    if (!(program = aug_getserviceopt(AUG_OPTPROGRAM))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPROGRAM' not set"));
         return NULL;
@@ -41,9 +40,9 @@ makepath_(const struct aug_service* service)
         || -1 == aug_catstrbufc(&s, '"'))
         goto fail;
 
-    if ((conffile = service->getopt_(&service->arg_, AUG_OPTCONFFILE))) {
+    if ((confpath = aug_getserviceopt(AUG_OPTCONFFILE))) {
 
-        if (!aug_realpath(buf, conffile, sizeof(buf)))
+        if (!aug_realpath(buf, confpath, sizeof(buf)))
             goto fail;
 
         if (-1 == aug_catstrbufs(&s, " -f \"")
@@ -60,7 +59,7 @@ makepath_(const struct aug_service* service)
 }
 
 static int
-start_(SC_HANDLE scm, const struct aug_service* service)
+start_(SC_HANDLE scm)
 {
     const char* sname;
     SC_HANDLE serv;
@@ -70,13 +69,13 @@ start_(SC_HANDLE scm, const struct aug_service* service)
         "-f", NULL
     };
 
-    if (!(sname = service->getopt_(&service->arg_, AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
 
-    argv[1] = service->getopt_(&service->arg_, AUG_OPTCONFFILE);
+    argv[1] = aug_getserviceopt(AUG_OPTCONFFILE);
 
     if (!(serv = OpenService(scm, sname, SERVICE_START))) {
         aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
@@ -109,14 +108,14 @@ fail:
 }
 
 static int
-control_(SC_HANDLE scm, const struct aug_service* service, int event)
+control_(SC_HANDLE scm, int event)
 {
     const char* sname;
     SC_HANDLE serv;
     SERVICE_STATUS status;
     int ret = 0;
 
-    if (!(sname = service->getopt_(&service->arg_, AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
@@ -139,26 +138,26 @@ control_(SC_HANDLE scm, const struct aug_service* service, int event)
 }
 
 static int
-install_(SC_HANDLE scm, const struct aug_service* service)
+install_(SC_HANDLE scm)
 {
     const char* lname, * sname;
     aug_strbuf_t path;
     SC_HANDLE serv;
     int ret = -1;
 
-    if (!(lname = service->getopt_(&service->arg_, AUG_OPTLONGNAME))) {
+    if (!(lname = aug_getserviceopt(AUG_OPTLONGNAME))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTLONGNAME' not set"));
         return -1;
     }
 
-    if (!(sname = service->getopt_(&service->arg_, AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
 
-    if (!(path = makepath_(service)))
+    if (!(path = makepath_()))
         return -1;
 
     if (!(serv = CreateService(scm, sname, lname, SERVICE_ALL_ACCESS,
@@ -179,14 +178,14 @@ install_(SC_HANDLE scm, const struct aug_service* service)
 }
 
 static int
-uninstall_(SC_HANDLE scm, const struct aug_service* service)
+uninstall_(SC_HANDLE scm)
 {
     const char* sname;
     SC_HANDLE serv;
     SERVICE_STATUS status;
     int ret = 0;
 
-    if (!(sname = service->getopt_(&service->arg_, AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
@@ -215,7 +214,7 @@ uninstall_(SC_HANDLE scm, const struct aug_service* service)
 }
 
 AUGSRV_API int
-aug_start(const struct aug_service* service)
+aug_start(void)
 {
     int ret;
     SC_HANDLE scm;
@@ -225,13 +224,13 @@ aug_start(const struct aug_service* service)
         return -1;
     }
 
-    ret = start_(scm, service);
+    ret = start_(scm);
     CloseServiceHandle(scm);
     return ret;
 }
 
 AUGSRV_API int
-aug_control(const struct aug_service* service, int event)
+aug_control(int event)
 {
     int ret;
     SC_HANDLE scm;
@@ -241,13 +240,13 @@ aug_control(const struct aug_service* service, int event)
         return -1;
     }
 
-    ret = control_(scm, service, event);
+    ret = control_(scm, event);
     CloseServiceHandle(scm);
     return ret;
 }
 
 AUGSRV_API int
-aug_install(const struct aug_service* service)
+aug_install(void)
 {
     int ret;
     SC_HANDLE scm;
@@ -257,13 +256,13 @@ aug_install(const struct aug_service* service)
         return -1;
     }
 
-    ret = install_(scm, service);
+    ret = install_(scm);
     CloseServiceHandle(scm);
     return ret;
 }
 
 AUGSRV_API int
-aug_uninstall(const struct aug_service* service)
+aug_uninstall(void)
 {
     int ret;
     SC_HANDLE scm;
@@ -273,7 +272,7 @@ aug_uninstall(const struct aug_service* service)
         return -1;
     }
 
-    ret = uninstall_(scm, service);
+    ret = uninstall_(scm);
     CloseServiceHandle(scm);
     return ret;
 }

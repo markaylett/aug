@@ -5,6 +5,7 @@
 #define AUGSYSPP_DLFCN_HPP
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/null.hpp"
 
 #include "augsys/dlfcn.h"
 
@@ -42,12 +43,40 @@ namespace aug {
                 aug_perrinfo("aug_dlclose() failed");
         }
 
+        dlib(const null_&) AUG_NOTHROW
+        : dlib_(0)
+        {
+        }
+
         explicit
         dlib(const char* path)
-            : dlib_(aug_dlopen(path))
         {
-            if (!dlib_)
+            open(path);
+        }
+
+        void
+        close()
+        {
+            if (dlib_) {
+                aug_dlib_t dlib(dlib_);
+                dlib_ = 0;
+                if (-1 == aug_dlclose(dlib))
+                    throwerrinfo("aug_dlclose() failed");
+            }
+        }
+
+        void
+        open(const char* path)
+        {
+            if (!(dlib_ = aug_dlopen(path)))
                 throwerrinfo("aug_dlopen() failed");
+        }
+
+        dlib&
+        operator =(const null_&)
+        {
+            close();
+            return *this;
         }
 
         operator aug_dlib_t()
@@ -61,6 +90,12 @@ namespace aug {
             return dlib_;
         }
     };
+}
+
+inline bool
+isnull(aug_dlib_t dlib)
+{
+    return 0 == dlib;
 }
 
 #endif // AUGSYSPP_DLFCN_HPP

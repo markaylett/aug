@@ -3,7 +3,6 @@
 */
 #include "augsrv/base.h"
 #include "augsrv/options.h"
-#include "augsrv/types.h" /* struct aug_service */
 
 #include "augutil/event.h"
 
@@ -53,12 +52,12 @@ handler_(DWORD code)
     case RECONF_:
         event.type_ = AUG_EVENTRECONF;
         if (!aug_writeevent(aug_eventout(), &event))
-            aug_perrinfo("failed to re-configure daemon");
+            aug_perrinfo("aug_writeevent() failed");
         break;
     case STATUS_:
         event.type_ = AUG_EVENTSTATUS;
         if (!aug_writeevent(aug_eventout(), &event))
-            aug_perrinfo("failed to get daemon status");
+            aug_perrinfo("aug_writeevent() failed");
         break;
     case STOP_:
     case SERVICE_CONTROL_STOP:
@@ -66,7 +65,7 @@ handler_(DWORD code)
         setstatus_(SERVICE_STOP_PENDING);
         event.type_ = AUG_EVENTSTOP;
         if (!aug_writeevent(aug_eventout(), &event)) {
-            aug_perrinfo("failed to stop daemon");
+            aug_perrinfo("aug_writeevent() failed");
             setstatus_(SERVICE_RUNNING);
         }
         break;
@@ -76,17 +75,16 @@ handler_(DWORD code)
 static void WINAPI
 start_(DWORD argc, char** argv)
 {
-    const struct aug_service* service = aug_service();
     const char* sname;
     struct aug_options options;
 
-    if (!(sname = service->getopt_(&service->arg_, AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return;
     }
 
-    if (-1 == aug_readopts(service, &options, argc, argv))
+    if (-1 == aug_readopts(&options, argc, argv))
         return;
 
     if (AUG_CMDDEFAULT != options.command_) {
@@ -99,23 +97,23 @@ start_(DWORD argc, char** argv)
         return;
     }
 
-    if (-1 == service->config_(&service->arg_, options.conffile_, 1)) {
-        aug_perrinfo("failed to configure daemon");
+    if (-1 == aug_readserviceconf(options.confpath_, 1)) {
+        aug_perrinfo("aug_readserviceconf() failed");
         return;
     }
 
     if (!(ssh_ = RegisterServiceCtrlHandler(sname, handler_))) {
 
         aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
-        aug_perrinfo("failed to register handler");
+        aug_perrinfo("RegisterServiceCtrlHandler() failed");
         return;
     }
 
     setstatus_(SERVICE_START_PENDING);
 
-    if (-1 == service->init_(&service->arg_)) {
+    if (-1 == aug_initservice()) {
 
-        aug_perrinfo("failed to initialise daemon");
+        aug_perrinfo("aug_initservice() failed");
         setstatus_(SERVICE_STOPPED);
         return;
     }
@@ -123,15 +121,15 @@ start_(DWORD argc, char** argv)
     aug_notice("daemon started");
     setstatus_(SERVICE_RUNNING);
 
-    if (-1 == service->run_(&service->arg_))
-        aug_perrinfo("error running daemon");
+    if (-1 == aug_runservice())
+        aug_perrinfo("aug_runservice() failed");
 
     aug_notice("daemon stopped");
     setstatus_(SERVICE_STOPPED);
 }
 
 AUGSRV_API int
-aug_daemonise(const struct aug_service* service)
+aug_daemonise(void)
 {
     int ret = 0;
     const char* sname;
@@ -140,7 +138,7 @@ aug_daemonise(const struct aug_service* service)
         { NULL, NULL }
     };
 
-    if (!(sname = service->getopt_(&service->arg_, AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;

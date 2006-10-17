@@ -6,13 +6,13 @@
 
 #include "augsrv/config.h"
 
-struct aug_service;
-
 /**
+   Called from aug_main().
+
    \return on Windows, #AUG_RETNONE if the service has not been installed.
 */
 
 AUGSRV_API int
-aug_daemonise(const struct aug_service* service);
+aug_daemonise(void);
 
 #endif /* AUGSRV_DAEMON_H */

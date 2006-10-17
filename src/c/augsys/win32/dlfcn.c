@@ -43,8 +43,12 @@ aug_dlopen(const char* path)
 AUGSYS_API void*
 aug_dlsym(aug_dlib_t dlib, const char* symbol)
 {
-	FARPROC fn = GetProcAddress(dlib->handle_, symbol);
-    if (!fn) {
+    union {
+        FARPROC fn_;
+        void* ptr_;
+    } local;
+
+    if (!(local.fn_ = GetProcAddress(dlib->handle_, symbol))) {
         aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
         return NULL;
     }
@@ -54,5 +58,5 @@ aug_dlsym(aug_dlib_t dlib, const char* symbol)
        pointer type.
     */
 
-    return (void*)*(void**)&fn;
+    return local.ptr_;
 }

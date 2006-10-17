@@ -20,14 +20,11 @@ enum aug_command {
 };
 
 struct aug_options {
-    const char* conffile_;
+    const char* confpath_;
     enum aug_command command_;
 };
 
-struct aug_service;
-
 AUGSRV_API int
-aug_readopts(const struct aug_service* service, struct aug_options* options,
-             int argc, char* argv[]);
+aug_readopts(struct aug_options* options, int argc, char* argv[]);
 
 #endif /* AUGSRV_OPTIONS_H */

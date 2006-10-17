@@ -1,9 +1,8 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#include "augsrv/base.h"
 #include "augsrv/options.h"
-
-#include "augsrv/types.h"  /* struct aug_service */
 
 #include "augsys/defs.h"
 #include "augsys/errinfo.h"
@@ -84,7 +83,7 @@ send_(int fd, pid_t pid, int event)
 }
 
 AUGSRV_API int
-aug_start(const struct aug_service* service)
+aug_start(void)
 {
     aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                    AUG_MSG("aug_start() not supported"));
@@ -92,13 +91,13 @@ aug_start(const struct aug_service* service)
 }
 
 AUGSRV_API int
-aug_control(const struct aug_service* service, int event)
+aug_control(int event)
 {
     const char* pidfile;
     struct flock fl;
     int fd, ret = -1;
 
-    if (!(pidfile = service->getopt_(&service->arg_, AUG_OPTPIDFILE))) {
+    if (!(pidfile = aug_getserviceopt(AUG_OPTPIDFILE))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return -1;
@@ -163,13 +162,13 @@ aug_control(const struct aug_service* service, int event)
 }
 
 AUGSRV_API int
-aug_install(const struct aug_service* service)
+aug_install(void)
 {
     return 0;
 }
 
 AUGSRV_API int
-aug_uninstall(const struct aug_service* service)
+aug_uninstall(void)
 {
     return 0;
 }

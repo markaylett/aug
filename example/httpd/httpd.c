@@ -30,7 +30,7 @@ static const char* program_;
 static int daemon_ = 0;
 static int quit_ = 0;
 
-static char conffile_[AUG_PATH_MAX + 1] = "";
+static char confpath_[AUG_PATH_MAX + 1] = "";
 static char rundir_[AUG_PATH_MAX + 1];
 static char pidfile_[AUG_PATH_MAX + 1] = "httpd.pid";
 static char logfile_[AUG_PATH_MAX + 1] = "httpd.log";
@@ -238,7 +238,7 @@ getopt_(const struct aug_var* arg, enum aug_option opt)
 {
     switch (opt) {
     case AUG_OPTCONFFILE:
-        return *conffile_ ? conffile_ : NULL;
+        return *confpath_ ? confpath_ : NULL;
     case AUG_OPTEMAIL:
         return "Mark Aylett <mark@emantic.co.uk>";
     case AUG_OPTLONGNAME:
@@ -256,11 +256,11 @@ getopt_(const struct aug_var* arg, enum aug_option opt)
 static int
 reconfig_(void)
 {
-    if (*conffile_) {
+    if (*confpath_) {
 
-        aug_info("reading: %s", conffile_);
+        aug_info("reading: %s", confpath_);
 
-        if (-1 == aug_readconf(conffile_, setconfopt_, NULL))
+        if (-1 == aug_readconf(confpath_, setconfopt_, NULL))
             return -1;
     }
 
@@ -278,9 +278,9 @@ reconfig_(void)
 }
 
 static int
-config_(const struct aug_var* arg, const char* conffile, int daemon)
+config_(const struct aug_var* arg, const char* confpath, int daemon)
 {
-    if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
+    if (confpath && !aug_realpath(confpath_, confpath, sizeof(confpath_)))
         return -1;
 
     daemon_ = daemon;
@@ -379,14 +379,18 @@ run_(const struct aug_var* arg)
         AUG_PERRINFO(aug_processconns(&conns_),
                      "aug_processconns() failed");
     }
+    return 0;
+}
 
-    aug_info("stopping daemon process");
+static void
+term_(const struct aug_var* arg)
+{
+    aug_info("terminating daemon process");
 
     AUG_PERRINFO(aug_freetimers(&timers_), "aug_freetimers() failed");
     AUG_PERRINFO(aug_freeconns(&conns_), "aug_freeconns() failed");
     AUG_PERRINFO(aug_close(fd_), "aug_close() failed");
     AUG_PERRINFO(aug_freemplexer(mplexer_), "aug_freemplexer() failed");
-    return 0;
 }
 
 int
@@ -398,6 +402,7 @@ main(int argc, char* argv[])
         config_,
         init_,
         run_,
+        term_,
         AUG_VARNULL
     };
 
