@@ -93,10 +93,10 @@ aug_getserviceopt(enum aug_option opt)
 }
 
 AUGSRV_API int
-aug_readserviceconf(const char* confpath, int daemon)
+aug_readserviceconf(const char* conffile, int daemon)
 {
     assert(service_.readconf_);
-    return service_.readconf_(&service_.arg_, confpath, daemon);
+    return service_.readconf_(&service_.arg_, conffile, daemon);
 }
 
 AUGSRV_API int
@@ -125,7 +125,7 @@ AUGSRV_API void
 aug_exitservice(int status)
 {
     if (-1 != fds_[0]) {
-        assert(service_.run_);
+        assert(service_.term_);
         service_.term_(&service_.arg_);
         closepipe_();
     }

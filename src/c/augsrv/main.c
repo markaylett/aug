@@ -129,7 +129,7 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
     if (daemon)
         aug_setlogger(aug_daemonlogger);
 
-    if (-1 == aug_readserviceconf(options.confpath_, daemon))
+    if (-1 == aug_readserviceconf(options.conffile_, daemon))
         die_("aug_readserviceconf() failed");
 
     switch (options.command_) {

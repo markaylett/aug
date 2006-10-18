@@ -88,7 +88,7 @@ AUGSRV_API int
 aug_readopts(struct aug_options* options, int argc, char* argv[])
 {
     int ch, ret;
-    options->confpath_ = NULL;
+    options->conffile_ = NULL;
 
     aug_optind = 1; /* Skip program name. */
     aug_opterr = 0;
@@ -97,7 +97,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         switch (ch) {
         case 'f':
             if (aug_optind == argc
-                || !*(options->confpath_ = argv[aug_optind++])) {
+                || !*(options->conffile_ = argv[aug_optind++])) {
 
                 usage_();
                 aug_error("missing path argument");

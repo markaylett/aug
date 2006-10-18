@@ -22,7 +22,7 @@ namespace aug {
         do_getopt(enum aug_option opt) = 0;
 
         virtual void
-        do_readconf(const char* confpath, bool daemon) = 0;
+        do_readconf(const char* conffile, bool daemon) = 0;
 
         virtual void
         do_init() = 0;
@@ -46,9 +46,9 @@ namespace aug {
         }
 
         void
-        readconf(const char* confpath, bool daemon)
+        readconf(const char* conffile, bool daemon)
         {
-            do_readconf(confpath, daemon);
+            do_readconf(conffile, daemon);
         }
 
         void
@@ -66,7 +66,7 @@ namespace aug {
         void
         term()
         {
-            do_run();
+            do_term();
         }
     };
 
@@ -84,12 +84,12 @@ namespace aug {
         }
 
         inline int
-        readconf(const struct aug_var* arg, const char* confpath, int daemon)
+        readconf(const struct aug_var* arg, const char* conffile, int daemon)
         {
             try {
                 service_base* ptr = static_cast<
                     service_base*>(aug_getvarp(arg));
-                ptr->readconf(confpath, daemon ? true : false);
+                ptr->readconf(conffile, daemon ? true : false);
                 return 0;
             } AUG_SETERRINFOCATCH;
             return -1;

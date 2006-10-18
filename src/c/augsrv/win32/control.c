@@ -20,7 +20,7 @@
 static aug_strbuf_t
 makepath_(void)
 {
-    const char* program, * confpath;
+    const char* program, * conffile;
     char buf[AUG_PATH_MAX + 1];
     aug_strbuf_t s;
 
@@ -40,9 +40,9 @@ makepath_(void)
         || -1 == aug_catstrbufc(&s, '"'))
         goto fail;
 
-    if ((confpath = aug_getserviceopt(AUG_OPTCONFFILE))) {
+    if ((conffile = aug_getserviceopt(AUG_OPTCONFFILE))) {
 
-        if (!aug_realpath(buf, confpath, sizeof(buf)))
+        if (!aug_realpath(buf, conffile, sizeof(buf)))
             goto fail;
 
         if (-1 == aug_catstrbufs(&s, " -f \"")

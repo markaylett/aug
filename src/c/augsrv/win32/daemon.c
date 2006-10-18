@@ -7,6 +7,7 @@
 #include "augutil/event.h"
 
 #include "augsys/errinfo.h"
+#include "augsys/limits.h"
 #include "augsys/log.h"
 #include "augsys/windows.h"
 
@@ -20,6 +21,17 @@
 #define STOP_    (OFFSET_ + AUG_EVENTSTOP)
 
 static SERVICE_STATUS_HANDLE ssh_;
+
+static const char*
+gettemp_(void)
+{
+    static char path[MAX_PATH + 1];
+    if (0 == GetTempPath(MAX_PATH, path)) {
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        return NULL;
+    }
+    return path;
+}
 
 static int
 setstatus_(DWORD state)
@@ -77,6 +89,19 @@ start_(DWORD argc, char** argv)
 {
     const char* sname;
     struct aug_options options;
+    const char* appdata = getenv("APPDATA");
+
+    /* Fallback to temp. */
+
+    if (!appdata && !(appdata = gettemp_()))
+        return;
+
+    /* Move away from system32. */
+
+    if (!SetCurrentDirectory(appdata)) {
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        return;
+    }
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
@@ -97,7 +122,7 @@ start_(DWORD argc, char** argv)
         return;
     }
 
-    if (-1 == aug_readserviceconf(options.confpath_, 1)) {
+    if (-1 == aug_readserviceconf(options.conffile_, 1)) {
         aug_perrinfo("aug_readserviceconf() failed");
         return;
     }

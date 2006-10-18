@@ -20,7 +20,7 @@ enum aug_command {
 };
 
 struct aug_options {
-    const char* confpath_;
+    const char* conffile_;
     enum aug_command command_;
 };
 

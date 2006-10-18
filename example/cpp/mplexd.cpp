@@ -22,7 +22,7 @@ namespace test {
 
     const char* program_;
 
-    cstring confpath_= "";
+    cstring conffile_= "";
     cstring rundir_;
     cstring pidfile_ = "mplexd.pid";
     cstring logfile_ = "mplexd.log";
@@ -69,12 +69,12 @@ namespace test {
     void
     reconf()
     {
-        if (*confpath_) {
+        if (*conffile_) {
 
-            aug_info("reading: %s", confpath_);
+            aug_info("reading: %s", conffile_);
 
             test::confcb cb;
-            readconf(confpath_, cb);
+            readconf(conffile_, cb);
         }
 
         if (-1 == chdir(rundir_)) {
@@ -92,10 +92,10 @@ namespace test {
     }
 
     void
-    readconf(const char* confpath, bool daemon)
+    readconf(const char* conffile, bool daemon)
     {
-        if (confpath)
-            realpath(confpath_, confpath, sizeof(confpath_));
+        if (conffile)
+            realpath(conffile_, conffile, sizeof(conffile_));
 
         daemon_ = daemon;
         reconf();
@@ -341,7 +341,7 @@ namespace test {
         {
             switch (opt) {
             case AUG_OPTCONFFILE:
-                return *confpath_ ? confpath_ : 0;
+                return *conffile_ ? conffile_ : 0;
             case AUG_OPTEMAIL:
                 return "Mark Aylett <mark@emantic.co.uk>";
             case AUG_OPTLONGNAME:
@@ -357,9 +357,9 @@ namespace test {
         }
 
         void
-        do_readconf(const char* confpath, bool daemon)
+        do_readconf(const char* conffile, bool daemon)
         {
-            test::readconf(confpath, daemon);
+            test::readconf(conffile, daemon);
         }
 
         void

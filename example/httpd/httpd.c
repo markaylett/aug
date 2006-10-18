@@ -30,7 +30,7 @@ static const char* program_;
 static int daemon_ = 0;
 static int quit_ = 0;
 
-static char confpath_[AUG_PATH_MAX + 1] = "";
+static char conffile_[AUG_PATH_MAX + 1] = "";
 static char rundir_[AUG_PATH_MAX + 1];
 static char pidfile_[AUG_PATH_MAX + 1] = "httpd.pid";
 static char logfile_[AUG_PATH_MAX + 1] = "httpd.log";
@@ -238,7 +238,7 @@ getopt_(const struct aug_var* arg, enum aug_option opt)
 {
     switch (opt) {
     case AUG_OPTCONFFILE:
-        return *confpath_ ? confpath_ : NULL;
+        return *conffile_ ? conffile_ : NULL;
     case AUG_OPTEMAIL:
         return "Mark Aylett <mark@emantic.co.uk>";
     case AUG_OPTLONGNAME:
@@ -256,11 +256,11 @@ getopt_(const struct aug_var* arg, enum aug_option opt)
 static int
 reconfig_(void)
 {
-    if (*confpath_) {
+    if (*conffile_) {
 
-        aug_info("reading: %s", confpath_);
+        aug_info("reading: %s", conffile_);
 
-        if (-1 == aug_readconf(confpath_, setconfopt_, NULL))
+        if (-1 == aug_readconf(conffile_, setconfopt_, NULL))
             return -1;
     }
 
@@ -278,9 +278,9 @@ reconfig_(void)
 }
 
 static int
-config_(const struct aug_var* arg, const char* confpath, int daemon)
+config_(const struct aug_var* arg, const char* conffile, int daemon)
 {
-    if (confpath && !aug_realpath(confpath_, confpath, sizeof(confpath_)))
+    if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
         return -1;
 
     daemon_ = daemon;

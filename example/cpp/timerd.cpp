@@ -16,7 +16,7 @@ namespace test {
 
     const char* program_;
 
-    char confpath_[AUG_PATH_MAX + 1] = "";
+    char conffile_[AUG_PATH_MAX + 1] = "";
     char rundir_[AUG_PATH_MAX + 1];
     char pidfile_[AUG_PATH_MAX + 1] = "timerd.pid";
     char logfile_[AUG_PATH_MAX + 1] = "timerd.log";
@@ -101,12 +101,12 @@ namespace test {
         void
         reconf()
         {
-            if (*confpath_) {
+            if (*conffile_) {
 
-                aug_info("reading: %s", confpath_);
+                aug_info("reading: %s", conffile_);
 
                 test::confcb cb;
-                aug::readconf(confpath_, cb);
+                aug::readconf(conffile_, cb);
             }
 
             if (-1 == chdir(rundir_)) {
@@ -130,7 +130,7 @@ namespace test {
         {
             switch (opt) {
             case AUG_OPTCONFFILE:
-                return *confpath_ ? confpath_ : 0;
+                return *conffile_ ? conffile_ : 0;
             case AUG_OPTEMAIL:
                 return "Mark Aylett <mark@emantic.co.uk>";
             case AUG_OPTLONGNAME:
@@ -146,10 +146,10 @@ namespace test {
         }
 
         void
-        do_readconf(const char* confpath, bool daemon)
+        do_readconf(const char* conffile, bool daemon)
         {
-            if (confpath && !aug_realpath(confpath_, confpath,
-                                          sizeof(confpath_))) {
+            if (conffile && !aug_realpath(conffile_, conffile,
+                                          sizeof(conffile_))) {
                 aug_setposixerrinfo(__FILE__, __LINE__, errno);
                 throwerrinfo("aug_realpath() failed");
             }

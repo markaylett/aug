@@ -46,3 +46,13 @@ aug_srand(unsigned seed)
 {
     srand(seed);
 }
+
+AUGSYS_API unsigned
+aug_threadid(void)
+{
+#if !defined(_MT)
+    return 0;
+#else /* _MT */
+    return (unsigned)GetCurrentThreadId();
+#endif /* _MT */
+}

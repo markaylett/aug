@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 static const char* program_;
-static char confpath_[AUG_PATH_MAX + 1] = "";
+static char conffile_[AUG_PATH_MAX + 1] = "";
 static int daemon_ = 0;
 
 static const char*
@@ -16,7 +16,7 @@ getopt_(const struct aug_var* arg, enum aug_option opt)
 {
     switch (opt) {
     case AUG_OPTCONFFILE:
-        return *confpath_ ? confpath_ : NULL;
+        return *conffile_ ? conffile_ : NULL;
     case AUG_OPTEMAIL:
         return "Mark Aylett <mark@emantic.co.uk>";
     case AUG_OPTLONGNAME:
@@ -32,9 +32,9 @@ getopt_(const struct aug_var* arg, enum aug_option opt)
 }
 
 static int
-config_(const struct aug_var* arg, const char* confpath, int daemon)
+config_(const struct aug_var* arg, const char* conffile, int daemon)
 {
-    if (confpath && !aug_realpath(confpath_, confpath, sizeof(confpath_)))
+    if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
         return -1;
 
     daemon_ = daemon;

@@ -7,6 +7,10 @@
 #include <stdlib.h> /* random(), srandom() */
 #include <sys/stat.h>
 
+#if defined(_MT)
+# include <pthread.h>
+#endif /* _MT */
+
 AUGSYS_API int
 aug_filesize(int fd, size_t* size)
 {
@@ -30,4 +34,14 @@ AUGSYS_API void
 aug_srand(unsigned seed)
 {
     srandom(seed);
+}
+
+AUGSYS_API unsigned
+aug_threadid(void)
+{
+#if !defined(_MT)
+    return 0;
+#else /* _MT */
+    return (unsigned)pthread_self();
+#endif /* _MT */
 }
