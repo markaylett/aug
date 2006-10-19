@@ -109,10 +109,7 @@ namespace test {
                 aug::readconf(conffile_, cb);
             }
 
-            if (-1 == chdir(rundir_)) {
-                aug_setposixerrinfo(__FILE__, __LINE__, errno);
-                throwerrinfo("chdir() failed");
-            }
+            aug::chdir(rundir_);
 
             if (daemon_ && -1 == aug_openlog(logfile_)) {
                 aug_setposixerrinfo(__FILE__, __LINE__, errno);

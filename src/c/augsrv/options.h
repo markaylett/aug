@@ -6,6 +6,8 @@
 
 #include "augsrv/config.h"
 
+#include "augsys/limits.h" /* AUG_PATH_MAX */
+
 enum aug_command {
 
     AUG_CMDDEFAULT,
@@ -20,7 +22,7 @@ enum aug_command {
 };
 
 struct aug_options {
-    const char* conffile_;
+    char conffile_[AUG_PATH_MAX + 1];
     enum aug_command command_;
 };
 

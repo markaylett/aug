@@ -16,6 +16,28 @@
 
 namespace aug {
 
+    inline void
+    chdir(const char* path)
+    {
+        if (-1 == aug_chdir(path))
+            throwerrinfo("aug_chdir() failed");
+    }
+
+    inline char*
+    getcwd(char* dst, size_t size)
+    {
+        if (!aug_getcwd(dst, size))
+            throwerrinfo("aug_getcwd() failed");
+        return dst;
+    }
+
+    inline std::string
+    getcwd()
+    {
+        char buf[AUG_PATH_MAX + 1];
+        return getcwd(buf, sizeof(buf));
+    }
+
     inline char*
     realpath(char* dst, const char* src, size_t size)
     {
@@ -28,10 +50,7 @@ namespace aug {
     realpath(const char* path)
     {
         char buf[AUG_PATH_MAX + 1];
-        if (!aug_realpath(buf, path, sizeof(buf)))
-            throwerrinfo("aug_realpath() failed");
-
-        return buf;
+        return realpath(buf, path, sizeof(buf));
     }
 }
 

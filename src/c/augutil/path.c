@@ -6,7 +6,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/path.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/errinfo.h"
 #include "augsys/limits.h" /* AUG_PATH_MAX */
@@ -41,6 +41,26 @@ aug_basename(const char* path)
             base = path + 1;
 
     return base;
+}
+
+AUGUTIL_API int
+aug_chdir(const char* path)
+{
+    if (-1 == chdir(path)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return -1;
+    }
+    return 0;
+}
+
+AUGUTIL_API char*
+aug_getcwd(char* dst, size_t size)
+{
+    if (!getcwd(dst, size)) {
+        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        return NULL;
+    }
+    return dst;
 }
 
 AUGUTIL_API char*

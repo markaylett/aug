@@ -12,6 +12,7 @@ static const char rcsid[] = "$Id$";
 #include "augutil/getopt.h"
 
 #include "augsys/defs.h"   /* AUG_MKSTR */
+#include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/string.h"
 
@@ -88,7 +89,8 @@ AUGSRV_API int
 aug_readopts(struct aug_options* options, int argc, char* argv[])
 {
     int ch, ret;
-    options->conffile_ = NULL;
+    const char* conffile;
+    *options->conffile_ = '\0';
 
     aug_optind = 1; /* Skip program name. */
     aug_opterr = 0;
@@ -96,11 +98,15 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
     while (EOF != (ch = aug_getopt(argc, argv, "fh")))
         switch (ch) {
         case 'f':
-            if (aug_optind == argc
-                || !*(options->conffile_ = argv[aug_optind++])) {
-
+            if (aug_optind == argc || !(conffile = argv[aug_optind++])) {
                 usage_();
                 aug_error("missing path argument");
+                return -1;
+            }
+            if (!aug_realpath(options->conffile_, conffile,
+                              sizeof(options->conffile_))) {
+                usage_();
+                aug_perrinfo("aug_realpath() failed");
                 return -1;
             }
             break;
@@ -110,7 +116,6 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
             return 0;
         case '?':
         default:
-
             usage_();
             aug_error("unknown option '%c'", aug_optopt);
             return -1;
@@ -130,7 +135,6 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         options->command_ = ret;
         break;
     default:
-
         usage_();
         aug_error("too many arguments");
         return -1;

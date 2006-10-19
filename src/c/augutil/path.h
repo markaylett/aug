@@ -11,6 +11,12 @@
 AUGUTIL_API const char*
 aug_basename(const char* path);
 
+AUGUTIL_API int
+aug_chdir(const char* path);
+
+AUGUTIL_API char*
+aug_getcwd(char* dst, size_t size);
+
 AUGUTIL_API char*
 aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
              size_t size);
