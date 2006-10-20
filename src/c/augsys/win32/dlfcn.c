@@ -40,23 +40,23 @@ aug_dlopen(const char* path)
     return dlib;
 }
 
-AUGSYS_API void*
+AUGSYS_API aug_fnptr_t
 aug_dlsym(aug_dlib_t dlib, const char* symbol)
 {
-    union {
-        FARPROC fn_;
-        void* ptr_;
-    } local;
-
-    if (!(local.fn_ = GetProcAddress(dlib->handle_, symbol))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
-        return NULL;
-    }
-
     /**
        Avoid warnings: ISO C forbids conversion of function pointer to object
        pointer type.
     */
 
-    return local.ptr_;
+    union {
+        FARPROC in_;
+        aug_fnptr_t out_;
+    } local;
+
+    if (!(local.in_ = GetProcAddress(dlib->handle_, symbol))) {
+        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        return NULL;
+    }
+
+    return local.out_;
 }

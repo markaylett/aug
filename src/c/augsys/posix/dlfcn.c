@@ -46,13 +46,23 @@ aug_dlopen(const char* path)
     return dlib;
 }
 
-AUGSYS_API void*
+AUGSYS_API aug_fnptr_t
 aug_dlsym(aug_dlib_t dlib, const char* symbol)
 {
-    void* fn = dlsym(dlib->handle_, symbol);
-    if (!fn) {
+    /**
+       Avoid warnings: ISO C forbids conversion of function pointer to object
+       pointer type.
+    */
+
+    union {
+        void* in_;
+        aug_fnptr_t out_;
+    } local;
+
+    if (!(local.in_ = dlsym(dlib->handle_, symbol))) {
         seterrinfo_(__FILE__, __LINE__);
         return NULL;
     }
-    return fn;
+
+    return local.out_;
 }

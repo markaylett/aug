@@ -11,10 +11,10 @@
 
 namespace aug {
 
-    inline void*
+    inline aug_fnptr_t
     dlsym(aug_dlib_t dlib, const char* symbol)
     {
-        void* fn(aug_dlsym(dlib, symbol));
+        aug_fnptr_t fn(aug_dlsym(dlib, symbol));
         if (!fn)
             throwerrinfo("aug_dlsym() failed");
         return fn;
@@ -24,7 +24,7 @@ namespace aug {
     fnT
     dlsym(aug_dlib_t dlib, const char* symbol)
     {
-        return (fnT)(dlsym(dlib, symbol));
+        return (fnT)dlsym(dlib, symbol);
     }
 
     class dlib {
