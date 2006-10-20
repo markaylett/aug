@@ -17,7 +17,7 @@ namespace test {
     const char* program_;
 
     char conffile_[AUG_PATH_MAX + 1] = "";
-    char rundir_[AUG_PATH_MAX + 1];
+    char rundir_[AUG_PATH_MAX + 1] = "";
     char pidfile_[AUG_PATH_MAX + 1] = "timerd.pid";
     char logfile_[AUG_PATH_MAX + 1] = "timerd.log";
 
@@ -41,10 +41,10 @@ namespace test {
 
             } else if (0 == aug_strcasecmp(name, "rundir")) {
 
-                if (!aug_realpath(rundir_, value, sizeof(rundir_))) {
-                    aug_setposixerrinfo(__FILE__, __LINE__, errno);
-                    throwerrinfo("aug_realpath() failed");
-                }
+                // Once set, the run directory should not change.
+
+                if (!*rundir_)
+                    realpath(rundir_, value, sizeof(rundir_));
 
             } else {
 
@@ -86,6 +86,11 @@ namespace test {
             switch (aug::readevent(aug_eventin(), event).type_) {
             case AUG_EVENTRECONF:
                 aug_info("received AUG_EVENTRECONF");
+                if (*conffile_) {
+                    aug_info("reading: %s", conffile_);
+                    test::confcb cb;
+                    aug::readconf(conffile_, cb);
+                }
                 reconf();
                 break;
             case AUG_EVENTSTATUS:
@@ -101,20 +106,10 @@ namespace test {
         void
         reconf()
         {
-            if (*conffile_) {
-
-                aug_info("reading: %s", conffile_);
-
-                test::confcb cb;
-                aug::readconf(conffile_, cb);
-            }
-
             aug::chdir(rundir_);
 
-            if (daemon_ && -1 == aug_openlog(logfile_)) {
-                aug_setposixerrinfo(__FILE__, __LINE__, errno);
-                throwerrinfo("aug_openlog() failed");
-            }
+            if (daemon_)
+                openlog(logfile_);
 
             aug_info("run directory: %s", rundir_);
             aug_info("pid file: %s", pidfile_);
@@ -145,13 +140,20 @@ namespace test {
         void
         do_readconf(const char* conffile, bool daemon)
         {
-            if (conffile && !aug_realpath(conffile_, conffile,
-                                          sizeof(conffile_))) {
-                aug_setposixerrinfo(__FILE__, __LINE__, errno);
-                throwerrinfo("aug_realpath() failed");
+            if (conffile) {
+                aug_info("reading: %s", conffile);
+                test::confcb cb;
+                aug::readconf(conffile, cb);
+                aug_strlcpy(conffile_, conffile, sizeof(conffile_));
             }
 
             daemon_ = daemon;
+
+            // Use working directory as default.
+
+            if (!*rundir_)
+                realpath(rundir_, getcwd().c_str(), sizeof(rundir_));
+
             reconf();
         }
 
@@ -252,11 +254,6 @@ main(int argc, char* argv[])
 		service serv;
 
         program_ = argv[0];
-
-        if (!getcwd(rundir_, sizeof(rundir_))) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
-            throwerrinfo("getcwd() failed");
-        }
 
         main(serv, argc, argv);
 

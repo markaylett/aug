@@ -31,7 +31,7 @@ static int daemon_ = 0;
 static int quit_ = 0;
 
 static char conffile_[AUG_PATH_MAX + 1] = "";
-static char rundir_[AUG_PATH_MAX + 1];
+static char rundir_[AUG_PATH_MAX + 1] = "";
 static char pidfile_[AUG_PATH_MAX + 1] = "httpd.pid";
 static char logfile_[AUG_PATH_MAX + 1] = "httpd.log";
 static char address_[AUG_PATH_MAX + 1] = "127.0.0.1:8080";
@@ -221,7 +221,9 @@ setconfopt_(const struct aug_var* arg, const char* name, const char* value)
 
     } else if (0 == aug_strcasecmp(name, "rundir")) {
 
-        if (!aug_realpath(rundir_, value, sizeof(rundir_)))
+        /* Once set, the run directory should not change. */
+
+        if (!*rundir_ && !aug_realpath(rundir_, value, sizeof(rundir_)))
             return -1;
 
     } else {
@@ -254,16 +256,8 @@ getopt_(const struct aug_var* arg, enum aug_option opt)
 }
 
 static int
-reconfig_(void)
+reconf_(void)
 {
-    if (*conffile_) {
-
-        aug_info("reading: %s", conffile_);
-
-        if (-1 == aug_readconf(conffile_, setconfopt_, NULL))
-            return -1;
-    }
-
     AUG_PERROR(chdir(rundir_), "chdir() failed");
 
     if (daemon_)
@@ -280,11 +274,26 @@ reconfig_(void)
 static int
 config_(const struct aug_var* arg, const char* conffile, int daemon)
 {
-    if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
-        return -1;
+    if (conffile) {
+        aug_info("reading: %s", conffile);
+        if (-1 == aug_readconf(conffile, setconfopt_, NULL))
+            return -1;
+        aug_strlcpy(conffile_, conffile, sizeof(conffile_));
+    }
 
     daemon_ = daemon;
-    return reconfig_();
+
+    /* Use working directory as default. */
+
+    if (!*rundir_) {
+        char cwd[AUG_PATH_MAX + 1];
+        if (!aug_getcwd(cwd, sizeof(cwd)))
+            return -1;
+        if (!aug_realpath(rundir_, cwd, sizeof(rundir_)))
+            return -1;
+    }
+
+    return reconf_();
 }
 
 static int
@@ -304,7 +313,12 @@ readevent_(const struct aug_var* arg, int fd, struct aug_conns* conns)
     switch (event.type_) {
     case AUG_EVENTRECONF:
         aug_info("received AUG_EVENTRECONF");
-        AUG_PERRINFO(reconfig_(), "failed to re-configure daemon");
+        if (*conffile_) {
+            aug_info("reading: %s", conffile_);
+            if (-1 == aug_readconf(conffile_, setconfopt_, NULL))
+                return -1;
+        }
+        AUG_PERRINFO(reconf_(), "failed to re-configure daemon");
         break;
     case AUG_EVENTSTATUS:
         aug_info("received AUG_EVENTSTATUS");
@@ -407,14 +421,8 @@ main(int argc, char* argv[])
     };
 
     program_ = argv[0];
-    aug_atexitinit(&errinfo);
-
     service_ = &service;
-    if (!getcwd(rundir_, sizeof(rundir_))) {
-        aug_perror("getcwd() failed");
-        return 1;
-    }
-
+    aug_atexitinit(&errinfo);
     aug_main(&service, argc, argv);
     return 1;
 }

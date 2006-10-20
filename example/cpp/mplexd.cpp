@@ -23,7 +23,7 @@ namespace test {
     const char* program_;
 
     cstring conffile_= "";
-    cstring rundir_;
+    cstring rundir_ = "";
     cstring pidfile_ = "mplexd.pid";
     cstring logfile_ = "mplexd.log";
     cstring address_ = "127.0.0.1:8080";
@@ -52,7 +52,10 @@ namespace test {
 
             } else if (0 == aug_strcasecmp(name, "rundir")) {
 
-                realpath(rundir_, value, sizeof(rundir_));
+                // Once set, the run directory should not change.
+
+                if (!*rundir_)
+                    realpath(rundir_, value, sizeof(rundir_));
 
             } else {
 
@@ -69,14 +72,6 @@ namespace test {
     void
     reconf()
     {
-        if (*conffile_) {
-
-            aug_info("reading: %s", conffile_);
-
-            test::confcb cb;
-            readconf(conffile_, cb);
-        }
-
         aug::chdir(rundir_);
 
         if (daemon_)
@@ -91,10 +86,20 @@ namespace test {
     void
     readconf(const char* conffile, bool daemon)
     {
-        if (conffile)
-            realpath(conffile_, conffile, sizeof(conffile_));
+        if (conffile) {
+            aug_info("reading: %s", conffile);
+            test::confcb cb;
+            readconf(conffile, cb);
+            aug_strlcpy(conffile_, conffile, sizeof(conffile_));
+        }
 
         daemon_ = daemon;
+
+        // Use working directory as default.
+
+        if (!*rundir_)
+            realpath(rundir_, getcwd().c_str(), sizeof(rundir_));
+
         reconf();
     }
 
@@ -238,6 +243,11 @@ namespace test {
             switch (aug::readevent(aug_eventin(), event).type_) {
             case AUG_EVENTRECONF:
                 aug_info("received AUG_EVENTRECONF");
+                if (*conffile_) {
+                    aug_info("reading: %s", conffile_);
+                    test::confcb cb;
+                    aug::readconf(conffile_, cb);
+                }
                 reconf();
                 break;
             case AUG_EVENTSTATUS:
@@ -441,11 +451,6 @@ main(int argc, char* argv[])
 
         blocksignals();
         aug_setloglevel(AUG_LOGINFO);
-
-        if (!getcwd(rundir_, sizeof(rundir_))) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
-            throwerrinfo("getcwd() failed");
-        }
 
         main(serv, argc, argv);
 

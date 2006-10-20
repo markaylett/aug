@@ -137,6 +137,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augsrvpp/Makefile
                  src/cpp/augsyspp/Makefile
                  src/cpp/augutilpp/Makefile
+                 src/cpp/augas/Makefile
                  src/pl/Makefile
                  src/sh/Makefile
                  vc7/Makefile])
