@@ -44,13 +44,16 @@ enum augas_loglevel {
     AUGAS_LOGDEBUG
 };
 
-#define AUGAS_TIMRD    0x01
-#define AUGAS_TIMWR    0x02
-#define AUGAS_TIMBOTH (AUGAS_TIMRD | AUGAS_TIMWR)
+#define AUGAS_TIMRD     0x01
+#define AUGAS_TIMWR     0x02
+#define AUGAS_TIMBOTH  (AUGAS_TIMRD | AUGAS_TIMWR)
 
-#define AUGAS_SESSELF  0x01
-#define AUGAS_SESOTHER 0x02
-#define AUGAS_SESALL  (AUGAS_SESSELF | AUGAS_SESOTHER)
+#define AUGAS_SESSELF   0x01
+#define AUGAS_SESOTHER  0x02
+#define AUGAS_SESALL   (AUGAS_SESSELF | AUGAS_SESOTHER)
+
+#define AUGAS_SUCCESS   0
+#define AUGAS_FAILURE (-1)
 
 typedef unsigned augas_sid;
 

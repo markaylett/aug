@@ -4,10 +4,19 @@ modincludedir = $(includedir)/augas
 modinclude_HEADERS = \
 	module.h
 
+noinst_HEADERS = \
+	buffer.hpp \
+	module.hpp \
+	utility.hpp
+
 bin_PROGRAMS = augasd
 
 augasd_SOURCES = \
-	augasd.cpp
+	augasd.cpp \
+	buffer.cpp \
+	module.cpp \
+	options.cpp \
+	utility.cpp
 
 augasd_LDADD = \
 	$(top_srcdir)/src/c/augnet/libaugnet.la \

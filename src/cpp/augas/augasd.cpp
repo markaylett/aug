@@ -7,7 +7,12 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "module.h"
+#include "augas/buffer.hpp"
+#include "augas/module.hpp"
+#include "augas/options.hpp"
+#include "augas/utility.hpp"
+
+#include "augconfig.h"
 
 #include <cassert>
 #include <map>
@@ -21,242 +26,19 @@ using namespace std;
 
 namespace augas {
 
-    void
-    close_(const struct augas_session* s)
-    {
-    }
-
-    int
-    open_(struct augas_session* s, const char* serv)
-    {
-        return 0;
-    }
-
-    int
-    data_(const struct augas_session* s, const char* buf, size_t size)
-    {
-        return 0;
-    }
-
-    int
-    rdexpire_(const struct augas_session* s, unsigned* ms)
-    {
-        return 0;
-    }
-
-    int
-    wrexpire_(const struct augas_session* s, unsigned* ms)
-    {
-        return 0;
-    }
-
-    int
-    stop_(const struct augas_session* s)
-    {
-        return 0;
-    }
-
-    int
-    event_(int type, void* arg)
-    {
-        return 0;
-    }
-
-    int
-    expire_(void* arg, unsigned id, unsigned* ms)
-    {
-        return 0;
-    }
-
-    int
-    reconf_(void)
-    {
-        return 0;
-    }
-
-    void
-    setdefaults(struct augas_module& dst, const struct augas_module& src)
-    {
-        dst.close_ = src.close_ ? src.close_ : close_;
-        dst.open_ = src.open_ ? src.open_ : open_;
-        dst.data_ = src.data_ ? src.data_ : data_;
-        dst.rdexpire_ = src.rdexpire_ ? src.rdexpire_ : rdexpire_;
-        dst.wrexpire_ = src.wrexpire_ ? src.wrexpire_ : wrexpire_;
-        dst.stop_ = src.stop_ ? src.stop_ : stop_;
-        dst.event_ = src.event_ ? src.event_ : event_;
-        dst.expire_ = src.expire_ ? src.expire_ : expire_;
-        dst.reconf_ = src.reconf_ ? src.reconf_ : reconf_;
-    }
-
-    class module {
-        dlib lib_;
-        augas_unloadfn unloadfn_;
-        struct augas_module module_;
-    public:
-        ~module() AUG_NOTHROW
-        {
-            unloadfn_();
-        }
-        module(const char* path, const struct augas_service& service)
-            : lib_(path)
-        {
-            augas_loadfn loadfn(dlsym<augas_loadfn>(lib_, "augas_load"));
-            unloadfn_ = dlsym<augas_unloadfn>(lib_, "augas_unload");
-            setdefaults(module_, *loadfn(&service));
-        }
-        void
-        close(const struct augas_session& s) const
-        {
-            module_.close_(&s);
-        }
-        int
-        open(struct augas_session& s, const char* serv) const
-        {
-            return module_.open_(&s, serv);
-        }
-        int
-        data(const struct augas_session& s, const char* buf,
-             size_t size) const
-        {
-            return module_.data_(&s, buf, size);
-        }
-        int
-        rdexpire(const struct augas_session& s, unsigned& ms) const
-        {
-            return module_.rdexpire_(&s, &ms);
-        }
-        int
-        wrexpire(const struct augas_session& s, unsigned& ms) const
-        {
-            return module_.wrexpire_(&s, &ms);
-        }
-        int
-        stop(const struct augas_session& s) const
-        {
-            return module_.stop_(&s);
-        }
-        int
-        event(int type, void* arg) const
-        {
-            return module_.event_(type, arg);
-        }
-        int
-        expire(void* arg, unsigned id, unsigned* ms) const
-        {
-            return module_.expire_(arg, id, ms);
-        }
-        int
-        reconf() const
-        {
-            return module_.reconf_();
-        }
-    };
-
-    class buffer {
-        vector<char> vec_;
-        size_t begin_, end_;
-    public:
-        explicit
-        buffer(size_t size = 4096)
-            : vec_(size),
-              begin_(0),
-              end_(0)
-        {
-        }
-        void
-        putsome(const void* buf, size_t size)
-        {
-            if (vec_.size() - end_ < size)
-                vec_.resize(end_ + size);
-
-            memcpy(&vec_[end_], buf, size);
-            end_ += size;
-        }
-        bool
-        readsome(fdref ref)
-        {
-            char buf[4096];
-			size_t size(aug::read(ref, buf, sizeof(buf) - 1));
-            if (0 == size)
-                return false;
-
-            putsome(buf, size);
-            return true;
-        }
-        bool
-        writesome(fdref ref)
-        {
-            size_t size(end_ - begin_);
-			size = aug::write(ref, &vec_[begin_], size);
-            if ((begin_ += size) == end_) {
-                begin_ = end_ = 0;
-                return false;
-            }
-            return true;
-        }
-        bool
-        consume(size_t n)
-        {
-            size_t size(end_ - begin_);
-            size = AUG_MIN(n, size);
-            if ((begin_ += size) == end_) {
-                begin_ = end_ = 0;
-                return false;
-            }
-            return true;
-        }
-        bool
-        empty() const
-        {
-            return begin_ == end_;
-        }
-    };
-
-    class opts : private confcb_base {
-        map<string, string> opts_;
-        void
-        do_callback(const char* name, const char* value)
-        {
-            opts_[name] = value;
-        }
-    public:
-        ~opts() AUG_NOTHROW
-        {
-        }
-        void
-        read(const char* path)
-        {
-            opts_.clear();
-            readconf(path, *this);
-        }
-        void
-        set(const string& name, const string& value)
-        {
-            opts_[name] = value;
-        }
-        const char*
-        get(const string& name, const char* def = 0) const
-        {
-            map<string, string>::const_iterator it(opts_.find(name));
-            if (opts_.find(name) == opts_.end())
-                return def;
-            return it->second.c_str();
-        }
-    };
-
     typedef char cstring[AUG_PATH_MAX + 1];
 
     const char* program_;
     cstring conffile_= "";
     cstring rundir_ = "";
-    opts opts_;
+    options options_;
     bool daemon_(false);
     bool stopping_(false);
 
     void
     reconf()
     {
-        const char* loglevel(opts_.get("loglevel", 0));
+        const char* loglevel(options_.get("loglevel", 0));
         if (loglevel) {
             unsigned level(strtoui(loglevel, 10));
             aug_info("setting log level: %d", level);
@@ -265,7 +47,7 @@ namespace augas {
 
         aug::chdir(rundir_);
         if (daemon_)
-            openlog(opts_.get("logfile", "augasd.log"));
+            openlog(options_.get("logfile", "augasd.log"));
 
         aug_info("log level: %d", aug_loglevel());
         aug_info("run directory: %s", rundir_);
@@ -337,7 +119,8 @@ namespace augas {
               module_("module.so", service)
         {
             aug_hostserv hostserv;
-            parsehostserv(opts_.get("address", "127.0.0.1:8080"), hostserv);
+            parsehostserv(options_.get("address", "127.0.0.1:8080"),
+                          hostserv);
 
             endpoint ep(null);
             smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
@@ -374,7 +157,7 @@ namespace augas {
     const char*
     getenv_(const char* name)
     {
-        return opts_.get(name, 0);
+        return options_.get(name, 0);
     }
 
     void
@@ -618,7 +401,7 @@ namespace augas {
             aug_info("received AUG_EVENTRECONF");
             if (*conffile_) {
                 aug_info("reading: %s", conffile_);
-                opts_.read(conffile_);
+                options_.read(conffile_);
             }
             reconf();
             state_->module_.reconf();
@@ -709,11 +492,11 @@ namespace augas {
             case AUG_OPTCONFFILE:
                 return *conffile_ ? conffile_ : 0;
             case AUG_OPTEMAIL:
-                return "Mark Aylett <mark@emantic.co.uk>";
+                return PACKAGE_BUGREPORT;
             case AUG_OPTLONGNAME:
-                return "AugAsd Daemon";
+                return "aug application server";
             case AUG_OPTPIDFILE:
-                return opts_.get("pidfile", "augasd.pid");
+                return options_.get("pidfile", "augasd.pid");
             case AUG_OPTPROGRAM:
                 return program_;
             case AUG_OPTSHORTNAME:
@@ -731,7 +514,7 @@ namespace augas {
             if (conffile) {
 
                 aug_info("reading: %s", conffile);
-                opts_.read(conffile);
+                options_.read(conffile);
 
                 // Store the absolute path to service any reconf requests.
 
@@ -742,7 +525,7 @@ namespace augas {
 
             // Once set, the run directory should not change.
 
-            const char* rundir(opts_.get("rundir", 0));
+            const char* rundir(options_.get("rundir", 0));
             realpath(rundir_, rundir ? rundir : getcwd().c_str(),
                      sizeof(rundir_));
 

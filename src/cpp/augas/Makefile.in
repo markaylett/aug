@@ -38,8 +38,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
+DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/src/cpp/lang.mk
 bin_PROGRAMS = augasd$(EXEEXT)
 subdir = src/cpp/augas
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -52,7 +53,8 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(modincludedir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_augasd_OBJECTS = augasd.$(OBJEXT)
+am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) module.$(OBJEXT) \
+	options.$(OBJEXT) utility.$(OBJEXT)
 augasd_OBJECTS = $(am_augasd_OBJECTS)
 augasd_DEPENDENCIES = $(top_srcdir)/src/c/augnet/libaugnet.la \
 	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
@@ -78,7 +80,7 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 modincludeHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(modinclude_HEADERS)
+HEADERS = $(modinclude_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -202,8 +204,17 @@ modincludedir = $(includedir)/augas
 modinclude_HEADERS = \
 	module.h
 
+noinst_HEADERS = \
+	buffer.hpp \
+	module.hpp \
+	utility.hpp
+
 augasd_SOURCES = \
-	augasd.cpp
+	augasd.cpp \
+	buffer.cpp \
+	module.cpp \
+	options.cpp \
+	utility.cpp
 
 augasd_LDADD = \
 	$(top_srcdir)/src/c/augnet/libaugnet.la \
@@ -284,6 +295,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augasd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
