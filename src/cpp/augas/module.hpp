@@ -22,7 +22,7 @@ namespace augas {
         void
         close(const struct augas_session& s) const;
 
-        int
+        void
         open(struct augas_session& s, const char* serv) const;
 
         int

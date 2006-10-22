@@ -78,6 +78,10 @@ struct augas_service {
     int (*cancelrwtimer_)(augas_sid id, unsigned flags);
 };
 
+/**
+   Module functions should return either #AUGAS_SUCCESS or #AUGAS_FAILURE.
+*/
+
 struct augas_module {
     void (*close_)(const struct augas_session* s);
     int (*open_)(struct augas_session* s, const char* serv);
@@ -90,11 +94,9 @@ struct augas_module {
     int (*reconf_)(void);
 };
 
-typedef const struct augas_module*
-(*augas_loadfn)(const struct augas_service*);
-
-typedef void
-(*augas_unloadfn)(void);
+/**
+   augas_load() should return NULL on failure.
+*/
 
 #define AUGAS_MODULE(load, unload) \
 AUGAS_API const struct augas_module* \
@@ -107,5 +109,11 @@ augas_unload(void) \
 { \
     (*unload)(); \
 }
+
+typedef const struct augas_module*
+(*augas_loadfn)(const struct augas_service*);
+
+typedef void
+(*augas_unloadfn)(void);
 
 #endif /* AUGAS_MODULE_H */

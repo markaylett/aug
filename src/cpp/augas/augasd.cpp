@@ -387,6 +387,7 @@ namespace augas {
             (make_pair(sid, sessionptr
                        (new session(sid, sfd, state_->module_,
                                     state_->mplexer_, state_->timers_))));
+
         return true;
     }
 

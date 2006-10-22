@@ -29,19 +29,30 @@ module::module(const char* path, const struct augas_service& service)
 {
     augas_loadfn loadfn(dlsym<augas_loadfn>(lib_, "augas_load"));
     unloadfn_ = dlsym<augas_unloadfn>(lib_, "augas_unload");
+
+    const struct augas_module* ptr(loadfn(&service));
+    if (!ptr) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EUSER,
+                       "module error");
+        throwerrinfo("augas_load() failed");
+    }
     setdefaults(module_, *loadfn(&service));
 }
 
 void
 module::close(const struct augas_session& s) const
 {
-    return module_.close_(&s);
+    module_.close_(&s);
 }
 
-int
+void
 module::open(struct augas_session& s, const char* serv) const
 {
-    return module_.open_(&s, serv);
+    if (AUGAS_SUCCESS != module_.open_(&s, serv)) {
+        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EUSER,
+                       "module error");
+        throwerrinfo("augas_module::open_() failed");
+    }
 }
 
 int

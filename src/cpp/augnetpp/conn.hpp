@@ -96,9 +96,11 @@ namespace aug {
                 conncb_base* ptr = static_cast<
                     conncb_base*>(aug_getvarp(arg));
                 return ptr->callback(id, *conns) ? 1 : 0;
-            } AUG_SETERRINFOCATCH;
+            } AUG_PERRINFOCATCH;
 
-            // Do not remove the connection unless explicitly asked to.
+            /**
+               Do not remove the connection unless explicitly asked to.
+            */
 
             return 1;
         }

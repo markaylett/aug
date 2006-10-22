@@ -15,8 +15,8 @@
 #define AUG_SRCDLFCN 4
 
 /**
-   These error constants may also be used as return codes for communicating
-   exceptional conditions.
+   Common exception code for the #AUG_SRCLOCAL domain.  These codes may also
+   be used as return codes for communicating exception conditions.
 */
 
 #define AUG_NOERROR  0
@@ -35,6 +35,12 @@
 #define AUG_EPARSE   12
 #define AUG_ESUPPORT 13
 #define AUG_ETIMEOUT 14
+
+/**
+   Base value for user-defined exception codes.
+*/
+
+#define AUG_EUSER    32
 
 struct aug_errinfo {
     char file_[AUG_MAXLINE];

@@ -57,6 +57,15 @@ namespace aug {
         }
     };
 
+    class dlfcn_error : public system_error {
+    public:
+        explicit
+        dlfcn_error(const std::string& s)
+            : system_error(s)
+        {
+        }
+    };
+
     inline void
     throwerrinfo(const std::string& s)
     {
@@ -67,6 +76,8 @@ namespace aug {
             throw posix_error(s);
         case AUG_SRCWIN32:
             throw win32_error(s);
+        case AUG_SRCDLFCN:
+            throw dlfcn_error(s);
         default:
             throw errinfo_error(s);
         }
@@ -75,7 +86,7 @@ namespace aug {
 
 /**
    The following series of catch blocks would typically be used to contain
-   exceptions from within functions that cannot throw.
+   exceptions within functions that cannot throw.
 */
 
 #define AUG_PERRINFOCATCH \
