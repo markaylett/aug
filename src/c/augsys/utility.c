@@ -23,7 +23,7 @@ aug_setnonblock(int fd, int on)
         return -1;
 
     if (!driver->setnonblock_) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_setnonblock() not supported"));
         return -1;
     }

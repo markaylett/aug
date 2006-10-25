@@ -11,7 +11,7 @@ main(int argc, char* argv[])
     struct aug_errinfo errinfo;
     aug_atexitinit(&errinfo);
 
-    aug_setposixerrinfo(__FILE__, 101, EINVAL);
+    aug_setposixerrinfo(NULL, __FILE__, 101, EINVAL);
 
     if (0 != strcmp(aug_errfile, __FILE__)) {
         fprintf(stderr, "unexpected aug_errfile value: %s\n", aug_errfile);

@@ -9,14 +9,14 @@
 
 #include <errno.h>
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 AUGSYS_API aug_mutex_t
 aug_createmutex(void)
 {
     aug_mutex_t mutex = aug_createmutex_();
     if (!mutex)
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return mutex;
 }
 
@@ -25,7 +25,7 @@ aug_freemutex(aug_mutex_t mutex)
 {
     int ret = aug_freemutex_(mutex);
     if (-1 == ret)
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return ret;
 }
 
@@ -34,7 +34,7 @@ aug_lockmutex(aug_mutex_t mutex)
 {
     int ret = aug_lockmutex_(mutex);
     if (-1 == ret)
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return ret;
 }
 
@@ -43,6 +43,6 @@ aug_unlockmutex(aug_mutex_t mutex)
 {
     int ret = aug_unlockmutex_(mutex);
     if (-1 == ret)
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return ret;
 }

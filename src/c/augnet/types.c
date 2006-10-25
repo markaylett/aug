@@ -4,4 +4,4 @@
 #define AUGNET_BUILD
 #include "augnet/types.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";

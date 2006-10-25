@@ -15,6 +15,7 @@
 #include "augconfig.h"
 
 #include <cassert>
+#include <iostream>
 #include <map>
 #include <memory> // auto_ptr<>
 #include <vector>
@@ -594,19 +595,21 @@ main(int argc, char* argv[])
 
         struct aug_errinfo errinfo;
         scoped_init init(errinfo);
-        service serv;
+        try {
+            service serv;
+            program_ = argv[0];
 
-        program_ = argv[0];
+            blocksignals();
+            aug_setloglevel(AUG_LOGDEBUG);
+            main(serv, argc, argv);
 
-        blocksignals();
-        aug_setloglevel(AUG_LOGDEBUG);
-
-        main(serv, argc, argv);
-
+        } catch (const errinfo_error& e) {
+            aug_perrinfo(cptr(e), "aug::errorinfo_error");
+        } catch (const exception& e) {
+            aug_error("std::exception: %s", e.what());
+        }
     } catch (const exception& e) {
-
-        aug_error("%s", e.what());
+        cerr << e.what() << endl;
     }
-
     return 1; // aug_main() does not return.
 }

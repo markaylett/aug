@@ -42,9 +42,9 @@ static void
 closepipe_(void)
 {
     if (-1 != fds_[0])
-        AUG_PERRINFO(aug_close(fds_[0]), "aug_close() failed");
+        AUG_PERRINFO(aug_close(fds_[0]), NULL, "aug_close() failed");
     if (-1 != fds_[1])
-        AUG_PERRINFO(aug_close(fds_[1]), "aug_close() failed");
+        AUG_PERRINFO(aug_close(fds_[1]), NULL, "aug_close() failed");
 
     fds_[0] = -1;
     fds_[1] = -1;
@@ -56,7 +56,7 @@ handler_(int sig)
     struct aug_event event;
     aug_info("handling interrupt");
     if (!aug_writeevent(fds_[1], aug_setsigevent(&event, sig)))
-        aug_perrinfo("aug_writeevent() failed");
+        aug_perrinfo(NULL, "aug_writeevent() failed");
 }
 
 static int

@@ -17,7 +17,7 @@ aug_readv(int fd, const struct iovec* iov, int size)
         return -1;
 
     if (!driver->readv_) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_readv() not supported"));
         return -1;
     }
@@ -33,7 +33,7 @@ aug_writev(int fd, const struct iovec* iov, int size)
         return -1;
 
     if (!driver->writev_) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_writev() not supported"));
         return -1;
     }

@@ -7,6 +7,7 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
+#include <iostream>
 #include <map>
 #include <memory> // auto_ptr<>
 #include <vector>
@@ -422,18 +423,6 @@ namespace test {
         {
         }
     };
-
-    string
-    getcwd()
-    {
-        cstring buf;
-        if (!::getcwd(buf, sizeof(buf))) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
-            throwerrinfo("getcwd() failed");
-        }
-
-        return buf;
-    }
 }
 
 int
@@ -445,19 +434,22 @@ main(int argc, char* argv[])
 
         struct aug_errinfo errinfo;
         scoped_init init(errinfo);
-        service serv;
+        try {
 
-        program_ = argv[0];
+            service serv;
+            program_ = argv[0];
 
-        blocksignals();
-        aug_setloglevel(AUG_LOGINFO);
+            blocksignals();
+            aug_setloglevel(AUG_LOGINFO);
+            main(serv, argc, argv);
 
-        main(serv, argc, argv);
-
+        } catch (const errinfo_error& e) {
+            aug_perrinfo(cptr(e), "aug::errorinfo_error");
+        } catch (const exception& e) {
+            aug_error("std::exception: %s", e.what());
+        }
     } catch (const exception& e) {
-
-        aug_error("%s", e.what());
+        cerr << e.what() << endl;
     }
-
     return 1; // aug_main() does not return.
 }

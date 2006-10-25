@@ -14,7 +14,7 @@ struct aug_dlib_ {
 static void
 seterrinfo_(const char* file, int line)
 {
-    aug_seterrinfo(file, line, AUG_SRCDLFCN, 1, dlerror());
+    aug_seterrinfo(NULL, file, line, AUG_SRCDLFCN, 1, dlerror());
 }
 
 AUGSYS_API int

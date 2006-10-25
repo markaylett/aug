@@ -17,7 +17,7 @@ aug_dlclose(aug_dlib_t dlib)
     HMODULE handle = dlib->handle_;
     free(dlib);
     if (!FreeLibrary(handle)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
     return 0;
@@ -34,7 +34,7 @@ aug_dlopen(const char* path)
 
     if (!(dlib->handle_ = LoadLibrary(path))) {
         free(dlib);
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return NULL;
     }
     return dlib;
@@ -54,7 +54,7 @@ aug_dlsym(aug_dlib_t dlib, const char* symbol)
     } local;
 
     if (!(local.in_ = GetProcAddress(dlib->handle_, symbol))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return NULL;
     }
 

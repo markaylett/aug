@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/file.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/defs.h"
 #include "augsys/errinfo.h"
@@ -34,7 +34,7 @@ aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg)
 
     FILE* fp = fopen(path, "r");
     if (!fp) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -59,7 +59,7 @@ aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg)
 
         if (!(value = strchr(name, '='))) {
 
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("missing token separator"));
             ret = -1;
             break;
@@ -70,7 +70,7 @@ aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg)
 
         name[rtrim_(name, value - name)] = '\0';
         if ('\0' == *name) {
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("missing name part"));
             ret = -1;
             break;

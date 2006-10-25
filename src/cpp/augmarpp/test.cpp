@@ -3,7 +3,7 @@
 */
 #include "augmarpp.hpp"
 
-#include "augsys.h"
+#include "augsyspp.hpp"
 
 #include <fstream>
 #include <string>
@@ -342,13 +342,13 @@ namespace {
             (*t.test_)(dst, src);
             cout << "ok\n";
         } catch (const aug::errinfo_error& e) {
-            aug_perrinfo(e.what());
+            aug_perrinfo(aug::cptr(e), "aug::errinfo_error");
             result = false;
         } catch (const exception& e) {
-            cerr << "error: " << e.what() << endl;
+            cerr << "std::exception: " << e.what() << endl;
             result = false;
         } catch (...) {
-            cerr << "error: unknown exception\n";
+            cerr << "unknown exception\n";
             result = false;
         }
         if (!result)

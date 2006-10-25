@@ -4,7 +4,7 @@
 #define AUGMAR_BUILD
 #include "augmar/flags_.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augmar/types.h"
 
@@ -60,7 +60,7 @@ aug_toflags_(int* to, int from)
     return 0;
 
  fail:
-    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                    AUG_MSG("invalid open flags"));
     return -1;
 }

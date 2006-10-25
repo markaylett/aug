@@ -47,7 +47,7 @@ AUGUTIL_API int
 aug_chdir(const char* path)
 {
     if (-1 == chdir(path)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
     return 0;
@@ -57,7 +57,7 @@ AUGUTIL_API char*
 aug_getcwd(char* dst, size_t size)
 {
     if (!getcwd(dst, size)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;
     }
     return dst;
@@ -82,7 +82,7 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
             --dirlen;
 
         if (size < dirlen + namelen + extlen + 3) {
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                            AUG_MSG("buffer size exceeded"));
             return NULL;
         }
@@ -94,7 +94,7 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
         dst += dirlen + 1;
 
     } else if (size < namelen + extlen + 2) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }
@@ -122,22 +122,22 @@ aug_realpath(char* dst, const char* src, size_t size)
        of realpath().  Verify that this is indeed the case. */
 
     if (-1 == (pathmax = pathconf(src, _PC_PATH_MAX))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;
     }
 
     if (!(buf = alloca(pathmax + 1))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
     if (!realpath(src, buf)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;
     }
 
     if (size <= strlen(buf)) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }
@@ -146,7 +146,7 @@ aug_realpath(char* dst, const char* src, size_t size)
     return dst;
 #else /* _WIN32 */
     if (!_fullpath(dst, src, size)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;
     }
     return dst;

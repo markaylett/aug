@@ -80,7 +80,7 @@ aug_createmplexer(void)
 {
     aug_mplexer_t mplexer = malloc(sizeof(struct aug_mplexer_));
     if (!mplexer) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -101,7 +101,7 @@ AUGSYS_API int
 aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 {
     if (mask & ~(AUG_IOEVENTRD | AUG_IOEVENTWR)) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid ioevent mask"));
         return -1;
     }
@@ -127,7 +127,7 @@ aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout)
         (ret = select(-1, &mplexer->out_.rd_, &mplexer->out_.wr_,
                       NULL, timeout))) {
 
-        if (WSAEINTR == aug_setwin32errinfo(__FILE__, __LINE__,
+        if (WSAEINTR == aug_setwin32errinfo(NULL, __FILE__, __LINE__,
                                             WSAGetLastError()))
             ret = AUG_RETINTR;
     }

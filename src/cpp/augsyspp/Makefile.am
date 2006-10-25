@@ -6,6 +6,7 @@ modinclude_HEADERS = \
 	config.hpp \
 	dlfcn.hpp \
 	endpoint.hpp \
+	errinfo.hpp \
 	exception.hpp \
 	inetaddr.hpp \
 	mcast.hpp \
@@ -30,6 +31,7 @@ libaugsyspp_la_SOURCES = \
 	config.cpp \
 	dlfcn.cpp \
 	endpoint.cpp \
+	errinfo.cpp \
 	exception.cpp \
 	inetaddr.cpp \
 	mcast.cpp \

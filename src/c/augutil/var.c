@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/var.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include <stddef.h> /* NULL */
 

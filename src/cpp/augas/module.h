@@ -80,6 +80,8 @@ struct augas_service {
 
 /**
    Module functions should return either #AUGAS_SUCCESS or #AUGAS_FAILURE.
+   For those functions associated with sessions, a failure will result in the
+   session being closed.
 */
 
 struct augas_module {

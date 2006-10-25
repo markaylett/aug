@@ -13,16 +13,14 @@ namespace aug {
     inline struct timeval&
     gettimeofday(struct timeval& tv, struct timezone& tz)
     {
-        if (-1 == aug_gettimeofday(&tv, &tz))
-            throwerrinfo("aug_gettimeofday() failed");
+        verify(aug_gettimeofday(&tv, &tz));
         return tv;
     }
 
     inline struct timeval&
     gettimeofday(struct timeval& tv)
     {
-        if (-1 == aug_gettimeofday(&tv, 0))
-            throwerrinfo("aug_gettimeofday() failed");
+        verify(aug_gettimeofday(&tv, 0));
         return tv;
     }
 

@@ -16,7 +16,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_socket(domain, type, protocol)));
         if (null == sfd)
-            throwerrinfo("aug_socket() failed");
+            fail();
 
         return sfd;
     }
@@ -26,7 +26,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_accept(ref.get(), &ep)));
         if (null == sfd)
-            throwerrinfo("aug_accept() failed");
+            fail();
 
         return sfd;
     }
@@ -34,108 +34,84 @@ namespace aug {
     inline void
     bind(fdref ref, const struct aug_endpoint& ep)
     {
-        if (-1 == aug_bind(ref.get(), &ep))
-            throwerrinfo("aug_bind() failed");
+        verify(aug_bind(ref.get(), &ep));
     }
 
     inline void
     connect(fdref ref, const struct aug_endpoint& ep)
     {
-        if (-1 == aug_connect(ref.get(), &ep))
-            throwerrinfo("aug_connect() failed");
+        verify(aug_connect(ref.get(), &ep));
     }
 
     inline struct aug_endpoint&
     getpeername(fdref ref, struct aug_endpoint& ep)
     {
-        if (!aug_getpeername(ref.get(), &ep))
-            throwerrinfo("aug_getpeername() failed");
-        return ep;
+        return *verify(aug_getpeername(ref.get(), &ep));
     }
 
     inline const struct aug_endpoint&
     getsockname(fdref ref, struct aug_endpoint& ep)
     {
-        if (!aug_getsockname(ref.get(), &ep))
-            throwerrinfo("aug_getsockname() failed");
-        return ep;
+        return *verify(aug_getsockname(ref.get(), &ep));
     }
 
     inline void
     listen(fdref ref, int backlog)
     {
-        if (-1 == aug_listen(ref.get(), backlog))
-            throwerrinfo("aug_listen() failed");
+        verify(aug_listen(ref.get(), backlog));
     }
 
     inline size_t
     recv(fdref ref, void* buf, size_t len, int flags)
     {
-        ssize_t ret(aug_recv(ref.get(), buf, len, flags));
-        if (-1 == ret)
-            throwerrinfo("aug_recv() failed");
-        return ret;
+        return verify(aug_recv(ref.get(), buf, len, flags));
     }
 
     inline size_t
     recvfrom(fdref ref, void* buf, size_t len, int flags,
              struct aug_endpoint& ep)
     {
-        ssize_t ret(aug_recvfrom(ref.get(), buf, len, flags, &ep));
-        if (-1 == ret)
-            throwerrinfo("aug_recvfrom() failed");
-        return ret;
+        return verify(aug_recvfrom(ref.get(), buf, len, flags, &ep));
     }
 
     inline size_t
     send(fdref ref, const void* buf, size_t len, int flags)
     {
-        ssize_t ret(aug_send(ref.get(), buf, len, flags));
-        if (-1 == ret)
-            throwerrinfo("aug_send() failed");
-        return ret;
+        return verify(aug_send(ref.get(), buf, len, flags));
     }
 
     inline size_t
     sendto(fdref ref, const void* buf, size_t len, int flags,
            const struct aug_endpoint& ep)
     {
-        ssize_t ret(aug_sendto(ref.get(), buf, len, flags, &ep));
-        if (-1 == ret)
-            throwerrinfo("aug_sendto() failed");
-        return ret;
+        return verify(aug_sendto(ref.get(), buf, len, flags, &ep));
     }
 
     inline void
     getsockopt(fdref ref, int level, int optname, void* optval,
                socklen_t& optlen)
     {
-        if (-1 == aug_getsockopt(ref.get(), level, optname, optval, &optlen))
-            throwerrinfo("aug_getsockopt() failed");
+        verify(aug_getsockopt(ref.get(), level, optname, optval, &optlen));
     }
 
     inline void
     setsockopt(fdref ref, int level, int optname, const void* optval,
                socklen_t optlen)
     {
-        if (-1 == aug_setsockopt(ref.get(), level, optname, optval, optlen))
-            throwerrinfo("aug_setsockopt() failed");
+        verify(aug_setsockopt(ref.get(), level, optname, optval, optlen));
     }
 
     inline void
     shutdown(fdref ref, int how)
     {
-        if (-1 == aug_shutdown(ref.get(), how))
-            throwerrinfo("aug_shutdown() failed");
+        verify(aug_shutdown(ref.get(), how));
     }
 
     inline std::pair<smartfd, smartfd>
     socketpair(int domain, int type, int protocol)
     {
         int sv[2];
-        if (-1 == aug_socketpair(domain, type, protocol, sv))
-            throwerrinfo("aug_socketpair() failed");
-
+        verify(aug_socketpair(domain, type, protocol, sv));
         return std::make_pair(smartfd::attach(sv[0]), smartfd::attach(sv[1]));
     }
 
@@ -143,17 +119,14 @@ namespace aug {
     inetntop(const struct aug_inetaddr& src)
     {
         char buf[AUG_MAXADDRLEN];
-        if (!aug_inetntop(&src, buf, sizeof(buf)))
-            throwerrinfo("aug_inetntop() failed");
+        verify(aug_inetntop(&src, buf, sizeof(buf)));
         return buf;
     }
 
     inline struct aug_inetaddr&
     inetpton(int af, const char* src, struct aug_inetaddr& dst)
     {
-        if (!aug_inetpton(af, src, &dst))
-            throwerrinfo("aug_inetpton() failed");
-        return dst;
+        return *verify(aug_inetpton(af, src, &dst));
     }
 
     inline struct aug_inetaddr&
@@ -161,59 +134,45 @@ namespace aug {
     {
         if (!aug_inetpton(AF_INET, src, &dst)
             && !aug_inetpton(AF_INET6, src, &dst))
-            throwerrinfo("aug_inetpton() failed");
+            fail();
         return dst;
     }
 
     inline int
     getfamily(fdref ref)
     {
-        int ret(aug_getfamily(ref.get()));
-        if (-1 == ret)
-            throwerrinfo("aug_getfamily() failed");
-        return ret;
+        return verify(aug_getfamily(ref.get()));
     }
 
     inline void
     setreuseaddr(fdref ref, bool on)
     {
         int value(on ? 1 : 0);
-        if (-1 == aug_setreuseaddr(ref.get(), value))
-            throwerrinfo("aug_setreuseaddr() failed");
+        verify(aug_setreuseaddr(ref.get(), value));
     }
 
     inline struct aug_endpoint&
     setinetaddr(struct aug_endpoint& ep, const struct aug_inetaddr& addr)
     {
-        if (!aug_setinetaddr(&ep, &addr))
-            throwerrinfo("aug_setinetaddr() failed");
-        return ep;
+        return *verify(aug_setinetaddr(&ep, &addr));
     }
 
     inline struct aug_inetaddr&
     getinetaddr(const struct aug_endpoint& ep, struct aug_inetaddr& addr)
     {
-        if (!aug_getinetaddr(&ep, &addr))
-            throwerrinfo("aug_getinetaddr() failed");
-        return addr;
+        return *verify(aug_getinetaddr(&ep, &addr));
     }
 
     inline const struct aug_inetaddr&
     inetany(int af)
     {
-        const struct aug_inetaddr* ret(aug_inetany(af));
-        if (!ret)
-            throwerrinfo("aug_inetany() failed");
-        return *ret;
+        return *verify(aug_inetany(af));
     }
 
     inline const struct aug_inetaddr&
     inetloopback(int af)
     {
-        const struct aug_inetaddr* ret(aug_inetloopback(af));
-        if (!ret)
-            throwerrinfo("aug_inetloopback() failed");
-        return *ret;
+        return *verify(aug_inetloopback(af));
     }
 }
 

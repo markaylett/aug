@@ -11,6 +11,8 @@
 #include "augsys/errno.h"
 #include "augsys/string.h" // aug_perror()
 
+#include <stdexcept>
+
 namespace aug {
 
     namespace detail {
@@ -49,40 +51,32 @@ namespace aug {
     inline void
     openfd(int fd, const struct aug_driver* driver)
     {
-        if (-1 == aug_openfd(fd, driver))
-            throwerrinfo("aug_openfd() failed");
+        verify(aug_openfd(fd, driver));
     }
     inline void
     openfds(int fds[2], const struct aug_driver* driver)
     {
-        if (-1 == aug_openfds(fds, driver))
-            throwerrinfo("aug_openfds() failed");
+        verify(aug_openfds(fds, driver));
     }
     inline void
     releasefd(int fd)
     {
-        if (-1 == aug_releasefd(fd))
-            throwerrinfo("aug_releasefd() failed");
+        verify(aug_releasefd(fd));
     }
     inline void
     retainfd(int fd)
     {
-        if (-1 == aug_retainfd(fd))
-            throwerrinfo("aug_retainfd() failed");
+        verify(aug_retainfd(fd));
     }
     inline void
     setdriver(fdref ref, const struct aug_driver* driver)
     {
-        if (-1 == aug_setdriver(ref.get(), driver))
-            throwerrinfo("aug_setdriver() failed");
+        verify(aug_setdriver(ref.get(), driver));
     }
     inline const struct aug_driver*
     getdriver(fdref ref)
     {
-        const struct aug_driver* driver(aug_getdriver(ref.get()));
-        if (!driver)
-            throwerrinfo("aug_driver() failed");
-        return driver;
+        return verify(aug_getdriver(ref.get()));
     }
 
     class scoped_init {

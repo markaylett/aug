@@ -4,4 +4,4 @@
 #define AUGSYS_BUILD
 #include "augsys/types.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";

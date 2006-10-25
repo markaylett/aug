@@ -53,7 +53,7 @@ fileset_(aug_mar_t mar, const char* filename)
     } else {
 
         if (!(stream = fopen(filename, "r"))) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             return -1;
         }
 
@@ -61,7 +61,7 @@ fileset_(aug_mar_t mar, const char* filename)
             goto fail;
 
         if (0 != fclose(stream)) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             return -1;
         }
     }
@@ -84,7 +84,7 @@ extract_(aug_mar_t mar, const char* filename)
             return -1;
 
         if (size != fwrite(body, 1, size, stdout)) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             return -1;
         }
 
@@ -157,7 +157,7 @@ names_(aug_mar_t mar)
         printf("%s\n", name);
     }
     if (EOF == fflush(stdout)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -194,7 +194,7 @@ list_(aug_mar_t mar)
     }
 
     if (EOF == fflush(stdout)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -214,7 +214,7 @@ get_(aug_mar_t mar, const char* name)
         return -1;
 
     if (EOF == fflush(stdout)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -292,7 +292,7 @@ run_(int argc, char* argv[], const char* archivename)
     }
 
     if (!(mar = aug_openmar(archivename, flags, mode))) {
-        aug_perrinfo("aug_openmar() failed");
+        aug_perrinfo(NULL, "aug_openmar() failed");
         return -1;
     }
 
@@ -300,7 +300,7 @@ run_(int argc, char* argv[], const char* archivename)
         switch (ch) {
         case 'c':
             if (-1 == aug_compactmar(mar)) {
-                aug_perrinfo("failed to " COMPACTTEXT_);
+                aug_perrinfo(NULL, "failed to " COMPACTTEXT_);
                 goto fail;
             }
             break;
@@ -308,61 +308,61 @@ run_(int argc, char* argv[], const char* archivename)
             break;
         case 'g':
             if (-1 == get_(mar, aug_optarg)) {
-                aug_perrinfo("failed to " GETTEXT_);
+                aug_perrinfo(NULL, "failed to " GETTEXT_);
                 goto fail;
             }
             break;
         case 'i':
             if (-1 == insert_(mar, aug_optarg)) {
-                aug_perrinfo("failed to " INSERTTEXT_);
+                aug_perrinfo(NULL, "failed to " INSERTTEXT_);
                 goto fail;
             }
             break;
         case 'l':
             if (-1 == names_(mar)) {
-                aug_perrinfo("failed to " NAMESTEXT_);
+                aug_perrinfo(NULL, "failed to " NAMESTEXT_);
                 goto fail;
             }
             break;
         case 'n':
             if (-1 == size_(mar)) {
-                aug_perrinfo("failed to " SIZETEXT_);
+                aug_perrinfo(NULL, "failed to " SIZETEXT_);
                 goto fail;
             }
             break;
         case 'r':
             if (-1 == remove_(mar)) {
-                aug_perrinfo("failed to " REMOVETEXT_);
+                aug_perrinfo(NULL, "failed to " REMOVETEXT_);
                 goto fail;
             }
             break;
         case 's':
             if (-1 == set_(mar, aug_optarg)) {
-                aug_perrinfo("failed to " SETTEXT_);
+                aug_perrinfo(NULL, "failed to " SETTEXT_);
                 goto fail;
             }
             break;
         case 't':
             if (-1 == list_(mar)) {
-                aug_perrinfo("failed to " LISTTEXT_);
+                aug_perrinfo(NULL, "failed to " LISTTEXT_);
                 goto fail;
             }
             break;
         case 'u':
             if (-1 == unset_(mar, aug_optarg)) {
-                aug_perrinfo("failed to " UNSETTEXT_);
+                aug_perrinfo(NULL, "failed to " UNSETTEXT_);
                 goto fail;
             }
             break;
         case 'x':
             if (-1 == extract_(mar, aug_optarg)) {
-                aug_perrinfo("failed to " EXTRACTTEXT_);
+                aug_perrinfo(NULL, "failed to " EXTRACTTEXT_);
                 goto fail;
             }
             break;
         case 'z':
             if (-1 == zero_(mar)) {
-                aug_perrinfo("failed to " ZEROTEXT_);
+                aug_perrinfo(NULL, "failed to " ZEROTEXT_);
                 goto fail;
             }
             break;
@@ -390,7 +390,7 @@ main(int argc, char* argv[])
     AUG_INITLEAKDUMP();
 
     if (-1 == atexit(exit_)) {
-        aug_perrinfo("atexit() failed");
+        aug_perrinfo(NULL, "atexit() failed");
         goto fail;
     }
 

@@ -7,6 +7,7 @@
 #include "augutilpp/file.hpp"
 
 #include <map>
+#include <string>
 
 namespace augas {
 

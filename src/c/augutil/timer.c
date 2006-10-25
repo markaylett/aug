@@ -196,7 +196,7 @@ aug_processtimers(struct aug_timers* timers, int force, struct timeval* next)
             if (it->ms_) {
 
                 if (-1 == expiry_(&it->tv_, it->ms_))
-                    aug_perrinfo("expiry_() failed");
+                    aug_perrinfo(NULL, "expiry_() failed");
                 else
                     insert_(timers, it);
 

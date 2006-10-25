@@ -7,7 +7,7 @@
 #define AUGNET_BUILD
 #include "augnet/inet.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/errinfo.h"
 #include "augsys/socket.h"
@@ -249,7 +249,7 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     /* Locate host and serv separator. */
 
     if (!(serv = strrchr(dst->data_, ':'))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                        AUG_MSG("missing separator '%s'"), src);
         return NULL;
     }
@@ -261,13 +261,13 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     /* Ensure host and serv parts exists. */
 
     if (!len) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                        AUG_MSG("missing host part '%s'"), src);
         return NULL;
     }
 
     if ('\0' == *++serv) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                        AUG_MSG("missing service part '%s'"), src);
         return NULL;
     }
@@ -278,7 +278,7 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     if ('[' == dst->data_[0]) {
 
         if (']' != dst->data_[len - 1]) {
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("unmatched brackets '%s'"), src);
             return NULL;
         }

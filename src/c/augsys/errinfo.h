@@ -15,6 +15,12 @@
 #define AUG_SRCDLFCN 4
 
 /**
+   Base value for user-defined exception sources.
+*/
+
+#define AUG_SRCUSER  32
+
+/**
    Common exception code for the #AUG_SRCLOCAL domain.  These codes may also
    be used as return codes for communicating exception conditions.
 */
@@ -26,7 +32,7 @@
 #define AUG_EAUTH    3
 #define AUG_EBOUND   4
 #define AUG_EENDOF   5
-#define AUG_EEXCEPT  6
+#define AUG_ECXX     6
 #define AUG_EEXIST   7
 #define AUG_EFORMAT  8
 #define AUG_EINVAL   9
@@ -35,12 +41,6 @@
 #define AUG_EPARSE   12
 #define AUG_ESUPPORT 13
 #define AUG_ETIMEOUT 14
-
-/**
-   Base value for user-defined exception codes.
-*/
-
-#define AUG_EUSER    32
 
 struct aug_errinfo {
     char file_[AUG_MAXLINE];
@@ -72,29 +72,31 @@ AUGSYS_API int
 aug_initerrinfo(struct aug_errinfo* errinfo);
 
 AUGSYS_API int
-aug_vseterrinfo(const char* file, int line, int src, int num,
-                const char* format, va_list args);
+aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                int src, int num, const char* format, va_list args);
 
 AUGSYS_API int
-aug_seterrinfo(const char* file, int line, int src, int num,
-               const char* format, ...);
+aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+               int src, int num, const char* format, ...);
 
 AUGSYS_API int
-aug_setposixerrinfo(const char* file, int line, int err);
+aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    int err);
 
 #if defined(_WIN32)
 AUGSYS_API int
-aug_setwin32errinfo(const char* file, int line, unsigned long err);
+aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    unsigned long err);
 #endif /* _WIN32 */
+
+AUGSYS_API int
+aug_iserrinfo(const struct aug_errinfo* errinfo, int src, int num);
+
+AUGSYS_API int
+aug_perrinfo(const struct aug_errinfo* errinfo, const char* s);
 
 AUGSYS_API const struct aug_errinfo*
 aug_geterrinfo(void);
-
-AUGSYS_API int
-aug_iserrinfo(int src, int num);
-
-AUGSYS_API int
-aug_perrinfo(const char* s);
 
 #define aug_errfile (aug_geterrinfo()->file_)
 #define aug_errline (aug_geterrinfo()->line_)
@@ -102,10 +104,10 @@ aug_perrinfo(const char* s);
 #define aug_errnum  (aug_geterrinfo()->num_)
 #define aug_errdesc (aug_geterrinfo()->desc_)
 
-#define AUG_PERRINFO(x, s) \
-do { \
-    if (-1 == x) \
-        aug_perrinfo(s); \
-} while (0)
+#define AUG_PERRINFO(x, e, s)                    \
+    do {                                         \
+        if (-1 == x)                             \
+            aug_perrinfo(e, s);                  \
+    } while (0)
 
 #endif /* AUGSYS_ERRINFO_H */

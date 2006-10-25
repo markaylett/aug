@@ -18,7 +18,7 @@ getifaddr_(int s, struct in_addr* addr, const char* ifname)
     aug_strlcpy(ifreq.ifr_name, ifname, sizeof(ifreq.ifr_name));
 
     if (-1 == ioctl(s, SIOCGIFADDR, &ifreq)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -30,7 +30,7 @@ static int
 getifindex_(unsigned* index, const char* ifname)
 {
     if (!(*index = if_nametoindex(ifname))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENODEV);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENODEV);
         return -1;
     }
     return 0;
@@ -78,7 +78,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* !AUG_NOIPV6 */
     }
 
-    aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAFNOSUPPORT);
     return -1;
 }
 
@@ -124,7 +124,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* !AUG_NOIPV6 */
     }
 
-    aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAFNOSUPPORT);
     return -1;
 }
 
@@ -162,7 +162,7 @@ aug_setmcastif(int s, const char* ifname)
 #endif /* !AUG_NOIPV6 */
     }
 
-    aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAFNOSUPPORT);
     return -1;
 }
 
@@ -193,7 +193,7 @@ aug_setmcastloop(int s, int on)
 #endif /* !AUG_NOIPV6 */
     }
 
-    aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAFNOSUPPORT);
     return -1;
 }
 
@@ -224,6 +224,6 @@ aug_setmcastttl(int s, int ttl)
 #endif /* !AUG_NOIPV6 */
     }
 
-    aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT);
+    aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAFNOSUPPORT);
     return -1;
 }

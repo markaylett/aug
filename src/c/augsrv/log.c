@@ -4,7 +4,7 @@
 #define AUGSRV_BUILD
 #include "augsrv/log.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #if !defined(_WIN32)
 # include "augsrv/posix/log.c"
@@ -47,7 +47,7 @@ redirectout_(int fd)
     /* Duplicate stdout descriptor so that it can be restored on failure. */
 
     if (-1 == (old = dup(STDOUT_FILENO))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -55,13 +55,13 @@ redirectout_(int fd)
        state will remain unchanged. */
 
     if (-1 == dup2(fd, STDOUT_FILENO)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         goto done;
     }
 
     if (-1 == dup2(fd, STDERR_FILENO)) {
 
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
 
         /* Restore the original descriptor. */
 
@@ -84,7 +84,7 @@ aug_openlog(const char* path)
     int fd, ret = 0;
 
     if (-1 == (fd = open(path, O_APPEND | O_CREAT | O_WRONLY, 0640))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 

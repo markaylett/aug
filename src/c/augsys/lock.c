@@ -4,7 +4,7 @@
 #define AUGSYS_BUILD
 #include "augsys/lock.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include <errno.h>
 #include <stdlib.h> /* NULL */

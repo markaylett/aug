@@ -14,7 +14,7 @@ static int
 close_(int fd)
 {
     if (-1 == close(fd))
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return 0;
 }
 
@@ -23,7 +23,7 @@ read_(int fd, void* buf, size_t size)
 {
     ssize_t ret = read(fd, buf, size);
     if (-1 == ret)
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return ret;
 }
 
@@ -32,7 +32,7 @@ readv_(int fd, const struct iovec* iov, int size)
 {
     ssize_t ret = readv(fd, iov, size);
     if (-1 == ret)
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return ret;
 }
 
@@ -41,7 +41,7 @@ write_(int fd, const void* buf, size_t size)
 {
     ssize_t ret = write(fd, buf, size);
     if (-1 == ret)
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return ret;
 }
 
@@ -50,7 +50,7 @@ writev_(int fd, const struct iovec* iov, int size)
 {
     ssize_t ret = writev(fd, iov, size);
     if (-1 == ret)
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return ret;
 }
 
@@ -59,7 +59,7 @@ setnonblock_(int fd, int on)
 {
     int flags = fcntl(fd, F_GETFL);
     if (-1 == flags) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -69,7 +69,7 @@ setnonblock_(int fd, int on)
         flags &= ~O_NONBLOCK;
 
     if (-1 == fcntl(fd, F_SETFL, flags)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 

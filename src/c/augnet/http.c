@@ -103,7 +103,7 @@ tail_(aug_httpparser_t parser)
         /* Empty line in the name phase of the parse. */
 
         if ('\0' != *aug_token(parser->lexer_)) {
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("failed to parse name"));
             return -1;
         }
@@ -118,7 +118,7 @@ tail_(aug_httpparser_t parser)
         /* Check to ensure that the entire body has been parsed. */
 
         if (0 < parser->csize_) {
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("failed to parse body"));
             return -1;
         }
@@ -208,7 +208,7 @@ aug_createhttpparser(unsigned size, const struct aug_httphandlers* handlers,
     aug_lexer_t lexer;
 
     if (!parser) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 

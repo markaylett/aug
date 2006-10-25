@@ -21,7 +21,7 @@ static const char rcsid[] = "$Id$";
 static void
 die_(const char* s)
 {
-    aug_perrinfo(s);
+    aug_perrinfo(NULL, s);
     aug_exitservice(1);
 }
 

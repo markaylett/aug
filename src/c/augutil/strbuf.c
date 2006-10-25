@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/strbuf.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/defs.h"   /* AUG_MAX */
 #include "augsys/errinfo.h"
@@ -31,7 +31,7 @@ resize_(aug_strbuf_t* strbuf, size_t size)
 {
 	aug_strbuf_t local = realloc(*strbuf, sizeof(struct aug_strbuf_) + size);
     if (!local) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 
@@ -62,7 +62,7 @@ aug_createstrbuf(size_t size)
 	size = AUG_MAX(MINSIZE_, size);
 
 	if (!(strbuf = malloc(sizeof(struct aug_strbuf_) + size))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
 		return NULL;
     }
 

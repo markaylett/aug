@@ -100,7 +100,7 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
         return NULL;
 
     if (!(mfile = (aug_mfile_t)malloc(sizeof(struct aug_mfile_) + tail))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         goto fail;
     }
 
@@ -134,7 +134,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 
         if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EACCES,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EACCES,
                            AUG_MSG("file is not writable"));
             return NULL;
         }
@@ -184,7 +184,7 @@ aug_truncatemfile_(aug_mfile_t mfile, unsigned size)
     assert(mfile);
     if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EACCES,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EACCES,
                        AUG_MSG("file is not writable"));
         return -1;
     }

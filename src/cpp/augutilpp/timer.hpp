@@ -34,7 +34,7 @@ namespace aug {
         ~timers() AUG_NOTHROW
         {
             if (-1 == aug_freetimers(&timers_))
-                aug_perrinfo("aug_freetimers() failed");
+                aug_perrinfo(0, "aug_freetimers() failed");
         }
 
         timers()
@@ -102,21 +102,15 @@ namespace aug {
              timercb_base& cb)
     {
         var v(&cb);
-        int ret(aug_settimer(&timers, ref.get(), ms, detail::timercb,
-                             cptr(v)));
-        if (-1 == ret)
-            throwerrinfo("aug_settimer() failed");
-        return ret;
+        return verify(aug_settimer(&timers, ref.get(), ms, detail::timercb,
+                                   cptr(v)));
     }
 
     inline bool
     resettimer(struct aug_timers& timers, idref ref, unsigned ms = 0)
     {
-        int ret(aug_resettimer(&timers, ref.get(), ms));
-        if (-1 == ret)
-            throwerrinfo("aug_resettimer() failed");
-
-        return AUG_RETNONE == ret ? false : true;
+        return AUG_RETNONE == verify(aug_resettimer(&timers, ref.get(), ms))
+            ? false : true;
     }
 
     inline bool
@@ -134,15 +128,13 @@ namespace aug {
     inline void
     processtimers(struct aug_timers& timers, bool force)
     {
-        if (-1 == aug_processtimers(&timers, force ? 1 : 0, 0))
-            throwerrinfo("aug_processtimers() failed");
+        verify(aug_processtimers(&timers, force ? 1 : 0, 0));
     }
 
     inline void
     processtimers(struct aug_timers& timers, bool force, struct timeval& next)
     {
-        if (-1 == aug_processtimers(&timers, force ? 1 : 0, &next))
-            throwerrinfo("aug_processtimers() failed");
+        verify(aug_processtimers(&timers, force ? 1 : 0, &next));
     }
 
     class timer {

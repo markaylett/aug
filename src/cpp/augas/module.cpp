@@ -31,11 +31,8 @@ module::module(const char* path, const struct augas_service& service)
     unloadfn_ = dlsym<augas_unloadfn>(lib_, "augas_unload");
 
     const struct augas_module* ptr(loadfn(&service));
-    if (!ptr) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EUSER,
-                       "module error");
-        throwerrinfo("augas_load() failed");
-    }
+    if (!ptr)
+        throw local_error(__FILE__, __LINE__, 1, "aug_load() failed");
     setdefaults(module_, *loadfn(&service));
 }
 
@@ -48,52 +45,64 @@ module::close(const struct augas_session& s) const
 void
 module::open(struct augas_session& s, const char* serv) const
 {
-    if (AUGAS_SUCCESS != module_.open_(&s, serv)) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EUSER,
-                       "module error");
-        throwerrinfo("augas_module::open_() failed");
-    }
+    if (AUGAS_SUCCESS != module_.open_(&s, serv))
+        throw local_error(__FILE__, __LINE__, 1,
+                          "augas_module::open_() failed");
 }
 
-int
+void
 module::data(const struct augas_session& s, const char* buf,
              size_t size) const
 {
-    return module_.data_(&s, buf, size);
+    if (AUGAS_SUCCESS != module_.data_(&s, buf, size))
+        throw local_error(__FILE__, __LINE__, 1,
+                          "augas_module::data_() failed");
 }
 
-int
+void
 module::rdexpire(const struct augas_session& s, unsigned& ms) const
 {
-    return module_.rdexpire_(&s, &ms);
+    if (AUGAS_SUCCESS != module_.rdexpire_(&s, &ms))
+        throw local_error(__FILE__, __LINE__, 1,
+                          "augas_module::rdexpire_() failed");
 }
 
-int
+void
 module::wrexpire(const struct augas_session& s, unsigned& ms) const
 {
-    return module_.wrexpire_(&s, &ms);
+    if (AUGAS_SUCCESS != module_.wrexpire_(&s, &ms))
+        throw local_error(__FILE__, __LINE__, 1,
+                          "augas_module::wrexpire_() failed");
 }
 
-int
+void
 module::stop(const struct augas_session& s) const
 {
-    return module_.stop_(&s);
+    if (AUGAS_SUCCESS != module_.stop_(&s))
+        throw local_error(__FILE__, __LINE__, 1,
+                          "augas_module::stop_() failed");
 }
 
-int
+void
 module::event(int type, void* arg) const
 {
-    return module_.event_(type, arg);
+    if (AUGAS_SUCCESS != module_.event_(type, arg))
+        throw local_error(__FILE__, __LINE__, 1,
+                          "augas_module::event_() failed");
 }
 
-int
+void
 module::expire(void* arg, unsigned id, unsigned* ms) const
 {
-    return module_.expire_(arg, id, ms);
+    if (AUGAS_SUCCESS != module_.expire_(arg, id, ms))
+        throw local_error(__FILE__, __LINE__, 1,
+                          "augas_module::expire_() failed");
 }
 
-int
+void
 module::reconf() const
 {
-    return module_.reconf_();
+    if (AUGAS_SUCCESS != module_.reconf_())
+        throw local_error(__FILE__, __LINE__, 1,
+                          "augas_module::reconf_() failed");
 }

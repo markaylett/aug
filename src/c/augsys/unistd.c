@@ -29,7 +29,7 @@ aug_pipe(int fds[2])
 #else /* _WIN32 */
     if (-1 == _pipe(fds, 1024, O_BINARY)) {
 #endif /* _WIN32 */
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -50,7 +50,7 @@ aug_read(int fd, void* buf, size_t size)
         return -1;
 
     if (!driver->read_) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_read() not supported"));
         return -1;
     }
@@ -66,7 +66,7 @@ aug_write(int fd, const void* buf, size_t size)
         return -1;
 
     if (!driver->write_) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_write() not supported"));
         return -1;
     }

@@ -48,7 +48,7 @@ aug_signalhandler(void (*handler)(int))
     for (i = 0; i < sizeof(handlers_) / sizeof(handlers_[0]); ++i) {
         sethandler_(&sa, handlers_[i].dfl_ ? SIG_DFL : handler);
         if (-1 == sigaction(handlers_[i].sig_, &sa, NULL)) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             return -1;
         }
     }
@@ -62,12 +62,12 @@ aug_blocksignals(void)
     sigfillset(&set);
 #if !defined(_MT)
     if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 #else /* _MT */
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 #endif /* _MT */
@@ -81,12 +81,12 @@ aug_unblocksignals(void)
     sigemptyset(&set);
 #if !defined(_MT)
     if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 #else /* _MT */
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 #endif /* _MT */

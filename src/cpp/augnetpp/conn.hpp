@@ -62,7 +62,7 @@ namespace aug {
         ~conns() AUG_NOTHROW
         {
             if (-1 == aug_freeconns(&conns_))
-                aug_perrinfo("aug_freeconns() failed");
+                aug_perrinfo(0, "aug_freeconns() failed");
         }
 
         conns()
@@ -110,22 +110,19 @@ namespace aug {
     insertconn(struct aug_conns& conns, fdref ref, conncb_base& cb)
     {
         var v(&cb);
-        if (-1 == aug_insertconn(&conns, ref.get(), detail::conncb, cptr(v)))
-            throwerrinfo("aug_insertconn() failed");
+        verify(aug_insertconn(&conns, ref.get(), detail::conncb, cptr(v)));
     }
 
     inline void
     removeconn(struct aug_conns& conns, fdref ref)
     {
-        if (-1 == aug_removeconn(&conns, ref.get()))
-            throwerrinfo("aug_removeconn() failed");
+        verify(aug_removeconn(&conns, ref.get()));
     }
 
     inline void
     processconns(struct aug_conns& conns)
     {
-        if (-1 == aug_processconns(&conns))
-            throwerrinfo("aug_processconns() failed");
+        verify(aug_processconns(&conns));
     }
 }
 

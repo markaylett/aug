@@ -5,7 +5,7 @@
 #define AUGSYS_BUILD
 #include "augsys/errinfo.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/errno.h"
 #include "augsys/log.h"
@@ -29,8 +29,7 @@ vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line, int src,
     errinfo->src_ = src;
     errinfo->num_ = num;
 
-    if (0 > vsnprintf(errinfo->desc_, sizeof(errinfo->desc_),
-                      format, args))
+    if (0 > vsnprintf(errinfo->desc_, sizeof(errinfo->desc_), format, args))
         aug_strlcpy(errinfo->desc_, "no message: bad format",
                     sizeof(errinfo->desc_));
 }
@@ -57,7 +56,7 @@ vwritelog_(const char* file, int line, int src, int num, const char* format,
 
 static struct aug_errinfo* errinfo_ = NULL;
 
-static const struct aug_errinfo*
+static struct aug_errinfo*
 geterrinfo_(void)
 {
     return errinfo_ ? errinfo_ : 0;
@@ -83,28 +82,6 @@ aug_initerrinfo(struct aug_errinfo* errinfo)
     return 0;
 }
 
-AUGSYS_API int
-aug_vseterrinfo(const char* file, int line, int src, int num,
-                const char* format, va_list args)
-{
-    if (errinfo_)
-        vseterrinfo_(errinfo_, file, line, src, num, format, args);
-    else
-        vwritelog_(file, line, src, num, format, args);
-    return num;
-}
-
-AUGSYS_API int
-aug_seterrinfo(const char* file, int line, int src, int num,
-               const char* format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    aug_vseterrinfo(file, line, src, num, format, args);
-    va_end(args);
-    return num;
-}
-
 #else /* _MT */
 
 # include "augsys/tls_.h"
@@ -112,7 +89,7 @@ aug_seterrinfo(const char* file, int line, int src, int num,
 static int init_ = 0;
 static aug_tlskey_t tlskey_;
 
-static const struct aug_errinfo*
+static struct aug_errinfo*
 geterrinfo_(void)
 {
     void* errinfo;
@@ -170,47 +147,45 @@ aug_initerrinfo(struct aug_errinfo* errinfo)
     return 0;
 }
 
+#endif /* _MT */
+
 AUGSYS_API int
-aug_vseterrinfo(const char* file, int line, int src, int num,
-                const char* format, va_list args)
+aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                int src, int num, const char* format, va_list args)
 {
-    void* value;
-    if (init_ && -1 != aug_gettlsvalue_(tlskey_, &value) && value)
-        vseterrinfo_((struct aug_errinfo*)value, file, line, src, num,
-                     format, args);
+    if (errinfo || (errinfo = geterrinfo_()))
+        vseterrinfo_(errinfo, file, line, src, num, format, args);
     else
         vwritelog_(file, line, src, num, format, args);
     return num;
 }
 
 AUGSYS_API int
-aug_seterrinfo(const char* file, int line, int src, int num,
-               const char* format, ...)
+aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+               int src, int num, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    aug_vseterrinfo(file, line, src, num, format, args);
+    aug_vseterrinfo(errinfo, file, line, src, num, format, args);
     va_end(args);
     return num;
 }
 
-#endif /* _MT */
-
 AUGSYS_API int
-aug_setposixerrinfo(const char* file, int line, int err)
+aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    int err)
 {
-    aug_seterrinfo(file, line, AUG_SRCPOSIX, err, aug_strerror(err));
+    aug_seterrinfo(errinfo, file, line, AUG_SRCPOSIX, err, aug_strerror(err));
     return errno = err;
 }
 
 #if defined(_WIN32)
-
-#include "augsys/windows.h"
-
-#include <ctype.h>
+# include "augsys/windows.h"
+# include <ctype.h>
 
 AUGSYS_API int
-aug_setwin32errinfo(const char* file, int line, unsigned long err)
+aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    unsigned long err)
 {
     char desc[AUG_MAXLINE];
     DWORD i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
@@ -228,7 +203,7 @@ aug_setwin32errinfo(const char* file, int line, unsigned long err)
         --i;
 
     desc[i] = '\0';
-    aug_seterrinfo(file, line, AUG_SRCWIN32, (int)err,
+    aug_seterrinfo(errinfo, file, line, AUG_SRCWIN32, (int)err,
                    i ? desc : AUG_MSG("no description available"));
 
     /* Map to errno for completeness. */
@@ -236,29 +211,21 @@ aug_setwin32errinfo(const char* file, int line, unsigned long err)
     aug_setwin32errno(err);
     return (int)err;
 }
-
 #endif /* _WIN32 */
 
-AUGSYS_API const struct aug_errinfo*
-aug_geterrinfo(void)
-{
-    const struct aug_errinfo* errinfo = geterrinfo_();
-    return errinfo ? errinfo : &nullinfo_;
-}
-
 AUGSYS_API int
-aug_iserrinfo(int src, int num)
+aug_iserrinfo(const struct aug_errinfo* errinfo, int src, int num)
 {
-    const struct aug_errinfo* errinfo = geterrinfo_();
+    if (!errinfo)
+        errinfo = geterrinfo_();
     return errinfo && errinfo->src_ == src && errinfo->num_ == num;
 }
 
 AUGSYS_API int
-aug_perrinfo(const char* s)
+aug_perrinfo(const struct aug_errinfo* errinfo, const char* s)
 {
-    const struct aug_errinfo* errinfo = geterrinfo_();
     const char* file;
-    if (!errinfo || 0 == errinfo->num_) {
+    if ((!errinfo && !(errinfo = geterrinfo_())) || 0 == errinfo->num_) {
         aug_error("%s: no description available", s);
         return 0;
     }
@@ -276,4 +243,11 @@ aug_perrinfo(const char* s)
     return aug_error("%s: [src=%d, num=0x%.8x (%d)] %s at %s line %d.", s,
                      errinfo->src_, (int)errinfo->num_, (int)errinfo->num_,
                      errinfo->desc_, file, (int)errinfo->line_);
+}
+
+AUGSYS_API const struct aug_errinfo*
+aug_geterrinfo(void)
+{
+    const struct aug_errinfo* errinfo = geterrinfo_();
+    return errinfo ? errinfo : &nullinfo_;
 }

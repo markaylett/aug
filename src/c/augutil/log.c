@@ -68,7 +68,7 @@ writeall_(int fd, const char* buf, size_t n)
             if (EINTR == errno)
                 continue;
 
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             return -1;
         }
         buf += ret, n -= ret;
@@ -98,7 +98,7 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
      */
 
     if (0 == size) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                        AUG_MSG("size cannot be zero"));
         return -1;
     }
@@ -125,14 +125,14 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
 
 #if !defined(_MT)
     if (0 > (ret = snprintf(buf, size, " %s ", aug_loglabel(loglevel)))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("broken format specification"));
         return -1;
     }
 #else /* _MT */
     if (0 > (ret = snprintf(buf, size, " %08x %s ", aug_threadid(),
                             aug_loglabel(loglevel)))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("broken format specification"));
         return -1;
     }
@@ -151,7 +151,7 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
     buf += ret, size -= ret;
 
     if (0 > (ret = vsnprintf(buf, size, format, args))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("broken format specification '%s'"), format);
         return -1;
     }

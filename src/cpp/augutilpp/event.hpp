@@ -16,17 +16,13 @@ namespace aug {
     inline struct aug_event&
     readevent(fdref ref, struct aug_event& sig)
     {
-        if (!aug_readevent(ref.get(), &sig))
-            throwerrinfo("aug_readevent() failed");
-        return sig;
+        return *verify(aug_readevent(ref.get(), &sig));
     }
 
     inline const struct aug_event&
     writeevent(fdref ref, const struct aug_event& sig)
     {
-        if (!aug_writeevent(ref.get(), &sig))
-            throwerrinfo("aug_writeevent() failed");
-        return sig;
+        return *verify(aug_writeevent(ref.get(), &sig));
     }
 }
 

@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/event.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/errinfo.h"
 #include "augsys/unistd.h"

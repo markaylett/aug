@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/config.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #if defined(_MSC_VER)
 # pragma comment(lib, "libaugsys.lib")

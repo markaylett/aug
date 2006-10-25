@@ -23,11 +23,8 @@ namespace aug {
         smartmar(marref ref, bool retain)
             : ref_(ref)
         {
-            if (retain && null != ref) {
-
-                if (-1 == aug_retainmar(ref.get()))
-                    throwerrinfo("aug_retainmar() failed");
-            }
+            if (retain && null != ref)
+                verify(aug_retainmar(ref.get()));
         }
 
     public:
@@ -37,7 +34,7 @@ namespace aug {
                 return;
 
             if (null != ref_ && -1 == aug_releasemar(ref_.get()))
-                aug_perrinfo("aug_releasemar() failed");
+                aug_perrinfo(0, "aug_releasemar() failed");
         }
 
         smartmar(const null_&) AUG_NOTHROW
@@ -48,8 +45,8 @@ namespace aug {
         smartmar(const smartmar& rhs)
             : ref_(rhs.ref_)
         {
-            if (null != ref_ && -1 == aug_retainmar(ref_.get()))
-                throwerrinfo("aug_retainmar() failed");
+            if (null != ref_)
+                verify(aug_retainmar(ref_.get()));
         }
 
         smartmar&
@@ -79,8 +76,7 @@ namespace aug {
             if (null != ref_) {
                 marref ref(ref_);
                 ref_ = null;
-                if (-1 == aug_releasemar(ref.get()))
-                    throwerrinfo("aug_releasemar() failed");
+                verify(aug_releasemar(ref.get()));
             }
         }
 

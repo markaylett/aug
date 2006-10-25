@@ -72,21 +72,21 @@ term_(void)
 static void
 setalreadyreg_(const char* file, int line, int fd)
 {
-    aug_seterrinfo(file, line, AUG_SRCLOCAL, AUG_EEXIST,
+    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EEXIST,
                    AUG_MSG("descriptor '%d' already registered"), (int)fd);
 }
 
 static void
 setbadfd_(const char* file, int line)
 {
-    aug_seterrinfo(file, line, AUG_SRCLOCAL, AUG_EINVAL,
+    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EINVAL,
                    AUG_MSG("invalid file descriptor"));
 }
 
 static void
 setnotreg_(const char* file, int line, int fd)
 {
-    aug_seterrinfo(file, line, AUG_SRCLOCAL, AUG_EEXIST,
+    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EEXIST,
                    AUG_MSG("descriptor '%d' not registered"), (int)fd);
 }
 
@@ -118,7 +118,7 @@ growfiles_(size_t size)
         files = malloc(size * sizeof(struct file_));
 
     if (!files) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 

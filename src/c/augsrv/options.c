@@ -106,7 +106,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
             if (!aug_realpath(options->conffile_, conffile,
                               sizeof(options->conffile_))) {
                 usage_();
-                aug_perrinfo("aug_realpath() failed");
+                aug_perrinfo(NULL, "aug_realpath() failed");
                 return -1;
             }
             break;

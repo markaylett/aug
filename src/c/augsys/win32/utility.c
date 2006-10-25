@@ -13,7 +13,7 @@ aug_filesize(int fd, size_t* size)
     intptr_t file;
 
     if (-1 == (file = _get_osfhandle(fd))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid file descriptor"));
         return -1;
     }
@@ -21,12 +21,12 @@ aug_filesize(int fd, size_t* size)
     low = GetFileSize((HANDLE)file, &high);
 
     if (-1 == low && NO_ERROR != GetLastError()) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
     if (high) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("file too large"));
         return -1;
     }

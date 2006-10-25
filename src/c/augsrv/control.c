@@ -5,7 +5,7 @@
 #define AUGSRV_BUILD
 #include "augsrv/control.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #if !defined(_WIN32)
 # include "augsrv/posix/control.c"

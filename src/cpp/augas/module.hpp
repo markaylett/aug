@@ -25,26 +25,26 @@ namespace augas {
         void
         open(struct augas_session& s, const char* serv) const;
 
-        int
+        void
         data(const struct augas_session& s, const char* buf,
              size_t size) const;
 
-        int
+        void
         rdexpire(const struct augas_session& s, unsigned& ms) const;
 
-        int
+        void
         wrexpire(const struct augas_session& s, unsigned& ms) const;
 
-        int
+        void
         stop(const struct augas_session& s) const;
 
-        int
+        void
         event(int type, void* arg) const;
 
-        int
+        void
         expire(void* arg, unsigned id, unsigned* ms) const;
 
-        int
+        void
         reconf() const;
     };
 }

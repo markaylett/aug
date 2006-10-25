@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/conv.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/errinfo.h"
 
@@ -24,14 +24,14 @@ aug_strtoul(unsigned long* dst, const char* src, int base)
 
     if (0 != errno) {
 
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         ret = -1;
 
     } else if ('\0' != *end) {
 
         /* The string was only partially processed. */
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                        AUG_MSG("partial conversion"));
         ret = -1;
 
@@ -56,7 +56,7 @@ aug_strtoui(unsigned* dst, const char* src, int base)
 
         /* Bounds exceeded for target type. */
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                        AUG_MSG("max integer value exceeded"));
         return -1;
     }
@@ -76,7 +76,7 @@ aug_strtous(unsigned short* dst, const char* src, int base)
 
         /* Bounds exceeded for target type. */
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                        AUG_MSG("max integer value exceeded"));
         return -1;
     }

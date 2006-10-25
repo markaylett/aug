@@ -15,22 +15,19 @@ namespace aug {
     inline void
     signalhandler(void (*handler)(int))
     {
-        if (-1 == aug_signalhandler(handler))
-            throwerrinfo("aug_signalhandler() failed");
+        verify(aug_signalhandler(handler));
     }
 
     inline void
     blocksignals()
     {
-        if (-1 == aug_blocksignals())
-            throwerrinfo("aug_blocksignals() failed");
+        verify(aug_blocksignals());
     }
 
     inline void
     unblocksignals()
     {
-        if (-1 == aug_unblocksignals())
-            throwerrinfo("aug_unblocksignals() failed");
+        verify(aug_unblocksignals());
     }
 
     class scoped_block {
@@ -44,7 +41,7 @@ namespace aug {
         ~scoped_block() AUG_NOTHROW
         {
             if (-1 == aug_unblocksignals())
-                aug_perrinfo("aug_unblocksignals() failed");
+                aug_perrinfo(0, "aug_unblocksignals() failed");
         }
 
         scoped_block()
@@ -64,7 +61,7 @@ namespace aug {
         ~scoped_unblock() AUG_NOTHROW
         {
             if (-1 == aug_blocksignals())
-                aug_perrinfo("aug_blocksignals() failed");
+                aug_perrinfo(0, "aug_blocksignals() failed");
         }
 
         scoped_unblock()

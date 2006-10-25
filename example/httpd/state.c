@@ -187,7 +187,7 @@ aug_createstate(aug_request_t request, const struct aug_var* arg)
     struct aug_var local;
 
     if (!state) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 

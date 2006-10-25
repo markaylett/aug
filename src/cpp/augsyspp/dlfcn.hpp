@@ -14,10 +14,7 @@ namespace aug {
     inline aug_fnptr_t
     dlsym(aug_dlib_t dlib, const char* symbol)
     {
-        aug_fnptr_t fn(aug_dlsym(dlib, symbol));
-        if (!fn)
-            throwerrinfo("aug_dlsym() failed");
-        return fn;
+        return verify(aug_dlsym(dlib, symbol));
     }
 
     template <typename fnT>
@@ -40,7 +37,7 @@ namespace aug {
         ~dlib() AUG_NOTHROW
         {
             if (-1 == aug_dlclose(dlib_))
-                aug_perrinfo("aug_dlclose() failed");
+                aug_perrinfo(0, "aug_dlclose() failed");
         }
 
         dlib(const null_&) AUG_NOTHROW
@@ -60,16 +57,14 @@ namespace aug {
             if (dlib_) {
                 aug_dlib_t dlib(dlib_);
                 dlib_ = 0;
-                if (-1 == aug_dlclose(dlib))
-                    throwerrinfo("aug_dlclose() failed");
+                verify(aug_dlclose(dlib));
             }
         }
 
         void
         open(const char* path)
         {
-            if (!(dlib_ = aug_dlopen(path)))
-                throwerrinfo("aug_dlopen() failed");
+            verify(dlib_ = aug_dlopen(path));
         }
 
         dlib&

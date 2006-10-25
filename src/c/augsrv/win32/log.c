@@ -54,7 +54,7 @@ aug_setsrvlogger(const char* sname)
         aug_unsetsrvlogger();
 
     if (!(eventlog_ = RegisterEventSource(NULL, sname))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -75,7 +75,7 @@ aug_unsetsrvlogger(void)
         aug_setlogger(orig_);
 
         if (!DeregisterEventSource(eventlog)) {
-            aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+            aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
             return -1;
         }
     }

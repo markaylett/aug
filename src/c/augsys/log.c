@@ -5,7 +5,7 @@
 #define AUGSYS_BUILD
 #include "augsys/log.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/lock.h"

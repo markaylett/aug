@@ -118,7 +118,7 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     if (!field->name_) {
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
                        AUG_MSG("null field name"));
         return -1;
     }
@@ -128,14 +128,14 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     if (AUG_NSIZE_MAX < nsize) {
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                        AUG_MSG("maximum field-name size exceeded"));
         return -1;
     }
 
     if (AUG_VSIZE_MAX < vsize) {
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                        AUG_MSG("maximum field-value size exceeded"));
         return -1;
     }
@@ -203,7 +203,7 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
 
     if (ord >= info->fields_) {
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
                        AUG_MSG("field '%d' does not exist"), (int)ord);
         return -1;
     }
@@ -214,7 +214,7 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
 
     if (AUG_VSIZE_MAX < vsize) {
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
                        AUG_MSG("maximum field-value size exceeded"));
         return -1;
     }
@@ -346,7 +346,7 @@ aug_valuebyname_(aug_seq_t seq, const struct aug_info_* info,
 
     if (inout == info->fields_) {
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
                        AUG_MSG("field '%s' does not exist"), name);
         return NULL;
     }
@@ -368,7 +368,7 @@ aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, unsigned ord,
 
     if (ord >= info->fields_) {
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
                        AUG_MSG("field '%d' does not exist"), (int)ord);
         return NULL;
     }

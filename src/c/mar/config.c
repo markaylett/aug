@@ -4,4 +4,4 @@
 #define AUGMAR_BUILD
 #include "mar/config.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";

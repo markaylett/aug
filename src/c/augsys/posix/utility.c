@@ -16,7 +16,7 @@ aug_filesize(int fd, size_t* size)
 {
     struct stat s;
     if (-1 == fstat(fd, &s)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 

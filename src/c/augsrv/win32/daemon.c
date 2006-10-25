@@ -27,7 +27,7 @@ gettemp_(void)
 {
     static char path[MAX_PATH + 1];
     if (0 == GetTempPath(MAX_PATH, path)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return NULL;
     }
     return path;
@@ -48,7 +48,7 @@ setstatus_(DWORD state)
     status.dwWaitHint = 0;
 
     if (!SetServiceStatus(ssh_, &status)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
     return 0;
@@ -64,12 +64,12 @@ handler_(DWORD code)
     case RECONF_:
         event.type_ = AUG_EVENTRECONF;
         if (!aug_writeevent(aug_eventout(), &event))
-            aug_perrinfo("aug_writeevent() failed");
+            aug_perrinfo(NULL, "aug_writeevent() failed");
         break;
     case STATUS_:
         event.type_ = AUG_EVENTSTATUS;
         if (!aug_writeevent(aug_eventout(), &event))
-            aug_perrinfo("aug_writeevent() failed");
+            aug_perrinfo(NULL, "aug_writeevent() failed");
         break;
     case STOP_:
     case SERVICE_CONTROL_STOP:
@@ -77,7 +77,7 @@ handler_(DWORD code)
         setstatus_(SERVICE_STOP_PENDING);
         event.type_ = AUG_EVENTSTOP;
         if (!aug_writeevent(aug_eventout(), &event)) {
-            aug_perrinfo("aug_writeevent() failed");
+            aug_perrinfo(NULL, "aug_writeevent() failed");
             setstatus_(SERVICE_RUNNING);
         }
         break;
@@ -99,12 +99,12 @@ start_(DWORD argc, char** argv)
     /* Move away from system32. */
 
     if (!SetCurrentDirectory(appdata)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return;
     }
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return;
     }
@@ -116,21 +116,21 @@ start_(DWORD argc, char** argv)
 
         /* Commands other than AUG_CMDDEFAULT are invalid in this context. */
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid argument(s)"));
-        aug_perrinfo("failed to read options");
+        aug_perrinfo(NULL, "failed to read options");
         return;
     }
 
     if (-1 == aug_readserviceconf(options.conffile_, 1)) {
-        aug_perrinfo("aug_readserviceconf() failed");
+        aug_perrinfo(NULL, "aug_readserviceconf() failed");
         return;
     }
 
     if (!(ssh_ = RegisterServiceCtrlHandler(sname, handler_))) {
 
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
-        aug_perrinfo("RegisterServiceCtrlHandler() failed");
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+        aug_perrinfo(NULL, "RegisterServiceCtrlHandler() failed");
         return;
     }
 
@@ -138,7 +138,7 @@ start_(DWORD argc, char** argv)
 
     if (-1 == aug_initservice()) {
 
-        aug_perrinfo("aug_initservice() failed");
+        aug_perrinfo(NULL, "aug_initservice() failed");
         setstatus_(SERVICE_STOPPED);
         return;
     }
@@ -147,7 +147,7 @@ start_(DWORD argc, char** argv)
     setstatus_(SERVICE_RUNNING);
 
     if (-1 == aug_runservice())
-        aug_perrinfo("aug_runservice() failed");
+        aug_perrinfo(NULL, "aug_runservice() failed");
 
     aug_notice("daemon stopped");
     setstatus_(SERVICE_STOPPED);
@@ -164,7 +164,7 @@ aug_daemonise(void)
     };
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
@@ -177,7 +177,7 @@ aug_daemonise(void)
         if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == err)
             ret = AUG_RETNONE;
         else {
-            aug_setwin32errinfo(__FILE__, __LINE__, err);
+            aug_setwin32errinfo(NULL, __FILE__, __LINE__, err);
             ret = -1;
         }
     }

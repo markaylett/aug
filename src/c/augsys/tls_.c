@@ -4,7 +4,7 @@
 #define AUGSYS_BUILD
 #include "augsys/tls_.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #if !defined(_MT)
 

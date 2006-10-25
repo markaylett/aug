@@ -4,4 +4,4 @@
 #define AUGSRV_BUILD
 #include "augsrv/types.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";

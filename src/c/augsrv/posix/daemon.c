@@ -41,7 +41,7 @@ daemonise_(void)
     case 0:
         break;
     case -1:
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     default:
         /* Use system version of exit to avoid flushing standard
@@ -53,7 +53,7 @@ daemonise_(void)
        leader. */
 
     if (-1 == setsid()) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -64,7 +64,7 @@ daemonise_(void)
     case 0:
         break;
     case -1:
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     default:
         /* Use system version of exit to avoid flushing standard streams. */
@@ -74,7 +74,7 @@ daemonise_(void)
     /* Restrict file creation mode. */
 
     if (-1 == umask(0027)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -100,25 +100,25 @@ writepid_(int fd)
     size_t len = digits_(pid) + 1;
     char* str = alloca(sizeof(char) * (len + 1));
     if (!str) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 
     /* Buffer is always terminated with null byte. */
 
     if (len != (snprintf(str, len + 1, "%ld\n", (long)pid))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
                        AUG_MSG("pid formatting failed"));
         return -1;
     }
 
     if (len != write(fd, str, len)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
     if (-1 == fsync(fd)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -136,7 +136,7 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_len = 0;
 
     if (-1 == fcntl(fd, cmd, fl)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -149,7 +149,7 @@ lockfile_(const char* path)
     struct flock fl;
     int fd = open(path, O_CREAT | O_WRONLY, 0640);
     if (-1 == fd) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -162,7 +162,7 @@ lockfile_(const char* path)
 
         /* EAGAIN indicates that another process has locked the file. */
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
                        AUG_MSG("pidfile still in use: %s"), path);
 
         VERIFYCLOSE_(fd);
@@ -172,7 +172,7 @@ lockfile_(const char* path)
     /* Truncate any existing pid value. */
 
     if (-1 == ftruncate(fd, 0)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         goto fail;
     }
 
@@ -193,12 +193,12 @@ closein_(void)
 {
     int fd = open("/dev/null", O_RDONLY), ret = -1;
 	if (-1 == fd) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
     if (-1 == dup2(fd, STDIN_FILENO))
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     else
         ret = 0;
 
@@ -211,7 +211,7 @@ aug_daemonise(void)
 {
     const char* pidfile;
     if (!(pidfile = aug_getserviceopt(AUG_OPTPIDFILE))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return -1;
     }

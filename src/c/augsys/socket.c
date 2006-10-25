@@ -8,11 +8,11 @@ static const char rcsid[] = "$Id$";
 
 #if !defined(_WIN32)
 # define SETAFNOSUPPORT_()                                  \
-    aug_setposixerrinfo(__FILE__, __LINE__, EAFNOSUPPORT)
+    aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAFNOSUPPORT)
 # include "augsys/posix/socket.c"
 #else /* _WIN32 */
 # define SETAFNOSUPPORT_()                                      \
-    aug_setwin32errinfo(__FILE__, __LINE__, WSAEAFNOSUPPORT)
+    aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEAFNOSUPPORT)
 # include "augsys/win32/socket.c"
 #endif /* _WIN32 */
 

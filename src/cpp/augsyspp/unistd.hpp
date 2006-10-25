@@ -14,17 +14,14 @@ namespace aug {
     inline void
     close(int fd)
     {
-        if (-1 == aug_close(fd))
-            throwerrinfo("aug_close() failed");
+        verify(aug_close(fd));
     }
 
     inline std::pair<smartfd, smartfd>
     pipe()
     {
         int fds[2];
-        if (-1 == aug_pipe(fds))
-            throwerrinfo("aug_pipe() failed");
-
+        verify(aug_pipe(fds));
         return std::make_pair(smartfd::attach(fds[0]),
                               smartfd::attach(fds[1]));
     }
@@ -32,19 +29,13 @@ namespace aug {
     inline size_t
     read(fdref ref, void* buf, size_t size)
     {
-        ssize_t ret(aug_read(ref.get(), buf, size));
-        if (-1 == ret)
-            throwerrinfo("aug_read() failed");
-        return ret;
+        return verify(aug_read(ref.get(), buf, size));
     }
 
     inline size_t
     write(fdref ref, const void* buf, size_t size)
     {
-        ssize_t ret(aug_write(ref.get(), buf, size));
-        if (-1 == ret)
-            throwerrinfo("aug_write() failed");
-        return ret;
+        return verify(aug_write(ref.get(), buf, size));
     }
 
     inline void

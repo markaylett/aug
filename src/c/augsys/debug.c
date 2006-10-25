@@ -4,7 +4,7 @@
 #define AUGSYS_BUILD
 #include "augsys/debug.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/log.h"
 

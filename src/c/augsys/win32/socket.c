@@ -11,7 +11,7 @@
 static void
 setbadfd_(const char* file, int line)
 {
-    aug_seterrinfo(file, line, AUG_SRCLOCAL, AUG_EINVAL,
+    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EINVAL,
                    AUG_MSG("invalid file descriptor"));
 }
 
@@ -29,7 +29,7 @@ close_(int fd)
 
     int ret = closesocket(_get_osfhandle(fd));
     if (SOCKET_ERROR == ret)
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
 
 #if defined(_MSC_VER)
     __try {
@@ -50,7 +50,7 @@ read_(int fd, void* buf, size_t size)
 {
     ssize_t ret = recv(_get_osfhandle(fd), buf, (int)size, 0);
     if (SOCKET_ERROR == ret)
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
 
     return ret;
 }
@@ -69,7 +69,8 @@ readv_(int fd, const struct iovec* iov, int size)
         buf = _alloca(sizeof(WSABUF) * size);
 #if defined(_MSC_VER)
 	} __except (STATUS_STACK_OVERFLOW == GetExceptionCode()) {
-		aug_setwin32errinfo(__FILE__, __LINE__, ERROR_NOT_ENOUGH_MEMORY);
+		aug_setwin32errinfo(NULL, __FILE__, __LINE__,
+                            ERROR_NOT_ENOUGH_MEMORY);
 		return -1;
 	}
 #endif /* _MSC_VER */
@@ -80,7 +81,7 @@ readv_(int fd, const struct iovec* iov, int size)
     }
 
     if (SOCKET_ERROR == WSARecv((SOCKET)h, buf, size, &ret, 0, NULL, NULL)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -92,7 +93,7 @@ write_(int fd, const void* buf, size_t size)
 {
     ssize_t ret = send(_get_osfhandle(fd), buf, (int)size, 0);
     if (SOCKET_ERROR == ret)
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
 
     return ret;
 }
@@ -112,7 +113,8 @@ writev_(int fd, const struct iovec* iov, int size)
 #if defined(_MSC_VER)
 	}
 	__except (STATUS_STACK_OVERFLOW == GetExceptionCode()) {
-		aug_setwin32errinfo(__FILE__, __LINE__, ERROR_NOT_ENOUGH_MEMORY);
+		aug_setwin32errinfo(NULL, __FILE__, __LINE__,
+                            ERROR_NOT_ENOUGH_MEMORY);
 		return -1;
 	}
 #endif /* _MSC_VER */
@@ -123,7 +125,7 @@ writev_(int fd, const struct iovec* iov, int size)
     }
 
     if (SOCKET_ERROR == WSASend((SOCKET)h, buf, size, &ret, 0, NULL, NULL)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -137,7 +139,7 @@ setnonblock_(int fd, int on)
     unsigned long arg = (unsigned long)on;
 
     if (SOCKET_ERROR == ioctlsocket((SOCKET)h, FIONBIO, &arg)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -243,7 +245,7 @@ streampair_(int protocol, int sv[2])
  fail2:
 	closesocket(l);
  fail1:
-    aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+    aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
     return -1;
 }
 
@@ -281,7 +283,7 @@ dgrampair_(int protocol, int sv[2])
  fail2:
 	closesocket(s);
  fail1:
-    aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+    aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
 	return -1;
 }
 
@@ -290,7 +292,7 @@ aug_socket(int domain, int type, int protocol)
 {
     SOCKET h = socket(domain, type, protocol);
     if (INVALID_SOCKET == h) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -304,7 +306,7 @@ aug_accept(int s, struct aug_endpoint* ep)
     ep->len_ = AUG_MAXADDRLEN;
     h = accept(_get_osfhandle(s), &ep->un_.sa_, &ep->len_);
     if (INVALID_SOCKET == h) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -315,7 +317,7 @@ AUGSYS_API int
 aug_bind(int s, const struct aug_endpoint* ep)
 {
     if (SOCKET_ERROR == bind(_get_osfhandle(s), &ep->un_.sa_, ep->len_)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -326,7 +328,7 @@ AUGSYS_API int
 aug_connect(int s, const struct aug_endpoint* ep)
 {
     if (SOCKET_ERROR == connect(_get_osfhandle(s), &ep->un_.sa_, ep->len_)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -339,7 +341,7 @@ aug_getpeername(int s, struct aug_endpoint* ep)
     ep->len_ = AUG_MAXADDRLEN;
     if (SOCKET_ERROR == getpeername(_get_osfhandle(s), &ep->un_.sa_,
                                     &ep->len_)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return NULL;
     }
 
@@ -352,7 +354,7 @@ aug_getsockname(int s, struct aug_endpoint* ep)
     ep->len_ = AUG_MAXADDRLEN;
     if (SOCKET_ERROR == getsockname(_get_osfhandle(s), &ep->un_.sa_,
                                     &ep->len_)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return NULL;
     }
 
@@ -363,7 +365,7 @@ AUGSYS_API int
 aug_listen(int s, int backlog)
 {
     if (SOCKET_ERROR == listen(_get_osfhandle(s), backlog)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -375,7 +377,7 @@ aug_recv(int s, void* buf, size_t len, int flags)
 {
     ssize_t ret = recv(_get_osfhandle(s), buf, (int)len, flags);
     if (SOCKET_ERROR == ret)
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
 
     return ret;
 }
@@ -388,7 +390,7 @@ aug_recvfrom(int s, void* buf, size_t len, int flags, struct aug_endpoint* ep)
     ret = recvfrom(_get_osfhandle(s), buf, (int)len, flags, &ep->un_.sa_,
                    &ep->len_);
     if (SOCKET_ERROR == ret)
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
 
     return ret;
 }
@@ -398,7 +400,7 @@ aug_send(int s, const void* buf, size_t len, int flags)
 {
     ssize_t ret = send(_get_osfhandle(s), buf, (int)len, flags);
     if (SOCKET_ERROR == ret)
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
 
     return ret;
 }
@@ -410,7 +412,7 @@ aug_sendto(int s, const void* buf, size_t len, int flags,
     ssize_t ret = sendto(_get_osfhandle(s), buf, (int)len, flags,
                          &ep->un_.sa_, ep->len_);
     if (SOCKET_ERROR == ret)
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
 
     return ret;
 }
@@ -420,7 +422,7 @@ aug_getsockopt(int s, int level, int optname, void* optval, socklen_t* optlen)
 {
     if (SOCKET_ERROR == getsockopt(_get_osfhandle(s), level, optname, optval,
                                    optlen)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -433,7 +435,7 @@ aug_setsockopt(int s, int level, int optname, const void* optval,
 {
     if (SOCKET_ERROR == setsockopt(_get_osfhandle(s), level, optname, optval,
                                    optlen)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -444,7 +446,7 @@ AUGSYS_API int
 aug_shutdown(int s, int how)
 {
     if (SOCKET_ERROR == shutdown(_get_osfhandle(s), how)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
     }
 
@@ -466,7 +468,7 @@ aug_socketpair(int domain, int type, int protocol, int sv[2])
 		return dgrampair_(protocol, sv);
 	}
 
-	aug_setwin32errinfo(__FILE__, __LINE__, WSAESOCKTNOSUPPORT);
+	aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAESOCKTNOSUPPORT);
 	return -1;
 }
 
@@ -505,7 +507,7 @@ aug_inetntop(const struct aug_inetaddr* src, char* dst, socklen_t len)
 
     if (SOCKET_ERROR == WSAAddressToString(&un.sa_, srclen, NULL, dst,
                                            &dstlen)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return NULL;
     }
 
@@ -544,7 +546,7 @@ aug_inetpton(int af, const char* src, struct aug_inetaddr* dst)
 
     if (SOCKET_ERROR == WSAStringToAddress((LPTSTR)src, af, NULL, &un.sa_,
                                            &len)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return NULL;
     }
 
@@ -569,7 +571,7 @@ aug_getaddrinfo(const char* host, const char* serv,
 {
     int ret = getaddrinfo(host, serv, hints, res);
     if (0 != ret) {
-        aug_setwin32errinfo(__FILE__, __LINE__, ret);
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, ret);
         return -1;
     }
     return 0;

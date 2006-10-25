@@ -41,7 +41,7 @@ handler_(const struct aug_var* arg, const char* buf, size_t size)
     }
 
     if (-1 == aug_checkfix(&fixstd, buf, size)) {
-        aug_perrinfo("aug_checkfix() failed");
+        aug_perrinfo(NULL, "aug_checkfix() failed");
         exit(1);
     }
 
@@ -53,7 +53,7 @@ handler_(const struct aug_var* arg, const char* buf, size_t size)
     while (fixstd.size_) {
 
         if (-1 == (ret = aug_fixfield(&field, fixstd.body_, fixstd.size_))) {
-            aug_perrinfo("aug_fixfield() failed");
+            aug_perrinfo(NULL, "aug_fixfield() failed");
             exit(1);
         }
 
@@ -75,24 +75,24 @@ main(int argc, char* argv[])
     aug_atexitinit(&errinfo);
 
     if (!(stream = aug_createfixstream(0, handler_, NULL))) {
-        aug_perrinfo("aug_createfixstream() failed");
+        aug_perrinfo(NULL, "aug_createfixstream() failed");
         return 1;
     }
 
     if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {
-        aug_perrinfo("aug_socketpair() failed");
+        aug_perrinfo(NULL, "aug_socketpair() failed");
         return 1;
     }
 
     for (i = 0; i < TESTLEN_; ++i) {
 
         if (-1 == aug_write(sv[0], TEST_ + i, 1)) {
-            aug_perrinfo("aug_write() failed");
+            aug_perrinfo(NULL, "aug_write() failed");
             return 1;
         }
 
         if (-1 ==aug_readfix(stream, sv[1], 4096)) {
-            aug_perrinfo("aug_parsefix() failed");
+            aug_perrinfo(NULL, "aug_parsefix() failed");
             return 1;
         }
     }
@@ -103,17 +103,17 @@ main(int argc, char* argv[])
     }
 
     if (-1 == aug_write(sv[0], TEST_, TESTLEN_)) {
-        aug_perrinfo("aug_write() failed");
+        aug_perrinfo(NULL, "aug_write() failed");
         return 1;
     }
 
     if (-1 == aug_write(sv[0], TEST_, TESTLEN_)) {
-        aug_perrinfo("aug_write() failed");
+        aug_perrinfo(NULL, "aug_write() failed");
         return 1;
     }
 
     if (-1 ==aug_readfix(stream, sv[1], 4096)) {
-        aug_perrinfo("aug_parsefix() failed");
+        aug_perrinfo(NULL, "aug_parsefix() failed");
         return 1;
     }
 

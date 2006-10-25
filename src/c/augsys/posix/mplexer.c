@@ -67,7 +67,7 @@ resize_(aug_mplexer_t mplexer, size_t size)
     struct pollfd* ptr = realloc(mplexer->pollfds_,
                                  sizeof(struct pollfd) * size);
     if (!ptr) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 
@@ -82,7 +82,7 @@ aug_createmplexer(void)
 {
     aug_mplexer_t mplexer = malloc(sizeof(struct aug_mplexer_));
     if (!mplexer) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -111,7 +111,7 @@ aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
     struct pollfd* ptr;
 
     if (mask & ~(AUG_IOEVENTRD | AUG_IOEVENTWR)) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid ioevent mask '%d'"), (int)mask);
         return -1;
     }
@@ -152,7 +152,7 @@ aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 
     if (-1 == (ret = poll(mplexer->pollfds_, mplexer->nfds_, ms))) {
 
-        if (EINTR == aug_setposixerrinfo(__FILE__, __LINE__, errno))
+        if (EINTR == aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno))
             ret = AUG_RETINTR;
     }
     return ret;

@@ -4,7 +4,7 @@
 #define AUGSYS_BUILD
 #include "augsys/errno.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #if defined(_WIN32)
 

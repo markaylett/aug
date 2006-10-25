@@ -25,7 +25,7 @@ makepath_(void)
     aug_strbuf_t s;
 
     if (!(program = aug_getserviceopt(AUG_OPTPROGRAM))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPROGRAM' not set"));
         return NULL;
     }
@@ -70,7 +70,7 @@ start_(SC_HANDLE scm)
     };
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
@@ -78,7 +78,7 @@ start_(SC_HANDLE scm)
     argv[1] = aug_getserviceopt(AUG_OPTCONFFILE);
 
     if (!(serv = OpenService(scm, sname, SERVICE_START))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -98,7 +98,7 @@ start_(SC_HANDLE scm)
         b = StartService(serv, 0, NULL);
 
     if (!b) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         ret = -1;
     }
 
@@ -116,20 +116,20 @@ control_(SC_HANDLE scm, int event)
     int ret = 0;
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
 
     if (!(serv = OpenService(scm, sname, SERVICE_USER_DEFINED_CONTROL))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
     if (!ControlService(serv, OFFSET_ + event, &status)) {
 
         DWORD err = GetLastError();
-        aug_setwin32errinfo(__FILE__, __LINE__, err);
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, err);
         ret = -1;
     }
 
@@ -146,13 +146,13 @@ install_(SC_HANDLE scm)
     int ret = -1;
 
     if (!(lname = aug_getserviceopt(AUG_OPTLONGNAME))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTLONGNAME' not set"));
         return -1;
     }
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
@@ -165,7 +165,7 @@ install_(SC_HANDLE scm)
                                SERVICE_ERROR_NORMAL, aug_getstr(path), NULL,
                                NULL, NULL, NULL, NULL))) {
 
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         goto done;
     }
 
@@ -186,26 +186,26 @@ uninstall_(SC_HANDLE scm)
     int ret = 0;
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
 
     if (!(serv = OpenService(scm, sname, SERVICE_STOP | DELETE))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
     if (!ControlService(serv, SERVICE_CONTROL_STOP, &status)) {
         DWORD err = GetLastError();
         if (ERROR_SERVICE_NOT_ACTIVE != err) {
-            aug_setwin32errinfo(__FILE__, __LINE__, err);
+            aug_setwin32errinfo(NULL, __FILE__, __LINE__, err);
             ret = -1;
         }
     }
 
     if (!DeleteService(serv) && -1 != ret) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         ret = -1;
     }
 
@@ -220,7 +220,7 @@ aug_start(void)
     SC_HANDLE scm;
 
     if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -236,7 +236,7 @@ aug_control(int event)
     SC_HANDLE scm;
 
     if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -252,7 +252,7 @@ aug_install(void)
     SC_HANDLE scm;
 
     if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -268,7 +268,7 @@ aug_uninstall(void)
     SC_HANDLE scm;
 
     if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 

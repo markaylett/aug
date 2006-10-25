@@ -19,16 +19,13 @@ namespace aug {
     inline void
     chdir(const char* path)
     {
-        if (-1 == aug_chdir(path))
-            throwerrinfo("aug_chdir() failed");
+        verify(aug_chdir(path));
     }
 
     inline char*
     getcwd(char* dst, size_t size)
     {
-        if (!aug_getcwd(dst, size))
-            throwerrinfo("aug_getcwd() failed");
-        return dst;
+        return verify(aug_getcwd(dst, size));
     }
 
     inline std::string
@@ -41,9 +38,7 @@ namespace aug {
     inline char*
     realpath(char* dst, const char* src, size_t size)
     {
-        if (!aug_realpath(dst, src, size))
-            throwerrinfo("aug_realpath() failed");
-        return dst;
+        return verify(aug_realpath(dst, src, size));
     }
 
     inline std::string

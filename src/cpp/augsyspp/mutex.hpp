@@ -13,15 +13,13 @@ namespace aug {
     inline void
     lockmutex(aug_mutex_t mutex)
     {
-        if (-1 == aug_lockmutex(mutex))
-            throwerrinfo("aug_lockmutex() failed");
+        verify(aug_lockmutex(mutex));
     }
 
     inline void
     unlockmutex(aug_mutex_t mutex)
     {
-        if (-1 == aug_unlockmutex(mutex))
-            throwerrinfo("aug_unlockmutex() failed");
+        verify(aug_unlockmutex(mutex));
     }
 
     class mutex {
@@ -37,14 +35,13 @@ namespace aug {
         ~mutex() AUG_NOTHROW
         {
             if (-1 == aug_freemutex(mutex_))
-                aug_perrinfo("aug_freemutex() failed");
+                aug_perrinfo(0, "aug_freemutex() failed");
         }
 
         mutex()
             : mutex_(aug_createmutex())
         {
-            if (!mutex_)
-                throwerrinfo("aug_createmutex() failed");
+            verify(mutex_);
         }
 
         operator aug_mutex_t()
@@ -72,7 +69,7 @@ namespace aug {
         ~scoped_lock() AUG_NOTHROW
         {
             if (-1 == aug_unlockmutex(mutex_))
-                aug_perrinfo("aug_unlockmutex() failed");
+                aug_perrinfo(0, "aug_unlockmutex() failed");
         }
 
         explicit
@@ -96,7 +93,7 @@ namespace aug {
         ~scoped_unlock() AUG_NOTHROW
         {
             if (-1 == aug_lockmutex(mutex_))
-                aug_perrinfo("aug_lockmutex() failed");
+                aug_perrinfo(0, "aug_lockmutex() failed");
         }
 
         explicit

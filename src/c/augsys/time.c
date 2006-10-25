@@ -53,7 +53,8 @@ aug_localtime(const time_t* clock, struct tm* res)
     return ret;
 
  fail:
-    aug_setposixerrinfo(__FILE__, __LINE__, 0 == errno ? EINVAL : errno);
+    aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+                        ? EINVAL : errno);
     return NULL;
 }
 

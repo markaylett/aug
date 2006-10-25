@@ -30,7 +30,7 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_len = 0;
 
     if (-1 == fcntl(fd, cmd, fl)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -45,26 +45,26 @@ send_(int fd, pid_t pid, int event)
     switch (event) {
     case AUG_EVENTRECONF:
         if (-1 == kill(pid, SIGHUP)) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             return -1;
         }
         break;
     case AUG_EVENTSTATUS:
         if (-1 == kill(pid, SIGUSR1)) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             return -1;
         }
         break;
     case AUG_EVENTSTOP:
         if (-1 == kill(pid, SIGTERM)) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             return -1;
         }
 
         /* Wait for daemon process to release lock. */
 
         if (-1 == flock_(&fl, fd, F_SETLKW, F_RDLCK)) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             return -1;
         }
 
@@ -75,7 +75,7 @@ send_(int fd, pid_t pid, int event)
 
         /* Invalid command. */
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid control command '%d'"), (int)event);
         return -1;
     }
@@ -85,7 +85,7 @@ send_(int fd, pid_t pid, int event)
 AUGSRV_API int
 aug_start(void)
 {
-    aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                    AUG_MSG("aug_start() not supported"));
     return -1;
 }
@@ -98,7 +98,7 @@ aug_control(int event)
     int fd, ret = -1;
 
     if (!(pidfile = aug_getserviceopt(AUG_OPTPIDFILE))) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return -1;
     }
@@ -106,13 +106,13 @@ aug_control(int event)
     /* Check for existence of file. */
 
     if (-1 == access(pidfile, F_OK)) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
                        AUG_MSG("pidfile does not exist: %s"), pidfile);
         return -1;
     }
 
 	if (-1 == (fd = open(pidfile, O_RDONLY))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -131,7 +131,7 @@ aug_control(int event)
            another node. */
 
         if (0 == fl.l_pid) {
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
                            AUG_MSG("lockfile on NFS mount: %s"), pidfile);
             return -1;
         }
@@ -147,11 +147,11 @@ aug_control(int event)
            running. */
 
         if (-1 == unlink(pidfile)) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
             goto done;
         }
 
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
                        AUG_MSG("server process is not running"));
         ret = -1;
     }

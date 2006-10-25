@@ -162,10 +162,7 @@ namespace test {
         {
             aug_info("initialising daemon process");
 
-            if (-1 == aug_setsrvlogger("aug")) {
-                aug_setposixerrinfo(__FILE__, __LINE__, errno);
-                throwerrinfo("aug_setsrvlogger() failed");
-            }
+            verify(aug_setsrvlogger("aug"));
 
             auto_ptr<state> ptr(new state());
             setioeventmask(ptr->mplexer_, aug_eventin(), AUG_IOEVENTRD);
@@ -228,18 +225,6 @@ namespace test {
         {
         }
     };
-
-    string
-    getcwd()
-    {
-        char buf[AUG_PATH_MAX + 1];
-        if (!::getcwd(buf, sizeof(buf))) {
-            aug_setposixerrinfo(__FILE__, __LINE__, errno);
-            throwerrinfo("getcwd() failed");
-        }
-
-        return buf;
-    }
 }
 
 int

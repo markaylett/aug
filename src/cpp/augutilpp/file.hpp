@@ -58,8 +58,7 @@ namespace aug {
     readconf(const char* path, confcb_base& cb)
     {
         var v(&cb);
-        if (-1 == aug_readconf(path, detail::confcb, cptr(v)))
-            throwerrinfo("aug_readconf() failed");
+        verify(aug_readconf(path, detail::confcb, cptr(v)));
     }
 }
 

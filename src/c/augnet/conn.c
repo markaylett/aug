@@ -4,7 +4,7 @@
 #define AUGNET_BUILD
 #include "augnet/conn.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augutil/var.h"
 
@@ -67,7 +67,7 @@ aug_removeconn(struct aug_conns* conns, int fd)
             break;
 
     if (!it) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
                        AUG_MSG("no connection for descriptor '%d'"), (int)fd);
         return -1;
     }

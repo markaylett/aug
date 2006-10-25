@@ -119,7 +119,7 @@ conn_(const struct aug_var* arg, int fd, struct aug_conns* conns)
         AUG_DEBUG("handling read event");
 
         if (-1 == (ret = aug_readsome(state, fd))) {
-            aug_perrinfo("aug_readsome() failed");
+            aug_perrinfo(NULL, "aug_readsome() failed");
             goto fail;
         }
 
@@ -137,7 +137,7 @@ conn_(const struct aug_var* arg, int fd, struct aug_conns* conns)
         AUG_DEBUG("handling write event");
 
         if (-1 == (ret = aug_writesome(state, fd))) {
-            aug_perrinfo("aug_writesome() failed");
+            aug_perrinfo(NULL, "aug_writesome() failed");
             goto fail;
         }
 
@@ -172,21 +172,21 @@ listener_(const struct aug_var* arg, int fd, struct aug_conns* conns)
     AUG_DEBUG("accepting new connection");
 
     if (-1 == (conn = aug_accept(fd, &ep))) {
-        aug_perrinfo("aug_accept() failed");
+        aug_perrinfo(NULL, "aug_accept() failed");
         return 1;
     }
 
     aug_info("initialising new connection '%d'", conn);
 
     if (-1 == aug_setnonblock(conn, 1)) {
-        aug_perrinfo("aug_setnonblock() failed");
+        aug_perrinfo(NULL, "aug_setnonblock() failed");
         aug_close(conn);
         return 1;
     }
 
     aug_setvarp(&var, createconn_(mplexer_, conn));
     if (aug_isnull(&var)) {
-        aug_perrinfo("failed to create connection");
+        aug_perrinfo(NULL, "failed to create connection");
         aug_close(conn);
         return 1;
     }
@@ -261,7 +261,7 @@ reconf_(void)
     AUG_PERROR(chdir(rundir_), "chdir() failed");
 
     if (daemon_)
-        AUG_PERRINFO(aug_openlog(logfile_), "aug_openlog() failed");
+        AUG_PERRINFO(aug_openlog(logfile_), NULL, "aug_openlog() failed");
 
     aug_info("run directory: %s", rundir_);
     aug_info("pid file: %s", pidfile_);
@@ -308,7 +308,7 @@ readevent_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 
     AUG_DEBUG("reading event");
     if (!aug_readevent(aug_eventin(), &event))
-        aug_perrinfo("aug_readevent() failed");
+        aug_perrinfo(NULL, "aug_readevent() failed");
 
     switch (event.type_) {
     case AUG_EVENTRECONF:
@@ -318,7 +318,7 @@ readevent_(const struct aug_var* arg, int fd, struct aug_conns* conns)
             if (-1 == aug_readconf(conffile_, setconfopt_, NULL))
                 return -1;
         }
-        AUG_PERRINFO(reconf_(), "failed to re-configure daemon");
+        AUG_PERRINFO(reconf_(), NULL, "failed to re-configure daemon");
         break;
     case AUG_EVENTSTATUS:
         aug_info("received AUG_EVENTSTATUS");
@@ -379,7 +379,7 @@ run_(const struct aug_var* arg)
     while (!AUG_EMPTY(&conns_) && !quit_) {
 
         if (!AUG_EMPTY(&timers_))
-            AUG_PERRINFO(aug_processtimers(&timers_, 0, &timeout),
+            AUG_PERRINFO(aug_processtimers(&timers_, 0, &timeout), NULL,
                          "aug_processtimers() failed");
 
         /* If SA_RESTART has been set for an interrupting signal, it is
@@ -388,9 +388,9 @@ run_(const struct aug_var* arg)
 
         while (-1 == aug_waitioevents(mplexer_, !AUG_EMPTY(&timers_)
                                       ? &timeout : NULL))
-            aug_perrinfo("aug_waitevents() failed");
+            aug_perrinfo(NULL, "aug_waitevents() failed");
 
-        AUG_PERRINFO(aug_processconns(&conns_),
+        AUG_PERRINFO(aug_processconns(&conns_), NULL,
                      "aug_processconns() failed");
     }
     return 0;
@@ -401,10 +401,10 @@ term_(const struct aug_var* arg)
 {
     aug_info("terminating daemon process");
 
-    AUG_PERRINFO(aug_freetimers(&timers_), "aug_freetimers() failed");
-    AUG_PERRINFO(aug_freeconns(&conns_), "aug_freeconns() failed");
-    AUG_PERRINFO(aug_close(fd_), "aug_close() failed");
-    AUG_PERRINFO(aug_freemplexer(mplexer_), "aug_freemplexer() failed");
+    AUG_PERRINFO(aug_freetimers(&timers_), NULL, "aug_freetimers() failed");
+    AUG_PERRINFO(aug_freeconns(&conns_), NULL, "aug_freeconns() failed");
+    AUG_PERRINFO(aug_close(fd_), NULL, "aug_close() failed");
+    AUG_PERRINFO(aug_freemplexer(mplexer_), NULL, "aug_freemplexer() failed");
 }
 
 int

@@ -16,17 +16,17 @@ main(int argc, char* argv[])
     aug_atexitinit(&errinfo);
 
     if (-1 == aug_mplexerpipe(fds)) {
-        aug_perrinfo("aug_term() failed");
+        aug_perrinfo(NULL, "aug_term() failed");
         return 1;
     }
 
     if (!aug_writeevent(fds[1], &in)) {
-        aug_perrinfo("aug_writeevent() failed");
+        aug_perrinfo(NULL, "aug_writeevent() failed");
         goto fail;
     }
 
     if (!aug_readevent(fds[0], &out)) {
-        aug_perrinfo("aug_readevent() failed");
+        aug_perrinfo(NULL, "aug_readevent() failed");
         goto fail;
     }
 
@@ -36,14 +36,14 @@ main(int argc, char* argv[])
     }
 
     if (-1 == aug_close(fds[0]) || -1 == aug_close(fds[1])) {
-        aug_perrinfo("aug_close() failed");
+        aug_perrinfo(NULL, "aug_close() failed");
         return 1;
     }
 
     return 0;
 
  fail:
-    AUG_PERRINFO(aug_close(fds[0]), "aug_close() failed");
-    AUG_PERRINFO(aug_close(fds[1]), "aug_close() failed");
+    AUG_PERRINFO(aug_close(fds[0]), NULL, "aug_close() failed");
+    AUG_PERRINFO(aug_close(fds[1]), NULL, "aug_close() failed");
     return 1;
 }

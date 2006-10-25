@@ -4,7 +4,7 @@
 #define AUGNET_BUILD
 #include "augnet/utility.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/uio.h"
 

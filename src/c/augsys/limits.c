@@ -4,4 +4,4 @@
 #define AUGSYS_BUILD
 #include "augsys/limits.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";

@@ -12,7 +12,7 @@ static int
 close_(int fd)
 {
     if (-1 == close(fd)) {
-        aug_setposixerrinfo(__FILE__, __LINE__, errno);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -25,7 +25,7 @@ read_(int fd, void* buf, size_t size)
     DWORD ret;
 
     if (!ReadFile((HANDLE)_get_osfhandle(fd), buf, (DWORD)size, &ret, NULL)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -39,7 +39,7 @@ write_(int fd, const void* buf, size_t size)
 
     if (!WriteFile((HANDLE)_get_osfhandle(fd), buf, (DWORD)size, &ret,
                    NULL)) {
-        aug_setwin32errinfo(__FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 

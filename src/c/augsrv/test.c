@@ -59,7 +59,7 @@ run_(const struct aug_var* arg)
         return -1;
 
     if (in.type_ != out.type_) {
-        aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
                        AUG_MSG("unexpected event type from"
                                " aug_readevent()"));
         return -1;

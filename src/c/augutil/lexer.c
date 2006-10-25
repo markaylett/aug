@@ -4,7 +4,7 @@
 #define AUGUTIL_BUILD
 #include "augutil/lexer.h"
 
-static const char rcsid[] = "$Id:$";
+static const char rcsid[] = "$Id$";
 
 #include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/errinfo.h"
@@ -37,7 +37,7 @@ grow_(aug_lexer_t* lexer)
     size_t size = (*lexer)->size_ * 2;
     aug_lexer_t ptr = realloc(*lexer, sizeof(struct aug_lexer_) + size);
     if (!ptr) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 
@@ -112,7 +112,7 @@ aug_createlexer(size_t size, aug_isdelim_t isdelim)
         size = AUG_MAXLINE;
 
     if (!(lexer = malloc(sizeof(struct aug_lexer_) + size))) {
-        aug_setposixerrinfo(__FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -200,7 +200,7 @@ aug_lexchar(aug_lexer_t* lexer, char ch)
            the header and body sections of a message. */
 
         if ('\n' != ch) {
-            aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("carriage-return without newline"));
             return AUG_TOKERROR;
         }
@@ -248,7 +248,8 @@ aug_lexchar(aug_lexer_t* lexer, char ch)
         if ('\r' == (first = pending_(*lexer))) {
 
             if ('\n' != ch) {
-                aug_seterrinfo(__FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL,
+                               AUG_EPARSE,
                                AUG_MSG("carriage-return without newline"));
                 return AUG_TOKERROR;
             }

@@ -675,15 +675,13 @@ main(int argc, char* argv[])
             setinetaddr(ep, in);
             run(argv[1], sfd, ep);
 
+        } catch (const errinfo_error& e) {
+            aug_perrinfo(cptr(e), "aug::errorinfo_error");
         } catch (const exception& e) {
-            aug_perrinfo(e.what());
-            return 1;
+            aug_error("std::exception: %s", e.what());
         }
-
     } catch (const exception& e) {
         cerr << e.what() << endl;
-        return 1;
     }
-
-    return 0;
+    return 1;
 }

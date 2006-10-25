@@ -18,8 +18,7 @@ namespace aug {
     strtoul(const char* src, int base)
     {
         unsigned long ul;
-        if (-1 == aug_strtoul(&ul, src, base))
-            throwerrinfo("aug_strtoul() failed");
+        verify(aug_strtoul(&ul, src, base));
         return ul;
     }
 
@@ -27,8 +26,7 @@ namespace aug {
     strtoui(const char* src, int base)
     {
         unsigned ui;
-        if (-1 == aug_strtoui(&ui, src, base))
-            throwerrinfo("aug_strtoui() failed");
+        verify(aug_strtoui(&ui, src, base));
         return ui;
     }
 
@@ -36,8 +34,7 @@ namespace aug {
     strtous(const char* src, int base)
     {
         unsigned short us;
-        if (-1 == aug_strtous(&us, src, base))
-            throwerrinfo("aug_strtous() failed");
+        verify(aug_strtous(&us, src, base));
         return us;
     }
 }

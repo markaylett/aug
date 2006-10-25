@@ -11,6 +11,8 @@
 
 #include "augmarpp/mar.hpp"
 
+#include "augsyspp/types.hpp"
+
 #include "augsys/limits.h" // AUG_PATH_MAX
 #include "augsys/log.h"
 #include "augsys/string.h" // aug_strlcpy

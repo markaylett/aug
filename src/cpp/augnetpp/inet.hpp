@@ -18,7 +18,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_tcpconnect(host, serv, &ep)));
         if (null == sfd)
-            throwerrinfo("aug_tcpconnect() failed");
+            fail();
 
         return sfd;
     }
@@ -28,7 +28,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_tcplisten(host, serv, &ep)));
         if (null == sfd)
-            throwerrinfo("aug_tcplisten() failed");
+            fail();
 
         return sfd;
     }
@@ -38,7 +38,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_udpclient(host, serv, &ep)));
         if (null == sfd)
-            throwerrinfo("aug_udpclient() failed");
+            fail();
 
         return sfd;
     }
@@ -48,7 +48,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_udpconnect(host, serv, &ep)));
         if (null == sfd)
-            throwerrinfo("aug_udpconnect() failed");
+            fail();
 
         return sfd;
     }
@@ -58,7 +58,7 @@ namespace aug {
     {
         smartfd sfd(smartfd::attach(aug_udpserver(host, serv, &ep)));
         if (null == sfd)
-            throwerrinfo("aug_udpserver() failed");
+            fail();
 
         return sfd;
     }
@@ -67,16 +67,13 @@ namespace aug {
     setnodelay(fdref ref, bool on)
     {
         int value(on ? 1 : 0);
-        if (-1 == aug_setnodelay(ref.get(), value))
-            throwerrinfo("aug_setnodelay() failed");
+        verify(aug_setnodelay(ref.get(), value));
     }
 
     inline struct aug_hostserv&
     parsehostserv(const char* src, struct aug_hostserv& dst)
     {
-        if (!aug_parsehostserv(src, &dst))
-            throwerrinfo("aug_parsehostserv() failed");
-        return dst;
+        return *verify(aug_parsehostserv(src, &dst));
     }
 }
 

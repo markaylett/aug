@@ -52,12 +52,16 @@ main(int argc, char* argv[])
 
         aug_extenddriver(&driver_, 0);
         smartfd sfd1(open());
+        return 0;
+
+    } catch (const errinfo_error& e) {
+
+        aug_perrinfo(cptr(e), "aug::errorinfo_error");
 
     } catch (const exception& e) {
 
-        aug_perrinfo("error");
-        return 1;
+        aug_error("std::exception: %s", e.what());
     }
 
-    return 0;
+    return 1;
 }

@@ -20,7 +20,7 @@ main(int argc, char* argv[])
     aug_atexitinit(&errinfo);
 
     if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {
-        aug_perrinfo("aug_socketpair() failed");
+        aug_perrinfo(NULL, "aug_socketpair() failed");
         return 1;
     }
 
@@ -30,17 +30,17 @@ main(int argc, char* argv[])
     iov[1].iov_len = sizeof(MSG2_);
 
     if (-1 == aug_writev(sv[0], iov, 2)) {
-        aug_perrinfo("aug_writev() failed");
+        aug_perrinfo(NULL, "aug_writev() failed");
         return 1;
     }
 
     if (-1 == aug_setnonblock(sv[1], 1)) {
-        aug_perrinfo("aug_setnonblock() failed");
+        aug_perrinfo(NULL, "aug_setnonblock() failed");
         return 1;
     }
 
     if (-1 == aug_read(sv[1], buf, iov[0].iov_len + iov[1].iov_len)) {
-        aug_perrinfo("aug_read() failed");
+        aug_perrinfo(NULL, "aug_read() failed");
         return 1;
     }
 
