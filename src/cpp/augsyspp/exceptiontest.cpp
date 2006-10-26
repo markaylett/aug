@@ -13,7 +13,7 @@ namespace {
 
     typedef logic_error error;
 
-    enum {
+    enum which {
         NONE = 0,
         BOOL,
         INT,
