@@ -146,8 +146,10 @@ namespace aug {
             throw local_error();
         case AUG_SRCPOSIX:
             throw posix_error();
+#if defined(_WIN32)
         case AUG_SRCWIN32:
             throw win32_error();
+#endif // _WIN32
         case AUG_SRCDLFCN:
             throw dlfcn_error();
         default:

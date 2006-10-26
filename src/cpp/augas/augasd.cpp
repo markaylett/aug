@@ -222,7 +222,7 @@ namespace augas {
     }
 
     int
-    sendall_(augas_sid sid, const char* buf, unsigned size)
+    sendall_(augas_sid sid, const char* buf, size_t size)
     {
         int ret(0);
         sessions::const_iterator it(state_->sessions_.begin()),
@@ -241,7 +241,7 @@ namespace augas {
     }
 
     int
-    sendself_(augas_sid sid, const char* buf, unsigned size)
+    sendself_(augas_sid sid, const char* buf, size_t size)
     {
         sessions::const_iterator it(state_->sessions_.find(sid));
         if (it != state_->sessions_.end()) {
@@ -255,7 +255,7 @@ namespace augas {
     }
 
     int
-    sendother_(augas_sid sid, const char* buf, unsigned size)
+    sendother_(augas_sid sid, const char* buf, size_t size)
     {
         sessions::const_iterator it(state_->sessions_.begin()),
             end(state_->sessions_.end());
@@ -273,7 +273,7 @@ namespace augas {
     }
 
     int
-    send_(augas_sid sid, const char* buf, unsigned size, unsigned flags)
+    send_(augas_sid sid, const char* buf, size_t size, unsigned flags)
     {
         switch (flags) {
         case AUGAS_SESALL:

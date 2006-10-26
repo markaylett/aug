@@ -157,7 +157,7 @@ lockfile_(const char* path)
 
     if (-1 == flock_(&fl, fd, F_SETLK, F_WRLCK)) {
 
-        if (!aug_iserrinfo(AUG_SRCPOSIX, EAGAIN))
+        if (!aug_iserrinfo(NULL, AUG_SRCPOSIX, EAGAIN))
             goto fail;
 
         /* EAGAIN indicates that another process has locked the file. */
