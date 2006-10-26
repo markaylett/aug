@@ -34,7 +34,7 @@ namespace aug {
         ~timers() AUG_NOTHROW
         {
             if (-1 == aug_freetimers(&timers_))
-                aug_perrinfo(0, "aug_freetimers() failed");
+                perrinfo("aug_freetimers() failed");
         }
 
         timers()

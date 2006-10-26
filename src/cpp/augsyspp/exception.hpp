@@ -157,6 +157,14 @@ namespace aug {
         }
     }
 
+    inline bool
+    verify(bool result)
+    {
+        if (!result)
+            fail();
+        return result;
+    }
+
     template <typename T>
     T
     verify(T result)
@@ -174,15 +182,6 @@ namespace aug {
             fail();
         return result;
     }
-
-    template <typename T>
-    const T*
-    verify(const T* result)
-    {
-        if (!result)
-            fail();
-        return result;
-    }
 }
 
 /**
@@ -193,20 +192,20 @@ namespace aug {
 #define AUG_PERRINFOCATCH                                               \
     catch (const aug::errinfo_error& e) {                               \
         e.seterrinfo();                                                 \
-        aug_perrinfo(aug::cptr(e), "aug::errinfo_error");               \
+        perrinfo(e, "aug::errinfo_error");                              \
     } catch (const std::exception& e) {                                 \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
                        AUG_ECXX, e.what());                             \
-        aug_perrinfo(0, "std::exception");                              \
+        perrinfo("std::exception");                                     \
     } catch (...) {                                                     \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
                        AUG_ECXX, "no description available");           \
-        aug_perrinfo(0, "unknown");                                     \
+        perrinfo("unknown");                                            \
     } do { } while (0)
 
 #define AUG_SETERRINFOCATCH                                             \
     catch (const aug::errinfo_error& e) {                               \
-        e.seterrinfo();                                                      \
+        e.seterrinfo();                                                 \
     } catch (const std::exception& e) {                                 \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
                        AUG_ECXX, e.what());                             \

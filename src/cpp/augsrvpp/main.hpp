@@ -138,7 +138,7 @@ namespace aug {
        structure will be performed by aug_main().
     */
 
-    inline void
+    inline int
     main(service_base& service, int argc, char* argv[])
     {
         struct aug_service s = {
@@ -150,7 +150,7 @@ namespace aug {
             { AUG_VTNULL }
         };
         aug_setvarp(&s.arg_, &service);
-        aug_main(&s, argc, argv);
+        return aug_main(&s, argc, argv);
     }
 }
 

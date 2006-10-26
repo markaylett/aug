@@ -423,6 +423,5 @@ main(int argc, char* argv[])
     program_ = argv[0];
     service_ = &service;
     aug_atexitinit(&errinfo);
-    aug_main(&service, argc, argv);
-    return 1;
+    return aug_main(&service, argc, argv);
 }

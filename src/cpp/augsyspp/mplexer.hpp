@@ -26,7 +26,7 @@ namespace aug {
         ~mplexer() AUG_NOTHROW
         {
             if (-1 == aug_freemplexer(mplexer_))
-                aug_perrinfo(0, "aug_freemplexer() failed");
+                perrinfo("aug_freemplexer() failed");
         }
 
         mplexer()

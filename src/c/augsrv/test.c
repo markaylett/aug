@@ -93,6 +93,5 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    aug_main(&service, argc, argv);
-    return 1;
+    return aug_main(&service, argc, argv);
 }

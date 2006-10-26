@@ -240,7 +240,7 @@ main(int argc, char* argv[])
 
         program_ = argv[0];
 
-        main(serv, argc, argv);
+        return main(serv, argc, argv);
 
     } catch (const exception& e) {
 

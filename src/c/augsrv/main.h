@@ -14,7 +14,7 @@ struct aug_service;
    from the service thread.  A shallow copy of the service structure will be
    performed.
 */
-AUGSRV_API void
+AUGSRV_API int
 aug_main(const struct aug_service* service, int argc, char* argv[]);
 
 #endif /* AUGSRV_MAIN_H */

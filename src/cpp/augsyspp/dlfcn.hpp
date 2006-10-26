@@ -37,7 +37,7 @@ namespace aug {
         ~dlib() AUG_NOTHROW
         {
             if (-1 == aug_dlclose(dlib_))
-                aug_perrinfo(0, "aug_dlclose() failed");
+                perrinfo("aug_dlclose() failed");
         }
 
         dlib(const null_&) AUG_NOTHROW

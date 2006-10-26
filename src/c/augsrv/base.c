@@ -122,14 +122,13 @@ aug_runservice(void)
 }
 
 AUGSRV_API void
-aug_exitservice(int status)
+aug_termservice(void)
 {
     if (-1 != fds_[0]) {
         assert(service_.term_);
         service_.term_(&service_.arg_);
         closepipe_();
     }
-    aug_exit(status);
 }
 
 AUGSRV_API int

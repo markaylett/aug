@@ -17,12 +17,16 @@ static const char rcsid[] = "$Id$";
 #include "augsys/log.h"
 
 #include <assert.h>
+#include <setjmp.h>
+
+static jmp_buf mark_;
 
 static void
 die_(const char* s)
 {
     aug_perrinfo(NULL, s);
-    aug_exitservice(1);
+    aug_termservice();
+    longjmp(mark_, 1);
 }
 
 static void
@@ -105,18 +109,21 @@ uninstall_(void)
     }
 }
 
-AUGSRV_API void
+AUGSRV_API int
 aug_main(const struct aug_service* service, int argc, char* argv[])
 {
     int daemon;
     struct aug_options options;
-    aug_setservice_(service);
+    int jmpret = setjmp(mark_);
+    if (jmpret)
+        return jmpret;
 
+    aug_setservice_(service);
     if (-1 == aug_readopts(&options, argc, argv))
-        aug_exitservice(1);
+        return 1;
 
     if (AUG_CMDEXIT == options.command_)
-        aug_exitservice(0);
+        return 0;
 
 #if !defined(_WIN32)
     daemon = AUG_CMDSTART == options.command_;
@@ -174,5 +181,6 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
         uninstall_();
         break;
     }
-    aug_exitservice(0);
+    aug_termservice();
+    return 0;
 }

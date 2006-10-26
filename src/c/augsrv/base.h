@@ -25,7 +25,7 @@ AUGSRV_API int
 aug_runservice(void);
 
 AUGSRV_API void
-aug_exitservice(int status);
+aug_termservice(void);
 
 AUGSRV_API int
 aug_eventin(void);

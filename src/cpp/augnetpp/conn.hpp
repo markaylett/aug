@@ -62,7 +62,7 @@ namespace aug {
         ~conns() AUG_NOTHROW
         {
             if (-1 == aug_freeconns(&conns_))
-                aug_perrinfo(0, "aug_freeconns() failed");
+                perrinfo("aug_freeconns() failed");
         }
 
         conns()

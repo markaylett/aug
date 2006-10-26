@@ -35,7 +35,7 @@ namespace aug {
         ~mutex() AUG_NOTHROW
         {
             if (-1 == aug_freemutex(mutex_))
-                aug_perrinfo(0, "aug_freemutex() failed");
+                perrinfo("aug_freemutex() failed");
         }
 
         mutex()
@@ -69,7 +69,7 @@ namespace aug {
         ~scoped_lock() AUG_NOTHROW
         {
             if (-1 == aug_unlockmutex(mutex_))
-                aug_perrinfo(0, "aug_unlockmutex() failed");
+                perrinfo("aug_unlockmutex() failed");
         }
 
         explicit
@@ -93,7 +93,7 @@ namespace aug {
         ~scoped_unlock() AUG_NOTHROW
         {
             if (-1 == aug_lockmutex(mutex_))
-                aug_perrinfo(0, "aug_lockmutex() failed");
+                perrinfo("aug_lockmutex() failed");
         }
 
         explicit
