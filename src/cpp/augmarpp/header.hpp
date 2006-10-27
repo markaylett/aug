@@ -36,7 +36,7 @@ namespace aug {
             aug::removefields(mar_);
         }
         const_iterator
-        setfield(const struct aug_field& f)
+        setfield(const aug_field& f)
         {
             return const_iterator(mar_, aug::setfield(mar_, f));
         }
@@ -94,7 +94,7 @@ namespace aug {
             return aug::getfield(mar_, toord(it), s);
         }
         void
-        getfield(struct aug_field& f, const const_iterator& it) const
+        getfield(aug_field& f, const const_iterator& it) const
         {
             aug::getfield(mar_, f, toord(it));
         }

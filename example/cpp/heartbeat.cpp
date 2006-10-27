@@ -358,7 +358,7 @@ namespace {
         unsigned mwaitms_;
         timer mwait_;
         bool mseen_;
-        struct timeval mlast_;
+        timeval mlast_;
         endpoint slave_;
 
         void
@@ -390,7 +390,7 @@ namespace {
         }
 
         void
-        do_callback(idref ref, unsigned& ms, struct aug_timers& timers)
+        do_callback(idref ref, unsigned& ms, aug_timers& timers)
         {
             if (ref == hbwait_) {
 
@@ -581,7 +581,7 @@ namespace {
                 // it should ask the candidate to stand-down.
 
                 if (mseen_) {
-                    struct timeval tv;
+                    timeval tv;
                     gettimeofday(tv);
                     unsigned ms(tvtoms(tvsub(tv, mlast_)));
                     if (ms < HB_MS) {
@@ -609,7 +609,7 @@ namespace {
         session s(node, ref, ep, ts);
         setioeventmask(mp, ref, AUG_IOEVENTRD);
 
-        struct timeval tv;
+        timeval tv;
         int ret(!0);
         while (!stop_) {
 
@@ -642,13 +642,13 @@ main(int argc, char* argv[])
 
     try {
 
-        struct aug_errinfo errinfo;
+        aug_errinfo errinfo;
         scoped_init init(errinfo);
         aug_setlogger(aug_daemonlogger);
 
         try {
 
-            struct timeval tv;
+            timeval tv;
             aug::gettimeofday(tv);
             aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
 

@@ -294,6 +294,7 @@ namespace augas {
 
             if (flags & AUGAS_TIMRD)
                 it->second->rdtimer_.set(ms, *it->second);
+
             if (flags & AUGAS_TIMWR)
                 it->second->wrtimer_.set(ms, *it->second);
         }
@@ -308,6 +309,7 @@ namespace augas {
 
             if (flags & AUGAS_TIMRD)
                 it->second->rdtimer_.reset(ms);
+
             if (flags & AUGAS_TIMWR)
                 it->second->wrtimer_.reset(ms);
         }
@@ -322,6 +324,7 @@ namespace augas {
 
             if (flags & AUGAS_TIMRD)
                 it->second->rdtimer_.cancel();
+
             if (flags & AUGAS_TIMWR)
                 it->second->wrtimer_.cancel();
         }
@@ -439,31 +442,48 @@ namespace augas {
             AUG_DEBUG("handling read event '%d'", fd);
 
             char buf[4096];
-			unsigned size((unsigned)aug::read(fd, buf, sizeof(buf)));
+            size_t size(aug::read(fd, buf, sizeof(buf)));
             if (0 == size) {
+
+                // Connection closed.
+
                 aug_info("closing connection '%d'", fd);
                 state_->sessions_.erase(state_->sids_[fd]);
                 state_->sids_.erase(fd);
                 return false;
             }
 
-            ptr->module_.data(ptr->session_, buf, size);
+            // Data has been read: reset read timer.
 
-            setioeventmask(state_->mplexer_, fd, AUG_IOEVENTRDWR);
-            ptr->wrtimer_.cancel();
+            if (null != ptr->rdtimer_)
+                if (!ptr->rdtimer_.reset()) // If timer nolonger exists.
+                    ptr->rdtimer_ = null;
+
+            // Notify module of new data.
+
+            ptr->module_.data(ptr->session_, buf, size);
         }
 
         if (bits & AUG_IOEVENTWR) {
 
-            if (!ptr->buffer_.writesome(fd)) {
+            bool more(ptr->buffer_.writesome(fd));
+
+            // Data has been written: reset write timer.
+
+            if (null != ptr->wrtimer_)
+                if (!ptr->wrtimer_.reset()) // If timer nolonger exists.
+                    ptr->wrtimer_ = null;
+
+            if (!more) {
+
+                // No more (buffered) data to be written.
+
                 setioeventmask(state_->mplexer_, fd, AUG_IOEVENTRD);
+
+                // If flagged for shutdown, send FIN and disable writes.
 
                 if (ptr->shutdown_)
                     aug::shutdown(ptr->sfd_, SHUT_WR);
-
-                if (null != ptr->wrtimer_)
-                    if (!ptr->wrtimer_.reset())
-                        ptr->wrtimer_ = null;
             }
         }
 

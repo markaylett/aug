@@ -28,7 +28,7 @@ namespace aug {
     }
 
     inline void
-    init(struct aug_errinfo& errinfo)
+    init(aug_errinfo& errinfo)
     {
         if (-1 == aug_init(&errinfo))
             throw std::runtime_error(detail::join("aug_init() failed",
@@ -42,19 +42,19 @@ namespace aug {
                                                   aug_strerror(errno)));
     }
     inline void
-    atexitinit(struct aug_errinfo& errinfo)
+    atexitinit(aug_errinfo& errinfo)
     {
         if (-1 == aug_atexitinit(&errinfo))
             throw std::runtime_error(detail::join("aug_atexitinit() failed",
                                                   aug_strerror(errno)));
     }
     inline void
-    openfd(int fd, const struct aug_driver* driver)
+    openfd(int fd, const aug_driver* driver)
     {
         verify(aug_openfd(fd, driver));
     }
     inline void
-    openfds(int fds[2], const struct aug_driver* driver)
+    openfds(int fds[2], const aug_driver* driver)
     {
         verify(aug_openfds(fds, driver));
     }
@@ -69,11 +69,11 @@ namespace aug {
         verify(aug_retainfd(fd));
     }
     inline void
-    setdriver(fdref ref, const struct aug_driver* driver)
+    setdriver(fdref ref, const aug_driver* driver)
     {
         verify(aug_setdriver(ref.get(), driver));
     }
-    inline const struct aug_driver*
+    inline const aug_driver*
     getdriver(fdref ref)
     {
         return verify(aug_getdriver(ref.get()));
@@ -93,7 +93,7 @@ namespace aug {
                 aug_perror("aug_term() failed");
         }
 
-        scoped_init(struct aug_errinfo& errinfo)
+        scoped_init(aug_errinfo& errinfo)
         {
             init(errinfo);
         }

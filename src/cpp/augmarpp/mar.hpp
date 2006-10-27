@@ -64,7 +64,7 @@ namespace aug {
         verify(aug_removefields(ref.get()));
     }
     inline unsigned
-    setfield(marref ref, const struct aug_field& f)
+    setfield(marref ref, const aug_field& f)
     {
         unsigned ord;
         verify(aug_setfield(ref.get(), &f, &ord));
@@ -113,7 +113,7 @@ namespace aug {
         return verify(aug_valuebyord(ref.get(), ord, 0));
     }
     inline bool
-    getfield(marref ref, struct aug_field& f, unsigned ord)
+    getfield(marref ref, aug_field& f, unsigned ord)
     {
         return ismatch(aug_getfield(ref.get(), &f, ord));
     }

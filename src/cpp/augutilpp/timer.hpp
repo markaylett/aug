@@ -18,12 +18,12 @@ namespace aug {
 
     class timers {
     public:
-        typedef struct aug_timers ctype;
+        typedef aug_timers ctype;
     private:
 
         friend class timer;
 
-        struct aug_timers timers_;
+        aug_timers timers_;
 
         timers(const timers&);
 
@@ -42,12 +42,12 @@ namespace aug {
             AUG_INIT(&timers_);
         }
 
-        operator struct aug_timers&()
+        operator aug_timers&()
         {
             return timers_;
         }
 
-        operator const struct aug_timers&() const
+        operator const aug_timers&() const
         {
             return timers_;
         }
@@ -62,7 +62,7 @@ namespace aug {
     class timercb_base {
 
         virtual void
-        do_callback(idref ref, unsigned& ms, struct aug_timers& timers) = 0;
+        do_callback(idref ref, unsigned& ms, aug_timers& timers) = 0;
 
     public:
         virtual
@@ -71,13 +71,13 @@ namespace aug {
         }
 
         void
-        callback(idref ref, unsigned& ms, struct aug_timers& timers)
+        callback(idref ref, unsigned& ms, aug_timers& timers)
         {
             return do_callback(ref.get(), ms,timers);
         }
 
         void
-        operator ()(idref ref, unsigned& ms, struct aug_timers& timers)
+        operator ()(idref ref, unsigned& ms, aug_timers& timers)
         {
             return do_callback(ref.get(), ms, timers);
         }
@@ -86,8 +86,7 @@ namespace aug {
     namespace detail {
 
         inline void
-        timercb(const struct aug_var* arg, int id, unsigned* ms,
-                struct aug_timers* timers)
+        timercb(const aug_var* arg, int id, unsigned* ms, aug_timers* timers)
         {
             try {
                 timercb_base* ptr = static_cast<
@@ -98,8 +97,7 @@ namespace aug {
     }
 
     inline int
-    settimer(struct aug_timers& timers, idref ref, unsigned ms,
-             timercb_base& cb)
+    settimer(aug_timers& timers, idref ref, unsigned ms, timercb_base& cb)
     {
         var v(&cb);
         return verify(aug_settimer(&timers, ref.get(), ms, detail::timercb,
@@ -107,39 +105,39 @@ namespace aug {
     }
 
     inline bool
-    resettimer(struct aug_timers& timers, idref ref, unsigned ms = 0)
+    resettimer(aug_timers& timers, idref ref, unsigned ms = 0)
     {
         return AUG_RETNONE == verify(aug_resettimer(&timers, ref.get(), ms))
             ? false : true;
     }
 
     inline bool
-    canceltimer(struct aug_timers& timers, idref ref)
+    canceltimer(aug_timers& timers, idref ref)
     {
         return aug_canceltimer(&timers, ref.get()) ? true : false;
     }
 
     inline bool
-    expired(struct aug_timers& timers, idref ref)
+    expired(aug_timers& timers, idref ref)
     {
         return aug_expired(&timers, ref.get()) ? true : false;
     }
 
     inline void
-    processtimers(struct aug_timers& timers, bool force)
+    processtimers(aug_timers& timers, bool force)
     {
         verify(aug_processtimers(&timers, force ? 1 : 0, 0));
     }
 
     inline void
-    processtimers(struct aug_timers& timers, bool force, struct timeval& next)
+    processtimers(aug_timers& timers, bool force, timeval& next)
     {
         verify(aug_processtimers(&timers, force ? 1 : 0, &next));
     }
 
     class timer {
 
-        struct aug_timers& timers_;
+        aug_timers& timers_;
         idref ref_;
 
         timer(const timer& rhs);
@@ -154,7 +152,7 @@ namespace aug {
                 canceltimer(timers_, ref_);
         }
 
-        timer(struct aug_timers& timers, idref ref)
+        timer(aug_timers& timers, idref ref)
             : timers_(timers),
               ref_(ref)
         {

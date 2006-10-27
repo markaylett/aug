@@ -14,7 +14,7 @@
 namespace aug {
 
     inline smartfd
-    tcpconnect(const char* host, const char* serv, struct aug_endpoint& ep)
+    tcpconnect(const char* host, const char* serv, aug_endpoint& ep)
     {
         smartfd sfd(smartfd::attach(aug_tcpconnect(host, serv, &ep)));
         if (null == sfd)
@@ -24,7 +24,7 @@ namespace aug {
     }
 
     inline smartfd
-    tcplisten(const char* host, const char* serv, struct aug_endpoint& ep)
+    tcplisten(const char* host, const char* serv, aug_endpoint& ep)
     {
         smartfd sfd(smartfd::attach(aug_tcplisten(host, serv, &ep)));
         if (null == sfd)
@@ -34,7 +34,7 @@ namespace aug {
     }
 
     inline smartfd
-    udpclient(const char* host, const char* serv, struct aug_endpoint& ep)
+    udpclient(const char* host, const char* serv, aug_endpoint& ep)
     {
         smartfd sfd(smartfd::attach(aug_udpclient(host, serv, &ep)));
         if (null == sfd)
@@ -44,7 +44,7 @@ namespace aug {
     }
 
     inline smartfd
-    udpconnect(const char* host, const char* serv, struct aug_endpoint& ep)
+    udpconnect(const char* host, const char* serv, aug_endpoint& ep)
     {
         smartfd sfd(smartfd::attach(aug_udpconnect(host, serv, &ep)));
         if (null == sfd)
@@ -54,7 +54,7 @@ namespace aug {
     }
 
     inline smartfd
-    udpserver(const char* host, const char* serv, struct aug_endpoint& ep)
+    udpserver(const char* host, const char* serv, aug_endpoint& ep)
     {
         smartfd sfd(smartfd::attach(aug_udpserver(host, serv, &ep)));
         if (null == sfd)
@@ -70,8 +70,8 @@ namespace aug {
         verify(aug_setnodelay(ref.get(), value));
     }
 
-    inline struct aug_hostserv&
-    parsehostserv(const char* src, struct aug_hostserv& dst)
+    inline aug_hostserv&
+    parsehostserv(const char* src, aug_hostserv& dst)
     {
         return *verify(aug_parsehostserv(src, &dst));
     }

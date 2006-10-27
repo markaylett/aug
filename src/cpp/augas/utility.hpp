@@ -9,7 +9,7 @@ struct augas_module;
 namespace augas {
 
     void
-    setdefaults(struct augas_module& dst, const struct augas_module& src);
+    setdefaults(augas_module& dst, const augas_module& src);
 }
 
 #endif // AUGAS_UTILITY_HPP

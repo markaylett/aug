@@ -22,7 +22,7 @@ namespace aug {
     }
 
     inline smartfd
-    accept(fdref ref, struct aug_endpoint& ep)
+    accept(fdref ref, aug_endpoint& ep)
     {
         smartfd sfd(smartfd::attach(aug_accept(ref.get(), &ep)));
         if (null == sfd)
@@ -32,25 +32,25 @@ namespace aug {
     }
 
     inline void
-    bind(fdref ref, const struct aug_endpoint& ep)
+    bind(fdref ref, const aug_endpoint& ep)
     {
         verify(aug_bind(ref.get(), &ep));
     }
 
     inline void
-    connect(fdref ref, const struct aug_endpoint& ep)
+    connect(fdref ref, const aug_endpoint& ep)
     {
         verify(aug_connect(ref.get(), &ep));
     }
 
-    inline struct aug_endpoint&
-    getpeername(fdref ref, struct aug_endpoint& ep)
+    inline aug_endpoint&
+    getpeername(fdref ref, aug_endpoint& ep)
     {
         return *verify(aug_getpeername(ref.get(), &ep));
     }
 
-    inline const struct aug_endpoint&
-    getsockname(fdref ref, struct aug_endpoint& ep)
+    inline const aug_endpoint&
+    getsockname(fdref ref, aug_endpoint& ep)
     {
         return *verify(aug_getsockname(ref.get(), &ep));
     }
@@ -69,7 +69,7 @@ namespace aug {
 
     inline size_t
     recvfrom(fdref ref, void* buf, size_t len, int flags,
-             struct aug_endpoint& ep)
+             aug_endpoint& ep)
     {
         return verify(aug_recvfrom(ref.get(), buf, len, flags, &ep));
     }
@@ -82,7 +82,7 @@ namespace aug {
 
     inline size_t
     sendto(fdref ref, const void* buf, size_t len, int flags,
-           const struct aug_endpoint& ep)
+           const aug_endpoint& ep)
     {
         return verify(aug_sendto(ref.get(), buf, len, flags, &ep));
     }
@@ -116,21 +116,21 @@ namespace aug {
     }
 
     inline std::string
-    inetntop(const struct aug_inetaddr& src)
+    inetntop(const aug_inetaddr& src)
     {
         char buf[AUG_MAXADDRLEN];
         verify(aug_inetntop(&src, buf, sizeof(buf)));
         return buf;
     }
 
-    inline struct aug_inetaddr&
-    inetpton(int af, const char* src, struct aug_inetaddr& dst)
+    inline aug_inetaddr&
+    inetpton(int af, const char* src, aug_inetaddr& dst)
     {
         return *verify(aug_inetpton(af, src, &dst));
     }
 
-    inline struct aug_inetaddr&
-    inetpton(const char* src, struct aug_inetaddr& dst)
+    inline aug_inetaddr&
+    inetpton(const char* src, aug_inetaddr& dst)
     {
         if (!aug_inetpton(AF_INET, src, &dst)
             && !aug_inetpton(AF_INET6, src, &dst))
@@ -151,25 +151,25 @@ namespace aug {
         verify(aug_setreuseaddr(ref.get(), value));
     }
 
-    inline struct aug_endpoint&
-    setinetaddr(struct aug_endpoint& ep, const struct aug_inetaddr& addr)
+    inline aug_endpoint&
+    setinetaddr(aug_endpoint& ep, const aug_inetaddr& addr)
     {
         return *verify(aug_setinetaddr(&ep, &addr));
     }
 
-    inline struct aug_inetaddr&
-    getinetaddr(const struct aug_endpoint& ep, struct aug_inetaddr& addr)
+    inline aug_inetaddr&
+    getinetaddr(const aug_endpoint& ep, aug_inetaddr& addr)
     {
         return *verify(aug_getinetaddr(&ep, &addr));
     }
 
-    inline const struct aug_inetaddr&
+    inline const aug_inetaddr&
     inetany(int af)
     {
         return *verify(aug_inetany(af));
     }
 
-    inline const struct aug_inetaddr&
+    inline const aug_inetaddr&
     inetloopback(int af)
     {
         return *verify(aug_inetloopback(af));

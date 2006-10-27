@@ -162,7 +162,7 @@ namespace test {
         int heartbeats_;
 
         void
-        do_callback(idref ref, unsigned& ms, struct aug_timers& timers)
+        do_callback(idref ref, unsigned& ms, aug_timers& timers)
         {
             ms = 0; // Cancel.
 
@@ -236,9 +236,9 @@ namespace test {
         }
 
         bool
-        readevent(int fd, struct aug_conns& conns)
+        readevent(int fd, aug_conns& conns)
         {
-            struct aug_event event;
+            aug_event event;
             AUG_DEBUG("reading event");
 
             switch (aug::readevent(aug_eventin(), event).type_) {
@@ -263,9 +263,9 @@ namespace test {
         }
 
         bool
-        listener(int fd, struct aug_conns& conns)
+        listener(int fd, aug_conns& conns)
         {
-            struct aug_endpoint ep;
+            aug_endpoint ep;
 
             AUG_DEBUG("accepting connection");
 
@@ -297,7 +297,7 @@ namespace test {
         }
 
         bool
-        connection(int fd, struct aug_conns& conns)
+        connection(int fd, aug_conns& conns)
         {
             sessionptr ptr(state_->sfds_[fd]);
             unsigned short bits(ioevents(state_->mplexer_, fd));
@@ -330,7 +330,7 @@ namespace test {
         }
 
         bool
-        do_callback(int fd, struct aug_conns& conns)
+        do_callback(int fd, aug_conns& conns)
         {
             if (!ioevents(state_->mplexer_, fd))
                 return true;
@@ -382,7 +382,7 @@ namespace test {
         void
         do_run()
         {
-            struct timeval tv;
+            timeval tv;
 
             aug_info("running daemon process");
 
@@ -432,7 +432,7 @@ main(int argc, char* argv[])
 
     try {
 
-        struct aug_errinfo errinfo;
+        aug_errinfo errinfo;
         scoped_init init(errinfo);
         try {
 

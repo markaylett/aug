@@ -50,7 +50,7 @@ namespace aug {
     }
 
     class field {
-        struct aug_field field_;
+        aug_field field_;
         void
         clear()
         {
@@ -64,7 +64,7 @@ namespace aug {
             clear();
         }
         explicit
-        field(const struct aug_field& f)
+        field(const aug_field& f)
             : field_(f)
         {
         }
@@ -108,7 +108,7 @@ namespace aug {
             field_.value_ = v;
             field_.size_ = (unsigned)strlen(v);
         }
-        operator struct aug_field&()
+        operator aug_field&()
         {
             return field_;
         }
@@ -127,7 +127,7 @@ namespace aug {
         {
             return field_.size_;
         }
-        operator const struct aug_field&() const
+        operator const aug_field&() const
         {
             return field_;
         }

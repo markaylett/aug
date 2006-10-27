@@ -53,8 +53,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(modincludedir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) module.$(OBJEXT) \
-	options.$(OBJEXT) utility.$(OBJEXT)
+am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) \
+	exception.$(OBJEXT) module.$(OBJEXT) options.$(OBJEXT) \
+	utility.$(OBJEXT)
 augasd_OBJECTS = $(am_augasd_OBJECTS)
 augasd_DEPENDENCIES = $(top_srcdir)/src/c/augnet/libaugnet.la \
 	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
@@ -206,12 +207,14 @@ modinclude_HEADERS = \
 
 noinst_HEADERS = \
 	buffer.hpp \
+	exception.hpp \
 	module.hpp \
 	utility.hpp
 
 augasd_SOURCES = \
 	augasd.cpp \
 	buffer.cpp \
+	exception.cpp \
 	module.cpp \
 	options.cpp \
 	utility.cpp
@@ -296,6 +299,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augasd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@

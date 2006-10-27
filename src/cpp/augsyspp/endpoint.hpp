@@ -9,21 +9,21 @@
 namespace aug {
 
     inline aug_endpoint&
-    clear(struct aug_endpoint& ep)
+    clear(aug_endpoint& ep)
     {
-        bzero(&ep, sizeof(struct aug_endpoint));
+        bzero(&ep, sizeof(aug_endpoint));
         return ep;
     }
 
     inline aug_endpoint&
-    setfamily(struct aug_endpoint& ep, short family)
+    setfamily(aug_endpoint& ep, short family)
     {
         switch (ep.un_.family_ = family) {
         case AF_INET:
-            ep.len_ = sizeof(struct sockaddr_in);
+            ep.len_ = sizeof(sockaddr_in);
             break;
         case AF_INET6:
-            ep.len_ = sizeof(struct sockaddr_in6);
+            ep.len_ = sizeof(sockaddr_in6);
             break;
         default:
             ep.len_ = AUG_MAXADDRLEN;
@@ -32,47 +32,47 @@ namespace aug {
     }
 
     inline aug_endpoint&
-    setport(struct aug_endpoint& ep, unsigned short port)
+    setport(aug_endpoint& ep, unsigned short port)
     {
         ep.un_.all_.port_ = port;
         return ep;
     }
 
     inline aug_endpoint&
-    setsockaddr(struct aug_endpoint& ep, const struct sockaddr_in& ipv4)
+    setsockaddr(aug_endpoint& ep, const sockaddr_in& ipv4)
     {
-        ep.len_ = sizeof(struct sockaddr_in);
+        ep.len_ = sizeof(sockaddr_in);
         memcpy(&ep.un_.ipv4_, &ipv4, sizeof(ep.un_.ipv4_));
         return ep;
     }
 
 #if !defined(AUG_NOIPV6)
     inline aug_endpoint&
-    setsockaddr(struct aug_endpoint& ep, const struct sockaddr_in6& ipv6)
+    setsockaddr(aug_endpoint& ep, const sockaddr_in6& ipv6)
     {
-        ep.len_ = sizeof(struct sockaddr_in6);
+        ep.len_ = sizeof(sockaddr_in6);
         memcpy(&ep.un_.ipv6_, &ipv6, sizeof(ep.un_.ipv6_));
         return ep;
     }
 #endif // !AUG_NOIPV6
 
     inline short
-    family(const struct aug_endpoint& ep)
+    family(const aug_endpoint& ep)
     {
         return ep.un_.family_;
     }
 
     inline socklen_t
-    len(const struct aug_endpoint& ep)
+    len(const aug_endpoint& ep)
     {
         return ep.len_;
     }
 
     class endpoint {
     public:
-        typedef struct aug_endpoint ctype;
+        typedef aug_endpoint ctype;
     private:
-        struct aug_endpoint ep_;
+        aug_endpoint ep_;
 
     public:
         endpoint(const null_&) AUG_NOTHROW
@@ -81,7 +81,7 @@ namespace aug {
         }
 
         explicit
-        endpoint(const struct aug_inetaddr& addr, unsigned short port = 0)
+        endpoint(const aug_inetaddr& addr, unsigned short port = 0)
         {
             setport(ep_, port);
             setinetaddr(ep_, addr);
@@ -94,12 +94,12 @@ namespace aug {
             return *this;
         }
 
-        operator struct aug_endpoint&()
+        operator aug_endpoint&()
         {
             return ep_;
         }
 
-        operator const struct aug_endpoint&() const
+        operator const aug_endpoint&() const
         {
             return ep_;
         }
@@ -107,7 +107,7 @@ namespace aug {
 }
 
 inline bool
-isnull(const struct aug_endpoint& ep)
+isnull(const aug_endpoint& ep)
 {
     return 0 == aug::family(ep);
 }

@@ -10,46 +10,46 @@
 
 namespace aug {
 
-    inline struct timeval&
-    gettimeofday(struct timeval& tv, struct timezone& tz)
+    inline timeval&
+    gettimeofday(timeval& tv, timezone& tz)
     {
         verify(aug_gettimeofday(&tv, &tz));
         return tv;
     }
 
-    inline struct timeval&
-    gettimeofday(struct timeval& tv)
+    inline timeval&
+    gettimeofday(timeval& tv)
     {
         verify(aug_gettimeofday(&tv, 0));
         return tv;
     }
 
-    inline struct tm&
-    localtime(const time_t& clock, struct tm& res)
+    inline tm&
+    localtime(const time_t& clock, tm& res)
     {
         return *aug_localtime(&clock, &res);
     }
 
-    inline struct timeval&
-    mstotv(struct timeval& tv, unsigned ms)
+    inline timeval&
+    mstotv(timeval& tv, unsigned ms)
     {
         return *aug_mstotv(&tv, ms);
     }
 
     inline unsigned
-    tvtoms(const struct timeval& tv)
+    tvtoms(const timeval& tv)
     {
         return aug_tvtoms(&tv);
     }
 
-    inline struct timeval&
-    tvadd(struct timeval& dst, const struct timeval& src)
+    inline timeval&
+    tvadd(timeval& dst, const timeval& src)
     {
         return *aug_tvadd(&dst, &src);
     }
 
-    inline struct timeval&
-    tvsub(struct timeval& dst, const struct timeval& src)
+    inline timeval&
+    tvsub(timeval& dst, const timeval& src)
     {
         return *aug_tvsub(&dst, &src);
     }

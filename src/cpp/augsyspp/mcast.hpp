@@ -12,13 +12,13 @@
 namespace aug {
 
     inline void
-    joinmcast(fdref ref, const struct aug_inetaddr& addr, const char* ifname)
+    joinmcast(fdref ref, const aug_inetaddr& addr, const char* ifname)
     {
         verify(aug_joinmcast(ref.get(), &addr, ifname));
     }
 
     inline void
-    leavemcast(fdref ref, const struct aug_inetaddr& addr, const char* ifname)
+    leavemcast(fdref ref, const aug_inetaddr& addr, const char* ifname)
     {
         verify(aug_leavemcast(ref.get(), &addr, ifname));
     }

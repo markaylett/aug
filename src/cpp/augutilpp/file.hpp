@@ -42,7 +42,7 @@ namespace aug {
     namespace detail {
 
         inline int
-        confcb(const struct aug_var* arg, const char* name, const char* value)
+        confcb(const aug_var* arg, const char* name, const char* value)
         {
             try {
                 confcb_base* ptr = static_cast<

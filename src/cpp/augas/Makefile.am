@@ -6,6 +6,7 @@ modinclude_HEADERS = \
 
 noinst_HEADERS = \
 	buffer.hpp \
+	exception.hpp \
 	module.hpp \
 	utility.hpp
 
@@ -14,6 +15,7 @@ bin_PROGRAMS = augasd
 augasd_SOURCES = \
 	augasd.cpp \
 	buffer.cpp \
+	exception.cpp \
 	module.cpp \
 	options.cpp \
 	utility.cpp

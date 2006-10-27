@@ -74,7 +74,7 @@ namespace test {
         readevent()
         {
             int fd(aug_eventin());
-            struct aug_event event;
+            aug_event event;
 
             AUG_DEBUG("checking event pipe '%d'", fd);
 
@@ -172,7 +172,7 @@ namespace test {
         void
         do_run()
         {
-            struct timeval tv;
+            timeval tv;
 
             aug_info("running daemon process");
 
@@ -208,7 +208,7 @@ namespace test {
         }
 
         void
-        do_callback(idref ref, unsigned& ms, struct aug_timers& timers)
+        do_callback(idref ref, unsigned& ms, aug_timers& timers)
         {
             aug_info("timer fired");
             --remain_;
@@ -234,7 +234,7 @@ main(int argc, char* argv[])
 
     try {
 
-        struct aug_errinfo errinfo;
+        aug_errinfo errinfo;
         scoped_init init(errinfo);
 		service serv;
 

@@ -74,7 +74,7 @@ namespace aug {
     namespace detail {
 
         inline const char*
-        getopt(const struct aug_var* arg, enum aug_option opt)
+        getopt(const aug_var* arg, enum aug_option opt)
         {
             try {
                 service_base* ptr = static_cast<
@@ -85,7 +85,7 @@ namespace aug {
         }
 
         inline int
-        readconf(const struct aug_var* arg, const char* conffile, int daemon)
+        readconf(const aug_var* arg, const char* conffile, int daemon)
         {
             try {
                 service_base* ptr = static_cast<
@@ -97,7 +97,7 @@ namespace aug {
         }
 
         inline int
-        init(const struct aug_var* arg)
+        init(const aug_var* arg)
         {
             try {
                 service_base* ptr = static_cast<
@@ -109,7 +109,7 @@ namespace aug {
         }
 
         inline int
-        run(const struct aug_var* arg)
+        run(const aug_var* arg)
         {
             try {
                 service_base* ptr = static_cast<
@@ -121,7 +121,7 @@ namespace aug {
         }
 
         inline void
-        term(const struct aug_var* arg)
+        term(const aug_var* arg)
         {
             try {
                 service_base* ptr = static_cast<
@@ -141,7 +141,7 @@ namespace aug {
     inline int
     main(service_base& service, int argc, char* argv[])
     {
-        struct aug_service s = {
+        aug_service s = {
             detail::getopt,
             detail::readconf,
             detail::init,

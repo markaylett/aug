@@ -16,13 +16,13 @@ namespace aug {
 
         template <typename T>
         struct var_traits {
-            static struct aug_var&
-            set(struct aug_var& v, T l)
+            static aug_var&
+            set(aug_var& v, T l)
             {
                 return *aug_setvarl(&v, static_cast<long>(l));
             }
             static T
-            get(const struct aug_var& v)
+            get(const aug_var& v)
             {
                 return static_cast<T>(aug_getvarl(&v));
             }
@@ -30,13 +30,13 @@ namespace aug {
 
         template <typename T>
         struct var_traits<T*> {
-            static struct aug_var&
-            set(struct aug_var& v, T* p)
+            static aug_var&
+            set(aug_var& v, T* p)
             {
                 return *aug_setvarp(&v, p);
             }
             static T*
-            get(const struct aug_var& v)
+            get(const aug_var& v)
             {
                 return static_cast<T*>(aug_getvarp(&v));
             }
@@ -44,8 +44,8 @@ namespace aug {
 
         template <>
         struct var_traits<aug_var> {
-            static struct aug_var&
-            set(struct aug_var& v, const struct aug_var& w)
+            static aug_var&
+            set(aug_var& v, const aug_var& w)
             {
                 return *aug_setvar(&v, &w);
             }
@@ -53,36 +53,36 @@ namespace aug {
     }
 
     inline aug_var&
-    clear(struct aug_var& v)
+    clear(aug_var& v)
     {
         return *aug_clearvar(&v);
     }
 
     template <typename T>
     aug_var&
-    setvar(struct aug_var& v, T x)
+    setvar(aug_var& v, T x)
     {
         return detail::var_traits<T>::set(v, x);
     }
 
     template <typename T>
     T
-    getvar(const struct aug_var& v)
+    getvar(const aug_var& v)
     {
         return detail::var_traits<T>::get(v);
     }
 
     inline aug_vartype
-    type(const struct aug_var& v)
+    type(const aug_var& v)
     {
         return v.type_;
     }
 
     class var {
     public:
-        typedef struct aug_var ctype;
+        typedef aug_var ctype;
     private:
-        struct aug_var var_;
+        aug_var var_;
 
         var(const var&);
 
@@ -117,12 +117,12 @@ namespace aug {
             return *this;
         }
 
-        operator struct aug_var&()
+        operator aug_var&()
         {
             return var_;
         }
 
-        operator const struct aug_var&() const
+        operator const aug_var&() const
         {
             return var_;
         }

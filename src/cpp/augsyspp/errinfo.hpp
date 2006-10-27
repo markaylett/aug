@@ -21,37 +21,37 @@ namespace aug {
     }
 
     inline int
-    perrinfo(const struct aug_errinfo& errinfo, const char* s) AUG_NOTHROW
+    perrinfo(const aug_errinfo& errinfo, const char* s) AUG_NOTHROW
     {
         return aug_perrinfo(&errinfo, s);
     }
 
     inline const char*
-    errfile(const struct aug_errinfo& errinfo)
+    errfile(const aug_errinfo& errinfo)
     {
         return errinfo.file_;
     }
 
     inline int
-    errline(const struct aug_errinfo& errinfo)
+    errline(const aug_errinfo& errinfo)
     {
         return errinfo.line_;
     }
 
     inline int
-    errsrc(const struct aug_errinfo& errinfo)
+    errsrc(const aug_errinfo& errinfo)
     {
         return errinfo.src_;
     }
 
     inline int
-    errnum(const struct aug_errinfo& errinfo)
+    errnum(const aug_errinfo& errinfo)
     {
         return errinfo.num_;
     }
 
     inline const char*
-    errdesc(const struct aug_errinfo& errinfo)
+    errdesc(const aug_errinfo& errinfo)
     {
         return errinfo.desc_;
     }

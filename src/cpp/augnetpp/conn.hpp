@@ -23,7 +23,7 @@ namespace aug {
     class conncb_base {
 
         virtual bool
-        do_callback(int fd, struct aug_conns& conns) = 0;
+        do_callback(int fd, aug_conns& conns) = 0;
 
     public:
         virtual
@@ -32,13 +32,13 @@ namespace aug {
         }
 
         bool
-        callback(int fd, struct aug_conns& conns)
+        callback(int fd, aug_conns& conns)
         {
             return do_callback(fd, conns);
         }
 
         bool
-        operator ()(int fd, struct aug_conns& conns)
+        operator ()(int fd, aug_conns& conns)
         {
             return do_callback(fd, conns);
         }
@@ -46,12 +46,12 @@ namespace aug {
 
     class conns {
     public:
-        typedef struct aug_conns ctype;
+        typedef aug_conns ctype;
     private:
 
         friend class conn;
 
-        struct aug_conns conns_;
+        aug_conns conns_;
 
         conns(const conns&);
 
@@ -70,12 +70,12 @@ namespace aug {
             AUG_INIT(&conns_);
         }
 
-        operator struct aug_conns&()
+        operator aug_conns&()
         {
             return conns_;
         }
 
-        operator const struct aug_conns&() const
+        operator const aug_conns&() const
         {
             return conns_;
         }
@@ -90,7 +90,7 @@ namespace aug {
     namespace detail {
 
         inline int
-        conncb(const struct aug_var* arg, int id, struct aug_conns* conns)
+        conncb(const aug_var* arg, int id, aug_conns* conns)
         {
             try {
                 conncb_base* ptr = static_cast<
@@ -107,20 +107,20 @@ namespace aug {
     }
 
     inline void
-    insertconn(struct aug_conns& conns, fdref ref, conncb_base& cb)
+    insertconn(aug_conns& conns, fdref ref, conncb_base& cb)
     {
         var v(&cb);
         verify(aug_insertconn(&conns, ref.get(), detail::conncb, cptr(v)));
     }
 
     inline void
-    removeconn(struct aug_conns& conns, fdref ref)
+    removeconn(aug_conns& conns, fdref ref)
     {
         verify(aug_removeconn(&conns, ref.get()));
     }
 
     inline void
-    processconns(struct aug_conns& conns)
+    processconns(aug_conns& conns)
     {
         verify(aug_processconns(&conns));
     }

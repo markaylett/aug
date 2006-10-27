@@ -13,9 +13,9 @@ namespace aug {
 
     class errinfo_error : public std::exception {
     public:
-        typedef struct aug_errinfo ctype;
-    protected:
-        struct aug_errinfo errinfo_;
+        typedef aug_errinfo ctype;
+    private:
+        aug_errinfo errinfo_;
     public:
         errinfo_error()
         {
@@ -45,12 +45,21 @@ namespace aug {
             aug_seterrinfo(0, errinfo_.file_, errinfo_.line_, errinfo_.src_,
                            errinfo_.num_, errinfo_.desc_);
         }
-        const struct aug_errinfo&
+        aug_errinfo&
+        errinfo()
+        {
+            return errinfo_;
+        }
+        operator aug_errinfo& ()
+        {
+            return errinfo_;
+        }
+        const aug_errinfo&
         errinfo() const
         {
             return errinfo_;
         }
-        operator const struct aug_errinfo& () const
+        operator const aug_errinfo& () const
         {
             return errinfo_;
         }
@@ -65,41 +74,21 @@ namespace aug {
         basic_error(const char* file, int line, int num, const char* format,
                     va_list args)
         {
-            aug_vseterrinfo(&static_cast<errinfo_error*>(this)->errinfo_,
-                            file, line, srcT, num, format, args);
+            aug_vseterrinfo(&this->errinfo(), file, line, srcT, num, format,
+                            args);
         }
         basic_error(const char* file, int line, int num, const char* format,
                     ...)
         {
             va_list args;
             va_start(args, format);
-            aug_vseterrinfo(&static_cast<errinfo_error*>(this)->errinfo_,
-                            file, line, srcT, num, format, args);
+            aug_vseterrinfo(&this->errinfo(), file, line, srcT, num, format,
+                            args);
             va_end(args);
         }
     };
 
-    class local_error : public errinfo_error {
-    public:
-        local_error()
-        {
-        }
-        local_error(const char* file, int line, int num, const char* format,
-                    va_list args)
-        {
-            aug_vseterrinfo(&errinfo_, file, line, AUG_SRCLOCAL, num, format,
-                            args);
-        }
-        local_error(const char* file, int line, int num, const char* format,
-                    ...)
-        {
-            va_list args;
-            va_start(args, format);
-            aug_vseterrinfo(&errinfo_, file, line, AUG_SRCLOCAL, num, format,
-                            args);
-            va_end(args);
-        }
-    };
+    typedef basic_error<AUG_SRCLOCAL> local_error;
 
     class system_error : public errinfo_error { };
 
@@ -110,7 +99,7 @@ namespace aug {
         }
         posix_error(const char* file, int line, int err)
         {
-            aug_setposixerrinfo(&errinfo_, file, line, err);
+            aug_setposixerrinfo(&errinfo(), file, line, err);
         }
     };
 
@@ -122,7 +111,7 @@ namespace aug {
         }
         win32_error(const char* file, int line, unsigned long err)
         {
-            aug_setwin32errinfo(&errinfo_, file, line, err);
+            aug_setwin32errinfo(&errinfo(), file, line, err);
         }
     };
 #endif // _WIN32
@@ -134,7 +123,7 @@ namespace aug {
         }
         dlfcn_error(const char* file, int line, const char* desc)
         {
-            aug_seterrinfo(&errinfo_, file, line, AUG_SRCDLFCN, 1, desc);
+            aug_seterrinfo(&errinfo(), file, line, AUG_SRCDLFCN, 1, desc);
         }
     };
 

@@ -9,21 +9,21 @@
 namespace aug {
 
     inline aug_inetaddr&
-    clear(struct aug_inetaddr& addr)
+    clear(aug_inetaddr& addr)
     {
-        bzero(&addr, sizeof(struct aug_inetaddr));
+        bzero(&addr, sizeof(aug_inetaddr));
         return addr;
     }
 
     inline aug_inetaddr&
-    setfamily(struct aug_inetaddr& addr, short family)
+    setfamily(aug_inetaddr& addr, short family)
     {
         addr.family_ = family;
         return addr;
     }
 
     inline aug_inetaddr&
-    setinaddr(struct aug_inetaddr& addr, const struct in_addr& ipv4)
+    setinaddr(aug_inetaddr& addr, const in_addr& ipv4)
     {
         addr.family_ = AF_INET;
         addr.un_.ipv4_.s_addr = ipv4.s_addr;
@@ -32,7 +32,7 @@ namespace aug {
 
 #if !defined(AUG_NOIPV6)
     inline aug_inetaddr&
-    setinaddr(struct aug_inetaddr& addr, const struct in6_addr& ipv6)
+    setinaddr(aug_inetaddr& addr, const in6_addr& ipv6)
     {
         addr.family_ = AF_INET6;
         memcpy(&addr.un_.ipv6_, &ipv6, sizeof(addr.un_.ipv6_));
@@ -41,16 +41,16 @@ namespace aug {
 #endif // !AUG_NOIPV6
 
     inline short
-    family(const struct aug_inetaddr& addr)
+    family(const aug_inetaddr& addr)
     {
         return addr.family_;
     }
 
     class inetaddr {
     public:
-        typedef struct aug_inetaddr ctype;
+        typedef aug_inetaddr ctype;
     private:
-        struct aug_inetaddr addr_;
+        aug_inetaddr addr_;
 
     public:
         inetaddr(const null_&) AUG_NOTHROW
@@ -76,12 +76,12 @@ namespace aug {
             return *this;
         }
 
-        operator struct aug_inetaddr&()
+        operator aug_inetaddr&()
         {
             return addr_;
         }
 
-        operator const struct aug_inetaddr&() const
+        operator const aug_inetaddr&() const
         {
             return addr_;
         }
@@ -89,7 +89,7 @@ namespace aug {
 }
 
 inline bool
-isnull(const struct aug_inetaddr& addr)
+isnull(const aug_inetaddr& addr)
 {
     return 0 == aug::family(addr);
 }

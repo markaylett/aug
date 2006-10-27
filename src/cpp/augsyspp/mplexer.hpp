@@ -58,7 +58,7 @@ namespace aug {
     */
 
     inline int
-    waitioevents(aug_mplexer_t mplexer, const struct timeval& timeout)
+    waitioevents(aug_mplexer_t mplexer, const timeval& timeout)
     {
         return verify(aug_waitioevents(mplexer, &timeout));
     }

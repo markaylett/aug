@@ -13,7 +13,7 @@ main(int argc, char* argv[])
 {
     try {
 
-        struct aug_errinfo errinfo;
+        aug_errinfo errinfo;
         scoped_init init(errinfo);
 
         try {
