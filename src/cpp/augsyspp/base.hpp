@@ -69,14 +69,29 @@ namespace aug {
         verify(aug_retainfd(fd));
     }
     inline void
-    setdriver(fdref ref, const aug_driver* driver)
+    setdriver(fdref ref, const aug_driver& driver)
     {
-        verify(aug_setdriver(ref.get(), driver));
+        verify(aug_setdriver(ref.get(), &driver));
     }
-    inline const aug_driver*
+    inline void
+    setdriver(fdref ref)
+    {
+        verify(aug_setdriver(ref.get(), 0));
+    }
+    inline const aug_driver&
     getdriver(fdref ref)
     {
-        return verify(aug_getdriver(ref.get()));
+        return *verify(aug_getdriver(ref.get()));
+    }
+    inline aug_driver&
+    extdriver(aug_driver& derived, const struct aug_driver& base)
+    {
+        return *aug_extdriver(&derived, &base);
+    }
+    inline aug_driver&
+    extdriver(aug_driver& derived)
+    {
+        return *aug_extdriver(&derived, 0);
     }
 
     class scoped_init {

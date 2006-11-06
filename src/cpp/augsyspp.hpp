@@ -14,6 +14,7 @@
 #include "augsyspp/inetaddr.hpp"
 #include "augsyspp/mcast.hpp"
 #include "augsyspp/mplexer.hpp"
+#include "augsyspp/mutex.hpp"
 #include "augsyspp/null.hpp"
 #include "augsyspp/smartfd.hpp"
 #include "augsyspp/smartptr.hpp"

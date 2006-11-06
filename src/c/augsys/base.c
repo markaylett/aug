@@ -372,33 +372,6 @@ aug_retainfd(int fd)
     return ret;
 }
 
-AUGSYS_API struct aug_driver*
-aug_extenddriver(struct aug_driver* derived, const struct aug_driver* base)
-{
-    if (!base)
-        base = aug_posixdriver();
-
-    if (!derived->close_)
-        derived->close_ = base->close_;
-
-    if (!derived->read_)
-        derived->read_ = base->read_;
-
-    if (!derived->readv_)
-        derived->readv_ = base->readv_;
-
-    if (!derived->write_)
-        derived->write_ = base->write_;
-
-    if (!derived->writev_)
-        derived->writev_ = base->writev_;
-
-    if (!derived->setnonblock_)
-        derived->setnonblock_ = base->setnonblock_;
-
-    return derived;
-}
-
 AUGSYS_API int
 aug_setdriver(int fd, const struct aug_driver* driver)
 {
@@ -434,4 +407,31 @@ aug_getdriver(int fd)
     aug_unlock();
 
     return driver;
+}
+
+AUGSYS_API struct aug_driver*
+aug_extdriver(struct aug_driver* derived, const struct aug_driver* base)
+{
+    if (!base)
+        base = aug_posixdriver();
+
+    if (!derived->close_)
+        derived->close_ = base->close_;
+
+    if (!derived->read_)
+        derived->read_ = base->read_;
+
+    if (!derived->readv_)
+        derived->readv_ = base->readv_;
+
+    if (!derived->write_)
+        derived->write_ = base->write_;
+
+    if (!derived->writev_)
+        derived->writev_ = base->writev_;
+
+    if (!derived->setnonblock_)
+        derived->setnonblock_ = base->setnonblock_;
+
+    return derived;
 }

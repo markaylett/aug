@@ -4,7 +4,7 @@ UNAME := $(shell uname | sed -e 's/CYGWIN.*/WIN32/i' -e 's/MINGW.*/WIN32/i')
 .SUFFIXES:
 .SUFFIXES: .c .cpp .exe .o
 
-CC = g++
+CC = gcc
 RM = rm
 
 ifeq ($(UNAME), WIN32)
@@ -48,9 +48,9 @@ LDFLAGS += \
 LIBS +=
 
 SRC = \
-	modskel.cpp
+	modskel.c
 
-OBJ = $(SRC:%.cpp=%.o)
+OBJ = $(SRC:%.c=%.o)
 NAME = modskel
 SONAME = $(NAME).$(DLLEXT)
 
@@ -62,7 +62,7 @@ clean:
 $(SONAME): $(OBJ)
 	$(CC) $(COMMON) -shared -Wl,-soname,$(SONAME) $(LDFLAGS) $(CDEFS) -o $@ $(OBJ) $(LIBS)
 
-%.o: %.cpp
+%.o: %.c
 	$(CC) $(COMMON) $(CFLAGS) $(CDEFS) -c -o $@ $<
 
 .PHONY: all clean

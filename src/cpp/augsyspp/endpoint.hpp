@@ -68,6 +68,12 @@ namespace aug {
         return ep.len_;
     }
 
+    inline unsigned short
+    port(const aug_endpoint& ep)
+    {
+        return ep.un_.all_.port_;
+    }
+
     class endpoint {
     public:
         typedef aug_endpoint ctype;

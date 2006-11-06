@@ -26,7 +26,10 @@ namespace augas {
         set(const std::string& name, const std::string& value);
 
         const char*
-        get(const std::string& name, const char* def = 0) const;
+        get(const std::string& name, const char* def) const;
+
+        const std::string&
+        get(const std::string& name) const;
     };
 }
 

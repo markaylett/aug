@@ -676,7 +676,7 @@ main(int argc, char* argv[])
             run(argv[1], sfd, ep);
 
         } catch (const errinfo_error& e) {
-            aug_perrinfo(cptr(e), "aug::errorinfo_error");
+            perrinfo(e, "aug::errorinfo_error");
         } catch (const exception& e) {
             aug_error("std::exception: %s", e.what());
         }

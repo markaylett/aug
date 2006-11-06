@@ -8,10 +8,11 @@
 
 namespace augas {
 
-    const int SRCMODULE(AUG_SRCUSER + 0);
-    const int EMODCALL(1);
+    const int SRCAUGAS(AUG_SRCUSER + 0);
+    const int ECONFIG(1);
+    const int EMODCALL(2);
 
-    typedef aug::basic_error<SRCMODULE> module_error;
+    typedef aug::basic_error<SRCAUGAS> error;
 }
 
 #endif // AUGAS_EXCEPTION_HPP

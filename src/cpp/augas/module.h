@@ -62,15 +62,27 @@ struct augas_session {
     void* user_;
 };
 
-struct augas_service {
-    const char* (*error_)(void);
-    const char* (*getenv_)(const char* name);
-    void (*writelog_)(int level, const char* format, ...);
-    void (*vwritelog_)(int level, const char* format, va_list args);
-    int (*post_)(int type, void* arg);
-    int (*settimer_)(int id, unsigned ms, void* arg);
-    int (*resettimer_)(int id, unsigned ms);
-    int (*canceltimer_)(int id);
+struct augas_host {
+
+    /**
+       \return the last error that occurred.
+    */
+
+    const char* (*error_)(const char* mod);
+
+    /**
+       \return the value associated with name.
+    */
+
+    const char* (*getenv_)(const char* modname, const char* name);
+    void (*writelog_)(const char* modname, int level, const char* format,
+                      ...);
+    void (*vwritelog_)(const char* modname, int level, const char* format,
+                       va_list args);
+    int (*post_)(const char* modname, int type, void* arg);
+    int (*settimer_)(const char* modname, int id, unsigned ms, void* arg);
+    int (*resettimer_)(const char* modname, int id, unsigned ms);
+    int (*canceltimer_)(const char* modname, int id);
     int (*shutdown_)(augas_sid id);
     int (*send_)(augas_sid id, const char* buf, size_t size, unsigned flags);
     int (*setrwtimer_)(augas_sid id, unsigned ms, unsigned flags);
@@ -86,7 +98,7 @@ struct augas_service {
 
 struct augas_module {
     void (*close_)(const struct augas_session* s);
-    int (*open_)(struct augas_session* s, const char* serv);
+    int (*open_)(struct augas_session* s, const char* serv, const char* peer);
     int (*data_)(const struct augas_session* s, const char* buf, size_t size);
     int (*rdexpire_)(const struct augas_session* s, unsigned* ms);
     int (*wrexpire_)(const struct augas_session* s, unsigned* ms);
@@ -100,20 +112,20 @@ struct augas_module {
    augas_load() should return NULL on failure.
 */
 
-#define AUGAS_MODULE(load, unload) \
-AUGAS_API const struct augas_module* \
-augas_load(const struct augas_service* service) \
-{ \
-    return (*load)(service); \
-} \
-AUGAS_API void \
-augas_unload(void) \
-{ \
-    (*unload)(); \
-}
+#define AUGAS_MODULE(load, unload)                                  \
+    AUGAS_API const struct augas_module*                            \
+    augas_load(const char* modname, const struct augas_host* host)  \
+    {                                                               \
+        return (*load)(modname, host);                              \
+    }                                                               \
+    AUGAS_API void                                                  \
+    augas_unload(void)                                              \
+    {                                                               \
+        (*unload)();                                                \
+    }
 
 typedef const struct augas_module*
-(*augas_loadfn)(const struct augas_service*);
+(*augas_loadfn)(const char*, const struct augas_host*);
 
 typedef void
 (*augas_unloadfn)(void);

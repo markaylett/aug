@@ -3,6 +3,8 @@
 */
 #include "augas/options.hpp"
 
+#include "augas/exception.hpp"
+
 using namespace augas;
 using namespace std;
 
@@ -36,4 +38,14 @@ options::get(const string& name, const char* def) const
     if (options_.find(name) == options_.end())
         return def;
     return it->second.c_str();
+}
+
+const string&
+options::get(const string& name) const
+{
+    map<string, string>::const_iterator it(options_.find(name));
+    if (options_.find(name) == options_.end())
+        throw error(__FILE__, __LINE__, ECONFIG, "missing option '%s'",
+                    name.c_str());
+    return it->second;
 }

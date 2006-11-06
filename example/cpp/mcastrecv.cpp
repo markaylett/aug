@@ -46,7 +46,7 @@ main(int argc, char* argv[])
             }
 
         } catch (const errinfo_error& e) {
-            aug_perrinfo(cptr(e), "aug::errorinfo_error");
+            perrinfo(e, "aug::errorinfo_error");
         } catch (const exception& e) {
             aug_error("std::exception: %s", e.what());
         }

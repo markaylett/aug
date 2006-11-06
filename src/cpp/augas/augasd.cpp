@@ -8,6 +8,8 @@
 #include "augutilpp.hpp"
 
 #include "augas/buffer.hpp"
+#include "augas/exception.hpp"
+#include "augas/manager.hpp"
 #include "augas/module.hpp"
 #include "augas/options.hpp"
 #include "augas/utility.hpp"
@@ -39,16 +41,22 @@ namespace augas {
     void
     reconf()
     {
-        const char* loglevel(options_.get("loglevel", 0));
-        if (loglevel) {
-            unsigned level(strtoui(loglevel, 10));
+        const char* value;
+        if ((value = options_.get("loglevel", 0))) {
+            unsigned level(strtoui(value, 10));
             aug_info("setting log level: %d", level);
             aug_setloglevel(level);
         }
 
+        // Other directories may be specified relative to the run directory.
+
         aug::chdir(rundir_);
-        if (daemon_)
+        if (daemon_) {
+
+            // Re-opening the log file facilitates rolling.
+
             openlog(options_.get("logfile", "augasd.log"));
+        }
 
         aug_info("log level: %d", aug_loglevel());
         aug_info("run directory: %s", rundir_);
@@ -56,9 +64,9 @@ namespace augas {
 
     struct session : public timercb_base {
 
-        struct augas_session session_;
+        augas_session session_;
         smartfd sfd_;
-        module& module_;
+        moduleptr module_;
         mplexer& mplexer_;
         timer rdtimer_;
         timer wrtimer_;
@@ -66,24 +74,26 @@ namespace augas {
         bool shutdown_;
 
         void
-        do_callback(idref ref, unsigned& ms, struct aug_timers& timers)
+        do_callback(idref ref, unsigned& ms, aug_timers& timers)
         {
-            aug_info("timeout");
-            if (rdtimer_ == ref)
-                module_.rdexpire(session_, ms);
-            else if (wrtimer_ == ref)
-                module_.wrexpire(session_, ms);
-            else
+            if (rdtimer_ == ref) {
+                aug_info("read timer expiry");
+                module_->rdexpire(session_, ms);
+            } else if (wrtimer_ == ref) {
+                aug_info("write timer expiry");
+                module_->wrexpire(session_, ms);
+            } else
                 assert(0);
         }
         ~session() AUG_NOTHROW
         {
             try {
-                module_.close(session_);
+                module_->close(session_);
                 setioeventmask(mplexer_, sfd_, 0);
             } AUG_PERRINFOCATCH;
         }
-        session(augas_sid sid, const smartfd& sfd, module& module,
+        session(augas_sid sid, const smartfd& sfd, const char* serv,
+                const aug_endpoint& ep, const moduleptr& module,
                 mplexer& mplexer, timers& timers)
             : sfd_(sfd),
               module_(module),
@@ -94,75 +104,84 @@ namespace augas {
         {
             session_.sid_ = sid;
             session_.user_ = 0;
-            module.open(session_, "augas");
-            session_.sid_ = sid; // For safety.
+
+            inetaddr addr(null);
+            module->open(session_, serv,
+                         inetntop(getinetaddr(ep, addr)).c_str());
+            session_.sid_ = sid; // For safety: the callee may have changed.
         }
     };
 
     typedef smartptr<session> sessionptr;
     typedef map<int, augas_sid> sids;
     typedef map<augas_sid, sessionptr> sessions;
+    typedef map<int, moduleptr> pending;
+    typedef map<unsigned, pair<moduleptr, void*> > events;
 
     struct state {
 
+        mutex mutex_;
+        manager manager_;
         conns conns_;
         timers timers_;
         mplexer mplexer_;
-        smartfd sfd_;
         sids sids_;
         sessions sessions_;
+        pending pending_;
+        events events_;
         string lastError_;
-        module module_;
 
-        explicit
-        state(const struct augas_service& service, conncb_base& cb)
-            : sfd_(null),
-              module_("module.so", service)
+        state(const struct augas_host& host, conncb_base& cb)
         {
-            aug_hostserv hostserv;
-            parsehostserv(options_.get("address", "127.0.0.1:8080"),
-                          hostserv);
+            aug_info("loading modules");
 
-            endpoint ep(null);
-            smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
+            manager_.load(options_, host);
 
-            // Add event pipe.
+            aug_info("adding listener sockets");
+
+            map<int, serviceinfo>::const_iterator
+                it(manager_.services_.begin()), end(manager_.services_.end());
+            for (; it != end; ++it) {
+                insertconn(conns_, it->second.sfd_, cb);
+                setioeventmask(mplexer_, it->second.sfd_, AUG_IOEVENTRD);
+            }
+
+            aug_info("adding event pipe");
 
             insertconn(conns_, aug_eventin(), cb);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
 
-            // Add listener socket.
-
-            insertconn(conns_, sfd, cb);
-            setioeventmask(mplexer_, sfd, AUG_IOEVENTRD);
-
-            sfd_ = sfd;
         }
     };
 
     auto_ptr<state> state_;
 
     void
-    timercb_(const struct aug_var* arg, int id, unsigned* ms,
-             struct aug_timers* timers)
+    timercb_(const aug_var* arg, int id, unsigned* ms, aug_timers* timers)
     {
-        state_->module_.expire(aug_getvarp(arg), id, ms);
+        aug_info("custom timer expiry");
+
+        pending::iterator it(state_->pending_.find(id));
+        moduleptr ptr(it->second);
+        state_->pending_.erase(it);
+        ptr->expire(aug_getvarp(arg), id, ms);
     }
 
     const char*
-    error_(void)
+    error_(const char* modname)
     {
         return state_->lastError_.c_str();
     }
 
     const char*
-    getenv_(const char* name)
+    getenv_(const char* modname, const char* name)
     {
-        return options_.get(name, 0);
+        return options_.get(string(modname).append(".").append(name)
+                            .c_str(), 0);
     }
 
     void
-    writelog_(int level, const char* format, ...)
+    writelog_(const char* modname, int level, const char* format, ...)
     {
         va_list args;
         va_start(args, format);
@@ -171,41 +190,58 @@ namespace augas {
     }
 
     void
-    vwritelog_(int level, const char* format, va_list args)
+    vwritelog_(const char* modname, int level, const char* format,
+               va_list args)
     {
         aug_vwritelog(level, format, args);
     }
 
     int
-    post_(int type, void* arg)
+    post_(const char* modname, int type, void* arg)
     {
-        struct aug_event e;
+        unsigned id(aug_nextid());
+
+        {
+            scoped_lock l(state_->mutex_);
+            moduleptr ptr(getmodule(state_->manager_.modules_, modname));
+            state_->events_[id] = make_pair(ptr, arg);
+        }
+
+        aug_event e;
         e.type_ = type;
-        aug_setvarp(&e.arg_, arg);
+        aug_setvarl(&e.arg_, id);
         writeevent(aug_eventout(), e);
         return 0;
     }
 
     int
-    settimer_(int id, unsigned ms, void* arg)
+    settimer_(const char* modname, int id, unsigned ms, void* arg)
     {
         var v(arg);
-        aug_settimer(cptr(state_->timers_), 0, ms, timercb_, cptr(v));
-        return 0;
+        id = aug_settimer(cptr(state_->timers_), id, ms, timercb_, cptr(v));
+        if (0 < id) {
+            scoped_lock l(state_->mutex_);
+            state_->pending_[id] = getmodule(state_->manager_.modules_,
+                                             modname);
+        }
+        return id;
     }
 
     int
-    resettimer_(int id, unsigned ms)
+    resettimer_(const char* modname, int id, unsigned ms)
     {
-        aug_resettimer(cptr(state_->timers_), id, ms);
-        return 0;
+        int ret(aug_resettimer(cptr(state_->timers_), id, ms));
+        if (ret < 0)
+            state_->pending_.erase(id);
+        return ret;
     }
 
     int
-    canceltimer_(int id)
+    canceltimer_(const char* modname, int id)
     {
-        aug_canceltimer(cptr(state_->timers_), id);
-        return 0;
+        int ret(aug_canceltimer(cptr(state_->timers_), id));
+        state_->pending_.erase(id);
+        return ret;
     }
 
     int
@@ -229,8 +265,10 @@ namespace augas {
             end(state_->sessions_.end());
         for (; it != end; ++it) {
             if (it->second->shutdown_) {
-                if (it->second->session_.sid_ == sid)
+                if (it->second->session_.sid_ == sid) {
+                    state_->lastError_ = "session has been shutdown";
                     ret = -1;
+                }
                 continue;
             }
             it->second->buffer_.putsome(buf, size);
@@ -245,8 +283,10 @@ namespace augas {
     {
         sessions::const_iterator it(state_->sessions_.find(sid));
         if (it != state_->sessions_.end()) {
-            if (it->second->shutdown_)
+            if (it->second->shutdown_) {
+                state_->lastError_ = "session has been shutdown";
                 return -1;
+            }
             it->second->buffer_.putsome(buf, size);
             setioeventmask(state_->mplexer_, it->second->sfd_,
                            AUG_IOEVENTRDWR);
@@ -260,6 +300,8 @@ namespace augas {
         sessions::const_iterator it(state_->sessions_.begin()),
             end(state_->sessions_.end());
         for (; it != end; ++it) {
+
+            // Ignore self and sessions that have been marked for shutdown.
 
             if (it->second->session_.sid_ == sid
                 || it->second->shutdown_)
@@ -283,6 +325,8 @@ namespace augas {
         case AUGAS_SESOTHER:
             return sendother_(sid, buf, size);
         }
+
+        state_->lastError_ = "invalid flags";
         return -1;
     }
 
@@ -331,7 +375,7 @@ namespace augas {
         return 0;
     }
 
-    const struct augas_service fntable_ = {
+    const struct augas_host host_ = {
         error_,
         getenv_,
         writelog_,
@@ -347,28 +391,48 @@ namespace augas {
         cancelrwtimer_
     };
 
-    void
-    setfdhook(fdref ref, conncb_base& conncb, unsigned short mask)
+    const aug_driver* base_ = 0;
+
+    int
+    extclose(int fd)
     {
+        aug_info("extclose(%d)", fd);
+        aug_setioeventmask(state_->mplexer_, fd, 0);
+        return base_->close_(fd);
+    }
+
+    void
+    setextdriver(fdref ref, conncb_base& conncb, unsigned short mask)
+    {
+        // Override close function.
+
+        static aug_driver extended = { extclose, 0, 0, 0, 0, 0 };
+        if (!base_) {
+            base_ = &getdriver(ref);
+            extdriver(extended, *base_);
+        }
+
         insertconn(state_->conns_, ref, conncb);
         try {
             setioeventmask(state_->mplexer_, ref, mask);
+            setdriver(ref, extended);
         } catch (...) {
             removeconn(state_->conns_, ref);
+            throw;
         }
     }
 
     bool
-    listener(conncb_base& conncb)
+    listener(const serviceinfo& si, conncb_base& conncb)
     {
-        struct aug_endpoint ep;
+        aug_endpoint ep;
 
         AUG_DEBUG("accepting connection");
 
         smartfd sfd(null);
         try {
 
-            sfd = accept(state_->sfd_, ep);
+            sfd = accept(si.sfd_, ep);
 
         } catch (const errinfo_error& e) {
 
@@ -383,14 +447,15 @@ namespace augas {
 
         setnodelay(sfd, true);
         setnonblock(sfd, true);
-        setfdhook(sfd, conncb, AUG_IOEVENTRD);
+        setextdriver(sfd, conncb, AUG_IOEVENTRD);
 
         unsigned sid(aug_nextid());
         state_->sids_[sfd.get()] = sid;
         state_->sessions_.insert
             (make_pair(sid, sessionptr
-                       (new session(sid, sfd, state_->module_,
-                                    state_->mplexer_, state_->timers_))));
+                       (new session(sid, sfd, si.name_.c_str(), ep,
+                                    si.module_, state_->mplexer_,
+                                    state_->timers_))));
 
         return true;
     }
@@ -398,7 +463,7 @@ namespace augas {
     bool
     readevent()
     {
-        struct aug_event event;
+        aug_event event;
         AUG_DEBUG("reading event");
 
         switch (aug::readevent(aug_eventin(), event).type_) {
@@ -409,7 +474,10 @@ namespace augas {
                 options_.read(conffile_);
             }
             reconf();
-            state_->module_.reconf();
+            {
+                scoped_lock l(state_->mutex_);
+                reconf(state_->manager_.modules_);
+            }
             break;
         case AUG_EVENTSTATUS:
             aug_info("received AUG_EVENTSTATUS");
@@ -420,13 +488,20 @@ namespace augas {
                 sessions::const_iterator it(state_->sessions_.begin()),
                     end(state_->sessions_.end());
                 for (; it != end; ++it)
-                    state_->module_.stop(it->second->session_);
+                    it->second->module_->stop(it->second->session_);
             }
             stopping_ = true;
             break;
         default:
-            assert(AUG_VTLONG != event.arg_.type_);
-            state_->module_.event(event.type_, event.arg_.un_.ptr_);
+            assert(AUG_VTLONG == event.arg_.type_);
+            {
+                unsigned id(aug_getvarl(&event.arg_));
+
+                scoped_lock l(state_->mutex_);
+                events::iterator it(state_->events_.find(id));
+                it->second.first->event(event.type_, it->second.second);
+                state_->events_.erase(it);
+            }
         }
         return true;
     }
@@ -461,7 +536,7 @@ namespace augas {
 
             // Notify module of new data.
 
-            ptr->module_.data(ptr->session_, buf, size);
+            ptr->module_->data(ptr->session_, buf, size);
         }
 
         if (bits & AUG_IOEVENTWR) {
@@ -493,7 +568,7 @@ namespace augas {
     class service : public conncb_base, public service_base {
 
         bool
-        do_callback(int fd, struct aug_conns& conns)
+        do_callback(int fd, aug_conns& conns)
         {
             if (!ioevents(state_->mplexer_, fd))
                 return true;
@@ -501,8 +576,9 @@ namespace augas {
             if (fd == aug_eventin())
                 return readevent();
 
-            if (fd == state_->sfd_.get())
-                return listener(*this);
+            services::const_iterator it(state_->manager_.services_.find(fd));
+            if (it != state_->manager_.services_.end())
+                return listener(it->second, *this);
 
             return connection(fd);
         }
@@ -561,7 +637,7 @@ namespace augas {
 
             setsrvlogger("augasd");
 
-            auto_ptr<state> s(new state(fntable_, *this));
+            auto_ptr<state> s(new state(host_, *this));
             state_ = s;
         }
 
@@ -613,21 +689,22 @@ main(int argc, char* argv[])
 
     try {
 
-        struct aug_errinfo errinfo;
+        aug_errinfo errinfo;
         scoped_init init(errinfo);
         try {
             service serv;
             program_ = argv[0];
 
             blocksignals();
-            aug_setloglevel(AUG_LOGDEBUG);
+            aug_setloglevel(AUG_LOGINFO);
             return main(serv, argc, argv);
 
         } catch (const errinfo_error& e) {
-            aug_perrinfo(cptr(e), "aug::errorinfo_error");
+            perrinfo(e, "aug::errorinfo_error");
         } catch (const exception& e) {
             aug_error("std::exception: %s", e.what());
         }
+
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }

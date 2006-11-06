@@ -13,7 +13,7 @@ namespace {
     }
 
     int
-    open(struct augas_session* s, const char* serv)
+    open(struct augas_session* s, const char* serv, const char* peer)
     {
         return 0;
     }

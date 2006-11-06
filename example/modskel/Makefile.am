@@ -1,1 +1,3 @@
-EXTRA_DIST = modskel.mk
+EXTRA_DIST = \
+	modskel.c \
+	modskel.mk

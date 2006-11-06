@@ -7,23 +7,34 @@
 #include "augas/module.h"
 
 #include "augsyspp/dlfcn.hpp"
+#include "augsyspp/smartptr.hpp"
+
+#include <string>
 
 namespace augas {
 
     class module {
+        const std::string modname_;
         aug::dlib lib_;
         augas_unloadfn unloadfn_;
         augas_module module_;
+
+        module(const module&);
+
+        module&
+        operator =(const module&);
+
     public:
         ~module() AUG_NOTHROW;
 
-        module(const char* path, const augas_service& service);
+        module(const std::string& modname, const char* path,
+               const augas_host& host);
 
         void
         close(const augas_session& s) const;
 
         void
-        open(augas_session& s, const char* serv) const;
+        open(augas_session& s, const char* serv, const char* peer) const;
 
         void
         data(const augas_session& s, const char* buf,
@@ -47,6 +58,8 @@ namespace augas {
         void
         reconf() const;
     };
+
+    typedef aug::smartptr<module> moduleptr;
 }
 
 #endif // AUGAS_MODULE_HPP

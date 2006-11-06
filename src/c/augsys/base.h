@@ -66,14 +66,14 @@ aug_releasefd(int fd);
 AUGSYS_API int
 aug_retainfd(int fd);
 
-AUGSYS_API struct aug_driver*
-aug_extenddriver(struct aug_driver* derived, const struct aug_driver* base);
-
 AUGSYS_API int
 aug_setdriver(int fd, const struct aug_driver* driver);
 
 AUGSYS_API const struct aug_driver*
 aug_getdriver(int fd);
+
+AUGSYS_API struct aug_driver*
+aug_extdriver(struct aug_driver* derived, const struct aug_driver* base);
 
 AUGSYS_API const struct aug_driver*
 aug_posixdriver(void);

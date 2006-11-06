@@ -8,9 +8,11 @@
 
 #include <algorithm> // swap()
 
-// A simple shared pointer implementation.  Where it is available,
-// boost::shared_ptr should be preferred.  Note: the reference count
-// implementation is not thread-safe.
+/**
+   A simple shared pointer implementation.  Where available, boost's
+   shared_ptr should be preferred.  Note: the reference count implementation
+   is not thread-safe.
+*/
 
 namespace aug {
 
@@ -76,6 +78,11 @@ namespace aug {
         {
             std::swap(ptr_, rhs.ptr_);
             std::swap(refs_, rhs.refs_);
+        }
+        unsigned
+        refs() const
+        {
+            return *refs_;
         }
         T*
         get() const AUG_NOTHROW
