@@ -50,7 +50,7 @@ main(int argc, char* argv[])
         struct aug_errinfo errinfo;
         scoped_init init(errinfo);
 
-        aug_extenddriver(&driver_, 0);
+        aug_extdriver(&driver_, 0);
         smartfd sfd1(open());
         return 0;
 

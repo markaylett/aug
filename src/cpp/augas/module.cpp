@@ -28,7 +28,8 @@ module::~module() AUG_NOTHROW
 
 module::module(const string& modname, const char* path,
                const struct augas_host& host)
-    : lib_(path)
+    : modname_(modname),
+      lib_(path)
 {
     aug_info("resolving symbols '%s'", modname.c_str());
     augas_loadfn loadfn(dlsym<augas_loadfn>(lib_, "augas_load"));

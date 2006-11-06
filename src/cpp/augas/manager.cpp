@@ -21,9 +21,9 @@ namespace {
     const char DEFAULT_LISTEN[] = "0.0.0.0:8080";
 
 #if !defined(_WIN32)
-    const char DEFAULT_MODULE[] = "module.so";
+    const char DEFAULT_MODULE[] = "./modskel.so";
 #else // _WIN32
-    const char DEFAULT_MODULE[] = "module.dll";
+    const char DEFAULT_MODULE[] = "./modskel.dll";
 #endif // _WIN32
 
     void
