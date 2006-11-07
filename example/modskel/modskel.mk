@@ -4,7 +4,7 @@ UNAME := $(shell uname | sed -e 's/CYGWIN.*/WIN32/i' -e 's/MINGW.*/WIN32/i')
 .SUFFIXES:
 .SUFFIXES: .c .cpp .exe .o
 
-CC = gcc
+CC = gcc -mno-cygwin
 RM = rm
 
 ifeq ($(UNAME), WIN32)
@@ -15,7 +15,6 @@ COMMON =
 CDEFS = \
 	-DWINVER=0x0501
 CFLAGS = \
-	-mno-cygwin \
 	-mthreads
 LDFLAGS =
 LIBS =

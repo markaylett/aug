@@ -1,6 +1,7 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#define AUGAS_BUILD
 
 #include "augnetpp.hpp"
 #include "augsrvpp.hpp"
@@ -14,7 +15,11 @@
 #include "augas/options.hpp"
 #include "augas/utility.hpp"
 
-#include "augconfig.h"
+#if !defined(_WIN32)
+# include "augconfig.h"
+#else // _WIN32
+# define PACKAGE_BUGREPORT "mark@emantic.co.uk"
+#endif // _WIN32
 
 #include <cassert>
 #include <iostream>

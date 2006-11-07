@@ -56,7 +56,11 @@ aug_chdir(const char* path)
 AUGUTIL_API char*
 aug_getcwd(char* dst, size_t size)
 {
+#if !defined(_WIN32)
     if (!getcwd(dst, size)) {
+#else /* _WIN32 */
+    if (!getcwd(dst, (int)size)) {
+#endif /* _WIN32 */
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;
     }

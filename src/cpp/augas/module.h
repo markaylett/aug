@@ -21,19 +21,11 @@
 # define AUGAS_IMPORT AUGAS_EXTERN __declspec(dllimport)
 #endif /* _WIN32 */
 
-#if defined(DLL_EXPORT)
-# define AUGAS_SHARED
-#endif /* DLL_EXPORT */
-
-#if !defined(AUGAS_SHARED)
-# define AUGAS_API AUGAS_EXTERN
-#else /* AUGAS_SHARED */
-# if !defined(AUGAS_BUILD)
-#  define AUGAS_API AUGAS_IMPORT
-# else /* AUGAS_BUILD */
-#  define AUGAS_API AUGAS_EXPORT
-# endif /* AUGAS_BUILD */
-#endif /* AUGAS_SHARED */
+#if !defined(AUGAS_BUILD)
+# define AUGAS_API AUGAS_EXPORT
+#else /* AUGAS_BUILD */
+# define AUGAS_API AUGAS_IMPORT
+#endif /* AUGAS_BUILD */
 
 enum augas_loglevel {
     AUGAS_LOGCRIT,

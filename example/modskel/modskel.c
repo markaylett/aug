@@ -1,5 +1,3 @@
-#define AUGAS_SHARED
-#define AUGAS_BUILD
 #include "augas/module.h"
 
 #include <stdlib.h>

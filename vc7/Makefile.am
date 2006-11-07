@@ -1,5 +1,6 @@
 EXTRA_DIST = \
 	aug.sln \
+	augas.vcproj \
 	augmarpp.vcproj \
 	augmar.vcproj \
 	augnetpp.vcproj \
@@ -9,6 +10,4 @@ EXTRA_DIST = \
 	augsyspp.vcproj \
 	augsys.vcproj \
 	augutilpp.vcproj \
-	augutil.vcproj \
-	test.cpp \
-	test.vcproj
+	augutil.vcproj

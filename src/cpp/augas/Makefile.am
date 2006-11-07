@@ -11,6 +11,7 @@ noinst_HEADERS = \
 	exception.hpp \
 	manager.hpp \
 	module.hpp \
+	options.hpp \
 	utility.hpp
 
 bin_PROGRAMS = augasd
