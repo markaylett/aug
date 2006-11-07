@@ -126,40 +126,56 @@ namespace augas {
     struct state {
 
         mutex mutex_;
-        manager manager_;
         conns conns_;
         timers timers_;
         mplexer mplexer_;
+        manager manager_;
         sids sids_;
         sessions sessions_;
         pending pending_;
         events events_;
         string lastError_;
 
-        state(const struct augas_host& host, conncb_base& cb)
+        explicit
+        state(conncb_base& cb)
         {
-            aug_info("loading modules");
-
-            manager_.load(options_, host);
-
-            aug_info("adding listener sockets");
-
-            map<int, serviceinfo>::const_iterator
-                it(manager_.services_.begin()), end(manager_.services_.end());
-            for (; it != end; ++it) {
-                insertconn(conns_, it->second.sfd_, cb);
-                setioeventmask(mplexer_, it->second.sfd_, AUG_IOEVENTRD);
-            }
-
             aug_info("adding event pipe");
-
             insertconn(conns_, aug_eventin(), cb);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
-
         }
     };
 
     auto_ptr<state> state_;
+    const aug_driver* base_(0);
+
+    int
+    extclose(int fd)
+    {
+        aug_info("clearing io event mask '%d'", fd);
+        aug_setioeventmask(state_->mplexer_, fd, 0);
+        return base_->close_(fd);
+    }
+
+    void
+    setextdriver(fdref ref, conncb_base& cb, unsigned short mask)
+    {
+        // Override close function.
+
+        static aug_driver extended = { extclose, 0, 0, 0, 0, 0 };
+        if (!base_) {
+            base_ = &getdriver(ref);
+            extdriver(extended, *base_);
+        }
+
+        insertconn(state_->conns_, ref, cb);
+        try {
+            setioeventmask(state_->mplexer_, ref, mask);
+            setdriver(ref, extended);
+        } catch (...) {
+            removeconn(state_->conns_, ref);
+            throw;
+        }
+    }
 
     void
     timercb_(const aug_var* arg, int id, unsigned* ms, aug_timers* timers)
@@ -396,35 +412,19 @@ namespace augas {
         cancelrwtimer_
     };
 
-    const aug_driver* base_ = 0;
-
-    int
-    extclose(int fd)
-    {
-        aug_info("extclose(%d)", fd);
-        aug_setioeventmask(state_->mplexer_, fd, 0);
-        return base_->close_(fd);
-    }
-
     void
-    setextdriver(fdref ref, conncb_base& conncb, unsigned short mask)
+    load(conncb_base& cb)
     {
-        // Override close function.
+        aug_info("loading modules");
+        state_->manager_.load(options_, host_);
 
-        static aug_driver extended = { extclose, 0, 0, 0, 0, 0 };
-        if (!base_) {
-            base_ = &getdriver(ref);
-            extdriver(extended, *base_);
-        }
+        aug_info("adding listener sockets");
 
-        insertconn(state_->conns_, ref, conncb);
-        try {
-            setioeventmask(state_->mplexer_, ref, mask);
-            setdriver(ref, extended);
-        } catch (...) {
-            removeconn(state_->conns_, ref);
-            throw;
-        }
+        map<int, serviceinfo>::const_iterator
+            it(state_->manager_.services_.begin()),
+            end(state_->manager_.services_.end());
+        for (; it != end; ++it)
+            setextdriver(it->second.sfd_, cb, AUG_IOEVENTRD);
     }
 
     bool
@@ -466,7 +466,7 @@ namespace augas {
     }
 
     bool
-    readevent()
+    readevent(conncb_base& cb)
     {
         aug_event event;
         AUG_DEBUG("reading event");
@@ -478,6 +478,7 @@ namespace augas {
                 aug_info("reading: %s", conffile_);
                 options_.read(conffile_);
             }
+            load(cb);
             reconf();
             {
                 scoped_lock l(state_->mutex_);
@@ -579,7 +580,7 @@ namespace augas {
                 return true;
 
             if (fd == aug_eventin())
-                return readevent();
+                return readevent(*this);
 
             services::const_iterator it(state_->manager_.services_.find(fd));
             if (it != state_->manager_.services_.end())
@@ -642,8 +643,9 @@ namespace augas {
 
             setsrvlogger("augasd");
 
-            auto_ptr<state> s(new state(host_, *this));
+            auto_ptr<state> s(new state(*this));
             state_ = s;
+            load(*this);
         }
 
         void
@@ -682,6 +684,7 @@ namespace augas {
         do_term()
         {
             aug_info("terminating daemon process");
+            state_->manager_.services_.clear();
             state_.reset();
         }
     };

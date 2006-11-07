@@ -10,4 +10,5 @@ EXTRA_DIST = \
 	augsyspp.vcproj \
 	augsys.vcproj \
 	augutilpp.vcproj \
-	augutil.vcproj
+	augutil.vcproj \
+	modskel.vcproj

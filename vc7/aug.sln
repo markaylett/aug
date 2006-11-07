@@ -44,6 +44,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augas", "augas.vcproj", "{E
 		{D9C66FA8-7D39-4496-AA2A-AA52BF2B7650} = {D9C66FA8-7D39-4496-AA2A-AA52BF2B7650}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "modskel", "modskel.vcproj", "{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -94,6 +98,10 @@ Global
 		{E905FF28-F95F-4125-B153-C67B96CD0C65}.Debug.Build.0 = Debug|Win32
 		{E905FF28-F95F-4125-B153-C67B96CD0C65}.Release.ActiveCfg = Release|Win32
 		{E905FF28-F95F-4125-B153-C67B96CD0C65}.Release.Build.0 = Release|Win32
+		{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}.Debug.ActiveCfg = Debug|Win32
+		{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}.Debug.Build.0 = Debug|Win32
+		{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}.Release.ActiveCfg = Release|Win32
+		{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

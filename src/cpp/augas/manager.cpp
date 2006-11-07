@@ -50,7 +50,7 @@ namespace {
         inetaddr addr(null);
         aug_info("listening on interface '%s', port '%d'",
                  inetntop(getinetaddr(ep, addr)).c_str(),
-                 static_cast<int>(port(ep)));
+                 static_cast<int>(ntohs(port(ep))));
         return sfd;
     }
 }
