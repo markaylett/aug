@@ -154,9 +154,6 @@
 				RelativePath="..\src\cpp\augas\manager.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\module.h">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augas\module.hpp">
 			</File>
 			<File

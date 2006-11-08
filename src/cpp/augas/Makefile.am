@@ -1,10 +1,4 @@
-EXTRA_DIST = augasd.conf
-
 include $(top_srcdir)/src/cpp/lang.mk
-
-modincludedir = $(includedir)/augas
-modinclude_HEADERS = \
-	module.h
 
 noinst_HEADERS = \
 	buffer.hpp \

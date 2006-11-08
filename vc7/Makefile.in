@@ -159,7 +159,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	aug.sln \
+	augas.sln \
 	augas.vcproj \
 	augmarpp.vcproj \
 	augmar.vcproj \
@@ -170,7 +170,14 @@ EXTRA_DIST = \
 	augsyspp.vcproj \
 	augsys.vcproj \
 	augutilpp.vcproj \
-	augutil.vcproj
+	augutil.vcproj \
+	modskel.vcproj \
+	setup.vdproj \
+	install.bat \
+	reconf.bat \
+	start.bat \
+	stop.bat \
+	uninstall.bat
 
 all: all-am
 

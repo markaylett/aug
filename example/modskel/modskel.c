@@ -1,4 +1,4 @@
-#include "augas/module.h"
+#include "augas.h"
 
 #include <stdlib.h>
 

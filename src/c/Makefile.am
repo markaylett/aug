@@ -9,6 +9,7 @@ SUBDIRS = \
 	mar
 
 include_HEADERS = \
+	augas.h \
 	augsys.h \
 	augmar.h \
 	augutil.h \

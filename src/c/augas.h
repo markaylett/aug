@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_MODULE_H
-#define AUGAS_MODULE_H
+#ifndef AUGAS_H
+#define AUGAS_H
 
 #include <stdarg.h>    /* va_list */
 #include <sys/types.h> /* size_t */
@@ -122,4 +122,4 @@ typedef const struct augas_module*
 typedef void
 (*augas_unloadfn)(void);
 
-#endif /* AUGAS_MODULE_H */
+#endif /* AUGAS_H */

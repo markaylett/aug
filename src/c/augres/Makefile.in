@@ -14,7 +14,6 @@
 
 @SET_MAKE@
 
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -48,19 +47,11 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/augconfig.h
 CONFIG_CLEAN_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(etcdir)"
+am__installdirs = "$(DESTDIR)$(bindir)"
 dist_binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(dist_bin_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-etcDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(etc_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
@@ -176,14 +167,11 @@ EXTRA_DIST = \
 	MSG00001.bin \
 	augres.h \
 	augres.mc \
-	augres.rc \
-	augres.reg
+	augres.rc
 
 dist_bin_SCRIPTS = \
 	augres.dll
 
-etcdir = $(prefix)/etc
-etc_DATA = augres.reg
 all: all-am
 
 .SUFFIXES:
@@ -245,23 +233,6 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-install-etcDATA: $(etc_DATA)
-	@$(NORMAL_INSTALL)
-	test -z "$(etcdir)" || $(mkdir_p) "$(DESTDIR)$(etcdir)"
-	@list='$(etc_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(etcDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(etcdir)/$$f'"; \
-	  $(etcDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(etcdir)/$$f"; \
-	done
-
-uninstall-etcDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(etc_DATA)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(etcdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(etcdir)/$$f"; \
-	done
 tags: TAGS
 TAGS:
 
@@ -298,9 +269,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(SCRIPTS) $(DATA)
+all-am: Makefile $(SCRIPTS)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(etcdir)"; do \
+	for dir in "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -345,7 +316,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-etcDATA
+install-data-am:
 
 install-exec-am: install-dist_binSCRIPTS
 
@@ -371,20 +342,19 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-dist_binSCRIPTS uninstall-etcDATA \
-	uninstall-info-am uninstall-local
+uninstall-am: uninstall-dist_binSCRIPTS uninstall-info-am \
+	uninstall-local
 
 .PHONY: all all-am check check-am clean clean-generic clean-libtool \
 	distclean distclean-generic distclean-libtool distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-dist_binSCRIPTS \
-	install-etcDATA install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am \
-	uninstall-dist_binSCRIPTS uninstall-etcDATA uninstall-info-am \
-	uninstall-local
+	install-exec install-exec-am install-info install-info-am \
+	install-man install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
+	ps ps-am uninstall uninstall-am uninstall-dist_binSCRIPTS \
+	uninstall-info-am uninstall-local
 
 
 uninstall-local:

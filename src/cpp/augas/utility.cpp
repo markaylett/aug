@@ -4,7 +4,7 @@
 #define AUGAS_BUILD
 #include "augas/utility.hpp"
 
-#include "augas/module.h"
+#include "augas.h"
 
 namespace {
 

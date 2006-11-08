@@ -1,5 +1,5 @@
 EXTRA_DIST = \
-	aug.sln \
+	augas.sln \
 	augas.vcproj \
 	augmarpp.vcproj \
 	augmar.vcproj \
@@ -11,4 +11,11 @@ EXTRA_DIST = \
 	augsys.vcproj \
 	augutilpp.vcproj \
 	augutil.vcproj \
-	modskel.vcproj
+	modskel.vcproj \
+	setup.vdproj \
+	install.bat \
+	reconf.bat \
+	start.bat \
+	stop.bat \
+	uninstall.bat
+

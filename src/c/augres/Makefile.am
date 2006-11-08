@@ -2,14 +2,10 @@ EXTRA_DIST = \
 	MSG00001.bin \
 	augres.h \
 	augres.mc \
-	augres.rc \
-	augres.reg
+	augres.rc
 
 dist_bin_SCRIPTS = \
 	augres.dll
-
-etcdir = $(prefix)/etc
-etc_DATA = augres.reg
 
 uninstall-local:
 	rm -f $(DESTDIR)$(bindir)/augres.dll \

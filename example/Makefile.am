@@ -1,3 +1,4 @@
 SUBDIRS = \
 	cpp \
-	httpd
+	httpd \
+	modskel

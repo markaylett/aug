@@ -38,9 +38,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/src/cpp/lang.mk
+DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 bin_PROGRAMS = augasd$(EXEEXT)
 subdir = src/cpp/augas
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -50,7 +49,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/augconfig.h
 CONFIG_CLEAN_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(modincludedir)"
+am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) \
@@ -74,14 +73,7 @@ CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(augasd_SOURCES)
 DIST_SOURCES = $(augasd_SOURCES)
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-modincludeHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(modinclude_HEADERS) $(noinst_HEADERS)
+HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -195,16 +187,11 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-EXTRA_DIST = augasd.conf
 SUFFIXES = .cpp .hpp .idl
 DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/c \
 	-I$(top_srcdir)/src/cpp
-
-modincludedir = $(includedir)/augas
-modinclude_HEADERS = \
-	module.h
 
 noinst_HEADERS = \
 	buffer.hpp \
@@ -339,23 +326,6 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-install-modincludeHEADERS: $(modinclude_HEADERS)
-	@$(NORMAL_INSTALL)
-	test -z "$(modincludedir)" || $(mkdir_p) "$(DESTDIR)$(modincludedir)"
-	@list='$(modinclude_HEADERS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(modincludeHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(modincludedir)/$$f'"; \
-	  $(modincludeHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(modincludedir)/$$f"; \
-	done
-
-uninstall-modincludeHEADERS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(modinclude_HEADERS)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(modincludedir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(modincludedir)/$$f"; \
-	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -437,7 +407,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(PROGRAMS) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(modincludedir)"; do \
+	for dir in "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -484,7 +454,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-modincludeHEADERS
+install-data-am:
 
 install-exec-am: install-binPROGRAMS
 
@@ -512,8 +482,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
-	uninstall-modincludeHEADERS
+uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libtool ctags distclean distclean-compile \
@@ -521,12 +490,11 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
 	dvi-am html html-am info info-am install install-am \
 	install-binPROGRAMS install-data install-data-am install-exec \
 	install-exec-am install-info install-info-am install-man \
-	install-modincludeHEADERS install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-info-am uninstall-modincludeHEADERS
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -23597,7 +23597,7 @@ _ACEOF
 fi
 
 
-                                                                                                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile example/Makefile example/cpp/Makefile example/httpd/Makefile src/Makefile src/c/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augres/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/augas/Makefile src/pl/Makefile src/sh/Makefile vc7/Makefile"
+                                                                                                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile example/Makefile example/cpp/Makefile example/httpd/Makefile example/modskel/Makefile src/Makefile src/c/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augres/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/augas/Makefile src/pl/Makefile src/sh/Makefile vc7/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -24180,9 +24180,11 @@ do
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "doc/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
   "doc/man/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/man/Makefile" ;;
+  "etc/Makefile" ) CONFIG_FILES="$CONFIG_FILES etc/Makefile" ;;
   "example/Makefile" ) CONFIG_FILES="$CONFIG_FILES example/Makefile" ;;
   "example/cpp/Makefile" ) CONFIG_FILES="$CONFIG_FILES example/cpp/Makefile" ;;
   "example/httpd/Makefile" ) CONFIG_FILES="$CONFIG_FILES example/httpd/Makefile" ;;
+  "example/modskel/Makefile" ) CONFIG_FILES="$CONFIG_FILES example/modskel/Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "src/c/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/c/Makefile" ;;
   "src/c/augmar/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/c/augmar/Makefile" ;;

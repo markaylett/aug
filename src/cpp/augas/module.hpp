@@ -4,7 +4,7 @@
 #ifndef AUGAS_MODULE_HPP
 #define AUGAS_MODULE_HPP
 
-#include "augas/module.h"
+#include "augas.h"
 
 #include "augsyspp/dlfcn.hpp"
 #include "augsyspp/smartptr.hpp"
