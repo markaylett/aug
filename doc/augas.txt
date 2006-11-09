@@ -1,0 +1,46 @@
+Basic Installation
+==================
+
+  1. Run the MSI installer.  Before changing the destination folder from the
+     default, please read the FAQ, below.
+
+  2. From the installation directory, copy the 'etc\augasd.conf.default' file
+     to 'etc\augasd.conf'.
+
+  3. Change the 'etc\augasd.conf' file as appropriate.  At least, the 'rundir'
+     option should be set to the absolute path of the installation directory.
+
+  4. Run the 'install.bat' file in the installation directory: this will
+     register the service with the Service Control Manager.
+
+  5. To start the service, run the 'start.bat' file in the installation
+     directory.
+
+FAQ
+===
+
+  1. Why do I receive a 'The system cannot open the device or file specified.'
+     error when trying to install the MSI?
+
+     This error is often followed by:
+
+     The installer has encountered an unexpected error installing this
+     package.  This may indicate a problem with this package.  The error code
+     is 2755.
+
+     If you are using an encrypted file system, decrypt the MSI installer and
+     rerun.
+
+  2. Why do I receive an 'Access Denied' error when attempting to start the
+     service?
+
+     By default the Service will be run using the system's 'Network Service'
+     account.  As with the 'Local System' account, access may be restricted to
+     certain areas of the file system.
+
+     This may occur when installing to destination directories other than the
+     default.
+
+     This issue can be resolved by either a) re-installing to a shared
+     (common) area of the file system, or b) running the service under an
+     alternate account.

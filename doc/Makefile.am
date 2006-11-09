@@ -2,6 +2,7 @@ SUBDIRS = \
 	man
 
 EXTRA_DIST = \
+	augas.txt \
 	augsys.gif \
 	augmar.gif \
 	augutil.gif \

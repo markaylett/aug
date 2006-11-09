@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_0B16F77D4AE546D5B9992A5211905EF7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2FA9F56BD08A761A5A27BBAD1C71D592"
         "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
@@ -149,6 +155,26 @@
         }
         "File"
         {
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_0B16F77D4AE546D5B9992A5211905EF7"
+            {
+            "SourcePath" = "8:..\\doc\\augas.txt"
+            "TargetName" = "8:README"
+            "Tag" = "8:"
+            "Folder" = "8:_5D616DF14FB240A1B1BBE8EA16DE9AB6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_2FA9F56BD08A761A5A27BBAD1C71D592"
             {
             "SourcePath" = "8:MSVCP71D.dll"
@@ -357,7 +383,7 @@
         {
             "{58C0ADA3-3CEA-43BD-A3B3-2EA121BC8217}:_5D616DF14FB240A1B1BBE8EA16DE9AB6"
             {
-            "DefaultLocation" = "8:c:\\augas"
+            "DefaultLocation" = "8:[ProgramFilesFolder][ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -452,7 +478,7 @@
         "PackageCode" = "8:{71843DA9-CC1F-47FB-A08F-521DBD868BB3}"
         "UpgradeCode" = "8:{89166B9C-C3CB-4DE2-8BE3-DD90993E23EE}"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:TRUE"
+        "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "ProductVersion" = "8:1.0.0"
         "Manufacturer" = "8:aug"
