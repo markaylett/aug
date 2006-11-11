@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="modskel"
+	Name="modpython"
 	ProjectGUID="{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -13,7 +13,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="debug/modskel"
+			IntermediateDirectory="debug/modpython"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -33,12 +33,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="FALSE"
-				OutputFile="$(OutDir)/modskel.dll"
+				OutputFile="$(OutDir)/modpython.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/modskel.pdb"
+				ProgramDatabaseFile="$(OutDir)/modpython.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/modskel.lib"
+				ImportLibrary="$(OutDir)/modpython.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -64,7 +64,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="release/modskel"
+			IntermediateDirectory="release/modpython"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -81,13 +81,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="FALSE"
-				OutputFile="$(OutDir)/modskel.dll"
+				OutputFile="$(OutDir)/modpython.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/modskel.lib"
+				ImportLibrary="$(OutDir)/modpython.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -119,7 +119,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\example\modskel\modskel.c">
+				RelativePath="..\example\module\modpython.c">
 			</File>
 		</Filter>
 		<Filter

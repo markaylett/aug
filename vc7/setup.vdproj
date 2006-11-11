@@ -52,13 +52,13 @@
         "Entry"
         {
         "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
-        "OwnerKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmKey" = "8:_5860DD303EE6400ABE0C19AAA1C6CD3B"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -82,6 +82,12 @@
         "Entry"
         {
         "MsmKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D39ED234812E427D88DCE6AB3D1404F1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -295,6 +301,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_5860DD303EE6400ABE0C19AAA1C6CD3B"
+            {
+            "SourcePath" = "8:test.bat"
+            "TargetName" = "8:test.bat"
+            "Tag" = "8:"
+            "Folder" = "8:_5D616DF14FB240A1B1BBE8EA16DE9AB6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_7600BA5FBA2044409A155A4489A86DCF"
             {
             "SourcePath" = "8:..\\etc\\augasd.conf"
@@ -321,6 +347,26 @@
             "TargetName" = "8:reconf.bat"
             "Tag" = "8:"
             "Folder" = "8:_5D616DF14FB240A1B1BBE8EA16DE9AB6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_D39ED234812E427D88DCE6AB3D1404F1"
+            {
+            "SourcePath" = "8:..\\example\\module\\modpython.py"
+            "TargetName" = "8:modpython.py"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1105,7 +1151,7 @@
             }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_720D3E1937294BCABCF76E3132943BCD"
             {
-            "SourcePath" = "8:bin\\modskel.dll"
+            "SourcePath" = "8:bin\\modpython.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"

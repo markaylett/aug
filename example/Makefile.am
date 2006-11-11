@@ -1,4 +1,4 @@
 SUBDIRS = \
 	cpp \
 	httpd \
-	modskel
+	module

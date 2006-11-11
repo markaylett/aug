@@ -44,7 +44,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augas", "augas.vcproj", "{E
 		{D9C66FA8-7D39-4496-AA2A-AA52BF2B7650} = {D9C66FA8-7D39-4496-AA2A-AA52BF2B7650}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "modskel", "modskel.vcproj", "{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "modpython", "modpython.vcproj", "{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject

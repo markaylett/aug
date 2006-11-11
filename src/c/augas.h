@@ -60,7 +60,7 @@ struct augas_host {
        \return the last error that occurred.
     */
 
-    const char* (*error_)(const char* mod);
+    const char* (*error_)(const char* modname);
 
     /**
        \return the value associated with name.

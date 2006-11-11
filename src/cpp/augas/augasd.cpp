@@ -184,8 +184,9 @@ namespace augas {
 
         pending::iterator it(state_->pending_.find(id));
         moduleptr ptr(it->second);
-        state_->pending_.erase(it);
         ptr->expire(aug_getvarp(arg), id, ms);
+        if (0 == *ms) // What if canceltimer is used?
+            state_->pending_.erase(it);
     }
 
     const char*
@@ -229,7 +230,7 @@ namespace augas {
         }
 
         aug_event e;
-        e.type_ = type;
+        e.type_ = type + AUG_EVENTUSER;
         aug_setvarl(&e.arg_, id);
         writeevent(aug_eventout(), e);
         return 0;
@@ -505,7 +506,8 @@ namespace augas {
 
                 scoped_lock l(state_->mutex_);
                 events::iterator it(state_->events_.find(id));
-                it->second.first->event(event.type_, it->second.second);
+                it->second.first->event(event.type_ - AUG_EVENTUSER,
+                                        it->second.second);
                 state_->events_.erase(it);
             }
         }
@@ -645,7 +647,12 @@ namespace augas {
 
             auto_ptr<state> s(new state(*this));
             state_ = s;
-            load(*this);
+            try {
+                load(*this);
+            } catch (...) {
+                s = state_;
+                throw;
+            }
         }
 
         void
