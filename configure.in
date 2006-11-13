@@ -59,6 +59,12 @@ case $host in
         LDFLAGS="-mthreads $LDFLAGS"
     fi
     ;;
+*-apple-darwin*)
+    if test "$threads" != "no"; then
+        CFLAGS="-D_MT $CFLAGS"
+        CXXFLAGS="-D_MT $CXXFLAGS"
+    fi
+    ;;
 *)
     AC_SEARCH_LIBS(gethostbyname, nsl)
     AC_SEARCH_LIBS(gethostname, nsl)
