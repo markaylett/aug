@@ -72,11 +72,9 @@ daemonise_(void)
     }
 
     /* Restrict file creation mode. */
-
-    if (-1 == umask(0027)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    /* No need to check the return value: it is the previous value of the file
+       mode mask. This function is always successful */
+    umask(0027);
 
     /* Leave both the standard file descriptors (3), and the signal pipe
        descriptors (2) open. */

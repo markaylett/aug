@@ -19636,7 +19636,7 @@ fi
     ;;
 esac
 
-CFLAGS="$CFLAGS -D_POSIX_SOURCE -D_BSD_SOURCE"
+CFLAGS="$CFLAGS -D_BSD_SOURCE"
 
 # Checks for libraries.
 
