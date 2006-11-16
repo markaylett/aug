@@ -91,7 +91,7 @@ aug_processconns(struct aug_conns* conns)
     prev = &AUG_FIRST(conns);
     while ((it = *prev)) {
 
-        if (!(it->cb_(&it->arg_, it->fd_, &tail))) {
+        if (!(it->cb_(it->fd_, &it->arg_, &tail))) {
 
             AUG_REMOVE_PREVPTR(it, prev, conns);
 

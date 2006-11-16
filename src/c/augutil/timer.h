@@ -12,7 +12,7 @@ struct timeval;
 struct aug_timer_;
 AUG_HEAD(aug_timers, aug_timer_);
 
-typedef void (*aug_timercb_t)(const struct aug_var*, int, unsigned*,
+typedef void (*aug_timercb_t)(int, const struct aug_var*, unsigned*,
                               struct aug_timers*);
 
 AUGUTIL_API int

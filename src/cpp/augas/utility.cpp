@@ -9,54 +9,60 @@
 namespace {
 
     void
-    close(const struct augas_session* s)
+    closesess(const struct augas_sess* sess)
     {
     }
-
     int
-    open(struct augas_session* s, const char* serv, const char* peer)
-    {
-        return 0;
-    }
-
-    int
-    data(const struct augas_session* s, const char* buf, size_t size)
+    opensess(struct augas_sess* sess)
     {
         return 0;
     }
-
     int
-    rdexpire(const struct augas_session* s, unsigned* ms)
+    event(const struct augas_sess* sess, int type, void* user)
     {
         return 0;
     }
-
     int
-    wrexpire(const struct augas_session* s, unsigned* ms)
+    expire(const struct augas_sess* sess, unsigned tid, void* user,
+           unsigned* ms)
     {
         return 0;
     }
-
     int
-    stop(const struct augas_session* s)
+    reconf(const struct augas_sess* sess)
     {
         return 0;
     }
-
+    void
+    closeconn(const struct augas_conn* conn)
+    {
+    }
     int
-    event(int type, void* arg)
+    openconn(struct augas_conn* conn, const char* addr, unsigned short port)
     {
         return 0;
     }
-
+    void
+    notconn(const struct augas_conn* conn)
+    {
+    }
     int
-    expire(void* arg, unsigned id, unsigned* ms)
+    data(const struct augas_conn* conn, const char* buf, size_t size)
     {
         return 0;
     }
-
     int
-    reconf(void)
+    rdexpire(const struct augas_conn* conn, unsigned* ms)
+    {
+        return 0;
+    }
+    int
+    wrexpire(const struct augas_conn* conn, unsigned* ms)
+    {
+        return 0;
+    }
+    int
+    teardown(const struct augas_conn* conn)
     {
         return 0;
     }
@@ -65,13 +71,16 @@ namespace {
 void
 augas::setdefaults(struct augas_module& dst, const struct augas_module& src)
 {
-    dst.close_ = src.close_ ? src.close_ : close;
-    dst.open_ = src.open_ ? src.open_ : open;
-    dst.data_ = src.data_ ? src.data_ : data;
-    dst.rdexpire_ = src.rdexpire_ ? src.rdexpire_ : rdexpire;
-    dst.wrexpire_ = src.wrexpire_ ? src.wrexpire_ : wrexpire;
-    dst.stop_ = src.stop_ ? src.stop_ : stop;
+    dst.closesess_ = src.closesess_ ? src.closesess_ : closesess;
+    dst.opensess_ = src.opensess_ ? src.opensess_ : opensess;
     dst.event_ = src.event_ ? src.event_ : event;
     dst.expire_ = src.expire_ ? src.expire_ : expire;
     dst.reconf_ = src.reconf_ ? src.reconf_ : reconf;
+    dst.closeconn_ = src.closeconn_ ? src.closeconn_ : closeconn;
+    dst.openconn_ = src.openconn_ ? src.openconn_ : openconn;
+    dst.notconn_ = src.notconn_ ? src.notconn_ : notconn;
+    dst.data_ = src.data_ ? src.data_ : data;
+    dst.rdexpire_ = src.rdexpire_ ? src.rdexpire_ : rdexpire;
+    dst.wrexpire_ = src.wrexpire_ ? src.wrexpire_ : wrexpire;
+    dst.teardown_ = src.teardown_ ? src.teardown_ : teardown;
 }

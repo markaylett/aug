@@ -18,8 +18,8 @@ using namespace std;
 module::~module() AUG_NOTHROW
 {
     try {
-        aug_info("unloading module '%s'", modname_.c_str());
-        unloadfn_();
+        aug_info("terminating module '%s'", name_.c_str());
+        termfn_();
     } catch (const exception& e) {
         aug_error("std::exception: %s", e.what());
     } catch (...) {
@@ -27,91 +27,110 @@ module::~module() AUG_NOTHROW
     }
 }
 
-module::module(const string& modname, const char* path,
+module::module(const string& name, const char* path,
                const struct augas_host& host)
-    : modname_(modname),
+    : name_(name),
       lib_(path)
 {
-    aug_info("resolving symbols '%s'", modname.c_str());
-    augas_loadfn loadfn(dlsym<augas_loadfn>(lib_, "augas_load"));
-    unloadfn_ = dlsym<augas_unloadfn>(lib_, "augas_unload");
+    aug_info("resolving symbols in module '%s'", name_.c_str());
+    augas_initfn initfn(dlsym<augas_initfn>(lib_, "augas_init"));
+    termfn_ = dlsym<augas_termfn>(lib_, "augas_term");
 
-    aug_info("loading module '%s'", modname.c_str());
-    const struct augas_module* ptr(loadfn(modname.c_str(), &host));
+    aug_info("initialising module '%s'", name_.c_str());
+    const struct augas_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "aug_load() failed");
+        throw error(__FILE__, __LINE__, EMODCALL, "aug_init() failed");
     setdefaults(module_, *ptr);
 }
 
 void
-module::close(const struct augas_session& s) const
+module::closesess(const augas_sess& sess) const
 {
-    module_.close_(&s);
+    module_.closesess_(&sess);
 }
 
 void
-module::open(struct augas_session& s, const char* serv,
-             const char* peer) const
+module::opensess(augas_sess& sess) const
 {
-    if (AUGAS_SUCCESS != module_.open_(&s, serv, peer))
+    if (AUGAS_SUCCESS != module_.opensess_(&sess))
         throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::open_() failed");
+                    "augas_module::opensess_() failed");
 }
 
 void
-module::data(const struct augas_session& s, const char* buf,
-             size_t size) const
+module::event(const augas_sess& sess, int type, void* user) const
 {
-    if (AUGAS_SUCCESS != module_.data_(&s, buf, size))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::data_() failed");
-}
-
-void
-module::rdexpire(const struct augas_session& s, unsigned& ms) const
-{
-    if (AUGAS_SUCCESS != module_.rdexpire_(&s, &ms))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::rdexpire_() failed");
-}
-
-void
-module::wrexpire(const struct augas_session& s, unsigned& ms) const
-{
-    if (AUGAS_SUCCESS != module_.wrexpire_(&s, &ms))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::wrexpire_() failed");
-}
-
-void
-module::stop(const struct augas_session& s) const
-{
-    if (AUGAS_SUCCESS != module_.stop_(&s))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::stop_() failed");
-}
-
-void
-module::event(int type, void* arg) const
-{
-    if (AUGAS_SUCCESS != module_.event_(type, arg))
+    if (AUGAS_SUCCESS != module_.event_(&sess, type, user))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::event_() failed");
 }
 
 void
-module::expire(void* arg, unsigned id, unsigned* ms) const
+module::expire(const augas_sess& sess, unsigned tid, void* user,
+               unsigned& ms) const
 {
-    if (AUGAS_SUCCESS != module_.expire_(arg, id, ms))
+    if (AUGAS_SUCCESS != module_.expire_(&sess, tid, user, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::expire_() failed");
 }
 
 void
-module::reconf() const
+module::reconf(const augas_sess& sess) const
 {
-    if (AUGAS_SUCCESS != module_.reconf_())
+    if (AUGAS_SUCCESS != module_.reconf_(&sess))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::reconf_() failed");
+}
+
+void
+module::closeconn(const augas_conn& conn) const
+{
+    module_.closeconn_(&conn);
+}
+
+void
+module::openconn(augas_conn& conn, const char* addr,
+                 unsigned short port) const
+{
+    if (AUGAS_SUCCESS != module_.openconn_(&conn, addr, port))
+        throw error(__FILE__, __LINE__, EMODCALL,
+                    "augas_module::openconn_() failed");
+}
+
+void
+module::notconn(const augas_conn& conn) const
+{
+    module_.notconn_(&conn);
+}
+
+void
+module::data(const augas_conn& conn, const char* buf, size_t size) const
+{
+    if (AUGAS_SUCCESS != module_.data_(&conn, buf, size))
+        throw error(__FILE__, __LINE__, EMODCALL,
+                    "augas_module::data_() failed");
+}
+
+void
+module::rdexpire(const augas_conn& conn, unsigned& ms) const
+{
+    if (AUGAS_SUCCESS != module_.rdexpire_(&conn, &ms))
+        throw error(__FILE__, __LINE__, EMODCALL,
+                    "augas_module::rdexpire_() failed");
+}
+
+void
+module::wrexpire(const augas_conn& conn, unsigned& ms) const
+{
+    if (AUGAS_SUCCESS != module_.wrexpire_(&conn, &ms))
+        throw error(__FILE__, __LINE__, EMODCALL,
+                    "augas_module::wrexpire_() failed");
+}
+
+void
+module::teardown(const augas_conn& conn) const
+{
+    if (AUGAS_SUCCESS != module_.teardown_(&conn))
+        throw error(__FILE__, __LINE__, EMODCALL,
+                    "augas_module::teardown_() failed");
 }

@@ -17,7 +17,7 @@ AUG_HEAD(aug_conns, aug_conn_);
    The callback function has a boolean return value: returning false removes
    the connection.
 */
-typedef int (*aug_conncb_t)(const struct aug_var*, int, struct aug_conns*);
+typedef int (*aug_conncb_t)(int, const struct aug_var*, struct aug_conns*);
 
 AUGNET_API int
 aug_freeconns(struct aug_conns* conns);

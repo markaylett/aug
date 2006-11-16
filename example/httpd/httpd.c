@@ -106,7 +106,7 @@ freeconn_(aug_state_t state, aug_mplexer_t mplexer, int fd)
 }
 
 static int
-conn_(const struct aug_var* arg, int fd, struct aug_conns* conns)
+conn_(int fd, const struct aug_var* arg, struct aug_conns* conns)
 {
     ssize_t ret;
     aug_state_t state = aug_getvarp(arg);
@@ -158,7 +158,7 @@ conn_(const struct aug_var* arg, int fd, struct aug_conns* conns)
 }
 
 static int
-listener_(const struct aug_var* arg, int fd, struct aug_conns* conns)
+listener_(int fd, const struct aug_var* arg, struct aug_conns* conns)
 {
     struct aug_endpoint ep;
     int conn;
@@ -297,7 +297,7 @@ config_(const struct aug_var* arg, const char* conffile, int daemon)
 }
 
 static int
-readevent_(const struct aug_var* arg, int fd, struct aug_conns* conns)
+readevent_(int fd, const struct aug_var* arg, struct aug_conns* conns)
 {
     struct aug_event event;
 

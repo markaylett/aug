@@ -90,7 +90,7 @@ namespace aug {
     namespace detail {
 
         inline int
-        conncb(const aug_var* arg, int id, aug_conns* conns)
+        conncb(int id, const aug_var* arg, aug_conns* conns)
         {
             try {
                 conncb_base* ptr = static_cast<

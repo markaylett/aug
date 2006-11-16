@@ -14,9 +14,9 @@
 namespace augas {
 
     class module {
-        const std::string modname_;
+        const std::string name_;
         aug::dlib lib_;
-        augas_unloadfn unloadfn_;
+        augas_termfn termfn_;
         augas_module module_;
 
         module(const module&);
@@ -27,36 +27,47 @@ namespace augas {
     public:
         ~module() AUG_NOTHROW;
 
-        module(const std::string& modname, const char* path,
+        module(const std::string& name, const char* path,
                const augas_host& host);
 
         void
-        close(const augas_session& s) const;
+        closesess(const augas_sess& sess) const;
 
         void
-        open(augas_session& s, const char* serv, const char* peer) const;
+        opensess(augas_sess& sess) const;
+
 
         void
-        data(const augas_session& s, const char* buf,
-             size_t size) const;
+        event(const augas_sess& sess, int type, void* user) const;
 
         void
-        rdexpire(const augas_session& s, unsigned& ms) const;
+        expire(const augas_sess& sess, unsigned tid, void* user,
+               unsigned& ms) const;
 
         void
-        wrexpire(const augas_session& s, unsigned& ms) const;
+        reconf(const augas_sess& sess) const;
 
         void
-        stop(const augas_session& s) const;
+        closeconn(const augas_conn& conn) const;
 
         void
-        event(int type, void* arg) const;
+        openconn(augas_conn& conn, const char* addr,
+                 unsigned short port) const;
 
         void
-        expire(void* arg, unsigned id, unsigned* ms) const;
+        notconn(const augas_conn& conn) const;
 
         void
-        reconf() const;
+        data(const augas_conn& conn, const char* buf, size_t size) const;
+
+        void
+        rdexpire(const augas_conn& conn, unsigned& ms) const;
+
+        void
+        wrexpire(const augas_conn& conn, unsigned& ms) const;
+
+        void
+        teardown(const augas_conn& conn) const;
     };
 
     typedef aug::smartptr<module> moduleptr;

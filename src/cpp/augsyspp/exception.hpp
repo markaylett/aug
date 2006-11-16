@@ -181,15 +181,15 @@ namespace aug {
 #define AUG_PERRINFOCATCH                                               \
     catch (const aug::errinfo_error& e) {                               \
         e.seterrinfo();                                                 \
-        perrinfo(e, "aug::errinfo_error");                              \
+        aug::perrinfo(e, "aug::errinfo_error");                         \
     } catch (const std::exception& e) {                                 \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
                        AUG_ECXX, e.what());                             \
-        perrinfo("std::exception");                                     \
+        aug::perrinfo("std::exception");                                \
     } catch (...) {                                                     \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
                        AUG_ECXX, "no description available");           \
-        perrinfo("unknown");                                            \
+        aug::perrinfo("unknown");                                       \
     } do { } while (0)
 
 #define AUG_SETERRINFOCATCH                                             \

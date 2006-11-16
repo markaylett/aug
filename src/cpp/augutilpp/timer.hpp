@@ -86,7 +86,7 @@ namespace aug {
     namespace detail {
 
         inline void
-        timercb(const aug_var* arg, int id, unsigned* ms, aug_timers* timers)
+        timercb(int id, const aug_var* arg, unsigned* ms, aug_timers* timers)
         {
             try {
                 timercb_base* ptr = static_cast<
