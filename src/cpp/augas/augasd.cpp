@@ -173,6 +173,9 @@ namespace augas {
 
         endpoint ep(null);
         smartfd sfd(tcpconnect(host, serv, ep));
+
+        setnodelay(sfd, true);
+        setnonblock(sfd, true);
         setextdriver(sfd, state_->cb_, AUG_IOEVENTRD);
 
         unsigned id(aug_nextid());
@@ -251,10 +254,8 @@ namespace augas {
     int
     shutdown_(augas_id cid)
     {
-        conns::const_iterator it(state_->manager_.conns_
-                                       .find(state_->manager_.idtofd_[cid]));
-        if (it != state_->manager_.conns_.end())
-            it->second->shutdown();
+        connptr conn(state_->manager_.getbyid(cid));
+        conn->shutdown();
         return 0;
     }
 
@@ -339,7 +340,7 @@ namespace augas {
     }
 
     bool
-    listener(fdref ref, const sessptr& sess, conncb_base& conncb)
+    accept(fdref ref, const sessptr& sess, conncb_base& conncb)
     {
         aug_endpoint ep;
 
@@ -415,64 +416,6 @@ namespace augas {
         return true;
     }
 
-    /*
-    bool
-    connection(int fd)
-    {
-        connptr conn(state_->manager_.getbyfd(fd));
-        unsigned short bits(ioevents(state_->mplexer_, fd));
-
-        if (bits & AUG_IOEVENTRD) {
-
-            AUG_DEBUG("handling read event '%d'", fd);
-
-            char buf[4096];
-            size_t size(aug::read(fd, buf, sizeof(buf)));
-            if (0 == size) {
-
-                // Connection closed.
-
-                aug_info("closing connection '%d'", fd);
-                state_->manager_.erase(conn);
-                return false;
-            }
-
-            // Data has been read: reset read timer.
-
-            conn->resetrdtimer();
-
-            // Notify module of new data.
-
-            conn->data(buf, size);
-        }
-
-        if (bits & AUG_IOEVENTWR) {
-
-            bool more(conn->buffer_.writesome(fd));
-
-            // Data has been written: reset write timer.
-
-            if (null != conn->wrtimer_)
-                if (!conn->wrtimer_.reset()) // If timer nolonger exists.
-                    conn->wrtimer_ = null;
-
-            if (!more) {
-
-                // No more (buffered) data to be written.
-
-                setioeventmask(state_->mplexer_, fd, AUG_IOEVENTRD);
-
-                // If flagged for shutdown, send FIN and disable writes.
-
-                if (conn->isshutdown())
-                    conn->shutdown();
-            }
-        }
-
-        return true;
-    }
-    */
-
     class service : public conncb_base, public service_base {
 
         bool
@@ -486,7 +429,7 @@ namespace augas {
 
             sessptr sess(state_->manager_.islistener(fd));
             if (sess != null)
-                return listener(fd, sess, *this);
+                return accept(fd, sess, *this);
 
             connptr conn(state_->manager_.getbyfd(fd));
             if (!conn->process(state_->mplexer_)) {
@@ -597,7 +540,7 @@ namespace augas {
         do_term()
         {
             aug_info("terminating daemon process");
-            state_->manager_.sesss_.clear();
+            state_->manager_.clear();
             state_.reset();
         }
     };

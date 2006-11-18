@@ -363,8 +363,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_D39ED234812E427D88DCE6AB3D1404F1"
             {
-            "SourcePath" = "8:..\\example\\module\\modpython.py"
-            "TargetName" = "8:modpython.py"
+            "SourcePath" = "8:..\\example\\module\\modskel.py"
+            "TargetName" = "8:modskel.py"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
             "Condition" = "8:"

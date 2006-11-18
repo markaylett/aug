@@ -2,10 +2,12 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 noinst_HEADERS = \
 	buffer.hpp \
+	conn.hpp \
 	exception.hpp \
 	manager.hpp \
 	module.hpp \
 	options.hpp \
+	sess.hpp \
 	utility.hpp
 
 bin_PROGRAMS = augasd
@@ -13,10 +15,12 @@ bin_PROGRAMS = augasd
 augasd_SOURCES = \
 	augasd.cpp \
 	buffer.cpp \
+	conn.cpp \
 	exception.cpp \
 	manager.cpp \
 	module.cpp \
 	options.cpp \
+	sess.cpp \
 	utility.cpp
 
 augasd_LDADD = \

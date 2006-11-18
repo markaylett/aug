@@ -125,6 +125,9 @@
 				RelativePath="..\src\cpp\augas\buffer.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augas\conn.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augas\exception.cpp">
 			</File>
 			<File
@@ -135,6 +138,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\options.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\sess.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\utility.cpp">
@@ -148,6 +154,9 @@
 				RelativePath="..\src\cpp\augas\buffer.hpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augas\conn.hpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augas\exception.hpp">
 			</File>
 			<File
@@ -158,6 +167,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\options.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\sess.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\utility.hpp">
