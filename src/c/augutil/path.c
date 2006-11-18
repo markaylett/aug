@@ -1,6 +1,7 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#undef __STRICT_ANSI__     /* _fullpath() */
 #define AUGUTIL_BUILD
 #include "augutil/path.h"
 
