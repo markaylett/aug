@@ -41,7 +41,7 @@ CFLAGS += \
 	-Wall \
 	-Werror \
 	-I$(AUG_HOME)/include \
-	-I$(PYTHON_HOME)/include/python2.4
+	-I$(PYTHON_HOME)/include
 LDFLAGS += \
 	-L$(AUG_HOME)/lib \
 	-L$(PYTHON_HOME)/libs

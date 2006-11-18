@@ -95,12 +95,15 @@ manager::load(const options& options, const augas_host& host)
 
                 // Load module.
 
+                aug_info("loading module '%s'", value.c_str());
                 string path(options.get(string("module.").append(value)
                                         .append(".path")));
                 moduleptr module(new augas::module(value, path.c_str(),
                                                    host));
                 it = modules_.insert(make_pair(value, module)).first;
             }
+
+            aug_info("creating session '%s'", name.c_str());
 
             sessptr sess(new augas::sess(it->second, name.c_str()));
 
@@ -195,7 +198,7 @@ connptr
 manager::getbyfd(fdref fd) const
 {
     conns::const_iterator it(conns_.find(fd.get()));
-    if (it != conns_.end())
+    if (it == conns_.end())
         throw error(__FILE__, __LINE__, ESTATE,
                     "connection-fd '%d' not found", fd.get());
     return it->second;
@@ -205,7 +208,7 @@ connptr
 manager::getbyid(augas_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));
-    if (it != idtofd_.end())
+    if (it == idtofd_.end())
         throw error(__FILE__, __LINE__, ESTATE,
                     "connection-id '%d' not found", id);
     return getbyfd(it->second);

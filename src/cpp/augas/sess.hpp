@@ -9,6 +9,9 @@
 namespace augas {
 
     class sess {
+    public:
+        typedef augas_sess ctype;
+    private:
 
         moduleptr module_;
         augas_sess sess_;
@@ -72,6 +75,14 @@ namespace augas {
         teardown(const augas_conn& conn) const
         {
             module_->teardown(conn);
+        }
+        operator augas_sess&()
+        {
+            return sess_;
+        }
+        operator const augas_sess&() const
+        {
+            return sess_;
         }
         bool
         isopen() const

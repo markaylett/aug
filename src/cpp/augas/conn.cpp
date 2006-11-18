@@ -40,6 +40,7 @@ conn::conn(const sessptr& sess, const smartfd& sfd, augas_id cid,
       wrtimer_(timers, null),
       shutdown_(false)
 {
+    conn_.sess_ = cptr(*sess_);
     conn_.id_ = cid;
     conn_.user_ = 0;
 

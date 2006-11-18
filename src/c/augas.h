@@ -76,15 +76,14 @@ struct augas_host {
     */
 
     const char* (*error_)(void);
+    void (*writelog_)(int level, const char* format, ...);
+    void (*vwritelog_)(int level, const char* format, va_list args);
 
     /**
        \return the value associated with name.
     */
 
     const char* (*getenv_)(const char* sname, const char* name);
-    void (*writelog_)(const char* sname, int level, const char* format, ...);
-    void (*vwritelog_)(const char* sname, int level, const char* format,
-                       va_list args);
 
     /**
        \return the new conn id.

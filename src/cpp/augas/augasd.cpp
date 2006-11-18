@@ -142,15 +142,8 @@ namespace augas {
         return state_->lastError_.c_str();
     }
 
-    const char*
-    getenv_(const char* sname, const char* name)
-    {
-        return options_.get(string(sname).append(".").append(name)
-                            .c_str(), 0);
-    }
-
     void
-    writelog_(const char* sname, int level, const char* format, ...)
+    writelog_(int level, const char* format, ...)
     {
         va_list args;
         va_start(args, format);
@@ -159,10 +152,16 @@ namespace augas {
     }
 
     void
-    vwritelog_(const char* sname, int level, const char* format,
-               va_list args)
+    vwritelog_(int level, const char* format, va_list args)
     {
         aug_vwritelog(level, format, args);
+    }
+
+    const char*
+    getenv_(const char* sname, const char* name)
+    {
+        return options_.get(string(sname).append(".").append(name)
+                            .c_str(), 0);
     }
 
     int
@@ -314,9 +313,9 @@ namespace augas {
 
     const struct augas_host host_ = {
         error_,
-        getenv_,
         writelog_,
         vwritelog_,
+        getenv_,
         tcpconnect_,
         tcplisten_,
         post_,
