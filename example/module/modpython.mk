@@ -4,7 +4,7 @@ UNAME := $(shell uname | sed -e 's/CYGWIN.*/WIN32/i' -e 's/MINGW.*/WIN32/i')
 .SUFFIXES:
 .SUFFIXES: .c .cpp .exe .o
 
-CC = gcc -mno-cygwin
+CC = gcc
 RM = rm
 
 ifeq ($(UNAME), WIN32)
@@ -41,7 +41,7 @@ CFLAGS += \
 	-Wall \
 	-Werror \
 	-I$(AUG_HOME)/include \
-	-I$(PYTHON_HOME)/include
+	-I$(PYTHON_HOME)/include/python2.4
 LDFLAGS += \
 	-L$(AUG_HOME)/lib \
 	-L$(PYTHON_HOME)/libs

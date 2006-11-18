@@ -31,25 +31,34 @@ aug_swap32(uint32_t i)
 AUGSYS_API uint64_t
 aug_swap64(uint64_t i)
 {
-#if !defined(__GNUC__)
-    return (i & 0xff00000000000000) >> 56
-        | (i & 0x00ff000000000000) >> 40
-        | (i & 0x0000ff0000000000) >> 24
-        | (i & 0x000000ff00000000) >> 8
-        | (i & 0x00000000ff000000) << 8
-        | (i & 0x0000000000ff0000) << 24
-        | (i & 0x000000000000ff00) << 40
-        | (i & 0x00000000000000ff) << 56;
-#else /* __GNUC__ */
-    return (i & 0xff00000000000000LL) >> 56
-        | (i & 0x00ff000000000000LL) >> 40
-        | (i & 0x0000ff0000000000LL) >> 24
-        | (i & 0x000000ff00000000LL) >> 8
-        | (i & 0x00000000ff000000LL) << 8
-        | (i & 0x0000000000ff0000LL) << 24
-        | (i & 0x000000000000ff00LL) << 40
-        | (i & 0x00000000000000ffLL) << 56;
-#endif /* __GNUC__ */
+    union {
+        uint64_t i64_;
+        uint32_t i32_[2];
+    } u;
+    uint32_t tmp;
+
+    /**
+       u = ABCDEFGH
+       tmp = DCBA
+    */
+
+    u.i64_ = i;
+    tmp = aug_swap32(u.i32_[0]);
+
+    /**
+       u = HGFEEFGH
+       tmp = DCBA
+    */
+
+    u.i32_[0] = aug_swap32(u.i32_[1]);
+
+    /**
+       u = HGFEDCBA
+       tmp = DCBA
+    */
+
+    u.i32_[1] = tmp;
+    return u.i64_;
 }
 
 #if WORDS_BIGENDIAN

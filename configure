@@ -20755,8 +20755,6 @@ fi
     ;;
 esac
 
-CFLAGS="$CFLAGS -D_BSD_SOURCE"
-
 # Checks for libraries.
 
 # Checks for header files.

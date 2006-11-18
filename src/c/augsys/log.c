@@ -1,7 +1,6 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#undef __STRICT_ANSI__ /* vsnprintf() */
 #define AUGSYS_BUILD
 #include "augsys/log.h"
 

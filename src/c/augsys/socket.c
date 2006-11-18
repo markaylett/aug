@@ -158,7 +158,7 @@ aug_acceptlost(void)
         case ECONNABORTED:
 #if !defined(_WIN32)
         case EPROTO:
-#endif // !_WIN32
+#endif /* !_WIN32 */
         case EWOULDBLOCK:
             return 1;
         }

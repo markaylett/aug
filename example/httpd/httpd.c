@@ -4,7 +4,6 @@
 
 static const char rcsid[] = "$Id$";
 
-#undef __STRICT_ANSI__ /* snprintf() */
 #include "message.h"
 #include "state.h"
 

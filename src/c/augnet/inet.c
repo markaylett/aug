@@ -1,9 +1,6 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#if defined(__CYGWIN__)
-# undef _POSIX_SOURCE /* u_short */
-#endif
 #define AUGNET_BUILD
 #include "augnet/inet.h"
 
