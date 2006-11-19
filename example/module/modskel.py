@@ -27,7 +27,7 @@ def notconn(sname, cid, user):
 
 def data(sname, cid, user, buf):
     augas.writelog(augas.LOGINFO, "data()")
-    # augas.send(cid, buf, augas.SESSELF)
+    # augas.send(cid, buf, augas.SNDSELF)
 
 def rdexpire(sname, cid, user, ms):
     augas.writelog(augas.LOGINFO, "rdexpire()")
