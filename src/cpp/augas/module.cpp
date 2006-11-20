@@ -18,7 +18,7 @@ using namespace std;
 module::~module() AUG_NOTHROW
 {
     try {
-        aug_info("terminating module '%s'", name_.c_str());
+        AUG_DEBUG2("terminating module '%s'", name_.c_str());
         termfn_();
     } catch (const exception& e) {
         aug_error("std::exception: %s", e.what());
@@ -32,11 +32,11 @@ module::module(const string& name, const char* path,
     : name_(name),
       lib_(path)
 {
-    aug_info("resolving symbols in module '%s'", name_.c_str());
+    AUG_DEBUG2("resolving symbols in module '%s'", name_.c_str());
     augas_initfn initfn(dlsym<augas_initfn>(lib_, "augas_init"));
     termfn_ = dlsym<augas_termfn>(lib_, "augas_term");
 
-    aug_info("initialising module '%s'", name_.c_str());
+    AUG_DEBUG2("initialising module '%s'", name_.c_str());
     const struct augas_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
         throw error(__FILE__, __LINE__, EMODCALL, "aug_init() failed");

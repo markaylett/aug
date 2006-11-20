@@ -16,10 +16,10 @@ void
 conn::do_callback(idref ref, unsigned& ms, aug_timers& timers)
 {
     if (rdtimer_ == ref) {
-        aug_info("read timer expiry");
+        aug_debug2("read timer expiry");
         sess_->rdexpire(conn_, ms);
     } else if (wrtimer_ == ref) {
-        aug_info("write timer expiry");
+        aug_debug2("write timer expiry");
         sess_->wrexpire(conn_, ms);
     } else
         assert(0);
@@ -57,7 +57,7 @@ conn::process(mplexer& mplexer)
 
     if (bits & AUG_IOEVENTRD) {
 
-        AUG_DEBUG("handling read event '%d'", sfd_.get());
+        AUG_DEBUG2("handling read event '%d'", sfd_.get());
 
         char buf[4096];
         size_t size(aug::read(sfd_, buf, sizeof(buf)));
@@ -65,7 +65,7 @@ conn::process(mplexer& mplexer)
 
             // Connection closed.
 
-            aug_info("closing connection '%d'", sfd_.get());
+            aug_debug2("closing connection '%d'", sfd_.get());
             return false;
         }
 

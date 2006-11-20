@@ -57,13 +57,39 @@ aug_notice(const char* format, ...);
 AUGSYS_API int
 aug_info(const char* format, ...);
 
+/**
+   Guidelines for debug-level use:
+
+   aug_debug0() - user applications;
+   aug_debug1() - user applications;
+   aug_debug2() - aug applications (such as augasd and mar);
+   aug_debug3() - aug libraries.
+
+   Note: further levels can be used by calling aug_writelog() directly.
+*/
+
 AUGSYS_API int
-aug_debug(const char* format, ...);
+aug_debug0(const char* format, ...);
+
+AUGSYS_API int
+aug_debug1(const char* format, ...);
+
+AUGSYS_API int
+aug_debug2(const char* format, ...);
+
+AUGSYS_API int
+aug_debug3(const char* format, ...);
 
 #if !defined(NDEBUG)
-# define AUG_DEBUG aug_debug
+# define AUG_DEBUG0 aug_debug0
+# define AUG_DEBUG1 aug_debug1
+# define AUG_DEBUG2 aug_debug2
+# define AUG_DEBUG3 aug_debug3
 #else /* NDEBUG */
-# define AUG_DEBUG 1 ? ((void)0) : aug_debug
+# define AUG_DEBUG0 1 ? ((void)0) : aug_debug0
+# define AUG_DEBUG1 1 ? ((void)0) : aug_debug1
+# define AUG_DEBUG2 1 ? ((void)0) : aug_debug2
+# define AUG_DEBUG3 1 ? ((void)0) : aug_debug3
 #endif /* NDEBUG */
 
 #endif /* AUGSYS_LOG_H */

@@ -80,7 +80,7 @@ prepare_(aug_state_t state)
 
     format_(&state->out_.header_, aug_getstr(next->initial_), next->mar_);
 
-    AUG_DEBUG("response: [%s]", aug_getstr(state->out_.header_));
+    AUG_DEBUG0("response: [%s]", aug_getstr(state->out_.header_));
 
     state->out_.buf_.iov_ = state->out_.iovec_;
     state->out_.buf_.size_ = 1;
@@ -151,7 +151,7 @@ end_(const struct aug_var* arg, int commit)
 
         static struct aug_messages messages = AUG_HEAD_INITIALIZER(messages);
 
-        AUG_DEBUG("request received");
+        AUG_DEBUG0("request received");
 
         if (!state->in_.initial_)
             return; /* Blank line. */
@@ -266,7 +266,7 @@ aug_readsome(aug_state_t state, int fd)
 
 #if !defined(NDEBUG)
         buf[ret] = '\0';
-        AUG_DEBUG("request: [%s]", buf);
+        AUG_DEBUG0("request: [%s]", buf);
 #endif /* !NDEBUG */
 
         pending = !AUG_EMPTY(&state->out_.pending_);

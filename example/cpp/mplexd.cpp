@@ -239,7 +239,7 @@ namespace test {
         readevent(int fd, aug_conns& conns)
         {
             aug_event event;
-            AUG_DEBUG("reading event");
+            AUG_DEBUG2("reading event");
 
             switch (aug::readevent(aug_eventin(), event).type_) {
             case AUG_EVENTRECONF:
@@ -267,7 +267,7 @@ namespace test {
         {
             aug_endpoint ep;
 
-            AUG_DEBUG("accepting connection");
+            AUG_DEBUG2("accepting connection");
 
             smartfd sfd(null);
             try {
@@ -304,7 +304,7 @@ namespace test {
 
             if (bits & AUG_IOEVENTRD) {
 
-                AUG_DEBUG("handling read event '%d'", fd);
+                AUG_DEBUG2("handling read event '%d'", fd);
 
                 if (!ptr->buffer_.readsome(fd)) {
 

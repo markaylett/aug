@@ -31,7 +31,7 @@ enum aug_loglevel {
     AUG_LOGWARN,
     AUG_LOGNOTICE,
     AUG_LOGINFO,
-    AUG_LOGDEBUG
+    AUG_LOGDEBUG0
 };
 
 #endif /* AUGSYS_TYPES_H */

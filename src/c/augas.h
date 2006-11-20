@@ -86,7 +86,7 @@ struct augas_host {
     const char* (*getenv_)(const char* sname, const char* name);
 
     /**
-       \return the new conn id.
+       \return the assigned connection-id.
     */
 
     int (*tcpconnect_)(const char* sname, const char* host, const char* serv,
@@ -94,6 +94,11 @@ struct augas_host {
     int (*tcplisten_)(const char* sname, const char* host, const char* serv,
                       void* user);
     int (*post_)(const char* sname, int type, void* user);
+
+    /**
+       \return the assigned timer-id.
+    */
+
     int (*settimer_)(const char* sname, int tid, unsigned ms, void* user);
     int (*resettimer_)(const char* sname, int tid, unsigned ms);
     int (*canceltimer_)(const char* sname, int tid);

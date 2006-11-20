@@ -34,7 +34,7 @@ printerr_(void)
     PyObject* module;
 
     PyErr_Fetch(&type, &value, &traceback);
-    if (!(module = PyImport_ImportModule("traceback"))) {
+    if ((module = PyImport_ImportModule("traceback"))) {
 
         PyObject* list, * empty, * message;
         list = PyObject_CallMethod(module, "format_exception", "OOO", type,
@@ -193,9 +193,9 @@ pywritelog_(PyObject* self, PyObject* args)
 static PyObject*
 pytcpconnect_(PyObject* self, PyObject* args)
 {
-    int cid;
     const char* sname, * host, * serv;
     PyObject* user;
+    int cid;
 
     if (!PyArg_ParseTuple(args, "sssO:tcpconnect", &sname, &host, &serv,
                           &user))
@@ -505,8 +505,8 @@ static int
 event_(const struct augas_sess* sess, int type, void* user)
 {
     struct import_* import = sess->user_;
-    int ret = 0;
     PyObject* x = user;
+    int ret = 0;
 
     host_->writelog_(AUGAS_LOGINFO, "event_()");
     if (import->event_) {
@@ -594,8 +594,8 @@ static int
 openconn_(struct augas_conn* conn, const char* addr, unsigned short port)
 {
     struct import_* import = conn->sess_->user_;
-    int ret = 0;
     PyObject* x;
+    int ret = 0;
 
     host_->writelog_(AUGAS_LOGINFO, "openconn_()");
     if (import->openconn_) {
@@ -706,8 +706,8 @@ static int
 teardown_(const struct augas_conn* conn)
 {
     struct import_* import = conn->sess_->user_;
-    int ret = 0;
     PyObject* x = conn->user_;
+    int ret = 0;
 
     host_->writelog_(AUGAS_LOGINFO, "teardown_()");
     if (import->teardown_) {
@@ -715,7 +715,7 @@ teardown_(const struct augas_conn* conn)
         PyObject* y = PyObject_CallFunction(import->teardown_, "sIO",
                                             conn->sess_->name_, conn->id_, x);
 
-        if (0 == check_(y)) {
+        if (0 == (ret = check_(y))) {
             Py_DECREF(y);
         }
 

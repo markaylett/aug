@@ -111,11 +111,11 @@ conn_(int fd, const struct aug_var* arg, struct aug_conns* conns)
     aug_state_t state = aug_getvarp(arg);
     int events = aug_ioevents(mplexer_, fd);
 
-    AUG_DEBUG("checking connection '%d'", fd);
+    AUG_DEBUG0("checking connection '%d'", fd);
 
     if (events & AUG_IOEVENTRD) {
 
-        AUG_DEBUG("handling read event");
+        AUG_DEBUG0("handling read event");
 
         if (-1 == (ret = aug_readsome(state, fd))) {
             aug_perrinfo(NULL, "aug_readsome() failed");
@@ -133,7 +133,7 @@ conn_(int fd, const struct aug_var* arg, struct aug_conns* conns)
 
     if (events & AUG_IOEVENTWR) {
 
-        AUG_DEBUG("handling write event");
+        AUG_DEBUG0("handling write event");
 
         if (-1 == (ret = aug_writesome(state, fd))) {
             aug_perrinfo(NULL, "aug_writesome() failed");
@@ -163,12 +163,12 @@ listener_(int fd, const struct aug_var* arg, struct aug_conns* conns)
     int conn;
     struct aug_var var;
 
-    AUG_DEBUG("checking listener '%d'", fd);
+    AUG_DEBUG0("checking listener '%d'", fd);
 
     if (!aug_ioevents(mplexer_, fd))
         return 1;
 
-    AUG_DEBUG("accepting new connection");
+    AUG_DEBUG0("accepting new connection");
 
     if (-1 == (conn = aug_accept(fd, &ep))) {
         aug_perrinfo(NULL, "aug_accept() failed");
@@ -300,12 +300,12 @@ readevent_(int fd, const struct aug_var* arg, struct aug_conns* conns)
 {
     struct aug_event event;
 
-    AUG_DEBUG("checking event pipe '%d'", fd);
+    AUG_DEBUG0("checking event pipe '%d'", fd);
 
     if (!aug_ioevents(mplexer_, fd))
         return 1;
 
-    AUG_DEBUG("reading event");
+    AUG_DEBUG0("reading event");
     if (!aug_readevent(aug_eventin(), &event))
         aug_perrinfo(NULL, "aug_readevent() failed");
 

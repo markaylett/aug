@@ -76,12 +76,12 @@ namespace test {
             int fd(aug_eventin());
             aug_event event;
 
-            AUG_DEBUG("checking event pipe '%d'", fd);
+            AUG_DEBUG2("checking event pipe '%d'", fd);
 
             if (!ioevents(state_->mplexer_, fd))
                 return;
 
-            AUG_DEBUG("reading event");
+            AUG_DEBUG2("reading event");
 
             switch (aug::readevent(aug_eventin(), event).type_) {
             case AUG_EVENTRECONF:

@@ -10,8 +10,9 @@ namespace augas {
 
     const int SRCAUGAS(AUG_SRCUSER + 0);
     const int ECONFIG(1);
-    const int EMODCALL(2);
-    const int ESTATE(3);
+    const int EHOSTCALL(2);
+    const int EMODCALL(3);
+    const int ESTATE(4);
 
     typedef aug::basic_error<SRCAUGAS> error;
 }

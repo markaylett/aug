@@ -79,7 +79,7 @@ AUGUTIL_API const char*
 aug_loglabel(int loglevel)
 {
     if (sizeof(LABELS_) / sizeof(LABELS_[0]) <= (size_t)loglevel)
-        loglevel = AUG_LOGDEBUG;
+        loglevel = AUG_LOGDEBUG0;
 
     return LABELS_[loglevel];
 }

@@ -26,7 +26,7 @@ static const char rcsid[] = "$Id$";
 
 static volatile int loglevel_ =
 #if !defined(NDEBUG)
-AUG_LOGDEBUG
+AUG_LOGDEBUG0
 #else /* NDEBUG */
 AUG_LOGINFO
 #endif /* NDEBUG */
@@ -154,12 +154,45 @@ aug_info(const char* format, ...)
 }
 
 AUGSYS_API int
-aug_debug(const char* format, ...)
+aug_debug0(const char* format, ...)
 {
     int ret;
     va_list args;
     va_start(args, format);
-    ret = aug_vwritelog(AUG_LOGDEBUG, format, args);
+    ret = aug_vwritelog(AUG_LOGDEBUG0, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGSYS_API int
+aug_debug1(const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vwritelog(AUG_LOGDEBUG0 + 1, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGSYS_API int
+aug_debug2(const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vwritelog(AUG_LOGDEBUG0 + 2, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGSYS_API int
+aug_debug3(const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vwritelog(AUG_LOGDEBUG0 + 3, format, args);
     va_end(args);
     return ret;
 }

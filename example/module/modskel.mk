@@ -4,7 +4,7 @@ UNAME := $(shell uname | sed -e 's/CYGWIN.*/WIN32/i' -e 's/MINGW.*/WIN32/i')
 .SUFFIXES:
 .SUFFIXES: .c .cpp .exe .o
 
-CC = gcc -mno-cygwin
+CC = gcc
 RM = rm
 
 ifeq ($(UNAME), WIN32)
@@ -15,8 +15,10 @@ COMMON =
 CDEFS = \
 	-DWINVER=0x0501
 CFLAGS = \
+	-mno-cygwin \
 	-mthreads
-LDFLAGS =
+LDFLAGS = \
+	-mno-cygwin
 LIBS =
 else
 AUG_HOME = $(HOME)
@@ -34,13 +36,10 @@ endif
 COMMON += \
 	-ggdb
 CDEFS += \
-	-D_MT\
-	-D_POSIX_SOURCE \
-	-D_BSD_SOURCE
+	-D_MT
 CFLAGS += \
 	-Wall \
 	-Werror \
-	-pedantic \
 	-I$(AUG_HOME)/include
 LDFLAGS += \
 	-L$(AUG_HOME)/lib

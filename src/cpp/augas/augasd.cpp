@@ -49,7 +49,7 @@ namespace augas {
         const char* value;
         if ((value = options_.get("loglevel", 0))) {
             unsigned level(strtoui(value, 10));
-            aug_info("setting log level: %d", level);
+            AUG_DEBUG2("setting log level: %d", level);
             aug_setloglevel(level);
         }
 
@@ -63,8 +63,8 @@ namespace augas {
             openlog(options_.get("logfile", "augasd.log"));
         }
 
-        aug_info("log level: %d", aug_loglevel());
-        aug_info("run directory: %s", rundir_);
+        AUG_DEBUG2("log level: %d", aug_loglevel());
+        AUG_DEBUG2("run directory: %s", rundir_);
     }
 
     typedef map<int, sessptr> pending;
@@ -80,13 +80,12 @@ namespace augas {
         manager manager_;
         pending pending_;
         events events_;
-        string lastError_;
 
         explicit
         state(conncb_base& cb)
             : cb_(cb)
         {
-            aug_info("adding event pipe");
+            AUG_DEBUG2("adding event pipe");
             insertconn(conns_, aug_eventin(), cb);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
         }
@@ -98,7 +97,7 @@ namespace augas {
     int
     extclose(int fd)
     {
-        aug_info("clearing io event mask '%d'", fd);
+        AUG_DEBUG2("clearing io event mask '%d'", fd);
         aug_setioeventmask(state_->mplexer_, fd, 0);
         return base_->close_(fd);
     }
@@ -127,7 +126,7 @@ namespace augas {
     void
     timercb_(int id, const aug_var* arg, unsigned* ms, aug_timers* timers)
     {
-        aug_info("custom timer expiry");
+        AUG_DEBUG2("custom timer expiry");
 
         pending::iterator it(state_->pending_.find(id));
         sessptr sess(it->second);
@@ -139,12 +138,14 @@ namespace augas {
     const char*
     error_()
     {
-        return state_->lastError_.c_str();
+        return aug_errdesc;
     }
 
     void
     writelog_(int level, const char* format, ...)
     {
+        // Cannot throw.
+
         va_list args;
         va_start(args, format);
         aug_vwritelog(level, format, args);
@@ -154,161 +155,212 @@ namespace augas {
     void
     vwritelog_(int level, const char* format, va_list args)
     {
+        // Cannot throw.
+
         aug_vwritelog(level, format, args);
     }
 
     const char*
     getenv_(const char* sname, const char* name)
     {
-        return options_.get(string(sname).append(".").append(name)
-                            .c_str(), 0);
+        try {
+            return options_.get(string(sname).append(".").append(name)
+                                .c_str(), 0);
+        } AUG_SETERRINFOCATCH;
+        return 0;
     }
 
     int
     tcpconnect_(const char* sname, const char* host, const char* serv,
                 void* user)
     {
-        sessptr sess(state_->manager_.getsess(sname));
+        try {
 
-        endpoint ep(null);
-        smartfd sfd(tcpconnect(host, serv, ep));
+            sessptr sess(state_->manager_.getsess(sname));
 
-        setnodelay(sfd, true);
-        setnonblock(sfd, true);
-        setextdriver(sfd, state_->cb_, AUG_IOEVENTRD);
+            // TODO: alter tcpconnect to support a non-blocking mode of
+            // operation.
 
-        unsigned id(aug_nextid());
-        state_->manager_.insert(connptr(new conn(sess, sfd, id, ep,
-                                                 state_->timers_)));
+            endpoint ep(null);
+            smartfd sfd(tcpconnect(host, serv, ep));
 
-        inetaddr addr(null);
-        aug_info("connected to host '%s', port '%d'",
-                 inetntop(getinetaddr(ep, addr)).c_str(),
-                 static_cast<int>(ntohs(port(ep))));
-        return 0;
+            setnodelay(sfd, true);
+            setnonblock(sfd, true);
+            setextdriver(sfd, state_->cb_, AUG_IOEVENTRD);
+
+            unsigned id(aug_nextid());
+            state_->manager_.insert(connptr(new conn(sess, sfd, id, ep,
+                                                     state_->timers_)));
+
+            inetaddr addr(null);
+            AUG_DEBUG2("connected to host '%s', port '%d'",
+                       inetntop(getinetaddr(ep, addr)).c_str(),
+                       static_cast<int>(ntohs(port(ep))));
+            return (int)id;
+
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
     int
     tcplisten_(const char* sname, const char* host, const char* serv,
                void* user)
     {
-        endpoint ep(null);
-        smartfd sfd(tcplisten(host, serv, ep));
-        setextdriver(sfd, state_->cb_, AUG_IOEVENTRD);
+        try {
 
-        sessptr sess(state_->manager_.getsess(sname));
-        state_->manager_.insert(sess, sfd);
+            endpoint ep(null);
+            smartfd sfd(tcplisten(host, serv, ep));
+            setextdriver(sfd, state_->cb_, AUG_IOEVENTRD);
 
-        inetaddr addr(null);
-        aug_info("listening on interface '%s', port '%d'",
-                 inetntop(getinetaddr(ep, addr)).c_str(),
-                 static_cast<int>(ntohs(port(ep))));
-        return 0;
+            sessptr sess(state_->manager_.getsess(sname));
+            state_->manager_.insert(sess, sfd);
+
+            inetaddr addr(null);
+            AUG_DEBUG2("listening on interface '%s', port '%d'",
+                       inetntop(getinetaddr(ep, addr)).c_str(),
+                       static_cast<int>(ntohs(port(ep))));
+            return 0;
+
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
     int
     post_(const char* sname, int type, void* user)
     {
-        unsigned id(aug_nextid());
-        {
-            scoped_lock l(state_->mutex_);
-            sessptr sess(state_->manager_.getsess(sname));
-            state_->events_[id] = make_pair(sess, user);
-        }
+        try {
 
-        aug_event e;
-        e.type_ = type + AUG_EVENTUSER;
-        aug_setvarl(&e.arg_, id);
-        writeevent(aug_eventout(), e);
-        return 0;
+            unsigned id(aug_nextid());
+            {
+                scoped_lock l(state_->mutex_);
+                sessptr sess(state_->manager_.getsess(sname));
+                state_->events_[id] = make_pair(sess, user);
+            }
+
+            aug_event e;
+            e.type_ = type + AUG_EVENTUSER;
+            aug_setvarl(&e.arg_, id);
+            writeevent(aug_eventout(), e);
+            return 0;
+
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     int
     settimer_(const char* sname, int id, unsigned ms, void* arg)
     {
-        var v(arg);
-        id = aug_settimer(cptr(state_->timers_), id, ms, timercb_, cptr(v));
-        if (0 < id) {
-            scoped_lock l(state_->mutex_);
-            state_->pending_[id] = state_->manager_.getsess(sname);
-        }
-        return id;
+        try {
+
+            var v(arg);
+            id = aug_settimer(cptr(state_->timers_), id, ms, timercb_,
+                              cptr(v));
+            if (0 < id) {
+                scoped_lock l(state_->mutex_);
+                state_->pending_[id] = state_->manager_.getsess(sname);
+            }
+
+            // TODO: propagate id to modpython.
+
+            return id;
+
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     int
     resettimer_(const char* sname, int tid, unsigned ms)
     {
-        int ret(aug_resettimer(cptr(state_->timers_), tid, ms));
-        if (ret < 0)
-            state_->pending_.erase(tid);
-        return ret;
+        try {
+            int ret(aug_resettimer(cptr(state_->timers_), tid, ms));
+            if (ret < 0)
+                state_->pending_.erase(tid);
+            return ret;
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     int
     canceltimer_(const char* sname, int tid)
     {
-        int ret(aug_canceltimer(cptr(state_->timers_), tid));
-        state_->pending_.erase(tid);
-        return ret;
+        try {
+            int ret(aug_canceltimer(cptr(state_->timers_), tid));
+            state_->pending_.erase(tid);
+            return ret;
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     int
     shutdown_(augas_id cid)
     {
-        connptr conn(state_->manager_.getbyid(cid));
-        conn->shutdown();
-        return 0;
+        try {
+            connptr conn(state_->manager_.getbyid(cid));
+            conn->shutdown();
+            return 0;
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     int
     send_(const char* sname, augas_id cid, const char* buf, size_t size,
           unsigned flags)
     {
-        switch (flags) {
-        case AUGAS_SNDALL:
-            if (!state_->manager_.sendall(state_->mplexer_, cid, sname, buf,
-                                          size)) {
-                state_->lastError_ = "connection has been shutdown";
-                return -1;
+        try {
+            switch (flags) {
+            case AUGAS_SNDALL:
+                if (!state_->manager_.sendall(state_->mplexer_, cid, sname,
+                                              buf, size))
+                    throw error(__FILE__, __LINE__, EHOSTCALL,
+                                "connection has been shutdown");
+                break;
+            case AUGAS_SNDSELF:
+                if (!state_->manager_.sendself(state_->mplexer_, cid, buf,
+                                               size))
+                    throw error(__FILE__, __LINE__, EHOSTCALL,
+                                "connection has been shutdown");
+                break;
+            case AUGAS_SNDOTHER:
+                state_->manager_.sendother(state_->mplexer_, cid, sname, buf,
+                                           size);
+                break;
+            default:
+                throw error(__FILE__, __LINE__, EHOSTCALL, "invalid flags");
             }
             return 0;
-        case AUGAS_SNDSELF:
-            if (!state_->manager_.sendself(state_->mplexer_, cid, buf,
-                                           size)) {
-                state_->lastError_ = "connection has been shutdown";
-                return -1;
-            }
-            return 0;
-        case AUGAS_SNDOTHER:
-            state_->manager_.sendother(state_->mplexer_, cid, sname, buf,
-                                       size);
-            return 0;
-        }
-
-        state_->lastError_ = "invalid flags";
+        } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
     setrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
-        connptr conn(state_->manager_.getbyid(cid));
-        conn->setrwtimer(ms, flags);
-        return 0;
+        try {
+            connptr conn(state_->manager_.getbyid(cid));
+            conn->setrwtimer(ms, flags);
+            return 0;
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     int
     resetrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
-        connptr conn(state_->manager_.getbyid(cid));
-        conn->resetrwtimer(ms, flags);
-        return 0;
+        try {
+            connptr conn(state_->manager_.getbyid(cid));
+            conn->resetrwtimer(ms, flags);
+            return 0;
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     int
     cancelrwtimer_(augas_id cid, unsigned flags)
     {
-        connptr conn(state_->manager_.getbyid(cid));
-        conn->cancelrwtimer(flags);
-        return 0;
+        try {
+            connptr conn(state_->manager_.getbyid(cid));
+            conn->cancelrwtimer(flags);
+            return 0;
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     const struct augas_host host_ = {
@@ -332,7 +384,7 @@ namespace augas {
     void
     load(conncb_base& cb)
     {
-        aug_info("loading sessions");
+        AUG_DEBUG2("loading sessions");
         state_->manager_.load(options_, host_);
 
         // TODO: check isopen().
@@ -343,7 +395,7 @@ namespace augas {
     {
         aug_endpoint ep;
 
-        AUG_DEBUG("accepting connection");
+        AUG_DEBUG2("accepting connection");
 
         smartfd sfd(null);
         try {
@@ -359,7 +411,7 @@ namespace augas {
             throw;
         }
 
-        aug_info("initialising connection '%d'", sfd.get());
+        AUG_DEBUG2("initialising connection '%d'", sfd.get());
 
         setnodelay(sfd, true);
         setnonblock(sfd, true);
@@ -376,13 +428,13 @@ namespace augas {
     readevent(conncb_base& cb)
     {
         aug_event event;
-        AUG_DEBUG("reading event");
+        AUG_DEBUG2("reading event");
 
         switch (aug::readevent(aug_eventin(), event).type_) {
         case AUG_EVENTRECONF:
-            aug_info("received AUG_EVENTRECONF");
+            AUG_DEBUG2("received AUG_EVENTRECONF");
             if (*conffile_) {
-                aug_info("reading: %s", conffile_);
+                AUG_DEBUG2("reading: %s", conffile_);
                 options_.read(conffile_);
             }
             load(cb);
@@ -393,10 +445,10 @@ namespace augas {
             }
             break;
         case AUG_EVENTSTATUS:
-            aug_info("received AUG_EVENTSTATUS");
+            AUG_DEBUG2("received AUG_EVENTSTATUS");
             break;
         case AUG_EVENTSTOP:
-            aug_info("received AUG_EVENTSTOP");
+            AUG_DEBUG2("received AUG_EVENTSTOP");
             stopping_ = true;
             state_->manager_.teardown();
             break;
@@ -467,7 +519,7 @@ namespace augas {
 
             if (conffile) {
 
-                aug_info("reading: %s", conffile);
+                AUG_DEBUG2("reading: %s", conffile);
                 options_.read(conffile);
 
                 // Store the absolute path to service any reconf requests.
@@ -489,7 +541,7 @@ namespace augas {
         void
         do_init()
         {
-            aug_info("initialising daemon process");
+            AUG_DEBUG2("initialising daemon process");
 
             setsrvlogger("augasd");
 
@@ -508,7 +560,7 @@ namespace augas {
         {
             struct timeval tv;
 
-            aug_info("running daemon process");
+            AUG_DEBUG2("running daemon process");
 
             int ret(!0);
             while (!stopping_ || !state_->manager_.isconnected()) {
@@ -538,7 +590,7 @@ namespace augas {
         void
         do_term()
         {
-            aug_info("terminating daemon process");
+            AUG_DEBUG2("terminating daemon process");
             state_->manager_.clear();
             state_.reset();
         }

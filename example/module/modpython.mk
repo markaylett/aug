@@ -16,8 +16,10 @@ COMMON =
 CDEFS = \
 	-DWINVER=0x0501
 CFLAGS = \
+	-mno-cygwin \
 	-mthreads
-LDFLAGS =
+LDFLAGS = \
+	-mno-cygwin
 LIBS =
 else
 AUG_HOME = $(HOME)

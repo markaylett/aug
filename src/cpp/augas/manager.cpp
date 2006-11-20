@@ -95,7 +95,7 @@ manager::load(const options& options, const augas_host& host)
 
                 // Load module.
 
-                aug_info("loading module '%s'", value.c_str());
+                AUG_DEBUG2("loading module '%s'", value.c_str());
                 string path(options.get(string("module.").append(value)
                                         .append(".path")));
                 moduleptr module(new augas::module(value, path.c_str(),
@@ -103,17 +103,16 @@ manager::load(const options& options, const augas_host& host)
                 it = modules_.insert(make_pair(value, module)).first;
             }
 
-            aug_info("creating session '%s'", name.c_str());
+            AUG_DEBUG2("creating session '%s'", name.c_str());
 
             sessptr sess(new augas::sess(it->second, name.c_str()));
 
             // Insert before calling open().
 
             sesss_[name] = sess;
-
-            // TODO: try/catch.
-
-            sess->open();
+            try {
+                sess->open();
+            } AUG_PERRINFOCATCH;
         }
 
     } else {
@@ -125,7 +124,9 @@ manager::load(const options& options, const augas_host& host)
         modules_[DEFAULT_NAME] = module;
         sessptr sess(new augas::sess(module, DEFAULT_NAME));
         sesss_[DEFAULT_NAME] = sess;
-        sess->open();
+        try {
+            sess->open();
+        } AUG_PERRINFOCATCH;
     }
 }
 
