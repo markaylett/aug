@@ -483,6 +483,7 @@ static void
 closesess_(const struct augas_sess* sess)
 {
     struct import_* import = sess->user_;
+    assert(sess->user_);
 
     host_->writelog_(AUGAS_LOGINFO, "closesess_()");
     freeimport_(import);
@@ -507,6 +508,8 @@ event_(const struct augas_sess* sess, int type, void* user)
     struct import_* import = sess->user_;
     PyObject* x = user;
     int ret = 0;
+    assert(sess->user_);
+    assert(user);
 
     host_->writelog_(AUGAS_LOGINFO, "event_()");
     if (import->event_) {
@@ -529,6 +532,8 @@ expire_(const struct augas_sess* sess, unsigned tid, void* user,
 {
     struct import_* import = sess->user_;
     int ret = 0;
+    assert(sess->user_);
+    assert(user);
 
     host_->writelog_(AUGAS_LOGINFO, "expire_()");
     if (import->expire_) {
@@ -537,7 +542,6 @@ expire_(const struct augas_sess* sess, unsigned tid, void* user,
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->expire_, "sIOO",
                                             sess->name_, tid, x, y);
-
         if (0 == (ret = check_(z))) {
             *ms = PyInt_AsLong(y);
             Py_DECREF(z);
@@ -557,6 +561,7 @@ reconf_(const struct augas_sess* sess)
 {
     struct import_* import = sess->user_;
     int ret = 0;
+    assert(sess->user_);
 
     host_->writelog_(AUGAS_LOGINFO, "reconf_()");
     if (import->reconf_) {
@@ -576,6 +581,8 @@ closeconn_(const struct augas_conn* conn)
 {
     struct import_* import = conn->sess_->user_;
     PyObject* x = conn->user_;
+    assert(conn->user_);
+    assert(conn->sess_->user_);
 
     host_->writelog_(AUGAS_LOGINFO, "closeconn_()");
     if (import->closeconn_) {
@@ -596,6 +603,8 @@ openconn_(struct augas_conn* conn, const char* addr, unsigned short port)
     struct import_* import = conn->sess_->user_;
     PyObject* x;
     int ret = 0;
+    assert(conn->user_);
+    assert(conn->sess_->user_);
 
     host_->writelog_(AUGAS_LOGINFO, "openconn_()");
     if (import->openconn_) {
@@ -616,6 +625,8 @@ notconn_(const struct augas_conn* conn)
 {
     struct import_* import = conn->sess_->user_;
     PyObject* x = conn->user_;
+    assert(conn->user_);
+    assert(conn->sess_->user_);
 
     host_->writelog_(AUGAS_LOGINFO, "notconn_()");
     if (import->notconn_) {
@@ -635,6 +646,8 @@ data_(const struct augas_conn* conn, const char* buf, size_t size)
 {
     struct import_* import = conn->sess_->user_;
     int ret = 0;
+    assert(conn->user_);
+    assert(conn->sess_->user_);
 
     host_->writelog_(AUGAS_LOGINFO, "data_()");
     if (import->data_) {
@@ -657,6 +670,8 @@ rdexpire_(const struct augas_conn* conn, unsigned* ms)
 {
     struct import_* import = conn->sess_->user_;
     int ret = 0;
+    assert(conn->user_);
+    assert(conn->sess_->user_);
 
     host_->writelog_(AUGAS_LOGINFO, "rdexpire_()");
     if (import->rdexpire_) {
@@ -682,6 +697,8 @@ wrexpire_(const struct augas_conn* conn, unsigned* ms)
 {
     struct import_* import = conn->sess_->user_;
     int ret = 0;
+    assert(conn->user_);
+    assert(conn->sess_->user_);
 
     host_->writelog_(AUGAS_LOGINFO, "wrexpire_()");
     if (import->wrexpire_) {
@@ -708,6 +725,8 @@ teardown_(const struct augas_conn* conn)
     struct import_* import = conn->sess_->user_;
     PyObject* x = conn->user_;
     int ret = 0;
+    assert(conn->user_);
+    assert(conn->sess_->user_);
 
     host_->writelog_(AUGAS_LOGINFO, "teardown_()");
     if (import->teardown_) {

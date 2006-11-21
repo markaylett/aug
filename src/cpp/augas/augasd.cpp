@@ -131,7 +131,7 @@ namespace augas {
         pending::iterator it(state_->pending_.find(id));
         sessptr sess(it->second);
         sess->expire(id, aug_getvarp(arg), *ms);
-        if (0 == *ms) // What if canceltimer is used?
+        if (0 == *ms) // TODO: what if canceltimer is used?
             state_->pending_.erase(it);
     }
 
@@ -459,8 +459,13 @@ namespace augas {
 
                 scoped_lock l(state_->mutex_);
                 events::iterator it(state_->events_.find(id));
-                it->second.first->event(event.type_ - AUG_EVENTUSER,
-                                        it->second.second);
+                try {
+                    it->second.first->event(event.type_ - AUG_EVENTUSER,
+                                            it->second.second);
+                } catch (...) {
+                    state_->events_.erase(it);
+                    throw;
+                }
                 state_->events_.erase(it);
             }
         }

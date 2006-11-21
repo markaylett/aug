@@ -5,6 +5,7 @@
 #define AUGSYSPP_EXCEPTION_HPP
 
 #include "augsyspp/errinfo.hpp"
+#include "augsyspp/types.hpp"
 
 #include <cstring> // memcpy()
 #include <exception>
@@ -74,7 +75,7 @@ namespace aug {
         basic_error(const char* file, int line, int num, const char* format,
                     va_list args)
         {
-            aug_vseterrinfo(&this->errinfo(), file, line, srcT, num, format,
+            aug_vseterrinfo(cptr(*this), file, line, srcT, num, format,
                             args);
         }
         basic_error(const char* file, int line, int num, const char* format,
@@ -82,7 +83,7 @@ namespace aug {
         {
             va_list args;
             va_start(args, format);
-            aug_vseterrinfo(&this->errinfo(), file, line, srcT, num, format,
+            aug_vseterrinfo(cptr(*this), file, line, srcT, num, format,
                             args);
             va_end(args);
         }
@@ -99,7 +100,7 @@ namespace aug {
         }
         posix_error(const char* file, int line, int err)
         {
-            aug_setposixerrinfo(&errinfo(), file, line, err);
+            aug_setposixerrinfo(cptr(*this), file, line, err);
         }
     };
 
@@ -111,7 +112,7 @@ namespace aug {
         }
         win32_error(const char* file, int line, unsigned long err)
         {
-            aug_setwin32errinfo(&errinfo(), file, line, err);
+            aug_setwin32errinfo(cptr(*this), file, line, err);
         }
     };
 #endif // _WIN32
@@ -123,7 +124,7 @@ namespace aug {
         }
         dlfcn_error(const char* file, int line, const char* desc)
         {
-            aug_seterrinfo(&errinfo(), file, line, AUG_SRCDLFCN, 1, desc);
+            aug_seterrinfo(cptr(*this), file, line, AUG_SRCDLFCN, 1, desc);
         }
     };
 
@@ -204,3 +205,6 @@ namespace aug {
     } do { } while (0)
 
 #endif // AUGSYSPP_EXCEPTION_HPP
+
+
+

@@ -111,7 +111,11 @@ manager::load(const options& options, const augas_host& host)
 
             sesss_[name] = sess;
             try {
-                sess->open();
+                try {
+                    sess->open();
+                } catch (...) {
+                    sesss_.erase(name);
+                }
             } AUG_PERRINFOCATCH;
         }
 
@@ -125,7 +129,11 @@ manager::load(const options& options, const augas_host& host)
         sessptr sess(new augas::sess(module, DEFAULT_NAME));
         sesss_[DEFAULT_NAME] = sess;
         try {
-            sess->open();
+            try {
+                sess->open();
+            } catch (...) {
+                sesss_.erase(DEFAULT_NAME);
+            }
         } AUG_PERRINFOCATCH;
     }
 }

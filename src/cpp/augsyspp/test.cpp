@@ -45,23 +45,17 @@ namespace {
 int
 main(int argc, char* argv[])
 {
-    try {
+    struct aug_errinfo errinfo;
+    aug_atexitinit(&errinfo);
 
-        struct aug_errinfo errinfo;
-        scoped_init init(errinfo);
+    try {
 
         aug_extdriver(&driver_, 0);
         smartfd sfd1(open());
         return 0;
 
-    } catch (const errinfo_error& e) {
+        return 0;
 
-        aug_perrinfo(cptr(e), "aug::errorinfo_error");
-
-    } catch (const exception& e) {
-
-        aug_error("std::exception: %s", e.what());
-    }
-
+    } AUG_PERRINFOCATCH;
     return 1;
 }
