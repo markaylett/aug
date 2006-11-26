@@ -66,7 +66,7 @@ module::event(const augas_sess& sess, int type, void* user) const
 }
 
 void
-module::expire(const augas_sess& sess, unsigned tid, void* user,
+module::expire(const augas_sess& sess, int tid, void* user,
                unsigned& ms) const
 {
     if (AUGAS_SUCCESS != module_.expire_(&sess, tid, user, &ms))

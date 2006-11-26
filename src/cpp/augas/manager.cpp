@@ -114,6 +114,7 @@ manager::load(const options& options, const augas_host& host)
                 try {
                     sess->open();
                 } catch (...) {
+                    // TODO: leave if event posted.
                     sesss_.erase(name);
                 }
             } AUG_PERRINFOCATCH;
@@ -132,6 +133,7 @@ manager::load(const options& options, const augas_host& host)
             try {
                 sess->open();
             } catch (...) {
+                // TODO: leave if event posted.
                 sesss_.erase(DEFAULT_NAME);
             }
         } AUG_PERRINFOCATCH;

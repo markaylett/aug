@@ -28,26 +28,34 @@ conn::do_callback(idref ref, unsigned& ms, aug_timers& timers)
 conn::~conn() AUG_NOTHROW
 {
     try {
-        sess_->closeconn(conn_);
+        if (open_)
+            sess_->closeconn(conn_);
     } AUG_PERRINFOCATCH;
 }
 
 conn::conn(const sessptr& sess, const smartfd& sfd, augas_id cid,
-           const aug_endpoint& ep, timers& timers)
+           timers& timers)
     : sess_(sess),
       sfd_(sfd),
       rdtimer_(timers, null),
       wrtimer_(timers, null),
+      open_(false),
       shutdown_(false)
 {
     conn_.sess_ = cptr(*sess_);
     conn_.id_ = cid;
     conn_.user_ = 0;
+}
 
-    inetaddr addr(null);
-    sess_->openconn(conn_, inetntop(getinetaddr(ep, addr)).c_str(),
-                    port(ep));
-    conn_.id_ = cid; // Just in case the callee has modified.
+void
+conn::open(const aug_endpoint& ep)
+{
+    if (!open_) {
+        inetaddr addr(null);
+        sess_->openconn(conn_, inetntop(getinetaddr(ep, addr)).c_str(),
+                        port(ep));
+        open_ = true;
+    }
 }
 
 bool

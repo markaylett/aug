@@ -68,7 +68,7 @@ namespace augas {
     }
 
     typedef map<int, sessptr> pending;
-    typedef map<unsigned, pair<sessptr, void*> > events;
+    typedef map<int, pair<sessptr, void*> > events;
 
     struct state {
 
@@ -171,8 +171,7 @@ namespace augas {
     }
 
     int
-    tcpconnect_(const char* sname, const char* host, const char* serv,
-                void* user)
+    tcpconnect_(const char* sname, const char* host, const char* serv)
     {
         try {
 
@@ -184,26 +183,31 @@ namespace augas {
             endpoint ep(null);
             smartfd sfd(tcpconnect(host, serv, ep));
 
-            setnodelay(sfd, true);
-            setnonblock(sfd, true);
-            setextdriver(sfd, state_->cb_, AUG_IOEVENTRD);
-
-            unsigned id(aug_nextid());
-            state_->manager_.insert(connptr(new conn(sess, sfd, id, ep,
-                                                     state_->timers_)));
-
             inetaddr addr(null);
             AUG_DEBUG2("connected to host '%s', port '%d'",
                        inetntop(getinetaddr(ep, addr)).c_str(),
                        static_cast<int>(ntohs(port(ep))));
+
+            setnodelay(sfd, true);
+            setnonblock(sfd, true);
+            setextdriver(sfd, state_->cb_, AUG_IOEVENTRD);
+
+            augas_id id(aug_nextid());
+            connptr conn(new augas::conn(sess, sfd, id, state_->timers_));
+            state_->manager_.insert(conn);
+            try {
+                conn->open(ep);
+            } catch (...) {
+                // TODO: leave if rw timers set.
+                state_->manager_.erase(conn);
+            }
             return (int)id;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
     int
-    tcplisten_(const char* sname, const char* host, const char* serv,
-               void* user)
+    tcplisten_(const char* sname, const char* host, const char* serv)
     {
         try {
 
@@ -228,7 +232,7 @@ namespace augas {
     {
         try {
 
-            unsigned id(aug_nextid());
+            augas_id id(aug_nextid());
             {
                 scoped_lock l(state_->mutex_);
                 sessptr sess(state_->manager_.getsess(sname));
@@ -257,9 +261,6 @@ namespace augas {
                 scoped_lock l(state_->mutex_);
                 state_->pending_[id] = state_->manager_.getsess(sname);
             }
-
-            // TODO: propagate id to modpython.
-
             return id;
 
         } AUG_SETERRINFOCATCH;
@@ -387,10 +388,21 @@ namespace augas {
         AUG_DEBUG2("loading sessions");
         state_->manager_.load(options_, host_);
 
-        // TODO: check isopen().
+        // Remove any timers allocated to sessions that could not be opened.
+
+        pending::iterator it(state_->pending_.begin()),
+            end(state_->pending_.end());
+        while (it != end) {
+            if (!it->second->isopen()) {
+                aug_warn("cancelling timer associated with failed session");
+                aug_canceltimer(cptr(state_->timers_), it->first);
+                state_->pending_.erase(it++);
+            } else
+                ++it;
+        }
     }
 
-    bool
+    void
     accept(fdref ref, const sessptr& sess, conncb_base& conncb)
     {
         aug_endpoint ep;
@@ -406,7 +418,7 @@ namespace augas {
 
             if (aug_acceptlost()) {
                 aug_warn("accept() failed: %s", e.what());
-                return true;
+                return;
             }
             throw;
         }
@@ -417,11 +429,15 @@ namespace augas {
         setnonblock(sfd, true);
         setextdriver(sfd, conncb, AUG_IOEVENTRD);
 
-        unsigned id(aug_nextid());
-        state_->manager_.insert
-            (connptr(new conn(sess, sfd, id, ep, state_->timers_)));
-
-        return true;
+        augas_id id(aug_nextid());
+        connptr conn(new augas::conn(sess, sfd, id, state_->timers_));
+        state_->manager_.insert(conn);
+        try {
+            conn->open(ep);
+        } catch (...) {
+            // TODO: leave if rw timer set.
+            state_->manager_.erase(conn);
+        }
     }
 
     bool
@@ -455,17 +471,20 @@ namespace augas {
         default:
             assert(AUG_VTLONG == event.arg_.type_);
             {
-                unsigned id(aug_getvarl(&event.arg_));
+                augas_id id(aug_getvarl(&event.arg_));
 
                 scoped_lock l(state_->mutex_);
                 events::iterator it(state_->events_.find(id));
-                try {
-                    it->second.first->event(event.type_ - AUG_EVENTUSER,
-                                            it->second.second);
-                } catch (...) {
-                    state_->events_.erase(it);
-                    throw;
-                }
+                if (it->second.first->isopen()) {
+                    try {
+                        it->second.first->event(event.type_ - AUG_EVENTUSER,
+                                                it->second.second);
+                    } catch (...) {
+                        state_->events_.erase(it);
+                        throw;
+                    }
+                } else
+                    aug_warn("event not delivered to failed session");
                 state_->events_.erase(it);
             }
         }
@@ -484,8 +503,10 @@ namespace augas {
                 return readevent(*this);
 
             sessptr sess(state_->manager_.islistener(fd));
-            if (sess != null)
-                return accept(fd, sess, *this);
+            if (sess != null) {
+                accept(fd, sess, *this);
+                return true;
+            }
 
             connptr conn(state_->manager_.getbyfd(fd));
             if (!conn->process(state_->mplexer_)) {

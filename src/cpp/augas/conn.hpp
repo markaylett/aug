@@ -13,6 +13,9 @@
 namespace augas {
 
     class conn : public aug::timercb_base {
+    public:
+        typedef augas_conn ctype;
+    private:
 
         sessptr sess_;
         aug::smartfd sfd_;
@@ -20,7 +23,7 @@ namespace augas {
         aug::timer rdtimer_;
         aug::timer wrtimer_;
         buffer buffer_;
-        bool shutdown_;
+        bool open_, shutdown_;
 
         void
         do_callback(aug::idref ref, unsigned& ms, aug_timers& timers);
@@ -29,7 +32,10 @@ namespace augas {
         ~conn() AUG_NOTHROW;
 
         conn(const sessptr& sess, const aug::smartfd& sfd, augas_id cid,
-             const aug_endpoint& ep, aug::timers& timers);
+             aug::timers& timers);
+
+        void
+        open(const aug_endpoint& ep);
 
         bool
         process(aug::mplexer& mplexer);
@@ -73,6 +79,19 @@ namespace augas {
         teardown() const
         {
             sess_->teardown(conn_);
+        }
+        operator augas_conn&()
+        {
+            return conn_;
+        }
+        operator const augas_conn&() const
+        {
+            return conn_;
+        }
+        bool
+        isopen() const
+        {
+            return open_;
         }
         bool
         isshutdown() const

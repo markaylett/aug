@@ -25,7 +25,7 @@ event_(const struct augas_sess* sess, int type, void* user)
 }
 
 static int
-expire_(const struct augas_sess* sess, unsigned tid, void* user,
+expire_(const struct augas_sess* sess, int tid, void* user,
         unsigned* ms)
 {
     host_->writelog_(AUGAS_LOGINFO, "expire_()");

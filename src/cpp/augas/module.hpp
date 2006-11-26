@@ -41,7 +41,7 @@ namespace augas {
         event(const augas_sess& sess, int type, void* user) const;
 
         void
-        expire(const augas_sess& sess, unsigned tid, void* user,
+        expire(const augas_sess& sess, int tid, void* user,
                unsigned& ms) const;
 
         void

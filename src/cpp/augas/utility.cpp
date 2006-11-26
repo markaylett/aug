@@ -23,8 +23,7 @@ namespace {
         return 0;
     }
     int
-    expire(const struct augas_sess* sess, unsigned tid, void* user,
-           unsigned* ms)
+    expire(const struct augas_sess* sess, int tid, void* user, unsigned* ms)
     {
         return 0;
     }

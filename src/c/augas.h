@@ -56,7 +56,7 @@ enum augas_loglevel {
    module.modpython.path = modpython.dll
 */
 
-typedef unsigned augas_id;
+typedef int augas_id;
 
 struct augas_sess {
     char name_[AUGAS_MAXNAME + 1];
@@ -89,10 +89,8 @@ struct augas_host {
        \return the assigned connection-id.
     */
 
-    int (*tcpconnect_)(const char* sname, const char* host, const char* serv,
-                       void* user);
-    int (*tcplisten_)(const char* sname, const char* host, const char* serv,
-                      void* user);
+    int (*tcpconnect_)(const char* sname, const char* host, const char* serv);
+    int (*tcplisten_)(const char* sname, const char* host, const char* serv);
     int (*post_)(const char* sname, int type, void* user);
 
     /**
@@ -121,7 +119,7 @@ struct augas_module {
     void (*closesess_)(const struct augas_sess* sess);
     int (*opensess_)(struct augas_sess* sess);
     int (*event_)(const struct augas_sess* sess, int type, void* user);
-    int (*expire_)(const struct augas_sess* sess, unsigned tid, void* user,
+    int (*expire_)(const struct augas_sess* sess, int tid, void* user,
                    unsigned* ms);
     int (*reconf_)(const struct augas_sess* sess);
 
