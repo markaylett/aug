@@ -16,7 +16,7 @@
 #define AUG_MKSTR_(x) #x
 #define AUG_MKSTR(x) AUG_MKSTR_(x)
 
-#define AUG_RETSUCCESS 0
+#define AUG_RETOK        0
 #define AUG_RETERROR   (-1)
 #define AUG_RETNONE    (-2)
 #define AUG_RETINTR    (-3)

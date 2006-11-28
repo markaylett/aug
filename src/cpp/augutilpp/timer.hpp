@@ -114,7 +114,8 @@ namespace aug {
     inline bool
     canceltimer(aug_timers& timers, idref ref)
     {
-        return aug_canceltimer(&timers, ref.get()) ? true : false;
+        return AUG_RETNONE == aug_canceltimer(&timers, ref.get())
+            ? false : true;
     }
 
     inline bool

@@ -52,7 +52,7 @@ module::closesess(const augas_sess& sess) const
 void
 module::opensess(augas_sess& sess) const
 {
-    if (AUGAS_SUCCESS != module_.opensess_(&sess))
+    if (AUGAS_OK != module_.opensess_(&sess))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::opensess_() failed");
 }
@@ -60,7 +60,7 @@ module::opensess(augas_sess& sess) const
 void
 module::event(const augas_sess& sess, int type, void* user) const
 {
-    if (AUGAS_SUCCESS != module_.event_(&sess, type, user))
+    if (AUGAS_OK != module_.event_(&sess, type, user))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::event_() failed");
 }
@@ -69,7 +69,7 @@ void
 module::expire(const augas_sess& sess, int tid, void* user,
                unsigned& ms) const
 {
-    if (AUGAS_SUCCESS != module_.expire_(&sess, tid, user, &ms))
+    if (AUGAS_OK != module_.expire_(&sess, tid, user, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::expire_() failed");
 }
@@ -77,7 +77,7 @@ module::expire(const augas_sess& sess, int tid, void* user,
 void
 module::reconf(const augas_sess& sess) const
 {
-    if (AUGAS_SUCCESS != module_.reconf_(&sess))
+    if (AUGAS_OK != module_.reconf_(&sess))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::reconf_() failed");
 }
@@ -92,7 +92,7 @@ void
 module::openconn(augas_conn& conn, const char* addr,
                  unsigned short port) const
 {
-    if (AUGAS_SUCCESS != module_.openconn_(&conn, addr, port))
+    if (AUGAS_OK != module_.openconn_(&conn, addr, port))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::openconn_() failed");
 }
@@ -106,7 +106,7 @@ module::notconn(const augas_conn& conn) const
 void
 module::data(const augas_conn& conn, const char* buf, size_t size) const
 {
-    if (AUGAS_SUCCESS != module_.data_(&conn, buf, size))
+    if (AUGAS_OK != module_.data_(&conn, buf, size))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::data_() failed");
 }
@@ -114,7 +114,7 @@ module::data(const augas_conn& conn, const char* buf, size_t size) const
 void
 module::rdexpire(const augas_conn& conn, unsigned& ms) const
 {
-    if (AUGAS_SUCCESS != module_.rdexpire_(&conn, &ms))
+    if (AUGAS_OK != module_.rdexpire_(&conn, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::rdexpire_() failed");
 }
@@ -122,7 +122,7 @@ module::rdexpire(const augas_conn& conn, unsigned& ms) const
 void
 module::wrexpire(const augas_conn& conn, unsigned& ms) const
 {
-    if (AUGAS_SUCCESS != module_.wrexpire_(&conn, &ms))
+    if (AUGAS_OK != module_.wrexpire_(&conn, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::wrexpire_() failed");
 }
@@ -130,7 +130,7 @@ module::wrexpire(const augas_conn& conn, unsigned& ms) const
 void
 module::teardown(const augas_conn& conn) const
 {
-    if (AUGAS_SUCCESS != module_.teardown_(&conn))
+    if (AUGAS_OK != module_.teardown_(&conn))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::teardown_() failed");
 }

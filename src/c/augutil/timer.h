@@ -41,7 +41,7 @@ AUGUTIL_API int
 aug_resettimer(struct aug_timers* timers, int id, unsigned ms);
 
 /**
-   Returns false if timer did not exist.
+   \return #AUG_RETNONE if the timer does not exist.
 */
 
 AUGUTIL_API int

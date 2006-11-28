@@ -131,7 +131,7 @@ namespace augas {
         pending::iterator it(state_->pending_.find(id));
         sessptr sess(it->second);
         sess->expire(id, aug_getvarp(arg), *ms);
-        if (0 == *ms) // TODO: what if canceltimer is used?
+        if (0 == *ms)
             state_->pending_.erase(it);
     }
 
@@ -271,10 +271,7 @@ namespace augas {
     resettimer_(const char* sname, int tid, unsigned ms)
     {
         try {
-            int ret(aug_resettimer(cptr(state_->timers_), tid, ms));
-            if (ret < 0)
-                state_->pending_.erase(tid);
-            return ret;
+            return aug_resettimer(cptr(state_->timers_), tid, ms);
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -284,7 +281,14 @@ namespace augas {
     {
         try {
             int ret(aug_canceltimer(cptr(state_->timers_), tid));
-            state_->pending_.erase(tid);
+
+            // Only erase if aug_canceltimer() returns true: may be in the
+            // midst of a processtimers() call, in which case,
+            // aug_canceltimer() will return false for the timer being
+            // expired.
+
+            if (0 < ret)
+                state_->pending_.erase(tid);
             return ret;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -576,6 +580,9 @@ namespace augas {
             try {
                 load(*this);
             } catch (...) {
+
+                // Ownership back to local.
+
                 s = state_;
                 throw;
             }

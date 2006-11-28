@@ -126,7 +126,6 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
         } else
             prev = &AUG_NEXT(it);
     }
-
     return AUG_RETNONE;
 }
 
@@ -145,12 +144,12 @@ aug_canceltimer(struct aug_timers* timers, int id)
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
             aug_unlock();
-            return 1;
+            return 0;
 
         } else
             prev = &AUG_NEXT(it);
     }
-    return 0;
+    return AUG_RETNONE;
 }
 
 AUGUTIL_API int

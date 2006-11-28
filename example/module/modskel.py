@@ -1,39 +1,74 @@
 import augas
 
+# string getenv (string sname, string name);
+# void writelog (int level, string msg);
+# int tcpconnect (string sname, string host, string serv);
+# void tcplisten (string sname, string host, string serv);
+# void post (string sname, int type, object user);
+# int settimer (string sname, int tid, unsigned ms, object user);
+# bool resettimer (string sname, int tid, unsigned ms);
+# bool canceltimer (string sname, int tid);
+# void shutdown (int cid);
+# void send (string sname, int cid, buffer buf);
+# void setrwtimer (int cid, unsigned ms, unsigned flags);
+# void resetrwtimer (int cid, unsigned ms, unsigned flags);
+# void cancelrwtimer (int cid, unsigned flags);
+
+class Buffer:
+    def __init__(self):
+        self.tail = ''
+
+    def lines(self, data):
+        data = self.tail + data
+        ls = data.split('\n')
+        self.tail = ls.pop()
+        for l in ls:
+            yield l
+
+def logdebug(s):
+    augas.writelog(augas.LOGDEBUG, s)
+
 def closesess(sname):
-    augas.writelog(augas.LOGINFO, "closesess()")
+    logdebug("closesess(): %s" % sname)
 
 def opensess(sname):
-    augas.writelog(augas.LOGINFO, "opensess()")
-    augas.settimer(sname, 0, 1000, "this is a test")
+    augas.writelog(augas.LOGDEBUG, "opensess(): %s" % sname)
+    augas.tcplisten(sname, "0.0.0.0", "8080")
 
 def event(sname, type, user):
-    augas.writelog(augas.LOGINFO, "event()")
+    logdebug("event(): %s" % sname)
 
 def expire(sname, tid, user, ms):
-    augas.writelog(augas.LOGINFO, "expire()")
+    logdebug("expire(): %s" % sname)
 
 def reconf(sname):
-    augas.writelog(augas.LOGINFO, "reconf()")
+    logdebug("reconf(): %s" % sname)
 
 def closeconn(sname, cid, user):
-    augas.writelog(augas.LOGINFO, "closeconn()")
+    logdebug("closeconn(): %s" % sname)
 
 def openconn(sname, cid, addr, port):
-    augas.writelog(augas.LOGINFO, "openconn()")
+    logdebug("openconn(): %s" % sname)
+    augas.setrwtimer(cid, 5000, augas.TIMRD)
+    return Buffer()
 
 def notconn(sname, cid, user):
-    augas.writelog(augas.LOGINFO, "notconn()")
+    logdebug("notconn(): %s" % sname)
 
 def data(sname, cid, user, buf):
-    augas.writelog(augas.LOGINFO, "data()")
-    # augas.send(cid, buf, augas.SNDSELF)
+    logdebug("data(): %s" % sname)
+    for line in user.lines(str(buf)):
+        augas.send(sname, cid, line + '\n', augas.SNDSELF)
 
 def rdexpire(sname, cid, user, ms):
-    augas.writelog(augas.LOGINFO, "rdexpire()")
+    logdebug("rdexpire(): %s" % sname)
+    augas.send(sname, cid, 'are you there?\n', augas.SNDSELF)
 
 def wrexpire(sname, cid, user, ms):
-    augas.writelog(augas.LOGINFO, "wrexpire()")
+    logdebug("wrexpire(): %s" % sname)
 
 def teardown(sname, cid, user):
-    augas.writelog(augas.LOGINFO, "teardown()")
+    logdebug("teardown(): %s" % sname)
+    for line in user.lines(str(buf)):
+        augas.send(sname, cid, user.tail + '\n', augas.SNDSELF)
+    augas.shutdown(cid)

@@ -44,8 +44,9 @@ enum augas_loglevel {
 #define AUGAS_SNDOTHER  0x02
 #define AUGAS_SNDALL   (AUGAS_SNDSELF | AUGAS_SNDOTHER)
 
-#define AUGAS_SUCCESS   0
-#define AUGAS_FAILURE (-1)
+#define AUGAS_OK         0
+#define AUGAS_ERROR    (-1)
+#define AUGAS_NONE     (-2)
 
 #define AUGAS_MAXNAME   63
 
@@ -109,9 +110,9 @@ struct augas_host {
 };
 
 /**
-   Module functions should return either #AUGAS_SUCCESS or #AUGAS_FAILURE.
-   For those functions associated with conns, a failure will result in the
-   conn being closed.
+   Module functions should return either #AUGAS_OK or #AUGAS_ERROR.  For those
+   functions associated with conns, a failure will result in the conn being
+   closed.
 */
 
 struct augas_module {
