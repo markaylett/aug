@@ -23,18 +23,6 @@ namespace {
     const char DEFAULT_MODULE[] = "./modskel.dll";
 #endif // _WIN32
 
-    void
-    removeunused(map<string, moduleptr>& modules)
-    {
-        map<string, moduleptr>::iterator it(modules.begin()),
-            end(modules.end());
-        while (it != end) {
-            if (1 < it->second.refs())
-                modules.erase(it++);
-            else
-                ++it;
-        }
-    }
 }
 
 void
@@ -70,9 +58,8 @@ manager::insert(const sessptr& sess, const aug::smartfd& sfd)
 void
 manager::load(const options& options, const augas_host& host)
 {
-    // Delete modules that are not currently in use.
-
-    removeunused(modules_);
+    // TODO: allow each session to specify a list of sessions on which it
+    // depends.
 
     // Obtain list of sessions.
 
@@ -95,7 +82,7 @@ manager::load(const options& options, const augas_host& host)
 
                 // Load module.
 
-                AUG_DEBUG2("loading module '%s'", value.c_str());
+                aug_info("loading module '%s'", value.c_str());
                 string path(options.get(string("module.").append(value)
                                         .append(".path")));
                 moduleptr module(new augas::module(value, path.c_str(),
@@ -103,7 +90,7 @@ manager::load(const options& options, const augas_host& host)
                 it = modules_.insert(make_pair(value, module)).first;
             }
 
-            AUG_DEBUG2("creating session '%s'", name.c_str());
+            aug_info("creating session '%s'", name.c_str());
 
             sessptr sess(new augas::sess(it->second, name.c_str()));
 

@@ -39,7 +39,7 @@ module::module(const string& name, const char* path,
     AUG_DEBUG2("initialising module '%s'", name_.c_str());
     const struct augas_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
-        throw error(__FILE__, __LINE__, EMODCALL, "aug_init() failed");
+        throw error(__FILE__, __LINE__, EMODCALL, "augas_init() failed");
     setdefaults(module_, *ptr);
 }
 

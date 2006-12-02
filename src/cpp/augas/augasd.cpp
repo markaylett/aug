@@ -44,7 +44,7 @@ namespace augas {
     bool stopping_(false);
 
     void
-    reconf()
+    reconf_()
     {
         const char* value;
         if ((value = options_.get("loglevel", 0))) {
@@ -68,18 +68,16 @@ namespace augas {
     }
 
     typedef map<int, sessptr> pending;
-    typedef map<int, pair<sessptr, void*> > events;
+    typedef pair<sessptr, void*> eventpair;
 
     struct state {
 
         conncb_base& cb_;
-        mutex mutex_;
         aug::conns conns_;
         timers timers_;
         mplexer mplexer_;
         manager manager_;
         pending pending_;
-        events events_;
 
         explicit
         state(conncb_base& cb)
@@ -95,7 +93,7 @@ namespace augas {
     const aug_driver* base_(0);
 
     int
-    extclose(int fd)
+    extclose_(int fd)
     {
         AUG_DEBUG2("clearing io event mask '%d'", fd);
         aug_setioeventmask(state_->mplexer_, fd, 0);
@@ -103,11 +101,11 @@ namespace augas {
     }
 
     void
-    setextdriver(fdref ref, conncb_base& cb, unsigned short mask)
+    setextdriver_(fdref ref, conncb_base& cb, unsigned short mask)
     {
         // Override close function.
 
-        static aug_driver extended = { extclose, 0, 0, 0, 0, 0 };
+        static aug_driver extended = { extclose_, 0, 0, 0, 0, 0 };
         if (!base_) {
             base_ = &getdriver(ref);
             extdriver(extended, *base_);
@@ -190,7 +188,7 @@ namespace augas {
 
             setnodelay(sfd, true);
             setnonblock(sfd, true);
-            setextdriver(sfd, state_->cb_, AUG_IOEVENTRD);
+            setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
 
             augas_id id(aug_nextid());
             connptr conn(new augas::conn(sess, sfd, id, state_->timers_));
@@ -213,7 +211,7 @@ namespace augas {
 
             endpoint ep(null);
             smartfd sfd(tcplisten(host, serv, ep));
-            setextdriver(sfd, state_->cb_, AUG_IOEVENTRD);
+            setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
 
             sessptr sess(state_->manager_.getsess(sname));
             state_->manager_.insert(sess, sfd);
@@ -232,17 +230,14 @@ namespace augas {
     {
         try {
 
-            augas_id id(aug_nextid());
-            {
-                scoped_lock l(state_->mutex_);
-                sessptr sess(state_->manager_.getsess(sname));
-                state_->events_[id] = make_pair(sess, user);
-            }
+            sessptr sess(state_->manager_.getsess(sname));
+            auto_ptr<eventpair> ap(new eventpair(sess, user));
 
             aug_event e;
             e.type_ = type + AUG_EVENTUSER;
-            aug_setvarl(&e.arg_, id);
+            aug_setvarp(&e.arg_, ap.get());
             writeevent(aug_eventout(), e);
+            ap.release();
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -257,10 +252,8 @@ namespace augas {
             var v(arg);
             id = aug_settimer(cptr(state_->timers_), id, ms, timercb_,
                               cptr(v));
-            if (0 < id) {
-                scoped_lock l(state_->mutex_);
+            if (0 < id)
                 state_->pending_[id] = state_->manager_.getsess(sname);
-            }
             return id;
 
         } AUG_SETERRINFOCATCH;
@@ -387,7 +380,7 @@ namespace augas {
     };
 
     void
-    load(conncb_base& cb)
+    load_(conncb_base& cb)
     {
         AUG_DEBUG2("loading sessions");
         state_->manager_.load(options_, host_);
@@ -407,7 +400,7 @@ namespace augas {
     }
 
     void
-    accept(fdref ref, const sessptr& sess, conncb_base& conncb)
+    accept_(fdref ref, const sessptr& sess, conncb_base& conncb)
     {
         aug_endpoint ep;
 
@@ -431,7 +424,7 @@ namespace augas {
 
         setnodelay(sfd, true);
         setnonblock(sfd, true);
-        setextdriver(sfd, conncb, AUG_IOEVENTRD);
+        setextdriver_(sfd, conncb, AUG_IOEVENTRD);
 
         augas_id id(aug_nextid());
         connptr conn(new augas::conn(sess, sfd, id, state_->timers_));
@@ -445,7 +438,7 @@ namespace augas {
     }
 
     bool
-    readevent(conncb_base& cb)
+    readevent_(conncb_base& cb)
     {
         aug_event event;
         AUG_DEBUG2("reading event");
@@ -457,12 +450,8 @@ namespace augas {
                 AUG_DEBUG2("reading: %s", conffile_);
                 options_.read(conffile_);
             }
-            load(cb);
-            reconf();
-            {
-                scoped_lock l(state_->mutex_);
-                state_->manager_.reconf();
-            }
+            reconf_();
+            state_->manager_.reconf();
             break;
         case AUG_EVENTSTATUS:
             AUG_DEBUG2("received AUG_EVENTSTATUS");
@@ -473,23 +462,14 @@ namespace augas {
             state_->manager_.teardown();
             break;
         default:
-            assert(AUG_VTLONG == event.arg_.type_);
+            assert(AUG_VTPTR == event.arg_.type_);
             {
-                augas_id id(aug_getvarl(&event.arg_));
-
-                scoped_lock l(state_->mutex_);
-                events::iterator it(state_->events_.find(id));
-                if (it->second.first->isopen()) {
-                    try {
-                        it->second.first->event(event.type_ - AUG_EVENTUSER,
-                                                it->second.second);
-                    } catch (...) {
-                        state_->events_.erase(it);
-                        throw;
-                    }
-                } else
+                auto_ptr<eventpair> ap(static_cast<
+                                       eventpair*>(aug_getvarp(&event.arg_)));
+                if (ap->first->isopen())
+                    ap->first->event(event.type_ - AUG_EVENTUSER, ap->second);
+                else
                     aug_warn("event not delivered to failed session");
-                state_->events_.erase(it);
             }
         }
         return true;
@@ -504,11 +484,11 @@ namespace augas {
                 return true;
 
             if (fd == aug_eventin())
-                return readevent(*this);
+                return readevent_(*this);
 
             sessptr sess(state_->manager_.islistener(fd));
             if (sess != null) {
-                accept(fd, sess, *this);
+                accept_(fd, sess, *this);
                 return true;
             }
 
@@ -565,7 +545,7 @@ namespace augas {
             realpath(rundir_, rundir ? rundir : getcwd().c_str(),
                      sizeof(rundir_));
 
-            reconf();
+            reconf_();
         }
 
         void
@@ -578,7 +558,7 @@ namespace augas {
             auto_ptr<state> s(new state(*this));
             state_ = s;
             try {
-                load(*this);
+                load_(*this);
             } catch (...) {
 
                 // Ownership back to local.
