@@ -136,8 +136,8 @@ if (is $gcc) {
     $flags .= (is $debug) ? '-ggdb' : '-O3';
     if (is $strict) {
         $flags .= ' -Wall -Werror -pedantic';
-        $cflags = "-std=c89 $flags";
-        $cxxflags = "-std=c++98 $flags -Wno-deprecated";
+        $cflags = "$flags";
+        $cxxflags = "$flags -Wno-deprecated";
     } else {
         $cflags = $flags;
         $cxxflags = $flags;
