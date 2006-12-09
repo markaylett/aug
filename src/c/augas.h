@@ -73,12 +73,21 @@ struct augas_conn {
 struct augas_host {
 
     /**
+     * The following functions are thread-safe.
+     */
+
+    /**
        \return the last error that occurred.
     */
 
     const char* (*error_)(void);
     void (*writelog_)(int level, const char* format, ...);
     void (*vwritelog_)(int level, const char* format, va_list args);
+    int (*post_)(const char* sname, int type, void* user);
+
+    /**
+     * The remaining functions are not thread-safe.
+     */
 
     /**
        \return the value associated with name.
@@ -92,7 +101,6 @@ struct augas_host {
 
     int (*tcpconnect_)(const char* sname, const char* host, const char* serv);
     int (*tcplisten_)(const char* sname, const char* host, const char* serv);
-    int (*post_)(const char* sname, int type, void* user);
 
     /**
        \return the assigned timer-id.

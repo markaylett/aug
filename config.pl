@@ -137,7 +137,7 @@ if (is $gcc) {
     if (is $strict) {
         $flags .= ' -Wall -Werror -pedantic';
         $cflags = "$flags";
-        $cxxflags = "$flags -Wno-deprecated";
+        $cxxflags = "$flags -Wno-deprecated -Wno-unused-variable";
     } else {
         $cflags = $flags;
         $cxxflags = $flags;

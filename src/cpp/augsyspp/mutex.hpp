@@ -10,18 +10,6 @@
 
 namespace aug {
 
-    inline void
-    lockmutex(aug_mutex_t mutex)
-    {
-        verify(aug_lockmutex(mutex));
-    }
-
-    inline void
-    unlockmutex(aug_mutex_t mutex)
-    {
-        verify(aug_unlockmutex(mutex));
-    }
-
     class mutex {
 
         aug_mutex_t mutex_;
@@ -53,54 +41,6 @@ namespace aug {
         get()
         {
             return mutex_;
-        }
-    };
-
-    class scoped_lock {
-
-        aug_mutex_t mutex_;
-
-        scoped_lock(const scoped_lock& rhs);
-
-        scoped_lock&
-        operator =(const scoped_lock& rhs);
-
-    public:
-        ~scoped_lock() AUG_NOTHROW
-        {
-            if (-1 == aug_unlockmutex(mutex_))
-                perrinfo("aug_unlockmutex() failed");
-        }
-
-        explicit
-        scoped_lock(aug_mutex_t mutex)
-            : mutex_(mutex)
-        {
-            lockmutex(mutex);
-        }
-    };
-
-    class scoped_unlock {
-
-        aug_mutex_t mutex_;
-
-        scoped_unlock(const scoped_unlock& rhs);
-
-        scoped_unlock&
-        operator =(const scoped_unlock& rhs);
-
-    public:
-        ~scoped_unlock() AUG_NOTHROW
-        {
-            if (-1 == aug_lockmutex(mutex_))
-                perrinfo("aug_lockmutex() failed");
-        }
-
-        explicit
-        scoped_unlock(aug_mutex_t mutex)
-            : mutex_(mutex)
-        {
-            unlockmutex(mutex);
         }
     };
 }

@@ -215,6 +215,41 @@ createimport_(const char* sname)
 }
 
 static PyObject*
+pywritelog_(PyObject* self, PyObject* args)
+{
+    int level;
+    const char* msg;
+
+    if (!PyArg_ParseTuple(args, "is:writelog", &level, &msg))
+        return NULL;
+
+    host_->writelog_(level, "%s", msg);
+    Py_RETURN_NONE;
+}
+
+static PyObject*
+pypost_(PyObject* self, PyObject* args)
+{
+    const char* sname;
+    int type;
+    PyObject* user;
+
+    if (!PyArg_ParseTuple(args, "siO:post", &sname, &type, &user))
+        return NULL;
+
+    if (-1 == host_->post_(sname, type, user)) {
+        PyErr_SetString(PyExc_RuntimeError, host_->error_());
+        return NULL;
+    }
+
+    if (opencall_)
+        pushuser_(user);
+
+    Py_INCREF(user);
+    Py_RETURN_NONE;
+}
+
+static PyObject*
 pygetenv_(PyObject* self, PyObject* args)
 {
     const char* sname, * name, * value;
@@ -229,19 +264,6 @@ pygetenv_(PyObject* self, PyObject* args)
         Py_RETURN_NONE;
 
     return Py_BuildValue("s", value);
-}
-
-static PyObject*
-pywritelog_(PyObject* self, PyObject* args)
-{
-    int level;
-    const char* msg;
-
-    if (!PyArg_ParseTuple(args, "is:writelog", &level, &msg))
-        return NULL;
-
-    host_->writelog_(level, "%s", msg);
-    Py_RETURN_NONE;
 }
 
 static PyObject*
@@ -274,28 +296,6 @@ pytcplisten_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    Py_RETURN_NONE;
-}
-
-static PyObject*
-pypost_(PyObject* self, PyObject* args)
-{
-    const char* sname;
-    int type;
-    PyObject* user;
-
-    if (!PyArg_ParseTuple(args, "siO:post", &sname, &type, &user))
-        return NULL;
-
-    if (-1 == host_->post_(sname, type, user)) {
-        PyErr_SetString(PyExc_RuntimeError, host_->error_());
-        return NULL;
-    }
-
-    if (opencall_)
-        pushuser_(user);
-
-    Py_INCREF(user);
     Py_RETURN_NONE;
 }
 
@@ -451,11 +451,11 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
 }
 
 /**
-   string getenv (string sname, string name);
    void writelog (int level, string msg);
+   void post (string sname, int type, object user);
+   string getenv (string sname, string name);
    int tcpconnect (string sname, string host, string serv);
    void tcplisten (string sname, string host, string serv);
-   void post (string sname, int type, object user);
    int settimer (string sname, int tid, unsigned ms, object user);
    bool resettimer (string sname, int tid, unsigned ms);
    bool canceltimer (string sname, int tid);
@@ -468,11 +468,15 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
 
 static PyMethodDef pymethods_[] = {
     {
-        "getenv", pygetenv_, METH_VARARGS,
+        "writelog", pywritelog_, METH_VARARGS,
         "TODO"
     },
     {
-        "writelog", pywritelog_, METH_VARARGS,
+        "post", pypost_, METH_VARARGS,
+        "TODO"
+    },
+    {
+        "getenv", pygetenv_, METH_VARARGS,
         "TODO"
     },
     {
@@ -481,10 +485,6 @@ static PyMethodDef pymethods_[] = {
     },
     {
         "tcplisten", pytcplisten_, METH_VARARGS,
-        "TODO"
-    },
-    {
-        "post", pypost_, METH_VARARGS,
         "TODO"
     },
     {

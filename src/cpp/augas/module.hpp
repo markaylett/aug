@@ -70,7 +70,7 @@ namespace augas {
         teardown(const augas_conn& conn) const;
     };
 
-    typedef aug::smartptr<module> moduleptr;
+    typedef aug::smartptr<module, aug::scoped_lock> moduleptr;
 }
 
 #endif // AUGAS_MODULE_HPP

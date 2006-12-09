@@ -26,12 +26,39 @@ namespace {
 }
 
 void
+manager::insert(const string& name, const sessptr& sess)
+{
+    // Insert prior to calling open().
+    {
+        scoped_lock lock(mutex_);
+        sesss_[name] = sess;
+    }
+    try {
+        try {
+            sess->open();
+        } catch (...) {
+
+            // TODO: leave if event posted.
+
+            scoped_lock lock(mutex_);
+            sesss_.erase(name); // close() will not be called.
+            throw;
+        }
+    } AUG_PERRINFOCATCH;
+}
+
+void
 manager::clear()
 {
     idtofd_.clear();
     conns_.clear();
     listeners_.clear();
-    sesss_.clear();
+    sesss tmp;
+    {
+        scoped_lock lock(mutex_);
+        sesss_.swap(tmp);
+    }
+    tmp.clear();
     modules_.clear();
 }
 
@@ -82,48 +109,31 @@ manager::load(const options& options, const augas_host& host)
 
                 // Load module.
 
-                aug_info("loading module '%s'", value.c_str());
                 string path(options.get(string("module.").append(value)
                                         .append(".path")));
+
+                aug_info("loading module '%s'", value.c_str());
                 moduleptr module(new augas::module(value, path.c_str(),
                                                    host));
                 it = modules_.insert(make_pair(value, module)).first;
             }
 
             aug_info("creating session '%s'", name.c_str());
-
-            sessptr sess(new augas::sess(it->second, name.c_str()));
-
-            // Insert before calling open().
-
-            sesss_[name] = sess;
-            try {
-                try {
-                    sess->open();
-                } catch (...) {
-                    // TODO: leave if event posted.
-                    sesss_.erase(name);
-                }
-            } AUG_PERRINFOCATCH;
+            insert(name, sessptr(new augas::sess(it->second, name.c_str())));
         }
 
     } else {
 
         // No service list: assume reasonable defaults.
 
+        aug_info("loading module '%s'", DEFAULT_NAME);
         moduleptr module(new augas::module(DEFAULT_NAME, DEFAULT_MODULE,
                                            host));
         modules_[DEFAULT_NAME] = module;
-        sessptr sess(new augas::sess(module, DEFAULT_NAME));
-        sesss_[DEFAULT_NAME] = sess;
-        try {
-            try {
-                sess->open();
-            } catch (...) {
-                // TODO: leave if event posted.
-                sesss_.erase(DEFAULT_NAME);
-            }
-        } AUG_PERRINFOCATCH;
+
+        aug_info("creating session '%s'", DEFAULT_NAME);
+        insert(DEFAULT_NAME,
+               sessptr(new augas::sess(module, DEFAULT_NAME)));
     }
 }
 
@@ -179,6 +189,7 @@ manager::sendother(aug::mplexer& mplexer, augas_id cid, const char* sname,
 void
 manager::reconf() const
 {
+    scoped_lock lock(mutex_);
     sesss::const_iterator it(sesss_.begin()), end(sesss_.end());
     for (; it != end; ++it)
         it->second->reconf();
@@ -215,6 +226,7 @@ manager::getbyid(augas_id id) const
 sessptr
 manager::getsess(const std::string& name) const
 {
+    scoped_lock lock(mutex_);
     sesss::const_iterator it(sesss_.find(name));
     if (it == sesss_.end())
         throw error(__FILE__, __LINE__, ESTATE,

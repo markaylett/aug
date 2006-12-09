@@ -133,11 +133,15 @@ namespace augas {
             state_->pending_.erase(it);
     }
 
+    // Thread-safe.
+
     const char*
     error_()
     {
         return aug_errdesc;
     }
+
+    // Thread-safe.
 
     void
     writelog_(int level, const char* format, ...)
@@ -150,12 +154,37 @@ namespace augas {
         va_end(args);
     }
 
+    // Thread-safe.
+
     void
     vwritelog_(int level, const char* format, va_list args)
     {
         // Cannot throw.
 
         aug_vwritelog(level, format, args);
+    }
+
+    // Thread-safe.
+
+    int
+    post_(const char* sname, int type, void* user)
+    {
+        // TODO: at least, allow post() to be called from multiple threads.
+
+        try {
+
+            sessptr sess(state_->manager_.getsess(sname));
+            auto_ptr<eventpair> ap(new eventpair(sess, user));
+
+            aug_event e;
+            e.type_ = type + AUG_EVENTUSER;
+            aug_setvarp(&e.arg_, ap.get());
+            writeevent(aug_eventout(), e);
+            ap.release();
+            return 0;
+
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     const char*
@@ -220,24 +249,6 @@ namespace augas {
             AUG_DEBUG2("listening on interface '%s', port '%d'",
                        inetntop(getinetaddr(ep, addr)).c_str(),
                        static_cast<int>(ntohs(port(ep))));
-            return 0;
-
-        } AUG_SETERRINFOCATCH;
-        return -1;
-    }
-    int
-    post_(const char* sname, int type, void* user)
-    {
-        try {
-
-            sessptr sess(state_->manager_.getsess(sname));
-            auto_ptr<eventpair> ap(new eventpair(sess, user));
-
-            aug_event e;
-            e.type_ = type + AUG_EVENTUSER;
-            aug_setvarp(&e.arg_, ap.get());
-            writeevent(aug_eventout(), e);
-            ap.release();
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -365,10 +376,10 @@ namespace augas {
         error_,
         writelog_,
         vwritelog_,
+        post_,
         getenv_,
         tcpconnect_,
         tcplisten_,
-        post_,
         settimer_,
         resettimer_,
         canceltimer_,

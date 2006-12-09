@@ -4,36 +4,48 @@
 #ifndef AUGSYSPP_SMARTPTR_HPP
 #define AUGSYSPP_SMARTPTR_HPP
 
-#include "augsyspp/types.hpp"
+#include "augsyspp/lock.hpp"
 
 #include <algorithm> // swap()
 
 /**
    A simple shared pointer implementation.  Where available, boost's
-   shared_ptr should be preferred.  Note: the reference count implementation
-   is not thread-safe.
+   shared_ptr<> would be preferrable.
 */
 
 namespace aug {
 
-    template <typename T>
+    template <typename T, typename U = null_>
     class smartptr {
+        typedef U scoped_lock;
         T* ptr_;
         unsigned* refs_;
 
         void
         release()
         {
-            if (ptr_ && 0 == --*refs_) {
-                delete ptr_;
-                delete refs_;
-                ptr_ = 0;
-                refs_ = 0;
+            T* ptr(0);
+            unsigned* refs(0);
+            {
+                scoped_lock lock;
+                if (!ptr_ || 0 < --*refs_)
+                    return;
+
+                std::swap(ptr_, ptr);
+                std::swap(refs_, refs);
             }
+
+            /**
+               Release lock before deleting: ~T() may use aug_lock().
+            */
+
+            delete ptr;
+            delete refs;
         }
         void
         retain()
         {
+            scoped_lock lock;
             if (ptr_)
                 ++*refs_;
         }
@@ -76,35 +88,40 @@ namespace aug {
         void
         swap(smartptr& rhs) AUG_NOTHROW
         {
+            scoped_lock lock;
             std::swap(ptr_, rhs.ptr_);
             std::swap(refs_, rhs.refs_);
         }
         unsigned
         refs() const
         {
+            scoped_lock lock;
             return *refs_;
         }
         T*
         get() const AUG_NOTHROW
         {
+            scoped_lock lock;
             return ptr_;
         }
         T&
         operator*() const AUG_NOTHROW
         {
+            scoped_lock lock;
             return *ptr_;
         }
         T*
         operator->() const AUG_NOTHROW
         {
+            scoped_lock lock;
             return ptr_;
         }
     };
 }
 
-template <typename T>
+template <typename T, typename U>
 bool
-isnull(const aug::smartptr<T>& ptr)
+isnull(const aug::smartptr<T, U>& ptr)
 {
     return 0 == ptr.get();
 }

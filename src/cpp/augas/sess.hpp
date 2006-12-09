@@ -96,7 +96,7 @@ namespace augas {
         }
     };
 
-    typedef aug::smartptr<sess> sessptr;
+    typedef aug::smartptr<sess, aug::scoped_lock> sessptr;
 }
 
 #endif // AUGAS_SESS_HPP

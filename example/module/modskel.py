@@ -1,10 +1,10 @@
 import augas
 
-# string getenv (string sname, string name);
 # void writelog (int level, string msg);
+# void post (string sname, int type, object user);
+# string getenv (string sname, string name);
 # int tcpconnect (string sname, string host, string serv);
 # void tcplisten (string sname, string host, string serv);
-# void post (string sname, int type, object user);
 # int settimer (string sname, int tid, unsigned ms, object user);
 # bool resettimer (string sname, int tid, unsigned ms);
 # bool canceltimer (string sname, int tid);

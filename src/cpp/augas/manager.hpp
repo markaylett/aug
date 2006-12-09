@@ -20,11 +20,15 @@ namespace augas {
         typedef std::map<augas_id, int> idtofd;
         typedef std::map<int, connptr> conns;
 
+        mutable aug::mutex mutex_;
         modules modules_;
-        sesss sesss_;
+        sesss sesss_; // May be accessed from multiple threads.
         listeners listeners_;
         conns conns_;
         idtofd idtofd_;
+
+        void
+        insert(const std::string& name, const sessptr& sess);
 
     public:
         void
@@ -65,6 +69,8 @@ namespace augas {
 
         connptr
         getbyid(augas_id id) const;
+
+        // Thread-safe.
 
         sessptr
         getsess(const std::string& name) const;

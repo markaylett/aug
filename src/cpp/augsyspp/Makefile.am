@@ -9,6 +9,7 @@ modinclude_HEADERS = \
 	errinfo.hpp \
 	exception.hpp \
 	inetaddr.hpp \
+	lock.hpp \
 	mcast.hpp \
 	mplexer.hpp \
 	mutex.hpp \
@@ -34,6 +35,7 @@ libaugsyspp_la_SOURCES = \
 	errinfo.cpp \
 	exception.cpp \
 	inetaddr.cpp \
+	lock.cpp \
 	mcast.cpp \
 	mplexer.cpp \
 	mutex.cpp \
