@@ -45,6 +45,11 @@ fi
 
 LDFLAGS="-lm $LDFLAGS"
 
+if test "$threads" != "no"; then
+   CFLAGS="-D_MT -D_REENTRANT $CFLAGS"
+   CXXFLAGS="-D_MT -D_REENTRANT $CXXFLAGS"
+fi
+
 case $host in
 *-*-cygwin* | *-*-mingw*)
 
@@ -54,27 +59,19 @@ case $host in
     LIBS="-Wl,-lws2_32 -Wl,-liphlpapi $LIBS"
 
     if test "$threads" != "no"; then
-        CFLAGS="-mthreads -D_MT -D_REENTRANT $CFLAGS"
-        CXXFLAGS="-mthreads -D_MT -D_REENTRANT $CXXFLAGS"
+        CFLAGS="-mthreads $CFLAGS"
+        CXXFLAGS="-mthreads $CXXFLAGS"
         LDFLAGS="-mthreads $LDFLAGS"
-    fi
-    ;;
-*-apple-darwin*)
-    if test "$threads" != "no"; then
-        CFLAGS="-D_MT -D_REENTRANT $CFLAGS"
-        CXXFLAGS="-D_MT -D_REENTRANT $CXXFLAGS"
     fi
     ;;
 *)
     AC_SEARCH_LIBS(gethostbyname, nsl)
     AC_SEARCH_LIBS(gethostname, nsl)
     AC_SEARCH_LIBS(socket, socket)
-    AC_SEARCH_LIBS(dlopen, [dl])
+    AC_SEARCH_LIBS(dlopen, [dl dlcompat])
 
     if test "$threads" != "no"; then
-        CFLAGS="-pthread -D_MT -D_REENTRANT $CFLAGS"
-        CXXFLAGS="-pthread -D_MT -D_REENTRANT $CXXFLAGS"
-        LDFLAGS="-pthread $LDFLAGS"
+        AC_SEARCH_LIBS(pthread_create, [pthread])
     fi
     ;;
 esac
