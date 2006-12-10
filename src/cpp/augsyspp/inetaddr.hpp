@@ -11,7 +11,7 @@ namespace aug {
     inline aug_inetaddr&
     clear(aug_inetaddr& addr)
     {
-        bzero(&addr, sizeof(aug_inetaddr));
+        memset(&addr, 0, sizeof(aug_inetaddr));
         return addr;
     }
 

@@ -11,7 +11,7 @@ namespace aug {
     inline aug_endpoint&
     clear(aug_endpoint& ep)
     {
-        bzero(&ep, sizeof(aug_endpoint));
+        memset(&ep, 0, sizeof(aug_endpoint));
         return ep;
     }
 

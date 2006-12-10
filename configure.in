@@ -54,15 +54,15 @@ case $host in
     LIBS="-Wl,-lws2_32 -Wl,-liphlpapi $LIBS"
 
     if test "$threads" != "no"; then
-        CFLAGS="-mthreads -D_MT $CFLAGS"
-        CXXFLAGS="-mthreads -D_MT $CXXFLAGS"
+        CFLAGS="-mthreads -D_MT -D_REENTRANT $CFLAGS"
+        CXXFLAGS="-mthreads -D_MT -D_REENTRANT $CXXFLAGS"
         LDFLAGS="-mthreads $LDFLAGS"
     fi
     ;;
 *-apple-darwin*)
     if test "$threads" != "no"; then
-        CFLAGS="-D_MT $CFLAGS"
-        CXXFLAGS="-D_MT $CXXFLAGS"
+        CFLAGS="-D_MT -D_REENTRANT $CFLAGS"
+        CXXFLAGS="-D_MT -D_REENTRANT $CXXFLAGS"
     fi
     ;;
 *)
@@ -72,8 +72,8 @@ case $host in
     AC_SEARCH_LIBS(dlopen, [dl])
 
     if test "$threads" != "no"; then
-        CFLAGS="-pthread -D_MT $CFLAGS"
-        CXXFLAGS="-pthread -D_MT $CXXFLAGS"
+        CFLAGS="-pthread -D_MT -D_REENTRANT $CFLAGS"
+        CXXFLAGS="-pthread -D_MT -D_REENTRANT $CXXFLAGS"
         LDFLAGS="-pthread $LDFLAGS"
     fi
     ;;
