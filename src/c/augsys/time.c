@@ -14,10 +14,6 @@ static const char rcsid[] = "$Id$";
 # include "augsys/win32/time.c"
 #endif /* _WIN32 */
 
-#if HAVE_CONFIG_H
-# include "augconfig.h"
-#endif /* HAVE_CONFIG_H */
-
 #include <errno.h>
 
 AUGSYS_API struct tm*

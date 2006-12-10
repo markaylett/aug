@@ -32,4 +32,13 @@
 # endif /* AUGNET_BUILD */
 #endif /* AUGNET_SHARED */
 
+#if HAVE_CONFIG_H
+# ifndef AUGCONFIG_H
+# define AUGCONFIG_H
+#  include "augconfig.h"
+# endif /* AUGCONFIG_H */
+#endif /* HAVE_CONFIG_H */
+
 #endif /* AUGNET_CONFIG_H */
+
+

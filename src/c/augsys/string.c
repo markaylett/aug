@@ -7,10 +7,6 @@
 
 static const char rcsid[] = "$Id$";
 
-#if HAVE_CONFIG_H
-# include "augconfig.h"
-#endif /* HAVE_CONFIG_H */
-
 #if !defined(_WIN32)
 # include <strings.h> /* strncasecmp() */
 # include "augsys/posix/string.c"

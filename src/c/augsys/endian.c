@@ -6,10 +6,6 @@
 
 static const char rcsid[] = "$Id$";
 
-#if HAVE_CONFIG_H
-# include "augconfig.h"
-#endif /* HAVE_CONFIG_H */
-
 #include <string.h> /* memcpy() */
 
 AUGSYS_API uint16_t

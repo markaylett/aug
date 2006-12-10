@@ -32,4 +32,11 @@
 # endif /* AUGUTIL_BUILD */
 #endif /* AUGUTIL_SHARED */
 
+#if HAVE_CONFIG_H
+# ifndef AUGCONFIG_H
+# define AUGCONFIG_H
+#  include "augconfig.h"
+# endif /* AUGCONFIG_H */
+#endif /* HAVE_CONFIG_H */
+
 #endif /* AUGUTIL_CONFIG_H */

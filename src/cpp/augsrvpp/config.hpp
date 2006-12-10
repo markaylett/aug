@@ -30,4 +30,11 @@
 # define AUG_NOTHROW throw()
 #endif // !AUG_NOTHROW
 
+#if HAVE_CONFIG_H
+# ifndef AUGCONFIG_H
+# define AUGCONFIG_H
+#  include "augconfig.h"
+# endif // AUGCONFIG_H
+#endif // HAVE_CONFIG_H
+
 #endif // AUGSRVPP_CONFIG_HPP

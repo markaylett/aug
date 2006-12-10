@@ -11,6 +11,10 @@
 #include <net/if.h>
 #include <sys/ioctl.h>
 
+#if HAVE_SYS_SOCKIO_H
+# include <sys/sockio.h>  /* SIOCGIFADDR */
+#else /* HAVE_SYS_SOCKIO_H */
+
 static int
 getifaddr_(int s, struct in_addr* addr, const char* ifname)
 {
