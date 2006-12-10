@@ -18,7 +18,9 @@ static const char rcsid[] = "$Id$";
 #include <string.h>        /* strlen() */
 
 #if !defined(_WIN32)
-# include <alloca.h>
+# if HAVE_ALLOCA_H
+#  include <alloca.h>
+# endif /* HAVE_ALLOCA_H */
 # define IS_DIRSEP_(ch) ((ch) == '/')
 #else /* _WIN32 */
 # include <malloc.h>

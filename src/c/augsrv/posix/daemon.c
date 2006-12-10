@@ -12,7 +12,9 @@
 #include "augsys/string.h"
 
 #include <assert.h>
-#include <alloca.h>
+#if HAVE_ALLOCA_H
+# include <alloca.h>
+#endif /* HAVE_ALLOCA_H */
 #include <fcntl.h>         /* struct flock */
 #include <math.h>          /* log10() */
 #include <stdio.h>         /* snprintf() */

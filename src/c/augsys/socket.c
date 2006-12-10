@@ -156,9 +156,9 @@ aug_acceptlost(void)
     if (AUG_SRCPOSIX == aug_errsrc)
         switch (aug_errnum) {
         case ECONNABORTED:
-#if !defined(_WIN32)
+#if defined(EPROTO)
         case EPROTO:
-#endif /* !_WIN32 */
+#endif /* EPROTO */
         case EWOULDBLOCK:
             return 1;
         }

@@ -12,7 +12,9 @@ static const char rcsid[] = "$Id$";
 #include "augsys/unistd.h" /* aug_close() */
 
 #if !defined(_WIN32)
-# include <alloca.h>
+# if HAVE_ALLOCA_H
+#  include <alloca.h>
+# endif /* HAVE_ALLOCA_H */
 # include <netinet/tcp.h>
 #else /* _WIN32 */
 # include <malloc.h>
