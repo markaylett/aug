@@ -5,7 +5,14 @@
 #include "augsys/errno.h"
 
 #include <stdlib.h> /* NULL */
-#include <dlfcn.h>
+
+#if !defined(__APPLE__) || !defined(__MACH__)
+# include <dlfcn.h>
+#else /* __APPLE__ && __MACH__ */
+# if !HAVE_DLFCN_H
+#  include "augsys/osx/dlfcn_.c"
+# endif /* !HAVE_DLFCN_H */
+#else /* __APPLE__ && __MACH__ */
 
 struct aug_dlib_ {
     void* handle_;

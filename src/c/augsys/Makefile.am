@@ -1,5 +1,6 @@
 include $(top_srcdir)/src/c/lang.mk
 SUBDIRS = \
+	osx \
 	posix \
 	win32
 

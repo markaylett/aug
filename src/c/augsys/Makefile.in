@@ -229,6 +229,7 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/c
 
 SUBDIRS = \
+	osx \
 	posix \
 	win32
 

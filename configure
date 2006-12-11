@@ -1471,7 +1471,7 @@ Optional Features:
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-cppbuild       enable cpp build [default=yes]
-  --enable-ipv6           enable ipv6 support [default=yes]
+  --enable-ipv6           enable ipv6 support [default=no]
   --enable-threads        enable thread support [default=yes]
 
 Optional Packages:
@@ -25518,7 +25518,7 @@ _ACEOF
 fi
 
 
-ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile example/Makefile example/cpp/Makefile example/httpd/Makefile example/module/Makefile src/Makefile src/c/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augres/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/augas/Makefile src/pl/Makefile src/sh/Makefile vc7/Makefile"
+ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile example/Makefile example/cpp/Makefile example/httpd/Makefile example/module/Makefile src/Makefile src/c/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augres/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/osx/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/augas/Makefile src/pl/Makefile src/sh/Makefile vc7/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -26130,6 +26130,7 @@ do
     "src/c/augsrv/posix/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsrv/posix/Makefile" ;;
     "src/c/augsrv/win32/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsrv/win32/Makefile" ;;
     "src/c/augsys/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsys/Makefile" ;;
+    "src/c/augsys/osx/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsys/osx/Makefile" ;;
     "src/c/augsys/posix/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsys/posix/Makefile" ;;
     "src/c/augsys/win32/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsys/win32/Makefile" ;;
     "src/c/augutil/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augutil/Makefile" ;;
