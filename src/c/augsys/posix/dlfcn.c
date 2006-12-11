@@ -12,7 +12,7 @@
 # if !HAVE_DLFCN_H
 #  include "augsys/osx/dlfcn_.c"
 # endif /* !HAVE_DLFCN_H */
-#else /* __APPLE__ && __MACH__ */
+#endif /* __APPLE__ && __MACH__ */
 
 struct aug_dlib_ {
     void* handle_;
