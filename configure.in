@@ -34,11 +34,11 @@ AC_ARG_ENABLE(threads,
     threads=$enableval)
 
 AM_CONDITIONAL(AUG_CPPBUILD, test "$cppbuild" != "no")
-AM_CONDITIONAL(AUG_NOIPV6, test "$ipv6" == "no")
+AM_CONDITIONAL(AUG_NOIPV6, test "$ipv6" != "yes")
 
 # Checks for libraries.
 
-if test "$ipv6" == "no"; then
+if test "$ipv6" != "yes"; then
    CFLAGS="-DAUG_NOIPV6 $CFLAGS"
    CXXFLAGS="-DAUG_NOIPV6 $CXXFLAGS"
 fi

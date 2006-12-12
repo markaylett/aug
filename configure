@@ -20311,7 +20311,7 @@ fi
 
 
 
-if test "$ipv6" == "no"; then
+if test "$ipv6" != "yes"; then
   AUG_NOIPV6_TRUE=
   AUG_NOIPV6_FALSE='#'
 else
@@ -20322,7 +20322,7 @@ fi
 
 # Checks for libraries.
 
-if test "$ipv6" == "no"; then
+if test "$ipv6" != "yes"; then
    CFLAGS="-DAUG_NOIPV6 $CFLAGS"
    CXXFLAGS="-DAUG_NOIPV6 $CXXFLAGS"
 fi
@@ -22693,7 +22693,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 
         #include <sys/types.h>
         #include <sys/socket.h>
-        int accept(int, struct sockaddr *, size_t *);
+        int accept(int, struct sockaddr*, size_t*);
 
 int
 main ()
