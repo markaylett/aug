@@ -39,4 +39,11 @@
 # endif /* AUGCONFIG_H */
 #endif /* HAVE_CONFIG_H */
 
+#if defined(_MSC_VER)
+# if !defined(AUGUTIL_BUILD)
+#  pragma comment(lib, "libaugutil.lib")
+# endif /* AUGUTIL_BUILD */
+# pragma comment(lib, "libaugsys.lib")
+#endif /* _MSC_VER */
+
 #endif /* AUGUTIL_CONFIG_H */

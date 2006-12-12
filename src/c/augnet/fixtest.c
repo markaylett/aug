@@ -91,7 +91,7 @@ main(int argc, char* argv[])
             return 1;
         }
 
-        if (-1 ==aug_readfix(stream, sv[1], 4096)) {
+        if (-1 == aug_readfix(stream, sv[1], 4096)) {
             aug_perrinfo(NULL, "aug_parsefix() failed");
             return 1;
         }
@@ -112,7 +112,7 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 ==aug_readfix(stream, sv[1], 4096)) {
+    if (-1 == aug_readfix(stream, sv[1], 4096)) {
         aug_perrinfo(NULL, "aug_parsefix() failed");
         return 1;
     }

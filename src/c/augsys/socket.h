@@ -23,7 +23,9 @@
 #  define SHUT_WR SD_SEND
 #  define SHUT_RDWR SD_BOTH
 # endif /* !SHUT_RD */
+# if !defined(socklen_t)
 typedef int socklen_t;
+# endif /* socklen_t */
 #endif /* _WIN32 */
 
 #define AUG_MAXADDRLEN 128

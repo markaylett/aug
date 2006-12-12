@@ -15,6 +15,11 @@
 
 namespace aug {
 
+#if defined(_MSC_VER)
+# pragma warning(push)
+# pragma warning(disable:4101)
+#endif // _MSC_VER
+
     template <typename T, typename U = null_>
     class smartptr {
         typedef U scoped_lock;
@@ -117,6 +122,10 @@ namespace aug {
             return ptr_;
         }
     };
+
+#if defined(_MSC_VER)
+# pragma warning(pop)
+#endif // _MSC_VER
 }
 
 template <typename T, typename U>

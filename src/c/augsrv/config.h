@@ -39,4 +39,11 @@
 # endif /* AUGCONFIG_H */
 #endif /* HAVE_CONFIG_H */
 
+#if defined(_MSC_VER)
+# if !defined(AUGSRV_BUILD)
+#  pragma comment(lib, "libaugsrv.lib")
+# endif /* AUGSRV_BUILD */
+# pragma comment(lib, "libaugutil.lib")
+#endif /* _MSC_VER */
+
 #endif /* AUGSRV_CONFIG_H */
