@@ -23,8 +23,6 @@ modinclude_HEADERS = \
 	unistd.hpp \
 	utility.hpp
 
-if AUG_CPPBUILD
-
 noinst_LTLIBRARIES = libaugsyspp.la
 
 libaugsyspp_la_SOURCES = \
@@ -79,5 +77,3 @@ augsyspp_smartptrtest_SOURCES = smartptrtest.cpp
 augsyspp_smartptrtest_LDADD = \
 	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
-
-endif

@@ -26,6 +26,9 @@
 # if !defined(socklen_t)
 typedef int socklen_t;
 # endif /* socklen_t */
+# if defined(_MSC_VER) && !defined(HAVE_IPV6)
+#  define HAVE_IPV6 1
+# endif /* _MSC_VER && !HAVE_IPV6 */
 #endif /* _WIN32 */
 
 #define AUG_MAXADDRLEN 128
@@ -40,9 +43,9 @@ struct aug_endpoint {
         } all_;
         struct sockaddr sa_;
         struct sockaddr_in ipv4_;
-#if !defined(AUG_NOIPV6)
+#if HAVE_IPV6
         struct sockaddr_in6 ipv6_;
-#endif /* !AUG_NOIPV6 */
+#endif /* HAVE_IPV6 */
         char pad_[AUG_MAXADDRLEN];
     } un_;
 };
@@ -51,9 +54,9 @@ struct aug_inetaddr {
     short family_;
     union {
         struct in_addr ipv4_;
-#if !defined(AUG_NOIPV6)
+#if HAVE_IPV6
         struct in6_addr ipv6_;
-#endif /* !AUG_NOIPV6 */
+#endif /* HAVE_IPV6 */
         char pad_[16];
     } un_;
 };

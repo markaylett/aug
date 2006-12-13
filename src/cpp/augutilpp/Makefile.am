@@ -11,8 +11,6 @@ modinclude_HEADERS = \
 	timer.hpp \
 	var.hpp
 
-if AUG_CPPBUILD
-
 noinst_LTLIBRARIES = libaugutilpp.la
 
 libaugutilpp_la_SOURCES = \
@@ -45,5 +43,3 @@ augutilpp_test_LDADD = \
 	$(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
-
-endif

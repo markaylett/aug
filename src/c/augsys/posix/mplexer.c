@@ -9,9 +9,9 @@
 #include <errno.h>
 #include <stdlib.h>        /* malloc() */
 
-#include <sys/poll.h>
-
-#define INIT_SIZE_ 64
+#if HAVE_POLL
+# include <sys/poll.h>
+# define INIT_SIZE_ 64
 
 struct aug_mplexer_ {
     struct pollfd* pollfds_;
@@ -169,6 +169,143 @@ aug_ioevents(aug_mplexer_t mplexer, int fd)
 {
     return external_(mplexer->pollfds_[fd].revents);
 }
+
+#else /* !HAVE_POLL */
+# include <sys/select.h>
+
+struct set_ {
+    fd_set rd_, wr_;
+};
+
+struct aug_mplexer_ {
+    struct set_ in_, out_;
+    int maxfd_;
+};
+
+static void
+zeroset_(struct set_* p)
+{
+    FD_ZERO(&p->rd_);
+    FD_ZERO(&p->wr_);
+}
+
+static unsigned short
+external_(struct set_* p, int fd)
+{
+    unsigned short dst = 0;
+
+    if (FD_ISSET(fd, &p->rd_))
+        dst |= AUG_IOEVENTRD;
+
+    if (FD_ISSET(fd, &p->wr_))
+        dst |= AUG_IOEVENTWR;
+
+    return dst;
+}
+
+static void
+setioevents_(struct set_* p, int fd, unsigned short mask)
+{
+    unsigned short cur = external_(p, fd);
+    unsigned short set = ~cur & mask;
+    unsigned short unset = cur & ~mask;
+
+    if (set & AUG_IOEVENTRD)
+        FD_SET(fd, &p->rd_);
+    else if (unset & AUG_IOEVENTRD)
+        FD_CLR(fd, &p->rd_);
+
+    if (set & AUG_IOEVENTWR)
+        FD_SET(fd, &p->wr_);
+    else if (unset & AUG_IOEVENTWR)
+        FD_CLR(fd, &p->wr_);
+}
+
+AUGSYS_API aug_mplexer_t
+aug_createmplexer(void)
+{
+    aug_mplexer_t mplexer = malloc(sizeof(struct aug_mplexer_));
+    if (!mplexer) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        return NULL;
+    }
+
+    zeroset_(&mplexer->in_);
+    zeroset_(&mplexer->out_);
+
+    /** A maxfd of -1 will result in a zero nfds value. */
+
+    mplexer->maxfd_ = -1;
+    return mplexer;
+}
+
+AUGSYS_API int
+aug_freemplexer(aug_mplexer_t mplexer)
+{
+    free(mplexer);
+    return 0;
+}
+
+AUGSYS_API int
+aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
+{
+    if (mask & ~(AUG_IOEVENTRD | AUG_IOEVENTWR)) {
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("invalid ioevent mask"));
+        return -1;
+    }
+
+    setioevents_(&mplexer->in_, fd, mask);
+
+    /** Update maxfd. */
+
+    if (mplexer->maxfd_ <= fd) {
+
+        /** Use fd a starting point to find the highest fd with events set. */
+
+        do {
+
+            if (FD_ISSET(fd, &mplexer->in_.rd_)
+                || FD_ISSET(fd, &mplexer->in_.wr_))
+                break;
+
+        } while (-1 != --fd);
+
+        mplexer->maxfd_ = fd;
+    }
+
+    return 0;
+}
+
+AUGSYS_API int
+aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout)
+{
+    int ret;
+    mplexer->out_ = mplexer->in_;
+
+    if (-1 == (ret = select(mplexer->maxfd_ + 1, &mplexer->out_.rd_,
+                            &mplexer->out_.wr_, NULL,
+                            (struct timeval*)timeout))) {
+
+        if (EINTR == aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno))
+            ret = AUG_RETINTR;
+    }
+    return ret;
+}
+
+AUGSYS_API int
+aug_ioeventmask(aug_mplexer_t mplexer, int fd)
+{
+    return external_(&mplexer->in_, fd);
+}
+
+AUGSYS_API int
+aug_ioevents(aug_mplexer_t mplexer, int fd)
+{
+    return external_(&mplexer->out_, fd);
+}
+
+#endif /* !HAVE_POLL */
 
 AUGSYS_API int
 aug_mplexerpipe(int fds[2])

@@ -54,6 +54,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if you have ipv6 support. */
+#undef HAVE_IPV6
+
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
@@ -93,6 +96,9 @@
 
 /* Define to 1 if you have the `pathconf' function. */
 #undef HAVE_PATHCONF
+
+/* Define to 1 if you have the `poll' function. */
+#undef HAVE_POLL
 
 /* Define to 1 if your system has a GNU libc compatible `realloc' function,
    and to 0 otherwise. */

@@ -860,10 +860,6 @@ F77
 FFLAGS
 ac_ct_F77
 LIBTOOL
-AUG_CPPBUILD_TRUE
-AUG_CPPBUILD_FALSE
-AUG_NOIPV6_TRUE
-AUG_NOIPV6_FALSE
 ALLOCA
 LIBOBJS
 LTLIBOBJS'
@@ -1470,8 +1466,6 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --enable-cppbuild       enable cpp build [default=yes]
-  --enable-ipv6           enable ipv6 support [default=no]
   --enable-threads        enable thread support [default=yes]
 
 Optional Packages:
@@ -5314,7 +5308,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5317 "configure"' > conftest.$ac_ext
+  echo '#line 5311 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7776,11 +7770,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7779: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7773: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7783: \$? = $ac_status" >&5
+   echo "$as_me:7777: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8066,11 +8060,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8069: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8063: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8073: \$? = $ac_status" >&5
+   echo "$as_me:8067: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8170,11 +8164,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8173: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8167: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8177: \$? = $ac_status" >&5
+   echo "$as_me:8171: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10624,7 +10618,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10627 "configure"
+#line 10621 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10724,7 +10718,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10727 "configure"
+#line 10721 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13171,11 +13165,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13174: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13168: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13178: \$? = $ac_status" >&5
+   echo "$as_me:13172: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13275,11 +13269,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13278: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13272: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13282: \$? = $ac_status" >&5
+   echo "$as_me:13276: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14854,11 +14848,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14857: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14851: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14861: \$? = $ac_status" >&5
+   echo "$as_me:14855: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14958,11 +14952,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14961: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14955: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14965: \$? = $ac_status" >&5
+   echo "$as_me:14959: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17190,11 +17184,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17193: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17187: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17197: \$? = $ac_status" >&5
+   echo "$as_me:17191: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17480,11 +17474,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17483: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17477: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17487: \$? = $ac_status" >&5
+   echo "$as_me:17481: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17584,11 +17578,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17587: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17581: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17591: \$? = $ac_status" >&5
+   echo "$as_me:17585: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -20281,51 +20275,13 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 
 
 
-# Check whether --enable-cppbuild was given.
-if test "${enable_cppbuild+set}" = set; then
-  enableval=$enable_cppbuild; cppbuild=$enableval
-fi
-
-
-# Check whether --enable-ipv6 was given.
-if test "${enable_ipv6+set}" = set; then
-  enableval=$enable_ipv6; ipv6=$enableval
-fi
-
-
 # Check whether --enable-threads was given.
 if test "${enable_threads+set}" = set; then
   enableval=$enable_threads; threads=$enableval
 fi
 
 
-
-
-if test "$cppbuild" != "no"; then
-  AUG_CPPBUILD_TRUE=
-  AUG_CPPBUILD_FALSE='#'
-else
-  AUG_CPPBUILD_TRUE='#'
-  AUG_CPPBUILD_FALSE=
-fi
-
-
-
-if test "$ipv6" != "yes"; then
-  AUG_NOIPV6_TRUE=
-  AUG_NOIPV6_FALSE='#'
-else
-  AUG_NOIPV6_TRUE='#'
-  AUG_NOIPV6_FALSE=
-fi
-
-
 # Checks for libraries.
-
-if test "$ipv6" != "yes"; then
-   CFLAGS="-DAUG_NOIPV6 $CFLAGS"
-   CXXFLAGS="-DAUG_NOIPV6 $CXXFLAGS"
-fi
 
 LDFLAGS="-lm $LDFLAGS"
 
@@ -22629,8 +22585,12 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-    #include <sys/types.h>
-    #include <sys/socket.h>
+    # include <sys/types.h>
+    #if !defined(_WIN32)
+    # include <sys/socket.h>
+    #else /* _WIN32 */
+    # include <winsock2.h>
+    #endif /* _WIN32 */
     socklen_t x;
 
 int
@@ -22691,8 +22651,12 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-        #include <sys/types.h>
-        #include <sys/socket.h>
+        # include <sys/types.h>
+        #if !defined(_WIN32)
+        # include <sys/socket.h>
+        #else /* _WIN32 */
+        # include <winsock2.h>
+        #endif /* _WIN32 */
         int accept(int, struct sockaddr*, size_t*);
 
 int
@@ -22762,6 +22726,95 @@ _ACEOF
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+{ echo "$as_me:$LINENO: checking for ipv6" >&5
+echo $ECHO_N "checking for ipv6... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+    # include <sys/types.h>
+    #if !defined(_WIN32)
+    # include <sys/socket.h>
+    # include <netinet/in.h>
+    # include <arpa/inet.h>
+    # include <netdb.h>
+    #else /* _WIN32 */
+    # include <winsock2.h>
+    # include <ws2tcpip.h>
+    #endif /* _WIN32 */
+    int x = IPV6_ADD_MEMBERSHIP;
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag" || test ! -s conftest.err'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+
+	{ echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+
+cat >>confdefs.h <<\_ACEOF
+#define socklen_t int
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_IPV6 1
+_ACEOF
+
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+	{ echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
 
 fi
 
@@ -25448,7 +25501,9 @@ done
 
 
 
-for ac_func in atexit bzero dup2 ftruncate getcwd getpagesize gettimeofday localtime_r memchr memmove memset munmap pathconf realpath select socket strcasecmp strchr strerror strncasecmp strrchr strspn strtoul
+
+
+for ac_func in atexit bzero dup2 ftruncate getcwd getpagesize gettimeofday localtime_r memchr memmove memset munmap pathconf poll realpath select socket strcasecmp strchr strerror strlcpy strncasecmp strrchr strspn strtoul
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 { echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -25556,113 +25611,6 @@ _ACEOF
 
 fi
 done
-
-
-{ echo "$as_me:$LINENO: checking for strlcpy" >&5
-echo $ECHO_N "checking for strlcpy... $ECHO_C" >&6; }
-if test "${ac_cv_func_strlcpy+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* Define strlcpy to an innocuous variant, in case <limits.h> declares strlcpy.
-   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-#define strlcpy innocuous_strlcpy
-
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char strlcpy (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-
-#undef strlcpy
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char strlcpy ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined __stub_strlcpy || defined __stub___strlcpy
-choke me
-#endif
-
-int
-main ()
-{
-return strlcpy ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag" || test ! -s conftest.err'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_func_strlcpy=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_func_strlcpy=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_func_strlcpy" >&5
-echo "${ECHO_T}$ac_cv_func_strlcpy" >&6; }
-if test $ac_cv_func_strlcpy = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_STRLCPY 1
-_ACEOF
-
-
-fi
 
 
 ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile example/Makefile example/cpp/Makefile example/httpd/Makefile example/module/Makefile src/Makefile src/c/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augres/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/osx/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/augas/Makefile src/pl/Makefile src/sh/Makefile vc7/Makefile"
@@ -25788,20 +25736,6 @@ if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"am__fastdepCC\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${AUG_CPPBUILD_TRUE}" && test -z "${AUG_CPPBUILD_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"AUG_CPPBUILD\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"AUG_CPPBUILD\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${AUG_NOIPV6_TRUE}" && test -z "${AUG_NOIPV6_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"AUG_NOIPV6\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"AUG_NOIPV6\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -26502,16 +26436,12 @@ F77!$F77$ac_delim
 FFLAGS!$FFLAGS$ac_delim
 ac_ct_F77!$ac_ct_F77$ac_delim
 LIBTOOL!$LIBTOOL$ac_delim
-AUG_CPPBUILD_TRUE!$AUG_CPPBUILD_TRUE$ac_delim
-AUG_CPPBUILD_FALSE!$AUG_CPPBUILD_FALSE$ac_delim
-AUG_NOIPV6_TRUE!$AUG_NOIPV6_TRUE$ac_delim
-AUG_NOIPV6_FALSE!$AUG_NOIPV6_FALSE$ac_delim
 ALLOCA!$ALLOCA$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 17; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 13; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-@AUG_CPPBUILD_TRUE@check_PROGRAMS = augutilpp-test$(EXEEXT)
+check_PROGRAMS = augutilpp-test$(EXEEXT)
 subdir = src/cpp/augutilpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -50,26 +50,23 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/augconfig.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-@AUG_CPPBUILD_TRUE@libaugutilpp_la_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-am__libaugutilpp_la_SOURCES_DIST = config.cpp conv.cpp event.cpp \
-	file.cpp log.cpp path.cpp timer.cpp var.cpp
-@AUG_CPPBUILD_TRUE@am_libaugutilpp_la_OBJECTS = config.lo conv.lo \
-@AUG_CPPBUILD_TRUE@	event.lo file.lo log.lo path.lo timer.lo \
-@AUG_CPPBUILD_TRUE@	var.lo
+libaugutilpp_la_DEPENDENCIES =  \
+	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_srcdir)/src/c/augutil/libaugutil.la \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+am_libaugutilpp_la_OBJECTS = config.lo conv.lo event.lo file.lo log.lo \
+	path.lo timer.lo var.lo
 libaugutilpp_la_OBJECTS = $(am_libaugutilpp_la_OBJECTS)
-@AUG_CPPBUILD_TRUE@am_libaugutilpp_la_rpath =
-am__augutilpp_test_SOURCES_DIST = test.cpp
-@AUG_CPPBUILD_TRUE@am_augutilpp_test_OBJECTS = test.$(OBJEXT)
+am_augutilpp_test_OBJECTS = test.$(OBJEXT)
 augutilpp_test_OBJECTS = $(am_augutilpp_test_OBJECTS)
-@AUG_CPPBUILD_TRUE@augutilpp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+augutilpp_test_DEPENDENCIES =  \
+	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_srcdir)/src/c/augnet/libaugnet.la \
+	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+	$(top_srcdir)/src/c/augutil/libaugutil.la \
+	$(top_srcdir)/src/c/augmar/libaugmar.la \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -81,8 +78,7 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugutilpp_la_SOURCES) $(augutilpp_test_SOURCES)
-DIST_SOURCES = $(am__libaugutilpp_la_SOURCES_DIST) \
-	$(am__augutilpp_test_SOURCES_DIST)
+DIST_SOURCES = $(libaugutilpp_la_SOURCES) $(augutilpp_test_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -102,10 +98,6 @@ AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
 AS = @AS@
-AUG_CPPBUILD_FALSE = @AUG_CPPBUILD_FALSE@
-AUG_CPPBUILD_TRUE = @AUG_CPPBUILD_TRUE@
-AUG_NOIPV6_FALSE = @AUG_NOIPV6_FALSE@
-AUG_NOIPV6_TRUE = @AUG_NOIPV6_TRUE@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -225,35 +217,35 @@ modinclude_HEADERS = \
 	timer.hpp \
 	var.hpp
 
-@AUG_CPPBUILD_TRUE@noinst_LTLIBRARIES = libaugutilpp.la
-@AUG_CPPBUILD_TRUE@libaugutilpp_la_SOURCES = \
-@AUG_CPPBUILD_TRUE@	config.cpp \
-@AUG_CPPBUILD_TRUE@	conv.cpp \
-@AUG_CPPBUILD_TRUE@	event.cpp \
-@AUG_CPPBUILD_TRUE@	file.cpp \
-@AUG_CPPBUILD_TRUE@	log.cpp \
-@AUG_CPPBUILD_TRUE@	path.cpp \
-@AUG_CPPBUILD_TRUE@	timer.cpp \
-@AUG_CPPBUILD_TRUE@	var.cpp
+noinst_LTLIBRARIES = libaugutilpp.la
+libaugutilpp_la_SOURCES = \
+	config.cpp \
+	conv.cpp \
+	event.cpp \
+	file.cpp \
+	log.cpp \
+	path.cpp \
+	timer.cpp \
+	var.cpp
 
-@AUG_CPPBUILD_TRUE@libaugutilpp_la_LDFLAGS = \
-@AUG_CPPBUILD_TRUE@	-no-undefined
+libaugutilpp_la_LDFLAGS = \
+	-no-undefined
 
-@AUG_CPPBUILD_TRUE@libaugutilpp_la_LIBADD = \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+libaugutilpp_la_LIBADD = \
+	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_srcdir)/src/c/augutil/libaugutil.la \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@AUG_CPPBUILD_TRUE@TESTS = augutilpp-test
-@AUG_CPPBUILD_TRUE@augutilpp_test_SOURCES = test.cpp
-@AUG_CPPBUILD_TRUE@augutilpp_test_LDADD = \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+TESTS = augutilpp-test
+augutilpp_test_SOURCES = test.cpp
+augutilpp_test_LDADD = \
+	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_srcdir)/src/c/augnet/libaugnet.la \
+	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+	$(top_srcdir)/src/c/augutil/libaugutil.la \
+	$(top_srcdir)/src/c/augmar/libaugmar.la \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 all: all-am
 
@@ -298,7 +290,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libaugutilpp.la: $(libaugutilpp_la_OBJECTS) $(libaugutilpp_la_DEPENDENCIES) 
-	$(CXXLINK) $(am_libaugutilpp_la_rpath) $(libaugutilpp_la_LDFLAGS) $(libaugutilpp_la_OBJECTS) $(libaugutilpp_la_LIBADD) $(LIBS)
+	$(CXXLINK)  $(libaugutilpp_la_LDFLAGS) $(libaugutilpp_la_OBJECTS) $(libaugutilpp_la_LIBADD) $(LIBS)
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; for p in $$list; do \

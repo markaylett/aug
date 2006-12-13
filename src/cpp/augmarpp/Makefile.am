@@ -13,8 +13,6 @@ modinclude_HEADERS = \
 	swapfile.hpp \
 	types.hpp
 
-if AUG_CPPBUILD
-
 noinst_LTLIBRARIES = libaugmarpp.la
 
 libaugmarpp_la_SOURCES = \
@@ -44,5 +42,3 @@ augmarpp_test_SOURCES = test.cpp
 augmarpp_test_LDADD = \
 	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
 	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
-
-endif

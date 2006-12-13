@@ -219,7 +219,9 @@ namespace augas {
             setnonblock(sfd, true);
             setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
 
-            augas_id id(aug_nextid());
+            augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
+                             // uninitialized in this function.
+            id = aug_nextid();
             connptr conn(new augas::conn(sess, sfd, id, state_->timers_));
             state_->manager_.insert(conn);
             try {

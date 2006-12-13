@@ -6,8 +6,6 @@ modinclude_HEADERS = \
 	conn.hpp \
 	inet.hpp
 
-if AUG_CPPBUILD
-
 noinst_LTLIBRARIES = libaugnetpp.la
 
 libaugnetpp_la_SOURCES = \
@@ -37,5 +35,3 @@ augnetpp_test_LDADD = \
 	$(top_srcdir)/src/c/augutil/libaugutil.la \
 	$(top_srcdir)/src/c/augmar/libaugmar.la \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
-
-endif

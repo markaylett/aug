@@ -80,7 +80,6 @@ my (
     $strict,
     $debug,
     $mt,
-    $ipv6,
     $libtype
     );
 
@@ -122,7 +121,6 @@ if ($CYGWIN_MINGW == $toolset) {
 $strict = valueask ("strict build", 'n');
 $debug = valueask ("debug build", 'n');
 $mt = valueask ("multi-threaded", 'y');
-$ipv6 = valueask ("ipv6 support", 'n');
 $libtype = listask ("library type", $BOTH, \%LIBTYPE);
 
 my (
@@ -161,8 +159,6 @@ $options .= " \\\n\t--enable-maintainer-mode"
     if is $maintainer;
 $options .= " \\\n\t--disable-threads"
     unless is $mt;
-$options .= " \\\n\t--enable-ipv6"
-    if is $ipv6;
 
 if ($SHARED_ONLY == $libtype) {
     $options .= " \\\n\t--disable-static";

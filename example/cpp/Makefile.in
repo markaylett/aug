@@ -39,9 +39,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/cpp/lang.mk
-@AUG_CPPBUILD_TRUE@noinst_PROGRAMS = heartbeat$(EXEEXT) \
-@AUG_CPPBUILD_TRUE@	mcastrecv$(EXEEXT) mcastsend$(EXEEXT) \
-@AUG_CPPBUILD_TRUE@	mplexd$(EXEEXT) timerd$(EXEEXT)
+noinst_PROGRAMS = heartbeat$(EXEEXT) mcastrecv$(EXEEXT) \
+	mcastsend$(EXEEXT) mplexd$(EXEEXT) timerd$(EXEEXT)
 subdir = example/cpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -51,32 +50,26 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/augconfig.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am__heartbeat_SOURCES_DIST = heartbeat.cpp
-@AUG_CPPBUILD_TRUE@am_heartbeat_OBJECTS = heartbeat.$(OBJEXT)
+am_heartbeat_OBJECTS = heartbeat.$(OBJEXT)
 heartbeat_OBJECTS = $(am_heartbeat_OBJECTS)
-@AUG_CPPBUILD_TRUE@am__DEPENDENCIES_1 =  \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-@AUG_CPPBUILD_TRUE@heartbeat_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__mcastrecv_SOURCES_DIST = mcastrecv.cpp
-@AUG_CPPBUILD_TRUE@am_mcastrecv_OBJECTS = mcastrecv.$(OBJEXT)
+am__DEPENDENCIES_1 = $(top_srcdir)/src/c/augnet/libaugnet.la \
+	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+	$(top_srcdir)/src/c/augutil/libaugutil.la \
+	$(top_srcdir)/src/c/augmar/libaugmar.la \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+heartbeat_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_mcastrecv_OBJECTS = mcastrecv.$(OBJEXT)
 mcastrecv_OBJECTS = $(am_mcastrecv_OBJECTS)
-@AUG_CPPBUILD_TRUE@mcastrecv_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__mcastsend_SOURCES_DIST = mcastsend.cpp
-@AUG_CPPBUILD_TRUE@am_mcastsend_OBJECTS = mcastsend.$(OBJEXT)
+mcastrecv_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_mcastsend_OBJECTS = mcastsend.$(OBJEXT)
 mcastsend_OBJECTS = $(am_mcastsend_OBJECTS)
-@AUG_CPPBUILD_TRUE@mcastsend_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__mplexd_SOURCES_DIST = mplexd.cpp
-@AUG_CPPBUILD_TRUE@am_mplexd_OBJECTS = mplexd.$(OBJEXT)
+mcastsend_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_mplexd_OBJECTS = mplexd.$(OBJEXT)
 mplexd_OBJECTS = $(am_mplexd_OBJECTS)
-@AUG_CPPBUILD_TRUE@mplexd_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__timerd_SOURCES_DIST = timerd.cpp
-@AUG_CPPBUILD_TRUE@am_timerd_OBJECTS = timerd.$(OBJEXT)
+mplexd_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_timerd_OBJECTS = timerd.$(OBJEXT)
 timerd_OBJECTS = $(am_timerd_OBJECTS)
-@AUG_CPPBUILD_TRUE@timerd_DEPENDENCIES = $(am__DEPENDENCIES_1)
+timerd_DEPENDENCIES = $(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -89,9 +82,8 @@ CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
 	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(timerd_SOURCES)
-DIST_SOURCES = $(am__heartbeat_SOURCES_DIST) \
-	$(am__mcastrecv_SOURCES_DIST) $(am__mcastsend_SOURCES_DIST) \
-	$(am__mplexd_SOURCES_DIST) $(am__timerd_SOURCES_DIST)
+DIST_SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
+	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(timerd_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -102,10 +94,6 @@ AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
 AS = @AS@
-AUG_CPPBUILD_FALSE = @AUG_CPPBUILD_FALSE@
-AUG_CPPBUILD_TRUE = @AUG_CPPBUILD_TRUE@
-AUG_NOIPV6_FALSE = @AUG_NOIPV6_FALSE@
-AUG_NOIPV6_TRUE = @AUG_NOIPV6_TRUE@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -214,33 +202,33 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/c \
 	-I$(top_srcdir)/src/cpp
 
-@AUG_CPPBUILD_TRUE@AUGLIBS = \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augnet/libaugnet.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augutil/libaugutil.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+AUGLIBS = \
+	$(top_srcdir)/src/c/augnet/libaugnet.la \
+	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
+	$(top_srcdir)/src/c/augutil/libaugutil.la \
+	$(top_srcdir)/src/c/augmar/libaugmar.la \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@AUG_CPPBUILD_TRUE@heartbeat_SOURCES = \
-@AUG_CPPBUILD_TRUE@	heartbeat.cpp
+heartbeat_SOURCES = \
+	heartbeat.cpp
 
-@AUG_CPPBUILD_TRUE@heartbeat_LDADD = $(AUGLIBS)
-@AUG_CPPBUILD_TRUE@mcastrecv_SOURCES = \
-@AUG_CPPBUILD_TRUE@	mcastrecv.cpp
+heartbeat_LDADD = $(AUGLIBS)
+mcastrecv_SOURCES = \
+	mcastrecv.cpp
 
-@AUG_CPPBUILD_TRUE@mcastrecv_LDADD = $(AUGLIBS)
-@AUG_CPPBUILD_TRUE@mcastsend_SOURCES = \
-@AUG_CPPBUILD_TRUE@	mcastsend.cpp
+mcastrecv_LDADD = $(AUGLIBS)
+mcastsend_SOURCES = \
+	mcastsend.cpp
 
-@AUG_CPPBUILD_TRUE@mcastsend_LDADD = $(AUGLIBS)
-@AUG_CPPBUILD_TRUE@mplexd_SOURCES = \
-@AUG_CPPBUILD_TRUE@	mplexd.cpp
+mcastsend_LDADD = $(AUGLIBS)
+mplexd_SOURCES = \
+	mplexd.cpp
 
-@AUG_CPPBUILD_TRUE@mplexd_LDADD = $(AUGLIBS)
-@AUG_CPPBUILD_TRUE@timerd_SOURCES = \
-@AUG_CPPBUILD_TRUE@	timerd.cpp
+mplexd_LDADD = $(AUGLIBS)
+timerd_SOURCES = \
+	timerd.cpp
 
-@AUG_CPPBUILD_TRUE@timerd_LDADD = $(AUGLIBS)
+timerd_LDADD = $(AUGLIBS)
 all: all-am
 
 .SUFFIXES:

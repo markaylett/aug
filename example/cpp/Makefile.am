@@ -1,7 +1,5 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
-if AUG_CPPBUILD
-
 noinst_PROGRAMS = \
 	heartbeat \
 	mcastrecv \
@@ -35,5 +33,3 @@ mplexd_LDADD = $(AUGLIBS)
 timerd_SOURCES = \
 	timerd.cpp
 timerd_LDADD = $(AUGLIBS)
-
-endif

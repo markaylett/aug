@@ -30,7 +30,7 @@ namespace aug {
         return addr;
     }
 
-#if !defined(AUG_NOIPV6)
+#if HAVE_IPV6
     inline aug_inetaddr&
     setinaddr(aug_inetaddr& addr, const in6_addr& ipv6)
     {
@@ -38,7 +38,7 @@ namespace aug {
         memcpy(&addr.un_.ipv6_, &ipv6, sizeof(addr.un_.ipv6_));
         return addr;
     }
-#endif // !AUG_NOIPV6
+#endif // HAVE_IPV6
 
     inline short
     family(const aug_inetaddr& addr)

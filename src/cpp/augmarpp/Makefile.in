@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-@AUG_CPPBUILD_TRUE@check_PROGRAMS = augmarpp-test$(EXEEXT)
+check_PROGRAMS = augmarpp-test$(EXEEXT)
 subdir = src/cpp/augmarpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -50,22 +50,19 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/augconfig.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-@AUG_CPPBUILD_TRUE@libaugmarpp_la_DEPENDENCIES = $(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
-am__libaugmarpp_la_SOURCES_DIST = mar.cpp compat.cpp config.cpp \
-	header.cpp iterator.cpp smartmar.cpp stream.cpp streambuf.cpp \
-	swapfile.cpp types.cpp
-@AUG_CPPBUILD_TRUE@am_libaugmarpp_la_OBJECTS = mar.lo compat.lo \
-@AUG_CPPBUILD_TRUE@	config.lo header.lo iterator.lo smartmar.lo \
-@AUG_CPPBUILD_TRUE@	stream.lo streambuf.lo swapfile.lo types.lo
+libaugmarpp_la_DEPENDENCIES =  \
+	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_srcdir)/src/c/augmar/libaugmar.la \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+am_libaugmarpp_la_OBJECTS = mar.lo compat.lo config.lo header.lo \
+	iterator.lo smartmar.lo stream.lo streambuf.lo swapfile.lo \
+	types.lo
 libaugmarpp_la_OBJECTS = $(am_libaugmarpp_la_OBJECTS)
-@AUG_CPPBUILD_TRUE@am_libaugmarpp_la_rpath =
-am__augmarpp_test_SOURCES_DIST = test.cpp
-@AUG_CPPBUILD_TRUE@am_augmarpp_test_OBJECTS = test.$(OBJEXT)
+am_augmarpp_test_OBJECTS = test.$(OBJEXT)
 augmarpp_test_OBJECTS = $(am_augmarpp_test_OBJECTS)
-@AUG_CPPBUILD_TRUE@augmarpp_test_DEPENDENCIES = $(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
+augmarpp_test_DEPENDENCIES =  \
+	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
+	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -77,8 +74,7 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugmarpp_la_SOURCES) $(augmarpp_test_SOURCES)
-DIST_SOURCES = $(am__libaugmarpp_la_SOURCES_DIST) \
-	$(am__augmarpp_test_SOURCES_DIST)
+DIST_SOURCES = $(libaugmarpp_la_SOURCES) $(augmarpp_test_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -98,10 +94,6 @@ AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
 AS = @AS@
-AUG_CPPBUILD_FALSE = @AUG_CPPBUILD_FALSE@
-AUG_CPPBUILD_TRUE = @AUG_CPPBUILD_TRUE@
-AUG_NOIPV6_FALSE = @AUG_NOIPV6_FALSE@
-AUG_NOIPV6_TRUE = @AUG_NOIPV6_TRUE@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -223,32 +215,32 @@ modinclude_HEADERS = \
 	swapfile.hpp \
 	types.hpp
 
-@AUG_CPPBUILD_TRUE@noinst_LTLIBRARIES = libaugmarpp.la
-@AUG_CPPBUILD_TRUE@libaugmarpp_la_SOURCES = \
-@AUG_CPPBUILD_TRUE@	mar.cpp \
-@AUG_CPPBUILD_TRUE@	compat.cpp \
-@AUG_CPPBUILD_TRUE@	config.cpp \
-@AUG_CPPBUILD_TRUE@	header.cpp \
-@AUG_CPPBUILD_TRUE@	iterator.cpp \
-@AUG_CPPBUILD_TRUE@	smartmar.cpp \
-@AUG_CPPBUILD_TRUE@	stream.cpp \
-@AUG_CPPBUILD_TRUE@	streambuf.cpp \
-@AUG_CPPBUILD_TRUE@	swapfile.cpp \
-@AUG_CPPBUILD_TRUE@	types.cpp
+noinst_LTLIBRARIES = libaugmarpp.la
+libaugmarpp_la_SOURCES = \
+	mar.cpp \
+	compat.cpp \
+	config.cpp \
+	header.cpp \
+	iterator.cpp \
+	smartmar.cpp \
+	stream.cpp \
+	streambuf.cpp \
+	swapfile.cpp \
+	types.cpp
 
-@AUG_CPPBUILD_TRUE@libaugmarpp_la_LDFLAGS = \
-@AUG_CPPBUILD_TRUE@	-no-undefined
+libaugmarpp_la_LDFLAGS = \
+	-no-undefined
 
-@AUG_CPPBUILD_TRUE@libaugmarpp_la_LIBADD = \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augmar/libaugmar.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/c/augsys/libaugsys.la
+libaugmarpp_la_LIBADD = \
+	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_srcdir)/src/c/augmar/libaugmar.la \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
 
-@AUG_CPPBUILD_TRUE@TESTS = augmarpp-test
-@AUG_CPPBUILD_TRUE@augmarpp_test_SOURCES = test.cpp
-@AUG_CPPBUILD_TRUE@augmarpp_test_LDADD = \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
-@AUG_CPPBUILD_TRUE@	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
+TESTS = augmarpp-test
+augmarpp_test_SOURCES = test.cpp
+augmarpp_test_LDADD = \
+	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
+	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
 
 all: all-am
 
@@ -293,7 +285,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libaugmarpp.la: $(libaugmarpp_la_OBJECTS) $(libaugmarpp_la_DEPENDENCIES) 
-	$(CXXLINK) $(am_libaugmarpp_la_rpath) $(libaugmarpp_la_LDFLAGS) $(libaugmarpp_la_OBJECTS) $(libaugmarpp_la_LIBADD) $(LIBS)
+	$(CXXLINK)  $(libaugmarpp_la_LDFLAGS) $(libaugmarpp_la_OBJECTS) $(libaugmarpp_la_LIBADD) $(LIBS)
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; for p in $$list; do \

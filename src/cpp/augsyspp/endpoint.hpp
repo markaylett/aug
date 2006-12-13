@@ -46,7 +46,7 @@ namespace aug {
         return ep;
     }
 
-#if !defined(AUG_NOIPV6)
+#if HAVE_IPV6
     inline aug_endpoint&
     setsockaddr(aug_endpoint& ep, const sockaddr_in6& ipv6)
     {
@@ -54,7 +54,7 @@ namespace aug {
         memcpy(&ep.un_.ipv6_, &ipv6, sizeof(ep.un_.ipv6_));
         return ep;
     }
-#endif // !AUG_NOIPV6
+#endif // HAVE_IPV6
 
     inline short
     family(const aug_endpoint& ep)

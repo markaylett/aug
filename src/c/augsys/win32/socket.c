@@ -481,9 +481,9 @@ aug_inetntop(const struct aug_inetaddr* src, char* dst, socklen_t len)
         short family_;
         struct sockaddr sa_;
         struct sockaddr_in ipv4_;
-#if !defined(AUG_NOIPV6)
+#if HAVE_IPV6
         struct sockaddr_in6 ipv6_;
-#endif /* !AUG_NOIPV6 */
+#endif /* HAVE_IPV6 */
     } un;
     bzero(&un, sizeof(un));
 
@@ -493,13 +493,13 @@ aug_inetntop(const struct aug_inetaddr* src, char* dst, socklen_t len)
         un.ipv4_.sin_addr.s_addr = src->un_.ipv4_.s_addr;
 		srclen = sizeof(un.ipv4_);
         break;
-#if !defined(AUG_NOIPV6)
+#if HAVE_IPV6
     case AF_INET6:
         un.family_ = AF_INET6;
         memcpy(&un.ipv6_.sin6_addr, &src->un_, sizeof(src->un_.ipv6_));
 		srclen = sizeof(un.ipv6_);
         break;
-#endif /* !AUG_NOIPV6 */
+#endif /* HAVE_IPV6 */
     default:
         SETAFNOSUPPORT_();
         return NULL;
@@ -522,9 +522,9 @@ aug_inetpton(int af, const char* src, struct aug_inetaddr* dst)
         short family_;
         struct sockaddr sa_;
         struct sockaddr_in ipv4_;
-#if !defined(AUG_NOIPV6)
+#if HAVE_IPV6
         struct sockaddr_in6 ipv6_;
-#endif /* !AUG_NOIPV6 */
+#endif /* HAVE_IPV6 */
     } un;
     bzero(&un, sizeof(un));
 
@@ -533,12 +533,12 @@ aug_inetpton(int af, const char* src, struct aug_inetaddr* dst)
 		len = sizeof(un.ipv4_);
         un.family_ = AF_INET;
         break;
-#if !defined(AUG_NOIPV6)
+#if HAVE_IPV6
     case AF_INET6:
 		len = sizeof(un.ipv6_);
         un.family_ = AF_INET6;
         break;
-#endif /* !AUG_NOIPV6 */
+#endif /* HAVE_IPV6 */
     default:
         SETAFNOSUPPORT_();
         return NULL;
@@ -552,10 +552,10 @@ aug_inetpton(int af, const char* src, struct aug_inetaddr* dst)
 
     if (AF_INET == (dst->family_ = af))
         dst->un_.ipv4_.s_addr = un.ipv4_.sin_addr.s_addr;
-#if !defined(AUG_NOIPV6)
+#if HAVE_IPV6
     else
         memcpy(&dst->un_, &un.ipv6_.sin6_addr, sizeof(dst->un_.ipv6_));
-#endif /* !AUG_NOIPV6 */
+#endif /* HAVE_IPV6 */
     return dst;
 }
 
