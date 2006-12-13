@@ -157,7 +157,7 @@ static struct dlstatus *loadModule(const char *path, const struct stat *sbuf, in
 static NSSymbol *search_linked_libs(const struct mach_header *mh, const char *symbol);
 static const char *get_lib_name(const struct mach_header *mh);
 static const struct mach_header *get_mach_header_from_NSModule(NSModule * mod);
-static void dlcompat_init_func(void);
+void dlcompat_init_func(void);
 static inline void dolock(void);
 static inline void dounlock(void);
 static void dlerrorfree(void *data);
@@ -797,7 +797,7 @@ static struct dlstatus *loadModule(const char *path, const struct stat *sbuf, in
 	return dls;
 }
 
-static void dlcompat_init_func(void)
+void dlcompat_init_func(void)
 {
 	static int inited = 0;
 	if (!inited)
