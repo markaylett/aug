@@ -1,6 +1,11 @@
 /* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+
+#if !defined(NDEBUG)
+# define NDEBUG
+#endif /* !NDEBUG */
+
 #include "augsys.h"
 
 #include <stdio.h>
@@ -37,9 +42,6 @@ main(int argc, char* argv[])
         return 1;
     }
 
-#if !defined(NDEBUG)
-# define NDEBUG
-#endif /* !NDEBUG */
     {
         int i = 101;
         AUG_DEBUG0("not evaluated: %d", (i = 202));
