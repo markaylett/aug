@@ -56,11 +56,11 @@ am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) conn.$(OBJEXT) \
 	exception.$(OBJEXT) manager.$(OBJEXT) module.$(OBJEXT) \
 	options.$(OBJEXT) sess.$(OBJEXT) utility.$(OBJEXT)
 augasd_OBJECTS = $(am_augasd_OBJECTS)
-augasd_DEPENDENCIES = $(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+augasd_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -214,11 +214,11 @@ augasd_SOURCES = \
 	utility.cpp
 
 augasd_LDADD = \
-	$(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 all: all-am
 

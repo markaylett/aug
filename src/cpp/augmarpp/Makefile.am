@@ -31,14 +31,14 @@ libaugmarpp_la_LDFLAGS = \
 	-no-undefined
 
 libaugmarpp_la_LIBADD = \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augmarpp-test
 TESTS = augmarpp-test
 
 augmarpp_test_SOURCES = test.cpp
 augmarpp_test_LDADD = \
-	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
+	$(top_builddir)/src/cpp/augmarpp/libaugmarpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la

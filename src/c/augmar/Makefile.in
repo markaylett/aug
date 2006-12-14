@@ -59,13 +59,13 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libaugmar_la_DEPENDENCIES = $(top_srcdir)/src/c/augsys/libaugsys.la
+libaugmar_la_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugmar_la_OBJECTS = config.lo mar.lo types.lo body_.lo file_.lo \
 	flags_.lo format_.lo header_.lo info_.lo mfile_.lo seq_.lo
 libaugmar_la_OBJECTS = $(am_libaugmar_la_OBJECTS)
 am_augmar_test_OBJECTS = test.$(OBJEXT)
 augmar_test_OBJECTS = $(am_augmar_test_OBJECTS)
-augmar_test_DEPENDENCIES = $(top_srcdir)/src/c/augmar/libaugmar.la
+augmar_test_DEPENDENCIES = $(top_builddir)/src/c/augmar/libaugmar.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -231,12 +231,12 @@ libaugmar_la_LDFLAGS = \
 	-version-info 0:0:0
 
 libaugmar_la_LIBADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = augmar-test
 augmar_test_SOURCES = test.c
 augmar_test_LDADD = \
-	$(top_srcdir)/src/c/augmar/libaugmar.la
+	$(top_builddir)/src/c/augmar/libaugmar.la
 
 all: all-am
 

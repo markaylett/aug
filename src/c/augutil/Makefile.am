@@ -38,11 +38,11 @@ libaugutil_la_LDFLAGS = \
 	-version-info 0:0:0
 
 libaugutil_la_LIBADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augutil-test
 TESTS = augutil-test
 
 augutil_test_SOURCES = test.c
 augutil_test_LDADD = \
-	$(top_srcdir)/src/c/augutil/libaugutil.la
+	$(top_builddir)/src/c/augutil/libaugutil.la

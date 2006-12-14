@@ -51,23 +51,23 @@ CONFIG_HEADER = $(top_builddir)/src/augconfig.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libaugnetpp_la_DEPENDENCIES =  \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugnetpp_la_OBJECTS = config.lo conn.lo inet.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
 am_augnetpp_test_OBJECTS = test.$(OBJEXT)
 augnetpp_test_OBJECTS = $(am_augnetpp_test_OBJECTS)
 augnetpp_test_DEPENDENCIES =  \
-	$(top_srcdir)/src/cpp/augsrvpp/libaugsrvpp.la \
-	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsrvpp/libaugsrvpp.la \
+	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -223,22 +223,22 @@ libaugnetpp_la_LDFLAGS = \
 	-no-undefined
 
 libaugnetpp_la_LIBADD = \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = augnetpp-test
 augnetpp_test_SOURCES = test.cpp
 augnetpp_test_LDADD = \
-	$(top_srcdir)/src/cpp/augsrvpp/libaugsrvpp.la \
-	$(top_srcdir)/src/cpp/augutilpp/libaugutilpp.la \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsrvpp/libaugsrvpp.la \
+	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 all: all-am
 

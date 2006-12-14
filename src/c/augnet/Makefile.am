@@ -28,17 +28,17 @@ libaugnet_la_LDFLAGS = \
 	-version-info 0:0:0
 
 libaugnet_la_LIBADD = \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augnet-fixtest augnet-httptest
 TESTS = augnet-fixtest augnet-httptest
 
 augnet_fixtest_SOURCES = fixtest.c
 augnet_fixtest_LDADD = \
-	$(top_srcdir)/src/c/augnet/libaugnet.la
+	$(top_builddir)/src/c/augnet/libaugnet.la
 
 augnet_httptest_SOURCES = httptest.c
 augnet_httptest_LDADD = \
-	$(top_srcdir)/src/c/augnet/libaugnet.la
+	$(top_builddir)/src/c/augnet/libaugnet.la

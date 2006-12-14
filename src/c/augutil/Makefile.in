@@ -59,14 +59,16 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libaugutil_la_DEPENDENCIES = $(top_srcdir)/src/c/augsys/libaugsys.la
+libaugutil_la_DEPENDENCIES =  \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugutil_la_OBJECTS = config.lo conv.lo event.lo file.lo \
 	getopt.lo lexer.lo list.lo log.lo path.lo strbuf.lo timer.lo \
 	var.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
 am_augutil_test_OBJECTS = test.$(OBJEXT)
 augutil_test_OBJECTS = $(am_augutil_test_OBJECTS)
-augutil_test_DEPENDENCIES = $(top_srcdir)/src/c/augutil/libaugutil.la
+augutil_test_DEPENDENCIES =  \
+	$(top_builddir)/src/c/augutil/libaugutil.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -233,12 +235,12 @@ libaugutil_la_LDFLAGS = \
 	-version-info 0:0:0
 
 libaugutil_la_LIBADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = augutil-test
 augutil_test_SOURCES = test.c
 augutil_test_LDADD = \
-	$(top_srcdir)/src/c/augutil/libaugutil.la
+	$(top_builddir)/src/c/augutil/libaugutil.la
 
 all: all-am
 

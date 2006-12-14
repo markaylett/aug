@@ -58,14 +58,15 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libaugsrv_la_DEPENDENCIES = $(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+libaugsrv_la_DEPENDENCIES =  \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugsrv_la_OBJECTS = base.lo config.lo control.lo daemon.lo \
 	log.lo main.lo options.lo signal.lo types.lo
 libaugsrv_la_OBJECTS = $(am_libaugsrv_la_OBJECTS)
 am_augsrv_test_OBJECTS = test.$(OBJEXT)
 augsrv_test_OBJECTS = $(am_augsrv_test_OBJECTS)
-augsrv_test_DEPENDENCIES = $(top_srcdir)/src/c/augsrv/libaugsrv.la
+augsrv_test_DEPENDENCIES = $(top_builddir)/src/c/augsrv/libaugsrv.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -236,13 +237,13 @@ libaugsrv_la_LDFLAGS = \
 	-version-info 0:0:0
 
 libaugsrv_la_LIBADD = \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = augsrv-test
 augsrv_test_SOURCES = test.c
 augsrv_test_LDADD = \
-	$(top_srcdir)/src/c/augsrv/libaugsrv.la
+	$(top_builddir)/src/c/augsrv/libaugsrv.la
 
 all: all-recursive
 

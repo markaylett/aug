@@ -33,12 +33,12 @@ libaugsrv_la_LDFLAGS = \
 	-version-info 0:0:0
 
 libaugsrv_la_LIBADD = \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augsrv-test
 TESTS = augsrv-test
 
 augsrv_test_SOURCES = test.c
 augsrv_test_LDADD = \
-	$(top_srcdir)/src/c/augsrv/libaugsrv.la
+	$(top_builddir)/src/c/augsrv/libaugsrv.la

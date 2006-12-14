@@ -51,7 +51,8 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/augconfig.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libaugsyspp_la_DEPENDENCIES = $(top_srcdir)/src/c/augsys/libaugsys.la
+libaugsyspp_la_DEPENDENCIES =  \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugsyspp_la_OBJECTS = base.lo config.lo dlfcn.lo endpoint.lo \
 	errinfo.lo exception.lo inetaddr.lo lock.lo mcast.lo \
 	mplexer.lo mutex.lo null.lo smartfd.lo smartptr.lo socket.lo \
@@ -60,18 +61,18 @@ libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
 am_augsyspp_exceptiontest_OBJECTS = exceptiontest.$(OBJEXT)
 augsyspp_exceptiontest_OBJECTS = $(am_augsyspp_exceptiontest_OBJECTS)
 augsyspp_exceptiontest_DEPENDENCIES =  \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_augsyspp_smartptrtest_OBJECTS = smartptrtest.$(OBJEXT)
 augsyspp_smartptrtest_OBJECTS = $(am_augsyspp_smartptrtest_OBJECTS)
 augsyspp_smartptrtest_DEPENDENCIES =  \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_augsyspp_test_OBJECTS = test.$(OBJEXT)
 augsyspp_test_OBJECTS = $(am_augsyspp_test_OBJECTS)
 augsyspp_test_DEPENDENCIES =  \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -264,7 +265,7 @@ libaugsyspp_la_LDFLAGS = \
 	-no-undefined
 
 libaugsyspp_la_LIBADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = \
 	augsyspp-test \
@@ -273,18 +274,18 @@ TESTS = \
 
 augsyspp_test_SOURCES = test.cpp
 augsyspp_test_LDADD = \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsyspp_exceptiontest_SOURCES = exceptiontest.cpp
 augsyspp_exceptiontest_LDADD = \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsyspp_smartptrtest_SOURCES = smartptrtest.cpp
 augsyspp_smartptrtest_LDADD = \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 all: all-am
 

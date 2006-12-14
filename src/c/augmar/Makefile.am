@@ -36,11 +36,11 @@ libaugmar_la_LDFLAGS = \
 	-version-info 0:0:0
 
 libaugmar_la_LIBADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augmar-test
 TESTS = augmar-test
 
 augmar_test_SOURCES = test.c
 augmar_test_LDADD = \
-	$(top_srcdir)/src/c/augmar/libaugmar.la
+	$(top_builddir)/src/c/augmar/libaugmar.la

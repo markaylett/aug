@@ -51,7 +51,7 @@ libaugsyspp_la_LDFLAGS = \
 	-no-undefined
 
 libaugsyspp_la_LIBADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
 	augsyspp-test \
@@ -65,15 +65,15 @@ TESTS = \
 
 augsyspp_test_SOURCES = test.cpp
 augsyspp_test_LDADD = \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsyspp_exceptiontest_SOURCES = exceptiontest.cpp
 augsyspp_exceptiontest_LDADD = \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsyspp_smartptrtest_SOURCES = smartptrtest.cpp
 augsyspp_smartptrtest_LDADD = \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la

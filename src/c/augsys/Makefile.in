@@ -71,22 +71,23 @@ libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_augsys_basetest_OBJECTS = basetest.$(OBJEXT)
 augsys_basetest_OBJECTS = $(am_augsys_basetest_OBJECTS)
 augsys_basetest_DEPENDENCIES =  \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_augsys_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
 augsys_errinfotest_OBJECTS = $(am_augsys_errinfotest_OBJECTS)
 augsys_errinfotest_DEPENDENCIES =  \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_augsys_logtest_OBJECTS = logtest.$(OBJEXT)
 augsys_logtest_OBJECTS = $(am_augsys_logtest_OBJECTS)
-augsys_logtest_DEPENDENCIES = $(top_srcdir)/src/c/augsys/libaugsys.la
+augsys_logtest_DEPENDENCIES =  \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_augsys_mcasttest_OBJECTS = mcasttest.$(OBJEXT)
 augsys_mcasttest_OBJECTS = $(am_augsys_mcasttest_OBJECTS)
 augsys_mcasttest_DEPENDENCIES =  \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_augsys_sockettest_OBJECTS = sockettest.$(OBJEXT)
 augsys_sockettest_OBJECTS = $(am_augsys_sockettest_OBJECTS)
 augsys_sockettest_DEPENDENCIES =  \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -304,23 +305,23 @@ TESTS = \
 
 augsys_basetest_SOURCES = basetest.c
 augsys_basetest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsys_errinfotest_SOURCES = errinfotest.c
 augsys_errinfotest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsys_logtest_SOURCES = logtest.c
 augsys_logtest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsys_mcasttest_SOURCES = mcasttest.c
 augsys_mcasttest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsys_sockettest_SOURCES = sockettest.c
 augsys_sockettest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 all: all-recursive
 

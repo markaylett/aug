@@ -51,9 +51,9 @@ CONFIG_HEADER = $(top_builddir)/src/augconfig.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libaugmarpp_la_DEPENDENCIES =  \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugmarpp_la_OBJECTS = mar.lo compat.lo config.lo header.lo \
 	iterator.lo smartmar.lo stream.lo streambuf.lo swapfile.lo \
 	types.lo
@@ -61,8 +61,8 @@ libaugmarpp_la_OBJECTS = $(am_libaugmarpp_la_OBJECTS)
 am_augmarpp_test_OBJECTS = test.$(OBJEXT)
 augmarpp_test_OBJECTS = $(am_augmarpp_test_OBJECTS)
 augmarpp_test_DEPENDENCIES =  \
-	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
+	$(top_builddir)/src/cpp/augmarpp/libaugmarpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -232,15 +232,15 @@ libaugmarpp_la_LDFLAGS = \
 	-no-undefined
 
 libaugmarpp_la_LIBADD = \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = augmarpp-test
 augmarpp_test_SOURCES = test.cpp
 augmarpp_test_LDADD = \
-	$(top_srcdir)/src/cpp/augmarpp/libaugmarpp.la \
-	$(top_srcdir)/src/cpp/augsyspp/libaugsyspp.la
+	$(top_builddir)/src/cpp/augmarpp/libaugmarpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la
 
 all: all-am
 

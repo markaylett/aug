@@ -51,11 +51,11 @@ CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am_httpd_OBJECTS = message.$(OBJEXT) httpd.$(OBJEXT) state.$(OBJEXT)
 httpd_OBJECTS = $(am_httpd_OBJECTS)
-httpd_DEPENDENCIES = $(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+httpd_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -192,11 +192,11 @@ httpd_SOURCES = \
 	state.h
 
 httpd_LDADD = \
-	$(top_srcdir)/src/c/augnet/libaugnet.la \
-	$(top_srcdir)/src/c/augsrv/libaugsrv.la \
-	$(top_srcdir)/src/c/augutil/libaugutil.la \
-	$(top_srcdir)/src/c/augmar/libaugmar.la \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 all: all-am
 

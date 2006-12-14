@@ -84,20 +84,20 @@ TESTS = \
 
 augsys_basetest_SOURCES = basetest.c
 augsys_basetest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsys_errinfotest_SOURCES = errinfotest.c
 augsys_errinfotest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsys_logtest_SOURCES = logtest.c
 augsys_logtest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsys_mcasttest_SOURCES = mcasttest.c
 augsys_mcasttest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augsys_sockettest_SOURCES = sockettest.c
 augsys_sockettest_LDADD = \
-	$(top_srcdir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la
