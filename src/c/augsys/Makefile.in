@@ -42,7 +42,8 @@ DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
 check_PROGRAMS = augsys-basetest$(EXEEXT) augsys-errinfotest$(EXEEXT) \
-	augsys-mcasttest$(EXEEXT) augsys-sockettest$(EXEEXT)
+	augsys-logtest$(EXEEXT) augsys-mcasttest$(EXEEXT) \
+	augsys-sockettest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -75,6 +76,9 @@ am_augsys_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
 augsys_errinfotest_OBJECTS = $(am_augsys_errinfotest_OBJECTS)
 augsys_errinfotest_DEPENDENCIES =  \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
+am_augsys_logtest_OBJECTS = logtest.$(OBJEXT)
+augsys_logtest_OBJECTS = $(am_augsys_logtest_OBJECTS)
+augsys_logtest_DEPENDENCIES = $(top_srcdir)/src/c/augsys/libaugsys.la
 am_augsys_mcasttest_OBJECTS = mcasttest.$(OBJEXT)
 augsys_mcasttest_OBJECTS = $(am_augsys_mcasttest_OBJECTS)
 augsys_mcasttest_DEPENDENCIES =  \
@@ -94,11 +98,11 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
-	$(augsys_errinfotest_SOURCES) $(augsys_mcasttest_SOURCES) \
-	$(augsys_sockettest_SOURCES)
+	$(augsys_errinfotest_SOURCES) $(augsys_logtest_SOURCES) \
+	$(augsys_mcasttest_SOURCES) $(augsys_sockettest_SOURCES)
 DIST_SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
-	$(augsys_errinfotest_SOURCES) $(augsys_mcasttest_SOURCES) \
-	$(augsys_sockettest_SOURCES)
+	$(augsys_errinfotest_SOURCES) $(augsys_logtest_SOURCES) \
+	$(augsys_mcasttest_SOURCES) $(augsys_sockettest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -294,6 +298,7 @@ libaugsys_la_LIBADD =
 TESTS = \
 	augsys-basetest \
 	augsys-errinfotest \
+	augsys-logtest \
 	augsys-mcasttest \
 	augsys-sockettest
 
@@ -303,6 +308,10 @@ augsys_basetest_LDADD = \
 
 augsys_errinfotest_SOURCES = errinfotest.c
 augsys_errinfotest_LDADD = \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+augsys_logtest_SOURCES = logtest.c
+augsys_logtest_LDADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 augsys_mcasttest_SOURCES = mcasttest.c
@@ -388,6 +397,9 @@ augsys-basetest$(EXEEXT): $(augsys_basetest_OBJECTS) $(augsys_basetest_DEPENDENC
 augsys-errinfotest$(EXEEXT): $(augsys_errinfotest_OBJECTS) $(augsys_errinfotest_DEPENDENCIES) 
 	@rm -f augsys-errinfotest$(EXEEXT)
 	$(LINK) $(augsys_errinfotest_LDFLAGS) $(augsys_errinfotest_OBJECTS) $(augsys_errinfotest_LDADD) $(LIBS)
+augsys-logtest$(EXEEXT): $(augsys_logtest_OBJECTS) $(augsys_logtest_DEPENDENCIES) 
+	@rm -f augsys-logtest$(EXEEXT)
+	$(LINK) $(augsys_logtest_LDFLAGS) $(augsys_logtest_OBJECTS) $(augsys_logtest_LDADD) $(LIBS)
 augsys-mcasttest$(EXEEXT): $(augsys_mcasttest_OBJECTS) $(augsys_mcasttest_DEPENDENCIES) 
 	@rm -f augsys-mcasttest$(EXEEXT)
 	$(LINK) $(augsys_mcasttest_LDFLAGS) $(augsys_mcasttest_OBJECTS) $(augsys_mcasttest_LDADD) $(LIBS)
@@ -414,6 +426,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcasttest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@

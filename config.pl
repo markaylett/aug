@@ -131,7 +131,7 @@ my (
     );
 
 if (is $gcc) {
-    $flags .= (is $debug) ? '-ggdb' : '-O3';
+    $flags .= (is $debug) ? '-ggdb' : '-O3 -DNDEBUG';
     if (is $strict) {
         $flags .= ' -Wall -Werror -pedantic';
         $cflags = "$flags";
@@ -141,7 +141,7 @@ if (is $gcc) {
         $cxxflags = $flags;
     }
 } else {
-    $flags .= (is $debug) ? '-g' : '-O';
+    $flags .= (is $debug) ? '-g' : '-O -DNDEBUG';
     $cflags = $flags;
     $cxxflags = $flags;
 }

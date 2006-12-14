@@ -71,12 +71,14 @@ libaugsys_la_LIBADD =
 check_PROGRAMS = \
 	augsys-basetest \
 	augsys-errinfotest \
+	augsys-logtest \
 	augsys-mcasttest \
 	augsys-sockettest
 
 TESTS = \
 	augsys-basetest \
 	augsys-errinfotest \
+	augsys-logtest \
 	augsys-mcasttest \
 	augsys-sockettest
 
@@ -86,6 +88,10 @@ augsys_basetest_LDADD = \
 
 augsys_errinfotest_SOURCES = errinfotest.c
 augsys_errinfotest_LDADD = \
+	$(top_srcdir)/src/c/augsys/libaugsys.la
+
+augsys_logtest_SOURCES = logtest.c
+augsys_logtest_LDADD = \
 	$(top_srcdir)/src/c/augsys/libaugsys.la
 
 augsys_mcasttest_SOURCES = mcasttest.c
