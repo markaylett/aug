@@ -21684,19 +21684,18 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-    # include <sys/types.h>
-    #if !defined(_WIN32)
-    # include <sys/socket.h>
-    # include <unistd.h>
-    #else /* _WIN32 */
-    # include <winsock2.h>
-    #endif /* _WIN32 */
-    socklen_t x;
+#include <sys/types.h>
+#if !defined(_WIN32)
+# include <sys/socket.h>
+# include <unistd.h>
+#else /* _WIN32 */
+# include <winsock2.h>
+#endif /* _WIN32 */
 
 int
 main ()
 {
-
+socklen_t x;
   ;
   return 0;
 }
@@ -21735,10 +21734,8 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-
-    { echo "$as_me:$LINENO: result: yes" >&5
+  { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
-
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
@@ -21751,13 +21748,13 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-        # include <sys/types.h>
-        #if !defined(_WIN32)
-        # include <sys/socket.h>
-        #else /* _WIN32 */
-        # include <winsock2.h>
-        #endif /* _WIN32 */
-        int accept(int, struct sockaddr*, size_t*);
+#include <sys/types.h>
+#if !defined(_WIN32)
+# include <sys/socket.h>
+#else /* _WIN32 */
+# include <winsock2.h>
+#endif /* _WIN32 */
+int accept(int, struct sockaddr*, size_t*);
 
 int
 main ()
