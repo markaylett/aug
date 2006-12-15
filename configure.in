@@ -78,7 +78,8 @@ AC_TRY_COMPILE([
 #else /* _WIN32 */
 # include <winsock2.h>
 #endif /* _WIN32 */
-], [socklen_t x;], [AC_MSG_RESULT(yes)], [
+socklen_t x;
+], [], [AC_MSG_RESULT(yes)], [
     AC_TRY_COMPILE([
 #include <sys/types.h>
 #if !defined(_WIN32)
@@ -111,7 +112,6 @@ AC_TRY_COMPILE([
     int x = IPV6_ADD_MEMBERSHIP;
 ], [], [
 	AC_MSG_RESULT(yes)
-        AC_DEFINE(socklen_t, int, [socklen_t size])
 	AC_DEFINE(HAVE_IPV6, 1, [Define to 1 if you have ipv6 support.])
 ], [
 	AC_MSG_RESULT(no)

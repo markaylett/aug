@@ -21691,11 +21691,12 @@ cat >>conftest.$ac_ext <<_ACEOF
 #else /* _WIN32 */
 # include <winsock2.h>
 #endif /* _WIN32 */
+socklen_t x;
 
 int
 main ()
 {
-socklen_t x;
+
   ;
   return 0;
 }
@@ -21894,11 +21895,6 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
 
 	{ echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
-
-cat >>confdefs.h <<\_ACEOF
-#define socklen_t int
-_ACEOF
-
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_IPV6 1
