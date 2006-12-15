@@ -204,4 +204,10 @@ namespace aug {
     };
 }
 
+inline bool
+isnull(const aug::timer& t)
+{
+    return null == static_cast<aug::idref>(t);
+}
+
 #endif // AUGUTILPP_TIMER_HPP
