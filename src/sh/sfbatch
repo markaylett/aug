@@ -1,9 +1,56 @@
 #!/bin/sh
+
 SRCDIR=$HOME/src/aug
-SERVERS="alpha-linux1 ppc-osx3"
 
-(cd $SRCDIR && svn update)
+mkdir -p log
 
-for s in $SERVERS; do
-    ssh $s "cd $SRCDIR && ./configure --prefix=$HOME && make clean distcheck"
+echo -n "building distribution..."
+
+(cd $SRCDIR \
+    && svn update \
+    && ./configure --prefix=$HOME \
+    && make clean dist) >log/dist.log 2>&1
+
+if test $? -ne 0; then
+    echo " [fatal]"
+    tail log/dist.log
+    exit 1
+fi
+echo " [ok]"
+
+# alpha-linux1
+# amd64-linux1
+# amd64-linux2
+# openpower-linux1
+# ppc-osx1
+# ppc-osx2
+# ppc-osx3
+# shell
+# sparc-solaris1
+# sparc-solaris2
+# x86-freebsd1
+# x86-linux1
+# x86-linux2
+# x86-netbsd1
+# x86-openbsd1
+# x86-solaris1
+
+for host in amd64-linux1 sparc-solaris1 ppc-osx3; do
+
+    echo -n "building on $host..."
+
+    ssh $host "chmod -R +w aug-trunk && rm -fr aug-trunk && tar xzvf $SRCDIR/aug-trunk.tar.gz && (cd aug-trunk && ./configure --prefix=$HOME && make distcheck)" >log/$host.log 2>&1
+
+    case $? in
+        0)
+            echo " [ok]"
+            ;;
+        255)
+            echo " [unavail]"
+            ;;
+        *)
+            echo " [fail]"
+            tail log/$host.log
+            ;;
+    esac
 done
