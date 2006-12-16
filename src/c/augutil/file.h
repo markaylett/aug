@@ -8,6 +8,10 @@
 
 typedef int (*aug_confcb_t)(const struct aug_var*, const char*, const char*);
 
+/**
+   aug_freevar() will be called in all cases.
+*/
+
 AUGUTIL_API int
 aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg);
 

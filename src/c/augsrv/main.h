@@ -13,7 +13,10 @@ struct aug_service;
    thread - automatic variables on the main thread's stack will not be visible
    from the service thread.  A shallow copy of the service structure will be
    performed.
+
+   aug_freevar() will be called in all cases for "service->arg_".
 */
+
 AUGSRV_API int
 aug_main(const struct aug_service* service, int argc, char* argv[]);
 

@@ -44,7 +44,7 @@ namespace augas {
     bool stopping_(false);
 
     void
-    reconf_()
+    doreconf_()
     {
         const char* value;
         if ((value = options_.get("loglevel", 0))) {
@@ -141,6 +141,13 @@ namespace augas {
         return aug_errdesc;
     }
 
+    void
+    reconf_()
+    {
+        aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
+        writeevent(aug_eventout(), e);
+    }
+
     // Thread-safe.
 
     void
@@ -178,7 +185,7 @@ namespace augas {
 
             aug_event e;
             e.type_ = type + AUG_EVENTUSER;
-            aug_setvarp(&e.arg_, ap.get());
+            aug_setvarp(&e.arg_, ap.get(), 0);
             writeevent(aug_eventout(), e);
             ap.release();
             return 0;
@@ -191,8 +198,7 @@ namespace augas {
     getenv_(const char* sname, const char* name)
     {
         try {
-            return options_.get(string(sname).append(".").append(name)
-                                .c_str(), 0);
+            return options_.get(name, 0);
         } AUG_SETERRINFOCATCH;
         return 0;
     }
@@ -376,6 +382,7 @@ namespace augas {
 
     const struct augas_host host_ = {
         error_,
+        reconf_,
         writelog_,
         vwritelog_,
         post_,
@@ -463,7 +470,7 @@ namespace augas {
                 AUG_DEBUG2("reading: %s", conffile_);
                 options_.read(conffile_);
             }
-            reconf_();
+            doreconf_();
             state_->manager_.reconf();
             break;
         case AUG_EVENTSTATUS:
@@ -485,6 +492,7 @@ namespace augas {
                     aug_warn("event not delivered to failed session");
             }
         }
+        aug_freevar(&event.arg_);
         return true;
     }
 
@@ -558,7 +566,7 @@ namespace augas {
             realpath(rundir_, rundir ? rundir : getcwd().c_str(),
                      sizeof(rundir_));
 
-            reconf_();
+            doreconf_();
         }
 
         void

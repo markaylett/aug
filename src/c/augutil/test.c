@@ -35,6 +35,8 @@ main(int argc, char* argv[])
         goto fail;
     }
 
+    aug_freevar(&out.arg_);
+
     if (-1 == aug_close(fds[0]) || -1 == aug_close(fds[1])) {
         aug_perrinfo(NULL, "aug_close() failed");
         return 1;

@@ -215,6 +215,16 @@ createimport_(const char* sname)
 }
 
 static PyObject*
+pyreconf_(PyObject* self, PyObject* args)
+{
+    if (!PyArg_ParseTuple(args, ":reconf"))
+        return NULL;
+
+    host_->reconf_();
+    Py_RETURN_NONE;
+}
+
+static PyObject*
 pywritelog_(PyObject* self, PyObject* args)
 {
     int level;
@@ -451,6 +461,7 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
 }
 
 /**
+   void reconf(void);
    void writelog (int level, string msg);
    void post (string sname, int type, object user);
    string getenv (string sname, string name);
@@ -467,6 +478,10 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
 */
 
 static PyMethodDef pymethods_[] = {
+    {
+        "reconf", pyreconf_, METH_VARARGS,
+        "TODO"
+    },
     {
         "writelog", pywritelog_, METH_VARARGS,
         "TODO"

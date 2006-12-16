@@ -101,6 +101,7 @@ namespace test {
                 remain_ = 0;
                 break;
             }
+            aug_freevar(&event.arg_);
         }
 
         void

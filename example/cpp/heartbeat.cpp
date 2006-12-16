@@ -392,7 +392,7 @@ namespace {
         void
         do_callback(idref ref, unsigned& ms, aug_timers& timers)
         {
-            if (ref == hbwait_) {
+            if (ref == hbwait_.id()) {
 
                 aug_info("hbint timeout: state='%s'", tostring(state_));
 
@@ -406,7 +406,7 @@ namespace {
                     sendto(ref_, node_, SLAVEHB, ep_);
                 }
 
-            } else if (ref == mwait_) {
+            } else if (ref == mwait_.id()) {
 
                 aug_info("wait timeout: state='%s'", tostring(state_));
 

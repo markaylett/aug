@@ -183,7 +183,7 @@ listener_(int fd, const struct aug_var* arg, struct aug_conns* conns)
         return 1;
     }
 
-    aug_setvarp(&var, createconn_(mplexer_, conn));
+    aug_setvarp(&var, createconn_(mplexer_, conn), NULL);
     if (aug_isnull(&var)) {
         aug_perrinfo(NULL, "failed to create connection");
         aug_close(conn);
@@ -327,6 +327,7 @@ readevent_(int fd, const struct aug_var* arg, struct aug_conns* conns)
         quit_ = 1;
         break;
     }
+    aug_freevar(&event.arg_);
     return 1;
 }
 
@@ -349,7 +350,7 @@ init_(const struct aug_var* arg)
         goto fail1;
 
     if (-1 == aug_insertconn(&conns_, fd_, listener_,
-                             aug_setvarp(&ptr, &mplexer_)))
+                             aug_setvarp(&ptr, &mplexer_, NULL)))
         goto fail2;
 
     if (-1 == aug_insertconn(&conns_, aug_eventin(), readevent_, &ptr)

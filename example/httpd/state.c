@@ -188,14 +188,15 @@ aug_createstate(aug_request_t request, const struct aug_var* arg)
 
     if (!state) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_freevar(arg);
         return NULL;
     }
 
     state->request_ = request;
     aug_setvar(&state->arg_, arg);
-    if (!(state->in_.parser_ = aug_createhttpparser(AUG_MAXLINE, &handlers_,
-                                                    aug_setvarp(&local,
-                                                                state))))
+    if (!(state->in_.parser_
+          = aug_createhttpparser(AUG_MAXLINE, &handlers_,
+                                 aug_setvarp(&local, state, NULL))))
         goto fail;
 
     state->in_.initial_ = NULL;
@@ -206,6 +207,7 @@ aug_createstate(aug_request_t request, const struct aug_var* arg)
 
  fail:
     free(state);
+    aug_freevar(arg);
     return NULL;
 }
 
@@ -238,6 +240,7 @@ aug_freestate(aug_state_t state)
     if (state->out_.header_)
         aug_freestrbuf(state->out_.header_);
 
+    aug_freevar(&state->arg_);
     free(state);
     return 0;
 }

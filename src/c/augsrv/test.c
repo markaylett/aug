@@ -65,6 +65,7 @@ run_(const struct aug_var* arg)
         return -1;
     }
 
+    aug_freevar(&out.arg_);
     return 0;
 }
 

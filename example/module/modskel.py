@@ -1,5 +1,6 @@
 import augas
 
+# void reconf (void);
 # void writelog (int level, string msg);
 # void post (string sname, int type, object user);
 # string getenv (string sname, string name);

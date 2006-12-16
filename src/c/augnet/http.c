@@ -209,11 +209,13 @@ aug_createhttpparser(unsigned size, const struct aug_httphandlers* handlers,
 
     if (!parser) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_freevar(arg);
         return NULL;
     }
 
     if (!(lexer = aug_createlexer(size, NULL))) {
         free(parser);
+        aug_freevar(arg);
         return NULL;
     }
 
@@ -229,6 +231,7 @@ AUGNET_API int
 aug_freehttpparser(aug_httpparser_t parser)
 {
     int ret = aug_freelexer(parser->lexer_);
+    aug_freevar(&parser->arg_);
     free(parser);
     return ret;
 }

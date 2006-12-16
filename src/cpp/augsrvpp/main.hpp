@@ -149,7 +149,7 @@ namespace aug {
             detail::term,
             { AUG_VTNULL }
         };
-        aug_setvarp(&s.arg_, &service);
+        aug_setvarp(&s.arg_, &service, 0);
         return aug_main(&s, argc, argv);
     }
 }

@@ -15,54 +15,55 @@ namespace aug {
     namespace detail {
 
         template <typename T>
-        struct var_traits {
-            static aug_var&
-            set(aug_var& v, T l)
-            {
-                return *aug_setvarl(&v, static_cast<long>(l));
-            }
-            static T
-            get(const aug_var& v)
-            {
-                return static_cast<T>(aug_getvarl(&v));
-            }
-        };
+        struct var_traits;
 
-        template <typename T>
-        struct var_traits<T*> {
-            static aug_var&
-            set(aug_var& v, T* p)
-            {
-                return *aug_setvarp(&v, p);
-            }
-            static T*
+        template <>
+        struct var_traits<long> {
+            static long
             get(const aug_var& v)
             {
-                return static_cast<T*>(aug_getvarp(&v));
+                return aug_getvarl(&v);
             }
         };
 
         template <>
-        struct var_traits<aug_var> {
-            static aug_var&
-            set(aug_var& v, const aug_var& w)
+        struct var_traits<void*> {
+            static void*
+            get(const aug_var& v)
             {
-                return *aug_setvar(&v, &w);
+                return aug_getvarp(&v);
             }
         };
     }
 
-    inline aug_var&
-    clear(aug_var& v)
+    inline const aug_var&
+    freevar(const aug_var& v)
     {
-        return *aug_clearvar(&v);
+        return *aug_freevar(&v);
     }
 
-    template <typename T>
-    aug_var&
-    setvar(aug_var& v, T x)
+    inline aug_var&
+    clearvar(aug_var& v, void (*fn)(void) = 0)
     {
-        return detail::var_traits<T>::set(v, x);
+        return *aug_clearvar(&v, fn);
+    }
+
+    inline aug_var&
+    setvar(aug_var& v, const aug_var& w)
+    {
+        return *aug_setvar(&v, &w);
+    }
+
+    inline aug_var&
+    setvar(aug_var& v, long l, void (*fn)(long) = 0)
+    {
+        return *aug_setvarl(&v, l, fn);
+    }
+
+    inline aug_var&
+    setvar(aug_var& v, void* p, void (*fn)(void*) = 0)
+    {
+        return *aug_setvarp(&v, p, fn);
     }
 
     template <typename T>
@@ -90,30 +91,28 @@ namespace aug {
         operator =(const var&);
 
     public:
-        var(const null_&) AUG_NOTHROW
+        explicit
+        var(const null_&, void (*fn)(void) = 0) AUG_NOTHROW
         {
-            clear(var_);
+            clearvar(var_, fn);
         }
 
-        template <typename T>
         explicit
-        var(T x)
+        var(long l, void (*fn)(long) = 0) AUG_NOTHROW
         {
-            setvar<T>(var_, x);
+            setvar(var_, l, fn);
+        }
+
+        explicit
+        var(void* p, void (*fn)(void*) = 0) AUG_NOTHROW
+        {
+            setvar(var_, p, fn);
         }
 
         var&
         operator =(const null_&) AUG_NOTHROW
         {
-            clear(var_);
-            return *this;
-        }
-
-        template <typename T>
-        var&
-        operator =(T x)
-        {
-            setvar<T>(var_, x);
+            clearvar(var_);
             return *this;
         }
 
@@ -129,15 +128,15 @@ namespace aug {
     };
 
     inline bool
-    operator ==(const var& lhs, const var& rhs)
+    operator ==(const aug_var& lhs, const aug_var& rhs)
     {
-        return 0 != aug_equalvar(cptr(lhs), cptr(rhs)) ? true : false;
+        return 0 != aug_equalvar(&lhs, &rhs) ? true : false;
     }
 
     inline bool
-    operator !=(const var& lhs, const var& rhs)
+    operator !=(const aug_var& lhs, const aug_var& rhs)
     {
-        return 0 == aug_equalvar(cptr(lhs), cptr(rhs)) ? true : false;
+        return 0 == aug_equalvar(&lhs, &rhs) ? true : false;
     }
 }
 
@@ -145,12 +144,6 @@ inline bool
 isnull(const aug_var& v)
 {
     return 0 != aug_isnull(&v) ? true : false;
-}
-
-inline bool
-isnull(const aug::var& v)
-{
-    return 0 != aug_isnull(cptr(v)) ? true : false;
 }
 
 #endif // AUGUTILPP_VAR_HPP

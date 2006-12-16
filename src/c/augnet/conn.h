@@ -22,6 +22,11 @@ typedef int (*aug_conncb_t)(int, const struct aug_var*, struct aug_conns*);
 AUGNET_API int
 aug_freeconns(struct aug_conns* conns);
 
+/**
+   aug_freevar() will be called if aug_insertconn() fails or else when the
+   connection is removed.
+*/
+
 AUGNET_API int
 aug_insertconn(struct aug_conns* conns, int fd, aug_conncb_t cb,
                const struct aug_var* arg);

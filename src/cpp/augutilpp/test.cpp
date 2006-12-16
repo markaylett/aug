@@ -10,6 +10,33 @@
 using namespace aug;
 using namespace std;
 
+namespace {
+
+    bool freed_ = false;
+
+    void
+    freetest()
+    {
+        freed_ = true;
+    }
+
+    long freedl_(0);
+
+    void
+    freetest(long l)
+    {
+        freedl_ = l;
+    }
+
+    void* freedp_(0);
+
+    void
+    freetest(void* p)
+    {
+        freedp_ = p;
+    }
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -21,13 +48,13 @@ main(int argc, char* argv[])
             || 0 != getvar<void*>(v))
             throw logic_error("null constructor failed");
 
-        v = 101;
+        setvar(v, 101);
 
         if (AUG_VTLONG != type(v) || 101 != getvar<long>(v)
             || 0 != getvar<void*>(v))
             throw logic_error("long assignment failed");
 
-        v = &argc;
+        setvar(v, &argc);
 
         if (AUG_VTPTR != type(v) || 0 != getvar<long>(v)
             || &argc != getvar<void*>(v))
@@ -42,14 +69,27 @@ main(int argc, char* argv[])
         if (v != null || null != v)
             throw logic_error("equality test failed");
 
-        v = 100;
+        setvar(v, 100);
+
         var w(100);
         if (v != w)
             throw logic_error("equality test failed");
 
-        w = 200;
+        setvar(w, 200);
         if (v == w)
             throw logic_error("equality test failed");
+
+        freevar(var(null, freetest));
+        if (!freed_)
+            throw logic_error("free null test failed");
+
+        freevar(var(101, freetest));
+        if (101 != freedl_)
+            throw logic_error("free long test failed");
+
+        freevar(var(&argc, freetest));
+        if (&argc != freedp_)
+            throw logic_error("free ptr test failed");
 
     } catch (const exception& e) {
         cerr << e.what() << endl;

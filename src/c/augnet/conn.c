@@ -27,6 +27,10 @@ AUG_ALLOCATOR(allocate_, &free_, aug_conn_, 64)
 AUGNET_API int
 aug_freeconns(struct aug_conns* conns)
 {
+    struct aug_conn_* it;
+    AUG_FOREACH(it, conns)
+        aug_freevar(&it->arg_);
+
     if (!AUG_EMPTY(conns)) {
 
         aug_lock();
@@ -45,6 +49,7 @@ aug_insertconn(struct aug_conns* conns, int fd, aug_conncb_t cb,
     aug_lock();
     if (!(conn = allocate_())) {
         aug_unlock();
+        aug_freevar(arg);
         return -1;
     }
     aug_unlock();
@@ -54,6 +59,7 @@ aug_insertconn(struct aug_conns* conns, int fd, aug_conncb_t cb,
     aug_setvar(&conn->arg_, arg);
 
     AUG_INSERT_TAIL(conns, conn);
+
     return 0;
 }
 
@@ -74,6 +80,7 @@ aug_removeconn(struct aug_conns* conns, int fd)
 
     AUG_REMOVE(conns, it, aug_conn_);
 
+    aug_freevar(&it->arg_);
     aug_lock();
     AUG_INSERT_TAIL(&free_, it);
     aug_unlock();
@@ -95,6 +102,7 @@ aug_processconns(struct aug_conns* conns)
 
             AUG_REMOVE_PREVPTR(it, prev, conns);
 
+            aug_freevar(&it->arg_);
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
             aug_unlock();

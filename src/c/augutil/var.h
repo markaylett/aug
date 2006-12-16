@@ -17,22 +17,30 @@ struct aug_var {
     union {
         long long_;
         void* ptr_;
-    } un_;
+    } u_;
+    void (*free_)();
 };
 
-#define AUG_VARNULL { AUG_VTNULL, { 0 } }
+#define AUG_VARNULL { AUG_VTNULL, { 0 }, NULL }
+
+/**
+   "v" may be null.
+*/
+
+AUGUTIL_API const struct aug_var*
+aug_freevar(const struct aug_var* v);
 
 AUGUTIL_API struct aug_var*
-aug_clearvar(struct aug_var* v);
-
-AUGUTIL_API struct aug_var*
-aug_setvarl(struct aug_var* v, long l);
-
-AUGUTIL_API struct aug_var*
-aug_setvarp(struct aug_var* v, void* p);
+aug_clearvar(struct aug_var* v, void (*fn)(void));
 
 AUGUTIL_API struct aug_var*
 aug_setvar(struct aug_var* v, const struct aug_var* w);
+
+AUGUTIL_API struct aug_var*
+aug_setvarl(struct aug_var* v, long l, void (*fn)(long));
+
+AUGUTIL_API struct aug_var*
+aug_setvarp(struct aug_var* v, void* p, void (*fn)(void*));
 
 AUGUTIL_API long
 aug_getvarl(const struct aug_var* v);

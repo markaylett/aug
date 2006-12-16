@@ -81,6 +81,7 @@ struct augas_host {
     */
 
     const char* (*error_)(void);
+    void (*reconf_)(void);
     void (*writelog_)(int level, const char* format, ...);
     void (*vwritelog_)(int level, const char* format, va_list args);
     int (*post_)(const char* sname, int type, void* user);

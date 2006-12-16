@@ -191,15 +191,10 @@ namespace aug {
             return aug::expired(timers_, ref_);
         }
 
-        operator idref() const
+        idref
+        id() const
         {
             return ref_;
-        }
-
-        int
-        get() const
-        {
-            return ref_.get();
         }
     };
 }
@@ -207,7 +202,7 @@ namespace aug {
 inline bool
 isnull(const aug::timer& t)
 {
-    return null == static_cast<aug::idref>(t);
+    return null == t.id();
 }
 
 #endif // AUGUTILPP_TIMER_HPP

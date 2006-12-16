@@ -62,6 +62,10 @@ insert_(struct aug_timers* timers, struct aug_timer_* timer)
 AUGUTIL_API int
 aug_freetimers(struct aug_timers* timers)
 {
+    struct aug_timer_* it;
+    AUG_FOREACH(it, timers)
+        aug_freevar(&it->arg_);
+
     if (!AUG_EMPTY(timers)) {
 
         aug_lock();
@@ -83,12 +87,15 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
     else
         aug_canceltimer(timers, id);
 
-    if (-1 == expiry_(&tv, ms))
+    if (-1 == expiry_(&tv, ms)) {
+        aug_freevar(arg);
         return -1;
+    }
 
     aug_lock();
     if (!(timer = allocate_())) {
         aug_unlock();
+        aug_freevar(arg);
         return -1;
     }
     aug_unlock();
@@ -117,8 +124,15 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
             AUG_REMOVE_PREVPTR(it, prev, timers);
             if (ms) /* May be zero. */
                 it->ms_ = ms;
-            if (-1 == expiry_(&it->tv_, it->ms_))
+
+            if (-1 == expiry_(&it->tv_, it->ms_)) {
+
+                aug_freevar(&it->arg_);
+                aug_lock();
+                AUG_INSERT_TAIL(&free_, it);
+                aug_unlock();
                 return -1;
+            }
 
             insert_(timers, it);
             return 0;
@@ -141,6 +155,7 @@ aug_canceltimer(struct aug_timers* timers, int id)
 
             AUG_REMOVE_PREVPTR(it, prev, timers);
 
+            aug_freevar(&it->arg_);
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
             aug_unlock();
@@ -201,6 +216,9 @@ aug_processtimers(struct aug_timers* timers, int force, struct timeval* next)
 
             } else {
 
+                /* A zero ms value cancels the timer. */
+
+                aug_freevar(&it->arg_);
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
                 aug_unlock();

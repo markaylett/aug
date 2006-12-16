@@ -15,10 +15,10 @@ using namespace std;
 void
 conn::do_callback(idref ref, unsigned& ms, aug_timers& timers)
 {
-    if (rdtimer_ == ref) {
+    if (rdtimer_.id() == ref) {
         aug_debug2("read timer expiry");
         sess_->rdexpire(conn_, ms);
-    } else if (wrtimer_ == ref) {
+    } else if (wrtimer_.id() == ref) {
         aug_debug2("write timer expiry");
         sess_->wrexpire(conn_, ms);
     } else
