@@ -147,30 +147,47 @@ namespace aug {
         }
     }
 
-    inline bool
-    verify(bool result)
-    {
-        if (!result)
-            fail();
-        return result;
+    namespace detail {
+
+        template <typename T>
+        struct result_traits {
+            static T
+            verify(T result)
+            {
+                if (-1 == result)
+                    fail();
+                return result;
+            }
+        };
+
+        template <typename T>
+        struct result_traits<T*> {
+            static T*
+            verify(T* result)
+            {
+                if (!result)
+                    fail();
+                return result;
+            }
+        };
+
+        template <>
+        struct result_traits<bool> {
+            static bool
+            verify(bool result)
+            {
+                if (!result)
+                    fail();
+                return result;
+            }
+        };
     }
 
     template <typename T>
     T
     verify(T result)
     {
-        if (-1 == result)
-            fail();
-        return result;
-    }
-
-    template <typename T>
-    T*
-    verify(T* result)
-    {
-        if (!result)
-            fail();
-        return result;
+        return detail::result_traits<T>::verify(result);
     }
 }
 
