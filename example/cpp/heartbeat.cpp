@@ -18,16 +18,134 @@ namespace {
     const unsigned MAX_NAME(32);
 
     /*
-    LEAD 0x001
-    CAND 0x002
-    MEMB 0x004
+      Heartbeat Protocol
 
-    ELCT 0x010
-    JOIN 0x020
-    LEAV 0x040
-    STDN 0x080
-    STAT 0x100
-    LIST 0x200
+      Member MB 0x001
+      Candidate CD 0x002
+      Leader LD 0x004
+      Elect EL 0x010
+      Join JN 0x020
+      Leave LV 0x040
+      Stand-down SD 0x080
+      Status ST 0x100
+      List LS 0x200
+
+      NONE
+      BELD: become LD
+      BECD: become CD
+      BEMB: become MB
+      BRST: broadcast ST
+      REMS: reset RESPONSE_MS
+      RETO: reset TO
+      SEEL: send EL
+      SESD: send SD
+      SEST: send ST
+      WAIT: rand() wait
+      CLIF: clear if last
+      POIF: pop if last
+
+      LD CD MB
+
+      LDTO
+      NONE (already LD)
+      BELD
+      BECD, REMS
+
+      HBTO
+      BRST
+      BRST
+      BRST
+
+      LD & EL
+      NONE (already LD)
+      NONE
+      BELD
+
+      LD & (ST | JN)
+      BEMB, RETO
+      BEMB, RETO
+      RETO
+
+      LD & LV
+      SEST (not req), CLIF
+      SEST (not req), CLIF
+      WAIT (election), CLIF
+
+      LD & SD
+      RETO, BEMB
+      RETO, BEMB
+      RETO
+
+      LD & LS
+      BEMB, SEST, RETO
+      BEMB, SEST, RETO
+      SEST, RETO
+
+      CD & (ST | JN)
+      SESD
+      BEMB
+      RETO
+
+      CD & LV
+      POIF
+      POIF
+      POIF
+
+      CD & SD
+      BEMB
+      BEMB
+      RETO
+
+      CD & LS
+      SESD, SEST
+      BEMB, SEST
+      RETO, SEST
+
+      MB & (ST | JN)
+      NONE
+      NONE
+      NONE
+
+      MB & LV
+      CLIF
+      CLIF
+      CLIF
+
+      MB & SD
+      BEMB
+      BEMB
+      NONE
+
+      MB & LS
+      SEST
+      SEST
+      SEST
+
+      HBTO: heartbeat MS
+      LDTO: HBTO + latency tolerance + rand()
+
+      1.On stop, if LD and last is known then SEEL
+      2.On start, broadcast (JN & LS)
+      3.On stop, broadcast LV
+      4.On HBTO, broadcast ST
+      5.On receive, drop packets from self
+      6.On state change, broadcast ST
+      7.If not LV, update last known
+      8.On receive, reset HBTO
+      9.On conflict, send SD to node with least authority
+    */
+
+    /*
+      LEAD 0x001
+      CAND 0x002
+      MEMB 0x004
+
+      ELCT 0x010
+      JOIN 0x020
+      LEAV 0x040
+      STDN 0x080
+      STAT 0x100
+      LIST 0x200
     */
 
     void
