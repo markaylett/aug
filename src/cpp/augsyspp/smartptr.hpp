@@ -20,8 +20,16 @@ namespace aug {
 # pragma warning(disable:4101)
 #endif // _MSC_VER
 
+    namespace detail {
+        struct cast_tag { };
+    }
+
     template <typename T, typename U = null_>
     class smartptr {
+
+        template <typename V, typename W>
+        friend class smartptr;
+
         typedef U scoped_lock;
         T* ptr_;
         unsigned* refs_;
@@ -72,8 +80,23 @@ namespace aug {
         {
         }
         smartptr(const smartptr& rhs) AUG_NOTHROW
-        : ptr_(rhs.ptr_),
+        :   ptr_(rhs.ptr_),
             refs_(rhs.refs_)
+        {
+            retain();
+        }
+        template <typename V, typename W>
+        smartptr(const smartptr<V, W>& rhs) AUG_NOTHROW
+        :   ptr_(rhs.ptr_),
+            refs_(rhs.refs_)
+        {
+            retain();
+        }
+        template <typename V, typename W>
+        smartptr(const smartptr<V, W>& rhs,
+                 const detail::cast_tag&) AUG_NOTHROW
+        :   ptr_(dynamic_cast<T*>(rhs.ptr_)),
+            refs_(ptr_ ? rhs.refs_ : 0)
         {
             retain();
         }
@@ -85,6 +108,14 @@ namespace aug {
         }
         smartptr&
         operator =(const smartptr& rhs) AUG_NOTHROW
+        {
+            smartptr ptr(rhs);
+            swap(ptr);
+            return *this;
+        }
+        template <typename V, typename W>
+        smartptr&
+        operator =(const smartptr<V, W>& rhs) AUG_NOTHROW
         {
             smartptr ptr(rhs);
             swap(ptr);
@@ -122,6 +153,20 @@ namespace aug {
             return ptr_;
         }
     };
+
+    template <typename T, typename U, typename V, typename W>
+    smartptr<T, U>
+    smartptr_cast(const smartptr<V, W>& ptr)
+    {
+        return smartptr<T, U>(ptr, detail::cast_tag());
+    }
+
+    template <typename T, typename U, typename V>
+    smartptr<T, U>
+    smartptr_cast(const smartptr<V, U>& ptr)
+    {
+        return smartptr<T, U>(ptr, detail::cast_tag());
+    }
 
 #if defined(_MSC_VER)
 # pragma warning(pop)

@@ -1,0 +1,51 @@
+#!/bin/sh
+
+copt=
+lopt=
+win32=
+
+while getopts cl opt
+  do
+  case $opt in
+      c)
+          copt=1
+          ;;
+      l)
+          lopt=1
+          ;;
+      ?)
+          echo "usage: `basename $0`: [-c] [-l]\n" >&2
+          exit 1
+          ;;
+  esac
+done
+
+case "`uname`" in
+    *CYGWIN*|*MINGW*)
+        win32=1
+        ;;
+esac
+
+python="`which python`"
+bindir="`dirname $python`"
+
+if [ -z "$win32" ]; then
+    version="`python -c 'import sys; print sys.version[0:3]'`"
+    incdir="`echo $bindir | sed -e 's/bin/include/'`/python$version"
+    libdir="`echo $bindir | sed -e 's/bin/lib/'`"
+else
+    version="`python -c 'import sys; print "%c%c" % (sys.version[0], sys.version[2])' | tr -d '\015'`"
+    incdir="$bindir/include"
+    libdir="$bindir/libs"
+fi
+
+cflags="-I$incdir"
+ldflags="-L$libdir -lpython$version"
+
+if [ -n "$copt" -a -z "$lopt" ]; then
+    echo $cflags
+elif [ -z "$copt" -a -n "$lopt" ]; then
+    echo $ldflags
+else
+    echo "$cflags $ldflags"
+fi

@@ -10,6 +10,7 @@
 
 #include "augas/buffer.hpp"
 #include "augas/exception.hpp"
+#include "augas/listener.hpp"
 #include "augas/manager.hpp"
 #include "augas/module.hpp"
 #include "augas/options.hpp"
@@ -68,7 +69,20 @@ namespace augas {
     }
 
     typedef map<int, sessptr> pending;
-    typedef pair<sessptr, void*> eventpair;
+
+    struct eventarg {
+        string sname_;
+        aug_var arg_;
+        ~eventarg() AUG_NOTHROW
+        {
+            aug_freevar(&arg_);
+        }
+        eventarg(const string& sname, void* arg, void (*free)(void*))
+            : sname_(sname)
+        {
+            aug_setvarp(&arg_, arg, free);
+        }
+    };
 
     struct state {
 
@@ -174,20 +188,17 @@ namespace augas {
     // Thread-safe.
 
     int
-    post_(const char* sname, int type, void* user)
+    post_(const char* sname, int type, void* user, void (*free)(void*))
     {
-        // TODO: at least, allow post() to be called from multiple threads.
-
         try {
 
-            sessptr sess(state_->manager_.getsess(sname));
-            auto_ptr<eventpair> ap(new eventpair(sess, user));
+            auto_ptr<eventarg> arg(new eventarg(sname, user, free));
 
             aug_event e;
-            e.type_ = type + AUG_EVENTUSER;
-            aug_setvarp(&e.arg_, ap.get(), 0);
+            e.type_ = AUG_EVENTUSER + type;
+            aug_setvarp(&e.arg_, arg.get(), 0);
             writeevent(aug_eventout(), e);
-            ap.release();
+            arg.release();
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -228,13 +239,13 @@ namespace augas {
             augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
                              // uninitialized in this function.
             id = aug_nextid();
-            connptr conn(new augas::conn(sess, sfd, id, state_->timers_));
-            state_->manager_.insert(conn);
+            connptr cptr(new augas::conn(sess, sfd, id, state_->timers_));
+            state_->manager_.insert(cptr);
             try {
-                conn->open(ep);
+                cptr->open(ep);
             } catch (...) {
                 // TODO: leave if rw timers set.
-                state_->manager_.erase(conn);
+                state_->manager_.erase(*cptr);
             }
             return (int)id;
 
@@ -251,24 +262,30 @@ namespace augas {
             setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
 
             sessptr sess(state_->manager_.getsess(sname));
-            state_->manager_.insert(sess, sfd);
+
+            augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
+                             // uninitialized in this function.
+            id = aug_nextid();
+            listenerptr lptr(new augas::listener(sess, sfd, id));
+            state_->manager_.insert(lptr);
 
             inetaddr addr(null);
             AUG_DEBUG2("listening on interface '%s', port '%d'",
                        inetntop(getinetaddr(ep, addr)).c_str(),
                        static_cast<int>(ntohs(port(ep))));
-            return 0;
+            return (int)id;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
-    settimer_(const char* sname, int id, unsigned ms, void* arg)
+    settimer_(const char* sname, int id, unsigned ms, void* arg,
+              void (*free)(void*))
     {
         try {
 
-            var v(arg);
+            var v(arg, free);
             id = aug_settimer(cptr(state_->timers_), id, ms, timercb_,
                               cptr(v));
             if (0 < id)
@@ -310,8 +327,12 @@ namespace augas {
     shutdown_(augas_id cid)
     {
         try {
-            connptr conn(state_->manager_.getbyid(cid));
-            conn->shutdown();
+            fileptr file(state_->manager_.getbyid(cid));
+            connptr cptr(smartptr_cast<conn>(file));
+            if (null != cptr)
+                cptr->shutdown();
+            else
+                state_->manager_.erase(*file);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -351,7 +372,10 @@ namespace augas {
     setrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
         try {
-            connptr conn(state_->manager_.getbyid(cid));
+            connptr conn(smartptr_cast<conn>(state_->manager_.getbyid(cid)));
+            if (null == conn)
+                throw error(__FILE__, __LINE__, ESTATE,
+                            "connection-id '%d' not found", cid);
             conn->setrwtimer(ms, flags);
             return 0;
         } AUG_SETERRINFOCATCH;
@@ -362,7 +386,10 @@ namespace augas {
     resetrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
         try {
-            connptr conn(state_->manager_.getbyid(cid));
+            connptr conn(smartptr_cast<conn>(state_->manager_.getbyid(cid)));
+            if (null == conn)
+                throw error(__FILE__, __LINE__, ESTATE,
+                            "connection-id '%d' not found", cid);
             conn->resetrwtimer(ms, flags);
             return 0;
         } AUG_SETERRINFOCATCH;
@@ -373,7 +400,10 @@ namespace augas {
     cancelrwtimer_(augas_id cid, unsigned flags)
     {
         try {
-            connptr conn(state_->manager_.getbyid(cid));
+            connptr conn(smartptr_cast<conn>(state_->manager_.getbyid(cid)));
+            if (null == conn)
+                throw error(__FILE__, __LINE__, ESTATE,
+                            "connection-id '%d' not found", cid);
             conn->cancelrwtimer(flags);
             return 0;
         } AUG_SETERRINFOCATCH;
@@ -453,7 +483,7 @@ namespace augas {
             conn->open(ep);
         } catch (...) {
             // TODO: leave if rw timer set.
-            state_->manager_.erase(conn);
+            state_->manager_.erase(*conn);
         }
     }
 
@@ -484,10 +514,12 @@ namespace augas {
         default:
             assert(AUG_VTPTR == event.arg_.type_);
             {
-                auto_ptr<eventpair> ap(static_cast<
-                                       eventpair*>(aug_getvarp(&event.arg_)));
-                if (ap->first->isopen())
-                    ap->first->event(event.type_ - AUG_EVENTUSER, ap->second);
+                auto_ptr<eventarg> arg(static_cast<
+                                       eventarg*>(aug_getvarp(&event.arg_)));
+                sessptr sess(state_->manager_.getsess(arg->sname_));
+                if (sess->isopen())
+                    sess->event(event.type_ - AUG_EVENTUSER,
+                                aug_getvarp(&arg->arg_));
                 else
                     aug_warn("event not delivered to failed session");
             }
@@ -507,17 +539,18 @@ namespace augas {
             if (fd == aug_eventin())
                 return readevent_(*this);
 
-            sessptr sess(state_->manager_.islistener(fd));
-            if (sess != null) {
-                accept_(fd, sess, *this);
-                return true;
-            }
+            fileptr file(state_->manager_.getbyfd(fd));
+            connptr cptr(smartptr_cast<conn>(file));
 
-            connptr conn(state_->manager_.getbyfd(fd));
-            if (!conn->process(state_->mplexer_)) {
-                state_->manager_.erase(conn);
-                return false;
-            }
+            if (null != cptr) {
+
+                if (!cptr->process(state_->mplexer_)) {
+                    state_->manager_.erase(*file);
+                    return false;
+                }
+
+            } else
+                accept_(fd, file->sess(), *this);
 
             return true;
         }
@@ -597,7 +630,7 @@ namespace augas {
             AUG_DEBUG2("running daemon process");
 
             int ret(!0);
-            while (!stopping_ || !state_->manager_.isconnected()) {
+            while (!stopping_ || !state_->manager_.empty()) {
 
                 if (state_->timers_.empty()) {
 

@@ -162,6 +162,7 @@ EXTRA_DIST = \
 	findjunk \
 	mkaugconf \
 	mkimplib \
+	pyflags \
 	sfbatch
 
 all: all-am

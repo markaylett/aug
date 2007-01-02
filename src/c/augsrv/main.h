@@ -14,7 +14,7 @@ struct aug_service;
    from the service thread.  A shallow copy of the service structure will be
    performed.
 
-   aug_freevar() will be called in all cases for "service->arg_".
+   aug_freevar() will not be called.
 */
 
 AUGSRV_API int

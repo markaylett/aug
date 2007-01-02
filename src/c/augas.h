@@ -84,7 +84,8 @@ struct augas_host {
     void (*reconf_)(void);
     void (*writelog_)(int level, const char* format, ...);
     void (*vwritelog_)(int level, const char* format, va_list args);
-    int (*post_)(const char* sname, int type, void* user);
+    int (*post_)(const char* sname, int type, void* user,
+                 void (*free)(void*));
 
     /**
      * The remaining functions are not thread-safe.
@@ -107,10 +108,11 @@ struct augas_host {
        \return the assigned timer-id.
     */
 
-    int (*settimer_)(const char* sname, int tid, unsigned ms, void* user);
+    int (*settimer_)(const char* sname, int tid, unsigned ms, void* user,
+                     void (*free_)(void*));
     int (*resettimer_)(const char* sname, int tid, unsigned ms);
     int (*canceltimer_)(const char* sname, int tid);
-    int (*shutdown_)(augas_id cid);
+    int (*shutdown_)(augas_id fid);
     int (*send_)(const char* sname, augas_id cid, const char* buf,
                  size_t size, unsigned flags);
     int (*setrwtimer_)(augas_id cid, unsigned ms, unsigned flags);

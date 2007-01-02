@@ -35,7 +35,6 @@ aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg)
     FILE* fp = fopen(path, "r");
     if (!fp) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
-        aug_freevar(arg);
         return -1;
     }
 
@@ -92,6 +91,5 @@ aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg)
     }
 
     fclose(fp);
-    aug_freevar(arg);
     return ret;
 }

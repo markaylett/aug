@@ -21,7 +21,7 @@ struct aug_httphandlers {
 typedef struct aug_httpparser_* aug_httpparser_t;
 
 /**
-   aug_freevar() will be called if aug_createhttpparser() fails or else from
+   If aug_createhttpparser() succeeds, aug_freevar() will be called from
    aug_freehttpparser().
 */
 

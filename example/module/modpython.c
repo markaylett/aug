@@ -32,44 +32,11 @@ struct link_ {
 static const struct augas_host* host_ = NULL;
 static PyObject* pyaugas_ = NULL;
 
-/**
-   List of objects that need to be freed if a call to either opensess() or
-   openconn() fail.
-*/
-
-static struct link_* list_ = NULL;
-static int opencall_ = 0;
-
 static void
-retain_(void)
+free_(void* arg)
 {
-    while (list_) {
-        struct link_* p = list_;
-        list_ = p->next_;
-        free(p);
-    }
-}
-
-static void
-release_(void)
-{
-    while (list_) {
-        struct link_* p = list_;
-        list_ = p->next_;
-        Py_DECREF(p->object_);
-        free(p);
-    }
-}
-
-static void
-pushuser_(PyObject* x)
-{
-    struct link_* p = malloc(sizeof(struct link_));
-    if (p) {
-        p->object_ = x;
-        p->next_ = list_;
-        list_ = p;
-    }
+    PyObject* x = arg;
+    Py_DECREF(x);
 }
 
 static void
@@ -191,18 +158,11 @@ createimport_(const char* sname)
 
     if (import->opensess_) {
 
-        PyObject* x;
-        opencall_ = 1;
-        x = PyObject_CallFunction(import->opensess_, "s", sname);
-        opencall_ = 0;
-
+        PyObject* x = PyObject_CallFunction(import->opensess_, "s", sname);
         if (!x) {
             printerr_();
-            release_();
             goto fail;
         }
-
-        retain_();
         Py_DECREF(x);
     }
 
@@ -247,13 +207,10 @@ pypost_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "siO:post", &sname, &type, &user))
         return NULL;
 
-    if (-1 == host_->post_(sname, type, user)) {
+    if (-1 == host_->post_(sname, type, user, free_)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
-
-    if (opencall_)
-        pushuser_(user);
 
     Py_INCREF(user);
     Py_RETURN_NONE;
@@ -297,16 +254,17 @@ static PyObject*
 pytcplisten_(PyObject* self, PyObject* args)
 {
     const char* sname, * host, * serv;
+    int lid;
 
     if (!PyArg_ParseTuple(args, "sss:tcplisten", &sname, &host, &serv))
         return NULL;
 
-    if (-1 == host_->tcplisten_(sname, host, serv)) {
+    if (-1 == (lid = host_->tcplisten_(sname, host, serv))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
 
-    Py_RETURN_NONE;
+    return Py_BuildValue("i", lid);
 }
 
 static PyObject*
@@ -320,13 +278,10 @@ pysettimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "siIO:settimer", &sname, &tid, &ms, &user))
         return NULL;
 
-    if (-1 == (tid = host_->settimer_(sname, tid, ms, user))) {
+    if (-1 == (tid = host_->settimer_(sname, tid, ms, user, free_))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
-
-    if (opencall_)
-        pushuser_(user);
 
     Py_INCREF(user);
     return Py_BuildValue("i", tid);
@@ -376,12 +331,12 @@ pycanceltimer_(PyObject* self, PyObject* args)
 static PyObject*
 pyshutdown_(PyObject* self, PyObject* args)
 {
-    int cid;
+    int fid;
 
-    if (!PyArg_ParseTuple(args, "i:shutdown", &cid))
+    if (!PyArg_ParseTuple(args, "i:shutdown", &fid))
         return NULL;
 
-    if (-1 == host_->shutdown_(cid)) {
+    if (-1 == host_->shutdown_(fid)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -466,11 +421,11 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
    void post (string sname, int type, object user);
    string getenv (string sname, string name);
    int tcpconnect (string sname, string host, string serv);
-   void tcplisten (string sname, string host, string serv);
+   int tcplisten (string sname, string host, string serv);
    int settimer (string sname, int tid, unsigned ms, object user);
    bool resettimer (string sname, int tid, unsigned ms);
    bool canceltimer (string sname, int tid);
-   void shutdown (int cid);
+   void shutdown (int fid);
    void send (string sname, int cid, buffer buf);
    void setrwtimer (int cid, unsigned ms, unsigned flags);
    void resetrwtimer (int cid, unsigned ms, unsigned flags);
@@ -706,16 +661,11 @@ openconn_(struct augas_conn* conn, const char* addr, unsigned short port)
 
     host_->writelog_(AUGAS_LOGDEBUG, "openconn_()");
     if (import->openconn_) {
-        opencall_ = 1;
-        x = PyObject_CallFunction(import->openconn_, "sisH",
-                                  conn->sess_->name_, conn->id_, addr, port);
-        opencall_ = 0;
-        if (x)
-            retain_();
-        else {
-            release_();
+
+        if (!(x = PyObject_CallFunction(import->openconn_, "sisH",
+                                        conn->sess_->name_, conn->id_, addr,
+                                        port)))
             ret = -1;
-        }
 
     } else {
         x = Py_None;

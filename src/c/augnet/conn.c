@@ -49,7 +49,6 @@ aug_insertconn(struct aug_conns* conns, int fd, aug_conncb_t cb,
     aug_lock();
     if (!(conn = allocate_())) {
         aug_unlock();
-        aug_freevar(arg);
         return -1;
     }
     aug_unlock();
@@ -59,7 +58,6 @@ aug_insertconn(struct aug_conns* conns, int fd, aug_conncb_t cb,
     aug_setvar(&conn->arg_, arg);
 
     AUG_INSERT_TAIL(conns, conn);
-
     return 0;
 }
 

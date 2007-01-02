@@ -5,11 +5,11 @@ import augas
 # void post (string sname, int type, object user);
 # string getenv (string sname, string name);
 # int tcpconnect (string sname, string host, string serv);
-# void tcplisten (string sname, string host, string serv);
+# int tcplisten (string sname, string host, string serv);
 # int settimer (string sname, int tid, unsigned ms, object user);
 # bool resettimer (string sname, int tid, unsigned ms);
 # bool canceltimer (string sname, int tid);
-# void shutdown (int cid);
+# void shutdown (int fid);
 # void send (string sname, int cid, buffer buf);
 # void setrwtimer (int cid, unsigned ms, unsigned flags);
 # void resetrwtimer (int cid, unsigned ms, unsigned flags);

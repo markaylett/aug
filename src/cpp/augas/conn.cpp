@@ -12,6 +12,24 @@ using namespace aug;
 using namespace augas;
 using namespace std;
 
+augas_id
+conn::do_id() const
+{
+    return conn_.id_;
+}
+
+int
+conn::do_fd() const
+{
+    return sfd_.get();
+}
+
+const sessptr&
+conn::do_sess() const
+{
+    return sess_;
+}
+
 void
 conn::do_callback(idref ref, unsigned& ms, aug_timers& timers)
 {
@@ -122,14 +140,6 @@ conn::putsome(aug::mplexer& mplexer, const void* buf, size_t size)
 }
 
 void
-conn::shutdown()
-{
-    shutdown_ = true;
-    if (buffer_.empty())
-        aug::shutdown(sfd_, SHUT_WR);
-}
-
-void
 conn::setrwtimer(unsigned ms, unsigned flags)
 {
     if (flags & AUGAS_TIMRD)
@@ -137,6 +147,14 @@ conn::setrwtimer(unsigned ms, unsigned flags)
 
     if (flags & AUGAS_TIMWR)
         wrtimer_.set(ms, *this);
+}
+
+void
+conn::shutdown()
+{
+    shutdown_ = true;
+    if (buffer_.empty())
+        aug::shutdown(sfd_, SHUT_WR);
 }
 
 void

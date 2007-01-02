@@ -23,7 +23,7 @@ AUGNET_API int
 aug_freeconns(struct aug_conns* conns);
 
 /**
-   aug_freevar() will be called if aug_insertconn() fails or else when the
+   If aug_insertconn() succeeds, aug_freevar() will be called when the
    connection is removed.
 */
 

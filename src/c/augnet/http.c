@@ -209,13 +209,11 @@ aug_createhttpparser(unsigned size, const struct aug_httphandlers* handlers,
 
     if (!parser) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
-        aug_freevar(arg);
         return NULL;
     }
 
     if (!(lexer = aug_createlexer(size, NULL))) {
         free(parser);
-        aug_freevar(arg);
         return NULL;
     }
 

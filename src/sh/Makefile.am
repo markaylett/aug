@@ -3,4 +3,5 @@ EXTRA_DIST = \
 	findjunk \
 	mkaugconf \
 	mkimplib \
+	pyflags \
 	sfbatch

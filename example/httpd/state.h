@@ -17,7 +17,7 @@ typedef int (*aug_request_t)(const struct aug_var*, const char*, aug_mar_t,
                              struct aug_messages*);
 
 /**
-   aug_freevar() will be called if aug_createstate() fails or else from
+   If aug_createstate() succeeds, aug_freevar() will be called from
    aug_freestate().
 */
 

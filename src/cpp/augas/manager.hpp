@@ -16,15 +16,12 @@ namespace augas {
 
         typedef std::map<std::string, moduleptr> modules;
         typedef std::map<std::string, sessptr> sesss;
-        typedef std::map<int, std::pair<sessptr, aug::smartfd> > listeners;
         typedef std::map<augas_id, int> idtofd;
-        typedef std::map<int, connptr> conns;
+        typedef std::map<int, fileptr> files;
 
-        mutable aug::mutex mutex_;
         modules modules_;
-        sesss sesss_; // May be accessed from multiple threads.
-        listeners listeners_;
-        conns conns_;
+        sesss sesss_;
+        files files_;
         idtofd idtofd_;
 
         void
@@ -35,13 +32,10 @@ namespace augas {
         clear();
 
         void
-        erase(const connptr& conn);
+        erase(const file_base& file);
 
         void
-        insert(const connptr& conn);
-
-        void
-        insert(const sessptr& sess, const aug::smartfd& sfd);
+        insert(const fileptr& file);
 
         void
         load(const options& options, const augas_host& host);
@@ -59,27 +53,22 @@ namespace augas {
                   const char* buf, size_t size);
 
         void
-        reconf() const;
+        teardown();
 
         void
-        teardown() const;
+        reconf() const;
 
-        connptr
+        fileptr
         getbyfd(aug::fdref fd) const;
 
-        connptr
+        fileptr
         getbyid(augas_id id) const;
-
-        // Thread-safe.
 
         sessptr
         getsess(const std::string& name) const;
 
         bool
-        isconnected() const;
-
-        sessptr
-        islistener(aug::fdref fd) const;
+        empty() const;
     };
 }
 

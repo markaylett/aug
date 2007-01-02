@@ -115,21 +115,15 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
     int daemon;
     struct aug_options options;
     int jmpret = setjmp(mark_);
-    if (jmpret) {
-        aug_freevar(&service->arg_);
+    if (jmpret)
         return jmpret;
-    }
 
     aug_setservice_(service);
-    if (-1 == aug_readopts(&options, argc, argv)) {
-        aug_freevar(&service->arg_);
+    if (-1 == aug_readopts(&options, argc, argv))
         return 1;
-    }
 
-    if (AUG_CMDEXIT == options.command_) {
-        aug_freevar(&service->arg_);
+    if (AUG_CMDEXIT == options.command_)
         return 0;
-    }
 
 #if !defined(_WIN32)
     daemon = AUG_CMDSTART == options.command_;
@@ -188,6 +182,5 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
         break;
     }
     aug_termservice();
-    aug_freevar(&service->arg_);
     return 0;
 }

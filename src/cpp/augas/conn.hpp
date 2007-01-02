@@ -5,14 +5,14 @@
 #define AUGAS_CONN_HPP
 
 #include "augas/buffer.hpp"
-#include "augas/sess.hpp"
+#include "augas/file.hpp"
 
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
 namespace augas {
 
-    class conn : public aug::timercb_base {
+    class conn : public file_base, public aug::timercb_base {
     public:
         typedef augas_conn ctype;
     private:
@@ -24,6 +24,15 @@ namespace augas {
         aug::timer wrtimer_;
         buffer buffer_;
         bool open_, shutdown_;
+
+        augas_id
+        do_id() const;
+
+        int
+        do_fd() const;
+
+        const sessptr&
+        do_sess() const;
 
         void
         do_callback(aug::idref ref, unsigned& ms, aug_timers& timers);
@@ -97,21 +106,6 @@ namespace augas {
         isshutdown() const
         {
             return shutdown_;
-        }
-        augas_id
-        id() const
-        {
-            return conn_.id_;
-        }
-        int
-        fd() const
-        {
-            return sfd_.get();
-        }
-        const char*
-        sname() const
-        {
-            return sess_->name();
         }
     };
 

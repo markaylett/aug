@@ -4,6 +4,8 @@ noinst_HEADERS = \
 	buffer.hpp \
 	conn.hpp \
 	exception.hpp \
+	file.hpp \
+	listener.hpp \
 	manager.hpp \
 	module.hpp \
 	options.hpp \
@@ -17,6 +19,8 @@ augasd_SOURCES = \
 	buffer.cpp \
 	conn.cpp \
 	exception.cpp \
+	file.cpp \
+	listener.cpp \
 	manager.cpp \
 	module.cpp \
 	options.cpp \

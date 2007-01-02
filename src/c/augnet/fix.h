@@ -31,7 +31,7 @@ typedef void (*aug_fixcb_t)(const struct aug_var*, const char*, size_t);
 typedef struct aug_fixstream_* aug_fixstream_t;
 
 /**
-   aug_freevar() will be called if aug_createfixstream() fails or else from
+   If aug_createfixstream() succeeds, aug_freevar() will be called from
    aug_freefixstream().
 */
 

@@ -175,13 +175,11 @@ aug_createfixstream(size_t size, aug_fixcb_t cb, const struct aug_var* arg)
 
     if (!stream) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
-        aug_freevar(arg);
         return NULL;
     }
 
     if (!(strbuf = aug_createstrbuf(0 == size ? BUFSIZE_ : size))) {
         free(stream);
-        aug_freevar(arg);
         return NULL;
     }
 

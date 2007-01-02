@@ -135,6 +135,12 @@
 				RelativePath="..\src\cpp\augas\exception.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augas\file.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\listener.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augas\manager.cpp">
 			</File>
 			<File
@@ -162,6 +168,12 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\exception.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\file.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\listener.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\manager.hpp">

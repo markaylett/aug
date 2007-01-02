@@ -29,10 +29,8 @@ void
 manager::insert(const string& name, const sessptr& sess)
 {
     // Insert prior to calling open().
-    {
-        scoped_lock lock(mutex_);
-        sesss_[name] = sess;
-    }
+
+    sesss_[name] = sess;
     try {
         try {
             sess->open();
@@ -40,7 +38,6 @@ manager::insert(const string& name, const sessptr& sess)
 
             // TODO: leave if event posted.
 
-            scoped_lock lock(mutex_);
             sesss_.erase(name); // close() will not be called.
             throw;
         }
@@ -51,35 +48,23 @@ void
 manager::clear()
 {
     idtofd_.clear();
-    conns_.clear();
-    listeners_.clear();
-    sesss tmp;
-    {
-        scoped_lock lock(mutex_);
-        sesss_.swap(tmp);
-    }
-    tmp.clear();
+    files_.clear();
+    sesss_.clear();
     modules_.clear();
 }
 
 void
-manager::erase(const connptr& conn)
+manager::erase(const file_base& file)
 {
-    idtofd_.erase(conn->id());
-    conns_.erase(conn->fd());
+    idtofd_.erase(file.id());
+    files_.erase(file.fd());
 }
 
 void
-manager::insert(const connptr& conn)
+manager::insert(const fileptr& file)
 {
-    conns_.insert(make_pair(conn->fd(), conn));
-    idtofd_.insert(make_pair(conn->id(), conn->fd()));
-}
-
-void
-manager::insert(const sessptr& sess, const aug::smartfd& sfd)
-{
-    listeners_.insert(make_pair(sfd.get(), make_pair(sess, sfd)));
+    files_.insert(make_pair(file->fd(), file));
+    idtofd_.insert(make_pair(file->id(), file->fd()));
 }
 
 void
@@ -143,15 +128,21 @@ manager::sendall(aug::mplexer& mplexer, augas_id cid, const char* sname,
 {
     bool ret(true);
 
-    conns::const_iterator it(conns_.begin()), end(conns_.end());
+    files::const_iterator it(files_.begin()), end(files_.end());
     for (; it != end; ++it) {
-        if (it->second->isshutdown()) {
-            if (it->second->id() == cid)
+
+        connptr cptr(smartptr_cast<conn>(it->second));
+        if (null == cptr)
+            continue;
+
+        if (cptr->isshutdown()) {
+            if (cptr->id() == cid)
                 ret = false;
             continue;
         }
-        if (it->second->sname() == sname)
-            it->second->putsome(mplexer, buf, size);
+
+        if (cptr->sess()->name() == sname)
+            cptr->putsome(mplexer, buf, size);
     }
 
     return ret;
@@ -161,7 +152,7 @@ bool
 manager::sendself(aug::mplexer& mplexer, augas_id cid, const char* buf,
                   size_t size)
 {
-    connptr cptr(getbyid(cid));
+    connptr cptr(smartptr_cast<conn>(getbyid(cid)));
     if (cptr->isshutdown())
         return false;
 
@@ -173,60 +164,72 @@ void
 manager::sendother(aug::mplexer& mplexer, augas_id cid, const char* sname,
                    const char* buf, size_t size)
 {
-    conns::const_iterator it(conns_.begin()), end(conns_.end());
+    files::const_iterator it(files_.begin()), end(files_.end());
     for (; it != end; ++it) {
+
+        connptr cptr(smartptr_cast<conn>(it->second));
+        if (null == cptr)
+            continue;
 
         // Ignore self as well as connections that have been marked for
         // shutdown.
 
-        if (it->second->id() == cid || it->second->isshutdown())
+        if (cptr->id() == cid || cptr->isshutdown())
             continue;
 
-        it->second->putsome(mplexer, buf, size);
+        cptr->putsome(mplexer, buf, size);
+    }
+}
+
+void
+manager::teardown()
+{
+    files::iterator it(files_.begin()), end(files_.end());
+    while (it != end) {
+
+        connptr cptr(smartptr_cast<conn>(it->second));
+        if (null != cptr) {
+            cptr->teardown();
+            ++it;
+            continue;
+        }
+
+        // Erase listener.
+
+        files_.erase(it++);
     }
 }
 
 void
 manager::reconf() const
 {
-    scoped_lock lock(mutex_);
     sesss::const_iterator it(sesss_.begin()), end(sesss_.end());
     for (; it != end; ++it)
         it->second->reconf();
 }
 
-void
-manager::teardown() const
-{
-    conns::const_iterator it(conns_.begin()), end(conns_.end());
-    for (; it != end; ++it)
-        it->second->teardown();
-}
-
-connptr
+fileptr
 manager::getbyfd(fdref fd) const
 {
-    conns::const_iterator it(conns_.find(fd.get()));
-    if (it == conns_.end())
-        throw error(__FILE__, __LINE__, ESTATE,
-                    "connection-fd '%d' not found", fd.get());
+    files::const_iterator it(files_.find(fd.get()));
+    if (it == files_.end())
+        throw error(__FILE__, __LINE__, ESTATE, "fd '%d' not found",
+                    fd.get());
     return it->second;
 }
 
-connptr
+fileptr
 manager::getbyid(augas_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));
     if (it == idtofd_.end())
-        throw error(__FILE__, __LINE__, ESTATE,
-                    "connection-id '%d' not found", id);
+        throw error(__FILE__, __LINE__, ESTATE, "id '%d' not found", id);
     return getbyfd(it->second);
 }
 
 sessptr
 manager::getsess(const std::string& name) const
 {
-    scoped_lock lock(mutex_);
     sesss::const_iterator it(sesss_.find(name));
     if (it == sesss_.end())
         throw error(__FILE__, __LINE__, ESTATE,
@@ -235,17 +238,7 @@ manager::getsess(const std::string& name) const
 }
 
 bool
-manager::isconnected() const
+manager::empty() const
 {
-    return !conns_.empty();
-}
-
-sessptr
-manager::islistener(aug::fdref fd) const
-{
-    sessptr sess;
-    listeners::const_iterator it(listeners_.find(fd.get()));
-    if (it != listeners_.end())
-        sess = it->second.first;
-    return sess;
+    return files_.empty();
 }
