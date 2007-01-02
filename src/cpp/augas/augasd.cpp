@@ -1,4 +1,4 @@
-/* Copyright (c) 2004-2006, Mark Aylett <mark@emantic.co.uk>
+/* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
 #define AUGAS_BUILD
@@ -244,7 +244,6 @@ namespace augas {
             try {
                 cptr->open(ep);
             } catch (...) {
-                // TODO: leave if rw timers set.
                 state_->manager_.erase(*cptr);
             }
             return (int)id;
@@ -482,7 +481,6 @@ namespace augas {
         try {
             conn->open(ep);
         } catch (...) {
-            // TODO: leave if rw timer set.
             state_->manager_.erase(*conn);
         }
     }
