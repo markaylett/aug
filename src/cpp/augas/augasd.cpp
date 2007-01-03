@@ -23,9 +23,11 @@
 #endif // _WIN32
 
 #include <cassert>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory> // auto_ptr<>
+#include <sstream>
 #include <vector>
 
 #include <time.h>
@@ -40,9 +42,23 @@ namespace augas {
     const char* program_;
     cstring conffile_= "";
     cstring rundir_ = "";
+    cstring logdir_ = "";
     options options_;
     bool daemon_(false);
     bool stopping_(false);
+
+    void
+    openlog_()
+    {
+        tm tm;
+        aug::gmtime(tm);
+        stringstream ss;
+        ss << "augasd-" << setfill('0')
+           << setw(4) << tm.tm_year + 1900
+           << setw(2) << tm.tm_mon + 1
+           << setw(2) << tm.tm_mday;
+        openlog(makepath(logdir_, ss.str().c_str(), "log").c_str());
+    }
 
     void
     doreconf_()
@@ -59,9 +75,13 @@ namespace augas {
         aug::chdir(rundir_);
         if (daemon_) {
 
+            const char* logdir(options_.get("rundir", "."));
+            aug::chdir(options_.get("logdir", "."));
+            realpath(logdir_, getcwd().c_str(), sizeof(logdir_));
+
             // Re-opening the log file facilitates rolling.
 
-            openlog(options_.get("logfile", "augasd.log"));
+            openlog_();
         }
 
         AUG_DEBUG2("log level: %d", aug_loglevel());
@@ -623,7 +643,20 @@ namespace augas {
         void
         do_run()
         {
-            struct timeval tv;
+            struct timercb : timercb_base {
+                void
+                do_callback(idref ref, unsigned& ms, aug_timers& timers)
+                {
+                    AUG_DEBUG2("re-opening log file");
+                    openlog_();
+                }
+            } cb;
+            timer reopen(state_->timers_);
+
+            // Re-open log file every minute.
+
+            if (daemon_)
+                reopen.set(60000, cb);
 
             AUG_DEBUG2("running daemon process");
 
@@ -639,6 +672,7 @@ namespace augas {
 
                 } else {
 
+                    struct timeval tv;
                     processtimers(state_->timers_, 0 == ret, tv);
 
                     scoped_unblock unblock;

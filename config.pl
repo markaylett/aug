@@ -133,7 +133,7 @@ my (
 if (is $gcc) {
     $flags .= (is $debug) ? '-ggdb' : '-O3 -DNDEBUG';
     if (is $strict) {
-        $flags .= ' -Wall -Werror -pedantic';
+        $flags .= ' -Wall -Werror -pedantic -Wno-unused-value';
         $cflags = "$flags";
         $cxxflags = "$flags -Wno-deprecated -Wno-unused-variable";
     } else {

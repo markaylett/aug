@@ -149,11 +149,12 @@ namespace aug {
     public:
         ~timer() AUG_NOTHROW
         {
-            if (null != ref_)
+            if (0 < ref_)
                 canceltimer(timers_, ref_);
         }
 
-        timer(aug_timers& timers, idref ref)
+        explicit
+        timer(aug_timers& timers, idref ref = null)
             : timers_(timers),
               ref_(ref)
         {

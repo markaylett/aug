@@ -17,6 +17,44 @@ static const char rcsid[] = "$Id$";
 #include <errno.h>
 
 AUGSYS_API struct tm*
+aug_gmtime(const time_t* clock, struct tm* res)
+{
+    struct tm* ret;
+
+    /* Although there is no documented failure condition for the gmtime_r
+       function, provisions are made for interpreting a NULL return as an
+       error condition. */
+
+    errno = 0;
+
+#if HAVE_LOCALTIME_R
+
+    if (!(ret = gmtime_r(clock, res)))
+        goto fail;
+
+#elif defined(_WIN32)
+
+    /* Note: On windows, the gmtime function is implemented using thread-local
+       storage - making it thread safe (but not re-entrant). */
+
+    if (!(ret = gmtime(clock)))
+        goto fail;
+
+    memcpy(res, ret, sizeof(*res));
+
+#else /* !HAVE_LOCALTIME_R && !_WIN32 */
+# error "gmtime_r is required on non-Windows platform"
+#endif /* !HAVE_LOCALTIME_R && !_WIN32 */
+
+    return ret;
+
+ fail:
+    aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+                        ? EINVAL : errno);
+    return NULL;
+}
+
+AUGSYS_API struct tm*
 aug_localtime(const time_t* clock, struct tm* res)
 {
     struct tm* ret;

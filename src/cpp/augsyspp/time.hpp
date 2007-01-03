@@ -25,9 +25,27 @@ namespace aug {
     }
 
     inline tm&
+    gmtime(const time_t& clock, tm& res)
+    {
+        return *verify(aug_gmtime(&clock, &res));
+    }
+
+    inline tm&
+    gmtime(tm& res)
+    {
+        return gmtime(time(0), res);
+    }
+
+    inline tm&
     localtime(const time_t& clock, tm& res)
     {
-        return *aug_localtime(&clock, &res);
+        return *verify(aug_localtime(&clock, &res));
+    }
+
+    inline tm&
+    localtime(tm& res)
+    {
+        return localtime(time(0), res);
     }
 
     inline timeval&

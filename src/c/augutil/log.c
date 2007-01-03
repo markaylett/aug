@@ -45,10 +45,10 @@ static const char LABELS_[][7] = {
 };
 
 static int
-localtime_(struct tm* res)
+gmtime_(struct tm* res)
 {
     time_t clock = time(NULL);
-    return !aug_localtime(&clock, res) ? -1 : 0;
+    return !aug_gmtime(&clock, res) ? -1 : 0;
 }
 
 static int
@@ -102,7 +102,7 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
         return -1;
     }
 
-    if (-1 == localtime_(&tm))
+    if (-1 == gmtime_(&tm))
         return -1;
 
     /**

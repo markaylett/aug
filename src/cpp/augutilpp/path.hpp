@@ -36,6 +36,20 @@ namespace aug {
     }
 
     inline char*
+    makepath(char* dst, const char* dir, const char* name, const char* ext,
+             size_t size)
+    {
+        return verify(aug_makepath(dst, dir, name, ext, size));
+    }
+
+    inline std::string
+    makepath(const char* dir, const char* name, const char* ext)
+    {
+        char buf[AUG_PATH_MAX + 1];
+        return makepath(buf, dir, name, ext, sizeof(buf));
+    }
+
+    inline char*
     realpath(char* dst, const char* src, size_t size)
     {
         return verify(aug_realpath(dst, src, size));

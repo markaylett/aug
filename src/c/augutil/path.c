@@ -72,6 +72,7 @@ AUGUTIL_API char*
 aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
              size_t size)
 {
+    char* ptr = dst;
     size_t namelen = strlen(name);
     size_t extlen = strlen(ext);
 
@@ -94,9 +95,9 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
 
         /* Directory part. */
 
-        memcpy(dst, dir, dirlen);
-        dst[dirlen] = '/';
-        dst += dirlen + 1;
+        memcpy(ptr, dir, dirlen);
+        ptr[dirlen] = '/';
+        ptr += dirlen + 1;
 
     } else if (size < namelen + extlen + 2) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
@@ -106,13 +107,13 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
 
     /* File name part. */
 
-    memcpy(dst, name, namelen);
-    dst[namelen] = '.';
-    dst += namelen + 1;
+    memcpy(ptr, name, namelen);
+    ptr[namelen] = '.';
+    ptr += namelen + 1;
 
     /* Extension part. */
 
-    strcpy(dst, ext);
+    strcpy(ptr, ext);
     return dst;
 }
 
