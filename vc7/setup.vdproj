@@ -21,6 +21,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1171900EB8BF4F49B56ECDB4FDFA3393"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2FA9F56BD08A761A5A27BBAD1C71D592"
         "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
@@ -28,6 +34,12 @@
         "Entry"
         {
         "MsmKey" = "8:_339E3B7FC6244D40A2C0E2BCADB9D629"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3436CA155BAE450689A92453AE79B404"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -52,12 +64,24 @@
         "Entry"
         {
         "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
+        "OwnerKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
         "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_5860DD303EE6400ABE0C19AAA1C6CD3B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6134F68D1A7F4BB6AEF465AB7A4D39B6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -81,13 +105,25 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B6C9873ADF7231F8A75B96E14808DA10"
+        "OwnerKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B7AEAA90118C4CC497CF2A956B1DA290"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_D39ED234812E427D88DCE6AB3D1404F1"
+        "MsmKey" = "8:_D5F95E1E2E6F4B849CB0661C7E6F0040"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -181,6 +217,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_1171900EB8BF4F49B56ECDB4FDFA3393"
+            {
+            "SourcePath" = "8:..\\src\\py\\modskel.py"
+            "TargetName" = "8:modskel.py"
+            "Tag" = "8:"
+            "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_2FA9F56BD08A761A5A27BBAD1C71D592"
             {
             "SourcePath" = "8:MSVCP71D.dll"
@@ -207,6 +263,26 @@
             "TargetName" = "8:uninstall.bat"
             "Tag" = "8:"
             "Folder" = "8:_5D616DF14FB240A1B1BBE8EA16DE9AB6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_3436CA155BAE450689A92453AE79B404"
+            {
+            "SourcePath" = "8:..\\src\\py\\modecho.py"
+            "TargetName" = "8:modecho.py"
+            "Tag" = "8:"
+            "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -321,6 +397,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_6134F68D1A7F4BB6AEF465AB7A4D39B6"
+            {
+            "SourcePath" = "8:..\\src\\py\\buffer.py"
+            "TargetName" = "8:buffer.py"
+            "Tag" = "8:"
+            "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_7600BA5FBA2044409A155A4489A86DCF"
             {
             "SourcePath" = "8:..\\etc\\augasd.conf"
@@ -361,12 +457,52 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_D39ED234812E427D88DCE6AB3D1404F1"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_B6C9873ADF7231F8A75B96E14808DA10"
             {
-            "SourcePath" = "8:..\\example\\module\\modskel.py"
-            "TargetName" = "8:modskel.py"
+            "SourcePath" = "8:python25.dll"
+            "TargetName" = "8:python25.dll"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_B7AEAA90118C4CC497CF2A956B1DA290"
+            {
+            "SourcePath" = "8:..\\src\\py\\log.py"
+            "TargetName" = "8:log.py"
+            "Tag" = "8:"
+            "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_D5F95E1E2E6F4B849CB0661C7E6F0040"
+            {
+            "SourcePath" = "8:..\\src\\py\\modclient.py"
+            "TargetName" = "8:modclient.py"
+            "Tag" = "8:"
+            "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -459,6 +595,17 @@
                         {
                         }
                     }
+                    "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_DEC816F06599440E89A43AF0FEF4C63B"
+                    {
+                    "Name" = "8:python"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_4B10D03877C24BC89D82C8716387A9B8"
+                        "Folders"
+                        {
+                        }
+                    }
                     "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_E6769D031B944066BA37EDB08C0AF9A5"
                     {
                     "Name" = "8:log"
@@ -521,7 +668,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:augas"
         "ProductCode" = "8:{210B4079-4AB6-4491-B94D-63BC120D02F0}"
-        "PackageCode" = "8:{71843DA9-CC1F-47FB-A08F-521DBD868BB3}"
+        "PackageCode" = "8:{5BC0073E-59BB-445E-8315-E878B73C0514}"
         "UpgradeCode" = "8:{89166B9C-C3CB-4DE2-8BE3-DD90993E23EE}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"

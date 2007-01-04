@@ -1,5 +1,6 @@
 #if defined(_WIN32)
 # undef _DEBUG
+# include <direct.h>
 #endif /* _WIN32 */
 
 #include <Python.h>
@@ -37,6 +38,45 @@ free_(void* arg)
 {
     PyObject* x = arg;
     Py_DECREF(x);
+}
+
+static void
+setpath_(void)
+{
+    const char* s;
+    PyObject* sys;
+
+    if ((s = host_->getenv_("rundir")))
+        chdir(s);
+
+    if (!(s = host_->getenv_("module.modpython.pythonpath")))
+        s = "bin";
+
+    chdir(s);
+
+    if ((sys = PyImport_ImportModule("sys"))) {
+
+        PyObject* path = PyObject_GetAttrString(sys, "path");
+        if (path) {
+
+            char buf[1024];
+            PyObject* dir;
+
+            getcwd(buf, sizeof(buf));
+
+            if ((dir = PyString_FromString(buf))) {
+
+                host_->writelog_(AUGAS_LOGDEBUG, "adding to sys.path: %s",
+                                 buf);
+
+                PyList_Insert(path, 0, dir);
+                Py_DECREF(dir);
+            }
+            Py_DECREF(path);
+        }
+
+        Py_DECREF(sys);
+    }
 }
 
 static void
@@ -156,17 +196,6 @@ createimport_(const char* sname)
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
     import->teardown_ = getmethod_(import->module_, "teardown");
 
-    if (import->opensess_) {
-
-        PyObject* x = PyObject_CallFunction(import->opensess_, "s", sname);
-        if (!x) {
-            printerr_();
-            goto fail;
-        }
-        Py_DECREF(x);
-    }
-
-    import->open_ = 1;
     return import;
 
  fail:
@@ -219,15 +248,12 @@ pypost_(PyObject* self, PyObject* args)
 static PyObject*
 pygetenv_(PyObject* self, PyObject* args)
 {
-    const char* sname, * name, * value;
+    const char* name, * value;
 
-    if (!(sname = PyModule_GetName(self)))
+    if (!PyArg_ParseTuple(args, "s:getenv", &name))
         return NULL;
 
-    if (!PyArg_ParseTuple(args, "ss:getenv", &sname, &name))
-        return NULL;
-
-    if (!(value = host_->getenv_(sname, name)))
+    if (!(value = host_->getenv_(name)))
         Py_RETURN_NONE;
 
     return Py_BuildValue("s", value);
@@ -503,6 +529,8 @@ static int
 pycreate_(void)
 {
     Py_Initialize();
+    setpath_();
+
     if (!(pyaugas_ = Py_InitModule("augas", pymethods_)))
         goto fail;
 
@@ -548,6 +576,20 @@ opensess_(struct augas_sess* sess)
         return -1;
 
     sess->user_ = import;
+
+    if (import->opensess_) {
+
+        PyObject* x = PyObject_CallFunction(import->opensess_, "s",
+                                            sess->name_);
+        if (!x) {
+            printerr_();
+            freeimport_(import);
+            return -1;
+        }
+        Py_DECREF(x);
+    }
+
+    import->open_ = 1;
     return 0;
 }
 

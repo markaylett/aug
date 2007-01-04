@@ -36,7 +36,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-subdir = example/module
+subdir = src/py
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -158,10 +158,11 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	modpython.c \
-	modpython.mk \
-	modskel.c \
-	modskel.mk
+	buffer.py \
+	log.py \
+	modclient.py \
+	modecho.py \
+	modskel.py
 
 all: all-am
 
@@ -175,9 +176,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  example/module/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/py/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  example/module/Makefile
+	  $(AUTOMAKE) --foreign  src/py/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

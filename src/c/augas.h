@@ -95,7 +95,7 @@ struct augas_host {
        \return the value associated with name.
     */
 
-    const char* (*getenv_)(const char* sname, const char* name);
+    const char* (*getenv_)(const char* name);
 
     /**
        \return the assigned connection-id.

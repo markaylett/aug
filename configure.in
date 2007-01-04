@@ -150,6 +150,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augutilpp/Makefile
                  src/cpp/augas/Makefile
                  src/pl/Makefile
+                 src/py/Makefile
                  src/sh/Makefile
                  vc7/Makefile])
 AC_OUTPUT

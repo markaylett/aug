@@ -226,7 +226,7 @@ namespace augas {
     }
 
     const char*
-    getenv_(const char* sname, const char* name)
+    getenv_(const char* name)
     {
         try {
             return options_.get(name, 0);
