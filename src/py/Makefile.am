@@ -3,4 +3,5 @@ EXTRA_DIST = \
 	log.py \
 	modclient.py \
 	modecho.py \
+	modproxy.py \
 	modskel.py

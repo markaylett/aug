@@ -50,7 +50,8 @@ manager::clear()
     idtofd_.clear();
     files_.clear();
     sesss_.clear();
-    modules_.clear();
+
+    // Modules not released.
 }
 
 void

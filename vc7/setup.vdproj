@@ -45,6 +45,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_35CBA93B61EE4DC4AF97087BE1EAD454"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3CFD807797304D7581D522BF9805E932"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -281,6 +287,26 @@
             {
             "SourcePath" = "8:..\\src\\py\\modecho.py"
             "TargetName" = "8:modecho.py"
+            "Tag" = "8:"
+            "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_35CBA93B61EE4DC4AF97087BE1EAD454"
+            {
+            "SourcePath" = "8:..\\src\\py\\modproxy.py"
+            "TargetName" = "8:modproxy.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
             "Condition" = "8:"
@@ -668,7 +694,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:augas"
         "ProductCode" = "8:{210B4079-4AB6-4491-B94D-63BC120D02F0}"
-        "PackageCode" = "8:{5BC0073E-59BB-445E-8315-E878B73C0514}"
+        "PackageCode" = "8:{5CF0DD53-D55F-4DBB-B56F-24968F0FFAA9}"
         "UpgradeCode" = "8:{89166B9C-C3CB-4DE2-8BE3-DD90993E23EE}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"

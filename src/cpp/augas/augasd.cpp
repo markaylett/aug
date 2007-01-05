@@ -107,10 +107,10 @@ namespace augas {
     struct state {
 
         conncb_base& cb_;
-        aug::conns conns_;
-        timers timers_;
         mplexer mplexer_;
         manager manager_;
+        aug::conns conns_;
+        timers timers_;
         pending pending_;
 
         explicit
@@ -690,7 +690,15 @@ namespace augas {
         do_term()
         {
             AUG_DEBUG2("terminating daemon process");
+
+            // Clear sessions first.
+
             state_->manager_.clear();
+
+            // Modules must be kept alive until remaining connections and
+            // timers have been destroyed: a free_() function may depend on a
+            // function implemented in a module.
+
             state_.reset();
         }
     };

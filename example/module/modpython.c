@@ -116,17 +116,6 @@ printerr_(void)
 }
 
 static PyObject*
-getmodule_(const char* name)
-{
-    PyObject* s, * m;
-    s = PyString_FromString(name);
-    if (!(m = PyImport_Import(s)))
-        printerr_();
-    Py_DECREF(s);
-    return m;
-}
-
-static PyObject*
 getmethod_(PyObject* module, const char* name)
 {
     PyObject* x = PyObject_GetAttrString(module, name);
@@ -180,7 +169,7 @@ createimport_(const char* sname)
         return NULL;
 
     import->open_ = 0;
-    if (!(import->module_ = getmodule_(sname)))
+    if (!(import->module_ = PyImport_ImportModule(sname)))
         goto fail;
 
     import->closesess_ = getmethod_(import->module_, "closesess");
@@ -635,7 +624,8 @@ expire_(const struct augas_sess* sess, int tid, void* user, unsigned* ms)
         PyObject* z = PyObject_CallFunction(import->expire_, "siOO",
                                             sess->name_, tid, x, y);
         if (z) {
-            *ms = PyInt_AsLong(y);
+            if (PyInt_Check(z))
+                *ms = PyInt_AsLong(z);
             Py_DECREF(z);
         } else {
             printerr_();

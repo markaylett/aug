@@ -2,6 +2,7 @@ from augas import *
 from buffer import *
 import log
 
+# string error (void);
 # void reconf (void);
 # void writelog (int level, string msg);
 # void post (string sname, int type, object user);

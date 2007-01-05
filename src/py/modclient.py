@@ -2,11 +2,15 @@ from augas import *
 import log
 
 def opensess(sname):
-    cid = tcpconnect(sname, "localhost", "7001")
-    settimer(sname, 0, 1000, cid)
+    log.info("connecting to client's service")
+    cid = tcpconnect(sname, "localhost", getenv("session.modclient.to"))
+    settimer(sname, 0, 5000, cid)
 
 def expire(sname, tid, user, ms):
     send(sname, user, 'ping', SNDSELF)
 
+def notconn(sname, cid, user):
+    log.info('failed to open client connection')
+
 def data(sname, cid, user, buf):
-    log.debug("data: %s" % buf)
+    log.debug("received: %s" % buf)
