@@ -169,8 +169,10 @@ createimport_(const char* sname)
         return NULL;
 
     import->open_ = 0;
-    if (!(import->module_ = PyImport_ImportModule(sname)))
+    if (!(import->module_ = PyImport_ImportModule(sname))) {
+        printerr_();
         goto fail;
+    }
 
     import->closesess_ = getmethod_(import->module_, "closesess");
     import->opensess_ = getmethod_(import->module_, "opensess");
@@ -696,8 +698,10 @@ openconn_(struct augas_conn* conn, const char* addr, unsigned short port)
 
         if (!(x = PyObject_CallFunction(import->openconn_, "sisH",
                                         conn->sess_->name_, conn->id_, addr,
-                                        port)))
+                                        port))) {
+            printerr_();
             ret = -1;
+        }
 
     } else {
         x = Py_None;
