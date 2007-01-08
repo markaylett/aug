@@ -23,7 +23,7 @@ namespace augas {
         aug::timer rdtimer_;
         aug::timer wrtimer_;
         buffer buffer_;
-        bool open_, shutdown_;
+        bool open_, teardown_, shutdown_;
 
         augas_id
         do_id() const;
@@ -65,6 +65,9 @@ namespace augas {
         cancelrwtimer(unsigned flags);
 
         void
+        teardown();
+
+        void
         notconn() const
         {
             sess_->notconn(conn_);
@@ -83,11 +86,6 @@ namespace augas {
         wrexpire(unsigned& ms) const
         {
             sess_->wrexpire(conn_, ms);
-        }
-        void
-        teardown() const
-        {
-            sess_->teardown(conn_);
         }
         operator augas_conn&()
         {

@@ -46,12 +46,14 @@ module::module(const string& name, const char* path,
 void
 module::closesess(const augas_sess& sess) const
 {
+    AUG_DEBUG2("closesess() for session '%s'", sess.name_);
     module_.closesess_(&sess);
 }
 
 void
 module::opensess(augas_sess& sess) const
 {
+    AUG_DEBUG2("opensess() for session '%s'", sess.name_);
     if (AUGAS_OK != module_.opensess_(&sess))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::opensess_() failed");
@@ -60,6 +62,7 @@ module::opensess(augas_sess& sess) const
 void
 module::event(const augas_sess& sess, int type, void* user) const
 {
+    AUG_DEBUG2("event() for session '%s'", sess.name_);
     if (AUGAS_OK != module_.event_(&sess, type, user))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::event_() failed");
@@ -69,6 +72,7 @@ void
 module::expire(const augas_sess& sess, int tid, void* user,
                unsigned& ms) const
 {
+    AUG_DEBUG2("expire() for session '%s'", sess.name_);
     if (AUGAS_OK != module_.expire_(&sess, tid, user, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::expire_() failed");
@@ -77,6 +81,7 @@ module::expire(const augas_sess& sess, int tid, void* user,
 void
 module::reconf(const augas_sess& sess) const
 {
+    AUG_DEBUG2("reconf() for session '%s'", sess.name_);
     if (AUGAS_OK != module_.reconf_(&sess))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::reconf_() failed");
@@ -85,6 +90,8 @@ module::reconf(const augas_sess& sess) const
 void
 module::closeconn(const augas_conn& conn) const
 {
+    AUG_DEBUG2("closeconn() for session '%s', id '%d'", conn.sess_->name_,
+               conn.id_);
     module_.closeconn_(&conn);
 }
 
@@ -92,6 +99,8 @@ void
 module::openconn(augas_conn& conn, const char* addr,
                  unsigned short port) const
 {
+    AUG_DEBUG2("openconn() for session '%s', id '%d'", conn.sess_->name_,
+               conn.id_);
     if (AUGAS_OK != module_.openconn_(&conn, addr, port))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::openconn_() failed");
@@ -100,12 +109,16 @@ module::openconn(augas_conn& conn, const char* addr,
 void
 module::notconn(const augas_conn& conn) const
 {
+    AUG_DEBUG2("notconn() for session '%s', id '%d'", conn.sess_->name_,
+               conn.id_);
     module_.notconn_(&conn);
 }
 
 void
 module::data(const augas_conn& conn, const char* buf, size_t size) const
 {
+    AUG_DEBUG2("data() for session '%s', id '%d'", conn.sess_->name_,
+               conn.id_);
     if (AUGAS_OK != module_.data_(&conn, buf, size))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::data_() failed");
@@ -114,6 +127,8 @@ module::data(const augas_conn& conn, const char* buf, size_t size) const
 void
 module::rdexpire(const augas_conn& conn, unsigned& ms) const
 {
+    AUG_DEBUG2("rdexpire() for session '%s', id '%d'", conn.sess_->name_,
+               conn.id_);
     if (AUGAS_OK != module_.rdexpire_(&conn, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::rdexpire_() failed");
@@ -122,6 +137,8 @@ module::rdexpire(const augas_conn& conn, unsigned& ms) const
 void
 module::wrexpire(const augas_conn& conn, unsigned& ms) const
 {
+    AUG_DEBUG2("wrexpire() for session '%s', id '%d'", conn.sess_->name_,
+               conn.id_);
     if (AUGAS_OK != module_.wrexpire_(&conn, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::wrexpire_() failed");
@@ -130,6 +147,8 @@ module::wrexpire(const augas_conn& conn, unsigned& ms) const
 void
 module::teardown(const augas_conn& conn) const
 {
+    AUG_DEBUG2("teardown() for session '%s', id '%d'", conn.sess_->name_,
+               conn.id_);
     if (AUGAS_OK != module_.teardown_(&conn))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::teardown_() failed");

@@ -185,19 +185,27 @@ manager::sendother(aug::mplexer& mplexer, augas_id cid, const char* sname,
 void
 manager::teardown()
 {
-    files::iterator it(files_.begin()), end(files_.end());
-    while (it != end) {
+    idtofd::reverse_iterator rit(idtofd_.rbegin()), rend(idtofd_.rend());
+    while (rit != rend) {
+
+        files::iterator it(files_.find(rit->second));
+        if (it == files_.end())
+            throw error(__FILE__, __LINE__, ESTATE, "fd '%d' not found",
+                        rit->second);
 
         connptr cptr(smartptr_cast<conn>(it->second));
         if (null != cptr) {
-            cptr->teardown();
-            ++it;
+            ++rit;
+            try {
+                cptr->teardown();
+            } AUG_PERRINFOCATCH;
             continue;
         }
 
         // Erase listener.
 
-        files_.erase(it++);
+        idtofd_.erase(rit++.base());
+        files_.erase(it);
     }
 }
 

@@ -210,6 +210,7 @@ namespace augas {
     int
     post_(const char* sname, int type, void* user, void (*free)(void*))
     {
+        AUG_DEBUG2("post() for session '%s'", sname);
         try {
 
             auto_ptr<eventarg> arg(new eventarg(sname, user, free));
@@ -237,6 +238,7 @@ namespace augas {
     int
     tcpconnect_(const char* sname, const char* host, const char* serv)
     {
+        AUG_DEBUG2("tcpconnect() for session '%s'", sname);
         try {
 
             sessptr sess(state_->manager_.getsess(sname));
@@ -274,6 +276,7 @@ namespace augas {
     int
     tcplisten_(const char* sname, const char* host, const char* serv)
     {
+        AUG_DEBUG2("tcplisten() for session '%s'", sname);
         try {
 
             endpoint ep(null);
@@ -302,6 +305,7 @@ namespace augas {
     settimer_(const char* sname, int id, unsigned ms, void* arg,
               void (*free)(void*))
     {
+        AUG_DEBUG2("settimer() for session '%s', id '%d'", sname, id);
         try {
 
             var v(arg, free);
@@ -318,6 +322,7 @@ namespace augas {
     int
     resettimer_(const char* sname, int tid, unsigned ms)
     {
+        AUG_DEBUG2("resettimer() for session '%s', id '%d'", sname, tid);
         try {
             return aug_resettimer(cptr(state_->timers_), tid, ms);
         } AUG_SETERRINFOCATCH;
@@ -327,6 +332,7 @@ namespace augas {
     int
     canceltimer_(const char* sname, int tid)
     {
+        AUG_DEBUG2("canceltimer() for session '%s', id '%d'", sname, tid);
         try {
             int ret(aug_canceltimer(cptr(state_->timers_), tid));
 
@@ -345,6 +351,7 @@ namespace augas {
     int
     shutdown_(augas_id cid)
     {
+        AUG_DEBUG2("shutdown() for id '%d'", cid);
         try {
             fileptr file(state_->manager_.getbyid(cid));
             connptr cptr(smartptr_cast<conn>(file));
@@ -361,6 +368,7 @@ namespace augas {
     send_(const char* sname, augas_id cid, const char* buf, size_t size,
           unsigned flags)
     {
+        AUG_DEBUG2("send() for session '%s', id '%d'", sname, cid);
         try {
             switch (flags) {
             case AUGAS_SNDALL:
@@ -390,6 +398,7 @@ namespace augas {
     int
     setrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
+        AUG_DEBUG2("setrwtimer() for id '%d'", cid);
         try {
             connptr conn(smartptr_cast<conn>(state_->manager_.getbyid(cid)));
             if (null == conn)
@@ -404,6 +413,7 @@ namespace augas {
     int
     resetrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
+        AUG_DEBUG2("resetrwtimer() for id '%d'", cid);
         try {
             connptr conn(smartptr_cast<conn>(state_->manager_.getbyid(cid)));
             if (null == conn)
@@ -418,6 +428,7 @@ namespace augas {
     int
     cancelrwtimer_(augas_id cid, unsigned flags)
     {
+        AUG_DEBUG2("cancelrwtimer() for id '%d'", cid);
         try {
             connptr conn(smartptr_cast<conn>(state_->manager_.getbyid(cid)));
             if (null == conn)
@@ -663,26 +674,36 @@ namespace augas {
             int ret(!0);
             while (!stopping_ || !state_->manager_.empty()) {
 
-                if (state_->timers_.empty()) {
+                try {
 
-                    scoped_unblock unblock;
-                    while (AUG_RETINTR == (ret = waitioevents(state_
-                                                              ->mplexer_)))
-                        ;
+                    if (state_->timers_.empty()) {
 
-                } else {
+                        scoped_unblock unblock;
+                        while (AUG_RETINTR == (ret = waitioevents
+                                               (state_->mplexer_)))
+                            ;
 
-                    struct timeval tv;
-                    processtimers(state_->timers_, 0 == ret, tv);
+                    } else {
 
-                    scoped_unblock unblock;
-                    while (AUG_RETINTR == (ret = waitioevents(state_
-                                                              ->mplexer_,
-                                                              tv)))
-                        ;
+                        struct timeval tv;
+                        processtimers(state_->timers_, 0 == ret, tv);
+
+                        scoped_unblock unblock;
+                        while (AUG_RETINTR == (ret = waitioevents
+                                               (state_->mplexer_, tv)))
+                            ;
+                    }
+
+                    processconns(state_->conns_);
+                    continue;
+
+                } catch (const errinfo_error& e) {
+                    perrinfo(e, "aug::errorinfo_error");
+                } catch (const exception& e) {
+                    aug_error("std::exception: %s", e.what());
                 }
-
-                processconns(state_->conns_);
+                stopping_ = true;
+                state_->manager_.teardown();
             }
         }
 

@@ -193,6 +193,10 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/c \
 	-I$(top_srcdir)/src/cpp
 
+EXTRA_DIST = \
+	augasd.conf \
+	augasd.sh
+
 noinst_HEADERS = \
 	buffer.hpp \
 	conn.hpp \

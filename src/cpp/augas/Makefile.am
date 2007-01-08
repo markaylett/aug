@@ -1,5 +1,9 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
+EXTRA_DIST = \
+	augasd.conf \
+	augasd.sh
+
 noinst_HEADERS = \
 	buffer.hpp \
 	conn.hpp \

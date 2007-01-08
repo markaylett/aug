@@ -3,9 +3,9 @@ import log
 
 def opensess(sname):
     log.info("connecting to client's service")
-    for x in xrange(1, 10):
+    for x in xrange(1, 2):
         cid = tcpconnect(sname, "localhost", getenv("session.modclient.to"))
-        settimer(sname, 0, x * 100, cid)
+        settimer(sname, 0, x * 1000, cid)
 
 def expire(sname, tid, user, ms):
     send(sname, user, 'ping', SNDSELF)

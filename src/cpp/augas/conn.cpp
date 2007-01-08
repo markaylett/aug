@@ -34,10 +34,10 @@ void
 conn::do_callback(idref ref, unsigned& ms, aug_timers& timers)
 {
     if (rdtimer_.id() == ref) {
-        aug_debug2("read timer expiry");
+        AUG_DEBUG2("read timer expiry");
         sess_->rdexpire(conn_, ms);
     } else if (wrtimer_.id() == ref) {
-        aug_debug2("write timer expiry");
+        AUG_DEBUG2("write timer expiry");
         sess_->wrexpire(conn_, ms);
     } else
         assert(0);
@@ -58,6 +58,7 @@ conn::conn(const sessptr& sess, const smartfd& sfd, augas_id cid,
       rdtimer_(timers, null),
       wrtimer_(timers, null),
       open_(false),
+      teardown_(false),
       shutdown_(false)
 {
     conn_.sess_ = cptr(*sess_);
@@ -91,7 +92,7 @@ conn::process(mplexer& mplexer)
 
             // Connection closed.
 
-            aug_debug2("closing connection '%d'", sfd_.get());
+            AUG_DEBUG2("closing connection '%d'", sfd_.get());
             return false;
         }
 
@@ -153,8 +154,10 @@ void
 conn::shutdown()
 {
     shutdown_ = true;
-    if (buffer_.empty())
+    if (buffer_.empty()) {
+        AUG_DEBUG2("shutdown() for id '%d'", sfd_.get());
         aug::shutdown(sfd_, SHUT_WR);
+    }
 }
 
 void
@@ -175,4 +178,13 @@ conn::cancelrwtimer(unsigned flags)
 
     if (flags & AUGAS_TIMWR)
         wrtimer_.cancel();
+}
+
+void
+conn::teardown()
+{
+    if (!teardown_) {
+        teardown_ = true;
+        sess_->teardown(conn_);
+    }
 }
