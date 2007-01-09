@@ -33,35 +33,35 @@ namespace {
         return 0;
     }
     void
-    closeconn(const struct augas_conn* conn)
+    close(const struct augas_file* file)
     {
     }
     int
-    openconn(struct augas_conn* conn, const char* addr, unsigned short port)
+    openconn(struct augas_file* file, const char* addr, unsigned short port)
     {
         return 0;
     }
     void
-    notconn(const struct augas_conn* conn)
+    notconn(const struct augas_file* file)
     {
     }
     int
-    data(const struct augas_conn* conn, const char* buf, size_t size)
-    {
-        return 0;
-    }
-    int
-    rdexpire(const struct augas_conn* conn, unsigned* ms)
+    data(const struct augas_file* file, const char* buf, size_t size)
     {
         return 0;
     }
     int
-    wrexpire(const struct augas_conn* conn, unsigned* ms)
+    rdexpire(const struct augas_file* file, unsigned* ms)
     {
         return 0;
     }
     int
-    teardown(const struct augas_conn* conn)
+    wrexpire(const struct augas_file* file, unsigned* ms)
+    {
+        return 0;
+    }
+    int
+    teardown(const struct augas_file* file)
     {
         return 0;
     }
@@ -75,9 +75,8 @@ augas::setdefaults(struct augas_module& dst, const struct augas_module& src)
     dst.event_ = src.event_ ? src.event_ : event;
     dst.expire_ = src.expire_ ? src.expire_ : expire;
     dst.reconf_ = src.reconf_ ? src.reconf_ : reconf;
-    dst.closeconn_ = src.closeconn_ ? src.closeconn_ : closeconn;
+    dst.close_ = src.close_ ? src.close_ : close;
     dst.openconn_ = src.openconn_ ? src.openconn_ : openconn;
-    dst.notconn_ = src.notconn_ ? src.notconn_ : notconn;
     dst.data_ = src.data_ ? src.data_ : data;
     dst.rdexpire_ = src.rdexpire_ ? src.rdexpire_ : rdexpire;
     dst.wrexpire_ = src.wrexpire_ ? src.wrexpire_ : wrexpire;

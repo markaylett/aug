@@ -236,7 +236,8 @@ namespace augas {
     }
 
     int
-    tcpconnect_(const char* sname, const char* host, const char* serv)
+    tcpconnect_(const char* sname, const char* host, const char* serv,
+                void* user)
     {
         AUG_DEBUG2("tcpconnect() for session '%s'", sname);
         try {
@@ -261,7 +262,8 @@ namespace augas {
             augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
                              // uninitialized in this function.
             id = aug_nextid();
-            connptr cptr(new augas::conn(sess, sfd, id, state_->timers_));
+            connptr cptr(new augas::conn(sess, sfd, id, user,
+                                         state_->timers_));
             state_->manager_.insert(cptr);
             try {
                 cptr->open(ep);
@@ -274,7 +276,8 @@ namespace augas {
         return -1;
     }
     int
-    tcplisten_(const char* sname, const char* host, const char* serv)
+    tcplisten_(const char* sname, const char* host, const char* serv,
+               void* user)
     {
         AUG_DEBUG2("tcplisten() for session '%s'", sname);
         try {
@@ -288,7 +291,7 @@ namespace augas {
             augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
                              // uninitialized in this function.
             id = aug_nextid();
-            listenerptr lptr(new augas::listener(sess, sfd, id));
+            listenerptr lptr(new augas::listener(sess, sfd, id, user));
             state_->manager_.insert(lptr);
 
             inetaddr addr(null);
@@ -480,7 +483,7 @@ namespace augas {
     }
 
     void
-    accept_(fdref ref, const sessptr& sess, conncb_base& conncb)
+    accept_(const file_base& file, conncb_base& conncb)
     {
         aug_endpoint ep;
 
@@ -489,7 +492,7 @@ namespace augas {
         smartfd sfd(null);
         try {
 
-            sfd = accept(ref, ep);
+            sfd = accept(file.fd(), ep);
 
         } catch (const errinfo_error& e) {
 
@@ -507,7 +510,8 @@ namespace augas {
         setextdriver_(sfd, conncb, AUG_IOEVENTRD);
 
         augas_id id(aug_nextid());
-        connptr conn(new augas::conn(sess, sfd, id, state_->timers_));
+        connptr conn(new augas::conn(file.sess(), sfd, id, file.user(),
+                                     state_->timers_));
         state_->manager_.insert(conn);
         try {
             conn->open(ep);
@@ -579,7 +583,7 @@ namespace augas {
                 }
 
             } else
-                accept_(fd, file->sess(), *this);
+                accept_(*file, *this);
 
             return true;
         }
@@ -702,8 +706,11 @@ namespace augas {
                 } catch (const exception& e) {
                     aug_error("std::exception: %s", e.what());
                 }
-                stopping_ = true;
-                state_->manager_.teardown();
+
+                if (!stopping_ && !daemon_) {
+                    stopping_ = true;
+                    state_->manager_.teardown();
+                }
             }
         }
 

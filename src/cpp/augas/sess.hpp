@@ -41,40 +41,35 @@ namespace augas {
             module_->reconf(sess_);
         }
         void
-        closeconn(const augas_conn& conn) const
+        close(const augas_file& file) const
         {
-            module_->closeconn(conn);
+            module_->close(file);
         }
         void
-        openconn(augas_conn& conn, const char* addr,
+        openconn(augas_file& file, const char* addr,
                  unsigned short port) const
         {
-            module_->openconn(conn, addr, port);
+            module_->openconn(file, addr, port);
         }
         void
-        notconn(const augas_conn& conn) const
+        data(const augas_file& file, const char* buf, size_t size) const
         {
-            module_->notconn(conn);
+            module_->data(file, buf, size);
         }
         void
-        data(const augas_conn& conn, const char* buf, size_t size) const
+        rdexpire(const augas_file& file, unsigned& ms) const
         {
-            module_->data(conn, buf, size);
+            module_->rdexpire(file, ms);
         }
         void
-        rdexpire(const augas_conn& conn, unsigned& ms) const
+        wrexpire(const augas_file& file, unsigned& ms) const
         {
-            module_->rdexpire(conn, ms);
+            module_->wrexpire(file, ms);
         }
         void
-        wrexpire(const augas_conn& conn, unsigned& ms) const
+        teardown(const augas_file& file) const
         {
-            module_->wrexpire(conn, ms);
-        }
-        void
-        teardown(const augas_conn& conn) const
-        {
-            module_->teardown(conn);
+            module_->teardown(file);
         }
         operator augas_sess&()
         {

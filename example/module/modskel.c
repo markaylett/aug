@@ -40,51 +40,45 @@ reconf_(const struct augas_sess* sess)
 }
 
 static void
-closeconn_(const struct augas_conn* conn)
+close_(const struct augas_file* file)
 {
-    host_->writelog_(AUGAS_LOGINFO, "closeconn_()");
+    host_->writelog_(AUGAS_LOGINFO, "close_()");
 }
 
 static int
-openconn_(struct augas_conn* conn, const char* addr, unsigned short port)
+openconn_(struct augas_file* file, const char* addr, unsigned short port)
 {
     host_->writelog_(AUGAS_LOGINFO, "openconn_()");
     return 0;
 }
 
-static void
-notconn_(const struct augas_conn* conn)
-{
-    host_->writelog_(AUGAS_LOGINFO, "notconn_()");
-}
-
 static int
-data_(const struct augas_conn* conn, const char* buf, size_t size)
+data_(const struct augas_file* file, const char* buf, size_t size)
 {
     host_->writelog_(AUGAS_LOGINFO, "data_()");
-    host_->send_(conn->sess_->name_, conn->id_, buf, size, AUGAS_SNDSELF);
+    host_->send_(file->sess_->name_, file->id_, buf, size, AUGAS_SNDSELF);
     return 0;
 }
 
 static int
-rdexpire_(const struct augas_conn* conn, unsigned* ms)
+rdexpire_(const struct augas_file* file, unsigned* ms)
 {
     host_->writelog_(AUGAS_LOGINFO, "rdexpire_()");
     return 0;
 }
 
 static int
-wrexpire_(const struct augas_conn* conn, unsigned* ms)
+wrexpire_(const struct augas_file* file, unsigned* ms)
 {
     host_->writelog_(AUGAS_LOGINFO, "wrexpire_()");
     return 0;
 }
 
 static int
-teardown_(const struct augas_conn* conn)
+teardown_(const struct augas_file* file)
 {
     host_->writelog_(AUGAS_LOGINFO, "teardown_()");
-    host_->shutdown_(conn->id_);
+    host_->shutdown_(file->id_);
     return 0;
 }
 
@@ -94,9 +88,8 @@ static const struct augas_module fntable_ = {
     event_,
     expire_,
     reconf_,
-    closeconn_,
+    close_,
     openconn_,
-    notconn_,
     data_,
     rdexpire_,
     wrexpire_,

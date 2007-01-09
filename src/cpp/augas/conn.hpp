@@ -13,23 +13,23 @@
 namespace augas {
 
     class conn : public file_base, public aug::timercb_base {
-    public:
-        typedef augas_conn ctype;
-    private:
 
         sessptr sess_;
         aug::smartfd sfd_;
-        augas_conn conn_;
+        augas_file file_;
         aug::timer rdtimer_;
         aug::timer wrtimer_;
         buffer buffer_;
         bool open_, teardown_, shutdown_;
 
-        augas_id
-        do_id() const;
+        augas_file&
+        do_file();
 
         int
         do_fd() const;
+
+        const augas_file&
+        do_file() const;
 
         const sessptr&
         do_sess() const;
@@ -41,7 +41,7 @@ namespace augas {
         ~conn() AUG_NOTHROW;
 
         conn(const sessptr& sess, const aug::smartfd& sfd, augas_id cid,
-             aug::timers& timers);
+             void* user, aug::timers& timers);
 
         void
         open(const aug_endpoint& ep);
@@ -68,32 +68,19 @@ namespace augas {
         teardown();
 
         void
-        notconn() const
-        {
-            sess_->notconn(conn_);
-        }
-        void
         data(const char* buf, size_t size) const
         {
-            sess_->data(conn_, buf, size);
+            sess_->data(file_, buf, size);
         }
         void
         rdexpire(unsigned& ms) const
         {
-            sess_->rdexpire(conn_, ms);
+            sess_->rdexpire(file_, ms);
         }
         void
         wrexpire(unsigned& ms) const
         {
-            sess_->wrexpire(conn_, ms);
-        }
-        operator augas_conn&()
-        {
-            return conn_;
-        }
-        operator const augas_conn&() const
-        {
-            return conn_;
+            sess_->wrexpire(file_, ms);
         }
         bool
         isopen() const

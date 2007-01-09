@@ -12,16 +12,22 @@ using namespace aug;
 using namespace augas;
 using namespace std;
 
-augas_id
-conn::do_id() const
+augas_file&
+conn::do_file()
 {
-    return conn_.id_;
+    return file_;
 }
 
 int
 conn::do_fd() const
 {
     return sfd_.get();
+}
+
+const augas_file&
+conn::do_file() const
+{
+    return file_;
 }
 
 const sessptr&
@@ -35,10 +41,10 @@ conn::do_callback(idref ref, unsigned& ms, aug_timers& timers)
 {
     if (rdtimer_.id() == ref) {
         AUG_DEBUG2("read timer expiry");
-        sess_->rdexpire(conn_, ms);
+        sess_->rdexpire(file_, ms);
     } else if (wrtimer_.id() == ref) {
         AUG_DEBUG2("write timer expiry");
-        sess_->wrexpire(conn_, ms);
+        sess_->wrexpire(file_, ms);
     } else
         assert(0);
 }
@@ -47,12 +53,12 @@ conn::~conn() AUG_NOTHROW
 {
     try {
         if (open_)
-            sess_->closeconn(conn_);
+            sess_->close(file_);
     } AUG_PERRINFOCATCH;
 }
 
 conn::conn(const sessptr& sess, const smartfd& sfd, augas_id cid,
-           timers& timers)
+           void* user, timers& timers)
     : sess_(sess),
       sfd_(sfd),
       rdtimer_(timers, null),
@@ -61,9 +67,9 @@ conn::conn(const sessptr& sess, const smartfd& sfd, augas_id cid,
       teardown_(false),
       shutdown_(false)
 {
-    conn_.sess_ = cptr(*sess_);
-    conn_.id_ = cid;
-    conn_.user_ = 0;
+    file_.sess_ = cptr(*sess_);
+    file_.id_ = cid;
+    file_.user_ = user;
 }
 
 void
@@ -71,7 +77,7 @@ conn::open(const aug_endpoint& ep)
 {
     if (!open_) {
         inetaddr addr(null);
-        sess_->openconn(conn_, inetntop(getinetaddr(ep, addr)).c_str(),
+        sess_->openconn(file_, inetntop(getinetaddr(ep, addr)).c_str(),
                         port(ep));
         open_ = true;
     }
@@ -185,6 +191,6 @@ conn::teardown()
 {
     if (!teardown_) {
         teardown_ = true;
-        sess_->teardown(conn_);
+        sess_->teardown(file_);
     }
 }

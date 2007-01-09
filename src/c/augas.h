@@ -64,7 +64,7 @@ struct augas_sess {
     void* user_;
 };
 
-struct augas_conn {
+struct augas_file {
     const struct augas_sess* sess_;
     augas_id id_;
     void* user_;
@@ -101,8 +101,10 @@ struct augas_host {
        \return the assigned connection-id.
     */
 
-    int (*tcpconnect_)(const char* sname, const char* host, const char* serv);
-    int (*tcplisten_)(const char* sname, const char* host, const char* serv);
+    int (*tcpconnect_)(const char* sname, const char* host, const char* serv,
+                       void* user);
+    int (*tcplisten_)(const char* sname, const char* host, const char* serv,
+                      void* user);
 
     /**
        \return the assigned timer-id.
@@ -135,20 +137,13 @@ struct augas_module {
                    unsigned* ms);
     int (*reconf_)(const struct augas_sess* sess);
 
-    void (*closeconn_)(const struct augas_conn* conn);
-    int (*openconn_)(struct augas_conn* conn, const char* addr,
+    void (*close_)(const struct augas_file* file);
+    int (*openconn_)(struct augas_file* file, const char* addr,
                      unsigned short port);
-
-    /**
-       Notifies the application that a previous call to tcpconnect_() has
-       failed.
-    */
-
-    void (*notconn_)(const struct augas_conn* conn);
-    int (*data_)(const struct augas_conn* conn, const char* buf, size_t size);
-    int (*rdexpire_)(const struct augas_conn* conn, unsigned* ms);
-    int (*wrexpire_)(const struct augas_conn* conn, unsigned* ms);
-    int (*teardown_)(const struct augas_conn* conn);
+    int (*data_)(const struct augas_file* file, const char* buf, size_t size);
+    int (*rdexpire_)(const struct augas_file* file, unsigned* ms);
+    int (*wrexpire_)(const struct augas_file* file, unsigned* ms);
+    int (*teardown_)(const struct augas_file* file);
 };
 
 /**

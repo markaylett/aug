@@ -15,9 +15,8 @@ struct import_ {
     PyObject* event_;
     PyObject* expire_;
     PyObject* reconf_;
-    PyObject* closeconn_;
+    PyObject* close_;
     PyObject* openconn_;
-    PyObject* notconn_;
     PyObject* data_;
     PyObject* rdexpire_;
     PyObject* wrexpire_;
@@ -148,9 +147,8 @@ freeimport_(struct import_* import)
     Py_XDECREF(import->wrexpire_);
     Py_XDECREF(import->rdexpire_);
     Py_XDECREF(import->data_);
-    Py_XDECREF(import->notconn_);
     Py_XDECREF(import->openconn_);
-    Py_XDECREF(import->closeconn_);
+    Py_XDECREF(import->close_);
     Py_XDECREF(import->reconf_);
     Py_XDECREF(import->expire_);
     Py_XDECREF(import->event_);
@@ -179,9 +177,8 @@ createimport_(const char* sname)
     import->event_ = getmethod_(import->module_, "event");
     import->expire_ = getmethod_(import->module_, "expire");
     import->reconf_ = getmethod_(import->module_, "reconf");
-    import->closeconn_ = getmethod_(import->module_, "closeconn");
+    import->close_ = getmethod_(import->module_, "close");
     import->openconn_ = getmethod_(import->module_, "openconn");
-    import->notconn_ = getmethod_(import->module_, "notconn");
     import->data_ = getmethod_(import->module_, "data");
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
@@ -254,16 +251,19 @@ static PyObject*
 pytcpconnect_(PyObject* self, PyObject* args)
 {
     const char* sname, * host, * serv;
+    PyObject* user;
     int cid;
 
-    if (!PyArg_ParseTuple(args, "sss:tcpconnect", &sname, &host, &serv))
+    if (!PyArg_ParseTuple(args, "sssO:tcpconnect", &sname, &host, &serv,
+                          &user))
         return NULL;
 
-    if (-1 == (cid = host_->tcpconnect_(sname, host, serv))) {
+    if (-1 == (cid = host_->tcpconnect_(sname, host, serv, user))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
 
+    Py_INCREF(user);
     return Py_BuildValue("i", cid);
 }
 
@@ -271,16 +271,19 @@ static PyObject*
 pytcplisten_(PyObject* self, PyObject* args)
 {
     const char* sname, * host, * serv;
+    PyObject* user;
     int lid;
 
-    if (!PyArg_ParseTuple(args, "sss:tcplisten", &sname, &host, &serv))
+    if (!PyArg_ParseTuple(args, "sssO:tcplisten", &sname, &host, &serv,
+                          &user))
         return NULL;
 
-    if (-1 == (lid = host_->tcplisten_(sname, host, serv))) {
+    if (-1 == (lid = host_->tcplisten_(sname, host, serv, user))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
 
+    Py_INCREF(user);
     return Py_BuildValue("i", lid);
 }
 
@@ -659,17 +662,17 @@ reconf_(const struct augas_sess* sess)
 }
 
 static void
-closeconn_(const struct augas_conn* conn)
+close_(const struct augas_file* file)
 {
-    struct import_* import = conn->sess_->user_;
-    PyObject* x = conn->user_;
-    assert(conn->user_);
-    assert(conn->sess_->user_);
+    struct import_* import = file->sess_->user_;
+    PyObject* x = file->user_;
+    assert(file->user_);
+    assert(file->sess_->user_);
 
-    if (import->closeconn_) {
+    if (import->close_) {
 
-        PyObject* y = PyObject_CallFunction(import->closeconn_, "siO",
-                                            conn->sess_->name_, conn->id_, x);
+        PyObject* y = PyObject_CallFunction(import->close_, "siO",
+                                            file->sess_->name_, file->id_, x);
         if (y) {
             Py_DECREF(y);
         } else
@@ -679,66 +682,47 @@ closeconn_(const struct augas_conn* conn)
 }
 
 static int
-openconn_(struct augas_conn* conn, const char* addr, unsigned short port)
+openconn_(struct augas_file* file, const char* addr, unsigned short port)
 {
-    struct import_* import = conn->sess_->user_;
-    PyObject* x;
+    struct import_* import = file->sess_->user_;
+    PyObject* x = file->user_, * y;
     int ret = 0;
-    assert(conn->sess_->user_);
+    assert(file->user_);
+    assert(file->sess_->user_);
 
     if (import->openconn_) {
 
-        if (!(x = PyObject_CallFunction(import->openconn_, "sisH",
-                                        conn->sess_->name_, conn->id_, addr,
-                                        port))) {
+        if (!(y = PyObject_CallFunction(import->openconn_, "siOsH",
+                                        file->sess_->name_, file->id_, x,
+                                        addr, port))) {
             printerr_();
             ret = -1;
         }
 
     } else {
-        x = Py_None;
-        Py_INCREF(x);
+        y = Py_None;
+        Py_INCREF(y);
     }
 
-    conn->user_ = x;
+    Py_DECREF(x);
+    file->user_ = y;
     return ret;
 }
 
-static void
-notconn_(const struct augas_conn* conn)
-{
-    struct import_* import = conn->sess_->user_;
-    PyObject* x = conn->user_;
-    assert(conn->user_);
-    assert(conn->sess_->user_);
-
-    if (import->notconn_) {
-
-        PyObject* y = PyObject_CallFunction(import->notconn_, "siO",
-                                            conn->sess_->name_, conn->id_, x);
-        if (y) {
-            Py_DECREF(y);
-        } else
-            printerr_();
-
-    }
-    Py_DECREF(x);
-}
-
 static int
-data_(const struct augas_conn* conn, const char* buf, size_t size)
+data_(const struct augas_file* file, const char* buf, size_t size)
 {
-    struct import_* import = conn->sess_->user_;
+    struct import_* import = file->sess_->user_;
     int ret = 0;
-    assert(conn->user_);
-    assert(conn->sess_->user_);
+    assert(file->user_);
+    assert(file->sess_->user_);
 
     if (import->data_) {
 
-        PyObject* x = conn->user_;
+        PyObject* x = file->user_;
         PyObject* y = PyBuffer_FromMemory((void*)buf, size);
         PyObject* z = PyObject_CallFunction(import->data_, "siOO",
-                                            conn->sess_->name_, conn->id_, x,
+                                            file->sess_->name_, file->id_, x,
                                             y);
         if (z) {
             Py_DECREF(z);
@@ -752,19 +736,19 @@ data_(const struct augas_conn* conn, const char* buf, size_t size)
 }
 
 static int
-rdexpire_(const struct augas_conn* conn, unsigned* ms)
+rdexpire_(const struct augas_file* file, unsigned* ms)
 {
-    struct import_* import = conn->sess_->user_;
+    struct import_* import = file->sess_->user_;
     int ret = 0;
-    assert(conn->user_);
-    assert(conn->sess_->user_);
+    assert(file->user_);
+    assert(file->sess_->user_);
 
     if (import->rdexpire_) {
 
-        PyObject* x = conn->user_;
+        PyObject* x = file->user_;
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->rdexpire_, "siOO",
-                                            conn->sess_->name_, conn->id_, x,
+                                            file->sess_->name_, file->id_, x,
                                             y);
         if (z) {
             *ms = PyInt_AsLong(y);
@@ -780,19 +764,19 @@ rdexpire_(const struct augas_conn* conn, unsigned* ms)
 }
 
 static int
-wrexpire_(const struct augas_conn* conn, unsigned* ms)
+wrexpire_(const struct augas_file* file, unsigned* ms)
 {
-    struct import_* import = conn->sess_->user_;
+    struct import_* import = file->sess_->user_;
     int ret = 0;
-    assert(conn->user_);
-    assert(conn->sess_->user_);
+    assert(file->user_);
+    assert(file->sess_->user_);
 
     if (import->wrexpire_) {
 
-        PyObject* x = conn->user_;
+        PyObject* x = file->user_;
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->wrexpire_, "siOO",
-                                            conn->sess_->name_, conn->id_, x,
+                                            file->sess_->name_, file->id_, x,
                                             y);
         if (z) {
             *ms = PyInt_AsLong(y);
@@ -808,18 +792,18 @@ wrexpire_(const struct augas_conn* conn, unsigned* ms)
 }
 
 static int
-teardown_(const struct augas_conn* conn)
+teardown_(const struct augas_file* file)
 {
-    struct import_* import = conn->sess_->user_;
-    PyObject* x = conn->user_;
+    struct import_* import = file->sess_->user_;
+    PyObject* x = file->user_;
     int ret = 0;
-    assert(conn->user_);
-    assert(conn->sess_->user_);
+    assert(file->user_);
+    assert(file->sess_->user_);
 
     if (import->teardown_) {
 
         PyObject* y = PyObject_CallFunction(import->teardown_, "siO",
-                                            conn->sess_->name_, conn->id_, x);
+                                            file->sess_->name_, file->id_, x);
         if (y) {
             Py_DECREF(y);
         } else {
@@ -828,7 +812,7 @@ teardown_(const struct augas_conn* conn)
         }
 
     } else
-        host_->shutdown_(conn->id_);
+        host_->shutdown_(file->id_);
 
     return ret;
 }
@@ -839,9 +823,8 @@ static const struct augas_module fntable_ = {
     event_,
     expire_,
     reconf_,
-    closeconn_,
+    close_,
     openconn_,
-    notconn_,
     data_,
     rdexpire_,
     wrexpire_,
