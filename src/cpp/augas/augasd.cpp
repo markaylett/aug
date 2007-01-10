@@ -75,7 +75,6 @@ namespace augas {
         aug::chdir(rundir_);
         if (daemon_) {
 
-            const char* logdir(options_.get("rundir", "."));
             aug::chdir(options_.get("logdir", "."));
             realpath(logdir_, getcwd().c_str(), sizeof(logdir_));
 
