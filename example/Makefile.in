@@ -168,8 +168,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 SUBDIRS = \
 	cpp \
-	httpd \
-	module
+	httpd
 
 all: all-recursive
 

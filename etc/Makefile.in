@@ -168,12 +168,12 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	augasd.conf \
+	augasd.conf.default \
 	augres.reg
 
 etcdir = $(prefix)/etc
 etc_DATA = \
-	augasd.conf \
+	augasd.conf.default \
 	augres.reg
 
 all: all-am

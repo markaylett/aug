@@ -38,7 +38,8 @@ namespace augas {
         insert(const fileptr& file);
 
         void
-        load(const options& options, const augas_host& host);
+        load(const char* rundir, const options& options,
+             const augas_host& host);
 
         bool
         sendall(aug::mplexer& mplexer, augas_id cid, const char* sname,

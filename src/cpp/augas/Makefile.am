@@ -37,3 +37,19 @@ augasd_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
+
+PY_CFLAGS=`sh $(top_srcdir)/src/sh/pyflags -c`
+PY_LDFLAGS=`sh $(top_srcdir)/src/sh/pyflags -l`
+AM_CFLAGS = $(PY_CFLAGS)
+
+moddir = $(prefix)/mod
+
+mod_LTLIBRARIES = modpython.la
+modpython_la_SOURCES = modpython.c
+modpython_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
+modpython_la_LIBADD =
+
+mod_LTLIBRARIES += modskel.la
+modskel_la_SOURCES = modskel.c
+modskel_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
+modskel_la_LIBADD =

@@ -5,3 +5,12 @@ EXTRA_DIST = \
 	modecho.py \
 	modproxy.py \
 	modskel.py
+
+pythondir = $(prefix)/python
+python_DATA = \
+	buffer.py \
+	log.py \
+	modclient.py \
+	modecho.py \
+	modproxy.py \
+	modskel.py

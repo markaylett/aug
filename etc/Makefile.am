@@ -1,8 +1,8 @@
 EXTRA_DIST = \
-	augasd.conf \
+	augasd.conf.default \
 	augres.reg
 
 etcdir = $(prefix)/etc
 etc_DATA = \
-	augasd.conf \
+	augasd.conf.default \
 	augres.reg

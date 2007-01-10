@@ -39,6 +39,27 @@ free_(void* arg)
     Py_DECREF(x);
 }
 
+static PyObject*
+inctrue_(void)
+{
+    Py_INCREF(Py_True);
+    return Py_True;
+}
+
+static PyObject*
+incfalse_(void)
+{
+    Py_INCREF(Py_False);
+    return Py_False;
+}
+
+static PyObject*
+incnone_(void)
+{
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static void
 setpath_(void)
 {
@@ -198,7 +219,7 @@ pyreconf_(PyObject* self, PyObject* args)
         return NULL;
 
     host_->reconf_();
-    Py_RETURN_NONE;
+    return incnone_();
 }
 
 static PyObject*
@@ -211,7 +232,7 @@ pywritelog_(PyObject* self, PyObject* args)
         return NULL;
 
     host_->writelog_(level, "%s", msg);
-    Py_RETURN_NONE;
+    return incnone_();
 }
 
 static PyObject*
@@ -230,7 +251,7 @@ pypost_(PyObject* self, PyObject* args)
     }
 
     Py_INCREF(user);
-    Py_RETURN_NONE;
+    return incnone_();
 }
 
 static PyObject*
@@ -242,7 +263,7 @@ pygetenv_(PyObject* self, PyObject* args)
         return NULL;
 
     if (!(value = host_->getenv_(name)))
-        Py_RETURN_NONE;
+        return incnone_();
 
     return Py_BuildValue("s", value);
 }
@@ -322,10 +343,10 @@ pyresettimer_(PyObject* self, PyObject* args)
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     case AUGAS_NONE:
-        Py_RETURN_FALSE;
+        return incfalse_();
     }
 
-    Py_RETURN_TRUE;
+    return inctrue_();
 }
 
 static PyObject*
@@ -342,10 +363,10 @@ pycanceltimer_(PyObject* self, PyObject* args)
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     case AUGAS_NONE:
-        Py_RETURN_FALSE;
+        return incfalse_();
     }
 
-    Py_RETURN_TRUE;
+    return inctrue_();
 }
 
 static PyObject*
@@ -361,7 +382,7 @@ pyshutdown_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    Py_RETURN_NONE;
+    return incnone_();
 }
 
 static PyObject*
@@ -382,7 +403,7 @@ pysend_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    Py_RETURN_NONE;
+    return incnone_();
 }
 
 static PyObject*
@@ -399,7 +420,7 @@ pysetrwtimer_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    Py_RETURN_NONE;
+    return incnone_();
 }
 
 static PyObject*
@@ -416,7 +437,7 @@ pyresetrwtimer_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    Py_RETURN_NONE;
+    return incnone_();
 }
 
 static PyObject*
@@ -432,7 +453,7 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    Py_RETURN_NONE;
+    return incnone_();
 }
 
 /**

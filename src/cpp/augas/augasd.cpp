@@ -466,7 +466,7 @@ namespace augas {
     load_(conncb_base& cb)
     {
         AUG_DEBUG2("loading sessions");
-        state_->manager_.load(options_, host_);
+        state_->manager_.load(rundir_, options_, host_);
 
         // Remove any timers allocated to sessions that could not be opened.
 

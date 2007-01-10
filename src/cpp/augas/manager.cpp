@@ -69,7 +69,8 @@ manager::insert(const fileptr& file)
 }
 
 void
-manager::load(const options& options, const augas_host& host)
+manager::load(const char* rundir, const options& options,
+              const augas_host& host)
 {
     // TODO: allow each session to specify a list of sessions on which it
     // depends.
@@ -99,6 +100,7 @@ manager::load(const options& options, const augas_host& host)
                                         .append(".path")));
 
                 aug_info("loading module '%s'", value.c_str());
+                aug::chdir(rundir);
                 moduleptr module(new augas::module(value, path.c_str(),
                                                    host));
                 it = modules_.insert(make_pair(value, module)).first;

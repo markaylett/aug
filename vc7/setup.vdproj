@@ -57,6 +57,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4949A76E3E3C4C45B7374520F10551EB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4BB3B10F7E66429BA00160F54931CB1D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -94,12 +100,6 @@
         "Entry"
         {
         "MsmKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7600BA5FBA2044409A155A4489A86DCF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -343,6 +343,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_4949A76E3E3C4C45B7374520F10551EB"
+            {
+            "SourcePath" = "8:..\\etc\\augasd.conf.default"
+            "TargetName" = "8:augasd.conf.default"
+            "Tag" = "8:"
+            "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_4BB3B10F7E66429BA00160F54931CB1D"
             {
             "SourcePath" = "8:start.bat"
@@ -443,26 +463,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_7600BA5FBA2044409A155A4489A86DCF"
-            {
-            "SourcePath" = "8:..\\etc\\augasd.conf"
-            "TargetName" = "8:augasd.conf.default"
-            "Tag" = "8:"
-            "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_9B84652AEA4F4980896DA4DDBB7F39CC"
             {
             "SourcePath" = "8:reconf.bat"
@@ -488,7 +488,7 @@
             "SourcePath" = "8:python25.dll"
             "TargetName" = "8:python25.dll"
             "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -599,6 +599,17 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_0A56689C8E9D472A823ECE14BB0E848C"
+                    {
+                    "Name" = "8:mod"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_82F27A6DEB054139AC254754470FA2B0"
+                        "Folders"
+                        {
+                        }
+                    }
                     "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_5E5D8A6D5D904345AEB5F68D66FF9128"
                     {
                     "Name" = "8:include"
@@ -694,7 +705,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:augas"
         "ProductCode" = "8:{210B4079-4AB6-4491-B94D-63BC120D02F0}"
-        "PackageCode" = "8:{5CF0DD53-D55F-4DBB-B56F-24968F0FFAA9}"
+        "PackageCode" = "8:{8BEB6410-76A3-45E3-91D0-FDC748BEA367}"
         "UpgradeCode" = "8:{89166B9C-C3CB-4DE2-8BE3-DD90993E23EE}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -1327,7 +1338,7 @@
             "SourcePath" = "8:bin\\modpython.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1355,7 +1366,7 @@
             "SourcePath" = "8:"
             "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

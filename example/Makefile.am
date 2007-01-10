@@ -1,4 +1,3 @@
 SUBDIRS = \
 	cpp \
-	httpd \
-	module
+	httpd
