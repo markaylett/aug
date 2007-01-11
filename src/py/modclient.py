@@ -5,9 +5,13 @@ class State:
     def __del__(self):
         log.info("destroying State object")        
     
-    def __init__(self, cid):
+    def __init__(self, sname, cid):
         self.cid = cid
-        self.n = 1000
+        self.tid = settimer(sname, 0, 100, self)
+        self.n = 10
+
+    def cancel(self, sname):
+        canceltimer(sname, self.tid)
 
     def done(self):
         self.n = self.n - 1
@@ -18,9 +22,12 @@ def opensess(sname):
     for x in xrange(1, 5):
         tcpconnect(sname, "localhost", getenv("session.modclient.to"), None)
 
+def close(sname, id, user):
+    user.cancel(sname)
+
 def openconn(sname, cid, user, addr, port):
     log.info("client established, starting timer")
-    settimer(sname, 0, 100, State(cid))
+    return State(sname, cid)
 
 def expire(sname, tid, user, ms):
     if not user.done():

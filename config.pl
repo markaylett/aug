@@ -79,6 +79,7 @@ my (
     $gcc,
     $strict,
     $debug,
+    $python,
     $mt,
     $libtype
     );
@@ -120,6 +121,7 @@ if ($CYGWIN_MINGW == $toolset) {
 }
 $strict = valueask ("strict build", 'n');
 $debug = valueask ("debug build", 'n');
+$python = valueask ("python support", 'y');
 $mt = valueask ("multi-threaded", 'y');
 $libtype = listask ("library type", $BOTH, \%LIBTYPE);
 
@@ -157,6 +159,8 @@ print FILE "AUG_HOME='$prefix'; export AUG_HOME\n";
 $options = "--prefix=\$AUG_HOME";
 $options .= " \\\n\t--enable-maintainer-mode"
     if is $maintainer;
+$options .= " \\\n\t--disable-python"
+    unless is $python;
 $options .= " \\\n\t--disable-threads"
     unless is $mt;
 

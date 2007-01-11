@@ -57,6 +57,8 @@ manager::clear()
 void
 manager::erase(const file_base& file)
 {
+    AUG_DEBUG2("erasing id '%d', fd '%d'", file.id(), file.fd());
+
     idtofd_.erase(file.id());
     files_.erase(file.fd());
 }
@@ -64,6 +66,8 @@ manager::erase(const file_base& file)
 void
 manager::insert(const fileptr& file)
 {
+    AUG_DEBUG2("inserting id '%d', fd '%d'", file->id(), file->fd());
+
     files_.insert(make_pair(file->fd(), file));
     idtofd_.insert(make_pair(file->id(), file->fd()));
 }
@@ -190,6 +194,8 @@ manager::teardown()
     idtofd::reverse_iterator rit(idtofd_.rbegin()), rend(idtofd_.rend());
     while (rit != rend) {
 
+        AUG_DEBUG2("teardown id '%d', fd '%d'", rit->first, rit->second);
+
         files::iterator it(files_.find(rit->second));
         if (it == files_.end())
             throw error(__FILE__, __LINE__, ESTATE, "fd '%d' not found",
@@ -204,9 +210,10 @@ manager::teardown()
             continue;
         }
 
-        // Erase listener.
+        // Pre-increment, not post-increment: base() points to the element
+        // after the one the reverse_iterator refers to.
 
-        idtofd_.erase(rit++.base());
+        idtofd_.erase((++rit).base());
         files_.erase(it);
     }
 }

@@ -42,6 +42,7 @@ LIBOBJDIR =
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 bin_PROGRAMS = augasd$(EXEEXT)
+@ENABLE_PYTHON_TRUE@am__append_1 = modpython.la
 subdir = src/cpp/augas
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -60,8 +61,10 @@ am__installdirs = "$(DESTDIR)$(moddir)" "$(DESTDIR)$(bindir)"
 modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
 modpython_la_DEPENDENCIES =
-am_modpython_la_OBJECTS = modpython.lo
+am__modpython_la_SOURCES_DIST = modpython.c
+@ENABLE_PYTHON_TRUE@am_modpython_la_OBJECTS = modpython.lo
 modpython_la_OBJECTS = $(am_modpython_la_OBJECTS)
+@ENABLE_PYTHON_TRUE@am_modpython_la_rpath = -rpath $(moddir)
 modskel_la_DEPENDENCIES =
 am_modskel_la_OBJECTS = modskel.lo
 modskel_la_OBJECTS = $(am_modskel_la_OBJECTS)
@@ -97,7 +100,7 @@ CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(modpython_la_SOURCES) $(modskel_la_SOURCES) \
 	$(augasd_SOURCES)
-DIST_SOURCES = $(modpython_la_SOURCES) $(modskel_la_SOURCES) \
+DIST_SOURCES = $(am__modpython_la_SOURCES_DIST) $(modskel_la_SOURCES) \
 	$(augasd_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
@@ -132,6 +135,8 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_PYTHON_FALSE = @ENABLE_PYTHON_FALSE@
+ENABLE_PYTHON_TRUE = @ENABLE_PYTHON_TRUE@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
@@ -254,17 +259,17 @@ augasd_LDADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-PY_CFLAGS = `sh $(top_srcdir)/src/sh/pyflags -c`
-PY_LDFLAGS = `sh $(top_srcdir)/src/sh/pyflags -l`
-AM_CFLAGS = $(PY_CFLAGS)
 moddir = $(prefix)/mod
-mod_LTLIBRARIES = modpython.la modskel.la
-modpython_la_SOURCES = modpython.c
-modpython_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
-modpython_la_LIBADD = 
+mod_LTLIBRARIES = modskel.la $(am__append_1)
 modskel_la_SOURCES = modskel.c
 modskel_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modskel_la_LIBADD = 
+@ENABLE_PYTHON_TRUE@PY_CFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -c`
+@ENABLE_PYTHON_TRUE@PY_LDFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -l`
+@ENABLE_PYTHON_TRUE@AM_CFLAGS = $(PY_CFLAGS)
+@ENABLE_PYTHON_TRUE@modpython_la_SOURCES = modpython.c
+@ENABLE_PYTHON_TRUE@modpython_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
+@ENABLE_PYTHON_TRUE@modpython_la_LIBADD = 
 all: all-am
 
 .SUFFIXES:
@@ -326,7 +331,7 @@ clean-modLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 modpython.la: $(modpython_la_OBJECTS) $(modpython_la_DEPENDENCIES) 
-	$(LINK) -rpath $(moddir) $(modpython_la_LDFLAGS) $(modpython_la_OBJECTS) $(modpython_la_LIBADD) $(LIBS)
+	$(LINK) $(am_modpython_la_rpath) $(modpython_la_LDFLAGS) $(modpython_la_OBJECTS) $(modpython_la_LIBADD) $(LIBS)
 modskel.la: $(modskel_la_OBJECTS) $(modskel_la_DEPENDENCIES) 
 	$(LINK) -rpath $(moddir) $(modskel_la_LDFLAGS) $(modskel_la_OBJECTS) $(modskel_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)

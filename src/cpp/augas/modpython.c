@@ -24,11 +24,6 @@ struct import_ {
     int open_;
 };
 
-struct link_ {
-    PyObject* object_;
-    struct link_* next_;
-};
-
 static const struct augas_host* host_ = NULL;
 static PyObject* pyaugas_ = NULL;
 
@@ -90,8 +85,10 @@ setpath_(void)
                                  buf);
 
                 PyList_Insert(path, 0, dir);
+
                 Py_DECREF(dir);
             }
+
             Py_DECREF(path);
         }
 
@@ -123,6 +120,7 @@ printerr_(void)
         Py_DECREF(message);
         Py_DECREF(empty);
         Py_DECREF(list);
+
         Py_DECREF(module);
 
     } else
@@ -138,10 +136,11 @@ printerr_(void)
 static PyObject*
 getmethod_(PyObject* module, const char* name)
 {
-    PyObject* x = PyObject_GetAttrString(module, name);
+    PyObject* x = PyObject_GetAttrString(module, (char*)name);
     if (x) {
         if (!PyCallable_Check(x)) {
             Py_DECREF(x);
+            x = NULL;
         }
     } else
         PyErr_Clear();
@@ -188,7 +187,7 @@ createimport_(const char* sname)
         return NULL;
 
     import->open_ = 0;
-    if (!(import->module_ = PyImport_ImportModule(sname))) {
+    if (!(import->module_ = PyImport_ImportModule((char*)sname))) {
         printerr_();
         goto fail;
     }
@@ -545,6 +544,8 @@ pycreate_(void)
 {
     Py_Initialize();
     setpath_();
+
+    /* Py_InitModule() returns a borrowed reference. */
 
     if (!(pyaugas_ = Py_InitModule("augas", pymethods_)))
         goto fail;
