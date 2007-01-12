@@ -44,7 +44,10 @@ namespace augas {
              void* user, aug::timers& timers);
 
         void
-        open(const aug_endpoint& ep);
+        accept(const aug_endpoint& ep);
+
+        void
+        connect(const aug_endpoint& ep);
 
         bool
         process(aug::mplexer& mplexer);

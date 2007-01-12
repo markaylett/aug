@@ -51,8 +51,11 @@ namespace augas {
         close(const augas_file& file) const;
 
         void
-        openconn(augas_file& file, const char* addr,
-                 unsigned short port) const;
+        accept(augas_file& file, const char* addr, unsigned short port) const;
+
+        void
+        connect(augas_file& file, const char* addr,
+                unsigned short port) const;
 
         void
         data(const augas_file& file, const char* buf, size_t size) const;

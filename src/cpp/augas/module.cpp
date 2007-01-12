@@ -96,14 +96,23 @@ module::close(const augas_file& file) const
 }
 
 void
-module::openconn(augas_file& file, const char* addr,
-                 unsigned short port) const
+module::accept(augas_file& file, const char* addr, unsigned short port) const
 {
-    AUG_DEBUG2("openconn() for session '%s', id '%d'", file.sess_->name_,
+    AUG_DEBUG2("accept() for session '%s', id '%d'", file.sess_->name_,
                file.id_);
-    if (AUGAS_OK != module_.openconn_(&file, addr, port))
+    if (AUGAS_OK != module_.accept_(&file, addr, port))
         throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::openconn_() failed");
+                    "augas_module::accept_() failed");
+}
+
+void
+module::connect(augas_file& file, const char* addr, unsigned short port) const
+{
+    AUG_DEBUG2("connect() for session '%s', id '%d'", file.sess_->name_,
+               file.id_);
+    if (AUGAS_OK != module_.connect_(&file, addr, port))
+        throw error(__FILE__, __LINE__, EMODCALL,
+                    "augas_module::connect_() failed");
 }
 
 void

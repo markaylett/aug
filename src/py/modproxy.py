@@ -16,13 +16,12 @@ def close(sname, id, user):
         del pairs[to]
         shutdown(to)
 
-def openconn(sname, cid, user, addr, port):
+def accept(sname, cid, user, addr, port):
     global pairs
-    if user == None:
-        log.info("opening proxy pair")
-        to = tcpconnect(sname, "localhost", getenv("session.modproxy.to"), cid)
-        pairs[cid] = to
-        pairs[to] = cid
+    log.info("opening proxy pair")
+    to = tcpconnect(sname, "localhost", getenv("session.modproxy.to"), cid)
+    pairs[cid] = to
+    pairs[to] = cid
 
 def data(sname, cid, user, buf):
     send(sname, pairs[cid], buf, SNDSELF)

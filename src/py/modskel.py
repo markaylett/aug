@@ -4,6 +4,7 @@ import log
 
 # string error (void);
 # void reconf (void);
+# void stop (void);
 # void writelog (int level, string msg);
 # void post (string sname, int type, object user);
 # string getenv (string name);
@@ -37,10 +38,13 @@ def reconf(sname):
 def close(sname, id, user):
     log.debug("closeconn(): %s" % sname)
 
-def openconn(sname, cid, user, addr, port):
-    log.debug("openconn(): %s" % sname)
+def accept(sname, cid, user, addr, port):
+    log.debug("accept(): %s" % sname)
     setrwtimer(cid, 5000, TIMRD)
     return Buffer()
+
+def connect(sname, cid, user, addr, port):
+    log.debug("connect(): %s" % sname)
 
 def data(sname, cid, user, buf):
     log.debug("data(): %s" % sname)

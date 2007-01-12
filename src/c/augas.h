@@ -82,6 +82,7 @@ struct augas_host {
 
     const char* (*error_)(void);
     void (*reconf_)(void);
+    void (*stop_)(void);
     void (*writelog_)(int level, const char* format, ...);
     void (*vwritelog_)(int level, const char* format, va_list args);
     int (*post_)(const char* sname, int type, void* user,
@@ -138,8 +139,10 @@ struct augas_module {
     int (*reconf_)(const struct augas_sess* sess);
 
     void (*close_)(const struct augas_file* file);
-    int (*openconn_)(struct augas_file* file, const char* addr,
-                     unsigned short port);
+    int (*accept_)(struct augas_file* file, const char* addr,
+                   unsigned short port);
+    int (*connect_)(struct augas_file* file, const char* addr,
+                    unsigned short port);
     int (*data_)(const struct augas_file* file, const char* buf, size_t size);
     int (*rdexpire_)(const struct augas_file* file, unsigned* ms);
     int (*wrexpire_)(const struct augas_file* file, unsigned* ms);

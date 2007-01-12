@@ -46,9 +46,16 @@ close_(const struct augas_file* file)
 }
 
 static int
-openconn_(struct augas_file* file, const char* addr, unsigned short port)
+accept_(struct augas_file* file, const char* addr, unsigned short port)
 {
-    host_->writelog_(AUGAS_LOGINFO, "openconn_()");
+    host_->writelog_(AUGAS_LOGINFO, "accept_()");
+    return 0;
+}
+
+static int
+connect_(struct augas_file* file, const char* addr, unsigned short port)
+{
+    host_->writelog_(AUGAS_LOGINFO, "connect_()");
     return 0;
 }
 
@@ -89,7 +96,8 @@ static const struct augas_module fntable_ = {
     expire_,
     reconf_,
     close_,
-    openconn_,
+    accept_,
+    connect_,
     data_,
     rdexpire_,
     wrexpire_,

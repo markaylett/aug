@@ -174,10 +174,21 @@ namespace augas {
         return aug_errdesc;
     }
 
+    // Thread-safe.
+
     void
     reconf_()
     {
         aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
+        writeevent(aug_eventout(), e);
+    }
+
+    // Thread-safe.
+
+    void
+    stop_()
+    {
+        aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
         writeevent(aug_eventout(), e);
     }
 
@@ -265,7 +276,7 @@ namespace augas {
                                          state_->timers_));
             state_->manager_.insert(cptr);
             try {
-                cptr->open(ep);
+                cptr->connect(ep);
             } catch (...) {
                 state_->manager_.erase(*cptr);
             }
@@ -343,7 +354,7 @@ namespace augas {
             // aug_canceltimer() will return false for the timer being
             // expired.
 
-            if (0 < ret)
+            if (0 == ret)
                 state_->pending_.erase(tid);
             return ret;
         } AUG_SETERRINFOCATCH;
@@ -445,6 +456,7 @@ namespace augas {
     const struct augas_host host_ = {
         error_,
         reconf_,
+        stop_,
         writelog_,
         vwritelog_,
         post_,
@@ -513,7 +525,7 @@ namespace augas {
                                      state_->timers_));
         state_->manager_.insert(conn);
         try {
-            conn->open(ep);
+            conn->accept(ep);
         } catch (...) {
             state_->manager_.erase(*conn);
         }
@@ -542,6 +554,9 @@ namespace augas {
             AUG_DEBUG2("received AUG_EVENTSTOP");
             stopping_ = true;
             state_->manager_.teardown();
+            break;
+        case AUG_EVENTSIGNAL:
+            AUG_DEBUG2("received AUG_EVENTSIGNAL");
             break;
         default:
             assert(AUG_VTPTR == event.arg_.type_);

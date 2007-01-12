@@ -73,12 +73,23 @@ conn::conn(const sessptr& sess, const smartfd& sfd, augas_id cid,
 }
 
 void
-conn::open(const aug_endpoint& ep)
+conn::accept(const aug_endpoint& ep)
 {
     if (!open_) {
         inetaddr addr(null);
-        sess_->openconn(file_, inetntop(getinetaddr(ep, addr)).c_str(),
-                        port(ep));
+        sess_->accept(file_, inetntop(getinetaddr(ep, addr)).c_str(),
+                      port(ep));
+        open_ = true;
+    }
+}
+
+void
+conn::connect(const aug_endpoint& ep)
+{
+    if (!open_) {
+        inetaddr addr(null);
+        sess_->connect(file_, inetntop(getinetaddr(ep, addr)).c_str(),
+                       port(ep));
         open_ = true;
     }
 }

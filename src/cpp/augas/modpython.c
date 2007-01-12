@@ -16,7 +16,8 @@ struct import_ {
     PyObject* expire_;
     PyObject* reconf_;
     PyObject* close_;
-    PyObject* openconn_;
+    PyObject* accept_;
+    PyObject* connect_;
     PyObject* data_;
     PyObject* rdexpire_;
     PyObject* wrexpire_;
@@ -26,12 +27,26 @@ struct import_ {
 
 static const struct augas_host* host_ = NULL;
 static PyObject* pyaugas_ = NULL;
+static unsigned refs_ = 0;
 
 static void
-free_(void* arg)
+release_(void* user)
 {
-    PyObject* x = arg;
+    PyObject* x = user;
+    --refs_;
+    if (host_)
+        host_->writelog_(AUGAS_LOGDEBUG,
+                         "releasing python object, %u remaining", refs_);
     Py_DECREF(x);
+}
+
+static void
+retain_(PyObject* user)
+{
+    ++refs_;
+    host_->writelog_(AUGAS_LOGDEBUG,
+                     "retaining python object, %u remaining", refs_);
+    Py_INCREF(user);
 }
 
 static PyObject*
@@ -105,6 +120,8 @@ printerr_(void)
     if (!PyErr_Occurred())
         return;
 
+    /* Returns owned references. */
+
     PyErr_Fetch(&type, &value, &traceback);
     if ((module = PyImport_ImportModule("traceback"))) {
 
@@ -167,15 +184,16 @@ freeimport_(struct import_* import)
     Py_XDECREF(import->wrexpire_);
     Py_XDECREF(import->rdexpire_);
     Py_XDECREF(import->data_);
-    Py_XDECREF(import->openconn_);
+    Py_XDECREF(import->accept_);
+    Py_XDECREF(import->connect_);
     Py_XDECREF(import->close_);
     Py_XDECREF(import->reconf_);
     Py_XDECREF(import->expire_);
     Py_XDECREF(import->event_);
     Py_XDECREF(import->opensess_);
     Py_XDECREF(import->closesess_);
-    Py_XDECREF(import->module_);
 
+    Py_XDECREF(import->module_);
     free(import);
 }
 
@@ -198,7 +216,8 @@ createimport_(const char* sname)
     import->expire_ = getmethod_(import->module_, "expire");
     import->reconf_ = getmethod_(import->module_, "reconf");
     import->close_ = getmethod_(import->module_, "close");
-    import->openconn_ = getmethod_(import->module_, "openconn");
+    import->accept_ = getmethod_(import->module_, "accept");
+    import->connect_ = getmethod_(import->module_, "connect");
     import->data_ = getmethod_(import->module_, "data");
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
@@ -218,6 +237,16 @@ pyreconf_(PyObject* self, PyObject* args)
         return NULL;
 
     host_->reconf_();
+    return incnone_();
+}
+
+static PyObject*
+pystop_(PyObject* self, PyObject* args)
+{
+    if (!PyArg_ParseTuple(args, ":stop"))
+        return NULL;
+
+    host_->stop_();
     return incnone_();
 }
 
@@ -244,12 +273,16 @@ pypost_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "siO:post", &sname, &type, &user))
         return NULL;
 
-    if (-1 == host_->post_(sname, type, user, free_)) {
+    if (-1 == host_->post_(sname, type, user, release_)) {
+
+        /* Examples show that PyExc_RuntimeError does not need to be
+           Py_INCREF()-ed. */
+
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
 
-    Py_INCREF(user);
+    retain_(user);
     return incnone_();
 }
 
@@ -283,7 +316,9 @@ pytcpconnect_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    Py_INCREF(user);
+    /* When tcpconnect() becomes asynchronous, user will need to be
+       Py_INCREF()-ed. */
+
     return Py_BuildValue("i", cid);
 }
 
@@ -303,7 +338,7 @@ pytcplisten_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    Py_INCREF(user);
+    retain_(user);
     return Py_BuildValue("i", lid);
 }
 
@@ -318,12 +353,12 @@ pysettimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "siIO:settimer", &sname, &tid, &ms, &user))
         return NULL;
 
-    if (-1 == (tid = host_->settimer_(sname, tid, ms, user, free_))) {
+    if (-1 == (tid = host_->settimer_(sname, tid, ms, user, release_))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
 
-    Py_INCREF(user);
+    retain_(user);
     return Py_BuildValue("i", tid);
 }
 
@@ -478,6 +513,10 @@ static PyMethodDef pymethods_[] = {
         "TODO"
     },
     {
+        "stop", pystop_, METH_VARARGS,
+        "TODO"
+    },
+    {
         "writelog", pywritelog_, METH_VARARGS,
         "TODO"
     },
@@ -535,18 +574,23 @@ static PyMethodDef pymethods_[] = {
 static void
 pyfree_(void)
 {
-    if (Py_IsInitialized())
+    if (Py_IsInitialized()) {
+
+        host_->writelog_(AUGAS_LOGDEBUG, "finalising python interpreter");
         Py_Finalize();
+    }
 }
 
 static int
 pycreate_(void)
 {
+    host_->writelog_(AUGAS_LOGDEBUG, "initialising python interpreter");
     Py_Initialize();
     setpath_();
 
-    /* Py_InitModule() returns a borrowed reference. */
+    /* Returns borrowed reference. */
 
+    host_->writelog_(AUGAS_LOGDEBUG, "initialising augas module");
     if (!(pyaugas_ = Py_InitModule("augas", pymethods_)))
         goto fail;
 
@@ -565,6 +609,9 @@ pycreate_(void)
     PyModule_AddIntConstant(pyaugas_, "SNDOTHER", AUGAS_SNDOTHER);
     PyModule_AddIntConstant(pyaugas_, "SNDALL", AUGAS_SNDALL);
 
+    PyModule_AddIntConstant(pyaugas_, "SNDSELF", AUGAS_SNDSELF);
+    PyModule_AddIntConstant(pyaugas_, "SNDOTHER", AUGAS_SNDOTHER);
+    PyModule_AddIntConstant(pyaugas_, "SNDALL", AUGAS_SNDALL);
     return 0;
 
  fail:
@@ -627,7 +674,8 @@ event_(const struct augas_sess* sess, int type, void* user)
         }
     }
 
-    Py_DECREF(x);
+    /* x will be Py_DECREF()-ed by free_(). */
+
     return ret;
 }
 
@@ -645,6 +693,8 @@ expire_(const struct augas_sess* sess, int tid, void* user, unsigned* ms)
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->expire_, "siOO",
                                             sess->name_, tid, x, y);
+        Py_DECREF(y);
+
         if (z) {
             if (PyInt_Check(z))
                 *ms = PyInt_AsLong(z);
@@ -653,11 +703,8 @@ expire_(const struct augas_sess* sess, int tid, void* user, unsigned* ms)
             printerr_();
             ret = -1;
         }
-        Py_DECREF(y);
 
-        if (0 == *ms) {
-            Py_DECREF(x);
-        }
+        /* x will be Py_DECREF()-ed by free_() when *ms == 0. */
     }
     return ret;
 }
@@ -700,34 +747,76 @@ close_(const struct augas_file* file)
         } else
             printerr_();
     }
-    Py_DECREF(x);
+    release_(x);
 }
 
 static int
-openconn_(struct augas_file* file, const char* addr, unsigned short port)
+accept_(struct augas_file* file, const char* addr, unsigned short port)
 {
     struct import_* import = file->sess_->user_;
-    PyObject* x = file->user_, * y;
+    PyObject* x = file->user_, * y = NULL;
     int ret = 0;
     assert(file->user_);
     assert(file->sess_->user_);
 
-    if (import->openconn_) {
+    if (import->accept_) {
 
-        if (!(y = PyObject_CallFunction(import->openconn_, "siOsH",
+        if (!(y = PyObject_CallFunction(import->accept_, "siOsH",
                                         file->sess_->name_, file->id_, x,
                                         addr, port))) {
             printerr_();
             ret = -1;
         }
+    }
 
-    } else {
+    if (!y) {
         y = Py_None;
         Py_INCREF(y);
     }
 
-    Py_DECREF(x);
+    ++refs_;
+    host_->writelog_(AUGAS_LOGDEBUG,
+                     "retaining python object, %u remaining", refs_);
     file->user_ = y;
+
+    /* x is either still owned by the tcplistener or will be released by the
+       tcpconnector. */
+
+    return ret;
+}
+
+static int
+connect_(struct augas_file* file, const char* addr, unsigned short port)
+{
+    struct import_* import = file->sess_->user_;
+    PyObject* x = file->user_, * y = NULL;
+    int ret = 0;
+    assert(file->user_);
+    assert(file->sess_->user_);
+
+    if (import->connect_) {
+
+        if (!(y = PyObject_CallFunction(import->connect_, "siOsH",
+                                        file->sess_->name_, file->id_, x,
+                                        addr, port))) {
+            printerr_();
+            ret = -1;
+        }
+    }
+
+    if (!y) {
+        y = Py_None;
+        Py_INCREF(y);
+    }
+
+    ++refs_;
+    host_->writelog_(AUGAS_LOGDEBUG,
+                     "retaining python object, %u remaining", refs_);
+    file->user_ = y;
+
+    /* x is either still owned by the tcplistener or will be released by the
+       tcpconnector. */
+
     return ret;
 }
 
@@ -752,6 +841,7 @@ data_(const struct augas_file* file, const char* buf, size_t size)
             printerr_();
             ret = -1;
         }
+
         Py_DECREF(y);
     }
     return ret;
@@ -773,12 +863,14 @@ rdexpire_(const struct augas_file* file, unsigned* ms)
                                             file->sess_->name_, file->id_, x,
                                             y);
         if (z) {
-            *ms = PyInt_AsLong(y);
+            if (PyInt_Check(z))
+                *ms = PyInt_AsLong(z);
             Py_DECREF(z);
         } else {
             printerr_();
             ret = -1;
         }
+
         Py_DECREF(y);
     }
 
@@ -801,12 +893,14 @@ wrexpire_(const struct augas_file* file, unsigned* ms)
                                             file->sess_->name_, file->id_, x,
                                             y);
         if (z) {
-            *ms = PyInt_AsLong(y);
+            if (PyInt_Check(z))
+                *ms = PyInt_AsLong(z);
             Py_DECREF(z);
         } else {
             printerr_();
             ret = -1;
         }
+
         Py_DECREF(y);
     }
 
@@ -846,7 +940,8 @@ static const struct augas_module fntable_ = {
     expire_,
     reconf_,
     close_,
-    openconn_,
+    accept_,
+    connect_,
     data_,
     rdexpire_,
     wrexpire_,

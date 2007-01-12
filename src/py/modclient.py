@@ -25,7 +25,7 @@ def opensess(sname):
 def close(sname, id, user):
     user.cancel(sname)
 
-def openconn(sname, cid, user, addr, port):
+def connect(sname, cid, user, addr, port):
     log.info("client established, starting timer")
     return State(sname, cid)
 
@@ -35,6 +35,7 @@ def expire(sname, tid, user, ms):
     else:
         log.info("done: shutting client connection")
         shutdown(user.cid)
+        stop()
         return 0
 
 def data(sname, cid, user, buf):
