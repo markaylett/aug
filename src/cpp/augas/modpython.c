@@ -586,6 +586,7 @@ pycreate_(void)
 {
     host_->writelog_(AUGAS_LOGDEBUG, "initialising python interpreter");
     Py_Initialize();
+    /* Py_VerboseFlag = 1; */
     setpath_();
 
     /* Returns borrowed reference. */

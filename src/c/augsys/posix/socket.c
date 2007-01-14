@@ -145,9 +145,30 @@ aug_sendto(int s, const void* buf, size_t len, int flags,
 AUGSYS_API int
 aug_getsockopt(int s, int level, int optname, void* optval, socklen_t* optlen)
 {
-    if (-1 == getsockopt(s, level, optname, optval, optlen)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
-        return -1;
+    int ret = getsockopt(s, level, optname, optval, optlen);
+    if (SOL_SOCKET == level && SO_ERROR == optname) {
+
+        /* Handle broken SO_ERROR semantics documented in Stevens. */
+
+        switch (ret) {
+        case -1:
+            *((int*)optval) = errno;
+            errno = 0;
+            break;
+        case 0:
+            /* Correct semantics: error stored in optval. */
+            break;
+        default:
+            *((int*)optval) = ret;
+            break;
+        }
+
+    } else {
+
+        if (-1 == ret) {
+            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+            return -1;
+        }
     }
 
     return 0;
@@ -199,8 +220,8 @@ aug_inetntop(const struct aug_inetaddr* src, char* dst, socklen_t len)
 {
     const char* ret = inet_ntop(src->family_, &src->un_, dst, len);
     if (!ret) {
-      aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
-      return NULL;
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        return NULL;
     }
     return dst;
 }
