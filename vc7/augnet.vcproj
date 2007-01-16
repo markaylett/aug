@@ -115,6 +115,9 @@
 				RelativePath="..\src\c\augnet\conn.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\connector.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\http.c">
 			</File>
 			<File
@@ -136,6 +139,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\conn.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\connector.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\http.h">

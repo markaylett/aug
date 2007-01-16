@@ -61,7 +61,10 @@
 # define EOPERATIONABORTED (AUG_ERRNOBASE + 110)
 
 AUGSYS_API int
-aug_setwin32errno(unsigned long err);
+aug_win32errno(unsigned long win32);
+
+AUGSYS_API int
+aug_setwin32errno(unsigned long win32);
 
 #endif /* _WIN32 */
 

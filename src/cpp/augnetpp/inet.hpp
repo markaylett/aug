@@ -63,6 +63,12 @@ namespace aug {
         return sfd;
     }
 
+    inline aug_hostserv&
+    parsehostserv(const char* src, aug_hostserv& dst)
+    {
+        return *verify(aug_parsehostserv(src, &dst));
+    }
+
     inline void
     setnodelay(fdref ref, bool on)
     {
@@ -70,10 +76,11 @@ namespace aug {
         verify(aug_setnodelay(ref.get(), value));
     }
 
-    inline aug_hostserv&
-    parsehostserv(const char* src, aug_hostserv& dst)
+    inline bool
+    established(fdref ref)
     {
-        return *verify(aug_parsehostserv(src, &dst));
+        return AUG_RETNONE == verify(aug_established(ref.get()))
+            ? false : true;
     }
 }
 

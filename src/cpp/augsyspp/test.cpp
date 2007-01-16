@@ -54,8 +54,6 @@ main(int argc, char* argv[])
         smartfd sfd1(open());
         return 0;
 
-        return 0;
-
     } AUG_PERRINFOCATCH;
     return 1;
 }

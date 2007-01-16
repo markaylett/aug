@@ -7,6 +7,7 @@
 static const char rcsid[] = "$Id$";
 
 #include "augsys/errinfo.h"
+#include "augsys/errno.h"
 #include "augsys/socket.h"
 #include "augsys/string.h" /* aug_strlcpy() */
 #include "augsys/unistd.h" /* aug_close() */
@@ -296,4 +297,17 @@ AUGNET_API int
 aug_setnodelay(int fd, int on)
 {
     return aug_setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
+}
+
+AUGNET_API int
+aug_established(int s)
+{
+    int ret;
+    struct aug_endpoint ep;
+    if (!aug_getpeername(s, &ep))
+        ret = ENOTCONN == aug_errno() ? AUG_RETNONE : -1;
+    else
+        ret = 0;
+
+    return ret;
 }

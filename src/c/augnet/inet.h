@@ -39,4 +39,7 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst);
 AUGNET_API int
 aug_setnodelay(int fd, int on);
 
+AUGNET_API int
+aug_established(int s);
+
 #endif /* AUGNET_INET_H */

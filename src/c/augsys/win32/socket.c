@@ -3,6 +3,7 @@
 */
 #include "augsys/base.h"
 #include "augsys/errinfo.h"
+#include "augsys/errno.h"
 #include "augsys/uio.h"
 
 #include <io.h>
@@ -424,6 +425,13 @@ aug_getsockopt(int s, int level, int optname, void* optval, socklen_t* optlen)
                                    optlen)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
         return -1;
+    }
+
+    /* Map Winsock error to Posix error. */
+
+    if (SOL_SOCKET == level && SO_ERROR == optname) {
+        int* err = optval;
+        *err = aug_win32errno(*err);
     }
 
     return 0;

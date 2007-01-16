@@ -7,6 +7,7 @@
 static const char rcsid[] = "$Id$";
 
 #include "augsys/errinfo.h"
+#include "augsys/errno.h"
 #include "augsys/unistd.h"
 
 #include <errno.h>
@@ -26,7 +27,7 @@ readall_(int fd, char* buf, size_t n)
 
         int ret = aug_read(fd, buf, n);
         if (-1 == ret) {
-            if (AUG_SRCPOSIX == aug_errsrc && EINTR == aug_errnum)
+            if (EINTR == aug_errno())
                 continue;
 
             return -1;
@@ -45,7 +46,7 @@ writeall_(int fd, const char* buf, size_t n)
 
         int ret = aug_write(fd, buf, n);
         if (-1 == ret) {
-            if (AUG_SRCPOSIX == aug_errsrc && EINTR == aug_errnum)
+            if (EINTR == aug_errno())
                 continue;
 
             return -1;

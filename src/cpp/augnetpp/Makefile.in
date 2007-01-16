@@ -40,7 +40,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-check_PROGRAMS = augnetpp-test$(EXEEXT)
+check_PROGRAMS = augnetpp-test$(EXEEXT) \
+	augnetpp-connectortest$(EXEEXT)
 subdir = src/cpp/augnetpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -55,8 +56,19 @@ libaugnetpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugnetpp_la_OBJECTS = config.lo conn.lo inet.lo
+am_libaugnetpp_la_OBJECTS = config.lo conn.lo connector.lo inet.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
+am_augnetpp_connectortest_OBJECTS = connectortest.$(OBJEXT)
+augnetpp_connectortest_OBJECTS = $(am_augnetpp_connectortest_OBJECTS)
+augnetpp_connectortest_DEPENDENCIES =  \
+	$(top_builddir)/src/cpp/augsrvpp/libaugsrvpp.la \
+	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_augnetpp_test_OBJECTS = test.$(OBJEXT)
 augnetpp_test_OBJECTS = $(am_augnetpp_test_OBJECTS)
 augnetpp_test_DEPENDENCIES =  \
@@ -78,8 +90,10 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugnetpp_la_SOURCES) $(augnetpp_test_SOURCES)
-DIST_SOURCES = $(libaugnetpp_la_SOURCES) $(augnetpp_test_SOURCES)
+SOURCES = $(libaugnetpp_la_SOURCES) $(augnetpp_connectortest_SOURCES) \
+	$(augnetpp_test_SOURCES)
+DIST_SOURCES = $(libaugnetpp_la_SOURCES) \
+	$(augnetpp_connectortest_SOURCES) $(augnetpp_test_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -213,12 +227,14 @@ modincludedir = $(includedir)/augnetpp
 modinclude_HEADERS = \
 	config.hpp \
 	conn.hpp \
+	connector.hpp \
 	inet.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
 libaugnetpp_la_SOURCES = \
 	config.cpp \
 	conn.cpp \
+	connector.cpp \
 	inet.cpp
 
 libaugnetpp_la_LDFLAGS = \
@@ -230,9 +246,23 @@ libaugnetpp_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-TESTS = augnetpp-test
+TESTS = \
+	augnetpp-test \
+	augnetpp-connectortest
+
 augnetpp_test_SOURCES = test.cpp
 augnetpp_test_LDADD = \
+	$(top_builddir)/src/cpp/augsrvpp/libaugsrvpp.la \
+	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+augnetpp_connectortest_SOURCES = connectortest.cpp
+augnetpp_connectortest_LDADD = \
 	$(top_builddir)/src/cpp/augsrvpp/libaugsrvpp.la \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
@@ -293,6 +323,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+augnetpp-connectortest$(EXEEXT): $(augnetpp_connectortest_OBJECTS) $(augnetpp_connectortest_DEPENDENCIES) 
+	@rm -f augnetpp-connectortest$(EXEEXT)
+	$(CXXLINK) $(augnetpp_connectortest_LDFLAGS) $(augnetpp_connectortest_OBJECTS) $(augnetpp_connectortest_LDADD) $(LIBS)
 augnetpp-test$(EXEEXT): $(augnetpp_test_OBJECTS) $(augnetpp_test_DEPENDENCIES) 
 	@rm -f augnetpp-test$(EXEEXT)
 	$(CXXLINK) $(augnetpp_test_LDFLAGS) $(augnetpp_test_OBJECTS) $(augnetpp_test_LDADD) $(LIBS)
@@ -305,6 +338,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connectortest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 
