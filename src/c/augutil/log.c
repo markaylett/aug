@@ -47,8 +47,14 @@ static const char LABELS_[][7] = {
 static int
 gmtime_(struct tm* res)
 {
-    time_t clock = time(NULL);
-    return !aug_gmtime(&clock, res) ? -1 : 0;
+    struct timeval tv;
+    if (-1 == aug_gettimeofday(&tv, NULL))
+        return -1;
+
+    if (!aug_gmtime(&tv.tv_sec, res))
+        return -1;
+
+    return tv.tv_usec / 1000;
 }
 
 static int
@@ -88,7 +94,7 @@ AUGUTIL_API int
 aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
                va_list args)
 {
-    int ret;
+    int ms, ret;
     size_t size = *n;
     struct tm tm;
 
@@ -100,7 +106,7 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
         return -1;
     }
 
-    if (-1 == gmtime_(&tm))
+    if (-1 == (ms = gmtime_(&tm)))
         return -1;
 
     /* The return value from the strftime function is either a) the number of
@@ -118,13 +124,14 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
        value, indicating an error. */
 
 #if !defined(_MT)
-    if (0 > (ret = snprintf(buf, size, " %s ", aug_loglabel(loglevel)))) {
+    if (0 > (ret = snprintf(buf, size, ".%03d %s ", ms,
+                            aug_loglabel(loglevel)))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("broken format specification"));
         return -1;
     }
 #else /* _MT */
-    if (0 > (ret = snprintf(buf, size, " %08x %s ", aug_threadid(),
+    if (0 > (ret = snprintf(buf, size, ".%03d %08x %s ", ms, aug_threadid(),
                             aug_loglabel(loglevel)))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("broken format specification"));

@@ -13,6 +13,8 @@ static const char rcsid[] = "$Id: $";
 
 #include "augnet/inet.h"    /* aug_established() */
 
+#include <assert.h>
+
 struct aug_connector_ {
     struct addrinfo* res_, *save_;
     int fd_;
