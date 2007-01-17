@@ -160,10 +160,8 @@ install_(SC_HANDLE scm)
     if (!(path = makepath_()))
         return -1;
 
-    /**
-       An alternative to running as "Local System" (the default), is to run as
-       "NT Authority\\NetworkService".
-    */
+    /* An alternative to running as "Local System" (the default), is to run as
+       "NT Authority\\NetworkService". */
 
     if (!(serv = CreateService(scm, sname, lname, SERVICE_ALL_ACCESS,
                                SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START,

@@ -76,6 +76,12 @@ aug_setwin32errno(unsigned long win32);
 AUGSYS_API void
 aug_seterrno(int err);
 
+/**
+   Where possible, system specific errors, such as win32 errors, will be
+   mapped onto the standard errno value.  aug_errno() should therefore be used
+   when testing for posix error codes.
+ */
+
 AUGSYS_API int
 aug_errno(void);
 

@@ -33,7 +33,7 @@ aug_swap64(uint64_t i)
     } u;
     uint32_t tmp;
 
-    /**
+    /*
        u = ABCDEFGH
        tmp = DCBA
     */
@@ -41,14 +41,14 @@ aug_swap64(uint64_t i)
     u.i64_ = i;
     tmp = aug_swap32(u.i32_[0]);
 
-    /**
+    /*
        u = HGFEEFGH
        tmp = DCBA
     */
 
     u.i32_[0] = aug_swap32(u.i32_[1]);
 
-    /**
+    /*
        u = HGFEDCBA
        tmp = DCBA
     */

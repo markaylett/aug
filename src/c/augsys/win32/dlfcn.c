@@ -43,10 +43,8 @@ aug_dlopen(const char* path)
 AUGSYS_API aug_fnptr_t
 aug_dlsym(aug_dlib_t dlib, const char* symbol)
 {
-    /**
-       Avoid warnings: ISO C forbids conversion of function pointer to object
-       pointer type.
-    */
+    /* Avoid warnings: ISO C forbids conversion of function pointer to object
+       pointer type. */
 
     union {
         FARPROC in_;

@@ -13,7 +13,7 @@
 #include <stdlib.h>      /* malloc() */
 
 struct set_ {
-    fd_set rd_, wr_;
+    fd_set rd_, wr_, ex_;
 };
 
 struct aug_mplexer_ {
@@ -26,6 +26,7 @@ zeroset_(struct set_* p)
 {
     FD_ZERO(&p->rd_);
     FD_ZERO(&p->wr_);
+    FD_ZERO(&p->ex_);
 }
 
 static unsigned short
@@ -38,6 +39,9 @@ external_(struct set_* p, SOCKET h)
 
     if (FD_ISSET(h, &p->wr_))
         dst |= AUG_IOEVENTWR;
+
+    if (FD_ISSET(h, &p->ex_))
+        dst |= AUG_IOEVENTEX;
 
     return dst;
 }
@@ -72,6 +76,17 @@ setioevents_(struct set_* p, SOCKET h, unsigned short mask)
         --bits;
     }
 
+    if (set & AUG_IOEVENTEX) {
+
+        FD_SET(h, &p->ex_);
+        ++bits;
+
+    } else if (unset & AUG_IOEVENTEX) {
+
+        FD_CLR(h, &p->ex_);
+        --bits;
+    }
+
     return bits;
 }
 
@@ -100,7 +115,7 @@ aug_freemplexer(aug_mplexer_t mplexer)
 AUGSYS_API int
 aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 {
-    if (mask & ~(AUG_IOEVENTRD | AUG_IOEVENTWR)) {
+    if (mask & ~AUG_IOEVENTALL) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid ioevent mask"));
         return -1;
@@ -125,7 +140,7 @@ aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 
     if (SOCKET_ERROR ==
         (ret = select(-1, &mplexer->out_.rd_, &mplexer->out_.wr_,
-                      NULL, timeout))) {
+                      &mplexer->out_.ex_, timeout))) {
 
         if (WSAEINTR == aug_setwin32errinfo(NULL, __FILE__, __LINE__,
                                             WSAGetLastError()))

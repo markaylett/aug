@@ -257,6 +257,8 @@ namespace augas {
             // TODO: alter tcpconnect to support a non-blocking mode of
             // operation.
 
+            // Create connnector and call tryconnect().
+
             endpoint ep(null);
             smartfd sfd(tcpconnect(host, serv, ep));
 

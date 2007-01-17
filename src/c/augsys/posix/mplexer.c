@@ -29,6 +29,9 @@ external_(short src)
     if (src & POLLOUT)
         dst |= AUG_IOEVENTWR;
 
+    if (src & POLLPRI)
+        dst |= AUG_IOEVENTEX;
+
     return dst;
 }
 
@@ -42,6 +45,9 @@ internal_(unsigned short src)
 
     if (src & AUG_IOEVENTWR)
         dst |= POLLOUT;
+
+    if (src & AUG_IOEVENTEX)
+        dst |= POLLPRI;
 
     return dst;
 }
@@ -110,7 +116,7 @@ aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 {
     struct pollfd* ptr;
 
-    if (mask & ~(AUG_IOEVENTRD | AUG_IOEVENTWR)) {
+    if (mask & ~AUG_IOEVENTALL) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid ioevent mask '%d'"), (int)mask);
         return -1;
@@ -174,7 +180,7 @@ aug_ioevents(aug_mplexer_t mplexer, int fd)
 # include <sys/select.h>
 
 struct set_ {
-    fd_set rd_, wr_;
+    fd_set rd_, wr_, ex_;
 };
 
 struct aug_mplexer_ {
@@ -187,6 +193,7 @@ zeroset_(struct set_* p)
 {
     FD_ZERO(&p->rd_);
     FD_ZERO(&p->wr_);
+    FD_ZERO(&p->ex_);
 }
 
 static unsigned short
@@ -199,6 +206,9 @@ external_(struct set_* p, int fd)
 
     if (FD_ISSET(fd, &p->wr_))
         dst |= AUG_IOEVENTWR;
+
+    if (FD_ISSET(fd, &p->ex_))
+        dst |= AUG_IOEVENTEX;
 
     return dst;
 }
@@ -219,6 +229,11 @@ setioevents_(struct set_* p, int fd, unsigned short mask)
         FD_SET(fd, &p->wr_);
     else if (unset & AUG_IOEVENTWR)
         FD_CLR(fd, &p->wr_);
+
+    if (set & AUG_IOEVENTEX)
+        FD_SET(fd, &p->ex_);
+    else if (unset & AUG_IOEVENTEX)
+        FD_CLR(fd, &p->ex_);
 }
 
 AUGSYS_API aug_mplexer_t
@@ -233,7 +248,7 @@ aug_createmplexer(void)
     zeroset_(&mplexer->in_);
     zeroset_(&mplexer->out_);
 
-    /** A maxfd of -1 will result in a zero nfds value. */
+    /* A maxfd of -1 will result in a zero nfds value. */
 
     mplexer->maxfd_ = -1;
     return mplexer;
@@ -249,7 +264,7 @@ aug_freemplexer(aug_mplexer_t mplexer)
 AUGSYS_API int
 aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 {
-    if (mask & ~(AUG_IOEVENTRD | AUG_IOEVENTWR)) {
+    if (mask & ~AUG_IOEVENTALL) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid ioevent mask"));
         return -1;
@@ -257,16 +272,17 @@ aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 
     setioevents_(&mplexer->in_, fd, mask);
 
-    /** Update maxfd. */
+    /* Update maxfd. */
 
     if (mplexer->maxfd_ <= fd) {
 
-        /** Use fd a starting point to find the highest fd with events set. */
+        /* Use fd a starting point to find the highest fd with events set. */
 
         do {
 
             if (FD_ISSET(fd, &mplexer->in_.rd_)
-                || FD_ISSET(fd, &mplexer->in_.wr_))
+                || FD_ISSET(fd, &mplexer->in_.wr_)
+                || FD_ISSET(fd, &mplexer->in_.ex_))
                 break;
 
         } while (-1 != --fd);
@@ -284,7 +300,7 @@ aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout)
     mplexer->out_ = mplexer->in_;
 
     if (-1 == (ret = select(mplexer->maxfd_ + 1, &mplexer->out_.rd_,
-                            &mplexer->out_.wr_, NULL,
+                            &mplexer->out_.wr_, &mplexer->out_.ex_,
                             (struct timeval*)timeout))) {
 
         if (EINTR == aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno))

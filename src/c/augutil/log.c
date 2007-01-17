@@ -92,9 +92,7 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
     size_t size = *n;
     struct tm tm;
 
-    /**
-       At least one character is needed for the null-terminator.
-     */
+    /* At least one character is needed for the null-terminator. */
 
     if (0 == size) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
@@ -105,22 +103,19 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
     if (-1 == gmtime_(&tm))
         return -1;
 
-    /**
-       The return value from the strftime function is either a) the number of
+    /* The return value from the strftime function is either a) the number of
        characters copied to the buffer, excluding the null terminator, or b)
-       zero, indicating an error.
-    */
+       zero, indicating an error. */
 
     if (0 == (ret = (int)strftime(buf, size, AUG_TIMEFORMAT, &tm)))
         goto done;
 
     buf += ret, size -= ret;
 
-    /**
-       The return value from the snprintf function is either a) the number of
+
+    /* The return value from the snprintf function is either a) the number of
        characters required, excluding the null terminator, or b) a negative
-       value, indicating an error.
-    */
+       value, indicating an error. */
 
 #if !defined(_MT)
     if (0 > (ret = snprintf(buf, size, " %s ", aug_loglabel(loglevel)))) {
@@ -137,10 +132,8 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
     }
 #endif /* _MT */
 
-    /**
-       Adjust the return value to be the actual number of characters copied,
-       where truncation has occured.
-    */
+    /* Adjust the return value to be the actual number of characters copied,
+       where truncation has occured. */
 
     if ((size_t)ret >= size) {
         ret = (int)size - 1;
@@ -155,10 +148,8 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
         return -1;
     }
 
-    /**
-       Adjust the return value to be the actual number of characters copied,
-       where truncation has occured.
-    */
+    /* Adjust the return value to be the actual number of characters copied,
+       where truncation has occured. */
 
     if ((size_t)ret >= size)
         ret = (int)size - 1;
@@ -168,9 +159,7 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
     buf += ret, size -= ret;
     *buf = '\0';
 
-    /**
-       Set output parameter to be total number of characters copied.
-    */
+    /* Set output parameter to be total number of characters copied. */
 
     *n -= size;
     return 0;

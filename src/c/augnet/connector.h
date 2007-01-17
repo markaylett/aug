@@ -16,6 +16,11 @@ aug_createconnector(const char* host, const char* serv);
 AUGNET_API int
 aug_freeconnector(aug_connector_t ctor);
 
+/**
+   A blocking socket will be returned when the established flag is set.  Use
+   aug_setnonblock() to change to non-blocking socket.
+*/
+
 AUGNET_API int
 aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est);
 

@@ -5,11 +5,15 @@
 
 #include "augsyspp/base.hpp"
 #include "augsyspp/endpoint.hpp"
+#include "augsyspp/mplexer.hpp"
 #include "augsyspp/unistd.hpp"
 
 #include "augsys/log.h"
 
 using namespace aug;
+using namespace std;
+
+typedef logic_error error;
 
 int
 main(int argc, char* argv[])
@@ -18,11 +22,29 @@ main(int argc, char* argv[])
     aug_atexitinit(&errinfo);
 
     try {
-        connector ctor("127.0.0.1", "10000");
+
         endpoint ep(null);
-        tryconnect(ctor, ep);
-        tryconnect(ctor, ep);
-        return 0;
+        connector ctor("127.0.0.1", "10000");
+
+        std::pair<smartfd, bool> xy(tryconnect(ctor, ep));
+        if (!xy.second) {
+
+            mplexer mp;
+            setioeventmask(mp, xy.first, AUG_IOEVENTALL);
+            waitioevents(mp);
+
+            // Assuming that there is no endpoint, an exception should now be
+            // thrown.
+
+            try {
+                xy = tryconnect(ctor, ep);
+            } catch (...) {
+                if (ECONNREFUSED == aug_errno())
+                    return 0;
+                throw;
+            }
+        }
+        throw error("error not thrown by tryconnect()");
 
     } AUG_PERRINFOCATCH;
     return 1;

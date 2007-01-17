@@ -20,23 +20,19 @@ static const char rcsid[] = "$Id$";
 #include <stdlib.h>        /* NULL */
 #include <string.h>        /* memcpy() */
 
-/**
-   No protection is required around these statics: they are only set once,
+/* No protection is required around these statics: they are only set once,
    from aug_main().
 
    On Windows, the Service Manager calls the service entry point on a separate
    thread: automatic variables on the main thread's stack will not be visible
-   from the service thread.
-*/
+   from the service thread. */
 
 static struct aug_service service_ = { 0 };
 static int fds_[2] = { -1, -1 };
 
-/**
-   closepipe_() should not be called from an atexit() handler: on Windows, the
+/* closepipe_() should not be called from an atexit() handler: on Windows, the
    pipe is implemented as a socket pair.  The c-runtime may terminate the
-   Winsock layer prior to calling the cleanup function.
-*/
+   Winsock layer prior to calling the cleanup function. */
 
 static void
 closepipe_(void)

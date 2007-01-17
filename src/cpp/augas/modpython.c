@@ -490,7 +490,7 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
     return incnone_();
 }
 
-/**
+/*
    void reconf(void);
    void writelog (int level, string msg);
    void post (string sname, int type, object user);
@@ -952,9 +952,7 @@ static const struct augas_module fntable_ = {
 static const struct augas_module*
 load_(const char* name, const struct augas_host* host)
 {
-    /**
-       Fail if module has already been loaded.
-    */
+    /* Fail if module has already been loaded. */
 
     host->writelog_(AUGAS_LOGINFO, "loading modpython");
 

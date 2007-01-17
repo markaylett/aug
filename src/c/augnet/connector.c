@@ -37,6 +37,7 @@ aug_createconnector(const char* host, const char* serv)
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
+
     ctor->res_ = ctor->save_ = res;
     ctor->fd_ = -1;
     return ctor;
@@ -63,8 +64,9 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
        failed. */
 
     if (!ctor->res_) {
+        assert(-1 == fd);
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("address list exhausted"));
+                       AUG_MSG("address-list exhausted"));
         return -1;
     }
 
@@ -84,7 +86,9 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
             /* Established. */
 
-            *est = 1;
+            ep->len_ = (socklen_t)ctor->res_->ai_addrlen;
+            memcpy(&ep->un_, ctor->res_->ai_addr, ctor->res_->ai_addrlen);
+
             goto done;
 
         case AUG_RETNONE:
@@ -129,7 +133,6 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
             /* Immediate establishment. */
 
-            *est = 1;
             goto done;
         }
 
@@ -138,20 +141,29 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
             /* Connection pending. */
 
             *est = 0;
-            ctor->fd_ = fd;
-            goto done;
+            return ctor->fd_ = fd;
         }
+
+        /* Failed for other reason. */
 
         if (-1 == aug_close(fd)) /* Ignore this one. */
             return -1;
 
     } while ((ctor->res_ = ctor->res_->ai_next));
 
-    /* errno set from last aug_connect(). */
+    /* Error set from last aug_connect() attempt. */
+
     return -1;
 
  done:
-    ep->len_ = (socklen_t)ctor->res_->ai_addrlen;
-    memcpy(&ep->un_, ctor->res_->ai_addr, ctor->res_->ai_addrlen);
+
+    /* Set back to blocking. */
+
+    if (-1 == aug_setnonblock(fd, 0)) {
+        aug_close(fd);
+        return -1;
+    }
+
+    *est = 1;
     return fd;
 }

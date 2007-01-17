@@ -54,6 +54,10 @@ namespace aug {
     {
         int est;
         int ret(verify(aug_tryconnect(ctor, &ep, &est)));
+
+        // When established, aug_tryconnect() will release ownership of the
+        // returned socket descriptor - it will not call aug_close() on it.
+
         if (est)
             return std::make_pair(smartfd::attach(ret), true);
 
