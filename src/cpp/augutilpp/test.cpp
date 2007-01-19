@@ -2,6 +2,7 @@
    See the file COPYING for copying permission.
 */
 
+#include "augutilpp/log.hpp"
 #include "augutilpp/var.hpp"
 
 #include <iostream>
@@ -90,6 +91,8 @@ main(int argc, char* argv[])
         freevar(var(&argc, freetest));
         if (&argc != freedp_)
             throw logic_error("free ptr test failed");
+
+        cout << formatlog(AUG_LOGINFO, "a %s message", "test") << endl;
 
     } catch (const exception& e) {
         cerr << e.what() << endl;

@@ -274,8 +274,8 @@ namespace augas {
             augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
                              // uninitialized in this function.
             id = aug_nextid();
-            connptr cptr(new augas::conn(sess, sfd, id, user,
-                                         state_->timers_));
+            connptr cptr(new augas::client(sess, id, user, state_->timers_,
+                                           sfd));
             state_->manager_.insert(cptr);
             try {
                 cptr->connect(ep);
@@ -303,7 +303,7 @@ namespace augas {
             augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
                              // uninitialized in this function.
             id = aug_nextid();
-            listenerptr lptr(new augas::listener(sess, sfd, id, user));
+            listenerptr lptr(new augas::listener(sess, id, user, sfd));
             state_->manager_.insert(lptr);
 
             inetaddr addr(null);
@@ -369,7 +369,7 @@ namespace augas {
         AUG_DEBUG2("shutdown() for id '%d'", cid);
         try {
             fileptr file(state_->manager_.getbyid(cid));
-            connptr cptr(smartptr_cast<conn>(file));
+            connptr cptr(smartptr_cast<conn_base>(file));
             if (null != cptr)
                 cptr->shutdown();
             else
@@ -415,11 +415,12 @@ namespace augas {
     {
         AUG_DEBUG2("setrwtimer() for id '%d'", cid);
         try {
-            connptr conn(smartptr_cast<conn>(state_->manager_.getbyid(cid)));
-            if (null == conn)
+            rwtimerptr rwtimer(smartptr_cast<
+                               rwtimer_base>(state_->manager_.getbyid(cid)));
+            if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection-id '%d' not found", cid);
-            conn->setrwtimer(ms, flags);
+            rwtimer->setrwtimer(ms, flags);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -430,11 +431,12 @@ namespace augas {
     {
         AUG_DEBUG2("resetrwtimer() for id '%d'", cid);
         try {
-            connptr conn(smartptr_cast<conn>(state_->manager_.getbyid(cid)));
-            if (null == conn)
+            rwtimerptr rwtimer(smartptr_cast<
+                               rwtimer_base>(state_->manager_.getbyid(cid)));
+            if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection-id '%d' not found", cid);
-            conn->resetrwtimer(ms, flags);
+            rwtimer->resetrwtimer(ms, flags);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -445,11 +447,12 @@ namespace augas {
     {
         AUG_DEBUG2("cancelrwtimer() for id '%d'", cid);
         try {
-            connptr conn(smartptr_cast<conn>(state_->manager_.getbyid(cid)));
-            if (null == conn)
+            rwtimerptr rwtimer(smartptr_cast<
+                               rwtimer_base>(state_->manager_.getbyid(cid)));
+            if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection-id '%d' not found", cid);
-            conn->cancelrwtimer(flags);
+            rwtimer->cancelrwtimer(flags);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -523,8 +526,8 @@ namespace augas {
         setextdriver_(sfd, conncb, AUG_IOEVENTRD);
 
         augas_id id(aug_nextid());
-        connptr conn(new augas::conn(file.sess(), sfd, id, file.user(),
-                                     state_->timers_));
+        connptr conn(new augas::server(file.sess(), id, file.user(),
+                                       state_->timers_, sfd));
         state_->manager_.insert(conn);
         try {
             conn->accept(ep);
@@ -589,11 +592,18 @@ namespace augas {
                 return readevent_(*this);
 
             fileptr file(state_->manager_.getbyfd(fd));
-            connptr cptr(smartptr_cast<conn>(file));
+            connptr cptr(smartptr_cast<conn_base>(file));
 
             if (null != cptr) {
 
-                if (!cptr->process(state_->mplexer_)) {
+                switch (cptr->process(state_->mplexer_)) {
+                case CONNECTING:
+                case ESTABLISHED:
+                    state_->manager_.update(file, fd);
+                    break;
+                case CONNECTED:
+                    break;
+                case CLOSED:
                     state_->manager_.erase(*file);
                     return false;
                 }

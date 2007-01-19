@@ -38,6 +38,9 @@ namespace augas {
         insert(const fileptr& file);
 
         void
+        update(const fileptr& file, aug::fdref prev);
+
+        void
         load(const char* rundir, const options& options,
              const augas_host& host);
 

@@ -32,28 +32,35 @@ namespace augas {
         virtual
         ~file_base() AUG_NOTHROW;
 
+        augas_file&
+        file()
+        {
+            return do_file();
+        }
         int
         fd() const
         {
             return do_fd();
         }
-
+        const augas_file&
+        file() const
+        {
+            return do_file();
+        }
+        const sessptr&
+        sess() const
+        {
+            return do_sess();
+        }
         augas_id
         id() const
         {
             return do_file().id_;
         }
-
         void*
         user() const
         {
             return do_file().user_;
-        }
-
-        const sessptr&
-        sess() const
-        {
-            return do_sess();
         }
         operator augas_file&()
         {

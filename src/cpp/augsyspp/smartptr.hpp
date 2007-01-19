@@ -109,17 +109,23 @@ namespace aug {
         smartptr&
         operator =(const smartptr& rhs) AUG_NOTHROW
         {
-            smartptr ptr(rhs);
-            swap(ptr);
+            smartptr sptr(rhs);
+            swap(sptr);
             return *this;
         }
         template <typename V, typename W>
         smartptr&
         operator =(const smartptr<V, W>& rhs) AUG_NOTHROW
         {
-            smartptr ptr(rhs);
-            swap(ptr);
+            smartptr sptr(rhs);
+            swap(sptr);
             return *this;
+        }
+        void
+        reset(T* ptr = 0)
+        {
+            smartptr sptr(ptr);
+            swap(sptr);
         }
         void
         swap(smartptr& rhs) AUG_NOTHROW
@@ -156,16 +162,16 @@ namespace aug {
 
     template <typename T, typename U, typename V, typename W>
     smartptr<T, U>
-    smartptr_cast(const smartptr<V, W>& ptr)
+    smartptr_cast(const smartptr<V, W>& sptr)
     {
-        return smartptr<T, U>(ptr, detail::cast_tag());
+        return smartptr<T, U>(sptr, detail::cast_tag());
     }
 
     template <typename T, typename U, typename V>
     smartptr<T, U>
-    smartptr_cast(const smartptr<V, U>& ptr)
+    smartptr_cast(const smartptr<V, U>& sptr)
     {
-        return smartptr<T, U>(ptr, detail::cast_tag());
+        return smartptr<T, U>(sptr, detail::cast_tag());
     }
 
 #if defined(_MSC_VER)
@@ -175,9 +181,9 @@ namespace aug {
 
 template <typename T, typename U>
 bool
-isnull(const aug::smartptr<T, U>& ptr)
+isnull(const aug::smartptr<T, U>& sptr)
 {
-    return 0 == ptr.get();
+    return 0 == sptr.get();
 }
 
 #endif // AUGSYSPP_SMARTPTR_HPP

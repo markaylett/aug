@@ -13,8 +13,8 @@ namespace augas {
     class listener : public file_base {
 
         sessptr sess_;
-        aug::smartfd sfd_;
         augas_file file_;
+        aug::smartfd sfd_;
 
         augas_file&
         do_file();
@@ -31,8 +31,8 @@ namespace augas {
     public:
         ~listener() AUG_NOTHROW;
 
-        listener(const sessptr& sess, const aug::smartfd& sfd, augas_id id,
-                 void* user);
+        listener(const sessptr& sess, augas_id id, void* user,
+                 const aug::smartfd& sfd);
     };
 
     typedef aug::smartptr<listener> listenerptr;

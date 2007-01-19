@@ -40,12 +40,12 @@ listener::~listener() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-listener::listener(const sessptr& sess, const smartfd& sfd, augas_id id,
-                   void* user)
+listener::listener(const sessptr& sess, augas_id id, void* user,
+                   const smartfd& sfd)
     : sess_(sess),
       sfd_(sfd)
 {
-    file_.sess_ = cptr(*sess_);
+    file_.sess_ = cptr(*sess);
     file_.id_ = id;
     file_.user_ = user;
 }

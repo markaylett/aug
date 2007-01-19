@@ -73,6 +73,18 @@ manager::insert(const fileptr& file)
 }
 
 void
+manager::update(const fileptr& file, fdref prev)
+{
+    AUG_DEBUG2("updating id '%d', fd '%d', prev '%d'", file->id(), file->fd(),
+               prev.get());
+
+    files_.insert(make_pair(file->fd(), file));
+    files_.erase(prev.get());
+
+    idtofd_[file->id()] = file->fd();
+}
+
+void
 manager::load(const char* rundir, const options& options,
               const augas_host& host)
 {
@@ -130,7 +142,7 @@ manager::load(const char* rundir, const options& options,
 }
 
 bool
-manager::sendall(aug::mplexer& mplexer, augas_id cid, const char* sname,
+manager::sendall(mplexer& mplexer, augas_id cid, const char* sname,
                  const char* buf, size_t size)
 {
     bool ret(true);
@@ -138,7 +150,7 @@ manager::sendall(aug::mplexer& mplexer, augas_id cid, const char* sname,
     files::const_iterator it(files_.begin()), end(files_.end());
     for (; it != end; ++it) {
 
-        connptr cptr(smartptr_cast<conn>(it->second));
+        connptr cptr(smartptr_cast<conn_base>(it->second));
         if (null == cptr)
             continue;
 
@@ -156,10 +168,10 @@ manager::sendall(aug::mplexer& mplexer, augas_id cid, const char* sname,
 }
 
 bool
-manager::sendself(aug::mplexer& mplexer, augas_id cid, const char* buf,
+manager::sendself(mplexer& mplexer, augas_id cid, const char* buf,
                   size_t size)
 {
-    connptr cptr(smartptr_cast<conn>(getbyid(cid)));
+    connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (cptr->isshutdown())
         return false;
 
@@ -168,13 +180,13 @@ manager::sendself(aug::mplexer& mplexer, augas_id cid, const char* buf,
 }
 
 void
-manager::sendother(aug::mplexer& mplexer, augas_id cid, const char* sname,
+manager::sendother(mplexer& mplexer, augas_id cid, const char* sname,
                    const char* buf, size_t size)
 {
     files::const_iterator it(files_.begin()), end(files_.end());
     for (; it != end; ++it) {
 
-        connptr cptr(smartptr_cast<conn>(it->second));
+        connptr cptr(smartptr_cast<conn_base>(it->second));
         if (null == cptr)
             continue;
 
@@ -201,7 +213,7 @@ manager::teardown()
             throw error(__FILE__, __LINE__, ESTATE, "fd '%d' not found",
                         rit->second);
 
-        connptr cptr(smartptr_cast<conn>(it->second));
+        connptr cptr(smartptr_cast<conn_base>(it->second));
         if (null != cptr) {
             ++rit;
             try {
@@ -246,7 +258,7 @@ manager::getbyid(augas_id id) const
 }
 
 sessptr
-manager::getsess(const std::string& name) const
+manager::getsess(const string& name) const
 {
     sesss::const_iterator it(sesss_.find(name));
     if (it == sesss_.end())
