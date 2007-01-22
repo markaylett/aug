@@ -18,7 +18,7 @@ using namespace std;
 module::~module() AUG_NOTHROW
 {
     try {
-        AUG_DEBUG2("terminating module '%s'", name_.c_str());
+        AUG_DEBUG2("terminating module: name=[%s]", name_.c_str());
         termfn_();
     } catch (const exception& e) {
         aug_error("std::exception: %s", e.what());
@@ -32,11 +32,11 @@ module::module(const string& name, const char* path,
     : name_(name),
       lib_(path)
 {
-    AUG_DEBUG2("resolving symbols in module '%s'", name_.c_str());
+    AUG_DEBUG2("resolving symbols in module: name=[%s]", name_.c_str());
     augas_initfn initfn(dlsym<augas_initfn>(lib_, "augas_init"));
     termfn_ = dlsym<augas_termfn>(lib_, "augas_term");
 
-    AUG_DEBUG2("initialising module '%s'", name_.c_str());
+    AUG_DEBUG2("initialising module: name=[%s]", name_.c_str());
     const struct augas_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
         throw error(__FILE__, __LINE__, EMODCALL, "augas_init() failed");
@@ -46,14 +46,14 @@ module::module(const string& name, const char* path,
 void
 module::closesess(const augas_sess& sess) const
 {
-    AUG_DEBUG2("closesess() for session '%s'", sess.name_);
+    AUG_DEBUG2("closesess(): sname=[%s]", sess.name_);
     module_.closesess_(&sess);
 }
 
 void
 module::opensess(augas_sess& sess) const
 {
-    AUG_DEBUG2("opensess() for session '%s'", sess.name_);
+    AUG_DEBUG2("opensess(): sname=[%s]", sess.name_);
     if (AUGAS_OK != module_.opensess_(&sess))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::opensess_() failed");
@@ -62,7 +62,7 @@ module::opensess(augas_sess& sess) const
 void
 module::event(const augas_sess& sess, int type, void* user) const
 {
-    AUG_DEBUG2("event() for session '%s'", sess.name_);
+    AUG_DEBUG2("event(): sname=[%s]", sess.name_);
     if (AUGAS_OK != module_.event_(&sess, type, user))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::event_() failed");
@@ -72,7 +72,7 @@ void
 module::expire(const augas_sess& sess, int tid, void* user,
                unsigned& ms) const
 {
-    AUG_DEBUG2("expire() for session '%s'", sess.name_);
+    AUG_DEBUG2("expire(): sname=[%s]", sess.name_);
     if (AUGAS_OK != module_.expire_(&sess, tid, user, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::expire_() failed");
@@ -81,7 +81,7 @@ module::expire(const augas_sess& sess, int tid, void* user,
 void
 module::reconf(const augas_sess& sess) const
 {
-    AUG_DEBUG2("reconf() for session '%s'", sess.name_);
+    AUG_DEBUG2("reconf(): sname=[%s]", sess.name_);
     if (AUGAS_OK != module_.reconf_(&sess))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::reconf_() failed");
@@ -90,16 +90,14 @@ module::reconf(const augas_sess& sess) const
 void
 module::close(const augas_file& file) const
 {
-    AUG_DEBUG2("close() for session '%s', id '%d'", file.sess_->name_,
-               file.id_);
+    AUG_DEBUG2("close(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
     module_.close_(&file);
 }
 
 void
 module::accept(augas_file& file, const char* addr, unsigned short port) const
 {
-    AUG_DEBUG2("accept() for session '%s', id '%d'", file.sess_->name_,
-               file.id_);
+    AUG_DEBUG2("accept(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
     if (AUGAS_OK != module_.accept_(&file, addr, port))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::accept_() failed");
@@ -108,8 +106,7 @@ module::accept(augas_file& file, const char* addr, unsigned short port) const
 void
 module::connect(augas_file& file, const char* addr, unsigned short port) const
 {
-    AUG_DEBUG2("connect() for session '%s', id '%d'", file.sess_->name_,
-               file.id_);
+    AUG_DEBUG2("connect(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
     if (AUGAS_OK != module_.connect_(&file, addr, port))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::connect_() failed");
@@ -118,8 +115,7 @@ module::connect(augas_file& file, const char* addr, unsigned short port) const
 void
 module::data(const augas_file& file, const char* buf, size_t size) const
 {
-    AUG_DEBUG2("data() for session '%s', id '%d'", file.sess_->name_,
-               file.id_);
+    AUG_DEBUG2("data(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
     if (AUGAS_OK != module_.data_(&file, buf, size))
         throw error(__FILE__, __LINE__, EMODCALL,
                     "augas_module::data_() failed");
@@ -128,7 +124,7 @@ module::data(const augas_file& file, const char* buf, size_t size) const
 void
 module::rdexpire(const augas_file& file, unsigned& ms) const
 {
-    AUG_DEBUG2("rdexpire() for session '%s', id '%d'", file.sess_->name_,
+    AUG_DEBUG2("rdexpire(): sname=[%s], id=[%d]", file.sess_->name_,
                file.id_);
     if (AUGAS_OK != module_.rdexpire_(&file, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
@@ -138,7 +134,7 @@ module::rdexpire(const augas_file& file, unsigned& ms) const
 void
 module::wrexpire(const augas_file& file, unsigned& ms) const
 {
-    AUG_DEBUG2("wrexpire() for session '%s', id '%d'", file.sess_->name_,
+    AUG_DEBUG2("wrexpire(): sname=[%s], id=[%d]", file.sess_->name_,
                file.id_);
     if (AUGAS_OK != module_.wrexpire_(&file, &ms))
         throw error(__FILE__, __LINE__, EMODCALL,
@@ -148,7 +144,7 @@ module::wrexpire(const augas_file& file, unsigned& ms) const
 void
 module::teardown(const augas_file& file) const
 {
-    AUG_DEBUG2("teardown() for session '%s', id '%d'", file.sess_->name_,
+    AUG_DEBUG2("teardown(): sname=[%s], id=[%d]", file.sess_->name_,
                file.id_);
     if (AUGAS_OK != module_.teardown_(&file))
         throw error(__FILE__, __LINE__, EMODCALL,

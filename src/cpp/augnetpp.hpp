@@ -7,6 +7,7 @@
 #include "augnet.h"
 
 #include "augnetpp/conn.hpp"
+#include "augnetpp/connector.hpp"
 #include "augnetpp/inet.hpp"
 
 #endif // AUGNETPP_HPP

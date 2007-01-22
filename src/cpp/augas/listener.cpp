@@ -15,12 +15,6 @@ listener::do_file()
     return file_;
 }
 
-int
-listener::do_fd() const
-{
-    return sfd_.get();
-}
-
 const augas_file&
 listener::do_file() const
 {
@@ -31,6 +25,12 @@ const sessptr&
 listener::do_sess() const
 {
     return sess_;
+}
+
+smartfd
+listener::do_sfd() const
+{
+    return sfd_;
 }
 
 listener::~listener() AUG_NOTHROW

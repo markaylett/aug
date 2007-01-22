@@ -19,14 +19,14 @@ namespace augas {
         augas_file&
         do_file();
 
-        int
-        do_fd() const;
-
         const augas_file&
         do_file() const;
 
         const sessptr&
         do_sess() const;
+
+        aug::smartfd
+        do_sfd() const;
 
     public:
         ~listener() AUG_NOTHROW;

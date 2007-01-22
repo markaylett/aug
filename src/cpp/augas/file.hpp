@@ -7,7 +7,7 @@
 #include "augas.h"
 #include "augas/sess.hpp"
 
-#include "augsyspp/smartptr.hpp"
+#include "augsyspp.hpp"
 
 namespace augas {
 
@@ -19,14 +19,14 @@ namespace augas {
         virtual augas_file&
         do_file() = 0;
 
-        virtual int
-        do_fd() const = 0;
-
         virtual const augas_file&
         do_file() const = 0;
 
         virtual const sessptr&
         do_sess() const = 0;
+
+        virtual aug::smartfd
+        do_sfd() const = 0;
 
     public:
         virtual
@@ -37,11 +37,6 @@ namespace augas {
         {
             return do_file();
         }
-        int
-        fd() const
-        {
-            return do_fd();
-        }
         const augas_file&
         file() const
         {
@@ -51,6 +46,11 @@ namespace augas {
         sess() const
         {
             return do_sess();
+        }
+        aug::smartfd
+        sfd() const
+        {
+            return do_sfd();
         }
         augas_id
         id() const

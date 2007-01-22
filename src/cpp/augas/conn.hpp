@@ -9,13 +9,15 @@
 
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
+#include "augnetpp.hpp"
 
 namespace augas {
 
-    enum connstate {
+    enum connphase {
         CONNECTING,
-        ESTABLISHED,
         CONNECTED,
+        TEARDOWN,
+        SHUTDOWN,
         CLOSED
     };
 
@@ -97,7 +99,7 @@ namespace augas {
         virtual void
         do_connect(const aug_endpoint& ep) = 0;
 
-        virtual connstate
+        virtual bool
         do_process(aug::mplexer& mplexer) = 0;
 
         virtual void
@@ -109,14 +111,11 @@ namespace augas {
         virtual void
         do_teardown() = 0;
 
-        virtual void
-        do_data(const char* buf, size_t size) const = 0;
+        virtual const aug::endpoint&
+        do_endpoint() const = 0;
 
-        virtual bool
-        do_isopen() const = 0;
-
-        virtual bool
-        do_isshutdown() const = 0;
+        virtual connphase
+        do_phase() const = 0;
 
     public:
         ~conn_base() AUG_NOTHROW;
@@ -131,7 +130,7 @@ namespace augas {
         {
             do_connect(ep);
         }
-        connstate
+        bool
         process(aug::mplexer& mplexer)
         {
             return do_process(mplexer);
@@ -151,39 +150,40 @@ namespace augas {
         {
             do_teardown();
         }
-        void
-        data(const char* buf, size_t size) const
+        const aug::endpoint&
+        endpoint() const
         {
-            do_data(buf, size);
+            return do_endpoint();
         }
-        bool
-        isopen() const
+        connphase
+        phase() const
         {
-            return do_isopen();
-        }
-        bool
-        isshutdown() const
-        {
-            return do_isshutdown();
+            return do_phase();
         }
     };
 
     typedef aug::smartptr<conn_base> connptr;
 
-    class conn : public conn_base {
+    inline bool
+    sendable(const conn_base& conn)
+    {
+        connphase phase(conn.phase());
+        return CONNECTED == phase || TEARDOWN == phase;
+    }
+
+    class connected : public conn_base {
 
         sessptr sess_;
         augas_file& file_;
         rwtimer& rwtimer_;
+        aug::endpoint endpoint_;
         aug::smartfd sfd_;
         buffer buffer_;
-        bool open_, teardown_, shutdown_;
+        connphase phase_;
+        bool close_;
 
         augas_file&
         do_file();
-
-        int
-        do_fd() const;
 
         const augas_file&
         do_file() const;
@@ -191,13 +191,16 @@ namespace augas {
         const sessptr&
         do_sess() const;
 
+        aug::smartfd
+        do_sfd() const;
+
         void
         do_accept(const aug_endpoint& ep);
 
         void
         do_connect(const aug_endpoint& ep);
 
-        connstate
+        bool
         do_process(aug::mplexer& mplexer);
 
         void
@@ -209,27 +212,76 @@ namespace augas {
         void
         do_teardown();
 
-        void
-        do_data(const char* buf, size_t size) const;
+        const aug::endpoint&
+        do_endpoint() const;
 
-        bool
-        do_isopen() const;
-
-        bool
-        do_isshutdown() const;
+        connphase
+        do_phase() const;
 
     public:
-        ~conn() AUG_NOTHROW;
+        ~connected() AUG_NOTHROW;
 
-        conn(const sessptr& sess, augas_file& file, rwtimer& rwtimer,
-             const aug::smartfd& sfd);
+        connected(const sessptr& sess, augas_file& file, rwtimer& rwtimer,
+                  const aug::smartfd& sfd, const aug::endpoint& ep);
+    };
+
+    class connecting : public conn_base {
+
+        sessptr sess_;
+        augas_file& file_;
+        aug::connector connector_;
+        aug::endpoint endpoint_;
+        aug::smartfd sfd_;
+        connphase phase_;
+
+        augas_file&
+        do_file();
+
+        const augas_file&
+        do_file() const;
+
+        const sessptr&
+        do_sess() const;
+
+        aug::smartfd
+        do_sfd() const;
+
+        void
+        do_accept(const aug_endpoint& ep);
+
+        void
+        do_connect(const aug_endpoint& ep);
+
+        bool
+        do_process(aug::mplexer& mplexer);
+
+        void
+        do_putsome(aug::mplexer& mplexer, const void* buf, size_t size);
+
+        void
+        do_shutdown();
+
+        void
+        do_teardown();
+
+        const aug::endpoint&
+        do_endpoint() const;
+
+        connphase
+        do_phase() const;
+
+    public:
+        ~connecting() AUG_NOTHROW;
+
+        connecting(const sessptr& sess, augas_file& file, const char* host,
+                   const char* serv);
     };
 
     class client : public rwtimer_base, public conn_base {
 
         augas_file file_;
         rwtimer rwtimer_;
-        conn conn_;
+        connptr conn_;
 
         // rwtimer_base.
 
@@ -253,14 +305,14 @@ namespace augas {
         augas_file&
         do_file();
 
-        int
-        do_fd() const;
-
         const augas_file&
         do_file() const;
 
         const sessptr&
         do_sess() const;
+
+        aug::smartfd
+        do_sfd() const;
 
         void
         do_accept(const aug_endpoint& ep);
@@ -268,7 +320,7 @@ namespace augas {
         void
         do_connect(const aug_endpoint& ep);
 
-        connstate
+        bool
         do_process(aug::mplexer& mplexer);
 
         void
@@ -280,27 +332,24 @@ namespace augas {
         void
         do_teardown();
 
-        void
-        do_data(const char* buf, size_t size) const;
+        const aug::endpoint&
+        do_endpoint() const;
 
-        bool
-        do_isopen() const;
-
-        bool
-        do_isshutdown() const;
+        connphase
+        do_phase() const;
 
     public:
         ~client() AUG_NOTHROW;
 
         client(const sessptr& sess, augas_id cid, void* user,
-               aug::timers& timers, const aug::smartfd& sfd);
+               aug::timers& timers, const char* host, const char* serv);
     };
 
     class server : public rwtimer_base, public conn_base {
 
         augas_file file_;
         rwtimer rwtimer_;
-        conn conn_;
+        connected conn_;
 
         // rwtimer_base.
 
@@ -324,14 +373,14 @@ namespace augas {
         augas_file&
         do_file();
 
-        int
-        do_fd() const;
-
         const augas_file&
         do_file() const;
 
         const sessptr&
         do_sess() const;
+
+        aug::smartfd
+        do_sfd() const;
 
         void
         do_accept(const aug_endpoint& ep);
@@ -339,7 +388,7 @@ namespace augas {
         void
         do_connect(const aug_endpoint& ep);
 
-        connstate
+        bool
         do_process(aug::mplexer& mplexer);
 
         void
@@ -351,20 +400,18 @@ namespace augas {
         void
         do_teardown();
 
-        void
-        do_data(const char* buf, size_t size) const;
+        const aug::endpoint&
+        do_endpoint() const;
 
-        bool
-        do_isopen() const;
-
-        bool
-        do_isshutdown() const;
+        connphase
+        do_phase() const;
 
     public:
         ~server() AUG_NOTHROW;
 
         server(const sessptr& sess, augas_id cid, void* user,
-               aug::timers& timers, const aug::smartfd& sfd);
+               aug::timers& timers, const aug::smartfd& sfd,
+               const aug::endpoint& ep);
     };
 }
 

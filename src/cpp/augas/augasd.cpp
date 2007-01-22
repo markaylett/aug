@@ -66,7 +66,7 @@ namespace augas {
         const char* value;
         if ((value = options_.get("loglevel", 0))) {
             unsigned level(strtoui(value, 10));
-            AUG_DEBUG2("setting log level: %d", level);
+            AUG_DEBUG2("setting log level: level=[%d]", level);
             aug_setloglevel(level);
         }
 
@@ -83,8 +83,8 @@ namespace augas {
             openlog_();
         }
 
-        AUG_DEBUG2("log level: %d", aug_loglevel());
-        AUG_DEBUG2("run directory: %s", rundir_);
+        AUG_DEBUG2("log-level=[%d]", aug_loglevel());
+        AUG_DEBUG2("run-directory=[%s]", rundir_);
     }
 
     typedef map<int, sessptr> pending;
@@ -128,7 +128,7 @@ namespace augas {
     int
     extclose_(int fd)
     {
-        AUG_DEBUG2("clearing io event mask '%d'", fd);
+        AUG_DEBUG2("clearing io event mask: fd=[%d]", fd);
         aug_setioeventmask(state_->mplexer_, fd, 0);
         return base_->close_(fd);
     }
@@ -144,7 +144,9 @@ namespace augas {
             extdriver(extended, *base_);
         }
 
+        AUG_DEBUG2("adding connection to list: fd=[%d]", ref.get());
         insertconn(state_->conns_, ref, cb);
+
         try {
             setioeventmask(state_->mplexer_, ref, mask);
             setdriver(ref, extended);
@@ -220,7 +222,7 @@ namespace augas {
     int
     post_(const char* sname, int type, void* user, void (*free)(void*))
     {
-        AUG_DEBUG2("post() for session '%s'", sname);
+        AUG_DEBUG2("post(): sname=[%s]", sname);
         try {
 
             auto_ptr<eventarg> arg(new eventarg(sname, user, free));
@@ -245,43 +247,55 @@ namespace augas {
         return 0;
     }
 
+    void
+    preparefd_(const smartfd& sfd)
+    {
+        setnodelay(sfd, true);
+        setnonblock(sfd, true);
+        setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
+    }
+
+    void
+    connect_(const connptr& cptr)
+    {
+        const endpoint& ep(cptr->endpoint());
+        inetaddr addr(null);
+        AUG_DEBUG2("connected: host=[%s], port=[%d]",
+                   inetntop(getinetaddr(ep, addr)).c_str(),
+                   static_cast<int>(ntohs(port(ep))));
+
+        try {
+            setioeventmask(state_->mplexer_, cptr->sfd(), AUG_IOEVENTRD);
+            cptr->connect(ep);
+        } catch (...) {
+            state_->manager_.erase(*cptr);
+            throw;
+        }
+    }
+
     int
     tcpconnect_(const char* sname, const char* host, const char* serv,
                 void* user)
     {
-        AUG_DEBUG2("tcpconnect() for session '%s'", sname);
+        AUG_DEBUG2("tcpconnect(): sname=[%s]", sname);
         try {
 
             sessptr sess(state_->manager_.getsess(sname));
-
-            // TODO: alter tcpconnect to support a non-blocking mode of
-            // operation.
-
-            // Create connnector and call tryconnect().
-
-            endpoint ep(null);
-            smartfd sfd(tcpconnect(host, serv, ep));
-
-            inetaddr addr(null);
-            AUG_DEBUG2("connected to host '%s', port '%d'",
-                       inetntop(getinetaddr(ep, addr)).c_str(),
-                       static_cast<int>(ntohs(port(ep))));
-
-            setnodelay(sfd, true);
-            setnonblock(sfd, true);
-            setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
 
             augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
                              // uninitialized in this function.
             id = aug_nextid();
             connptr cptr(new augas::client(sess, id, user, state_->timers_,
-                                           sfd));
+                                           host, serv));
+
             state_->manager_.insert(cptr);
-            try {
-                cptr->connect(ep);
-            } catch (...) {
-                state_->manager_.erase(*cptr);
-            }
+
+            if (CONNECTED == cptr->phase()) {
+                preparefd_(cptr->sfd());
+                connect_(cptr);
+            } else
+                setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
+
             return (int)id;
 
         } AUG_SETERRINFOCATCH;
@@ -291,7 +305,7 @@ namespace augas {
     tcplisten_(const char* sname, const char* host, const char* serv,
                void* user)
     {
-        AUG_DEBUG2("tcplisten() for session '%s'", sname);
+        AUG_DEBUG2("tcplisten(): sname=[%s]", sname);
         try {
 
             endpoint ep(null);
@@ -307,7 +321,7 @@ namespace augas {
             state_->manager_.insert(lptr);
 
             inetaddr addr(null);
-            AUG_DEBUG2("listening on interface '%s', port '%d'",
+            AUG_DEBUG2("listening: interface=[%s], port=[%d]",
                        inetntop(getinetaddr(ep, addr)).c_str(),
                        static_cast<int>(ntohs(port(ep))));
             return (int)id;
@@ -320,7 +334,7 @@ namespace augas {
     settimer_(const char* sname, int id, unsigned ms, void* arg,
               void (*free)(void*))
     {
-        AUG_DEBUG2("settimer() for session '%s', id '%d'", sname, id);
+        AUG_DEBUG2("settimer(): sname=[%s], id=[%d]", sname, id);
         try {
 
             var v(arg, free);
@@ -337,7 +351,7 @@ namespace augas {
     int
     resettimer_(const char* sname, int tid, unsigned ms)
     {
-        AUG_DEBUG2("resettimer() for session '%s', id '%d'", sname, tid);
+        AUG_DEBUG2("resettimer(): sname=[%s], id=[%d]", sname, tid);
         try {
             return aug_resettimer(cptr(state_->timers_), tid, ms);
         } AUG_SETERRINFOCATCH;
@@ -347,7 +361,7 @@ namespace augas {
     int
     canceltimer_(const char* sname, int tid)
     {
-        AUG_DEBUG2("canceltimer() for session '%s', id '%d'", sname, tid);
+        AUG_DEBUG2("canceltimer(): sname=[%s], id=[%d]", sname, tid);
         try {
             int ret(aug_canceltimer(cptr(state_->timers_), tid));
 
@@ -366,7 +380,7 @@ namespace augas {
     int
     shutdown_(augas_id cid)
     {
-        AUG_DEBUG2("shutdown() for id '%d'", cid);
+        AUG_DEBUG2("shutdown(): id=[%d]", cid);
         try {
             fileptr file(state_->manager_.getbyid(cid));
             connptr cptr(smartptr_cast<conn_base>(file));
@@ -383,7 +397,7 @@ namespace augas {
     send_(const char* sname, augas_id cid, const char* buf, size_t size,
           unsigned flags)
     {
-        AUG_DEBUG2("send() for session '%s', id '%d'", sname, cid);
+        AUG_DEBUG2("send(): sname=[%s], id=[%d]", sname, cid);
         try {
             switch (flags) {
             case AUGAS_SNDALL:
@@ -413,13 +427,13 @@ namespace augas {
     int
     setrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
-        AUG_DEBUG2("setrwtimer() for id '%d'", cid);
+        AUG_DEBUG2("setrwtimer(): id=[%d]", cid);
         try {
             rwtimerptr rwtimer(smartptr_cast<
                                rwtimer_base>(state_->manager_.getbyid(cid)));
             if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
-                            "connection-id '%d' not found", cid);
+                            "connection not found: id=[%d]", cid);
             rwtimer->setrwtimer(ms, flags);
             return 0;
         } AUG_SETERRINFOCATCH;
@@ -429,13 +443,13 @@ namespace augas {
     int
     resetrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
-        AUG_DEBUG2("resetrwtimer() for id '%d'", cid);
+        AUG_DEBUG2("resetrwtimer(): id=[%d]", cid);
         try {
             rwtimerptr rwtimer(smartptr_cast<
                                rwtimer_base>(state_->manager_.getbyid(cid)));
             if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
-                            "connection-id '%d' not found", cid);
+                            "connection not found: id=[%d]", cid);
             rwtimer->resetrwtimer(ms, flags);
             return 0;
         } AUG_SETERRINFOCATCH;
@@ -445,13 +459,13 @@ namespace augas {
     int
     cancelrwtimer_(augas_id cid, unsigned flags)
     {
-        AUG_DEBUG2("cancelrwtimer() for id '%d'", cid);
+        AUG_DEBUG2("cancelrwtimer(): id=[%d]", cid);
         try {
             rwtimerptr rwtimer(smartptr_cast<
                                rwtimer_base>(state_->manager_.getbyid(cid)));
             if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
-                            "connection-id '%d' not found", cid);
+                            "connection not found: id=[%d]", cid);
             rwtimer->cancelrwtimer(flags);
             return 0;
         } AUG_SETERRINFOCATCH;
@@ -501,14 +515,14 @@ namespace augas {
     void
     accept_(const file_base& file, conncb_base& conncb)
     {
-        aug_endpoint ep;
+        endpoint ep(null);
 
         AUG_DEBUG2("accepting connection");
 
         smartfd sfd(null);
         try {
 
-            sfd = accept(file.fd(), ep);
+            sfd = accept(file.sfd(), ep);
 
         } catch (const errinfo_error& e) {
 
@@ -519,20 +533,20 @@ namespace augas {
             throw;
         }
 
-        AUG_DEBUG2("initialising connection '%d'", sfd.get());
-
-        setnodelay(sfd, true);
-        setnonblock(sfd, true);
-        setextdriver_(sfd, conncb, AUG_IOEVENTRD);
-
+        preparefd_(sfd);
         augas_id id(aug_nextid());
+
+        AUG_DEBUG2("initialising connection: id=[%d%], fd=[%d]", id,
+                   sfd.get());
+
         connptr conn(new augas::server(file.sess(), id, file.user(),
-                                       state_->timers_, sfd));
+                                       state_->timers_, sfd, ep));
         state_->manager_.insert(conn);
         try {
             conn->accept(ep);
         } catch (...) {
             state_->manager_.erase(*conn);
+            throw;
         }
     }
 
@@ -546,7 +560,7 @@ namespace augas {
         case AUG_EVENTRECONF:
             AUG_DEBUG2("received AUG_EVENTRECONF");
             if (*conffile_) {
-                AUG_DEBUG2("reading: %s", conffile_);
+                AUG_DEBUG2("reading config-file: path=[%s]", conffile_);
                 options_.read(conffile_);
             }
             doreconf_();
@@ -594,19 +608,29 @@ namespace augas {
             fileptr file(state_->manager_.getbyfd(fd));
             connptr cptr(smartptr_cast<conn_base>(file));
 
+            AUG_DEBUG2("processing file: id=[%d], fd=[%d]", file->id(), fd);
+
             if (null != cptr) {
 
-                switch (cptr->process(state_->mplexer_)) {
-                case CONNECTING:
-                case ESTABLISHED:
+                bool changed(cptr->process(state_->mplexer_));
+
+                if (CONNECTING == cptr->phase()) {
+                    setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
                     state_->manager_.update(file, fd);
-                    break;
-                case CONNECTED:
-                    break;
-                case CLOSED:
-                    state_->manager_.erase(*file);
-                    return false;
-                }
+                } else if (changed)
+                    switch (cptr->phase()) {
+                    case CONNECTED:
+                        setnodelay(fd, true);
+                        setnonblock(fd, true);
+                        setioeventmask(state_->mplexer_, fd, AUG_IOEVENTRD);
+                        connect_(cptr);
+                        break;
+                    case CLOSED:
+                        state_->manager_.erase(*file);
+                        return false;
+                    default:
+                        break;
+                    }
 
             } else
                 accept_(*file, *this);
@@ -642,7 +666,7 @@ namespace augas {
 
             if (conffile) {
 
-                AUG_DEBUG2("reading: %s", conffile);
+                AUG_DEBUG2("reading config-file: path=[%s]", conffile);
                 options_.read(conffile);
 
                 // Store the absolute path to service any reconf requests.
@@ -715,6 +739,8 @@ namespace augas {
 
                     } else {
 
+                        AUG_DEBUG2("processing timers");
+
                         struct timeval tv;
                         processtimers(state_->timers_, 0 == ret, tv);
 
@@ -723,6 +749,8 @@ namespace augas {
                                                (state_->mplexer_, tv)))
                             ;
                     }
+
+                    AUG_DEBUG2("processing connections");
 
                     processconns(state_->conns_);
                     continue;

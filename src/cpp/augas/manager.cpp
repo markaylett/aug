@@ -57,31 +57,33 @@ manager::clear()
 void
 manager::erase(const file_base& file)
 {
-    AUG_DEBUG2("erasing id '%d', fd '%d'", file.id(), file.fd());
+    AUG_DEBUG2("removing from manager: id=[%d], fd=[%d]", file.id(),
+               file.sfd().get());
 
     idtofd_.erase(file.id());
-    files_.erase(file.fd());
+    files_.erase(file.sfd().get());
 }
 
 void
 manager::insert(const fileptr& file)
 {
-    AUG_DEBUG2("inserting id '%d', fd '%d'", file->id(), file->fd());
+    AUG_DEBUG2("adding to manager: id=[%d], fd=[%d]", file->id(),
+               file->sfd().get());
 
-    files_.insert(make_pair(file->fd(), file));
-    idtofd_.insert(make_pair(file->id(), file->fd()));
+    files_.insert(make_pair(file->sfd().get(), file));
+    idtofd_.insert(make_pair(file->id(), file->sfd().get()));
 }
 
 void
 manager::update(const fileptr& file, fdref prev)
 {
-    AUG_DEBUG2("updating id '%d', fd '%d', prev '%d'", file->id(), file->fd(),
-               prev.get());
+    AUG_DEBUG2("updating manager: id=[%d], fd=[%d], prev=[%d]", file->id(),
+               file->sfd().get(), prev.get());
 
-    files_.insert(make_pair(file->fd(), file));
+    files_.insert(make_pair(file->sfd().get(), file));
     files_.erase(prev.get());
 
-    idtofd_[file->id()] = file->fd();
+    idtofd_[file->id()] = file->sfd().get();
 }
 
 void
@@ -115,14 +117,14 @@ manager::load(const char* rundir, const options& options,
                 string path(options.get(string("module.").append(value)
                                         .append(".path")));
 
-                aug_info("loading module '%s'", value.c_str());
+                aug_info("loading module: name=[%s]", value.c_str());
                 aug::chdir(rundir);
                 moduleptr module(new augas::module(value, path.c_str(),
                                                    host));
                 it = modules_.insert(make_pair(value, module)).first;
             }
 
-            aug_info("creating session '%s'", name.c_str());
+            aug_info("creating session: name=[%s]", name.c_str());
             insert(name, sessptr(new augas::sess(it->second, name.c_str())));
         }
 
@@ -130,12 +132,12 @@ manager::load(const char* rundir, const options& options,
 
         // No service list: assume reasonable defaults.
 
-        aug_info("loading module '%s'", DEFAULT_NAME);
+        aug_info("loading module: name=[%s]", DEFAULT_NAME);
         moduleptr module(new augas::module(DEFAULT_NAME, DEFAULT_MODULE,
                                            host));
         modules_[DEFAULT_NAME] = module;
 
-        aug_info("creating session '%s'", DEFAULT_NAME);
+        aug_info("creating session: name=[%s]", DEFAULT_NAME);
         insert(DEFAULT_NAME,
                sessptr(new augas::sess(module, DEFAULT_NAME)));
     }
@@ -154,7 +156,7 @@ manager::sendall(mplexer& mplexer, augas_id cid, const char* sname,
         if (null == cptr)
             continue;
 
-        if (cptr->isshutdown()) {
+        if (!sendable(*cptr)) {
             if (cptr->id() == cid)
                 ret = false;
             continue;
@@ -172,7 +174,7 @@ manager::sendself(mplexer& mplexer, augas_id cid, const char* buf,
                   size_t size)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
-    if (cptr->isshutdown())
+    if (!sendable(*cptr))
         return false;
 
     cptr->putsome(mplexer, buf, size);
@@ -193,7 +195,7 @@ manager::sendother(mplexer& mplexer, augas_id cid, const char* sname,
         // Ignore self as well as connections that have been marked for
         // shutdown.
 
-        if (cptr->id() == cid || cptr->isshutdown())
+        if (cptr->id() == cid || !sendable(*cptr))
             continue;
 
         cptr->putsome(mplexer, buf, size);
@@ -206,11 +208,11 @@ manager::teardown()
     idtofd::reverse_iterator rit(idtofd_.rbegin()), rend(idtofd_.rend());
     while (rit != rend) {
 
-        AUG_DEBUG2("teardown id '%d', fd '%d'", rit->first, rit->second);
+        AUG_DEBUG2("teardown: id=[%d], fd=[%d]", rit->first, rit->second);
 
         files::iterator it(files_.find(rit->second));
         if (it == files_.end())
-            throw error(__FILE__, __LINE__, ESTATE, "fd '%d' not found",
+            throw error(__FILE__, __LINE__, ESTATE, "file not found: fd=[%d]",
                         rit->second);
 
         connptr cptr(smartptr_cast<conn_base>(it->second));
@@ -243,7 +245,7 @@ manager::getbyfd(fdref fd) const
 {
     files::const_iterator it(files_.find(fd.get()));
     if (it == files_.end())
-        throw error(__FILE__, __LINE__, ESTATE, "fd '%d' not found",
+        throw error(__FILE__, __LINE__, ESTATE, "file not found: fd=[%d]",
                     fd.get());
     return it->second;
 }
@@ -253,7 +255,8 @@ manager::getbyid(augas_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));
     if (it == idtofd_.end())
-        throw error(__FILE__, __LINE__, ESTATE, "id '%d' not found", id);
+        throw error(__FILE__, __LINE__, ESTATE, "file not found: id=[%d]",
+                    id);
     return getbyfd(it->second);
 }
 
@@ -263,7 +266,7 @@ manager::getsess(const string& name) const
     sesss::const_iterator it(sesss_.find(name));
     if (it == sesss_.end())
         throw error(__FILE__, __LINE__, ESTATE,
-                    "session '%s' not found", name.c_str());
+                    "session not found: sname=[%1%]", name.c_str());
     return it->second;
 }
 
