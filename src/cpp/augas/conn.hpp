@@ -93,7 +93,7 @@ namespace augas {
 
     class conn_base : public file_base {
 
-        virtual void
+        virtual bool
         do_accept(const aug_endpoint& ep) = 0;
 
         virtual void
@@ -120,10 +120,10 @@ namespace augas {
     public:
         ~conn_base() AUG_NOTHROW;
 
-        void
+        bool
         accept(const aug_endpoint& ep)
         {
-            do_accept(ep);
+            return do_accept(ep);
         }
         void
         connect(const aug_endpoint& ep)
@@ -194,7 +194,7 @@ namespace augas {
         aug::smartfd
         do_sfd() const;
 
-        void
+        bool
         do_accept(const aug_endpoint& ep);
 
         void
@@ -222,7 +222,8 @@ namespace augas {
         ~connected() AUG_NOTHROW;
 
         connected(const sessptr& sess, augas_file& file, rwtimer& rwtimer,
-                  const aug::smartfd& sfd, const aug::endpoint& ep);
+                  const aug::smartfd& sfd, const aug::endpoint& ep,
+                  bool close);
     };
 
     class connecting : public conn_base {
@@ -246,7 +247,7 @@ namespace augas {
         aug::smartfd
         do_sfd() const;
 
-        void
+        bool
         do_accept(const aug_endpoint& ep);
 
         void
@@ -314,7 +315,7 @@ namespace augas {
         aug::smartfd
         do_sfd() const;
 
-        void
+        bool
         do_accept(const aug_endpoint& ep);
 
         void
@@ -382,7 +383,7 @@ namespace augas {
         aug::smartfd
         do_sfd() const;
 
-        void
+        bool
         do_accept(const aug_endpoint& ep);
 
         void

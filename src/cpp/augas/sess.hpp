@@ -15,87 +15,92 @@ namespace augas {
 
         moduleptr module_;
         augas_sess sess_;
-        bool open_;
+        bool close_;
 
     public:
         ~sess() AUG_NOTHROW;
 
         sess(const moduleptr& module, const char* name);
 
-        void
-        open();
-
-        void
-        event(int type, void* user) const
+        bool
+        open() AUG_NOTHROW
         {
-            module_->event(sess_, type, user);
+            return close_ = module_->opensess(sess_);
+        }
+        bool
+        event(int type, void* user) const AUG_NOTHROW
+        {
+            return module_->event(sess_, type, user);
+        }
+        bool
+        expire(unsigned tid, void* user, unsigned& ms) const AUG_NOTHROW
+        {
+            return module_->expire(sess_, tid, user, ms);
+        }
+        bool
+        reconf() const AUG_NOTHROW
+        {
+            return module_->reconf(sess_);
         }
         void
-        expire(unsigned tid, void* user, unsigned& ms) const
-        {
-            module_->expire(sess_, tid, user, ms);
-        }
-        void
-        reconf() const
-        {
-            module_->reconf(sess_);
-        }
-        void
-        close(const augas_file& file) const
+        close(const augas_file& file) const AUG_NOTHROW
         {
             module_->close(file);
         }
-        void
-        accept(augas_file& file, const char* addr, unsigned short port) const
+        bool
+        accept(augas_file& file, const char* addr,
+               unsigned short port) const AUG_NOTHROW
         {
-            module_->accept(file, addr, port);
+            return module_->accept(file, addr, port);
         }
-        void
-        connect(augas_file& file, const char* addr, unsigned short port) const
+        bool
+        connect(augas_file& file, const char* addr,
+                unsigned short port) const AUG_NOTHROW
         {
-            module_->connect(file, addr, port);
+            return module_->connect(file, addr, port);
         }
-        void
-        data(const augas_file& file, const char* buf, size_t size) const
+        bool
+        data(const augas_file& file, const char* buf,
+             size_t size) const AUG_NOTHROW
         {
-            module_->data(file, buf, size);
+            return module_->data(file, buf, size);
         }
-        void
-        rdexpire(const augas_file& file, unsigned& ms) const
+        bool
+        rdexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW
         {
-            module_->rdexpire(file, ms);
+            return module_->rdexpire(file, ms);
         }
-        void
-        wrexpire(const augas_file& file, unsigned& ms) const
+        bool
+        wrexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW
         {
-            module_->wrexpire(file, ms);
+            return module_->wrexpire(file, ms);
         }
-        void
-        teardown(const augas_file& file) const
+        bool
+        teardown(const augas_file& file) const AUG_NOTHROW
         {
-            module_->teardown(file);
+            return module_->teardown(file);
         }
-        operator augas_sess&()
+        operator augas_sess&() AUG_NOTHROW
         {
             return sess_;
         }
-        operator const augas_sess&() const
+        operator const augas_sess&() const AUG_NOTHROW
         {
             return sess_;
         }
         bool
-        isopen() const
+        isopen() const AUG_NOTHROW
         {
-            return open_;
+            return close_;
         }
         const char*
-        name() const
+        name() const AUG_NOTHROW
         {
             return sess_.name_;
         }
     };
 
-    typedef aug::smartptr<sess, aug::scoped_lock> sessptr;
+    typedef aug::smartptr<sess> sessptr;
 }
 
 #endif // AUGAS_SESS_HPP

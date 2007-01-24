@@ -99,5 +99,8 @@
    first (like Motorola and SPARC, unlike Intel and VAX). */
 #undef WORDS_BIGENDIAN
 
+/* Define to the equivalent of __func__ */
+#undef __func__
+
 /* socklen_t size */
 #undef socklen_t

@@ -123,6 +123,35 @@ AC_TRY_COMPILE([
 	AC_MSG_RESULT(no)
 ])
 
+AC_MSG_CHECKING(whether the compiler supports __func__)
+AC_TRY_COMPILE([
+const char*
+func()
+{
+    return __func__;
+}
+], [], [
+    AC_MSG_RESULT(yes)
+], [
+    AC_MSG_RESULT(no)
+    AC_MSG_CHECKING(whether the compiler supports __FUNCTION__)
+    AC_TRY_COMPILE([
+const char*
+func()
+{
+    return __FUNCTION__;
+}
+    ], [], [
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(__func__, __FUNCTION__,
+            [Define to the equivalent of __func__])
+    ], [
+        AC_MSG_RESULT(no)
+        AC_DEFINE(__func__, "unknown",
+            [Define to the equivalent of __func__])
+    ])
+])
+
 # Checks for library functions.
 AC_CHECK_FUNCS([bzero localtime_r poll strlcpy])
 

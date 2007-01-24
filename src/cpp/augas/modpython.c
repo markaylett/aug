@@ -27,26 +27,45 @@ struct import_ {
 
 static const struct augas_host* host_ = NULL;
 static PyObject* pyaugas_ = NULL;
-static unsigned refs_ = 0;
+static int refs_ = 0;
 
 static void
-release_(void* user)
+release_(PyObject* user, const char* func)
 {
-    PyObject* x = user;
     --refs_;
     if (host_)
-        host_->writelog_(AUGAS_LOGDEBUG,
-                         "releasing python object, %u remaining", refs_);
-    Py_DECREF(x);
+        host_->writelog_
+            (AUGAS_LOGDEBUG,
+             "releasing python object: user=[%08x], fn=[%s()], refs=[%d]",
+             user, func, refs_);
+    Py_DECREF(user);
 }
 
 static void
-retain_(PyObject* user)
+retain_(PyObject* user, const char* func)
 {
     ++refs_;
-    host_->writelog_(AUGAS_LOGDEBUG,
-                     "retaining python object, %u remaining", refs_);
+    host_->writelog_
+        (AUGAS_LOGDEBUG,
+         "retaining python object: user=[%08x], fn=[%s()], refs=[%d]",
+         user, func, refs_);
     Py_INCREF(user);
+}
+
+static void
+return_(PyObject* user, const char* func)
+{
+    ++refs_;
+    host_->writelog_
+        (AUGAS_LOGDEBUG,
+         "retaining python object: user=[%08x], fn=[%s()], refs=[%d]",
+         user, func, refs_);
+}
+
+static void
+free_(void* user)
+{
+    release_(user, __func__);
 }
 
 static PyObject*
@@ -273,7 +292,7 @@ pypost_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "siO:post", &sname, &type, &user))
         return NULL;
 
-    if (-1 == host_->post_(sname, type, user, release_)) {
+    if (-1 == host_->post_(sname, type, user, free_)) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
@@ -282,7 +301,7 @@ pypost_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    retain_(user);
+    retain_(user, __func__);
     return incnone_();
 }
 
@@ -319,6 +338,7 @@ pytcpconnect_(PyObject* self, PyObject* args)
     /* When tcpconnect() becomes asynchronous, user will need to be
        Py_INCREF()-ed. */
 
+    retain_(user, __func__);
     return Py_BuildValue("i", cid);
 }
 
@@ -338,7 +358,7 @@ pytcplisten_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    retain_(user);
+    retain_(user, __func__);
     return Py_BuildValue("i", lid);
 }
 
@@ -353,12 +373,12 @@ pysettimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "siIO:settimer", &sname, &tid, &ms, &user))
         return NULL;
 
-    if (-1 == (tid = host_->settimer_(sname, tid, ms, user, release_))) {
+    if (-1 == (tid = host_->settimer_(sname, tid, ms, user, free_))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
 
-    retain_(user);
+    retain_(user, __func__);
     return Py_BuildValue("i", tid);
 }
 
@@ -578,6 +598,11 @@ pyfree_(void)
 
         host_->writelog_(AUGAS_LOGDEBUG, "finalising python interpreter");
         Py_Finalize();
+
+        if (refs_)
+            host_->writelog_(AUGAS_LOGERROR,
+                             "unreleased python references: refs=[%d]",
+                             refs_);
     }
 }
 
@@ -748,42 +773,41 @@ close_(const struct augas_file* file)
         } else
             printerr_();
     }
-    release_(x);
+    release_(x, __func__);
 }
 
 static int
 accept_(struct augas_file* file, const char* addr, unsigned short port)
 {
     struct import_* import = file->sess_->user_;
-    PyObject* x = file->user_, * y = NULL;
-    int ret = 0;
+    PyObject* x = file->user_;
     assert(file->user_);
     assert(file->sess_->user_);
 
     if (import->accept_) {
 
-        if (!(y = PyObject_CallFunction(import->accept_, "siOsH",
+        if (!(x = PyObject_CallFunction(import->accept_, "siOsH",
                                         file->sess_->name_, file->id_, x,
                                         addr, port))) {
+
+            /* close() will not be called if accept() fails. */
+
             printerr_();
-            ret = -1;
+            return -1;
         }
+
+    } else {
+
+        x = Py_None;
+        Py_INCREF(x);
     }
 
-    if (!y) {
-        y = Py_None;
-        Py_INCREF(y);
-    }
+    file->user_ = x;
+    return_(x, __func__);
 
-    ++refs_;
-    host_->writelog_(AUGAS_LOGDEBUG,
-                     "retaining python object, %u remaining", refs_);
-    file->user_ = y;
+    /* x is still retained by the listener. */
 
-    /* x is either still owned by the tcplistener or will be released by the
-       tcpconnector. */
-
-    return ret;
+    return 0;
 }
 
 static int
@@ -805,19 +829,16 @@ connect_(struct augas_file* file, const char* addr, unsigned short port)
         }
     }
 
+    /* close() will always be called, even if connect() fails. */
+
     if (!y) {
-        y = Py_None;
+        y = x;
         Py_INCREF(y);
     }
 
-    ++refs_;
-    host_->writelog_(AUGAS_LOGDEBUG,
-                     "retaining python object, %u remaining", refs_);
     file->user_ = y;
-
-    /* x is either still owned by the tcplistener or will be released by the
-       tcpconnector. */
-
+    return_(y, __func__);
+    release_(x, __func__);
     return ret;
 }
 

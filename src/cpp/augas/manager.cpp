@@ -31,17 +31,12 @@ manager::insert(const string& name, const sessptr& sess)
     // Insert prior to calling open().
 
     sesss_[name] = sess;
-    try {
-        try {
-            sess->open();
-        } catch (...) {
+    if (!sess->open()) {
 
-            // TODO: leave if event posted.
+        // TODO: leave if event posted.
 
-            sesss_.erase(name); // close() will not be called.
-            throw;
-        }
-    } AUG_PERRINFOCATCH;
+        sesss_.erase(name); // close() will not be called.
+    }
 }
 
 void

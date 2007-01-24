@@ -31,46 +31,48 @@ namespace augas {
                const augas_host& host);
 
         void
-        closesess(const augas_sess& sess) const;
+        closesess(const augas_sess& sess) const AUG_NOTHROW;
 
-        void
-        opensess(augas_sess& sess) const;
+        bool
+        opensess(augas_sess& sess) const AUG_NOTHROW;
 
 
-        void
-        event(const augas_sess& sess, int type, void* user) const;
+        bool
+        event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW;
 
-        void
+        bool
         expire(const augas_sess& sess, int tid, void* user,
-               unsigned& ms) const;
+               unsigned& ms) const AUG_NOTHROW;
+
+        bool
+        reconf(const augas_sess& sess) const AUG_NOTHROW;
 
         void
-        reconf(const augas_sess& sess) const;
+        close(const augas_file& file) const AUG_NOTHROW;
 
-        void
-        close(const augas_file& file) const;
+        bool
+        accept(augas_file& file, const char* addr,
+               unsigned short port) const AUG_NOTHROW;
 
-        void
-        accept(augas_file& file, const char* addr, unsigned short port) const;
-
-        void
+        bool
         connect(augas_file& file, const char* addr,
-                unsigned short port) const;
+                unsigned short port) const AUG_NOTHROW;
 
-        void
-        data(const augas_file& file, const char* buf, size_t size) const;
+        bool
+        data(const augas_file& file, const char* buf,
+             size_t size) const AUG_NOTHROW;
 
-        void
-        rdexpire(const augas_file& file, unsigned& ms) const;
+        bool
+        rdexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW;
 
-        void
-        wrexpire(const augas_file& file, unsigned& ms) const;
+        bool
+        wrexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW;
 
-        void
-        teardown(const augas_file& file) const;
+        bool
+        teardown(const augas_file& file) const AUG_NOTHROW;
     };
 
-    typedef aug::smartptr<module, aug::scoped_lock> moduleptr;
+    typedef aug::smartptr<module> moduleptr;
 }
 
 #endif // AUGAS_MODULE_HPP

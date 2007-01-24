@@ -12,25 +12,14 @@ using namespace std;
 
 sess::~sess() AUG_NOTHROW
 {
-    try {
-        if (open_)
-            module_->closesess(sess_);
-    } AUG_PERRINFOCATCH;
+    if (close_)
+        module_->closesess(sess_); // AUG_NOTHROW
 }
 
 sess::sess(const moduleptr& module, const char* name)
     : module_(module),
-      open_(false)
+      close_(false)
 {
     aug_strlcpy(sess_.name_, name, sizeof(sess_.name_));
     sess_.user_ = 0;
-}
-
-void
-sess::open()
-{
-    if (!open_) {
-        module_->opensess(sess_);
-        open_ = true;
-    }
 }

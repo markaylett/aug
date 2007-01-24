@@ -111,26 +111,19 @@ connected::do_sfd() const
     return sfd_;
 }
 
-void
+bool
 connected::do_accept(const aug_endpoint& ep)
 {
-    if (!close_) {
-        inetaddr addr(null);
-        sess_->accept(file_, inetntop(getinetaddr(ep, addr)).c_str(),
-                      port(ep));
-        close_ = true;
-    }
+    inetaddr addr(null);
+    return close_ = sess_
+        ->accept(file_, inetntop(getinetaddr(ep, addr)).c_str(), port(ep));
 }
 
 void
 connected::do_connect(const aug_endpoint& ep)
 {
-    if (!close_) {
-        inetaddr addr(null);
-        sess_->connect(file_, inetntop(getinetaddr(ep, addr)).c_str(),
-                       port(ep));
-        close_ = true;
-    }
+    inetaddr addr(null);
+    sess_->connect(file_, inetntop(getinetaddr(ep, addr)).c_str(), port(ep));
 }
 
 bool
@@ -237,14 +230,14 @@ connected::~connected() AUG_NOTHROW
 }
 
 connected::connected(const sessptr& sess, augas_file& file, rwtimer& rwtimer,
-                     const smartfd& sfd, const aug::endpoint& ep)
+                     const smartfd& sfd, const aug::endpoint& ep, bool close)
     : sess_(sess),
       file_(file),
       rwtimer_(rwtimer),
       endpoint_(ep),
       sfd_(sfd),
       phase_(CONNECTED),
-      close_(false)
+      close_(close)
 {
 }
 
@@ -272,11 +265,10 @@ connecting::do_sfd() const
     return sfd_;
 }
 
-void
+bool
 connecting::do_accept(const aug_endpoint& ep)
 {
-    throw error(__FILE__, __LINE__, ESTATE,
-                "connection not established: id=[%d]", file_.id_);
+    return false;
 }
 
 void
@@ -300,12 +292,9 @@ connecting::do_process(mplexer& mplexer)
 
     } catch (const errinfo_error& e) {
 
-        if (ECONNREFUSED == aug_errno()) {
-            perrinfo(e, "connection failed");
-            phase_ = CLOSED;
-            return true;
-        }
-        throw;
+        perrinfo(e, "connection failed");
+        phase_ = CLOSED;
+        return true;
     }
 
     return false;
@@ -346,6 +335,10 @@ connecting::do_phase() const
 
 connecting::~connecting() AUG_NOTHROW
 {
+    try {
+        if (CLOSED == phase_)
+            sess_->close(file_);
+    } AUG_PERRINFOCATCH;
 }
 
 connecting::connecting(const sessptr& sess, augas_file& file,
@@ -354,7 +347,8 @@ connecting::connecting(const sessptr& sess, augas_file& file,
       file_(file),
       connector_(host, serv),
       endpoint_(null),
-      sfd_(null)
+      sfd_(null),
+      phase_(CLOSED)
 {
     pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
     sfd_ = xy.first;
@@ -415,10 +409,10 @@ client::do_sfd() const
     return conn_->sfd();
 }
 
-void
+bool
 client::do_accept(const aug_endpoint& ep)
 {
-    conn_->accept(ep);
+    return conn_->accept(ep);
 }
 
 void
@@ -438,7 +432,7 @@ client::do_process(mplexer& mplexer)
         AUG_DEBUG2("client is now connected, assuming new state");
 
         conn_ = connptr(new connected(conn_->sess(), file_, rwtimer_,
-                                      conn_->sfd(), conn_->endpoint()));
+                                      conn_->sfd(), conn_->endpoint(), true));
     }
 
     return true;
@@ -492,7 +486,7 @@ client::client(const sessptr& sess, augas_id cid, void* user, timers& timers,
         AUG_DEBUG2("client is now connected, assuming new state");
 
         conn_ = connptr(new connected(conn_->sess(), file_, rwtimer_,
-                                      conn_->sfd(), conn_->endpoint()));
+                                      conn_->sfd(), conn_->endpoint(), true));
     }
 }
 
@@ -550,10 +544,10 @@ server::do_sfd() const
     return conn_.sfd();
 }
 
-void
+bool
 server::do_accept(const aug_endpoint& ep)
 {
-    conn_.accept(ep);
+    return conn_.accept(ep);
 }
 
 void
@@ -605,7 +599,7 @@ server::~server() AUG_NOTHROW
 server::server(const sessptr& sess, augas_id cid, void* user, timers& timers,
                const smartfd& sfd, const aug::endpoint& ep)
     : rwtimer_(sess, file_, timers),
-      conn_(sess, file_, rwtimer_, sfd, ep)
+      conn_(sess, file_, rwtimer_, sfd, ep, false)
 {
     file_.sess_ = cptr(*sess);
     file_.id_ = cid;

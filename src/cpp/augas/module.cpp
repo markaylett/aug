@@ -20,11 +20,7 @@ module::~module() AUG_NOTHROW
     try {
         AUG_DEBUG2("terminating module: name=[%s]", name_.c_str());
         termfn_();
-    } catch (const exception& e) {
-        aug_error("std::exception: %s", e.what());
-    } catch (...) {
-        aug_error("unknown exception");
-    }
+    } AUG_PERRINFOCATCH;
 }
 
 module::module(const string& name, const char* path,
@@ -44,109 +40,94 @@ module::module(const string& name, const char* path,
 }
 
 void
-module::closesess(const augas_sess& sess) const
+module::closesess(const augas_sess& sess) const AUG_NOTHROW
 {
     AUG_DEBUG2("closesess(): sname=[%s]", sess.name_);
     module_.closesess_(&sess);
 }
 
-void
-module::opensess(augas_sess& sess) const
+bool
+module::opensess(augas_sess& sess) const AUG_NOTHROW
 {
     AUG_DEBUG2("opensess(): sname=[%s]", sess.name_);
-    if (AUGAS_OK != module_.opensess_(&sess))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::opensess_() failed");
+    return AUGAS_OK == module_.opensess_(&sess);
 }
 
-void
-module::event(const augas_sess& sess, int type, void* user) const
+bool
+module::event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW
 {
-    AUG_DEBUG2("event(): sname=[%s]", sess.name_);
-    if (AUGAS_OK != module_.event_(&sess, type, user))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::event_() failed");
+    AUG_DEBUG2("event(): sname=[%s], type=[%d]", sess.name_, type);
+    return AUGAS_OK == module_.event_(&sess, type, user);
 }
 
-void
+bool
 module::expire(const augas_sess& sess, int tid, void* user,
-               unsigned& ms) const
+               unsigned& ms) const AUG_NOTHROW
 {
-    AUG_DEBUG2("expire(): sname=[%s]", sess.name_);
-    if (AUGAS_OK != module_.expire_(&sess, tid, user, &ms))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::expire_() failed");
+    AUG_DEBUG2("expire(): sname=[%s], id=[%d], ms=[%u]", sess.name_, tid, ms);
+    return AUGAS_OK == module_.expire_(&sess, tid, user, &ms);
 }
 
-void
-module::reconf(const augas_sess& sess) const
+bool
+module::reconf(const augas_sess& sess) const AUG_NOTHROW
 {
     AUG_DEBUG2("reconf(): sname=[%s]", sess.name_);
-    if (AUGAS_OK != module_.reconf_(&sess))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::reconf_() failed");
+    return AUGAS_OK == module_.reconf_(&sess);
 }
 
 void
-module::close(const augas_file& file) const
+module::close(const augas_file& file) const AUG_NOTHROW
 {
     AUG_DEBUG2("close(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
     module_.close_(&file);
 }
 
-void
-module::accept(augas_file& file, const char* addr, unsigned short port) const
+bool
+module::accept(augas_file& file, const char* addr,
+               unsigned short port) const AUG_NOTHROW
 {
-    AUG_DEBUG2("accept(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
-    if (AUGAS_OK != module_.accept_(&file, addr, port))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::accept_() failed");
+    AUG_DEBUG2("accept(): sname=[%s], id=[%d], addr=[%s], port=[%u]",
+               file.sess_->name_, file.id_, addr, (unsigned)port);
+    return AUGAS_OK == module_.accept_(&file, addr, port);
 }
 
-void
-module::connect(augas_file& file, const char* addr, unsigned short port) const
+bool
+module::connect(augas_file& file, const char* addr,
+                unsigned short port) const AUG_NOTHROW
 {
-    AUG_DEBUG2("connect(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
-    if (AUGAS_OK != module_.connect_(&file, addr, port))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::connect_() failed");
+    AUG_DEBUG2("connect(): sname=[%s], id=[%d], addr=[%s], port=[%u]",
+               file.sess_->name_, file.id_, addr, (unsigned)port);
+    return AUGAS_OK == module_.connect_(&file, addr, port);
 }
 
-void
-module::data(const augas_file& file, const char* buf, size_t size) const
+bool
+module::data(const augas_file& file, const char* buf,
+             size_t size) const AUG_NOTHROW
 {
     AUG_DEBUG2("data(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
-    if (AUGAS_OK != module_.data_(&file, buf, size))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::data_() failed");
+    return AUGAS_OK == module_.data_(&file, buf, size);
 }
 
-void
-module::rdexpire(const augas_file& file, unsigned& ms) const
+bool
+module::rdexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW
 {
-    AUG_DEBUG2("rdexpire(): sname=[%s], id=[%d]", file.sess_->name_,
-               file.id_);
-    if (AUGAS_OK != module_.rdexpire_(&file, &ms))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::rdexpire_() failed");
+    AUG_DEBUG2("rdexpire(): sname=[%s], id=[%d], ms=[%u]",
+               file.sess_->name_, file.id_, ms);
+    return AUGAS_OK == module_.rdexpire_(&file, &ms);
 }
 
-void
-module::wrexpire(const augas_file& file, unsigned& ms) const
+bool
+module::wrexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW
 {
-    AUG_DEBUG2("wrexpire(): sname=[%s], id=[%d]", file.sess_->name_,
-               file.id_);
-    if (AUGAS_OK != module_.wrexpire_(&file, &ms))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::wrexpire_() failed");
+    AUG_DEBUG2("wrexpire(): sname=[%s], id=[%d], ms=[%u]",
+               file.sess_->name_, file.id_, ms);
+    return AUGAS_OK == module_.wrexpire_(&file, &ms);
 }
 
-void
-module::teardown(const augas_file& file) const
+bool
+module::teardown(const augas_file& file) const AUG_NOTHROW
 {
-    AUG_DEBUG2("teardown(): sname=[%s], id=[%d]", file.sess_->name_,
-               file.id_);
-    if (AUGAS_OK != module_.teardown_(&file))
-        throw error(__FILE__, __LINE__, EMODCALL,
-                    "augas_module::teardown_() failed");
+    AUG_DEBUG2("teardown(): sname=[%s], id=[%d]",
+               file.sess_->name_, file.id_);
+    return AUGAS_OK == module_.teardown_(&file);
 }

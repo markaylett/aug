@@ -8,7 +8,7 @@ class State:
     def __init__(self, sname, cid):
         self.cid = cid
         self.tid = settimer(sname, 0, 100, self)
-        self.n = 10
+        self.n = 1
 
     def cancel(self, sname):
         canceltimer(sname, self.tid)
@@ -19,11 +19,12 @@ class State:
 
 def opensess(sname):
     log.info("connecting to client's service")
-    for x in xrange(1, 5):
+    for x in xrange(1, 2):
         tcpconnect(sname, "localhost", getenv("session.modclient.to"), None)
 
 def close(sname, id, user):
-    user.cancel(sname)
+    if user != None:
+        user.cancel(sname)
 
 def connect(sname, cid, user, addr, port):
     log.info("client established, starting timer")

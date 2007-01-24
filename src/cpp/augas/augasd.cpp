@@ -83,8 +83,8 @@ namespace augas {
             openlog_();
         }
 
-        AUG_DEBUG2("log-level=[%d]", aug_loglevel());
-        AUG_DEBUG2("run-directory=[%s]", rundir_);
+        AUG_DEBUG2("loglevel=[%d]", aug_loglevel());
+        AUG_DEBUG2("rundir=[%s]", rundir_);
     }
 
     typedef map<int, sessptr> pending;
@@ -116,7 +116,7 @@ namespace augas {
         state(conncb_base& cb)
             : cb_(cb)
         {
-            AUG_DEBUG2("adding event pipe");
+            AUG_DEBUG2("adding event pipe to list");
             insertconn(conns_, aug_eventin(), cb);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
         }
@@ -128,7 +128,7 @@ namespace augas {
     int
     extclose_(int fd)
     {
-        AUG_DEBUG2("clearing io event mask: fd=[%d]", fd);
+        AUG_DEBUG2("clearing io-event mask prior to close: fd=[%d]", fd);
         aug_setioeventmask(state_->mplexer_, fd, 0);
         return base_->close_(fd);
     }
@@ -151,6 +151,7 @@ namespace augas {
             setioeventmask(state_->mplexer_, ref, mask);
             setdriver(ref, extended);
         } catch (...) {
+            AUG_DEBUG2("removing connection from list: fd=[%d]", ref.get());
             removeconn(state_->conns_, ref);
             throw;
         }
@@ -164,8 +165,11 @@ namespace augas {
         pending::iterator it(state_->pending_.find(id));
         sessptr sess(it->second);
         sess->expire(id, aug_getvarp(arg), *ms);
-        if (0 == *ms)
+
+        if (0 == *ms) {
+            AUG_DEBUG2("removing timer: ms has been set to zero");
             state_->pending_.erase(it);
+        }
     }
 
     // Thread-safe.
@@ -222,7 +226,7 @@ namespace augas {
     int
     post_(const char* sname, int type, void* user, void (*free)(void*))
     {
-        AUG_DEBUG2("post(): sname=[%s]", sname);
+        AUG_DEBUG2("post(): sname=[%s], type=[%d]", sname, type);
         try {
 
             auto_ptr<eventarg> arg(new eventarg(sname, user, free));
@@ -248,11 +252,10 @@ namespace augas {
     }
 
     void
-    preparefd_(const smartfd& sfd)
+    setsockopts_(const smartfd& sfd)
     {
         setnodelay(sfd, true);
         setnonblock(sfd, true);
-        setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
     }
 
     void
@@ -264,20 +267,16 @@ namespace augas {
                    inetntop(getinetaddr(ep, addr)).c_str(),
                    static_cast<int>(ntohs(port(ep))));
 
-        try {
-            setioeventmask(state_->mplexer_, cptr->sfd(), AUG_IOEVENTRD);
-            cptr->connect(ep);
-        } catch (...) {
-            state_->manager_.erase(*cptr);
-            throw;
-        }
+        setioeventmask(state_->mplexer_, cptr->sfd(), AUG_IOEVENTRD);
+        cptr->connect(ep);
     }
 
     int
     tcpconnect_(const char* sname, const char* host, const char* serv,
                 void* user)
     {
-        AUG_DEBUG2("tcpconnect(): sname=[%s]", sname);
+        AUG_DEBUG2("tcpconnect(): sname=[%s], host=[%s], serv=[%s]",
+                   sname, host, serv);
         try {
 
             sessptr sess(state_->manager_.getsess(sname));
@@ -291,7 +290,8 @@ namespace augas {
             state_->manager_.insert(cptr);
 
             if (CONNECTED == cptr->phase()) {
-                preparefd_(cptr->sfd());
+                setsockopts_(cptr->sfd());
+                setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
                 connect_(cptr);
             } else
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
@@ -305,7 +305,8 @@ namespace augas {
     tcplisten_(const char* sname, const char* host, const char* serv,
                void* user)
     {
-        AUG_DEBUG2("tcplisten(): sname=[%s]", sname);
+        AUG_DEBUG2("tcplisten(): sname=[%s], host=[%s], serv=[%s]",
+                   sname, host, serv);
         try {
 
             endpoint ep(null);
@@ -334,7 +335,7 @@ namespace augas {
     settimer_(const char* sname, int id, unsigned ms, void* arg,
               void (*free)(void*))
     {
-        AUG_DEBUG2("settimer(): sname=[%s], id=[%d]", sname, id);
+        AUG_DEBUG2("settimer(): sname=[%s], id=[%d], ms=[%u]", sname, id, ms);
         try {
 
             var v(arg, free);
@@ -351,7 +352,8 @@ namespace augas {
     int
     resettimer_(const char* sname, int tid, unsigned ms)
     {
-        AUG_DEBUG2("resettimer(): sname=[%s], id=[%d]", sname, tid);
+        AUG_DEBUG2("resettimer(): sname=[%s], id=[%d], ms=[%u]",
+                   sname, tid, ms);
         try {
             return aug_resettimer(cptr(state_->timers_), tid, ms);
         } AUG_SETERRINFOCATCH;
@@ -427,7 +429,8 @@ namespace augas {
     int
     setrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
-        AUG_DEBUG2("setrwtimer(): id=[%d]", cid);
+        AUG_DEBUG2("setrwtimer(): id=[%d], ms=[%u], flags=[%x]",
+                   cid, ms, flags);
         try {
             rwtimerptr rwtimer(smartptr_cast<
                                rwtimer_base>(state_->manager_.getbyid(cid)));
@@ -443,7 +446,8 @@ namespace augas {
     int
     resetrwtimer_(augas_id cid, unsigned ms, unsigned flags)
     {
-        AUG_DEBUG2("resetrwtimer(): id=[%d]", cid);
+        AUG_DEBUG2("resetrwtimer(): id=[%d], ms=[%u], flags=[%x]",
+                   cid, ms, flags);
         try {
             rwtimerptr rwtimer(smartptr_cast<
                                rwtimer_base>(state_->manager_.getbyid(cid)));
@@ -459,7 +463,7 @@ namespace augas {
     int
     cancelrwtimer_(augas_id cid, unsigned flags)
     {
-        AUG_DEBUG2("cancelrwtimer(): id=[%d]", cid);
+        AUG_DEBUG2("cancelrwtimer(): id=[%d], flags=[%x]", cid, flags);
         try {
             rwtimerptr rwtimer(smartptr_cast<
                                rwtimer_base>(state_->manager_.getbyid(cid)));
@@ -533,7 +537,8 @@ namespace augas {
             throw;
         }
 
-        preparefd_(sfd);
+        setsockopts_(sfd);
+        setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
         augas_id id(aug_nextid());
 
         AUG_DEBUG2("initialising connection: id=[%d%], fd=[%d]", id,
@@ -543,11 +548,13 @@ namespace augas {
                                        state_->timers_, sfd, ep));
         state_->manager_.insert(conn);
         try {
-            conn->accept(ep);
-        } catch (...) {
-            state_->manager_.erase(*conn);
-            throw;
-        }
+            if (conn->accept(ep))
+                return;
+
+            // Fallthrough.
+
+        } AUG_PERRINFOCATCH;
+        state_->manager_.erase(*conn);
     }
 
     bool
@@ -622,7 +629,6 @@ namespace augas {
                     case CONNECTED:
                         setnodelay(fd, true);
                         setnonblock(fd, true);
-                        setioeventmask(state_->mplexer_, fd, AUG_IOEVENTRD);
                         connect_(cptr);
                         break;
                     case CLOSED:
@@ -755,11 +761,7 @@ namespace augas {
                     processconns(state_->conns_);
                     continue;
 
-                } catch (const errinfo_error& e) {
-                    perrinfo(e, "aug::errorinfo_error");
-                } catch (const exception& e) {
-                    aug_error("std::exception: %s", e.what());
-                }
+                } AUG_PERRINFOCATCH;
 
                 if (!stopping_ && !daemon_) {
                     stopping_ = true;
@@ -803,11 +805,7 @@ main(int argc, char* argv[])
             aug_setloglevel(AUG_LOGINFO);
             return main(serv, argc, argv);
 
-        } catch (const errinfo_error& e) {
-            perrinfo(e, "aug::errorinfo_error");
-        } catch (const exception& e) {
-            aug_error("std::exception: %s", e.what());
-        }
+        } AUG_PERRINFOCATCH;
 
     } catch (const exception& e) {
         cerr << e.what() << endl;
