@@ -31,8 +31,7 @@ namespace augas {
     public:
         ~listener() AUG_NOTHROW;
 
-        listener(const sessptr& sess, augas_id id, void* user,
-                 const aug::smartfd& sfd);
+        listener(const sessptr& sess, void* user, const aug::smartfd& sfd);
     };
 
     typedef aug::smartptr<listener> listenerptr;

@@ -15,7 +15,7 @@ namespace augas {
 
     enum connphase {
         CONNECTING,
-        CONNECTED,
+        ESTABLISHED,
         TEARDOWN,
         SHUTDOWN,
         CLOSED
@@ -97,7 +97,7 @@ namespace augas {
         do_accept(const aug_endpoint& ep) = 0;
 
         virtual void
-        do_connect(const aug_endpoint& ep) = 0;
+        do_connected(const aug_endpoint& ep) = 0;
 
         virtual bool
         do_process(aug::mplexer& mplexer) = 0;
@@ -126,9 +126,9 @@ namespace augas {
             return do_accept(ep);
         }
         void
-        connect(const aug_endpoint& ep)
+        connected(const aug_endpoint& ep)
         {
-            do_connect(ep);
+            do_connected(ep);
         }
         bool
         process(aug::mplexer& mplexer)
@@ -168,10 +168,10 @@ namespace augas {
     sendable(const conn_base& conn)
     {
         connphase phase(conn.phase());
-        return CONNECTED == phase || TEARDOWN == phase;
+        return ESTABLISHED == phase || TEARDOWN == phase;
     }
 
-    class connected : public conn_base {
+    class established : public conn_base {
 
         sessptr sess_;
         augas_file& file_;
@@ -198,7 +198,7 @@ namespace augas {
         do_accept(const aug_endpoint& ep);
 
         void
-        do_connect(const aug_endpoint& ep);
+        do_connected(const aug_endpoint& ep);
 
         bool
         do_process(aug::mplexer& mplexer);
@@ -219,11 +219,11 @@ namespace augas {
         do_phase() const;
 
     public:
-        ~connected() AUG_NOTHROW;
+        ~established() AUG_NOTHROW;
 
-        connected(const sessptr& sess, augas_file& file, rwtimer& rwtimer,
-                  const aug::smartfd& sfd, const aug::endpoint& ep,
-                  bool close);
+        established(const sessptr& sess, augas_file& file, rwtimer& rwtimer,
+                    const aug::smartfd& sfd, const aug::endpoint& ep,
+                    bool close);
     };
 
     class connecting : public conn_base {
@@ -251,7 +251,7 @@ namespace augas {
         do_accept(const aug_endpoint& ep);
 
         void
-        do_connect(const aug_endpoint& ep);
+        do_connected(const aug_endpoint& ep);
 
         bool
         do_process(aug::mplexer& mplexer);
@@ -319,7 +319,7 @@ namespace augas {
         do_accept(const aug_endpoint& ep);
 
         void
-        do_connect(const aug_endpoint& ep);
+        do_connected(const aug_endpoint& ep);
 
         bool
         do_process(aug::mplexer& mplexer);
@@ -342,15 +342,15 @@ namespace augas {
     public:
         ~client() AUG_NOTHROW;
 
-        client(const sessptr& sess, augas_id cid, void* user,
-               aug::timers& timers, const char* host, const char* serv);
+        client(const sessptr& sess, void* user, aug::timers& timers,
+               const char* host, const char* serv);
     };
 
     class server : public rwtimer_base, public conn_base {
 
         augas_file file_;
         rwtimer rwtimer_;
-        connected conn_;
+        established conn_;
 
         // rwtimer_base.
 
@@ -387,7 +387,7 @@ namespace augas {
         do_accept(const aug_endpoint& ep);
 
         void
-        do_connect(const aug_endpoint& ep);
+        do_connected(const aug_endpoint& ep);
 
         bool
         do_process(aug::mplexer& mplexer);
@@ -410,9 +410,8 @@ namespace augas {
     public:
         ~server() AUG_NOTHROW;
 
-        server(const sessptr& sess, augas_id cid, void* user,
-               aug::timers& timers, const aug::smartfd& sfd,
-               const aug::endpoint& ep);
+        server(const sessptr& sess, void* user, aug::timers& timers,
+               const aug::smartfd& sfd, const aug::endpoint& ep);
     };
 }
 

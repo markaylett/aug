@@ -3,11 +3,11 @@ import log
 
 pairs = {}
 
-def opensess(sname):
+def init(sname):
     log.info("binding proxy listener")
     tcplisten(sname, "0.0.0.0", getenv("session.modproxy.serv"), None)
 
-def close(sname, id, user):
+def closed(sname, id, user):
     global pairs
     if pairs.has_key(id):
         to = pairs[id]

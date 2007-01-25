@@ -31,7 +31,7 @@ manager::insert(const string& name, const sessptr& sess)
     // Insert prior to calling open().
 
     sesss_[name] = sess;
-    if (!sess->open()) {
+    if (!sess->init()) {
 
         // TODO: leave if event posted.
 
@@ -200,7 +200,7 @@ manager::sendother(mplexer& mplexer, augas_id cid, const char* sname,
 void
 manager::teardown()
 {
-    idtofd::reverse_iterator rit(idtofd_.rbegin()), rend(idtofd_.rend());
+    idtofd::iterator rit(idtofd_.begin()), rend(idtofd_.end());
     while (rit != rend) {
 
         AUG_DEBUG2("teardown: id=[%d], fd=[%d]", rit->first, rit->second);
@@ -219,10 +219,9 @@ manager::teardown()
             continue;
         }
 
-        // Pre-increment, not post-increment: base() points to the element
-        // after the one the reverse_iterator refers to.
+        // Not a connection.
 
-        idtofd_.erase((++rit).base());
+        idtofd_.erase(rit++);
         files_.erase(it);
     }
 }

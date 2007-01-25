@@ -10,14 +10,14 @@
 
 struct import_ {
     PyObject* module_;
-    PyObject* closesess_;
-    PyObject* opensess_;
+    PyObject* term_;
+    PyObject* init_;
     PyObject* event_;
     PyObject* expire_;
     PyObject* reconf_;
-    PyObject* close_;
+    PyObject* closed_;
     PyObject* accept_;
-    PyObject* connect_;
+    PyObject* connected_;
     PyObject* data_;
     PyObject* rdexpire_;
     PyObject* wrexpire_;
@@ -186,11 +186,11 @@ getmethod_(PyObject* module, const char* name)
 static void
 freeimport_(struct import_* import)
 {
-    if (import->open_ && import->closesess_) {
+    if (import->open_ && import->term_) {
 
         const char* sname = PyModule_GetName(import->module_);
         if (sname) {
-            PyObject* x = PyObject_CallFunction(import->closesess_, "s",
+            PyObject* x = PyObject_CallFunction(import->term_, "s",
                                                 sname);
             if (x) {
                 Py_DECREF(x);
@@ -204,13 +204,13 @@ freeimport_(struct import_* import)
     Py_XDECREF(import->rdexpire_);
     Py_XDECREF(import->data_);
     Py_XDECREF(import->accept_);
-    Py_XDECREF(import->connect_);
-    Py_XDECREF(import->close_);
+    Py_XDECREF(import->connected_);
+    Py_XDECREF(import->closed_);
     Py_XDECREF(import->reconf_);
     Py_XDECREF(import->expire_);
     Py_XDECREF(import->event_);
-    Py_XDECREF(import->opensess_);
-    Py_XDECREF(import->closesess_);
+    Py_XDECREF(import->init_);
+    Py_XDECREF(import->term_);
 
     Py_XDECREF(import->module_);
     free(import);
@@ -229,14 +229,14 @@ createimport_(const char* sname)
         goto fail;
     }
 
-    import->closesess_ = getmethod_(import->module_, "closesess");
-    import->opensess_ = getmethod_(import->module_, "opensess");
+    import->term_ = getmethod_(import->module_, "term");
+    import->init_ = getmethod_(import->module_, "init");
     import->event_ = getmethod_(import->module_, "event");
     import->expire_ = getmethod_(import->module_, "expire");
     import->reconf_ = getmethod_(import->module_, "reconf");
-    import->close_ = getmethod_(import->module_, "close");
+    import->closed_ = getmethod_(import->module_, "closed");
     import->accept_ = getmethod_(import->module_, "accept");
-    import->connect_ = getmethod_(import->module_, "connect");
+    import->connected_ = getmethod_(import->module_, "connected");
     import->data_ = getmethod_(import->module_, "data");
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
@@ -646,7 +646,7 @@ pycreate_(void)
 }
 
 static void
-closesess_(const struct augas_sess* sess)
+term_(const struct augas_sess* sess)
 {
     struct import_* import = sess->user_;
     assert(sess->user_);
@@ -654,7 +654,7 @@ closesess_(const struct augas_sess* sess)
 }
 
 static int
-opensess_(struct augas_sess* sess)
+init_(struct augas_sess* sess)
 {
     struct import_* import;
 
@@ -663,9 +663,9 @@ opensess_(struct augas_sess* sess)
 
     sess->user_ = import;
 
-    if (import->opensess_) {
+    if (import->init_) {
 
-        PyObject* x = PyObject_CallFunction(import->opensess_, "s",
+        PyObject* x = PyObject_CallFunction(import->init_, "s",
                                             sess->name_);
         if (!x) {
             printerr_();
@@ -757,16 +757,16 @@ reconf_(const struct augas_sess* sess)
 }
 
 static void
-close_(const struct augas_file* file)
+closed_(const struct augas_file* file)
 {
     struct import_* import = file->sess_->user_;
     PyObject* x = file->user_;
     assert(file->user_);
     assert(file->sess_->user_);
 
-    if (import->close_) {
+    if (import->closed_) {
 
-        PyObject* y = PyObject_CallFunction(import->close_, "siO",
+        PyObject* y = PyObject_CallFunction(import->closed_, "siO",
                                             file->sess_->name_, file->id_, x);
         if (y) {
             Py_DECREF(y);
@@ -786,32 +786,45 @@ accept_(struct augas_file* file, const char* addr, unsigned short port)
 
     if (import->accept_) {
 
-        if (!(x = PyObject_CallFunction(import->accept_, "siOsH",
-                                        file->sess_->name_, file->id_, x,
-                                        addr, port))) {
+        PyObject* y = PyObject_CallFunction(import->accept_, "siOsH",
+                                            file->sess_->name_, file->id_, x,
+                                            addr, port);
+        if (!y) {
 
-            /* close() will not be called if accept() fails. */
+            /* closed() will not be called if accept() fails. */
 
             printerr_();
             return -1;
-        }
+
+        } else if (PyBool_Check(y)) {
+
+            if (y == Py_False)
+                return -1;
+
+            /* x unchanged. */
+
+            Py_INCREF(x);
+
+        } else
+            x = y;
 
     } else {
 
-        x = Py_None;
+        /* x unchanged. */
+
         Py_INCREF(x);
     }
 
     file->user_ = x;
     return_(x, __func__);
 
-    /* x is still retained by the listener. */
+    /* Original x is still retained by the listener. */
 
     return 0;
 }
 
 static int
-connect_(struct augas_file* file, const char* addr, unsigned short port)
+connected_(struct augas_file* file, const char* addr, unsigned short port)
 {
     struct import_* import = file->sess_->user_;
     PyObject* x = file->user_, * y = NULL;
@@ -819,9 +832,9 @@ connect_(struct augas_file* file, const char* addr, unsigned short port)
     assert(file->user_);
     assert(file->sess_->user_);
 
-    if (import->connect_) {
+    if (import->connected_) {
 
-        if (!(y = PyObject_CallFunction(import->connect_, "siOsH",
+        if (!(y = PyObject_CallFunction(import->connected_, "siOsH",
                                         file->sess_->name_, file->id_, x,
                                         addr, port))) {
             printerr_();
@@ -829,7 +842,7 @@ connect_(struct augas_file* file, const char* addr, unsigned short port)
         }
     }
 
-    /* close() will always be called, even if connect() fails. */
+    /* closed() will always be called, even if connected() fails. */
 
     if (!y) {
         y = x;
@@ -956,14 +969,14 @@ teardown_(const struct augas_file* file)
 }
 
 static const struct augas_module fntable_ = {
-    closesess_,
-    opensess_,
+    term_,
+    init_,
     event_,
     expire_,
     reconf_,
-    close_,
+    closed_,
     accept_,
-    connect_,
+    connected_,
     data_,
     rdexpire_,
     wrexpire_,

@@ -5,15 +5,15 @@
 static const struct augas_host* host_ = NULL;
 
 static void
-closesess_(const struct augas_sess* sess)
+term_(const struct augas_sess* sess)
 {
-    host_->writelog_(AUGAS_LOGINFO, "closesess_()");
+    host_->writelog_(AUGAS_LOGINFO, "term_()");
 }
 
 static int
-opensess_(struct augas_sess* sess)
+init_(struct augas_sess* sess)
 {
-    host_->writelog_(AUGAS_LOGINFO, "opensess_()");
+    host_->writelog_(AUGAS_LOGINFO, "init_()");
     return 0;
 }
 
@@ -40,9 +40,9 @@ reconf_(const struct augas_sess* sess)
 }
 
 static void
-close_(const struct augas_file* file)
+closed_(const struct augas_file* file)
 {
-    host_->writelog_(AUGAS_LOGINFO, "close_()");
+    host_->writelog_(AUGAS_LOGINFO, "closed_()");
 }
 
 static int
@@ -53,9 +53,9 @@ accept_(struct augas_file* file, const char* addr, unsigned short port)
 }
 
 static int
-connect_(struct augas_file* file, const char* addr, unsigned short port)
+connected_(struct augas_file* file, const char* addr, unsigned short port)
 {
-    host_->writelog_(AUGAS_LOGINFO, "connect_()");
+    host_->writelog_(AUGAS_LOGINFO, "connected_()");
     return 0;
 }
 
@@ -90,14 +90,14 @@ teardown_(const struct augas_file* file)
 }
 
 static const struct augas_module fntable_ = {
-    closesess_,
-    opensess_,
+    term_,
+    init_,
     event_,
     expire_,
     reconf_,
-    close_,
+    closed_,
     accept_,
-    connect_,
+    connected_,
     data_,
     rdexpire_,
     wrexpire_,

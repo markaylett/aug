@@ -12,13 +12,13 @@ using namespace std;
 
 sess::~sess() AUG_NOTHROW
 {
-    if (close_)
-        module_->closesess(sess_); // AUG_NOTHROW
+    if (term_)
+        module_->term(sess_); // AUG_NOTHROW
 }
 
 sess::sess(const moduleptr& module, const char* name)
     : module_(module),
-      close_(false)
+      term_(false)
 {
     aug_strlcpy(sess_.name_, name, sizeof(sess_.name_));
     sess_.user_ = 0;

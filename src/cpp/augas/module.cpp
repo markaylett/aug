@@ -19,7 +19,7 @@ module::~module() AUG_NOTHROW
 {
     try {
         AUG_DEBUG2("terminating module: name=[%s]", name_.c_str());
-        termfn_();
+        unloadfn_();
     } AUG_PERRINFOCATCH;
 }
 
@@ -29,28 +29,28 @@ module::module(const string& name, const char* path,
       lib_(path)
 {
     AUG_DEBUG2("resolving symbols in module: name=[%s]", name_.c_str());
-    augas_initfn initfn(dlsym<augas_initfn>(lib_, "augas_init"));
-    termfn_ = dlsym<augas_termfn>(lib_, "augas_term");
+    augas_loadfn loadfn(dlsym<augas_loadfn>(lib_, "augas_load"));
+    unloadfn_ = dlsym<augas_unloadfn>(lib_, "augas_unload");
 
     AUG_DEBUG2("initialising module: name=[%s]", name_.c_str());
-    const struct augas_module* ptr(initfn(name_.c_str(), &host));
+    const struct augas_module* ptr(loadfn(name_.c_str(), &host));
     if (!ptr)
-        throw error(__FILE__, __LINE__, EMODCALL, "augas_init() failed");
+        throw error(__FILE__, __LINE__, EMODCALL, "augas_load() failed");
     setdefaults(module_, *ptr);
 }
 
 void
-module::closesess(const augas_sess& sess) const AUG_NOTHROW
+module::term(const augas_sess& sess) const AUG_NOTHROW
 {
-    AUG_DEBUG2("closesess(): sname=[%s]", sess.name_);
-    module_.closesess_(&sess);
+    AUG_DEBUG2("term(): sname=[%s]", sess.name_);
+    module_.term_(&sess);
 }
 
 bool
-module::opensess(augas_sess& sess) const AUG_NOTHROW
+module::init(augas_sess& sess) const AUG_NOTHROW
 {
-    AUG_DEBUG2("opensess(): sname=[%s]", sess.name_);
-    return AUGAS_OK == module_.opensess_(&sess);
+    AUG_DEBUG2("init(): sname=[%s]", sess.name_);
+    return AUGAS_OK == module_.init_(&sess);
 }
 
 bool
@@ -76,10 +76,10 @@ module::reconf(const augas_sess& sess) const AUG_NOTHROW
 }
 
 void
-module::close(const augas_file& file) const AUG_NOTHROW
+module::closed(const augas_file& file) const AUG_NOTHROW
 {
-    AUG_DEBUG2("close(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
-    module_.close_(&file);
+    AUG_DEBUG2("closed(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
+    module_.closed_(&file);
 }
 
 bool
@@ -92,12 +92,12 @@ module::accept(augas_file& file, const char* addr,
 }
 
 bool
-module::connect(augas_file& file, const char* addr,
+module::connected(augas_file& file, const char* addr,
                 unsigned short port) const AUG_NOTHROW
 {
-    AUG_DEBUG2("connect(): sname=[%s], id=[%d], addr=[%s], port=[%u]",
+    AUG_DEBUG2("connected(): sname=[%s], id=[%d], addr=[%s], port=[%u]",
                file.sess_->name_, file.id_, addr, (unsigned)port);
-    return AUGAS_OK == module_.connect_(&file, addr, port);
+    return AUGAS_OK == module_.connected_(&file, addr, port);
 }
 
 bool

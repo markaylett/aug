@@ -107,7 +107,7 @@ namespace aug {
             if (-1 == aug_term())
                 aug_perror("aug_term() failed");
         }
-
+        explicit
         scoped_init(aug_errinfo& errinfo)
         {
             init(errinfo);

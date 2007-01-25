@@ -15,7 +15,7 @@ namespace augas {
 
         moduleptr module_;
         augas_sess sess_;
-        bool close_;
+        bool term_;
 
     public:
         ~sess() AUG_NOTHROW;
@@ -23,9 +23,9 @@ namespace augas {
         sess(const moduleptr& module, const char* name);
 
         bool
-        open() AUG_NOTHROW
+        init() AUG_NOTHROW
         {
-            return close_ = module_->opensess(sess_);
+            return term_ = module_->init(sess_);
         }
         bool
         event(int type, void* user) const AUG_NOTHROW
@@ -43,9 +43,9 @@ namespace augas {
             return module_->reconf(sess_);
         }
         void
-        close(const augas_file& file) const AUG_NOTHROW
+        closed(const augas_file& file) const AUG_NOTHROW
         {
-            module_->close(file);
+            module_->closed(file);
         }
         bool
         accept(augas_file& file, const char* addr,
@@ -54,10 +54,10 @@ namespace augas {
             return module_->accept(file, addr, port);
         }
         bool
-        connect(augas_file& file, const char* addr,
-                unsigned short port) const AUG_NOTHROW
+        connected(augas_file& file, const char* addr,
+                  unsigned short port) const AUG_NOTHROW
         {
-            return module_->connect(file, addr, port);
+            return module_->connected(file, addr, port);
         }
         bool
         data(const augas_file& file, const char* buf,
@@ -89,9 +89,9 @@ namespace augas {
             return sess_;
         }
         bool
-        isopen() const AUG_NOTHROW
+        ready() const AUG_NOTHROW
         {
-            return close_;
+            return term_;
         }
         const char*
         name() const AUG_NOTHROW

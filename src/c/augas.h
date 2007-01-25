@@ -131,18 +131,18 @@ struct augas_host {
 
 struct augas_module {
 
-    void (*closesess_)(const struct augas_sess* sess);
-    int (*opensess_)(struct augas_sess* sess);
+    void (*term_)(const struct augas_sess* sess);
+    int (*init_)(struct augas_sess* sess);
     int (*event_)(const struct augas_sess* sess, int type, void* user);
     int (*expire_)(const struct augas_sess* sess, int tid, void* user,
                    unsigned* ms);
     int (*reconf_)(const struct augas_sess* sess);
 
-    void (*close_)(const struct augas_file* file);
+    void (*closed_)(const struct augas_file* file);
     int (*accept_)(struct augas_file* file, const char* addr,
                    unsigned short port);
-    int (*connect_)(struct augas_file* file, const char* addr,
-                    unsigned short port);
+    int (*connected_)(struct augas_file* file, const char* addr,
+                      unsigned short port);
     int (*data_)(const struct augas_file* file, const char* buf, size_t size);
     int (*rdexpire_)(const struct augas_file* file, unsigned* ms);
     int (*wrexpire_)(const struct augas_file* file, unsigned* ms);
@@ -153,20 +153,20 @@ struct augas_module {
    augas_load() should return NULL on failure.
 */
 
-#define AUGAS_MODULE(init, term)                                    \
-    AUGAS_API void                                                  \
-    augas_term(void)                                                \
-    {                                                               \
-        (*term)();                                                  \
-    }                                                               \
-    AUGAS_API const struct augas_module*                            \
-    augas_init(const char* name, const struct augas_host* host)     \
-    {                                                               \
-        return (*init)(name, host);                                 \
+#define AUGAS_MODULE(load, unload)                                    \
+    AUGAS_API void                                                    \
+    augas_unload(void)                                                \
+    {                                                                 \
+        (*unload)();                                                  \
+    }                                                                 \
+    AUGAS_API const struct augas_module*                              \
+    augas_load(const char* name, const struct augas_host* host)       \
+    {                                                                 \
+        return (*load)(name, host);                                   \
     }
 
-typedef void (*augas_termfn)(void);
-typedef const struct augas_module* (*augas_initfn)(const char*,
+typedef void (*augas_unloadfn)(void);
+typedef const struct augas_module* (*augas_loadfn)(const char*,
                                                    const struct augas_host*);
 
 #endif /* AUGAS_H */

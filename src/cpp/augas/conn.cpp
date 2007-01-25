@@ -88,31 +88,31 @@ rwtimer::rwtimer(const sessptr& sess, const augas_file& file, timers& timers)
 }
 
 augas_file&
-connected::do_file()
+established::do_file()
 {
     return file_;
 }
 
 const augas_file&
-connected::do_file() const
+established::do_file() const
 {
     return file_;
 }
 
 const sessptr&
-connected::do_sess() const
+established::do_sess() const
 {
     return sess_;
 }
 
 smartfd
-connected::do_sfd() const
+established::do_sfd() const
 {
     return sfd_;
 }
 
 bool
-connected::do_accept(const aug_endpoint& ep)
+established::do_accept(const aug_endpoint& ep)
 {
     inetaddr addr(null);
     return close_ = sess_
@@ -120,14 +120,15 @@ connected::do_accept(const aug_endpoint& ep)
 }
 
 void
-connected::do_connect(const aug_endpoint& ep)
+established::do_connected(const aug_endpoint& ep)
 {
     inetaddr addr(null);
-    sess_->connect(file_, inetntop(getinetaddr(ep, addr)).c_str(), port(ep));
+    sess_->connected(file_, inetntop(getinetaddr(ep, addr)).c_str(),
+                     port(ep));
 }
 
 bool
-connected::do_process(mplexer& mplexer)
+established::do_process(mplexer& mplexer)
 {
     unsigned short bits(ioevents(mplexer, sfd_));
 
@@ -182,14 +183,14 @@ connected::do_process(mplexer& mplexer)
 }
 
 void
-connected::do_putsome(aug::mplexer& mplexer, const void* buf, size_t size)
+established::do_putsome(aug::mplexer& mplexer, const void* buf, size_t size)
 {
     buffer_.putsome(buf, size);
     setioeventmask(mplexer, sfd_, AUG_IOEVENTRDWR);
 }
 
 void
-connected::do_shutdown()
+established::do_shutdown()
 {
     if (phase_ < SHUTDOWN) {
         phase_ = SHUTDOWN;
@@ -201,7 +202,7 @@ connected::do_shutdown()
 }
 
 void
-connected::do_teardown()
+established::do_teardown()
 {
     if (phase_ < TEARDOWN) {
         phase_ = TEARDOWN;
@@ -210,33 +211,34 @@ connected::do_teardown()
 }
 
 const endpoint&
-connected::do_endpoint() const
+established::do_endpoint() const
 {
     return endpoint_;
 }
 
 connphase
-connected::do_phase() const
+established::do_phase() const
 {
     return phase_;
 }
 
-connected::~connected() AUG_NOTHROW
+established::~established() AUG_NOTHROW
 {
     try {
         if (close_)
-            sess_->close(file_);
+            sess_->closed(file_);
     } AUG_PERRINFOCATCH;
 }
 
-connected::connected(const sessptr& sess, augas_file& file, rwtimer& rwtimer,
-                     const smartfd& sfd, const aug::endpoint& ep, bool close)
+established::established(const sessptr& sess, augas_file& file,
+                         rwtimer& rwtimer, const smartfd& sfd,
+                         const aug::endpoint& ep, bool close)
     : sess_(sess),
       file_(file),
       rwtimer_(rwtimer),
       endpoint_(ep),
       sfd_(sfd),
-      phase_(CONNECTED),
+      phase_(ESTABLISHED),
       close_(close)
 {
 }
@@ -272,7 +274,7 @@ connecting::do_accept(const aug_endpoint& ep)
 }
 
 void
-connecting::do_connect(const aug_endpoint& ep)
+connecting::do_connected(const aug_endpoint& ep)
 {
     throw error(__FILE__, __LINE__, ESTATE,
                 "connection not established: id=[%d]", file_.id_);
@@ -286,7 +288,7 @@ connecting::do_process(mplexer& mplexer)
         pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
         sfd_ = xy.first;
         if (xy.second) {
-            phase_ = CONNECTED;
+            phase_ = ESTABLISHED;
             return true;
         }
 
@@ -337,7 +339,7 @@ connecting::~connecting() AUG_NOTHROW
 {
     try {
         if (CLOSED == phase_)
-            sess_->close(file_);
+            sess_->closed(file_);
     } AUG_PERRINFOCATCH;
 }
 
@@ -352,7 +354,7 @@ connecting::connecting(const sessptr& sess, augas_file& file,
 {
     pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
     sfd_ = xy.first;
-    phase_ = xy.second ? CONNECTED : CONNECTING;
+    phase_ = xy.second ? ESTABLISHED : CONNECTING;
 }
 
 void
@@ -416,9 +418,9 @@ client::do_accept(const aug_endpoint& ep)
 }
 
 void
-client::do_connect(const aug_endpoint& ep)
+client::do_connected(const aug_endpoint& ep)
 {
-    conn_->connect(ep);
+    conn_->connected(ep);
 }
 
 bool
@@ -427,12 +429,13 @@ client::do_process(mplexer& mplexer)
     if (!conn_->process(mplexer))
         return false;
 
-    if (CONNECTED == conn_->phase()) {
+    if (ESTABLISHED == conn_->phase()) {
 
-        AUG_DEBUG2("client is now connected, assuming new state");
+        AUG_DEBUG2("client is now established, assuming new state");
 
-        conn_ = connptr(new connected(conn_->sess(), file_, rwtimer_,
-                                      conn_->sfd(), conn_->endpoint(), true));
+        conn_ = connptr(new augas::established(conn_->sess(), file_, rwtimer_,
+                                             conn_->sfd(), conn_->endpoint(),
+                                             true));
     }
 
     return true;
@@ -472,21 +475,22 @@ client::~client() AUG_NOTHROW
 {
 }
 
-client::client(const sessptr& sess, augas_id cid, void* user, timers& timers,
+client::client(const sessptr& sess, void* user, timers& timers,
                const char* host, const char* serv)
     : rwtimer_(sess, file_, timers),
       conn_(new connecting(sess, file_, host, serv))
 {
     file_.sess_ = cptr(*sess);
-    file_.id_ = cid;
+    file_.id_ = aug_nextid();
     file_.user_ = user;
 
-    if (CONNECTED == conn_->phase()) {
+    if (ESTABLISHED == conn_->phase()) {
 
-        AUG_DEBUG2("client is now connected, assuming new state");
+        AUG_DEBUG2("client is now established, assuming new state");
 
-        conn_ = connptr(new connected(conn_->sess(), file_, rwtimer_,
-                                      conn_->sfd(), conn_->endpoint(), true));
+        conn_ = connptr(new augas::established(conn_->sess(), file_, rwtimer_,
+                                             conn_->sfd(), conn_->endpoint(),
+                                             true));
     }
 }
 
@@ -551,9 +555,9 @@ server::do_accept(const aug_endpoint& ep)
 }
 
 void
-server::do_connect(const aug_endpoint& ep)
+server::do_connected(const aug_endpoint& ep)
 {
-    conn_.connect(ep);
+    conn_.connected(ep);
 }
 
 bool
@@ -596,12 +600,12 @@ server::~server() AUG_NOTHROW
 {
 }
 
-server::server(const sessptr& sess, augas_id cid, void* user, timers& timers,
+server::server(const sessptr& sess, void* user, timers& timers,
                const smartfd& sfd, const aug::endpoint& ep)
     : rwtimer_(sess, file_, timers),
       conn_(sess, file_, rwtimer_, sfd, ep, false)
 {
     file_.sess_ = cptr(*sess);
-    file_.id_ = cid;
+    file_.id_ = aug_nextid();
     file_.user_ = user;
 }

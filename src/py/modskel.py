@@ -19,11 +19,11 @@ import log
 # void resetrwtimer (int cid, unsigned ms, unsigned flags);
 # void cancelrwtimer (int cid, unsigned flags);
 
-def closesess(sname):
-    log.debug("closesess(): %s" % sname)
+def term(sname):
+    log.debug("term(): %s" % sname)
 
-def opensess(sname):
-    log.debug("opensess(): %s" % sname)
+def init(sname):
+    log.debug("init(): %s" % sname)
     tcplisten(sname, "0.0.0.0", getenv("session.modskel.serv"), None)
 
 def event(sname, type, user):
@@ -35,16 +35,16 @@ def expire(sname, tid, user, ms):
 def reconf(sname):
     log.debug("reconf(): %s" % sname)
 
-def close(sname, id, user):
-    log.debug("closeconn(): %s" % sname)
+def closed(sname, id, user):
+    log.debug("closed(): %s" % sname)
 
 def accept(sname, cid, user, addr, port):
     log.debug("accept(): %s" % sname)
     setrwtimer(cid, 5000, TIMRD)
     return Buffer()
 
-def connect(sname, cid, user, addr, port):
-    log.debug("connect(): %s" % sname)
+def connected(sname, cid, user, addr, port):
+    log.debug("connected(): %s" % sname)
 
 def data(sname, cid, user, buf):
     log.debug("data(): %s" % sname)

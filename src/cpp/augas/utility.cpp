@@ -9,11 +9,11 @@
 namespace {
 
     void
-    closesess(const struct augas_sess* sess)
+    term(const struct augas_sess* sess)
     {
     }
     int
-    opensess(struct augas_sess* sess)
+    init(struct augas_sess* sess)
     {
         return 0;
     }
@@ -33,7 +33,7 @@ namespace {
         return 0;
     }
     void
-    close(const struct augas_file* file)
+    closed(const struct augas_file* file)
     {
     }
     int
@@ -42,7 +42,7 @@ namespace {
         return 0;
     }
     int
-    connect(struct augas_file* file, const char* addr, unsigned short port)
+    connected(struct augas_file* file, const char* addr, unsigned short port)
     {
         return 0;
     }
@@ -71,14 +71,14 @@ namespace {
 void
 augas::setdefaults(struct augas_module& dst, const struct augas_module& src)
 {
-    dst.closesess_ = src.closesess_ ? src.closesess_ : closesess;
-    dst.opensess_ = src.opensess_ ? src.opensess_ : opensess;
+    dst.term_ = src.term_ ? src.term_ : term;
+    dst.init_ = src.init_ ? src.init_ : init;
     dst.event_ = src.event_ ? src.event_ : event;
     dst.expire_ = src.expire_ ? src.expire_ : expire;
     dst.reconf_ = src.reconf_ ? src.reconf_ : reconf;
-    dst.close_ = src.close_ ? src.close_ : close;
+    dst.closed_ = src.closed_ ? src.closed_ : closed;
     dst.accept_ = src.accept_ ? src.accept_ : accept;
-    dst.connect_ = src.connect_ ? src.connect_ : connect;
+    dst.connected_ = src.connected_ ? src.connected_ : connected;
     dst.data_ = src.data_ ? src.data_ : data;
     dst.rdexpire_ = src.rdexpire_ ? src.rdexpire_ : rdexpire;
     dst.wrexpire_ = src.wrexpire_ ? src.wrexpire_ : wrexpire;

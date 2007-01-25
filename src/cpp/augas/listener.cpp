@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
@@ -36,16 +35,15 @@ listener::do_sfd() const
 listener::~listener() AUG_NOTHROW
 {
     try {
-        sess_->close(file_);
+        sess_->closed(file_);
     } AUG_PERRINFOCATCH;
 }
 
-listener::listener(const sessptr& sess, augas_id id, void* user,
-                   const smartfd& sfd)
+listener::listener(const sessptr& sess, void* user, const smartfd& sfd)
     : sess_(sess),
       sfd_(sfd)
 {
     file_.sess_ = cptr(*sess);
-    file_.id_ = id;
+    file_.id_ = aug_nextid();
     file_.user_ = user;
 }

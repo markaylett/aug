@@ -259,7 +259,7 @@ namespace augas {
     }
 
     void
-    connect_(const connptr& cptr)
+    connected_(const connptr& cptr)
     {
         const endpoint& ep(cptr->endpoint());
         inetaddr addr(null);
@@ -268,7 +268,7 @@ namespace augas {
                    static_cast<int>(ntohs(port(ep))));
 
         setioeventmask(state_->mplexer_, cptr->sfd(), AUG_IOEVENTRD);
-        cptr->connect(ep);
+        cptr->connected(ep);
     }
 
     int
@@ -280,23 +280,19 @@ namespace augas {
         try {
 
             sessptr sess(state_->manager_.getsess(sname));
+            connptr cptr(new augas::client(sess, user, state_->timers_, host,
+                                           serv));
+            scoped_insert si(state_->manager_, cptr);
 
-            augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
-                             // uninitialized in this function.
-            id = aug_nextid();
-            connptr cptr(new augas::client(sess, id, user, state_->timers_,
-                                           host, serv));
-
-            state_->manager_.insert(cptr);
-
-            if (CONNECTED == cptr->phase()) {
+            if (ESTABLISHED == cptr->phase()) {
                 setsockopts_(cptr->sfd());
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
-                connect_(cptr);
+                connected_(cptr);
             } else
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
 
-            return (int)id;
+            si.commit();
+            return (int)cptr->id();
 
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -314,18 +310,16 @@ namespace augas {
             setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
 
             sessptr sess(state_->manager_.getsess(sname));
-
-            augas_id id = 0; // TODO: resolve GCC warning: 'id' might be used
-                             // uninitialized in this function.
-            id = aug_nextid();
-            listenerptr lptr(new augas::listener(sess, id, user, sfd));
-            state_->manager_.insert(lptr);
+            listenerptr lptr(new augas::listener(sess, user, sfd));
+            scoped_insert si(state_->manager_, lptr);
 
             inetaddr addr(null);
             AUG_DEBUG2("listening: interface=[%s], port=[%d]",
                        inetntop(getinetaddr(ep, addr)).c_str(),
                        static_cast<int>(ntohs(port(ep))));
-            return (int)id;
+
+            si.commit();
+            return (int)lptr->id();
 
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -507,7 +501,7 @@ namespace augas {
         pending::iterator it(state_->pending_.begin()),
             end(state_->pending_.end());
         while (it != end) {
-            if (!it->second->isopen()) {
+            if (!it->second->ready()) {
                 aug_warn("cancelling timer associated with failed session");
                 aug_canceltimer(cptr(state_->timers_), it->first);
                 state_->pending_.erase(it++);
@@ -539,22 +533,14 @@ namespace augas {
 
         setsockopts_(sfd);
         setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
-        augas_id id(aug_nextid());
-
-        AUG_DEBUG2("initialising connection: id=[%d%], fd=[%d]", id,
+        connptr cptr(new augas::server(file.sess(), file.user(),
+                                       state_->timers_, sfd, ep));
+        scoped_insert si(state_->manager_, cptr);
+        AUG_DEBUG2("initialising connection: id=[%d%], fd=[%d]", cptr->id(),
                    sfd.get());
 
-        connptr conn(new augas::server(file.sess(), id, file.user(),
-                                       state_->timers_, sfd, ep));
-        state_->manager_.insert(conn);
-        try {
-            if (conn->accept(ep))
-                return;
-
-            // Fallthrough.
-
-        } AUG_PERRINFOCATCH;
-        state_->manager_.erase(*conn);
+        if (cptr->accept(ep))
+            si.commit();
     }
 
     bool
@@ -590,7 +576,7 @@ namespace augas {
                 auto_ptr<eventarg> arg(static_cast<
                                        eventarg*>(aug_getvarp(&event.arg_)));
                 sessptr sess(state_->manager_.getsess(arg->sname_));
-                if (sess->isopen())
+                if (sess->ready())
                     sess->event(event.type_ - AUG_EVENTUSER,
                                 aug_getvarp(&arg->arg_));
                 else
@@ -626,10 +612,10 @@ namespace augas {
                     state_->manager_.update(file, fd);
                 } else if (changed)
                     switch (cptr->phase()) {
-                    case CONNECTED:
+                    case ESTABLISHED:
                         setnodelay(fd, true);
                         setnonblock(fd, true);
-                        connect_(cptr);
+                        connected_(cptr);
                         break;
                     case CLOSED:
                         state_->manager_.erase(*file);

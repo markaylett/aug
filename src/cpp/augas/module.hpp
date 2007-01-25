@@ -16,7 +16,7 @@ namespace augas {
     class module {
         const std::string name_;
         aug::dlib lib_;
-        augas_termfn termfn_;
+        augas_unloadfn unloadfn_;
         augas_module module_;
 
         module(const module&);
@@ -31,11 +31,10 @@ namespace augas {
                const augas_host& host);
 
         void
-        closesess(const augas_sess& sess) const AUG_NOTHROW;
+        term(const augas_sess& sess) const AUG_NOTHROW;
 
         bool
-        opensess(augas_sess& sess) const AUG_NOTHROW;
-
+        init(augas_sess& sess) const AUG_NOTHROW;
 
         bool
         event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW;
@@ -48,15 +47,15 @@ namespace augas {
         reconf(const augas_sess& sess) const AUG_NOTHROW;
 
         void
-        close(const augas_file& file) const AUG_NOTHROW;
+        closed(const augas_file& file) const AUG_NOTHROW;
 
         bool
         accept(augas_file& file, const char* addr,
                unsigned short port) const AUG_NOTHROW;
 
         bool
-        connect(augas_file& file, const char* addr,
-                unsigned short port) const AUG_NOTHROW;
+        connected(augas_file& file, const char* addr,
+                  unsigned short port) const AUG_NOTHROW;
 
         bool
         data(const augas_file& file, const char* buf,

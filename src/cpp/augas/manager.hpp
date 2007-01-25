@@ -16,7 +16,7 @@ namespace augas {
 
         typedef std::map<std::string, moduleptr> modules;
         typedef std::map<std::string, sessptr> sesss;
-        typedef std::map<augas_id, int> idtofd;
+        typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
         typedef std::map<int, fileptr> files;
 
         modules modules_;
@@ -24,10 +24,18 @@ namespace augas {
         files files_;
         idtofd idtofd_;
 
+        manager(const manager& rhs);
+
+        manager&
+        operator =(const manager& rhs);
+
         void
         insert(const std::string& name, const sessptr& sess);
 
     public:
+        manager()
+        {
+        }
         void
         clear();
 
@@ -73,6 +81,35 @@ namespace augas {
 
         bool
         empty() const;
+    };
+
+    class scoped_insert {
+
+        manager& manager_;
+        fileptr file_;
+
+        scoped_insert(const scoped_insert& rhs);
+
+        scoped_insert&
+        operator =(const scoped_insert& rhs);
+
+    public:
+        ~scoped_insert() AUG_NOTHROW
+        {
+            if (null != file_)
+                manager_.erase(*file_);
+        }
+        scoped_insert(manager& manager, const fileptr& file)
+            : manager_(manager),
+              file_(file)
+        {
+            manager.insert(file);
+        }
+        void
+        commit()
+        {
+            file_ = fileptr();
+        }
     };
 }
 
