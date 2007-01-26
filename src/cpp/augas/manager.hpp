@@ -17,11 +17,11 @@ namespace augas {
         typedef std::map<std::string, moduleptr> modules;
         typedef std::map<std::string, sessptr> sesss;
         typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
-        typedef std::map<int, fileptr> files;
+        typedef std::map<int, sockptr> socks;
 
         modules modules_;
         sesss sesss_;
-        files files_;
+        socks socks_;
         idtofd idtofd_;
 
         manager(const manager& rhs);
@@ -40,13 +40,13 @@ namespace augas {
         clear();
 
         void
-        erase(const file_base& file);
+        erase(const sock_base& sock);
 
         void
-        insert(const fileptr& file);
+        insert(const sockptr& sock);
 
         void
-        update(const fileptr& file, aug::fdref prev);
+        update(const sockptr& sock, aug::fdref prev);
 
         void
         load(const char* rundir, const options& options,
@@ -70,10 +70,10 @@ namespace augas {
         void
         reconf() const;
 
-        fileptr
+        sockptr
         getbyfd(aug::fdref fd) const;
 
-        fileptr
+        sockptr
         getbyid(augas_id id) const;
 
         sessptr
@@ -86,7 +86,7 @@ namespace augas {
     class scoped_insert {
 
         manager& manager_;
-        fileptr file_;
+        sockptr sock_;
 
         scoped_insert(const scoped_insert& rhs);
 
@@ -96,19 +96,19 @@ namespace augas {
     public:
         ~scoped_insert() AUG_NOTHROW
         {
-            if (null != file_)
-                manager_.erase(*file_);
+            if (null != sock_)
+                manager_.erase(*sock_);
         }
-        scoped_insert(manager& manager, const fileptr& file)
+        scoped_insert(manager& manager, const sockptr& sock)
             : manager_(manager),
-              file_(file)
+              sock_(sock)
         {
-            manager.insert(file);
+            manager.insert(sock);
         }
         void
         commit()
         {
-            file_ = fileptr();
+            sock_ = sockptr();
         }
     };
 }

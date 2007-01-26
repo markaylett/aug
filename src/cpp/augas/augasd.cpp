@@ -8,12 +8,13 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "augas/buffer.hpp"
+#include "augas/client.hpp"
 #include "augas/exception.hpp"
 #include "augas/listener.hpp"
 #include "augas/manager.hpp"
 #include "augas/module.hpp"
 #include "augas/options.hpp"
+#include "augas/server.hpp"
 #include "augas/utility.hpp"
 
 #if !defined(_WIN32)
@@ -242,11 +243,37 @@ namespace augas {
         return -1;
     }
 
+    int
+    forward_(const char* sname, int type, void* user)
+    {
+        try {
+
+            sessptr sess(state_->manager_.getsess(sname));
+            if (!sess->ready())
+                throw error(__FILE__, __LINE__, ESTATE,
+                            "failed session: sname=[%s]", sname);
+
+            sess->event(type, user);
+            return 0;
+
+        } AUG_SETERRINFOCATCH;
+        return -1;
+    }
+
     const char*
     getenv_(const char* name)
     {
         try {
-            return options_.get(name, 0);
+
+            const char* value(options_.get(name, 0));
+
+            /* Fallback to environment table. */
+
+            if (!value)
+                value = getenv(name);
+
+            return value;
+
         } AUG_SETERRINFOCATCH;
         return 0;
     }
@@ -261,6 +288,8 @@ namespace augas {
     void
     connected_(const connptr& cptr)
     {
+        setsockopts_(cptr->sfd());
+
         const endpoint& ep(cptr->endpoint());
         inetaddr addr(null);
         AUG_DEBUG2("connected: host=[%s], port=[%d]",
@@ -285,7 +314,6 @@ namespace augas {
             scoped_insert si(state_->manager_, cptr);
 
             if (ESTABLISHED == cptr->phase()) {
-                setsockopts_(cptr->sfd());
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
                 connected_(cptr);
             } else
@@ -297,6 +325,7 @@ namespace augas {
         } AUG_SETERRINFOCATCH;
         return -1;
     }
+
     int
     tcplisten_(const char* sname, const char* host, const char* serv,
                void* user)
@@ -378,12 +407,12 @@ namespace augas {
     {
         AUG_DEBUG2("shutdown(): id=[%d]", cid);
         try {
-            fileptr file(state_->manager_.getbyid(cid));
-            connptr cptr(smartptr_cast<conn_base>(file));
+            sockptr sock(state_->manager_.getbyid(cid));
+            connptr cptr(smartptr_cast<conn_base>(sock));
             if (null != cptr)
                 cptr->shutdown();
             else
-                state_->manager_.erase(*file);
+                state_->manager_.erase(*sock);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -477,6 +506,7 @@ namespace augas {
         writelog_,
         vwritelog_,
         post_,
+        forward_,
         getenv_,
         tcpconnect_,
         tcplisten_,
@@ -511,7 +541,7 @@ namespace augas {
     }
 
     void
-    accept_(const file_base& file, conncb_base& conncb)
+    accept_(const sock_base& sock, conncb_base& conncb)
     {
         endpoint ep(null);
 
@@ -520,7 +550,7 @@ namespace augas {
         smartfd sfd(null);
         try {
 
-            sfd = accept(file.sfd(), ep);
+            sfd = accept(sock.sfd(), ep);
 
         } catch (const errinfo_error& e) {
 
@@ -531,12 +561,13 @@ namespace augas {
             throw;
         }
 
-        setsockopts_(sfd);
         setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
-        connptr cptr(new augas::server(file.sess(), file.user(),
+        setsockopts_(sfd);
+        connptr cptr(new augas::server(sock.sess(), sock.user(),
                                        state_->timers_, sfd, ep));
+
         scoped_insert si(state_->manager_, cptr);
-        AUG_DEBUG2("initialising connection: id=[%d%], fd=[%d]", cptr->id(),
+        AUG_DEBUG2("initialising connection: id=[%d], fd=[%d]", cptr->id(),
                    sfd.get());
 
         if (cptr->accept(ep))
@@ -598,10 +629,10 @@ namespace augas {
             if (fd == aug_eventin())
                 return readevent_(*this);
 
-            fileptr file(state_->manager_.getbyfd(fd));
-            connptr cptr(smartptr_cast<conn_base>(file));
+            sockptr sock(state_->manager_.getbyfd(fd));
+            connptr cptr(smartptr_cast<conn_base>(sock));
 
-            AUG_DEBUG2("processing file: id=[%d], fd=[%d]", file->id(), fd);
+            AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", sock->id(), fd);
 
             if (null != cptr) {
 
@@ -609,23 +640,21 @@ namespace augas {
 
                 if (CONNECTING == cptr->phase()) {
                     setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
-                    state_->manager_.update(file, fd);
+                    state_->manager_.update(sock, fd);
                 } else if (changed)
                     switch (cptr->phase()) {
                     case ESTABLISHED:
-                        setnodelay(fd, true);
-                        setnonblock(fd, true);
                         connected_(cptr);
                         break;
                     case CLOSED:
-                        state_->manager_.erase(*file);
+                        state_->manager_.erase(*sock);
                         return false;
                     default:
                         break;
                     }
 
             } else
-                accept_(*file, *this);
+                accept_(*sock, *this);
 
             return true;
         }

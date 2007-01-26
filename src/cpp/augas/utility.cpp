@@ -9,67 +9,67 @@
 namespace {
 
     void
-    term(const struct augas_sess* sess)
+    term(const augas_sess* sess)
     {
     }
     int
-    init(struct augas_sess* sess)
-    {
-        return 0;
-    }
-    int
-    event(const struct augas_sess* sess, int type, void* user)
+    init(augas_sess* sess)
     {
         return 0;
     }
     int
-    expire(const struct augas_sess* sess, int tid, void* user, unsigned* ms)
+    event(const augas_sess* sess, int type, void* user)
     {
         return 0;
     }
     int
-    reconf(const struct augas_sess* sess)
+    expire(const augas_sess* sess, int tid, void* user, unsigned* ms)
+    {
+        return 0;
+    }
+    int
+    reconf(const augas_sess* sess)
     {
         return 0;
     }
     void
-    closed(const struct augas_file* file)
+    closed(const augas_sock* sock)
     {
     }
     int
-    accept(struct augas_file* file, const char* addr, unsigned short port)
-    {
-        return 0;
-    }
-    int
-    connected(struct augas_file* file, const char* addr, unsigned short port)
+    accept(augas_sock* sock, const char* addr, unsigned short port)
     {
         return 0;
     }
     int
-    data(const struct augas_file* file, const char* buf, size_t size)
+    connected(augas_sock* sock, const char* addr, unsigned short port)
     {
         return 0;
     }
     int
-    rdexpire(const struct augas_file* file, unsigned* ms)
+    data(const augas_sock* sock, const char* buf, size_t size)
     {
         return 0;
     }
     int
-    wrexpire(const struct augas_file* file, unsigned* ms)
+    rdexpire(const augas_sock* sock, unsigned* ms)
     {
         return 0;
     }
     int
-    teardown(const struct augas_file* file)
+    wrexpire(const augas_sock* sock, unsigned* ms)
+    {
+        return 0;
+    }
+    int
+    teardown(const augas_sock* sock)
     {
         return 0;
     }
 }
 
 void
-augas::setdefaults(struct augas_module& dst, const struct augas_module& src)
+augas::setdefaults(augas_module& dst, const augas_module& src)
 {
     dst.term_ = src.term_ ? src.term_ : term;
     dst.init_ = src.init_ ? src.init_ : init;

@@ -43,42 +43,42 @@ namespace augas {
             return module_->reconf(sess_);
         }
         void
-        closed(const augas_file& file) const AUG_NOTHROW
+        closed(const augas_sock& sock) const AUG_NOTHROW
         {
-            module_->closed(file);
+            module_->closed(sock);
         }
         bool
-        accept(augas_file& file, const char* addr,
+        accept(augas_sock& sock, const char* addr,
                unsigned short port) const AUG_NOTHROW
         {
-            return module_->accept(file, addr, port);
+            return module_->accept(sock, addr, port);
         }
         bool
-        connected(augas_file& file, const char* addr,
+        connected(augas_sock& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW
         {
-            return module_->connected(file, addr, port);
+            return module_->connected(sock, addr, port);
         }
         bool
-        data(const augas_file& file, const char* buf,
+        data(const augas_sock& sock, const char* buf,
              size_t size) const AUG_NOTHROW
         {
-            return module_->data(file, buf, size);
+            return module_->data(sock, buf, size);
         }
         bool
-        rdexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW
+        rdexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
         {
-            return module_->rdexpire(file, ms);
+            return module_->rdexpire(sock, ms);
         }
         bool
-        wrexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW
+        wrexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
         {
-            return module_->wrexpire(file, ms);
+            return module_->wrexpire(sock, ms);
         }
         bool
-        teardown(const augas_file& file) const AUG_NOTHROW
+        teardown(const augas_sock& sock) const AUG_NOTHROW
         {
-            return module_->teardown(file);
+            return module_->teardown(sock);
         }
         operator augas_sess&() AUG_NOTHROW
         {

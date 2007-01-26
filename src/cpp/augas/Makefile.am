@@ -6,14 +6,17 @@ EXTRA_DIST = \
 
 noinst_HEADERS = \
 	buffer.hpp \
+	client.hpp \
 	conn.hpp \
 	exception.hpp \
-	file.hpp \
 	listener.hpp \
 	manager.hpp \
 	module.hpp \
 	options.hpp \
+	rwtimer.hpp \
+	server.hpp \
 	sess.hpp \
+	sock.hpp \
 	utility.hpp
 
 bin_PROGRAMS = augasd
@@ -21,14 +24,17 @@ bin_PROGRAMS = augasd
 augasd_SOURCES = \
 	augasd.cpp \
 	buffer.cpp \
+	client.cpp \
 	conn.cpp \
 	exception.cpp \
-	file.cpp \
 	listener.cpp \
 	manager.cpp \
 	module.cpp \
 	options.cpp \
+	rwtimer.cpp \
+	server.cpp \
 	sess.cpp \
+	sock.cpp \
 	utility.cpp
 
 augasd_LDADD = \

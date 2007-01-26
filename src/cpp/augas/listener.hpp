@@ -4,23 +4,23 @@
 #ifndef AUGAS_LISTENER_HPP
 #define AUGAS_LISTENER_HPP
 
-#include "augas/file.hpp"
+#include "augas/sock.hpp"
 
 #include "augsyspp.hpp"
 
 namespace augas {
 
-    class listener : public file_base {
+    class listener : public sock_base {
 
         sessptr sess_;
-        augas_file file_;
+        augas_sock sock_;
         aug::smartfd sfd_;
 
-        augas_file&
-        do_file();
+        augas_sock&
+        do_sock();
 
-        const augas_file&
-        do_file() const;
+        const augas_sock&
+        do_sock() const;
 
         const sessptr&
         do_sess() const;

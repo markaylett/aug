@@ -5,10 +5,9 @@
 #define AUGAS_CONN_HPP
 
 #include "augas/buffer.hpp"
-#include "augas/file.hpp"
+#include "augas/rwtimer.hpp"
+#include "augas/sock.hpp"
 
-#include "augsyspp.hpp"
-#include "augutilpp.hpp"
 #include "augnetpp.hpp"
 
 namespace augas {
@@ -21,77 +20,7 @@ namespace augas {
         CLOSED
     };
 
-    class rwtimer_base : public aug::timercb_base {
-
-        virtual void
-        do_setrwtimer(unsigned ms, unsigned flags) = 0;
-
-        virtual void
-        do_resetrwtimer(unsigned ms, unsigned flags) = 0;
-
-        virtual void
-        do_resetrwtimer(unsigned flags) = 0;
-
-        virtual void
-        do_cancelrwtimer(unsigned flags) = 0;
-
-    public:
-        ~rwtimer_base() AUG_NOTHROW;
-
-        void
-        setrwtimer(unsigned ms, unsigned flags)
-        {
-            do_setrwtimer(ms, flags);
-        }
-        void
-        resetrwtimer(unsigned ms, unsigned flags)
-        {
-            do_resetrwtimer(ms, flags);
-        }
-        void
-        resetrwtimer(unsigned flags)
-        {
-            do_resetrwtimer(flags);
-        }
-        void
-        cancelrwtimer(unsigned flags)
-        {
-            do_cancelrwtimer(flags);
-        }
-    };
-
-    typedef aug::smartptr<rwtimer_base> rwtimerptr;
-
-    class rwtimer : public rwtimer_base {
-
-        sessptr sess_;
-        const augas_file& file_;
-        aug::timer rdtimer_;
-        aug::timer wrtimer_;
-
-        void
-        do_callback(aug::idref ref, unsigned& ms, aug_timers& timers);
-
-        void
-        do_setrwtimer(unsigned ms, unsigned flags);
-
-        void
-        do_resetrwtimer(unsigned ms, unsigned flags);
-
-        void
-        do_resetrwtimer(unsigned flags);
-
-        void
-        do_cancelrwtimer(unsigned flags);
-
-    public:
-        ~rwtimer() AUG_NOTHROW;
-
-        rwtimer(const sessptr& sess, const augas_file& file,
-                aug::timers& timers);
-    };
-
-    class conn_base : public file_base {
+    class conn_base : public sock_base {
 
         virtual bool
         do_accept(const aug_endpoint& ep) = 0;
@@ -174,7 +103,7 @@ namespace augas {
     class established : public conn_base {
 
         sessptr sess_;
-        augas_file& file_;
+        augas_sock& sock_;
         rwtimer& rwtimer_;
         aug::endpoint endpoint_;
         aug::smartfd sfd_;
@@ -182,11 +111,11 @@ namespace augas {
         connphase phase_;
         bool close_;
 
-        augas_file&
-        do_file();
+        augas_sock&
+        do_sock();
 
-        const augas_file&
-        do_file() const;
+        const augas_sock&
+        do_sock() const;
 
         const sessptr&
         do_sess() const;
@@ -221,7 +150,7 @@ namespace augas {
     public:
         ~established() AUG_NOTHROW;
 
-        established(const sessptr& sess, augas_file& file, rwtimer& rwtimer,
+        established(const sessptr& sess, augas_sock& sock, rwtimer& rwtimer,
                     const aug::smartfd& sfd, const aug::endpoint& ep,
                     bool close);
     };
@@ -229,17 +158,17 @@ namespace augas {
     class connecting : public conn_base {
 
         sessptr sess_;
-        augas_file& file_;
+        augas_sock& sock_;
         aug::connector connector_;
         aug::endpoint endpoint_;
         aug::smartfd sfd_;
         connphase phase_;
 
-        augas_file&
-        do_file();
+        augas_sock&
+        do_sock();
 
-        const augas_file&
-        do_file() const;
+        const augas_sock&
+        do_sock() const;
 
         const sessptr&
         do_sess() const;
@@ -274,144 +203,8 @@ namespace augas {
     public:
         ~connecting() AUG_NOTHROW;
 
-        connecting(const sessptr& sess, augas_file& file, const char* host,
+        connecting(const sessptr& sess, augas_sock& sock, const char* host,
                    const char* serv);
-    };
-
-    class client : public rwtimer_base, public conn_base {
-
-        augas_file file_;
-        rwtimer rwtimer_;
-        connptr conn_;
-
-        // rwtimer_base.
-
-        void
-        do_callback(aug::idref ref, unsigned& ms, aug_timers& timers);
-
-        void
-        do_setrwtimer(unsigned ms, unsigned flags);
-
-        void
-        do_resetrwtimer(unsigned ms, unsigned flags);
-
-        void
-        do_resetrwtimer(unsigned flags);
-
-        void
-        do_cancelrwtimer(unsigned flags);
-
-        // conn_base.
-
-        augas_file&
-        do_file();
-
-        const augas_file&
-        do_file() const;
-
-        const sessptr&
-        do_sess() const;
-
-        aug::smartfd
-        do_sfd() const;
-
-        bool
-        do_accept(const aug_endpoint& ep);
-
-        void
-        do_connected(const aug_endpoint& ep);
-
-        bool
-        do_process(aug::mplexer& mplexer);
-
-        void
-        do_putsome(aug::mplexer& mplexer, const void* buf, size_t size);
-
-        void
-        do_shutdown();
-
-        void
-        do_teardown();
-
-        const aug::endpoint&
-        do_endpoint() const;
-
-        connphase
-        do_phase() const;
-
-    public:
-        ~client() AUG_NOTHROW;
-
-        client(const sessptr& sess, void* user, aug::timers& timers,
-               const char* host, const char* serv);
-    };
-
-    class server : public rwtimer_base, public conn_base {
-
-        augas_file file_;
-        rwtimer rwtimer_;
-        established conn_;
-
-        // rwtimer_base.
-
-        void
-        do_callback(aug::idref ref, unsigned& ms, aug_timers& timers);
-
-        void
-        do_setrwtimer(unsigned ms, unsigned flags);
-
-        void
-        do_resetrwtimer(unsigned ms, unsigned flags);
-
-        void
-        do_resetrwtimer(unsigned flags);
-
-        void
-        do_cancelrwtimer(unsigned flags);
-
-        // conn_base.
-
-        augas_file&
-        do_file();
-
-        const augas_file&
-        do_file() const;
-
-        const sessptr&
-        do_sess() const;
-
-        aug::smartfd
-        do_sfd() const;
-
-        bool
-        do_accept(const aug_endpoint& ep);
-
-        void
-        do_connected(const aug_endpoint& ep);
-
-        bool
-        do_process(aug::mplexer& mplexer);
-
-        void
-        do_putsome(aug::mplexer& mplexer, const void* buf, size_t size);
-
-        void
-        do_shutdown();
-
-        void
-        do_teardown();
-
-        const aug::endpoint&
-        do_endpoint() const;
-
-        connphase
-        do_phase() const;
-
-    public:
-        ~server() AUG_NOTHROW;
-
-        server(const sessptr& sess, void* user, aug::timers& timers,
-               const aug::smartfd& sfd, const aug::endpoint& ep);
     };
 }
 

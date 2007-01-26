@@ -129,13 +129,16 @@
 				RelativePath="..\src\cpp\augas\buffer.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augas\client.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augas\conn.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\exception.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\file.cpp">
+				RelativePath="..\src\cpp\augas\sock.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\listener.cpp">
@@ -148,6 +151,12 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\options.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\rwtimer.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\server.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\sess.cpp">
@@ -164,13 +173,16 @@
 				RelativePath="..\src\cpp\augas\buffer.hpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augas\client.hpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augas\conn.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\exception.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\file.hpp">
+				RelativePath="..\src\cpp\augas\sock.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\listener.hpp">
@@ -183,6 +195,12 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\options.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\rwtimer.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\server.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\sess.hpp">

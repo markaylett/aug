@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_FILE_HPP
-#define AUGAS_FILE_HPP
+#ifndef AUGAS_SOCK_HPP
+#define AUGAS_SOCK_HPP
 
 #include "augas.h"
 #include "augas/sess.hpp"
@@ -11,16 +11,16 @@
 
 namespace augas {
 
-    class file_base {
+    class sock_base {
     public:
-        typedef augas_file ctype;
+        typedef augas_sock ctype;
     private:
 
-        virtual augas_file&
-        do_file() = 0;
+        virtual augas_sock&
+        do_sock() = 0;
 
-        virtual const augas_file&
-        do_file() const = 0;
+        virtual const augas_sock&
+        do_sock() const = 0;
 
         virtual const sessptr&
         do_sess() const = 0;
@@ -30,17 +30,17 @@ namespace augas {
 
     public:
         virtual
-        ~file_base() AUG_NOTHROW;
+        ~sock_base() AUG_NOTHROW;
 
-        augas_file&
-        file()
+        augas_sock&
+        sock()
         {
-            return do_file();
+            return do_sock();
         }
-        const augas_file&
-        file() const
+        const augas_sock&
+        sock() const
         {
-            return do_file();
+            return do_sock();
         }
         const sessptr&
         sess() const
@@ -55,24 +55,24 @@ namespace augas {
         augas_id
         id() const
         {
-            return do_file().id_;
+            return do_sock().id_;
         }
         void*
         user() const
         {
-            return do_file().user_;
+            return do_sock().user_;
         }
-        operator augas_file&()
+        operator augas_sock&()
         {
-            return do_file();
+            return do_sock();
         }
-        operator const augas_file&() const
+        operator const augas_sock&() const
         {
-            return do_file();
+            return do_sock();
         }
     };
 
-    typedef aug::smartptr<file_base> fileptr;
+    typedef aug::smartptr<sock_base> sockptr;
 }
 
-#endif // AUGAS_FILE_HPP
+#endif // AUGAS_SOCK_HPP

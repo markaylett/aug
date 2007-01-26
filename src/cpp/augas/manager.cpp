@@ -43,42 +43,42 @@ void
 manager::clear()
 {
     idtofd_.clear();
-    files_.clear();
+    socks_.clear();
     sesss_.clear();
 
     // Modules not released.
 }
 
 void
-manager::erase(const file_base& file)
+manager::erase(const sock_base& sock)
 {
-    AUG_DEBUG2("removing from manager: id=[%d], fd=[%d]", file.id(),
-               file.sfd().get());
+    AUG_DEBUG2("removing from manager: id=[%d], fd=[%d]", sock.id(),
+               sock.sfd().get());
 
-    idtofd_.erase(file.id());
-    files_.erase(file.sfd().get());
+    idtofd_.erase(sock.id());
+    socks_.erase(sock.sfd().get());
 }
 
 void
-manager::insert(const fileptr& file)
+manager::insert(const sockptr& sock)
 {
-    AUG_DEBUG2("adding to manager: id=[%d], fd=[%d]", file->id(),
-               file->sfd().get());
+    AUG_DEBUG2("adding to manager: id=[%d], fd=[%d]", sock->id(),
+               sock->sfd().get());
 
-    files_.insert(make_pair(file->sfd().get(), file));
-    idtofd_.insert(make_pair(file->id(), file->sfd().get()));
+    socks_.insert(make_pair(sock->sfd().get(), sock));
+    idtofd_.insert(make_pair(sock->id(), sock->sfd().get()));
 }
 
 void
-manager::update(const fileptr& file, fdref prev)
+manager::update(const sockptr& sock, fdref prev)
 {
-    AUG_DEBUG2("updating manager: id=[%d], fd=[%d], prev=[%d]", file->id(),
-               file->sfd().get(), prev.get());
+    AUG_DEBUG2("updating manager: id=[%d], fd=[%d], prev=[%d]", sock->id(),
+               sock->sfd().get(), prev.get());
 
-    files_.insert(make_pair(file->sfd().get(), file));
-    files_.erase(prev.get());
+    socks_.insert(make_pair(sock->sfd().get(), sock));
+    socks_.erase(prev.get());
 
-    idtofd_[file->id()] = file->sfd().get();
+    idtofd_[sock->id()] = sock->sfd().get();
 }
 
 void
@@ -144,7 +144,7 @@ manager::sendall(mplexer& mplexer, augas_id cid, const char* sname,
 {
     bool ret(true);
 
-    files::const_iterator it(files_.begin()), end(files_.end());
+    socks::const_iterator it(socks_.begin()), end(socks_.end());
     for (; it != end; ++it) {
 
         connptr cptr(smartptr_cast<conn_base>(it->second));
@@ -180,7 +180,7 @@ void
 manager::sendother(mplexer& mplexer, augas_id cid, const char* sname,
                    const char* buf, size_t size)
 {
-    files::const_iterator it(files_.begin()), end(files_.end());
+    socks::const_iterator it(socks_.begin()), end(socks_.end());
     for (; it != end; ++it) {
 
         connptr cptr(smartptr_cast<conn_base>(it->second));
@@ -205,9 +205,9 @@ manager::teardown()
 
         AUG_DEBUG2("teardown: id=[%d], fd=[%d]", rit->first, rit->second);
 
-        files::iterator it(files_.find(rit->second));
-        if (it == files_.end())
-            throw error(__FILE__, __LINE__, ESTATE, "file not found: fd=[%d]",
+        socks::iterator it(socks_.find(rit->second));
+        if (it == socks_.end())
+            throw error(__FILE__, __LINE__, ESTATE, "sock not found: fd=[%d]",
                         rit->second);
 
         connptr cptr(smartptr_cast<conn_base>(it->second));
@@ -222,7 +222,7 @@ manager::teardown()
         // Not a connection.
 
         idtofd_.erase(rit++);
-        files_.erase(it);
+        socks_.erase(it);
     }
 }
 
@@ -234,22 +234,22 @@ manager::reconf() const
         it->second->reconf();
 }
 
-fileptr
+sockptr
 manager::getbyfd(fdref fd) const
 {
-    files::const_iterator it(files_.find(fd.get()));
-    if (it == files_.end())
-        throw error(__FILE__, __LINE__, ESTATE, "file not found: fd=[%d]",
+    socks::const_iterator it(socks_.find(fd.get()));
+    if (it == socks_.end())
+        throw error(__FILE__, __LINE__, ESTATE, "sock not found: fd=[%d]",
                     fd.get());
     return it->second;
 }
 
-fileptr
+sockptr
 manager::getbyid(augas_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));
     if (it == idtofd_.end())
-        throw error(__FILE__, __LINE__, ESTATE, "file not found: id=[%d]",
+        throw error(__FILE__, __LINE__, ESTATE, "sock not found: id=[%d]",
                     id);
     return getbyfd(it->second);
 }
@@ -260,12 +260,12 @@ manager::getsess(const string& name) const
     sesss::const_iterator it(sesss_.find(name));
     if (it == sesss_.end())
         throw error(__FILE__, __LINE__, ESTATE,
-                    "session not found: sname=[%1%]", name.c_str());
+                    "session not found: sname=[%s]", name.c_str());
     return it->second;
 }
 
 bool
 manager::empty() const
 {
-    return files_.empty();
+    return socks_.empty();
 }

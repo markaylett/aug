@@ -8,16 +8,16 @@ using namespace aug;
 using namespace augas;
 using namespace std;
 
-augas_file&
-listener::do_file()
+augas_sock&
+listener::do_sock()
 {
-    return file_;
+    return sock_;
 }
 
-const augas_file&
-listener::do_file() const
+const augas_sock&
+listener::do_sock() const
 {
-    return file_;
+    return sock_;
 }
 
 const sessptr&
@@ -35,7 +35,7 @@ listener::do_sfd() const
 listener::~listener() AUG_NOTHROW
 {
     try {
-        sess_->closed(file_);
+        sess_->closed(sock_);
     } AUG_PERRINFOCATCH;
 }
 
@@ -43,7 +43,7 @@ listener::listener(const sessptr& sess, void* user, const smartfd& sfd)
     : sess_(sess),
       sfd_(sfd)
 {
-    file_.sess_ = cptr(*sess);
-    file_.id_ = aug_nextid();
-    file_.user_ = user;
+    sock_.sess_ = cptr(*sess);
+    sock_.id_ = aug_nextid();
+    sock_.user_ = user;
 }

@@ -50,13 +50,6 @@ enum augas_loglevel {
 
 #define AUGAS_MAXNAME   63
 
-/**
-   sessions = foo bar
-   session.foo.module = modpython
-   session.bar.module = modpython
-   module.modpython.path = modpython.dll
-*/
-
 typedef int augas_id;
 
 struct augas_sess {
@@ -64,7 +57,7 @@ struct augas_sess {
     void* user_;
 };
 
-struct augas_file {
+struct augas_sock {
     const struct augas_sess* sess_;
     augas_id id_;
     void* user_;
@@ -77,14 +70,47 @@ struct augas_host {
      */
 
     /**
-       \return the last error that occurred.
+       \brief Get a description of the last error.
+       \return error description
+
+       If the return values of any host function indicates failure, this
+       function can be used to obtain a description of the error.
     */
 
     const char* (*error_)(void);
+
+    /**
+       \brief Re-configure the server and all loaded modules.
+       \sa TODO
+    */
+
     void (*reconf_)(void);
+
+    /**
+       \brief Stop the server.
+    */
+
     void (*stop_)(void);
+
+    /**
+       \brief Write message to server's log.
+    */
+
     void (*writelog_)(int level, const char* format, ...);
+
+    /**
+       \brief Write message to server's log.
+    */
+
     void (*vwritelog_)(int level, const char* format, va_list args);
+
+    /**
+       \brief Post an event to the event queue.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
     int (*post_)(const char* sname, int type, void* user,
                  void (*free)(void*));
 
@@ -93,34 +119,122 @@ struct augas_host {
      */
 
     /**
-       \return the value associated with name.
+       \brief Forward event to a different session.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*forward_)(const char* sname, int type, void* user);
+
+    /**
+       \brief Read a configuration value.
+       \param TODO
+       \return TODO
+       \sa TODO
+
+       If the specified value does not exist in the configuration file, an
+       attempt will be made to read the value from the environment table.
     */
 
     const char* (*getenv_)(const char* name);
 
     /**
-       \return the assigned connection-id.
+       \brief TODO
+       \param sname Session name.
+       \param host Ip address or host name.
+       \param serv Port or service name.
+       \param user User data to be associated with the resulting connection.
+       \return The connection id.
+       \sa TODO
     */
 
     int (*tcpconnect_)(const char* sname, const char* host, const char* serv,
                        void* user);
+
+    /**
+       \brief TODO
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
     int (*tcplisten_)(const char* sname, const char* host, const char* serv,
                       void* user);
 
     /**
-       \return the assigned timer-id.
+       \brief TODO
+       \param TODO
+       \return TODO
+       \sa TODO
     */
 
-    int (*settimer_)(const char* sname, int tid, unsigned ms, void* user,
+    int (*settimer_)(const char* sname, augas_id id, unsigned ms, void* user,
                      void (*free_)(void*));
-    int (*resettimer_)(const char* sname, int tid, unsigned ms);
-    int (*canceltimer_)(const char* sname, int tid);
-    int (*shutdown_)(augas_id fid);
-    int (*send_)(const char* sname, augas_id cid, const char* buf,
+
+    /**
+       \brief TODO
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*resettimer_)(const char* sname, augas_id id, unsigned ms);
+
+    /**
+       \brief TODO
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*canceltimer_)(const char* sname, augas_id id);
+
+    /**
+       \brief TODO
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*shutdown_)(augas_id id);
+
+    /**
+       \brief TODO
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*send_)(const char* sname, augas_id id, const char* buf,
                  size_t size, unsigned flags);
-    int (*setrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
-    int (*resetrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
-    int (*cancelrwtimer_)(augas_id cid, unsigned flags);
+
+    /**
+       \brief TODO
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*setrwtimer_)(augas_id id, unsigned ms, unsigned flags);
+
+    /**
+       \brief TODO
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*resetrwtimer_)(augas_id id, unsigned ms, unsigned flags);
+
+    /**
+       \brief TODO
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*cancelrwtimer_)(augas_id id, unsigned flags);
 };
 
 /**
@@ -131,22 +245,117 @@ struct augas_host {
 
 struct augas_module {
 
+    /**
+       \brief Session termination.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
     void (*term_)(const struct augas_sess* sess);
+
+    /**
+       \brief Session initialisation.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
     int (*init_)(struct augas_sess* sess);
+
+    /**
+       \brief Custom event notification.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
     int (*event_)(const struct augas_sess* sess, int type, void* user);
-    int (*expire_)(const struct augas_sess* sess, int tid, void* user,
+
+    /**
+       \brief Timer expiry.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*expire_)(const struct augas_sess* sess, augas_id id, void* user,
                    unsigned* ms);
+
+    /**
+       \brief Re-configure request.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
     int (*reconf_)(const struct augas_sess* sess);
 
-    void (*closed_)(const struct augas_file* file);
-    int (*accept_)(struct augas_file* file, const char* addr,
+
+    /**
+       \brief Connection closure.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    void (*closed_)(const struct augas_sock* sock);
+
+    /**
+       \brief Acceptance of server connection.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*accept_)(struct augas_sock* sock, const char* addr,
                    unsigned short port);
-    int (*connected_)(struct augas_file* file, const char* addr,
+
+    /**
+       \brief Completion of client connection handshake.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*connected_)(struct augas_sock* sock, const char* addr,
                       unsigned short port);
-    int (*data_)(const struct augas_file* file, const char* buf, size_t size);
-    int (*rdexpire_)(const struct augas_file* file, unsigned* ms);
-    int (*wrexpire_)(const struct augas_file* file, unsigned* ms);
-    int (*teardown_)(const struct augas_file* file);
+
+    /**
+       \brief Inbound data.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*data_)(const struct augas_sock* sock, const char* buf, size_t size);
+
+    /**
+       \brief Expiry of read timer.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*rdexpire_)(const struct augas_sock* sock, unsigned* ms);
+
+    /**
+       \brief Expiry of write timer.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*wrexpire_)(const struct augas_sock* sock, unsigned* ms);
+
+    /**
+       \brief Teardown request.
+       \param TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*teardown_)(const struct augas_sock* sock);
 };
 
 /**

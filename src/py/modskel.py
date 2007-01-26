@@ -7,6 +7,7 @@ import log
 # void stop (void);
 # void writelog (int level, string msg);
 # void post (string sname, int type, object user);
+# void forward (string sname, int type, object user);
 # string getenv (string name);
 # int tcpconnect (string sname, string host, string serv, object user);
 # int tcplisten (string sname, string host, string serv, object user);

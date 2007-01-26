@@ -40,52 +40,52 @@ reconf_(const struct augas_sess* sess)
 }
 
 static void
-closed_(const struct augas_file* file)
+closed_(const struct augas_sock* sock)
 {
     host_->writelog_(AUGAS_LOGINFO, "closed_()");
 }
 
 static int
-accept_(struct augas_file* file, const char* addr, unsigned short port)
+accept_(struct augas_sock* sock, const char* addr, unsigned short port)
 {
     host_->writelog_(AUGAS_LOGINFO, "accept_()");
     return 0;
 }
 
 static int
-connected_(struct augas_file* file, const char* addr, unsigned short port)
+connected_(struct augas_sock* sock, const char* addr, unsigned short port)
 {
     host_->writelog_(AUGAS_LOGINFO, "connected_()");
     return 0;
 }
 
 static int
-data_(const struct augas_file* file, const char* buf, size_t size)
+data_(const struct augas_sock* sock, const char* buf, size_t size)
 {
     host_->writelog_(AUGAS_LOGINFO, "data_()");
-    host_->send_(file->sess_->name_, file->id_, buf, size, AUGAS_SNDSELF);
+    host_->send_(sock->sess_->name_, sock->id_, buf, size, AUGAS_SNDSELF);
     return 0;
 }
 
 static int
-rdexpire_(const struct augas_file* file, unsigned* ms)
+rdexpire_(const struct augas_sock* sock, unsigned* ms)
 {
     host_->writelog_(AUGAS_LOGINFO, "rdexpire_()");
     return 0;
 }
 
 static int
-wrexpire_(const struct augas_file* file, unsigned* ms)
+wrexpire_(const struct augas_sock* sock, unsigned* ms)
 {
     host_->writelog_(AUGAS_LOGINFO, "wrexpire_()");
     return 0;
 }
 
 static int
-teardown_(const struct augas_file* file)
+teardown_(const struct augas_sock* sock)
 {
     host_->writelog_(AUGAS_LOGINFO, "teardown_()");
-    host_->shutdown_(file->id_);
+    host_->shutdown_(sock->id_);
     return 0;
 }
 

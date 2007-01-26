@@ -70,10 +70,11 @@ am_modskel_la_OBJECTS = modskel.lo
 modskel_la_OBJECTS = $(am_modskel_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) conn.$(OBJEXT) \
-	exception.$(OBJEXT) file.$(OBJEXT) listener.$(OBJEXT) \
+am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) client.$(OBJEXT) \
+	conn.$(OBJEXT) exception.$(OBJEXT) listener.$(OBJEXT) \
 	manager.$(OBJEXT) module.$(OBJEXT) options.$(OBJEXT) \
-	sess.$(OBJEXT) utility.$(OBJEXT)
+	rwtimer.$(OBJEXT) server.$(OBJEXT) sess.$(OBJEXT) \
+	sock.$(OBJEXT) utility.$(OBJEXT)
 augasd_OBJECTS = $(am_augasd_OBJECTS)
 augasd_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
@@ -229,27 +230,33 @@ EXTRA_DIST = \
 
 noinst_HEADERS = \
 	buffer.hpp \
+	client.hpp \
 	conn.hpp \
 	exception.hpp \
-	file.hpp \
 	listener.hpp \
 	manager.hpp \
 	module.hpp \
 	options.hpp \
+	rwtimer.hpp \
+	server.hpp \
 	sess.hpp \
+	sock.hpp \
 	utility.hpp
 
 augasd_SOURCES = \
 	augasd.cpp \
 	buffer.cpp \
+	client.cpp \
 	conn.cpp \
 	exception.cpp \
-	file.cpp \
 	listener.cpp \
 	manager.cpp \
 	module.cpp \
 	options.cpp \
+	rwtimer.cpp \
+	server.cpp \
 	sess.cpp \
+	sock.cpp \
 	utility.cpp
 
 augasd_LDADD = \
@@ -374,16 +381,19 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augasd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modpython.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modskel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rwtimer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sess.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@
 
 .c.o:

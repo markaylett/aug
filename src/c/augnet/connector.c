@@ -8,12 +8,14 @@ static const char rcsid[] = "$Id: $";
 
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
+#include "augsys/string.h"  /* bzero() */
 #include "augsys/unistd.h"  /* aug_close() */
 #include "augsys/utility.h" /* aug_setnonblock() */
 
 #include "augnet/inet.h"    /* aug_established() */
 
 #include <assert.h>
+#include <stdlib.h>         /* malloc() */
 
 struct aug_connector_ {
     struct addrinfo* res_, *save_;

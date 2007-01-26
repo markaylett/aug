@@ -100,6 +100,9 @@ setpath_(void)
 
     if (!(s = host_->getenv_("module.modpython.pythonpath")))
         s = "bin";
+    else
+        host_->writelog_(AUGAS_LOGDEBUG,
+                         "module.modpython.pythonpath=[%s]", s);
 
     chdir(s);
 
@@ -302,6 +305,24 @@ pypost_(PyObject* self, PyObject* args)
     }
 
     retain_(user, __func__);
+    return incnone_();
+}
+
+static PyObject*
+pyforward_(PyObject* self, PyObject* args)
+{
+    const char* sname;
+    int type;
+    PyObject* user;
+
+    if (!PyArg_ParseTuple(args, "siO:forward", &sname, &type, &user))
+        return NULL;
+
+    if (-1 == host_->forward_(sname, type, user)) {
+        PyErr_SetString(PyExc_RuntimeError, host_->error_());
+        return NULL;
+    }
+
     return incnone_();
 }
 
@@ -545,6 +566,10 @@ static PyMethodDef pymethods_[] = {
         "TODO"
     },
     {
+        "forward", pyforward_, METH_VARARGS,
+        "TODO"
+    },
+    {
         "getenv", pygetenv_, METH_VARARGS,
         "TODO"
     },
@@ -757,17 +782,17 @@ reconf_(const struct augas_sess* sess)
 }
 
 static void
-closed_(const struct augas_file* file)
+closed_(const struct augas_sock* sock)
 {
-    struct import_* import = file->sess_->user_;
-    PyObject* x = file->user_;
-    assert(file->user_);
-    assert(file->sess_->user_);
+    struct import_* import = sock->sess_->user_;
+    PyObject* x = sock->user_;
+    assert(sock->user_);
+    assert(sock->sess_->user_);
 
     if (import->closed_) {
 
         PyObject* y = PyObject_CallFunction(import->closed_, "siO",
-                                            file->sess_->name_, file->id_, x);
+                                            sock->sess_->name_, sock->id_, x);
         if (y) {
             Py_DECREF(y);
         } else
@@ -777,17 +802,17 @@ closed_(const struct augas_file* file)
 }
 
 static int
-accept_(struct augas_file* file, const char* addr, unsigned short port)
+accept_(struct augas_sock* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = file->sess_->user_;
-    PyObject* x = file->user_;
-    assert(file->user_);
-    assert(file->sess_->user_);
+    struct import_* import = sock->sess_->user_;
+    PyObject* x = sock->user_;
+    assert(sock->user_);
+    assert(sock->sess_->user_);
 
     if (import->accept_) {
 
         PyObject* y = PyObject_CallFunction(import->accept_, "siOsH",
-                                            file->sess_->name_, file->id_, x,
+                                            sock->sess_->name_, sock->id_, x,
                                             addr, port);
         if (!y) {
 
@@ -815,7 +840,7 @@ accept_(struct augas_file* file, const char* addr, unsigned short port)
         Py_INCREF(x);
     }
 
-    file->user_ = x;
+    sock->user_ = x;
     return_(x, __func__);
 
     /* Original x is still retained by the listener. */
@@ -824,18 +849,18 @@ accept_(struct augas_file* file, const char* addr, unsigned short port)
 }
 
 static int
-connected_(struct augas_file* file, const char* addr, unsigned short port)
+connected_(struct augas_sock* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = file->sess_->user_;
-    PyObject* x = file->user_, * y = NULL;
+    struct import_* import = sock->sess_->user_;
+    PyObject* x = sock->user_, * y = NULL;
     int ret = 0;
-    assert(file->user_);
-    assert(file->sess_->user_);
+    assert(sock->user_);
+    assert(sock->sess_->user_);
 
     if (import->connected_) {
 
         if (!(y = PyObject_CallFunction(import->connected_, "siOsH",
-                                        file->sess_->name_, file->id_, x,
+                                        sock->sess_->name_, sock->id_, x,
                                         addr, port))) {
             printerr_();
             ret = -1;
@@ -849,26 +874,26 @@ connected_(struct augas_file* file, const char* addr, unsigned short port)
         Py_INCREF(y);
     }
 
-    file->user_ = y;
+    sock->user_ = y;
     return_(y, __func__);
     release_(x, __func__);
     return ret;
 }
 
 static int
-data_(const struct augas_file* file, const char* buf, size_t size)
+data_(const struct augas_sock* sock, const char* buf, size_t size)
 {
-    struct import_* import = file->sess_->user_;
+    struct import_* import = sock->sess_->user_;
     int ret = 0;
-    assert(file->user_);
-    assert(file->sess_->user_);
+    assert(sock->user_);
+    assert(sock->sess_->user_);
 
     if (import->data_) {
 
-        PyObject* x = file->user_;
+        PyObject* x = sock->user_;
         PyObject* y = PyBuffer_FromMemory((void*)buf, size);
         PyObject* z = PyObject_CallFunction(import->data_, "siOO",
-                                            file->sess_->name_, file->id_, x,
+                                            sock->sess_->name_, sock->id_, x,
                                             y);
         if (z) {
             Py_DECREF(z);
@@ -883,19 +908,19 @@ data_(const struct augas_file* file, const char* buf, size_t size)
 }
 
 static int
-rdexpire_(const struct augas_file* file, unsigned* ms)
+rdexpire_(const struct augas_sock* sock, unsigned* ms)
 {
-    struct import_* import = file->sess_->user_;
+    struct import_* import = sock->sess_->user_;
     int ret = 0;
-    assert(file->user_);
-    assert(file->sess_->user_);
+    assert(sock->user_);
+    assert(sock->sess_->user_);
 
     if (import->rdexpire_) {
 
-        PyObject* x = file->user_;
+        PyObject* x = sock->user_;
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->rdexpire_, "siOO",
-                                            file->sess_->name_, file->id_, x,
+                                            sock->sess_->name_, sock->id_, x,
                                             y);
         if (z) {
             if (PyInt_Check(z))
@@ -913,19 +938,19 @@ rdexpire_(const struct augas_file* file, unsigned* ms)
 }
 
 static int
-wrexpire_(const struct augas_file* file, unsigned* ms)
+wrexpire_(const struct augas_sock* sock, unsigned* ms)
 {
-    struct import_* import = file->sess_->user_;
+    struct import_* import = sock->sess_->user_;
     int ret = 0;
-    assert(file->user_);
-    assert(file->sess_->user_);
+    assert(sock->user_);
+    assert(sock->sess_->user_);
 
     if (import->wrexpire_) {
 
-        PyObject* x = file->user_;
+        PyObject* x = sock->user_;
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->wrexpire_, "siOO",
-                                            file->sess_->name_, file->id_, x,
+                                            sock->sess_->name_, sock->id_, x,
                                             y);
         if (z) {
             if (PyInt_Check(z))
@@ -943,18 +968,18 @@ wrexpire_(const struct augas_file* file, unsigned* ms)
 }
 
 static int
-teardown_(const struct augas_file* file)
+teardown_(const struct augas_sock* sock)
 {
-    struct import_* import = file->sess_->user_;
-    PyObject* x = file->user_;
+    struct import_* import = sock->sess_->user_;
+    PyObject* x = sock->user_;
     int ret = 0;
-    assert(file->user_);
-    assert(file->sess_->user_);
+    assert(sock->user_);
+    assert(sock->sess_->user_);
 
     if (import->teardown_) {
 
         PyObject* y = PyObject_CallFunction(import->teardown_, "siO",
-                                            file->sess_->name_, file->id_, x);
+                                            sock->sess_->name_, sock->id_, x);
         if (y) {
             Py_DECREF(y);
         } else {
@@ -963,7 +988,7 @@ teardown_(const struct augas_file* file)
         }
 
     } else
-        host_->shutdown_(file->id_);
+        host_->shutdown_(sock->id_);
 
     return ret;
 }

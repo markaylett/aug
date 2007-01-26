@@ -76,58 +76,58 @@ module::reconf(const augas_sess& sess) const AUG_NOTHROW
 }
 
 void
-module::closed(const augas_file& file) const AUG_NOTHROW
+module::closed(const augas_sock& sock) const AUG_NOTHROW
 {
-    AUG_DEBUG2("closed(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
-    module_.closed_(&file);
+    AUG_DEBUG2("closed(): sname=[%s], id=[%d]", sock.sess_->name_, sock.id_);
+    module_.closed_(&sock);
 }
 
 bool
-module::accept(augas_file& file, const char* addr,
+module::accept(augas_sock& sock, const char* addr,
                unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("accept(): sname=[%s], id=[%d], addr=[%s], port=[%u]",
-               file.sess_->name_, file.id_, addr, (unsigned)port);
-    return AUGAS_OK == module_.accept_(&file, addr, port);
+               sock.sess_->name_, sock.id_, addr, (unsigned)port);
+    return AUGAS_OK == module_.accept_(&sock, addr, port);
 }
 
 bool
-module::connected(augas_file& file, const char* addr,
+module::connected(augas_sock& sock, const char* addr,
                 unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("connected(): sname=[%s], id=[%d], addr=[%s], port=[%u]",
-               file.sess_->name_, file.id_, addr, (unsigned)port);
-    return AUGAS_OK == module_.connected_(&file, addr, port);
+               sock.sess_->name_, sock.id_, addr, (unsigned)port);
+    return AUGAS_OK == module_.connected_(&sock, addr, port);
 }
 
 bool
-module::data(const augas_file& file, const char* buf,
+module::data(const augas_sock& sock, const char* buf,
              size_t size) const AUG_NOTHROW
 {
-    AUG_DEBUG2("data(): sname=[%s], id=[%d]", file.sess_->name_, file.id_);
-    return AUGAS_OK == module_.data_(&file, buf, size);
+    AUG_DEBUG2("data(): sname=[%s], id=[%d]", sock.sess_->name_, sock.id_);
+    return AUGAS_OK == module_.data_(&sock, buf, size);
 }
 
 bool
-module::rdexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW
+module::rdexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("rdexpire(): sname=[%s], id=[%d], ms=[%u]",
-               file.sess_->name_, file.id_, ms);
-    return AUGAS_OK == module_.rdexpire_(&file, &ms);
+               sock.sess_->name_, sock.id_, ms);
+    return AUGAS_OK == module_.rdexpire_(&sock, &ms);
 }
 
 bool
-module::wrexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW
+module::wrexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("wrexpire(): sname=[%s], id=[%d], ms=[%u]",
-               file.sess_->name_, file.id_, ms);
-    return AUGAS_OK == module_.wrexpire_(&file, &ms);
+               sock.sess_->name_, sock.id_, ms);
+    return AUGAS_OK == module_.wrexpire_(&sock, &ms);
 }
 
 bool
-module::teardown(const augas_file& file) const AUG_NOTHROW
+module::teardown(const augas_sock& sock) const AUG_NOTHROW
 {
     AUG_DEBUG2("teardown(): sname=[%s], id=[%d]",
-               file.sess_->name_, file.id_);
-    return AUGAS_OK == module_.teardown_(&file);
+               sock.sess_->name_, sock.id_);
+    return AUGAS_OK == module_.teardown_(&sock);
 }

@@ -47,28 +47,28 @@ namespace augas {
         reconf(const augas_sess& sess) const AUG_NOTHROW;
 
         void
-        closed(const augas_file& file) const AUG_NOTHROW;
+        closed(const augas_sock& sock) const AUG_NOTHROW;
 
         bool
-        accept(augas_file& file, const char* addr,
+        accept(augas_sock& sock, const char* addr,
                unsigned short port) const AUG_NOTHROW;
 
         bool
-        connected(augas_file& file, const char* addr,
+        connected(augas_sock& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW;
 
         bool
-        data(const augas_file& file, const char* buf,
+        data(const augas_sock& sock, const char* buf,
              size_t size) const AUG_NOTHROW;
 
         bool
-        rdexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW;
+        rdexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        wrexpire(const augas_file& file, unsigned& ms) const AUG_NOTHROW;
+        wrexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        teardown(const augas_file& file) const AUG_NOTHROW;
+        teardown(const augas_sock& sock) const AUG_NOTHROW;
     };
 
     typedef aug::smartptr<module> moduleptr;
