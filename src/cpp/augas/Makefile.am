@@ -2,7 +2,11 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 EXTRA_DIST = \
 	augasd.conf \
-	augasd.sh
+	augasd.sh \
+	test.sh
+
+SUBDIRS = \
+	etc
 
 noinst_HEADERS = \
 	buffer.hpp \
@@ -60,4 +64,7 @@ mod_LTLIBRARIES += modpython.la
 modpython_la_SOURCES = modpython.c
 modpython_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
 modpython_la_LIBADD =
+
+TESTS = \
+	test.sh
 endif

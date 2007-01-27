@@ -4,7 +4,8 @@ EXTRA_DIST = \
 	modclient.py \
 	modecho.py \
 	modproxy.py \
-	modskel.py
+	modskel.py \
+	modtest1.py
 
 pythondir = $(prefix)/python
 python_DATA = \

@@ -183,6 +183,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augsyspp/Makefile
                  src/cpp/augutilpp/Makefile
                  src/cpp/augas/Makefile
+                 src/cpp/augas/etc/Makefile
                  src/pl/Makefile
                  src/py/Makefile
                  src/sh/Makefile
