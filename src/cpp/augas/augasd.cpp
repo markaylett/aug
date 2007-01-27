@@ -373,7 +373,7 @@ namespace augas {
     }
 
     int
-    resettimer_(const char* sname, int tid, unsigned ms)
+    resettimer_(const char* sname, augas_id tid, unsigned ms)
     {
         AUG_DEBUG2("resettimer(): sname=[%s], id=[%d], ms=[%u]",
                    sname, tid, ms);
@@ -384,7 +384,7 @@ namespace augas {
     }
 
     int
-    canceltimer_(const char* sname, int tid)
+    canceltimer_(const char* sname, augas_id tid)
     {
         AUG_DEBUG2("canceltimer(): sname=[%s], id=[%d]", sname, tid);
         try {

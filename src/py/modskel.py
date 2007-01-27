@@ -14,7 +14,7 @@ import log
 # int settimer (string sname, int tid, unsigned ms, object user);
 # bool resettimer (string sname, int tid, unsigned ms);
 # bool canceltimer (string sname, int tid);
-# void shutdown (int fid);
+# void shutdown (int sid);
 # void send (string sname, int cid, buffer buf);
 # void setrwtimer (int cid, unsigned ms, unsigned flags);
 # void resetrwtimer (int cid, unsigned ms, unsigned flags);

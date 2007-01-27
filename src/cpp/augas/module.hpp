@@ -40,7 +40,7 @@ namespace augas {
         event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW;
 
         bool
-        expire(const augas_sess& sess, int tid, void* user,
+        expire(const augas_sess& sess, augas_id tid, void* user,
                unsigned& ms) const AUG_NOTHROW;
 
         bool

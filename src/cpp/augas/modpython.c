@@ -531,23 +531,6 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
     return incnone_();
 }
 
-/*
-   void reconf(void);
-   void writelog (int level, string msg);
-   void post (string sname, int type, object user);
-   string getenv (string sname, string name);
-   int tcpconnect (string sname, string host, string serv);
-   int tcplisten (string sname, string host, string serv);
-   int settimer (string sname, int tid, unsigned ms, object user);
-   bool resettimer (string sname, int tid, unsigned ms);
-   bool canceltimer (string sname, int tid);
-   void shutdown (int fid);
-   void send (string sname, int cid, buffer buf);
-   void setrwtimer (int cid, unsigned ms, unsigned flags);
-   void resetrwtimer (int cid, unsigned ms, unsigned flags);
-   void cancelrwtimer (int cid, unsigned flags);
-*/
-
 static PyMethodDef pymethods_[] = {
     {
         "reconf", pyreconf_, METH_VARARGS,
@@ -731,7 +714,7 @@ event_(const struct augas_sess* sess, int type, void* user)
 }
 
 static int
-expire_(const struct augas_sess* sess, int tid, void* user, unsigned* ms)
+expire_(const struct augas_sess* sess, augas_id tid, void* user, unsigned* ms)
 {
     struct import_* import = sess->user_;
     int ret = 0;

@@ -61,7 +61,7 @@ module::event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW
 }
 
 bool
-module::expire(const augas_sess& sess, int tid, void* user,
+module::expire(const augas_sess& sess, augas_id tid, void* user,
                unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("expire(): sname=[%s], id=[%d], ms=[%u]", sess.name_, tid, ms);

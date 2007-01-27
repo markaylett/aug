@@ -169,7 +169,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*settimer_)(const char* sname, augas_id id, unsigned ms, void* user,
+    int (*settimer_)(const char* sname, augas_id tid, unsigned ms, void* user,
                      void (*free_)(void*));
 
     /**
@@ -179,7 +179,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*resettimer_)(const char* sname, augas_id id, unsigned ms);
+    int (*resettimer_)(const char* sname, augas_id tid, unsigned ms);
 
     /**
        \brief TODO
@@ -188,7 +188,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*canceltimer_)(const char* sname, augas_id id);
+    int (*canceltimer_)(const char* sname, augas_id tid);
 
     /**
        \brief TODO
@@ -197,7 +197,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*shutdown_)(augas_id id);
+    int (*shutdown_)(augas_id sid);
 
     /**
        \brief TODO
@@ -206,7 +206,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*send_)(const char* sname, augas_id id, const char* buf,
+    int (*send_)(const char* sname, augas_id cid, const char* buf,
                  size_t size, unsigned flags);
 
     /**
@@ -216,7 +216,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*setrwtimer_)(augas_id id, unsigned ms, unsigned flags);
+    int (*setrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
 
     /**
        \brief TODO
@@ -225,7 +225,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*resetrwtimer_)(augas_id id, unsigned ms, unsigned flags);
+    int (*resetrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
 
     /**
        \brief TODO
@@ -234,7 +234,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*cancelrwtimer_)(augas_id id, unsigned flags);
+    int (*cancelrwtimer_)(augas_id cid, unsigned flags);
 };
 
 /**
@@ -279,7 +279,7 @@ struct augas_module {
        \sa TODO
     */
 
-    int (*expire_)(const struct augas_sess* sess, augas_id id, void* user,
+    int (*expire_)(const struct augas_sess* sess, augas_id cid, void* user,
                    unsigned* ms);
 
     /**
