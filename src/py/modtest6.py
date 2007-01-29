@@ -1,8 +1,6 @@
 from augas import *
 import log
 
-# stop()
-
 def term(sname):
     log.debug("term(): %s" % sname)
 

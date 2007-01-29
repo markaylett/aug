@@ -15,7 +15,7 @@ namespace augas {
 
         moduleptr module_;
         augas_sess sess_;
-        bool term_;
+        bool active_;
 
     public:
         ~sess() AUG_NOTHROW;
@@ -25,7 +25,8 @@ namespace augas {
         bool
         init() AUG_NOTHROW
         {
-            return term_ = module_->init(sess_);
+            active_ = true; // Functions may be called during initialisation.
+            return active_ = module_->init(sess_);
         }
         bool
         event(int type, void* user) const AUG_NOTHROW
@@ -89,9 +90,9 @@ namespace augas {
             return sess_;
         }
         bool
-        ready() const AUG_NOTHROW
+        active() const AUG_NOTHROW
         {
-            return term_;
+            return active_;
         }
         const char*
         name() const AUG_NOTHROW

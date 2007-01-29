@@ -181,8 +181,10 @@ getmethod_(PyObject* module, const char* name)
             Py_DECREF(x);
             x = NULL;
         }
-    } else
+    } else {
+        host_->writelog_(AUGAS_LOGDEBUG, "no binding for %s()", name);
         PyErr_Clear();
+    }
     return x;
 }
 
@@ -309,16 +311,16 @@ pypost_(PyObject* self, PyObject* args)
 }
 
 static PyObject*
-pyforward_(PyObject* self, PyObject* args)
+pydelegate_(PyObject* self, PyObject* args)
 {
     const char* sname;
     int type;
     PyObject* user;
 
-    if (!PyArg_ParseTuple(args, "siO:forward", &sname, &type, &user))
+    if (!PyArg_ParseTuple(args, "siO:delegate", &sname, &type, &user))
         return NULL;
 
-    if (-1 == host_->forward_(sname, type, user)) {
+    if (-1 == host_->delegate_(sname, type, user)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -549,7 +551,7 @@ static PyMethodDef pymethods_[] = {
         "TODO"
     },
     {
-        "forward", pyforward_, METH_VARARGS,
+        "delegate", pydelegate_, METH_VARARGS,
         "TODO"
     },
     {
@@ -639,13 +641,10 @@ pycreate_(void)
     PyModule_AddIntConstant(pyaugas_, "TIMWR", AUGAS_TIMWR);
     PyModule_AddIntConstant(pyaugas_, "TIMBOTH", AUGAS_TIMBOTH);
 
-    PyModule_AddIntConstant(pyaugas_, "SNDSELF", AUGAS_SNDSELF);
+    PyModule_AddIntConstant(pyaugas_, "SNDPEER", AUGAS_SNDPEER);
     PyModule_AddIntConstant(pyaugas_, "SNDOTHER", AUGAS_SNDOTHER);
     PyModule_AddIntConstant(pyaugas_, "SNDALL", AUGAS_SNDALL);
 
-    PyModule_AddIntConstant(pyaugas_, "SNDSELF", AUGAS_SNDSELF);
-    PyModule_AddIntConstant(pyaugas_, "SNDOTHER", AUGAS_SNDOTHER);
-    PyModule_AddIntConstant(pyaugas_, "SNDALL", AUGAS_SNDALL);
     return 0;
 
  fail:

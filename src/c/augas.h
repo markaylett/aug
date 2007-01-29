@@ -40,9 +40,9 @@ enum augas_loglevel {
 #define AUGAS_TIMWR     0x02
 #define AUGAS_TIMBOTH  (AUGAS_TIMRD | AUGAS_TIMWR)
 
-#define AUGAS_SNDSELF   0x01
+#define AUGAS_SNDPEER   0x01
 #define AUGAS_SNDOTHER  0x02
-#define AUGAS_SNDALL   (AUGAS_SNDSELF | AUGAS_SNDOTHER)
+#define AUGAS_SNDALL   (AUGAS_SNDPEER | AUGAS_SNDOTHER)
 
 #define AUGAS_OK         0
 #define AUGAS_ERROR    (-1)
@@ -119,13 +119,13 @@ struct augas_host {
      */
 
     /**
-       \brief Forward event to a different session.
+       \brief Delegate event to a different session.
        \param TODO
        \return TODO
        \sa TODO
     */
 
-    int (*forward_)(const char* sname, int type, void* user);
+    int (*delegate_)(const char* sname, int type, void* user);
 
     /**
        \brief Read a configuration value.

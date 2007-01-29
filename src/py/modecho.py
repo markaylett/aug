@@ -6,4 +6,4 @@ def init(sname):
 
 def data(sname, cid, user, buf):
     log.info("echoing data")
-    send(sname, cid, buf, SNDSELF)
+    send(sname, cid, buf, SNDPEER)

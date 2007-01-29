@@ -7,7 +7,7 @@ import log
 # void stop (void);
 # void writelog (int level, string msg);
 # void post (string sname, int type, object user);
-# void forward (string sname, int type, object user);
+# void delegate (string sname, int type, object user);
 # string getenv (string name);
 # int tcpconnect (string sname, string host, string serv, object user);
 # int tcplisten (string sname, string host, string serv, object user);
@@ -50,11 +50,11 @@ def connected(sname, cid, user, addr, port):
 def data(sname, cid, user, buf):
     log.debug("data(): %s" % sname)
     for line in user.lines(str(buf)):
-        send(sname, cid, line + "\n", SNDSELF)
+        send(sname, cid, line + "\n", SNDPEER)
 
 def rdexpire(sname, cid, user, ms):
     log.debug("rdexpire(): %s" % sname)
-    send(sname, cid, "are you there?\n", SNDSELF)
+    send(sname, cid, "are you there?\n", SNDPEER)
 
 def wrexpire(sname, cid, user, ms):
     log.debug("wrexpire(): %s" % sname)
@@ -62,5 +62,5 @@ def wrexpire(sname, cid, user, ms):
 def teardown(sname, cid, user):
     log.debug("teardown(): %s" % sname)
     for line in user.lines(str(buf)):
-        send(sname, cid, user.tail + "\n", SNDSELF)
+        send(sname, cid, user.tail + "\n", SNDPEER)
     shutdown(cid)

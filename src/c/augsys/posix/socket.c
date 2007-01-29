@@ -70,6 +70,7 @@ aug_connect(int s, const struct aug_endpoint* ep)
 AUGSYS_API struct aug_endpoint*
 aug_getpeername(int s, struct aug_endpoint* ep)
 {
+    ep->len_ = AUG_MAXADDRLEN;
     if (-1 == getpeername(s, &ep->un_.sa_, &ep->len_)) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;
@@ -81,6 +82,7 @@ aug_getpeername(int s, struct aug_endpoint* ep)
 AUGSYS_API struct aug_endpoint*
 aug_getsockname(int s, struct aug_endpoint* ep)
 {
+    ep->len_ = AUG_MAXADDRLEN;
     if (-1 == getsockname(s, &ep->un_.sa_, &ep->len_)) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;

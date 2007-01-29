@@ -63,7 +63,7 @@ static int
 data_(const struct augas_sock* sock, const char* buf, size_t size)
 {
     host_->writelog_(AUGAS_LOGINFO, "data_()");
-    host_->send_(sock->sess_->name_, sock->id_, buf, size, AUGAS_SNDSELF);
+    host_->send_(sock->sess_->name_, sock->id_, buf, size, AUGAS_SNDPEER);
     return 0;
 }
 

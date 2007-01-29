@@ -19,7 +19,7 @@ class State:
 
     def process(self, sname):
         if not self.done():
-            send(sname, self.cid, "hello, world!", SNDSELF)
+            send(sname, self.cid, "hello, world!", SNDPEER)
         else:
             log.info("done: shutting client connection")
             shutdown(self.cid)

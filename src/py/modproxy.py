@@ -24,4 +24,4 @@ def accept(sname, cid, user, addr, port):
     pairs[to] = cid
 
 def data(sname, cid, user, buf):
-    send(sname, pairs[cid], buf, SNDSELF)
+    send(sname, pairs[cid], buf, SNDPEER)

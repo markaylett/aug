@@ -29,12 +29,16 @@
 #include <map>
 #include <memory> // auto_ptr<>
 #include <sstream>
+#include <queue>
 #include <vector>
 
 #include <time.h>
 
 using namespace aug;
 using namespace std;
+
+#define AUGAS_CONNECTED (AUG_EVENTUSER + 0)
+#define AUGAS_MODEVENT  (AUG_EVENTUSER + 1)
 
 namespace augas {
 
@@ -89,6 +93,7 @@ namespace augas {
     }
 
     typedef map<int, sessptr> pending;
+    typedef queue<connptr> connected;
 
     struct eventarg {
         string sname_;
@@ -112,6 +117,7 @@ namespace augas {
         aug::conns conns_;
         timers timers_;
         pending pending_;
+        connected connected_;
 
         explicit
         state(conncb_base& cb)
@@ -233,7 +239,7 @@ namespace augas {
             auto_ptr<eventarg> arg(new eventarg(sname, user, free));
 
             aug_event e;
-            e.type_ = AUG_EVENTUSER + type;
+            e.type_ = AUGAS_MODEVENT + type;
             aug_setvarp(&e.arg_, arg.get(), 0);
             writeevent(aug_eventout(), e);
             arg.release();
@@ -244,14 +250,15 @@ namespace augas {
     }
 
     int
-    forward_(const char* sname, int type, void* user)
+    delegate_(const char* sname, int type, void* user)
     {
+        AUG_DEBUG2("delegate(): sname=[%s], type=[%d]", sname, type);
         try {
 
             sessptr sess(state_->manager_.getsess(sname));
-            if (!sess->ready())
+            if (!sess->active())
                 throw error(__FILE__, __LINE__, ESTATE,
-                            "failed session: sname=[%s]", sname);
+                            "inactive session: sname=[%s]", sname);
 
             sess->event(type, user);
             return 0;
@@ -315,7 +322,11 @@ namespace augas {
 
             if (ESTABLISHED == cptr->phase()) {
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
-                connected_(cptr);
+                if (state_->connected_.empty()) {
+                    aug_event e = { AUGAS_CONNECTED, AUG_VARNULL };
+                    writeevent(aug_eventout(), e);
+                }
+                state_->connected_.push(cptr);
             } else
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
 
@@ -431,7 +442,7 @@ namespace augas {
                     throw error(__FILE__, __LINE__, EHOSTCALL,
                                 "connection has been shutdown");
                 break;
-            case AUGAS_SNDSELF:
+            case AUGAS_SNDPEER:
                 if (!state_->manager_.sendself(state_->mplexer_, cid, buf,
                                                size))
                     throw error(__FILE__, __LINE__, EHOSTCALL,
@@ -506,7 +517,7 @@ namespace augas {
         writelog_,
         vwritelog_,
         post_,
-        forward_,
+        delegate_,
         getenv_,
         tcpconnect_,
         tcplisten_,
@@ -531,8 +542,8 @@ namespace augas {
         pending::iterator it(state_->pending_.begin()),
             end(state_->pending_.end());
         while (it != end) {
-            if (!it->second->ready()) {
-                aug_warn("cancelling timer associated with failed session");
+            if (!it->second->active()) {
+                aug_warn("cancelling timer associated with inactive session");
                 aug_canceltimer(cptr(state_->timers_), it->first);
                 state_->pending_.erase(it++);
             } else
@@ -601,17 +612,21 @@ namespace augas {
         case AUG_EVENTSIGNAL:
             AUG_DEBUG2("received AUG_EVENTSIGNAL");
             break;
+        case AUGAS_CONNECTED:
+            AUG_DEBUG2("received AUGAS_CONNECTED");
+            // Handled in do_run().
+            break;
         default:
             assert(AUG_VTPTR == event.arg_.type_);
             {
                 auto_ptr<eventarg> arg(static_cast<
                                        eventarg*>(aug_getvarp(&event.arg_)));
                 sessptr sess(state_->manager_.getsess(arg->sname_));
-                if (sess->ready())
-                    sess->event(event.type_ - AUG_EVENTUSER,
+                if (sess->active())
+                    sess->event(event.type_ - AUGAS_MODEVENT,
                                 aug_getvarp(&arg->arg_));
                 else
-                    aug_warn("event not delivered to failed session");
+                    aug_warn("event not delivered to inactive session");
             }
         }
         aug_freevar(&event.arg_);
@@ -769,6 +784,11 @@ namespace augas {
                         while (AUG_RETINTR == (ret = waitioevents
                                                (state_->mplexer_, tv)))
                             ;
+                    }
+
+                    while (!state_->connected_.empty()) {
+                        connected_(state_->connected_.front());
+                        state_->connected_.pop();
                     }
 
                     AUG_DEBUG2("processing connections");
