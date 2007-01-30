@@ -17,5 +17,5 @@ session.modproxy.to = 7001
 session.modclient.module = modpython
 session.modclient.to = 7002
 
-module.modpython.path = mod/modpython.dll
+module.modpython.path = mod/modpython.so
 module.modpython.pythonpath = python

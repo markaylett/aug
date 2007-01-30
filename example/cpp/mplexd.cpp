@@ -194,14 +194,14 @@ namespace test {
 
     struct state {
 
-        conns conns_;
+        files files_;
         timers timers_;
         mplexer mplexer_;
         smartfd sfd_;
         map<int, sessionptr> sfds_;
 
         explicit
-        state(conncb_base& cb)
+        state(filecb_base& cb)
             : sfd_(null)
         {
             aug_hostserv hostserv;
@@ -210,33 +210,33 @@ namespace test {
             endpoint ep(null);
             smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
 
-            insertconn(conns_, aug_eventin(), cb);
+            insertfile(files_, aug_eventin(), cb);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
 
-            insertconn(conns_, sfd, cb);
+            insertfile(files_, sfd, cb);
             setioeventmask(mplexer_, sfd, AUG_IOEVENTRD);
 
             sfd_ = sfd;
         }
     };
 
-    class service : public conncb_base, public service_base {
+    class service : public filecb_base, public service_base {
 
         auto_ptr<state> state_;
 
         void
         setfdhook(fdref ref, unsigned short mask)
         {
-            insertconn(state_->conns_, ref, *this);
+            insertfile(state_->files_, ref, *this);
             try {
                 setioeventmask(state_->mplexer_, ref, mask);
             } catch (...) {
-                removeconn(state_->conns_, ref);
+                removefile(state_->files_, ref);
             }
         }
 
         bool
-        readevent(int fd, aug_conns& conns)
+        readevent(int fd, aug_files& files)
         {
             aug_event event;
             AUG_DEBUG2("reading event");
@@ -264,7 +264,7 @@ namespace test {
         }
 
         bool
-        listener(int fd, aug_conns& conns)
+        listener(int fd, aug_files& files)
         {
             aug_endpoint ep;
 
@@ -298,7 +298,7 @@ namespace test {
         }
 
         bool
-        connection(int fd, aug_conns& conns)
+        connection(int fd, aug_files& files)
         {
             sessionptr ptr(state_->sfds_[fd]);
             unsigned short bits(ioevents(state_->mplexer_, fd));
@@ -331,18 +331,18 @@ namespace test {
         }
 
         bool
-        do_callback(int fd, aug_conns& conns)
+        do_callback(int fd, aug_files& files)
         {
             if (!ioevents(state_->mplexer_, fd))
                 return true;
 
             if (fd == aug_eventin())
-                return readevent(fd, conns);
+                return readevent(fd, files);
 
             if (fd == state_->sfd_.get())
-                return listener(fd, conns);
+                return listener(fd, files);
 
-            return connection(fd, conns);
+            return connection(fd, files);
         }
 
         const char*
@@ -399,7 +399,7 @@ namespace test {
 
                 } else {
 
-                    processtimers(state_->timers_, 0 == ret, tv);
+                    foreachexpired(state_->timers_, 0 == ret, tv);
 
                     scoped_unblock unblock;
                     while (AUG_RETINTR == (ret = waitioevents(state_
@@ -408,7 +408,7 @@ namespace test {
                         ;
                 }
 
-                processconns(state_->conns_);
+                foreachfile(state_->files_);
             }
         }
 

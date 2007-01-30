@@ -40,10 +40,6 @@ enum augas_loglevel {
 #define AUGAS_TIMWR     0x02
 #define AUGAS_TIMBOTH  (AUGAS_TIMRD | AUGAS_TIMWR)
 
-#define AUGAS_SNDPEER   0x01
-#define AUGAS_SNDOTHER  0x02
-#define AUGAS_SNDALL   (AUGAS_SNDPEER | AUGAS_SNDOTHER)
-
 #define AUGAS_OK         0
 #define AUGAS_ERROR    (-1)
 #define AUGAS_NONE     (-2)
@@ -207,7 +203,7 @@ struct augas_host {
     */
 
     int (*send_)(const char* sname, augas_id cid, const char* buf,
-                 size_t size, unsigned flags);
+                 size_t size);
 
     /**
        \brief TODO
@@ -239,8 +235,8 @@ struct augas_host {
 
 /**
    Module functions should return either #AUGAS_OK or #AUGAS_ERROR.  For those
-   functions associated with conns, a failure will result in the conn being
-   closed.
+   functions associated with a connection, a failure will result in the
+   connection being closed.
 */
 
 struct augas_module {

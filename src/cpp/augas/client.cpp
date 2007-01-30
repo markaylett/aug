@@ -82,11 +82,14 @@ client::do_process(mplexer& mplexer)
 
     if (ESTABLISHED == conn_->phase()) {
 
+        if (!buffer_.empty())
+            setioeventmask(mplexer, conn_->sfd(), AUG_IOEVENTRDWR);
+
         AUG_DEBUG2("client is now established, assuming new state");
 
-        conn_ = connptr(new augas::established(conn_->sess(), sock_, rwtimer_,
-                                             conn_->sfd(), conn_->endpoint(),
-                                             true));
+        conn_ = connptr(new augas::established
+                        (conn_->sess(), sock_, buffer_, rwtimer_,
+                         conn_->sfd(), conn_->endpoint(), true));
     }
 
     return true;
@@ -129,7 +132,7 @@ client::~client() AUG_NOTHROW
 client::client(const sessptr& sess, void* user, timers& timers,
                const char* host, const char* serv)
     : rwtimer_(sess, sock_, timers),
-      conn_(new connecting(sess, sock_, host, serv))
+      conn_(new connecting(sess, sock_, buffer_, host, serv))
 {
     sock_.sess_ = cptr(*sess);
     sock_.id_ = aug_nextid();
@@ -139,8 +142,8 @@ client::client(const sessptr& sess, void* user, timers& timers,
 
         AUG_DEBUG2("client is now established, assuming new state");
 
-        conn_ = connptr(new augas::established(conn_->sess(), sock_, rwtimer_,
-                                             conn_->sfd(), conn_->endpoint(),
-                                             true));
+        conn_ = connptr(new augas::established
+                        (conn_->sess(), sock_, buffer_, rwtimer_,
+                         conn_->sfd(), conn_->endpoint(), true));
     }
 }

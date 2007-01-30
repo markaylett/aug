@@ -22,7 +22,6 @@ namespace {
 #else // _WIN32
     const char DEFAULT_MODULE[] = "./modskel.dll";
 #endif // _WIN32
-
 }
 
 void
@@ -139,34 +138,7 @@ manager::load(const char* rundir, const options& options,
 }
 
 bool
-manager::sendall(mplexer& mplexer, augas_id cid, const char* sname,
-                 const char* buf, size_t size)
-{
-    bool ret(true);
-
-    socks::const_iterator it(socks_.begin()), end(socks_.end());
-    for (; it != end; ++it) {
-
-        connptr cptr(smartptr_cast<conn_base>(it->second));
-        if (null == cptr)
-            continue;
-
-        if (!sendable(*cptr)) {
-            if (cptr->id() == cid)
-                ret = false;
-            continue;
-        }
-
-        if (cptr->sess()->name() == sname)
-            cptr->putsome(mplexer, buf, size);
-    }
-
-    return ret;
-}
-
-bool
-manager::sendself(mplexer& mplexer, augas_id cid, const char* buf,
-                  size_t size)
+manager::send(mplexer& mplexer, augas_id cid, const char* buf, size_t size)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
@@ -174,27 +146,6 @@ manager::sendself(mplexer& mplexer, augas_id cid, const char* buf,
 
     cptr->putsome(mplexer, buf, size);
     return true;
-}
-
-void
-manager::sendother(mplexer& mplexer, augas_id cid, const char* sname,
-                   const char* buf, size_t size)
-{
-    socks::const_iterator it(socks_.begin()), end(socks_.end());
-    for (; it != end; ++it) {
-
-        connptr cptr(smartptr_cast<conn_base>(it->second));
-        if (null == cptr)
-            continue;
-
-        // Ignore self as well as connections that have been marked for
-        // shutdown.
-
-        if (cptr->id() == cid || !sendable(*cptr))
-            continue;
-
-        cptr->putsome(mplexer, buf, size);
-    }
 }
 
 void

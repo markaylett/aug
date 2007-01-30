@@ -53,16 +53,8 @@ namespace augas {
              const augas_host& host);
 
         bool
-        sendall(aug::mplexer& mplexer, augas_id cid, const char* sname,
-                const char* buf, size_t size);
-
-        bool
-        sendself(aug::mplexer& mplexer, augas_id cid, const char* buf,
-                 size_t size);
-
-        void
-        sendother(aug::mplexer& mplexer, augas_id cid, const char* sname,
-                  const char* buf, size_t size);
+        send(aug::mplexer& mplexer, augas_id cid, const char* buf,
+             size_t size);
 
         void
         teardown();

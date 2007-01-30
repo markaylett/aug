@@ -117,7 +117,7 @@ server::~server() AUG_NOTHROW
 server::server(const sessptr& sess, void* user, timers& timers,
                const smartfd& sfd, const aug::endpoint& ep)
     : rwtimer_(sess, sock_, timers),
-      conn_(sess, sock_, rwtimer_, sfd, ep, false)
+      conn_(sess, sock_, buffer_, rwtimer_, sfd, ep, false)
 {
     sock_.sess_ = cptr(*sess);
     sock_.id_ = aug_nextid();

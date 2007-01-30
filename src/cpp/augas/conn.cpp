@@ -4,6 +4,7 @@
 #define AUGAS_BUILD
 #include "augas/conn.hpp"
 
+#include "augas/buffer.hpp"
 #include "augas/exception.hpp"
 
 #include <cassert>
@@ -160,13 +161,14 @@ established::~established() AUG_NOTHROW
 }
 
 established::established(const sessptr& sess, augas_sock& sock,
-                         rwtimer& rwtimer, const smartfd& sfd,
+                         buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
                          const aug::endpoint& ep, bool close)
     : sess_(sess),
       sock_(sock),
+      buffer_(buffer),
       rwtimer_(rwtimer),
-      endpoint_(ep),
       sfd_(sfd),
+      endpoint_(ep),
       phase_(ESTABLISHED),
       close_(close)
 {
@@ -234,8 +236,7 @@ connecting::do_process(mplexer& mplexer)
 void
 connecting::do_putsome(aug::mplexer& mplexer, const void* buf, size_t size)
 {
-    throw error(__FILE__, __LINE__, ESTATE,
-                "connection not established: id=[%d]", sock_.id_);
+    buffer_.putsome(buf, size);
 }
 
 void
@@ -272,13 +273,14 @@ connecting::~connecting() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-connecting::connecting(const sessptr& sess, augas_sock& sock,
+connecting::connecting(const sessptr& sess, augas_sock& sock, buffer& buffer,
                        const char* host, const char* serv)
     : sess_(sess),
       sock_(sock),
+      buffer_(buffer),
       connector_(host, serv),
-      endpoint_(null),
       sfd_(null),
+      endpoint_(null),
       phase_(CLOSED)
 {
     pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));

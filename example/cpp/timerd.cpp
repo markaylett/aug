@@ -190,7 +190,7 @@ namespace test {
 
                 } else {
 
-                    processtimers(state_->timers_, 0 == ret, tv);
+                    foreachexpired(state_->timers_, 0 == ret, tv);
                     while (AUG_RETINTR == (ret = waitioevents(state_
                                                               ->mplexer_,
                                                               tv)))

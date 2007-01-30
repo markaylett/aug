@@ -50,11 +50,11 @@ def connected(sname, cid, user, addr, port):
 def data(sname, cid, user, buf):
     log.debug("data(): %s" % sname)
     for line in user.lines(str(buf)):
-        send(sname, cid, line + "\n", SNDPEER)
+        send(sname, cid, line + "\n")
 
 def rdexpire(sname, cid, user, ms):
     log.debug("rdexpire(): %s" % sname)
-    send(sname, cid, "are you there?\n", SNDPEER)
+    send(sname, cid, "are you there?\n")
 
 def wrexpire(sname, cid, user, ms):
     log.debug("wrexpire(): %s" % sname)
@@ -62,5 +62,5 @@ def wrexpire(sname, cid, user, ms):
 def teardown(sname, cid, user):
     log.debug("teardown(): %s" % sname)
     for line in user.lines(str(buf)):
-        send(sname, cid, user.tail + "\n", SNDPEER)
+        send(sname, cid, user.tail + "\n")
     shutdown(cid)

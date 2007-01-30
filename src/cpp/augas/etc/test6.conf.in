@@ -7,5 +7,5 @@ sessions = modstop modtest6
 session.modstop.module = modpython
 session.modtest6.module = modpython
 
-module.modpython.path = .libs/modpython.dll
+module.modpython.path = .libs/modpython.${modext}
 module.modpython.pythonpath = ../../py

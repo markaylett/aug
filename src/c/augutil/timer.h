@@ -65,6 +65,7 @@ aug_expired(struct aug_timers* timers, int id);
 */
 
 AUGUTIL_API int
-aug_processtimers(struct aug_timers* timers, int force, struct timeval* next);
+aug_foreachexpired(struct aug_timers* timers, int force,
+                   struct timeval* next);
 
 #endif /* AUGUTIL_TIMER_H */

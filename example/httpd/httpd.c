@@ -38,7 +38,7 @@ static char address_[AUG_PATH_MAX + 1] = "127.0.0.1:8080";
 static const struct aug_service* service_ = NULL;
 static aug_mplexer_t mplexer_ = NULL;
 static int fd_ = -1;
-static struct aug_conns conns_ = AUG_HEAD_INITIALIZER(conns_);
+static struct aug_files files_ = AUG_HEAD_INITIALIZER(files_);
 static struct aug_timers timers_ = AUG_HEAD_INITIALIZER(timers_);
 
 static int
@@ -105,7 +105,7 @@ freeconn_(aug_state_t state, aug_mplexer_t mplexer, int fd)
 }
 
 static int
-conn_(int fd, const struct aug_var* arg, struct aug_conns* conns)
+conn_(int fd, const struct aug_var* arg, struct aug_files* files)
 {
     ssize_t ret;
     aug_state_t state = aug_getvarp(arg);
@@ -157,7 +157,7 @@ conn_(int fd, const struct aug_var* arg, struct aug_conns* conns)
 }
 
 static int
-listener_(int fd, const struct aug_var* arg, struct aug_conns* conns)
+listener_(int fd, const struct aug_var* arg, struct aug_files* files)
 {
     struct aug_endpoint ep;
     int conn;
@@ -190,7 +190,7 @@ listener_(int fd, const struct aug_var* arg, struct aug_conns* conns)
         return 1;
     }
 
-    aug_insertconn(conns, conn, conn_, &var);
+    aug_insertfile(files, conn, conn_, &var);
     return 1;
 }
 
@@ -296,7 +296,7 @@ config_(const struct aug_var* arg, const char* conffile, int daemon)
 }
 
 static int
-readevent_(int fd, const struct aug_var* arg, struct aug_conns* conns)
+readevent_(int fd, const struct aug_var* arg, struct aug_files* files)
 {
     struct aug_event event;
 
@@ -349,11 +349,11 @@ init_(const struct aug_var* arg)
     if (-1 == (fd_ = aug_tcplisten(hs.host_, hs.serv_, &ep)))
         goto fail1;
 
-    if (-1 == aug_insertconn(&conns_, fd_, listener_,
+    if (-1 == aug_insertfile(&files_, fd_, listener_,
                              aug_setvarp(&ptr, &mplexer_, NULL)))
         goto fail2;
 
-    if (-1 == aug_insertconn(&conns_, aug_eventin(), readevent_, &ptr)
+    if (-1 == aug_insertfile(&files_, aug_eventin(), readevent_, &ptr)
         || -1 == aug_setioeventmask(mplexer_, fd_, AUG_IOEVENTRD)
         || -1 == aug_setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD))
         goto fail3;
@@ -361,7 +361,7 @@ init_(const struct aug_var* arg)
     return 0;
 
  fail3:
-    aug_freeconns(&conns_);
+    aug_freefiles(&files_);
  fail2:
     aug_close(fd_);
  fail1:
@@ -376,11 +376,11 @@ run_(const struct aug_var* arg)
 
     aug_info("running daemon process");
 
-    while (!AUG_EMPTY(&conns_) && !quit_) {
+    while (!AUG_EMPTY(&files_) && !quit_) {
 
         if (!AUG_EMPTY(&timers_))
-            AUG_PERRINFO(aug_processtimers(&timers_, 0, &timeout), NULL,
-                         "aug_processtimers() failed");
+            AUG_PERRINFO(aug_foreachexpired(&timers_, 0, &timeout), NULL,
+                         "aug_foreachexpired() failed");
 
         /* If SA_RESTART has been set for an interrupting signal, it is
            implementation dependant whether select/poll restart or return with
@@ -390,8 +390,8 @@ run_(const struct aug_var* arg)
                                       ? &timeout : NULL))
             aug_perrinfo(NULL, "aug_waitevents() failed");
 
-        AUG_PERRINFO(aug_processconns(&conns_), NULL,
-                     "aug_processconns() failed");
+        AUG_PERRINFO(aug_foreachfile(&files_), NULL,
+                     "aug_foreachfile() failed");
     }
     return 0;
 }
@@ -402,7 +402,7 @@ term_(const struct aug_var* arg)
     aug_info("terminating daemon process");
 
     AUG_PERRINFO(aug_freetimers(&timers_), NULL, "aug_freetimers() failed");
-    AUG_PERRINFO(aug_freeconns(&conns_), NULL, "aug_freeconns() failed");
+    AUG_PERRINFO(aug_freefiles(&files_), NULL, "aug_freefiles() failed");
     AUG_PERRINFO(aug_close(fd_), NULL, "aug_close() failed");
     AUG_PERRINFO(aug_freemplexer(mplexer_), NULL, "aug_freemplexer() failed");
 }

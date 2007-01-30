@@ -4,13 +4,14 @@
 #ifndef AUGAS_CONN_HPP
 #define AUGAS_CONN_HPP
 
-#include "augas/buffer.hpp"
 #include "augas/rwtimer.hpp"
 #include "augas/sock.hpp"
 
 #include "augnetpp.hpp"
 
 namespace augas {
+
+    class buffer;
 
     enum connphase {
         CONNECTING,
@@ -96,18 +97,17 @@ namespace augas {
     inline bool
     sendable(const conn_base& conn)
     {
-        connphase phase(conn.phase());
-        return ESTABLISHED == phase || TEARDOWN == phase;
+        return conn.phase() < SHUTDOWN;
     }
 
     class established : public conn_base {
 
         sessptr sess_;
         augas_sock& sock_;
+        buffer& buffer_;
         rwtimer& rwtimer_;
-        aug::endpoint endpoint_;
         aug::smartfd sfd_;
-        buffer buffer_;
+        aug::endpoint endpoint_;
         connphase phase_;
         bool close_;
 
@@ -150,18 +150,19 @@ namespace augas {
     public:
         ~established() AUG_NOTHROW;
 
-        established(const sessptr& sess, augas_sock& sock, rwtimer& rwtimer,
-                    const aug::smartfd& sfd, const aug::endpoint& ep,
-                    bool close);
+        established(const sessptr& sess, augas_sock& sock, buffer& buffer,
+                    rwtimer& rwtimer, const aug::smartfd& sfd,
+                    const aug::endpoint& ep, bool close);
     };
 
     class connecting : public conn_base {
 
         sessptr sess_;
         augas_sock& sock_;
+        buffer& buffer_;
         aug::connector connector_;
-        aug::endpoint endpoint_;
         aug::smartfd sfd_;
+        aug::endpoint endpoint_;
         connphase phase_;
 
         augas_sock&
@@ -203,8 +204,8 @@ namespace augas {
     public:
         ~connecting() AUG_NOTHROW;
 
-        connecting(const sessptr& sess, augas_sock& sock, const char* host,
-                   const char* serv);
+        connecting(const sessptr& sess, augas_sock& sock, buffer& buffer,
+                   const char* host, const char* serv);
     };
 }
 

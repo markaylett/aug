@@ -37,8 +37,8 @@
 using namespace aug;
 using namespace std;
 
-#define AUGAS_CONNECTED (AUG_EVENTUSER + 0)
-#define AUGAS_MODEVENT  (AUG_EVENTUSER + 1)
+#define AUGAS_WAKEUP   (AUG_EVENTUSER + 0)
+#define AUGAS_MODEVENT (AUG_EVENTUSER + 1)
 
 namespace augas {
 
@@ -111,20 +111,20 @@ namespace augas {
 
     struct state {
 
-        conncb_base& cb_;
+        filecb_base& cb_;
         mplexer mplexer_;
         manager manager_;
-        aug::conns conns_;
+        aug::files files_;
         timers timers_;
         pending pending_;
         connected connected_;
 
         explicit
-        state(conncb_base& cb)
+        state(filecb_base& cb)
             : cb_(cb)
         {
             AUG_DEBUG2("adding event pipe to list");
-            insertconn(conns_, aug_eventin(), cb);
+            insertfile(files_, aug_eventin(), cb);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
         }
     };
@@ -141,7 +141,7 @@ namespace augas {
     }
 
     void
-    setextdriver_(fdref ref, conncb_base& cb, unsigned short mask)
+    setextdriver_(fdref ref, filecb_base& cb, unsigned short mask)
     {
         // Override close function.
 
@@ -151,15 +151,15 @@ namespace augas {
             extdriver(extended, *base_);
         }
 
-        AUG_DEBUG2("adding connection to list: fd=[%d]", ref.get());
-        insertconn(state_->conns_, ref, cb);
+        AUG_DEBUG2("adding file to list: fd=[%d]", ref.get());
+        insertfile(state_->files_, ref, cb);
 
         try {
             setioeventmask(state_->mplexer_, ref, mask);
             setdriver(ref, extended);
         } catch (...) {
-            AUG_DEBUG2("removing connection from list: fd=[%d]", ref.get());
-            removeconn(state_->conns_, ref);
+            AUG_DEBUG2("removing file from list: fd=[%d]", ref.get());
+            removefile(state_->files_, ref);
             throw;
         }
     }
@@ -321,12 +321,23 @@ namespace augas {
             scoped_insert si(state_->manager_, cptr);
 
             if (ESTABLISHED == cptr->phase()) {
+
+                // connected() must be called after this function has
+                // returned.
+
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
                 if (state_->connected_.empty()) {
-                    aug_event e = { AUGAS_CONNECTED, AUG_VARNULL };
+
+                    // Schedule an event to ensure that connected() is called.
+
+                    aug_event e = { AUGAS_WAKEUP, AUG_VARNULL };
                     writeevent(aug_eventout(), e);
                 }
+
+                // Add to pending queue.
+
                 state_->connected_.push(cptr);
+
             } else
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
 
@@ -402,7 +413,7 @@ namespace augas {
             int ret(aug_canceltimer(cptr(state_->timers_), tid));
 
             // Only erase if aug_canceltimer() returns true: may be in the
-            // midst of a processtimers() call, in which case,
+            // midst of a aug_foreachexpired() call, in which case,
             // aug_canceltimer() will return false for the timer being
             // expired.
 
@@ -430,31 +441,13 @@ namespace augas {
     }
 
     int
-    send_(const char* sname, augas_id cid, const char* buf, size_t size,
-          unsigned flags)
+    send_(const char* sname, augas_id cid, const char* buf, size_t size)
     {
         AUG_DEBUG2("send(): sname=[%s], id=[%d]", sname, cid);
         try {
-            switch (flags) {
-            case AUGAS_SNDALL:
-                if (!state_->manager_.sendall(state_->mplexer_, cid, sname,
-                                              buf, size))
-                    throw error(__FILE__, __LINE__, EHOSTCALL,
-                                "connection has been shutdown");
-                break;
-            case AUGAS_SNDPEER:
-                if (!state_->manager_.sendself(state_->mplexer_, cid, buf,
-                                               size))
-                    throw error(__FILE__, __LINE__, EHOSTCALL,
-                                "connection has been shutdown");
-                break;
-            case AUGAS_SNDOTHER:
-                state_->manager_.sendother(state_->mplexer_, cid, sname, buf,
-                                           size);
-                break;
-            default:
-                throw error(__FILE__, __LINE__, EHOSTCALL, "invalid flags");
-            }
+            if (!state_->manager_.send(state_->mplexer_, cid, buf, size))
+                throw error(__FILE__, __LINE__, EHOSTCALL,
+                            "connection has been shutdown");
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -532,7 +525,7 @@ namespace augas {
     };
 
     void
-    load_(conncb_base& cb)
+    load_(filecb_base& cb)
     {
         AUG_DEBUG2("loading sessions");
         state_->manager_.load(rundir_, options_, host_);
@@ -552,7 +545,7 @@ namespace augas {
     }
 
     void
-    accept_(const sock_base& sock, conncb_base& conncb)
+    accept_(const sock_base& sock, filecb_base& filecb)
     {
         endpoint ep(null);
 
@@ -586,7 +579,7 @@ namespace augas {
     }
 
     bool
-    readevent_(conncb_base& cb)
+    readevent_(filecb_base& cb)
     {
         aug_event event;
         AUG_DEBUG2("reading event");
@@ -612,9 +605,9 @@ namespace augas {
         case AUG_EVENTSIGNAL:
             AUG_DEBUG2("received AUG_EVENTSIGNAL");
             break;
-        case AUGAS_CONNECTED:
-            AUG_DEBUG2("received AUGAS_CONNECTED");
-            // Handled in do_run().
+        case AUGAS_WAKEUP:
+            AUG_DEBUG2("received AUGAS_WAKEUP");
+            // Actual handling is performed in do_run().
             break;
         default:
             assert(AUG_VTPTR == event.arg_.type_);
@@ -633,25 +626,36 @@ namespace augas {
         return true;
     }
 
-    class service : public conncb_base, public service_base {
+    class service : public filecb_base, public service_base {
 
         bool
-        do_callback(int fd, aug_conns& conns)
+        do_callback(int fd, aug_files& files)
         {
             if (!ioevents(state_->mplexer_, fd))
                 return true;
+
+            // Intercept activity on event pipe.
 
             if (fd == aug_eventin())
                 return readevent_(*this);
 
             sockptr sock(state_->manager_.getbyfd(fd));
-            connptr cptr(smartptr_cast<conn_base>(sock));
+            connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
             AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", sock->id(), fd);
 
             if (null != cptr) {
 
-                bool changed(cptr->process(state_->mplexer_));
+                bool changed, ok = false;
+                try {
+                    changed = cptr->process(state_->mplexer_);
+                    ok = true;
+                } AUG_PERRINFOCATCH;
+
+                if (!ok) {
+                    state_->manager_.erase(*cptr);
+                    return false;
+                }
 
                 if (CONNECTING == cptr->phase()) {
                     setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
@@ -662,7 +666,7 @@ namespace augas {
                         connected_(cptr);
                         break;
                     case CLOSED:
-                        state_->manager_.erase(*sock);
+                        state_->manager_.erase(*cptr);
                         return false;
                     default:
                         break;
@@ -778,7 +782,7 @@ namespace augas {
                         AUG_DEBUG2("processing timers");
 
                         struct timeval tv;
-                        processtimers(state_->timers_, 0 == ret, tv);
+                        foreachexpired(state_->timers_, 0 == ret, tv);
 
                         scoped_unblock unblock;
                         while (AUG_RETINTR == (ret = waitioevents
@@ -786,14 +790,18 @@ namespace augas {
                             ;
                     }
 
+                    // Notify of any established connections before processing
+                    // the files: data may have arrived on a newly established
+                    // connection.
+
                     while (!state_->connected_.empty()) {
                         connected_(state_->connected_.front());
                         state_->connected_.pop();
                     }
 
-                    AUG_DEBUG2("processing connections");
+                    AUG_DEBUG2("processing files");
 
-                    processconns(state_->conns_);
+                    foreachfile(state_->files_);
                     continue;
 
                 } AUG_PERRINFOCATCH;

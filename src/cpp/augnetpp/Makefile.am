@@ -3,16 +3,16 @@ include $(top_srcdir)/src/cpp/lang.mk
 modincludedir = $(includedir)/augnetpp
 modinclude_HEADERS = \
 	config.hpp \
-	conn.hpp \
 	connector.hpp \
+	file.hpp \
 	inet.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
 
 libaugnetpp_la_SOURCES = \
 	config.cpp \
-	conn.cpp \
 	connector.cpp \
+	file.cpp \
 	inet.cpp
 
 libaugnetpp_la_LDFLAGS = \

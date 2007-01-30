@@ -4,6 +4,7 @@
 #ifndef AUGAS_CLIENT_HPP
 #define AUGAS_CLIENT_HPP
 
+#include "augas/buffer.hpp"
 #include "augas/conn.hpp"
 
 namespace augas {
@@ -11,6 +12,7 @@ namespace augas {
     class client : public rwtimer_base, public conn_base {
 
         augas_sock sock_;
+        buffer buffer_;
         rwtimer rwtimer_;
         connptr conn_;
 

@@ -469,13 +469,11 @@ pysend_(PyObject* self, PyObject* args)
     int cid;
     const char* buf;
     int size;
-    unsigned flags;
 
-    if (!PyArg_ParseTuple(args, "sis#I:send", &sname, &cid, &buf, &size,
-                          &flags))
+    if (!PyArg_ParseTuple(args, "sis#:send", &sname, &cid, &buf, &size))
         return NULL;
 
-    if (-1 == host_->send_(sname, cid, buf, size, flags)) {
+    if (-1 == host_->send_(sname, cid, buf, size)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -640,10 +638,6 @@ pycreate_(void)
     PyModule_AddIntConstant(pyaugas_, "TIMRD", AUGAS_TIMRD);
     PyModule_AddIntConstant(pyaugas_, "TIMWR", AUGAS_TIMWR);
     PyModule_AddIntConstant(pyaugas_, "TIMBOTH", AUGAS_TIMBOTH);
-
-    PyModule_AddIntConstant(pyaugas_, "SNDPEER", AUGAS_SNDPEER);
-    PyModule_AddIntConstant(pyaugas_, "SNDOTHER", AUGAS_SNDOTHER);
-    PyModule_AddIntConstant(pyaugas_, "SNDALL", AUGAS_SNDALL);
 
     return 0;
 

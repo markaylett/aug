@@ -164,10 +164,10 @@ install_(SC_HANDLE scm)
        "NT Authority\\NetworkService". */
 
     if (!(serv = CreateService(scm, sname, lname, SERVICE_ALL_ACCESS,
-                               SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START,
-                               SERVICE_ERROR_NORMAL, aug_getstr(path), NULL,
-                               NULL, NULL, "NT Authority\\NetworkService",
-                               NULL))) {
+                               SERVICE_WIN32_OWN_PROCESS,
+                               SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
+                               aug_getstr(path), NULL, NULL, NULL,
+                               "NT Authority\\NetworkService", NULL))) {
 
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         goto done;

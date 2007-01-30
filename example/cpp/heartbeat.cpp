@@ -731,7 +731,7 @@ namespace {
         int ret(!0);
         while (!stop_) {
 
-            processtimers(ts, 0 == ret, tv);
+            foreachexpired(ts, 0 == ret, tv);
             aug_info("timeout in: tv_sec=%d, tv_usec=%d", (int)tv.tv_sec,
                      (int)tv.tv_usec);
 

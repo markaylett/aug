@@ -1,64 +1,46 @@
 from augas import *
 import log
 
-class State:
+class Client:
     def __del__(self):
         log.info("destroying State object")
 
     def __init__(self, sname, cid):
+        self.sname = sname
         self.cid = cid
-        self.tid = settimer(sname, 0, 100, self)
+        self.tid = settimer(sname, 0, 10, self)
         self.n = 10
 
-    def cancel(self, sname):
-        canceltimer(sname, self.tid)
+    def cancel(self):
+        canceltimer(self.sname, self.tid)
 
     def done(self):
         self.n = self.n - 1
         return self.n < 0
 
-    def process(self, sname):
+    def expire(self):
         if not self.done():
-            send(sname, self.cid, "hello, world!", SNDPEER)
+            send(self.sname, self.cid, "hello, world!")
         else:
             log.info("done: shutting client connection")
             shutdown(self.cid)
             return 0
 
-class Stop:
-    def __del__(self):
-        log.info("destroying Stop object")
-
-    def __init__(self, sname):
-        settimer(sname, 0, 5000, self)
-
-    def process(self, sname):
-        stop()
-        return 0
-
-stopper = None
-
-def term(sname):
-    global stopper
-    stopper = None
-
 def init(sname):
-    global stopper
-    stopper = Stop(sname)
     log.info("connecting to client's service")
-    for x in xrange(1, 2):
+    for x in xrange(1, 10):
         tcpconnect(sname, "localhost", getenv("session.modclient.to"), None)
 
 def closed(sname, id, user):
     if user != None:
-        user.cancel(sname)
+        user.cancel()
 
 def connected(sname, cid, user, addr, port):
     log.info("client established, starting timer")
-    return State(sname, cid)
+    return Client(sname, cid)
 
 def expire(sname, tid, user, ms):
-    return user.process(sname)
+    return user.expire()
 
 def data(sname, cid, user, buf):
     log.info("received by client: %s" % buf)

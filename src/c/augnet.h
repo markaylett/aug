@@ -4,7 +4,8 @@
 #ifndef AUGNET_H
 #define AUGNET_H
 
-#include "augnet/conn.h"
+#include "augnet/connector.h"
+#include "augnet/file.h"
 #include "augnet/fix.h"
 #include "augnet/http.h"
 #include "augnet/inet.h"

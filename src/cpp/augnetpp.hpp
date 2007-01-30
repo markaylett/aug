@@ -6,7 +6,7 @@
 
 #include "augnet.h"
 
-#include "augnetpp/conn.hpp"
+#include "augnetpp/file.hpp"
 #include "augnetpp/connector.hpp"
 #include "augnetpp/inet.hpp"
 

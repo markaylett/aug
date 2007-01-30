@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGNET_BUILD
-#include "augnet/conn.h"
+#include "augnet/file.h"
 
 static const char rcsid[] = "$Id$";
 
@@ -14,69 +14,69 @@ static const char rcsid[] = "$Id$";
 
 #include <stdlib.h>
 
-struct aug_conn_ {
-    AUG_ENTRY(aug_conn_);
+struct aug_file_ {
+    AUG_ENTRY(aug_file_);
     int fd_;
-    aug_conncb_t cb_;
+    aug_filecb_t cb_;
     struct aug_var arg_;
 };
 
-static struct aug_conns free_ = AUG_HEAD_INITIALIZER(free_);
-AUG_ALLOCATOR(allocate_, &free_, aug_conn_, 64)
+static struct aug_files free_ = AUG_HEAD_INITIALIZER(free_);
+AUG_ALLOCATOR(allocate_, &free_, aug_file_, 64)
 
 AUGNET_API int
-aug_freeconns(struct aug_conns* conns)
+aug_freefiles(struct aug_files* files)
 {
-    struct aug_conn_* it;
-    AUG_FOREACH(it, conns)
+    struct aug_file_* it;
+    AUG_FOREACH(it, files)
         aug_freevar(&it->arg_);
 
-    if (!AUG_EMPTY(conns)) {
+    if (!AUG_EMPTY(files)) {
 
         aug_lock();
-        AUG_CONCAT(&free_, conns);
+        AUG_CONCAT(&free_, files);
         aug_unlock();
     }
     return 0;
 }
 
 AUGNET_API int
-aug_insertconn(struct aug_conns* conns, int fd, aug_conncb_t cb,
+aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
                const struct aug_var* arg)
 {
-    struct aug_conn_* conn;
+    struct aug_file_* file;
 
     aug_lock();
-    if (!(conn = allocate_())) {
+    if (!(file = allocate_())) {
         aug_unlock();
         return -1;
     }
     aug_unlock();
 
-    conn->fd_ = fd;
-    conn->cb_ = cb;
-    aug_setvar(&conn->arg_, arg);
+    file->fd_ = fd;
+    file->cb_ = cb;
+    aug_setvar(&file->arg_, arg);
 
-    AUG_INSERT_TAIL(conns, conn);
+    AUG_INSERT_TAIL(files, file);
     return 0;
 }
 
 AUGNET_API int
-aug_removeconn(struct aug_conns* conns, int fd)
+aug_removefile(struct aug_files* files, int fd)
 {
-    struct aug_conn_* it;
+    struct aug_file_* it;
 
-    AUG_FOREACH(it, conns)
+    AUG_FOREACH(it, files)
         if (it->fd_ == fd)
             break;
 
     if (!it) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
-                       AUG_MSG("no connection for descriptor '%d'"), (int)fd);
+                       AUG_MSG("no file for descriptor '%d'"), (int)fd);
         return -1;
     }
 
-    AUG_REMOVE(conns, it, aug_conn_);
+    AUG_REMOVE(files, it, aug_file_);
 
     aug_freevar(&it->arg_);
     aug_lock();
@@ -87,18 +87,18 @@ aug_removeconn(struct aug_conns* conns, int fd)
 }
 
 AUGNET_API int
-aug_processconns(struct aug_conns* conns)
+aug_foreachfile(struct aug_files* files)
 {
-    struct aug_conn_* it, ** prev;
-    struct aug_conns tail;
+    struct aug_file_* it, ** prev;
+    struct aug_files tail;
     AUG_INIT(&tail);
 
-    prev = &AUG_FIRST(conns);
+    prev = &AUG_FIRST(files);
     while ((it = *prev)) {
 
         if (!(it->cb_(it->fd_, &it->arg_, &tail))) {
 
-            AUG_REMOVE_PREVPTR(it, prev, conns);
+            AUG_REMOVE_PREVPTR(it, prev, files);
 
             aug_freevar(&it->arg_);
             aug_lock();
@@ -109,6 +109,13 @@ aug_processconns(struct aug_conns* conns)
             prev = &AUG_NEXT(it);
     }
 
-    AUG_CONCAT(conns, &tail);
+    AUG_CONCAT(files, &tail);
+
+    /* Rotate files to promote fairness. */
+
+    if (!(it = AUG_FIRST(files))) {
+        AUG_REMOVE_HEAD(files);
+        AUG_INSERT_TAIL(files, it);
+    }
     return 0;
 }
