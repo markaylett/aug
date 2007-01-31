@@ -54,36 +54,36 @@ module::init(augas_sess& sess) const AUG_NOTHROW
 }
 
 bool
-module::event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW
-{
-    AUG_DEBUG2("event(): sname=[%s], type=[%d]", sess.name_, type);
-    return AUGAS_OK == module_.event_(&sess, type, user);
-}
-
-bool
-module::expire(const augas_sess& sess, augas_id tid, void* user,
-               unsigned& ms) const AUG_NOTHROW
-{
-    AUG_DEBUG2("expire(): sname=[%s], id=[%d], ms=[%u]", sess.name_, tid, ms);
-    return AUGAS_OK == module_.expire_(&sess, tid, user, &ms);
-}
-
-bool
 module::reconf(const augas_sess& sess) const AUG_NOTHROW
 {
     AUG_DEBUG2("reconf(): sname=[%s]", sess.name_);
     return AUGAS_OK == module_.reconf_(&sess);
 }
 
+bool
+module::event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW
+{
+    AUG_DEBUG2("event(): sname=[%s], type=[%d]", sess.name_, type);
+    return AUGAS_OK == module_.event_(&sess, type, user);
+}
+
 void
-module::closed(const augas_sock& sock) const AUG_NOTHROW
+module::closed(const augas_object& sock) const AUG_NOTHROW
 {
     AUG_DEBUG2("closed(): sname=[%s], id=[%d]", sock.sess_->name_, sock.id_);
     module_.closed_(&sock);
 }
 
 bool
-module::accept(augas_sock& sock, const char* addr,
+module::teardown(const augas_object& sock) const AUG_NOTHROW
+{
+    AUG_DEBUG2("teardown(): sname=[%s], id=[%d]",
+               sock.sess_->name_, sock.id_);
+    return AUGAS_OK == module_.teardown_(&sock);
+}
+
+bool
+module::accept(augas_object& sock, const char* addr,
                unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("accept(): sname=[%s], id=[%d], addr=[%s], port=[%u]",
@@ -92,7 +92,7 @@ module::accept(augas_sock& sock, const char* addr,
 }
 
 bool
-module::connected(augas_sock& sock, const char* addr,
+module::connected(augas_object& sock, const char* addr,
                 unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("connected(): sname=[%s], id=[%d], addr=[%s], port=[%u]",
@@ -101,7 +101,7 @@ module::connected(augas_sock& sock, const char* addr,
 }
 
 bool
-module::data(const augas_sock& sock, const char* buf,
+module::data(const augas_object& sock, const char* buf,
              size_t size) const AUG_NOTHROW
 {
     AUG_DEBUG2("data(): sname=[%s], id=[%d]", sock.sess_->name_, sock.id_);
@@ -109,7 +109,7 @@ module::data(const augas_sock& sock, const char* buf,
 }
 
 bool
-module::rdexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
+module::rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("rdexpire(): sname=[%s], id=[%d], ms=[%u]",
                sock.sess_->name_, sock.id_, ms);
@@ -117,7 +117,7 @@ module::rdexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
 }
 
 bool
-module::wrexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
+module::wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("wrexpire(): sname=[%s], id=[%d], ms=[%u]",
                sock.sess_->name_, sock.id_, ms);
@@ -125,9 +125,9 @@ module::wrexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
 }
 
 bool
-module::teardown(const augas_sock& sock) const AUG_NOTHROW
+module::expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
 {
-    AUG_DEBUG2("teardown(): sname=[%s], id=[%d]",
-               sock.sess_->name_, sock.id_);
-    return AUGAS_OK == module_.teardown_(&sock);
+    AUG_DEBUG2("expire(): sname=[%s], id=[%d], ms=[%u]",
+               timer.sess_->name_, timer.id_, ms);
+    return AUGAS_OK == module_.expire_(&timer, &ms);
 }

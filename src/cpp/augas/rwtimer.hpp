@@ -55,7 +55,7 @@ namespace augas {
     class rwtimer : public rwtimer_base {
 
         sessptr sess_;
-        const augas_sock& sock_;
+        const augas_object& sock_;
         aug::timer rdtimer_;
         aug::timer wrtimer_;
 
@@ -77,7 +77,7 @@ namespace augas {
     public:
         ~rwtimer() AUG_NOTHROW;
 
-        rwtimer(const sessptr& sess, const augas_sock& sock,
+        rwtimer(const sessptr& sess, const augas_object& sock,
                 aug::timers& timers);
     };
 }

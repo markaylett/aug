@@ -30,4 +30,4 @@ def connected(sname, cid, user, addr, port):
 def data(sname, cid, user, buf):
     # It is safe to send to a connection that has not been fully established.
     if pairs.has_key(cid):
-        send(sname, pairs[cid], buf)
+        send(pairs[cid], buf)

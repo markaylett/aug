@@ -18,90 +18,89 @@ init_(struct augas_sess* sess)
 }
 
 static int
-event_(const struct augas_sess* sess, int type, void* user)
-{
-    host_->writelog_(AUGAS_LOGINFO, "event_()");
-    return 0;
-}
-
-static int
-expire_(const struct augas_sess* sess, augas_id tid, void* user,
-        unsigned* ms)
-{
-    host_->writelog_(AUGAS_LOGINFO, "expire_()");
-    return 0;
-}
-
-static int
 reconf_(const struct augas_sess* sess)
 {
     host_->writelog_(AUGAS_LOGINFO, "reconf_()");
     return 0;
 }
 
+static int
+event_(const struct augas_sess* sess, int type, void* user)
+{
+    host_->writelog_(AUGAS_LOGINFO, "event_()");
+    return 0;
+}
+
 static void
-closed_(const struct augas_sock* sock)
+closed_(const struct augas_object* sock)
 {
     host_->writelog_(AUGAS_LOGINFO, "closed_()");
 }
 
 static int
-accept_(struct augas_sock* sock, const char* addr, unsigned short port)
-{
-    host_->writelog_(AUGAS_LOGINFO, "accept_()");
-    return 0;
-}
-
-static int
-connected_(struct augas_sock* sock, const char* addr, unsigned short port)
-{
-    host_->writelog_(AUGAS_LOGINFO, "connected_()");
-    return 0;
-}
-
-static int
-data_(const struct augas_sock* sock, const char* buf, size_t size)
-{
-    host_->writelog_(AUGAS_LOGINFO, "data_()");
-    host_->send_(sock->sess_->name_, sock->id_, buf, size);
-    return 0;
-}
-
-static int
-rdexpire_(const struct augas_sock* sock, unsigned* ms)
-{
-    host_->writelog_(AUGAS_LOGINFO, "rdexpire_()");
-    return 0;
-}
-
-static int
-wrexpire_(const struct augas_sock* sock, unsigned* ms)
-{
-    host_->writelog_(AUGAS_LOGINFO, "wrexpire_()");
-    return 0;
-}
-
-static int
-teardown_(const struct augas_sock* sock)
+teardown_(const struct augas_object* sock)
 {
     host_->writelog_(AUGAS_LOGINFO, "teardown_()");
     host_->shutdown_(sock->id_);
     return 0;
 }
 
+static int
+accept_(struct augas_object* sock, const char* addr, unsigned short port)
+{
+    host_->writelog_(AUGAS_LOGINFO, "accept_()");
+    return 0;
+}
+
+static int
+connected_(struct augas_object* sock, const char* addr, unsigned short port)
+{
+    host_->writelog_(AUGAS_LOGINFO, "connected_()");
+    return 0;
+}
+
+static int
+data_(const struct augas_object* sock, const char* buf, size_t size)
+{
+    host_->writelog_(AUGAS_LOGINFO, "data_()");
+    host_->send_(sock->id_, buf, size);
+    return 0;
+}
+
+static int
+rdexpire_(const struct augas_object* sock, unsigned* ms)
+{
+    host_->writelog_(AUGAS_LOGINFO, "rdexpire_()");
+    return 0;
+}
+
+static int
+wrexpire_(const struct augas_object* sock, unsigned* ms)
+{
+    host_->writelog_(AUGAS_LOGINFO, "wrexpire_()");
+    return 0;
+}
+
+static int
+expire_(const struct augas_object* timer, unsigned* ms)
+{
+    host_->writelog_(AUGAS_LOGINFO, "expire_()");
+    return 0;
+}
+
 static const struct augas_module fntable_ = {
     term_,
     init_,
-    event_,
-    expire_,
     reconf_,
+    event_,
     closed_,
+    teardown_,
     accept_,
     connected_,
     data_,
     rdexpire_,
     wrexpire_,
-    teardown_
+    expire_
 };
 
 static const struct augas_module*

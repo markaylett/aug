@@ -49,7 +49,7 @@ manager::clear()
 }
 
 void
-manager::erase(const sock_base& sock)
+manager::erase(const object_base& sock)
 {
     AUG_DEBUG2("removing from manager: id=[%d], fd=[%d]", sock.id(),
                sock.sfd().get());
@@ -59,7 +59,7 @@ manager::erase(const sock_base& sock)
 }
 
 void
-manager::insert(const sockptr& sock)
+manager::insert(const objectptr& sock)
 {
     AUG_DEBUG2("adding to manager: id=[%d], fd=[%d]", sock->id(),
                sock->sfd().get());
@@ -69,7 +69,7 @@ manager::insert(const sockptr& sock)
 }
 
 void
-manager::update(const sockptr& sock, fdref prev)
+manager::update(const objectptr& sock, fdref prev)
 {
     AUG_DEBUG2("updating manager: id=[%d], fd=[%d], prev=[%d]", sock->id(),
                sock->sfd().get(), prev.get());
@@ -185,7 +185,7 @@ manager::reconf() const
         it->second->reconf();
 }
 
-sockptr
+objectptr
 manager::getbyfd(fdref fd) const
 {
     socks::const_iterator it(socks_.find(fd.get()));
@@ -195,7 +195,7 @@ manager::getbyfd(fdref fd) const
     return it->second;
 }
 
-sockptr
+objectptr
 manager::getbyid(augas_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));

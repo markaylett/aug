@@ -72,9 +72,9 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) client.$(OBJEXT) \
 	conn.$(OBJEXT) exception.$(OBJEXT) listener.$(OBJEXT) \
-	manager.$(OBJEXT) module.$(OBJEXT) options.$(OBJEXT) \
-	rwtimer.$(OBJEXT) server.$(OBJEXT) sess.$(OBJEXT) \
-	sock.$(OBJEXT) utility.$(OBJEXT)
+	manager.$(OBJEXT) module.$(OBJEXT) object.$(OBJEXT) \
+	options.$(OBJEXT) rwtimer.$(OBJEXT) server.$(OBJEXT) \
+	sess.$(OBJEXT) utility.$(OBJEXT)
 augasd_OBJECTS = $(am_augasd_OBJECTS)
 augasd_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
@@ -247,11 +247,11 @@ noinst_HEADERS = \
 	listener.hpp \
 	manager.hpp \
 	module.hpp \
+	object.hpp \
 	options.hpp \
 	rwtimer.hpp \
 	server.hpp \
 	sess.hpp \
-	sock.hpp \
 	utility.hpp
 
 augasd_SOURCES = \
@@ -263,11 +263,11 @@ augasd_SOURCES = \
 	listener.cpp \
 	manager.cpp \
 	module.cpp \
+	object.cpp \
 	options.cpp \
 	rwtimer.cpp \
 	server.cpp \
 	sess.cpp \
-	sock.cpp \
 	utility.cpp
 
 augasd_LDADD = \
@@ -403,11 +403,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modpython.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modskel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rwtimer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sess.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@
 
 .c.o:

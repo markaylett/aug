@@ -17,14 +17,14 @@ conn_base::~conn_base() AUG_NOTHROW
 {
 }
 
-augas_sock&
-established::do_sock()
+augas_object&
+established::do_object()
 {
     return sock_;
 }
 
-const augas_sock&
-established::do_sock() const
+const augas_object&
+established::do_object() const
 {
     return sock_;
 }
@@ -160,7 +160,7 @@ established::~established() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-established::established(const sessptr& sess, augas_sock& sock,
+established::established(const sessptr& sess, augas_object& sock,
                          buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
                          const aug::endpoint& ep, bool close)
     : sess_(sess),
@@ -174,14 +174,14 @@ established::established(const sessptr& sess, augas_sock& sock,
 {
 }
 
-augas_sock&
-connecting::do_sock()
+augas_object&
+connecting::do_object()
 {
     return sock_;
 }
 
-const augas_sock&
-connecting::do_sock() const
+const augas_object&
+connecting::do_object() const
 {
     return sock_;
 }
@@ -273,8 +273,8 @@ connecting::~connecting() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-connecting::connecting(const sessptr& sess, augas_sock& sock, buffer& buffer,
-                       const char* host, const char* serv)
+connecting::connecting(const sessptr& sess, augas_object& sock,
+                       buffer& buffer, const char* host, const char* serv)
     : sess_(sess),
       sock_(sock),
       buffer_(buffer),

@@ -2,10 +2,10 @@
    See the file COPYING for copying permission.
 */
 #define AUGAS_BUILD
-#include "augas/sock.hpp"
+#include "augas/object.hpp"
 
 using namespace augas;
 
-sock_base::~sock_base() AUG_NOTHROW
+object_base::~object_base() AUG_NOTHROW
 {
 }

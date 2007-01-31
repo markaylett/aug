@@ -73,7 +73,8 @@ rwtimer::~rwtimer() AUG_NOTHROW
 {
 }
 
-rwtimer::rwtimer(const sessptr& sess, const augas_sock& sock, timers& timers)
+rwtimer::rwtimer(const sessptr& sess, const augas_object& sock,
+                 timers& timers)
     : sess_(sess),
       sock_(sock),
       rdtimer_(timers, null),

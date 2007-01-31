@@ -112,10 +112,10 @@
 				RelativePath="..\src\c\augnet\config.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\conn.c">
+				RelativePath="..\src\c\augnet\connector.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\connector.c">
+				RelativePath="..\src\c\augnet\file.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\http.c">
@@ -138,10 +138,10 @@
 				RelativePath="..\src\c\augnet\config.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\conn.h">
+				RelativePath="..\src\c\augnet\connector.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\connector.h">
+				RelativePath="..\src\c\augnet\file.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\http.h">

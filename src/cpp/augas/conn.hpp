@@ -5,7 +5,7 @@
 #define AUGAS_CONN_HPP
 
 #include "augas/rwtimer.hpp"
-#include "augas/sock.hpp"
+#include "augas/object.hpp"
 
 #include "augnetpp.hpp"
 
@@ -21,7 +21,7 @@ namespace augas {
         CLOSED
     };
 
-    class conn_base : public sock_base {
+    class conn_base : public object_base {
 
         virtual bool
         do_accept(const aug_endpoint& ep) = 0;
@@ -103,7 +103,7 @@ namespace augas {
     class established : public conn_base {
 
         sessptr sess_;
-        augas_sock& sock_;
+        augas_object& sock_;
         buffer& buffer_;
         rwtimer& rwtimer_;
         aug::smartfd sfd_;
@@ -111,11 +111,11 @@ namespace augas {
         connphase phase_;
         bool close_;
 
-        augas_sock&
-        do_sock();
+        augas_object&
+        do_object();
 
-        const augas_sock&
-        do_sock() const;
+        const augas_object&
+        do_object() const;
 
         const sessptr&
         do_sess() const;
@@ -150,7 +150,7 @@ namespace augas {
     public:
         ~established() AUG_NOTHROW;
 
-        established(const sessptr& sess, augas_sock& sock, buffer& buffer,
+        established(const sessptr& sess, augas_object& sock, buffer& buffer,
                     rwtimer& rwtimer, const aug::smartfd& sfd,
                     const aug::endpoint& ep, bool close);
     };
@@ -158,18 +158,18 @@ namespace augas {
     class connecting : public conn_base {
 
         sessptr sess_;
-        augas_sock& sock_;
+        augas_object& sock_;
         buffer& buffer_;
         aug::connector connector_;
         aug::smartfd sfd_;
         aug::endpoint endpoint_;
         connphase phase_;
 
-        augas_sock&
-        do_sock();
+        augas_object&
+        do_object();
 
-        const augas_sock&
-        do_sock() const;
+        const augas_object&
+        do_object() const;
 
         const sessptr&
         do_sess() const;
@@ -204,7 +204,7 @@ namespace augas {
     public:
         ~connecting() AUG_NOTHROW;
 
-        connecting(const sessptr& sess, augas_sock& sock, buffer& buffer,
+        connecting(const sessptr& sess, augas_object& sock, buffer& buffer,
                    const char* host, const char* serv);
     };
 }

@@ -37,38 +37,37 @@ namespace augas {
         init(augas_sess& sess) const AUG_NOTHROW;
 
         bool
-        event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW;
-
-        bool
-        expire(const augas_sess& sess, augas_id tid, void* user,
-               unsigned& ms) const AUG_NOTHROW;
-
-        bool
         reconf(const augas_sess& sess) const AUG_NOTHROW;
 
+        bool
+        event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW;
+
         void
-        closed(const augas_sock& sock) const AUG_NOTHROW;
+        closed(const augas_object& sock) const AUG_NOTHROW;
 
         bool
-        accept(augas_sock& sock, const char* addr,
+        teardown(const augas_object& sock) const AUG_NOTHROW;
+
+        bool
+        accept(augas_object& sock, const char* addr,
                unsigned short port) const AUG_NOTHROW;
 
         bool
-        connected(augas_sock& sock, const char* addr,
+        connected(augas_object& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW;
 
         bool
-        data(const augas_sock& sock, const char* buf,
+        data(const augas_object& sock, const char* buf,
              size_t size) const AUG_NOTHROW;
 
         bool
-        rdexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW;
+        rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        wrexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW;
+        wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        teardown(const augas_sock& sock) const AUG_NOTHROW;
+        expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW;
     };
 
     typedef aug::smartptr<module> moduleptr;

@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_SOCK_HPP
-#define AUGAS_SOCK_HPP
+#ifndef AUGAS_OBJECT_HPP
+#define AUGAS_OBJECT_HPP
 
 #include "augas.h"
 #include "augas/sess.hpp"
@@ -11,16 +11,16 @@
 
 namespace augas {
 
-    class sock_base {
+    class object_base {
     public:
-        typedef augas_sock ctype;
+        typedef augas_object ctype;
     private:
 
-        virtual augas_sock&
-        do_sock() = 0;
+        virtual augas_object&
+        do_object() = 0;
 
-        virtual const augas_sock&
-        do_sock() const = 0;
+        virtual const augas_object&
+        do_object() const = 0;
 
         virtual const sessptr&
         do_sess() const = 0;
@@ -30,17 +30,17 @@ namespace augas {
 
     public:
         virtual
-        ~sock_base() AUG_NOTHROW;
+        ~object_base() AUG_NOTHROW;
 
-        augas_sock&
-        sock()
+        augas_object&
+        object()
         {
-            return do_sock();
+            return do_object();
         }
-        const augas_sock&
-        sock() const
+        const augas_object&
+        object() const
         {
-            return do_sock();
+            return do_object();
         }
         const sessptr&
         sess() const
@@ -55,24 +55,24 @@ namespace augas {
         augas_id
         id() const
         {
-            return do_sock().id_;
+            return do_object().id_;
         }
         void*
         user() const
         {
-            return do_sock().user_;
+            return do_object().user_;
         }
-        operator augas_sock&()
+        operator augas_object&()
         {
-            return do_sock();
+            return do_object();
         }
-        operator const augas_sock&() const
+        operator const augas_object&() const
         {
-            return do_sock();
+            return do_object();
         }
     };
 
-    typedef aug::smartptr<sock_base> sockptr;
+    typedef aug::smartptr<object_base> objectptr;
 }
 
-#endif // AUGAS_SOCK_HPP
+#endif // AUGAS_OBJECT_HPP

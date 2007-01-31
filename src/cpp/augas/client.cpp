@@ -38,16 +38,16 @@ client::do_cancelrwtimer(unsigned flags)
     rwtimer_.cancelrwtimer(flags);
 }
 
-augas_sock&
-client::do_sock()
+augas_object&
+client::do_object()
 {
-    return conn_->sock();
+    return conn_->object();
 }
 
-const augas_sock&
-client::do_sock() const
+const augas_object&
+client::do_object() const
 {
-    return conn_->sock();
+    return conn_->object();
 }
 
 const sessptr&
@@ -81,6 +81,9 @@ client::do_process(mplexer& mplexer)
         return false;
 
     if (ESTABLISHED == conn_->phase()) {
+
+        // Connection is now established.  If data has been buffered for
+        // writing then set the write event-mask.
 
         if (!buffer_.empty())
             setioeventmask(mplexer, conn_->sfd(), AUG_IOEVENTRDWR);

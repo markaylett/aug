@@ -29,57 +29,57 @@ namespace augas {
             return active_ = module_->init(sess_);
         }
         bool
-        event(int type, void* user) const AUG_NOTHROW
-        {
-            return module_->event(sess_, type, user);
-        }
-        bool
-        expire(unsigned tid, void* user, unsigned& ms) const AUG_NOTHROW
-        {
-            return module_->expire(sess_, tid, user, ms);
-        }
-        bool
         reconf() const AUG_NOTHROW
         {
             return module_->reconf(sess_);
         }
+        bool
+        event(int type, void* user) const AUG_NOTHROW
+        {
+            return module_->event(sess_, type, user);
+        }
         void
-        closed(const augas_sock& sock) const AUG_NOTHROW
+        closed(const augas_object& sock) const AUG_NOTHROW
         {
             module_->closed(sock);
         }
         bool
-        accept(augas_sock& sock, const char* addr,
+        teardown(const augas_object& sock) const AUG_NOTHROW
+        {
+            return module_->teardown(sock);
+        }
+        bool
+        accept(augas_object& sock, const char* addr,
                unsigned short port) const AUG_NOTHROW
         {
             return module_->accept(sock, addr, port);
         }
         bool
-        connected(augas_sock& sock, const char* addr,
+        connected(augas_object& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW
         {
             return module_->connected(sock, addr, port);
         }
         bool
-        data(const augas_sock& sock, const char* buf,
+        data(const augas_object& sock, const char* buf,
              size_t size) const AUG_NOTHROW
         {
             return module_->data(sock, buf, size);
         }
         bool
-        rdexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
+        rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
         {
             return module_->rdexpire(sock, ms);
         }
         bool
-        wrexpire(const augas_sock& sock, unsigned& ms) const AUG_NOTHROW
+        wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
         {
             return module_->wrexpire(sock, ms);
         }
         bool
-        teardown(const augas_sock& sock) const AUG_NOTHROW
+        expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
         {
-            return module_->teardown(sock);
+            return module_->expire(timer, ms);
         }
         operator augas_sess&() AUG_NOTHROW
         {

@@ -171,12 +171,58 @@ namespace augas {
 
         pending::iterator it(state_->pending_.find(id));
         sessptr sess(it->second);
-        sess->expire(id, aug_getvarp(arg), *ms);
+        augas_object timer = { cptr(*sess), id, aug_getvarp(arg) };
+        sess->expire(timer, *ms);
 
         if (0 == *ms) {
             AUG_DEBUG2("removing timer: ms has been set to zero");
             state_->pending_.erase(it);
         }
+    }
+
+    void
+    setsockopts_(const smartfd& sfd)
+    {
+        setnodelay(sfd, true);
+        setnonblock(sfd, true);
+    }
+
+    void
+    connected_(conn_base& conn)
+    {
+        setsockopts_(conn.sfd());
+
+        const endpoint& ep(conn.endpoint());
+        inetaddr addr(null);
+        AUG_DEBUG2("connected: host=[%s], port=[%d]",
+                   inetntop(getinetaddr(ep, addr)).c_str(),
+                   static_cast<int>(ntohs(port(ep))));
+
+        setioeventmask(state_->mplexer_, conn.sfd(), AUG_IOEVENTRD);
+        conn.connected(ep);
+    }
+
+    // Thread-safe.
+
+    void
+    writelog_(int level, const char* format, ...)
+    {
+        // Cannot throw.
+
+        va_list args;
+        va_start(args, format);
+        aug_vwritelog(level, format, args);
+        va_end(args);
+    }
+
+    // Thread-safe.
+
+    void
+    vwritelog_(int level, const char* format, va_list args)
+    {
+        // Cannot throw.
+
+        aug_vwritelog(level, format, args);
     }
 
     // Thread-safe.
@@ -203,29 +249,6 @@ namespace augas {
     {
         aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
         writeevent(aug_eventout(), e);
-    }
-
-    // Thread-safe.
-
-    void
-    writelog_(int level, const char* format, ...)
-    {
-        // Cannot throw.
-
-        va_list args;
-        va_start(args, format);
-        aug_vwritelog(level, format, args);
-        va_end(args);
-    }
-
-    // Thread-safe.
-
-    void
-    vwritelog_(int level, const char* format, va_list args)
-    {
-        // Cannot throw.
-
-        aug_vwritelog(level, format, args);
     }
 
     // Thread-safe.
@@ -285,26 +308,20 @@ namespace augas {
         return 0;
     }
 
-    void
-    setsockopts_(const smartfd& sfd)
+    int
+    shutdown_(augas_id cid)
     {
-        setnodelay(sfd, true);
-        setnonblock(sfd, true);
-    }
-
-    void
-    connected_(const connptr& cptr)
-    {
-        setsockopts_(cptr->sfd());
-
-        const endpoint& ep(cptr->endpoint());
-        inetaddr addr(null);
-        AUG_DEBUG2("connected: host=[%s], port=[%d]",
-                   inetntop(getinetaddr(ep, addr)).c_str(),
-                   static_cast<int>(ntohs(port(ep))));
-
-        setioeventmask(state_->mplexer_, cptr->sfd(), AUG_IOEVENTRD);
-        cptr->connected(ep);
+        AUG_DEBUG2("shutdown(): id=[%d]", cid);
+        try {
+            objectptr sock(state_->manager_.getbyid(cid));
+            connptr cptr(smartptr_cast<conn_base>(sock));
+            if (null != cptr)
+                cptr->shutdown();
+            else
+                state_->manager_.erase(*sock);
+            return 0;
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     int
@@ -328,7 +345,8 @@ namespace augas {
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
                 if (state_->connected_.empty()) {
 
-                    // Schedule an event to ensure that connected() is called.
+                    // Schedule an event to ensure that connected() is called
+                    // after this function has returned.
 
                     aug_event e = { AUGAS_WAKEUP, AUG_VARNULL };
                     writeevent(aug_eventout(), e);
@@ -377,73 +395,9 @@ namespace augas {
     }
 
     int
-    settimer_(const char* sname, int id, unsigned ms, void* arg,
-              void (*free)(void*))
+    send_(augas_id cid, const char* buf, size_t size)
     {
-        AUG_DEBUG2("settimer(): sname=[%s], id=[%d], ms=[%u]", sname, id, ms);
-        try {
-
-            var v(arg, free);
-            id = aug_settimer(cptr(state_->timers_), id, ms, timercb_,
-                              cptr(v));
-            if (0 < id)
-                state_->pending_[id] = state_->manager_.getsess(sname);
-            return id;
-
-        } AUG_SETERRINFOCATCH;
-        return -1;
-    }
-
-    int
-    resettimer_(const char* sname, augas_id tid, unsigned ms)
-    {
-        AUG_DEBUG2("resettimer(): sname=[%s], id=[%d], ms=[%u]",
-                   sname, tid, ms);
-        try {
-            return aug_resettimer(cptr(state_->timers_), tid, ms);
-        } AUG_SETERRINFOCATCH;
-        return -1;
-    }
-
-    int
-    canceltimer_(const char* sname, augas_id tid)
-    {
-        AUG_DEBUG2("canceltimer(): sname=[%s], id=[%d]", sname, tid);
-        try {
-            int ret(aug_canceltimer(cptr(state_->timers_), tid));
-
-            // Only erase if aug_canceltimer() returns true: may be in the
-            // midst of a aug_foreachexpired() call, in which case,
-            // aug_canceltimer() will return false for the timer being
-            // expired.
-
-            if (0 == ret)
-                state_->pending_.erase(tid);
-            return ret;
-        } AUG_SETERRINFOCATCH;
-        return -1;
-    }
-
-    int
-    shutdown_(augas_id cid)
-    {
-        AUG_DEBUG2("shutdown(): id=[%d]", cid);
-        try {
-            sockptr sock(state_->manager_.getbyid(cid));
-            connptr cptr(smartptr_cast<conn_base>(sock));
-            if (null != cptr)
-                cptr->shutdown();
-            else
-                state_->manager_.erase(*sock);
-            return 0;
-        } AUG_SETERRINFOCATCH;
-        return -1;
-    }
-
-    int
-    send_(const char* sname, augas_id cid, const char* buf, size_t size)
-    {
-        AUG_DEBUG2("send(): sname=[%s], id=[%d]", sname, cid);
+        AUG_DEBUG2("send(): id=[%d]", cid);
         try {
             if (!state_->manager_.send(state_->mplexer_, cid, buf, size))
                 throw error(__FILE__, __LINE__, EHOSTCALL,
@@ -503,25 +457,73 @@ namespace augas {
         return -1;
     }
 
+    int
+    settimer_(const char* sname, int id, unsigned ms, void* arg,
+              void (*free)(void*))
+    {
+        AUG_DEBUG2("settimer(): sname=[%s], id=[%d], ms=[%u]", sname, id, ms);
+        try {
+
+            var v(arg, free);
+            id = aug_settimer(cptr(state_->timers_), id, ms, timercb_,
+                              cptr(v));
+            if (0 < id)
+                state_->pending_[id] = state_->manager_.getsess(sname);
+            return id;
+
+        } AUG_SETERRINFOCATCH;
+        return -1;
+    }
+
+    int
+    resettimer_(const char* sname, augas_id tid, unsigned ms)
+    {
+        AUG_DEBUG2("resettimer(): sname=[%s], id=[%d], ms=[%u]",
+                   sname, tid, ms);
+        try {
+            return aug_resettimer(cptr(state_->timers_), tid, ms);
+        } AUG_SETERRINFOCATCH;
+        return -1;
+    }
+
+    int
+    canceltimer_(const char* sname, augas_id tid)
+    {
+        AUG_DEBUG2("canceltimer(): sname=[%s], id=[%d]", sname, tid);
+        try {
+            int ret(aug_canceltimer(cptr(state_->timers_), tid));
+
+            // Only erase if aug_canceltimer() returns true: may be in the
+            // midst of a aug_foreachexpired() call, in which case,
+            // aug_canceltimer() will return false for the timer being
+            // expired.
+
+            if (0 == ret)
+                state_->pending_.erase(tid);
+            return ret;
+        } AUG_SETERRINFOCATCH;
+        return -1;
+    }
+
     const struct augas_host host_ = {
+        writelog_,
+        vwritelog_,
         error_,
         reconf_,
         stop_,
-        writelog_,
-        vwritelog_,
         post_,
         delegate_,
         getenv_,
+        shutdown_,
         tcpconnect_,
         tcplisten_,
-        settimer_,
-        resettimer_,
-        canceltimer_,
-        shutdown_,
         send_,
         setrwtimer_,
         resetrwtimer_,
-        cancelrwtimer_
+        cancelrwtimer_,
+        settimer_,
+        resettimer_,
+        canceltimer_
     };
 
     void
@@ -545,7 +547,7 @@ namespace augas {
     }
 
     void
-    accept_(const sock_base& sock, filecb_base& filecb)
+    accept_(const object_base& sock, filecb_base& filecb)
     {
         endpoint ep(null);
 
@@ -576,6 +578,52 @@ namespace augas {
 
         if (cptr->accept(ep))
             si.commit();
+    }
+
+    bool
+    process_(const connptr& cptr, int fd)
+    {
+        bool changed, ok = false;
+        try {
+            changed = cptr->process(state_->mplexer_);
+            ok = true;
+        } AUG_PERRINFOCATCH;
+
+        if (!ok) {
+
+            // Connection is closed if an exception is thrown during
+            // processing.
+
+            state_->manager_.erase(*cptr);
+            return false;
+        }
+
+        if (CONNECTING == cptr->phase()) {
+
+            // The associated file descriptor may change as connection
+            // attempts fail and alternative addresses are tried.
+
+            setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
+            state_->manager_.update(cptr, fd);
+
+        } else if (changed)
+
+            switch (cptr->phase()) {
+            case ESTABLISHED:
+
+                // Was connecting, now established: notify module of
+                // connection establishment.
+
+                connected_(*cptr);
+                break;
+            case CLOSED:
+                state_->manager_.erase(*cptr);
+                return false;
+            default:
+                break;
+            }
+
+        return true;
     }
 
     bool
@@ -639,42 +687,15 @@ namespace augas {
             if (fd == aug_eventin())
                 return readevent_(*this);
 
-            sockptr sock(state_->manager_.getbyfd(fd));
+            objectptr sock(state_->manager_.getbyfd(fd));
             connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
             AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", sock->id(), fd);
 
-            if (null != cptr) {
+            if (null != cptr)
+                return process_(cptr, fd);
 
-                bool changed, ok = false;
-                try {
-                    changed = cptr->process(state_->mplexer_);
-                    ok = true;
-                } AUG_PERRINFOCATCH;
-
-                if (!ok) {
-                    state_->manager_.erase(*cptr);
-                    return false;
-                }
-
-                if (CONNECTING == cptr->phase()) {
-                    setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
-                    state_->manager_.update(sock, fd);
-                } else if (changed)
-                    switch (cptr->phase()) {
-                    case ESTABLISHED:
-                        connected_(cptr);
-                        break;
-                    case CLOSED:
-                        state_->manager_.erase(*cptr);
-                        return false;
-                    default:
-                        break;
-                    }
-
-            } else
-                accept_(*sock, *this);
-
+            accept_(*sock, *this);
             return true;
         }
 
@@ -795,7 +816,7 @@ namespace augas {
                     // connection.
 
                     while (!state_->connected_.empty()) {
-                        connected_(state_->connected_.front());
+                        connected_(*state_->connected_.front());
                         state_->connected_.pop();
                     }
 

@@ -27,7 +27,7 @@ def accept(sname, cid, user, addr, port):
 def connected(sname, cid, user, addr, port):
     global server
     log.debug("connected(): %s" % sname)
-    send(sname, server, "hello, world!\n")
+    send(server, "hello, world!\n")
     return Buffer()
 
 def data(sname, cid, user, buf):
@@ -36,6 +36,6 @@ def data(sname, cid, user, buf):
         if line != "hello, world!":
             log.error("unexpected line from data()")
         if cid == server:
-            send(sname, cid, line + "\n")
+            send(cid, line + "\n")
         else:
             stop()

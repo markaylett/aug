@@ -112,10 +112,10 @@
 				RelativePath="..\src\cpp\augnetpp\config.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\conn.cpp">
+				RelativePath="..\src\cpp\augnetpp\connector.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\connector.cpp">
+				RelativePath="..\src\cpp\augnetpp\file.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\inet.cpp">
@@ -129,10 +129,10 @@
 				RelativePath="..\src\cpp\augnetpp\config.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\conn.hpp">
+				RelativePath="..\src\cpp\augnetpp\connector.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\connector.hpp">
+				RelativePath="..\src\cpp\augnetpp\file.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\inet.hpp">

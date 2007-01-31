@@ -16,11 +16,11 @@ noinst_HEADERS = \
 	listener.hpp \
 	manager.hpp \
 	module.hpp \
+	object.hpp \
 	options.hpp \
 	rwtimer.hpp \
 	server.hpp \
 	sess.hpp \
-	sock.hpp \
 	utility.hpp
 
 bin_PROGRAMS = augasd
@@ -34,11 +34,11 @@ augasd_SOURCES = \
 	listener.cpp \
 	manager.cpp \
 	module.cpp \
+	object.cpp \
 	options.cpp \
 	rwtimer.cpp \
 	server.cpp \
 	sess.cpp \
-	sock.cpp \
 	utility.cpp
 
 augasd_LDADD = \

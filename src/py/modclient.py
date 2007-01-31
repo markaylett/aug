@@ -20,7 +20,7 @@ class Client:
 
     def expire(self):
         if not self.done():
-            send(self.sname, self.cid, "hello, world!")
+            send(self.cid, "hello, world!")
         else:
             log.info("done: shutting client connection")
             shutdown(self.cid)
@@ -39,8 +39,8 @@ def connected(sname, cid, user, addr, port):
     log.info("client established, starting timer")
     return Client(sname, cid)
 
-def expire(sname, tid, user, ms):
-    return user.expire()
-
 def data(sname, cid, user, buf):
     log.info("received by client: %s" % buf)
+
+def expire(sname, tid, user, ms):
+    return user.expire()

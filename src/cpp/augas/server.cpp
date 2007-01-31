@@ -38,16 +38,16 @@ server::do_cancelrwtimer(unsigned flags)
     rwtimer_.cancelrwtimer(flags);
 }
 
-augas_sock&
-server::do_sock()
+augas_object&
+server::do_object()
 {
-    return conn_.sock();
+    return conn_.object();
 }
 
-const augas_sock&
-server::do_sock() const
+const augas_object&
+server::do_object() const
 {
-    return conn_.sock();
+    return conn_.object();
 }
 
 const sessptr&

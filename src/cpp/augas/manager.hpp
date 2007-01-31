@@ -17,7 +17,7 @@ namespace augas {
         typedef std::map<std::string, moduleptr> modules;
         typedef std::map<std::string, sessptr> sesss;
         typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
-        typedef std::map<int, sockptr> socks;
+        typedef std::map<int, objectptr> socks;
 
         modules modules_;
         sesss sesss_;
@@ -40,13 +40,13 @@ namespace augas {
         clear();
 
         void
-        erase(const sock_base& sock);
+        erase(const object_base& sock);
 
         void
-        insert(const sockptr& sock);
+        insert(const objectptr& sock);
 
         void
-        update(const sockptr& sock, aug::fdref prev);
+        update(const objectptr& sock, aug::fdref prev);
 
         void
         load(const char* rundir, const options& options,
@@ -62,10 +62,10 @@ namespace augas {
         void
         reconf() const;
 
-        sockptr
+        objectptr
         getbyfd(aug::fdref fd) const;
 
-        sockptr
+        objectptr
         getbyid(augas_id id) const;
 
         sessptr
@@ -78,7 +78,7 @@ namespace augas {
     class scoped_insert {
 
         manager& manager_;
-        sockptr sock_;
+        objectptr sock_;
 
         scoped_insert(const scoped_insert& rhs);
 
@@ -91,7 +91,7 @@ namespace augas {
             if (null != sock_)
                 manager_.erase(*sock_);
         }
-        scoped_insert(manager& manager, const sockptr& sock)
+        scoped_insert(manager& manager, const objectptr& sock)
             : manager_(manager),
               sock_(sock)
         {
@@ -100,7 +100,7 @@ namespace augas {
         void
         commit()
         {
-            sock_ = sockptr();
+            sock_ = objectptr();
         }
     };
 }

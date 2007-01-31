@@ -8,14 +8,14 @@ using namespace aug;
 using namespace augas;
 using namespace std;
 
-augas_sock&
-listener::do_sock()
+augas_object&
+listener::do_object()
 {
     return sock_;
 }
 
-const augas_sock&
-listener::do_sock() const
+const augas_object&
+listener::do_object() const
 {
     return sock_;
 }

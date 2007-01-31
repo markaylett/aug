@@ -11,7 +11,7 @@ namespace augas {
 
     class client : public rwtimer_base, public conn_base {
 
-        augas_sock sock_;
+        augas_object sock_;
         buffer buffer_;
         rwtimer rwtimer_;
         connptr conn_;
@@ -35,11 +35,11 @@ namespace augas {
 
         // conn_base.
 
-        augas_sock&
-        do_sock();
+        augas_object&
+        do_object();
 
-        const augas_sock&
-        do_sock() const;
+        const augas_object&
+        do_object() const;
 
         const sessptr&
         do_sess() const;
