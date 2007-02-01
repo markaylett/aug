@@ -12,7 +12,7 @@ class Client:
         self.n = 10
 
     def cancel(self):
-        canceltimer(self.sname, self.tid)
+        canceltimer(self.tid)
 
     def done(self):
         self.n = self.n - 1
@@ -31,16 +31,16 @@ def init(sname):
     for x in xrange(1, 10):
         tcpconnect(sname, "localhost", getenv("session.modclient.to"), None)
 
-def closed(sname, id, user):
-    if user != None:
-        user.cancel()
+def closed(sock):
+    if sock.user != None:
+        sock.user.cancel()
 
-def connected(sname, cid, user, addr, port):
+def connected(sock, addr, port):
     log.info("client established, starting timer")
-    return Client(sname, cid)
+    sock.user = Client(sock.sname, sock.id)
 
-def data(sname, cid, user, buf):
+def data(sock, buf):
     log.info("received by client: %s" % buf)
 
-def expire(sname, tid, user, ms):
-    return user.expire()
+def expire(timer, ms):
+    return timer.user.expire()

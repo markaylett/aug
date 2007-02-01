@@ -476,10 +476,9 @@ namespace augas {
     }
 
     int
-    resettimer_(const char* sname, augas_id tid, unsigned ms)
+    resettimer_(augas_id tid, unsigned ms)
     {
-        AUG_DEBUG2("resettimer(): sname=[%s], id=[%d], ms=[%u]",
-                   sname, tid, ms);
+        AUG_DEBUG2("resettimer(): id=[%d], ms=[%u]", tid, ms);
         try {
             return aug_resettimer(cptr(state_->timers_), tid, ms);
         } AUG_SETERRINFOCATCH;
@@ -487,9 +486,9 @@ namespace augas {
     }
 
     int
-    canceltimer_(const char* sname, augas_id tid)
+    canceltimer_(augas_id tid)
     {
-        AUG_DEBUG2("canceltimer(): sname=[%s], id=[%d]", sname, tid);
+        AUG_DEBUG2("canceltimer(): id=[%d]", tid);
         try {
             int ret(aug_canceltimer(cptr(state_->timers_), tid));
 

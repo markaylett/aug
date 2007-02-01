@@ -8,6 +8,25 @@
 
 #include <stdlib.h>
 
+#define CHECKPOINT_                                                 \
+    host_->writelog_(AUGAS_LOGDEBUG,                                \
+                    "checkpoint at " __FILE__ " line %d", __LINE__)
+
+extern PyTypeObject*
+pycreatetype(void);
+
+extern PyObject*
+pycreateobject(PyTypeObject* type, const char* sname, int id, PyObject* user);
+
+extern void
+pysetid(PyObject* self, int id);
+
+extern PyObject*
+pysetuser(PyObject* self, PyObject* user);
+
+extern PyObject*
+pygetuser(PyObject* self);
+
 struct import_ {
     PyObject* module_;
     PyObject* term_;
@@ -27,6 +46,7 @@ struct import_ {
 
 static const struct augas_host* host_ = NULL;
 static PyObject* pyaugas_ = NULL;
+static PyTypeObject* pytype_ = NULL;
 static int refs_ = 0;
 
 static void
@@ -69,24 +89,10 @@ free_(void* user)
 }
 
 static PyObject*
-inctrue_(void)
+incret_(PyObject* x)
 {
-    Py_INCREF(Py_True);
-    return Py_True;
-}
-
-static PyObject*
-incfalse_(void)
-{
-    Py_INCREF(Py_False);
-    return Py_False;
-}
-
-static PyObject*
-incnone_(void)
-{
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_INCREF(x);
+    return x;
 }
 
 static void
@@ -264,7 +270,7 @@ pywritelog_(PyObject* self, PyObject* args)
         return NULL;
 
     host_->writelog_(level, "%s", msg);
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
@@ -274,7 +280,7 @@ pyreconf_(PyObject* self, PyObject* args)
         return NULL;
 
     host_->reconf_();
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
@@ -284,7 +290,7 @@ pystop_(PyObject* self, PyObject* args)
         return NULL;
 
     host_->stop_();
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
@@ -307,7 +313,7 @@ pypost_(PyObject* self, PyObject* args)
     }
 
     incuser_(user, __func__);
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
@@ -325,7 +331,7 @@ pydelegate_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
@@ -337,7 +343,7 @@ pygetenv_(PyObject* self, PyObject* args)
         return NULL;
 
     if (!(value = host_->getenv_(name)))
-        return incnone_();
+        return incret_(Py_None);
 
     return Py_BuildValue("s", value);
 }
@@ -355,29 +361,32 @@ pyshutdown_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
 pytcpconnect_(PyObject* self, PyObject* args)
 {
     const char* sname, * host, * serv;
-    PyObject* user;
+    PyObject* user, * sock;
     int cid;
 
     if (!PyArg_ParseTuple(args, "sssO:tcpconnect", &sname, &host, &serv,
                           &user))
         return NULL;
 
-    if (-1 == (cid = host_->tcpconnect_(sname, host, serv, user))) {
+    if (!(sock = pycreateobject(pytype_, sname, 0, user)))
+        return NULL;
+
+    noincuser_(sock, __func__);
+
+    if (-1 == (cid = host_->tcpconnect_(sname, host, serv, sock))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
+        decuser_(sock, __func__);
         return NULL;
     }
 
-    /* When tcpconnect() becomes asynchronous, user will need to be
-       Py_INCREF()-ed. */
-
-    incuser_(user, __func__);
+    pysetid(sock, cid);
     return Py_BuildValue("i", cid);
 }
 
@@ -385,19 +394,25 @@ static PyObject*
 pytcplisten_(PyObject* self, PyObject* args)
 {
     const char* sname, * host, * serv;
-    PyObject* user;
+    PyObject* user, * sock;
     int lid;
 
     if (!PyArg_ParseTuple(args, "sssO:tcplisten", &sname, &host, &serv,
                           &user))
         return NULL;
 
-    if (-1 == (lid = host_->tcplisten_(sname, host, serv, user))) {
+    if (!(sock = pycreateobject(pytype_, sname, 0, user)))
+        return NULL;
+
+    noincuser_(sock, __func__);
+
+    if (-1 == (lid = host_->tcplisten_(sname, host, serv, sock))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
+        decuser_(sock, __func__);
         return NULL;
     }
 
-    incuser_(user, __func__);
+    pysetid(sock, lid);
     return Py_BuildValue("i", lid);
 }
 
@@ -416,7 +431,7 @@ pysend_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
@@ -433,7 +448,7 @@ pysetrwtimer_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
@@ -450,7 +465,7 @@ pyresetrwtimer_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
@@ -466,7 +481,7 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    return incnone_();
+    return incret_(Py_None);
 }
 
 static PyObject*
@@ -475,59 +490,63 @@ pysettimer_(PyObject* self, PyObject* args)
     const char* sname;
     int tid;
     unsigned ms;
-    PyObject* user;
+    PyObject* user, * timer;
 
     if (!PyArg_ParseTuple(args, "siIO:settimer", &sname, &tid, &ms, &user))
         return NULL;
 
-    if (-1 == (tid = host_->settimer_(sname, tid, ms, user, free_))) {
+    if (!(timer = pycreateobject(pytype_, sname, tid, user)))
+        return NULL;
+
+    noincuser_(timer, __func__);
+
+    if (-1 == (tid = host_->settimer_(sname, tid, ms, timer, free_))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
+        decuser_(timer, __func__);
         return NULL;
     }
 
-    incuser_(user, __func__);
+    pysetid(timer, tid);
     return Py_BuildValue("i", tid);
 }
 
 static PyObject*
 pyresettimer_(PyObject* self, PyObject* args)
 {
-    const char* sname;
     int tid;
     unsigned ms;
 
-    if (!PyArg_ParseTuple(args, "siI:resettimer", &sname, &tid, &ms))
+    if (!PyArg_ParseTuple(args, "iI:resettimer", &tid, &ms))
         return NULL;
 
-    switch (host_->resettimer_(sname, tid, ms)) {
+    switch (host_->resettimer_(tid, ms)) {
     case -1:
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     case AUGAS_NONE:
-        return incfalse_();
+        return incret_(Py_False);
     }
 
-    return inctrue_();
+    return incret_(Py_True);
 }
 
 static PyObject*
 pycanceltimer_(PyObject* self, PyObject* args)
 {
-    const char* sname;
     int tid;
 
-    if (!PyArg_ParseTuple(args, "si:canceltimer", &sname, &tid))
+    if (!PyArg_ParseTuple(args, "i:canceltimer", &tid))
         return NULL;
 
-    switch (host_->canceltimer_(sname, tid)) {
+    switch (host_->canceltimer_(tid)) {
     case -1:
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     case AUGAS_NONE:
-        return incfalse_();
+        return incret_(Py_False);
     }
 
-    return inctrue_();
+    return incret_(Py_True);
 }
 
 static PyMethodDef pymethods_[] = {
@@ -595,7 +614,7 @@ static PyMethodDef pymethods_[] = {
         "canceltimer", pycanceltimer_, METH_VARARGS,
         "TODO"
     },
-    { NULL, NULL, 0, NULL }
+    { NULL }
 };
 
 static void
@@ -608,8 +627,7 @@ pyfree_(void)
 
         if (refs_)
             host_->writelog_(AUGAS_LOGERROR,
-                             "unreleased python references: refs=[%d]",
-                             refs_);
+                             "invalid reference count: refs=[%d]", refs_);
     }
 }
 
@@ -626,6 +644,9 @@ pycreate_(void)
     host_->writelog_(AUGAS_LOGDEBUG, "initialising augas module");
     if (!(pyaugas_ = Py_InitModule("augas", pymethods_)))
         goto fail;
+
+    pytype_ = pycreatetype();
+    PyModule_AddObject(pyaugas_, "Object", (PyObject*)pytype_);
 
     PyModule_AddIntConstant(pyaugas_, "LOGCRIT", AUGAS_LOGCRIT);
     PyModule_AddIntConstant(pyaugas_, "LOGERROR", AUGAS_LOGERROR);
@@ -665,8 +686,7 @@ init_(struct augas_sess* sess)
 
     if (import->init_) {
 
-        PyObject* x = PyObject_CallFunction(import->init_, "s",
-                                            sess->name_);
+        PyObject* x = PyObject_CallFunction(import->init_, "s", sess->name_);
         if (!x) {
             printerr_();
             freeimport_(import);
@@ -731,13 +751,12 @@ closed_(const struct augas_object* sock)
 {
     struct import_* import = sock->sess_->user_;
     PyObject* x = sock->user_;
-    assert(sock->user_);
     assert(sock->sess_->user_);
+    assert(sock->user_);
 
     if (import->closed_) {
 
-        PyObject* y = PyObject_CallFunction(import->closed_, "siO",
-                                            sock->sess_->name_, sock->id_, x);
+        PyObject* y = PyObject_CallFunction(import->closed_, "O", x);
         if (y) {
             Py_DECREF(y);
         } else
@@ -750,15 +769,15 @@ static int
 teardown_(const struct augas_object* sock)
 {
     struct import_* import = sock->sess_->user_;
-    PyObject* x = sock->user_;
     int ret = 0;
-    assert(sock->user_);
     assert(sock->sess_->user_);
+    assert(sock->user_);
 
     if (import->teardown_) {
 
-        PyObject* y = PyObject_CallFunction(import->teardown_, "siO",
-                                            sock->sess_->name_, sock->id_, x);
+        PyObject* x = sock->user_;
+        PyObject* y = PyObject_CallFunction(import->teardown_, "O", x);
+
         if (y) {
             Py_DECREF(y);
         } else {
@@ -776,46 +795,52 @@ static int
 accept_(struct augas_object* sock, const char* addr, unsigned short port)
 {
     struct import_* import = sock->sess_->user_;
-    PyObject* x = sock->user_;
-    assert(sock->user_);
+    PyObject* x, * y;
     assert(sock->sess_->user_);
+    assert(sock->user_);
+
+    x = pygetuser(sock->user_);
+    y = pycreateobject(pytype_, sock->sess_->name_, sock->id_, x);
+    Py_DECREF(x);
+
+    if (!y) {
+
+        /* closed() will not be called if accept() fails. */
+
+        printerr_();
+        return -1;
+    }
+
+    noincuser_(y, __func__);
 
     if (import->accept_) {
 
-        PyObject* y = PyObject_CallFunction(import->accept_, "siOsH",
-                                            sock->sess_->name_, sock->id_, x,
-                                            addr, port);
-        if (!y) {
+        PyObject* z = PyObject_CallFunction(import->accept_, "OsH",
+                                            y, addr, port);
+
+        if (!z) {
 
             /* closed() will not be called if accept() fails. */
 
+            decuser_(y, __func__);
             printerr_();
             return -1;
 
-        } else if (PyBool_Check(y)) {
+        } else if (z == Py_False) {
 
-            if (y == Py_False)
-                return -1;
+            /* closed() will not be called if accept() fails. */
 
-            /* x unchanged. */
+            Py_DECREF(z);
+            decuser_(y, __func__);
+            return -1;
+        }
 
-            Py_INCREF(x);
-
-        } else
-            x = y;
-
-    } else {
-
-        /* x unchanged. */
-
-        Py_INCREF(x);
+        Py_DECREF(z);
     }
 
-    sock->user_ = x;
-    noincuser_(x, __func__);
+    /* The original user data is still retained by the listener. */
 
-    /* Original x is still retained by the listener. */
-
+    sock->user_ = y;
     return 0;
 }
 
@@ -823,16 +848,19 @@ static int
 connected_(struct augas_object* sock, const char* addr, unsigned short port)
 {
     struct import_* import = sock->sess_->user_;
-    PyObject* x = sock->user_, * y = NULL;
     int ret = 0;
-    assert(sock->user_);
     assert(sock->sess_->user_);
+    assert(sock->user_);
 
     if (import->connected_) {
 
-        if (!(y = PyObject_CallFunction(import->connected_, "siOsH",
-                                        sock->sess_->name_, sock->id_, x,
-                                        addr, port))) {
+        PyObject* x = sock->user_;
+        PyObject* y = PyObject_CallFunction(import->connected_, "OsH",
+                                            x, addr, port);
+
+        if (y) {
+            Py_DECREF(y);
+        } else {
             printerr_();
             ret = -1;
         }
@@ -840,14 +868,6 @@ connected_(struct augas_object* sock, const char* addr, unsigned short port)
 
     /* closed() will always be called, even if connected() fails. */
 
-    if (!y) {
-        y = x;
-        Py_INCREF(y);
-    }
-
-    sock->user_ = y;
-    noincuser_(y, __func__);
-    decuser_(x, __func__);
     return ret;
 }
 
@@ -856,16 +876,15 @@ data_(const struct augas_object* sock, const char* buf, size_t size)
 {
     struct import_* import = sock->sess_->user_;
     int ret = 0;
-    assert(sock->user_);
     assert(sock->sess_->user_);
+    assert(sock->user_);
 
     if (import->data_) {
 
         PyObject* x = sock->user_;
         PyObject* y = PyBuffer_FromMemory((void*)buf, size);
-        PyObject* z = PyObject_CallFunction(import->data_, "siOO",
-                                            sock->sess_->name_, sock->id_, x,
-                                            y);
+        PyObject* z = PyObject_CallFunction(import->data_, "OO", x, y);
+
         if (z) {
             Py_DECREF(z);
         } else {
@@ -883,16 +902,15 @@ rdexpire_(const struct augas_object* sock, unsigned* ms)
 {
     struct import_* import = sock->sess_->user_;
     int ret = 0;
-    assert(sock->user_);
     assert(sock->sess_->user_);
+    assert(sock->user_);
 
     if (import->rdexpire_) {
 
         PyObject* x = sock->user_;
         PyObject* y = PyInt_FromLong(*ms);
-        PyObject* z = PyObject_CallFunction(import->rdexpire_, "siOO",
-                                            sock->sess_->name_, sock->id_, x,
-                                            y);
+        PyObject* z = PyObject_CallFunction(import->rdexpire_, "OO", x, y);
+
         if (z) {
             if (PyInt_Check(z))
                 *ms = PyInt_AsLong(z);
@@ -913,16 +931,15 @@ wrexpire_(const struct augas_object* sock, unsigned* ms)
 {
     struct import_* import = sock->sess_->user_;
     int ret = 0;
-    assert(sock->user_);
     assert(sock->sess_->user_);
+    assert(sock->user_);
 
     if (import->wrexpire_) {
 
         PyObject* x = sock->user_;
         PyObject* y = PyInt_FromLong(*ms);
-        PyObject* z = PyObject_CallFunction(import->wrexpire_, "siOO",
-                                            sock->sess_->name_, sock->id_, x,
-                                            y);
+        PyObject* z = PyObject_CallFunction(import->wrexpire_, "OO", x, y);
+
         if (z) {
             if (PyInt_Check(z))
                 *ms = PyInt_AsLong(z);
@@ -950,9 +967,7 @@ expire_(const struct augas_object* timer, unsigned* ms)
 
         PyObject* x = timer->user_;
         PyObject* y = PyInt_FromLong(*ms);
-        PyObject* z = PyObject_CallFunction(import->expire_, "siOO",
-                                            timer->sess_->name_, timer->id_,
-                                            x, y);
+        PyObject* z = PyObject_CallFunction(import->expire_, "OO", x, y);
         Py_DECREF(y);
 
         if (z) {

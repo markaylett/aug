@@ -15,27 +15,27 @@ def init(sname):
     listener = tcplisten(sname, "0.0.0.0", "1234", None)
     client = tcpconnect(sname, "127.0.0.1", "1234", None)
 
-def closed(sname, id, user):
-    log.debug("closed(): %s" % sname)
+def closed(sock):
+    log.debug("closed(): %s" % sock.sname)
 
-def accept(sname, cid, user, addr, port):
+def accept(sock, addr, port):
     global server
-    log.debug("accept(): %s" % sname)
-    server = cid
-    return Buffer()
+    log.debug("accept(): %s" % sock.sname)
+    sock.user = Buffer()
+    server = sock.id
 
-def connected(sname, cid, user, addr, port):
+def connected(sock, addr, port):
     global server
-    log.debug("connected(): %s" % sname)
+    log.debug("connected(): %s" % sock.sname)
+    sock.user = Buffer()
     send(server, "hello, world!\n")
-    return Buffer()
 
-def data(sname, cid, user, buf):
-    log.debug("data(): %s" % sname)
-    for line in user.lines(str(buf)):
+def data(sock, buf):
+    log.debug("data(): %s" % sock.sname)
+    for line in sock.user.lines(str(buf)):
         if line != "hello, world!":
             log.error("unexpected line from data()")
-        if cid == server:
-            send(cid, line + "\n")
+        if sock.id == server:
+            send(sock.id, line + "\n")
         else:
             stop()

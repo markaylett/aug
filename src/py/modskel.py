@@ -17,8 +17,8 @@ import log
 # void resetrwtimer (int cid, unsigned ms, unsigned flags);
 # void cancelrwtimer (int cid, unsigned flags);
 # int settimer (string sname, int tid, unsigned ms, object user);
-# bool resettimer (string sname, int tid, unsigned ms);
-# bool canceltimer (string sname, int tid);
+# bool resettimer (int tid, unsigned ms);
+# bool canceltimer (int tid);
 
 def term(sname):
     log.debug("term(): %s" % sname)
@@ -33,34 +33,34 @@ def reconf(sname):
 def event(sname, type, user):
     log.debug("event(): %s" % sname)
 
-def closed(sname, id, user):
-    log.debug("closed(): %s" % sname)
+def closed(sock):
+    log.debug("closed(): %s" % sock.sname)
 
-def teardown(sname, cid, user):
-    log.debug("teardown(): %s" % sname)
-    for line in user.lines(str(buf)):
-        send(cid, user.tail + "\n")
-    shutdown(cid)
+def teardown(sock):
+    log.debug("teardown(): %s" % sock.sname)
+    for line in sock.user.lines(str(buf)):
+        send(sock.id, sock.user.tail + "\n")
+    shutdown(sock.id)
 
-def accept(sname, cid, user, addr, port):
-    log.debug("accept(): %s" % sname)
-    setrwtimer(cid, 5000, TIMRD)
-    return Buffer()
+def accept(sock, addr, port):
+    log.debug("accept(): %s" % sock.sname)
+    sock.user = Buffer()
+    setrwtimer(sock.id, 5000, TIMRD)
 
-def connected(sname, cid, user, addr, port):
-    log.debug("connected(): %s" % sname)
+def connected(sock, addr, port):
+    log.debug("connected(): %s" % sock.sname)
 
-def data(sname, cid, user, buf):
-    log.debug("data(): %s" % sname)
-    for line in user.lines(str(buf)):
-        send(cid, line + "\n")
+def data(sock, buf):
+    log.debug("data(): %s" % sock.sname)
+    for line in sock.user.lines(str(buf)):
+        send(sock.id, line + "\n")
 
-def rdexpire(sname, cid, user, ms):
-    log.debug("rdexpire(): %s" % sname)
+def rdexpire(sock, ms):
+    log.debug("rdexpire(): %s" % sock.sname)
     send(cid, "are you there?\n")
 
-def wrexpire(sname, cid, user, ms):
-    log.debug("wrexpire(): %s" % sname)
+def wrexpire(sock, ms):
+    log.debug("wrexpire(): %s" % sock.sname)
 
-def expire(sname, tid, user, ms):
-    log.debug("expire(): %s" % sname)
+def expire(timer, ms):
+    log.debug("expire(): %s" % timer.sname)

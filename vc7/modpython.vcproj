@@ -123,6 +123,9 @@
 			<File
 				RelativePath="..\src\cpp\augas\modpython.c">
 			</File>
+			<File
+				RelativePath="..\src\cpp\augas\pyobject.c">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

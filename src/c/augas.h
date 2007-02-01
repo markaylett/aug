@@ -228,7 +228,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*resettimer_)(const char* sname, augas_id tid, unsigned ms);
+    int (*resettimer_)(augas_id tid, unsigned ms);
 
     /**
        \brief TODO
@@ -237,7 +237,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*canceltimer_)(const char* sname, augas_id tid);
+    int (*canceltimer_)(augas_id tid);
 };
 
 /**

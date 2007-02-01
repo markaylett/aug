@@ -61,7 +61,9 @@ PY_LDFLAGS=`$(SHELL) $(top_srcdir)/src/sh/pyflags -l`
 AM_CFLAGS = $(PY_CFLAGS)
 
 mod_LTLIBRARIES += modpython.la
-modpython_la_SOURCES = modpython.c
+modpython_la_SOURCES = \
+	modpython.c \
+	pyobject.c
 modpython_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
 modpython_la_LIBADD =
 
