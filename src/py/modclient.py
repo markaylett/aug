@@ -1,7 +1,7 @@
 from augas import *
 import log
 
-class Client:
+class State:
     def __del__(self):
         log.info("destroying State object")
 
@@ -15,13 +15,13 @@ class Client:
         if self.timer != None:
             canceltimer(self.timer)
 
-    def done(self):
+    def more(self):
         self.n = self.n - 1
-        return self.n < 0
+        return 0 <= self.n
 
     def expire(self):
-        if not self.done():
-            send(self.sock, "hello, world!\n")
+        if self.more():
+            send(self.sock, "hello, world!")
         else:
             log.info("done: shutting client connection")
             shutdown(self.sock)
@@ -39,10 +39,11 @@ def closed(sock):
 
 def connected(sock, addr, port):
     log.info("client established, starting timer")
-    sock.user = Client(sock)
+    sock.user = State(sock)
 
 def data(sock, buf):
     log.info("received by client: %s" % buf)
 
 def expire(timer, ms):
+    log.info("timer expired")
     return timer.user.expire()

@@ -1,37 +1,11 @@
-#if defined(_WIN32)
-# undef _DEBUG
-# include <direct.h>
-#endif /* _WIN32 */
-
-#include <Python.h>
+#include "pyobject.h"
 #include <augas.h>
 
 #include <stdlib.h>
 
-#define CHECKPOINT_                                                 \
-    host_->writelog_(AUGAS_LOGDEBUG,                                \
-                    "checkpoint at " __FILE__ " line %d", __LINE__)
-
-extern PyTypeObject*
-pycreatetype(const struct augas_host* host);
-
-extern PyObject*
-pycreateobject(PyTypeObject* type, const char* sname, int id, PyObject* user);
-
-extern void
-pysetid(PyObject* self, int id);
-
-extern int
-pygetid(PyObject* self);
-
-extern PyObject*
-pysetuser(PyObject* self, PyObject* user);
-
-extern PyObject*
-pygetuser(PyObject* self);
-
-extern void
-pycheckobjects(void);
+#if defined(_WIN32)
+# include <direct.h>
+#endif /* _WIN32 */
 
 struct import_ {
     PyObject* module_;
@@ -759,6 +733,7 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
 {
     struct import_* import = sock->sess_->user_;
     PyObject* x, * y;
+    int ret = 0;
     assert(sock->sess_->user_);
     assert(sock->user_);
 
@@ -771,10 +746,9 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
         /* closed() will not be called if accept() fails. */
 
         printerr_();
-        return -1;
-    }
+        ret = -1;
 
-    if (import->accept_) {
+    } else if (import->accept_) {
 
         PyObject* z = PyObject_CallFunction(import->accept_, "OsH",
                                             y, addr, port);
@@ -787,13 +761,15 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
             Py_DECREF(y);
             return -1;
 
-        } else if (z == Py_False) {
+        }
+
+        if (z == Py_False) {
 
             /* closed() will not be called if accept() fails. */
 
-            Py_DECREF(z);
             Py_DECREF(y);
-            return -1;
+            y = NULL;
+            ret = -1;
         }
 
         Py_DECREF(z);
@@ -802,7 +778,7 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
     /* The original user data is still retained by the listener. */
 
     sock->user_ = y;
-    return 0;
+    return ret;
 }
 
 static int

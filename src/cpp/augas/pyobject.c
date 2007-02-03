@@ -1,11 +1,10 @@
-#if defined(_WIN32)
-# undef _DEBUG
-#endif /* _WIN32 */
-
-#include <Python.h>
+#include "pyobject.h"
 #include <structmember.h>
 
 #include <augas.h>
+
+/* Implementation note: always reassign members before decrementing reference
+   counts. */
 
 static const struct augas_host* host_ = NULL;
 static int objects_ = 0;
