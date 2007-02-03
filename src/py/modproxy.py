@@ -9,10 +9,10 @@ def init(sname):
 
 def closed(sock):
     global pairs
-    if pairs.has_key(sock.id):
-        to = pairs[sock.id]
-        log.info("closing proxy pair: (%d, %d)" % (sock.id, to))
-        del pairs[sock.id]
+    if pairs.has_key(sock):
+        to = pairs[sock]
+        log.info("closing proxy pair: %s -> %s" % (sock, to))
+        del pairs[sock]
         del pairs[to]
         shutdown(to)
 
@@ -20,14 +20,14 @@ def accept(sock, addr, port):
     global pairs
     log.info("opening proxy pair")
     # connected() will always be called after tcpconnect() returns.
-    to = tcpconnect(sock.sname, "localhost", getenv("session.modproxy.to"), sock.id)
-    pairs[sock.id] = to
-    pairs[to] = sock.id
+    to = tcpconnect(sock.sname, "localhost", getenv("session.modproxy.to"), None)
+    pairs[sock] = to
+    pairs[to] = sock
 
 def connected(sock, addr, port):
     log.info("proxy pair established")
 
 def data(sock, buf):
     # It is safe to send to a connection that has not been fully established.
-    if pairs.has_key(sock.id):
-        send(pairs[sock.id], buf)
+    if pairs.has_key(sock):
+        send(pairs[sock], buf)

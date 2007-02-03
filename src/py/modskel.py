@@ -2,23 +2,23 @@ from augas import *
 from buffer import *
 import log
 
-# void writelog (int level, string msg);
-# string error (void);
-# void reconf (void);
-# void stop (void);
-# void post (string sname, int type, object user);
-# void delegate (string sname, int type, object user);
-# string getenv (string name);
-# void shutdown (int sid);
-# int tcpconnect (string sname, string host, string serv, object user);
-# int tcplisten (string sname, string host, string serv, object user);
-# void send (int cid, buffer buf);
-# void setrwtimer (int cid, unsigned ms, unsigned flags);
-# void resetrwtimer (int cid, unsigned ms, unsigned flags);
-# void cancelrwtimer (int cid, unsigned flags);
-# int settimer (string sname, int tid, unsigned ms, object user);
-# bool resettimer (int tid, unsigned ms);
-# bool canceltimer (int tid);
+# void writelog(level, msg)
+# string error()
+# void reconf()
+# void stop()
+# void post(sname, type, user)
+# void delegate(sname, type, user)
+# string getenv(name)
+# void shutdown(sock)
+# int tcpconnect(sname, host, serv, user)
+# int tcplisten(sname, host, serv, user)
+# void send(sock, buffer buf)
+# void setrwtimer(sock, ms, flags)
+# void resetrwtimer(sock, ms, flags)
+# void cancelrwtimer(sock, flags)
+# int settimer(sname, ms, user)
+# bool resettimer(timer, ms)
+# bool canceltimer(timer)
 
 def term(sname):
     log.debug("term(): %s" % sname)
@@ -34,33 +34,33 @@ def event(sname, type, user):
     log.debug("event(): %s" % sname)
 
 def closed(sock):
-    log.debug("closed(): %s" % sock.sname)
+    log.debug("closed(): %s" % sock)
 
 def teardown(sock):
-    log.debug("teardown(): %s" % sock.sname)
+    log.debug("teardown(): %s" % sock)
     for line in sock.user.lines(str(buf)):
-        send(sock.id, sock.user.tail + "\n")
-    shutdown(sock.id)
+        send(sock, sock.user.tail + "\n")
+    shutdown(sock)
 
 def accept(sock, addr, port):
-    log.debug("accept(): %s" % sock.sname)
+    log.debug("accept(): %s" % sock)
     sock.user = Buffer()
-    setrwtimer(sock.id, 5000, TIMRD)
+    setrwtimer(sock, 5000, TIMRD)
 
 def connected(sock, addr, port):
-    log.debug("connected(): %s" % sock.sname)
+    log.debug("connected(): %s" % sock)
 
 def data(sock, buf):
-    log.debug("data(): %s" % sock.sname)
+    log.debug("data(): %s" % sock)
     for line in sock.user.lines(str(buf)):
-        send(sock.id, line + "\n")
+        send(sock, line + "\n")
 
 def rdexpire(sock, ms):
-    log.debug("rdexpire(): %s" % sock.sname)
-    send(cid, "are you there?\n")
+    log.debug("rdexpire(): %s" % sock)
+    send(sock, "are you there?\n")
 
 def wrexpire(sock, ms):
-    log.debug("wrexpire(): %s" % sock.sname)
+    log.debug("wrexpire(): %s" % sock)
 
 def expire(timer, ms):
-    log.debug("expire(): %s" % timer.sname)
+    log.debug("expire(): %s" % timer)

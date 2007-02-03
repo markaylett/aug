@@ -6,4 +6,4 @@ def init(sname):
 
 def data(sock, buf):
     log.info("echoing data")
-    send(sock.id, buf)
+    send(sock, buf)

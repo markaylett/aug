@@ -5,14 +5,15 @@ class Client:
     def __del__(self):
         log.info("destroying State object")
 
-    def __init__(self, sname, cid):
-        self.sname = sname
-        self.cid = cid
-        self.tid = settimer(sname, 0, 10, self)
+    def __init__(self, sock):
+        self.sock = sock
+        self.timer = settimer(sock.sname, 10, self)
         self.n = 10
 
     def cancel(self):
-        canceltimer(self.tid)
+        self.sock = None
+        if self.timer != None:
+            canceltimer(self.timer)
 
     def done(self):
         self.n = self.n - 1
@@ -20,10 +21,11 @@ class Client:
 
     def expire(self):
         if not self.done():
-            send(self.cid, "hello, world!")
+            send(self.sock, "hello, world!\n")
         else:
             log.info("done: shutting client connection")
-            shutdown(self.cid)
+            shutdown(self.sock)
+            self.timer = None
             return 0
 
 def init(sname):
@@ -37,7 +39,7 @@ def closed(sock):
 
 def connected(sock, addr, port):
     log.info("client established, starting timer")
-    sock.user = Client(sock.sname, sock.id)
+    sock.user = Client(sock)
 
 def data(sock, buf):
     log.info("received by client: %s" % buf)

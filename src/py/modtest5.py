@@ -8,10 +8,10 @@ def term(sname):
 
 def init(sname):
     log.debug("init(): %s" % sname)
-    settimer(sname, 0, 1000, "our timer")
+    settimer(sname, 1000, "our timer")
 
 def expire(timer, ms):
-    log.debug("expire(): %s" % timer.sname)
+    log.debug("expire(): %s" % timer)
     if timer.user != "our timer":
         log.error("unexpected user in expire()")
     stop()

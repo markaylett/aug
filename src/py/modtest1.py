@@ -9,6 +9,7 @@ def term(sname):
 def init(sname):
     log.debug("init(): %s" % sname)
     o = Object("test", 101, "our object")
+    log.debug("str(): %s" % o)
     if o.sname != "test":
         log.error("object returned unexpected sname")
     if o.id != 101:
