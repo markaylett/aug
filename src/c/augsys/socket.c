@@ -151,18 +151,6 @@ aug_inetloopback(int af)
 }
 
 AUGSYS_API int
-aug_setsockerrinfo(int s)
-{
-    int err;
-    socklen_t len = sizeof(err);
-    if (-1 == aug_getsockopt(s, SOL_SOCKET, SO_ERROR, &err, &len))
-        return -1;
-
-    aug_setposixerrinfo(NULL, __FILE__, __LINE__, err);
-    return 0;
-}
-
-AUGSYS_API int
 aug_acceptlost(void)
 {
     switch (aug_errno()) {

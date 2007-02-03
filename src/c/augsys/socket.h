@@ -147,9 +147,6 @@ aug_inetany(int af);
 AUGSYS_API const struct aug_inetaddr*
 aug_inetloopback(int af);
 
-AUGSYS_API int
-aug_setsockerrinfo(int s);
-
 /**
    After a failed call to aug_accept(), this function can be used to determine
    whether the error was a result of the peer closing the connection.  This

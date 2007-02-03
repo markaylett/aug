@@ -22,6 +22,16 @@ struct aug_connector_ {
     int fd_;
 };
 
+static int
+getsockerr_(int s, int* err)
+{
+    socklen_t len = sizeof(*err);
+    if (-1 == aug_getsockopt(s, SOL_SOCKET, SO_ERROR, err, &len))
+        return -1;
+
+    return 0;
+}
+
 AUGNET_API aug_connector_t
 aug_createconnector(const char* host, const char* serv)
 {
@@ -110,8 +120,12 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
             /* No more addresses: set error to connection failure reason. */
 
-            aug_setsockerrinfo(fd);
-            aug_close(fd);
+            {
+                int err = ECONNREFUSED;
+                getsockerr_(fd, &err);
+                aug_close(fd); /* May set errno */
+                aug_setposixerrinfo(NULL, __FILE__, __LINE__, err);
+            }
             return -1;
         }
     }
