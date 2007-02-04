@@ -1,4 +1,4 @@
-#include "pyobject.h"
+#include "augpy/object.h"
 #include <augas.h>
 
 #include <stdlib.h>
@@ -50,11 +50,11 @@ setpath_(void)
     if ((s = host_->getenv_("rundir")))
         chdir(s);
 
-    if (!(s = host_->getenv_("module.modpython.pythonpath")))
+    if (!(s = host_->getenv_("module.modaugpy.pythonpath")))
         s = "bin";
     else
         host_->writelog_(AUGAS_LOGDEBUG,
-                         "module.modpython.pythonpath=[%s]", s);
+                         "module.modaugpy.pythonpath=[%s]", s);
 
     chdir(s);
 
@@ -301,7 +301,7 @@ pyshutdown_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!:shutdown", pytype_, &sock))
         return NULL;
 
-    if (-1 == host_->shutdown_(pygetid(sock))) {
+    if (-1 == host_->shutdown_(augpy_getid(sock))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -320,7 +320,7 @@ pytcpconnect_(PyObject* self, PyObject* args)
                           &user))
         return NULL;
 
-    if (!(sock = pycreateobject(pytype_, sname, 0, user)))
+    if (!(sock = augpy_createobject(pytype_, sname, 0, user)))
         return NULL;
 
     if (-1 == (cid = host_->tcpconnect_(sname, host, serv, sock))) {
@@ -328,7 +328,7 @@ pytcpconnect_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    pysetid(sock, cid);
+    augpy_setid(sock, cid);
     return incret_(sock);
 }
 
@@ -343,7 +343,7 @@ pytcplisten_(PyObject* self, PyObject* args)
                           &user))
         return NULL;
 
-    if (!(sock = pycreateobject(pytype_, sname, 0, user)))
+    if (!(sock = augpy_createobject(pytype_, sname, 0, user)))
         return NULL;
 
     if (-1 == (lid = host_->tcplisten_(sname, host, serv, sock))) {
@@ -351,7 +351,7 @@ pytcplisten_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    pysetid(sock, lid);
+    augpy_setid(sock, lid);
     return incret_(sock);
 }
 
@@ -365,7 +365,7 @@ pysend_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!s#:send", pytype_, &sock, &buf, &size))
         return NULL;
 
-    if (-1 == host_->send_(pygetid(sock), buf, size)) {
+    if (-1 == host_->send_(augpy_getid(sock), buf, size)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -383,7 +383,7 @@ pysetrwtimer_(PyObject* self, PyObject* args)
                           pytype_, &sock, &ms, &flags))
         return NULL;
 
-    if (-1 == host_->setrwtimer_(pygetid(sock), ms, flags)) {
+    if (-1 == host_->setrwtimer_(augpy_getid(sock), ms, flags)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -401,7 +401,7 @@ pyresetrwtimer_(PyObject* self, PyObject* args)
                           pytype_, &sock, &ms, &flags))
         return NULL;
 
-    if (-1 == host_->resetrwtimer_(pygetid(sock), ms, flags)) {
+    if (-1 == host_->resetrwtimer_(augpy_getid(sock), ms, flags)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -418,7 +418,7 @@ pycancelrwtimer_(PyObject* self, PyObject* args)
                           pytype_, &sock, &flags))
         return NULL;
 
-    if (-1 == host_->cancelrwtimer_(pygetid(sock), flags)) {
+    if (-1 == host_->cancelrwtimer_(augpy_getid(sock), flags)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -437,7 +437,7 @@ pysettimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "sIO:settimer", &sname, &ms, &user))
         return NULL;
 
-    if (!(timer = pycreateobject(pytype_, sname, 0, user)))
+    if (!(timer = augpy_createobject(pytype_, sname, 0, user)))
         return NULL;
 
     if (-1 == (tid = host_->settimer_(sname, 0, ms, timer, free_))) {
@@ -445,7 +445,7 @@ pysettimer_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    pysetid(timer, tid);
+    augpy_setid(timer, tid);
     return incret_(timer);
 }
 
@@ -458,7 +458,7 @@ pyresettimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!I:resettimer", pytype_, &timer, &ms))
         return NULL;
 
-    switch (host_->resettimer_(pygetid(timer), ms)) {
+    switch (host_->resettimer_(augpy_getid(timer), ms)) {
     case -1:
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
@@ -477,7 +477,7 @@ pycanceltimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!:canceltimer", pytype_, &timer))
         return NULL;
 
-    switch (host_->canceltimer_(pygetid(timer))) {
+    switch (host_->canceltimer_(augpy_getid(timer))) {
     case -1:
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
@@ -563,7 +563,7 @@ pyfree_(void)
 
         host_->writelog_(AUGAS_LOGDEBUG, "finalising python interpreter");
         Py_Finalize();
-        pycheckobjects();
+        augpy_checkobjects();
     }
 }
 
@@ -581,7 +581,7 @@ pycreate_(void)
     if (!(pyaugas_ = Py_InitModule("augas", pymethods_)))
         goto fail;
 
-    pytype_ = pycreatetype(host_);
+    pytype_ = augpy_createtype(host_);
     PyModule_AddObject(pyaugas_, "Object", (PyObject*)pytype_);
 
     PyModule_AddIntConstant(pyaugas_, "LOGCRIT", AUGAS_LOGCRIT);
@@ -737,8 +737,8 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
     assert(sock->sess_->user_);
     assert(sock->user_);
 
-    x = pygetuser(sock->user_);
-    y = pycreateobject(pytype_, sock->sess_->name_, sock->id_, x);
+    x = augpy_getuser(sock->user_);
+    y = augpy_createobject(pytype_, sock->sess_->name_, sock->id_, x);
     Py_DECREF(x);
 
     if (!y) {
@@ -941,7 +941,7 @@ load_(const char* name, const struct augas_host* host)
 {
     /* Fail if module has already been loaded. */
 
-    host->writelog_(AUGAS_LOGINFO, "loading modpython");
+    host->writelog_(AUGAS_LOGINFO, "loading modaugpy");
 
     if (host_)
         return NULL;
@@ -957,7 +957,7 @@ load_(const char* name, const struct augas_host* host)
 static void
 unload_(void)
 {
-    host_->writelog_(AUGAS_LOGINFO, "unloading modpython");
+    host_->writelog_(AUGAS_LOGINFO, "unloading modaugpy");
     pyfree_();
     host_ = 0;
 }

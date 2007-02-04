@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="modpython"
+	Name="augpy"
 	ProjectGUID="{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -13,7 +13,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="debug/modpython"
+			IntermediateDirectory="debug/augpy"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -34,12 +34,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="FALSE"
-				OutputFile="$(OutDir)/modpython.dll"
+				OutputFile="$(OutDir)/modaugpy.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/modpython.pdb"
+				ProgramDatabaseFile="$(OutDir)/modaugpy.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/modpython.lib"
+				ImportLibrary="$(OutDir)/modaugpy.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -65,7 +65,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="release/modpython"
+			IntermediateDirectory="release/augpy"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -83,13 +83,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="FALSE"
-				OutputFile="$(OutDir)/modpython.dll"
+				OutputFile="$(OutDir)/modaugpy.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/modpython.lib"
+				ImportLibrary="$(OutDir)/modaugpy.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -121,10 +121,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\cpp\augas\modpython.c">
+				RelativePath="..\src\c\augpy\module.c">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\pyobject.c">
+				RelativePath="..\src\c\augpy\object.c">
 			</File>
 		</Filter>
 		<Filter
@@ -132,7 +132,7 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\cpp\augas\pyobject.h">
+				RelativePath="..\src\c\augpy\object.h">
 			</File>
 		</Filter>
 		<Filter

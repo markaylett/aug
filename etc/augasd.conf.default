@@ -4,18 +4,18 @@ loglevel = 4
 
 sessions = modecho modproxy
 
-session.modskel.module = modpython
+session.modskel.module = modaugpy
 session.modskel.serv = 7000
 
-session.modecho.module = modpython
+session.modecho.module = modaugpy
 session.modecho.serv = 7001
 
-session.modproxy.module = modpython
+session.modproxy.module = modaugpy
 session.modproxy.serv = 7002
 session.modproxy.to = 7001
 
-session.modclient.module = modpython
+session.modclient.module = modaugpy
 session.modclient.to = 7002
 
-module.modpython.path = mod/modpython.so
-module.modpython.pythonpath = python
+module.modaugpy.path = mod/modaugpy.so
+module.modaugpy.pythonpath = python

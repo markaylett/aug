@@ -6,8 +6,8 @@ modtest3 = test value
 
 sessions = modstop modtest3
 
-session.modstop.module = modpython
-session.modtest3.module = modpython
+session.modstop.module = modaugpy
+session.modtest3.module = modaugpy
 
-module.modpython.path = .libs/modpython.${modext}
-module.modpython.pythonpath = ../../py
+module.modaugpy.path = ../../c/augpy/.libs/modaugpy.${modext}
+module.modaugpy.pythonpath = ../../py

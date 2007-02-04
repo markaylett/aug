@@ -166,6 +166,7 @@ AC_CONFIG_FILES([Makefile
                  src/c/Makefile
                  src/c/augmar/Makefile
                  src/c/augnet/Makefile
+                 src/c/augpy/Makefile
                  src/c/augres/Makefile
                  src/c/augsrv/Makefile
                  src/c/augsrv/posix/Makefile

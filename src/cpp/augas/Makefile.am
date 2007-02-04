@@ -55,19 +55,3 @@ mod_LTLIBRARIES = modskel.la
 modskel_la_SOURCES = modskel.c
 modskel_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modskel_la_LIBADD =
-
-if ENABLE_PYTHON
-PY_CFLAGS=`$(SHELL) $(top_srcdir)/src/sh/pyflags -c`
-PY_LDFLAGS=`$(SHELL) $(top_srcdir)/src/sh/pyflags -l`
-AM_CFLAGS = $(PY_CFLAGS)
-
-mod_LTLIBRARIES += modpython.la
-modpython_la_SOURCES = \
-	modpython.c \
-	pyobject.c
-modpython_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
-modpython_la_LIBADD =
-
-TESTS = \
-	test.sh
-endif

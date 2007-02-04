@@ -4,8 +4,8 @@ loglevel = 7
 
 sessions = modstop modtest7
 
-session.modstop.module = modpython
-session.modtest7.module = modpython
+session.modstop.module = modaugpy
+session.modtest7.module = modaugpy
 
-module.modpython.path = .libs/modpython.${modext}
-module.modpython.pythonpath = ../../py
+module.modaugpy.path = ../../c/augpy/.libs/modaugpy.${modext}
+module.modaugpy.pythonpath = ../../py

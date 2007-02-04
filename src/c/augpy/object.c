@@ -1,4 +1,4 @@
-#include "pyobject.h"
+#include "augpy/object.h"
 #include <structmember.h>
 
 #include <augas.h>
@@ -227,7 +227,7 @@ static PyTypeObject pytype_ = {
 };
 
 PyTypeObject*
-pycreatetype(const struct augas_host* host)
+augpy_createtype(const struct augas_host* host)
 {
     host_ = host;
     if (-1 == PyType_Ready(&pytype_))
@@ -238,7 +238,8 @@ pycreatetype(const struct augas_host* host)
 }
 
 PyObject*
-pycreateobject(PyTypeObject* type, const char* sname, int id, PyObject* user)
+augpy_createobject(PyTypeObject* type, const char* sname, int id,
+                   PyObject* user)
 {
     pyobject* self = PyObject_GC_New(pyobject, type);
     if (!self)
@@ -264,21 +265,21 @@ pycreateobject(PyTypeObject* type, const char* sname, int id, PyObject* user)
 }
 
 void
-pysetid(PyObject* self, int id)
+augpy_setid(PyObject* self, int id)
 {
     pyobject* x = (pyobject*)self;
     x->id_ = id;
 }
 
 int
-pygetid(PyObject* self)
+augpy_getid(PyObject* self)
 {
     pyobject* x = (pyobject*)self;
     return x->id_;
 }
 
 void
-pysetuser(PyObject* self, PyObject* user)
+augpy_setuser(PyObject* self, PyObject* user)
 {
     pyobject* x = (pyobject*)self;
     PyObject* tmp = x->user_;
@@ -288,7 +289,7 @@ pysetuser(PyObject* self, PyObject* user)
 }
 
 PyObject*
-pygetuser(PyObject* self)
+augpy_getuser(PyObject* self)
 {
     pyobject* x = (pyobject*)self;
     Py_INCREF(x->user_);
@@ -296,7 +297,7 @@ pygetuser(PyObject* self)
 }
 
 void
-pycheckobjects(void)
+augpy_checkobjects(void)
 {
     int level = objects_ ? AUGAS_LOGERROR : AUGAS_LOGINFO;
     host_->writelog_(level, "allocated objects: %d", objects_);
