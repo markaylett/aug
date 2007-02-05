@@ -23,8 +23,8 @@ aug_freetimers(struct aug_timers* timers);
    allocated timer id can be specified.  In which case, any timer with a
    matching id will be cancelled prior to setting the new timer.
 
-   aug_freevar() will be called if aug_settimer() fails or else when the timer
-   is removed.
+   If aug_settimer() succeeds, aug_freevar() will be called when the timer is
+   removed.
 
    \return the timer id.
 */

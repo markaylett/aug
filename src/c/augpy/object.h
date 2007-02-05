@@ -31,7 +31,7 @@ augpy_setuser(PyObject* self, PyObject* user);
 PyObject*
 augpy_getuser(PyObject* self);
 
-void
-augpy_checkobjects(void);
+int
+augpy_objects(void);
 
 #endif /* AUGPY_OBJECT_H */

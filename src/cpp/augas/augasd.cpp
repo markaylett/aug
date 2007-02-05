@@ -98,12 +98,15 @@ namespace augas {
     struct eventarg {
         string sname_;
         aug_var arg_;
+        bool free_;
         ~eventarg() AUG_NOTHROW
         {
-            aug_freevar(&arg_);
+            if (free_)
+                aug_freevar(&arg_);
         }
         eventarg(const string& sname, void* arg, void (*free)(void*))
-            : sname_(sname)
+            : sname_(sname),
+              free_(false)
         {
             aug_setvarp(&arg_, arg, free);
         }
@@ -265,6 +268,7 @@ namespace augas {
             e.type_ = AUGAS_MODEVENT + type;
             aug_setvarp(&e.arg_, arg.get(), 0);
             writeevent(aug_eventout(), e);
+            arg->free_ = true;
             arg.release();
             return 0;
 
@@ -458,17 +462,24 @@ namespace augas {
     }
 
     int
-    settimer_(const char* sname, int id, unsigned ms, void* arg,
-              void (*free)(void*))
+    settimer_(const char* sname, unsigned ms, void* arg, void (*free)(void*))
     {
-        AUG_DEBUG2("settimer(): sname=[%s], id=[%d], ms=[%u]", sname, id, ms);
+        AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
 
+            augas_id id(aug_nextid());
             var v(arg, free);
-            id = aug_settimer(cptr(state_->timers_), id, ms, timercb_,
-                              cptr(v));
-            if (0 < id)
-                state_->pending_[id] = state_->manager_.getsess(sname);
+
+            // If aug_settimer() succeeds, it will call free() on var when the
+            // timer is destroyed.  The session is added to the container
+            // first to minimise the chance of failure after aug_settimer()
+            // has been called.
+
+            state_->pending_[id] = state_->manager_.getsess(sname);
+            if (-1 == aug_settimer(cptr(state_->timers_), id, ms, timercb_,
+                                   cptr(v)))
+                state_->pending_.erase(id);
+
             return id;
 
         } AUG_SETERRINFOCATCH;

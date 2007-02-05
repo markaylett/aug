@@ -87,15 +87,12 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
     else
         aug_canceltimer(timers, id);
 
-    if (-1 == expiry_(&tv, ms)) {
-        aug_freevar(arg);
+    if (-1 == expiry_(&tv, ms))
         return -1;
-    }
 
     aug_lock();
     if (!(timer = allocate_())) {
         aug_unlock();
-        aug_freevar(arg);
         return -1;
     }
     aug_unlock();
@@ -108,7 +105,7 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
     aug_setvar(&timer->arg_, arg);
     insert_(timers, timer);
 
-    return timer->id_;
+    return id;
 }
 
 AUGUTIL_API int

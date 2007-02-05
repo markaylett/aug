@@ -18,7 +18,6 @@ noinst_HEADERS = \
 	module.hpp \
 	object.hpp \
 	options.hpp \
-	pyobject.h \
 	rwtimer.hpp \
 	server.hpp \
 	sess.hpp \

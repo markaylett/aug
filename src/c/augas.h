@@ -218,7 +218,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*settimer_)(const char* sname, augas_id tid, unsigned ms, void* user,
+    int (*settimer_)(const char* sname, unsigned ms, void* user,
                      void (*free_)(void*));
 
     /**

@@ -5,13 +5,13 @@ EXTRA_DIST = \
 	augmar.vcproj \
 	augnetpp.vcproj \
 	augnet.vcproj \
+	augpy.vcproj \
 	augsrvpp.vcproj \
 	augsrv.vcproj \
 	augsyspp.vcproj \
 	augsys.vcproj \
 	augutilpp.vcproj \
 	augutil.vcproj \
-	modpython.vcproj \
 	setup.vdproj \
 	install.bat \
 	reconf.bat \

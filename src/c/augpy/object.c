@@ -14,17 +14,17 @@ typedef struct {
     PyObject* sname_;
     int id_;
     PyObject* user_;
-} pyobject;
+} object_;
 
-static PyMemberDef pymembers_[] = {
+static PyMemberDef members_[] = {
     {
-        "user", T_OBJECT_EX, offsetof(pyobject, user_), 0, "TODO"
+        "user", T_OBJECT_EX, offsetof(object_, user_), 0, "TODO"
     },
     { NULL }
 };
 
 static int
-pyclear_(pyobject* self)
+clear_(object_* self)
 {
     PyObject* tmp;
 
@@ -40,19 +40,19 @@ pyclear_(pyobject* self)
 }
 
 static void
-pydealloc_(pyobject* self)
+dealloc_(object_* self)
 {
     --objects_;
     host_->writelog_(AUGAS_LOGDEBUG,
                      "deallocated: <augas.Object at %p, sname='%s', id=%d>",
                      (void*)self, PyString_AsString(self->sname_), self->id_);
 
-    pyclear_(self);
+    clear_(self);
     self->ob_type->tp_free((PyObject*)self);
 }
 
 static int
-pycompare_(pyobject* lhs, pyobject* rhs)
+compare_(object_* lhs, object_* rhs)
 {
     int ret;
     if (lhs->id_ < rhs->id_)
@@ -65,7 +65,7 @@ pycompare_(pyobject* lhs, pyobject* rhs)
 }
 
 static PyObject*
-pyrepr_(pyobject* self)
+repr_(object_* self)
 {
     return PyString_FromFormat("<augas.Object at %p, sname='%s', id=%d>",
                                (void*)self, PyString_AsString(self->sname_),
@@ -73,7 +73,7 @@ pyrepr_(pyobject* self)
 }
 
 static long
-pyhash_(pyobject* self)
+hash_(object_* self)
 {
     /* Must not return -1. */
 
@@ -81,14 +81,14 @@ pyhash_(pyobject* self)
 }
 
 static PyObject*
-pystr_(pyobject* self)
+str_(object_* self)
 {
     return PyString_FromFormat("('%s', %d)", PyString_AsString(self->sname_),
                                self->id_);
 }
 
 static int
-pytraverse_(pyobject* self, visitproc visit, void* arg)
+traverse_(object_* self, visitproc visit, void* arg)
 {
     int ret;
 
@@ -108,7 +108,7 @@ pytraverse_(pyobject* self, visitproc visit, void* arg)
 }
 
 static int
-pyinit_(pyobject* self, PyObject* args, PyObject* kwds)
+init_(object_* self, PyObject* args, PyObject* kwds)
 {
     PyObject* sname = NULL, * user = NULL, * tmp;
 
@@ -136,11 +136,11 @@ pyinit_(pyobject* self, PyObject* args, PyObject* kwds)
 }
 
 static PyObject*
-pynew_(PyTypeObject* type, PyObject* args, PyObject* kwds)
+new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
 {
-    pyobject* self;
+    object_* self;
 
-    self = (pyobject*)type->tp_alloc(type, 0);
+    self = (object_*)type->tp_alloc(type, 0);
     if (self) {
 
         if (!(self->sname_ = PyString_FromString(""))) {
@@ -162,68 +162,69 @@ pynew_(PyTypeObject* type, PyObject* args, PyObject* kwds)
 }
 
 static PyObject*
-pygetsname_(pyobject* self, void *closure)
+getsname_(object_* self, void *closure)
 {
     Py_INCREF(self->sname_);
     return self->sname_;
 }
 
 static PyObject*
-pygetid_(pyobject* self, void *closure)
+getid_(object_* self, void *closure)
 {
     return Py_BuildValue("i", self->id_);
 }
 
-static PyGetSetDef pygetset_[] = {
+static PyGetSetDef getset_[] = {
     {
-        "sname", (getter)pygetsname_, NULL, "TODO", NULL
+        "sname", (getter)getsname_, NULL, "TODO", NULL
     },
     {
-        "id", (getter)pygetid_, NULL, "TODO", NULL
+        "id", (getter)getid_, NULL, "TODO", NULL
     },
     { NULL }  /* Sentinel */
 };
 
 static PyTypeObject pytype_ = {
     PyObject_HEAD_INIT(NULL)
-    0,                      /*ob_size*/
-    "augas.Object",         /*tp_name*/
-    sizeof(pyobject),       /*tp_basicsize*/
-    0,                      /*tp_itemsize*/
-    (destructor)pydealloc_, /*tp_dealloc*/
-    0,                      /*tp_print*/
-    0,                      /*tp_getattr*/
-    0,                      /*tp_setattr*/
-    (cmpfunc)pycompare_,    /*tp_compare*/
-    (reprfunc)pyrepr_,      /*tp_repr*/
-    0,                      /*tp_as_number*/
-    0,                      /*tp_as_sequence*/
-    0,                      /*tp_as_mapping*/
-    (hashfunc)pyhash_,      /*tp_hash */
-    0,                      /*tp_call*/
-    (reprfunc)pystr_,       /*tp_str*/
-    0,                      /*tp_getattro*/
-    0,                      /*tp_setattro*/
-    0,                      /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, /*tp_flags*/
-    "TODO",                 /* tp_doc */
-    (traverseproc)pytraverse_, /* tp_traverse */
-    (inquiry)pyclear_,      /* tp_clear */
-    0,                      /* tp_richcompare */
-    0,                      /* tp_weaklistoffset */
-    0,                      /* tp_iter */
-    0,                      /* tp_iternext */
-    0,                      /* tp_methods */
-    pymembers_,             /* tp_members */
-    pygetset_,              /* tp_getset */
-    0,                      /* tp_base */
-    0,                      /* tp_dict */
-    0,                      /* tp_descr_get */
-    0,                      /* tp_descr_set */
-    0,                      /* tp_dictoffset */
-    (initproc)pyinit_,      /* tp_init */
-    0,                      /* tp_alloc */
-    pynew_,                 /* tp_new */
+    0,                       /*ob_size*/
+    "augas.Object",          /*tp_name*/
+    sizeof(object_),         /*tp_basicsize*/
+    0,                       /*tp_itemsize*/
+    (destructor)dealloc_,    /*tp_dealloc*/
+    0,                       /*tp_print*/
+    0,                       /*tp_getattr*/
+    0,                       /*tp_setattr*/
+    (cmpfunc)compare_,       /*tp_compare*/
+    (reprfunc)repr_,         /*tp_repr*/
+    0,                       /*tp_as_number*/
+    0,                       /*tp_as_sequence*/
+    0,                       /*tp_as_mapping*/
+    (hashfunc)hash_,         /*tp_hash */
+    0,                       /*tp_call*/
+    (reprfunc)str_,          /*tp_str*/
+    0,                       /*tp_getattro*/
+    0,                       /*tp_setattro*/
+    0,                       /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE
+    | Py_TPFLAGS_HAVE_GC,    /*tp_flags*/
+    "TODO",                  /* tp_doc */
+    (traverseproc)traverse_, /* tp_traverse */
+    (inquiry)clear_,         /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    0,                       /* tp_methods */
+    members_,                /* tp_members */
+    getset_,                 /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    (initproc)init_,         /* tp_init */
+    0,                       /* tp_alloc */
+    new_,                    /* tp_new */
 };
 
 PyTypeObject*
@@ -241,7 +242,7 @@ PyObject*
 augpy_createobject(PyTypeObject* type, const char* sname, int id,
                    PyObject* user)
 {
-    pyobject* self = PyObject_GC_New(pyobject, type);
+    object_* self = PyObject_GC_New(object_, type);
     if (!self)
         return NULL;
 
@@ -267,21 +268,21 @@ augpy_createobject(PyTypeObject* type, const char* sname, int id,
 void
 augpy_setid(PyObject* self, int id)
 {
-    pyobject* x = (pyobject*)self;
+    object_* x = (object_*)self;
     x->id_ = id;
 }
 
 int
 augpy_getid(PyObject* self)
 {
-    pyobject* x = (pyobject*)self;
+    object_* x = (object_*)self;
     return x->id_;
 }
 
 void
 augpy_setuser(PyObject* self, PyObject* user)
 {
-    pyobject* x = (pyobject*)self;
+    object_* x = (object_*)self;
     PyObject* tmp = x->user_;
     Py_INCREF(user);
     x->user_ = user;
@@ -291,14 +292,13 @@ augpy_setuser(PyObject* self, PyObject* user)
 PyObject*
 augpy_getuser(PyObject* self)
 {
-    pyobject* x = (pyobject*)self;
+    object_* x = (object_*)self;
     Py_INCREF(x->user_);
     return x->user_;
 }
 
-void
-augpy_checkobjects(void)
+int
+augpy_objects(void)
 {
-    int level = objects_ ? AUGAS_LOGERROR : AUGAS_LOGINFO;
-    host_->writelog_(level, "allocated objects: %d", objects_);
+    return objects_;
 }

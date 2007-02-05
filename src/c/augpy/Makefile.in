@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -37,8 +38,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/src/c/lang.mk
+DIST_COMMON = $(am__noinst_HEADERS_DIST) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
 subdir = src/c/augpy
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -57,8 +58,9 @@ am__installdirs = "$(DESTDIR)$(moddir)"
 modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
 modaugpy_la_DEPENDENCIES =
-am__modaugpy_la_SOURCES_DIST = module.c object.c
-@ENABLE_PYTHON_TRUE@am_modaugpy_la_OBJECTS = module.lo object.lo
+am__modaugpy_la_SOURCES_DIST = entry.c module.c object.c
+@ENABLE_PYTHON_TRUE@am_modaugpy_la_OBJECTS = entry.lo module.lo \
+@ENABLE_PYTHON_TRUE@	object.lo
 modaugpy_la_OBJECTS = $(am_modaugpy_la_OBJECTS)
 @ENABLE_PYTHON_TRUE@am_modaugpy_la_rpath = -rpath $(moddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -73,6 +75,8 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(modaugpy_la_SOURCES)
 DIST_SOURCES = $(am__modaugpy_la_SOURCES_DIST)
+am__noinst_HEADERS_DIST = module.h object.h
+HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -195,8 +199,13 @@ moddir = $(prefix)/mod
 @ENABLE_PYTHON_TRUE@PY_CFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -c`
 @ENABLE_PYTHON_TRUE@PY_LDFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -l`
 @ENABLE_PYTHON_TRUE@AM_CFLAGS = $(PY_CFLAGS)
+@ENABLE_PYTHON_TRUE@noinst_HEADERS = \
+@ENABLE_PYTHON_TRUE@	module.h \
+@ENABLE_PYTHON_TRUE@	object.h
+
 @ENABLE_PYTHON_TRUE@mod_LTLIBRARIES = modaugpy.la
 @ENABLE_PYTHON_TRUE@modaugpy_la_SOURCES = \
+@ENABLE_PYTHON_TRUE@	entry.c \
 @ENABLE_PYTHON_TRUE@	module.c \
 @ENABLE_PYTHON_TRUE@	object.c
 
@@ -271,6 +280,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/entry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 
@@ -383,7 +393,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(moddir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
