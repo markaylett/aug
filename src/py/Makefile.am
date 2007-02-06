@@ -1,5 +1,6 @@
 EXTRA_DIST = \
 	buffer.py \
+	interpreter.py \
 	log.py \
 	modclient.py \
 	modecho.py \

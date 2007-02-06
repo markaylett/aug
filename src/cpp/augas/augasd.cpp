@@ -55,6 +55,8 @@ namespace augas {
     void
     openlog_()
     {
+        // The current date is appended to the log file name.
+
         tm tm;
         aug::gmtime(tm);
         stringstream ss;
@@ -69,18 +71,27 @@ namespace augas {
     doreconf_()
     {
         const char* value;
+
+        // Always set log-level first so that any subsequent log statements
+        // use the new level.
+
         if ((value = options_.get("loglevel", 0))) {
             unsigned level(strtoui(value, 10));
             AUG_DEBUG2("setting log level: level=[%d]", level);
             aug_setloglevel(level);
         }
 
-        // Other directories may be specified relative to the run directory.
+        // Other config directories may be specified relative to the run
+        // directory.
 
         aug::chdir(rundir_);
         if (daemon_) {
 
             aug::chdir(options_.get("logdir", "."));
+
+            // Cache real path so that the log file can be re-opened without
+            // having to change directories.
+
             realpath(logdir_, getcwd().c_str(), sizeof(logdir_));
 
             // Re-opening the log file facilitates rolling.
@@ -92,7 +103,7 @@ namespace augas {
         AUG_DEBUG2("rundir=[%s]", rundir_);
     }
 
-    typedef map<int, sessptr> pending;
+    typedef map<int, sessptr> idtosess;
     typedef queue<connptr> connected;
 
     struct eventarg {
@@ -119,7 +130,13 @@ namespace augas {
         manager manager_;
         aug::files files_;
         timers timers_;
-        pending pending_;
+
+        // Mapping of timer-ids to sessions.
+
+        idtosess idtosess_;
+
+        // Pending calls to connected().
+
         connected connected_;
 
         explicit
@@ -140,13 +157,13 @@ namespace augas {
     {
         AUG_DEBUG2("clearing io-event mask prior to close: fd=[%d]", fd);
         aug_setioeventmask(state_->mplexer_, fd, 0);
-        return base_->close_(fd);
+        return base_->close_(fd); // Delegate to base version.
     }
 
     void
     setextdriver_(fdref ref, filecb_base& cb, unsigned short mask)
     {
-        // Override close function.
+        // Override close() function.
 
         static aug_driver extended = { extclose_, 0, 0, 0, 0, 0 };
         if (!base_) {
@@ -172,14 +189,14 @@ namespace augas {
     {
         AUG_DEBUG2("custom timer expiry");
 
-        pending::iterator it(state_->pending_.find(id));
+        idtosess::iterator it(state_->idtosess_.find(id));
         sessptr sess(it->second);
         augas_object timer = { cptr(*sess), id, aug_getvarp(arg) };
         sess->expire(timer, *ms);
 
         if (0 == *ms) {
             AUG_DEBUG2("removing timer: ms has been set to zero");
-            state_->pending_.erase(it);
+            state_->idtosess_.erase(it);
         }
     }
 
@@ -339,11 +356,14 @@ namespace augas {
             sessptr sess(state_->manager_.getsess(sname));
             connptr cptr(new augas::client(sess, user, state_->timers_, host,
                                            serv));
+
+            // Remove on exception.
+
             scoped_insert si(state_->manager_, cptr);
 
             if (ESTABLISHED == cptr->phase()) {
 
-                // connected() must be called after this function has
+                // connected() must only be called after this function has
                 // returned.
 
                 setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
@@ -378,18 +398,22 @@ namespace augas {
                    sname, host, serv);
         try {
 
+            // Bind listener socket.
+
             endpoint ep(null);
             smartfd sfd(tcplisten(host, serv, ep));
             setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
-
-            sessptr sess(state_->manager_.getsess(sname));
-            listenerptr lptr(new augas::listener(sess, user, sfd));
-            scoped_insert si(state_->manager_, lptr);
 
             inetaddr addr(null);
             AUG_DEBUG2("listening: interface=[%s], port=[%d]",
                        inetntop(getinetaddr(ep, addr)).c_str(),
                        static_cast<int>(ntohs(port(ep))));
+
+            // Prepare state.
+
+            sessptr sess(state_->manager_.getsess(sname));
+            listenerptr lptr(new augas::listener(sess, user, sfd));
+            scoped_insert si(state_->manager_, lptr);
 
             si.commit();
             return (int)lptr->id();
@@ -472,13 +496,13 @@ namespace augas {
 
             // If aug_settimer() succeeds, it will call free() on var when the
             // timer is destroyed.  The session is added to the container
-            // first to minimise the chance of failure after aug_settimer()
+            // first to minimise any chance of failure after aug_settimer()
             // has been called.
 
-            state_->pending_[id] = state_->manager_.getsess(sname);
+            state_->idtosess_[id] = state_->manager_.getsess(sname);
             if (-1 == aug_settimer(cptr(state_->timers_), id, ms, timercb_,
                                    cptr(v)))
-                state_->pending_.erase(id);
+                state_->idtosess_.erase(id);
 
             return id;
 
@@ -509,7 +533,7 @@ namespace augas {
             // expired.
 
             if (0 == ret)
-                state_->pending_.erase(tid);
+                state_->idtosess_.erase(tid);
             return ret;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -544,13 +568,13 @@ namespace augas {
 
         // Remove any timers allocated to sessions that could not be opened.
 
-        pending::iterator it(state_->pending_.begin()),
-            end(state_->pending_.end());
+        idtosess::iterator it(state_->idtosess_.begin()),
+            end(state_->idtosess_.end());
         while (it != end) {
             if (!it->second->active()) {
                 aug_warn("cancelling timer associated with inactive session");
                 aug_canceltimer(cptr(state_->timers_), it->first);
-                state_->pending_.erase(it++);
+                state_->idtosess_.erase(it++);
             } else
                 ++it;
         }

@@ -394,6 +394,9 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
 
         if (z == Py_False) {
 
+            host_->writelog_(AUGAS_LOGDEBUG,
+                             "accept() handler returned false");
+
             /* closed() will not be called if accept() fails. */
 
             Py_DECREF(y);
@@ -478,8 +481,11 @@ rdexpire_(const struct augas_object* sock, unsigned* ms)
         PyObject* z = PyObject_CallFunction(import->rdexpire_, "OO", x, y);
 
         if (z) {
-            if (PyInt_Check(z))
+            if (PyInt_Check(z)) {
+                host_->writelog_(AUGAS_LOGDEBUG,
+                                "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
+            }
             Py_DECREF(z);
         } else {
             printerr_();
@@ -507,8 +513,11 @@ wrexpire_(const struct augas_object* sock, unsigned* ms)
         PyObject* z = PyObject_CallFunction(import->wrexpire_, "OO", x, y);
 
         if (z) {
-            if (PyInt_Check(z))
+            if (PyInt_Check(z)) {
+                host_->writelog_(AUGAS_LOGDEBUG,
+                                "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
+            }
             Py_DECREF(z);
         } else {
             printerr_();
@@ -537,8 +546,11 @@ expire_(const struct augas_object* timer, unsigned* ms)
         Py_DECREF(y);
 
         if (z) {
-            if (PyInt_Check(z))
+            if (PyInt_Check(z)) {
+                host_->writelog_(AUGAS_LOGDEBUG,
+                                "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
+            }
             Py_DECREF(z);
         } else {
             printerr_();

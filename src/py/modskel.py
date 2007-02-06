@@ -1,5 +1,6 @@
 from augas import *
 from buffer import *
+from interpreter import *
 import log
 
 # void writelog(level, msg)
@@ -20,6 +21,11 @@ import log
 # bool resettimer(timer, ms)
 # bool canceltimer(timer)
 
+interp = Interpreter({
+    "echo": lambda x: x,
+    "ping": lambda: "pong"
+    })
+
 def term(sname):
     log.debug("term(): %s" % sname)
 
@@ -34,30 +40,34 @@ def event(sname, type, user):
     log.debug("event(): %s" % sname)
 
 def closed(sock):
-    log.debug("closed(): %s" % sock)
+    log.info("closed(): %s" % sock)
 
 def teardown(sock):
     log.debug("teardown(): %s" % sock)
-    for line in sock.user.lines(str(buf)):
-        send(sock, sock.user.tail + "\n")
     shutdown(sock)
 
 def accept(sock, addr, port):
-    log.debug("accept(): %s" % sock)
+    log.info("accept(): %s" % sock)
     sock.user = Buffer()
-    setrwtimer(sock, 5000, TIMRD)
+    setrwtimer(sock, 15000, TIMRD)
+    send(sock, "OK: hello\r\n")
 
 def connected(sock, addr, port):
     log.debug("connected(): %s" % sock)
 
 def data(sock, buf):
     log.debug("data(): %s" % sock)
+    global interp
     for line in sock.user.lines(str(buf)):
-        send(sock, line + "\n")
+        s = interp(line)
+        if s == Quit:
+            shutdown(sock)
+        elif s != None:
+            send(sock, s + "\r\n")
 
 def rdexpire(sock, ms):
     log.debug("rdexpire(): %s" % sock)
-    send(sock, "are you there?\n")
+    shutdown(sock)
 
 def wrexpire(sock, ms):
     log.debug("wrexpire(): %s" % sock)

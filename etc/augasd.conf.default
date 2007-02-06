@@ -2,7 +2,7 @@ rundir = c:/program files/augas
 logdir = log
 loglevel = 4
 
-sessions = modecho modproxy
+sessions = modskel modecho modproxy
 
 session.modskel.module = modaugpy
 session.modskel.serv = 7000
