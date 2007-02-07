@@ -231,8 +231,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_1171900EB8BF4F49B56ECDB4FDFA3393"
             {
-            "SourcePath" = "8:..\\src\\py\\modskel.py"
-            "TargetName" = "8:modskel.py"
+            "SourcePath" = "8:..\\src\\py\\pyskel.py"
+            "TargetName" = "8:pyskel.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
             "Condition" = "8:"
@@ -291,8 +291,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_3436CA155BAE450689A92453AE79B404"
             {
-            "SourcePath" = "8:..\\src\\py\\modecho.py"
-            "TargetName" = "8:modecho.py"
+            "SourcePath" = "8:..\\src\\py\\pyecho.py"
+            "TargetName" = "8:pyecho.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
             "Condition" = "8:"
@@ -311,8 +311,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_35CBA93B61EE4DC4AF97087BE1EAD454"
             {
-            "SourcePath" = "8:..\\src\\py\\modproxy.py"
-            "TargetName" = "8:modproxy.py"
+            "SourcePath" = "8:..\\src\\py\\pyproxy.py"
+            "TargetName" = "8:pyproxy.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
             "Condition" = "8:"
@@ -551,8 +551,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_D5F95E1E2E6F4B849CB0661C7E6F0040"
             {
-            "SourcePath" = "8:..\\src\\py\\modclient.py"
-            "TargetName" = "8:modclient.py"
+            "SourcePath" = "8:..\\src\\py\\pyclient.py"
+            "TargetName" = "8:pyclient.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
             "Condition" = "8:"

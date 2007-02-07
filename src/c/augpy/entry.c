@@ -38,11 +38,11 @@ setpath_(void)
     if ((s = host_->getenv_("rundir")))
         chdir(s);
 
-    if (!(s = host_->getenv_("module.modaugpy.pythonpath")))
+    if (!(s = host_->getenv_("module.augpy.pythonpath")))
         s = "bin";
     else
         host_->writelog_(AUGAS_LOGDEBUG,
-                         "module.modaugpy.pythonpath=[%s]", s);
+                         "module.augpy.pythonpath=[%s]", s);
 
     chdir(s);
 
@@ -582,7 +582,7 @@ load_(const char* name, const struct augas_host* host)
 {
     /* Fail if module has already been loaded. */
 
-    host->writelog_(AUGAS_LOGINFO, "loading modaugpy");
+    host->writelog_(AUGAS_LOGINFO, "loading augpy module");
 
     if (host_)
         return NULL;
@@ -598,7 +598,7 @@ load_(const char* name, const struct augas_host* host)
 static void
 unload_(void)
 {
-    host_->writelog_(AUGAS_LOGINFO, "unloading modaugpy");
+    host_->writelog_(AUGAS_LOGINFO, "unloading augpy module");
     unloadpy_();
     host_ = 0;
 }

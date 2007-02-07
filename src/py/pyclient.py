@@ -31,7 +31,7 @@ class State:
 def init(sname):
     log.info("connecting to client's service")
     for x in xrange(1, 10):
-        tcpconnect(sname, "localhost", getenv("session.modclient.to"), None)
+        tcpconnect(sname, "localhost", getenv("session.pyclient.to"), None)
 
 def closed(sock):
     if sock.user != None:

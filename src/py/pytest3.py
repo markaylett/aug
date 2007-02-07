@@ -8,6 +8,6 @@ def term(sname):
 
 def init(sname):
     log.debug("init(): %s" % sname)
-    if getenv("modtest3") != "test value":
+    if getenv("pytest3") != "test value":
         error("unexpected value from getenv()")
     stop()

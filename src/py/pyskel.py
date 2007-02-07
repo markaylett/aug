@@ -21,17 +21,43 @@ import log
 # bool resettimer(timer, ms)
 # bool canceltimer(timer)
 
-interp = Interpreter({
-    "echo": lambda x: x,
-    "ping": lambda: "pong"
-    })
+class Commands:
+    def __init__(self):
+        self.props = {}
+
+    def do_exit(self):
+        return Quit
+
+    def do_quit(self):
+        return Quit
+
+    def do_get(self, x):
+        return self.props[x]
+
+    def do_ls(self):
+        return self.props.iteritems()
+
+    def do_set(self, x, y):
+        self.props[x] = y
+
+    def do_unset(self, x):
+        del self.props[x]
+
+interp = Interpreter(Commands())
+
+# for line in sys.stdin:
+#     x = interp(line)
+#     if x == Quit:
+#         sys.exit()
+#     elif x != None:
+#         print x
 
 def term(sname):
     log.debug("term(): %s" % sname)
 
 def init(sname):
     log.debug("init(): %s" % sname)
-    tcplisten(sname, "0.0.0.0", getenv("session.modskel.serv"), None)
+    tcplisten(sname, "0.0.0.0", getenv("session.pyskel.serv"), None)
 
 def reconf(sname):
     log.debug("reconf(): %s" % sname)
@@ -50,7 +76,7 @@ def accept(sock, addr, port):
     log.info("accept(): %s" % sock)
     sock.user = Buffer()
     setrwtimer(sock, 15000, TIMRD)
-    send(sock, "OK: hello\r\n")
+    send(sock, "+OK hello\r\n")
 
 def connected(sock, addr, port):
     log.debug("connected(): %s" % sock)
@@ -59,15 +85,16 @@ def data(sock, buf):
     log.debug("data(): %s" % sock)
     global interp
     for line in sock.user.lines(str(buf)):
-        s = interp(line)
-        if s == Quit:
+        x = interp(line)
+        if x == Quit:
+            send(sock, "+OK goodbye\r\n")
             shutdown(sock)
-        elif s != None:
-            send(sock, s + "\r\n")
+        elif x != None:
+            send(sock, x + "\r\n")
 
 def rdexpire(sock, ms):
     log.debug("rdexpire(): %s" % sock)
-    shutdown(sock)
+    send(sock, "+OK hello\r\n")
 
 def wrexpire(sock, ms):
     log.debug("wrexpire(): %s" % sock)

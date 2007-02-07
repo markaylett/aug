@@ -2,10 +2,10 @@ rundir = .
 logdir = .
 loglevel = 7
 
-sessions = modstop modtest6
+sessions = pystop pytest6
 
-session.modstop.module = modaugpy
-session.modtest6.module = modaugpy
+session.pystop.module = augpy
+session.pytest6.module = augpy
 
-module.modaugpy.path = ../../c/augpy/.libs/modaugpy.${modext}
-module.modaugpy.pythonpath = ../../py
+module.augpy.path = ../../c/augpy/.libs/modaugpy.${modext}
+module.augpy.pythonpath = ../../py

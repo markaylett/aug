@@ -7,4 +7,4 @@ class Buffer:
         ls = data.split("\n")
         self.tail = ls.pop()
         for l in ls:
-            yield l
+            yield l.rstrip("\r")

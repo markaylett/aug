@@ -11,14 +11,20 @@ class Interpreter:
         if len(line) == 0:
             return None
         toks = re.split(r"\s+", line.strip())
-        name = toks[0].lower()
-        if name == "exit" or name == "quit":
-            return Quit
-        args = toks[1:]
         try:
-            s = "OK: " + apply(self.cmds[name], args)
-        except KeyError:
-            s = "ER: invalid command: %s" % line
-        except TypeError:
-            s = "ER: invalid arguments: %s" % line
-        return s
+            x = apply(getattr(self.cmds, "do_" + toks[0].lower()), toks[1:])
+            if x is not Quit:
+                if x is None:
+                    x = "+OK"
+                elif hasattr(x, "__iter__"):
+                    x = "OK:\r\n" \
+                        + "".join(map(lambda y: str(y) + "\r\n", x)) + ".";
+                else:
+                    x = "+OK " + x
+        except AttributeError, e:
+            x = "-ERR invalid command: %s" % e
+        except TypeError, e:
+            x = "-ERR invalid arguments: %s" % e
+        except Exception, e:
+            x = "-ERR exception: %s" % e
+        return x
