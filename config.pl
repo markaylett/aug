@@ -133,17 +133,16 @@ my (
     );
 
 if (is $gcc) {
-    $flags .= (is $debug) ? '-ggdb' : '-O3 -DNDEBUG';
+    $flags = (is $debug) ? '-ggdb' : '-O3 -DNDEBUG';
+    $flags .= ' -Wno-long-long -Wno-unused-value';
+    $cflags = "$flags";
+    $cxxflags = "$flags -Wno-deprecated -Wno-unused-variable";
     if (is $strict) {
-        $flags .= ' -Wall -Werror -pedantic -Wno-unused-value';
-        $cflags = "$flags";
-        $cxxflags = "$flags -Wno-deprecated -Wno-unused-variable";
-    } else {
-        $cflags = $flags;
-        $cxxflags = $flags;
+        $cflags .= ' -Wall -Werror -pedantic';
+        $cxxflags .= ' -Wall -Werror -pedantic';
     }
 } else {
-    $flags .= (is $debug) ? '-g' : '-O -DNDEBUG';
+    $flags = (is $debug) ? '-g' : '-O -DNDEBUG';
     $cflags = $flags;
     $cxxflags = $flags;
 }

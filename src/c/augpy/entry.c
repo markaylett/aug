@@ -1,4 +1,9 @@
+/* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
+   See the file COPYING for copying permission.
+*/
+#define AUGPY_BUILD
 #include "augpy/module.h"
+
 #include "augpy/object.h"
 #include <augas.h>
 
@@ -451,7 +456,7 @@ data_(const struct augas_object* sock, const char* buf, size_t size)
     if (import->data_) {
 
         PyObject* x = sock->user_;
-        PyObject* y = PyBuffer_FromMemory((void*)buf, size);
+        PyObject* y = PyBuffer_FromMemory((void*)buf, (int)size);
         PyObject* z = PyObject_CallFunction(import->data_, "OO", x, y);
 
         if (z) {

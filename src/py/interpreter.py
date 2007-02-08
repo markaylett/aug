@@ -17,10 +17,10 @@ class Interpreter:
                 if x is None:
                     x = "+OK"
                 elif hasattr(x, "__iter__"):
-                    x = "OK:\r\n" \
-                        + "".join(map(lambda y: str(y) + "\r\n", x)) + ".";
+                    x = reduce(lambda y, z: y + str(z) + "\r\n", \
+                               x, "+OK\r\n") + ".";
                 else:
-                    x = "+OK " + x
+                    x = "+OK " + str(x)
         except AttributeError, e:
             x = "-ERR invalid command: %s" % e
         except TypeError, e:
