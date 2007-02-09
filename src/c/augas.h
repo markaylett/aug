@@ -67,19 +67,28 @@ struct augas_host {
 
     /**
        \brief Write message to server's log.
+       \param level TODO
+       \param format TODO
+       \param ... TODO
+       \sa vwritelog_().
     */
 
     void (*writelog_)(int level, const char* format, ...);
 
     /**
        \brief Write message to server's log.
+       \param level TODO
+       \param format TODO
+       \param args TODO
+       \return TODO
+       \sa writelog_().
     */
 
     void (*vwritelog_)(int level, const char* format, va_list args);
 
     /**
-       \brief Get a description of the last error.
-       \return error description
+       \brief Get a description of the last host error.
+       \return The error description.
 
        If the return values of any host function indicates failure, this
        function can be used to obtain a description of the error.
@@ -89,20 +98,24 @@ struct augas_host {
 
     /**
        \brief Re-configure the server and all loaded modules.
-       \sa TODO
+       \sa stop_().
     */
 
     void (*reconf_)(void);
 
     /**
        \brief Stop the server.
+       \sa reconf_().
     */
 
     void (*stop_)(void);
 
     /**
        \brief Post an event to the event queue.
-       \param TODO
+       \param sname TODO
+       \param type TODO
+       \param user TODO
+       \param free TODO
        \return TODO
        \sa TODO
     */
@@ -115,17 +128,19 @@ struct augas_host {
      */
 
     /**
-       \brief Delegate event to a different session.
-       \param TODO
+       \brief Invoke peer session with event.
+       \param sname TODO
+       \param type TODO
+       \param user TODO
        \return TODO
-       \sa TODO
+       \sa post_()
     */
 
-    int (*delegate_)(const char* sname, int type, void* user);
+    int (*invoke_)(const char* sname, int type, void* user);
 
     /**
        \brief Read a configuration value.
-       \param TODO
+       \param name TODO
        \return TODO
        \sa TODO
 
@@ -137,7 +152,7 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param TODO
+       \param sid TODO
        \return TODO
        \sa TODO
     */
@@ -162,7 +177,10 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param TODO
+       \param sname TODO
+       \param host TODO
+       \param serv TODO
+       \param user TODO
        \return TODO
        \sa TODO
     */
@@ -172,7 +190,9 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param TODO
+       \param cid TODO
+       \param buf TODO
+       \param size TODO
        \return TODO
        \sa TODO
 
@@ -185,7 +205,9 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param TODO
+       \param cid TODO
+       \param ms TODO
+       \param flags TODO
        \return TODO
        \sa TODO
     */
@@ -194,7 +216,9 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param TODO
+       \param cid TODO
+       \param ms TODO
+       \param flags TODO
        \return TODO
        \sa TODO
     */
@@ -203,7 +227,8 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param TODO
+       \param cid TODO
+       \param flags TODO
        \return TODO
        \sa TODO
     */
@@ -213,17 +238,21 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param TODO
+       \param sname TODO
+       \param ms TODO
+       \param user TODO
+       \param free TODO
        \return TODO
        \sa TODO
     */
 
     int (*settimer_)(const char* sname, unsigned ms, void* user,
-                     void (*free_)(void*));
+                     void (*free)(void*));
 
     /**
        \brief TODO
-       \param TODO
+       \param tid TODO
+       \param ms TODO
        \return TODO
        \sa TODO
     */
@@ -232,7 +261,7 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param TODO
+       \param tid TODO
        \return TODO
        \sa TODO
     */
@@ -250,7 +279,7 @@ struct augas_module {
 
     /**
        \brief Session termination.
-       \param TODO
+       \param sess TODO
        \return TODO
        \sa TODO
     */
@@ -259,7 +288,7 @@ struct augas_module {
 
     /**
        \brief Session initialisation.
-       \param TODO
+       \param sess TODO
        \return TODO
        \sa TODO
     */
@@ -268,7 +297,7 @@ struct augas_module {
 
     /**
        \brief Re-configure request.
-       \param TODO
+       \param sess TODO
        \return TODO
        \sa TODO
     */
@@ -277,7 +306,9 @@ struct augas_module {
 
     /**
        \brief Custom event notification.
-       \param TODO
+       \param sess TODO
+       \param type TODO
+       \param user TODO
        \return TODO
        \sa TODO
     */
@@ -286,7 +317,7 @@ struct augas_module {
 
     /**
        \brief Connection closure.
-       \param TODO
+       \param sock TODO
        \return TODO
        \sa TODO
     */
@@ -295,7 +326,7 @@ struct augas_module {
 
     /**
        \brief Teardown request.
-       \param TODO
+       \param sock TODO
        \return TODO
        \sa TODO
     */
@@ -304,7 +335,9 @@ struct augas_module {
 
     /**
        \brief Acceptance of server connection.
-       \param TODO
+       \param sock TODO
+       \param addr TODO
+       \param port TODO
        \return TODO
        \sa TODO
     */
@@ -314,7 +347,9 @@ struct augas_module {
 
     /**
        \brief Completion of client connection handshake.
-       \param TODO
+       \param sock TODO
+       \param addr TODO
+       \param port TODO
        \return TODO
        \sa TODO
     */
@@ -324,7 +359,9 @@ struct augas_module {
 
     /**
        \brief Inbound data.
-       \param TODO
+       \param sock TODO
+       \param buf TODO
+       \param size TODO
        \return TODO
        \sa TODO
     */
@@ -334,7 +371,8 @@ struct augas_module {
 
     /**
        \brief Expiry of read timer.
-       \param TODO
+       \param sock TODO
+       \param ms TODO
        \return TODO
        \sa TODO
     */
@@ -343,7 +381,8 @@ struct augas_module {
 
     /**
        \brief Expiry of write timer.
-       \param TODO
+       \param sock TODO
+       \param ms TODO
        \return TODO
        \sa TODO
     */
@@ -352,7 +391,8 @@ struct augas_module {
 
     /**
        \brief Timer expiry.
-       \param TODO
+       \param timer TODO
+       \param ms TODO
        \return TODO
        \sa TODO
     */

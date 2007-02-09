@@ -294,15 +294,14 @@ static int
 event_(const struct augas_sess* sess, int type, void* user)
 {
     struct import_* import = sess->user_;
-    PyObject* x = user;
     int ret = 0;
     assert(sess->user_);
-    assert(user);
 
     if (import->event_) {
 
-        PyObject* y = PyObject_CallFunction(import->event_, "siO",
-                                            sess->name_, type, x);
+        PyObject* y = PyObject_CallFunction(import->event_, "siz",
+                                            sess->name_, type,
+                                            (const char*)user);
         if (y) {
             Py_DECREF(y);
         } else {

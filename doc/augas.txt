@@ -9,6 +9,7 @@ Basic Installation
 
   3. Change the 'etc\augasd.conf' file as appropriate.  At least, the 'rundir'
      option should be set to the absolute path of the installation directory.
+     The file extension of any modules may also need to change.
 
   4. Run the 'install.bat' file in the installation directory: this will
      register the service with the Service Control Manager.
@@ -30,6 +31,14 @@ FAQ
 
      If you are using an encrypted file system, decrypt the MSI installer and
      rerun.
+
+  2. Why does the following message appear in the log file?
+
+     'import site' failed; use -v for traceback
+     ImportError: No module named traceback
+
+     If you are using an encrypted file system, recursively decrypt the
+     directory to which Python was installed.
 
   2. Why do I receive an 'Access Denied' error when attempting to start the
      service?

@@ -112,6 +112,12 @@ $| = 1;
 # Collect the input.
 
 $prefix = valueask ("prefix directory", $prefix);
+$prefix =~ s{^~([^/]*)}
+{
+    $1 ? (getpwnam($1))[7]
+        : ($ENV{HOME} || $ENV{LOGDIR} || (getpwuid($>))[7])
+    }ex;
+
 $toolset = listask ("compiler toolset", $toolset, \%TOOLSET);
 $maintainer = valueask ("maintainer mode", 'n');
 if ($CYGWIN_MINGW == $toolset) {
@@ -138,8 +144,8 @@ if (is $gcc) {
     $cflags = "$flags";
     $cxxflags = "$flags -Wno-deprecated -Wno-unused-variable";
     if (is $strict) {
-        $cflags .= ' -Wall -Werror -pedantic';
-        $cxxflags .= ' -Wall -Werror -pedantic';
+        $cflags = "-Wall -Werror -pedantic $cflags";
+        $cxxflags = "-Wall -Werror -pedantic $cxxflags";
     }
 } else {
     $flags = (is $debug) ? '-g' : '-O -DNDEBUG';

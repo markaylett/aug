@@ -62,35 +62,37 @@ post_(PyObject* self, PyObject* args)
 {
     const char* sname;
     int type;
-    PyObject* user;
+    char* user;
 
-    if (!PyArg_ParseTuple(args, "siO:post", &sname, &type, &user))
+    if (!PyArg_ParseTuple(args, "siz:post", &sname, &type, &user))
         return NULL;
 
-    if (-1 == host_->post_(sname, type, user, free_)) {
+    user = strdup(user);
+    if (-1 == host_->post_(sname, type, user, user ? free : NULL)) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
 
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
+        if (user)
+            free(user);
         return NULL;
     }
 
-    Py_INCREF(user);
     return incret_(Py_None);
 }
 
 static PyObject*
-delegate_(PyObject* self, PyObject* args)
+invoke_(PyObject* self, PyObject* args)
 {
     const char* sname;
     int type;
-    PyObject* user;
+    char* user;
 
-    if (!PyArg_ParseTuple(args, "siO:delegate", &sname, &type, &user))
+    if (!PyArg_ParseTuple(args, "siz:invoke", &sname, &type, &user))
         return NULL;
 
-    if (-1 == host_->delegate_(sname, type, user)) {
+    if (-1 == host_->invoke_(sname, type, user)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -327,7 +329,7 @@ static PyMethodDef methods_[] = {
         "TODO"
     },
     {
-        "delegate", delegate_, METH_VARARGS,
+        "invoke", invoke_, METH_VARARGS,
         "TODO"
     },
     {

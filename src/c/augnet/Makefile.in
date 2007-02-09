@@ -240,7 +240,8 @@ libaugnet_la_LIBADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-TESTS = augnet-fixtest augnet-httptest
+#TESTS = augnet-fixtest augnet-httptest
+TESTS = augnet-httptest
 augnet_fixtest_SOURCES = fixtest.c
 augnet_fixtest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la

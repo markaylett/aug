@@ -35,7 +35,8 @@ libaugnet_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = augnet-fixtest augnet-httptest
-TESTS = augnet-fixtest augnet-httptest
+#TESTS = augnet-fixtest augnet-httptest
+TESTS = augnet-httptest
 
 augnet_fixtest_SOURCES = fixtest.c
 augnet_fixtest_LDADD = \

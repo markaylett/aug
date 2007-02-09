@@ -294,9 +294,9 @@ namespace augas {
     }
 
     int
-    delegate_(const char* sname, int type, void* user)
+    invoke_(const char* sname, int type, void* user)
     {
-        AUG_DEBUG2("delegate(): sname=[%s], type=[%d]", sname, type);
+        AUG_DEBUG2("invoke(): sname=[%s], type=[%d]", sname, type);
         try {
 
             sessptr sess(state_->manager_.getsess(sname));
@@ -546,7 +546,7 @@ namespace augas {
         reconf_,
         stop_,
         post_,
-        delegate_,
+        invoke_,
         getenv_,
         shutdown_,
         tcpconnect_,

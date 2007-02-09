@@ -11,7 +11,7 @@ EXTRA_DIST = \
 	cvs-policy.txt \
 	Doxyfile
 
-doc:
+gif:
 	for l in augsys augmar augutil augsrv augnet; do \
 		(cd $(top_srcdir)/src/c && \
 			../pl/dotdepend -I. `find $$l -name "*.c"`) \
