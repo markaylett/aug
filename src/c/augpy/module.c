@@ -67,7 +67,9 @@ post_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "siz:post", &sname, &type, &user))
         return NULL;
 
-    user = strdup(user);
+    if (user)
+        user = strdup(user);
+
     if (-1 == host_->post_(sname, type, user, user ? free : NULL)) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
