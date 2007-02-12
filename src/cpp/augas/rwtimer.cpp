@@ -19,10 +19,10 @@ rwtimer::do_callback(idref ref, unsigned& ms, aug_timers& timers)
 {
     if (rdtimer_.id() == ref) {
         AUG_DEBUG2("read timer expiry");
-        sess_->rdexpire(sock_, ms);
+        serv_->rdexpire(sock_, ms);
     } else if (wrtimer_.id() == ref) {
         AUG_DEBUG2("write timer expiry");
-        sess_->wrexpire(sock_, ms);
+        serv_->wrexpire(sock_, ms);
     } else
         assert(0);
 }
@@ -73,9 +73,9 @@ rwtimer::~rwtimer() AUG_NOTHROW
 {
 }
 
-rwtimer::rwtimer(const sessptr& sess, const augas_object& sock,
+rwtimer::rwtimer(const servptr& serv, const augas_object& sock,
                  timers& timers)
-    : sess_(sess),
+    : serv_(serv),
       sock_(sock),
       rdtimer_(timers, null),
       wrtimer_(timers, null)

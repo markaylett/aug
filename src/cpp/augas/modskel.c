@@ -5,27 +5,28 @@
 static const struct augas_host* host_ = NULL;
 
 static void
-term_(const struct augas_sess* sess)
+term_(const struct augas_serv* serv)
 {
     host_->writelog_(AUGAS_LOGINFO, "term_()");
 }
 
 static int
-init_(struct augas_sess* sess)
+init_(struct augas_serv* serv)
 {
     host_->writelog_(AUGAS_LOGINFO, "init_()");
     return 0;
 }
 
 static int
-reconf_(const struct augas_sess* sess)
+reconf_(const struct augas_serv* serv)
 {
     host_->writelog_(AUGAS_LOGINFO, "reconf_()");
     return 0;
 }
 
 static int
-event_(const struct augas_sess* sess, int type, void* user)
+event_(const struct augas_serv* serv, const char* from,
+       const struct augas_event* event)
 {
     host_->writelog_(AUGAS_LOGINFO, "event_()");
     return 0;

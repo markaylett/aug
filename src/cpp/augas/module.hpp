@@ -31,16 +31,17 @@ namespace augas {
                const augas_host& host);
 
         void
-        term(const augas_sess& sess) const AUG_NOTHROW;
+        term(const augas_serv& serv) const AUG_NOTHROW;
 
         bool
-        init(augas_sess& sess) const AUG_NOTHROW;
+        init(augas_serv& serv) const AUG_NOTHROW;
 
         bool
-        reconf(const augas_sess& sess) const AUG_NOTHROW;
+        reconf(const augas_serv& serv) const AUG_NOTHROW;
 
         bool
-        event(const augas_sess& sess, int type, void* user) const AUG_NOTHROW;
+        event(const augas_serv& serv, const char* from,
+              const augas_event& event) const AUG_NOTHROW;
 
         void
         closed(const augas_object& sock) const AUG_NOTHROW;

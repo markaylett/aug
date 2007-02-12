@@ -1,15 +1,15 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_SERVER_HPP
-#define AUGAS_SERVER_HPP
+#ifndef AUGAS_SERVCONN_HPP
+#define AUGAS_SERVCONN_HPP
 
 #include "augas/buffer.hpp"
 #include "augas/conn.hpp"
 
 namespace augas {
 
-    class server : public rwtimer_base, public conn_base {
+    class servconn : public rwtimer_base, public conn_base {
 
         augas_object sock_;
         buffer buffer_;
@@ -41,8 +41,8 @@ namespace augas {
         const augas_object&
         do_object() const;
 
-        const sessptr&
-        do_sess() const;
+        const servptr&
+        do_serv() const;
 
         aug::smartfd
         do_sfd() const;
@@ -72,11 +72,11 @@ namespace augas {
         do_phase() const;
 
     public:
-        ~server() AUG_NOTHROW;
+        ~servconn() AUG_NOTHROW;
 
-        server(const sessptr& sess, void* user, aug::timers& timers,
-               const aug::smartfd& sfd, const aug::endpoint& ep);
+        servconn(const servptr& serv, void* user, aug::timers& timers,
+                 const aug::smartfd& sfd, const aug::endpoint& ep);
     };
 }
 
-#endif // AUGAS_SERVER_HPP
+#endif // AUGAS_SERVCONN_HPP

@@ -48,13 +48,19 @@ enum augas_loglevel {
 
 typedef int augas_id;
 
-struct augas_sess {
+struct augas_serv {
     char name_[AUGAS_MAXNAME + 1];
     void* user_;
 };
 
+struct augas_event {
+    int type_;
+    void* user_;
+    size_t size_;
+};
+
 struct augas_object {
-    const struct augas_sess* sess_;
+    const struct augas_serv* serv_;
     augas_id id_;
     void* user_;
 };
@@ -66,7 +72,7 @@ struct augas_host {
      */
 
     /**
-       \brief Write message to server's log.
+       \brief Write message to the application server's log.
        \param level TODO
        \param format TODO
        \param ... TODO
@@ -76,7 +82,7 @@ struct augas_host {
     void (*writelog_)(int level, const char* format, ...);
 
     /**
-       \brief Write message to server's log.
+       \brief Write message to the application server's log.
        \param level TODO
        \param format TODO
        \param args TODO
@@ -97,14 +103,14 @@ struct augas_host {
     const char* (*error_)(void);
 
     /**
-       \brief Re-configure the server and all loaded modules.
+       \brief Re-configure the host and all loaded modules.
        \sa stop_().
     */
 
     void (*reconf_)(void);
 
     /**
-       \brief Stop the server.
+       \brief Stop the application server.
        \sa reconf_().
     */
 
@@ -113,30 +119,31 @@ struct augas_host {
     /**
        \brief Post an event to the event queue.
        \param sname TODO
-       \param type TODO
-       \param user TODO
+       \param to TODO
+       \param event TODO
        \param free TODO
        \return TODO
        \sa TODO
     */
 
-    int (*post_)(const char* sname, int type, void* user,
-                 void (*free)(void*));
+    int (*post_)(const char* sname, const char* to,
+                 const struct augas_event* event, void (*free)(void*));
 
     /**
      * The remaining functions are not thread-safe.
      */
 
     /**
-       \brief Invoke peer session with event.
+       \brief Invoke peer service with event.
        \param sname TODO
-       \param type TODO
-       \param user TODO
+       \param to TODO
+       \param event TODO
        \return TODO
        \sa post_()
     */
 
-    int (*invoke_)(const char* sname, int type, void* user);
+    int (*invoke_)(const char* sname, const char* to,
+                   const struct augas_event* event);
 
     /**
        \brief Read a configuration value.
@@ -161,9 +168,9 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param sname Session name.
+       \param sname Service name.
        \param host Ip address or host name.
-       \param serv Port or service name.
+       \param port Port or service name.
        \param user User data to be associated with the resulting connection.
        \return The connection id.
        \sa TODO
@@ -172,20 +179,20 @@ struct augas_host {
        module is notified of connection establishment.
     */
 
-    int (*tcpconnect_)(const char* sname, const char* host, const char* serv,
+    int (*tcpconnect_)(const char* sname, const char* host, const char* port,
                        void* user);
 
     /**
        \brief TODO
        \param sname TODO
        \param host TODO
-       \param serv TODO
+       \param port TODO
        \param user TODO
        \return TODO
        \sa TODO
     */
 
-    int (*tcplisten_)(const char* sname, const char* host, const char* serv,
+    int (*tcplisten_)(const char* sname, const char* host, const char* port,
                       void* user);
 
     /**
@@ -278,42 +285,43 @@ struct augas_host {
 struct augas_module {
 
     /**
-       \brief Session termination.
-       \param sess TODO
+       \brief Service termination.
+       \param serv TODO
        \return TODO
        \sa TODO
     */
 
-    void (*term_)(const struct augas_sess* sess);
+    void (*term_)(const struct augas_serv* serv);
 
     /**
-       \brief Session initialisation.
-       \param sess TODO
+       \brief Service initialisation.
+       \param serv TODO
        \return TODO
        \sa TODO
     */
 
-    int (*init_)(struct augas_sess* sess);
+    int (*init_)(struct augas_serv* serv);
 
     /**
        \brief Re-configure request.
-       \param sess TODO
+       \param serv TODO
        \return TODO
        \sa TODO
     */
 
-    int (*reconf_)(const struct augas_sess* sess);
+    int (*reconf_)(const struct augas_serv* serv);
 
     /**
        \brief Custom event notification.
-       \param sess TODO
-       \param type TODO
-       \param user TODO
+       \param serv TODO
+       \param from TODO
+       \param event TODO
        \return TODO
        \sa TODO
     */
 
-    int (*event_)(const struct augas_sess* sess, int type, void* user);
+    int (*event_)(const struct augas_serv* serv, const char* from,
+                  const struct augas_event* event);
 
     /**
        \brief Connection closure.
@@ -334,7 +342,7 @@ struct augas_module {
     int (*teardown_)(const struct augas_object* sock);
 
     /**
-       \brief Acceptance of server connection.
+       \brief Acceptance of socket connection.
        \param sock TODO
        \param addr TODO
        \param port TODO

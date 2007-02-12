@@ -8,13 +8,13 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "augas/client.hpp"
+#include "augas/clntconn.hpp"
 #include "augas/exception.hpp"
 #include "augas/listener.hpp"
 #include "augas/manager.hpp"
 #include "augas/module.hpp"
 #include "augas/options.hpp"
-#include "augas/server.hpp"
+#include "augas/servconn.hpp"
 #include "augas/utility.hpp"
 
 #if !defined(_WIN32)
@@ -103,23 +103,23 @@ namespace augas {
         AUG_DEBUG2("rundir=[%s]", rundir_);
     }
 
-    typedef map<int, sessptr> idtosess;
+    typedef map<int, servptr> idtoserv;
     typedef queue<connptr> connected;
 
-    struct eventarg {
-        string sname_;
-        aug_var arg_;
-        bool free_;
-        ~eventarg() AUG_NOTHROW
+    struct event : public augas_event {
+        string from_, to_;
+        void (*free_)(void*);
+        ~event() AUG_NOTHROW
         {
             if (free_)
-                aug_freevar(&arg_);
+                free_(user_);
         }
-        eventarg(const string& sname, void* arg, void (*free)(void*))
-            : sname_(sname),
-              free_(false)
+        event(const string& from, const string& to, const augas_event& event)
+            : from_(from),
+              to_(to),
+              free_(0)
         {
-            aug_setvarp(&arg_, arg, free);
+            memcpy(this, &event, sizeof(augas_event));
         }
     };
 
@@ -131,9 +131,9 @@ namespace augas {
         aug::files files_;
         timers timers_;
 
-        // Mapping of timer-ids to sessions.
+        // Mapping of timer-ids to services.
 
-        idtosess idtosess_;
+        idtoserv idtoserv_;
 
         // Pending calls to connected().
 
@@ -189,14 +189,14 @@ namespace augas {
     {
         AUG_DEBUG2("custom timer expiry");
 
-        idtosess::iterator it(state_->idtosess_.find(id));
-        sessptr sess(it->second);
-        augas_object timer = { cptr(*sess), id, aug_getvarp(arg) };
-        sess->expire(timer, *ms);
+        idtoserv::iterator it(state_->idtoserv_.find(id));
+        servptr serv(it->second);
+        augas_object timer = { cptr(*serv), id, aug_getvarp(arg) };
+        serv->expire(timer, *ms);
 
         if (0 == *ms) {
             AUG_DEBUG2("removing timer: ms has been set to zero");
-            state_->idtosess_.erase(it);
+            state_->idtoserv_.erase(it);
         }
     }
 
@@ -274,18 +274,20 @@ namespace augas {
     // Thread-safe.
 
     int
-    post_(const char* sname, int type, void* user, void (*free)(void*))
+    post_(const char* sname, const char* to, const augas_event* event,
+          void (*free)(void*))
     {
-        AUG_DEBUG2("post(): sname=[%s], type=[%d]", sname, type);
+        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%d], size=[%d]",
+                   sname, to, event->type_, event->size_);
         try {
 
-            auto_ptr<eventarg> arg(new eventarg(sname, user, free));
+            auto_ptr<augas::event> arg(new augas::event(sname, to, *event));
 
             aug_event e;
-            e.type_ = AUGAS_MODEVENT + type;
+            e.type_ = AUGAS_MODEVENT;
             aug_setvarp(&e.arg_, arg.get(), 0);
             writeevent(aug_eventout(), e);
-            arg->free_ = true;
+            arg->free_ = free;
             arg.release();
             return 0;
 
@@ -294,17 +296,18 @@ namespace augas {
     }
 
     int
-    invoke_(const char* sname, int type, void* user)
+    invoke_(const char* sname, const char* to, const augas_event* event)
     {
-        AUG_DEBUG2("invoke(): sname=[%s], type=[%d]", sname, type);
+        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%d], size=[%d]",
+                   sname, to, event->type_, event->size_);
         try {
 
-            sessptr sess(state_->manager_.getsess(sname));
-            if (!sess->active())
+            servptr serv(state_->manager_.getserv(to));
+            if (!serv->active())
                 throw error(__FILE__, __LINE__, ESTATE,
-                            "inactive session: sname=[%s]", sname);
+                            "inactive service: sname=[%s]", to);
 
-            sess->event(type, user);
+            serv->event(sname, *event);
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -346,16 +349,16 @@ namespace augas {
     }
 
     int
-    tcpconnect_(const char* sname, const char* host, const char* serv,
+    tcpconnect_(const char* sname, const char* host, const char* port,
                 void* user)
     {
-        AUG_DEBUG2("tcpconnect(): sname=[%s], host=[%s], serv=[%s]",
-                   sname, host, serv);
+        AUG_DEBUG2("tcpconnect(): sname=[%s], host=[%s], port=[%s]",
+                   sname, host, port);
         try {
 
-            sessptr sess(state_->manager_.getsess(sname));
-            connptr cptr(new augas::client(sess, user, state_->timers_, host,
-                                           serv));
+            servptr serv(state_->manager_.getserv(sname));
+            connptr cptr(new augas::clntconn(serv, user, state_->timers_,
+                                             host, port));
 
             // Remove on exception.
 
@@ -391,28 +394,28 @@ namespace augas {
     }
 
     int
-    tcplisten_(const char* sname, const char* host, const char* serv,
+    tcplisten_(const char* sname, const char* host, const char* port,
                void* user)
     {
-        AUG_DEBUG2("tcplisten(): sname=[%s], host=[%s], serv=[%s]",
-                   sname, host, serv);
+        AUG_DEBUG2("tcplisten(): sname=[%s], host=[%s], port=[%s]",
+                   sname, host, port);
         try {
 
             // Bind listener socket.
 
             endpoint ep(null);
-            smartfd sfd(tcplisten(host, serv, ep));
+            smartfd sfd(tcplisten(host, port, ep));
             setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
 
             inetaddr addr(null);
             AUG_DEBUG2("listening: interface=[%s], port=[%d]",
                        inetntop(getinetaddr(ep, addr)).c_str(),
-                       static_cast<int>(ntohs(port(ep))));
+                       static_cast<int>(ntohs(aug::port(ep))));
 
             // Prepare state.
 
-            sessptr sess(state_->manager_.getsess(sname));
-            listenerptr lptr(new augas::listener(sess, user, sfd));
+            servptr serv(state_->manager_.getserv(sname));
+            listenerptr lptr(new augas::listener(serv, user, sfd));
             scoped_insert si(state_->manager_, lptr);
 
             si.commit();
@@ -495,14 +498,14 @@ namespace augas {
             var v(arg, free);
 
             // If aug_settimer() succeeds, it will call free() on var when the
-            // timer is destroyed.  The session is added to the container
+            // timer is destroyed.  The service is added to the container
             // first to minimise any chance of failure after aug_settimer()
             // has been called.
 
-            state_->idtosess_[id] = state_->manager_.getsess(sname);
+            state_->idtoserv_[id] = state_->manager_.getserv(sname);
             if (-1 == aug_settimer(cptr(state_->timers_), id, ms, timercb_,
                                    cptr(v)))
-                state_->idtosess_.erase(id);
+                state_->idtoserv_.erase(id);
 
             return id;
 
@@ -533,7 +536,7 @@ namespace augas {
             // expired.
 
             if (0 == ret)
-                state_->idtosess_.erase(tid);
+                state_->idtoserv_.erase(tid);
             return ret;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -563,18 +566,18 @@ namespace augas {
     void
     load_(filecb_base& cb)
     {
-        AUG_DEBUG2("loading sessions");
+        AUG_DEBUG2("loading services");
         state_->manager_.load(rundir_, options_, host_);
 
-        // Remove any timers allocated to sessions that could not be opened.
+        // Remove any timers allocated to services that could not be opened.
 
-        idtosess::iterator it(state_->idtosess_.begin()),
-            end(state_->idtosess_.end());
+        idtoserv::iterator it(state_->idtoserv_.begin()),
+            end(state_->idtoserv_.end());
         while (it != end) {
             if (!it->second->active()) {
-                aug_warn("cancelling timer associated with inactive session");
+                aug_warn("cancelling timer associated with inactive service");
                 aug_canceltimer(cptr(state_->timers_), it->first);
-                state_->idtosess_.erase(it++);
+                state_->idtoserv_.erase(it++);
             } else
                 ++it;
         }
@@ -603,8 +606,8 @@ namespace augas {
 
         setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
         setsockopts_(sfd);
-        connptr cptr(new augas::server(sock.sess(), sock.user(),
-                                       state_->timers_, sfd, ep));
+        connptr cptr(new augas::servconn(sock.serv(), sock.user(),
+                                         state_->timers_, sfd, ep));
 
         scoped_insert si(state_->manager_, cptr);
         AUG_DEBUG2("initialising connection: id=[%d], fd=[%d]", cptr->id(),
@@ -691,17 +694,16 @@ namespace augas {
             AUG_DEBUG2("received AUGAS_WAKEUP");
             // Actual handling is performed in do_run().
             break;
-        default:
+        case AUGAS_MODEVENT:
             assert(AUG_VTPTR == event.arg_.type_);
             {
-                auto_ptr<eventarg> arg(static_cast<
-                                       eventarg*>(aug_getvarp(&event.arg_)));
-                sessptr sess(state_->manager_.getsess(arg->sname_));
-                if (sess->active())
-                    sess->event(event.type_ - AUGAS_MODEVENT,
-                                aug_getvarp(&arg->arg_));
+                auto_ptr<augas::event> arg
+                    (static_cast<augas::event*>(aug_getvarp(&event.arg_)));
+                servptr serv(state_->manager_.getserv(arg->to_));
+                if (serv->active())
+                    serv->event(arg->from_.c_str(), *arg);
                 else
-                    aug_warn("event not delivered to inactive session");
+                    aug_warn("event not delivered to inactive service");
             }
         }
         aug_freevar(&event.arg_);
@@ -873,7 +875,7 @@ namespace augas {
         {
             AUG_DEBUG2("terminating daemon process");
 
-            // Clear sessions first.
+            // Clear services first.
 
             state_->manager_.clear();
 

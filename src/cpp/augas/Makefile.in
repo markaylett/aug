@@ -64,11 +64,11 @@ am_modskel_la_OBJECTS = modskel.lo
 modskel_la_OBJECTS = $(am_modskel_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) client.$(OBJEXT) \
-	conn.$(OBJEXT) exception.$(OBJEXT) listener.$(OBJEXT) \
-	manager.$(OBJEXT) module.$(OBJEXT) object.$(OBJEXT) \
-	options.$(OBJEXT) rwtimer.$(OBJEXT) server.$(OBJEXT) \
-	sess.$(OBJEXT) utility.$(OBJEXT)
+am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) \
+	clntconn.$(OBJEXT) conn.$(OBJEXT) exception.$(OBJEXT) \
+	listener.$(OBJEXT) manager.$(OBJEXT) module.$(OBJEXT) \
+	object.$(OBJEXT) options.$(OBJEXT) rwtimer.$(OBJEXT) \
+	servconn.$(OBJEXT) serv.$(OBJEXT) utility.$(OBJEXT)
 augasd_OBJECTS = $(am_augasd_OBJECTS)
 augasd_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
@@ -233,7 +233,7 @@ SUBDIRS = \
 
 noinst_HEADERS = \
 	buffer.hpp \
-	client.hpp \
+	clntconn.hpp \
 	conn.hpp \
 	exception.hpp \
 	listener.hpp \
@@ -242,14 +242,14 @@ noinst_HEADERS = \
 	object.hpp \
 	options.hpp \
 	rwtimer.hpp \
-	server.hpp \
-	sess.hpp \
+	serv.hpp \
+	servconn.hpp \
 	utility.hpp
 
 augasd_SOURCES = \
 	augasd.cpp \
 	buffer.cpp \
-	client.cpp \
+	clntconn.cpp \
 	conn.cpp \
 	exception.cpp \
 	listener.cpp \
@@ -258,8 +258,8 @@ augasd_SOURCES = \
 	object.cpp \
 	options.cpp \
 	rwtimer.cpp \
-	server.cpp \
-	sess.cpp \
+	servconn.cpp \
+	serv.cpp \
 	utility.cpp
 
 augasd_LDADD = \
@@ -376,7 +376,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augasd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clntconn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Po@am__quote@
@@ -386,8 +386,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rwtimer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sess.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servconn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@
 
 .c.o:

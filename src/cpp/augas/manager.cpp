@@ -25,16 +25,16 @@ namespace {
 }
 
 void
-manager::insert(const string& name, const sessptr& sess)
+manager::insert(const string& name, const servptr& serv)
 {
     // Insert prior to calling open().
 
-    sesss_[name] = sess;
-    if (!sess->init()) {
+    servs_[name] = serv;
+    if (!serv->init()) {
 
         // TODO: leave if event posted.
 
-        sesss_.erase(name); // close() will not be called.
+        servs_.erase(name); // close() will not be called.
     }
 }
 
@@ -43,7 +43,7 @@ manager::clear()
 {
     idtofd_.clear();
     socks_.clear();
-    sesss_.clear();
+    servs_.clear();
 
     // Modules not released.
 }
@@ -84,15 +84,15 @@ void
 manager::load(const char* rundir, const options& options,
               const augas_host& host)
 {
-    // TODO: allow each session to specify a list of sessions on which it
+    // TODO: allow each service to specify a list of services on which it
     // depends.
 
-    // Obtain list of sessions.
+    // Obtain list of services.
 
-    const char* value(options.get("sessions", 0));
+    const char* value(options.get("services", 0));
     if (value) {
 
-        // For each session...
+        // For each service...
 
         istringstream is(value);
         string name, value;
@@ -100,7 +100,7 @@ manager::load(const char* rundir, const options& options,
 
             // Obtain module associated with service.
 
-            string base(string("session.").append(name));
+            string base(string("service.").append(name));
             value = options.get(base + ".module");
 
             modules::iterator it(modules_.find(value));
@@ -118,8 +118,8 @@ manager::load(const char* rundir, const options& options,
                 it = modules_.insert(make_pair(value, module)).first;
             }
 
-            aug_info("creating session: name=[%s]", name.c_str());
-            insert(name, sessptr(new augas::sess(it->second, name.c_str())));
+            aug_info("creating service: name=[%s]", name.c_str());
+            insert(name, servptr(new augas::serv(it->second, name.c_str())));
         }
 
     } else {
@@ -131,9 +131,9 @@ manager::load(const char* rundir, const options& options,
                                            host));
         modules_[DEFAULT_NAME] = module;
 
-        aug_info("creating session: name=[%s]", DEFAULT_NAME);
+        aug_info("creating service: name=[%s]", DEFAULT_NAME);
         insert(DEFAULT_NAME,
-               sessptr(new augas::sess(module, DEFAULT_NAME)));
+               servptr(new augas::serv(module, DEFAULT_NAME)));
     }
 }
 
@@ -180,7 +180,7 @@ manager::teardown()
 void
 manager::reconf() const
 {
-    sesss::const_iterator it(sesss_.begin()), end(sesss_.end());
+    servs::const_iterator it(servs_.begin()), end(servs_.end());
     for (; it != end; ++it)
         it->second->reconf();
 }
@@ -205,13 +205,13 @@ manager::getbyid(augas_id id) const
     return getbyfd(it->second);
 }
 
-sessptr
-manager::getsess(const string& name) const
+servptr
+manager::getserv(const string& name) const
 {
-    sesss::const_iterator it(sesss_.find(name));
-    if (it == sesss_.end())
+    servs::const_iterator it(servs_.find(name));
+    if (it == servs_.end())
         throw error(__FILE__, __LINE__, ESTATE,
-                    "session not found: sname=[%s]", name.c_str());
+                    "service not found: sname=[%s]", name.c_str());
     return it->second;
 }
 

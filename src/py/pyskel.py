@@ -7,8 +7,8 @@ import log
 # string error()
 # void reconf()
 # void stop()
-# void post(sname, type, user)
-# void invoke(sname, type, user)
+# void post(sname, to, type, user)
+# void invoke(sname, to, type, user)
 # string getenv(name)
 # void shutdown(sock)
 # int tcpconnect(sname, host, serv, user)
@@ -62,7 +62,7 @@ def init(sname):
 def reconf(sname):
     log.debug("reconf(): %s" % sname)
 
-def event(sname, type, user):
+def event(sname, from, type, user):
     log.debug("event(): %s" % sname)
 
 def closed(sock):

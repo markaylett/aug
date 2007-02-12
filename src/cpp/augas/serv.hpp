@@ -1,42 +1,42 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_SESS_HPP
-#define AUGAS_SESS_HPP
+#ifndef AUGAS_SERV_HPP
+#define AUGAS_SERV_HPP
 
 #include "augas/module.hpp"
 
 namespace augas {
 
-    class sess {
+    class serv {
     public:
-        typedef augas_sess ctype;
+        typedef augas_serv ctype;
     private:
 
         moduleptr module_;
-        augas_sess sess_;
+        augas_serv serv_;
         bool active_;
 
     public:
-        ~sess() AUG_NOTHROW;
+        ~serv() AUG_NOTHROW;
 
-        sess(const moduleptr& module, const char* name);
+        serv(const moduleptr& module, const char* name);
 
         bool
         init() AUG_NOTHROW
         {
             active_ = true; // Functions may be called during initialisation.
-            return active_ = module_->init(sess_);
+            return active_ = module_->init(serv_);
         }
         bool
         reconf() const AUG_NOTHROW
         {
-            return module_->reconf(sess_);
+            return module_->reconf(serv_);
         }
         bool
-        event(int type, void* user) const AUG_NOTHROW
+        event(const char* from, const augas_event& event) const AUG_NOTHROW
         {
-            return module_->event(sess_, type, user);
+            return module_->event(serv_, from, event);
         }
         void
         closed(const augas_object& sock) const AUG_NOTHROW
@@ -81,13 +81,13 @@ namespace augas {
         {
             return module_->expire(timer, ms);
         }
-        operator augas_sess&() AUG_NOTHROW
+        operator augas_serv&() AUG_NOTHROW
         {
-            return sess_;
+            return serv_;
         }
-        operator const augas_sess&() const AUG_NOTHROW
+        operator const augas_serv&() const AUG_NOTHROW
         {
-            return sess_;
+            return serv_;
         }
         bool
         active() const AUG_NOTHROW
@@ -97,11 +97,11 @@ namespace augas {
         const char*
         name() const AUG_NOTHROW
         {
-            return sess_.name_;
+            return serv_.name_;
         }
     };
 
-    typedef aug::smartptr<sess> sessptr;
+    typedef aug::smartptr<serv> servptr;
 }
 
-#endif // AUGAS_SESS_HPP
+#endif // AUGAS_SERV_HPP

@@ -102,7 +102,7 @@ namespace augas {
 
     class established : public conn_base {
 
-        sessptr sess_;
+        servptr serv_;
         augas_object& sock_;
         buffer& buffer_;
         rwtimer& rwtimer_;
@@ -117,8 +117,8 @@ namespace augas {
         const augas_object&
         do_object() const;
 
-        const sessptr&
-        do_sess() const;
+        const servptr&
+        do_serv() const;
 
         aug::smartfd
         do_sfd() const;
@@ -150,14 +150,14 @@ namespace augas {
     public:
         ~established() AUG_NOTHROW;
 
-        established(const sessptr& sess, augas_object& sock, buffer& buffer,
+        established(const servptr& serv, augas_object& sock, buffer& buffer,
                     rwtimer& rwtimer, const aug::smartfd& sfd,
                     const aug::endpoint& ep, bool close);
     };
 
     class connecting : public conn_base {
 
-        sessptr sess_;
+        servptr serv_;
         augas_object& sock_;
         buffer& buffer_;
         aug::connector connector_;
@@ -171,8 +171,8 @@ namespace augas {
         const augas_object&
         do_object() const;
 
-        const sessptr&
-        do_sess() const;
+        const servptr&
+        do_serv() const;
 
         aug::smartfd
         do_sfd() const;
@@ -204,8 +204,8 @@ namespace augas {
     public:
         ~connecting() AUG_NOTHROW;
 
-        connecting(const sessptr& sess, augas_object& sock, buffer& buffer,
-                   const char* host, const char* serv);
+        connecting(const servptr& serv, augas_object& sock, buffer& buffer,
+                   const char* host, const char* port);
     };
 }
 

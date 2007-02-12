@@ -129,7 +129,7 @@
 				RelativePath="..\src\cpp\augas\buffer.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\client.cpp">
+				RelativePath="..\src\cpp\augas\clntconn.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\conn.cpp">
@@ -156,10 +156,10 @@
 				RelativePath="..\src\cpp\augas\rwtimer.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\server.cpp">
+				RelativePath="..\src\cpp\augas\serv.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\sess.cpp">
+				RelativePath="..\src\cpp\augas\servconn.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\utility.cpp">
@@ -173,7 +173,7 @@
 				RelativePath="..\src\cpp\augas\buffer.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\client.hpp">
+				RelativePath="..\src\cpp\augas\clntconn.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\conn.hpp">
@@ -200,10 +200,10 @@
 				RelativePath="..\src\cpp\augas\rwtimer.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\server.hpp">
+				RelativePath="..\src\cpp\augas\serv.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\sess.hpp">
+				RelativePath="..\src\cpp\augas\servconn.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\utility.hpp">

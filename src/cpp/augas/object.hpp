@@ -5,7 +5,7 @@
 #define AUGAS_OBJECT_HPP
 
 #include "augas.h"
-#include "augas/sess.hpp"
+#include "augas/serv.hpp"
 
 #include "augsyspp.hpp"
 
@@ -22,8 +22,8 @@ namespace augas {
         virtual const augas_object&
         do_object() const = 0;
 
-        virtual const sessptr&
-        do_sess() const = 0;
+        virtual const servptr&
+        do_serv() const = 0;
 
         virtual aug::smartfd
         do_sfd() const = 0;
@@ -42,10 +42,10 @@ namespace augas {
         {
             return do_object();
         }
-        const sessptr&
-        sess() const
+        const servptr&
+        serv() const
         {
-            return do_sess();
+            return do_serv();
         }
         aug::smartfd
         sfd() const

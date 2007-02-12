@@ -8,11 +8,11 @@ def term(sname):
 
 def init(sname):
     log.debug("init(): %s" % sname)
-    invoke(sname, 1, str(101))
-    post(sname, 2, str(202))
-    post(sname, 3, None)
+    invoke(sname, sname, 1, str(101))
+    post(sname, sname, 2, buffer("202"))
+    post(sname, sname, 3, None)
 
-def event(sname, type, user):
+def event(sname, frm, type, user):
     log.debug("event(): %s" % sname)
     if type == 1:
         if int(user) != 101:

@@ -9,21 +9,21 @@
 namespace {
 
     void
-    term(const augas_sess* sess)
+    term(const augas_serv* serv)
     {
     }
     int
-    init(augas_sess* sess)
-    {
-        return 0;
-    }
-    int
-    reconf(const augas_sess* sess)
+    init(augas_serv* serv)
     {
         return 0;
     }
     int
-    event(const augas_sess* sess, int type, void* user)
+    reconf(const augas_serv* serv)
+    {
+        return 0;
+    }
+    int
+    event(const augas_serv* serv, const char* from, const augas_event* event)
     {
         return 0;
     }

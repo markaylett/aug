@@ -10,7 +10,7 @@ SUBDIRS = \
 
 noinst_HEADERS = \
 	buffer.hpp \
-	client.hpp \
+	clntconn.hpp \
 	conn.hpp \
 	exception.hpp \
 	listener.hpp \
@@ -19,8 +19,8 @@ noinst_HEADERS = \
 	object.hpp \
 	options.hpp \
 	rwtimer.hpp \
-	server.hpp \
-	sess.hpp \
+	serv.hpp \
+	servconn.hpp \
 	utility.hpp
 
 bin_PROGRAMS = augasd
@@ -28,7 +28,7 @@ bin_PROGRAMS = augasd
 augasd_SOURCES = \
 	augasd.cpp \
 	buffer.cpp \
-	client.cpp \
+	clntconn.cpp \
 	conn.cpp \
 	exception.cpp \
 	listener.cpp \
@@ -37,8 +37,8 @@ augasd_SOURCES = \
 	object.cpp \
 	options.cpp \
 	rwtimer.cpp \
-	server.cpp \
-	sess.cpp \
+	servconn.cpp \
+	serv.cpp \
 	utility.cpp
 
 augasd_LDADD = \

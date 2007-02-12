@@ -12,7 +12,7 @@ namespace augas {
 
     class listener : public object_base {
 
-        sessptr sess_;
+        servptr serv_;
         augas_object sock_;
         aug::smartfd sfd_;
 
@@ -22,8 +22,8 @@ namespace augas {
         const augas_object&
         do_object() const;
 
-        const sessptr&
-        do_sess() const;
+        const servptr&
+        do_serv() const;
 
         aug::smartfd
         do_sfd() const;
@@ -31,7 +31,7 @@ namespace augas {
     public:
         ~listener() AUG_NOTHROW;
 
-        listener(const sessptr& sess, void* user, const aug::smartfd& sfd);
+        listener(const servptr& serv, void* user, const aug::smartfd& sfd);
     };
 
     typedef aug::smartptr<listener> listenerptr;

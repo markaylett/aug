@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGAS_BUILD
-#include "augas/sess.hpp"
+#include "augas/serv.hpp"
 
 #include "augsys.h"
 
@@ -10,16 +10,16 @@ using namespace aug;
 using namespace augas;
 using namespace std;
 
-sess::~sess() AUG_NOTHROW
+serv::~serv() AUG_NOTHROW
 {
     if (active_)
-        module_->term(sess_); // AUG_NOTHROW
+        module_->term(serv_); // AUG_NOTHROW
 }
 
-sess::sess(const moduleptr& module, const char* name)
+serv::serv(const moduleptr& module, const char* name)
     : module_(module),
       active_(false)
 {
-    aug_strlcpy(sess_.name_, name, sizeof(sess_.name_));
-    sess_.user_ = 0;
+    aug_strlcpy(serv_.name_, name, sizeof(serv_.name_));
+    serv_.user_ = 0;
 }

@@ -29,10 +29,10 @@ established::do_object() const
     return sock_;
 }
 
-const sessptr&
-established::do_sess() const
+const servptr&
+established::do_serv() const
 {
-    return sess_;
+    return serv_;
 }
 
 smartfd
@@ -45,7 +45,7 @@ bool
 established::do_accept(const aug_endpoint& ep)
 {
     inetaddr addr(null);
-    return close_ = sess_
+    return close_ = serv_
         ->accept(sock_, inetntop(getinetaddr(ep, addr)).c_str(), port(ep));
 }
 
@@ -53,7 +53,7 @@ void
 established::do_connected(const aug_endpoint& ep)
 {
     inetaddr addr(null);
-    sess_->connected(sock_, inetntop(getinetaddr(ep, addr)).c_str(),
+    serv_->connected(sock_, inetntop(getinetaddr(ep, addr)).c_str(),
                      port(ep));
 }
 
@@ -85,7 +85,7 @@ established::do_process(mplexer& mplexer)
 
         // Notify module of new data.
 
-        sess_->data(sock_, buf, size);
+        serv_->data(sock_, buf, size);
     }
 
     if (bits & AUG_IOEVENTWR) {
@@ -136,7 +136,7 @@ established::do_teardown()
 {
     if (phase_ < TEARDOWN) {
         phase_ = TEARDOWN;
-        sess_->teardown(sock_);
+        serv_->teardown(sock_);
     }
 }
 
@@ -156,14 +156,14 @@ established::~established() AUG_NOTHROW
 {
     try {
         if (close_)
-            sess_->closed(sock_);
+            serv_->closed(sock_);
     } AUG_PERRINFOCATCH;
 }
 
-established::established(const sessptr& sess, augas_object& sock,
+established::established(const servptr& serv, augas_object& sock,
                          buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
                          const aug::endpoint& ep, bool close)
-    : sess_(sess),
+    : serv_(serv),
       sock_(sock),
       buffer_(buffer),
       rwtimer_(rwtimer),
@@ -186,10 +186,10 @@ connecting::do_object() const
     return sock_;
 }
 
-const sessptr&
-connecting::do_sess() const
+const servptr&
+connecting::do_serv() const
 {
-    return sess_;
+    return serv_;
 }
 
 smartfd
@@ -269,16 +269,16 @@ connecting::~connecting() AUG_NOTHROW
 {
     try {
         if (CLOSED == phase_)
-            sess_->closed(sock_);
+            serv_->closed(sock_);
     } AUG_PERRINFOCATCH;
 }
 
-connecting::connecting(const sessptr& sess, augas_object& sock,
-                       buffer& buffer, const char* host, const char* serv)
-    : sess_(sess),
+connecting::connecting(const servptr& serv, augas_object& sock,
+                       buffer& buffer, const char* host, const char* port)
+    : serv_(serv),
       sock_(sock),
       buffer_(buffer),
-      connector_(host, serv),
+      connector_(host, port),
       sfd_(null),
       endpoint_(null),
       phase_(CLOSED)

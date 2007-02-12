@@ -2,10 +2,10 @@ rundir = .
 logdir = .
 loglevel = 7
 
-sessions = pystop pytest4
+services = pystop pytest4
 
-session.pystop.module = augpy
-session.pytest4.module = augpy
+service.pystop.module = augpy
+service.pytest4.module = augpy
 
 module.augpy.path = ../../c/augpy/.libs/modaugpy.${modext}
 module.augpy.pythonpath = ../../py

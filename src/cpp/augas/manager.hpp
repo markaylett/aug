@@ -15,12 +15,12 @@ namespace augas {
     class manager {
 
         typedef std::map<std::string, moduleptr> modules;
-        typedef std::map<std::string, sessptr> sesss;
+        typedef std::map<std::string, servptr> servs;
         typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
         typedef std::map<int, objectptr> socks;
 
         modules modules_;
-        sesss sesss_;
+        servs servs_;
         socks socks_;
         idtofd idtofd_;
 
@@ -30,7 +30,7 @@ namespace augas {
         operator =(const manager& rhs);
 
         void
-        insert(const std::string& name, const sessptr& sess);
+        insert(const std::string& name, const servptr& serv);
 
     public:
         manager()
@@ -68,8 +68,8 @@ namespace augas {
         objectptr
         getbyid(augas_id id) const;
 
-        sessptr
-        getsess(const std::string& name) const;
+        servptr
+        getserv(const std::string& name) const;
 
         bool
         empty() const;

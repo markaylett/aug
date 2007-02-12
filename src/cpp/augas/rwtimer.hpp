@@ -4,7 +4,7 @@
 #ifndef AUGAS_RWTIMER_HPP
 #define AUGAS_RWTIMER_HPP
 
-#include "augas/sess.hpp"
+#include "augas/serv.hpp"
 
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
@@ -54,7 +54,7 @@ namespace augas {
 
     class rwtimer : public rwtimer_base {
 
-        sessptr sess_;
+        servptr serv_;
         const augas_object& sock_;
         aug::timer rdtimer_;
         aug::timer wrtimer_;
@@ -77,7 +77,7 @@ namespace augas {
     public:
         ~rwtimer() AUG_NOTHROW;
 
-        rwtimer(const sessptr& sess, const augas_object& sock,
+        rwtimer(const servptr& serv, const augas_object& sock,
                 aug::timers& timers);
     };
 }

@@ -60,24 +60,27 @@ stop_(PyObject* self, PyObject* args)
 static PyObject*
 post_(PyObject* self, PyObject* args)
 {
-    const char* sname;
-    int type;
-    char* user;
+    const char* sname, * to, * user;
+    int size;
+    struct augas_event event = { 0, NULL, 0 };
 
-    if (!PyArg_ParseTuple(args, "siz:post", &sname, &type, &user))
+    if (!PyArg_ParseTuple(args, "ssiz#:post", &sname, &to, &event.type_,
+                          &user, &size))
         return NULL;
 
-    if (user)
-        user = strdup(user);
+    if (user) {
+        event.user_ = strdup(user);
+        event.size_ = size;
+    }
 
-    if (-1 == host_->post_(sname, type, user, user ? free : NULL)) {
+    if (-1 == host_->post_(sname, to, &event, event.user_ ? free : NULL)) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
 
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
-        if (user)
-            free(user);
+        if (event.user_)
+            free(event.user_);
         return NULL;
     }
 
@@ -87,14 +90,20 @@ post_(PyObject* self, PyObject* args)
 static PyObject*
 invoke_(PyObject* self, PyObject* args)
 {
-    const char* sname;
-    int type;
-    char* user;
+    const char* sname, * to, * user;
+    int size;
+    struct augas_event event = { 0, NULL, 0 };
 
-    if (!PyArg_ParseTuple(args, "siz:invoke", &sname, &type, &user))
+    if (!PyArg_ParseTuple(args, "ssiz#:invoke", &sname, &to, &event.type_,
+                          &user, &size))
         return NULL;
 
-    if (-1 == host_->invoke_(sname, type, user)) {
+    if (user) {
+        event.user_ = (void*)user;
+        event.size_ = size;
+    }
+
+    if (-1 == host_->invoke_(sname, to, &event)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }

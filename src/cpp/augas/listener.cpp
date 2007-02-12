@@ -20,10 +20,10 @@ listener::do_object() const
     return sock_;
 }
 
-const sessptr&
-listener::do_sess() const
+const servptr&
+listener::do_serv() const
 {
-    return sess_;
+    return serv_;
 }
 
 smartfd
@@ -35,15 +35,15 @@ listener::do_sfd() const
 listener::~listener() AUG_NOTHROW
 {
     try {
-        sess_->closed(sock_);
+        serv_->closed(sock_);
     } AUG_PERRINFOCATCH;
 }
 
-listener::listener(const sessptr& sess, void* user, const smartfd& sfd)
-    : sess_(sess),
+listener::listener(const servptr& serv, void* user, const smartfd& sfd)
+    : serv_(serv),
       sfd_(sfd)
 {
-    sock_.sess_ = cptr(*sess);
+    sock_.serv_ = cptr(*serv);
     sock_.id_ = aug_nextid();
     sock_.user_ = user;
 }
