@@ -108,16 +108,16 @@ namespace augas {
 
     struct event : public augas_event {
         string from_, to_;
-        void (*free_)(void*);
+        void (*destroy_)(void*);
         ~event() AUG_NOTHROW
         {
-            if (free_)
-                free_(user_);
+            if (destroy_)
+                destroy_(user_);
         }
         event(const string& from, const string& to, const augas_event& event)
             : from_(from),
               to_(to),
-              free_(0)
+              destroy_(0)
         {
             memcpy(this, &event, sizeof(augas_event));
         }
@@ -275,7 +275,7 @@ namespace augas {
 
     int
     post_(const char* sname, const char* to, const augas_event* event,
-          void (*free)(void*))
+          void (*destroy)(void*))
     {
         AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s], size=[%d]",
                    sname, to, event->type_, event->size_);
@@ -287,7 +287,7 @@ namespace augas {
             e.type_ = AUGAS_MODEVENT;
             aug_setvarp(&e.arg_, arg.get(), 0);
             writeevent(aug_eventout(), e);
-            arg->free_ = free;
+            arg->destroy_ = destroy;
             arg.release();
             return 0;
 
@@ -489,18 +489,19 @@ namespace augas {
     }
 
     int
-    settimer_(const char* sname, unsigned ms, void* arg, void (*free)(void*))
+    settimer_(const char* sname, unsigned ms, void* arg,
+              void (*destroy)(void*))
     {
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
 
             augas_id id(aug_nextid());
-            var v(arg, free);
+            var v(arg, destroy);
 
-            // If aug_settimer() succeeds, it will call free() on var when the
-            // timer is destroyed.  The service is added to the container
-            // first to minimise any chance of failure after aug_settimer()
-            // has been called.
+            // If aug_settimer() succeeds, it will call aug_destroyvar() on
+            // var when the timer is destroyed.  The service is added to the
+            // container first to minimise any chance of failure after
+            // aug_settimer() has been called.
 
             state_->idtoserv_[id] = state_->manager_.getserv(sname);
             if (-1 == aug_settimer(cptr(state_->timers_), id, ms, timercb_,
@@ -706,7 +707,7 @@ namespace augas {
                     aug_warn("event not delivered to inactive service");
             }
         }
-        aug_freevar(&event.arg_);
+        aug_destroyvar(&event.arg_);
         return true;
     }
 
@@ -880,8 +881,8 @@ namespace augas {
             state_->manager_.clear();
 
             // Modules must be kept alive until remaining connections and
-            // timers have been destroyed: a free_() function may depend on a
-            // function implemented in a module.
+            // timers have been destroyed: a destroy_() function may depend on
+            // a function implemented in a module.
 
             state_.reset();
         }

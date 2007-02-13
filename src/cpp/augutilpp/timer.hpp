@@ -33,8 +33,8 @@ namespace aug {
     public:
         ~timers() AUG_NOTHROW
         {
-            if (-1 == aug_freetimers(&timers_))
-                perrinfo("aug_freetimers() failed");
+            if (-1 == aug_destroytimers(&timers_))
+                perrinfo("aug_destroytimers() failed");
         }
 
         timers()

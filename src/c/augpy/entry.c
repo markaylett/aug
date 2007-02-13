@@ -134,7 +134,7 @@ getmethod_(PyObject* module, const char* name)
 }
 
 static void
-freeimport_(struct import_* import)
+destroyimport_(struct import_* import)
 {
     if (import->open_ && import->term_) {
 
@@ -195,7 +195,7 @@ createimport_(const char* sname)
     return import;
 
  fail:
-    freeimport_(import);
+    destroyimport_(import);
     return NULL;
 }
 
@@ -241,7 +241,7 @@ term_(const struct augas_serv* serv)
 {
     struct import_* import = serv->user_;
     assert(serv->user_);
-    freeimport_(import);
+    destroyimport_(import);
 }
 
 static int
@@ -259,7 +259,7 @@ init_(struct augas_serv* serv)
         PyObject* x = PyObject_CallFunction(import->init_, "s", serv->name_);
         if (!x) {
             printerr_();
-            freeimport_(import);
+            destroyimport_(import);
             return -1;
         }
         Py_DECREF(x);
@@ -312,7 +312,7 @@ event_(const struct augas_serv* serv, const char* from,
         }
     }
 
-    /* x will be Py_DECREF()-ed by free_(). */
+    /* x will be Py_DECREF()-ed by destroy_(). */
 
     return ret;
 }
@@ -563,7 +563,7 @@ expire_(const struct augas_object* timer, unsigned* ms)
             ret = -1;
         }
 
-        /* x will be Py_DECREF()-ed by free_() when *ms == 0. */
+        /* x will be Py_DECREF()-ed by destroy_() when *ms == 0. */
     }
     return ret;
 }

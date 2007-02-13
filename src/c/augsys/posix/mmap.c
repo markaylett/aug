@@ -86,7 +86,7 @@ createmmap_(impl_t impl, size_t offset, size_t len)
 }
 
 static int
-freemmap_(impl_t impl)
+destroymmap_(impl_t impl)
 {
     if (impl->mmap_.addr_
         && -1 == munmap(impl->mmap_.addr_, impl->mmap_.len_)) {
@@ -97,10 +97,10 @@ freemmap_(impl_t impl)
 }
 
 AUGSYS_EXTERN int
-aug_freemmap(struct aug_mmap_* mmap_)
+aug_destroymmap(struct aug_mmap_* mmap_)
 {
     impl_t impl = (impl_t)mmap_;
-    int ret = freemmap_(impl);
+    int ret = destroymmap_(impl);
     free(impl);
     return ret;
 }

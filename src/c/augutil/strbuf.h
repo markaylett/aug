@@ -14,7 +14,7 @@ AUGUTIL_API aug_strbuf_t
 aug_createstrbuf(size_t size);
 
 AUGUTIL_API int
-aug_freestrbuf(aug_strbuf_t strbuf);
+aug_destroystrbuf(aug_strbuf_t strbuf);
 
 AUGUTIL_API int
 aug_clearstrbuf(aug_strbuf_t* strbuf);

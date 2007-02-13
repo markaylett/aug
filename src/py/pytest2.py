@@ -8,19 +8,19 @@ def term(sname):
 
 def init(sname):
     log.debug("init(): %s" % sname)
-    invoke(sname, sname, "1", str(101))
-    post(sname, sname, "2", buffer("202"))
-    post(sname, sname, "3", None)
+    invoke(sname, sname, "foo", str(101))
+    post(sname, sname, "bar", buffer("202"))
+    post(sname, sname, "none", None)
 
 def event(sname, frm, type, user):
     log.debug("event(): %s" % sname)
-    if type == "1":
+    if type == "foo":
         if int(user) != 101:
             log.error("unexpected user data")
-    elif type == "2":
+    elif type == "bar":
         if int(user) != 202:
             log.error("unexpected user data")
-    elif type == "3":
+    elif type == "none":
         if user is not None:
             log.error("unexpected user data")
         stop()

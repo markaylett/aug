@@ -12,7 +12,7 @@ AUGSYS_API aug_mutex_t
 aug_createmutex(void);
 
 AUGSYS_API int
-aug_freemutex(aug_mutex_t mutex);
+aug_destroymutex(aug_mutex_t mutex);
 
 AUGSYS_API int
 aug_lockmutex(aug_mutex_t mutex);

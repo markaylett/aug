@@ -25,11 +25,11 @@ static struct aug_files free_ = AUG_HEAD_INITIALIZER(free_);
 AUG_ALLOCATOR(allocate_, &free_, aug_file_, 64)
 
 AUGNET_API int
-aug_freefiles(struct aug_files* files)
+aug_destroyfiles(struct aug_files* files)
 {
     struct aug_file_* it;
     AUG_FOREACH(it, files)
-        aug_freevar(&it->arg_);
+        aug_destroyvar(&it->arg_);
 
     if (!AUG_EMPTY(files)) {
 
@@ -78,7 +78,7 @@ aug_removefile(struct aug_files* files, int fd)
 
     AUG_REMOVE(files, it, aug_file_);
 
-    aug_freevar(&it->arg_);
+    aug_destroyvar(&it->arg_);
     aug_lock();
     AUG_INSERT_TAIL(&free_, it);
     aug_unlock();
@@ -100,7 +100,7 @@ aug_foreachfile(struct aug_files* files)
 
             AUG_REMOVE_PREVPTR(it, prev, files);
 
-            aug_freevar(&it->arg_);
+            aug_destroyvar(&it->arg_);
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
             aug_unlock();

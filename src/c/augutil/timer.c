@@ -60,11 +60,11 @@ insert_(struct aug_timers* timers, struct aug_timer_* timer)
 }
 
 AUGUTIL_API int
-aug_freetimers(struct aug_timers* timers)
+aug_destroytimers(struct aug_timers* timers)
 {
     struct aug_timer_* it;
     AUG_FOREACH(it, timers)
-        aug_freevar(&it->arg_);
+        aug_destroyvar(&it->arg_);
 
     if (!AUG_EMPTY(timers)) {
 
@@ -124,7 +124,7 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
 
             if (-1 == expiry_(&it->tv_, it->ms_)) {
 
-                aug_freevar(&it->arg_);
+                aug_destroyvar(&it->arg_);
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
                 aug_unlock();
@@ -152,7 +152,7 @@ aug_canceltimer(struct aug_timers* timers, int id)
 
             AUG_REMOVE_PREVPTR(it, prev, timers);
 
-            aug_freevar(&it->arg_);
+            aug_destroyvar(&it->arg_);
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
             aug_unlock();
@@ -215,7 +215,7 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
 
                 /* A zero ms value cancels the timer. */
 
-                aug_freevar(&it->arg_);
+                aug_destroyvar(&it->arg_);
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
                 aug_unlock();

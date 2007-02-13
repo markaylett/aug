@@ -16,7 +16,7 @@ struct aug_mmap_ {
 };
 
 AUGSYS_API int
-aug_freemmap(struct aug_mmap_* mmap_);
+aug_destroymmap(struct aug_mmap_* mmap_);
 
 AUGSYS_API struct aug_mmap_*
 aug_createmmap(int fd, size_t offset, size_t len, int flags);

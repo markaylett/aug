@@ -27,8 +27,8 @@ namespace aug {
     public:
         ~connector() AUG_NOTHROW
         {
-            if (-1 == aug_freeconnector(connector_))
-                perrinfo("aug_freeconnector() failed");
+            if (-1 == aug_destroyconnector(connector_))
+                perrinfo("aug_destroyconnector() failed");
         }
 
         connector(const char* host, const char* serv)

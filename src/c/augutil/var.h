@@ -18,7 +18,7 @@ struct aug_var {
         long long_;
         void* ptr_;
     } u_;
-    void (*free_)();
+    void (*destroy_)();
 };
 
 #define AUG_VARNULL { AUG_VTNULL, { 0 }, NULL }
@@ -28,7 +28,7 @@ struct aug_var {
 */
 
 AUGUTIL_API const struct aug_var*
-aug_freevar(const struct aug_var* v);
+aug_destroyvar(const struct aug_var* v);
 
 AUGUTIL_API struct aug_var*
 aug_clearvar(struct aug_var* v, void (*fn)(void));

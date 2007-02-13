@@ -47,7 +47,7 @@ aug_createconnector(const char* host, const char* serv)
         return NULL;
 
     if (!(ctor  = malloc(sizeof(struct aug_connector_)))) {
-        aug_freeaddrinfo(res);
+        aug_destroyaddrinfo(res);
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
@@ -58,12 +58,12 @@ aug_createconnector(const char* host, const char* serv)
 }
 
 AUGNET_API int
-aug_freeconnector(aug_connector_t ctor)
+aug_destroyconnector(aug_connector_t ctor)
 {
     if (-1 != ctor->fd_)
         aug_close(ctor->fd_);
 
-    aug_freeaddrinfo(ctor->save_);
+    aug_destroyaddrinfo(ctor->save_);
     free(ctor);
     return 0;
 }

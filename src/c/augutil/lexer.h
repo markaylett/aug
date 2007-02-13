@@ -29,7 +29,7 @@ AUGUTIL_API aug_lexer_t
 aug_createlexer(size_t size, aug_isdelim_t isdelim);
 
 AUGUTIL_API int
-aug_freelexer(aug_lexer_t lexer);
+aug_destroylexer(aug_lexer_t lexer);
 
 AUGUTIL_API enum aug_token
 aug_lexchar(aug_lexer_t* lexer, char ch);

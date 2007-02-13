@@ -37,9 +37,9 @@ namespace aug {
     }
 
     inline const aug_var&
-    freevar(const aug_var& v)
+    destroyvar(const aug_var& v)
     {
-        return *aug_freevar(&v);
+        return *aug_destroyvar(&v);
     }
 
     inline aug_var&

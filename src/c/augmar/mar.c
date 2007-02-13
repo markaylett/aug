@@ -138,7 +138,7 @@ aug_createmar(void)
     return mar;
 
  fail:
-    aug_freeseq_(seq);
+    aug_destroyseq_(seq);
     return NULL;
 }
 
@@ -184,7 +184,7 @@ aug_openmar(const char* path, int flags, ...)
     return mar;
 
  fail:
-    aug_freeseq_(seq);
+    aug_destroyseq_(seq);
     return NULL;
 }
 
@@ -212,10 +212,10 @@ aug_releasemar(aug_mar_t mar)
             goto fail;
     }
 
-    return aug_freeseq_(mar->seq_);
+    return aug_destroyseq_(mar->seq_);
 
  fail:
-    aug_freeseq_(mar->seq_);
+    aug_destroyseq_(mar->seq_);
     return -1;
 }
 

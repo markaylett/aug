@@ -14,7 +14,7 @@ AUGNET_API aug_connector_t
 aug_createconnector(const char* host, const char* serv);
 
 AUGNET_API int
-aug_freeconnector(aug_connector_t ctor);
+aug_destroyconnector(aug_connector_t ctor);
 
 /**
    A blocking socket will be returned when the established flag is set.  Use

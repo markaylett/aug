@@ -15,7 +15,7 @@
 typedef struct aug_seq_* aug_seq_t;
 
 AUGMAR_EXTERN int
-aug_freeseq_(aug_seq_t seq);
+aug_destroyseq_(aug_seq_t seq);
 
 AUGMAR_EXTERN int
 aug_copyseq_(aug_seq_t dst, aug_seq_t src);

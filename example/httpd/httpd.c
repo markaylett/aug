@@ -89,7 +89,7 @@ createconn_(aug_mplexer_t mplexer, int fd)
         return NULL;
 
     if (-1 == aug_setioeventmask(mplexer, fd, AUG_IOEVENTRD)) {
-        aug_freestate(state);
+        aug_destroystate(state);
         return NULL;
     }
 
@@ -97,10 +97,10 @@ createconn_(aug_mplexer_t mplexer, int fd)
 }
 
 static int
-freeconn_(aug_state_t state, aug_mplexer_t mplexer, int fd)
+destroyconn_(aug_state_t state, aug_mplexer_t mplexer, int fd)
 {
     aug_setioeventmask(mplexer, fd, 0);
-    aug_freestate(state);
+    aug_destroystate(state);
     return 0;
 }
 
@@ -151,7 +151,7 @@ conn_(int fd, const struct aug_var* arg, struct aug_files* files)
     return 1;
 
  fail:
-    freeconn_(aug_getvarp(arg), mplexer_, fd);
+    destroyconn_(aug_getvarp(arg), mplexer_, fd);
     aug_close(fd);
     return 0;
 }
@@ -327,7 +327,7 @@ readevent_(int fd, const struct aug_var* arg, struct aug_files* files)
         quit_ = 1;
         break;
     }
-    aug_freevar(&event.arg_);
+    aug_destroyvar(&event.arg_);
     return 1;
 }
 
@@ -361,11 +361,11 @@ init_(const struct aug_var* arg)
     return 0;
 
  fail3:
-    aug_freefiles(&files_);
+    aug_destroyfiles(&files_);
  fail2:
     aug_close(fd_);
  fail1:
-    aug_freemplexer(mplexer_);
+    aug_destroymplexer(mplexer_);
     return -1;
 }
 
@@ -401,10 +401,13 @@ term_(const struct aug_var* arg)
 {
     aug_info("terminating daemon process");
 
-    AUG_PERRINFO(aug_freetimers(&timers_), NULL, "aug_freetimers() failed");
-    AUG_PERRINFO(aug_freefiles(&files_), NULL, "aug_freefiles() failed");
+    AUG_PERRINFO(aug_destroytimers(&timers_), NULL,
+                 "aug_destroytimers() failed");
+    AUG_PERRINFO(aug_destroyfiles(&files_), NULL,
+                 "aug_destroyfiles() failed");
     AUG_PERRINFO(aug_close(fd_), NULL, "aug_close() failed");
-    AUG_PERRINFO(aug_freemplexer(mplexer_), NULL, "aug_freemplexer() failed");
+    AUG_PERRINFO(aug_destroymplexer(mplexer_), NULL,
+                 "aug_destroymplexer() failed");
 }
 
 int

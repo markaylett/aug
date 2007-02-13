@@ -12,7 +12,7 @@ static const struct augas_host* host_ = NULL;
 static PyTypeObject* type_ = NULL;
 
 static void
-free_(void* user)
+destroy_(void* user)
 {
     Py_DECREF((PyObject*)user);
 }
@@ -284,7 +284,7 @@ settimer_(PyObject* self, PyObject* args)
     if (!(timer = augpy_createobject(type_, sname, 0, user)))
         return NULL;
 
-    if (-1 == (tid = host_->settimer_(sname, ms, timer, free_))) {
+    if (-1 == (tid = host_->settimer_(sname, ms, timer, destroy_))) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         Py_DECREF(timer);
         return NULL;

@@ -61,8 +61,8 @@ namespace aug {
     public:
         ~files() AUG_NOTHROW
         {
-            if (-1 == aug_freefiles(&files_))
-                perrinfo("aug_freefiles() failed");
+            if (-1 == aug_destroyfiles(&files_))
+                perrinfo("aug_destroyfiles() failed");
         }
 
         files()

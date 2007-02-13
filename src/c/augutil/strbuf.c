@@ -73,7 +73,7 @@ aug_createstrbuf(size_t size)
 }
 
 AUGUTIL_API int
-aug_freestrbuf(aug_strbuf_t strbuf)
+aug_destroystrbuf(aug_strbuf_t strbuf)
 {
 	if (strbuf)
 		free(strbuf);

@@ -57,11 +57,11 @@ aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
     if (!res) /* errno set from final aug_connect(). */
         goto fail;
 
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return fd;
 
  fail:
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return -1;
 }
 
@@ -106,14 +106,14 @@ aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep)
     if (-1 == aug_listen(fd, SOMAXCONN))
         goto fail2;
 
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return fd;
 
  fail2:
     aug_close(fd);
 
  fail1:
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return -1;
 }
 
@@ -145,11 +145,11 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep)
     ep->len_ = (socklen_t)res->ai_addrlen;
     memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
 
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return fd;
 
  fail:
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return -1;
 }
 
@@ -187,11 +187,11 @@ aug_udpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
     if (!res) /* errno set from final aug_connect() */
         return -1;
 
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return fd;
 
  fail:
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return -1;
 }
 
@@ -230,11 +230,11 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
     if (!res) /* errno from final aug_socket() or aug_bind(). */
         return -1;
 
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return fd;
 
  fail:
-    aug_freeaddrinfo(save);
+    aug_destroyaddrinfo(save);
     return -1;
 }
 

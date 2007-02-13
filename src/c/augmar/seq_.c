@@ -23,7 +23,7 @@ static const char rcsid[] = "$Id$";
 #endif /* _WIN32 */
 
 struct impl_ {
-    int (*free_)(aug_seq_t);
+    int (*destroy_)(aug_seq_t);
     void* (*resize_)(aug_seq_t, unsigned, unsigned);
     int (*sync_)(aug_seq_t);
     void* (*addr_)(aug_seq_t);
@@ -48,7 +48,7 @@ struct mfileseq_ {
 };
 
 static int
-freemem_(aug_seq_t seq)
+destroymem_(aug_seq_t seq)
 {
     struct memseq_* memseq = (struct memseq_*)seq;
     if (memseq->addr_)
@@ -125,7 +125,7 @@ memtail_(aug_seq_t seq)
 }
 
 static const struct impl_ memimpl_ = {
-    freemem_,
+    destroymem_,
     resizemem_,
     syncmem_,
     memaddr_,
@@ -134,7 +134,7 @@ static const struct impl_ memimpl_ = {
 };
 
 static int
-freemfile_(aug_seq_t seq)
+destroymfile_(aug_seq_t seq)
 {
     struct mfileseq_* mfileseq = (struct mfileseq_*)seq;
     return aug_closemfile_(mfileseq->mfile_);
@@ -199,7 +199,7 @@ mfiletail_(aug_seq_t seq)
 }
 
 static const struct impl_ mfileimpl_ = {
-    freemfile_,
+    destroymfile_,
     resizemfile_,
     syncmfile_,
     mfileaddr_,
@@ -208,9 +208,9 @@ static const struct impl_ mfileimpl_ = {
 };
 
 AUGMAR_EXTERN int
-aug_freeseq_(aug_seq_t seq)
+aug_destroyseq_(aug_seq_t seq)
 {
-    return (*seq->impl_->free_)(seq);
+    return (*seq->impl_->destroy_)(seq);
 }
 
 AUGMAR_EXTERN int

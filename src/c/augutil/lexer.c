@@ -124,7 +124,7 @@ aug_createlexer(size_t size, aug_isdelim_t isdelim)
 }
 
 AUGUTIL_API int
-aug_freelexer(aug_lexer_t lexer)
+aug_destroylexer(aug_lexer_t lexer)
 {
     free(lexer);
     return 0;

@@ -20,10 +20,10 @@ AUG_HEAD(aug_files, aug_file_);
 typedef int (*aug_filecb_t)(int, const struct aug_var*, struct aug_files*);
 
 AUGNET_API int
-aug_freefiles(struct aug_files* files);
+aug_destroyfiles(struct aug_files* files);
 
 /**
-   If aug_insertfile() succeeds, aug_freevar() will be called when the file is
+   If aug_insertfile() succeeds, aug_destroyvar() will be called when the file is
    removed.
 */
 

@@ -106,7 +106,7 @@ aug_createmplexer(void)
 }
 
 AUGSYS_API int
-aug_freemplexer(aug_mplexer_t mplexer)
+aug_destroymplexer(aug_mplexer_t mplexer)
 {
     free(mplexer);
     return 0;

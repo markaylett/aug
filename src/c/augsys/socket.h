@@ -123,7 +123,7 @@ AUGSYS_API struct aug_inetaddr*
 aug_inetpton(int af, const char* src, struct aug_inetaddr* dst);
 
 AUGSYS_API void
-aug_freeaddrinfo(struct addrinfo* res);
+aug_destroyaddrinfo(struct addrinfo* res);
 
 AUGSYS_API int
 aug_getaddrinfo(const char* host, const char* serv,

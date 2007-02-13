@@ -20,7 +20,7 @@ aug_createmutex_(void)
 }
 
 AUGSYS_EXTERN int
-aug_freemutex_(aug_mutex_t mutex)
+aug_destroymutex_(aug_mutex_t mutex)
 {
     return 0;
 }
@@ -94,7 +94,7 @@ aug_termlock_(void)
     }
 
     mutex_ = NULL;
-    return aug_freemutex_(tmp);
+    return aug_destroymutex_(tmp);
 }
 
 /* If these locking functions fail, all bets are off. */

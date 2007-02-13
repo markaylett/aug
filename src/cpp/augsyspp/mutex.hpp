@@ -22,8 +22,8 @@ namespace aug {
     public:
         ~mutex() AUG_NOTHROW
         {
-            if (-1 == aug_freemutex(mutex_))
-                perrinfo("aug_freemutex() failed");
+            if (-1 == aug_destroymutex(mutex_))
+                perrinfo("aug_destroymutex() failed");
         }
 
         mutex()

@@ -21,9 +21,9 @@ aug_createmutex(void)
 }
 
 AUGSYS_API int
-aug_freemutex(aug_mutex_t mutex)
+aug_destroymutex(aug_mutex_t mutex)
 {
-    int ret = aug_freemutex_(mutex);
+    int ret = aug_destroymutex_(mutex);
     if (-1 == ret)
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return ret;

@@ -31,15 +31,15 @@ typedef void (*aug_fixcb_t)(const struct aug_var*, const char*, size_t);
 typedef struct aug_fixstream_* aug_fixstream_t;
 
 /**
-   If aug_createfixstream() succeeds, aug_freevar() will be called from
-   aug_freefixstream().
+   If aug_createfixstream() succeeds, aug_destroyvar() will be called from
+   aug_destroyfixstream().
 */
 
 AUGNET_API aug_fixstream_t
 aug_createfixstream(size_t size, aug_fixcb_t cb, const struct aug_var* arg);
 
 AUGNET_API int
-aug_freefixstream(aug_fixstream_t stream);
+aug_destroyfixstream(aug_fixstream_t stream);
 
 AUGNET_API ssize_t
 aug_readfix(aug_fixstream_t stream, int fd, size_t size);

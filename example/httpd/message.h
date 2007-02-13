@@ -21,9 +21,9 @@ struct aug_message*
 aug_createmessage(aug_strbuf_t initial, aug_mar_t mar);
 
 int
-aug_freemessages(struct aug_messages* messages);
+aug_destroymessages(struct aug_messages* messages);
 
 int
-aug_freemessage(struct aug_message* message);
+aug_destroymessage(struct aug_message* message);
 
 #endif /* HTTPD_MESSAGE_H */

@@ -75,13 +75,13 @@ main(int argc, char* argv[])
         goto fail;
     }
 
-    if (-1 == aug_freehttpparser(parser)) {
-        aug_perrinfo(NULL, "aug_freehttpparser() failed");
+    if (-1 == aug_destroyhttpparser(parser)) {
+        aug_perrinfo(NULL, "aug_destroyhttpparser() failed");
         return 1;
     }
     return 0;
 
  fail:
-    aug_freehttpparser(parser);
+    aug_destroyhttpparser(parser);
     return 1;
 }

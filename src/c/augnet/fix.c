@@ -191,10 +191,10 @@ aug_createfixstream(size_t size, aug_fixcb_t cb, const struct aug_var* arg)
 }
 
 AUGNET_API int
-aug_freefixstream(aug_fixstream_t stream)
+aug_destroyfixstream(aug_fixstream_t stream)
 {
-    int ret = aug_freestrbuf(stream->strbuf_);
-    aug_freevar(&stream->arg_);
+    int ret = aug_destroystrbuf(stream->strbuf_);
+    aug_destroyvar(&stream->arg_);
     free(stream);
     return ret;
 }

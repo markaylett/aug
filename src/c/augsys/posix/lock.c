@@ -26,7 +26,7 @@ aug_createmutex_(void)
 }
 
 AUGSYS_EXTERN int
-aug_freemutex_(aug_mutex_t mutex)
+aug_destroymutex_(aug_mutex_t mutex)
 {
     errno = pthread_mutex_destroy(&mutex->handle_);
     free(mutex);

@@ -13,28 +13,28 @@ using namespace std;
 
 namespace {
 
-    bool freed_ = false;
+    bool destroyed_ = false;
 
     void
-    freetest()
+    destroytest()
     {
-        freed_ = true;
+        destroyed_ = true;
     }
 
-    long freedl_(0);
+    long destroyedl_(0);
 
     void
-    freetest(long l)
+    destroytest(long l)
     {
-        freedl_ = l;
+        destroyedl_ = l;
     }
 
-    void* freedp_(0);
+    void* destroyedp_(0);
 
     void
-    freetest(void* p)
+    destroytest(void* p)
     {
-        freedp_ = p;
+        destroyedp_ = p;
     }
 }
 
@@ -80,17 +80,17 @@ main(int argc, char* argv[])
         if (v == w)
             throw logic_error("equality test failed");
 
-        freevar(var(null, freetest));
-        if (!freed_)
-            throw logic_error("free null test failed");
+        destroyvar(var(null, destroytest));
+        if (!destroyed_)
+            throw logic_error("destroy null test failed");
 
-        freevar(var(101, freetest));
-        if (101 != freedl_)
-            throw logic_error("free long test failed");
+        destroyvar(var(101, destroytest));
+        if (101 != destroyedl_)
+            throw logic_error("destroy long test failed");
 
-        freevar(var(&argc, freetest));
-        if (&argc != freedp_)
-            throw logic_error("free ptr test failed");
+        destroyvar(var(&argc, destroytest));
+        if (&argc != destroyedp_)
+            throw logic_error("destroy ptr test failed");
 
         cout << formatlog(AUG_LOGINFO, "a %s message", "test") << endl;
 

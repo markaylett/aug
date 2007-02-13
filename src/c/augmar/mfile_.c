@@ -62,7 +62,7 @@ aug_closemfile_(aug_mfile_t mfile)
 
     if (mfile->mmap_) {
 
-        if (-1 == aug_freemmap(mfile->mmap_))
+        if (-1 == aug_destroymmap(mfile->mmap_))
             ret = -1;
 
         if (mfile->resvd_ > mfile->size_) {
@@ -150,7 +150,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 
         if (-1 == aug_remmap(mfile->mmap_, 0, size)) {
 
-            aug_freemmap(mfile->mmap_);
+            aug_destroymmap(mfile->mmap_);
             mfile->mmap_ = NULL;
             return NULL;
         }

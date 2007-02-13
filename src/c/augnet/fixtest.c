@@ -124,6 +124,6 @@ main(int argc, char* argv[])
 
     aug_close(sv[0]);
     aug_close(sv[1]);
-    aug_freefixstream(stream);
+    aug_destroyfixstream(stream);
     return 0;
 }

@@ -16,14 +16,14 @@ typedef void (*aug_timercb_t)(int, const struct aug_var*, unsigned*,
                               struct aug_timers*);
 
 AUGUTIL_API int
-aug_freetimers(struct aug_timers* timers);
+aug_destroytimers(struct aug_timers* timers);
 
 /**
    If id <= 0, a new id will be allocated.  Alternatively, a previously
    allocated timer id can be specified.  In which case, any timer with a
    matching id will be cancelled prior to setting the new timer.
 
-   If aug_settimer() succeeds, aug_freevar() will be called when the timer is
+   If aug_settimer() succeeds, aug_destroyvar() will be called when the timer is
    removed.
 
    \return the timer id.

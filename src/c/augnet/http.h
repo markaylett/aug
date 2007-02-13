@@ -21,8 +21,8 @@ struct aug_httphandlers {
 typedef struct aug_httpparser_* aug_httpparser_t;
 
 /**
-   If aug_createhttpparser() succeeds, aug_freevar() will be called from
-   aug_freehttpparser().
+   If aug_createhttpparser() succeeds, aug_destroyvar() will be called from
+   aug_destroyhttpparser().
 */
 
 AUGNET_API aug_httpparser_t
@@ -30,7 +30,7 @@ aug_createhttpparser(unsigned size, const struct aug_httphandlers* handlers,
                      const struct aug_var* arg);
 
 AUGNET_API int
-aug_freehttpparser(aug_httpparser_t parser);
+aug_destroyhttpparser(aug_httpparser_t parser);
 
 AUGNET_API int
 aug_parsehttp(aug_httpparser_t parser, const char*, unsigned size);

@@ -121,13 +121,13 @@ struct augas_host {
        \param sname TODO
        \param to TODO
        \param event TODO
-       \param destr TODO
+       \param destroy TODO
        \return TODO
        \sa TODO
     */
 
     int (*post_)(const char* sname, const char* to,
-                 const struct augas_event* event, void (*destr)(void*));
+                 const struct augas_event* event, void (*destroy)(void*));
 
     /**
      * The remaining functions are not thread-safe.
@@ -248,13 +248,13 @@ struct augas_host {
        \param sname TODO
        \param ms TODO
        \param user TODO
-       \param destr TODO
+       \param destroy TODO
        \return TODO
        \sa TODO
     */
 
     int (*settimer_)(const char* sname, unsigned ms, void* user,
-                     void (*destr)(void*));
+                     void (*destroy)(void*));
 
     /**
        \brief TODO

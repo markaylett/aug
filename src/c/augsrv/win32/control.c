@@ -54,7 +54,7 @@ makepath_(void)
     return s;
 
  fail:
-    aug_freestrbuf(s);
+    aug_destroystrbuf(s);
     return NULL;
 }
 
@@ -177,7 +177,7 @@ install_(SC_HANDLE scm)
     ret = 0;
 
  done:
-    aug_freestrbuf(path);
+    aug_destroystrbuf(path);
     return ret;
 }
 

@@ -12,7 +12,7 @@ aug_createtlskey_(aug_tlskey_t* tlskey)
 }
 
 AUGSYS_EXTERN int
-aug_freetlskey_(aug_tlskey_t tlskey)
+aug_destroytlskey_(aug_tlskey_t tlskey)
 {
     if (!TlsFree(tlskey)) {
         aug_setwin32errno(GetLastError());

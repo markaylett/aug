@@ -246,7 +246,7 @@ aug_inetpton(int af, const char* src, struct aug_inetaddr* dst)
 }
 
 AUGSYS_API void
-aug_freeaddrinfo(struct addrinfo* res)
+aug_destroyaddrinfo(struct addrinfo* res)
 {
     freeaddrinfo(res);
 }

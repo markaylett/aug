@@ -17,15 +17,15 @@ typedef int (*aug_request_t)(const struct aug_var*, const char*, aug_mar_t,
                              struct aug_messages*);
 
 /**
-   If aug_createstate() succeeds, aug_freevar() will be called from
-   aug_freestate().
+   If aug_createstate() succeeds, aug_destroyvar() will be called from
+   aug_destroystate().
 */
 
 aug_state_t
 aug_createstate(aug_request_t request, const struct aug_var* arg);
 
 int
-aug_freestate(aug_state_t state);
+aug_destroystate(aug_state_t state);
 
 int
 aug_sendresponse(aug_state_t state, struct aug_message* message);

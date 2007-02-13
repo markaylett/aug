@@ -110,7 +110,7 @@ aug_initerrinfo_(struct aug_errinfo* errinfo)
         return -1;
 
     if (-1 == aug_settlsvalue_(tlskey_, errinfo)) {
-        aug_freetlskey_(tlskey_);
+        aug_destroytlskey_(tlskey_);
         return -1;
     }
 
@@ -128,7 +128,7 @@ aug_termerrinfo_(void)
     }
 
     init_ = 0;
-    return aug_freetlskey_(tlskey_);
+    return aug_destroytlskey_(tlskey_);
 }
 
 AUGSYS_API int

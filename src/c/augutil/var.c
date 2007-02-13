@@ -9,21 +9,21 @@ static const char rcsid[] = "$Id$";
 #include <stddef.h> /* NULL */
 
 AUGUTIL_API const struct aug_var*
-aug_freevar(const struct aug_var* v)
+aug_destroyvar(const struct aug_var* v)
 {
     if (!v)
         return NULL;
 
-    if (v->free_) {
+    if (v->destroy_) {
         switch (v->type_) {
         case AUG_VTNULL:
-            v->free_();
+            v->destroy_();
             break;
         case AUG_VTLONG:
-            v->free_(v->u_.long_);
+            v->destroy_(v->u_.long_);
             break;
         case AUG_VTPTR:
-            v->free_(v->u_.ptr_);
+            v->destroy_(v->u_.ptr_);
             break;
         }
     }
@@ -35,7 +35,7 @@ aug_clearvar(struct aug_var* v, void (*fn)(void))
 {
     v->type_ = AUG_VTNULL;
     v->u_.ptr_ = NULL;
-    v->free_ = fn;
+    v->destroy_ = fn;
     return v;
 }
 
@@ -47,11 +47,11 @@ aug_setvar(struct aug_var* v, const struct aug_var* w)
             v->u_.long_ = w->u_.long_;
         else
             v->u_.ptr_ = w->u_.ptr_;
-        v->free_ = w->free_;
+        v->destroy_ = w->destroy_;
     } else {
         v->type_ = AUG_VTNULL;
         v->u_.ptr_ = NULL;
-        v->free_ = NULL;
+        v->destroy_ = NULL;
     }
     return v;
 }
@@ -61,7 +61,7 @@ aug_setvarl(struct aug_var* v, long l, void (*fn)(long))
 {
     v->type_ = AUG_VTLONG;
     v->u_.long_ = l;
-    v->free_ = fn;
+    v->destroy_ = fn;
     return v;
 }
 
@@ -70,7 +70,7 @@ aug_setvarp(struct aug_var* v, void* p, void (*fn)(void*))
 {
     v->type_ = AUG_VTPTR;
     v->u_.ptr_ = p;
-    v->free_ = fn;
+    v->destroy_ = fn;
     return v;
 }
 

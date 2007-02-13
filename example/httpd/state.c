@@ -162,7 +162,7 @@ end_(const struct aug_var* arg, int commit)
     }
 
     if (state->in_.initial_) {
-        aug_freestrbuf(state->in_.initial_);
+        aug_destroystrbuf(state->in_.initial_);
         state->in_.initial_ = NULL;
     }
 
@@ -210,14 +210,14 @@ aug_createstate(aug_request_t request, const struct aug_var* arg)
 }
 
 int
-aug_freestate(aug_state_t state)
+aug_destroystate(aug_state_t state)
 {
     struct aug_message* it;
 
-    aug_freehttpparser(state->in_.parser_);
+    aug_destroyhttpparser(state->in_.parser_);
 
     if (state->in_.initial_)
-        aug_freestrbuf(state->in_.initial_);
+        aug_destroystrbuf(state->in_.initial_);
 
     if (state->in_.mar_)
         aug_releasemar(state->in_.mar_);
@@ -227,18 +227,18 @@ aug_freestate(aug_state_t state)
         /* An initial line will always be present. */
 
         assert(it->initial_);
-        aug_freestrbuf(it->initial_);
+        aug_destroystrbuf(it->initial_);
 
         if (it->mar_)
             aug_releasemar(it->mar_);
     }
 
-    aug_freemessages(&state->out_.pending_);
+    aug_destroymessages(&state->out_.pending_);
 
     if (state->out_.header_)
-        aug_freestrbuf(state->out_.header_);
+        aug_destroystrbuf(state->out_.header_);
 
-    aug_freevar(&state->arg_);
+    aug_destroyvar(&state->arg_);
     free(state);
     return 0;
 }
@@ -296,11 +296,11 @@ aug_writesome(aug_state_t state, int fd)
             struct aug_message* message = AUG_FIRST(&state->out_.pending_);
             AUG_REMOVE_HEAD(&state->out_.pending_);
 
-            aug_freestrbuf(message->initial_);
+            aug_destroystrbuf(message->initial_);
             if (message->mar_)
                 aug_releasemar(message->mar_);
 
-            aug_freemessage(message);
+            aug_destroymessage(message);
             if (!AUG_EMPTY(&state->out_.pending_))
                 prepare_(state);
         }

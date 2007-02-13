@@ -20,7 +20,7 @@ AUGSYS_EXTERN aug_mutex_t
 aug_createmutex_(void);
 
 AUGSYS_EXTERN int
-aug_freemutex_(aug_mutex_t mutex);
+aug_destroymutex_(aug_mutex_t mutex);
 
 AUGSYS_EXTERN int
 aug_lockmutex_(aug_mutex_t mutex);

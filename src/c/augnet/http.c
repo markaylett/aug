@@ -226,10 +226,10 @@ aug_createhttpparser(unsigned size, const struct aug_httphandlers* handlers,
 }
 
 AUGNET_API int
-aug_freehttpparser(aug_httpparser_t parser)
+aug_destroyhttpparser(aug_httpparser_t parser)
 {
-    int ret = aug_freelexer(parser->lexer_);
-    aug_freevar(&parser->arg_);
+    int ret = aug_destroylexer(parser->lexer_);
+    aug_destroyvar(&parser->arg_);
     free(parser);
     return ret;
 }
