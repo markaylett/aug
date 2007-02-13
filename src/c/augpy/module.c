@@ -24,6 +24,23 @@ incret_(PyObject* x)
     return x;
 }
 
+static struct augas_event*
+setevent_(struct augas_event* event, const char* type, const char* user,
+          int size)
+{
+    strncpy(event->type_, type, sizeof(event->type_));
+    event->type_[AUGAS_MAXNAME] ='\0';
+
+    if (user) {
+        event->user_ = (void*)user;
+        event->size_ = (size_t)size;
+    } else {
+        event->user_ = NULL;
+        event->size_ = 0;
+    }
+    return event;
+}
+
 static PyObject*
 writelog_(PyObject* self, PyObject* args)
 {
@@ -60,18 +77,15 @@ stop_(PyObject* self, PyObject* args)
 static PyObject*
 post_(PyObject* self, PyObject* args)
 {
-    const char* sname, * to, * user;
+    const char* sname, * to, * ename, * user;
     int size;
-    struct augas_event event = { 0, NULL, 0 };
+    struct augas_event event;
 
-    if (!PyArg_ParseTuple(args, "ssiz#:post", &sname, &to, &event.type_,
-                          &user, &size))
+    if (!PyArg_ParseTuple(args, "sssz#:post", &sname, &to, &ename, &user,
+                          &size))
         return NULL;
 
-    if (user) {
-        event.user_ = strdup(user);
-        event.size_ = size;
-    }
+    setevent_(&event, ename, user ? user : strdup(user), size);
 
     if (-1 == host_->post_(sname, to, &event, event.user_ ? free : NULL)) {
 
@@ -90,18 +104,15 @@ post_(PyObject* self, PyObject* args)
 static PyObject*
 invoke_(PyObject* self, PyObject* args)
 {
-    const char* sname, * to, * user;
+    const char* sname, * to, * ename, * user;
     int size;
-    struct augas_event event = { 0, NULL, 0 };
+    struct augas_event event;
 
-    if (!PyArg_ParseTuple(args, "ssiz#:invoke", &sname, &to, &event.type_,
-                          &user, &size))
+    if (!PyArg_ParseTuple(args, "sssz#:invoke", &sname, &to, &ename, &user,
+                          &size))
         return NULL;
 
-    if (user) {
-        event.user_ = (void*)user;
-        event.size_ = size;
-    }
+    setevent_(&event, ename, user, size);
 
     if (-1 == host_->invoke_(sname, to, &event)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());

@@ -300,7 +300,7 @@ event_(const struct augas_serv* serv, const char* from,
 
     if (import->event_) {
 
-        PyObject* y = PyObject_CallFunction(import->event_, "ssiz#",
+        PyObject* y = PyObject_CallFunction(import->event_, "sssz#",
                                             serv->name_, from, event->type_,
                                             (const char*)event->user_,
                                             (int)event->size_);

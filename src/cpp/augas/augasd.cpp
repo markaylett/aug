@@ -277,7 +277,7 @@ namespace augas {
     post_(const char* sname, const char* to, const augas_event* event,
           void (*free)(void*))
     {
-        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%d], size=[%d]",
+        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s], size=[%d]",
                    sname, to, event->type_, event->size_);
         try {
 
@@ -298,7 +298,7 @@ namespace augas {
     int
     invoke_(const char* sname, const char* to, const augas_event* event)
     {
-        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%d], size=[%d]",
+        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s], size=[%d]",
                    sname, to, event->type_, event->size_);
         try {
 

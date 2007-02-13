@@ -54,7 +54,7 @@ struct augas_serv {
 };
 
 struct augas_event {
-    int type_;
+    char type_[AUGAS_MAXNAME + 1];
     void* user_;
     size_t size_;
 };
@@ -121,13 +121,13 @@ struct augas_host {
        \param sname TODO
        \param to TODO
        \param event TODO
-       \param free TODO
+       \param destr TODO
        \return TODO
        \sa TODO
     */
 
     int (*post_)(const char* sname, const char* to,
-                 const struct augas_event* event, void (*free)(void*));
+                 const struct augas_event* event, void (*destr)(void*));
 
     /**
      * The remaining functions are not thread-safe.
@@ -248,13 +248,13 @@ struct augas_host {
        \param sname TODO
        \param ms TODO
        \param user TODO
-       \param free TODO
+       \param destr TODO
        \return TODO
        \sa TODO
     */
 
     int (*settimer_)(const char* sname, unsigned ms, void* user,
-                     void (*free)(void*));
+                     void (*destr)(void*));
 
     /**
        \brief TODO

@@ -64,7 +64,7 @@ bool
 module::event(const augas_serv& serv, const char* from,
               const augas_event& event) const AUG_NOTHROW
 {
-    AUG_DEBUG2("event(): sname=[%s], from=[%s], type=[%d], size=[%d]",
+    AUG_DEBUG2("event(): sname=[%s], from=[%s], ename=[%s], size=[%d]",
                serv.name_, from, event.type_, event.size_);
     return AUGAS_OK == module_.event_(&serv, from, &event);
 }
