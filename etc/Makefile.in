@@ -171,11 +171,13 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
 	augasd.conf.default \
+	augmod.mk \
 	augres.reg
 
 etcdir = $(prefix)/etc
 etc_DATA = \
 	augasd.conf.default \
+	augmod.mk \
 	augres.reg
 
 all: all-am
