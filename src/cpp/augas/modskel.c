@@ -26,7 +26,7 @@ reconf_(const struct augas_serv* serv)
 
 static int
 event_(const struct augas_serv* serv, const char* from,
-       const struct augas_event* event)
+        const struct augas_event* event)
 {
     host_->writelog_(AUGAS_LOGINFO, "event_()");
     return 0;

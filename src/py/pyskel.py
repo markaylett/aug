@@ -8,7 +8,7 @@ import log
 # void reconf()
 # void stop()
 # void post(sname, to, type, user)
-# void invoke(sname, to, type, user)
+# void dispatch(sname, to, type, user)
 # string getenv(name)
 # void shutdown(sock)
 # int tcpconnect(sname, host, serv, user)

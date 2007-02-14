@@ -296,18 +296,20 @@ namespace augas {
     }
 
     int
-    invoke_(const char* sname, const char* to, const augas_event* event)
+    dispatch_(const char* sname, const char* to, const augas_event* event)
     {
-        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s], size=[%d]",
+        AUG_DEBUG2("dispatch(): sname=[%s], to=[%s], type=[%s], size=[%d]",
                    sname, to, event->type_, event->size_);
         try {
 
-            servptr serv(state_->manager_.getserv(to));
-            if (!serv->active())
-                throw error(__FILE__, __LINE__, ESTATE,
-                            "inactive service: sname=[%s]", to);
+            vector<servptr> servs;
+            state_->manager_.getservs(servs, to);
 
-            serv->event(sname, *event);
+            vector<servptr>::const_iterator it(servs.begin()),
+                end(servs.end());
+            for (; it != end; ++it)
+                (*it)->event(sname, *event);
+
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -550,7 +552,7 @@ namespace augas {
         reconf_,
         stop_,
         post_,
-        invoke_,
+        dispatch_,
         getenv_,
         shutdown_,
         tcpconnect_,
@@ -700,11 +702,14 @@ namespace augas {
             {
                 auto_ptr<augas::event> arg
                     (static_cast<augas::event*>(aug_getvarp(&event.arg_)));
-                servptr serv(state_->manager_.getserv(arg->to_));
-                if (serv->active())
-                    serv->event(arg->from_.c_str(), *arg);
-                else
-                    aug_warn("event not delivered to inactive service");
+
+                vector<servptr> servs;
+                state_->manager_.getservs(servs, arg->to_);
+
+                vector<servptr>::const_iterator it(servs.begin()),
+                    end(servs.end());
+                for (; it != end; ++it)
+                    (*it)->event(arg->from_.c_str(), *arg);
             }
         }
         aug_destroyvar(&event.arg_);

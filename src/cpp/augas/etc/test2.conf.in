@@ -5,6 +5,8 @@ loglevel = 7
 services = pystop pytest2
 
 service.pystop.module = augpy
+
+service.pytest2.groups = group1 group2
 service.pytest2.module = augpy
 
 module.augpy.path = ../../c/augpy/.libs/modaugpy.${modext}

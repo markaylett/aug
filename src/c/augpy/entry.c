@@ -149,16 +149,16 @@ destroyimport_(struct import_* import)
         }
     }
 
-    Py_XDECREF(import->teardown_);
+    Py_XDECREF(import->expire_);
     Py_XDECREF(import->wrexpire_);
     Py_XDECREF(import->rdexpire_);
     Py_XDECREF(import->data_);
-    Py_XDECREF(import->accept_);
     Py_XDECREF(import->connected_);
+    Py_XDECREF(import->accept_);
+    Py_XDECREF(import->teardown_);
     Py_XDECREF(import->closed_);
-    Py_XDECREF(import->reconf_);
-    Py_XDECREF(import->expire_);
     Py_XDECREF(import->event_);
+    Py_XDECREF(import->reconf_);
     Py_XDECREF(import->init_);
     Py_XDECREF(import->term_);
 
@@ -181,16 +181,16 @@ createimport_(const char* sname)
 
     import->term_ = getmethod_(import->module_, "term");
     import->init_ = getmethod_(import->module_, "init");
-    import->event_ = getmethod_(import->module_, "event");
-    import->expire_ = getmethod_(import->module_, "expire");
     import->reconf_ = getmethod_(import->module_, "reconf");
+    import->event_ = getmethod_(import->module_, "event");
     import->closed_ = getmethod_(import->module_, "closed");
+    import->teardown_ = getmethod_(import->module_, "teardown");
     import->accept_ = getmethod_(import->module_, "accept");
     import->connected_ = getmethod_(import->module_, "connected");
     import->data_ = getmethod_(import->module_, "data");
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
-    import->teardown_ = getmethod_(import->module_, "teardown");
+    import->expire_ = getmethod_(import->module_, "expire");
 
     return import;
 

@@ -25,8 +25,18 @@ namespace {
 }
 
 void
-manager::insert(const string& name, const servptr& serv)
+manager::insert(const string& name, const servptr& serv, const char* groups)
 {
+    temp_.insert(make_pair(name, serv));
+
+    if (groups) {
+
+        istringstream is(groups);
+        string name;
+        while (is >> name)
+            temp_.insert(make_pair(name, serv));
+    }
+
     // Insert prior to calling open().
 
     servs_[name] = serv;
@@ -35,7 +45,11 @@ manager::insert(const string& name, const servptr& serv)
         // TODO: leave if event posted.
 
         servs_.erase(name); // close() will not be called.
-    }
+
+    } else
+        groups_.insert(temp_.begin(), temp_.end());
+
+    temp_.clear();
 }
 
 void
@@ -43,6 +57,8 @@ manager::clear()
 {
     idtofd_.clear();
     socks_.clear();
+    temp_.clear();
+    groups_.clear();
     servs_.clear();
 
     // Modules not released.
@@ -100,7 +116,7 @@ manager::load(const char* rundir, const options& options,
 
             // Obtain module associated with service.
 
-            string base(string("service.").append(name));
+            const string base(string("service.").append(name));
             value = options.get(base + ".module");
 
             modules::iterator it(modules_.find(value));
@@ -119,7 +135,8 @@ manager::load(const char* rundir, const options& options,
             }
 
             aug_info("creating service: name=[%s]", name.c_str());
-            insert(name, servptr(new augas::serv(it->second, name.c_str())));
+            insert(name, servptr(new augas::serv(it->second, name.c_str())),
+                   options.get(base + ".groups", 0));
         }
 
     } else {
@@ -133,7 +150,7 @@ manager::load(const char* rundir, const options& options,
 
         aug_info("creating service: name=[%s]", DEFAULT_NAME);
         insert(DEFAULT_NAME,
-               servptr(new augas::serv(module, DEFAULT_NAME)));
+               servptr(new augas::serv(module, DEFAULT_NAME)), 0);
     }
 }
 
@@ -213,6 +230,21 @@ manager::getserv(const string& name) const
         throw error(__FILE__, __LINE__, ESTATE,
                     "service not found: sname=[%s]", name.c_str());
     return it->second;
+}
+
+void
+manager::getservs(vector<servptr>& servs, const string& group) const
+{
+    pair<groups::const_iterator,
+        groups::const_iterator> its(groups_.equal_range(group));
+
+    for (; its.first != its.second; ++its.first)
+        servs.push_back(its.first->second);
+
+    its = temp_.equal_range(group);
+
+    for (; its.first != its.second; ++its.first)
+        servs.push_back(its.first->second);
 }
 
 bool

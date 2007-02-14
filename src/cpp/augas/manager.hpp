@@ -7,6 +7,7 @@
 #include "augas/conn.hpp"
 
 #include <map>
+#include <vector>
 
 namespace augas {
 
@@ -16,11 +17,13 @@ namespace augas {
 
         typedef std::map<std::string, moduleptr> modules;
         typedef std::map<std::string, servptr> servs;
-        typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
+        typedef std::multimap<std::string, servptr> groups;
         typedef std::map<int, objectptr> socks;
+        typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
 
         modules modules_;
         servs servs_;
+        groups groups_, temp_;
         socks socks_;
         idtofd idtofd_;
 
@@ -30,7 +33,8 @@ namespace augas {
         operator =(const manager& rhs);
 
         void
-        insert(const std::string& name, const servptr& serv);
+        insert(const std::string& name, const servptr& serv,
+               const char* groups);
 
     public:
         manager()
@@ -70,6 +74,9 @@ namespace augas {
 
         servptr
         getserv(const std::string& name) const;
+
+        void
+        getservs(std::vector<servptr>& servs, const std::string& alias) const;
 
         bool
         empty() const;

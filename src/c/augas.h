@@ -134,7 +134,7 @@ struct augas_host {
      */
 
     /**
-       \brief Invoke peer service with event.
+       \brief Dispatch event to peer service.
        \param sname TODO
        \param to TODO
        \param event TODO
@@ -142,8 +142,8 @@ struct augas_host {
        \sa post_()
     */
 
-    int (*invoke_)(const char* sname, const char* to,
-                   const struct augas_event* event);
+    int (*dispatch_)(const char* sname, const char* to,
+                     const struct augas_event* event);
 
     /**
        \brief Read a configuration value.

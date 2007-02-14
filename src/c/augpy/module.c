@@ -85,7 +85,7 @@ post_(PyObject* self, PyObject* args)
                           &size))
         return NULL;
 
-    setevent_(&event, ename, user ? user : strdup(user), size);
+    setevent_(&event, ename, user ? strdup(user) : NULL, size);
 
     if (-1 == host_->post_(sname, to, &event, event.user_ ? free : NULL)) {
 
@@ -102,19 +102,19 @@ post_(PyObject* self, PyObject* args)
 }
 
 static PyObject*
-invoke_(PyObject* self, PyObject* args)
+dispatch_(PyObject* self, PyObject* args)
 {
     const char* sname, * to, * ename, * user;
     int size;
     struct augas_event event;
 
-    if (!PyArg_ParseTuple(args, "sssz#:invoke", &sname, &to, &ename, &user,
+    if (!PyArg_ParseTuple(args, "sssz#:dispatch", &sname, &to, &ename, &user,
                           &size))
         return NULL;
 
     setevent_(&event, ename, user, size);
 
-    if (-1 == host_->invoke_(sname, to, &event)) {
+    if (-1 == host_->dispatch_(sname, to, &event)) {
         PyErr_SetString(PyExc_RuntimeError, host_->error_());
         return NULL;
     }
@@ -351,7 +351,7 @@ static PyMethodDef methods_[] = {
         "TODO"
     },
     {
-        "invoke", invoke_, METH_VARARGS,
+        "dispatch", dispatch_, METH_VARARGS,
         "TODO"
     },
     {
