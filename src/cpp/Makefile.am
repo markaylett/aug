@@ -8,6 +8,7 @@ SUBDIRS = \
 	augas
 
 include_HEADERS = \
+	augaspp.hpp \
 	augsyspp.hpp \
 	augmarpp.hpp  \
 	augutilpp.hpp \

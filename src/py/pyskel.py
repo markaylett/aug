@@ -52,11 +52,11 @@ interp = Interpreter(Commands())
 #     elif x != None:
 #         print x
 
-def term(sname):
-    log.debug("term(): %s" % sname)
+def destroy(sname):
+    log.debug("destroy(): %s" % sname)
 
-def init(sname):
-    log.debug("init(): %s" % sname)
+def create(sname):
+    log.debug("create(): %s" % sname)
     tcplisten(sname, "0.0.0.0", getenv("session.pyskel.serv"), None)
 
 def reconf(sname):

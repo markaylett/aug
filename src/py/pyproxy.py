@@ -3,7 +3,7 @@ import log
 
 pairs = {}
 
-def init(sname):
+def create(sname):
     log.info("binding proxy listener")
     tcplisten(sname, "0.0.0.0", getenv("session.pyproxy.serv"), None)
 

@@ -6,11 +6,11 @@ import log
 
 # post(), dispatch()
 
-def term(sname):
-    log.debug("term(): %s" % sname)
+def destroy(sname):
+    log.debug("destroy(): %s" % sname)
 
-def init(sname):
-    log.debug("init(): %s" % sname)
+def create(sname):
+    log.debug("create(): %s" % sname)
     dispatch(sname, "group1", "foo", str(101))
     post(sname, "group2", "application/x-www-form-urlencoded", urlencode({"a": 1}))
     post(sname, sname, "none", None)

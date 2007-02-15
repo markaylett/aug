@@ -5,9 +5,8 @@
 #include "augpy/module.h"
 
 #include "augpy/object.h"
-#include <augas.h>
 
-#include <stdlib.h>
+#include "augas.h"
 
 #if defined(_WIN32)
 # include <direct.h>
@@ -15,8 +14,8 @@
 
 struct import_ {
     PyObject* module_;
-    PyObject* term_;
-    PyObject* init_;
+    PyObject* destroy_;
+    PyObject* create_;
     PyObject* reconf_;
     PyObject* event_;
     PyObject* closed_;
@@ -30,7 +29,6 @@ struct import_ {
     int open_;
 };
 
-static const struct augas_host* host_ = NULL;
 static PyObject* augas_ = NULL;
 static PyTypeObject* type_ = NULL;
 
@@ -40,14 +38,13 @@ setpath_(void)
     const char* s;
     PyObject* sys;
 
-    if ((s = host_->getenv_("rundir")))
+    if ((s = augas_getenv("rundir")))
         chdir(s);
 
-    if (!(s = host_->getenv_("module.augpy.pythonpath")))
+    if (!(s = augas_getenv("module.augpy.pythonpath")))
         s = "bin";
     else
-        host_->writelog_(AUGAS_LOGDEBUG,
-                         "module.augpy.pythonpath=[%s]", s);
+        augas_writelog(AUGAS_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
 
     chdir(s);
 
@@ -63,8 +60,7 @@ setpath_(void)
 
             if ((dir = PyString_FromString(buf))) {
 
-                host_->writelog_(AUGAS_LOGDEBUG, "adding to sys.path: %s",
-                                 buf);
+                augas_writelog(AUGAS_LOGDEBUG, "adding to sys.path: %s", buf);
 
                 PyList_Insert(path, 0, dir);
 
@@ -99,7 +95,7 @@ printerr_(void)
         empty = PyString_FromString("");
         message = PyObject_CallMethod(empty, "join", "O", list);
 
-        host_->writelog_(AUGAS_LOGERROR, "%s", PyString_AsString(message));
+        augas_writelog(AUGAS_LOGERROR, "%s", PyString_AsString(message));
 
         Py_DECREF(message);
         Py_DECREF(empty);
@@ -127,7 +123,7 @@ getmethod_(PyObject* module, const char* name)
             x = NULL;
         }
     } else {
-        host_->writelog_(AUGAS_LOGDEBUG, "no binding for %s()", name);
+        augas_writelog(AUGAS_LOGDEBUG, "no binding for %s()", name);
         PyErr_Clear();
     }
     return x;
@@ -136,11 +132,11 @@ getmethod_(PyObject* module, const char* name)
 static void
 destroyimport_(struct import_* import)
 {
-    if (import->open_ && import->term_) {
+    if (import->open_ && import->destroy_) {
 
         const char* sname = PyModule_GetName(import->module_);
         if (sname) {
-            PyObject* x = PyObject_CallFunction(import->term_, "s",
+            PyObject* x = PyObject_CallFunction(import->destroy_, "s",
                                                 sname);
             if (x) {
                 Py_DECREF(x);
@@ -159,8 +155,8 @@ destroyimport_(struct import_* import)
     Py_XDECREF(import->closed_);
     Py_XDECREF(import->event_);
     Py_XDECREF(import->reconf_);
-    Py_XDECREF(import->init_);
-    Py_XDECREF(import->term_);
+    Py_XDECREF(import->create_);
+    Py_XDECREF(import->destroy_);
 
     Py_XDECREF(import->module_);
     free(import);
@@ -179,8 +175,8 @@ createimport_(const char* sname)
         goto fail;
     }
 
-    import->term_ = getmethod_(import->module_, "term");
-    import->init_ = getmethod_(import->module_, "init");
+    import->destroy_ = getmethod_(import->module_, "destroy");
+    import->create_ = getmethod_(import->module_, "create");
     import->reconf_ = getmethod_(import->module_, "reconf");
     import->event_ = getmethod_(import->module_, "event");
     import->closed_ = getmethod_(import->module_, "closed");
@@ -200,44 +196,44 @@ createimport_(const char* sname)
 }
 
 static void
-unloadpy_(void)
+termpy_(void)
 {
     int level, objects;
 
     if (!Py_IsInitialized())
         return;
 
-    host_->writelog_(AUGAS_LOGDEBUG, "finalising python interpreter");
+    augas_writelog(AUGAS_LOGDEBUG, "finalising python interpreter");
     Py_Finalize();
 
     objects = augpy_objects();
     level = objects ? AUGAS_LOGERROR : AUGAS_LOGINFO;
-    host_->writelog_(level, "allocated objects: %d", objects);
+    augas_writelog(level, "allocated objects: %d", objects);
 }
 
 static int
-loadpy_(void)
+initpy_(void)
 {
-    host_->writelog_(AUGAS_LOGDEBUG, "initialising python interpreter");
+    augas_writelog(AUGAS_LOGDEBUG, "initialising python interpreter");
     Py_Initialize();
     /* Py_VerboseFlag = 1; */
     setpath_();
 
-    host_->writelog_(AUGAS_LOGDEBUG, "initialising augas module");
-    if (!(type_ = augpy_createtype(host_)))
+    augas_writelog(AUGAS_LOGDEBUG, "initialising augas module");
+    if (!(type_ = augpy_createtype()))
         goto fail;
 
-    if (!(augas_ = augpy_createmodule(host_, type_)))
+    if (!(augas_ = augpy_createmodule(type_)))
         goto fail;
     return 0;
 
  fail:
-    unloadpy_();
+    termpy_();
     return -1;
 }
 
 static void
-term_(const struct augas_serv* serv)
+destroy_(const struct augas_serv* serv)
 {
     struct import_* import = serv->user_;
     assert(serv->user_);
@@ -245,7 +241,7 @@ term_(const struct augas_serv* serv)
 }
 
 static int
-init_(struct augas_serv* serv)
+create_(struct augas_serv* serv)
 {
     struct import_* import;
 
@@ -254,9 +250,9 @@ init_(struct augas_serv* serv)
 
     serv->user_ = import;
 
-    if (import->init_) {
+    if (import->create_) {
 
-        PyObject* x = PyObject_CallFunction(import->init_, "s", serv->name_);
+        PyObject* x = PyObject_CallFunction(import->create_, "s", serv->name_);
         if (!x) {
             printerr_();
             destroyimport_(import);
@@ -358,7 +354,7 @@ teardown_(const struct augas_object* sock)
         }
 
     } else
-        host_->shutdown_(sock->id_);
+        augas_shutdown(sock->id_);
 
     return ret;
 }
@@ -400,8 +396,7 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
 
         if (z == Py_False) {
 
-            host_->writelog_(AUGAS_LOGDEBUG,
-                             "accept() handler returned false");
+            augas_writelog(AUGAS_LOGDEBUG, "accept() handler returned false");
 
             /* closed() will not be called if accept() fails. */
 
@@ -488,8 +483,8 @@ rdexpire_(const struct augas_object* sock, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                host_->writelog_(AUGAS_LOGDEBUG,
-                                "handler returned new timeout value");
+                augas_writelog(AUGAS_LOGDEBUG,
+                               "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
@@ -520,8 +515,8 @@ wrexpire_(const struct augas_object* sock, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                host_->writelog_(AUGAS_LOGDEBUG,
-                                "handler returned new timeout value");
+                augas_writelog(AUGAS_LOGDEBUG,
+                               "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
@@ -553,8 +548,8 @@ expire_(const struct augas_object* timer, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                host_->writelog_(AUGAS_LOGDEBUG,
-                                "handler returned new timeout value");
+                augas_writelog(AUGAS_LOGDEBUG,
+                               "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
@@ -568,9 +563,9 @@ expire_(const struct augas_object* timer, unsigned* ms)
     return ret;
 }
 
-static const struct augas_module fntable_ = {
-    term_,
-    init_,
+static const struct augas_module module_ = {
+    destroy_,
+    create_,
     reconf_,
     event_,
     closed_,
@@ -584,29 +579,21 @@ static const struct augas_module fntable_ = {
 };
 
 static const struct augas_module*
-load_(const char* name, const struct augas_host* host)
+init_(const char* name)
 {
-    /* Fail if module has already been loaded. */
+    augas_writelog(AUGAS_LOGINFO, "initialising augpy module");
 
-    host->writelog_(AUGAS_LOGINFO, "loading augpy module");
-
-    if (host_)
+    if (initpy_() < 0)
         return NULL;
 
-    host_ = host;
-
-    if (loadpy_() < 0)
-        return NULL;
-
-    return &fntable_;
+    return &module_;
 }
 
 static void
-unload_(void)
+term_(void)
 {
-    host_->writelog_(AUGAS_LOGINFO, "unloading augpy module");
-    unloadpy_();
-    host_ = 0;
+    augas_writelog(AUGAS_LOGINFO, "terminating augpy module");
+    termpy_();
 }
 
-AUGAS_MODULE(load_, unload_)
+AUGAS_MODULE(init_, term_)

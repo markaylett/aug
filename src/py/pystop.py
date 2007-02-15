@@ -1,7 +1,7 @@
 from augas import *
 import log
 
-def init(sname):
+def create(sname):
     settimer(sname, 5000, None)
 
 def expire(timer, ms):

@@ -9,11 +9,11 @@
 namespace {
 
     void
-    term(const augas_serv* serv)
+    destroy(const augas_serv* serv)
     {
     }
     int
-    init(augas_serv* serv)
+    create(augas_serv* serv)
     {
         return 0;
     }
@@ -71,8 +71,8 @@ namespace {
 void
 augas::setdefaults(augas_module& dst, const augas_module& src)
 {
-    dst.term_ = src.term_ ? src.term_ : term;
-    dst.init_ = src.init_ ? src.init_ : init;
+    dst.destroy_ = src.destroy_ ? src.destroy_ : destroy;
+    dst.create_ = src.create_ ? src.create_ : create;
     dst.reconf_ = src.reconf_ ? src.reconf_ : reconf;
     dst.event_ = src.event_ ? src.event_ : event;
     dst.closed_ = src.closed_ ? src.closed_ : closed;

@@ -117,8 +117,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_AA21D8BD861324692B9AADF8FE38CADF"
-        "OwnerKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
+        "MsmKey" = "8:_A783D157AC31455DBF36EFAC59A165FC"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -149,6 +149,12 @@
         {
         "MsmKey" = "8:_E865868FA75E4AE8BF4F54B0EFB5248B"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FB19068976255653AB1FDEF3D7FD105C"
+        "OwnerKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -509,12 +515,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_AA21D8BD861324692B9AADF8FE38CADF"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_A783D157AC31455DBF36EFAC59A165FC"
             {
-            "SourcePath" = "8:python25.dll"
-            "TargetName" = "8:python25.dll"
+            "SourcePath" = "8:..\\src\\cpp\\augaspp.hpp"
+            "TargetName" = "8:augaspp.hpp"
             "Tag" = "8:"
-            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
+            "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -526,7 +532,7 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_B7AEAA90118C4CC497CF2A956B1DA290"
@@ -607,6 +613,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_FB19068976255653AB1FDEF3D7FD105C"
+            {
+            "SourcePath" = "8:python24.dll"
+            "TargetName" = "8:python24.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
         }

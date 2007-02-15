@@ -3,11 +3,11 @@ import log
 
 # settimer()
 
-def term(sname):
-    log.debug("term(): %s" % sname)
+def destroy(sname):
+    log.debug("destroy(): %s" % sname)
 
-def init(sname):
-    log.debug("init(): %s" % sname)
+def create(sname):
+    log.debug("create(): %s" % sname)
     settimer(sname, 1000, "our timer")
 
 def expire(timer, ms):

@@ -3,11 +3,11 @@ import log
 
 # stop(), Object()
 
-def term(sname):
-    log.debug("term(): %s" % sname)
+def destroy(sname):
+    log.debug("destroy(): %s" % sname)
 
-def init(sname):
-    log.debug("init(): %s" % sname)
+def create(sname):
+    log.debug("create(): %s" % sname)
     o = Object("test", 101, "our object")
     log.debug("str(): %s" % o)
     if o.sname != "test":

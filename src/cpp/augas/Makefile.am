@@ -49,8 +49,12 @@ augasd_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 moddir = $(prefix)/mod
+mod_LTLIBRARIES = modskel.la modskelpp.la
 
-mod_LTLIBRARIES = modskel.la
 modskel_la_SOURCES = modskel.c
 modskel_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modskel_la_LIBADD =
+
+modskelpp_la_SOURCES = modskelpp.cpp
+modskelpp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
+modskelpp_la_LIBADD =

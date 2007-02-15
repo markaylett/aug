@@ -13,7 +13,7 @@ using namespace std;
 serv::~serv() AUG_NOTHROW
 {
     if (active_)
-        module_->term(serv_); // AUG_NOTHROW
+        module_->destroy(serv_); // AUG_NOTHROW
 }
 
 serv::serv(const moduleptr& module, const char* name)

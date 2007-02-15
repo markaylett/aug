@@ -19,7 +19,7 @@ module::~module() AUG_NOTHROW
 {
     try {
         AUG_DEBUG2("terminating module: name=[%s]", name_.c_str());
-        unloadfn_();
+        termfn_();
     } AUG_PERRINFOCATCH;
 }
 
@@ -29,28 +29,28 @@ module::module(const string& name, const char* path,
       lib_(path)
 {
     AUG_DEBUG2("resolving symbols in module: name=[%s]", name_.c_str());
-    augas_loadfn loadfn(dlsym<augas_loadfn>(lib_, "augas_load"));
-    unloadfn_ = dlsym<augas_unloadfn>(lib_, "augas_unload");
+    augas_initfn initfn(dlsym<augas_initfn>(lib_, "augas_init"));
+    termfn_ = dlsym<augas_termfn>(lib_, "augas_term");
 
     AUG_DEBUG2("initialising module: name=[%s]", name_.c_str());
-    const struct augas_module* ptr(loadfn(name_.c_str(), &host));
+    const struct augas_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
-        throw error(__FILE__, __LINE__, EMODCALL, "augas_load() failed");
+        throw error(__FILE__, __LINE__, EMODCALL, "augas_init() failed");
     setdefaults(module_, *ptr);
 }
 
 void
-module::term(const augas_serv& serv) const AUG_NOTHROW
+module::destroy(const augas_serv& serv) const AUG_NOTHROW
 {
-    AUG_DEBUG2("term(): sname=[%s]", serv.name_);
-    module_.term_(&serv);
+    AUG_DEBUG2("destroy(): sname=[%s]", serv.name_);
+    module_.destroy_(&serv);
 }
 
 bool
-module::init(augas_serv& serv) const AUG_NOTHROW
+module::create(augas_serv& serv) const AUG_NOTHROW
 {
-    AUG_DEBUG2("init(): sname=[%s]", serv.name_);
-    return AUGAS_OK == module_.init_(&serv);
+    AUG_DEBUG2("create(): sname=[%s]", serv.name_);
+    return AUGAS_OK == module_.create_(&serv);
 }
 
 bool

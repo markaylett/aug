@@ -23,10 +23,10 @@ namespace augas {
         serv(const moduleptr& module, const char* name);
 
         bool
-        init() AUG_NOTHROW
+        create() AUG_NOTHROW
         {
             active_ = true; // Functions may be called during initialisation.
-            return active_ = module_->init(serv_);
+            return active_ = module_->create(serv_);
         }
         bool
         reconf() const AUG_NOTHROW

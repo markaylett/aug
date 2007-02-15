@@ -19,3 +19,6 @@ service.pyclient.to = 7002
 
 module.augpy.path = mod/modaugpy.so
 module.augpy.pythonpath = python
+
+module.augskel.path = mod/modskel.so
+module.augskelpp.path = mod/modskelpp.so

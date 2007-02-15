@@ -6,12 +6,11 @@
 
 #include <structmember.h>
 
-#include <augas.h>
+#include "augas.h"
 
 /* Implementation note: always reassign members before decrementing reference
    counts. */
 
-static const struct augas_host* host_ = NULL;
 static int objects_ = 0;
 
 typedef struct {
@@ -48,9 +47,9 @@ static void
 dealloc_(object_* self)
 {
     --objects_;
-    host_->writelog_(AUGAS_LOGDEBUG,
-                     "deallocated: <augas.Object at %p, sname='%s', id=%d>",
-                     (void*)self, PyString_AsString(self->sname_), self->id_);
+    augas_writelog(AUGAS_LOGDEBUG,
+                   "deallocated: <augas.Object at %p, sname='%s', id=%d>",
+                   (void*)self, PyString_AsString(self->sname_), self->id_);
 
     clear_(self);
     self->ob_type->tp_free((PyObject*)self);
@@ -160,9 +159,9 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
     }
 
     ++objects_;
-    host_->writelog_(AUGAS_LOGDEBUG,
-                     "allocated: <augas.Object at %p, sname='%s', id=%d>",
-                     (void*)self, PyString_AsString(self->sname_), self->id_);
+    augas_writelog(AUGAS_LOGDEBUG,
+                   "allocated: <augas.Object at %p, sname='%s', id=%d>",
+                   (void*)self, PyString_AsString(self->sname_), self->id_);
     return (PyObject*)self;
 }
 
@@ -233,9 +232,8 @@ static PyTypeObject pytype_ = {
 };
 
 PyTypeObject*
-augpy_createtype(const struct augas_host* host)
+augpy_createtype(void)
 {
-    host_ = host;
     if (-1 == PyType_Ready(&pytype_))
         return NULL;
 
@@ -264,9 +262,9 @@ augpy_createobject(PyTypeObject* type, const char* sname, int id,
     self->user_ = user;
 
     ++objects_;
-    host_->writelog_(AUGAS_LOGDEBUG,
-                     "allocated: <augas.Object at %p, sname='%s', id=%d>",
-                     (void*)self, PyString_AsString(self->sname_), self->id_);
+    augas_writelog(AUGAS_LOGDEBUG,
+                   "allocated: <augas.Object at %p, sname='%s', id=%d>",
+                   (void*)self, PyString_AsString(self->sname_), self->id_);
     return (PyObject*)self;
 }
 

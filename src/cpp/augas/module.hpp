@@ -16,7 +16,7 @@ namespace augas {
     class module {
         const std::string name_;
         aug::dlib lib_;
-        augas_unloadfn unloadfn_;
+        augas_termfn termfn_;
         augas_module module_;
 
         module(const module&);
@@ -31,10 +31,10 @@ namespace augas {
                const augas_host& host);
 
         void
-        term(const augas_serv& serv) const AUG_NOTHROW;
+        destroy(const augas_serv& serv) const AUG_NOTHROW;
 
         bool
-        init(augas_serv& serv) const AUG_NOTHROW;
+        create(augas_serv& serv) const AUG_NOTHROW;
 
         bool
         reconf(const augas_serv& serv) const AUG_NOTHROW;

@@ -40,7 +40,7 @@ manager::insert(const string& name, const servptr& serv, const char* groups)
     // Insert prior to calling open().
 
     servs_[name] = serv;
-    if (!serv->init()) {
+    if (!serv->create()) {
 
         // TODO: leave if event posted.
 

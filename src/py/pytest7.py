@@ -1,9 +1,9 @@
 from augas import *
 import log
 
-def term(sname):
-    log.debug("term(): %s" % sname)
+def destroy(sname):
+    log.debug("destroy(): %s" % sname)
 
-def init(sname):
-    log.debug("init(): %s" % sname)
+def create(sname):
+    log.debug("create(): %s" % sname)
     stop()

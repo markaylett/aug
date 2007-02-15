@@ -10,9 +10,7 @@
 
 #include <Python.h>
 
-struct augas_host;
-
 PyObject*
-augpy_createmodule(const struct augas_host* host, PyTypeObject* type);
+augpy_createmodule(PyTypeObject* type);
 
 #endif /* AUGPY_MODULE_H */

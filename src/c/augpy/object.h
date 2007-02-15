@@ -10,10 +10,8 @@
 
 #include <Python.h>
 
-struct augas_host;
-
 PyTypeObject*
-augpy_createtype(const struct augas_host* host);
+augpy_createtype(void);
 
 PyObject*
 augpy_createobject(PyTypeObject* type, const char* sname, int id,

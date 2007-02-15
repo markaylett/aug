@@ -5,6 +5,7 @@
 #define AUGAS_H
 
 #include <stdarg.h>    /* va_list */
+#include <stdlib.h>    /* NULL */
 #include <sys/types.h> /* size_t */
 
 #if !defined(__cplusplus)
@@ -285,22 +286,22 @@ struct augas_host {
 struct augas_module {
 
     /**
-       \brief Service termination.
+       \brief Service destruction.
        \param serv TODO
        \return TODO
        \sa TODO
     */
 
-    void (*term_)(const struct augas_serv* serv);
+    void (*destroy_)(const struct augas_serv* serv);
 
     /**
-       \brief Service initialisation.
+       \brief Service creation.
        \param serv TODO
        \return TODO
        \sa TODO
     */
 
-    int (*init_)(struct augas_serv* serv);
+    int (*create_)(struct augas_serv* serv);
 
     /**
        \brief Re-configure request.
@@ -408,24 +409,56 @@ struct augas_module {
     int (*expire_)(const struct augas_object* timer, unsigned* ms);
 };
 
+AUGAS_EXTERN const struct augas_host*
+augas_gethost(void);
+
+#define augas_writelog      (augas_gethost()->writelog_)
+#define augas_vwritelog     (augas_gethost()->vwritelog_)
+#define augas_error         (augas_gethost()->error_)
+#define augas_reconf        (augas_gethost()->reconf_)
+#define augas_stop          (augas_gethost()->stop_)
+#define augas_post          (augas_gethost()->post_)
+#define augas_dispatch      (augas_gethost()->dispatch_)
+#define augas_getenv        (augas_gethost()->getenv_)
+#define augas_shutdown      (augas_gethost()->shutdown_)
+#define augas_tcpconnect    (augas_gethost()->tcpconnect_)
+#define augas_tcplisten     (augas_gethost()->tcplisten_)
+#define augas_send          (augas_gethost()->send_)
+#define augas_setrwtimer    (augas_gethost()->setrwtimer_)
+#define augas_resetrwtimer  (augas_gethost()->resetrwtimer_)
+#define augas_cancelrwtimer (augas_gethost()->cancelrwtimer_)
+#define augas_settimer      (augas_gethost()->settimer_)
+#define augas_resettimer    (augas_gethost()->resettimer_)
+#define augas_canceltimer   (augas_gethost()->canceltimer_)
+
 /**
-   augas_load() should return NULL on failure.
+   augas_init() should return NULL on failure.
 */
 
-#define AUGAS_MODULE(load, unload)                                    \
-    AUGAS_API void                                                    \
-    augas_unload(void)                                                \
+#define AUGAS_MODULE(init, term)                                      \
+    static const struct augas_host* host_ = NULL;                     \
+    AUGAS_EXTERN const struct augas_host*                             \
+    augas_gethost(void)                                               \
     {                                                                 \
-        (*unload)();                                                  \
+        return host_;                                                 \
+    }                                                                 \
+    AUGAS_API void                                                    \
+    augas_term(void)                                                  \
+    {                                                                 \
+        (*term)();                                                    \
+        host_ = NULL;                                                 \
     }                                                                 \
     AUGAS_API const struct augas_module*                              \
-    augas_load(const char* name, const struct augas_host* host)       \
+    augas_init(const char* name, const struct augas_host* host)       \
     {                                                                 \
-        return (*load)(name, host);                                   \
+        if (host_)                                                    \
+            return NULL;                                              \
+        host_ = host;                                                 \
+        return (*init)(name);                                         \
     }
 
-typedef void (*augas_unloadfn)(void);
-typedef const struct augas_module* (*augas_loadfn)(const char*,
+typedef void (*augas_termfn)(void);
+typedef const struct augas_module* (*augas_initfn)(const char*,
                                                    const struct augas_host*);
 
 #endif /* AUGAS_H */

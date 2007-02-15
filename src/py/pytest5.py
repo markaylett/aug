@@ -6,12 +6,12 @@ import log
 
 (client, listener, server) = (None, None, None)
 
-def term(sname):
-    log.debug("term(): %s" % sname)
+def destroy(sname):
+    log.debug("destroy(): %s" % sname)
 
-def init(sname):
+def create(sname):
     global client, listener
-    log.debug("init(): %s" % sname)
+    log.debug("create(): %s" % sname)
     listener = tcplisten(sname, "0.0.0.0", "1234", None)
     client = tcpconnect(sname, "127.0.0.1", "1234", None)
 

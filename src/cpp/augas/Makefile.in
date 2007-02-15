@@ -62,6 +62,9 @@ LTLIBRARIES = $(mod_LTLIBRARIES)
 modskel_la_DEPENDENCIES =
 am_modskel_la_OBJECTS = modskel.lo
 modskel_la_OBJECTS = $(am_modskel_la_OBJECTS)
+modskelpp_la_DEPENDENCIES =
+am_modskelpp_la_OBJECTS = modskelpp.lo
+modskelpp_la_OBJECTS = $(am_modskelpp_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) \
@@ -93,8 +96,10 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(modskel_la_SOURCES) $(augasd_SOURCES)
-DIST_SOURCES = $(modskel_la_SOURCES) $(augasd_SOURCES)
+SOURCES = $(modskel_la_SOURCES) $(modskelpp_la_SOURCES) \
+	$(augasd_SOURCES)
+DIST_SOURCES = $(modskel_la_SOURCES) $(modskelpp_la_SOURCES) \
+	$(augasd_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -270,10 +275,13 @@ augasd_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 moddir = $(prefix)/mod
-mod_LTLIBRARIES = modskel.la
+mod_LTLIBRARIES = modskel.la modskelpp.la
 modskel_la_SOURCES = modskel.c
 modskel_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modskel_la_LIBADD = 
+modskelpp_la_SOURCES = modskelpp.cpp
+modskelpp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
+modskelpp_la_LIBADD = 
 all: all-recursive
 
 .SUFFIXES:
@@ -336,6 +344,8 @@ clean-modLTLIBRARIES:
 	done
 modskel.la: $(modskel_la_OBJECTS) $(modskel_la_DEPENDENCIES) 
 	$(LINK) -rpath $(moddir) $(modskel_la_LDFLAGS) $(modskel_la_OBJECTS) $(modskel_la_LIBADD) $(LIBS)
+modskelpp.la: $(modskelpp_la_OBJECTS) $(modskelpp_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(moddir) $(modskelpp_la_LDFLAGS) $(modskelpp_la_OBJECTS) $(modskelpp_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -382,6 +392,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modskel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modskelpp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
