@@ -6,12 +6,12 @@ import log
 
 (client, listener, server) = (None, None, None)
 
-def destroy(sname):
-    log.debug("destroy(): %s" % sname)
+def stop(sname):
+    log.debug("stop(): %s" % sname)
 
-def create(sname):
+def start(sname):
     global client, listener
-    log.debug("create(): %s" % sname)
+    log.debug("start(): %s" % sname)
     listener = tcplisten(sname, "0.0.0.0", "1234", None)
     client = tcpconnect(sname, "127.0.0.1", "1234", None)
 
@@ -38,4 +38,4 @@ def data(sock, buf):
         if sock == server:
             send(sock, line + "\n")
         else:
-            stop()
+            stopall()

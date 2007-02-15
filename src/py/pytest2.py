@@ -6,11 +6,11 @@ import log
 
 # post(), dispatch()
 
-def destroy(sname):
-    log.debug("destroy(): %s" % sname)
+def stop(sname):
+    log.debug("stop(): %s" % sname)
 
-def create(sname):
-    log.debug("create(): %s" % sname)
+def start(sname):
+    log.debug("start(): %s" % sname)
     dispatch(sname, "group1", "foo", str(101))
     post(sname, "group2", "application/x-www-form-urlencoded", urlencode({"a": 1}))
     post(sname, sname, "none", None)
@@ -30,6 +30,6 @@ def event(sname, frm, type, user):
     elif type == "none":
         if user is not None:
             log.error("unexpected user data")
-        stop()
+        stopall()
     else:
         log.error("unexpected type")

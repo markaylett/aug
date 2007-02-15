@@ -3,11 +3,11 @@ import log
 
 # stop(), Object()
 
-def destroy(sname):
-    log.debug("destroy(): %s" % sname)
+def stop(sname):
+    log.debug("stop(): %s" % sname)
 
-def create(sname):
-    log.debug("create(): %s" % sname)
+def start(sname):
+    log.debug("start(): %s" % sname)
     o = Object("test", 101, "our object")
     log.debug("str(): %s" % o)
     if o.sname != "test":
@@ -21,4 +21,4 @@ def create(sname):
         log.error("object returned unexpected user")
     if o != Object("other", 101, None):
         log.error("comparison operator failed")
-    stop()
+    stopall()

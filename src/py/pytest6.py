@@ -3,12 +3,12 @@ import log
 
 # Return false from accept.
 
-def destroy(sname):
-    log.debug("destroy(): %s" % sname)
+def stop(sname):
+    log.debug("stop(): %s" % sname)
 
-def create(sname):
+def start(sname):
     global client, listener
-    log.debug("create(): %s" % sname)
+    log.debug("start(): %s" % sname)
     tcplisten(sname, "0.0.0.0", "1234", None)
     tcpconnect(sname, "127.0.0.1", "1234", None)
 

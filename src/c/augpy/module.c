@@ -64,12 +64,12 @@ reconf_(PyObject* self, PyObject* args)
 }
 
 static PyObject*
-stop_(PyObject* self, PyObject* args)
+stopall_(PyObject* self, PyObject* args)
 {
-    if (!PyArg_ParseTuple(args, ":stop"))
+    if (!PyArg_ParseTuple(args, ":stopall"))
         return NULL;
 
-    augas_stop();
+    augas_stopall();
     return incret_(Py_None);
 }
 
@@ -342,7 +342,7 @@ static PyMethodDef methods_[] = {
         "TODO"
     },
     {
-        "stop", stop_, METH_VARARGS,
+        "stopall", stopall_, METH_VARARGS,
         "TODO"
     },
     {

@@ -105,7 +105,7 @@ struct augas_host {
 
     /**
        \brief Re-configure the host and all loaded modules.
-       \sa stop_().
+       \sa stopall_().
     */
 
     void (*reconf_)(void);
@@ -115,7 +115,7 @@ struct augas_host {
        \sa reconf_().
     */
 
-    void (*stop_)(void);
+    void (*stopall_)(void);
 
     /**
        \brief Post an event to the event queue.
@@ -286,22 +286,22 @@ struct augas_host {
 struct augas_module {
 
     /**
-       \brief Service destruction.
+       \brief Stop service.
        \param serv TODO
        \return TODO
        \sa TODO
     */
 
-    void (*destroy_)(const struct augas_serv* serv);
+    void (*stop_)(const struct augas_serv* serv);
 
     /**
-       \brief Service creation.
+       \brief Start service.
        \param serv TODO
        \return TODO
        \sa TODO
     */
 
-    int (*create_)(struct augas_serv* serv);
+    int (*start_)(struct augas_serv* serv);
 
     /**
        \brief Re-configure request.
@@ -416,7 +416,7 @@ augas_gethost(void);
 #define augas_vwritelog     (augas_gethost()->vwritelog_)
 #define augas_error         (augas_gethost()->error_)
 #define augas_reconf        (augas_gethost()->reconf_)
-#define augas_stop          (augas_gethost()->stop_)
+#define augas_stopall       (augas_gethost()->stopall_)
 #define augas_post          (augas_gethost()->post_)
 #define augas_dispatch      (augas_gethost()->dispatch_)
 #define augas_getenv        (augas_gethost()->getenv_)

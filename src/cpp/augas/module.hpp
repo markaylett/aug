@@ -31,10 +31,10 @@ namespace augas {
                const augas_host& host);
 
         void
-        destroy(const augas_serv& serv) const AUG_NOTHROW;
+        stop(const augas_serv& serv) const AUG_NOTHROW;
 
         bool
-        create(augas_serv& serv) const AUG_NOTHROW;
+        start(augas_serv& serv) const AUG_NOTHROW;
 
         bool
         reconf(const augas_serv& serv) const AUG_NOTHROW;

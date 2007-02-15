@@ -79,12 +79,7 @@ namespace augas {
 
     class serv_base {
         virtual bool
-        do_destroy(const char* sname)
-        {
-            return true;
-        }
-        virtual bool
-        do_create(const char* sname)
+        do_start(const char* sname)
         {
             return true;
         }
@@ -143,14 +138,9 @@ namespace augas {
         {
         }
         bool
-        destroy(const char* sname)
+        start(const char* sname)
         {
-            return do_destroy(sname);
-        }
-        bool
-        create(const char* sname)
-        {
-            return do_create(sname);
+            return do_start(sname);
         }
         bool
         reconf(const char* sname)
@@ -158,7 +148,7 @@ namespace augas {
             return do_reconf(sname);
         }
         bool
-        event_(const char* sname, const char* from, const event& event)
+        event(const char* sname, const char* from, const event& event)
         {
             return do_event(sname, from, event);
         }
@@ -213,21 +203,17 @@ namespace augas {
             return x ? AUGAS_OK : AUGAS_ERROR;
         }
         static void
-        destroy(const augas_serv* serv) AUGAS_NOTHROW
+        stop(const augas_serv* serv) AUGAS_NOTHROW
         {
-            try {
-                static_cast<serv_base*>(serv->user_)
-                    ->destroy(serv->name_);
-            } AUGAS_WRITELOGCATCH;
             delete static_cast<serv_base*>(serv->user_);
         }
         static int
-        create(augas_serv* serv) AUGAS_NOTHROW
+        start(augas_serv* serv) AUGAS_NOTHROW
         {
             try {
                 serv->user_ = impl_->create(serv->name_);
                 return result(static_cast<serv_base*>(serv->user_)
-                              ->create(serv->name_));
+                              ->start(serv->name_));
             } AUGAS_WRITELOGCATCH;
             return AUGAS_ERROR;
         }
@@ -246,8 +232,8 @@ namespace augas {
         {
             try {
                 return result(static_cast<serv_base*>(serv->user_)
-                              ->event_(serv->name_, from,
-                                       augas::event(*event)));
+                              ->event(serv->name_, from,
+                                      augas::event(*event)));
             } AUGAS_WRITELOGCATCH;
             return AUGAS_ERROR;
         }
@@ -332,8 +318,8 @@ namespace augas {
         init(const char* name) AUGAS_NOTHROW
         {
             static const augas_module module_ = {
-                destroy,
-                create,
+                stop,
+                start,
                 reconf,
                 event,
                 closed,

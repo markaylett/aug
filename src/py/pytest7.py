@@ -1,9 +1,9 @@
 from augas import *
 import log
 
-def destroy(sname):
-    log.debug("destroy(): %s" % sname)
+def stop(sname):
+    log.debug("stop(): %s" % sname)
 
-def create(sname):
-    log.debug("create(): %s" % sname)
-    stop()
+def start(sname):
+    log.debug("start(): %s" % sname)
+    stopall()

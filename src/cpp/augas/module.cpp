@@ -40,17 +40,17 @@ module::module(const string& name, const char* path,
 }
 
 void
-module::destroy(const augas_serv& serv) const AUG_NOTHROW
+module::stop(const augas_serv& serv) const AUG_NOTHROW
 {
-    AUG_DEBUG2("destroy(): sname=[%s]", serv.name_);
-    module_.destroy_(&serv);
+    AUG_DEBUG2("stop(): sname=[%s]", serv.name_);
+    module_.stop_(&serv);
 }
 
 bool
-module::create(augas_serv& serv) const AUG_NOTHROW
+module::start(augas_serv& serv) const AUG_NOTHROW
 {
-    AUG_DEBUG2("create(): sname=[%s]", serv.name_);
-    return AUGAS_OK == module_.create_(&serv);
+    AUG_DEBUG2("start(): sname=[%s]", serv.name_);
+    return AUGAS_OK == module_.start_(&serv);
 }
 
 bool

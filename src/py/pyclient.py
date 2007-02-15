@@ -28,7 +28,7 @@ class State:
             self.timer = None
             return 0
 
-def create(sname):
+def start(sname):
     log.info("connecting to client's service")
     for x in xrange(1, 10):
         tcpconnect(sname, "localhost", getenv("session.pyclient.to"), None)

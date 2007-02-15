@@ -1,15 +1,15 @@
 #include "augas.h"
 
 static void
-destroy_(const struct augas_serv* serv)
+stop_(const struct augas_serv* serv)
 {
-    augas_writelog(AUGAS_LOGINFO, "destroy_()");
+    augas_writelog(AUGAS_LOGINFO, "stop_()");
 }
 
 static int
-create_(struct augas_serv* serv)
+start_(struct augas_serv* serv)
 {
-    augas_writelog(AUGAS_LOGINFO, "create_()");
+    augas_writelog(AUGAS_LOGINFO, "start_()");
     return 0;
 }
 
@@ -86,8 +86,8 @@ expire_(const struct augas_object* timer, unsigned* ms)
 }
 
 static const struct augas_module module_ = {
-    destroy_,
-    create_,
+    stop_,
+    start_,
     reconf_,
     event_,
     closed_,

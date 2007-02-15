@@ -14,8 +14,8 @@
 
 struct import_ {
     PyObject* module_;
-    PyObject* destroy_;
-    PyObject* create_;
+    PyObject* stop_;
+    PyObject* start_;
     PyObject* reconf_;
     PyObject* event_;
     PyObject* closed_;
@@ -132,11 +132,11 @@ getmethod_(PyObject* module, const char* name)
 static void
 destroyimport_(struct import_* import)
 {
-    if (import->open_ && import->destroy_) {
+    if (import->open_ && import->stop_) {
 
         const char* sname = PyModule_GetName(import->module_);
         if (sname) {
-            PyObject* x = PyObject_CallFunction(import->destroy_, "s",
+            PyObject* x = PyObject_CallFunction(import->stop_, "s",
                                                 sname);
             if (x) {
                 Py_DECREF(x);
@@ -155,8 +155,8 @@ destroyimport_(struct import_* import)
     Py_XDECREF(import->closed_);
     Py_XDECREF(import->event_);
     Py_XDECREF(import->reconf_);
-    Py_XDECREF(import->create_);
-    Py_XDECREF(import->destroy_);
+    Py_XDECREF(import->start_);
+    Py_XDECREF(import->stop_);
 
     Py_XDECREF(import->module_);
     free(import);
@@ -175,8 +175,8 @@ createimport_(const char* sname)
         goto fail;
     }
 
-    import->destroy_ = getmethod_(import->module_, "destroy");
-    import->create_ = getmethod_(import->module_, "create");
+    import->stop_ = getmethod_(import->module_, "stop");
+    import->start_ = getmethod_(import->module_, "start");
     import->reconf_ = getmethod_(import->module_, "reconf");
     import->event_ = getmethod_(import->module_, "event");
     import->closed_ = getmethod_(import->module_, "closed");
@@ -233,7 +233,7 @@ initpy_(void)
 }
 
 static void
-destroy_(const struct augas_serv* serv)
+stop_(const struct augas_serv* serv)
 {
     struct import_* import = serv->user_;
     assert(serv->user_);
@@ -241,7 +241,7 @@ destroy_(const struct augas_serv* serv)
 }
 
 static int
-create_(struct augas_serv* serv)
+start_(struct augas_serv* serv)
 {
     struct import_* import;
 
@@ -250,9 +250,9 @@ create_(struct augas_serv* serv)
 
     serv->user_ = import;
 
-    if (import->create_) {
+    if (import->start_) {
 
-        PyObject* x = PyObject_CallFunction(import->create_, "s", serv->name_);
+        PyObject* x = PyObject_CallFunction(import->start_, "s", serv->name_);
         if (!x) {
             printerr_();
             destroyimport_(import);
@@ -564,8 +564,8 @@ expire_(const struct augas_object* timer, unsigned* ms)
 }
 
 static const struct augas_module module_ = {
-    destroy_,
-    create_,
+    stop_,
+    start_,
     reconf_,
     event_,
     closed_,
