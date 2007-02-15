@@ -78,6 +78,7 @@ namespace augas {
     };
 
     class serv_base {
+        typedef augas::event event_type;
         virtual bool
         do_start(const char* sname)
         {
@@ -89,7 +90,7 @@ namespace augas {
             return true;
         }
         virtual bool
-        do_event(const char* sname, const char* from, const event& event)
+        do_event(const char* sname, const char* from, const event_type& event)
         {
             return true;
         }
@@ -148,7 +149,7 @@ namespace augas {
             return do_reconf(sname);
         }
         bool
-        event(const char* sname, const char* from, const event& event)
+        event(const char* sname, const char* from, const event_type& event)
         {
             return do_event(sname, from, event);
         }
