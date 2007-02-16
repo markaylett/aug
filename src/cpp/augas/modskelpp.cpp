@@ -4,26 +4,22 @@ using namespace augas;
 
 namespace {
 
-    struct serv : public serv_base {
-        explicit
-        serv(const char* name)
+    struct serv : stubserv {
+        bool
+        do_start(const char* sname)
         {
+            writelog(AUGAS_LOGINFO, "starting...");
+            tcplisten(sname, "0.0.0.0", "5000");
+            return true;
+        }
+        void
+        do_data(const object& sock, const char* buf, size_t size)
+        {
+            send(sock, buf, size);
         }
     };
 
-    struct factory {
-        explicit
-        factory(const char* name)
-        {
-        }
-        serv_base*
-        create(const char* name)
-        {
-            return new serv(name);
-        }
-    };
-
-    typedef basic_module<factory> module;
+    typedef basic_module<basic_factory<serv> > module;
 }
 
 AUGAS_MODULE(module::init, module::term)

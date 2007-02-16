@@ -59,6 +59,9 @@ manager::clear()
     socks_.clear();
     temp_.clear();
     groups_.clear();
+
+    // TODO: erase the services in reverse order to which they were added.
+
     servs_.clear();
 
     // Modules not released.

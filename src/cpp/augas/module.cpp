@@ -53,20 +53,20 @@ module::start(augas_serv& serv) const AUG_NOTHROW
     return AUGAS_OK == module_.start_(&serv);
 }
 
-bool
+void
 module::reconf(const augas_serv& serv) const AUG_NOTHROW
 {
     AUG_DEBUG2("reconf(): sname=[%s]", serv.name_);
-    return AUGAS_OK == module_.reconf_(&serv);
+    module_.reconf_(&serv);
 }
 
-bool
+void
 module::event(const augas_serv& serv, const char* from,
               const augas_event& event) const AUG_NOTHROW
 {
     AUG_DEBUG2("event(): sname=[%s], from=[%s], ename=[%s], size=[%d]",
                serv.name_, from, event.type_, event.size_);
-    return AUGAS_OK == module_.event_(&serv, from, &event);
+    module_.event_(&serv, from, &event);
 }
 
 void
@@ -76,12 +76,12 @@ module::closed(const augas_object& sock) const AUG_NOTHROW
     module_.closed_(&sock);
 }
 
-bool
+void
 module::teardown(const augas_object& sock) const AUG_NOTHROW
 {
     AUG_DEBUG2("teardown(): sname=[%s], id=[%d]",
                sock.serv_->name_, sock.id_);
-    return AUGAS_OK == module_.teardown_(&sock);
+    module_.teardown_(&sock);
 }
 
 bool
@@ -93,43 +93,43 @@ module::accept(augas_object& sock, const char* addr,
     return AUGAS_OK == module_.accept_(&sock, addr, port);
 }
 
-bool
+void
 module::connected(augas_object& sock, const char* addr,
                 unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("connected(): sname=[%s], id=[%d], addr=[%s], port=[%u]",
                sock.serv_->name_, sock.id_, addr, (unsigned)port);
-    return AUGAS_OK == module_.connected_(&sock, addr, port);
+    module_.connected_(&sock, addr, port);
 }
 
-bool
+void
 module::data(const augas_object& sock, const char* buf,
              size_t size) const AUG_NOTHROW
 {
     AUG_DEBUG2("data(): sname=[%s], id=[%d]", sock.serv_->name_, sock.id_);
-    return AUGAS_OK == module_.data_(&sock, buf, size);
+    module_.data_(&sock, buf, size);
 }
 
-bool
+void
 module::rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("rdexpire(): sname=[%s], id=[%d], ms=[%u]",
                sock.serv_->name_, sock.id_, ms);
-    return AUGAS_OK == module_.rdexpire_(&sock, &ms);
+    module_.rdexpire_(&sock, &ms);
 }
 
-bool
+void
 module::wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("wrexpire(): sname=[%s], id=[%d], ms=[%u]",
                sock.serv_->name_, sock.id_, ms);
-    return AUGAS_OK == module_.wrexpire_(&sock, &ms);
+    module_.wrexpire_(&sock, &ms);
 }
 
-bool
+void
 module::expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("expire(): sname=[%s], id=[%d], ms=[%u]",
                timer.serv_->name_, timer.id_, ms);
-    return AUGAS_OK == module_.expire_(&timer, &ms);
+    module_.expire_(&timer, &ms);
 }

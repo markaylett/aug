@@ -36,38 +36,38 @@ namespace augas {
         bool
         start(augas_serv& serv) const AUG_NOTHROW;
 
-        bool
+        void
         reconf(const augas_serv& serv) const AUG_NOTHROW;
 
-        bool
+        void
         event(const augas_serv& serv, const char* from,
               const augas_event& event) const AUG_NOTHROW;
 
         void
         closed(const augas_object& sock) const AUG_NOTHROW;
 
-        bool
+        void
         teardown(const augas_object& sock) const AUG_NOTHROW;
 
         bool
         accept(augas_object& sock, const char* addr,
                unsigned short port) const AUG_NOTHROW;
 
-        bool
+        void
         connected(augas_object& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW;
 
-        bool
+        void
         data(const augas_object& sock, const char* buf,
              size_t size) const AUG_NOTHROW;
 
-        bool
+        void
         rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW;
 
-        bool
+        void
         wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW;
 
-        bool
+        void
         expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW;
     };
 

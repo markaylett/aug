@@ -3,7 +3,7 @@
 # SRC = \
 # 	$(NAME).cpp
 #
-# include augmod.mk
+# include augaspp.mk
 
 SHELL = /bin/sh
 UNAME := $(shell uname | sed -e 's/CYGWIN.*/WIN32/i' -e 's/MINGW.*/WIN32/i')

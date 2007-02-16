@@ -255,20 +255,28 @@ namespace augas {
 
     // Thread-safe.
 
-    void
+    int
     reconf_()
     {
-        aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
-        writeevent(aug_eventout(), e);
+        try {
+            aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
+            writeevent(aug_eventout(), e);
+            return 0;
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     // Thread-safe.
 
-    void
-    stop_()
+    int
+    stopall_()
     {
-        aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
-        writeevent(aug_eventout(), e);
+        try {
+            aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
+            writeevent(aug_eventout(), e);
+            return 0;
+        } AUG_SETERRINFOCATCH;
+        return -1;
     }
 
     // Thread-safe.
@@ -468,8 +476,7 @@ namespace augas {
             if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection not found: id=[%d]", cid);
-            rwtimer->resetrwtimer(ms, flags);
-            return 0;
+            return rwtimer->resetrwtimer(ms, flags) ? 0 : AUGAS_NONE;
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -484,8 +491,7 @@ namespace augas {
             if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection not found: id=[%d]", cid);
-            rwtimer->cancelrwtimer(flags);
-            return 0;
+            return rwtimer->cancelrwtimer(flags) ? 0 : AUGAS_NONE;
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -550,7 +556,7 @@ namespace augas {
         vwritelog_,
         error_,
         reconf_,
-        stop_,
+        stopall_,
         post_,
         dispatch_,
         getenv_,

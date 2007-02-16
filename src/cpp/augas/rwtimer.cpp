@@ -37,36 +37,52 @@ rwtimer::do_setrwtimer(unsigned ms, unsigned flags)
         wrtimer_.set(ms, *this);
 }
 
-void
+bool
 rwtimer::do_resetrwtimer(unsigned ms, unsigned flags)
 {
+    bool exists(true);
+
     if (flags & AUGAS_TIMRD)
-        rdtimer_.reset(ms);
+        if (!rdtimer_.reset(ms))
+            exists = false;
 
     if (flags & AUGAS_TIMWR)
-        wrtimer_.reset(ms);
+        if (!wrtimer_.reset(ms))
+            exists = false;
+
+    return exists;
 }
 
-void
+bool
 rwtimer::do_resetrwtimer(unsigned flags)
 {
-    if (flags & AUGAS_TIMRD && null != rdtimer_)
-        if (!rdtimer_.reset()) // If timer nolonger exists.
-            rdtimer_ = null;
+    bool exists(true);
 
-    if (flags & AUGAS_TIMWR && null != wrtimer_)
-        if (!wrtimer_.reset()) // If timer nolonger exists.
-            wrtimer_ = null;
-}
-
-void
-rwtimer::do_cancelrwtimer(unsigned flags)
-{
     if (flags & AUGAS_TIMRD)
-        rdtimer_.cancel();
+        if (!rdtimer_.reset())
+            exists = false;
 
     if (flags & AUGAS_TIMWR)
-        wrtimer_.cancel();
+        if (!wrtimer_.reset())
+            exists = false;
+
+    return exists;
+}
+
+bool
+rwtimer::do_cancelrwtimer(unsigned flags)
+{
+    bool exists(true);
+
+    if (flags & AUGAS_TIMRD)
+        if (!rdtimer_.cancel())
+            exists = false;
+
+    if (flags & AUGAS_TIMWR)
+        if (!wrtimer_.cancel())
+            exists = false;
+
+    return exists;
 }
 
 rwtimer::~rwtimer() AUG_NOTHROW

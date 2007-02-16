@@ -24,13 +24,13 @@ namespace augas {
         void
         do_setrwtimer(unsigned ms, unsigned flags);
 
-        void
+        bool
         do_resetrwtimer(unsigned ms, unsigned flags);
 
-        void
+        bool
         do_resetrwtimer(unsigned flags);
 
-        void
+        bool
         do_cancelrwtimer(unsigned flags);
 
         // conn_base.

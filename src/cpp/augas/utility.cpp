@@ -17,54 +17,46 @@ namespace {
     {
         return 0;
     }
-    int
+    void
     reconf(const augas_serv* serv)
     {
-        return 0;
     }
-    int
+    void
     event(const augas_serv* serv, const char* from, const augas_event* event)
     {
-        return 0;
     }
     void
     closed(const augas_object* sock)
     {
     }
-    int
+    void
     teardown(const augas_object* sock)
     {
-        return 0;
     }
     int
     accept(augas_object* sock, const char* addr, unsigned short port)
     {
         return 0;
     }
-    int
+    void
     connected(augas_object* sock, const char* addr, unsigned short port)
     {
-        return 0;
     }
-    int
+    void
     data(const augas_object* sock, const char* buf, size_t size)
     {
-        return 0;
     }
-    int
+    void
     rdexpire(const augas_object* sock, unsigned* ms)
     {
-        return 0;
     }
-    int
+    void
     wrexpire(const augas_object* sock, unsigned* ms)
     {
-        return 0;
     }
-    int
+    void
     expire(const augas_object* timer, unsigned* ms)
     {
-        return 0;
     }
 }
 

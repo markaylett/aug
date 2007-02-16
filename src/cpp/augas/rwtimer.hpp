@@ -16,13 +16,13 @@ namespace augas {
         virtual void
         do_setrwtimer(unsigned ms, unsigned flags) = 0;
 
-        virtual void
+        virtual bool
         do_resetrwtimer(unsigned ms, unsigned flags) = 0;
 
-        virtual void
+        virtual bool
         do_resetrwtimer(unsigned flags) = 0;
 
-        virtual void
+        virtual bool
         do_cancelrwtimer(unsigned flags) = 0;
 
     public:
@@ -33,20 +33,20 @@ namespace augas {
         {
             do_setrwtimer(ms, flags);
         }
-        void
+        bool
         resetrwtimer(unsigned ms, unsigned flags)
         {
-            do_resetrwtimer(ms, flags);
+            return do_resetrwtimer(ms, flags);
         }
-        void
+        bool
         resetrwtimer(unsigned flags)
         {
-            do_resetrwtimer(flags);
+            return do_resetrwtimer(flags);
         }
-        void
+        bool
         cancelrwtimer(unsigned flags)
         {
-            do_cancelrwtimer(flags);
+            return do_cancelrwtimer(flags);
         }
     };
 
@@ -65,13 +65,13 @@ namespace augas {
         void
         do_setrwtimer(unsigned ms, unsigned flags);
 
-        void
+        bool
         do_resetrwtimer(unsigned ms, unsigned flags);
 
-        void
+        bool
         do_resetrwtimer(unsigned flags);
 
-        void
+        bool
         do_cancelrwtimer(unsigned flags);
 
     public:

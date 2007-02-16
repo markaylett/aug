@@ -28,25 +28,25 @@ namespace augas {
             active_ = true; // Functions may be called during initialisation.
             return active_ = module_->start(serv_);
         }
-        bool
+        void
         reconf() const AUG_NOTHROW
         {
-            return module_->reconf(serv_);
+            module_->reconf(serv_);
         }
-        bool
+        void
         event(const char* from, const augas_event& event) const AUG_NOTHROW
         {
-            return module_->event(serv_, from, event);
+            module_->event(serv_, from, event);
         }
         void
         closed(const augas_object& sock) const AUG_NOTHROW
         {
             module_->closed(sock);
         }
-        bool
+        void
         teardown(const augas_object& sock) const AUG_NOTHROW
         {
-            return module_->teardown(sock);
+            module_->teardown(sock);
         }
         bool
         accept(augas_object& sock, const char* addr,
@@ -54,32 +54,32 @@ namespace augas {
         {
             return module_->accept(sock, addr, port);
         }
-        bool
+        void
         connected(augas_object& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW
         {
-            return module_->connected(sock, addr, port);
+            module_->connected(sock, addr, port);
         }
-        bool
+        void
         data(const augas_object& sock, const char* buf,
              size_t size) const AUG_NOTHROW
         {
-            return module_->data(sock, buf, size);
+            module_->data(sock, buf, size);
         }
-        bool
+        void
         rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
         {
-            return module_->rdexpire(sock, ms);
+            module_->rdexpire(sock, ms);
         }
-        bool
+        void
         wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
         {
-            return module_->wrexpire(sock, ms);
+            module_->wrexpire(sock, ms);
         }
-        bool
+        void
         expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
         {
-            return module_->expire(timer, ms);
+            module_->expire(timer, ms);
         }
         operator augas_serv&() AUG_NOTHROW
         {

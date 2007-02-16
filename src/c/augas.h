@@ -105,17 +105,19 @@ struct augas_host {
 
     /**
        \brief Re-configure the host and all loaded modules.
+       \return TODO
        \sa stopall_().
     */
 
-    void (*reconf_)(void);
+    int (*reconf_)(void);
 
     /**
        \brief Stop the application server.
+       \return TODO
        \sa reconf_().
     */
 
-    void (*stopall_)(void);
+    int (*stopall_)(void);
 
     /**
        \brief Post an event to the event queue.
@@ -310,7 +312,7 @@ struct augas_module {
        \sa TODO
     */
 
-    int (*reconf_)(const struct augas_serv* serv);
+    void (*reconf_)(const struct augas_serv* serv);
 
     /**
        \brief Custom event notification.
@@ -321,8 +323,8 @@ struct augas_module {
        \sa TODO
     */
 
-    int (*event_)(const struct augas_serv* serv, const char* from,
-                  const struct augas_event* event);
+    void (*event_)(const struct augas_serv* serv, const char* from,
+                   const struct augas_event* event);
 
     /**
        \brief Connection closure.
@@ -340,7 +342,7 @@ struct augas_module {
        \sa TODO
     */
 
-    int (*teardown_)(const struct augas_object* sock);
+    void (*teardown_)(const struct augas_object* sock);
 
     /**
        \brief Acceptance of socket connection.
@@ -363,8 +365,8 @@ struct augas_module {
        \sa TODO
     */
 
-    int (*connected_)(struct augas_object* sock, const char* addr,
-                      unsigned short port);
+    void (*connected_)(struct augas_object* sock, const char* addr,
+                       unsigned short port);
 
     /**
        \brief Inbound data.
@@ -375,8 +377,8 @@ struct augas_module {
        \sa TODO
     */
 
-    int (*data_)(const struct augas_object* sock, const char* buf,
-                 size_t size);
+    void (*data_)(const struct augas_object* sock, const char* buf,
+                  size_t size);
 
     /**
        \brief Expiry of read timer.
@@ -386,7 +388,7 @@ struct augas_module {
        \sa TODO
     */
 
-    int (*rdexpire_)(const struct augas_object* sock, unsigned* ms);
+    void (*rdexpire_)(const struct augas_object* sock, unsigned* ms);
 
     /**
        \brief Expiry of write timer.
@@ -396,7 +398,7 @@ struct augas_module {
        \sa TODO
     */
 
-    int (*wrexpire_)(const struct augas_object* sock, unsigned* ms);
+    void (*wrexpire_)(const struct augas_object* sock, unsigned* ms);
 
     /**
        \brief Timer expiry.
@@ -406,7 +408,7 @@ struct augas_module {
        \sa TODO
     */
 
-    int (*expire_)(const struct augas_object* timer, unsigned* ms);
+    void (*expire_)(const struct augas_object* timer, unsigned* ms);
 };
 
 AUGAS_EXTERN const struct augas_host*

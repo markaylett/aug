@@ -177,13 +177,23 @@ namespace aug {
         bool
         reset(unsigned ms = 0)
         {
-            return resettimer(timers_, ref_, ms);
+            if (null == ref_)
+                return false;
+
+            idref ref(ref_);
+            ref_ = null;
+            return resettimer(timers_, ref, ms);
         }
 
         bool
         cancel()
         {
-            return canceltimer(timers_, ref_);
+            if (null == ref_)
+                return false;
+
+            idref ref(ref_);
+            ref_ = null;
+            return canceltimer(timers_, ref);
         }
 
         bool

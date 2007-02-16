@@ -20,22 +20,22 @@ servconn::do_setrwtimer(unsigned ms, unsigned flags)
     rwtimer_.setrwtimer(ms, flags);
 }
 
-void
+bool
 servconn::do_resetrwtimer(unsigned ms, unsigned flags)
 {
-    rwtimer_.resetrwtimer(ms, flags);
+    return rwtimer_.resetrwtimer(ms, flags);
 }
 
-void
+bool
 servconn::do_resetrwtimer(unsigned flags)
 {
-    rwtimer_.resetrwtimer(flags);
+    return rwtimer_.resetrwtimer(flags);
 }
 
-void
+bool
 servconn::do_cancelrwtimer(unsigned flags)
 {
-    rwtimer_.cancelrwtimer(flags);
+    return rwtimer_.cancelrwtimer(flags);
 }
 
 augas_object&

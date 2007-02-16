@@ -59,7 +59,11 @@ reconf_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, ":reconf"))
         return NULL;
 
-    augas_reconf();
+    if (-1 == augas_reconf()) {
+        PyErr_SetString(PyExc_RuntimeError, augas_error());
+        return NULL;
+    }
+
     return incret_(Py_None);
 }
 
@@ -69,7 +73,11 @@ stopall_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, ":stopall"))
         return NULL;
 
-    augas_stopall();
+    if (-1 == augas_stopall()) {
+        PyErr_SetString(PyExc_RuntimeError, augas_error());
+        return NULL;
+    }
+
     return incret_(Py_None);
 }
 
@@ -244,12 +252,15 @@ resetrwtimer_(PyObject* self, PyObject* args)
                           type_, &sock, &ms, &flags))
         return NULL;
 
-    if (-1 == augas_resetrwtimer(augpy_getid(sock), ms, flags)) {
+    switch (augas_resetrwtimer(augpy_getid(sock), ms, flags)) {
+    case -1:
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         return NULL;
+    case AUGAS_NONE:
+        return incret_(Py_False);
     }
 
-    return incret_(Py_None);
+    return incret_(Py_True);
 }
 
 static PyObject*
@@ -261,12 +272,15 @@ cancelrwtimer_(PyObject* self, PyObject* args)
                           type_, &sock, &flags))
         return NULL;
 
-    if (-1 == augas_cancelrwtimer(augpy_getid(sock), flags)) {
+    switch (augas_cancelrwtimer(augpy_getid(sock), flags)) {
+    case -1:
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         return NULL;
+    case AUGAS_NONE:
+        return incret_(Py_False);
     }
 
-    return incret_(Py_None);
+    return incret_(Py_True);
 }
 
 static PyObject*

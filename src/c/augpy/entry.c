@@ -265,11 +265,10 @@ start_(struct augas_serv* serv)
     return 0;
 }
 
-static int
+static void
 reconf_(const struct augas_serv* serv)
 {
     struct import_* import = serv->user_;
-    int ret = 0;
     assert(serv->user_);
 
     if (import->reconf_) {
@@ -278,20 +277,16 @@ reconf_(const struct augas_serv* serv)
                                             serv->name_);
         if (x) {
             Py_DECREF(x);
-        } else {
+        } else
             printerr_();
-            ret = -1;
-        }
     }
-    return ret;
 }
 
-static int
+static void
 event_(const struct augas_serv* serv, const char* from,
        const struct augas_event* event)
 {
     struct import_* import = serv->user_;
-    int ret = 0;
     assert(serv->user_);
 
     if (import->event_) {
@@ -302,15 +297,11 @@ event_(const struct augas_serv* serv, const char* from,
                                             (int)event->size_);
         if (y) {
             Py_DECREF(y);
-        } else {
+        } else
             printerr_();
-            ret = -1;
-        }
     }
 
     /* x will be Py_DECREF()-ed by destroy_(). */
-
-    return ret;
 }
 
 static void
@@ -333,11 +324,10 @@ closed_(const struct augas_object* sock)
     Py_DECREF(x);
 }
 
-static int
+static void
 teardown_(const struct augas_object* sock)
 {
     struct import_* import = sock->serv_->user_;
-    int ret = 0;
     assert(sock->serv_->user_);
     assert(sock->user_);
 
@@ -348,15 +338,11 @@ teardown_(const struct augas_object* sock)
 
         if (y) {
             Py_DECREF(y);
-        } else {
+        } else
             printerr_();
-            ret = -1;
-        }
 
     } else
         augas_shutdown(sock->id_);
-
-    return ret;
 }
 
 static int
@@ -391,7 +377,6 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
             printerr_();
             Py_DECREF(y);
             return -1;
-
         }
 
         if (z == Py_False) {
@@ -414,11 +399,10 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
     return ret;
 }
 
-static int
+static void
 connected_(struct augas_object* sock, const char* addr, unsigned short port)
 {
     struct import_* import = sock->serv_->user_;
-    int ret = 0;
     assert(sock->serv_->user_);
     assert(sock->user_);
 
@@ -430,22 +414,17 @@ connected_(struct augas_object* sock, const char* addr, unsigned short port)
 
         if (y) {
             Py_DECREF(y);
-        } else {
+        } else
             printerr_();
-            ret = -1;
-        }
     }
 
     /* closed() will always be called, even if connected() fails. */
-
-    return ret;
 }
 
-static int
+static void
 data_(const struct augas_object* sock, const char* buf, size_t size)
 {
     struct import_* import = sock->serv_->user_;
-    int ret = 0;
     assert(sock->serv_->user_);
     assert(sock->user_);
 
@@ -457,21 +436,17 @@ data_(const struct augas_object* sock, const char* buf, size_t size)
 
         if (z) {
             Py_DECREF(z);
-        } else {
+        } else
             printerr_();
-            ret = -1;
-        }
 
         Py_DECREF(y);
     }
-    return ret;
 }
 
-static int
+static void
 rdexpire_(const struct augas_object* sock, unsigned* ms)
 {
     struct import_* import = sock->serv_->user_;
-    int ret = 0;
     assert(sock->serv_->user_);
     assert(sock->user_);
 
@@ -488,22 +463,17 @@ rdexpire_(const struct augas_object* sock, unsigned* ms)
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
-        } else {
+        } else
             printerr_();
-            ret = -1;
-        }
 
         Py_DECREF(y);
     }
-
-    return ret;
 }
 
-static int
+static void
 wrexpire_(const struct augas_object* sock, unsigned* ms)
 {
     struct import_* import = sock->serv_->user_;
-    int ret = 0;
     assert(sock->serv_->user_);
     assert(sock->user_);
 
@@ -520,22 +490,17 @@ wrexpire_(const struct augas_object* sock, unsigned* ms)
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
-        } else {
+        } else
             printerr_();
-            ret = -1;
-        }
 
         Py_DECREF(y);
     }
-
-    return ret;
 }
 
-static int
+static void
 expire_(const struct augas_object* timer, unsigned* ms)
 {
     struct import_* import = timer->serv_->user_;
-    int ret = 0;
     assert(timer->serv_->user_);
     assert(timer->user_);
 
@@ -553,14 +518,11 @@ expire_(const struct augas_object* timer, unsigned* ms)
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
-        } else {
+        } else
             printerr_();
-            ret = -1;
-        }
 
         /* x will be Py_DECREF()-ed by destroy_() when *ms == 0. */
     }
-    return ret;
 }
 
 static const struct augas_module module_ = {
