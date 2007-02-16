@@ -165,7 +165,7 @@ destroyimport_(struct import_* import)
 static struct import_*
 createimport_(const char* sname)
 {
-    struct import_* import = malloc(sizeof(struct import_));
+    struct import_* import = calloc(1, sizeof(struct import_));
     if (!import)
         return NULL;
 
