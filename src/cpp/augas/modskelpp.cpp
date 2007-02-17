@@ -4,7 +4,7 @@ using namespace augas;
 
 namespace {
 
-    struct serv : stubserv {
+    struct serv : basic_serv {
         bool
         do_start(const char* sname)
         {

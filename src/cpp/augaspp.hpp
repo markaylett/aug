@@ -224,7 +224,7 @@ namespace augas {
         }
     };
 
-    class stubserv : public serv_base {
+    class basic_serv : public serv_base {
         typedef augas::event event_type;
         void
         do_reconf(const char* sname)
@@ -269,7 +269,7 @@ namespace augas {
         }
     public:
         virtual
-        ~stubserv() AUGAS_NOTHROW
+        ~basic_serv() AUGAS_NOTHROW
         {
         }
     };
