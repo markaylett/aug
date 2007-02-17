@@ -17,8 +17,8 @@ service.pyproxy.to = 7001
 service.pyclient.module = augpy
 service.pyclient.to = 7002
 
-module.augpy.path = mod/modaugpy.so
+module.augpy.path = mod/modaugpy
 module.augpy.pythonpath = python
 
-module.augskel.path = mod/modskel.so
-module.augskelpp.path = mod/modskelpp.so
+module.augskel.path = mod/modskel
+module.augskelpp.path = mod/modskelpp

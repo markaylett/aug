@@ -19,9 +19,38 @@ namespace {
 
 #if !defined(_WIN32)
     const char DEFAULT_MODULE[] = "./modskel.so";
+    const char MODEXT[] = ".so";
 #else // _WIN32
     const char DEFAULT_MODULE[] = "./modskel.dll";
+    const char MODEXT[] = ".dll";
 #endif // _WIN32
+
+    bool
+    withso(const string& s)
+    {
+        string::size_type n(s.size());
+        return 3 < n
+            && '.' == s[n - 3]
+            && ('s' == s[n - 2] || 'S' == s[n - 2])
+            && ('o' == s[n - 1] || 'O' == s[n - 1]);
+    }
+
+    bool
+    withdll(const string& s)
+    {
+        string::size_type n(s.size());
+        return 4 < n
+            && '.' == s[n - 4]
+            && ('d' == s[n - 3] || 'D' == s[n - 3])
+            && ('l' == s[n - 2] || 'L' == s[n - 2])
+            && ('l' == s[n - 1] || 'L' == s[n - 1]);
+    }
+
+    bool
+    withext(const string& s)
+    {
+        return withso(s) || withdll(s);
+    }
 }
 
 void
@@ -129,8 +158,11 @@ manager::load(const char* rundir, const options& options,
 
                 string path(options.get(string("module.").append(value)
                                         .append(".path")));
+                if (!withext(path))
+                    path += MODEXT;
 
-                aug_info("loading module: name=[%s]", value.c_str());
+                aug_info("loading module: name=[%s], path=[%s]",
+                         value.c_str(), path.c_str());
                 aug::chdir(rundir);
                 moduleptr module(new augas::module(value, path.c_str(),
                                                    host));
