@@ -173,12 +173,14 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	augas.txt \
+	augasintro.w \
 	augsys.gif \
 	augmar.gif \
 	augutil.gif \
 	augsrv.gif \
 	augnet.gif \
 	cvs-policy.txt \
+	cwebmac.tex \
 	Doxyfile
 
 all: all-recursive
@@ -496,6 +498,15 @@ gif:
 			../pl/dotdepend -I. `find $$l -name "*.c"`) \
 			| dot -Tgif >$$l.gif; \
 	done
+
+augasintro.tex: augasintro.w
+	cweave $<
+
+augasintro.dvi: augasintro.tex
+	tex $<
+
+augasintro.pdf: augasintro.dvi
+	dvipdfm $<
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
