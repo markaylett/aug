@@ -625,6 +625,18 @@ namespace augas {
     {
         return resettimer(timer.id_, ms);
     }
+
+    bool
+    split(std::string& head, std::string& tail, const char* delims = "\n",
+          std::string::size_type off = 0)
+    {
+        std::string::size_type pos(tail.find_first_of(delims, off));
+        if (std::string::npos == pos)
+            return false;
+        head = tail.substr(0, pos);
+        tail.erase(0, pos + 1);
+        return true;
+    }
 }
 
 #endif // AUGASPP_HPP
