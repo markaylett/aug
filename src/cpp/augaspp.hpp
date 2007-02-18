@@ -650,10 +650,61 @@ namespace augas {
     }
 
     inline int
-    xdigittoi(char ch)
+    xdigitoi(char ch)
     {
         return '0' <= ch && ch <= '9'
             ? ch - '0' : std::toupper(ch) - 'A' + 10;
+    }
+
+    inline std::string
+    urlencode(const std::string& x)
+    {
+        static const char HEX[] = "0123456789ABCDEF";
+
+        std::string y;
+        for (std::string::size_type i(0); i < x.size(); ++i)
+
+            if (std::isalnum(x[i]))
+                y += x[i];
+            else
+                switch (x[i]) {
+                case ' ':
+                    y += '+';
+                    break;
+                case '-':
+                case '_':
+                case '.':
+                case '!':
+                case '~':
+                case '*':
+                case '\'':
+                case '(':
+                case ')':
+                    y += x[i];
+                    break;
+                default:
+                    y += '%';
+                    y += HEX[x[i] / 16];
+                    y += HEX[x[i] % 16];
+                }
+        return y;
+    }
+
+    template <typename T>
+    std::string
+    urlencode(T it, T end)
+    {
+        std::string s;
+        for (bool first(true); it != end; ++it) {
+            if (first)
+                first = false;
+            else
+                s += '&';
+            s += urlencode(it->first);
+            s += '=';
+            s += urlencode(it->second);
+        }
+        return s;
     }
 
     inline std::string
@@ -668,8 +719,8 @@ namespace augas {
             case '%':
                 if (i < x.size() - 2 && std::isxdigit(x[i + 1])
                     && std::isxdigit(x[i + 2])) {
-                    y += static_cast<char>(xdigittoi(x[i + 1]) * 16
-                                           + xdigittoi(x[i + 2]));
+                    y += static_cast<char>(xdigitoi(x[i + 1]) * 16
+                                           + xdigitoi(x[i + 2]));
                     i += 2;
                     break;
                 }
@@ -693,6 +744,7 @@ namespace augas {
         do {
             more = split(head, tail, "&");
             std::pair<std::string, std::string> xy(split(head, "="));
+            xy.first = urldecode(xy.first);
             xy.second = urldecode(xy.second);
             *it++ = xy;
             head.clear();
