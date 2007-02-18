@@ -6,6 +6,7 @@
 
 #include "augas.h"
 
+#include <cctype>
 #include <cstring>
 #include <stdexcept>
 
@@ -626,16 +627,76 @@ namespace augas {
         return resettimer(timer.id_, ms);
     }
 
-    bool
-    split(std::string& head, std::string& tail, const char* delims = "\n",
-          std::string::size_type off = 0)
+    inline bool
+    split(std::string& head, std::string& tail, const char* delims = "\n")
     {
-        std::string::size_type pos(tail.find_first_of(delims, off));
-        if (std::string::npos == pos)
+        std::string::size_type pos(tail.find_first_of(delims));
+        if (std::string::npos == pos) {
+            head += tail;
+            tail.clear();
             return false;
-        head = tail.substr(0, pos);
+        }
+        head += tail.substr(0, pos);
         tail.erase(0, pos + 1);
         return true;
+    }
+
+    inline std::pair<std::string, std::string>
+    split(const std::string& s, const char* delims = "\n")
+    {
+        std::pair<std::string, std::string> xy(std::string(), s);
+        split(xy.first, xy.second, delims);
+        return xy;
+    }
+
+    inline int
+    xdigittoi(char ch)
+    {
+        return '0' <= ch && ch <= '9'
+            ? ch - '0' : std::toupper(ch) - 'A' + 10;
+    }
+
+    inline std::string
+    urldecode(const std::string& x)
+    {
+        std::string y;
+        for (std::string::size_type i(0); i < x.size(); ++i)
+            switch (x[i]) {
+            case '+':
+                y += ' ';
+                break;
+            case '%':
+                if (i < x.size() - 2 && std::isxdigit(x[i + 1])
+                    && std::isxdigit(x[i + 2])) {
+                    y += static_cast<char>(xdigittoi(x[i + 1]) * 16
+                                           + xdigittoi(x[i + 2]));
+                    i += 2;
+                    break;
+                }
+            default:
+                y += x[i];
+                break;
+            }
+        return y;
+    }
+
+    // Example:
+    // map<string, string> params;
+    // urldecode(inserter(params, params.begin()), tail);
+
+    template <typename T>
+    void
+    urldecode(T it, const std::string& x)
+    {
+        std::string head, tail(x);
+        bool more;
+        do {
+            more = split(head, tail, "&");
+            std::pair<std::string, std::string> xy(split(head, "="));
+            xy.second = urldecode(xy.second);
+            *it++ = xy;
+            head.clear();
+        } while (more);
     }
 }
 
