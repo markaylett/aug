@@ -164,7 +164,6 @@ namespace aug {
         operator =(const null_&)
         {
             cancel();
-            ref_ = null;
             return *this;
         }
 
@@ -180,9 +179,12 @@ namespace aug {
             if (null == ref_)
                 return false;
 
-            idref ref(ref_);
-            ref_ = null;
-            return resettimer(timers_, ref, ms);
+            if (!resettimer(timers_, ref_, ms)) {
+                ref_ = null;
+                return false;
+            }
+
+            return true;
         }
 
         bool

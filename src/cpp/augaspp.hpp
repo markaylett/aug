@@ -43,7 +43,8 @@ namespace augas {
             event_.user_ = 0;
             event_.size_ = 0;
         }
-        event(const char* type, void* user, size_t size = 0)
+        template <typename T>
+        event(const char* type, T* user, size_t size = 0)
         {
             settype(type);
             setuser(user, size);
@@ -61,11 +62,12 @@ namespace augas {
             strncpy(event_.type_, type, sizeof(event_.type_));
             event_.type_[AUGAS_MAXNAME] ='\0';
         }
+        template <typename T>
         void
-        setuser(void* user, size_t size = 0)
+        setuser(T* user, size_t size = 0)
         {
             if (user) {
-                event_.user_ = user;
+                event_.user_ = static_cast<void*>(user);
                 event_.size_ = size;
             } else {
                 event_.user_ = 0;
@@ -77,10 +79,11 @@ namespace augas {
         {
             return event_.type_;
         }
-        void*
+        template <typename T>
+        T*
         user() const
         {
-            return event_.user_;
+            return static_cast<T>(event_.user_);
         }
         size_t
         size() const
@@ -101,10 +104,12 @@ namespace augas {
             : object_(object)
         {
         }
+        template <typename T>
         void
-        setuser(void* user)
+        setuser(T* user)
         {
-            const_cast<augas_object&>(object_).user_ = user;
+            const_cast<augas_object&>(object_).user_
+                = static_cast<void*>(user);
         }
         const char*
         sname() const
@@ -116,10 +121,11 @@ namespace augas {
         {
             return object_.id_;
         }
-        void*
+        template <typename T>
+        T*
         user() const
         {
-            return object_.user_;
+            return static_cast<T*>(object_.user_);
         }
         operator const augas_object&() const
         {
@@ -628,7 +634,7 @@ namespace augas {
     }
 
     inline bool
-    split(std::string& head, std::string& tail, const char* delims = "\n")
+    shift(std::string& head, std::string& tail, const char* delims = "\n")
     {
         std::string::size_type pos(tail.find_first_of(delims));
         if (std::string::npos == pos) {
@@ -645,7 +651,7 @@ namespace augas {
     split(const std::string& s, const char* delims = "\n")
     {
         std::pair<std::string, std::string> xy(std::string(), s);
-        split(xy.first, xy.second, delims);
+        shift(xy.first, xy.second, delims);
         return xy;
     }
 
@@ -742,7 +748,7 @@ namespace augas {
         std::string head, tail(x);
         bool more;
         do {
-            more = split(head, tail, "&");
+            more = shift(head, tail, "&");
             std::pair<std::string, std::string> xy(split(head, "="));
             xy.first = urldecode(xy.first);
             xy.second = urldecode(xy.second);
