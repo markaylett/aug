@@ -24,7 +24,7 @@ augasintro.tex: augasintro.w
 	cweave $<
 
 augasintro.dvi: augasintro.tex
-	tex $<
+	tex "\let\pdf+ \input $<"
 
 augasintro.pdf: augasintro.dvi
 	dvipdfm $<

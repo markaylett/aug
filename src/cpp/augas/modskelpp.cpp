@@ -5,27 +5,23 @@ using namespace std;
 
 namespace {
 
-    struct state {
-        string head_;
-    };
-
     struct serv : basic_serv {
         bool
         do_start(const char* sname)
         {
             writelog(AUGAS_LOGINFO, "starting...");
-            tcplisten(sname, "0.0.0.0", "5000");
+            tcplisten(sname, "0.0.0.0", augas::getenv("session.echo.serv"));
             return true;
         }
         void
         do_closed(const object& sock)
         {
-            delete sock.user<state>();
+            delete sock.user<string>();
         }
         bool
         do_accept(object& sock, const char* addr, unsigned short port)
         {
-            sock.setuser(new state());
+            sock.setuser(new string());
             send(sock, "hello\r\n", 7);
             setrwtimer(sock, 15000, AUGAS_TIMRD);
             return true;
@@ -33,20 +29,19 @@ namespace {
         void
         do_data(const object& sock, const char* buf, size_t size)
         {
-            state* s(sock.user<state>());
+            string& head(*sock.user<string>());
 
             string tail(buf, size);
-            while (shift(s->head_, tail)) {
+            while (shift(head, tail)) {
 
-                if (!s->head_.empty()
-                    && '\r' == s->head_[s->head_.size() - 1])
-                    s->head_.resize(s->head_.size() - 1);
+                if (!head.empty() && '\r' == head[head.size() - 1])
+                    head.resize(head.size() - 1);
 
-                s->head_ = urlencode(s->head_);
+                head = urlencode(head);
 
-                s->head_ += "\r\n";
-                send(sock, s->head_.c_str(), s->head_.size());
-                s->head_.clear();
+                head += "\r\n";
+                send(sock, head.c_str(), head.size());
+                head.clear();
             }
         }
         void
