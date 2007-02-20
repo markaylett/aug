@@ -5,6 +5,26 @@ using namespace std;
 
 namespace {
 
+    struct eachline {
+        const object* const sock_;
+        explicit
+        eachline(const object& sock)
+            : sock_(&sock)
+        {
+        }
+        void
+        operator ()(std::string& s)
+        {
+            if (!s.empty() && '\r' == s[s.size() - 1])
+                s.resize(s.size() - 1);
+
+            reverse(s.begin(), s.end());
+            s += "\r\n";
+
+            send(*sock_, s.c_str(), s.size());
+        }
+    };
+
     struct serv : basic_serv {
         bool
         do_start(const char* sname)
@@ -29,20 +49,8 @@ namespace {
         void
         do_data(const object& sock, const char* buf, size_t size)
         {
-            string& head(*sock.user<string>());
-
-            string tail(buf, size);
-            while (shift(head, tail)) {
-
-                if (!head.empty() && '\r' == head[head.size() - 1])
-                    head.resize(head.size() - 1);
-
-                head = urlencode(head);
-
-                head += "\r\n";
-                send(sock, head.c_str(), head.size());
-                head.clear();
-            }
+            string& tok(*sock.user<string>());
+            tokenise(buf, buf + size, tok, '\n', eachline(sock));
         }
         void
         do_rdexpire(const object& sock, unsigned& ms)

@@ -6,9 +6,13 @@
 
 #include "augas.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cstring>
+#include <iterator>
 #include <stdexcept>
+#include <vector>
+#include <functional>
 
 #if !defined(AUGAS_NOTHROW)
 # define AUGAS_NOTHROW throw()
@@ -633,27 +637,172 @@ namespace augas {
         return resettimer(timer.id_, ms);
     }
 
-    inline bool
-    shift(std::string& head, std::string& tail, const char* delims = "\n")
-    {
-        std::string::size_type pos(tail.find_first_of(delims));
-        if (std::string::npos == pos) {
-            head += tail;
-            tail.clear();
-            return false;
+	const char WHITE[] = " \t\r\n";
+
+	inline std::string&
+	ltrim(std::string& s, const char* delims = WHITE)
+	{
+        s.erase(0, s.find_first_not_of(delims));
+        return s;
+	}
+
+	inline std::string
+	ltrimcopy(const std::string& s, const char* delims = WHITE)
+	{
+        std::string::size_type pos(s.find_first_not_of(delims));
+        return std::string::npos == pos
+            ? std::string() : s.substr(pos);
+	}
+
+	inline std::string&
+	rtrim(std::string& s, const char* delims = WHITE)
+	{
+        std::string::size_type pos(s.find_last_not_of(delims));
+        if (std::string::npos == pos)
+            s.clear();
+        else
+            s.erase(pos + 1);
+        return s;
+	}
+
+	inline std::string
+	rtrimcopy(const std::string& s, const char* delims = WHITE)
+	{
+        std::string::size_type pos(s.find_last_not_of(delims));
+        return std::string::npos == pos
+            ? std::string() : s.substr(0, pos + 1);
+	}
+
+	inline std::string&
+	trim(std::string& s, const char* delims = WHITE)
+	{
+		return rtrim(ltrim(s, delims), delims);
+	}
+
+	inline std::string
+	trimcopy(const std::string& s, const char* delims = WHITE)
+	{
+        return rtrimcopy(ltrimcopy(s, delims));
+	}
+
+	template <typename T, typename U, typename V>
+	T
+	copyif(T it, T end, U dst, V pred)
+	{
+		for (; it != end && pred(*it); ++it, ++dst)
+            *dst = *it;
+        return it;
+	}
+
+	template <typename T, typename U, typename V>
+	T
+	appendif(T it, T end, U& dst, V pred)
+	{
+		return copyif(it, end, std::back_inserter(dst), pred);
+	}
+
+	template <typename T, typename U, typename V>
+	T
+	copyneq(T it, T end, U dst, V val)
+	{
+		return copyif(it, end, dst,
+                      std::bind2nd(std::not_equal_to<V>(), val));
+	}
+
+	template <typename T, typename U, typename V>
+	T
+	appendneq(T it, T end, U& dst, V val)
+	{
+		return copyif(it, end, std::back_inserter(dst),
+                      std::bind2nd(std::not_equal_to<V>(), val));
+	}
+
+	template <typename T, typename U, typename V, typename W>
+	W
+	tokenise(T it, T end, U& tok, V val, W fn)
+	{
+        for (; (it = appendneq(it, end, tok, val)) != end; ++it) {
+			fn(tok);
+            tok.clear();
         }
-        head += tail.substr(0, pos);
-        tail.erase(0, pos + 1);
-        return true;
+		return fn;
+	}
+
+	template <typename T, typename U, typename V, typename W>
+	W
+	tokenise(const T& x, U& tok, V val, W fn)
+	{
+		return tokenise(x.begin(), x.end(), tok, val, fn);
+	}
+
+    namespace detail {
+        template <typename T>
+        struct tokens {
+            std::vector<T> v_;
+            void
+            operator ()(T& x)
+            {
+                v_.push_back(x);
+            }
+        };
     }
 
-    inline std::pair<std::string, std::string>
-    split(const std::string& s, const char* delims = "\n")
-    {
-        std::pair<std::string, std::string> xy(std::string(), s);
-        shift(xy.first, xy.second, delims);
-        return xy;
-    }
+	template <typename T, typename U, typename V>
+	std::vector<U>
+	tokenise(T it, T end, U& tok, V val)
+	{
+		return tokenise(it, end, tok, val, detail::tokens<U>()).v_;
+	}
+
+	template <typename T, typename U, typename V>
+	std::vector<U>
+	tokenise(const T& x, U& tok, V val)
+	{
+		return tokenise(x.begin(), x.end(), tok, val);
+	}
+
+	template <typename T, typename U, typename V>
+	V
+	splitn(T it, T end, U val, V fn)
+	{
+        std::string tok;
+		fn = tokenise(it, end, val, fn);
+		fn(tok);
+		return fn;
+	}
+
+	template <typename T, typename U>
+	std::vector<std::string>
+	splitn(T it, T end, char val)
+	{
+		return splitn(it, end, val, detail::tokens<std::string>()).v_;
+	}
+
+	template <typename T, typename U>
+	std::vector<std::string>
+	splitn(const T& x, char val)
+	{
+		return splitn(x.begin(), x.end(), val,
+                      detail::tokens<std::string>()).v_;
+	}
+
+	template <typename T, typename U, typename V>
+	bool
+	split2(T it, T end, U& first, U& second, V val)
+	{
+		if ((it = appendneq(it, end, first, val)) == end)
+            return false;
+
+        std::copy(++it, end, std::back_inserter(second));
+        return true;
+	}
+
+	template <typename T, typename U, typename V>
+	bool
+	split2(const T& x, U& first, U& second, V val)
+	{
+        return split2(x.begin(), x.end(), first, second, val);
+	}
 
     inline int
     xdigitoi(char ch)
@@ -662,20 +811,20 @@ namespace augas {
             ? ch - '0' : std::toupper(ch) - 'A' + 10;
     }
 
-    inline std::string
-    urlencode(const std::string& x)
+    template <typename T, typename U>
+    U
+    urlencode(T it, T end, U dst)
     {
         static const char HEX[] = "0123456789ABCDEF";
 
-        std::string y;
-        for (std::string::size_type i(0); i < x.size(); ++i)
+        for (; it != end; ++it, ++dst)
 
-            if (std::isalnum(x[i]))
-                y += x[i];
+            if (std::isalnum(*it))
+                *dst = *it;
             else
-                switch (x[i]) {
+                switch (*it) {
                 case ' ':
-                    y += '+';
+                    *dst = '+';
                     break;
                 case '-':
                 case '_':
@@ -686,14 +835,15 @@ namespace augas {
                 case '\'':
                 case '(':
                 case ')':
-                    y += x[i];
+                    *dst = *it;
                     break;
                 default:
-                    y += '%';
-                    y += HEX[x[i] / 16];
-                    y += HEX[x[i] % 16];
+                    *dst++ = '%';
+                    *dst++ = HEX[*it / 16];
+                    *dst = HEX[*it % 16];
                 }
-        return y;
+
+        return dst;
     }
 
     template <typename T>
@@ -701,60 +851,135 @@ namespace augas {
     urlencode(T it, T end)
     {
         std::string s;
+        urlencode(it, end, std::back_inserter(s));
+        return s;
+    }
+
+    template <typename T>
+    std::string
+    urlencode(const T& x)
+    {
+        return urlencode(x.begin(), x.end());
+    }
+
+    template <typename T, typename U>
+    U
+    urlpack(T it, T end, U dst)
+    {
         for (bool first(true); it != end; ++it) {
             if (first)
                 first = false;
             else
-                s += '&';
-            s += urlencode(it->first);
-            s += '=';
-            s += urlencode(it->second);
+                *dst++ = '&';
+            urlencode(it->first.begin(), it->first.end(), dst);
+            *dst++ = '=';
+            urlencode(it->second.begin(), it->second.end(), dst);
         }
+        return dst;
+    }
+
+    template <typename T>
+    std::string
+    urlpack(T it, T end)
+    {
+        std::string s;
+        urlpack(it, end, std::back_inserter(s));
         return s;
     }
 
-    inline std::string
-    urldecode(const std::string& x)
+    template <typename T>
+    std::string
+    urlpack(const T& x)
     {
-        std::string y;
-        for (std::string::size_type i(0); i < x.size(); ++i)
-            switch (x[i]) {
+        return urlpack(x.begin(), x.end());
+    }
+
+    template <typename T, typename U>
+    U
+    urldecode(T it, T end, U dst)
+    {
+        for (; it != end; ++it, ++dst)
+            switch (*it) {
             case '+':
-                y += ' ';
+                *dst = ' ';
                 break;
             case '%':
-                if (i < x.size() - 2 && std::isxdigit(x[i + 1])
-                    && std::isxdigit(x[i + 2])) {
-                    y += static_cast<char>(xdigitoi(x[i + 1]) * 16
-                                           + xdigitoi(x[i + 2]));
-                    i += 2;
+                if (2 < distance(it, end) && std::isxdigit(it[1])
+                    && std::isxdigit(it[2])) {
+                    *dst = static_cast<char>(xdigitoi(it[1]) * 16
+                                             + xdigitoi(it[2]));
+                    it += 2;
                     break;
                 }
             default:
-                y += x[i];
+                *dst = *it;
                 break;
             }
-        return y;
+
+        return dst;
     }
 
-    // Example:
-    // map<string, string> params;
-    // urldecode(inserter(params, params.begin()), tail);
+    template <typename T>
+    std::string
+    urldecode(T it, T end)
+    {
+        std::string s;
+        urldecode(it, end, std::back_inserter(s));
+        return s;
+    }
 
     template <typename T>
-    void
-    urldecode(T it, const std::string& x)
+    std::string
+    urldecode(const T& x)
     {
-        std::string head, tail(x);
-        bool more;
-        do {
-            more = shift(head, tail, "&");
-            std::pair<std::string, std::string> xy(split(head, "="));
-            xy.first = urldecode(xy.first);
-            xy.second = urldecode(xy.second);
-            *it++ = xy;
-            head.clear();
-        } while (more);
+        return urldecode(x.begin(), x.end());
+    }
+
+    namespace detail {
+        template <typename T>
+        struct urlpairs {
+            T dst_;
+            explicit
+            urlpairs(T dst)
+                : dst_(dst)
+            {
+            }
+            void
+            operator ()(std::string& s)
+            {
+                std::pair<std::string, std::string> xy;
+                split2(s.begin(), s.end(), xy.first, xy.second, '&');
+                xy.first = urldecode(xy.first);
+                xy.second = urldecode(xy.second);
+                *dst_++ = xy;
+            }
+        };
+    }
+
+    template <typename T, typename U>
+    U
+    urlunpack(T it, T end, U dst)
+    {
+        std::string tok;
+        splitn(it, end, tok, '=', detail::urlpairs<U>(dst));
+        return dst;
+    }
+
+    template <typename T, typename U>
+    std::vector<std::pair<std::string, std::string> >
+    urlunpack(T it, T end)
+    {
+        std::vector<std::pair<std::string, std::string> > v;
+        std::string tok;
+        splitn(it, end, tok, '=', detail::urlpairs<U>(back_inserter(v)));
+        return v;
+    }
+
+    template <typename T>
+    std::vector<std::pair<std::string, std::string> >
+    urlunpack(const T& x)
+    {
+        return urlunpack(x.begin(), x.end());
     }
 }
 
