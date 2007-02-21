@@ -20,7 +20,11 @@
 @s serv_base int
 @s user int
 
-@* Overview.  \AS/ is a network application server.  \AS/ manages many common
+@f line normal
+
+@* Overview.
+
+\AS/ is a network application server.  \AS/ manages many common
 and error-prone tasks associated with network servers.
 
 \AS/ provides a host environment to Modules.  Modules are
@@ -37,17 +41,21 @@ environment as a \PYTHON/ module (not to be confused with an \AS/ Module).
 reuse, and presents a uniform interface to system administrators, regardless
 of the services provided.
 
-@ Portability.  \AS/ runs natively on a variety of OSes, including \LINUX/ and
+@ \AS/ runs natively on a variety of OSes, including \LINUX/ and
 \WINDOWS/.  On \WINDOWS/, \AS/ does not require a porting layer, such as \CYGWIN/,
 to operate.
 
 Where appropriate, \AS/ adheres to the conventions of the target platform.
 Daemonisation, for example, takes the form of an NT service on \WINDOWS/.
+However, from a sys-admin perspective, the interface remains the same.  The
+following command can be used to start the service from a command window:
 
-@ Event Model.  \AS/ uses an event-based model to de-multiplex activity on
-signal, socket, timer and custom event objects.  All module calls are
-dispatched from the event thread (similar to a UI thread).  A multi-threaded
-environment is not imposed upon a service by the host environment.
+\.{C:\\> augasd -f augasd.conf start}
+
+@ \AS/ uses an event-based model to de-multiplex activity on signal, socket,
+timer and custom event objects.  All module calls are dispatched from the
+event thread (similar to a UI thread).  A multi-threaded environment is not
+imposed upon a service by the host environment.
 
 Internally, the application operates on a single thread.  Services are,
 however, free to select a threading model best suited to their needs.  They
@@ -57,7 +65,9 @@ Services can interact with one another using custom events.  In a
 multi-language environment, a \PYTHON/ service could delegate tasks to a
 service which happens to be implemented in a different language.
 
-@* Example.  In the sections below, a module is built in \CPLUSPLUS/ that:
+@* A Sample Module.
+
+In the sections below, a module is built in \CPLUSPLUS/ that:
 
 \yskip\item{$\bullet$} exposes a TCP service
 \item{$\bullet$} reverses lines sent from client
@@ -85,13 +95,14 @@ using namespace augas;
 using namespace std;@/
 
 namespace {@/
-struct serv : basic_serv {@/
-@<start service@>@/
-@<accept connection@>@/
-@<cleanup on disconnect@>@/
-@<process data@>@/
-@<handle timer expiry@>@/
-};@/
+  @<request handler@>@;
+  struct serv : basic_serv {@/
+  @<start service@>@/
+  @<accept connection@>@/
+  @<cleanup on disconnect@>@/
+  @<process data@>@/
+  @<handle timer expiry@>@/
+  };@/
 }
 
 @ Here is the main program.
@@ -107,17 +118,16 @@ bool
 do_start(const char* sname)
 {
   writelog(AUGAS_LOGINFO, "starting service [%s]", sname);
-  const char* serv = augas::getenv("session.intro.serv");
-  if (!serv)
+  const char* port = augas::getenv("service.intro.serv");
+  if (!port)
     return false;
-  tcplisten(sname, "0.0.0.0", serv);
+  tcplisten(sname, "0.0.0.0", port);
   return true;
 }
 
-@ TODO
-
-Timers are especially useful for implementing heartbeat mechanisms common to
-many protocols.
+@ A buffer is assigned in the socket's user state.  The buffer is stores
+incomplete line data received from the client.  Timers are especially useful
+for implementing heartbeat mechanisms common to many protocols.
 
 @<accept...@>=
 bool
@@ -129,7 +139,7 @@ do_accept(object& sock, const char* addr, unsigned short port)
   return true;
 }
 
-@ Cleanup any state associated with the socket.
+@ Delete the |string| buffer associated with the connection.
 
 @<cleanup...@>=
 void
@@ -138,22 +148,16 @@ do_closed(const object& sock)
   delete sock.user<string>();
 }
 
-@ TODO
-
-@f line normal
+@ |tok| is used to buffer incomplete lines between calls to |do_data|.  The
+|tokenise()| function appends new data to the back of |tok|.  Each complete
+line is processed by the |echoline| functor.
 
 @<process data...@>=
 void
 do_data(const object& sock, const char* buf, size_t size)
 {
-  string& line = sock.user<string>();
-
-  string tail(buf, size);
-  while (shift(line, tail)) {
-    @<strip eol sequence@>;
-    @<prepare response@>;
-    @<send response@>;
-  }
+  string& tok(*sock.user<string>());
+  tokenise(buf, buf + size, tok, '\n', echoline(sock));
 }
 
 @ No data has arrived for 15 seconds so the connection is shutdown (a FIN is
@@ -166,26 +170,60 @@ do_rdexpire(const object& sock, unsigned& ms)
   shutdown(sock);
 }
 
-@ Remove any trailing carriage-return character from the end of the line.
+@ The |send()| function buffers the data to be written.
 
-@<strip...@>=
-if (!line.empty() && '\r' == line[line.size() - 1])@/
-  line.resize(line.size() - 1);
+@<request...@>=
+struct echoline {
+  const object* const sock_;
+  explicit
+  echoline(const object& sock)
+    : sock_(&sock)
+  {
+  }
+  void
+  operator ()(std::string& line)
+  {
+    @<prepare response@>@;
+    send(*sock_, line.c_str(), line.size());
+  }
+};
 
-@ Reverse the line.  CR/LF pairs are used as the end-of-line sequence.  This
-is common in many text-based protocols, such as POP3 and SMTP.
+@ Trim white-space, including any carriage-return characters, from the input.
+Transform to upper-case.  Append CR/LF end-of-line sequence.  This is common
+in many text-based protocols, such as POP3 and SMTP.
 
 @<prepare...@>=
-reverse(line.begin(), line.end());
+trim(line);
+transform(line.begin(), line.end(), line.begin(), ucase);
 line += "\r\n";
 
-@ The |send()| function buffers the data to be written.  Clear the line in
-anticipation of the next.
+@* Build and Install.
 
-@<send...@>=
-send(sock, line.c_str(), line.size());
-line.clear();
+The Makefile:
+
+\.{CXXFLAGS = -Wall -Werror}
+
+\.{LDFLAGS =}
+
+\.{CXXMODULES = modskelpp}
+
+\.{modskelpp_OBJS = modskelpp.o}
+
+\.{modskelpp_LIBS = m}
+
+\.{include augas.mk}
+
+The configuration file:
+
+\.{services = echo}
+
+\.{service.echo.module = sample}
+
+\.{service.echo.serv = 5000}
+
+\.{module.sample.path = ./modsample}
 
 @* Index.
-Here is a list of the identifiers used, and where they appear. Underlined
-entries indicate the place of definition. Error messages are also shown.
+
+Here is a list of the identifiers used, and where they appear.  Underlined
+entries indicate the place of definition.  Error messages are also shown.

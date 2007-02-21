@@ -20,6 +20,9 @@ gif:
 			| dot -Tgif >$$l.gif; \
 	done
 
+modsample.cpp: augasintro.w
+	ctangle $< - $@
+
 augasintro.tex: augasintro.w
 	cweave $<
 

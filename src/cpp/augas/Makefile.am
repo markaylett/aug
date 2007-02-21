@@ -58,3 +58,12 @@ modskel_la_LIBADD =
 modskelpp_la_SOURCES = modskelpp.cpp
 modskelpp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modskelpp_la_LIBADD =
+
+check_PROGRAMS = \
+	augaspp-test
+
+TESTS = \
+	augaspp-test
+
+augaspp_test_SOURCES = test.cpp
+augaspp_test_LDADD =

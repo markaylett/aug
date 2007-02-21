@@ -13,15 +13,13 @@ namespace {
         {
         }
         void
-        operator ()(std::string& s)
+        operator ()(std::string& tok)
         {
-            if (!s.empty() && '\r' == s[s.size() - 1])
-                s.resize(s.size() - 1);
+            trim(tok);
+            transform(tok.begin(), tok.end(), tok.begin(), ucase);
+            tok += "\r\n";
 
-            reverse(s.begin(), s.end());
-            s += "\r\n";
-
-            send(*sock_, s.c_str(), s.size());
+            send(*sock_, tok.c_str(), tok.size());
         }
     };
 
@@ -30,7 +28,11 @@ namespace {
         do_start(const char* sname)
         {
             writelog(AUGAS_LOGINFO, "starting...");
-            tcplisten(sname, "0.0.0.0", augas::getenv("session.echo.serv"));
+            const char* serv = augas::getenv("service.echo.serv");
+            if (!serv)
+                return false;
+
+            tcplisten(sname, "0.0.0.0", serv);
             return true;
         }
         void

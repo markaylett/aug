@@ -1,81 +1,67 @@
-# Makefile:
-# NAME = modxxx
-# SRC = \
-# 	$(NAME).c
-#
-# include augas.mk
+.SUFFIXES:
+.SUFFIXES: .c .cpp .dll .exe .so .o
 
 SHELL = /bin/sh
-UNAME := $(shell uname | sed -e 's/CYGWIN.*/WIN32/i' -e 's/MINGW.*/WIN32/i')
-
-.SUFFIXES:
-.SUFFIXES: .c .dll .exe .so .o
+UNAME := $(shell uname | sed -e 's/CYGWIN.*/WIN32/i' \
+	-e 's/MINGW.*/WIN32/i')
 
 CC = gcc
+CXX = g++
 RM = rm
 
 ifeq ($(UNAME), WIN32)
-AUG_HOME = c:/aug
 DLLEXT = dll
 EXEEXT = exe
-COMMON = \
+COPTS = \
 	-mno-cygwin \
 	-mthreads
 CDEFS = \
 	-DWINVER=0x0501
-CFLAGS =
-LDFLAGS =
-LIBS =
 else
-AUG_HOME = $(HOME)
 DLLEXT = so
 EXEEXT =
-COMMON =
 CDEFS = \
 	-DPIC
-CFLAGS = \
+COPTS = \
 	-fPIC
-LDFLAGS =
-LIBS = -lpthread
 endif
-
-COMMON += \
-	-ggdb \
-	-O3
 
 CDEFS += \
 	-D_MT \
 	-D_REENTRANT
 
-CFLAGS += \
+COPTS += \
 	-MMD \
-	-MP	\
-	-Wall \
-	-Werror \
-	-I$(AUG_HOME)/include
+	-MP
 
-LDFLAGS += \
-	-L$(AUG_HOME)/lib
-
-LIBS += \
-	-lm
-
-OBJ = $(SRC:%.c=%.o)
-DEP = $(SRC:%.c=%.d)
-
-SONAME = $(NAME).$(DLLEXT)
-
-all: $(SONAME)
-
-clean:
-	$(RM) -f $(SONAME) $(OBJ) $(DEP)
-
--include $(DEP)
-
-$(SONAME): $(OBJ)
-	$(CC) $(COMMON) -shared -Wl,-soname,$(SONAME) $(LDFLAGS) $(CDEFS) -o $@ $(OBJ) $(LIBS)
-
-%.o: %.c
-	$(CC) $(COMMON) $(CFLAGS) $(CDEFS) -c -o $@ $<
+DLLS = $(CMODULES:%=%.$(DLLEXT)) $(CXXMODULES:%=%.$(DLLEXT))
 
 .PHONY: all clean
+
+all: $(DLLS)
+
+clean:
+	$(RM) -f $(DEPS) $(DLLS) $(OBJS)
+
+define MODULE_template
+DEPS += $$($(1)_DEPS)
+OBJS += $$($(1)_OBJS)
+$(1).$(DLLEXT): $$($(1)_OBJS)
+	$(2) $(COPTS) $(3) -shared -Wl,-soname,$(1).$(DLLEXT) \
+		$(LDFLAGS) $(CDEFS) -o $(1).$(DLLEXT) \
+		$$($(1)_OBJS) $$($(1)_LIBS:%=-l%)
+endef
+
+$(foreach module,$(CMODULES),$(eval $(call \
+	MODULE_template,$(module),$(CC), $(CFLAGS))))
+
+$(foreach module,$(CXXMODULES),$(eval \
+	$(call MODULE_template,$(module),$(CXX), $(CXXFLAGS))))
+
+%.o: %.c
+	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) -c -o $@ $<
+
+%.o: %.cpp
+	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) -c -o $@ $<
+
+-include $(DEPS)
