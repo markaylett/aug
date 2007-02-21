@@ -3,11 +3,14 @@
 \nocon % omit table of contents
 \datethis % print date on listing
 
-\def\AS/{AugAS}
-\def\CYGWIN/{Cygwin}
-\def\LINUX/{Linux}
-\def\PYTHON/{Python}
-\def\WINDOWS/{Windows}
+\def\AUG/{{\sc AUG}}
+\def\AUGAS/{{\sc AUGAS}}
+\def\CYGWIN/{{\sc CYGWIN}}
+\def\LINUX/{{\sc LINUX}}
+\def\POP3/{{\sc POP3}}
+\def\PYTHON/{{\sc PYTHON}}
+\def\SMTP/{{\sc SMTP}}
+\def\WINDOWS/{{\sc WINDOWS}}
 
 @s std int @s string int
 
@@ -22,40 +25,40 @@
 
 @f line normal
 
-@* Overview.
+@* Introduction.
 
-\AS/ is a network application server.  \AS/ manages many common
+\AUGAS/ is a network application server.  \AUGAS/ manages many common
 and error-prone tasks associated with network servers.
 
-\AS/ provides a host environment to Modules.  Modules are
+\AUGAS/ provides a host environment to Modules.  Modules are
 physical components that are dynamically loaded into the the application
 server at run-time.  Each Module exposes one or more services.  Services are
 wired together at configuration-time, rather than compile-time.
 
 Such a system allows features common to many services to be implemented in
 Modules.  The \PYTHON/ Module is an example of this, it allows services to be
-implemented in \PYTHON/.  The \PYTHON/ module exposes the \AS/'s host
-environment as a \PYTHON/ module (not to be confused with an \AS/ Module).
+implemented in \PYTHON/.  The \PYTHON/ module exposes the \AUGAS/'s host
+environment as a \PYTHON/ module (not to be confused with an \AUGAS/ Module).
 
-\AS/ helps to promote component rather than source-level
+\AUGAS/ helps to promote component rather than source-level
 reuse, and presents a uniform interface to system administrators, regardless
 of the services provided.
 
-@ \AS/ runs natively on a variety of OSes, including \LINUX/ and
-\WINDOWS/.  On \WINDOWS/, \AS/ does not require a porting layer, such as \CYGWIN/,
+@ \AUGAS/ runs natively on a variety of OSes, including \LINUX/ and
+\WINDOWS/.  On \WINDOWS/, \AUGAS/ does not require a porting layer, such as \CYGWIN/,
 to operate.
 
-Where appropriate, \AS/ adheres to the conventions of the target platform.
-Daemonisation, for example, takes the form of an NT service on \WINDOWS/.
+Where appropriate, \AUGAS/ adheres to the conventions of the target platform.
+D\ae monisation, for example, takes the form of an NT service on \WINDOWS/.
 However, from a sys-admin perspective, the interface remains the same.  The
 following command can be used to start the service from a command window:
 
-\.{C:\\> augasd -f augasd.conf start}
+\yskip\.{C:\\> augasd -f augasd.conf start}
 
-@ \AS/ uses an event-based model to de-multiplex activity on signal, socket,
-timer and custom event objects.  All module calls are dispatched from the
-event thread (similar to a UI thread).  A multi-threaded environment is not
-imposed upon a service by the host environment.
+@ \AUGAS/ uses an event-based model to de-multiplex activity on signal,
+socket, timer and custom event objects.  All module calls are dispatched from
+the event thread (similar to a UI thread).  A multi-threaded environment is
+not imposed upon a service by the host environment.
 
 Internally, the application operates on a single thread.  Services are,
 however, free to select a threading model best suited to their needs.  They
@@ -65,7 +68,7 @@ Services can interact with one another using custom events.  In a
 multi-language environment, a \PYTHON/ service could delegate tasks to a
 service which happens to be implemented in a different language.
 
-@* A Sample Module.
+@* Sample Module.
 
 In the sections below, a module is built in \CPLUSPLUS/ that:
 
@@ -118,7 +121,7 @@ bool
 do_start(const char* sname)
 {
   writelog(AUGAS_LOGINFO, "starting service [%s]", sname);
-  const char* port = augas::getenv("service.intro.serv");
+  const char* port = augas::getenv("service.echo.serv");
   if (!port)
     return false;
   tcplisten(sname, "0.0.0.0", port);
@@ -190,7 +193,7 @@ struct echoline {
 
 @ Trim white-space, including any carriage-return characters, from the input.
 Transform to upper-case.  Append CR/LF end-of-line sequence.  This is common
-in many text-based protocols, such as POP3 and SMTP.
+in many text-based protocols, such as \POP3/ and \SMTP/.
 
 @<prepare...@>=
 trim(line);
@@ -201,27 +204,30 @@ line += "\r\n";
 
 The Makefile:
 
-\.{CXXFLAGS = -Wall -Werror}
+\yskip\.{CXXFLAGS = -Wall -Werror}
 
 \.{LDFLAGS =}
 
-\.{CXXMODULES = modskelpp}
+\.{CXXMODULES = modsample}
 
-\.{modskelpp_OBJS = modskelpp.o}
+\.{modsample\_OBJS = modsample.o}
 
-\.{modskelpp_LIBS = m}
+\.{modsample\_LIBS = m}
 
 \.{include augas.mk}
 
-The configuration file:
+\yskip The configuration file:
 
-\.{services = echo}
+\yskip\.{services = echo}
 
 \.{service.echo.module = sample}
 
 \.{service.echo.serv = 5000}
 
 \.{module.sample.path = ./modsample}
+
+\yskip You can send email to \pdfURL{the author}{mailto:mark@@emantic.co.uk} or visit
+\pdfURL{the \AUG/ home page}{http://aug.sourceforge.net}.
 
 @* Index.
 
