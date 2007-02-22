@@ -32,7 +32,7 @@ namespace {
             if (!serv)
                 return false;
 
-            tcplisten(sname, "0.0.0.0", serv);
+            tcplisten("0.0.0.0", serv);
             return true;
         }
         void

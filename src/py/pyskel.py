@@ -7,17 +7,18 @@ import log
 # string error()
 # void reconf()
 # void stop()
-# void post(sname, to, type, user)
-# void dispatch(sname, to, type, user)
+# void post(to, type, user)
+# void dispatch(to, type, user)
 # string getenv(name)
+# string getserv()
 # void shutdown(sock)
-# int tcpconnect(sname, host, serv, user)
-# int tcplisten(sname, host, serv, user)
+# int tcpconnect(host, serv, user)
+# int tcplisten(host, serv, user)
 # void send(sock, buffer buf)
 # void setrwtimer(sock, ms, flags)
 # void resetrwtimer(sock, ms, flags)
 # void cancelrwtimer(sock, flags)
-# int settimer(sname, ms, user)
+# int settimer(ms, user)
 # bool resettimer(timer, ms)
 # bool canceltimer(timer)
 
@@ -52,18 +53,18 @@ interp = Interpreter(Commands())
 #     elif x != None:
 #         print x
 
-def stop(sname):
-    log.debug("stop(): %s" % sname)
+def stop():
+    log.debug("stop()")
 
 def start(sname):
     log.debug("start(): %s" % sname)
-    tcplisten(sname, "0.0.0.0", getenv("session.pyskel.serv"), None)
+    tcplisten("0.0.0.0", getenv("session.pyskel.serv"), None)
 
-def reconf(sname):
-    log.debug("reconf(): %s" % sname)
+def reconf():
+    log.debug("reconf()")
 
-def event(sname, from, type, user):
-    log.debug("event(): %s" % sname)
+def event(from, type, user):
+    log.debug("event()")
 
 def closed(sock):
     log.info("closed(): %s" % sock)

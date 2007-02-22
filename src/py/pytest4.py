@@ -3,12 +3,12 @@ import log
 
 # settimer()
 
-def stop(sname):
-    log.debug("stop(): %s" % sname)
+def stop():
+    log.debug("stop()")
 
 def start(sname):
     log.debug("start(): %s" % sname)
-    settimer(sname, 1000, "our timer")
+    settimer(1000, "our timer")
 
 def expire(timer, ms):
     log.debug("expire(): %s" % timer)

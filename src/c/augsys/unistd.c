@@ -27,7 +27,7 @@ aug_pipe(int fds[2])
 #if !defined(_WIN32)
     if (-1 == pipe(fds)) {
 #else /* _WIN32 */
-    if (-1 == _pipe(fds, 1024, O_BINARY)) {
+    if (-1 == _pipe(fds, 8192, O_BINARY)) {
 #endif /* _WIN32 */
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;

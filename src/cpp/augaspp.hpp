@@ -28,6 +28,201 @@
 
 namespace augas {
 
+    typedef std::runtime_error error;
+
+    inline void
+    writelog(int level, const char* format, ...)
+    {
+        va_list args;
+        va_start(args, format);
+        augas_vwritelog(level, format, args);
+        va_end(args);
+    }
+
+    inline void
+    vwritelog(int level, const char* format, va_list args)
+    {
+        augas_vwritelog(level, format, args);
+    }
+
+    inline void
+    reconf()
+    {
+        if (AUGAS_ERROR == augas_reconf())
+            throw error(augas_error());
+    }
+
+    inline void
+    stopall()
+    {
+        if (AUGAS_ERROR == augas_stopall())
+            throw error(augas_error());
+    }
+
+    inline void
+    post(const char* to, const augas_event& event, void (*destroy)(void*) = 0)
+    {
+        if (AUGAS_ERROR == augas_post(to, &event, destroy))
+            throw error(augas_error());
+    }
+
+    inline void
+    dispatch(const char* to, const augas_event& event)
+    {
+        if (AUGAS_ERROR == augas_dispatch(to, &event))
+            throw error(augas_error());
+    }
+
+    inline const char*
+    getenv(const char* name)
+    {
+        return augas_getenv(name);
+    }
+
+    inline const augas_serv*
+    getserv()
+    {
+        return augas_getserv();
+    }
+
+    inline void
+    shutdown(augas_id sid)
+    {
+        if (AUGAS_ERROR == augas_shutdown(sid))
+            throw error(augas_error());
+    }
+
+    inline void
+    shutdown(const augas_object& sock)
+    {
+        shutdown(sock.id_);
+    }
+
+    inline augas_id
+    tcpconnect(const char* host, const char* port, void* user = 0)
+    {
+        int ret(augas_tcpconnect(host, port, user));
+        if (AUGAS_ERROR == ret)
+            throw error(augas_error());
+        return static_cast<augas_id>(ret);
+    }
+
+    inline augas_id
+    tcplisten(const char* host, const char* port, void* user = 0)
+    {
+        int ret(augas_tcplisten(host, port, user));
+        if (AUGAS_ERROR == ret)
+            throw error(augas_error());
+        return static_cast<augas_id>(ret);
+    }
+
+    inline void
+    send(augas_id cid, const char* buf, size_t size)
+    {
+        if (AUGAS_ERROR == augas_send(cid, buf, size))
+            throw error(augas_error());
+    }
+
+    inline void
+    send(const augas_object& conn, const char* buf, size_t size)
+    {
+        send(conn.id_, buf, size);
+    }
+
+    inline void
+    setrwtimer(augas_id cid, unsigned ms, unsigned flags)
+    {
+        if (AUGAS_ERROR == augas_setrwtimer(cid, ms, flags))
+            throw error(augas_error());
+    }
+
+    inline void
+    setrwtimer(const augas_object& conn, unsigned ms, unsigned flags)
+    {
+        setrwtimer(conn.id_, ms, flags);
+    }
+
+    inline bool
+    resetrwtimer(augas_id cid, unsigned ms, unsigned flags)
+    {
+        switch (augas_resetrwtimer(cid, ms, flags)) {
+        case AUGAS_ERROR:
+            throw error(augas_error());
+        case AUGAS_NONE:
+            return false;
+        }
+        return true;
+    }
+
+    inline bool
+    retsetrwtimer(const augas_object& conn, unsigned ms, unsigned flags)
+    {
+        return resetrwtimer(conn.id_, ms, flags);
+    }
+
+    inline bool
+    cancelrwtimer(augas_id cid, unsigned flags)
+    {
+        switch (augas_cancelrwtimer(cid, flags)) {
+        case AUGAS_ERROR:
+            throw error(augas_error());
+        case AUGAS_NONE:
+            return false;
+        }
+        return true;
+    }
+
+    inline bool
+    cancelrwtimer(const augas_object& conn, unsigned flags)
+    {
+        return cancelrwtimer(conn.id_, flags);
+    }
+
+    inline augas_id
+    settimer(unsigned ms, void* user = 0, void (*destroy)(void*) = 0)
+    {
+        int ret(augas_settimer(ms, user, destroy));
+        if (AUGAS_ERROR == ret)
+            throw error(augas_error());
+        return static_cast<augas_id>(ret);
+    }
+
+    inline bool
+    resettimer(augas_id tid, unsigned ms)
+    {
+        switch (augas_resettimer(tid, ms)) {
+        case AUGAS_ERROR:
+            throw error(augas_error());
+        case AUGAS_NONE:
+            return false;
+        }
+        return true;
+    }
+
+    inline bool
+    resettimer(const augas_object& timer, unsigned ms)
+    {
+        return resettimer(timer.id_, ms);
+    }
+
+    inline bool
+    canceltimer(augas_id tid)
+    {
+        switch (augas_canceltimer(tid)) {
+        case AUGAS_ERROR:
+            throw error(augas_error());
+        case AUGAS_NONE:
+            return false;
+        }
+        return true;
+    }
+
+    inline bool
+    canceltimer(const augas_object& timer, unsigned ms)
+    {
+        return resettimer(timer.id_, ms);
+    }
+
     class event {
         augas_event event_;
     public:
@@ -115,11 +310,6 @@ namespace augas {
             const_cast<augas_object&>(object_).user_
                 = static_cast<void*>(user);
         }
-        const char*
-        sname() const
-        {
-            return object_.serv_->name_;
-        }
         augas_id
         id() const
         {
@@ -143,11 +333,10 @@ namespace augas {
         do_start(const char* sname) = 0;
 
         virtual void
-        do_reconf(const char* sname) = 0;
+        do_reconf() = 0;
 
         virtual void
-        do_event(const char* sname, const char* from,
-                 const event_type& event) = 0;
+        do_event(const char* from, const event_type& event) = 0;
 
         virtual void
         do_closed(const object& sock) = 0;
@@ -184,14 +373,14 @@ namespace augas {
             return do_start(sname);
         }
         void
-        reconf(const char* sname)
+        reconf()
         {
-            do_reconf(sname);
+            do_reconf();
         }
         void
-        event(const char* sname, const char* from, const event_type& event)
+        event(const char* from, const event_type& event)
         {
-            do_event(sname, from, event);
+            do_event(from, event);
         }
         void
         closed(const object& sock)
@@ -238,11 +427,11 @@ namespace augas {
     class basic_serv : public serv_base {
         typedef augas::event event_type;
         void
-        do_reconf(const char* sname)
+        do_reconf()
         {
         }
         void
-        do_event(const char* sname, const char* from, const event_type& event)
+        do_event(const char* from, const event_type& event)
         {
         }
         void
@@ -302,57 +491,56 @@ namespace augas {
     template <typename T>
     class basic_module {
         static T* impl_;
+        static serv_base*
+        getbase()
+        {
+            return static_cast<serv_base*>(getserv()->user_);
+        }
         static int
         result(bool x)
         {
             return x ? AUGAS_OK : AUGAS_ERROR;
         }
         static void
-        stop(const augas_serv* serv) AUGAS_NOTHROW
+        stop() AUGAS_NOTHROW
         {
-            delete static_cast<serv_base*>(serv->user_);
+            delete getbase();
         }
         static int
         start(augas_serv* serv) AUGAS_NOTHROW
         {
             try {
                 serv->user_ = impl_->create(serv->name_);
-                return result(static_cast<serv_base*>(serv->user_)
-                              ->start(serv->name_));
+                return result(getbase()->start(serv->name_));
             } AUGAS_WRITELOGCATCH;
             return AUGAS_ERROR;
         }
         static void
-        reconf(const augas_serv* serv) AUGAS_NOTHROW
+        reconf() AUGAS_NOTHROW
         {
             try {
-                static_cast<serv_base*>(serv->user_)
-                    ->reconf(serv->name_);
+                getbase()->reconf();
             } AUGAS_WRITELOGCATCH;
         }
         static void
-        event(const augas_serv* serv, const char* from,
-              const augas_event* event) AUGAS_NOTHROW
+        event(const char* from, const augas_event* event) AUGAS_NOTHROW
         {
             try {
-                static_cast<serv_base*>(serv->user_)
-                    ->event(serv->name_, from, augas::event(*event));
+                getbase()->event(from, augas::event(*event));
             } AUGAS_WRITELOGCATCH;
         }
         static void
         closed(const augas_object* sock) AUGAS_NOTHROW
         {
             try {
-                static_cast<serv_base*>(sock->serv_->user_)
-                    ->closed(object(*sock));
+                getbase()->closed(object(*sock));
             } AUGAS_WRITELOGCATCH;
         }
         static void
         teardown(const augas_object* sock) AUGAS_NOTHROW
         {
             try {
-                static_cast<serv_base*>(sock->serv_->user_)
-                    ->teardown(object(*sock));
+                getbase()->teardown(object(*sock));
             } AUGAS_WRITELOGCATCH;
         }
         static int
@@ -361,8 +549,7 @@ namespace augas {
         {
             try {
                 object o(*sock);
-                return result(static_cast<serv_base*>(sock->serv_->user_)
-                              ->accept(o, addr, port));
+                return result(getbase()->accept(o, addr, port));
             } AUGAS_WRITELOGCATCH;
             return AUGAS_ERROR;
         }
@@ -372,8 +559,7 @@ namespace augas {
         {
             try {
                 object o(*sock);
-                static_cast<serv_base*>(sock->serv_->user_)
-                    ->connected(o, addr, port);
+                getbase()->connected(o, addr, port);
             } AUGAS_WRITELOGCATCH;
         }
         static void
@@ -381,32 +567,28 @@ namespace augas {
              size_t size) AUGAS_NOTHROW
         {
             try {
-                static_cast<serv_base*>(sock->serv_->user_)
-                    ->data(object(*sock), buf, size);
+                getbase()->data(object(*sock), buf, size);
             } AUGAS_WRITELOGCATCH;
         }
         static void
         rdexpire(const augas_object* sock, unsigned* ms) AUGAS_NOTHROW
         {
             try {
-                static_cast<serv_base*>(sock->serv_->user_)
-                    ->rdexpire(object(*sock), *ms);
+                getbase()->rdexpire(object(*sock), *ms);
             } AUGAS_WRITELOGCATCH;
         }
         static void
         wrexpire(const augas_object* sock, unsigned* ms) AUGAS_NOTHROW
         {
             try {
-                static_cast<serv_base*>(sock->serv_->user_)
-                    ->wrexpire(object(*sock), *ms);
+                getbase()->wrexpire(object(*sock), *ms);
             } AUGAS_WRITELOGCATCH;
         }
         static void
         expire(const augas_object* timer, unsigned* ms) AUGAS_NOTHROW
         {
             try {
-                static_cast<serv_base*>(timer->serv_->user_)
-                    ->expire(object(*timer), *ms);
+                getbase()->expire(object(*timer), *ms);
             } AUGAS_WRITELOGCATCH;
         }
     public:
@@ -443,199 +625,6 @@ namespace augas {
 
     template <typename T>
     T* basic_module<T>::impl_ = 0;
-
-    typedef std::runtime_error error;
-
-    inline void
-    writelog(int level, const char* format, ...)
-    {
-        va_list args;
-        va_start(args, format);
-        augas_vwritelog(level, format, args);
-        va_end(args);
-    }
-
-    inline void
-    vwritelog(int level, const char* format, va_list args)
-    {
-        augas_vwritelog(level, format, args);
-    }
-
-    inline void
-    reconf()
-    {
-        if (AUGAS_ERROR == augas_reconf())
-            throw error(augas_error());
-    }
-
-    inline void
-    stopall()
-    {
-        if (AUGAS_ERROR == augas_stopall())
-            throw error(augas_error());
-    }
-
-    inline void
-    post(const char* sname, const char* to, const augas_event& event,
-         void (*destroy)(void*) = 0)
-    {
-        if (AUGAS_ERROR == augas_post(sname, to, &event, destroy))
-            throw error(augas_error());
-    }
-
-    inline void
-    dispatch(const char* sname, const char* to, const augas_event& event)
-    {
-        if (AUGAS_ERROR == augas_dispatch(sname, to, &event))
-            throw error(augas_error());
-    }
-
-    inline const char*
-    getenv(const char* name)
-    {
-        return augas_getenv(name);
-    }
-
-    inline void
-    shutdown(augas_id sid)
-    {
-        if (AUGAS_ERROR == augas_shutdown(sid))
-            throw error(augas_error());
-    }
-
-    inline void
-    shutdown(const augas_object& sock)
-    {
-        shutdown(sock.id_);
-    }
-
-    inline augas_id
-    tcpconnect(const char* sname, const char* host, const char* port,
-               void* user = 0)
-    {
-        int ret(augas_tcpconnect(sname, host, port, user));
-        if (AUGAS_ERROR == ret)
-            throw error(augas_error());
-        return static_cast<augas_id>(ret);
-    }
-
-    inline augas_id
-    tcplisten(const char* sname, const char* host, const char* port,
-              void* user = 0)
-    {
-        int ret(augas_tcplisten(sname, host, port, user));
-        if (AUGAS_ERROR == ret)
-            throw error(augas_error());
-        return static_cast<augas_id>(ret);
-    }
-
-    inline void
-    send(augas_id cid, const char* buf, size_t size)
-    {
-        if (AUGAS_ERROR == augas_send(cid, buf, size))
-            throw error(augas_error());
-    }
-
-    inline void
-    send(const augas_object& conn, const char* buf, size_t size)
-    {
-        send(conn.id_, buf, size);
-    }
-
-    inline void
-    setrwtimer(augas_id cid, unsigned ms, unsigned flags)
-    {
-        if (AUGAS_ERROR == augas_setrwtimer(cid, ms, flags))
-            throw error(augas_error());
-    }
-
-    inline void
-    setrwtimer(const augas_object& conn, unsigned ms, unsigned flags)
-    {
-        setrwtimer(conn.id_, ms, flags);
-    }
-
-    inline bool
-    resetrwtimer(augas_id cid, unsigned ms, unsigned flags)
-    {
-        switch (augas_resetrwtimer(cid, ms, flags)) {
-        case AUGAS_ERROR:
-            throw error(augas_error());
-        case AUGAS_NONE:
-            return false;
-        }
-        return true;
-    }
-
-    inline bool
-    retsetrwtimer(const augas_object& conn, unsigned ms, unsigned flags)
-    {
-        return resetrwtimer(conn.id_, ms, flags);
-    }
-
-    inline bool
-    cancelrwtimer(augas_id cid, unsigned flags)
-    {
-        switch (augas_cancelrwtimer(cid, flags)) {
-        case AUGAS_ERROR:
-            throw error(augas_error());
-        case AUGAS_NONE:
-            return false;
-        }
-        return true;
-    }
-
-    inline bool
-    cancelrwtimer(const augas_object& conn, unsigned flags)
-    {
-        return cancelrwtimer(conn.id_, flags);
-    }
-
-    inline augas_id
-    settimer(const char* sname, unsigned ms, void* user = 0,
-             void (*destroy)(void*) = 0)
-    {
-        int ret(augas_settimer(sname, ms, user, destroy));
-        if (AUGAS_ERROR == ret)
-            throw error(augas_error());
-        return static_cast<augas_id>(ret);
-    }
-
-    inline bool
-    resettimer(augas_id tid, unsigned ms)
-    {
-        switch (augas_resettimer(tid, ms)) {
-        case AUGAS_ERROR:
-            throw error(augas_error());
-        case AUGAS_NONE:
-            return false;
-        }
-        return true;
-    }
-
-    inline bool
-    resettimer(const augas_object& timer, unsigned ms)
-    {
-        return resettimer(timer.id_, ms);
-    }
-
-    inline bool
-    canceltimer(augas_id tid)
-    {
-        switch (augas_canceltimer(tid)) {
-        case AUGAS_ERROR:
-            throw error(augas_error());
-        case AUGAS_NONE:
-            return false;
-        }
-        return true;
-    }
-
-    inline bool
-    canceltimer(const augas_object& timer, unsigned ms)
-    {
-        return resettimer(timer.id_, ms);
-    }
 
     namespace detail {
         const char SPACE[] = " \t\n\v\f\r";

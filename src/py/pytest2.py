@@ -6,21 +6,21 @@ import log
 
 # post(), dispatch()
 
-def stop(sname):
-    log.debug("stop(): %s" % sname)
+def stop():
+    log.debug("stop()")
 
 def start(sname):
     log.debug("start(): %s" % sname)
-    dispatch(sname, "group1", "foo", str(101))
-    post(sname, "group2", "application/x-www-form-urlencoded", urlencode({"a": 1}))
-    post(sname, sname, "none", None)
+    dispatch("group1", "foo", str(101))
+    post("group2", "application/x-www-form-urlencoded", urlencode({"a": 1}))
+    post(sname, "none", None)
 
-def event(sname, frm, type, user):
-    log.debug("event(): %s %s" % (sname, user))
+def event(frm, type, user):
+    log.debug("event(): %s" % user)
     if type == "foo":
         if int(user) != 101:
             log.error("unexpected user data")
-        dispatch(sname, frm, "bar", buffer("202"))
+        dispatch(frm, "bar", buffer("202"))
     elif type == "bar":
         if int(user) != 202:
             log.error("unexpected user data")

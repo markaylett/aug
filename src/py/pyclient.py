@@ -7,7 +7,7 @@ class State:
 
     def __init__(self, sock):
         self.sock = sock
-        self.timer = settimer(sock.sname, 10, self)
+        self.timer = settimer(10, self)
         self.n = 10
 
     def cancel(self):
@@ -31,7 +31,7 @@ class State:
 def start(sname):
     log.info("connecting to client's service")
     for x in xrange(1, 10):
-        tcpconnect(sname, "localhost", getenv("session.pyclient.to"), None)
+        tcpconnect("localhost", getenv("session.pyclient.to"), None)
 
 def closed(sock):
     if sock.user != None:

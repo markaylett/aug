@@ -6,14 +6,14 @@ import log
 
 (client, listener, server) = (None, None, None)
 
-def stop(sname):
-    log.debug("stop(): %s" % sname)
+def stop():
+    log.debug("stop()")
 
 def start(sname):
     global client, listener
     log.debug("start(): %s" % sname)
-    listener = tcplisten(sname, "0.0.0.0", "1234", None)
-    client = tcpconnect(sname, "127.0.0.1", "1234", None)
+    listener = tcplisten("0.0.0.0", "1234", None)
+    client = tcpconnect("127.0.0.1", "1234", None)
 
 def closed(sock):
     log.debug("closed(): %s" % sock)

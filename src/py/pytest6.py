@@ -3,14 +3,14 @@ import log
 
 # Return false from accept.
 
-def stop(sname):
-    log.debug("stop(): %s" % sname)
+def stop():
+    log.debug("stop()")
 
 def start(sname):
     global client, listener
     log.debug("start(): %s" % sname)
-    tcplisten(sname, "0.0.0.0", "1234", None)
-    tcpconnect(sname, "127.0.0.1", "1234", None)
+    tcplisten("0.0.0.0", "1234", None)
+    tcpconnect("127.0.0.1", "1234", None)
 
 def closed(sock):
     log.debug("closed(): %s" % sock)

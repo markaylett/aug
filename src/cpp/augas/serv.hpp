@@ -23,64 +23,41 @@ namespace augas {
         serv(const moduleptr& module, const char* name);
 
         bool
-        start() AUG_NOTHROW
-        {
-            active_ = true; // Functions may be called during initialisation.
-            return active_ = module_->start(serv_);
-        }
+        start() AUG_NOTHROW;
+
         void
-        reconf() const AUG_NOTHROW
-        {
-            module_->reconf(serv_);
-        }
+        reconf() const AUG_NOTHROW;
+
         void
-        event(const char* from, const augas_event& event) const AUG_NOTHROW
-        {
-            module_->event(serv_, from, event);
-        }
+        event(const char* from, const augas_event& event) const AUG_NOTHROW;
+
         void
-        closed(const augas_object& sock) const AUG_NOTHROW
-        {
-            module_->closed(sock);
-        }
+        closed(const augas_object& sock) const AUG_NOTHROW;
+
         void
-        teardown(const augas_object& sock) const AUG_NOTHROW
-        {
-            module_->teardown(sock);
-        }
+        teardown(const augas_object& sock) const AUG_NOTHROW;
+
         bool
         accept(augas_object& sock, const char* addr,
-               unsigned short port) const AUG_NOTHROW
-        {
-            return module_->accept(sock, addr, port);
-        }
+               unsigned short port) const AUG_NOTHROW;
+
         void
         connected(augas_object& sock, const char* addr,
-                  unsigned short port) const AUG_NOTHROW
-        {
-            module_->connected(sock, addr, port);
-        }
+                  unsigned short port) const AUG_NOTHROW;
+
         void
         data(const augas_object& sock, const char* buf,
-             size_t size) const AUG_NOTHROW
-        {
-            module_->data(sock, buf, size);
-        }
+             size_t size) const AUG_NOTHROW;
+
         void
-        rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
-        {
-            module_->rdexpire(sock, ms);
-        }
+        rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW;
+
         void
-        wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
-        {
-            module_->wrexpire(sock, ms);
-        }
+        wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW;
+
         void
-        expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
-        {
-            module_->expire(timer, ms);
-        }
+        expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW;
+
         operator augas_serv&() AUG_NOTHROW
         {
             return serv_;
@@ -102,6 +79,9 @@ namespace augas {
     };
 
     typedef aug::smartptr<serv> servptr;
+
+    const augas_serv*
+    getserv();
 }
 
 #endif // AUGAS_SERV_HPP

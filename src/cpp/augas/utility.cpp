@@ -9,7 +9,7 @@
 namespace {
 
     void
-    stop(const augas_serv* serv)
+    stop()
     {
     }
     int
@@ -18,11 +18,11 @@ namespace {
         return 0;
     }
     void
-    reconf(const augas_serv* serv)
+    reconf()
     {
     }
     void
-    event(const augas_serv* serv, const char* from, const augas_event* event)
+    event(const char* from, const augas_event* event)
     {
     }
     void

@@ -15,7 +15,7 @@ static int objects_ = 0;
 
 typedef struct {
     PyObject_HEAD
-    PyObject* sname_;
+    char name_[AUGAS_MAXNAME + 1];
     int id_;
     PyObject* user_;
 } object_;
@@ -32,10 +32,6 @@ clear_(object_* self)
 {
     PyObject* tmp;
 
-    tmp = self->sname_;
-    self->sname_ = NULL;
-    Py_DECREF(tmp);
-
     tmp = self->user_;
     self->user_ = NULL;
     Py_DECREF(tmp);
@@ -48,8 +44,8 @@ dealloc_(object_* self)
 {
     --objects_;
     augas_writelog(AUGAS_LOGDEBUG,
-                   "deallocated: <augas.Object at %p, sname='%s', id=%d>",
-                   (void*)self, PyString_AsString(self->sname_), self->id_);
+                   "deallocated: <augas.Object at %p, id=%d>",
+                   (void*)self, self->id_);
 
     clear_(self);
     self->ob_type->tp_free((PyObject*)self);
@@ -71,9 +67,8 @@ compare_(object_* lhs, object_* rhs)
 static PyObject*
 repr_(object_* self)
 {
-    return PyString_FromFormat("<augas.Object at %p, sname='%s', id=%d>",
-                               (void*)self, PyString_AsString(self->sname_),
-                               self->id_);
+    return PyString_FromFormat("<augas.Object at %p, id=%d>",
+                               (void*)self, self->id_);
 }
 
 static long
@@ -87,20 +82,13 @@ hash_(object_* self)
 static PyObject*
 str_(object_* self)
 {
-    return PyString_FromFormat("('%s', %d)", PyString_AsString(self->sname_),
-                               self->id_);
+    return PyString_FromFormat("%d", self->id_);
 }
 
 static int
 traverse_(object_* self, visitproc visit, void* arg)
 {
     int ret;
-
-    if (self->sname_) {
-        ret = visit(self->sname_, arg);
-        if (ret != 0)
-            return ret;
-    }
 
     if (self->user_) {
         ret = visit(self->user_, arg);
@@ -114,20 +102,13 @@ traverse_(object_* self, visitproc visit, void* arg)
 static int
 init_(object_* self, PyObject* args, PyObject* kwds)
 {
-    PyObject* sname = NULL, * user = NULL, * tmp;
+    PyObject* user = NULL, * tmp;
 
-    static char* kwlist[] = { "sname", "id", "user", NULL };
+    static char* kwlist[] = { "id", "user", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "Si|O", kwlist,
-                                     &sname, &self->id_, &user))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i|O", kwlist, &self->id_,
+                                     &user))
         return -1;
-
-    if (sname) {
-        tmp = self->sname_;
-        Py_INCREF(sname);
-        self->sname_ = sname;
-        Py_DECREF(tmp);
-    }
 
     if (user) {
         tmp = self->user_;
@@ -147,11 +128,6 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
     self = (object_*)type->tp_alloc(type, 0);
     if (self) {
 
-        if (!(self->sname_ = PyString_FromString(""))) {
-            Py_DECREF(self);
-            return NULL;
-        }
-
         self->id_ = 0;
 
         Py_INCREF(Py_None);
@@ -160,16 +136,9 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
 
     ++objects_;
     augas_writelog(AUGAS_LOGDEBUG,
-                   "allocated: <augas.Object at %p, sname='%s', id=%d>",
-                   (void*)self, PyString_AsString(self->sname_), self->id_);
+                   "allocated: <augas.Object at %p, id=%d>",
+                   (void*)self, self->id_);
     return (PyObject*)self;
-}
-
-static PyObject*
-getsname_(object_* self, void *closure)
-{
-    Py_INCREF(self->sname_);
-    return self->sname_;
 }
 
 static PyObject*
@@ -179,9 +148,6 @@ getid_(object_* self, void *closure)
 }
 
 static PyGetSetDef getset_[] = {
-    {
-        "sname", (getter)getsname_, NULL, "TODO", NULL
-    },
     {
         "id", (getter)getid_, NULL, "TODO", NULL
     },
@@ -242,17 +208,11 @@ augpy_createtype(void)
 }
 
 PyObject*
-augpy_createobject(PyTypeObject* type, const char* sname, int id,
-                   PyObject* user)
+augpy_createobject(PyTypeObject* type, int id, PyObject* user)
 {
     object_* self = PyObject_GC_New(object_, type);
     if (!self)
         return NULL;
-
-    if (!(self->sname_ = PyString_FromString(sname))) {
-        Py_DECREF(self);
-        return NULL;
-    }
 
     self->id_ = id;
 
@@ -263,8 +223,8 @@ augpy_createobject(PyTypeObject* type, const char* sname, int id,
 
     ++objects_;
     augas_writelog(AUGAS_LOGDEBUG,
-                   "allocated: <augas.Object at %p, sname='%s', id=%d>",
-                   (void*)self, PyString_AsString(self->sname_), self->id_);
+                   "allocated: <augas.Object at %p, id=%d>",
+                   (void*)self, self->id_);
     return (PyObject*)self;
 }
 

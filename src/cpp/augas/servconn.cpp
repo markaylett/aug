@@ -119,7 +119,6 @@ servconn::servconn(const servptr& serv, void* user, timers& timers,
     : rwtimer_(serv, sock_, timers),
       conn_(serv, sock_, buffer_, rwtimer_, sfd, ep, false)
 {
-    sock_.serv_ = cptr(*serv);
     sock_.id_ = aug_nextid();
     sock_.user_ = user;
 }

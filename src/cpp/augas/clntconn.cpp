@@ -137,7 +137,6 @@ clntconn::clntconn(const servptr& serv, void* user, timers& timers,
     : rwtimer_(serv, sock_, timers),
       conn_(new connecting(serv, sock_, buffer_, host, port))
 {
-    sock_.serv_ = cptr(*serv);
     sock_.id_ = aug_nextid();
     sock_.user_ = user;
 

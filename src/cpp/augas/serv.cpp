@@ -6,14 +6,33 @@
 
 #include "augsys.h"
 
+#include <stack>
+
 using namespace aug;
 using namespace augas;
 using namespace std;
 
+namespace {
+    stack<const augas_serv*> stack_;
+    struct scoped_frame {
+        ~scoped_frame() AUG_NOTHROW
+        {
+            stack_.pop();
+        }
+        explicit
+        scoped_frame(const augas_serv* serv)
+        {
+            stack_.push(serv);
+        }
+    };
+}
+
 serv::~serv() AUG_NOTHROW
 {
-    if (active_)
-        module_->stop(serv_); // AUG_NOTHROW
+    if (active_) {
+        scoped_frame frame(&serv_);
+        module_->stop(); // AUG_NOTHROW
+    }
 }
 
 serv::serv(const moduleptr& module, const char* name)
@@ -22,4 +41,91 @@ serv::serv(const moduleptr& module, const char* name)
 {
     aug_strlcpy(serv_.name_, name, sizeof(serv_.name_));
     serv_.user_ = 0;
+}
+
+bool
+serv::start() AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    active_ = true; // Functions may be called during initialisation.
+    return active_ = module_->start(serv_);
+}
+
+void
+serv::reconf() const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->reconf();
+}
+
+void
+serv::event(const char* from, const augas_event& event) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->event(from, event);
+}
+
+void
+serv::closed(const augas_object& sock) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->closed(sock);
+}
+
+void
+serv::teardown(const augas_object& sock) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->teardown(sock);
+}
+
+bool
+serv::accept(augas_object& sock, const char* addr,
+             unsigned short port) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    return module_->accept(sock, addr, port);
+}
+
+void
+serv::connected(augas_object& sock, const char* addr,
+                unsigned short port) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->connected(sock, addr, port);
+}
+
+void
+serv::data(const augas_object& sock, const char* buf,
+           size_t size) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->data(sock, buf, size);
+}
+
+void
+serv::rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->rdexpire(sock, ms);
+}
+
+void
+serv::wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->wrexpire(sock, ms);
+}
+
+void
+serv::expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->expire(timer, ms);
+}
+
+const augas_serv*
+augas::getserv()
+{
+    return stack_.empty() ? 0 : stack_.top();
 }

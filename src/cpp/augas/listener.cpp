@@ -43,7 +43,6 @@ listener::listener(const servptr& serv, void* user, const smartfd& sfd)
     : serv_(serv),
       sfd_(sfd)
 {
-    sock_.serv_ = cptr(*serv);
     sock_.id_ = aug_nextid();
     sock_.user_ = user;
 }

@@ -3,8 +3,8 @@ import log
 
 # getenv()
 
-def stop(sname):
-    log.debug("stop(): %s" % sname)
+def stop():
+    log.debug("stop()")
 
 def start(sname):
     log.debug("start(): %s" % sname)

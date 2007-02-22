@@ -191,7 +191,7 @@ namespace augas {
 
         idtoserv::iterator it(state_->idtoserv_.find(id));
         servptr serv(it->second);
-        augas_object timer = { cptr(*serv), id, aug_getvarp(arg) };
+        augas_object timer = { id, aug_getvarp(arg) };
         serv->expire(timer, *ms);
 
         if (0 == *ms) {
@@ -282,9 +282,9 @@ namespace augas {
     // Thread-safe.
 
     int
-    post_(const char* sname, const char* to, const augas_event* event,
-          void (*destroy)(void*))
+    post_(const char* to, const augas_event* event, void (*destroy)(void*))
     {
+        const char* sname = getserv()->name_;
         AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s], size=[%d]",
                    sname, to, event->type_, event->size_);
         try {
@@ -304,8 +304,9 @@ namespace augas {
     }
 
     int
-    dispatch_(const char* sname, const char* to, const augas_event* event)
+    dispatch_(const char* to, const augas_event* event)
     {
+        const char* sname = getserv()->name_;
         AUG_DEBUG2("dispatch(): sname=[%s], to=[%s], type=[%s], size=[%d]",
                    sname, to, event->type_, event->size_);
         try {
@@ -342,6 +343,15 @@ namespace augas {
         return 0;
     }
 
+    const augas_serv*
+    getserv_()
+    {
+        try {
+            return getserv();
+        } AUG_SETERRINFOCATCH;
+        return 0;
+    }
+
     int
     shutdown_(augas_id cid)
     {
@@ -359,9 +369,9 @@ namespace augas {
     }
 
     int
-    tcpconnect_(const char* sname, const char* host, const char* port,
-                void* user)
+    tcpconnect_(const char* host, const char* port, void* user)
     {
+        const char* sname = getserv()->name_;
         AUG_DEBUG2("tcpconnect(): sname=[%s], host=[%s], port=[%s]",
                    sname, host, port);
         try {
@@ -404,9 +414,9 @@ namespace augas {
     }
 
     int
-    tcplisten_(const char* sname, const char* host, const char* port,
-               void* user)
+    tcplisten_(const char* host, const char* port, void* user)
     {
+        const char* sname = getserv()->name_;
         AUG_DEBUG2("tcplisten(): sname=[%s], host=[%s], port=[%s]",
                    sname, host, port);
         try {
@@ -497,9 +507,9 @@ namespace augas {
     }
 
     int
-    settimer_(const char* sname, unsigned ms, void* arg,
-              void (*destroy)(void*))
+    settimer_(unsigned ms, void* arg, void (*destroy)(void*))
     {
+        const char* sname = getserv()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
 
@@ -560,6 +570,7 @@ namespace augas {
         post_,
         dispatch_,
         getenv_,
+        getserv_,
         shutdown_,
         tcpconnect_,
         tcplisten_,

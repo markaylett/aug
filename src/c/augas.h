@@ -61,7 +61,6 @@ struct augas_event {
 };
 
 struct augas_object {
-    const struct augas_serv* serv_;
     augas_id id_;
     void* user_;
 };
@@ -121,7 +120,6 @@ struct augas_host {
 
     /**
        \brief Post an event to the event queue.
-       \param sname TODO
        \param to TODO
        \param event TODO
        \param destroy TODO
@@ -129,8 +127,8 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*post_)(const char* sname, const char* to,
-                 const struct augas_event* event, void (*destroy)(void*));
+    int (*post_)(const char* to, const struct augas_event* event,
+                 void (*destroy)(void*));
 
     /**
      * The remaining functions are not thread-safe.
@@ -138,15 +136,13 @@ struct augas_host {
 
     /**
        \brief Dispatch event to peer service.
-       \param sname TODO
        \param to TODO
        \param event TODO
        \return TODO
        \sa post_()
     */
 
-    int (*dispatch_)(const char* sname, const char* to,
-                     const struct augas_event* event);
+    int (*dispatch_)(const char* to, const struct augas_event* event);
 
     /**
        \brief Read a configuration value.
@@ -161,6 +157,14 @@ struct augas_host {
     const char* (*getenv_)(const char* name);
 
     /**
+       \brief Get the active service.
+       \return TODO
+       \sa TODO
+    */
+
+    const struct augas_serv* (*getserv_)(void);
+
+    /**
        \brief TODO
        \param sid TODO
        \return TODO
@@ -171,7 +175,6 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param sname Service name.
        \param host Ip address or host name.
        \param port Port or service name.
        \param user User data to be associated with the resulting connection.
@@ -182,12 +185,10 @@ struct augas_host {
        module is notified of connection establishment.
     */
 
-    int (*tcpconnect_)(const char* sname, const char* host, const char* port,
-                       void* user);
+    int (*tcpconnect_)(const char* host, const char* port, void* user);
 
     /**
        \brief TODO
-       \param sname TODO
        \param host TODO
        \param port TODO
        \param user TODO
@@ -195,8 +196,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*tcplisten_)(const char* sname, const char* host, const char* port,
-                      void* user);
+    int (*tcplisten_)(const char* host, const char* port, void* user);
 
     /**
        \brief TODO
@@ -248,7 +248,6 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param sname TODO
        \param ms TODO
        \param user TODO
        \param destroy TODO
@@ -256,8 +255,7 @@ struct augas_host {
        \sa TODO
     */
 
-    int (*settimer_)(const char* sname, unsigned ms, void* user,
-                     void (*destroy)(void*));
+    int (*settimer_)(unsigned ms, void* user, void (*destroy)(void*));
 
     /**
        \brief TODO
@@ -289,16 +287,14 @@ struct augas_module {
 
     /**
        \brief Stop service.
-       \param serv TODO
        \return TODO
        \sa TODO
     */
 
-    void (*stop_)(const struct augas_serv* serv);
+    void (*stop_)(void);
 
     /**
        \brief Start service.
-       \param serv TODO
        \return TODO
        \sa TODO
     */
@@ -307,24 +303,21 @@ struct augas_module {
 
     /**
        \brief Re-configure request.
-       \param serv TODO
        \return TODO
        \sa TODO
     */
 
-    void (*reconf_)(const struct augas_serv* serv);
+    void (*reconf_)(void);
 
     /**
        \brief Custom event notification.
-       \param serv TODO
        \param from TODO
        \param event TODO
        \return TODO
        \sa TODO
     */
 
-    void (*event_)(const struct augas_serv* serv, const char* from,
-                   const struct augas_event* event);
+    void (*event_)(const char* from, const struct augas_event* event);
 
     /**
        \brief Connection closure.
@@ -422,6 +415,7 @@ augas_gethost(void);
 #define augas_post          (augas_gethost()->post_)
 #define augas_dispatch      (augas_gethost()->dispatch_)
 #define augas_getenv        (augas_gethost()->getenv_)
+#define augas_getserv       (augas_gethost()->getserv_)
 #define augas_shutdown      (augas_gethost()->shutdown_)
 #define augas_tcpconnect    (augas_gethost()->tcpconnect_)
 #define augas_tcplisten     (augas_gethost()->tcplisten_)

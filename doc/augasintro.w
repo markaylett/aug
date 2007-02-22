@@ -27,58 +27,71 @@
 
 @* Introduction.
 
-\AUGAS/ is a network application server.  \AUGAS/ manages many common
-and error-prone tasks associated with network servers.
+All too often, threads are forced upon an application by APIs that use a
+blocking mode of operation.  Unless these threads are managed carefully, they
+may increase resource contention and the risk of deadlocks.
 
-\AUGAS/ provides a host environment to Modules.  Modules are
-physical components that are dynamically loaded into the the application
-server at run-time.  Each Module exposes one or more services.  Services are
-wired together at configuration-time, rather than compile-time.
+Threads are best suited to processing, not waiting.  Where possible, they
+should be used to maximise parallelisation on multi-processor machines.
 
-Such a system allows features common to many services to be implemented in
-Modules.  The \PYTHON/ Module is an example of this, it allows services to be
-implemented in \PYTHON/.  The \PYTHON/ module exposes the \AUGAS/'s host
-environment as a \PYTHON/ module (not to be confused with an \AUGAS/ Module).
+Socket-based applications can opt for a non-blocking mode of operation.  In
+this mode, a single thread can be dedicated to waiting and de-multiplexing
+network events.  Sizeable chunks of CPU-intensive work can then be delegated
+off to worker threads.
 
-\AUGAS/ helps to promote component rather than source-level
-reuse, and presents a uniform interface to system administrators, regardless
-of the services provided.
+@ The \AUGAS/ Application Server uses such an event-based model to
+de-multiplex activity on signal, socket, timer and custom event objects.
 
-@ \AUGAS/ runs natively on a variety of OSes, including \LINUX/ and
+These event notifications are then communicated to Modules hosted by the
+Application Server.
+
+Modules are physical components that are dynamically loaded into the the
+application server at run-time.  Each Module provides one or more Services.
+Modules and Services are wired together at configuration-time.
+
+This system allows features common to many Services to be implemented in
+Modules.  The \.{augpy} Module is an example of this, it enables Services to
+be implemented in the \PYTHON/ language.  The \.{augpy} Module exposes
+\AUGAS/'s host environment to \PYTHON/ modules (not to be confused with an
+\AUGAS/ Module) acting as Services.
+
+Modules help to promote component rather than source-level reuse.  Services
+can co-operate using custom events.  This allows Services to bridge language
+boundaries.
+
+All Module calls are dispatched from the event thread (similar to a UI
+thread).  A Service either can opt for a simple, single-threaded model, or a
+more elaborate model such as a thread-pool, depending on its requirements.
+
+@ \AUGAS/ is an Open Source application written in \CEE//\CPLUSPLUS/. It is
+part of the \pdfURL{\AUG/ project}{http://aug.sourceforge.net}.  \AUGAS/ runs
+natively on a variety of OSes, including \LINUX/ and
 \WINDOWS/.  On \WINDOWS/, \AUGAS/ does not require a porting layer, such as \CYGWIN/,
-to operate.
+to operate.  And, its dependencies are minimal.
 
-Where appropriate, \AUGAS/ adheres to the conventions of the target platform.
-D\ae monisation, for example, takes the form of an NT service on \WINDOWS/.
-However, from a sys-admin perspective, the interface remains the same.  The
-following command can be used to start the service from a command window:
+\AUGAS/ presents a uniform interface to system administrators across all
+platforms.  Although, on \WINDOWS/, D\ae monised \AUGAS/ process take the form
+of NT services, from a sys-admin perspective, the interface remains the same.
+The following command can be used to start the service from a command window:
 
 \yskip\.{C:\\> augasd -f augasd.conf start}
-
-@ \AUGAS/ uses an event-based model to de-multiplex activity on signal,
-socket, timer and custom event objects.  All module calls are dispatched from
-the event thread (similar to a UI thread).  A multi-threaded environment is
-not imposed upon a service by the host environment.
-
-Internally, the application operates on a single thread.  Services are,
-however, free to select a threading model best suited to their needs.  They
-may, for example, use worker threads to handle CPU-intensive tasks.
-
-Services can interact with one another using custom events.  In a
-multi-language environment, a \PYTHON/ service could delegate tasks to a
-service which happens to be implemented in a different language.
 
 @* Sample Module.
 
 In the sections below, a module is built in \CPLUSPLUS/ that:
 
 \yskip\item{$\bullet$} exposes a TCP service
-\item{$\bullet$} reverses lines sent from client
+\item{$\bullet$} reads line-based input from clients
+\item{$\bullet$} echos input lines in upper-case
 \item{$\bullet$} times-out when a client is inactive
 
+\yskip The basic outline of the Module follows:
+
 @c
-@<include augas header@>@/
-@<implement service@>@/
+@<include headers@>@;
+namespace {@/
+@<implement service@>@;
+}@/
 @<declare export table@>
 
 @ The \.{<augaspp.hpp>} provides a set of utiliy functions and classes
@@ -89,30 +102,54 @@ the \.{<augas.h>} header.
 @<include...@>=
 #include <augaspp.hpp>
 
-@ Services must implement the |serv_base| interface.  Stub implementations to
-most of the pure virtual functions are provided by |basic_serv|.  For
-convenience, |serv| is derived from |basic_serv|.
+@ Services implement the |serv_base| interface.  Stub implementations to most
+of the pure virtual functions are provided by |basic_serv|.  For convenience,
+|serv| is derived from |basic_serv|.
 
 @<implement...@>=
-using namespace augas;
+using namespace augas;@/
 using namespace std;@/
-
-namespace {@/
-  @<request handler@>@;
-  struct serv : basic_serv {@/
-  @<start service@>@/
-  @<accept connection@>@/
-  @<cleanup on disconnect@>@/
-  @<process data@>@/
-  @<handle timer expiry@>@/
-  };@/
-}
+@<echoline functor@>@;
+struct serv : basic_serv {@/
+@<start service@>@/
+@<accept connection@>@/
+@<cleanup on disconnect@>@/
+@<process data@>@/
+@<handle timer expiry@>@/
+};
 
 @ Here is the main program.
 
 @<declare...@>=
 typedef basic_module<basic_factory<serv> > module;@/
 AUGAS_MODULE(module::init, module::term)
+
+@ The |send()| function buffers the data to be written.
+
+@<echoline...@>=
+struct echoline {
+  const object* const sock_;
+  explicit
+  echoline(const object& sock)
+    : sock_(&sock)
+  {
+  }
+  void
+  operator ()(std::string& line)
+  {
+    @<prepare response@>@;
+    send(*sock_, line.c_str(), line.size());
+  }
+};
+
+@ Trim white-space, including any carriage-return characters, from the input.
+Transform to upper-case.  Append CR/LF end-of-line sequence.  This is common
+in many text-based protocols, such as \POP3/ and \SMTP/.
+
+@<prepare...@>=
+trim(line);
+transform(line.begin(), line.end(), line.begin(), ucase);
+line += "\r\n";
 
 @ TODO
 
@@ -124,7 +161,7 @@ do_start(const char* sname)
   const char* port = augas::getenv("service.echo.serv");
   if (!port)
     return false;
-  tcplisten(sname, "0.0.0.0", port);
+  tcplisten("0.0.0.0", port);
   return true;
 }
 
@@ -173,46 +210,13 @@ do_rdexpire(const object& sock, unsigned& ms)
   shutdown(sock);
 }
 
-@ The |send()| function buffers the data to be written.
-
-@<request...@>=
-struct echoline {
-  const object* const sock_;
-  explicit
-  echoline(const object& sock)
-    : sock_(&sock)
-  {
-  }
-  void
-  operator ()(std::string& line)
-  {
-    @<prepare response@>@;
-    send(*sock_, line.c_str(), line.size());
-  }
-};
-
-@ Trim white-space, including any carriage-return characters, from the input.
-Transform to upper-case.  Append CR/LF end-of-line sequence.  This is common
-in many text-based protocols, such as \POP3/ and \SMTP/.
-
-@<prepare...@>=
-trim(line);
-transform(line.begin(), line.end(), line.begin(), ucase);
-line += "\r\n";
-
 @* Build and Install.
 
-The Makefile:
-
-\yskip\.{CXXFLAGS = -Wall -Werror}
-
-\.{LDFLAGS =}
+The \.{Makefile}:
 
 \.{CXXMODULES = modsample}
 
 \.{modsample\_OBJS = modsample.o}
-
-\.{modsample\_LIBS = m}
 
 \.{include augas.mk}
 

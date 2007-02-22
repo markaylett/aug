@@ -84,17 +84,16 @@ stopall_(PyObject* self, PyObject* args)
 static PyObject*
 post_(PyObject* self, PyObject* args)
 {
-    const char* sname, * to, * ename, * user;
+    const char* to, * ename, * user;
     int size;
     struct augas_event event;
 
-    if (!PyArg_ParseTuple(args, "sssz#:post", &sname, &to, &ename, &user,
-                          &size))
+    if (!PyArg_ParseTuple(args, "ssz#:post", &to, &ename, &user, &size))
         return NULL;
 
     setevent_(&event, ename, user ? strdup(user) : NULL, size);
 
-    if (-1 == augas_post(sname, to, &event, event.user_ ? free : NULL)) {
+    if (-1 == augas_post(to, &event, event.user_ ? free : NULL)) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
@@ -111,17 +110,16 @@ post_(PyObject* self, PyObject* args)
 static PyObject*
 dispatch_(PyObject* self, PyObject* args)
 {
-    const char* sname, * to, * ename, * user;
+    const char* to, * ename, * user;
     int size;
     struct augas_event event;
 
-    if (!PyArg_ParseTuple(args, "sssz#:dispatch", &sname, &to, &ename, &user,
-                          &size))
+    if (!PyArg_ParseTuple(args, "ssz#:dispatch", &to, &ename, &user, &size))
         return NULL;
 
     setevent_(&event, ename, user, size);
 
-    if (-1 == augas_dispatch(sname, to, &event)) {
+    if (-1 == augas_dispatch(to, &event)) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         return NULL;
     }
@@ -144,6 +142,20 @@ getenv_(PyObject* self, PyObject* args)
 }
 
 static PyObject*
+getserv_(PyObject* self, PyObject* args)
+{
+    const struct augas_serv* serv;
+
+    if (!PyArg_ParseTuple(args, ":getserv"))
+        return NULL;
+
+    if (!(serv = augas_getserv()))
+        return incret_(Py_None);
+
+    return Py_BuildValue("s", serv->name_);
+}
+
+static PyObject*
 shutdown_(PyObject* self, PyObject* args)
 {
     PyObject* sock;
@@ -161,18 +173,17 @@ shutdown_(PyObject* self, PyObject* args)
 static PyObject*
 tcpconnect_(PyObject* self, PyObject* args)
 {
-    const char* sname, * host, * serv;
+    const char* host, * serv;
     PyObject* user, * sock;
     int cid;
 
-    if (!PyArg_ParseTuple(args, "sssO:tcpconnect", &sname, &host, &serv,
-                          &user))
+    if (!PyArg_ParseTuple(args, "ssO:tcpconnect", &host, &serv, &user))
         return NULL;
 
-    if (!(sock = augpy_createobject(type_, sname, 0, user)))
+    if (!(sock = augpy_createobject(type_, 0, user)))
         return NULL;
 
-    if (-1 == (cid = augas_tcpconnect(sname, host, serv, sock))) {
+    if (-1 == (cid = augas_tcpconnect(host, serv, sock))) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         Py_DECREF(sock);
         return NULL;
@@ -185,18 +196,17 @@ tcpconnect_(PyObject* self, PyObject* args)
 static PyObject*
 tcplisten_(PyObject* self, PyObject* args)
 {
-    const char* sname, * host, * serv;
+    const char* host, * serv;
     PyObject* user, * sock;
     int lid;
 
-    if (!PyArg_ParseTuple(args, "sssO:tcplisten", &sname, &host, &serv,
-                          &user))
+    if (!PyArg_ParseTuple(args, "ssO:tcplisten", &host, &serv, &user))
         return NULL;
 
-    if (!(sock = augpy_createobject(type_, sname, 0, user)))
+    if (!(sock = augpy_createobject(type_, 0, user)))
         return NULL;
 
-    if (-1 == (lid = augas_tcplisten(sname, host, serv, sock))) {
+    if (-1 == (lid = augas_tcplisten(host, serv, sock))) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         Py_DECREF(sock);
         return NULL;
@@ -286,18 +296,17 @@ cancelrwtimer_(PyObject* self, PyObject* args)
 static PyObject*
 settimer_(PyObject* self, PyObject* args)
 {
-    const char* sname;
     unsigned ms;
     PyObject* user, * timer;
     int tid;
 
-    if (!PyArg_ParseTuple(args, "sIO:settimer", &sname, &ms, &user))
+    if (!PyArg_ParseTuple(args, "IO:settimer", &ms, &user))
         return NULL;
 
-    if (!(timer = augpy_createobject(type_, sname, 0, user)))
+    if (!(timer = augpy_createobject(type_, 0, user)))
         return NULL;
 
-    if (-1 == (tid = augas_settimer(sname, ms, timer, destroy_))) {
+    if (-1 == (tid = augas_settimer(ms, timer, destroy_))) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         Py_DECREF(timer);
         return NULL;
@@ -369,6 +378,10 @@ static PyMethodDef methods_[] = {
     },
     {
         "getenv", getenv_, METH_VARARGS,
+        "TODO"
+    },
+    {
+        "getserv", getserv_, METH_VARARGS,
         "TODO"
     },
     {

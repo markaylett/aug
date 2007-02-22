@@ -134,15 +134,11 @@ destroyimport_(struct import_* import)
 {
     if (import->open_ && import->stop_) {
 
-        const char* sname = PyModule_GetName(import->module_);
-        if (sname) {
-            PyObject* x = PyObject_CallFunction(import->stop_, "s",
-                                                sname);
-            if (x) {
-                Py_DECREF(x);
-            } else
-                printerr_();
-        }
+        PyObject* x = PyObject_CallFunction(import->stop_, NULL);
+        if (x) {
+            Py_DECREF(x);
+        } else
+            printerr_();
     }
 
     Py_XDECREF(import->expire_);
@@ -233,10 +229,10 @@ initpy_(void)
 }
 
 static void
-stop_(const struct augas_serv* serv)
+stop_(void)
 {
-    struct import_* import = serv->user_;
-    assert(serv->user_);
+    struct import_* import = augas_getserv()->user_;
+    assert(import);
     destroyimport_(import);
 }
 
@@ -244,7 +240,6 @@ static int
 start_(struct augas_serv* serv)
 {
     struct import_* import;
-
     if (!(import = createimport_(serv->name_)))
         return -1;
 
@@ -266,15 +261,14 @@ start_(struct augas_serv* serv)
 }
 
 static void
-reconf_(const struct augas_serv* serv)
+reconf_(void)
 {
-    struct import_* import = serv->user_;
-    assert(serv->user_);
+    struct import_* import = augas_getserv()->user_;
+    assert(import);
 
     if (import->reconf_) {
 
-        PyObject* x = PyObject_CallFunction(import->reconf_, "s",
-                                            serv->name_);
+        PyObject* x = PyObject_CallFunction(import->reconf_, NULL);
         if (x) {
             Py_DECREF(x);
         } else
@@ -283,16 +277,15 @@ reconf_(const struct augas_serv* serv)
 }
 
 static void
-event_(const struct augas_serv* serv, const char* from,
-       const struct augas_event* event)
+event_(const char* from, const struct augas_event* event)
 {
-    struct import_* import = serv->user_;
-    assert(serv->user_);
+    struct import_* import = augas_getserv()->user_;
+    assert(import);
 
     if (import->event_) {
 
-        PyObject* y = PyObject_CallFunction(import->event_, "sssz#",
-                                            serv->name_, from, event->type_,
+        PyObject* y = PyObject_CallFunction(import->event_, "ssz#",
+                                            from, event->type_,
                                             (const char*)event->user_,
                                             (int)event->size_);
         if (y) {
@@ -307,10 +300,10 @@ event_(const struct augas_serv* serv, const char* from,
 static void
 closed_(const struct augas_object* sock)
 {
-    struct import_* import = sock->serv_->user_;
+    struct import_* import = augas_getserv()->user_;
     PyObject* x = sock->user_;
-    assert(sock->serv_->user_);
-    assert(sock->user_);
+    assert(import);
+    assert(x);
 
     if (import->closed_) {
 
@@ -327,8 +320,8 @@ closed_(const struct augas_object* sock)
 static void
 teardown_(const struct augas_object* sock)
 {
-    struct import_* import = sock->serv_->user_;
-    assert(sock->serv_->user_);
+    struct import_* import = augas_getserv()->user_;
+    assert(import);
     assert(sock->user_);
 
     if (import->teardown_) {
@@ -348,14 +341,14 @@ teardown_(const struct augas_object* sock)
 static int
 accept_(struct augas_object* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = sock->serv_->user_;
+    struct import_* import = augas_getserv()->user_;
     PyObject* x, * y;
     int ret = 0;
-    assert(sock->serv_->user_);
+    assert(import);
     assert(sock->user_);
 
     x = augpy_getuser(sock->user_);
-    y = augpy_createobject(type_, sock->serv_->name_, sock->id_, x);
+    y = augpy_createobject(type_, sock->id_, x);
     Py_DECREF(x);
 
     if (!y) {
@@ -402,8 +395,8 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
 static void
 connected_(struct augas_object* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = sock->serv_->user_;
-    assert(sock->serv_->user_);
+    struct import_* import = augas_getserv()->user_;
+    assert(import);
     assert(sock->user_);
 
     if (import->connected_) {
@@ -424,8 +417,8 @@ connected_(struct augas_object* sock, const char* addr, unsigned short port)
 static void
 data_(const struct augas_object* sock, const char* buf, size_t size)
 {
-    struct import_* import = sock->serv_->user_;
-    assert(sock->serv_->user_);
+    struct import_* import = augas_getserv()->user_;
+    assert(import);
     assert(sock->user_);
 
     if (import->data_) {
@@ -446,8 +439,8 @@ data_(const struct augas_object* sock, const char* buf, size_t size)
 static void
 rdexpire_(const struct augas_object* sock, unsigned* ms)
 {
-    struct import_* import = sock->serv_->user_;
-    assert(sock->serv_->user_);
+    struct import_* import = augas_getserv()->user_;
+    assert(import);
     assert(sock->user_);
 
     if (import->rdexpire_) {
@@ -473,8 +466,8 @@ rdexpire_(const struct augas_object* sock, unsigned* ms)
 static void
 wrexpire_(const struct augas_object* sock, unsigned* ms)
 {
-    struct import_* import = sock->serv_->user_;
-    assert(sock->serv_->user_);
+    struct import_* import = augas_getserv()->user_;
+    assert(import);
     assert(sock->user_);
 
     if (import->wrexpire_) {
@@ -500,8 +493,8 @@ wrexpire_(const struct augas_object* sock, unsigned* ms)
 static void
 expire_(const struct augas_object* timer, unsigned* ms)
 {
-    struct import_* import = timer->serv_->user_;
-    assert(timer->serv_->user_);
+    struct import_* import = augas_getserv()->user_;
+    assert(import);
     assert(timer->user_);
 
     if (import->expire_) {

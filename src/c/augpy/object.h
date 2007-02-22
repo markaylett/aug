@@ -14,8 +14,7 @@ PyTypeObject*
 augpy_createtype(void);
 
 PyObject*
-augpy_createobject(PyTypeObject* type, const char* sname, int id,
-                   PyObject* user);
+augpy_createobject(PyTypeObject* type, int id, PyObject* user);
 
 void
 augpy_setid(PyObject* self, int id);
