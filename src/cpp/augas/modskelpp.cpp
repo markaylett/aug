@@ -6,10 +6,10 @@ using namespace std;
 namespace {
 
     struct eachline {
-        const object* const sock_;
+        object sock_;
         explicit
         eachline(const object& sock)
-            : sock_(&sock)
+            : sock_(sock)
         {
         }
         void
@@ -19,7 +19,7 @@ namespace {
             transform(tok.begin(), tok.end(), tok.begin(), ucase);
             tok += "\r\n";
 
-            send(*sock_, tok.c_str(), tok.size());
+            send(sock_, tok.c_str(), tok.size());
         }
     };
 

@@ -438,12 +438,6 @@ augas_gethost(void);
     {                                                                 \
         return host_;                                                 \
     }                                                                 \
-    AUGAS_API void                                                    \
-    augas_term(void)                                                  \
-    {                                                                 \
-        (*term)();                                                    \
-        host_ = NULL;                                                 \
-    }                                                                 \
     AUGAS_API const struct augas_module*                              \
     augas_init(const char* name, const struct augas_host* host)       \
     {                                                                 \
@@ -451,6 +445,12 @@ augas_gethost(void);
             return NULL;                                              \
         host_ = host;                                                 \
         return (*init)(name);                                         \
+    }                                                                 \
+    AUGAS_API void                                                    \
+    augas_term(void)                                                  \
+    {                                                                 \
+        (*term)();                                                    \
+        host_ = NULL;                                                 \
     }
 
 typedef void (*augas_termfn)(void);
