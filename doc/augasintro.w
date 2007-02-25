@@ -27,7 +27,7 @@
 @* Introduction.
 \AUGAS/ is an Open Source, Network Application Server written in
 \CEE//\CPLUSPLUS/.  It is part of the \pdfURL{\AUG/ project}
-{http://aug.sourceforge.net}, which has been ported to a number of OSes
+{http://aug.sourceforge.net}, and has been ported to a number of OSes
 including \LINUX/ and \WINDOWS/.  \AUGAS/ runs natively on \WINDOWS/; it does
 not require a porting layer, such as \CYGWIN/, to run.  Dependencies are kept
 to a minimum.
@@ -53,7 +53,7 @@ The \AUGAS/ Application Server uses an efficient, event-based model to
 de-multiplex activity on signal, socket, timer and user-event objects.
 
 @ \AUGAS/ communicates event notifications to Modules.  Modules are
-dynamically loaded into the the Application Server.  Each Module
+dynamically loaded into the the Application Server at run-time.  Each Module
 provides one or more Services.  Modules and Services are wired together at
 configuration-time, not compile-time.
 
@@ -65,9 +65,8 @@ suitable alternative, such as a thread-pool, depending on its requirements.
 \bigskip\noindent
 The separation of physical Modules and logical Services allows Modules to
 adapt and extend the host environment exposed to Services.  The \.{augpy}
-Module, for example, presents the \AUGAS/ host environment as a \PYTHON/
-module (not to be confused with \AUGAS/ Modules), allowing Services to be
-written in \PYTHON/.
+Module, for example, exposes a \PYTHON/ module which encapsulates the \AUGAS/
+host environment.  This allows Services to be implemented in \PYTHON/.
 
 \bigskip\noindent
 Modules help to promote component, rather than source-level reuse.  Services
