@@ -242,8 +242,7 @@ namespace augas {
             event_.user_ = 0;
             event_.size_ = 0;
         }
-        template <typename T>
-        event(const char* type, T* user, size_t size = 0)
+        event(const char* type, void* user, size_t size = 0)
         {
             settype(type);
             setuser(user, size);
@@ -261,12 +260,11 @@ namespace augas {
             strncpy(event_.type_, type, sizeof(event_.type_));
             event_.type_[AUGAS_MAXNAME] ='\0';
         }
-        template <typename T>
         void
-        setuser(T* user, size_t size = 0)
+        setuser(void* user, size_t size = 0)
         {
             if (user) {
-                event_.user_ = static_cast<void*>(user);
+                event_.user_ = user;
                 event_.size_ = size;
             } else {
                 event_.user_ = 0;
@@ -303,12 +301,10 @@ namespace augas {
             : object_(object)
         {
         }
-        template <typename T>
         void
-        setuser(T* user)
+        setuser(void* user)
         {
-            const_cast<augas_object&>(object_).user_
-                = static_cast<void*>(user);
+            const_cast<augas_object&>(object_).user_ = user;
         }
         augas_id
         id() const
@@ -477,13 +473,16 @@ namespace augas {
     template <typename T>
     struct basic_factory {
         explicit
-        basic_factory(const char* sname)
+        basic_factory(const char* module)
         {
+            augas_writelog(AUGAS_LOGINFO, "creating factory: module=[%s]",
+                           module);
         }
         serv_base*
         create(const char* sname)
         {
-            augas_writelog(AUGAS_LOGINFO, "creating session [%s]", sname);
+            augas_writelog(AUGAS_LOGINFO, "creating service: name=[%s]",
+                           sname);
             return new T();
         }
     };

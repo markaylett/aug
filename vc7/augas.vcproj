@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../src/c, ../src/cpp"
-				PreprocessorDefinitions="__func__=__FUNCTION__"
+				PreprocessorDefinitions="__func__=__FUNCTION__;FD_SETSIZE=256"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -72,7 +72,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../src/c, ../src/cpp"
-				PreprocessorDefinitions="__func__=__FUNCTION__"
+				PreprocessorDefinitions="__func__=__FUNCTION__;FD_SETSIZE=256"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
@@ -138,9 +138,6 @@
 				RelativePath="..\src\cpp\augas\exception.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\object.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augas\listener.cpp">
 			</File>
 			<File
@@ -148,6 +145,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\module.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\object.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\options.cpp">
@@ -182,9 +182,6 @@
 				RelativePath="..\src\cpp\augas\exception.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\object.hpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augas\listener.hpp">
 			</File>
 			<File
@@ -192,6 +189,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\module.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\object.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\options.hpp">

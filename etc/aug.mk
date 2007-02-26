@@ -47,7 +47,7 @@ BINS = \
 all: $(BINS)
 
 clean:
-	$(RM) -f $(DEPS) $(BINS) $(OBJS)
+	$(RM) -f $(DEPS) $(BINS) $(OBJS) *~
 
 define LIBRARY_template
 DEPS += $$($(1)_OBJS:%.o=%.d)

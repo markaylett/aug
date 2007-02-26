@@ -1,8 +1,6 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
 EXTRA_DIST = \
-	augasd.conf \
-	augasd.sh \
 	test.sh
 
 SUBDIRS = \
@@ -47,17 +45,6 @@ augasd_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-moddir = $(prefix)/mod
-mod_LTLIBRARIES = modskel.la modskelpp.la
-
-modskel_la_SOURCES = modskel.c
-modskel_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
-modskel_la_LIBADD =
-
-modskelpp_la_SOURCES = modskelpp.cpp
-modskelpp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
-modskelpp_la_LIBADD =
 
 check_PROGRAMS = \
 	augaspp-test

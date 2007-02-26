@@ -27,6 +27,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_25CF16A3F7F44A00B054A6FD8F5E142B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2FA9F56BD08A761A5A27BBAD1C71D592"
         "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
@@ -117,13 +123,37 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_9DAB51320B364DC8B867D0567DB57D70"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A783D157AC31455DBF36EFAC59A165FC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
+        "MsmKey" = "8:_A7AE6B4B7ADE4B63B0B2ABAF41E87770"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A7D63EA79A624B0EB9130EAD0AB9CB6C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B7AEAA90118C4CC497CF2A956B1DA290"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B8B9A673EB1A4397A7D2EC96366FDE5F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -141,6 +171,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_DB015F19248B42D38AFF5BFF67215318"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E2AF29C9CC8D48CE938F8D4D86AD54CC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -148,6 +184,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E865868FA75E4AE8BF4F54B0EFB5248B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F7E8B327838E4B5A99EE90D2579154D6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -241,6 +283,26 @@
             "TargetName" = "8:pyskel.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_25CF16A3F7F44A00B054A6FD8F5E142B"
+            {
+            "SourcePath" = "8:..\\example\\augas\\modules.mk"
+            "TargetName" = "8:modules.mk"
+            "Tag" = "8:"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -515,12 +577,72 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_9DAB51320B364DC8B867D0567DB57D70"
+            {
+            "SourcePath" = "8:..\\etc\\aug.mk"
+            "TargetName" = "8:aug.mk"
+            "Tag" = "8:"
+            "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_A783D157AC31455DBF36EFAC59A165FC"
             {
             "SourcePath" = "8:..\\src\\cpp\\augaspp.hpp"
             "TargetName" = "8:augaspp.hpp"
             "Tag" = "8:"
             "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_A7AE6B4B7ADE4B63B0B2ABAF41E87770"
+            {
+            "SourcePath" = "8:..\\example\\augas\\minimal.c"
+            "TargetName" = "8:minimal.c"
+            "Tag" = "8:"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_A7D63EA79A624B0EB9130EAD0AB9CB6C"
+            {
+            "SourcePath" = "8:..\\example\\augas\\bench.conf"
+            "TargetName" = "8:bench.conf"
+            "Tag" = "8:"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -555,12 +677,52 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_B8B9A673EB1A4397A7D2EC96366FDE5F"
+            {
+            "SourcePath" = "8:..\\example\\augas\\bench.sh"
+            "TargetName" = "8:bench.sh"
+            "Tag" = "8:"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_D5F95E1E2E6F4B849CB0661C7E6F0040"
             {
             "SourcePath" = "8:..\\src\\py\\pyclient.py"
             "TargetName" = "8:pyclient.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_DB015F19248B42D38AFF5BFF67215318"
+            {
+            "SourcePath" = "8:..\\example\\augas\\server.cpp"
+            "TargetName" = "8:server.cpp"
+            "Tag" = "8:"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -601,6 +763,26 @@
             "TargetName" = "8:augres.dll"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_F7E8B327838E4B5A99EE90D2579154D6"
+            {
+            "SourcePath" = "8:..\\example\\augas\\client.cpp"
+            "TargetName" = "8:client.cpp"
+            "Tag" = "8:"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -693,6 +875,28 @@
                     "Property" = "8:_4B10D03877C24BC89D82C8716387A9B8"
                         "Folders"
                         {
+                        }
+                    }
+                    "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_E55E5AF02BE6464CB5CB3C198184D602"
+                    {
+                    "Name" = "8:example"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_CE0EBC928DFA4A37BC03C48BEADEF8FD"
+                        "Folders"
+                        {
+                            "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_5BCAC7B63D584ABE91ADDCEE5480201E"
+                            {
+                            "Name" = "8:augas"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_95A7DC243A1A40F5A0BCBB82850F473D"
+                                "Folders"
+                                {
+                                }
+                            }
                         }
                     }
                     "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_E6769D031B944066BA37EDB08C0AF9A5"

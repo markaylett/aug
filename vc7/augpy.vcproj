@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../src/c"
-				PreprocessorDefinitions="__func__=__FUNCTION__"
+				PreprocessorDefinitions="__func__=__FUNCTION__;FD_SETSIZE=256"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../src/c"
-				PreprocessorDefinitions="__func__=__FUNCTION__"
+				PreprocessorDefinitions="__func__=__FUNCTION__;FD_SETSIZE=256"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				ProgramDataBaseFileName="$(OutDir)/vc70.pdb"

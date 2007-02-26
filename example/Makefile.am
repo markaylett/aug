@@ -1,3 +1,4 @@
 SUBDIRS = \
+	augas \
 	cpp \
 	httpd

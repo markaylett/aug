@@ -115,6 +115,15 @@ aug_destroymplexer(aug_mplexer_t mplexer)
 AUGSYS_API int
 aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 {
+    /* Although this condition does not necessarily mean that the set has been
+       exhausted, it gives a reasonable approximation given the costly
+       alternatives. */
+
+    if (FD_SETSIZE <= fd) {
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEMFILE);
+        return -1;
+    }
+
     if (mask & ~AUG_IOEVENTALL) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("invalid ioevent mask"));

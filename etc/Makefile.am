@@ -4,7 +4,4 @@ EXTRA_DIST = \
 	augres.reg
 
 etcdir = $(prefix)/etc
-etc_DATA = \
-	aug.mk \
-	augasd.conf.default \
-	augres.reg
+etc_DATA = $(EXTRA_DIST)

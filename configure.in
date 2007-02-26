@@ -43,8 +43,8 @@ fi
 case $host in
 *-*-cygwin* | *-*-mingw*)
 
-    CFLAGS="$CFLAGS -DWINVER=0x0501"
-    CXXFLAGS="$CXXFLAGS -DWINVER=0x0501"
+    CFLAGS="$CFLAGS -DWINVER=0x0501 -DFD_SETSIZE=256"
+    CXXFLAGS="$CXXFLAGS -DWINVER=0x0501 -DFD_SETSIZE=256"
     LDFLAGS="-lws2_32 -liphlpapi $LDFLAGS"
     LIBS="-Wl,-lws2_32 -Wl,-liphlpapi $LIBS"
 
@@ -160,6 +160,7 @@ AC_CONFIG_FILES([Makefile
                  doc/man/Makefile
                  etc/Makefile
                  example/Makefile
+                 example/augas/Makefile
                  example/cpp/Makefile
                  example/httpd/Makefile
                  src/Makefile
