@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="augas"
-	ProjectGUID="{E905FF28-F95F-4125-B153-C67B96CD0C65}"
+	Name="minimal"
+	ProjectGUID="{E980D9AD-ACCD-4D21-A2E1-24E00913F725}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -12,21 +12,20 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="bin"
-			IntermediateDirectory="debug/augas"
-			ConfigurationType="1"
+			OutputDirectory="mod"
+			IntermediateDirectory="debug/minimal"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src/c, ../src/cpp"
+				AdditionalIncludeDirectories="../src/c"
 				PreprocessorDefinitions="__func__=__FUNCTION__;FD_SETSIZE=256"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)/vc70.pdb"
 				WarningLevel="3"
 				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -35,13 +34,12 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/augasd.exe"
+				OutputFile="$(OutDir)/modminimal.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/augasd.pdb"
-				SubSystem="1"
+				ProgramDatabaseFile="$(OutDir)/minimal.pdb"
+				SubSystem="2"
+				ImportLibrary="$(OutDir)/minimal.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -66,18 +64,17 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="bin"
-			IntermediateDirectory="release/augas"
-			ConfigurationType="1"
+			OutputDirectory="mod"
+			IntermediateDirectory="release/minimal"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../src/c, ../src/cpp"
+				AdditionalIncludeDirectories="../src/c"
 				PreprocessorDefinitions="__func__=__FUNCTION__;FD_SETSIZE=256"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)/vc70.pdb"
 				WarningLevel="3"
 				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -86,14 +83,13 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/augasd.exe"
+				OutputFile="$(OutDir)/modminimal.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				ImportLibrary="$(OutDir)/minimal.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -125,91 +121,13 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\cpp\augas\augasd.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\buffer.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\clntconn.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\conn.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\exception.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\listener.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\manager.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\module.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\object.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\options.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\rwtimer.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\serv.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\servconn.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\utility.cpp">
+				RelativePath="..\example\augas\minimal.c">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
-				RelativePath="..\src\cpp\augas\buffer.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\clntconn.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\conn.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\exception.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\listener.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\manager.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\module.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\object.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\options.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\rwtimer.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\serv.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\servconn.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augas\utility.hpp">
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

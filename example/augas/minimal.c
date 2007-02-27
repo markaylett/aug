@@ -1,7 +1,7 @@
 #include "augas.h"
 
 static void
-stop_()
+stop_(void)
 {
     augas_writelog(AUGAS_LOGINFO, "stop_()");
 }
@@ -14,7 +14,7 @@ start_(struct augas_serv* serv)
 }
 
 static void
-reconf_()
+reconf_(void)
 {
     augas_writelog(AUGAS_LOGINFO, "reconf_()");
 }

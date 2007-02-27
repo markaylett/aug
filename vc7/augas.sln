@@ -41,7 +41,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augutilpp", "augutilpp.vcpr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augas", "augas.vcproj", "{E905FF28-F95F-4125-B153-C67B96CD0C65}"
 	ProjectSection(ProjectDependencies) = postProject
+		{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539} = {2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}
+		{D29B4A1B-FFCD-464D-B2AD-010A9536E58D} = {D29B4A1B-FFCD-464D-B2AD-010A9536E58D}
 		{D9C66FA8-7D39-4496-AA2A-AA52BF2B7650} = {D9C66FA8-7D39-4496-AA2A-AA52BF2B7650}
+		{E980D9AD-ACCD-4D21-A2E1-24E00913F725} = {E980D9AD-ACCD-4D21-A2E1-24E00913F725}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augpy", "augpy.vcproj", "{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
@@ -49,6 +52,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augpy", "augpy.vcproj", "{B
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "setup", "setup.vdproj", "{97C445E8-0294-4624-BC15-5FB6DF76439A}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "client.vcproj", "{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "server.vcproj", "{D29B4A1B-FFCD-464D-B2AD-010A9536E58D}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "minimal", "minimal.vcproj", "{E980D9AD-ACCD-4D21-A2E1-24E00913F725}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -107,9 +122,20 @@ Global
 		{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}.Release.ActiveCfg = Release|Win32
 		{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}.Release.Build.0 = Release|Win32
 		{97C445E8-0294-4624-BC15-5FB6DF76439A}.Debug.ActiveCfg = Debug
-		{97C445E8-0294-4624-BC15-5FB6DF76439A}.Debug.Build.0 = Debug
 		{97C445E8-0294-4624-BC15-5FB6DF76439A}.Release.ActiveCfg = Release
 		{97C445E8-0294-4624-BC15-5FB6DF76439A}.Release.Build.0 = Release
+		{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}.Debug.ActiveCfg = Debug|Win32
+		{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}.Debug.Build.0 = Debug|Win32
+		{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}.Release.ActiveCfg = Release|Win32
+		{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}.Release.Build.0 = Release|Win32
+		{D29B4A1B-FFCD-464D-B2AD-010A9536E58D}.Debug.ActiveCfg = Debug|Win32
+		{D29B4A1B-FFCD-464D-B2AD-010A9536E58D}.Debug.Build.0 = Debug|Win32
+		{D29B4A1B-FFCD-464D-B2AD-010A9536E58D}.Release.ActiveCfg = Release|Win32
+		{D29B4A1B-FFCD-464D-B2AD-010A9536E58D}.Release.Build.0 = Release|Win32
+		{E980D9AD-ACCD-4D21-A2E1-24E00913F725}.Debug.ActiveCfg = Debug|Win32
+		{E980D9AD-ACCD-4D21-A2E1-24E00913F725}.Debug.Build.0 = Debug|Win32
+		{E980D9AD-ACCD-4D21-A2E1-24E00913F725}.Release.ActiveCfg = Release|Win32
+		{E980D9AD-ACCD-4D21-A2E1-24E00913F725}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
