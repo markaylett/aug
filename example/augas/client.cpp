@@ -5,6 +5,8 @@ using namespace std;
 
 namespace {
 
+    const char MSG[] = "hello, world!\r\n";
+
     struct state {
         string tok_;
         unsigned sent_, recvd_;
@@ -29,7 +31,7 @@ namespace {
             if (1000 == ++s.recvd_)
                 shutdown(sock_);
             else if (s.sent_ < 1000) {
-                send(sock_, "hello\r\n", 7);
+                send(sock_, MSG, sizeof(MSG) - 1);
                 ++s.sent_;
             }
         }
@@ -62,7 +64,7 @@ namespace {
         do_connected(object& sock, const char* addr, unsigned short port)
         {
             state& s(*sock.user<state>());
-            send(sock, "hello\r\n", 7);
+            send(sock, MSG, sizeof(MSG) - 1);
             ++s.sent_;
         }
         void
