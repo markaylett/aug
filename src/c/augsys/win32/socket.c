@@ -32,9 +32,6 @@ close_(int fd)
 
 #if defined(_MSC_VER)
     __try {
-# if !defined(_MT)
-        _free_osfhnd(fd);
-# endif /* !_MT */
 #endif /* _MSC_VER */
         close(fd);
 #if defined(_MSC_VER)

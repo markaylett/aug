@@ -41,7 +41,8 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 check_PROGRAMS = augsyspp-test$(EXEEXT) \
-	augsyspp-exceptiontest$(EXEEXT) augsyspp-smartptrtest$(EXEEXT)
+	augsyspp-exceptiontest$(EXEEXT) augsyspp-mplexertest$(EXEEXT) \
+	augsyspp-smartptrtest$(EXEEXT)
 subdir = src/cpp/augsyspp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -61,6 +62,11 @@ libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
 am_augsyspp_exceptiontest_OBJECTS = exceptiontest.$(OBJEXT)
 augsyspp_exceptiontest_OBJECTS = $(am_augsyspp_exceptiontest_OBJECTS)
 augsyspp_exceptiontest_DEPENDENCIES =  \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+am_augsyspp_mplexertest_OBJECTS = mplexertest.$(OBJEXT)
+augsyspp_mplexertest_OBJECTS = $(am_augsyspp_mplexertest_OBJECTS)
+augsyspp_mplexertest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_augsyspp_smartptrtest_OBJECTS = smartptrtest.$(OBJEXT)
@@ -84,9 +90,11 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugsyspp_la_SOURCES) $(augsyspp_exceptiontest_SOURCES) \
+	$(augsyspp_mplexertest_SOURCES) \
 	$(augsyspp_smartptrtest_SOURCES) $(augsyspp_test_SOURCES)
 DIST_SOURCES = $(libaugsyspp_la_SOURCES) \
 	$(augsyspp_exceptiontest_SOURCES) \
+	$(augsyspp_mplexertest_SOURCES) \
 	$(augsyspp_smartptrtest_SOURCES) $(augsyspp_test_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -272,6 +280,7 @@ libaugsyspp_la_LIBADD = \
 TESTS = \
 	augsyspp-test \
 	augsyspp-exceptiontest \
+	augsyspp-mplexertest \
 	augsyspp-smartptrtest
 
 augsyspp_test_SOURCES = test.cpp
@@ -281,6 +290,11 @@ augsyspp_test_LDADD = \
 
 augsyspp_exceptiontest_SOURCES = exceptiontest.cpp
 augsyspp_exceptiontest_LDADD = \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+augsyspp_mplexertest_SOURCES = mplexertest.cpp
+augsyspp_mplexertest_LDADD = \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
@@ -343,6 +357,9 @@ clean-checkPROGRAMS:
 augsyspp-exceptiontest$(EXEEXT): $(augsyspp_exceptiontest_OBJECTS) $(augsyspp_exceptiontest_DEPENDENCIES) 
 	@rm -f augsyspp-exceptiontest$(EXEEXT)
 	$(CXXLINK) $(augsyspp_exceptiontest_LDFLAGS) $(augsyspp_exceptiontest_OBJECTS) $(augsyspp_exceptiontest_LDADD) $(LIBS)
+augsyspp-mplexertest$(EXEEXT): $(augsyspp_mplexertest_OBJECTS) $(augsyspp_mplexertest_DEPENDENCIES) 
+	@rm -f augsyspp-mplexertest$(EXEEXT)
+	$(CXXLINK) $(augsyspp_mplexertest_LDFLAGS) $(augsyspp_mplexertest_OBJECTS) $(augsyspp_mplexertest_LDADD) $(LIBS)
 augsyspp-smartptrtest$(EXEEXT): $(augsyspp_smartptrtest_OBJECTS) $(augsyspp_smartptrtest_DEPENDENCIES) 
 	@rm -f augsyspp-smartptrtest$(EXEEXT)
 	$(CXXLINK) $(augsyspp_smartptrtest_LDFLAGS) $(augsyspp_smartptrtest_OBJECTS) $(augsyspp_smartptrtest_LDADD) $(LIBS)
@@ -367,6 +384,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexertest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/null.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartfd.Plo@am__quote@

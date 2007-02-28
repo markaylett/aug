@@ -56,11 +56,13 @@ libaugsyspp_la_LIBADD = \
 check_PROGRAMS = \
 	augsyspp-test \
 	augsyspp-exceptiontest \
+	augsyspp-mplexertest \
 	augsyspp-smartptrtest
 
 TESTS = \
 	augsyspp-test \
 	augsyspp-exceptiontest \
+	augsyspp-mplexertest \
 	augsyspp-smartptrtest
 
 augsyspp_test_SOURCES = test.cpp
@@ -70,6 +72,11 @@ augsyspp_test_LDADD = \
 
 augsyspp_exceptiontest_SOURCES = exceptiontest.cpp
 augsyspp_exceptiontest_LDADD = \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+augsyspp_mplexertest_SOURCES = mplexertest.cpp
+augsyspp_mplexertest_LDADD = \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 

@@ -54,6 +54,21 @@ namespace {
                 throw error("invalid error description");
         }
     }
+
+    void
+    rethrowtest()
+    {
+        try {
+            try {
+                throw basic_error<AUG_SRCUSER>(__FILE__, __LINE__, 1, "test");
+            } catch (...) {
+                throw;
+            }
+        } catch (const aug::errinfo_error& e) {
+            if (0 != strcmp("test", errdesc(e)))
+                throw error("invalid error description");
+        }
+    }
 }
 
 int
@@ -93,6 +108,7 @@ main(int argc, char* argv[])
             throw error("returned const pointer differs from original");
 
         throwtest();
+        rethrowtest();
         return 0;
 
     } AUG_PERRINFOCATCH;
