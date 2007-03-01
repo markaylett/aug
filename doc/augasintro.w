@@ -126,6 +126,7 @@ struct echoserv : basic_serv {@/
 @<cleanup on disconnect@>@/
 @<process data@>@/
 @<handle timer expiry@>@/
+@<create service@>@/
 };
 
 @ \AUGAS/ Modules are required to export two library functions, namely
@@ -236,6 +237,15 @@ void
 do_rdexpire(const object& sock, unsigned& ms)
 {
   shutdown(sock);
+}
+
+@ Define the static function required by |basic_factory|.
+
+@<create...@>=
+static serv_base*
+create(const char* sname)
+{
+  return 0 == strcmp(sname, "echo") ? new echoserv() : 0;
 }
 
 @* Build and Install.

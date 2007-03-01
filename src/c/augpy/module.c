@@ -131,12 +131,13 @@ static PyObject*
 getenv_(PyObject* self, PyObject* args)
 {
     const char* name, * value;
+    PyObject* def = Py_None;
 
-    if (!PyArg_ParseTuple(args, "s:getenv", &name))
+    if (!PyArg_ParseTuple(args, "s|O:getenv", &name, &def))
         return NULL;
 
-    if (!(value = augas_getenv(name)))
-        return incret_(Py_None);
+    if (!(value = augas_getenv(name, NULL)))
+        return incret_(def);
 
     return Py_BuildValue("s", value);
 }

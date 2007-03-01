@@ -9,7 +9,7 @@ import log
 # void stop()
 # void post(to, type, user)
 # void dispatch(to, type, user)
-# string getenv(name)
+# string getenv(name, def)
 # string getserv()
 # void shutdown(sock)
 # int tcpconnect(host, serv, user)

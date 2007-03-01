@@ -74,9 +74,9 @@ namespace augas {
     }
 
     inline const char*
-    getenv(const char* name)
+    getenv(const char* name, const char* def = 0)
     {
-        return augas_getenv(name);
+        return augas_getenv(name, def);
     }
 
     inline const augas_serv*
@@ -470,7 +470,25 @@ namespace augas {
         }
     };
 
-    template <typename T>
+    struct nil {
+        static serv_base*
+        create(const char* sname)
+        {
+            return 0;
+        }
+    };
+
+    template <typename headT, typename tailT>
+    struct cons {
+        static serv_base*
+        create(const char* sname)
+        {
+            serv_base* p = headT::create(sname);
+            return p ? p : tailT::create(sname);
+        }
+    };
+
+    template <typename listT>
     struct basic_factory {
         explicit
         basic_factory(const char* module)
@@ -483,7 +501,7 @@ namespace augas {
         {
             augas_writelog(AUGAS_LOGINFO, "creating service: name=[%s]",
                            sname);
-            return new T();
+            return listT::create(sname);
         }
     };
 

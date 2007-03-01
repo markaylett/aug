@@ -326,7 +326,7 @@ namespace augas {
     }
 
     const char*
-    getenv_(const char* name)
+    getenv_(const char* name, const char* def)
     {
         try {
 
@@ -337,7 +337,7 @@ namespace augas {
             if (!value)
                 value = getenv(name);
 
-            return value;
+            return value ? value : def;
 
         } AUG_SETERRINFOCATCH;
         return 0;

@@ -147,6 +147,7 @@ struct augas_host {
     /**
        \brief Read a configuration value.
        \param name TODO
+       \param def TODO
        \return TODO
        \sa TODO
 
@@ -154,7 +155,7 @@ struct augas_host {
        attempt will be made to read the value from the environment table.
     */
 
-    const char* (*getenv_)(const char* name);
+    const char* (*getenv_)(const char* name, const char* def);
 
     /**
        \brief Get the active service.

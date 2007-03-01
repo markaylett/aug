@@ -3,7 +3,6 @@ from cgi import *
 from urllib import *
 import log
 
-
 # post(), dispatch()
 
 def stop():

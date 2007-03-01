@@ -37,7 +37,7 @@ namespace {
         }
     };
 
-    struct client : basic_serv {
+    struct benchserv : basic_serv {
         unsigned conns_;
         bool
         do_start(const char* sname)
@@ -73,13 +73,18 @@ namespace {
             state& s(*sock.user<state>());
             tokenise(buf, buf + size, s.tok_, '\n', eachline(sock));
         }
-        client()
+        benchserv()
             : conns_(0)
         {
         }
+        static serv_base*
+        create(const char* sname)
+        {
+            return new benchserv();
+        }
     };
 
-    typedef basic_module<basic_factory<client> > module;
+    typedef basic_module<basic_factory<benchserv> > module;
 }
 
 AUGAS_MODULE(module::init, module::term)

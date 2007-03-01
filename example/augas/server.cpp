@@ -23,7 +23,7 @@ namespace {
         }
     };
 
-    struct serv : basic_serv {
+    struct echoserv : basic_serv {
         bool
         do_start(const char* sname)
         {
@@ -59,9 +59,14 @@ namespace {
         {
             shutdown(sock);
         }
+        static serv_base*
+        create(const char* sname)
+        {
+            return new echoserv();
+        }
     };
 
-    typedef basic_module<basic_factory<serv> > module;
+    typedef basic_module<basic_factory<echoserv> > module;
 }
 
 AUGAS_MODULE(module::init, module::term)

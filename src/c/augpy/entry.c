@@ -38,10 +38,10 @@ setpath_(void)
     const char* s;
     PyObject* sys;
 
-    if ((s = augas_getenv("rundir")))
+    if ((s = augas_getenv("rundir", NULL)))
         chdir(s);
 
-    if (!(s = augas_getenv("module.augpy.pythonpath")))
+    if (!(s = augas_getenv("module.augpy.pythonpath", NULL)))
         s = "bin";
     else
         augas_writelog(AUGAS_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
