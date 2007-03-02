@@ -51,10 +51,6 @@ retain_(void)
 
 #define BLOCKSIZE_ 256
 
-#if defined(_MSC_VER) && !defined(_MT)
-_CRTIMP int __cdecl _free_osfhnd(int);
-#endif /* _MSC_VER && !_MT */
-
 struct file_ {
     size_t refs_;
     const struct aug_driver* driver_;
