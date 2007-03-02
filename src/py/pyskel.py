@@ -58,7 +58,7 @@ def stop():
 
 def start(sname):
     log.debug("start(): %s" % sname)
-    tcplisten("0.0.0.0", getenv("session.pyskel.serv"), None)
+    tcplisten("0.0.0.0", getenv("service.pyskel.serv"), None)
 
 def reconf():
     log.debug("reconf()")
