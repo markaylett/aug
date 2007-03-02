@@ -1,5 +1,7 @@
 #include "augaspp.hpp"
 
+#include "augsyspp.hpp"
+
 using namespace augas;
 using namespace std;
 
@@ -9,10 +11,11 @@ namespace {
 
     struct state {
         string tok_;
-        unsigned sent_, recvd_;
-        state()
-            : sent_(0),
-              recvd_(0)
+        unsigned tosend_, torecv_;
+        explicit
+        state(int echos)
+            : tosend_(echos),
+              torecv_(echos)
         {
         }
     };
@@ -28,44 +31,69 @@ namespace {
         operator ()(std::string& tok)
         {
             state& s(*sock_.user<state>());
-            if (1000 == ++s.recvd_)
+            if (0 == --s.torecv_)
                 shutdown(sock_);
-            else if (s.sent_ < 1000) {
+            else if (0 < s.tosend_--)
                 send(sock_, MSG, sizeof(MSG) - 1);
-                ++s.sent_;
-            }
         }
     };
 
     struct benchserv : basic_serv {
-        unsigned conns_;
+        unsigned conns_, estab_, echos_;
+        timeval start_;
         bool
         do_start(const char* sname)
         {
             writelog(AUGAS_LOGINFO, "starting...");
-            const char* host = augas::getenv("service.bench.host");
-            if (!host)
-                host = "localhost";
+
             const char* serv = augas::getenv("service.bench.serv");
             if (!serv)
                 return false;
-            for (; conns_ < 100; ++conns_)
-                tcpconnect(host, serv, new state());
+
+            const char* host = augas::getenv("service.bench.host",
+                                             "localhost");
+            conns_ = atoi(augas::getenv("service.bench.conns", "100"));
+            echos_ = atoi(augas::getenv("service.bench.echos", "1000"));
+
+            augas_writelog(AUGAS_LOGINFO, "host: %s", host);
+            augas_writelog(AUGAS_LOGINFO, "serv: %s", serv);
+            augas_writelog(AUGAS_LOGINFO, "conns: %d", conns_);
+            augas_writelog(AUGAS_LOGINFO, "echos: %d", echos_);
+
+            aug::gettimeofday(start_);
+
+            for (; estab_ < conns_; ++estab_)
+                tcpconnect(host, serv, new state(echos_));
             return true;
         }
         void
         do_closed(const object& sock)
         {
             delete sock.user<state>();
-            if (0 == --conns_)
-                stopall();
+            if (0 < --estab_)
+                return;
+
+            timeval tv;
+            aug::gettimeofday(tv);
+            aug::tvsub(tv, start_);
+            double ms(static_cast<double>(aug::tvtoms(tv)));
+
+            augas_writelog(AUGAS_LOGINFO, "total time: %f ms", ms);
+
+            ms /= static_cast<double>(conns_);
+            augas_writelog(AUGAS_LOGINFO, "per conn: %f ms", ms);
+
+            ms /= static_cast<double>(echos_);
+            augas_writelog(AUGAS_LOGINFO, "echos per sec: %f", 1000.0 / ms);
+
+            stopall();
         }
         void
         do_connected(object& sock, const char* addr, unsigned short port)
         {
             state& s(*sock.user<state>());
             send(sock, MSG, sizeof(MSG) - 1);
-            ++s.sent_;
+            --s.tosend_;
         }
         void
         do_data(const object& sock, const char* buf, size_t size)
@@ -74,7 +102,8 @@ namespace {
             tokenise(buf, buf + size, s.tok_, '\n', eachline(sock));
         }
         benchserv()
-            : conns_(0)
+            : conns_(0),
+              estab_(0)
         {
         }
         static serv_base*

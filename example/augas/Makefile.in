@@ -57,7 +57,7 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(moddir)" "$(DESTDIR)$(exampledir)"
 modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
-modclient_la_DEPENDENCIES =
+modclient_la_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_modclient_la_OBJECTS = client.lo
 modclient_la_OBJECTS = $(am_modclient_la_OBJECTS)
 modminimal_la_DEPENDENCIES =
@@ -230,7 +230,9 @@ mod_LTLIBRARIES = \
 
 modclient_la_SOURCES = client.cpp
 modclient_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
-modclient_la_LIBADD = 
+modclient_la_LIBADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
 modminimal_la_SOURCES = minimal.c
 modminimal_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modminimal_la_LIBADD = 

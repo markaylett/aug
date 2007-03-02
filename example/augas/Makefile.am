@@ -20,7 +20,8 @@ mod_LTLIBRARIES = \
 
 modclient_la_SOURCES = client.cpp
 modclient_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
-modclient_la_LIBADD =
+modclient_la_LIBADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 modminimal_la_SOURCES = minimal.c
 modminimal_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined

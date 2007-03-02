@@ -4,11 +4,15 @@
 \def\AUG/{{\sc AUG}}
 \def\AUGAS/{{\sc AUGAS}}
 \def\CYGWIN/{{\sc CYGWIN}}
+\def\IPV6/{{\sc IPv6}}
 \def\GNU/{{\sc GNU}}
 \def\LINUX/{{\sc LINUX}}
+\def\MINGW/{{\sc MINGW}}
+\def\MSVC/{{\sc MSVC}}
 \def\POP3/{{\sc POP3}}
 \def\PYTHON/{{\sc PYTHON}}
 \def\SMTP/{{\sc SMTP}}
+\def\UNIX/{{\sc UNIX}}
 \def\WINDOWS/{{\sc WINDOWS}}
 
 @s std int @s string int
@@ -25,22 +29,34 @@
 @f line normal
 
 @* Introduction.
-\AUGAS/ is an Open Source, Network Application Server written in
-\CEE//\CPLUSPLUS/.  It is part of the \pdfURL{\AUG/ project}
-{http://aug.sourceforge.net}, and has been ported to a number of OSes
-including \LINUX/ and \WINDOWS/.  \AUGAS/ runs natively on \WINDOWS/; it does
-not require a porting layer, such as \CYGWIN/, to run.  Dependencies are kept
-to a minimum.
+\AUGAS/ is an Open Source, Application Server written in \CEE/\AM\CPLUSPLUS/.
+ It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net} which
+is available for \LINUX/, \WINDOWS/ and \UNIX/.  On \WINDOWS/, \AUGAS/ does
+not require a porting layer, such as \CYGWIN/, to run.  \AUGAS/ also includes
+support for:
 
-@ Threads are often forced upon an application by APIs that use a blocking
-mode of operation.  The application must then introduce threads to effectively
-bypass the blockage.  If these threads are allowed to reach into other areas
-of the application, complexity, resource contention and the risk of deadlocks
-will increase.
+\yskip
+\item{$\bullet$} \IPV6/;
+\item{$\bullet$} non-blocking IO;
+\item{$\bullet$} \MINGW/ and \MSVC/;
+\item{$\bullet$} plug-in modules;
+\item{$\bullet$} \PYTHON/.
+
+\bigskip\noindent
+This document is a brief introduction to building and installing \AUGAS/
+modules.  For further information, please visit the \pdfURL{\AUG/ home
+page}{http://aug.sourceforge.net} or email myself, \pdfURL{Mark
+Aylett}{mailto:mark@@emantic.co.uk}.
+
+@* Design Principles.
+Threads are often forced upon an application by APIs that perform blocking
+operations; threads are introduced to bypass the blockage.  If these threads
+are allowed to extend into other areas of the application, complexity,
+resource contention and the risk of deadlocks will increase.
 
 \bigskip\noindent
 Threads are best suited to processing, not waiting.  Where possible, they
-should be used to improve parallelisation on multi-processor machines.
+should be used to improve CPU utilisation on multi-processor machines.
 
 \bigskip\noindent
 Using non-blocking IO, a single thread can be dedicated to waiting for, and
@@ -84,7 +100,7 @@ command window:
 \.{C:\\> augasd -f augasd.conf start}
 
 @* Sample Module.
-In the sections below, a Module is built in \CPLUSPLUS/ that:
+In the sections below, a Module is constructed in \CPLUSPLUS/ that:
 
 \yskip
 \item{$\bullet$} exposes a TCP service;
@@ -93,7 +109,9 @@ In the sections below, a Module is built in \CPLUSPLUS/ that:
 \item{$\bullet$} disconnects inactive clients.
 
 \bigskip\noindent
-The basic outline of the Module is:
+
+The module is implemented in a single source file.  The layout of this file
+is:
 
 @c
 @<include headers@>@;
@@ -293,9 +311,5 @@ on \WINDOWS/, and |so| otherwise:
 
 \yskip
 \.{module.sample.path = ./modsample}
-
-@ For further information, please visit the \pdfURL{\AUG/ home
-page}{http://aug.sourceforge.net} or email myself, \pdfURL{Mark
-Aylett}{mailto:mark@@emantic.co.uk}.
 
 @* Index.
