@@ -109,8 +109,7 @@ In the sections below, a Module is constructed in \CPLUSPLUS/ that:
 \item{$\bullet$} disconnects inactive clients.
 
 \bigskip\noindent
-
-The module is implemented in a single source file.  The layout of this file
+The Module is implemented in a single source file.  The layout of this file
 is:
 
 @c
@@ -121,20 +120,21 @@ namespace {@/
 @<declare export table@>
 
 @ The \.{<augaspp.hpp>} header provides a set of utiliy functions and classes
-designed to facilitate Module implementations in \CPLUSPLUS/.  Modules can,
-however, just as easily be written in \CEE/.  A \CEE/ implementation would use
-the \.{<augas.h>} header.  For convenience, names are imported from the
-|augas| and |std| namespaces.
+designed for Module implementations in \CPLUSPLUS/.  Modules can, however,
+just as easily be written in \CEE/.  A \CEE/ implementation would use the
+\.{<augas.h>} header.  For convenience, names are imported from the |augas|
+and |std| namespaces.
 
 @<include...@>=
 #include <augaspp.hpp>@/
 using namespace augas;@/
 using namespace std;
 
-@ The |echoline| functor is defined to handle each line received from the
-client.  \CPLUSPLUS/ Services implement the |serv_base| interface.  Stub
+@ The |echoline| functor handles each line received from the client.
+\CPLUSPLUS/ Services implement the |serv_base| interface.  Stub
 implementations to most of |serv_base|'s pure virtual functions are provided
-by |basic_serv|.  For simplicity, |echoserv| is derived from |basic_serv|.
+by the |basic_serv| class.  For simplicity, |echoserv| is derived from
+|basic_serv|.
 
 @<implement...@>=
 @<echoline functor@>@;
@@ -148,14 +148,13 @@ struct echoserv : basic_serv {@/
 };
 
 @ \AUGAS/ Modules are required to export two library functions, namely
-|augas_init()| and |augas_term()|.
+|augas_init()| and |augas_term()|.  |echoserv| is fed into class templates
+which simplify the \CEE/ to \CPLUSPLUS/ translation.  The |basic_factory|
+template is intended for use by Modules that provide a single Service.  The
+|AUGAS_MODULE| macro defines the export functions.
 
-The |serv_base| derived type, |echoserv| in this case, is fed into class
-templates which deal with the \CEE/ to \CPLUSPLUS/ translation.  The
-|basic_factory| template is intended for use by Modules that provide a single
-Service.  The |AUGAS_MODULE| macro defines the export functions.
-
-@<declare...@>= typedef basic_module<basic_factory<echoserv> > sample;@/
+@<declare...@>=
+typedef basic_module<basic_factory<echoserv> > sample;@/
 AUGAS_MODULE(sample::init, sample::term)
 
 @ Each time the |echoline| functor is called, a response is prepared and sent
@@ -178,9 +177,9 @@ struct echoline {
 };
 
 @ White-space, including any carriage-returns, are trimmed from the input
-line.  The response is then prepared by converting the line to upper-case and
-appending a CR/LF pair.  This end-of-line sequence is commonly used by
-text-based, network protocols such as \POP3/ and \SMTP/.
+line.  Then, the response is prepared by converting the line to upper-case and
+appending a CR/LF pair.  This end-of-line sequence is common in text-based,
+network protocols such as \POP3/ and \SMTP/.
 
 @<prepare...@>=
 trim(line);
@@ -205,11 +204,12 @@ do_start(const char* sname)
   return true;
 }
 
-@ The |setuser()| function binds an opaque, user-defined value to an \AUGAS/
-object.  Here, A |string| buffer is assigned to track incomplete line data
-received from the client.  An initial, {\sc ``HELLO''} message is sent to the
-client.  The call to |setrwtimer()| establishes a timer that will expire when
-there has been no read activity on the |sock| object for a period of 15
+@ The |do_accept()| function is called when a new client connection is
+accepted.  The |setuser()| function binds an opaque, user-defined value to an
+\AUGAS/ object.  Here, A |string| buffer is assigned to track incomplete line
+data received from the client.  An initial, {\sc ``HELLO''} message is sent to
+the client.  The call to |setrwtimer()| establishes a timer that will expire
+when there has been no read activity on the |sock| object for a period of 15
 seconds or more.  \AUGAS/ will automatically reset the timer when read
 activity occurs.
 
@@ -232,10 +232,11 @@ do_closed(const object& sock)
   delete sock.user<string>();
 }
 
-@ The |tok| reference is bound to the |string| buffer used to store incomplete
-lines between calls to |do_data|.  The |tokenise()| function appends new data
-to the back of |tok|.  Each complete line is processed by the |echoline|
-functor before |tok| is cleared.
+@ |do_data()| is called whenever new data is received from a client.  The
+|tok| reference is bound to the |string| buffer used to store incomplete lines
+between calls to |do_data|.  The |tokenise()| function appends new data to the
+back of |tok|.  Each complete line is processed by the |echoline| functor
+before |tok| is cleared.
 
 @<process data...@>=
 void
@@ -245,10 +246,11 @@ do_data(const object& sock, const char* buf, size_t size)
   tokenise(buf, buf + size, tok, '\n', echoline(sock));
 }
 
-@ If no data arrives for 15 seconds, the connection is shutdown.  The
-|shutdown()| function sends a FIN packet after ensuring that all buffered data
-has been flushed.  \AUGAS/ ensures that any inflight messages sent by the client
-are still delivered to the Service.
+@ Read-timer expiry is communicated using the |do_rdexpire()| function.  If no
+data arrives for 15 seconds, the connection is shutdown.  The |shutdown()|
+function sends a FIN packet after ensuring that all buffered data has been
+flushed.  \AUGAS/ ensures that any inflight messages sent by the client are
+still delivered to the Service.
 
 @<handle timer...@>=
 void
@@ -257,7 +259,8 @@ do_rdexpire(const object& sock, unsigned& ms)
   shutdown(sock);
 }
 
-@ Define the static function required by |basic_factory|.
+@ The |basic_factory| template requires that Service classes define a static
+|create()| function.
 
 @<create...@>=
 static serv_base*
@@ -267,28 +270,38 @@ create(const char* sname)
 }
 
 @* Build and Install.
+
 The \AUG/ package includes a \GNU/ makefile, named \.{aug.mk}, that can be
 used to build Modules.  Simple Modules do not have any link-time dependencies;
 all dependencies are injected into the Module when the Module is initialised.
+Here is the complete \.{Makefile}:
 
-@ First, assign a list of \CPLUSPLUS/ Modules to the |CXXMODULES| variable:
+\yskip
+\.{CXXFLAGS = -I\$(AUG\_HOME)/include}
+
+\.{CXXMODULES = modsample}
+
+\.{modsample\_OBJS = modsample.o}
+
+\.{include \DS(AUG_HOME)/etc/aug.mk}
+
+@ First, the list of \CPLUSPLUS/ Modules to build are assigned to the
+|CXXMODULES| variable:
 
 \yskip
 \.{CXXMODULES = modsample}
 
 \bigskip\noindent
-Each Module can specify a list of |OBJS| and |LIBS|, as follows:
+Each Module can specify a list of |OBJS| and |LIBS|:
 
 \yskip
 \.{modsample\_OBJS = modsample.o}
-
-\.{modsample\_LIBS = m}
 
 \bigskip\noindent
 Finally, include the template makefile:
 
 \yskip
-\.{include aug.mk}
+\.{include \DS(AUG_HOME)/etc/aug.mk}
 
 @ To configure the new Module, first add the name of the Service to the
 ``services'' property in the \.{augasd.conf} file:
