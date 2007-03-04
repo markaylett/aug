@@ -56,6 +56,14 @@ namespace {
 void
 manager::insert(const string& name, const servptr& serv, const char* groups)
 {
+    // The service's start() function may callback into the host.  All state
+    // will, therefore, need to be configured prior to calling start().  If
+    // start() fails then the state changes will need to be rolled-back.  The
+    // temp_ container is used to store the groups that need to be removed on
+    // failure.
+
+    // The implementation is simplified by adding the service name as a group.
+
     temp_.insert(make_pair(name, serv));
 
     if (groups) {
@@ -203,6 +211,8 @@ manager::send(mplexer& mplexer, augas_id cid, const char* buf, size_t size)
 void
 manager::teardown()
 {
+    // Ids are stored in reverse order using the the greater<> predicate.
+
     idtofd::iterator rit(idtofd_.begin()), rend(idtofd_.end());
     while (rit != rend) {
 
@@ -275,6 +285,8 @@ manager::getservs(vector<servptr>& servs, const string& group) const
 
     for (; its.first != its.second; ++its.first)
         servs.push_back(its.first->second);
+
+    // Include any groups in the temporary container.
 
     its = temp_.equal_range(group);
 

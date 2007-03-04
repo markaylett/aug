@@ -270,7 +270,6 @@ create(const char* sname)
 }
 
 @* Build and Install.
-
 The \AUG/ package includes a \GNU/ makefile, named \.{aug.mk}, that can be
 used to build Modules.  Simple Modules do not have any link-time dependencies;
 all dependencies are injected into the Module when the Module is initialised.
@@ -283,7 +282,7 @@ Here is the complete \.{Makefile}:
 
 \.{modsample\_OBJS = modsample.o}
 
-\.{include \DS(AUG_HOME)/etc/aug.mk}
+\.{include \$(AUG\_HOME)/etc/aug.mk}
 
 @ First, the list of \CPLUSPLUS/ Modules to build are assigned to the
 |CXXMODULES| variable:
@@ -301,7 +300,7 @@ Each Module can specify a list of |OBJS| and |LIBS|:
 Finally, include the template makefile:
 
 \yskip
-\.{include \DS(AUG_HOME)/etc/aug.mk}
+\.{include \$(AUG\_HOME)/etc/aug.mk}
 
 @ To configure the new Module, first add the name of the Service to the
 ``services'' property in the \.{augasd.conf} file:
