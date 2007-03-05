@@ -419,12 +419,12 @@ main(int argc, char* argv[])
         config_,
         init_,
         run_,
-        term_,
-        AUG_VARNULL
+        term_
     };
+    struct aug_var arg = AUG_VARNULL;
 
     program_ = argv[0];
     service_ = &service;
     aug_atexitinit(&errinfo);
-    return aug_main(&service, argc, argv);
+    return aug_main(argc, argv, &service, &arg);
 }

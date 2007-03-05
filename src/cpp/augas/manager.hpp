@@ -57,7 +57,7 @@ namespace augas {
              const augas_host& host);
 
         bool
-        send(aug::mplexer& mplexer, augas_id cid, const char* buf,
+        send(aug::mplexer& mplexer, augas_id cid, const void* buf,
              size_t size);
 
         void

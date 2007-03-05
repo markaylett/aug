@@ -118,6 +118,9 @@
 				RelativePath="..\src\cpp\augnetpp\file.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augnetpp\http.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augnetpp\inet.cpp">
 			</File>
 		</Filter>
@@ -133,6 +136,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\file.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augnetpp\http.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\inet.hpp">

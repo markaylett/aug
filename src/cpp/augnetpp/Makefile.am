@@ -5,6 +5,7 @@ modinclude_HEADERS = \
 	config.hpp \
 	connector.hpp \
 	file.hpp \
+	http.hpp \
 	inet.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -13,6 +14,7 @@ libaugnetpp_la_SOURCES = \
 	config.cpp \
 	connector.cpp \
 	file.cpp \
+	http.cpp \
 	inet.cpp
 
 libaugnetpp_la_LDFLAGS = \

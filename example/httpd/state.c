@@ -36,7 +36,7 @@ struct aug_state_ {
     } in_;
     struct {
         struct aug_messages pending_;
-        aug_strbuf_t header_;     /* Current, formatted header. */
+        aug_strbuf_t header_;   /* Current, formatted header. */
         struct iovec iovec_[2]; /* Header and body. */
         struct aug_buf buf_;
     } out_;
@@ -101,7 +101,7 @@ prepare_(aug_state_t state)
 }
 
 static void
-setinitial_(const struct aug_var* arg, const char* initial)
+initial_(const struct aug_var* arg, const char* initial)
 {
     aug_state_t state = aug_getvarp(arg);
     if (!state->in_.initial_)
@@ -110,7 +110,7 @@ setinitial_(const struct aug_var* arg, const char* initial)
 }
 
 static void
-setfield_(const struct aug_var* arg, const char* name, const char* value)
+field_(const struct aug_var* arg, const char* name, const char* value)
 {
     aug_state_t state = aug_getvarp(arg);
     struct aug_field field;
@@ -125,7 +125,7 @@ setfield_(const struct aug_var* arg, const char* name, const char* value)
 }
 
 static void
-setcsize_(const struct aug_var* arg, unsigned csize)
+csize_(const struct aug_var* arg, unsigned csize)
 {
     aug_state_t state = aug_getvarp(arg);
     if (!state->in_.mar_)
@@ -172,10 +172,10 @@ end_(const struct aug_var* arg, int commit)
     }
 }
 
-const struct aug_httphandlers handlers_ = {
-    setinitial_,
-    setfield_,
-    setcsize_,
+const struct aug_httphandler handler_ = {
+    initial_,
+    field_,
+    csize_,
     cdata_,
     end_
 };
@@ -194,7 +194,7 @@ aug_createstate(aug_request_t request, const struct aug_var* arg)
     state->request_ = request;
     aug_setvar(&state->arg_, arg);
     if (!(state->in_.parser_
-          = aug_createhttpparser(AUG_MAXLINE, &handlers_,
+          = aug_createhttpparser(AUG_MAXLINE, &handler_,
                                  aug_setvarp(&local, state, NULL))))
         goto fail;
 

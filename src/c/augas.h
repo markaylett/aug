@@ -212,7 +212,7 @@ struct augas_host {
        the connection has been established.
     */
 
-    int (*send_)(augas_id cid, const char* buf, size_t size);
+    int (*send_)(augas_id cid, const void* buf, size_t size);
 
     /**
        \brief TODO
@@ -371,7 +371,7 @@ struct augas_module {
        \sa TODO
     */
 
-    void (*data_)(const struct augas_object* sock, const char* buf,
+    void (*data_)(const struct augas_object* sock, const void* buf,
                   size_t size);
 
     /**

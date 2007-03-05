@@ -43,7 +43,7 @@ namespace {
     {
     }
     void
-    data(const augas_object* sock, const char* buf, size_t size)
+    data(const augas_object* sock, const void* buf, size_t size)
     {
     }
     void

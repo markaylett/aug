@@ -9,11 +9,12 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
 
-#include "augsrv/main.h"
-#include "augsrv/types.h"
+#include "augutilpp/var.hpp"
 
 #include "augsys/errno.h"
 #include "augsys/log.h"
+#include "augsrv/main.h"
+#include "augsrv/types.h"
 
 namespace aug {
 
@@ -139,18 +140,17 @@ namespace aug {
     */
 
     inline int
-    main(service_base& service, int argc, char* argv[])
+    main(int argc, char* argv[], service_base& service)
     {
-        aug_service s = {
+        static const aug_service local = {
             detail::getopt,
             detail::readconf,
             detail::init,
             detail::run,
-            detail::term,
-            { AUG_VTNULL }
+            detail::term
         };
-        aug_setvarp(&s.arg_, &service, 0);
-        return aug_main(&s, argc, argv);
+        var v(&service);
+        return aug_main(argc, argv, &local, cptr(v));
     }
 }
 

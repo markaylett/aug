@@ -117,14 +117,14 @@ namespace augas {
     }
 
     inline void
-    send(augas_id cid, const char* buf, size_t size)
+    send(augas_id cid, const void* buf, size_t size)
     {
         if (AUGAS_ERROR == augas_send(cid, buf, size))
             throw error(augas_error());
     }
 
     inline void
-    send(const augas_object& conn, const char* buf, size_t size)
+    send(const augas_object& conn, const void* buf, size_t size)
     {
         send(conn.id_, buf, size);
     }
@@ -347,7 +347,7 @@ namespace augas {
         do_connected(object& sock, const char* addr, unsigned short port) = 0;
 
         virtual void
-        do_data(const object& sock, const char* buf, size_t size) = 0;
+        do_data(const object& sock, const void* buf, size_t size) = 0;
 
         virtual void
         do_rdexpire(const object& sock, unsigned& ms) = 0;
@@ -399,7 +399,7 @@ namespace augas {
             do_connected(sock, addr, port);
         }
         void
-        data(const object& sock, const char* buf, size_t size)
+        data(const object& sock, const void* buf, size_t size)
         {
             do_data(sock, buf, size);
         }
@@ -448,7 +448,7 @@ namespace augas {
         {
         }
         void
-        do_data(const object& sock, const char* buf, size_t size)
+        do_data(const object& sock, const void* buf, size_t size)
         {
         }
         void
@@ -580,7 +580,7 @@ namespace augas {
             } AUGAS_WRITELOGCATCH;
         }
         static void
-        data(const augas_object* sock, const char* buf,
+        data(const augas_object* sock, const void* buf,
              size_t size) AUGAS_NOTHROW
         {
             try {

@@ -241,7 +241,7 @@ main(int argc, char* argv[])
 
         program_ = argv[0];
 
-        return main(serv, argc, argv);
+        return main(argc, argv, serv);
 
     } catch (const exception& e) {
 

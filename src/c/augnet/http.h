@@ -10,10 +10,10 @@
 
 struct aug_var;
 
-struct aug_httphandlers {
-    void (*setinitial_)(const struct aug_var*, const char*);
-    void (*setfield_)(const struct aug_var*, const char*, const char*);
-    void (*setcsize_)(const struct aug_var*, unsigned);
+struct aug_httphandler {
+    void (*initial_)(const struct aug_var*, const char*);
+    void (*field_)(const struct aug_var*, const char*, const char*);
+    void (*csize_)(const struct aug_var*, unsigned);
     void (*cdata_)(const struct aug_var*, const void*, unsigned);
     void (*end_)(const struct aug_var*, int);
 };
@@ -26,7 +26,7 @@ typedef struct aug_httpparser_* aug_httpparser_t;
 */
 
 AUGNET_API aug_httpparser_t
-aug_createhttpparser(unsigned size, const struct aug_httphandlers* handlers,
+aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
                      const struct aug_var* arg);
 
 AUGNET_API int

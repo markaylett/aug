@@ -110,7 +110,8 @@ uninstall_(void)
 }
 
 AUGSRV_API int
-aug_main(const struct aug_service* service, int argc, char* argv[])
+aug_main(int argc, char* argv[], const struct aug_service* service,
+         const struct aug_var* arg)
 {
     int daemon;
     struct aug_options options;
@@ -118,7 +119,7 @@ aug_main(const struct aug_service* service, int argc, char* argv[])
     if (jmpret)
         return jmpret;
 
-    aug_setservice_(service);
+    aug_setservice_(service, arg);
     if (-1 == aug_readopts(&options, argc, argv))
         return 1;
 

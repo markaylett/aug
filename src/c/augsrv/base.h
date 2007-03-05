@@ -9,7 +9,7 @@
 
 #if defined(AUGSRV_BUILD)
 AUGSRV_EXTERN void
-aug_setservice_(const struct aug_service* service);
+aug_setservice_(const struct aug_service* service, const struct aug_var* arg);
 #endif /* AUGSRV_BUILD */
 
 AUGSRV_API const char*

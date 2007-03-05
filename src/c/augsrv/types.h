@@ -4,7 +4,7 @@
 #ifndef AUGSRV_TYPES_H
 #define AUGSRV_TYPES_H
 
-#include "augutil/var.h"
+struct aug_var;
 
 enum aug_option {
 
@@ -39,7 +39,6 @@ struct aug_service {
     int (*init_)(const struct aug_var*);
     int (*run_)(const struct aug_var*);
     void (*term_)(const struct aug_var*);
-    struct aug_var arg_;
 };
 
 #endif /* AUGSRV_TYPES_H */

@@ -56,7 +56,8 @@ libaugnetpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugnetpp_la_OBJECTS = config.lo connector.lo file.lo inet.lo
+am_libaugnetpp_la_OBJECTS = config.lo connector.lo file.lo http.lo \
+	inet.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
 am_augnetpp_connectortest_OBJECTS = connectortest.$(OBJEXT)
 augnetpp_connectortest_OBJECTS = $(am_augnetpp_connectortest_OBJECTS)
@@ -228,6 +229,7 @@ modinclude_HEADERS = \
 	config.hpp \
 	connector.hpp \
 	file.hpp \
+	http.hpp \
 	inet.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -235,6 +237,7 @@ libaugnetpp_la_SOURCES = \
 	config.cpp \
 	connector.cpp \
 	file.cpp \
+	http.cpp \
 	inet.cpp
 
 libaugnetpp_la_LDFLAGS = \
@@ -340,6 +343,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connectortest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 

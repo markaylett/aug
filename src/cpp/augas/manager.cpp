@@ -198,7 +198,7 @@ manager::load(const char* rundir, const options& options,
 }
 
 bool
-manager::send(mplexer& mplexer, augas_id cid, const char* buf, size_t size)
+manager::send(mplexer& mplexer, augas_id cid, const void* buf, size_t size)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))

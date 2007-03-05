@@ -6,8 +6,9 @@
 
 #include "augnet.h"
 
-#include "augnetpp/file.hpp"
 #include "augnetpp/connector.hpp"
+#include "augnetpp/file.hpp"
+#include "augnetpp/http.hpp"
 #include "augnetpp/inet.hpp"
 
 #endif // AUGNETPP_HPP

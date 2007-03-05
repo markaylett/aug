@@ -7,6 +7,7 @@
 #include "augsrv/config.h"
 
 struct aug_service;
+struct aug_var;
 
 /**
    On Windows, the Service Manager calls the service entry point on a separate
@@ -18,6 +19,7 @@ struct aug_service;
 */
 
 AUGSRV_API int
-aug_main(const struct aug_service* service, int argc, char* argv[]);
+aug_main(int argc, char* argv[], const struct aug_service* service,
+         const struct aug_var* arg);
 
 #endif /* AUGSRV_MAIN_H */

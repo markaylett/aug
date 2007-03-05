@@ -442,7 +442,7 @@ main(int argc, char* argv[])
 
             blocksignals();
             aug_setloglevel(AUG_LOGINFO);
-            return main(serv, argc, argv);
+            return main(argc, argv, serv);
 
         } catch (const errinfo_error& e) {
             perrinfo(e, "aug::errorinfo_error");

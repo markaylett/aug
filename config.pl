@@ -144,8 +144,8 @@ if (is $gcc) {
     $cflags = "$flags";
     $cxxflags = "$flags -Wno-deprecated -Wno-unused-variable";
     if (is $strict) {
-        $cflags = "-Wall -Werror -pedantic $cflags";
-        $cxxflags = "-Wall -Werror -pedantic $cxxflags";
+        $cflags = "-Werror -pedantic $cflags";
+        $cxxflags = "-Werror -pedantic $cxxflags";
     }
 } else {
     $flags = (is $debug) ? '-g' : '-O -DNDEBUG';

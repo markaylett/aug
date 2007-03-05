@@ -415,7 +415,7 @@ connected_(struct augas_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct augas_object* sock, const char* buf, size_t size)
+data_(const struct augas_object* sock, const void* buf, size_t size)
 {
     struct import_* import = augas_getserv()->user_;
     assert(import);

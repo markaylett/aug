@@ -12,14 +12,13 @@ AUGNET_API void
 aug_addbuf(struct aug_buf* buf, size_t num)
 {
     while (buf->size_ && (size_t)buf->iov_->iov_len <= num) {
-        num -= (buf->iov_++)->iov_len;
+        num -= buf->iov_->iov_len;
+        ++buf->iov_;
         --buf->size_;
     }
 
     if (buf->size_ && num) {
-
         buf->iov_->iov_base = (char*)buf->iov_->iov_base + num;
         buf->iov_->iov_len -= (int)num;
-        num = 0;
     }
 }
