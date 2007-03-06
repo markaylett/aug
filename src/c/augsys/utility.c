@@ -17,15 +17,15 @@ static const char rcsid[] = "$Id$";
 AUGSYS_API int
 aug_setnonblock(int fd, int on)
 {
-    const struct aug_driver* driver = aug_getdriver(fd);
-    if (!driver)
+    const struct aug_fdtype* fdtype = aug_getfdtype(fd);
+    if (!fdtype)
         return -1;
 
-    if (!driver->setnonblock_) {
+    if (!fdtype->setnonblock_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_setnonblock() not supported"));
         return -1;
     }
 
-    return driver->setnonblock_(fd, on);
+    return fdtype->setnonblock_(fd, on);
 }

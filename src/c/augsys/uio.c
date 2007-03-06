@@ -12,31 +12,31 @@ static const char rcsid[] = "$Id$";
 AUGSYS_API ssize_t
 aug_readv(int fd, const struct iovec* iov, int size)
 {
-    const struct aug_driver* driver = aug_getdriver(fd);
-    if (!driver)
+    const struct aug_fdtype* fdtype = aug_getfdtype(fd);
+    if (!fdtype)
         return -1;
 
-    if (!driver->readv_) {
+    if (!fdtype->readv_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_readv() not supported"));
         return -1;
     }
 
-    return driver->readv_(fd, iov, size);
+    return fdtype->readv_(fd, iov, size);
 }
 
 AUGSYS_API ssize_t
 aug_writev(int fd, const struct iovec* iov, int size)
 {
-    const struct aug_driver* driver = aug_getdriver(fd);
-    if (!driver)
+    const struct aug_fdtype* fdtype = aug_getfdtype(fd);
+    if (!fdtype)
         return -1;
 
-    if (!driver->writev_) {
+    if (!fdtype->writev_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_writev() not supported"));
         return -1;
     }
 
-    return driver->writev_(fd, iov, size);
+    return fdtype->writev_(fd, iov, size);
 }

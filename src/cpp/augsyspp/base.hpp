@@ -49,14 +49,14 @@ namespace aug {
                                                   aug_strerror(errno)));
     }
     inline void
-    openfd(int fd, const aug_driver* driver)
+    openfd(int fd, const aug_fdtype* fdtype)
     {
-        verify(aug_openfd(fd, driver));
+        verify(aug_openfd(fd, fdtype));
     }
     inline void
-    openfds(int fds[2], const aug_driver* driver)
+    openfds(int fds[2], const aug_fdtype* fdtype)
     {
-        verify(aug_openfds(fds, driver));
+        verify(aug_openfds(fds, fdtype));
     }
     inline void
     releasefd(int fd)
@@ -69,29 +69,29 @@ namespace aug {
         verify(aug_retainfd(fd));
     }
     inline void
-    setdriver(fdref ref, const aug_driver& driver)
+    setfdtype(fdref ref, const aug_fdtype& fdtype)
     {
-        verify(aug_setdriver(ref.get(), &driver));
+        verify(aug_setfdtype(ref.get(), &fdtype));
     }
     inline void
-    setdriver(fdref ref)
+    setfdtype(fdref ref)
     {
-        verify(aug_setdriver(ref.get(), 0));
+        verify(aug_setfdtype(ref.get(), 0));
     }
-    inline const aug_driver&
-    getdriver(fdref ref)
+    inline const aug_fdtype&
+    getfdtype(fdref ref)
     {
-        return *verify(aug_getdriver(ref.get()));
+        return *verify(aug_getfdtype(ref.get()));
     }
-    inline aug_driver&
-    extdriver(aug_driver& derived, const struct aug_driver& base)
+    inline aug_fdtype&
+    extfdtype(aug_fdtype& derived, const struct aug_fdtype& base)
     {
-        return *aug_extdriver(&derived, &base);
+        return *aug_extfdtype(&derived, &base);
     }
-    inline aug_driver&
-    extdriver(aug_driver& derived)
+    inline aug_fdtype&
+    extfdtype(aug_fdtype& derived)
     {
-        return *aug_extdriver(&derived, 0);
+        return *aug_extfdtype(&derived, 0);
     }
 
     class scoped_init {

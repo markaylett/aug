@@ -507,7 +507,7 @@ namespace augas {
 
     template <typename T>
     class basic_module {
-        static T* impl_;
+        static T* factory_;
         static serv_base*
         getbase()
         {
@@ -527,7 +527,7 @@ namespace augas {
         start(augas_serv* serv) AUGAS_NOTHROW
         {
             try {
-                serv->user_ = impl_->create(serv->name_);
+                serv->user_ = factory_->create(serv->name_);
                 return result(getbase()->start(serv->name_));
             } AUGAS_WRITELOGCATCH;
             return AUGAS_ERROR;
@@ -612,7 +612,7 @@ namespace augas {
         static const struct augas_module*
         init(const char* name) AUGAS_NOTHROW
         {
-            static const augas_module module_ = {
+            static const augas_module local = {
                 stop,
                 start,
                 reconf,
@@ -627,21 +627,21 @@ namespace augas {
                 expire
             };
             try {
-                impl_ = new T(name);
-                return &module_;
+                factory_ = new T(name);
+                return &local;
             } AUGAS_WRITELOGCATCH;
             return 0; // Error.
         }
         static void
         term() AUGAS_NOTHROW
         {
-            delete impl_;
-            impl_ = 0;
+            delete factory_;
+            factory_ = 0;
         }
     };
 
     template <typename T>
-    T* basic_module<T>::impl_ = 0;
+    T* basic_module<T>::factory_ = 0;
 
     namespace detail {
         const char SPACE[] = " \t\n\v\f\r";

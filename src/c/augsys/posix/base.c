@@ -76,7 +76,7 @@ setnonblock_(int fd, int on)
     return 0;
 }
 
-static struct aug_driver driver_ = {
+static struct aug_fdtype fdtype_ = {
     close_,
     read_,
     readv_,
@@ -120,8 +120,8 @@ aug_term(void)
     return aug_termlock_();
 }
 
-AUGSYS_API const struct aug_driver*
-aug_posixdriver(void)
+AUGSYS_API const struct aug_fdtype*
+aug_posixfdtype(void)
 {
-    return &driver_;
+    return &fdtype_;
 }

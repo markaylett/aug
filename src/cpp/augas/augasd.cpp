@@ -150,7 +150,7 @@ namespace augas {
     };
 
     auto_ptr<state> state_;
-    const aug_driver* base_(0);
+    const aug_fdtype* base_(0);
 
     int
     extclose_(int fd)
@@ -161,14 +161,14 @@ namespace augas {
     }
 
     void
-    setextdriver_(fdref ref, filecb_base& cb, unsigned short mask)
+    setextfdtype_(fdref ref, filecb_base& cb, unsigned short mask)
     {
         // Override close() function.
 
-        static aug_driver extended = { extclose_, 0, 0, 0, 0, 0 };
+        static aug_fdtype extended = { extclose_, 0, 0, 0, 0, 0 };
         if (!base_) {
-            base_ = &getdriver(ref);
-            extdriver(extended, *base_);
+            base_ = &getfdtype(ref);
+            extfdtype(extended, *base_);
         }
 
         AUG_DEBUG2("adding file to list: fd=[%d]", ref.get());
@@ -176,7 +176,7 @@ namespace augas {
 
         try {
             setioeventmask(state_->mplexer_, ref, mask);
-            setdriver(ref, extended);
+            setfdtype(ref, extended);
         } catch (...) {
             AUG_DEBUG2("removing file from list: fd=[%d]", ref.get());
             removefile(state_->files_, ref);
@@ -389,7 +389,7 @@ namespace augas {
                 // connected() must only be called after this function has
                 // returned.
 
-                setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
+                setextfdtype_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
                 if (state_->connected_.empty()) {
 
                     // Schedule an event to ensure that connected() is called
@@ -404,7 +404,7 @@ namespace augas {
                 state_->connected_.push(cptr);
 
             } else
-                setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
+                setextfdtype_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
 
             si.commit();
             return (int)cptr->id();
@@ -425,7 +425,7 @@ namespace augas {
 
             endpoint ep(null);
             smartfd sfd(tcplisten(host, port, ep));
-            setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
+            setextfdtype_(sfd, state_->cb_, AUG_IOEVENTRD);
 
             inetaddr addr(null);
             AUG_DEBUG2("listening: interface=[%s], port=[%d]",
@@ -624,7 +624,7 @@ namespace augas {
             throw;
         }
 
-        setextdriver_(sfd, state_->cb_, AUG_IOEVENTRD);
+        setextfdtype_(sfd, state_->cb_, AUG_IOEVENTRD);
         setsockopts_(sfd);
         connptr cptr(new augas::servconn(sock.serv(), sock.user(),
                                          state_->timers_, sfd, ep));
@@ -660,7 +660,7 @@ namespace augas {
             // The associated file descriptor may change as connection
             // attempts fail and alternative addresses are tried.
 
-            setextdriver_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
+            setextfdtype_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
             state_->manager_.update(cptr, fd);
 
         } else if (changed)

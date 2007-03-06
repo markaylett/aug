@@ -10,7 +10,7 @@
 struct iovec;
 struct aug_errinfo;
 
-struct aug_driver {
+struct aug_fdtype {
     int (*close_)(int);
     ssize_t (*read_)(int, void*, size_t);
     ssize_t (*readv_)(int, const struct iovec*, int);
@@ -55,10 +55,10 @@ AUGSYS_API int
 aug_nextid(void);
 
 AUGSYS_API int
-aug_openfd(int fd, const struct aug_driver* driver);
+aug_openfd(int fd, const struct aug_fdtype* fdtype);
 
 AUGSYS_API int
-aug_openfds(int fds[2], const struct aug_driver* driver);
+aug_openfds(int fds[2], const struct aug_fdtype* fdtype);
 
 AUGSYS_API int
 aug_releasefd(int fd);
@@ -67,15 +67,15 @@ AUGSYS_API int
 aug_retainfd(int fd);
 
 AUGSYS_API int
-aug_setdriver(int fd, const struct aug_driver* driver);
+aug_setfdtype(int fd, const struct aug_fdtype* fdtype);
 
-AUGSYS_API const struct aug_driver*
-aug_getdriver(int fd);
+AUGSYS_API const struct aug_fdtype*
+aug_getfdtype(int fd);
 
-AUGSYS_API struct aug_driver*
-aug_extdriver(struct aug_driver* derived, const struct aug_driver* base);
+AUGSYS_API struct aug_fdtype*
+aug_extfdtype(struct aug_fdtype* derived, const struct aug_fdtype* base);
 
-AUGSYS_API const struct aug_driver*
-aug_posixdriver(void);
+AUGSYS_API const struct aug_fdtype*
+aug_posixfdtype(void);
 
 #endif /* AUGSYS_BASE_H */

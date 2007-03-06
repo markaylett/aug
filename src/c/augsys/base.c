@@ -53,7 +53,7 @@ retain_(void)
 
 struct file_ {
     size_t refs_;
-    const struct aug_driver* driver_;
+    const struct aug_fdtype* fdtype_;
 };
 
 static struct file_* files_ = NULL;
@@ -92,7 +92,7 @@ zerofiles_(struct file_* begin, size_t n)
     size_t i;
     for (i = 0; n > i; ++i) {
         begin[i].refs_ = 0;
-        begin[i].driver_ = NULL;
+        begin[i].fdtype_ = NULL;
     }
 }
 
@@ -128,7 +128,7 @@ growfiles_(size_t size)
 }
 
 static int
-openfd_(int fd, const struct aug_driver* driver)
+openfd_(int fd, const struct aug_fdtype* fdtype)
 {
     struct file_* file;
 
@@ -150,12 +150,12 @@ openfd_(int fd, const struct aug_driver* driver)
     }
 
     file->refs_ = 1;
-    file->driver_ = driver;
+    file->fdtype_ = fdtype;
     return 0;
 }
 
 static int
-openfds_(int fds[2], const struct aug_driver* driver)
+openfds_(int fds[2], const struct aug_fdtype* fdtype)
 {
     struct file_* first, * second;
     int maxfd = AUG_MAX(fds[0], fds[1]);
@@ -185,10 +185,10 @@ openfds_(int fds[2], const struct aug_driver* driver)
     }
 
     first->refs_ = 1;
-    first->driver_ = driver;
+    first->fdtype_ = fdtype;
 
     second->refs_ = 1;
-    second->driver_ = driver;
+    second->fdtype_ = fdtype;
     return 0;
 }
 
@@ -205,7 +205,7 @@ releasefd_(int fd, struct file_* current)
     memcpy(current, file, sizeof(*current));
 
     if (--file->refs_ == 0)
-        file->driver_ = NULL;
+        file->fdtype_ = NULL;
 
     return 0;
 }
@@ -223,26 +223,26 @@ retainfd_(int fd)
 }
 
 static int
-setdriver_(int fd, const struct aug_driver* driver)
+setfdtype_(int fd, const struct aug_fdtype* fdtype)
 {
     if (size_ <= (size_t)fd || files_[fd].refs_ == 0) {
         setnotreg_(__FILE__, __LINE__, fd);
         return -1;
     }
 
-    files_[fd].driver_ = driver;
+    files_[fd].fdtype_ = fdtype;
     return 0;
 }
 
-static const struct aug_driver*
-getdriver_(int fd)
+static const struct aug_fdtype*
+getfdtype_(int fd)
 {
     if (size_ <= (size_t)fd || 0 == files_[fd].refs_) {
         setnotreg_(__FILE__, __LINE__, fd);
         return NULL;
     }
 
-    return files_[fd].driver_;
+    return files_[fd].fdtype_;
 }
 
 AUGSYS_API int
@@ -286,7 +286,7 @@ aug_nextid(void)
 }
 
 AUGSYS_API int
-aug_openfd(int fd, const struct aug_driver* driver)
+aug_openfd(int fd, const struct aug_fdtype* fdtype)
 {
     int ret;
 
@@ -295,18 +295,18 @@ aug_openfd(int fd, const struct aug_driver* driver)
         return -1;
     }
 
-    if (!driver)
-        driver = aug_posixdriver();
+    if (!fdtype)
+        fdtype = aug_posixfdtype();
 
     aug_lock();
-    ret = openfd_(fd, driver);
+    ret = openfd_(fd, fdtype);
     aug_unlock();
 
     return ret;
 }
 
 AUGSYS_API int
-aug_openfds(int fds[2], const struct aug_driver* driver)
+aug_openfds(int fds[2], const struct aug_fdtype* fdtype)
 {
     int ret;
 
@@ -315,11 +315,11 @@ aug_openfds(int fds[2], const struct aug_driver* driver)
         return -1;
     }
 
-    if (!driver)
-        driver = aug_posixdriver();
+    if (!fdtype)
+        fdtype = aug_posixfdtype();
 
     aug_lock();
-    ret = openfds_(fds, driver);
+    ret = openfds_(fds, fdtype);
     aug_unlock();
 
     return ret;
@@ -345,10 +345,10 @@ aug_releasefd(int fd)
     /* The file structure now contains the state of the file prior to the
        release operation (including ref count). */
 
-    if (1 < file.refs_ || !file.driver_->close_)
+    if (1 < file.refs_ || !file.fdtype_->close_)
         return  0;
 
-    return file.driver_->close_(fd);
+    return file.fdtype_->close_(fd);
 }
 
 AUGSYS_API int
@@ -369,7 +369,7 @@ aug_retainfd(int fd)
 }
 
 AUGSYS_API int
-aug_setdriver(int fd, const struct aug_driver* driver)
+aug_setfdtype(int fd, const struct aug_fdtype* fdtype)
 {
     int ret;
 
@@ -378,20 +378,20 @@ aug_setdriver(int fd, const struct aug_driver* driver)
         return -1;
     }
 
-    if (!driver)
-        driver = aug_posixdriver();
+    if (!fdtype)
+        fdtype = aug_posixfdtype();
 
     aug_lock();
-    ret = setdriver_(fd, driver);
+    ret = setfdtype_(fd, fdtype);
     aug_unlock();
 
     return ret;
 }
 
-AUGSYS_API const struct aug_driver*
-aug_getdriver(int fd)
+AUGSYS_API const struct aug_fdtype*
+aug_getfdtype(int fd)
 {
-    const struct aug_driver* driver;
+    const struct aug_fdtype* fdtype;
 
     if (-1 == fd) {
         setbadfd_(__FILE__, __LINE__);
@@ -399,17 +399,17 @@ aug_getdriver(int fd)
     }
 
     aug_lock();
-    driver = getdriver_(fd);
+    fdtype = getfdtype_(fd);
     aug_unlock();
 
-    return driver;
+    return fdtype;
 }
 
-AUGSYS_API struct aug_driver*
-aug_extdriver(struct aug_driver* derived, const struct aug_driver* base)
+AUGSYS_API struct aug_fdtype*
+aug_extfdtype(struct aug_fdtype* derived, const struct aug_fdtype* base)
 {
     if (!base)
-        base = aug_posixdriver();
+        base = aug_posixfdtype();
 
     if (!derived->close_)
         derived->close_ = base->close_;

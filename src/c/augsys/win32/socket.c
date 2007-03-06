@@ -142,7 +142,7 @@ setnonblock_(int fd, int on)
     return 0;
 }
 
-static struct aug_driver driver_ = {
+static struct aug_fdtype fdtype_ = {
     close_,
     read_,
     readv_,
@@ -161,7 +161,7 @@ tofd_(SOCKET h)
         return -1;
     }
 
-    if (-1 == aug_openfd(fd, &driver_)) {
+    if (-1 == aug_openfd(fd, &fdtype_)) {
         close_(fd);
         return -1;
     }
@@ -188,7 +188,7 @@ tofds_(SOCKET rd, SOCKET wr, int sv[2])
         return -1;
     }
 
-    if (-1 == aug_openfds(local, &driver_)) {
+    if (-1 == aug_openfds(local, &fdtype_)) {
         close_(local[0]);
         close_(local[1]);
         return -1;

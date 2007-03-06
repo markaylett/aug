@@ -33,7 +33,7 @@ aug_pipe(int fds[2])
         return -1;
     }
 
-    if (-1 == aug_openfds(fds, aug_posixdriver())) {
+    if (-1 == aug_openfds(fds, aug_posixfdtype())) {
         close(fds[0]);
         close(fds[1]);
         return -1;
@@ -45,33 +45,33 @@ aug_pipe(int fds[2])
 AUGSYS_API ssize_t
 aug_read(int fd, void* buf, size_t size)
 {
-    const struct aug_driver* driver = aug_getdriver(fd);
-    if (!driver)
+    const struct aug_fdtype* fdtype = aug_getfdtype(fd);
+    if (!fdtype)
         return -1;
 
-    if (!driver->read_) {
+    if (!fdtype->read_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_read() not supported"));
         return -1;
     }
 
-    return driver->read_(fd, buf, size);
+    return fdtype->read_(fd, buf, size);
 }
 
 AUGSYS_API ssize_t
 aug_write(int fd, const void* buf, size_t size)
 {
-    const struct aug_driver* driver = aug_getdriver(fd);
-    if (!driver)
+    const struct aug_fdtype* fdtype = aug_getfdtype(fd);
+    if (!fdtype)
         return -1;
 
-    if (!driver->write_) {
+    if (!fdtype->write_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_write() not supported"));
         return -1;
     }
 
-    return driver->write_(fd, buf, size);
+    return fdtype->write_(fd, buf, size);
 }
 
 AUGSYS_API void
