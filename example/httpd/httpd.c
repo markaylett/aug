@@ -42,7 +42,7 @@ static struct aug_files files_ = AUG_HEAD_INITIALIZER(files_);
 static struct aug_timers timers_ = AUG_HEAD_INITIALIZER(timers_);
 
 static int
-request_(const struct aug_var* arg, const char* initial, aug_mar_t mar,
+request_(const struct aug_var* var, const char* initial, aug_mar_t mar,
          struct aug_messages* messages)
 {
     char buf[64];
@@ -105,10 +105,10 @@ destroyconn_(aug_state_t state, aug_mplexer_t mplexer, int fd)
 }
 
 static int
-conn_(int fd, const struct aug_var* arg, struct aug_files* files)
+conn_(int fd, const struct aug_var* var, struct aug_files* files)
 {
     ssize_t ret;
-    aug_state_t state = aug_getvarp(arg);
+    aug_state_t state = var->ptr_;
     int events = aug_ioevents(mplexer_, fd);
 
     AUG_DEBUG0("checking connection '%d'", fd);
@@ -151,17 +151,17 @@ conn_(int fd, const struct aug_var* arg, struct aug_files* files)
     return 1;
 
  fail:
-    destroyconn_(aug_getvarp(arg), mplexer_, fd);
+    destroyconn_(var->ptr_, mplexer_, fd);
     aug_close(fd);
     return 0;
 }
 
 static int
-listener_(int fd, const struct aug_var* arg, struct aug_files* files)
+listener_(int fd, const struct aug_var* var, struct aug_files* files)
 {
     struct aug_endpoint ep;
     int conn;
-    struct aug_var var;
+    struct aug_var local;
 
     AUG_DEBUG0("checking listener '%d'", fd);
 
@@ -183,19 +183,20 @@ listener_(int fd, const struct aug_var* arg, struct aug_files* files)
         return 1;
     }
 
-    aug_setvarp(&var, createconn_(mplexer_, conn), NULL);
-    if (aug_isnull(&var)) {
+    local.type_ = NULL;
+    local.ptr_ = createconn_(mplexer_, conn);
+    if (!local.ptr_) {
         aug_perrinfo(NULL, "failed to create connection");
         aug_close(conn);
         return 1;
     }
 
-    aug_insertfile(files, conn, conn_, &var);
+    aug_insertfile(files, conn, conn_, &local);
     return 1;
 }
 
 static int
-setconfopt_(const struct aug_var* arg, const char* name, const char* value)
+setconfopt_(void* arg, const char* name, const char* value)
 {
     if (0 == aug_strcasecmp(name, "address")) {
 
@@ -235,7 +236,7 @@ setconfopt_(const struct aug_var* arg, const char* name, const char* value)
 }
 
 static const char*
-getopt_(const struct aug_var* arg, enum aug_option opt)
+getopt_(void* arg, enum aug_option opt)
 {
     switch (opt) {
     case AUG_OPTCONFFILE:
@@ -271,7 +272,7 @@ reconf_(void)
 }
 
 static int
-config_(const struct aug_var* arg, const char* conffile, int daemon)
+config_(void* arg, const char* conffile, int daemon)
 {
     if (conffile) {
         aug_info("reading: %s", conffile);
@@ -296,7 +297,7 @@ config_(const struct aug_var* arg, const char* conffile, int daemon)
 }
 
 static int
-readevent_(int fd, const struct aug_var* arg, struct aug_files* files)
+readevent_(int fd, const struct aug_var* var, struct aug_files* files)
 {
     struct aug_event event;
 
@@ -327,16 +328,16 @@ readevent_(int fd, const struct aug_var* arg, struct aug_files* files)
         quit_ = 1;
         break;
     }
-    aug_destroyvar(&event.arg_);
+    aug_destroyvar(&event.var_);
     return 1;
 }
 
 static int
-init_(const struct aug_var* arg)
+init_(void* arg)
 {
     struct aug_hostserv hs;
     struct aug_endpoint ep;
-    struct aug_var ptr;
+    struct aug_var var;
 
     aug_info("initialising daemon process");
 
@@ -349,11 +350,12 @@ init_(const struct aug_var* arg)
     if (-1 == (fd_ = aug_tcplisten(hs.host_, hs.serv_, &ep)))
         goto fail1;
 
-    if (-1 == aug_insertfile(&files_, fd_, listener_,
-                             aug_setvarp(&ptr, &mplexer_, NULL)))
+    var.type_ = NULL;
+    var.ptr_ = &mplexer_;
+    if (-1 == aug_insertfile(&files_, fd_, listener_, &var))
         goto fail2;
 
-    if (-1 == aug_insertfile(&files_, aug_eventin(), readevent_, &ptr)
+    if (-1 == aug_insertfile(&files_, aug_eventin(), readevent_, &var)
         || -1 == aug_setioeventmask(mplexer_, fd_, AUG_IOEVENTRD)
         || -1 == aug_setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD))
         goto fail3;
@@ -370,7 +372,7 @@ init_(const struct aug_var* arg)
 }
 
 static int
-run_(const struct aug_var* arg)
+run_(void* arg)
 {
     struct timeval timeout;
 
@@ -397,7 +399,7 @@ run_(const struct aug_var* arg)
 }
 
 static void
-term_(const struct aug_var* arg)
+term_(void* arg)
 {
     aug_info("terminating daemon process");
 
@@ -421,10 +423,9 @@ main(int argc, char* argv[])
         run_,
         term_
     };
-    struct aug_var arg = AUG_VARNULL;
 
     program_ = argv[0];
     service_ = &service;
     aug_atexitinit(&errinfo);
-    return aug_main(argc, argv, &service, &arg);
+    return aug_main(argc, argv, &service, NULL);
 }

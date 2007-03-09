@@ -73,7 +73,8 @@ aug_setsigevent(struct aug_event* event, int sig)
     default:
         event->type_ = AUG_EVENTSIGNAL;
     }
-    aug_setvarl(&event->arg_, sig, NULL);
+    event->var_.type_ = NULL;
+    event->var_.ptr_ = (void*)sig;
     return event;
 }
 

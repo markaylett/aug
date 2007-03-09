@@ -10,34 +10,40 @@
 
 static PyTypeObject* type_ = NULL;
 
-static void
-destroy_(void* user)
+static int
+destroy_(void* ptr)
 {
-    Py_DECREF((PyObject*)user);
+    Py_DECREF((PyObject*)ptr);
+    return 0;
 }
+
+static const void*
+buf_(void* ptr, size_t* size)
+{
+    const void* buf;
+    int len;
+
+    if (-1 == PyObject_AsReadBuffer((PyObject*)ptr, &buf, &len)) {
+        if (size)
+            *size = 0;
+        return NULL;
+    }
+
+    if (size)
+        *size = len;
+    return buf;
+}
+
+static const struct augas_vartype vartype_ = {
+    destroy_,
+    buf_
+};
 
 static PyObject*
 incret_(PyObject* x)
 {
     Py_INCREF(x);
     return x;
-}
-
-static struct augas_event*
-setevent_(struct augas_event* event, const char* type, const char* user,
-          int size)
-{
-    strncpy(event->type_, type, sizeof(event->type_));
-    event->type_[AUGAS_MAXNAME] ='\0';
-
-    if (user) {
-        event->user_ = (void*)user;
-        event->size_ = (size_t)size;
-    } else {
-        event->user_ = NULL;
-        event->size_ = 0;
-    }
-    return event;
 }
 
 static PyObject*
@@ -84,42 +90,51 @@ stopall_(PyObject* self, PyObject* args)
 static PyObject*
 post_(PyObject* self, PyObject* args)
 {
-    const char* to, * ename, * user;
-    int size;
-    struct augas_event event;
+    const char* to, * type;
+    PyObject* buf = NULL;
+    struct augas_var var = { NULL, NULL };
 
-    if (!PyArg_ParseTuple(args, "ssz#:post", &to, &ename, &user, &size))
+    if (!PyArg_ParseTuple(args, "ss|O:post", &to, &type, &buf))
         return NULL;
 
-    setevent_(&event, ename, user ? strdup(user) : NULL, size);
+    if (buf && buf != Py_None) {
 
-    if (-1 == augas_post(to, &event, event.user_ ? free : NULL)) {
+        if (!PyObject_CheckReadBuffer(buf)) {
+
+            PyErr_SetString(PyExc_TypeError,
+                            "post() argument 3 must be string or read-only"
+                            " buffer");
+            return NULL;
+        }
+
+        var.type_ = &vartype_;
+        var.ptr_ = buf;
+    }
+
+    if (-1 == augas_post(to, type, &var)) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
 
         PyErr_SetString(PyExc_RuntimeError, augas_error());
-        if (event.user_)
-            free(event.user_);
         return NULL;
     }
 
+    if (buf)
+        Py_INCREF(buf);
     return incret_(Py_None);
 }
 
 static PyObject*
 dispatch_(PyObject* self, PyObject* args)
 {
-    const char* to, * ename, * user;
-    int size;
-    struct augas_event event;
+    const char* to, * type, * user = NULL;
+    int size = 0;
 
-    if (!PyArg_ParseTuple(args, "ssz#:dispatch", &to, &ename, &user, &size))
+    if (!PyArg_ParseTuple(args, "ss|z#:dispatch", &to, &type, &user, &size))
         return NULL;
 
-    setevent_(&event, ename, user, size);
-
-    if (-1 == augas_dispatch(to, &event)) {
+    if (-1 == augas_dispatch(to, type, user, size)) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         return NULL;
     }
@@ -175,10 +190,10 @@ static PyObject*
 tcpconnect_(PyObject* self, PyObject* args)
 {
     const char* host, * serv;
-    PyObject* user, * sock;
+    PyObject* user = NULL, * sock;
     int cid;
 
-    if (!PyArg_ParseTuple(args, "ssO:tcpconnect", &host, &serv, &user))
+    if (!PyArg_ParseTuple(args, "ss|O:tcpconnect", &host, &serv, &user))
         return NULL;
 
     if (!(sock = augpy_createobject(type_, 0, user)))
@@ -198,10 +213,10 @@ static PyObject*
 tcplisten_(PyObject* self, PyObject* args)
 {
     const char* host, * serv;
-    PyObject* user, * sock;
+    PyObject* user = NULL, * sock;
     int lid;
 
-    if (!PyArg_ParseTuple(args, "ssO:tcplisten", &host, &serv, &user))
+    if (!PyArg_ParseTuple(args, "ss|O:tcplisten", &host, &serv, &user))
         return NULL;
 
     if (!(sock = augpy_createobject(type_, 0, user)))
@@ -298,16 +313,20 @@ static PyObject*
 settimer_(PyObject* self, PyObject* args)
 {
     unsigned ms;
-    PyObject* user, * timer;
+    PyObject* user = NULL, * timer;
+    struct augas_var var;
     int tid;
 
-    if (!PyArg_ParseTuple(args, "IO:settimer", &ms, &user))
+    if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &user))
         return NULL;
 
     if (!(timer = augpy_createobject(type_, 0, user)))
         return NULL;
 
-    if (-1 == (tid = augas_settimer(ms, timer, destroy_))) {
+    var.type_ = &vartype_;
+    var.ptr_ = timer;
+
+    if (-1 == (tid = augas_settimer(ms, &var))) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         Py_DECREF(timer);
         return NULL;

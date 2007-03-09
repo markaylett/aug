@@ -86,11 +86,10 @@ namespace aug {
     namespace detail {
 
         inline void
-        timercb(int id, const aug_var* arg, unsigned* ms, aug_timers* timers)
+        timercb(int id, const aug_var* var, unsigned* ms, aug_timers* timers)
         {
             try {
-                timercb_base* ptr = static_cast<
-                    timercb_base*>(aug_getvarp(arg));
+                timercb_base* ptr = static_cast<timercb_base*>(var->ptr_);
                 ptr->callback(id, *ms, *timers);
             } AUG_SETERRINFOCATCH;
         }
@@ -99,9 +98,9 @@ namespace aug {
     inline int
     settimer(aug_timers& timers, idref ref, unsigned ms, timercb_base& cb)
     {
-        var v(&cb);
+        aug_var var = { NULL, &cb };
         return verify(aug_settimer(&timers, ref.get(), ms, detail::timercb,
-                                   cptr(v)));
+                                   &var));
     }
 
     inline bool

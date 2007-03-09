@@ -59,10 +59,11 @@ serv::reconf() const AUG_NOTHROW
 }
 
 void
-serv::event(const char* from, const augas_event& event) const AUG_NOTHROW
+serv::event(const char* from, const char* type, const void* user,
+            size_t size) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
-    module_->event(from, event);
+    module_->event(from, type, user, size);
 }
 
 void

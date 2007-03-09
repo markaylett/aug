@@ -12,7 +12,7 @@ static char conffile_[AUG_PATH_MAX + 1] = "";
 static int daemon_ = 0;
 
 static const char*
-getopt_(const struct aug_var* arg, enum aug_option opt)
+getopt_(void* arg, enum aug_option opt)
 {
     switch (opt) {
     case AUG_OPTCONFFILE:
@@ -32,7 +32,7 @@ getopt_(const struct aug_var* arg, enum aug_option opt)
 }
 
 static int
-config_(const struct aug_var* arg, const char* conffile, int daemon)
+config_(void* arg, const char* conffile, int daemon)
 {
     if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
         return -1;
@@ -42,13 +42,13 @@ config_(const struct aug_var* arg, const char* conffile, int daemon)
 }
 
 static int
-init_(const struct aug_var* arg)
+init_(void* arg)
 {
     return 0;
 }
 
 static int
-run_(const struct aug_var* arg)
+run_(void* arg)
 {
     struct aug_event in = { 1, AUG_VARNULL }, out = { !1, AUG_VARNULL };
 
@@ -65,12 +65,12 @@ run_(const struct aug_var* arg)
         return -1;
     }
 
-    aug_destroyvar(&out.arg_);
+    aug_destroyvar(&out.var_);
     return 0;
 }
 
 static void
-term_(const struct aug_var* arg)
+term_(void* arg)
 {
 }
 
@@ -83,8 +83,7 @@ main(int argc, char* argv[])
         config_,
         init_,
         run_,
-        term_,
-        AUG_VARNULL
+        term_
     };
 
     program_ = argv[0];
@@ -94,5 +93,5 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    return aug_main(&service, argc, argv);
+    return aug_main(argc, argv, &service, NULL);
 }

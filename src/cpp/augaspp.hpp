@@ -60,16 +60,16 @@ namespace augas {
     }
 
     inline void
-    post(const char* to, const augas_event& event, void (*destroy)(void*) = 0)
+    post(const char* to, const char* type, const augas_var& var)
     {
-        if (AUGAS_ERROR == augas_post(to, &event, destroy))
+        if (AUGAS_ERROR == augas_post(to, type, &var))
             throw error(augas_error());
     }
 
     inline void
-    dispatch(const char* to, const augas_event& event)
+    dispatch(const char* to, const char* type, const void* user, size_t size)
     {
-        if (AUGAS_ERROR == augas_dispatch(to, &event))
+        if (AUGAS_ERROR == augas_dispatch(to, type, user, size))
             throw error(augas_error());
     }
 
@@ -179,9 +179,9 @@ namespace augas {
     }
 
     inline augas_id
-    settimer(unsigned ms, void* user = 0, void (*destroy)(void*) = 0)
+    settimer(unsigned ms, const augas_var& var)
     {
-        int ret(augas_settimer(ms, user, destroy));
+        int ret(augas_settimer(ms, &var));
         if (AUGAS_ERROR == ret)
             throw error(augas_error());
         return static_cast<augas_id>(ret);
@@ -223,76 +223,6 @@ namespace augas {
         return resettimer(timer.id_, ms);
     }
 
-    class event {
-        augas_event event_;
-    public:
-        event()
-        {
-            memset(&event_, 0, sizeof(event_));
-        }
-        explicit
-        event(const augas_event& event)
-            : event_(event)
-        {
-        }
-        explicit
-        event(const char* type)
-        {
-            settype(type);
-            event_.user_ = 0;
-            event_.size_ = 0;
-        }
-        event(const char* type, void* user, size_t size = 0)
-        {
-            settype(type);
-            setuser(user, size);
-        }
-        void
-        clear()
-        {
-            event_.type_[0] ='\0';
-            event_.user_ = 0;
-            event_.size_ = 0;
-        }
-        void
-        settype(const char* type)
-        {
-            strncpy(event_.type_, type, sizeof(event_.type_));
-            event_.type_[AUGAS_MAXNAME] ='\0';
-        }
-        void
-        setuser(void* user, size_t size = 0)
-        {
-            if (user) {
-                event_.user_ = user;
-                event_.size_ = size;
-            } else {
-                event_.user_ = 0;
-                event_.size_ = 0;
-            }
-        }
-        const char*
-        type() const
-        {
-            return event_.type_;
-        }
-        template <typename T>
-        T*
-        user() const
-        {
-            return static_cast<T>(event_.user_);
-        }
-        size_t
-        size() const
-        {
-            return event_.size_;
-        }
-        operator const augas_event&() const
-        {
-            return event_;
-        }
-    };
-
     class object {
         const augas_object& object_;
     public:
@@ -324,7 +254,6 @@ namespace augas {
     };
 
     class serv_base {
-        typedef augas::event event_type;
         virtual bool
         do_start(const char* sname) = 0;
 
@@ -332,7 +261,8 @@ namespace augas {
         do_reconf() = 0;
 
         virtual void
-        do_event(const char* from, const event_type& event) = 0;
+        do_event(const char* from, const char* type, const void* user,
+                 size_t size) = 0;
 
         virtual void
         do_closed(const object& sock) = 0;
@@ -374,9 +304,10 @@ namespace augas {
             do_reconf();
         }
         void
-        event(const char* from, const event_type& event)
+        event(const char* from, const char* type, const void* user,
+              size_t size)
         {
-            do_event(from, event);
+            do_event(from, type, user, size);
         }
         void
         closed(const object& sock)
@@ -421,13 +352,13 @@ namespace augas {
     };
 
     class basic_serv : public serv_base {
-        typedef augas::event event_type;
         void
         do_reconf()
         {
         }
         void
-        do_event(const char* from, const event_type& event)
+        do_event(const char* from, const char* type, const void* user,
+                 size_t size)
         {
         }
         void
@@ -540,10 +471,11 @@ namespace augas {
             } AUGAS_WRITELOGCATCH;
         }
         static void
-        event(const char* from, const augas_event* event) AUGAS_NOTHROW
+        event(const char* from, const char* type, const void* user,
+              size_t size) AUGAS_NOTHROW
         {
             try {
-                getbase()->event(from, augas::event(*event));
+                getbase()->event(from, type, user, size);
             } AUGAS_WRITELOGCATCH;
         }
         static void

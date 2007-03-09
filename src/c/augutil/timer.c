@@ -20,7 +20,7 @@ struct aug_timer_ {
     unsigned ms_;
     struct timeval tv_;
     aug_timercb_t cb_;
-    struct aug_var arg_;
+    struct aug_var var_;
 };
 
 static struct aug_timers free_ = AUG_HEAD_INITIALIZER(free_);
@@ -64,7 +64,7 @@ aug_destroytimers(struct aug_timers* timers)
 {
     struct aug_timer_* it;
     AUG_FOREACH(it, timers)
-        aug_destroyvar(&it->arg_);
+        aug_destroyvar(&it->var_);
 
     if (!AUG_EMPTY(timers)) {
 
@@ -77,7 +77,7 @@ aug_destroytimers(struct aug_timers* timers)
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, const struct aug_var* arg)
+             aug_timercb_t cb, const struct aug_var* var)
 {
     struct timeval tv;
     struct aug_timer_* timer;
@@ -102,7 +102,7 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
     timer->tv_.tv_sec = tv.tv_sec;
     timer->tv_.tv_usec = tv.tv_usec;
     timer->cb_ = cb;
-    aug_setvar(&timer->arg_, arg);
+    aug_setvar(&timer->var_, var);
     insert_(timers, timer);
 
     return id;
@@ -124,7 +124,7 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
 
             if (-1 == expiry_(&it->tv_, it->ms_)) {
 
-                aug_destroyvar(&it->arg_);
+                aug_destroyvar(&it->var_);
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
                 aug_unlock();
@@ -152,7 +152,7 @@ aug_canceltimer(struct aug_timers* timers, int id)
 
             AUG_REMOVE_PREVPTR(it, prev, timers);
 
-            aug_destroyvar(&it->arg_);
+            aug_destroyvar(&it->var_);
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
             aug_unlock();
@@ -203,7 +203,7 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
 
             AUG_REMOVE_HEAD(timers);
 
-            (*it->cb_)(it->id_, &it->arg_, &it->ms_, timers);
+            (*it->cb_)(it->id_, &it->var_, &it->ms_, timers);
             if (it->ms_) {
 
                 if (-1 == expiry_(&it->tv_, it->ms_))
@@ -215,7 +215,7 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
 
                 /* A zero ms value cancels the timer. */
 
-                aug_destroyvar(&it->arg_);
+                aug_destroyvar(&it->var_);
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
                 aug_unlock();

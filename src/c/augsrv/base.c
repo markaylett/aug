@@ -28,7 +28,7 @@ static const char rcsid[] = "$Id$";
    from the service thread. */
 
 static struct aug_service service_ = { 0 };
-static struct aug_var arg_ = AUG_VARNULL;
+static void* arg_ = NULL;
 static int fds_[2] = { -1, -1 };
 
 /* closepipe_() should not be called from an atexit() handler: on Windows, the
@@ -77,24 +77,24 @@ openpipe_(void)
 }
 
 AUGSRV_EXTERN void
-aug_setservice_(const struct aug_service* service, const struct aug_var* arg)
+aug_setservice_(const struct aug_service* service, void* arg)
 {
     memcpy(&service_, service, sizeof(service_));
-    aug_setvar(&arg_, arg);
+    arg_ = arg;
 }
 
 AUGSRV_API const char*
 aug_getserviceopt(enum aug_option opt)
 {
     assert(service_.getopt_);
-    return service_.getopt_(&arg_, opt);
+    return service_.getopt_(arg_, opt);
 }
 
 AUGSRV_API int
 aug_readserviceconf(const char* conffile, int daemon)
 {
     assert(service_.readconf_);
-    return service_.readconf_(&arg_, conffile, daemon);
+    return service_.readconf_(arg_, conffile, daemon);
 }
 
 AUGSRV_API int
@@ -104,7 +104,7 @@ aug_initservice(void)
     if (-1 == openpipe_())
         return -1;
 
-    if (-1 == service_.init_(&arg_)) {
+    if (-1 == service_.init_(arg_)) {
         closepipe_();
         return -1;
     }
@@ -116,7 +116,7 @@ AUGSRV_API int
 aug_runservice(void)
 {
     assert(service_.run_);
-    return service_.run_(&arg_);
+    return service_.run_(arg_);
 }
 
 AUGSRV_API void
@@ -124,7 +124,7 @@ aug_termservice(void)
 {
     if (-1 != fds_[0]) {
         assert(service_.term_);
-        service_.term_(&arg_);
+        service_.term_(arg_);
         closepipe_();
     }
 }

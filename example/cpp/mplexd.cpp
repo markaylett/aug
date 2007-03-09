@@ -259,7 +259,7 @@ namespace test {
                 quit_ = true;
                 break;
             }
-            aug_destroyvar(&event.arg_);
+            aug_destroyvar(&event.var_);
             return true;
         }
 

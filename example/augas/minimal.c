@@ -20,7 +20,7 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const struct augas_event* event)
+event_(const char* from, const char* type, const void* user, size_t size)
 {
     augas_writelog(AUGAS_LOGINFO, "event_()");
 }
@@ -52,7 +52,7 @@ connected_(struct augas_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct augas_object* sock, const char* buf, size_t size)
+data_(const struct augas_object* sock, const void* buf, size_t size)
 {
     augas_writelog(AUGAS_LOGINFO, "data_()");
     augas_send(sock->id_, buf, size);

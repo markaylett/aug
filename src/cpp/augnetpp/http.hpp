@@ -65,51 +65,51 @@ namespace aug {
     namespace detail {
 
         inline void
-        initial(const aug_var* arg, const char* value)
+        initial(const aug_var* var, const char* value)
         {
             try {
                 httphandler_base* ptr = static_cast<
-                    httphandler_base*>(aug_getvarp(arg));
+                    httphandler_base*>(var->ptr_);
                 ptr->initial(value);
             } AUG_SETERRINFOCATCH;
         }
 
         inline void
-        field(const aug_var* arg, const char* name, const char* value)
+        field(const aug_var* var, const char* name, const char* value)
         {
             try {
                 httphandler_base* ptr = static_cast<
-                    httphandler_base*>(aug_getvarp(arg));
+                    httphandler_base*>(var->ptr_);
                 ptr->field(name, value);
             } AUG_SETERRINFOCATCH;
         }
 
         inline void
-        csize(const aug_var* arg, unsigned csize)
+        csize(const aug_var* var, unsigned csize)
         {
             try {
                 httphandler_base* ptr = static_cast<
-                    httphandler_base*>(aug_getvarp(arg));
+                    httphandler_base*>(var->ptr_);
                 ptr->csize(csize);
             } AUG_SETERRINFOCATCH;
         }
 
         inline void
-        cdata(const aug_var* arg, const void* cdata, unsigned csize)
+        cdata(const aug_var* var, const void* cdata, unsigned csize)
         {
             try {
                 httphandler_base* ptr = static_cast<
-                    httphandler_base*>(aug_getvarp(arg));
+                    httphandler_base*>(var->ptr_);
                 ptr->cdata(cdata, csize);
             } AUG_SETERRINFOCATCH;
         }
 
         inline void
-        end(const aug_var* arg, int commit)
+        end(const aug_var* var, int commit)
         {
             try {
                 httphandler_base* ptr = static_cast<
-                    httphandler_base*>(aug_getvarp(arg));
+                    httphandler_base*>(var->ptr_);
                 ptr->end(commit ? true : false);
             } AUG_SETERRINFOCATCH;
         }
@@ -140,9 +140,9 @@ namespace aug {
                 detail::cdata,
                 detail::end
             };
-            var v(this);
+            aug_var var = { NULL, this };
             verify(httpparser_
-                   = aug_createhttpparser(size, &local, cptr(v)));
+                   = aug_createhttpparser(size, &local, &var));
         }
 
         operator aug_httpparser_t()

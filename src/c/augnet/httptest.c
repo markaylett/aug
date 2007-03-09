@@ -17,34 +17,34 @@ static const char TEST_[] =
 "Connection: Keep-Alive\r\n\r\n";
 
 static void
-setinitial_(const struct aug_var* arg, const char* value)
+setinitial_(const struct aug_var* var, const char* value)
 {
     aug_info("initial: %s", value);
 }
 
 static void
-setfield_(const struct aug_var* arg, const char* name, const char* value)
+setfield_(const struct aug_var* var, const char* name, const char* value)
 {
     aug_info("field: %s=%s", name, value);
 }
 
 static void
-setcsize_(const struct aug_var* arg, unsigned size)
+setcsize_(const struct aug_var* var, unsigned size)
 {
     aug_info("size: %d", (int)size);
 }
 
 static void
-cdata_(const struct aug_var* arg, const void* buf, unsigned size)
+cdata_(const struct aug_var* var, const void* buf, unsigned size)
 {
 }
 
 static void
-end_(const struct aug_var* arg, int commit)
+end_(const struct aug_var* var, int commit)
 {
 }
 
-static const struct aug_httphandlers handlers_ = {
+static const struct aug_httphandler handler_ = {
     setinitial_,
     setfield_,
     setcsize_,
@@ -60,7 +60,7 @@ main(int argc, char* argv[])
 
     aug_atexitinit(&errinfo);
 
-    if (!(parser = aug_createhttpparser(1024, &handlers_, NULL))) {
+    if (!(parser = aug_createhttpparser(1024, &handler_, NULL))) {
         aug_perrinfo(NULL, "aug_createhttpparser() failed");
         return 1;
     }

@@ -8,97 +8,31 @@ static const char rcsid[] = "$Id$";
 
 #include <stddef.h> /* NULL */
 
-AUGUTIL_API const struct aug_var*
+AUGUTIL_API int
 aug_destroyvar(const struct aug_var* v)
 {
-    if (!v)
-        return NULL;
+    return v && v->ptr_ && v->type_ && v->type_->destroy_
+        ? v->type_->destroy_(v->ptr_) : 0;
+}
 
-    if (v->destroy_) {
-        switch (v->type_) {
-        case AUG_VTNULL:
-            v->destroy_();
-            break;
-        case AUG_VTLONG:
-            v->destroy_(v->u_.long_);
-            break;
-        case AUG_VTPTR:
-            v->destroy_(v->u_.ptr_);
-            break;
-        }
+AUGUTIL_API void
+aug_setvar(struct aug_var* dst, const struct aug_var* src)
+{
+    if (src)
+        *dst = *src;
+    else {
+        dst->type_ = NULL;
+        dst->ptr_ = NULL;
     }
-    return v;
 }
 
-AUGUTIL_API struct aug_var*
-aug_clearvar(struct aug_var* v, void (*fn)(void))
+AUGUTIL_API const void*
+aug_varbuf(const struct aug_var* v, size_t* size)
 {
-    v->type_ = AUG_VTNULL;
-    v->u_.ptr_ = NULL;
-    v->destroy_ = fn;
-    return v;
-}
+    if (v && v->ptr_ && v->type_ && v->type_->buf_)
+        return v->type_->buf_(v->ptr_, size);
 
-AUGUTIL_API struct aug_var*
-aug_setvar(struct aug_var* v, const struct aug_var* w)
-{
-    if (w) {
-        if (AUG_VTLONG == (v->type_ = w->type_))
-            v->u_.long_ = w->u_.long_;
-        else
-            v->u_.ptr_ = w->u_.ptr_;
-        v->destroy_ = w->destroy_;
-    } else {
-        v->type_ = AUG_VTNULL;
-        v->u_.ptr_ = NULL;
-        v->destroy_ = NULL;
-    }
-    return v;
-}
-
-AUGUTIL_API struct aug_var*
-aug_setvarl(struct aug_var* v, long l, void (*fn)(long))
-{
-    v->type_ = AUG_VTLONG;
-    v->u_.long_ = l;
-    v->destroy_ = fn;
-    return v;
-}
-
-AUGUTIL_API struct aug_var*
-aug_setvarp(struct aug_var* v, void* p, void (*fn)(void*))
-{
-    v->type_ = AUG_VTPTR;
-    v->u_.ptr_ = p;
-    v->destroy_ = fn;
-    return v;
-}
-
-AUGUTIL_API long
-aug_getvarl(const struct aug_var* v)
-{
-    return v && AUG_VTLONG == v->type_ ? v->u_.long_ : 0;
-}
-
-AUGUTIL_API void*
-aug_getvarp(const struct aug_var* v)
-{
-    return v && AUG_VTPTR == v->type_ ? v->u_.ptr_ : NULL;
-}
-
-AUGUTIL_API int
-aug_equalvar(const struct aug_var* v, const struct aug_var* w)
-{
-    if (AUG_VTLONG == v->type_)
-        return AUG_VTLONG == w->type_
-            && v->u_.long_ == w->u_.long_;
-
-    return v->u_.ptr_ == w->u_.ptr_;
-}
-
-AUGUTIL_API int
-aug_isnull(const struct aug_var* v)
-{
-    return !v || AUG_VTNULL == v->type_
-        || (AUG_VTPTR == v->type_ && !v->u_.ptr_);
+    if (size)
+        *size = 0;
+    return 0;
 }

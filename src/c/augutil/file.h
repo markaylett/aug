@@ -4,15 +4,11 @@
 #ifndef AUGUTIL_FILE_H
 #define AUGUTIL_FILE_H
 
-#include "augutil/var.h"
+#include "augutil/config.h"
 
-typedef int (*aug_confcb_t)(const struct aug_var*, const char*, const char*);
-
-/**
-   aug_destroyvar() will not be called.
-*/
+typedef int (*aug_confcb_t)(void*, const char*, const char*);
 
 AUGUTIL_API int
-aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg);
+aug_readconf(const char* path, aug_confcb_t cb, void* arg);
 
 #endif /* AUGUTIL_FILE_H */

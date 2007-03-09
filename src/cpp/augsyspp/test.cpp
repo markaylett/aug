@@ -19,10 +19,10 @@ namespace {
     close_(int fd)
     {
         aug_info("closing fd: %d", (int)fd);
-        return aug_posixdriver()->close_(fd);
+        return aug_posixfdtype()->close_(fd);
     }
 
-    struct aug_driver driver_ = {
+    struct aug_fdtype fdtype_ = {
         close_, 0, 0, 0, 0, 0
     };
 
@@ -32,7 +32,7 @@ namespace {
         int fd(::open("Makefile", O_RDONLY));
         if (-1 != fd)
             try {
-                openfd(fd, &driver_);
+                openfd(fd, &fdtype_);
                 return smartfd::attach(fd);
             } catch (...) {
                 close(fd);
@@ -50,7 +50,7 @@ main(int argc, char* argv[])
 
     try {
 
-        aug_extdriver(&driver_, 0);
+        aug_extfdtype(&fdtype_, 0);
         smartfd sfd1(open());
         return 0;
 

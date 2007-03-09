@@ -25,7 +25,7 @@ rtrim_(const char* s, size_t n)
 }
 
 AUGUTIL_API int
-aug_readconf(const char* path, aug_confcb_t cb, const struct aug_var* arg)
+aug_readconf(const char* path, aug_confcb_t cb, void* arg)
 {
     char buf[AUG_MAXLINE];
     char* name;

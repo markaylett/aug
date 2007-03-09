@@ -42,11 +42,10 @@ namespace aug {
     namespace detail {
 
         inline int
-        confcb(const aug_var* arg, const char* name, const char* value)
+        confcb(void* arg, const char* name, const char* value)
         {
             try {
-                confcb_base* ptr = static_cast<
-                    confcb_base*>(aug_getvarp(arg));
+                confcb_base* ptr = static_cast<confcb_base*>(arg);
                 ptr->callback(name, value);
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -57,8 +56,7 @@ namespace aug {
     inline void
     readconf(const char* path, confcb_base& cb)
     {
-        var v(&cb);
-        verify(aug_readconf(path, detail::confcb, cptr(v)));
+        verify(aug_readconf(path, detail::confcb, &cb));
     }
 }
 

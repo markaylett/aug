@@ -40,7 +40,8 @@ namespace augas {
         reconf() const AUG_NOTHROW;
 
         void
-        event(const char* from, const augas_event& event) const AUG_NOTHROW;
+        event(const char* from, const char* type, const void* user,
+              size_t size) const AUG_NOTHROW;
 
         void
         closed(const augas_object& sock) const AUG_NOTHROW;

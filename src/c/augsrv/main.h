@@ -7,19 +7,16 @@
 #include "augsrv/config.h"
 
 struct aug_service;
-struct aug_var;
 
 /**
    On Windows, the Service Manager calls the service entry point on a separate
    thread - automatic variables on the main thread's stack will not be visible
    from the service thread.  A shallow copy of the service structure will be
    performed.
-
-   aug_destroyvar() will not be called.
 */
 
 AUGSRV_API int
 aug_main(int argc, char* argv[], const struct aug_service* service,
-         const struct aug_var* arg);
+         void* arg);
 
 #endif /* AUGSRV_MAIN_H */

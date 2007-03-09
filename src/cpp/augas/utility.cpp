@@ -22,7 +22,7 @@ namespace {
     {
     }
     void
-    event(const char* from, const augas_event* event)
+    event(const char* from, const char* type, const void* user, size_t size)
     {
     }
     void

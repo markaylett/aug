@@ -29,7 +29,7 @@ aug_destroyfiles(struct aug_files* files);
 
 AUGNET_API int
 aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
-               const struct aug_var* arg);
+               const struct aug_var* var);
 
 AUGNET_API int
 aug_removefile(struct aug_files* files, int fd);

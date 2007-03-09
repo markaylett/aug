@@ -49,15 +49,19 @@ enum augas_loglevel {
 
 typedef int augas_id;
 
+struct augas_vartype {
+    int (*destroy_)(void*);
+    const void* (*buf_)(void*, size_t*);
+};
+
+struct augas_var {
+    const struct augas_vartype* type_;
+    void* ptr_;
+};
+
 struct augas_serv {
     char name_[AUGAS_MAXNAME + 1];
     void* user_;
-};
-
-struct augas_event {
-    char type_[AUGAS_MAXNAME + 1];
-    void* user_;
-    size_t size_;
 };
 
 struct augas_object {
@@ -121,14 +125,14 @@ struct augas_host {
     /**
        \brief Post an event to the event queue.
        \param to TODO
-       \param event TODO
-       \param destroy TODO
+       \param type TODO
+       \param var TODO
        \return TODO
        \sa TODO
     */
 
-    int (*post_)(const char* to, const struct augas_event* event,
-                 void (*destroy)(void*));
+    int (*post_)(const char* to, const char* type,
+                 const struct augas_var* var);
 
     /**
      * The remaining functions are not thread-safe.
@@ -137,12 +141,15 @@ struct augas_host {
     /**
        \brief Dispatch event to peer service.
        \param to TODO
-       \param event TODO
+       \param type TODO
+       \param user TODO
+       \param size TODO
        \return TODO
        \sa post_()
     */
 
-    int (*dispatch_)(const char* to, const struct augas_event* event);
+    int (*dispatch_)(const char* to, const char* type, const void* user,
+                     size_t size);
 
     /**
        \brief Read a configuration value.
@@ -250,13 +257,12 @@ struct augas_host {
     /**
        \brief TODO
        \param ms TODO
-       \param user TODO
-       \param destroy TODO
+       \param var TODO
        \return TODO
        \sa TODO
     */
 
-    int (*settimer_)(unsigned ms, void* user, void (*destroy)(void*));
+    int (*settimer_)(unsigned ms, const struct augas_var* var);
 
     /**
        \brief TODO
@@ -313,12 +319,15 @@ struct augas_module {
     /**
        \brief Custom event notification.
        \param from TODO
-       \param event TODO
+       \param type TODO
+       \param user TODO
+       \param len TODO
        \return TODO
        \sa TODO
     */
 
-    void (*event_)(const char* from, const struct augas_event* event);
+    void (*event_)(const char* from, const char* type, const void* user,
+                   size_t size);
 
     /**
        \brief Connection closure.

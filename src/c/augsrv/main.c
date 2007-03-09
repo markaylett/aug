@@ -110,8 +110,7 @@ uninstall_(void)
 }
 
 AUGSRV_API int
-aug_main(int argc, char* argv[], const struct aug_service* service,
-         const struct aug_var* arg)
+aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
 {
     int daemon;
     struct aug_options options;

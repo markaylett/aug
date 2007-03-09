@@ -27,7 +27,7 @@ typedef struct aug_httpparser_* aug_httpparser_t;
 
 AUGNET_API aug_httpparser_t
 aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
-                     const struct aug_var* arg);
+                     const struct aug_var* var);
 
 AUGNET_API int
 aug_destroyhttpparser(aug_httpparser_t parser);

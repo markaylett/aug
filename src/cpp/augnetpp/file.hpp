@@ -90,11 +90,10 @@ namespace aug {
     namespace detail {
 
         inline int
-        filecb(int id, const aug_var* arg, aug_files* files)
+        filecb(int id, const struct aug_var* var, aug_files* files)
         {
             try {
-                filecb_base* ptr = static_cast<
-                    filecb_base*>(aug_getvarp(arg));
+                filecb_base* ptr = static_cast<filecb_base*>(var->ptr_);
                 return ptr->callback(id, *files) ? 1 : 0;
             } AUG_PERRINFOCATCH;
 
@@ -109,8 +108,8 @@ namespace aug {
     inline void
     insertfile(aug_files& files, fdref ref, filecb_base& cb)
     {
-        var v(&cb);
-        verify(aug_insertfile(&files, ref.get(), detail::filecb, cptr(v)));
+        aug_var var = { NULL, &cb };
+        verify(aug_insertfile(&files, ref.get(), detail::filecb, &var));
     }
 
     inline void

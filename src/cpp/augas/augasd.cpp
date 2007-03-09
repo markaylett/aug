@@ -106,20 +106,22 @@ namespace augas {
     typedef map<int, servptr> idtoserv;
     typedef queue<connptr> connected;
 
-    struct event : public augas_event {
-        string from_, to_;
-        void (*destroy_)(void*);
+    struct event {
+        string from_, to_, type_;
+        aug_var var_;
         ~event() AUG_NOTHROW
         {
-            if (destroy_)
-                destroy_(user_);
+            try {
+                destroyvar(var_);
+            } AUG_PERRINFOCATCH;
         }
-        event(const string& from, const string& to, const augas_event& event)
+        event(const string& from, const string& to, const string& type)
             : from_(from),
               to_(to),
-              destroy_(0)
+              type_(type)
         {
-            memcpy(this, &event, sizeof(augas_event));
+            var_.type_ = 0;
+            var_.ptr_ = 0;
         }
     };
 
@@ -185,13 +187,13 @@ namespace augas {
     }
 
     void
-    timercb_(int id, const aug_var* arg, unsigned* ms, aug_timers* timers)
+    timercb_(int id, const aug_var* var, unsigned* ms, aug_timers* timers)
     {
         AUG_DEBUG2("custom timer expiry");
 
         idtoserv::iterator it(state_->idtoserv_.find(id));
         servptr serv(it->second);
-        augas_object timer = { id, aug_getvarp(arg) };
+        augas_object timer = { id, var->ptr_ };
         serv->expire(timer, *ms);
 
         if (0 == *ms) {
@@ -282,20 +284,19 @@ namespace augas {
     // Thread-safe.
 
     int
-    post_(const char* to, const augas_event* event, void (*destroy)(void*))
+    post_(const char* to, const char* type, const augas_var* var)
     {
         const char* sname = getserv()->name_;
-        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s], size=[%d]",
-                   sname, to, event->type_, event->size_);
+        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s]", sname, to, type);
         try {
 
-            auto_ptr<augas::event> arg(new augas::event(sname, to, *event));
-
+            auto_ptr<augas::event> arg(new augas::event(sname, to, type));
             aug_event e;
             e.type_ = AUGAS_MODEVENT;
-            aug_setvarp(&e.arg_, arg.get(), 0);
+            e.var_.type_ = 0;
+            e.var_.ptr_ = arg.get();
             writeevent(aug_eventout(), e);
-            arg->destroy_ = destroy;
+            aug_setvar(&arg->var_, reinterpret_cast<const aug_var*>(var));
             arg.release();
             return 0;
 
@@ -304,11 +305,11 @@ namespace augas {
     }
 
     int
-    dispatch_(const char* to, const augas_event* event)
+    dispatch_(const char* to, const char* type, const void* user, size_t size)
     {
         const char* sname = getserv()->name_;
-        AUG_DEBUG2("dispatch(): sname=[%s], to=[%s], type=[%s], size=[%d]",
-                   sname, to, event->type_, event->size_);
+        AUG_DEBUG2("dispatch(): sname=[%s], to=[%s], type=[%s]",
+                   sname, to, type);
         try {
 
             vector<servptr> servs;
@@ -317,7 +318,7 @@ namespace augas {
             vector<servptr>::const_iterator it(servs.begin()),
                 end(servs.end());
             for (; it != end; ++it)
-                (*it)->event(sname, *event);
+                (*it)->event(sname, type, user, size);
 
             return 0;
 
@@ -507,14 +508,13 @@ namespace augas {
     }
 
     int
-    settimer_(unsigned ms, void* arg, void (*destroy)(void*))
+    settimer_(unsigned ms, const struct augas_var* var)
     {
         const char* sname = getserv()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
 
             augas_id id(aug_nextid());
-            var v(arg, destroy);
 
             // If aug_settimer() succeeds, it will call aug_destroyvar() on
             // var when the timer is destroyed.  The service is added to the
@@ -523,7 +523,7 @@ namespace augas {
 
             state_->idtoserv_[id] = state_->manager_.getserv(sname);
             if (-1 == aug_settimer(cptr(state_->timers_), id, ms, timercb_,
-                                   cptr(v)))
+                                   reinterpret_cast<const aug_var*>(var)))
                 state_->idtoserv_.erase(id);
 
             return id;
@@ -561,7 +561,7 @@ namespace augas {
         return -1;
     }
 
-    const struct augas_host host_ = {
+    const augas_host host_ = {
         writelog_,
         vwritelog_,
         error_,
@@ -717,19 +717,23 @@ namespace augas {
         case AUGAS_MODEVENT:
             assert(AUG_VTPTR == event.arg_.type_);
             {
-                auto_ptr<augas::event> arg
-                    (static_cast<augas::event*>(aug_getvarp(&event.arg_)));
+                auto_ptr<augas::event> ev(static_cast<
+                                          augas::event*>(event.var_.ptr_));
 
                 vector<servptr> servs;
-                state_->manager_.getservs(servs, arg->to_);
+                state_->manager_.getservs(servs, ev->to_);
+
+                size_t size;
+                const void* user(varbuf(ev->var_, size));
 
                 vector<servptr>::const_iterator it(servs.begin()),
                     end(servs.end());
                 for (; it != end; ++it)
-                    (*it)->event(arg->from_.c_str(), *arg);
+                    (*it)->event(ev->from_.c_str(), ev->type_.c_str(), user,
+                                 size);
             }
         }
-        aug_destroyvar(&event.arg_);
+        destroyvar(event.var_);
         return true;
     }
 
@@ -861,7 +865,7 @@ namespace augas {
 
                         AUG_DEBUG2("processing timers");
 
-                        struct timeval tv;
+                        timeval tv;
                         foreachexpired(state_->timers_, 0 == ret, tv);
 
                         scoped_unblock unblock;

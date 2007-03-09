@@ -18,7 +18,7 @@ struct aug_file_ {
     AUG_ENTRY(aug_file_);
     int fd_;
     aug_filecb_t cb_;
-    struct aug_var arg_;
+    struct aug_var var_;
 };
 
 static struct aug_files free_ = AUG_HEAD_INITIALIZER(free_);
@@ -29,7 +29,7 @@ aug_destroyfiles(struct aug_files* files)
 {
     struct aug_file_* it;
     AUG_FOREACH(it, files)
-        aug_destroyvar(&it->arg_);
+        aug_destroyvar(&it->var_);
 
     if (!AUG_EMPTY(files)) {
 
@@ -42,7 +42,7 @@ aug_destroyfiles(struct aug_files* files)
 
 AUGNET_API int
 aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
-               const struct aug_var* arg)
+               const struct aug_var* var)
 {
     struct aug_file_* file;
 
@@ -55,7 +55,7 @@ aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
 
     file->fd_ = fd;
     file->cb_ = cb;
-    aug_setvar(&file->arg_, arg);
+    aug_setvar(&file->var_, var);
 
     AUG_INSERT_TAIL(files, file);
     return 0;
@@ -78,7 +78,7 @@ aug_removefile(struct aug_files* files, int fd)
 
     AUG_REMOVE(files, it, aug_file_);
 
-    aug_destroyvar(&it->arg_);
+    aug_destroyvar(&it->var_);
     aug_lock();
     AUG_INSERT_TAIL(&free_, it);
     aug_unlock();
@@ -96,11 +96,11 @@ aug_foreachfile(struct aug_files* files)
     prev = &AUG_FIRST(files);
     while ((it = *prev)) {
 
-        if (!(it->cb_(it->fd_, &it->arg_, &tail))) {
+        if (!(it->cb_(it->fd_, &it->var_, &tail))) {
 
             AUG_REMOVE_PREVPTR(it, prev, files);
 
-            aug_destroyvar(&it->arg_);
+            aug_destroyvar(&it->var_);
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
             aug_unlock();

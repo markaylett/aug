@@ -31,7 +31,7 @@ aug_destroytimers(struct aug_timers* timers);
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, const struct aug_var* arg);
+             aug_timercb_t cb, const struct aug_var* var);
 
 /**
    On failure, the timer will be removed.

@@ -6,52 +6,27 @@
 
 #include "augutil/config.h"
 
-enum aug_vartype {
-    AUG_VTNULL,
-    AUG_VTLONG,
-    AUG_VTPTR
+#include "augsys/types.h"
+
+struct aug_vartype {
+    int (*destroy_)(void*);
+    const void* (*buf_)(void*, size_t*);
 };
 
 struct aug_var {
-    enum aug_vartype type_;
-    union {
-        long long_;
-        void* ptr_;
-    } u_;
-    void (*destroy_)();
+    const struct aug_vartype* type_;
+    void* ptr_;
 };
 
-#define AUG_VARNULL { AUG_VTNULL, { 0 }, NULL }
-
-/**
-   "v" may be null.
-*/
-
-AUGUTIL_API const struct aug_var*
-aug_destroyvar(const struct aug_var* v);
-
-AUGUTIL_API struct aug_var*
-aug_clearvar(struct aug_var* v, void (*fn)(void));
-
-AUGUTIL_API struct aug_var*
-aug_setvar(struct aug_var* v, const struct aug_var* w);
-
-AUGUTIL_API struct aug_var*
-aug_setvarl(struct aug_var* v, long l, void (*fn)(long));
-
-AUGUTIL_API struct aug_var*
-aug_setvarp(struct aug_var* v, void* p, void (*fn)(void*));
-
-AUGUTIL_API long
-aug_getvarl(const struct aug_var* v);
-
-AUGUTIL_API void*
-aug_getvarp(const struct aug_var* v);
+#define AUG_VARNULL { NULL, NULL }
 
 AUGUTIL_API int
-aug_equalvar(const struct aug_var* v, const struct aug_var* w);
+aug_destroyvar(const struct aug_var* var);
 
-AUGUTIL_API int
-aug_isnull(const struct aug_var* v);
+AUGUTIL_API void
+aug_setvar(struct aug_var* dst, const struct aug_var* src);
+
+AUGUTIL_API const void*
+aug_varbuf(const struct aug_var* var, size_t* size);
 
 #endif /* AUGUTIL_VAR_H */

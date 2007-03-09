@@ -277,17 +277,22 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const struct augas_event* event)
+event_(const char* from, const char* type, const void* user, size_t size)
 {
     struct import_* import = augas_getserv()->user_;
     assert(import);
 
     if (import->event_) {
 
-        PyObject* y = PyObject_CallFunction(import->event_, "ssz#",
-                                            from, event->type_,
-                                            (const char*)event->user_,
-                                            (int)event->size_);
+        PyObject* y;
+        if (user) {
+            y = PyObject_CallFunction(import->event_, "ssz#", from, type,
+                                      (const char*)user, size);
+        } else {
+            y = PyObject_CallFunction(import->event_, "ssO", from, type,
+                                      Py_None);
+        }
+
         if (y) {
             Py_DECREF(y);
         } else

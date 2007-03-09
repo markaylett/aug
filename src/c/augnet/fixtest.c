@@ -23,7 +23,7 @@ static const aug_fixver_t FIXVER_ = "FIX.4.4";
 static size_t received_ = 0;
 
 static void
-handler_(const struct aug_var* arg, const char* buf, size_t size)
+handler_(const struct aug_var* var, const char* buf, size_t size)
 {
     ssize_t ret;
     struct aug_fixfield_ field;

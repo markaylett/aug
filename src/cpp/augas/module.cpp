@@ -61,11 +61,11 @@ module::reconf() const AUG_NOTHROW
 }
 
 void
-module::event(const char* from, const augas_event& event) const AUG_NOTHROW
+module::event(const char* from, const char* type, const void* user,
+              size_t size) const AUG_NOTHROW
 {
-    AUG_DEBUG2("event(): from=[%s], ename=[%s], size=[%d]",
-               from, event.type_, event.size_);
-    module_.event_(from, &event);
+    AUG_DEBUG2("event(): from=[%s], type=[%s]", from, type);
+    module_.event_(from, type, user, size);
 }
 
 void

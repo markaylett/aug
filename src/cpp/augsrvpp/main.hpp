@@ -75,22 +75,20 @@ namespace aug {
     namespace detail {
 
         inline const char*
-        getopt(const aug_var* arg, enum aug_option opt)
+        getopt(void* arg, enum aug_option opt)
         {
             try {
-                service_base* ptr = static_cast<
-                    service_base*>(aug_getvarp(arg));
+                service_base* ptr = static_cast<service_base*>(arg);
                 return ptr->getopt(opt);
             } AUG_SETERRINFOCATCH;
             return 0;
         }
 
         inline int
-        readconf(const aug_var* arg, const char* conffile, int daemon)
+        readconf(void* arg, const char* conffile, int daemon)
         {
             try {
-                service_base* ptr = static_cast<
-                    service_base*>(aug_getvarp(arg));
+                service_base* ptr = static_cast<service_base*>(arg);
                 ptr->readconf(conffile, daemon ? true : false);
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -98,11 +96,10 @@ namespace aug {
         }
 
         inline int
-        init(const aug_var* arg)
+        init(void* arg)
         {
             try {
-                service_base* ptr = static_cast<
-                    service_base*>(aug_getvarp(arg));
+                service_base* ptr = static_cast<service_base*>(arg);
                 ptr->init();
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -110,11 +107,10 @@ namespace aug {
         }
 
         inline int
-        run(const aug_var* arg)
+        run(void* arg)
         {
             try {
-                service_base* ptr = static_cast<
-                    service_base*>(aug_getvarp(arg));
+                service_base* ptr = static_cast<service_base*>(arg);
                 ptr->run();
                 return 0;
             } AUG_SETERRINFOCATCH;
@@ -122,11 +118,10 @@ namespace aug {
         }
 
         inline void
-        term(const aug_var* arg)
+        term(void* arg)
         {
             try {
-                service_base* ptr = static_cast<
-                    service_base*>(aug_getvarp(arg));
+                service_base* ptr = static_cast<service_base*>(arg);
                 ptr->term();
             } AUG_PERRINFOCATCH;
         }
@@ -149,8 +144,7 @@ namespace aug {
             detail::run,
             detail::term
         };
-        var v(&service);
-        return aug_main(argc, argv, &local, cptr(v));
+        return aug_main(argc, argv, &local, &service);
     }
 }
 

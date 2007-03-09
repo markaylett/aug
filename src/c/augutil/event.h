@@ -19,7 +19,7 @@
 
 struct aug_event {
     int type_;
-    struct aug_var arg_;
+    struct aug_var var_;
 };
 
 /**

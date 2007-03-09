@@ -4,8 +4,6 @@
 #ifndef AUGSRV_TYPES_H
 #define AUGSRV_TYPES_H
 
-struct aug_var;
-
 enum aug_option {
 
     /**
@@ -34,11 +32,11 @@ enum aug_option {
 };
 
 struct aug_service {
-    const char* (*getopt_)(const struct aug_var*, enum aug_option);
-    int (*readconf_)(const struct aug_var*, const char*, int);
-    int (*init_)(const struct aug_var*);
-    int (*run_)(const struct aug_var*);
-    void (*term_)(const struct aug_var*);
+    const char* (*getopt_)(void*, enum aug_option);
+    int (*readconf_)(void*, const char*, int);
+    int (*init_)(void*);
+    int (*run_)(void*);
+    void (*term_)(void*);
 };
 
 #endif /* AUGSRV_TYPES_H */

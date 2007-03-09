@@ -22,7 +22,7 @@ typedef int (*aug_request_t)(const struct aug_var*, const char*, aug_mar_t,
 */
 
 aug_state_t
-aug_createstate(aug_request_t request, const struct aug_var* arg);
+aug_createstate(aug_request_t request, const struct aug_var* var);
 
 int
 aug_destroystate(aug_state_t state);
