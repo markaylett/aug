@@ -108,7 +108,7 @@ static int
 conn_(int fd, const struct aug_var* var, struct aug_files* files)
 {
     ssize_t ret;
-    aug_state_t state = var->ptr_;
+    aug_state_t state = var->arg_;
     int events = aug_ioevents(mplexer_, fd);
 
     AUG_DEBUG0("checking connection '%d'", fd);
@@ -135,7 +135,7 @@ conn_(int fd, const struct aug_var* var, struct aug_files* files)
 
         AUG_DEBUG0("handling write event");
 
-        if (-1 == (ret = aug_writesome(state, fd))) {
+        if (-1 == (ret = aug_writesome_(state, fd))) {
             aug_perrinfo(NULL, "aug_writesome() failed");
             goto fail;
         }
@@ -151,7 +151,7 @@ conn_(int fd, const struct aug_var* var, struct aug_files* files)
     return 1;
 
  fail:
-    destroyconn_(var->ptr_, mplexer_, fd);
+    destroyconn_(var->arg_, mplexer_, fd);
     aug_close(fd);
     return 0;
 }
@@ -184,8 +184,8 @@ listener_(int fd, const struct aug_var* var, struct aug_files* files)
     }
 
     local.type_ = NULL;
-    local.ptr_ = createconn_(mplexer_, conn);
-    if (!local.ptr_) {
+    local.arg_ = createconn_(mplexer_, conn);
+    if (!local.arg_) {
         aug_perrinfo(NULL, "failed to create connection");
         aug_close(conn);
         return 1;
@@ -351,7 +351,7 @@ init_(void* arg)
         goto fail1;
 
     var.type_ = NULL;
-    var.ptr_ = &mplexer_;
+    var.arg_ = &mplexer_;
     if (-1 == aug_insertfile(&files_, fd_, listener_, &var))
         goto fail2;
 

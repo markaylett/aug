@@ -9,7 +9,6 @@ static const char rcsid[] = "$Id$";
 
 #include "augnet/http.h"
 #include "augnet/types.h"
-#include "augnet/utility.h"
 
 #include "augutil/var.h"
 
@@ -25,6 +24,27 @@ static const char rcsid[] = "$Id$";
 #include <string.h>       /* strlen() */
 
 #define BUFSIZE_ 4096
+
+struct aug_buf {
+    struct iovec* iov_;
+    size_t size_;
+};
+
+static void
+aug_addbuf(struct aug_buf* buf, size_t num)
+{
+    while (buf->size_ && (size_t)buf->iov_->iov_len <= num) {
+        num -= (buf->iov_++)->iov_len;
+        --buf->size_;
+    }
+
+    if (buf->size_ && num) {
+
+        buf->iov_->iov_base = (char*)buf->iov_->iov_base + num;
+        buf->iov_->iov_len -= (int)num;
+        num = 0;
+    }
+}
 
 struct aug_state_ {
     aug_request_t request_;
@@ -103,7 +123,7 @@ prepare_(aug_state_t state)
 static void
 initial_(const struct aug_var* var, const char* initial)
 {
-    aug_state_t state = var->ptr_;
+    aug_state_t state = var->arg_;
     if (!state->in_.initial_)
         state->in_.initial_ = aug_createstrbuf(AUG_MAXLINE);
     aug_setstrbufs(&state->in_.initial_, initial);
@@ -112,7 +132,7 @@ initial_(const struct aug_var* var, const char* initial)
 static void
 field_(const struct aug_var* var, const char* name, const char* value)
 {
-    aug_state_t state = var->ptr_;
+    aug_state_t state = var->arg_;
     struct aug_field field;
 
     field.name_ = name;
@@ -127,7 +147,7 @@ field_(const struct aug_var* var, const char* name, const char* value)
 static void
 csize_(const struct aug_var* var, unsigned csize)
 {
-    aug_state_t state = var->ptr_;
+    aug_state_t state = var->arg_;
     if (!state->in_.mar_)
         state->in_.mar_ = aug_createmar();
     aug_truncatemar(state->in_.mar_, csize);
@@ -137,7 +157,7 @@ csize_(const struct aug_var* var, unsigned csize)
 static void
 cdata_(const struct aug_var* var, const void* buf, unsigned size)
 {
-    aug_state_t state = var->ptr_;
+    aug_state_t state = var->arg_;
     if (!state->in_.mar_)
         state->in_.mar_ = aug_createmar();
     aug_writemar(state->in_.mar_, buf, size);
@@ -146,7 +166,7 @@ cdata_(const struct aug_var* var, const void* buf, unsigned size)
 static void
 end_(const struct aug_var* var, int commit)
 {
-    aug_state_t state = var->ptr_;
+    aug_state_t state = var->arg_;
     if (commit) {
 
         static struct aug_messages messages = AUG_HEAD_INITIALIZER(messages);
@@ -194,7 +214,7 @@ aug_createstate(aug_request_t request, const struct aug_var* var)
     state->request_ = request;
     aug_setvar(&state->var_, var);
     local.type_ = NULL;
-    local.ptr_ = state;
+    local.arg_ = state;
     if (!(state->in_.parser_
           = aug_createhttpparser(AUG_MAXLINE, &handler_, &local)))
         goto fail;
@@ -284,7 +304,7 @@ aug_readsome(aug_state_t state, int fd)
 }
 
 ssize_t
-aug_writesome(aug_state_t state, int fd)
+aug_writesome_(aug_state_t state, int fd)
 {
     ssize_t ret = aug_writev(fd, state->out_.buf_.iov_,
                              state->out_.buf_.size_);

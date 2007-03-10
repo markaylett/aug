@@ -9,7 +9,7 @@ modinclude_HEADERS = \
 	http.h \
 	inet.h \
 	types.h \
-	utility.h
+	writer.h
 
 noinst_HEADERS =
 
@@ -23,7 +23,7 @@ libaugnet_la_SOURCES = \
 	http.c \
 	inet.c \
 	types.c \
-	utility.c
+	writer.c
 
 libaugnet_la_LDFLAGS = \
 	-no-undefined \

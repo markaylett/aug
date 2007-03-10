@@ -121,7 +121,7 @@ namespace augas {
               type_(type)
         {
             var_.type_ = 0;
-            var_.ptr_ = 0;
+            var_.arg_ = 0;
         }
     };
 
@@ -193,7 +193,7 @@ namespace augas {
 
         idtoserv::iterator it(state_->idtoserv_.find(id));
         servptr serv(it->second);
-        augas_object timer = { id, var->ptr_ };
+        augas_object timer = { id, var->arg_ };
         serv->expire(timer, *ms);
 
         if (0 == *ms) {
@@ -294,7 +294,7 @@ namespace augas {
             aug_event e;
             e.type_ = AUGAS_MODEVENT;
             e.var_.type_ = 0;
-            e.var_.ptr_ = arg.get();
+            e.var_.arg_ = arg.get();
             writeevent(aug_eventout(), e);
             aug_setvar(&arg->var_, reinterpret_cast<const aug_var*>(var));
             arg.release();
@@ -715,10 +715,9 @@ namespace augas {
             // Actual handling is performed in do_run().
             break;
         case AUGAS_MODEVENT:
-            assert(AUG_VTPTR == event.arg_.type_);
             {
                 auto_ptr<augas::event> ev(static_cast<
-                                          augas::event*>(event.var_.ptr_));
+                                          augas::event*>(event.var_.arg_));
 
                 vector<servptr> servs;
                 state_->manager_.getservs(servs, ev->to_);

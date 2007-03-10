@@ -89,8 +89,8 @@ namespace aug {
         timercb(int id, const aug_var* var, unsigned* ms, aug_timers* timers)
         {
             try {
-                timercb_base* ptr = static_cast<timercb_base*>(var->ptr_);
-                ptr->callback(id, *ms, *timers);
+                timercb_base* arg = static_cast<timercb_base*>(var->arg_);
+                arg->callback(id, *ms, *timers);
             } AUG_SETERRINFOCATCH;
         }
     }

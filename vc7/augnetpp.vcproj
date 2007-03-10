@@ -123,6 +123,9 @@
 			<File
 				RelativePath="..\src\cpp\augnetpp\inet.cpp">
 			</File>
+			<File
+				RelativePath="..\src\cpp\augnetpp\writer.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -142,6 +145,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\inet.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augnetpp\writer.hpp">
 			</File>
 		</Filter>
 		<Filter

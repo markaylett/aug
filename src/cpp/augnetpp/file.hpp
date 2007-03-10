@@ -93,8 +93,8 @@ namespace aug {
         filecb(int id, const struct aug_var* var, aug_files* files)
         {
             try {
-                filecb_base* ptr = static_cast<filecb_base*>(var->ptr_);
-                return ptr->callback(id, *files) ? 1 : 0;
+                filecb_base* arg = static_cast<filecb_base*>(var->arg_);
+                return arg->callback(id, *files) ? 1 : 0;
             } AUG_PERRINFOCATCH;
 
             /**

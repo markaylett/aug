@@ -57,6 +57,7 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "setup", "setup.vdproj", "{9
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "client.vcproj", "{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}"
 	ProjectSection(ProjectDependencies) = postProject
+		{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36} = {05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "server.vcproj", "{D29B4A1B-FFCD-464D-B2AD-010A9536E58D}"

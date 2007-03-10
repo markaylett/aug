@@ -37,6 +37,6 @@ ssize_t
 aug_readsome(aug_state_t state, int fd);
 
 ssize_t
-aug_writesome(aug_state_t state, int fd);
+aug_writesome_(aug_state_t state, int fd);
 
 #endif /* HTTPD_STATE_H */

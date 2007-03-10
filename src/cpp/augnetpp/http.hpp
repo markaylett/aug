@@ -65,52 +65,54 @@ namespace aug {
     namespace detail {
 
         inline void
-        initial(const aug_var* var, const char* value)
+        initial(const aug_var* var, const char* value) AUG_NOTHROW
         {
             try {
-                httphandler_base* ptr = static_cast<
-                    httphandler_base*>(var->ptr_);
-                ptr->initial(value);
+                httphandler_base* arg = static_cast<
+                    httphandler_base*>(var->arg_);
+                arg->initial(value);
             } AUG_SETERRINFOCATCH;
         }
 
         inline void
-        field(const aug_var* var, const char* name, const char* value)
+        field(const aug_var* var, const char* name,
+              const char* value) AUG_NOTHROW
         {
             try {
-                httphandler_base* ptr = static_cast<
-                    httphandler_base*>(var->ptr_);
-                ptr->field(name, value);
+                httphandler_base* arg = static_cast<
+                    httphandler_base*>(var->arg_);
+                arg->field(name, value);
             } AUG_SETERRINFOCATCH;
         }
 
         inline void
-        csize(const aug_var* var, unsigned csize)
+        csize(const aug_var* var, unsigned csize) AUG_NOTHROW
         {
             try {
-                httphandler_base* ptr = static_cast<
-                    httphandler_base*>(var->ptr_);
-                ptr->csize(csize);
+                httphandler_base* arg = static_cast<
+                    httphandler_base*>(var->arg_);
+                arg->csize(csize);
             } AUG_SETERRINFOCATCH;
         }
 
         inline void
-        cdata(const aug_var* var, const void* cdata, unsigned csize)
+        cdata(const aug_var* var, const void* cdata,
+              unsigned csize) AUG_NOTHROW
         {
             try {
-                httphandler_base* ptr = static_cast<
-                    httphandler_base*>(var->ptr_);
-                ptr->cdata(cdata, csize);
+                httphandler_base* arg = static_cast<
+                    httphandler_base*>(var->arg_);
+                arg->cdata(cdata, csize);
             } AUG_SETERRINFOCATCH;
         }
 
         inline void
-        end(const aug_var* var, int commit)
+        end(const aug_var* var, int commit) AUG_NOTHROW
         {
             try {
-                httphandler_base* ptr = static_cast<
-                    httphandler_base*>(var->ptr_);
-                ptr->end(commit ? true : false);
+                httphandler_base* arg = static_cast<
+                    httphandler_base*>(var->arg_);
+                arg->end(commit ? true : false);
             } AUG_SETERRINFOCATCH;
         }
     }

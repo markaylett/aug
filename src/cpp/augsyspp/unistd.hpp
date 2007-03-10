@@ -12,9 +12,9 @@
 namespace aug {
 
     inline void
-    close(int fd)
+    close(fdref ref)
     {
-        verify(aug_close(fd));
+        verify(aug_close(ref.get()));
     }
 
     inline std::pair<smartfd, smartfd>

@@ -10,6 +10,6 @@
 #include "augnet/http.h"
 #include "augnet/inet.h"
 #include "augnet/types.h"
-#include "augnet/utility.h"
+#include "augnet/writer.h"
 
 #endif /* AUGNET_H */

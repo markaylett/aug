@@ -27,18 +27,6 @@ buffer::putsome(const void* buf, size_t size)
 }
 
 bool
-buffer::readsome(fdref ref)
-{
-    char buf[4096];
-    size_t size(aug::read(ref, buf, sizeof(buf) - 1));
-    if (0 == size)
-        return false;
-
-    putsome(buf, size);
-    return true;
-}
-
-bool
 buffer::writesome(fdref ref)
 {
     size_t size(end_ - begin_);

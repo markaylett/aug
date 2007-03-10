@@ -15,7 +15,7 @@ struct aug_vartype {
 
 struct aug_var {
     const struct aug_vartype* type_;
-    void* ptr_;
+    void* arg_;
 };
 
 #define AUG_VARNULL { NULL, NULL }

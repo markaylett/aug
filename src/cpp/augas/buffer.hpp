@@ -21,9 +21,6 @@ namespace augas {
         putsome(const void* buf, size_t size);
 
         bool
-        readsome(aug::fdref ref);
-
-        bool
         writesome(aug::fdref ref);
 
         bool

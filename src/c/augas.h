@@ -56,7 +56,7 @@ struct augas_vartype {
 
 struct augas_var {
     const struct augas_vartype* type_;
-    void* ptr_;
+    void* arg_;
 };
 
 struct augas_serv {

@@ -108,7 +108,7 @@ post_(PyObject* self, PyObject* args)
         }
 
         var.type_ = &vartype_;
-        var.ptr_ = buf;
+        var.arg_ = buf;
     }
 
     if (-1 == augas_post(to, type, &var)) {
@@ -324,7 +324,7 @@ settimer_(PyObject* self, PyObject* args)
         return NULL;
 
     var.type_ = &vartype_;
-    var.ptr_ = timer;
+    var.arg_ = timer;
 
     if (-1 == (tid = augas_settimer(ms, &var))) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
