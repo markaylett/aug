@@ -224,6 +224,16 @@ struct augas_host {
     /**
        \brief TODO
        \param cid TODO
+       \param var TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*sendv_)(augas_id cid, const struct augas_var* var);
+
+    /**
+       \brief TODO
+       \param cid TODO
        \param ms TODO
        \param flags TODO
        \return TODO
@@ -430,6 +440,7 @@ augas_gethost(void);
 #define augas_tcpconnect    (augas_gethost()->tcpconnect_)
 #define augas_tcplisten     (augas_gethost()->tcplisten_)
 #define augas_send          (augas_gethost()->send_)
+#define augas_sendv         (augas_gethost()->sendv_)
 #define augas_setrwtimer    (augas_gethost()->setrwtimer_)
 #define augas_resetrwtimer  (augas_gethost()->resetrwtimer_)
 #define augas_cancelrwtimer (augas_gethost()->cancelrwtimer_)

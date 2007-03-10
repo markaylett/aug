@@ -5,31 +5,30 @@
 #define AUGAS_BUFFER_HPP
 
 #include "augsyspp/types.hpp"
+#include "augnetpp/writer.hpp"
 
 #include <vector>
 
 namespace augas {
 
     class buffer {
-        std::vector<char> vec_;
-        size_t begin_, end_;
+        aug::writer writer_;
     public:
-        explicit
-        buffer(size_t size = 4096);
-
         void
-        putsome(const void* buf, size_t size);
+        append(const aug_var& var)
+        {
+            appendbuf(writer_, var);
+        }
+        void
+        append(const void* buf, size_t size);
 
         bool
         writesome(aug::fdref ref);
 
         bool
-        consume(size_t n);
-
-        bool
         empty() const
         {
-            return begin_ == end_;
+            return writer_.empty();
         }
     };
 }

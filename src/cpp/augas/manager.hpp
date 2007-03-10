@@ -40,6 +40,13 @@ namespace augas {
         manager()
         {
         }
+        bool
+        append(aug::mplexer& mplexer, augas_id cid, const aug_var& var);
+
+        bool
+        append(aug::mplexer& mplexer, augas_id cid, const void* buf,
+               size_t size);
+
         void
         clear();
 
@@ -55,10 +62,6 @@ namespace augas {
         void
         load(const char* rundir, const options& options,
              const augas_host& host);
-
-        bool
-        send(aug::mplexer& mplexer, augas_id cid, const void* buf,
-             size_t size);
 
         void
         teardown();

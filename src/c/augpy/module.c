@@ -11,19 +11,19 @@
 static PyTypeObject* type_ = NULL;
 
 static int
-destroy_(void* ptr)
+destroy_(void* arg)
 {
-    Py_DECREF((PyObject*)ptr);
+    Py_DECREF((PyObject*)arg);
     return 0;
 }
 
 static const void*
-buf_(void* ptr, size_t* size)
+buf_(void* arg, size_t* size)
 {
     const void* buf;
     int len;
 
-    if (-1 == PyObject_AsReadBuffer((PyObject*)ptr, &buf, &len)) {
+    if (-1 == PyObject_AsReadBuffer((PyObject*)arg, &buf, &len)) {
         if (size)
             *size = 0;
         return NULL;
@@ -235,18 +235,29 @@ tcplisten_(PyObject* self, PyObject* args)
 static PyObject*
 send_(PyObject* self, PyObject* args)
 {
-    PyObject* sock;
-    const char* buf;
-    int size;
+    PyObject* sock, * buf;
+    struct augas_var var = { NULL, NULL };
 
-    if (!PyArg_ParseTuple(args, "O!s#:send", type_, &sock, &buf, &size))
+    if (!PyArg_ParseTuple(args, "O!O:send", type_, &sock, &buf))
         return NULL;
 
-    if (-1 == augas_send(augpy_getid(sock), buf, size)) {
+    if (!PyObject_CheckReadBuffer(buf)) {
+
+        PyErr_SetString(PyExc_TypeError,
+                        "post() argument 3 must be string or read-only"
+                        " buffer");
+        return NULL;
+    }
+
+    var.type_ = &vartype_;
+    var.arg_ = buf;
+
+    if (-1 == augas_sendv(augpy_getid(sock), &var)) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         return NULL;
     }
 
+    Py_INCREF(buf);
     return incret_(Py_None);
 }
 

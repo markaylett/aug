@@ -53,6 +53,28 @@ namespace {
     }
 }
 
+bool
+manager::append(mplexer& mplexer, augas_id cid, const aug_var& var)
+{
+    connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
+    if (!sendable(*cptr))
+        return false;
+
+    cptr->append(mplexer, var);
+    return true;
+}
+
+bool
+manager::append(mplexer& mplexer, augas_id cid, const void* buf, size_t size)
+{
+    connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
+    if (!sendable(*cptr))
+        return false;
+
+    cptr->append(mplexer, buf, size);
+    return true;
+}
+
 void
 manager::insert(const string& name, const servptr& serv, const char* groups)
 {
@@ -195,17 +217,6 @@ manager::load(const char* rundir, const options& options,
         insert(DEFAULT_NAME,
                servptr(new augas::serv(module, DEFAULT_NAME)), 0);
     }
-}
-
-bool
-manager::send(mplexer& mplexer, augas_id cid, const void* buf, size_t size)
-{
-    connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
-    if (!sendable(*cptr))
-        return false;
-
-    cptr->putsome(mplexer, buf, size);
-    return true;
 }
 
 void

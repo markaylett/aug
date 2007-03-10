@@ -69,6 +69,18 @@ clntconn::do_accept(const aug_endpoint& ep)
 }
 
 void
+clntconn::do_append(aug::mplexer& mplexer, const aug_var& var)
+{
+    conn_->append(mplexer, var);
+}
+
+void
+clntconn::do_append(aug::mplexer& mplexer, const void* buf, size_t size)
+{
+    conn_->append(mplexer, buf, size);
+}
+
+void
 clntconn::do_connected(const aug_endpoint& ep)
 {
     conn_->connected(ep);
@@ -96,12 +108,6 @@ clntconn::do_process(mplexer& mplexer)
     }
 
     return true;
-}
-
-void
-clntconn::do_putsome(aug::mplexer& mplexer, const void* buf, size_t size)
-{
-    conn_->putsome(mplexer, buf, size);
 }
 
 void

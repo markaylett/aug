@@ -135,6 +135,12 @@ aug_appendbuf(aug_writer_t writer, const struct aug_var* var)
     return 0;
 }
 
+AUGNET_API int
+aug_emptybuf(aug_writer_t writer)
+{
+    return AUG_EMPTY(&writer->bufs_);
+}
+
 AUGNET_API ssize_t
 aug_writesome(aug_writer_t writer, int fd)
 {

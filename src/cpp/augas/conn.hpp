@@ -27,13 +27,16 @@ namespace augas {
         do_accept(const aug_endpoint& ep) = 0;
 
         virtual void
+        do_append(aug::mplexer& mplexer, const aug_var& var) = 0;
+
+        virtual void
+        do_append(aug::mplexer& mplexer, const void* buf, size_t size) = 0;
+
+        virtual void
         do_connected(const aug_endpoint& ep) = 0;
 
         virtual bool
         do_process(aug::mplexer& mplexer) = 0;
-
-        virtual void
-        do_putsome(aug::mplexer& mplexer, const void* buf, size_t size) = 0;
 
         virtual void
         do_shutdown() = 0;
@@ -56,6 +59,16 @@ namespace augas {
             return do_accept(ep);
         }
         void
+        append(aug::mplexer& mplexer, const aug_var& var)
+        {
+            do_append(mplexer, var);
+        }
+        void
+        append(aug::mplexer& mplexer, const void* buf, size_t size)
+        {
+            do_append(mplexer, buf, size);
+        }
+        void
         connected(const aug_endpoint& ep)
         {
             do_connected(ep);
@@ -64,11 +77,6 @@ namespace augas {
         process(aug::mplexer& mplexer)
         {
             return do_process(mplexer);
-        }
-        void
-        putsome(aug::mplexer& mplexer, const void* buf, size_t size)
-        {
-            do_putsome(mplexer, buf, size);
         }
         void
         shutdown()
@@ -127,13 +135,16 @@ namespace augas {
         do_accept(const aug_endpoint& ep);
 
         void
+        do_append(aug::mplexer& mplexer, const aug_var& var);
+
+        void
+        do_append(aug::mplexer& mplexer, const void* buf, size_t size);
+
+        void
         do_connected(const aug_endpoint& ep);
 
         bool
         do_process(aug::mplexer& mplexer);
-
-        void
-        do_putsome(aug::mplexer& mplexer, const void* buf, size_t size);
 
         void
         do_shutdown();
@@ -181,13 +192,16 @@ namespace augas {
         do_accept(const aug_endpoint& ep);
 
         void
+        do_append(aug::mplexer& mplexer, const aug_var& var);
+
+        void
+        do_append(aug::mplexer& mplexer, const void* buf, size_t size);
+
+        void
         do_connected(const aug_endpoint& ep);
 
         bool
         do_process(aug::mplexer& mplexer);
-
-        void
-        do_putsome(aug::mplexer& mplexer, const void* buf, size_t size);
 
         void
         do_shutdown();

@@ -4,48 +4,47 @@
 #define AUGAS_BUILD
 #include "augas/buffer.hpp"
 
-#include "augsyspp/unistd.hpp"
+#include "augutilpp/var.hpp"
+
+#include <string>
 
 using namespace aug;
 using namespace augas;
+using namespace std;
 
-buffer::buffer(size_t size)
-    : vec_(size),
-      begin_(0),
-      end_(0)
-{
+namespace {
+
+    struct vartype : basic_vartype<string> {
+        static void
+        destroy(arg_type* arg)
+        {
+            delete arg;
+        }
+        static const void*
+        buf(arg_type& arg, size_t& size)
+        {
+            size = arg.size();
+            return arg.data();
+        }
+        static const void*
+        buf(arg_type& arg)
+        {
+            return arg.data();
+        }
+    };
 }
 
 void
-buffer::putsome(const void* buf, size_t size)
+buffer::append(const void* buf, size_t size)
 {
-    if (vec_.size() - end_ < size)
-        vec_.resize(end_ + size);
-
-    memcpy(&vec_[end_], buf, size);
-    end_ += size;
+    string* s(new string(static_cast<const char*>(buf), size));
+    aug_var v;
+    appendbuf(writer_, bindvar<vartype>(v, *s));
 }
 
 bool
 buffer::writesome(fdref ref)
 {
-    size_t size(end_ - begin_);
-    size = aug::write(ref, &vec_[begin_], size);
-    if ((begin_ += size) == end_) {
-        begin_ = end_ = 0;
-        return false;
-    }
-    return true;
-}
-
-bool
-buffer::consume(size_t n)
-{
-    size_t size(end_ - begin_);
-    size = AUG_MIN(n, size);
-    if ((begin_ += size) == end_) {
-        begin_ = end_ = 0;
-        return false;
-    }
-    return true;
+    aug::writesome(writer_, ref);
+    return writer_.empty();
 }

@@ -130,6 +130,19 @@ namespace augas {
     }
 
     inline void
+    sendv(augas_id cid, const augas_var& var)
+    {
+        if (AUGAS_ERROR == augas_sendv(cid, &var))
+            throw error(augas_error());
+    }
+
+    inline void
+    sendv(const augas_object& conn, const augas_var& var)
+    {
+        sendv(conn.id_, var);
+    }
+
+    inline void
     setrwtimer(augas_id cid, unsigned ms, unsigned flags)
     {
         if (AUGAS_ERROR == augas_setrwtimer(cid, ms, flags))

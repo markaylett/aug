@@ -50,6 +50,20 @@ established::do_accept(const aug_endpoint& ep)
 }
 
 void
+established::do_append(aug::mplexer& mplexer, const aug_var& var)
+{
+    buffer_.append(var);
+    setioeventmask(mplexer, sfd_, AUG_IOEVENTRDWR);
+}
+
+void
+established::do_append(aug::mplexer& mplexer, const void* buf, size_t size)
+{
+    buffer_.append(buf, size);
+    setioeventmask(mplexer, sfd_, AUG_IOEVENTRDWR);
+}
+
+void
 established::do_connected(const aug_endpoint& ep)
 {
     inetaddr addr(null);
@@ -90,13 +104,13 @@ established::do_process(mplexer& mplexer)
 
     if (bits & AUG_IOEVENTWR) {
 
-        bool more(buffer_.writesome(sfd_));
+        bool done(buffer_.writesome(sfd_));
 
         // Data has been written: reset write timer.
 
         rwtimer_.resetrwtimer(AUGAS_TIMWR);
 
-        if (!more) {
+        if (done) {
 
             // No more (buffered) data to be written.
 
@@ -110,13 +124,6 @@ established::do_process(mplexer& mplexer)
     }
 
     return false;
-}
-
-void
-established::do_putsome(aug::mplexer& mplexer, const void* buf, size_t size)
-{
-    buffer_.putsome(buf, size);
-    setioeventmask(mplexer, sfd_, AUG_IOEVENTRDWR);
 }
 
 void
@@ -205,6 +212,18 @@ connecting::do_accept(const aug_endpoint& ep)
 }
 
 void
+connecting::do_append(aug::mplexer& mplexer, const aug_var& var)
+{
+    buffer_.append(var);
+}
+
+void
+connecting::do_append(aug::mplexer& mplexer, const void* buf, size_t size)
+{
+    buffer_.append(buf, size);
+}
+
+void
 connecting::do_connected(const aug_endpoint& ep)
 {
     throw error(__FILE__, __LINE__, ESTATE,
@@ -231,12 +250,6 @@ connecting::do_process(mplexer& mplexer)
     }
 
     return false;
-}
-
-void
-connecting::do_putsome(aug::mplexer& mplexer, const void* buf, size_t size)
-{
-    buffer_.putsome(buf, size);
 }
 
 void

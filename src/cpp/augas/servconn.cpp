@@ -69,6 +69,18 @@ servconn::do_accept(const aug_endpoint& ep)
 }
 
 void
+servconn::do_append(aug::mplexer& mplexer, const aug_var& var)
+{
+    conn_.append(mplexer, var);
+}
+
+void
+servconn::do_append(aug::mplexer& mplexer, const void* buf, size_t size)
+{
+    conn_.append(mplexer, buf, size);
+}
+
+void
 servconn::do_connected(const aug_endpoint& ep)
 {
     conn_.connected(ep);
@@ -78,12 +90,6 @@ bool
 servconn::do_process(mplexer& mplexer)
 {
     return conn_.process(mplexer);
-}
-
-void
-servconn::do_putsome(aug::mplexer& mplexer, const void* buf, size_t size)
-{
-    conn_.putsome(mplexer, buf, size);
 }
 
 void

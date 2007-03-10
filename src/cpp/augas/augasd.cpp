@@ -451,7 +451,22 @@ namespace augas {
     {
         AUG_DEBUG2("send(): id=[%d]", cid);
         try {
-            if (!state_->manager_.send(state_->mplexer_, cid, buf, size))
+            if (!state_->manager_.append(state_->mplexer_, cid, buf, size))
+                throw error(__FILE__, __LINE__, EHOSTCALL,
+                            "connection has been shutdown");
+            return 0;
+        } AUG_SETERRINFOCATCH;
+        return -1;
+    }
+
+    int
+    sendv_(augas_id cid, const augas_var* var)
+    {
+        AUG_DEBUG2("sendv(): id=[%d]", cid);
+        try {
+            if (!state_->manager_
+                .append(state_->mplexer_, cid,
+                        *reinterpret_cast<const aug_var*>(var)))
                 throw error(__FILE__, __LINE__, EHOSTCALL,
                             "connection has been shutdown");
             return 0;
@@ -575,6 +590,7 @@ namespace augas {
         tcpconnect_,
         tcplisten_,
         send_,
+        sendv_,
         setrwtimer_,
         resetrwtimer_,
         cancelrwtimer_,

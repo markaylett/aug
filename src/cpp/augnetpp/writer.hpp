@@ -42,6 +42,12 @@ namespace aug {
         {
             return writer_;
         }
+
+        bool
+        empty() const
+        {
+            return aug_emptybuf(writer_) ? true : false;
+        }
     };
 
     inline void
