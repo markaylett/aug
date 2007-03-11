@@ -11,6 +11,32 @@
 
 namespace augas {
 
+#if !AUGAS_VARBUFFER
+    class buffer {
+        aug::writer writer_;
+    public:
+        std::vector<char> vec_;
+        size_t begin_, end_;
+
+        explicit
+        buffer(size_t size = 4096);
+
+        void
+        append(const aug_var& var);
+
+        void
+        append(const void* buf, size_t size);
+
+        bool
+        writesome(aug::fdref ref);
+
+        bool
+        empty() const
+        {
+            return begin_ == end_;
+        }
+    };
+#else // AUGAS_VARBUFFER
     class buffer {
         aug::writer writer_;
     public:
@@ -31,6 +57,7 @@ namespace augas {
             return writer_.empty();
         }
     };
+#endif // AUGAS_VARBUFFER
 }
 
 #endif // AUGAS_BUFFER_HPP
