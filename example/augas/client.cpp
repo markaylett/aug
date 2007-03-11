@@ -91,12 +91,6 @@ namespace {
             double k(static_cast<double>(bytes_) / 1024);
             augas_writelog(AUGAS_LOGINFO, "total size: %f k", k);
 
-            k /= static_cast<double>(conns_);
-            augas_writelog(AUGAS_LOGINFO, "size per conn: %f k", k);
-
-            ms /= static_cast<double>(echos_);
-            augas_writelog(AUGAS_LOGINFO, "size per sec: %f k", 1000.0 / k);
-
             stopall();
         }
         void
