@@ -49,10 +49,12 @@ namespace {
             return true;
         }
         void
-        do_data(const object& sock, const char* buf, size_t size)
+        do_data(const object& sock, const void* buf, size_t size)
         {
             string& tok(*sock.user<string>());
-            tokenise(buf, buf + size, tok, '\n', eachline(sock));
+            tokenise(static_cast<const char*>(buf),
+                     static_cast<const char*>(buf) + size, tok, '\n',
+                     eachline(sock));
         }
         void
         do_rdexpire(const object& sock, unsigned& ms)

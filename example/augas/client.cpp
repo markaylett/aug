@@ -107,11 +107,13 @@ namespace {
             --s.tosend_;
         }
         void
-        do_data(const object& sock, const char* buf, size_t size)
+        do_data(const object& sock, const void* buf, size_t size)
         {
             bytes_ += size;
             state& s(*sock.user<state>());
-            tokenise(buf, buf + size, s.tok_, '\n', eachline(sock));
+            tokenise(static_cast<const char*>(buf),
+                     static_cast<const char*>(buf) + size, s.tok_, '\n',
+                     eachline(sock));
         }
         benchserv()
             : conns_(0),
