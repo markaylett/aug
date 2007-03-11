@@ -40,6 +40,7 @@ namespace {
 
     struct benchserv : basic_serv {
         unsigned conns_, estab_, echos_;
+        size_t bytes_;
         timeval start_;
         bool
         do_start(const char* sname)
@@ -76,15 +77,25 @@ namespace {
             timeval tv;
             aug::gettimeofday(tv);
             aug::tvsub(tv, start_);
+
             double ms(static_cast<double>(aug::tvtoms(tv)));
 
             augas_writelog(AUGAS_LOGINFO, "total time: %f ms", ms);
 
             ms /= static_cast<double>(conns_);
-            augas_writelog(AUGAS_LOGINFO, "per conn: %f ms", ms);
+            augas_writelog(AUGAS_LOGINFO, "time per conn: %f ms", ms);
 
             ms /= static_cast<double>(echos_);
             augas_writelog(AUGAS_LOGINFO, "echos per sec: %f", 1000.0 / ms);
+
+            double k(static_cast<double>(bytes_) / 1024);
+            augas_writelog(AUGAS_LOGINFO, "total size: %f k", k);
+
+            k /= static_cast<double>(conns_);
+            augas_writelog(AUGAS_LOGINFO, "size per conn: %f k", k);
+
+            ms /= static_cast<double>(echos_);
+            augas_writelog(AUGAS_LOGINFO, "size per sec: %f k", 1000.0 / k);
 
             stopall();
         }
@@ -98,12 +109,14 @@ namespace {
         void
         do_data(const object& sock, const char* buf, size_t size)
         {
+            bytes_ += size;
             state& s(*sock.user<state>());
             tokenise(buf, buf + size, s.tok_, '\n', eachline(sock));
         }
         benchserv()
             : conns_(0),
-              estab_(0)
+              estab_(0),
+              bytes_(0)
         {
         }
         static serv_base*

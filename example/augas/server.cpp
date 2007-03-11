@@ -57,6 +57,7 @@ namespace {
         void
         do_rdexpire(const object& sock, unsigned& ms)
         {
+            writelog(AUGAS_LOGINFO, "no data received for 15 seconds");
             shutdown(sock);
         }
         static serv_base*
