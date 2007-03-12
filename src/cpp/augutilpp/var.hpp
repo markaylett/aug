@@ -40,38 +40,45 @@ namespace aug {
     namespace detail {
 
         template <typename T>
-        int
-        destroy(void* arg) AUG_NOTHROW
-        {
-            try {
-                T::destroy(static_cast<typename T::arg_type*>(arg));
+        class vartype {
+            static int
+            destroy(void* arg) AUG_NOTHROW
+            {
+                try {
+                    T::destroy(static_cast<typename T::arg_type*>(arg));
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static const void*
+            buf(void* arg, size_t* size) AUG_NOTHROW
+            {
+                try {
+                    return size
+                        ? T::buf(*static_cast<typename T::arg_type*>(arg),
+                                 *size)
+                        : T::buf(*static_cast<typename T::arg_type*>(arg));
+                } AUG_SETERRINFOCATCH;
                 return 0;
-            } AUG_SETERRINFOCATCH;
-            return -1;
-        }
-
-        template <typename T>
-        const void*
-        buf(void* arg, size_t* size) AUG_NOTHROW
-        {
-            try {
-                return size
-                    ? T::buf(*static_cast<typename T::arg_type*>(arg), *size)
-                    : T::buf(*static_cast<typename T::arg_type*>(arg));
-            } AUG_SETERRINFOCATCH;
-            return 0;
-        }
+            }
+        public:
+            static const aug_vartype&
+            get()
+            {
+                static const aug_vartype local = {
+                    destroy,
+                    buf
+                };
+                return local;
+            }
+        };
     }
 
     template <typename T>
     aug_var&
     bindvar(aug_var& var, typename T::arg_type& arg)
     {
-        static struct aug_vartype type = {
-            detail::destroy<T>,
-            detail::buf<T>
-        };
-        var.type_ = &type;
+        var.type_ = &detail::vartype<T>::get();
         var.arg_ = &arg;
         return var;
     }
@@ -80,11 +87,7 @@ namespace aug {
     aug_var&
     bindvar(aug_var& var, const null_&)
     {
-        static struct aug_vartype type = {
-            detail::destroy<T>,
-            detail::buf<T>
-        };
-        var.type_ = &type;
+        var.type_ = &detail::vartype<T>::get();
         var.arg_ = 0;
         return var;
     }

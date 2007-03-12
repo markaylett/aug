@@ -192,7 +192,7 @@ end_(const struct aug_var* var, int commit)
     }
 }
 
-const struct aug_httphandler handler_ = {
+static const struct aug_httphandler handler_ = {
     initial_,
     field_,
     csize_,

@@ -228,10 +228,11 @@ before |tok| is cleared.
 
 @<member...@>+=
 void
-echoserv::do_data(const object& sock, const char* buf, size_t size)
+echoserv::do_data(const object& sock, const void* buf, size_t size)
 {
   string& tok(*sock.user<string>());
-  tokenise(buf, buf + size, tok, '\n', echoline(sock));
+  tokenise(static_cast<const char*>(buf),
+    static_cast<const char*>(buf) + size, tok, '\n', echoline(sock));
 }
 
 @ Read-timer expiry is communicated using the |do_rdexpire()| function.  If no

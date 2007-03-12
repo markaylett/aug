@@ -15,3 +15,6 @@ modclient_OBJS = client.o
 modclient_LIBS = augsys
 
 include $(AUG_HOME)/etc/aug.mk
+
+test: all
+	$(AUG_HOME)/bin/augasd -f bench.conf test

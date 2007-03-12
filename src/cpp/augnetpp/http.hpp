@@ -14,107 +14,69 @@
 
 namespace aug {
 
-    class httphandler_base {
-
-        virtual void
-        do_initial(const char* value) = 0;
-
-        virtual void
-        do_field(const char* name, const char* value) = 0;
-
-        virtual void
-        do_csize(unsigned csize) = 0;
-
-        virtual void
-        do_cdata(const void* cdata, unsigned csize) = 0;
-
-        virtual void
-        do_end(bool commit) = 0;
-
-    public:
-        virtual
-        ~httphandler_base() AUG_NOTHROW
-        {
-        }
-        void
-        initial(const char* value)
-        {
-            do_initial(value);
-        }
-        void
-        field(const char* name, const char* value)
-        {
-            do_field(name, value);
-        }
-        void
-        csize(unsigned csize)
-        {
-            do_csize(csize);
-        }
-        void
-        cdata(const void* cdata, unsigned csize)
-        {
-            do_cdata(cdata, csize);
-        }
-        void
-        end(bool commit)
-        {
-        }
-    };
-
     namespace detail {
 
-        inline void
-        initial(const aug_var* var, const char* value) AUG_NOTHROW
-        {
-            try {
-                httphandler_base* arg = static_cast<
-                    httphandler_base*>(var->arg_);
-                arg->initial(value);
-            } AUG_SETERRINFOCATCH;
-        }
+        template <typename T>
+        class httphandler {
+            static void
+            initial(const aug_var* var, const char* value) AUG_NOTHROW
+            {
+                try {
+                    T::initial(*var, value);
+                } AUG_SETERRINFOCATCH;
+            }
+            static void
+            field(const aug_var* var, const char* name,
+                  const char* value) AUG_NOTHROW
+            {
+                try {
+                    T::field(*var, name, value);
+                } AUG_SETERRINFOCATCH;
+            }
+            static void
+            csize(const aug_var* var, unsigned csize) AUG_NOTHROW
+            {
+                try {
+                    T::csize(*var, csize);
+                } AUG_SETERRINFOCATCH;
+            }
+            static void
+            cdata(const aug_var* var, const void* cdata,
+                  unsigned csize) AUG_NOTHROW
+            {
+                try {
+                    T::cdata(*var, cdata, csize);
+                } AUG_SETERRINFOCATCH;
+            }
+            static void
+            end(const aug_var* var, int commit) AUG_NOTHROW
+            {
+                try {
+                    T::end(*var, commit ? true : false);
+                } AUG_SETERRINFOCATCH;
+            }
 
-        inline void
-        field(const aug_var* var, const char* name,
-              const char* value) AUG_NOTHROW
-        {
-            try {
-                httphandler_base* arg = static_cast<
-                    httphandler_base*>(var->arg_);
-                arg->field(name, value);
-            } AUG_SETERRINFOCATCH;
-        }
+        public:
+            static const aug_httphandler&
+            get()
+            {
+                static const aug_httphandler local = {
+                    initial,
+                    field,
+                    csize,
+                    cdata,
+                    end
+                };
+                return &local;
+            }
+        };
+    }
 
-        inline void
-        csize(const aug_var* var, unsigned csize) AUG_NOTHROW
-        {
-            try {
-                httphandler_base* arg = static_cast<
-                    httphandler_base*>(var->arg_);
-                arg->csize(csize);
-            } AUG_SETERRINFOCATCH;
-        }
-
-        inline void
-        cdata(const aug_var* var, const void* cdata,
-              unsigned csize) AUG_NOTHROW
-        {
-            try {
-                httphandler_base* arg = static_cast<
-                    httphandler_base*>(var->arg_);
-                arg->cdata(cdata, csize);
-            } AUG_SETERRINFOCATCH;
-        }
-
-        inline void
-        end(const aug_var* var, int commit) AUG_NOTHROW
-        {
-            try {
-                httphandler_base* arg = static_cast<
-                    httphandler_base*>(var->arg_);
-                arg->end(commit ? true : false);
-            } AUG_SETERRINFOCATCH;
-        }
+    template <typename T>
+    const aug_httphandler&
+    httphandler()
+    {
+        return detail::httphandler<T>::get();
     }
 
     class httpparser {
@@ -133,18 +95,11 @@ namespace aug {
                 perrinfo("aug_destroyhttpparser() failed");
         }
 
-        httpparser(unsigned size, httphandler_base& handler)
+        httpparser(unsigned size, const aug_httphandler& handler,
+                   const aug_var& var)
         {
-            static const aug_httphandler local = {
-                detail::initial,
-                detail::field,
-                detail::csize,
-                detail::cdata,
-                detail::end
-            };
-            aug_var var = { NULL, this };
             verify(httpparser_
-                   = aug_createhttpparser(size, &local, &var));
+                   = aug_createhttpparser(size, &handler, &var));
         }
 
         operator aug_httpparser_t()

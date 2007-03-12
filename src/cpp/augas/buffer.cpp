@@ -12,11 +12,14 @@ using namespace aug;
 using namespace augas;
 using namespace std;
 
-#if !AUGAS_VARBUFFER
-
 namespace {
 
-    struct vartype : basic_vartype<buffer> {
+    struct vectype : basic_vartype<vecarg> {
+        static void
+        destroy(arg_type* arg)
+        {
+            arg->begin_ = arg->end_ = 0;
+        }
         static const void*
         buf(arg_type& arg, size_t& size)
         {
@@ -29,86 +32,82 @@ namespace {
             return &arg.vec_[arg.begin_];
         }
     };
+
+    struct copyarg {
+        size_t size_;
+        char buf_[1];
+    };
+
+    struct copytype : basic_vartype<copyarg> {
+        static void
+        destroy(arg_type* arg)
+        {
+            free(arg);
+        }
+        static const void*
+        buf(arg_type& arg, size_t& size)
+        {
+            size = arg.size_;
+            return arg.buf_;
+        }
+        static const void*
+        buf(arg_type& arg)
+        {
+            return arg.buf_;
+        }
+    };
 }
 
 buffer::buffer(size_t size)
-    : vec_(size),
-      begin_(0),
-      end_(0)
+    : arg_(size),
+      usevec_(true)
 {
 }
 
 void
 buffer::append(const aug_var& var)
 {
-    size_t size;
-    const void* buf(varbuf(var, size));
-    append(buf, size);
+    appendbuf(writer_, var);
+    usevec_ = false;
 }
 
 void
 buffer::append(const void* buf, size_t size)
 {
-    if (empty()) {
-        aug_var v;
-        appendbuf(writer_, bindvar<vartype>(v, *this));
+    if (usevec_) {
+
+        if (empty()) {
+            aug_var var;
+            appendbuf(writer_, bindvar<vectype>(var, arg_));
+        }
+
+        // Grow buffer if needed.
+
+        if (arg_.vec_.size() - arg_.end_ < size)
+            arg_.vec_.resize(arg_.end_ + size);
+
+        memcpy(&arg_.vec_[arg_.end_], buf, size);
+        arg_.end_ += size;
+
+    } else {
+
+        copyarg* arg(static_cast<copyarg*>(malloc(sizeof(copyarg)
+                                                  + size - 1)));
+        arg->size_ = size;
+        memcpy(arg->buf_, buf, size);
+
+        aug_var var;
+        appendbuf(writer_, bindvar<copytype>(var, *arg));
     }
-
-    if (vec_.size() - end_ < size)
-        vec_.resize(end_ + size);
-
-    memcpy(&vec_[end_], buf, size);
-    end_ += size;
-}
-
-bool
-buffer::writesome(fdref ref)
-{
-    size_t size(aug::writesome(writer_, ref));
-    if ((begin_ += size) == end_) {
-        begin_ = end_ = 0;
-        return true;
-    }
-    return false;
-}
-
-#else // AUGAS_VARBUFFER
-
-namespace {
-
-    struct vartype : basic_vartype<string> {
-        static void
-        destroy(arg_type* arg)
-        {
-            delete arg;
-        }
-        static const void*
-        buf(arg_type& arg, size_t& size)
-        {
-            size = arg.size();
-            return arg.data();
-        }
-        static const void*
-        buf(arg_type& arg)
-        {
-            return arg.data();
-        }
-    };
-}
-
-void
-buffer::append(const void* buf, size_t size)
-{
-    string* s(new string(static_cast<const char*>(buf), size));
-    aug_var v;
-    appendbuf(writer_, bindvar<vartype>(v, *s));
 }
 
 bool
 buffer::writesome(fdref ref)
 {
     aug::writesome(writer_, ref);
-    return writer_.empty();
+    if (writer_.empty()) {
+        usevec_ = true;
+        return true;
+    }
+    return false;
 }
-
-#endif // AUGAS_VARBUFFER

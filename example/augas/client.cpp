@@ -9,6 +9,36 @@ namespace {
 
     const char MSG[] = "hello, world!\r\n";
 
+    const void*
+    buf(void* arg, size_t* size)
+    {
+        if (size)
+            *size = sizeof(MSG) - 1;
+        return MSG;
+    }
+
+    const struct augas_vartype vartype = {
+        NULL,
+        buf
+    };
+
+    const struct augas_var var = {
+        &vartype,
+        NULL
+    };
+
+    void
+    dosend(object& sock)
+    {
+        send(sock, MSG, sizeof(MSG) - 1);
+    }
+
+    void
+    dosendv(object& sock)
+    {
+        sendv(sock, var);
+    }
+
     struct state {
         string tok_;
         unsigned tosend_, torecv_;
@@ -21,10 +51,12 @@ namespace {
     };
 
     struct eachline {
+        void (*fn_)(object&);
         object sock_;
         explicit
-        eachline(const object& sock)
-            : sock_(sock)
+        eachline(void (*fn)(object&), const object& sock)
+            : fn_(fn),
+              sock_(sock)
         {
         }
         void
@@ -34,11 +66,12 @@ namespace {
             if (0 == --s.torecv_)
                 shutdown(sock_);
             else if (0 < s.tosend_--)
-                send(sock_, MSG, sizeof(MSG) - 1);
+                fn_(sock_);
         }
     };
 
     struct benchserv : basic_serv {
+        void (*send_)(object&);
         unsigned conns_, estab_, echos_;
         size_t bytes_;
         timeval start_;
@@ -46,6 +79,14 @@ namespace {
         do_start(const char* sname)
         {
             writelog(AUGAS_LOGINFO, "starting...");
+
+            if (atoi(augas::getenv("service.bench.sendv", "1"))) {
+                send_ = dosendv;
+                augas_writelog(AUGAS_LOGINFO, "sendv: yes");
+            } else {
+                send_ = dosend;
+                augas_writelog(AUGAS_LOGINFO, "sendv: no");
+            }
 
             const char* serv = augas::getenv("service.bench.serv");
             if (!serv)
@@ -97,7 +138,7 @@ namespace {
         do_connected(object& sock, const char* addr, unsigned short port)
         {
             state& s(*sock.user<state>());
-            send(sock, MSG, sizeof(MSG) - 1);
+            send_(sock);
             --s.tosend_;
         }
         void
@@ -107,7 +148,7 @@ namespace {
             state& s(*sock.user<state>());
             tokenise(static_cast<const char*>(buf),
                      static_cast<const char*>(buf) + size, s.tok_, '\n',
-                     eachline(sock));
+                     eachline(send_, sock));
         }
         benchserv()
             : conns_(0),

@@ -11,7 +11,7 @@ static const char rcsid[] = "$Id$";
 AUGUTIL_API int
 aug_destroyvar(const struct aug_var* v)
 {
-    return v && v->arg_ && v->type_ && v->type_->destroy_
+    return v && v->type_ && v->type_->destroy_
         ? v->type_->destroy_(v->arg_) : 0;
 }
 
@@ -29,7 +29,7 @@ aug_setvar(struct aug_var* dst, const struct aug_var* src)
 AUGUTIL_API const void*
 aug_varbuf(const struct aug_var* v, size_t* size)
 {
-    if (v && v->arg_ && v->type_ && v->type_->buf_)
+    if (v && v->type_ && v->type_->buf_)
         return v->type_->buf_(v->arg_, size);
 
     if (size)

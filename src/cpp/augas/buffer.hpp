@@ -8,18 +8,29 @@
 #include "augnetpp/writer.hpp"
 
 #include <vector>
-
+#define AUGAS_VARBUFFER 1
 namespace augas {
 
-#if !AUGAS_VARBUFFER
+    struct vecarg {
+        std::vector<char> vec_;
+        size_t begin_, end_;
+        explicit
+        vecarg(size_t size)
+            : vec_(size),
+              begin_(0),
+              end_(0)
+        {
+        }
+    };
+
     class buffer {
         aug::writer writer_;
     public:
-        std::vector<char> vec_;
-        size_t begin_, end_;
+        vecarg arg_;
+        bool usevec_;
 
         explicit
-        buffer(size_t size = 4096);
+        buffer(size_t size = 1024);
 
         void
         append(const aug_var& var);
@@ -33,31 +44,9 @@ namespace augas {
         bool
         empty() const
         {
-            return begin_ == end_;
-        }
-    };
-#else // AUGAS_VARBUFFER
-    class buffer {
-        aug::writer writer_;
-    public:
-        void
-        append(const aug_var& var)
-        {
-            appendbuf(writer_, var);
-        }
-        void
-        append(const void* buf, size_t size);
-
-        bool
-        writesome(aug::fdref ref);
-
-        bool
-        empty() const
-        {
             return writer_.empty();
         }
     };
-#endif // AUGAS_VARBUFFER
 }
 
 #endif // AUGAS_BUFFER_HPP
