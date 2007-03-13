@@ -18,42 +18,52 @@ namespace aug {
 
         template <typename T>
         class httphandler {
-            static void
+            static int
             initial(const aug_var* var, const char* value) AUG_NOTHROW
             {
                 try {
                     T::initial(*var, value);
+                    return 0;
                 } AUG_SETERRINFOCATCH;
+                return -1;
             }
-            static void
+            static int
             field(const aug_var* var, const char* name,
                   const char* value) AUG_NOTHROW
             {
                 try {
                     T::field(*var, name, value);
+                    return 0;
                 } AUG_SETERRINFOCATCH;
+                return -1;
             }
-            static void
+            static int
             csize(const aug_var* var, unsigned csize) AUG_NOTHROW
             {
                 try {
                     T::csize(*var, csize);
+                    return 0;
                 } AUG_SETERRINFOCATCH;
+                return -1;
             }
-            static void
+            static int
             cdata(const aug_var* var, const void* cdata,
                   unsigned csize) AUG_NOTHROW
             {
                 try {
                     T::cdata(*var, cdata, csize);
+                    return 0;
                 } AUG_SETERRINFOCATCH;
+                return -1;
             }
-            static void
+            static int
             end(const aug_var* var, int commit) AUG_NOTHROW
             {
                 try {
                     T::end(*var, commit ? true : false);
+                    return 0;
                 } AUG_SETERRINFOCATCH;
+                return -1;
             }
 
         public:
@@ -67,7 +77,7 @@ namespace aug {
                     cdata,
                     end
                 };
-                return &local;
+                return local;
             }
         };
     }

@@ -17,6 +17,8 @@ static const char rcsid[] = "$Id$";
 #include <errno.h>       /* ENOMEM */
 #include <stdlib.h>      /* malloc() */
 
+#define EOF_ (-1)
+
 struct aug_httpparser_ {
     const struct aug_httphandler* handler_;
     struct aug_var var_;
@@ -28,7 +30,7 @@ struct aug_httpparser_ {
         BODY_
     } state_;
     char name_[AUG_MAXLINE];
-    unsigned csize_;
+    int csize_;
 };
 
 static int
@@ -37,14 +39,19 @@ iscolon_(char ch)
     return ':' == ch;
 }
 
-static void
-setinitial_(aug_httpparser_t parser)
+static int
+initial_(aug_httpparser_t parser)
 {
-    parser->handler_->initial_(&parser->var_, aug_token(parser->lexer_));
+    /* Unless Content-Length is encountered, read body until end of stream is
+       reached. */
+
+    /* parser->csize_ = EOF_; */
+    return parser->handler_
+        ->initial_(&parser->var_, aug_token(parser->lexer_));
 }
 
 static int
-setname_(aug_httpparser_t parser)
+name_(aug_httpparser_t parser)
 {
     aug_strlcpy(parser->name_, aug_token(parser->lexer_),
                 sizeof(parser->name_));
@@ -52,11 +59,11 @@ setname_(aug_httpparser_t parser)
 }
 
 static int
-setvalue_(aug_httpparser_t parser)
+value_(aug_httpparser_t parser)
 {
     unsigned csize;
 
-    /* Intercept and handler any fields that affect the parsing phase. */
+    /* Intercept and handle any fields that affect the parsing phase. */
 
     switch (parser->name_[0]) {
     case 'C':
@@ -66,35 +73,34 @@ setvalue_(aug_httpparser_t parser)
             if (-1 == aug_strtoui(&csize, aug_token(parser->lexer_), 10))
                 return -1;
 
-            parser->handler_->csize_(&parser->var_, csize);
-            parser->csize_ = csize;
-            return 0;
+            parser->csize_ = (int)csize;
+            return parser->handler_->csize_(&parser->var_, csize);
         }
     }
 
-    parser->handler_->field_(&parser->var_, parser->name_,
-                             aug_token(parser->lexer_));
-    return 0;
+    return parser->handler_
+        ->field_(&parser->var_, parser->name_, aug_token(parser->lexer_));
 }
 
-static void
+static int
 end_(aug_httpparser_t parser, int commit)
 {
     parser->state_ = INITIAL_;
     parser->csize_ = 0;
-    parser->handler_->end_(&parser->var_, commit);
+    return parser->handler_->end_(&parser->var_, commit);
 }
 
 static int
 tail_(aug_httpparser_t parser)
 {
+    int ret = 0;
     switch (parser->state_) {
     case INITIAL_:
 
         /* Ignore empty lines that precede a message. */
 
         if ('\0' != *aug_token(parser->lexer_))
-            setinitial_(parser);
+            ret = initial_(parser);
         break;
 
     case NAME_:
@@ -104,12 +110,12 @@ tail_(aug_httpparser_t parser)
         if ('\0' != *aug_token(parser->lexer_)) {
             aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("failed to parse name"));
-            return -1;
+            ret = -1;
         }
         break;
 
     case VALUE_:
-        setvalue_(parser);
+        ret = value_(parser);
         break;
 
     case BODY_:
@@ -117,12 +123,18 @@ tail_(aug_httpparser_t parser)
         /* Check to ensure that the entire body has been parsed. */
 
         if (0 < parser->csize_) {
+
             aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("failed to parse body"));
-            return -1;
+            ret = -1;
+
+        } else if (-1 == parser->csize_) {
+
+            ret = end_(parser, 1);
         }
+        break;
     }
-    return 0;
+    return ret;
 }
 
 static int
@@ -137,7 +149,7 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
         case AUG_TOKNONE:
             break;
         case AUG_TOKDELIM:
-            if (-1 == setname_(parser))
+            if (-1 == name_(parser))
                 return -1;
 
             /* The field's value follows its name. */
@@ -162,7 +174,8 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
 
                 /* End of message (with commit). */
 
-                end_(parser, 1);
+                if (-1 == end_(parser, 1))
+                    return -1;
             } else
                 parser->state_ = BODY_;
             goto done;
@@ -176,12 +189,15 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
 static int
 body_(aug_httpparser_t parser, const char* buf, unsigned size)
 {
-    if (size < parser->csize_) {
+    if (EOF_ == parser->csize_ || (int)size < parser->csize_) {
 
         /* Not enough data to fulfil the content. */
 
-        parser->handler_->cdata_(&parser->var_, buf, size);
-        parser->csize_ -= size;
+        if (EOF_ != parser->csize_)
+            parser->csize_ -= size;
+
+        if (-1 == parser->handler_->cdata_(&parser->var_, buf, size))
+            return -1;
 
         /* Entire buffer consumed. */
 
@@ -190,12 +206,15 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
     /* Consume enough of the buffer to fulfil content. */
 
-    size = parser->csize_;
-    parser->handler_->cdata_(&parser->var_, buf, size);
+    if ((size = parser->csize_)
+        && -1 == parser->handler_->cdata_(&parser->var_, buf, size))
+        return -1;
 
     /* End of message (with commit). */
 
-    end_(parser, 1);
+    if (-1 == end_(parser, 1))
+        return -1;
+
     return size;
 }
 

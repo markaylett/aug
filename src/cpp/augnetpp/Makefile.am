@@ -7,6 +7,7 @@ modinclude_HEADERS = \
 	file.hpp \
 	http.hpp \
 	inet.hpp \
+	mar.hpp \
 	writer.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -17,6 +18,7 @@ libaugnetpp_la_SOURCES = \
 	file.cpp \
 	http.cpp \
 	inet.cpp \
+	mar.hpp \
 	writer.cpp
 
 libaugnetpp_la_LDFLAGS = \

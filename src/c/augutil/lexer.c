@@ -14,10 +14,10 @@ static const char rcsid[] = "$Id$";
 #include <stdlib.h>      /* malloc() */
 
 #define LTRIM_ (-1)
-#define DATA_ (-2)
-#define ESC_ (-3)
-#define CR_ (-4)
-#define LF_ (-5)
+#define DATA_  (-2)
+#define ESC_   (-3)
+#define CR_    (-4)
+#define LF_    (-5)
 
 struct aug_lexer_ {
     size_t pos_, size_;
@@ -278,7 +278,7 @@ aug_lexchar(aug_lexer_t* lexer, char ch)
 AUGUTIL_API int
 aug_lexend(aug_lexer_t* lexer)
 {
-    /* If present, add the first character of the new line. */
+    /* If present (0 < state_), add the first character of the new line.*/
 
     if (0 < (*lexer)->state_
         && AUG_TOKERROR == aug_lexchar(lexer, pending_(*lexer)))

@@ -8,6 +8,7 @@ modinclude_HEADERS = \
 	fix.h \
 	http.h \
 	inet.h \
+	mar.h \
 	types.h \
 	writer.h
 
@@ -22,6 +23,7 @@ libaugnet_la_SOURCES = \
 	fix.c \
 	http.c \
 	inet.c \
+	mar.c \
 	types.c \
 	writer.c
 

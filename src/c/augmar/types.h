@@ -21,6 +21,12 @@ typedef int ssize_t;
 #endif /* _MSC_VER */
 
 /**
+   \brief The message archive handle type.
+*/
+
+typedef struct aug_mar_* aug_mar_t;
+
+/**
    \brief The field structure.
  */
 

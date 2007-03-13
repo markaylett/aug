@@ -91,6 +91,14 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugnetpp_la_SOURCES) $(augnetpp_connectortest_SOURCES) \
 	$(augnetpp_test_SOURCES)
 DIST_SOURCES = $(libaugnetpp_la_SOURCES) \
@@ -231,6 +239,7 @@ modinclude_HEADERS = \
 	file.hpp \
 	http.hpp \
 	inet.hpp \
+	mar.hpp \
 	writer.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -240,6 +249,7 @@ libaugnetpp_la_SOURCES = \
 	file.cpp \
 	http.cpp \
 	inet.cpp \
+	mar.hpp \
 	writer.cpp
 
 libaugnetpp_la_LDFLAGS = \

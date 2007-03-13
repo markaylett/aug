@@ -11,11 +11,11 @@
 struct aug_var;
 
 struct aug_httphandler {
-    void (*initial_)(const struct aug_var*, const char*);
-    void (*field_)(const struct aug_var*, const char*, const char*);
-    void (*csize_)(const struct aug_var*, unsigned);
-    void (*cdata_)(const struct aug_var*, const void*, unsigned);
-    void (*end_)(const struct aug_var*, int);
+    int (*initial_)(const struct aug_var*, const char*);
+    int (*field_)(const struct aug_var*, const char*, const char*);
+    int (*csize_)(const struct aug_var*, unsigned);
+    int (*cdata_)(const struct aug_var*, const void*, unsigned);
+    int (*end_)(const struct aug_var*, int);
 };
 
 typedef struct aug_httpparser_* aug_httpparser_t;

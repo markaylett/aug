@@ -14,12 +14,6 @@
 #include "augmar/types.h"
 
 /**
-   \brief The message archive handle type.
-*/
-
-typedef struct aug_mar_* aug_mar_t;
-
-/**
    \brief Copy an existing message archive.
 
    \param dst A handle to the destination message archive.

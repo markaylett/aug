@@ -124,6 +124,9 @@
 				RelativePath="..\src\c\augnet\inet.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\mar.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\types.c">
 			</File>
 			<File
@@ -148,6 +151,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\inet.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\mar.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\types.h">

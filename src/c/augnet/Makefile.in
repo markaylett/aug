@@ -64,7 +64,7 @@ libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugnet_la_OBJECTS = config.lo connector.lo file.lo fix.lo \
-	http.lo inet.lo types.lo writer.lo
+	http.lo inet.lo mar.lo types.lo writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_augnet_fixtest_OBJECTS = fixtest.$(OBJEXT)
 augnet_fixtest_OBJECTS = $(am_augnet_fixtest_OBJECTS)
@@ -216,6 +216,7 @@ modinclude_HEADERS = \
 	fix.h \
 	http.h \
 	inet.h \
+	mar.h \
 	types.h \
 	writer.h
 
@@ -228,6 +229,7 @@ libaugnet_la_SOURCES = \
 	fix.c \
 	http.c \
 	inet.c \
+	mar.c \
 	types.c \
 	writer.c
 
@@ -340,6 +342,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/httptest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Plo@am__quote@
 

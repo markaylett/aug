@@ -60,6 +60,12 @@ LTLIBRARIES = $(mod_LTLIBRARIES)
 modclient_la_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_modclient_la_OBJECTS = client.lo
 modclient_la_OBJECTS = $(am_modclient_la_OBJECTS)
+modhttp_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+am_modhttp_la_OBJECTS = http.lo
+modhttp_la_OBJECTS = $(am_modhttp_la_OBJECTS)
 modminimal_la_DEPENDENCIES =
 am_modminimal_la_OBJECTS = minimal.lo
 modminimal_la_OBJECTS = $(am_modminimal_la_OBJECTS)
@@ -84,10 +90,10 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(modclient_la_SOURCES) $(modminimal_la_SOURCES) \
-	$(modserver_la_SOURCES)
-DIST_SOURCES = $(modclient_la_SOURCES) $(modminimal_la_SOURCES) \
-	$(modserver_la_SOURCES)
+SOURCES = $(modclient_la_SOURCES) $(modhttp_la_SOURCES) \
+	$(modminimal_la_SOURCES) $(modserver_la_SOURCES)
+DIST_SOURCES = $(modclient_la_SOURCES) $(modhttp_la_SOURCES) \
+	$(modminimal_la_SOURCES) $(modserver_la_SOURCES)
 exampleDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(example_DATA)
 ETAGS = etags
@@ -218,18 +224,28 @@ exampledir = $(prefix)/example/augas
 example_DATA = \
 	$(EXTRA_DIST) \
 	client.cpp \
+	http.cpp \
 	minimal.c \
 	server.cpp
 
 moddir = $(prefix)/mod
 mod_LTLIBRARIES = \
 	modclient.la \
+	modhttp.la \
 	modminimal.la \
 	modserver.la
 
 modclient_la_SOURCES = client.cpp
 modclient_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modclient_la_LIBADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+modhttp_la_SOURCES = http.cpp
+modhttp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
+modhttp_la_LIBADD = \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 modminimal_la_SOURCES = minimal.c
@@ -300,6 +316,8 @@ clean-modLTLIBRARIES:
 	done
 modclient.la: $(modclient_la_OBJECTS) $(modclient_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(moddir) $(modclient_la_LDFLAGS) $(modclient_la_OBJECTS) $(modclient_la_LIBADD) $(LIBS)
+modhttp.la: $(modhttp_la_OBJECTS) $(modhttp_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(moddir) $(modhttp_la_LDFLAGS) $(modhttp_la_OBJECTS) $(modhttp_la_LIBADD) $(LIBS)
 modminimal.la: $(modminimal_la_OBJECTS) $(modminimal_la_DEPENDENCIES) 
 	$(LINK) -rpath $(moddir) $(modminimal_la_LDFLAGS) $(modminimal_la_OBJECTS) $(modminimal_la_LIBADD) $(LIBS)
 modserver.la: $(modserver_la_OBJECTS) $(modserver_la_DEPENDENCIES) 
@@ -312,6 +330,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minimal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
 

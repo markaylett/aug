@@ -9,6 +9,7 @@
 #include "augnet/fix.h"
 #include "augnet/http.h"
 #include "augnet/inet.h"
+#include "augnet/mar.h"
 #include "augnet/types.h"
 #include "augnet/writer.h"
 
