@@ -12,7 +12,7 @@
 #define FLAGMASK_ (AUG_MMAPRD | AUG_MMAPWR)
 
 typedef struct impl_ {
-    struct aug_mmap_ mmap_;
+    struct aug_mmap mmap_;
     int fd_;
     DWORD prot_, access_;
     size_t size_;
@@ -154,15 +154,15 @@ destroymmap_(impl_t impl)
 }
 
 AUGSYS_EXTERN int
-aug_destroymmap(struct aug_mmap_* mmap_)
+aug_destroymmap(struct aug_mmap* mm)
 {
-    impl_t impl = (impl_t)mmap_;
+    impl_t impl = (impl_t)mm;
     int ret = destroymmap_(impl);
     free(impl);
     return ret;
 }
 
-AUGSYS_EXTERN struct aug_mmap_*
+AUGSYS_EXTERN struct aug_mmap*
 aug_createmmap(int fd, size_t offset, size_t len, int flags)
 {
     impl_t impl;
@@ -198,13 +198,13 @@ aug_createmmap(int fd, size_t offset, size_t len, int flags)
         free(impl);
         return NULL;
     }
-    return (struct aug_mmap_*)impl;
+    return (struct aug_mmap*)impl;
 }
 
 AUGSYS_EXTERN int
-aug_remmap(struct aug_mmap_* mmap_, size_t offset, size_t len)
+aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
 {
-    impl_t impl = (impl_t)mmap_;
+    impl_t impl = (impl_t)mm;
     void* addr = impl->mmap_.addr_;
     impl->mmap_.addr_ = NULL;
 
@@ -234,9 +234,9 @@ aug_remmap(struct aug_mmap_* mmap_, size_t offset, size_t len)
 }
 
 AUGSYS_EXTERN int
-aug_syncmmap(struct aug_mmap_* mmap_)
+aug_syncmmap(const struct aug_mmap* mm)
 {
-    impl_t impl = (impl_t)mmap_;
+    impl_t impl = (impl_t)mm;
 
     if (!FlushViewOfFile(impl->mmap_.addr_, impl->mmap_.len_)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
@@ -246,9 +246,9 @@ aug_syncmmap(struct aug_mmap_* mmap_)
 }
 
 AUGSYS_EXTERN size_t
-aug_mmapsize(struct aug_mmap_* mmap_)
+aug_mmapsize(const struct aug_mmap* mm)
 {
-    impl_t impl = (impl_t)mmap_;
+    impl_t impl = (impl_t)mm;
     return impl->size_;
 }
 

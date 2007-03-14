@@ -13,6 +13,7 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/inetaddr.hpp"
 #include "augsyspp/mcast.hpp"
+#include "augsyspp/mmap.hpp"
 #include "augsyspp/mplexer.hpp"
 #include "augsyspp/mutex.hpp"
 #include "augsyspp/null.hpp"

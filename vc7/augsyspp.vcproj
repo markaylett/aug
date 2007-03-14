@@ -133,6 +133,9 @@
 				RelativePath="..\src\cpp\augsyspp\mcast.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augsyspp\mmap.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsyspp\mplexer.cpp">
 			</File>
 			<File
@@ -193,6 +196,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\mcast.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsyspp\mmap.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\mplexer.hpp">

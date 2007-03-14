@@ -18,6 +18,7 @@ static const char rcsid[] = "$Id$";
 
 #include "augsys/log.h"
 
+#include <ctype.h>
 #include <errno.h>
 
 AUGSYS_API int
@@ -59,4 +60,50 @@ AUGSYS_API int
 aug_strncasecmp(const char* lhs, const char* rhs, size_t size)
 {
     return strncasecmp(lhs, rhs, size);
+}
+
+AUGSYS_API const char*
+aug_strcasestr(const char* haystack, const char* needle)
+{
+    /* Thanks to Fred Cole and Bob Stout for this public domain implementation
+       of strcasestr(). */
+
+    char *pptr, *sptr, *start;
+    unsigned slen, plen;
+
+    for (start = (char *)haystack,
+             pptr  = (char *)needle,
+             slen  = strlen(haystack),
+             plen  = strlen(needle);
+
+         /* while string length not shorter than pattern length */
+
+         slen >= plen;
+         start++, slen--) {
+
+        /* find start of pattern in string */
+        while (toupper(*start) != toupper(*needle)) {
+            start++;
+            slen--;
+
+            /* if pattern longer than string */
+
+            if (slen < plen)
+                return(NULL);
+        }
+
+        sptr = start;
+        pptr = (char *)needle;
+
+        while (toupper(*sptr) == toupper(*pptr)) {
+            sptr++;
+            pptr++;
+
+            /* if end of pattern then pattern was found */
+
+            if ('\0' == *pptr)
+                return (start);
+        }
+    }
+    return(NULL);
 }

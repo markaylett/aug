@@ -21,5 +21,8 @@ modserver_OBJS = server.o
 
 include $(AUG_HOME)/etc/aug.mk
 
-test: all
+bench: all
 	$(AUG_HOME)/bin/augasd -f bench.conf test
+
+http: all
+	$(AUG_HOME)/bin/augasd -f http.conf test

@@ -11,6 +11,7 @@ modinclude_HEADERS = \
 	inetaddr.hpp \
 	lock.hpp \
 	mcast.hpp \
+	mmap.hpp \
 	mplexer.hpp \
 	mutex.hpp \
 	null.hpp \
@@ -35,6 +36,7 @@ libaugsyspp_la_SOURCES = \
 	inetaddr.cpp \
 	lock.cpp \
 	mcast.cpp \
+	mmap.cpp \
 	mplexer.cpp \
 	mutex.cpp \
 	null.cpp \

@@ -21,7 +21,7 @@ static const char rcsid[] = "$Id$";
 struct aug_mfile_ {
     int fd_, flags_;
     unsigned resvd_, size_;
-    struct aug_mmap_* mmap_;
+    struct aug_mmap* mmap_;
 };
 
 static int

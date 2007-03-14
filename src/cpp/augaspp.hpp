@@ -723,12 +723,12 @@ namespace augas {
     splitn(T it, T end, U delim, V fn)
     {
         std::string tok;
-        fn = tokenise(it, end, delim, fn);
+        fn = tokenise(it, end, tok, delim, fn);
         fn(tok);
         return fn;
     }
 
-    template <typename T, typename U>
+    template <typename T>
     std::vector<std::string>
     splitn(T it, T end, char delim)
     {

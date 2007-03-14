@@ -16,32 +16,37 @@ static const char TEST_[] =
 "Host: localhost:8080\r\n"
 "Connection: Keep-Alive\r\n\r\n";
 
-static void
+static int
 setinitial_(const struct aug_var* var, const char* value)
 {
     aug_info("initial: %s", value);
+    return 0;
 }
 
-static void
+static int
 setfield_(const struct aug_var* var, const char* name, const char* value)
 {
     aug_info("field: %s=%s", name, value);
+    return 0;
 }
 
-static void
+static int
 setcsize_(const struct aug_var* var, unsigned size)
 {
     aug_info("size: %d", (int)size);
+    return 0;
 }
 
-static void
+static int
 cdata_(const struct aug_var* var, const void* buf, unsigned size)
 {
+    return 0;
 }
 
-static void
+static int
 end_(const struct aug_var* var, int commit)
 {
+    return 0;
 }
 
 static const struct aug_httphandler handler_ = {

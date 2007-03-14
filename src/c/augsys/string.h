@@ -27,6 +27,9 @@ aug_strcasecmp(const char* lhs, const char* rhs);
 AUGSYS_API int
 aug_strncasecmp(const char* lhs, const char* rhs, size_t size);
 
+AUGSYS_API const char*
+aug_strcasestr(const char* haystack, const char* needle);
+
 #define AUG_PERROR(x, s) \
 do { \
     if (-1 == x) \

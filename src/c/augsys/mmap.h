@@ -10,25 +10,25 @@
 #define AUG_MMAPRD 0x01
 #define AUG_MMAPWR 0x02
 
-struct aug_mmap_ {
+struct aug_mmap {
     void* addr_;
     size_t len_;
 };
 
 AUGSYS_API int
-aug_destroymmap(struct aug_mmap_* mmap_);
+aug_destroymmap(struct aug_mmap* mm);
 
-AUGSYS_API struct aug_mmap_*
+AUGSYS_API struct aug_mmap*
 aug_createmmap(int fd, size_t offset, size_t len, int flags);
 
 AUGSYS_API int
-aug_remmap(struct aug_mmap_* mmap_, size_t offset, size_t len);
+aug_remmap(struct aug_mmap* mm, size_t offset, size_t len);
 
 AUGSYS_API int
-aug_syncmmap(struct aug_mmap_* mmap_);
+aug_syncmmap(const struct aug_mmap* mm);
 
 AUGSYS_API size_t
-aug_mmapsize(struct aug_mmap_* mmap_);
+aug_mmapsize(const struct aug_mmap* mm);
 
 AUGSYS_API unsigned
 aug_granularity(void);

@@ -2,6 +2,7 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 EXTRA_DIST = \
 	bench.conf \
+	http.conf \
 	modules.mk
 
 exampledir = $(prefix)/example/augas
