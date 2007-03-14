@@ -11,11 +11,26 @@ using namespace std;
 
 namespace {
 
+    string
+    utcdate()
+    {
+        char buf[64];
+        time_t t;
+        time(&t);
+        strftime(buf, sizeof(buf), "%a, %d-%b-%Y %X GMT", gmtime(&t));
+        return buf;
+    }
+
     struct handler : basic_marhandler {
         static void
         message(const aug_var& var, const char* initial, aug_mar_t mar)
         {
-            augas_id id((augas_id)var.arg_);
+            static const char MSG[]
+                = "<html><body>test message</body></html>";
+
+            augas_id id(reinterpret_cast<augas_id>(var.arg_));
+
+            aug_info("%s", initial);
 
             header header(mar);
             header::const_iterator it(header.begin()),
@@ -23,23 +38,23 @@ namespace {
             for (; it != end; ++it)
                 aug_info("%s: %s", *it, header.getfield(it));
 
-            char buf[64];
-            time_t t;
-            time(&t);
-            strftime(buf, sizeof(buf), "%a, %d-%b-%Y %X GMT", gmtime(&t));
-
-#define MSG "<html><body><h1>Test Message</h1></body></html>"
-
             stringstream ss;
             ss << "HTTP/1.0 200 OK\r\n"
-               << "Date: " << buf << "\r\n"
+               << "Date: " << utcdate() << "\r\n"
                << "Content-Type: text/html\r\n"
                << "Content-Length: " << strlen(MSG) << "\r\n"
                << "\r\n"
                << MSG;
 
             send(id, ss.str().c_str(), ss.str().size());
-            shutdown(id);
+
+            unsigned size;
+            const char* value(static_cast<const char*>
+                              (getfield(mar, "Connection", size)));
+            if (!value || 0 ==  size || !strstr(value, "Keep-Alive"))
+                shutdown(id);
+            else
+                writelog(AUGAS_LOGINFO, "keep alive");
         }
     };
 
@@ -58,13 +73,16 @@ namespace {
         void
         do_closed(const object& sock)
         {
-            auto_ptr<marparser> parser(sock.user<marparser>());
-            endmar(*parser);
+            writelog(AUGAS_LOGINFO, "closed");
+            if (sock.user()) {
+                auto_ptr<marparser> parser(sock.user<marparser>());
+                endmar(*parser);
+            }
         }
         bool
         do_accept(object& sock, const char* addr, unsigned short port)
         {
-            aug_var var = { 0, (void*)sock.id() };
+            aug_var var = { 0, reinterpret_cast<void*>(sock.id()) };
             sock.setuser(new marparser(0, marhandler<handler>(), var));
             setrwtimer(sock, 15000, AUGAS_TIMRD);
             return true;
@@ -72,8 +90,6 @@ namespace {
         void
         do_data(const object& sock, const void* buf, size_t size)
         {
-            string s(static_cast<const char*>(buf), size);
-            writelog(AUGAS_LOGINFO, "do_data() [%s]", s.c_str());
             marparser& parser(*sock.user<marparser>());
             parsemar(parser, static_cast<const char*>(buf),
                      static_cast<unsigned>(size));

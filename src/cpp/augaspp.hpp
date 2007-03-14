@@ -254,6 +254,11 @@ namespace augas {
         {
             return object_.id_;
         }
+        void*
+        user() const
+        {
+            return object_.user_;
+        }
         template <typename T>
         T*
         user() const
