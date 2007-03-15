@@ -80,6 +80,25 @@ namespace {
         if (out != "onetwo" || it != in.end())
             throw error("copyif() failed");
     }
+
+    void
+    tokenisetest()
+    {
+        string in("one:two:three"), tok;
+        vector<string> toks(tokenise(in.begin(), in.end(), tok, ':'));
+        if (2 != toks.size() || toks[0] != "one" || toks[1] != "two"
+            || tok != "three")
+            throw error("tokenise() failed");
+    }
+
+    void
+    splitntest()
+    {
+        string in("one:two");
+        vector<string> toks(splitn(in.begin(), in.end(), ':'));
+        if (2 != toks.size() || toks[0] != "one" || toks[1] != "two")
+            throw error("splitn() failed");
+    }
 }
 
 int
@@ -92,6 +111,8 @@ main(int argc, char* argv[])
         rtrimtest();
         trimtest();
         copyiftest();
+        tokenisetest();
+        splitntest();
         return 0;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;

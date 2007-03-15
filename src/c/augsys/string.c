@@ -73,8 +73,8 @@ aug_strcasestr(const char* haystack, const char* needle)
 
     for (start = (char *)haystack,
              pptr  = (char *)needle,
-             slen  = strlen(haystack),
-             plen  = strlen(needle);
+             slen  = (unsigned)strlen(haystack),
+             plen  = (unsigned)strlen(needle);
 
          /* while string length not shorter than pattern length */
 

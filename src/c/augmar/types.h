@@ -9,16 +9,10 @@
 #ifndef AUGMAR_TYPES_H
 #define AUGMAR_TYPES_H
 
+#include "augsys/types.h"
+
 #include <fcntl.h>
 #include <stdarg.h>
-#include <stddef.h>
-
-#include <sys/types.h>
-
-#if defined(_MSC_VER)
-typedef int mode_t;
-typedef int ssize_t;
-#endif /* _MSC_VER */
 
 /**
    \brief The message archive handle type.

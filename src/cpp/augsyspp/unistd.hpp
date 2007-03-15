@@ -17,6 +17,18 @@ namespace aug {
         verify(aug_close(ref.get()));
     }
 
+    inline smartfd
+    open(const char* path, int flags)
+    {
+        return smartfd::attach(verify(aug_open(path, flags)));
+    }
+
+    inline smartfd
+    open(const char* path, int flags, mode_t mode)
+    {
+        return smartfd::attach(verify(aug_open(path, flags, mode)));
+    }
+
     inline std::pair<smartfd, smartfd>
     pipe()
     {

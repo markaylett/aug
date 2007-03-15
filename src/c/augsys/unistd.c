@@ -22,6 +22,37 @@ aug_close(int fd)
 }
 
 AUGSYS_API int
+aug_open(const char* path, int flags, ...)
+{
+    int fd;
+    mode_t mode;
+
+    if (flags & O_CREAT) {
+        va_list args;
+        va_start(args, flags);
+        mode = va_arg(args, int);
+        va_end(args);
+    } else
+        mode = 0;
+
+#if defined(_WIN32)
+    flags |= O_BINARY;
+#endif /* _WIN32 */
+
+    if (-1 == (fd = open(path, flags, mode))) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        return -1;
+    }
+
+    if (-1 == aug_openfd(fd, aug_posixfdtype())) {
+        close(fd);
+        return -1;
+    }
+
+    return 0;
+}
+
+AUGSYS_API int
 aug_pipe(int fds[2])
 {
 #if !defined(_WIN32)

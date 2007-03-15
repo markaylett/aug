@@ -21,6 +21,9 @@ AUGSYS_API int
 aug_close(int fd);
 
 AUGSYS_API int
+aug_open(const char* path, int flags, ...);
+
+AUGSYS_API int
 aug_pipe(int fds[2]);
 
 AUGSYS_API ssize_t

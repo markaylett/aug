@@ -701,21 +701,35 @@ namespace augas {
 
     namespace detail {
         template <typename T>
-        struct tokens {
-            std::vector<T> v_;
-            void
-            operator ()(T& x)
+        class tokens {
+            T* xs_;
+        public:
+            explicit
+            tokens(T& xs)
+                : xs_(&xs)
             {
-                v_.push_back(x);
+            }
+            void
+            operator ()(typename T::value_type& x)
+            {
+                xs_->push_back(x);
             }
         };
+        template <typename T>
+        tokens<T>
+        maketokens(T& xs)
+        {
+            return tokens<T>(xs);
+        }
     }
 
     template <typename T, typename U, typename V>
     std::vector<U>
     tokenise(T it, T end, U& tok, V delim)
     {
-        return tokenise(it, end, tok, delim, detail::tokens<U>()).v_;
+        std::vector<U> v;
+        tokenise(it, end, tok, delim, detail::maketokens(v));
+        return v;
     }
 
     template <typename T, typename U, typename V>
@@ -732,7 +746,9 @@ namespace augas {
     std::vector<std::string>
     splitn(T it, T end, char delim)
     {
-        return splitn(it, end, delim, detail::tokens<std::string>()).v_;
+        std::vector<std::string> v;
+        splitn(it, end, delim, detail::maketokens(v));
+        return v;
     }
 
     template <typename T, typename U, typename V>

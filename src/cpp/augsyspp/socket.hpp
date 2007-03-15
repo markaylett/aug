@@ -14,21 +14,13 @@ namespace aug {
     inline smartfd
     socket(int domain, int type, int protocol = 0)
     {
-        smartfd sfd(smartfd::attach(aug_socket(domain, type, protocol)));
-        if (null == sfd)
-            fail();
-
-        return sfd;
+        return smartfd::attach(verify(aug_socket(domain, type, protocol)));
     }
 
     inline smartfd
     accept(fdref ref, aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_accept(ref.get(), &ep)));
-        if (null == sfd)
-            fail();
-
-        return sfd;
+        return smartfd::attach(verify(aug_accept(ref.get(), &ep)));
     }
 
     inline void
