@@ -162,7 +162,6 @@ AC_CONFIG_FILES([Makefile
                  example/Makefile
                  example/augas/Makefile
                  example/cpp/Makefile
-                 example/httpd/Makefile
                  src/Makefile
                  src/c/Makefile
                  src/c/augmar/Makefile

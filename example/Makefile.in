@@ -170,8 +170,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 SUBDIRS = \
 	augas \
-	cpp \
-	httpd
+	cpp
 
 all: all-recursive
 
