@@ -59,10 +59,6 @@ writeall_(int fd, const char* buf, size_t n)
 AUGUTIL_API struct aug_event*
 aug_setsigevent(struct aug_event* event, int sig)
 {
-	union {
-		int i_;
-		void* p_;
-	} u = { sig };
     switch (sig) {
     case SIGHUP:
         event->type_ = AUG_EVENTRECONF;
@@ -78,7 +74,7 @@ aug_setsigevent(struct aug_event* event, int sig)
         event->type_ = AUG_EVENTSIGNAL;
     }
     event->var_.type_ = NULL;
-    event->var_.arg_ = u.p_;
+    event->var_.arg_ = aug_itop(sig);
     return event;
 }
 

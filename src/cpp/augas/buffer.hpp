@@ -8,7 +8,7 @@
 #include "augnetpp/writer.hpp"
 
 #include <vector>
-#define AUGAS_VARBUFFER 1
+
 namespace augas {
 
     struct vecarg {

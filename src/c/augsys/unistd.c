@@ -49,7 +49,7 @@ aug_open(const char* path, int flags, ...)
         return -1;
     }
 
-    return 0;
+    return fd;
 }
 
 AUGSYS_API int

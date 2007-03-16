@@ -700,26 +700,26 @@ namespace augas {
     }
 
     namespace detail {
-        template <typename T>
+        template <typename T, typename U>
         class tokens {
-            T* xs_;
+            T it_;
         public:
             explicit
-            tokens(T& xs)
-                : xs_(&xs)
+            tokens(T it)
+                : it_(it)
             {
             }
             void
-            operator ()(typename T::value_type& x)
+            operator ()(U& x)
             {
-                xs_->push_back(x);
+                *it_++ = x;
             }
         };
-        template <typename T>
-        tokens<T>
-        maketokens(T& xs)
+        template <typename T, typename U>
+        tokens<U, T>
+        maketokens(U it)
         {
-            return tokens<T>(xs);
+            return tokens<U, T>(it);
         }
     }
 
@@ -728,7 +728,8 @@ namespace augas {
     tokenise(T it, T end, U& tok, V delim)
     {
         std::vector<U> v;
-        tokenise(it, end, tok, delim, detail::maketokens(v));
+        tokenise(it, end, tok, delim,
+                 detail::maketokens<U>(std::back_inserter(v)));
         return v;
     }
 
@@ -747,7 +748,8 @@ namespace augas {
     splitn(T it, T end, char delim)
     {
         std::vector<std::string> v;
-        splitn(it, end, delim, detail::maketokens(v));
+        splitn(it, end, delim,
+               detail::maketokens<std::string>(std::back_inserter(v)));
         return v;
     }
 
@@ -873,10 +875,10 @@ namespace augas {
     namespace detail {
         template <typename T>
         struct urlpairs {
-            T dst_;
+            T it_;
             explicit
-            urlpairs(T dst)
-                : dst_(dst)
+            urlpairs(T it)
+                : it_(it)
             {
             }
             void
@@ -886,9 +888,15 @@ namespace augas {
                 split2(s.begin(), s.end(), xy.first, xy.second, '&');
                 xy.first = urldecode(xy.first.begin(), xy.first.end());
                 xy.second = urldecode(xy.second.begin(), xy.second.end());
-                *dst_++ = xy;
+                *it_++ = xy;
             }
         };
+        template <typename T>
+        urlpairs<T>
+        makeurlpairs(T it)
+        {
+            return urlpairs<T>(it);
+        }
     }
 
     template <typename T, typename U>
@@ -896,7 +904,7 @@ namespace augas {
     urlunpack(T it, T end, U dst)
     {
         std::string tok;
-        splitn(it, end, tok, '=', detail::urlpairs<U>(dst));
+        splitn(it, end, tok, '=', detail::makeurlpairs(dst));
         return dst;
     }
 
@@ -906,7 +914,8 @@ namespace augas {
     {
         std::vector<std::pair<std::string, std::string> > v;
         std::string tok;
-        splitn(it, end, tok, '=', detail::urlpairs<U>(back_inserter(v)));
+        splitn(it, end, tok, '=',
+               detail::makeurlpairs(std::back_inserter(v)));
         return v;
     }
 }

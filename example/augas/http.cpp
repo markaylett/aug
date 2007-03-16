@@ -2,6 +2,7 @@
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"
 #include "augmarpp.hpp"
+#include "augsyspp.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -49,8 +50,8 @@ namespace {
         string base_, path_, query_;
     };
 
-    void
-    getrequest(request& r, const string& s)
+    request&
+    splitrequest(request& r, const string& s)
     {
         string::size_type first, last;
         if (string::npos == (first = s.find_first_of(' '))
@@ -59,27 +60,19 @@ namespace {
         r.method_ = s.substr(0, first++);
         r.uri_ = s.substr(first, last - first);
         r.version_ = s.substr(last + 1);
+        return r;
     }
 
-    void
-    geturi(uri& u, const string& s)
+    uri&
+    splituri(uri& u, const string& s)
     {
         string::size_type pos;
-        if (0 == s.compare(0, 7, "http://")) {
+        if (0 == s.compare(0, (pos = 7), "http://")
+            || 0 == s.compare(0, (pos = 8), "https://")) {
 
-            if (string::npos == (pos = s.find_first_of('/', 7))) {
+            if (string::npos == (pos = s.find_first_of('/', pos))) {
                 u.base_ = s;
-                return;
-            }
-
-            u.base_ = s.substr(0, pos++);
-            u.path_ = s.substr(pos);
-
-        } else if (0 == s.compare(0, 8, "https://")) {
-
-            if (string::npos == (pos = s.find_first_of('/', 8))) {
-                u.base_ = s;
-                return;
+                return u;
             }
 
             u.base_ = s.substr(0, pos++);
@@ -92,6 +85,8 @@ namespace {
             u.query_ = u.path_.substr(pos + 1);
             u.path_.erase(pos);
         }
+
+        return u;
     }
 
     class nodes {
@@ -134,22 +129,63 @@ namespace {
         return path;
     }
 
+    class filecontent {
+        smartfd sfd_;
+        mmap mmap_;
+    public:
+        typedef filecontent arg_type;
+        explicit
+        filecontent(const char* path)
+            : sfd_(aug::open(path, O_RDONLY)),
+              mmap_(sfd_, 0, 0, AUG_MMAPRD)
+        {
+        }
+        void*
+        addr() const
+        {
+            return mmap_.addr();
+        }
+        size_t
+        size() const
+        {
+            return mmap_.len();
+        }
+        static void
+        destroy(arg_type* arg)
+        {
+            delete arg;
+        }
+        static const void*
+        buf(arg_type& arg, size_t& size)
+        {
+            size = arg.size();
+            return arg.addr();
+        }
+        static const void*
+        buf(arg_type& arg)
+        {
+            return arg.addr();
+        }
+    };
+
     struct handler : basic_marhandler {
         static void
         message(const aug_var& var, const char* initial, aug_mar_t mar)
         {
-            augas_id id(reinterpret_cast<augas_id>(var.arg_));
+            static const char ROOT[] = ".";
+
+            augas_id id(aug_ptoi(var.arg_));
 
             aug_info("%s", initial);
 
             request r;
-            getrequest(r, initial);
+            splitrequest(r, initial);
             aug_info("method: [%s]", r.method_.c_str());
             aug_info("uri: [%s]", r.uri_.c_str());
             aug_info("version: [%s]", r.version_.c_str());
 
             uri u;
-            geturi(u, r.uri_);
+            splituri(u, r.uri_);
 
             if (r.method_ == "POST") {
                 unsigned size;
@@ -171,17 +207,24 @@ namespace {
             u.path_ = urldecode(u.path_.begin(), u.path_.end());
 
             vector<string> nodes(splitpath(u.path_));
-            string path(joinpath(".", nodes));
+            string path(joinpath(ROOT, nodes));
             aug_info("path [%s]", path.c_str());
 
             stringstream ss;
 
             if (!nodes.empty() && nodes[0] == "services") {
 
+                unsigned size;
+                const char* value(static_cast<const char*>
+                                  (getfield(mar, "Host", size)));
+
                 ss << "HTTP/1.1 303 See Other\r\n"
                    << "Date: " << utcdate() << "\r\n"
-                   << "Location: http://localhost:8080\r\n"
+                   << "Location: http://" << value << "\r\n"
+                   << "Content-Length: 0\r\n"
                    << "\r\n";
+
+                send(id, ss.str().c_str(), ss.str().size());
 
             } else {
 
@@ -198,19 +241,22 @@ namespace {
                     break;
                 }
 
-                stringstream content;
-                ifstream is(path.c_str());
-                content << is.rdbuf();
-
+                auto_ptr<filecontent> ptr(new filecontent(path.c_str()));
                 ss << "HTTP/1.1 200 OK\r\n"
                    << "Date: " << utcdate() << "\r\n"
                    << "Content-Type: text/html\r\n"
-                   << "Content-Length: " << content.str().size() << "\r\n"
-                   << "\r\n"
-                   << content.rdbuf();
+                   << "Content-Length: " << ptr->size() << "\r\n"
+                   << "\r\n";
+
+                send(id, ss.str().c_str(), ss.str().size());
+                aug_var var;
+                bindvar<filecontent>(var, *ptr);
+                augas_var v2;
+                memcpy(&v2, &var, sizeof(v2));
+                sendv(id, v2);
+                ptr.release();
             }
 
-            send(id, ss.str().c_str(), ss.str().size());
 
             unsigned size;
             const char* value(static_cast<const char*>
@@ -243,10 +289,15 @@ namespace {
                 endmar(*parser);
             }
         }
+        void
+        do_teardown(const object& sock)
+        {
+            shutdown(sock);
+        }
         bool
         do_accept(object& sock, const char* addr, unsigned short port)
         {
-            aug_var var = { 0, reinterpret_cast<void*>(sock.id()) };
+            aug_var var = { 0, aug_itop(sock.id()) };
             sock.setuser(new marparser(0, marhandler<handler>(), var));
             setrwtimer(sock, 30000, AUGAS_TIMRD);
             return true;

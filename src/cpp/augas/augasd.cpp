@@ -296,7 +296,7 @@ namespace augas {
             e.var_.type_ = 0;
             e.var_.arg_ = arg.get();
             writeevent(aug_eventout(), e);
-            aug_setvar(&arg->var_, reinterpret_cast<const aug_var*>(var));
+            aug_setvar(&arg->var_, var);
             arg.release();
             return 0;
 
@@ -465,8 +465,7 @@ namespace augas {
         AUG_DEBUG2("sendv(): id=[%d]", cid);
         try {
             if (!state_->manager_
-                .append(state_->mplexer_, cid,
-                        *reinterpret_cast<const aug_var*>(var)))
+                .append(state_->mplexer_, cid, *var))
                 throw error(__FILE__, __LINE__, EHOSTCALL,
                             "connection has been shutdown");
             return 0;
@@ -538,7 +537,7 @@ namespace augas {
 
             state_->idtoserv_[id] = state_->manager_.getserv(sname);
             if (-1 == aug_settimer(cptr(state_->timers_), id, ms, timercb_,
-                                   reinterpret_cast<const aug_var*>(var)))
+                                   var))
                 state_->idtoserv_.erase(id);
 
             return id;

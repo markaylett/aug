@@ -140,7 +140,7 @@ aug_createmmap(int fd, size_t offset, size_t len, int flags)
 }
 
 AUGSYS_EXTERN int
-aug_remmap(const struct aug_mmap* mm, size_t offset, size_t len)
+aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
 {
     impl_t impl = (impl_t)mm;
     void* addr = impl->mmap_.addr_;
@@ -175,7 +175,7 @@ aug_syncmmap(const struct aug_mmap* mm)
 }
 
 AUGSYS_EXTERN size_t
-aug_mmapsize(struct aug_mmap* mm)
+aug_mmapsize(const struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
     return impl->size_;

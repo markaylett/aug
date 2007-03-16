@@ -36,3 +36,25 @@ aug_varbuf(const struct aug_var* v, size_t* size)
         *size = 0;
     return 0;
 }
+
+AUGUTIL_API void*
+aug_itop(int i)
+{
+	union {
+		int i_;
+		void* p_;
+	} u;
+    u.i_ = i;
+    return u.p_;
+}
+
+AUGUTIL_API int
+aug_ptoi(void* p)
+{
+	union {
+		int i_;
+		void* p_;
+	} u;
+    u.p_ = p;
+    return u.i_;
+}

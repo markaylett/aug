@@ -23,7 +23,7 @@ namespace aug {
     }
 
     inline size_t
-    aug_mmapsize(const aug_mmap& mm)
+    mmapsize(const aug_mmap& mm)
     {
         return aug_mmapsize(&mm);
     }
@@ -50,6 +50,18 @@ namespace aug {
             : mmap_(aug_createmmap(ref.get(), offset, len, flags))
         {
             verify(mmap_);
+        }
+
+        void*
+        addr() const
+        {
+            return mmap_->addr_;
+        }
+
+        size_t
+        len() const
+        {
+            return mmap_->len_;
         }
 
         operator aug_mmap&()

@@ -8,15 +8,25 @@
 
 #include "augsys/types.h"
 
+/* Also defined in augas.h. */
+
+#if !defined(AUG_VARTYPE)
+# define AUG_VARTYPE
 struct aug_vartype {
     int (*destroy_)(void*);
     const void* (*buf_)(void*, size_t*);
 };
+#endif /* !AUG_VARTYPE */
 
+/* Also defined in augas.h. */
+
+#if !defined(AUG_VAR)
+# define AUG_VAR
 struct aug_var {
     const struct aug_vartype* type_;
     void* arg_;
 };
+#endif /* AUG_VAR */
 
 #define AUG_VARNULL { NULL, NULL }
 
@@ -28,5 +38,11 @@ aug_setvar(struct aug_var* dst, const struct aug_var* src);
 
 AUGUTIL_API const void*
 aug_varbuf(const struct aug_var* var, size_t* size);
+
+AUGUTIL_API void*
+aug_itop(int i);
+
+AUGUTIL_API int
+aug_ptoi(void* p);
 
 #endif /* AUGUTIL_VAR_H */

@@ -36,6 +36,13 @@ namespace {
             return true;
         }
         void
+        do_event(const char* from, const char* type, const void* user,
+                 size_t size)
+        {
+            if (0 == strcmp(type, "application/x-www-form-urlencoded")) {
+            }
+        }
+        void
         do_closed(const object& sock)
         {
             delete sock.user<string>();

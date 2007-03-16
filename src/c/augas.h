@@ -28,6 +28,29 @@
 # define AUGAS_API AUGAS_IMPORT
 #endif /* AUGAS_BUILD */
 
+/* Also defined in augutil/var.h. */
+
+#if !defined(AUG_VARTYPE)
+# define AUG_VARTYPE
+struct aug_vartype {
+    int (*destroy_)(void*);
+    const void* (*buf_)(void*, size_t*);
+};
+#endif /* !AUG_VARTYPE */
+
+/* Also defined in augutil/var.h. */
+
+#if !defined(AUG_VAR)
+# define AUG_VAR
+struct aug_var {
+    const struct aug_vartype* type_;
+    void* arg_;
+};
+#endif /* AUG_VAR */
+
+#define augas_vartype aug_vartype
+#define augas_var     aug_var
+
 enum augas_loglevel {
     AUGAS_LOGCRIT,
     AUGAS_LOGERROR,
@@ -48,16 +71,6 @@ enum augas_loglevel {
 #define AUGAS_MAXNAME  63
 
 typedef int augas_id;
-
-struct augas_vartype {
-    int (*destroy_)(void*);
-    const void* (*buf_)(void*, size_t*);
-};
-
-struct augas_var {
-    const struct augas_vartype* type_;
-    void* arg_;
-};
 
 struct augas_serv {
     char name_[AUGAS_MAXNAME + 1];
