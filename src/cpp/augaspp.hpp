@@ -757,7 +757,7 @@ namespace augas {
     bool
     split2(T it, T end, U& first, U& second, V delim)
     {
-        if ((it = appendneq(it, end, first, delim)) == end)
+        if ((it = copybackneq(it, end, first, delim)) == end)
             return false;
 
         std::copy(++it, end, std::back_inserter(second));
@@ -885,7 +885,7 @@ namespace augas {
             operator ()(std::string& s)
             {
                 std::pair<std::string, std::string> xy;
-                split2(s.begin(), s.end(), xy.first, xy.second, '&');
+                split2(s.begin(), s.end(), xy.first, xy.second, '=');
                 xy.first = urldecode(xy.first.begin(), xy.first.end());
                 xy.second = urldecode(xy.second.begin(), xy.second.end());
                 *it_++ = xy;
@@ -903,18 +903,15 @@ namespace augas {
     U
     urlunpack(T it, T end, U dst)
     {
-        std::string tok;
-        splitn(it, end, tok, '=', detail::makeurlpairs(dst));
-        return dst;
+        return splitn(it, end, '&', detail::makeurlpairs(dst)).it_;
     }
 
-    template <typename T, typename U>
+    template <typename T>
     std::vector<std::pair<std::string, std::string> >
     urlunpack(T it, T end)
     {
         std::vector<std::pair<std::string, std::string> > v;
-        std::string tok;
-        splitn(it, end, tok, '=',
+        splitn(it, end, '&',
                detail::makeurlpairs(std::back_inserter(v)));
         return v;
     }

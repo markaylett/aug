@@ -212,7 +212,11 @@ namespace {
 
             stringstream ss;
 
-            if (!nodes.empty() && nodes[0] == "services") {
+            if (2 == nodes.size() && nodes[0] == "services") {
+
+                dispatch(nodes[1].c_str(),
+                         "application/x-www-form-urlencoded",
+                         u.query_.c_str(), u.query_.size());
 
                 unsigned size;
                 const char* value(static_cast<const char*>

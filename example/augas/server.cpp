@@ -1,5 +1,7 @@
 #include "augaspp.hpp"
 
+#include <map>
+
 using namespace augas;
 using namespace std;
 
@@ -40,6 +42,17 @@ namespace {
                  size_t size)
         {
             if (0 == strcmp(type, "application/x-www-form-urlencoded")) {
+
+                map<string, string> fields;
+                const char* encoded(static_cast<const char*>(user));
+                urlunpack(encoded, encoded + size,
+                          inserter(fields, fields.begin()));
+
+                map<string, string>::const_iterator it(fields.begin()),
+                    end(fields.end());
+                for (; it != end; ++it)
+                    writelog(AUGAS_LOGINFO, "%s=%s", it->first.c_str(),
+                             it->second.c_str());
             }
         }
         void
