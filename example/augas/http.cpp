@@ -14,7 +14,9 @@
 # define _stat stat
 # define _S_ISDIR S_ISDIR
 # define _S_ISREG S_ISREG
-#endif // !_WIN32
+#else // _WIN32
+# define lstat _stat
+#endif // _WIN32
 
 using namespace aug;
 using namespace augas;
@@ -38,9 +40,12 @@ namespace {
     };
 
     bool
-    stat(const char* path, struct _stat& sb)
+    lstat(const char* path, struct _stat& sb)
     {
-        if (-1 == _stat(path, &sb)) {
+        // lstat() is used so that the link, rather than the file it
+        // references, is stat()-ed.
+
+        if (-1 == lstat(path, &sb)) {
             if (ENOENT != errno)
                 throw posix_error(__FILE__, __LINE__, errno);
             return false;
@@ -137,11 +142,35 @@ namespace {
     joinpath(const char* root, const vector<string>& nodes)
     {
         string path(root);
+        struct _stat sb;
+
         vector<string>::const_iterator it(nodes.begin()), end(nodes.end());
         for (; it != end; ++it) {
             path += '/';
             path += *it;
+
+            if (!lstat(path.c_str(), sb))
+                throw http_error(404, "Not Found");
+
+            // Do not follow symbolic links.
+
+            if (!_S_ISDIR(sb.st_mode) && !_S_ISREG(sb.st_mode))
+                throw http_error(403, "Forbidden");
         }
+
+        // Use index.html if directory.
+
+        if (nodes.empty() || _S_ISDIR(sb.st_mode)) {
+            path += "/index.html";
+            if (!lstat(path.c_str(), sb))
+                throw http_error(404, "Not Found");
+        }
+
+        // Must be regular, world-readable file.
+
+        if (!_S_ISREG(sb.st_mode) || !(sb.st_mode & S_IROTH))
+            throw http_error(403, "Forbidden");
+
         return path;
     }
 
@@ -189,19 +218,6 @@ namespace {
     void
     sendfile(augas_id id, string path)
     {
-        for (;;) {
-            struct _stat sb;
-            if (!stat(path.c_str(), sb))
-                throw http_error(404, "Not Found");
-
-            if (_S_ISDIR(sb.st_mode)) {
-                path += "/index.html";
-                continue;
-            } else if (!_S_ISREG(sb.st_mode))
-                throw http_error(404, "Not Found");
-            break;
-        }
-
         auto_ptr<filecontent> ptr(new filecontent(path.c_str()));
 
         stringstream header;
@@ -355,9 +371,6 @@ namespace {
                 u.path_ = urldecode(u.path_.begin(), u.path_.end());
 
                 vector<string> nodes(splitpath(u.path_));
-                string path(joinpath(ROOT, nodes));
-                aug_info("path [%s]", path.c_str());
-
                 if (nodes.empty())
                     sendhome(id);
                 else if (2 == nodes.size() && nodes[0] == "services") {
@@ -377,8 +390,11 @@ namespace {
 
                 } else if (3 == nodes.size() && nodes[0] == "services")
                     sendpage(id, nodes[1], nodes[2]);
-                else
+                else {
+                    string path(joinpath(ROOT, nodes));
+                    aug_info("path [%s]", path.c_str());
                     sendfile(id, path);
+                }
 
             } catch (const http_error& e) {
                 aug_error("%d: %s", e.status(), e.what());
