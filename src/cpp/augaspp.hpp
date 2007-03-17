@@ -10,6 +10,7 @@
 #include <cctype>
 #include <cstring>
 #include <iterator>
+#include <memory>
 #include <stdexcept>
 #include <vector>
 #include <functional>
@@ -234,6 +235,42 @@ namespace augas {
     canceltimer(const augas_object& timer, unsigned ms)
     {
         return resettimer(timer.id_, ms);
+    }
+
+    namespace detail {
+        class stringtype {
+            static int
+            destroy(void* arg) AUGAS_NOTHROW
+            {
+                delete static_cast<std::string*>(arg);
+            }
+            static const void*
+            buf(void* arg, size_t* size) AUGAS_NOTHROW
+            {
+                std::string* s(static_cast<std::string*>(arg));
+                if (size)
+                    *size = s->size();
+                return s->data();
+            }
+        public:
+            static const augas_vartype&
+            get()
+            {
+                static const augas_vartype local = {
+                    destroy,
+                    buf
+                };
+                return local;
+            }
+        };
+    }
+
+    inline aug_var&
+    stringvar(aug_var& var, const std::auto_ptr<std::string>& ptr)
+    {
+        var.type_ = &detail::stringtype::get();
+        var.arg_ = ptr.get();
+        return var;
     }
 
     class object {

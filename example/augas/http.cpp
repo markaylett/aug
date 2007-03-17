@@ -5,6 +5,7 @@
 #include "augsyspp.hpp"
 
 #include <fstream>
+#include <map>
 #include <sstream>
 
 #include <sys/stat.h>
@@ -20,6 +21,21 @@ using namespace augas;
 using namespace std;
 
 namespace {
+
+    class http_error : public domain_error {
+        const int status_;
+    public:
+        http_error(int status, const string& title)
+            : domain_error(title),
+              status_(status)
+        {
+        }
+        int
+        status() const
+        {
+            return status_;
+        }
+    };
 
     bool
     stat(const char* path, struct _stat& sb)
@@ -56,7 +72,7 @@ namespace {
         string::size_type first, last;
         if (string::npos == (first = s.find_first_of(' '))
             || string::npos == (last = s.find_last_of(' ')))
-            throw error("malformed request");
+            throw http_error(400, "Bad Request");
         r.method_ = s.substr(0, first++);
         r.uri_ = s.substr(first, last - first);
         r.version_ = s.substr(last + 1);
@@ -102,7 +118,7 @@ namespace {
         {
             if (x == "..") {
                 if (xs_->empty())
-                    throw error("bad path");
+                    throw http_error(403, "Forbidden");
                 xs_->pop_back();
             } else if (!x.empty() && x != ".")
                 xs_->push_back(x);
@@ -168,6 +184,82 @@ namespace {
         }
     };
 
+    typedef vector<pair<string, string> > fields;
+
+    void
+    sendfile(augas_id id, string path)
+    {
+        for (;;) {
+            struct _stat sb;
+            if (!stat(path.c_str(), sb))
+                throw http_error(404, "Not Found");
+
+            if (_S_ISDIR(sb.st_mode)) {
+                path += "/index.html";
+                continue;
+            } else if (!_S_ISREG(sb.st_mode))
+                throw http_error(404, "Not Found");
+            break;
+        }
+
+        auto_ptr<filecontent> ptr(new filecontent(path.c_str()));
+
+        stringstream header;
+        header << "HTTP/1.1 200 OK\r\n"
+               << "Date: " << utcdate() << "\r\n"
+               << "Content-Type: text/html\r\n"
+               << "Content-Length: " << ptr->size() << "\r\n"
+               << "\r\n";
+
+        send(id, header.str().c_str(), header.str().size());
+        aug_var var;
+        sendv(id, bindvar<filecontent>(var, *ptr));
+        ptr.release();
+    }
+
+    typedef map<string, map<string, string> > pages;
+    pages pages_;
+
+    void
+    sendhome(augas_id id)
+    {
+        stringstream message;
+        message << "HTTP/1.1 200 OK\r\n"
+                << "Date: " << utcdate() << "\r\n"
+                << "Content-Type: text/html\r\n"
+                << "Content-Length: " << 40 << "\r\n"
+                << "\r\n"
+                << "<html><body>this is a test</body></html>";
+
+        send(id, message.str().c_str(), message.str().size());
+    }
+
+    void
+    sendstatus(augas_id id, int status, const string& title,
+               const fields& fs = fields())
+    {
+        stringstream content;
+        content << "<html><head><title>"
+                << status << ' ' << title
+                << "</title></head><body><h1>" << title
+                << "</h1></body></html>";
+
+        stringstream message;
+        message << "HTTP/1.1 " << status << ' ' << title << "\r\n"
+                << "Date: " << utcdate() << "\r\n";
+
+        fields::const_iterator it(fs.begin()), end(fs.end());
+        for (; it != end; ++it)
+            message << it->first << ": " << it->second << "\r\n";
+
+        message << "Content-Type: text/html\r\n"
+                << "Content-Length: " << content.str().size() << "\r\n"
+                << "\r\n"
+                << content.rdbuf();
+
+        send(id, message.str().c_str(), message.str().size());
+    }
+
     struct handler : basic_marhandler {
         static void
         message(const aug_var& var, const char* initial, aug_mar_t mar)
@@ -176,91 +268,69 @@ namespace {
 
             augas_id id(aug_ptoi(var.arg_));
 
-            aug_info("%s", initial);
+            try {
 
-            request r;
-            splitrequest(r, initial);
-            aug_info("method: [%s]", r.method_.c_str());
-            aug_info("uri: [%s]", r.uri_.c_str());
-            aug_info("version: [%s]", r.version_.c_str());
+                aug_info("%s", initial);
 
-            uri u;
-            splituri(u, r.uri_);
+                request r;
+                splitrequest(r, initial);
+                aug_info("method: [%s]", r.method_.c_str());
+                aug_info("uri: [%s]", r.uri_.c_str());
+                aug_info("version: [%s]", r.version_.c_str());
 
-            if (r.method_ == "POST") {
-                unsigned size;
-                const char* query(static_cast<
-                                  const char*>(content(mar, size)));
-                u.query_ = string(query, size);
-            }
+                uri u;
+                splituri(u, r.uri_);
 
-            aug_info("base: [%s]", u.base_.c_str());
-            aug_info("path: [%s]", u.path_.c_str());
-            aug_info("query: [%s]", u.query_.c_str());
-
-            header header(mar);
-            header::const_iterator it(header.begin()),
-                end(header.end());
-            for (; it != end; ++it)
-                aug_info("%s: %s", *it, header.getfield(it));
-
-            u.path_ = urldecode(u.path_.begin(), u.path_.end());
-
-            vector<string> nodes(splitpath(u.path_));
-            string path(joinpath(ROOT, nodes));
-            aug_info("path [%s]", path.c_str());
-
-            stringstream ss;
-
-            if (2 == nodes.size() && nodes[0] == "services") {
-
-                dispatch(nodes[1].c_str(),
-                         "application/x-www-form-urlencoded",
-                         u.query_.c_str(), u.query_.size());
-
-                unsigned size;
-                const char* value(static_cast<const char*>
-                                  (getfield(mar, "Host", size)));
-
-                ss << "HTTP/1.1 303 See Other\r\n"
-                   << "Date: " << utcdate() << "\r\n"
-                   << "Location: http://" << value << "\r\n"
-                   << "Content-Length: 0\r\n"
-                   << "\r\n";
-
-                send(id, ss.str().c_str(), ss.str().size());
-
-            } else {
-
-                for (;;) {
-                    struct _stat sb;
-                    if (!stat(path.c_str(), sb))
-                        throw runtime_error("file does not exist");
-
-                    if (_S_ISDIR(sb.st_mode)) {
-                        path += "/index.html";
-                        continue;
-                    } else if (!_S_ISREG(sb.st_mode))
-                        throw runtime_error("invalid file type");
-                    break;
+                if (r.method_ == "POST") {
+                    unsigned size;
+                    const char* query(static_cast<
+                                      const char*>(content(mar, size)));
+                    u.query_ = string(query, size);
                 }
 
-                auto_ptr<filecontent> ptr(new filecontent(path.c_str()));
-                ss << "HTTP/1.1 200 OK\r\n"
-                   << "Date: " << utcdate() << "\r\n"
-                   << "Content-Type: text/html\r\n"
-                   << "Content-Length: " << ptr->size() << "\r\n"
-                   << "\r\n";
+                aug_info("base: [%s]", u.base_.c_str());
+                aug_info("path: [%s]", u.path_.c_str());
+                aug_info("query: [%s]", u.query_.c_str());
 
-                send(id, ss.str().c_str(), ss.str().size());
-                aug_var var;
-                bindvar<filecontent>(var, *ptr);
-                augas_var v2;
-                memcpy(&v2, &var, sizeof(v2));
-                sendv(id, v2);
-                ptr.release();
+                header header(mar);
+                header::const_iterator it(header.begin()),
+                    end(header.end());
+                for (; it != end; ++it)
+                    aug_info("%s: %s", *it, header.getfield(it));
+
+                u.path_ = urldecode(u.path_.begin(), u.path_.end());
+
+                vector<string> nodes(splitpath(u.path_));
+                string path(joinpath(ROOT, nodes));
+                aug_info("path [%s]", path.c_str());
+
+                if (nodes.empty())
+                    sendhome(id);
+                else if (2 == nodes.size() && nodes[0] == "services") {
+
+                    dispatch(nodes[1].c_str(),
+                             "application/x-www-form-urlencoded",
+                             u.query_.c_str(), u.query_.size());
+
+                    unsigned size;
+                    const char* value(static_cast<const char*>
+                                      (getfield(mar, "Host", size)));
+
+                    fields fs;
+                    fs.push_back(make_pair("Location", string("http://")
+                                           .append(value)));
+                    sendstatus(id, 303, "See Other", fs);
+
+                } else
+                    sendfile(id, path);
+
+            } catch (const http_error& e) {
+                aug_error("%d: %s", e.status(), e.what());
+                sendstatus(id, e.status(), e.what());
+            } catch (const exception& e) {
+                sendstatus(id, 500, "Internal Server Error");
+                throw;
             }
-
 
             unsigned size;
             const char* value(static_cast<const char*>
@@ -283,6 +353,12 @@ namespace {
 
             tcplisten("0.0.0.0", serv);
             return true;
+        }
+        void
+        do_event(const char* from, const char* type, const void* user,
+                 size_t size)
+        {
+            pages_[from][type] = string(static_cast<const char*>(user), size);
         }
         void
         do_closed(const object& sock)

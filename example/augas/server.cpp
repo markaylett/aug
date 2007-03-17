@@ -35,6 +35,11 @@ namespace {
                 return false;
 
             tcplisten("0.0.0.0", serv);
+
+            aug_var var;
+            auto_ptr<string> ptr(new string("<h1>OK</h1>"));
+            post("http", "status", stringvar(var, ptr));
+            ptr.release();
             return true;
         }
         void

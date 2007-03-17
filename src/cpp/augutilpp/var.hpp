@@ -22,16 +22,16 @@ namespace aug {
         }
     public:
         static void
-        destroy(T* arg)
+        destroy(arg_type* arg)
         {
         }
         static const void*
-        buf(T& arg, size_t& size)
+        buf(arg_type& arg, size_t& size)
         {
             return 0;
         }
         static const void*
-        buf(T& arg)
+        buf(arg_type& arg)
         {
             return 0;
         }
