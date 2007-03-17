@@ -7,6 +7,10 @@ using namespace std;
 
 namespace {
 
+    const char HOME[] = "<form name=\"input\" action=\"/services/echo\""
+        " method=\"post\">name:&nbsp;<input type=\"text\" name=\"user\">"
+        "<input type=\"submit\" value=\"Submit\"></form>";
+
     struct eachline {
         object sock_;
         explicit
@@ -37,9 +41,12 @@ namespace {
             tcplisten("0.0.0.0", serv);
 
             aug_var var;
-            auto_ptr<string> ptr(new string("<h1>OK</h1>"));
-            post("http", "status", stringvar(var, ptr));
-            ptr.release();
+            auto_ptr<string> home(new string(HOME));
+            auto_ptr<string> status(new string("running"));
+            post("http", "home", stringvar(var, home));
+            post("http", "status", stringvar(var, status));
+            home.release();
+            status.release();
             return true;
         }
         void

@@ -223,13 +223,57 @@ namespace {
     void
     sendhome(augas_id id)
     {
+        stringstream content;
+        content << "<html><head><title>AugAS</title></head>"
+            "<body><h1>AugAS</h1><table>"
+            "<tr><th>service</th><th>status</th></tr>";
+
+        pages::const_iterator it(pages_.begin()), end(pages_.end());
+        for (; it != end; ++it) {
+            content << "<tr><td>";
+            map<string, string>::const_iterator jt(it->second.find("home"));
+
+            if (jt != it->second.end())
+                content << "<a href=\"/services/" << it->first << "/home\">"
+                        << it->first << "</a>";
+            else
+                content << it->first;
+
+            content << "</td><td>";
+            if ((jt = it->second.find("status")) != it->second.end())
+                content << jt->second;
+            content << "</td></tr>";
+        }
+
+        content << "</table></body></html>";
+
         stringstream message;
         message << "HTTP/1.1 200 OK\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Content-Type: text/html\r\n"
-                << "Content-Length: " << 40 << "\r\n"
+                << "Content-Length: " << content.str().size() << "\r\n"
                 << "\r\n"
-                << "<html><body>this is a test</body></html>";
+                << content.rdbuf();
+
+        send(id, message.str().c_str(), message.str().size());
+    }
+
+    void
+    sendpage(augas_id id, const string& service, const string& page)
+    {
+        stringstream content;
+        content << "<html><head><title>"
+                << service << ' ' << page
+                << "</title></head><body><h1>" << page
+                << "</h1>" << pages_[service][page] << "</body></html>";
+
+        stringstream message;
+        message << "HTTP/1.1 200 OK\r\n"
+                << "Date: " << utcdate() << "\r\n"
+                << "Content-Type: text/html\r\n"
+                << "Content-Length: " << content.str().size() << "\r\n"
+                << "\r\n"
+                << content.rdbuf();
 
         send(id, message.str().c_str(), message.str().size());
     }
@@ -321,7 +365,9 @@ namespace {
                                            .append(value)));
                     sendstatus(id, 303, "See Other", fs);
 
-                } else
+                } else if (3 == nodes.size() && nodes[0] == "services")
+                    sendpage(id, nodes[1], nodes[2]);
+                else
                     sendfile(id, path);
 
             } catch (const http_error& e) {
