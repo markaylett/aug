@@ -225,23 +225,32 @@ namespace {
     {
         stringstream content;
         content << "<html><head><title>AugAS</title></head>"
-            "<body><h1>AugAS</h1><table>"
+            "<body><h2>augas console</h2><table>"
             "<tr><th>service</th><th>status</th></tr>";
 
         pages::const_iterator it(pages_.begin()), end(pages_.end());
         for (; it != end; ++it) {
-            content << "<tr><td>";
-            map<string, string>::const_iterator jt(it->second.find("home"));
 
-            if (jt != it->second.end())
+            map<string, string>::const_iterator home(it->second.find("home")),
+                status(it->second.find("status"));
+
+            if (home == it->second.end()
+                && status == it->second.end())
+                continue;
+
+            content << "<tr><td>";
+
+            if (home != it->second.end())
                 content << "<a href=\"/services/" << it->first << "/home\">"
                         << it->first << "</a>";
             else
                 content << it->first;
 
             content << "</td><td>";
-            if ((jt = it->second.find("status")) != it->second.end())
-                content << jt->second;
+
+            if (status != it->second.end())
+                content << status->second;
+
             content << "</td></tr>";
         }
 
@@ -263,9 +272,10 @@ namespace {
     {
         stringstream content;
         content << "<html><head><title>"
-                << service << ' ' << page
-                << "</title></head><body><h1>" << page
-                << "</h1>" << pages_[service][page] << "</body></html>";
+                << service << "&nbsp;" << page
+                << "</title></head><body><h2>" << service
+                << "&nbsp;service</h2>" << pages_[service][page]
+                << "</body></html>";
 
         stringstream message;
         message << "HTTP/1.1 200 OK\r\n"
@@ -284,7 +294,7 @@ namespace {
     {
         stringstream content;
         content << "<html><head><title>"
-                << status << ' ' << title
+                << status << "&nbsp;" << title
                 << "</title></head><body><h1>" << title
                 << "</h1></body></html>";
 

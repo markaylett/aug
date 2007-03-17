@@ -243,6 +243,7 @@ namespace augas {
             destroy(void* arg) AUGAS_NOTHROW
             {
                 delete static_cast<std::string*>(arg);
+                return 0;
             }
             static const void*
             buf(void* arg, size_t* size) AUGAS_NOTHROW
