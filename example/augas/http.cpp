@@ -14,6 +14,7 @@
 # define _stat stat
 # define _S_ISDIR S_ISDIR
 # define _S_ISREG S_ISREG
+# define _S_IREAD S_IROTH
 #else // _WIN32
 # define lstat _stat
 #endif // _WIN32
@@ -168,7 +169,7 @@ namespace {
 
         // Must be regular, world-readable file.
 
-        if (!_S_ISREG(sb.st_mode) || !(sb.st_mode & S_IROTH))
+        if (!_S_ISREG(sb.st_mode) || !(sb.st_mode & _S_IREAD))
             throw http_error(403, "Forbidden");
 
         return path;
@@ -286,11 +287,19 @@ namespace {
     void
     sendpage(augas_id id, const string& service, const string& page)
     {
+        pages::const_iterator it(pages_.find(service));
+        if (it == pages_.end())
+            throw http_error(404, "Not Found");
+
+        map<string, string>::const_iterator jt(it->second.find(page));
+        if (jt == it->second.end())
+            throw http_error(404, "Not Found");
+
         stringstream content;
         content << "<html><head><title>"
                 << service << "&nbsp;" << page
                 << "</title></head><body><h2>" << service
-                << "&nbsp;service</h2>" << pages_[service][page]
+                << "&nbsp;service</h2>" << jt->second
                 << "</body></html>";
 
         stringstream message;
@@ -356,7 +365,8 @@ namespace {
                     const char* query(static_cast<
                                       const char*>(content(mar, size)));
                     u.query_ = string(query, size);
-                }
+                } else if (r.method_ != "GET")
+                    throw http_error(501, "Not Implemented");
 
                 aug_info("base: [%s]", u.base_.c_str());
                 aug_info("path: [%s]", u.path_.c_str());
@@ -373,27 +383,36 @@ namespace {
                 vector<string> nodes(splitpath(u.path_));
                 if (nodes.empty())
                     sendhome(id);
-                else if (2 == nodes.size() && nodes[0] == "services") {
-
-                    dispatch(nodes[1].c_str(),
-                             "application/x-www-form-urlencoded",
-                             u.query_.c_str(), u.query_.size());
-
-                    unsigned size;
-                    const char* value(static_cast<const char*>
-                                      (getfield(mar, "Host", size)));
-
-                    fields fs;
-                    fs.push_back(make_pair("Location", string("http://")
-                                           .append(value)));
-                    sendstatus(id, 303, "See Other", fs);
-
-                } else if (3 == nodes.size() && nodes[0] == "services")
-                    sendpage(id, nodes[1], nodes[2]);
                 else {
-                    string path(joinpath(ROOT, nodes));
-                    aug_info("path [%s]", path.c_str());
-                    sendfile(id, path);
+
+                    if (nodes[0] == "services") {
+
+                        if (2 == nodes.size()) {
+
+                            dispatch(nodes[1].c_str(),
+                                     "application/x-www-form-urlencoded",
+                                     u.query_.c_str(), u.query_.size());
+
+                            const char* value
+                                (static_cast<
+                                 const char*>(getfield(mar, "Host")));
+                            fields fs;
+                            fs.push_back
+                                (make_pair("Location", string("http://")
+                                           .append(value)));
+                            sendstatus(id, 303, "See Other", fs);
+
+                        } else if (3 == nodes.size())
+                            sendpage(id, nodes[1], nodes[2]);
+                        else
+                            throw http_error(404, "Not Found");
+
+                    } else {
+
+                        string path(joinpath(ROOT, nodes));
+                        aug_info("path [%s]", path.c_str());
+                        sendfile(id, path);
+                    }
                 }
 
             } catch (const http_error& e) {
@@ -430,7 +449,17 @@ namespace {
         do_event(const char* from, const char* type, const void* user,
                  size_t size)
         {
-            pages_[from][type] = string(static_cast<const char*>(user), size);
+            pages::iterator it(pages_.find(from));
+            if (it == pages_.end())
+                it = pages_.insert(make_pair(from, map<string, string>()))
+                    .first;
+
+            string page(static_cast<const char*>(user), size);
+
+            pair<map<string, string>::iterator,
+                bool> xy(it->second.insert(make_pair(type, page)));
+            if (!xy.second)
+                xy.first->second = page;
         }
         void
         do_closed(const object& sock)

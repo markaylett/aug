@@ -17,11 +17,21 @@
 
 namespace aug {
 
-    inline bool
-    ismatch(int result)
-    {
-        verify(result);
-        return AUG_RETNOMATCH != result;
+    namespace detail {
+        inline bool
+        ismatch(int result)
+        {
+            verify(result);
+            return AUG_RETNOMATCH != result;
+        }
+        inline const void*
+        verify(const void* result)
+        {
+            if (!result && !(AUG_SRCLOCAL == aug_errsrc
+                             && AUG_EEXIST == aug_errnum))
+                fail();
+            return result;
+        }
     }
     inline void
     copymar(marref dst, marref src)
@@ -84,38 +94,38 @@ namespace aug {
     unsetfield(marref ref, const char* name)
     {
         unsigned ord;
-        bool match(ismatch(aug_unsetbyname(ref.get(), name, &ord)));
+        bool match(detail::ismatch(aug_unsetbyname(ref.get(), name, &ord)));
         return std::make_pair(ord, match);
     }
     inline bool
     unsetfield(marref ref, unsigned ord)
     {
-        return ismatch(aug_unsetbyord(ref.get(), ord));
+        return detail::ismatch(aug_unsetbyord(ref.get(), ord));
     }
     inline const void*
     getfield(marref ref, const char* name)
     {
-        return verify(aug_valuebyname(ref.get(), name, 0));
+        return detail::verify(aug_valuebyname(ref.get(), name, 0));
     }
     inline const void*
     getfield(marref ref, const char* name, unsigned& size)
     {
-        return verify(aug_valuebyname(ref.get(), name, &size));
+        return detail::verify(aug_valuebyname(ref.get(), name, &size));
     }
     inline const void*
     getfield(marref ref, unsigned ord, unsigned& size)
     {
-        return verify(aug_valuebyord(ref.get(), ord, &size));
+        return detail::verify(aug_valuebyord(ref.get(), ord, &size));
     }
     inline const void*
     getfield(marref ref, unsigned ord)
     {
-        return verify(aug_valuebyord(ref.get(), ord, 0));
+        return detail::verify(aug_valuebyord(ref.get(), ord, 0));
     }
     inline bool
     getfield(marref ref, aug_field& f, unsigned ord)
     {
-        return ismatch(aug_getfield(ref.get(), &f, ord));
+        return detail::ismatch(aug_getfield(ref.get(), &f, ord));
     }
     inline unsigned
     getfields(marref ref)
@@ -127,13 +137,13 @@ namespace aug {
     inline bool
     toname(marref ref, const char*& s, unsigned ord)
     {
-        return ismatch(aug_ordtoname(ref.get(), &s, ord));
+        return detail::ismatch(aug_ordtoname(ref.get(), &s, ord));
     }
     inline std::pair<unsigned, bool>
     toord(marref ref, const char* name)
     {
         unsigned ord;
-        bool match(ismatch(aug_nametoord(ref.get(), &ord, name)));
+        bool match(detail::ismatch(aug_nametoord(ref.get(), &ord, name)));
         return std::make_pair(ord, match);
     }
     inline void

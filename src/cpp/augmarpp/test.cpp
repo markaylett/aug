@@ -116,11 +116,9 @@ namespace {
         unsigned ord(aug::unsetfield(ref, FIELDS[1].name_).first);
         if (1 != ord)
             throw error(__LINE__);
-        try {
-            aug::getfield(ref, FIELDS[1].name_);
+
+        if (aug::getfield(ref, FIELDS[1].name_))
             throw error(__LINE__);
-        } catch (...) {
-        }
 
         aug::removefields(ref);
         if (0 != aug::getfields(ref))
