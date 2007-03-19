@@ -2,6 +2,7 @@ include $(top_srcdir)/src/c/lang.mk
 
 modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
+	base64.h \
 	config.h \
 	connector.h \
 	file.h \
@@ -17,6 +18,7 @@ noinst_HEADERS =
 lib_LTLIBRARIES = libaugnet.la
 
 libaugnet_la_SOURCES = \
+	base64.c \
 	config.c \
 	connector.c \
 	file.c \
@@ -36,9 +38,12 @@ libaugnet_la_LIBADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = augnet-fixtest augnet-httptest
-#TESTS = augnet-fixtest augnet-httptest
-TESTS = augnet-httptest
+check_PROGRAMS = augnet-base64test augnet-fixtest augnet-httptest
+TESTS = augnet-base64test augnet-httptest
+
+augnet_base64test_SOURCES = base64test.c
+augnet_base64test_LDADD = \
+	$(top_builddir)/src/c/augnet/libaugnet.la
 
 augnet_fixtest_SOURCES = fixtest.c
 augnet_fixtest_LDADD = \

@@ -17,8 +17,6 @@ static const char rcsid[] = "$Id$";
 #include <errno.h>       /* ENOMEM */
 #include <stdlib.h>      /* malloc() */
 
-#define EOF_ (-1)
-
 struct aug_httpparser_ {
     const struct aug_httphandler* handler_;
     struct aug_var var_;
@@ -45,7 +43,6 @@ initial_(aug_httpparser_t parser)
     /* Unless Content-Length is encountered, read body until end of stream is
        reached. */
 
-    /* parser->csize_ = EOF_; */
     return parser->handler_
         ->initial_(&parser->var_, aug_token(parser->lexer_));
 }
@@ -189,12 +186,11 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
 static int
 body_(aug_httpparser_t parser, const char* buf, unsigned size)
 {
-    if (EOF_ == parser->csize_ || (int)size < parser->csize_) {
+    if ((int)size < parser->csize_) {
 
         /* Not enough data to fulfil the content. */
 
-        if (EOF_ != parser->csize_)
-            parser->csize_ -= size;
+        parser->csize_ -= size;
 
         if (-1 == parser->handler_->cdata_(&parser->var_, buf, size))
             return -1;
