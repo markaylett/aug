@@ -17,7 +17,7 @@ typedef struct aug_base64_* aug_base64_t;
 enum aug_base64mode {
 	AUG_DECODE64,
 	AUG_ENCODE64
-} aug_base64mode;
+};
 
 AUGNET_API aug_base64_t
 aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb,
