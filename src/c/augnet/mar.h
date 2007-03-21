@@ -31,9 +31,9 @@ AUGNET_API int
 aug_destroymarparser(aug_marparser_t parser);
 
 AUGNET_API int
-aug_parsemar(aug_marparser_t parser, const char*, unsigned size);
+aug_appendmar(aug_marparser_t parser, const char*, unsigned size);
 
 AUGNET_API int
-aug_endmar(aug_marparser_t parser);
+aug_finishmar(aug_marparser_t parser);
 
 #endif /* AUGNET_MAR_H */

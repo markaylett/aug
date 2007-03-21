@@ -30,6 +30,6 @@ AUGNET_API int
 aug_appendbase64(aug_base64_t base64, const char* src, size_t len);
 
 AUGNET_API int
-aug_endbase64(aug_base64_t base64);
+aug_finishbase64(aug_base64_t base64);
 
 #endif /* AUGNET_BASE64_H */

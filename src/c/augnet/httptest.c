@@ -70,13 +70,13 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_parsehttp(parser, TEST_, sizeof(TEST_) - 1)) {
-        aug_perrinfo(NULL, "aug_parsehttp() failed");
+    if (-1 == aug_appendhttp(parser, TEST_, sizeof(TEST_) - 1)) {
+        aug_perrinfo(NULL, "aug_appendhttp() failed");
         goto fail;
     }
 
-    if (-1 == aug_endhttp(parser)) {
-        aug_perrinfo(NULL, "aug_endhttp() failed");
+    if (-1 == aug_finishhttp(parser)) {
+        aug_perrinfo(NULL, "aug_finishhttp() failed");
         goto fail;
     }
 

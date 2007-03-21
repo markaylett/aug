@@ -45,7 +45,7 @@ AUGNET_API ssize_t
 aug_readfix(aug_fixstream_t stream, int fd, size_t size);
 
 AUGNET_API int
-aug_endfix(aug_fixstream_t stream);
+aug_finishfix(aug_fixstream_t stream);
 
 AUGNET_API int
 aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size);

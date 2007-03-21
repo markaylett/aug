@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-check_PROGRAMS = augnetpp-test$(EXEEXT) \
+check_PROGRAMS = augnetpp-test$(EXEEXT) augnetpp-base64test$(EXEEXT) \
 	augnetpp-connectortest$(EXEEXT)
 subdir = src/cpp/augnetpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -56,30 +56,32 @@ libaugnetpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugnetpp_la_OBJECTS = config.lo connector.lo file.lo http.lo \
-	inet.lo writer.lo
+am_libaugnetpp_la_OBJECTS = base64.lo config.lo connector.lo file.lo \
+	http.lo inet.lo writer.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
-am_augnetpp_connectortest_OBJECTS = connectortest.$(OBJEXT)
-augnetpp_connectortest_OBJECTS = $(am_augnetpp_connectortest_OBJECTS)
-augnetpp_connectortest_DEPENDENCIES =  \
-	$(top_builddir)/src/cpp/augsrvpp/libaugsrvpp.la \
+am_augnetpp_base64test_OBJECTS = base64test.$(OBJEXT)
+augnetpp_base64test_OBJECTS = $(am_augnetpp_base64test_OBJECTS)
+augnetpp_base64test_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+am_augnetpp_connectortest_OBJECTS = connectortest.$(OBJEXT)
+augnetpp_connectortest_OBJECTS = $(am_augnetpp_connectortest_OBJECTS)
+augnetpp_connectortest_DEPENDENCIES =  \
+	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_augnetpp_test_OBJECTS = test.$(OBJEXT)
 augnetpp_test_OBJECTS = $(am_augnetpp_test_OBJECTS)
 augnetpp_test_DEPENDENCIES =  \
-	$(top_builddir)/src/cpp/augsrvpp/libaugsrvpp.la \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -99,9 +101,10 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugnetpp_la_SOURCES) $(augnetpp_connectortest_SOURCES) \
-	$(augnetpp_test_SOURCES)
+SOURCES = $(libaugnetpp_la_SOURCES) $(augnetpp_base64test_SOURCES) \
+	$(augnetpp_connectortest_SOURCES) $(augnetpp_test_SOURCES)
 DIST_SOURCES = $(libaugnetpp_la_SOURCES) \
+	$(augnetpp_base64test_SOURCES) \
 	$(augnetpp_connectortest_SOURCES) $(augnetpp_test_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -234,6 +237,7 @@ DEFAULT_INCLUDES = \
 
 modincludedir = $(includedir)/augnetpp
 modinclude_HEADERS = \
+	base64.hpp \
 	config.hpp \
 	connector.hpp \
 	file.hpp \
@@ -244,6 +248,7 @@ modinclude_HEADERS = \
 
 noinst_LTLIBRARIES = libaugnetpp.la
 libaugnetpp_la_SOURCES = \
+	base64.cpp \
 	config.cpp \
 	connector.cpp \
 	file.cpp \
@@ -263,28 +268,31 @@ libaugnetpp_la_LIBADD = \
 
 TESTS = \
 	augnetpp-test \
+	augnetpp-base64test \
 	augnetpp-connectortest
 
 augnetpp_test_SOURCES = test.cpp
 augnetpp_test_LDADD = \
-	$(top_builddir)/src/cpp/augsrvpp/libaugsrvpp.la \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+augnetpp_base64test_SOURCES = base64test.cpp
+augnetpp_base64test_LDADD = \
+	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 augnetpp_connectortest_SOURCES = connectortest.cpp
 augnetpp_connectortest_LDADD = \
-	$(top_builddir)/src/cpp/augsrvpp/libaugsrvpp.la \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 all: all-am
@@ -338,6 +346,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+augnetpp-base64test$(EXEEXT): $(augnetpp_base64test_OBJECTS) $(augnetpp_base64test_DEPENDENCIES) 
+	@rm -f augnetpp-base64test$(EXEEXT)
+	$(CXXLINK) $(augnetpp_base64test_LDFLAGS) $(augnetpp_base64test_OBJECTS) $(augnetpp_base64test_LDADD) $(LIBS)
 augnetpp-connectortest$(EXEEXT): $(augnetpp_connectortest_OBJECTS) $(augnetpp_connectortest_DEPENDENCIES) 
 	@rm -f augnetpp-connectortest$(EXEEXT)
 	$(CXXLINK) $(augnetpp_connectortest_LDFLAGS) $(augnetpp_connectortest_OBJECTS) $(augnetpp_connectortest_LDADD) $(LIBS)
@@ -351,6 +362,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connectortest.Po@am__quote@

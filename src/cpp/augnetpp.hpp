@@ -6,6 +6,7 @@
 
 #include "augnet.h"
 
+#include "augnetpp/base64.hpp"
 #include "augnetpp/connector.hpp"
 #include "augnetpp/file.hpp"
 #include "augnetpp/http.hpp"

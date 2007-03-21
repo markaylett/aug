@@ -125,15 +125,15 @@ namespace aug {
     };
 
     inline void
-    parsehttp(aug_httpparser_t parser, const char* buf, unsigned size)
+    appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
     {
-        verify(aug_parsehttp(parser, buf, size));
+        verify(aug_appendhttp(parser, buf, size));
     }
 
     inline void
-    endhttp(aug_httpparser_t parser)
+    finishhttp(aug_httpparser_t parser)
     {
-        verify(aug_endhttp(parser));
+        verify(aug_finishhttp(parser));
     }
 }
 

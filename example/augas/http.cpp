@@ -339,14 +339,33 @@ namespace {
         send(id, message.str().c_str(), message.str().size());
     }
 
+    struct session {
+        augas_id id_;
+        bool auth_;
+        explicit
+        session(augas_id id)
+            : id_(id),
+              auth_(false)
+        {
+        }
+    };
+
+    /*
+#
+header('WWW-Authenticate: Basic realm="Secret page"');
+#
+header('HTTP/1.0 401 Unauthorized');
+#
+print "Login failed!\n";
+     */
+
     struct handler : basic_marhandler {
         static void
         message(const aug_var& var, const char* initial, aug_mar_t mar)
         {
             static const char ROOT[] = ".";
 
-            augas_id id(aug_ptoi(var.arg_));
-
+            session& sess(*static_cast<session*>(var.arg_));
             try {
 
                 aug_info("%s", initial);
@@ -375,15 +394,41 @@ namespace {
                 header header(mar);
                 header::const_iterator it(header.begin()),
                     end(header.end());
-                for (; it != end; ++it)
-                    aug_info("%s: %s", *it, header.getfield(it));
+                for (; it != end; ++it) {
+
+                    unsigned size;
+                    const char* value
+                        (static_cast<const char*>(header.getfield(it, size)));
+
+                    aug_info("%s: %s", *it, value);
+
+                    if (0 == strcmp(*it, "Authorization")) {
+
+                        string x, y;
+                        split2(value, value + size, x, y, ' ');
+                        aug_info("%s", filterbase64(y.c_str(), y.size(),
+                                                    AUG_DECODE64).c_str());
+                        sess.auth_ = true;
+                    }
+                }
 
                 u.path_ = urldecode(u.path_.begin(), u.path_.end());
 
                 vector<string> nodes(splitpath(u.path_));
-                if (nodes.empty())
-                    sendhome(id);
-                else {
+
+                if (!sess.auth_) {
+
+                    fields fs;
+                    fs.push_back
+                        (make_pair("WWW-Authenticate",
+                                   "Basic realm=\"AugAS Web Admin\""));
+                    sendstatus(sess.id_, 401, "Unauthorized", fs);
+
+                } else if (nodes.empty()) {
+
+                    sendhome(sess.id_);
+
+                } else {
 
                     if (nodes[0] == "services") {
 
@@ -400,10 +445,10 @@ namespace {
                             fs.push_back
                                 (make_pair("Location", string("http://")
                                            .append(value)));
-                            sendstatus(id, 303, "See Other", fs);
+                            sendstatus(sess.id_, 303, "See Other", fs);
 
                         } else if (3 == nodes.size())
-                            sendpage(id, nodes[1], nodes[2]);
+                            sendpage(sess.id_, nodes[1], nodes[2]);
                         else
                             throw http_error(404, "Not Found");
 
@@ -411,15 +456,15 @@ namespace {
 
                         string path(joinpath(ROOT, nodes));
                         aug_info("path [%s]", path.c_str());
-                        sendfile(id, path);
+                        sendfile(sess.id_, path);
                     }
                 }
 
             } catch (const http_error& e) {
                 aug_error("%d: %s", e.status(), e.what());
-                sendstatus(id, e.status(), e.what());
+                sendstatus(sess.id_, e.status(), e.what());
             } catch (const exception& e) {
-                sendstatus(id, 500, "Internal Server Error");
+                sendstatus(sess.id_, 500, "Internal Server Error");
                 throw;
             }
 
@@ -428,7 +473,7 @@ namespace {
                               (getfield(mar, "Connection", size)));
             if (value && size && aug_strcasestr(value, "close")) {
                 aug_info("closing");
-                shutdown(id);
+                shutdown(sess.id_);
             }
         }
     };
@@ -467,7 +512,7 @@ namespace {
             aug_info("closed");
             if (sock.user()) {
                 auto_ptr<marparser> parser(sock.user<marparser>());
-                endmar(*parser);
+                finishmar(*parser);
             }
         }
         void
@@ -478,9 +523,17 @@ namespace {
         bool
         do_accept(object& sock, const char* addr, unsigned short port)
         {
-            aug_var var = { 0, aug_itop(sock.id()) };
-            sock.setuser(new marparser(0, marhandler<handler>(), var));
+            auto_ptr<session> sess(new session(sock.id()));
+
+            aug_var var;
+            auto_ptr<marparser> parser
+                (new marparser(0, marhandler<handler>(),
+                               bindvar<deletearg<session> >(var, *sess)));
+            sess.release();
+
+            sock.setuser(parser.get());
             setrwtimer(sock, 30000, AUGAS_TIMRD);
+            parser.release();
             return true;
         }
         void
@@ -488,8 +541,8 @@ namespace {
         {
             marparser& parser(*sock.user<marparser>());
             try {
-                parsemar(parser, static_cast<const char*>(buf),
-                         static_cast<unsigned>(size));
+                appendmar(parser, static_cast<const char*>(buf),
+                          static_cast<unsigned>(size));
             } catch (...) {
                 shutdown(sock);
                 throw;

@@ -131,12 +131,12 @@ aug_destroylexer(aug_lexer_t lexer)
 }
 
 AUGUTIL_API enum aug_token
-aug_lexchar(aug_lexer_t* lexer, char ch)
+aug_appendlexer(aug_lexer_t* lexer, char ch)
 {
     char first;
 
     if ('\0' == ch)
-        return -1 == aug_lexend(lexer) ? AUG_TOKERROR : AUG_TOKBREAK;
+        return -1 == aug_finishlexer(lexer) ? AUG_TOKERROR : AUG_TOKBREAK;
 
     switch ((*lexer)->state_) {
     case LTRIM_:
@@ -156,7 +156,7 @@ aug_lexchar(aug_lexer_t* lexer, char ch)
 
         if ((*lexer)->isdelim_ && ((*lexer)->isdelim_)(ch)) {
 
-            aug_lexend(lexer);
+            aug_finishlexer(lexer);
             return AUG_TOKDELIM;
         }
 
@@ -262,26 +262,26 @@ aug_lexchar(aug_lexer_t* lexer, char ch)
             return AUG_TOKBREAK;
         }
 
-        switch (aug_lexchar(lexer, first)) {
+        switch (aug_appendlexer(lexer, first)) {
         case AUG_TOKERROR:
             return AUG_TOKERROR;
         case AUG_TOKDELIM:
             (*lexer)->state_ = ch;
             return AUG_TOKDELIM;
         default:
-            return aug_lexchar(lexer, ch);
+            return aug_appendlexer(lexer, ch);
         }
     }
     return AUG_TOKNONE;
 }
 
 AUGUTIL_API int
-aug_lexend(aug_lexer_t* lexer)
+aug_finishlexer(aug_lexer_t* lexer)
 {
     /* If present (0 < state_), add the first character of the new line.*/
 
     if (0 < (*lexer)->state_
-        && AUG_TOKERROR == aug_lexchar(lexer, pending_(*lexer)))
+        && AUG_TOKERROR == aug_appendlexer(lexer, pending_(*lexer)))
         return -1;
 
     rtrim_(*lexer);
@@ -296,7 +296,7 @@ aug_lexend(aug_lexer_t* lexer)
 }
 
 AUGUTIL_API aug_isdelim_t
-aug_setisdelim(aug_lexer_t lexer, aug_isdelim_t isdelim)
+aug_setlexerdelim(aug_lexer_t lexer, aug_isdelim_t isdelim)
 {
     int (*old)(char) = lexer->isdelim_;
     lexer->isdelim_ = isdelim;
@@ -304,7 +304,7 @@ aug_setisdelim(aug_lexer_t lexer, aug_isdelim_t isdelim)
 }
 
 AUGUTIL_API const char*
-aug_token(aug_lexer_t lexer)
+aug_lexertoken(aug_lexer_t lexer)
 {
     return BUFFER_(lexer);
 }

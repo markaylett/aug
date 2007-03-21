@@ -33,9 +33,9 @@ AUGNET_API int
 aug_destroyhttpparser(aug_httpparser_t parser);
 
 AUGNET_API int
-aug_parsehttp(aug_httpparser_t parser, const char*, unsigned size);
+aug_appendhttp(aug_httpparser_t parser, const char*, unsigned size);
 
 AUGNET_API int
-aug_endhttp(aug_httpparser_t parser);
+aug_finishhttp(aug_httpparser_t parser);
 
 #endif /* AUGNET_HTTP_H */

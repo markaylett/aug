@@ -44,13 +44,13 @@ initial_(aug_httpparser_t parser)
        reached. */
 
     return parser->handler_
-        ->initial_(&parser->var_, aug_token(parser->lexer_));
+        ->initial_(&parser->var_, aug_lexertoken(parser->lexer_));
 }
 
 static int
 name_(aug_httpparser_t parser)
 {
-    aug_strlcpy(parser->name_, aug_token(parser->lexer_),
+    aug_strlcpy(parser->name_, aug_lexertoken(parser->lexer_),
                 sizeof(parser->name_));
     return 0;
 }
@@ -67,7 +67,7 @@ value_(aug_httpparser_t parser)
     case 'c':
         if (0 == aug_strcasecmp(&parser->name_[1], "ontent-Length")) {
 
-            if (-1 == aug_strtoui(&csize, aug_token(parser->lexer_), 10))
+            if (-1 == aug_strtoui(&csize, aug_lexertoken(parser->lexer_), 10))
                 return -1;
 
             parser->csize_ = (int)csize;
@@ -75,8 +75,8 @@ value_(aug_httpparser_t parser)
         }
     }
 
-    return parser->handler_
-        ->field_(&parser->var_, parser->name_, aug_token(parser->lexer_));
+    return parser->handler_->field_(&parser->var_, parser->name_,
+                                    aug_lexertoken(parser->lexer_));
 }
 
 static int
@@ -96,7 +96,7 @@ tail_(aug_httpparser_t parser)
 
         /* Ignore empty lines that precede a message. */
 
-        if ('\0' != *aug_token(parser->lexer_))
+        if ('\0' != *aug_lexertoken(parser->lexer_))
             ret = initial_(parser);
         break;
 
@@ -104,7 +104,7 @@ tail_(aug_httpparser_t parser)
 
         /* Empty line in the name phase of the parse. */
 
-        if ('\0' != *aug_token(parser->lexer_)) {
+        if ('\0' != *aug_lexertoken(parser->lexer_)) {
             aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
                            AUG_MSG("failed to parse name"));
             ret = -1;
@@ -140,7 +140,7 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
     unsigned i = 0;
     while (i < size) {
 
-        switch (aug_lexchar(&parser->lexer_, ptr[i++])) {
+        switch (aug_appendlexer(&parser->lexer_, ptr[i++])) {
         case AUG_TOKERROR:
             return -1;
         case AUG_TOKNONE:
@@ -152,7 +152,7 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
             /* The field's value follows its name. */
 
             parser->state_ = VALUE_;
-            aug_setisdelim(parser->lexer_, NULL);
+            aug_setlexerdelim(parser->lexer_, NULL);
             break;
 
         case AUG_TOKLINE:
@@ -160,7 +160,7 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
                 return -1;
 
             parser->state_ = NAME_;
-            aug_setisdelim(parser->lexer_, iscolon_);
+            aug_setlexerdelim(parser->lexer_, iscolon_);
             break;
 
         case AUG_TOKBREAK:
@@ -249,7 +249,7 @@ aug_destroyhttpparser(aug_httpparser_t parser)
 }
 
 AUGNET_API int
-aug_parsehttp(aug_httpparser_t parser, const char* buf, unsigned size)
+aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
 {
     int ret;
 
@@ -288,9 +288,9 @@ aug_parsehttp(aug_httpparser_t parser, const char* buf, unsigned size)
 }
 
 AUGNET_API int
-aug_endhttp(aug_httpparser_t parser)
+aug_finishhttp(aug_httpparser_t parser)
 {
-    if (-1 == aug_lexend(&parser->lexer_))
+    if (-1 == aug_finishlexer(&parser->lexer_))
         goto fail;
 
     if (-1 == tail_(parser))

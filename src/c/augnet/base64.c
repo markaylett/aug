@@ -25,7 +25,7 @@ struct aug_base64_ {
 	int save_[3];
 	unsigned saved_;
 	int (*append_)(struct aug_base64_*, const char*, size_t);
-	int (*end_)(struct aug_base64_*);
+	int (*finish_)(struct aug_base64_*);
 };
 
 /* Each set of three bytes are encodes as four: three sets of eight bits are
@@ -367,7 +367,7 @@ decodeappend_(aug_base64_t base64, const char* src, size_t len)
 }
 
 static int
-decodeend_(aug_base64_t base64)
+decodefinish_(aug_base64_t base64)
 {
     return base64->pos_ ? flush_(base64) : 0;
 }
@@ -491,7 +491,7 @@ encodeappend_(aug_base64_t base64, const char* src, size_t len)
 }
 
 static int
-encodeend_(aug_base64_t base64)
+encodefinish_(aug_base64_t base64)
 {
     const int* save = base64->save_;
     aug_chunk_t chunk;
@@ -541,12 +541,12 @@ aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb,
     switch (mode) {
     case AUG_DECODE64:
         base64->append_ = decodeappend_;
-        base64->end_ = decodeend_;
+        base64->finish_ = decodefinish_;
         break;
 
     case AUG_ENCODE64:
         base64->append_ = encodeappend_;
-        base64->end_ = encodeend_;
+        base64->finish_ = encodefinish_;
         break;
     }
 
@@ -568,7 +568,7 @@ aug_appendbase64(aug_base64_t base64, const char* src, size_t len)
 }
 
 AUGNET_API int
-aug_endbase64(aug_base64_t base64)
+aug_finishbase64(aug_base64_t base64)
 {
-    return base64->end_(base64);
+    return base64->finish_(base64);
 }

@@ -32,15 +32,15 @@ AUGUTIL_API int
 aug_destroylexer(aug_lexer_t lexer);
 
 AUGUTIL_API enum aug_token
-aug_lexchar(aug_lexer_t* lexer, char ch);
+aug_appendlexer(aug_lexer_t* lexer, char ch);
 
 AUGUTIL_API int
-aug_lexend(aug_lexer_t* lexer);
+aug_finishlexer(aug_lexer_t* lexer);
 
 AUGUTIL_API aug_isdelim_t
-aug_setisdelim(aug_lexer_t lexer, aug_isdelim_t isdelim);
+aug_setlexerdelim(aug_lexer_t lexer, aug_isdelim_t isdelim);
 
 AUGUTIL_API const char*
-aug_token(aug_lexer_t lexer);
+aug_lexertoken(aug_lexer_t lexer);
 
 #endif /* AUGUTIL_LEXER_H */

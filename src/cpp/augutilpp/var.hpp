@@ -37,6 +37,21 @@ namespace aug {
         }
     };
 
+    template <typename T>
+    struct deletearg : basic_vartype<T> {
+        typedef typename basic_vartype<T>::arg_type arg_type;
+    protected:
+        ~deletearg() AUG_NOTHROW
+        {
+        }
+    public:
+        static void
+        destroy(arg_type* arg)
+        {
+            delete arg;
+        }
+    };
+
     namespace detail {
 
         template <typename T>

@@ -154,13 +154,13 @@ aug_destroymarparser(aug_marparser_t parser)
 }
 
 AUGNET_API int
-aug_parsemar(aug_marparser_t parser, const char* buf, unsigned size)
+aug_appendmar(aug_marparser_t parser, const char* buf, unsigned size)
 {
-    return aug_parsehttp(parser->http_, buf, size);
+    return aug_appendhttp(parser->http_, buf, size);
 }
 
 AUGNET_API int
-aug_endmar(aug_marparser_t parser)
+aug_finishmar(aug_marparser_t parser)
 {
-    return aug_endhttp(parser->http_);
+    return aug_finishhttp(parser->http_);
 }

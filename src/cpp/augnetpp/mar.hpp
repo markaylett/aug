@@ -109,15 +109,15 @@ namespace aug {
     };
 
     inline void
-    parsemar(aug_marparser_t parser, const char* buf, unsigned size)
+    appendmar(aug_marparser_t parser, const char* buf, unsigned size)
     {
-        verify(aug_parsemar(parser, buf, size));
+        verify(aug_appendmar(parser, buf, size));
     }
 
     inline void
-    endmar(aug_marparser_t parser)
+    finishmar(aug_marparser_t parser)
     {
-        verify(aug_endmar(parser));
+        verify(aug_finishmar(parser));
     }
 }
 
