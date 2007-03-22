@@ -487,7 +487,7 @@ aug_truncatemar(aug_mar_t mar, unsigned size)
 }
 
 AUGMAR_API int
-aug_writemar(aug_mar_t mar, const void* buf, unsigned size)
+aug_writemar(aug_mar_t mar, const void* buf, unsigned len)
 {
     int ret;
 
@@ -505,7 +505,7 @@ aug_writemar(aug_mar_t mar, const void* buf, unsigned size)
     }
 
     if (-1 == (ret = aug_write_(mar->seq_, &mar->info_, mar->offset_, buf,
-                                size)))
+                                len)))
         return -1;
 
     mar->offset_ += ret;
@@ -557,7 +557,7 @@ aug_content(aug_mar_t mar, unsigned* size)
 }
 
 AUGMAR_API int
-aug_readmar(aug_mar_t mar, void* buf, unsigned size)
+aug_readmar(aug_mar_t mar, void* buf, unsigned len)
 {
     int ret;
 
@@ -569,7 +569,7 @@ aug_readmar(aug_mar_t mar, void* buf, unsigned size)
     }
 
     if (-1 == (ret = aug_read_(mar->seq_, &mar->info_, mar->offset_, buf,
-                               size)))
+                               len)))
         return -1;
 
     mar->offset_ += ret;

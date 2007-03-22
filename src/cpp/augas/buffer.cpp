@@ -67,37 +67,37 @@ buffer::buffer(size_t size)
 void
 buffer::append(const aug_var& var)
 {
-    appendbuf(writer_, var);
+    appendwriter(writer_, var);
     usevec_ = false;
 }
 
 void
-buffer::append(const void* buf, size_t size)
+buffer::append(const void* buf, size_t len)
 {
     if (usevec_) {
 
         if (empty()) {
             aug_var var;
-            appendbuf(writer_, bindvar<vectype>(var, arg_));
+            appendwriter(writer_, bindvar<vectype>(var, arg_));
         }
 
         // Grow buffer if needed.
 
-        if (arg_.vec_.size() - arg_.end_ < size)
-            arg_.vec_.resize(arg_.end_ + size);
+        if (arg_.vec_.size() - arg_.end_ < len)
+            arg_.vec_.resize(arg_.end_ + len);
 
-        memcpy(&arg_.vec_[arg_.end_], buf, size);
-        arg_.end_ += size;
+        memcpy(&arg_.vec_[arg_.end_], buf, len);
+        arg_.end_ += len;
 
     } else {
 
         copyarg* arg(static_cast<copyarg*>(malloc(sizeof(copyarg)
-                                                  + size - 1)));
-        arg->size_ = size;
-        memcpy(arg->buf_, buf, size);
+                                                  + len - 1)));
+        arg->size_ = len;
+        memcpy(arg->buf_, buf, len);
 
         aug_var var;
-        appendbuf(writer_, bindvar<copytype>(var, *arg));
+        appendwriter(writer_, bindvar<copytype>(var, *arg));
     }
 }
 

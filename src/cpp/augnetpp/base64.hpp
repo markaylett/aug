@@ -27,6 +27,34 @@ namespace aug {
         return -1;
     }
 
+    template <typename T, void (T::*U)(const char*, size_t)>
+    int
+    base64memcb(const aug_var* var, const char* buf, size_t len) AUG_NOTHROW
+    {
+        try {
+            (static_cast<T*>(var->arg_)->*U)(buf, len);
+            return 0;
+        } AUG_SETERRINFOCATCH;
+        return -1;
+    }
+
+    template <typename T, void (T::*U)(const char*, size_t)>
+    std::pair<aug_base64cb_t, aug_var>
+    bindbase64cb(T& x)
+    {
+        aug_var var = { 0, &x };
+        return std::pair<aug_base64cb_t, aug_var>(base64memcb<T, U>, var);
+    }
+
+    template <typename T>
+    std::pair<aug_base64cb_t, aug_var>
+    bindbase64cb(T& x)
+    {
+        aug_var var = { 0, &x };
+        return std::pair<aug_base64cb_t,
+            aug_var>(base64memcb<T, &T::base64cb>, var);
+    }
+
     class base64 {
 
         aug_base64_t base64_;
@@ -46,6 +74,12 @@ namespace aug {
         base64(aug_base64mode mode, aug_base64cb_t cb, const aug_var& var)
         {
             verify(base64_ = aug_createbase64(mode, cb, &var));
+        }
+
+        base64(aug_base64mode mode,
+               const std::pair<aug_base64cb_t, aug_var>& xy)
+        {
+            verify(base64_ = aug_createbase64(mode, xy.first, &xy.second));
         }
 
         operator aug_base64_t()

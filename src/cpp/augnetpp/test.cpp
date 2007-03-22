@@ -2,33 +2,54 @@
    See the file COPYING for copying permission.
 */
 
-#include "augutilpp/var.hpp"
+#include "augnetpp.hpp"
 
-#include <cstring>
 #include <iostream>
-#include <string>
 
 using namespace aug;
 using namespace std;
 
 namespace {
 
-    struct test : basic_vartype<string> {
-        static void
-        destroy(arg_type* arg)
+    struct callbacks {
+        void
+        base64cb(const char* buf, size_t len)
         {
-            delete arg;
         }
-        static const void*
-        buf(arg_type& arg, size_t& size)
+        bool
+        filecb(int fd, aug_files& files)
         {
-            size = arg.size();
-            return arg.data();
+            return true;
         }
-        static const void*
-        buf(arg_type& arg)
+    };
+
+    struct httphandler {
+        void
+        initial(const char* value)
         {
-            return arg.data();
+        }
+        void
+        field(const char* name, const char* value)
+        {
+        }
+        void
+        csize(unsigned csize)
+        {
+        }
+        void
+        cdata(const void* cdata, unsigned csize)
+        {
+        }
+        void
+        end(bool commit)
+        {
+        }
+    };
+
+    struct marhandler : basic_marnonstatic {
+        void
+        message(const char* initial, aug_mar_t mar)
+        {
         }
     };
 }
@@ -36,14 +57,24 @@ namespace {
 int
 main(int argc, char* argv[])
 {
+    struct aug_errinfo errinfo;
+    aug_atexitinit(&errinfo);
+
     try {
-        string* s(new string());
-        aug_var v;
-        bindvar<test>(v, null);
-        bindvar<test>(v, *s);
-        s->assign("test");
-        memcmp(varbuf<char>(v), "test", 4);
-        destroyvar(v);
+        callbacks cbs;
+
+        base64 b64(AUG_ENCODE64, bindbase64cb<callbacks,
+                   &callbacks::base64cb>(cbs));
+
+        files fs;
+        insertfile(fs, 0, bindfilecb<callbacks, &callbacks::filecb>(cbs));
+
+        httphandler x;
+        httpparser hparser(1024, x);
+
+        marhandler y;
+        marparser mparser(1024, y);
+
     } catch (const exception& e) {
         cerr << e.what() << endl;
         return 1;

@@ -75,9 +75,9 @@ clntconn::do_append(aug::mplexer& mplexer, const aug_var& var)
 }
 
 void
-clntconn::do_append(aug::mplexer& mplexer, const void* buf, size_t size)
+clntconn::do_append(aug::mplexer& mplexer, const void* buf, size_t len)
 {
-    conn_->append(mplexer, buf, size);
+    conn_->append(mplexer, buf, len);
 }
 
 void

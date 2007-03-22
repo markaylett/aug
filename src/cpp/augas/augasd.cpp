@@ -127,7 +127,7 @@ namespace augas {
 
     struct state {
 
-        filecb_base& cb_;
+        pair<aug_filecb_t, aug_var> cb_;
         mplexer mplexer_;
         manager manager_;
         aug::files files_;
@@ -142,7 +142,7 @@ namespace augas {
         connected connected_;
 
         explicit
-        state(filecb_base& cb)
+        state(const pair<aug_filecb_t, aug_var>& cb)
             : cb_(cb)
         {
             AUG_DEBUG2("adding event pipe to list");
@@ -163,7 +163,8 @@ namespace augas {
     }
 
     void
-    setextfdtype_(fdref ref, filecb_base& cb, unsigned short mask)
+    setextfdtype_(fdref ref, const pair<aug_filecb_t, aug_var>& cb,
+                  unsigned short mask)
     {
         // Override close() function.
 
@@ -447,11 +448,11 @@ namespace augas {
     }
 
     int
-    send_(augas_id cid, const void* buf, size_t size)
+    send_(augas_id cid, const void* buf, size_t len)
     {
         AUG_DEBUG2("send(): id=[%d]", cid);
         try {
-            if (!state_->manager_.append(state_->mplexer_, cid, buf, size))
+            if (!state_->manager_.append(state_->mplexer_, cid, buf, len))
                 throw error(__FILE__, __LINE__, EHOSTCALL,
                             "connection has been shutdown");
             return 0;
@@ -599,7 +600,7 @@ namespace augas {
     };
 
     void
-    load_(filecb_base& cb)
+    load_(const pair<aug_filecb_t, aug_var>& cb)
     {
         AUG_DEBUG2("loading services");
         state_->manager_.load(rundir_, options_, host_);
@@ -619,7 +620,7 @@ namespace augas {
     }
 
     void
-    accept_(const object_base& sock, filecb_base& filecb)
+    accept_(const object_base& sock, const pair<aug_filecb_t, aug_var>& cb)
     {
         endpoint ep(null);
 
@@ -699,7 +700,7 @@ namespace augas {
     }
 
     bool
-    readevent_(filecb_base& cb)
+    readevent_(const pair<aug_filecb_t, aug_var>& cb)
     {
         aug_event event;
         AUG_DEBUG2("reading event");
@@ -751,30 +752,7 @@ namespace augas {
         return true;
     }
 
-    class service : public filecb_base, public service_base {
-
-        bool
-        do_callback(int fd, aug_files& files)
-        {
-            if (!ioevents(state_->mplexer_, fd))
-                return true;
-
-            // Intercept activity on event pipe.
-
-            if (fd == aug_eventin())
-                return readevent_(*this);
-
-            objectptr sock(state_->manager_.getbyfd(fd));
-            connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
-
-            AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", sock->id(), fd);
-
-            if (null != cptr)
-                return process_(cptr, fd);
-
-            accept_(*sock, *this);
-            return true;
-        }
+    class service : public service_base {
 
         const char*
         do_getopt(enum aug_option opt)
@@ -830,10 +808,10 @@ namespace augas {
 
             setsrvlogger("augasd");
 
-            auto_ptr<state> s(new state(*this));
+            auto_ptr<state> s(new state(bindfilecb<service>(*this)));
             state_ = s;
             try {
-                load_(*this);
+                load_(bindfilecb<service>(*this));
             } catch (...) {
 
                 // Ownership back to local.
@@ -926,6 +904,30 @@ namespace augas {
             // a function implemented in a module.
 
             state_.reset();
+        }
+
+    public:
+        bool
+        filecb(int fd, aug_files& files)
+        {
+            if (!ioevents(state_->mplexer_, fd))
+                return true;
+
+            // Intercept activity on event pipe.
+
+            if (fd == aug_eventin())
+                return readevent_(bindfilecb<service>(*this));
+
+            objectptr sock(state_->manager_.getbyfd(fd));
+            connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
+
+            AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", sock->id(), fd);
+
+            if (null != cptr)
+                return process_(cptr, fd);
+
+            accept_(*sock, bindfilecb<service>(*this));
+            return true;
         }
     };
 }

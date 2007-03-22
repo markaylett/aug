@@ -14,6 +14,11 @@ using namespace std;
 namespace {
 
     struct test : basic_vartype<string> {
+        static void
+        destroy(arg_type* arg)
+        {
+            delete arg;
+        }
         static const void*
         buf(arg_type& arg, size_t& size)
         {
@@ -32,12 +37,13 @@ int
 main(int argc, char* argv[])
 {
     try {
-        string s;
+        string* s(new string());
         aug_var v;
         bindvar<test>(v, null);
-        bindvar<test>(v, s);
-        s = "test";
+        bindvar<test>(v, *s);
+        s->assign("test");
         memcmp(varbuf<char>(v), "test", 4);
+        destroyvar(v);
     } catch (const exception& e) {
         cerr << e.what() << endl;
         return 1;

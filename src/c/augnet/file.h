@@ -17,7 +17,7 @@ AUG_HEAD(aug_files, aug_file_);
    The callback function has a boolean return value: returning false removes
    the file.
 */
-typedef int (*aug_filecb_t)(int, const struct aug_var*, struct aug_files*);
+typedef int (*aug_filecb_t)(const struct aug_var*, int, struct aug_files*);
 
 AUGNET_API int
 aug_destroyfiles(struct aug_files* files);

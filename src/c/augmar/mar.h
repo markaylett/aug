@@ -391,7 +391,7 @@ aug_truncatemar(aug_mar_t mar, unsigned size);
 
    \param buf The buffer from which the content will be copied.
 
-   \param size The number of bytes to be written.
+   \param len The number of bytes to be written.
 
    \return The number of bytes actually written or -1 on failure, in which
    case errno can be used to determine the error.
@@ -400,7 +400,7 @@ aug_truncatemar(aug_mar_t mar, unsigned size);
 */
 
 AUGMAR_API int
-aug_writemar(aug_mar_t mar, const void* buf, unsigned size);
+aug_writemar(aug_mar_t mar, const void* buf, unsigned len);
 
 /**
    \brief Extract content from message archive into file.
@@ -442,7 +442,7 @@ aug_content(aug_mar_t mar, unsigned* size);
 
    \param buf The output buffer into which the content will be copied.
 
-   \param size The number of bytes to be read.
+   \param len The number of bytes to be read.
 
    \return The number of bytes actually read, or zero to signal end-of-file.
    -1 is returned on failure, in which case errno can be used to determine the
@@ -452,7 +452,7 @@ aug_content(aug_mar_t mar, unsigned* size);
 */
 
 AUGMAR_API int
-aug_readmar(aug_mar_t mar, void* buf, unsigned size);
+aug_readmar(aug_mar_t mar, void* buf, unsigned len);
 
 /**
    \brief Obtain size of content within message archive.

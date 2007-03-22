@@ -34,7 +34,7 @@ struct aug_field {
      */
     const void* value_;
     /**
-       The length of the field's value.
+       The size of the field's value.
      */
     unsigned size_;
 };

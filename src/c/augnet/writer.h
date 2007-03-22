@@ -19,10 +19,10 @@ AUGNET_API int
 aug_destroywriter(aug_writer_t writer);
 
 AUGNET_API int
-aug_appendbuf(aug_writer_t writer, const struct aug_var* var);
+aug_appendwriter(aug_writer_t writer, const struct aug_var* var);
 
 AUGNET_API int
-aug_emptybuf(aug_writer_t writer);
+aug_emptywriter(aug_writer_t writer);
 
 AUGNET_API ssize_t
 aug_writesome(aug_writer_t writer, int fd);

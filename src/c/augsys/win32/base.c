@@ -33,11 +33,11 @@ read_(int fd, void* buf, size_t size)
 }
 
 static ssize_t
-write_(int fd, const void* buf, size_t size)
+write_(int fd, const void* buf, size_t len)
 {
     DWORD ret;
 
-    if (!WriteFile((HANDLE)_get_osfhandle(fd), buf, (DWORD)size, &ret,
+    if (!WriteFile((HANDLE)_get_osfhandle(fd), buf, (DWORD)len, &ret,
                    NULL)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;

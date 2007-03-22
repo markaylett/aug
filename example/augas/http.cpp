@@ -339,7 +339,7 @@ namespace {
         send(id, message.str().c_str(), message.str().size());
     }
 
-    struct session {
+    struct session : basic_marnonstatic {
         augas_id id_;
         bool auth_;
         explicit
@@ -348,24 +348,10 @@ namespace {
               auth_(false)
         {
         }
-    };
-
-    /*
-#
-header('WWW-Authenticate: Basic realm="Secret page"');
-#
-header('HTTP/1.0 401 Unauthorized');
-#
-print "Login failed!\n";
-     */
-
-    struct handler : basic_marhandler {
-        static void
-        message(const aug_var& var, const char* initial, aug_mar_t mar)
+        void
+        message(const char* initial, aug_mar_t mar)
         {
             static const char ROOT[] = ".";
-
-            session& sess(*static_cast<session*>(var.arg_));
             try {
 
                 aug_info("%s", initial);
@@ -408,7 +394,7 @@ print "Login failed!\n";
                         split2(value, value + size, x, y, ' ');
                         aug_info("%s", filterbase64(y.c_str(), y.size(),
                                                     AUG_DECODE64).c_str());
-                        sess.auth_ = true;
+                        auth_ = true;
                     }
                 }
 
@@ -416,17 +402,17 @@ print "Login failed!\n";
 
                 vector<string> nodes(splitpath(u.path_));
 
-                if (!sess.auth_) {
+                if (!auth_) {
 
                     fields fs;
                     fs.push_back
                         (make_pair("WWW-Authenticate",
                                    "Basic realm=\"AugAS Web Admin\""));
-                    sendstatus(sess.id_, 401, "Unauthorized", fs);
+                    sendstatus(id_, 401, "Unauthorized", fs);
 
                 } else if (nodes.empty()) {
 
-                    sendhome(sess.id_);
+                    sendhome(id_);
 
                 } else {
 
@@ -445,10 +431,10 @@ print "Login failed!\n";
                             fs.push_back
                                 (make_pair("Location", string("http://")
                                            .append(value)));
-                            sendstatus(sess.id_, 303, "See Other", fs);
+                            sendstatus(id_, 303, "See Other", fs);
 
                         } else if (3 == nodes.size())
-                            sendpage(sess.id_, nodes[1], nodes[2]);
+                            sendpage(id_, nodes[1], nodes[2]);
                         else
                             throw http_error(404, "Not Found");
 
@@ -456,15 +442,15 @@ print "Login failed!\n";
 
                         string path(joinpath(ROOT, nodes));
                         aug_info("path [%s]", path.c_str());
-                        sendfile(sess.id_, path);
+                        sendfile(id_, path);
                     }
                 }
 
             } catch (const http_error& e) {
                 aug_error("%d: %s", e.status(), e.what());
-                sendstatus(sess.id_, e.status(), e.what());
+                sendstatus(id_, e.status(), e.what());
             } catch (const exception& e) {
-                sendstatus(sess.id_, 500, "Internal Server Error");
+                sendstatus(id_, 500, "Internal Server Error");
                 throw;
             }
 
@@ -473,7 +459,7 @@ print "Login failed!\n";
                               (getfield(mar, "Connection", size)));
             if (value && size && aug_strcasestr(value, "close")) {
                 aug_info("closing");
-                shutdown(sess.id_);
+                shutdown(id_);
             }
         }
     };
@@ -524,12 +510,7 @@ print "Login failed!\n";
         do_accept(object& sock, const char* addr, unsigned short port)
         {
             auto_ptr<session> sess(new session(sock.id()));
-
-            aug_var var;
-            auto_ptr<marparser> parser
-                (new marparser(0, marhandler<handler>(),
-                               bindvar<deletearg<session> >(var, *sess)));
-            sess.release();
+            auto_ptr<marparser> parser(new marparser(0, sess));
 
             sock.setuser(parser.get());
             setrwtimer(sock, 30000, AUGAS_TIMRD);
@@ -537,12 +518,12 @@ print "Login failed!\n";
             return true;
         }
         void
-        do_data(const object& sock, const void* buf, size_t size)
+        do_data(const object& sock, const void* buf, size_t len)
         {
             marparser& parser(*sock.user<marparser>());
             try {
                 appendmar(parser, static_cast<const char*>(buf),
-                          static_cast<unsigned>(size));
+                          static_cast<unsigned>(len));
             } catch (...) {
                 shutdown(sock);
                 throw;

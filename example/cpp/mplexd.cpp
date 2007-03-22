@@ -116,13 +116,13 @@ namespace test {
         {
         }
         void
-        putsome(const void* buf, size_t size)
+        putsome(const void* buf, size_t len)
         {
-            if (vec_.size() - end_ < size)
-                vec_.resize(end_ + size);
+            if (vec_.size() - end_ < len)
+                vec_.resize(end_ + len);
 
-            memcpy(&vec_[end_], buf, size);
-            end_ += size;
+            memcpy(&vec_[end_], buf, len);
+            end_ += len;
         }
         bool
         readsome(fdref ref)
@@ -201,7 +201,7 @@ namespace test {
         map<int, sessionptr> sfds_;
 
         explicit
-        state(filecb_base& cb)
+        state(const pair<aug_filecb_t, aug_var>& cb)
             : sfd_(null)
         {
             aug_hostserv hostserv;
@@ -220,14 +220,14 @@ namespace test {
         }
     };
 
-    class service : public filecb_base, public service_base {
+    class service : public service_base {
 
         auto_ptr<state> state_;
 
         void
         setfdhook(fdref ref, unsigned short mask)
         {
-            insertfile(state_->files_, ref, *this);
+            insertfile(state_->files_, ref, bindfilecb<service>(*this));
             try {
                 setioeventmask(state_->mplexer_, ref, mask);
             } catch (...) {
@@ -330,21 +330,6 @@ namespace test {
             return true;
         }
 
-        bool
-        do_callback(int fd, aug_files& files)
-        {
-            if (!ioevents(state_->mplexer_, fd))
-                return true;
-
-            if (fd == aug_eventin())
-                return readevent(fd, files);
-
-            if (fd == state_->sfd_.get())
-                return listener(fd, files);
-
-            return connection(fd, files);
-        }
-
         const char*
         do_getopt(enum aug_option opt)
         {
@@ -377,7 +362,7 @@ namespace test {
             aug_info("initialising daemon process");
 
             setsrvlogger("aug");
-            state_.reset(new state(*this));
+            state_.reset(new state(bindfilecb<service>(*this)));
         }
 
         void
@@ -422,6 +407,20 @@ namespace test {
     public:
         ~service() AUG_NOTHROW
         {
+        }
+        bool
+        filecb(int fd, aug_files& files)
+        {
+            if (!ioevents(state_->mplexer_, fd))
+                return true;
+
+            if (fd == aug_eventin())
+                return readevent(fd, files);
+
+            if (fd == state_->sfd_.get())
+                return listener(fd, files);
+
+            return connection(fd, files);
         }
     };
 }

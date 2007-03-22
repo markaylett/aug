@@ -20,29 +20,52 @@
 
 namespace aug {
 
-    class filecb_base {
+    template <bool (*T)(const aug_var&, int, aug_files&)>
+    int
+    filecb(const aug_var* var, int fd, aug_files* files) AUG_NOTHROW
+    {
+        try {
+            return T(*var, fd, *files) ? 1 : 0;
+        } AUG_SETERRINFOCATCH;
 
-        virtual bool
-        do_callback(int fd, aug_files& files) = 0;
+        /**
+           Do not remove the file unless explicitly asked to.
+        */
 
-    public:
-        virtual
-        ~filecb_base() AUG_NOTHROW
-        {
-        }
+        return 1;
+    }
 
-        bool
-        callback(int fd, aug_files& files)
-        {
-            return do_callback(fd, files);
-        }
+    template <typename T, bool (T::*U)(int, aug_files&)>
+    int
+    filememcb(const aug_var* var, int fd, aug_files* files) AUG_NOTHROW
+    {
+        try {
+            return (static_cast<T*>(var->arg_)->*U)(fd, *files) ? 1 : 0;
+        } AUG_SETERRINFOCATCH;
 
-        bool
-        operator ()(int fd, aug_files& files)
-        {
-            return do_callback(fd, files);
-        }
-    };
+        /**
+           Do not remove the file unless explicitly asked to.
+        */
+
+        return 1;
+    }
+
+    template <typename T, bool (T::*U)(int, aug_files&)>
+    std::pair<aug_filecb_t, aug_var>
+    bindfilecb(T& x)
+    {
+        aug_var var = { 0, &x };
+        return std::pair<aug_filecb_t, aug_var>(filememcb<T, U>, var);
+    }
+
+    template <typename T>
+    std::pair<aug_filecb_t, aug_var>
+    bindfilecb(T& x)
+    {
+        aug_var var = { 0, &x };
+        return std::pair<aug_filecb_t,
+            aug_var>(filememcb<T, &T::filecb>, var);
+    }
 
     class files {
     public:
@@ -87,29 +110,18 @@ namespace aug {
         }
     };
 
-    namespace detail {
-
-        inline int
-        filecb(int id, const struct aug_var* var, aug_files* files)
-        {
-            try {
-                filecb_base* arg = static_cast<filecb_base*>(var->arg_);
-                return arg->callback(id, *files) ? 1 : 0;
-            } AUG_PERRINFOCATCH;
-
-            /**
-               Do not remove the file unless explicitly asked to.
-            */
-
-            return 1;
-        }
+    inline void
+    insertfile(aug_files& files, fdref ref, aug_filecb_t cb,
+               const aug_var& var)
+    {
+        verify(aug_insertfile(&files, ref.get(), cb, &var));
     }
 
     inline void
-    insertfile(aug_files& files, fdref ref, filecb_base& cb)
+    insertfile(aug_files& files, fdref ref, const std::pair<aug_filecb_t,
+               aug_var>& xy)
     {
-        aug_var var = { NULL, &cb };
-        verify(aug_insertfile(&files, ref.get(), detail::filecb, &var));
+        verify(aug_insertfile(&files, ref.get(), xy.first, &xy.second));
     }
 
     inline void

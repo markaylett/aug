@@ -420,7 +420,7 @@ connected_(struct augas_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct augas_object* sock, const void* buf, size_t size)
+data_(const struct augas_object* sock, const void* buf, size_t len)
 {
     struct import_* import = augas_getserv()->user_;
     assert(import);
@@ -429,7 +429,7 @@ data_(const struct augas_object* sock, const void* buf, size_t size)
     if (import->data_) {
 
         PyObject* x = sock->user_;
-        PyObject* y = PyBuffer_FromMemory((void*)buf, (int)size);
+        PyObject* y = PyBuffer_FromMemory((void*)buf, (int)len);
         PyObject* z = PyObject_CallFunction(import->data_, "OO", x, y);
 
         if (z) {

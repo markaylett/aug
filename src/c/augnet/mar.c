@@ -67,10 +67,10 @@ csize_(const struct aug_var* var, unsigned csize)
 }
 
 static int
-cdata_(const struct aug_var* var, const void* buf, unsigned size)
+cdata_(const struct aug_var* var, const void* buf, unsigned len)
 {
     aug_marparser_t parser = var->arg_;
-    return aug_writemar(parser->mar_, buf, size);
+    return aug_writemar(parser->mar_, buf, len);
 }
 
 static int

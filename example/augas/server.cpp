@@ -81,11 +81,11 @@ namespace {
             return true;
         }
         void
-        do_data(const object& sock, const void* buf, size_t size)
+        do_data(const object& sock, const void* buf, size_t len)
         {
             string& tok(*sock.user<string>());
             tokenise(static_cast<const char*>(buf),
-                     static_cast<const char*>(buf) + size, tok, '\n',
+                     static_cast<const char*>(buf) + len, tok, '\n',
                      eachline(sock));
         }
         void

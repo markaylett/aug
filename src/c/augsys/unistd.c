@@ -90,7 +90,7 @@ aug_read(int fd, void* buf, size_t size)
 }
 
 AUGSYS_API ssize_t
-aug_write(int fd, const void* buf, size_t size)
+aug_write(int fd, const void* buf, size_t len)
 {
     const struct aug_fdtype* fdtype = aug_getfdtype(fd);
     if (!fdtype)
@@ -102,7 +102,7 @@ aug_write(int fd, const void* buf, size_t size)
         return -1;
     }
 
-    return fdtype->write_(fd, buf, size);
+    return fdtype->write_(fd, buf, len);
 }
 
 AUGSYS_API void

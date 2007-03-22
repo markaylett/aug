@@ -37,9 +37,9 @@ readv_(int fd, const struct iovec* iov, int size)
 }
 
 static ssize_t
-write_(int fd, const void* buf, size_t size)
+write_(int fd, const void* buf, size_t len)
 {
-    ssize_t ret = write(fd, buf, size);
+    ssize_t ret = write(fd, buf, len);
     if (-1 == ret)
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
     return ret;

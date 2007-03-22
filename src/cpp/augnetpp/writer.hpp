@@ -46,14 +46,14 @@ namespace aug {
         bool
         empty() const
         {
-            return aug_emptybuf(writer_) ? true : false;
+            return aug_emptywriter(writer_) ? true : false;
         }
     };
 
     inline void
-    appendbuf(aug_writer_t writer, const aug_var& var)
+    appendwriter(aug_writer_t writer, const aug_var& var)
     {
-        verify(aug_appendbuf(writer, &var));
+        verify(aug_appendwriter(writer, &var));
     }
 
     inline ssize_t

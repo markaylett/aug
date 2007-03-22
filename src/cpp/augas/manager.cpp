@@ -65,13 +65,13 @@ manager::append(mplexer& mplexer, augas_id cid, const aug_var& var)
 }
 
 bool
-manager::append(mplexer& mplexer, augas_id cid, const void* buf, size_t size)
+manager::append(mplexer& mplexer, augas_id cid, const void* buf, size_t len)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
         return false;
 
-    cptr->append(mplexer, buf, size);
+    cptr->append(mplexer, buf, len);
     return true;
 }
 

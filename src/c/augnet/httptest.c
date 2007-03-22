@@ -38,7 +38,7 @@ setcsize_(const struct aug_var* var, unsigned size)
 }
 
 static int
-cdata_(const struct aug_var* var, const void* buf, unsigned size)
+cdata_(const struct aug_var* var, const void* buf, unsigned len)
 {
     return 0;
 }

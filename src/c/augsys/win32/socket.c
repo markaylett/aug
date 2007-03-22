@@ -85,9 +85,9 @@ readv_(int fd, const struct iovec* iov, int size)
 }
 
 static ssize_t
-write_(int fd, const void* buf, size_t size)
+write_(int fd, const void* buf, size_t len)
 {
-    ssize_t ret = send(_get_osfhandle(fd), buf, (int)size, 0);
+    ssize_t ret = send(_get_osfhandle(fd), buf, (int)len, 0);
     if (SOCKET_ERROR == ret)
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
 

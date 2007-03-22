@@ -124,7 +124,7 @@ aug_destroywriter(aug_writer_t writer)
 }
 
 AUGNET_API int
-aug_appendbuf(aug_writer_t writer, const struct aug_var* var)
+aug_appendwriter(aug_writer_t writer, const struct aug_var* var)
 {
     struct aug_buf* buf = createbuf_(var);
     if (!buf)
@@ -136,7 +136,7 @@ aug_appendbuf(aug_writer_t writer, const struct aug_var* var)
 }
 
 AUGNET_API int
-aug_emptybuf(aug_writer_t writer)
+aug_emptywriter(aug_writer_t writer)
 {
     return AUG_EMPTY(&writer->bufs_);
 }

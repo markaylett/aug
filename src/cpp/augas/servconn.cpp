@@ -75,9 +75,9 @@ servconn::do_append(aug::mplexer& mplexer, const aug_var& var)
 }
 
 void
-servconn::do_append(aug::mplexer& mplexer, const void* buf, size_t size)
+servconn::do_append(aug::mplexer& mplexer, const void* buf, size_t len)
 {
-    conn_.append(mplexer, buf, size);
+    conn_.append(mplexer, buf, len);
 }
 
 void

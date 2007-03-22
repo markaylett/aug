@@ -96,7 +96,7 @@ aug_foreachfile(struct aug_files* files)
     prev = &AUG_FIRST(files);
     while ((it = *prev)) {
 
-        if (!(it->cb_(it->fd_, &it->var_, &tail))) {
+        if (!(it->cb_(&it->var_, it->fd_, &tail))) {
 
             AUG_REMOVE_PREVPTR(it, prev, files);
 

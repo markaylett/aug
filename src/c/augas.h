@@ -223,7 +223,7 @@ struct augas_host {
        \brief TODO
        \param cid TODO
        \param buf TODO
-       \param size TODO
+       \param len TODO
        \return TODO
        \sa TODO
 
@@ -232,7 +232,7 @@ struct augas_host {
        the connection has been established.
     */
 
-    int (*send_)(augas_id cid, const void* buf, size_t size);
+    int (*send_)(augas_id cid, const void* buf, size_t len);
 
     /**
        \brief TODO
@@ -344,7 +344,7 @@ struct augas_module {
        \param from TODO
        \param type TODO
        \param user TODO
-       \param len TODO
+       \param size TODO
        \return TODO
        \sa TODO
     */
@@ -398,13 +398,13 @@ struct augas_module {
        \brief Inbound data.
        \param sock TODO
        \param buf TODO
-       \param size TODO
+       \param len TODO
        \return TODO
        \sa TODO
     */
 
     void (*data_)(const struct augas_object* sock, const void* buf,
-                  size_t size);
+                  size_t len);
 
     /**
        \brief Expiry of read timer.

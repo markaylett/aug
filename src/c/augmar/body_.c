@@ -56,14 +56,14 @@ aug_truncate_(aug_seq_t seq, struct aug_info_* info, unsigned size)
 
 AUGMAR_EXTERN int
 aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
-           const void* buf, unsigned size)
+           const void* buf, unsigned len)
 {
-    char* addr = resize_(seq, info, offset + size, 0);
+    char* addr = resize_(seq, info, offset + len, 0);
     if (!addr)
         return -1;
 
-    memcpy(addr + offset, buf, size);
-    return (int)size;
+    memcpy(addr + offset, buf, len);
+    return (int)len;
 }
 
 AUGMAR_EXTERN const void*
@@ -77,7 +77,7 @@ aug_content_(aug_seq_t seq, const struct aug_info_* info)
 
 AUGMAR_EXTERN int
 aug_read_(aug_seq_t seq, const struct aug_info_* info, unsigned offset,
-          void* buf, unsigned size)
+          void* buf, unsigned len)
 {
     unsigned bsize = info->bsize_;
     const char* addr;
@@ -85,16 +85,16 @@ aug_read_(aug_seq_t seq, const struct aug_info_* info, unsigned offset,
     /* If there are no bytes to read, or the offset is either at, or passed the
        end of file. */
 
-    if (0 == size || bsize <= offset)
+    if (0 == len || bsize <= offset)
         return 0;
 
     bsize -= offset;
-    if (bsize < size)
-        size = bsize;
+    if (bsize < len)
+        len = bsize;
 
     if (!(addr = aug_content_(seq, info)))
         return -1;
 
-    memcpy(buf, addr + offset, size);
-    return (int)size;
+    memcpy(buf, addr + offset, len);
+    return (int)len;
 }

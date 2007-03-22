@@ -25,6 +25,13 @@ namespace {
         " of any carnal pleasure.";
 
     typedef logic_error error;
+
+    struct test {
+        void
+        cb(const char* buf, size_t len)
+        {
+        }
+    };
 }
 
 int
@@ -37,6 +44,11 @@ main(int argc, char* argv[])
 
         if (filterbase64(ENCODED, strlen(ENCODED), AUG_DECODE64) != DECODED)
             throw error("decodebase64() failed");
+
+        test x;
+        base64 b64(AUG_ENCODE64, bindbase64cb<test, &test::cb>(x));
+        appendbase64(b64, DECODED, strlen(DECODED));
+        finishbase64(b64);
 
         return 0;
 

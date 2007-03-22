@@ -12,12 +12,14 @@
 
 #include "augnet/http.h"
 
+#include <memory> // auto_ptr<>
+
 namespace aug {
 
     namespace detail {
 
         template <typename T>
-        class httphandler {
+        class httpstatic {
             static int
             initial(const aug_var* var, const char* value) AUG_NOTHROW
             {
@@ -80,13 +82,85 @@ namespace aug {
                 return local;
             }
         };
+
+        template <typename T>
+        class httpnonstatic {
+            static int
+            initial(const aug_var* var, const char* value) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(var->arg_)->initial(value);
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static int
+            field(const aug_var* var, const char* name,
+                  const char* value) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(var->arg_)->field(name, value);
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static int
+            csize(const aug_var* var, unsigned csize) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(var->arg_)->csize(csize);
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static int
+            cdata(const aug_var* var, const void* cdata,
+                  unsigned csize) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(var->arg_)->cdata(cdata, csize);
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static int
+            end(const aug_var* var, int commit) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(var->arg_)->end(commit ? true : false);
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+
+        public:
+            static const aug_httphandler&
+            get()
+            {
+                static const aug_httphandler local = {
+                    initial,
+                    field,
+                    csize,
+                    cdata,
+                    end
+                };
+                return local;
+            }
+        };
     }
 
     template <typename T>
     const aug_httphandler&
-    httphandler()
+    httpstatic()
     {
-        return detail::httphandler<T>::get();
+        return detail::httpstatic<T>::get();
+    }
+
+    template <typename T>
+    const aug_httphandler&
+    httpnonstatic()
+    {
+        return detail::httpnonstatic<T>::get();
     }
 
     class httpparser {
@@ -110,6 +184,24 @@ namespace aug {
         {
             verify(httpparser_
                    = aug_createhttpparser(size, &handler, &var));
+        }
+
+        template <typename T>
+        httpparser(unsigned size, T& x)
+        {
+            aug_var var = { 0, &x };
+            verify(httpparser_ = aug_createhttpparser
+                   (size, &httpnonstatic<T>(), &var));
+        }
+
+        template <typename T>
+        httpparser(unsigned size, std::auto_ptr<T>& x)
+        {
+            aug_var var;
+            verify(httpparser_ = aug_createhttpparser
+                   (size, &httpnonstatic<T>(),
+                    &bindvar<deletearg<T> >(var, *x)));
+            x.release();
         }
 
         operator aug_httpparser_t()

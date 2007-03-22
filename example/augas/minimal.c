@@ -52,10 +52,10 @@ connected_(struct augas_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct augas_object* sock, const void* buf, size_t size)
+data_(const struct augas_object* sock, const void* buf, size_t len)
 {
     augas_writelog(AUGAS_LOGINFO, "data_()");
-    augas_send(sock->id_, buf, size);
+    augas_send(sock->id_, buf, len);
 }
 
 static void

@@ -57,9 +57,9 @@ established::do_append(aug::mplexer& mplexer, const aug_var& var)
 }
 
 void
-established::do_append(aug::mplexer& mplexer, const void* buf, size_t size)
+established::do_append(aug::mplexer& mplexer, const void* buf, size_t len)
 {
-    buffer_.append(buf, size);
+    buffer_.append(buf, len);
     setioeventmask(mplexer, sfd_, AUG_IOEVENTRDWR);
 }
 
@@ -218,9 +218,9 @@ connecting::do_append(aug::mplexer& mplexer, const aug_var& var)
 }
 
 void
-connecting::do_append(aug::mplexer& mplexer, const void* buf, size_t size)
+connecting::do_append(aug::mplexer& mplexer, const void* buf, size_t len)
 {
-    buffer_.append(buf, size);
+    buffer_.append(buf, len);
 }
 
 void
