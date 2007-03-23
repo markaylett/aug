@@ -467,7 +467,7 @@ namespace {
         return aug::sendto(ref, buf, sizeof(buf), 0, ep);
     }
 
-    class session : private timercb_base {
+    class session {
         const char* const node_;
         fdref ref_;
         const endpoint& ep_;
@@ -504,41 +504,6 @@ namespace {
                 aug_info("broadcasting or sending slave-up");
                 sendto(ref_, node_, SLAVEUP, ep);
                 break;
-            }
-        }
-
-        void
-        do_callback(idref ref, unsigned& ms, aug_timers& timers)
-        {
-            if (ref == hbwait_.id()) {
-
-                aug_info("hbint timeout: state='%s'", tostring(state_));
-
-                // Candidates for master will still heartbeat as slaves.
-
-                if (MASTER == state_) {
-                    aug_info("broadcasting master hb");
-                    sendto(ref_, node_, MASTERHB, ep_);
-                } else {
-                    aug_info("broadcasting slave hb");
-                    sendto(ref_, node_, SLAVEHB, ep_);
-                }
-
-            } else if (ref == mwait_.id()) {
-
-                aug_info("wait timeout: state='%s'", tostring(state_));
-
-                if (CANDID == state_) {
-                    aug_info("becoming master");
-                    ms = 0; // Cancel timer.
-                    state_ = MASTER;
-                    sendto(ref_, node_, MASTERUP, ep_);
-                } else {
-                    aug_info("becoming candidate");
-                    ms = RESPONSE_MS;
-                    state_ = CANDID;
-                    sendto(ref_, node_, CANDIDUP, ep_);
-                }
             }
         }
 
@@ -715,6 +680,40 @@ namespace {
 
                 // No state change.
                 break;
+            }
+        }
+        void
+        timercb(int id, unsigned& ms, aug_timers& timers)
+        {
+            if (id == hbwait_.id()) {
+
+                aug_info("hbint timeout: state='%s'", tostring(state_));
+
+                // Candidates for master will still heartbeat as slaves.
+
+                if (MASTER == state_) {
+                    aug_info("broadcasting master hb");
+                    sendto(ref_, node_, MASTERHB, ep_);
+                } else {
+                    aug_info("broadcasting slave hb");
+                    sendto(ref_, node_, SLAVEHB, ep_);
+                }
+
+            } else if (id == mwait_.id()) {
+
+                aug_info("wait timeout: state='%s'", tostring(state_));
+
+                if (CANDID == state_) {
+                    aug_info("becoming master");
+                    ms = 0; // Cancel timer.
+                    state_ = MASTER;
+                    sendto(ref_, node_, MASTERUP, ep_);
+                } else {
+                    aug_info("becoming candidate");
+                    ms = RESPONSE_MS;
+                    state_ = CANDID;
+                    sendto(ref_, node_, CANDIDUP, ep_);
+                }
             }
         }
     };

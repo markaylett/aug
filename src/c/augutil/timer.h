@@ -12,7 +12,7 @@ struct timeval;
 struct aug_timer_;
 AUG_HEAD(aug_timers, aug_timer_);
 
-typedef void (*aug_timercb_t)(int, const struct aug_var*, unsigned*,
+typedef void (*aug_timercb_t)(const struct aug_var*, int, unsigned*,
                               struct aug_timers*);
 
 AUGUTIL_API int
@@ -23,8 +23,8 @@ aug_destroytimers(struct aug_timers* timers);
    allocated timer id can be specified.  In which case, any timer with a
    matching id will be cancelled prior to setting the new timer.
 
-   If aug_settimer() succeeds, aug_destroyvar() will be called when the timer is
-   removed.
+   If aug_settimer() succeeds, aug_destroyvar() will be called when the timer
+   is removed.
 
    \return the timer id.
 */

@@ -62,12 +62,10 @@ main(int argc, char* argv[])
 
     try {
         callbacks cbs;
-
-        base64 b64(AUG_ENCODE64, bindbase64cb<callbacks,
-                   &callbacks::base64cb>(cbs));
+        base64 b64(AUG_ENCODE64, cbs);
 
         files fs;
-        insertfile(fs, 0, bindfilecb<callbacks, &callbacks::filecb>(cbs));
+        insertfile(fs, 0, cbs);
 
         httphandler x;
         httpparser hparser(1024, x);

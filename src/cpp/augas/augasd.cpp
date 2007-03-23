@@ -127,7 +127,8 @@ namespace augas {
 
     struct state {
 
-        pair<aug_filecb_t, aug_var> cb_;
+        aug_filecb_t cb_;
+        aug_var var_;
         mplexer mplexer_;
         manager manager_;
         aug::files files_;
@@ -141,12 +142,12 @@ namespace augas {
 
         connected connected_;
 
-        explicit
-        state(const pair<aug_filecb_t, aug_var>& cb)
-            : cb_(cb)
+        state(aug_filecb_t cb, const aug_var& var)
+            : cb_(cb),
+              var_(var)
         {
             AUG_DEBUG2("adding event pipe to list");
-            insertfile(files_, aug_eventin(), cb);
+            insertfile(files_, aug_eventin(), cb, var);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
         }
     };
@@ -163,7 +164,7 @@ namespace augas {
     }
 
     void
-    setextfdtype_(fdref ref, const pair<aug_filecb_t, aug_var>& cb,
+    setextfdtype_(fdref ref, aug_filecb_t cb, const aug_var& var,
                   unsigned short mask)
     {
         // Override close() function.
@@ -175,7 +176,7 @@ namespace augas {
         }
 
         AUG_DEBUG2("adding file to list: fd=[%d]", ref.get());
-        insertfile(state_->files_, ref, cb);
+        insertfile(state_->files_, ref, cb, var);
 
         try {
             setioeventmask(state_->mplexer_, ref, mask);
@@ -188,7 +189,7 @@ namespace augas {
     }
 
     void
-    timercb_(int id, const aug_var* var, unsigned* ms, aug_timers* timers)
+    timercb_(const aug_var* var, int id, unsigned* ms, aug_timers* timers)
     {
         AUG_DEBUG2("custom timer expiry");
 
@@ -391,7 +392,8 @@ namespace augas {
                 // connected() must only be called after this function has
                 // returned.
 
-                setextfdtype_(cptr->sfd(), state_->cb_, AUG_IOEVENTRD);
+                setextfdtype_(cptr->sfd(), state_->cb_, state_->var_,
+                              AUG_IOEVENTRD);
                 if (state_->connected_.empty()) {
 
                     // Schedule an event to ensure that connected() is called
@@ -406,7 +408,8 @@ namespace augas {
                 state_->connected_.push(cptr);
 
             } else
-                setextfdtype_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
+                setextfdtype_(cptr->sfd(), state_->cb_, state_->var_,
+                              AUG_IOEVENTALL);
 
             si.commit();
             return (int)cptr->id();
@@ -427,7 +430,7 @@ namespace augas {
 
             endpoint ep(null);
             smartfd sfd(tcplisten(host, port, ep));
-            setextfdtype_(sfd, state_->cb_, AUG_IOEVENTRD);
+            setextfdtype_(sfd, state_->cb_, state_->var_, AUG_IOEVENTRD);
 
             inetaddr addr(null);
             AUG_DEBUG2("listening: interface=[%s], port=[%d]",
@@ -600,7 +603,7 @@ namespace augas {
     };
 
     void
-    load_(const pair<aug_filecb_t, aug_var>& cb)
+    load_()
     {
         AUG_DEBUG2("loading services");
         state_->manager_.load(rundir_, options_, host_);
@@ -620,7 +623,7 @@ namespace augas {
     }
 
     void
-    accept_(const object_base& sock, const pair<aug_filecb_t, aug_var>& cb)
+    accept_(const object_base& sock)
     {
         endpoint ep(null);
 
@@ -640,7 +643,7 @@ namespace augas {
             throw;
         }
 
-        setextfdtype_(sfd, state_->cb_, AUG_IOEVENTRD);
+        setextfdtype_(sfd, state_->cb_, state_->var_, AUG_IOEVENTRD);
         setsockopts_(sfd);
         connptr cptr(new augas::servconn(sock.serv(), sock.user(),
                                          state_->timers_, sfd, ep));
@@ -676,7 +679,8 @@ namespace augas {
             // The associated file descriptor may change as connection
             // attempts fail and alternative addresses are tried.
 
-            setextfdtype_(cptr->sfd(), state_->cb_, AUG_IOEVENTALL);
+            setextfdtype_(cptr->sfd(), state_->cb_, state_->var_,
+                          AUG_IOEVENTALL);
             state_->manager_.update(cptr, fd);
 
         } else if (changed)
@@ -700,7 +704,7 @@ namespace augas {
     }
 
     bool
-    readevent_(const pair<aug_filecb_t, aug_var>& cb)
+    readevent_()
     {
         aug_event event;
         AUG_DEBUG2("reading event");
@@ -753,6 +757,13 @@ namespace augas {
     }
 
     class service : public service_base {
+
+        static void
+        reopen(const aug_var& var, int id, unsigned& ms, aug_timers& timers)
+        {
+            AUG_DEBUG2("re-opening log file");
+            openlog_();
+        }
 
         const char*
         do_getopt(enum aug_option opt)
@@ -808,10 +819,11 @@ namespace augas {
 
             setsrvlogger("augasd");
 
-            auto_ptr<state> s(new state(bindfilecb<service>(*this)));
+            aug_var var = { 0, this };
+            auto_ptr<state> s(new state(filememcb<service>, var));
             state_ = s;
             try {
-                load_(bindfilecb<service>(*this));
+                load_();
             } catch (...) {
 
                 // Ownership back to local.
@@ -825,20 +837,12 @@ namespace augas {
         void
         do_run()
         {
-            struct timercb : timercb_base {
-                void
-                do_callback(idref ref, unsigned& ms, aug_timers& timers)
-                {
-                    AUG_DEBUG2("re-opening log file");
-                    openlog_();
-                }
-            } cb;
-            timer reopen(state_->timers_);
+            timer t(state_->timers_);
 
             // Re-open log file every minute.
 
             if (daemon_)
-                reopen.set(60000, cb);
+                t.set(60000, timercb<reopen>, null);
 
             AUG_DEBUG2("running daemon process");
 
@@ -916,7 +920,7 @@ namespace augas {
             // Intercept activity on event pipe.
 
             if (fd == aug_eventin())
-                return readevent_(bindfilecb<service>(*this));
+                return readevent_();
 
             objectptr sock(state_->manager_.getbyfd(fd));
             connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
@@ -926,7 +930,7 @@ namespace augas {
             if (null != cptr)
                 return process_(cptr, fd);
 
-            accept_(*sock, bindfilecb<service>(*this));
+            accept_(*sock);
             return true;
         }
     };

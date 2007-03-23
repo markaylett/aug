@@ -9,9 +9,9 @@ using namespace augas;
 using namespace std;
 
 void
-clntconn::do_callback(idref ref, unsigned& ms, aug_timers& timers)
+clntconn::do_timercb(int id, unsigned& ms, aug_timers& timers)
 {
-    rwtimer_.callback(ref, ms, timers);
+    rwtimer_.timercb(id, ms, timers);
 }
 
 void

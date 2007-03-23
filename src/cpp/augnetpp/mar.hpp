@@ -150,6 +150,12 @@ namespace aug {
                    = aug_createmarparser(size, &handler, &var));
         }
 
+        marparser(unsigned size, const aug_marhandler& handler, const null_&)
+        {
+            verify(marparser_
+                   = aug_createmarparser(size, &handler, 0));
+        }
+
         template <typename T>
         marparser(unsigned size, T& x)
         {

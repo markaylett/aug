@@ -42,29 +42,17 @@ namespace aug {
         try {
             return (static_cast<T*>(var->arg_)->*U)(fd, *files) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
-
-        /**
-           Do not remove the file unless explicitly asked to.
-        */
-
         return 1;
     }
 
-    template <typename T, bool (T::*U)(int, aug_files&)>
-    std::pair<aug_filecb_t, aug_var>
-    bindfilecb(T& x)
-    {
-        aug_var var = { 0, &x };
-        return std::pair<aug_filecb_t, aug_var>(filememcb<T, U>, var);
-    }
-
     template <typename T>
-    std::pair<aug_filecb_t, aug_var>
-    bindfilecb(T& x)
+    int
+    filememcb(const aug_var* var, int fd, aug_files* files) AUG_NOTHROW
     {
-        aug_var var = { 0, &x };
-        return std::pair<aug_filecb_t,
-            aug_var>(filememcb<T, &T::filecb>, var);
+        try {
+            return static_cast<T*>(var->arg_)->filecb(fd, *files) ? 1 : 0;
+        } AUG_SETERRINFOCATCH;
+        return 1;
     }
 
     class files {
@@ -118,10 +106,27 @@ namespace aug {
     }
 
     inline void
-    insertfile(aug_files& files, fdref ref, const std::pair<aug_filecb_t,
-               aug_var>& xy)
+    insertfile(aug_files& files, fdref ref, aug_filecb_t cb, const null_&)
     {
-        verify(aug_insertfile(&files, ref.get(), xy.first, &xy.second));
+        verify(aug_insertfile(&files, ref.get(), cb, 0));
+    }
+
+    template <typename T>
+    void
+    insertfile(aug_files& files, fdref ref, T& x)
+    {
+        aug_var var = { 0, &x };
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>, &var));
+    }
+
+    template <typename T>
+    void
+    insertfile(aug_files& files, fdref ref, std::auto_ptr<T>& x)
+    {
+        aug_var var;
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>,
+                              &bindvar<deletearg<T> >(var, *x)));
+        x.release();
     }
 
     inline void

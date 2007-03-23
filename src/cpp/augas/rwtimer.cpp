@@ -15,12 +15,12 @@ rwtimer_base::~rwtimer_base() AUG_NOTHROW
 }
 
 void
-rwtimer::do_callback(idref ref, unsigned& ms, aug_timers& timers)
+rwtimer::do_timercb(int id, unsigned& ms, aug_timers& timers)
 {
-    if (rdtimer_.id() == ref) {
+    if (rdtimer_.id() == id) {
         AUG_DEBUG2("read timer expiry");
         serv_->rdexpire(sock_, ms);
-    } else if (wrtimer_.id() == ref) {
+    } else if (wrtimer_.id() == id) {
         AUG_DEBUG2("write timer expiry");
         serv_->wrexpire(sock_, ms);
     } else

@@ -186,6 +186,13 @@ namespace aug {
                    = aug_createhttpparser(size, &handler, &var));
         }
 
+        httpparser(unsigned size, const aug_httphandler& handler,
+                   const null_&)
+        {
+            verify(httpparser_
+                   = aug_createhttpparser(size, &handler, 0));
+        }
+
         template <typename T>
         httpparser(unsigned size, T& x)
         {

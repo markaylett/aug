@@ -11,7 +11,10 @@
 
 namespace augas {
 
-    class rwtimer_base : public aug::timercb_base {
+    class rwtimer_base {
+
+        virtual void
+        do_timercb(int id, unsigned& ms, aug_timers& timers) = 0;
 
         virtual void
         do_setrwtimer(unsigned ms, unsigned flags) = 0;
@@ -26,8 +29,14 @@ namespace augas {
         do_cancelrwtimer(unsigned flags) = 0;
 
     public:
+        virtual
         ~rwtimer_base() AUG_NOTHROW;
 
+        void
+        timercb(int id, unsigned& ms, aug_timers& timers)
+        {
+            do_timercb(id, ms, timers);
+        }
         void
         setrwtimer(unsigned ms, unsigned flags)
         {
@@ -60,7 +69,7 @@ namespace augas {
         aug::timer wrtimer_;
 
         void
-        do_callback(aug::idref ref, unsigned& ms, aug_timers& timers);
+        do_timercb(int id, unsigned& ms, aug_timers& timers);
 
         void
         do_setrwtimer(unsigned ms, unsigned flags);

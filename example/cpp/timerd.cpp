@@ -53,7 +53,7 @@ namespace test {
         }
     };
 
-    class service : public service_base, public timercb_base {
+    class service : public service_base {
 
         struct state {
             mplexer mplexer_;
@@ -208,13 +208,6 @@ namespace test {
             state_.reset();
         }
 
-        void
-        do_callback(idref ref, unsigned& ms, aug_timers& timers)
-        {
-            aug_info("timer fired");
-            --remain_;
-        }
-
     public:
         ~service() AUG_NOTHROW
         {
@@ -224,6 +217,13 @@ namespace test {
             : daemon_(false),
               remain_(5)
         {
+        }
+
+        void
+        timercb(int id, unsigned& ms, aug_timers& timers)
+        {
+            aug_info("timer fired");
+            --remain_;
         }
     };
 }

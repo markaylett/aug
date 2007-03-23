@@ -19,7 +19,7 @@ namespace augas {
         // rwtimer_base.
 
         void
-        do_callback(aug::idref ref, unsigned& ms, aug_timers& timers);
+        do_timercb(int id, unsigned& ms, aug_timers& timers);
 
         void
         do_setrwtimer(unsigned ms, unsigned flags);

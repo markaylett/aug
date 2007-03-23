@@ -153,7 +153,7 @@ namespace test {
         }
     };
 
-    struct session : public timercb_base {
+    struct session {
 
         mplexer& mplexer_;
         smartfd sfd_;
@@ -161,19 +161,6 @@ namespace test {
         buffer buffer_;
         int heartbeats_;
 
-        void
-        do_callback(idref ref, unsigned& ms, aug_timers& timers)
-        {
-            ms = 0; // Cancel.
-
-            aug_info("timeout");
-            if (heartbeats_ < 3) {
-                buffer_.putsome("heartbeat\n", 10);
-                ++heartbeats_;
-                setioeventmask(mplexer_, sfd_, AUG_IOEVENTRDWR);
-            } else
-                shutdown(sfd_, SHUT_RDWR);
-        }
         ~session() AUG_NOTHROW
         {
             try {
@@ -188,6 +175,19 @@ namespace test {
         {
             timer_.set(5000, *this);
         }
+        void
+        timercb(int id, unsigned& ms, aug_timers& timers)
+        {
+            ms = 0; // Cancel.
+
+            aug_info("timeout");
+            if (heartbeats_ < 3) {
+                buffer_.putsome("heartbeat\n", 10);
+                ++heartbeats_;
+                setioeventmask(mplexer_, sfd_, AUG_IOEVENTRDWR);
+            } else
+                shutdown(sfd_, SHUT_RDWR);
+        }
     };
 
     typedef smartptr<session> sessionptr;
@@ -200,8 +200,7 @@ namespace test {
         smartfd sfd_;
         map<int, sessionptr> sfds_;
 
-        explicit
-        state(const pair<aug_filecb_t, aug_var>& cb)
+        state(aug_filecb_t cb, const aug_var& var)
             : sfd_(null)
         {
             aug_hostserv hostserv;
@@ -210,10 +209,10 @@ namespace test {
             endpoint ep(null);
             smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
 
-            insertfile(files_, aug_eventin(), cb);
+            insertfile(files_, aug_eventin(), cb, var);
             setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
 
-            insertfile(files_, sfd, cb);
+            insertfile(files_, sfd, cb, var);
             setioeventmask(mplexer_, sfd, AUG_IOEVENTRD);
 
             sfd_ = sfd;
@@ -227,7 +226,7 @@ namespace test {
         void
         setfdhook(fdref ref, unsigned short mask)
         {
-            insertfile(state_->files_, ref, bindfilecb<service>(*this));
+            insertfile(state_->files_, ref, *this);
             try {
                 setioeventmask(state_->mplexer_, ref, mask);
             } catch (...) {
@@ -362,7 +361,9 @@ namespace test {
             aug_info("initialising daemon process");
 
             setsrvlogger("aug");
-            state_.reset(new state(bindfilecb<service>(*this)));
+
+            aug_var var = { 0, this };
+            state_.reset(new state(filememcb<service>, var));
         }
 
         void
