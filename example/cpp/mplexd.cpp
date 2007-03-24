@@ -29,43 +29,41 @@ namespace test {
     cstring logfile_ = "mplexd.log";
     cstring address_ = "127.0.0.1:8080";
 
-    class confcb : public confcb_base {
-        void
-        do_callback(const char* name, const char* value)
-        {
-            if (0 == aug_strcasecmp(name, "address")) {
+    void
+    confcb(void* arg, const char* name, const char* value)
+    {
+        if (0 == aug_strcasecmp(name, "address")) {
 
-                aug_strlcpy(address_, value, sizeof(address_));
+            aug_strlcpy(address_, value, sizeof(address_));
 
-            } else if (0 == aug_strcasecmp(name, "loglevel")) {
+        } else if (0 == aug_strcasecmp(name, "loglevel")) {
 
-                unsigned level(strtoui(value, 10));
-                aug_info("setting log level: %d", level);
-                aug_setloglevel(level);
+            unsigned level(strtoui(value, 10));
+            aug_info("setting log level: %d", level);
+            aug_setloglevel(level);
 
-            } else if (0 == aug_strcasecmp(name, "logfile")) {
+        } else if (0 == aug_strcasecmp(name, "logfile")) {
 
-                aug_strlcpy(logfile_, value, sizeof(logfile_));
+            aug_strlcpy(logfile_, value, sizeof(logfile_));
 
-            } else if (0 == aug_strcasecmp(name, "pidfile")) {
+        } else if (0 == aug_strcasecmp(name, "pidfile")) {
 
-                aug_strlcpy(pidfile_, value, sizeof(pidfile_));
+            aug_strlcpy(pidfile_, value, sizeof(pidfile_));
 
-            } else if (0 == aug_strcasecmp(name, "rundir")) {
+        } else if (0 == aug_strcasecmp(name, "rundir")) {
 
-                // Once set, the run directory should not change.
+            // Once set, the run directory should not change.
 
-                if (!*rundir_)
-                    realpath(rundir_, value, sizeof(rundir_));
+            if (!*rundir_)
+                realpath(rundir_, value, sizeof(rundir_));
 
-            } else {
+        } else {
 
-                string s("option not supported: ");
-                s += name;
-                throw runtime_error("option not supported");
-            }
+            string s("option not supported: ");
+            s += name;
+            throw runtime_error("option not supported");
         }
-    };
+    }
 
     bool daemon_(false);
     bool quit_(false);
@@ -89,8 +87,7 @@ namespace test {
     {
         if (conffile) {
             aug_info("reading: %s", conffile);
-            test::confcb cb;
-            readconf(conffile, cb);
+            readconf(conffile, aug::confcb<confcb>, null);
             aug_strlcpy(conffile_, conffile, sizeof(conffile_));
         }
 
@@ -245,8 +242,7 @@ namespace test {
                 aug_info("received AUG_EVENTRECONF");
                 if (*conffile_) {
                     aug_info("reading: %s", conffile_);
-                    test::confcb cb;
-                    aug::readconf(conffile_, cb);
+                    aug::readconf(conffile_, aug::confcb<confcb>, null);
                 }
                 reconf();
                 break;

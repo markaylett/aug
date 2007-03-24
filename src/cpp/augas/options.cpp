@@ -6,13 +6,19 @@
 
 #include "augas/exception.hpp"
 
+#include "augutilpp/file.hpp"
+
+using namespace aug;
 using namespace augas;
 using namespace std;
 
-void
-options::do_callback(const char* name, const char* value)
-{
-    options_[name] = value;
+namespace {
+    void
+    cb(void* arg, const char* name, const char* value)
+    {
+        map<string, string>& x(*static_cast<map<string, string>*>(arg));
+        x[name] = value;
+    }
 }
 
 options::~options() AUG_NOTHROW
@@ -23,7 +29,7 @@ void
 options::read(const char* path)
 {
     options_.clear();
-    readconf(path, *this);
+    readconf(path, confcb<cb>, &options_);
 }
 
 void

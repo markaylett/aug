@@ -12,6 +12,7 @@
 
 #include "augnet/base64.h"
 
+#include <memory> // auto_ptr<>
 #include <sstream>
 
 namespace aug {

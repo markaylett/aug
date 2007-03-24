@@ -4,18 +4,15 @@
 #ifndef AUGAS_OPTIONS_HPP
 #define AUGAS_OPTIONS_HPP
 
-#include "augutilpp/file.hpp"
-
 #include <map>
 #include <string>
 
+#include "augsyspp/config.hpp"
+
 namespace augas {
 
-    class options : private aug::confcb_base {
+    class options {
         std::map<std::string, std::string> options_;
-        void
-        do_callback(const char* name, const char* value);
-
     public:
         ~options() AUG_NOTHROW;
 

@@ -43,35 +43,36 @@ support for:
 \item{$\bullet$} \PYTHON/.
 
 \yskip\noindent
-This document is a brief introduction to building and installing \AUGAS/
-modules.  For further information, please visit the \pdfURL{\AUG/ home
-page}{http://aug.sourceforge.net} or email myself, \pdfURL{Mark
-Aylett}{mailto:mark@@emantic.co.uk}.
+This document is a brief introduction to building and installing Modules for
+the \AUGAS/ Application Server.  For further information, please visit the
+\pdfURL{\AUG/ home page}{http://aug.sourceforge.net} or email myself,
+\pdfURL{Mark Aylett}{mailto:mark@@emantic.co.uk}.
 
-@* Design Principles.
-Threads are often forced upon an application by APIs that perform blocking
-operations; threads are introduced to bypass the blockage.  If these threads
-are allowed to extend into other areas of the application, complexity,
-resource contention and the risk of deadlocks will increase.
+@* Event Model.
 
-\yskip\noindent
-Threads are best suited to processing, not waiting.  Where possible, they
-should be used to improve CPU utilisation on multi-processor machines.
+Threads are best suited to processing, not waiting.  Ideally, they should
+focus on improving CPU utilisation on multi-processor machines.
 
 \yskip\noindent
-Using non-blocking IO, a single thread can be dedicated to waiting for, and
-de-multiplexing, network events.  The event thread can be kept responsive by
-delegating sizeable units of work off to worker threads.  Worker threads can
-avoid the risk of deadlocks by posting events back to the event queue.
+Unfortunately, threads are often required when dealing with APIs that perform
+blocking operations; secondary threads are introduced to avoid suspension of
+the process during a blocking call.  Unless secondary threads are managed with
+care, complexity, resource contention and the risk of deadlocks will increase.
 
 \yskip\noindent
-The \AUGAS/ Application Server uses an efficient, event-based model to
-de-multiplex activity on signal, socket, timer and user-event objects.
+Using non-blocking IO, a single thread can be dedicated to the de-multiplexing
+of network events.  This event thread can be kept responsive by delegating
+sizeable units of work to worker threads.  Worker threads can avoid the risk
+of deadlocks by posting event notifications back to the event queue.
 
-@ \AUGAS/ communicates event notifications to Modules.  Modules are
-dynamically loaded into the Application Server at run-time.  Each Module
-provides one or more Services.  Modules and Services are wired together at
-configuration-time, not compile-time.
+\yskip\noindent
+The \AUGAS/ Application Server implements such an event model to de-multiplex
+activity on signal, socket, timer and user-event objects.
+
+@ \AUGAS/ propagates event notifications to Modules.  Modules are dynamically
+loaded into the Application Server at run-time.  Each Module provides one or
+more Services.  Modules and Services are wired together at configuration-time,
+not compile-time.
 
 \yskip\noindent
 All Module calls are dispatched from the event thread (similar to a UI

@@ -14,6 +14,8 @@
 
 #include "augmar/mar.h"
 
+#include <memory> // auto_ptr<>
+
 namespace aug {
 
     struct basic_marstatic {

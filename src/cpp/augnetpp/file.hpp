@@ -18,6 +18,8 @@
 #include "augsys/errno.h"
 #include "augsys/log.h"
 
+#include <memory> // auto_ptr<>
+
 namespace aug {
 
     template <bool (*T)(const aug_var&, int, aug_files&)>
