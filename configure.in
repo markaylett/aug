@@ -176,6 +176,9 @@ AC_CONFIG_FILES([Makefile
                  src/c/augsys/posix/Makefile
                  src/c/augsys/win32/Makefile
                  src/c/augutil/Makefile
+                 src/c/augutil/posix/Makefile
+                 src/c/augutil/win32/Makefile
+                 src/c/htdigest/Makefile
                  src/c/mar/Makefile
                  src/cpp/Makefile
                  src/cpp/augmarpp/Makefile

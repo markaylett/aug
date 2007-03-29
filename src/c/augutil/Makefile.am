@@ -1,4 +1,7 @@
 include $(top_srcdir)/src/c/lang.mk
+SUBDIRS = \
+	posix \
+	win32
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
@@ -10,7 +13,9 @@ modinclude_HEADERS = \
 	lexer.h \
 	list.h \
 	log.h \
+	md5.h \
 	path.h \
+	pwd.h \
 	strbuf.h \
 	timer.h \
 	var.h
@@ -28,7 +33,9 @@ libaugutil_la_SOURCES = \
 	lexer.c \
 	list.c \
 	log.c \
+	md5.c \
 	path.c \
+	pwd.c \
 	strbuf.c \
 	timer.c \
 	var.c

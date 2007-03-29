@@ -7,6 +7,7 @@ SUBDIRS = \
 	augutil \
 	augsrv \
 	augnet \
+	htdigest \
 	mar
 
 include_HEADERS = \

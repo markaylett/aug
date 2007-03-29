@@ -133,7 +133,13 @@
 				RelativePath="..\src\c\augutil\log.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augutil\md5.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augutil\path.c">
+			</File>
+			<File
+				RelativePath="..\src\c\augutil\pwd.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\strbuf.c">
@@ -174,7 +180,13 @@
 				RelativePath="..\src\c\augutil\log.h">
 			</File>
 			<File
+				RelativePath="..\src\c\augutil\md5.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augutil\path.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augutil\pwd.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\strbuf.h">

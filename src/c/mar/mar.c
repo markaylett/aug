@@ -401,7 +401,7 @@ main(int argc, char* argv[])
             if (0 == strcmp(aug_optarg, "-")) {
 
                 if (options_ & STDINOPT_) {
-                    fprintf(stderr, "Multiple use of stdin");
+                    fprintf(stderr, "multiple use of stdin");
                     goto info;
                 }
 

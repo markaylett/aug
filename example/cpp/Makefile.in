@@ -40,7 +40,8 @@ LIBOBJDIR =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/cpp/lang.mk
 noinst_PROGRAMS = heartbeat$(EXEEXT) mcastrecv$(EXEEXT) \
-	mcastsend$(EXEEXT) mplexd$(EXEEXT) timerd$(EXEEXT)
+	mcastsend$(EXEEXT) mplexd$(EXEEXT) tcpclient$(EXEEXT) \
+	timerd$(EXEEXT)
 subdir = example/cpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -67,6 +68,9 @@ mcastsend_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_mplexd_OBJECTS = mplexd.$(OBJEXT)
 mplexd_OBJECTS = $(am_mplexd_OBJECTS)
 mplexd_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_tcpclient_OBJECTS = tcpclient.$(OBJEXT)
+tcpclient_OBJECTS = $(am_tcpclient_OBJECTS)
+tcpclient_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_timerd_OBJECTS = timerd.$(OBJEXT)
 timerd_OBJECTS = $(am_timerd_OBJECTS)
 timerd_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -81,9 +85,11 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
-	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(timerd_SOURCES)
+	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(tcpclient_SOURCES) \
+	$(timerd_SOURCES)
 DIST_SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
-	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(timerd_SOURCES)
+	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(tcpclient_SOURCES) \
+	$(timerd_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -227,6 +233,10 @@ mplexd_SOURCES = \
 	mplexd.cpp
 
 mplexd_LDADD = $(AUGLIBS)
+tcpclient_SOURCES = \
+	tcpclient.cpp
+
+tcpclient_LDADD = $(AUGLIBS)
 timerd_SOURCES = \
 	timerd.cpp
 
@@ -283,6 +293,9 @@ mcastsend$(EXEEXT): $(mcastsend_OBJECTS) $(mcastsend_DEPENDENCIES)
 mplexd$(EXEEXT): $(mplexd_OBJECTS) $(mplexd_DEPENDENCIES) 
 	@rm -f mplexd$(EXEEXT)
 	$(CXXLINK) $(mplexd_LDFLAGS) $(mplexd_OBJECTS) $(mplexd_LDADD) $(LIBS)
+tcpclient$(EXEEXT): $(tcpclient_OBJECTS) $(tcpclient_DEPENDENCIES) 
+	@rm -f tcpclient$(EXEEXT)
+	$(CXXLINK) $(tcpclient_LDFLAGS) $(tcpclient_OBJECTS) $(tcpclient_LDADD) $(LIBS)
 timerd$(EXEEXT): $(timerd_OBJECTS) $(timerd_DEPENDENCIES) 
 	@rm -f timerd$(EXEEXT)
 	$(CXXLINK) $(timerd_LDFLAGS) $(timerd_OBJECTS) $(timerd_LDADD) $(LIBS)
@@ -297,6 +310,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastrecv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastsend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpclient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timerd.Po@am__quote@
 
 .cpp.o:

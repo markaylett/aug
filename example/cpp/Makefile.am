@@ -5,6 +5,7 @@ noinst_PROGRAMS = \
 	mcastrecv \
 	mcastsend \
 	mplexd \
+	tcpclient \
 	timerd
 
 AUGLIBS= \
@@ -29,6 +30,10 @@ mcastsend_LDADD = $(AUGLIBS)
 mplexd_SOURCES = \
 	mplexd.cpp
 mplexd_LDADD = $(AUGLIBS)
+
+tcpclient_SOURCES = \
+	tcpclient.cpp
+tcpclient_LDADD = $(AUGLIBS)
 
 timerd_SOURCES = \
 	timerd.cpp

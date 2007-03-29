@@ -1,4 +1,3 @@
-
 EXTRA_DIST = \
 	base.c \
 	dlfcn.c \

@@ -11,6 +11,7 @@
 #include "augutil/lexer.h"
 #include "augutil/list.h"
 #include "augutil/log.h"
+#include "augutil/md5.h"
 #include "augutil/path.h"
 #include "augutil/strbuf.h"
 #include "augutil/timer.h"
