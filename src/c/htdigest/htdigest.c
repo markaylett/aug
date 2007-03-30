@@ -5,10 +5,12 @@
  */
 #include "augutil/md5.h"
 
+static const char rcsid[] = "$Id:$";
+
 #define MD5_CTX struct aug_md5context
 #define MD5Init aug_initmd5
-#define MD5Update aug_updatemd5
-#define MD5Final aug_finalmd5
+#define MD5Update aug_appendmd5
+#define MD5Final aug_finishmd5
 
 #if defined(_WIN32)
 # include "augutil/pwd.h"

@@ -18,13 +18,10 @@ AUGUTIL_API void
 aug_initmd5(struct aug_md5context* ctx);
 
 AUGUTIL_API void
-aug_updatemd5(struct aug_md5context* ctx, const unsigned char* buf,
+aug_appendmd5(struct aug_md5context* ctx, const unsigned char* buf,
               unsigned len);
 
 AUGUTIL_API void
-aug_finalmd5(unsigned char digest[16], struct aug_md5context* ctx);
-
-AUGUTIL_API void
-aug_transformmd5(uint32_t buf[4], const uint32_t in[16]);
+aug_finishmd5(unsigned char digest[16], struct aug_md5context* ctx);
 
 #endif /* AUGUTIL_MD5_H */

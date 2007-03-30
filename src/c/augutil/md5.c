@@ -21,6 +21,14 @@ static const char rcsid[] = "$Id:$";
 
 #include <string.h> /* memcpy() */
 
+#define MD5_CTX aug_md5context
+#define MD5Init aug_initmd5
+#define MD5Update aug_appendmd5
+#define MD5Final aug_finishmd5
+
+static void
+MD5Transform(uint32_t buf[4], const uint32_t in[16]);
+
 # if WORDS_BIGENDIAN
 #  define HIGHFIRST 1
 # endif
@@ -51,7 +59,7 @@ static void byteReverse(unsigned char *buf, unsigned longs)
  * initialization constants.
  */
 AUGUTIL_API void
-aug_initmd5(struct aug_md5context* ctx)
+MD5Init(struct MD5_CTX* ctx)
 {
     ctx->buf[0] = 0x67452301;
     ctx->buf[1] = 0xefcdab89;
@@ -67,8 +75,7 @@ aug_initmd5(struct aug_md5context* ctx)
  * of bytes.
  */
 AUGUTIL_API void
-aug_updatemd5(struct aug_md5context* ctx, const unsigned char* buf,
-              unsigned len)
+MD5Update(struct MD5_CTX* ctx, const unsigned char* buf, unsigned len)
 {
     uint32_t t;
 
@@ -93,7 +100,7 @@ aug_updatemd5(struct aug_md5context* ctx, const unsigned char* buf,
         }
         memcpy(p, buf, t);
         byteReverse(ctx->in, 16);
-        aug_transformmd5(ctx->buf, (uint32_t *) ctx->in);
+        MD5Transform(ctx->buf, (uint32_t *) ctx->in);
         buf += t;
         len -= t;
     }
@@ -102,7 +109,7 @@ aug_updatemd5(struct aug_md5context* ctx, const unsigned char* buf,
     while (len >= 64) {
         memcpy(ctx->in, buf, 64);
         byteReverse(ctx->in, 16);
-        aug_transformmd5(ctx->buf, (uint32_t *) ctx->in);
+        MD5Transform(ctx->buf, (uint32_t *) ctx->in);
         buf += 64;
         len -= 64;
     }
@@ -113,11 +120,11 @@ aug_updatemd5(struct aug_md5context* ctx, const unsigned char* buf,
 }
 
 /*
- * Final wrapup - pad to 64-byte boundary with the bit pattern 
+ * Final wrapup - pad to 64-byte boundary with the bit pattern
  * 1 0* (64-bit count of bits processed, MSB-first)
  */
 AUGUTIL_API void
-aug_finalmd5(unsigned char digest[16], struct aug_md5context* ctx)
+MD5Final(unsigned char digest[16], struct MD5_CTX* ctx)
 {
     unsigned count;
     unsigned char *p;
@@ -138,7 +145,7 @@ aug_finalmd5(unsigned char digest[16], struct aug_md5context* ctx)
         /* Two lots of padding:  Pad the first block to 64 bytes */
         memset(p, 0, count);
         byteReverse(ctx->in, 16);
-        aug_transformmd5(ctx->buf, (uint32_t *) ctx->in);
+        MD5Transform(ctx->buf, (uint32_t *) ctx->in);
 
         /* Now fill the next block with 56 bytes */
         memset(ctx->in, 0, 56);
@@ -152,7 +159,7 @@ aug_finalmd5(unsigned char digest[16], struct aug_md5context* ctx)
     ((uint32_t *) ctx->in)[14] = ctx->bits[0];
     ((uint32_t *) ctx->in)[15] = ctx->bits[1];
 
-    aug_transformmd5(ctx->buf, (uint32_t *) ctx->in);
+    MD5Transform(ctx->buf, (uint32_t *) ctx->in);
     byteReverse((unsigned char *) ctx->buf, 4);
     memcpy(digest, ctx->buf, 16);
     memset(ctx, 0, sizeof(ctx));    /* In case it's sensitive */
@@ -177,8 +184,8 @@ aug_finalmd5(unsigned char digest[16], struct aug_md5context* ctx)
  * reflect the addition of 16 longwords of new data.  MD5Update blocks
  * the data and converts bytes into longwords for this routine.
  */
-AUGUTIL_API void
-aug_transformmd5(uint32_t buf[4], const uint32_t in[16])
+static void
+MD5Transform(uint32_t buf[4], const uint32_t in[16])
 {
     register uint32_t a, b, c, d;
 
