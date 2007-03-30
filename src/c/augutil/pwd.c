@@ -3,8 +3,9 @@
 */
 #define AUGUTIL_BUILD
 #include "augutil/pwd.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id:$";
+AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
 # include "augutil/posix/pwd.c"

@@ -3,8 +3,9 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/mmap.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
 # include "augsys/posix/mmap.c"

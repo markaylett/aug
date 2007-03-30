@@ -1,8 +1,9 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #include "mar/getopt.h"
 #include "mar/utility.h"

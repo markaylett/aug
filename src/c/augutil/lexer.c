@@ -3,10 +3,10 @@
 */
 #define AUGUTIL_BUILD
 #include "augutil/lexer.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
-#include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/errinfo.h"
 
 #include <ctype.h>       /* isspace() */

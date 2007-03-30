@@ -21,4 +21,12 @@
 #define AUG_RETNONE    (-2)
 #define AUG_RETINTR    (-3)
 
+#if !defined(__GNUC__)
+# define AUG_RCSID(x)                           \
+    static const char rcsid[] = x
+#else /* __GNUC__ */
+# define AUG_RCSID(x)                                       \
+    static const char rcsid[] __attribute__((used)) = x
+#endif /* __GNUC__ */
+
 #endif /* AUGSYS_DEFS_H */

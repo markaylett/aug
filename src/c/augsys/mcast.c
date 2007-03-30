@@ -3,8 +3,9 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/mcast.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
 # include "augsys/posix/mcast.c"

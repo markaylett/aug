@@ -3,8 +3,9 @@
 */
 #define AUGSRV_BUILD
 #include "augsrv/daemon.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
 # include "augsrv/posix/daemon.c"

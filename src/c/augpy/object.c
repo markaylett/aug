@@ -3,10 +3,13 @@
 */
 #define AUGPY_BUILD
 #include "augpy/object.h"
+#include "augsys/defs.h"
 
-#include <structmember.h>
+AUG_RCSID("$Id:$");
 
 #include "augas.h"
+
+#include <structmember.h>
 
 /* Implementation note: always reassign members before decrementing reference
    counts. */

@@ -3,13 +3,14 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/mutex.h"
+#include "augsys/defs.h"
 
 #include "augsys/errinfo.h"
 #include "augsys/lock.h"
 
 #include <errno.h>
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 AUGSYS_API aug_mutex_t
 aug_createmutex(void)

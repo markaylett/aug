@@ -3,8 +3,9 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/uio.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #include "augsys/base.h"
 #include "augsys/errinfo.h"

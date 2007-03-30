@@ -2,8 +2,11 @@
    See the file COPYING for copying permission.
 */
 #define AUGPY_BUILD
-#include "augpy/module.h"
+#include "augsys/defs.h"
 
+AUG_RCSID("$Id:$");
+
+#include "augpy/module.h"
 #include "augpy/object.h"
 
 #include "augas.h"

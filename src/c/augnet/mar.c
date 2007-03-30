@@ -3,6 +3,9 @@
 */
 #define AUGNET_BUILD
 #include "augnet/mar.h"
+#include "augsys/defs.h"
+
+AUG_RCSID("$Id$");
 
 #include "augnet/http.h"
 
@@ -16,8 +19,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-
-static const char rcsid[] = "$Id:$";
 
 struct aug_marparser_ {
     const struct aug_marhandler* handler_;

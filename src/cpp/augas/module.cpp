@@ -3,6 +3,9 @@
 */
 #define AUGAS_BUILD
 #include "augas/module.hpp"
+#include "augsys/defs.h"
+
+AUG_RCSID("$Id:$");
 
 #include "augas/exception.hpp"
 #include "augas/utility.hpp"

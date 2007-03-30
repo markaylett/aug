@@ -3,8 +3,9 @@
 */
 #define AUGSRV_BUILD
 #include "augsrv/options.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #include "augsrv/base.h"   /* aug_basename() */
 

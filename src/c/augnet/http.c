@@ -3,14 +3,14 @@
 */
 #define AUGNET_BUILD
 #include "augnet/http.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #include "augutil/conv.h"
 #include "augutil/lexer.h"
 #include "augutil/var.h"
 
-#include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/errinfo.h"
 #include "augsys/string.h"
 

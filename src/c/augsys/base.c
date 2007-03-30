@@ -3,11 +3,13 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/base.h"
+#include "augsys/defs.h"
+
+AUG_RCSID("$Id$");
+
 #include "augsys/errno.h"
 
 #include <limits.h> /* INT_MAX */
-
-static const char rcsid[] = "$Id$";
 
 #define PROCEED_ 1
 

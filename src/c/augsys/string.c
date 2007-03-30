@@ -4,8 +4,9 @@
 #undef __STRICT_ANSI__ /* _stricmp() */
 #define AUGSYS_BUILD
 #include "augsys/string.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
 # include <strings.h> /* strncasecmp() */

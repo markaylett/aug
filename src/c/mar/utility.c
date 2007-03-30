@@ -2,10 +2,10 @@
    See the file COPYING for copying permission.
 */
 #include "mar/utility.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
-#include "augsys/defs.h" /* AUG_MAXLINE */
 #include "augsys/errinfo.h"
 
 #include <errno.h>

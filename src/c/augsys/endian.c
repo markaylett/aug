@@ -3,8 +3,9 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/endian.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #include <string.h> /* memcpy() */
 

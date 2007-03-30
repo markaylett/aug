@@ -4,8 +4,9 @@
  * by Alexei Kosut, based on htpasswd.c, by Rob McCool
  */
 #include "augutil/md5.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id:$";
+AUG_RCSID("$Id$");
 
 #define MD5_CTX struct aug_md5context
 #define MD5Init aug_initmd5

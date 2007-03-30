@@ -3,6 +3,9 @@
 */
 #define AUGAS_BUILD
 #include "augas/rwtimer.hpp"
+#include "augsys/defs.h"
+
+AUG_RCSID("$Id:$");
 
 #include <cassert>
 

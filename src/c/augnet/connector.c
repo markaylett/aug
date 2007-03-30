@@ -3,8 +3,9 @@
 */
 #define AUGNET_BUILD
 #include "augnet/connector.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"

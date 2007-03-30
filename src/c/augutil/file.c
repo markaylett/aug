@@ -3,10 +3,10 @@
 */
 #define AUGUTIL_BUILD
 #include "augutil/file.h"
-
-static const char rcsid[] = "$Id$";
-
 #include "augsys/defs.h"
+
+AUG_RCSID("$Id$");
+
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
 

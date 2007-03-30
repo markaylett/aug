@@ -3,8 +3,9 @@
 */
 #define AUGMAR_BUILD
 #include "augmar/mar.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #include "augmar/body_.h"
 #include "augmar/format_.h"
@@ -12,7 +13,6 @@ static const char rcsid[] = "$Id$";
 #include "augmar/info_.h"
 #include "augmar/mfile_.h"
 
-#include "augsys/defs.h"
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
 

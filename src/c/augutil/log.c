@@ -3,10 +3,10 @@
 */
 #define AUGUTIL_BUILD
 #include "augutil/log.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
-#include "augsys/defs.h"    /* AUG_MAXLINE */
 #include "augsys/errinfo.h"
 #include "augsys/lock.h"
 #include "augsys/time.h"

@@ -3,8 +3,9 @@
 */
 #define AUGSRV_BUILD
 #include "augsrv/signal.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
 # include "augsrv/posix/signal.c"

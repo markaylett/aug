@@ -3,5 +3,6 @@
 */
 #define AUGUTIL_BUILD
 #include "augutil/list.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");

@@ -3,8 +3,9 @@
 */
 #define AUGSRV_BUILD
 #include "augsrv/log.h"
+#include "augsys/defs.h"
 
-static const char rcsid[] = "$Id$";
+AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
 # include "augsrv/posix/log.c"
@@ -12,7 +13,6 @@ static const char rcsid[] = "$Id$";
 # include "augsrv/win32/log.c"
 #endif /* _WIN32 */
 
-#include "augsys/defs.h"
 #include "augsys/errinfo.h"
 #include "augsys/string.h"
 #include "augsys/unistd.h"

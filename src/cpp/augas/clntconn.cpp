@@ -3,6 +3,9 @@
 */
 #define AUGAS_BUILD
 #include "augas/clntconn.hpp"
+#include "augsys/defs.h"
+
+AUG_RCSID("$Id:$");
 
 using namespace aug;
 using namespace augas;

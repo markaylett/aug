@@ -2,6 +2,9 @@
    See the file COPYING for copying permission.
 */
 #define AUGAS_BUILD
+#include "augsys/defs.h"
+
+AUG_RCSID("$Id:$");
 
 #include "augnetpp.hpp"
 #include "augsrvpp.hpp"
