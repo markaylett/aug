@@ -64,8 +64,8 @@ libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugnet_la_OBJECTS = base64.lo config.lo connector.lo file.lo \
-	fix.lo http.lo inet.lo mar.lo types.lo writer.lo
+am_libaugnet_la_OBJECTS = auth.lo base64.lo config.lo connector.lo \
+	file.lo fix.lo http.lo inet.lo mar.lo types.lo writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_augnet_base64test_OBJECTS = base64test.$(OBJEXT)
 augnet_base64test_OBJECTS = $(am_augnet_base64test_OBJECTS)
@@ -215,6 +215,7 @@ DEFAULT_INCLUDES = \
 
 modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
+	auth.h \
 	base64.h \
 	config.h \
 	connector.h \
@@ -229,6 +230,7 @@ modinclude_HEADERS = \
 noinst_HEADERS = 
 lib_LTLIBRARIES = libaugnet.la
 libaugnet_la_SOURCES = \
+	auth.c \
 	base64.c \
 	config.c \
 	connector.c \
@@ -347,6 +349,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/auth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
