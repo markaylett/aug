@@ -5,7 +5,7 @@
 #include "augnet/auth.h"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augutil/md5.h"
 
@@ -48,33 +48,12 @@ AUG_RCSID("$Id:$");
                  opaque="5ccc069c403ebaf9f0171e9517f40e41"
 */
 
-static void
-cvthex_(const unsigned char bin[16], AUG_HASHHEX hex)
-{
-    unsigned short i;
-    unsigned char j;
-
-    for (i = 0; i < 16; i++) {
-        j = (bin[i] >> 4) & 0xf;
-        if (j <= 9)
-            hex[i*2] = (j + '0');
-        else
-            hex[i*2] = (j + 'a' - 10);
-        j = bin[i] & 0xf;
-        if (j <= 9)
-            hex[i*2+1] = (j + '0');
-        else
-            hex[i*2+1] = (j + 'a' - 10);
-    }
-    hex[AUG_HASHHEXLEN] = '\0';
-}
-
 /* calculate H(A1) as per spec */
 
-AUGNET_API void
+AUGNET_API const char*
 aug_digestha1(const char* alg, const char* username,
               const char* realm, const char* password,
-              const char* nonce, const char* cnonce, AUG_HASHHEX sessionkey)
+              const char* nonce, const char* cnonce, AUG_MD5BASE64 sessionkey)
 {
     struct aug_md5context md5ctx;
     unsigned char ha1[16];
@@ -102,7 +81,8 @@ aug_digestha1(const char* alg, const char* username,
         aug_finishmd5(ha1, &md5ctx);
     }
 
-    cvthex_(ha1, sessionkey);
+    aug_md5base64(ha1, sessionkey);
+    return sessionkey;
 }
 
 /* calculate request-digest/response-digest as per HTTP Digest spec
@@ -117,17 +97,17 @@ aug_digestha1(const char* alg, const char* username,
    request-digest or response-digest
 */
 
-AUGNET_API void
-aug_digestresponse(const AUG_HASHHEX ha1, const char* nonce,
+AUGNET_API const char*
+aug_digestresponse(const AUG_MD5BASE64 ha1, const char* nonce,
                    const char* noncecount, const char* cnonce,
                    const char* qop, const char* method,
-                   const char* digesturi, const AUG_HASHHEX hentity,
-                   AUG_HASHHEX response)
+                   const char* digesturi, const AUG_MD5BASE64 hentity,
+                   AUG_MD5BASE64 response)
 {
     struct aug_md5context md5ctx;
     unsigned char ha2[16];
     unsigned char resphash[16];
-    AUG_HASHHEX ha2hex;
+    AUG_MD5BASE64 ha2base64;
 
     /* calculate H(A2) */
 
@@ -140,16 +120,16 @@ aug_digestresponse(const AUG_HASHHEX ha1, const char* nonce,
 
     if (stricmp(qop, "auth-int") == 0) {
         aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
-        aug_appendmd5(&md5ctx, (unsigned char*)hentity, AUG_HASHHEXLEN);
+        aug_appendmd5(&md5ctx, (unsigned char*)hentity, AUG_MD5BASE64LEN);
     }
 
     aug_finishmd5(ha2, &md5ctx);
-    cvthex_(ha2, ha2hex);
+    aug_md5base64(ha2, ha2base64);
 
     /* calculate response */
 
     aug_initmd5(&md5ctx);
-    aug_appendmd5(&md5ctx, (unsigned char*)ha1, AUG_HASHHEXLEN);
+    aug_appendmd5(&md5ctx, (unsigned char*)ha1, AUG_MD5BASE64LEN);
     aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
     aug_appendmd5(&md5ctx, (unsigned char*)nonce,
                   (unsigned int)strlen(nonce));
@@ -167,7 +147,9 @@ aug_digestresponse(const AUG_HASHHEX ha1, const char* nonce,
         aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
     }
 
-    aug_appendmd5(&md5ctx, (unsigned char*)ha2hex, AUG_HASHHEXLEN);
+    aug_appendmd5(&md5ctx, (unsigned char*)ha2base64, AUG_MD5BASE64LEN);
+
     aug_finishmd5(resphash, &md5ctx);
-    cvthex_(resphash, response);
+    aug_md5base64(resphash, response);
+    return response;
 }

@@ -4,7 +4,7 @@
 #define AUGAS_BUILD
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augnetpp.hpp"
 #include "augsrvpp.hpp"
@@ -948,6 +948,11 @@ main(int argc, char* argv[])
 
         aug_errinfo errinfo;
         scoped_init init(errinfo);
+
+        timeval tv;
+        aug::gettimeofday(tv);
+        aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
+
         try {
             service serv;
             program_ = argv[0];

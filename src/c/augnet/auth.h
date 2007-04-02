@@ -6,20 +6,19 @@
 
 #include "augnet/config.h"
 
-#define AUG_HASHHEXLEN 32
+#include "augutil/md5.h"
 
-typedef char AUG_HASHHEX[AUG_HASHHEXLEN + 1];
-
-AUGNET_API void
+AUGNET_API const char*
 aug_digestha1(const char* alg, const char* username,
               const char* realm, const char* password,
-              const char* nonce, const char* cnonce, AUG_HASHHEX sessionkey);
+              const char* nonce, const char* cnonce,
+              AUG_MD5BASE64 sessionkey);
 
-AUGNET_API void
-aug_digestresponse(const AUG_HASHHEX ha1, const char* nonce,
+AUGNET_API const char*
+aug_digestresponse(const AUG_MD5BASE64 ha1, const char* nonce,
                    const char* noncecount, const char* cnonce,
                    const char* qop, const char* method,
-                   const char* digesturi, const AUG_HASHHEX hentity,
-                   AUG_HASHHEX response);
+                   const char* digesturi, const AUG_MD5BASE64 hentity,
+                   AUG_MD5BASE64 response);
 
 #endif /* AUGNET_AUTH_H */

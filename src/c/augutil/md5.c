@@ -270,3 +270,25 @@ MD5Transform(uint32_t buf[4], const uint32_t in[16])
 }
 
 #endif
+
+AUGUTIL_API const char*
+aug_md5base64(const unsigned char digest[16], AUG_MD5BASE64 base64)
+{
+    unsigned short i;
+    unsigned char j;
+
+    for (i = 0; i < 16; i++) {
+        j = (digest[i] >> 4) & 0xf;
+        if (j <= 9)
+            base64[i*2] = (j + '0');
+        else
+            base64[i*2] = (j + 'a' - 10);
+        j = digest[i] & 0xf;
+        if (j <= 9)
+            base64[i*2+1] = (j + '0');
+        else
+            base64[i*2+1] = (j + 'a' - 10);
+    }
+    base64[AUG_MD5BASE64LEN] = '\0';
+    return base64;
+}
