@@ -4,12 +4,11 @@
 #define AUGNET_BUILD
 #include "augnet/auth.h"
 #include "augsys/defs.h"
+#include "augsys/string.h"
 
 AUG_RCSID("$Id$");
 
 #include "augutil/md5.h"
-
-#include <string.h>
 
 /* Derived from example in rfc2617 - HTTP Authentication: Basic and Digest
    Access Authentication.
@@ -50,39 +49,38 @@ AUG_RCSID("$Id$");
 
 /* calculate H(A1) as per spec */
 
-AUGNET_API const char*
-aug_digestha1(const char* alg, const char* username,
-              const char* realm, const char* password,
-              const char* nonce, const char* cnonce, AUG_MD5BASE64 sessionkey)
+AUGNET_API char*
+aug_digestha1(const char* alg, const char* username, const char* realm,
+              const char* password, const char* nonce, const char* cnonce,
+              aug_md5base64_t base64)
 {
     struct aug_md5context md5ctx;
     unsigned char ha1[16];
 
     aug_initmd5(&md5ctx);
     aug_appendmd5(&md5ctx, (unsigned char*)username,
-                  (unsigned int)strlen(username));
+                  (unsigned)strlen(username));
     aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
-    aug_appendmd5(&md5ctx, (unsigned char*)realm,
-                  (unsigned int)strlen(realm));
+    aug_appendmd5(&md5ctx, (unsigned char*)realm, (unsigned)strlen(realm));
     aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
     aug_appendmd5(&md5ctx, (unsigned char*)password,
-                  (unsigned int)strlen(password));
+                  (unsigned)strlen(password));
     aug_finishmd5(ha1, &md5ctx);
 
-    if (stricmp(alg, "md5-sess") == 0) {
+    if (aug_strcasecmp(alg, "md5-sess") == 0) {
         aug_initmd5(&md5ctx);
         aug_appendmd5(&md5ctx, (unsigned char*)ha1, 16);
         aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
         aug_appendmd5(&md5ctx, (unsigned char*)nonce,
-                      (unsigned int)strlen(nonce));
+                      (unsigned)strlen(nonce));
         aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
         aug_appendmd5(&md5ctx, (unsigned char*)cnonce,
-                      (unsigned int)strlen(cnonce));
+                      (unsigned)strlen(cnonce));
         aug_finishmd5(ha1, &md5ctx);
     }
 
-    aug_md5base64(ha1, sessionkey);
-    return sessionkey;
+    aug_md5base64(ha1, base64);
+    return base64;
 }
 
 /* calculate request-digest/response-digest as per HTTP Digest spec
@@ -97,28 +95,25 @@ aug_digestha1(const char* alg, const char* username,
    request-digest or response-digest
 */
 
-AUGNET_API const char*
-aug_digestresponse(const AUG_MD5BASE64 ha1, const char* nonce,
-                   const char* noncecount, const char* cnonce,
-                   const char* qop, const char* method,
-                   const char* digesturi, const AUG_MD5BASE64 hentity,
-                   AUG_MD5BASE64 response)
+AUGNET_API char*
+aug_digestresponse(const aug_md5base64_t ha1, const char* nonce,
+                   const char* nc, const char* cnonce, const char* qop,
+                   const char* method, const char* uri,
+                   const aug_md5base64_t hentity, aug_md5base64_t base64)
 {
     struct aug_md5context md5ctx;
     unsigned char ha2[16];
-    unsigned char resphash[16];
-    AUG_MD5BASE64 ha2base64;
+    unsigned char response[16];
+    aug_md5base64_t ha2base64;
 
     /* calculate H(A2) */
 
     aug_initmd5(&md5ctx);
-    aug_appendmd5(&md5ctx, (unsigned char*)method,
-                  (unsigned int)strlen(method));
+    aug_appendmd5(&md5ctx, (unsigned char*)method, (unsigned)strlen(method));
     aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
-    aug_appendmd5(&md5ctx, (unsigned char*)digesturi,
-                  (unsigned int)strlen(digesturi));
+    aug_appendmd5(&md5ctx, (unsigned char*)uri, (unsigned)strlen(uri));
 
-    if (stricmp(qop, "auth-int") == 0) {
+    if (aug_strcasecmp(qop, "auth-int") == 0) {
         aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
         aug_appendmd5(&md5ctx, (unsigned char*)hentity, AUG_MD5BASE64LEN);
     }
@@ -131,25 +126,22 @@ aug_digestresponse(const AUG_MD5BASE64 ha1, const char* nonce,
     aug_initmd5(&md5ctx);
     aug_appendmd5(&md5ctx, (unsigned char*)ha1, AUG_MD5BASE64LEN);
     aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
-    aug_appendmd5(&md5ctx, (unsigned char*)nonce,
-                  (unsigned int)strlen(nonce));
+    aug_appendmd5(&md5ctx, (unsigned char*)nonce, (unsigned)strlen(nonce));
     aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
 
     if (*qop) {
-        aug_appendmd5(&md5ctx, (unsigned char*)noncecount,
-                      (unsigned int)strlen(noncecount));
+        aug_appendmd5(&md5ctx, (unsigned char*)nc, (unsigned)strlen(nc));
         aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
         aug_appendmd5(&md5ctx, (unsigned char*)cnonce,
-                      (unsigned int)strlen(cnonce));
+                      (unsigned)strlen(cnonce));
         aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
-        aug_appendmd5(&md5ctx, (unsigned char*)qop,
-                      (unsigned int)strlen(qop));
+        aug_appendmd5(&md5ctx, (unsigned char*)qop, (unsigned)strlen(qop));
         aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
     }
 
     aug_appendmd5(&md5ctx, (unsigned char*)ha2base64, AUG_MD5BASE64LEN);
 
-    aug_finishmd5(resphash, &md5ctx);
-    aug_md5base64(resphash, response);
-    return response;
+    aug_finishmd5(response, &md5ctx);
+    aug_md5base64(response, base64);
+    return base64;
 }

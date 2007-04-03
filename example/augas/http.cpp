@@ -25,116 +25,6 @@ using namespace std;
 
 namespace {
 
-    bool
-    getpass(const string& user, const string& realm, string& digest)
-    {
-        const char* passwd(augas::getenv("service.http.passwd"));
-        if (!passwd)
-            return false;
-
-        ifstream is(passwd);
-        string line;
-        while (getline(is, line)) {
-
-            trim(line);
-            if (line.empty() || '#' == line[0])
-                continue;
-
-            vector<string> toks(splitn(line.begin(), line.end(), ':'));
-            if (3 != toks.size())
-                return false;
-
-            if (toks[0] == user && toks[1] == realm) {
-                digest = toks[2];
-                return true;
-            }
-        }
-        return false;
-    }
-
-    const char*
-    basicbase64(const char* username, const char* realm, const char* password,
-                AUG_MD5BASE64 base64)
-    {
-        aug_md5context md5ctx;
-        unsigned char ha1[16];
-
-        aug_initmd5(&md5ctx);
-        aug_appendmd5(&md5ctx, (unsigned char*)username,
-                      (unsigned)strlen(username));
-        aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
-        aug_appendmd5(&md5ctx, (unsigned char*)realm,
-                      (unsigned)strlen(realm));
-        aug_appendmd5(&md5ctx, (unsigned char*)":", 1);
-        aug_appendmd5(&md5ctx, (unsigned char*)password,
-                      (unsigned)strlen(password));
-        aug_finishmd5(ha1, &md5ctx);
-        aug_md5base64(ha1, base64);
-        return base64;
-    }
-
-    bool
-    basicauth(const string& encoded, const string& realm)
-    {
-        string xy, x, y;
-        xy = filterbase64(encoded.c_str(), encoded.size(), AUG_DECODE64);
-        split2(xy.begin(), xy.end(), x, y, ':');
-
-        aug_info("%s:%s", x.c_str(), y.c_str());
-
-        string digest;
-        if (!getpass(x, realm, digest))
-            return false;
-
-        AUG_MD5BASE64 base64;
-        if (digest != basicbase64(x.c_str(), realm.c_str(), y.c_str(),
-                                  base64))
-            return false;
-
-        return true;
-    }
-
-    void
-    splitlist(map<string, string>& pairs, const string& encoded)
-    {
-        vector<string> toks(splitn(encoded.begin(), encoded.end(), ','));
-        vector<string>::const_iterator it(toks.begin()), end(toks.end());
-        for (; it != end; ++it) {
-            string x, y;
-            split2(it->begin(), it->end(), x, y, '=');
-            trim(x);
-            trim(y);
-            trim(y, "\"");
-            pairs[x] = y;
-        }
-    }
-
-    bool
-    digestauth(const string& list, const string& realm, const string& method)
-    {
-        map<string, string> pairs;
-        splitlist(pairs, list);
-
-        string digest;
-        if (!getpass(pairs["username"], pairs["realm"], digest))
-            return false;
-
-        AUG_MD5BASE64 ha1;
-        strcpy(ha1, digest.c_str());
-        AUG_MD5BASE64 ha2 = "";
-        AUG_MD5BASE64 response;
-
-        aug_digestresponse(ha1, pairs["nonce"].c_str(), pairs["nc"].c_str(),
-                           pairs["cnonce"].c_str(), pairs["qop"].c_str(),
-                           method.c_str(), pairs["uri"].c_str(), ha2,
-                           response);
-
-        if (pairs["response"] != response)
-            return false;
-
-        return true;
-    }
-
     class http_error : public domain_error {
         const int status_;
     public:
@@ -164,6 +54,21 @@ namespace {
         return true;
     }
 
+    void
+    splitlist(map<string, string>& pairs, const string& encoded)
+    {
+        vector<string> toks(splitn(encoded.begin(), encoded.end(), ','));
+        vector<string>::const_iterator it(toks.begin()), end(toks.end());
+        for (; it != end; ++it) {
+            string x, y;
+            split2(it->begin(), it->end(), x, y, '=');
+            trim(x);
+            trim(y);
+            trim(y, "\"");
+            pairs[x] = y;
+        }
+    }
+
     string
     utcdate()
     {
@@ -172,6 +77,105 @@ namespace {
         time(&t);
         strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", gmtime(&t));
         return buf;
+    }
+
+    bool
+    getpass(const string& user, const string& realm, string& digest)
+    {
+        const char* passwd(augas::getenv("service.http.passwd"));
+        if (!passwd)
+            return false;
+
+        ifstream is(passwd);
+        string line;
+        while (getline(is, line)) {
+
+            trim(line);
+            if (line.empty() || '#' == line[0])
+                continue;
+
+            vector<string> toks(splitn(line.begin(), line.end(), ':'));
+            if (3 != toks.size())
+                return false;
+
+            if (toks[0] == user && toks[1] == realm) {
+                digest = toks[2];
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool
+    basicauth(const string& encoded, const string& realm)
+    {
+        string xy, x, y;
+        xy = filterbase64(encoded.c_str(), encoded.size(), AUG_DECODE64);
+        split2(xy.begin(), xy.end(), x, y, ':');
+
+        aug_info("%s", x.c_str());
+
+        string digest;
+        if (!getpass(x, realm, digest))
+            return false;
+
+        aug_md5base64_t base64;
+        if (digest != aug_digestpass(x.c_str(), realm.c_str(), y.c_str(),
+                                     base64))
+            return false;
+        return true;
+    }
+
+    bool
+    digestauth(const string& list, const string& realm, const string& method)
+    {
+        map<string, string> pairs;
+        splitlist(pairs, list);
+
+        aug_info("%s", pairs["username"].c_str());
+
+        string digest;
+        if (!getpass(pairs["username"], pairs["realm"], digest))
+            return false;
+
+        aug_md5base64_t ha1;
+        strcpy(ha1, digest.c_str());
+        aug_md5base64_t ha2 = "";
+        aug_md5base64_t response;
+
+        aug_digestresponse(ha1, pairs["nonce"].c_str(), pairs["nc"].c_str(),
+                           pairs["cnonce"].c_str(), pairs["qop"].c_str(),
+                           method.c_str(), pairs["uri"].c_str(), ha2,
+                           response);
+
+        if (pairs["response"] != response)
+            return false;
+
+        return true;
+    }
+
+    const char*
+    nonce(augas_id id, const string& addr, aug_md5base64_t base64)
+    {
+        time_t now;
+        time(&now);
+        long rand(aug_rand());
+        const char* salt(augas::getenv("service.http.salt"));
+
+        aug_md5context md5ctx;
+        unsigned char digest[16];
+
+        aug_initmd5(&md5ctx);
+        aug_appendmd5(&md5ctx, (unsigned char*)&id, sizeof(id));
+        aug_appendmd5(&md5ctx, (unsigned char*)addr.data(), addr.size());
+        aug_appendmd5(&md5ctx, (unsigned char*)&now, sizeof(now));
+        aug_appendmd5(&md5ctx, (unsigned char*)&rand, sizeof(rand));
+        if (salt)
+            aug_appendmd5(&md5ctx, (unsigned char*)salt,
+                          (unsigned)strlen(salt));
+        aug_finishmd5(digest, &md5ctx);
+        aug_md5base64(digest, base64);
+        return base64;
     }
 
     struct request {
@@ -449,35 +453,11 @@ namespace {
         send(id, message.str().c_str(), message.str().size());
     }
 
-    const char*
-    nonce(augas_id id, const string& addr, AUG_MD5BASE64 base64)
-    {
-        time_t t;
-        time(&t);
-        long rand(aug_rand());
-        const char* salt(augas::getenv("service.http.salt"));
-
-        aug_md5context md5ctx;
-        unsigned char digest[16];
-
-        aug_initmd5(&md5ctx);
-        aug_appendmd5(&md5ctx, (unsigned char*)&id, sizeof(id));
-        aug_appendmd5(&md5ctx, (unsigned char*)addr.data(), addr.size());
-        aug_appendmd5(&md5ctx, (unsigned char*)&t, sizeof(t));
-        aug_appendmd5(&md5ctx, (unsigned char*)&rand, sizeof(rand));
-        if (salt)
-            aug_appendmd5(&md5ctx, (unsigned char*)salt,
-                          (unsigned)strlen(salt));
-        aug_finishmd5(digest, &md5ctx);
-        aug_md5base64(digest, base64);
-        return base64;
-    }
-
     struct session : basic_marnonstatic {
         const string& realm_;
         augas_id id_;
         const string addr_;
-        AUG_MD5BASE64 nonce_;
+        aug_md5base64_t nonce_;
         bool auth_;
         session(const string& realm, augas_id id, const string& addr)
             : realm_(realm),
@@ -486,6 +466,7 @@ namespace {
               auth_(false)
         {
             nonce(id_, addr_, nonce_);
+            aug_info("nonce: [%s]", nonce_);
         }
         void
         message(const char* initial, aug_mar_t mar)

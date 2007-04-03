@@ -10,7 +10,7 @@
 
 #define AUG_MD5BASE64LEN 32
 
-typedef char AUG_MD5BASE64[AUG_MD5BASE64LEN + 1];
+typedef char aug_md5base64_t[AUG_MD5BASE64LEN + 1];
 
 struct aug_md5context {
     uint32_t buf[4];
@@ -29,6 +29,6 @@ AUGUTIL_API void
 aug_finishmd5(unsigned char digest[16], struct aug_md5context* ctx);
 
 AUGUTIL_API const char*
-aug_md5base64(const unsigned char digest[16], AUG_MD5BASE64 base64);
+aug_md5base64(const unsigned char digest[16], aug_md5base64_t base64);
 
 #endif /* AUGUTIL_MD5_H */

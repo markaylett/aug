@@ -8,17 +8,15 @@
 
 #include "augutil/md5.h"
 
-AUGNET_API const char*
-aug_digestha1(const char* alg, const char* username,
-              const char* realm, const char* password,
-              const char* nonce, const char* cnonce,
-              AUG_MD5BASE64 sessionkey);
+AUGNET_API char*
+aug_digestha1(const char* alg, const char* username, const char* realm,
+              const char* password, const char* nonce, const char* cnonce,
+              aug_md5base64_t base64);
 
-AUGNET_API const char*
-aug_digestresponse(const AUG_MD5BASE64 ha1, const char* nonce,
-                   const char* noncecount, const char* cnonce,
-                   const char* qop, const char* method,
-                   const char* digesturi, const AUG_MD5BASE64 hentity,
-                   AUG_MD5BASE64 response);
+AUGNET_API char*
+aug_digestresponse(const aug_md5base64_t ha1, const char* nonce,
+                   const char* nc, const char* cnonce, const char* qop,
+                   const char* method, const char* uri,
+                   const aug_md5base64_t hentity, aug_md5base64_t base64);
 
 #endif /* AUGNET_AUTH_H */

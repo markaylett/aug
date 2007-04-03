@@ -8,11 +8,6 @@
 
 AUG_RCSID("$Id$");
 
-#define MD5_CTX struct aug_md5context
-#define MD5Init aug_initmd5
-#define MD5Update aug_appendmd5
-#define MD5Final aug_finishmd5
-
 #if defined(_WIN32)
 # include "augutil/pwd.h"
 # define MPE
@@ -92,10 +87,7 @@ void putline(FILE *f,char *l) {
 
 void add_password(char *user, char *realm, FILE *f) {
     char *pw;
-    MD5_CTX context;
-    unsigned char digest[16];
-    char string[MAX_STRING_LEN];
-    unsigned int i;
+    aug_md5base64_t base64;
 
     pw = strd((char *) getpass("New password:"));
     if(strcmp(pw,(char *) getpass("Re-type new password:"))) {
@@ -104,19 +96,10 @@ void add_password(char *user, char *realm, FILE *f) {
             unlink(tn);
         exit(1);
     }
-    fprintf(f,"%s:%s:",user,realm);
 
     /* Do MD5 stuff */
-    sprintf(string, "%s:%s:%s", user, realm, pw);
-
-    MD5Init (&context);
-    MD5Update (&context, (unsigned char *) string, strlen(string));
-    MD5Final (digest, &context);
-
-    for (i = 0; i < 16; i++)
-        fprintf(f, "%02x", digest[i]);
-
-    fprintf(f, "\n");
+    aug_digestpass(user, realm, pw, base64);
+    fprintf(f, "%s:%s:%s\n",user,realm,base64);
 }
 
 void usage() {
