@@ -148,6 +148,9 @@
 				RelativePath="..\src\c\augutil\timer.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augutil\tmspec.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augutil\var.c">
 			</File>
 		</Filter>
@@ -193,6 +196,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\timer.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augutil\tmspec.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\var.h">

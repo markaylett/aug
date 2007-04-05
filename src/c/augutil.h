@@ -16,6 +16,7 @@
 #include "augutil/pwd.h"
 #include "augutil/strbuf.h"
 #include "augutil/timer.h"
+#include "augutil/tmspec.h"
 #include "augutil/var.h"
 
 #endif /* AUGUTIL_H */

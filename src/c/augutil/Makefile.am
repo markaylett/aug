@@ -18,6 +18,7 @@ modinclude_HEADERS = \
 	pwd.h \
 	strbuf.h \
 	timer.h \
+	tmspec.h \
 	var.h
 
 noinst_HEADERS =
@@ -38,6 +39,7 @@ libaugutil_la_SOURCES = \
 	pwd.c \
 	strbuf.c \
 	timer.c \
+	tmspec.c \
 	var.c
 
 libaugutil_la_LDFLAGS = \

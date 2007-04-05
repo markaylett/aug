@@ -63,7 +63,7 @@ libaugutil_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugutil_la_OBJECTS = config.lo conv.lo event.lo file.lo \
 	getopt.lo lexer.lo list.lo log.lo md5.lo path.lo pwd.lo \
-	strbuf.lo timer.lo var.lo
+	strbuf.lo timer.lo tmspec.lo var.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
 am_augutil_test_OBJECTS = test.$(OBJEXT)
 augutil_test_OBJECTS = $(am_augutil_test_OBJECTS)
@@ -227,6 +227,7 @@ modinclude_HEADERS = \
 	pwd.h \
 	strbuf.h \
 	timer.h \
+	tmspec.h \
 	var.h
 
 noinst_HEADERS = 
@@ -245,6 +246,7 @@ libaugutil_la_SOURCES = \
 	pwd.c \
 	strbuf.c \
 	timer.c \
+	tmspec.c \
 	var.c
 
 libaugutil_la_LDFLAGS = \
@@ -352,6 +354,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strbuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tmspec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/var.Plo@am__quote@
 
 .c.o:
