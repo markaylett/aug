@@ -69,6 +69,9 @@ modhttp_la_OBJECTS = $(am_modhttp_la_OBJECTS)
 modminimal_la_DEPENDENCIES =
 am_modminimal_la_OBJECTS = minimal.lo
 modminimal_la_OBJECTS = $(am_modminimal_la_OBJECTS)
+modsched_la_DEPENDENCIES =
+am_modsched_la_OBJECTS = sched.lo
+modsched_la_OBJECTS = $(am_modsched_la_OBJECTS)
 modserver_la_DEPENDENCIES =
 am_modserver_la_OBJECTS = server.lo
 modserver_la_OBJECTS = $(am_modserver_la_OBJECTS)
@@ -91,9 +94,11 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(modclient_la_SOURCES) $(modhttp_la_SOURCES) \
-	$(modminimal_la_SOURCES) $(modserver_la_SOURCES)
+	$(modminimal_la_SOURCES) $(modsched_la_SOURCES) \
+	$(modserver_la_SOURCES)
 DIST_SOURCES = $(modclient_la_SOURCES) $(modhttp_la_SOURCES) \
-	$(modminimal_la_SOURCES) $(modserver_la_SOURCES)
+	$(modminimal_la_SOURCES) $(modsched_la_SOURCES) \
+	$(modserver_la_SOURCES)
 exampleDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(example_DATA)
 ETAGS = etags
@@ -228,6 +233,7 @@ example_DATA = \
 	client.cpp \
 	http.cpp \
 	minimal.c \
+	sched.cpp \
 	server.cpp
 
 moddir = $(prefix)/mod
@@ -235,6 +241,7 @@ mod_LTLIBRARIES = \
 	modclient.la \
 	modhttp.la \
 	modminimal.la \
+	modsched.la \
 	modserver.la
 
 modclient_la_SOURCES = client.cpp
@@ -253,6 +260,9 @@ modhttp_la_LIBADD = \
 modminimal_la_SOURCES = minimal.c
 modminimal_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modminimal_la_LIBADD = 
+modsched_la_SOURCES = sched.cpp
+modsched_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
+modsched_la_LIBADD = 
 modserver_la_SOURCES = server.cpp
 modserver_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modserver_la_LIBADD = 
@@ -322,6 +332,8 @@ modhttp.la: $(modhttp_la_OBJECTS) $(modhttp_la_DEPENDENCIES)
 	$(CXXLINK) -rpath $(moddir) $(modhttp_la_LDFLAGS) $(modhttp_la_OBJECTS) $(modhttp_la_LIBADD) $(LIBS)
 modminimal.la: $(modminimal_la_OBJECTS) $(modminimal_la_DEPENDENCIES) 
 	$(LINK) -rpath $(moddir) $(modminimal_la_LDFLAGS) $(modminimal_la_OBJECTS) $(modminimal_la_LIBADD) $(LIBS)
+modsched.la: $(modsched_la_OBJECTS) $(modsched_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(moddir) $(modsched_la_LDFLAGS) $(modsched_la_OBJECTS) $(modsched_la_LIBADD) $(LIBS)
 modserver.la: $(modserver_la_OBJECTS) $(modserver_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(moddir) $(modserver_la_LDFLAGS) $(modserver_la_OBJECTS) $(modserver_la_LIBADD) $(LIBS)
 
@@ -334,6 +346,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minimal.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sched.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
 
 .c.o:

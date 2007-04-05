@@ -5,16 +5,12 @@
 #include "augutil/tmspec.h"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include <time.h>
 #include <string.h> /* memcpy() */
 
 #define FIXED_(x) (-1 != (x))
-
-struct tmspec {
-    int min_, hour_, mday_, mon_, wday_;
-};
 
 static const int MDAYS_[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
@@ -38,14 +34,14 @@ mday_(const struct tm* tm)
 }
 
 static void
-nextmon_(struct tm* tm, const struct tmspec* tms)
+nextmon_(struct tm* tm, const struct aug_tmspec* tms)
 {
     if (FIXED_(tms->mon_) || 0 == (tm->tm_mon = (tm->tm_mon + 1) % 12))
         ++tm->tm_year;
 }
 
 static void
-nextmday_(struct tm* tm, const struct tmspec* tms)
+nextmday_(struct tm* tm, const struct aug_tmspec* tms)
 {
     if (FIXED_(tms->mday_))
         nextmon_(tm, tms);
@@ -57,41 +53,41 @@ nextmday_(struct tm* tm, const struct tmspec* tms)
 }
 
 static void
-nextmhour_(struct tm* tm, const struct tmspec* tms)
+nextmhour_(struct tm* tm, const struct aug_tmspec* tms)
 {
     if (FIXED_(tms->hour_) || 0 == (tm->tm_hour = (tm->tm_hour + 1) % 24))
         nextmday_(tm, tms);
 }
 
 static void
-nextmmin_(struct tm* tm, const struct tmspec* tms)
+nextmmin_(struct tm* tm, const struct aug_tmspec* tms)
 {
     if (FIXED_(tms->min_) || 0 == (tm->tm_min = (tm->tm_min + 1) % 60))
         nextmhour_(tm, tms);
 }
 
 static void
-nextwday_(struct tm* tm, const struct tmspec* tms)
+nextwday_(struct tm* tm, const struct aug_tmspec* tms)
 {
     tm->tm_mday += FIXED_(tms->wday_) ? 7 : 1;
 }
 
 static void
-nextwhour_(struct tm* tm, const struct tmspec* tms)
+nextwhour_(struct tm* tm, const struct aug_tmspec* tms)
 {
     if (FIXED_(tms->hour_) || 0 == (tm->tm_hour = (tm->tm_hour + 1) % 24))
         nextwday_(tm, tms);
 }
 
 static void
-nextwmin_(struct tm* tm, const struct tmspec* tms)
+nextwmin_(struct tm* tm, const struct aug_tmspec* tms)
 {
     if (FIXED_(tms->min_) || 0 == (tm->tm_min = (tm->tm_min + 1) % 60))
         nextwhour_(tm, tms);
 }
 
 static void
-nextmtime_(struct tm* tm, const struct tmspec* tms)
+nextmtime_(struct tm* tm, const struct aug_tmspec* tms)
 {
     struct tm out = { 0 };
 
@@ -172,7 +168,7 @@ nextmtime_(struct tm* tm, const struct tmspec* tms)
 }
 
 static void
-nextwtime_(struct tm* tm, const struct tmspec* tms)
+nextwtime_(struct tm* tm, const struct aug_tmspec* tms)
 {
     struct tm out = { 0 };
 
@@ -229,8 +225,8 @@ nextwtime_(struct tm* tm, const struct tmspec* tms)
     memcpy(tm, &out, sizeof(out));
 }
 
-AUGUTIL_API struct tmspec*
-aug_strtmspec(struct tmspec* tms, const char* s)
+AUGUTIL_API struct aug_tmspec*
+aug_strtmspec(struct aug_tmspec* tms, const char* s)
 {
     char ch;
     int x = 0;
@@ -299,9 +295,9 @@ aug_strtmspec(struct tmspec* tms, const char* s)
 }
 
 AUGUTIL_API struct tm*
-aug_nexttime(struct tm* tm, const struct tmspec* tms)
+aug_nexttime(struct tm* tm, const struct aug_tmspec* tms)
 {
-    void (*fn)(struct tm*, const struct tmspec*) = NULL;
+    void (*fn)(struct tm*, const struct aug_tmspec*) = NULL;
 
     if (FIXED_(tms->wday_)) {
 

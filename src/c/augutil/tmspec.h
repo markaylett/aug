@@ -12,10 +12,10 @@ struct aug_tmspec {
     int min_, hour_, mday_, mon_, wday_;
 };
 
-AUGUTIL_API struct tmspec*
-aug_strtmspec(struct tmspec* tms, const char* s);
+AUGUTIL_API struct aug_tmspec*
+aug_strtmspec(struct aug_tmspec* tms, const char* s);
 
 AUGUTIL_API struct tm*
-aug_nexttime(struct tm* tm, const struct tmspec* tms);
+aug_nexttime(struct tm* tm, const struct aug_tmspec* tms);
 
 #endif /* AUGUTIL_TMSPEC_H */
