@@ -10,6 +10,26 @@ AUG_RCSID("$Id$");
 #include <time.h>
 #include <string.h> /* memcpy() */
 
+/*
+  Given a specification, the next expiry time is calculated as follows:
+
+  Fix any time components that have been specified, and zero those that
+  haven't.  Note: this assumes zero-based indexes for all time components
+  (month, dayofmonth, hour and minute).
+
+  So, for example, "10d11H" becomes: m=0, d=10, H=11, M=0
+
+  Then, for each time component, largest to smallest:
+
+  If time component is fixed and not equal to current value, ensure that it is
+  in future: if past, roll next, larger time component that is not fixed.
+
+  In the example above, assuming that the current day is the tenth day of the
+  month, if the current hour is 12 then "11H" is in the past: the day cannot
+  be rolled because it is fixed, so the month is rolled.
+
+ */
+
 #define FIXED_(x) (-1 != (x))
 
 static const int MDAYS_[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -91,6 +111,8 @@ nextmtime_(struct tm* tm, const struct aug_tmspec* tms)
 {
     struct tm out = { 0 };
 
+    /* Set defaults. */
+
     if (FIXED_(tms->min_))
         out.tm_min = tms->min_;
 
@@ -112,6 +134,8 @@ nextmtime_(struct tm* tm, const struct aug_tmspec* tms)
             if (out.tm_mon < tm->tm_mon)
                 ++out.tm_year;
 
+            /* Future. */
+
             goto done;
         }
 
@@ -127,6 +151,8 @@ nextmtime_(struct tm* tm, const struct aug_tmspec* tms)
             if (mday < tm->tm_mday)
                 nextmon_(&out, tms);
 
+            /* Future. */
+
             goto done;
         }
 
@@ -140,6 +166,8 @@ nextmtime_(struct tm* tm, const struct aug_tmspec* tms)
             if (out.tm_hour < tm->tm_hour)
                 nextmday_(&out, tms);
 
+            /* Future. */
+
             goto done;
         }
 
@@ -152,6 +180,8 @@ nextmtime_(struct tm* tm, const struct aug_tmspec* tms)
 
             if (out.tm_min < tm->tm_min)
                 nextmhour_(&out, tms);
+
+            /* Future. */
 
             goto done;
         }
@@ -172,6 +202,8 @@ nextwtime_(struct tm* tm, const struct aug_tmspec* tms)
 {
     struct tm out = { 0 };
 
+    /* Set defaults. */
+
     if (FIXED_(tms->min_))
         out.tm_min = tms->min_;
 
@@ -188,6 +220,9 @@ nextwtime_(struct tm* tm, const struct aug_tmspec* tms)
         if (wdays) {
 
             out.tm_mday += wdays;
+
+            /* Future. */
+
             goto done;
         }
     }
@@ -198,6 +233,8 @@ nextwtime_(struct tm* tm, const struct aug_tmspec* tms)
 
             if (out.tm_hour < tm->tm_hour)
                 nextwday_(&out, tms);
+
+            /* Future. */
 
             goto done;
         }
@@ -211,6 +248,8 @@ nextwtime_(struct tm* tm, const struct aug_tmspec* tms)
 
             if (out.tm_min < tm->tm_min)
                 nextwhour_(&out, tms);
+
+            /* Future. */
 
             goto done;
         }
