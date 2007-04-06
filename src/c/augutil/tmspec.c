@@ -11,7 +11,7 @@ AUG_RCSID("$Id$");
 #include <string.h> /* memcpy() */
 
 /*
-  Given a specification, the next expiry time is calculated as follows:
+  Given a time specification, the next expiry time is calculated as follows:
 
   Fix any time components that have been specified, and zero those that
   haven't.  Note: this assumes zero-based indexes for all time components
@@ -21,13 +21,17 @@ AUG_RCSID("$Id$");
 
   Then, for each time component, largest to smallest:
 
-  If time component is fixed and not equal to current value, ensure that it is
-  in future: if past, roll next, larger time component that is not fixed.
+  If the time component is fixed and not equal to current value then ensure
+  that it is in future and then finish: move a fixed value to the future by
+  rolling the next, larger time component that is not fixed.
 
   In the example above, assuming that the current day is the tenth day of the
   month, if the current hour is 12 then "11H" is in the past: the day cannot
   be rolled because it is fixed, so the month is rolled.
 
+  If a fixed time component is equal to the current value then move to the
+  next, smaller time component.  If a time component is not fixed then set it
+  to the current value.
  */
 
 #define FIXED_(x) (-1 != (x))
