@@ -45,13 +45,13 @@ static const char LABELS_[][7] = {
 };
 
 static int
-gmtime_(struct tm* res)
+localtime_(struct tm* res)
 {
     struct timeval tv;
     if (-1 == aug_gettimeofday(&tv, NULL))
         return -1;
 
-    if (!aug_gmtime(&tv.tv_sec, res))
+    if (!aug_localtime(&tv.tv_sec, res))
         return -1;
 
     return tv.tv_usec / 1000;
@@ -106,7 +106,7 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
         return -1;
     }
 
-    if (-1 == (ms = gmtime_(&tm)))
+    if (-1 == (ms = localtime_(&tm)))
         return -1;
 
     /* The return value from the strftime function is either a) the number of
