@@ -18,6 +18,7 @@ modhttp_LIBS = augnet augutil augmar augsys
 modminimal_OBJS = minimal.o
 
 modsched_OBJS = sched.o
+modsched_LIBS = augutil augsys
 
 modserver_OBJS = server.o
 

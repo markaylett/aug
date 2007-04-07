@@ -4,7 +4,8 @@ EXTRA_DIST = \
 	bench.conf \
 	http.conf \
 	modules.mk \
-	passwd.txt
+	passwd.txt \
+	sched.conf
 
 exampledir = $(prefix)/example/augas
 example_DATA = \
@@ -42,7 +43,9 @@ modminimal_la_LIBADD =
 
 modsched_la_SOURCES = sched.cpp
 modsched_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
-modsched_la_LIBADD =
+modsched_la_LIBADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 modserver_la_SOURCES = server.cpp
 modserver_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined

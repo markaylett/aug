@@ -130,6 +130,7 @@ nextmtime_(struct tm* tm, const struct aug_tmspec* tms)
         out.tm_mon = tms->mon_;
 
     out.tm_year = tm->tm_year;
+    out.tm_isdst = tm->tm_isdst;
 
     if (FIXED_(tms->mon_)) {
 
@@ -217,6 +218,7 @@ nextwtime_(struct tm* tm, const struct aug_tmspec* tms)
     out.tm_mday = tm->tm_mday;
     out.tm_mon = tm->tm_mon;
     out.tm_year = tm->tm_year;
+    out.tm_isdst = tm->tm_isdst;
 
     if (FIXED_(tms->wday_)) {
 
