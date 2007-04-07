@@ -13,6 +13,23 @@ using namespace std;
 
 namespace {
 
+#if 0
+    time_t
+    timegm(tm& tm)
+    {
+        char* tz(::getenv("TZ"));
+        setenv("TZ", "", 1);
+        tzset();
+        int ret(mktime(&tm));
+        if (tz)
+            setenv("TZ", tz, 1);
+        else
+            unsetenv("TZ");
+        tzset();
+        return ret;
+    }
+#endif
+
     struct tmevent {
         const string name_;
         aug_tmspec spec_;
