@@ -15,7 +15,15 @@ AUG_RCSID("$Id$");
 # include "augsys/win32/time.c"
 #endif /* _WIN32 */
 
-#include <errno.h>
+AUGSYS_API time_t
+aug_timelocal(struct tm* tm)
+{
+    time_t ret = mktime(tm);
+    if (ret == (time_t)-1)
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+                            ? EINVAL : errno);
+    return ret;
+}
 
 AUGSYS_API struct tm*
 aug_gmtime(const time_t* clock, struct tm* res)

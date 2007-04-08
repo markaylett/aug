@@ -12,3 +12,22 @@ aug_gettimeofday(struct timeval* tv, struct timezone* tz)
     }
     return 0;
 }
+
+AUGSYS_API time_t
+aug_timegm(struct tm* tm)
+{
+    time_t ret;
+    const char* tz = getenv("TZ");
+    setenv("TZ", "", 1);
+    tzset();
+    ret = mktime(tm);
+    if (tz)
+        setenv("TZ", tz, 1);
+    else
+        unsetenv("TZ");
+    tzset();
+    if (ret == (time_t)-1)
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+                            ? EINVAL : errno);
+    return ret;
+}

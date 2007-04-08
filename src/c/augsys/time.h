@@ -29,6 +29,12 @@ struct timezone {
 AUGSYS_API int
 aug_gettimeofday(struct timeval* tv, struct timezone* tz);
 
+AUGSYS_API time_t
+aug_timegm(struct tm* tm);
+
+AUGSYS_API time_t
+aug_timelocal(struct tm* tm);
+
 AUGSYS_API struct tm*
 aug_gmtime(const time_t* clock, struct tm* res);
 
