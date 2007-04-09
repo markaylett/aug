@@ -55,7 +55,7 @@ aug_gmtime(const time_t* clock, struct tm* res)
 # error "gmtime_r is required on non-Windows platform"
 #endif /* !HAVE_LOCALTIME_R && !_WIN32 */
 
-    return ret;
+    return res;
 
  fail:
     aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
@@ -93,7 +93,7 @@ aug_localtime(const time_t* clock, struct tm* res)
 # error "localtime_r is required on non-Windows platform"
 #endif /* !HAVE_LOCALTIME_R && !_WIN32 */
 
-    return ret;
+    return res;
 
  fail:
     aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno

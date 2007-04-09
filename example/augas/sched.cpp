@@ -49,21 +49,22 @@ namespace {
     void
     pushevent(tmqueue& q, time_t now, const tmeventptr& ptr)
     {
+        tm tm;
         if (ptr->utc_) {
 
-            tm* gmt(gmtime(&now));
-            if (aug_nexttime(gmt, &ptr->spec_)) {
-                q.push(make_pair(aug_timegm(gmt), ptr));
+            aug_gmtime(&now, &tm);
+            if (aug_nexttime(&tm, &ptr->spec_)) {
+                q.push(make_pair(now = aug_timegm(&tm), ptr));
                 aug_info("event scheduled: %s at %s UTC", ptr->name_.c_str(),
-                         tmstring(*gmt).c_str());
+                         tmstring(*aug_localtime(&now, &tm)).c_str());
             }
         } else {
 
-            tm* local(localtime(&now));
-            if (aug_nexttime(local, &ptr->spec_)) {
-                q.push(make_pair(aug_timelocal(local), ptr));
+            aug_localtime(&now, &tm);
+            if (aug_nexttime(&tm, &ptr->spec_)) {
+                q.push(make_pair(now = aug_timelocal(&tm), ptr));
                 aug_info("event scheduled: %s at %s", ptr->name_.c_str(),
-                         tmstring(*local).c_str());
+                         tmstring(*aug_localtime(&now, &tm)).c_str());
             }
         }
     }
