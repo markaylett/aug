@@ -15,15 +15,18 @@ namespace {
 
     struct tmevent {
         const string name_;
+        const bool utc_;
         aug_tmspec spec_;
         explicit
-        tmevent(const string& name)
-            : name_(name)
+        tmevent(const string& name, bool utc)
+            : name_(name),
+              utc_(utc)
         {
         }
     };
 
-    typedef pair<time_t, smartptr<tmevent> > tmpair;
+    typedef smartptr<tmevent> tmeventptr;
+    typedef pair<time_t, tmeventptr> tmpair;
 
     struct tmgreater {
         bool
@@ -44,10 +47,34 @@ namespace {
     }
 
     void
-    pushevent(tmqueue& q, const string& name, time_t now)
+    pushevent(tmqueue& q, time_t now, const tmeventptr& ptr)
     {
-        const char* tmspecs(augas::getenv(string("service.sched.event.")
-                                          .append(name).c_str()));
+        if (ptr->utc_) {
+
+            tm* gmt(gmtime(&now));
+            if (aug_nexttime(gmt, &ptr->spec_)) {
+                q.push(make_pair(aug_timegm(gmt), ptr));
+                aug_info("event scheduled: %s at %s UTC", ptr->name_.c_str(),
+                         tmstring(*gmt).c_str());
+            }
+        } else {
+
+            tm* local(localtime(&now));
+            if (aug_nexttime(local, &ptr->spec_)) {
+                q.push(make_pair(aug_timelocal(local), ptr));
+                aug_info("event scheduled: %s at %s", ptr->name_.c_str(),
+                         tmstring(*local).c_str());
+            }
+        }
+    }
+
+    void
+    pushevent(tmqueue& q, time_t now, const string& name, bool utc)
+    {
+        const char* tmspecs
+            (augas::getenv(string("service.sched.event.")
+                           .append(name).append(utc ? ".utc" : ".local")
+                           .c_str()));
         if (!tmspecs)
             return;
 
@@ -55,16 +82,9 @@ namespace {
         string tmspec;
         while (is >> tmspec) {
 
-            tm* local(localtime(&now));
-            smartptr<tmevent> sptr(new tmevent(name));
-
-            if (aug_strtmspec(&sptr->spec_, tmspec.c_str())
-                && aug_nexttime(local, &sptr->spec_)) {
-
-                q.push(make_pair(mktime(local), sptr));
-                aug_info("event scheduled: %s at %s", name.c_str(),
-                         tmstring(*local).c_str());
-            }
+            tmeventptr ptr(new tmevent(name, utc));
+            if (aug_strtmspec(&ptr->spec_, tmspec.c_str()))
+                pushevent(q, now, ptr);
         }
     }
 
@@ -77,8 +97,10 @@ namespace {
 
         istringstream is(events);
         string name;
-        while (is >> name)
-            pushevent(q, name, now);
+        while (is >> name) {
+            pushevent(q, now, name, true);
+            pushevent(q, now, name, false);
+        }
     }
 
     unsigned
@@ -120,14 +142,9 @@ namespace {
 
             while (!queue_.empty() && queue_.top().first <= now) {
 
-                tm* local(localtime(&now));
-                smartptr<tmevent> sptr(queue_.top().second);
+                tmeventptr ptr(queue_.top().second);
                 queue_.pop();
-
-                aug_info("event triggered: %s at %s",
-                         sptr->name_.c_str(), tmstring(*local).c_str());
-                if (aug_nexttime(local, &sptr->spec_))
-                    queue_.push(make_pair(mktime(local), sptr));
+                pushevent(queue_, now, ptr);
             }
 
             ms = timerms(queue_, tv);
