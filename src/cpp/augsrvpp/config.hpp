@@ -12,7 +12,7 @@
 # define AUGSRVPP_IMPORT __declspec(dllimport)
 #endif // _WIN32
 
-#if defined(DLL_EXPORT)
+#if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGSRVPP_SHARED
 #endif // DLL_EXPORT
 

@@ -1,17 +1,22 @@
 EXTRA_DIST = \
 	augas.sln \
 	augas.vcproj \
-	augmarpp.vcproj \
 	augmar.vcproj \
-	augnetpp.vcproj \
+	augmarpp.vcproj \
 	augnet.vcproj \
+	augnetpp.vcproj \
 	augpy.vcproj \
-	augsrvpp.vcproj \
 	augsrv.vcproj \
-	augsyspp.vcproj \
+	augsrvpp.vcproj \
 	augsys.vcproj \
-	augutilpp.vcproj \
+	augsyspp.vcproj \
 	augutil.vcproj \
+	augutilpp.vcproj \
+	client.vcproj \
+	http.vcproj \
+	minimal.vcproj \
+	sched.vcproj \
+	server.vcproj \
 	setup.vdproj \
 	install.bat \
 	reconf.bat \
@@ -19,4 +24,3 @@ EXTRA_DIST = \
 	stop.bat \
 	test.bat \
 	uninstall.bat
-

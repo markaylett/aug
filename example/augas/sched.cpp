@@ -13,14 +13,16 @@ using namespace std;
 
 namespace {
 
+    enum tmtype { TMLOCAL, TMUTC };
+
     struct tmevent {
         const string name_;
-        const bool utc_;
+        const tmtype type_;
         aug_tmspec spec_;
         explicit
-        tmevent(const string& name, bool utc)
+        tmevent(const string& name, tmtype type)
             : name_(name),
-              utc_(utc)
+              type_(type)
         {
         }
     };
@@ -50,31 +52,31 @@ namespace {
     pushevent(tmqueue& q, time_t now, const tmeventptr& ptr)
     {
         tm tm;
-        if (ptr->utc_) {
+        if (TMUTC == ptr->type_) {
 
-            aug_gmtime(&now, &tm);
-            if (aug_nexttime(&tm, &ptr->spec_)) {
-                q.push(make_pair(now = aug_timegm(&tm), ptr));
-                aug_info("event scheduled: %s at %s UTC", ptr->name_.c_str(),
-                         tmstring(*aug_localtime(&now, &tm)).c_str());
-            }
+            if (!aug_nexttime(aug_gmtime(&now, &tm), &ptr->spec_))
+                return;
+
+            q.push(make_pair(now = aug_timegm(&tm), ptr));
+
         } else {
 
-            aug_localtime(&now, &tm);
-            if (aug_nexttime(&tm, &ptr->spec_)) {
-                q.push(make_pair(now = aug_timelocal(&tm), ptr));
-                aug_info("event scheduled: %s at %s", ptr->name_.c_str(),
-                         tmstring(*aug_localtime(&now, &tm)).c_str());
-            }
+            if (!aug_nexttime(aug_localtime(&now, &tm), &ptr->spec_))
+                return;
+
+            q.push(make_pair(now = aug_timelocal(&tm), ptr));
         }
+
+        aug_info("event [%s] scheduled for %s", ptr->name_.c_str(),
+                 tmstring(*aug_localtime(&now, &tm)).c_str());
     }
 
     void
-    pushevent(tmqueue& q, time_t now, const string& name, bool utc)
+    pushevent(tmqueue& q, time_t now, const string& name, tmtype type)
     {
         const char* tmspecs
-            (augas::getenv(string("service.sched.event.")
-                           .append(name).append(utc ? ".utc" : ".local")
+            (augas::getenv(string("service.sched.event.").append(name)
+                           .append(TMUTC == type ? ".utc" : ".local")
                            .c_str()));
         if (!tmspecs)
             return;
@@ -83,7 +85,7 @@ namespace {
         string tmspec;
         while (is >> tmspec) {
 
-            tmeventptr ptr(new tmevent(name, utc));
+            tmeventptr ptr(new tmevent(name, type));
             if (aug_strtmspec(&ptr->spec_, tmspec.c_str()))
                 pushevent(q, now, ptr);
         }
@@ -99,8 +101,8 @@ namespace {
         istringstream is(events);
         string name;
         while (is >> name) {
-            pushevent(q, now, name, true);
-            pushevent(q, now, name, false);
+            pushevent(q, now, name, TMLOCAL);
+            pushevent(q, now, name, TMUTC);
         }
     }
 
@@ -135,6 +137,12 @@ namespace {
             return true;
         }
         void
+        do_event(const char* from, const char* type, const void* user,
+                 size_t size)
+        {
+            aug_info("event [%s] triggered", type);
+        }
+        void
         do_expire(const object& timer, unsigned& ms)
         {
             timeval tv;
@@ -145,6 +153,7 @@ namespace {
 
                 tmeventptr ptr(queue_.top().second);
                 queue_.pop();
+                augas_post("schedclient", ptr->name_.c_str(), 0);
                 pushevent(queue_, now, ptr);
             }
 

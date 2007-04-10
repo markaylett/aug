@@ -334,6 +334,11 @@ namespace augas {
     const char*
     getenv_(const char* name, const char* def)
     {
+        // Return absolute rundir.
+
+        if (0 == strcmp(name, "rundir"))
+            return rundir_;
+
         try {
 
             const char* value(options_.get(name, 0));

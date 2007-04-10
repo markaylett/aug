@@ -153,7 +153,7 @@ func()
 ])
 
 # Checks for library functions.
-AC_CHECK_FUNCS([bzero localtime_r poll strlcpy])
+AC_CHECK_FUNCS([bzero localtime_r poll strlcpy timegm])
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile

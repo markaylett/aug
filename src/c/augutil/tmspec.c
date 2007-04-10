@@ -22,7 +22,7 @@ AUG_RCSID("$Id$");
   Then, for each time component, largest to smallest:
 
   If the time component is fixed and not equal to current value then ensure
-  that it is in future and then finish: move a fixed value to the future by
+  that it's in future and then finish: move a fixed value to the future by
   rolling the next, larger time component that is not fixed.
 
   In the example above, assuming that the current day is the tenth day of the

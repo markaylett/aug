@@ -25,18 +25,32 @@ aug_gettimeofday(struct timeval* tv, struct timezone* tz)
 AUGSYS_API time_t
 aug_timegm(struct tm* tm)
 {
-    time_t ret;
-    const char* tz = getenv("TZ");
-    SetEnvironmentVariable("TZ", "");
-    tzset();
-    ret = mktime(tm);
-    if (tz)
-        SetEnvironmentVariable("TZ", tz);
-    else
-        SetEnvironmentVariable("TZ", NULL);
-    tzset();
-    if (ret == (time_t)-1)
+    TIME_ZONE_INFORMATION tz;
+    time_t ret = mktime(tm);
+
+    if (ret == (time_t)-1) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
+        return ret;
+    }
+
+    switch(GetTimeZoneInformation(&tz)) {
+    case TIME_ZONE_ID_INVALID:
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+        ret = (time_t)-1;
+        break;
+    case TIME_ZONE_ID_UNKNOWN:
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+                       AUG_MSG("timezone id unknown"));
+        ret = (time_t)-1;
+        break;
+    case TIME_ZONE_ID_STANDARD:
+        ret -= (tz.Bias + tz.StandardBias) * 60;
+        break;
+    case TIME_ZONE_ID_DAYLIGHT:
+        ret -= (tz.Bias + tz.DaylightBias) * 60;
+        break;
+    }
+
     return ret;
 }

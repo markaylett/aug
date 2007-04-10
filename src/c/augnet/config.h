@@ -18,7 +18,7 @@
 # define AUGNET_IMPORT AUGNET_EXTERN __declspec(dllimport)
 #endif /* _WIN32 */
 
-#ifdef DLL_EXPORT
+#if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGNET_SHARED
 #endif /* DLL_EXPORT */
 

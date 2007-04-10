@@ -12,9 +12,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="lib"
+			OutputDirectory="bin"
 			IntermediateDirectory="debug/augsrvpp"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
@@ -34,8 +34,16 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/libaugsrvpp.lib"/>
+				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
+				OutputFile="$(OutDir)/lib$(ProjectName).dll"
+				LinkIncremental="1"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				ImportLibrary=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -51,15 +59,17 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="lib"
+			OutputDirectory="bin"
 			IntermediateDirectory="release/augsrvpp"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
@@ -76,8 +86,16 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/libaugsrvpp.lib"/>
+				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
+				OutputFile="$(OutDir)/lib$(ProjectName).dll"
+				LinkIncremental="1"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				ImportLibrary=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -93,6 +111,8 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
@@ -100,8 +120,17 @@
 	</Configurations>
 	<References>
 		<ProjectReference
-			ReferencedProjectIdentifier="{91B6CDD3-4C09-428D-BBC8-09FCC9A4AAC4}"
-			Name="augutilpp"/>
+			ReferencedProjectIdentifier="{01150DDF-A141-4B5B-A4FB-81FD65C964C5}"
+			Name="augmar"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{D71F12D2-E969-4A00-8173-FFA33C1B963E}"
+			Name="augsrv"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
+			Name="augsys"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{63BEF71A-3B15-494E-89B0-3CCDBF48B4E0}"
+			Name="augutil"/>
 	</References>
 	<Files>
 		<Filter

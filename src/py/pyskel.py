@@ -63,7 +63,7 @@ def start(sname):
 def reconf():
     log.debug("reconf()")
 
-def event(from, type, user):
+def event(frm, type, user):
     log.debug("event()")
 
 def closed(sock):

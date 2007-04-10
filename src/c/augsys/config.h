@@ -18,7 +18,7 @@
 # define AUGSYS_IMPORT AUGSYS_EXTERN __declspec(dllimport)
 #endif /* _WIN32 */
 
-#if defined(DLL_EXPORT)
+#if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGSYS_SHARED
 #endif /* DLL_EXPORT */
 

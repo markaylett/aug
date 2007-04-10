@@ -34,13 +34,15 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
 				OutputFile="$(OutDir)/modserver.dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/server.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/server.lib"
-				TargetMachine="1"/>
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				ImportLibrary=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -83,14 +85,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
 				OutputFile="$(OutDir)/modserver.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/server.lib"
-				TargetMachine="1"/>
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				ImportLibrary=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

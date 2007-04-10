@@ -17,6 +17,12 @@
 # define _S_IREAD S_IROTH
 #else // _WIN32
 # define lstat _stat
+# if !defined(_S_ISDIR)
+#  define _S_ISDIR(mode) (((mode) & _S_IFDIR) == _S_IFDIR)
+# endif // !_S_ISDIR
+# if !defined(_S_ISREG)
+#  define _S_ISREG(mode) (((mode) & _S_IFREG) == _S_IFREG)
+# endif // !_S_ISREG
 #endif // _WIN32
 
 using namespace aug;
@@ -46,7 +52,7 @@ namespace {
         // lstat() is used so that the link, rather than the file it
         // references, is stat()-ed.
 
-        if (-1 == lstat(path, &sb)) {
+		if (-1 == ::lstat(path, &sb)) {
             if (ENOENT != errno)
                 throw posix_error(__FILE__, __LINE__, errno);
             return false;
@@ -167,7 +173,8 @@ namespace {
 
         aug_initmd5(&md5ctx);
         aug_appendmd5(&md5ctx, (unsigned char*)&id, sizeof(id));
-        aug_appendmd5(&md5ctx, (unsigned char*)addr.data(), addr.size());
+        aug_appendmd5(&md5ctx, (unsigned char*)addr.data(),
+                      (unsigned)addr.size());
         aug_appendmd5(&md5ctx, (unsigned char*)&now, sizeof(now));
         aug_appendmd5(&md5ctx, (unsigned char*)&rand, sizeof(rand));
         if (salt)
@@ -339,7 +346,7 @@ namespace {
         header << "HTTP/1.1 200 OK\r\n"
                << "Date: " << utcdate() << "\r\n"
                << "Content-Type: text/html\r\n"
-               << "Content-Length: " << ptr->size() << "\r\n"
+               << "Content-Length: " << (unsigned)ptr->size() << "\r\n"
                << "\r\n";
 
         send(id, header.str().c_str(), header.str().size());
@@ -391,8 +398,8 @@ namespace {
         message << "HTTP/1.1 200 OK\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Content-Type: text/html\r\n"
-                << "Content-Length: " << content.str().size() << "\r\n"
-                << "\r\n"
+                << "Content-Length: " << (unsigned)content.str().size()
+                << "\r\n\r\n"
                 << content.rdbuf();
 
         send(id, message.str().c_str(), message.str().size());
@@ -420,8 +427,8 @@ namespace {
         message << "HTTP/1.1 200 OK\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Content-Type: text/html\r\n"
-                << "Content-Length: " << content.str().size() << "\r\n"
-                << "\r\n"
+                << "Content-Length: " << (unsigned)content.str().size()
+                << "\r\n\r\n"
                 << content.rdbuf();
 
         send(id, message.str().c_str(), message.str().size());
@@ -446,8 +453,8 @@ namespace {
             message << it->first << ": " << it->second << "\r\n";
 
         message << "Content-Type: text/html\r\n"
-                << "Content-Length: " << content.str().size() << "\r\n"
-                << "\r\n"
+                << "Content-Length: " << (unsigned)content.str().size()
+                << "\r\n\r\n"
                 << content.rdbuf();
 
         send(id, message.str().c_str(), message.str().size());
@@ -575,7 +582,7 @@ namespace {
             } catch (const http_error& e) {
                 aug_error("%d: %s", e.status(), e.what());
                 sendstatus(id_, e.status(), e.what());
-            } catch (const exception& e) {
+            } catch (const exception&) {
                 sendstatus(id_, 500, "Internal Server Error");
                 throw;
             }

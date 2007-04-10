@@ -34,13 +34,15 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
 				OutputFile="$(OutDir)/modclient.dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/client.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/client.lib"
-				TargetMachine="1"/>
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				ImportLibrary=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -83,14 +85,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
 				OutputFile="$(OutDir)/modclient.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/client.lib"
-				TargetMachine="1"/>
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				ImportLibrary=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -114,6 +116,9 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
+			Name="augsys"/>
 	</References>
 	<Files>
 		<Filter

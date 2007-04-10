@@ -29,6 +29,11 @@ struct timezone {
 AUGSYS_API int
 aug_gettimeofday(struct timeval* tv, struct timezone* tz);
 
+/**
+   Some implementations of this function may modify the TZ environment
+   variable.  It should not, therefore, be considered thread-safe.
+ */
+
 AUGSYS_API time_t
 aug_timegm(struct tm* tm);
 

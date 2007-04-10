@@ -35,7 +35,7 @@
    \brief Integration of configuration information set by Autoconf.
  */
 
-#if defined(DLL_EXPORT)
+#if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGMAR_SHARED
 #endif /* DLL_EXPORT */
 

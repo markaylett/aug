@@ -35,14 +35,15 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				IgnoreImportLibrary="FALSE"
-				OutputFile="$(OutDir)/modaugpy.dll"
-				LinkIncremental="2"
+				IgnoreImportLibrary="TRUE"
+				OutputFile="$(OutDir)/mod$(ProjectName).dll"
+				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/modaugpy.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/modaugpy.lib"
-				TargetMachine="1"/>
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				ImportLibrary=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -86,15 +87,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				IgnoreImportLibrary="FALSE"
-				OutputFile="$(OutDir)/modaugpy.dll"
+				IgnoreImportLibrary="TRUE"
+				OutputFile="$(OutDir)/mod$(ProjectName).dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/modaugpy.lib"
-				TargetMachine="1"/>
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				ImportLibrary=""/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
