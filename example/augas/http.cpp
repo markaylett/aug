@@ -31,6 +31,31 @@ using namespace std;
 
 namespace {
 
+    string css_;
+
+    void
+    loadcss()
+    {
+        const char* css(augas::getenv("service.http.css"));
+        if (css) {
+            aug::chdir(augas::getenv("rundir"));
+            ifstream fs(css);
+            stringstream ss;
+            ss << fs.rdbuf();
+            css_ = ss.str();
+        } else
+            css_.clear();
+    }
+
+    void
+    sethead(ostream& os, const string& title)
+    {
+        os << "<head><title>" << title << "</title>";
+        if (!css_.empty())
+            os << "<style type=\"text/css\">" << css_ << "</style>";
+        os << "</head>";
+    }
+
     class http_error : public domain_error {
         const int status_;
     public:
@@ -92,9 +117,10 @@ namespace {
         if (!passwd)
             return false;
 
-        ifstream is(passwd);
+        aug::chdir(augas::getenv("rundir"));
+        ifstream fs(passwd);
         string line;
-        while (getline(is, line)) {
+        while (getline(fs, line)) {
 
             trim(line);
             if (line.empty() || '#' == line[0])
@@ -119,7 +145,7 @@ namespace {
         xy = filterbase64(encoded.c_str(), encoded.size(), AUG_DECODE64);
         split2(xy.begin(), xy.end(), x, y, ':');
 
-        aug_info("%s", x.c_str());
+        aug_info("authenticating user [%s]", x.c_str());
 
         string digest;
         if (!getpass(x, realm, digest))
@@ -138,7 +164,7 @@ namespace {
         map<string, string> pairs;
         splitlist(pairs, list);
 
-        aug_info("%s", pairs["username"].c_str());
+        aug_info("authenticating user [%s]", pairs["username"].c_str());
 
         string digest;
         if (!getpass(pairs["username"], pairs["realm"], digest))
@@ -362,8 +388,9 @@ namespace {
     sendhome(augas_id id)
     {
         stringstream content;
-        content << "<html><head><title>AugAS</title></head>"
-            "<body><h2>augas console</h2><table>"
+        content << "<html>";
+        sethead(content, "AugAS");
+        content << "<body><h2>augas console</h2><table class=\"grid\">"
             "<tr><th>service</th><th>status</th></tr>";
 
         pages::const_iterator it(pages_.begin()), end(pages_.end());
@@ -392,7 +419,9 @@ namespace {
             content << "</td></tr>";
         }
 
-        content << "</table></body></html>";
+        content << "</table><p><form action=\"/reconf\""
+            " method=\"post\"><input type=\"submit\" value=\"RECONF\">"
+            "</form></p></body></html>";
 
         stringstream message;
         message << "HTTP/1.1 200 OK\r\n"
@@ -417,11 +446,10 @@ namespace {
             throw http_error(404, "Not Found");
 
         stringstream content;
-        content << "<html><head><title>"
-                << service << "&nbsp;" << page
-                << "</title></head><body><h2>" << service
-                << "&nbsp;service</h2>" << jt->second
-                << "</body></html>";
+        content << "<html>";
+        sethead(content, service + "&nbsp;" + page);
+        content << "<body><h2>" << service << "&nbsp;service</h2>"
+                << jt->second << "</body></html>";
 
         stringstream message;
         message << "HTTP/1.1 200 OK\r\n"
@@ -439,10 +467,9 @@ namespace {
                const fields& fs = fields())
     {
         stringstream content;
-        content << "<html><head><title>"
-                << status << "&nbsp;" << title
-                << "</title></head><body><h1>" << title
-                << "</h1></body></html>";
+        content << "<html>";
+        sethead(content, status + "&nbsp;" + title);
+        content << "<body><h1>" << title << "</h1></body></html>";
 
         stringstream message;
         message << "HTTP/1.1 " << status << ' ' << title << "\r\n"
@@ -549,7 +576,20 @@ namespace {
 
                 } else {
 
-                    if (nodes[0] == "services") {
+                    if (1 == nodes.size() && nodes[0] == "reconf") {
+
+                        reconf();
+
+                        const char* value
+                            (static_cast<
+                             const char*>(getfield(mar, "Host")));
+                        fields fs;
+                        fs.push_back
+                            (make_pair("Location", string("http://")
+                                       .append(value)));
+                        sendstatus(id_, 303, "See Other", fs);
+
+                    } else if (nodes[0] == "services") {
 
                         if (2 == nodes.size()) {
 
@@ -610,7 +650,13 @@ namespace {
 
             realm_ = realm;
             tcplisten("0.0.0.0", serv);
+            do_reconf();
             return true;
+        }
+        void
+        do_reconf()
+        {
+            loadcss();
         }
         void
         do_event(const char* from, const char* type, const void* user,
@@ -637,51 +683,51 @@ namespace {
                 finishmar(*parser);
             }
         }
-        void
-        do_teardown(const object& sock)
-        {
-            shutdown(sock);
-        }
-        bool
-        do_accept(object& sock, const char* addr, unsigned short port)
-        {
-            auto_ptr<session> sess(new session(realm_, sock.id(), addr));
-            auto_ptr<marparser> parser(new marparser(0, sess));
+    void
+    do_teardown(const object& sock)
+    {
+        shutdown(sock);
+    }
+    bool
+    do_accept(object& sock, const char* addr, unsigned short port)
+    {
+        auto_ptr<session> sess(new session(realm_, sock.id(), addr));
+        auto_ptr<marparser> parser(new marparser(0, sess));
 
-            sock.setuser(parser.get());
-            setrwtimer(sock, 30000, AUGAS_TIMRD);
-            parser.release();
-            return true;
-        }
-        void
-        do_data(const object& sock, const void* buf, size_t len)
-        {
-            marparser& parser(*sock.user<marparser>());
-            try {
-                appendmar(parser, static_cast<const char*>(buf),
-                          static_cast<unsigned>(len));
-            } catch (...) {
-                shutdown(sock);
-                throw;
-            }
-        }
-        void
-        do_rdexpire(const object& sock, unsigned& ms)
-        {
-            aug_info("no data received for 30 seconds");
+        sock.setuser(parser.get());
+        setrwtimer(sock, 30000, AUGAS_TIMRD);
+        parser.release();
+        return true;
+    }
+    void
+    do_data(const object& sock, const void* buf, size_t len)
+    {
+        marparser& parser(*sock.user<marparser>());
+        try {
+            appendmar(parser, static_cast<const char*>(buf),
+                      static_cast<unsigned>(len));
+        } catch (...) {
             shutdown(sock);
+            throw;
         }
-        ~httpserv() AUG_NOTHROW
-        {
-        }
-        static serv_base*
-        create(const char* sname)
-        {
-            return new httpserv();
-        }
-    };
+    }
+    void
+    do_rdexpire(const object& sock, unsigned& ms)
+    {
+        aug_info("no data received for 30 seconds");
+        shutdown(sock);
+    }
+    ~httpserv() AUG_NOTHROW
+    {
+    }
+    static serv_base*
+    create(const char* sname)
+    {
+        return new httpserv();
+    }
+};
 
-    typedef basic_module<basic_factory<httpserv> > module;
+typedef basic_module<basic_factory<httpserv> > module;
 }
 
 AUGAS_MODULE(module::init, module::term)

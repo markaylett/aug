@@ -20,7 +20,7 @@
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGUTIL_SHARED
-#endif /* DLL_EXPORT */
+#endif /* DLL_EXPORT || _WINDLL */
 
 #if !defined(AUGUTIL_SHARED)
 # define AUGUTIL_API AUGUTIL_EXTERN

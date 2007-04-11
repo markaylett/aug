@@ -2,7 +2,20 @@ rundir = c:/program files/augas
 logdir = log
 loglevel = 4
 
-services = pyskel pyecho pyproxy
+services = http sched pyskel pyecho pyproxy
+
+service.http.module = http
+service.http.serv = 8080
+service.http.css = etc/augas.css
+service.http.passwd = etc/passwd.txt
+service.http.realm = testrealm@host.com
+service.http.salt = some random phrase
+
+service.sched.groups = schedclient
+service.sched.module = sched
+service.sched.events = foo bar
+service.sched.event.foo.utc = 0M 30M
+service.sched.event.bar.local = 1m17d13H0M
 
 service.pyskel.module = augpy
 service.pyskel.serv = 7000
@@ -20,5 +33,7 @@ service.pyclient.to = 7002
 module.augpy.path = mod/modaugpy
 module.augpy.pythonpath = python
 
+module.http.path = mod/modhttp
+module.sched.path = mod/modsched
 module.augskel.path = mod/modskel
 module.augskelpp.path = mod/modskelpp

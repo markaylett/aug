@@ -20,7 +20,7 @@
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGNET_SHARED
-#endif /* DLL_EXPORT */
+#endif /* DLL_EXPORT || _WINDLL */
 
 #if !defined(AUGNET_SHARED)
 # define AUGNET_API AUGNET_EXTERN

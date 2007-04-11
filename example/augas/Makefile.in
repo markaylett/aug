@@ -224,11 +224,11 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/cpp
 
 EXTRA_DIST = \
+	augas.css \
 	bench.conf \
-	http.conf \
 	modules.mk \
 	passwd.txt \
-	sched.conf
+	test.conf
 
 exampledir = $(prefix)/example/augas
 example_DATA = \

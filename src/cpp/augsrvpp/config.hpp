@@ -14,7 +14,7 @@
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGSRVPP_SHARED
-#endif // DLL_EXPORT
+#endif // DLL_EXPORT || _WINDLL
 
 #if !defined(AUGSRVPP_SHARED)
 # define AUGSRVPP_API

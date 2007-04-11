@@ -27,8 +27,5 @@ include $(AUG_HOME)/etc/aug.mk
 bench: all
 	$(AUG_HOME)/bin/augasd -f bench.conf test
 
-sched: all
-	$(AUG_HOME)/bin/augasd -f sched.conf test
-
-http: all
-	$(AUG_HOME)/bin/augasd -f http.conf test
+test: all
+	$(AUG_HOME)/bin/augasd -f test.conf test

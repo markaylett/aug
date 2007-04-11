@@ -1,11 +1,11 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
 EXTRA_DIST = \
+	augas.css \
 	bench.conf \
-	http.conf \
 	modules.mk \
 	passwd.txt \
-	sched.conf
+	test.conf
 
 exampledir = $(prefix)/example/augas
 example_DATA = \

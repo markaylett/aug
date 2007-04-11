@@ -14,7 +14,7 @@
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGMARPP_SHARED
-#endif // DLL_EXPORT
+#endif // DLL_EXPORT || _WINDLL
 
 #if !defined(AUGMARPP_SHARED)
 # define AUGMARPP_API

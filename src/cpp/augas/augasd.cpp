@@ -836,8 +836,8 @@ namespace augas {
 
                 // Ownership back to local.
 
-                s->manager_.clear();
                 s = state_;
+                s->manager_.clear();
                 throw;
             }
         }

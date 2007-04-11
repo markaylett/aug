@@ -37,7 +37,7 @@
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGMAR_SHARED
-#endif /* DLL_EXPORT */
+#endif /* DLL_EXPORT || _WINDLL */
 
 /**
    \brief The API storage class definition.

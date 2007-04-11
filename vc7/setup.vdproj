@@ -52,13 +52,13 @@
         "Entry"
         {
         "MsmKey" = "8:_1E8D5C9ACFD5C8D8DDAE4FF77D3F9FCE"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "OwnerKey" = "8:_066BB5B090154238AD74FA0BE08087EF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_1E8D5C9ACFD5C8D8DDAE4FF77D3F9FCE"
-        "OwnerKey" = "8:_066BB5B090154238AD74FA0BE08087EF"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -76,6 +76,12 @@
         "Entry"
         {
         "MsmKey" = "8:_3436CA155BAE450689A92453AE79B404"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_358BD46B60814C888FCE59823DE6A083"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -112,31 +118,13 @@
         "Entry"
         {
         "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
         "OwnerKey" = "8:_066BB5B090154238AD74FA0BE08087EF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
-        "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
-        "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
-        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -155,6 +143,24 @@
         {
         "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
         "OwnerKey" = "8:_712859D82D144DC5B44AC8C8FB68CDAC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
+        "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
+        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_55ADDBFCA7126077FE689172CD3B204F"
+        "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -243,6 +249,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_BF78FAA9C26B468D81063CA6D72E9392"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_D5F95E1E2E6F4B849CB0661C7E6F0040"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -262,7 +274,7 @@
         "Entry"
         {
         "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
-        "OwnerKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
+        "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -274,7 +286,7 @@
         "Entry"
         {
         "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
-        "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
+        "OwnerKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -485,6 +497,26 @@
             "TargetName" = "8:pyecho.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_358BD46B60814C888FCE59823DE6A083"
+            {
+            "SourcePath" = "8:..\\example\\augas\\passwd.txt"
+            "TargetName" = "8:passwd.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -785,6 +817,26 @@
             "TargetName" = "8:log.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_BF78FAA9C26B468D81063CA6D72E9392"
+            {
+            "SourcePath" = "8:..\\example\\augas\\augas.css"
+            "TargetName" = "8:augas.css"
+            "Tag" = "8:"
+            "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

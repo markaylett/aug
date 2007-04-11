@@ -20,7 +20,7 @@
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGSRV_SHARED
-#endif /* DLL_EXPORT */
+#endif /* DLL_EXPORT || _WINDLL */
 
 #if !defined(AUGSRV_SHARED)
 # define AUGSRV_API AUGSRV_EXTERN

@@ -20,7 +20,7 @@
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGSYS_SHARED
-#endif /* DLL_EXPORT */
+#endif /* DLL_EXPORT || _WINDLL */
 
 #if !defined(AUGSYS_SHARED)
 # define AUGSYS_API AUGSYS_EXTERN

@@ -14,7 +14,7 @@
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGNETPP_SHARED
-#endif // DLL_EXPORT
+#endif // DLL_EXPORT || _WINDLL
 
 #if !defined(AUGNETPP_SHARED)
 # define AUGNETPP_API

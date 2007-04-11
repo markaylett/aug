@@ -1,0 +1,27 @@
+body {
+  font-family: verdana, arial, sans-serif;
+}
+table.grid {
+  border-width: 1px 1px 1px 1px;
+  border-spacing: 2px;
+  border-style: outset outset outset outset;
+  border-color: gray gray gray gray;
+  border-collapse: collapse;
+  background-color: white;
+}
+table.grid th {
+  border-width: 1px 1px 1px 1px;
+  padding: 4px 4px 4px 4px;
+  border-style: inset inset inset inset;
+  border-color: gray gray gray gray;
+  background-color: rgb(255, 255, 240);
+  -moz-border-radius: 0px 0px 0px 0px;
+}
+table.grid td {
+  border-width: 1px 1px 1px 1px;
+  padding: 4px 4px 4px 4px;
+  border-style: inset inset inset inset;
+  border-color: gray gray gray gray;
+  background-color: rgb(255, 255, 240);
+  -moz-border-radius: 0px 0px 0px 0px;
+}
