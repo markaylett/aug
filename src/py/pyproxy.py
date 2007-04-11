@@ -7,6 +7,9 @@ def start(sname):
     log.info("binding proxy listener")
     tcplisten("0.0.0.0", getenv("service.pyproxy.serv"), None)
 
+def reconf():
+    pass
+
 def closed(sock):
     global pairs
     if pairs.has_key(sock):
