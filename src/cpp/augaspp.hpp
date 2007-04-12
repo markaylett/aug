@@ -48,9 +48,9 @@ namespace augas {
     }
 
     inline void
-    reconf()
+    reconfall()
     {
-        if (AUGAS_ERROR == augas_reconf())
+        if (AUGAS_ERROR == augas_reconfall())
             throw error(augas_error());
     }
 

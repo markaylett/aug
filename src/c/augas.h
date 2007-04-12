@@ -125,12 +125,12 @@ struct augas_host {
        \sa stopall_().
     */
 
-    int (*reconf_)(void);
+    int (*reconfall_)(void);
 
     /**
        \brief Stop the application server.
        \return TODO
-       \sa reconf_().
+       \sa reconfall_().
     */
 
     int (*stopall_)(void);
@@ -443,7 +443,7 @@ augas_gethost(void);
 #define augas_writelog      (augas_gethost()->writelog_)
 #define augas_vwritelog     (augas_gethost()->vwritelog_)
 #define augas_error         (augas_gethost()->error_)
-#define augas_reconf        (augas_gethost()->reconf_)
+#define augas_reconfall     (augas_gethost()->reconfall_)
 #define augas_stopall       (augas_gethost()->stopall_)
 #define augas_post          (augas_gethost()->post_)
 #define augas_dispatch      (augas_gethost()->dispatch_)

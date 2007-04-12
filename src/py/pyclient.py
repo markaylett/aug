@@ -33,9 +33,6 @@ def start(sname):
     for x in xrange(1, 10):
         tcpconnect("localhost", getenv("service.pyclient.to"), None)
 
-def reconf():
-    pass
-
 def closed(sock):
     if sock.user != None:
         sock.user.cancel()

@@ -263,7 +263,7 @@ namespace augas {
     // Thread-safe.
 
     int
-    reconf_()
+    reconfall_()
     {
         try {
             aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
@@ -591,7 +591,7 @@ namespace augas {
         writelog_,
         vwritelog_,
         error_,
-        reconf_,
+        reconfall_,
         stopall_,
         post_,
         dispatch_,

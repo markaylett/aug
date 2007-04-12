@@ -26,17 +26,19 @@ static void
 die_(const char* s)
 {
     aug_perrinfo(NULL, s);
-    aug_termservice();
     longjmp(mark_, 1);
 }
 
 static void
 foreground_(void)
 {
+    int ret;
     if (-1 == aug_initservice())
         die_("aug_initservice() failed");
 
-    if (-1 == aug_runservice())
+    ret = aug_runservice();
+    aug_termservice();
+    if (-1 == ret)
         die_("aug_runservice() failed");
 }
 
@@ -182,6 +184,5 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
         uninstall_();
         break;
     }
-    aug_termservice();
     return 0;
 }

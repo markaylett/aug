@@ -5,8 +5,8 @@ import log
 
 # void writelog(level, msg)
 # string error()
-# void reconf()
-# void stop()
+# void reconfall()
+# void stopall()
 # void post(to, type, user)
 # void dispatch(to, type, user)
 # string getenv(name, def)

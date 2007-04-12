@@ -5,7 +5,7 @@
 #include "augpy/module.h"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augpy/object.h"
 
@@ -63,12 +63,12 @@ writelog_(PyObject* self, PyObject* args)
 }
 
 static PyObject*
-reconf_(PyObject* self, PyObject* args)
+reconfall_(PyObject* self, PyObject* args)
 {
-    if (!PyArg_ParseTuple(args, ":reconf"))
+    if (!PyArg_ParseTuple(args, ":reconfall"))
         return NULL;
 
-    if (-1 == augas_reconf()) {
+    if (-1 == augas_reconfall()) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         return NULL;
     }
@@ -395,7 +395,7 @@ static PyMethodDef methods_[] = {
         "TODO"
     },
     {
-        "reconf", reconf_, METH_VARARGS,
+        "reconfall", reconfall_, METH_VARARGS,
         "TODO"
     },
     {

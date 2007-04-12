@@ -578,7 +578,7 @@ namespace {
 
                     if (1 == nodes.size() && nodes[0] == "reconf") {
 
-                        reconf();
+                        reconfall();
 
                         const char* value
                             (static_cast<

@@ -152,6 +152,13 @@ start_(DWORD argc, char** argv)
 
     aug_notice("daemon stopped");
     setstatus_(SERVICE_STOPPED);
+
+    /* This function will be called on the Service Manager's thread.  Given
+       that aug_initservice() and aug_runservice() have been called on this
+       thread, aug_termservice() is also called from this thread and not the
+       main thread. */
+
+    /*aug_termservice();*/
 }
 
 AUGSRV_API int
@@ -182,5 +189,7 @@ aug_daemonise(void)
             ret = -1;
         }
     }
+
+    aug_termservice();
     return ret;
 }

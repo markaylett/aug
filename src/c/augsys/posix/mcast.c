@@ -12,7 +12,7 @@
 #include <sys/ioctl.h>
 
 #if HAVE_SYS_SOCKIO_H
-# include <sys/sockio.h>  /* SIOCGIFADDR */
+# include <sys/sockio.h> /* SIOCGIFADDR */
 #endif /* HAVE_SYS_SOCKIO_H */
 
 static int
