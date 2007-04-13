@@ -14,6 +14,7 @@ AUG_RCSID("$Id$");
 #include "augsys/log.h"
 #include "augsys/mplexer.h"
 #include "augsys/unistd.h" /* aug_close() */
+#include "augsys/windows.h"
 
 #include "augutil/event.h" /* struct aug_event */
 
@@ -49,13 +50,25 @@ closepipe_(void)
 }
 
 static void
-handler_(int sig)
+signalhandler_(int sig)
 {
     struct aug_event event;
-    aug_info("handling interrupt");
+    aug_info("handling signal interrupt");
     if (!aug_writeevent(fds_[1], aug_setsigevent(&event, sig)))
         aug_perrinfo(NULL, "aug_writeevent() failed");
 }
+
+#if defined(_WIN32)
+static BOOL WINAPI
+ctrlhandler_(DWORD ctrl)
+{
+    struct aug_event event = { AUG_EVENTSTOP, AUG_VARNULL };
+    aug_info("handling console interrupt");
+    if (!aug_writeevent(fds_[1], &event))
+        aug_perrinfo(NULL, "aug_writeevent() failed");
+    return TRUE;
+}
+#endif /* _WIN32 */
 
 static int
 openpipe_(void)
@@ -69,11 +82,14 @@ openpipe_(void)
     fds_[0] = fds[0];
     fds_[1] = fds[1];
 
-    if (-1 == aug_signalhandler(handler_)) {
+    if (-1 == aug_signalhandler(signalhandler_)) {
         closepipe_();
         return -1;
     }
 
+#if defined(_WIN32)
+    SetConsoleCtrlHandler(ctrlhandler_, TRUE);
+#endif /* _WIN32 */
     return 0;
 }
 

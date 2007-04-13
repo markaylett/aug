@@ -62,9 +62,9 @@
 
 #if defined(_MSC_VER)
 # if !defined(AUGMAR_BUILD)
-#  pragma comment(lib, "libaugmar.lib")
+#  pragma comment(lib, "libaugmar-1.lib")
 # endif /* AUGMAR_BUILD */
-# pragma comment(lib, "libaugsys.lib")
+# pragma comment(lib, "libaugsys-1.lib")
 #endif /* _MSC_VER */
 
 #endif /* AUGMAR_CONFIG_H */

@@ -10,6 +10,10 @@
 
 struct aug_var;
 
+/**
+   #AUG_INIT should be used to initialise the aug_files structure.
+ */
+
 struct aug_file_;
 AUG_HEAD(aug_files, aug_file_);
 

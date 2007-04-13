@@ -295,7 +295,7 @@ libaugsys_la_SOURCES = \
 
 libaugsys_la_LDFLAGS = \
 	-no-undefined \
-	-version-info 0:0:0
+	-version-info 1:0:0
 
 libaugsys_la_LIBADD = 
 TESTS = \

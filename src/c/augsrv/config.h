@@ -41,9 +41,9 @@
 
 #if defined(_MSC_VER)
 # if !defined(AUGSRV_BUILD)
-#  pragma comment(lib, "libaugsrv.lib")
+#  pragma comment(lib, "libaugsrv-1.lib")
 # endif /* AUGSRV_BUILD */
-# pragma comment(lib, "libaugutil.lib")
+# pragma comment(lib, "libaugutil-1.lib")
 #endif /* _MSC_VER */
 
 #endif /* AUGSRV_CONFIG_H */

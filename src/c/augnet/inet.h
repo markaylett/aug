@@ -20,8 +20,9 @@ struct aug_hostserv {
 
 /**
    Implementations of the original, classic functions by Richard Stevens.
-    \todo introduce timeout for aug_tcpconnect() by implementing in terms of
-    aug_tryconnect().
+
+   \todo introduce timeout for aug_tcpconnect() by implementing in terms of
+   aug_tryconnect().
 */
 
 AUGNET_API int

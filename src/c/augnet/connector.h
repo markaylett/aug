@@ -19,6 +19,10 @@ aug_destroyconnector(aug_connector_t ctor);
 /**
    A blocking socket will be returned when the established flag is set.  Use
    aug_setnonblock() to change to non-blocking socket.
+
+   The descriptor returned between calls to aug_tryconnect() may change, this
+   may occur as the implementation cycles through the addresses associated
+   with the host.
 */
 
 AUGNET_API int

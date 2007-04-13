@@ -26,7 +26,7 @@ AUGSYS_API int
 aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
 
 /**
-   Returns either the total number of descriptors set, zero on timeout, or a
+   \return either the total number of descriptors set, zero on timeout, or a
    negative value on error.
 
    If #SA_RESTART has been set for an interrupting signal, it is
@@ -42,6 +42,15 @@ aug_ioeventmask(aug_mplexer_t mplexer, int fd);
 
 AUGSYS_API int
 aug_ioevents(aug_mplexer_t mplexer, int fd);
+
+/**
+   Creates a pipe or socket-pair suitable for use with mplexer.  On Windows,
+   only socket descriptors can be used with select(), therefore,
+   aug_mplexerpipe() will return a socket-pair.
+
+   \sa aug_socketpair().
+
+ */
 
 AUGSYS_API int
 aug_mplexerpipe(int fds[2]);

@@ -30,7 +30,7 @@ libaugsrv_la_SOURCES = \
 
 libaugsrv_la_LDFLAGS = \
 	-no-undefined \
-	-version-info 0:0:0
+	-version-info 1:0:0
 
 libaugsrv_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \

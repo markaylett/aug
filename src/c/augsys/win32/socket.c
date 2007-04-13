@@ -4,6 +4,7 @@
 #include "augsys/base.h"
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
+#include "augsys/log.h"
 #include "augsys/uio.h"
 
 #include <io.h>
@@ -35,7 +36,9 @@ close_(int fd)
 #endif /* _MSC_VER */
         close(fd);
 #if defined(_MSC_VER)
-    } __except (EXCEPTION_EXECUTE_HANDLER) { }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        AUG_DEBUG3("structured exception [%08x]", GetExceptionCode());
+    }
 #endif /* _MSC_VER */
 
     return SOCKET_ERROR == ret ? -1 : 0;

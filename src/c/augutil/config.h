@@ -41,9 +41,9 @@
 
 #if defined(_MSC_VER)
 # if !defined(AUGUTIL_BUILD)
-#  pragma comment(lib, "libaugutil.lib")
+#  pragma comment(lib, "libaugutil-1.lib")
 # endif /* AUGUTIL_BUILD */
-# pragma comment(lib, "libaugsys.lib")
+# pragma comment(lib, "libaugsys-1.lib")
 #endif /* _MSC_VER */
 
 #endif /* AUGUTIL_CONFIG_H */

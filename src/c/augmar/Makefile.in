@@ -230,7 +230,7 @@ libaugmar_la_SOURCES = \
 
 libaugmar_la_LDFLAGS = \
 	-no-undefined \
-	-version-info 0:0:0
+	-version-info 1:0:0
 
 libaugmar_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
