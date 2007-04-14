@@ -142,6 +142,12 @@ namespace aug {
     {
         verify(aug_foreachfile(&files));
     }
+
+    inline const struct aug_var*
+    filevar(aug_files& files, fdref ref)
+    {
+        return aug_filevar(&files, ref.get());
+    }
 }
 
 #endif // AUGNETPP_FILE_HPP

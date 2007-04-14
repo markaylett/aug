@@ -105,8 +105,7 @@ aug_createwriter(void)
 
     AUG_INIT(&writer->bufs_);
     writer->part_ = 0;
-    writer->size_ 
-= 0;
+    writer->size_ = 0;
     return writer;
 }
 

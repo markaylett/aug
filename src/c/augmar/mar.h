@@ -23,7 +23,7 @@
    \return Zero on success or -1 on failure, in which case errno can be used
    to determine the error.
 
-   \sa #aug_retainmar.
+   \sa aug_retainmar().
 */
 
 AUGMAR_API int

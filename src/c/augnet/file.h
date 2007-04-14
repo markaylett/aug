@@ -41,4 +41,12 @@ aug_removefile(struct aug_files* files, int fd);
 AUGNET_API int
 aug_foreachfile(struct aug_files* files);
 
+/**
+   \return a pointer to the aug_var structure associated with the file, or
+   NULL if the file does not exist.
+ */
+
+AUGNET_API const struct aug_var*
+aug_filevar(struct aug_files* files, int fd);
+
 #endif /* AUGNET_FILE_H */
