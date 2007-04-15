@@ -41,9 +41,9 @@
 
 #if defined(_MSC_VER)
 # if !defined(AUGNET_BUILD)
-#  pragma comment(lib, "libaugnet-1.lib")
+#  pragma comment(lib, "libaugnet.lib")
 # endif /* AUGNET_BUILD */
-# pragma comment(lib, "libaugutil-1.lib")
+# pragma comment(lib, "libaugutil.lib")
 #endif /* _MSC_VER */
 
 #endif /* AUGNET_CONFIG_H */

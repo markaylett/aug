@@ -112,8 +112,10 @@ namespace {
         do_closed(const object& sock)
         {
             delete sock.user<state>();
-            if (0 < --estab_)
+            if (0 < --estab_) {
+                augas_writelog(AUGAS_LOGINFO, "%d established", estab_);
                 return;
+            }
 
             timeval tv;
             aug::gettimeofday(tv);

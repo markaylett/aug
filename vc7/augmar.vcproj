@@ -43,7 +43,7 @@
 				SubSystem="2"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
-				ImportLibrary="lib/$(TargetName).lib"/>
+				ImportLibrary="lib/lib$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -95,7 +95,7 @@
 				SubSystem="2"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
-				ImportLibrary="lib/$(TargetName).lib"/>
+				ImportLibrary="lib/lib$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

@@ -37,6 +37,13 @@
 # include <sys/cdefs.h>
 #endif
 
+#include "augsys/types.h"
+
+#if !defined(__offsetof)
+# define __offsetof(type, field) ((size_t)((char*)&((type*)0)->field))
+#endif /* !__offsetof */
+
+
 /*
  * This file defines four types of data structures: singly-linked lists,
  * singly-linked tail queues, lists and tail queues.
