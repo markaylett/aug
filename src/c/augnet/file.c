@@ -197,7 +197,7 @@ aug_foreachfile(struct aug_files* files)
         /* Rotate files to promote fairness - this must only be done once the
            lock marker has been removed from the front of the list. */
 
-        if (!(it = AUG_FIRST(files))) {
+        if ((it = AUG_FIRST(files))) {
             AUG_REMOVE_HEAD(files);
             AUG_INSERT_TAIL(files, it);
         }
