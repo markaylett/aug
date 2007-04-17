@@ -6,11 +6,11 @@
 
 #include "augsys/config.h"
 
-#define AUG_IOEVENTRD    0x1
-#define AUG_IOEVENTWR    0x2
-#define AUG_IOEVENTEX    0x4
-#define AUG_IOEVENTRDWR (AUG_IOEVENTRD | AUG_IOEVENTWR)
-#define AUG_IOEVENTALL  (AUG_IOEVENTRDWR | AUG_IOEVENTEX)
+#define AUG_FDEVENTRD    0x1
+#define AUG_FDEVENTWR    0x2
+#define AUG_FDEVENTEX    0x4
+#define AUG_FDEVENTRDWR (AUG_FDEVENTRD   | AUG_FDEVENTWR)
+#define AUG_FDEVENTALL  (AUG_FDEVENTRDWR | AUG_FDEVENTEX)
 
 struct timeval;
 
@@ -23,7 +23,7 @@ AUGSYS_API int
 aug_destroymplexer(aug_mplexer_t mplexer);
 
 AUGSYS_API int
-aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
+aug_setfdeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
 
 /**
    \return either the total number of descriptors set, zero on timeout, or a
@@ -35,13 +35,13 @@ aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
 */
 
 AUGSYS_API int
-aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout);
+aug_waitfdevents(aug_mplexer_t mplexer, const struct timeval* timeout);
 
 AUGSYS_API int
-aug_ioeventmask(aug_mplexer_t mplexer, int fd);
+aug_fdeventmask(aug_mplexer_t mplexer, int fd);
 
 AUGSYS_API int
-aug_ioevents(aug_mplexer_t mplexer, int fd);
+aug_fdevents(aug_mplexer_t mplexer, int fd);
 
 /**
    Creates a pipe or socket-pair suitable for use with mplexer.  On Windows,

@@ -5,23 +5,15 @@
 #include "augnet/nbfile.h"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
-#include "augnet/base.h"
-#include "augnet/file.h"
+#include "augnet/extend.h"
 
 #include "augsys/base.h"
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/log.h"
-#include "augsys/mplexer.h"
 #include "augsys/socket.h" /* aug_shutdown() */
-
-struct aug_nbfiles_ {
-    aug_mplexer_t mplexer_;
-    struct aug_files files_;
-    int pending_;
-};
 
 static int
 close_(int fd)
@@ -30,7 +22,7 @@ close_(int fd)
     aug_getnbfile(fd, &nbfile);
 
     AUG_DEBUG2("clearing io-event mask: fd=[%d]", fd);
-    aug_setioeventmask(nbfile.nbfiles_->mplexer_, fd, 0);
+    aug_setfdeventmask(nbfile.nbfiles_->mplexer_, fd, 0);
 
     if (!nbfile.base_->close_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -129,7 +121,7 @@ static int
 filecb_(const struct aug_var* var, struct aug_nbfile* nbfile,
         struct aug_files* files)
 {
-    int events = aug_ioevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
+    int events = aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
     return events ? nbfile
         ->cb_(var, nbfile->fd_, (unsigned short)events, nbfile->nbfiles_) : 1;
 }
@@ -137,19 +129,19 @@ filecb_(const struct aug_var* var, struct aug_nbfile* nbfile,
 static int
 seteventmask_(struct aug_nbfile* nbfile, unsigned short mask)
 {
-    return aug_setioeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_, mask);
+    return aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_, mask);
 }
 
 static int
 eventmask_(struct aug_nbfile* nbfile)
 {
-    return aug_ioeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_);
+    return aug_fdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_);
 }
 
 static int
 events_(struct aug_nbfile* nbfile)
 {
-    return aug_ioevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
+    return aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
 }
 
 static int
@@ -158,7 +150,7 @@ shutdown_(struct aug_nbfile* nbfile)
     return aug_shutdown(nbfile->fd_, SHUT_WR);
 }
 
-struct aug_nbtype nbtype_ = {
+static const struct aug_nbtype nbtype_ = {
     filecb_,
     seteventmask_,
     eventmask_,
@@ -223,9 +215,11 @@ aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
 }
 
 AUGNET_API int
-aug_removenbfile(aug_nbfiles_t nbfiles, int fd)
+aug_removenbfile(int fd)
 {
-    return aug_removefile(&nbfiles->files_, fd);
+    struct aug_nbfile nbfile;
+    aug_getnbfile(fd, &nbfile);
+    return aug_removefile(&nbfile.nbfiles_->files_, fd);
 }
 
 AUGNET_API int
@@ -239,7 +233,7 @@ AUGNET_API int
 aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout)
 {
     return nbfiles->pending_ ? nbfiles->pending_
-        : aug_waitioevents(nbfiles->mplexer_, timeout);
+        : aug_waitfdevents(nbfiles->mplexer_, timeout);
 }
 
 AUGNET_API int

@@ -389,6 +389,36 @@ canceltimer_(PyObject* self, PyObject* args)
     return incret_(Py_True);
 }
 
+static PyObject*
+setsslclient_(PyObject* self, PyObject* args)
+{
+    PyObject* sock;
+    if (!PyArg_ParseTuple(args, "O!:setsslclient", type_, &sock))
+        return NULL;
+
+    if (-1 == augas_setsslclient(augpy_getid(sock))) {
+        PyErr_SetString(PyExc_RuntimeError, augas_error());
+        return NULL;
+    }
+
+    return incret_(Py_None);
+}
+
+static PyObject*
+setsslserver_(PyObject* self, PyObject* args)
+{
+    PyObject* sock;
+    if (!PyArg_ParseTuple(args, "O!:setsslserver", type_, &sock))
+        return NULL;
+
+    if (-1 == augas_setsslserver(augpy_getid(sock))) {
+        PyErr_SetString(PyExc_RuntimeError, augas_error());
+        return NULL;
+    }
+
+    return incret_(Py_None);
+}
+
 static PyMethodDef methods_[] = {
     {
         "writelog", writelog_, METH_VARARGS,
@@ -456,6 +486,14 @@ static PyMethodDef methods_[] = {
     },
     {
         "canceltimer", canceltimer_, METH_VARARGS,
+        "TODO"
+    },
+    {
+        "setsslclient", setsslclient_, METH_VARARGS,
+        "TODO"
+    },
+    {
+        "setsslserver", setsslserver_, METH_VARARGS,
         "TODO"
     },
     { NULL }

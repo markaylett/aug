@@ -36,10 +36,10 @@ main(int argc, char* argv[])
             joinmcast(sfd, in, 4 == argc ? argv[3] : 0);
 
             mplexer mp;
-            setioeventmask(mp, sfd, AUG_IOEVENTRD);
+            setfdeventmask(mp, sfd, AUG_FDEVENTRD);
 
             for (;;) {
-                while (AUG_RETINTR == waitioevents(mp))
+                while (AUG_RETINTR == waitfdevents(mp))
                     ;
 
                 char buf[1024];

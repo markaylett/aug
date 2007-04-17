@@ -138,9 +138,6 @@
 				RelativePath="..\src\c\augnet\auth.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\base.c">
-			</File>
-			<File
 				RelativePath="..\src\c\augnet\base64.c">
 			</File>
 			<File
@@ -148,6 +145,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\connector.c">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\extend.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\file.c">
@@ -182,9 +182,6 @@
 				RelativePath="..\src\c\augnet\auth.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\base.h">
-			</File>
-			<File
 				RelativePath="..\src\c\augnet\base64.h">
 			</File>
 			<File
@@ -192,6 +189,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\connector.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\extend.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\file.h">

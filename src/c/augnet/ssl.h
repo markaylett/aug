@@ -7,9 +7,9 @@
 #include "augnet/config.h"
 
 AUGNET_API int
-aug_startsslclient(int fd, void* ctx);
+aug_setsslclient(int fd, void* ctx);
 
 AUGNET_API int
-aug_startsslserver(int fd, void* ctx);
+aug_setsslserver(int fd, void* ctx);
 
 #endif /* AUGNET_SSL_H */

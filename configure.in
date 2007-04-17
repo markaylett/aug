@@ -43,10 +43,15 @@ fi
 case $host in
 *-*-cygwin* | *-*-mingw*)
 
+    # ssleay.a must be renamed to libssleay.a
+
+    #AC_SEARCH_LIBS(SSL_library_init, [ssleay32])
+    #AC_SEARCH_LIBS(BIO_new, [eay32])
+
     CFLAGS="$CFLAGS -DWINVER=0x0501 -DFD_SETSIZE=256"
     CXXFLAGS="$CXXFLAGS -DWINVER=0x0501 -DFD_SETSIZE=256"
-    LDFLAGS="-lws2_32 -liphlpapi $LDFLAGS"
-    LIBS="-Wl,-lws2_32 -Wl,-liphlpapi $LIBS"
+    LDFLAGS="-lssleay32 -leay32 -lws2_32 -liphlpapi $LDFLAGS"
+    LIBS="-Wl,-lssleay32 -Wl,-leay32 -Wl,-lws2_32 -Wl,-liphlpapi $LIBS"
 
     if test "$enable_threads" != "no"; then
         CFLAGS="-mthreads $CFLAGS"
@@ -55,6 +60,9 @@ case $host in
     fi
     ;;
 *)
+    AC_SEARCH_LIBS(SSL_library_init, [ssl])
+    AC_SEARCH_LIBS(BIO_new, [crypto])
+
     AC_SEARCH_LIBS(gethostbyname, nsl)
     AC_SEARCH_LIBS(gethostname, nsl)
     AC_SEARCH_LIBS(socket, socket)
@@ -70,7 +78,7 @@ esac
 
 # Checks for header files.
 AC_FUNC_ALLOCA
-AC_CHECK_HEADERS([dlfcn.h sys/sockio.h])
+AC_CHECK_HEADERS([dlfcn.h sys/sockio.h openssl/err.h openssl/ssl.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_BIGENDIAN

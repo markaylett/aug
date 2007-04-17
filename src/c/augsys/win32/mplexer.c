@@ -35,53 +35,53 @@ external_(struct set_* p, SOCKET h)
     unsigned short dst = 0;
 
     if (FD_ISSET(h, &p->rd_))
-        dst |= AUG_IOEVENTRD;
+        dst |= AUG_FDEVENTRD;
 
     if (FD_ISSET(h, &p->wr_))
-        dst |= AUG_IOEVENTWR;
+        dst |= AUG_FDEVENTWR;
 
     if (FD_ISSET(h, &p->ex_))
-        dst |= AUG_IOEVENTEX;
+        dst |= AUG_FDEVENTEX;
 
     return dst;
 }
 
 static int
-setioevents_(struct set_* p, SOCKET h, unsigned short mask)
+setfdevents_(struct set_* p, SOCKET h, unsigned short mask)
 {
     unsigned short cur = external_(p, h);
     unsigned short set = ~cur & mask;
     unsigned short unset = cur & ~mask;
     int bits = 0;
 
-    if (set & AUG_IOEVENTRD) {
+    if (set & AUG_FDEVENTRD) {
 
         FD_SET(h, &p->rd_);
         ++bits;
 
-    } else if (unset & AUG_IOEVENTRD) {
+    } else if (unset & AUG_FDEVENTRD) {
 
         FD_CLR(h, &p->rd_);
         --bits;
     }
 
-    if (set & AUG_IOEVENTWR) {
+    if (set & AUG_FDEVENTWR) {
 
         FD_SET(h, &p->wr_);
         ++bits;
 
-    } else if (unset & AUG_IOEVENTWR) {
+    } else if (unset & AUG_FDEVENTWR) {
 
         FD_CLR(h, &p->wr_);
         --bits;
     }
 
-    if (set & AUG_IOEVENTEX) {
+    if (set & AUG_FDEVENTEX) {
 
         FD_SET(h, &p->ex_);
         ++bits;
 
-    } else if (unset & AUG_IOEVENTEX) {
+    } else if (unset & AUG_FDEVENTEX) {
 
         FD_CLR(h, &p->ex_);
         --bits;
@@ -113,7 +113,7 @@ aug_destroymplexer(aug_mplexer_t mplexer)
 }
 
 AUGSYS_API int
-aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
+aug_setfdeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
 {
     /* Although this condition does not necessarily mean that the set has been
        exhausted, it gives a reasonable approximation given the costly
@@ -124,18 +124,18 @@ aug_setioeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
         return -1;
     }
 
-    if (mask & ~AUG_IOEVENTALL) {
+    if (mask & ~AUG_FDEVENTALL) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("invalid ioevent mask"));
+                       AUG_MSG("invalid fdevent mask"));
         return -1;
     }
 
-    mplexer->bits_ += setioevents_(&mplexer->in_, _get_osfhandle(fd), mask);
+    mplexer->bits_ += setfdevents_(&mplexer->in_, _get_osfhandle(fd), mask);
     return 0;
 }
 
 AUGSYS_API int
-aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout)
+aug_waitfdevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 {
     int ret;
     mplexer->out_ = mplexer->in_;
@@ -159,13 +159,13 @@ aug_waitioevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 }
 
 AUGSYS_API int
-aug_ioeventmask(aug_mplexer_t mplexer, int fd)
+aug_fdeventmask(aug_mplexer_t mplexer, int fd)
 {
     return external_(&mplexer->in_, _get_osfhandle(fd));
 }
 
 AUGSYS_API int
-aug_ioevents(aug_mplexer_t mplexer, int fd)
+aug_fdevents(aug_mplexer_t mplexer, int fd)
 {
     return external_(&mplexer->out_, _get_osfhandle(fd));
 }

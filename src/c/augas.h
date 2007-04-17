@@ -187,12 +187,12 @@ struct augas_host {
 
     /**
        \brief TODO
-       \param sid TODO
+       \param cid TODO
        \return TODO
        \sa TODO
     */
 
-    int (*shutdown_)(augas_id sid);
+    int (*shutdown_)(augas_id cid);
 
     /**
        \brief TODO
@@ -305,6 +305,24 @@ struct augas_host {
     */
 
     int (*canceltimer_)(augas_id tid);
+
+    /**
+       \brief TODO
+       \param cid TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*setsslclient_)(augas_id cid);
+
+    /**
+       \brief TODO
+       \param cid TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*setsslserver_)(augas_id cid);
 };
 
 /**
@@ -460,6 +478,8 @@ augas_gethost(void);
 #define augas_settimer      (augas_gethost()->settimer_)
 #define augas_resettimer    (augas_gethost()->resettimer_)
 #define augas_canceltimer   (augas_gethost()->canceltimer_)
+#define augas_setsslclient  (augas_gethost()->setsslclient_)
+#define augas_setsslserver  (augas_gethost()->setsslserver_)
 
 /**
    augas_init() should return NULL on failure.

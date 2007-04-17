@@ -151,7 +151,7 @@ namespace augas {
         {
             AUG_DEBUG2("adding event pipe to list");
             insertfile(files_, aug_eventin(), cb, var);
-            setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
+            setfdeventmask(mplexer_, aug_eventin(), AUG_FDEVENTRD);
         }
     };
 
@@ -162,7 +162,7 @@ namespace augas {
     extclose_(int fd)
     {
         AUG_DEBUG2("clearing io-event mask prior to close: fd=[%d]", fd);
-        aug_setioeventmask(state_->mplexer_, fd, 0);
+        aug_setfdeventmask(state_->mplexer_, fd, 0);
         return base_->close_(fd); // Delegate to base version.
     }
 
@@ -182,7 +182,7 @@ namespace augas {
         insertfile(state_->files_, ref, cb, var);
 
         try {
-            setioeventmask(state_->mplexer_, ref, mask);
+            setfdeventmask(state_->mplexer_, ref, mask);
             setfdtype(ref, extended);
         } catch (...) {
             AUG_DEBUG2("removing file from list: fd=[%d]", ref.get());
@@ -225,7 +225,7 @@ namespace augas {
                    inetntop(getinetaddr(ep, addr)).c_str(),
                    static_cast<int>(ntohs(port(ep))));
 
-        setioeventmask(state_->mplexer_, conn.sfd(), AUG_IOEVENTRD);
+        setfdeventmask(state_->mplexer_, conn.sfd(), AUG_FDEVENTRD);
         conn.connected(ep);
     }
 
@@ -401,7 +401,7 @@ namespace augas {
                 // returned.
 
                 setextfdtype_(cptr->sfd(), state_->cb_, state_->var_,
-                              AUG_IOEVENTRD);
+                              AUG_FDEVENTRD);
                 if (state_->connected_.empty()) {
 
                     // Schedule an event to ensure that connected() is called
@@ -417,7 +417,7 @@ namespace augas {
 
             } else
                 setextfdtype_(cptr->sfd(), state_->cb_, state_->var_,
-                              AUG_IOEVENTALL);
+                              AUG_FDEVENTALL);
 
             si.commit();
             return (int)cptr->id();
@@ -438,7 +438,7 @@ namespace augas {
 
             endpoint ep(null);
             smartfd sfd(tcplisten(host, port, ep));
-            setextfdtype_(sfd, state_->cb_, state_->var_, AUG_IOEVENTRD);
+            setextfdtype_(sfd, state_->cb_, state_->var_, AUG_FDEVENTRD);
 
             inetaddr addr(null);
             AUG_DEBUG2("listening: interface=[%s], port=[%d]",
@@ -587,6 +587,24 @@ namespace augas {
         return -1;
     }
 
+    int
+    setsslclient_(augas_id cid)
+    {
+        AUG_DEBUG2("setsslclient(): id=[%d]", cid);
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+                       AUG_MSG("aug_setsslclient() not supported"));
+        return -1;
+    }
+
+    int
+    setsslserver_(augas_id cid)
+    {
+        AUG_DEBUG2("setsslserver(): id=[%d]", cid);
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+                       AUG_MSG("aug_setsslserver() not supported"));
+        return -1;
+    }
+
     const augas_host host_ = {
         writelog_,
         vwritelog_,
@@ -607,7 +625,9 @@ namespace augas {
         cancelrwtimer_,
         settimer_,
         resettimer_,
-        canceltimer_
+        canceltimer_,
+        setsslclient_,
+        setsslserver_
     };
 
     void
@@ -651,7 +671,7 @@ namespace augas {
             throw;
         }
 
-        setextfdtype_(sfd, state_->cb_, state_->var_, AUG_IOEVENTRD);
+        setextfdtype_(sfd, state_->cb_, state_->var_, AUG_FDEVENTRD);
         setsockopts_(sfd);
         connptr cptr(new augas::servconn(sock.serv(), sock.user(),
                                          state_->timers_, sfd, ep));
@@ -688,7 +708,7 @@ namespace augas {
             // attempts fail and alternative addresses are tried.
 
             setextfdtype_(cptr->sfd(), state_->cb_, state_->var_,
-                          AUG_IOEVENTALL);
+                          AUG_FDEVENTALL);
             state_->manager_.update(cptr, fd);
 
         } else if (changed)
@@ -862,7 +882,7 @@ namespace augas {
                     if (state_->timers_.empty()) {
 
                         scoped_unblock unblock;
-                        while (AUG_RETINTR == (ret = waitioevents
+                        while (AUG_RETINTR == (ret = waitfdevents
                                                (state_->mplexer_)))
                             ;
 
@@ -874,7 +894,7 @@ namespace augas {
                         foreachexpired(state_->timers_, 0 == ret, tv);
 
                         scoped_unblock unblock;
-                        while (AUG_RETINTR == (ret = waitioevents
+                        while (AUG_RETINTR == (ret = waitfdevents
                                                (state_->mplexer_, tv)))
                             ;
                     }
@@ -922,7 +942,7 @@ namespace augas {
         bool
         filecb(int fd, aug_files& files)
         {
-            if (!ioevents(state_->mplexer_, fd))
+            if (!fdevents(state_->mplexer_, fd))
                 return true;
 
             // Intercept activity on event pipe.

@@ -5,7 +5,7 @@
 #include "augas/clntconn.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 using namespace aug;
 using namespace augas;
@@ -101,7 +101,7 @@ clntconn::do_process(mplexer& mplexer)
         // writing then set the write event-mask.
 
         if (!buffer_.empty())
-            setioeventmask(mplexer, conn_->sfd(), AUG_IOEVENTRDWR);
+            setfdeventmask(mplexer, conn_->sfd(), AUG_FDEVENTRDWR);
 
         AUG_DEBUG2("connection is now established, assuming new state");
 

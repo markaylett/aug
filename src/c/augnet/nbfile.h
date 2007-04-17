@@ -20,7 +20,7 @@ aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
                  const struct aug_var* var);
 
 AUGNET_API int
-aug_removenbfile(aug_nbfiles_t nbfiles, int fd);
+aug_removenbfile(int fd);
 
 AUGNET_API int
 aug_foreachnbfile(aug_nbfiles_t nbfiles);

@@ -13,6 +13,7 @@
 #define AUG_SRCPOSIX 2
 #define AUG_SRCWIN32 3
 #define AUG_SRCDLFCN 4
+#define AUG_SRCSSL   5
 
 /**
    Base value for user-defined exception sources.

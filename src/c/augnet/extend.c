@@ -2,10 +2,10 @@
    See the file COPYING for copying permission.
 */
 #define AUGNET_BUILD
-#include "augnet/base.h"
+#include "augnet/extend.h"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"

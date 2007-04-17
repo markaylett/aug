@@ -160,7 +160,7 @@ namespace test {
         ~session() AUG_NOTHROW
         {
             try {
-                setioeventmask(mplexer_, sfd_, 0);
+                setfdeventmask(mplexer_, sfd_, 0);
             } AUG_PERRINFOCATCH;
         }
         session(mplexer& mplexer, const smartfd& sfd, timers& timers)
@@ -180,7 +180,7 @@ namespace test {
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
-                setioeventmask(mplexer_, sfd_, AUG_IOEVENTRDWR);
+                setfdeventmask(mplexer_, sfd_, AUG_FDEVENTRDWR);
             } else
                 shutdown(sfd_, SHUT_RDWR);
         }
@@ -206,10 +206,10 @@ namespace test {
             smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
 
             insertfile(files_, aug_eventin(), cb, var);
-            setioeventmask(mplexer_, aug_eventin(), AUG_IOEVENTRD);
+            setfdeventmask(mplexer_, aug_eventin(), AUG_FDEVENTRD);
 
             insertfile(files_, sfd, cb, var);
-            setioeventmask(mplexer_, sfd, AUG_IOEVENTRD);
+            setfdeventmask(mplexer_, sfd, AUG_FDEVENTRD);
 
             sfd_ = sfd;
         }
@@ -224,7 +224,7 @@ namespace test {
         {
             insertfile(state_->files_, ref, *this);
             try {
-                setioeventmask(state_->mplexer_, ref, mask);
+                setfdeventmask(state_->mplexer_, ref, mask);
             } catch (...) {
                 removefile(state_->files_, ref);
             }
@@ -282,7 +282,7 @@ namespace test {
 
             setnodelay(sfd, true);
             setnonblock(sfd, true);
-            setfdhook(sfd, AUG_IOEVENTRD);
+            setfdhook(sfd, AUG_FDEVENTRD);
 
             state_->sfds_.insert(make_pair
                                  (sfd.get(), sessionptr
@@ -295,9 +295,9 @@ namespace test {
         connection(int fd, aug_files& files)
         {
             sessionptr ptr(state_->sfds_[fd]);
-            unsigned short bits(ioevents(state_->mplexer_, fd));
+            unsigned short bits(fdevents(state_->mplexer_, fd));
 
-            if (bits & AUG_IOEVENTRD) {
+            if (bits & AUG_FDEVENTRD) {
 
                 AUG_DEBUG2("handling read event '%d'", fd);
 
@@ -308,15 +308,15 @@ namespace test {
                     return false;
                 }
 
-                setioeventmask(state_->mplexer_, fd, AUG_IOEVENTRDWR);
+                setfdeventmask(state_->mplexer_, fd, AUG_FDEVENTRDWR);
                 ptr->timer_.cancel();
                 ptr->heartbeats_ = 0;
             }
 
-            if (bits & AUG_IOEVENTWR) {
+            if (bits & AUG_FDEVENTWR) {
 
                 if (!ptr->buffer_.writesome(fd)) {
-                    setioeventmask(state_->mplexer_, fd, AUG_IOEVENTRD);
+                    setfdeventmask(state_->mplexer_, fd, AUG_FDEVENTRD);
                     ptr->timer_.reset(5000);
                 }
             }
@@ -374,7 +374,7 @@ namespace test {
                 if (state_->timers_.empty()) {
 
                     scoped_unblock unblock;
-                    while (AUG_RETINTR == (ret = waitioevents(state_
+                    while (AUG_RETINTR == (ret = waitfdevents(state_
                                                               ->mplexer_)))
                         ;
 
@@ -383,7 +383,7 @@ namespace test {
                     foreachexpired(state_->timers_, 0 == ret, tv);
 
                     scoped_unblock unblock;
-                    while (AUG_RETINTR == (ret = waitioevents(state_
+                    while (AUG_RETINTR == (ret = waitfdevents(state_
                                                               ->mplexer_,
                                                               tv)))
                         ;
@@ -407,7 +407,7 @@ namespace test {
         bool
         filecb(int fd, aug_files& files)
         {
-            if (!ioevents(state_->mplexer_, fd))
+            if (!fdevents(state_->mplexer_, fd))
                 return true;
 
             if (fd == aug_eventin())

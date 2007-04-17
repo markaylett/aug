@@ -30,8 +30,8 @@ main(int argc, char* argv[])
         if (!xy.second) {
 
             mplexer mp;
-            setioeventmask(mp, xy.first, AUG_IOEVENTALL);
-            waitioevents(mp);
+            setfdeventmask(mp, xy.first, AUG_FDEVENTALL);
+            waitfdevents(mp);
 
             // Assuming that there is no endpoint, an exception should now be
             // thrown.

@@ -238,6 +238,20 @@ namespace augas {
         return resettimer(timer.id_, ms);
     }
 
+    inline void
+    setsslclient(augas_id cid)
+    {
+        if (AUGAS_ERROR == augas_setsslclient(cid))
+            throw error(augas_error());
+    }
+
+    inline void
+    setsslserver(augas_id cid)
+    {
+        if (AUGAS_ERROR == augas_setsslserver(cid))
+            throw error(augas_error());
+    }
+
     namespace detail {
         class stringtype {
             static int

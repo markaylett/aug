@@ -5,7 +5,7 @@
 #include "augas/conn.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augas/buffer.hpp"
 #include "augas/exception.hpp"
@@ -56,14 +56,14 @@ void
 established::do_append(aug::mplexer& mplexer, const aug_var& var)
 {
     buffer_.append(var);
-    setioeventmask(mplexer, sfd_, AUG_IOEVENTRDWR);
+    setfdeventmask(mplexer, sfd_, AUG_FDEVENTRDWR);
 }
 
 void
 established::do_append(aug::mplexer& mplexer, const void* buf, size_t len)
 {
     buffer_.append(buf, len);
-    setioeventmask(mplexer, sfd_, AUG_IOEVENTRDWR);
+    setfdeventmask(mplexer, sfd_, AUG_FDEVENTRDWR);
 }
 
 void
@@ -77,9 +77,9 @@ established::do_connected(const aug_endpoint& ep)
 bool
 established::do_process(mplexer& mplexer)
 {
-    unsigned short bits(ioevents(mplexer, sfd_));
+    unsigned short bits(fdevents(mplexer, sfd_));
 
-    if (bits & AUG_IOEVENTRD) {
+    if (bits & AUG_FDEVENTRD) {
 
         AUG_DEBUG2("handling read event: id=[%d], fd=[%d]", sock_.id_,
                    sfd_.get());
@@ -105,7 +105,7 @@ established::do_process(mplexer& mplexer)
         serv_->data(sock_, buf, size);
     }
 
-    if (bits & AUG_IOEVENTWR) {
+    if (bits & AUG_FDEVENTWR) {
 
         bool done(buffer_.writesome(sfd_));
 
@@ -117,7 +117,7 @@ established::do_process(mplexer& mplexer)
 
             // No more (buffered) data to be written.
 
-            setioeventmask(mplexer, sfd_, AUG_IOEVENTRD);
+            setfdeventmask(mplexer, sfd_, AUG_FDEVENTRD);
 
             // If flagged for shutdown, send FIN and disable writes.
 

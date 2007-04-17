@@ -48,9 +48,9 @@ namespace aug {
     };
 
     inline void
-    setioeventmask(aug_mplexer_t mplexer, fdref ref, unsigned short mask)
+    setfdeventmask(aug_mplexer_t mplexer, fdref ref, unsigned short mask)
     {
-        verify(aug_setioeventmask(mplexer, ref.get(), mask));
+        verify(aug_setfdeventmask(mplexer, ref.get(), mask));
     }
 
     /**
@@ -58,27 +58,27 @@ namespace aug {
     */
 
     inline int
-    waitioevents(aug_mplexer_t mplexer, const timeval& timeout)
+    waitfdevents(aug_mplexer_t mplexer, const timeval& timeout)
     {
-        return verify(aug_waitioevents(mplexer, &timeout));
+        return verify(aug_waitfdevents(mplexer, &timeout));
     }
 
     inline int
-    waitioevents(aug_mplexer_t mplexer)
+    waitfdevents(aug_mplexer_t mplexer)
     {
-        return verify(aug_waitioevents(mplexer, 0));
+        return verify(aug_waitfdevents(mplexer, 0));
     }
 
     inline unsigned short
-    ioeventmask(aug_mplexer_t mplexer, fdref ref)
+    fdeventmask(aug_mplexer_t mplexer, fdref ref)
     {
-        return verify(aug_ioeventmask(mplexer, ref.get()));
+        return verify(aug_fdeventmask(mplexer, ref.get()));
     }
 
     inline unsigned short
-    ioevents(aug_mplexer_t mplexer, fdref ref)
+    fdevents(aug_mplexer_t mplexer, fdref ref)
     {
-        return verify(aug_ioevents(mplexer, ref.get()));
+        return verify(aug_fdevents(mplexer, ref.get()));
     }
 
     inline std::pair<smartfd, smartfd>

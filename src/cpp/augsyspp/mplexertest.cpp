@@ -23,8 +23,8 @@ main(int argc, char* argv[])
         for (int i(0); i < 256; ++i) {
             pair<smartfd, smartfd> xy(socketpair(AF_UNIX, SOCK_STREAM, 0));
             try {
-                setioeventmask(mp, xy.first, AUG_IOEVENTRD);
-                setioeventmask(mp, xy.second, AUG_IOEVENTRD);
+                setfdeventmask(mp, xy.first, AUG_FDEVENTRD);
+                setfdeventmask(mp, xy.second, AUG_FDEVENTRD);
                 v.push_back(xy.first);
                 v.push_back(xy.second);
             } catch (const system_error& e) {

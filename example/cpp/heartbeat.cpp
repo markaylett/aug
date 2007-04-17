@@ -727,7 +727,7 @@ namespace {
         mplexer mp;
         timers ts;
         session s(node, ref, ep, ts);
-        setioeventmask(mp, ref, AUG_IOEVENTRD);
+        setfdeventmask(mp, ref, AUG_FDEVENTRD);
 
         timeval tv;
         int ret(!0);
@@ -737,10 +737,10 @@ namespace {
             aug_info("timeout in: tv_sec=%d, tv_usec=%d", (int)tv.tv_sec,
                      (int)tv.tv_usec);
 
-            while (AUG_RETINTR == (ret = waitioevents(mp, tv)))
+            while (AUG_RETINTR == (ret = waitfdevents(mp, tv)))
                 ;
 
-            aug_info("waitioevents: %d", ret);
+            aug_info("waitfdevents: %d", ret);
 
             if (0 < ret) {
                 packet p;
