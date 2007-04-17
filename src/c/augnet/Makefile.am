@@ -3,6 +3,7 @@ include $(top_srcdir)/src/c/lang.mk
 modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
 	auth.h \
+	base.h \
 	base64.h \
 	config.h \
 	connector.h \
@@ -11,6 +12,8 @@ modinclude_HEADERS = \
 	http.h \
 	inet.h \
 	mar.h \
+	nbfile.h \
+	ssl.h \
 	types.h \
 	writer.h
 
@@ -20,6 +23,7 @@ lib_LTLIBRARIES = libaugnet.la
 
 libaugnet_la_SOURCES = \
 	auth.c \
+	base.c \
 	base64.c \
 	config.c \
 	connector.c \
@@ -28,6 +32,8 @@ libaugnet_la_SOURCES = \
 	http.c \
 	inet.c \
 	mar.c \
+	nbfile.c \
+	ssl.c \
 	types.c \
 	writer.c
 

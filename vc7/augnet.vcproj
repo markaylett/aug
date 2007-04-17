@@ -138,6 +138,9 @@
 				RelativePath="..\src\c\augnet\auth.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\base.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\base64.c">
 			</File>
 			<File
@@ -159,6 +162,12 @@
 				RelativePath="..\src\c\augnet\mar.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\nbfile.c">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\ssl.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\types.c">
 			</File>
 			<File
@@ -171,6 +180,9 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath="..\src\c\augnet\auth.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\base.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\base64.h">
@@ -192,6 +204,12 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\mar.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\nbfile.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\ssl.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\types.h">

@@ -5,6 +5,7 @@
 #define AUGNET_H
 
 #include "augnet/auth.h"
+#include "augnet/base.h"
 #include "augnet/base64.h"
 #include "augnet/connector.h"
 #include "augnet/file.h"
@@ -12,6 +13,8 @@
 #include "augnet/http.h"
 #include "augnet/inet.h"
 #include "augnet/mar.h"
+#include "augnet/nbio.h"
+#include "augnet/ssl.h"
 #include "augnet/types.h"
 #include "augnet/writer.h"
 

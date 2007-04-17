@@ -6,4 +6,21 @@
 
 #include "augsys/types.h"
 
+struct aug_files;
+struct aug_nbtype;
+struct aug_var;
+
+typedef struct aug_nbfiles_* aug_nbfiles_t;
+typedef int (*aug_nbfilecb_t)(const struct aug_var*, int, unsigned short,
+                              aug_nbfiles_t);
+
+struct aug_nbfile {
+    aug_nbfiles_t nbfiles_;
+    int fd_;
+    aug_nbfilecb_t cb_;
+    const struct aug_fdtype* base_;
+    const struct aug_nbtype* type_;
+    void* ext_;
+};
+
 #endif /* AUGNET_TYPES_H */

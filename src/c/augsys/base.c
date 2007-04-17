@@ -92,7 +92,7 @@ static void
 zerofiles_(struct file_* begin, size_t n)
 {
     size_t i;
-    for (i = 0; n > i; ++i) {
+    for (i = 0; i < n; ++i) {
         begin[i].refs_ = 0;
         begin[i].fdtype_ = NULL;
     }
