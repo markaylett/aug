@@ -237,6 +237,12 @@ aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout)
 }
 
 AUGNET_API int
+aug_emptynbfiles(aug_nbfiles_t nbfiles)
+{
+    return AUG_EMPTY(&nbfiles->files_);
+}
+
+AUGNET_API int
 aug_shutdownnbfile(int fd)
 {
     struct aug_nbfile nbfile;

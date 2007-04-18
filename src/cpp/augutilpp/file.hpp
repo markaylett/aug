@@ -62,7 +62,7 @@ namespace aug {
 
     template <typename T>
     void
-    readconf(const char* path, aug_confcb_t cb, T& x)
+    readconf(const char* path, T& x)
     {
         verify(aug_readconf(path, confmemcb<T>, &x));
     }

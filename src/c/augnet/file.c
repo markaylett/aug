@@ -204,15 +204,3 @@ aug_foreachfile(struct aug_files* files)
     }
     return 0;
 }
-
-AUGNET_API const struct aug_var*
-aug_filevar(struct aug_files* files, int fd)
-{
-    struct aug_file_* it;
-
-    AUG_FOREACH(it, files)
-        if (it->fd_ == fd && !it->trash_)
-            return &it->var_;
-
-    return NULL;
-}

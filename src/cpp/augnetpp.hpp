@@ -12,6 +12,7 @@
 #include "augnetpp/http.hpp"
 #include "augnetpp/inet.hpp"
 #include "augnetpp/mar.hpp"
+#include "augnetpp/nbfile.hpp"
 #include "augnetpp/writer.hpp"
 
 #endif // AUGNETPP_HPP

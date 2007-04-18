@@ -29,6 +29,9 @@ AUGNET_API int
 aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout);
 
 AUGNET_API int
+aug_emptynbfiles(aug_nbfiles_t nbfiles);
+
+AUGNET_API int
 aug_shutdownnbfile(int fd);
 
 AUGNET_API int

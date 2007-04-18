@@ -14,14 +14,16 @@ AUG_RCSID("$Id$");
 #include "augsys/base.h"
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
+#include "augsys/socket.h" /* aug_shutdown() */
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 
 #if !defined(_WIN32)
-# define _get_osfhandle(x) x
+# define OSFD_(x) (x)
 #else /* _WIN32 */
 # include <io.h>
+# define OSFD_(x) _get_osfhandle(x)
 #endif /* _WIN32 */
 
 struct buf_ {
@@ -31,8 +33,10 @@ struct buf_ {
 
 enum sslstate_ {
     NORMAL,
-    RDONWR,
-    WRONRD,
+    RDWANTRD,
+    RDWANTWR,
+    WRWANTRD,
+    WRWANTWR,
     RDPEND,
     RDZERO,
     SSLERR
@@ -42,6 +46,7 @@ struct sslext_ {
     SSL* ssl_;
     struct buf_ inbuf_, outbuf_;
     enum sslstate_ state_;
+    int shutdown_;
 
     /* The event mask from the user's perspective. */
 
@@ -160,11 +165,13 @@ realmask_(struct aug_nbfile* nbfile)
         else
             mask = AUG_FDEVENTRD;
         break;
-    case RDONWR:
-        mask = AUG_FDEVENTWR;
-        break;
-    case WRONRD:
+    case RDWANTRD:
+    case WRWANTRD:
         mask = AUG_FDEVENTRD;
+        break;
+    case RDWANTWR:
+    case WRWANTWR:
+        mask = AUG_FDEVENTWR;
         break;
     case RDPEND:
     case RDZERO:
@@ -255,29 +262,34 @@ readwrite_(struct sslext_* x, int events)
     /* Now check if there's data to read. */
 
     if ((events & AUG_FDEVENTRD)
-        && (RDONWR == x->state_ || !buffull_(&x->inbuf_))) {
-
-        x->state_ = NORMAL;
+        && (RDWANTRD == x->state_ || RDWANTWR == x->state_
+            || !buffull_(&x->inbuf_))) {
 
         ret = readssl_(x->ssl_, &x->inbuf_);
         switch (SSL_get_error(x->ssl_, ret)) {
         case SSL_ERROR_NONE:
             AUG_DEBUG2("SSL: %d bytes read to input buffer", ret);
-
             if ((ret = SSL_pending(x->ssl_))) {
                 AUG_DEBUG2("SSL: %d bytes pending for immediate read", ret);
                 x->state_ = RDPEND;
+                goto done;
             }
+            x->state_ = NORMAL;
             break;
 
         case SSL_ERROR_ZERO_RETURN:
             AUG_DEBUG2("SSL: end of data");
+            if (!x->shutdown_) {
+                AUG_DEBUG2("SSL: shutting-down", ret);
+                SSL_shutdown(x->ssl_);
+            }
             x->state_ = RDZERO;
-            return;
+            goto done;
 
         case SSL_ERROR_WANT_READ:
             AUG_DEBUG2("SSL: read wants read");
-            return;
+            x->state_ = RDWANTRD;
+            goto done;
 
             /* We get a WANT_WRITE if we're trying to rehandshake and we block
                on a write during that rehandshake.
@@ -287,22 +299,21 @@ readwrite_(struct sslext_* x, int events)
 
         case SSL_ERROR_WANT_WRITE:
             AUG_DEBUG2("SSL: read wants write");
-            x->state_ = RDONWR;
-            break;
+            x->state_ = RDWANTWR;
+            goto done;
 
         default:
             seterrinfo_(__FILE__, __LINE__, "SSL_read() failed");
             x->state_ = SSLERR;
-            return;
+            goto done;
         }
     }
 
     /* If the socket is writeable... */
 
     if ((events & AUG_FDEVENTWR)
-        && (WRONRD == x->state_ || !bufempty_(&x->outbuf_))) {
-
-        x->state_ = NORMAL;
+        && (WRWANTRD == x->state_ || WRWANTWR == x->state_
+            || !bufempty_(&x->outbuf_))) {
 
         /* Try to write. */
 
@@ -310,12 +321,14 @@ readwrite_(struct sslext_* x, int events)
         switch (SSL_get_error(x->ssl_, ret)) {
         case SSL_ERROR_NONE:
             AUG_DEBUG2("SSL: %d bytes written from output buffer", ret);
+            x->state_ = NORMAL;
             break;
 
             /* We would have blocked. */
 
         case SSL_ERROR_WANT_WRITE:
             AUG_DEBUG2("SSL: write wants write");
+            x->state_ = WRWANTWR;
             break;
 
             /* We get a WANT_READ if we're trying to rehandshake and we block
@@ -326,7 +339,7 @@ readwrite_(struct sslext_* x, int events)
 
         case SSL_ERROR_WANT_READ:
             AUG_DEBUG2("SSL: write wants read");
-            x->state_ = WRONRD;
+            x->state_ = WRWANTRD;
             break;
 
             /* Some other error. */
@@ -334,9 +347,11 @@ readwrite_(struct sslext_* x, int events)
         default:
             seterrinfo_(__FILE__, __LINE__, "SSL_write() failed");
             x->state_ = SSLERR;
-            return;
+            break;
         }
     }
+ done:
+    return;
 }
 
 static int
@@ -350,14 +365,14 @@ filecb_(const struct aug_var* var, struct aug_nbfile* nbfile,
     int events = aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
     int ret;
 
+    /* Transform events. */
+
     switch (x->state_) {
-    case NORMAL:
-        break;
-    case RDONWR:
+    case RDWANTWR:
         if (events & AUG_FDEVENTWR)
             events = AUG_FDEVENTRD;
         break;
-    case WRONRD:
+    case WRWANTRD:
         if (events & AUG_FDEVENTRD)
             events = AUG_FDEVENTWR;
         break;
@@ -370,6 +385,8 @@ filecb_(const struct aug_var* var, struct aug_nbfile* nbfile,
     case RDZERO:
     case SSLERR:
         events = 0;
+        break;
+    default:
         break;
     }
 
@@ -427,6 +444,8 @@ shutdown_(struct aug_nbfile* nbfile)
 {
     struct sslext_* x = nbfile->ext_;
     int ret = SSL_shutdown(x->ssl_);
+    aug_shutdown(nbfile->fd_, SHUT_WR);
+    x->shutdown_ = 1;
 
     if (ret <= 0) {
         seterrinfo_(__FILE__, __LINE__, "SSL_shutdown() failed");
@@ -448,14 +467,15 @@ createsslext_(aug_nbfiles_t nbfiles, int fd, SSL_CTX* ctx)
 {
     struct sslext_* x;
     SSL* ssl = SSL_new(ctx);
-    BIO* sbio = BIO_new_socket(_get_osfhandle(fd), BIO_NOCLOSE);
+    BIO* sbio = BIO_new_socket(OSFD_(fd), BIO_NOCLOSE);
     SSL_set_bio(ssl, sbio, sbio);
 
     x = malloc(sizeof(struct sslext_));
     x->ssl_ = ssl;
     clearbuf_(&x->inbuf_);
     clearbuf_(&x->outbuf_);
-    x->state_ = RDONWR;
+    x->state_ = RDWANTWR;
+    x->shutdown_ = 0;
     x->mask_ = aug_fdeventmask(nbfiles->mplexer_, fd);
     aug_setfdeventmask(nbfiles->mplexer_, fd, AUG_FDEVENTRDWR);
 

@@ -57,7 +57,7 @@ libaugnetpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugnetpp_la_OBJECTS = base64.lo config.lo connector.lo file.lo \
-	http.lo inet.lo writer.lo
+	http.lo inet.lo mar.lo nbfile.lo writer.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
 am_augnetpp_base64test_OBJECTS = base64test.$(OBJEXT)
 augnetpp_base64test_OBJECTS = $(am_augnetpp_base64test_OBJECTS)
@@ -93,14 +93,6 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugnetpp_la_SOURCES) $(augnetpp_base64test_SOURCES) \
 	$(augnetpp_connectortest_SOURCES) $(augnetpp_test_SOURCES)
 DIST_SOURCES = $(libaugnetpp_la_SOURCES) \
@@ -244,6 +236,7 @@ modinclude_HEADERS = \
 	http.hpp \
 	inet.hpp \
 	mar.hpp \
+	nbfile.hpp \
 	writer.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -254,7 +247,8 @@ libaugnetpp_la_SOURCES = \
 	file.cpp \
 	http.cpp \
 	inet.cpp \
-	mar.hpp \
+	mar.cpp \
+	nbfile.cpp \
 	writer.cpp
 
 libaugnetpp_la_LDFLAGS = \
@@ -370,6 +364,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nbfile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Plo@am__quote@
 

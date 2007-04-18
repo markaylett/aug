@@ -159,6 +159,9 @@
 				RelativePath="..\src\cpp\augnetpp\mar.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augnetpp\nbfile.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augnetpp\writer.cpp">
 			</File>
 		</Filter>
@@ -186,6 +189,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\mar.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augnetpp\nbfile.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\writer.hpp">

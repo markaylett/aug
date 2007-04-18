@@ -2,12 +2,13 @@
 
 for path in $*; do
 
-    name=`basename $path | cut -d. -f1 | cut -d- -f1`
+    cyg=`basename $path | cut -d. -f1 | cut -d- -f1`
+    lib=`echo $cyg | sed -e s/^cyg/lib/`
 
-    echo "LIBRARY $name-0.dll" >$name.def
-    echo 'EXPORTS' >>$name.def
+    echo "LIBRARY $cyg-1.dll" >$lib.def
+    echo 'EXPORTS' >>$lib.def
     dumpbin -EXPORTS $path \
-        | awk '{ if ($4 ~ /^aug/) print "\t", $4; }' >>$name.def
-    lib /DEF:$name.def /MACHINE:X86
+        | awk '{ if ($4 ~ /^aug/) print "\t", $4; }' >>$lib.def
+    lib /DEF:$lib.def /MACHINE:X86
 
 done
