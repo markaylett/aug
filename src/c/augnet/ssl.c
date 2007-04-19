@@ -179,17 +179,52 @@ realmask_(struct aug_nbfile* nbfile)
         break;
     }
 
+    AUG_DEBUG2("SSL: real mask: fd=[%d], mask=[%d]", nbfile->fd_, mask);
     return mask;
+}
+
+static int
+userevents_(struct aug_nbfile* nbfile)
+{
+    struct sslext_* x = nbfile->ext_;
+    int events = 0;
+
+    if ((x->mask_ & AUG_FDEVENTRD)
+        && (!bufempty_(&x->inbuf_) || RDZERO == x->state_
+            || SSLERR == x->state_))
+        events |= AUG_FDEVENTRD;
+
+    if ((x->mask_ & AUG_FDEVENTWR) && !buffull_(&x->outbuf_))
+        events |= AUG_FDEVENTWR;
+
+    AUG_DEBUG2("SSL: user events: fd=[%d], mask=[%d], events=[%d]",
+               nbfile->fd_, x->mask_, events);
+    return events;
+}
+
+static void
+updateevents_(struct aug_nbfile* nbfile)
+{
+    aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_,
+                       realmask_(nbfile));
+    if (userevents_(nbfile))
+        nbfile->nbfiles_->nowait_ = 1;
 }
 
 static int
 close_(int fd)
 {
     struct aug_nbfile nbfile;
-    struct sslext_* x = aug_getnbfile(fd, &nbfile)->ext_;
+    struct sslext_* x;
+
+    if (!aug_resetnbfile(fd, &nbfile))
+        return -1;
+
+    x = nbfile.ext_;
 
     AUG_DEBUG2("clearing io-event mask: fd=[%d]", fd);
     aug_setfdeventmask(nbfile.nbfiles_->mplexer_, fd, 0);
+    aug_removefile(&nbfile.nbfiles_->files_, fd);
 
     SSL_free(x->ssl_);
     free(x);
@@ -207,7 +242,13 @@ static ssize_t
 read_(int fd, void* buf, size_t size)
 {
     struct aug_nbfile nbfile;
-    struct sslext_* x = aug_getnbfile(fd, &nbfile)->ext_;
+    struct sslext_* x;
+    ssize_t ret;
+
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
+
+    x = nbfile.ext_;
 
     if (SSLERR == x->state_)
         return -1;
@@ -215,18 +256,29 @@ read_(int fd, void* buf, size_t size)
     if (RDZERO == x->state_ && bufempty_(&x->inbuf_))
         return 0;
 
-    return readbuf_(&x->inbuf_, buf, size);
+    AUG_DEBUG2("SSL: reading from user buffer: fd=[%d]", fd);
+
+    ret = readbuf_(&x->inbuf_, buf, size);
+    updateevents_(&nbfile);
+    return ret;
 }
 
 static ssize_t
 write_(int fd, const void* buf, size_t len)
 {
     struct aug_nbfile nbfile;
-    struct sslext_* x = aug_getnbfile(fd, &nbfile)->ext_;
-    ssize_t ret = writebuf_(&x->outbuf_, buf, len);
+    struct sslext_* x;
+    ssize_t ret;
 
-    aug_setfdeventmask(nbfile.nbfiles_->mplexer_, nbfile.fd_,
-                       realmask_(&nbfile));
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
+
+    x = nbfile.ext_;
+
+    AUG_DEBUG2("SSL: writing to user buffer: fd=[%d]", fd);
+
+    ret = writebuf_(&x->outbuf_, buf, len);
+    updateevents_(&nbfile);
     return ret;
 }
 
@@ -234,7 +286,9 @@ static int
 setnonblock_(int fd, int on)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
 
     if (!nbfile.base_->setnonblock_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -355,11 +409,7 @@ readwrite_(struct sslext_* x, int events)
 }
 
 static int
-events_(struct aug_nbfile* nbfile);
-
-static int
-filecb_(const struct aug_var* var, struct aug_nbfile* nbfile,
-        struct aug_files* files)
+filecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
 {
     struct sslext_* x = nbfile->ext_;
     int events = aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
@@ -393,15 +443,10 @@ filecb_(const struct aug_var* var, struct aug_nbfile* nbfile,
     if (events)
         readwrite_(x, events);
 
-    events = events_(nbfile);
-    ret = events ? nbfile
-        ->cb_(var, nbfile->fd_, (unsigned short)events, nbfile->nbfiles_) : 1;
+    events = userevents_(nbfile);
+    ret = events ? nbfile->cb_(var, nbfile->fd_, events) : 1;
 
-    if (ret && !(events = realmask_(nbfile)))
-        ++nbfile->nbfiles_->pending_;
-
-    aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_,
-                       (unsigned short)events);
+    updateevents_(nbfile);
     return ret;
 }
 
@@ -409,7 +454,12 @@ static int
 seteventmask_(struct aug_nbfile* nbfile, unsigned short mask)
 {
     struct sslext_* x = nbfile->ext_;
+
+    AUG_DEBUG2("SSL: setting event mask: fd=[%d], mask=[%d]",
+               nbfile->fd_, (int)mask);
+
     x->mask_ = mask;
+    updateevents_(nbfile);
     return 0;
 }
 
@@ -423,20 +473,7 @@ eventmask_(struct aug_nbfile* nbfile)
 static int
 events_(struct aug_nbfile* nbfile)
 {
-    struct sslext_* x = nbfile->ext_;
-    int events = 0;
-
-    if ((x->mask_ & AUG_FDEVENTRD)
-        && (!bufempty_(&x->inbuf_) || RDZERO == x->state_
-            || SSLERR == x->state_))
-        events |= AUG_FDEVENTRD;
-
-    if ((x->mask_ & AUG_FDEVENTWR) && !buffull_(&x->outbuf_))
-        events |= AUG_FDEVENTWR;
-
-    AUG_DEBUG2("SSL: client events: mask=[%d], events=[%d]",
-               x->mask_, events);
-    return events;
+    return userevents_(nbfile);
 }
 
 static int
@@ -488,7 +525,9 @@ setsslext_(int fd, SSL_CTX* ctx)
     struct aug_nbfile nbfile;
     struct sslext_* x;
 
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return NULL;
+
     aug_setfdtype(fd, &sslfdtype_);
     nbfile.type_ = &nbtype_;
     nbfile.ext_ = x = createsslext_(nbfile.nbfiles_, fd, ctx);
@@ -498,18 +537,20 @@ setsslext_(int fd, SSL_CTX* ctx)
 }
 
 AUGNET_API int
-aug_setsslclient(int fd, void* ctx)
+aug_setsslclient(int fd, void* ctx, int verify)
 {
     struct sslext_* x = setsslext_(fd, ctx);
     SSL_set_connect_state(x->ssl_);
+    SSL_set_verify(ctx, verify, SSL_get_verify_callback(x->ssl_));
     return 0;
 }
 
 AUGNET_API int
-aug_setsslserver(int fd, void* ctx)
+aug_setsslserver(int fd, void* ctx, int verify)
 {
     struct sslext_* x = setsslext_(fd, ctx);
     SSL_set_accept_state(x->ssl_);
+    SSL_set_verify(ctx, verify, SSL_get_verify_callback(x->ssl_));
     return 0;
 }
 
@@ -518,7 +559,7 @@ aug_setsslserver(int fd, void* ctx)
 #include "augsys/errinfo.h"
 
 AUGNET_API int
-aug_setsslclient(int fd, void* ctx)
+aug_setsslclient(int fd, void* ctx, int verify)
 {
     aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                    AUG_MSG("aug_setsslclient() not supported"));
@@ -526,7 +567,7 @@ aug_setsslclient(int fd, void* ctx)
 }
 
 AUGNET_API int
-aug_setsslserver(int fd, void* ctx)
+aug_setsslserver(int fd, void* ctx, int verify)
 {
     aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                    AUG_MSG("aug_setsslserver() not supported"));

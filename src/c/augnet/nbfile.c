@@ -15,14 +15,18 @@ AUG_RCSID("$Id$");
 #include "augsys/log.h"
 #include "augsys/socket.h" /* aug_shutdown() */
 
+#include <stdlib.h>        /* malloc() */
+
 static int
 close_(int fd)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_resetnbfile(fd, &nbfile))
+        return -1;
 
     AUG_DEBUG2("clearing io-event mask: fd=[%d]", fd);
     aug_setfdeventmask(nbfile.nbfiles_->mplexer_, fd, 0);
+    aug_removefile(&nbfile.nbfiles_->files_, fd);
 
     if (!nbfile.base_->close_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -37,7 +41,8 @@ static ssize_t
 read_(int fd, void* buf, size_t size)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
 
     if (!nbfile.base_->read_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -52,7 +57,8 @@ static ssize_t
 readv_(int fd, const struct iovec* iov, int size)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
 
     if (!nbfile.base_->readv_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -67,7 +73,8 @@ static ssize_t
 write_(int fd, const void* buf, size_t len)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
 
     if (!nbfile.base_->write_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -82,7 +89,8 @@ static ssize_t
 writev_(int fd, const struct iovec* iov, int size)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
 
     if (!nbfile.base_->writev_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -97,7 +105,8 @@ static int
 setnonblock_(int fd, int on)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
 
     if (!nbfile.base_->setnonblock_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -118,12 +127,11 @@ static const struct aug_fdtype fdtype_ = {
 };
 
 static int
-filecb_(const struct aug_var* var, struct aug_nbfile* nbfile,
-        struct aug_files* files)
+filecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
 {
     int events = aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
-    return events ? nbfile
-        ->cb_(var, nbfile->fd_, (unsigned short)events, nbfile->nbfiles_) : 1;
+    return events
+        ? nbfile->cb_(var, nbfile->fd_, (unsigned short)events) : 1;
 }
 
 static int
@@ -159,11 +167,12 @@ static const struct aug_nbtype nbtype_ = {
 };
 
 static int
-cb_(const struct aug_var* var, int fd, struct aug_files* files)
+cb_(const struct aug_var* var, int fd)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
-    return nbfile.type_->filecb_(var, &nbfile, files);
+    if (!aug_getnbfile(fd, &nbfile))
+        return 0;
+    return nbfile.type_->filecb_(var, &nbfile);
 }
 
 AUGNET_API aug_nbfiles_t
@@ -179,7 +188,7 @@ aug_createnbfiles(void)
         return NULL;
     }
     AUG_INIT(&nbfiles->files_);
-    nbfiles->pending_ = 0;
+    nbfiles->nowait_ = 0;
     return nbfiles;
 }
 
@@ -218,22 +227,15 @@ AUGNET_API int
 aug_removenbfile(int fd)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
     return aug_removefile(&nbfile.nbfiles_->files_, fd);
 }
 
 AUGNET_API int
 aug_foreachnbfile(aug_nbfiles_t nbfiles)
 {
-    nbfiles->pending_ = 0;
     return aug_foreachfile(&nbfiles->files_);
-}
-
-AUGNET_API int
-aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout)
-{
-    return nbfiles->pending_ ? nbfiles->pending_
-        : aug_waitfdevents(nbfiles->mplexer_, timeout);
 }
 
 AUGNET_API int
@@ -243,10 +245,27 @@ aug_emptynbfiles(aug_nbfiles_t nbfiles)
 }
 
 AUGNET_API int
+aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout)
+{
+    static const struct timeval nowait = { 0, 0 };
+    int ret;
+
+    if (nbfiles->nowait_) {
+        nbfiles->nowait_ = 0;
+        ret = aug_waitfdevents(nbfiles->mplexer_, &nowait)
+            + 1; /* At least one. */
+    } else
+        ret = aug_waitfdevents(nbfiles->mplexer_, timeout);
+
+    return ret;
+}
+
+AUGNET_API int
 aug_shutdownnbfile(int fd)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
     return nbfile.type_->shutdown_(&nbfile);
 }
 
@@ -254,7 +273,8 @@ AUGNET_API int
 aug_setnbeventmask(int fd, unsigned short mask)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
     return nbfile.type_->seteventmask_(&nbfile, mask);
 }
 
@@ -262,7 +282,8 @@ AUGNET_API int
 aug_nbeventmask(int fd)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
     return nbfile.type_->eventmask_(&nbfile);
 }
 
@@ -270,6 +291,7 @@ AUGNET_API int
 aug_nbevents(int fd)
 {
     struct aug_nbfile nbfile;
-    aug_getnbfile(fd, &nbfile);
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
     return nbfile.type_->events_(&nbfile);
 }

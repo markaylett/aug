@@ -18,33 +18,30 @@
 
 namespace aug {
 
-    template <void (*T)(const aug_var&, int, unsigned&, aug_timers&)>
+    template <void (*T)(const aug_var&, int, unsigned&)>
     void
-    timercb(const aug_var* var, int id, unsigned* ms,
-            aug_timers* timers) AUG_NOTHROW
+    timercb(const aug_var* var, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            T(*var, id, *ms, *timers);
+            T(*var, id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
-    template <typename T, void (T::*U)(int, unsigned&, aug_timers&)>
+    template <typename T, void (T::*U)(int, unsigned&)>
     void
-    timermemcb(const aug_var* var, int id, unsigned* ms,
-               aug_timers* timers) AUG_NOTHROW
+    timermemcb(const aug_var* var, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            (static_cast<T*>(var->arg_)->*U)(id, *ms, *timers);
+            (static_cast<T*>(var->arg_)->*U)(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
     template <typename T>
     void
-    timermemcb(const aug_var* var, int id, unsigned* ms,
-               aug_timers* timers) AUG_NOTHROW
+    timermemcb(const aug_var* var, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            static_cast<T*>(var->arg_)->timercb(id, *ms, *timers);
+            static_cast<T*>(var->arg_)->timercb(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 

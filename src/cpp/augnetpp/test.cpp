@@ -17,7 +17,7 @@ namespace {
         {
         }
         bool
-        filecb(int fd, aug_files& files)
+        filecb(int fd)
         {
             return true;
         }

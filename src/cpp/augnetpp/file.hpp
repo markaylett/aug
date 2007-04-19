@@ -22,12 +22,12 @@
 
 namespace aug {
 
-    template <bool (*T)(const aug_var&, int, aug_files&)>
+    template <bool (*T)(const aug_var&, int)>
     int
-    filecb(const aug_var* var, int fd, aug_files* files) AUG_NOTHROW
+    filecb(const aug_var* var, int fd) AUG_NOTHROW
     {
         try {
-            return T(*var, fd, *files) ? 1 : 0;
+            return T(*var, fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
 
         /**
@@ -37,22 +37,22 @@ namespace aug {
         return 1;
     }
 
-    template <typename T, bool (T::*U)(int, aug_files&)>
+    template <typename T, bool (T::*U)(int)>
     int
-    filememcb(const aug_var* var, int fd, aug_files* files) AUG_NOTHROW
+    filememcb(const aug_var* var, int fd) AUG_NOTHROW
     {
         try {
-            return (static_cast<T*>(var->arg_)->*U)(fd, *files) ? 1 : 0;
+            return (static_cast<T*>(var->arg_)->*U)(fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
 
     template <typename T>
     int
-    filememcb(const aug_var* var, int fd, aug_files* files) AUG_NOTHROW
+    filememcb(const aug_var* var, int fd) AUG_NOTHROW
     {
         try {
-            return static_cast<T*>(var->arg_)->filecb(fd, *files) ? 1 : 0;
+            return static_cast<T*>(var->arg_)->filecb(fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
@@ -91,12 +91,6 @@ namespace aug {
         operator const aug_files&() const
         {
             return files_;
-        }
-
-        bool
-        empty() const
-        {
-            return AUG_EMPTY(&files_);
         }
     };
 
@@ -141,6 +135,12 @@ namespace aug {
     foreachfile(aug_files& files)
     {
         verify(aug_foreachfile(&files));
+    }
+
+    inline bool
+    emptyfiles(aug_files& files)
+    {
+        return AUG_EMPTY(&files);
     }
 }
 

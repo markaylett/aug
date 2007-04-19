@@ -204,7 +204,7 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
 
             AUG_REMOVE_HEAD(timers);
 
-            (*it->cb_)(&it->var_, it->id_, &it->ms_, timers);
+            (*it->cb_)(&it->var_, it->id_, &it->ms_);
             if (it->ms_) {
 
                 if (-1 == expiry_(&it->tv_, it->ms_))

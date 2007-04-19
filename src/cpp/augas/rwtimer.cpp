@@ -5,7 +5,7 @@
 #include "augas/rwtimer.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include <cassert>
 
@@ -18,7 +18,7 @@ rwtimer_base::~rwtimer_base() AUG_NOTHROW
 }
 
 void
-rwtimer::do_timercb(int id, unsigned& ms, aug_timers& timers)
+rwtimer::do_timercb(int id, unsigned& ms)
 {
     if (rdtimer_.id() == id) {
         AUG_DEBUG2("read timer expiry");

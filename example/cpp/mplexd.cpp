@@ -172,7 +172,7 @@ namespace test {
             timer_.set(5000, *this);
         }
         void
-        timercb(int id, unsigned& ms, aug_timers& timers)
+        timercb(int id, unsigned& ms)
         {
             ms = 0; // Cancel.
 
@@ -405,18 +405,18 @@ namespace test {
         {
         }
         bool
-        filecb(int fd, aug_files& files)
+        filecb(int fd)
         {
             if (!fdevents(state_->mplexer_, fd))
                 return true;
 
             if (fd == aug_eventin())
-                return readevent(fd, files);
+                return readevent(fd, state_->files_);
 
             if (fd == state_->sfd_.get())
-                return listener(fd, files);
+                return listener(fd, state_->files_);
 
-            return connection(fd, files);
+            return connection(fd, state_->files_);
         }
     };
 }

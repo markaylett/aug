@@ -215,7 +215,7 @@ namespace test {
         }
 
         void
-        timercb(int id, unsigned& ms, aug_timers& timers)
+        timercb(int id, unsigned& ms)
         {
             aug_info("timer fired");
             --remain_;

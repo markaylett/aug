@@ -22,13 +22,12 @@
 
 namespace aug {
 
-    template <bool (*T)(const aug_var&, int, unsigned short, aug_nbfiles_t)>
+    template <bool (*T)(const aug_var&, int, unsigned short)>
     int
-    nbfilecb(const aug_var* var, int fd, unsigned short events,
-             aug_nbfiles_t nbfiles) AUG_NOTHROW
+    nbfilecb(const aug_var* var, int fd, unsigned short events) AUG_NOTHROW
     {
         try {
-            return T(*var, fd, events, nbfiles) ? 1 : 0;
+            return T(*var, fd, events) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
 
         /**
@@ -38,27 +37,22 @@ namespace aug {
         return 1;
     }
 
-    template <typename T, bool (T::*U)(const aug_var&, int, unsigned short,
-                                       aug_nbfiles_t)>
+    template <typename T, bool (T::*U)(const aug_var&, int, unsigned short)>
     int
-    nbfilememcb(const aug_var* var, int fd, unsigned short events,
-              aug_nbfiles_t nbfiles) AUG_NOTHROW
+    nbfilememcb(const aug_var* var, int fd, unsigned short events) AUG_NOTHROW
     {
         try {
-            return (static_cast<T*>(var->arg_)->*U)(fd, events, nbfiles)
-                ? 1 : 0;
+            return (static_cast<T*>(var->arg_)->*U)(fd, events) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
 
     template <typename T>
     int
-    nbfilememcb(const aug_var* var, int fd, unsigned short events,
-              aug_nbfiles_t nbfiles) AUG_NOTHROW
+    nbfilememcb(const aug_var* var, int fd, unsigned short events) AUG_NOTHROW
     {
         try {
-            return static_cast<T*>(var->arg_)->nbfilecb(fd, events, nbfiles)
-                ? 1 : 0;
+            return static_cast<T*>(var->arg_)->nbfilecb(fd, events) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
@@ -140,6 +134,12 @@ namespace aug {
         verify(aug_foreachnbfile(nbfiles));
     }
 
+    inline bool
+    emptynbfiles(aug_nbfiles_t nbfiles)
+    {
+        return verify(aug_emptynbfiles(nbfiles)) ? true : false;
+    }
+
     /**
        Returns #AUG_RETINTR if the system call was interrupted.
     */
@@ -154,12 +154,6 @@ namespace aug {
     waitnbevents(aug_nbfiles_t nbfiles)
     {
         return verify(aug_waitnbevents(nbfiles, 0));
-    }
-
-    inline bool
-    emptynbfiles(aug_nbfiles_t nbfiles)
-    {
-        return verify(aug_emptynbfiles(nbfiles)) ? true : false;
     }
 
     inline void

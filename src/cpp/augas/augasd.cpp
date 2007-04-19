@@ -192,7 +192,7 @@ namespace augas {
     }
 
     void
-    timercb_(const aug_var* var, int id, unsigned* ms, aug_timers* timers)
+    timercb_(const aug_var* var, int id, unsigned* ms)
     {
         AUG_DEBUG2("custom timer expiry");
 
@@ -787,7 +787,7 @@ namespace augas {
     class service : public service_base {
 
         static void
-        reopen(const aug_var& var, int id, unsigned& ms, aug_timers& timers)
+        reopen(const aug_var& var, int id, unsigned& ms)
         {
             AUG_DEBUG2("re-opening log file");
             openlog_();
@@ -940,7 +940,7 @@ namespace augas {
 
     public:
         bool
-        filecb(int fd, aug_files& files)
+        filecb(int fd)
         {
             if (!fdevents(state_->mplexer_, fd))
                 return true;

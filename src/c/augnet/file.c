@@ -177,7 +177,7 @@ aug_foreachfile(struct aug_files* files)
         if (it == LOCKFILE_ || it->trash_)
             continue;
 
-        if (!(it->cb_(&it->var_, it->fd_, files))) {
+        if (!(it->cb_(&it->var_, it->fd_))) {
 
             aug_destroyvar(&it->var_);
             it->trash_ = 1;

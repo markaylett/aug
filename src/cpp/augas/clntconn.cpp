@@ -12,9 +12,9 @@ using namespace augas;
 using namespace std;
 
 void
-clntconn::do_timercb(int id, unsigned& ms, aug_timers& timers)
+clntconn::do_timercb(int id, unsigned& ms)
 {
-    rwtimer_.timercb(id, ms, timers);
+    rwtimer_.timercb(id, ms);
 }
 
 void

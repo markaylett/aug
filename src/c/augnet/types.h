@@ -11,8 +11,7 @@ struct aug_nbtype;
 struct aug_var;
 
 typedef struct aug_nbfiles_* aug_nbfiles_t;
-typedef int (*aug_nbfilecb_t)(const struct aug_var*, int, unsigned short,
-                              aug_nbfiles_t);
+typedef int (*aug_nbfilecb_t)(const struct aug_var*, int, unsigned short);
 
 struct aug_nbfile {
     aug_nbfiles_t nbfiles_;
