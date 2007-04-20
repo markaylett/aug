@@ -588,18 +588,18 @@ namespace augas {
     }
 
     int
-    setsslclient_(augas_id cid)
+    setsslclient_(augas_id cid, int flags)
     {
-        AUG_DEBUG2("setsslclient(): id=[%d]", cid);
+        AUG_DEBUG2("setsslclient(): id=[%d], flags=[%d]", cid, flags);
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_setsslclient() not supported"));
         return -1;
     }
 
     int
-    setsslserver_(augas_id cid)
+    setsslserver_(augas_id cid, int flags)
     {
-        AUG_DEBUG2("setsslserver(): id=[%d]", cid);
+        AUG_DEBUG2("setsslserver(): id=[%d], flags=[%d]", cid, flags);
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_setsslserver() not supported"));
         return -1;

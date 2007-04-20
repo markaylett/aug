@@ -37,7 +37,13 @@ enum sslstate_ {
     RDWANTWR,
     WRWANTRD,
     WRWANTWR,
+
+    /* Bytes stored in SSL buffer awaiting SSL_read(). */
+
     RDPEND,
+
+    /* End of data. */
+
     RDZERO,
     SSLERR
 };
@@ -52,17 +58,6 @@ struct sslext_ {
 
     unsigned short mask_;
 };
-
-static void
-seterrinfo_(const char* file, int line, const char* s)
-{
-    unsigned long err = ERR_get_error();
-    aug_seterrinfo(NULL, file, line, AUG_SRCSSL, err,
-                   "%s: %s: %s: %s", s,
-                   ERR_lib_error_string(err),
-                   ERR_func_error_string(err),
-                   ERR_reason_error_string(err));
-}
 
 static int
 bufempty_(struct buf_* x)
@@ -155,6 +150,8 @@ writessl_(SSL* ssl, struct buf_* x)
 static int
 realmask_(struct aug_nbfile* nbfile)
 {
+    /* Calculate the real mask to be used by the mplexer. */
+
     struct sslext_* x = nbfile->ext_;
     int mask = 0;
 
@@ -205,9 +202,13 @@ userevents_(struct aug_nbfile* nbfile)
 static void
 updateevents_(struct aug_nbfile* nbfile)
 {
+    struct sslext_* x = nbfile->ext_;
+
     aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_,
                        realmask_(nbfile));
-    if (userevents_(nbfile))
+
+    if (userevents_(nbfile)
+        || (RDPEND == x->state_ && !buffull_(&x->inbuf_)))
         nbfile->nbfiles_->nowait_ = 1;
 }
 
@@ -252,6 +253,8 @@ read_(int fd, void* buf, size_t size)
 
     if (SSLERR == x->state_)
         return -1;
+
+    /* Only return end once all data has been read from buffer. */
 
     if (RDZERO == x->state_ && bufempty_(&x->inbuf_))
         return 0;
@@ -302,9 +305,9 @@ setnonblock_(int fd, int on)
 static const struct aug_fdtype sslfdtype_ = {
     close_,
     read_,
-    NULL,
+    NULL, /* TODO */
     write_,
-    NULL,
+    NULL, /* TODO */
     setnonblock_
 };
 
@@ -357,7 +360,7 @@ readwrite_(struct sslext_* x, int events)
             goto done;
 
         default:
-            seterrinfo_(__FILE__, __LINE__, "SSL_read() failed");
+            aug_setsslerrinfo(NULL, __FILE__, __LINE__, ERR_get_error());
             x->state_ = SSLERR;
             goto done;
         }
@@ -399,7 +402,7 @@ readwrite_(struct sslext_* x, int events)
             /* Some other error. */
 
         default:
-            seterrinfo_(__FILE__, __LINE__, "SSL_write() failed");
+            aug_setsslerrinfo(NULL, __FILE__, __LINE__, ERR_get_error());
             x->state_ = SSLERR;
             break;
         }
@@ -485,7 +488,7 @@ shutdown_(struct aug_nbfile* nbfile)
     x->shutdown_ = 1;
 
     if (ret <= 0) {
-        seterrinfo_(__FILE__, __LINE__, "SSL_shutdown() failed");
+        aug_setsslerrinfo(NULL, __FILE__, __LINE__, ERR_get_error());
         return -1;
     }
     return 0;
@@ -500,14 +503,14 @@ static const struct aug_nbtype nbtype_ = {
 };
 
 static struct sslext_*
-createsslext_(aug_nbfiles_t nbfiles, int fd, SSL_CTX* ctx)
+createsslext_(aug_nbfiles_t nbfiles, int fd, SSL* ssl)
 {
-    struct sslext_* x;
-    SSL* ssl = SSL_new(ctx);
-    BIO* sbio = BIO_new_socket(OSFD_(fd), BIO_NOCLOSE);
-    SSL_set_bio(ssl, sbio, sbio);
+    struct sslext_* x = malloc(sizeof(struct sslext_));
+    if (!x) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        return NULL;
+    }
 
-    x = malloc(sizeof(struct sslext_));
     x->ssl_ = ssl;
     clearbuf_(&x->inbuf_);
     clearbuf_(&x->outbuf_);
@@ -520,58 +523,60 @@ createsslext_(aug_nbfiles_t nbfiles, int fd, SSL_CTX* ctx)
 }
 
 static struct sslext_*
-setsslext_(int fd, SSL_CTX* ctx)
+setsslext_(int fd, SSL* ssl)
 {
     struct aug_nbfile nbfile;
     struct sslext_* x;
 
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(fd, &nbfile)
+        || !(x = createsslext_(nbfile.nbfiles_, fd, ssl)))
         return NULL;
 
     aug_setfdtype(fd, &sslfdtype_);
     nbfile.type_ = &nbtype_;
-    nbfile.ext_ = x = createsslext_(nbfile.nbfiles_, fd, ctx);
+    nbfile.ext_ = x;
     aug_setnbfile(fd, &nbfile);
 
     return x;
 }
 
-AUGNET_API int
-aug_setsslclient(int fd, void* ctx, int verify)
+AUGNET_API void
+aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                  unsigned long err)
 {
-    struct sslext_* x = setsslext_(fd, ctx);
-    SSL_set_connect_state(x->ssl_);
-    SSL_set_verify(ctx, verify, SSL_get_verify_callback(x->ssl_));
+    aug_seterrinfo(errinfo, file, line, AUG_SRCSSL, err,
+                   "%s: %s: %s",
+                   ERR_lib_error_string(err),
+                   ERR_func_error_string(err),
+                   ERR_reason_error_string(err));
+
+    /* Log those that are not set in errinfo record. */
+
+    while ((err = ERR_get_error()))
+        aug_error("%s: %s: %s",
+                  ERR_lib_error_string(err),
+                  ERR_func_error_string(err),
+                  ERR_reason_error_string(err));
+}
+
+AUGNET_API int
+aug_setsslclient(int fd, void* ssl)
+{
+    if (!setsslext_(fd, ssl))
+        return -1;
+
+    SSL_set_connect_state(ssl);
     return 0;
 }
 
 AUGNET_API int
-aug_setsslserver(int fd, void* ctx, int verify)
+aug_setsslserver(int fd, void* ssl)
 {
-    struct sslext_* x = setsslext_(fd, ctx);
-    SSL_set_accept_state(x->ssl_);
-    SSL_set_verify(ctx, verify, SSL_get_verify_callback(x->ssl_));
+    if (!setsslext_(fd, ssl))
+        return -1;
+
+    SSL_set_accept_state(ssl);
     return 0;
 }
 
-#else /* !HAVE_OPENSSL_SSL_H */
-
-#include "augsys/errinfo.h"
-
-AUGNET_API int
-aug_setsslclient(int fd, void* ctx, int verify)
-{
-    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
-                   AUG_MSG("aug_setsslclient() not supported"));
-    return -1;
-}
-
-AUGNET_API int
-aug_setsslserver(int fd, void* ctx, int verify)
-{
-    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
-                   AUG_MSG("aug_setsslserver() not supported"));
-    return -1;
-}
-
-#endif /* !HAVE_OPENSSL_SSL_H */
+#endif /* HAVE_OPENSSL_SSL_H */

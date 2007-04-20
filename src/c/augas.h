@@ -309,20 +309,22 @@ struct augas_host {
     /**
        \brief TODO
        \param cid TODO
+       \param flags TODO
        \return TODO
        \sa TODO
     */
 
-    int (*setsslclient_)(augas_id cid);
+    int (*setsslclient_)(augas_id cid, int flags);
 
     /**
        \brief TODO
        \param cid TODO
+       \param flags TODO
        \return TODO
        \sa TODO
     */
 
-    int (*setsslserver_)(augas_id cid);
+    int (*setsslserver_)(augas_id cid, int flags);
 };
 
 /**

@@ -68,15 +68,15 @@ namespace aug {
     {
         verify(aug_retainfd(fd));
     }
-    inline void
+    inline const aug_fdtype&
     setfdtype(fdref ref, const aug_fdtype& fdtype)
     {
-        verify(aug_setfdtype(ref.get(), &fdtype));
+        return *verify(aug_setfdtype(ref.get(), &fdtype));
     }
-    inline void
+    inline const aug_fdtype&
     setfdtype(fdref ref)
     {
-        verify(aug_setfdtype(ref.get(), 0));
+        return *verify(aug_setfdtype(ref.get(), 0));
     }
     inline const aug_fdtype&
     getfdtype(fdref ref)

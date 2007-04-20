@@ -224,16 +224,19 @@ retainfd_(int fd)
     return 0;
 }
 
-static int
+static const struct aug_fdtype*
 setfdtype_(int fd, const struct aug_fdtype* fdtype)
 {
+    const struct aug_fdtype* ret;
+
     if (size_ <= (size_t)fd || files_[fd].refs_ == 0) {
         setnotreg_(__FILE__, __LINE__, fd);
-        return -1;
+        return NULL;
     }
 
+    ret = files_[fd].fdtype_;
     files_[fd].fdtype_ = fdtype;
-    return 0;
+    return ret;
 }
 
 static const struct aug_fdtype*
@@ -370,24 +373,22 @@ aug_retainfd(int fd)
     return ret;
 }
 
-AUGSYS_API int
+AUGSYS_API const struct aug_fdtype*
 aug_setfdtype(int fd, const struct aug_fdtype* fdtype)
 {
-    int ret;
-
     if (-1 == fd) {
         setbadfd_(__FILE__, __LINE__);
-        return -1;
+        return NULL;
     }
 
     if (!fdtype)
         fdtype = aug_posixfdtype();
 
     aug_lock();
-    ret = setfdtype_(fd, fdtype);
+    fdtype = setfdtype_(fd, fdtype);
     aug_unlock();
 
-    return ret;
+    return fdtype;
 }
 
 AUGSYS_API const struct aug_fdtype*

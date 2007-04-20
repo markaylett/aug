@@ -66,7 +66,11 @@ aug_releasefd(int fd);
 AUGSYS_API int
 aug_retainfd(int fd);
 
-AUGSYS_API int
+/**
+   \returns previous file type.
+ */
+
+AUGSYS_API const struct aug_fdtype*
 aug_setfdtype(int fd, const struct aug_fdtype* fdtype);
 
 AUGSYS_API const struct aug_fdtype*
@@ -77,5 +81,12 @@ aug_extfdtype(struct aug_fdtype* derived, const struct aug_fdtype* base);
 
 AUGSYS_API const struct aug_fdtype*
 aug_posixfdtype(void);
+
+#if !defined(_WIN32)
+# define aug_getosfd(x) (x)
+#else /* _WIN32 */
+AUGSYS_API intptr_t
+aug_getosfd(int fd);
+#endif /* _WIN32 */
 
 #endif /* AUGSYS_BASE_H */

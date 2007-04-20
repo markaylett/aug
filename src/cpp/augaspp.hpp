@@ -239,16 +239,16 @@ namespace augas {
     }
 
     inline void
-    setsslclient(augas_id cid)
+    setsslclient(augas_id cid, int flags)
     {
-        if (AUGAS_ERROR == augas_setsslclient(cid))
+        if (AUGAS_ERROR == augas_setsslclient(cid, flags))
             throw error(augas_error());
     }
 
     inline void
-    setsslserver(augas_id cid)
+    setsslserver(augas_id cid, int flags)
     {
-        if (AUGAS_ERROR == augas_setsslserver(cid))
+        if (AUGAS_ERROR == augas_setsslserver(cid, flags))
             throw error(augas_error());
     }
 

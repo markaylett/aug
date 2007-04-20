@@ -17,6 +17,23 @@ AUG_RCSID("$Id$");
 
 #include <stdlib.h>        /* malloc() */
 
+static struct aug_nbfile*
+removenbfile_(struct aug_nbfile* nbfile)
+{
+    AUG_DEBUG2("clearing io-event mask: fd=[%d]", nbfile->fd_);
+
+    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->mplexer_,  nbfile->fd_, 0))
+        nbfile = NULL;
+
+    if (-1 == aug_removefile(&nbfile->nbfiles_->files_,  nbfile->fd_))
+        nbfile = NULL;
+
+    if (!aug_setfdtype(nbfile->fd_, nbfile->base_))
+        nbfile = NULL;
+
+    return nbfile;
+}
+
 static int
 close_(int fd)
 {
@@ -24,9 +41,7 @@ close_(int fd)
     if (!aug_resetnbfile(fd, &nbfile))
         return -1;
 
-    AUG_DEBUG2("clearing io-event mask: fd=[%d]", fd);
-    aug_setfdeventmask(nbfile.nbfiles_->mplexer_, fd, 0);
-    aug_removefile(&nbfile.nbfiles_->files_, fd);
+    removenbfile_(&nbfile);
 
     if (!nbfile.base_->close_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -211,25 +226,31 @@ aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
     nbfile.nbfiles_ = nbfiles;
     nbfile.fd_ = fd;
     nbfile.cb_ = cb;
-    nbfile.base_ = aug_getfdtype(fd);
+    if (!(nbfile.base_ = aug_setfdtype(fd, &fdtype_)))
+        return -1;
     nbfile.type_ = &nbtype_;
     nbfile.ext_ = NULL;
 
-    aug_setnbfile(fd, &nbfile);
+    if (!aug_setnbfile(fd, &nbfile)
+        || -1 == aug_insertfile(&nbfiles->files_, fd, cb_, var)) {
 
-    if (-1 == aug_setfdtype(fd, &fdtype_))
+        /* On failure, restore original file type. */
+
+        aug_setfdtype(fd, nbfile.base_);
         return -1;
+    }
 
-    return aug_insertfile(&nbfiles->files_, fd, cb_, var);
+    return 0;
 }
 
 AUGNET_API int
 aug_removenbfile(int fd)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_resetnbfile(fd, &nbfile))
         return -1;
-    return aug_removefile(&nbfile.nbfiles_->files_, fd);
+
+    return removenbfile_(&nbfile) ? 0 : -1;
 }
 
 AUGNET_API int

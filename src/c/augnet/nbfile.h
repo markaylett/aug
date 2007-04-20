@@ -15,9 +15,18 @@ aug_createnbfiles(void);
 AUGNET_API int
 aug_destroynbfiles(aug_nbfiles_t nbfiles);
 
+/**
+   Once inserted, a call to aug_close() will remove the file from the nbfiles
+   set.
+*/
+
 AUGNET_API int
 aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
                  const struct aug_var* var);
+
+/**
+   Can be used to remove a file without closing it.
+*/
 
 AUGNET_API int
 aug_removenbfile(int fd);

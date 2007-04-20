@@ -94,12 +94,14 @@ createmmap_(impl_t impl, size_t offset, size_t len)
     void* addr;
     HANDLE mapping;
     DWORD err;
-    intptr_t file = _get_osfhandle(impl->fd_);
+    intptr_t file;
 
-    if (-1 == file) {
+    if (-1 == impl->fd_) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, EBADF);
         return -1;
     }
+
+    file = _get_osfhandle(impl->fd_);
 
     if (!len)
         len = impl->size_ - offset;
