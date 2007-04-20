@@ -2,6 +2,9 @@
    See the file COPYING for copying permission.
 */
 #include "augaspp.hpp"
+#include "augsys/defs.h"
+
+AUG_RCSID("$Id:$");
 
 #include <iostream>
 

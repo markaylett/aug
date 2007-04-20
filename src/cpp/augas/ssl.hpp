@@ -1,0 +1,44 @@
+/* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
+   See the file COPYING for copying permission.
+*/
+#ifndef AUGAS_SSL_HPP
+#define AUGAS_SSL_HPP
+
+#if HAVE_OPENSSL_SSL_H
+
+# include "augsyspp/exception.hpp"
+# include "augnet/ssl.h"
+
+# include <openssl/ssl.h>
+
+namespace augas {
+
+    class ssl_error : public aug::errinfo_error {
+    public:
+        ssl_error()
+        {
+        }
+        ssl_error(const char* file, int line, unsigned long err)
+        {
+            aug_setsslerrinfo(cptr(*this), file, line, err);
+        }
+    };
+
+    class sslctx {
+
+        SSL_CTX* const ctx_;
+
+        sslctx(const sslctx&);
+
+        sslctx&
+        operator =(const sslctx&);
+
+    public:
+        ~sslctx() AUG_NOTHROW;
+
+        sslcxt(const char* keyfile, const char* password, const char* cafile);
+    };
+}
+#endif // HAVE_OPENSSL_SSL_H
+
+#endif // AUGAS_SSL_HPP

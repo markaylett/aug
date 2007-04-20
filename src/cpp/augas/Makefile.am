@@ -19,6 +19,7 @@ noinst_HEADERS = \
 	rwtimer.hpp \
 	serv.hpp \
 	servconn.hpp \
+	ssl.hpp \
 	utility.hpp
 
 bin_PROGRAMS = augasd
@@ -37,6 +38,7 @@ augasd_SOURCES = \
 	rwtimer.cpp \
 	servconn.cpp \
 	serv.cpp \
+	ssl.cpp \
 	utility.cpp
 
 augasd_LDADD = \

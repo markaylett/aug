@@ -179,6 +179,9 @@
 				RelativePath="..\src\cpp\augas\servconn.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augas\ssl.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augas\utility.cpp">
 			</File>
 		</Filter>
@@ -221,6 +224,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\servconn.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augas\ssl.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augas\utility.hpp">

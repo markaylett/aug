@@ -57,7 +57,8 @@ am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) \
 	clntconn.$(OBJEXT) conn.$(OBJEXT) exception.$(OBJEXT) \
 	listener.$(OBJEXT) manager.$(OBJEXT) module.$(OBJEXT) \
 	object.$(OBJEXT) options.$(OBJEXT) rwtimer.$(OBJEXT) \
-	servconn.$(OBJEXT) serv.$(OBJEXT) utility.$(OBJEXT)
+	servconn.$(OBJEXT) serv.$(OBJEXT) ssl.$(OBJEXT) \
+	utility.$(OBJEXT)
 augasd_OBJECTS = $(am_augasd_OBJECTS)
 augasd_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
@@ -226,6 +227,7 @@ noinst_HEADERS = \
 	rwtimer.hpp \
 	serv.hpp \
 	servconn.hpp \
+	ssl.hpp \
 	utility.hpp
 
 augasd_SOURCES = \
@@ -242,6 +244,7 @@ augasd_SOURCES = \
 	rwtimer.cpp \
 	servconn.cpp \
 	serv.cpp \
+	ssl.cpp \
 	utility.cpp
 
 augasd_LDADD = \
@@ -350,6 +353,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rwtimer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servconn.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@
 
