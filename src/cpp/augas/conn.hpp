@@ -27,16 +27,16 @@ namespace augas {
         do_accept(const aug_endpoint& ep) = 0;
 
         virtual void
-        do_append(aug::mplexer& mplexer, const aug_var& var) = 0;
+        do_append(const aug_var& var) = 0;
 
         virtual void
-        do_append(aug::mplexer& mplexer, const void* buf, size_t size) = 0;
+        do_append(const void* buf, size_t size) = 0;
 
         virtual void
         do_connected(const aug_endpoint& ep) = 0;
 
         virtual bool
-        do_process(aug::mplexer& mplexer) = 0;
+        do_process(unsigned short events) = 0;
 
         virtual void
         do_shutdown() = 0;
@@ -59,14 +59,14 @@ namespace augas {
             return do_accept(ep);
         }
         void
-        append(aug::mplexer& mplexer, const aug_var& var)
+        append(const aug_var& var)
         {
-            do_append(mplexer, var);
+            do_append(var);
         }
         void
-        append(aug::mplexer& mplexer, const void* buf, size_t size)
+        append(const void* buf, size_t size)
         {
-            do_append(mplexer, buf, size);
+            do_append(buf, size);
         }
         void
         connected(const aug_endpoint& ep)
@@ -74,9 +74,9 @@ namespace augas {
             do_connected(ep);
         }
         bool
-        process(aug::mplexer& mplexer)
+        process(unsigned short events)
         {
-            return do_process(mplexer);
+            return do_process(events);
         }
         void
         shutdown()
@@ -135,16 +135,16 @@ namespace augas {
         do_accept(const aug_endpoint& ep);
 
         void
-        do_append(aug::mplexer& mplexer, const aug_var& var);
+        do_append(const aug_var& var);
 
         void
-        do_append(aug::mplexer& mplexer, const void* buf, size_t size);
+        do_append(const void* buf, size_t size);
 
         void
         do_connected(const aug_endpoint& ep);
 
         bool
-        do_process(aug::mplexer& mplexer);
+        do_process(unsigned short events);
 
         void
         do_shutdown();
@@ -192,16 +192,16 @@ namespace augas {
         do_accept(const aug_endpoint& ep);
 
         void
-        do_append(aug::mplexer& mplexer, const aug_var& var);
+        do_append(const aug_var& var);
 
         void
-        do_append(aug::mplexer& mplexer, const void* buf, size_t size);
+        do_append(const void* buf, size_t size);
 
         void
         do_connected(const aug_endpoint& ep);
 
         bool
-        do_process(aug::mplexer& mplexer);
+        do_process(unsigned short events);
 
         void
         do_shutdown();

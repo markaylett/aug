@@ -412,7 +412,7 @@ readwrite_(struct sslext_* x, int events)
 }
 
 static int
-filecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
+nbfilecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
 {
     struct sslext_* x = nbfile->ext_;
     int events = aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
@@ -495,7 +495,7 @@ shutdown_(struct aug_nbfile* nbfile)
 }
 
 static const struct aug_nbtype nbtype_ = {
-    filecb_,
+    nbfilecb_,
     seteventmask_,
     eventmask_,
     events_,

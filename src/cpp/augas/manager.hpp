@@ -41,11 +41,10 @@ namespace augas {
         {
         }
         bool
-        append(aug::mplexer& mplexer, augas_id cid, const aug_var& var);
+        append(augas_id cid, const aug_var& var);
 
         bool
-        append(aug::mplexer& mplexer, augas_id cid, const void* buf,
-               size_t size);
+        append(augas_id cid, const void* buf, size_t size);
 
         void
         clear();

@@ -20,18 +20,20 @@ AUG_RCSID("$Id$");
 static struct aug_nbfile*
 removenbfile_(struct aug_nbfile* nbfile)
 {
+    struct aug_nbfile* ret = nbfile;
+
     AUG_DEBUG2("clearing io-event mask: fd=[%d]", nbfile->fd_);
 
-    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->mplexer_,  nbfile->fd_, 0))
-        nbfile = NULL;
+    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_, 0))
+        ret = NULL;
 
-    if (-1 == aug_removefile(&nbfile->nbfiles_->files_,  nbfile->fd_))
-        nbfile = NULL;
+    if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->fd_))
+        ret = NULL;
 
     if (!aug_setfdtype(nbfile->fd_, nbfile->base_))
-        nbfile = NULL;
+        ret = NULL;
 
-    return nbfile;
+    return ret;
 }
 
 static int
@@ -142,7 +144,7 @@ static const struct aug_fdtype fdtype_ = {
 };
 
 static int
-filecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
+nbfilecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
 {
     int events = aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
     return events
@@ -174,7 +176,7 @@ shutdown_(struct aug_nbfile* nbfile)
 }
 
 static const struct aug_nbtype nbtype_ = {
-    filecb_,
+    nbfilecb_,
     seteventmask_,
     eventmask_,
     events_,
@@ -182,7 +184,7 @@ static const struct aug_nbtype nbtype_ = {
 };
 
 static int
-cb_(const struct aug_var* var, int fd)
+filecb_(const struct aug_var* var, int fd)
 {
     struct aug_nbfile nbfile;
     if (!aug_getnbfile(fd, &nbfile))
@@ -232,7 +234,7 @@ aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
     nbfile.ext_ = NULL;
 
     if (!aug_setnbfile(fd, &nbfile)
-        || -1 == aug_insertfile(&nbfiles->files_, fd, cb_, var)) {
+        || -1 == aug_insertfile(&nbfiles->files_, fd, filecb_, var)) {
 
         /* On failure, restore original file type. */
 

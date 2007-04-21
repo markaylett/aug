@@ -5,7 +5,7 @@
 #include "augas/manager.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augas/exception.hpp"
 #include "augas/options.hpp"
@@ -57,24 +57,24 @@ namespace {
 }
 
 bool
-manager::append(mplexer& mplexer, augas_id cid, const aug_var& var)
+manager::append(augas_id cid, const aug_var& var)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
         return false;
 
-    cptr->append(mplexer, var);
+    cptr->append(var);
     return true;
 }
 
 bool
-manager::append(mplexer& mplexer, augas_id cid, const void* buf, size_t len)
+manager::append(augas_id cid, const void* buf, size_t len)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
         return false;
 
-    cptr->append(mplexer, buf, len);
+    cptr->append(buf, len);
     return true;
 }
 

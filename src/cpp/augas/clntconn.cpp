@@ -72,15 +72,15 @@ clntconn::do_accept(const aug_endpoint& ep)
 }
 
 void
-clntconn::do_append(aug::mplexer& mplexer, const aug_var& var)
+clntconn::do_append(const aug_var& var)
 {
-    conn_->append(mplexer, var);
+    conn_->append(var);
 }
 
 void
-clntconn::do_append(aug::mplexer& mplexer, const void* buf, size_t len)
+clntconn::do_append(const void* buf, size_t len)
 {
-    conn_->append(mplexer, buf, len);
+    conn_->append(buf, len);
 }
 
 void
@@ -90,9 +90,9 @@ clntconn::do_connected(const aug_endpoint& ep)
 }
 
 bool
-clntconn::do_process(mplexer& mplexer)
+clntconn::do_process(unsigned short events)
 {
-    if (!conn_->process(mplexer))
+    if (!conn_->process(events))
         return false;
 
     if (ESTABLISHED == conn_->phase()) {
@@ -101,7 +101,7 @@ clntconn::do_process(mplexer& mplexer)
         // writing then set the write event-mask.
 
         if (!buffer_.empty())
-            setfdeventmask(mplexer, conn_->sfd(), AUG_FDEVENTRDWR);
+            setnbeventmask(conn_->sfd(), AUG_FDEVENTRDWR);
 
         AUG_DEBUG2("connection is now established, assuming new state");
 

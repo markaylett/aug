@@ -5,7 +5,7 @@
 #include "augas/servconn.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 using namespace aug;
 using namespace augas;
@@ -72,15 +72,15 @@ servconn::do_accept(const aug_endpoint& ep)
 }
 
 void
-servconn::do_append(aug::mplexer& mplexer, const aug_var& var)
+servconn::do_append(const aug_var& var)
 {
-    conn_.append(mplexer, var);
+    conn_.append(var);
 }
 
 void
-servconn::do_append(aug::mplexer& mplexer, const void* buf, size_t len)
+servconn::do_append(const void* buf, size_t len)
 {
-    conn_.append(mplexer, buf, len);
+    conn_.append(buf, len);
 }
 
 void
@@ -90,9 +90,9 @@ servconn::do_connected(const aug_endpoint& ep)
 }
 
 bool
-servconn::do_process(mplexer& mplexer)
+servconn::do_process(unsigned short events)
 {
-    return conn_.process(mplexer);
+    return conn_.process(events);
 }
 
 void

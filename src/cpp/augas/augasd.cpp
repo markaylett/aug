@@ -130,11 +130,10 @@ namespace augas {
 
     struct state {
 
-        aug_filecb_t cb_;
+        aug_nbfilecb_t cb_;
         aug_var var_;
-        mplexer mplexer_;
+        aug::nbfiles nbfiles_;
         manager manager_;
-        aug::files files_;
         timers timers_;
 
         // Mapping of timer-ids to services.
@@ -145,51 +144,17 @@ namespace augas {
 
         connected connected_;
 
-        state(aug_filecb_t cb, const aug_var& var)
+        state(aug_nbfilecb_t cb, const aug_var& var)
             : cb_(cb),
               var_(var)
         {
             AUG_DEBUG2("adding event pipe to list");
-            insertfile(files_, aug_eventin(), cb, var);
-            setfdeventmask(mplexer_, aug_eventin(), AUG_FDEVENTRD);
+            insertnbfile(nbfiles_, aug_eventin(), cb, var);
+            setnbeventmask(aug_eventin(), AUG_FDEVENTRD);
         }
     };
 
     auto_ptr<state> state_;
-    const aug_fdtype* base_(0);
-
-    int
-    extclose_(int fd)
-    {
-        AUG_DEBUG2("clearing io-event mask prior to close: fd=[%d]", fd);
-        aug_setfdeventmask(state_->mplexer_, fd, 0);
-        return base_->close_(fd); // Delegate to base version.
-    }
-
-    void
-    setextfdtype_(fdref ref, aug_filecb_t cb, const aug_var& var,
-                  unsigned short mask)
-    {
-        // Override close() function.
-
-        static aug_fdtype extended = { extclose_, 0, 0, 0, 0, 0 };
-        if (!base_) {
-            base_ = &getfdtype(ref);
-            extfdtype(extended, *base_);
-        }
-
-        AUG_DEBUG2("adding file to list: fd=[%d]", ref.get());
-        insertfile(state_->files_, ref, cb, var);
-
-        try {
-            setfdeventmask(state_->mplexer_, ref, mask);
-            setfdtype(ref, extended);
-        } catch (...) {
-            AUG_DEBUG2("removing file from list: fd=[%d]", ref.get());
-            removefile(state_->files_, ref);
-            throw;
-        }
-    }
 
     void
     timercb_(const aug_var* var, int id, unsigned* ms)
@@ -225,7 +190,7 @@ namespace augas {
                    inetntop(getinetaddr(ep, addr)).c_str(),
                    static_cast<int>(ntohs(port(ep))));
 
-        setfdeventmask(state_->mplexer_, conn.sfd(), AUG_FDEVENTRD);
+        setnbeventmask(conn.sfd(), AUG_FDEVENTRD);
         conn.connected(ep);
     }
 
@@ -400,8 +365,10 @@ namespace augas {
                 // connected() must only be called after this function has
                 // returned.
 
-                setextfdtype_(cptr->sfd(), state_->cb_, state_->var_,
-                              AUG_FDEVENTRD);
+                insertnbfile(state_->nbfiles_, cptr->sfd(), state_->cb_,
+                             state_->var_);
+                setnbeventmask(cptr->sfd(), AUG_FDEVENTRD);
+
                 if (state_->connected_.empty()) {
 
                     // Schedule an event to ensure that connected() is called
@@ -415,9 +382,12 @@ namespace augas {
 
                 state_->connected_.push(cptr);
 
-            } else
-                setextfdtype_(cptr->sfd(), state_->cb_, state_->var_,
-                              AUG_FDEVENTALL);
+            } else {
+
+                insertnbfile(state_->nbfiles_, cptr->sfd(), state_->cb_,
+                             state_->var_);
+                setnbeventmask(cptr->sfd(), AUG_FDEVENTALL);
+            }
 
             si.commit();
             return (int)cptr->id();
@@ -438,7 +408,9 @@ namespace augas {
 
             endpoint ep(null);
             smartfd sfd(tcplisten(host, port, ep));
-            setextfdtype_(sfd, state_->cb_, state_->var_, AUG_FDEVENTRD);
+
+            insertnbfile(state_->nbfiles_, sfd, state_->cb_, state_->var_);
+            setnbeventmask(sfd, AUG_FDEVENTRD);
 
             inetaddr addr(null);
             AUG_DEBUG2("listening: interface=[%s], port=[%d]",
@@ -463,7 +435,7 @@ namespace augas {
     {
         AUG_DEBUG2("send(): id=[%d]", cid);
         try {
-            if (!state_->manager_.append(state_->mplexer_, cid, buf, len))
+            if (!state_->manager_.append(cid, buf, len))
                 throw error(__FILE__, __LINE__, EHOSTCALL,
                             "connection has been shutdown");
             return 0;
@@ -476,8 +448,7 @@ namespace augas {
     {
         AUG_DEBUG2("sendv(): id=[%d]", cid);
         try {
-            if (!state_->manager_
-                .append(state_->mplexer_, cid, *var))
+            if (!state_->manager_.append(cid, *var))
                 throw error(__FILE__, __LINE__, EHOSTCALL,
                             "connection has been shutdown");
             return 0;
@@ -671,7 +642,10 @@ namespace augas {
             throw;
         }
 
-        setextfdtype_(sfd, state_->cb_, state_->var_, AUG_FDEVENTRD);
+        insertnbfile(state_->nbfiles_, sfd, state_->cb_, state_->var_);
+        setnbeventmask(sfd, AUG_FDEVENTRD);
+
+
         setsockopts_(sfd);
         connptr cptr(new augas::servconn(sock.serv(), sock.user(),
                                          state_->timers_, sfd, ep));
@@ -685,11 +659,11 @@ namespace augas {
     }
 
     bool
-    process_(const connptr& cptr, int fd)
+    process_(const connptr& cptr, int fd, unsigned short events)
     {
         bool changed = false, ok = false;
         try {
-            changed = cptr->process(state_->mplexer_);
+            changed = cptr->process(events);
             ok = true;
         } AUG_PERRINFOCATCH;
 
@@ -707,8 +681,10 @@ namespace augas {
             // The associated file descriptor may change as connection
             // attempts fail and alternative addresses are tried.
 
-            setextfdtype_(cptr->sfd(), state_->cb_, state_->var_,
-                          AUG_FDEVENTALL);
+            insertnbfile(state_->nbfiles_, cptr->sfd(), state_->cb_,
+                         state_->var_);
+            setnbeventmask(cptr->sfd(), AUG_FDEVENTALL);
+
             state_->manager_.update(cptr, fd);
 
         } else if (changed)
@@ -848,7 +824,7 @@ namespace augas {
             setsrvlogger("augasd");
 
             aug_var var = { 0, this };
-            auto_ptr<state> s(new state(filememcb<service>, var));
+            auto_ptr<state> s(new state(nbfilememcb<service>, var));
             state_ = s;
             try {
                 load_();
@@ -882,8 +858,8 @@ namespace augas {
                     if (state_->timers_.empty()) {
 
                         scoped_unblock unblock;
-                        while (AUG_RETINTR == (ret = waitfdevents
-                                               (state_->mplexer_)))
+                        while (AUG_RETINTR == (ret = waitnbevents
+                                               (state_->nbfiles_)))
                             ;
 
                     } else {
@@ -894,8 +870,8 @@ namespace augas {
                         foreachexpired(state_->timers_, 0 == ret, tv);
 
                         scoped_unblock unblock;
-                        while (AUG_RETINTR == (ret = waitfdevents
-                                               (state_->mplexer_, tv)))
+                        while (AUG_RETINTR == (ret = waitnbevents
+                                               (state_->nbfiles_, tv)))
                             ;
                     }
 
@@ -910,7 +886,7 @@ namespace augas {
 
                     AUG_DEBUG2("processing files");
 
-                    foreachfile(state_->files_);
+                    foreachnbfile(state_->nbfiles_);
                     continue;
 
                 } AUG_PERRINFOCATCH;
@@ -940,11 +916,8 @@ namespace augas {
 
     public:
         bool
-        filecb(int fd)
+        nbfilecb(int fd, unsigned short events)
         {
-            if (!fdevents(state_->mplexer_, fd))
-                return true;
-
             // Intercept activity on event pipe.
 
             if (fd == aug_eventin())
@@ -956,7 +929,7 @@ namespace augas {
             AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", sock->id(), fd);
 
             if (null != cptr)
-                return process_(cptr, fd);
+                return process_(cptr, fd, events);
 
             accept_(*sock);
             return true;

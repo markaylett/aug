@@ -53,17 +53,17 @@ established::do_accept(const aug_endpoint& ep)
 }
 
 void
-established::do_append(aug::mplexer& mplexer, const aug_var& var)
+established::do_append(const aug_var& var)
 {
     buffer_.append(var);
-    setfdeventmask(mplexer, sfd_, AUG_FDEVENTRDWR);
+    setnbeventmask(sfd_, AUG_FDEVENTRDWR);
 }
 
 void
-established::do_append(aug::mplexer& mplexer, const void* buf, size_t len)
+established::do_append(const void* buf, size_t len)
 {
     buffer_.append(buf, len);
-    setfdeventmask(mplexer, sfd_, AUG_FDEVENTRDWR);
+    setnbeventmask(sfd_, AUG_FDEVENTRDWR);
 }
 
 void
@@ -75,11 +75,9 @@ established::do_connected(const aug_endpoint& ep)
 }
 
 bool
-established::do_process(mplexer& mplexer)
+established::do_process(unsigned short events)
 {
-    unsigned short bits(fdevents(mplexer, sfd_));
-
-    if (bits & AUG_FDEVENTRD) {
+    if (events & AUG_FDEVENTRD) {
 
         AUG_DEBUG2("handling read event: id=[%d], fd=[%d]", sock_.id_,
                    sfd_.get());
@@ -105,7 +103,7 @@ established::do_process(mplexer& mplexer)
         serv_->data(sock_, buf, size);
     }
 
-    if (bits & AUG_FDEVENTWR) {
+    if (events & AUG_FDEVENTWR) {
 
         bool done(buffer_.writesome(sfd_));
 
@@ -117,12 +115,12 @@ established::do_process(mplexer& mplexer)
 
             // No more (buffered) data to be written.
 
-            setfdeventmask(mplexer, sfd_, AUG_FDEVENTRD);
+            setnbeventmask(sfd_, AUG_FDEVENTRD);
 
             // If flagged for shutdown, send FIN and disable writes.
 
             if (SHUTDOWN <= phase_)
-                aug::shutdown(sfd_, SHUT_WR);
+                aug::shutdownnbfile(sfd_);
         }
     }
 
@@ -136,7 +134,7 @@ established::do_shutdown()
         phase_ = SHUTDOWN;
         if (buffer_.empty()) {
             AUG_DEBUG2("shutdown(): id=[%d], fd=[%d]", sock_.id_, sfd_.get());
-            aug::shutdown(sfd_, SHUT_WR);
+            aug::shutdownnbfile(sfd_);
         }
     }
 }
@@ -215,13 +213,13 @@ connecting::do_accept(const aug_endpoint& ep)
 }
 
 void
-connecting::do_append(aug::mplexer& mplexer, const aug_var& var)
+connecting::do_append(const aug_var& var)
 {
     buffer_.append(var);
 }
 
 void
-connecting::do_append(aug::mplexer& mplexer, const void* buf, size_t len)
+connecting::do_append(const void* buf, size_t len)
 {
     buffer_.append(buf, len);
 }
@@ -234,7 +232,7 @@ connecting::do_connected(const aug_endpoint& ep)
 }
 
 bool
-connecting::do_process(mplexer& mplexer)
+connecting::do_process(unsigned short events)
 {
     try {
 
