@@ -28,15 +28,11 @@ namespace {
     }
 
     SSL_CTX*
-    createctx_(const char* keyfile, const char* password, const char* cafile)
+    createctx_(const char* certfile, const char* keyfile,
+               const char* password, const char* cafile)
     {
         SSL_METHOD* meth;
         SSL_CTX* ctx;
-
-        // Global system initialization.
-
-        SSL_library_init();
-        SSL_load_error_strings();
 
         // Create our context.
 
@@ -45,7 +41,7 @@ namespace {
 
         // Load our keys and certificates.
 
-        if (!(SSL_CTX_use_certificate_chain_file(ctx, keyfile)))
+        if (!(SSL_CTX_use_certificate_chain_file(ctx, certfile)))
             throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 
         SSL_CTX_set_default_passwd_cb(ctx, passwdcb_);
@@ -73,29 +69,37 @@ sslctx::~sslctx() AUG_NOTHROW
         SSL_CTX_free(ctx_);
 }
 
-sslctx::sslctx(const char* keyfile, const char* password, const char* cafile)
-    : ctx_(createctx_(keyfile, password, cafile))
+sslctx::sslctx(const char* certfile, const char* keyfile,
+               const char* password, const char* cafile)
+    : ctx_(createctx_(certfile, keyfile, password, cafile))
 {
 }
 
 void
-sslctx::setsslclient(fdref ref, int flags)
+sslctx::setsslclient(fdref ref)
 {
     SSL* ssl = SSL_new(ctx_);
     BIO* sbio = BIO_new_socket(aug_getosfd(ref.get()), BIO_NOCLOSE);
     SSL_set_bio(ssl, sbio, sbio);
-    SSL_set_verify(ssl, SSL_VERIFY_PEER, SSL_get_verify_callback(ssl));
     aug_setsslclient(ref.get(), ssl);
 }
 
 void
-sslctx::setsslserver(fdref ref, int flags)
+sslctx::setsslserver(fdref ref)
 {
     SSL* ssl = SSL_new(ctx_);
     BIO* sbio = BIO_new_socket(aug_getosfd(ref.get()), BIO_NOCLOSE);
     SSL_set_bio(ssl, sbio, sbio);
-    SSL_set_verify(ssl, SSL_VERIFY_PEER, SSL_get_verify_callback(ssl));
     aug_setsslserver(ref.get(), ssl);
+}
+
+void
+augas::initssl()
+{
+    // Global system initialization.
+
+    SSL_library_init();
+    SSL_load_error_strings();
 }
 
 #endif // HAVE_OPENSSL_SSL_H

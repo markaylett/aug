@@ -393,12 +393,12 @@ static PyObject*
 setsslclient_(PyObject* self, PyObject* args)
 {
     PyObject* sock;
-    int flags;
+    const char* ctx;
 
-    if (!PyArg_ParseTuple(args, "O!i:setsslclient", type_, &sock, &flags))
+    if (!PyArg_ParseTuple(args, "O!s:setsslclient", type_, &sock, &ctx))
         return NULL;
 
-    if (-1 == augas_setsslclient(augpy_getid(sock), flags)) {
+    if (-1 == augas_setsslclient(augpy_getid(sock), ctx)) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         return NULL;
     }
@@ -410,12 +410,12 @@ static PyObject*
 setsslserver_(PyObject* self, PyObject* args)
 {
     PyObject* sock;
-    int flags;
+    const char* ctx;
 
-    if (!PyArg_ParseTuple(args, "O!i:setsslserver", type_, &sock, &flags))
+    if (!PyArg_ParseTuple(args, "O!s:setsslserver", type_, &sock, &ctx))
         return NULL;
 
-    if (-1 == augas_setsslserver(augpy_getid(sock), flags)) {
+    if (-1 == augas_setsslserver(augpy_getid(sock), ctx)) {
         PyErr_SetString(PyExc_RuntimeError, augas_error());
         return NULL;
     }

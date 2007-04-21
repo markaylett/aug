@@ -160,12 +160,16 @@ namespace augas {
               var_(var)
         {
 #if HAVE_OPENSSL_SSL_H
+            const char* certfile = options_.get("ssl.certfile", 0);
             const char* keyfile = options_.get("ssl.keyfile", 0);
             const char* password = options_.get("ssl.password", 0);
             const char* cafile = options_.get("ssl.cafile", 0);
 
-            if (keyfile && password && cafile)
-                sslctx_.reset(new sslctx(keyfile, password, cafile));
+            if (certfile && keyfile && password && cafile) {
+                initssl();
+                sslctx_.reset(new sslctx
+                              (certfile, keyfile, password, cafile));
+            }
 #endif // HAVE_OPENSSL_SSL_H
 
             AUG_DEBUG2("inserting event pipe to list");
@@ -579,16 +583,16 @@ namespace augas {
     }
 
     int
-    setsslclient_(augas_id cid, int flags)
+    setsslclient_(augas_id cid, const char* ctx)
     {
-        AUG_DEBUG2("setsslclient(): id=[%d], flags=[%d]", cid, flags);
+        AUG_DEBUG2("setsslclient(): id=[%d], ctx=[%s]", cid, ctx);
 #if HAVE_OPENSSL_SSL_H
         try {
             if (!state_->sslctx_.get())
                 throw error(__FILE__, __LINE__, ESSLCTX,
                             "SSL context not initialised");
             objectptr sock(state_->manager_.getbyid(cid));
-            state_->sslctx_->setsslclient(sock->sfd(), flags);
+            state_->sslctx_->setsslclient(sock->sfd());
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H
@@ -599,16 +603,16 @@ namespace augas {
     }
 
     int
-    setsslserver_(augas_id cid, int flags)
+    setsslserver_(augas_id cid, const char* ctx)
     {
-        AUG_DEBUG2("setsslserver(): id=[%d], flags=[%d]", cid, flags);
+        AUG_DEBUG2("setsslserver(): id=[%d], ctx=[%s]", cid, ctx);
 #if HAVE_OPENSSL_SSL_H
         try {
             if (!state_->sslctx_.get())
                 throw error(__FILE__, __LINE__, ESSLCTX,
                             "SSL context not initialised");
             objectptr sock(state_->manager_.getbyid(cid));
-            state_->sslctx_->setsslserver(sock->sfd(), flags);
+            state_->sslctx_->setsslserver(sock->sfd());
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H

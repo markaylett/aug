@@ -40,14 +40,18 @@ namespace augas {
     public:
         ~sslctx() AUG_NOTHROW;
 
-        sslctx(const char* keyfile, const char* password, const char* cafile);
+        sslctx(const char* certfile, const char* keyfile,
+               const char* password, const char* cafile);
 
         void
-        setsslclient(aug::fdref ref, int flags);
+        setsslclient(aug::fdref ref);
 
         void
-        setsslserver(aug::fdref ref, int flags);
+        setsslserver(aug::fdref ref);
     };
+
+    void
+    initssl();
 }
 #endif // HAVE_OPENSSL_SSL_H
 
