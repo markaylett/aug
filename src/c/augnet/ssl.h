@@ -14,7 +14,7 @@ struct aug_errinfo;
    SSL* ssl = SSL_new(ctx);
    BIO* sbio = BIO_new_socket(aug_getosfd(fd), BIO_NOCLOSE);
    SSL_set_bio(ssl, sbio, sbio);
-   SSL_set_verify(x->ssl_, verify, SSL_get_verify_callback(x->ssl_));
+   SSL_set_verify(ssl, verify, SSL_get_verify_callback(ssl));
    aug_setsslclient(fd, ssl);
  */
 

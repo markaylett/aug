@@ -12,7 +12,8 @@ namespace augas {
     const int ECONFIG(1);
     const int EHOSTCALL(2);
     const int EMODCALL(3);
-    const int ESTATE(4);
+    const int ESSLCTX(4);
+    const int ESTATE(5);
 
     typedef aug::basic_error<SRCAUGAS> error;
 }

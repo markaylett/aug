@@ -18,13 +18,14 @@ AUG_RCSID("$Id$");
 #include "augas/module.hpp"
 #include "augas/options.hpp"
 #include "augas/servconn.hpp"
+#include "augas/ssl.hpp"
 #include "augas/utility.hpp"
 
-#if !defined(_WIN32)
+#if !defined(_MSC_VER)
 # include "augconfig.h"
-#else // _WIN32
+#else // _MSC_VER
 # define PACKAGE_BUGREPORT "mark@emantic.co.uk"
-#endif // _WIN32
+#endif // _MSC_VER
 
 #include <cassert>
 #include <iomanip>
@@ -132,6 +133,9 @@ namespace augas {
 
         aug_nbfilecb_t cb_;
         aug_var var_;
+#if HAVE_OPENSSL_SSL_H
+        auto_ptr<sslctx> sslctx_;
+#endif // HAVE_OPENSSL_SSL_H
         aug::nbfiles nbfiles_;
         manager manager_;
         timers timers_;
@@ -144,11 +148,27 @@ namespace augas {
 
         connected connected_;
 
+        ~state() AUG_NOTHROW
+        {
+            AUG_DEBUG2("removing event pipe from list");
+            try {
+                removenbfile(aug_eventin());
+            } AUG_PERRINFOCATCH;
+        }
         state(aug_nbfilecb_t cb, const aug_var& var)
             : cb_(cb),
               var_(var)
         {
-            AUG_DEBUG2("adding event pipe to list");
+#if HAVE_OPENSSL_SSL_H
+            const char* keyfile = options_.get("ssl.keyfile", 0);
+            const char* password = options_.get("ssl.password", 0);
+            const char* cafile = options_.get("ssl.cafile", 0);
+
+            if (keyfile && password && cafile)
+                sslctx_.reset(new sslctx(keyfile, password, cafile));
+#endif // HAVE_OPENSSL_SSL_H
+
+            AUG_DEBUG2("inserting event pipe to list");
             insertnbfile(nbfiles_, aug_eventin(), cb, var);
             setnbeventmask(aug_eventin(), AUG_FDEVENTRD);
         }
@@ -562,8 +582,19 @@ namespace augas {
     setsslclient_(augas_id cid, int flags)
     {
         AUG_DEBUG2("setsslclient(): id=[%d], flags=[%d]", cid, flags);
+#if HAVE_OPENSSL_SSL_H
+        try {
+            if (!state_->sslctx_.get())
+                throw error(__FILE__, __LINE__, ESSLCTX,
+                            "SSL context not initialised");
+            objectptr sock(state_->manager_.getbyid(cid));
+            state_->sslctx_->setsslclient(sock->sfd(), flags);
+            return 0;
+        } AUG_SETERRINFOCATCH;
+#else // !HAVE_OPENSSL_SSL_H
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_setsslclient() not supported"));
+#endif // !HAVE_OPENSSL_SSL_H
         return -1;
     }
 
@@ -571,8 +602,19 @@ namespace augas {
     setsslserver_(augas_id cid, int flags)
     {
         AUG_DEBUG2("setsslserver(): id=[%d], flags=[%d]", cid, flags);
+#if HAVE_OPENSSL_SSL_H
+        try {
+            if (!state_->sslctx_.get())
+                throw error(__FILE__, __LINE__, ESSLCTX,
+                            "SSL context not initialised");
+            objectptr sock(state_->manager_.getbyid(cid));
+            state_->sslctx_->setsslserver(sock->sfd(), flags);
+            return 0;
+        } AUG_SETERRINFOCATCH;
+#else // !HAVE_OPENSSL_SSL_H
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_setsslserver() not supported"));
+#endif // !HAVE_OPENSSL_SSL_H
         return -1;
     }
 
