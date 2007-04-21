@@ -9,7 +9,11 @@ AUG_RCSID("$Id$");
 
 #if HAVE_OPENSSL_SSL_H
 
-#include "augsys/base.h"
+# include "augas/options.hpp"
+# include "augsys/base.h"
+
+# include <sstream>
+# include <string>
 
 # include <openssl/err.h>
 
@@ -41,25 +45,42 @@ namespace {
 
         // Load our keys and certificates.
 
-        if (!(SSL_CTX_use_certificate_chain_file(ctx, certfile)))
+        if (certfile && !SSL_CTX_use_certificate_chain_file(ctx, certfile))
             throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 
-        SSL_CTX_set_default_passwd_cb(ctx, passwdcb_);
-        SSL_CTX_set_default_passwd_cb_userdata
-            (ctx, const_cast<char*>(password));
+        if (password) {
+            SSL_CTX_set_default_passwd_cb(ctx, passwdcb_);
+            SSL_CTX_set_default_passwd_cb_userdata
+                (ctx, const_cast<char*>(password));
+        }
 
-        if (!(SSL_CTX_use_PrivateKey_file(ctx, keyfile, SSL_FILETYPE_PEM)))
+        if (keyfile && !SSL_CTX_use_PrivateKey_file(ctx, keyfile,
+                                                    SSL_FILETYPE_PEM))
             throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 
         // Load the CAs we trust.
 
-        if (!(SSL_CTX_load_verify_locations(ctx, cafile, 0)))
+        if (cafile && !SSL_CTX_load_verify_locations(ctx, cafile, 0))
             throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 
 #if OPENSSL_VERSION_NUMBER < 0x00905100L
         SSL_CTX_set_verify_depth(ctx, 1);
 #endif
         return ctx;
+    }
+
+    static sslctxptr
+    createctx_(const string& name, const options& options)
+    {
+        string s("ssl.context.");
+        s += name;
+
+        const char* certfile = options.get(s + ".certfile", 0);
+        const char* keyfile = options.get(s + ".keyfile", 0);
+        const char* password = options.get(s + ".password", 0);
+        const char* cafile = options.get(s + ".cafile", 0);
+
+        return sslctxptr(new sslctx(certfile, keyfile, password, cafile));
     }
 }
 
@@ -100,6 +121,20 @@ augas::initssl()
 
     SSL_library_init();
     SSL_load_error_strings();
+}
+
+void
+augas::loadsslctxs(sslctxs& sslctxs, const options& options)
+{
+    const char* contexts = options.get("ssl.contexts", 0);
+
+    if (contexts) {
+
+        istringstream is(contexts);
+        string name;
+        while (is >> name)
+            sslctxs.insert(make_pair(name, createctx_(name, options)));
+    }
 }
 
 #endif // HAVE_OPENSSL_SSL_H

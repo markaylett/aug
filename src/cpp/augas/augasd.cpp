@@ -134,7 +134,7 @@ namespace augas {
         aug_nbfilecb_t cb_;
         aug_var var_;
 #if HAVE_OPENSSL_SSL_H
-        auto_ptr<sslctx> sslctx_;
+        sslctxs sslctxs_;
 #endif // HAVE_OPENSSL_SSL_H
         aug::nbfiles nbfiles_;
         manager manager_;
@@ -160,16 +160,8 @@ namespace augas {
               var_(var)
         {
 #if HAVE_OPENSSL_SSL_H
-            const char* certfile = options_.get("ssl.certfile", 0);
-            const char* keyfile = options_.get("ssl.keyfile", 0);
-            const char* password = options_.get("ssl.password", 0);
-            const char* cafile = options_.get("ssl.cafile", 0);
-
-            if (certfile && keyfile && password && cafile) {
-                initssl();
-                sslctx_.reset(new sslctx
-                              (certfile, keyfile, password, cafile));
-            }
+            initssl();
+            loadsslctxs(sslctxs_, options_);
 #endif // HAVE_OPENSSL_SSL_H
 
             AUG_DEBUG2("inserting event pipe to list");
@@ -588,11 +580,12 @@ namespace augas {
         AUG_DEBUG2("setsslclient(): id=[%d], ctx=[%s]", cid, ctx);
 #if HAVE_OPENSSL_SSL_H
         try {
-            if (!state_->sslctx_.get())
+            sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
+            if (it == state_->sslctxs_.end())
                 throw error(__FILE__, __LINE__, ESSLCTX,
-                            "SSL context not initialised");
+                            "SSL context [%s] not initialised", ctx);
             objectptr sock(state_->manager_.getbyid(cid));
-            state_->sslctx_->setsslclient(sock->sfd());
+            it->second->setsslclient(sock->sfd());
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H
@@ -608,11 +601,12 @@ namespace augas {
         AUG_DEBUG2("setsslserver(): id=[%d], ctx=[%s]", cid, ctx);
 #if HAVE_OPENSSL_SSL_H
         try {
-            if (!state_->sslctx_.get())
+            sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
+            if (it == state_->sslctxs_.end())
                 throw error(__FILE__, __LINE__, ESSLCTX,
-                            "SSL context not initialised");
+                            "SSL context [%s] not initialised", ctx);
             objectptr sock(state_->manager_.getbyid(cid));
-            state_->sslctx_->setsslserver(sock->sfd());
+            it->second->setsslserver(sock->sfd());
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H

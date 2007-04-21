@@ -2,6 +2,18 @@ rundir = c:/program files/augas
 logdir = log
 loglevel = 4
 
+ssl.contexts = client server
+
+ssl.context.client.certfile = etc/clientcert.pem
+ssl.context.client.keyfile = etc/clientkey.pem
+ssl.context.client.password = test
+ssl.context.client.cafile = etc/cacert.pem
+
+ssl.context.server.certfile = etc/servercert.pem
+ssl.context.server.keyfile = etc/serverkey.pem
+ssl.context.server.password = test
+ssl.context.server.cafile = etc/cacert.pem
+
 services = http sched pyskel pyecho pyproxy
 
 service.http.module = http

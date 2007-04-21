@@ -11,11 +11,16 @@
 #if HAVE_OPENSSL_SSL_H
 
 # include "augsyspp/exception.hpp"
+# include "augsyspp/smartptr.hpp"
 # include "augnet/ssl.h"
+
+# include <map>
 
 # include <openssl/ssl.h>
 
 namespace augas {
+
+    class options;
 
     class ssl_error : public aug::errinfo_error {
     public:
@@ -50,8 +55,14 @@ namespace augas {
         setsslserver(aug::fdref ref);
     };
 
+    typedef aug::smartptr<sslctx> sslctxptr;
+    typedef std::map<std::string, sslctxptr> sslctxs;
+
     void
     initssl();
+
+    void
+    loadsslctxs(sslctxs& sslctxs, const options& options);
 }
 #endif // HAVE_OPENSSL_SSL_H
 

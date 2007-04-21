@@ -246,10 +246,22 @@ namespace augas {
     }
 
     inline void
+    setsslclient(const augas_object& conn, const char* ctx)
+    {
+        setsslclient(conn.id_, ctx);
+    }
+
+    inline void
     setsslserver(augas_id cid, const char* ctx)
     {
         if (AUGAS_ERROR == augas_setsslserver(cid, ctx))
             throw error(augas_error());
+    }
+
+    inline void
+    setsslserver(const augas_object& conn, const char* ctx)
+    {
+        setsslserver(conn.id_, ctx);
     }
 
     namespace detail {
