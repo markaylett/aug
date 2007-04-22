@@ -300,7 +300,7 @@ read_(int fd, void* buf, size_t size)
         return -1;
     }
 
-    AUG_DEBUG2("SSL: reading from user buffer: fd=[%d]", fd);
+    AUG_DEBUG2("SSL: user read from input buffer: fd=[%d]", fd);
 
     ret = readbuf_(&x->inbuf_, buf, size);
     updateevents_(&nbfile);
@@ -334,8 +334,6 @@ readv_(int fd, const struct iovec* iov, int size)
         return -1;
     }
 
-    AUG_DEBUG2("SSL: reading from user buffer: fd=[%d]", fd);
-
     ret = readbufv_(&x->inbuf_, iov, size);
     updateevents_(&nbfile);
     return ret;
@@ -353,7 +351,7 @@ write_(int fd, const void* buf, size_t len)
 
     x = nbfile.ext_;
 
-    AUG_DEBUG2("SSL: writing to user buffer: fd=[%d]", fd);
+    AUG_DEBUG2("SSL: user write to output buffer: fd=[%d]", fd);
 
     /* Fail with EAGAIN is non-blocking operation would have blocked. */
 
@@ -378,8 +376,6 @@ writev_(int fd, const struct iovec* iov, int size)
         return -1;
 
     x = nbfile.ext_;
-
-    AUG_DEBUG2("SSL: writing to user buffer: fd=[%d]", fd);
 
     /* Fail with EAGAIN is non-blocking operation would have blocked. */
 
@@ -429,6 +425,8 @@ readwrite_(struct sslext_* x, int events)
     if ((events & AUG_FDEVENTRD)
         && (RDWANTRD == x->state_ || RDWANTWR == x->state_
             || !buffull_(&x->inbuf_))) {
+
+        AUG_DEBUG2("SSL: ssl read to input buffer");
 
         ret = readssl_(x->ssl_, &x->inbuf_);
         switch (SSL_get_error(x->ssl_, ret)) {
@@ -481,6 +479,8 @@ readwrite_(struct sslext_* x, int events)
             || !bufempty_(&x->outbuf_))) {
 
         /* Try to write. */
+
+        AUG_DEBUG2("SSL: ssl write from output buffer");
 
         ret = writessl_(x->ssl_, &x->outbuf_);
         switch (SSL_get_error(x->ssl_, ret)) {
