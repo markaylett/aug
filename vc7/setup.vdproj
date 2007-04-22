@@ -21,6 +21,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_07AE10F5555CE939AEE87DEB456A42E8"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_0B16F77D4AE546D5B9992A5211905EF7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -45,25 +51,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1AAB634858A5523FE1AEB12CD3351749"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_1E8D5C9ACFD5C8D8DDAE4FF77D3F9FCE"
-        "OwnerKey" = "8:_066BB5B090154238AD74FA0BE08087EF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_1E8D5C9ACFD5C8D8DDAE4FF77D3F9FCE"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_25CF16A3F7F44A00B054A6FD8F5E142B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2AF056B0CFE740548035EAB432E967A8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -106,6 +100,12 @@
         "Entry"
         {
         "MsmKey" = "8:_4BB3B10F7E66429BA00160F54931CB1D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4E9C14E9A7C245DE89FEF436AA53BCE7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -171,7 +171,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_59B43AD4F828533E7E2DB10BBB5EB0A1"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_6134F68D1A7F4BB6AEF465AB7A4D39B6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_63E2586081D24CDC9DC5F2C4C347F202"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -201,13 +213,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_83AE08237FB2BC612388031692B21068"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmKey" = "8:_77B95F3EE9E049DAB01D116543E00F74"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8ECAD86A0E394E05A1708B75E7DDA791"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -255,14 +273,32 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D5F95E1E2E6F4B849CB0661C7E6F0040"
+        "MsmKey" = "8:_C30F73F6BF1E452E8D7D696A1565394C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_DB1B3EE29671296A101E349858C9C75B"
+        "MsmKey" = "8:_C77083D1777A0F30CE269EC525A82BA2"
         "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D05C4E57C5684253FD4E69F76BC7751E"
+        "OwnerKey" = "8:_066BB5B090154238AD74FA0BE08087EF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D05C4E57C5684253FD4E69F76BC7751E"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D5F95E1E2E6F4B849CB0661C7E6F0040"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -309,8 +345,26 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_EBE295F2AEF942A2A2BC754FEA66B4D3"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EE06F209392C4844B4FE7D22D100B6F5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_FB19068976255653AB1FDEF3D7FD105C"
         "OwnerKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FB98207485BD4764B362E0034F849191"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -371,6 +425,26 @@
         }
         "File"
         {
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_07AE10F5555CE939AEE87DEB456A42E8"
+            {
+            "SourcePath" = "8:libaugnet-1.dll"
+            "TargetName" = "8:libaugnet-1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_0B16F77D4AE546D5B9992A5211905EF7"
             {
             "SourcePath" = "8:..\\doc\\augas.txt"
@@ -411,52 +485,32 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_1AAB634858A5523FE1AEB12CD3351749"
-            {
-            "SourcePath" = "8:libaugnet.dll"
-            "TargetName" = "8:libaugnet.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_1E8D5C9ACFD5C8D8DDAE4FF77D3F9FCE"
-            {
-            "SourcePath" = "8:libaugsys.dll"
-            "TargetName" = "8:libaugsys.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_25CF16A3F7F44A00B054A6FD8F5E142B"
             {
             "SourcePath" = "8:..\\example\\augas\\modules.mk"
             "TargetName" = "8:modules.mk"
             "Tag" = "8:"
             "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_2AF056B0CFE740548035EAB432E967A8"
+            {
+            "SourcePath" = "8:..\\example\\augas\\etc\\serverreq.pem"
+            "TargetName" = "8:serverreq.pem"
+            "Tag" = "8:"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -513,10 +567,10 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_358BD46B60814C888FCE59823DE6A083"
             {
-            "SourcePath" = "8:..\\example\\augas\\passwd.txt"
+            "SourcePath" = "8:..\\example\\augas\\etc\\passwd.txt"
             "TargetName" = "8:passwd.txt"
             "Tag" = "8:"
-            "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -611,6 +665,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_4E9C14E9A7C245DE89FEF436AA53BCE7"
+            {
+            "SourcePath" = "8:..\\example\\augas\\etc\\clientkey.pem"
+            "TargetName" = "8:clientkey.pem"
+            "Tag" = "8:"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_51176500727D43818CA3FC49EF4AD428"
             {
             "SourcePath" = "8:install.bat"
@@ -671,12 +745,52 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_59B43AD4F828533E7E2DB10BBB5EB0A1"
+            {
+            "SourcePath" = "8:libaugsrv-1.dll"
+            "TargetName" = "8:libaugsrv-1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_6134F68D1A7F4BB6AEF465AB7A4D39B6"
             {
             "SourcePath" = "8:..\\src\\py\\buffer.py"
             "TargetName" = "8:buffer.py"
             "Tag" = "8:"
             "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_63E2586081D24CDC9DC5F2C4C347F202"
+            {
+            "SourcePath" = "8:..\\etc\\augres.reg"
+            "TargetName" = "8:augres.reg"
+            "Tag" = "8:"
+            "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -711,12 +825,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_83AE08237FB2BC612388031692B21068"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_77B95F3EE9E049DAB01D116543E00F74"
             {
-            "SourcePath" = "8:libaugutil.dll"
-            "TargetName" = "8:libaugutil.dll"
+            "SourcePath" = "8:..\\example\\augas\\test.conf"
+            "TargetName" = "8:test.conf"
             "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -728,7 +842,27 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_8ECAD86A0E394E05A1708B75E7DDA791"
+            {
+            "SourcePath" = "8:..\\example\\augas\\etc\\serverkey.pem"
+            "TargetName" = "8:serverkey.pem"
+            "Tag" = "8:"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_9B84652AEA4F4980896DA4DDBB7F39CC"
@@ -833,10 +967,10 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_BF78FAA9C26B468D81063CA6D72E9392"
             {
-            "SourcePath" = "8:..\\example\\augas\\augas.css"
+            "SourcePath" = "8:..\\example\\augas\\etc\\augas.css"
             "TargetName" = "8:augas.css"
             "Tag" = "8:"
-            "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -849,6 +983,66 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C30F73F6BF1E452E8D7D696A1565394C"
+            {
+            "SourcePath" = "8:..\\example\\augas\\etc\\clientcert.pem"
+            "TargetName" = "8:clientcert.pem"
+            "Tag" = "8:"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C77083D1777A0F30CE269EC525A82BA2"
+            {
+            "SourcePath" = "8:libaugutil-1.dll"
+            "TargetName" = "8:libaugutil-1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_D05C4E57C5684253FD4E69F76BC7751E"
+            {
+            "SourcePath" = "8:libaugsys-1.dll"
+            "TargetName" = "8:libaugsys-1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_D5F95E1E2E6F4B849CB0661C7E6F0040"
@@ -869,26 +1063,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_DB1B3EE29671296A101E349858C9C75B"
-            {
-            "SourcePath" = "8:libaugsrv.dll"
-            "TargetName" = "8:libaugsrv.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_E2AF29C9CC8D48CE938F8D4D86AD54CC"
@@ -951,6 +1125,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_EBE295F2AEF942A2A2BC754FEA66B4D3"
+            {
+            "SourcePath" = "8:..\\example\\augas\\etc\\cacert.pem"
+            "TargetName" = "8:cacert.pem"
+            "Tag" = "8:"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_EE06F209392C4844B4FE7D22D100B6F5"
+            {
+            "SourcePath" = "8:..\\example\\augas\\etc\\clientreq.pem"
+            "TargetName" = "8:clientreq.pem"
+            "Tag" = "8:"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_FB19068976255653AB1FDEF3D7FD105C"
             {
             "SourcePath" = "8:python24.dll"
@@ -969,6 +1183,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_FB98207485BD4764B362E0034F849191"
+            {
+            "SourcePath" = "8:..\\example\\augas\\etc\\servercert.pem"
+            "TargetName" = "8:servercert.pem"
+            "Tag" = "8:"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }
@@ -1049,6 +1283,17 @@
                             "Property" = "8:_95A7DC243A1A40F5A0BCBB82850F473D"
                                 "Folders"
                                 {
+                                    "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_D23077110041428BA2CF82B2E531E609"
+                                    {
+                                    "Name" = "8:etc"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_3773E55BDC2A40968AD11A93DB7863CC"
+                                        "Folders"
+                                        {
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1717,7 +1962,7 @@
         {
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_066BB5B090154238AD74FA0BE08087EF"
             {
-            "SourcePath" = "8:bin\\libaugmar.dll"
+            "SourcePath" = "8:bin\\libaugmar-1.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"

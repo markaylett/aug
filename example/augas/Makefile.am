@@ -1,10 +1,11 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
+SUBDIRS = \
+	etc
+
 EXTRA_DIST = \
-	augas.css \
 	bench.conf \
 	modules.mk \
-	passwd.txt \
 	test.conf
 
 exampledir = $(prefix)/example/augas

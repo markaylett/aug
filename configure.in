@@ -172,6 +172,7 @@ AC_CONFIG_FILES([Makefile
                  etc/Makefile
                  example/Makefile
                  example/augas/Makefile
+                 example/augas/etc/Makefile
                  example/cpp/Makefile
                  src/Makefile
                  src/c/Makefile
