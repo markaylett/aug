@@ -15,16 +15,10 @@ AUG_RCSID("$Id$");
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/socket.h" /* aug_shutdown() */
+#include "augsys/uio.h"
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
-
-#if !defined(_WIN32)
-# define OSFD_(x) (x)
-#else /* _WIN32 */
-# include <io.h>
-# define OSFD_(x) _get_osfhandle(x)
-#endif /* _WIN32 */
 
 struct buf_ {
     char buf_[4096];
@@ -84,10 +78,10 @@ clearbuf_(struct buf_* x)
     x->rd_ = x->wr_ = x->buf_;
 }
 
-static ssize_t
+static size_t
 readbuf_(struct buf_* x, void* buf, size_t size)
 {
-    ssize_t ret = AUG_MIN(x->wr_ - x->rd_, size);
+    size_t ret = AUG_MIN(x->wr_ - x->rd_, size);
     if (ret) {
 
         /* Copy bytes from buffer at read pointer. */
@@ -103,17 +97,57 @@ readbuf_(struct buf_* x, void* buf, size_t size)
     return ret;
 }
 
-static ssize_t
+static size_t
 writebuf_(struct buf_* x, const void* buf, size_t size)
 {
     const char* end = x->buf_ + sizeof(x->buf_);
-    ssize_t ret = AUG_MIN(end - x->wr_, size);
+    size_t ret = AUG_MIN(end - x->wr_, size);
     if (ret) {
 
         /* Copy bytes to buffer at write pointer. */
 
         memcpy(x->wr_, buf, ret);
         x->wr_ += ret;
+    }
+    return ret;
+}
+
+static size_t
+readbufv_(struct buf_* x, const struct iovec* iov, int size)
+{
+    size_t n, ret = 0;
+
+    /* For each entry in the vector. */
+
+    for (; size; --size, ++iov) {
+
+        n = readbuf_(x, iov->iov_base, iov->iov_len);
+        ret += n;
+
+        /* Not enough to satisfy entry. */
+
+        if (n < iov->iov_len)
+            break;
+    }
+    return ret;
+}
+
+static size_t
+writebufv_(struct buf_* x, const struct iovec* iov, int size)
+{
+    size_t n, ret = 0;
+
+    /* For each entry in the vector. */
+
+    for (; size; --size, ++iov) {
+
+        n = writebuf_(x, iov->iov_base, iov->iov_len);
+        ret += n;
+
+        /* Not enough to satisfy entry. */
+
+        if (n < iov->iov_len)
+            break;
     }
     return ret;
 }
@@ -259,9 +293,50 @@ read_(int fd, void* buf, size_t size)
     if (RDZERO == x->state_ && bufempty_(&x->inbuf_))
         return 0;
 
+    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+
+    if (!bufempty_(&x->inbuf_)) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAGAIN);
+        return -1;
+    }
+
     AUG_DEBUG2("SSL: reading from user buffer: fd=[%d]", fd);
 
     ret = readbuf_(&x->inbuf_, buf, size);
+    updateevents_(&nbfile);
+    return ret;
+}
+
+static ssize_t
+readv_(int fd, const struct iovec* iov, int size)
+{
+    struct aug_nbfile nbfile;
+    struct sslext_* x;
+    ssize_t ret;
+
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
+
+    x = nbfile.ext_;
+
+    if (SSLERR == x->state_)
+        return -1;
+
+    /* Only return end once all data has been read from buffer. */
+
+    if (RDZERO == x->state_ && bufempty_(&x->inbuf_))
+        return 0;
+
+    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+
+    if (!bufempty_(&x->inbuf_)) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAGAIN);
+        return -1;
+    }
+
+    AUG_DEBUG2("SSL: reading from user buffer: fd=[%d]", fd);
+
+    ret = readbufv_(&x->inbuf_, iov, size);
     updateevents_(&nbfile);
     return ret;
 }
@@ -280,7 +355,40 @@ write_(int fd, const void* buf, size_t len)
 
     AUG_DEBUG2("SSL: writing to user buffer: fd=[%d]", fd);
 
+    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+
+    if (buffull_(&x->outbuf_)) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAGAIN);
+        return -1;
+    }
+
     ret = writebuf_(&x->outbuf_, buf, len);
+    updateevents_(&nbfile);
+    return ret;
+}
+
+static ssize_t
+writev_(int fd, const struct iovec* iov, int size)
+{
+    struct aug_nbfile nbfile;
+    struct sslext_* x;
+    ssize_t ret;
+
+    if (!aug_getnbfile(fd, &nbfile))
+        return -1;
+
+    x = nbfile.ext_;
+
+    AUG_DEBUG2("SSL: writing to user buffer: fd=[%d]", fd);
+
+    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+
+    if (buffull_(&x->outbuf_)) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAGAIN);
+        return -1;
+    }
+
+    ret = writebufv_(&x->outbuf_, iov, size);
     updateevents_(&nbfile);
     return ret;
 }
@@ -305,9 +413,9 @@ setnonblock_(int fd, int on)
 static const struct aug_fdtype sslfdtype_ = {
     close_,
     read_,
-    NULL, /* TODO */
+    readv_,
     write_,
-    NULL, /* TODO */
+    writev_,
     setnonblock_
 };
 
