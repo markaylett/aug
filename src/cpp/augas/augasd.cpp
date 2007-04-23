@@ -585,7 +585,7 @@ namespace augas {
                 throw error(__FILE__, __LINE__, ESSLCTX,
                             "SSL context [%s] not initialised", ctx);
             objectptr sock(state_->manager_.getbyid(cid));
-            it->second->setsslclient(sock->sfd());
+            it->second->setclient(sock->sfd());
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H
@@ -606,7 +606,7 @@ namespace augas {
                 throw error(__FILE__, __LINE__, ESSLCTX,
                             "SSL context [%s] not initialised", ctx);
             objectptr sock(state_->manager_.getbyid(cid));
-            it->second->setsslserver(sock->sfd());
+            it->second->setserver(sock->sfd());
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H

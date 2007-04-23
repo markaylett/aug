@@ -105,6 +105,9 @@ established::do_process(unsigned short events)
 
     if (events & AUG_FDEVENTWR) {
 
+        AUG_DEBUG2("handling write event: id=[%d], fd=[%d]", sock_.id_,
+                   sfd_.get());
+
         bool done(buffer_.writesome(sfd_));
 
         // Data has been written: reset write timer.

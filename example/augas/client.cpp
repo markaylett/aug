@@ -139,6 +139,7 @@ namespace {
         void
         do_connected(object& sock, const char* addr, unsigned short port)
         {
+            //setsslclient(sock, "client");
             state& s(*sock.user<state>());
             send_(sock);
             --s.tosend_;

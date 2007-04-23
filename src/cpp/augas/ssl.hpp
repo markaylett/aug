@@ -49,10 +49,10 @@ namespace augas {
                const char* password, const char* cafile);
 
         void
-        setsslclient(aug::fdref ref);
+        setclient(aug::fdref ref);
 
         void
-        setsslserver(aug::fdref ref);
+        setserver(aug::fdref ref);
     };
 
     typedef aug::smartptr<sslctx> sslctxptr;

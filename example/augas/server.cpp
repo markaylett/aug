@@ -75,6 +75,7 @@ namespace {
         bool
         do_accept(object& sock, const char* addr, unsigned short port)
         {
+            //setsslserver(sock, "server");
             sock.setuser(new string());
             send(sock, "hello\r\n", 7);
             setrwtimer(sock, 15000, AUGAS_TIMRD);

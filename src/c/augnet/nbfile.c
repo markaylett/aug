@@ -22,7 +22,7 @@ removenbfile_(struct aug_nbfile* nbfile)
 {
     struct aug_nbfile* ret = nbfile;
 
-    AUG_DEBUG2("clearing io-event mask: fd=[%d]", nbfile->fd_);
+    AUG_DEBUG3("clearing io-event mask: fd=[%d]", nbfile->fd_);
 
     if (-1 == aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_, 0))
         ret = NULL;
@@ -188,7 +188,7 @@ filecb_(const struct aug_var* var, int fd)
 {
     struct aug_nbfile nbfile;
     if (!aug_getnbfile(fd, &nbfile))
-        return 0;
+        return 0; /* Not found so remove. */
     return nbfile.type_->filecb_(var, &nbfile);
 }
 
@@ -258,6 +258,7 @@ aug_removenbfile(int fd)
 AUGNET_API int
 aug_foreachnbfile(aug_nbfiles_t nbfiles)
 {
+    AUG_DEBUG3("aug_foreachnbfile()");
     return aug_foreachfile(&nbfiles->files_);
 }
 
@@ -272,6 +273,8 @@ aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout)
 {
     static const struct timeval nowait = { 0, 0 };
     int ret;
+
+    AUG_DEBUG3("aug_waitnbevents()");
 
     if (nbfiles->nowait_) {
         nbfiles->nowait_ = 0;

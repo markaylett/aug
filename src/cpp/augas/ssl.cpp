@@ -97,20 +97,22 @@ sslctx::sslctx(const char* certfile, const char* keyfile,
 }
 
 void
-sslctx::setsslclient(fdref ref)
+sslctx::setclient(fdref ref)
 {
     SSL* ssl = SSL_new(ctx_);
-    BIO* sbio = BIO_new_socket(aug_getosfd(ref.get()), BIO_NOCLOSE);
+    BIO* sbio = BIO_new_socket((int)aug_getosfd(ref.get()), BIO_NOCLOSE);
     SSL_set_bio(ssl, sbio, sbio);
+    SSL_set_verify(ssl, SSL_VERIFY_PEER, SSL_get_verify_callback(ssl));
     aug_setsslclient(ref.get(), ssl);
 }
 
 void
-sslctx::setsslserver(fdref ref)
+sslctx::setserver(fdref ref)
 {
     SSL* ssl = SSL_new(ctx_);
-    BIO* sbio = BIO_new_socket(aug_getosfd(ref.get()), BIO_NOCLOSE);
+    BIO* sbio = BIO_new_socket((int)aug_getosfd(ref.get()), BIO_NOCLOSE);
     SSL_set_bio(ssl, sbio, sbio);
+    SSL_set_verify(ssl, SSL_VERIFY_PEER, SSL_get_verify_callback(ssl));
     aug_setsslserver(ref.get(), ssl);
 }
 
