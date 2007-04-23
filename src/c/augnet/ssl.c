@@ -260,6 +260,8 @@ userevents_(struct aug_nbfile* nbfile)
     struct sslext_* x = nbfile->ext_;
     int events = 0;
 
+    /* End of data and errors are communicated via aug_read(). */
+
     if ((x->mask_ & AUG_FDEVENTRD)
         && (!bufempty_(&x->inbuf_) || RDZERO == x->state_
             || SSLERR == x->state_))
@@ -759,7 +761,9 @@ aug_setsslclient(int fd, void* ssl)
     if (!x)
         return -1;
 
-    x->state_ = RDWANTWR;
+    /* Write client-initiated handshake. */
+
+    x->state_ = WRWANTWR;
 
     SSL_set_connect_state(ssl);
     return 0;
@@ -772,7 +776,9 @@ aug_setsslserver(int fd, void* ssl)
     if (!x)
         return -1;
 
-    x->state_ = WRWANTWR;
+    /* Read client-initiated handshake. */
+
+    x->state_ = RDWANTRD;
 
     SSL_set_accept_state(ssl);
     return 0;
