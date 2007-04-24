@@ -6,4 +6,5 @@ SUBDIRS = \
 	sh
 
 include_HEADERS = \
-	augconfig.h
+	augconfig.h \
+	auglocal.h

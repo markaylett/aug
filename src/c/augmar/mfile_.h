@@ -14,31 +14,31 @@
 
 typedef struct aug_mfile_* aug_mfile_t;
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_closemfile_(aug_mfile_t mfile);
 
-AUGMAR_EXTERN aug_mfile_t
+AUG_EXTERN aug_mfile_t
 aug_openmfile_(const char* path, int flags, mode_t mode, unsigned tail);
 
-AUGMAR_EXTERN void*
+AUG_EXTERN void*
 aug_mapmfile_(aug_mfile_t mfile, unsigned size);
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_syncmfile_(aug_mfile_t mfile);
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_truncatemfile_(aug_mfile_t mfile, unsigned size);
 
-AUGMAR_EXTERN void*
+AUG_EXTERN void*
 aug_mfileaddr_(aug_mfile_t mfile);
 
-AUGMAR_EXTERN unsigned
+AUG_EXTERN unsigned
 aug_mfileresvd_(aug_mfile_t mfile);
 
-AUGMAR_EXTERN unsigned
+AUG_EXTERN unsigned
 aug_mfilesize_(aug_mfile_t mfile);
 
-AUGMAR_EXTERN void*
+AUG_EXTERN void*
 aug_mfiletail_(aug_mfile_t mfile);
 
 #endif /* AUGMAR_MFILE_H_ */

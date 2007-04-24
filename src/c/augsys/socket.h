@@ -26,9 +26,6 @@
 # if !defined(socklen_t)
 typedef int socklen_t;
 # endif /* socklen_t */
-# if defined(_MSC_VER) && !defined(HAVE_IPV6)
-#  define HAVE_IPV6 1
-# endif /* _MSC_VER && !HAVE_IPV6 */
 #endif /* _WIN32 */
 
 #define AUG_MAXADDRLEN 128

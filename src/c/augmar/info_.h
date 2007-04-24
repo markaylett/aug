@@ -16,10 +16,10 @@ struct aug_info_ {
     unsigned verno_, fields_, hsize_, bsize_;
 };
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_setinfo_(aug_seq_t seq, const struct aug_info_* info);
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_info_(aug_seq_t seq, struct aug_info_* info);
 
 #endif /* AUGMAR_INFO_H_ */

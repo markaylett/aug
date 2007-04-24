@@ -1,6 +1,6 @@
 #include "augsys/errno.h"
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_createtlskey_(aug_tlskey_t* tlskey)
 {
     if (0xffffffff == (*tlskey = TlsAlloc())) {
@@ -11,7 +11,7 @@ aug_createtlskey_(aug_tlskey_t* tlskey)
     return 0;
 }
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_destroytlskey_(aug_tlskey_t tlskey)
 {
     if (!TlsFree(tlskey)) {
@@ -22,7 +22,7 @@ aug_destroytlskey_(aug_tlskey_t tlskey)
     return 0;
 }
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_gettlsvalue_(aug_tlskey_t tlskey, void** value)
 {
     void* ret = TlsGetValue(tlskey);
@@ -35,7 +35,7 @@ aug_gettlsvalue_(aug_tlskey_t tlskey, void** value)
     return 0;
 }
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_settlsvalue_(aug_tlskey_t tlskey, void* value)
 {
     if (!TlsSetValue(tlskey, value)) {

@@ -17,7 +17,7 @@ AUG_RCSID("$Id$");
 #include <errno.h>
 #include <stdio.h>         /* SEEK_CUR */
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_closefile_(int fd)
 {
     if (-1 == close(fd)) {
@@ -28,7 +28,7 @@ aug_closefile_(int fd)
     return 0;
 }
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_openfile_(const char* path, int flags, mode_t mode)
 {
     int fd, local;
@@ -43,7 +43,7 @@ aug_openfile_(const char* path, int flags, mode_t mode)
     return fd;
 }
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_extendfile_(int fd, unsigned size)
 {
     /* The lseek function can be used to move the file pointer beyond the end
@@ -99,7 +99,7 @@ aug_extendfile_(int fd, unsigned size)
     return -1;
 }
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_syncfile_(int fd)
 {
     if (-1 == fsync(fd)) {
@@ -109,7 +109,7 @@ aug_syncfile_(int fd)
     return 0;
 }
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_truncatefile_(int fd, off_t size)
 {
     if (-1 == ftruncate(fd, size)) {

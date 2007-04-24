@@ -19,8 +19,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src/c, ../src/cpp"
-				PreprocessorDefinitions="__func__=__FUNCTION__;FD_SETSIZE=256;HAVE_OPENSSL_SSL_H=1"
+				AdditionalIncludeDirectories="../src;../src/c;../src/cpp"
+				PreprocessorDefinitions="FD_SETSIZE=256"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -72,8 +72,8 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../src/c, ../src/cpp"
-				PreprocessorDefinitions="__func__=__FUNCTION__;FD_SETSIZE=256;HAVE_OPENSSL_SSL_H=1"
+				AdditionalIncludeDirectories="../src;../src/c;../src/cpp"
+				PreprocessorDefinitions="FD_SETSIZE=256"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"

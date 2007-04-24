@@ -208,13 +208,13 @@ static const struct impl_ mfileimpl_ = {
     mfiletail_
 };
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_destroyseq_(aug_seq_t seq)
 {
     return (*seq->impl_->destroy_)(seq);
 }
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_copyseq_(aug_seq_t dst, aug_seq_t src)
 {
     unsigned size = aug_seqsize_(src);
@@ -233,7 +233,7 @@ aug_copyseq_(aug_seq_t dst, aug_seq_t src)
     return 0;
 }
 
-AUGMAR_EXTERN aug_seq_t
+AUG_EXTERN aug_seq_t
 aug_createseq_(unsigned tail)
 {
     struct memseq_* memseq;
@@ -250,7 +250,7 @@ aug_createseq_(unsigned tail)
     return (aug_seq_t)memseq;
 }
 
-AUGMAR_EXTERN aug_seq_t
+AUG_EXTERN aug_seq_t
 aug_openseq_(const char* path, int flags, mode_t mode, unsigned tail)
 {
     unsigned size;
@@ -278,7 +278,7 @@ aug_openseq_(const char* path, int flags, mode_t mode, unsigned tail)
     return NULL;
 }
 
-AUGMAR_EXTERN void*
+AUG_EXTERN void*
 aug_resizeseq_(aug_seq_t seq, unsigned size)
 {
     void* addr;
@@ -296,7 +296,7 @@ aug_resizeseq_(aug_seq_t seq, unsigned size)
     return (char*)addr + seq->offset_;
 }
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_setregion_(aug_seq_t seq, unsigned offset, unsigned len)
 {
     unsigned total = (*seq->impl_->size_)(seq);
@@ -312,25 +312,25 @@ aug_setregion_(aug_seq_t seq, unsigned offset, unsigned len)
     return 0;
 }
 
-AUGMAR_EXTERN int
+AUG_EXTERN int
 aug_syncseq_(aug_seq_t seq)
 {
     return (*seq->impl_->sync_)(seq);
 }
 
-AUGMAR_EXTERN void*
+AUG_EXTERN void*
 aug_seqaddr_(aug_seq_t seq)
 {
     return (char*)(*seq->impl_->addr_)(seq) + seq->offset_;
 }
 
-AUGMAR_EXTERN unsigned
+AUG_EXTERN unsigned
 aug_seqsize_(aug_seq_t seq)
 {
     return (*seq->impl_->size_)(seq);
 }
 
-AUGMAR_EXTERN void*
+AUG_EXTERN void*
 aug_seqtail_(aug_seq_t seq)
 {
     return (*seq->impl_->tail_)(seq);

@@ -9,7 +9,7 @@ struct aug_mutex_ {
     pthread_mutex_t handle_;
 };
 
-AUGSYS_EXTERN aug_mutex_t
+AUG_EXTERN aug_mutex_t
 aug_createmutex_(void)
 {
     aug_mutex_t mutex = malloc(sizeof(struct aug_mutex_));
@@ -25,7 +25,7 @@ aug_createmutex_(void)
 	return mutex;
 }
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_destroymutex_(aug_mutex_t mutex)
 {
     errno = pthread_mutex_destroy(&mutex->handle_);
@@ -33,14 +33,14 @@ aug_destroymutex_(aug_mutex_t mutex)
     return 0 == errno ? 0 : -1;
 }
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_lockmutex_(aug_mutex_t mutex)
 {
     errno = pthread_mutex_lock(&mutex->handle_);
     return 0 == errno ? 0 : -1;
 }
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_unlockmutex_(aug_mutex_t mutex)
 {
     errno = pthread_mutex_unlock(&mutex->handle_);

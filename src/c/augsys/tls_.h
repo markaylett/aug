@@ -14,16 +14,16 @@ typedef pthread_key_t aug_tlskey_t;
 typedef DWORD aug_tlskey_t;
 #endif /* _WIN32 */
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_createtlskey_(aug_tlskey_t* tlskey);
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_destroytlskey_(aug_tlskey_t tlskey);
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_gettlsvalue_(aug_tlskey_t tlskey, void** value);
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_settlsvalue_(aug_tlskey_t tlskey, void* value);
 
 #endif /* AUGSYS_TLS_H_ */

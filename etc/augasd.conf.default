@@ -8,11 +8,13 @@ loglevel = 4
 #ssl.context.foo.keyfile = etc/fookey.pem
 #ssl.context.foo.password = test
 #ssl.context.foo.cafile = etc/cacert.pem
+#ssl.context.foo.verify = 1
 
 #ssl.context.bar.certfile = etc/barcert.pem
 #ssl.context.bar.keyfile = etc/barkey.pem
 #ssl.context.bar.password = test
 #ssl.context.bar.cafile = etc/cacert.pem
+#ssl.context.bar.verify = 1
 
 services = http sched pyskel pyecho pyproxy
 

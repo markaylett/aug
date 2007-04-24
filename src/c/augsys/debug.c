@@ -21,7 +21,7 @@ dumpclient_(void* userdata, size_t size)
              file, (int)line, userdata, (int)size);
 }
 
-AUGSYS_EXTERN void
+AUG_EXTERN void
 aug_initleakdump_(void)
 {
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
@@ -29,7 +29,7 @@ aug_initleakdump_(void)
     _CrtSetDumpClient(dumpclient_);
 }
 
-AUGSYS_EXTERN void
+AUG_EXTERN void
 aug_dumpleaks_(void)
 {
     _CrtDumpMemoryLeaks();

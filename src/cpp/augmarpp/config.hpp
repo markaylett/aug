@@ -4,13 +4,7 @@
 #ifndef AUGMARPP_CONFIG_HPP
 #define AUGMARPP_CONFIG_HPP
 
-#if !defined(_WIN32)
-# define AUGMARPP_EXPORT
-# define AUGMARPP_IMPORT
-#else // _WIN32
-# define AUGMARPP_EXPORT __declspec(dllexport)
-# define AUGMARPP_IMPORT __declspec(dllimport)
-#endif // _WIN32
+#include "augconfig.h"
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGMARPP_SHARED
@@ -20,21 +14,10 @@
 # define AUGMARPP_API
 #else // AUGMARPP_SHARED
 # if !defined(AUGMARPP_BUILD)
-#  define AUGMARPP_API AUGMARPP_IMPORT
+#  define AUGMARPP_API AUG_IMPORT
 # else // AUGMARPP_BUILD
-#  define AUGMARPP_API AUGMARPP_EXPORT
+#  define AUGMARPP_API AUG_EXPORT
 # endif // AUGMARPP_BUILD
 #endif // AUGMARPP_SHARED
-
-#if !defined(AUG_NOTHROW)
-# define AUG_NOTHROW throw()
-#endif // !AUG_NOTHROW
-
-#if HAVE_CONFIG_H
-# ifndef AUGCONFIG_H
-# define AUGCONFIG_H
-#  include "augconfig.h"
-# endif // AUGCONFIG_H
-#endif // HAVE_CONFIG_H
 
 #endif // AUGMARPP_CONFIG_HPP

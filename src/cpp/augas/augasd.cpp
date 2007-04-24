@@ -21,12 +21,6 @@ AUG_RCSID("$Id$");
 #include "augas/ssl.hpp"
 #include "augas/utility.hpp"
 
-#if !defined(_MSC_VER)
-# include "augconfig.h"
-#else // _MSC_VER
-# define PACKAGE_BUGREPORT "mark@emantic.co.uk"
-#endif // _MSC_VER
-
 #include <cassert>
 #include <iomanip>
 #include <iostream>

@@ -16,22 +16,22 @@
 typedef struct aug_mutex_* aug_mutex_t;
 # endif /* !AUGSYS_MUTEX_H */
 
-AUGSYS_EXTERN aug_mutex_t
+AUG_EXTERN aug_mutex_t
 aug_createmutex_(void);
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_destroymutex_(aug_mutex_t mutex);
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_lockmutex_(aug_mutex_t mutex);
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_unlockmutex_(aug_mutex_t mutex);
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_initlock_(void);
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_termlock_(void);
 
 #endif /* AUGSYS_BUILD */

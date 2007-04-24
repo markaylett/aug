@@ -2406,7 +2406,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 
-ac_config_headers="$ac_config_headers src/augconfig.h"
+ac_config_headers="$ac_config_headers src/auglocal.h"
 
 { echo "$as_me:$LINENO: checking whether to enable maintainer-specific portions of Makefiles" >&5
 echo $ECHO_N "checking whether to enable maintainer-specific portions of Makefiles... $ECHO_C" >&6; }
@@ -22305,7 +22305,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "src/augconfig.h") CONFIG_HEADERS="$CONFIG_HEADERS src/augconfig.h" ;;
+    "src/auglocal.h") CONFIG_HEADERS="$CONFIG_HEADERS src/auglocal.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;

@@ -4,9 +4,7 @@
 #ifndef AUGAS_SSL_HPP
 #define AUGAS_SSL_HPP
 
-#if !defined(_MSC_VER)
-# include "augconfig.h"
-#endif // !_MSC_VER
+#include "augconfig.h"
 
 #if HAVE_OPENSSL_SSL_H
 
@@ -46,7 +44,8 @@ namespace augas {
         ~sslctx() AUG_NOTHROW;
 
         sslctx(const char* certfile, const char* keyfile,
-               const char* password, const char* cafile);
+               const char* password, const char* cafile, const char* ciphers,
+               int verify);
 
         void
         setclient(aug::fdref ref);

@@ -4,13 +4,7 @@
 #ifndef AUGSYSPP_CONFIG_HPP
 #define AUGSYSPP_CONFIG_HPP
 
-#if !defined(_WIN32)
-# define AUGSYSPP_EXPORT
-# define AUGSYSPP_IMPORT
-#else // _WIN32
-# define AUGSYSPP_EXPORT __declspec(dllexport)
-# define AUGSYSPP_IMPORT __declspec(dllimport)
-#endif // _WIN32
+#include "augconfig.h"
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
 # define AUGSYSPP_SHARED
@@ -20,21 +14,10 @@
 # define AUGSYSPP_API
 #else // AUGSYSPP_SHARED
 # if !defined(AUGSYSPP_BUILD)
-#  define AUGSYSPP_API AUGSYSPP_IMPORT
+#  define AUGSYSPP_API AUG_IMPORT
 # else // AUGSYSPP_BUILD
-#  define AUGSYSPP_API AUGSYSPP_EXPORT
+#  define AUGSYSPP_API AUG_EXPORT
 # endif // AUGSYSPP_BUILD
 #endif // AUGSYSPP_SHARED
-
-#if !defined(AUG_NOTHROW)
-# define AUG_NOTHROW throw()
-#endif // !AUG_NOTHROW
-
-#if HAVE_CONFIG_H
-# ifndef AUGCONFIG_H
-# define AUGCONFIG_H
-#  include "augconfig.h"
-# endif // AUGCONFIG_H
-#endif // HAVE_CONFIG_H
 
 #endif // AUGSYSPP_CONFIG_HPP

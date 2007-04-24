@@ -11,7 +11,7 @@ struct aug_mutex_ {
     CRITICAL_SECTION handle_;
 };
 
-AUGSYS_EXTERN aug_mutex_t
+AUG_EXTERN aug_mutex_t
 aug_createmutex_(void)
 {
     aug_mutex_t mutex = malloc(sizeof(struct aug_mutex_));
@@ -38,7 +38,7 @@ aug_createmutex_(void)
 	return mutex;
 }
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_destroymutex_(aug_mutex_t mutex)
 {
 	DeleteCriticalSection(&mutex->handle_);
@@ -46,7 +46,7 @@ aug_destroymutex_(aug_mutex_t mutex)
     return 0;
 }
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_lockmutex_(aug_mutex_t mutex)
 {
 	/* In low memory situations, EnterCriticalSection can raise a
@@ -66,7 +66,7 @@ aug_lockmutex_(aug_mutex_t mutex)
 	return 0;
 }
 
-AUGSYS_EXTERN int
+AUG_EXTERN int
 aug_unlockmutex_(aug_mutex_t mutex)
 {
 	LeaveCriticalSection(&mutex->handle_);
