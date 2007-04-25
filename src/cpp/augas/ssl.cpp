@@ -94,29 +94,47 @@ namespace {
         X509_NAME_oneline(subject, buf, sizeof(buf));
         aug_info("subject: %s", buf);
 
-        X509_NAME_get_text_by_NID
-            (subject, NID_commonName, buf, sizeof(buf));
-        aug_info("commonName: %s", buf);
-
+        buf[0] = '\0';
         X509_NAME_get_text_by_NID
             (subject, NID_countryName, buf, sizeof(buf));
-        aug_info("countryName: %s", buf);
+        if (buf[0])
+            aug_info("country: %s", buf);
 
-        X509_NAME_get_text_by_NID
-            (subject, NID_localityName, buf, sizeof(buf));
-        aug_info("localityName: %s", buf);
-
+        buf[0] = '\0';
         X509_NAME_get_text_by_NID
             (subject, NID_stateOrProvinceName, buf, sizeof(buf));
-        aug_info("stateOrProvinceName: %s", buf);
+        if (buf[0])
+            aug_info("state or province: %s", buf);
 
+        buf[0] = '\0';
+        X509_NAME_get_text_by_NID
+            (subject, NID_localityName, buf, sizeof(buf));
+        if (buf[0])
+            aug_info("locality: %s", buf);
+
+        buf[0] = '\0';
         X509_NAME_get_text_by_NID
             (subject, NID_organizationName, buf, sizeof(buf));
-        aug_info("organizationName: %s", buf);
+        if (buf[0])
+            aug_info("organization: %s", buf);
 
+        buf[0] = '\0';
         X509_NAME_get_text_by_NID
             (subject, NID_organizationalUnitName, buf, sizeof(buf));
-        aug_info("organizationalUnitName: %s", buf);
+        if (buf[0])
+            aug_info("organizational unit: %s", buf);
+
+        buf[0] = '\0';
+        X509_NAME_get_text_by_NID
+            (subject, NID_commonName, buf, sizeof(buf));
+        if (buf[0])
+            aug_info("common name: %s", buf);
+
+        buf[0] = '\0';
+        X509_NAME_get_text_by_NID
+            (subject, NID_pkcs9_emailAddress, buf, sizeof(buf));
+        if (buf[0])
+            aug_info("email address: %s", buf);
 
 		return preverify_ok;
     }
