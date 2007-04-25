@@ -155,7 +155,7 @@ namespace augas {
         {
 #if HAVE_OPENSSL_SSL_H
             initssl();
-            loadsslctxs(sslctxs_, options_);
+            createsslctxs(sslctxs_, options_);
 #endif // HAVE_OPENSSL_SSL_H
 
             AUG_DEBUG2("inserting event pipe to list");

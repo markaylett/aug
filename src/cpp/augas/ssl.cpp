@@ -11,6 +11,7 @@ AUG_RCSID("$Id$");
 
 # include "augas/options.hpp"
 # include "augsys/base.h"
+# include "augsys/log.h"
 # include "augsys/string.h"
 
 # include <sstream>
@@ -31,10 +32,93 @@ namespace {
         return static_cast<int>(strlen(buf));
     }
 
-    int
-    verifycb_(int ok, X509_STORE_CTX* ctx)
+    void
+    infocb_(const SSL* ssl, int where, int ret)
     {
-		return 1;
+        if (aug_loglevel() < AUG_LOGDEBUG0 + 2)
+            return;
+
+        const char* str;
+        int op(where & ~SSL_ST_MASK);
+
+        if (op & SSL_ST_CONNECT)
+            str = "connect";
+        else if (op & SSL_ST_ACCEPT)
+            str = "accept";
+        else
+            str = "undefined";
+
+        if (where & SSL_CB_LOOP) {
+
+            // Callback has been called to indicate state change inside a
+            // loop.
+
+            aug_debug2("SSL: %s loop: %s", str, SSL_state_string_long(ssl));
+
+        } else if (where & SSL_CB_ALERT) {
+
+            // Callback has been called due to an alert being sent or
+            // received.
+
+            str = (where & SSL_CB_READ) ? "read" : "write";
+            aug_debug2("SSL: %s %s: %s", str,
+                       SSL_alert_type_string_long(ret),
+                       SSL_alert_desc_string_long(ret));
+
+        } else if (where & SSL_CB_EXIT) {
+
+            // Callback has been called to indicate error exit of a handshake
+            // function. (May be soft error with retry option for non-blocking
+            // setups.)
+
+            if (0 == ret) {
+                aug_debug2("SSL: %s failed: %s", str,
+                           SSL_state_string_long(ssl));
+            } else if (ret < 0) {
+                aug_debug2("SSL: %s error: %s", str,
+                           SSL_state_string_long(ssl));
+            }
+        }
+    }
+
+    int
+    verifycb_(int preverify_ok, X509_STORE_CTX* x509_ctx)
+    {
+        X509* peer(X509_STORE_CTX_get_current_cert(x509_ctx));
+
+        char buf[256];
+        X509_NAME_oneline(X509_get_issuer_name(peer), buf, sizeof(buf));
+        aug_info("issuer: %s", buf);
+
+        X509_NAME* subject(X509_get_subject_name(peer));
+        X509_NAME_oneline(subject, buf, sizeof(buf));
+        aug_info("subject: %s", buf);
+
+        X509_NAME_get_text_by_NID
+            (subject, NID_commonName, buf, sizeof(buf));
+        aug_info("commonName: %s", buf);
+
+        X509_NAME_get_text_by_NID
+            (subject, NID_countryName, buf, sizeof(buf));
+        aug_info("countryName: %s", buf);
+
+        X509_NAME_get_text_by_NID
+            (subject, NID_localityName, buf, sizeof(buf));
+        aug_info("localityName: %s", buf);
+
+        X509_NAME_get_text_by_NID
+            (subject, NID_stateOrProvinceName, buf, sizeof(buf));
+        aug_info("stateOrProvinceName: %s", buf);
+
+        X509_NAME_get_text_by_NID
+            (subject, NID_organizationName, buf, sizeof(buf));
+        aug_info("organizationName: %s", buf);
+
+        X509_NAME_get_text_by_NID
+            (subject, NID_organizationalUnitName, buf, sizeof(buf));
+        aug_info("organizationalUnitName: %s", buf);
+
+		return preverify_ok;
     }
 
     int
@@ -54,92 +138,18 @@ namespace {
         }
         return mode;
     }
+}
 
-    SSL_CTX*
-    createctx_(const char* certfile, const char* keyfile,
-               const char* password, const char* cafile, const char* ciphers,
-               int verify)
-    {
-        SSL_METHOD* meth;
-        SSL_CTX* ctx;
-
-        // Create our context.
-
-        meth = SSLv23_method();
-        ctx = SSL_CTX_new(meth);
-
-#if SSLEAY_VERSION_NUMBER >= 0x00906000L
-        SSL_CTX_set_mode(ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
-#endif // >= OpenSSL-0.9.6
-
-#if OPENSSL_VERSION_NUMBER < 0x00905100L
-        SSL_CTX_set_verify_depth(ctx, 1);
-#endif // < OpenSSL-0.9.5
-
-        try {
-
-            // Load our keys and certificates.
-
-            if (certfile && !SSL_CTX_use_certificate_chain_file(ctx,
-                                                                certfile))
-                throw ssl_error(__FILE__, __LINE__, ERR_get_error());
-
-            if (password) {
-                SSL_CTX_set_default_passwd_cb(ctx, passwdcb_);
-                SSL_CTX_set_default_passwd_cb_userdata
-                    (ctx, const_cast<char*>(password));
-            }
-
-            if (keyfile && !SSL_CTX_use_PrivateKey_file(ctx, keyfile,
-                                                        SSL_FILETYPE_PEM))
-                throw ssl_error(__FILE__, __LINE__, ERR_get_error());
-
-            // Load the CAs we trust.
-
-            if (cafile && !SSL_CTX_load_verify_locations(ctx, cafile, 0))
-                throw ssl_error(__FILE__, __LINE__, ERR_get_error());
-
-            if (ciphers && !SSL_CTX_set_cipher_list(ctx, ciphers))
-                throw ssl_error(__FILE__, __LINE__, ERR_get_error());
-
-            SSL_CTX_set_verify(ctx, tomode_(verify), verifycb_);
-
-        } catch (...) {
-            SSL_CTX_free(ctx);
-			throw;
-        }
-        return ctx;
-    }
-
-    sslctxptr
-    createctx_(const string& name, const options& options)
-    {
-        string s("ssl.context.");
-        s += name;
-
-        const char* certfile = options.get(s + ".certfile", 0);
-        const char* keyfile = options.get(s + ".keyfile", 0);
-        const char* password = options.get(s + ".password", 0);
-        const char* cafile = options.get(s + ".cafile", 0);
-        const char* ciphers = options.get(s + ".ciphers", 0);
-        const char* verify = options.get(s + ".verify", "1");
-
-        return sslctxptr(new sslctx(certfile, keyfile, password, cafile,
-                                    ciphers, atoi(verify)));
-    }
+sslctx::sslctx()
+    : ctx_(SSL_CTX_new(SSLv23_method()))
+{
+    if (!ctx_)
+        throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 }
 
 sslctx::~sslctx() AUG_NOTHROW
 {
-    if (ctx_)
-        SSL_CTX_free(ctx_);
-}
-
-sslctx::sslctx(const char* certfile, const char* keyfile,
-               const char* password, const char* cafile, const char* ciphers,
-               int verify)
-    : ctx_(createctx_(certfile, keyfile, password, cafile, ciphers, verify))
-{
+    SSL_CTX_free(ctx_);
 }
 
 void
@@ -169,8 +179,63 @@ augas::initssl()
     SSL_load_error_strings();
 }
 
+sslctxptr
+augas::createsslctx(const string& name, const options& options)
+{
+    string s("ssl.context.");
+    s += name;
+
+    const char* certfile(options.get(s + ".certfile", 0));
+    const char* keyfile(options.get(s + ".keyfile", 0));
+    const char* password(options.get(s + ".password", 0));
+    const char* cadir(options.get(s + ".cadir", 0));
+    const char* cafile(options.get(s + ".cafile", 0));
+    const char* ciphers(options.get(s + ".ciphers", 0));
+    int verify(atoi(options.get(s + ".verify", "1")));
+
+    sslctxptr ptr(new sslctx());
+    SSL_CTX* ctx(ptr->ctx_);
+
+    // Load our keys and certificates.
+
+    if (certfile && !SSL_CTX_use_certificate_chain_file(ctx, certfile))
+        throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+
+    if (password) {
+        SSL_CTX_set_default_passwd_cb(ctx, passwdcb_);
+        SSL_CTX_set_default_passwd_cb_userdata
+            (ctx, const_cast<char*>(password));
+    }
+
+    if (keyfile && !SSL_CTX_use_PrivateKey_file(ctx, keyfile,
+                                                SSL_FILETYPE_PEM))
+        throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+
+    // Load the CAs we trust.
+
+    if ((cafile || cadir)
+        && !SSL_CTX_load_verify_locations(ctx, cafile, cadir))
+        throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+
+    if (ciphers && !SSL_CTX_set_cipher_list(ctx, ciphers))
+        throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+
+    SSL_CTX_set_info_callback(ctx, infocb_);
+    SSL_CTX_set_verify(ctx, tomode_(verify), verifycb_);
+
+#if SSLEAY_VERSION_NUMBER >= 0x00906000L
+    SSL_CTX_set_mode(ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
+#endif // >= OpenSSL-0.9.6
+
+#if OPENSSL_VERSION_NUMBER < 0x00905100L
+    SSL_CTX_set_verify_depth(ctx, 1);
+#endif // < OpenSSL-0.9.5
+
+    return ptr;
+}
+
 void
-augas::loadsslctxs(sslctxs& sslctxs, const options& options)
+augas::createsslctxs(sslctxs& sslctxs, const options& options)
 {
     const char* contexts = options.get("ssl.contexts", 0);
 
@@ -179,7 +244,7 @@ augas::loadsslctxs(sslctxs& sslctxs, const options& options)
         istringstream is(contexts);
         string name;
         while (is >> name)
-            sslctxs.insert(make_pair(name, createctx_(name, options)));
+            sslctxs.insert(make_pair(name, createsslctx(name, options)));
     }
 }
 
