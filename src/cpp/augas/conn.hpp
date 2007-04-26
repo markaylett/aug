@@ -44,6 +44,9 @@ namespace augas {
         virtual void
         do_teardown() = 0;
 
+        virtual bool
+        do_authcert(const char* subject, const char* issuer) = 0;
+
         virtual const aug::endpoint&
         do_endpoint() const = 0;
 
@@ -87,6 +90,11 @@ namespace augas {
         teardown()
         {
             do_teardown();
+        }
+        bool
+        authcert(const char* subject, const char* issuer)
+        {
+            return do_authcert(subject, issuer);
         }
         const aug::endpoint&
         endpoint() const
@@ -152,6 +160,9 @@ namespace augas {
         void
         do_teardown();
 
+        bool
+        do_authcert(const char* subject, const char* issuer);
+
         const aug::endpoint&
         do_endpoint() const;
 
@@ -208,6 +219,9 @@ namespace augas {
 
         void
         do_teardown();
+
+        bool
+        do_authcert(const char* subject, const char* issuer);
 
         const aug::endpoint&
         do_endpoint() const;

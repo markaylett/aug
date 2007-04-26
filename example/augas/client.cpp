@@ -153,6 +153,13 @@ namespace {
                      static_cast<const char*>(buf) + len, s.tok_, '\n',
                      eachline(send_, sock));
         }
+        bool
+        do_authcert(const object& sock, const char* subject,
+                    const char* issuer)
+        {
+            augas_writelog(AUGAS_LOGINFO, "checking subject...");
+            return true;
+        }
         benchserv()
             : conns_(0),
               estab_(0),

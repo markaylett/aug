@@ -151,6 +151,12 @@ established::do_teardown()
     }
 }
 
+bool
+established::do_authcert(const char* subject, const char* issuer)
+{
+    return serv_->authcert(sock_, subject, issuer);
+}
+
 const endpoint&
 established::do_endpoint() const
 {
@@ -265,6 +271,13 @@ connecting::do_shutdown()
 
 void
 connecting::do_teardown()
+{
+    throw error(__FILE__, __LINE__, ESTATE,
+                "connection not established: id=[%d]", sock_.id_);
+}
+
+bool
+connecting::do_authcert(const char* subject, const char* issuer)
 {
     throw error(__FILE__, __LINE__, ESTATE,
                 "connection not established: id=[%d]", sock_.id_);

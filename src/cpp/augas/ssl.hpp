@@ -18,6 +18,7 @@
 
 namespace augas {
 
+    class conn_base;
     class options;
 
     class ssl_error : public aug::errinfo_error {
@@ -36,6 +37,7 @@ namespace augas {
         friend aug::smartptr<sslctx>
         createsslctx(const std::string& name, const options& options);
 
+        const int verify_;
         SSL_CTX* const ctx_;
 
         sslctx(const sslctx&);
@@ -43,16 +45,17 @@ namespace augas {
         sslctx&
         operator =(const sslctx&);
 
-        sslctx();
+        explicit
+        sslctx(int verify);
 
     public:
         ~sslctx() AUG_NOTHROW;
 
         void
-        setclient(aug::fdref ref);
+        setclient(conn_base& conn);
 
         void
-        setserver(aug::fdref ref);
+        setserver(conn_base& conn);
     };
 
     typedef aug::smartptr<sslctx> sslctxptr;

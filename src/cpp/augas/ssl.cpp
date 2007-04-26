@@ -9,6 +9,7 @@ AUG_RCSID("$Id$");
 
 #if HAVE_OPENSSL_SSL_H
 
+# include "augas/conn.hpp"
 # include "augas/options.hpp"
 # include "augsys/base.h"
 # include "augsys/log.h"
@@ -81,62 +82,51 @@ namespace {
         }
     }
 
+    void
+    lognid_(const char* s, X509_name_st* name, int nid)
+    {
+        char buf[256];
+        buf[0] = '\0';
+
+        X509_NAME_get_text_by_NID(name, nid, buf, sizeof(buf));
+        if (buf[0])
+            aug_info("%s=[%s]", s, buf);
+    }
+
     int
     verifycb_(int preverify_ok, X509_STORE_CTX* x509_ctx)
     {
         X509* peer(X509_STORE_CTX_get_current_cert(x509_ctx));
+        X509_name_st* name(X509_get_subject_name(peer));
 
-        char buf[256];
-        X509_NAME_oneline(X509_get_issuer_name(peer), buf, sizeof(buf));
-        aug_info("issuer: %s", buf);
+        char subject[256];
+        X509_NAME_oneline(name, subject, sizeof(subject));
+        aug_info("subject: %s", subject);
 
-        X509_NAME* subject(X509_get_subject_name(peer));
-        X509_NAME_oneline(subject, buf, sizeof(buf));
-        aug_info("subject: %s", buf);
+        char issuer[256];
+        X509_NAME_oneline(X509_get_issuer_name(peer), issuer, sizeof(issuer));
+        aug_info("issuer: %s", issuer);
 
-        buf[0] = '\0';
-        X509_NAME_get_text_by_NID
-            (subject, NID_countryName, buf, sizeof(buf));
-        if (buf[0])
-            aug_info("country: %s", buf);
+        lognid_("country", name, NID_countryName);
+        lognid_("state or province", name, NID_stateOrProvinceName);
+        lognid_("locality", name, NID_localityName);
+        lognid_("organisation", name, NID_organizationName);
+        lognid_("organisational unit", name, NID_organizationalUnitName);
+        lognid_("common name", name, NID_commonName);
+        lognid_("email address", name, NID_pkcs9_emailAddress);
 
-        buf[0] = '\0';
-        X509_NAME_get_text_by_NID
-            (subject, NID_stateOrProvinceName, buf, sizeof(buf));
-        if (buf[0])
-            aug_info("state or province: %s", buf);
+        if (!preverify_ok) {
+            aug_warn("verification failed: %s",
+                     X509_verify_cert_error_string(x509_ctx->error));
+            return 0;
+        }
 
-        buf[0] = '\0';
-        X509_NAME_get_text_by_NID
-            (subject, NID_localityName, buf, sizeof(buf));
-        if (buf[0])
-            aug_info("locality: %s", buf);
+        SSL* ssl(static_cast<SSL*>
+                 (X509_STORE_CTX_get_ex_data
+                  (x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx())));
+        conn_base* conn(static_cast<conn_base*>(SSL_get_app_data(ssl)));
 
-        buf[0] = '\0';
-        X509_NAME_get_text_by_NID
-            (subject, NID_organizationName, buf, sizeof(buf));
-        if (buf[0])
-            aug_info("organization: %s", buf);
-
-        buf[0] = '\0';
-        X509_NAME_get_text_by_NID
-            (subject, NID_organizationalUnitName, buf, sizeof(buf));
-        if (buf[0])
-            aug_info("organizational unit: %s", buf);
-
-        buf[0] = '\0';
-        X509_NAME_get_text_by_NID
-            (subject, NID_commonName, buf, sizeof(buf));
-        if (buf[0])
-            aug_info("common name: %s", buf);
-
-        buf[0] = '\0';
-        X509_NAME_get_text_by_NID
-            (subject, NID_pkcs9_emailAddress, buf, sizeof(buf));
-        if (buf[0])
-            aug_info("email address: %s", buf);
-
-		return preverify_ok;
+        return conn->authcert(subject, issuer) ? 1 : 0;
     }
 
     int
@@ -158,8 +148,9 @@ namespace {
     }
 }
 
-sslctx::sslctx()
-    : ctx_(SSL_CTX_new(SSLv23_method()))
+sslctx::sslctx(int verify)
+    : verify_(verify),
+      ctx_(SSL_CTX_new(SSLv23_method()))
 {
     if (!ctx_)
         throw ssl_error(__FILE__, __LINE__, ERR_get_error());
@@ -171,21 +162,25 @@ sslctx::~sslctx() AUG_NOTHROW
 }
 
 void
-sslctx::setclient(fdref ref)
+sslctx::setclient(conn_base& conn)
 {
     SSL* ssl = SSL_new(ctx_);
-    BIO* sbio = BIO_new_socket((int)aug_getosfd(ref.get()), BIO_NOCLOSE);
+    BIO* sbio = BIO_new_socket((int)aug_getosfd(conn.sfd().get()),
+                               BIO_NOCLOSE);
     SSL_set_bio(ssl, sbio, sbio);
-    aug_setsslclient(ref.get(), ssl);
+    SSL_set_app_data(ssl, &conn);
+    aug_setsslclient(conn.sfd().get(), ssl);
 }
 
 void
-sslctx::setserver(fdref ref)
+sslctx::setserver(conn_base& conn)
 {
     SSL* ssl = SSL_new(ctx_);
-    BIO* sbio = BIO_new_socket((int)aug_getosfd(ref.get()), BIO_NOCLOSE);
+    BIO* sbio = BIO_new_socket((int)aug_getosfd(conn.sfd().get()),
+                               BIO_NOCLOSE);
     SSL_set_bio(ssl, sbio, sbio);
-    aug_setsslserver(ref.get(), ssl);
+    SSL_set_app_data(ssl, &conn);
+    aug_setsslserver(conn.sfd().get(), ssl);
 }
 
 void
@@ -208,10 +203,12 @@ augas::createsslctx(const string& name, const options& options)
     const char* password(options.get(s + ".password", 0));
     const char* cadir(options.get(s + ".cadir", 0));
     const char* cafile(options.get(s + ".cafile", 0));
+    const char* crlfile(options.get(s + ".crlfile", 0));
     const char* ciphers(options.get(s + ".ciphers", 0));
+    int depth(atoi(options.get(s + ".depth", "1")));
     int verify(atoi(options.get(s + ".verify", "1")));
 
-    sslctxptr ptr(new sslctx());
+    sslctxptr ptr(new sslctx(verify));
     SSL_CTX* ctx(ptr->ctx_);
 
     // Load our keys and certificates.
@@ -225,8 +222,9 @@ augas::createsslctx(const string& name, const options& options)
             (ctx, const_cast<char*>(password));
     }
 
-    if (keyfile && !SSL_CTX_use_PrivateKey_file(ctx, keyfile,
-                                                SSL_FILETYPE_PEM))
+    if ((certfile || keyfile)
+        && !SSL_CTX_use_PrivateKey_file(ctx, keyfile ? keyfile : certfile,
+                                        SSL_FILETYPE_PEM))
         throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 
     // Load the CAs we trust.
@@ -241,13 +239,23 @@ augas::createsslctx(const string& name, const options& options)
     SSL_CTX_set_info_callback(ctx, infocb_);
     SSL_CTX_set_verify(ctx, tomode_(verify), verifycb_);
 
-#if SSLEAY_VERSION_NUMBER >= 0x00906000L
     SSL_CTX_set_mode(ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
-#endif // >= OpenSSL-0.9.6
+    SSL_CTX_set_verify_depth(ctx, verify);
 
-#if OPENSSL_VERSION_NUMBER < 0x00905100L
-    SSL_CTX_set_verify_depth(ctx, 1);
-#endif // < OpenSSL-0.9.5
+    if (crlfile) {
+
+        X509_STORE* store(SSL_CTX_get_cert_store(ctx));
+        X509_LOOKUP* lookup;
+
+        if (!(lookup = X509_STORE_add_lookup(store, X509_LOOKUP_file())))
+            throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+
+        if (X509_load_crl_file(lookup, crlfile, X509_FILETYPE_PEM) != 1)
+            throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+
+        X509_STORE_set_flags(store, X509_V_FLAG_CRL_CHECK
+                             | X509_V_FLAG_CRL_CHECK_ALL);
+    }
 
     return ptr;
 }

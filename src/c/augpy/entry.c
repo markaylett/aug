@@ -4,7 +4,7 @@
 #define AUGPY_BUILD
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augpy/module.h"
 #include "augpy/object.h"
@@ -29,6 +29,7 @@ struct import_ {
     PyObject* rdexpire_;
     PyObject* wrexpire_;
     PyObject* expire_;
+    PyObject* authcert_;
     int open_;
 };
 
@@ -144,6 +145,7 @@ destroyimport_(struct import_* import)
             printerr_();
     }
 
+    Py_XDECREF(import->authcert_);
     Py_XDECREF(import->expire_);
     Py_XDECREF(import->wrexpire_);
     Py_XDECREF(import->rdexpire_);
@@ -186,6 +188,7 @@ createimport_(const char* sname)
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
     import->expire_ = getmethod_(import->module_, "expire");
+    import->authcert_ = getmethod_(import->module_, "authcert");
 
     return import;
 
@@ -526,6 +529,33 @@ expire_(const struct augas_object* timer, unsigned* ms)
     }
 }
 
+static int
+authcert_(const struct augas_object* sock, const char* subject,
+          const char* issuer)
+{
+    struct import_* import = augas_getserv()->user_;
+    int ret = 0;
+    assert(import);
+    assert(sock->user_);
+
+    if (import->authcert_) {
+
+        PyObject* x = sock->user_;
+        PyObject* y = PyObject_CallFunction(import->authcert_, "Oss", x,
+                                            subject, issuer);
+        if (y) {
+            if (y == Py_False)
+                ret = -1;
+            Py_DECREF(y);
+        } else {
+            printerr_();
+            ret = -1;
+        }
+    }
+
+    return ret;
+}
+
 static const struct augas_module module_ = {
     stop_,
     start_,
@@ -538,7 +568,8 @@ static const struct augas_module module_ = {
     data_,
     rdexpire_,
     wrexpire_,
-    expire_
+    expire_,
+    authcert_
 };
 
 static const struct augas_module*

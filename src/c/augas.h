@@ -455,6 +455,18 @@ struct augas_module {
     */
 
     void (*expire_)(const struct augas_object* timer, unsigned* ms);
+
+    /**
+       \brief Authorisation of peer certificate.
+       \param sock TODO
+       \param subject TODO
+       \param issuer TODO
+       \return TODO
+       \sa TODO
+    */
+
+    int (*authcert_)(const struct augas_object* sock, const char* subject,
+                     const char* issuer);
 };
 
 AUGAS_EXTERN const struct augas_host*

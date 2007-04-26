@@ -76,6 +76,14 @@ expire_(const struct augas_object* timer, unsigned* ms)
     augas_writelog(AUGAS_LOGINFO, "expire_()");
 }
 
+static int
+authcert_(const struct augas_object* sock, const char* subject,
+          const char* issuer)
+{
+    augas_writelog(AUGAS_LOGINFO, "authcert_()");
+    return 0;
+}
+
 static const struct augas_module module_ = {
     stop_,
     start_,
@@ -88,7 +96,8 @@ static const struct augas_module module_ = {
     data_,
     rdexpire_,
     wrexpire_,
-    expire_
+    expire_,
+    authcert_
 };
 
 static const struct augas_module*

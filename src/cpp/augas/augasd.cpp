@@ -578,8 +578,14 @@ namespace augas {
             if (it == state_->sslctxs_.end())
                 throw error(__FILE__, __LINE__, ESSLCTX,
                             "SSL context [%s] not initialised", ctx);
-            objectptr sock(state_->manager_.getbyid(cid));
-            it->second->setclient(sock->sfd());
+
+            connptr cptr(smartptr_cast<
+                         conn_base>(state_->manager_.getbyid(cid)));
+            if (null == cptr)
+                throw error(__FILE__, __LINE__, ESTATE,
+                            "connection not found: id=[%d]", cid);
+
+            it->second->setclient(*cptr);
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H
@@ -599,8 +605,14 @@ namespace augas {
             if (it == state_->sslctxs_.end())
                 throw error(__FILE__, __LINE__, ESSLCTX,
                             "SSL context [%s] not initialised", ctx);
-            objectptr sock(state_->manager_.getbyid(cid));
-            it->second->setserver(sock->sfd());
+
+            connptr cptr(smartptr_cast<
+                         conn_base>(state_->manager_.getbyid(cid)));
+            if (null == cptr)
+                throw error(__FILE__, __LINE__, ESTATE,
+                            "connection not found: id=[%d]", cid);
+
+            it->second->setserver(*cptr);
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H

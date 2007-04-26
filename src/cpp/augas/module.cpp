@@ -5,7 +5,7 @@
 #include "augas/module.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augas/exception.hpp"
 #include "augas/utility.hpp"
@@ -130,4 +130,12 @@ module::expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("expire(): id=[%d], ms=[%u]", timer.id_, ms);
     module_.expire_(&timer, &ms);
+}
+
+bool
+module::authcert(const augas_object& sock, const char* subject,
+                 const char* issuer) const AUG_NOTHROW
+{
+    AUG_DEBUG2("authcert(): id=[%d]", sock.id_);
+    return AUGAS_OK == module_.authcert_(&sock, subject, issuer);
 }

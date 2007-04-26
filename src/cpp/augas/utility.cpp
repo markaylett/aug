@@ -5,7 +5,7 @@
 #include "augas/utility.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augas.h"
 
@@ -61,6 +61,12 @@ namespace {
     expire(const augas_object* timer, unsigned* ms)
     {
     }
+    int
+    authcert(const augas_object* sock, const char* subject,
+             const char* issuer)
+    {
+        return 0;
+    }
 }
 
 void
@@ -78,4 +84,5 @@ augas::setdefaults(augas_module& dst, const augas_module& src)
     dst.rdexpire_ = src.rdexpire_ ? src.rdexpire_ : rdexpire;
     dst.wrexpire_ = src.wrexpire_ ? src.wrexpire_ : wrexpire;
     dst.expire_ = src.expire_ ? src.expire_ : expire;
+    dst.authcert_ = src.authcert_ ? src.authcert_ : authcert;
 }

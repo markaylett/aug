@@ -68,6 +68,9 @@ namespace augas {
         void
         do_teardown();
 
+        bool
+        do_authcert(const char* subject, const char* issuer);
+
         const aug::endpoint&
         do_endpoint() const;
 

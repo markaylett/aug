@@ -5,7 +5,7 @@
 #include "augas/serv.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augsys.h"
 
@@ -126,6 +126,14 @@ serv::expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
     module_->expire(timer, ms);
+}
+
+bool
+serv::authcert(const augas_object& sock, const char* subject,
+               const char* issuer) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    return module_->authcert(sock, subject, issuer);
 }
 
 const augas_serv*

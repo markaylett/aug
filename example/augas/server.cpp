@@ -95,6 +95,13 @@ namespace {
             writelog(AUGAS_LOGINFO, "no data received for 15 seconds");
             shutdown(sock);
         }
+        bool
+        do_authcert(const object& sock, const char* subject,
+                    const char* issuer)
+        {
+            augas_writelog(AUGAS_LOGINFO, "checking subject...");
+            return true;
+        }
         static serv_base*
         create(const char* sname)
         {

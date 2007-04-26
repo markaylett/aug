@@ -107,6 +107,12 @@ servconn::do_teardown()
     conn_.teardown();
 }
 
+bool
+servconn::do_authcert(const char* subject, const char* issuer)
+{
+    return conn_.authcert(subject, issuer);
+}
+
 const endpoint&
 servconn::do_endpoint() const
 {

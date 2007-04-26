@@ -371,6 +371,10 @@ namespace augas {
         virtual void
         do_expire(const object& timer, unsigned& ms) = 0;
 
+        virtual bool
+        do_authcert(const object& sock, const char* subject,
+                    const char* issuer) = 0;
+
     public:
         virtual
         ~serv_base() AUGAS_NOTHROW
@@ -432,6 +436,11 @@ namespace augas {
         {
             do_expire(timer, ms);
         }
+        bool
+        authcert(const object& sock, const char* subject, const char* issuer)
+        {
+            return do_authcert(sock, subject, issuer);
+        }
     };
 
     class basic_serv : public serv_base {
@@ -476,6 +485,12 @@ namespace augas {
         void
         do_expire(const object& timer, unsigned& ms)
         {
+        }
+        bool
+        do_authcert(const object& sock, const char* subject,
+                    const char* issuer)
+        {
+            return true;
         }
     public:
         virtual
@@ -623,6 +638,17 @@ namespace augas {
                 getbase()->expire(object(*timer), *ms);
             } AUGAS_WRITELOGCATCH;
         }
+        static int
+        authcert(const augas_object* sock, const char* subject,
+                 const char* issuer)
+        {
+            try {
+                object o(*sock);
+                return result(getbase()->authcert(o, subject, issuer));
+            } AUGAS_WRITELOGCATCH;
+            return AUGAS_ERROR;
+        }
+
     public:
         static const struct augas_module*
         init(const char* name) AUGAS_NOTHROW
@@ -639,7 +665,8 @@ namespace augas {
                 data,
                 rdexpire,
                 wrexpire,
-                expire
+                expire,
+                authcert
             };
             try {
                 factory_ = new T(name);

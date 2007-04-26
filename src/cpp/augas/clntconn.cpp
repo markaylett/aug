@@ -125,6 +125,12 @@ clntconn::do_teardown()
     conn_->teardown();
 }
 
+bool
+clntconn::do_authcert(const char* subject, const char* issuer)
+{
+    return conn_->authcert(subject, issuer);
+}
+
 const endpoint&
 clntconn::do_endpoint() const
 {

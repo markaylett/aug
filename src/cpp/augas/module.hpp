@@ -69,6 +69,10 @@ namespace augas {
 
         void
         expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW;
+
+        bool
+        authcert(const augas_object& sock, const char* subject,
+                 const char* issuer) const AUG_NOTHROW;
     };
 
     typedef aug::smartptr<module> moduleptr;
