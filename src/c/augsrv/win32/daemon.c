@@ -123,7 +123,7 @@ start_(DWORD argc, char** argv)
     }
 
     if (-1 == aug_readserviceconf(*options.conffile_
-                                  ? options.conffile_ : NULL, 1)) {
+                                  ? options.conffile_ : NULL, 0, 1)) {
         aug_perrinfo(NULL, "aug_readserviceconf() failed");
         return;
     }

@@ -37,6 +37,7 @@ usage_(void)
     aug_info("options:\n"
              "  -f <conf>  specify path to configuration file\n"
              "  -h         display this usage summary and exit\n"
+             "  -p         prompt for user input if required\n"
              "\ncommands:\n"
              "  install    install program\n"
              "  reconf     re-configure daemon\n"
@@ -91,12 +92,13 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
 {
     int ch, ret;
     const char* conffile;
-    *options->conffile_ = '\0';
+    options->conffile_[0] = '\0';
+    options->prompt_ = 0;
 
     aug_optind = 1; /* Skip program name. */
     aug_opterr = 0;
 
-    while (EOF != (ch = aug_getopt(argc, argv, "fh")))
+    while (EOF != (ch = aug_getopt(argc, argv, "fhp")))
         switch (ch) {
         case 'f':
             if (aug_optind == argc || !(conffile = argv[aug_optind++])) {
@@ -115,6 +117,9 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
             options->command_ = AUG_CMDEXIT;
             usage_();
             return 0;
+        case 'p':
+            options->prompt_ = 1;
+            break;
         case '?':
         default:
             usage_();

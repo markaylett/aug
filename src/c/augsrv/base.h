@@ -16,7 +16,7 @@ AUGSRV_API const char*
 aug_getserviceopt(enum aug_option opt);
 
 AUGSRV_API int
-aug_readserviceconf(const char* conffile, int daemon);
+aug_readserviceconf(const char* conffile, int prompt, int daemon);
 
 AUGSRV_API int
 aug_initservice(void);

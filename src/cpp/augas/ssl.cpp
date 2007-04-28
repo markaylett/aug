@@ -88,6 +88,8 @@ namespace {
         char buf[256];
         buf[0] = '\0';
 
+        // Log specified component of name.
+
         X509_NAME_get_text_by_NID(name, nid, buf, sizeof(buf));
         if (buf[0])
             aug_info("%s=[%s]", s, buf);
@@ -121,6 +123,10 @@ namespace {
             return 0;
         }
 
+        // Allow the associated module an opportunity to reject the
+        // certificate: although the certificate has been verified by the CA,
+        // the module should determine whether, or not, it is fit for purpose.
+
         SSL* ssl(static_cast<SSL*>
                  (X509_STORE_CTX_get_ex_data
                   (x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx())));
@@ -148,8 +154,8 @@ namespace {
     }
 }
 
-sslctx::sslctx(int verify)
-    : verify_(verify),
+sslctx::sslctx(const string& name)
+    : name_(name),
       ctx_(SSL_CTX_new(SSLv23_method()))
 {
     if (!ctx_)
@@ -198,6 +204,8 @@ augas::createsslctx(const string& name, const options& options)
     string s("ssl.context.");
     s += name;
 
+    // Read ssl options from configuration.
+
     const char* certfile(options.get(s + ".certfile", 0));
     const char* keyfile(options.get(s + ".keyfile", 0));
     const char* password(options.get(s + ".password", 0));
@@ -208,13 +216,24 @@ augas::createsslctx(const string& name, const options& options)
     int depth(atoi(options.get(s + ".depth", "1")));
     int verify(atoi(options.get(s + ".verify", "1")));
 
-    sslctxptr ptr(new sslctx(verify));
+    sslctxptr ptr(new sslctx(name));
     SSL_CTX* ctx(ptr->ctx_);
 
     // Load our keys and certificates.
 
-    if (certfile && !SSL_CTX_use_certificate_chain_file(ctx, certfile))
-        throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+    if (certfile) {
+
+        if (!SSL_CTX_use_certificate_file(ctx, certfile, SSL_FILETYPE_ASN1)) {
+
+            ERR_clear_error();
+
+            if (!SSL_CTX_use_certificate_chain_file(ctx, certfile))
+                throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+        }
+
+        if (!keyfile)
+            keyfile = certfile;
+    }
 
     if (password) {
         SSL_CTX_set_default_passwd_cb(ctx, passwdcb_);
@@ -222,10 +241,16 @@ augas::createsslctx(const string& name, const options& options)
             (ctx, const_cast<char*>(password));
     }
 
-    if ((certfile || keyfile)
-        && !SSL_CTX_use_PrivateKey_file(ctx, keyfile ? keyfile : certfile,
-                                        SSL_FILETYPE_PEM))
-        throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+    if (keyfile) {
+
+        if (!SSL_CTX_use_PrivateKey_file(ctx, keyfile, SSL_FILETYPE_ASN1)) {
+
+            ERR_clear_error();
+
+            if (!SSL_CTX_use_PrivateKey_file(ctx, keyfile, SSL_FILETYPE_PEM))
+                throw ssl_error(__FILE__, __LINE__, ERR_get_error());
+        }
+    }
 
     // Load the CAs we trust.
 
@@ -250,7 +275,7 @@ augas::createsslctx(const string& name, const options& options)
         if (!(lookup = X509_STORE_add_lookup(store, X509_LOOKUP_file())))
             throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 
-        if (X509_load_crl_file(lookup, crlfile, X509_FILETYPE_PEM) != 1)
+        if (!X509_load_crl_file(lookup, crlfile, X509_FILETYPE_PEM))
             throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 
         X509_STORE_set_flags(store, X509_V_FLAG_CRL_CHECK

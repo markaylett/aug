@@ -836,7 +836,7 @@ namespace augas {
         }
 
         void
-        do_readconf(const char* conffile, bool daemon)
+        do_readconf(const char* conffile, bool prompt, bool daemon)
         {
             // The conffile is optional, if specified it will be an absolute
             // path.

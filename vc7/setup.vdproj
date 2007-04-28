@@ -219,6 +219,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_87425CC478A5A151CF1D04E3028B3B07"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -280,6 +286,12 @@
         "Entry"
         {
         "MsmKey" = "8:_C77083D1777A0F30CE269EC525A82BA2"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CFDF1DF6AAC19582692390307A93D6F6"
         "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -430,7 +442,7 @@
             "SourcePath" = "8:libaugnet-1.dll"
             "TargetName" = "8:libaugnet-1.dll"
             "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -750,7 +762,7 @@
             "SourcePath" = "8:libaugsrv-1.dll"
             "TargetName" = "8:libaugsrv-1.dll"
             "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -843,6 +855,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_87425CC478A5A151CF1D04E3028B3B07"
+            {
+            "SourcePath" = "8:SSLEAY32.dll"
+            "TargetName" = "8:SSLEAY32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_8ECAD86A0E394E05A1708B75E7DDA791"
@@ -1010,7 +1042,27 @@
             "SourcePath" = "8:libaugutil-1.dll"
             "TargetName" = "8:libaugutil-1.dll"
             "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_CFDF1DF6AAC19582692390307A93D6F6"
+            {
+            "SourcePath" = "8:LIBEAY32.dll"
+            "TargetName" = "8:LIBEAY32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1030,7 +1082,7 @@
             "SourcePath" = "8:libaugsys-1.dll"
             "TargetName" = "8:libaugsys-1.dll"
             "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1344,6 +1396,17 @@
                 {
                 }
             }
+            "{78BAF5CE-F2E5-45BE-83BC-DB6AF387E941}:_FD05A54424E44D7EA973FA56F3B36A88"
+            {
+            "Name" = "8:#1914"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:SystemFolder"
+                "Folders"
+                {
+                }
+            }
         }
         "LaunchCondition"
         {
@@ -1360,7 +1423,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:augas"
         "ProductCode" = "8:{210B4079-4AB6-4491-B94D-63BC120D02F0}"
-        "PackageCode" = "8:{12EFD05C-DD14-4C72-9C5A-9043D27DF8CB}"
+        "PackageCode" = "8:{B6F9AF95-6F73-4048-8851-E9DE50EF180E}"
         "UpgradeCode" = "8:{89166B9C-C3CB-4DE2-8BE3-DD90993E23EE}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -1965,7 +2028,7 @@
             "SourcePath" = "8:bin\\libaugmar-1.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

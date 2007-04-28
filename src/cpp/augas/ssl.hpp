@@ -37,7 +37,7 @@ namespace augas {
         friend aug::smartptr<sslctx>
         createsslctx(const std::string& name, const options& options);
 
-        const int verify_;
+        const std::string& name_;
         SSL_CTX* const ctx_;
 
         sslctx(const sslctx&);
@@ -46,7 +46,7 @@ namespace augas {
         operator =(const sslctx&);
 
         explicit
-        sslctx(int verify);
+        sslctx(const std::string& name);
 
     public:
         ~sslctx() AUG_NOTHROW;

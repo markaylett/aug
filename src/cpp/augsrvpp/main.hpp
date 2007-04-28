@@ -24,7 +24,7 @@ namespace aug {
         do_getopt(enum aug_option opt) = 0;
 
         virtual void
-        do_readconf(const char* conffile, bool daemon) = 0;
+        do_readconf(const char* conffile, bool prompt, bool daemon) = 0;
 
         virtual void
         do_init() = 0;
@@ -48,9 +48,9 @@ namespace aug {
         }
 
         void
-        readconf(const char* conffile, bool daemon)
+        readconf(const char* conffile, bool prompt, bool daemon)
         {
-            do_readconf(conffile, daemon);
+            do_readconf(conffile, prompt, daemon);
         }
 
         void
@@ -85,11 +85,12 @@ namespace aug {
         }
 
         inline int
-        readconf(void* arg, const char* conffile, int daemon)
+        readconf(void* arg, const char* conffile, int prompt, int daemon)
         {
             try {
                 service_base* ptr = static_cast<service_base*>(arg);
-                ptr->readconf(conffile, daemon ? true : false);
+                ptr->readconf(conffile, prompt ? true : false,
+                              daemon ? true : false);
                 return 0;
             } AUG_SETERRINFOCATCH;
             return -1;

@@ -33,7 +33,7 @@ enum aug_option {
 
 struct aug_service {
     const char* (*getopt_)(void*, enum aug_option);
-    int (*readconf_)(void*, const char*, int);
+    int (*readconf_)(void*, const char*, int, int);
     int (*init_)(void*);
     int (*run_)(void*);
     void (*term_)(void*);

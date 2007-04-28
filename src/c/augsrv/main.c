@@ -16,6 +16,7 @@ AUG_RCSID("$Id$");
 
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
+#include "augsys/windows.h" /* GetStdHandle() */
 
 #include <assert.h>
 #include <setjmp.h>
@@ -115,13 +116,29 @@ uninstall_(void)
 AUGSRV_API int
 aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
 {
-    int daemon;
     struct aug_options options;
-    int jmpret = setjmp(mark_);
+    int daemon = 0, jmpret = setjmp(mark_);
     if (jmpret)
         return jmpret;
 
     aug_setservice_(service, arg);
+
+#if defined(_WIN32)
+
+    /* Assume that if there is no stdin handle then the process is being
+       started by the Service Control Manager. */
+
+    if (!GetStdHandle(STD_INPUT_HANDLE)) {
+
+        /* Note: aug_readopts() will be called from the main service
+           function. */
+
+        aug_setlogger(aug_daemonlogger);
+        daemonise_();
+        return 0;
+    }
+#endif /* _WIN32 */
+
     if (-1 == aug_readopts(&options, argc, argv))
         return 1;
 
@@ -129,27 +146,23 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
         return 0;
 
 #if !defined(_WIN32)
-    daemon = AUG_CMDSTART == options.command_;
-#else /* _WIN32 */
-    daemon = AUG_CMDDEFAULT == options.command_;
+    if (AUG_CMDSTART == options.command_) {
+
+        /* Install daemon logger prior to opening log file. */
+
+        aug_setlogger(aug_daemonlogger);
+        daemon = 1;
+    }
 #endif /* !_WIN32 */
 
-    /* Install daemon logger prior to opening log file. */
-
-    if (daemon)
-        aug_setlogger(aug_daemonlogger);
-
     if (-1 == aug_readserviceconf(*options.conffile_
-                                  ? options.conffile_ : NULL, daemon))
+                                  ? options.conffile_ : NULL,
+                                  options.prompt_, daemon))
         die_("aug_readserviceconf() failed");
 
     switch (options.command_) {
     case AUG_CMDDEFAULT:
-#if !defined(_WIN32)
         foreground_();
-#else /* _WIN32 */
-        daemonise_();
-#endif /* !_WIN32 */
         break;
     case AUG_CMDEXIT:
         assert(0);

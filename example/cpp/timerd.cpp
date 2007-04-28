@@ -135,7 +135,7 @@ namespace test {
         }
 
         void
-        do_readconf(const char* conffile, bool daemon)
+        do_readconf(const char* conffile, bool prompt, bool daemon)
         {
             if (conffile) {
                 aug_info("reading: %s", conffile);
