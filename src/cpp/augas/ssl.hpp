@@ -35,7 +35,7 @@ namespace augas {
     class sslctx {
 
         friend aug::smartptr<sslctx>
-        createsslctx(const std::string& name, const options& options);
+        createsslctx(const std::string&, const options&, const std::string&);
 
         const std::string& name_;
         SSL_CTX* const ctx_;
@@ -65,10 +65,12 @@ namespace augas {
     initssl();
 
     sslctxptr
-    createsslctx(const std::string& name, const options& options);
+    createsslctx(const std::string& name, const options& options,
+                 const std::string& pass64);
 
     void
-    createsslctxs(sslctxs& sslctxs, const options& options);
+    createsslctxs(sslctxs& sslctxs, const options& options,
+                  const std::string& pass64);
 }
 #endif // HAVE_OPENSSL_SSL_H
 

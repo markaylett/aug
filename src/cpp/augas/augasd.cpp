@@ -149,13 +149,13 @@ namespace augas {
                 removenbfile(aug_eventin());
             } AUG_PERRINFOCATCH;
         }
-        state(aug_nbfilecb_t cb, const aug_var& var)
+        state(aug_nbfilecb_t cb, const aug_var& var, const string& pass64)
             : cb_(cb),
               var_(var)
         {
 #if HAVE_OPENSSL_SSL_H
             initssl();
-            createsslctxs(sslctxs_, options_);
+            createsslctxs(sslctxs_, options_, pass64);
 #endif // HAVE_OPENSSL_SSL_H
 
             AUG_DEBUG2("inserting event pipe to list");
@@ -808,6 +808,8 @@ namespace augas {
 
     class service : public service_base {
 
+        string pass64_;
+
         static void
         reopen(const aug_var& var, int id, unsigned& ms)
         {
@@ -838,6 +840,13 @@ namespace augas {
         void
         do_readconf(const char* conffile, bool prompt, bool daemon)
         {
+            if (prompt) {
+                char pass[AUG_MAXPASSWORD + 1];
+                aug_getpass("Enter PEM pass phrase:", pass, sizeof(pass));
+                pass64_ = filterbase64(pass, strlen(pass), AUG_ENCODE64);
+                memset(pass, 0, sizeof(pass));
+            }
+
             // The conffile is optional, if specified it will be an absolute
             // path.
 
@@ -870,7 +879,7 @@ namespace augas {
             setsrvlogger("augasd");
 
             aug_var var = { 0, this };
-            auto_ptr<state> s(new state(nbfilememcb<service>, var));
+            auto_ptr<state> s(new state(nbfilememcb<service>, var, pass64_));
             state_ = s;
             try {
                 load_();
@@ -961,6 +970,9 @@ namespace augas {
         }
 
     public:
+        ~service() AUG_NOTHROW
+        {
+        }
         bool
         nbfilecb(int fd, unsigned short events)
         {

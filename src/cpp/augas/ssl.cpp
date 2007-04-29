@@ -27,10 +27,20 @@ using namespace std;
 namespace {
 
     int
-    passwdcb_(char* buf, int size, int rwflag, void* password)
+    passwdcb_(char* buf, int size, int rwflag, void* arg)
     {
-        aug_strlcpy(buf, static_cast<const char*>(password), size);
-        return static_cast<int>(strlen(buf));
+        // TODO: decode directly to output buffer.
+
+        const string* pass64(static_cast<const string*>(arg));
+        if (pass64->empty()) {
+            buf[0] = '\0';
+            return 0;
+        }
+
+        string s(filterbase64(pass64->c_str(), pass64->size(), AUG_DECODE64));
+        aug_strlcpy(buf, s.c_str(), size);
+        fill(s.begin(), s.end(), '\0');
+        return static_cast<int>(s.size());
     }
 
     void
@@ -199,7 +209,8 @@ augas::initssl()
 }
 
 sslctxptr
-augas::createsslctx(const string& name, const options& options)
+augas::createsslctx(const string& name, const options& options,
+                    const string& pass64)
 {
     string s("ssl.context.");
     s += name;
@@ -208,7 +219,6 @@ augas::createsslctx(const string& name, const options& options)
 
     const char* certfile(options.get(s + ".certfile", 0));
     const char* keyfile(options.get(s + ".keyfile", 0));
-    const char* password(options.get(s + ".password", 0));
     const char* cadir(options.get(s + ".cadir", 0));
     const char* cafile(options.get(s + ".cafile", 0));
     const char* crlfile(options.get(s + ".crlfile", 0));
@@ -235,11 +245,9 @@ augas::createsslctx(const string& name, const options& options)
             keyfile = certfile;
     }
 
-    if (password) {
-        SSL_CTX_set_default_passwd_cb(ctx, passwdcb_);
-        SSL_CTX_set_default_passwd_cb_userdata
-            (ctx, const_cast<char*>(password));
-    }
+    SSL_CTX_set_default_passwd_cb(ctx, passwdcb_);
+    SSL_CTX_set_default_passwd_cb_userdata
+        (ctx, const_cast<string*>(&pass64));
 
     if (keyfile) {
 
@@ -286,7 +294,8 @@ augas::createsslctx(const string& name, const options& options)
 }
 
 void
-augas::createsslctxs(sslctxs& sslctxs, const options& options)
+augas::createsslctxs(sslctxs& sslctxs, const options& options,
+                     const string& pass64)
 {
     const char* contexts = options.get("ssl.contexts", 0);
 
@@ -295,7 +304,8 @@ augas::createsslctxs(sslctxs& sslctxs, const options& options)
         istringstream is(contexts);
         string name;
         while (is >> name)
-            sslctxs.insert(make_pair(name, createsslctx(name, options)));
+            sslctxs.insert(make_pair(name, createsslctx(name, options,
+                                                        pass64)));
     }
 }
 
