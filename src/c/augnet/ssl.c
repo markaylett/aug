@@ -303,9 +303,6 @@ removenbfile_(struct aug_nbfile* nbfile)
     if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->fd_))
         ret = NULL;
 
-    if (!aug_setfdtype(nbfile->fd_, nbfile->base_))
-        ret = NULL;
-
     return ret;
 }
 
@@ -314,11 +311,15 @@ close_(int fd)
 {
     struct aug_nbfile nbfile;
     struct sslext_* x;
+    int ret = 0;
+
+    AUG_DEBUG3("nbfile close");
 
     if (!aug_resetnbfile(fd, &nbfile))
         return -1;
 
-    removenbfile_(&nbfile);
+    if (!removenbfile_(&nbfile))
+        ret = -1;
 
     x = nbfile.ext_;
     SSL_free(x->ssl_);
@@ -330,7 +331,10 @@ close_(int fd)
         return -1;
     }
 
-    return nbfile.base_->close_(fd);
+    if (-1 == nbfile.base_->close_(fd))
+        ret = -1;
+
+    return ret;
 }
 
 static ssize_t

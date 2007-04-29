@@ -30,9 +30,6 @@ removenbfile_(struct aug_nbfile* nbfile)
     if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->fd_))
         ret = NULL;
 
-    if (!aug_setfdtype(nbfile->fd_, nbfile->base_))
-        ret = NULL;
-
     return ret;
 }
 
@@ -40,10 +37,15 @@ static int
 close_(int fd)
 {
     struct aug_nbfile nbfile;
+    int ret = 0;
+
+    AUG_DEBUG3("nbfile close");
+
     if (!aug_resetnbfile(fd, &nbfile))
         return -1;
 
-    removenbfile_(&nbfile);
+    if (!removenbfile_(&nbfile))
+        ret = -1;
 
     if (!nbfile.base_->close_) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -51,7 +53,10 @@ close_(int fd)
         return -1;
     }
 
-    return nbfile.base_->close_(fd);
+    if (-1 == nbfile.base_->close_(fd))
+        ret = -1;
+
+    return ret;
 }
 
 static ssize_t
@@ -249,10 +254,20 @@ AUGNET_API int
 aug_removenbfile(int fd)
 {
     struct aug_nbfile nbfile;
+    int ret = 0;
+
+    AUG_DEBUG3("aug_removenbfile()");
+
     if (!aug_resetnbfile(fd, &nbfile))
         return -1;
 
-    return removenbfile_(&nbfile) ? 0 : -1;
+    if (!removenbfile_(&nbfile))
+        ret = -1;
+
+    if (!aug_setfdtype(nbfile.fd_, nbfile.base_))
+        ret = -1;
+
+    return ret;
 }
 
 AUGNET_API int

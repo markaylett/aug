@@ -195,7 +195,7 @@ openfds_(int fds[2], const struct aug_fdtype* fdtype)
 }
 
 static int
-releasefd_(int fd, struct file_* current)
+releasefd_(int fd, struct file_* prev)
 {
     struct file_* file = files_ + fd;
 
@@ -204,7 +204,7 @@ releasefd_(int fd, struct file_* current)
         return -1;
     }
 
-    memcpy(current, file, sizeof(*current));
+    memcpy(prev, file, sizeof(*prev));
 
     if (--file->refs_ == 0)
         file->fdtype_ = NULL;
@@ -333,7 +333,7 @@ aug_openfds(int fds[2], const struct aug_fdtype* fdtype)
 AUGSYS_API int
 aug_releasefd(int fd)
 {
-    struct file_ file;
+    struct file_ prev;
 
     if (-1 == fd) {
         setbadfd_(__FILE__, __LINE__);
@@ -341,19 +341,21 @@ aug_releasefd(int fd)
     }
 
     aug_lock();
-    if (-1 == releasefd_(fd, &file)) {
+    if (-1 == releasefd_(fd, &prev)) {
         aug_unlock();
         return -1;
     }
     aug_unlock();
 
-    /* The file structure now contains the state of the file prior to the
+    /* The prev structure now contains the state of the file prior to the
        release operation (including ref count). */
 
-    if (1 < file.refs_ || !file.fdtype_->close_)
+    AUG_DEBUG3("aug_releasefd(): fd=[%d], refs=[%d]", fd, prev.refs_ - 1);
+
+    if (1 < prev.refs_ || !prev.fdtype_->close_)
         return  0;
 
-    return file.fdtype_->close_(fd);
+    return prev.fdtype_->close_(fd);
 }
 
 AUGSYS_API int
