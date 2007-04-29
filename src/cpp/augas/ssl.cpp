@@ -17,6 +17,7 @@ AUG_RCSID("$Id$");
 
 # include <sstream>
 # include <string>
+# include <strstream>
 
 # include <openssl/err.h>
 
@@ -29,18 +30,20 @@ namespace {
     int
     passwdcb_(char* buf, int size, int rwflag, void* arg)
     {
-        // TODO: decode directly to output buffer.
-
         const string* pass64(static_cast<const string*>(arg));
         if (pass64->empty()) {
             buf[0] = '\0';
             return 0;
         }
 
-        string s(filterbase64(pass64->c_str(), pass64->size(), AUG_DECODE64));
-        aug_strlcpy(buf, s.c_str(), size);
-        fill(s.begin(), s.end(), '\0');
-        return static_cast<int>(s.size());
+        strstream out(buf, size - 1);
+        stringstream in(*pass64);
+        if (filterbase64(out, in, AUG_DECODE64))
+            out << ends;
+        else
+            buf[size - 1] = '\0'; // Truncated.
+
+        return static_cast<int>(strlen(buf));
     }
 
     void

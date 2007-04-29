@@ -4,6 +4,8 @@
 #include "augnetpp/base64.hpp"
 
 #include <iostream>
+#include <sstream>
+#include <strstream>
 #include <stdexcept>
 
 using namespace aug;
@@ -50,6 +52,16 @@ main(int argc, char* argv[])
         base64 b64(AUG_ENCODE64, base64memcb<test, &test::cb>, var);
         appendbase64(b64, DECODED, strlen(DECODED));
         finishbase64(b64);
+
+        char buf[21];
+        strstream out(buf, 20);
+        stringstream in(ENCODED);
+        if (!filterbase64(out, in, AUG_DECODE64))
+            buf[20] = '\0';
+        else
+            out << ends;
+        if (0 != strcmp(buf, "Man is distinguished"))
+            throw error("decodebase64() failed");
 
         return 0;
 
