@@ -30,11 +30,15 @@ namespace {
     int
     passwdcb_(char* buf, int size, int rwflag, void* arg)
     {
+        // Handle blank password.
+
         const string* pass64(static_cast<const string*>(arg));
         if (pass64->empty()) {
             buf[0] = '\0';
             return 0;
         }
+
+        // Decode password.
 
         strstream out(buf, size - 1);
         stringstream in(*pass64);
@@ -232,7 +236,7 @@ augas::createsslctx(const string& name, const options& options,
     sslctxptr ptr(new sslctx(name));
     SSL_CTX* ctx(ptr->ctx_);
 
-    // Load our keys and certificates.
+    // Load keys and certificates.
 
     if (certfile) {
 
@@ -263,7 +267,7 @@ augas::createsslctx(const string& name, const options& options,
         }
     }
 
-    // Load the CAs we trust.
+    // Load trusted CAs.
 
     if ((cafile || cadir)
         && !SSL_CTX_load_verify_locations(ctx, cafile, cadir))

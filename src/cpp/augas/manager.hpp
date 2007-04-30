@@ -60,7 +60,7 @@ namespace augas {
 
         void
         load(const char* rundir, const options& options,
-             const augas_host& host);
+             const augas_host& host, void (*teardown)(const augas_object*));
 
         void
         teardown();

@@ -22,6 +22,7 @@ AUG_RCSID("$Id$");
 # include <malloc.h>
 #endif /* _WIN32 */
 
+#include <assert.h>
 #include <stdlib.h> /* malloc() */
 
 struct aug_buf {
@@ -77,9 +78,10 @@ destroybuf_(struct aug_buf* buf)
 static void
 popbufs_(aug_writer_t writer, const struct iovec* iov, size_t num)
 {
-    while ((size_t)iov->iov_len <= num) {
+    while (num && (size_t)iov->iov_len <= num) {
 
         struct aug_buf* it = AUG_FIRST(&writer->bufs_);
+        assert(it);
         AUG_REMOVE_HEAD(&writer->bufs_);
 
         aug_destroyvar(&it->var_);

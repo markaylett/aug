@@ -27,7 +27,8 @@ module::~module() AUG_NOTHROW
 }
 
 module::module(const string& name, const char* path,
-               const struct augas_host& host)
+               const struct augas_host& host,
+               void (*teardown)(const augas_object*))
     : name_(name),
       lib_(path)
 {
@@ -39,7 +40,7 @@ module::module(const string& name, const char* path,
     const struct augas_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
         throw error(__FILE__, __LINE__, EMODCALL, "augas_init() failed");
-    setdefaults(module_, *ptr);
+    setdefaults(module_, *ptr, teardown);
 }
 
 void

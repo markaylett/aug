@@ -5,11 +5,13 @@
 #define AUGAS_UTILITY_HPP
 
 struct augas_module;
+struct augas_object;
 
 namespace augas {
 
     void
-    setdefaults(augas_module& dst, const augas_module& src);
+    setdefaults(augas_module& dst, const augas_module& src,
+                void (*teardown)(const augas_object*));
 }
 
 #endif // AUGAS_UTILITY_HPP

@@ -28,7 +28,7 @@ namespace augas {
         ~module() AUG_NOTHROW;
 
         module(const std::string& name, const char* path,
-               const augas_host& host);
+               const augas_host& host, void (*teardown)(const augas_object*));
 
         void
         stop() const AUG_NOTHROW;

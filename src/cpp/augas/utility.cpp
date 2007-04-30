@@ -32,10 +32,6 @@ namespace {
     closed(const augas_object* sock)
     {
     }
-    void
-    teardown(const augas_object* sock)
-    {
-    }
     int
     accept(augas_object* sock, const char* addr, unsigned short port)
     {
@@ -70,7 +66,8 @@ namespace {
 }
 
 void
-augas::setdefaults(augas_module& dst, const augas_module& src)
+augas::setdefaults(augas_module& dst, const augas_module& src,
+                   void (*teardown)(const augas_object*))
 {
     dst.stop_ = src.stop_ ? src.stop_ : stop;
     dst.start_ = src.start_ ? src.start_ : start;

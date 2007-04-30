@@ -163,7 +163,7 @@ manager::update(const objectptr& sock, fdref prev)
 
 void
 manager::load(const char* rundir, const options& options,
-              const augas_host& host)
+              const augas_host& host, void (*teardown)(const augas_object*))
 {
     // TODO: allow each service to specify a list of services on which it
     // depends.
@@ -198,7 +198,7 @@ manager::load(const char* rundir, const options& options,
                          value.c_str(), path.c_str());
                 aug::chdir(rundir);
                 moduleptr module(new augas::module(value, path.c_str(),
-                                                   host));
+                                                   host, teardown));
                 it = modules_.insert(make_pair(value, module)).first;
             }
 
@@ -213,7 +213,7 @@ manager::load(const char* rundir, const options& options,
 
         aug_info("loading module: name=[%s]", DEFAULT_NAME);
         moduleptr module(new augas::module(DEFAULT_NAME, DEFAULT_MODULE,
-                                           host));
+                                           host, teardown));
         modules_[DEFAULT_NAME] = module;
 
         aug_info("creating service: name=[%s]", DEFAULT_NAME);

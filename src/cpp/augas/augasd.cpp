@@ -48,7 +48,14 @@ namespace augas {
     cstring logdir_ = "";
     options options_;
     bool daemon_(false);
-    bool stopping_(false);
+    unsigned stopping_(0);
+
+    void
+    stop_(const aug_var& var, int id, unsigned& ms)
+    {
+        aug_info("giving-up, closing connections");
+        stopping_ = 2;
+    }
 
     void
     openlog_()
@@ -63,6 +70,13 @@ namespace augas {
            << setw(2) << tm.tm_mon + 1
            << setw(2) << tm.tm_mday;
         openlog(makepath(logdir_, ss.str().c_str(), "log").c_str());
+    }
+
+    void
+    reopen_(const aug_var& var, int id, unsigned& ms)
+    {
+        AUG_DEBUG2("re-opening log file");
+        openlog_();
     }
 
     void
@@ -133,6 +147,7 @@ namespace augas {
         aug::nbfiles nbfiles_;
         manager manager_;
         timers timers_;
+        timer grace_;
 
         // Mapping of timer-ids to services.
 
@@ -151,7 +166,8 @@ namespace augas {
         }
         state(aug_nbfilecb_t cb, const aug_var& var, const string& pass64)
             : cb_(cb),
-              var_(var)
+              var_(var),
+              grace_(timers_)
         {
 #if HAVE_OPENSSL_SSL_H
             initssl();
@@ -165,6 +181,16 @@ namespace augas {
     };
 
     auto_ptr<state> state_;
+
+    void
+    stop_()
+    {
+        if (!stopping_) {
+            stopping_ = 1;
+            state_->manager_.teardown();
+            state_->grace_.set(15000, timercb<stop_>, null);
+        }
+    }
 
     void
     timercb_(const aug_var* var, int id, unsigned* ms)
@@ -648,10 +674,17 @@ namespace augas {
     };
 
     void
+    teardown_(const augas_object* sock)
+    {
+        aug_info("teardown defaulting to shutdown");
+        shutdown_(sock->id_);
+    }
+
+    void
     load_()
     {
         AUG_DEBUG2("loading services");
-        state_->manager_.load(rundir_, options_, host_);
+        state_->manager_.load(rundir_, options_, host_, teardown_);
 
         // Remove any timers allocated to services that could not be opened.
 
@@ -774,8 +807,7 @@ namespace augas {
             break;
         case AUG_EVENTSTOP:
             AUG_DEBUG2("received AUG_EVENTSTOP");
-            stopping_ = true;
-            state_->manager_.teardown();
+            stop_();
             break;
         case AUG_EVENTSIGNAL:
             AUG_DEBUG2("received AUG_EVENTSIGNAL");
@@ -809,13 +841,6 @@ namespace augas {
     class service : public service_base {
 
         string pass64_;
-
-        static void
-        reopen(const aug_var& var, int id, unsigned& ms)
-        {
-            AUG_DEBUG2("re-opening log file");
-            openlog_();
-        }
 
         const char*
         do_getopt(enum aug_option opt)
@@ -896,17 +921,20 @@ namespace augas {
         void
         do_run()
         {
-            timer t(state_->timers_);
+            timer reopen(state_->timers_);
 
             // Re-open log file every minute.
 
             if (daemon_)
-                t.set(60000, timercb<reopen>, null);
+                reopen.set(60000, timercb<reopen_>, null);
 
             AUG_DEBUG2("running daemon process");
 
             int ret(!0);
             while (!stopping_ || !state_->manager_.empty()) {
+
+                if (2 == stopping_)
+                    break;
 
                 try {
 
@@ -946,10 +974,10 @@ namespace augas {
 
                 } AUG_PERRINFOCATCH;
 
-                if (!stopping_ && !daemon_) {
-                    stopping_ = true;
-                    state_->manager_.teardown();
-                }
+                // When running in foreground, stop on error.
+
+                if (!daemon_)
+                    stop_();
             }
         }
 

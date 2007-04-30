@@ -683,51 +683,46 @@ namespace {
                 finishmar(*parser);
             }
         }
-    void
-    do_teardown(const object& sock)
-    {
-        shutdown(sock);
-    }
-    bool
-    do_accept(object& sock, const char* addr, unsigned short port)
-    {
-        auto_ptr<session> sess(new session(realm_, sock.id(), addr));
-        auto_ptr<marparser> parser(new marparser(0, sess));
+        bool
+        do_accept(object& sock, const char* addr, unsigned short port)
+        {
+            auto_ptr<session> sess(new session(realm_, sock.id(), addr));
+            auto_ptr<marparser> parser(new marparser(0, sess));
 
-        sock.setuser(parser.get());
-        setrwtimer(sock, 30000, AUGAS_TIMRD);
-        parser.release();
-        return true;
-    }
-    void
-    do_data(const object& sock, const void* buf, size_t len)
-    {
-        marparser& parser(*sock.user<marparser>());
-        try {
-            appendmar(parser, static_cast<const char*>(buf),
-                      static_cast<unsigned>(len));
-        } catch (...) {
-            shutdown(sock);
-            throw;
+            sock.setuser(parser.get());
+            setrwtimer(sock, 30000, AUGAS_TIMRD);
+            parser.release();
+            return true;
         }
-    }
-    void
-    do_rdexpire(const object& sock, unsigned& ms)
-    {
-        aug_info("no data received for 30 seconds");
-        shutdown(sock);
-    }
-    ~httpserv() AUG_NOTHROW
-    {
-    }
-    static serv_base*
-    create(const char* sname)
-    {
-        return new httpserv();
-    }
-};
+        void
+        do_data(const object& sock, const void* buf, size_t len)
+        {
+            marparser& parser(*sock.user<marparser>());
+            try {
+                appendmar(parser, static_cast<const char*>(buf),
+                          static_cast<unsigned>(len));
+            } catch (...) {
+                shutdown(sock);
+                throw;
+            }
+        }
+        void
+        do_rdexpire(const object& sock, unsigned& ms)
+        {
+            aug_info("no data received for 30 seconds");
+            shutdown(sock);
+        }
+        ~httpserv() AUG_NOTHROW
+        {
+        }
+        static serv_base*
+        create(const char* sname)
+        {
+            return new httpserv();
+        }
+    };
 
-typedef basic_module<basic_factory<httpserv> > module;
+    typedef basic_module<basic_factory<httpserv> > module;
 }
 
 AUGAS_MODULE(module::init, module::term)
