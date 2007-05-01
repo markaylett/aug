@@ -4,7 +4,9 @@ SUBDIRS = \
 	etc
 
 EXTRA_DIST = \
+	augas.js \
 	bench.conf \
+	index.html \
 	modules.mk \
 	test.conf
 
