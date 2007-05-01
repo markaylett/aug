@@ -7,10 +7,6 @@ using namespace std;
 
 namespace {
 
-    const char HOME[] = "<form name=\"input\" action=\"/services/echo\""
-        " method=\"post\">name:&nbsp;<input type=\"text\" name=\"user\">"
-        "<input type=\"submit\" value=\"Submit\"></form>";
-
     struct eachline {
         object sock_;
         explicit
@@ -39,33 +35,22 @@ namespace {
                 return false;
 
             tcplisten("0.0.0.0", serv);
-
-            aug_var var;
-            auto_ptr<string> home(new string(HOME));
-            auto_ptr<string> status(new string("running"));
-            post("http", "home", stringvar(var, home));
-            post("http", "status", stringvar(var, status));
-            home.release();
-            status.release();
             return true;
         }
         void
         do_event(const char* from, const char* type, const void* user,
                  size_t size)
         {
-            if (0 == strcmp(type, "application/x-www-form-urlencoded")) {
+            map<string, string> fields;
+            const char* encoded(static_cast<const char*>(user));
+            urlunpack(encoded, encoded + size,
+                      inserter(fields, fields.begin()));
 
-                map<string, string> fields;
-                const char* encoded(static_cast<const char*>(user));
-                urlunpack(encoded, encoded + size,
-                          inserter(fields, fields.begin()));
-
-                map<string, string>::const_iterator it(fields.begin()),
-                    end(fields.end());
-                for (; it != end; ++it)
-                    writelog(AUGAS_LOGINFO, "%s=%s", it->first.c_str(),
-                             it->second.c_str());
-            }
+            map<string, string>::const_iterator it(fields.begin()),
+                end(fields.end());
+            for (; it != end; ++it)
+                writelog(AUGAS_LOGINFO, "%s=%s", it->first.c_str(),
+                         it->second.c_str());
         }
         void
         do_closed(const object& sock)

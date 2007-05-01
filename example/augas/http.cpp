@@ -32,6 +32,8 @@ using namespace std;
 namespace {
 
     string css_;
+    map<string, string> mimetypes_;
+    map<string, time_t> sessids_;
 
     void
     loadcss()
@@ -48,12 +50,143 @@ namespace {
     }
 
     void
+    confcb_(void* arg, const char* name, const char* value)
+    {
+        mimetypes_[name] = value;
+    }
+
+    void
+    loadmimetypes()
+    {
+        mimetypes_.clear();
+
+        // Add some basic types.
+
+        mimetypes_["css"] = "text/css";
+        mimetypes_["gif"] = "image/gif";
+        mimetypes_["html"] = "text/html";
+        mimetypes_["htm"] = "text/html";
+        mimetypes_["jpeg"] = "image/jpeg";
+        mimetypes_["jpg"] = "image/jpeg";
+        mimetypes_["js"] = "application/x-javascript";
+        mimetypes_["png"] = "image/png";
+        mimetypes_["tif"] = "image/tiff";
+        mimetypes_["tiff"] = "image/tiff";
+        mimetypes_["txt"] = "text/plain";
+        mimetypes_["xml"] = "text/xml";
+
+        const char* mimetypes(augas::getenv("service.http.mimetypes"));
+        if (mimetypes) {
+            aug::chdir(augas::getenv("rundir"));
+            readconf(mimetypes, confcb<confcb_>, null);
+        }
+    }
+
+    const char*
+    nonce(augas_id id, const string& addr, aug_md5base64_t base64)
+    {
+        pid_t pid(getpid());
+
+        timeval tv;
+        aug_gettimeofday(&tv, 0);
+
+        long rand(aug_rand());
+        const char* salt(augas::getenv("service.http.salt"));
+
+        aug_md5context md5ctx;
+        unsigned char digest[16];
+
+        aug_initmd5(&md5ctx);
+        aug_appendmd5(&md5ctx, (unsigned char*)&pid, sizeof(pid));
+        aug_appendmd5(&md5ctx, (unsigned char*)&id, sizeof(id));
+        aug_appendmd5(&md5ctx, (unsigned char*)addr.data(),
+                      (unsigned)addr.size());
+        aug_appendmd5(&md5ctx, (unsigned char*)&tv.tv_sec, sizeof(tv.tv_sec));
+        aug_appendmd5(&md5ctx, (unsigned char*)&tv.tv_usec,
+                      sizeof(tv.tv_usec));
+        aug_appendmd5(&md5ctx, (unsigned char*)&rand, sizeof(rand));
+        if (salt)
+            aug_appendmd5(&md5ctx, (unsigned char*)salt,
+                          (unsigned)strlen(salt));
+        aug_finishmd5(digest, &md5ctx);
+        aug_md5base64(digest, base64);
+        return base64;
+    }
+
+    void
+    splitlist(map<string, string>& pairs, const string& encoded, char delim)
+    {
+        vector<string> toks(splitn(encoded.begin(), encoded.end(), delim));
+        vector<string>::const_iterator it(toks.begin()), end(toks.end());
+        for (; it != end; ++it) {
+            string x, y;
+            split2(it->begin(), it->end(), x, y, '=');
+            trim(x);
+            trim(y);
+            trim(y, "\"");
+            pairs[x] = y;
+        }
+    }
+
+    string
+    getsessid(augas_id id, const string& addr, const char* cookie)
+    {
+        aug_md5base64_t base64;
+
+        if (cookie) {
+
+            map<string, string> pairs;
+            splitlist(pairs, cookie, ';');
+
+            map<string, string>::const_iterator it(pairs.find("AUGSESSID"));
+
+            // Have session cookie and associated map entry.
+
+            if (it != pairs.end()
+                && sessids_.find(it->second) != sessids_.end())
+                return it->second;
+        }
+
+        // Create new session id.
+
+        string sessid;
+        do {
+
+            sessid = nonce(id, addr, base64);
+
+            // Loop while duplicate.
+
+        } while (sessids_.find(sessid) != sessids_.end());
+
+        // Note on duplicates.
+
+        sessids_[sessid] = 0;
+        return sessid;
+    }
+
+    void
     sethead(ostream& os, const string& title)
     {
         os << "<head><title>" << title << "</title>";
         if (!css_.empty())
             os << "<style type=\"text/css\">" << css_ << "</style>";
         os << "</head>";
+    }
+
+    string
+    mimetype(const string& path)
+    {
+        string type("text/plain");
+
+        string::size_type pos(path.find_last_of('.'));
+        if (pos != string::npos) {
+            string ext(path.substr(pos + 1));
+            map<string, string>::const_iterator it(mimetypes_.find(ext));
+            if (it != mimetypes_.end())
+                type = it->second;
+        }
+
+        return type;
     }
 
     class http_error : public domain_error {
@@ -83,21 +216,6 @@ namespace {
             return false;
         }
         return true;
-    }
-
-    void
-    splitlist(map<string, string>& pairs, const string& encoded)
-    {
-        vector<string> toks(splitn(encoded.begin(), encoded.end(), ','));
-        vector<string>::const_iterator it(toks.begin()), end(toks.end());
-        for (; it != end; ++it) {
-            string x, y;
-            split2(it->begin(), it->end(), x, y, '=');
-            trim(x);
-            trim(y);
-            trim(y, "\"");
-            pairs[x] = y;
-        }
     }
 
     string
@@ -162,7 +280,7 @@ namespace {
     digestauth(const string& list, const string& realm, const string& method)
     {
         map<string, string> pairs;
-        splitlist(pairs, list);
+        splitlist(pairs, list, ',');
 
         aug_info("authenticating user [%s]", pairs["username"].c_str());
 
@@ -184,31 +302,6 @@ namespace {
             return false;
 
         return true;
-    }
-
-    const char*
-    nonce(augas_id id, const string& addr, aug_md5base64_t base64)
-    {
-        time_t now;
-        time(&now);
-        long rand(aug_rand());
-        const char* salt(augas::getenv("service.http.salt"));
-
-        aug_md5context md5ctx;
-        unsigned char digest[16];
-
-        aug_initmd5(&md5ctx);
-        aug_appendmd5(&md5ctx, (unsigned char*)&id, sizeof(id));
-        aug_appendmd5(&md5ctx, (unsigned char*)addr.data(),
-                      (unsigned)addr.size());
-        aug_appendmd5(&md5ctx, (unsigned char*)&now, sizeof(now));
-        aug_appendmd5(&md5ctx, (unsigned char*)&rand, sizeof(rand));
-        if (salt)
-            aug_appendmd5(&md5ctx, (unsigned char*)salt,
-                          (unsigned)strlen(salt));
-        aug_finishmd5(digest, &md5ctx);
-        aug_md5base64(digest, base64);
-        return base64;
     }
 
     struct request {
@@ -322,6 +415,19 @@ namespace {
         return path;
     }
 
+    string
+    jointype(const vector<string>& nodes)
+    {
+        string type;
+        vector<string>::const_iterator it(nodes.begin()), end(nodes.end());
+        for (; it != end; ++it) {
+            if (!type.empty())
+                type += '.';
+            type += *it;
+        }
+        return type;
+    }
+
     class filecontent {
         smartfd sfd_;
         mmap mmap_;
@@ -364,14 +470,15 @@ namespace {
     typedef vector<pair<string, string> > fields;
 
     void
-    sendfile(augas_id id, string path)
+    sendfile(augas_id id, const string& sessid, const string& path)
     {
         auto_ptr<filecontent> ptr(new filecontent(path.c_str()));
 
         stringstream header;
         header << "HTTP/1.1 200 OK\r\n"
                << "Date: " << utcdate() << "\r\n"
-               << "Content-Type: text/html\r\n"
+               << "Set-Cookie: AUGSESSID=" << sessid << "\r\n"
+               << "Content-Type: " << mimetype(path) << "\r\n"
                << "Content-Length: " << (unsigned)ptr->size() << "\r\n"
                << "\r\n";
 
@@ -381,52 +488,24 @@ namespace {
         ptr.release();
     }
 
-    typedef map<string, map<string, string> > pages;
-    pages pages_;
+    vector<string> result_;
 
     void
-    sendhome(augas_id id)
+    sendresponse(augas_id id, const string& sessid)
     {
         stringstream content;
-        content << "<html>";
-        sethead(content, "AugAS");
-        content << "<body><h2>augas console</h2><table class=\"grid\">"
-            "<tr><th>service</th><th>status</th></tr>";
-
-        pages::const_iterator it(pages_.begin()), end(pages_.end());
-        for (; it != end; ++it) {
-
-            map<string, string>::const_iterator home(it->second.find("home")),
-                status(it->second.find("status"));
-
-            if (home == it->second.end()
-                && status == it->second.end())
-                continue;
-
-            content << "<tr><td>";
-
-            if (home != it->second.end())
-                content << "<a href=\"/services/" << it->first << "/home\">"
-                        << it->first << "</a>";
-            else
-                content << it->first;
-
-            content << "</td><td>";
-
-            if (status != it->second.end())
-                content << status->second;
-
-            content << "</td></tr>";
-        }
-
-        content << "</table><p><form action=\"/reconf\""
-            " method=\"post\"><input type=\"submit\" value=\"RECONF\">"
-            "</form></p></body></html>";
+        content << "<result>";
+        vector<string>::const_iterator it(result_.begin()),
+            end(result_.end());
+        for (; it != end; ++it)
+            content << *it;
+        content << "</result>";
 
         stringstream message;
         message << "HTTP/1.1 200 OK\r\n"
                 << "Date: " << utcdate() << "\r\n"
-                << "Content-Type: text/html\r\n"
+                << "Set-Cookie: AUGSESSID=" << sessid << "\r\n"
+                << "Content-Type: text/xml\r\n"
                 << "Content-Length: " << (unsigned)content.str().size()
                 << "\r\n\r\n"
                 << content.rdbuf();
@@ -435,36 +514,8 @@ namespace {
     }
 
     void
-    sendpage(augas_id id, const string& service, const string& page)
-    {
-        pages::const_iterator it(pages_.find(service));
-        if (it == pages_.end())
-            throw http_error(404, "Not Found");
-
-        map<string, string>::const_iterator jt(it->second.find(page));
-        if (jt == it->second.end())
-            throw http_error(404, "Not Found");
-
-        stringstream content;
-        content << "<html>";
-        sethead(content, service + "&nbsp;" + page);
-        content << "<body><h2>" << service << "&nbsp;service</h2>"
-                << jt->second << "</body></html>";
-
-        stringstream message;
-        message << "HTTP/1.1 200 OK\r\n"
-                << "Date: " << utcdate() << "\r\n"
-                << "Content-Type: text/html\r\n"
-                << "Content-Length: " << (unsigned)content.str().size()
-                << "\r\n\r\n"
-                << content.rdbuf();
-
-        send(id, message.str().c_str(), message.str().size());
-    }
-
-    void
-    sendstatus(augas_id id, int status, const string& title,
-               const fields& fs = fields())
+    sendstatus(augas_id id, const string& sessid, int status,
+               const string& title, const fields& fs = fields())
     {
         stringstream content;
         content << "<html>";
@@ -473,7 +524,8 @@ namespace {
 
         stringstream message;
         message << "HTTP/1.1 " << status << ' ' << title << "\r\n"
-                << "Date: " << utcdate() << "\r\n";
+                << "Date: " << utcdate() << "\r\n"
+                << "Set-Cookie: AUGSESSID=" << sessid << "\r\n";
 
         fields::const_iterator it(fs.begin()), end(fs.end());
         for (; it != end; ++it)
@@ -490,6 +542,7 @@ namespace {
     struct session : basic_marnonstatic {
         const string& realm_;
         augas_id id_;
+        string sessid_;
         const string addr_;
         aug_md5base64_t nonce_;
         bool auth_;
@@ -506,6 +559,11 @@ namespace {
         message(const char* initial, aug_mar_t mar)
         {
             static const char ROOT[] = ".";
+
+            if (sessid_.empty())
+                sessid_ = getsessid(id_, addr_, static_cast<
+                                    const char*>(getfield(mar, "Cookie")));
+
             try {
 
                 aug_info("%s", initial);
@@ -519,17 +577,32 @@ namespace {
                 uri u;
                 splituri(u, r.uri_);
 
-                if (r.method_ == "POST") {
-                    unsigned size;
-                    const char* query(static_cast<
-                                      const char*>(content(mar, size)));
-                    u.query_ = string(query, size);
-                } else if (r.method_ != "GET")
-                    throw http_error(501, "Not Implemented");
-
                 aug_info("base: [%s]", u.base_.c_str());
                 aug_info("path: [%s]", u.path_.c_str());
                 aug_info("query: [%s]", u.query_.c_str());
+
+                string contenttype, content;
+
+                if (r.method_ == "POST") {
+
+                    contenttype = static_cast<const char*>
+                        (getfield(mar, "Content-Type"));
+
+                    unsigned size;
+                    const void* ptr(aug::content(mar, size));
+                    content = filterbase64(static_cast<const char*>(ptr),
+                                           size, AUG_ENCODE64);
+
+                } else if (r.method_ == "GET") {
+
+                    if (!u.query_.empty()) {
+                        contenttype = "application/x-www-form-urlencoded";
+                        content = filterbase64(u.query_.data(),
+                                               u.query_.size(), AUG_ENCODE64);
+                    }
+
+                } else
+                    throw http_error(501, "Not Implemented");
 
                 header header(mar);
                 header::const_iterator it(header.begin()),
@@ -552,11 +625,11 @@ namespace {
                             auth_ = digestauth(y, realm_, r.method_);
                         else
                             throw http_error(501, "Not Implemented");
+
                     }
                 }
 
                 u.path_ = urldecode(u.path_.begin(), u.path_.end());
-
                 vector<string> nodes(splitpath(u.path_));
 
                 if (!auth_) {
@@ -568,62 +641,36 @@ namespace {
 
                     fields fs;
                     fs.push_back(make_pair("WWW-Authenticate", ss.str()));
-                    sendstatus(id_, 401, "Unauthorized", fs);
+                    sendstatus(id_, sessid_, 401, "Unauthorized", fs);
 
-                } else if (nodes.empty()) {
+                } else if (!nodes.empty() && nodes[0] == "service") {
 
-                    sendhome(id_);
+                    nodes[0] = "http";
+                    string type(jointype(nodes));
+
+                    map<string, string> values;
+                    values["contenttype"] = contenttype;
+                    values["content"] = content;
+                    values["sessid"] = sessid_;
+
+                    string s(urlpack(values.begin(), values.end()));
+
+                    result_.clear();
+                    dispatch("httpclient", type.c_str(), s.data(), s.size());
+                    sendresponse(id_, sessid_);
 
                 } else {
 
-                    if (1 == nodes.size() && nodes[0] == "reconf") {
-
-                        reconfall();
-
-                        const char* value
-                            (static_cast<
-                             const char*>(getfield(mar, "Host")));
-                        fields fs;
-                        fs.push_back
-                            (make_pair("Location", string("http://")
-                                       .append(value)));
-                        sendstatus(id_, 303, "See Other", fs);
-
-                    } else if (nodes[0] == "services") {
-
-                        if (2 == nodes.size()) {
-
-                            dispatch(nodes[1].c_str(),
-                                     "application/x-www-form-urlencoded",
-                                     u.query_.c_str(), u.query_.size());
-
-                            const char* value
-                                (static_cast<
-                                 const char*>(getfield(mar, "Host")));
-                            fields fs;
-                            fs.push_back
-                                (make_pair("Location", string("http://")
-                                           .append(value)));
-                            sendstatus(id_, 303, "See Other", fs);
-
-                        } else if (3 == nodes.size())
-                            sendpage(id_, nodes[1], nodes[2]);
-                        else
-                            throw http_error(404, "Not Found");
-
-                    } else {
-
-                        string path(joinpath(ROOT, nodes));
-                        aug_info("path [%s]", path.c_str());
-                        sendfile(id_, path);
-                    }
+                    string path(joinpath(ROOT, nodes));
+                    aug_info("path [%s]", path.c_str());
+                    sendfile(id_, sessid_, path);
                 }
 
             } catch (const http_error& e) {
                 aug_error("%d: %s", e.status(), e.what());
-                sendstatus(id_, e.status(), e.what());
+                sendstatus(id_, sessid_, e.status(), e.what());
             } catch (const exception&) {
-                sendstatus(id_, 500, "Internal Server Error");
+                sendstatus(id_, sessid_, 500, "Internal Server Error");
                 throw;
             }
 
@@ -657,22 +704,14 @@ namespace {
         do_reconf()
         {
             loadcss();
+            loadmimetypes();
         }
         void
         do_event(const char* from, const char* type, const void* user,
                  size_t size)
         {
-            pages::iterator it(pages_.find(from));
-            if (it == pages_.end())
-                it = pages_.insert(make_pair(from, map<string, string>()))
-                    .first;
-
-            string page(static_cast<const char*>(user), size);
-
-            pair<map<string, string>::iterator,
-                bool> xy(it->second.insert(make_pair(type, page)));
-            if (!xy.second)
-                xy.first->second = page;
+            string xml(static_cast<const char*>(user), size);
+            result_.push_back(xml);
         }
         void
         do_closed(const object& sock)

@@ -4,6 +4,7 @@ EXTRA_DIST = \
 	clientcert.pem \
 	clientkey.pem \
 	clientreq.pem \
+	mimetypes.conf \
 	passwd.txt \
 	servercert.pem \
 	serverkey.pem \

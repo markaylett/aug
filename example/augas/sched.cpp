@@ -111,39 +111,6 @@ namespace {
     struct schedserv : basic_serv {
         augas_id timer_;
         tmqueue queue_;
-        void
-        updatehome()
-        {
-            stringstream ss;
-            ss << "<table class=\"grid\"><tr><th>name</th><th>spec</th>"
-                "<th>type</th><th>local</th></tr>";
-            tmqueue::const_iterator it(queue_.begin()), end(queue_.end());
-            for (; it != end; ++it) {
-                tm tm;
-                ss << "<tr><td>" << it->second->name_
-                   << "</td><td>" << it->second->spec_ << "</td><td>"
-                   << (TMUTC == it->second->type_ ? "utc" : "local")
-                   << "</td><td>" << tmstring(*aug_localtime(&it->first, &tm))
-                   << "</td></tr>";
-            }
-            ss << "</table>";
-
-            aug_var var;
-            auto_ptr<string> home(new string(ss.str()));
-            post("http", "home", stringvar(var, home));
-            home.release();
-        }
-        void
-        updatestatus()
-        {
-            stringstream ss;
-            ss << (unsigned)queue_.size() << " events";
-
-            aug_var var;
-            auto_ptr<string> status(new string(ss.str()));
-            post("http", "status", stringvar(var, status));
-            status.release();
-        }
         bool
         do_start(const char* sname)
         {
@@ -172,15 +139,28 @@ namespace {
                 canceltimer(timer_);
                 timer_ = -1;
             }
-
-            updatehome();
-            updatestatus();
         }
         void
         do_event(const char* from, const char* type, const void* user,
                  size_t size)
         {
             aug_info("event [%s] triggered", type);
+
+            stringstream ss;
+            ss << "<events>";
+            tmqueue::const_iterator it(queue_.begin()), end(queue_.end());
+            for (; it != end; ++it) {
+                tm tm;
+                ss << "<event name=\"" << it->second->name_
+                   << "\" spec=\"" << it->second->spec_ << "\" tz=\""
+                   << (TMUTC == it->second->type_ ? "utc" : "local")
+                   << "\">" << tmstring(*aug_localtime(&it->first,
+                                                                 &tm))
+                   << "</event>";
+            }
+            ss << "</events>";
+
+            dispatch("http", "response", ss.str().c_str(), ss.str().size());
         }
         void
         do_expire(const object& timer, unsigned& ms)
@@ -199,9 +179,6 @@ namespace {
 
             ms = timerms(queue_, tv);
             aug_info("next expiry in %d ms", ms);
-
-            updatehome();
-            updatestatus();
         }
         ~schedserv() AUGAS_NOTHROW
         {
