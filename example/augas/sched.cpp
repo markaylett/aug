@@ -12,16 +12,18 @@ using namespace std;
 
 namespace {
 
-    enum tmtype { TMLOCAL, TMUTC };
+    enum tmtz { TMLOCAL, TMUTC };
 
     struct tmevent {
+        const augas_id id_;
         const string name_, spec_;
-        const tmtype type_;
+        const tmtz tz_;
         aug_tmspec tmspec_;
-        tmevent(const string& name, const string& spec, tmtype type)
-            : name_(name),
+        tmevent(const string& name, const string& spec, tmtz tz)
+            : id_(aug_nextid()),
+              name_(name),
               spec_(spec),
-              type_(type)
+              tz_(tz)
         {
         }
     };
@@ -41,7 +43,7 @@ namespace {
     pushevent(tmqueue& q, time_t now, const tmeventptr& ptr)
     {
         tm tm;
-        if (TMUTC == ptr->type_) {
+        if (TMUTC == ptr->tz_) {
 
             if (!aug_nexttime(aug_gmtime(&now, &tm), &ptr->tmspec_))
                 return;
@@ -61,11 +63,11 @@ namespace {
     }
 
     void
-    pushevent(tmqueue& q, time_t now, const string& name, tmtype type)
+    pushevent(tmqueue& q, time_t now, const string& name, tmtz tz)
     {
         const char* tmspecs
             (augas::getenv(string("service.sched.event.").append(name)
-                           .append(TMUTC == type ? ".utc" : ".local")
+                           .append(TMUTC == tz ? ".utc" : ".local")
                            .c_str()));
         if (!tmspecs)
             return;
@@ -74,7 +76,7 @@ namespace {
         string spec;
         while (is >> spec) {
 
-            tmeventptr ptr(new tmevent(name, spec, type));
+            tmeventptr ptr(new tmevent(name, spec, tz));
             if (aug_strtmspec(&ptr->tmspec_, spec.c_str()))
                 pushevent(q, now, ptr);
         }
@@ -145,15 +147,18 @@ namespace {
                  size_t size)
         {
             aug_info("event [%s] triggered", type);
+            if (0 != strcmp(type, "http.sched.getevents"))
+                return;
 
             stringstream ss;
             ss << "<events>";
             tmqueue::const_iterator it(queue_.begin()), end(queue_.end());
             for (; it != end; ++it) {
                 tm tm;
-                ss << "<event name=\"" << it->second->name_
+                ss << "<event id=\"" << it->second->id_
+                   << "\" name=\"" << it->second->name_
                    << "\" spec=\"" << it->second->spec_ << "\" tz=\""
-                   << (TMUTC == it->second->type_ ? "utc" : "local")
+                   << (TMUTC == it->second->tz_ ? "utc" : "local")
                    << "\">" << tmstring(*aug_localtime(&it->first,
                                                                  &tm))
                    << "</event>";

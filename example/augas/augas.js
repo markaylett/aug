@@ -1,6 +1,8 @@
 // -*- java -*-
+// Note: jsshell can be downloaded from:
+// http://www.mozilla.org/js/spidermonkey
 
-function getHttpRequest() {
+function createHttpRequest() {
     var obj = null;
     if (window.XMLHttpRequest) {
         obj = new XMLHttpRequest();
@@ -17,29 +19,82 @@ function getHttpRequest() {
     return obj;
 }
 
-function readXml(file, fn) {
-    var obj = getHttpRequest();
+function getXml(url, fn) {
+    var obj = createHttpRequest();
     obj.onreadystatechange = function() {
         if (obj.readyState == 4){
             fn(obj.responseXML);
         }
     }
-    obj.open('GET', file, true);
-    obj.send(null);
+    obj.open('GET', url, true);
+    obj.send('');
 }
 
-function processXml(obj) {
-    var dataArray = obj.getElementsByTagName('event');
-    var dataArrayLen = dataArray.length;
-    var insertData = '<table style="width:300px; border: solid 1px #000"><tr>'
-        + '<th>Name</th><th>Spec</th><th>TZ</th><th>Next</th></tr>';
-    for (var i=0; i<dataArrayLen; i++){
-        var attrs = dataArray[i].attributes;
-        insertData += '<tr><td>' + attrs.getNamedItem('name').value + '</td>';
-        insertData += '<td>' + attrs.getNamedItem('spec').value + '</td>';
-        insertData += '<td>' + attrs.getNamedItem('tz').value + '</td>';
-        insertData += '<td>' + dataArray[i].firstChild.data + '</td></tr>';
+function urlEncode(ids) {
+    var s = '';
+    for (var i in ids) {
+
+        var id = ids[i];
+        var value = document.getElementById(id).value;
+
+        s += s ? '&' : '?';
+        s += id;
+        s += '=';
+        s += escape(value);
     }
-    insertData += '</table>';
-    document.getElementById ('dataArea').innerHTML = insertData;
+    return s;
+}
+
+var log = [];
+
+function Message(type, text) {
+    this.type = type;
+    this.text = text;
+}
+
+function addLog(type, text) {
+
+    log.unshift(new Message(type, text));
+    if (10 < log.length)
+        log = log.slice(0, 10);
+}
+
+function displayLog() {
+
+    var length = log.length;
+
+    var html = '<table><tr><th>type</th><th>message</th></tr>';
+    for (var i = 0; i < length; ++i) {
+        var message = log[i];
+        html += '<tr><td>' + message.type + '</td>';
+        html += '<td>' + message.text + '</td></tr>';
+    }
+    html += '</table>';
+
+    document.getElementById('log').innerHTML = html;
+}
+
+function logMessage(type, text) {
+
+    addLog(type, text);
+    displayLog();
+}
+
+function logXmlMessages(xml) {
+
+    var messages = xml.getElementsByTagName('message');
+    var length = messages.length;
+
+    for (var i = 0; i < length; ++i) {
+        var message = messages[i];
+        addLog(message.getAttribute('type'),
+               message.childNodes[0].nodeValue);
+    }
+
+    displayLog();
+}
+
+function reconf() {
+    logMessage('info', 'reconf');
+    getXml('service/reconf', logXmlMessages);
 }

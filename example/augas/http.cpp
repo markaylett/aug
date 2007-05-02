@@ -488,15 +488,15 @@ namespace {
         ptr.release();
     }
 
-    vector<string> result_;
+    vector<string> results_;
 
     void
     sendresponse(augas_id id, const string& sessid)
     {
         stringstream content;
         content << "<result>";
-        vector<string>::const_iterator it(result_.begin()),
-            end(result_.end());
+        vector<string>::const_iterator it(results_.begin()),
+            end(results_.end());
         for (; it != end; ++it)
             content << *it;
         content << "</result>";
@@ -648,15 +648,27 @@ namespace {
                     nodes[0] = "http";
                     string type(jointype(nodes));
 
-                    map<string, string> values;
-                    values["contenttype"] = contenttype;
-                    values["content"] = content;
-                    values["sessid"] = sessid_;
+                    results_.clear();
 
-                    string s(urlpack(values.begin(), values.end()));
+                    if (type == "http.reconf") {
 
-                    result_.clear();
-                    dispatch("httpclient", type.c_str(), s.data(), s.size());
+                        reconfall();
+                        results_.push_back("<message type=\"info\">"
+                                           "re-configured</message>");
+
+                    } else {
+
+                        map<string, string> values;
+                        values["contenttype"] = contenttype;
+                        values["content"] = content;
+                        values["sessid"] = sessid_;
+
+                        string s(urlpack(values.begin(), values.end()));
+
+                        dispatch("httpclient", type.c_str(), s.data(),
+                                 s.size());
+                    }
+
                     sendresponse(id_, sessid_);
 
                 } else {
@@ -711,7 +723,7 @@ namespace {
                  size_t size)
         {
             string xml(static_cast<const char*>(user), size);
-            result_.push_back(xml);
+            results_.push_back(xml);
         }
         void
         do_closed(const object& sock)

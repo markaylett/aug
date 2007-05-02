@@ -238,6 +238,7 @@ EXTRA_DIST = \
 	bench.conf \
 	index.html \
 	modules.mk \
+	sched.js \
 	test.conf
 
 exampledir = $(prefix)/example/augas

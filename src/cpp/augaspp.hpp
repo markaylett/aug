@@ -460,6 +460,8 @@ namespace augas {
         void
         do_teardown(const object& sock)
         {
+            augas_writelog(AUGAS_LOGINFO, "teardown defaulting to shutdown");
+            shutdown(sock);
         }
         bool
         do_accept(object& sock, const char* addr, unsigned short port)

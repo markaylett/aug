@@ -3,12 +3,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
   <head>
     <title>AugAS</title>
-    <script type="text/javascript" src="augas.js"/>
+    <script type="text/javascript" src="augas.js"></script>
+    <script type="text/javascript" src="sched.js"></script>
   </head>
-  <body>
+  <body onLoad="getEvents();">
     <h1>AugAS Example Page</h1>
-    <p>To view current list of events, <a href="#"
-    onclick="readXml('service/test?zipcode=xyz', processXml);">click here</a>.</p>
-    <div id="dataArea"></div>
+    <p>To reconfigure the server, <a href="#"
+    onclick="reconf();">click here</a>.</p>
+    <p>To refresh this page, <a href="#"
+    onclick="getEvents()">click here</a>.</p>
+    <div id="events"></div>
+    <form>
+      <p>Name: <input id="name" type="text" size="5"/></p>
+      <p>Spec: <input id="spec" type="text" size="5"/></p>
+      <p>TZ: <input id="tz" type="text" size="5"/></p>
+      <input type="button" value="update" onclick="putEvent();">
+    </form>
+    <div id="log"></div>
   </body>
 </html>

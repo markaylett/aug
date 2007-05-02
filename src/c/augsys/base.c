@@ -281,13 +281,17 @@ AUGSYS_API int
 aug_nextid(void)
 {
     static int id_ = 1;
+    int id;
 
+    aug_lock();
     if (id_ == INT_MAX) {
         id_ = 1;
-        return INT_MAX;
-    }
+        id = INT_MAX;
+    } else
+        id = id_++;
+    aug_unlock();
 
-    return id_++;
+    return id;
 }
 
 AUGSYS_API int
