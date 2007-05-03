@@ -1,5 +1,6 @@
 #include "augaspp.hpp"
 
+#include "augnetpp.hpp"
 #include "augutilpp.hpp"
 #include "augsyspp.hpp"
 
@@ -98,7 +99,7 @@ namespace {
     }
 
     unsigned
-    timerms(tmqueue& q, const timeval& tv)
+    timerms(const tmqueue& q, const timeval& tv)
     {
         if (q.empty())
             return 0;
@@ -110,9 +111,77 @@ namespace {
         return ms < 60000 ? ms : 60000;
     }
 
+    ostream&
+    toxml(ostream& os, const tmqueue& q)
+    {
+        os << "<events>";
+        tmqueue::const_iterator it(q.begin()), end(q.end());
+        for (; it != end; ++it) {
+            tm tm;
+            os << "<event id=\"" << it->second->id_
+               << "\" name=\"" << it->second->name_
+               << "\" spec=\"" << it->second->spec_ << "\" tz=\""
+               << (TMUTC == it->second->tz_ ? "utc" : "local")
+               << "\">" << tmstring(*aug_localtime(&it->first, &tm))
+               << "</event>";
+        }
+        os << "</events>";
+    }
+
     struct schedserv : basic_serv {
         augas_id timer_;
         tmqueue queue_;
+        void
+        settimer(const timeval& tv)
+        {
+            unsigned ms(timerms(queue_, tv));
+            if (ms) {
+                if (-1 != timer_)
+                    resettimer(timer_, ms);
+                else {
+                    augas_var var = AUG_VARNULL;
+                    timer_ = augas::settimer(ms, var);
+                }
+                aug_info("next expiry in %d ms", ms);
+            } else if (-1 != timer_) {
+                canceltimer(timer_);
+                timer_ = -1;
+            }
+        }
+        void
+        delevent(const string& urlencoded)
+        {
+            map<string, string> params;
+            urlunpack(urlencoded.begin(), urlencoded.end(),
+                      inserter(params, params.begin()));
+
+            int id(atoi(params["id"].c_str()));
+            aug_info("deleting event: id=[%d]", id);
+            tmqueue::iterator it(queue_.begin()), end(queue_.end());
+            for (; it != end; ++it)
+                if (it->second->id_ == id) {
+                    queue_.erase(it);
+                    break;
+                }
+
+            timeval tv;
+            gettimeofday(tv);
+            settimer(tv);
+        }
+        void
+        putevent(const string& urlencoded)
+        {
+            map<string, string> params;
+            urlunpack(urlencoded.begin(), urlencoded.end(),
+                      inserter(params, params.begin()));
+
+            int id(atoi(params["id"].c_str()));
+            if (id) {
+                aug_info("updating event: id=[%d]", id);
+            } else {
+                aug_info("inserting new event");
+            }
+        }
         bool
         do_start(const char* sname)
         {
@@ -126,45 +195,43 @@ namespace {
 
             timeval tv;
             gettimeofday(tv);
+
             time_t now(tv.tv_sec);
             pushevents(queue_, now);
-            unsigned ms(timerms(queue_, tv));
-            if (ms) {
-                if (-1 != timer_)
-                    resettimer(timer_, ms);
-                else {
-                    augas_var var = AUG_VARNULL;
-                    timer_ = settimer(ms, var);
-                }
-                aug_info("next expiry in %d ms", ms);
-            } else if (-1 != timer_) {
-                canceltimer(timer_);
-                timer_ = -1;
-            }
+
+            settimer(tv);
         }
         void
         do_event(const char* from, const char* type, const void* user,
                  size_t size)
         {
             aug_info("event [%s] triggered", type);
-            if (0 != strcmp(type, "http.sched.getevents"))
+
+            map<string, string> fields;
+            const char* encoded(static_cast<const char*>(user));
+            urlunpack(encoded, encoded + size,
+                      inserter(fields, fields.begin()));
+
+            map<string, string>::iterator it(fields.find("content"));
+            if (it != fields.end() && !it->second.empty())
+                it->second = filterbase64(it->second.data(),
+                                          it->second.size(), AUG_DECODE64);
+
+            map<string, string>::const_iterator jt(fields.begin()),
+                end(fields.end());
+            for (; jt != end; ++jt)
+                writelog(AUGAS_LOGINFO, "%s=%s", jt->first.c_str(),
+                         jt->second.c_str());
+
+            if (0 == strcmp(type, "http.sched.delevent"))
+                delevent(fields["content"]);
+            else if (0 == strcmp(type, "http.sched.putevent"))
+                putevent(fields["content"]);
+            else if (0 != strcmp(type, "http.sched.events"))
                 return;
 
             stringstream ss;
-            ss << "<events>";
-            tmqueue::const_iterator it(queue_.begin()), end(queue_.end());
-            for (; it != end; ++it) {
-                tm tm;
-                ss << "<event id=\"" << it->second->id_
-                   << "\" name=\"" << it->second->name_
-                   << "\" spec=\"" << it->second->spec_ << "\" tz=\""
-                   << (TMUTC == it->second->tz_ ? "utc" : "local")
-                   << "\">" << tmstring(*aug_localtime(&it->first,
-                                                                 &tm))
-                   << "</event>";
-            }
-            ss << "</events>";
-
+            toxml(ss, queue_);
             dispatch("http", "response", ss.str().c_str(), ss.str().size());
         }
         void

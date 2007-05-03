@@ -69,7 +69,7 @@ modhttp_la_OBJECTS = $(am_modhttp_la_OBJECTS)
 modminimal_la_DEPENDENCIES =
 am_modminimal_la_OBJECTS = minimal.lo
 modminimal_la_OBJECTS = $(am_modminimal_la_OBJECTS)
-modsched_la_DEPENDENCIES =  \
+modsched_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_modsched_la_OBJECTS = sched.lo
@@ -277,6 +277,7 @@ modminimal_la_LIBADD =
 modsched_la_SOURCES = sched.cpp
 modsched_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modsched_la_LIBADD = \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 

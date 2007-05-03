@@ -6,18 +6,19 @@
     <script type="text/javascript" src="augas.js"></script>
     <script type="text/javascript" src="sched.js"></script>
   </head>
-  <body onLoad="getEvents();">
+  <body onLoad="loadEvents();">
     <h1>AugAS Example Page</h1>
     <p>To reconfigure the server, <a href="#"
     onclick="reconf();">click here</a>.</p>
     <p>To refresh this page, <a href="#"
-    onclick="getEvents()">click here</a>.</p>
+    onclick="loadEvents()">click here</a>.</p>
     <div id="events"></div>
     <form>
+      <input id="id" type="hidden" value="0"/>
       <p>Name: <input id="name" type="text" size="5"/></p>
       <p>Spec: <input id="spec" type="text" size="5"/></p>
       <p>TZ: <input id="tz" type="text" size="5"/></p>
-      <input type="button" value="update" onclick="putEvent();">
+      <input type="button" value="save" onclick="putEvent();">
     </form>
     <div id="log"></div>
   </body>

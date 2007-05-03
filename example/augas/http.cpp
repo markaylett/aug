@@ -260,7 +260,7 @@ namespace {
     basicauth(const string& encoded, const string& realm)
     {
         string xy, x, y;
-        xy = filterbase64(encoded.c_str(), encoded.size(), AUG_DECODE64);
+        xy = filterbase64(encoded.data(), encoded.size(), AUG_DECODE64);
         split2(xy.begin(), xy.end(), x, y, ':');
 
         aug_info("authenticating user [%s]", x.c_str());

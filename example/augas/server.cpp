@@ -38,21 +38,6 @@ namespace {
             return true;
         }
         void
-        do_event(const char* from, const char* type, const void* user,
-                 size_t size)
-        {
-            map<string, string> fields;
-            const char* encoded(static_cast<const char*>(user));
-            urlunpack(encoded, encoded + size,
-                      inserter(fields, fields.begin()));
-
-            map<string, string>::const_iterator it(fields.begin()),
-                end(fields.end());
-            for (; it != end; ++it)
-                writelog(AUGAS_LOGINFO, "%s=%s", it->first.c_str(),
-                         it->second.c_str());
-        }
-        void
         do_closed(const object& sock)
         {
             delete sock.user<string>();
