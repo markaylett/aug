@@ -1,27 +1,73 @@
 body {
   font-family: verdana, arial, sans-serif;
+  margin: 20px;
 }
-table.grid {
-  border-width: 1px 1px 1px 1px;
-  border-spacing: 2px;
-  border-style: outset outset outset outset;
-  border-color: gray gray gray gray;
+
+.th {
+    text-align: left;
+}
+
+#view {
+  width: 90%;
+  background-color: #eeeeff;
+  padding: 10px;
+  margin-bottom: 20px;
+  margin-right: 20px;
+}
+
+#view table {
   border-collapse: collapse;
-  background-color: white;
 }
-table.grid th {
-  border-width: 1px 1px 1px 1px;
+
+#view th, td {
   padding: 4px 4px 4px 4px;
-  border-style: inset inset inset inset;
-  border-color: gray gray gray gray;
-  background-color: rgb(255, 255, 240);
-  -moz-border-radius: 0px 0px 0px 0px;
 }
-table.grid td {
-  border-width: 1px 1px 1px 1px;
+
+#editor {
+  float: left;
+  width: 40%;
+  background-color: #eeffee;
+  border: 2px solid #ccccff;
+  padding: 10px;
+  margin-bottom: 20px;
+  margin-right: 20px;
+}
+
+#editor table {
+  border-collapse: collapse;
+}
+
+#editor th, td {
   padding: 4px 4px 4px 4px;
-  border-style: inset inset inset inset;
-  border-color: gray gray gray gray;
-  background-color: rgb(255, 255, 240);
-  -moz-border-radius: 0px 0px 0px 0px;
+}
+
+#log {
+  float: left;
+  padding: 10px;
+  margin-bottom: 20px;
+  margin-right: 20px;
+}
+
+.header {
+}
+
+.item {
+  cursor: pointer;
+  cursor: hand;
+}
+
+.current {
+  background-color: #ccccff;
+}
+
+.field {
+}
+
+.new {
+}
+
+.save {
+}
+
+.delete {
 }

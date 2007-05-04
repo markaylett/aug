@@ -20,6 +20,13 @@ namespace {
         const string name_, spec_;
         const tmtz tz_;
         aug_tmspec tmspec_;
+        tmevent(augas_id id, const string& name, const string& spec, tmtz tz)
+            : id_(id),
+              name_(name),
+              spec_(spec),
+              tz_(tz)
+        {
+        }
         tmevent(const string& name, const string& spec, tmtz tz)
             : id_(aug_nextid()),
               name_(name),
@@ -98,6 +105,17 @@ namespace {
         }
     }
 
+    void
+    eraseevent(tmqueue& q, augas_id id)
+    {
+        tmqueue::iterator it(q.begin()), end(q.end());
+        for (; it != end; ++it)
+            if (it->second->id_ == id) {
+                q.erase(it);
+                break;
+            }
+    }
+
     unsigned
     timerms(const tmqueue& q, const timeval& tv)
     {
@@ -132,8 +150,23 @@ namespace {
         augas_id timer_;
         tmqueue queue_;
         void
+        checkexpired(const timeval& tv)
+        {
+            time_t now(tv.tv_sec);
+
+            while (!queue_.empty() && queue_.begin()->first <= now) {
+
+                tmeventptr ptr(queue_.begin()->second);
+                queue_.erase(queue_.begin());
+                augas_post("schedclient", ptr->name_.c_str(), 0);
+                pushevent(queue_, now, ptr);
+            }
+        }
+        void
         settimer(const timeval& tv)
         {
+            checkexpired(tv);
+
             unsigned ms(timerms(queue_, tv));
             if (ms) {
                 if (-1 != timer_)
@@ -155,14 +188,10 @@ namespace {
             urlunpack(urlencoded.begin(), urlencoded.end(),
                       inserter(params, params.begin()));
 
-            int id(atoi(params["id"].c_str()));
-            aug_info("deleting event: id=[%d]", id);
-            tmqueue::iterator it(queue_.begin()), end(queue_.end());
-            for (; it != end; ++it)
-                if (it->second->id_ == id) {
-                    queue_.erase(it);
-                    break;
-                }
+            augas_id id(atoi(params["id"].c_str()));
+            aug_info("deleting event: id=[%d]", (int)id);
+
+            eraseevent(queue_, id);
 
             timeval tv;
             gettimeofday(tv);
@@ -175,12 +204,29 @@ namespace {
             urlunpack(urlencoded.begin(), urlencoded.end(),
                       inserter(params, params.begin()));
 
-            int id(atoi(params["id"].c_str()));
+            augas_id id(atoi(params["id"].c_str()));
             if (id) {
                 aug_info("updating event: id=[%d]", id);
+                eraseevent(queue_, id);
             } else {
                 aug_info("inserting new event");
+                id = aug_nextid();
             }
+
+            const string& spec(params["spec"]);
+
+            tmtz tz(TMUTC);
+            if (params["tz"] == "local")
+                tz = TMLOCAL;
+
+            timeval tv;
+            gettimeofday(tv);
+
+            tmeventptr ptr(new tmevent(id, params["name"], spec, tz));
+            if (aug_strtmspec(&ptr->tmspec_, spec.c_str()))
+                pushevent(queue_, tv.tv_sec, ptr);
+
+            settimer(tv);
         }
         bool
         do_start(const char* sname)
@@ -191,14 +237,11 @@ namespace {
         void
         do_reconf()
         {
-            queue_.clear();
-
             timeval tv;
             gettimeofday(tv);
 
-            time_t now(tv.tv_sec);
-            pushevents(queue_, now);
-
+            queue_.clear();
+            pushevents(queue_, tv.tv_sec);
             settimer(tv);
         }
         void
@@ -223,11 +266,11 @@ namespace {
                 writelog(AUGAS_LOGINFO, "%s=%s", jt->first.c_str(),
                          jt->second.c_str());
 
-            if (0 == strcmp(type, "http.sched.delevent"))
+            if (0 == strcmp(type, "http.sched.delevent")) {
                 delevent(fields["content"]);
-            else if (0 == strcmp(type, "http.sched.putevent"))
+            } else if (0 == strcmp(type, "http.sched.putevent")) {
                 putevent(fields["content"]);
-            else if (0 != strcmp(type, "http.sched.events"))
+            } else if (0 != strcmp(type, "http.sched.events"))
                 return;
 
             stringstream ss;
@@ -239,15 +282,8 @@ namespace {
         {
             timeval tv;
             gettimeofday(tv);
-            time_t now(tv.tv_sec);
 
-            while (!queue_.empty() && queue_.begin()->first <= now) {
-
-                tmeventptr ptr(queue_.begin()->second);
-                queue_.erase(queue_.begin());
-                augas_post("schedclient", ptr->name_.c_str(), 0);
-                pushevent(queue_, now, ptr);
-            }
+            checkexpired(tv);
 
             ms = timerms(queue_, tv);
             aug_info("next expiry in %d ms", ms);

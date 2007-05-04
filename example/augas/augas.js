@@ -67,18 +67,16 @@ function getXml(url, fn) {
     obj.send('');
 }
 
-function urlEncode(ids) {
-    var s = '';
-    for (var i in ids) {
+function encodePair(x, y) {
+    return x + '=' + escape(y);
+}
 
-        var id = ids[i];
-        var value = document.getElementById(id).value;
-
-        if (s) s += '&';
-        s += id;
-        s += '=';
-        s += escape(value);
-    }
+function encodeIds(s, ids) {
+    iterate(function(x) {
+            var y = document.getElementById(x).value;
+            if (s) s += '&';
+            s += encodePair(x, y);
+        }, ids);
     return s;
 }
 
@@ -87,7 +85,7 @@ function Message(type, text) {
     this.text = text;
 }
 
-function Log() {
+function Log(div) {
 
     var log = [];
 
@@ -111,7 +109,8 @@ function Log() {
 
     var display = function() {
 
-        var html = '<table><tr><th>type</th><th>message</th></tr>';
+        var html = '<table><tr>'
+          + '<th align="left">type</th><th align="left">message</th></tr>';
 
         iterate(function(x) {
                 html += '<tr><td>' + x.type + '</td>';
@@ -120,7 +119,7 @@ function Log() {
 
         html += '</table>';
 
-        document.getElementById('log').innerHTML = html;
+        div.innerHTML = html;
     }
 
     this.add = function(type, text) {

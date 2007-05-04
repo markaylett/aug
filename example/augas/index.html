@@ -2,24 +2,43 @@
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
   <head>
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="cache-control" content="no-cache"/>
     <title>AugAS</title>
+    <link type="text/css" rel="stylesheet" href="etc/augas.css"/>
     <script type="text/javascript" src="augas.js"></script>
     <script type="text/javascript" src="sched.js"></script>
   </head>
-  <body onLoad="loadEvents();">
-    <h1>AugAS Example Page</h1>
+  <body onLoad="init();">
+    <center><h1>AugAS Example Page</h1></center>
     <p>To reconfigure the server, <a href="#"
-    onclick="reconf();">click here</a>.</p>
+      onclick="reconf();">click here</a>.</p>
     <p>To refresh this page, <a href="#"
-    onclick="loadEvents()">click here</a>.</p>
-    <div id="events"></div>
-    <form>
-      <input id="id" type="hidden" value="0"/>
-      <p>Name: <input id="name" type="text" size="5"/></p>
-      <p>Spec: <input id="spec" type="text" size="5"/></p>
-      <p>TZ: <input id="tz" type="text" size="5"/></p>
-      <input type="button" value="save" onclick="putEvent();">
-    </form>
+      onclick="loadEvents()">click here</a>.</p>
+    <div id="view"></div>
+    <div id="editor">
+      <table>
+        <tr>
+          <td>Name:</td>
+          <td align="right"><input id="name" type="text"/></td>
+        </tr>
+        <tr>
+          <td>Spec:</td>
+          <td align="right"><input id="spec" type="text"/></td>
+        </tr>
+        <tr>
+          <td>TZ:</td>
+          <td align="right"><input id="tz" type="text"/></td>
+        </tr>
+        <tr><td align="right" colspan="2">
+        <input class="new" type="button" value="new" onclick="setCurrent(0);">
+        <input class="save" type="button" value="save" onclick="putEvent();">
+        <input class="delete" type="button" value="delete"
+          onclick="delEvent();">
+        </td></tr>
+      </table>
+    </div>
     <div id="log"></div>
   </body>
 </html>

@@ -7,7 +7,7 @@ function Event(name, spec, tz, next) {
     this.next = next;
 }
 
-function Events(log) {
+function Events(div, log) {
 
     var events = {};
     var current = 0;
@@ -30,26 +30,28 @@ function Events(log) {
 
     var displayTable = function() {
 
-        var html = '<table><tr><th>name</th><th>spec</th><th>tz</th>'
-            + '<th>next</th><th></th></tr>';
+        var html = '<table width="100%">'
+            + '<tr class="header"><th align="left">name</th>'
+            + '<th align="left">spec</th><th align="left">tz</th>'
+            + '<th align="left">next</th></tr>';
 
         for (var id in events) {
 
             var event = events[id];
-            html += '<tr><td><a href="#" onclick="setEvent(' + id + ')">'
-                + event.name + '</a></td>';
+            if (id == current) {
+                html += '<tr class="current">';
+            } else {
+                html += '<tr class="item" onclick="setCurrent(' + id + ')">';
+            }
+            html += '<td>' + event.name + '</td>';
             html += '<td>' + event.spec + '</td>';
             html += '<td>' + event.tz + '</td>';
             html += '<td>' + event.next + '</td>';
-            html += '<td><a href="#" onclick="delEvent(' + id
-                + ')">del</a></td></tr>';
         }
 
-        html += '<tr><td><a href="#" onclick="setEvent(0)">add</a></td>'
-            + '<td colspan=\"3\">...</td></tr>';
         html += '</table>';
 
-        document.getElementById('events').innerHTML = html;
+        div.innerHTML = html;
     }
 
     var displayForm = function() {
@@ -60,7 +62,6 @@ function Events(log) {
             event = new Event('', '', 'local', '');
         }
 
-        document.getElementById('id').value = current;
         document.getElementById('name').value = event.name;
         document.getElementById('spec').value = event.spec;
         document.getElementById('tz').value = event.tz;
@@ -73,18 +74,23 @@ function Events(log) {
         displayForm();
     }
 
-    this.setEvent = function(id) {
+    this.setCurrent = function(id) {
         current = id;
+        displayTable();
         displayForm();
     }
 
-    this.urlEncode = function() {
-        return urlEncode(['id', 'name', 'spec', 'tz']);
+    this.getCurrent = function() {
+        return current;
+    }
+
+    this.encode = function() {
+        return encodeIds(encodePair('id', current), ['name', 'spec', 'tz']);
     }
 }
 
-var log = new Log();
-var events = new Events(log);
+var log = null;
+var events = null;
 
 function reconf() {
     log.add('info', 'reconf');
@@ -96,17 +102,26 @@ function loadEvents() {
     getXml('service/sched/events', events.addXml);
 }
 
-function delEvent(id) {
-    log.add('info', 'del event: ' + id);
-    getXml('service/sched/delevent?id=' + escape(id), events.addXml);
+function delEvent() {
+    var id = events.getCurrent();
+    if (id) {
+        log.add('info', 'del event: ' + id);
+        getXml('service/sched/delevent?id=' + escape(id), events.addXml);
+    }
 }
 
 function putEvent() {
     log.add('info', 'put event');
-    getXml('service/sched/putevent?' + events.urlEncode(), events.addXml);
+    getXml('service/sched/putevent?' + events.encode(), events.addXml);
 }
 
-function setEvent(id) {
-    log.add('info', 'set event: ' + id);
-    events.setEvent(id);
+function setCurrent(id) {
+    log.add('info', 'set current: ' + id);
+    events.setCurrent(id);
+}
+
+function init() {
+    log = new Log(document.getElementById('log'));
+    events = new Events(document.getElementById('view'), log);
+    loadEvents();
 }
