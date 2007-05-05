@@ -11,7 +11,7 @@
     <script type="text/javascript" src="sched.js"></script>
   </head>
   <body onLoad="init();">
-    <center><h1>AugAS Example Page</h1></center>
+    <center><h1>AugAS Example</h1></center>
     <p>To reconfigure the server, <a href="#"
       onclick="reconf();">click here</a>.</p>
     <p>To refresh this page, <a href="#"
@@ -32,10 +32,8 @@
           <td align="right"><input id="tz" type="text"/></td>
         </tr>
         <tr><td align="right" colspan="2">
-        <input class="new" type="button" value="new" onclick="setCurrent(0);">
-        <input class="save" type="button" value="save" onclick="putEvent();">
-        <input class="delete" type="button" value="delete"
-          onclick="delEvent();">
+        <input class="action" type="button" value="save" onclick="putEvent();">
+        <input class="action" type="button" value="cancel" onclick="setCurrent(0);">
         </td></tr>
       </table>
     </div>

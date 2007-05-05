@@ -9,7 +9,7 @@ body {
 
 #view {
   width: 90%;
-  background-color: #eeeeff;
+  background-color: #bbf;
   padding: 10px;
   margin-bottom: 20px;
   margin-right: 20px;
@@ -19,15 +19,21 @@ body {
   border-collapse: collapse;
 }
 
-#view th, td {
-  padding: 4px 4px 4px 4px;
+#view th {
+  color: blue;
+  padding: 2px 8px 2px 8px;
+}
+
+#view td {
+  padding: 2px 8px 2px 8px;
+  border-top: 1px solid #99f;
 }
 
 #editor {
   float: left;
   width: 40%;
-  background-color: #eeffee;
-  border: 2px solid #ccccff;
+  background-color: #ddf;
+  border: 2px solid #99f;
   padding: 10px;
   margin-bottom: 20px;
   margin-right: 20px;
@@ -37,7 +43,7 @@ body {
   border-collapse: collapse;
 }
 
-#editor th, td {
+#editor th, #editor td {
   padding: 4px 4px 4px 4px;
 }
 
@@ -49,25 +55,33 @@ body {
 }
 
 .header {
+  background-color: #eee;
 }
 
 .item {
+  background-color: #fff;
   cursor: pointer;
   cursor: hand;
 }
 
 .current {
-  background-color: #ccccff;
+  background-color: #fc3;
 }
 
 .field {
 }
 
-.new {
-}
-
-.save {
-}
-
-.delete {
+.action {
+   color: blue;
+   font-family: trebuchet ms, helvetica, sans-serif;
+   font-size: 90%;
+   font-weight: bold;
+   background-color: #eee;
+   border: 1px solid;
+   border-top-color: #669;
+   border-left-color: #669;
+   border-right-color: #336;
+   border-bottom-color: #336;
+   filter:progid:DXImageTransform.Microsoft.Gradient
+      (GradientType=0, StartColorStr='#ffffffff', EndColorStr='#eeeeeeaa');
 }

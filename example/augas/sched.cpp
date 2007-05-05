@@ -37,7 +37,7 @@ namespace {
     };
 
     typedef smartptr<tmevent> tmeventptr;
-    typedef map<time_t, tmeventptr> tmqueue;
+    typedef multimap<time_t, tmeventptr> tmqueue;
 
     string
     tmstring(const tm& local)

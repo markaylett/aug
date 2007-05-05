@@ -51,6 +51,11 @@ function Events(div, log) {
 
         html += '</table>';
 
+        html += '<p>';
+        html += '<input class="action" type="button" value="delete"'
+            + ' onclick="delEvent();">';
+        html += '</p>';
+
         div.innerHTML = html;
     }
 

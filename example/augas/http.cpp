@@ -300,7 +300,7 @@ namespace {
 
         if (pairs["response"] != response) {
             aug_info("access denied: expected=[%s]", response);
-            return true;//false;
+            return false;
         }
 
         return true;
