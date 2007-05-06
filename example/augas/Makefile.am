@@ -1,14 +1,12 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
 SUBDIRS = \
-	etc
+	etc \
+	htdocs
 
 EXTRA_DIST = \
-	augas.js \
 	bench.conf \
-	index.html \
 	modules.mk \
-	sched.js \
 	test.conf
 
 exampledir = $(prefix)/example/augas

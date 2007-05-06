@@ -15,6 +15,7 @@
 #else /* _MSC_VER */
 
 typedef int mode_t;
+typedef int pid_t;
 typedef int ssize_t;
 typedef void* caddr_t;
 typedef unsigned char uint8_t;

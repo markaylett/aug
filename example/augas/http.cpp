@@ -560,7 +560,7 @@ namespace {
         void
         message(const char* initial, aug_mar_t mar)
         {
-            static const char ROOT[] = ".";
+            static const char ROOT[] = "./htdocs";
 
             if (sessid_.empty())
                 sessid_ = getsessid(id_, addr_, static_cast<

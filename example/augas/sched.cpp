@@ -144,6 +144,7 @@ namespace {
                << "</event>";
         }
         os << "</events>";
+        return os;
     }
 
     struct schedserv : basic_serv {

@@ -37,7 +37,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-subdir = example/augas/etc
+subdir = example/augas/htdocs
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -170,17 +170,12 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	cacert.pem \
-	clientcert.pem \
-	clientkey.pem \
-	clientreq.pem \
-	mimetypes.conf \
-	passwd.txt \
-	servercert.pem \
-	serverkey.pem \
-	serverreq.pem
+	augas.css \
+	augas.js \
+	index.html \
+	sched.js
 
-exampledir = $(prefix)/example/augas/etc
+exampledir = $(prefix)/example/augas/htdocs
 example_DATA = \
 	$(EXTRA_DIST)
 
@@ -196,9 +191,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  example/augas/etc/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  example/augas/htdocs/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  example/augas/etc/Makefile
+	  $(AUTOMAKE) --foreign  example/augas/htdocs/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

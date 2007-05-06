@@ -1,5 +1,4 @@
 EXTRA_DIST = \
-	augas.css \
 	cacert.pem \
 	clientcert.pem \
 	clientkey.pem \

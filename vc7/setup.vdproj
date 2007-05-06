@@ -93,6 +93,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3E46065D387B472781F00EDA4C912E7C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4949A76E3E3C4C45B7374520F10551EB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -165,6 +171,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_755FCF128217483B9DF88D140A27940C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_77B95F3EE9E049DAB01D116543E00F74"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -178,6 +190,12 @@
         "Entry"
         {
         "MsmKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8C62ACFB11A543E4A3F1D06B866DAAD2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -255,12 +273,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_BF78FAA9C26B468D81063CA6D72E9392"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_C30F73F6BF1E452E8D7D696A1565394C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -291,6 +303,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D592FD1ECDA941138C8BEEF4EDA71FCC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_D5F95E1E2E6F4B849CB0661C7E6F0040"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -310,18 +328,6 @@
         "Entry"
         {
         "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
-        "OwnerKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
         "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -329,6 +335,18 @@
         {
         "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
         "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
+        "OwnerKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -370,6 +388,18 @@
         "Entry"
         {
         "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
+        "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
+        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
         "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -389,18 +419,6 @@
         {
         "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
         "OwnerKey" = "8:_712859D82D144DC5B44AC8C8FB68CDAC"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
-        "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
-        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -667,6 +685,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_3E46065D387B472781F00EDA4C912E7C"
+            {
+            "SourcePath" = "8:..\\example\\augas\\htdocs\\index.html"
+            "TargetName" = "8:index.html"
+            "Tag" = "8:"
+            "Folder" = "8:_D5DD57BD2ADF473396909242620CD520"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_4949A76E3E3C4C45B7374520F10551EB"
             {
             "SourcePath" = "8:..\\etc\\augasd.conf.default"
@@ -847,6 +885,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_755FCF128217483B9DF88D140A27940C"
+            {
+            "SourcePath" = "8:..\\example\\augas\\htdocs\\augas.css"
+            "TargetName" = "8:augas.css"
+            "Tag" = "8:"
+            "Folder" = "8:_D5DD57BD2ADF473396909242620CD520"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_77B95F3EE9E049DAB01D116543E00F74"
             {
             "SourcePath" = "8:..\\example\\augas\\test.conf"
@@ -885,6 +943,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_8C62ACFB11A543E4A3F1D06B866DAAD2"
+            {
+            "SourcePath" = "8:..\\example\\augas\\htdocs\\augas.js"
+            "TargetName" = "8:augas.js"
+            "Tag" = "8:"
+            "Folder" = "8:_D5DD57BD2ADF473396909242620CD520"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_8ECAD86A0E394E05A1708B75E7DDA791"
@@ -1067,26 +1145,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_BF78FAA9C26B468D81063CA6D72E9392"
-            {
-            "SourcePath" = "8:..\\example\\augas\\etc\\augas.css"
-            "TargetName" = "8:augas.css"
-            "Tag" = "8:"
-            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_C30F73F6BF1E452E8D7D696A1565394C"
             {
             "SourcePath" = "8:..\\example\\augas\\etc\\clientcert.pem"
@@ -1165,6 +1223,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_D592FD1ECDA941138C8BEEF4EDA71FCC"
+            {
+            "SourcePath" = "8:..\\example\\augas\\htdocs\\sched.js"
+            "TargetName" = "8:sched.js"
+            "Tag" = "8:"
+            "Folder" = "8:_D5DD57BD2ADF473396909242620CD520"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_D5F95E1E2E6F4B849CB0661C7E6F0040"
@@ -1385,6 +1463,17 @@
                         {
                         }
                     }
+                    "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_756481A7F0C743CE93DC8A0E9C01646F"
+                    {
+                    "Name" = "8:htdocs"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_7040D6BC0F8648A982D28E7B7995389B"
+                        "Folders"
+                        {
+                        }
+                    }
                     "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_A29D53DA2F6D4B56ACE57462A5E1AA42"
                     {
                     "Name" = "8:bin"
@@ -1432,6 +1521,17 @@
                                     "Condition" = "8:"
                                     "Transitive" = "11:FALSE"
                                     "Property" = "8:_3773E55BDC2A40968AD11A93DB7863CC"
+                                        "Folders"
+                                        {
+                                        }
+                                    }
+                                    "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_D5DD57BD2ADF473396909242620CD520"
+                                    {
+                                    "Name" = "8:htdocs"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_116F79C6E93C479C9F1681A4114568CD"
                                         "Folders"
                                         {
                                         }
@@ -1513,7 +1613,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:augas"
         "ProductCode" = "8:{210B4079-4AB6-4491-B94D-63BC120D02F0}"
-        "PackageCode" = "8:{B6F9AF95-6F73-4048-8851-E9DE50EF180E}"
+        "PackageCode" = "8:{C514D8E1-40D3-4AA8-86EB-DA68BB28A89B}"
         "UpgradeCode" = "8:{89166B9C-C3CB-4DE2-8BE3-DD90993E23EE}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
