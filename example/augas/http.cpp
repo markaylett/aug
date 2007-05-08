@@ -493,7 +493,7 @@ namespace {
     vector<string> results_;
 
     void
-    sendresponse(augas_id id, const string& sessid)
+    sendresult(augas_id id, const string& sessid)
     {
         stringstream content;
         content << "<result>";
@@ -505,6 +505,7 @@ namespace {
 
         stringstream message;
         message << "HTTP/1.1 200 OK\r\n"
+                << "Cache-Control: no-cache\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Set-Cookie: AUGSESSID=" << sessid << "\r\n"
                 << "Content-Type: text/xml\r\n"
@@ -526,6 +527,7 @@ namespace {
 
         stringstream message;
         message << "HTTP/1.1 " << status << ' ' << title << "\r\n"
+                << "Cache-Control: no-cache\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Set-Cookie: AUGSESSID=" << sessid << "\r\n";
 
@@ -671,7 +673,7 @@ namespace {
                                  s.size());
                     }
 
-                    sendresponse(id_, sessid_);
+                    sendresult(id_, sessid_);
 
                 } else {
 

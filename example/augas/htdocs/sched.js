@@ -1,6 +1,7 @@
 // -*- java -*-
 
-function Event(name, spec, tz, next) {
+function Event(id, name, spec, tz, next) {
+    this.id = id;
     this.name = name;
     this.spec = spec;
     this.tz = tz;
@@ -9,24 +10,42 @@ function Event(name, spec, tz, next) {
 
 function Events(div, log) {
 
-    var events = {};
+    var events = [];
     var current = 0;
+
+    var getPrev = function() {
+        if (current) {
+            var pair = prevById(events, current);
+            if (pair)
+                return pair.value.id;
+        }
+        return null;
+    };
+
+    var getNext = function() {
+        if (current) {
+            var pair = nextById(events, current);
+            if (pair)
+                return pair.value.id;
+        }
+        return null;
+    };
 
     var parseXml = function(xml) {
 
-        events = {};
+        events = [];
 
-        iterate(function(x) {
+        iterate(function(i, x) {
 
                 var id = x.getAttribute('id');
                 var name = x.getAttribute('name');
                 var spec = x.getAttribute('spec');
                 var tz = x.getAttribute('tz');
                 var next = x.childNodes[0].nodeValue;
-                events[id] = new Event(name, spec, tz, next);
+                events.push(new Event(id, name, spec, tz, next));
 
             }, xml.getElementsByTagName('event'));
-    }
+    };
 
     var displayTable = function() {
 
@@ -35,63 +54,91 @@ function Events(div, log) {
             + '<th align="left">spec</th><th align="left">tz</th>'
             + '<th align="left">next</th></tr>';
 
-        for (var id in events) {
+        iterate(function(i, x) {
 
-            var event = events[id];
-            if (id == current) {
-                html += '<tr class="current">';
-            } else {
-                html += '<tr class="item" onclick="setCurrent(' + id + ')">';
-            }
-            html += '<td>' + event.name + '</td>';
-            html += '<td>' + event.spec + '</td>';
-            html += '<td>' + event.tz + '</td>';
-            html += '<td>' + event.next + '</td>';
-        }
+                if (x.id == current) {
+                    html += '<tr class="current">';
+                } else {
+                    html += '<tr class="item" onclick="setCurrent('
+                        + x.id + ')">';
+                }
+                html += '<td>' + x.name + '</td>';
+                html += '<td>' + x.spec + '</td>';
+                html += '<td>' + x.tz + '</td>';
+                html += '<td>' + x.next + '</td></tr>';
+            }, events);
+
+        for (var i = events.length; i < 10; ++i)
+            html += '<tr class="empty"><td colspan="4">&nbsp;</td></tr>';
 
         html += '</table>';
 
+        var prev = getPrev();
+        var next = getNext();
+
         html += '<p>';
-        html += '<input class="action" type="button" value="delete"'
-            + ' onclick="delEvent();">';
+        html += '<input class="action" type="button" value="prev"'
+        if (prev)
+            html += ' onclick="setCurrent(' + prev + ');"/>';
+        else
+            html += ' disabled="true"/>';
+
+        html += '<input class="action" type="button" value="next"'
+        if (next)
+            html += ' onclick="setCurrent(' + next + ');"/>';
+        else
+            html += ' disabled="true"/>';
+
+        html += '<input class="action" type="button" value="delete"';
+        if (current)
+            html += ' onclick="delEvent(' + current + ');"/>';
+        else
+            html += ' disabled="true"/>';
         html += '</p>';
 
         div.innerHTML = html;
-    }
+    };
 
     var displayForm = function() {
 
-        var event = events[current];
-        if (event == undefined) {
+        var x = null;
+        if (current && (x = getById(events, current)))
+            x = x.value;
+        else {
             current = 0;
-            event = new Event('', '', 'local', '');
+            x = new Event('', '', '', 'local', '');
         }
 
-        document.getElementById('name').value = event.name;
-        document.getElementById('spec').value = event.spec;
-        document.getElementById('tz').value = event.tz;
-    }
+        document.getElementById('name').value = x.name;
+        document.getElementById('spec').value = x.spec;
+        document.getElementById('tz').value = x.tz;
+    };
 
     this.addXml = function(xml) {
         log.addXml(xml);
         parseXml(xml);
         displayTable();
         displayForm();
-    }
+    };
 
     this.setCurrent = function(id) {
-        current = id;
+        current = id ? id : 0;
         displayTable();
         displayForm();
-    }
+    };
+
+    this.setPeer = function(id) {
+        var peer = getNext(id) || getPrev(id);
+        current = peer ? peer : 0;
+    };
 
     this.getCurrent = function() {
         return current;
-    }
+    };
 
     this.encode = function() {
         return encodeIds(encodePair('id', current), ['name', 'spec', 'tz']);
-    }
+    };
 }
 
 var log = null;
@@ -107,12 +154,10 @@ function loadEvents() {
     getXml('service/sched/events', events.addXml);
 }
 
-function delEvent() {
-    var id = events.getCurrent();
-    if (id) {
-        log.add('info', 'del event: ' + id);
-        getXml('service/sched/delevent?id=' + escape(id), events.addXml);
-    }
+function delEvent(id) {
+    log.add('info', 'del event: ' + id);
+    getXml('service/sched/delevent?id=' + escape(id), events.addXml);
+    events.setPeer(id);
 }
 
 function putEvent() {

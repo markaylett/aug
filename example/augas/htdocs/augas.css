@@ -58,6 +58,10 @@ body {
   background-color: #eee;
 }
 
+.empty {
+  background-color: #fff;
+}
+
 .item {
   background-color: #fff;
   cursor: pointer;

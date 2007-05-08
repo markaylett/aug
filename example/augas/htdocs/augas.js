@@ -2,35 +2,48 @@
 // Note: jsshell can be downloaded from:
 // http://www.mozilla.org/js/spidermonkey
 
+// Basic Types.
+
+function Pair(id, value) {
+    this.id = id;
+    this.value = value;
+}
+
+Pair.prototype.toString = function() {
+    return '{id: ' + this.id + ', value: ' + this.value + '}';
+};
+
+// Functional.
+
 function iterate(fn, xs) {
     for (i = 0; i < xs.length; ++i)
-        fn(xs[i]);
+        fn(i, xs[i]);
 }
 
 function riterate(fn, xs) {
     for (i = xs.length; 0 < i; --i)
-        fn(xs[i - 1]);
+        fn(i, xs[i - 1]);
 }
 
 function filter(fn, xs) {
     var ys = [];
-    iterate(function(x) { if (fn(x)) ys.push(x); }, xs);
+    iterate(function(i, x) { if (fn(x)) ys.push(x); }, xs);
     return ys;
 }
 
 function map(fn, xs) {
     var ys = [];
-    iterate(function(x) { ys.push(fn(x)); }, xs);
+    iterate(function(i, x) { ys.push(fn(x)); }, xs);
     return ys;
 }
 
 function fold(fn, x, ys) {
-    iterate(function(y) { x = fn(x, y); }, ys);
+    iterate(function(i, y) { x = fn(x, y); }, ys);
     return x;
 }
 
 function rfold(fn, xs, y) {
-    riterate(function(x) { y = fn(x, y); }, xs);
+    riterate(function(i, x) { y = fn(x, y); }, xs);
     return y;
 }
 
@@ -41,6 +54,46 @@ function prod(xs) {
 function sum(xs) {
     return fold(function(x, y) { return x + y; }, 0, xs);
 }
+
+function find(fn, xs) {
+    try {
+        iterate(function(i, x) { if (fn(x)) throw new Pair(i, x); }, xs);
+    } catch (e) {
+        if (e instanceof Pair) {
+            return e;
+        }
+        throw e;
+    }
+    return null;
+}
+
+// Algorithms.
+
+function getById(xs, id) {
+    return find(function(x) { return x.id == id; }, xs);
+}
+
+function nextById(xs, id) {
+    var x = getById(xs, id);
+    if (x) {
+        var i = x.id + 1;
+        if (i < xs.length)
+            return new Pair(i, xs[i]);
+    }
+    return null;
+}
+
+function prevById(xs, id) {
+    var x = getById(xs, id);
+    if (x) {
+        var i = x.id - 1;
+        if (0 <= i)
+            return new Pair(i, xs[i]);
+    }
+    return null;
+}
+
+// HTTP Request.
 
 function xmlHttpRequest() {
     var obj = null;
@@ -67,18 +120,22 @@ function getXml(url, fn) {
     obj.send('');
 }
 
+// URL Encoding.
+
 function encodePair(x, y) {
     return x + '=' + escape(y);
 }
 
 function encodeIds(s, ids) {
-    iterate(function(x) {
+    iterate(function(i, x) {
             var y = document.getElementById(x).value;
             if (s) s += '&';
             s += encodePair(x, y);
         }, ids);
     return s;
 }
+
+// Logging.
 
 function Message(type, text) {
     this.type = type;
@@ -98,7 +155,7 @@ function Log(div) {
 
     var parseXml = function(xml) {
 
-        iterate(function(x) {
+        iterate(function(i, x) {
 
                 var type = x.getAttribute('type');
                 var text = x.childNodes[0].nodeValue;
@@ -112,7 +169,7 @@ function Log(div) {
         var html = '<table><tr>'
           + '<th align="left">type</th><th align="left">message</th></tr>';
 
-        iterate(function(x) {
+        iterate(function(i, x) {
                 html += '<tr><td>' + x.type + '</td>';
                 html += '<td>' + x.text + '</td></tr>';
             }, log);
