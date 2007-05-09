@@ -10,9 +10,11 @@
 #include <cctype>
 #include <cstring>
 #include <iterator>
+#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <functional>
 
@@ -1008,6 +1010,33 @@ namespace augas {
         splitn(it, end, '&',
                detail::makeurlpairs(std::back_inserter(v)));
         return v;
+    }
+
+    template<typename T>
+    bool
+    getvalue(const std::map<std::string, std::string>& pairs,
+             const std::string& key, T& value)
+    {
+        std::map<std::string, std::string>
+            ::const_iterator it(pairs.find(key));
+        if (it == pairs.end())
+            return false;
+
+        std::istringstream ss(it->second);
+        if (!(ss >> value))
+            throw std::bad_cast();
+
+        return true;
+    }
+
+    template<typename T>
+    T
+    getvalue(const std::map<std::string, std::string>& pairs,
+             const std::string& key)
+    {
+        T value = T();
+        getvalue(pairs, key, value);
+        return value;
     }
 }
 

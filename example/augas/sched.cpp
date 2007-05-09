@@ -130,9 +130,10 @@ namespace {
     }
 
     ostream&
-    toxml(ostream& os, const tmqueue& q)
+    toxml(ostream& os, const tmqueue& q, unsigned offset, unsigned max)
     {
-        os << "<events>";
+        os << "<events offset=\"" << offset
+           << "\" total=\"" << q.size() << "\">";
         tmqueue::const_iterator it(q.begin()), end(q.end());
         for (; it != end; ++it) {
             tm tm;
@@ -183,15 +184,11 @@ namespace {
             }
         }
         void
-        delevent(const string& urlencoded)
+        delevent(const map<string, string>& params)
         {
-            map<string, string> params;
-            urlunpack(urlencoded.begin(), urlencoded.end(),
-                      inserter(params, params.begin()));
+            augas_id id(getvalue<augas_id>(params, "id"));
 
-            augas_id id(atoi(params["id"].c_str()));
             aug_info("deleting event: id=[%d]", (int)id);
-
             eraseevent(queue_, id);
 
             timeval tv;
@@ -199,13 +196,10 @@ namespace {
             settimer(tv);
         }
         void
-        putevent(const string& urlencoded)
+        putevent(const map<string, string>& params)
         {
-            map<string, string> params;
-            urlunpack(urlencoded.begin(), urlencoded.end(),
-                      inserter(params, params.begin()));
+            augas_id id(getvalue<augas_id>(params, "id"));
 
-            augas_id id(atoi(params["id"].c_str()));
             if (id) {
                 aug_info("updating event: id=[%d]", id);
                 eraseevent(queue_, id);
@@ -214,20 +208,42 @@ namespace {
                 id = aug_nextid();
             }
 
-            const string& spec(params["spec"]);
+            string name(getvalue<string>(params, "name"));
+            string spec(getvalue<string>(params, "spec"));
 
             tmtz tz(TMUTC);
-            if (params["tz"] == "local")
+            if (getvalue<string>(params, "tz") == "local")
                 tz = TMLOCAL;
 
             timeval tv;
             gettimeofday(tv);
 
-            tmeventptr ptr(new tmevent(id, params["name"], spec, tz));
+            tmeventptr ptr(new tmevent(id, name, spec, tz));
             if (aug_strtmspec(&ptr->tmspec_, spec.c_str()))
                 pushevent(queue_, tv.tv_sec, ptr);
 
             settimer(tv);
+        }
+        void
+        respond(const char* from, const char* type, const string& urlencoded)
+        {
+            map<string, string> params;
+            urlunpack(urlencoded.begin(), urlencoded.end(),
+                      inserter(params, params.begin()));
+
+            if (0 == strcmp(type, "http.sched.delevent")) {
+                delevent(params);
+            } else if (0 == strcmp(type, "http.sched.putevent")) {
+                putevent(params);
+            } else if (0 != strcmp(type, "http.sched.events"))
+                return;
+
+            unsigned offset(getvalue<unsigned>(params, "offset"));
+            unsigned max(getvalue<unsigned>(params, "max"));
+
+            stringstream ss;
+            toxml(ss, queue_, offset, max);
+            dispatch(from, "result", ss.str().c_str(), ss.str().size());
         }
         bool
         do_start(const char* sname)
@@ -267,16 +283,7 @@ namespace {
                 writelog(AUGAS_LOGINFO, "%s=%s", jt->first.c_str(),
                          jt->second.c_str());
 
-            if (0 == strcmp(type, "http.sched.delevent")) {
-                delevent(fields["content"]);
-            } else if (0 == strcmp(type, "http.sched.putevent")) {
-                putevent(fields["content"]);
-            } else if (0 != strcmp(type, "http.sched.events"))
-                return;
-
-            stringstream ss;
-            toxml(ss, queue_);
-            dispatch("http", "response", ss.str().c_str(), ss.str().size());
+            respond(from, type, fields["content"]);
         }
         void
         do_expire(const object& timer, unsigned& ms)

@@ -68,7 +68,7 @@ function Events(div, log) {
                 html += '<td>' + x.next + '</td></tr>';
             }, events);
 
-        for (var i = events.length; i < 10; ++i)
+        for (var i = events.length; i < 5; ++i)
             html += '<tr class="empty"><td colspan="4">&nbsp;</td></tr>';
 
         html += '</table>';
