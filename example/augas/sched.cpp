@@ -132,10 +132,12 @@ namespace {
     ostream&
     toxml(ostream& os, const tmqueue& q, unsigned offset, unsigned max)
     {
+        offset = std::min(offset, q.size());
+
         os << "<events offset=\"" << offset
            << "\" total=\"" << q.size() << "\">";
         tmqueue::const_iterator it(q.begin()), end(q.end());
-        for (; it != end; ++it) {
+        for (advance(it, offset); it != end && max; ++it, --max) {
             tm tm;
             os << "<event id=\"" << it->second->id_
                << "\" name=\"" << it->second->name_

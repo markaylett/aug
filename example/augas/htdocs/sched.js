@@ -95,8 +95,8 @@ function Events(div, log) {
 
         html += '</table>';
 
-        var prev = pager_.getPrevId();
-        var next = pager_.getNextId();
+        var prev = pager_.getPrevId(current);
+        var next = pager_.getNextId(current);
 
         html += '<p>';
         html += '<input class="action" type="button" value="prev"'
@@ -157,16 +157,17 @@ function Events(div, log) {
     this.delEvent = function(id) {
         log.add('info', 'del event: ' + id);
         pager_.setNearId(id);
-        getXml(parseXml, 'service/sched/delevent?id=' + escape(id));
+        getXml(parseXml, 'service/sched/delevent?'
+               + pager_.encodePairs([new Pair('id', id)]));
     };
 
     this.putEvent = function() {
         log.add('info', 'put event');
         getXml(parseXml, 'service/sched/putevent?'
-               + encodePairs([new Pair('id', pager_.getCurrentId()),
-                              getPairById('name'),
-                              getPairById('spec'),
-                              getPairById('tz')]));
+               + pager_.encodePairs([new Pair('id', pager_.getCurrentId()),
+                                     getPairById('name'),
+                                     getPairById('spec'),
+                                     getPairById('tz')]));
     };
 
     this.setCurrent = function(id) {

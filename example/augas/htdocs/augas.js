@@ -223,6 +223,11 @@ function Pager(refresh, request, max) {
 
     // Public functions.
 
+    this.encodePairs = function(pairs) {
+        return encodePairs([new Pair('offset', offset_),
+                            new Pair('max', max)].concat(pairs));
+    };
+
     // Callback function used for updating current page.
 
     this.setItems = function(items, offset, total) {
@@ -230,6 +235,31 @@ function Pager(refresh, request, max) {
         offset_ = offset;
         total_ = total;
         refresh(items, offset, total);
+    };
+
+    // Set current item.
+
+    this.setCurrentId = function(id) {
+        setCurrentId(id);
+        refresh(items_, offset_, total_);
+    };
+
+    // Set current item near to specified id - useful when deleting.
+
+    this.setNearId = function(id) {
+        this.setCurrentId(this.getNextId(id) || this.getPrevId(id));
+    };
+
+    // Move relative to current page offset.
+
+    this.movePage = function(n) {
+        request(itemsOffset(offset_, n), max);
+    };
+
+    // Set absolute page.
+
+    this.setPage = function(n) {
+        request(itemsOffset(0, n), max);
     };
 
     // Return current item's id.
@@ -276,30 +306,5 @@ function Pager(refresh, request, max) {
 
     this.getPages = function() {
         return Math.ceil(total_ / (max - 1));
-    };
-
-    // Set current item.
-
-    this.setCurrentId = function(id) {
-        setCurrentId(id);
-        refresh(items_, offset_, total_);
-    };
-
-    // Set current item near to specified id - useful when deleting.
-
-    this.setNearId = function(id) {
-        this.setCurrentId(this.getNextId(id) || this.getPrevId(id));
-    };
-
-    // Move relative to current page offset.
-
-    this.movePage = function(n) {
-        request(itemsOffset(offset_, n), max);
-    };
-
-    // Set absolute page.
-
-    this.setPage = function(n) {
-        request(itemsOffset(0, n), max);
     };
 }
