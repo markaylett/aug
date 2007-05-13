@@ -8,32 +8,13 @@ function Event(id, name, spec, tz, next) {
     this.next = next;
 }
 
-function Events(div, log) {
+function getEventParser(setEvents) {
 
-    var events = [];
-    var current = 0;
+    return function(xml) {
 
-    var getPrev = function() {
-        if (current) {
-            var pair = prevById(events, current);
-            if (pair)
-                return pair.value.id;
-        }
-        return null;
-    };
-
-    var getNext = function() {
-        if (current) {
-            var pair = nextById(events, current);
-            if (pair)
-                return pair.value.id;
-        }
-        return null;
-    };
-
-    var parseXml = function(xml) {
-
-        events = [];
+        var offset = xml.documentElement.getAttribute('offset');
+        var total = xml.documentElement.getAttribute('total');
+        var items = [];
 
         iterate(function(i, x) {
 
@@ -42,17 +23,58 @@ function Events(div, log) {
                 var spec = x.getAttribute('spec');
                 var tz = x.getAttribute('tz');
                 var next = x.childNodes[0].nodeValue;
-                events.push(new Event(id, name, spec, tz, next));
+                items.push(new Event(id, name, spec, tz, next));
 
             }, xml.getElementsByTagName('event'));
+
+        if (offset == null)
+            offset = 0;
+
+        if (total == null)
+            total = items.length;
+
+        setEvents(items, offset, total);
+    };
+}
+
+function Events(div, log) {
+
+    var pager_ = null;
+
+    var parseXml = function(xml) {
+
+        var offset = xml.documentElement.getAttribute('offset');
+        var total = xml.documentElement.getAttribute('total');
+        var items = [];
+
+        iterate(function(i, x) {
+
+                var id = x.getAttribute('id');
+                var name = x.getAttribute('name');
+                var spec = x.getAttribute('spec');
+                var tz = x.getAttribute('tz');
+                var next = x.childNodes[0].nodeValue;
+                items.push(new Event(id, name, spec, tz, next));
+
+            }, xml.getElementsByTagName('event'));
+
+        if (offset == null)
+            offset = 0;
+
+        if (total == null)
+            total = items.length;
+
+        pager_.setItems(items, offset, total);
     };
 
-    var displayTable = function() {
+    var refreshTable = function(items, offset, total) {
+
+        var current = pager_.getCurrentId();
 
         var html = '<table width="100%">'
-            + '<tr class="header"><th align="left">name</th>'
-            + '<th align="left">spec</th><th align="left">tz</th>'
-            + '<th align="left">next</th></tr>';
+        + '<tr class="header"><th align="left">name</th>'
+        + '<th align="left">spec</th><th align="left">tz</th>'
+        + '<th align="left">next</th></tr>';
 
         iterate(function(i, x) {
 
@@ -66,15 +88,15 @@ function Events(div, log) {
                 html += '<td>' + x.spec + '</td>';
                 html += '<td>' + x.tz + '</td>';
                 html += '<td>' + x.next + '</td></tr>';
-            }, events);
+            }, items);
 
-        for (var i = events.length; i < 5; ++i)
+        for (var i = items.length; i < 5; ++i)
             html += '<tr class="empty"><td colspan="4">&nbsp;</td></tr>';
 
         html += '</table>';
 
-        var prev = getPrev();
-        var next = getNext();
+        var prev = pager_.getPrevId();
+        var next = pager_.getNextId();
 
         html += '<p>';
         html += '<input class="action" type="button" value="prev"'
@@ -99,10 +121,12 @@ function Events(div, log) {
         div.innerHTML = html;
     };
 
-    var displayForm = function() {
+    var refreshForm = function(items, offset, total) {
+
+        var current = pager_.getCurrentId();
 
         var x = null;
-        if (current && (x = getById(events, current)))
+        if (current && (x = getById(items, current)))
             x = x.value;
         else {
             current = 0;
@@ -114,64 +138,63 @@ function Events(div, log) {
         document.getElementById('tz').value = x.tz;
     };
 
-    this.addXml = function(xml) {
-        log.addXml(xml);
-        parseXml(xml);
-        displayTable();
-        displayForm();
+    var refresh = function(items, offset, total) {
+        refreshTable(items, offset, total);
+        refreshForm(items, offset, total);
+    };
+
+    var request = function(offset, max) {
+        getXml(parseXml, 'service/sched/events?'
+               + encodePairs([new Pair('offset', offset),
+                              new Pair('max', max)]));
+    };
+
+    this.loadEvents = function() {
+        log.add('info', 'load events');
+        request(0, 5);
+    };
+
+    this.delEvent = function(id) {
+        log.add('info', 'del event: ' + id);
+        pager_.setNearId(id);
+        getXml(parseXml, 'service/sched/delevent?id=' + escape(id));
+    };
+
+    this.putEvent = function() {
+        log.add('info', 'put event');
+        getXml(parseXml, 'service/sched/putevent?'
+               + encodePairs([new Pair('id', pager_.getCurrentId()),
+                              getPairById('name'),
+                              getPairById('spec'),
+                              getPairById('tz')]));
     };
 
     this.setCurrent = function(id) {
-        current = id ? id : 0;
-        displayTable();
-        displayForm();
+        log.add('info', 'set current: ' + id);
+        pager_.setCurrentId(id);
     };
 
-    this.setPeer = function(id) {
-        var peer = getNext(id) || getPrev(id);
-        current = peer ? peer : 0;
-    };
-
-    this.getCurrent = function() {
-        return current;
-    };
-
-    this.encode = function() {
-        return encodeIds(encodePair('id', current), ['name', 'spec', 'tz']);
-    };
+    pager_ = new Pager(refresh, request, 5);
 }
 
 var log = null;
 var events = null;
-
-function reconf() {
-    log.add('info', 'reconf');
-    getXml('service/reconf', log.addXml);
-}
-
-function loadEvents() {
-    log.add('info', 'load events');
-    getXml('service/sched/events', events.addXml);
-}
-
-function delEvent(id) {
-    log.add('info', 'del event: ' + id);
-    getXml('service/sched/delevent?id=' + escape(id), events.addXml);
-    events.setPeer(id);
-}
-
-function putEvent() {
-    log.add('info', 'put event');
-    getXml('service/sched/putevent?' + events.encode(), events.addXml);
-}
-
-function setCurrent(id) {
-    log.add('info', 'set current: ' + id);
-    events.setCurrent(id);
-}
+var loadEvents = null;
+var delEvent = null;
+var putEvent = null;
+var setCurrent = null;
 
 function init() {
     log = new Log(document.getElementById('log'));
     events = new Events(document.getElementById('view'), log);
+    loadEvents = events.loadEvents;
+    delEvent = events.delEvent;
+    putEvent = events.putEvent;
+    setCurrent = events.setCurrent;
     loadEvents();
+}
+
+function reconf() {
+    log.add('info', 'reconf');
+    getXml(log.addXml, 'service/reconf');
 }
