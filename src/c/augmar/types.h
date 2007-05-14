@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
+   External type definitions.
    \file types.h
-   \brief External type definitions.
  */
 
 #ifndef AUGMAR_TYPES_H
@@ -15,13 +15,13 @@
 #include <stdarg.h>
 
 /**
-   \brief The message archive handle type.
+   The message archive handle type.
 */
 
 typedef struct aug_mar_* aug_mar_t;
 
 /**
-   \brief The field structure.
+   The field structure.
  */
 
 struct aug_field {

@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
+   TODO
    \file mar.hpp
-   \brief TODO
  */
 
 #ifndef AUGMARPP_MAR_HPP

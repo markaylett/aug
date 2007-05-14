@@ -18,6 +18,8 @@ AUGUTIL_API int
 aug_destroytimers(struct aug_timers* timers);
 
 /**
+   Create new timer.
+
    If id <= 0, a new id will be allocated.  Alternatively, a previously
    allocated timer id can be specified.  In which case, any timer with a
    matching id will be cancelled prior to setting the new timer.
@@ -25,6 +27,11 @@ aug_destroytimers(struct aug_timers* timers);
    If aug_settimer() succeeds, aug_destroyvar() will be called when the timer
    is removed.
 
+   \param timers TODO
+   \param id TODO
+   \param ms TODO
+   \param cb TODO
+   \param var TODO
    \return the timer id.
 */
 

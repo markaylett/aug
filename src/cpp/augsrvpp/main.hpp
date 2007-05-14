@@ -18,134 +18,172 @@
 
 namespace aug {
 
-    class service_base {
-
-        virtual const char*
-        do_getopt(enum aug_option opt) = 0;
-
-        virtual void
-        do_readconf(const char* conffile, bool prompt, bool daemon) = 0;
-
-        virtual void
-        do_init() = 0;
-
-        virtual void
-        do_run() = 0;
-
-        virtual void
-        do_term() = 0;
-
-    public:
-        virtual
-        ~service_base() AUG_NOTHROW
-        {
-        }
-
-        const char*
-        getopt(enum aug_option opt)
-        {
-            return do_getopt(opt);
-        }
-
-        void
-        readconf(const char* conffile, bool prompt, bool daemon)
-        {
-            do_readconf(conffile, prompt, daemon);
-        }
-
-        void
-        init()
-        {
-            do_init();
-        }
-
-        void
-        run()
-        {
-            do_run();
-        }
-
-        void
-        term()
-        {
-            do_term();
-        }
-    };
-
     namespace detail {
 
-        inline const char*
-        getopt(void* arg, enum aug_option opt)
-        {
-            try {
-                service_base* ptr = static_cast<service_base*>(arg);
-                return ptr->getopt(opt);
-            } AUG_SETERRINFOCATCH;
-            return 0;
-        }
-
-        inline int
-        readconf(void* arg, const char* conffile, int prompt, int daemon)
-        {
-            try {
-                service_base* ptr = static_cast<service_base*>(arg);
-                ptr->readconf(conffile, prompt ? true : false,
-                              daemon ? true : false);
+        template <typename T>
+        class servicestatic {
+            static const char*
+            getopt(void* arg, enum aug_option opt) AUG_NOTHROW
+            {
+                try {
+                    return T::getopt(arg, opt);
+                } AUG_SETERRINFOCATCH;
                 return 0;
-            } AUG_SETERRINFOCATCH;
-            return -1;
-        }
+            }
+            static int
+            readconf(void* arg, const char* conffile, int prompt,
+                     int daemon) AUG_NOTHROW
+            {
+                try {
+                    T::readconf(arg, conffile, prompt ? true : false,
+                                daemon ? true : false);
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static int
+            init(void* arg) AUG_NOTHROW
+            {
+                try {
+                    T::init(arg);
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static int
+            run(void* arg) AUG_NOTHROW
+            {
+                try {
+                    T::run(arg);
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static void
+            term(void* arg) AUG_NOTHROW
+            {
+                try {
+                    T::term(arg);
+                } AUG_PERRINFOCATCH;
+            }
 
-        inline int
-        init(void* arg)
-        {
-            try {
-                service_base* ptr = static_cast<service_base*>(arg);
-                ptr->init();
+        public:
+            static const aug_service&
+            get()
+            {
+                static const aug_service local = {
+                    getopt,
+                    readconf,
+                    init,
+                    run,
+                    term
+                };
+                return local;
+            }
+        };
+
+        template <typename T>
+        class servicenonstatic {
+            static const char*
+            getopt(void* arg, enum aug_option opt) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(arg)->getopt(opt);
+                } AUG_SETERRINFOCATCH;
                 return 0;
-            } AUG_SETERRINFOCATCH;
-            return -1;
-        }
+            }
+            static int
+            readconf(void* arg, const char* conffile, int prompt,
+                     int daemon) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(arg)
+                        ->readconf(conffile, prompt ? true : false,
+                                   daemon ? true : false);
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static int
+            init(void* arg) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(arg)->init();
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static int
+            run(void* arg) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(arg)->run();
+                    return 0;
+                } AUG_SETERRINFOCATCH;
+                return -1;
+            }
+            static void
+            term(void* arg) AUG_NOTHROW
+            {
+                try {
+                    static_cast<T*>(arg)->term();
+                } AUG_PERRINFOCATCH;
+            }
 
-        inline int
-        run(void* arg)
-        {
-            try {
-                service_base* ptr = static_cast<service_base*>(arg);
-                ptr->run();
-                return 0;
-            } AUG_SETERRINFOCATCH;
-            return -1;
-        }
+        public:
+            static const aug_service&
+            get()
+            {
+                static const aug_service local = {
+                    getopt,
+                    readconf,
+                    init,
+                    run,
+                    term
+                };
+                return local;
+            }
+        };
+    }
 
-        inline void
-        term(void* arg)
-        {
-            try {
-                service_base* ptr = static_cast<service_base*>(arg);
-                ptr->term();
-            } AUG_PERRINFOCATCH;
-        }
+    template <typename T>
+    const aug_service&
+    servicestatic()
+    {
+        return detail::servicestatic<T>::get();
+    }
+
+    template <typename T>
+    const aug_service&
+    servicenonstatic()
+    {
+        return detail::servicenonstatic<T>::get();
     }
 
     /**
        On Windows, the Service Manager calls the service entry point on a
        separate thread - automatic variables on the main thread's stack will
        not be visible from the service thread.  A shallow copy of the service
-       structure will be performed by aug_main().
+       structure is, therefore, performed by aug_main().
     */
 
     inline int
-    main(int argc, char* argv[], service_base& service)
+    main(int argc, char* argv[], const aug_service& service, void* arg)
     {
-        static const aug_service local = {
-            detail::getopt,
-            detail::readconf,
-            detail::init,
-            detail::run,
-            detail::term
-        };
-        return aug_main(argc, argv, &local, &service);
+        return aug_main(argc, argv, &service, arg);
+    }
+
+    inline int
+    main(int argc, char* argv[], const aug_service& service, const null_&)
+    {
+        return aug_main(argc, argv, &service, 0);
+    }
+
+    template <typename T>
+    int
+    main(int argc, char* argv[], T& x)
+    {
+        return aug_main(argc, argv, &servicenonstatic<T>(), &x);
     }
 }
 

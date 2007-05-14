@@ -838,12 +838,17 @@ namespace augas {
         return true;
     }
 
-    class service : public service_base {
+    class service {
 
         string pass64_;
 
+    public:
+        ~service() AUG_NOTHROW
+        {
+        }
+
         const char*
-        do_getopt(enum aug_option opt)
+        getopt(enum aug_option opt)
         {
             switch (opt) {
             case AUG_OPTCONFFILE:
@@ -863,7 +868,7 @@ namespace augas {
         }
 
         void
-        do_readconf(const char* conffile, bool prompt, bool daemon)
+        readconf(const char* conffile, bool prompt, bool daemon)
         {
             if (prompt) {
                 char pass[AUG_MAXPASSWORD + 1];
@@ -897,7 +902,7 @@ namespace augas {
         }
 
         void
-        do_init()
+        init()
         {
             AUG_DEBUG2("initialising daemon process");
 
@@ -919,7 +924,7 @@ namespace augas {
         }
 
         void
-        do_run()
+        run()
         {
             timer reopen(state_->timers_);
 
@@ -982,7 +987,7 @@ namespace augas {
         }
 
         void
-        do_term()
+        term()
         {
             AUG_DEBUG2("terminating daemon process");
 
@@ -997,10 +1002,6 @@ namespace augas {
             state_.reset();
         }
 
-    public:
-        ~service() AUG_NOTHROW
-        {
-        }
         bool
         nbfilecb(int fd, unsigned short events)
         {

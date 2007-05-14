@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
+   TODO
    \file seq.h
-   \brief TODO
  */
 
 #ifndef AUGMAR_SEQ_H_

@@ -50,7 +50,7 @@ namespace test {
         }
     }
 
-    class service : public service_base {
+    class service {
 
         struct state {
             mplexer mplexer_;
@@ -114,8 +114,19 @@ namespace test {
             aug_info("log level: %d", aug_loglevel());
         }
 
+    public:
+        ~service() AUG_NOTHROW
+        {
+        }
+
+        service()
+            : daemon_(false),
+              remain_(5)
+        {
+        }
+
         const char*
-        do_getopt(enum aug_option opt)
+        getopt(enum aug_option opt)
         {
             switch (opt) {
             case AUG_OPTCONFFILE:
@@ -135,7 +146,7 @@ namespace test {
         }
 
         void
-        do_readconf(const char* conffile, bool prompt, bool daemon)
+        readconf(const char* conffile, bool prompt, bool daemon)
         {
             if (conffile) {
                 aug_info("reading: %s", conffile);
@@ -154,7 +165,7 @@ namespace test {
         }
 
         void
-        do_init()
+        init()
         {
             aug_info("initialising daemon process");
 
@@ -166,7 +177,7 @@ namespace test {
         }
 
         void
-        do_run()
+        run()
         {
             timeval tv;
 
@@ -197,21 +208,10 @@ namespace test {
         }
 
         void
-        do_term()
+        term()
         {
             aug_info("terminating daemon process");
             state_.reset();
-        }
-
-    public:
-        ~service() AUG_NOTHROW
-        {
-        }
-
-        service()
-            : daemon_(false),
-              remain_(5)
-        {
         }
 
         void

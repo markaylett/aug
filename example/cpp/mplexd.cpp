@@ -215,7 +215,7 @@ namespace test {
         }
     };
 
-    class service : public service_base {
+    class service {
 
         auto_ptr<state> state_;
 
@@ -323,9 +323,13 @@ namespace test {
 
             return true;
         }
+    public:
+        ~service() AUG_NOTHROW
+        {
+        }
 
         const char*
-        do_getopt(enum aug_option opt)
+        getopt(enum aug_option opt)
         {
             switch (opt) {
             case AUG_OPTCONFFILE:
@@ -345,13 +349,13 @@ namespace test {
         }
 
         void
-        do_readconf(const char* conffile, bool prompt, bool daemon)
+        readconf(const char* conffile, bool prompt, bool daemon)
         {
             test::readconf(conffile, prompt, daemon);
         }
 
         void
-        do_init()
+        init()
         {
             aug_info("initialising daemon process");
 
@@ -362,7 +366,7 @@ namespace test {
         }
 
         void
-        do_run()
+        run()
         {
             timeval tv;
 
@@ -394,16 +398,12 @@ namespace test {
         }
 
         void
-        do_term()
+        term()
         {
             aug_info("terminating daemon process");
             state_.reset();
         }
 
-    public:
-        ~service() AUG_NOTHROW
-        {
-        }
         bool
         filecb(int fd)
         {

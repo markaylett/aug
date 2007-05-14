@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
-` \file utility.h
- `\brief TODO
+   TODO
+   \file utility.h
  */
 
 #ifndef MAR_UTILITY_H

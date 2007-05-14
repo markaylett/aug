@@ -11,8 +11,8 @@ struct aug_service;
 /**
    On Windows, the Service Manager calls the service entry point on a separate
    thread - automatic variables on the main thread's stack will not be visible
-   from the service thread.  A shallow copy of the service structure will be
-   performed.
+   from the service thread.  A shallow copy of the service structure is,
+   therefore, performed by aug_main().
 */
 
 AUGSRV_API int

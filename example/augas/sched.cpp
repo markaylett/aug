@@ -130,14 +130,14 @@ namespace {
     }
 
     ostream&
-    toxml(ostream& os, const tmqueue& q, unsigned offset, unsigned max)
+    toxml(ostream& os, const tmqueue& q, unsigned offset, unsigned max_)
     {
-        offset = std::min(offset, q.size());
+        offset = AUG_MIN(offset, q.size());
 
         os << "<events offset=\"" << offset
-           << "\" total=\"" << q.size() << "\">";
+           << "\" total=\"" << static_cast<unsigned>(q.size()) << "\">";
         tmqueue::const_iterator it(q.begin()), end(q.end());
-        for (advance(it, offset); it != end && max; ++it, --max) {
+        for (advance(it, offset); it != end && max_; ++it, --max_) {
             tm tm;
             os << "<event id=\"" << it->second->id_
                << "\" name=\"" << it->second->name_
@@ -241,10 +241,10 @@ namespace {
                 return;
 
             unsigned offset(getvalue<unsigned>(params, "offset"));
-            unsigned max(getvalue<unsigned>(params, "max"));
+            unsigned max_(getvalue<unsigned>(params, "max"));
 
             stringstream ss;
-            toxml(ss, queue_, offset, max);
+            toxml(ss, queue_, offset, max_);
             dispatch(from, "result", ss.str().c_str(), ss.str().size());
         }
         bool

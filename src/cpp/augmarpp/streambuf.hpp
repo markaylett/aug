@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
+   TODO
    \file streambuf.h
-   \brief TODO
  */
 
 #ifndef AUGMARPP_STREAMBUF_HPP

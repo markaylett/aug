@@ -85,11 +85,12 @@ struct augas_object {
 struct augas_host {
 
     /**
-     * The following functions are thread-safe.
+       The following functions are thread-safe.
      */
 
     /**
-       \brief Write message to the application server's log.
+       Write message to the application server's log.
+
        \param level TODO
        \param format TODO
        \param ... TODO
@@ -99,7 +100,8 @@ struct augas_host {
     void (*writelog_)(int level, const char* format, ...);
 
     /**
-       \brief Write message to the application server's log.
+       Write message to the application server's log.
+
        \param level TODO
        \param format TODO
        \param args TODO
@@ -110,17 +112,19 @@ struct augas_host {
     void (*vwritelog_)(int level, const char* format, va_list args);
 
     /**
-       \brief Get a description of the last host error.
-       \return The error description.
+       Get a description of the last host error.
 
        If the return values of any host function indicates failure, this
        function can be used to obtain a description of the error.
+
+       \return The error description.
     */
 
     const char* (*error_)(void);
 
     /**
-       \brief Re-configure the host and all loaded modules.
+       Re-configure the host and all loaded modules.
+
        \return TODO
        \sa stopall_().
     */
@@ -128,7 +132,8 @@ struct augas_host {
     int (*reconfall_)(void);
 
     /**
-       \brief Stop the application server.
+       Stop the application server.
+
        \return TODO
        \sa reconfall_().
     */
@@ -136,7 +141,8 @@ struct augas_host {
     int (*stopall_)(void);
 
     /**
-       \brief Post an event to the event queue.
+       Post an event to the event queue.
+
        \param to TODO
        \param type TODO
        \param var TODO
@@ -148,11 +154,12 @@ struct augas_host {
                  const struct augas_var* var);
 
     /**
-     * The remaining functions are not thread-safe.
+       The remaining functions are not thread-safe.
      */
 
     /**
-       \brief Dispatch event to peer service.
+       Dispatch event to peer service.
+
        \param to TODO
        \param type TODO
        \param user TODO
@@ -165,20 +172,22 @@ struct augas_host {
                      size_t size);
 
     /**
-       \brief Read a configuration value.
+       Read a configuration value.
+
+       If the specified value does not exist in the configuration file, an
+       attempt will be made to read the value from the environment table.
+
        \param name TODO
        \param def TODO
        \return TODO
        \sa TODO
-
-       If the specified value does not exist in the configuration file, an
-       attempt will be made to read the value from the environment table.
     */
 
     const char* (*getenv_)(const char* name, const char* def);
 
     /**
-       \brief Get the active service.
+       Get the active service.
+
        \return TODO
        \sa TODO
     */
@@ -186,7 +195,8 @@ struct augas_host {
     const struct augas_serv* (*getserv_)(void);
 
     /**
-       \brief TODO
+       Shutdown the connection.
+
        \param cid TODO
        \return TODO
        \sa TODO
@@ -195,21 +205,23 @@ struct augas_host {
     int (*shutdown_)(augas_id cid);
 
     /**
-       \brief TODO
+       Establish tcp connection.
+
+       This function will always return with the connection-id before the
+       module is notified of connection establishment.
+
        \param host Ip address or host name.
        \param port Port or service name.
        \param user User data to be associated with the resulting connection.
        \return The connection id.
        \sa TODO
-
-       This function will always return with the connection-id before the
-       module is notified of connection establishment.
     */
 
     int (*tcpconnect_)(const char* host, const char* port, void* user);
 
     /**
-       \brief TODO
+       Bind tcp listener socket.
+
        \param host TODO
        \param port TODO
        \param user TODO
@@ -220,22 +232,24 @@ struct augas_host {
     int (*tcplisten_)(const char* host, const char* port, void* user);
 
     /**
-       \brief TODO
+       Send data to peer.
+
+       Data may be written to a client connection that has not been fully
+       established.  In which case, the data will be buffered for writing once
+       the connection has been established.
+
        \param cid TODO
        \param buf TODO
        \param len TODO
        \return TODO
        \sa TODO
-
-       Data may be written to a client connection that has not been fully
-       established.  In which case, the data will be buffered for writing once
-       the connection has been established.
     */
 
     int (*send_)(augas_id cid, const void* buf, size_t len);
 
     /**
-       \brief TODO
+       Send data to peer.
+
        \param cid TODO
        \param var TODO
        \return TODO
@@ -245,7 +259,8 @@ struct augas_host {
     int (*sendv_)(augas_id cid, const struct augas_var* var);
 
     /**
-       \brief TODO
+       Set read/write timer.
+
        \param cid TODO
        \param ms TODO
        \param flags TODO
@@ -256,7 +271,8 @@ struct augas_host {
     int (*setrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
 
     /**
-       \brief TODO
+       Reset read/write timer.
+
        \param cid TODO
        \param ms TODO
        \param flags TODO
@@ -267,7 +283,8 @@ struct augas_host {
     int (*resetrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
 
     /**
-       \brief TODO
+       Cancel read/write timer.
+
        \param cid TODO
        \param flags TODO
        \return TODO
@@ -278,7 +295,8 @@ struct augas_host {
 
 
     /**
-       \brief TODO
+       Create new timer.
+
        \param ms TODO
        \param var TODO
        \return TODO
@@ -288,7 +306,8 @@ struct augas_host {
     int (*settimer_)(unsigned ms, const struct augas_var* var);
 
     /**
-       \brief TODO
+       Reset timer.
+
        \param tid TODO
        \param ms TODO
        \return TODO
@@ -298,7 +317,8 @@ struct augas_host {
     int (*resettimer_)(augas_id tid, unsigned ms);
 
     /**
-       \brief TODO
+       Cancel timer.
+
        \param tid TODO
        \return TODO
        \sa TODO
@@ -307,7 +327,8 @@ struct augas_host {
     int (*canceltimer_)(augas_id tid);
 
     /**
-       \brief TODO
+       Set ssl client.
+
        \param cid TODO
        \param ctx TODO
        \return TODO
@@ -317,7 +338,8 @@ struct augas_host {
     int (*setsslclient_)(augas_id cid, const char* ctx);
 
     /**
-       \brief TODO
+       Set ssl server.
+
        \param cid TODO
        \param ctx TODO
        \return TODO
@@ -336,7 +358,8 @@ struct augas_host {
 struct augas_module {
 
     /**
-       \brief Stop service.
+       Stop service.
+
        \return TODO
        \sa TODO
     */
@@ -344,7 +367,8 @@ struct augas_module {
     void (*stop_)(void);
 
     /**
-       \brief Start service.
+       Start service.
+
        \return TODO
        \sa TODO
     */
@@ -352,7 +376,8 @@ struct augas_module {
     int (*start_)(struct augas_serv* serv);
 
     /**
-       \brief Re-configure request.
+       Re-configure request.
+
        \return TODO
        \sa TODO
     */
@@ -360,7 +385,8 @@ struct augas_module {
     void (*reconf_)(void);
 
     /**
-       \brief Custom event notification.
+       Custom event notification.
+
        \param from TODO
        \param type TODO
        \param user TODO
@@ -373,7 +399,8 @@ struct augas_module {
                    size_t size);
 
     /**
-       \brief Connection closure.
+       Connection closure.
+
        \param sock TODO
        \return TODO
        \sa TODO
@@ -382,7 +409,8 @@ struct augas_module {
     void (*closed_)(const struct augas_object* sock);
 
     /**
-       \brief Teardown request.
+       Teardown request.
+
        \param sock TODO
        \return TODO
        \sa TODO
@@ -391,7 +419,8 @@ struct augas_module {
     void (*teardown_)(const struct augas_object* sock);
 
     /**
-       \brief Acceptance of socket connection.
+       Acceptance of socket connection.
+
        \param sock TODO
        \param addr TODO
        \param port TODO
@@ -403,7 +432,8 @@ struct augas_module {
                    unsigned short port);
 
     /**
-       \brief Completion of client connection handshake.
+       Completion of client connection handshake.
+
        \param sock TODO
        \param addr TODO
        \param port TODO
@@ -415,7 +445,8 @@ struct augas_module {
                        unsigned short port);
 
     /**
-       \brief Inbound data.
+       Inbound data.
+
        \param sock TODO
        \param buf TODO
        \param len TODO
@@ -427,7 +458,8 @@ struct augas_module {
                   size_t len);
 
     /**
-       \brief Expiry of read timer.
+       Expiry of read timer.
+
        \param sock TODO
        \param ms TODO
        \return TODO
@@ -437,7 +469,8 @@ struct augas_module {
     void (*rdexpire_)(const struct augas_object* sock, unsigned* ms);
 
     /**
-       \brief Expiry of write timer.
+       Expiry of write timer.
+
        \param sock TODO
        \param ms TODO
        \return TODO
@@ -447,7 +480,8 @@ struct augas_module {
     void (*wrexpire_)(const struct augas_object* sock, unsigned* ms);
 
     /**
-       \brief Timer expiry.
+       Timer expiry.
+
        \param timer TODO
        \param ms TODO
        \return TODO
@@ -457,7 +491,8 @@ struct augas_module {
     void (*expire_)(const struct augas_object* timer, unsigned* ms);
 
     /**
-       \brief Authorisation of peer certificate.
+       Authorisation of peer certificate.
+
        \param sock TODO
        \param subject TODO
        \param issuer TODO

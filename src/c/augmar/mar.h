@@ -3,8 +3,8 @@
 */
 
 /**
+   The MAR API header file.
    \file mar.h
-   \brief The MAR API header file.
 */
 
 #ifndef AUGMAR_MAR_H
@@ -14,7 +14,7 @@
 #include "augmar/types.h"
 
 /**
-   \brief Copy an existing message archive.
+   Copy an existing message archive.
 
    \param dst A handle to the destination message archive.
 
@@ -30,7 +30,7 @@ AUGMAR_API int
 aug_copymar(aug_mar_t dst, aug_mar_t src);
 
 /**
-   \brief Create an in-memory message archive.
+   Create an in-memory message archive.
 
    \return A handle to the newly created message archive or NULL on failure,
    in which case errno can be used to determine the error.
@@ -42,7 +42,7 @@ AUGMAR_API aug_mar_t
 aug_createmar(void);
 
 /**
-   \brief Create or open a file-based message archive.
+   Create or open a file-based message archive.
 
    \param path A path to the file to be created or opened.
 
@@ -61,7 +61,7 @@ AUGMAR_API aug_mar_t
 aug_openmar(const char* path, int flags, ...);
 
 /**
-   \brief Release message archive handle.
+   Release message archive handle.
 
    This function must be used to release handles allocated by either the
    aug_createmar() or aug_openmar() functions.
@@ -78,7 +78,7 @@ AUGMAR_API int
 aug_releasemar(aug_mar_t mar);
 
 /**
-   \brief Retain additional reference to message archive handle.
+   Retain additional reference to message archive handle.
 
    \param mar A handle to the message archive.
 
@@ -92,7 +92,7 @@ AUGMAR_API int
 aug_retainmar(aug_mar_t mar);
 
 /**
-   \brief Compact any unused space within message archive.
+   Compact any unused space within message archive.
 
    \param mar A handle to the message archive.
 
@@ -106,7 +106,7 @@ AUGMAR_API int
 aug_compactmar(aug_mar_t mar);
 
 /**
-   \brief Remove all fields contained within message archive.
+   Remove all fields contained within message archive.
 
    \param mar A handle to the message archive.
 
@@ -120,7 +120,7 @@ AUGMAR_API int
 aug_removefields(aug_mar_t mar);
 
 /**
-   \brief Set field within message archive.
+   Set field within message archive.
 
    \param mar A handle to the message archive.
 
@@ -140,7 +140,7 @@ AUGMAR_API int
 aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord);
 
 /**
-   \brief Set field value within message archive.
+   Set field value within message archive.
 
    \param mar A handle to the message archive.
 
@@ -160,7 +160,7 @@ AUGMAR_API int
 aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size);
 
 /**
-   \brief Unset field (by name) within message archive.
+   Unset field (by name) within message archive.
 
    \param mar A handle to the message archive.
 
@@ -179,7 +179,7 @@ AUGMAR_API int
 aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord);
 
 /**
-   \brief Unset field (by ordinal) within message archive.
+   Unset field (by ordinal) within message archive.
 
    \param mar A handle to the message archive.
 
@@ -195,7 +195,7 @@ AUGMAR_API int
 aug_unsetbyord(aug_mar_t mar, unsigned ord);
 
 /**
-   \brief Obtain field value (by name) from message archive.
+   Obtain field value (by name) from message archive.
 
    \param mar A handle to the message archive.
 
@@ -214,7 +214,7 @@ AUGMAR_API const void*
 aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size);
 
 /**
-   \brief Obtain field value (by ordinal) from message archive.
+   Obtain field value (by ordinal) from message archive.
 
    \param mar A handle to the message archive.
 
@@ -233,7 +233,7 @@ AUGMAR_API const void*
 aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size);
 
 /**
-   \brief Obtain field from message archive.
+   Obtain field from message archive.
 
    \param mar A handle to the message archive.
 
@@ -251,7 +251,7 @@ AUGMAR_API int
 aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord);
 
 /**
-   \brief Obtain the number of fields contained within message archive.
+   Obtain the number of fields contained within message archive.
 
    \param mar A handle to the message archive.
 
@@ -268,7 +268,7 @@ AUGMAR_API int
 aug_getfields(aug_mar_t mar, unsigned* size);
 
 /**
-   \brief Obtain field name from ordinal position in message archive.
+   Obtain field name from ordinal position in message archive.
 
    \param mar A handle to the message archive.
 
@@ -286,7 +286,7 @@ AUGMAR_API int
 aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord);
 
 /**
-   \brief Obtain ordinal position from field name in message archive.
+   Obtain ordinal position from field name in message archive.
 
    \param mar A handle to the message archive.
 
@@ -305,7 +305,7 @@ AUGMAR_API int
 aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name);
 
 /**
-   \brief Insert file into body content of message archive.
+   Insert file into body content of message archive.
 
    \param mar A handle to the message archive.
 
@@ -321,7 +321,7 @@ AUGMAR_API int
 aug_insertmar(aug_mar_t mar, const char* path);
 
 /**
-   \brief Reposition content offset within message archive.
+   Reposition content offset within message archive.
 
    \param mar A handle to the message archive.
 
@@ -341,7 +341,7 @@ AUGMAR_API off_t
 aug_seekmar(aug_mar_t mar, off_t offset, int whence);
 
 /**
-   \brief Set content within message archive.
+   Set content within message archive.
 
    \param mar A handle to the message archive.
 
@@ -359,7 +359,7 @@ AUGMAR_API int
 aug_setcontent(aug_mar_t mar, const void* cdata, unsigned size);
 
 /**
-   \brief Flush message archive buffers.
+   Flush message archive buffers.
 
    \param mar A handle to the message archive.
 
@@ -371,7 +371,7 @@ AUGMAR_API int
 aug_syncmar(aug_mar_t mar);
 
 /**
-   \brief Truncate content within message archive.
+   Truncate content within message archive.
 
    \param mar A handle to the message archive.
 
@@ -385,7 +385,7 @@ AUGMAR_API int
 aug_truncatemar(aug_mar_t mar, unsigned size);
 
 /**
-   \brief Write content to message archive.
+   Write content to message archive.
 
    \param mar A handle to the message archive.
 
@@ -403,7 +403,7 @@ AUGMAR_API int
 aug_writemar(aug_mar_t mar, const void* buf, unsigned len);
 
 /**
-   \brief Extract content from message archive into file.
+   Extract content from message archive into file.
 
    \param mar A handle to the message archive.
 
@@ -419,7 +419,7 @@ AUGMAR_API int
 aug_extractmar(aug_mar_t mar, const char* path);
 
 /**
-   \brief Obtain content from message archive.
+   Obtain content from message archive.
 
    \param mar A handle to the message archive.
 
@@ -436,7 +436,7 @@ AUGMAR_API const void*
 aug_content(aug_mar_t mar, unsigned* size);
 
 /**
-   \brief Read content from message archive.
+   Read content from message archive.
 
    \param mar A handle to the message archive.
 
@@ -455,7 +455,7 @@ AUGMAR_API int
 aug_readmar(aug_mar_t mar, void* buf, unsigned len);
 
 /**
-   \brief Obtain size of content within message archive.
+   Obtain size of content within message archive.
 
    \param mar A handle to the message archive.
 
