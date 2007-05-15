@@ -60,13 +60,60 @@ enum augas_loglevel {
     AUGAS_LOGDEBUG
 };
 
+/**
+   \defgroup TimerFlags Timer Flags
+   \{
+*/
+
+/**
+   Read timer.
+ */
+
 #define AUGAS_TIMRD    0x01
+
+/**
+   Write timer.
+ */
+
 #define AUGAS_TIMWR    0x02
+
+/**
+   Both read and write timer.
+ */
+
 #define AUGAS_TIMBOTH (AUGAS_TIMRD | AUGAS_TIMWR)
 
+/**
+   \}
+ */
+
+/**
+   \defgroup ReturnCodes Return Codes
+   \{
+*/
+
+
+/**
+   Success.
+ */
+
 #define AUGAS_OK        0
+
+/**
+   Failure.
+ */
+
 #define AUGAS_ERROR   (-1)
+
+/**
+   None, empty or null depending on context.
+ */
+
 #define AUGAS_NONE    (-2)
+
+/**
+   /}
+ */
 
 #define AUGAS_MAXNAME  63
 
@@ -91,10 +138,10 @@ struct augas_host {
     /**
        Write message to the application server's log.
 
-       \param level TODO
-       \param format TODO
-       \param ... TODO
-       \sa vwritelog_().
+       \param level The log level.
+       \param format Printf-style specification.
+       \param ... Arguments to format specification.
+       \sa #augas_loglevel, vwritelog_().
     */
 
     void (*writelog_)(int level, const char* format, ...);
@@ -102,11 +149,10 @@ struct augas_host {
     /**
        Write message to the application server's log.
 
-       \param level TODO
-       \param format TODO
-       \param args TODO
-       \return TODO
-       \sa writelog_().
+       \param level The log level.
+       \param format Printf-style specification.
+       \param ... Arguments to format specification.
+       \sa #augas_loglevel, writelog_().
     */
 
     void (*vwritelog_)(int level, const char* format, va_list args);
@@ -125,7 +171,6 @@ struct augas_host {
     /**
        Re-configure the host and all loaded modules.
 
-       \return TODO
        \sa stopall_().
     */
 
@@ -134,7 +179,6 @@ struct augas_host {
     /**
        Stop the application server.
 
-       \return TODO
        \sa reconfall_().
     */
 
@@ -143,11 +187,10 @@ struct augas_host {
     /**
        Post an event to the event queue.
 
-       \param to TODO
-       \param type TODO
-       \param var TODO
-       \return TODO
-       \sa TODO
+       \param to Target service name.
+       \param type Type name associated with "var".
+       \param var User data.
+       \sa dispatch_()
     */
 
     int (*post_)(const char* to, const char* type,
@@ -155,16 +198,15 @@ struct augas_host {
 
     /**
        The remaining functions are not thread-safe.
-     */
+    */
 
     /**
        Dispatch event to peer service.
 
-       \param to TODO
-       \param type TODO
-       \param user TODO
-       \param size TODO
-       \return TODO
+       \param to Target service name.
+       \param type Type name associated with "user".
+       \param user User data.
+       \param size Size of user data.
        \sa post_()
     */
 
@@ -177,19 +219,15 @@ struct augas_host {
        If the specified value does not exist in the configuration file, an
        attempt will be made to read the value from the environment table.
 
-       \param name TODO
-       \param def TODO
-       \return TODO
-       \sa TODO
+       \param name Name or key of desired value.
+       \param def The value to return by default.
+       \return The default value if no value exists for name.
     */
 
     const char* (*getenv_)(const char* name, const char* def);
 
     /**
        Get the active service.
-
-       \return TODO
-       \sa TODO
     */
 
     const struct augas_serv* (*getserv_)(void);
@@ -197,9 +235,7 @@ struct augas_host {
     /**
        Shutdown the connection.
 
-       \param cid TODO
-       \return TODO
-       \sa TODO
+       \param cid Connection id.
     */
 
     int (*shutdown_)(augas_id cid);
@@ -214,7 +250,6 @@ struct augas_host {
        \param port Port or service name.
        \param user User data to be associated with the resulting connection.
        \return The connection id.
-       \sa TODO
     */
 
     int (*tcpconnect_)(const char* host, const char* port, void* user);
@@ -222,11 +257,9 @@ struct augas_host {
     /**
        Bind tcp listener socket.
 
-       \param host TODO
-       \param port TODO
-       \param user TODO
-       \return TODO
-       \sa TODO
+       \param host Host to be bound.
+       \param port Port to be bound.
+       \param user User data.
     */
 
     int (*tcplisten_)(const char* host, const char* port, void* user);
@@ -238,11 +271,9 @@ struct augas_host {
        established.  In which case, the data will be buffered for writing once
        the connection has been established.
 
-       \param cid TODO
-       \param buf TODO
-       \param len TODO
-       \return TODO
-       \sa TODO
+       \param cid Connection id.
+       \param buf Data buffer.
+       \param len Length of data buffer.
     */
 
     int (*send_)(augas_id cid, const void* buf, size_t len);
@@ -250,10 +281,8 @@ struct augas_host {
     /**
        Send data to peer.
 
-       \param cid TODO
-       \param var TODO
-       \return TODO
-       \sa TODO
+       \param cid Connection id.
+       \param var User data.
     */
 
     int (*sendv_)(augas_id cid, const struct augas_var* var);
@@ -261,11 +290,9 @@ struct augas_host {
     /**
        Set read/write timer.
 
-       \param cid TODO
-       \param ms TODO
-       \param flags TODO
-       \return TODO
-       \sa TODO
+       \param cid Connection id.
+       \param ms Timeout value in milliseconds.
+       \param flags \ref TimerFlags.
     */
 
     int (*setrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
@@ -273,11 +300,9 @@ struct augas_host {
     /**
        Reset read/write timer.
 
-       \param cid TODO
-       \param ms TODO
-       \param flags TODO
-       \return TODO
-       \sa TODO
+       \param cid Connection id.
+       \param ms Timeout value in milliseconds.
+       \param flags \ref TimerFlags.
     */
 
     int (*resetrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
@@ -285,10 +310,8 @@ struct augas_host {
     /**
        Cancel read/write timer.
 
-       \param cid TODO
-       \param flags TODO
-       \return TODO
-       \sa TODO
+       \param cid Connection id.
+       \param flags \ref TimerFlags.
     */
 
     int (*cancelrwtimer_)(augas_id cid, unsigned flags);
@@ -297,10 +320,8 @@ struct augas_host {
     /**
        Create new timer.
 
-       \param ms TODO
-       \param var TODO
-       \return TODO
-       \sa TODO
+       \param ms Timeout value in milliseconds.
+       \param var User data.
     */
 
     int (*settimer_)(unsigned ms, const struct augas_var* var);
@@ -308,10 +329,8 @@ struct augas_host {
     /**
        Reset timer.
 
-       \param tid TODO
-       \param ms TODO
-       \return TODO
-       \sa TODO
+       \param tid Timer id.
+       \param ms Timeout value in milliseconds.
     */
 
     int (*resettimer_)(augas_id tid, unsigned ms);
@@ -319,9 +338,7 @@ struct augas_host {
     /**
        Cancel timer.
 
-       \param tid TODO
-       \return TODO
-       \sa TODO
+       \param tid Timer id.
     */
 
     int (*canceltimer_)(augas_id tid);
@@ -329,10 +346,8 @@ struct augas_host {
     /**
        Set ssl client.
 
-       \param cid TODO
-       \param ctx TODO
-       \return TODO
-       \sa TODO
+       \param cid Connection id.
+       \param ctx SSL context.
     */
 
     int (*setsslclient_)(augas_id cid, const char* ctx);
@@ -340,10 +355,8 @@ struct augas_host {
     /**
        Set ssl server.
 
-       \param cid TODO
-       \param ctx TODO
-       \return TODO
-       \sa TODO
+       \param cid Connection id.
+       \param ctx SSL context.
     */
 
     int (*setsslserver_)(augas_id cid, const char* ctx);
@@ -359,27 +372,18 @@ struct augas_module {
 
     /**
        Stop service.
-
-       \return TODO
-       \sa TODO
     */
 
     void (*stop_)(void);
 
     /**
        Start service.
-
-       \return TODO
-       \sa TODO
     */
 
     int (*start_)(struct augas_serv* serv);
 
     /**
        Re-configure request.
-
-       \return TODO
-       \sa TODO
     */
 
     void (*reconf_)(void);
@@ -391,8 +395,6 @@ struct augas_module {
        \param type TODO
        \param user TODO
        \param size TODO
-       \return TODO
-       \sa TODO
     */
 
     void (*event_)(const char* from, const char* type, const void* user,
@@ -402,8 +404,6 @@ struct augas_module {
        Connection closure.
 
        \param sock TODO
-       \return TODO
-       \sa TODO
     */
 
     void (*closed_)(const struct augas_object* sock);
@@ -412,8 +412,6 @@ struct augas_module {
        Teardown request.
 
        \param sock TODO
-       \return TODO
-       \sa TODO
     */
 
     void (*teardown_)(const struct augas_object* sock);
@@ -424,8 +422,6 @@ struct augas_module {
        \param sock TODO
        \param addr TODO
        \param port TODO
-       \return TODO
-       \sa TODO
     */
 
     int (*accept_)(struct augas_object* sock, const char* addr,
@@ -437,8 +433,6 @@ struct augas_module {
        \param sock TODO
        \param addr TODO
        \param port TODO
-       \return TODO
-       \sa TODO
     */
 
     void (*connected_)(struct augas_object* sock, const char* addr,
@@ -450,8 +444,6 @@ struct augas_module {
        \param sock TODO
        \param buf TODO
        \param len TODO
-       \return TODO
-       \sa TODO
     */
 
     void (*data_)(const struct augas_object* sock, const void* buf,
@@ -462,8 +454,6 @@ struct augas_module {
 
        \param sock TODO
        \param ms TODO
-       \return TODO
-       \sa TODO
     */
 
     void (*rdexpire_)(const struct augas_object* sock, unsigned* ms);
@@ -473,8 +463,6 @@ struct augas_module {
 
        \param sock TODO
        \param ms TODO
-       \return TODO
-       \sa TODO
     */
 
     void (*wrexpire_)(const struct augas_object* sock, unsigned* ms);
@@ -484,8 +472,6 @@ struct augas_module {
 
        \param timer TODO
        \param ms TODO
-       \return TODO
-       \sa TODO
     */
 
     void (*expire_)(const struct augas_object* timer, unsigned* ms);
@@ -496,8 +482,6 @@ struct augas_module {
        \param sock TODO
        \param subject TODO
        \param issuer TODO
-       \return TODO
-       \sa TODO
     */
 
     int (*authcert_)(const struct augas_object* sock, const char* subject,

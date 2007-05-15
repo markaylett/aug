@@ -1,10 +1,9 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-
 /**
-   The MAR API header file.
    \file mar.h
+   The MAR API header file.
 */
 
 #ifndef AUGMAR_MAR_H

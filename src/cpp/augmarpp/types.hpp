@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
-   TODO
    \file types.hpp
+   TODO
  */
 
 #ifndef AUGMARPP_TYPES_HPP

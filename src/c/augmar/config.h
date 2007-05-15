@@ -2,9 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
-   Definitions of the storage class macros.
-
    \file config.h
+   Definitions of the storage class macros.
  */
 #ifndef AUGMAR_CONFIG_H
 #define AUGMAR_CONFIG_H

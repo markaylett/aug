@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
-   TODO
    \file body.h
+   TODO
  */
 #ifndef AUGMAR_BODY_H_
 #define AUGMAR_BODY_H_

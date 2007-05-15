@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
-   TODO
    \file compat.hpp
+   TODO
  */
 
 #ifndef AUGMARPP_COMPAT_HPP

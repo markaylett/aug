@@ -42,8 +42,9 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
 /**
    On failure, the timer will be removed.
 
-   \param ms may be zero, it which case the previous timeout value will be
-   used.
+   \param timers The timer list.
+   \param id Timer identifier.
+   \param ms If zero, the previous timeout value will be used.
 
    \return #AUG_RETNONE if the timer does not exist.
 */
@@ -52,22 +53,45 @@ AUGUTIL_API int
 aug_resettimer(struct aug_timers* timers, int id, unsigned ms);
 
 /**
+   Cancel timer.
+
+   \param timers The timer list.
+   \param id Timer identifier.
    \return #AUG_RETNONE if the timer does not exist.
 */
 
 AUGUTIL_API int
 aug_canceltimer(struct aug_timers* timers, int id);
 
+/**
+   Check whether timer has expired.
+
+   \param timers The timer list.
+   \param id Timer identifier.
+   \return Boolean.
+*/
+
 AUGUTIL_API int
 aug_expired(struct aug_timers* timers, int id);
 
 /**
+   Iterate through expired timers.
+
    The force flag forces, at least, the first timer to expire.  This can be
    especially useful when used in combination with a call to
    aug_waitfdevents().  Each expired timer will be removed from the list of
    timers prior to calling the callback function.  If the callback function
    returns with a number of milli-seconds greater than zero, the timer will be
    re-scheduled with the same id.
+
+   \param timers The timer list.
+   \param id Timer identifier.
+
+   \param force Boolean indicated whether first timer should be forced to
+   expire.
+
+   \param next Optional output parameter.  If specified will be populated with
+   next expiry time.
 */
 
 AUGUTIL_API int

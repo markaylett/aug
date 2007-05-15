@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
-   TODO
    \file stream.hpp
+   TODO
  */
 
 #ifndef AUGMARPP_STREAM_HPP

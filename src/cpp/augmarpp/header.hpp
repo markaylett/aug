@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
-   TODO
    \file header.hpp
+   TODO
  */
 
 #ifndef AUGMARPP_HEADER_HPP

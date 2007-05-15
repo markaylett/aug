@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
-   TODO
    \file iterator.hpp
+   TODO
  */
 
 #ifndef AUGMARPP_ITERATOR_HPP

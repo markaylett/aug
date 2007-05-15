@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 /**
-   External type definitions.
    \file types.h
+   External type definitions.
  */
 
 #ifndef AUGMAR_TYPES_H
@@ -84,7 +84,9 @@ struct aug_field {
    Error if create and file exists.
 */
 #define AUG_EXCL   O_EXCL
-/* \} */
+/**
+   \}
+*/
 
 /**
    \defgroup SeekWhence Seek Whence
@@ -105,6 +107,8 @@ struct aug_field {
    The offset is set to the size of the file plus offset bytes.
 */
 #define AUG_END 2
-/* \} */
+/**
+  \}
+*/
 
 #endif /* AUGMAR_TYPES_H */
