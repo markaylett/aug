@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGAS_BUILD
-#include "augas/serv.hpp"
+#include "daug/serv.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");

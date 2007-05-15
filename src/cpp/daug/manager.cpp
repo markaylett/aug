@@ -2,13 +2,13 @@
    See the file COPYING for copying permission.
 */
 #define AUGAS_BUILD
-#include "augas/manager.hpp"
+#include "daug/manager.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
-#include "augas/exception.hpp"
-#include "augas/options.hpp"
+#include "daug/exception.hpp"
+#include "daug/options.hpp"
 
 #include <sstream>
 

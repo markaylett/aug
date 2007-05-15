@@ -4,7 +4,7 @@
 #ifndef AUGAS_LISTENER_HPP
 #define AUGAS_LISTENER_HPP
 
-#include "augas/object.hpp"
+#include "daug/object.hpp"
 
 #include "augsyspp.hpp"
 

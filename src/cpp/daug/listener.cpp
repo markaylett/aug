@@ -2,10 +2,10 @@
    See the file COPYING for copying permission.
 */
 #define AUGAS_BUILD
-#include "augas/listener.hpp"
+#include "daug/listener.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 using namespace aug;
 using namespace augas;

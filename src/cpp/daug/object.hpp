@@ -5,7 +5,7 @@
 #define AUGAS_OBJECT_HPP
 
 #include "augas.h"
-#include "augas/serv.hpp"
+#include "daug/serv.hpp"
 
 #include "augsyspp.hpp"
 

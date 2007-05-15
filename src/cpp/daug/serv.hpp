@@ -4,7 +4,7 @@
 #ifndef AUGAS_SERV_HPP
 #define AUGAS_SERV_HPP
 
-#include "augas/module.hpp"
+#include "daug/module.hpp"
 
 namespace augas {
 

@@ -1,20 +1,20 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_CLNTCONN_HPP
-#define AUGAS_CLNTCONN_HPP
+#ifndef AUGAS_SERVCONN_HPP
+#define AUGAS_SERVCONN_HPP
 
-#include "augas/buffer.hpp"
-#include "augas/conn.hpp"
+#include "daug/buffer.hpp"
+#include "daug/conn.hpp"
 
 namespace augas {
 
-    class clntconn : public rwtimer_base, public conn_base {
+    class servconn : public rwtimer_base, public conn_base {
 
         augas_object sock_;
         buffer buffer_;
         rwtimer rwtimer_;
-        connptr conn_;
+        established conn_;
 
         // rwtimer_base.
 
@@ -78,11 +78,11 @@ namespace augas {
         do_phase() const;
 
     public:
-        ~clntconn() AUG_NOTHROW;
+        ~servconn() AUG_NOTHROW;
 
-        clntconn(const servptr& serv, void* user, aug::timers& timers,
-                 const char* host, const char* port);
+        servconn(const servptr& serv, void* user, aug::timers& timers,
+                 const aug::smartfd& sfd, const aug::endpoint& ep);
     };
 }
 
-#endif // AUGAS_CLNTCONN_HPP
+#endif // AUGAS_SERVCONN_HPP

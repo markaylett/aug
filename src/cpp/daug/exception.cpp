@@ -2,13 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGAS_BUILD
-#include "augas/object.hpp"
+#include "daug/exception.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
-
-using namespace augas;
-
-object_base::~object_base() AUG_NOTHROW
-{
-}
+AUG_RCSID("$Id$");

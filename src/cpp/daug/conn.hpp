@@ -4,8 +4,8 @@
 #ifndef AUGAS_CONN_HPP
 #define AUGAS_CONN_HPP
 
-#include "augas/rwtimer.hpp"
-#include "augas/object.hpp"
+#include "daug/rwtimer.hpp"
+#include "daug/object.hpp"
 
 #include "augnetpp.hpp"
 

@@ -11,15 +11,15 @@ AUG_RCSID("$Id$");
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "augas/clntconn.hpp"
-#include "augas/exception.hpp"
-#include "augas/listener.hpp"
-#include "augas/manager.hpp"
-#include "augas/module.hpp"
-#include "augas/options.hpp"
-#include "augas/servconn.hpp"
-#include "augas/ssl.hpp"
-#include "augas/utility.hpp"
+#include "daug/clntconn.hpp"
+#include "daug/exception.hpp"
+#include "daug/listener.hpp"
+#include "daug/manager.hpp"
+#include "daug/module.hpp"
+#include "daug/options.hpp"
+#include "daug/servconn.hpp"
+#include "daug/ssl.hpp"
+#include "daug/utility.hpp"
 
 #include <cassert>
 #include <iomanip>

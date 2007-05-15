@@ -2,15 +2,15 @@
    See the file COPYING for copying permission.
 */
 #define AUGAS_BUILD
-#include "augas/ssl.hpp"
+#include "daug/ssl.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
 #if HAVE_OPENSSL_SSL_H
 
-# include "augas/conn.hpp"
-# include "augas/options.hpp"
+# include "daug/conn.hpp"
+# include "daug/options.hpp"
 # include "augsys/base.h"
 # include "augsys/log.h"
 # include "augsys/string.h"

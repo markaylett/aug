@@ -4,7 +4,7 @@
 #ifndef AUGAS_MANAGER_HPP
 #define AUGAS_MANAGER_HPP
 
-#include "augas/conn.hpp"
+#include "daug/conn.hpp"
 
 #include <map>
 #include <vector>
