@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_CONN_HPP
-#define AUGAS_CONN_HPP
+#ifndef DAUG_CONN_HPP
+#define DAUG_CONN_HPP
 
 #include "daug/rwtimer.hpp"
 #include "daug/object.hpp"
@@ -237,4 +237,4 @@ namespace augas {
     };
 }
 
-#endif // AUGAS_CONN_HPP
+#endif // DAUG_CONN_HPP

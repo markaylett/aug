@@ -2,7 +2,7 @@
 \datethis % print date on listing
 
 \def\AUG/{{\sc AUG}}
-\def\AUGAS/{{\sc AUGAS}}
+\def\AUGAS/{{\sc DAUG}}
 \def\CYGWIN/{{\sc CYGWIN}}
 \def\IPV6/{{\sc IPv6}}
 \def\GNU/{{\sc GNU}}
@@ -10,9 +10,11 @@
 \def\MINGW/{{\sc MINGW}}
 \def\MSVC/{{\sc MSVC}}
 \def\POP3/{{\sc POP3}}
+\def\POSIX/{{\sc POSIX}}
 \def\PYTHON/{{\sc PYTHON}}
 \def\SMTP/{{\sc SMTP}}
-\def\UNIX/{{\sc UNIX}}
+\def\SMTP/{{\sc SMTP}}
+\def\SSL/{{\sc SSL}}
 \def\WINDOWS/{{\sc WINDOWS}}
 
 @s std int @s string int
@@ -31,16 +33,18 @@
 @* Introduction.
 \AUGAS/ is an Open Source, Application Server written in \CEE/\AM\CPLUSPLUS/.
  It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net} which
-is available for \LINUX/, \WINDOWS/ and \UNIX/.  On \WINDOWS/, \AUGAS/ does
-not require a porting layer, such as \CYGWIN/, to run.  \AUGAS/ also includes
-support for:
+is available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
+\AUGAS/ takes an unbiased view towards the systems it supports; it does not
+favour one over another, and runs natively on all.  \AUGAS/ includes support
+for:
 
 \yskip
 \item{$\bullet$} \IPV6/;
 \item{$\bullet$} non-blocking IO;
 \item{$\bullet$} \MINGW/ and \MSVC/;
 \item{$\bullet$} plug-in modules;
-\item{$\bullet$} \PYTHON/.
+\item{$\bullet$} \PYTHON/;
+\item{$\bullet$} \SSL/.
 
 \yskip\noindent
 This document is a brief introduction to building and installing Modules for
@@ -98,7 +102,7 @@ same.  The following command can still be used to start the service from a
 command window:
 
 \yskip\noindent
-\.{C:\\> augasd -f augasd.conf start}
+\.{C:\\> daug -f daug.conf start}
 
 @* Sample Module.
 In the sections below, a Module is constructed in \CPLUSPLUS/ that:
@@ -164,7 +168,7 @@ struct echoserv : basic_serv {@/
   do_closed(const object& sock);
 
   void
-  do_data(const object& sock, const char* buf, size_t size);
+  do_data(const object& sock, const void* buf, size_t size);
 
   void
   do_rdexpire(const object& sock, unsigned& ms);
@@ -322,7 +326,7 @@ Finally, include the template makefile:
 \.{include \$(AUG\_HOME)/etc/aug.mk}
 
 @ To configure the new Module, first add the name of the Service to the
-``services'' property in the \.{augasd.conf} file:
+``services'' property in the \.{daug.conf} file:
 
 \yskip
 \.{services = echo}

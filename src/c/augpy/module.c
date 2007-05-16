@@ -247,7 +247,7 @@ send_(PyObject* self, PyObject* args)
     if (!PyObject_CheckReadBuffer(buf)) {
 
         PyErr_SetString(PyExc_TypeError,
-                        "post() argument 3 must be string or read-only"
+                        "send() argument 3 must be string or read-only"
                         " buffer");
         return NULL;
     }

@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_RWTIMER_HPP
-#define AUGAS_RWTIMER_HPP
+#ifndef DAUG_RWTIMER_HPP
+#define DAUG_RWTIMER_HPP
 
 #include "daug/serv.hpp"
 
@@ -91,4 +91,4 @@ namespace augas {
     };
 }
 
-#endif // AUGAS_RWTIMER_HPP
+#endif // DAUG_RWTIMER_HPP

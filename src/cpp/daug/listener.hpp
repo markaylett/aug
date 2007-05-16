@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_LISTENER_HPP
-#define AUGAS_LISTENER_HPP
+#ifndef DAUG_LISTENER_HPP
+#define DAUG_LISTENER_HPP
 
 #include "daug/object.hpp"
 
@@ -37,4 +37,4 @@ namespace augas {
     typedef aug::smartptr<listener> listenerptr;
 }
 
-#endif // AUGAS_LISTENER_HPP
+#endif // DAUG_LISTENER_HPP

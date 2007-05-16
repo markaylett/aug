@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_MANAGER_HPP
-#define AUGAS_MANAGER_HPP
+#ifndef DAUG_MANAGER_HPP
+#define DAUG_MANAGER_HPP
 
 #include "daug/conn.hpp"
 
@@ -114,4 +114,4 @@ namespace augas {
     };
 }
 
-#endif // AUGAS_MANAGER_HPP
+#endif // DAUG_MANAGER_HPP

@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="augas"
+	Name="daug"
 	ProjectGUID="{E905FF28-F95F-4125-B153-C67B96CD0C65}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -13,7 +13,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="debug/augas"
+			IntermediateDirectory="debug/daug"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -36,11 +36,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/augasd.exe"
+				OutputFile="$(OutDir)/daug.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/augasd.pdb"
+				ProgramDatabaseFile="$(OutDir)/daug.pdb"
 				SubSystem="1"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"/>
@@ -68,7 +68,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="release/augas"
+			IntermediateDirectory="release/daug"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -88,7 +88,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/augasd.exe"
+				OutputFile="$(OutDir)/daug.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
@@ -140,49 +140,49 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\cpp\augas\augasd.cpp">
+				RelativePath="..\src\cpp\daug\daug.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\buffer.cpp">
+				RelativePath="..\src\cpp\daug\buffer.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\clntconn.cpp">
+				RelativePath="..\src\cpp\daug\clntconn.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\conn.cpp">
+				RelativePath="..\src\cpp\daug\conn.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\exception.cpp">
+				RelativePath="..\src\cpp\daug\exception.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\listener.cpp">
+				RelativePath="..\src\cpp\daug\listener.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\manager.cpp">
+				RelativePath="..\src\cpp\daug\manager.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\module.cpp">
+				RelativePath="..\src\cpp\daug\module.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\object.cpp">
+				RelativePath="..\src\cpp\daug\object.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\options.cpp">
+				RelativePath="..\src\cpp\daug\options.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\rwtimer.cpp">
+				RelativePath="..\src\cpp\daug\rwtimer.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\serv.cpp">
+				RelativePath="..\src\cpp\daug\serv.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\servconn.cpp">
+				RelativePath="..\src\cpp\daug\servconn.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\ssl.cpp">
+				RelativePath="..\src\cpp\daug\ssl.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\utility.cpp">
+				RelativePath="..\src\cpp\daug\utility.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -190,46 +190,46 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\cpp\augas\buffer.hpp">
+				RelativePath="..\src\cpp\daug\buffer.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\clntconn.hpp">
+				RelativePath="..\src\cpp\daug\clntconn.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\conn.hpp">
+				RelativePath="..\src\cpp\daug\conn.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\exception.hpp">
+				RelativePath="..\src\cpp\daug\exception.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\listener.hpp">
+				RelativePath="..\src\cpp\daug\listener.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\manager.hpp">
+				RelativePath="..\src\cpp\daug\manager.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\module.hpp">
+				RelativePath="..\src\cpp\daug\module.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\object.hpp">
+				RelativePath="..\src\cpp\daug\object.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\options.hpp">
+				RelativePath="..\src\cpp\daug\options.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\rwtimer.hpp">
+				RelativePath="..\src\cpp\daug\rwtimer.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\serv.hpp">
+				RelativePath="..\src\cpp\daug\serv.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\servconn.hpp">
+				RelativePath="..\src\cpp\daug\servconn.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\ssl.hpp">
+				RelativePath="..\src\cpp\daug\ssl.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augas\utility.hpp">
+				RelativePath="..\src\cpp\daug\utility.hpp">
 			</File>
 		</Filter>
 		<Filter

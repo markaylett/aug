@@ -25,7 +25,7 @@ modserver_OBJS = server.o
 include $(AUG_HOME)/etc/aug.mk
 
 bench: all
-	$(AUG_HOME)/bin/augasd -f bench.conf test
+	$(AUG_HOME)/bin/daug -f bench.conf test
 
 test: all
-	$(AUG_HOME)/bin/augasd -f test.conf test
+	$(AUG_HOME)/bin/daug -f test.conf test

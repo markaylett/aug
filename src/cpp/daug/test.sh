@@ -1,7 +1,7 @@
 #!/bin/sh
 
 for f in etc/*.conf; do
-    cmd="./augasd -f $f test"
+    cmd="./daug -f $f test"
     echo "running [$cmd]..."
     err=`$cmd 2>&1 >/dev/null | wc -l`
     if [ $err != "0" ]; then

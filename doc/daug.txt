@@ -4,10 +4,10 @@ Basic Installation
   1. Run the MSI installer.  Before changing the destination folder from the
      default, please read the FAQ, below.
 
-  2. From the installation directory, copy the 'etc\augasd.conf.default' file
-     to 'etc\augasd.conf'.
+  2. From the installation directory, copy the 'etc\daug.conf.default' file
+     to 'etc\daug.conf'.
 
-  3. Change the 'etc\augasd.conf' file as appropriate.  At least, the 'rundir'
+  3. Change the 'etc\daug.conf' file as appropriate.  At least, the 'rundir'
      option should be set to the absolute path of the installation directory.
      The file extension of any modules may also need to change.
 

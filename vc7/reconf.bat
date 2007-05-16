@@ -1,3 +1,3 @@
 echo off
-bin\\augasd.exe -f etc\\augasd.conf reconf
+bin\\daug.exe -f etc\\daug.conf reconf
 pause

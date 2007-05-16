@@ -1,6 +1,6 @@
 EXTRA_DIST = \
 	aug.mk \
-	augasd.conf.default \
+	daug.conf.default \
 	augres.reg
 
 etcdir = $(prefix)/etc

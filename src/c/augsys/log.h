@@ -62,7 +62,7 @@ aug_info(const char* format, ...);
 
    aug_debug0() - user applications;
    aug_debug1() - user applications;
-   aug_debug2() - aug applications (such as augasd and mar);
+   aug_debug2() - aug applications (such as daug and mar);
    aug_debug3() - aug libraries.
 
    Note: further levels can be used by calling aug_writelog() directly.

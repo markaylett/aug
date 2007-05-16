@@ -435,7 +435,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:debug\\augas.msi"
+        "OutputFilename" = "8:debug\\daug.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -451,7 +451,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:release\\augas.msi"
+        "OutputFilename" = "8:release\\daug.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -507,7 +507,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_0B16F77D4AE546D5B9992A5211905EF7"
             {
-            "SourcePath" = "8:..\\doc\\augas.txt"
+            "SourcePath" = "8:..\\doc\\daug.txt"
             "TargetName" = "8:README"
             "Tag" = "8:"
             "Folder" = "8:_5D616DF14FB240A1B1BBE8EA16DE9AB6"
@@ -707,8 +707,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_4949A76E3E3C4C45B7374520F10551EB"
             {
-            "SourcePath" = "8:..\\etc\\augasd.conf.default"
-            "TargetName" = "8:augasd.conf.default"
+            "SourcePath" = "8:..\\etc\\daug.conf.default"
+            "TargetName" = "8:daug.conf.default"
             "Tag" = "8:"
             "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
             "Condition" = "8:"
@@ -1611,7 +1611,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:augas"
+        "ProductName" = "8:daug"
         "ProductCode" = "8:{210B4079-4AB6-4491-B94D-63BC120D02F0}"
         "PackageCode" = "8:{C514D8E1-40D3-4AA8-86EB-DA68BB28A89B}"
         "UpgradeCode" = "8:{89166B9C-C3CB-4DE2-8BE3-DD90993E23EE}"
@@ -1622,7 +1622,7 @@
         "Manufacturer" = "8:aug"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:augas"
+        "Title" = "8:daug"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Mark Aylett"
         "Keywords" = "8:"
@@ -1686,7 +1686,7 @@
                                                         {
                                                             "{6A471EEF-D31B-40F8-BCF6-C9E8EC783F36}:_05E3B798D76F4BC3B628EC9440CF076A"
                                                             {
-                                                            "Name" = "8:augasd"
+                                                            "Name" = "8:daug"
                                                             "Condition" = "8:"
                                                             "AlwaysCreate" = "11:FALSE"
                                                             "DeleteAtUninstall" = "11:FALSE"
@@ -2691,7 +2691,7 @@
             }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_BD368259223B4E79A1BB40733BFC9986"
             {
-            "SourcePath" = "8:bin\\augasd.exe"
+            "SourcePath" = "8:bin\\daug.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"

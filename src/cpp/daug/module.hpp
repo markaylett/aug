@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_MODULE_HPP
-#define AUGAS_MODULE_HPP
+#ifndef DAUG_MODULE_HPP
+#define DAUG_MODULE_HPP
 
 #include "augas.h"
 
@@ -78,4 +78,4 @@ namespace augas {
     typedef aug::smartptr<module> moduleptr;
 }
 
-#endif // AUGAS_MODULE_HPP
+#endif // DAUG_MODULE_HPP

@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_OBJECT_HPP
-#define AUGAS_OBJECT_HPP
+#ifndef DAUG_OBJECT_HPP
+#define DAUG_OBJECT_HPP
 
 #include "augas.h"
 #include "daug/serv.hpp"
@@ -75,4 +75,4 @@ namespace augas {
     typedef aug::smartptr<object_base> objectptr;
 }
 
-#endif // AUGAS_OBJECT_HPP
+#endif // DAUG_OBJECT_HPP

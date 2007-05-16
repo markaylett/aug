@@ -22,10 +22,10 @@ noinst_HEADERS = \
 	ssl.hpp \
 	utility.hpp
 
-bin_PROGRAMS = augasd
+bin_PROGRAMS = daug
 
-augasd_SOURCES = \
-	augasd.cpp \
+daug_SOURCES = \
+	daug.cpp \
 	buffer.cpp \
 	clntconn.cpp \
 	conn.cpp \
@@ -41,7 +41,7 @@ augasd_SOURCES = \
 	ssl.cpp \
 	utility.cpp
 
-augasd_LDADD = \
+daug_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \

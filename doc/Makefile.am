@@ -2,8 +2,8 @@ SUBDIRS = \
 	man
 
 EXTRA_DIST = \
-	augas.txt \
-	augasintro.w \
+	daug.txt \
+	daugintro.w \
 	augsys.gif \
 	augmar.gif \
 	augutil.gif \
@@ -20,14 +20,14 @@ gif:
 			| dot -Tgif >$$l.gif; \
 	done
 
-modsample.cpp: augasintro.w
+modsample.cpp: daugintro.w
 	ctangle $< - $@
 
-augasintro.tex: augasintro.w
+daugintro.tex: daugintro.w
 	cweave $<
 
-augasintro.dvi: augasintro.tex
+daugintro.dvi: daugintro.tex
 	tex "\let\pdf+ \input $<"
 
-augasintro.pdf: augasintro.dvi
+daugintro.pdf: daugintro.dvi
 	dvipdfm $<

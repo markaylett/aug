@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_SSL_HPP
-#define AUGAS_SSL_HPP
+#ifndef DAUG_SSL_HPP
+#define DAUG_SSL_HPP
 
 #include "augconfig.h"
 
@@ -74,4 +74,4 @@ namespace augas {
 }
 #endif // HAVE_OPENSSL_SSL_H
 
-#endif // AUGAS_SSL_HPP
+#endif // DAUG_SSL_HPP

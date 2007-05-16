@@ -1,6 +1,4 @@
 EXTRA_DIST = \
-	augas.sln \
-	augas.vcproj \
 	augmar.vcproj \
 	augmarpp.vcproj \
 	augnet.vcproj \
@@ -13,6 +11,8 @@ EXTRA_DIST = \
 	augutil.vcproj \
 	augutilpp.vcproj \
 	client.vcproj \
+	daug.sln \
+	daug.vcproj \
 	http.vcproj \
 	minimal.vcproj \
 	sched.vcproj \

@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-bin_PROGRAMS = augasd$(EXEEXT)
+bin_PROGRAMS = daug$(EXEEXT)
 check_PROGRAMS = augaspp-test$(EXEEXT)
 subdir = src/cpp/daug
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -53,21 +53,20 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_augasd_OBJECTS = augasd.$(OBJEXT) buffer.$(OBJEXT) \
-	clntconn.$(OBJEXT) conn.$(OBJEXT) exception.$(OBJEXT) \
-	listener.$(OBJEXT) manager.$(OBJEXT) module.$(OBJEXT) \
-	object.$(OBJEXT) options.$(OBJEXT) rwtimer.$(OBJEXT) \
-	servconn.$(OBJEXT) serv.$(OBJEXT) ssl.$(OBJEXT) \
-	utility.$(OBJEXT)
-augasd_OBJECTS = $(am_augasd_OBJECTS)
-augasd_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
+am_augaspp_test_OBJECTS = test.$(OBJEXT)
+augaspp_test_OBJECTS = $(am_augaspp_test_OBJECTS)
+augaspp_test_DEPENDENCIES =
+am_daug_OBJECTS = daug.$(OBJEXT) buffer.$(OBJEXT) clntconn.$(OBJEXT) \
+	conn.$(OBJEXT) exception.$(OBJEXT) listener.$(OBJEXT) \
+	manager.$(OBJEXT) module.$(OBJEXT) object.$(OBJEXT) \
+	options.$(OBJEXT) rwtimer.$(OBJEXT) servconn.$(OBJEXT) \
+	serv.$(OBJEXT) ssl.$(OBJEXT) utility.$(OBJEXT)
+daug_OBJECTS = $(am_daug_OBJECTS)
+daug_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augaspp_test_OBJECTS = test.$(OBJEXT)
-augaspp_test_OBJECTS = $(am_augaspp_test_OBJECTS)
-augaspp_test_DEPENDENCIES =
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -78,8 +77,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(augasd_SOURCES) $(augaspp_test_SOURCES)
-DIST_SOURCES = $(augasd_SOURCES) $(augaspp_test_SOURCES)
+SOURCES = $(augaspp_test_SOURCES) $(daug_SOURCES)
+DIST_SOURCES = $(augaspp_test_SOURCES) $(daug_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -230,8 +229,8 @@ noinst_HEADERS = \
 	ssl.hpp \
 	utility.hpp
 
-augasd_SOURCES = \
-	augasd.cpp \
+daug_SOURCES = \
+	daug.cpp \
 	buffer.cpp \
 	clntconn.cpp \
 	conn.cpp \
@@ -247,7 +246,7 @@ augasd_SOURCES = \
 	ssl.cpp \
 	utility.cpp
 
-augasd_LDADD = \
+daug_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
@@ -327,12 +326,12 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augasd$(EXEEXT): $(augasd_OBJECTS) $(augasd_DEPENDENCIES) 
-	@rm -f augasd$(EXEEXT)
-	$(CXXLINK) $(augasd_LDFLAGS) $(augasd_OBJECTS) $(augasd_LDADD) $(LIBS)
 augaspp-test$(EXEEXT): $(augaspp_test_OBJECTS) $(augaspp_test_DEPENDENCIES) 
 	@rm -f augaspp-test$(EXEEXT)
 	$(CXXLINK) $(augaspp_test_LDFLAGS) $(augaspp_test_OBJECTS) $(augaspp_test_LDADD) $(LIBS)
+daug$(EXEEXT): $(daug_OBJECTS) $(daug_DEPENDENCIES) 
+	@rm -f daug$(EXEEXT)
+	$(CXXLINK) $(daug_LDFLAGS) $(daug_OBJECTS) $(daug_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -340,10 +339,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augasd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clntconn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/manager.Po@am__quote@

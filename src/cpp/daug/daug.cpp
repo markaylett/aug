@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGAS_BUILD
+#define DAUG_BUILD
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -35,8 +35,8 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-#define AUGAS_WAKEUP   (AUG_EVENTUSER + 0)
-#define AUGAS_MODEVENT (AUG_EVENTUSER + 1)
+#define DAUG_WAKEUP   (AUG_EVENTUSER + 0)
+#define DAUG_MODEVENT (AUG_EVENTUSER + 1)
 
 namespace augas {
 
@@ -65,7 +65,7 @@ namespace augas {
         tm tm;
         aug::gmtime(tm);
         stringstream ss;
-        ss << "augasd-" << setfill('0')
+        ss << "daug-" << setfill('0')
            << setw(4) << tm.tm_year + 1900
            << setw(2) << tm.tm_mon + 1
            << setw(2) << tm.tm_mday;
@@ -298,7 +298,7 @@ namespace augas {
 
             auto_ptr<augas::event> arg(new augas::event(sname, to, type));
             aug_event e;
-            e.type_ = AUGAS_MODEVENT;
+            e.type_ = DAUG_MODEVENT;
             e.var_.type_ = 0;
             e.var_.arg_ = arg.get();
             writeevent(aug_eventout(), e);
@@ -410,7 +410,7 @@ namespace augas {
                     // Schedule an event to ensure that connected() is called
                     // after this function has returned.
 
-                    aug_event e = { AUGAS_WAKEUP, AUG_VARNULL };
+                    aug_event e = { DAUG_WAKEUP, AUG_VARNULL };
                     writeevent(aug_eventout(), e);
                 }
 
@@ -812,11 +812,12 @@ namespace augas {
         case AUG_EVENTSIGNAL:
             AUG_DEBUG2("received AUG_EVENTSIGNAL");
             break;
-        case AUGAS_WAKEUP:
-            AUG_DEBUG2("received AUGAS_WAKEUP");
+        case DAUG_WAKEUP:
+            AUG_DEBUG2("received DAUG_WAKEUP");
             // Actual handling is performed in do_run().
             break;
-        case AUGAS_MODEVENT:
+        case DAUG_MODEVENT:
+            AUG_DEBUG2("received DAUG_MODEVENT");
             {
                 auto_ptr<augas::event> ev(static_cast<
                                           augas::event*>(event.var_.arg_));
@@ -858,11 +859,11 @@ namespace augas {
             case AUG_OPTLONGNAME:
                 return "aug application server";
             case AUG_OPTPIDFILE:
-                return options_.get("pidfile", "augasd.pid");
+                return options_.get("pidfile", "daug.pid");
             case AUG_OPTPROGRAM:
                 return program_;
             case AUG_OPTSHORTNAME:
-                return "augasd";
+                return "daug";
             }
             return 0;
         }
@@ -906,7 +907,7 @@ namespace augas {
         {
             AUG_DEBUG2("initialising daemon process");
 
-            setsrvlogger("augasd");
+            setsrvlogger("daug");
 
             aug_var var = { 0, this };
             auto_ptr<state> s(new state(nbfilememcb<service>, var, pass64_));

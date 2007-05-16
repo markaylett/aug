@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_OPTIONS_HPP
-#define AUGAS_OPTIONS_HPP
+#ifndef DAUG_OPTIONS_HPP
+#define DAUG_OPTIONS_HPP
 
 #include <map>
 #include <string>
@@ -30,4 +30,4 @@ namespace augas {
     };
 }
 
-#endif // AUGAS_OPTIONS_HPP
+#endif // DAUG_OPTIONS_HPP

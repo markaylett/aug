@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_SERV_HPP
-#define AUGAS_SERV_HPP
+#ifndef DAUG_SERV_HPP
+#define DAUG_SERV_HPP
 
 #include "daug/module.hpp"
 
@@ -89,4 +89,4 @@ namespace augas {
     getserv();
 }
 
-#endif // AUGAS_SERV_HPP
+#endif // DAUG_SERV_HPP

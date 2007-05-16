@@ -1,14 +1,14 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_BUFFER_HPP
-#define AUGAS_BUFFER_HPP
+#ifndef DAUG_BUFFER_HPP
+#define DAUG_BUFFER_HPP
 
 #include "augsyspp/types.hpp"
 #include "augnetpp/writer.hpp"
 
 #include <vector>
-#define AUGAS_VARBUFFER 1
+#define DAUG_VARBUFFER 1
 namespace augas {
 
     struct vecarg {
@@ -49,4 +49,4 @@ namespace augas {
     };
 }
 
-#endif // AUGAS_BUFFER_HPP
+#endif // DAUG_BUFFER_HPP
