@@ -57,11 +57,11 @@ the \AUGAS/ Application Server.  For further information, please visit the
 Threads are best suited to processing, not waiting.  Ideally, they should
 focus on improving CPU utilisation on multi-processor machines.
 
-\yskip\noindent
-Unfortunately, threads are often required when dealing with APIs that perform
-blocking operations; secondary threads are introduced to avoid suspension of
-the process during a blocking call.  Unless secondary threads are managed with
-care, complexity, resource contention and the risk of deadlocks will increase.
+\yskip\noinden
+Threads are often used in combination with blocking APIs; secondary threads
+allow processing to continue while blocking operations are in progress.
+Unless secondary threads are managed with care, complexity, resource
+contention and the risk of deadlocks will increase.
 
 \yskip\noindent
 Using non-blocking IO, a single thread can be dedicated to the de-multiplexing
