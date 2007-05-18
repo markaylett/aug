@@ -7,6 +7,7 @@ SUBDIRS = \
 	augutil \
 	augsrv \
 	augnet \
+	augrt \
 	htdigest \
 	mar
 

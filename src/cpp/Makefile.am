@@ -5,6 +5,7 @@ SUBDIRS = \
 	augutilpp \
 	augsrvpp \
 	augnetpp \
+	augrtpp \
 	daug
 
 include_HEADERS = \

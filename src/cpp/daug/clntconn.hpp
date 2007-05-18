@@ -41,7 +41,7 @@ namespace augas {
         const augas_object&
         do_object() const;
 
-        const servptr&
+        const aug::servptr&
         do_serv() const;
 
         aug::smartfd
@@ -80,7 +80,7 @@ namespace augas {
     public:
         ~clntconn() AUG_NOTHROW;
 
-        clntconn(const servptr& serv, void* user, aug::timers& timers,
+        clntconn(const aug::servptr& serv, void* user, aug::timers& timers,
                  const char* host, const char* port);
     };
 }

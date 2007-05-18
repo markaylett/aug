@@ -30,6 +30,114 @@ namespace {
     };
 }
 
+augas_serv&
+serv::do_get() AUG_NOTHROW
+{
+    return serv_;
+}
+
+const augas_serv&
+serv::do_get() const AUG_NOTHROW
+{
+    return serv_;
+}
+
+bool
+serv::do_active() const AUG_NOTHROW
+{
+    return active_;
+}
+
+bool
+serv::do_start() AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    active_ = true; // Functions may be called during initialisation.
+    return active_ = module_->start(serv_);
+}
+
+void
+serv::do_reconf() const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->reconf();
+}
+
+void
+serv::do_event(const char* from, const char* type, const void* user,
+               size_t size) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->event(from, type, user, size);
+}
+
+void
+serv::do_closed(const augas_object& sock) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->closed(sock);
+}
+
+void
+serv::do_teardown(const augas_object& sock) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->teardown(sock);
+}
+
+bool
+serv::do_accept(augas_object& sock, const char* addr,
+                unsigned short port) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    return module_->accept(sock, addr, port);
+}
+
+void
+serv::do_connected(augas_object& sock, const char* addr,
+                   unsigned short port) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->connected(sock, addr, port);
+}
+
+void
+serv::do_data(const augas_object& sock, const char* buf,
+              size_t size) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->data(sock, buf, size);
+}
+
+void
+serv::do_rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->rdexpire(sock, ms);
+}
+
+void
+serv::do_wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->wrexpire(sock, ms);
+}
+
+void
+serv::do_expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    module_->expire(timer, ms);
+}
+
+bool
+serv::do_authcert(const augas_object& sock, const char* subject,
+                  const char* issuer) const AUG_NOTHROW
+{
+    scoped_frame frame(&serv_);
+    return module_->authcert(sock, subject, issuer);
+}
+
 serv::~serv() AUG_NOTHROW
 {
     if (active_) {
@@ -44,96 +152,6 @@ serv::serv(const moduleptr& module, const char* name)
 {
     aug_strlcpy(serv_.name_, name, sizeof(serv_.name_));
     serv_.user_ = 0;
-}
-
-bool
-serv::start() AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    active_ = true; // Functions may be called during initialisation.
-    return active_ = module_->start(serv_);
-}
-
-void
-serv::reconf() const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    module_->reconf();
-}
-
-void
-serv::event(const char* from, const char* type, const void* user,
-            size_t size) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    module_->event(from, type, user, size);
-}
-
-void
-serv::closed(const augas_object& sock) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    module_->closed(sock);
-}
-
-void
-serv::teardown(const augas_object& sock) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    module_->teardown(sock);
-}
-
-bool
-serv::accept(augas_object& sock, const char* addr,
-             unsigned short port) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    return module_->accept(sock, addr, port);
-}
-
-void
-serv::connected(augas_object& sock, const char* addr,
-                unsigned short port) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    module_->connected(sock, addr, port);
-}
-
-void
-serv::data(const augas_object& sock, const char* buf,
-           size_t size) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    module_->data(sock, buf, size);
-}
-
-void
-serv::rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    module_->rdexpire(sock, ms);
-}
-
-void
-serv::wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    module_->wrexpire(sock, ms);
-}
-
-void
-serv::expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    module_->expire(timer, ms);
-}
-
-bool
-serv::authcert(const augas_object& sock, const char* subject,
-               const char* issuer) const AUG_NOTHROW
-{
-    scoped_frame frame(&serv_);
-    return module_->authcert(sock, subject, issuer);
 }
 
 const augas_serv*

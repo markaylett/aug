@@ -41,7 +41,7 @@ namespace augas {
         const augas_object&
         do_object() const;
 
-        const servptr&
+        const aug::servptr&
         do_serv() const;
 
         aug::smartfd
@@ -80,7 +80,7 @@ namespace augas {
     public:
         ~servconn() AUG_NOTHROW;
 
-        servconn(const servptr& serv, void* user, aug::timers& timers,
+        servconn(const aug::servptr& serv, void* user, aug::timers& timers,
                  const aug::smartfd& sfd, const aug::endpoint& ep);
     };
 }

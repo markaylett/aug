@@ -22,7 +22,7 @@ namespace augas {
         virtual const augas_object&
         do_object() const = 0;
 
-        virtual const servptr&
+        virtual const aug::servptr&
         do_serv() const = 0;
 
         virtual aug::smartfd
@@ -42,7 +42,7 @@ namespace augas {
         {
             return do_object();
         }
-        const servptr&
+        const aug::servptr&
         serv() const
         {
             return do_serv();

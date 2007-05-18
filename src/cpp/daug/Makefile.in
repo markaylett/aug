@@ -62,7 +62,8 @@ am_daug_OBJECTS = daug.$(OBJEXT) buffer.$(OBJEXT) clntconn.$(OBJEXT) \
 	options.$(OBJEXT) rwtimer.$(OBJEXT) servconn.$(OBJEXT) \
 	serv.$(OBJEXT) ssl.$(OBJEXT) utility.$(OBJEXT)
 daug_OBJECTS = $(am_daug_OBJECTS)
-daug_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
+daug_DEPENDENCIES = $(top_builddir)/src/cpp/augrtpp/libaugrtpp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
@@ -247,6 +248,7 @@ daug_SOURCES = \
 	utility.cpp
 
 daug_LDADD = \
+	$(top_builddir)/src/cpp/augrtpp/libaugrtpp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
