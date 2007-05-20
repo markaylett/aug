@@ -1,15 +1,16 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef DAUG_OBJECT_HPP
-#define DAUG_OBJECT_HPP
+#ifndef AUGRTPP_OBJECT_HPP
+#define AUGRTPP_OBJECT_HPP
 
-#include "augas.h"
-#include "daug/serv.hpp"
+#include "augrtpp/serv.hpp"
 
 #include "augsyspp.hpp"
 
-namespace augas {
+#include "augas.h"
+
+namespace aug {
 
     class object_base {
     public:
@@ -17,10 +18,10 @@ namespace augas {
     private:
 
         virtual augas_object&
-        do_object() = 0;
+        do_get() = 0;
 
         virtual const augas_object&
-        do_object() const = 0;
+        do_get() const = 0;
 
         virtual const aug::servptr&
         do_serv() const = 0;
@@ -33,14 +34,14 @@ namespace augas {
         ~object_base() AUG_NOTHROW;
 
         augas_object&
-        object()
+        get()
         {
-            return do_object();
+            return do_get();
         }
         const augas_object&
-        object() const
+        get() const
         {
-            return do_object();
+            return do_get();
         }
         const aug::servptr&
         serv() const
@@ -52,27 +53,29 @@ namespace augas {
         {
             return do_sfd();
         }
-        augas_id
-        id() const
-        {
-            return do_object().id_;
-        }
-        void*
-        user() const
-        {
-            return do_object().user_;
-        }
         operator augas_object&()
         {
-            return do_object();
+            return do_get();
         }
         operator const augas_object&() const
         {
-            return do_object();
+            return do_get();
         }
     };
 
-    typedef aug::smartptr<object_base> objectptr;
+    typedef smartptr<object_base> objectptr;
+
+    inline int
+    id(const augas_object& ref)
+    {
+        return static_cast<int>(ref.id_);
+    }
+
+    inline void*
+    user(const augas_object& ref)
+    {
+        return ref.user_;
+    }
 }
 
-#endif // DAUG_OBJECT_HPP
+#endif // AUGRTPP_OBJECT_HPP

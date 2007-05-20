@@ -33,15 +33,17 @@
 #define AUG_EAUTH    3
 #define AUG_EBOUND   4
 #define AUG_EENDOF   5
-#define AUG_ECXX     6
-#define AUG_EEXIST   7
-#define AUG_EFORMAT  8
-#define AUG_EINVAL   9
-#define AUG_EIO      10
-#define AUG_ENULL    11
-#define AUG_EPARSE   12
-#define AUG_ESUPPORT 13
-#define AUG_ETIMEOUT 14
+#define AUG_ECONFIG  6
+#define AUG_ECXX     7
+#define AUG_EEXIST   8
+#define AUG_EFORMAT  9
+#define AUG_EINVAL   10
+#define AUG_EIO      11
+#define AUG_ENULL    12
+#define AUG_EPARSE   13
+#define AUG_ESTATE   14
+#define AUG_ESUPPORT 15
+#define AUG_ETIMEOUT 16
 
 struct aug_errinfo {
     char file_[AUG_MAXLINE];

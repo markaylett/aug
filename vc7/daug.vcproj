@@ -140,22 +140,25 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath="..\src\cpp\augrtpp\buffer.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\clntconn.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\config.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\conn.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\daug\daug.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\daug\buffer.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\daug\clntconn.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\daug\conn.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\exception.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\listener.cpp">
+				RelativePath="..\src\cpp\augrtpp\listener.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\manager.cpp">
@@ -164,19 +167,34 @@
 				RelativePath="..\src\cpp\daug\module.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\object.cpp">
+				RelativePath="..\src\cpp\augrtpp\object.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\options.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\rwtimer.cpp">
+				RelativePath="..\src\cpp\augrtpp\rwtimer.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\serv.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\serv.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\servconn.cpp">
+				RelativePath="..\src\cpp\augrtpp\servconn.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\ssl.cpp">
@@ -190,19 +208,22 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\cpp\daug\buffer.hpp">
+				RelativePath="..\src\cpp\augrtpp\buffer.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\clntconn.hpp">
+				RelativePath="..\src\cpp\augrtpp\clntconn.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\conn.hpp">
+				RelativePath="..\src\cpp\augrtpp\config.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\conn.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\exception.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\listener.hpp">
+				RelativePath="..\src\cpp\augrtpp\listener.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\manager.hpp">
@@ -211,19 +232,22 @@
 				RelativePath="..\src\cpp\daug\module.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\object.hpp">
+				RelativePath="..\src\cpp\augrtpp\object.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\options.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\rwtimer.hpp">
+				RelativePath="..\src\cpp\augrtpp\rwtimer.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\serv.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\serv.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\servconn.hpp">
+				RelativePath="..\src\cpp\augrtpp\servconn.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\ssl.hpp">

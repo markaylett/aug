@@ -9,8 +9,10 @@ AUG_RCSID("$Id$");
 
 #if HAVE_OPENSSL_SSL_H
 
-# include "daug/conn.hpp"
 # include "daug/options.hpp"
+
+# include "augrtpp/conn.hpp"
+
 # include "augsys/base.h"
 # include "augsys/log.h"
 # include "augsys/string.h"

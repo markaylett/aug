@@ -9,6 +9,9 @@ AUG_RCSID("$Id$");
 
 #include "daug/exception.hpp"
 #include "daug/options.hpp"
+#include "daug/serv.hpp"
+
+#include "augrtpp/conn.hpp"
 
 #include <sstream>
 
@@ -132,33 +135,33 @@ manager::clear()
 void
 manager::erase(const object_base& sock)
 {
-    AUG_DEBUG2("removing from manager: id=[%d], fd=[%d]", sock.id(),
+    AUG_DEBUG2("removing from manager: id=[%d], fd=[%d]", id(sock),
                sock.sfd().get());
 
-    idtofd_.erase(sock.id());
+    idtofd_.erase(id(sock));
     socks_.erase(sock.sfd().get());
 }
 
 void
 manager::insert(const objectptr& sock)
 {
-    AUG_DEBUG2("adding to manager: id=[%d], fd=[%d]", sock->id(),
+    AUG_DEBUG2("adding to manager: id=[%d], fd=[%d]", id(*sock),
                sock->sfd().get());
 
     socks_.insert(make_pair(sock->sfd().get(), sock));
-    idtofd_.insert(make_pair(sock->id(), sock->sfd().get()));
+    idtofd_.insert(make_pair(id(*sock), sock->sfd().get()));
 }
 
 void
 manager::update(const objectptr& sock, fdref prev)
 {
-    AUG_DEBUG2("updating manager: id=[%d], fd=[%d], prev=[%d]", sock->id(),
+    AUG_DEBUG2("updating manager: id=[%d], fd=[%d], prev=[%d]", id(*sock),
                sock->sfd().get(), prev.get());
 
     socks_.insert(make_pair(sock->sfd().get(), sock));
     socks_.erase(prev.get());
 
-    idtofd_[sock->id()] = sock->sfd().get();
+    idtofd_[id(*sock)] = sock->sfd().get();
 }
 
 void

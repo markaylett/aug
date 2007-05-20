@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define DAUG_BUILD
-#include "daug/buffer.hpp"
+#define AUGRTPP_BUILD
+#include "augrtpp/buffer.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -12,7 +12,6 @@ AUG_RCSID("$Id$");
 #include <string>
 
 using namespace aug;
-using namespace augas;
 using namespace std;
 
 namespace {

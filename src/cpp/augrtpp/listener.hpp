@@ -1,14 +1,14 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef DAUG_LISTENER_HPP
-#define DAUG_LISTENER_HPP
+#ifndef AUGRTPP_LISTENER_HPP
+#define AUGRTPP_LISTENER_HPP
 
-#include "daug/object.hpp"
+#include "augrtpp/object.hpp"
 
 #include "augsyspp.hpp"
 
-namespace augas {
+namespace aug {
 
     class listener : public object_base {
 
@@ -17,10 +17,10 @@ namespace augas {
         aug::smartfd sfd_;
 
         augas_object&
-        do_object();
+        do_get();
 
         const augas_object&
-        do_object() const;
+        do_get() const;
 
         const aug::servptr&
         do_serv() const;
@@ -38,4 +38,4 @@ namespace augas {
     typedef aug::smartptr<listener> listenerptr;
 }
 
-#endif // DAUG_LISTENER_HPP
+#endif // AUGRTPP_LISTENER_HPP

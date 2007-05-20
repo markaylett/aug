@@ -7,18 +7,11 @@ SUBDIRS = \
 	etc
 
 noinst_HEADERS = \
-	buffer.hpp \
-	clntconn.hpp \
-	conn.hpp \
 	exception.hpp \
-	listener.hpp \
 	manager.hpp \
 	module.hpp \
-	object.hpp \
 	options.hpp \
-	rwtimer.hpp \
 	serv.hpp \
-	servconn.hpp \
 	ssl.hpp \
 	utility.hpp
 
@@ -26,17 +19,10 @@ bin_PROGRAMS = daug
 
 daug_SOURCES = \
 	daug.cpp \
-	buffer.cpp \
-	clntconn.cpp \
-	conn.cpp \
 	exception.cpp \
-	listener.cpp \
 	manager.cpp \
 	module.cpp \
-	object.cpp \
 	options.cpp \
-	rwtimer.cpp \
-	servconn.cpp \
 	serv.cpp \
 	ssl.cpp \
 	utility.cpp

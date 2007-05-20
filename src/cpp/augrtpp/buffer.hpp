@@ -1,15 +1,17 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef DAUG_BUFFER_HPP
-#define DAUG_BUFFER_HPP
+#ifndef AUGRTPP_BUFFER_HPP
+#define AUGRTPP_BUFFER_HPP
 
 #include "augsyspp/types.hpp"
 #include "augnetpp/writer.hpp"
 
 #include <vector>
-#define DAUG_VARBUFFER 1
-namespace augas {
+
+#define AUG_VARBUFFER 1
+
+namespace aug {
 
     struct vecarg {
         std::vector<char> vec_;
@@ -24,7 +26,7 @@ namespace augas {
     };
 
     class buffer {
-        aug::writer writer_;
+        writer writer_;
     public:
         vecarg arg_;
         bool usevec_;
@@ -49,4 +51,4 @@ namespace augas {
     };
 }
 
-#endif // DAUG_BUFFER_HPP
+#endif // AUGRTPP_BUFFER_HPP

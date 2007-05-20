@@ -56,11 +56,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_augaspp_test_OBJECTS = test.$(OBJEXT)
 augaspp_test_OBJECTS = $(am_augaspp_test_OBJECTS)
 augaspp_test_DEPENDENCIES =
-am_daug_OBJECTS = daug.$(OBJEXT) buffer.$(OBJEXT) clntconn.$(OBJEXT) \
-	conn.$(OBJEXT) exception.$(OBJEXT) listener.$(OBJEXT) \
-	manager.$(OBJEXT) module.$(OBJEXT) object.$(OBJEXT) \
-	options.$(OBJEXT) rwtimer.$(OBJEXT) servconn.$(OBJEXT) \
-	serv.$(OBJEXT) ssl.$(OBJEXT) utility.$(OBJEXT)
+am_daug_OBJECTS = daug.$(OBJEXT) exception.$(OBJEXT) manager.$(OBJEXT) \
+	module.$(OBJEXT) options.$(OBJEXT) serv.$(OBJEXT) \
+	ssl.$(OBJEXT) utility.$(OBJEXT)
 daug_OBJECTS = $(am_daug_OBJECTS)
 daug_DEPENDENCIES = $(top_builddir)/src/cpp/augrtpp/libaugrtpp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -215,34 +213,20 @@ SUBDIRS = \
 	etc
 
 noinst_HEADERS = \
-	buffer.hpp \
-	clntconn.hpp \
-	conn.hpp \
 	exception.hpp \
-	listener.hpp \
 	manager.hpp \
 	module.hpp \
-	object.hpp \
 	options.hpp \
-	rwtimer.hpp \
 	serv.hpp \
-	servconn.hpp \
 	ssl.hpp \
 	utility.hpp
 
 daug_SOURCES = \
 	daug.cpp \
-	buffer.cpp \
-	clntconn.cpp \
-	conn.cpp \
 	exception.cpp \
-	listener.cpp \
 	manager.cpp \
 	module.cpp \
-	object.cpp \
 	options.cpp \
-	rwtimer.cpp \
-	servconn.cpp \
 	serv.cpp \
 	ssl.cpp \
 	utility.cpp
@@ -341,19 +325,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clntconn.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rwtimer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serv.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servconn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@

@@ -1,14 +1,13 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define DAUG_BUILD
-#include "daug/servconn.hpp"
+#define AUGRTPP_BUILD
+#include "augrtpp/servconn.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
 using namespace aug;
-using namespace augas;
 using namespace std;
 
 void
@@ -42,15 +41,15 @@ servconn::do_cancelrwtimer(unsigned flags)
 }
 
 augas_object&
-servconn::do_object()
+servconn::do_get()
 {
-    return conn_.object();
+    return conn_.get();
 }
 
 const augas_object&
-servconn::do_object() const
+servconn::do_get() const
 {
-    return conn_.object();
+    return conn_.get();
 }
 
 const servptr&
@@ -86,7 +85,10 @@ servconn::do_append(const void* buf, size_t len)
 void
 servconn::do_connected(const aug_endpoint& ep)
 {
-    conn_.connected(ep);
+    // BUG: workaround for bug in gcc version 3.4.4.
+
+    conn_base& r(conn_);
+    r.connected(ep);
 }
 
 bool
@@ -114,9 +116,9 @@ servconn::do_authcert(const char* subject, const char* issuer)
 }
 
 const endpoint&
-servconn::do_endpoint() const
+servconn::do_peername() const
 {
-    return conn_.endpoint();
+    return conn_.peername();
 }
 
 connphase
@@ -130,7 +132,7 @@ servconn::~servconn() AUG_NOTHROW
 }
 
 servconn::servconn(const servptr& serv, void* user, timers& timers,
-                   const smartfd& sfd, const aug::endpoint& ep)
+                   const smartfd& sfd, const endpoint& ep)
     : rwtimer_(serv, sock_, timers),
       conn_(serv, sock_, buffer_, rwtimer_, sfd, ep, false)
 {

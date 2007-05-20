@@ -1,19 +1,19 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define DAUG_BUILD
-#include "daug/conn.hpp"
+#define AUGRTPP_BUILD
+#include "augrtpp/conn.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
-#include "daug/buffer.hpp"
-#include "daug/exception.hpp"
+#include "augrtpp/buffer.hpp"
+
+#include "augaspp.hpp"
 
 #include <cassert>
 
 using namespace aug;
-using namespace augas;
 using namespace std;
 
 conn_base::~conn_base() AUG_NOTHROW
@@ -21,31 +21,31 @@ conn_base::~conn_base() AUG_NOTHROW
 }
 
 augas_object&
-established::do_object()
+connected::do_get()
 {
     return sock_;
 }
 
 const augas_object&
-established::do_object() const
+connected::do_get() const
 {
     return sock_;
 }
 
 const servptr&
-established::do_serv() const
+connected::do_serv() const
 {
     return serv_;
 }
 
 smartfd
-established::do_sfd() const
+connected::do_sfd() const
 {
     return sfd_;
 }
 
 bool
-established::do_accept(const aug_endpoint& ep)
+connected::do_accept(const aug_endpoint& ep)
 {
     inetaddr addr(null);
     return close_ = serv_
@@ -53,21 +53,21 @@ established::do_accept(const aug_endpoint& ep)
 }
 
 void
-established::do_append(const aug_var& var)
+connected::do_append(const aug_var& var)
 {
     buffer_.append(var);
     setnbeventmask(sfd_, AUG_FDEVENTRDWR);
 }
 
 void
-established::do_append(const void* buf, size_t len)
+connected::do_append(const void* buf, size_t len)
 {
     buffer_.append(buf, len);
     setnbeventmask(sfd_, AUG_FDEVENTRDWR);
 }
 
 void
-established::do_connected(const aug_endpoint& ep)
+connected::do_connected(const aug_endpoint& ep)
 {
     inetaddr addr(null);
     serv_->connected(sock_, inetntop(getinetaddr(ep, addr)).c_str(),
@@ -75,7 +75,7 @@ established::do_connected(const aug_endpoint& ep)
 }
 
 bool
-established::do_process(unsigned short events)
+connected::do_process(unsigned short events)
 {
     if (events & AUG_FDEVENTRD) {
 
@@ -131,7 +131,7 @@ established::do_process(unsigned short events)
 }
 
 void
-established::do_shutdown()
+connected::do_shutdown()
 {
     if (phase_ < SHUTDOWN) {
         phase_ = SHUTDOWN;
@@ -143,7 +143,7 @@ established::do_shutdown()
 }
 
 void
-established::do_teardown()
+connected::do_teardown()
 {
     if (phase_ < TEARDOWN) {
         phase_ = TEARDOWN;
@@ -152,24 +152,24 @@ established::do_teardown()
 }
 
 bool
-established::do_authcert(const char* subject, const char* issuer)
+connected::do_authcert(const char* subject, const char* issuer)
 {
     return serv_->authcert(sock_, subject, issuer);
 }
 
 const endpoint&
-established::do_endpoint() const
+connected::do_peername() const
 {
     return endpoint_;
 }
 
 connphase
-established::do_phase() const
+connected::do_phase() const
 {
     return phase_;
 }
 
-established::~established() AUG_NOTHROW
+connected::~connected() AUG_NOTHROW
 {
     try {
         if (close_)
@@ -177,7 +177,7 @@ established::~established() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-established::established(const servptr& serv, augas_object& sock,
+connected::connected(const servptr& serv, augas_object& sock,
                          buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
                          const aug::endpoint& ep, bool close)
     : serv_(serv),
@@ -186,69 +186,69 @@ established::established(const servptr& serv, augas_object& sock,
       rwtimer_(rwtimer),
       sfd_(sfd),
       endpoint_(ep),
-      phase_(ESTABLISHED),
+      phase_(CONNECTED),
       close_(close)
 {
 }
 
 augas_object&
-connecting::do_object()
+handshake::do_get()
 {
     return sock_;
 }
 
 const augas_object&
-connecting::do_object() const
+handshake::do_get() const
 {
     return sock_;
 }
 
 const servptr&
-connecting::do_serv() const
+handshake::do_serv() const
 {
     return serv_;
 }
 
 smartfd
-connecting::do_sfd() const
+handshake::do_sfd() const
 {
     return sfd_;
 }
 
 bool
-connecting::do_accept(const aug_endpoint& ep)
+handshake::do_accept(const aug_endpoint& ep)
 {
     return false;
 }
 
 void
-connecting::do_append(const aug_var& var)
+handshake::do_append(const aug_var& var)
 {
     buffer_.append(var);
 }
 
 void
-connecting::do_append(const void* buf, size_t len)
+handshake::do_append(const void* buf, size_t len)
 {
     buffer_.append(buf, len);
 }
 
 void
-connecting::do_connected(const aug_endpoint& ep)
+handshake::do_connected(const aug_endpoint& ep)
 {
-    throw error(__FILE__, __LINE__, ESTATE,
-                "connection not established: id=[%d]", sock_.id_);
+    throw local_error(__FILE__, __LINE__, AUG_ESTATE,
+                      AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
 bool
-connecting::do_process(unsigned short events)
+handshake::do_process(unsigned short events)
 {
     try {
 
         pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
         sfd_ = xy.first;
         if (xy.second) {
-            phase_ = ESTABLISHED;
+            phase_ = CONNECTED;
             return true;
         }
 
@@ -263,39 +263,41 @@ connecting::do_process(unsigned short events)
 }
 
 void
-connecting::do_shutdown()
+handshake::do_shutdown()
 {
-    throw error(__FILE__, __LINE__, ESTATE,
-                "connection not established: id=[%d]", sock_.id_);
+    throw local_error(__FILE__, __LINE__, AUG_ESTATE,
+                      AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
 void
-connecting::do_teardown()
+handshake::do_teardown()
 {
-    throw error(__FILE__, __LINE__, ESTATE,
-                "connection not established: id=[%d]", sock_.id_);
+    // TODO: call shutdown() here?
+
+    throw local_error(__FILE__, __LINE__, AUG_ESTATE,
+                      AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
 bool
-connecting::do_authcert(const char* subject, const char* issuer)
+handshake::do_authcert(const char* subject, const char* issuer)
 {
-    throw error(__FILE__, __LINE__, ESTATE,
-                "connection not established: id=[%d]", sock_.id_);
+    throw local_error(__FILE__, __LINE__, AUG_ESTATE,
+                      AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
 const endpoint&
-connecting::do_endpoint() const
+handshake::do_peername() const
 {
     return endpoint_;
 }
 
 connphase
-connecting::do_phase() const
+handshake::do_phase() const
 {
     return phase_;
 }
 
-connecting::~connecting() AUG_NOTHROW
+handshake::~handshake() AUG_NOTHROW
 {
     try {
         if (CLOSED == phase_)
@@ -303,8 +305,8 @@ connecting::~connecting() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-connecting::connecting(const servptr& serv, augas_object& sock,
-                       buffer& buffer, const char* host, const char* port)
+handshake::handshake(const servptr& serv, augas_object& sock, buffer& buffer,
+                     const char* host, const char* port)
     : serv_(serv),
       sock_(sock),
       buffer_(buffer),
@@ -315,5 +317,5 @@ connecting::connecting(const servptr& serv, augas_object& sock,
 {
     pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
     sfd_ = xy.first;
-    phase_ = xy.second ? ESTABLISHED : CONNECTING;
+    phase_ = xy.second ? CONNECTED : HANDSHAKE;
 }

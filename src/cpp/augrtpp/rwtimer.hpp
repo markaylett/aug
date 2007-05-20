@@ -1,15 +1,15 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef DAUG_RWTIMER_HPP
-#define DAUG_RWTIMER_HPP
+#ifndef AUGRTPP_RWTIMER_HPP
+#define AUGRTPP_RWTIMER_HPP
 
 #include "augrtpp/serv.hpp"
 
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-namespace augas {
+namespace aug {
 
     class rwtimer_base {
 
@@ -59,14 +59,14 @@ namespace augas {
         }
     };
 
-    typedef aug::smartptr<rwtimer_base> rwtimerptr;
+    typedef smartptr<rwtimer_base> rwtimerptr;
 
     class rwtimer : public rwtimer_base {
 
-        aug::servptr serv_;
+        servptr serv_;
         const augas_object& sock_;
-        aug::timer rdtimer_;
-        aug::timer wrtimer_;
+        timer rdtimer_;
+        timer wrtimer_;
 
         void
         do_timercb(int id, unsigned& ms);
@@ -86,9 +86,9 @@ namespace augas {
     public:
         ~rwtimer() AUG_NOTHROW;
 
-        rwtimer(const aug::servptr& serv, const augas_object& sock,
-                aug::timers& timers);
+        rwtimer(const servptr& serv, const augas_object& sock,
+                timers& timers);
     };
 }
 
-#endif // DAUG_RWTIMER_HPP
+#endif // AUGRTPP_RWTIMER_HPP

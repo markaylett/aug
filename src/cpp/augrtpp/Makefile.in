@@ -50,7 +50,8 @@ CONFIG_HEADER = $(top_builddir)/src/auglocal.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libaugrtpp_la_DEPENDENCIES = $(top_builddir)/src/c/augrt/libaugrt.la
-am_libaugrtpp_la_OBJECTS = config.lo serv.lo
+am_libaugrtpp_la_OBJECTS = buffer.lo clntconn.lo config.lo conn.lo \
+	listener.lo object.lo rwtimer.lo serv.lo servconn.lo
 libaugrtpp_la_OBJECTS = $(am_libaugrtpp_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -186,13 +187,27 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/cpp
 
 noinst_HEADERS = \
+	buffer.hpp \
+	clntconn.hpp \
 	config.hpp \
-	serv.hpp
+	conn.hpp \
+	listener.hpp \
+	object.hpp \
+	rwtimer.hpp \
+	serv.hpp \
+	servconn.hpp
 
 noinst_LTLIBRARIES = libaugrtpp.la
 libaugrtpp_la_SOURCES = \
+	buffer.cpp \
+	clntconn.cpp \
 	config.cpp \
-	serv.cpp
+	conn.cpp \
+	listener.cpp \
+	object.cpp \
+	rwtimer.cpp \
+	serv.cpp \
+	servconn.cpp
 
 libaugrtpp_la_LDFLAGS = \
 	-no-undefined
@@ -251,8 +266,15 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clntconn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rwtimer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servconn.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

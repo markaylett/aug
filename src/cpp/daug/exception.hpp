@@ -8,14 +8,14 @@
 
 namespace augas {
 
-    const int SRCAUGAS(AUG_SRCUSER + 0);
+    const int SRCDAUG(AUG_SRCUSER + 0);
     const int ECONFIG(1);
     const int EHOSTCALL(2);
     const int EMODCALL(3);
     const int ESSLCTX(4);
     const int ESTATE(5);
 
-    typedef aug::basic_error<SRCAUGAS> error;
+    typedef aug::basic_error<SRCDAUG> error;
 }
 
 #endif // DAUG_EXCEPTION_HPP

@@ -1,24 +1,23 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define DAUG_BUILD
-#include "daug/listener.hpp"
+#define AUGRTPP_BUILD
+#include "augrtpp/listener.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
 using namespace aug;
-using namespace augas;
 using namespace std;
 
 augas_object&
-listener::do_object()
+listener::do_get()
 {
     return sock_;
 }
 
 const augas_object&
-listener::do_object() const
+listener::do_get() const
 {
     return sock_;
 }

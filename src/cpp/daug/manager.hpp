@@ -4,7 +4,10 @@
 #ifndef DAUG_MANAGER_HPP
 #define DAUG_MANAGER_HPP
 
-#include "daug/conn.hpp"
+#include "daug/module.hpp"
+
+#include "augrtpp/object.hpp"
+#include "augrtpp/serv.hpp"
 
 #include <map>
 #include <vector>
@@ -18,7 +21,7 @@ namespace augas {
         typedef std::map<std::string, moduleptr> modules;
         typedef std::map<std::string, aug::servptr> servs;
         typedef std::multimap<std::string, aug::servptr> groups;
-        typedef std::map<int, objectptr> socks;
+        typedef std::map<int, aug::objectptr> socks;
         typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
 
         modules modules_;
@@ -50,13 +53,13 @@ namespace augas {
         clear();
 
         void
-        erase(const object_base& sock);
+        erase(const aug::object_base& sock);
 
         void
-        insert(const objectptr& sock);
+        insert(const aug::objectptr& sock);
 
         void
-        update(const objectptr& sock, aug::fdref prev);
+        update(const aug::objectptr& sock, aug::fdref prev);
 
         void
         load(const char* rundir, const options& options,
@@ -68,10 +71,10 @@ namespace augas {
         void
         reconf() const;
 
-        objectptr
+        aug::objectptr
         getbyfd(aug::fdref fd) const;
 
-        objectptr
+        aug::objectptr
         getbyid(augas_id id) const;
 
         aug::servptr
@@ -88,7 +91,7 @@ namespace augas {
     class scoped_insert {
 
         manager& manager_;
-        objectptr sock_;
+        aug::objectptr sock_;
 
         scoped_insert(const scoped_insert& rhs);
 
@@ -101,7 +104,7 @@ namespace augas {
             if (null != sock_)
                 manager_.erase(*sock_);
         }
-        scoped_insert(manager& manager, const objectptr& sock)
+        scoped_insert(manager& manager, const aug::objectptr& sock)
             : manager_(manager),
               sock_(sock)
         {
@@ -110,7 +113,7 @@ namespace augas {
         void
         commit()
         {
-            sock_ = objectptr();
+            sock_ = aug::objectptr();
         }
     };
 }

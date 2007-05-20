@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define DAUG_BUILD
-#include "daug/rwtimer.hpp"
+#define AUGRTPP_BUILD
+#include "augrtpp/rwtimer.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -10,7 +10,6 @@ AUG_RCSID("$Id$");
 #include <cassert>
 
 using namespace aug;
-using namespace augas;
 using namespace std;
 
 rwtimer_base::~rwtimer_base() AUG_NOTHROW

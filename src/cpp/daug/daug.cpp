@@ -11,13 +11,15 @@ AUG_RCSID("$Id$");
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "daug/clntconn.hpp"
+#include "augrtpp/clntconn.hpp"
+#include "augrtpp/listener.hpp"
+#include "augrtpp/servconn.hpp"
+
 #include "daug/exception.hpp"
-#include "daug/listener.hpp"
 #include "daug/manager.hpp"
 #include "daug/module.hpp"
 #include "daug/options.hpp"
-#include "daug/servconn.hpp"
+#include "daug/serv.hpp"
 #include "daug/ssl.hpp"
 #include "daug/utility.hpp"
 
@@ -220,7 +222,7 @@ namespace augas {
     {
         setsockopts_(conn.sfd());
 
-        const endpoint& ep(conn.endpoint());
+        const endpoint& ep(conn.peername());
         inetaddr addr(null);
         AUG_DEBUG2("connected: host=[%s], port=[%d]",
                    inetntop(getinetaddr(ep, addr)).c_str(),
@@ -389,14 +391,14 @@ namespace augas {
         try {
 
             servptr serv(state_->manager_.getserv(sname));
-            connptr cptr(new augas::clntconn(serv, user, state_->timers_,
-                                             host, port));
+            connptr cptr(new clntconn(serv, user, state_->timers_, host,
+                                      port));
 
             // Remove on exception.
 
             scoped_insert si(state_->manager_, cptr);
 
-            if (ESTABLISHED == cptr->phase()) {
+            if (CONNECTED == cptr->phase()) {
 
                 // connected() must only be called after this function has
                 // returned.
@@ -426,7 +428,7 @@ namespace augas {
             }
 
             si.commit();
-            return (int)cptr->id();
+            return id(*cptr);
 
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -456,11 +458,11 @@ namespace augas {
             // Prepare state.
 
             servptr serv(state_->manager_.getserv(sname));
-            listenerptr lptr(new augas::listener(serv, user, sfd));
+            listenerptr lptr(new listener(serv, user, sfd));
             scoped_insert si(state_->manager_, lptr);
 
             si.commit();
-            return (int)lptr->id();
+            return id(*lptr);
 
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -541,7 +543,7 @@ namespace augas {
     }
 
     int
-    settimer_(unsigned ms, const struct augas_var* var)
+    settimer_(unsigned ms, const augas_var* var)
     {
         const char* sname = getserv()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
@@ -726,11 +728,11 @@ namespace augas {
 
 
         setsockopts_(sfd);
-        connptr cptr(new augas::servconn(sock.serv(), sock.user(),
-                                         state_->timers_, sfd, ep));
+        connptr cptr(new servconn(sock.serv(), user(sock), state_->timers_,
+                                  sfd, ep));
 
         scoped_insert si(state_->manager_, cptr);
-        AUG_DEBUG2("initialising connection: id=[%d], fd=[%d]", cptr->id(),
+        AUG_DEBUG2("initialising connection: id=[%d], fd=[%d]", id(*cptr),
                    sfd.get());
 
         if (cptr->accept(ep))
@@ -755,7 +757,7 @@ namespace augas {
             return false;
         }
 
-        if (CONNECTING == cptr->phase()) {
+        if (HANDSHAKE == cptr->phase()) {
 
             // The associated file descriptor may change as connection
             // attempts fail and alternative addresses are tried.
@@ -769,7 +771,7 @@ namespace augas {
         } else if (changed)
 
             switch (cptr->phase()) {
-            case ESTABLISHED:
+            case CONNECTED:
 
                 // Was connecting, now established: notify module of
                 // connection establishment.
@@ -1014,7 +1016,7 @@ namespace augas {
             objectptr sock(state_->manager_.getbyfd(fd));
             connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
-            AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", sock->id(), fd);
+            AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", id(*sock), fd);
 
             if (null != cptr)
                 return process_(cptr, fd, events);

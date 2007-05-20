@@ -1,14 +1,13 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define DAUG_BUILD
-#include "daug/clntconn.hpp"
+#define AUGRTPP_BUILD
+#include "augrtpp/clntconn.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
 using namespace aug;
-using namespace augas;
 using namespace std;
 
 void
@@ -42,15 +41,15 @@ clntconn::do_cancelrwtimer(unsigned flags)
 }
 
 augas_object&
-clntconn::do_object()
+clntconn::do_get()
 {
-    return conn_->object();
+    return conn_->get();
 }
 
 const augas_object&
-clntconn::do_object() const
+clntconn::do_get() const
 {
-    return conn_->object();
+    return conn_->get();
 }
 
 const servptr&
@@ -95,7 +94,7 @@ clntconn::do_process(unsigned short events)
     if (!conn_->process(events))
         return false;
 
-    if (ESTABLISHED == conn_->phase()) {
+    if (CONNECTED == conn_->phase()) {
 
         // Connection is now established.  If data has been buffered for
         // writing then set the write event-mask.
@@ -103,11 +102,11 @@ clntconn::do_process(unsigned short events)
         if (!buffer_.empty())
             setnbeventmask(conn_->sfd(), AUG_FDEVENTRDWR);
 
-        AUG_DEBUG2("connection is now established, assuming new state");
+        AUG_DEBUG2("connection now established, assuming new state");
 
-        conn_ = connptr(new augas::established
+        conn_ = connptr(new aug::connected
                         (conn_->serv(), sock_, buffer_, rwtimer_,
-                         conn_->sfd(), conn_->endpoint(), true));
+                         conn_->sfd(), conn_->peername(), true));
     }
 
     return true;
@@ -132,9 +131,9 @@ clntconn::do_authcert(const char* subject, const char* issuer)
 }
 
 const endpoint&
-clntconn::do_endpoint() const
+clntconn::do_peername() const
 {
-    return conn_->endpoint();
+    return conn_->peername();
 }
 
 connphase
@@ -148,19 +147,19 @@ clntconn::~clntconn() AUG_NOTHROW
 }
 
 clntconn::clntconn(const servptr& serv, void* user, timers& timers,
-               const char* host, const char* port)
+                   const char* host, const char* port)
     : rwtimer_(serv, sock_, timers),
-      conn_(new connecting(serv, sock_, buffer_, host, port))
+      conn_(new handshake(serv, sock_, buffer_, host, port))
 {
     sock_.id_ = aug_nextid();
     sock_.user_ = user;
 
-    if (ESTABLISHED == conn_->phase()) {
+    if (CONNECTED == conn_->phase()) {
 
-        AUG_DEBUG2("clntconn is now established, assuming new state");
+        AUG_DEBUG2("connection now established, assuming new state");
 
-        conn_ = connptr(new augas::established
+        conn_ = connptr(new aug::connected
                         (conn_->serv(), sock_, buffer_, rwtimer_,
-                         conn_->sfd(), conn_->endpoint(), true));
+                         conn_->sfd(), conn_->peername(), true));
     }
 }

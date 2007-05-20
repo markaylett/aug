@@ -97,7 +97,7 @@ module::accept(augas_object& sock, const char* addr,
 
 void
 module::connected(augas_object& sock, const char* addr,
-                unsigned short port) const AUG_NOTHROW
+                  unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("connected(): id=[%d], addr=[%s], port=[%u]",
                sock.id_, addr, (unsigned)port);

@@ -16,9 +16,12 @@
 
 # include <openssl/ssl.h>
 
+namespace aug {
+    class conn_base;
+}
+
 namespace augas {
 
-    class conn_base;
     class options;
 
     class ssl_error : public aug::errinfo_error {
@@ -52,10 +55,10 @@ namespace augas {
         ~sslctx() AUG_NOTHROW;
 
         void
-        setclient(conn_base& conn);
+        setclient(aug::conn_base& conn);
 
         void
-        setserver(conn_base& conn);
+        setserver(aug::conn_base& conn);
     };
 
     typedef aug::smartptr<sslctx> sslctxptr;

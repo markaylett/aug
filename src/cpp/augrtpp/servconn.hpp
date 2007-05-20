@@ -1,20 +1,20 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef DAUG_CLNTCONN_HPP
-#define DAUG_CLNTCONN_HPP
+#ifndef AUGRTPP_SERVCONN_HPP
+#define AUGRTPP_SERVCONN_HPP
 
-#include "daug/buffer.hpp"
-#include "daug/conn.hpp"
+#include "augrtpp/buffer.hpp"
+#include "augrtpp/conn.hpp"
 
-namespace augas {
+namespace aug {
 
-    class clntconn : public rwtimer_base, public conn_base {
+    class servconn : public rwtimer_base, public conn_base {
 
         augas_object sock_;
         buffer buffer_;
         rwtimer rwtimer_;
-        connptr conn_;
+        aug::connected conn_;
 
         // rwtimer_base.
 
@@ -36,15 +36,15 @@ namespace augas {
         // conn_base.
 
         augas_object&
-        do_object();
+        do_get();
 
         const augas_object&
-        do_object() const;
+        do_get() const;
 
-        const aug::servptr&
+        const servptr&
         do_serv() const;
 
-        aug::smartfd
+        smartfd
         do_sfd() const;
 
         bool
@@ -71,18 +71,18 @@ namespace augas {
         bool
         do_authcert(const char* subject, const char* issuer);
 
-        const aug::endpoint&
-        do_endpoint() const;
+        const endpoint&
+        do_peername() const;
 
         connphase
         do_phase() const;
 
     public:
-        ~clntconn() AUG_NOTHROW;
+        ~servconn() AUG_NOTHROW;
 
-        clntconn(const aug::servptr& serv, void* user, aug::timers& timers,
-                 const char* host, const char* port);
+        servconn(const servptr& serv, void* user, timers& timers,
+                 const smartfd& sfd, const endpoint& ep);
     };
 }
 
-#endif // DAUG_CLNTCONN_HPP
+#endif // AUGRTPP_SERVCONN_HPP
