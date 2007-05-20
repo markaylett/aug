@@ -7,10 +7,6 @@
 
 AUG_RCSID("$Id$");
 
-#include "daug/exception.hpp"
-#include "daug/options.hpp"
-#include "daug/serv.hpp"
-
 #include "augrtpp/conn.hpp"
 
 #include <sstream>
@@ -18,46 +14,6 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace augas;
 using namespace std;
-
-namespace {
-
-    const char DEFAULT_NAME[] = "default";
-
-#if !defined(_WIN32)
-    const char DEFAULT_MODULE[] = "./modskel.so";
-    const char MODEXT[] = ".so";
-#else // _WIN32
-    const char DEFAULT_MODULE[] = "./modskel.dll";
-    const char MODEXT[] = ".dll";
-#endif // _WIN32
-
-    bool
-    withso(const string& s)
-    {
-        string::size_type n(s.size());
-        return 3 < n
-            && '.' == s[n - 3]
-            && ('s' == s[n - 2] || 'S' == s[n - 2])
-            && ('o' == s[n - 1] || 'O' == s[n - 1]);
-    }
-
-    bool
-    withdll(const string& s)
-    {
-        string::size_type n(s.size());
-        return 4 < n
-            && '.' == s[n - 4]
-            && ('d' == s[n - 3] || 'D' == s[n - 3])
-            && ('l' == s[n - 2] || 'L' == s[n - 2])
-            && ('l' == s[n - 1] || 'L' == s[n - 1]);
-    }
-
-    bool
-    withext(const string& s)
-    {
-        return withso(s) || withdll(s);
-    }
-}
 
 bool
 manager::append(augas_id cid, const aug_var& var)
@@ -165,67 +121,6 @@ manager::update(const objectptr& sock, fdref prev)
 }
 
 void
-manager::load(const char* rundir, const options& options,
-              const augas_host& host, void (*teardown)(const augas_object*))
-{
-    // TODO: allow each service to specify a list of services on which it
-    // depends.
-
-    // Obtain list of services.
-
-    const char* value(options.get("services", 0));
-    if (value) {
-
-        // For each service...
-
-        istringstream is(value);
-        string name, value;
-        while (is >> name) {
-
-            // Obtain module associated with service.
-
-            const string base(string("service.").append(name));
-            value = options.get(base + ".module");
-
-            modules::iterator it(modules_.find(value));
-            if (it == modules_.end()) {
-
-                // Load module.
-
-                string path(options.get(string("module.").append(value)
-                                        .append(".path")));
-                if (!withext(path))
-                    path += MODEXT;
-
-                aug_info("loading module: name=[%s], path=[%s]",
-                         value.c_str(), path.c_str());
-                aug::chdir(rundir);
-                moduleptr module(new augas::module(value, path.c_str(),
-                                                   host, teardown));
-                it = modules_.insert(make_pair(value, module)).first;
-            }
-
-            aug_info("creating service: name=[%s]", name.c_str());
-            insert(name, servptr(new augas::serv(it->second, name.c_str())),
-                   options.get(base + ".groups", 0));
-        }
-
-    } else {
-
-        // No service list: assume reasonable defaults.
-
-        aug_info("loading module: name=[%s]", DEFAULT_NAME);
-        moduleptr module(new augas::module(DEFAULT_NAME, DEFAULT_MODULE,
-                                           host, teardown));
-        modules_[DEFAULT_NAME] = module;
-
-        aug_info("creating service: name=[%s]", DEFAULT_NAME);
-        insert(DEFAULT_NAME,
-               servptr(new augas::serv(module, DEFAULT_NAME)), 0);
-    }
-}
-
-void
 manager::teardown()
 {
     // Ids are stored in reverse order using the the greater<> predicate.
@@ -237,8 +132,9 @@ manager::teardown()
 
         socks::iterator it(socks_.find(rit->second));
         if (it == socks_.end())
-            throw error(__FILE__, __LINE__, ESTATE, "sock not found: fd=[%d]",
-                        rit->second);
+            throw local_error(__FILE__, __LINE__, AUG_ESTATE,
+                              AUG_MSG("sock not found: fd=[%d]"),
+                              rit->second);
 
         connptr cptr(smartptr_cast<conn_base>(it->second));
         if (null != cptr) {
@@ -269,8 +165,9 @@ manager::getbyfd(fdref fd) const
 {
     socks::const_iterator it(socks_.find(fd.get()));
     if (it == socks_.end())
-        throw error(__FILE__, __LINE__, ESTATE, "sock not found: fd=[%d]",
-                    fd.get());
+        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
+                          AUG_MSG("sock not found: fd=[%d]"),
+                          fd.get());
     return it->second;
 }
 
@@ -279,8 +176,8 @@ manager::getbyid(augas_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));
     if (it == idtofd_.end())
-        throw error(__FILE__, __LINE__, ESTATE, "sock not found: id=[%d]",
-                    id);
+        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
+                          AUG_MSG("sock not found: id=[%d]"), id);
     return getbyfd(it->second);
 }
 
@@ -289,8 +186,9 @@ manager::getserv(const string& name) const
 {
     servs::const_iterator it(servs_.find(name));
     if (it == servs_.end())
-        throw error(__FILE__, __LINE__, ESTATE,
-                    "service not found: sname=[%s]", name.c_str());
+        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
+                          AUG_MSG("service not found: sname=[%s]"),
+                          name.c_str());
     return it->second;
 }
 

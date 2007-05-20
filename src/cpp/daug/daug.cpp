@@ -42,6 +42,43 @@ using namespace std;
 
 namespace augas {
 
+    const char DEFAULT_NAME[] = "default";
+
+#if !defined(_WIN32)
+    const char DEFAULT_MODULE[] = "./modskel.so";
+    const char MODEXT[] = ".so";
+#else // _WIN32
+    const char DEFAULT_MODULE[] = "./modskel.dll";
+    const char MODEXT[] = ".dll";
+#endif // _WIN32
+
+    bool
+    withso(const string& s)
+    {
+        string::size_type n(s.size());
+        return 3 < n
+            && '.' == s[n - 3]
+            && ('s' == s[n - 2] || 'S' == s[n - 2])
+            && ('o' == s[n - 1] || 'O' == s[n - 1]);
+    }
+
+    bool
+    withdll(const string& s)
+    {
+        string::size_type n(s.size());
+        return 4 < n
+            && '.' == s[n - 4]
+            && ('d' == s[n - 3] || 'D' == s[n - 3])
+            && ('l' == s[n - 2] || 'L' == s[n - 2])
+            && ('l' == s[n - 1] || 'L' == s[n - 1]);
+    }
+
+    bool
+    withext(const string& s)
+    {
+        return withso(s) || withdll(s);
+    }
+
     typedef char cstring[AUG_PATH_MAX + 1];
 
     const char* program_;
@@ -117,6 +154,7 @@ namespace augas {
         AUG_DEBUG2("rundir=[%s]", rundir_);
     }
 
+    typedef map<string, moduleptr> modules;
     typedef map<int, servptr> idtoserv;
     typedef queue<connptr> connected;
 
@@ -147,6 +185,7 @@ namespace augas {
         sslctxs sslctxs_;
 #endif // HAVE_OPENSSL_SSL_H
         aug::nbfiles nbfiles_;
+        modules modules_;
         manager manager_;
         timers timers_;
         timer grace_;
@@ -686,7 +725,66 @@ namespace augas {
     load_()
     {
         AUG_DEBUG2("loading services");
-        state_->manager_.load(rundir_, options_, host_, teardown_);
+
+        // TODO: allow each service to specify a list of services on which it
+        // depends.
+
+        // Obtain list of services.
+
+        const char* value(options_.get("services", 0));
+        if (value) {
+
+            // For each service...
+
+            istringstream is(value);
+            string name, value;
+            while (is >> name) {
+
+                // Obtain module associated with service.
+
+                const string base(string("service.").append(name));
+                value = options_.get(base + ".module");
+
+                modules::iterator it(state_->modules_.find(value));
+                if (it == state_->modules_.end()) {
+
+                    // Load module.
+
+                    string path(options_.get(string("module.").append(value)
+                                             .append(".path")));
+                    if (!withext(path))
+                        path += MODEXT;
+
+                    aug_info("loading module: name=[%s], path=[%s]",
+                             value.c_str(), path.c_str());
+                    aug::chdir(rundir_);
+                    moduleptr module(new augas::module(value, path.c_str(),
+                                                       host_, teardown_));
+                    it = state_->modules_
+                        .insert(make_pair(value, module)).first;
+                }
+
+                aug_info("creating service: name=[%s]", name.c_str());
+                state_->manager_
+                    .insert(name, servptr(new augas::serv(it->second,
+                                                          name.c_str())),
+                            options_.get(base + ".groups", 0));
+            }
+
+        } else {
+
+            // No service list: assume reasonable defaults.
+
+            aug_info("loading module: name=[%s]", DEFAULT_NAME);
+            moduleptr module(new augas::module(DEFAULT_NAME, DEFAULT_MODULE,
+                                               host_, teardown_));
+            state_->modules_[DEFAULT_NAME] = module;
+
+            aug_info("creating service: name=[%s]", DEFAULT_NAME);
+            state_->manager_
+                .insert(DEFAULT_NAME,
+                        servptr(new augas::serv(module, DEFAULT_NAME)), 0);
+        }
 
         // Remove any timers allocated to services that could not be opened.
 

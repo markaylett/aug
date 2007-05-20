@@ -4,8 +4,6 @@
 #ifndef DAUG_MANAGER_HPP
 #define DAUG_MANAGER_HPP
 
-#include "daug/module.hpp"
-
 #include "augrtpp/object.hpp"
 #include "augrtpp/serv.hpp"
 
@@ -18,13 +16,11 @@ namespace augas {
 
     class manager {
 
-        typedef std::map<std::string, moduleptr> modules;
         typedef std::map<std::string, aug::servptr> servs;
         typedef std::multimap<std::string, aug::servptr> groups;
         typedef std::map<int, aug::objectptr> socks;
         typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
 
-        modules modules_;
         servs servs_;
         groups groups_, temp_;
         socks socks_;
@@ -35,10 +31,6 @@ namespace augas {
         manager&
         operator =(const manager& rhs);
 
-        void
-        insert(const std::string& name, const aug::servptr& serv,
-               const char* groups);
-
     public:
         manager()
         {
@@ -48,6 +40,10 @@ namespace augas {
 
         bool
         append(augas_id cid, const void* buf, size_t size);
+
+        void
+        insert(const std::string& name, const aug::servptr& serv,
+               const char* groups);
 
         void
         clear();
