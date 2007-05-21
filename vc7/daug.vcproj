@@ -161,19 +161,22 @@
 				RelativePath="..\src\cpp\augrtpp\listener.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\manager.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\module.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augrtpp\object.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augrtpp\objects.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\daug\options.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augrtpp\rwtimer.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\daug\serv.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augrtpp\serv.cpp">
@@ -191,10 +194,10 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\serv.cpp">
+				RelativePath="..\src\cpp\augrtpp\servconn.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augrtpp\servconn.cpp">
+				RelativePath="..\src\cpp\augrtpp\servs.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\ssl.cpp">
@@ -226,13 +229,13 @@
 				RelativePath="..\src\cpp\augrtpp\listener.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\manager.hpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\module.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augrtpp\object.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\objects.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\options.hpp">
@@ -241,13 +244,16 @@
 				RelativePath="..\src\cpp\augrtpp\rwtimer.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augrtpp\serv.hpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\serv.hpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augrtpp\serv.hpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augrtpp\servconn.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\servs.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\ssl.hpp">

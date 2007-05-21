@@ -8,7 +8,6 @@ SUBDIRS = \
 
 noinst_HEADERS = \
 	exception.hpp \
-	manager.hpp \
 	module.hpp \
 	options.hpp \
 	serv.hpp \
@@ -20,7 +19,6 @@ bin_PROGRAMS = daug
 daug_SOURCES = \
 	daug.cpp \
 	exception.cpp \
-	manager.cpp \
 	module.cpp \
 	options.cpp \
 	serv.cpp \

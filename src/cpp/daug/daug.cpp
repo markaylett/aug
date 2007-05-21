@@ -13,10 +13,11 @@ AUG_RCSID("$Id$");
 
 #include "augrtpp/clntconn.hpp"
 #include "augrtpp/listener.hpp"
+#include "augrtpp/objects.hpp"
+#include "augrtpp/servs.hpp"
 #include "augrtpp/servconn.hpp"
 
 #include "daug/exception.hpp"
-#include "daug/manager.hpp"
 #include "daug/module.hpp"
 #include "daug/options.hpp"
 #include "daug/serv.hpp"
@@ -186,7 +187,8 @@ namespace augas {
 #endif // HAVE_OPENSSL_SSL_H
         aug::nbfiles nbfiles_;
         modules modules_;
-        manager manager_;
+        aug::servs servs_;
+        aug::objects objects_;
         timers timers_;
         timer grace_;
 
@@ -228,7 +230,7 @@ namespace augas {
     {
         if (!stopping_) {
             stopping_ = 1;
-            state_->manager_.teardown();
+            state_->objects_.teardown();
             state_->grace_.set(15000, timercb<stop_>, null);
         }
     }
@@ -360,7 +362,7 @@ namespace augas {
         try {
 
             vector<servptr> servs;
-            state_->manager_.getservs(servs, to);
+            state_->servs_.getbygroup(servs, to);
 
             vector<servptr>::const_iterator it(servs.begin()),
                 end(servs.end());
@@ -410,12 +412,12 @@ namespace augas {
     {
         AUG_DEBUG2("shutdown(): id=[%d]", cid);
         try {
-            objectptr sock(state_->manager_.getbyid(cid));
+            objectptr sock(state_->objects_.getbyid(cid));
             connptr cptr(smartptr_cast<conn_base>(sock));
             if (null != cptr)
                 cptr->shutdown();
             else
-                state_->manager_.erase(*sock);
+                state_->objects_.erase(*sock);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -429,13 +431,13 @@ namespace augas {
                    sname, host, port);
         try {
 
-            servptr serv(state_->manager_.getserv(sname));
+            servptr serv(state_->servs_.getbyname(sname));
             connptr cptr(new clntconn(serv, user, state_->timers_, host,
                                       port));
 
             // Remove on exception.
 
-            scoped_insert si(state_->manager_, cptr);
+            scoped_insert si(state_->objects_, cptr);
 
             if (CONNECTED == cptr->phase()) {
 
@@ -496,9 +498,9 @@ namespace augas {
 
             // Prepare state.
 
-            servptr serv(state_->manager_.getserv(sname));
+            servptr serv(state_->servs_.getbyname(sname));
             listenerptr lptr(new listener(serv, user, sfd));
-            scoped_insert si(state_->manager_, lptr);
+            scoped_insert si(state_->objects_, lptr);
 
             si.commit();
             return id(*lptr);
@@ -512,7 +514,7 @@ namespace augas {
     {
         AUG_DEBUG2("send(): id=[%d]", cid);
         try {
-            if (!state_->manager_.append(cid, buf, len))
+            if (!state_->objects_.append(cid, buf, len))
                 throw error(__FILE__, __LINE__, EHOSTCALL,
                             "connection has been shutdown");
             return 0;
@@ -525,7 +527,7 @@ namespace augas {
     {
         AUG_DEBUG2("sendv(): id=[%d]", cid);
         try {
-            if (!state_->manager_.append(cid, *var))
+            if (!state_->objects_.append(cid, *var))
                 throw error(__FILE__, __LINE__, EHOSTCALL,
                             "connection has been shutdown");
             return 0;
@@ -540,7 +542,7 @@ namespace augas {
                    cid, ms, flags);
         try {
             rwtimerptr rwtimer(smartptr_cast<
-                               rwtimer_base>(state_->manager_.getbyid(cid)));
+                               rwtimer_base>(state_->objects_.getbyid(cid)));
             if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection not found: id=[%d]", cid);
@@ -557,7 +559,7 @@ namespace augas {
                    cid, ms, flags);
         try {
             rwtimerptr rwtimer(smartptr_cast<
-                               rwtimer_base>(state_->manager_.getbyid(cid)));
+                               rwtimer_base>(state_->objects_.getbyid(cid)));
             if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection not found: id=[%d]", cid);
@@ -572,7 +574,7 @@ namespace augas {
         AUG_DEBUG2("cancelrwtimer(): id=[%d], flags=[%x]", cid, flags);
         try {
             rwtimerptr rwtimer(smartptr_cast<
-                               rwtimer_base>(state_->manager_.getbyid(cid)));
+                               rwtimer_base>(state_->objects_.getbyid(cid)));
             if (null == rwtimer)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection not found: id=[%d]", cid);
@@ -595,7 +597,7 @@ namespace augas {
             // container first to minimise any chance of failure after
             // aug_settimer() has been called.
 
-            state_->idtoserv_[id] = state_->manager_.getserv(sname);
+            state_->idtoserv_[id] = state_->servs_.getbyname(sname);
             if (-1 == aug_settimer(cptr(state_->timers_), id, ms, timercb_,
                                    var))
                 state_->idtoserv_.erase(id);
@@ -647,7 +649,7 @@ namespace augas {
                             "SSL context [%s] not initialised", ctx);
 
             connptr cptr(smartptr_cast<
-                         conn_base>(state_->manager_.getbyid(cid)));
+                         conn_base>(state_->objects_.getbyid(cid)));
             if (null == cptr)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection not found: id=[%d]", cid);
@@ -674,7 +676,7 @@ namespace augas {
                             "SSL context [%s] not initialised", ctx);
 
             connptr cptr(smartptr_cast<
-                         conn_base>(state_->manager_.getbyid(cid)));
+                         conn_base>(state_->objects_.getbyid(cid)));
             if (null == cptr)
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection not found: id=[%d]", cid);
@@ -765,7 +767,7 @@ namespace augas {
                 }
 
                 aug_info("creating service: name=[%s]", name.c_str());
-                state_->manager_
+                state_->servs_
                     .insert(name, servptr(new augas::serv(it->second,
                                                           name.c_str())),
                             options_.get(base + ".groups", 0));
@@ -781,7 +783,7 @@ namespace augas {
             state_->modules_[DEFAULT_NAME] = module;
 
             aug_info("creating service: name=[%s]", DEFAULT_NAME);
-            state_->manager_
+            state_->servs_
                 .insert(DEFAULT_NAME,
                         servptr(new augas::serv(module, DEFAULT_NAME)), 0);
         }
@@ -829,7 +831,7 @@ namespace augas {
         connptr cptr(new servconn(sock.serv(), user(sock), state_->timers_,
                                   sfd, ep));
 
-        scoped_insert si(state_->manager_, cptr);
+        scoped_insert si(state_->objects_, cptr);
         AUG_DEBUG2("initialising connection: id=[%d], fd=[%d]", id(*cptr),
                    sfd.get());
 
@@ -851,7 +853,7 @@ namespace augas {
             // Connection is closed if an exception is thrown during
             // processing.
 
-            state_->manager_.erase(*cptr);
+            state_->objects_.erase(*cptr);
             return false;
         }
 
@@ -864,7 +866,7 @@ namespace augas {
                          state_->var_);
             setnbeventmask(cptr->sfd(), AUG_FDEVENTALL);
 
-            state_->manager_.update(cptr, fd);
+            state_->objects_.update(cptr, fd);
 
         } else if (changed)
 
@@ -877,7 +879,7 @@ namespace augas {
                 connected_(*cptr);
                 break;
             case CLOSED:
-                state_->manager_.erase(*cptr);
+                state_->objects_.erase(*cptr);
                 return false;
             default:
                 break;
@@ -900,7 +902,7 @@ namespace augas {
                 options_.read(conffile_);
             }
             doreconf_();
-            state_->manager_.reconf();
+            state_->servs_.reconf();
             break;
         case AUG_EVENTSTATUS:
             AUG_DEBUG2("received AUG_EVENTSTATUS");
@@ -923,7 +925,7 @@ namespace augas {
                                           augas::event*>(event.var_.arg_));
 
                 vector<servptr> servs;
-                state_->manager_.getservs(servs, ev->to_);
+                state_->servs_.getbygroup(servs, ev->to_);
 
                 size_t size;
                 const void* user(varbuf(ev->var_, size));
@@ -1019,7 +1021,7 @@ namespace augas {
                 // Ownership back to local.
 
                 s = state_;
-                s->manager_.clear();
+                s->servs_.clear();
                 throw;
             }
         }
@@ -1037,7 +1039,7 @@ namespace augas {
             AUG_DEBUG2("running daemon process");
 
             int ret(!0);
-            while (!stopping_ || !state_->manager_.empty()) {
+            while (!stopping_ || !state_->objects_.empty()) {
 
                 if (2 == stopping_)
                     break;
@@ -1094,7 +1096,7 @@ namespace augas {
 
             // Clear services first.
 
-            state_->manager_.clear();
+            state_->servs_.clear();
 
             // Modules must be kept alive until remaining connections and
             // timers have been destroyed: a destroy_() function may depend on
@@ -1111,7 +1113,7 @@ namespace augas {
             if (fd == aug_eventin())
                 return readevent_();
 
-            objectptr sock(state_->manager_.getbyfd(fd));
+            objectptr sock(state_->objects_.getbyfd(fd));
             connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
             AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", id(*sock), fd);

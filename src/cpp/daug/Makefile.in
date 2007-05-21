@@ -56,9 +56,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_augaspp_test_OBJECTS = test.$(OBJEXT)
 augaspp_test_OBJECTS = $(am_augaspp_test_OBJECTS)
 augaspp_test_DEPENDENCIES =
-am_daug_OBJECTS = daug.$(OBJEXT) exception.$(OBJEXT) manager.$(OBJEXT) \
-	module.$(OBJEXT) options.$(OBJEXT) serv.$(OBJEXT) \
-	ssl.$(OBJEXT) utility.$(OBJEXT)
+am_daug_OBJECTS = daug.$(OBJEXT) exception.$(OBJEXT) module.$(OBJEXT) \
+	options.$(OBJEXT) serv.$(OBJEXT) ssl.$(OBJEXT) \
+	utility.$(OBJEXT)
 daug_OBJECTS = $(am_daug_OBJECTS)
 daug_DEPENDENCIES = $(top_builddir)/src/cpp/augrtpp/libaugrtpp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -214,7 +214,6 @@ SUBDIRS = \
 
 noinst_HEADERS = \
 	exception.hpp \
-	manager.hpp \
 	module.hpp \
 	options.hpp \
 	serv.hpp \
@@ -224,7 +223,6 @@ noinst_HEADERS = \
 daug_SOURCES = \
 	daug.cpp \
 	exception.cpp \
-	manager.cpp \
 	module.cpp \
 	options.cpp \
 	serv.cpp \
@@ -327,7 +325,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serv.Po@am__quote@

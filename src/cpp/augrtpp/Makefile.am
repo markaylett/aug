@@ -7,8 +7,10 @@ noinst_HEADERS = \
 	conn.hpp \
 	listener.hpp \
 	object.hpp \
+	objects.hpp \
 	rwtimer.hpp \
 	serv.hpp \
+	servs.hpp \
 	servconn.hpp
 
 noinst_LTLIBRARIES = libaugrtpp.la
@@ -20,8 +22,10 @@ libaugrtpp_la_SOURCES = \
 	conn.cpp \
 	listener.cpp \
 	object.cpp \
+	objects.cpp \
 	rwtimer.cpp \
 	serv.cpp \
+	servs.cpp \
 	servconn.cpp
 
 libaugrtpp_la_LDFLAGS = \
