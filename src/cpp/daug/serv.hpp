@@ -42,8 +42,8 @@ namespace augas {
         do_teardown(const augas_object& sock) const AUG_NOTHROW;
 
         bool
-        do_accept(augas_object& sock, const char* addr,
-                  unsigned short port) const AUG_NOTHROW;
+        do_accepted(augas_object& sock, const char* addr,
+                    unsigned short port) const AUG_NOTHROW;
 
         void
         do_connected(augas_object& sock, const char* addr,

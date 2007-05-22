@@ -86,11 +86,11 @@ serv::do_teardown(const augas_object& sock) const AUG_NOTHROW
 }
 
 bool
-serv::do_accept(augas_object& sock, const char* addr,
-                unsigned short port) const AUG_NOTHROW
+serv::do_accepted(augas_object& sock, const char* addr,
+                  unsigned short port) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
-    return module_->accept(sock, addr, port);
+    return module_->accepted(sock, addr, port);
 }
 
 void

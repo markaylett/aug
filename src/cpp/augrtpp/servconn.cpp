@@ -64,12 +64,6 @@ servconn::do_sfd() const
     return conn_.sfd();
 }
 
-bool
-servconn::do_accept(const aug_endpoint& ep)
-{
-    return conn_.accept(ep);
-}
-
 void
 servconn::do_append(const aug_var& var)
 {
@@ -80,6 +74,12 @@ void
 servconn::do_append(const void* buf, size_t len)
 {
     conn_.append(buf, len);
+}
+
+bool
+servconn::do_accepted(const aug_endpoint& ep)
+{
+    return conn_.accepted(ep);
 }
 
 void
@@ -121,10 +121,10 @@ servconn::do_peername() const
     return conn_.peername();
 }
 
-connphase
-servconn::do_phase() const
+sockstate
+servconn::do_state() const
 {
-    return conn_.phase();
+    return conn_.state();
 }
 
 servconn::~servconn() AUG_NOTHROW

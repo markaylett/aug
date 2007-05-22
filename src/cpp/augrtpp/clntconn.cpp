@@ -64,12 +64,6 @@ clntconn::do_sfd() const
     return conn_->sfd();
 }
 
-bool
-clntconn::do_accept(const aug_endpoint& ep)
-{
-    return conn_->accept(ep);
-}
-
 void
 clntconn::do_append(const aug_var& var)
 {
@@ -80,6 +74,12 @@ void
 clntconn::do_append(const void* buf, size_t len)
 {
     conn_->append(buf, len);
+}
+
+bool
+clntconn::do_accepted(const aug_endpoint& ep)
+{
+    return conn_->accepted(ep);
 }
 
 void
@@ -94,7 +94,7 @@ clntconn::do_process(unsigned short events)
     if (!conn_->process(events))
         return false;
 
-    if (CONNECTED == conn_->phase()) {
+    if (CONNECTED == conn_->state()) {
 
         // Connection is now established.  If data has been buffered for
         // writing then set the write event-mask.
@@ -136,10 +136,10 @@ clntconn::do_peername() const
     return conn_->peername();
 }
 
-connphase
-clntconn::do_phase() const
+sockstate
+clntconn::do_state() const
 {
-    return conn_->phase();
+    return conn_->state();
 }
 
 clntconn::~clntconn() AUG_NOTHROW
@@ -154,7 +154,7 @@ clntconn::clntconn(const servptr& serv, void* user, timers& timers,
     sock_.id_ = aug_nextid();
     sock_.user_ = user;
 
-    if (CONNECTED == conn_->phase()) {
+    if (CONNECTED == conn_->state()) {
 
         AUG_DEBUG2("connection now established, assuming new state");
 

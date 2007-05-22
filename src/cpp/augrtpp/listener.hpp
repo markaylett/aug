@@ -4,17 +4,17 @@
 #ifndef AUGRTPP_LISTENER_HPP
 #define AUGRTPP_LISTENER_HPP
 
-#include "augrtpp/object.hpp"
+#include "augrtpp/sock.hpp"
 
 #include "augsyspp.hpp"
 
 namespace aug {
 
-    class listener : public object_base {
+    class listener : public sock_base {
 
-        aug::servptr serv_;
+        servptr serv_;
         augas_object sock_;
-        aug::smartfd sfd_;
+        smartfd sfd_;
 
         augas_object&
         do_get();
@@ -22,20 +22,22 @@ namespace aug {
         const augas_object&
         do_get() const;
 
-        const aug::servptr&
+        const servptr&
         do_serv() const;
 
-        aug::smartfd
+        smartfd
         do_sfd() const;
+
+        sockstate
+        do_state() const;
 
     public:
         ~listener() AUG_NOTHROW;
 
-        listener(const aug::servptr& serv, void* user,
-                 const aug::smartfd& sfd);
+        listener(const servptr& serv, void* user, const smartfd& sfd);
     };
 
-    typedef aug::smartptr<listener> listenerptr;
+    typedef smartptr<listener> listenerptr;
 }
 
 #endif // AUGRTPP_LISTENER_HPP

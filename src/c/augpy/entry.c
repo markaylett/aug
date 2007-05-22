@@ -23,7 +23,7 @@ struct import_ {
     PyObject* event_;
     PyObject* closed_;
     PyObject* teardown_;
-    PyObject* accept_;
+    PyObject* accepted_;
     PyObject* connected_;
     PyObject* data_;
     PyObject* rdexpire_;
@@ -151,7 +151,7 @@ destroyimport_(struct import_* import)
     Py_XDECREF(import->rdexpire_);
     Py_XDECREF(import->data_);
     Py_XDECREF(import->connected_);
-    Py_XDECREF(import->accept_);
+    Py_XDECREF(import->accepted_);
     Py_XDECREF(import->teardown_);
     Py_XDECREF(import->closed_);
     Py_XDECREF(import->event_);
@@ -182,7 +182,7 @@ createimport_(const char* sname)
     import->event_ = getmethod_(import->module_, "event");
     import->closed_ = getmethod_(import->module_, "closed");
     import->teardown_ = getmethod_(import->module_, "teardown");
-    import->accept_ = getmethod_(import->module_, "accept");
+    import->accepted_ = getmethod_(import->module_, "accepted");
     import->connected_ = getmethod_(import->module_, "connected");
     import->data_ = getmethod_(import->module_, "data");
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
@@ -350,7 +350,7 @@ teardown_(const struct augas_object* sock)
 }
 
 static int
-accept_(struct augas_object* sock, const char* addr, unsigned short port)
+accepted_(struct augas_object* sock, const char* addr, unsigned short port)
 {
     struct import_* import = augas_getserv()->user_;
     PyObject* x, * y;
@@ -364,19 +364,19 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
 
     if (!y) {
 
-        /* closed() will not be called if accept() fails. */
+        /* closed() will not be called if accepted() fails. */
 
         printerr_();
         ret = -1;
 
-    } else if (import->accept_) {
+    } else if (import->accepted_) {
 
-        PyObject* z = PyObject_CallFunction(import->accept_, "OsH",
+        PyObject* z = PyObject_CallFunction(import->accepted_, "OsH",
                                             y, addr, port);
 
         if (!z) {
 
-            /* closed() will not be called if accept() fails. */
+            /* closed() will not be called if accepted() fails. */
 
             printerr_();
             Py_DECREF(y);
@@ -385,9 +385,10 @@ accept_(struct augas_object* sock, const char* addr, unsigned short port)
 
         if (z == Py_False) {
 
-            augas_writelog(AUGAS_LOGDEBUG, "accept() handler returned false");
+            augas_writelog(AUGAS_LOGDEBUG,
+                           "accepted() handler returned false");
 
-            /* closed() will not be called if accept() fails. */
+            /* closed() will not be called if accepted() fails. */
 
             Py_DECREF(y);
             y = NULL;
@@ -563,7 +564,7 @@ static const struct augas_module module_ = {
     event_,
     closed_,
     teardown_,
-    accept_,
+    accepted_,
     connected_,
     data_,
     rdexpire_,

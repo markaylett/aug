@@ -39,9 +39,9 @@ teardown_(const struct augas_object* sock)
 }
 
 static int
-accept_(struct augas_object* sock, const char* addr, unsigned short port)
+accepted_(struct augas_object* sock, const char* addr, unsigned short port)
 {
-    augas_writelog(AUGAS_LOGINFO, "accept_()");
+    augas_writelog(AUGAS_LOGINFO, "accepted_()");
     return 0;
 }
 
@@ -91,7 +91,7 @@ static const struct augas_module module_ = {
     event_,
     closed_,
     teardown_,
-    accept_,
+    accepted_,
     connected_,
     data_,
     rdexpire_,

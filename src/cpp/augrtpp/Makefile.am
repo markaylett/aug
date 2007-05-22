@@ -5,13 +5,16 @@ noinst_HEADERS = \
 	clntconn.hpp \
 	config.hpp \
 	conn.hpp \
+	engine.hpp \
 	listener.hpp \
 	object.hpp \
-	objects.hpp \
 	rwtimer.hpp \
 	serv.hpp \
 	servs.hpp \
-	servconn.hpp
+	servconn.hpp \
+	ssl.hpp \
+	sock.hpp \
+	socks.hpp
 
 noinst_LTLIBRARIES = libaugrtpp.la
 
@@ -20,13 +23,16 @@ libaugrtpp_la_SOURCES = \
 	clntconn.cpp \
 	config.cpp \
 	conn.cpp \
+	engine.cpp \
 	listener.cpp \
 	object.cpp \
-	objects.cpp \
 	rwtimer.cpp \
 	serv.cpp \
 	servs.cpp \
-	servconn.cpp
+	servconn.cpp \
+	ssl.cpp \
+	sock.cpp \
+	socks.cpp
 
 libaugrtpp_la_LDFLAGS = \
 	-no-undefined

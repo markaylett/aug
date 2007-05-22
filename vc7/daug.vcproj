@@ -140,46 +140,19 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\cpp\augrtpp\buffer.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\clntconn.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\config.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\conn.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\daug.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\exception.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augrtpp\listener.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\module.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\object.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\objects.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\options.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augrtpp\rwtimer.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\serv.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\serv.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -194,13 +167,19 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\src\cpp\augrtpp\servconn.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\servs.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\ssl.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\utility.cpp">
@@ -211,49 +190,16 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\cpp\augrtpp\buffer.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\clntconn.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\config.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\conn.hpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\exception.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\listener.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\module.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augrtpp\object.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\objects.hpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\options.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augrtpp\rwtimer.hpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\daug\serv.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\serv.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\servconn.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augrtpp\servs.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\ssl.hpp">
@@ -266,6 +212,102 @@
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+		</Filter>
+		<Filter
+			Name="augrtpp"
+			Filter="">
+			<Filter
+				Name="Source Files"
+				Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx">
+				<File
+					RelativePath="..\src\cpp\augrtpp\buffer.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\clntconn.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\config.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\conn.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\engine.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\listener.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\object.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\rwtimer.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\serv.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\servconn.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\servs.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\sock.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\socks.cpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\ssl.cpp">
+				</File>
+			</Filter>
+			<Filter
+				Name="Header Files"
+				Filter="h;hpp;hxx;hm;inl;inc;xsd">
+				<File
+					RelativePath="..\src\cpp\augrtpp\buffer.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\clntconn.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\config.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\conn.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\engine.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\listener.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\object.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\rwtimer.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\serv.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\servconn.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\servs.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\sock.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\socks.hpp">
+				</File>
+				<File
+					RelativePath="..\src\cpp\augrtpp\ssl.hpp">
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

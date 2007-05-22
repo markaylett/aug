@@ -73,8 +73,8 @@ def teardown(sock):
     log.debug("teardown(): %s" % sock)
     shutdown(sock)
 
-def accept(sock, addr, port):
-    log.info("accept(): %s" % sock)
+def accepted(sock, addr, port):
+    log.info("accepted(): %s" % sock)
     sock.user = Buffer()
     setrwtimer(sock, 15000, TIMRD)
     send(sock, "+OK hello\r\n")

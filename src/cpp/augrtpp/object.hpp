@@ -6,8 +6,6 @@
 
 #include "augrtpp/serv.hpp"
 
-#include "augsyspp.hpp"
-
 #include "augas.h"
 
 namespace aug {
@@ -23,11 +21,8 @@ namespace aug {
         virtual const augas_object&
         do_get() const = 0;
 
-        virtual const aug::servptr&
+        virtual const servptr&
         do_serv() const = 0;
-
-        virtual aug::smartfd
-        do_sfd() const = 0;
 
     public:
         virtual
@@ -43,15 +38,10 @@ namespace aug {
         {
             return do_get();
         }
-        const aug::servptr&
+        const servptr&
         serv() const
         {
             return do_serv();
-        }
-        aug::smartfd
-        sfd() const
-        {
-            return do_sfd();
         }
         operator augas_object&()
         {

@@ -162,7 +162,7 @@ struct echoserv : basic_serv {@/
   do_start(const char* sname);
 
   bool
-  do_accept(object& sock, const char* addr, unsigned short port);
+  do_accepted(object& sock, const char* addr, unsigned short port);
 
   void
   do_closed(const object& sock);
@@ -196,7 +196,7 @@ echoserv::do_start(const char* sname)
   return true;
 }
 
-@ The |do_accept()| function is called when a new client connection is
+@ The |do_accepted()| function is called when a new client connection is
 accepted.  The |setuser()| function binds an opaque, user-defined value to an
 \AUGAS/ object.  Here, a |string| buffer is assigned to track incomplete line
 data received from the client.  An initial, {\sc ``HELLO''} message is sent to
@@ -207,7 +207,7 @@ activity occurs.
 
 @<member...@>+=
 bool
-echoserv::do_accept(object& sock, const char* addr, unsigned short port)
+echoserv::do_accepted(object& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);

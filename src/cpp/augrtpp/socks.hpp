@@ -1,31 +1,30 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_OBJECTS_HPP
-#define AUGRTPP_OBJECTS_HPP
+#ifndef AUGRTPP_SOCKS_HPP
+#define AUGRTPP_SOCKS_HPP
 
-#include "augrtpp/object.hpp"
 #include "augrtpp/serv.hpp"
+#include "augrtpp/sock.hpp"
 
 #include <map>
 
 namespace aug {
 
-    class objects {
+    class socks {
 
-        typedef std::map<int, objectptr> socks;
         typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
 
-        socks socks_;
+        std::map<int, sockptr> socks_;
         idtofd idtofd_;
 
-        objects(const objects& rhs);
+        socks(const socks& rhs);
 
-        objects&
-        operator =(const objects& rhs);
+        socks&
+        operator =(const socks& rhs);
 
     public:
-        objects()
+        socks()
         {
         }
         bool
@@ -38,21 +37,21 @@ namespace aug {
         clear();
 
         void
-        erase(const object_base& sock);
+        erase(const sock_base& sock);
 
         void
-        insert(const objectptr& sock);
+        insert(const sockptr& sock);
 
         void
-        update(const objectptr& sock, fdref prev);
+        update(const sockptr& sock, fdref prev);
 
         void
         teardown();
 
-        objectptr
+        sockptr
         getbyfd(fdref fd) const;
 
-        objectptr
+        sockptr
         getbyid(augas_id id) const;
 
         bool
@@ -61,8 +60,8 @@ namespace aug {
 
     class scoped_insert {
 
-        objects& objects_;
-        objectptr sock_;
+        socks& socks_;
+        sockptr sock_;
 
         scoped_insert(const scoped_insert& rhs);
 
@@ -73,20 +72,20 @@ namespace aug {
         ~scoped_insert() AUG_NOTHROW
         {
             if (null != sock_)
-                objects_.erase(*sock_);
+                socks_.erase(*sock_);
         }
-        scoped_insert(objects& objects, const objectptr& sock)
-            : objects_(objects),
+        scoped_insert(socks& socks, const sockptr& sock)
+            : socks_(socks),
               sock_(sock)
         {
-            objects.insert(sock);
+            socks.insert(sock);
         }
         void
         commit()
         {
-            sock_ = objectptr();
+            sock_ = sockptr();
         }
     };
 }
 
-#endif // AUGRTPP_OBJECTS_HPP
+#endif // AUGRTPP_SOCKS_HPP

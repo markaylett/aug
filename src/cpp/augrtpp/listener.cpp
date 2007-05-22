@@ -34,6 +34,12 @@ listener::do_sfd() const
     return sfd_;
 }
 
+sockstate
+listener::do_state() const
+{
+    return LISTENING;
+}
+
 listener::~listener() AUG_NOTHROW
 {
     try {

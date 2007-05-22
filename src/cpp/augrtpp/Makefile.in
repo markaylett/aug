@@ -51,8 +51,8 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libaugrtpp_la_DEPENDENCIES = $(top_builddir)/src/c/augrt/libaugrt.la
 am_libaugrtpp_la_OBJECTS = buffer.lo clntconn.lo config.lo conn.lo \
-	listener.lo object.lo objects.lo rwtimer.lo serv.lo servs.lo \
-	servconn.lo
+	engine.lo listener.lo object.lo rwtimer.lo serv.lo servs.lo \
+	servconn.lo ssl.lo sock.lo socks.lo
 libaugrtpp_la_OBJECTS = $(am_libaugrtpp_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -192,13 +192,16 @@ noinst_HEADERS = \
 	clntconn.hpp \
 	config.hpp \
 	conn.hpp \
+	engine.hpp \
 	listener.hpp \
 	object.hpp \
-	objects.hpp \
 	rwtimer.hpp \
 	serv.hpp \
 	servs.hpp \
-	servconn.hpp
+	servconn.hpp \
+	ssl.hpp \
+	sock.hpp \
+	socks.hpp
 
 noinst_LTLIBRARIES = libaugrtpp.la
 libaugrtpp_la_SOURCES = \
@@ -206,13 +209,16 @@ libaugrtpp_la_SOURCES = \
 	clntconn.cpp \
 	config.cpp \
 	conn.cpp \
+	engine.cpp \
 	listener.cpp \
 	object.cpp \
-	objects.cpp \
 	rwtimer.cpp \
 	serv.cpp \
 	servs.cpp \
-	servconn.cpp
+	servconn.cpp \
+	ssl.cpp \
+	sock.cpp \
+	socks.cpp
 
 libaugrtpp_la_LDFLAGS = \
 	-no-undefined
@@ -275,13 +281,16 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clntconn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/objects.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rwtimer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servconn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sock.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socks.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

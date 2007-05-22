@@ -41,7 +41,7 @@ namespace aug {
         append(const void* buf, size_t size);
 
         bool
-        writesome(aug::fdref ref);
+        writesome(fdref ref);
 
         bool
         empty() const

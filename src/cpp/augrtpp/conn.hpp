@@ -5,7 +5,7 @@
 #define AUGRTPP_CONN_HPP
 
 #include "augrtpp/rwtimer.hpp"
-#include "augrtpp/object.hpp"
+#include "augrtpp/sock.hpp"
 
 #include "augnetpp.hpp"
 
@@ -13,24 +13,16 @@ namespace aug {
 
     class buffer;
 
-    enum connphase {
-        HANDSHAKE,
-        CONNECTED,
-        TEARDOWN,
-        SHUTDOWN,
-        CLOSED
-    };
-
-    class conn_base : public object_base {
-
-        virtual bool
-        do_accept(const aug_endpoint& ep) = 0;
+    class conn_base : public sock_base {
 
         virtual void
         do_append(const aug_var& var) = 0;
 
         virtual void
         do_append(const void* buf, size_t size) = 0;
+
+        virtual bool
+        do_accepted(const aug_endpoint& ep) = 0;
 
         virtual void
         do_connected(const aug_endpoint& ep) = 0;
@@ -50,17 +42,9 @@ namespace aug {
         virtual const endpoint&
         do_peername() const = 0;
 
-        virtual connphase
-        do_phase() const = 0;
-
     public:
         ~conn_base() AUG_NOTHROW;
 
-        bool
-        accept(const aug_endpoint& ep)
-        {
-            return do_accept(ep);
-        }
         void
         append(const aug_var& var)
         {
@@ -70,6 +54,11 @@ namespace aug {
         append(const void* buf, size_t size)
         {
             do_append(buf, size);
+        }
+        bool
+        accepted(const aug_endpoint& ep)
+        {
+            return do_accepted(ep);
         }
         void
         connected(const aug_endpoint& ep)
@@ -101,11 +90,6 @@ namespace aug {
         {
             return do_peername();
         }
-        connphase
-        phase() const
-        {
-            return do_phase();
-        }
     };
 
     typedef smartptr<conn_base> connptr;
@@ -113,7 +97,7 @@ namespace aug {
     inline bool
     sendable(const conn_base& conn)
     {
-        return conn.phase() < SHUTDOWN;
+        return conn.state() < SHUTDOWN;
     }
 
     class connected : public conn_base {
@@ -124,7 +108,7 @@ namespace aug {
         rwtimer& rwtimer_;
         smartfd sfd_;
         endpoint endpoint_;
-        connphase phase_;
+        sockstate state_;
         bool close_;
 
         augas_object&
@@ -139,14 +123,14 @@ namespace aug {
         smartfd
         do_sfd() const;
 
-        bool
-        do_accept(const aug_endpoint& ep);
-
         void
         do_append(const aug_var& var);
 
         void
         do_append(const void* buf, size_t size);
+
+        bool
+        do_accepted(const aug_endpoint& ep);
 
         void
         do_connected(const aug_endpoint& ep);
@@ -166,8 +150,8 @@ namespace aug {
         const endpoint&
         do_peername() const;
 
-        connphase
-        do_phase() const;
+        sockstate
+        do_state() const;
 
     public:
         ~connected() AUG_NOTHROW;
@@ -185,7 +169,7 @@ namespace aug {
         connector connector_;
         smartfd sfd_;
         endpoint endpoint_;
-        connphase phase_;
+        sockstate state_;
 
         augas_object&
         do_get();
@@ -199,14 +183,14 @@ namespace aug {
         smartfd
         do_sfd() const;
 
-        bool
-        do_accept(const aug_endpoint& ep);
-
         void
         do_append(const aug_var& var);
 
         void
         do_append(const void* buf, size_t size);
+
+        bool
+        do_accepted(const aug_endpoint& ep);
 
         void
         do_connected(const aug_endpoint& ep);
@@ -226,8 +210,8 @@ namespace aug {
         const endpoint&
         do_peername() const;
 
-        connphase
-        do_phase() const;
+        sockstate
+        do_state() const;
 
     public:
         ~handshake() AUG_NOTHROW;

@@ -43,8 +43,8 @@ namespace aug {
         do_teardown(const augas_object& sock) const AUG_NOTHROW = 0;
 
         virtual bool
-        do_accept(augas_object& sock, const char* addr,
-                  unsigned short port) const AUG_NOTHROW = 0;
+        do_accepted(augas_object& sock, const char* addr,
+                    unsigned short port) const AUG_NOTHROW = 0;
 
         virtual void
         do_connected(augas_object& sock, const char* addr,
@@ -116,10 +116,10 @@ namespace aug {
             do_teardown(sock);
         }
         bool
-        accept(augas_object& sock, const char* addr,
-               unsigned short port) const AUG_NOTHROW
+        accepted(augas_object& sock, const char* addr,
+                 unsigned short port) const AUG_NOTHROW
         {
-            return do_accept(sock, addr, port);
+            return do_accepted(sock, addr, port);
         }
         void
         connected(augas_object& sock, const char* addr,

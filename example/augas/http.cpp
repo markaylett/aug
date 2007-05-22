@@ -739,7 +739,7 @@ namespace {
             }
         }
         bool
-        do_accept(object& sock, const char* addr, unsigned short port)
+        do_accepted(object& sock, const char* addr, unsigned short port)
         {
             auto_ptr<session> sess(new session(realm_, sock.id(), addr));
             auto_ptr<marparser> parser(new marparser(0, sess));

@@ -47,14 +47,14 @@ namespace aug {
         smartfd
         do_sfd() const;
 
-        bool
-        do_accept(const aug_endpoint& ep);
-
         void
         do_append(const aug_var& var);
 
         void
         do_append(const void* buf, size_t size);
+
+        bool
+        do_accepted(const aug_endpoint& ep);
 
         void
         do_connected(const aug_endpoint& ep);
@@ -74,8 +74,8 @@ namespace aug {
         const endpoint&
         do_peername() const;
 
-        connphase
-        do_phase() const;
+        sockstate
+        do_state() const;
 
     public:
         ~servconn() AUG_NOTHROW;

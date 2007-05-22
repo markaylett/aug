@@ -424,8 +424,8 @@ struct augas_module {
        \param port TODO
     */
 
-    int (*accept_)(struct augas_object* sock, const char* addr,
-                   unsigned short port);
+    int (*accepted_)(struct augas_object* sock, const char* addr,
+                     unsigned short port);
 
     /**
        Completion of client connection handshake.

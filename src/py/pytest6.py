@@ -1,7 +1,7 @@
 from augas import *
 import log
 
-# Return false from accept.
+# Return false from accepted().
 
 def stop():
     log.debug("stop()")
@@ -15,8 +15,8 @@ def start(sname):
 def closed(sock):
     log.debug("closed(): %s" % sock)
 
-def accept(sock, addr, port):
-    log.debug("accept(): %s" % sock)
+def accepted(sock, addr, port):
+    log.debug("accepted(): %s" % sock)
     return False
 
 def connected(sock, addr, port):

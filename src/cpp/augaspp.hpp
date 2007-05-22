@@ -356,7 +356,7 @@ namespace augas {
         do_teardown(const object& sock) = 0;
 
         virtual bool
-        do_accept(object& sock, const char* addr, unsigned short port) = 0;
+        do_accepted(object& sock, const char* addr, unsigned short port) = 0;
 
         virtual void
         do_connected(object& sock, const char* addr, unsigned short port) = 0;
@@ -409,9 +409,9 @@ namespace augas {
             do_teardown(sock);
         }
         bool
-        accept(object& sock, const char* addr, unsigned short port)
+        accepted(object& sock, const char* addr, unsigned short port)
         {
-            return do_accept(sock, addr, port);
+            return do_accepted(sock, addr, port);
         }
         void
         connected(object& sock, const char* addr, unsigned short port)
@@ -466,7 +466,7 @@ namespace augas {
             shutdown(sock);
         }
         bool
-        do_accept(object& sock, const char* addr, unsigned short port)
+        do_accepted(object& sock, const char* addr, unsigned short port)
         {
             return true;
         }
@@ -595,12 +595,12 @@ namespace augas {
             } AUGAS_WRITELOGCATCH;
         }
         static int
-        accept(augas_object* sock, const char* addr,
-               unsigned short port) AUGAS_NOTHROW
+        accepted(augas_object* sock, const char* addr,
+                 unsigned short port) AUGAS_NOTHROW
         {
             try {
                 object o(*sock);
-                return result(getbase()->accept(o, addr, port));
+                return result(getbase()->accepted(o, addr, port));
             } AUGAS_WRITELOGCATCH;
             return AUGAS_ERROR;
         }
@@ -664,7 +664,7 @@ namespace augas {
                 event,
                 closed,
                 teardown,
-                accept,
+                accepted,
                 connected,
                 data,
                 rdexpire,

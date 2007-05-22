@@ -18,9 +18,9 @@ def start(sname):
 def closed(sock):
     log.debug("closed(): %s" % sock)
 
-def accept(sock, addr, port):
+def accepted(sock, addr, port):
     global server
-    log.debug("accept(): %s" % sock)
+    log.debug("accepted(): %s" % sock)
     sock.user = Buffer()
     server = sock
 

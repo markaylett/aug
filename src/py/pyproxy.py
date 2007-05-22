@@ -16,7 +16,7 @@ def closed(sock):
         del pairs[to]
         shutdown(to)
 
-def accept(sock, addr, port):
+def accepted(sock, addr, port):
     global pairs
     log.info("opening proxy pair")
     # connected() will always be called after tcpconnect() returns.

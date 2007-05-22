@@ -44,14 +44,6 @@ connected::do_sfd() const
     return sfd_;
 }
 
-bool
-connected::do_accept(const aug_endpoint& ep)
-{
-    inetaddr addr(null);
-    return close_ = serv_
-        ->accept(sock_, inetntop(getinetaddr(ep, addr)).c_str(), port(ep));
-}
-
 void
 connected::do_append(const aug_var& var)
 {
@@ -64,6 +56,14 @@ connected::do_append(const void* buf, size_t len)
 {
     buffer_.append(buf, len);
     setnbeventmask(sfd_, AUG_FDEVENTRDWR);
+}
+
+bool
+connected::do_accepted(const aug_endpoint& ep)
+{
+    inetaddr addr(null);
+    return close_ = serv_
+        ->accepted(sock_, inetntop(getinetaddr(ep, addr)).c_str(), port(ep));
 }
 
 void
@@ -90,7 +90,7 @@ connected::do_process(unsigned short events)
 
             AUG_DEBUG2("closing connection: id=[%d], fd=[%d]", sock_.id_,
                        sfd_.get());
-            phase_ = CLOSED;
+            state_ = CLOSED;
             return true;
         }
 
@@ -122,8 +122,8 @@ connected::do_process(unsigned short events)
 
             // If flagged for shutdown, send FIN and disable writes.
 
-            if (SHUTDOWN <= phase_)
-                aug::shutdownnbfile(sfd_);
+            if (SHUTDOWN <= state_)
+                shutdownnbfile(sfd_);
         }
     }
 
@@ -133,11 +133,11 @@ connected::do_process(unsigned short events)
 void
 connected::do_shutdown()
 {
-    if (phase_ < SHUTDOWN) {
-        phase_ = SHUTDOWN;
+    if (state_ < SHUTDOWN) {
+        state_ = SHUTDOWN;
         if (buffer_.empty()) {
             AUG_DEBUG2("shutdown(): id=[%d], fd=[%d]", sock_.id_, sfd_.get());
-            aug::shutdownnbfile(sfd_);
+            shutdownnbfile(sfd_);
         }
     }
 }
@@ -145,8 +145,8 @@ connected::do_shutdown()
 void
 connected::do_teardown()
 {
-    if (phase_ < TEARDOWN) {
-        phase_ = TEARDOWN;
+    if (state_ < TEARDOWN) {
+        state_ = TEARDOWN;
         serv_->teardown(sock_);
     }
 }
@@ -163,10 +163,10 @@ connected::do_peername() const
     return endpoint_;
 }
 
-connphase
-connected::do_phase() const
+sockstate
+connected::do_state() const
 {
-    return phase_;
+    return state_;
 }
 
 connected::~connected() AUG_NOTHROW
@@ -177,16 +177,16 @@ connected::~connected() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-connected::connected(const servptr& serv, augas_object& sock,
-                         buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
-                         const aug::endpoint& ep, bool close)
+connected::connected(const servptr& serv, augas_object& sock, buffer& buffer,
+                     rwtimer& rwtimer, const smartfd& sfd,
+                     const endpoint& ep, bool close)
     : serv_(serv),
       sock_(sock),
       buffer_(buffer),
       rwtimer_(rwtimer),
       sfd_(sfd),
       endpoint_(ep),
-      phase_(CONNECTED),
+      state_(CONNECTED),
       close_(close)
 {
 }
@@ -215,12 +215,6 @@ handshake::do_sfd() const
     return sfd_;
 }
 
-bool
-handshake::do_accept(const aug_endpoint& ep)
-{
-    return false;
-}
-
 void
 handshake::do_append(const aug_var& var)
 {
@@ -231,6 +225,12 @@ void
 handshake::do_append(const void* buf, size_t len)
 {
     buffer_.append(buf, len);
+}
+
+bool
+handshake::do_accepted(const aug_endpoint& ep)
+{
+    return false;
 }
 
 void
@@ -248,14 +248,14 @@ handshake::do_process(unsigned short events)
         pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
         sfd_ = xy.first;
         if (xy.second) {
-            phase_ = CONNECTED;
+            state_ = CONNECTED;
             return true;
         }
 
     } catch (const errinfo_error& e) {
 
         perrinfo(e, "connection failed");
-        phase_ = CLOSED;
+        state_ = CLOSED;
         return true;
     }
 
@@ -291,16 +291,16 @@ handshake::do_peername() const
     return endpoint_;
 }
 
-connphase
-handshake::do_phase() const
+sockstate
+handshake::do_state() const
 {
-    return phase_;
+    return state_;
 }
 
 handshake::~handshake() AUG_NOTHROW
 {
     try {
-        if (CLOSED == phase_)
+        if (CLOSED == state_)
             serv_->closed(sock_);
     } AUG_PERRINFOCATCH;
 }
@@ -313,9 +313,9 @@ handshake::handshake(const servptr& serv, augas_object& sock, buffer& buffer,
       connector_(host, port),
       sfd_(null),
       endpoint_(null),
-      phase_(CLOSED)
+      state_(CLOSED)
 {
     pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
     sfd_ = xy.first;
-    phase_ = xy.second ? CONNECTED : HANDSHAKE;
+    state_ = xy.second ? CONNECTED : HANDSHAKE;
 }

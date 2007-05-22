@@ -33,7 +33,7 @@ namespace {
     {
     }
     int
-    accept(augas_object* sock, const char* addr, unsigned short port)
+    accepted(augas_object* sock, const char* addr, unsigned short port)
     {
         return 0;
     }
@@ -75,7 +75,7 @@ augas::setdefaults(augas_module& dst, const augas_module& src,
     dst.event_ = src.event_ ? src.event_ : event;
     dst.closed_ = src.closed_ ? src.closed_ : closed;
     dst.teardown_ = src.teardown_ ? src.teardown_ : teardown;
-    dst.accept_ = src.accept_ ? src.accept_ : accept;
+    dst.accepted_ = src.accepted_ ? src.accepted_ : accepted;
     dst.connected_ = src.connected_ ? src.connected_ : connected;
     dst.data_ = src.data_ ? src.data_ : data;
     dst.rdexpire_ = src.rdexpire_ ? src.rdexpire_ : rdexpire;

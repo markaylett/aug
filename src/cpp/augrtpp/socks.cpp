@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGRTPP_BUILD
-#include "augrtpp/objects.hpp"
+#include "augrtpp/socks.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -13,7 +13,7 @@ using namespace aug;
 using namespace std;
 
 bool
-objects::append(augas_id cid, const aug_var& var)
+socks::append(augas_id cid, const aug_var& var)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
@@ -24,7 +24,7 @@ objects::append(augas_id cid, const aug_var& var)
 }
 
 bool
-objects::append(augas_id cid, const void* buf, size_t len)
+socks::append(augas_id cid, const void* buf, size_t len)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
@@ -35,36 +35,34 @@ objects::append(augas_id cid, const void* buf, size_t len)
 }
 
 void
-objects::clear()
+socks::clear()
 {
     idtofd_.clear();
     socks_.clear();
 }
 
 void
-objects::erase(const object_base& sock)
+socks::erase(const sock_base& sock)
 {
-    AUG_DEBUG2("removing object: id=[%d], fd=[%d]", id(sock),
-               sock.sfd().get());
+    AUG_DEBUG2("removing sock: id=[%d], fd=[%d]", id(sock), sock.sfd().get());
 
     idtofd_.erase(id(sock));
     socks_.erase(sock.sfd().get());
 }
 
 void
-objects::insert(const objectptr& sock)
+socks::insert(const sockptr& sock)
 {
-    AUG_DEBUG2("adding object: id=[%d], fd=[%d]", id(*sock),
-               sock->sfd().get());
+    AUG_DEBUG2("adding sock: id=[%d], fd=[%d]", id(*sock), sock->sfd().get());
 
     socks_.insert(make_pair(sock->sfd().get(), sock));
     idtofd_.insert(make_pair(id(*sock), sock->sfd().get()));
 }
 
 void
-objects::update(const objectptr& sock, fdref prev)
+socks::update(const sockptr& sock, fdref prev)
 {
-    AUG_DEBUG2("updating object: id=[%d], fd=[%d], prev=[%d]", id(*sock),
+    AUG_DEBUG2("updating sock: id=[%d], fd=[%d], prev=[%d]", id(*sock),
                sock->sfd().get(), prev.get());
 
     socks_.insert(make_pair(sock->sfd().get(), sock));
@@ -74,7 +72,7 @@ objects::update(const objectptr& sock, fdref prev)
 }
 
 void
-objects::teardown()
+socks::teardown()
 {
     // Ids are stored in reverse order using the the greater<> predicate.
 
@@ -83,10 +81,10 @@ objects::teardown()
 
         AUG_DEBUG2("teardown: id=[%d], fd=[%d]", rit->first, rit->second);
 
-        socks::iterator it(socks_.find(rit->second));
+        map<int, sockptr>::iterator it(socks_.find(rit->second));
         if (it == socks_.end())
             throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                              AUG_MSG("object not found: fd=[%d]"),
+                              AUG_MSG("sock not found: fd=[%d]"),
                               rit->second);
 
         connptr cptr(smartptr_cast<conn_base>(it->second));
@@ -105,29 +103,28 @@ objects::teardown()
     }
 }
 
-objectptr
-objects::getbyfd(fdref fd) const
+sockptr
+socks::getbyfd(fdref fd) const
 {
-    socks::const_iterator it(socks_.find(fd.get()));
+    map<int, sockptr>::const_iterator it(socks_.find(fd.get()));
     if (it == socks_.end())
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          AUG_MSG("object not found: fd=[%d]"),
-                          fd.get());
+                          AUG_MSG("sock not found: fd=[%d]"), fd.get());
     return it->second;
 }
 
-objectptr
-objects::getbyid(augas_id id) const
+sockptr
+socks::getbyid(augas_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));
     if (it == idtofd_.end())
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          AUG_MSG("object not found: id=[%d]"), id);
+                          AUG_MSG("sock not found: id=[%d]"), id);
     return getbyfd(it->second);
 }
 
 bool
-objects::empty() const
+socks::empty() const
 {
     return socks_.empty();
 }

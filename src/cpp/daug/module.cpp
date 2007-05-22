@@ -87,12 +87,12 @@ module::teardown(const augas_object& sock) const AUG_NOTHROW
 }
 
 bool
-module::accept(augas_object& sock, const char* addr,
-               unsigned short port) const AUG_NOTHROW
+module::accepted(augas_object& sock, const char* addr,
+                 unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("accept(): id=[%d], addr=[%s], port=[%u]",
                sock.id_, addr, (unsigned)port);
-    return AUGAS_OK == module_.accept_(&sock, addr, port);
+    return AUGAS_OK == module_.accepted_(&sock, addr, port);
 }
 
 void

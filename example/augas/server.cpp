@@ -43,7 +43,7 @@ namespace {
             delete sock.user<string>();
         }
         bool
-        do_accept(object& sock, const char* addr, unsigned short port)
+        do_accepted(object& sock, const char* addr, unsigned short port)
         {
             //setsslserver(sock, "server");
             sock.setuser(new string());
