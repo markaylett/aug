@@ -11,14 +11,6 @@ AUG_RCSID("$Id$");
 
 # include "augrtpp/conn.hpp"
 
-# include "augsys/base.h"
-# include "augsys/log.h"
-# include "augsys/string.h"
-
-# include <sstream>
-# include <string>
-# include <strstream>
-
 # include <openssl/err.h>
 
 using namespace aug;
@@ -45,9 +37,9 @@ aug::initssl()
 }
 
 void
-aug::setclient(sslctx& ctx, conn_base& conn)
+aug::setsslclient(sslctx& ctx, conn_base& conn)
 {
-    SSL* ssl = SSL_new(ctx.ctx_);
+    SSL* ssl = SSL_new(ctx);
     BIO* sbio = BIO_new_socket((int)aug_getosfd(conn.sfd().get()),
                                BIO_NOCLOSE);
     SSL_set_bio(ssl, sbio, sbio);
@@ -56,9 +48,9 @@ aug::setclient(sslctx& ctx, conn_base& conn)
 }
 
 void
-aug::setserver(sslctx& ctx, conn_base& conn)
+aug::setsslserver(sslctx& ctx, conn_base& conn)
 {
-    SSL* ssl = SSL_new(ctx.ctx_);
+    SSL* ssl = SSL_new(ctx);
     BIO* sbio = BIO_new_socket((int)aug_getosfd(conn.sfd().get()),
                                BIO_NOCLOSE);
     SSL_set_bio(ssl, sbio, sbio);

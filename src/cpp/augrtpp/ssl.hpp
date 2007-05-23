@@ -12,8 +12,6 @@
 # include "augsyspp/smartptr.hpp"
 # include "augnet/ssl.h"
 
-# include <map>
-
 # include <openssl/ssl.h>
 
 namespace aug {
@@ -33,12 +31,6 @@ namespace aug {
 
     class sslctx {
 
-        friend void
-        setclient(sslctx& ctx, conn_base& conn);
-
-        friend void
-        setserver(sslctx& ctx, conn_base& conn);
-
         SSL_CTX* const ctx_;
 
         sslctx(const sslctx&);
@@ -50,19 +42,28 @@ namespace aug {
         ~sslctx() AUG_NOTHROW;
 
         sslctx();
+
+        operator SSL_CTX*()
+        {
+            return ctx_;
+        }
+        SSL_CTX*
+        get()
+        {
+            return ctx_;
+        }
     };
 
     typedef smartptr<sslctx> sslctxptr;
-    typedef std::map<std::string, sslctxptr> sslctxs;
 
     void
     initssl();
 
     void
-    setclient(sslctx& ctx, conn_base& conn);
+    setsslclient(sslctx& ctx, conn_base& conn);
 
     void
-    setserver(sslctx& ctx, conn_base& conn);
+    setsslserver(sslctx& ctx, conn_base& conn);
 }
 #endif // HAVE_OPENSSL_SSL_H
 

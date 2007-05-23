@@ -13,7 +13,8 @@ AUG_RCSID("$Id$");
 
 # include "augrtpp/conn.hpp"
 
-# include "augsys/base.h"
+# include "augnetpp/base64.hpp"
+
 # include "augsys/log.h"
 # include "augsys/string.h"
 
@@ -173,50 +174,6 @@ namespace {
     }
 }
 
-sslctx::sslctx(const string& name)
-    : name_(name),
-      ctx_(SSL_CTX_new(SSLv23_method()))
-{
-    if (!ctx_)
-        throw ssl_error(__FILE__, __LINE__, ERR_get_error());
-}
-
-sslctx::~sslctx() AUG_NOTHROW
-{
-    SSL_CTX_free(ctx_);
-}
-
-void
-sslctx::setclient(conn_base& conn)
-{
-    SSL* ssl = SSL_new(ctx_);
-    BIO* sbio = BIO_new_socket((int)aug_getosfd(conn.sfd().get()),
-                               BIO_NOCLOSE);
-    SSL_set_bio(ssl, sbio, sbio);
-    SSL_set_app_data(ssl, &conn);
-    aug_setsslclient(conn.sfd().get(), ssl);
-}
-
-void
-sslctx::setserver(conn_base& conn)
-{
-    SSL* ssl = SSL_new(ctx_);
-    BIO* sbio = BIO_new_socket((int)aug_getosfd(conn.sfd().get()),
-                               BIO_NOCLOSE);
-    SSL_set_bio(ssl, sbio, sbio);
-    SSL_set_app_data(ssl, &conn);
-    aug_setsslserver(conn.sfd().get(), ssl);
-}
-
-void
-augas::initssl()
-{
-    // Global system initialization.
-
-    SSL_library_init();
-    SSL_load_error_strings();
-}
-
 sslctxptr
 augas::createsslctx(const string& name, const options& options,
                     const string& pass64)
@@ -235,8 +192,8 @@ augas::createsslctx(const string& name, const options& options,
     int depth(atoi(options.get(s + ".depth", "1")));
     int verify(atoi(options.get(s + ".verify", "1")));
 
-    sslctxptr ptr(new sslctx(name));
-    SSL_CTX* ctx(ptr->ctx_);
+    sslctxptr ptr(new sslctx());
+    SSL_CTX* ctx(ptr->get());
 
     // Load keys and certificates.
 

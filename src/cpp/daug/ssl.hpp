@@ -4,70 +4,19 @@
 #ifndef DAUG_SSL_HPP
 #define DAUG_SSL_HPP
 
-#include "augconfig.h"
+#include "augrtpp/ssl.hpp"
 
 #if HAVE_OPENSSL_SSL_H
 
-# include "augsyspp/exception.hpp"
-# include "augsyspp/smartptr.hpp"
-# include "augnet/ssl.h"
-
 # include <map>
-
-# include <openssl/ssl.h>
-
-namespace aug {
-    class conn_base;
-}
 
 namespace augas {
 
     class options;
 
-    class ssl_error : public aug::errinfo_error {
-    public:
-        ssl_error()
-        {
-        }
-        ssl_error(const char* file, int line, unsigned long err)
-        {
-            aug_setsslerrinfo(cptr(*this), file, line, err);
-        }
-    };
+    typedef std::map<std::string, aug::sslctxptr> sslctxs;
 
-    class sslctx {
-
-        friend aug::smartptr<sslctx>
-        createsslctx(const std::string&, const options&, const std::string&);
-
-        const std::string& name_;
-        SSL_CTX* const ctx_;
-
-        sslctx(const sslctx&);
-
-        sslctx&
-        operator =(const sslctx&);
-
-        explicit
-        sslctx(const std::string& name);
-
-    public:
-        ~sslctx() AUG_NOTHROW;
-
-        void
-        setclient(aug::conn_base& conn);
-
-        void
-        setserver(aug::conn_base& conn);
-    };
-
-    typedef aug::smartptr<sslctx> sslctxptr;
-    typedef std::map<std::string, sslctxptr> sslctxs;
-
-    void
-    initssl();
-
-    sslctxptr
+    aug::sslctxptr
     createsslctx(const std::string& name, const options& options,
                  const std::string& pass64);
 

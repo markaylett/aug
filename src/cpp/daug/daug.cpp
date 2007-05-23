@@ -654,7 +654,7 @@ namespace augas {
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection not found: id=[%d]", cid);
 
-            it->second->setclient(*cptr);
+            setsslclient(*it->second, *cptr);
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H
@@ -681,7 +681,7 @@ namespace augas {
                 throw error(__FILE__, __LINE__, ESTATE,
                             "connection not found: id=[%d]", cid);
 
-            it->second->setserver(*cptr);
+            setsslserver(*it->second, *cptr);
             return 0;
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H
