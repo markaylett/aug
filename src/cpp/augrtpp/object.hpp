@@ -55,10 +55,10 @@ namespace aug {
 
     typedef smartptr<object_base> objectptr;
 
-    inline int
+    inline augas_id
     id(const augas_object& ref)
     {
-        return static_cast<int>(ref.id_);
+        return ref.id_;
     }
 
     inline void*

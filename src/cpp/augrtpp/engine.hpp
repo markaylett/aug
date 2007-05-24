@@ -6,6 +6,10 @@
 
 #include "augrtpp/config.hpp"
 
+#include "augnetpp/nbfile.hpp"
+
+#include "augas.h"
+
 namespace aug {
 
     namespace detail {
@@ -24,10 +28,52 @@ namespace aug {
     public:
         ~engine() AUG_NOTHROW;
 
-        engine();
+        engine(fdref eventfd, aug_nbfilecb_t cb, const aug_var& var);
+
+        void
+        dispatch(const char* sname, const char* to, const char* type,
+                 const void* user, size_t size);
+
+        void
+        shutdown_(augas_id cid);
+
+        void
+        teardown();
+
+        augas_id
+        tcpconnect(const char* sname, const char* host, const char* port,
+                   void* user);
+
+        augas_id
+        tcplisten(const char* sname, const char* host, const char* port,
+                  void* user);
+
+        void
+        send(augas_id cid, const void* buf, size_t len);
+
+        void
+        sendv(augas_id cid, const augas_var& var);
+
+        void
+        setrwtimer(augas_id cid, unsigned ms, unsigned flags);
 
         bool
-        stop() const;
+        resetrwtimer(augas_id cid, unsigned ms, unsigned flags);
+
+        bool
+        cancelrwtimer(augas_id cid, unsigned flags);
+
+        augas_id
+        settimer(const char* sname, unsigned ms, const augas_var& var);
+
+        bool
+        resettimer(augas_id tid, unsigned ms);
+
+        bool
+        canceltimer(augas_id tid);
+
+        bool
+        stopping() const;
     };
 }
 

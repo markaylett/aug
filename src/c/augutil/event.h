@@ -10,6 +10,7 @@
 #define AUG_EVENTSTATUS 2
 #define AUG_EVENTSTOP   3
 #define AUG_EVENTSIGNAL 4
+#define AUG_EVENTWAKEUP 5
 
 /**
    Base value for user-defined events.
