@@ -60,10 +60,10 @@ namespace aug {
     initssl();
 
     void
-    setsslclient(sslctx& ctx, conn_base& conn);
+    setsslclient(conn_base& conn, sslctx& ctx);
 
     void
-    setsslserver(sslctx& ctx, conn_base& conn);
+    setsslserver(conn_base& conn, sslctx& ctx);
 }
 #endif // HAVE_OPENSSL_SSL_H
 

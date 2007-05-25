@@ -4,7 +4,7 @@
 #ifndef AUGRTPP_ENGINE_HPP
 #define AUGRTPP_ENGINE_HPP
 
-#include "augrtpp/config.hpp"
+#include "augrtpp/serv.hpp"
 
 #include "augnetpp/nbfile.hpp"
 
@@ -12,9 +12,34 @@
 
 namespace aug {
 
+    class sslctx;
+
     namespace detail {
         struct engineimpl;
     }
+
+    class enginecb_base {
+        virtual void
+        do_reconf() = 0;
+
+        virtual void
+        do_reopen() = 0;
+
+    public:
+        virtual
+        ~enginecb_base() AUG_NOTHROW;
+
+        void
+        reconf()
+        {
+            do_reconf();
+        }
+        void
+        reopen()
+        {
+            do_reopen();
+        }
+    };
 
     class engine {
 
@@ -28,14 +53,21 @@ namespace aug {
     public:
         ~engine() AUG_NOTHROW;
 
-        engine(fdref eventfd, aug_nbfilecb_t cb, const aug_var& var);
+        engine(fdref eventfd, enginecb_base& cb);
+
+        void
+        clear();
+
+        void
+        post(const char* sname, const char* to, const char* type,
+             const augas_var* var);
 
         void
         dispatch(const char* sname, const char* to, const char* type,
                  const void* user, size_t size);
 
         void
-        shutdown_(augas_id cid);
+        shutdown(augas_id cid);
 
         void
         teardown();
@@ -64,13 +96,29 @@ namespace aug {
         cancelrwtimer(augas_id cid, unsigned flags);
 
         augas_id
-        settimer(const char* sname, unsigned ms, const augas_var& var);
+        settimer(const char* sname, unsigned ms, const augas_var* var);
 
         bool
         resettimer(augas_id tid, unsigned ms);
 
         bool
         canceltimer(augas_id tid);
+
+        void
+        setsslclient(augas_id cid, sslctx& ctx);
+
+        void
+        setsslserver(augas_id cid, sslctx& ctx);
+
+        void
+        insert(const std::string& name, const servptr& serv,
+               const char* groups);
+
+        void
+        cancelinactive();
+
+        void
+        run(bool daemon);
 
         bool
         stopping() const;

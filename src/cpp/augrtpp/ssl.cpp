@@ -37,7 +37,7 @@ aug::initssl()
 }
 
 void
-aug::setsslclient(sslctx& ctx, conn_base& conn)
+aug::setsslclient(conn_base& conn, sslctx& ctx)
 {
     SSL* ssl = SSL_new(ctx);
     BIO* sbio = BIO_new_socket((int)aug_getosfd(conn.sfd().get()),
@@ -48,7 +48,7 @@ aug::setsslclient(sslctx& ctx, conn_base& conn)
 }
 
 void
-aug::setsslserver(sslctx& ctx, conn_base& conn)
+aug::setsslserver(conn_base& conn, sslctx& ctx)
 {
     SSL* ssl = SSL_new(ctx);
     BIO* sbio = BIO_new_socket((int)aug_getosfd(conn.sfd().get()),

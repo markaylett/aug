@@ -12,6 +12,7 @@ AUG_RCSID("$Id$");
 #include "augutilpp.hpp"
 
 #include "augrtpp/clntconn.hpp"
+#include "augrtpp/engine.hpp"
 #include "augrtpp/listener.hpp"
 #include "augrtpp/servs.hpp"
 #include "augrtpp/servconn.hpp"
@@ -88,14 +89,6 @@ namespace augas {
     cstring logdir_ = "";
     options options_;
     bool daemon_(false);
-    unsigned stopping_(0);
-
-    void
-    stop_(const aug_var& var, int id, unsigned& ms)
-    {
-        aug_info("giving-up, closing connections");
-        stopping_ = 2;
-    }
 
     void
     openlog_()
@@ -120,8 +113,13 @@ namespace augas {
     }
 
     void
-    doreconf_()
+    reconf_()
     {
+        if (*conffile_) {
+            AUG_DEBUG2("reading config-file: path=[%s]", conffile_);
+            options_.read(conffile_);
+        }
+
         const char* value;
 
         // Always set log-level first so that any subsequent log statements
@@ -155,50 +153,28 @@ namespace augas {
         AUG_DEBUG2("rundir=[%s]", rundir_);
     }
 
-    typedef map<string, moduleptr> modules;
-    typedef map<int, servptr> idtoserv;
-    typedef queue<connptr> connected;
+    class enginecb : public enginecb_base {
+        void
+        do_reconf()
+        {
+            if (*conffile_) {
+                AUG_DEBUG2("reading config-file: path=[%s]", conffile_);
+                options_.read(conffile_);
+            }
+            reconf_();
+        }
 
-    struct event {
-        string from_, to_, type_;
-        aug_var var_;
-        ~event() AUG_NOTHROW
-        {
-            try {
-                destroyvar(var_);
-            } AUG_PERRINFOCATCH;
-        }
-        event(const string& from, const string& to, const string& type)
-            : from_(from),
-              to_(to),
-              type_(type)
-        {
-            var_.type_ = 0;
-            var_.arg_ = 0;
-        }
-    };
+    } enginecb_;
+
+    typedef map<string, moduleptr> modules;
 
     struct state {
 
-        aug_nbfilecb_t cb_;
-        aug_var var_;
         modules modules_;
 #if HAVE_OPENSSL_SSL_H
         sslctxs sslctxs_;
 #endif // HAVE_OPENSSL_SSL_H
-        aug::nbfiles nbfiles_;
-        aug::servs servs_;
-        aug::socks socks_;
-        timers timers_;
-        timer grace_;
-
-        // Mapping of timer-ids to services.
-
-        idtoserv idtoserv_;
-
-        // Pending calls to connected().
-
-        connected connected_;
+        engine engine_;
 
         ~state() AUG_NOTHROW
         {
@@ -207,71 +183,18 @@ namespace augas {
                 removenbfile(aug_eventin());
             } AUG_PERRINFOCATCH;
         }
-        state(aug_nbfilecb_t cb, const aug_var& var, const string& pass64)
-            : cb_(cb),
-              var_(var),
-              grace_(timers_)
+        explicit
+        state(const string& pass64)
+            : engine_(aug_eventin(), enginecb_)
         {
 #if HAVE_OPENSSL_SSL_H
             initssl();
             createsslctxs(sslctxs_, options_, pass64);
 #endif // HAVE_OPENSSL_SSL_H
-
-            AUG_DEBUG2("inserting event pipe to list");
-            insertnbfile(nbfiles_, aug_eventin(), cb, var);
-            setnbeventmask(aug_eventin(), AUG_FDEVENTRD);
         }
     };
 
     auto_ptr<state> state_;
-
-    void
-    stop_()
-    {
-        if (!stopping_) {
-            stopping_ = 1;
-            state_->socks_.teardown();
-            state_->grace_.set(15000, timercb<stop_>, null);
-        }
-    }
-
-    void
-    timercb_(const aug_var* var, int id, unsigned* ms)
-    {
-        AUG_DEBUG2("custom timer expiry");
-
-        idtoserv::iterator it(state_->idtoserv_.find(id));
-        servptr serv(it->second);
-        augas_object timer = { id, var->arg_ };
-        serv->expire(timer, *ms);
-
-        if (0 == *ms) {
-            AUG_DEBUG2("removing timer: ms has been set to zero");
-            state_->idtoserv_.erase(it);
-        }
-    }
-
-    void
-    setsockopts_(const smartfd& sfd)
-    {
-        setnodelay(sfd, true);
-        setnonblock(sfd, true);
-    }
-
-    void
-    connected_(conn_base& conn)
-    {
-        setsockopts_(conn.sfd());
-
-        const endpoint& ep(conn.peername());
-        inetaddr addr(null);
-        AUG_DEBUG2("connected: host=[%s], port=[%d]",
-                   inetntop(getinetaddr(ep, addr)).c_str(),
-                   static_cast<int>(ntohs(port(ep))));
-
-        setnbeventmask(conn.sfd(), AUG_FDEVENTRD);
-        conn.connected(ep);
-    }
 
     // Thread-safe.
 
@@ -338,15 +261,7 @@ namespace augas {
         const char* sname = getserv()->name_;
         AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s]", sname, to, type);
         try {
-
-            auto_ptr<augas::event> arg(new augas::event(sname, to, type));
-            aug_event e;
-            e.type_ = DAUG_MODEVENT;
-            e.var_.type_ = 0;
-            e.var_.arg_ = arg.get();
-            writeevent(aug_eventout(), e);
-            aug_setvar(&arg->var_, var);
-            arg.release();
+            state_->engine_.post(sname, to, type, var);
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -360,15 +275,7 @@ namespace augas {
         AUG_DEBUG2("dispatch(): sname=[%s], to=[%s], type=[%s]",
                    sname, to, type);
         try {
-
-            vector<servptr> servs;
-            state_->servs_.getbygroup(servs, to);
-
-            vector<servptr>::const_iterator it(servs.begin()),
-                end(servs.end());
-            for (; it != end; ++it)
-                (*it)->event(sname, type, user, size);
-
+            state_->engine_.dispatch(sname, to, type, user, size);
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -412,13 +319,9 @@ namespace augas {
     {
         AUG_DEBUG2("shutdown(): id=[%d]", cid);
         try {
-            sockptr sock(state_->socks_.getbyid(cid));
-            connptr cptr(smartptr_cast<conn_base>(sock));
-            if (null != cptr)
-                cptr->shutdown();
-            else
-                state_->socks_.erase(*sock);
+            state_->engine_.shutdown(cid);
             return 0;
+
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -430,46 +333,7 @@ namespace augas {
         AUG_DEBUG2("tcpconnect(): sname=[%s], host=[%s], port=[%s]",
                    sname, host, port);
         try {
-
-            servptr serv(state_->servs_.getbyname(sname));
-            connptr cptr(new clntconn(serv, user, state_->timers_, host,
-                                      port));
-
-            // Remove on exception.
-
-            scoped_insert si(state_->socks_, cptr);
-
-            if (CONNECTED == cptr->state()) {
-
-                // connected() must only be called after this function has
-                // returned.
-
-                insertnbfile(state_->nbfiles_, cptr->sfd(), state_->cb_,
-                             state_->var_);
-                setnbeventmask(cptr->sfd(), AUG_FDEVENTRD);
-
-                if (state_->connected_.empty()) {
-
-                    // Schedule an event to ensure that connected() is called
-                    // after this function has returned.
-
-                    aug_event e = { DAUG_WAKEUP, AUG_VARNULL };
-                    writeevent(aug_eventout(), e);
-                }
-
-                // Add to pending queue.
-
-                state_->connected_.push(cptr);
-
-            } else {
-
-                insertnbfile(state_->nbfiles_, cptr->sfd(), state_->cb_,
-                             state_->var_);
-                setnbeventmask(cptr->sfd(), AUG_FDEVENTALL);
-            }
-
-            si.commit();
-            return id(*cptr);
+            return (int)state_->engine_.tcpconnect(sname, host, port, user);
 
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -482,28 +346,7 @@ namespace augas {
         AUG_DEBUG2("tcplisten(): sname=[%s], host=[%s], port=[%s]",
                    sname, host, port);
         try {
-
-            // Bind listener socket.
-
-            endpoint ep(null);
-            smartfd sfd(tcplisten(host, port, ep));
-
-            insertnbfile(state_->nbfiles_, sfd, state_->cb_, state_->var_);
-            setnbeventmask(sfd, AUG_FDEVENTRD);
-
-            inetaddr addr(null);
-            AUG_DEBUG2("listening: interface=[%s], port=[%d]",
-                       inetntop(getinetaddr(ep, addr)).c_str(),
-                       static_cast<int>(ntohs(aug::port(ep))));
-
-            // Prepare state.
-
-            servptr serv(state_->servs_.getbyname(sname));
-            listenerptr lptr(new listener(serv, user, sfd));
-            scoped_insert si(state_->socks_, lptr);
-
-            si.commit();
-            return id(*lptr);
+            return (int)state_->engine_.tcplisten(sname, host, port, user);
 
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -514,10 +357,9 @@ namespace augas {
     {
         AUG_DEBUG2("send(): id=[%d]", cid);
         try {
-            if (!state_->socks_.append(cid, buf, len))
-                throw error(__FILE__, __LINE__, EHOSTCALL,
-                            "connection has been shutdown");
+            state_->engine_.send(cid, buf, len);
             return 0;
+
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -527,10 +369,9 @@ namespace augas {
     {
         AUG_DEBUG2("sendv(): id=[%d]", cid);
         try {
-            if (!state_->socks_.append(cid, *var))
-                throw error(__FILE__, __LINE__, EHOSTCALL,
-                            "connection has been shutdown");
+            state_->engine_.sendv(cid, *var);
             return 0;
+
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -541,13 +382,9 @@ namespace augas {
         AUG_DEBUG2("setrwtimer(): id=[%d], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
-            rwtimerptr rwtimer(smartptr_cast<
-                               rwtimer_base>(state_->socks_.getbyid(cid)));
-            if (null == rwtimer)
-                throw error(__FILE__, __LINE__, ESTATE,
-                            "connection not found: id=[%d]", cid);
-            rwtimer->setrwtimer(ms, flags);
+            state_->engine_.setrwtimer(cid, ms, flags);
             return 0;
+
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -558,12 +395,9 @@ namespace augas {
         AUG_DEBUG2("resetrwtimer(): id=[%d], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
-            rwtimerptr rwtimer(smartptr_cast<
-                               rwtimer_base>(state_->socks_.getbyid(cid)));
-            if (null == rwtimer)
-                throw error(__FILE__, __LINE__, ESTATE,
-                            "connection not found: id=[%d]", cid);
-            return rwtimer->resetrwtimer(ms, flags) ? 0 : AUGAS_NONE;
+            return state_->engine_.resetrwtimer(cid, ms, flags)
+                ? 0 : AUGAS_NONE;
+
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -573,12 +407,9 @@ namespace augas {
     {
         AUG_DEBUG2("cancelrwtimer(): id=[%d], flags=[%x]", cid, flags);
         try {
-            rwtimerptr rwtimer(smartptr_cast<
-                               rwtimer_base>(state_->socks_.getbyid(cid)));
-            if (null == rwtimer)
-                throw error(__FILE__, __LINE__, ESTATE,
-                            "connection not found: id=[%d]", cid);
-            return rwtimer->cancelrwtimer(flags) ? 0 : AUGAS_NONE;
+            return state_->engine_.cancelrwtimer(cid, flags)
+                ? 0 : AUGAS_NONE;
+
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -589,20 +420,7 @@ namespace augas {
         const char* sname = getserv()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
-
-            augas_id id(aug_nextid());
-
-            // If aug_settimer() succeeds, it will call aug_destroyvar() on
-            // var when the timer is destroyed.  The service is added to the
-            // container first to minimise any chance of failure after
-            // aug_settimer() has been called.
-
-            state_->idtoserv_[id] = state_->servs_.getbyname(sname);
-            if (-1 == aug_settimer(cptr(state_->timers_), id, ms, timercb_,
-                                   var))
-                state_->idtoserv_.erase(id);
-
-            return id;
+            return (int)state_->engine_.settimer(sname, ms, var);
 
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -613,7 +431,8 @@ namespace augas {
     {
         AUG_DEBUG2("resettimer(): id=[%d], ms=[%u]", tid, ms);
         try {
-            return aug_resettimer(cptr(state_->timers_), tid, ms);
+            return state_->engine_.resettimer(tid, ms) ? 0 : AUGAS_NONE;
+
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -623,16 +442,8 @@ namespace augas {
     {
         AUG_DEBUG2("canceltimer(): id=[%d]", tid);
         try {
-            int ret(aug_canceltimer(cptr(state_->timers_), tid));
+            return state_->engine_.canceltimer(tid) ? 0 : AUGAS_NONE;
 
-            // Only erase if aug_canceltimer() returns true: may be in the
-            // midst of a aug_foreachexpired() call, in which case,
-            // aug_canceltimer() will return false for the timer being
-            // expired.
-
-            if (0 == ret)
-                state_->idtoserv_.erase(tid);
-            return ret;
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -648,18 +459,13 @@ namespace augas {
                 throw error(__FILE__, __LINE__, ESSLCTX,
                             "SSL context [%s] not initialised", ctx);
 
-            connptr cptr(smartptr_cast<
-                         conn_base>(state_->socks_.getbyid(cid)));
-            if (null == cptr)
-                throw error(__FILE__, __LINE__, ESTATE,
-                            "connection not found: id=[%d]", cid);
-
-            setsslclient(*it->second, *cptr);
+            state_->engine_.setsslclient(cid, *it->second);
             return 0;
+
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
-                       AUG_MSG("aug_setsslclient() not supported"));
+                       AUG_MSG("aug_setsslserver() not supported"));
 #endif // !HAVE_OPENSSL_SSL_H
         return -1;
     }
@@ -675,14 +481,9 @@ namespace augas {
                 throw error(__FILE__, __LINE__, ESSLCTX,
                             "SSL context [%s] not initialised", ctx);
 
-            connptr cptr(smartptr_cast<
-                         conn_base>(state_->socks_.getbyid(cid)));
-            if (null == cptr)
-                throw error(__FILE__, __LINE__, ESTATE,
-                            "connection not found: id=[%d]", cid);
-
-            setsslserver(*it->second, *cptr);
+            state_->engine_.setsslclient(cid, *it->second);
             return 0;
+
         } AUG_SETERRINFOCATCH;
 #else // !HAVE_OPENSSL_SSL_H
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
@@ -767,7 +568,7 @@ namespace augas {
                 }
 
                 aug_info("creating service: name=[%s]", name.c_str());
-                state_->servs_
+                state_->engine_
                     .insert(name, servptr(new augas::serv(it->second,
                                                           name.c_str())),
                             options_.get(base + ".groups", 0));
@@ -783,161 +584,12 @@ namespace augas {
             state_->modules_[DEFAULT_NAME] = module;
 
             aug_info("creating service: name=[%s]", DEFAULT_NAME);
-            state_->servs_
+            state_->engine_
                 .insert(DEFAULT_NAME,
                         servptr(new augas::serv(module, DEFAULT_NAME)), 0);
         }
 
-        // Remove any timers allocated to services that could not be opened.
-
-        idtoserv::iterator it(state_->idtoserv_.begin()),
-            end(state_->idtoserv_.end());
-        while (it != end) {
-            if (!it->second->active()) {
-                aug_warn("cancelling timer associated with inactive service");
-                aug_canceltimer(cptr(state_->timers_), it->first);
-                state_->idtoserv_.erase(it++);
-            } else
-                ++it;
-        }
-    }
-
-    void
-    accept_(const sock_base& sock)
-    {
-        endpoint ep(null);
-
-        AUG_DEBUG2("accepting connection");
-
-        smartfd sfd(null);
-        try {
-
-            sfd = accept(sock.sfd(), ep);
-
-        } catch (const errinfo_error& e) {
-
-            if (aug_acceptlost()) {
-                aug_warn("accept() failed: %s", e.what());
-                return;
-            }
-            throw;
-        }
-
-        insertnbfile(state_->nbfiles_, sfd, state_->cb_, state_->var_);
-        setnbeventmask(sfd, AUG_FDEVENTRD);
-
-        setsockopts_(sfd);
-        connptr cptr(new servconn(sock.serv(), user(sock), state_->timers_,
-                                  sfd, ep));
-
-        scoped_insert si(state_->socks_, cptr);
-        AUG_DEBUG2("initialising connection: id=[%d], fd=[%d]", id(*cptr),
-                   sfd.get());
-
-        if (cptr->accepted(ep))
-            si.commit();
-    }
-
-    bool
-    process_(const connptr& cptr, int fd, unsigned short events)
-    {
-        bool changed = false, ok = false;
-        try {
-            changed = cptr->process(events);
-            ok = true;
-        } AUG_PERRINFOCATCH;
-
-        if (!ok) {
-
-            // Connection is closed if an exception is thrown during
-            // processing.
-
-            state_->socks_.erase(*cptr);
-            return false;
-        }
-
-        if (HANDSHAKE == cptr->state()) {
-
-            // The associated file descriptor may change as connection
-            // attempts fail and alternative addresses are tried.
-
-            insertnbfile(state_->nbfiles_, cptr->sfd(), state_->cb_,
-                         state_->var_);
-            setnbeventmask(cptr->sfd(), AUG_FDEVENTALL);
-
-            state_->socks_.update(cptr, fd);
-
-        } else if (changed)
-
-            switch (cptr->state()) {
-            case CONNECTED:
-
-                // Was connecting, now established: notify module of
-                // connection establishment.
-
-                connected_(*cptr);
-                break;
-            case CLOSED:
-                state_->socks_.erase(*cptr);
-                return false;
-            default:
-                break;
-            }
-
-        return true;
-    }
-
-    bool
-    readevent_()
-    {
-        aug_event event;
-        AUG_DEBUG2("reading event");
-
-        switch (aug::readevent(aug_eventin(), event).type_) {
-        case AUG_EVENTRECONF:
-            AUG_DEBUG2("received AUG_EVENTRECONF");
-            if (*conffile_) {
-                AUG_DEBUG2("reading config-file: path=[%s]", conffile_);
-                options_.read(conffile_);
-            }
-            doreconf_();
-            state_->servs_.reconf();
-            break;
-        case AUG_EVENTSTATUS:
-            AUG_DEBUG2("received AUG_EVENTSTATUS");
-            break;
-        case AUG_EVENTSTOP:
-            AUG_DEBUG2("received AUG_EVENTSTOP");
-            stop_();
-            break;
-        case AUG_EVENTSIGNAL:
-            AUG_DEBUG2("received AUG_EVENTSIGNAL");
-            break;
-        case DAUG_WAKEUP:
-            AUG_DEBUG2("received DAUG_WAKEUP");
-            // Actual handling is performed in do_run().
-            break;
-        case DAUG_MODEVENT:
-            AUG_DEBUG2("received DAUG_MODEVENT");
-            {
-                auto_ptr<augas::event> ev(static_cast<
-                                          augas::event*>(event.var_.arg_));
-
-                vector<servptr> servs;
-                state_->servs_.getbygroup(servs, ev->to_);
-
-                size_t size;
-                const void* user(varbuf(ev->var_, size));
-
-                vector<servptr>::const_iterator it(servs.begin()),
-                    end(servs.end());
-                for (; it != end; ++it)
-                    (*it)->event(ev->from_.c_str(), ev->type_.c_str(), user,
-                                 size);
-            }
-        }
-        destroyvar(event.var_);
-        return true;
+        state_->engine_.cancelinactive();
     }
 
     class service {
@@ -1000,7 +652,7 @@ namespace augas {
             realpath(rundir_, rundir ? rundir : getcwd().c_str(),
                      sizeof(rundir_));
 
-            doreconf_();
+            reconf_();
         }
 
         void
@@ -1011,7 +663,7 @@ namespace augas {
             setsrvlogger("daug");
 
             aug_var var = { 0, this };
-            auto_ptr<state> s(new state(nbfilememcb<service>, var, pass64_));
+            auto_ptr<state> s(new state(pass64_));
             state_ = s;
             try {
                 load_();
@@ -1020,7 +672,7 @@ namespace augas {
                 // Ownership back to local.
 
                 s = state_;
-                s->servs_.clear();
+                s->engine_.clear();
                 throw;
             }
         }
@@ -1028,6 +680,7 @@ namespace augas {
         void
         run()
         {
+#if 0
             timer reopen(state_->timers_);
 
             // Re-open log file every minute.
@@ -1086,6 +739,7 @@ namespace augas {
                 if (!daemon_)
                     stop_();
             }
+#endif
         }
 
         void
@@ -1095,33 +749,13 @@ namespace augas {
 
             // Clear services first.
 
-            state_->servs_.clear();
+            state_->engine_.clear();
 
             // Modules must be kept alive until remaining connections and
             // timers have been destroyed: a destroy_() function may depend on
             // a function implemented in a module.
 
             state_.reset();
-        }
-
-        bool
-        nbfilecb(int fd, unsigned short events)
-        {
-            // Intercept activity on event pipe.
-
-            if (fd == aug_eventin())
-                return readevent_();
-
-            sockptr sock(state_->socks_.getbyfd(fd));
-            connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
-
-            AUG_DEBUG2("processing sock: id=[%d], fd=[%d]", id(*sock), fd);
-
-            if (null != cptr)
-                return process_(cptr, fd, events);
-
-            accept_(*sock);
-            return true;
         }
     };
 }
