@@ -70,7 +70,7 @@ namespace test {
         void
         readevent()
         {
-            int fd(aug_eventin());
+            int fd(aug_eventrd());
             aug_event event;
 
             AUG_DEBUG2("checking event pipe '%d'", fd);
@@ -80,7 +80,7 @@ namespace test {
 
             AUG_DEBUG2("reading event");
 
-            switch (aug::readevent(aug_eventin(), event).type_) {
+            switch (aug::readevent(aug_eventrd(), event).type_) {
             case AUG_EVENTRECONF:
                 aug_info("received AUG_EVENTRECONF");
                 if (*conffile_) {
@@ -172,7 +172,7 @@ namespace test {
             verify(aug_setsrvlogger("aug"));
 
             auto_ptr<state> ptr(new state());
-            setfdeventmask(ptr->mplexer_, aug_eventin(), AUG_FDEVENTRD);
+            setfdeventmask(ptr->mplexer_, aug_eventrd(), AUG_FDEVENTRD);
             state_ = ptr;
         }
 

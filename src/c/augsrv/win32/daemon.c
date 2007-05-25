@@ -63,12 +63,12 @@ handler_(DWORD code)
     switch (code) {
     case RECONF_:
         event.type_ = AUG_EVENTRECONF;
-        if (!aug_writeevent(aug_eventout(), &event))
+        if (!aug_writeevent(aug_eventwr(), &event))
             aug_perrinfo(NULL, "aug_writeevent() failed");
         break;
     case STATUS_:
         event.type_ = AUG_EVENTSTATUS;
-        if (!aug_writeevent(aug_eventout(), &event))
+        if (!aug_writeevent(aug_eventwr(), &event))
             aug_perrinfo(NULL, "aug_writeevent() failed");
         break;
     case STOP_:
@@ -76,7 +76,7 @@ handler_(DWORD code)
     case SERVICE_CONTROL_SHUTDOWN:
         setstatus_(SERVICE_STOP_PENDING);
         event.type_ = AUG_EVENTSTOP;
-        if (!aug_writeevent(aug_eventout(), &event)) {
+        if (!aug_writeevent(aug_eventwr(), &event)) {
             aug_perrinfo(NULL, "aug_writeevent() failed");
             setstatus_(SERVICE_RUNNING);
         }

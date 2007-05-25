@@ -80,10 +80,12 @@ enginecb_base::~enginecb_base() AUG_NOTHROW
 }
 
 namespace aug {
+
     namespace detail {
+
         struct engineimpl {
 
-            fdref eventfd_;
+            fdref rdfd_, wrfd_;
             enginecb_base& cb_;
             nbfiles nbfiles_;
             servs servs_;
@@ -109,18 +111,19 @@ namespace aug {
             {
                 AUG_DEBUG2("removing event pipe from list");
                 try {
-                    removenbfile(eventfd_);
+                    removenbfile(rdfd_);
                 } AUG_PERRINFOCATCH;
             }
-            engineimpl(fdref eventfd, enginecb_base& cb)
-                : eventfd_(eventfd),
+            engineimpl(fdref rdfd, fdref wrfd, enginecb_base& cb)
+                : rdfd_(rdfd),
+                  wrfd_(wrfd),
                   cb_(cb),
                   grace_(timers_),
                   state_(STARTED)
             {
                 AUG_DEBUG2("inserting event pipe to list");
-                insertnbfile(nbfiles_, eventfd, *this);
-                setnbeventmask(eventfd, AUG_FDEVENTRD);
+                insertnbfile(nbfiles_, rdfd, *this);
+                setnbeventmask(rdfd, AUG_FDEVENTRD);
             }
             void
             teardown()
@@ -223,7 +226,7 @@ namespace aug {
                 aug_event event;
                 AUG_DEBUG2("reading event");
 
-                switch (aug::readevent(eventfd_, event).type_) {
+                switch (aug::readevent(rdfd_, event).type_) {
                 case AUG_EVENTRECONF:
                     AUG_DEBUG2("received AUG_EVENTRECONF");
                     cb_.reconf();
@@ -270,7 +273,7 @@ namespace aug {
             {
                 // Intercept activity on event pipe.
 
-                if (fd == eventfd_)
+                if (fd == rdfd_)
                     return readevent();
 
                 sockptr sock(socks_.getbyfd(fd));
@@ -323,27 +326,32 @@ engine::~engine() AUG_NOTHROW
     delete impl_;
 }
 
-engine::engine(fdref eventfd, enginecb_base& cb)
-    : impl_(new detail::engineimpl(eventfd, cb))
+engine::engine(fdref rdfd, fdref wrfd, enginecb_base& cb)
+    : impl_(new detail::engineimpl(rdfd, wrfd, cb))
 {
 }
 
 void
 engine::clear()
 {
+    impl_->timerpairs_.clear();
+    impl_->socks_.clear();
+
+    // TODO: erase the services in reverse order to which they were added.
+
     impl_->servs_.clear();
 }
 
 void
 engine::post(const char* sname, const char* to, const char* type,
-             const augas_var* var)
+             const aug_var* var)
 {
     auto_ptr<postevent> arg(new postevent(sname, to, type));
     aug_event e;
     e.type_ = POSTEVENT_;
     e.var_.type_ = 0;
     e.var_.arg_ = arg.get();
-    writeevent(impl_->eventfd_, e);
+    writeevent(impl_->wrfd_, e);
     aug_setvar(&arg->var_, var);
     arg.release();
 }
@@ -409,7 +417,7 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
             // this function has returned.
 
             aug_event e = { AUG_EVENTWAKEUP, AUG_VARNULL };
-            writeevent(impl_->eventfd_, e);
+            writeevent(impl_->wrfd_, e);
         }
 
         // Add to pending queue.
@@ -462,7 +470,7 @@ engine::send(augas_id cid, const void* buf, size_t len)
 }
 
 void
-engine::sendv(augas_id cid, const augas_var& var)
+engine::sendv(augas_id cid, const aug_var& var)
 {
     if (!impl_->socks_.append(cid, var))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
@@ -504,7 +512,7 @@ engine::cancelrwtimer(augas_id cid, unsigned flags)
 }
 
 augas_id
-engine::settimer(const char* sname, unsigned ms, const augas_var* var)
+engine::settimer(const char* sname, unsigned ms, const aug_var* var)
 {
     augas_id id(aug_nextid());
     aug_var local;

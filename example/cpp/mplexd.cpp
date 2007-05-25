@@ -205,8 +205,8 @@ namespace test {
             endpoint ep(null);
             smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
 
-            insertfile(files_, aug_eventin(), cb, var);
-            setfdeventmask(mplexer_, aug_eventin(), AUG_FDEVENTRD);
+            insertfile(files_, aug_eventrd(), cb, var);
+            setfdeventmask(mplexer_, aug_eventrd(), AUG_FDEVENTRD);
 
             insertfile(files_, sfd, cb, var);
             setfdeventmask(mplexer_, sfd, AUG_FDEVENTRD);
@@ -236,7 +236,7 @@ namespace test {
             aug_event event;
             AUG_DEBUG2("reading event");
 
-            switch (aug::readevent(aug_eventin(), event).type_) {
+            switch (aug::readevent(aug_eventrd(), event).type_) {
             case AUG_EVENTRECONF:
                 aug_info("received AUG_EVENTRECONF");
                 if (*conffile_) {
@@ -410,7 +410,7 @@ namespace test {
             if (!fdevents(state_->mplexer_, fd))
                 return true;
 
-            if (fd == aug_eventin())
+            if (fd == aug_eventrd())
                 return readevent(fd, state_->files_);
 
             if (fd == state_->sfd_.get())

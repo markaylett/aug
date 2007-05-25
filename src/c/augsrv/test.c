@@ -52,10 +52,10 @@ run_(void* arg)
 {
     struct aug_event in = { 1, AUG_VARNULL }, out = { !1, AUG_VARNULL };
 
-    if (!aug_writeevent(aug_eventout(), &in))
+    if (!aug_writeevent(aug_eventwr(), &in))
         return -1;
 
-    if (!aug_readevent(aug_eventin(), &out))
+    if (!aug_readevent(aug_eventrd(), &out))
         return -1;
 
     if (in.type_ != out.type_) {

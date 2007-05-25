@@ -28,9 +28,9 @@ AUGSRV_API void
 aug_termservice(void);
 
 AUGSRV_API int
-aug_eventin(void);
+aug_eventrd(void);
 
 AUGSRV_API int
-aug_eventout(void);
+aug_eventwr(void);
 
 #endif /* AUGSRV_BASE_H */

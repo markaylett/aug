@@ -37,12 +37,15 @@ AUG_RCSID("$Id$");
 #include <time.h>
 
 using namespace aug;
+using namespace augas;
 using namespace std;
 
 #define DAUG_WAKEUP   (AUG_EVENTUSER + 0)
 #define DAUG_MODEVENT (AUG_EVENTUSER + 1)
 
-namespace augas {
+namespace {
+
+    typedef char cstring[AUG_PATH_MAX + 1];
 
     const char DEFAULT_NAME[] = "default";
 
@@ -54,8 +57,15 @@ namespace augas {
     const char MODEXT[] = ".dll";
 #endif // _WIN32
 
+    const char* program_;
+    cstring conffile_= "";
+    cstring rundir_ = "";
+    cstring logdir_ = "";
+    options options_;
+    bool daemon_(false);
+
     bool
-    withso(const string& s)
+    withso_(const string& s)
     {
         string::size_type n(s.size());
         return 3 < n
@@ -65,7 +75,7 @@ namespace augas {
     }
 
     bool
-    withdll(const string& s)
+    withdll_(const string& s)
     {
         string::size_type n(s.size());
         return 4 < n
@@ -76,19 +86,10 @@ namespace augas {
     }
 
     bool
-    withext(const string& s)
+    withext_(const string& s)
     {
-        return withso(s) || withdll(s);
+        return withso_(s) || withdll_(s);
     }
-
-    typedef char cstring[AUG_PATH_MAX + 1];
-
-    const char* program_;
-    cstring conffile_= "";
-    cstring rundir_ = "";
-    cstring logdir_ = "";
-    options options_;
-    bool daemon_(false);
 
     void
     openlog_()
@@ -103,13 +104,6 @@ namespace augas {
            << setw(2) << tm.tm_mon + 1
            << setw(2) << tm.tm_mday;
         openlog(makepath(logdir_, ss.str().c_str(), "log").c_str());
-    }
-
-    void
-    reopen_(const aug_var& var, int id, unsigned& ms)
-    {
-        AUG_DEBUG2("re-opening log file");
-        openlog_();
     }
 
     void
@@ -163,6 +157,12 @@ namespace augas {
             }
             reconf_();
         }
+        void
+        do_reopen()
+        {
+            AUG_DEBUG2("re-opening log file");
+            openlog_();
+        }
 
     } enginecb_;
 
@@ -176,16 +176,9 @@ namespace augas {
 #endif // HAVE_OPENSSL_SSL_H
         engine engine_;
 
-        ~state() AUG_NOTHROW
-        {
-            AUG_DEBUG2("removing event pipe from list");
-            try {
-                removenbfile(aug_eventin());
-            } AUG_PERRINFOCATCH;
-        }
         explicit
         state(const string& pass64)
-            : engine_(aug_eventin(), enginecb_)
+            : engine_(aug_eventrd(), aug_eventwr(), enginecb_)
         {
 #if HAVE_OPENSSL_SSL_H
             initssl();
@@ -234,7 +227,7 @@ namespace augas {
     {
         try {
             aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
-            writeevent(aug_eventout(), e);
+            writeevent(aug_eventwr(), e);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -247,7 +240,7 @@ namespace augas {
     {
         try {
             aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
-            writeevent(aug_eventout(), e);
+            writeevent(aug_eventwr(), e);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -555,7 +548,7 @@ namespace augas {
 
                     string path(options_.get(string("module.").append(value)
                                              .append(".path")));
-                    if (!withext(path))
+                    if (!withext_(path))
                         path += MODEXT;
 
                     aug_info("loading module: name=[%s], path=[%s]",
@@ -680,66 +673,7 @@ namespace augas {
         void
         run()
         {
-#if 0
-            timer reopen(state_->timers_);
-
-            // Re-open log file every minute.
-
-            if (daemon_)
-                reopen.set(60000, timercb<reopen_>, null);
-
-            AUG_DEBUG2("running daemon process");
-
-            int ret(!0);
-            while (!stopping_ || !state_->socks_.empty()) {
-
-                if (2 == stopping_)
-                    break;
-
-                try {
-
-                    if (state_->timers_.empty()) {
-
-                        scoped_unblock unblock;
-                        while (AUG_RETINTR == (ret = waitnbevents
-                                               (state_->nbfiles_)))
-                            ;
-
-                    } else {
-
-                        AUG_DEBUG2("processing timers");
-
-                        timeval tv;
-                        foreachexpired(state_->timers_, 0 == ret, tv);
-
-                        scoped_unblock unblock;
-                        while (AUG_RETINTR == (ret = waitnbevents
-                                               (state_->nbfiles_, tv)))
-                            ;
-                    }
-
-                    // Notify of any established connections before processing
-                    // the files: data may have arrived on a newly established
-                    // connection.
-
-                    while (!state_->connected_.empty()) {
-                        connected_(*state_->connected_.front());
-                        state_->connected_.pop();
-                    }
-
-                    AUG_DEBUG2("processing files");
-
-                    foreachnbfile(state_->nbfiles_);
-                    continue;
-
-                } AUG_PERRINFOCATCH;
-
-                // When running in foreground, stop on error.
-
-                if (!daemon_)
-                    stop_();
-            }
-#endif
+            state_->engine_.run(daemon_);
         }
 
         void
@@ -763,9 +697,9 @@ namespace augas {
 int
 main(int argc, char* argv[])
 {
-    using namespace augas;
-
     try {
+
+         // Initialise aug libraries.
 
         aug_errinfo errinfo;
         scoped_init init(errinfo);

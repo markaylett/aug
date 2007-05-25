@@ -53,14 +53,14 @@ namespace aug {
     public:
         ~engine() AUG_NOTHROW;
 
-        engine(fdref eventfd, enginecb_base& cb);
+        engine(fdref rdfd, fdref wrfd, enginecb_base& cb);
 
         void
         clear();
 
         void
         post(const char* sname, const char* to, const char* type,
-             const augas_var* var);
+             const aug_var* var);
 
         void
         dispatch(const char* sname, const char* to, const char* type,
@@ -84,7 +84,7 @@ namespace aug {
         send(augas_id cid, const void* buf, size_t len);
 
         void
-        sendv(augas_id cid, const augas_var& var);
+        sendv(augas_id cid, const aug_var& var);
 
         void
         setrwtimer(augas_id cid, unsigned ms, unsigned flags);
@@ -96,7 +96,7 @@ namespace aug {
         cancelrwtimer(augas_id cid, unsigned flags);
 
         augas_id
-        settimer(const char* sname, unsigned ms, const augas_var* var);
+        settimer(const char* sname, unsigned ms, const aug_var* var);
 
         bool
         resettimer(augas_id tid, unsigned ms);

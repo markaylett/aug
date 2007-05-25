@@ -147,13 +147,13 @@ aug_termservice(void)
 }
 
 AUGSRV_API int
-aug_eventin(void)
+aug_eventrd(void)
 {
     return fds_[0];
 }
 
 AUGSRV_API int
-aug_eventout(void)
+aug_eventwr(void)
 {
     return fds_[1];
 }
