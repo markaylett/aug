@@ -209,7 +209,7 @@ namespace aug {
                         // Was connecting, now established: notify module of
                         // connection establishment.
 
-                        connected(*cptr);
+                        setconnected(*cptr);
                         break;
                     case CLOSED:
                         socks_.erase(*cptr);
@@ -334,7 +334,6 @@ engine::engine(fdref rdfd, fdref wrfd, enginecb_base& cb)
 void
 engine::clear()
 {
-    impl_->timerpairs_.clear();
     impl_->socks_.clear();
 
     // TODO: erase the services in reverse order to which they were added.
@@ -632,7 +631,7 @@ engine::run(bool daemon)
     int ret(!0);
     while (!stopping() || !impl_->socks_.empty()) {
 
-        if (detail::engineimpl::STOPPED == stopping())
+        if (detail::engineimpl::STOPPED == impl_->state_)
             break;
 
         try {

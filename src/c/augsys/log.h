@@ -86,7 +86,7 @@ aug_debug3(const char* format, ...);
 # define AUG_DEBUG2 aug_debug2
 # define AUG_DEBUG3 aug_debug3
 #else /* NDEBUG */
-# define AUG_DEBUG0 aug_debug0
+# define AUG_DEBUG0 1 ? (void)0 : (void)aug_debug0
 # define AUG_DEBUG1 1 ? (void)0 : (void)aug_debug1
 # define AUG_DEBUG2 1 ? (void)0 : (void)aug_debug2
 # define AUG_DEBUG3 1 ? (void)0 : (void)aug_debug3
