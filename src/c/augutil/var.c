@@ -35,7 +35,7 @@ aug_varbuf(const struct aug_var* v, size_t* size)
 
     if (size)
         *size = 0;
-    return 0;
+    return NULL;
 }
 
 AUGUTIL_API void*

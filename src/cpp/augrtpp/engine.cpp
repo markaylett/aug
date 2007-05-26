@@ -30,9 +30,6 @@ using namespace std;
 
 namespace {
 
-    typedef map<int, pair<servptr, aug_var> > timerpairs;
-    typedef queue<connptr> pending;
-
     struct postevent {
         string from_, to_, type_;
         aug_var var_;
@@ -51,6 +48,28 @@ namespace {
             var_.arg_ = 0;
         }
     };
+
+    struct servtimer {
+        servptr serv_;
+        aug_var var_;
+        ~servtimer() AUG_NOTHROW
+        {
+            try {
+                destroyvar(var_);
+            } AUG_PERRINFOCATCH;
+        }
+        explicit
+        servtimer(const servptr& serv)
+            : serv_(serv)
+        {
+            var_.type_ = 0;
+            var_.arg_ = 0;
+        }
+    };
+
+    typedef smartptr<servtimer> servtimerptr;
+    typedef map<augas_id, servtimerptr> servtimers;
+    typedef queue<connptr> pending;
 
     void
     setsockopts(const smartfd& sfd)
@@ -95,7 +114,7 @@ namespace aug {
 
             // Mapping of timer-ids to services.
 
-            timerpairs timerpairs_;
+            servtimers servtimers_;
 
             // Pending calls to connected().
 
@@ -293,14 +312,14 @@ namespace aug {
             {
                 AUG_DEBUG2("custom timer expiry");
 
-                timerpairs::iterator it(timerpairs_.find(id));
-                pair<servptr, aug_var> xy(it->second);
-                augas_object timer = { id, xy.second.arg_ };
-                xy.first->expire(timer, ms);
+                servtimers::iterator it(servtimers_.find(id));
+                servtimerptr tptr(it->second);
+                augas_object timer = { id, tptr->var_.arg_ };
+                tptr->serv_->expire(timer, ms);
 
                 if (0 == ms) {
                     AUG_DEBUG2("removing timer: ms has been set to zero");
-                    timerpairs_.erase(it);
+                    servtimers_.erase(it);
                 }
             }
             void
@@ -351,6 +370,9 @@ engine::post(const char* sname, const char* to, const char* type,
     e.var_.type_ = 0;
     e.var_.arg_ = arg.get();
     writeevent(impl_->wrfd_, e);
+
+    // Event takes ownership of var only when post cannot fail.
+
     aug_setvar(&arg->var_, var);
     arg.release();
 }
@@ -513,25 +535,22 @@ engine::cancelrwtimer(augas_id cid, unsigned flags)
 augas_id
 engine::settimer(const char* sname, unsigned ms, const aug_var* var)
 {
-    augas_id id(aug_nextid());
-    aug_var local;
-    aug_setvar(&local, var);
-
     // If aug_settimer() succeeds, it will call aug_destroyvar() on var when
     // the timer is destroyed.  The service is added to the container first to
     // minimise any chance of failure after aug_settimer() has been called.
 
-    impl_->timerpairs_[id] = make_pair(impl_->servs_.getbyname(sname), local);
+    augas_id id(aug_nextid());
+    aug_var local = { 0, impl_ };
 
-    try {
-        local.type_ = 0;
-        local.arg_ = impl_;
-        aug::settimer(impl_->timers_, id, ms, timermemcb<detail::engineimpl,
-                      &detail::engineimpl::customcb>, local);
-    } catch (...) {
-        impl_->timerpairs_.erase(id);
-        throw;
-    }
+    aug::settimer(impl_->timers_, id, ms, timermemcb<detail::engineimpl,
+                  &detail::engineimpl::customcb>, local);
+
+    servtimerptr tptr(new servtimer(impl_->servs_.getbyname(sname)));
+    impl_->servtimers_[id] = tptr;
+
+    // Timer takes ownership of var only when settimer cannot fail.
+
+    aug_setvar(&tptr->var_, var);
     return id;
 }
 
@@ -551,7 +570,7 @@ engine::canceltimer(augas_id tid)
     // return false for the timer being expired.
 
     if (ret)
-        impl_->timerpairs_.erase(tid);
+        impl_->servtimers_.erase(tid);
     return ret;
 }
 
@@ -600,13 +619,13 @@ engine::cancelinactive()
 {
     // Remove any timers allocated to services that could not be opened.
 
-    timerpairs::iterator it(impl_->timerpairs_.begin()),
-        end(impl_->timerpairs_.end());
+    servtimers::iterator it(impl_->servtimers_.begin()),
+        end(impl_->servtimers_.end());
     while (it != end) {
-        if (!it->second.first->active()) {
+        if (!it->second->serv_->active()) {
             aug_warn("cancelling timer associated with inactive service");
             aug_canceltimer(cptr(impl_->timers_), it->first);
-            impl_->timerpairs_.erase(it++);
+            impl_->servtimers_.erase(it++);
         } else
             ++it;
     }
