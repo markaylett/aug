@@ -65,15 +65,15 @@ servconn::do_sfd() const
 }
 
 void
-servconn::do_append(const aug_var& var)
+servconn::do_send(const void* buf, size_t len)
 {
-    conn_.append(var);
+    conn_.send(buf, len);
 }
 
 void
-servconn::do_append(const void* buf, size_t len)
+servconn::do_sendv(const aug_var& var)
 {
-    conn_.append(buf, len);
+    conn_.sendv(var);
 }
 
 bool

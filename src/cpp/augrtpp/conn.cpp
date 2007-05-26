@@ -45,16 +45,16 @@ connected::do_sfd() const
 }
 
 void
-connected::do_append(const aug_var& var)
+connected::do_send(const void* buf, size_t len)
 {
-    buffer_.append(var);
+    buffer_.append(buf, len);
     setnbeventmask(sfd_, AUG_FDEVENTRDWR);
 }
 
 void
-connected::do_append(const void* buf, size_t len)
+connected::do_sendv(const aug_var& var)
 {
-    buffer_.append(buf, len);
+    buffer_.append(var);
     setnbeventmask(sfd_, AUG_FDEVENTRDWR);
 }
 
@@ -216,15 +216,15 @@ handshake::do_sfd() const
 }
 
 void
-handshake::do_append(const aug_var& var)
+handshake::do_send(const void* buf, size_t len)
 {
-    buffer_.append(var);
+    buffer_.append(buf, len);
 }
 
 void
-handshake::do_append(const void* buf, size_t len)
+handshake::do_sendv(const aug_var& var)
 {
-    buffer_.append(buf, len);
+    buffer_.append(var);
 }
 
 bool

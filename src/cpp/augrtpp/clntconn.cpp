@@ -65,15 +65,15 @@ clntconn::do_sfd() const
 }
 
 void
-clntconn::do_append(const aug_var& var)
+clntconn::do_send(const void* buf, size_t len)
 {
-    conn_->append(var);
+    conn_->send(buf, len);
 }
 
 void
-clntconn::do_append(const void* buf, size_t len)
+clntconn::do_sendv(const aug_var& var)
 {
-    conn_->append(buf, len);
+    conn_->sendv(var);
 }
 
 bool

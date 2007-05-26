@@ -308,7 +308,7 @@ namespace aug {
                 return true;
             }
             void
-            customcb(int id, unsigned& ms)
+            timercb(int id, unsigned& ms)
             {
                 AUG_DEBUG2("custom timer expiry");
 
@@ -371,7 +371,7 @@ engine::post(const char* sname, const char* to, const char* type,
     e.var_.arg_ = arg.get();
     writeevent(impl_->wrfd_, e);
 
-    // Event takes ownership of var only when post cannot fail.
+    // Event takes ownership of var when post cannot fail.
 
     aug_setvar(&arg->var_, var);
     arg.release();
@@ -485,7 +485,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
 void
 engine::send(augas_id cid, const void* buf, size_t len)
 {
-    if (!impl_->socks_.append(cid, buf, len))
+    if (!impl_->socks_.send(cid, buf, len))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                           "connection has been shutdown");
 }
@@ -493,7 +493,7 @@ engine::send(augas_id cid, const void* buf, size_t len)
 void
 engine::sendv(augas_id cid, const aug_var& var)
 {
-    if (!impl_->socks_.append(cid, var))
+    if (!impl_->socks_.sendv(cid, var))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                           "connection has been shutdown");
 }
@@ -535,20 +535,19 @@ engine::cancelrwtimer(augas_id cid, unsigned flags)
 augas_id
 engine::settimer(const char* sname, unsigned ms, const aug_var* var)
 {
-    // If aug_settimer() succeeds, it will call aug_destroyvar() on var when
-    // the timer is destroyed.  The service is added to the container first to
-    // minimise any chance of failure after aug_settimer() has been called.
-
     augas_id id(aug_nextid());
     aug_var local = { 0, impl_ };
 
+    // If aug_settimer() succeeds, aug_destroyvar() will be called on var when
+    // the timer is destroyed.
+
     aug::settimer(impl_->timers_, id, ms, timermemcb<detail::engineimpl,
-                  &detail::engineimpl::customcb>, local);
+                  &detail::engineimpl::timercb>, local);
 
     servtimerptr tptr(new servtimer(impl_->servs_.getbyname(sname)));
     impl_->servtimers_[id] = tptr;
 
-    // Timer takes ownership of var only when settimer cannot fail.
+    // Timer takes ownership of var when settimer cannot fail.
 
     aug_setvar(&tptr->var_, var);
     return id;

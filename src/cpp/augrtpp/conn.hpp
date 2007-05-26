@@ -16,10 +16,10 @@ namespace aug {
     class conn_base : public sock_base {
 
         virtual void
-        do_append(const aug_var& var) = 0;
+        do_send(const void* buf, size_t size) = 0;
 
         virtual void
-        do_append(const void* buf, size_t size) = 0;
+        do_sendv(const aug_var& var) = 0;
 
         virtual bool
         do_accepted(const aug_endpoint& ep) = 0;
@@ -46,14 +46,14 @@ namespace aug {
         ~conn_base() AUG_NOTHROW;
 
         void
-        append(const aug_var& var)
+        send(const void* buf, size_t size)
         {
-            do_append(var);
+            do_send(buf, size);
         }
         void
-        append(const void* buf, size_t size)
+        sendv(const aug_var& var)
         {
-            do_append(buf, size);
+            do_sendv(var);
         }
         bool
         accepted(const aug_endpoint& ep)
@@ -124,10 +124,10 @@ namespace aug {
         do_sfd() const;
 
         void
-        do_append(const aug_var& var);
+        do_send(const void* buf, size_t size);
 
         void
-        do_append(const void* buf, size_t size);
+        do_sendv(const aug_var& var);
 
         bool
         do_accepted(const aug_endpoint& ep);
@@ -184,10 +184,10 @@ namespace aug {
         do_sfd() const;
 
         void
-        do_append(const aug_var& var);
+        do_send(const void* buf, size_t size);
 
         void
-        do_append(const void* buf, size_t size);
+        do_sendv(const aug_var& var);
 
         bool
         do_accepted(const aug_endpoint& ep);

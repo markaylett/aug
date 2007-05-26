@@ -11,12 +11,7 @@ AUG_RCSID("$Id$");
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "augrtpp/clntconn.hpp"
 #include "augrtpp/engine.hpp"
-#include "augrtpp/listener.hpp"
-#include "augrtpp/servs.hpp"
-#include "augrtpp/servconn.hpp"
-#include "augrtpp/socks.hpp"
 
 #include "daug/exception.hpp"
 #include "daug/module.hpp"
@@ -25,23 +20,17 @@ AUG_RCSID("$Id$");
 #include "daug/ssl.hpp"
 #include "daug/utility.hpp"
 
-#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory> // auto_ptr<>
 #include <sstream>
-#include <queue>
-#include <vector>
 
 #include <time.h>
 
 using namespace aug;
 using namespace augas;
 using namespace std;
-
-#define DAUG_WAKEUP   (AUG_EVENTUSER + 0)
-#define DAUG_MODEVENT (AUG_EVENTUSER + 1)
 
 namespace {
 
@@ -225,10 +214,12 @@ namespace {
     int
     reconfall_()
     {
+        AUG_DEBUG2("reconfall()");
         try {
             aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
             writeevent(aug_eventwr(), e);
             return 0;
+
         } AUG_SETERRINFOCATCH;
         return -1;
     }
@@ -238,10 +229,12 @@ namespace {
     int
     stopall_()
     {
+        AUG_DEBUG2("stopall()");
         try {
             aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
             writeevent(aug_eventwr(), e);
             return 0;
+
         } AUG_SETERRINFOCATCH;
         return -1;
     }

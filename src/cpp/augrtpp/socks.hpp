@@ -28,10 +28,10 @@ namespace aug {
         {
         }
         bool
-        append(augas_id cid, const aug_var& var);
+        send(augas_id cid, const void* buf, size_t size);
 
         bool
-        append(augas_id cid, const void* buf, size_t size);
+        sendv(augas_id cid, const aug_var& var);
 
         void
         clear();

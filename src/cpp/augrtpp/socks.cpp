@@ -13,24 +13,24 @@ using namespace aug;
 using namespace std;
 
 bool
-socks::append(augas_id cid, const aug_var& var)
+socks::send(augas_id cid, const void* buf, size_t len)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
         return false;
 
-    cptr->append(var);
+    cptr->send(buf, len);
     return true;
 }
 
 bool
-socks::append(augas_id cid, const void* buf, size_t len)
+socks::sendv(augas_id cid, const aug_var& var)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
         return false;
 
-    cptr->append(buf, len);
+    cptr->sendv(var);
     return true;
 }
 
