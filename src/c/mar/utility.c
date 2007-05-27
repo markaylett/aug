@@ -13,7 +13,7 @@ AUG_RCSID("$Id$");
 
 static const char NL_ = '\n';
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_atofield_(struct aug_field* field, char* src)
 {
     /* Split field in the form of "name=value". */
@@ -37,7 +37,7 @@ aug_atofield_(struct aug_field* field, char* src)
     return 0;
 }
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_confirm_(const char* prompt)
 {
     char buf[3];
@@ -60,7 +60,7 @@ aug_confirm_(const char* prompt)
     return 0;
 }
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_insertstream_(aug_mar_t mar, FILE* stream)
 {
     char buf[AUG_MAXLINE];
@@ -73,7 +73,7 @@ aug_insertstream_(aug_mar_t mar, FILE* stream)
     return 0;
 }
 
-MAR_EXTERN ssize_t
+AUG_EXTERNC ssize_t
 aug_readline_(char* buf, size_t size, FILE* stream)
 {
     char* p = fgets(buf, size, stream);
@@ -97,7 +97,7 @@ aug_readline_(char* buf, size_t size, FILE* stream)
     return p - buf;
 }
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_streamset_(aug_mar_t mar, FILE* stream)
 {
     char buf[AUG_MAXLINE];
@@ -122,7 +122,7 @@ aug_streamset_(aug_mar_t mar, FILE* stream)
     return 0;
 }
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_writevalue_(FILE* stream, const void* value, size_t size)
 {
     if (size != fwrite(value, 1, size, stream)

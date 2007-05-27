@@ -8,13 +8,13 @@ PY_LDFLAGS=`$(SHELL) $(top_srcdir)/src/sh/pyflags -l`
 AM_CFLAGS = $(PY_CFLAGS)
 
 noinst_HEADERS = \
-	module.h \
+	host.h \
 	object.h
 
 mod_LTLIBRARIES = modaugpy.la
 modaugpy_la_SOURCES = \
-	entry.c \
-	module.c \
+	augpy.c \
+	host.c \
 	object.c
 modaugpy_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
 modaugpy_la_LIBADD =

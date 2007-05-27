@@ -62,13 +62,13 @@ geterrinfo_(void)
     return errinfo_ ? errinfo_ : 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_initerrinfo_(struct aug_errinfo* errinfo)
 {
     return aug_initerrinfo(errinfo);
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_termerrinfo_(void)
 {
     return 0;
@@ -99,7 +99,7 @@ geterrinfo_(void)
     return errinfo;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_initerrinfo_(struct aug_errinfo* errinfo)
 {
     if (init_) {
@@ -120,7 +120,7 @@ aug_initerrinfo_(struct aug_errinfo* errinfo)
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_termerrinfo_(void)
 {
     if (!init_) {

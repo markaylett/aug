@@ -38,9 +38,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-DIST_COMMON = $(am__noinst_HEADERS_DIST) $(srcdir)/Makefile.am \
+DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
-subdir = src/c/augpy
+subdir = src/c/augrb
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -57,12 +57,9 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(moddir)"
 modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
-modaugpy_la_DEPENDENCIES =
-am__modaugpy_la_SOURCES_DIST = augpy.c host.c object.c
-@ENABLE_PYTHON_TRUE@am_modaugpy_la_OBJECTS = augpy.lo host.lo \
-@ENABLE_PYTHON_TRUE@	object.lo
-modaugpy_la_OBJECTS = $(am_modaugpy_la_OBJECTS)
-@ENABLE_PYTHON_TRUE@am_modaugpy_la_rpath = -rpath $(moddir)
+modaugrb_la_DEPENDENCIES =
+am_modaugrb_la_OBJECTS = augrb.lo
+modaugrb_la_OBJECTS = $(am_modaugrb_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -73,9 +70,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(modaugpy_la_SOURCES)
-DIST_SOURCES = $(am__modaugpy_la_SOURCES_DIST)
-am__noinst_HEADERS_DIST = host.h object.h
+SOURCES = $(modaugrb_la_SOURCES)
+DIST_SOURCES = $(modaugrb_la_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -196,21 +192,13 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/c
 
 moddir = $(prefix)/mod
-@ENABLE_PYTHON_TRUE@PY_CFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -c`
-@ENABLE_PYTHON_TRUE@PY_LDFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -l`
-@ENABLE_PYTHON_TRUE@AM_CFLAGS = $(PY_CFLAGS)
-@ENABLE_PYTHON_TRUE@noinst_HEADERS = \
-@ENABLE_PYTHON_TRUE@	host.h \
-@ENABLE_PYTHON_TRUE@	object.h
+noinst_HEADERS = 
+mod_LTLIBRARIES = modaugrb.la
+modaugrb_la_SOURCES = \
+	augrb.c
 
-@ENABLE_PYTHON_TRUE@mod_LTLIBRARIES = modaugpy.la
-@ENABLE_PYTHON_TRUE@modaugpy_la_SOURCES = \
-@ENABLE_PYTHON_TRUE@	augpy.c \
-@ENABLE_PYTHON_TRUE@	host.c \
-@ENABLE_PYTHON_TRUE@	object.c
-
-@ENABLE_PYTHON_TRUE@modaugpy_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
-@ENABLE_PYTHON_TRUE@modaugpy_la_LIBADD = 
+modaugrb_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
+modaugrb_la_LIBADD = 
 all: all-am
 
 .SUFFIXES:
@@ -224,9 +212,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/c/augpy/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/c/augrb/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  src/c/augpy/Makefile
+	  $(AUTOMAKE) --foreign  src/c/augrb/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -271,8 +259,8 @@ clean-modLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-modaugpy.la: $(modaugpy_la_OBJECTS) $(modaugpy_la_DEPENDENCIES) 
-	$(LINK) $(am_modaugpy_la_rpath) $(modaugpy_la_LDFLAGS) $(modaugpy_la_OBJECTS) $(modaugpy_la_LIBADD) $(LIBS)
+modaugrb.la: $(modaugrb_la_OBJECTS) $(modaugrb_la_DEPENDENCIES) 
+	$(LINK) -rpath $(moddir) $(modaugrb_la_LDFLAGS) $(modaugrb_la_OBJECTS) $(modaugrb_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -280,9 +268,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augpy.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/host.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augrb.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

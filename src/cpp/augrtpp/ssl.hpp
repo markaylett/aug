@@ -8,6 +8,7 @@
 
 #if HAVE_OPENSSL_SSL_H
 
+# include "augrtpp/config.hpp"
 # include "augsyspp/exception.hpp"
 # include "augsyspp/smartptr.hpp"
 # include "augnet/ssl.h"
@@ -29,7 +30,7 @@ namespace aug {
         }
     };
 
-    class sslctx {
+    class AUGRTPP_API sslctx {
 
         SSL_CTX* const ctx_;
 
@@ -56,13 +57,13 @@ namespace aug {
 
     typedef smartptr<sslctx> sslctxptr;
 
-    void
+    AUGRTPP_API void
     initssl();
 
-    void
+    AUGRTPP_API void
     setsslclient(conn_base& conn, sslctx& ctx);
 
-    void
+    AUGRTPP_API void
     setsslserver(conn_base& conn, sslctx& ctx);
 }
 #endif // HAVE_OPENSSL_SSL_H

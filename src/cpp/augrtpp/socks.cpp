@@ -12,7 +12,12 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-bool
+AUGRTPP_API
+socks::~socks() AUG_NOTHROW
+{
+}
+
+AUGRTPP_API bool
 socks::send(augas_id cid, const void* buf, size_t len)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
@@ -23,7 +28,7 @@ socks::send(augas_id cid, const void* buf, size_t len)
     return true;
 }
 
-bool
+AUGRTPP_API bool
 socks::sendv(augas_id cid, const aug_var& var)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
@@ -34,14 +39,14 @@ socks::sendv(augas_id cid, const aug_var& var)
     return true;
 }
 
-void
+AUGRTPP_API void
 socks::clear()
 {
     idtofd_.clear();
     socks_.clear();
 }
 
-void
+AUGRTPP_API void
 socks::erase(const sock_base& sock)
 {
     AUG_DEBUG2("removing sock: id=[%d], fd=[%d]", id(sock), sock.sfd().get());
@@ -50,7 +55,7 @@ socks::erase(const sock_base& sock)
     socks_.erase(sock.sfd().get());
 }
 
-void
+AUGRTPP_API void
 socks::insert(const sockptr& sock)
 {
     AUG_DEBUG2("adding sock: id=[%d], fd=[%d]", id(*sock), sock->sfd().get());
@@ -59,7 +64,7 @@ socks::insert(const sockptr& sock)
     idtofd_.insert(make_pair(id(*sock), sock->sfd().get()));
 }
 
-void
+AUGRTPP_API void
 socks::update(const sockptr& sock, fdref prev)
 {
     AUG_DEBUG2("updating sock: id=[%d], fd=[%d], prev=[%d]", id(*sock),
@@ -71,7 +76,7 @@ socks::update(const sockptr& sock, fdref prev)
     idtofd_[id(*sock)] = sock->sfd().get();
 }
 
-void
+AUGRTPP_API void
 socks::teardown()
 {
     // Ids are stored in reverse order using the the greater<> predicate.
@@ -103,7 +108,7 @@ socks::teardown()
     }
 }
 
-sockptr
+AUGRTPP_API sockptr
 socks::getbyfd(fdref fd) const
 {
     map<int, sockptr>::const_iterator it(socks_.find(fd.get()));
@@ -113,7 +118,7 @@ socks::getbyfd(fdref fd) const
     return it->second;
 }
 
-sockptr
+AUGRTPP_API sockptr
 socks::getbyid(augas_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));
@@ -123,7 +128,7 @@ socks::getbyid(augas_id id) const
     return getbyfd(it->second);
 }
 
-bool
+AUGRTPP_API bool
 socks::empty() const
 {
     return socks_.empty();

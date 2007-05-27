@@ -96,7 +96,7 @@ destroymmap_(impl_t impl)
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_destroymmap(struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
@@ -105,7 +105,7 @@ aug_destroymmap(struct aug_mmap* mm)
     return ret;
 }
 
-AUG_EXTERN struct aug_mmap*
+AUG_EXTERNC struct aug_mmap*
 aug_createmmap(int fd, size_t offset, size_t len, int flags)
 {
     impl_t impl;
@@ -139,7 +139,7 @@ aug_createmmap(int fd, size_t offset, size_t len, int flags)
     return (struct aug_mmap*)impl;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
 {
     impl_t impl = (impl_t)mm;
@@ -163,7 +163,7 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
     return createmmap_(impl, offset, len);
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_syncmmap(const struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
@@ -174,14 +174,14 @@ aug_syncmmap(const struct aug_mmap* mm)
     return 0;
 }
 
-AUG_EXTERN size_t
+AUG_EXTERNC size_t
 aug_mmapsize(const struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
     return impl->size_;
 }
 
-AUG_EXTERN unsigned
+AUG_EXTERNC unsigned
 aug_granularity(void)
 {
     /* Not documented to return an error. */
@@ -189,7 +189,7 @@ aug_granularity(void)
     return getpagesize();
 }
 
-AUG_EXTERN unsigned
+AUG_EXTERNC unsigned
 aug_pagesize(void)
 {
     /* Not documented to return an error. */

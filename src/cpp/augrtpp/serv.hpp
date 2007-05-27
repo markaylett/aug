@@ -12,7 +12,7 @@
 
 namespace aug {
 
-    class serv_base {
+    class AUGRTPP_API serv_base {
     public:
         typedef augas_serv ctype;
     private:

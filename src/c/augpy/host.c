@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGPY_BUILD
-#include "augpy/module.h"
+#include "augpy/host.h"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -504,26 +504,26 @@ static PyMethodDef methods_[] = {
 };
 
 PyObject*
-augpy_createmodule(PyTypeObject* type)
+augpy_createaugas(PyTypeObject* type)
 {
-    PyObject* module = Py_InitModule("augas", methods_);
-    if (!module)
+    PyObject* augas = Py_InitModule("augas", methods_);
+    if (!augas)
         return NULL;
 
     type_ = type;
 
-    PyModule_AddObject(module, "Object", (PyObject*)type_);
+    PyModule_AddObject(augas, "Object", (PyObject*)type_);
 
-    PyModule_AddIntConstant(module, "LOGCRIT", AUGAS_LOGCRIT);
-    PyModule_AddIntConstant(module, "LOGERROR", AUGAS_LOGERROR);
-    PyModule_AddIntConstant(module, "LOGWARN", AUGAS_LOGWARN);
-    PyModule_AddIntConstant(module, "LOGNOTICE", AUGAS_LOGNOTICE);
-    PyModule_AddIntConstant(module, "LOGINFO", AUGAS_LOGINFO);
-    PyModule_AddIntConstant(module, "LOGDEBUG", AUGAS_LOGDEBUG);
+    PyModule_AddIntConstant(augas, "LOGCRIT", AUGAS_LOGCRIT);
+    PyModule_AddIntConstant(augas, "LOGERROR", AUGAS_LOGERROR);
+    PyModule_AddIntConstant(augas, "LOGWARN", AUGAS_LOGWARN);
+    PyModule_AddIntConstant(augas, "LOGNOTICE", AUGAS_LOGNOTICE);
+    PyModule_AddIntConstant(augas, "LOGINFO", AUGAS_LOGINFO);
+    PyModule_AddIntConstant(augas, "LOGDEBUG", AUGAS_LOGDEBUG);
 
-    PyModule_AddIntConstant(module, "TIMRD", AUGAS_TIMRD);
-    PyModule_AddIntConstant(module, "TIMWR", AUGAS_TIMWR);
-    PyModule_AddIntConstant(module, "TIMBOTH", AUGAS_TIMBOTH);
+    PyModule_AddIntConstant(augas, "TIMRD", AUGAS_TIMRD);
+    PyModule_AddIntConstant(augas, "TIMWR", AUGAS_TIMWR);
+    PyModule_AddIntConstant(augas, "TIMBOTH", AUGAS_TIMBOTH);
 
-    return module;
+    return augas;
 }

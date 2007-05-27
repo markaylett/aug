@@ -3,6 +3,7 @@ SUBDIRS = \
 	augsys \
 	augmar \
 	augpy \
+	augrb \
 	augres \
 	augutil \
 	augsrv \

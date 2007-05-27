@@ -37,7 +37,7 @@ resize_(aug_seq_t seq, struct aug_info_* info, unsigned bsize, int trunct)
     return addr;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
                 unsigned size)
 {
@@ -49,13 +49,13 @@ aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_truncate_(aug_seq_t seq, struct aug_info_* info, unsigned size)
 {
     return resize_(seq, info, size, 1) ? 0 : -1;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
            const void* buf, unsigned len)
 {
@@ -67,7 +67,7 @@ aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
     return (int)len;
 }
 
-AUG_EXTERN const void*
+AUG_EXTERNC const void*
 aug_content_(aug_seq_t seq, const struct aug_info_* info)
 {
     if (-1 == aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_))
@@ -76,7 +76,7 @@ aug_content_(aug_seq_t seq, const struct aug_info_* info)
     return aug_seqaddr_(seq);
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_read_(aug_seq_t seq, const struct aug_info_* info, unsigned offset,
           void* buf, unsigned len)
 {

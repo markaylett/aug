@@ -4,6 +4,7 @@
 #ifndef AUGRTPP_BUFFER_HPP
 #define AUGRTPP_BUFFER_HPP
 
+#include "augrtpp/config.hpp"
 #include "augsyspp/types.hpp"
 #include "augnetpp/writer.hpp"
 
@@ -25,11 +26,13 @@ namespace aug {
         }
     };
 
-    class buffer {
+    class AUGRTPP_API buffer {
         writer writer_;
     public:
         vecarg arg_;
         bool usevec_;
+
+        ~buffer() AUG_NOTHROW;
 
         explicit
         buffer(size_t size = 1024);

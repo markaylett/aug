@@ -6,10 +6,4 @@
 
 #include "augconfig.h"
 
-#if !defined(__cplusplus)
-# define MAR_EXTERN extern
-#else /* __cplusplus */
-# define MAR_EXTERN extern "C"
-#endif /* __cplusplus */
-
 #endif /* MAR_CONFIG_H */

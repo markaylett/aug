@@ -11,7 +11,7 @@
 
 #include "augmar/config.h"
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_toflags_(int* to, int from);
 
 #endif /* AUGMAR_FLAGS_H_ */

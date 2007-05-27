@@ -93,7 +93,7 @@ openpipe_(void)
     return 0;
 }
 
-AUG_EXTERN void
+AUG_EXTERNC void
 aug_setservice_(const struct aug_service* service, void* arg)
 {
     memcpy(&service_, service, sizeof(service_));

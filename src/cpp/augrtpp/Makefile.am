@@ -1,6 +1,7 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
-noinst_HEADERS = \
+modincludedir = $(includedir)/augrtpp
+modinclude_HEADERS = \
 	buffer.hpp \
 	clntconn.hpp \
 	config.hpp \
@@ -16,7 +17,7 @@ noinst_HEADERS = \
 	sock.hpp \
 	socks.hpp
 
-noinst_LTLIBRARIES = libaugrtpp.la
+lib_LTLIBRARIES = libaugrtpp.la
 
 libaugrtpp_la_SOURCES = \
 	buffer.cpp \
@@ -35,7 +36,12 @@ libaugrtpp_la_SOURCES = \
 	socks.cpp
 
 libaugrtpp_la_LDFLAGS = \
-	-no-undefined
+	-no-undefined \
+	-version-info 1:0:0
 
 libaugrtpp_la_LIBADD = \
-	$(top_builddir)/src/c/augrt/libaugrt.la
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la

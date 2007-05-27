@@ -11,28 +11,28 @@ AUG_RCSID("$Id$");
 
 # include <errno.h>
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_createtlskey_(aug_tlskey_t* tlskey)
 {
     errno = ENOSYS;
     return -1;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_destroytlskey_(aug_tlskey_t tlskey)
 {
     errno = ENOSYS;
     return -1;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_gettlsvalue_(aug_tlskey_t tlskey, void** value)
 {
     errno = ENOSYS;
     return -1;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_settlsvalue_(aug_tlskey_t tlskey, void* value)
 {
     errno = ENOSYS;

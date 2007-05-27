@@ -23,12 +23,12 @@
  */
 
 #if !defined(AUGMAR_SHARED)
-# define AUGMAR_API AUG_EXTERN
+# define AUGMAR_API AUG_EXTERNC
 #else /* AUGMAR_SHARED */
 # if !defined(AUGMAR_BUILD)
-#  define AUGMAR_API AUG_IMPORT
+#  define AUGMAR_API AUG_EXTERNC AUG_IMPORT
 # else /* AUGMAR_BUILD */
-#  define AUGMAR_API AUG_EXPORT
+#  define AUGMAR_API AUG_EXTERNC AUG_EXPORT
 # endif /* AUGMAR_BUILD */
 #endif /* AUGMAR_SHARED */
 

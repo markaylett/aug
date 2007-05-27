@@ -5,7 +5,7 @@
 #include "augpy/object.h"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id:$");
+AUG_RCSID("$Id$");
 
 #include "augas.h"
 

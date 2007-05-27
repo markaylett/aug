@@ -10,7 +10,7 @@
 
 namespace aug {
 
-    class object_base {
+    class AUGRTPP_API object_base {
     public:
         typedef augas_object ctype;
     private:

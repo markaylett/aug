@@ -24,20 +24,20 @@
 #endif /* _MSC_VER */
 
 #if !defined(__cplusplus)
-# define AUG_EXTERN extern
+# define AUG_EXTERNC extern
 #else /* __cplusplus */
-# define AUG_EXTERN extern "C"
+# define AUG_EXTERNC extern "C"
 # if !defined(AUG_NOTHROW)
 #  define AUG_NOTHROW throw()
 # endif // !AUG_NOTHROW
 #endif /* __cplusplus */
 
 #if !defined(_WIN32)
-# define AUG_EXPORT AUG_EXTERN
-# define AUG_IMPORT AUG_EXTERN
+# define AUG_EXPORT
+# define AUG_IMPORT
 #else /* _WIN32 */
-# define AUG_EXPORT AUG_EXTERN __declspec(dllexport)
-# define AUG_IMPORT AUG_EXTERN __declspec(dllimport)
+# define AUG_EXPORT __declspec(dllexport)
+# define AUG_IMPORT __declspec(dllimport)
 #endif /* _WIN32 */
 
 #endif /* AUGCONFIG_H */

@@ -14,37 +14,37 @@ AUG_RCSID("$Id$");
 
 struct aug_mutex_ { char dummy_; };
 
-AUG_EXTERN aug_mutex_t
+AUG_EXTERNC aug_mutex_t
 aug_createmutex_(void)
 {
 	return (aug_mutex_t)~0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_destroymutex_(aug_mutex_t mutex)
 {
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_lockmutex_(aug_mutex_t mutex)
 {
 	return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_unlockmutex_(aug_mutex_t mutex)
 {
 	return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_initlock_(void)
 {
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_termlock_(void)
 {
     return 0;
@@ -70,7 +70,7 @@ aug_unlock(void)
 
 static aug_mutex_t mutex_ = NULL;
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_initlock_(void)
 {
     if (mutex_) {
@@ -84,7 +84,7 @@ aug_initlock_(void)
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_termlock_(void)
 {
     aug_mutex_t tmp = mutex_;

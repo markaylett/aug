@@ -11,7 +11,7 @@
 
 namespace aug {
 
-    class rwtimer_base {
+    class AUGRTPP_API rwtimer_base {
 
         virtual void
         do_timercb(int id, unsigned& ms) = 0;
@@ -61,7 +61,7 @@ namespace aug {
 
     typedef smartptr<rwtimer_base> rwtimerptr;
 
-    class rwtimer : public rwtimer_base {
+    class AUGRTPP_API rwtimer : public rwtimer_base {
 
         servptr serv_;
         const augas_object& sock_;

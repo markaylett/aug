@@ -11,9 +11,9 @@
 
 namespace aug {
 
-    class buffer;
+    class AUGRTPP_API buffer;
 
-    class conn_base : public sock_base {
+    class AUGRTPP_API conn_base : public sock_base {
 
         virtual void
         do_send(const void* buf, size_t size) = 0;
@@ -100,7 +100,7 @@ namespace aug {
         return conn.state() < SHUTDOWN;
     }
 
-    class connected : public conn_base {
+    class AUGRTPP_API connected : public conn_base {
 
         servptr serv_;
         augas_object& sock_;
@@ -161,7 +161,7 @@ namespace aug {
                   bool close);
     };
 
-    class handshake : public conn_base {
+    class AUGRTPP_API handshake : public conn_base {
 
         servptr serv_;
         augas_object& sock_;

@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGPY_MODULE_H
-#define AUGPY_MODULE_H
+#ifndef AUGPY_HOST_H
+#define AUGPY_HOST_H
 
 #if defined(_WIN32)
 # undef _DEBUG
@@ -11,6 +11,6 @@
 #include <Python.h>
 
 PyObject*
-augpy_createmodule(PyTypeObject* type);
+augpy_createaugas(PyTypeObject* type);
 
-#endif /* AUGPY_MODULE_H */
+#endif /* AUGPY_HOST_H */

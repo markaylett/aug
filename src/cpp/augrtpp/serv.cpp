@@ -9,6 +9,7 @@ AUG_RCSID("$Id: serv.cpp 373 2007-05-16 19:28:46Z marayl $");
 
 using namespace aug;
 
+AUGRTPP_API
 serv_base::~serv_base() AUG_NOTHROW
 {
 }

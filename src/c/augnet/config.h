@@ -11,12 +11,12 @@
 #endif /* DLL_EXPORT || _WINDLL */
 
 #if !defined(AUGNET_SHARED)
-# define AUGNET_API AUG_EXTERN
+# define AUGNET_API AUG_EXTERNC
 #else /* AUGNET_SHARED */
 # ifndef AUGNET_BUILD
-#  define AUGNET_API AUG_IMPORT
+#  define AUGNET_API AUG_EXTERNC AUG_IMPORT
 # else /* AUGNET_BUILD */
-#  define AUGNET_API AUG_EXPORT
+#  define AUGNET_API AUG_EXTERNC AUG_EXPORT
 # endif /* AUGNET_BUILD */
 #endif /* AUGNET_SHARED */
 

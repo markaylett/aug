@@ -1,6 +1,6 @@
 #include <errno.h>
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_createtlskey_(aug_tlskey_t* tlskey)
 {
     int err = pthread_key_create(tlskey, NULL);
@@ -11,7 +11,7 @@ aug_createtlskey_(aug_tlskey_t* tlskey)
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_destroytlskey_(aug_tlskey_t tlskey)
 {
     int err = pthread_key_delete(tlskey);
@@ -22,7 +22,7 @@ aug_destroytlskey_(aug_tlskey_t tlskey)
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_gettlsvalue_(aug_tlskey_t tlskey, void** value)
 {
     /* The pthread_getspecific() function is documented not to return any
@@ -32,7 +32,7 @@ aug_gettlsvalue_(aug_tlskey_t tlskey, void** value)
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_settlsvalue_(aug_tlskey_t tlskey, void* value)
 {
     int err = pthread_setspecific(tlskey, value);

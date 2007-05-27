@@ -11,12 +11,12 @@
 #endif /* DLL_EXPORT || _WINDLL */
 
 #if !defined(AUGRT_SHARED)
-# define AUGRT_API AUG_EXTERN
+# define AUGRT_API AUG_EXTERNC
 #else /* AUGRT_SHARED */
 # if !defined(AUGRT_BUILD)
-#  define AUGRT_API AUG_IMPORT
+#  define AUGRT_API AUG_EXTERNC AUG_IMPORT
 # else /* AUGRT_BUILD */
-#  define AUGRT_API AUG_EXPORT
+#  define AUGRT_API AUG_EXTERNC AUG_EXPORT
 # endif /* AUGRT_BUILD */
 #endif /* AUGRT_SHARED */
 

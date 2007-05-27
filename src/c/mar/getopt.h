@@ -11,12 +11,12 @@
 
 #include "mar/config.h"
 
-MAR_EXTERN char* ntp_optarg;
-MAR_EXTERN int ntp_optind;
-MAR_EXTERN int ntp_optopt;
-MAR_EXTERN int ntp_opterr;
+AUG_EXTERNC char* ntp_optarg;
+AUG_EXTERNC int ntp_optind;
+AUG_EXTERNC int ntp_optopt;
+AUG_EXTERNC int ntp_opterr;
 
-MAR_EXTERN int
+AUG_EXTERNC int
 ntp_getopt(int argc, char** argv, const char* optstring);
 
 #define aug_optarg ntp_optarg

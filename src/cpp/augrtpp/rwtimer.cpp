@@ -12,11 +12,12 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
+AUGRTPP_API
 rwtimer_base::~rwtimer_base() AUG_NOTHROW
 {
 }
 
-void
+AUGRTPP_API void
 rwtimer::do_timercb(int id, unsigned& ms)
 {
     if (rdtimer_.id() == id) {
@@ -29,7 +30,7 @@ rwtimer::do_timercb(int id, unsigned& ms)
         assert(0);
 }
 
-void
+AUGRTPP_API void
 rwtimer::do_setrwtimer(unsigned ms, unsigned flags)
 {
     if (flags & AUGAS_TIMRD)
@@ -39,7 +40,7 @@ rwtimer::do_setrwtimer(unsigned ms, unsigned flags)
         wrtimer_.set(ms, *this);
 }
 
-bool
+AUGRTPP_API bool
 rwtimer::do_resetrwtimer(unsigned ms, unsigned flags)
 {
     bool exists(true);
@@ -55,7 +56,7 @@ rwtimer::do_resetrwtimer(unsigned ms, unsigned flags)
     return exists;
 }
 
-bool
+AUGRTPP_API bool
 rwtimer::do_resetrwtimer(unsigned flags)
 {
     bool exists(true);
@@ -71,7 +72,7 @@ rwtimer::do_resetrwtimer(unsigned flags)
     return exists;
 }
 
-bool
+AUGRTPP_API bool
 rwtimer::do_cancelrwtimer(unsigned flags)
 {
     bool exists(true);
@@ -87,10 +88,12 @@ rwtimer::do_cancelrwtimer(unsigned flags)
     return exists;
 }
 
+AUGRTPP_API
 rwtimer::~rwtimer() AUG_NOTHROW
 {
 }
 
+AUGRTPP_API
 rwtimer::rwtimer(const servptr& serv, const augas_object& sock,
                  timers& timers)
     : serv_(serv),

@@ -11,7 +11,7 @@ AUG_RCSID("$Id$");
 
 #include <assert.h>
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_setinfo_(aug_seq_t seq, const struct aug_info_* info)
 {
     char* addr;
@@ -30,7 +30,7 @@ aug_setinfo_(aug_seq_t seq, const struct aug_info_* info)
     return 0;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_info_(aug_seq_t seq, struct aug_info_* info)
 {
     char* addr;

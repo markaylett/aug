@@ -9,6 +9,7 @@ AUG_RCSID("$Id$");
 
 using namespace aug;
 
+AUGRTPP_API
 sock_base::~sock_base() AUG_NOTHROW
 {
 }

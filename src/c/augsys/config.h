@@ -11,12 +11,12 @@
 #endif /* DLL_EXPORT || _WINDLL */
 
 #if !defined(AUGSYS_SHARED)
-# define AUGSYS_API AUG_EXTERN
+# define AUGSYS_API AUG_EXTERNC
 #else /* AUGSYS_SHARED */
 # if !defined(AUGSYS_BUILD)
-#  define AUGSYS_API AUG_IMPORT
+#  define AUGSYS_API AUG_EXTERNC AUG_IMPORT
 # else /* AUGSYS_BUILD */
-#  define AUGSYS_API AUG_EXPORT
+#  define AUGSYS_API AUG_EXTERNC AUG_EXPORT
 # endif /* AUGSYS_BUILD */
 #endif /* AUGSYS_SHARED */
 

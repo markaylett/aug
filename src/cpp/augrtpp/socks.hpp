@@ -11,7 +11,7 @@
 
 namespace aug {
 
-    class socks {
+    class AUGRTPP_API socks {
 
         typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
 
@@ -24,6 +24,8 @@ namespace aug {
         operator =(const socks& rhs);
 
     public:
+        ~socks() AUG_NOTHROW;
+
         socks()
         {
         }

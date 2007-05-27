@@ -17,7 +17,7 @@ AUG_RCSID("$Id$");
 #define FLAGMASK_ (AUG_RDONLY | AUG_WRONLY | AUG_RDWR \
     | AUG_APPEND | AUG_CREAT | AUG_TRUNC | AUG_EXCL)
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_toflags_(int* to, int from)
 {
 #if !defined(_WIN32)

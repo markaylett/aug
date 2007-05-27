@@ -55,7 +55,7 @@ reserve_(unsigned size)
     return pages * pagesize;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_closemfile_(aug_mfile_t mfile)
 {
     int ret = 0;
@@ -80,7 +80,7 @@ aug_closemfile_(aug_mfile_t mfile)
     return ret;
 }
 
-AUG_EXTERN aug_mfile_t
+AUG_EXTERNC aug_mfile_t
 aug_openmfile_(const char* path, int flags, mode_t mode,
                unsigned tail)
 {
@@ -116,7 +116,7 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
     return NULL;
 }
 
-AUG_EXTERN void*
+AUG_EXTERNC void*
 aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 {
     assert(mfile);
@@ -169,7 +169,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
     return mfile->mmap_->addr_;
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_syncmfile_(aug_mfile_t mfile)
 {
     assert(mfile);
@@ -179,7 +179,7 @@ aug_syncmfile_(aug_mfile_t mfile)
     return aug_syncfile_(mfile->fd_);
 }
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_truncatemfile_(aug_mfile_t mfile, unsigned size)
 {
     assert(mfile);
@@ -193,7 +193,7 @@ aug_truncatemfile_(aug_mfile_t mfile, unsigned size)
     return 0;
 }
 
-AUG_EXTERN void*
+AUG_EXTERNC void*
 aug_mfileaddr_(aug_mfile_t mfile)
 {
     assert(mfile);
@@ -203,21 +203,21 @@ aug_mfileaddr_(aug_mfile_t mfile)
     return mfile->mmap_->addr_;
 }
 
-AUG_EXTERN unsigned
+AUG_EXTERNC unsigned
 aug_mfileresvd_(aug_mfile_t mfile)
 {
     assert(mfile);
     return mfile->resvd_;
 }
 
-AUG_EXTERN unsigned
+AUG_EXTERNC unsigned
 aug_mfilesize_(aug_mfile_t mfile)
 {
     assert(mfile);
     return mfile->size_;
 }
 
-AUG_EXTERN void*
+AUG_EXTERNC void*
 aug_mfiletail_(aug_mfile_t mfile)
 {
     assert(mfile);

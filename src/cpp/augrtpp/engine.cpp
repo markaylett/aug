@@ -94,6 +94,7 @@ namespace {
     }
 }
 
+AUGRTPP_API
 enginecb_base::~enginecb_base() AUG_NOTHROW
 {
 }
@@ -340,17 +341,19 @@ namespace aug {
     }
 }
 
+AUGRTPP_API
 engine::~engine() AUG_NOTHROW
 {
     delete impl_;
 }
 
+AUGRTPP_API
 engine::engine(fdref rdfd, fdref wrfd, enginecb_base& cb)
     : impl_(new detail::engineimpl(rdfd, wrfd, cb))
 {
 }
 
-void
+AUGRTPP_API void
 engine::clear()
 {
     impl_->socks_.clear();
@@ -360,7 +363,7 @@ engine::clear()
     impl_->servs_.clear();
 }
 
-void
+AUGRTPP_API void
 engine::post(const char* sname, const char* to, const char* type,
              const aug_var* var)
 {
@@ -377,7 +380,7 @@ engine::post(const char* sname, const char* to, const char* type,
     arg.release();
 }
 
-void
+AUGRTPP_API void
 engine::dispatch(const char* sname, const char* to, const char* type,
                  const void* user, size_t size)
 {
@@ -389,7 +392,7 @@ engine::dispatch(const char* sname, const char* to, const char* type,
         (*it)->event(sname, type, user, size);
 }
 
-void
+AUGRTPP_API void
 engine::shutdown(augas_id cid)
 {
     sockptr sock(impl_->socks_.getbyid(cid));
@@ -400,7 +403,7 @@ engine::shutdown(augas_id cid)
         impl_->socks_.erase(*sock);
 }
 
-void
+AUGRTPP_API void
 engine::teardown()
 {
     if (detail::engineimpl::STARTED == impl_->state_) {
@@ -414,7 +417,7 @@ engine::teardown()
     }
 }
 
-augas_id
+AUGRTPP_API augas_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
                    void* user)
 {
@@ -455,7 +458,7 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     return id(*cptr);
 }
 
-augas_id
+AUGRTPP_API augas_id
 engine::tcplisten(const char* sname, const char* host, const char* port,
                   void* user)
 {
@@ -482,7 +485,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     return id(*lptr);
 }
 
-void
+AUGRTPP_API void
 engine::send(augas_id cid, const void* buf, size_t len)
 {
     if (!impl_->socks_.send(cid, buf, len))
@@ -490,7 +493,7 @@ engine::send(augas_id cid, const void* buf, size_t len)
                           "connection has been shutdown");
 }
 
-void
+AUGRTPP_API void
 engine::sendv(augas_id cid, const aug_var& var)
 {
     if (!impl_->socks_.sendv(cid, var))
@@ -498,7 +501,7 @@ engine::sendv(augas_id cid, const aug_var& var)
                           "connection has been shutdown");
 }
 
-void
+AUGRTPP_API void
 engine::setrwtimer(augas_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
@@ -509,7 +512,7 @@ engine::setrwtimer(augas_id cid, unsigned ms, unsigned flags)
     rwtimer->setrwtimer(ms, flags);
 }
 
-bool
+AUGRTPP_API bool
 engine::resetrwtimer(augas_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
@@ -521,7 +524,7 @@ engine::resetrwtimer(augas_id cid, unsigned ms, unsigned flags)
     return rwtimer->resetrwtimer(ms, flags);
 }
 
-bool
+AUGRTPP_API bool
 engine::cancelrwtimer(augas_id cid, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
@@ -532,7 +535,7 @@ engine::cancelrwtimer(augas_id cid, unsigned flags)
     return rwtimer->cancelrwtimer(flags);
 }
 
-augas_id
+AUGRTPP_API augas_id
 engine::settimer(const char* sname, unsigned ms, const aug_var* var)
 {
     augas_id id(aug_nextid());
@@ -553,13 +556,13 @@ engine::settimer(const char* sname, unsigned ms, const aug_var* var)
     return id;
 }
 
-bool
+AUGRTPP_API bool
 engine::resettimer(augas_id tid, unsigned ms)
 {
     return aug::resettimer(impl_->timers_, tid, ms);
 }
 
-bool
+AUGRTPP_API bool
 engine::canceltimer(augas_id tid)
 {
     bool ret(aug::canceltimer(impl_->timers_, tid));
@@ -573,7 +576,7 @@ engine::canceltimer(augas_id tid)
     return ret;
 }
 
-void
+AUGRTPP_API void
 engine::setsslclient(augas_id cid, sslctx& ctx)
 {
 #if HAVE_OPENSSL_SSL_H
@@ -590,7 +593,7 @@ engine::setsslclient(augas_id cid, sslctx& ctx)
 #endif // !HAVE_OPENSSL_SSL_H
 }
 
-void
+AUGRTPP_API void
 engine::setsslserver(augas_id cid, sslctx& ctx)
 {
 #if HAVE_OPENSSL_SSL_H
@@ -607,13 +610,13 @@ engine::setsslserver(augas_id cid, sslctx& ctx)
 #endif // !HAVE_OPENSSL_SSL_H
 }
 
-void
+AUGRTPP_API void
 engine::insert(const string& name, const servptr& serv, const char* groups)
 {
     impl_->servs_.insert(name, serv, groups);
 }
 
-void
+AUGRTPP_API void
 engine::cancelinactive()
 {
     // Remove any timers allocated to services that could not be opened.
@@ -630,7 +633,7 @@ engine::cancelinactive()
     }
 }
 
-void
+AUGRTPP_API void
 engine::run(bool daemon)
 {
     timer reopen(impl_->timers_);
@@ -696,7 +699,7 @@ engine::run(bool daemon)
     }
 }
 
-bool
+AUGRTPP_API bool
 engine::stopping() const
 {
     return detail::engineimpl::STARTED != impl_->state_;

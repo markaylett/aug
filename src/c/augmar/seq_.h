@@ -14,34 +14,34 @@
 
 typedef struct aug_seq_* aug_seq_t;
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_destroyseq_(aug_seq_t seq);
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_copyseq_(aug_seq_t dst, aug_seq_t src);
 
-AUG_EXTERN aug_seq_t
+AUG_EXTERNC aug_seq_t
 aug_createseq_(unsigned tail);
 
-AUG_EXTERN aug_seq_t
+AUG_EXTERNC aug_seq_t
 aug_openseq_(const char* path, int flags, mode_t mode, unsigned tail);
 
-AUG_EXTERN void*
+AUG_EXTERNC void*
 aug_resizeseq_(aug_seq_t seq, unsigned size);
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_setregion_(aug_seq_t seq, unsigned offset, unsigned len);
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_syncseq_(aug_seq_t seq);
 
-AUG_EXTERN void*
+AUG_EXTERNC void*
 aug_seqaddr_(aug_seq_t seq);
 
-AUG_EXTERN unsigned
+AUG_EXTERNC unsigned
 aug_seqsize_(aug_seq_t seq);
 
-AUG_EXTERN void*
+AUG_EXTERNC void*
 aug_seqtail_(aug_seq_t seq);
 
 #endif /* AUGMAR_SEQ_H_ */

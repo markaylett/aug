@@ -11,12 +11,12 @@
 #endif /* DLL_EXPORT || _WINDLL */
 
 #if !defined(AUGSRV_SHARED)
-# define AUGSRV_API AUG_EXTERN
+# define AUGSRV_API AUG_EXTERNC
 #else /* AUGSRV_SHARED */
 # if !defined(AUGSRV_BUILD)
-#  define AUGSRV_API AUG_IMPORT
+#  define AUGSRV_API AUG_EXTERNC AUG_IMPORT
 # else /* AUGSRV_BUILD */
-#  define AUGSRV_API AUG_EXPORT
+#  define AUGSRV_API AUG_EXTERNC AUG_EXPORT
 # endif /* AUGSRV_BUILD */
 #endif /* AUGSRV_SHARED */
 

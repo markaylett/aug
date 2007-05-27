@@ -15,22 +15,22 @@
 
 #include <stdio.h>
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_atofield_(struct aug_field* field, char* src);
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_confirm_(const char* prompt);
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_insertstream_(aug_mar_t mar, FILE* stream);
 
-MAR_EXTERN ssize_t
+AUG_EXTERNC ssize_t
 aug_readline_(char* buf, size_t size, FILE* stream);
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_streamset_(aug_mar_t mar, FILE* stream);
 
-MAR_EXTERN int
+AUG_EXTERNC int
 aug_writevalue_(FILE* stream, const void* value, size_t size);
 
 #endif /* MAR_UTILITY_H */

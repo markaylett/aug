@@ -11,7 +11,7 @@
 
 namespace aug {
 
-    class servs {
+    class AUGRTPP_API servs {
 
         typedef std::multimap<std::string, servptr> groups;
 
@@ -24,6 +24,8 @@ namespace aug {
         operator =(const servs& rhs);
 
     public:
+        ~servs() AUG_NOTHROW;
+
         servs()
         {
         }

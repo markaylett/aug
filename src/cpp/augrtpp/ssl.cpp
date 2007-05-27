@@ -15,11 +15,13 @@ AUG_RCSID("$Id$");
 
 using namespace aug;
 
+AUGRTPP_API
 sslctx::~sslctx() AUG_NOTHROW
 {
     SSL_CTX_free(ctx_);
 }
 
+AUGRTPP_API
 sslctx::sslctx()
     : ctx_(SSL_CTX_new(SSLv23_method()))
 {
@@ -27,7 +29,7 @@ sslctx::sslctx()
         throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 }
 
-void
+AUGRTPP_API void
 aug::initssl()
 {
     // Global system initialization.
@@ -36,7 +38,7 @@ aug::initssl()
     SSL_load_error_strings();
 }
 
-void
+AUGRTPP_API void
 aug::setsslclient(conn_base& conn, sslctx& ctx)
 {
     SSL* ssl = SSL_new(ctx);
@@ -47,7 +49,7 @@ aug::setsslclient(conn_base& conn, sslctx& ctx)
     aug_setsslclient(conn.sfd().get(), ssl);
 }
 
-void
+AUGRTPP_API void
 aug::setsslserver(conn_base& conn, sslctx& ctx)
 {
     SSL* ssl = SSL_new(ctx);

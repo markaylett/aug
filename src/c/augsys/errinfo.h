@@ -64,10 +64,10 @@ struct aug_errinfo {
 */
 
 #if defined(AUGSYS_BUILD)
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_initerrinfo_(struct aug_errinfo* errinfo);
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_termerrinfo_(void);
 #endif /* AUGSYS_BUILD */
 

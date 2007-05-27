@@ -10,36 +10,37 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-augas_object&
+AUGRTPP_API augas_object&
 listener::do_get()
 {
     return sock_;
 }
 
-const augas_object&
+AUGRTPP_API const augas_object&
 listener::do_get() const
 {
     return sock_;
 }
 
-const servptr&
+AUGRTPP_API const servptr&
 listener::do_serv() const
 {
     return serv_;
 }
 
-smartfd
+AUGRTPP_API smartfd
 listener::do_sfd() const
 {
     return sfd_;
 }
 
-sockstate
+AUGRTPP_API sockstate
 listener::do_state() const
 {
     return LISTENING;
 }
 
+AUGRTPP_API
 listener::~listener() AUG_NOTHROW
 {
     try {
@@ -47,6 +48,7 @@ listener::~listener() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
+AUGRTPP_API
 listener::listener(const servptr& serv, void* user, const smartfd& sfd)
     : serv_(serv),
       sfd_(sfd)

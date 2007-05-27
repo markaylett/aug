@@ -10,7 +10,7 @@
 
 namespace aug {
 
-    class listener : public sock_base {
+    class AUGRTPP_API listener : public sock_base {
 
         servptr serv_;
         augas_object sock_;

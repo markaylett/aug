@@ -12,21 +12,21 @@
 
 struct aug_info_;
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
                 unsigned size);
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_truncate_(aug_seq_t seq, struct aug_info_* info, unsigned size);
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
            const void* buf, unsigned len);
 
-AUG_EXTERN const void*
+AUG_EXTERNC const void*
 aug_content_(aug_seq_t seq, const struct aug_info_* info);
 
-AUG_EXTERN int
+AUG_EXTERNC int
 aug_read_(aug_seq_t seq, const struct aug_info_* info, unsigned offset,
           void* buf, unsigned len);
 

@@ -6,7 +6,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augpy/module.h"
+#include "augpy/host.h"
 #include "augpy/object.h"
 
 #include "augas.h"
@@ -225,7 +225,7 @@ initpy_(void)
     if (!(type_ = augpy_createtype()))
         goto fail;
 
-    if (!(augas_ = augpy_createmodule(type_)))
+    if (!(augas_ = augpy_createaugas(type_)))
         goto fail;
     return 0;
 

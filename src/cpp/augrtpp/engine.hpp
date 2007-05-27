@@ -18,7 +18,7 @@ namespace aug {
         struct engineimpl;
     }
 
-    class enginecb_base {
+    class AUGRTPP_API enginecb_base {
         virtual void
         do_reconf() = 0;
 
@@ -41,7 +41,7 @@ namespace aug {
         }
     };
 
-    class engine {
+    class AUGRTPP_API engine {
 
         detail::engineimpl* const impl_;
 

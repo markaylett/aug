@@ -8,7 +8,7 @@
 #include "augsrv/types.h"
 
 #if defined(AUGSRV_BUILD)
-AUG_EXTERN void
+AUG_EXTERNC void
 aug_setservice_(const struct aug_service* service, void* arg);
 #endif /* AUGSRV_BUILD */
 
