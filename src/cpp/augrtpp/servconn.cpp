@@ -10,79 +10,79 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-AUGRTPP_API void
+void
 servconn::do_timercb(int id, unsigned& ms)
 {
     rwtimer_.timercb(id, ms);
 }
 
-AUGRTPP_API void
+void
 servconn::do_setrwtimer(unsigned ms, unsigned flags)
 {
     rwtimer_.setrwtimer(ms, flags);
 }
 
-AUGRTPP_API bool
+bool
 servconn::do_resetrwtimer(unsigned ms, unsigned flags)
 {
     return rwtimer_.resetrwtimer(ms, flags);
 }
 
-AUGRTPP_API bool
+bool
 servconn::do_resetrwtimer(unsigned flags)
 {
     return rwtimer_.resetrwtimer(flags);
 }
 
-AUGRTPP_API bool
+bool
 servconn::do_cancelrwtimer(unsigned flags)
 {
     return rwtimer_.cancelrwtimer(flags);
 }
 
-AUGRTPP_API augas_object&
+augas_object&
 servconn::do_get()
 {
     return conn_.get();
 }
 
-AUGRTPP_API const augas_object&
+const augas_object&
 servconn::do_get() const
 {
     return conn_.get();
 }
 
-AUGRTPP_API const servptr&
+const servptr&
 servconn::do_serv() const
 {
     return conn_.serv();
 }
 
-AUGRTPP_API smartfd
+smartfd
 servconn::do_sfd() const
 {
     return conn_.sfd();
 }
 
-AUGRTPP_API void
+void
 servconn::do_send(const void* buf, size_t len)
 {
     conn_.send(buf, len);
 }
 
-AUGRTPP_API void
+void
 servconn::do_sendv(const aug_var& var)
 {
     conn_.sendv(var);
 }
 
-AUGRTPP_API bool
+bool
 servconn::do_accepted(const aug_endpoint& ep)
 {
     return conn_.accepted(ep);
 }
 
-AUGRTPP_API void
+void
 servconn::do_connected(const aug_endpoint& ep)
 {
     // BUG: workaround for bug in gcc version 3.4.4.
@@ -91,48 +91,46 @@ servconn::do_connected(const aug_endpoint& ep)
     r.connected(ep);
 }
 
-AUGRTPP_API bool
+bool
 servconn::do_process(unsigned short events)
 {
     return conn_.process(events);
 }
 
-AUGRTPP_API void
+void
 servconn::do_shutdown()
 {
     conn_.shutdown();
 }
 
-AUGRTPP_API void
+void
 servconn::do_teardown()
 {
     conn_.teardown();
 }
 
-AUGRTPP_API bool
+bool
 servconn::do_authcert(const char* subject, const char* issuer)
 {
     return conn_.authcert(subject, issuer);
 }
 
-AUGRTPP_API const endpoint&
+const endpoint&
 servconn::do_peername() const
 {
     return conn_.peername();
 }
 
-AUGRTPP_API sockstate
+sockstate
 servconn::do_state() const
 {
     return conn_.state();
 }
 
-AUGRTPP_API
 servconn::~servconn() AUG_NOTHROW
 {
 }
 
-AUGRTPP_API
 servconn::servconn(const servptr& serv, void* user, timers& timers,
                    const smartfd& sfd, const endpoint& ep)
     : rwtimer_(serv, sock_, timers),

@@ -11,7 +11,7 @@
 
 namespace aug {
 
-    class AUGRTPP_API socks {
+    class socks {
 
         typedef std::map<augas_id, int, std::greater<augas_id> > idtofd;
 

@@ -12,12 +12,11 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-AUGRTPP_API
 servs::~servs() AUG_NOTHROW
 {
 }
 
-AUGRTPP_API void
+void
 servs::clear()
 {
     tmpgroups_.clear();
@@ -28,7 +27,7 @@ servs::clear()
     servs_.clear();
 }
 
-AUGRTPP_API void
+void
 servs::insert(const string& name, const servptr& serv, const char* groups)
 {
     // The service's start() function may callback into the host.  All state
@@ -64,7 +63,7 @@ servs::insert(const string& name, const servptr& serv, const char* groups)
     tmpgroups_.clear();
 }
 
-AUGRTPP_API void
+void
 servs::reconf() const
 {
     map<string, servptr>::const_iterator it(servs_.begin()),
@@ -73,7 +72,7 @@ servs::reconf() const
         it->second->reconf();
 }
 
-AUGRTPP_API servptr
+servptr
 servs::getbyname(const string& name) const
 {
     map<string, servptr>::const_iterator it(servs_.find(name));
@@ -84,7 +83,7 @@ servs::getbyname(const string& name) const
     return it->second;
 }
 
-AUGRTPP_API void
+void
 servs::getbygroup(vector<servptr>& servs, const string& group) const
 {
     pair<groups::const_iterator,

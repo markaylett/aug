@@ -60,26 +60,24 @@ namespace {
     };
 }
 
-AUGRTPP_API
 buffer::~buffer() AUG_NOTHROW
 {
 }
 
-AUGRTPP_API
 buffer::buffer(size_t size)
     : arg_(size),
       usevec_(true)
 {
 }
 
-AUGRTPP_API void
+void
 buffer::append(const aug_var& var)
 {
     appendwriter(writer_, var);
     usevec_ = false;
 }
 
-AUGRTPP_API void
+void
 buffer::append(const void* buf, size_t len)
 {
     if (usevec_) {
@@ -109,7 +107,7 @@ buffer::append(const void* buf, size_t len)
     }
 }
 
-AUGRTPP_API bool
+bool
 buffer::writesome(fdref ref)
 {
     aug::writesome(writer_, ref);

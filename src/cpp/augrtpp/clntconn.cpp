@@ -10,49 +10,49 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-AUGRTPP_API void
+void
 clntconn::do_timercb(int id, unsigned& ms)
 {
     rwtimer_.timercb(id, ms);
 }
 
-AUGRTPP_API void
+void
 clntconn::do_setrwtimer(unsigned ms, unsigned flags)
 {
     rwtimer_.setrwtimer(ms, flags);
 }
 
-AUGRTPP_API bool
+bool
 clntconn::do_resetrwtimer(unsigned ms, unsigned flags)
 {
     return rwtimer_.resetrwtimer(ms, flags);
 }
 
-AUGRTPP_API bool
+bool
 clntconn::do_resetrwtimer(unsigned flags)
 {
     return rwtimer_.resetrwtimer(flags);
 }
 
-AUGRTPP_API bool
+bool
 clntconn::do_cancelrwtimer(unsigned flags)
 {
     return rwtimer_.cancelrwtimer(flags);
 }
 
-AUGRTPP_API augas_object&
+augas_object&
 clntconn::do_get()
 {
     return conn_->get();
 }
 
-AUGRTPP_API const augas_object&
+const augas_object&
 clntconn::do_get() const
 {
     return conn_->get();
 }
 
-AUGRTPP_API const servptr&
+const servptr&
 clntconn::do_serv() const
 {
     return conn_->serv();

@@ -3,3 +3,6 @@
 */
 #define AUGRTPP_BUILD
 #include "augrtpp/config.hpp"
+#include "augsys/defs.h"
+
+AUG_RCSID("$Id: $");

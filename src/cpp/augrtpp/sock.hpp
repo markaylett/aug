@@ -19,7 +19,7 @@ namespace aug {
         CLOSED
     };
 
-    class AUGRTPP_API sock_base : public object_base {
+    class sock_base : public object_base {
 
         virtual smartfd
         do_sfd() const = 0;

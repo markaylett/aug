@@ -11,7 +11,7 @@
 
 namespace aug {
 
-    class AUGRTPP_API servs {
+    class servs {
 
         typedef std::multimap<std::string, servptr> groups;
 

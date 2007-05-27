@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="daug"
-	ProjectGUID="{E905FF28-F95F-4125-B153-C67B96CD0C65}"
+	Name="augrtpp"
+	ProjectGUID="{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -13,8 +13,8 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="debug/daug"
-			ConfigurationType="1"
+			IntermediateDirectory="debug/augrtpp"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
@@ -35,15 +35,15 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/daug.exe"
+				IgnoreImportLibrary="FALSE"
+				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/daug.pdb"
-				SubSystem="1"
+				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName)-1.pdb"
+				SubSystem="2"
 				OptimizeReferences="0"
-				EnableCOMDATFolding="0"/>
+				EnableCOMDATFolding="0"
+				ImportLibrary="lib/lib$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -68,8 +68,8 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="release/daug"
-			ConfigurationType="1"
+			IntermediateDirectory="release/augrtpp"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
@@ -87,14 +87,15 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/daug.exe"
+				IgnoreImportLibrary="FALSE"
+				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
-				SubSystem="1"
+				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName)-1.pdb"
+				SubSystem="2"
 				OptimizeReferences="0"
-				EnableCOMDATFolding="0"/>
+				EnableCOMDATFolding="0"
+				ImportLibrary="lib/lib$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -119,8 +120,20 @@
 	</Configurations>
 	<References>
 		<ProjectReference
-			ReferencedProjectIdentifier="{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}"
-			Name="augrtpp"/>
+			ReferencedProjectIdentifier="{01150DDF-A141-4B5B-A4FB-81FD65C964C5}"
+			Name="augmar"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{A6131AD7-FF69-436D-B4D2-0076969FC276}"
+			Name="augnet"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{D71F12D2-E969-4A00-8173-FFA33C1B963E}"
+			Name="augsrv"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
+			Name="augsys"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{63BEF71A-3B15-494E-89B0-3CCDBF48B4E0}"
+			Name="augutil"/>
 	</References>
 	<Files>
 		<Filter
@@ -128,49 +141,46 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\cpp\daug\daug.cpp">
+				RelativePath="..\src\cpp\augrtpp\buffer.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\exception.cpp">
+				RelativePath="..\src\cpp\augrtpp\clntconn.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\module.cpp">
+				RelativePath="..\src\cpp\augrtpp\config.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\options.cpp">
+				RelativePath="..\src\cpp\augrtpp\conn.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\serv.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
+				RelativePath="..\src\cpp\augrtpp\engine.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\ssl.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
+				RelativePath="..\src\cpp\augrtpp\listener.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\utility.cpp">
+				RelativePath="..\src\cpp\augrtpp\object.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\rwtimer.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\serv.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\servconn.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\servs.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\sock.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\socks.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\ssl.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -178,22 +188,46 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\cpp\daug\exception.hpp">
+				RelativePath="..\src\cpp\augrtpp\buffer.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\module.hpp">
+				RelativePath="..\src\cpp\augrtpp\clntconn.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\options.hpp">
+				RelativePath="..\src\cpp\augrtpp\config.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\serv.hpp">
+				RelativePath="..\src\cpp\augrtpp\conn.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\ssl.hpp">
+				RelativePath="..\src\cpp\augrtpp\engine.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\utility.hpp">
+				RelativePath="..\src\cpp\augrtpp\listener.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\object.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\rwtimer.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\serv.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\servconn.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\servs.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\sock.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\socks.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augrtpp\ssl.hpp">
 			</File>
 		</Filter>
 		<Filter

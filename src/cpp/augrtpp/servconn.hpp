@@ -9,7 +9,7 @@
 
 namespace aug {
 
-    class AUGRTPP_API servconn : public rwtimer_base, public conn_base {
+    class servconn : public rwtimer_base, public conn_base {
 
         augas_object sock_;
         buffer buffer_;

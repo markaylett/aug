@@ -16,50 +16,49 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-AUGRTPP_API
 conn_base::~conn_base() AUG_NOTHROW
 {
 }
 
-AUGRTPP_API augas_object&
+augas_object&
 connected::do_get()
 {
     return sock_;
 }
 
-AUGRTPP_API const augas_object&
+const augas_object&
 connected::do_get() const
 {
     return sock_;
 }
 
-AUGRTPP_API const servptr&
+const servptr&
 connected::do_serv() const
 {
     return serv_;
 }
 
-AUGRTPP_API smartfd
+smartfd
 connected::do_sfd() const
 {
     return sfd_;
 }
 
-AUGRTPP_API void
+void
 connected::do_send(const void* buf, size_t len)
 {
     buffer_.append(buf, len);
     setnbeventmask(sfd_, AUG_FDEVENTRDWR);
 }
 
-AUGRTPP_API void
+void
 connected::do_sendv(const aug_var& var)
 {
     buffer_.append(var);
     setnbeventmask(sfd_, AUG_FDEVENTRDWR);
 }
 
-AUGRTPP_API bool
+bool
 connected::do_accepted(const aug_endpoint& ep)
 {
     inetaddr addr(null);
@@ -67,7 +66,7 @@ connected::do_accepted(const aug_endpoint& ep)
         ->accepted(sock_, inetntop(getinetaddr(ep, addr)).c_str(), port(ep));
 }
 
-AUGRTPP_API void
+void
 connected::do_connected(const aug_endpoint& ep)
 {
     inetaddr addr(null);
@@ -75,7 +74,7 @@ connected::do_connected(const aug_endpoint& ep)
                      port(ep));
 }
 
-AUGRTPP_API bool
+bool
 connected::do_process(unsigned short events)
 {
     if (events & AUG_FDEVENTRD) {
@@ -131,7 +130,7 @@ connected::do_process(unsigned short events)
     return false;
 }
 
-AUGRTPP_API void
+void
 connected::do_shutdown()
 {
     if (state_ < SHUTDOWN) {
@@ -143,7 +142,7 @@ connected::do_shutdown()
     }
 }
 
-AUGRTPP_API void
+void
 connected::do_teardown()
 {
     if (state_ < TEARDOWN) {
@@ -152,25 +151,24 @@ connected::do_teardown()
     }
 }
 
-AUGRTPP_API bool
+bool
 connected::do_authcert(const char* subject, const char* issuer)
 {
     return serv_->authcert(sock_, subject, issuer);
 }
 
-AUGRTPP_API const endpoint&
+const endpoint&
 connected::do_peername() const
 {
     return endpoint_;
 }
 
-AUGRTPP_API sockstate
+sockstate
 connected::do_state() const
 {
     return state_;
 }
 
-AUGRTPP_API
 connected::~connected() AUG_NOTHROW
 {
     try {
@@ -179,7 +177,6 @@ connected::~connected() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-AUGRTPP_API
 connected::connected(const servptr& serv, augas_object& sock, buffer& buffer,
                      rwtimer& rwtimer, const smartfd& sfd,
                      const endpoint& ep, bool close)
@@ -194,56 +191,56 @@ connected::connected(const servptr& serv, augas_object& sock, buffer& buffer,
 {
 }
 
-AUGRTPP_API augas_object&
+augas_object&
 handshake::do_get()
 {
     return sock_;
 }
 
-AUGRTPP_API const augas_object&
+const augas_object&
 handshake::do_get() const
 {
     return sock_;
 }
 
-AUGRTPP_API const servptr&
+const servptr&
 handshake::do_serv() const
 {
     return serv_;
 }
 
-AUGRTPP_API smartfd
+smartfd
 handshake::do_sfd() const
 {
     return sfd_;
 }
 
-AUGRTPP_API void
+void
 handshake::do_send(const void* buf, size_t len)
 {
     buffer_.append(buf, len);
 }
 
-AUGRTPP_API void
+void
 handshake::do_sendv(const aug_var& var)
 {
     buffer_.append(var);
 }
 
-AUGRTPP_API bool
+bool
 handshake::do_accepted(const aug_endpoint& ep)
 {
     return false;
 }
 
-AUGRTPP_API void
+void
 handshake::do_connected(const aug_endpoint& ep)
 {
     throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                       AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
-AUGRTPP_API bool
+bool
 handshake::do_process(unsigned short events)
 {
     try {
@@ -265,14 +262,14 @@ handshake::do_process(unsigned short events)
     return false;
 }
 
-AUGRTPP_API void
+void
 handshake::do_shutdown()
 {
     throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                       AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
-AUGRTPP_API void
+void
 handshake::do_teardown()
 {
     // TODO: call shutdown() here?
@@ -281,26 +278,25 @@ handshake::do_teardown()
                       AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
-AUGRTPP_API bool
+bool
 handshake::do_authcert(const char* subject, const char* issuer)
 {
     throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                       AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
-AUGRTPP_API const endpoint&
+const endpoint&
 handshake::do_peername() const
 {
     return endpoint_;
 }
 
-AUGRTPP_API sockstate
+sockstate
 handshake::do_state() const
 {
     return state_;
 }
 
-AUGRTPP_API
 handshake::~handshake() AUG_NOTHROW
 {
     try {
@@ -309,7 +305,6 @@ handshake::~handshake() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-AUGRTPP_API
 handshake::handshake(const servptr& serv, augas_object& sock, buffer& buffer,
                      const char* host, const char* port)
     : serv_(serv),

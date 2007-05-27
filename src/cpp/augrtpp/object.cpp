@@ -9,7 +9,6 @@ AUG_RCSID("$Id$");
 
 using namespace aug;
 
-AUGRTPP_API
 object_base::~object_base() AUG_NOTHROW
 {
 }

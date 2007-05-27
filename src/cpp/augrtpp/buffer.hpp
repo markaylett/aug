@@ -26,7 +26,7 @@ namespace aug {
         }
     };
 
-    class AUGRTPP_API buffer {
+    class buffer {
         writer writer_;
     public:
         vecarg arg_;
