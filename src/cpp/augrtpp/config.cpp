@@ -5,4 +5,4 @@
 #include "augrtpp/config.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id: $");
+AUG_RCSID("$Id$");

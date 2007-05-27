@@ -5,4 +5,4 @@
 #include "augrt/config.h"
 #include "augrt/defs.h"
 
-AUG_RCSID("$Id: config.c 300 2007-03-30 19:43:22Z marayl $");
+AUG_RCSID("$Id$");

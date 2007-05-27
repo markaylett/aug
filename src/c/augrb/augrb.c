@@ -1,7 +1,7 @@
 #include "augas.h"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id: $");
+AUG_RCSID("$Id$");
 
 static void
 stop_(void)

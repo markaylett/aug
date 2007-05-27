@@ -5,7 +5,7 @@
 #include "augrtpp/serv.hpp"
 #include "augsys/defs.h"
 
-AUG_RCSID("$Id: serv.cpp 373 2007-05-16 19:28:46Z marayl $");
+AUG_RCSID("$Id$");
 
 using namespace aug;
 
