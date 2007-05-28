@@ -3,6 +3,7 @@ SUBDIRS = \
 	cpp \
 	pl \
 	py \
+	rb \
 	sh
 
 include_HEADERS = \

@@ -206,6 +206,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/daug/etc/Makefile
                  src/pl/Makefile
                  src/py/Makefile
+                 src/rb/Makefile
                  src/sh/Makefile
                  vc7/Makefile])
 AC_OUTPUT
