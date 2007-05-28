@@ -5,15 +5,15 @@ def expand(name)
   Config.expand(Config::CONFIG[name])
 end
 
-#/cygdrive/c/ruby/lib/ruby/1.8/i386-mswin32/ruby.h
-#/cygdrive/c/ruby/lib/msvcrt-ruby18.lib
-
 bindir = File.dirname(%x{which ruby})
 libdir = File.join(File.dirname(bindir), 'lib')
 
 ver = expand("ruby_version")
 arch = expand("arch")
 
-puts expand("LIBRUBYARG")
-puts "-L #{libdir}"
-puts "-I #{File.join(libdir, 'ruby', ver, arch)}"
+args = []
+args << "-I#{File.join(libdir, 'ruby', ver, arch)}"
+args << "-L#{libdir}"
+args << expand("LIBRUBYARG")
+
+puts args.join(' ')
