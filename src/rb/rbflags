@@ -8,12 +8,13 @@ end
 bindir = File.dirname(%x{which ruby})
 libdir = File.join(File.dirname(bindir), 'lib')
 
-ver = expand("ruby_version")
 arch = expand("arch")
+libname = expand("RUBY_SO_NAME")
+ver = expand("ruby_version")
 
 args = []
 args << "-I#{File.join(libdir, 'ruby', ver, arch)}"
 args << "-L#{libdir}"
-args << expand("LIBRUBYARG")
+args << "-l#{libname}"
 
 puts args.join(' ')
