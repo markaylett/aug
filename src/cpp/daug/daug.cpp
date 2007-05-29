@@ -216,8 +216,7 @@ namespace {
     {
         AUG_DEBUG2("reconfall()");
         try {
-            aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
-            writeevent(aug_eventwr(), e);
+            state_->engine_.reconfall();
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -231,8 +230,7 @@ namespace {
     {
         AUG_DEBUG2("stopall()");
         try {
-            aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
-            writeevent(aug_eventwr(), e);
+            state_->engine_.stopall();
             return 0;
 
         } AUG_SETERRINFOCATCH;

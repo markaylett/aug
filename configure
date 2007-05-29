@@ -877,6 +877,10 @@ ac_ct_F77
 LIBTOOL
 ENABLE_PYTHON_TRUE
 ENABLE_PYTHON_FALSE
+ENABLE_RUBY_TRUE
+ENABLE_RUBY_FALSE
+ENABLE_THREADS_TRUE
+ENABLE_THREADS_FALSE
 ALLOCA
 LIBOBJS
 LTLIBOBJS'
@@ -1485,7 +1489,8 @@ Optional Features:
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-python         enable python support [default=yes]
-  --enable-threads        enable thread support [default=yes]
+  --enable-ruby           enable ruby support [default=no]
+  --enable-threads        enable threads support [default=yes]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -5151,7 +5156,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5154 "configure"' > conftest.$ac_ext
+  echo '#line 5159 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7477,11 +7482,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7480: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7485: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7484: \$? = $ac_status" >&5
+   echo "$as_me:7489: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7767,11 +7772,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7770: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7775: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7774: \$? = $ac_status" >&5
+   echo "$as_me:7779: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7871,11 +7876,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7874: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7879: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7878: \$? = $ac_status" >&5
+   echo "$as_me:7883: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10181,7 +10186,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10184 "configure"
+#line 10189 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10281,7 +10286,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10284 "configure"
+#line 10289 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12696,11 +12701,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12699: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12704: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12703: \$? = $ac_status" >&5
+   echo "$as_me:12708: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12800,11 +12805,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12803: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12808: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12807: \$? = $ac_status" >&5
+   echo "$as_me:12812: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14379,11 +14384,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14382: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14387: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14386: \$? = $ac_status" >&5
+   echo "$as_me:14391: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14483,11 +14488,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14486: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14491: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14490: \$? = $ac_status" >&5
+   echo "$as_me:14495: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16683,11 +16688,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16686: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16691: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16690: \$? = $ac_status" >&5
+   echo "$as_me:16695: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16973,11 +16978,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16976: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16981: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16980: \$? = $ac_status" >&5
+   echo "$as_me:16985: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17077,11 +17082,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17080: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17085: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17084: \$? = $ac_status" >&5
+   echo "$as_me:17089: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -19742,15 +19747,24 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 
 
 
-# Check whether --enable-enable_python was given.
-if test "${enable_enable_python+set}" = set; then
-  enableval=$enable_enable_python; enable_python=$enableval
+# Check whether --enable-python was given.
+if test "${enable_python+set}" = set; then
+  enableval=$enable_python;
+    case "${enableval}" in
+        yes) enable_python=yes;;
+        no)  enable_python=no;;
+        *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-python" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-python" >&2;}
+   { (exit 1); exit 1; }; };;
+    esac
+
+else
+  enable_python=yes
 fi
 
 
 
-
-if test "$enable_python" != "yes"; then
+if test x$enable_python = xyes; then
   ENABLE_PYTHON_TRUE=
   ENABLE_PYTHON_FALSE='#'
 else
@@ -19759,9 +19773,55 @@ else
 fi
 
 
-# Check whether --enable-enable_threads was given.
-if test "${enable_enable_threads+set}" = set; then
-  enableval=$enable_enable_threads; enable_threads=$enableval
+# Check whether --enable-ruby was given.
+if test "${enable_ruby+set}" = set; then
+  enableval=$enable_ruby;
+    case "${enableval}" in
+        yes) enable_ruby=yes;;
+        no)  enable_ruby=no;;
+        *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-ruby" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-ruby" >&2;}
+   { (exit 1); exit 1; }; };;
+    esac
+
+else
+  enable_ruby=no
+fi
+
+
+
+if test x$enable_ruby = xyes; then
+  ENABLE_RUBY_TRUE=
+  ENABLE_RUBY_FALSE='#'
+else
+  ENABLE_RUBY_TRUE='#'
+  ENABLE_RUBY_FALSE=
+fi
+
+
+# Check whether --enable-threads was given.
+if test "${enable_threads+set}" = set; then
+  enableval=$enable_threads;
+    case "${enableval}" in
+        yes) enable_threads=yes;;
+        no)  enable_threads=no;;
+        *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-threads" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-threads" >&2;}
+   { (exit 1); exit 1; }; };;
+    esac
+
+else
+  enable_threads=yes
+fi
+
+
+
+if test x$enable_threads = xyes; then
+  ENABLE_THREADS_TRUE=
+  ENABLE_THREADS_FALSE='#'
+else
+  ENABLE_THREADS_TRUE='#'
+  ENABLE_THREADS_FALSE=
 fi
 
 
@@ -19769,7 +19829,7 @@ fi
 
 LDFLAGS="-lm $LDFLAGS"
 
-if test "$enable_threads" != "no"; then
+if test x$enable_threads != xno; then
    CFLAGS="-D_MT -D_REENTRANT $CFLAGS"
    CXXFLAGS="-D_MT -D_REENTRANT $CXXFLAGS"
 fi
@@ -19954,7 +20014,7 @@ fi
     LDFLAGS="-lws2_32 -liphlpapi $LDFLAGS"
     LIBS="-Wl,-lws2_32 -Wl,-liphlpapi $LIBS"
 
-    if test "$enable_threads" != "no"; then
+    if test x$enable_threads != xno; then
         CFLAGS="-mthreads $CFLAGS"
         CXXFLAGS="-mthreads $CXXFLAGS"
         LDFLAGS="-mthreads $LDFLAGS"
@@ -20461,7 +20521,7 @@ if test "$ac_res" != no; then
 fi
 
 
-    if test "$enable_threads" != "no"; then
+    if test x$enable_threads != xno; then
         { echo "$as_me:$LINENO: checking for library containing pthread_create" >&5
 echo $ECHO_N "checking for library containing pthread_create... $ECHO_C" >&6; }
 if test "${ac_cv_search_pthread_create+set}" = set; then
@@ -21839,6 +21899,20 @@ echo "$as_me: error: conditional \"ENABLE_PYTHON\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${ENABLE_RUBY_TRUE}" && test -z "${ENABLE_RUBY_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"ENABLE_RUBY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"ENABLE_RUBY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_THREADS_TRUE}" && test -z "${ENABLE_THREADS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"ENABLE_THREADS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"ENABLE_THREADS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
@@ -22562,12 +22636,16 @@ ac_ct_F77!$ac_ct_F77$ac_delim
 LIBTOOL!$LIBTOOL$ac_delim
 ENABLE_PYTHON_TRUE!$ENABLE_PYTHON_TRUE$ac_delim
 ENABLE_PYTHON_FALSE!$ENABLE_PYTHON_FALSE$ac_delim
+ENABLE_RUBY_TRUE!$ENABLE_RUBY_TRUE$ac_delim
+ENABLE_RUBY_FALSE!$ENABLE_RUBY_FALSE$ac_delim
+ENABLE_THREADS_TRUE!$ENABLE_THREADS_TRUE$ac_delim
+ENABLE_THREADS_FALSE!$ENABLE_THREADS_FALSE$ac_delim
 ALLOCA!$ALLOCA$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 15; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 19; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

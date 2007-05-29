@@ -80,6 +80,7 @@ my (
     $strict,
     $debug,
     $python,
+    $ruby,
     $mt,
     $libtype
     );
@@ -128,6 +129,7 @@ if ($CYGWIN_MINGW == $toolset) {
 $strict = valueask ("strict build", 'n');
 $debug = valueask ("debug build", 'n');
 $python = valueask ("python support", 'y');
+$ruby = valueask ("ruby support", 'n');
 $mt = valueask ("multi-threaded", 'y');
 $libtype = listask ("library type", $BOTH, \%LIBTYPE);
 
@@ -166,6 +168,8 @@ $options .= " \\\n\t--enable-maintainer-mode"
     if is $maintainer;
 $options .= " \\\n\t--disable-python"
     unless is $python;
+$options .= " \\\n\t--enable-ruby"
+    if is $ruby;
 $options .= " \\\n\t--disable-threads"
     unless is $mt;
 

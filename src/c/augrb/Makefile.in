@@ -58,8 +58,10 @@ am__installdirs = "$(DESTDIR)$(moddir)"
 modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
 modaugrb_la_DEPENDENCIES =
-am_modaugrb_la_OBJECTS = augrb.lo
+am__modaugrb_la_SOURCES_DIST = augrb.c
+@ENABLE_RUBY_TRUE@am_modaugrb_la_OBJECTS = augrb.lo
 modaugrb_la_OBJECTS = $(am_modaugrb_la_OBJECTS)
+@ENABLE_RUBY_TRUE@am_modaugrb_la_rpath = -rpath $(moddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -71,7 +73,7 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(modaugrb_la_SOURCES)
-DIST_SOURCES = $(modaugrb_la_SOURCES)
+DIST_SOURCES = $(am__modaugrb_la_SOURCES_DIST)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -107,6 +109,10 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 ENABLE_PYTHON_FALSE = @ENABLE_PYTHON_FALSE@
 ENABLE_PYTHON_TRUE = @ENABLE_PYTHON_TRUE@
+ENABLE_RUBY_FALSE = @ENABLE_RUBY_FALSE@
+ENABLE_RUBY_TRUE = @ENABLE_RUBY_TRUE@
+ENABLE_THREADS_FALSE = @ENABLE_THREADS_FALSE@
+ENABLE_THREADS_TRUE = @ENABLE_THREADS_TRUE@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
@@ -192,13 +198,16 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/c
 
 moddir = $(prefix)/mod
-noinst_HEADERS = 
-mod_LTLIBRARIES = modaugrb.la
-modaugrb_la_SOURCES = \
-	augrb.c
+@ENABLE_RUBY_TRUE@RB_CFLAGS = `$(top_srcdir)/src/rb/rbflags -c`
+@ENABLE_RUBY_TRUE@RB_LDFLAGS = `$(top_srcdir)/src/rb/rbflags -l`
+@ENABLE_RUBY_TRUE@AM_CFLAGS = $(RB_CFLAGS)
+@ENABLE_RUBY_TRUE@noinst_HEADERS = 
+@ENABLE_RUBY_TRUE@mod_LTLIBRARIES = modaugrb.la
+@ENABLE_RUBY_TRUE@modaugrb_la_SOURCES = \
+@ENABLE_RUBY_TRUE@	augrb.c
 
-modaugrb_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
-modaugrb_la_LIBADD = 
+@ENABLE_RUBY_TRUE@modaugrb_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(RB_LDFLAGS)
+@ENABLE_RUBY_TRUE@modaugrb_la_LIBADD = 
 all: all-am
 
 .SUFFIXES:
@@ -260,7 +269,7 @@ clean-modLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 modaugrb.la: $(modaugrb_la_OBJECTS) $(modaugrb_la_DEPENDENCIES) 
-	$(LINK) -rpath $(moddir) $(modaugrb_la_LDFLAGS) $(modaugrb_la_OBJECTS) $(modaugrb_la_LIBADD) $(LIBS)
+	$(LINK) $(am_modaugrb_la_rpath) $(modaugrb_la_LDFLAGS) $(modaugrb_la_OBJECTS) $(modaugrb_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

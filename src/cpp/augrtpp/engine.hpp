@@ -12,7 +12,7 @@
 
 namespace aug {
 
-    class sslctx;
+    class AUGRTPP_API sslctx;
 
     namespace detail {
         struct engineimpl;
@@ -59,8 +59,44 @@ namespace aug {
         clear();
 
         void
+        insert(const std::string& name, const servptr& serv,
+               const char* groups);
+
+        void
+        cancelinactive();
+
+        void
+        run(bool daemon);
+
+        void
+        teardown();
+
+        // Thread-safe host interface.
+
+        void
+        reconfall();
+
+        void
+        stopall();
+
+        void
         post(const char* sname, const char* to, const char* type,
              const aug_var* var);
+
+        void
+        post(const char* sname, const char* to, const char* type,
+             const aug_var& var)
+        {
+            post(sname, to, type, &var);
+        }
+        void
+        post(const char* sname, const char* to, const char* type,
+             const null_&)
+        {
+            post(sname, to, type, 0);
+        }
+
+        // Thread-unsafe host interface.
 
         void
         dispatch(const char* sname, const char* to, const char* type,
@@ -68,9 +104,6 @@ namespace aug {
 
         void
         shutdown(augas_id cid);
-
-        void
-        teardown();
 
         augas_id
         tcpconnect(const char* sname, const char* host, const char* port,
@@ -98,6 +131,17 @@ namespace aug {
         augas_id
         settimer(const char* sname, unsigned ms, const aug_var* var);
 
+        augas_id
+        settimer(const char* sname, unsigned ms, const aug_var& var)
+        {
+            return settimer(sname, ms, &var);
+        }
+        augas_id
+        settimer(const char* sname, unsigned ms, const null_&)
+        {
+            return settimer(sname, ms, 0);
+        }
+
         bool
         resettimer(augas_id tid, unsigned ms);
 
@@ -109,16 +153,6 @@ namespace aug {
 
         void
         setsslserver(augas_id cid, sslctx& ctx);
-
-        void
-        insert(const std::string& name, const servptr& serv,
-               const char* groups);
-
-        void
-        cancelinactive();
-
-        void
-        run(bool daemon);
 
         bool
         stopping() const;

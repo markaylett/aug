@@ -5,16 +5,34 @@ def expand(name)
   Config.expand(Config::CONFIG[name])
 end
 
+copt, lopt = false, false
+
+ARGV.each do |arg|
+  case arg
+  when '-c' then copt = true
+  when '-l' then lopt = true
+  end
+end
+
+unless copt || lopt
+  copt, lopt = true, true
+end
+
 bindir = File.dirname(%x{which ruby})
 libdir = File.join(File.dirname(bindir), 'lib')
 
-arch = expand("arch")
-libname = expand("RUBY_SO_NAME")
-ver = expand("ruby_version")
-
 args = []
-args << "-I#{File.join(libdir, 'ruby', ver, arch)}"
-args << "-L#{libdir}"
-args << "-l#{libname}"
+
+if copt
+  ver = expand('ruby_version')
+  arch = expand('arch')
+  args << "-I#{File.join(libdir, 'ruby', ver, arch)}"
+end
+
+if lopt
+  lprefix = expand('target_os') == 'mswin32' ? '-Wl,' : ''
+  libname = expand('RUBY_SO_NAME')
+  args << "-L#{libdir}" << "#{lprefix}-l#{libname}" if lopt
+end
 
 puts args.join(' ')

@@ -364,6 +364,123 @@ engine::clear()
 }
 
 AUGRTPP_API void
+engine::insert(const string& name, const servptr& serv, const char* groups)
+{
+    impl_->servs_.insert(name, serv, groups);
+}
+
+AUGRTPP_API void
+engine::cancelinactive()
+{
+    // Remove any timers allocated to services that could not be opened.
+
+    servtimers::iterator it(impl_->servtimers_.begin()),
+        end(impl_->servtimers_.end());
+    while (it != end) {
+        if (!it->second->serv_->active()) {
+            aug_warn("cancelling timer associated with inactive service");
+            aug_canceltimer(cptr(impl_->timers_), it->first);
+            impl_->servtimers_.erase(it++);
+        } else
+            ++it;
+    }
+}
+
+AUGRTPP_API void
+engine::run(bool daemon)
+{
+    timer reopen(impl_->timers_);
+
+    // Re-open log file every minute.
+
+    if (daemon) {
+
+        aug_var var = { 0, impl_ };
+        reopen.set(15000, timermemcb<detail::engineimpl,
+                   &detail::engineimpl::reopencb>, var);
+    }
+
+    AUG_DEBUG2("running daemon process");
+
+    int ret(!0);
+    while (!stopping() || !impl_->socks_.empty()) {
+
+        if (detail::engineimpl::STOPPED == impl_->state_)
+            break;
+
+        try {
+
+            if (impl_->timers_.empty()) {
+
+                scoped_unblock unblock;
+                while (AUG_RETINTR == (ret = waitnbevents
+                                       (impl_->nbfiles_)))
+                    ;
+
+            } else {
+
+                AUG_DEBUG2("processing timers");
+
+                timeval tv;
+                foreachexpired(impl_->timers_, 0 == ret, tv);
+
+                scoped_unblock unblock;
+                while (AUG_RETINTR == (ret = waitnbevents
+                                       (impl_->nbfiles_, tv)))
+                    ;
+            }
+
+            // Notify of any established connections before processing the
+            // files: data may have arrived on a newly established connection.
+
+            while (!impl_->pending_.empty()) {
+                setconnected(*impl_->pending_.front());
+                impl_->pending_.pop();
+            }
+
+            AUG_DEBUG2("processing files");
+
+            foreachnbfile(impl_->nbfiles_);
+            continue;
+
+        } AUG_PERRINFOCATCH;
+
+        // When running in foreground, stop on error.
+
+        if (!daemon)
+            teardown();
+    }
+}
+
+AUGRTPP_API void
+engine::teardown()
+{
+    if (detail::engineimpl::STARTED == impl_->state_) {
+
+        impl_->state_ = detail::engineimpl::TEARDOWN;
+        impl_->socks_.teardown();
+
+        aug_var var = { 0, impl_ };
+        impl_->grace_.set(15000, timermemcb<detail::engineimpl,
+                          &detail::engineimpl::stopcb>, var);
+    }
+}
+
+AUGRTPP_API void
+engine::reconfall()
+{
+    aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
+    writeevent(impl_->wrfd_, e);
+}
+
+AUGRTPP_API void
+engine::stopall()
+{
+    aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
+    writeevent(impl_->wrfd_, e);
+}
+
+AUGRTPP_API void
 engine::post(const char* sname, const char* to, const char* type,
              const aug_var* var)
 {
@@ -401,20 +518,6 @@ engine::shutdown(augas_id cid)
         cptr->shutdown();
     else
         impl_->socks_.erase(*sock);
-}
-
-AUGRTPP_API void
-engine::teardown()
-{
-    if (detail::engineimpl::STARTED == impl_->state_) {
-
-        impl_->state_ = detail::engineimpl::TEARDOWN;
-        impl_->socks_.teardown();
-
-        aug_var var = { 0, impl_ };
-        impl_->grace_.set(15000, timermemcb<detail::engineimpl,
-                          &detail::engineimpl::stopcb>, var);
-    }
 }
 
 AUGRTPP_API augas_id
@@ -608,95 +711,6 @@ engine::setsslserver(augas_id cid, sslctx& ctx)
     throw local_error(__FILE__, __LINE__, AUG_ESUPPORT,
                       AUG_MSG("aug_setsslserver() not supported"));
 #endif // !HAVE_OPENSSL_SSL_H
-}
-
-AUGRTPP_API void
-engine::insert(const string& name, const servptr& serv, const char* groups)
-{
-    impl_->servs_.insert(name, serv, groups);
-}
-
-AUGRTPP_API void
-engine::cancelinactive()
-{
-    // Remove any timers allocated to services that could not be opened.
-
-    servtimers::iterator it(impl_->servtimers_.begin()),
-        end(impl_->servtimers_.end());
-    while (it != end) {
-        if (!it->second->serv_->active()) {
-            aug_warn("cancelling timer associated with inactive service");
-            aug_canceltimer(cptr(impl_->timers_), it->first);
-            impl_->servtimers_.erase(it++);
-        } else
-            ++it;
-    }
-}
-
-AUGRTPP_API void
-engine::run(bool daemon)
-{
-    timer reopen(impl_->timers_);
-
-    // Re-open log file every minute.
-
-    if (daemon) {
-
-        aug_var var = { 0, impl_ };
-        reopen.set(15000, timermemcb<detail::engineimpl,
-                   &detail::engineimpl::reopencb>, var);
-    }
-
-    AUG_DEBUG2("running daemon process");
-
-    int ret(!0);
-    while (!stopping() || !impl_->socks_.empty()) {
-
-        if (detail::engineimpl::STOPPED == impl_->state_)
-            break;
-
-        try {
-
-            if (impl_->timers_.empty()) {
-
-                scoped_unblock unblock;
-                while (AUG_RETINTR == (ret = waitnbevents
-                                       (impl_->nbfiles_)))
-                    ;
-
-            } else {
-
-                AUG_DEBUG2("processing timers");
-
-                timeval tv;
-                foreachexpired(impl_->timers_, 0 == ret, tv);
-
-                scoped_unblock unblock;
-                while (AUG_RETINTR == (ret = waitnbevents
-                                       (impl_->nbfiles_, tv)))
-                    ;
-            }
-
-            // Notify of any established connections before processing the
-            // files: data may have arrived on a newly established connection.
-
-            while (!impl_->pending_.empty()) {
-                setconnected(*impl_->pending_.front());
-                impl_->pending_.pop();
-            }
-
-            AUG_DEBUG2("processing files");
-
-            foreachnbfile(impl_->nbfiles_);
-            continue;
-
-        } AUG_PERRINFOCATCH;
-
-        // When running in foreground, stop on error.
-
-        if (!daemon)
-            teardown();
-    }
 }
 
 AUGRTPP_API bool
