@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augas.h"
+#include "augrt.h"
 
 #include <structmember.h>
 
@@ -18,7 +18,7 @@ static int objects_ = 0;
 
 typedef struct {
     PyObject_HEAD
-    char name_[AUGAS_MAXNAME + 1];
+    char name_[AUGRT_MAXNAME + 1];
     int id_;
     PyObject* user_;
 } object_;
@@ -46,8 +46,8 @@ static void
 dealloc_(object_* self)
 {
     --objects_;
-    augas_writelog(AUGAS_LOGDEBUG,
-                   "deallocated: <augas.Object at %p, id=%d>",
+    augrt_writelog(AUGRT_LOGDEBUG,
+                   "deallocated: <augrt.Object at %p, id=%d>",
                    (void*)self, self->id_);
 
     clear_(self);
@@ -70,7 +70,7 @@ compare_(object_* lhs, object_* rhs)
 static PyObject*
 repr_(object_* self)
 {
-    return PyString_FromFormat("<augas.Object at %p, id=%d>",
+    return PyString_FromFormat("<augrt.Object at %p, id=%d>",
                                (void*)self, self->id_);
 }
 
@@ -138,8 +138,8 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
     }
 
     ++objects_;
-    augas_writelog(AUGAS_LOGDEBUG,
-                   "allocated: <augas.Object at %p, id=%d>",
+    augrt_writelog(AUGRT_LOGDEBUG,
+                   "allocated: <augrt.Object at %p, id=%d>",
                    (void*)self, self->id_);
     return (PyObject*)self;
 }
@@ -160,7 +160,7 @@ static PyGetSetDef getset_[] = {
 static PyTypeObject pytype_ = {
     PyObject_HEAD_INIT(NULL)
     0,                       /*ob_size*/
-    "augas.Object",          /*tp_name*/
+    "augrt.Object",          /*tp_name*/
     sizeof(object_),         /*tp_basicsize*/
     0,                       /*tp_itemsize*/
     (destructor)dealloc_,    /*tp_dealloc*/
@@ -225,8 +225,8 @@ augpy_createobject(PyTypeObject* type, int id, PyObject* user)
     self->user_ = user;
 
     ++objects_;
-    augas_writelog(AUGAS_LOGDEBUG,
-                   "allocated: <augas.Object at %p, id=%d>",
+    augrt_writelog(AUGRT_LOGDEBUG,
+                   "allocated: <augrt.Object at %p, id=%d>",
                    (void*)self, self->id_);
     return (PyObject*)self;
 }

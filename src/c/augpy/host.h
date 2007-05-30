@@ -11,6 +11,6 @@
 #include <Python.h>
 
 PyObject*
-augpy_createaugas(PyTypeObject* type);
+augpy_createaugrt(PyTypeObject* type);
 
 #endif /* AUGPY_HOST_H */

@@ -1,4 +1,4 @@
-#include "augaspp.hpp"
+#include "augrtpp.hpp"
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"
 #include "augmarpp.hpp"
@@ -26,7 +26,7 @@
 #endif // _WIN32
 
 using namespace aug;
-using namespace augas;
+using namespace augrt;
 using namespace std;
 
 namespace {
@@ -38,9 +38,9 @@ namespace {
     void
     loadcss()
     {
-        const char* css(augas::getenv("service.http.css"));
+        const char* css(augrt::getenv("service.http.css"));
         if (css) {
-            aug::chdir(augas::getenv("rundir"));
+            aug::chdir(augrt::getenv("rundir"));
             ifstream fs(css);
             stringstream ss;
             ss << fs.rdbuf();
@@ -75,15 +75,15 @@ namespace {
         mimetypes_["txt"] = "text/plain";
         mimetypes_["xml"] = "text/xml";
 
-        const char* mimetypes(augas::getenv("service.http.mimetypes"));
+        const char* mimetypes(augrt::getenv("service.http.mimetypes"));
         if (mimetypes) {
-            aug::chdir(augas::getenv("rundir"));
+            aug::chdir(augrt::getenv("rundir"));
             readconf(mimetypes, confcb<confcb_>, null);
         }
     }
 
     const char*
-    nonce(augas_id id, const string& addr, aug_md5base64_t base64)
+    nonce(augrt_id id, const string& addr, aug_md5base64_t base64)
     {
         pid_t pid(getpid());
 
@@ -91,7 +91,7 @@ namespace {
         aug_gettimeofday(&tv, 0);
 
         long rand(aug_rand());
-        const char* salt(augas::getenv("service.http.salt"));
+        const char* salt(augrt::getenv("service.http.salt"));
 
         aug_md5context md5ctx;
         unsigned char digest[16];
@@ -129,7 +129,7 @@ namespace {
     }
 
     string
-    getsessid(augas_id id, const string& addr, const char* cookie)
+    getsessid(augrt_id id, const string& addr, const char* cookie)
     {
         aug_md5base64_t base64;
 
@@ -231,11 +231,11 @@ namespace {
     bool
     getpass(const string& user, const string& realm, string& digest)
     {
-        const char* passwd(augas::getenv("service.http.passwd"));
+        const char* passwd(augrt::getenv("service.http.passwd"));
         if (!passwd)
             return false;
 
-        aug::chdir(augas::getenv("rundir"));
+        aug::chdir(augrt::getenv("rundir"));
         ifstream fs(passwd);
         string line;
         while (getline(fs, line)) {
@@ -472,7 +472,7 @@ namespace {
     typedef vector<pair<string, string> > fields;
 
     void
-    sendfile(augas_id id, const string& sessid, const string& path)
+    sendfile(augrt_id id, const string& sessid, const string& path)
     {
         auto_ptr<filecontent> ptr(new filecontent(path.c_str()));
 
@@ -493,7 +493,7 @@ namespace {
     vector<string> results_;
 
     void
-    sendresult(augas_id id, const string& sessid)
+    sendresult(augrt_id id, const string& sessid)
     {
         stringstream content;
         content << "<result>";
@@ -517,7 +517,7 @@ namespace {
     }
 
     void
-    sendstatus(augas_id id, const string& sessid, int status,
+    sendstatus(augrt_id id, const string& sessid, int status,
                const string& title, const fields& fs = fields())
     {
         stringstream content;
@@ -545,12 +545,12 @@ namespace {
 
     struct session : basic_marnonstatic {
         const string& realm_;
-        augas_id id_;
+        augrt_id id_;
         string sessid_;
         const string addr_;
         aug_md5base64_t nonce_;
         bool auth_;
-        session(const string& realm, augas_id id, const string& addr)
+        session(const string& realm, augrt_id id, const string& addr)
             : realm_(realm),
               id_(id),
               addr_(addr),
@@ -706,8 +706,8 @@ namespace {
         do_start(const char* sname)
         {
             aug_info("starting...");
-            const char* serv(augas::getenv("service.http.serv"));
-            const char* realm(augas::getenv("service.http.realm"));
+            const char* serv(augrt::getenv("service.http.serv"));
+            const char* realm(augrt::getenv("service.http.realm"));
             if (!serv || !realm)
                 return false;
 
@@ -745,7 +745,7 @@ namespace {
             auto_ptr<marparser> parser(new marparser(0, sess));
 
             sock.setuser(parser.get());
-            setrwtimer(sock, 30000, AUGAS_TIMRD);
+            setrwtimer(sock, 30000, AUGRT_TIMRD);
             parser.release();
             return true;
         }
@@ -780,4 +780,4 @@ namespace {
     typedef basic_module<basic_factory<httpserv> > module;
 }
 
-AUGAS_MODULE(module::init, module::term)
+AUGRT_MODULE(module::init, module::term)

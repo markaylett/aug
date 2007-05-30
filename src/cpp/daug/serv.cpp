@@ -12,31 +12,31 @@ AUG_RCSID("$Id$");
 #include <stack>
 
 using namespace aug;
-using namespace augas;
+using namespace augrt;
 using namespace std;
 
 namespace {
-    stack<const augas_serv*> stack_;
+    stack<const augrt_serv*> stack_;
     struct scoped_frame {
         ~scoped_frame() AUG_NOTHROW
         {
             stack_.pop();
         }
         explicit
-        scoped_frame(const augas_serv* serv)
+        scoped_frame(const augrt_serv* serv)
         {
             stack_.push(serv);
         }
     };
 }
 
-augas_serv&
+augrt_serv&
 serv::do_get() AUG_NOTHROW
 {
     return serv_;
 }
 
-const augas_serv&
+const augrt_serv&
 serv::do_get() const AUG_NOTHROW
 {
     return serv_;
@@ -72,21 +72,21 @@ serv::do_event(const char* from, const char* type, const void* user,
 }
 
 void
-serv::do_closed(const augas_object& sock) const AUG_NOTHROW
+serv::do_closed(const augrt_object& sock) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
     module_->closed(sock);
 }
 
 void
-serv::do_teardown(const augas_object& sock) const AUG_NOTHROW
+serv::do_teardown(const augrt_object& sock) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
     module_->teardown(sock);
 }
 
 bool
-serv::do_accepted(augas_object& sock, const char* addr,
+serv::do_accepted(augrt_object& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
@@ -94,7 +94,7 @@ serv::do_accepted(augas_object& sock, const char* addr,
 }
 
 void
-serv::do_connected(augas_object& sock, const char* addr,
+serv::do_connected(augrt_object& sock, const char* addr,
                    unsigned short port) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
@@ -102,7 +102,7 @@ serv::do_connected(augas_object& sock, const char* addr,
 }
 
 void
-serv::do_data(const augas_object& sock, const char* buf,
+serv::do_data(const augrt_object& sock, const char* buf,
               size_t size) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
@@ -110,28 +110,28 @@ serv::do_data(const augas_object& sock, const char* buf,
 }
 
 void
-serv::do_rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
+serv::do_rdexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
     module_->rdexpire(sock, ms);
 }
 
 void
-serv::do_wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
+serv::do_wrexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
     module_->wrexpire(sock, ms);
 }
 
 void
-serv::do_expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
+serv::do_expire(const augrt_object& timer, unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
     module_->expire(timer, ms);
 }
 
 bool
-serv::do_authcert(const augas_object& sock, const char* subject,
+serv::do_authcert(const augrt_object& sock, const char* subject,
                   const char* issuer) const AUG_NOTHROW
 {
     scoped_frame frame(&serv_);
@@ -154,8 +154,8 @@ serv::serv(const moduleptr& module, const char* name)
     serv_.user_ = 0;
 }
 
-const augas_serv*
-augas::getserv()
+const augrt_serv*
+augrt::getserv()
 {
     return stack_.empty() ? 0 : stack_.top();
 }

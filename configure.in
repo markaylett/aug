@@ -191,9 +191,9 @@ AC_CONFIG_FILES([Makefile
                  doc/man/Makefile
                  etc/Makefile
                  example/Makefile
-                 example/augas/Makefile
-                 example/augas/etc/Makefile
-                 example/augas/htdocs/Makefile
+                 example/augrt/Makefile
+                 example/augrt/etc/Makefile
+                 example/augrt/htdocs/Makefile
                  example/cpp/Makefile
                  src/Makefile
                  src/c/Makefile

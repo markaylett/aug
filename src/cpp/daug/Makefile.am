@@ -34,10 +34,10 @@ daug_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	augaspp-test
+	augrtpp-test
 
 TESTS = \
-	augaspp-test
+	augrtpp-test
 
-augaspp_test_SOURCES = test.cpp
-augaspp_test_LDADD =
+augrtpp_test_SOURCES = test.cpp
+augrtpp_test_LDADD =

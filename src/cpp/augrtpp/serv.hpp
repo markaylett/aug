@@ -8,19 +8,19 @@
 
 #include "augsyspp/smartptr.hpp"
 
-#include "augas.h"
+#include "augrt.h"
 
 namespace aug {
 
     class AUGRTPP_API serv_base {
     public:
-        typedef augas_serv ctype;
+        typedef augrt_serv ctype;
     private:
 
-        virtual augas_serv&
+        virtual augrt_serv&
         do_get() AUG_NOTHROW = 0;
 
-        virtual const augas_serv&
+        virtual const augrt_serv&
         do_get() const AUG_NOTHROW = 0;
 
         virtual bool
@@ -37,49 +37,49 @@ namespace aug {
                  size_t size) const AUG_NOTHROW = 0;
 
         virtual void
-        do_closed(const augas_object& sock) const AUG_NOTHROW = 0;
+        do_closed(const augrt_object& sock) const AUG_NOTHROW = 0;
 
         virtual void
-        do_teardown(const augas_object& sock) const AUG_NOTHROW = 0;
+        do_teardown(const augrt_object& sock) const AUG_NOTHROW = 0;
 
         virtual bool
-        do_accepted(augas_object& sock, const char* addr,
+        do_accepted(augrt_object& sock, const char* addr,
                     unsigned short port) const AUG_NOTHROW = 0;
 
         virtual void
-        do_connected(augas_object& sock, const char* addr,
+        do_connected(augrt_object& sock, const char* addr,
                      unsigned short port) const AUG_NOTHROW = 0;
 
         virtual void
-        do_data(const augas_object& sock, const char* buf,
+        do_data(const augrt_object& sock, const char* buf,
                 size_t size) const AUG_NOTHROW = 0;
 
         virtual void
-        do_rdexpire(const augas_object& sock,
+        do_rdexpire(const augrt_object& sock,
                     unsigned& ms) const AUG_NOTHROW = 0;
 
         virtual void
-        do_wrexpire(const augas_object& sock,
+        do_wrexpire(const augrt_object& sock,
                     unsigned& ms) const AUG_NOTHROW = 0;
 
         virtual void
-        do_expire(const augas_object& timer,
+        do_expire(const augrt_object& timer,
                   unsigned& ms) const AUG_NOTHROW = 0;
 
         virtual bool
-        do_authcert(const augas_object& sock, const char* subject,
+        do_authcert(const augrt_object& sock, const char* subject,
                     const char* issuer) const AUG_NOTHROW = 0;
 
     public:
         virtual
         ~serv_base() AUG_NOTHROW;
 
-        augas_serv&
+        augrt_serv&
         get() AUG_NOTHROW
         {
             return do_get();
         }
-        const augas_serv&
+        const augrt_serv&
         get() const AUG_NOTHROW
         {
             return do_get();
@@ -106,59 +106,59 @@ namespace aug {
             do_event(from, type, user, size);
         }
         void
-        closed(const augas_object& sock) const AUG_NOTHROW
+        closed(const augrt_object& sock) const AUG_NOTHROW
         {
             do_closed(sock);
         }
         void
-        teardown(const augas_object& sock) const AUG_NOTHROW
+        teardown(const augrt_object& sock) const AUG_NOTHROW
         {
             do_teardown(sock);
         }
         bool
-        accepted(augas_object& sock, const char* addr,
+        accepted(augrt_object& sock, const char* addr,
                  unsigned short port) const AUG_NOTHROW
         {
             return do_accepted(sock, addr, port);
         }
         void
-        connected(augas_object& sock, const char* addr,
+        connected(augrt_object& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW
         {
             do_connected(sock, addr, port);
         }
         void
-        data(const augas_object& sock, const char* buf,
+        data(const augrt_object& sock, const char* buf,
              size_t size) const AUG_NOTHROW
         {
             do_data(sock, buf, size);
         }
         void
-        rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
+        rdexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW
         {
             do_rdexpire(sock, ms);
         }
         void
-        wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW
+        wrexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW
         {
             do_wrexpire(sock, ms);
         }
         void
-        expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW
+        expire(const augrt_object& timer, unsigned& ms) const AUG_NOTHROW
         {
             do_expire(timer, ms);
         }
         bool
-        authcert(const augas_object& sock, const char* subject,
+        authcert(const augrt_object& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW
         {
             return do_authcert(sock, subject, issuer);
         }
-        operator augas_serv&() AUG_NOTHROW
+        operator augrt_serv&() AUG_NOTHROW
         {
             return do_get();
         }
-        operator const augas_serv&() const AUG_NOTHROW
+        operator const augrt_serv&() const AUG_NOTHROW
         {
             return do_get();
         }

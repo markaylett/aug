@@ -1,4 +1,4 @@
-from augas import *
+from augrt import *
 
 def crit(s):
     writelog(LOGCRIT, s)

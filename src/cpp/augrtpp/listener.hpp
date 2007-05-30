@@ -13,13 +13,13 @@ namespace aug {
     class listener : public sock_base {
 
         servptr serv_;
-        augas_object sock_;
+        augrt_object sock_;
         smartfd sfd_;
 
-        augas_object&
+        augrt_object&
         do_get();
 
-        const augas_object&
+        const augrt_object&
         do_get() const;
 
         const servptr&

@@ -1,32 +1,32 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGAS_H
-#define AUGAS_H
+#ifndef AUGRT_H
+#define AUGRT_H
 
 #include <stdarg.h>    /* va_list */
 #include <stdlib.h>    /* NULL */
 #include <sys/types.h> /* size_t */
 
 #if !defined(__cplusplus)
-# define AUGAS_EXTERN extern
+# define AUGRT_EXTERN extern
 #else /* __cplusplus */
-# define AUGAS_EXTERN extern "C"
+# define AUGRT_EXTERN extern "C"
 #endif /* __cplusplus */
 
 #if !defined(_WIN32)
-# define AUGAS_EXPORT AUGAS_EXTERN
-# define AUGAS_IMPORT AUGAS_EXTERN
+# define AUGRT_EXPORT AUGRT_EXTERN
+# define AUGRT_IMPORT AUGRT_EXTERN
 #else /* _WIN32 */
-# define AUGAS_EXPORT AUGAS_EXTERN __declspec(dllexport)
-# define AUGAS_IMPORT AUGAS_EXTERN __declspec(dllimport)
+# define AUGRT_EXPORT AUGRT_EXTERN __declspec(dllexport)
+# define AUGRT_IMPORT AUGRT_EXTERN __declspec(dllimport)
 #endif /* _WIN32 */
 
-#if !defined(AUGAS_BUILD)
-# define AUGAS_API AUGAS_EXPORT
-#else /* AUGAS_BUILD */
-# define AUGAS_API AUGAS_IMPORT
-#endif /* AUGAS_BUILD */
+#if !defined(AUGRT_BUILD)
+# define AUGRT_API AUGRT_EXPORT
+#else /* AUGRT_BUILD */
+# define AUGRT_API AUGRT_IMPORT
+#endif /* AUGRT_BUILD */
 
 /* Also defined in augutil/var.h. */
 
@@ -48,16 +48,16 @@ struct aug_var {
 };
 #endif /* AUG_VAR */
 
-#define augas_vartype aug_vartype
-#define augas_var     aug_var
+#define augrt_vartype aug_vartype
+#define augrt_var     aug_var
 
-enum augas_loglevel {
-    AUGAS_LOGCRIT,
-    AUGAS_LOGERROR,
-    AUGAS_LOGWARN,
-    AUGAS_LOGNOTICE,
-    AUGAS_LOGINFO,
-    AUGAS_LOGDEBUG
+enum augrt_loglevel {
+    AUGRT_LOGCRIT,
+    AUGRT_LOGERROR,
+    AUGRT_LOGWARN,
+    AUGRT_LOGNOTICE,
+    AUGRT_LOGINFO,
+    AUGRT_LOGDEBUG
 };
 
 /**
@@ -69,19 +69,19 @@ enum augas_loglevel {
    Read timer.
  */
 
-#define AUGAS_TIMRD    0x01
+#define AUGRT_TIMRD    0x01
 
 /**
    Write timer.
  */
 
-#define AUGAS_TIMWR    0x02
+#define AUGRT_TIMWR    0x02
 
 /**
    Both read and write timer.
  */
 
-#define AUGAS_TIMBOTH (AUGAS_TIMRD | AUGAS_TIMWR)
+#define AUGRT_TIMBOTH (AUGRT_TIMRD | AUGRT_TIMWR)
 
 /**
    \}
@@ -97,39 +97,39 @@ enum augas_loglevel {
    Success.
  */
 
-#define AUGAS_OK        0
+#define AUGRT_OK        0
 
 /**
    Failure.
  */
 
-#define AUGAS_ERROR   (-1)
+#define AUGRT_ERROR   (-1)
 
 /**
    None, empty or null depending on context.
  */
 
-#define AUGAS_NONE    (-2)
+#define AUGRT_NONE    (-2)
 
 /**
    /}
  */
 
-#define AUGAS_MAXNAME  63
+#define AUGRT_MAXNAME  63
 
-typedef int augas_id;
+typedef int augrt_id;
 
-struct augas_serv {
-    char name_[AUGAS_MAXNAME + 1];
+struct augrt_serv {
+    char name_[AUGRT_MAXNAME + 1];
     void* user_;
 };
 
-struct augas_object {
-    augas_id id_;
+struct augrt_object {
+    augrt_id id_;
     void* user_;
 };
 
-struct augas_host {
+struct augrt_host {
 
     /**
        The following functions are thread-safe.
@@ -141,7 +141,7 @@ struct augas_host {
        \param level The log level.
        \param format Printf-style specification.
        \param ... Arguments to format specification.
-       \sa #augas_loglevel, vwritelog_().
+       \sa #augrt_loglevel, vwritelog_().
     */
 
     void (*writelog_)(int level, const char* format, ...);
@@ -152,7 +152,7 @@ struct augas_host {
        \param level The log level.
        \param format Printf-style specification.
        \param ... Arguments to format specification.
-       \sa #augas_loglevel, writelog_().
+       \sa #augrt_loglevel, writelog_().
     */
 
     void (*vwritelog_)(int level, const char* format, va_list args);
@@ -194,7 +194,7 @@ struct augas_host {
     */
 
     int (*post_)(const char* to, const char* type,
-                 const struct augas_var* var);
+                 const struct augrt_var* var);
 
     /**
        The remaining functions are not thread-safe.
@@ -230,7 +230,7 @@ struct augas_host {
        Get the active service.
     */
 
-    const struct augas_serv* (*getserv_)(void);
+    const struct augrt_serv* (*getserv_)(void);
 
     /**
        Shutdown the connection.
@@ -238,7 +238,7 @@ struct augas_host {
        \param cid Connection id.
     */
 
-    int (*shutdown_)(augas_id cid);
+    int (*shutdown_)(augrt_id cid);
 
     /**
        Establish tcp connection.
@@ -276,7 +276,7 @@ struct augas_host {
        \param len Length of data buffer.
     */
 
-    int (*send_)(augas_id cid, const void* buf, size_t len);
+    int (*send_)(augrt_id cid, const void* buf, size_t len);
 
     /**
        Send data to peer.
@@ -285,7 +285,7 @@ struct augas_host {
        \param var User data.
     */
 
-    int (*sendv_)(augas_id cid, const struct augas_var* var);
+    int (*sendv_)(augrt_id cid, const struct augrt_var* var);
 
     /**
        Set read/write timer.
@@ -295,7 +295,7 @@ struct augas_host {
        \param flags \ref TimerFlags.
     */
 
-    int (*setrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
+    int (*setrwtimer_)(augrt_id cid, unsigned ms, unsigned flags);
 
     /**
        Reset read/write timer.
@@ -305,7 +305,7 @@ struct augas_host {
        \param flags \ref TimerFlags.
     */
 
-    int (*resetrwtimer_)(augas_id cid, unsigned ms, unsigned flags);
+    int (*resetrwtimer_)(augrt_id cid, unsigned ms, unsigned flags);
 
     /**
        Cancel read/write timer.
@@ -314,7 +314,7 @@ struct augas_host {
        \param flags \ref TimerFlags.
     */
 
-    int (*cancelrwtimer_)(augas_id cid, unsigned flags);
+    int (*cancelrwtimer_)(augrt_id cid, unsigned flags);
 
 
     /**
@@ -324,7 +324,7 @@ struct augas_host {
        \param var User data.
     */
 
-    int (*settimer_)(unsigned ms, const struct augas_var* var);
+    int (*settimer_)(unsigned ms, const struct augrt_var* var);
 
     /**
        Reset timer.
@@ -333,7 +333,7 @@ struct augas_host {
        \param ms Timeout value in milliseconds.
     */
 
-    int (*resettimer_)(augas_id tid, unsigned ms);
+    int (*resettimer_)(augrt_id tid, unsigned ms);
 
     /**
        Cancel timer.
@@ -341,7 +341,7 @@ struct augas_host {
        \param tid Timer id.
     */
 
-    int (*canceltimer_)(augas_id tid);
+    int (*canceltimer_)(augrt_id tid);
 
     /**
        Set ssl client.
@@ -350,7 +350,7 @@ struct augas_host {
        \param ctx SSL context.
     */
 
-    int (*setsslclient_)(augas_id cid, const char* ctx);
+    int (*setsslclient_)(augrt_id cid, const char* ctx);
 
     /**
        Set ssl server.
@@ -359,16 +359,16 @@ struct augas_host {
        \param ctx SSL context.
     */
 
-    int (*setsslserver_)(augas_id cid, const char* ctx);
+    int (*setsslserver_)(augrt_id cid, const char* ctx);
 };
 
 /**
-   Module functions should return either #AUGAS_OK or #AUGAS_ERROR.  For those
+   Module functions should return either #AUGRT_OK or #AUGRT_ERROR.  For those
    functions associated with a connection, a failure will result in the
    connection being closed.
 */
 
-struct augas_module {
+struct augrt_module {
 
     /**
        Stop service.
@@ -380,7 +380,7 @@ struct augas_module {
        Start service.
     */
 
-    int (*start_)(struct augas_serv* serv);
+    int (*start_)(struct augrt_serv* serv);
 
     /**
        Re-configure request.
@@ -406,7 +406,7 @@ struct augas_module {
        \param sock TODO
     */
 
-    void (*closed_)(const struct augas_object* sock);
+    void (*closed_)(const struct augrt_object* sock);
 
     /**
        Teardown request.
@@ -414,7 +414,7 @@ struct augas_module {
        \param sock TODO
     */
 
-    void (*teardown_)(const struct augas_object* sock);
+    void (*teardown_)(const struct augrt_object* sock);
 
     /**
        Acceptance of socket connection.
@@ -424,7 +424,7 @@ struct augas_module {
        \param port TODO
     */
 
-    int (*accepted_)(struct augas_object* sock, const char* addr,
+    int (*accepted_)(struct augrt_object* sock, const char* addr,
                      unsigned short port);
 
     /**
@@ -435,7 +435,7 @@ struct augas_module {
        \param port TODO
     */
 
-    void (*connected_)(struct augas_object* sock, const char* addr,
+    void (*connected_)(struct augrt_object* sock, const char* addr,
                        unsigned short port);
 
     /**
@@ -446,7 +446,7 @@ struct augas_module {
        \param len TODO
     */
 
-    void (*data_)(const struct augas_object* sock, const void* buf,
+    void (*data_)(const struct augrt_object* sock, const void* buf,
                   size_t len);
 
     /**
@@ -456,7 +456,7 @@ struct augas_module {
        \param ms TODO
     */
 
-    void (*rdexpire_)(const struct augas_object* sock, unsigned* ms);
+    void (*rdexpire_)(const struct augrt_object* sock, unsigned* ms);
 
     /**
        Expiry of write timer.
@@ -465,7 +465,7 @@ struct augas_module {
        \param ms TODO
     */
 
-    void (*wrexpire_)(const struct augas_object* sock, unsigned* ms);
+    void (*wrexpire_)(const struct augrt_object* sock, unsigned* ms);
 
     /**
        Timer expiry.
@@ -474,7 +474,7 @@ struct augas_module {
        \param ms TODO
     */
 
-    void (*expire_)(const struct augas_object* timer, unsigned* ms);
+    void (*expire_)(const struct augrt_object* timer, unsigned* ms);
 
     /**
        Authorisation of peer certificate.
@@ -484,64 +484,64 @@ struct augas_module {
        \param issuer TODO
     */
 
-    int (*authcert_)(const struct augas_object* sock, const char* subject,
+    int (*authcert_)(const struct augrt_object* sock, const char* subject,
                      const char* issuer);
 };
 
-AUGAS_EXTERN const struct augas_host*
-augas_gethost(void);
+AUGRT_EXTERN const struct augrt_host*
+augrt_gethost(void);
 
-#define augas_writelog      (augas_gethost()->writelog_)
-#define augas_vwritelog     (augas_gethost()->vwritelog_)
-#define augas_error         (augas_gethost()->error_)
-#define augas_reconfall     (augas_gethost()->reconfall_)
-#define augas_stopall       (augas_gethost()->stopall_)
-#define augas_post          (augas_gethost()->post_)
-#define augas_dispatch      (augas_gethost()->dispatch_)
-#define augas_getenv        (augas_gethost()->getenv_)
-#define augas_getserv       (augas_gethost()->getserv_)
-#define augas_shutdown      (augas_gethost()->shutdown_)
-#define augas_tcpconnect    (augas_gethost()->tcpconnect_)
-#define augas_tcplisten     (augas_gethost()->tcplisten_)
-#define augas_send          (augas_gethost()->send_)
-#define augas_sendv         (augas_gethost()->sendv_)
-#define augas_setrwtimer    (augas_gethost()->setrwtimer_)
-#define augas_resetrwtimer  (augas_gethost()->resetrwtimer_)
-#define augas_cancelrwtimer (augas_gethost()->cancelrwtimer_)
-#define augas_settimer      (augas_gethost()->settimer_)
-#define augas_resettimer    (augas_gethost()->resettimer_)
-#define augas_canceltimer   (augas_gethost()->canceltimer_)
-#define augas_setsslclient  (augas_gethost()->setsslclient_)
-#define augas_setsslserver  (augas_gethost()->setsslserver_)
+#define augrt_writelog      (augrt_gethost()->writelog_)
+#define augrt_vwritelog     (augrt_gethost()->vwritelog_)
+#define augrt_error         (augrt_gethost()->error_)
+#define augrt_reconfall     (augrt_gethost()->reconfall_)
+#define augrt_stopall       (augrt_gethost()->stopall_)
+#define augrt_post          (augrt_gethost()->post_)
+#define augrt_dispatch      (augrt_gethost()->dispatch_)
+#define augrt_getenv        (augrt_gethost()->getenv_)
+#define augrt_getserv       (augrt_gethost()->getserv_)
+#define augrt_shutdown      (augrt_gethost()->shutdown_)
+#define augrt_tcpconnect    (augrt_gethost()->tcpconnect_)
+#define augrt_tcplisten     (augrt_gethost()->tcplisten_)
+#define augrt_send          (augrt_gethost()->send_)
+#define augrt_sendv         (augrt_gethost()->sendv_)
+#define augrt_setrwtimer    (augrt_gethost()->setrwtimer_)
+#define augrt_resetrwtimer  (augrt_gethost()->resetrwtimer_)
+#define augrt_cancelrwtimer (augrt_gethost()->cancelrwtimer_)
+#define augrt_settimer      (augrt_gethost()->settimer_)
+#define augrt_resettimer    (augrt_gethost()->resettimer_)
+#define augrt_canceltimer   (augrt_gethost()->canceltimer_)
+#define augrt_setsslclient  (augrt_gethost()->setsslclient_)
+#define augrt_setsslserver  (augrt_gethost()->setsslserver_)
 
 /**
-   augas_init() should return NULL on failure.
+   augrt_init() should return NULL on failure.
 */
 
-#define AUGAS_MODULE(init, term)                                      \
-    static const struct augas_host* host_ = NULL;                     \
-    AUGAS_EXTERN const struct augas_host*                             \
-    augas_gethost(void)                                               \
+#define AUGRT_MODULE(init, term)                                      \
+    static const struct augrt_host* host_ = NULL;                     \
+    AUGRT_EXTERN const struct augrt_host*                             \
+    augrt_gethost(void)                                               \
     {                                                                 \
         return host_;                                                 \
     }                                                                 \
-    AUGAS_API const struct augas_module*                              \
-    augas_init(const char* name, const struct augas_host* host)       \
+    AUGRT_API const struct augrt_module*                              \
+    augrt_init(const char* name, const struct augrt_host* host)       \
     {                                                                 \
         if (host_)                                                    \
             return NULL;                                              \
         host_ = host;                                                 \
         return (*init)(name);                                         \
     }                                                                 \
-    AUGAS_API void                                                    \
-    augas_term(void)                                                  \
+    AUGRT_API void                                                    \
+    augrt_term(void)                                                  \
     {                                                                 \
         (*term)();                                                    \
         host_ = NULL;                                                 \
     }
 
-typedef void (*augas_termfn)(void);
-typedef const struct augas_module* (*augas_initfn)(const char*,
-                                                   const struct augas_host*);
+typedef void (*augrt_termfn)(void);
+typedef const struct augrt_module* (*augrt_initfn)(const char*,
+                                                   const struct augrt_host*);
 
-#endif /* AUGAS_H */
+#endif /* AUGRT_H */

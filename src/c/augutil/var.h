@@ -8,7 +8,7 @@
 
 #include "augsys/types.h"
 
-/* Also defined in augas.h. */
+/* Also defined in augrt.h. */
 
 #if !defined(AUG_VARTYPE)
 # define AUG_VARTYPE
@@ -18,7 +18,7 @@ struct aug_vartype {
 };
 #endif /* !AUG_VARTYPE */
 
-/* Also defined in augas.h. */
+/* Also defined in augrt.h. */
 
 #if !defined(AUG_VAR)
 # define AUG_VAR

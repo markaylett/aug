@@ -17,7 +17,7 @@ socks::~socks() AUG_NOTHROW
 }
 
 bool
-socks::send(augas_id cid, const void* buf, size_t len)
+socks::send(augrt_id cid, const void* buf, size_t len)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
@@ -28,7 +28,7 @@ socks::send(augas_id cid, const void* buf, size_t len)
 }
 
 bool
-socks::sendv(augas_id cid, const aug_var& var)
+socks::sendv(augrt_id cid, const aug_var& var)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (!sendable(*cptr))
@@ -118,7 +118,7 @@ socks::getbyfd(fdref fd) const
 }
 
 sockptr
-socks::getbyid(augas_id id) const
+socks::getbyid(augrt_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));
     if (it == idtofd_.end())

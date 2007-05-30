@@ -68,7 +68,7 @@ namespace {
     };
 
     typedef smartptr<servtimer> servtimerptr;
-    typedef map<augas_id, servtimerptr> servtimers;
+    typedef map<augrt_id, servtimerptr> servtimers;
     typedef queue<connptr> pending;
 
     void
@@ -315,7 +315,7 @@ namespace aug {
 
                 servtimers::iterator it(servtimers_.find(id));
                 servtimerptr tptr(it->second);
-                augas_object timer = { id, tptr->var_.arg_ };
+                augrt_object timer = { id, tptr->var_.arg_ };
                 tptr->serv_->expire(timer, ms);
 
                 if (0 == ms) {
@@ -510,7 +510,7 @@ engine::dispatch(const char* sname, const char* to, const char* type,
 }
 
 AUGRTPP_API void
-engine::shutdown(augas_id cid)
+engine::shutdown(augrt_id cid)
 {
     sockptr sock(impl_->socks_.getbyid(cid));
     connptr cptr(smartptr_cast<conn_base>(sock));
@@ -520,7 +520,7 @@ engine::shutdown(augas_id cid)
         impl_->socks_.erase(*sock);
 }
 
-AUGRTPP_API augas_id
+AUGRTPP_API augrt_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
                    void* user)
 {
@@ -561,7 +561,7 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     return id(*cptr);
 }
 
-AUGRTPP_API augas_id
+AUGRTPP_API augrt_id
 engine::tcplisten(const char* sname, const char* host, const char* port,
                   void* user)
 {
@@ -589,7 +589,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
 }
 
 AUGRTPP_API void
-engine::send(augas_id cid, const void* buf, size_t len)
+engine::send(augrt_id cid, const void* buf, size_t len)
 {
     if (!impl_->socks_.send(cid, buf, len))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
@@ -597,7 +597,7 @@ engine::send(augas_id cid, const void* buf, size_t len)
 }
 
 AUGRTPP_API void
-engine::sendv(augas_id cid, const aug_var& var)
+engine::sendv(augrt_id cid, const aug_var& var)
 {
     if (!impl_->socks_.sendv(cid, var))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
@@ -605,7 +605,7 @@ engine::sendv(augas_id cid, const aug_var& var)
 }
 
 AUGRTPP_API void
-engine::setrwtimer(augas_id cid, unsigned ms, unsigned flags)
+engine::setrwtimer(augrt_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
@@ -616,7 +616,7 @@ engine::setrwtimer(augas_id cid, unsigned ms, unsigned flags)
 }
 
 AUGRTPP_API bool
-engine::resetrwtimer(augas_id cid, unsigned ms, unsigned flags)
+engine::resetrwtimer(augrt_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
@@ -628,7 +628,7 @@ engine::resetrwtimer(augas_id cid, unsigned ms, unsigned flags)
 }
 
 AUGRTPP_API bool
-engine::cancelrwtimer(augas_id cid, unsigned flags)
+engine::cancelrwtimer(augrt_id cid, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
@@ -638,10 +638,10 @@ engine::cancelrwtimer(augas_id cid, unsigned flags)
     return rwtimer->cancelrwtimer(flags);
 }
 
-AUGRTPP_API augas_id
+AUGRTPP_API augrt_id
 engine::settimer(const char* sname, unsigned ms, const aug_var* var)
 {
-    augas_id id(aug_nextid());
+    augrt_id id(aug_nextid());
     aug_var local = { 0, impl_ };
 
     // If aug_settimer() succeeds, aug_destroyvar() will be called on var when
@@ -660,13 +660,13 @@ engine::settimer(const char* sname, unsigned ms, const aug_var* var)
 }
 
 AUGRTPP_API bool
-engine::resettimer(augas_id tid, unsigned ms)
+engine::resettimer(augrt_id tid, unsigned ms)
 {
     return aug::resettimer(impl_->timers_, tid, ms);
 }
 
 AUGRTPP_API bool
-engine::canceltimer(augas_id tid)
+engine::canceltimer(augrt_id tid)
 {
     bool ret(aug::canceltimer(impl_->timers_, tid));
 
@@ -680,7 +680,7 @@ engine::canceltimer(augas_id tid)
 }
 
 AUGRTPP_API void
-engine::setsslclient(augas_id cid, sslctx& ctx)
+engine::setsslclient(augrt_id cid, sslctx& ctx)
 {
 #if HAVE_OPENSSL_SSL_H
     connptr cptr(smartptr_cast<
@@ -697,7 +697,7 @@ engine::setsslclient(augas_id cid, sslctx& ctx)
 }
 
 AUGRTPP_API void
-engine::setsslserver(augas_id cid, sslctx& ctx)
+engine::setsslserver(augrt_id cid, sslctx& ctx)
 {
 #if HAVE_OPENSSL_SSL_H
     connptr cptr(smartptr_cast<

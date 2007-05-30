@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 
 #include "augpy/object.h"
 
-#include "augas.h"
+#include "augrt.h"
 
 static PyTypeObject* type_ = NULL;
 
@@ -37,7 +37,7 @@ buf_(void* arg, size_t* size)
     return buf;
 }
 
-static const struct augas_vartype vartype_ = {
+static const struct augrt_vartype vartype_ = {
     destroy_,
     buf_
 };
@@ -58,7 +58,7 @@ writelog_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "is:writelog", &level, &msg))
         return NULL;
 
-    augas_writelog(level, "%s", msg);
+    augrt_writelog(level, "%s", msg);
     return incret_(Py_None);
 }
 
@@ -68,8 +68,8 @@ reconfall_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, ":reconfall"))
         return NULL;
 
-    if (-1 == augas_reconfall()) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == augrt_reconfall()) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
 
@@ -82,8 +82,8 @@ stopall_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, ":stopall"))
         return NULL;
 
-    if (-1 == augas_stopall()) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == augrt_stopall()) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
 
@@ -95,7 +95,7 @@ post_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
     PyObject* buf = NULL;
-    struct augas_var var = { NULL, NULL };
+    struct augrt_var var = { NULL, NULL };
 
     if (!PyArg_ParseTuple(args, "ss|O:post", &to, &type, &buf))
         return NULL;
@@ -114,12 +114,12 @@ post_(PyObject* self, PyObject* args)
         var.arg_ = buf;
     }
 
-    if (-1 == augas_post(to, type, &var)) {
+    if (-1 == augrt_post(to, type, &var)) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
 
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
 
@@ -137,8 +137,8 @@ dispatch_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "ss|z#:dispatch", &to, &type, &user, &size))
         return NULL;
 
-    if (-1 == augas_dispatch(to, type, user, size)) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == augrt_dispatch(to, type, user, size)) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
 
@@ -154,7 +154,7 @@ getenv_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "s|O:getenv", &name, &def))
         return NULL;
 
-    if (!(value = augas_getenv(name, NULL)))
+    if (!(value = augrt_getenv(name, NULL)))
         return incret_(def);
 
     return Py_BuildValue("s", value);
@@ -163,12 +163,12 @@ getenv_(PyObject* self, PyObject* args)
 static PyObject*
 getserv_(PyObject* self, PyObject* args)
 {
-    const struct augas_serv* serv;
+    const struct augrt_serv* serv;
 
     if (!PyArg_ParseTuple(args, ":getserv"))
         return NULL;
 
-    if (!(serv = augas_getserv()))
+    if (!(serv = augrt_getserv()))
         return incret_(Py_None);
 
     return Py_BuildValue("s", serv->name_);
@@ -181,8 +181,8 @@ shutdown_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!:shutdown", type_, &sock))
         return NULL;
 
-    if (-1 == augas_shutdown(augpy_getid(sock))) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == augrt_shutdown(augpy_getid(sock))) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
 
@@ -202,8 +202,8 @@ tcpconnect_(PyObject* self, PyObject* args)
     if (!(sock = augpy_createobject(type_, 0, user)))
         return NULL;
 
-    if (-1 == (cid = augas_tcpconnect(host, serv, sock))) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == (cid = augrt_tcpconnect(host, serv, sock))) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         Py_DECREF(sock);
         return NULL;
     }
@@ -225,8 +225,8 @@ tcplisten_(PyObject* self, PyObject* args)
     if (!(sock = augpy_createobject(type_, 0, user)))
         return NULL;
 
-    if (-1 == (lid = augas_tcplisten(host, serv, sock))) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == (lid = augrt_tcplisten(host, serv, sock))) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         Py_DECREF(sock);
         return NULL;
     }
@@ -239,7 +239,7 @@ static PyObject*
 send_(PyObject* self, PyObject* args)
 {
     PyObject* sock, * buf;
-    struct augas_var var = { NULL, NULL };
+    struct augrt_var var = { NULL, NULL };
 
     if (!PyArg_ParseTuple(args, "O!O:send", type_, &sock, &buf))
         return NULL;
@@ -255,8 +255,8 @@ send_(PyObject* self, PyObject* args)
     var.type_ = &vartype_;
     var.arg_ = buf;
 
-    if (-1 == augas_sendv(augpy_getid(sock), &var)) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == augrt_sendv(augpy_getid(sock), &var)) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
 
@@ -274,8 +274,8 @@ setrwtimer_(PyObject* self, PyObject* args)
                           type_, &sock, &ms, &flags))
         return NULL;
 
-    if (-1 == augas_setrwtimer(augpy_getid(sock), ms, flags)) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == augrt_setrwtimer(augpy_getid(sock), ms, flags)) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
 
@@ -292,11 +292,11 @@ resetrwtimer_(PyObject* self, PyObject* args)
                           type_, &sock, &ms, &flags))
         return NULL;
 
-    switch (augas_resetrwtimer(augpy_getid(sock), ms, flags)) {
+    switch (augrt_resetrwtimer(augpy_getid(sock), ms, flags)) {
     case -1:
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
-    case AUGAS_NONE:
+    case AUGRT_NONE:
         return incret_(Py_False);
     }
 
@@ -312,11 +312,11 @@ cancelrwtimer_(PyObject* self, PyObject* args)
                           type_, &sock, &flags))
         return NULL;
 
-    switch (augas_cancelrwtimer(augpy_getid(sock), flags)) {
+    switch (augrt_cancelrwtimer(augpy_getid(sock), flags)) {
     case -1:
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
-    case AUGAS_NONE:
+    case AUGRT_NONE:
         return incret_(Py_False);
     }
 
@@ -328,7 +328,7 @@ settimer_(PyObject* self, PyObject* args)
 {
     unsigned ms;
     PyObject* user = NULL, * timer;
-    struct augas_var var;
+    struct augrt_var var;
     int tid;
 
     if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &user))
@@ -340,8 +340,8 @@ settimer_(PyObject* self, PyObject* args)
     var.type_ = &vartype_;
     var.arg_ = timer;
 
-    if (-1 == (tid = augas_settimer(ms, &var))) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == (tid = augrt_settimer(ms, &var))) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         Py_DECREF(timer);
         return NULL;
     }
@@ -359,11 +359,11 @@ resettimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!I:resettimer", type_, &timer, &ms))
         return NULL;
 
-    switch (augas_resettimer(augpy_getid(timer), ms)) {
+    switch (augrt_resettimer(augpy_getid(timer), ms)) {
     case -1:
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
-    case AUGAS_NONE:
+    case AUGRT_NONE:
         return incret_(Py_False);
     }
 
@@ -378,11 +378,11 @@ canceltimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!:canceltimer", type_, &timer))
         return NULL;
 
-    switch (augas_canceltimer(augpy_getid(timer))) {
+    switch (augrt_canceltimer(augpy_getid(timer))) {
     case -1:
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
-    case AUGAS_NONE:
+    case AUGRT_NONE:
         return incret_(Py_False);
     }
 
@@ -398,8 +398,8 @@ setsslclient_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!s:setsslclient", type_, &sock, &ctx))
         return NULL;
 
-    if (-1 == augas_setsslclient(augpy_getid(sock), ctx)) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == augrt_setsslclient(augpy_getid(sock), ctx)) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
 
@@ -415,8 +415,8 @@ setsslserver_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!s:setsslserver", type_, &sock, &ctx))
         return NULL;
 
-    if (-1 == augas_setsslserver(augpy_getid(sock), ctx)) {
-        PyErr_SetString(PyExc_RuntimeError, augas_error());
+    if (-1 == augrt_setsslserver(augpy_getid(sock), ctx)) {
+        PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
 
@@ -504,26 +504,26 @@ static PyMethodDef methods_[] = {
 };
 
 PyObject*
-augpy_createaugas(PyTypeObject* type)
+augpy_createaugrt(PyTypeObject* type)
 {
-    PyObject* augas = Py_InitModule("augas", methods_);
-    if (!augas)
+    PyObject* augrt = Py_InitModule("augrt", methods_);
+    if (!augrt)
         return NULL;
 
     type_ = type;
 
-    PyModule_AddObject(augas, "Object", (PyObject*)type_);
+    PyModule_AddObject(augrt, "Object", (PyObject*)type_);
 
-    PyModule_AddIntConstant(augas, "LOGCRIT", AUGAS_LOGCRIT);
-    PyModule_AddIntConstant(augas, "LOGERROR", AUGAS_LOGERROR);
-    PyModule_AddIntConstant(augas, "LOGWARN", AUGAS_LOGWARN);
-    PyModule_AddIntConstant(augas, "LOGNOTICE", AUGAS_LOGNOTICE);
-    PyModule_AddIntConstant(augas, "LOGINFO", AUGAS_LOGINFO);
-    PyModule_AddIntConstant(augas, "LOGDEBUG", AUGAS_LOGDEBUG);
+    PyModule_AddIntConstant(augrt, "LOGCRIT", AUGRT_LOGCRIT);
+    PyModule_AddIntConstant(augrt, "LOGERROR", AUGRT_LOGERROR);
+    PyModule_AddIntConstant(augrt, "LOGWARN", AUGRT_LOGWARN);
+    PyModule_AddIntConstant(augrt, "LOGNOTICE", AUGRT_LOGNOTICE);
+    PyModule_AddIntConstant(augrt, "LOGINFO", AUGRT_LOGINFO);
+    PyModule_AddIntConstant(augrt, "LOGDEBUG", AUGRT_LOGDEBUG);
 
-    PyModule_AddIntConstant(augas, "TIMRD", AUGAS_TIMRD);
-    PyModule_AddIntConstant(augas, "TIMWR", AUGAS_TIMWR);
-    PyModule_AddIntConstant(augas, "TIMBOTH", AUGAS_TIMBOTH);
+    PyModule_AddIntConstant(augrt, "TIMRD", AUGRT_TIMRD);
+    PyModule_AddIntConstant(augrt, "TIMWR", AUGRT_TIMWR);
+    PyModule_AddIntConstant(augrt, "TIMBOTH", AUGRT_TIMBOTH);
 
-    return augas;
+    return augrt;
 }

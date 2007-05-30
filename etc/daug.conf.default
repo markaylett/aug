@@ -1,4 +1,4 @@
-rundir = c:/program files/augas
+rundir = c:/program files/daug
 logdir = log
 loglevel = 4
 
@@ -20,7 +20,7 @@ services = http sched pyskel pyecho pyproxy
 
 service.http.module = http
 service.http.serv = 8080
-service.http.css = htdocs/augas.css
+service.http.css = htdocs/aug.css
 service.http.mimetypes = etc/mimetypes.conf
 service.http.passwd = etc/passwd.txt
 service.http.realm = testrealm@host.com

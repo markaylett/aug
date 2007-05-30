@@ -21766,7 +21766,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile example/Makefile example/augas/Makefile example/augas/etc/Makefile example/augas/htdocs/Makefile example/cpp/Makefile src/Makefile src/c/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augpy/Makefile src/c/augrb/Makefile src/c/augres/Makefile src/c/augrt/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/osx/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/augutil/posix/Makefile src/c/augutil/win32/Makefile src/c/htdigest/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augrtpp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/daug/Makefile src/cpp/daug/etc/Makefile src/pl/Makefile src/py/Makefile src/rb/Makefile src/sh/Makefile vc7/Makefile"
+ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile example/Makefile example/augrt/Makefile example/augrt/etc/Makefile example/augrt/htdocs/Makefile example/cpp/Makefile src/Makefile src/c/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augpy/Makefile src/c/augrb/Makefile src/c/augres/Makefile src/c/augrt/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/osx/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/augutil/posix/Makefile src/c/augutil/win32/Makefile src/c/htdigest/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augrtpp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/daug/Makefile src/cpp/daug/etc/Makefile src/pl/Makefile src/py/Makefile src/rb/Makefile src/sh/Makefile vc7/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -22386,9 +22386,9 @@ do
     "doc/man/Makefile") CONFIG_FILES="$CONFIG_FILES doc/man/Makefile" ;;
     "etc/Makefile") CONFIG_FILES="$CONFIG_FILES etc/Makefile" ;;
     "example/Makefile") CONFIG_FILES="$CONFIG_FILES example/Makefile" ;;
-    "example/augas/Makefile") CONFIG_FILES="$CONFIG_FILES example/augas/Makefile" ;;
-    "example/augas/etc/Makefile") CONFIG_FILES="$CONFIG_FILES example/augas/etc/Makefile" ;;
-    "example/augas/htdocs/Makefile") CONFIG_FILES="$CONFIG_FILES example/augas/htdocs/Makefile" ;;
+    "example/augrt/Makefile") CONFIG_FILES="$CONFIG_FILES example/augrt/Makefile" ;;
+    "example/augrt/etc/Makefile") CONFIG_FILES="$CONFIG_FILES example/augrt/etc/Makefile" ;;
+    "example/augrt/htdocs/Makefile") CONFIG_FILES="$CONFIG_FILES example/augrt/htdocs/Makefile" ;;
     "example/cpp/Makefile") CONFIG_FILES="$CONFIG_FILES example/cpp/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/c/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/Makefile" ;;

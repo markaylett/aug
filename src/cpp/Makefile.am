@@ -9,9 +9,9 @@ SUBDIRS = \
 	daug
 
 include_HEADERS = \
-	augaspp.hpp \
 	augsyspp.hpp \
 	augmarpp.hpp  \
 	augutilpp.hpp \
 	augsrvpp.hpp \
-	augnetpp.hpp
+	augnetpp.hpp \
+	augrtpp.hpp

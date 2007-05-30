@@ -1,4 +1,4 @@
-from augas import *
+from augrt import *
 from buffer import *
 from interpreter import *
 import log

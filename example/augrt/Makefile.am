@@ -9,7 +9,7 @@ EXTRA_DIST = \
 	modules.mk \
 	test.conf
 
-exampledir = $(prefix)/example/augas
+exampledir = $(prefix)/example/augrt
 example_DATA = \
 	$(EXTRA_DIST) \
 	client.cpp \

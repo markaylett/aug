@@ -529,7 +529,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_25CF16A3F7F44A00B054A6FD8F5E142B"
             {
-            "SourcePath" = "8:..\\example\\augas\\modules.mk"
+            "SourcePath" = "8:..\\example\\augrt\\modules.mk"
             "TargetName" = "8:modules.mk"
             "Tag" = "8:"
             "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
@@ -549,7 +549,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_2AF056B0CFE740548035EAB432E967A8"
             {
-            "SourcePath" = "8:..\\example\\augas\\etc\\serverreq.pem"
+            "SourcePath" = "8:..\\example\\augrt\\etc\\serverreq.pem"
             "TargetName" = "8:serverreq.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
@@ -609,7 +609,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_358BD46B60814C888FCE59823DE6A083"
             {
-            "SourcePath" = "8:..\\example\\augas\\etc\\passwd.txt"
+            "SourcePath" = "8:..\\example\\augrt\\etc\\passwd.txt"
             "TargetName" = "8:passwd.txt"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
@@ -669,7 +669,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_3E46065D387B472781F00EDA4C912E7C"
             {
-            "SourcePath" = "8:..\\example\\augas\\htdocs\\index.html"
+            "SourcePath" = "8:..\\example\\augrt\\htdocs\\index.html"
             "TargetName" = "8:index.html"
             "Tag" = "8:"
             "Folder" = "8:_D5DD57BD2ADF473396909242620CD520"
@@ -729,7 +729,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_4E9C14E9A7C245DE89FEF436AA53BCE7"
             {
-            "SourcePath" = "8:..\\example\\augas\\etc\\clientkey.pem"
+            "SourcePath" = "8:..\\example\\augrt\\etc\\clientkey.pem"
             "TargetName" = "8:clientkey.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
@@ -869,8 +869,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_755FCF128217483B9DF88D140A27940C"
             {
-            "SourcePath" = "8:..\\example\\augas\\htdocs\\augas.css"
-            "TargetName" = "8:augas.css"
+            "SourcePath" = "8:..\\example\\augrt\\htdocs\\aug.css"
+            "TargetName" = "8:aug.css"
             "Tag" = "8:"
             "Folder" = "8:_D5DD57BD2ADF473396909242620CD520"
             "Condition" = "8:"
@@ -889,7 +889,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_77B95F3EE9E049DAB01D116543E00F74"
             {
-            "SourcePath" = "8:..\\example\\augas\\test.conf"
+            "SourcePath" = "8:..\\example\\augrt\\test.conf"
             "TargetName" = "8:test.conf"
             "Tag" = "8:"
             "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
@@ -929,8 +929,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_8C62ACFB11A543E4A3F1D06B866DAAD2"
             {
-            "SourcePath" = "8:..\\example\\augas\\htdocs\\augas.js"
-            "TargetName" = "8:augas.js"
+            "SourcePath" = "8:..\\example\\augrt\\htdocs\\aug.js"
+            "TargetName" = "8:aug.js"
             "Tag" = "8:"
             "Folder" = "8:_D5DD57BD2ADF473396909242620CD520"
             "Condition" = "8:"
@@ -949,7 +949,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_8ECAD86A0E394E05A1708B75E7DDA791"
             {
-            "SourcePath" = "8:..\\example\\augas\\etc\\serverkey.pem"
+            "SourcePath" = "8:..\\example\\augrt\\etc\\serverkey.pem"
             "TargetName" = "8:serverkey.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
@@ -1009,7 +1009,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_A012D77CE6B44F5EBCEF7B47A9EE590B"
             {
-            "SourcePath" = "8:..\\example\\augas\\etc\\mimetypes.conf"
+            "SourcePath" = "8:..\\example\\augrt\\etc\\mimetypes.conf"
             "TargetName" = "8:mimetypes.conf"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
@@ -1029,8 +1029,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_A783D157AC31455DBF36EFAC59A165FC"
             {
-            "SourcePath" = "8:..\\src\\cpp\\augaspp.hpp"
-            "TargetName" = "8:augaspp.hpp"
+            "SourcePath" = "8:..\\src\\cpp\\augrtpp.hpp"
+            "TargetName" = "8:augrtpp.hpp"
             "Tag" = "8:"
             "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
             "Condition" = "8:"
@@ -1049,7 +1049,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_A7D63EA79A624B0EB9130EAD0AB9CB6C"
             {
-            "SourcePath" = "8:..\\example\\augas\\bench.conf"
+            "SourcePath" = "8:..\\example\\augrt\\bench.conf"
             "TargetName" = "8:bench.conf"
             "Tag" = "8:"
             "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
@@ -1109,7 +1109,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_C30F73F6BF1E452E8D7D696A1565394C"
             {
-            "SourcePath" = "8:..\\example\\augas\\etc\\clientcert.pem"
+            "SourcePath" = "8:..\\example\\augrt\\etc\\clientcert.pem"
             "TargetName" = "8:clientcert.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
@@ -1189,7 +1189,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_D592FD1ECDA941138C8BEEF4EDA71FCC"
             {
-            "SourcePath" = "8:..\\example\\augas\\htdocs\\sched.js"
+            "SourcePath" = "8:..\\example\\augrt\\htdocs\\sched.js"
             "TargetName" = "8:sched.js"
             "Tag" = "8:"
             "Folder" = "8:_D5DD57BD2ADF473396909242620CD520"
@@ -1229,8 +1229,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_E2AF29C9CC8D48CE938F8D4D86AD54CC"
             {
-            "SourcePath" = "8:..\\src\\c\\augas.h"
-            "TargetName" = "8:augas.h"
+            "SourcePath" = "8:..\\src\\c\\augrt.h"
+            "TargetName" = "8:augrt.h"
             "Tag" = "8:"
             "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
             "Condition" = "8:"
@@ -1289,7 +1289,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_EBE295F2AEF942A2A2BC754FEA66B4D3"
             {
-            "SourcePath" = "8:..\\example\\augas\\etc\\cacert.pem"
+            "SourcePath" = "8:..\\example\\augrt\\etc\\cacert.pem"
             "TargetName" = "8:cacert.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
@@ -1309,7 +1309,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_EE06F209392C4844B4FE7D22D100B6F5"
             {
-            "SourcePath" = "8:..\\example\\augas\\etc\\clientreq.pem"
+            "SourcePath" = "8:..\\example\\augrt\\etc\\clientreq.pem"
             "TargetName" = "8:clientreq.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
@@ -1349,7 +1349,7 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_FB98207485BD4764B362E0034F849191"
             {
-            "SourcePath" = "8:..\\example\\augas\\etc\\servercert.pem"
+            "SourcePath" = "8:..\\example\\augrt\\etc\\servercert.pem"
             "TargetName" = "8:servercert.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
@@ -1469,7 +1469,7 @@
                         {
                             "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_5BCAC7B63D584ABE91ADDCEE5480201E"
                             {
-                            "Name" = "8:augas"
+                            "Name" = "8:augrt"
                             "AlwaysCreate" = "11:FALSE"
                             "Condition" = "8:"
                             "Transitive" = "11:FALSE"

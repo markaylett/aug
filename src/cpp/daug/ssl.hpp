@@ -10,7 +10,7 @@
 
 # include <map>
 
-namespace augas {
+namespace augrt {
 
     class options;
 

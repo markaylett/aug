@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 #include "augpy/host.h"
 #include "augpy/object.h"
 
-#include "augas.h"
+#include "augrt.h"
 
 #if defined(_WIN32)
 # include <direct.h>
@@ -33,7 +33,7 @@ struct import_ {
     int open_;
 };
 
-static PyObject* augas_ = NULL;
+static PyObject* augrt_ = NULL;
 static PyTypeObject* type_ = NULL;
 
 static void
@@ -42,13 +42,13 @@ setpath_(void)
     const char* s;
     PyObject* sys;
 
-    if ((s = augas_getenv("rundir", NULL)))
+    if ((s = augrt_getenv("rundir", NULL)))
         chdir(s);
 
-    if (!(s = augas_getenv("module.augpy.pythonpath", NULL)))
+    if (!(s = augrt_getenv("module.augpy.pythonpath", NULL)))
         s = "bin";
     else
-        augas_writelog(AUGAS_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
+        augrt_writelog(AUGRT_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
 
     chdir(s);
 
@@ -64,7 +64,7 @@ setpath_(void)
 
             if ((dir = PyString_FromString(buf))) {
 
-                augas_writelog(AUGAS_LOGDEBUG, "adding to sys.path: %s", buf);
+                augrt_writelog(AUGRT_LOGDEBUG, "adding to sys.path: %s", buf);
 
                 PyList_Insert(path, 0, dir);
 
@@ -99,7 +99,7 @@ printerr_(void)
         empty = PyString_FromString("");
         message = PyObject_CallMethod(empty, "join", "O", list);
 
-        augas_writelog(AUGAS_LOGERROR, "%s", PyString_AsString(message));
+        augrt_writelog(AUGRT_LOGERROR, "%s", PyString_AsString(message));
 
         Py_DECREF(message);
         Py_DECREF(empty);
@@ -127,7 +127,7 @@ getmethod_(PyObject* module, const char* name)
             x = NULL;
         }
     } else {
-        augas_writelog(AUGAS_LOGDEBUG, "no binding for %s()", name);
+        augrt_writelog(AUGRT_LOGDEBUG, "no binding for %s()", name);
         PyErr_Clear();
     }
     return x;
@@ -205,27 +205,27 @@ termpy_(void)
     if (!Py_IsInitialized())
         return;
 
-    augas_writelog(AUGAS_LOGDEBUG, "finalising python interpreter");
+    augrt_writelog(AUGRT_LOGDEBUG, "finalising python interpreter");
     Py_Finalize();
 
     objects = augpy_objects();
-    level = objects ? AUGAS_LOGERROR : AUGAS_LOGINFO;
-    augas_writelog(level, "allocated objects: %d", objects);
+    level = objects ? AUGRT_LOGERROR : AUGRT_LOGINFO;
+    augrt_writelog(level, "allocated objects: %d", objects);
 }
 
 static int
 initpy_(void)
 {
-    augas_writelog(AUGAS_LOGDEBUG, "initialising python interpreter");
+    augrt_writelog(AUGRT_LOGDEBUG, "initialising python interpreter");
     Py_Initialize();
     /* Py_VerboseFlag = 1; */
     setpath_();
 
-    augas_writelog(AUGAS_LOGDEBUG, "initialising augas module");
+    augrt_writelog(AUGRT_LOGDEBUG, "initialising augrt module");
     if (!(type_ = augpy_createtype()))
         goto fail;
 
-    if (!(augas_ = augpy_createaugas(type_)))
+    if (!(augrt_ = augpy_createaugrt(type_)))
         goto fail;
     return 0;
 
@@ -237,13 +237,13 @@ initpy_(void)
 static void
 stop_(void)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     assert(import);
     destroyimport_(import);
 }
 
 static int
-start_(struct augas_serv* serv)
+start_(struct augrt_serv* serv)
 {
     struct import_* import;
     if (!(import = createimport_(serv->name_)))
@@ -269,7 +269,7 @@ start_(struct augas_serv* serv)
 static void
 reconf_(void)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     assert(import);
 
     if (import->reconf_) {
@@ -285,7 +285,7 @@ reconf_(void)
 static void
 event_(const char* from, const char* type, const void* user, size_t size)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     assert(import);
 
     if (import->event_) {
@@ -309,9 +309,9 @@ event_(const char* from, const char* type, const void* user, size_t size)
 }
 
 static void
-closed_(const struct augas_object* sock)
+closed_(const struct augrt_object* sock)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     PyObject* x = sock->user_;
     assert(import);
     assert(x);
@@ -329,9 +329,9 @@ closed_(const struct augas_object* sock)
 }
 
 static void
-teardown_(const struct augas_object* sock)
+teardown_(const struct augrt_object* sock)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -346,13 +346,13 @@ teardown_(const struct augas_object* sock)
             printerr_();
 
     } else
-        augas_shutdown(sock->id_);
+        augrt_shutdown(sock->id_);
 }
 
 static int
-accepted_(struct augas_object* sock, const char* addr, unsigned short port)
+accepted_(struct augrt_object* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     PyObject* x, * y;
     int ret = 0;
     assert(import);
@@ -385,7 +385,7 @@ accepted_(struct augas_object* sock, const char* addr, unsigned short port)
 
         if (z == Py_False) {
 
-            augas_writelog(AUGAS_LOGDEBUG,
+            augrt_writelog(AUGRT_LOGDEBUG,
                            "accepted() handler returned false");
 
             /* closed() will not be called if accepted() fails. */
@@ -405,9 +405,9 @@ accepted_(struct augas_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-connected_(struct augas_object* sock, const char* addr, unsigned short port)
+connected_(struct augrt_object* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -427,9 +427,9 @@ connected_(struct augas_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct augas_object* sock, const void* buf, size_t len)
+data_(const struct augrt_object* sock, const void* buf, size_t len)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -449,9 +449,9 @@ data_(const struct augas_object* sock, const void* buf, size_t len)
 }
 
 static void
-rdexpire_(const struct augas_object* sock, unsigned* ms)
+rdexpire_(const struct augrt_object* sock, unsigned* ms)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -463,7 +463,7 @@ rdexpire_(const struct augas_object* sock, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                augas_writelog(AUGAS_LOGDEBUG,
+                augrt_writelog(AUGRT_LOGDEBUG,
                                "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
@@ -476,9 +476,9 @@ rdexpire_(const struct augas_object* sock, unsigned* ms)
 }
 
 static void
-wrexpire_(const struct augas_object* sock, unsigned* ms)
+wrexpire_(const struct augrt_object* sock, unsigned* ms)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -490,7 +490,7 @@ wrexpire_(const struct augas_object* sock, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                augas_writelog(AUGAS_LOGDEBUG,
+                augrt_writelog(AUGRT_LOGDEBUG,
                                "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
@@ -503,9 +503,9 @@ wrexpire_(const struct augas_object* sock, unsigned* ms)
 }
 
 static void
-expire_(const struct augas_object* timer, unsigned* ms)
+expire_(const struct augrt_object* timer, unsigned* ms)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     assert(import);
     assert(timer->user_);
 
@@ -518,7 +518,7 @@ expire_(const struct augas_object* timer, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                augas_writelog(AUGAS_LOGDEBUG,
+                augrt_writelog(AUGRT_LOGDEBUG,
                                "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
@@ -531,10 +531,10 @@ expire_(const struct augas_object* timer, unsigned* ms)
 }
 
 static int
-authcert_(const struct augas_object* sock, const char* subject,
+authcert_(const struct augrt_object* sock, const char* subject,
           const char* issuer)
 {
-    struct import_* import = augas_getserv()->user_;
+    struct import_* import = augrt_getserv()->user_;
     int ret = 0;
     assert(import);
     assert(sock->user_);
@@ -557,7 +557,7 @@ authcert_(const struct augas_object* sock, const char* subject,
     return ret;
 }
 
-static const struct augas_module module_ = {
+static const struct augrt_module module_ = {
     stop_,
     start_,
     reconf_,
@@ -573,10 +573,10 @@ static const struct augas_module module_ = {
     authcert_
 };
 
-static const struct augas_module*
+static const struct augrt_module*
 init_(const char* name)
 {
-    augas_writelog(AUGAS_LOGINFO, "initialising augpy module");
+    augrt_writelog(AUGRT_LOGINFO, "initialising augpy module");
 
     if (initpy_() < 0)
         return NULL;
@@ -587,8 +587,8 @@ init_(const char* name)
 static void
 term_(void)
 {
-    augas_writelog(AUGAS_LOGINFO, "terminating augpy module");
+    augrt_writelog(AUGRT_LOGINFO, "terminating augpy module");
     termpy_();
 }
 
-AUGAS_MODULE(init_, term_)
+AUGRT_MODULE(init_, term_)

@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augas.h"
+#include "augrt.h"
 
 namespace {
 
@@ -16,7 +16,7 @@ namespace {
     {
     }
     int
-    start(augas_serv* serv)
+    start(augrt_serv* serv)
     {
         return 0;
     }
@@ -29,36 +29,36 @@ namespace {
     {
     }
     void
-    closed(const augas_object* sock)
+    closed(const augrt_object* sock)
     {
     }
     int
-    accepted(augas_object* sock, const char* addr, unsigned short port)
+    accepted(augrt_object* sock, const char* addr, unsigned short port)
     {
         return 0;
     }
     void
-    connected(augas_object* sock, const char* addr, unsigned short port)
+    connected(augrt_object* sock, const char* addr, unsigned short port)
     {
     }
     void
-    data(const augas_object* sock, const void* buf, size_t len)
+    data(const augrt_object* sock, const void* buf, size_t len)
     {
     }
     void
-    rdexpire(const augas_object* sock, unsigned* ms)
+    rdexpire(const augrt_object* sock, unsigned* ms)
     {
     }
     void
-    wrexpire(const augas_object* sock, unsigned* ms)
+    wrexpire(const augrt_object* sock, unsigned* ms)
     {
     }
     void
-    expire(const augas_object* timer, unsigned* ms)
+    expire(const augrt_object* timer, unsigned* ms)
     {
     }
     int
-    authcert(const augas_object* sock, const char* subject,
+    authcert(const augrt_object* sock, const char* subject,
              const char* issuer)
     {
         return 0;
@@ -66,8 +66,8 @@ namespace {
 }
 
 void
-augas::setdefaults(augas_module& dst, const augas_module& src,
-                   void (*teardown)(const augas_object*))
+augrt::setdefaults(augrt_module& dst, const augrt_module& src,
+                   void (*teardown)(const augrt_object*))
 {
     dst.stop_ = src.stop_ ? src.stop_ : stop;
     dst.start_ = src.start_ ? src.start_ : start;

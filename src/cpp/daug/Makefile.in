@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 bin_PROGRAMS = daug$(EXEEXT)
-check_PROGRAMS = augaspp-test$(EXEEXT)
+check_PROGRAMS = augrtpp-test$(EXEEXT)
 subdir = src/cpp/daug
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -53,9 +53,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_augaspp_test_OBJECTS = test.$(OBJEXT)
-augaspp_test_OBJECTS = $(am_augaspp_test_OBJECTS)
-augaspp_test_DEPENDENCIES =
+am_augrtpp_test_OBJECTS = test.$(OBJEXT)
+augrtpp_test_OBJECTS = $(am_augrtpp_test_OBJECTS)
+augrtpp_test_DEPENDENCIES =
 am_daug_OBJECTS = daug.$(OBJEXT) exception.$(OBJEXT) module.$(OBJEXT) \
 	options.$(OBJEXT) serv.$(OBJEXT) ssl.$(OBJEXT) \
 	utility.$(OBJEXT)
@@ -76,8 +76,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(augaspp_test_SOURCES) $(daug_SOURCES)
-DIST_SOURCES = $(augaspp_test_SOURCES) $(daug_SOURCES)
+SOURCES = $(augrtpp_test_SOURCES) $(daug_SOURCES)
+DIST_SOURCES = $(augrtpp_test_SOURCES) $(daug_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -242,10 +242,10 @@ daug_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = \
-	augaspp-test
+	augrtpp-test
 
-augaspp_test_SOURCES = test.cpp
-augaspp_test_LDADD = 
+augrtpp_test_SOURCES = test.cpp
+augrtpp_test_LDADD = 
 all: all-recursive
 
 .SUFFIXES:
@@ -314,9 +314,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augaspp-test$(EXEEXT): $(augaspp_test_OBJECTS) $(augaspp_test_DEPENDENCIES) 
-	@rm -f augaspp-test$(EXEEXT)
-	$(CXXLINK) $(augaspp_test_LDFLAGS) $(augaspp_test_OBJECTS) $(augaspp_test_LDADD) $(LIBS)
+augrtpp-test$(EXEEXT): $(augrtpp_test_OBJECTS) $(augrtpp_test_DEPENDENCIES) 
+	@rm -f augrtpp-test$(EXEEXT)
+	$(CXXLINK) $(augrtpp_test_LDFLAGS) $(augrtpp_test_OBJECTS) $(augrtpp_test_LDADD) $(LIBS)
 daug$(EXEEXT): $(daug_OBJECTS) $(daug_DEPENDENCIES) 
 	@rm -f daug$(EXEEXT)
 	$(CXXLINK) $(daug_LDFLAGS) $(daug_OBJECTS) $(daug_LDADD) $(LIBS)

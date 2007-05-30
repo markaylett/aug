@@ -6,7 +6,7 @@
 
 #include "augsyspp/exception.hpp"
 
-namespace augas {
+namespace augrt {
 
     const int SRCDAUG(AUG_SRCUSER + 0);
     const int ECONFIG(1);

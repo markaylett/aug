@@ -32,10 +32,10 @@ rwtimer::do_timercb(int id, unsigned& ms)
 void
 rwtimer::do_setrwtimer(unsigned ms, unsigned flags)
 {
-    if (flags & AUGAS_TIMRD)
+    if (flags & AUGRT_TIMRD)
         rdtimer_.set(ms, *this);
 
-    if (flags & AUGAS_TIMWR)
+    if (flags & AUGRT_TIMWR)
         wrtimer_.set(ms, *this);
 }
 
@@ -44,11 +44,11 @@ rwtimer::do_resetrwtimer(unsigned ms, unsigned flags)
 {
     bool exists(true);
 
-    if (flags & AUGAS_TIMRD)
+    if (flags & AUGRT_TIMRD)
         if (!rdtimer_.reset(ms))
             exists = false;
 
-    if (flags & AUGAS_TIMWR)
+    if (flags & AUGRT_TIMWR)
         if (!wrtimer_.reset(ms))
             exists = false;
 
@@ -60,11 +60,11 @@ rwtimer::do_resetrwtimer(unsigned flags)
 {
     bool exists(true);
 
-    if (flags & AUGAS_TIMRD)
+    if (flags & AUGRT_TIMRD)
         if (!rdtimer_.reset())
             exists = false;
 
-    if (flags & AUGAS_TIMWR)
+    if (flags & AUGRT_TIMWR)
         if (!wrtimer_.reset())
             exists = false;
 
@@ -76,11 +76,11 @@ rwtimer::do_cancelrwtimer(unsigned flags)
 {
     bool exists(true);
 
-    if (flags & AUGAS_TIMRD)
+    if (flags & AUGRT_TIMRD)
         if (!rdtimer_.cancel())
             exists = false;
 
-    if (flags & AUGAS_TIMWR)
+    if (flags & AUGRT_TIMWR)
         if (!wrtimer_.cancel())
             exists = false;
 
@@ -91,7 +91,7 @@ rwtimer::~rwtimer() AUG_NOTHROW
 {
 }
 
-rwtimer::rwtimer(const servptr& serv, const augas_object& sock,
+rwtimer::rwtimer(const servptr& serv, const augrt_object& sock,
                  timers& timers)
     : serv_(serv),
       sock_(sock),

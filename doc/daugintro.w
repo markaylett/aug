@@ -2,7 +2,7 @@
 \datethis % print date on listing
 
 \def\AUG/{{\sc AUG}}
-\def\AUGAS/{{\sc DAUG}}
+\def\AUGRT/{{\sc DAUG}}
 \def\CYGWIN/{{\sc CYGWIN}}
 \def\IPV6/{{\sc IPv6}}
 \def\GNU/{{\sc GNU}}
@@ -19,7 +19,7 @@
 
 @s std int @s string int
 
-@s augas int
+@s augrt int
 @s basic_factory int
 @s basic_module int
 @s basic_serv int
@@ -31,11 +31,11 @@
 @f line normal
 
 @* Introduction.
-\AUGAS/ is an Open Source, Application Server written in \CEE/\AM\CPLUSPLUS/.
+\AUGRT/ is an Open Source, Application Server written in \CEE/\AM\CPLUSPLUS/.
  It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net} which
 is available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
-\AUGAS/ takes an unbiased view towards the systems it supports; it does not
-favour one over another, and runs natively on all.  \AUGAS/ includes support
+\AUGRT/ takes an unbiased view towards the systems it supports; it does not
+favour one over another, and runs natively on all.  \AUGRT/ includes support
 for:
 
 \yskip
@@ -48,7 +48,7 @@ for:
 
 \yskip\noindent
 This document is a brief introduction to building and installing Modules for
-the \AUGAS/ Application Server.  For further information, please visit the
+the \AUGRT/ Application Server.  For further information, please visit the
 \pdfURL{\AUG/ home page}{http://aug.sourceforge.net} or email myself,
 \pdfURL{Mark Aylett}{mailto:mark@@emantic.co.uk}.
 
@@ -70,10 +70,10 @@ sizeable units of work to worker threads.  Worker threads can avoid the risk
 of deadlocks by posting event notifications back to the event queue.
 
 \yskip\noindent
-The \AUGAS/ Application Server implements such an event model to de-multiplex
+The \AUGRT/ Application Server implements such an event model to de-multiplex
 activity on signal, socket, timer and user-event objects.
 
-@ \AUGAS/ propagates event notifications to Modules.  Modules are dynamically
+@ \AUGRT/ propagates event notifications to Modules.  Modules are dynamically
 loaded into the Application Server at run-time.  Each Module provides one or
 more Services.  Modules and Services are wired together at configuration-time,
 not compile-time.
@@ -86,7 +86,7 @@ suitable alternative, such as a thread-pool, depending on its requirements.
 \yskip\noindent
 The separation of physical Modules and logical Services allows Modules to
 adapt and extend the host environment exposed to Services.  The \.{augpy}
-Module, for example, exposes a \PYTHON/ module which encapsulates the \AUGAS/
+Module, for example, exposes a \PYTHON/ module which encapsulates the \AUGRT/
 host environment.  This allows Services to be implemented in \PYTHON/.
 
 \yskip\noindent
@@ -95,8 +95,8 @@ can interact by posting events to one another.  This allows Services to bridge
 language boundaries.
 
 \yskip\noindent
-\AUGAS/ presents a uniform interface to system administrators across all
-platforms.  Although, on \WINDOWS/, D\ae monised \AUGAS/ processes take the
+\AUGRT/ presents a uniform interface to system administrators across all
+platforms.  Although, on \WINDOWS/, D\ae monised \AUGRT/ processes take the
 form of NT services, from a sys-admin perspective, the interface remains the
 same.  The following command can still be used to start the service from a
 command window:
@@ -124,14 +124,14 @@ namespace {@/
 }@/
 @<declare export table@>
 
-@ The \.{<augaspp.hpp>} header is provided to aid Module implementations in
+@ The \.{<augrtpp.hpp>} header is provided to aid Module implementations in
 \CPLUSPLUS/.  Modules can also be written in \CEE/.  A \CEE/ implementation
-would use the \.{<augas.h>} header.  For convenience, names are imported from
-the |augas| and |std| namespaces.
+would use the \.{<augrt.h>} header.  For convenience, names are imported from
+the |augrt| and |std| namespaces.
 
 @<include...@>=
-#include <augaspp.hpp>@/
-using namespace augas;@/
+#include <augrtpp.hpp>@/
+using namespace augrt;@/
 using namespace std;
 
 @ The Service type, |echoserv| in this case, is fed into class templates which
@@ -141,13 +141,13 @@ template argument.  |basic_factory<>| is used to create a simple factory for
 the |echoserv| Service.
 
 \yskip\noindent
-\AUGAS/ Modules are required to export two library functions, namely
-|augas_init()| and |augas_term()|.  The |AUGAS_MODULE| macro defines these two
+\AUGRT/ Modules are required to export two library functions, namely
+|augrt_init()| and |augrt_term()|.  The |AUGRT_MODULE| macro defines these two
 export functions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echoserv> > sample;@/
-AUGAS_MODULE(sample::init, sample::term)
+AUGRT_MODULE(sample::init, sample::term)
 
 @ \CPLUSPLUS/ Services implement the |serv_base| interface.  Stub
 implementations to most of |serv_base|'s pure virtual functions are provided
@@ -188,8 +188,8 @@ configuration file, |false| is returned to prevent the Service from starting.
 bool
 echoserv::do_start(const char* sname)
 {
-  writelog(AUGAS_LOGINFO, "starting service [%s]", sname);
-  const char* port = augas::getenv("service.echo.serv");
+  writelog(AUGRT_LOGINFO, "starting service [%s]", sname);
+  const char* port = augrt::getenv("service.echo.serv");
   if (!port)
     return false;
   tcplisten("0.0.0.0", port);
@@ -198,11 +198,11 @@ echoserv::do_start(const char* sname)
 
 @ The |do_accepted()| function is called when a new client connection is
 accepted.  The |setuser()| function binds an opaque, user-defined value to an
-\AUGAS/ object.  Here, a |string| buffer is assigned to track incomplete line
+\AUGRT/ object.  Here, a |string| buffer is assigned to track incomplete line
 data received from the client.  An initial, {\sc ``HELLO''} message is sent to
 the client.  The call to |setrwtimer()| establishes a timer that will expire
 when there has been no read activity on the |sock| object for a period of 15
-seconds or more.  \AUGAS/ will automatically reset the timer when read
+seconds or more.  \AUGRT/ will automatically reset the timer when read
 activity occurs.
 
 @<member...@>+=
@@ -211,7 +211,7 @@ echoserv::do_accepted(object& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
-  setrwtimer(sock, 15000, AUGAS_TIMRD);
+  setrwtimer(sock, 15000, AUGRT_TIMRD);
   return true;
 }
 
@@ -243,7 +243,7 @@ echoserv::do_data(const object& sock, const void* buf, size_t size)
 @ Read-timer expiry is communicated using the |do_rdexpire()| function.  If no
 data arrives for 15 seconds, the connection is shutdown.  The |shutdown()|
 function sends a FIN packet after ensuring that all buffered data has been
-flushed.  \AUGAS/ ensures that any inflight messages sent by the client are
+flushed.  \AUGRT/ ensures that any inflight messages sent by the client are
 still delivered to the Service.
 
 @<member...@>+=

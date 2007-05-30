@@ -1,9 +1,9 @@
 EXTRA_DIST = \
-	augas.css \
-	augas.js \
+	aug.css \
+	aug.js \
 	index.html \
 	sched.js
 
-exampledir = $(prefix)/example/augas/htdocs
+exampledir = $(prefix)/example/augrt/htdocs
 example_DATA = \
 	$(EXTRA_DIST)

@@ -1,13 +1,4 @@
 #include "augrt.h"
-#include "augsys/defs.h"
-
-AUG_RCSID("$Id$");
-
-#if defined(_WIN32)
-# define HAVE_ISINF 1
-# define _MSC_VER 1200
-#endif /* _WIN32 */
-#include <ruby.h>
 
 static void
 stop_(void)
@@ -113,8 +104,6 @@ static const struct augrt_module*
 init_(const char* name)
 {
     augrt_writelog(AUGRT_LOGINFO, "init_()");
-    ruby_init();
-    ruby_script("augrb");
     return &module_;
 }
 
@@ -122,7 +111,6 @@ static void
 term_(void)
 {
     augrt_writelog(AUGRT_LOGINFO, "term_()");
-    ruby_finalize();
 }
 
 AUGRT_MODULE(init_, term_)

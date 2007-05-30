@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 
 #include "augrtpp/buffer.hpp"
 
-#include "augaspp.hpp"
+#include "augrtpp.hpp"
 
 #include <cassert>
 
@@ -20,13 +20,13 @@ conn_base::~conn_base() AUG_NOTHROW
 {
 }
 
-augas_object&
+augrt_object&
 connected::do_get()
 {
     return sock_;
 }
 
-const augas_object&
+const augrt_object&
 connected::do_get() const
 {
     return sock_;
@@ -96,7 +96,7 @@ connected::do_process(unsigned short events)
 
         // Data has been read: reset read timer.
 
-        rwtimer_.resetrwtimer(AUGAS_TIMRD);
+        rwtimer_.resetrwtimer(AUGRT_TIMRD);
 
         // Notify module of new data.
 
@@ -112,7 +112,7 @@ connected::do_process(unsigned short events)
 
         // Data has been written: reset write timer.
 
-        rwtimer_.resetrwtimer(AUGAS_TIMWR);
+        rwtimer_.resetrwtimer(AUGRT_TIMWR);
 
         if (done) {
 
@@ -177,7 +177,7 @@ connected::~connected() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-connected::connected(const servptr& serv, augas_object& sock, buffer& buffer,
+connected::connected(const servptr& serv, augrt_object& sock, buffer& buffer,
                      rwtimer& rwtimer, const smartfd& sfd,
                      const endpoint& ep, bool close)
     : serv_(serv),
@@ -191,13 +191,13 @@ connected::connected(const servptr& serv, augas_object& sock, buffer& buffer,
 {
 }
 
-augas_object&
+augrt_object&
 handshake::do_get()
 {
     return sock_;
 }
 
-const augas_object&
+const augrt_object&
 handshake::do_get() const
 {
     return sock_;
@@ -305,7 +305,7 @@ handshake::~handshake() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-handshake::handshake(const servptr& serv, augas_object& sock, buffer& buffer,
+handshake::handshake(const servptr& serv, augrt_object& sock, buffer& buffer,
                      const char* host, const char* port)
     : serv_(serv),
       sock_(sock),

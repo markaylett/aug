@@ -6,19 +6,19 @@
 
 #include "augrtpp/serv.hpp"
 
-#include "augas.h"
+#include "augrt.h"
 
 namespace aug {
 
     class object_base {
     public:
-        typedef augas_object ctype;
+        typedef augrt_object ctype;
     private:
 
-        virtual augas_object&
+        virtual augrt_object&
         do_get() = 0;
 
-        virtual const augas_object&
+        virtual const augrt_object&
         do_get() const = 0;
 
         virtual const servptr&
@@ -28,12 +28,12 @@ namespace aug {
         virtual
         ~object_base() AUG_NOTHROW;
 
-        augas_object&
+        augrt_object&
         get()
         {
             return do_get();
         }
-        const augas_object&
+        const augrt_object&
         get() const
         {
             return do_get();
@@ -43,11 +43,11 @@ namespace aug {
         {
             return do_serv();
         }
-        operator augas_object&()
+        operator augrt_object&()
         {
             return do_get();
         }
-        operator const augas_object&() const
+        operator const augrt_object&() const
         {
             return do_get();
         }
@@ -55,14 +55,14 @@ namespace aug {
 
     typedef smartptr<object_base> objectptr;
 
-    inline augas_id
-    id(const augas_object& ref)
+    inline augrt_id
+    id(const augrt_object& ref)
     {
         return ref.id_;
     }
 
     inline void*
-    user(const augas_object& ref)
+    user(const augrt_object& ref)
     {
         return ref.user_;
     }

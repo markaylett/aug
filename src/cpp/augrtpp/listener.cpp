@@ -10,13 +10,13 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-augas_object&
+augrt_object&
 listener::do_get()
 {
     return sock_;
 }
 
-const augas_object&
+const augrt_object&
 listener::do_get() const
 {
     return sock_;

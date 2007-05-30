@@ -1,8 +1,8 @@
-#include "augaspp.hpp"
+#include "augrtpp.hpp"
 
 #include <map>
 
-using namespace augas;
+using namespace augrt;
 using namespace std;
 
 namespace {
@@ -29,8 +29,8 @@ namespace {
         bool
         do_start(const char* sname)
         {
-            writelog(AUGAS_LOGINFO, "starting...");
-            const char* serv = augas::getenv("service.echo.serv");
+            writelog(AUGRT_LOGINFO, "starting...");
+            const char* serv = augrt::getenv("service.echo.serv");
             if (!serv)
                 return false;
 
@@ -48,7 +48,7 @@ namespace {
             //setsslserver(sock, "server");
             sock.setuser(new string());
             send(sock, "hello\r\n", 7);
-            setrwtimer(sock, 15000, AUGAS_TIMRD);
+            setrwtimer(sock, 15000, AUGRT_TIMRD);
             return true;
         }
         void
@@ -62,14 +62,14 @@ namespace {
         void
         do_rdexpire(const object& sock, unsigned& ms)
         {
-            writelog(AUGAS_LOGINFO, "no data received for 15 seconds");
+            writelog(AUGRT_LOGINFO, "no data received for 15 seconds");
             shutdown(sock);
         }
         bool
         do_authcert(const object& sock, const char* subject,
                     const char* issuer)
         {
-            augas_writelog(AUGAS_LOGINFO, "checking subject...");
+            augrt_writelog(AUGRT_LOGINFO, "checking subject...");
             return true;
         }
         static serv_base*
@@ -82,4 +82,4 @@ namespace {
     typedef basic_module<basic_factory<echoserv> > module;
 }
 
-AUGAS_MODULE(module::init, module::term)
+AUGRT_MODULE(module::init, module::term)

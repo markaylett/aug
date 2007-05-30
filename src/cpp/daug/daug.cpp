@@ -29,7 +29,7 @@ AUG_RCSID("$Id$");
 #include <time.h>
 
 using namespace aug;
-using namespace augas;
+using namespace augrt;
 using namespace std;
 
 namespace {
@@ -240,7 +240,7 @@ namespace {
     // Thread-safe.
 
     int
-    post_(const char* to, const char* type, const augas_var* var)
+    post_(const char* to, const char* type, const augrt_var* var)
     {
         const char* sname = getserv()->name_;
         AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s]", sname, to, type);
@@ -289,7 +289,7 @@ namespace {
         return 0;
     }
 
-    const augas_serv*
+    const augrt_serv*
     getserv_()
     {
         try {
@@ -299,7 +299,7 @@ namespace {
     }
 
     int
-    shutdown_(augas_id cid)
+    shutdown_(augrt_id cid)
     {
         AUG_DEBUG2("shutdown(): id=[%d]", cid);
         try {
@@ -337,7 +337,7 @@ namespace {
     }
 
     int
-    send_(augas_id cid, const void* buf, size_t len)
+    send_(augrt_id cid, const void* buf, size_t len)
     {
         AUG_DEBUG2("send(): id=[%d]", cid);
         try {
@@ -349,7 +349,7 @@ namespace {
     }
 
     int
-    sendv_(augas_id cid, const augas_var* var)
+    sendv_(augrt_id cid, const augrt_var* var)
     {
         AUG_DEBUG2("sendv(): id=[%d]", cid);
         try {
@@ -361,7 +361,7 @@ namespace {
     }
 
     int
-    setrwtimer_(augas_id cid, unsigned ms, unsigned flags)
+    setrwtimer_(augrt_id cid, unsigned ms, unsigned flags)
     {
         AUG_DEBUG2("setrwtimer(): id=[%d], ms=[%u], flags=[%x]",
                    cid, ms, flags);
@@ -374,32 +374,32 @@ namespace {
     }
 
     int
-    resetrwtimer_(augas_id cid, unsigned ms, unsigned flags)
+    resetrwtimer_(augrt_id cid, unsigned ms, unsigned flags)
     {
         AUG_DEBUG2("resetrwtimer(): id=[%d], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
             return state_->engine_.resetrwtimer(cid, ms, flags)
-                ? 0 : AUGAS_NONE;
+                ? 0 : AUGRT_NONE;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
-    cancelrwtimer_(augas_id cid, unsigned flags)
+    cancelrwtimer_(augrt_id cid, unsigned flags)
     {
         AUG_DEBUG2("cancelrwtimer(): id=[%d], flags=[%x]", cid, flags);
         try {
             return state_->engine_.cancelrwtimer(cid, flags)
-                ? 0 : AUGAS_NONE;
+                ? 0 : AUGRT_NONE;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
-    settimer_(unsigned ms, const augas_var* var)
+    settimer_(unsigned ms, const augrt_var* var)
     {
         const char* sname = getserv()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
@@ -411,29 +411,29 @@ namespace {
     }
 
     int
-    resettimer_(augas_id tid, unsigned ms)
+    resettimer_(augrt_id tid, unsigned ms)
     {
         AUG_DEBUG2("resettimer(): id=[%d], ms=[%u]", tid, ms);
         try {
-            return state_->engine_.resettimer(tid, ms) ? 0 : AUGAS_NONE;
+            return state_->engine_.resettimer(tid, ms) ? 0 : AUGRT_NONE;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
-    canceltimer_(augas_id tid)
+    canceltimer_(augrt_id tid)
     {
         AUG_DEBUG2("canceltimer(): id=[%d]", tid);
         try {
-            return state_->engine_.canceltimer(tid) ? 0 : AUGAS_NONE;
+            return state_->engine_.canceltimer(tid) ? 0 : AUGRT_NONE;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
-    setsslclient_(augas_id cid, const char* ctx)
+    setsslclient_(augrt_id cid, const char* ctx)
     {
         AUG_DEBUG2("setsslclient(): id=[%d], ctx=[%s]", cid, ctx);
 #if HAVE_OPENSSL_SSL_H
@@ -455,7 +455,7 @@ namespace {
     }
 
     int
-    setsslserver_(augas_id cid, const char* ctx)
+    setsslserver_(augrt_id cid, const char* ctx)
     {
         AUG_DEBUG2("setsslserver(): id=[%d], ctx=[%s]", cid, ctx);
 #if HAVE_OPENSSL_SSL_H
@@ -476,7 +476,7 @@ namespace {
         return -1;
     }
 
-    const augas_host host_ = {
+    const augrt_host host_ = {
         writelog_,
         vwritelog_,
         error_,
@@ -502,7 +502,7 @@ namespace {
     };
 
     void
-    teardown_(const augas_object* sock)
+    teardown_(const augrt_object* sock)
     {
         aug_info("teardown defaulting to shutdown");
         shutdown_(sock->id_);
@@ -545,7 +545,7 @@ namespace {
                     aug_info("loading module: name=[%s], path=[%s]",
                              value.c_str(), path.c_str());
                     aug::chdir(rundir_);
-                    moduleptr module(new augas::module(value, path.c_str(),
+                    moduleptr module(new augrt::module(value, path.c_str(),
                                                        host_, teardown_));
                     it = state_->modules_
                         .insert(make_pair(value, module)).first;
@@ -553,7 +553,7 @@ namespace {
 
                 aug_info("creating service: name=[%s]", name.c_str());
                 state_->engine_
-                    .insert(name, servptr(new augas::serv(it->second,
+                    .insert(name, servptr(new augrt::serv(it->second,
                                                           name.c_str())),
                             options_.get(base + ".groups", 0));
             }
@@ -563,14 +563,14 @@ namespace {
             // No service list: assume reasonable defaults.
 
             aug_info("loading module: name=[%s]", DEFAULT_NAME);
-            moduleptr module(new augas::module(DEFAULT_NAME, DEFAULT_MODULE,
+            moduleptr module(new augrt::module(DEFAULT_NAME, DEFAULT_MODULE,
                                                host_, teardown_));
             state_->modules_[DEFAULT_NAME] = module;
 
             aug_info("creating service: name=[%s]", DEFAULT_NAME);
             state_->engine_
                 .insert(DEFAULT_NAME,
-                        servptr(new augas::serv(module, DEFAULT_NAME)), 0);
+                        servptr(new augrt::serv(module, DEFAULT_NAME)), 0);
         }
 
         state_->engine_.cancelinactive();

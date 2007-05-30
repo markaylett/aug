@@ -1,4 +1,4 @@
-from augas import *
+from augrt import *
 from cgi import *
 from urllib import *
 import log

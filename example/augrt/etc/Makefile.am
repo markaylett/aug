@@ -9,6 +9,6 @@ EXTRA_DIST = \
 	serverkey.pem \
 	serverreq.pem
 
-exampledir = $(prefix)/example/augas/etc
+exampledir = $(prefix)/example/augrt/etc
 example_DATA = \
 	$(EXTRA_DIST)

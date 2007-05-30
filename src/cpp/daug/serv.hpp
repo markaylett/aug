@@ -8,18 +8,18 @@
 
 #include "augrtpp/serv.hpp"
 
-namespace augas {
+namespace augrt {
 
     class serv : public aug::serv_base {
 
         moduleptr module_;
-        augas_serv serv_;
+        augrt_serv serv_;
         bool active_;
 
-        augas_serv&
+        augrt_serv&
         do_get() AUG_NOTHROW;
 
-        const augas_serv&
+        const augrt_serv&
         do_get() const AUG_NOTHROW;
 
         bool
@@ -36,34 +36,34 @@ namespace augas {
                  size_t size) const AUG_NOTHROW;
 
         void
-        do_closed(const augas_object& sock) const AUG_NOTHROW;
+        do_closed(const augrt_object& sock) const AUG_NOTHROW;
 
         void
-        do_teardown(const augas_object& sock) const AUG_NOTHROW;
+        do_teardown(const augrt_object& sock) const AUG_NOTHROW;
 
         bool
-        do_accepted(augas_object& sock, const char* addr,
+        do_accepted(augrt_object& sock, const char* addr,
                     unsigned short port) const AUG_NOTHROW;
 
         void
-        do_connected(augas_object& sock, const char* addr,
+        do_connected(augrt_object& sock, const char* addr,
                      unsigned short port) const AUG_NOTHROW;
 
         void
-        do_data(const augas_object& sock, const char* buf,
+        do_data(const augrt_object& sock, const char* buf,
                 size_t size) const AUG_NOTHROW;
 
         void
-        do_rdexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW;
+        do_rdexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW;
 
         void
-        do_wrexpire(const augas_object& sock, unsigned& ms) const AUG_NOTHROW;
+        do_wrexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW;
 
         void
-        do_expire(const augas_object& timer, unsigned& ms) const AUG_NOTHROW;
+        do_expire(const augrt_object& timer, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        do_authcert(const augas_object& sock, const char* subject,
+        do_authcert(const augrt_object& sock, const char* subject,
                     const char* issuer) const AUG_NOTHROW;
 
     public:
@@ -72,7 +72,7 @@ namespace augas {
         serv(const moduleptr& module, const char* name);
     };
 
-    const augas_serv*
+    const augrt_serv*
     getserv();
 }
 

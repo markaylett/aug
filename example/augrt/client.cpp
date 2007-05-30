@@ -1,8 +1,8 @@
-#include "augaspp.hpp"
+#include "augrtpp.hpp"
 
 #include "augsyspp.hpp"
 
-using namespace augas;
+using namespace augrt;
 using namespace std;
 
 namespace {
@@ -17,12 +17,12 @@ namespace {
         return MSG;
     }
 
-    const struct augas_vartype vartype = {
+    const struct augrt_vartype vartype = {
         NULL,
         buf
     };
 
-    const struct augas_var var = {
+    const struct augrt_var var = {
         &vartype,
         NULL
     };
@@ -78,29 +78,29 @@ namespace {
         bool
         do_start(const char* sname)
         {
-            writelog(AUGAS_LOGINFO, "starting...");
+            writelog(AUGRT_LOGINFO, "starting...");
 
-            if (atoi(augas::getenv("service.bench.sendv", "1"))) {
+            if (atoi(augrt::getenv("service.bench.sendv", "1"))) {
                 send_ = dosendv;
-                augas_writelog(AUGAS_LOGINFO, "sendv: yes");
+                augrt_writelog(AUGRT_LOGINFO, "sendv: yes");
             } else {
                 send_ = dosend;
-                augas_writelog(AUGAS_LOGINFO, "sendv: no");
+                augrt_writelog(AUGRT_LOGINFO, "sendv: no");
             }
 
-            const char* serv = augas::getenv("service.bench.serv");
+            const char* serv = augrt::getenv("service.bench.serv");
             if (!serv)
                 return false;
 
-            const char* host = augas::getenv("service.bench.host",
+            const char* host = augrt::getenv("service.bench.host",
                                              "localhost");
-            conns_ = atoi(augas::getenv("service.bench.conns", "100"));
-            echos_ = atoi(augas::getenv("service.bench.echos", "1000"));
+            conns_ = atoi(augrt::getenv("service.bench.conns", "100"));
+            echos_ = atoi(augrt::getenv("service.bench.echos", "1000"));
 
-            augas_writelog(AUGAS_LOGINFO, "host: %s", host);
-            augas_writelog(AUGAS_LOGINFO, "serv: %s", serv);
-            augas_writelog(AUGAS_LOGINFO, "conns: %d", conns_);
-            augas_writelog(AUGAS_LOGINFO, "echos: %d", echos_);
+            augrt_writelog(AUGRT_LOGINFO, "host: %s", host);
+            augrt_writelog(AUGRT_LOGINFO, "serv: %s", serv);
+            augrt_writelog(AUGRT_LOGINFO, "conns: %d", conns_);
+            augrt_writelog(AUGRT_LOGINFO, "echos: %d", echos_);
 
             aug::gettimeofday(start_);
 
@@ -113,7 +113,7 @@ namespace {
         {
             delete sock.user<state>();
             if (0 < --estab_) {
-                augas_writelog(AUGAS_LOGINFO, "%d established", estab_);
+                augrt_writelog(AUGRT_LOGINFO, "%d established", estab_);
                 return;
             }
 
@@ -123,16 +123,16 @@ namespace {
 
             double ms(static_cast<double>(aug::tvtoms(tv)));
 
-            augas_writelog(AUGAS_LOGINFO, "total time: %f ms", ms);
+            augrt_writelog(AUGRT_LOGINFO, "total time: %f ms", ms);
 
             ms /= static_cast<double>(conns_);
-            augas_writelog(AUGAS_LOGINFO, "time per conn: %f ms", ms);
+            augrt_writelog(AUGRT_LOGINFO, "time per conn: %f ms", ms);
 
             ms /= static_cast<double>(echos_);
-            augas_writelog(AUGAS_LOGINFO, "echos per sec: %f", 1000.0 / ms);
+            augrt_writelog(AUGRT_LOGINFO, "echos per sec: %f", 1000.0 / ms);
 
             double k(static_cast<double>(bytes_) / 1024);
-            augas_writelog(AUGAS_LOGINFO, "total size: %f k", k);
+            augrt_writelog(AUGRT_LOGINFO, "total size: %f k", k);
 
             stopall();
         }
@@ -157,7 +157,7 @@ namespace {
         do_authcert(const object& sock, const char* subject,
                     const char* issuer)
         {
-            augas_writelog(AUGAS_LOGINFO, "checking subject...");
+            augrt_writelog(AUGRT_LOGINFO, "checking subject...");
             return true;
         }
         benchserv()
@@ -176,4 +176,4 @@ namespace {
     typedef basic_module<basic_factory<benchserv> > module;
 }
 
-AUGAS_MODULE(module::init, module::term)
+AUGRT_MODULE(module::init, module::term)
