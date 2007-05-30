@@ -106,11 +106,11 @@ namespace aug {
         struct engineimpl {
 
             fdref rdfd_, wrfd_;
+            timers& timers_;
             enginecb_base& cb_;
             nbfiles nbfiles_;
             servs servs_;
             socks socks_;
-            timers timers_;
             timer grace_;
 
             // Mapping of timer-ids to services.
@@ -134,9 +134,11 @@ namespace aug {
                     removenbfile(rdfd_);
                 } AUG_PERRINFOCATCH;
             }
-            engineimpl(fdref rdfd, fdref wrfd, enginecb_base& cb)
+            engineimpl(fdref rdfd, fdref wrfd, timers& timers,
+                       enginecb_base& cb)
                 : rdfd_(rdfd),
                   wrfd_(wrfd),
+                  timers_(timers),
                   cb_(cb),
                   grace_(timers_),
                   state_(STARTED)
@@ -324,11 +326,6 @@ namespace aug {
                 }
             }
             void
-            reopencb(int id, unsigned& ms)
-            {
-                cb_.reopen();
-            }
-            void
             stopcb(int id, unsigned& ms)
             {
                 // Called by grace timer when excessive time has been spent in
@@ -348,8 +345,8 @@ engine::~engine() AUG_NOTHROW
 }
 
 AUGRTPP_API
-engine::engine(fdref rdfd, fdref wrfd, enginecb_base& cb)
-    : impl_(new detail::engineimpl(rdfd, wrfd, cb))
+engine::engine(fdref rdfd, fdref wrfd, timers& timers, enginecb_base& cb)
+    : impl_(new detail::engineimpl(rdfd, wrfd, timers, cb))
 {
 }
 
@@ -387,19 +384,8 @@ engine::cancelinactive()
 }
 
 AUGRTPP_API void
-engine::run(bool daemon)
+engine::run(bool stoponerr)
 {
-    timer reopen(impl_->timers_);
-
-    // Re-open log file every minute.
-
-    if (daemon) {
-
-        aug_var var = { 0, impl_ };
-        reopen.set(15000, timermemcb<detail::engineimpl,
-                   &detail::engineimpl::reopencb>, var);
-    }
-
     AUG_DEBUG2("running daemon process");
 
     int ret(!0);
@@ -447,7 +433,7 @@ engine::run(bool daemon)
 
         // When running in foreground, stop on error.
 
-        if (!daemon)
+        if (stoponerr)
             teardown();
     }
 }

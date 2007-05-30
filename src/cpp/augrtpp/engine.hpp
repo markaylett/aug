@@ -13,6 +13,7 @@
 namespace aug {
 
     class AUGRTPP_API sslctx;
+    class timers;
 
     namespace detail {
         struct engineimpl;
@@ -22,9 +23,6 @@ namespace aug {
         virtual void
         do_reconf() = 0;
 
-        virtual void
-        do_reopen() = 0;
-
     public:
         virtual
         ~enginecb_base() AUG_NOTHROW;
@@ -33,11 +31,6 @@ namespace aug {
         reconf()
         {
             do_reconf();
-        }
-        void
-        reopen()
-        {
-            do_reopen();
         }
     };
 
@@ -53,7 +46,7 @@ namespace aug {
     public:
         ~engine() AUG_NOTHROW;
 
-        engine(fdref rdfd, fdref wrfd, enginecb_base& cb);
+        engine(fdref rdfd, fdref wrfd, timers& timers, enginecb_base& cb);
 
         void
         clear();
@@ -66,7 +59,7 @@ namespace aug {
         cancelinactive();
 
         void
-        run(bool daemon);
+        run(bool stoponerr);
 
         void
         teardown();

@@ -136,6 +136,13 @@ namespace {
         AUG_DEBUG2("rundir=[%s]", rundir_);
     }
 
+    void
+    reopencb_(const aug_var&, int id, unsigned& ms)
+    {
+        AUG_DEBUG2("re-opening log file");
+        openlog_();
+    }
+
     class enginecb : public enginecb_base {
         void
         do_reconf()
@@ -145,12 +152,6 @@ namespace {
                 options_.read(conffile_);
             }
             reconf_();
-        }
-        void
-        do_reopen()
-        {
-            AUG_DEBUG2("re-opening log file");
-            openlog_();
         }
 
     } enginecb_;
@@ -163,11 +164,12 @@ namespace {
 #if HAVE_OPENSSL_SSL_H
         sslctxs sslctxs_;
 #endif // HAVE_OPENSSL_SSL_H
+        timers timers_;
         engine engine_;
 
         explicit
         state(const string& pass64)
-            : engine_(aug_eventrd(), aug_eventwr(), enginecb_)
+            : engine_(aug_eventrd(), aug_eventwr(), timers_, enginecb_)
         {
 #if HAVE_OPENSSL_SSL_H
             initssl();
@@ -664,7 +666,9 @@ namespace {
         void
         run()
         {
-            state_->engine_.run(daemon_);
+            timer t(state_->timers_);
+            t.set(15000, timercb<reopencb_>, null);
+            state_->engine_.run(!daemon_);
         }
 
         void
