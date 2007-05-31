@@ -97,7 +97,7 @@ aug_control(int event)
     struct flock fl;
     int fd, ret = -1;
 
-    if (!(pidfile = aug_getserviceopt(AUG_OPTPIDFILE))) {
+    if (!(pidfile = aug_getserveropt(AUG_OPTPIDFILE))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return -1;

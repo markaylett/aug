@@ -215,7 +215,7 @@ namespace test {
         }
     };
 
-    class service {
+    class server {
 
         auto_ptr<state> state_;
 
@@ -324,7 +324,7 @@ namespace test {
             return true;
         }
     public:
-        ~service() AUG_NOTHROW
+        ~server() AUG_NOTHROW
         {
         }
 
@@ -362,7 +362,7 @@ namespace test {
             setsrvlogger("aug");
 
             aug_var var = { 0, this };
-            state_.reset(new state(filememcb<service>, var));
+            state_.reset(new state(filememcb<server>, var));
         }
 
         void
@@ -432,7 +432,7 @@ main(int argc, char* argv[])
         scoped_init init(errinfo);
         try {
 
-            service serv;
+            server serv;
             program_ = argv[0];
 
             blocksignals();

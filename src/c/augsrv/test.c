@@ -78,7 +78,7 @@ int
 main(int argc, char* argv[])
 {
     struct aug_errinfo errinfo;
-    struct aug_service service = {
+    struct aug_server server = {
         getopt_,
         config_,
         init_,
@@ -93,5 +93,5 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    return aug_main(argc, argv, &service, NULL);
+    return aug_main(argc, argv, &server, NULL);
 }

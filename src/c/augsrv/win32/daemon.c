@@ -103,7 +103,7 @@ start_(DWORD argc, char** argv)
         return;
     }
 
-    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getserveropt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return;
@@ -122,9 +122,9 @@ start_(DWORD argc, char** argv)
         return;
     }
 
-    if (-1 == aug_readserviceconf(*options.conffile_
-                                  ? options.conffile_ : NULL, 0, 1)) {
-        aug_perrinfo(NULL, "aug_readserviceconf() failed");
+    if (-1 == aug_readserverconf(*options.conffile_
+                                 ? options.conffile_ : NULL, 0, 1)) {
+        aug_perrinfo(NULL, "aug_readserverconf() failed");
         return;
     }
 
@@ -137,9 +137,9 @@ start_(DWORD argc, char** argv)
 
     setstatus_(SERVICE_START_PENDING);
 
-    if (-1 == aug_initservice()) {
+    if (-1 == aug_initserver()) {
 
-        aug_perrinfo(NULL, "aug_initservice() failed");
+        aug_perrinfo(NULL, "aug_initserver() failed");
         setstatus_(SERVICE_STOPPED);
         return;
     }
@@ -147,18 +147,18 @@ start_(DWORD argc, char** argv)
     aug_notice("daemon started");
     setstatus_(SERVICE_RUNNING);
 
-    if (-1 == aug_runservice())
-        aug_perrinfo(NULL, "aug_runservice() failed");
+    if (-1 == aug_runserver())
+        aug_perrinfo(NULL, "aug_runserver() failed");
 
     aug_notice("daemon stopped");
     setstatus_(SERVICE_STOPPED);
 
     /* This function will be called on the Service Manager's thread.  Given
-       that aug_initservice() and aug_runservice() have been called on this
-       thread, aug_termservice() is also called from this thread and not the
+       that aug_initserver() and aug_runserver() have been called on this
+       thread, aug_termserver() is also called from this thread and not the
        main thread. */
 
-    /*aug_termservice();*/
+    /*aug_termserver();*/
 }
 
 AUGSRV_API int
@@ -171,7 +171,7 @@ aug_daemonise(void)
         { NULL, NULL }
     };
 
-    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getserveropt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
@@ -190,6 +190,6 @@ aug_daemonise(void)
         }
     }
 
-    aug_termservice();
+    aug_termserver();
     return ret;
 }
