@@ -34,13 +34,13 @@ static void
 foreground_(void)
 {
     int ret;
-    if (-1 == aug_initserver())
-        die_("aug_initserver() failed");
+    if (-1 == aug_initservice())
+        die_("aug_initservice() failed");
 
-    ret = aug_runserver();
-    aug_termserver();
+    ret = aug_runservice();
+    aug_termservice();
     if (-1 == ret)
-        die_("aug_runserver() failed");
+        die_("aug_runservice() failed");
 }
 
 static void
@@ -114,14 +114,14 @@ uninstall_(void)
 }
 
 AUGSRV_API int
-aug_main(int argc, char* argv[], const struct aug_server* server, void* arg)
+aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
 {
     struct aug_options options;
     int daemon = 0, jmpret = setjmp(mark_);
     if (jmpret)
         return jmpret;
 
-    aug_setserver_(server, arg);
+    aug_setservice_(service, arg);
 
 #if defined(_WIN32)
 
@@ -130,7 +130,7 @@ aug_main(int argc, char* argv[], const struct aug_server* server, void* arg)
 
     if (!GetStdHandle(STD_INPUT_HANDLE)) {
 
-        /* Note: aug_readopts() will be called from the main server
+        /* Note: aug_readopts() will be called from the main service
            function. */
 
         aug_setlogger(aug_daemonlogger);
@@ -155,10 +155,10 @@ aug_main(int argc, char* argv[], const struct aug_server* server, void* arg)
     }
 #endif /* !_WIN32 */
 
-    if (-1 == aug_readserverconf(*options.conffile_
-                                 ? options.conffile_ : NULL,
-                                 options.prompt_, daemon))
-        die_("aug_readserverconf() failed");
+    if (-1 == aug_readserviceconf(*options.conffile_
+                                  ? options.conffile_ : NULL,
+                                  options.prompt_, daemon))
+        die_("aug_readserviceconf() failed");
 
     switch (options.command_) {
     case AUG_CMDDEFAULT:

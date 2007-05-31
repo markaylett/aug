@@ -9,23 +9,23 @@
 
 #if defined(AUGSRV_BUILD)
 AUG_EXTERNC void
-aug_setserver_(const struct aug_server* server, void* arg);
+aug_setservice_(const struct aug_service* service, void* arg);
 #endif /* AUGSRV_BUILD */
 
 AUGSRV_API const char*
-aug_getserveropt(enum aug_option opt);
+aug_getserviceopt(enum aug_option opt);
 
 AUGSRV_API int
-aug_readserverconf(const char* conffile, int prompt, int daemon);
+aug_readserviceconf(const char* conffile, int prompt, int daemon);
 
 AUGSRV_API int
-aug_initserver(void);
+aug_initservice(void);
 
 AUGSRV_API int
-aug_runserver(void);
+aug_runservice(void);
 
 AUGSRV_API void
-aug_termserver(void);
+aug_termservice(void);
 
 AUGSRV_API int
 aug_eventrd(void);

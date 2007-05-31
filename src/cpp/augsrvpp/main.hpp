@@ -21,7 +21,7 @@ namespace aug {
     namespace detail {
 
         template <typename T>
-        class serverstatic {
+        class servicestatic {
             static const char*
             getopt(void* arg, enum aug_option opt) AUG_NOTHROW
             {
@@ -68,10 +68,10 @@ namespace aug {
             }
 
         public:
-            static const aug_server&
+            static const aug_service&
             get()
             {
-                static const aug_server local = {
+                static const aug_service local = {
                     getopt,
                     readconf,
                     init,
@@ -83,7 +83,7 @@ namespace aug {
         };
 
         template <typename T>
-        class servernonstatic {
+        class servicenonstatic {
             static const char*
             getopt(void* arg, enum aug_option opt) AUG_NOTHROW
             {
@@ -131,10 +131,10 @@ namespace aug {
             }
 
         public:
-            static const aug_server&
+            static const aug_service&
             get()
             {
-                static const aug_server local = {
+                static const aug_service local = {
                     getopt,
                     readconf,
                     init,
@@ -147,43 +147,43 @@ namespace aug {
     }
 
     template <typename T>
-    const aug_server&
-    serverstatic()
+    const aug_service&
+    servicestatic()
     {
-        return detail::serverstatic<T>::get();
+        return detail::servicestatic<T>::get();
     }
 
     template <typename T>
-    const aug_server&
-    servernonstatic()
+    const aug_service&
+    servicenonstatic()
     {
-        return detail::servernonstatic<T>::get();
+        return detail::servicenonstatic<T>::get();
     }
 
     /**
        On Windows, the Service Manager calls the service entry point on a
        separate thread - automatic variables on the main thread's stack will
-       not be visible from the service thread.  A shallow copy of the server
+       not be visible from the service thread.  A shallow copy of the service
        structure is, therefore, performed by aug_main().
     */
 
     inline int
-    main(int argc, char* argv[], const aug_server& server, void* arg)
+    main(int argc, char* argv[], const aug_service& service, void* arg)
     {
-        return aug_main(argc, argv, &server, arg);
+        return aug_main(argc, argv, &service, arg);
     }
 
     inline int
-    main(int argc, char* argv[], const aug_server& server, const null_&)
+    main(int argc, char* argv[], const aug_service& service, const null_&)
     {
-        return aug_main(argc, argv, &server, 0);
+        return aug_main(argc, argv, &service, 0);
     }
 
     template <typename T>
     int
     main(int argc, char* argv[], T& x)
     {
-        return aug_main(argc, argv, &servernonstatic<T>(), &x);
+        return aug_main(argc, argv, &servicenonstatic<T>(), &x);
     }
 }
 

@@ -29,7 +29,7 @@ AUG_RCSID("$Id$");
    thread: automatic variables on the main thread's stack will not be visible
    from the service thread. */
 
-static struct aug_server server_ = { 0 };
+static struct aug_service service_ = { 0 };
 static void* arg_ = NULL;
 static int fds_[2] = { -1, -1 };
 
@@ -94,34 +94,34 @@ openpipe_(void)
 }
 
 AUG_EXTERNC void
-aug_setserver_(const struct aug_server* server, void* arg)
+aug_setservice_(const struct aug_service* service, void* arg)
 {
-    memcpy(&server_, server, sizeof(server_));
+    memcpy(&service_, service, sizeof(service_));
     arg_ = arg;
 }
 
 AUGSRV_API const char*
-aug_getserveropt(enum aug_option opt)
+aug_getserviceopt(enum aug_option opt)
 {
-    assert(server_.getopt_);
-    return server_.getopt_(arg_, opt);
+    assert(service_.getopt_);
+    return service_.getopt_(arg_, opt);
 }
 
 AUGSRV_API int
-aug_readserverconf(const char* conffile, int prompt, int daemon)
+aug_readserviceconf(const char* conffile, int prompt, int daemon)
 {
-    assert(server_.readconf_);
-    return server_.readconf_(arg_, conffile, prompt, daemon);
+    assert(service_.readconf_);
+    return service_.readconf_(arg_, conffile, prompt, daemon);
 }
 
 AUGSRV_API int
-aug_initserver(void)
+aug_initservice(void)
 {
-    assert(server_.init_);
+    assert(service_.init_);
     if (-1 == openpipe_())
         return -1;
 
-    if (-1 == server_.init_(arg_)) {
+    if (-1 == service_.init_(arg_)) {
         closepipe_();
         return -1;
     }
@@ -130,18 +130,18 @@ aug_initserver(void)
 }
 
 AUGSRV_API int
-aug_runserver(void)
+aug_runservice(void)
 {
-    assert(server_.run_);
-    return server_.run_(arg_);
+    assert(service_.run_);
+    return service_.run_(arg_);
 }
 
 AUGSRV_API void
-aug_termserver(void)
+aug_termservice(void)
 {
     if (-1 != fds_[0]) {
-        assert(server_.term_);
-        server_.term_(arg_);
+        assert(service_.term_);
+        service_.term_(arg_);
         closepipe_();
     }
 }

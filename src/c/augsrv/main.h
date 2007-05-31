@@ -6,16 +6,17 @@
 
 #include "augsrv/config.h"
 
-struct aug_server;
+struct aug_service;
 
 /**
    On Windows, the Service Manager calls the service entry point on a separate
    thread - automatic variables on the main thread's stack will not be visible
-   from the service thread.  A shallow copy of the server structure is,
+   from the service thread.  A shallow copy of the service structure is,
    therefore, performed by aug_main().
 */
 
 AUGSRV_API int
-aug_main(int argc, char* argv[], const struct aug_server* server, void* arg);
+aug_main(int argc, char* argv[], const struct aug_service* service,
+         void* arg);
 
 #endif /* AUGSRV_MAIN_H */

@@ -50,7 +50,7 @@ namespace test {
         }
     }
 
-    class server {
+    class service {
 
         struct state {
             mplexer mplexer_;
@@ -115,11 +115,11 @@ namespace test {
         }
 
     public:
-        ~server() AUG_NOTHROW
+        ~service() AUG_NOTHROW
         {
         }
 
-        server()
+        service()
             : daemon_(false),
               remain_(5)
         {
@@ -232,7 +232,7 @@ main(int argc, char* argv[])
 
         aug_errinfo errinfo;
         scoped_init init(errinfo);
-		server serv;
+		service serv;
 
         program_ = argv[0];
 

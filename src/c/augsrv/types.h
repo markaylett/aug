@@ -18,20 +18,20 @@ enum aug_option {
 
     /**
        The following option is optional (may be null) but should remain
-       constant after the call to aug_server.config_().
+       constant after the call to aug_service.config_().
     */
 
     AUG_OPTCONFFILE,
 
     /**
        The following option is required and should remain constant during the
-       call to aug_server.config_().
+       call to aug_service.config_().
     */
 
     AUG_OPTPIDFILE
 };
 
-struct aug_server {
+struct aug_service {
     const char* (*getopt_)(void*, enum aug_option);
     int (*readconf_)(void*, const char*, int, int);
     int (*init_)(void*);

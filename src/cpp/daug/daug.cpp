@@ -578,12 +578,12 @@ namespace {
         state_->engine_.cancelinactive();
     }
 
-    class server {
+    class service {
 
         string pass64_;
 
     public:
-        ~server() AUG_NOTHROW
+        ~service() AUG_NOTHROW
         {
         }
 
@@ -704,7 +704,7 @@ main(int argc, char* argv[])
         aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
 
         try {
-            server serv;
+            service serv;
             program_ = argv[0];
 
             blocksignals();
