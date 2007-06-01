@@ -52,10 +52,10 @@ clntconn::do_get() const
     return conn_->get();
 }
 
-const servptr&
-clntconn::do_serv() const
+const sessionptr&
+clntconn::do_session() const
 {
-    return conn_->serv();
+    return conn_->session();
 }
 
 smartfd
@@ -105,7 +105,7 @@ clntconn::do_process(unsigned short events)
         AUG_DEBUG2("connection now established, assuming new state");
 
         conn_ = connptr(new aug::connected
-                        (conn_->serv(), sock_, buffer_, rwtimer_,
+                        (conn_->session(), sock_, buffer_, rwtimer_,
                          conn_->sfd(), conn_->peername(), true));
     }
 
@@ -146,10 +146,10 @@ clntconn::~clntconn() AUG_NOTHROW
 {
 }
 
-clntconn::clntconn(const servptr& serv, void* user, timers& timers,
+clntconn::clntconn(const sessionptr& session, void* user, timers& timers,
                    const char* host, const char* port)
-    : rwtimer_(serv, sock_, timers),
-      conn_(new handshake(serv, sock_, buffer_, host, port))
+    : rwtimer_(session, sock_, timers),
+      conn_(new handshake(session, sock_, buffer_, host, port))
 {
     sock_.id_ = aug_nextid();
     sock_.user_ = user;
@@ -159,7 +159,7 @@ clntconn::clntconn(const servptr& serv, void* user, timers& timers,
         AUG_DEBUG2("connection now established, assuming new state");
 
         conn_ = connptr(new aug::connected
-                        (conn_->serv(), sock_, buffer_, rwtimer_,
+                        (conn_->session(), sock_, buffer_, rwtimer_,
                          conn_->sfd(), conn_->peername(), true));
     }
 }

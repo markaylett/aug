@@ -237,23 +237,23 @@ initpy_(void)
 static void
 stop_(void)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     assert(import);
     destroyimport_(import);
 }
 
 static int
-start_(struct augrt_serv* serv)
+start_(struct augrt_session* session)
 {
     struct import_* import;
-    if (!(import = createimport_(serv->name_)))
+    if (!(import = createimport_(session->name_)))
         return -1;
 
-    serv->user_ = import;
+    session->user_ = import;
 
     if (import->start_) {
 
-        PyObject* x = PyObject_CallFunction(import->start_, "s", serv->name_);
+        PyObject* x = PyObject_CallFunction(import->start_, "s", session->name_);
         if (!x) {
             printerr_();
             destroyimport_(import);
@@ -269,7 +269,7 @@ start_(struct augrt_serv* serv)
 static void
 reconf_(void)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     assert(import);
 
     if (import->reconf_) {
@@ -285,7 +285,7 @@ reconf_(void)
 static void
 event_(const char* from, const char* type, const void* user, size_t size)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     assert(import);
 
     if (import->event_) {
@@ -311,7 +311,7 @@ event_(const char* from, const char* type, const void* user, size_t size)
 static void
 closed_(const struct augrt_object* sock)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     PyObject* x = sock->user_;
     assert(import);
     assert(x);
@@ -331,7 +331,7 @@ closed_(const struct augrt_object* sock)
 static void
 teardown_(const struct augrt_object* sock)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -352,7 +352,7 @@ teardown_(const struct augrt_object* sock)
 static int
 accepted_(struct augrt_object* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     PyObject* x, * y;
     int ret = 0;
     assert(import);
@@ -407,7 +407,7 @@ accepted_(struct augrt_object* sock, const char* addr, unsigned short port)
 static void
 connected_(struct augrt_object* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -429,7 +429,7 @@ connected_(struct augrt_object* sock, const char* addr, unsigned short port)
 static void
 data_(const struct augrt_object* sock, const void* buf, size_t len)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -451,7 +451,7 @@ data_(const struct augrt_object* sock, const void* buf, size_t len)
 static void
 rdexpire_(const struct augrt_object* sock, unsigned* ms)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -478,7 +478,7 @@ rdexpire_(const struct augrt_object* sock, unsigned* ms)
 static void
 wrexpire_(const struct augrt_object* sock, unsigned* ms)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -505,7 +505,7 @@ wrexpire_(const struct augrt_object* sock, unsigned* ms)
 static void
 expire_(const struct augrt_object* timer, unsigned* ms)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     assert(import);
     assert(timer->user_);
 
@@ -534,7 +534,7 @@ static int
 authcert_(const struct augrt_object* sock, const char* subject,
           const char* issuer)
 {
-    struct import_* import = augrt_getserv()->user_;
+    struct import_* import = augrt_getsession()->user_;
     int ret = 0;
     assert(import);
     assert(sock->user_);

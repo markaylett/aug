@@ -161,17 +161,17 @@ getenv_(PyObject* self, PyObject* args)
 }
 
 static PyObject*
-getserv_(PyObject* self, PyObject* args)
+getsession_(PyObject* self, PyObject* args)
 {
-    const struct augrt_serv* serv;
+    const struct augrt_session* session;
 
-    if (!PyArg_ParseTuple(args, ":getserv"))
+    if (!PyArg_ParseTuple(args, ":getsession"))
         return NULL;
 
-    if (!(serv = augrt_getserv()))
+    if (!(session = augrt_getsession()))
         return incret_(Py_None);
 
-    return Py_BuildValue("s", serv->name_);
+    return Py_BuildValue("s", session->name_);
 }
 
 static PyObject*
@@ -449,7 +449,7 @@ static PyMethodDef methods_[] = {
         "TODO"
     },
     {
-        "getserv", getserv_, METH_VARARGS,
+        "getsession", getsession_, METH_VARARGS,
         "TODO"
     },
     {

@@ -5,7 +5,7 @@ pairs = {}
 
 def start(sname):
     log.info("binding proxy listener")
-    tcplisten("0.0.0.0", getenv("service.pyproxy.serv"), None)
+    tcplisten("0.0.0.0", getenv("session.pyproxy.serv"), None)
 
 def closed(sock):
     global pairs
@@ -20,7 +20,7 @@ def accepted(sock, addr, port):
     global pairs
     log.info("opening proxy pair")
     # connected() will always be called after tcpconnect() returns.
-    to = tcpconnect("localhost", getenv("service.pyproxy.to"), None)
+    to = tcpconnect("localhost", getenv("session.pyproxy.to"), None)
     pairs[sock] = to
     pairs[to] = sock
 

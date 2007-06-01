@@ -4,7 +4,7 @@
 #ifndef AUGRTPP_SOCKS_HPP
 #define AUGRTPP_SOCKS_HPP
 
-#include "augrtpp/serv.hpp"
+#include "augrtpp/session.hpp"
 #include "augrtpp/sock.hpp"
 
 #include <map>

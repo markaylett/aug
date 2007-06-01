@@ -119,7 +119,7 @@ enum augrt_loglevel {
 
 typedef int augrt_id;
 
-struct augrt_serv {
+struct augrt_session {
     char name_[AUGRT_MAXNAME + 1];
     void* user_;
 };
@@ -136,7 +136,7 @@ struct augrt_host {
      */
 
     /**
-       Write message to the application server's log.
+       Write message to the runtime log.
 
        \param level The log level.
        \param format Printf-style specification.
@@ -147,7 +147,7 @@ struct augrt_host {
     void (*writelog_)(int level, const char* format, ...);
 
     /**
-       Write message to the application server's log.
+       Write message to the runtime log.
 
        \param level The log level.
        \param format Printf-style specification.
@@ -177,7 +177,7 @@ struct augrt_host {
     int (*reconfall_)(void);
 
     /**
-       Stop the application server.
+       Stop the host environment.
 
        \sa reconfall_().
     */
@@ -187,7 +187,7 @@ struct augrt_host {
     /**
        Post an event to the event queue.
 
-       \param to Target service name.
+       \param to Target session name.
        \param type Type name associated with "var".
        \param var User data.
        \sa dispatch_()
@@ -201,9 +201,9 @@ struct augrt_host {
     */
 
     /**
-       Dispatch event to peer service.
+       Dispatch event to peer session.
 
-       \param to Target service name.
+       \param to Target session name.
        \param type Type name associated with "user".
        \param user User data.
        \param size Size of user data.
@@ -227,10 +227,10 @@ struct augrt_host {
     const char* (*getenv_)(const char* name, const char* def);
 
     /**
-       Get the active service.
+       Get the active session.
     */
 
-    const struct augrt_serv* (*getserv_)(void);
+    const struct augrt_session* (*getsession_)(void);
 
     /**
        Shutdown the connection.
@@ -247,7 +247,7 @@ struct augrt_host {
        module is notified of connection establishment.
 
        \param host Ip address or host name.
-       \param port Port or service name.
+       \param port Port or session name.
        \param user User data to be associated with the resulting connection.
        \return The connection id.
     */
@@ -371,16 +371,16 @@ struct augrt_host {
 struct augrt_module {
 
     /**
-       Stop service.
+       Stop session.
     */
 
     void (*stop_)(void);
 
     /**
-       Start service.
+       Start session.
     */
 
-    int (*start_)(struct augrt_serv* serv);
+    int (*start_)(struct augrt_session* session);
 
     /**
        Re-configure request.
@@ -499,7 +499,7 @@ augrt_gethost(void);
 #define augrt_post          (augrt_gethost()->post_)
 #define augrt_dispatch      (augrt_gethost()->dispatch_)
 #define augrt_getenv        (augrt_gethost()->getenv_)
-#define augrt_getserv       (augrt_gethost()->getserv_)
+#define augrt_getsession    (augrt_gethost()->getsession_)
 #define augrt_shutdown      (augrt_gethost()->shutdown_)
 #define augrt_tcpconnect    (augrt_gethost()->tcpconnect_)
 #define augrt_tcplisten     (augrt_gethost()->tcplisten_)

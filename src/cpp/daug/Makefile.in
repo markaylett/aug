@@ -57,7 +57,7 @@ am_augrtpp_test_OBJECTS = test.$(OBJEXT)
 augrtpp_test_OBJECTS = $(am_augrtpp_test_OBJECTS)
 augrtpp_test_DEPENDENCIES =
 am_daug_OBJECTS = daug.$(OBJEXT) exception.$(OBJEXT) module.$(OBJEXT) \
-	options.$(OBJEXT) serv.$(OBJEXT) ssl.$(OBJEXT) \
+	options.$(OBJEXT) session.$(OBJEXT) ssl.$(OBJEXT) \
 	utility.$(OBJEXT)
 daug_OBJECTS = $(am_daug_OBJECTS)
 daug_DEPENDENCIES = $(top_builddir)/src/cpp/augrtpp/libaugrtpp.la \
@@ -220,7 +220,7 @@ noinst_HEADERS = \
 	exception.hpp \
 	module.hpp \
 	options.hpp \
-	serv.hpp \
+	session.hpp \
 	ssl.hpp \
 	utility.hpp
 
@@ -229,7 +229,7 @@ daug_SOURCES = \
 	exception.cpp \
 	module.cpp \
 	options.cpp \
-	serv.cpp \
+	session.cpp \
 	ssl.cpp \
 	utility.cpp
 
@@ -331,7 +331,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@

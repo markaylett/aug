@@ -10,7 +10,7 @@ AUG_RCSID("$Id$");
 #include "augrtpp/clntconn.hpp"
 #include "augrtpp/listener.hpp"
 #include "augrtpp/servconn.hpp"
-#include "augrtpp/servs.hpp"
+#include "augrtpp/sessions.hpp"
 #include "augrtpp/socks.hpp"
 #include "augrtpp/ssl.hpp"
 
@@ -49,26 +49,26 @@ namespace {
         }
     };
 
-    struct servtimer {
-        servptr serv_;
+    struct sessiontimer {
+        sessionptr session_;
         aug_var var_;
-        ~servtimer() AUG_NOTHROW
+        ~sessiontimer() AUG_NOTHROW
         {
             try {
                 destroyvar(var_);
             } AUG_PERRINFOCATCH;
         }
         explicit
-        servtimer(const servptr& serv)
-            : serv_(serv)
+        sessiontimer(const sessionptr& session)
+            : session_(session)
         {
             var_.type_ = 0;
             var_.arg_ = 0;
         }
     };
 
-    typedef smartptr<servtimer> servtimerptr;
-    typedef map<augrt_id, servtimerptr> servtimers;
+    typedef smartptr<sessiontimer> sessiontimerptr;
+    typedef map<augrt_id, sessiontimerptr> sessiontimers;
     typedef queue<connptr> pending;
 
     void
@@ -109,13 +109,13 @@ namespace aug {
             timers& timers_;
             enginecb_base& cb_;
             nbfiles nbfiles_;
-            servs servs_;
+            sessions sessions_;
             socks socks_;
             timer grace_;
 
-            // Mapping of timer-ids to services.
+            // Mapping of timer-ids to sessions.
 
-            servtimers servtimers_;
+            sessiontimers sessiontimers_;
 
             // Pending calls to connected().
 
@@ -185,8 +185,8 @@ namespace aug {
                 setnbeventmask(sfd, AUG_FDEVENTRD);
 
                 setsockopts(sfd);
-                connptr cptr(new servconn(sock.serv(), user(sock), timers_,
-                                          sfd, ep));
+                connptr cptr(new servconn(sock.session(), user(sock),
+                                          timers_, sfd, ep));
 
                 scoped_insert si(socks_, cptr);
                 AUG_DEBUG2("initialising connection: id=[%d], fd=[%d]",
@@ -252,7 +252,7 @@ namespace aug {
                 case AUG_EVENTRECONF:
                     AUG_DEBUG2("received AUG_EVENTRECONF");
                     cb_.reconf();
-                    servs_.reconf();
+                    sessions_.reconf();
                     break;
                 case AUG_EVENTSTATUS:
                     AUG_DEBUG2("received AUG_EVENTSTATUS");
@@ -274,14 +274,15 @@ namespace aug {
                         auto_ptr<postevent> ev
                             (static_cast<postevent*>(event.var_.arg_));
 
-                        vector<servptr> servs;
-                        servs_.getbygroup(servs, ev->to_);
+                        vector<sessionptr> sessions;
+                        sessions_.getbygroup(sessions, ev->to_);
 
                         size_t size;
                         const void* user(varbuf(ev->var_, size));
 
-                        vector<servptr>::const_iterator it(servs.begin()),
-                            end(servs.end());
+                        vector<sessionptr>
+                            ::const_iterator it(sessions.begin()),
+                            end(sessions.end());
                         for (; it != end; ++it)
                             (*it)->event(ev->from_.c_str(), ev->type_.c_str(),
                                          user, size);
@@ -315,14 +316,14 @@ namespace aug {
             {
                 AUG_DEBUG2("custom timer expiry");
 
-                servtimers::iterator it(servtimers_.find(id));
-                servtimerptr tptr(it->second);
+                sessiontimers::iterator it(sessiontimers_.find(id));
+                sessiontimerptr tptr(it->second);
                 augrt_object timer = { id, tptr->var_.arg_ };
-                tptr->serv_->expire(timer, ms);
+                tptr->session_->expire(timer, ms);
 
                 if (0 == ms) {
                     AUG_DEBUG2("removing timer: ms has been set to zero");
-                    servtimers_.erase(it);
+                    sessiontimers_.erase(it);
                 }
             }
             void
@@ -355,29 +356,30 @@ engine::clear()
 {
     impl_->socks_.clear();
 
-    // TODO: erase the services in reverse order to which they were added.
+    // TODO: erase the sessions in reverse order to which they were added.
 
-    impl_->servs_.clear();
+    impl_->sessions_.clear();
 }
 
 AUGRTPP_API void
-engine::insert(const string& name, const servptr& serv, const char* groups)
+engine::insert(const string& name, const sessionptr& session,
+               const char* groups)
 {
-    impl_->servs_.insert(name, serv, groups);
+    impl_->sessions_.insert(name, session, groups);
 }
 
 AUGRTPP_API void
 engine::cancelinactive()
 {
-    // Remove any timers allocated to services that could not be opened.
+    // Remove any timers allocated to sessions that could not be opened.
 
-    servtimers::iterator it(impl_->servtimers_.begin()),
-        end(impl_->servtimers_.end());
+    sessiontimers::iterator it(impl_->sessiontimers_.begin()),
+        end(impl_->sessiontimers_.end());
     while (it != end) {
-        if (!it->second->serv_->active()) {
-            aug_warn("cancelling timer associated with inactive service");
+        if (!it->second->session_->active()) {
+            aug_warn("cancelling timer associated with inactive session");
             aug_canceltimer(cptr(impl_->timers_), it->first);
-            impl_->servtimers_.erase(it++);
+            impl_->sessiontimers_.erase(it++);
         } else
             ++it;
     }
@@ -487,10 +489,11 @@ AUGRTPP_API void
 engine::dispatch(const char* sname, const char* to, const char* type,
                  const void* user, size_t size)
 {
-    vector<servptr> servs;
-    impl_->servs_.getbygroup(servs, to);
+    vector<sessionptr> sessions;
+    impl_->sessions_.getbygroup(sessions, to);
 
-    vector<servptr>::const_iterator it(servs.begin()), end(servs.end());
+    vector<sessionptr>::const_iterator it(sessions.begin()),
+        end(sessions.end());
     for (; it != end; ++it)
         (*it)->event(sname, type, user, size);
 }
@@ -510,8 +513,8 @@ AUGRTPP_API augrt_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
                    void* user)
 {
-    servptr serv(impl_->servs_.getbyname(sname));
-    connptr cptr(new clntconn(serv, user, impl_->timers_, host, port));
+    sessionptr session(impl_->sessions_.getbyname(sname));
+    connptr cptr(new clntconn(session, user, impl_->timers_, host, port));
 
     // Remove on exception.
 
@@ -566,8 +569,8 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
 
     // Prepare state.
 
-    servptr serv(impl_->servs_.getbyname(sname));
-    listenerptr lptr(new listener(serv, user, sfd));
+    sessionptr session(impl_->sessions_.getbyname(sname));
+    listenerptr lptr(new listener(session, user, sfd));
     scoped_insert si(impl_->socks_, lptr);
 
     si.commit();
@@ -636,8 +639,8 @@ engine::settimer(const char* sname, unsigned ms, const aug_var* var)
     aug::settimer(impl_->timers_, id, ms, timermemcb<detail::engineimpl,
                   &detail::engineimpl::timercb>, local);
 
-    servtimerptr tptr(new servtimer(impl_->servs_.getbyname(sname)));
-    impl_->servtimers_[id] = tptr;
+    sessiontimerptr tptr(new sessiontimer(impl_->sessions_.getbyname(sname)));
+    impl_->sessiontimers_[id] = tptr;
 
     // Timer takes ownership of var when settimer cannot fail.
 
@@ -661,7 +664,7 @@ engine::canceltimer(augrt_id tid)
     // return false for the timer being expired.
 
     if (ret)
-        impl_->servtimers_.erase(tid);
+        impl_->sessiontimers_.erase(tid);
     return ret;
 }
 

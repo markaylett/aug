@@ -4,7 +4,7 @@
 #ifndef AUGRTPP_OBJECT_HPP
 #define AUGRTPP_OBJECT_HPP
 
-#include "augrtpp/serv.hpp"
+#include "augrtpp/session.hpp"
 
 #include "augrt.h"
 
@@ -21,8 +21,8 @@ namespace aug {
         virtual const augrt_object&
         do_get() const = 0;
 
-        virtual const servptr&
-        do_serv() const = 0;
+        virtual const sessionptr&
+        do_session() const = 0;
 
     public:
         virtual
@@ -38,10 +38,10 @@ namespace aug {
         {
             return do_get();
         }
-        const servptr&
-        serv() const
+        const sessionptr&
+        session() const
         {
-            return do_serv();
+            return do_session();
         }
         operator augrt_object&()
         {

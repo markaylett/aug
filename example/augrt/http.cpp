@@ -38,7 +38,7 @@ namespace {
     void
     loadcss()
     {
-        const char* css(augrt::getenv("service.http.css"));
+        const char* css(augrt::getenv("session.http.css"));
         if (css) {
             aug::chdir(augrt::getenv("rundir"));
             ifstream fs(css);
@@ -75,7 +75,7 @@ namespace {
         mimetypes_["txt"] = "text/plain";
         mimetypes_["xml"] = "text/xml";
 
-        const char* mimetypes(augrt::getenv("service.http.mimetypes"));
+        const char* mimetypes(augrt::getenv("session.http.mimetypes"));
         if (mimetypes) {
             aug::chdir(augrt::getenv("rundir"));
             readconf(mimetypes, confcb<confcb_>, null);
@@ -91,7 +91,7 @@ namespace {
         aug_gettimeofday(&tv, 0);
 
         long rand(aug_rand());
-        const char* salt(augrt::getenv("service.http.salt"));
+        const char* salt(augrt::getenv("session.http.salt"));
 
         aug_md5context md5ctx;
         unsigned char digest[16];
@@ -231,7 +231,7 @@ namespace {
     bool
     getpass(const string& user, const string& realm, string& digest)
     {
-        const char* passwd(augrt::getenv("service.http.passwd"));
+        const char* passwd(augrt::getenv("session.http.passwd"));
         if (!passwd)
             return false;
 
@@ -647,7 +647,7 @@ namespace {
                     fs.push_back(make_pair("WWW-Authenticate", ss.str()));
                     sendstatus(id_, sessid_, 401, "Unauthorized", fs);
 
-                } else if (!nodes.empty() && nodes[0] == "service") {
+                } else if (!nodes.empty() && nodes[0] == "session") {
 
                     nodes[0] = "http";
                     string type(jointype(nodes));
@@ -700,14 +700,14 @@ namespace {
         }
     };
 
-    struct httpserv : basic_serv {
+    struct httpsession : basic_session {
         string realm_;
         bool
         do_start(const char* sname)
         {
             aug_info("starting...");
-            const char* serv(augrt::getenv("service.http.serv"));
-            const char* realm(augrt::getenv("service.http.realm"));
+            const char* serv(augrt::getenv("session.http.serv"));
+            const char* realm(augrt::getenv("session.http.realm"));
             if (!serv || !realm)
                 return false;
 
@@ -767,17 +767,17 @@ namespace {
             aug_info("no data received for 30 seconds");
             shutdown(sock);
         }
-        ~httpserv() AUG_NOTHROW
+        ~httpsession() AUG_NOTHROW
         {
         }
-        static serv_base*
+        static session_base*
         create(const char* sname)
         {
-            return new httpserv();
+            return new httpsession();
         }
     };
 
-    typedef basic_module<basic_factory<httpserv> > module;
+    typedef basic_module<basic_factory<httpsession> > module;
 }
 
 AUGRT_MODULE(module::init, module::term)

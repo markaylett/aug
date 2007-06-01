@@ -64,8 +64,8 @@ libaugrtpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugrtpp_la_OBJECTS = buffer.lo clntconn.lo config.lo conn.lo \
-	engine.lo listener.lo object.lo rwtimer.lo serv.lo servs.lo \
-	servconn.lo ssl.lo sock.lo socks.lo
+	engine.lo listener.lo object.lo rwtimer.lo servconn.lo \
+	session.lo sessions.lo ssl.lo sock.lo socks.lo
 libaugrtpp_la_OBJECTS = $(am_libaugrtpp_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -215,9 +215,9 @@ modinclude_HEADERS = \
 	listener.hpp \
 	object.hpp \
 	rwtimer.hpp \
-	serv.hpp \
-	servs.hpp \
 	servconn.hpp \
+	session.hpp \
+	sessions.hpp \
 	ssl.hpp \
 	sock.hpp \
 	socks.hpp
@@ -232,9 +232,9 @@ libaugrtpp_la_SOURCES = \
 	listener.cpp \
 	object.cpp \
 	rwtimer.cpp \
-	serv.cpp \
-	servs.cpp \
 	servconn.cpp \
+	session.cpp \
+	sessions.cpp \
 	ssl.cpp \
 	sock.cpp \
 	socks.cpp
@@ -327,9 +327,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rwtimer.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servconn.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sessions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Plo@am__quote@

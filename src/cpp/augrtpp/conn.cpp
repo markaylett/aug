@@ -32,10 +32,10 @@ connected::do_get() const
     return sock_;
 }
 
-const servptr&
-connected::do_serv() const
+const sessionptr&
+connected::do_session() const
 {
-    return serv_;
+    return session_;
 }
 
 smartfd
@@ -62,7 +62,7 @@ bool
 connected::do_accepted(const aug_endpoint& ep)
 {
     inetaddr addr(null);
-    return close_ = serv_
+    return close_ = session_
         ->accepted(sock_, inetntop(getinetaddr(ep, addr)).c_str(), port(ep));
 }
 
@@ -70,8 +70,8 @@ void
 connected::do_connected(const aug_endpoint& ep)
 {
     inetaddr addr(null);
-    serv_->connected(sock_, inetntop(getinetaddr(ep, addr)).c_str(),
-                     port(ep));
+    session_->connected(sock_, inetntop(getinetaddr(ep, addr)).c_str(),
+                        port(ep));
 }
 
 bool
@@ -100,7 +100,7 @@ connected::do_process(unsigned short events)
 
         // Notify module of new data.
 
-        serv_->data(sock_, buf, size);
+        session_->data(sock_, buf, size);
     }
 
     if (events & AUG_FDEVENTWR) {
@@ -147,14 +147,14 @@ connected::do_teardown()
 {
     if (state_ < TEARDOWN) {
         state_ = TEARDOWN;
-        serv_->teardown(sock_);
+        session_->teardown(sock_);
     }
 }
 
 bool
 connected::do_authcert(const char* subject, const char* issuer)
 {
-    return serv_->authcert(sock_, subject, issuer);
+    return session_->authcert(sock_, subject, issuer);
 }
 
 const endpoint&
@@ -173,14 +173,14 @@ connected::~connected() AUG_NOTHROW
 {
     try {
         if (close_)
-            serv_->closed(sock_);
+            session_->closed(sock_);
     } AUG_PERRINFOCATCH;
 }
 
-connected::connected(const servptr& serv, augrt_object& sock, buffer& buffer,
-                     rwtimer& rwtimer, const smartfd& sfd,
+connected::connected(const sessionptr& session, augrt_object& sock,
+                     buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
                      const endpoint& ep, bool close)
-    : serv_(serv),
+    : session_(session),
       sock_(sock),
       buffer_(buffer),
       rwtimer_(rwtimer),
@@ -203,10 +203,10 @@ handshake::do_get() const
     return sock_;
 }
 
-const servptr&
-handshake::do_serv() const
+const sessionptr&
+handshake::do_session() const
 {
-    return serv_;
+    return session_;
 }
 
 smartfd
@@ -301,13 +301,13 @@ handshake::~handshake() AUG_NOTHROW
 {
     try {
         if (CLOSED == state_)
-            serv_->closed(sock_);
+            session_->closed(sock_);
     } AUG_PERRINFOCATCH;
 }
 
-handshake::handshake(const servptr& serv, augrt_object& sock, buffer& buffer,
-                     const char* host, const char* port)
-    : serv_(serv),
+handshake::handshake(const sessionptr& session, augrt_object& sock,
+                     buffer& buffer, const char* host, const char* port)
+    : session_(session),
       sock_(sock),
       buffer_(buffer),
       connector_(host, port),

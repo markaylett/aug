@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGRTPP_BUILD
-#include "augrtpp/servs.hpp"
+#include "augrtpp/sessions.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -12,50 +12,51 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-servs::~servs() AUG_NOTHROW
+sessions::~sessions() AUG_NOTHROW
 {
 }
 
 void
-servs::clear()
+sessions::clear()
 {
     tmpgroups_.clear();
     groups_.clear();
 
-    // TODO: erase the services in reverse order to which they were added.
+    // TODO: erase the sessions in reverse order to which they were added.
 
-    servs_.clear();
+    sessions_.clear();
 }
 
 void
-servs::insert(const string& name, const servptr& serv, const char* groups)
+sessions::insert(const string& name, const sessionptr& session,
+                 const char* groups)
 {
-    // The service's start() function may callback into the host.  All state
+    // The session's start() function may callback into the host.  All state
     // will, therefore, need to be configured prior to calling start().  If
     // start() fails then the state changes will need to be rolled-back.  The
     // tmpgroups_ container is used to store the groups that need to be
     // removed on failure.
 
-    // The implementation is simplified by adding the service name as a group.
+    // The implementation is simplified by adding the session name as a group.
 
-    tmpgroups_.insert(make_pair(name, serv));
+    tmpgroups_.insert(make_pair(name, session));
 
     if (groups) {
 
         istringstream is(groups);
         string name;
         while (is >> name)
-            tmpgroups_.insert(make_pair(name, serv));
+            tmpgroups_.insert(make_pair(name, session));
     }
 
     // Insert prior to calling open().
 
-    servs_[name] = serv;
-    if (!serv->start()) {
+    sessions_[name] = session;
+    if (!session->start()) {
 
         // TODO: leave if event posted.
 
-        servs_.erase(name); // close() will not be called.
+        sessions_.erase(name); // close() will not be called.
 
     } else
         groups_.insert(tmpgroups_.begin(), tmpgroups_.end());
@@ -64,38 +65,38 @@ servs::insert(const string& name, const servptr& serv, const char* groups)
 }
 
 void
-servs::reconf() const
+sessions::reconf() const
 {
-    map<string, servptr>::const_iterator it(servs_.begin()),
-        end(servs_.end());
+    map<string, sessionptr>::const_iterator it(sessions_.begin()),
+        end(sessions_.end());
     for (; it != end; ++it)
         it->second->reconf();
 }
 
-servptr
-servs::getbyname(const string& name) const
+sessionptr
+sessions::getbyname(const string& name) const
 {
-    map<string, servptr>::const_iterator it(servs_.find(name));
-    if (it == servs_.end())
+    map<string, sessionptr>::const_iterator it(sessions_.find(name));
+    if (it == sessions_.end())
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          AUG_MSG("service not found: sname=[%s]"),
+                          AUG_MSG("session not found: sname=[%s]"),
                           name.c_str());
     return it->second;
 }
 
 void
-servs::getbygroup(vector<servptr>& servs, const string& group) const
+sessions::getbygroup(vector<sessionptr>& sessions, const string& group) const
 {
     pair<groups::const_iterator,
         groups::const_iterator> its(groups_.equal_range(group));
 
     for (; its.first != its.second; ++its.first)
-        servs.push_back(its.first->second);
+        sessions.push_back(its.first->second);
 
     // Include any groups in the temporary container.
 
     its = tmpgroups_.equal_range(group);
 
     for (; its.first != its.second; ++its.first)
-        servs.push_back(its.first->second);
+        sessions.push_back(its.first->second);
 }

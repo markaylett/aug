@@ -25,12 +25,12 @@ namespace {
         }
     };
 
-    struct echoserv : basic_serv {
+    struct echosession : basic_session {
         bool
         do_start(const char* sname)
         {
             writelog(AUGRT_LOGINFO, "starting...");
-            const char* serv = augrt::getenv("service.echo.serv");
+            const char* serv = augrt::getenv("session.echo.serv");
             if (!serv)
                 return false;
 
@@ -72,14 +72,14 @@ namespace {
             augrt_writelog(AUGRT_LOGINFO, "checking subject...");
             return true;
         }
-        static serv_base*
+        static session_base*
         create(const char* sname)
         {
-            return new echoserv();
+            return new echosession();
         }
     };
 
-    typedef basic_module<basic_factory<echoserv> > module;
+    typedef basic_module<basic_factory<echosession> > module;
 }
 
 AUGRT_MODULE(module::init, module::term)

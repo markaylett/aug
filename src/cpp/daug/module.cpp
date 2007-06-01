@@ -51,10 +51,10 @@ module::stop() const AUG_NOTHROW
 }
 
 bool
-module::start(augrt_serv& serv) const AUG_NOTHROW
+module::start(augrt_session& session) const AUG_NOTHROW
 {
-    AUG_DEBUG2("start(): sname=[%s]", serv.name_);
-    return AUGRT_OK == module_.start_(&serv);
+    AUG_DEBUG2("start(): sname=[%s]", session.name_);
+    return AUGRT_OK == module_.start_(&session);
 }
 
 void

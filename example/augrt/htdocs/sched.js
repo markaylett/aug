@@ -144,7 +144,7 @@ function Events(div, log) {
     };
 
     var request = function(offset, max) {
-        getXml(parseXml, 'service/sched/events?'
+        getXml(parseXml, 'session/sched/events?'
                + encodePairs([new Pair('offset', offset),
                               new Pair('max', max)]));
     };
@@ -157,13 +157,13 @@ function Events(div, log) {
     this.delEvent = function(id) {
         log.add('info', 'del event: ' + id);
         pager_.setNearId(id);
-        getXml(parseXml, 'service/sched/delevent?'
+        getXml(parseXml, 'session/sched/delevent?'
                + pager_.encodePairs([new Pair('id', id)]));
     };
 
     this.putEvent = function() {
         log.add('info', 'put event');
-        getXml(parseXml, 'service/sched/putevent?'
+        getXml(parseXml, 'session/sched/putevent?'
                + pager_.encodePairs([new Pair('id', pager_.getCurrentId()),
                                      getPairById('name'),
                                      getPairById('spec'),
@@ -197,5 +197,5 @@ function init() {
 
 function reconf() {
     log.add('info', 'reconf');
-    getXml(log.addXml, 'service/reconf');
+    getXml(log.addXml, 'session/reconf');
 }

@@ -1,25 +1,25 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef DAUG_SERV_HPP
-#define DAUG_SERV_HPP
+#ifndef DAUG_SESSION_HPP
+#define DAUG_SESSION_HPP
 
 #include "daug/module.hpp"
 
-#include "augrtpp/serv.hpp"
+#include "augrtpp/session.hpp"
 
 namespace augrt {
 
-    class serv : public aug::serv_base {
+    class session : public aug::session_base {
 
         moduleptr module_;
-        augrt_serv serv_;
+        augrt_session session_;
         bool active_;
 
-        augrt_serv&
+        augrt_session&
         do_get() AUG_NOTHROW;
 
-        const augrt_serv&
+        const augrt_session&
         do_get() const AUG_NOTHROW;
 
         bool
@@ -67,13 +67,13 @@ namespace augrt {
                     const char* issuer) const AUG_NOTHROW;
 
     public:
-        ~serv() AUG_NOTHROW;
+        ~session() AUG_NOTHROW;
 
-        serv(const moduleptr& module, const char* name);
+        session(const moduleptr& module, const char* name);
     };
 
-    const augrt_serv*
-    getserv();
+    const augrt_session*
+    getsession();
 }
 
-#endif // DAUG_SERV_HPP
+#endif // DAUG_SESSION_HPP

@@ -10,9 +10,9 @@ modinclude_HEADERS = \
 	listener.hpp \
 	object.hpp \
 	rwtimer.hpp \
-	serv.hpp \
-	servs.hpp \
 	servconn.hpp \
+	session.hpp \
+	sessions.hpp \
 	ssl.hpp \
 	sock.hpp \
 	socks.hpp
@@ -28,9 +28,9 @@ libaugrtpp_la_SOURCES = \
 	listener.cpp \
 	object.cpp \
 	rwtimer.cpp \
-	serv.cpp \
-	servs.cpp \
 	servconn.cpp \
+	session.cpp \
+	sessions.cpp \
 	ssl.cpp \
 	sock.cpp \
 	socks.cpp

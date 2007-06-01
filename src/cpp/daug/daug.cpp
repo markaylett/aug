@@ -16,7 +16,7 @@ AUG_RCSID("$Id$");
 #include "daug/exception.hpp"
 #include "daug/module.hpp"
 #include "daug/options.hpp"
-#include "daug/serv.hpp"
+#include "daug/session.hpp"
 #include "daug/ssl.hpp"
 #include "daug/utility.hpp"
 
@@ -244,7 +244,7 @@ namespace {
     int
     post_(const char* to, const char* type, const augrt_var* var)
     {
-        const char* sname = getserv()->name_;
+        const char* sname = getsession()->name_;
         AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s]", sname, to, type);
         try {
             state_->engine_.post(sname, to, type, var);
@@ -257,7 +257,7 @@ namespace {
     int
     dispatch_(const char* to, const char* type, const void* user, size_t size)
     {
-        const char* sname = getserv()->name_;
+        const char* sname = getsession()->name_;
         AUG_DEBUG2("dispatch(): sname=[%s], to=[%s], type=[%s]",
                    sname, to, type);
         try {
@@ -291,11 +291,11 @@ namespace {
         return 0;
     }
 
-    const augrt_serv*
-    getserv_()
+    const augrt_session*
+    getsession_()
     {
         try {
-            return getserv();
+            return getsession();
         } AUG_SETERRINFOCATCH;
         return 0;
     }
@@ -315,7 +315,7 @@ namespace {
     int
     tcpconnect_(const char* host, const char* port, void* user)
     {
-        const char* sname = getserv()->name_;
+        const char* sname = getsession()->name_;
         AUG_DEBUG2("tcpconnect(): sname=[%s], host=[%s], port=[%s]",
                    sname, host, port);
         try {
@@ -328,7 +328,7 @@ namespace {
     int
     tcplisten_(const char* host, const char* port, void* user)
     {
-        const char* sname = getserv()->name_;
+        const char* sname = getsession()->name_;
         AUG_DEBUG2("tcplisten(): sname=[%s], host=[%s], port=[%s]",
                    sname, host, port);
         try {
@@ -403,7 +403,7 @@ namespace {
     int
     settimer_(unsigned ms, const augrt_var* var)
     {
-        const char* sname = getserv()->name_;
+        const char* sname = getsession()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
             return (int)state_->engine_.settimer(sname, ms, var);
@@ -487,7 +487,7 @@ namespace {
         post_,
         dispatch_,
         getenv_,
-        getserv_,
+        getsession_,
         shutdown_,
         tcpconnect_,
         tcplisten_,
@@ -513,25 +513,25 @@ namespace {
     void
     load_()
     {
-        AUG_DEBUG2("loading services");
+        AUG_DEBUG2("loading sessions");
 
-        // TODO: allow each service to specify a list of services on which it
+        // TODO: allow each session to specify a list of sessions on which it
         // depends.
 
-        // Obtain list of services.
+        // Obtain list of sessions.
 
-        const char* value(options_.get("services", 0));
+        const char* value(options_.get("sessions", 0));
         if (value) {
 
-            // For each service...
+            // For each session...
 
             istringstream is(value);
             string name, value;
             while (is >> name) {
 
-                // Obtain module associated with service.
+                // Obtain module associated with session.
 
-                const string base(string("service.").append(name));
+                const string base(string("session.").append(name));
                 value = options_.get(base + ".module");
 
                 modules::iterator it(state_->modules_.find(value));
@@ -553,26 +553,27 @@ namespace {
                         .insert(make_pair(value, module)).first;
                 }
 
-                aug_info("creating service: name=[%s]", name.c_str());
-                state_->engine_
-                    .insert(name, servptr(new augrt::serv(it->second,
-                                                          name.c_str())),
-                            options_.get(base + ".groups", 0));
+                aug_info("creating session: name=[%s]", name.c_str());
+                state_->engine_.insert
+                    (name, sessionptr(new augrt::session(it->second,
+                                                         name.c_str())),
+                     options_.get(base + ".groups", 0));
             }
 
         } else {
 
-            // No service list: assume reasonable defaults.
+            // No session list: assume reasonable defaults.
 
             aug_info("loading module: name=[%s]", DEFAULT_NAME);
             moduleptr module(new augrt::module(DEFAULT_NAME, DEFAULT_MODULE,
                                                host_, teardown_));
             state_->modules_[DEFAULT_NAME] = module;
 
-            aug_info("creating service: name=[%s]", DEFAULT_NAME);
+            aug_info("creating session: name=[%s]", DEFAULT_NAME);
             state_->engine_
                 .insert(DEFAULT_NAME,
-                        servptr(new augrt::serv(module, DEFAULT_NAME)), 0);
+                        sessionptr(new augrt::session(module, DEFAULT_NAME)),
+                        0);
         }
 
         state_->engine_.cancelinactive();

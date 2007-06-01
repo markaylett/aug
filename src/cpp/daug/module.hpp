@@ -34,7 +34,7 @@ namespace augrt {
         stop() const AUG_NOTHROW;
 
         bool
-        start(augrt_serv& serv) const AUG_NOTHROW;
+        start(augrt_session& session) const AUG_NOTHROW;
 
         void
         reconf() const AUG_NOTHROW;

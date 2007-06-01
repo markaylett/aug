@@ -83,10 +83,10 @@ namespace augrt {
         return augrt_getenv(name, def);
     }
 
-    inline const augrt_serv*
-    getserv()
+    inline const augrt_session*
+    getsession()
     {
-        return augrt_getserv();
+        return augrt_getsession();
     }
 
     inline void
@@ -338,7 +338,7 @@ namespace augrt {
         }
     };
 
-    class serv_base {
+    class session_base {
         virtual bool
         do_start(const char* sname) = 0;
 
@@ -379,7 +379,7 @@ namespace augrt {
 
     public:
         virtual
-        ~serv_base() AUGRT_NOTHROW
+        ~session_base() AUGRT_NOTHROW
         {
         }
         bool
@@ -445,7 +445,7 @@ namespace augrt {
         }
     };
 
-    class basic_serv : public serv_base {
+    class basic_session : public session_base {
         void
         do_reconf()
         {
@@ -498,13 +498,13 @@ namespace augrt {
         }
     public:
         virtual
-        ~basic_serv() AUGRT_NOTHROW
+        ~basic_session() AUGRT_NOTHROW
         {
         }
     };
 
     struct nil {
-        static serv_base*
+        static session_base*
         create(const char* sname)
         {
             return 0;
@@ -513,10 +513,10 @@ namespace augrt {
 
     template <typename headT, typename tailT>
     struct cons {
-        static serv_base*
+        static session_base*
         create(const char* sname)
         {
-            serv_base* p = headT::create(sname);
+            session_base* p = headT::create(sname);
             return p ? p : tailT::create(sname);
         }
     };
@@ -529,10 +529,10 @@ namespace augrt {
             augrt_writelog(AUGRT_LOGINFO, "creating factory: module=[%s]",
                            module);
         }
-        serv_base*
+        session_base*
         create(const char* sname)
         {
-            augrt_writelog(AUGRT_LOGINFO, "creating service: name=[%s]",
+            augrt_writelog(AUGRT_LOGINFO, "creating session: name=[%s]",
                            sname);
             return listT::create(sname);
         }
@@ -541,10 +541,10 @@ namespace augrt {
     template <typename T>
     class basic_module {
         static T* factory_;
-        static serv_base*
+        static session_base*
         getbase()
         {
-            return static_cast<serv_base*>(getserv()->user_);
+            return static_cast<session_base*>(getsession()->user_);
         }
         static int
         result(bool x)
@@ -557,11 +557,11 @@ namespace augrt {
             delete getbase();
         }
         static int
-        start(augrt_serv* serv) AUGRT_NOTHROW
+        start(augrt_session* session) AUGRT_NOTHROW
         {
             try {
-                serv->user_ = factory_->create(serv->name_);
-                return result(getbase()->start(serv->name_));
+                session->user_ = factory_->create(session->name_);
+                return result(getbase()->start(session->name_));
             } AUGRT_WRITELOGCATCH;
             return AUGRT_ERROR;
         }

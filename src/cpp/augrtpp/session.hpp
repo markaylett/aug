@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_SERV_HPP
-#define AUGRTPP_SERV_HPP
+#ifndef AUGRTPP_SESSION_HPP
+#define AUGRTPP_SESSION_HPP
 
 #include "augrtpp/config.hpp"
 
@@ -12,15 +12,15 @@
 
 namespace aug {
 
-    class AUGRTPP_API serv_base {
+    class AUGRTPP_API session_base {
     public:
-        typedef augrt_serv ctype;
+        typedef augrt_session ctype;
     private:
 
-        virtual augrt_serv&
+        virtual augrt_session&
         do_get() AUG_NOTHROW = 0;
 
-        virtual const augrt_serv&
+        virtual const augrt_session&
         do_get() const AUG_NOTHROW = 0;
 
         virtual bool
@@ -72,14 +72,14 @@ namespace aug {
 
     public:
         virtual
-        ~serv_base() AUG_NOTHROW;
+        ~session_base() AUG_NOTHROW;
 
-        augrt_serv&
+        augrt_session&
         get() AUG_NOTHROW
         {
             return do_get();
         }
-        const augrt_serv&
+        const augrt_session&
         get() const AUG_NOTHROW
         {
             return do_get();
@@ -154,17 +154,17 @@ namespace aug {
         {
             return do_authcert(sock, subject, issuer);
         }
-        operator augrt_serv&() AUG_NOTHROW
+        operator augrt_session&() AUG_NOTHROW
         {
             return do_get();
         }
-        operator const augrt_serv&() const AUG_NOTHROW
+        operator const augrt_session&() const AUG_NOTHROW
         {
             return do_get();
         }
     };
 
-    typedef smartptr<serv_base> servptr;
+    typedef smartptr<session_base> sessionptr;
 }
 
-#endif // AUGRTPP_SERV_HPP
+#endif // AUGRTPP_SESSION_HPP

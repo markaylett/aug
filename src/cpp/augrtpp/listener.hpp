@@ -12,7 +12,7 @@ namespace aug {
 
     class listener : public sock_base {
 
-        servptr serv_;
+        sessionptr session_;
         augrt_object sock_;
         smartfd sfd_;
 
@@ -22,8 +22,8 @@ namespace aug {
         const augrt_object&
         do_get() const;
 
-        const servptr&
-        do_serv() const;
+        const sessionptr&
+        do_session() const;
 
         smartfd
         do_sfd() const;
@@ -34,7 +34,7 @@ namespace aug {
     public:
         ~listener() AUG_NOTHROW;
 
-        listener(const servptr& serv, void* user, const smartfd& sfd);
+        listener(const sessionptr& session, void* user, const smartfd& sfd);
     };
 
     typedef smartptr<listener> listenerptr;

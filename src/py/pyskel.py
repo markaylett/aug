@@ -10,7 +10,7 @@ import log
 # void post(to, type, user)
 # void dispatch(to, type, user)
 # string getenv(name, def)
-# string getserv()
+# string getsession()
 # void shutdown(sock)
 # int tcpconnect(host, serv, user)
 # int tcplisten(host, serv, user)
@@ -58,7 +58,7 @@ def stop():
 
 def start(sname):
     log.debug("start(): %s" % sname)
-    tcplisten("0.0.0.0", getenv("service.pyskel.serv"), None)
+    tcplisten("0.0.0.0", getenv("session.pyskel.serv"), None)
 
 def reconf():
     log.debug("reconf()")

@@ -70,7 +70,7 @@ namespace {
         }
     };
 
-    struct benchserv : basic_serv {
+    struct benchsession : basic_session {
         void (*send_)(object&);
         unsigned conns_, estab_, echos_;
         size_t bytes_;
@@ -80,7 +80,7 @@ namespace {
         {
             writelog(AUGRT_LOGINFO, "starting...");
 
-            if (atoi(augrt::getenv("service.bench.sendv", "1"))) {
+            if (atoi(augrt::getenv("session.bench.sendv", "1"))) {
                 send_ = dosendv;
                 augrt_writelog(AUGRT_LOGINFO, "sendv: yes");
             } else {
@@ -88,14 +88,14 @@ namespace {
                 augrt_writelog(AUGRT_LOGINFO, "sendv: no");
             }
 
-            const char* serv = augrt::getenv("service.bench.serv");
+            const char* serv = augrt::getenv("session.bench.serv");
             if (!serv)
                 return false;
 
-            const char* host = augrt::getenv("service.bench.host",
+            const char* host = augrt::getenv("session.bench.host",
                                              "localhost");
-            conns_ = atoi(augrt::getenv("service.bench.conns", "100"));
-            echos_ = atoi(augrt::getenv("service.bench.echos", "1000"));
+            conns_ = atoi(augrt::getenv("session.bench.conns", "100"));
+            echos_ = atoi(augrt::getenv("session.bench.echos", "1000"));
 
             augrt_writelog(AUGRT_LOGINFO, "host: %s", host);
             augrt_writelog(AUGRT_LOGINFO, "serv: %s", serv);
@@ -160,20 +160,20 @@ namespace {
             augrt_writelog(AUGRT_LOGINFO, "checking subject...");
             return true;
         }
-        benchserv()
+        benchsession()
             : conns_(0),
               estab_(0),
               bytes_(0)
         {
         }
-        static serv_base*
+        static session_base*
         create(const char* sname)
         {
-            return new benchserv();
+            return new benchsession();
         }
     };
 
-    typedef basic_module<basic_factory<benchserv> > module;
+    typedef basic_module<basic_factory<benchsession> > module;
 }
 
 AUGRT_MODULE(module::init, module::term)

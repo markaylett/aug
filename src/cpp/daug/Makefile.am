@@ -10,7 +10,7 @@ noinst_HEADERS = \
 	exception.hpp \
 	module.hpp \
 	options.hpp \
-	serv.hpp \
+	session.hpp \
 	ssl.hpp \
 	utility.hpp
 
@@ -21,7 +21,7 @@ daug_SOURCES = \
 	exception.cpp \
 	module.cpp \
 	options.cpp \
-	serv.cpp \
+	session.cpp \
 	ssl.cpp \
 	utility.cpp
 

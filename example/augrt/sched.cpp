@@ -74,7 +74,7 @@ namespace {
     pushevent(tmqueue& q, time_t now, const string& name, tmtz tz)
     {
         const char* tmspecs
-            (augrt::getenv(string("service.sched.event.").append(name)
+            (augrt::getenv(string("session.sched.event.").append(name)
                            .append(TMUTC == tz ? ".utc" : ".local")
                            .c_str()));
         if (!tmspecs)
@@ -93,7 +93,7 @@ namespace {
     void
     pushevents(tmqueue& q, time_t now)
     {
-        const char* events(augrt::getenv("service.sched.events"));
+        const char* events(augrt::getenv("session.sched.events"));
         if (!events)
             return;
 
@@ -150,7 +150,7 @@ namespace {
         return os;
     }
 
-    struct schedserv : basic_serv {
+    struct schedsession : basic_session {
         augrt_id timer_;
         tmqueue queue_;
         void
@@ -298,21 +298,21 @@ namespace {
             ms = timerms(queue_, tv);
             aug_info("next expiry in %d ms", ms);
         }
-        ~schedserv() AUGRT_NOTHROW
+        ~schedsession() AUGRT_NOTHROW
         {
         }
-        schedserv()
+        schedsession()
             : timer_(-1)
         {
         }
-        static serv_base*
+        static session_base*
         create(const char* sname)
         {
-            return new schedserv();
+            return new schedsession();
         }
     };
 
-    typedef basic_module<basic_factory<schedserv> > module;
+    typedef basic_module<basic_factory<schedsession> > module;
 }
 
 AUGRT_MODULE(module::init, module::term)

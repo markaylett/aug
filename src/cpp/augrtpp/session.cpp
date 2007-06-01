@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGRTPP_BUILD
-#include "augrtpp/serv.hpp"
+#include "augrtpp/session.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -10,6 +10,6 @@ AUG_RCSID("$Id$");
 using namespace aug;
 
 AUGRTPP_API
-serv_base::~serv_base() AUG_NOTHROW
+session_base::~session_base() AUG_NOTHROW
 {
 }

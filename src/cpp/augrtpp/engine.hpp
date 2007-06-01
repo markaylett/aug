@@ -4,7 +4,7 @@
 #ifndef AUGRTPP_ENGINE_HPP
 #define AUGRTPP_ENGINE_HPP
 
-#include "augrtpp/serv.hpp"
+#include "augrtpp/session.hpp"
 
 #include "augnetpp/nbfile.hpp"
 
@@ -52,7 +52,7 @@ namespace aug {
         clear();
 
         void
-        insert(const std::string& name, const servptr& serv,
+        insert(const std::string& name, const sessionptr& session,
                const char* groups);
 
         void

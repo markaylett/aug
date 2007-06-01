@@ -52,10 +52,10 @@ servconn::do_get() const
     return conn_.get();
 }
 
-const servptr&
-servconn::do_serv() const
+const sessionptr&
+servconn::do_session() const
 {
-    return conn_.serv();
+    return conn_.session();
 }
 
 smartfd
@@ -131,10 +131,10 @@ servconn::~servconn() AUG_NOTHROW
 {
 }
 
-servconn::servconn(const servptr& serv, void* user, timers& timers,
+servconn::servconn(const sessionptr& session, void* user, timers& timers,
                    const smartfd& sfd, const endpoint& ep)
-    : rwtimer_(serv, sock_, timers),
-      conn_(serv, sock_, buffer_, rwtimer_, sfd, ep, false)
+    : rwtimer_(session, sock_, timers),
+      conn_(session, sock_, buffer_, rwtimer_, sfd, ep, false)
 {
     sock_.id_ = aug_nextid();
     sock_.user_ = user;

@@ -16,7 +16,7 @@ stop_(void)
 }
 
 static int
-start_(struct augrt_serv* serv)
+start_(struct augrt_session* session)
 {
     augrt_writelog(AUGRT_LOGINFO, "start_()");
     return 0;

@@ -22,10 +22,10 @@
 @s augrt int
 @s basic_factory int
 @s basic_module int
-@s basic_serv int
-@s echoserv int
+@s basic_session int
+@s echosession int
 @s object int
-@s serv_base int
+@s session_base int
 @s user int
 
 @f line normal
@@ -75,23 +75,23 @@ activity on signal, socket, timer and user-event objects.
 
 @ \AUGRT/ propagates event notifications to Modules.  Modules are dynamically
 loaded into the Application Server at run-time.  Each Module provides one or
-more Services.  Modules and Services are wired together at configuration-time,
+more Sessions.  Modules and Sessions are wired together at configuration-time,
 not compile-time.
 
 \yskip\noindent
 All Module calls are dispatched from the event thread (similar to a UI
-thread).  A Service can either opt for a simple, single-threaded model, or a
+thread).  A Session can either opt for a simple, single-threaded model, or a
 suitable alternative, such as a thread-pool, depending on its requirements.
 
 \yskip\noindent
-The separation of physical Modules and logical Services allows Modules to
-adapt and extend the host environment exposed to Services.  The \.{augpy}
+The separation of physical Modules and logical Sessions allows Modules to
+adapt and extend the host environment exposed to Sessions.  The \.{augpy}
 Module, for example, exposes a \PYTHON/ module which encapsulates the \AUGRT/
-host environment.  This allows Services to be implemented in \PYTHON/.
+host environment.  This allows Sessions to be implemented in \PYTHON/.
 
 \yskip\noindent
-Modules help to promote component, rather than source-level reuse.  Services
-can interact by posting events to one another.  This allows Services to bridge
+Modules help to promote component, rather than source-level reuse.  Sessions
+can interact by posting events to one another.  This allows Sessions to bridge
 language boundaries.
 
 \yskip\noindent
@@ -120,7 +120,7 @@ is:
 @c
 @<include headers@>@;
 namespace {@/
-@<implement echo service@>@;
+@<implement echo session@>@;
 }@/
 @<declare export table@>
 
@@ -134,11 +134,11 @@ the |augrt| and |std| namespaces.
 using namespace augrt;@/
 using namespace std;
 
-@ The Service type, |echoserv| in this case, is fed into class templates which
+@ The Session type, |echosession| in this case, is fed into class templates which
 simplify the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>| delegates the
-task of creating services to a factory object whose type is specified by the
+task of creating sessions to a factory object whose type is specified by the
 template argument.  |basic_factory<>| is used to create a simple factory for
-the |echoserv| Service.
+the |echosession| Session.
 
 \yskip\noindent
 \AUGRT/ Modules are required to export two library functions, namely
@@ -146,18 +146,18 @@ the |echoserv| Service.
 export functions.
 
 @<declare...@>=
-typedef basic_module<basic_factory<echoserv> > sample;@/
+typedef basic_module<basic_factory<echosession> > sample;@/
 AUGRT_MODULE(sample::init, sample::term)
 
-@ \CPLUSPLUS/ Services implement the |serv_base| interface.  Stub
-implementations to most of |serv_base|'s pure virtual functions are provided
-by the |basic_serv| class.  For simplicity, |echoserv| is derived from
-|basic_serv|.  The |echoline| functor handles each line received from the
+@ \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
+implementations to most of |session_base|'s pure virtual functions are provided
+by the |basic_session| class.  For simplicity, |echosession| is derived from
+|basic_session|.  The |echoline| functor handles each line received from the
 client.
 
 @<implement...@>=
 @<echoline functor@>@;
-struct echoserv : basic_serv {@/
+struct echosession : basic_session {@/
   bool
   do_start(const char* sname);
 
@@ -173,26 +173,26 @@ struct echoserv : basic_serv {@/
   void
   do_rdexpire(const object& sock, unsigned& ms);
 
-  static serv_base*
+  static session_base*
   create(const char* sname);
 };@/
 @<member functions@>
 
-@ The |do_start()| function is called to start the Service.  This is where
-Service initialisation is performed.  In this case, a TCP listener is bound to
+@ The |do_start()| function is called to start the Session.  This is where
+Session initialisation is performed.  In this case, a TCP listener is bound to
 a port which is read from the configuration file using the |getenv()|
-function.  If the ``service.echo.serv'' property is missing from the
-configuration file, |false| is returned to prevent the Service from starting.
+function.  If the ``session.echo.serv'' property is missing from the
+configuration file, |false| is returned to prevent the Session from starting.
 
 @<member...@>+=
 bool
-echoserv::do_start(const char* sname)
+echosession::do_start(const char* sname)
 {
-  writelog(AUGRT_LOGINFO, "starting service [%s]", sname);
-  const char* port = augrt::getenv("service.echo.serv");
-  if (!port)
+  writelog(AUGRT_LOGINFO, "starting session [%s]", sname);
+  const char* serv = augrt::getenv("session.echo.serv");
+  if (!serv)
     return false;
-  tcplisten("0.0.0.0", port);
+  tcplisten("0.0.0.0", serv);
   return true;
 }
 
@@ -207,7 +207,7 @@ activity occurs.
 
 @<member...@>+=
 bool
-echoserv::do_accepted(object& sock, const char* addr, unsigned short port)
+echosession::do_accepted(object& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
@@ -220,7 +220,7 @@ object is deleted.
 
 @<member...@>+=
 void
-echoserv::do_closed(const object& sock)
+echosession::do_closed(const object& sock)
 {
   delete sock.user<string>();
 }
@@ -233,7 +233,7 @@ before |tok| is cleared.
 
 @<member...@>+=
 void
-echoserv::do_data(const object& sock, const void* buf, size_t size)
+echosession::do_data(const object& sock, const void* buf, size_t size)
 {
   string& tok(*sock.user<string>());
   tokenise(static_cast<const char*>(buf),
@@ -244,23 +244,23 @@ echoserv::do_data(const object& sock, const void* buf, size_t size)
 data arrives for 15 seconds, the connection is shutdown.  The |shutdown()|
 function sends a FIN packet after ensuring that all buffered data has been
 flushed.  \AUGRT/ ensures that any inflight messages sent by the client are
-still delivered to the Service.
+still delivered to the Session.
 
 @<member...@>+=
 void
-echoserv::do_rdexpire(const object& sock, unsigned& ms)
+echosession::do_rdexpire(const object& sock, unsigned& ms)
 {
   shutdown(sock);
 }
 
-@ The |basic_factory| template requires that Service classes define a static
+@ The |basic_factory| template requires that Session classes define a static
 |create()| function.
 
 @<member...@>+=
-serv_base*
-echoserv::create(const char* sname)
+session_base*
+echosession::create(const char* sname)
 {
-  return 0 == strcmp(sname, "echo") ? new echoserv() : 0;
+  return 0 == strcmp(sname, "echo") ? new echosession() : 0;
 }
 
 @ Each time the |echoline| functor is called, a response is prepared and sent
@@ -325,20 +325,20 @@ Finally, include the template makefile:
 \yskip
 \.{include \$(AUG\_HOME)/etc/aug.mk}
 
-@ To configure the new Module, first add the name of the Service to the
-``services'' property in the \.{daug.conf} file:
+@ To configure the new Module, first add the name of the Session to the
+``sessions'' property in the \.{daug.conf} file:
 
 \yskip
-\.{services = echo}
+\.{sessions = echo}
 
 \yskip\noindent
-Then, specify the Module that provides the Service, along with any additional
-properties required by the Service implementation:
+Then, specify the Module that provides the Session, along with any additional
+properties required by the Session implementation:
 
 \yskip
-\.{service.echo.module = sample}
+\.{session.echo.module = sample}
 
-\.{service.echo.serv = 5000}
+\.{session.echo.serv = 5000}
 
 \yskip\noindent
 Finally, specify the path to the Module.  The file extension defaults to |dll|

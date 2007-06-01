@@ -22,10 +22,10 @@ listener::do_get() const
     return sock_;
 }
 
-const servptr&
-listener::do_serv() const
+const sessionptr&
+listener::do_session() const
 {
-    return serv_;
+    return session_;
 }
 
 smartfd
@@ -43,12 +43,12 @@ listener::do_state() const
 listener::~listener() AUG_NOTHROW
 {
     try {
-        serv_->closed(sock_);
+        session_->closed(sock_);
     } AUG_PERRINFOCATCH;
 }
 
-listener::listener(const servptr& serv, void* user, const smartfd& sfd)
-    : serv_(serv),
+listener::listener(const sessionptr& session, void* user, const smartfd& sfd)
+    : session_(session),
       sfd_(sfd)
 {
     sock_.id_ = aug_nextid();

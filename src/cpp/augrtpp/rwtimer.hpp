@@ -4,7 +4,7 @@
 #ifndef AUGRTPP_RWTIMER_HPP
 #define AUGRTPP_RWTIMER_HPP
 
-#include "augrtpp/serv.hpp"
+#include "augrtpp/session.hpp"
 
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
@@ -63,7 +63,7 @@ namespace aug {
 
     class rwtimer : public rwtimer_base {
 
-        servptr serv_;
+        sessionptr session_;
         const augrt_object& sock_;
         timer rdtimer_;
         timer wrtimer_;
@@ -86,7 +86,7 @@ namespace aug {
     public:
         ~rwtimer() AUG_NOTHROW;
 
-        rwtimer(const servptr& serv, const augrt_object& sock,
+        rwtimer(const sessionptr& session, const augrt_object& sock,
                 timers& timers);
     };
 }

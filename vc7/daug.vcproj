@@ -140,7 +140,7 @@
 				RelativePath="..\src\cpp\daug\options.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\serv.cpp">
+				RelativePath="..\src\cpp\daug\session.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -187,7 +187,7 @@
 				RelativePath="..\src\cpp\daug\options.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\daug\serv.hpp">
+				RelativePath="..\src\cpp\daug\session.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\daug\ssl.hpp">

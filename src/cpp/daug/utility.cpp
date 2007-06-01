@@ -16,7 +16,7 @@ namespace {
     {
     }
     int
-    start(augrt_serv* serv)
+    start(augrt_session* session)
     {
         return 0;
     }

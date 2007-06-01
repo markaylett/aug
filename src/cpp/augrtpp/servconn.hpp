@@ -41,8 +41,8 @@ namespace aug {
         const augrt_object&
         do_get() const;
 
-        const servptr&
-        do_serv() const;
+        const sessionptr&
+        do_session() const;
 
         smartfd
         do_sfd() const;
@@ -80,7 +80,7 @@ namespace aug {
     public:
         ~servconn() AUG_NOTHROW;
 
-        servconn(const servptr& serv, void* user, timers& timers,
+        servconn(const sessionptr& session, void* user, timers& timers,
                  const smartfd& sfd, const endpoint& ep);
     };
 }
