@@ -26,6 +26,9 @@ namespace aug {
         virtual bool
         do_active() const AUG_NOTHROW = 0;
 
+        // Sessions should be active during calls to start().  If start()
+        // fails they should be made inactive.
+
         virtual bool
         do_start() AUG_NOTHROW = 0;
 

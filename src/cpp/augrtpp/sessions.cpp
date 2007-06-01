@@ -33,7 +33,7 @@ sessions::insert(const string& name, const sessionptr& session,
 {
     // The session's start() function may callback into the host.  All state
     // will, therefore, need to be configured prior to calling start().  If
-    // start() fails then the state changes will need to be rolled-back.  The
+    // start() fails then any state changes will need to be rolled-back.  The
     // tmpgroups_ container is used to store the groups that need to be
     // removed on failure.
 
@@ -56,7 +56,7 @@ sessions::insert(const string& name, const sessionptr& session,
 
         // TODO: leave if event posted.
 
-        sessions_.erase(name); // close() will not be called.
+        sessions_.erase(name); // stop() should not be called.
 
     } else
         groups_.insert(tmpgroups_.begin(), tmpgroups_.end());
