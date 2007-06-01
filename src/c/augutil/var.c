@@ -16,7 +16,7 @@ aug_destroyvar(const struct aug_var* v)
         ? v->type_->destroy_(v->arg_) : 0;
 }
 
-AUGUTIL_API void
+AUGUTIL_API struct aug_var*
 aug_setvar(struct aug_var* dst, const struct aug_var* src)
 {
     if (src)
@@ -25,6 +25,7 @@ aug_setvar(struct aug_var* dst, const struct aug_var* src)
         dst->type_ = NULL;
         dst->arg_ = NULL;
     }
+    return dst;
 }
 
 AUGUTIL_API const void*

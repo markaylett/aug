@@ -33,14 +33,40 @@ struct aug_var {
 AUGUTIL_API int
 aug_destroyvar(const struct aug_var* var);
 
-AUGUTIL_API void
+/**
+   Set destination var from source.
+
+   \param Destination var.
+
+   \param Optional source var.  If NULL, both "type_" and "arg_" of "dst" will
+   be set to NULL.
+
+   \return Destination var.
+ */
+
+AUGUTIL_API struct aug_var*
 aug_setvar(struct aug_var* dst, const struct aug_var* src);
+
+/**
+   Translate to buffer using "buf_" function of "type_".
+
+   \return Result of applying function to "arg_", or NULL if no "buf_"
+   function exists.
+ */
 
 AUGUTIL_API const void*
 aug_varbuf(const struct aug_var* var, size_t* size);
 
+/**
+   Pack integer into var.
+ */
+
 AUGUTIL_API void*
 aug_itop(int i);
+
+/**
+   Unpack integer from var.
+*/
 
 AUGUTIL_API int
 aug_ptoi(void* p);

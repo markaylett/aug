@@ -20,19 +20,22 @@ struct aug_fdtype {
 };
 
 /**
-   The aug_init(), aug_term() and aug_atexitinit() functions set errno, and
-   not #aug_errinfo, on failure.  These functions must be called from the main
+   Initialise use of aug libraries.
+
+   On failure, aug_init(), aug_term() and aug_atexitinit() functions set
+   errno, and not #aug_errinfo.  These functions must be called from the main
    (primary) thread of the process.  They maintain an internal reference count
    that allows them to be called multiple times.  All but the first call to
-   aug_init() will simply update the internal reference count.  These
-   semantics have been formalised to facilitate initialisation from functions
-   such as DllMain.
+   aug_init() simply updates the reference count.  These semantics have been
+   formalised to facilitate initialisation from functions such as DllMain.
 */
 
 AUGSYS_API int
 aug_init(struct aug_errinfo* errinfo);
 
 /**
+   Terminate use of aug libraries.
+
    For reasons of safety, aug_term() will re-install the default logger.  The
    default logger is garaunteed to be safe even if aug_init() has not been
    called.  Sets errno, and not errinfo.
@@ -43,6 +46,15 @@ aug_term(void);
 
 AUGSYS_API int
 aug_atexitinit(struct aug_errinfo* errinfo);
+
+/**
+   Exit process.
+
+   Force termination of aug libraries, regardless of reference count, before
+   calling exit().
+
+   \param status The exit status.
+*/
 
 AUGSYS_API void
 aug_exit(int status);
@@ -67,8 +79,10 @@ AUGSYS_API int
 aug_retainfd(int fd);
 
 /**
-   \returns previous file type.
- */
+   Associated new type with file descriptor.
+
+   \return The previous file type.
+*/
 
 AUGSYS_API const struct aug_fdtype*
 aug_setfdtype(int fd, const struct aug_fdtype* fdtype);
@@ -81,6 +95,10 @@ aug_extfdtype(struct aug_fdtype* derived, const struct aug_fdtype* base);
 
 AUGSYS_API const struct aug_fdtype*
 aug_posixfdtype(void);
+
+/**
+   Obtain native file descriptor from posix descriptor.
+*/
 
 #if !defined(_WIN32)
 # define aug_getosfd(x) (x)
