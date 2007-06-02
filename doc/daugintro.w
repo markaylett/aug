@@ -36,15 +36,7 @@
 is available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
 \AUGRT/ takes an unbiased view towards the systems it supports; it does not
 favour one over another, and runs natively on all.  \AUGRT/ includes support
-for:
-
-\yskip
-\item{$\bullet$} \IPV6/;
-\item{$\bullet$} non-blocking IO;
-\item{$\bullet$} \MINGW/ and \MSVC/;
-\item{$\bullet$} plug-in modules;
-\item{$\bullet$} \PYTHON/;
-\item{$\bullet$} \SSL/.
+for \IPV6/ and \SSL/.
 
 \yskip\noindent
 This document is a brief introduction to building and installing Modules for
@@ -54,58 +46,60 @@ the \AUGRT/ Application Server.  For further information, please visit the
 
 @* Event Model.
 
-Threads are best suited to processing, not waiting.  Ideally, they should
-focus on improving CPU utilisation on multi-processor machines.
-
-\yskip\noinden
-Threads are often used in combination with blocking APIs; secondary threads
-allow processing to continue while blocking operations are in progress.
-Unless secondary threads are managed with care, complexity, resource
-contention and the risk of deadlocks will increase.
+Ideally, threads should to used to maximise CPU utilisation on multi-processor
+machines.  Threads are, however, often used in combination with blocking APIs;
+secondary threads allow execution to continue while blocking operations are in
+progress.  Unless these secondary threads are carefully managed, complexity,
+resource contention and the risk of deadlocks may increase.
 
 \yskip\noindent
 Using non-blocking IO, a single thread can be dedicated to the de-multiplexing
 of network events.  This event thread can be kept responsive by delegating
-sizeable units of work to worker threads.  Worker threads can avoid the risk
-of deadlocks by posting event notifications back to the event queue.
+large units of work to processing threads.  In this case, these processing
+threads can reduce the risk of deadlocks by minimising shared state, and
+constraining communicatings with the main thread to the event queue.  This is
+similar, in fact, to a UI event model.
 
 \yskip\noindent
 The \AUGRT/ Application Server implements such an event model to de-multiplex
 activity on signal, socket, timer and user-event objects.
 
-@ \AUGRT/ propagates event notifications to Modules.  Modules are dynamically
-loaded into the Application Server at run-time.  Each Module provides one or
-more Sessions.  Modules and Sessions are wired together at configuration-time,
-not compile-time.
+@ \AUGRT/ delegates event notifications to physical Modules and, in turn,
+Sessions.  Modules are dynamically loaded into the Application Server at
+run-time.  Each Module manages one or more Sessions.  Modules and Sessions are
+wired together at configuration-time, not compile-time.
 
 \yskip\noindent
-All Module calls are dispatched from the event thread (similar to a UI
-thread).  A Session can either opt for a simple, single-threaded model, or a
-suitable alternative, such as a thread-pool, depending on its requirements.
+All Module calls are dispatched from the event thread.  A Session can,
+therefore, either opt to implement a simple, single-threaded model, or a
+suitable alternative, such as a thread-pool, depending on its own
+requirements.  Following the tenets of Open Source, Module implementors are
+free from artificial constraints imposed upon them by the host environment.
 
 \yskip\noindent
 The separation of physical Modules and logical Sessions allows Modules to
-adapt and extend the host environment exposed to Sessions.  The \.{augpy}
-Module, for example, exposes a \PYTHON/ module which encapsulates the \AUGRT/
-host environment.  This allows Sessions to be implemented in \PYTHON/.
+adapt and extend the host environment as viewed by Sessions.  The \.{augpy}
+Module, for example, adapts the host environment to allow Sessions to be
+written in \PYTHON/.  These language bindings are introduced by the Module
+without change to \AUGRT/.
 
 \yskip\noindent
 Modules help to promote component, rather than source-level reuse.  Sessions
-can interact by posting events to one another.  This allows Sessions to bridge
-language boundaries.
+can interact with one-another by posting events to one another.  This allows
+Sessions to bridge language boundaries.
 
 \yskip\noindent
 \AUGRT/ presents a uniform interface to system administrators across all
-platforms.  Although, on \WINDOWS/, D\ae monised \AUGRT/ processes take the
+platforms.  Although, on \WINDOWS/, d\ae monised \AUGRT/ processes take the
 form of NT services, from a sys-admin perspective, the interface remains the
 same.  The following command can still be used to start the service from a
-command window:
+command prompt:
 
 \yskip\noindent
 \.{C:\\> daug -f daug.conf start}
 
 @* Sample Module.
-In the sections below, a Module is constructed in \CPLUSPLUS/ that:
+In the sections below, a Module is constructed, in \CPLUSPLUS/, that:
 
 \yskip
 \item{$\bullet$} exposes a TCP service;
@@ -125,7 +119,7 @@ namespace {@/
 @<declare export table@>
 
 @ The \.{<augrtpp.hpp>} header is provided to aid Module implementations in
-\CPLUSPLUS/.  Modules can also be written in \CEE/.  A \CEE/ implementation
+\CPLUSPLUS/.  Modules can also be written in \CEE/;  \CEE/ implementations
 would use the \.{<augrt.h>} header.  For convenience, names are imported from
 the |augrt| and |std| namespaces.
 
@@ -134,11 +128,11 @@ the |augrt| and |std| namespaces.
 using namespace augrt;@/
 using namespace std;
 
-@ The Session type, |echosession| in this case, is fed into class templates which
-simplify the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>| delegates the
-task of creating sessions to a factory object whose type is specified by the
-template argument.  |basic_factory<>| is used to create a simple factory for
-the |echosession| Session.
+@ The Session type - |echosession| in this case - is fed into class templates
+which simplify the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>|
+delegates the task of creating Sessions to a factory object, whose type is
+specified by the template argument.  |basic_factory<>| is used to create a
+simple factory for the |echosession| Session.
 
 \yskip\noindent
 \AUGRT/ Modules are required to export two library functions, namely
@@ -150,10 +144,10 @@ typedef basic_module<basic_factory<echosession> > sample;@/
 AUGRT_MODULE(sample::init, sample::term)
 
 @ \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
-implementations to most of |session_base|'s pure virtual functions are provided
-by the |basic_session| class.  For simplicity, |echosession| is derived from
-|basic_session|.  The |echoline| functor handles each line received from the
-client.
+implementations for most of |session_base|'s pure virtual functions are
+provided by the |basic_session| class.  For simplicity, |echosession| is
+derived from |basic_session|.  The |echoline| functor handles each line
+received from the client.
 
 @<implement...@>=
 @<echoline functor@>@;
@@ -182,7 +176,7 @@ struct echosession : basic_session {@/
 Session initialisation is performed.  In this case, a TCP listener is bound to
 a port which is read from the configuration file using the |getenv()|
 function.  If the ``session.echo.serv'' property is missing from the
-configuration file, |false| is returned to prevent the Session from starting.
+configuration file, |false| is returned to deactivate the Session.
 
 @<member...@>+=
 bool
@@ -198,7 +192,7 @@ echosession::do_start(const char* sname)
 
 @ The |do_accepted()| function is called when a new client connection is
 accepted.  The |setuser()| function binds an opaque, user-defined value to an
-\AUGRT/ object.  Here, a |string| buffer is assigned to track incomplete line
+\AUGRT/ object.  Here, a |string| buffer is assigned to track partial line
 data received from the client.  An initial, {\sc ``HELLO''} message is sent to
 the client.  The call to |setrwtimer()| establishes a timer that will expire
 when there has been no read activity on the |sock| object for a period of 15
@@ -243,8 +237,9 @@ echosession::do_data(const object& sock, const void* buf, size_t size)
 @ Read-timer expiry is communicated using the |do_rdexpire()| function.  If no
 data arrives for 15 seconds, the connection is shutdown.  The |shutdown()|
 function sends a FIN packet after ensuring that all buffered data has been
-flushed.  \AUGRT/ ensures that any inflight messages sent by the client are
-still delivered to the Session.
+flushed.  \AUGRT/ ensures that any buffered messages are flushed before
+performing the shutdown, and that any inflight messages sent by the client are
+delivered to the Session.
 
 @<member...@>+=
 void
