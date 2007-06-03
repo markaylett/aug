@@ -50,9 +50,9 @@ aug_srand(unsigned seed)
 AUGSYS_API unsigned
 aug_threadid(void)
 {
-#if !defined(_MT)
-    return 0;
-#else /* _MT */
+#if ENABLE_THREADS
     return (unsigned)GetCurrentThreadId();
-#endif /* _MT */
+#else /* !ENABLE_THREADS */
+    return 0;
+#endif /* !ENABLE_THREADS */
 }

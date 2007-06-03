@@ -123,21 +123,21 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
        characters required, excluding the null terminator, or b) a negative
        value, indicating an error. */
 
-#if !defined(_MT)
-    if (0 > (ret = snprintf(buf, size, ".%03d %s ", ms,
-                            aug_loglabel(loglevel)))) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
-                       AUG_MSG("broken format specification"));
-        return -1;
-    }
-#else /* _MT */
+#if ENABLE_THREADS
     if (0 > (ret = snprintf(buf, size, ".%03d %08x %s ", ms, aug_threadid(),
                             aug_loglabel(loglevel)))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("broken format specification"));
         return -1;
     }
-#endif /* _MT */
+#else /* !ENABLE_THREADS */
+    if (0 > (ret = snprintf(buf, size, ".%03d %s ", ms,
+                            aug_loglabel(loglevel)))) {
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
+                       AUG_MSG("broken format specification"));
+        return -1;
+    }
+#endif /* !ENABLE_THREADS */
 
     /* Adjust the return value to be the actual number of characters copied,
        where truncation has occured. */

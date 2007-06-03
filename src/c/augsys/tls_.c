@@ -7,42 +7,10 @@
 
 AUG_RCSID("$Id$");
 
-#if !defined(_MT)
-
-# include <errno.h>
-
-AUG_EXTERNC int
-aug_createtlskey_(aug_tlskey_t* tlskey)
-{
-    errno = ENOSYS;
-    return -1;
-}
-
-AUG_EXTERNC int
-aug_destroytlskey_(aug_tlskey_t tlskey)
-{
-    errno = ENOSYS;
-    return -1;
-}
-
-AUG_EXTERNC int
-aug_gettlsvalue_(aug_tlskey_t tlskey, void** value)
-{
-    errno = ENOSYS;
-    return -1;
-}
-
-AUG_EXTERNC int
-aug_settlsvalue_(aug_tlskey_t tlskey, void* value)
-{
-    errno = ENOSYS;
-    return -1;
-}
-
-#else /* _MT */
+#if ENABLE_THREADS
 # if !defined(_WIN32)
 #  include "augsys/posix/tls.c"
 # else /* _WIN32 */
 #  include "augsys/win32/tls.c"
 # endif /* _WIN32 */
-#endif /* _MT */
+#endif /* ENABLE_THREADS */

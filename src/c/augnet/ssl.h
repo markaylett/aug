@@ -7,15 +7,16 @@
 #include "augnet/config.h"
 
 struct aug_errinfo;
+struct ssl_st;
 
 AUGNET_API void
 aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                   unsigned long err);
 
 AUGNET_API int
-aug_setsslclient(int fd, void* ssl);
+aug_setsslclient(int fd, struct ssl_st* ssl);
 
 AUGNET_API int
-aug_setsslserver(int fd, void* ssl);
+aug_setsslserver(int fd, struct ssl_st* ssl);
 
 #endif /* AUGNET_SSL_H */

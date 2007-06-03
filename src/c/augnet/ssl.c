@@ -759,7 +759,7 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 }
 
 AUGNET_API int
-aug_setsslclient(int fd, void* ssl)
+aug_setsslclient(int fd, struct ssl_st* ssl)
 {
     struct sslext_* x = setsslext_(fd, ssl);
     if (!x)
@@ -774,7 +774,7 @@ aug_setsslclient(int fd, void* ssl)
 }
 
 AUGNET_API int
-aug_setsslserver(int fd, void* ssl)
+aug_setsslserver(int fd, struct ssl_st* ssl)
 {
     struct sslext_* x = setsslext_(fd, ssl);
     if (!x)

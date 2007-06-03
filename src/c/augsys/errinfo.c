@@ -52,37 +52,7 @@ vwritelog_(const char* file, int line, int src, int num, const char* format,
     aug_error("%s: %d: %s", errinfo.file_, (int)errinfo.line_, errinfo.desc_);
 }
 
-#if !defined(_MT)
-
-static struct aug_errinfo* errinfo_ = NULL;
-
-static struct aug_errinfo*
-geterrinfo_(void)
-{
-    return errinfo_ ? errinfo_ : 0;
-}
-
-AUG_EXTERNC int
-aug_initerrinfo_(struct aug_errinfo* errinfo)
-{
-    return aug_initerrinfo(errinfo);
-}
-
-AUG_EXTERNC int
-aug_termerrinfo_(void)
-{
-    return 0;
-}
-
-AUGSYS_API int
-aug_initerrinfo(struct aug_errinfo* errinfo)
-{
-    memset(errinfo, 0, sizeof(*errinfo));
-    errinfo_ = errinfo;
-    return 0;
-}
-
-#else /* _MT */
+#if ENABLE_THREADS
 
 # include "augsys/tls_.h"
 
@@ -147,7 +117,37 @@ aug_initerrinfo(struct aug_errinfo* errinfo)
     return 0;
 }
 
-#endif /* _MT */
+#else /* !ENABLE_THREADS */
+
+static struct aug_errinfo* errinfo_ = NULL;
+
+static struct aug_errinfo*
+geterrinfo_(void)
+{
+    return errinfo_ ? errinfo_ : 0;
+}
+
+AUG_EXTERNC int
+aug_initerrinfo_(struct aug_errinfo* errinfo)
+{
+    return aug_initerrinfo(errinfo);
+}
+
+AUG_EXTERNC int
+aug_termerrinfo_(void)
+{
+    return 0;
+}
+
+AUGSYS_API int
+aug_initerrinfo(struct aug_errinfo* errinfo)
+{
+    memset(errinfo, 0, sizeof(*errinfo));
+    errinfo_ = errinfo;
+    return 0;
+}
+
+#endif /* !ENABLE_THREADS */
 
 AUGSYS_API int
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,

@@ -10,57 +10,7 @@ AUG_RCSID("$Id$");
 #include <errno.h>
 #include <stdlib.h> /* NULL */
 
-#if !defined(_MT)
-
-struct aug_mutex_ { char dummy_; };
-
-AUG_EXTERNC aug_mutex_t
-aug_createmutex_(void)
-{
-	return (aug_mutex_t)~0;
-}
-
-AUG_EXTERNC int
-aug_destroymutex_(aug_mutex_t mutex)
-{
-    return 0;
-}
-
-AUG_EXTERNC int
-aug_lockmutex_(aug_mutex_t mutex)
-{
-	return 0;
-}
-
-AUG_EXTERNC int
-aug_unlockmutex_(aug_mutex_t mutex)
-{
-	return 0;
-}
-
-AUG_EXTERNC int
-aug_initlock_(void)
-{
-    return 0;
-}
-
-AUG_EXTERNC int
-aug_termlock_(void)
-{
-    return 0;
-}
-
-AUGSYS_API void
-aug_lock(void)
-{
-}
-
-AUGSYS_API void
-aug_unlock(void)
-{
-}
-
-#else /* _MT */
+#if ENABLE_THREADS
 
 # if !defined(_WIN32)
 #  include "augsys/posix/lock.c"
@@ -114,4 +64,54 @@ aug_unlock(void)
         abort();
 }
 
-#endif /* _MT */
+#else /* !ENABLE_THREADS */
+
+struct aug_mutex_ { char dummy_; };
+
+AUG_EXTERNC aug_mutex_t
+aug_createmutex_(void)
+{
+	return (aug_mutex_t)~0;
+}
+
+AUG_EXTERNC int
+aug_destroymutex_(aug_mutex_t mutex)
+{
+    return 0;
+}
+
+AUG_EXTERNC int
+aug_lockmutex_(aug_mutex_t mutex)
+{
+	return 0;
+}
+
+AUG_EXTERNC int
+aug_unlockmutex_(aug_mutex_t mutex)
+{
+	return 0;
+}
+
+AUG_EXTERNC int
+aug_initlock_(void)
+{
+    return 0;
+}
+
+AUG_EXTERNC int
+aug_termlock_(void)
+{
+    return 0;
+}
+
+AUGSYS_API void
+aug_lock(void)
+{
+}
+
+AUGSYS_API void
+aug_unlock(void)
+{
+}
+
+#endif /* !ENABLE_THREADS */

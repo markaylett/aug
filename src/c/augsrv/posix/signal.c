@@ -8,9 +8,9 @@
 #include <stdlib.h>  /* NULL */
 #include <strings.h> /* bzero() */
 
-#if defined(_MT)
+#if ENABLE_THREADS
 # include <pthread.h>
-#endif /* _MT */
+#endif /* ENABLE_THREADS */
 
 static const struct {
     int sig_;
@@ -58,17 +58,17 @@ aug_blocksignals(void)
 {
     sigset_t set;
     sigfillset(&set);
-#if !defined(_MT)
-    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
-        return -1;
-    }
-#else /* _MT */
+#if ENABLE_THREADS
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
-#endif /* _MT */
+#else /* !ENABLE_THREADS */
+    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        return -1;
+    }
+#endif /* !ENABLE_THREADS */
     return 0;
 }
 
@@ -77,16 +77,16 @@ aug_unblocksignals(void)
 {
     sigset_t set;
     sigemptyset(&set);
-#if !defined(_MT)
-    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
-        return -1;
-    }
-#else /* _MT */
+#if ENABLE_THREADS
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
-#endif /* _MT */
+#else /* !ENABLE_THREADS */
+    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        return -1;
+    }
+#endif /* !ENABLE_THREADS */
     return 0;
 }

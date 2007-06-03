@@ -7,9 +7,9 @@
 #include <stdlib.h> /* random(), srandom() */
 #include <sys/stat.h>
 
-#if defined(_MT)
+#if ENABLE_THREADS
 # include <pthread.h>
-#endif /* _MT */
+#endif /* ENABLE_THREADS */
 
 AUGSYS_API int
 aug_filesize(int fd, size_t* size)
@@ -39,9 +39,9 @@ aug_srand(unsigned seed)
 AUGSYS_API unsigned
 aug_threadid(void)
 {
-#if !defined(_MT)
-    return 0;
-#else /* _MT */
+#if ENABLE_THREADS
     return (unsigned)pthread_self();
-#endif /* _MT */
+#else /* !ENABLE_THREADS */
+    return 0;
+#endif /* !ENABLE_THREADS */
 }
