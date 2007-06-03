@@ -39,9 +39,13 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/cpp/lang.mk
-noinst_PROGRAMS = heartbeat$(EXEEXT) mcastrecv$(EXEEXT) \
-	mcastsend$(EXEEXT) mplexd$(EXEEXT) tcpclient$(EXEEXT) \
-	timerd$(EXEEXT)
+noinst_PROGRAMS = mplexd$(EXEEXT) tcpclient$(EXEEXT) timerd$(EXEEXT) \
+	$(am__EXEEXT_1)
+@ENABLE_MULTICAST_TRUE@am__append_1 = \
+@ENABLE_MULTICAST_TRUE@	heartbeat \
+@ENABLE_MULTICAST_TRUE@	mcastrecv \
+@ENABLE_MULTICAST_TRUE@	mcastsend
+
 subdir = example/cpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -50,21 +54,26 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/auglocal.h
 CONFIG_CLEAN_FILES =
+@ENABLE_MULTICAST_TRUE@am__EXEEXT_1 = heartbeat$(EXEEXT) \
+@ENABLE_MULTICAST_TRUE@	mcastrecv$(EXEEXT) mcastsend$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
-am_heartbeat_OBJECTS = heartbeat.$(OBJEXT)
+am__heartbeat_SOURCES_DIST = heartbeat.cpp
+@ENABLE_MULTICAST_TRUE@am_heartbeat_OBJECTS = heartbeat.$(OBJEXT)
 heartbeat_OBJECTS = $(am_heartbeat_OBJECTS)
 am__DEPENDENCIES_1 = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-heartbeat_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_mcastrecv_OBJECTS = mcastrecv.$(OBJEXT)
+@ENABLE_MULTICAST_TRUE@heartbeat_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__mcastrecv_SOURCES_DIST = mcastrecv.cpp
+@ENABLE_MULTICAST_TRUE@am_mcastrecv_OBJECTS = mcastrecv.$(OBJEXT)
 mcastrecv_OBJECTS = $(am_mcastrecv_OBJECTS)
-mcastrecv_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_mcastsend_OBJECTS = mcastsend.$(OBJEXT)
+@ENABLE_MULTICAST_TRUE@mcastrecv_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__mcastsend_SOURCES_DIST = mcastsend.cpp
+@ENABLE_MULTICAST_TRUE@am_mcastsend_OBJECTS = mcastsend.$(OBJEXT)
 mcastsend_OBJECTS = $(am_mcastsend_OBJECTS)
-mcastsend_DEPENDENCIES = $(am__DEPENDENCIES_1)
+@ENABLE_MULTICAST_TRUE@mcastsend_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_mplexd_OBJECTS = mplexd.$(OBJEXT)
 mplexd_OBJECTS = $(am_mplexd_OBJECTS)
 mplexd_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -87,9 +96,9 @@ CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
 	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(tcpclient_SOURCES) \
 	$(timerd_SOURCES)
-DIST_SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
-	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(tcpclient_SOURCES) \
-	$(timerd_SOURCES)
+DIST_SOURCES = $(am__heartbeat_SOURCES_DIST) \
+	$(am__mcastrecv_SOURCES_DIST) $(am__mcastsend_SOURCES_DIST) \
+	$(mplexd_SOURCES) $(tcpclient_SOURCES) $(timerd_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -122,10 +131,14 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_MULTICAST_FALSE = @ENABLE_MULTICAST_FALSE@
+ENABLE_MULTICAST_TRUE = @ENABLE_MULTICAST_TRUE@
 ENABLE_PYTHON_FALSE = @ENABLE_PYTHON_FALSE@
 ENABLE_PYTHON_TRUE = @ENABLE_PYTHON_TRUE@
 ENABLE_RUBY_FALSE = @ENABLE_RUBY_FALSE@
 ENABLE_RUBY_TRUE = @ENABLE_RUBY_TRUE@
+ENABLE_SSL_FALSE = @ENABLE_SSL_FALSE@
+ENABLE_SSL_TRUE = @ENABLE_SSL_TRUE@
 ENABLE_THREADS_FALSE = @ENABLE_THREADS_FALSE@
 ENABLE_THREADS_TRUE = @ENABLE_THREADS_TRUE@
 EXEEXT = @EXEEXT@
@@ -221,18 +234,6 @@ AUGLIBS = \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-heartbeat_SOURCES = \
-	heartbeat.cpp
-
-heartbeat_LDADD = $(AUGLIBS)
-mcastrecv_SOURCES = \
-	mcastrecv.cpp
-
-mcastrecv_LDADD = $(AUGLIBS)
-mcastsend_SOURCES = \
-	mcastsend.cpp
-
-mcastsend_LDADD = $(AUGLIBS)
 mplexd_SOURCES = \
 	mplexd.cpp
 
@@ -245,6 +246,18 @@ timerd_SOURCES = \
 	timerd.cpp
 
 timerd_LDADD = $(AUGLIBS)
+@ENABLE_MULTICAST_TRUE@heartbeat_SOURCES = \
+@ENABLE_MULTICAST_TRUE@	heartbeat.cpp
+
+@ENABLE_MULTICAST_TRUE@heartbeat_LDADD = $(AUGLIBS)
+@ENABLE_MULTICAST_TRUE@mcastrecv_SOURCES = \
+@ENABLE_MULTICAST_TRUE@	mcastrecv.cpp
+
+@ENABLE_MULTICAST_TRUE@mcastrecv_LDADD = $(AUGLIBS)
+@ENABLE_MULTICAST_TRUE@mcastsend_SOURCES = \
+@ENABLE_MULTICAST_TRUE@	mcastsend.cpp
+
+@ENABLE_MULTICAST_TRUE@mcastsend_LDADD = $(AUGLIBS)
 all: all-am
 
 .SUFFIXES:

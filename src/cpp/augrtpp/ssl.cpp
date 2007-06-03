@@ -7,11 +7,12 @@
 
 AUG_RCSID("$Id$");
 
-#if HAVE_OPENSSL_SSL_H
+#if ENABLE_SSL
 
 # include "augrtpp/conn.hpp"
 
 # include <openssl/err.h>
+# include <openssl/ssl.h>
 
 using namespace aug;
 
@@ -60,4 +61,4 @@ aug::setsslserver(conn_base& conn, sslctx& ctx)
     aug_setsslserver(conn.sfd().get(), ssl);
 }
 
-#endif // HAVE_OPENSSL_SSL_H
+#endif // ENABLE_SSL

@@ -4,16 +4,12 @@
 #ifndef AUGRTPP_SSL_HPP
 #define AUGRTPP_SSL_HPP
 
-#include "augconfig.h"
+#include "augrtpp/config.hpp"
+#include "augsyspp/exception.hpp"
+#include "augsyspp/smartptr.hpp"
+#include "augnet/ssl.h"
 
-#if HAVE_OPENSSL_SSL_H
-
-# include "augrtpp/config.hpp"
-# include "augsyspp/exception.hpp"
-# include "augsyspp/smartptr.hpp"
-# include "augnet/ssl.h"
-
-# include <openssl/ssl.h>
+struct ssl_ctx_st;
 
 namespace aug {
 
@@ -32,7 +28,7 @@ namespace aug {
 
     class AUGRTPP_API sslctx {
 
-        SSL_CTX* const ctx_;
+        ssl_ctx_st* const ctx_;
 
         sslctx(const sslctx&);
 
@@ -44,11 +40,11 @@ namespace aug {
 
         sslctx();
 
-        operator SSL_CTX*()
+        operator ssl_ctx_st*()
         {
             return ctx_;
         }
-        SSL_CTX*
+        ssl_ctx_st*
         get()
         {
             return ctx_;
@@ -66,6 +62,5 @@ namespace aug {
     AUGRTPP_API void
     setsslserver(conn_base& conn, sslctx& ctx);
 }
-#endif // HAVE_OPENSSL_SSL_H
 
 #endif // AUGRTPP_SSL_HPP

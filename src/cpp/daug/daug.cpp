@@ -161,9 +161,9 @@ namespace {
     struct state {
 
         modules modules_;
-#if HAVE_OPENSSL_SSL_H
+#if ENABLE_SSL
         sslctxs sslctxs_;
-#endif // HAVE_OPENSSL_SSL_H
+#endif // ENABLE_SSL
         timers timers_;
         engine engine_;
 
@@ -171,10 +171,10 @@ namespace {
         state(const string& pass64)
             : engine_(aug_eventrd(), aug_eventwr(), timers_, enginecb_)
         {
-#if HAVE_OPENSSL_SSL_H
+#if ENABLE_SSL
             initssl();
             createsslctxs(sslctxs_, options_, pass64);
-#endif // HAVE_OPENSSL_SSL_H
+#endif // ENABLE_SSL
         }
     };
 
@@ -438,7 +438,7 @@ namespace {
     setsslclient_(augrt_id cid, const char* ctx)
     {
         AUG_DEBUG2("setsslclient(): id=[%d], ctx=[%s]", cid, ctx);
-#if HAVE_OPENSSL_SSL_H
+#if ENABLE_SSL
         try {
             sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
             if (it == state_->sslctxs_.end())
@@ -449,10 +449,10 @@ namespace {
             return 0;
 
         } AUG_SETERRINFOCATCH;
-#else // !HAVE_OPENSSL_SSL_H
+#else // !ENABLE_SSL
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_setsslserver() not supported"));
-#endif // !HAVE_OPENSSL_SSL_H
+#endif // !ENABLE_SSL
         return -1;
     }
 
@@ -460,7 +460,7 @@ namespace {
     setsslserver_(augrt_id cid, const char* ctx)
     {
         AUG_DEBUG2("setsslserver(): id=[%d], ctx=[%s]", cid, ctx);
-#if HAVE_OPENSSL_SSL_H
+#if ENABLE_SSL
         try {
             sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
             if (it == state_->sslctxs_.end())
@@ -471,10 +471,10 @@ namespace {
             return 0;
 
         } AUG_SETERRINFOCATCH;
-#else // !HAVE_OPENSSL_SSL_H
+#else // !ENABLE_SSL
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
                        AUG_MSG("aug_setsslserver() not supported"));
-#endif // !HAVE_OPENSSL_SSL_H
+#endif // !ENABLE_SSL
         return -1;
     }
 

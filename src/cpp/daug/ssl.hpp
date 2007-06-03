@@ -6,9 +6,7 @@
 
 #include "augrtpp/ssl.hpp"
 
-#if HAVE_OPENSSL_SSL_H
-
-# include <map>
+#include <map>
 
 namespace augrt {
 
@@ -24,6 +22,5 @@ namespace augrt {
     createsslctxs(sslctxs& sslctxs, const options& options,
                   const std::string& pass64);
 }
-#endif // HAVE_OPENSSL_SSL_H
 
 #endif // DAUG_SSL_HPP

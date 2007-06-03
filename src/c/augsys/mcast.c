@@ -7,8 +7,10 @@
 
 AUG_RCSID("$Id$");
 
-#if !defined(_WIN32)
-# include "augsys/posix/mcast.c"
-#else /* _WIN32 */
-# include "augsys/win32/mcast.c"
-#endif /* _WIN32 */
+#if ENABLE_MULTICAST
+# if !defined(_WIN32)
+#  include "augsys/posix/mcast.c"
+# else /* _WIN32 */
+#  include "augsys/win32/mcast.c"
+# endif /* _WIN32 */
+#endif /* ENABLE_MULTICAST */

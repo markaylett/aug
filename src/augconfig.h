@@ -6,17 +6,33 @@
 
 #if HAVE_CONFIG_H
 # include "auglocal.h"
-#endif /* HAVE_CONFIG_H */
+#else /*!HAVE_CONFIG_H */
+
+# if !defined(ENABLE_MULTICAST)
+#  define ENABLE_MULTICAST 1
+# endif /* !ENABLE_MULTICAST */
+
+# if !defined(ENABLE_PYTHON)
+#  define ENABLE_PYTHON 1
+# endif /* !ENABLE_PYTHON */
+
+/* #undef ENABLE_RUBY */
+
+# if !defined(ENABLE_SSL)
+#  define ENABLE_SSL 1
+# endif /* !ENABLE_SSL */
+
+# if !defined(ENABLE_THREADS)
+#  define ENABLE_THREADS 1
+# endif /* !ENABLE_THREADS */
+
+#endif /* !HAVE_CONFIG_H */
 
 #if defined(_MSC_VER)
 
 # if !defined(HAVE_IPV6)
 #  define HAVE_IPV6 1
 # endif /* !HAVE_IPV6 */
-
-# if !defined(HAVE_OPENSSL_SSL_H)
-#  define HAVE_OPENSSL_SSL_H 1
-# endif /* !HAVE_OPENSSL_SSL_H */
 
 # define __func__ __FUNCTION__
 # define PACKAGE_BUGREPORT "mark@emantic.co.uk"

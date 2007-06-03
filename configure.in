@@ -21,6 +21,19 @@ AC_PROG_MAKE_SET
 AC_LIBTOOL_WIN32_DLL
 AM_PROG_LIBTOOL
 
+AC_ARG_ENABLE(multicast,
+[  --enable-multicast      enable multicast support @<:@default=yes@:>@], [
+    case "${enableval}" in
+        yes) enable_multicast=yes;;
+        no)  enable_multicast=no;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-multicast);;
+    esac
+], [enable_multicast=yes])
+AM_CONDITIONAL(ENABLE_MULTICAST, test x$enable_multicast = xyes)
+if test x$enable_multicast = xyes; then
+    AC_DEFINE(ENABLE_MULTICAST, 1, [Define to 1 for multicast support.])
+fi
+
 AC_ARG_ENABLE(python,
 [  --enable-python         enable python support @<:@default=yes@:>@], [
     case "${enableval}" in
@@ -30,6 +43,9 @@ AC_ARG_ENABLE(python,
     esac
 ], [enable_python=yes])
 AM_CONDITIONAL(ENABLE_PYTHON, test x$enable_python = xyes)
+if test x$enable_python = xyes; then
+    AC_DEFINE(ENABLE_PYTHON, 1, [Define to 1 for python support.])
+fi
 
 AC_ARG_ENABLE(ruby,
 [  --enable-ruby           enable ruby support @<:@default=no@:>@], [
@@ -40,6 +56,22 @@ AC_ARG_ENABLE(ruby,
     esac
 ], [enable_ruby=no])
 AM_CONDITIONAL(ENABLE_RUBY, test x$enable_ruby = xyes)
+if test x$enable_ruby = xyes; then
+    AC_DEFINE(ENABLE_RUBY, 1, [Define to 1 for ruby support.])
+fi
+
+AC_ARG_ENABLE(ssl,
+[  --enable-ssl            enable ssl support @<:@default=yes@:>@], [
+    case "${enableval}" in
+        yes) enable_ssl=yes;;
+        no)  enable_ssl=no;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --enable-ssl);;
+    esac
+], [enable_ssl=yes])
+AM_CONDITIONAL(ENABLE_SSL, test x$enable_ssl = xyes)
+if test x$enable_ssl = xyes; then
+    AC_DEFINE(ENABLE_SSL, 1, [Define to 1 for ssl support.])
+fi
 
 AC_ARG_ENABLE(threads,
 [  --enable-threads        enable threads support @<:@default=yes@:>@], [
@@ -50,12 +82,15 @@ AC_ARG_ENABLE(threads,
     esac
 ], [enable_threads=yes])
 AM_CONDITIONAL(ENABLE_THREADS, test x$enable_threads = xyes)
+if test x$enable_threads = xyes; then
+    AC_DEFINE(ENABLE_THREADS, 1, [Define to 1 for threads support.])
+fi
 
 # Checks for libraries.
 
 LDFLAGS="-lm $LDFLAGS"
 
-if test x$enable_threads != xno; then
+if test x$enable_threads = xyes; then
    CFLAGS="-D_MT -D_REENTRANT $CFLAGS"
    CXXFLAGS="-D_MT -D_REENTRANT $CXXFLAGS"
 fi
@@ -68,30 +103,39 @@ case $host in
     # cp ssleay32.a libssleay32.a
     # cp lib*.a /lib/mingw/
 
-    AC_SEARCH_LIBS(SSL_library_init, [ssleay32])
-    AC_SEARCH_LIBS(BIO_new, [eay32])
+    if test x$enable_ssl = xyes; then
+        AC_SEARCH_LIBS(SSL_library_init, [ssleay32])
+        AC_SEARCH_LIBS(BIO_new, [eay32])
+    fi
 
-    CFLAGS="$CFLAGS -DWINVER=0x0501 -DFD_SETSIZE=256"
-    CXXFLAGS="$CXXFLAGS -DWINVER=0x0501 -DFD_SETSIZE=256"
-    LDFLAGS="-lws2_32 -liphlpapi $LDFLAGS"
-    LIBS="-Wl,-lws2_32 -Wl,-liphlpapi $LIBS"
+    CFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 $CFLAGS"
+    CXXFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 $CXXFLAGS"
+    LDFLAGS="-lws2_32 $LDFLAGS"
+    LIBS="-Wl,-lws2_32 $LIBS"
 
-    if test x$enable_threads != xno; then
+    if test x$enable_multicast = xyes; then
+        LDFLAGS="-liphlpapi $LDFLAGS"
+        LIBS="-Wl,-liphlpapi $LIBS"
+    fi
+
+    if test x$enable_threads = xyes; then
         CFLAGS="-mthreads $CFLAGS"
         CXXFLAGS="-mthreads $CXXFLAGS"
         LDFLAGS="-mthreads $LDFLAGS"
     fi
     ;;
 *)
-    AC_SEARCH_LIBS(SSL_library_init, [ssl])
-    AC_SEARCH_LIBS(BIO_new, [crypto])
+    if test x$enable_ssl = xyes; then
+        AC_SEARCH_LIBS(SSL_library_init, [ssl])
+        AC_SEARCH_LIBS(BIO_new, [crypto])
+    fi
 
     AC_SEARCH_LIBS(gethostbyname, nsl)
     AC_SEARCH_LIBS(gethostname, nsl)
     AC_SEARCH_LIBS(socket, socket)
     AC_SEARCH_LIBS(dlopen, [dl dlcompat])
 
-    if test x$enable_threads != xno; then
+    if test x$enable_threads = xyes; then
         AC_SEARCH_LIBS(pthread_create, [pthread])
     fi
     ;;

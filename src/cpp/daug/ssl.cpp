@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#if HAVE_OPENSSL_SSL_H
+#if ENABLE_SSL
 
 # include "daug/options.hpp"
 
@@ -23,6 +23,7 @@ AUG_RCSID("$Id$");
 # include <strstream>
 
 # include <openssl/err.h>
+# include <openssl/ssl.h>
 
 using namespace aug;
 using namespace augrt;
@@ -275,4 +276,4 @@ augrt::createsslctxs(sslctxs& sslctxs, const options& options,
     }
 }
 
-#endif // HAVE_OPENSSL_SSL_H
+#endif // ENABLE_SSL

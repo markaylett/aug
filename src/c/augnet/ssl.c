@@ -7,21 +7,21 @@
 
 AUG_RCSID("$Id$");
 
-#if HAVE_OPENSSL_SSL_H
+#if ENABLE_SSL
 
-#include "augnet/extend.h"
+# include "augnet/extend.h"
 
-#include "augsys/base.h"
-#include "augsys/errinfo.h"
-#include "augsys/log.h"
-#include "augsys/socket.h" /* aug_shutdown() */
-#include "augsys/uio.h"
+# include "augsys/base.h"
+# include "augsys/errinfo.h"
+# include "augsys/log.h"
+# include "augsys/socket.h" /* aug_shutdown() */
+# include "augsys/uio.h"
 
-#include <openssl/err.h>
-#include <openssl/ssl.h>
+# include <openssl/err.h>
+# include <openssl/ssl.h>
 
-#define SSLREAD_  0x01
-#define SSLWRITE_ 0x02
+# define SSLREAD_  0x01
+# define SSLWRITE_ 0x02
 
 struct buf_ {
     char buf_[4096];
@@ -788,4 +788,4 @@ aug_setsslserver(int fd, void* ssl)
     return 0;
 }
 
-#endif /* HAVE_OPENSSL_SSL_H */
+#endif /* ENABLE_SSL */

@@ -8,6 +8,21 @@
 /* Define to 1 if using `alloca.c'. */
 #undef C_ALLOCA
 
+/* Define to 1 for multicast support. */
+#undef ENABLE_MULTICAST
+
+/* Define to 1 for python support. */
+#undef ENABLE_PYTHON
+
+/* Define to 1 for ruby support. */
+#undef ENABLE_RUBY
+
+/* Define to 1 for ssl support. */
+#undef ENABLE_SSL
+
+/* Define to 1 for threads support. */
+#undef ENABLE_THREADS
+
 /* Define to 1 if you have `alloca', as a function or macro. */
 #undef HAVE_ALLOCA
 

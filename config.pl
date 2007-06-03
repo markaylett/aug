@@ -79,9 +79,11 @@ my (
     $gcc,
     $strict,
     $debug,
+    $multicast,
     $python,
     $ruby,
-    $mt,
+    $ssl,
+    $threads,
     $libtype
     );
 
@@ -128,9 +130,11 @@ if ($CYGWIN_MINGW == $toolset) {
 }
 $strict = valueask ("strict build", 'n');
 $debug = valueask ("debug build", 'n');
+$multicast = valueask ("multicast support", 'y');
 $python = valueask ("python support", 'y');
 $ruby = valueask ("ruby support", 'n');
-$mt = valueask ("multi-threaded", 'y');
+$ssl = valueask ("ssl support", 'y');
+$threads = valueask ("thread support", 'y');
 $libtype = listask ("library type", $BOTH, \%LIBTYPE);
 
 my (
@@ -166,12 +170,16 @@ print FILE "AUG_HOME='$prefix'; export AUG_HOME\n";
 $options = "--prefix=\$AUG_HOME";
 $options .= " \\\n\t--enable-maintainer-mode"
     if is $maintainer;
+$options .= " \\\n\t--disable-multicast"
+    unless is $multicast;
 $options .= " \\\n\t--disable-python"
     unless is $python;
 $options .= " \\\n\t--enable-ruby"
     if is $ruby;
+$options .= " \\\n\t--disable-ssl"
+    unless is $ssl;
 $options .= " \\\n\t--disable-threads"
-    unless is $mt;
+    unless is $threads;
 
 if ($SHARED_ONLY == $libtype) {
     $options .= " \\\n\t--disable-static";
