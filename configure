@@ -19756,11 +19756,11 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 # Check whether --enable-multicast was given.
 if test "${enable_multicast+set}" = set; then
   enableval=$enable_multicast;
-    case "${enableval}" in
-        yes) enable_multicast=yes;;
-        no)  enable_multicast=no;;
-        *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-multicast" >&5
-echo "$as_me: error: bad value ${enableval} for --enable-multicast" >&2;}
+    case x$enableval in
+        xyes) enable_multicast=yes;;
+        xno)  enable_multicast=no;;
+        *) { { echo "$as_me:$LINENO: error: bad value $enableval for --enable-multicast" >&5
+echo "$as_me: error: bad value $enableval for --enable-multicast" >&2;}
    { (exit 1); exit 1; }; };;
     esac
 
@@ -19789,11 +19789,11 @@ fi
 # Check whether --enable-python was given.
 if test "${enable_python+set}" = set; then
   enableval=$enable_python;
-    case "${enableval}" in
-        yes) enable_python=yes;;
-        no)  enable_python=no;;
-        *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-python" >&5
-echo "$as_me: error: bad value ${enableval} for --enable-python" >&2;}
+    case x$enableval in
+        xyes) enable_python=yes;;
+        xno)  enable_python=no;;
+        *) { { echo "$as_me:$LINENO: error: bad value $enableval for --enable-python" >&5
+echo "$as_me: error: bad value $enableval for --enable-python" >&2;}
    { (exit 1); exit 1; }; };;
     esac
 
@@ -19822,11 +19822,11 @@ fi
 # Check whether --enable-ruby was given.
 if test "${enable_ruby+set}" = set; then
   enableval=$enable_ruby;
-    case "${enableval}" in
-        yes) enable_ruby=yes;;
-        no)  enable_ruby=no;;
-        *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-ruby" >&5
-echo "$as_me: error: bad value ${enableval} for --enable-ruby" >&2;}
+    case x$enableval in
+        xyes) enable_ruby=yes;;
+        xno)  enable_ruby=no;;
+        *) { { echo "$as_me:$LINENO: error: bad value $enableval for --enable-ruby" >&5
+echo "$as_me: error: bad value $enableval for --enable-ruby" >&2;}
    { (exit 1); exit 1; }; };;
     esac
 
@@ -19855,11 +19855,11 @@ fi
 # Check whether --enable-ssl was given.
 if test "${enable_ssl+set}" = set; then
   enableval=$enable_ssl;
-    case "${enableval}" in
-        yes) enable_ssl=yes;;
-        no)  enable_ssl=no;;
-        *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-ssl" >&5
-echo "$as_me: error: bad value ${enableval} for --enable-ssl" >&2;}
+    case x$enableval in
+        xyes) enable_ssl=yes;;
+        xno)  enable_ssl=no;;
+        *) { { echo "$as_me:$LINENO: error: bad value $enableval for --enable-ssl" >&5
+echo "$as_me: error: bad value $enableval for --enable-ssl" >&2;}
    { (exit 1); exit 1; }; };;
     esac
 
@@ -19888,11 +19888,11 @@ fi
 # Check whether --enable-threads was given.
 if test "${enable_threads+set}" = set; then
   enableval=$enable_threads;
-    case "${enableval}" in
-        yes) enable_threads=yes;;
-        no)  enable_threads=no;;
-        *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-threads" >&5
-echo "$as_me: error: bad value ${enableval} for --enable-threads" >&2;}
+    case x$enableval in
+        xyes) enable_threads=yes;;
+        xno)  enable_threads=no;;
+        *) { { echo "$as_me:$LINENO: error: bad value $enableval for --enable-threads" >&5
+echo "$as_me: error: bad value $enableval for --enable-threads" >&2;}
    { (exit 1); exit 1; }; };;
     esac
 

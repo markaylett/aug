@@ -1,0 +1,29 @@
+#!/bin/sh
+
+REPOSITORY='https://aug.svn.sourceforge.net/svnroot/aug'
+SUBDIR=aug-trunk
+USER=marayl
+
+if [ ! -d $SUBDIR ]; then
+
+    svn co --username=$USER $REPOSITORY/trunk $SUBDIR
+    cd $SUBDIR
+
+else
+
+    # localver=$(svn info | awk '/^Revision:/ { print $2 }')
+    # remotver=$(svn info $REPOSITORY | awk '/^Revision:/ { print $2 }')
+
+    cd $SUBDIR
+
+    if [ $(svn update | wc -l) -eq 1 ]; then
+        echo "no change"
+        exit
+    fi
+fi
+
+if [ ! -f Makefile ]; then
+    printf "\n\nn\nn\nn\ny\ny\nn\ny\ny\n\n" | ./config.pl && sh config.sh
+fi
+
+make distcheck

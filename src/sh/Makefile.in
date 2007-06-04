@@ -169,6 +169,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
 	autoinit \
+	buildcheck \
 	findjunk \
 	mkaugconf \
 	mkimplib \
