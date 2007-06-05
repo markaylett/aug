@@ -525,5 +525,8 @@ augpy_createaugrt(PyTypeObject* type)
     PyModule_AddIntConstant(augrt, "TIMWR", AUGRT_TIMWR);
     PyModule_AddIntConstant(augrt, "TIMBOTH", AUGRT_TIMBOTH);
 
+    PyModule_AddIntConstant(augrt, "MCAST", AUGRT_MCAST);
+    PyModule_AddIntConstant(augrt, "PACKETSIZE", AUGRT_PACKETSIZE);
+
     return augrt;
 }

@@ -97,25 +97,27 @@ enum augrt_loglevel {
    Success.
  */
 
-#define AUGRT_OK        0
+#define AUGRT_OK      0
 
 /**
    Failure.
  */
 
-#define AUGRT_ERROR   (-1)
+#define AUGRT_ERROR (-1)
 
 /**
    None, empty or null depending on context.
  */
 
-#define AUGRT_NONE    (-2)
+#define AUGRT_NONE  (-2)
 
 /**
    /}
  */
 
-#define AUGRT_MAXNAME  63
+#define AUGRT_MCAST        0
+#define AUGRT_MAXNAME     63
+#define AUGRT_PACKETSIZE 512
 
 typedef int augrt_id;
 

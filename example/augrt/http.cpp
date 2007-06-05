@@ -647,7 +647,7 @@ namespace {
                     fs.push_back(make_pair("WWW-Authenticate", ss.str()));
                     sendstatus(id_, sessid_, 401, "Unauthorized", fs);
 
-                } else if (!nodes.empty() && nodes[0] == "session") {
+                } else if (!nodes.empty() && nodes[0] == "service") {
 
                     nodes[0] = "http";
                     string type(jointype(nodes));
