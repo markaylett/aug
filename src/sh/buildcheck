@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 REPOSITORY='https://aug.svn.sourceforge.net/svnroot/aug'
 SUBDIR=aug-trunk
 USER=marayl
@@ -22,8 +24,32 @@ else
     fi
 fi
 
-if [ ! -f Makefile ]; then
-    printf "\n\nn\nn\nn\ny\ny\nn\ny\ny\n\n" | ./config.pl && sh config.sh
-fi
+#                       m
+#           m           u
+#         t a           l              l
+#       p o i     s     t  p        t  i
+#       r o n     t  d  i  y        h  b
+#       e l t     r  e  c  t  r     r  r
+#       f s a  g  i  b  a  h  u  s  e  a
+#       i e i  c  c  u  s  o  b  s  a  r
+#       x t n  c  t  g  t  n  y  l  d  y
 
-make distcheck
+BUILD0="\n\nN\nY\nN\nN\nY\nY\nN\nY\nY\n\n"
+BUILD1="\n\nY\nY\nN\nN\nY\nY\nN\nY\nY\n\n"
+BUILD2="\n\nN\nN\nN\nN\nY\nY\nN\nY\nY\n\n"
+BUILD3="\n\nN\nY\nY\nN\nY\nY\nN\nY\nY\n\n"
+BUILD4="\n\nN\nY\nN\nY\nY\nY\nN\nY\nY\n\n"
+BUILD5="\n\nN\nY\nN\nN\nN\nY\nN\nY\nY\n\n"
+BUILD6="\n\nN\nY\nN\nN\nY\nN\nN\nY\nY\n\n"
+BUILD7="\n\nN\nY\nN\nN\nY\nY\nY\nY\nY\n\n"
+BUILD8="\n\nN\nY\nN\nN\nY\nY\nN\nN\nY\n\n"
+BUILD9="\n\nN\nY\nN\nN\nY\nY\nN\nY\nN\n\n"
+
+for build in BUILD0 BUILD1 BUILD2 BUILD3 BUILD4 \
+    BUILD5 BUILD6 BUILD7 BUILD8 BUILD9; do
+
+    printf $build | ./config.pl
+    (sh config.sh && make clean check) >/dev/null
+done
+
+(sh configure && make distcheck) >/dev/null
