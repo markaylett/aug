@@ -105,7 +105,7 @@ namespace aug {
 
         struct engineimpl {
 
-            fdref rdfd_, wrfd_;
+            smartfd eventrd_, eventwr_, mcastfd_;
             timers& timers_;
             enginecb_base& cb_;
             nbfiles nbfiles_;
@@ -131,21 +131,23 @@ namespace aug {
             {
                 AUG_DEBUG2("removing event pipe from list");
                 try {
-                    removenbfile(rdfd_);
+                    removenbfile(eventrd_);
                 } AUG_PERRINFOCATCH;
             }
-            engineimpl(fdref rdfd, fdref wrfd, timers& timers,
+            engineimpl(const smartfd& eventrd, const smartfd& eventwr,
+                       const smartfd& mcastfd, timers& timers,
                        enginecb_base& cb)
-                : rdfd_(rdfd),
-                  wrfd_(wrfd),
+                : eventrd_(eventrd),
+                  eventwr_(eventwr),
+                  mcastfd_(mcastfd),
                   timers_(timers),
                   cb_(cb),
                   grace_(timers_),
                   state_(STARTED)
             {
                 AUG_DEBUG2("inserting event pipe to list");
-                insertnbfile(nbfiles_, rdfd, *this);
-                setnbeventmask(rdfd, AUG_FDEVENTRD);
+                insertnbfile(nbfiles_, eventrd_, *this);
+                setnbeventmask(eventrd_, AUG_FDEVENTRD);
             }
             void
             teardown()
@@ -248,7 +250,7 @@ namespace aug {
                 aug_event event;
                 AUG_DEBUG2("reading event");
 
-                switch (aug::readevent(rdfd_, event).type_) {
+                switch (aug::readevent(eventrd_, event).type_) {
                 case AUG_EVENTRECONF:
                     AUG_DEBUG2("received AUG_EVENTRECONF");
                     cb_.reconf();
@@ -296,7 +298,7 @@ namespace aug {
             {
                 // Intercept activity on event pipe.
 
-                if (fd == rdfd_)
+                if (fd == eventrd_)
                     return readevent();
 
                 sockptr sock(socks_.getbyfd(fd));
@@ -346,8 +348,9 @@ engine::~engine() AUG_NOTHROW
 }
 
 AUGRTPP_API
-engine::engine(fdref rdfd, fdref wrfd, timers& timers, enginecb_base& cb)
-    : impl_(new detail::engineimpl(rdfd, wrfd, timers, cb))
+engine::engine(const smartfd& eventrd, const smartfd& eventwr,
+               const smartfd& mcastfd, timers& timers, enginecb_base& cb)
+    : impl_(new detail::engineimpl(eventrd, eventwr, mcastfd, timers, cb))
 {
 }
 
@@ -458,14 +461,14 @@ AUGRTPP_API void
 engine::reconfall()
 {
     aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
-    writeevent(impl_->wrfd_, e);
+    writeevent(impl_->eventwr_, e);
 }
 
 AUGRTPP_API void
 engine::stopall()
 {
     aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
-    writeevent(impl_->wrfd_, e);
+    writeevent(impl_->eventwr_, e);
 }
 
 AUGRTPP_API void
@@ -477,7 +480,7 @@ engine::post(const char* sname, const char* to, const char* type,
     e.type_ = POSTEVENT_;
     e.var_.type_ = 0;
     e.var_.arg_ = arg.get();
-    writeevent(impl_->wrfd_, e);
+    writeevent(impl_->eventwr_, e);
 
     // Event takes ownership of var when post cannot fail.
 
@@ -533,7 +536,7 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
             // this function has returned.
 
             aug_event e = { AUG_EVENTWAKEUP, AUG_VARNULL };
-            writeevent(impl_->wrfd_, e);
+            writeevent(impl_->eventwr_, e);
         }
 
         // Add to pending queue.

@@ -169,7 +169,9 @@ namespace {
 
         explicit
         state(const string& pass64)
-            : engine_(aug_eventrd(), aug_eventwr(), timers_, enginecb_)
+            : engine_(smartfd::retain(aug_eventrd()),
+                      smartfd::retain(aug_eventwr()),
+                      smartfd::retain(aug_eventwr()), timers_, enginecb_)
         {
 #if ENABLE_SSL
             initssl();
