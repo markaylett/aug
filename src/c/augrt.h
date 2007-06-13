@@ -115,9 +115,7 @@ enum augrt_loglevel {
    /}
  */
 
-#define AUGRT_MCAST        0
 #define AUGRT_MAXNAME     63
-#define AUGRT_PACKETSIZE 512
 
 typedef int augrt_id;
 

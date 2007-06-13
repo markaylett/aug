@@ -247,10 +247,15 @@ handshake::do_process(unsigned short events)
 
         pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
         sfd_ = xy.first;
+
+        // Check to see if connection was established.
+
         if (xy.second) {
             state_ = CONNECTED;
             return true;
         }
+
+        // Otherwise, try next endpoint associated with address.
 
     } catch (const errinfo_error& e) {
 

@@ -21,17 +21,34 @@ namespace aug {
         virtual void
         do_sendv(const aug_var& var) = 0;
 
+        /**
+           Notify of newly accepted connection.
+
+           \return Whether the new connection should be kept.
+         */
+
         virtual bool
         do_accepted(const aug_endpoint& ep) = 0;
 
         virtual void
         do_connected(const aug_endpoint& ep) = 0;
 
+        /**
+           Process events.
+
+           \return Whether the connection state changed as a result of
+           processing.
+         */
+
         virtual bool
         do_process(unsigned short events) = 0;
 
         virtual void
         do_shutdown() = 0;
+
+        /**
+           Initiate application-level teardown.
+         */
 
         virtual void
         do_teardown() = 0;

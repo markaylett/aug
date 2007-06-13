@@ -170,7 +170,6 @@ namespace {
         explicit
         state(const string& pass64)
             : engine_(smartfd::retain(aug_eventrd()),
-                      smartfd::retain(aug_eventwr()),
                       smartfd::retain(aug_eventwr()), timers_, enginecb_)
         {
 #if ENABLE_SSL
@@ -613,6 +612,9 @@ namespace {
         void
         readconf(const char* conffile, bool prompt, bool daemon)
         {
+            // Password must be collected before process is detached from
+            // controlling terminal.
+
             if (prompt) {
                 char pass[AUG_MAXPASSWORD + 1];
                 aug_getpass("Enter PEM pass phrase:", pass, sizeof(pass));
@@ -653,12 +655,16 @@ namespace {
 
             aug_var var = { 0, this };
             auto_ptr<state> s(new state(pass64_));
+
+            // Assign state so that it is visible to callbacks during load_()
+            // call.
+
             state_ = s;
             try {
                 load_();
             } catch (...) {
 
-                // Ownership back to local.
+                // Ownership back to local for cleanup.
 
                 s = state_;
                 s->engine_.clear();

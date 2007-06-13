@@ -81,6 +81,8 @@ namespace {
     void
     setconnected(conn_base& conn)
     {
+        // Connection has now been established.
+
         setsockopts(conn.sfd());
 
         const endpoint& ep(conn.peername());
@@ -90,6 +92,9 @@ namespace {
                    static_cast<int>(ntohs(port(ep))));
 
         setnbeventmask(conn.sfd(), AUG_FDEVENTRD);
+
+        // Notify session of establishment.
+
         conn.connected(ep);
     }
 }
@@ -105,12 +110,15 @@ namespace aug {
 
         struct engineimpl {
 
-            smartfd eventrd_, eventwr_, mcastfd_;
+            smartfd eventrd_, eventwr_;
             timers& timers_;
             enginecb_base& cb_;
             nbfiles nbfiles_;
             sessions sessions_;
             socks socks_;
+
+            // Grace period on shutdown.
+
             timer grace_;
 
             // Mapping of timer-ids to sessions.
@@ -135,11 +143,9 @@ namespace aug {
                 } AUG_PERRINFOCATCH;
             }
             engineimpl(const smartfd& eventrd, const smartfd& eventwr,
-                       const smartfd& mcastfd, timers& timers,
-                       enginecb_base& cb)
+                       timers& timers, enginecb_base& cb)
                 : eventrd_(eventrd),
                   eventwr_(eventwr),
-                  mcastfd_(mcastfd),
                   timers_(timers),
                   cb_(cb),
                   grace_(timers_),
@@ -156,6 +162,8 @@ namespace aug {
 
                     state_ = TEARDOWN;
                     socks_.teardown();
+
+                    // Initiate grace period.
 
                     aug_var var = { 0, this };
                     grace_.set(15000, timermemcb<engineimpl,
@@ -194,6 +202,8 @@ namespace aug {
                 AUG_DEBUG2("initialising connection: id=[%d], fd=[%d]",
                            id(*cptr), sfd.get());
 
+                // Session may reject the connection by returning false.
+
                 if (cptr->accepted(ep))
                     si.commit();
             }
@@ -205,6 +215,9 @@ namespace aug {
                     changed = cptr->process(events);
                     ok = true;
                 } AUG_PERRINFOCATCH;
+
+                // If an exception was thrown, "ok" will still have its
+                // original value of false.
 
                 if (!ok) {
 
@@ -348,9 +361,9 @@ engine::~engine() AUG_NOTHROW
 }
 
 AUGRTPP_API
-engine::engine(const smartfd& eventrd, const smartfd& eventwr,
-               const smartfd& mcastfd, timers& timers, enginecb_base& cb)
-    : impl_(new detail::engineimpl(eventrd, eventwr, mcastfd, timers, cb))
+engine::engine(const smartfd& eventrd, const smartfd& eventwr, timers& timers,
+               enginecb_base& cb)
+    : impl_(new detail::engineimpl(eventrd, eventwr, timers, cb))
 {
 }
 
@@ -446,15 +459,7 @@ engine::run(bool stoponerr)
 AUGRTPP_API void
 engine::teardown()
 {
-    if (detail::engineimpl::STARTED == impl_->state_) {
-
-        impl_->state_ = detail::engineimpl::TEARDOWN;
-        impl_->socks_.teardown();
-
-        aug_var var = { 0, impl_ };
-        impl_->grace_.set(15000, timermemcb<detail::engineimpl,
-                          &detail::engineimpl::stopcb>, var);
-    }
+    impl_->socks_.teardown();
 }
 
 AUGRTPP_API void

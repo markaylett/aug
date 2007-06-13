@@ -20,7 +20,7 @@ bool
 socks::send(augrt_id cid, const void* buf, size_t len)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
-    if (!sendable(*cptr))
+    if (cptr == null || !sendable(*cptr))
         return false;
 
     cptr->send(buf, len);
@@ -31,7 +31,7 @@ bool
 socks::sendv(augrt_id cid, const aug_var& var)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
-    if (!sendable(*cptr))
+    if (cptr == null || !sendable(*cptr))
         return false;
 
     cptr->sendv(var);
@@ -100,7 +100,7 @@ socks::teardown()
             continue;
         }
 
-        // Not a connection.
+        // Erase listener.
 
         idtofd_.erase(rit++);
         socks_.erase(it);
