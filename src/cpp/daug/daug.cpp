@@ -708,6 +708,8 @@ main(int argc, char* argv[])
         aug_errinfo errinfo;
         scoped_init init(errinfo);
 
+        // Seed random number generator.
+
         timeval tv;
         aug::gettimeofday(tv);
         aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);

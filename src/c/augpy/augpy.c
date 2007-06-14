@@ -253,7 +253,8 @@ start_(struct augrt_session* session)
 
     if (import->start_) {
 
-        PyObject* x = PyObject_CallFunction(import->start_, "s", session->name_);
+        PyObject* x = PyObject_CallFunction(import->start_, "s",
+                                            session->name_);
         if (!x) {
             printerr_();
             destroyimport_(import);

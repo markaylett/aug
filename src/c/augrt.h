@@ -124,6 +124,10 @@ struct augrt_session {
     void* user_;
 };
 
+/**
+   Both sockets are timers are represented by objects.
+*/
+
 struct augrt_object {
     augrt_id id_;
     void* user_;
@@ -363,9 +367,9 @@ struct augrt_host {
 };
 
 /**
-   Module functions should return either #AUGRT_OK or #AUGRT_ERROR.  For those
-   functions associated with a connection, a failure will result in the
-   connection being closed.
+   Module functions of type int should return either #AUGRT_OK or
+   #AUGRT_ERROR, depending on the result.  For those functions associated with
+   a connection, a failure will result in the connection being closed.
 */
 
 struct augrt_module {
@@ -378,6 +382,8 @@ struct augrt_module {
 
     /**
        Start session.
+
+       \return either #AUGRT_OK or #AUGRT_ERROR.
     */
 
     int (*start_)(struct augrt_session* session);
@@ -419,9 +425,14 @@ struct augrt_module {
     /**
        Acceptance of socket connection.
 
+       This function is called when a new connection is accepted on a listener
+       socket.
+
        \param sock TODO
        \param addr TODO
        \param port TODO
+
+       \return either #AUGRT_OK or #AUGRT_ERROR.
     */
 
     int (*accepted_)(struct augrt_object* sock, const char* addr,
@@ -430,9 +441,14 @@ struct augrt_module {
     /**
        Completion of client connection handshake.
 
+       This function is called when a connection, initiated by a call to
+       tcpconnect_(), becomes established.
+
        \param sock TODO
        \param addr TODO
        \param port TODO
+
+       \sa tcpconnect_()
     */
 
     void (*connected_)(struct augrt_object* sock, const char* addr,
@@ -441,9 +457,11 @@ struct augrt_module {
     /**
        Inbound data.
 
-       \param sock TODO
-       \param buf TODO
-       \param len TODO
+       \param sock The socket on which the data was received.
+
+       \param buf Data buffer.  May not be null terminated.
+
+       \param len Length of data buffer.
     */
 
     void (*data_)(const struct augrt_object* sock, const void* buf,
@@ -453,7 +471,9 @@ struct augrt_module {
        Expiry of read timer.
 
        \param sock TODO
-       \param ms TODO
+
+       \param ms The current timeout value.  The callee may modify "ms" to
+       specify a new value; a value of zero will cancel the timer.
     */
 
     void (*rdexpire_)(const struct augrt_object* sock, unsigned* ms);
@@ -462,7 +482,9 @@ struct augrt_module {
        Expiry of write timer.
 
        \param sock TODO
-       \param ms TODO
+
+       \param ms The current timeout value.  The callee may modify "ms" to
+       specify a new value; a value of zero will cancel the timer.
     */
 
     void (*wrexpire_)(const struct augrt_object* sock, unsigned* ms);
@@ -471,7 +493,9 @@ struct augrt_module {
        Timer expiry.
 
        \param timer TODO
-       \param ms TODO
+
+       \param ms The current timeout value.  The callee may modify "ms" to
+       specify a new value; a value of zero will cancel the timer.
     */
 
     void (*expire_)(const struct augrt_object* timer, unsigned* ms);
@@ -482,6 +506,8 @@ struct augrt_module {
        \param sock TODO
        \param subject TODO
        \param issuer TODO
+
+       \return either #AUGRT_OK or #AUGRT_ERROR.
     */
 
     int (*authcert_)(const struct augrt_object* sock, const char* subject,
@@ -490,6 +516,11 @@ struct augrt_module {
 
 AUGRT_EXTERN const struct augrt_host*
 augrt_gethost(void);
+
+/**
+   Syntactic sugar that allows host functions to be called with a free
+   function-like syntax.
+ */
 
 #define augrt_writelog      (augrt_gethost()->writelog_)
 #define augrt_vwritelog     (augrt_gethost()->vwritelog_)
@@ -515,7 +546,8 @@ augrt_gethost(void);
 #define augrt_setsslserver  (augrt_gethost()->setsslserver_)
 
 /**
-   augrt_init() should return NULL on failure.
+   This macro defines the module's entry points.  augrt_init() should return
+   NULL on failure.
 */
 
 #define AUGRT_MODULE(init, term)                                      \
