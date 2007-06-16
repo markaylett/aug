@@ -28,7 +28,30 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
+// Definition placed outside anonymous namespace to avoid compiler warnings.
+
+struct sessiontimer {
+    sessionptr session_;
+    aug_var var_;
+    ~sessiontimer() AUG_NOTHROW
+    {
+        try {
+            destroyvar(var_);
+        } AUG_PERRINFOCATCH;
+    }
+    explicit
+    sessiontimer(const sessionptr& session)
+        : session_(session)
+    {
+        var_.type_ = 0;
+        var_.arg_ = 0;
+    }
+};
+
 namespace {
+
+    typedef smartptr<sessiontimer> sessiontimerptr;
+    typedef map<augrt_id, sessiontimerptr> sessiontimers;
 
     struct postevent {
         string from_, to_, type_;
@@ -49,26 +72,6 @@ namespace {
         }
     };
 
-    struct sessiontimer {
-        sessionptr session_;
-        aug_var var_;
-        ~sessiontimer() AUG_NOTHROW
-        {
-            try {
-                destroyvar(var_);
-            } AUG_PERRINFOCATCH;
-        }
-        explicit
-        sessiontimer(const sessionptr& session)
-            : session_(session)
-        {
-            var_.type_ = 0;
-            var_.arg_ = 0;
-        }
-    };
-
-    typedef smartptr<sessiontimer> sessiontimerptr;
-    typedef map<augrt_id, sessiontimerptr> sessiontimers;
     typedef queue<connptr> pending;
 
     void

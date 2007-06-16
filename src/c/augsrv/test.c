@@ -32,7 +32,7 @@ getopt_(void* arg, enum aug_option opt)
 }
 
 static int
-config_(void* arg, const char* conffile, int daemon)
+config_(void* arg, const char* conffile, int prompt, int daemon)
 {
     if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
         return -1;
