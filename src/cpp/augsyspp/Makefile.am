@@ -12,8 +12,8 @@ modinclude_HEADERS = \
 	lock.hpp \
 	mcast.hpp \
 	mmap.hpp \
-	mplexer.hpp \
 	mutex.hpp \
+	muxer.hpp \
 	null.hpp \
 	smartfd.hpp \
 	smartptr.hpp \
@@ -37,8 +37,8 @@ libaugsyspp_la_SOURCES = \
 	lock.cpp \
 	mcast.cpp \
 	mmap.cpp \
-	mplexer.cpp \
 	mutex.cpp \
+	muxer.cpp \
 	null.cpp \
 	smartfd.cpp \
 	smartptr.cpp \

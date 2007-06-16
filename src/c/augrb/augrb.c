@@ -12,6 +12,22 @@ AUG_RCSID("$Id$");
 #include "augrt.h"
 #include "ruby.h"
 
+struct have_ {
+    int stop_ : 1;
+    int start_ : 1;
+    int reconf_ : 1;
+    int event_ : 1;
+    int closed_ : 1;
+    int teardown_ : 1;
+    int accepted_ : 1;
+    int connected_ : 1;
+    int data_ : 1;
+    int rdexpire_ : 1;
+    int wrexpire_ : 1;
+    int expire_ : 1;
+    int authcert_ : 1;
+};
+
 static VALUE maugrt_, cobject_;
 
 static VALUE

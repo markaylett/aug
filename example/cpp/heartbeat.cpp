@@ -724,10 +724,10 @@ namespace {
     void
     run(const char* node, fdref ref, const endpoint& ep)
     {
-        mplexer mp;
+        muxer mux;
         timers ts;
         session s(node, ref, ep, ts);
-        setfdeventmask(mp, ref, AUG_FDEVENTRD);
+        setfdeventmask(mux, ref, AUG_FDEVENTRD);
 
         timeval tv;
         int ret(!0);
@@ -737,7 +737,7 @@ namespace {
             aug_info("timeout in: tv_sec=%d, tv_usec=%d", (int)tv.tv_sec,
                      (int)tv.tv_usec);
 
-            while (AUG_RETINTR == (ret = waitfdevents(mp, tv)))
+            while (AUG_RETINTR == (ret = waitfdevents(mux, tv)))
                 ;
 
             aug_info("waitfdevents: %d", ret);

@@ -64,9 +64,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES =
 am_libaugsys_la_OBJECTS = base.lo config.lo debug.lo defs.lo dlfcn.lo \
 	endian.lo errinfo.lo errno.lo limits.lo lock.lo log.lo \
-	mcast.lo mmap.lo mplexer.lo mutex.lo socket.lo string.lo \
-	time.lo types.lo uio.lo unistd.lo utility.lo windows.lo \
-	tls_.lo
+	mcast.lo mmap.lo mutex.lo muxer.lo socket.lo string.lo time.lo \
+	types.lo uio.lo unistd.lo utility.lo windows.lo tls_.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_augsys_basetest_OBJECTS = basetest.$(OBJEXT)
 augsys_basetest_OBJECTS = $(am_augsys_basetest_OBJECTS)
@@ -259,8 +258,8 @@ modinclude_HEADERS = \
 	log.h \
 	mcast.h \
 	mmap.h \
-	mplexer.h \
 	mutex.h \
+	muxer.h \
 	queue.h \
 	socket.h \
 	string.h \
@@ -289,8 +288,8 @@ libaugsys_la_SOURCES = \
 	log.c \
 	mcast.c \
 	mmap.c \
-	mplexer.c \
 	mutex.c \
+	muxer.c \
 	socket.c \
 	string.c \
 	time.c \
@@ -441,8 +440,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcasttest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockettest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@

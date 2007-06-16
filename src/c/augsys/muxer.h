@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGSYS_MPLEXER_H
-#define AUGSYS_MPLEXER_H
+#ifndef AUGSYS_MUXER_H
+#define AUGSYS_MUXER_H
 
 #include "augsys/config.h"
 
@@ -14,16 +14,16 @@
 
 struct timeval;
 
-typedef struct aug_mplexer_* aug_mplexer_t;
+typedef struct aug_muxer_* aug_muxer_t;
 
-AUGSYS_API aug_mplexer_t
-aug_createmplexer(void);
-
-AUGSYS_API int
-aug_destroymplexer(aug_mplexer_t mplexer);
+AUGSYS_API aug_muxer_t
+aug_createmuxer(void);
 
 AUGSYS_API int
-aug_setfdeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
+aug_destroymuxer(aug_muxer_t muxer);
+
+AUGSYS_API int
+aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask);
 
 /**
    \return either the total number of descriptors set, zero on timeout, or a
@@ -35,24 +35,24 @@ aug_setfdeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask);
 */
 
 AUGSYS_API int
-aug_waitfdevents(aug_mplexer_t mplexer, const struct timeval* timeout);
+aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout);
 
 AUGSYS_API int
-aug_fdeventmask(aug_mplexer_t mplexer, int fd);
+aug_fdeventmask(aug_muxer_t muxer, int fd);
 
 AUGSYS_API int
-aug_fdevents(aug_mplexer_t mplexer, int fd);
+aug_fdevents(aug_muxer_t muxer, int fd);
 
 /**
-   Creates a pipe or socket-pair suitable for use with mplexer.  On Windows,
+   Creates a pipe or socket-pair suitable for use with muxer.  On Windows,
    only socket descriptors can be used with select(), therefore,
-   aug_mplexerpipe() will return a socket-pair.
+   aug_muxerpipe() will return a socket-pair.
 
    \sa aug_socketpair().
 
  */
 
 AUGSYS_API int
-aug_mplexerpipe(int fds[2]);
+aug_muxerpipe(int fds[2]);
 
-#endif /* AUGSYS_MPLEXER_H */
+#endif /* AUGSYS_MUXER_H */

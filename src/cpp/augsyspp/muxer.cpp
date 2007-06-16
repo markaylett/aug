@@ -2,4 +2,4 @@
    See the file COPYING for copying permission.
 */
 #define AUGSYSPP_BUILD
-#include "augsyspp/mplexer.hpp"
+#include "augsyspp/muxer.hpp"

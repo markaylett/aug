@@ -56,7 +56,7 @@ libaugsyspp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugsyspp_la_OBJECTS = base.lo config.lo dlfcn.lo endpoint.lo \
 	errinfo.lo exception.lo inetaddr.lo lock.lo mcast.lo mmap.lo \
-	mplexer.lo mutex.lo null.lo smartfd.lo smartptr.lo socket.lo \
+	mutex.lo muxer.lo null.lo smartfd.lo smartptr.lo socket.lo \
 	string.lo time.lo types.lo unistd.lo utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
 am_augsyspp_exceptiontest_OBJECTS = exceptiontest.$(OBJEXT)
@@ -245,8 +245,8 @@ modinclude_HEADERS = \
 	lock.hpp \
 	mcast.hpp \
 	mmap.hpp \
-	mplexer.hpp \
 	mutex.hpp \
+	muxer.hpp \
 	null.hpp \
 	smartfd.hpp \
 	smartptr.hpp \
@@ -269,8 +269,8 @@ libaugsyspp_la_SOURCES = \
 	lock.cpp \
 	mcast.cpp \
 	mmap.cpp \
-	mplexer.cpp \
 	mutex.cpp \
+	muxer.cpp \
 	null.cpp \
 	smartfd.cpp \
 	smartptr.cpp \
@@ -394,9 +394,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexertest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/null.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartfd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartptr.Plo@am__quote@

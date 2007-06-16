@@ -224,7 +224,7 @@ sslwrite_(SSL* ssl, struct buf_* x)
 static int
 realmask_(struct aug_nbfile* nbfile)
 {
-    /* Calculate the real mask to be used by the mplexer. */
+    /* Calculate the real mask to be used by the muxer. */
 
     struct sslext_* x = nbfile->ext_;
     int mask = 0;
@@ -279,7 +279,7 @@ updateevents_(struct aug_nbfile* nbfile)
     struct sslext_* x = nbfile->ext_;
     int real, user;
 
-    aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_,
+    aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_,
                        (real = realmask_(nbfile)));
 
     if ((user = userevents_(nbfile))
@@ -297,7 +297,7 @@ removenbfile_(struct aug_nbfile* nbfile)
 
     AUG_DEBUG3("clearing io-event mask: fd=[%d]", nbfile->fd_);
 
-    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_, 0))
+    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_, 0))
         ret = NULL;
 
     if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->fd_))
@@ -585,7 +585,7 @@ static int
 nbfilecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
 {
     struct sslext_* x = nbfile->ext_;
-    int events = aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
+    int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
     int ret, rw = 0;
 
     /* Determine which SSL operations are to be performed. */
@@ -715,8 +715,8 @@ createsslext_(aug_nbfiles_t nbfiles, int fd, SSL* ssl)
     clearbuf_(&x->outbuf_);
     x->state_ = NORMAL;
     x->shutdown_ = 0;
-    x->mask_ = aug_fdeventmask(nbfiles->mplexer_, fd);
-    aug_setfdeventmask(nbfiles->mplexer_, fd, AUG_FDEVENTRDWR);
+    x->mask_ = aug_fdeventmask(nbfiles->muxer_, fd);
+    aug_setfdeventmask(nbfiles->muxer_, fd, AUG_FDEVENTRDWR);
 
     return x;
 }

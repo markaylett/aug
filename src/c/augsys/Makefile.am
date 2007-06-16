@@ -19,8 +19,8 @@ modinclude_HEADERS = \
 	log.h \
 	mcast.h \
 	mmap.h \
-	mplexer.h \
 	mutex.h \
+	muxer.h \
 	queue.h \
 	socket.h \
 	string.h \
@@ -50,8 +50,8 @@ libaugsys_la_SOURCES = \
 	log.c \
 	mcast.c \
 	mmap.c \
-	mplexer.c \
 	mutex.c \
+	muxer.c \
 	socket.c \
 	string.c \
 	time.c \

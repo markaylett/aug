@@ -151,7 +151,7 @@ namespace test {
 
     struct session {
 
-        mplexer& mplexer_;
+        muxer& muxer_;
         smartfd sfd_;
         timer timer_;
         buffer buffer_;
@@ -160,11 +160,11 @@ namespace test {
         ~session() AUG_NOTHROW
         {
             try {
-                setfdeventmask(mplexer_, sfd_, 0);
+                setfdeventmask(muxer_, sfd_, 0);
             } AUG_PERRINFOCATCH;
         }
-        session(mplexer& mplexer, const smartfd& sfd, timers& timers)
-            : mplexer_(mplexer),
+        session(muxer& muxer, const smartfd& sfd, timers& timers)
+            : muxer_(muxer),
               sfd_(sfd),
               timer_(timers, null),
               heartbeats_(0)
@@ -180,7 +180,7 @@ namespace test {
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
-                setfdeventmask(mplexer_, sfd_, AUG_FDEVENTRDWR);
+                setfdeventmask(muxer_, sfd_, AUG_FDEVENTRDWR);
             } else
                 shutdown(sfd_, SHUT_RDWR);
         }
@@ -192,7 +192,7 @@ namespace test {
 
         files files_;
         timers timers_;
-        mplexer mplexer_;
+        muxer muxer_;
         smartfd sfd_;
         map<int, sessionptr> sfds_;
 
@@ -206,10 +206,10 @@ namespace test {
             smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
 
             insertfile(files_, aug_eventrd(), cb, var);
-            setfdeventmask(mplexer_, aug_eventrd(), AUG_FDEVENTRD);
+            setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
 
             insertfile(files_, sfd, cb, var);
-            setfdeventmask(mplexer_, sfd, AUG_FDEVENTRD);
+            setfdeventmask(muxer_, sfd, AUG_FDEVENTRD);
 
             sfd_ = sfd;
         }
@@ -224,7 +224,7 @@ namespace test {
         {
             insertfile(state_->files_, ref, *this);
             try {
-                setfdeventmask(state_->mplexer_, ref, mask);
+                setfdeventmask(state_->muxer_, ref, mask);
             } catch (...) {
                 removefile(state_->files_, ref);
             }
@@ -286,7 +286,7 @@ namespace test {
 
             state_->sfds_.insert(make_pair
                                  (sfd.get(), sessionptr
-                                  (new session(state_->mplexer_, sfd,
+                                  (new session(state_->muxer_, sfd,
                                                state_->timers_))));
             return true;
         }
@@ -295,7 +295,7 @@ namespace test {
         connection(int fd, aug_files& files)
         {
             sessionptr ptr(state_->sfds_[fd]);
-            unsigned short bits(fdevents(state_->mplexer_, fd));
+            unsigned short bits(fdevents(state_->muxer_, fd));
 
             if (bits & AUG_FDEVENTRD) {
 
@@ -308,7 +308,7 @@ namespace test {
                     return false;
                 }
 
-                setfdeventmask(state_->mplexer_, fd, AUG_FDEVENTRDWR);
+                setfdeventmask(state_->muxer_, fd, AUG_FDEVENTRDWR);
                 ptr->timer_.cancel();
                 ptr->heartbeats_ = 0;
             }
@@ -316,7 +316,7 @@ namespace test {
             if (bits & AUG_FDEVENTWR) {
 
                 if (!ptr->buffer_.writesome(fd)) {
-                    setfdeventmask(state_->mplexer_, fd, AUG_FDEVENTRD);
+                    setfdeventmask(state_->muxer_, fd, AUG_FDEVENTRD);
                     ptr->timer_.reset(5000);
                 }
             }
@@ -379,7 +379,7 @@ namespace test {
 
                     scoped_unblock unblock;
                     while (AUG_RETINTR == (ret = waitfdevents(state_
-                                                              ->mplexer_)))
+                                                              ->muxer_)))
                         ;
 
                 } else {
@@ -388,7 +388,7 @@ namespace test {
 
                     scoped_unblock unblock;
                     while (AUG_RETINTR == (ret = waitfdevents(state_
-                                                              ->mplexer_,
+                                                              ->muxer_,
                                                               tv)))
                         ;
                 }
@@ -407,7 +407,7 @@ namespace test {
         bool
         filecb(int fd)
         {
-            if (!fdevents(state_->mplexer_, fd))
+            if (!fdevents(state_->muxer_, fd))
                 return true;
 
             if (fd == aug_eventrd())

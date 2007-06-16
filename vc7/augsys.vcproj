@@ -165,10 +165,10 @@
 				RelativePath="..\src\c\augsys\mmap.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augsys\mplexer.c">
+				RelativePath="..\src\c\augsys\mutex.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augsys\mutex.c">
+				RelativePath="..\src\c\augsys\muxer.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\socket.c">
@@ -242,10 +242,10 @@
 				RelativePath="..\src\c\augsys\mmap.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augsys\mplexer.h">
+				RelativePath="..\src\c\augsys\mutex.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augsys\mutex.h">
+				RelativePath="..\src\c\augsys\muxer.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\queue.h">

@@ -53,7 +53,7 @@ namespace test {
     class service {
 
         struct state {
-            mplexer mplexer_;
+            muxer muxer_;
             timers timers_;
             timer timer_;
         public:
@@ -75,7 +75,7 @@ namespace test {
 
             AUG_DEBUG2("checking event pipe '%d'", fd);
 
-            if (!fdevents(state_->mplexer_, fd))
+            if (!fdevents(state_->muxer_, fd))
                 return;
 
             AUG_DEBUG2("reading event");
@@ -172,7 +172,7 @@ namespace test {
             verify(aug_setsrvlogger("aug"));
 
             auto_ptr<state> ptr(new state());
-            setfdeventmask(ptr->mplexer_, aug_eventrd(), AUG_FDEVENTRD);
+            setfdeventmask(ptr->muxer_, aug_eventrd(), AUG_FDEVENTRD);
             state_ = ptr;
         }
 
@@ -191,14 +191,14 @@ namespace test {
                 if (state_->timers_.empty()) {
 
                     while (AUG_RETINTR == (ret = waitfdevents(state_
-                                                              ->mplexer_)))
+                                                              ->muxer_)))
                         ;
 
                 } else {
 
                     foreachexpired(state_->timers_, 0 == ret, tv);
                     while (AUG_RETINTR == (ret = waitfdevents(state_
-                                                              ->mplexer_,
+                                                              ->muxer_,
                                                               tv)))
                         ;
                 }

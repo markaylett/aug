@@ -16,7 +16,7 @@ struct set_ {
     fd_set rd_, wr_, ex_;
 };
 
-struct aug_mplexer_ {
+struct aug_muxer_ {
     struct set_ in_, out_;
     size_t bits_;
 };
@@ -90,30 +90,30 @@ setfdevents_(struct set_* p, SOCKET h, unsigned short mask)
     return bits;
 }
 
-AUGSYS_API aug_mplexer_t
-aug_createmplexer(void)
+AUGSYS_API aug_muxer_t
+aug_createmuxer(void)
 {
-    aug_mplexer_t mplexer = malloc(sizeof(struct aug_mplexer_));
-    if (!mplexer) {
+    aug_muxer_t muxer = malloc(sizeof(struct aug_muxer_));
+    if (!muxer) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    zeroset_(&mplexer->in_);
-    zeroset_(&mplexer->out_);
-    mplexer->bits_ = 0;
-    return mplexer;
+    zeroset_(&muxer->in_);
+    zeroset_(&muxer->out_);
+    muxer->bits_ = 0;
+    return muxer;
 }
 
 AUGSYS_API int
-aug_destroymplexer(aug_mplexer_t mplexer)
+aug_destroymuxer(aug_muxer_t muxer)
 {
-    free(mplexer);
+    free(muxer);
     return 0;
 }
 
 AUGSYS_API int
-aug_setfdeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
+aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask)
 {
     /* Although this condition does not necessarily mean that the set has been
        exhausted, it gives a reasonable approximation given the costly
@@ -130,17 +130,17 @@ aug_setfdeventmask(aug_mplexer_t mplexer, int fd, unsigned short mask)
         return -1;
     }
 
-    mplexer->bits_ += setfdevents_(&mplexer->in_, _get_osfhandle(fd), mask);
+    muxer->bits_ += setfdevents_(&muxer->in_, _get_osfhandle(fd), mask);
     return 0;
 }
 
 AUGSYS_API int
-aug_waitfdevents(aug_mplexer_t mplexer, const struct timeval* timeout)
+aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
     int ret;
-    mplexer->out_ = mplexer->in_;
+    muxer->out_ = muxer->in_;
 
-    if (0 == mplexer->bits_) {
+    if (0 == muxer->bits_) {
         Sleep(timeout ? aug_tvtoms(timeout) : INFINITE);
         return 0;
     }
@@ -148,8 +148,8 @@ aug_waitfdevents(aug_mplexer_t mplexer, const struct timeval* timeout)
     /* Note: WinSock ignores the nfds argument. */
 
     if (SOCKET_ERROR ==
-        (ret = select(-1, &mplexer->out_.rd_, &mplexer->out_.wr_,
-                      &mplexer->out_.ex_, timeout))) {
+        (ret = select(-1, &muxer->out_.rd_, &muxer->out_.wr_,
+                      &muxer->out_.ex_, timeout))) {
 
         if (WSAEINTR == aug_setwin32errinfo(NULL, __FILE__, __LINE__,
                                             WSAGetLastError()))
@@ -159,19 +159,19 @@ aug_waitfdevents(aug_mplexer_t mplexer, const struct timeval* timeout)
 }
 
 AUGSYS_API int
-aug_fdeventmask(aug_mplexer_t mplexer, int fd)
+aug_fdeventmask(aug_muxer_t muxer, int fd)
 {
-    return external_(&mplexer->in_, _get_osfhandle(fd));
+    return external_(&muxer->in_, _get_osfhandle(fd));
 }
 
 AUGSYS_API int
-aug_fdevents(aug_mplexer_t mplexer, int fd)
+aug_fdevents(aug_muxer_t muxer, int fd)
 {
-    return external_(&mplexer->out_, _get_osfhandle(fd));
+    return external_(&muxer->out_, _get_osfhandle(fd));
 }
 
 AUGSYS_API int
-aug_mplexerpipe(int fds[2])
+aug_muxerpipe(int fds[2])
 {
     int local[2];
 

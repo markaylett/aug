@@ -3,8 +3,8 @@ EXTRA_DIST = \
 	dlfcn.c \
 	lock.c \
 	mcast.c \
-	mplexer.c \
 	mmap.c \
+	muxer.c \
 	socket.c \
 	string.c \
 	time.c \

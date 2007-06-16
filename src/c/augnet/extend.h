@@ -7,10 +7,10 @@
 #include "augnet/file.h"
 #include "augnet/types.h"
 
-#include "augsys/mplexer.h"
+#include "augsys/muxer.h"
 
 struct aug_nbfiles_ {
-    aug_mplexer_t mplexer_;
+    aug_muxer_t muxer_;
     struct aug_files files_;
     int nowait_;
 };

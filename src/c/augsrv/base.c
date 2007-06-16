@@ -12,7 +12,7 @@ AUG_RCSID("$Id$");
 #include "augsys/base.h"   /* aug_exit() */
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
-#include "augsys/mplexer.h"
+#include "augsys/muxer.h"
 #include "augsys/unistd.h" /* aug_close() */
 #include "augsys/windows.h"
 
@@ -76,7 +76,7 @@ openpipe_(void)
     int fds[2];
     assert(-1 == fds_[0] && -1 == fds_[1]);
 
-    if (-1 == aug_mplexerpipe(fds))
+    if (-1 == aug_muxerpipe(fds))
         return -1;
 
     fds_[0] = fds[0];

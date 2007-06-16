@@ -5,7 +5,7 @@
 
 #include "augsyspp/base.hpp"
 #include "augsyspp/endpoint.hpp"
-#include "augsyspp/mplexer.hpp"
+#include "augsyspp/muxer.hpp"
 #include "augsyspp/unistd.hpp"
 
 #include "augsys/log.h"
@@ -29,9 +29,9 @@ main(int argc, char* argv[])
         std::pair<smartfd, bool> xy(tryconnect(ctor, ep));
         if (!xy.second) {
 
-            mplexer mp;
-            setfdeventmask(mp, xy.first, AUG_FDEVENTALL);
-            waitfdevents(mp);
+            muxer mux;
+            setfdeventmask(mux, xy.first, AUG_FDEVENTALL);
+            waitfdevents(mux);
 
             // Assuming that there is no endpoint, an exception should now be
             // thrown.

@@ -35,11 +35,11 @@ main(int argc, char* argv[])
 
             joinmcast(sfd, in, 4 == argc ? argv[3] : 0);
 
-            mplexer mp;
-            setfdeventmask(mp, sfd, AUG_FDEVENTRD);
+            muxer mux;
+            setfdeventmask(mux, sfd, AUG_FDEVENTRD);
 
             for (;;) {
-                while (AUG_RETINTR == waitfdevents(mp))
+                while (AUG_RETINTR == waitfdevents(mux))
                     ;
 
                 char buf[1024];

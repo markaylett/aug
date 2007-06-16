@@ -156,10 +156,10 @@
 				RelativePath="..\src\cpp\augsyspp\mmap.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augsyspp\mplexer.cpp">
+				RelativePath="..\src\cpp\augsyspp\mutex.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augsyspp\mutex.cpp">
+				RelativePath="..\src\cpp\augsyspp\muxer.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\null.cpp">
@@ -221,10 +221,10 @@
 				RelativePath="..\src\cpp\augsyspp\mmap.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augsyspp\mplexer.hpp">
+				RelativePath="..\src\cpp\augsyspp\mutex.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augsyspp\mutex.hpp">
+				RelativePath="..\src\cpp\augsyspp\muxer.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\null.hpp">

@@ -24,7 +24,7 @@ removenbfile_(struct aug_nbfile* nbfile)
 
     AUG_DEBUG3("clearing io-event mask: fd=[%d]", nbfile->fd_);
 
-    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_, 0))
+    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_, 0))
         ret = NULL;
 
     if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->fd_))
@@ -151,7 +151,7 @@ static const struct aug_fdtype fdtype_ = {
 static int
 nbfilecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
 {
-    int events = aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
+    int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
     return events
         ? nbfile->cb_(var, nbfile->fd_, (unsigned short)events) : 1;
 }
@@ -159,19 +159,19 @@ nbfilecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
 static int
 seteventmask_(struct aug_nbfile* nbfile, unsigned short mask)
 {
-    return aug_setfdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_, mask);
+    return aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_, mask);
 }
 
 static int
 eventmask_(struct aug_nbfile* nbfile)
 {
-    return aug_fdeventmask(nbfile->nbfiles_->mplexer_, nbfile->fd_);
+    return aug_fdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_);
 }
 
 static int
 events_(struct aug_nbfile* nbfile)
 {
-    return aug_fdevents(nbfile->nbfiles_->mplexer_, nbfile->fd_);
+    return aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
 }
 
 static int
@@ -205,7 +205,7 @@ aug_createnbfiles(void)
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
-    if (!(nbfiles->mplexer_ = aug_createmplexer())) {
+    if (!(nbfiles->muxer_ = aug_createmuxer())) {
         free(nbfiles);
         return NULL;
     }
@@ -218,7 +218,7 @@ AUGNET_API int
 aug_destroynbfiles(aug_nbfiles_t nbfiles)
 {
     int ret = aug_destroyfiles(&nbfiles->files_);
-    if (-1 == aug_destroymplexer(nbfiles->mplexer_))
+    if (-1 == aug_destroymuxer(nbfiles->muxer_))
         ret = -1;
     free(nbfiles);
     return ret;
@@ -293,10 +293,10 @@ aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout)
 
     if (nbfiles->nowait_) {
         nbfiles->nowait_ = 0;
-        ret = aug_waitfdevents(nbfiles->mplexer_, &nowait)
+        ret = aug_waitfdevents(nbfiles->muxer_, &nowait)
             + 1; /* At least one. */
     } else
-        ret = aug_waitfdevents(nbfiles->mplexer_, timeout);
+        ret = aug_waitfdevents(nbfiles->muxer_, timeout);
 
     return ret;
 }

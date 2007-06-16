@@ -15,7 +15,7 @@ main(int argc, char* argv[])
 
     aug_atexitinit(&errinfo);
 
-    if (-1 == aug_mplexerpipe(fds)) {
+    if (-1 == aug_muxerpipe(fds)) {
         aug_perrinfo(NULL, "aug_term() failed");
         return 1;
     }
