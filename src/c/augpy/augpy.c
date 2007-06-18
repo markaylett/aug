@@ -136,15 +136,6 @@ getmethod_(PyObject* module, const char* name)
 static void
 destroyimport_(struct import_* import)
 {
-    if (import->open_ && import->stop_) {
-
-        PyObject* x = PyObject_CallFunction(import->stop_, NULL);
-        if (x) {
-            Py_DECREF(x);
-        } else
-            printerr_();
-    }
-
     Py_XDECREF(import->authcert_);
     Py_XDECREF(import->expire_);
     Py_XDECREF(import->wrexpire_);
@@ -170,8 +161,7 @@ createimport_(const char* sname)
     if (!import)
         return NULL;
 
-    import->open_ = 0;
-    if (!(import->module_ = PyImport_ImportModule((char*)sname))) {
+     if (!(import->module_ = PyImport_ImportModule((char*)sname))) {
         printerr_();
         goto fail;
     }
@@ -189,6 +179,7 @@ createimport_(const char* sname)
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
     import->expire_ = getmethod_(import->module_, "expire");
     import->authcert_ = getmethod_(import->module_, "authcert");
+    import->open_ = 0;
 
     return import;
 
@@ -239,6 +230,16 @@ stop_(void)
 {
     struct import_* import = augrt_getsession()->user_;
     assert(import);
+
+    if (import->open_ && import->stop_) {
+
+        PyObject* x = PyObject_CallFunction(import->stop_, NULL);
+        if (x) {
+            Py_DECREF(x);
+        } else
+            printerr_();
+    }
+
     destroyimport_(import);
 }
 
