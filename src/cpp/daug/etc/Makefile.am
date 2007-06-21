@@ -5,4 +5,5 @@ EXTRA_DIST = \
 	test4.conf \
 	test5.conf \
 	test6.conf \
-	test7.conf
+	test7.conf \
+	test8.conf
