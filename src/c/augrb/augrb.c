@@ -66,7 +66,7 @@ dorescue_(VALUE unused, VALUE except)
 {
     except_ = 1;
     except = rb_funcall(except, rb_intern("to_s"), 0);
-    augrt_writelog(AUGRT_LOGERROR, "%s", StringValueCStr(except));
+    augrt_writelog(AUGRT_LOGERROR, "%s", StringValuePtr(except));
     return Qnil;
 }
 
@@ -335,7 +335,7 @@ createsession_(const char* sname)
 static VALUE
 writelog_(VALUE self, VALUE level, VALUE msg)
 {
-    augrt_writelog(NUM2INT(level), StringValueCStr(msg));
+    augrt_writelog(NUM2INT(level), StringValuePtr(msg));
     return Qnil;
 }
 
@@ -365,7 +365,7 @@ post_(int argc, VALUE* argv, VALUE self)
 
     rb_scan_args(argc, argv, "21", &to, &type, &buf);
 
-    /* Type-check now to ensure StringValueCStr() later succeeds. */
+    /* Type-check now to ensure string operations succeed. */
 
     Check_Type(to, T_STRING);
     Check_Type(type, T_STRING);
@@ -375,7 +375,7 @@ post_(int argc, VALUE* argv, VALUE self)
         var.arg_ = register_(StringValue(buf));
     }
 
-    if (-1 == augrt_post(StringValueCStr(to), StringValueCStr(type), &var)) {
+    if (-1 == augrt_post(RSTRING(to)->ptr, RSTRING(type)->ptr, &var)) {
         if (var.arg_)
             unregister_(var.arg_);
         rb_raise(cerror_, augrt_error());
@@ -393,14 +393,16 @@ dispatch_(int argc, VALUE* argv, VALUE self)
 
     rb_scan_args(argc, argv, "21", &to, &type, &user);
 
+    Check_Type(to, T_STRING);
+    Check_Type(type, T_STRING);
+
     if (user != Qnil) {
         user = StringValue(user);
         ptr = RSTRING(user)->ptr;
         len = RSTRING(user)->len;
     }
 
-    if (-1 == augrt_dispatch(StringValueCStr(to), StringValueCStr(type),
-                             ptr, len))
+    if (-1 == augrt_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr, ptr, len))
         rb_raise(cerror_, augrt_error());
 
     return Qnil;
@@ -414,10 +416,12 @@ getenv_(int argc, VALUE* argv, VALUE self)
 
     rb_scan_args(argc, argv, "11", &name, &def);
 
-    if (!(value = augrt_getenv(StringValueCStr(name), NULL)))
+    Check_Type(name, T_STRING);
+
+    if (!(value = augrt_getenv(RSTRING(name)->ptr, NULL)))
         return def;
 
-    return rb_str_new2(value);
+    return rb_tainted_str_new2(value);
 }
 
 static VALUE
@@ -451,15 +455,15 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
 
     rb_scan_args(argc, argv, "21", &host, &serv, &user);
 
-    /* Type-check now to ensure StringValueCStr() later succeeds. */
+    /* Type-check now to ensure string operations succeed. */
 
     Check_Type(host, T_STRING);
     serv = StringValue(serv);
 
     sock = register_(newobject_(INT2FIX(0), user));
 
-    if (-1 == (cid = augrt_tcpconnect(StringValueCStr(host),
-                                      StringValueCStr(serv), sock))) {
+    if (-1 == (cid = augrt_tcpconnect(RSTRING(host)->ptr,
+                                      RSTRING(serv)->ptr, sock))) {
         unregister_(sock);
         rb_raise(cerror_, augrt_error());
     }
@@ -477,15 +481,15 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
 
     rb_scan_args(argc, argv, "21", &host, &serv, &user);
 
-    /* Type-check now to ensure StringValueCStr() later succeeds. */
+    /* Type-check now to ensure string operations succeed. */
 
     Check_Type(host, T_STRING);
     serv = StringValue(serv);
 
     sock = register_(newobject_(INT2FIX(0), user));
 
-    if (-1 == (cid = augrt_tcplisten(StringValueCStr(host),
-                                     StringValueCStr(serv), sock))) {
+    if (-1 == (cid = augrt_tcplisten(RSTRING(host)->ptr,
+                                     RSTRING(serv)->ptr, sock))) {
         unregister_(sock);
         rb_raise(cerror_, augrt_error());
     }
@@ -621,7 +625,10 @@ static VALUE
 setsslclient_(VALUE self, VALUE sock, VALUE ctx)
 {
     int cid = getid_(sock);
-    if (-1 == augrt_setsslclient(cid, StringValueCStr(ctx)))
+
+    Check_Type(ctx, T_STRING);
+
+    if (-1 == augrt_setsslclient(cid, RSTRING(ctx)->ptr))
         rb_raise(cerror_, augrt_error());
 
     return Qnil;
@@ -631,17 +638,56 @@ static VALUE
 setsslserver_(VALUE self, VALUE sock, VALUE ctx)
 {
     int cid = getid_(sock);
-    if (-1 == augrt_setsslserver(cid, StringValueCStr(ctx)))
+
+    Check_Type(ctx, T_STRING);
+
+    if (-1 == augrt_setsslserver(cid, RSTRING(ctx)->ptr))
         rb_raise(cerror_, augrt_error());
 
     return Qnil;
 }
 
-static VALUE
-initrb_(VALUE nil)
+static void
+setpath_(void)
 {
+    const char* s;
+    char prev[1024], ruby[1024];
+
+    /* Store working directory for later restoration. */
+
+    getcwd(prev, sizeof(prev));
+
+    /* Path may be relative to run directory. */
+
+    if ((s = augrt_getenv("rundir", NULL)))
+        chdir(s);
+
+    s = augrt_getenv("module.augrb.rubypath", "ruby");
+    augrt_writelog(AUGRT_LOGDEBUG, "module.augrb.rubypath=[%s]", s);
+    chdir(s);
+
+    /* Append current directory. */
+
+    getcwd(ruby, sizeof(ruby));
+    ruby_incpush(ruby);
+
+    /* Restore previous working directory. */
+
+    chdir(prev);
+}
+
+static VALUE
+initrb_(VALUE unused)
+{
+#if defined(NT)
+    static int argc = 1;
+    static char* argv[] = { "augrb", NULL };
+    char** pp = argv;
+    NtInitialize(&argc, &pp);
+#endif /* NT */
+
     ruby_script("augrb");
-    ruby_init_loadpath();
+    setpath_();
 
     /* Ids of session functions. */
 
@@ -765,7 +811,7 @@ event_(const char* from, const char* type, const void* user, size_t size)
 
     if (session->event_)
         funcall3_(eventid_, rb_str_new2(from), rb_str_new2(type),
-                  user ? rb_str_new(user, size) : Qnil);
+                  user ? rb_tainted_str_new(user, size) : Qnil);
 }
 
 static void
@@ -842,7 +888,7 @@ data_(const struct augrt_object* sock, const void* buf, size_t len)
     user = *(VALUE*)sock->user_;
 
     if (session->data_)
-        funcall2_(dataid_, user, rb_str_new(buf, len));
+        funcall2_(dataid_, user, rb_tainted_str_new(buf, len));
 }
 
 static void

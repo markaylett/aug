@@ -45,11 +45,8 @@ setpath_(void)
     if ((s = augrt_getenv("rundir", NULL)))
         chdir(s);
 
-    if (!(s = augrt_getenv("module.augpy.pythonpath", NULL)))
-        s = "bin";
-    else
-        augrt_writelog(AUGRT_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
-
+    s = augrt_getenv("module.augpy.pythonpath", "python");
+    augrt_writelog(AUGRT_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
     chdir(s);
 
     if ((sys = PyImport_ImportModule("sys"))) {
@@ -66,7 +63,7 @@ setpath_(void)
 
                 augrt_writelog(AUGRT_LOGDEBUG, "adding to sys.path: %s", buf);
 
-                PyList_Insert(path, 0, dir);
+                PyList_Append(path, dir);
 
                 Py_DECREF(dir);
             }
