@@ -99,6 +99,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_45027AE8D0E01C2411D9F7DFA089D7E5"
+        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_45027AE8D0E01C2411D9F7DFA089D7E5"
+        "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4949A76E3E3C4C45B7374520F10551EB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -135,13 +147,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_6134F68D1A7F4BB6AEF465AB7A4D39B6"
+        "MsmKey" = "8:_63E2586081D24CDC9DC5F2C4C347F202"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_63E2586081D24CDC9DC5F2C4C347F202"
+        "MsmKey" = "8:_6593CC6426FE4DE7A5B3538C6C5E9DFC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -160,12 +172,6 @@
         "Entry"
         {
         "MsmKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_74285562AEBA4BBF909096B68BF16B39"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -207,8 +213,32 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8F02B2E63BCC4210B6B0001D45B5F481"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_990C2D718D9C4D788D787F9106CF2640"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9B84652AEA4F4980896DA4DDBB7F39CC"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9BB2FC870860B3290B41C958CD8685FC"
+        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9BB2FC870860B3290B41C958CD8685FC"
+        "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -231,8 +261,32 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A7B4C5AAB427F52322C38E5A209DC67B"
+        "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A7B4C5AAB427F52322C38E5A209DC67B"
+        "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A7B4C5AAB427F52322C38E5A209DC67B"
+        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A7D63EA79A624B0EB9130EAD0AB9CB6C"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B78E4B957466F5AA6A3DE2A2F000379D"
+        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -472,7 +526,7 @@
             "SourcePath" = "8:libaugnet-1.dll"
             "TargetName" = "8:libaugnet-1.dll"
             "Tag" = "8:"
-            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -687,6 +741,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_45027AE8D0E01C2411D9F7DFA089D7E5"
+            {
+            "SourcePath" = "8:libaugutil-1.dll"
+            "TargetName" = "8:libaugutil-1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_4949A76E3E3C4C45B7374520F10551EB"
             {
             "SourcePath" = "8:..\\etc\\daug.conf.default"
@@ -807,26 +881,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_6134F68D1A7F4BB6AEF465AB7A4D39B6"
-            {
-            "SourcePath" = "8:..\\src\\py\\buffer.py"
-            "TargetName" = "8:buffer.py"
-            "Tag" = "8:"
-            "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_63E2586081D24CDC9DC5F2C4C347F202"
             {
             "SourcePath" = "8:..\\etc\\augres.reg"
@@ -847,12 +901,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_74285562AEBA4BBF909096B68BF16B39"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_6593CC6426FE4DE7A5B3538C6C5E9DFC"
             {
-            "SourcePath" = "8:..\\src\\py\\interpreter.py"
-            "TargetName" = "8:interpreter.py"
+            "SourcePath" = "8:..\\src\\rb\\augutil.rb"
+            "TargetName" = "8:augutil.rb"
             "Tag" = "8:"
-            "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Folder" = "8:_044DEE46FA8344DC969C338FEC2A788E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -967,6 +1021,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_8F02B2E63BCC4210B6B0001D45B5F481"
+            {
+            "SourcePath" = "8:..\\src\\py\\augutil.py"
+            "TargetName" = "8:augutil.py"
+            "Tag" = "8:"
+            "Folder" = "8:_DEC816F06599440E89A43AF0FEF4C63B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_990C2D718D9C4D788D787F9106CF2640"
+            {
+            "SourcePath" = "8:..\\src\\rb\\rbflags"
+            "TargetName" = "8:rbflags"
+            "Tag" = "8:"
+            "Folder" = "8:_044DEE46FA8344DC969C338FEC2A788E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_9B84652AEA4F4980896DA4DDBB7F39CC"
             {
             "SourcePath" = "8:reconf.bat"
@@ -985,6 +1079,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_9BB2FC870860B3290B41C958CD8685FC"
+            {
+            "SourcePath" = "8:libaugnet-1.dll"
+            "TargetName" = "8:libaugnet-1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_9DAB51320B364DC8B867D0567DB57D70"
@@ -1047,6 +1161,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_A7B4C5AAB427F52322C38E5A209DC67B"
+            {
+            "SourcePath" = "8:libaugsys-1.dll"
+            "TargetName" = "8:libaugsys-1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_A7D63EA79A624B0EB9130EAD0AB9CB6C"
             {
             "SourcePath" = "8:..\\example\\augrt\\bench.conf"
@@ -1065,6 +1199,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_B78E4B957466F5AA6A3DE2A2F000379D"
+            {
+            "SourcePath" = "8:libaugmar-1.dll"
+            "TargetName" = "8:libaugmar-1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_B7AEAA90118C4CC497CF2A956B1DA290"
@@ -1132,7 +1286,7 @@
             "SourcePath" = "8:libaugutil-1.dll"
             "TargetName" = "8:libaugutil-1.dll"
             "Tag" = "8:"
-            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1403,6 +1557,17 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_044DEE46FA8344DC969C338FEC2A788E"
+                    {
+                    "Name" = "8:ruby"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_5ABC2097FA9D4390BE29297DCE2EFBA8"
+                        "Folders"
+                        {
+                        }
+                    }
                     "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_0A56689C8E9D472A823ECE14BB0E848C"
                     {
                     "Name" = "8:mod"

@@ -1,6 +1,7 @@
+#!/usr/bin/env python
+#import sys
 from augrt import *
-from buffer import *
-from interpreter import *
+from augutil import *
 import log
 
 # void writelog(level, msg)
@@ -22,7 +23,7 @@ import log
 # bool resettimer(timer, ms)
 # bool canceltimer(timer)
 
-class Commands:
+class Handler:
     def __init__(self):
         self.props = {}
 
@@ -44,14 +45,14 @@ class Commands:
     def do_unset(self, x):
         del self.props[x]
 
-interp = Interpreter(Commands())
+interp = Interpreter(Handler())
 
 # for line in sys.stdin:
-#     x = interp(line)
-#     if x == Quit:
-#         sys.exit()
-#     elif x != None:
-#         print x
+#      x = interp.interpret(line)
+#      if x == Quit:
+#          sys.exit()
+#      elif x != None:
+#          print x
 
 def stop():
     log.debug("stop()")
@@ -75,7 +76,7 @@ def teardown(sock):
 
 def accepted(sock, addr, port):
     log.info("accepted(): %s" % sock)
-    sock.user = Buffer()
+    sock.user = LineParser()
     setrwtimer(sock, 15000, TIMRD)
     send(sock, "+OK hello\r\n")
 
@@ -85,8 +86,8 @@ def connected(sock, addr, port):
 def data(sock, buf):
     log.debug("data(): %s" % sock)
     global interp
-    for line in sock.user.lines(str(buf)):
-        x = interp(line)
+    for line in sock.user.parse(str(buf)):
+        x = interp.interpret(line)
         if x == Quit:
             send(sock, "+OK goodbye\r\n")
             shutdown(sock)

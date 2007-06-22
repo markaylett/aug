@@ -178,11 +178,13 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
+	augutil.rb  \
 	rbflags \
 	rbtest1.rb
 
 rubydir = $(prefix)/ruby
 ruby_DATA = \
+	augutil.rb \
 	rbflags
 
 all: all-am

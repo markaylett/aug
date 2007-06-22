@@ -1,5 +1,5 @@
 from augrt import *
-from buffer import *
+from augutil import *
 import log
 
 # tcplisten(), tcpconnect()
@@ -21,18 +21,18 @@ def closed(sock):
 def accepted(sock, addr, port):
     global server
     log.debug("accepted(): %s" % sock)
-    sock.user = Buffer()
+    sock.user = LineParser()
     server = sock
 
 def connected(sock, addr, port):
     global server
     log.debug("connected(): %s" % sock)
-    sock.user = Buffer()
+    sock.user = LineParser()
     send(server, "hello, world!\n")
 
 def data(sock, buf):
     log.debug("data(): %s" % sock)
-    for line in sock.user.lines(str(buf)):
+    for line in sock.user.parse(str(buf)):
         if line != "hello, world!":
             log.error("unexpected line from data()")
         if sock == server:

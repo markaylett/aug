@@ -1493,7 +1493,7 @@ Optional Features:
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-multicast      enable multicast support [default=yes]
-  --enable-python         enable python support [default=yes]
+  --enable-python         enable python support [default=no]
   --enable-ruby           enable ruby support [default=no]
   --enable-ssl            enable ssl support [default=yes]
   --enable-threads        enable threads support [default=yes]
@@ -19798,7 +19798,7 @@ echo "$as_me: error: bad value $enableval for --enable-python" >&2;}
     esac
 
 else
-  enable_python=yes
+  enable_python=no
 fi
 
 

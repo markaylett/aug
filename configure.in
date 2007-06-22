@@ -35,13 +35,13 @@ if test x$enable_multicast = xyes; then
 fi
 
 AC_ARG_ENABLE(python,
-[  --enable-python         enable python support @<:@default=yes@:>@], [
+[  --enable-python         enable python support @<:@default=no@:>@], [
     case x$enableval in
         xyes) enable_python=yes;;
         xno)  enable_python=no;;
         *) AC_MSG_ERROR(bad value $enableval for --enable-python);;
     esac
-], [enable_python=yes])
+], [enable_python=no])
 AM_CONDITIONAL(ENABLE_PYTHON, test x$enable_python = xyes)
 if test x$enable_python = xyes; then
     AC_DEFINE(ENABLE_PYTHON, 1, [Define to 1 for python support.])

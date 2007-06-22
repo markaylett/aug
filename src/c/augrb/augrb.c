@@ -75,7 +75,7 @@ protect_(VALUE (*body)(), VALUE args)
 {
     VALUE ret;
     except_ = 0;
-    ret = rb_rescue(body, args, dorescue_, Qnil);
+    ret = rb_rescue2(body, args, dorescue_, Qnil, rb_eException, (VALUE)0);
     return ret;
 }
 

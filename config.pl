@@ -131,7 +131,7 @@ if ($CYGWIN_MINGW == $toolset) {
 $strict = valueask ("strict build", 'n');
 $debug = valueask ("debug build", 'n');
 $multicast = valueask ("multicast support", 'y');
-$python = valueask ("python support", 'y');
+$python = valueask ("python support", 'n');
 $ruby = valueask ("ruby support", 'n');
 $ssl = valueask ("ssl support", 'y');
 $threads = valueask ("thread support", 'y');
@@ -172,8 +172,8 @@ $options .= " \\\n\t--enable-maintainer-mode"
     if is $maintainer;
 $options .= " \\\n\t--disable-multicast"
     unless is $multicast;
-$options .= " \\\n\t--disable-python"
-    unless is $python;
+$options .= " \\\n\t--enable-python"
+    if is $python;
 $options .= " \\\n\t--enable-ruby"
     if is $ruby;
 $options .= " \\\n\t--disable-ssl"

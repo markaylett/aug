@@ -1,6 +1,5 @@
 EXTRA_DIST = \
-	buffer.py \
-	interpreter.py \
+	augutil.py \
 	log.py \
 	pyclient.py \
 	pyecho.py \
@@ -17,8 +16,7 @@ EXTRA_DIST = \
 
 pythondir = $(prefix)/python
 python_DATA = \
-	buffer.py \
-	interpreter.py \
+	augutil.py \
 	log.py \
 	pyclient.py \
 	pyecho.py \
