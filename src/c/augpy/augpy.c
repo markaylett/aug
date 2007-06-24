@@ -40,7 +40,14 @@ static void
 setpath_(void)
 {
     const char* s;
+    char prev[1024];
     PyObject* sys;
+
+    /* Store working directory for later restoration. */
+
+    getcwd(prev, sizeof(prev));
+
+    /* Path may be relative to run directory. */
 
     if ((s = augrt_getenv("rundir", NULL)))
         chdir(s);
@@ -73,6 +80,10 @@ setpath_(void)
 
         Py_DECREF(sys);
     }
+
+    /* Restore previous working directory. */
+
+    chdir(prev);
 }
 
 static void

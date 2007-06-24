@@ -271,7 +271,10 @@ newobject_(VALUE id, VALUE user)
 static int
 getid_(VALUE object)
 {
-    Check_Type(object, TYPE(cobject_));
+    if (!rb_obj_is_kind_of(object, cobject_))
+        rb_raise(rb_eTypeError,
+                 "wrong argument type %s (expected Augrt::Object)",
+                 rb_obj_classname(object));
     return FIX2INT(objectid_(object));
 }
 
@@ -852,7 +855,8 @@ accepted_(struct augrt_object* sock, const char* addr, unsigned short port)
 
     /* On entry, sock->user_ is user data belonging to listener. */
 
-    user = newobject_(sock->id_, rb_iv_get(*(VALUE*)sock->user_, "@user"));
+    user = newobject_(INT2FIX(sock->id_),
+                      rb_iv_get(*(VALUE*)sock->user_, "@user"));
 
     /* Reject if function either returns false, or throws an exception. */
 
