@@ -6,4 +6,7 @@ EXTRA_DIST = \
 	pytest5.conf \
 	pytest6.conf \
 	pytest7.conf \
-	rbtest1.conf
+	rbtest1.conf \
+	rbtest2.conf \
+	rbtest3.conf \
+	rbtest4.conf

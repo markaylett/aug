@@ -1,33 +1,28 @@
+require 'log'
+
+# stop(), Object()
+
 module RbTest1
-  def RbTest1.stop
-    puts "stop()"
-  end
-  def RbTest1.start(sname)
-    Augrt.writelog(Augrt::LOGINFO, "start(): #{sname} #{$:}")
-    o = Augrt::Object.new(101, "test")
-    puts o.id
-    puts o.user
-    o.user = "x"
-    puts o.user
-    Augrt.dispatch(sname, "foo", "hello")
-    Augrt.post(sname, "bar", "again")
-    $stdout.flush
-    s = Augrt.getenv("sessions")
-    puts "sessions: #{s}"
-    Augrt.settimer(1000, "our timer")
-    sock = Augrt.tcpconnect("localhost", "1245")
-    puts "opening: #{sock.id} - ruby"
-  end
-  def RbTest1.closed(sock)
-    puts "closing: #{sock.id} - ruby"
-  end
-  def RbTest1.event(frm, type, user)
-    puts "#{frm}: #{type}"    
-    $stdout.flush
-  end
-  def RbTest1.expire(timer, ms)
-    puts "timer: #{timer.user}, #{ms}"
-    ms += 1000
-    #Augrt.stopall
-  end
+    def RbTest1.stop
+        Log.debug("stop()")
+    end
+    def RbTest1.start(sname)
+        Log.debug("start(): #{sname}")
+        o = Augrt::Object.new(101, "our object")
+        Log.debug("to_s(): #{o}")
+        if o.id != 101
+            Log.error("object returned unexpected id")
+        end
+        if o.user != "our object"
+            Log.error("object returned unexpected user")
+        end
+        o.user = "new user"
+        if o.user != "new user"
+            Log.error("object returned unexpected user")
+        end
+        if o != Augrt::Object.new(101, nil)
+            Log.error("comparison operator failed")
+        end
+        Augrt.stopall()
+    end
 end

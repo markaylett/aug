@@ -199,6 +199,22 @@ static const struct augrt_vartype vartype_ = {
 
 /* Augrt::Object functions. */
 
+static void
+checkobject_(VALUE object)
+{
+    if (!rb_obj_is_kind_of(object, cobject_))
+        rb_raise(rb_eTypeError,
+                 "wrong argument type %s (expected Augrt::Object)",
+                 rb_obj_classname(object));
+}
+
+static int
+checkid_(VALUE object)
+{
+    checkobject_(object);
+    return FIX2INT(rb_iv_get(object, "@id"));
+}
+
 static VALUE
 initobject_(VALUE self, VALUE id, VALUE user)
 {
@@ -232,7 +248,7 @@ cmpobject_(VALUE self, VALUE other)
 {
     int lhs, rhs, ret;
 
-    Check_Type(other, TYPE(cobject_));
+    checkobject_(other);
 
     lhs = FIX2INT(rb_iv_get(self, "@id"));
     rhs = FIX2INT(rb_iv_get(other, "@id"));
@@ -243,7 +259,8 @@ cmpobject_(VALUE self, VALUE other)
         ret = 1;
     else
         ret = 0;
-    return ret;
+
+    return INT2FIX(ret);
 }
 
 static VALUE
@@ -266,16 +283,6 @@ newobject_(VALUE id, VALUE user)
 {
     VALUE argv[] = { id, user };
     return rb_class_new_instance(2, argv, cobject_);
-}
-
-static int
-getid_(VALUE object)
-{
-    if (!rb_obj_is_kind_of(object, cobject_))
-        rb_raise(rb_eTypeError,
-                 "wrong argument type %s (expected Augrt::Object)",
-                 rb_obj_classname(object));
-    return FIX2INT(objectid_(object));
 }
 
 static void
@@ -441,7 +448,7 @@ getsession_(VALUE self)
 static VALUE
 shutdown_(VALUE self, VALUE sock)
 {
-    int cid = getid_(sock);
+    int cid = checkid_(sock);
 
     if (-1 == augrt_shutdown(cid))
         rb_raise(cerror_, augrt_error());
@@ -505,7 +512,7 @@ static VALUE
 send_(VALUE self, VALUE sock, VALUE buf)
 {
     struct augrt_var var;
-    int cid = getid_(sock);
+    int cid = checkid_(sock);
 
     var.type_ = &vartype_;
     var.arg_ = register_(StringValue(buf));
@@ -521,7 +528,7 @@ send_(VALUE self, VALUE sock, VALUE buf)
 static VALUE
 setrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 {
-    int cid = getid_(sock);
+    int cid = checkid_(sock);
 
     if (-1 == augrt_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags)))
         rb_raise(cerror_, augrt_error());
@@ -532,7 +539,7 @@ setrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 static VALUE
 resetrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 {
-    int cid = getid_(sock);
+    int cid = checkid_(sock);
 
     /* Return false if no such timer. */
 
@@ -549,7 +556,7 @@ resetrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 static VALUE
 cancelrwtimer_(VALUE self, VALUE sock, VALUE flags)
 {
-    int cid = getid_(sock);
+    int cid = checkid_(sock);
 
     /* Return false if no such timer. */
 
@@ -593,7 +600,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
 static VALUE
 resettimer_(VALUE self, VALUE timer, VALUE ms)
 {
-    int tid = getid_(timer);
+    int tid = checkid_(timer);
 
     /* Return false if no such timer. */
 
@@ -610,7 +617,7 @@ resettimer_(VALUE self, VALUE timer, VALUE ms)
 static VALUE
 canceltimer_(VALUE self, VALUE timer)
 {
-    int tid = getid_(timer);
+    int tid = checkid_(timer);
 
     /* Return false if no such timer. */
 
@@ -627,7 +634,7 @@ canceltimer_(VALUE self, VALUE timer)
 static VALUE
 setsslclient_(VALUE self, VALUE sock, VALUE ctx)
 {
-    int cid = getid_(sock);
+    int cid = checkid_(sock);
 
     Check_Type(ctx, T_STRING);
 
@@ -640,7 +647,7 @@ setsslclient_(VALUE self, VALUE sock, VALUE ctx)
 static VALUE
 setsslserver_(VALUE self, VALUE sock, VALUE ctx)
 {
-    int cid = getid_(sock);
+    int cid = checkid_(sock);
 
     Check_Type(ctx, T_STRING);
 
@@ -737,6 +744,8 @@ initrb_(VALUE unused)
     rb_define_method(cobject_, "<=>", cmpobject_, 1);
     rb_define_method(cobject_, "hash", objecthash_, 0);
     rb_define_method(cobject_, "to_s", objectstr_, 0);
+
+    rb_include_module(cobject_, rb_mComparable);
 
     /* Host module functions. */
 
