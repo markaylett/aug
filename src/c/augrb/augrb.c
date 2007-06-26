@@ -997,6 +997,9 @@ init_(const char* name)
     /* Catch any exceptions. */
 
     protect_(initrb_, Qnil);
+
+    /* Fail if exception thrown during initialisation. */
+
     if (except_) {
         ruby_finalize();
         return NULL;

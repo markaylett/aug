@@ -26,7 +26,7 @@ module RbTest2
             if user != nil
                 Log.error("unexpected user data")
             end
-            Augrt.stopall()
+            Augrt.stopall
         else
             Log.error("unexpected type")
         end

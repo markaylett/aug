@@ -7,7 +7,10 @@ EXTRA_DIST = \
 	rbtest1.rb \
 	rbtest2.rb \
 	rbtest3.rb \
-	rbtest4.rb
+	rbtest4.rb \
+	rbtest5.rb \
+	rbtest6.rb \
+	rbtest7.rb
 
 rubydir = $(prefix)/ruby
 ruby_DATA = \

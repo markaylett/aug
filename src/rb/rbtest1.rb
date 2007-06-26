@@ -23,6 +23,6 @@ module RbTest1
         if o != Augrt::Object.new(101, nil)
             Log.error("comparison operator failed")
         end
-        Augrt.stopall()
+        Augrt.stopall
     end
 end

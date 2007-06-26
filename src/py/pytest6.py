@@ -7,7 +7,6 @@ def stop():
     log.debug("stop()")
 
 def start(sname):
-    global client, listener
     log.debug("start(): %s" % sname)
     tcplisten("0.0.0.0", "1234", None)
     tcpconnect("127.0.0.1", "1234", None)

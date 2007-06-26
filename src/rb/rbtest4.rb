@@ -3,7 +3,7 @@ require 'log'
 # settimer()
 
 module RbTest4
-    def RbTest4.stop()
+    def RbTest4.stop
         Log.debug("stop()")
     end
     def RbTest4.start(sname)
@@ -15,6 +15,6 @@ module RbTest4
         if timer.user != "our timer"
             Log.error("unexpected user in expire()")
         end
-        Augrt.stopall()
+        Augrt.stopall
     end
 end

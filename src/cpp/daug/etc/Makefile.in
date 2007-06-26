@@ -178,7 +178,10 @@ EXTRA_DIST = \
 	rbtest1.conf \
 	rbtest2.conf \
 	rbtest3.conf \
-	rbtest4.conf
+	rbtest4.conf \
+	rbtest5.conf \
+	rbtest6.conf \
+	rbtest7.conf
 
 all: all-am
 

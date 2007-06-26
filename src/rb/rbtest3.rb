@@ -3,7 +3,7 @@ require 'log'
 # getenv()
 
 module RbTest3
-    def RbTest3.stop()
+    def RbTest3.stop
         Log.debug("stop()")
     end
     def RbTest3.start(sname)
@@ -17,6 +17,6 @@ module RbTest3
         if Augrt.getenv("badname", 101) != 101
             Log.error("unexpected value from getenv()")
         end
-        Augrt.stopall()
+        Augrt.stopall
     end
 end
