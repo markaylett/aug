@@ -1,20 +1,20 @@
 module Log
     def Log.crit(s)
-        Augrt.writelog(Augrt::LOGCRIT, s)
+        AugRt.writelog(AugRt::LOGCRIT, s)
     end
     def Log.error(s)
-        Augrt.writelog(Augrt::LOGERROR, s)
+        AugRt.writelog(AugRt::LOGERROR, s)
     end
     def Log.warn(s)
-        Augrt.writelog(Augrt::LOGWARN, s)
+        AugRt.writelog(AugRt::LOGWARN, s)
     end
     def Log.notice(s)
-        Augrt.writelog(Augrt::LOGNOTICE, s)
+        AugRt.writelog(AugRt::LOGNOTICE, s)
     end
     def Log.info(s)
-        Augrt.writelog(Augrt::LOGINFO, s)
+        AugRt.writelog(AugRt::LOGINFO, s)
     end
     def Log.debug(s)
-        Augrt.writelog(Augrt::LOGDEBUG, s)
+        AugRt.writelog(AugRt::LOGDEBUG, s)
     end
 end

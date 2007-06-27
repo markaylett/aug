@@ -3,6 +3,7 @@ EXTRA_DIST = \
 	log.rb \
 	rbecho.rb \
 	rbflags \
+	rbskel.rb \
 	rbstop.rb \
 	rbtest1.rb \
 	rbtest2.rb \
@@ -18,4 +19,5 @@ ruby_DATA = \
 	log.rb \
 	rbecho.rb \
 	rbflags \
+	rbskel.rb \
 	rbstop.rb

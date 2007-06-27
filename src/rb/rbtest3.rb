@@ -8,15 +8,15 @@ module RbTest3
     end
     def RbTest3.start(sname)
         Log.debug("start() #{sname}")
-        if Augrt.getenv("RbTest3") != "test value"
+        if AugRt.getenv("RbTest3") != "test value"
             Log.error("unexpected value from getenv()")
         end
-        if Augrt.getenv("badname") != nil
+        if AugRt.getenv("badname") != nil
             Log.error("unexpected value from getenv()")
         end
-        if Augrt.getenv("badname", 101) != 101
+        if AugRt.getenv("badname", 101) != 101
             Log.error("unexpected value from getenv()")
         end
-        Augrt.stopall
+        AugRt.stopall
     end
 end

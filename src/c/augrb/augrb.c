@@ -197,14 +197,14 @@ static const struct augrt_vartype vartype_ = {
     buf_
 };
 
-/* Augrt::Object functions. */
+/* AugRt::Object functions. */
 
 static void
 checkobject_(VALUE object)
 {
     if (!rb_obj_is_kind_of(object, cobject_))
         rb_raise(rb_eTypeError,
-                 "wrong argument type %s (expected Augrt::Object)",
+                 "wrong argument type %s (expected AugRt::Object)",
                  rb_obj_classname(object));
 }
 
@@ -273,7 +273,7 @@ static VALUE
 objectstr_(VALUE self)
 {
     char sz[64];
-    sprintf(sz, "#<Augrt::Object:%lx,id=%d>", self,
+    sprintf(sz, "#<AugRt::Object:%lx,id=%d>", self,
             FIX2INT(rb_iv_get(self, "@id")));
     return rb_str_new2(sz);
 }
@@ -715,7 +715,7 @@ initrb_(VALUE unused)
     expireid_= rb_intern("expire");
     authcertid_= rb_intern("authcert");
 
-    maugrt_ = rb_define_module("Augrt");
+    maugrt_ = rb_define_module("AugRt");
     cobject_ = rb_define_class_under(maugrt_, "Object", rb_cObject);
     cerror_ = rb_define_class_under(maugrt_, "Error", rb_eStandardError);
 

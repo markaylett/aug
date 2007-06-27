@@ -1,6 +1,8 @@
 require 'augutil'
 require 'log'
 
+include AugUtil
+
 # tcplisten(), tcpconnect()
 
 module RbTest5
@@ -9,8 +11,8 @@ module RbTest5
     end
     def RbTest5.start(sname)
         Log.debug("start(): #{sname}")
-        @listener = Augrt.tcplisten("0.0.0.0", "1234", nil)
-        @client = Augrt.tcpconnect("127.0.0.1", "1234", nil)
+        @listener = AugRt.tcplisten("0.0.0.0", "1234", nil)
+        @client = AugRt.tcpconnect("127.0.0.1", "1234", nil)
         @server = nil
     end
     def RbTest5.closed(sock)
@@ -24,7 +26,7 @@ module RbTest5
     def RbTest5.connected(sock, addr, port)
         Log.debug("connected(): #{sock}")
         sock.user = LineParser.new()
-        Augrt.send(@server, "hello, world!\n")
+        AugRt.send(@server, "hello, world!\n")
     end
     def RbTest5.data(sock, buf)
         Log.debug("data(): #{sock}")
@@ -36,9 +38,9 @@ module RbTest5
             end
 
             if sock == @server
-                Augrt.send(sock, line + "\n")
+                AugRt.send(sock, line + "\n")
             else
-                Augrt.stopall
+                AugRt.stopall
             end
         end
     end

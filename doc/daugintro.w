@@ -2,7 +2,7 @@
 \datethis % print date on listing
 
 \def\AUG/{{\sc AUG}}
-\def\AUGRT/{{\sc DAUG}}
+\def\DAUG/{{\sc DAUG}}
 \def\CYGWIN/{{\sc CYGWIN}}
 \def\IPV6/{{\sc IPv6}}
 \def\GNU/{{\sc GNU}}
@@ -31,40 +31,40 @@
 @f line normal
 
 @* Introduction.
-\AUGRT/ is an Open Source, Application Server written in \CEE/\AM\CPLUSPLUS/.
- It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net} which
-is available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
-\AUGRT/ takes an unbiased view towards the systems it supports; it does not
-favour one over another, and runs natively on all.  \AUGRT/ includes support
-for \IPV6/ and \SSL/.
+\DAUG/ is an Open Source, Application Server written in \CEE/\AM\CPLUSPLUS/.
+It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net} which is
+available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.  \DAUG/
+takes an unbiased view of the systems it supports; it does not favour one over
+another, and runs natively on all.  \DAUG/ includes support for \IPV6/ and
+\SSL/.
 
 \yskip\noindent
 This document is a brief introduction to building and installing Modules for
-the \AUGRT/ Application Server.  For further information, please visit the
+the \DAUG/ Application Server.  For further information, please visit the
 \pdfURL{\AUG/ home page}{http://aug.sourceforge.net} or email myself,
 \pdfURL{Mark Aylett}{mailto:mark@@emantic.co.uk}.
 
 @* Event Model.
 
-Ideally, threads should to used to maximise CPU utilisation on multi-processor
-machines.  Threads are, however, often used in combination with blocking APIs;
-secondary threads allow execution to continue while blocking operations are in
-progress.  Unless these secondary threads are carefully managed, complexity,
-resource contention and the risk of deadlocks may increase.
+Well designed threading models can help to improve CPU utilisation on
+multi-processor machines.  Similar effects are rarely acheived where threading
+models are derived from attempts to simplify workflow, or to avoid
+blocking-API calls.  In such cases, complexity, resource contention and the
+risk of deadlocks may increase; performance may actually degrade.
 
 \yskip\noindent
-Using non-blocking IO, a single thread can be dedicated to the de-multiplexing
-of network events.  This event thread can be kept responsive by delegating
-large units of work to processing threads.  In this case, these processing
-threads can reduce the risk of deadlocks by minimising shared state, and
-constraining communicatings with the main thread to the event queue.  This is
-similar, in fact, to a UI event model.
+Using non-blocking IO, a single thread can be dedicated to de-multiplexing
+network events.  This event thread can be kept responsive by delegating large
+units of work to processing threads.  In this case, these processing threads
+can reduce the risk of deadlocks by minimising shared state, and constraining
+communicatings with the main thread to the event queue.  This is similar, in
+fact, to a UI event model.
 
 \yskip\noindent
-The \AUGRT/ Application Server implements such an event model to de-multiplex
+The \DAUG/ Application Server implements such an event model to de-multiplex
 activity on signal, socket, timer and user-event objects.
 
-@ \AUGRT/ delegates event notifications to physical Modules and, in turn,
+@ \DAUG/ delegates event notifications to physical Modules and, in turn,
 Sessions.  Modules are dynamically loaded into the Application Server at
 run-time.  Each Module manages one or more Sessions.  Modules and Sessions are
 wired together at configuration-time, not compile-time.
@@ -81,7 +81,7 @@ The separation of physical Modules and logical Sessions allows Modules to
 adapt and extend the host environment as viewed by Sessions.  The \.{augpy}
 Module, for example, adapts the host environment to allow Sessions to be
 written in \PYTHON/.  These language bindings are introduced by the Module
-without change to \AUGRT/.
+without change to \DAUG/.
 
 \yskip\noindent
 Modules help to promote component, rather than source-level reuse.  Sessions
@@ -89,8 +89,8 @@ can interact with one-another by posting events to one another.  This allows
 Sessions to bridge language boundaries.
 
 \yskip\noindent
-\AUGRT/ presents a uniform interface to system administrators across all
-platforms.  Although, on \WINDOWS/, d\ae monised \AUGRT/ processes take the
+\DAUG/ presents a uniform interface to system administrators across all
+platforms.  Although, on \WINDOWS/, d\ae monised \DAUG/ processes take the
 form of NT services, from a sys-admin perspective, the interface remains the
 same.  The following command can still be used to start the service from a
 command prompt:
@@ -135,13 +135,13 @@ specified by the template argument.  |basic_factory<>| is used to create a
 simple factory for the |echosession| Session.
 
 \yskip\noindent
-\AUGRT/ Modules are required to export two library functions, namely
-|augrt_init()| and |augrt_term()|.  The |AUGRT_MODULE| macro defines these two
+\DAUG/ Modules are required to export two library functions, namely
+|augrt_init()| and |augrt_term()|.  The |DAUG_MODULE| macro defines these two
 export functions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echosession> > sample;@/
-AUGRT_MODULE(sample::init, sample::term)
+DAUG_MODULE(sample::init, sample::term)
 
 @ \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
 implementations for most of |session_base|'s pure virtual functions are
@@ -182,7 +182,7 @@ configuration file, |false| is returned to deactivate the Session.
 bool
 echosession::do_start(const char* sname)
 {
-  writelog(AUGRT_LOGINFO, "starting session [%s]", sname);
+  writelog(DAUG_LOGINFO, "starting session [%s]", sname);
   const char* serv = augrt::getenv("session.echo.serv");
   if (!serv)
     return false;
@@ -192,11 +192,11 @@ echosession::do_start(const char* sname)
 
 @ The |do_accepted()| function is called when a new client connection is
 accepted.  The |setuser()| function binds an opaque, user-defined value to an
-\AUGRT/ object.  Here, a |string| buffer is assigned to track partial line
+\DAUG/ object.  Here, a |string| buffer is assigned to track partial line
 data received from the client.  An initial, {\sc ``HELLO''} message is sent to
 the client.  The call to |setrwtimer()| establishes a timer that will expire
 when there has been no read activity on the |sock| object for a period of 15
-seconds or more.  \AUGRT/ will automatically reset the timer when read
+seconds or more.  \DAUG/ will automatically reset the timer when read
 activity occurs.
 
 @<member...@>+=
@@ -205,7 +205,7 @@ echosession::do_accepted(object& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
-  setrwtimer(sock, 15000, AUGRT_TIMRD);
+  setrwtimer(sock, 15000, DAUG_TIMRD);
   return true;
 }
 
@@ -237,7 +237,7 @@ echosession::do_data(const object& sock, const void* buf, size_t size)
 @ Read-timer expiry is communicated using the |do_rdexpire()| function.  If no
 data arrives for 15 seconds, the connection is shutdown.  The |shutdown()|
 function sends a FIN packet after ensuring that all buffered data has been
-flushed.  \AUGRT/ ensures that any buffered messages are flushed before
+flushed.  \DAUG/ ensures that any buffered messages are flushed before
 performing the shutdown, and that any inflight messages sent by the client are
 delivered to the Session.
 

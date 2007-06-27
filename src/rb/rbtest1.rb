@@ -8,7 +8,7 @@ module RbTest1
     end
     def RbTest1.start(sname)
         Log.debug("start(): #{sname}")
-        o = Augrt::Object.new(101, "our object")
+        o = AugRt::Object.new(101, "our object")
         Log.debug("to_s(): #{o}")
         if o.id != 101
             Log.error("object returned unexpected id")
@@ -20,9 +20,9 @@ module RbTest1
         if o.user != "new user"
             Log.error("object returned unexpected user")
         end
-        if o != Augrt::Object.new(101, nil)
+        if o != AugRt::Object.new(101, nil)
             Log.error("comparison operator failed")
         end
-        Augrt.stopall
+        AugRt.stopall
     end
 end

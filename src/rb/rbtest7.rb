@@ -6,6 +6,6 @@ module RbTest7
     end
     def RbTest7.start(sname)
         Log.debug("start(): #{sname}")
-        Augrt.stopall()
+        AugRt.stopall()
     end
 end
