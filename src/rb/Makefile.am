@@ -13,6 +13,7 @@ EXTRA_DIST = \
 	rbtest6.rb \
 	rbtest7.rb
 
+if ENABLE_RUBY
 rubydir = $(prefix)/ruby
 ruby_DATA = \
 	augutil.rb \
@@ -21,3 +22,4 @@ ruby_DATA = \
 	rbflags \
 	rbskel.rb \
 	rbstop.rb
+endif

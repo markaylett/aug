@@ -14,6 +14,7 @@ EXTRA_DIST = \
 	pytest6.py \
 	pytest7.py
 
+if ENABLE_PYTHON
 pythondir = $(prefix)/python
 python_DATA = \
 	augutil.py \
@@ -23,3 +24,4 @@ python_DATA = \
 	pyproxy.py \
 	pyskel.py \
 	pystop.py
+endif

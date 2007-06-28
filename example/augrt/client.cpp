@@ -139,7 +139,11 @@ namespace {
         void
         do_connected(object& sock, const char* addr, unsigned short port)
         {
-            //setsslclient(sock, "client");
+            const char* sslctx = augrt::getenv("session.bench.sslcontext", 0);
+            if (sslctx) {
+                writelog(AUGRT_LOGINFO, "sslcontext: %s", sslctx);
+                setsslclient(sock, sslctx);
+            }
             state& s(*sock.user<state>());
             send_(sock);
             --s.tosend_;

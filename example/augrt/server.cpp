@@ -45,7 +45,11 @@ namespace {
         bool
         do_accepted(object& sock, const char* addr, unsigned short port)
         {
-            //setsslserver(sock, "server");
+            const char* sslctx = augrt::getenv("session.echo.sslcontext", 0);
+            if (sslctx) {
+                writelog(AUGRT_LOGINFO, "sslcontext: %s", sslctx);
+                setsslserver(sock, sslctx);
+            }
             sock.setuser(new string());
             send(sock, "hello\r\n", 7);
             setrwtimer(sock, 15000, AUGRT_TIMRD);

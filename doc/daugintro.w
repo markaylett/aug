@@ -12,6 +12,7 @@
 \def\POP3/{{\sc POP3}}
 \def\POSIX/{{\sc POSIX}}
 \def\PYTHON/{{\sc PYTHON}}
+\def\RUBY/{{\sc RUBY}}
 \def\SMTP/{{\sc SMTP}}
 \def\SMTP/{{\sc SMTP}}
 \def\SSL/{{\sc SSL}}
@@ -31,69 +32,70 @@
 @f line normal
 
 @* Introduction.
-\DAUG/ is an Open Source, Application Server written in \CEE/\AM\CPLUSPLUS/.
+\DAUG/ is an open source, application server written in \CEE/\AM\CPLUSPLUS/.
 It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net} which is
 available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.  \DAUG/
 takes an unbiased view of the systems it supports; it does not favour one over
-another, and runs natively on all.  \DAUG/ includes support for \IPV6/ and
-\SSL/.
+another, and runs natively on all.  \DAUG/ includes support for \IPV6/,
+\SSL/, \PYTHON/ and \RUBY/.
 
 \yskip\noindent
 This document is a brief introduction to building and installing Modules for
-the \DAUG/ Application Server.  For further information, please visit the
+\DAUG/, along with the key benefits.  For further information, please visit the
 \pdfURL{\AUG/ home page}{http://aug.sourceforge.net} or email myself,
 \pdfURL{Mark Aylett}{mailto:mark@@emantic.co.uk}.
 
 @* Event Model.
 
-Well designed threading models can help to improve CPU utilisation on
-multi-processor machines.  Similar effects are rarely acheived where threading
-models are derived from attempts to simplify workflow, or to avoid
-blocking-API calls.  In such cases, complexity, resource contention and the
-risk of deadlocks may increase; performance may actually degrade.
+Well designed threading models can improve CPU utilisation on multi-processor
+machines.  Similar effects, however, are rarely acheived when threads are used
+to implement asynchronous behaviour and avoid blocking-API calls.  In such
+cases, complexity, resource contention and the risk of deadlocks may increase,
+and performance degrade.
 
 \yskip\noindent
-Using non-blocking IO, a single thread can be dedicated to de-multiplexing
-network events.  This event thread can be kept responsive by delegating large
-units of work to processing threads.  In this case, these processing threads
-can reduce the risk of deadlocks by minimising shared state, and constraining
-communicatings with the main thread to the event queue.  This is similar, in
-fact, to a UI event model.
+Using non-blocking I/O, a single thread can be assigned to the scheduling of
+timers, and de-multiplexing of network events.  This primary, event thread can
+be kept responsive by delegating units of work to secondary threads.  By
+minimising shared state, and constraining communicatings with the main thread
+to the event queue, these secondary threads can operate in a environment that
+minimises the possibility of deadlocks.  This is similar, in fact, to the UI
+event model.
 
 \yskip\noindent
-The \DAUG/ Application Server implements such an event model to de-multiplex
+The \DAUG/ application server implements such an event model to de-multiplex
 activity on signal, socket, timer and user-event objects.
 
-@ \DAUG/ delegates event notifications to physical Modules and, in turn,
-Sessions.  Modules are dynamically loaded into the Application Server at
-run-time.  Each Module manages one or more Sessions.  Modules and Sessions are
-wired together at configuration-time, not compile-time.
+@ \DAUG/ delegates event notifications to Modules and, in turn, Sessions.
+Modules are physical components that are dynamically loaded into the
+application server at run-time.  Each Module manages one or more Sessions.
+Modules and Sessions are wired together at configuration-time, not
+compile-time.
 
 \yskip\noindent
 All Module calls are dispatched from the event thread.  A Session can,
-therefore, either opt to implement a simple, single-threaded model, or a
-suitable alternative, such as a thread-pool, depending on its own
-requirements.  Following the tenets of Open Source, Module implementors are
-free from artificial constraints imposed upon them by the host environment.
+therefore, either opt for a simple, single-threaded model, or a suitable
+alternative, such as a thread-pool: where possible, the host environment
+avoids imposing unnecessary constraints on Module implementors.
 
 \yskip\noindent
 The separation of physical Modules and logical Sessions allows Modules to
-adapt and extend the host environment as viewed by Sessions.  The \.{augpy}
-Module, for example, adapts the host environment to allow Sessions to be
-written in \PYTHON/.  These language bindings are introduced by the Module
-without change to \DAUG/.
+adapt and extend the host environment viewed by Sessions.  The \.{augpy} and
+\.{augrb} Modules, for example, adapt the host environment to allow Sessions
+to be written in either \PYTHON/ or \RUBY/.  These language bindings are
+provided by Modules, without change to \DAUG/.
 
 \yskip\noindent
-Modules help to promote component, rather than source-level reuse.  Sessions
-can interact with one-another by posting events to one another.  This allows
-Sessions to bridge language boundaries.
+Modules also help to promote component, rather than source-level reuse:
+Sessions can interact with one-another by posting events to one another.  This
+allows Sessions to bridge language boundaries.
 
 \yskip\noindent
-\DAUG/ presents a uniform interface to system administrators across all
+System administrators are presented with a uniform interface across all
 platforms.  Although, on \WINDOWS/, d\ae monised \DAUG/ processes take the
-form of NT services, from a sys-admin perspective, the interface remains the
-same.  The following command can still be used to start the service from a
-command prompt:
+form of an NT service, from a sys-admin perspective, the interface remains the
+same.  As with \LINUX/, the following command can be used to start the service
+from a command prompt:
 
 \yskip\noindent
 \.{C:\\> daug -f daug.conf start}
@@ -104,7 +106,7 @@ In the sections below, a Module is constructed, in \CPLUSPLUS/, that:
 \yskip
 \item{$\bullet$} exposes a TCP service;
 \item{$\bullet$} reads line-based input from clients;
-\item{$\bullet$} echos lines back to clients in upper-case;
+\item{$\bullet$} echos input lines back to clients in upper-case;
 \item{$\bullet$} disconnects inactive clients.
 
 \yskip\noindent
@@ -118,21 +120,21 @@ namespace {@/
 }@/
 @<declare export table@>
 
-@ The \.{<augrtpp.hpp>} header is provided to aid Module implementations in
-\CPLUSPLUS/.  Modules can also be written in \CEE/;  \CEE/ implementations
-would use the \.{<augrt.h>} header.  For convenience, names are imported from
-the |augrt| and |std| namespaces.
+@ The \.{<augrtpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
+implementations.  Modules can also be written in standard \CEE/.  A \CEE/
+implementation would use the \.{<augrt.h>} header instead.  For convenience,
+names are imported from the |augrt| and |std| namespaces.
 
 @<include...@>=
 #include <augrtpp.hpp>@/
 using namespace augrt;@/
 using namespace std;
 
-@ The Session type - |echosession| in this case - is fed into class templates
-which simplify the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>|
-delegates the task of creating Sessions to a factory object, whose type is
-specified by the template argument.  |basic_factory<>| is used to create a
-simple factory for the |echosession| Session.
+@ The Session type, |echosession| in this case, is fed into class templates
+which assist the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>| delegates
+the task of creating Sessions to a factory object, whose type is specified by
+the template argument.  |basic_factory<>| is used to create a simple factory
+for the |echosession| Session.
 
 \yskip\noindent
 \DAUG/ Modules are required to export two library functions, namely
