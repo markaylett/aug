@@ -34,11 +34,6 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_setnonblock(sv[1], 1)) {
-        aug_perrinfo(NULL, "aug_setnonblock() failed");
-        return 1;
-    }
-
     if (-1 == aug_read(sv[1], buf, iov[0].iov_len + iov[1].iov_len)) {
         aug_perrinfo(NULL, "aug_read() failed");
         return 1;

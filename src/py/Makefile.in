@@ -193,15 +193,15 @@ EXTRA_DIST = \
 	pytest6.py \
 	pytest7.py
 
-pythondir = $(prefix)/python
-python_DATA = \
-	augutil.py \
-	log.py \
-	pyclient.py \
-	pyecho.py \
-	pyproxy.py \
-	pyskel.py \
-	pystop.py
+@ENABLE_PYTHON_TRUE@pythondir = $(prefix)/python
+@ENABLE_PYTHON_TRUE@python_DATA = \
+@ENABLE_PYTHON_TRUE@	augutil.py \
+@ENABLE_PYTHON_TRUE@	log.py \
+@ENABLE_PYTHON_TRUE@	pyclient.py \
+@ENABLE_PYTHON_TRUE@	pyecho.py \
+@ENABLE_PYTHON_TRUE@	pyproxy.py \
+@ENABLE_PYTHON_TRUE@	pyskel.py \
+@ENABLE_PYTHON_TRUE@	pystop.py
 
 all: all-am
 

@@ -192,14 +192,14 @@ EXTRA_DIST = \
 	rbtest6.rb \
 	rbtest7.rb
 
-rubydir = $(prefix)/ruby
-ruby_DATA = \
-	augutil.rb \
-	log.rb \
-	rbecho.rb \
-	rbflags \
-	rbskel.rb \
-	rbstop.rb
+@ENABLE_RUBY_TRUE@rubydir = $(prefix)/ruby
+@ENABLE_RUBY_TRUE@ruby_DATA = \
+@ENABLE_RUBY_TRUE@	augutil.rb \
+@ENABLE_RUBY_TRUE@	log.rb \
+@ENABLE_RUBY_TRUE@	rbecho.rb \
+@ENABLE_RUBY_TRUE@	rbflags \
+@ENABLE_RUBY_TRUE@	rbskel.rb \
+@ENABLE_RUBY_TRUE@	rbstop.rb
 
 all: all-am
 

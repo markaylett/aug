@@ -15,6 +15,9 @@
 AUGSYS_API const char*
 aug_strerror(int errnum);
 
+AUGSYS_API void*
+aug_memfrob(void* dst, size_t size);
+
 AUGSYS_API int
 aug_perror(const char* s);
 

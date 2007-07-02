@@ -22,6 +22,15 @@ AUG_RCSID("$Id$");
 #include <ctype.h>
 #include <errno.h>
 
+AUGSYS_API void*
+aug_memfrob(void* dst, size_t size)
+{
+    char* ptr = (char*)dst;
+    while (size)
+        ptr[--size] ^= 42;
+    return dst;
+}
+
 AUGSYS_API int
 aug_perror(const char* s)
 {

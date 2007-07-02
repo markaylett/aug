@@ -8,8 +8,6 @@
 #include "augsys/time.h" /* aug_tvtoms() */
 #include "augsys/unistd.h"
 
-#include <winsock2.h>    /* select() */
-
 #include <stdlib.h>      /* malloc() */
 
 struct set_ {
@@ -115,11 +113,7 @@ aug_destroymuxer(aug_muxer_t muxer)
 AUGSYS_API int
 aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask)
 {
-    /* Although this condition does not necessarily mean that the set has been
-       exhausted, it gives a reasonable approximation given the costly
-       alternatives. */
-
-    if (FD_SETSIZE <= fd) {
+    if (FD_SETSIZE == muxer->out_.rd_.fd_count) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEMFILE);
         return -1;
     }
@@ -150,7 +144,6 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
     if (SOCKET_ERROR ==
         (ret = select(-1, &muxer->out_.rd_, &muxer->out_.wr_,
                       &muxer->out_.ex_, timeout))) {
-
         if (WSAEINTR == aug_setwin32errinfo(NULL, __FILE__, __LINE__,
                                             WSAGetLastError()))
             ret = AUG_RETINTR;

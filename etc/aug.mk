@@ -16,7 +16,8 @@ COPTS = \
 	-mno-cygwin \
 	-mthreads
 CDEFS = \
-	-DWINVER=0x0501
+	-DWINVER=0x0501 \
+	-DFD_SETSIZE=256
 
 DLL_EXT = .dll
 DLL_LDFLAGS = \
