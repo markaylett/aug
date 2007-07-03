@@ -4,7 +4,7 @@ EXTRA_DIST = \
 	test.sh
 
 SUBDIRS = \
-	etc
+	test
 
 noinst_HEADERS = \
 	exception.hpp \
@@ -36,8 +36,10 @@ daug_LDADD = \
 check_PROGRAMS = \
 	augrtpp-test
 
+TESTS_ENVIRONMENT = AUG_BUILDDIR=$(top_builddir) AUG_SRCDIR=$(top_srcdir)
 TESTS = \
-	augrtpp-test
+	augrtpp-test \
+	rbtest1
 
 augrtpp_test_SOURCES = test.cpp
 augrtpp_test_LDADD =
