@@ -436,7 +436,6 @@ main(int argc, char* argv[])
             program_ = argv[0];
 
             blocksignals();
-            aug_setloglevel(AUG_LOGINFO);
             return main(argc, argv, serv);
 
         } catch (const errinfo_error& e) {

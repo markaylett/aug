@@ -74,7 +74,8 @@ check_PROGRAMS = \
 	augsys-logtest \
 	augsys-mcasttest \
 	augsys-muxertest \
-	augsys-sockettest
+	augsys-sockettest \
+	augsys-stringtest
 
 TESTS = \
 	augsys-basetest \
@@ -82,7 +83,8 @@ TESTS = \
 	augsys-logtest \
 	augsys-mcasttest \
 	augsys-muxertest \
-	augsys-sockettest
+	augsys-sockettest \
+	augsys-stringtest
 
 augsys_basetest_SOURCES = basetest.c
 augsys_basetest_LDADD = \
@@ -106,4 +108,8 @@ augsys_muxertest_LDADD = \
 
 augsys_sockettest_SOURCES = sockettest.c
 augsys_sockettest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+augsys_stringtest_SOURCES = stringtest.c
+augsys_stringtest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la

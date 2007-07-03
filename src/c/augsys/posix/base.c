@@ -88,6 +88,7 @@ static struct aug_fdtype fdtype_ = {
 AUGSYS_API int
 aug_init(struct aug_errinfo* errinfo)
 {
+    const char* loglevel;
     int ret = retain_();
     if (PROCEED_ != ret)
         return ret;
@@ -99,6 +100,9 @@ aug_init(struct aug_errinfo* errinfo)
         aug_termlock_();
         return -1;
     }
+
+    if ((loglevel = getenv("AUG_LOGLEVEL")))
+        aug_setloglevel(atoi(loglevel));
 
     return 0;
 }

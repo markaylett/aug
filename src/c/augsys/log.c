@@ -21,17 +21,6 @@ AUG_RCSID("$Id$");
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
 
-/* No synchronisation exists around these variables.  Each logger is
-   responsible for checking its integrity before logging. */
-
-static volatile int loglevel_ =
-#if !defined(NDEBUG)
-AUG_LOGDEBUG0
-#else /* NDEBUG */
-AUG_LOGINFO
-#endif /* NDEBUG */
-;
-
 static volatile aug_logger_t logger_ = aug_stdiologger;
 
 AUGSYS_API int
@@ -57,12 +46,6 @@ aug_stdiologger(int loglevel, const char* format, va_list args)
     return 0;
 }
 
-AUGSYS_API void
-aug_setloglevel(int loglevel)
-{
-    loglevel_ = loglevel;
-}
-
 AUGSYS_API aug_logger_t
 aug_setlogger(aug_logger_t logger)
 {
@@ -72,16 +55,10 @@ aug_setlogger(aug_logger_t logger)
 }
 
 AUGSYS_API int
-aug_loglevel(void)
-{
-    return loglevel_;
-}
-
-AUGSYS_API int
 aug_vwritelog(int loglevel, const char* format, va_list args)
 {
     assert(format);
-    if (loglevel_ < loglevel)
+    if (aug_loglevel() < loglevel)
         return 0;
 
     return (*logger_)(loglevel, format, args);

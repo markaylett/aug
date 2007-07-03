@@ -63,6 +63,12 @@ aug_exit(int status);
    The remaining functions will set errinfo on failure.
 */
 
+AUGSYS_API void
+aug_setloglevel(int loglevel);
+
+AUGSYS_API int
+aug_loglevel(void);
+
 AUGSYS_API int
 aug_nextid(void);
 

@@ -168,13 +168,13 @@ namespace {
         engine engine_;
 
         explicit
-        state(const string& pass64)
+        state(char* frobpass)
             : engine_(smartfd::retain(aug_eventrd()),
                       smartfd::retain(aug_eventwr()), timers_, enginecb_)
         {
 #if ENABLE_SSL
             initssl();
-            createsslctxs(sslctxs_, options_, pass64);
+            createsslctxs(sslctxs_, options_, frobpass);
 #endif // ENABLE_SSL
         }
     };
@@ -582,6 +582,8 @@ namespace {
 
     class service {
 
+        char frobpass_[AUG_MAXPASSWORD + 1];
+
         string pass64_;
 
     public:
@@ -616,10 +618,9 @@ namespace {
             // controlling terminal.
 
             if (prompt) {
-                char pass[AUG_MAXPASSWORD + 1];
-                aug_getpass("Enter PEM pass phrase:", pass, sizeof(pass));
-                pass64_ = filterbase64(pass, strlen(pass), AUG_ENCODE64);
-                memset(pass, 0, sizeof(pass));
+                aug_getpass("Enter PEM pass phrase:", frobpass_,
+                            sizeof(frobpass_));
+                aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
             }
 
             // The conffile is optional, if specified it will be an absolute
@@ -654,7 +655,7 @@ namespace {
             setsrvlogger("daug");
 
             aug_var var = { 0, this };
-            auto_ptr<state> s(new state(pass64_));
+            auto_ptr<state> s(new state(frobpass_));
 
             // Assign state so that it is visible to callbacks during load_()
             // call.
@@ -719,7 +720,6 @@ main(int argc, char* argv[])
             program_ = argv[0];
 
             blocksignals();
-            aug_setloglevel(AUG_LOGINFO);
             return main(argc, argv, serv);
 
         } AUG_PERRINFOCATCH;

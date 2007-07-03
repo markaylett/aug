@@ -16,11 +16,11 @@ namespace augrt {
 
     aug::sslctxptr
     createsslctx(const std::string& name, const options& options,
-                 const std::string& pass64);
+                 char* frobpass);
 
     void
     createsslctxs(sslctxs& sslctxs, const options& options,
-                  const std::string& pass64);
+                  char* frobpass);
 }
 
 #endif // DAUG_SSL_HPP

@@ -59,7 +59,9 @@ AUGSYS_API int
 aug_init(struct aug_errinfo* errinfo)
 {
     WSADATA data;
+    const char* loglevel;
     int err, ret = retain_();
+
     if (PROCEED_ != ret)
         return ret;
 
@@ -77,6 +79,9 @@ aug_init(struct aug_errinfo* errinfo)
         aug_termerrinfo_();
         return -1;
     }
+
+    if ((loglevel = getenv("AUG_LOGLEVEL")))
+        aug_setloglevel(atoi(loglevel));
 
     return 0;
 }

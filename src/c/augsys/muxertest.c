@@ -34,6 +34,12 @@ test(aug_muxer_t muxer, int n)
         exit(1);
     }
 
+    if (AUG_FDEVENTRDWR != aug_fdeventmask(muxer, sv[0])
+        || AUG_FDEVENTRD != aug_fdeventmask(muxer, sv[1])) {
+        aug_perrinfo(NULL, "aug_fdeventmask() failed");
+        exit(1);
+    }
+
     if (-1 == aug_writev(sv[0], iov, 2)) {
         aug_perrinfo(NULL, "aug_writev() failed");
         exit(1);
@@ -74,7 +80,7 @@ main(int argc, char* argv[])
     aug_muxer_t muxer;
     aug_atexitinit(&errinfo);
     muxer = aug_createmuxer();
-    test(muxer, 30);
+    test(muxer, 100);
     aug_destroymuxer(muxer);
     return 0;
 }

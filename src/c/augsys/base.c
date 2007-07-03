@@ -13,6 +13,11 @@ AUG_RCSID("$Id$");
 
 #define PROCEED_ 1
 
+/* No synchronisation exists around these variables.  Each logger is
+   responsible for checking its integrity before logging. */
+
+static volatile int loglevel_ = AUG_LOGINFO;
+
 static unsigned refs_ = 0;
 
 static int
@@ -292,6 +297,18 @@ aug_nextid(void)
     aug_unlock();
 
     return id;
+}
+
+AUGSYS_API void
+aug_setloglevel(int loglevel)
+{
+    loglevel_ = loglevel;
+}
+
+AUGSYS_API int
+aug_loglevel(void)
+{
+    return loglevel_;
 }
 
 AUGSYS_API int

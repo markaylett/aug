@@ -13,14 +13,10 @@ AUG_RCSID("$Id$");
 
 # include "augrtpp/conn.hpp"
 
-# include "augnetpp/base64.hpp"
-
 # include "augsys/log.h"
 # include "augsys/string.h"
 
 # include <sstream>
-# include <string>
-# include <strstream>
 
 # include <openssl/err.h>
 # include <openssl/ssl.h>
@@ -34,23 +30,10 @@ namespace {
     int
     passwdcb_(char* buf, int size, int rwflag, void* arg)
     {
-        // Handle blank password.
-
-        const string* pass64(static_cast<const string*>(arg));
-        if (pass64->empty()) {
-            buf[0] = '\0';
-            return 0;
-        }
-
-        // Decode password.
-
-        strstream out(buf, size - 1);
-        stringstream in(*pass64);
-        if (filterbase64(out, in, AUG_DECODE64))
-            out << ends;
-        else
-            buf[size - 1] = '\0'; // Truncated.
-
+        char* frobpass(static_cast<char*>(arg));
+        aug_memfrob(frobpass, AUG_MAXPASSWORD);
+        aug_strlcpy(buf, frobpass, size);
+        aug_memfrob(frobpass, AUG_MAXPASSWORD);
         return static_cast<int>(strlen(buf));
     }
 
@@ -177,7 +160,7 @@ namespace {
 
 sslctxptr
 augrt::createsslctx(const string& name, const options& options,
-                    const string& pass64)
+                    char* frobpass)
 {
     string s("ssl.context.");
     s += name;
@@ -213,8 +196,7 @@ augrt::createsslctx(const string& name, const options& options,
     }
 
     SSL_CTX_set_default_passwd_cb(ctx, passwdcb_);
-    SSL_CTX_set_default_passwd_cb_userdata
-        (ctx, const_cast<string*>(&pass64));
+    SSL_CTX_set_default_passwd_cb_userdata(ctx, frobpass);
 
     if (keyfile) {
 
@@ -261,8 +243,7 @@ augrt::createsslctx(const string& name, const options& options,
 }
 
 void
-augrt::createsslctxs(sslctxs& sslctxs, const options& options,
-                     const string& pass64)
+augrt::createsslctxs(sslctxs& sslctxs, const options& options, char* frobpass)
 {
     const char* contexts = options.get("ssl.contexts", 0);
 
@@ -272,7 +253,7 @@ augrt::createsslctxs(sslctxs& sslctxs, const options& options,
         string name;
         while (is >> name)
             sslctxs.insert(make_pair(name, createsslctx(name, options,
-                                                        pass64)));
+                                                        frobpass)));
     }
 }
 

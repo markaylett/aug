@@ -18,18 +18,12 @@ typedef int (*aug_logger_t)(int, const char*, va_list);
 AUGSYS_API int
 aug_stdiologger(int loglevel, const char* format, va_list args);
 
-AUGSYS_API void
-aug_setloglevel(int loglevel);
-
 /**
    If the logger argument is NULL, the default logger is re-installed.
 */
 
 AUGSYS_API aug_logger_t
 aug_setlogger(aug_logger_t logger);
-
-AUGSYS_API int
-aug_loglevel(void);
 
 AUGSYS_API int
 aug_vwritelog(int loglevel, const char* format, va_list args);
