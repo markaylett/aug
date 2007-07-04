@@ -1,8 +1,5 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
-EXTRA_DIST = \
-	test.sh
-
 SUBDIRS = \
 	test
 
@@ -36,10 +33,35 @@ daug_LDADD = \
 check_PROGRAMS = \
 	augrtpp-test
 
-TESTS_ENVIRONMENT = AUG_BUILDDIR=$(top_builddir) AUG_SRCDIR=$(top_srcdir)
+TESTS_ENVIRONMENT = \
+	AUG_LOGLEVEL=3 \
+	AUG_BUILDDIR=$(top_builddir) \
+	AUG_SRCDIR=$(top_srcdir)
+
 TESTS = \
-	augrtpp-test \
-	rbtest1
+	augrtpp-test
+
+if ENABLE_PYTHON
+TESTS += \
+	test/pytest1 \
+	test/pytest2 \
+	test/pytest3 \
+	test/pytest4 \
+	test/pytest5 \
+	test/pytest6 \
+	test/pytest7
+endif
+
+if ENABLE_RUBY
+TESTS += \
+	test/rbtest1 \
+	test/rbtest2 \
+	test/rbtest3 \
+	test/rbtest4 \
+	test/rbtest5 \
+	test/rbtest6 \
+	test/rbtest7
+endif
 
 augrtpp_test_SOURCES = test.cpp
 augrtpp_test_LDADD =

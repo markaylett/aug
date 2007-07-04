@@ -132,8 +132,8 @@ namespace {
             openlog_();
         }
 
-        AUG_DEBUG2("loglevel=[%d]", aug_loglevel());
-        AUG_DEBUG2("rundir=[%s]", rundir_);
+        aug_info("loglevel=[%d]", aug_loglevel());
+        aug_info("rundir=[%s]", rundir_);
     }
 
     void
@@ -581,14 +581,14 @@ namespace {
     }
 
     class service {
-
         char frobpass_[AUG_MAXPASSWORD + 1];
-
-        string pass64_;
-
     public:
         ~service() AUG_NOTHROW
         {
+        }
+        service()
+        {
+            frobpass_[0] = '\0';
         }
 
         const char*
@@ -612,17 +612,8 @@ namespace {
         }
 
         void
-        readconf(const char* conffile, bool prompt, bool daemon)
+        readconf(const char* conffile, bool batch, bool daemon)
         {
-            // Password must be collected before process is detached from
-            // controlling terminal.
-
-            if (prompt) {
-                aug_getpass("Enter PEM pass phrase:", frobpass_,
-                            sizeof(frobpass_));
-                aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
-            }
-
             // The conffile is optional, if specified it will be an absolute
             // path.
 
@@ -645,6 +636,17 @@ namespace {
                      sizeof(rundir_));
 
             reconf_();
+
+#if ENABLE_SSL
+            // Password must be collected before process is detached from
+            // controlling terminal.
+
+            if (!batch && options_.get("ssl.contexts", 0)) {
+                aug_getpass("Enter PEM pass phrase:", frobpass_,
+                            sizeof(frobpass_));
+                aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
+            }
+#endif // ENABLE_SSL
         }
 
         void

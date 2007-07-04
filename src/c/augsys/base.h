@@ -36,9 +36,9 @@ aug_init(struct aug_errinfo* errinfo);
 /**
    Terminate use of aug libraries.
 
-   For reasons of safety, aug_term() will re-install the default logger.  The
+   For safety reasons, aug_term() will re-install the default logger.  The
    default logger is garaunteed to be safe even if aug_init() has not been
-   called.  Sets errno, and not errinfo.
+   called.  This function sets errno, and not errinfo, on failure.
 */
 
 AUGSYS_API int
@@ -59,8 +59,15 @@ aug_atexitinit(struct aug_errinfo* errinfo);
 AUGSYS_API void
 aug_exit(int status);
 
+/* The remaining functions will set errinfo on failure. */
+
 /**
-   The remaining functions will set errinfo on failure.
+   Set log-level.
+
+   The default log-level is #AUG_LOGINFO.  The "AUG_LOGLEVEL" environment
+   variable can be used to override this default.
+
+   \sa aug_loglevel()
 */
 
 AUGSYS_API void

@@ -82,7 +82,7 @@ namespace test {
     }
 
     void
-    readconf(const char* conffile, bool prompt, bool daemon)
+    readconf(const char* conffile, bool batch, bool daemon)
     {
         if (conffile) {
             aug_info("reading: %s", conffile);
@@ -349,9 +349,9 @@ namespace test {
         }
 
         void
-        readconf(const char* conffile, bool prompt, bool daemon)
+        readconf(const char* conffile, bool batch, bool daemon)
         {
-            test::readconf(conffile, prompt, daemon);
+            test::readconf(conffile, batch, daemon);
         }
 
         void

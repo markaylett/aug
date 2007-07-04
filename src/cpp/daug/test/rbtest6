@@ -1,0 +1,20 @@
+#!/bin/sh
+
+AUG_BUILDDIR=${AUG_BUILDDIR:-../../..}
+AUG_SRCDIR=${AUG_SRCDIR:-../../..}
+
+cat <<EOD >tmp.$$
+rundir = .
+logdir = .
+
+sessions = RbStop RbTest6
+
+session.RbStop.module = augrb
+session.RbTest6.module = augrb
+
+module.augrb.path = $AUG_BUILDDIR/src/c/augrb/.libs/modaugrb
+module.augrb.rubypath = $AUG_SRCDIR/src/rb
+EOD
+
+$AUG_BUILDDIR/src/cpp/daug/daug -f tmp.$$ test
+rm -f tmp.$$

@@ -157,7 +157,7 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
 
     if (-1 == aug_readserviceconf(*options.conffile_
                                   ? options.conffile_ : NULL,
-                                  options.prompt_, daemon))
+                                  options.batch_, daemon))
         die_("aug_readserviceconf() failed");
 
     switch (options.command_) {

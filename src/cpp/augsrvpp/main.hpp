@@ -31,11 +31,11 @@ namespace aug {
                 return 0;
             }
             static int
-            readconf(void* arg, const char* conffile, int prompt,
+            readconf(void* arg, const char* conffile, int batch,
                      int daemon) AUG_NOTHROW
             {
                 try {
-                    T::readconf(arg, conffile, prompt ? true : false,
+                    T::readconf(arg, conffile, batch ? true : false,
                                 daemon ? true : false);
                     return 0;
                 } AUG_SETERRINFOCATCH;
@@ -93,12 +93,12 @@ namespace aug {
                 return 0;
             }
             static int
-            readconf(void* arg, const char* conffile, int prompt,
+            readconf(void* arg, const char* conffile, int batch,
                      int daemon) AUG_NOTHROW
             {
                 try {
                     static_cast<T*>(arg)
-                        ->readconf(conffile, prompt ? true : false,
+                        ->readconf(conffile, batch ? true : false,
                                    daemon ? true : false);
                     return 0;
                 } AUG_SETERRINFOCATCH;

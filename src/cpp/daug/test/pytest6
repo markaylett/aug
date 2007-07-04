@@ -1,0 +1,20 @@
+#!/bin/sh
+
+AUG_BUILDDIR=${AUG_BUILDDIR:-../../..}
+AUG_SRCDIR=${AUG_SRCDIR:-../../..}
+
+cat <<EOD >tmp.$$
+rundir = .
+logdir = .
+
+sessions = pystop pytest6
+
+session.pystop.module = augpy
+session.pytest6.module = augpy
+
+module.augpy.path = $AUG_BUILDDIR/src/c/augpy/.libs/modaugpy
+module.augpy.pythonpath = $AUG_SRCDIR/src/py
+EOD
+
+$AUG_BUILDDIR/src/cpp/daug/daug -f tmp.$$ test
+rm -f tmp.$$

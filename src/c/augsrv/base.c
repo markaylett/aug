@@ -108,10 +108,10 @@ aug_getserviceopt(enum aug_option opt)
 }
 
 AUGSRV_API int
-aug_readserviceconf(const char* conffile, int prompt, int daemon)
+aug_readserviceconf(const char* conffile, int batch, int daemon)
 {
     assert(service_.readconf_);
-    return service_.readconf_(arg_, conffile, prompt, daemon);
+    return service_.readconf_(arg_, conffile, batch, daemon);
 }
 
 AUGSRV_API int

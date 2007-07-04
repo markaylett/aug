@@ -23,7 +23,7 @@ enum aug_command {
 
 struct aug_options {
     char conffile_[AUG_PATH_MAX + 1];
-    int prompt_;
+    int batch_;
     enum aug_command command_;
 };
 

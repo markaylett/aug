@@ -168,20 +168,20 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	pytest1.conf \
-	pytest2.conf \
-	pytest3.conf \
-	pytest4.conf \
-	pytest5.conf \
-	pytest6.conf \
-	pytest7.conf \
-	rbtest1.conf \
-	rbtest2.conf \
-	rbtest3.conf \
-	rbtest4.conf \
-	rbtest5.conf \
-	rbtest6.conf \
-	rbtest7.conf
+	pytest1 \
+	pytest2 \
+	pytest3 \
+	pytest4 \
+	pytest5 \
+	pytest6 \
+	pytest7 \
+	rbtest1 \
+	rbtest2 \
+	rbtest3 \
+	rbtest4 \
+	rbtest5 \
+	rbtest6 \
+	rbtest7
 
 all: all-am
 
