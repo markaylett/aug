@@ -17,15 +17,18 @@ enum aug_option {
     AUG_OPTEMAIL,
 
     /**
-       The following option is optional (may be null) but should remain
-       constant after the call to aug_service.config_().
+       The remaining options should remain constant after
+       aug_service.config_() has been called.
+    */
+
+    /**
+       Configuration file: optional (may be null).
     */
 
     AUG_OPTCONFFILE,
 
     /**
-       The following option is required and should remain constant during the
-       call to aug_service.config_().
+       Pid file.
     */
 
     AUG_OPTPIDFILE

@@ -5,7 +5,11 @@ AUG_RCSID("$Id$");
 
 #if defined(_WIN32)
 # define HAVE_ISINF 1
-# define _MSC_VER 1200
+# if !defined(_MSC_VER)
+#  define _MSC_VER 1200
+# else /* _MSC_VER */
+#  pragma comment(lib, "msvcrt-ruby18.lib")
+# endif /* _MSC_VER */
 #endif /* _WIN32 */
 #include <ruby.h>
 

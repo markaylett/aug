@@ -80,6 +80,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augrtpp", "augrtpp.vcproj",
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augrb", "augrb.vcproj", "{AB4EA74B-84B3-4ED6-88FA-49151967A19D}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -161,6 +165,10 @@ Global
 		{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}.Debug.Build.0 = Debug|Win32
 		{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}.Release.ActiveCfg = Release|Win32
 		{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}.Release.Build.0 = Release|Win32
+		{AB4EA74B-84B3-4ED6-88FA-49151967A19D}.Debug.ActiveCfg = Debug|Win32
+		{AB4EA74B-84B3-4ED6-88FA-49151967A19D}.Debug.Build.0 = Debug|Win32
+		{AB4EA74B-84B3-4ED6-88FA-49151967A19D}.Release.ActiveCfg = Release|Win32
+		{AB4EA74B-84B3-4ED6-88FA-49151967A19D}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

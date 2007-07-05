@@ -58,7 +58,7 @@ module RbSkel
         Log.debug("start(): #{sname}")
         AugRt.tcplisten("0.0.0.0", AugRt.getenv("session.RbSkel.serv"), nil)
     end
-    def RbSkel.reconf()
+    def RbSkel.reconf
         Log.debug("reconf()")
     end
     def RbSkel.event(frm, type, user)
