@@ -6,6 +6,8 @@
 #include "augsys/log.h"
 
 #include <fcntl.h>
+#include <stdlib.h> /* getenv() */
+#include <time.h>   /* tzset() */
 #include <unistd.h>
 
 #include <sys/uio.h>
@@ -92,6 +94,10 @@ aug_init(struct aug_errinfo* errinfo)
     int ret = retain_();
     if (PROCEED_ != ret)
         return ret;
+
+    /* Set timezone now in case of later chroot(). */
+
+    tzset();
 
     if (-1 == aug_initlock_())
         return -1;

@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../src;../src/c;../src/cpp"
-				PreprocessorDefinitions="FD_SETSIZE=256"
+				PreprocessorDefinitions="WIN32;_DEBUG;FD_SETSIZE=256"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -74,7 +74,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../src;../src/c;../src/cpp"
-				PreprocessorDefinitions="FD_SETSIZE=256"
+				PreprocessorDefinitions="WIN32;NDEBUG;FD_SETSIZE=256"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"

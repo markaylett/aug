@@ -10,6 +10,8 @@ AUG_RCSID("$Id$");
 # else /* _MSC_VER */
 #  pragma comment(lib, "msvcrt-ruby18.lib")
 # endif /* _MSC_VER */
+char*
+rb_w32_getcwd(char* buffer, int size);
 #endif /* _WIN32 */
 #include <ruby.h>
 
@@ -285,7 +287,9 @@ objectstr_(VALUE self)
 static VALUE
 newobject_(VALUE id, VALUE user)
 {
-    VALUE argv[] = { id, user };
+    VALUE argv[2];
+    argv[0] = id;
+    argv[1] = user;
     return rb_class_new_instance(2, argv, cobject_);
 }
 
@@ -827,7 +831,7 @@ event_(const char* from, const char* type, const void* user, size_t size)
 
     if (session->event_)
         funcall3_(eventid_, rb_str_new2(from), rb_str_new2(type),
-                  user ? rb_tainted_str_new(user, size) : Qnil);
+                  user ? rb_tainted_str_new(user, (long)size) : Qnil);
 }
 
 static void
@@ -905,7 +909,7 @@ data_(const struct augrt_object* sock, const void* buf, size_t len)
     user = *(VALUE*)sock->user_;
 
     if (session->data_)
-        funcall2_(dataid_, user, rb_tainted_str_new(buf, len));
+        funcall2_(dataid_, user, rb_tainted_str_new(buf, (long)len));
 }
 
 static void

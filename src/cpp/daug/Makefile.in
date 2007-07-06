@@ -82,8 +82,7 @@ daug_DEPENDENCIES = $(top_builddir)/src/cpp/augrtpp/libaugrtpp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augmar/libaugmar.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -257,8 +256,7 @@ daug_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augmar/libaugmar.la
 
 TESTS_ENVIRONMENT = \
 	AUG_LOGLEVEL=3 \

@@ -11,6 +11,7 @@ AUG_RCSID("$Id$");
 #include "augsys/errinfo.h"
 #include "augsys/limits.h" /* AUG_PATH_MAX */
 #include "augsys/string.h"
+#include "augsys/windows.h"
 #include "augsys/unistd.h"
 
 #include <ctype.h>         /* isalpha() */
@@ -66,6 +67,39 @@ aug_getcwd(char* dst, size_t size)
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;
     }
+    return dst;
+}
+
+AUGUTIL_API char*
+aug_gethome(char* dst, size_t size)
+{
+    const char* home = getenv("HOME");
+#if defined(_WIN32)
+    if (!home)
+        home = getenv("APPDATA");
+#endif /* _WIN32 */
+    if (!home) {
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+                       AUG_MSG("failed to determine home directory"));
+        return NULL;
+    }
+    aug_strlcpy(dst, home, size);
+    return dst;
+}
+
+AUGUTIL_API char*
+aug_gettmp(char* dst, size_t size)
+{
+#if !defined(_WIN32)
+    aug_strlcpy(dst, "/tmp", size);
+#else /* _WIN32 */
+    char buf[MAX_PATH + 1]; /* Ensure required buffer space. */
+    if (0 == GetTempPath(sizeof(buf), buf)) {
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+        return NULL;
+    }
+    aug_strlcpy(dst, buf, size);
+#endif /* _WIN32 */
     return dst;
 }
 

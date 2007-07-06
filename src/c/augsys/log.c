@@ -7,6 +7,7 @@
 
 AUG_RCSID("$Id$");
 
+#include "augsys/base.h" /* aug_loglevel() */
 #include "augsys/lock.h"
 
 #if defined(_WIN32)

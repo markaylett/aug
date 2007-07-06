@@ -622,6 +622,9 @@ nbfilecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
         if (events & AUG_FDEVENTWR)
             rw = SSLWRITE_;
         break;
+    case RDZERO:
+    case SSLERR:
+        break;
     }
 
     if (rw)

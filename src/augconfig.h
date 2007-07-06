@@ -45,7 +45,7 @@
 # define AUG_EXTERNC extern "C"
 # if !defined(AUG_NOTHROW)
 #  define AUG_NOTHROW throw()
-# endif // !AUG_NOTHROW
+# endif /* !AUG_NOTHROW */
 #endif /* __cplusplus */
 
 #if !defined(_WIN32)

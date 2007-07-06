@@ -53,8 +53,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_htdigest_OBJECTS = htdigest.$(OBJEXT)
 htdigest_OBJECTS = $(am_htdigest_OBJECTS)
-htdigest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+htdigest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -197,8 +196,7 @@ htdigest_SOURCES = \
 	htdigest.c
 
 htdigest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augutil/libaugutil.la
 
 all: all-am
 

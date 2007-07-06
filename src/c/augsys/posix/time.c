@@ -2,6 +2,7 @@
    See the file COPYING for copying permission.
 */
 #include <errno.h>
+#include <stdlib.h> /* getenv() */
 
 AUGSYS_API int
 aug_gettimeofday(struct timeval* tv, struct timezone* tz)

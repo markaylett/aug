@@ -6,5 +6,4 @@ htdigest_SOURCES = \
 	htdigest.c
 
 htdigest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augutil/libaugutil.la

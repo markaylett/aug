@@ -5,6 +5,7 @@
 #include "augsrv/options.h"
 
 #include "augutil/event.h"
+#include "augutil/path.h" /* aug_gethome(), aug_gettmp() */
 
 #include "augsys/errinfo.h"
 #include "augsys/limits.h"
@@ -21,17 +22,6 @@
 #define STOP_    (OFFSET_ + AUG_EVENTSTOP)
 
 static SERVICE_STATUS_HANDLE ssh_;
-
-static const char*
-gettemp_(void)
-{
-    static char path[MAX_PATH + 1];
-    if (0 == GetTempPath(MAX_PATH, path)) {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
-        return NULL;
-    }
-    return path;
-}
 
 static int
 setstatus_(DWORD state)
@@ -89,16 +79,17 @@ start_(DWORD argc, char** argv)
 {
     const char* sname;
     struct aug_options options;
-    const char* appdata = getenv("APPDATA");
+    char home[AUG_PATH_MAX + 1];
 
-    /* Fallback to temp. */
+    /* Fallback to tmp. */
 
-    if (!appdata && !(appdata = gettemp_()))
+    if (!aug_gethome(home, sizeof(home))
+        && !aug_gettmp(home, sizeof(home)))
         return;
 
     /* Move away from system32. */
 
-    if (!SetCurrentDirectory(appdata)) {
+    if (!SetCurrentDirectory(home)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return;
     }

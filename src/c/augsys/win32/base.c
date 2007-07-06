@@ -6,6 +6,7 @@
 #include "augsys/log.h"
 
 #include <io.h>
+#include <time.h> /* tzset() */
 #include <winsock2.h>
 
 static int
@@ -64,6 +65,8 @@ aug_init(struct aug_errinfo* errinfo)
 
     if (PROCEED_ != ret)
         return ret;
+
+    tzset();
 
     if (-1 == aug_initlock_())
         return -1;
