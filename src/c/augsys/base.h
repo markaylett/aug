@@ -61,6 +61,12 @@ aug_exit(int status);
 
 /* The remaining functions will set errinfo on failure. */
 
+AUGSYS_API void
+aug_setgmtoff(long gmtoff);
+
+AUGSYS_API long
+aug_gmtoff(void);
+
 /**
    Set log-level.
 

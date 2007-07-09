@@ -7,13 +7,49 @@
 
 AUG_RCSID("$Id$");
 
+#include "augsys/base.h"
 #include "augsys/errinfo.h"
+#include "augsys/errno.h"
 
 #if !defined(_WIN32)
 # include "augsys/posix/time.c"
 #else /* _WIN32 */
 # include "augsys/win32/time.c"
 #endif /* _WIN32 */
+
+AUGSYS_API time_t
+aug_timegm(struct tm* tm)
+{
+    time_t ret;
+
+#if HAVE_TIMEGM
+
+    if ((time_t)-1 == (ret = timegm(tm)))
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+                            ? EINVAL : errno);
+
+#else /* !HAVE_TIMEGM */
+
+    struct tm gm = { 0 };
+    gm.tm_sec = tm->tm_sec;
+    gm.tm_min = tm->tm_min;
+    gm.tm_hour = tm->tm_hour;
+    gm.tm_mday = tm->tm_mday;
+    gm.tm_mon = tm->tm_mon;
+    gm.tm_year = tm->tm_year;
+
+    if ((time_t)-1 == (ret = mktime(&gm))) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+                            ? EINVAL : errno);
+        return ret;
+    }
+
+    ret += aug_gmtoff();
+
+#endif /* !HAVE_TIMEGM */
+
+    return ret;
+}
 
 AUGSYS_API time_t
 aug_timelocal(struct tm* tm)

@@ -6,6 +6,10 @@
 #include <pwd.h>
 #include <unistd.h>
 
+/* Required by solaris build. */
+
+char* getpass(const char*);
+
 AUGUTIL_API char*
 aug_getpass(const char* prompt, char* buf, size_t len)
 {

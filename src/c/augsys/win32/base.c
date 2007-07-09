@@ -10,6 +10,25 @@
 #include <winsock2.h>
 
 static int
+getgmtoff_(volatile long* ptr)
+{
+	TIME_ZONE_INFORMATION tz;
+    switch (GetTimeZoneInformation(&tz)) {
+    case TIME_ZONE_ID_INVALID:
+        aug_setwin32errno(GetLastError());
+        return -1;
+    case TIME_ZONE_ID_UNKNOWN:
+        aug_seterrno(EINVAL);
+        return -1;
+    case TIME_ZONE_ID_STANDARD:
+    case TIME_ZONE_ID_DAYLIGHT:
+        break;
+    }
+    *ptr = (tz.Bias + tz.StandardBias) * -60;
+    return 0;
+}
+
+static int
 close_(int fd)
 {
     if (-1 == close(fd)) {
@@ -67,8 +86,8 @@ aug_init(struct aug_errinfo* errinfo)
         return ret;
 
     tzset();
-
-    if (-1 == aug_initlock_())
+    if (-1 == getgmtoff_(&gmtoff_)
+        || -1 == aug_initlock_())
         return -1;
 
     if (-1 == aug_initerrinfo_(errinfo)) {

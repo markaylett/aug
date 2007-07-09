@@ -12,6 +12,42 @@
 
 #include <sys/uio.h>
 
+#if HAVE_TM_GMTOFF
+static int
+getgmtoff_(volatile long* ptr)
+{
+    time_t t;
+    time(&t);
+    *ptr = localtime(&t)->tm_gmtoff;
+    return 0;
+}
+#else /* !HAVE_TM_GMTOFF */
+static struct tm*
+mktm_(struct tm* tms)
+{
+    struct tm x = { 0 };
+    x.tm_sec = tms->tm_sec;
+    x.tm_min = tms->tm_min;
+    x.tm_hour = tms->tm_hour;
+    x.tm_mday = tms->tm_mday;
+    x.tm_mon = tms->tm_mon;
+    x.tm_year = tms->tm_year;
+    memcpy(tms, &x, sizeof(*tms));
+    return tms;
+}
+
+static int
+getgmtoff_(volatile long* ptr)
+{
+    time_t gm, local;
+    local = time(&gm);
+    gm = mktime(mktm_(gmtime(&gm)));
+    local = mktime(mktm_(localtime(&local)));
+    *ptr = (long)(local - gm);
+    return 0;
+}
+#endif /* !HAVE_TM_GMTOFF */
+
 static int
 close_(int fd)
 {
@@ -98,8 +134,8 @@ aug_init(struct aug_errinfo* errinfo)
     /* Set timezone now in case of later chroot(). */
 
     tzset();
-
-    if (-1 == aug_initlock_())
+    if (-1 == getgmtoff_(&gmtoff_)
+        || -1 == aug_initlock_())
         return -1;
 
     if (-1 == aug_initerrinfo_(errinfo)) {
