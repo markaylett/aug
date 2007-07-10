@@ -61,11 +61,14 @@ aug_exit(int status);
 
 /* The remaining functions will set errinfo on failure. */
 
-AUGSYS_API void
-aug_setgmtoff(long gmtoff);
+/**
+   Timezone offset.
+
+   Seconds west of coordinated universal time.
+*/
 
 AUGSYS_API long
-aug_gmtoff(void);
+aug_timezone(void);
 
 /**
    Set log-level.

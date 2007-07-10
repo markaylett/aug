@@ -333,6 +333,9 @@ namespace {
         AUG_DEBUG2("tcplisten(): sname=[%s], host=[%s], port=[%s]",
                    sname, host, port);
         try {
+
+            // TODO: temporarily regain root privileges.
+
             return (int)state_->engine_.tcplisten(sname, host, port, user);
 
         } AUG_SETERRINFOCATCH;

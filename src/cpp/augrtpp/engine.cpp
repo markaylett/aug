@@ -72,7 +72,7 @@ namespace {
         }
     };
 
-    typedef queue<connptr> pending;
+    typedef std::queue<connptr> pending;
 
     void
     setsockopts(const smartfd& sfd)

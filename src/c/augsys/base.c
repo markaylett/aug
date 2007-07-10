@@ -13,8 +13,6 @@ AUG_RCSID("$Id$");
 
 #define PROCEED_ 1
 
-static volatile long gmtoff_ = 0;
-
 /* No synchronisation exists around these variables.  Each logger is
    responsible for checking its integrity before logging. */
 
@@ -299,18 +297,6 @@ aug_nextid(void)
     aug_unlock();
 
     return id;
-}
-
-AUGSYS_API void
-aug_setgmtoff(long gmtoff)
-{
-    gmtoff_ = gmtoff;
-}
-
-AUGSYS_API long
-aug_gmtoff(void)
-{
-    return gmtoff_;
 }
 
 AUGSYS_API void

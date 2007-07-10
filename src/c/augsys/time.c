@@ -37,6 +37,7 @@ aug_timegm(struct tm* tm)
     gm.tm_mday = tm->tm_mday;
     gm.tm_mon = tm->tm_mon;
     gm.tm_year = tm->tm_year;
+    gm.tm_isdst = 0; /* No daylight adjustment. */
 
     if ((time_t)-1 == (ret = mktime(&gm))) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
@@ -44,7 +45,9 @@ aug_timegm(struct tm* tm)
         return ret;
     }
 
-    ret += aug_gmtoff();
+    /* mktime() assumes localtime; adjust for gmt. */
+
+    ret -= aug_timezone();
 
 #endif /* !HAVE_TIMEGM */
 

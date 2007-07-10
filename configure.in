@@ -227,19 +227,6 @@ func()
     ])
 ])
 
-AC_MSG_CHECKING(for gmtoff in struct tm)
-AC_TRY_COMPILE([
-    #include <time.h>
-], [
-    struct tm x;
-    x.tm_gmtoff;
-], [
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_TM_GMTOFF, 1, [Define to 1 if you have gmtoff in struct tm.])
-], [
-	AC_MSG_RESULT(no)
-])
-
 # Checks for library functions.
 AC_CHECK_FUNCS([bzero localtime_r poll strlcpy timegm])
 

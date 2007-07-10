@@ -9,8 +9,10 @@
 #include <time.h> /* tzset() */
 #include <winsock2.h>
 
+static long timezone_ = 0;
+
 static int
-getgmtoff_(volatile long* ptr)
+settimezone_(void)
 {
 	TIME_ZONE_INFORMATION tz;
     switch (GetTimeZoneInformation(&tz)) {
@@ -24,7 +26,7 @@ getgmtoff_(volatile long* ptr)
     case TIME_ZONE_ID_DAYLIGHT:
         break;
     }
-    *ptr = (tz.Bias + tz.StandardBias) * -60;
+    timezone_ = (tz.Bias + tz.StandardBias) * 60;
     return 0;
 }
 
@@ -86,8 +88,7 @@ aug_init(struct aug_errinfo* errinfo)
         return ret;
 
     tzset();
-    if (-1 == getgmtoff_(&gmtoff_)
-        || -1 == aug_initlock_())
+    if (-1 == settimezone_() || -1 == aug_initlock_())
         return -1;
 
     if (-1 == aug_initerrinfo_(errinfo)) {
@@ -130,6 +131,12 @@ aug_term(void)
     }
 
     return aug_termlock_();
+}
+
+AUGSYS_API long
+aug_timezone(void)
+{
+    return timezone_;
 }
 
 AUGSYS_API const struct aug_fdtype*

@@ -7,6 +7,7 @@
 #include "augrtpp/session.hpp"
 
 #include <map>
+#include <string>
 #include <vector>
 
 namespace aug {

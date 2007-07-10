@@ -44,7 +44,7 @@ DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 check_PROGRAMS = augsys-basetest$(EXEEXT) augsys-errinfotest$(EXEEXT) \
 	augsys-logtest$(EXEEXT) augsys-mcasttest$(EXEEXT) \
 	augsys-muxertest$(EXEEXT) augsys-sockettest$(EXEEXT) \
-	augsys-stringtest$(EXEEXT)
+	augsys-stringtest$(EXEEXT) augsys-timetest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -96,6 +96,10 @@ am_augsys_stringtest_OBJECTS = stringtest.$(OBJEXT)
 augsys_stringtest_OBJECTS = $(am_augsys_stringtest_OBJECTS)
 augsys_stringtest_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
+am_augsys_timetest_OBJECTS = timetest.$(OBJEXT)
+augsys_timetest_OBJECTS = $(am_augsys_timetest_OBJECTS)
+augsys_timetest_DEPENDENCIES =  \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -109,11 +113,13 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
 	$(augsys_errinfotest_SOURCES) $(augsys_logtest_SOURCES) \
 	$(augsys_mcasttest_SOURCES) $(augsys_muxertest_SOURCES) \
-	$(augsys_sockettest_SOURCES) $(augsys_stringtest_SOURCES)
+	$(augsys_sockettest_SOURCES) $(augsys_stringtest_SOURCES) \
+	$(augsys_timetest_SOURCES)
 DIST_SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
 	$(augsys_errinfotest_SOURCES) $(augsys_logtest_SOURCES) \
 	$(augsys_mcasttest_SOURCES) $(augsys_muxertest_SOURCES) \
-	$(augsys_sockettest_SOURCES) $(augsys_stringtest_SOURCES)
+	$(augsys_sockettest_SOURCES) $(augsys_stringtest_SOURCES) \
+	$(augsys_timetest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -323,7 +329,8 @@ TESTS = \
 	augsys-mcasttest \
 	augsys-muxertest \
 	augsys-sockettest \
-	augsys-stringtest
+	augsys-stringtest \
+	augsys-timetest
 
 augsys_basetest_SOURCES = basetest.c
 augsys_basetest_LDADD = \
@@ -351,6 +358,10 @@ augsys_sockettest_LDADD = \
 
 augsys_stringtest_SOURCES = stringtest.c
 augsys_stringtest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+augsys_timetest_SOURCES = timetest.c
+augsys_timetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 all: all-recursive
@@ -443,6 +454,9 @@ augsys-sockettest$(EXEEXT): $(augsys_sockettest_OBJECTS) $(augsys_sockettest_DEP
 augsys-stringtest$(EXEEXT): $(augsys_stringtest_OBJECTS) $(augsys_stringtest_DEPENDENCIES) 
 	@rm -f augsys-stringtest$(EXEEXT)
 	$(LINK) $(augsys_stringtest_LDFLAGS) $(augsys_stringtest_OBJECTS) $(augsys_stringtest_LDADD) $(LIBS)
+augsys-timetest$(EXEEXT): $(augsys_timetest_OBJECTS) $(augsys_timetest_DEPENDENCIES) 
+	@rm -f augsys-timetest$(EXEEXT)
+	$(LINK) $(augsys_timetest_LDFLAGS) $(augsys_timetest_OBJECTS) $(augsys_timetest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -475,6 +489,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tls_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uio.Plo@am__quote@
