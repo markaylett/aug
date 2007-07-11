@@ -8,8 +8,9 @@
 
 AUG_RCSID("$Id$");
 
+#include "augutil/pwd.h"
+
 #if defined(_WIN32)
-# include "augutil/pwd.h"
 # define MPE
 static const char*
 getpass(const char* prompt)

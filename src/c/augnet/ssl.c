@@ -20,6 +20,8 @@ AUG_RCSID("$Id$");
 # include <openssl/err.h>
 # include <openssl/ssl.h>
 
+# include <string.h>        /* memcpy() */
+
 # define SSLREAD_  0x01
 # define SSLWRITE_ 0x02
 
