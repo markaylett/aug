@@ -2,6 +2,7 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 noinst_PROGRAMS = \
 	mplexd \
+	revpol \
 	tcpclient \
 	timerd
 
@@ -22,6 +23,9 @@ AUGLIBS= \
 mplexd_SOURCES = \
 	mplexd.cpp
 mplexd_LDADD = $(AUGLIBS)
+
+revpol_SOURCES = \
+	revpol.cpp
 
 tcpclient_SOURCES = \
 	tcpclient.cpp

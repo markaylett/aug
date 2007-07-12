@@ -47,11 +47,11 @@ This document is a brief introduction to building and installing Modules for
 
 @* Event Model.
 
-Well designed threading models can improve CPU utilisation on multi-processor
-machines.  Similar effects, however, are rarely acheived when threads are used
-to implement asynchronous behaviour and avoid blocking-API calls.  In such
-cases, complexity, resource contention and the risk of deadlocks may increase,
-and performance degrade.
+A well designed threading model can improve CPU utilisation on multi-processor
+machines.  Similar effects, however, are rarely acheived where threads are
+used to implement asynchronous behaviour and avoid blocking-API calls.  In
+such cases, complexity, resource contention and the risk of deadlocks may
+increase, and performance degrade.
 
 \yskip\noindent
 Using non-blocking I/O, a single thread can be assigned to the scheduling of

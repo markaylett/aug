@@ -15,6 +15,7 @@ example_DATA = \
 	client.cpp \
 	http.cpp \
 	minimal.c \
+	revpol.cpp \
 	sched.cpp \
 	server.cpp
 
