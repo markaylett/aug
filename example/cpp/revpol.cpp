@@ -14,9 +14,13 @@ using namespace augrt;
 using namespace std;
 
 /*
-  :tax begin
-    1.175 mul
-  end def
+/fib {
+  dup dup 1 eq exch 0 eq or not {
+    dup 1 sub fib
+    exch 2 sub fib
+    add
+  } if
+} def
 */
 
 namespace {
@@ -141,6 +145,22 @@ namespace {
         }
     };
 
+    enum cmptype {
+        EQ,
+        GT,
+        LT,
+        NEQ
+    };
+
+    enum nodetype {
+        NONE,
+        BLOCK,
+        FUN,
+        NAME,
+        NUM,
+        STR
+    };
+
     class node_base;
 
     class node {
@@ -179,14 +199,23 @@ namespace {
         void
         eval(stackv<node>& args);
 
-        double
-        tof() const;
-
-        string
-        tos() const;
+        cmptype
+        cmp(const node& rhs) const;
 
         void
         print(ostream& os) const;
+
+        bool
+        tobool() const;
+
+        double
+        tonum() const;
+
+        string
+        tostr() const;
+
+        nodetype
+        type() const;
     };
 
     ostream&
@@ -219,14 +248,23 @@ namespace {
             args.push(node::attach(this));
         }
 
-        virtual double
-        do_tof() const = 0;
+        virtual bool
+        do_tobool() const = 0;
 
-        virtual string
-        do_tos() const = 0;
+        virtual cmptype
+        do_cmp(const node& rhs) const = 0;
 
         virtual void
         do_print(ostream& os) const = 0;
+
+        virtual double
+        do_tonum() const = 0;
+
+        virtual string
+        do_tostr() const = 0;
+
+        virtual nodetype
+        do_type() const = 0;
 
     public:
         virtual
@@ -255,23 +293,20 @@ namespace {
     void
     node::eval(stackv<node>& args)
     {
+        cout << "trace: ";
+        print(cout);
+        cout << endl;
         if (ptr_)
             ptr_->do_eval(args);
     }
 
-    double
-    node::tof() const
+    cmptype
+    node::cmp(const node& rhs) const
     {
-        return ptr_ ? ptr_->do_tof() : 0.0;
-    }
+        if (!ptr_)
+            return rhs.ptr_ ? NEQ : EQ;
 
-    string
-    node::tos() const
-    {
-        string s;
-        if (ptr_)
-            s = ptr_->do_tos();
-        return s;
+        return ptr_->do_cmp(rhs);
     }
 
     void
@@ -281,6 +316,33 @@ namespace {
             ptr_->do_print(os);
         else
             os << "<null>";
+    }
+
+    bool
+    node::tobool() const
+    {
+        return ptr_ ? ptr_->do_tobool() : false;
+    }
+
+    double
+    node::tonum() const
+    {
+        return ptr_ ? ptr_->do_tonum() : 0.0;
+    }
+
+    string
+    node::tostr() const
+    {
+        string s;
+        if (ptr_)
+            s = ptr_->do_tostr();
+        return s;
+    }
+
+    nodetype
+    node::type() const
+    {
+        return ptr_ ? ptr_->do_type() : NONE;
     }
 
     class block : public node_base {
@@ -305,132 +367,100 @@ namespace {
         {
             vector<node>::iterator it(nodes_.begin()), end(nodes_.end());
             for (; it != end; ++it)
-                it->eval(args);
+                if (BLOCK != it->type())
+                    it->eval(args);
         }
-        double
-        do_tof() const
+        cmptype
+        do_cmp(const node& rhs) const
         {
-            throw runtime_error("invalid type: block");
-        }
-        string
-        do_tos() const
-        {
-            throw runtime_error("invalid type: block");
+            return NEQ;
         }
         void
         do_print(ostream& os) const
         {
             vector<node>::const_iterator it(nodes_.begin()),
                 end(nodes_.end());
-            for (; it != end; ++it)
-                cout << *it << endl;
+            if (it == end)
+                return;
+            it->print(os);
+            for (++it; it != end; ++it) {
+                os << ' ';
+                it->print(os);
+            }
+        }
+        bool
+        do_tobool() const
+        {
+            throw runtime_error("invalid type: block");
+        }
+        double
+        do_tonum() const
+        {
+            throw runtime_error("invalid type: block");
+        }
+        string
+        do_tostr() const
+        {
+            throw runtime_error("invalid type: block");
+        }
+        nodetype
+        do_type() const
+        {
+            return BLOCK;
         }
     };
 
-    class funval : public node_base {
-        void (*fun_)(argv&);
+    class fun : public node_base {
+        void (*fn_)(argv&);
         explicit
-        funval(void (*fun)(argv&))
-            : fun_(fun)
+        fun(void (*fn)(argv&))
+            : fn_(fn)
         {
         }
     public:
         virtual
-        ~funval()
+        ~fun()
         {
         }
         static node
-        create(void (*fun)(argv&))
+        create(void (*fn)(argv&))
         {
-            return node::attach(new funval(fun));
+            return node::attach(new fun(fn));
         }
         virtual void
         do_eval(stackv<node>& args)
         {
-            fun_(args);
+            fn_(args);
         }
-        double
-        do_tof() const
+        cmptype
+        do_cmp(const node& rhs) const
         {
-            throw runtime_error("invalid type: <fun>");
-        }
-        string
-        do_tos() const
-        {
-            throw runtime_error("invalid type: <fun>");
+            return NEQ;
         }
         void
         do_print(ostream& os) const
         {
             os << "<fun>";
         }
-    };
-
-    class numval : public node_base {
-        double value_;
-        explicit
-        numval(double value)
-            : value_(value)
+        bool
+        do_tobool() const
         {
-        }
-    public:
-        virtual
-        ~numval()
-        {
-        }
-        static node
-        create(double value)
-        {
-            return node::attach(new numval(value));
+            throw runtime_error("invalid type: <fun>");
         }
         double
-        do_tof() const
+        do_tonum() const
         {
-            return value_;
+            throw runtime_error("invalid type: <fun>");
         }
         string
-        do_tos() const
+        do_tostr() const
         {
-            throw runtime_error("invalid type: <num>");
+            throw runtime_error("invalid type: <fun>");
         }
-        void
-        do_print(ostream& os) const
+        nodetype
+        do_type() const
         {
-            os << value_;
-        }
-    };
-
-    class strval : public node_base {
-        string value_;
-        explicit
-        strval(const string& value)
-            : value_(value)
-        {
-        }
-    public:
-        virtual
-        ~strval()
-        {
-        }
-        static node
-        create(const string& value)
-        {
-            return node::attach(new strval(value));
-        }
-        double
-        do_tof() const
-        {
-            return atof(value_.c_str());
-        }
-        string
-        do_tos() const
-        {
-            return value_;
-        }
-        void
-        do_print(ostream& os) const
-        {
-            os << value_;
+            return FUN;
         }
     };
 
@@ -451,20 +481,137 @@ namespace {
         {
             return node::attach(new name(value));
         }
-        double
-        do_tof() const
+        bool
+        do_tobool() const
         {
             throw runtime_error("invalid type: name");
         }
-        string
-        do_tos() const
+        cmptype
+        do_cmp(const node& rhs) const
         {
-            return value_;
+            return NEQ;
         }
         void
         do_print(ostream& os) const
         {
-            os << ':' << value_;
+            os << '/' << value_;
+        }
+        double
+        do_tonum() const
+        {
+            throw runtime_error("invalid type: name");
+        }
+        string
+        do_tostr() const
+        {
+            return value_;
+        }
+        nodetype
+        do_type() const
+        {
+            return NAME;
+        }
+    };
+
+    class numval : public node_base {
+        double value_;
+        explicit
+        numval(double value)
+            : value_(value)
+        {
+        }
+    public:
+        virtual
+        ~numval()
+        {
+        }
+        static node
+        create(double value)
+        {
+            return node::attach(new numval(value));
+        }
+        bool
+        do_tobool() const
+        {
+            return 0.0 != value_;
+        }
+        cmptype
+        do_cmp(const node& rhs) const
+        {
+            return NUM == rhs.type() && value_ == rhs.tonum()
+                ? EQ : NEQ;
+        }
+        void
+        do_print(ostream& os) const
+        {
+            os << value_;
+        }
+        double
+        do_tonum() const
+        {
+            return value_;
+        }
+        string
+        do_tostr() const
+        {
+            throw runtime_error("invalid type: <num>");
+        }
+        nodetype
+        do_type() const
+        {
+            return NUM;
+        }
+    };
+
+    node zeroval(numval::create(0.0));
+    node oneval(numval::create(1.0));
+
+    class strval : public node_base {
+        string value_;
+        explicit
+        strval(const string& value)
+            : value_(value)
+        {
+        }
+    public:
+        virtual
+        ~strval()
+        {
+        }
+        static node
+        create(const string& value)
+        {
+            return node::attach(new strval(value));
+        }
+        bool
+        do_tobool() const
+        {
+            return !value_.empty();
+        }
+        cmptype
+        do_cmp(const node& rhs) const
+        {
+            return NEQ;
+        }
+        void
+        do_print(ostream& os) const
+        {
+            os << value_;
+        }
+        double
+        do_tonum() const
+        {
+            return atof(value_.c_str());
+        }
+        string
+        do_tostr() const
+        {
+            return value_;
+        }
+        nodetype
+        do_type() const
+        {
+            return STR;
         }
     };
 
@@ -487,18 +634,32 @@ namespace {
     {
         argv args(nodes);
         head.eval(args);
-        if (!args.empty())
-            cout << args.top() << endl;
+    }
+
+    node
+    createval(const string& tok)
+    {
+		char* end;
+		double d(strtod(tok.c_str(), &end));
+        return tok.c_str() + tok.size() == end
+            ? numval::create(d)
+            : strval::create(tok);
     }
 
     node
     createnode(const string& tok)
     {
-        if (':' == tok[0])
+        if ('/' == tok[0])
             return name::create(lcase(tok.substr(1)));
 
+        if (tok == "{")
+            throw begin();
+
+        if (tok == "}")
+            throw end();
+
         if (!isalpha(tok[0]))
-            return strval::create(tok);
+            return createval(tok);
 
         string lc(lcase(tok));
 
@@ -521,6 +682,8 @@ namespace {
         string tok;
         while (is >> tok) {
             try {
+                if ('#' == tok[0])
+                    break;
                 node x(createnode(tok));
                 if (1 == blocks.size())
                     eval(x, blocks.top());
@@ -544,44 +707,147 @@ namespace {
     }
 
     void
-    defop(argv& args)
+    addfun(argv& args)
     {
-        defs[args[1].tos()] = args[0];
+        node x(numval::create(args[1].tonum() + args[0].tonum()));
+        args.pop(2);
+        args.push(x);
+    }
+
+    void
+    andfun(argv& args)
+    {
+        node x(args[1].tobool() && args[0].tobool() ? oneval : zeroval);
+        args.pop(2);
+        args.push(x);
+    }
+
+    void
+    clearfun(argv& args)
+    {
+        args.clear();
+    }
+
+    void
+    deffun(argv& args)
+    {
+        defs[args[1].tostr()] = args[0];
         args.pop(2);
     }
 
     void
-    printop(argv& args)
+    divfun(argv& args)
     {
-        argv::const_iterator it(args.begin()), end(args.end());
-        for (; it != end; ++it)
-            cout << *it << endl;
+        node x(numval::create(args[1].tonum() / args[0].tonum()));
+        args.pop(2);
+        args.push(x);
     }
 
     void
-    prodop(argv& args)
+    dupfun(argv& args)
+    {
+        args.push(args[0]);
+    }
+
+    void
+    eqfun(argv& args)
+    {
+        node x(EQ == args[1].cmp(args[0]) ? oneval : zeroval);
+        args.pop(2);
+        args.push(x);
+    }
+
+    void
+    iffun(argv& args)
+    {
+        node b1(args[0]);
+        args.pop();
+        if (args[0].tobool())
+            b1.eval(args);
+    }
+
+    void
+    ifelsefun(argv& args)
+    {
+        node b1(args[1]);
+        node b2(args[0]);
+        args.pop(2);
+        if (args[0].tobool())
+            b1.eval(args);
+        else
+            b2.eval(args);
+    }
+
+    void
+    notfun(argv& args)
+    {
+        node x(args[0].tobool() ? zeroval : oneval);
+        args.pop(1);
+        args.push(x);
+    }
+
+    void
+    orfun(argv& args)
+    {
+        node x(args[1].tobool() || args[0].tobool() ? oneval : zeroval);
+        args.pop(2);
+        args.push(x);
+    }
+
+    void
+    popfun(argv& args)
+    {
+        args.pop();
+    }
+
+    void
+    mulfun(argv& args)
+    {
+        node x(numval::create(args[1].tonum() * args[0].tonum()));
+        args.pop(2);
+        args.push(x);
+    }
+
+    void
+    printfun(argv& args)
+    {
+        argv::const_iterator it(args.begin()), end(args.end());
+        for (unsigned i(0); it != end; ++it)
+            cout << i++ << ": " << *it << endl;
+    }
+
+    void
+    prodfun(argv& args)
     {
         double x(1.0);
         argv::const_iterator it(args.begin()), end(args.end());
         for (; it != end; ++it)
-            x *= it->tof();
+            x *= it->tonum();
         args.clear();
         args.push(numval::create(x));
     }
 
     void
-    sumop(argv& args)
+    sumfun(argv& args)
     {
         double x(0.0);
         argv::const_iterator it(args.begin()), end(args.end());
         for (; it != end; ++it)
-            x += it->tof();
+            x += it->tonum();
         args.clear();
         args.push(numval::create(x));
     }
 
     void
-    swapop(argv& args)
+    subfun(argv& args)
+    {
+        node x(numval::create(args[1].tonum() - args[0].tonum()));
+        args.pop(2);
+        args.push(x);
+    }
+
+    void
+    exchfun(argv& args)
     {
         node tmp(args[0]);
         args[0] = args[1];
@@ -589,7 +855,7 @@ namespace {
     }
 
     void
-    quitop(argv& args)
+    quitfun(argv& args)
     {
         throw quit();
     }
@@ -598,12 +864,25 @@ namespace {
 int
 main(int argc, char* argv[])
 {
-    defs["def"] = funval::create(defop);
-    defs["print"] = funval::create(printop);
-    defs["prod"] = funval::create(prodop);
-    defs["sum"] = funval::create(sumop);
-    defs["swap"] = funval::create(swapop);
-    defs["quit"] = funval::create(quitop);
+    defs["add"] = fun::create(addfun);
+    defs["and"] = fun::create(andfun);
+    defs["clear"] = fun::create(clearfun);
+    defs["def"] = fun::create(deffun);
+    defs["div"] = fun::create(divfun);
+    defs["dup"] = fun::create(dupfun);
+    defs["eq"] = fun::create(eqfun);
+    defs["if"] = fun::create(iffun);
+    defs["ifelse"] = fun::create(ifelsefun);
+    defs["not"] = fun::create(notfun);
+    defs["or"] = fun::create(orfun);
+    defs["pop"] = fun::create(popfun);
+    defs["print"] = fun::create(printfun);
+    defs["prod"] = fun::create(prodfun);
+    defs["mul"] = fun::create(mulfun);
+    defs["sub"] = fun::create(subfun);
+    defs["sum"] = fun::create(sumfun);
+    defs["exch"] = fun::create(exchfun);
+    defs["quit"] = fun::create(quitfun);
 
     string line;
     stack<vector<node> > blocks;
@@ -611,8 +890,12 @@ main(int argc, char* argv[])
 
     while (getline(cin, line)) {
         trim(line);
+        if (line.empty())
+            continue;
         try {
             parse(line, blocks);
+            if (1 == blocks.size() && !blocks.top().empty())
+                cout << "top: " << blocks.top().back() << endl;
         } catch (const quit&) {
             break;
         } catch (const exception& e) {
