@@ -26,16 +26,9 @@ using namespace std;
 
 namespace {
 
-    template<typename T>
-    T
-    to(const string& tok)
-    {
-        istringstream is(tok);
-        T x = T();
-        if (!(is >> x))
-            throw runtime_error(string("invalid type: ").append(tok));
-        return x;
-    }
+    struct begin { };
+    struct end { };
+    struct quit { };
 
     template <typename T>
     class stackv {
@@ -154,7 +147,7 @@ namespace {
     };
 
     enum nodetype {
-        BLOCK,
+        BRANCH,
         FUN,
         NAME,
         NOOP,
@@ -199,7 +192,7 @@ namespace {
             return node(ptr);
         }
         void
-        eval(stackv<node>& args);
+        eval(bool fork, stackv<node>& args, deque<node>& tail);
 
         cmptype
         cmp(const node& rhs) const;
@@ -209,6 +202,9 @@ namespace {
         {
             return ptr_;
         }
+
+        bool
+        isconst(stackv<node>& args) const;
 
         void
         print(ostream& os) const;
@@ -251,10 +247,13 @@ namespace {
         }
     protected:
         virtual void
-        do_eval(stackv<node>& args) = 0;
+        do_eval(bool fork, stackv<node>& args, deque<node>& tail) = 0;
 
         virtual cmptype
         do_cmp(const node& rhs) const = 0;
+
+        virtual bool
+        do_isconst(argv& args) const = 0;
 
         virtual void
         do_print(ostream& os) const = 0;
@@ -296,7 +295,7 @@ namespace {
     }
 
     void
-    node::eval(stackv<node>& args)
+    node::eval(bool fork, stackv<node>& args, deque<node>& tail)
     {
         if (1 < args.size())
             cout << args[1] << ' ' << args[0] << ' ';
@@ -305,7 +304,7 @@ namespace {
         print(cout);
         cout << endl;
         if (ptr_)
-            ptr_->do_eval(args);
+            ptr_->do_eval(fork, args, tail);
     }
 
     cmptype
@@ -315,6 +314,12 @@ namespace {
             return rhs.ptr_ ? NEQ : EQ;
 
         return ptr_->do_cmp(rhs);
+    }
+
+    bool
+    node::isconst(stackv<node>& args) const
+    {
+        return false;
     }
 
     void
@@ -354,7 +359,7 @@ namespace {
     }
 
     void
-    node_base::do_eval(stackv<node>& args)
+    node_base::do_eval(bool fork, stackv<node>& args, deque<node>& tail)
     {
         retain();
         args.push(node::attach(this));
@@ -366,40 +371,42 @@ namespace {
         return this == rhs.get() ? EQ : NEQ;
     }
 
-
     map<string, node> defs;
 
-    class block : public node_base {
+    class branch : public node_base {
         vector<node> nodes_;
         explicit
-        block(const vector<node>& nodes)
+        branch(const vector<node>& nodes)
             : nodes_(nodes)
         {
         }
     public:
         virtual
-        ~block()
+        ~branch()
         {
         }
         static node
         create(const vector<node>& nodes)
         {
-            return node::attach(new block(nodes));
+            return node::attach(new branch(nodes));
         }
         virtual void
-        do_eval(stackv<node>& args)
+        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
         {
-            vector<node>::iterator it(nodes_.begin()), end(nodes_.end());
-            for (; it != end; ++it)
-                if (BLOCK == it->type())
-                    args.push(*it);
-                else
-                    it->eval(args);
+            if (fork)
+                copy(nodes_.begin(), nodes_.end(), back_inserter(tail));
+            else
+                node_base::do_eval(fork, args, tail);
         }
         cmptype
         do_cmp(const node& rhs) const
         {
             return node_base::do_cmp(rhs);
+        }
+        bool
+        do_isconst(argv& args) const
+        {
+            return false;
         }
         void
         do_print(ostream& os) const
@@ -416,32 +423,40 @@ namespace {
         bool
         do_tobool() const
         {
-            throw runtime_error("invalid type: <block>");
+            throw runtime_error("invalid type: <branch>");
         }
         double
         do_tonum() const
         {
-            throw runtime_error("invalid type: <block>");
+            throw runtime_error("invalid type: <branch>");
         }
         string
         do_tostr() const
         {
-            throw runtime_error("invalid type: <block>");
+            throw runtime_error("invalid type: <branch>");
         }
         nodetype
         do_type() const
         {
-            return BLOCK;
+            return BRANCH;
         }
     };
 
     class ref : public node_base {
         string name_;
         node node_;
+        bool bound_;
         explicit
         ref(const string& name)
-            : name_(name)
+            : name_(name),
+              bound_(false)
         {
+            map<string, node>::iterator it(defs.find(name));
+            if (it != defs.end()) {
+                node_ = it->second;
+                bound_ = true;
+                cout << "bound\n";
+            }
         }
     public:
         virtual
@@ -449,11 +464,16 @@ namespace {
         {
         }
         virtual void
-        do_eval(stackv<node>& args)
+        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
         {
-            map<string, node>::iterator it(defs.find(name_));
-            node_ = it == defs.end() ? node() : it->second;
-            node_.eval(args);
+            if (!bound_) {
+                map<string, node>::iterator it(defs.find(name_));
+                if (it != defs.end())
+                    node_ = it->second;
+                bound_ = true;
+                cout << "bound\n";
+            }
+            node_.eval(true, args, tail);
         }
         static node
         create(const string& name)
@@ -464,6 +484,11 @@ namespace {
         do_cmp(const node& rhs) const
         {
             return node_.cmp(rhs);
+        }
+        bool
+        do_isconst(argv& args) const
+        {
+            return false;
         }
         void
         do_print(ostream& os) const
@@ -493,10 +518,11 @@ namespace {
     };
 
     class fun : public node_base {
-        void (*fn_)(argv&);
-        explicit
-        fun(void (*fn)(argv&))
-            : fn_(fn)
+        void (*fn_)(argv&, deque<node>&);
+        const int argc_;
+        fun(void (*fn)(argv&, deque<node>&), int argc)
+            : fn_(fn),
+              argc_(argc)
         {
         }
     public:
@@ -505,19 +531,27 @@ namespace {
         {
         }
         static node
-        create(void (*fn)(argv&))
+        create(void (*fn)(argv&, deque<node>&), int argc = -1)
         {
-            return node::attach(new fun(fn));
+            return node::attach(new fun(fn, argc));
         }
         virtual void
-        do_eval(stackv<node>& args)
+        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
         {
-            fn_(args);
+            fn_(args, tail);
         }
         cmptype
         do_cmp(const node& rhs) const
         {
             return node_base::do_cmp(rhs);
+        }
+        bool
+        do_isconst(argv& args) const
+        {
+            if (-1 == argc_ || args.size() < (unsigned)argc_)
+                return false;
+
+            return true;
         }
         void
         do_print(ostream& os) const
@@ -564,14 +598,19 @@ namespace {
             return node::attach(new name(value));
         }
         void
-        do_eval(stackv<node>& args)
+        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
         {
-            return node_base::do_eval(args);
+            return node_base::do_eval(fork, args, tail);
         }
         cmptype
         do_cmp(const node& rhs) const
         {
             return node_base::do_cmp(rhs);
+        }
+        bool
+        do_isconst(argv& args) const
+        {
+            return false;
         }
         void
         do_print(ostream& os) const
@@ -618,9 +657,9 @@ namespace {
             return node::attach(new numval(value));
         }
         void
-        do_eval(stackv<node>& args)
+        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
         {
-            return node_base::do_eval(args);
+            return node_base::do_eval(fork, args, tail);
         }
         cmptype
         do_cmp(const node& rhs) const
@@ -636,6 +675,11 @@ namespace {
                 return EQ;
 
             return GT;
+        }
+        bool
+        do_isconst(argv& args) const
+        {
+            return false;
         }
         void
         do_print(ostream& os) const
@@ -687,9 +731,9 @@ namespace {
             return node::attach(new strval(value));
         }
         void
-        do_eval(stackv<node>& args)
+        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
         {
-            return node_base::do_eval(args);
+            return node_base::do_eval(fork, args, tail);
         }
         cmptype
         do_cmp(const node& rhs) const
@@ -705,6 +749,11 @@ namespace {
                 return EQ;
 
             return GT;
+        }
+        bool
+        do_isconst(argv& args) const
+        {
+            return false;
         }
         void
         do_print(ostream& os) const
@@ -733,10 +782,6 @@ namespace {
         }
     };
 
-    struct begin { };
-    struct end { };
-    struct quit { };
-
     string
     lcase(const string& s)
     {
@@ -746,10 +791,30 @@ namespace {
     }
 
     void
-    eval(node& head, vector<node>& nodes)
+    eval(argv& args, node& head)
+    {
+        deque<node> tail;
+        head.eval(false, args, tail);
+        while (!tail.empty()) {
+
+            head = tail.front();
+            tail.pop_front();
+            head.eval(false, args, tail);
+        }
+    }
+
+    void
+    eval(vector<node>& nodes, node& head)
     {
         argv args(nodes);
-        head.eval(args);
+        eval(args, head);
+    }
+
+    bool
+    isconst(vector<node>& nodes, const node& head)
+    {
+        argv args(nodes);
+        return head.isconst(args);
     }
 
     node
@@ -781,37 +846,37 @@ namespace {
     }
 
     void
-    parse(istream& is, stack<vector<node> >& blocks)
+    parse(istream& is, stack<vector<node> >& branches)
     {
         string tok;
         while (is >> tok) {
             try {
                 if ('#' == tok[0])
                     break;
-                node x(createnode(tok));
-                if (1 == blocks.size())
-                    eval(x, blocks.top());
+                node head(createnode(tok));
+                if (1 == branches.size() || isconst(branches.top(), head))
+                    eval(branches.top(), head);
                 else
-                    blocks.top().push_back(x);
+                    branches.top().push_back(head);
             } catch (const begin&) {
-                blocks.push(vector<node>());
+                branches.push(vector<node>());
             } catch (const end&) {
-                node x(block::create(blocks.top()));
-                blocks.pop();
-                blocks.top().push_back(x);
+                node x(branch::create(branches.top()));
+                branches.pop();
+                branches.top().push_back(x);
             }
         }
     }
 
     void
-    parse(const string& s, stack<vector<node> >& blocks)
+    parse(const string& s, stack<vector<node> >& branches)
     {
         istringstream is(s);
-        parse(is, blocks);
+        parse(is, branches);
     }
 
     void
-    addfun(argv& args)
+    addfun(argv& args, deque<node>& tail)
     {
         node ret(numval::create(args[1].tonum() + args[0].tonum()));
         args.pop(2);
@@ -819,7 +884,7 @@ namespace {
     }
 
     void
-    andfun(argv& args)
+    andfun(argv& args, deque<node>& tail)
     {
         node ret(args[1].tobool() && args[0].tobool() ? oneval : zeroval);
         args.pop(2);
@@ -827,7 +892,7 @@ namespace {
     }
 
     void
-    clearfun(argv& args)
+    clearfun(argv& args, deque<node>& tail)
     {
         argv::const_iterator it(args.begin()), end(args.end());
         for (; it != end; ++it)
@@ -839,14 +904,14 @@ namespace {
     }
 
     void
-    deffun(argv& args)
+    deffun(argv& args, deque<node>& tail)
     {
         defs[args[1].tostr()] = args[0];
         args.pop(2);
     }
 
     void
-    divfun(argv& args)
+    divfun(argv& args, deque<node>& tail)
     {
         node ret(numval::create(args[1].tonum() / args[0].tonum()));
         args.pop(2);
@@ -854,13 +919,13 @@ namespace {
     }
 
     void
-    dupfun(argv& args)
+    dupfun(argv& args, deque<node>& tail)
     {
         args.push(args[0]);
     }
 
     void
-    eqfun(argv& args)
+    eqfun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
         args.pop(2);
@@ -868,7 +933,7 @@ namespace {
     }
 
     void
-    gefun(argv& args)
+    gefun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
         args.pop(2);
@@ -876,7 +941,7 @@ namespace {
     }
 
     void
-    gtfun(argv& args)
+    gtfun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
         args.pop(2);
@@ -884,37 +949,37 @@ namespace {
     }
 
     void
-    iffun(argv& args)
+    iffun(argv& args, deque<node>& tail)
     {
         bool expr(args[1].tobool());
         node b1(args[0]);
         args.pop(2);
         if (expr)
-            b1.eval(args);
+            b1.eval(true, args, tail);
     }
 
     void
-    ifelsefun(argv& args)
+    ifelsefun(argv& args, deque<node>& tail)
     {
         bool expr(args[2].tobool());
         node b1(args[1]);
         node b2(args[0]);
         args.pop(3);
         if (expr) {
-            b1.eval(args);
+            b1.eval(true, args, tail);
         } else {
-            b2.eval(args);
+            b2.eval(true, args, tail);
         }
     }
 
     void
-    indexfun(argv& args)
+    indexfun(argv& args, deque<node>& tail)
     {
         args.push(args[static_cast<unsigned>(args[0].tonum())]);
     }
 
     void
-    lefun(argv& args)
+    lefun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
         args.pop(2);
@@ -922,7 +987,7 @@ namespace {
     }
 
     void
-    ltfun(argv& args)
+    ltfun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
         args.pop(2);
@@ -930,7 +995,7 @@ namespace {
     }
 
     void
-    neqfun(argv& args)
+    neqfun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
         args.pop(2);
@@ -938,13 +1003,13 @@ namespace {
     }
 
     void
-    nopfun(argv& args)
+    nopfun(argv& args, deque<node>& tail)
     {
         args.push(node());
     }
 
     void
-    notfun(argv& args)
+    notfun(argv& args, deque<node>& tail)
     {
         node ret(args[0].tobool() ? zeroval : oneval);
         args.pop(1);
@@ -952,7 +1017,7 @@ namespace {
     }
 
     void
-    orfun(argv& args)
+    orfun(argv& args, deque<node>& tail)
     {
         node ret(args[1].tobool() || args[0].tobool() ? oneval : zeroval);
         args.pop(2);
@@ -960,13 +1025,13 @@ namespace {
     }
 
     void
-    popfun(argv& args)
+    popfun(argv& args, deque<node>& tail)
     {
         args.pop();
     }
 
     void
-    mulfun(argv& args)
+    mulfun(argv& args, deque<node>& tail)
     {
         node ret(numval::create(args[1].tonum() * args[0].tonum()));
         args.pop(2);
@@ -974,7 +1039,7 @@ namespace {
     }
 
     void
-    printfun(argv& args)
+    printfun(argv& args, deque<node>& tail)
     {
         argv::const_iterator it(args.begin()), end(args.end());
         for (unsigned i(0); it != end; ++it)
@@ -982,7 +1047,7 @@ namespace {
     }
 
     void
-    prodfun(argv& args)
+    prodfun(argv& args, deque<node>& tail)
     {
         double prod(1.0);
         argv::const_iterator it(args.begin()), end(args.end());
@@ -998,7 +1063,7 @@ namespace {
     }
 
     void
-    sumfun(argv& args)
+    sumfun(argv& args, deque<node>& tail)
     {
         double sum(0.0);
         argv::const_iterator it(args.begin()), end(args.end());
@@ -1014,7 +1079,7 @@ namespace {
     }
 
     void
-    subfun(argv& args)
+    subfun(argv& args, deque<node>& tail)
     {
         node ret(numval::create(args[1].tonum() - args[0].tonum()));
         args.pop(2);
@@ -1022,7 +1087,7 @@ namespace {
     }
 
     void
-    exchfun(argv& args)
+    exchfun(argv& args, deque<node>& tail)
     {
         node tmp(args[0]);
         args[0] = args[1];
@@ -1030,7 +1095,7 @@ namespace {
     }
 
     void
-    quitfun(argv& args)
+    quitfun(argv& args, deque<node>& tail)
     {
         throw quit();
     }
@@ -1067,17 +1132,17 @@ main(int argc, char* argv[])
     defs["quit"] = fun::create(quitfun);
 
     string line;
-    stack<vector<node> > blocks;
-    blocks.push(vector<node>());
+    stack<vector<node> > branches;
+    branches.push(vector<node>());
 
     while (getline(cin, line)) {
         trim(line);
         if (line.empty())
             continue;
         try {
-            parse(line, blocks);
-            if (1 == blocks.size() && !blocks.top().empty())
-                cout << "top: " << blocks.top().back() << endl;
+            parse(line, branches);
+            if (1 == branches.size() && !branches.top().empty())
+                cout << "top: " << branches.top().back() << endl;
         } catch (const quit&) {
             break;
         } catch (const exception& e) {
