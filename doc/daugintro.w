@@ -33,11 +33,12 @@
 
 @* Introduction.
 \DAUG/ is an open source, application server written in \CEE/\AM\CPLUSPLUS/.
-It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net} which is
-available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.  \DAUG/
-takes an unbiased view of the systems it supports; it does not favour one over
-another, and runs natively on all.  \DAUG/ includes support for \IPV6/,
-\SSL/, \PYTHON/ and \RUBY/.
+It is designed to simplify the implementation of portable and efficient,
+TCP-based network servers.  It is part of the \pdfURL{\AUG/ project}
+{http://aug.sourceforge.net} which is available for \LINUX/, \WINDOWS/ and
+other \POSIX/-compliant systems.  \DAUG/ takes an unbiased view of the systems
+it supports; it attempts not favour one over another, and runs natively on
+all. \DAUG/ includes support for \IPV6/, \SSL/, \PYTHON/ and \RUBY/.
 
 \yskip\noindent
 This document is a brief introduction to building and installing Modules for
@@ -47,48 +48,46 @@ This document is a brief introduction to building and installing Modules for
 
 @* Event Model.
 
-A well designed threading model can improve CPU utilisation on multi-processor
-machines.  Similar effects, however, are rarely acheived where threads are
-used to implement asynchronous behaviour and avoid blocking-API calls.  In
-such cases, complexity, resource contention and the risk of deadlocks may
-increase, and performance degrade.
+Carefully designed threading models can improve CPU utilisation on
+multi-processor machines.  Similar effects, however, are rarely acheived where
+threads are either used to ``simplify'' coding, or bypass blocking-API calls.
+In such cases, complexity, resource contention and the risk of deadlocks may
+actually increase, and performance degrade.
 
 \yskip\noindent
-Using non-blocking I/O, a single thread can be assigned to the scheduling of
-timers, and de-multiplexing of network events.  This primary, event thread can
-be kept responsive by delegating units of work to secondary threads.  By
-minimising shared state, and constraining communicatings with the main thread
-to the event queue, these secondary threads can operate in a environment that
-minimises the possibility of deadlocks.  This is similar, in fact, to the UI
-event model.
+Using non-blocking I/O, a single thread can be dedicated to the scheduling of
+timers, and the de-multiplexing of network events.  If needed, this ``event
+thread'' can be kept responsive by delegating CPU-intensive tasks to secondary
+threads.  Iteractions between the event thread and secondary threads can be
+confined to the event queue, to minimise the possibility of deadlocks.
+Similar, in fact, to a UI event model.
 
 \yskip\noindent
-The \DAUG/ application server implements such an event model to de-multiplex
-activity on signal, socket, timer and user-event objects.
+The \DAUG/ application server uses an event model, such as this, to
+de-multiplex activity on signal, socket, timer and user-event objects.
 
 @ \DAUG/ delegates event notifications to Modules and, in turn, Sessions.
-Modules are physical components that are dynamically loaded into the
-application server at run-time.  Each Module manages one or more Sessions.
-Modules and Sessions are wired together at configuration-time, not
-compile-time.
+Modules are physical components, dynamically loaded into the application
+server at run-time.  Each Module manages one or more Sessions.  Modules and
+Sessions are wired together at configuration-time, not compile-time.
 
 \yskip\noindent
 All Module calls are dispatched from the event thread.  A Session can,
 therefore, either opt for a simple, single-threaded model, or a suitable
-alternative, such as a thread-pool: where possible, the host environment
-avoids imposing unnecessary constraints on Module implementors.
+alternative, such as a thread-pool: whenever possible, \DAUG/ avoids imposing
+artificial constraints on Module implementors.
 
 \yskip\noindent
 The separation of physical Modules and logical Sessions allows Modules to
-adapt and extend the host environment viewed by Sessions.  The \.{augpy} and
-\.{augrb} Modules, for example, adapt the host environment to allow Sessions
-to be written in either \PYTHON/ or \RUBY/.  These language bindings are
-provided by Modules, without change to \DAUG/.
+adapt and extend the host environment as viewed by Sessions.  The \.{augpy}
+and \.{augrb} Modules, for example, adapt the host environment to allow
+Sessions to be written in either \PYTHON/ or \RUBY/.  These language bindings
+are provided by Modules, and are unbeknown to \DAUG/.
 
 \yskip\noindent
 Modules also help to promote component, rather than source-level reuse:
-Sessions can interact with one-another by posting events to one another.  This
-allows Sessions to bridge language boundaries.
+Sessions can interact with one-another by posting events to the event queue,
+allowing Sessions to bridge language boundaries.
 
 \yskip\noindent
 System administrators are presented with a uniform interface across all
@@ -122,7 +121,7 @@ namespace {@/
 
 @ The \.{<augrtpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
 implementations.  Modules can also be written in standard \CEE/.  A \CEE/
-implementation would use the \.{<augrt.h>} header instead.  For convenience,
+implementation would use the \.{<augrt.h>} header, instead.  For convenience,
 names are imported from the |augrt| and |std| namespaces.
 
 @<include...@>=
@@ -130,14 +129,14 @@ names are imported from the |augrt| and |std| namespaces.
 using namespace augrt;@/
 using namespace std;
 
-@ The Session type, |echosession| in this case, is fed into class templates
-which assist the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>| delegates
-the task of creating Sessions to a factory object, whose type is specified by
-the template argument.  |basic_factory<>| is used to create a simple factory
-for the |echosession| Session.
+@ A Session type, |echosession| in this example, is fed into a class template
+which assists with the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>|
+delegates the task of creating Sessions to a factory object, the type, of
+which, is specified by the template argument.  Here, |basic_factory<>| is used
+to create a simple factory for |echosession|.
 
 \yskip\noindent
-\DAUG/ Modules are required to export two library functions, namely
+\DAUG/ Modules are required to export two library functions, namely,
 |augrt_init()| and |augrt_term()|.  The |DAUG_MODULE| macro defines these two
 export functions.
 
@@ -145,11 +144,10 @@ export functions.
 typedef basic_module<basic_factory<echosession> > sample;@/
 DAUG_MODULE(sample::init, sample::term)
 
-@ \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
+@ The |echoline| functor handles each line received from the client.
+\CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
 implementations for most of |session_base|'s pure virtual functions are
-provided by the |basic_session| class.  For simplicity, |echosession| is
-derived from |basic_session|.  The |echoline| functor handles each line
-received from the client.
+provided by the |basic_session| class.
 
 @<implement...@>=
 @<echoline functor@>@;
@@ -177,8 +175,9 @@ struct echosession : basic_session {@/
 @ The |do_start()| function is called to start the Session.  This is where
 Session initialisation is performed.  In this case, a TCP listener is bound to
 a port which is read from the configuration file using the |getenv()|
-function.  If the ``session.echo.serv'' property is missing from the
-configuration file, |false| is returned to deactivate the Session.
+function.  If the ``session.echo.serv'' property is missing from both the
+configuration file and environment table, |false| is returned to deactivate
+the Session.
 
 @<member...@>+=
 bool
@@ -338,10 +337,16 @@ properties required by the Session implementation:
 \.{session.echo.serv = 5000}
 
 \yskip\noindent
-Finally, specify the path to the Module.  The file extension defaults to |dll|
-on \WINDOWS/, and |so| otherwise:
+Finally, specify the path to the Module.  The file extension defaults to |.dll|
+on \WINDOWS/, and |.so| otherwise:
 
 \yskip
 \.{module.sample.path = ./modsample}
+
+\yskip
+\yskip
+\yskip
+\yskip\noindent
+And, we're done.  Have fun!
 
 @* Index.

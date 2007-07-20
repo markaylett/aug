@@ -4,6 +4,7 @@
 
 #include "augrtpp.hpp"
 
+#include <cassert>
 #include <cctype>
 #include <cmath>
 #include <deque>
@@ -18,15 +19,14 @@ using namespace std;
 
 /*
   /fib {
-  dup dup 1 eq exch 0 eq or not {
-  dup 1 sub fib
-  exch 2 sub fib
-  add
-  } if
+    dup dup 1 eq exch 0 eq or not {
+      dup 1 sub fib
+      exch 2 sub fib
+      add
+    } if
   } def
 */
 
-#define MEMPOOL_ 0
 #define TRACE_ 0
 
 namespace {
@@ -35,10 +35,10 @@ namespace {
     struct end { };
     struct quit { };
 
-#if MEMPOOL_
+    template <size_t N>
     class mempool {
-        const size_t size_;
-        stack<void*, vector<void*> > freelist_;
+        static mempool instance_;
+        stack<void*, deque<void*> > freelist_;
     public:
         ~mempool()
         {
@@ -47,158 +47,148 @@ namespace {
                 freelist_.pop();
             }
         }
-        explicit
-        mempool(size_t size)
-            : size_(size)
-        {
-        }
-        void*
+        static void*
         create()
         {
             void* ptr;
-            if (freelist_.empty()) {
-                ptr = ::operator new(size_);
+            if (instance_.freelist_.empty()) {
+                ptr = ::operator new(N);
             } else {
-                ptr = freelist_.top();
-                freelist_.pop();
+                ptr = instance_.freelist_.top();
+                instance_.freelist_.pop();
             }
             return ptr;
         }
-        void
+        static void
         destroy(void* ptr)
         {
-            freelist_.push(ptr);
+            instance_.freelist_.push(ptr);
         }
     };
-#else // !MEMPOOL_
-    class mempool {
-        const size_t size_;
-    public:
-        ~mempool()
-        {
-        }
-        explicit
-        mempool(size_t size)
-            : size_(size)
-        {
-        }
-        void*
-        create()
-        {
-            return ::operator new(size_);
-        }
-        void
-        destroy(void* ptr)
-        {
-            ::operator delete(ptr);
-        }
+
+    template <size_t N>
+    mempool<N> mempool<N>::instance_;
+
+    enum numtype {
+        DOUBLE = 1,
+        INT
     };
-#endif // !MEMPOOL_
 
     class num {
+
         friend ostream&
         operator <<(ostream&, const num&);
-        enum { DNUM, LNUM } type_;
+
+        friend double
+        tod(const num&);
+
+        friend int
+        toi(const num&);
+
+        friend numtype
+        type(const num&);
+
+        numtype type_;
         union {
             double d_;
-            long l_;
+            int i_;
         } u_;
     public:
         num()
-            : type_(LNUM)
+            : type_(INT)
         {
-            u_.l_ = 0;
+            u_.i_ = 0;
         }
         num(const num& rhs)
         {
-            if (DNUM == (type_ = rhs.type_))
+            if (DOUBLE == (type_ = rhs.type_))
                 u_.d_ = rhs.u_.d_;
             else
-                u_.l_ = rhs.u_.l_;
+                u_.i_ = rhs.u_.i_;
         }
         num(double d)
-            : type_(DNUM)
+            : type_(DOUBLE)
         {
             u_.d_ = d;
         }
-        num(long l)
-            : type_(LNUM)
+        num(int i)
+            : type_(INT)
         {
-            u_.l_ = l;
+            u_.i_ = i;
         }
         num&
         operator =(const num& rhs)
         {
-            if (DNUM == (type_ = rhs.type_))
+            if (DOUBLE == (type_ = rhs.type_))
                 u_.d_ = rhs.u_.d_;
             else
-                u_.l_ = rhs.u_.l_;
+                u_.i_ = rhs.u_.i_;
             return *this;
         }
         num&
         operator =(double d)
         {
-            type_ = DNUM;
+            type_ = DOUBLE;
             u_.d_ = d;
             return *this;
         }
         num&
-        operator =(long l)
+        operator =(int i)
         {
-            type_ = LNUM;
-            u_.l_ = l;
+            type_ = INT;
+            u_.i_ = i;
             return *this;
         }
         num&
         operator +=(const num& rhs)
         {
-            if (LNUM == type_ && LNUM == rhs.type_)
-                u_.l_ += rhs.u_.l_;
+            if (INT == type_ && INT == rhs.type_)
+                u_.i_ += rhs.u_.i_;
             else
-                *this = tod() + rhs.tod();
+                *this = tod(*this) + tod(rhs);
             return *this;
         }
 
         num&
         operator -=(const num& rhs)
         {
-            if (LNUM == type_ && LNUM == rhs.type_)
-                u_.l_ -= rhs.u_.l_;
+            if (INT == type_ && INT == rhs.type_)
+                u_.i_ -= rhs.u_.i_;
             else
-                *this = tod() - rhs.tod();
+                *this = tod(*this) - tod(rhs);
             return *this;
         }
         num&
         operator *=(const num& rhs)
         {
-            if (LNUM == type_ && LNUM == rhs.type_)
-                u_.l_ *= rhs.u_.l_;
+            if (INT == type_ && INT == rhs.type_)
+                u_.i_ *= rhs.u_.i_;
             else
-                *this = tod() * rhs.tod();
+                *this = tod(*this) * tod(rhs);
             return *this;
         }
         num&
         operator /=(const num& rhs)
         {
-            *this = tod() / rhs.tod();
+            *this = tod(*this) / tod(rhs);
             return *this;
         }
         num&
         operator %=(const num& rhs)
         {
-            if (LNUM == type_ && LNUM == rhs.type_)
-                u_.l_ %= rhs.u_.l_;
+            if (INT == type_ && INT == rhs.type_)
+                u_.i_ %= rhs.u_.i_;
             else
-                *this = fmod(tod(), rhs.tod());
+                *this = fmod(tod(*this), tod(rhs));
             return *this;
         }
         num&
         operator ++()
         {
-            if (DNUM == type_)
+            if (DOUBLE == type_)
                 ++u_.d_;
             else
-                ++u_.l_;
+                ++u_.i_;
             return *this;
         }
         const num
@@ -211,10 +201,10 @@ namespace {
         num&
         operator --()
         {
-            if (DNUM == type_)
+            if (DOUBLE == type_)
                 --u_.d_;
             else
-                --u_.l_;
+                --u_.i_;
             return *this;
         }
         const num
@@ -224,55 +214,45 @@ namespace {
             --*this;
             return prev;
         }
-        double
-        tod() const
-        {
-            return DNUM == type_ ? u_.d_ : static_cast<double>(u_.l_);
-        }
-        long
-        tol() const
-        {
-            return LNUM == type_ ? u_.l_ : static_cast<long>(u_.d_);
-        }
         bool
         operator <(const num& rhs) const
         {
-            if (LNUM == type_ && LNUM == rhs.type_)
-                return u_.l_ < rhs.u_.l_;
+            if (INT == type_ && INT == rhs.type_)
+                return u_.i_ < rhs.u_.i_;
 
-            return tod() < rhs.tod();
+            return tod(*this) < tod(rhs);
         }
         bool
         operator <=(const num& rhs) const
         {
-            if (LNUM == type_ && LNUM == rhs.type_)
-                return u_.l_ <= rhs.u_.l_;
+            if (INT == type_ && INT == rhs.type_)
+                return u_.i_ <= rhs.u_.i_;
 
-            return tod() <= rhs.tod();
+            return tod(*this) <= tod(rhs);
         }
         bool
         operator ==(const num& rhs) const
         {
-            if (LNUM == type_ && LNUM == rhs.type_)
-                return u_.l_ == rhs.u_.l_;
+            if (INT == type_ && INT == rhs.type_)
+                return u_.i_ == rhs.u_.i_;
 
-            return tod() == rhs.tod();
+            return tod(*this) == tod(rhs);
         }
         bool
         operator >=(const num& rhs) const
         {
-            if (LNUM == type_ && LNUM == rhs.type_)
-                return u_.l_ >= rhs.u_.l_;
+            if (INT == type_ && INT == rhs.type_)
+                return u_.i_ >= rhs.u_.i_;
 
-            return tod() >= rhs.tod();
+            return tod(*this) >= tod(rhs);
         }
         bool
         operator >(const num& rhs) const
         {
-            if (LNUM == type_ && LNUM == rhs.type_)
-                return u_.l_ > rhs.u_.l_;
+            if (INT == type_ && INT == rhs.type_)
+                return u_.i_ > rhs.u_.i_;
 
-            return tod() > rhs.tod();
+            return tod(*this) > tod(rhs);
         }
     };
 
@@ -325,11 +305,42 @@ namespace {
     ostream&
     operator <<(ostream& os, const num& x)
     {
-        if (num::DNUM == x.type_)
+        if (DOUBLE == x.type_)
             os << x.u_.d_;
         else
-            os << x.u_.l_;
+            os << x.u_.i_;
         return os;
+    }
+
+    double
+    tod(const num& x)
+    {
+        return DOUBLE == x.type_ ? x.u_.d_ : static_cast<double>(x.u_.i_);
+    }
+
+    int
+    toi(const num& x)
+    {
+        return INT == x.type_ ? x.u_.i_ : static_cast<int>(x.u_.d_);
+    }
+
+    numtype
+    type(const num& x)
+    {
+        return x.type_;
+    }
+
+    num
+    abs(const num& x)
+    {
+        return DOUBLE == type(x) ? std::abs(tod(x)) : std::abs(toi(x));
+    }
+
+    num
+    pow(const num& x, const num& y)
+    {
+        return DOUBLE == type(y) ? std::pow(tod(x), tod(y))
+            : std::pow(tod(x), toi(y));
     }
 
     bool
@@ -337,9 +348,9 @@ namespace {
     {
         char* end;
 
-        long l(strtol(s.c_str(), &end, 10));
+        int i(strtol(s.c_str(), &end, 10));
         if (end == s.data() + s.size()) {
-            n = l;
+            n = i;
             return true;
         }
 
@@ -397,12 +408,16 @@ namespace {
         void
         pop()
         {
-            nodes_.pop_back();
+            if (!nodes_.empty())
+                nodes_.pop_back();
         }
         void
         pop(size_type n)
         {
-            nodes_.resize(size() - n);
+            if (size() <= n)
+                nodes_.clear();
+            else
+                nodes_.resize(size() - n);
         }
         void
         push(const value_type& x)
@@ -462,14 +477,14 @@ namespace {
     };
 
     enum cmptype {
-        EQ,
+        EQ = 1,
         GT,
         LT,
         NEQ
     };
 
     enum nodetype {
-        BRANCH,
+        BRANCH = 1,
         FUN,
         NAME,
         NOOP,
@@ -514,7 +529,7 @@ namespace {
             return node(ptr);
         }
         void
-        eval(bool fork, stackv<node>& args, deque<node>& tail);
+        eval(bool deref, stackv<node>& args, deque<node>& tail);
 
         cmptype
         cmp(const node& rhs) const;
@@ -571,7 +586,7 @@ namespace {
     protected:
 
         virtual void
-        do_eval(bool fork, stackv<node>& args, deque<node>& tail) = 0;
+        do_eval(bool deref, stackv<node>& args, deque<node>& tail) = 0;
 
         virtual cmptype
         do_cmp(const node& rhs) const = 0;
@@ -619,7 +634,7 @@ namespace {
     }
 
     void
-    node::eval(bool fork, stackv<node>& args, deque<node>& tail)
+    node::eval(bool deref, stackv<node>& args, deque<node>& tail)
     {
 #if TRACE_
         if (1 < args.size())
@@ -630,7 +645,7 @@ namespace {
         cout << endl;
 #endif // TRACE_
         if (ptr_)
-            ptr_->do_eval(fork, args, tail);
+            ptr_->do_eval(deref, args, tail);
     }
 
     cmptype
@@ -666,7 +681,7 @@ namespace {
     num
     node::tonum() const
     {
-        return ptr_ ? ptr_->do_tonum() : 0L;
+        return ptr_ ? ptr_->do_tonum() : 0;
     }
 
     string
@@ -685,7 +700,7 @@ namespace {
     }
 
     void
-    node_base::do_eval(bool fork, stackv<node>& args, deque<node>& tail)
+    node_base::do_eval(bool deref, stackv<node>& args, deque<node>& tail)
     {
         retain();
         args.push(node::attach(this));
@@ -700,7 +715,6 @@ namespace {
     map<string, node> defs;
 
     class branch : public node_base {
-        static mempool mempool_;
         vector<node> nodes_;
         explicit
         branch(const vector<node>& nodes)
@@ -714,13 +728,13 @@ namespace {
         static void*
         operator new(size_t size)
         {
-            assert(sizeof(test) == size);
-            return mempool_.create();
+            assert(sizeof(branch) == size);
+            return mempool<sizeof(branch)>::create();
         }
         static void
         operator delete(void* ptr)
         {
-            mempool_.destroy(ptr);
+            return mempool<sizeof(branch)>::destroy(ptr);
         }
         static node
         create(const vector<node>& nodes)
@@ -728,12 +742,12 @@ namespace {
             return node::attach(new branch(nodes));
         }
         void
-        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
+        do_eval(bool deref, stackv<node>& args, deque<node>& tail)
         {
-            if (fork)
+            if (deref)
                 copy(nodes_.rbegin(), nodes_.rend(), front_inserter(tail));
             else
-                node_base::do_eval(fork, args, tail);
+                node_base::do_eval(deref, args, tail);
         }
         cmptype
         do_cmp(const node& rhs) const
@@ -779,10 +793,7 @@ namespace {
         }
     };
 
-    mempool branch::mempool_(sizeof(branch));
-
     class ref : public node_base {
-        static mempool mempool_;
         string name_;
         node node_;
         bool bound_;
@@ -804,13 +815,13 @@ namespace {
         static void*
         operator new(size_t size)
         {
-            assert(sizeof(test) == size);
-            return mempool_.create();
+            assert(sizeof(ref) == size);
+            return mempool<sizeof(ref)>::create();
         }
         static void
         operator delete(void* ptr)
         {
-            mempool_.destroy(ptr);
+            return mempool<sizeof(ref)>::destroy(ptr);
         }
         static node
         create(const string& name)
@@ -818,7 +829,7 @@ namespace {
             return node::attach(new ref(name));
         }
         void
-        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
+        do_eval(bool deref, stackv<node>& args, deque<node>& tail)
         {
             if (!bound_) {
                 map<string, node>::iterator it(defs.find(name_));
@@ -865,10 +876,7 @@ namespace {
         }
     };
 
-    mempool ref::mempool_(sizeof(ref));
-
     class fun : public node_base {
-        static mempool mempool_;
         void (*fn_)(argv&, deque<node>&);
         const int argc_;
         fun(void (*fn)(argv&, deque<node>&), int argc)
@@ -883,13 +891,13 @@ namespace {
         static void*
         operator new(size_t size)
         {
-            assert(sizeof(test) == size);
-            return mempool_.create();
+            assert(sizeof(fun) == size);
+            return mempool<sizeof(fun)>::create();
         }
         static void
         operator delete(void* ptr)
         {
-            mempool_.destroy(ptr);
+            return mempool<sizeof(fun)>::destroy(ptr);
         }
         static node
         create(void (*fn)(argv&, deque<node>&), int argc = -1)
@@ -897,7 +905,7 @@ namespace {
             return node::attach(new fun(fn, argc));
         }
         void
-        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
+        do_eval(bool deref, stackv<node>& args, deque<node>& tail)
         {
             fn_(args, tail);
         }
@@ -941,14 +949,14 @@ namespace {
         }
     };
 
-    mempool fun::mempool_(sizeof(fun));
-
     class name : public node_base {
-        static mempool mempool_;
         string value_;
+        node node_;
+        bool bound_;
         explicit
         name(const string& value)
-            : value_(value)
+            : value_(value),
+              bound_(false)
         {
         }
     public:
@@ -958,13 +966,13 @@ namespace {
         static void*
         operator new(size_t size)
         {
-            assert(sizeof(test) == size);
-            return mempool_.create();
+            assert(sizeof(name) == size);
+            return mempool<sizeof(name)>::create();
         }
         static void
         operator delete(void* ptr)
         {
-            mempool_.destroy(ptr);
+            return mempool<sizeof(name)>::destroy(ptr);
         }
         static node
         create(const string& value)
@@ -972,9 +980,22 @@ namespace {
             return node::attach(new name(value));
         }
         void
-        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
+        do_eval(bool deref, stackv<node>& args, deque<node>& tail)
         {
-            return node_base::do_eval(fork, args, tail);
+            if (deref) {
+
+                if (!bound_) {
+
+                    map<string, node>::iterator it(defs.find(value_));
+                    if (it != defs.end())
+                        node_ = it->second;
+                    bound_ = true;
+                }
+
+                node_.eval(true, args, tail);
+
+            } else
+                node_base::do_eval(false, args, tail);
         }
         cmptype
         do_cmp(const node& rhs) const
@@ -1013,10 +1034,7 @@ namespace {
         }
     };
 
-    mempool name::mempool_(sizeof(name));
-
     class numval : public node_base {
-        static mempool mempool_;
         num value_;
         explicit
         numval(const num& value)
@@ -1030,13 +1048,13 @@ namespace {
         static void*
         operator new(size_t size)
         {
-            assert(sizeof(test) == size);
-            return mempool_.create();
+            assert(sizeof(numval) == size);
+            return mempool<sizeof(numval)>::create();
         }
         static void
         operator delete(void* ptr)
         {
-            mempool_.destroy(ptr);
+            return mempool<sizeof(numval)>::destroy(ptr);
         }
         static node
         create(const num& value)
@@ -1044,9 +1062,9 @@ namespace {
             return node::attach(new numval(value));
         }
         void
-        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
+        do_eval(bool deref, stackv<node>& args, deque<node>& tail)
         {
-            return node_base::do_eval(fork, args, tail);
+            return node_base::do_eval(deref, args, tail);
         }
         cmptype
         do_cmp(const node& rhs) const
@@ -1076,7 +1094,7 @@ namespace {
         bool
         do_tobool() const
         {
-            return 0L != value_;
+            return 0 != value_;
         }
         num
         do_tonum() const
@@ -1097,10 +1115,7 @@ namespace {
         }
     };
 
-    mempool numval::mempool_(sizeof(numval));
-
     class strval : public node_base {
-        static mempool mempool_;
         string value_;
         explicit
         strval(const string& value)
@@ -1114,13 +1129,13 @@ namespace {
         static void*
         operator new(size_t size)
         {
-            assert(sizeof(test) == size);
-            return mempool_.create();
+            assert(sizeof(strval) == size);
+            return mempool<sizeof(strval)>::create();
         }
         static void
         operator delete(void* ptr)
         {
-            mempool_.destroy(ptr);
+            return mempool<sizeof(strval)>::destroy(ptr);
         }
         static node
         create(const string& value)
@@ -1128,9 +1143,9 @@ namespace {
             return node::attach(new strval(value));
         }
         void
-        do_eval(bool fork, stackv<node>& args, deque<node>& tail)
+        do_eval(bool deref, stackv<node>& args, deque<node>& tail)
         {
-            return node_base::do_eval(fork, args, tail);
+            return node_base::do_eval(deref, args, tail);
         }
         cmptype
         do_cmp(const node& rhs) const
@@ -1181,10 +1196,8 @@ namespace {
         }
     };
 
-    mempool strval::mempool_(sizeof(strval));
-
-    node zeroval(numval::create(0L));
-    node oneval(numval::create(1L));
+    node zeroval(numval::create(0));
+    node oneval(numval::create(1));
 
     string
     lcase(const string& s)
@@ -1280,17 +1293,37 @@ namespace {
     }
 
     void
+    absfun(argv& args, deque<node>& tail)
+    {
+        args[0] = numval::create(abs(args[0].tonum()));
+    }
+
+    void
     addfun(argv& args, deque<node>& tail)
     {
-        args[1] = numval::create(args[1].tonum() + args[0].tonum());
-        args.pop(1);
+        args[1] = numval::create(args[1].tonum() += args[0].tonum());
+        args.pop();
     }
 
     void
     andfun(argv& args, deque<node>& tail)
     {
         args[1] = args[1].tobool() && args[0].tobool() ? oneval : zeroval;
-        args.pop(1);
+        args.pop();
+    }
+
+    void
+    callfun(argv& args, deque<node>& tail)
+    {
+        node b1(args[0]);
+        args.pop();
+        b1.eval(true, args, tail);
+    }
+
+    void
+    ceilfun(argv& args, deque<node>& tail)
+    {
+        args[0] = numval::create(ceil(tod(args[0].tonum())));
     }
 
     void
@@ -1321,8 +1354,8 @@ namespace {
     void
     divfun(argv& args, deque<node>& tail)
     {
-        args[1] = numval::create(args[1].tonum() / args[0].tonum());
-        args.pop(1);
+        args[1] = numval::create(args[1].tonum() /= args[0].tonum());
+        args.pop();
     }
 
     void
@@ -1336,7 +1369,19 @@ namespace {
     {
         cmptype cmp(args[1].cmp(args[0]));
         args[1] = EQ == cmp ? oneval : zeroval;
-        args.pop(1);
+        args.pop();
+    }
+
+    void
+    expfun(argv& args, deque<node>& tail)
+    {
+        args[0] = numval::create(exp(tod(args[0].tonum())));
+    }
+
+    void
+    floorfun(argv& args, deque<node>& tail)
+    {
+        args[0] = numval::create(floor(tod(args[0].tonum())));
     }
 
     void
@@ -1344,15 +1389,15 @@ namespace {
     {
         cmptype cmp(args[1].cmp(args[0]));
         args[1] = EQ == cmp || GT == cmp ? oneval : zeroval;
-        args.pop(1);
+        args.pop();
     }
 
     void
     gtfun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
-        args.pop(2);
-        args.push(GT == cmp ? oneval : zeroval);
+        args[1] = GT == cmp ? oneval : zeroval;
+        args.pop();
     }
 
     void
@@ -1372,11 +1417,10 @@ namespace {
         node b1(args[1]);
         node b2(args[0]);
         args.pop(3);
-        if (expr) {
+        if (expr)
             b1.eval(true, args, tail);
-        } else {
+        else
             b2.eval(true, args, tail);
-        }
     }
 
     void
@@ -1388,31 +1432,57 @@ namespace {
     void
     indexfun(argv& args, deque<node>& tail)
     {
-        args.push(args[args[0].tonum().tol()]);
+        args.push(args[toi(args[0].tonum())]);
     }
 
     void
     lefun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
-        args.pop(2);
-        args.push(EQ == cmp || LT == cmp ? oneval : zeroval);
+        args[1] = EQ == cmp || LT == cmp ? oneval : zeroval;
+        args.pop();
+    }
+
+    void
+    logfun(argv& args, deque<node>& tail)
+    {
+        args[0] = numval::create(log(tod(args[0].tonum())));
+    }
+
+    void
+    log10fun(argv& args, deque<node>& tail)
+    {
+        args[0] = numval::create(log10(tod(args[0].tonum())));
     }
 
     void
     ltfun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
-        args.pop(2);
-        args.push(LT == cmp ? oneval : zeroval);
+        args[1] = LT == cmp ? oneval : zeroval;
+        args.pop();
+    }
+
+    void
+    modfun(argv& args, deque<node>& tail)
+    {
+        args[1] = numval::create(args[1].tonum() %= args[0].tonum());
+        args.pop();
+    }
+
+    void
+    mulfun(argv& args, deque<node>& tail)
+    {
+        args[1] = numval::create(args[1].tonum() *= args[0].tonum());
+        args.pop();
     }
 
     void
     neqfun(argv& args, deque<node>& tail)
     {
         cmptype cmp(args[1].cmp(args[0]));
-        args.pop(2);
-        args.push(EQ != cmp ? oneval : zeroval);
+        args[1] = EQ != cmp ? oneval : zeroval;
+        args.pop();
     }
 
     void
@@ -1424,17 +1494,14 @@ namespace {
     void
     notfun(argv& args, deque<node>& tail)
     {
-        node ret(args[0].tobool() ? zeroval : oneval);
-        args.pop(1);
-        args.push(ret);
+        args[0] = args[0].tobool() ? zeroval : oneval;
     }
 
     void
     orfun(argv& args, deque<node>& tail)
     {
-        node ret(args[1].tobool() || args[0].tobool() ? oneval : zeroval);
-        args.pop(2);
-        args.push(ret);
+        args[1] = args[1].tobool() || args[0].tobool() ? oneval : zeroval;
+        args.pop();
     }
 
     void
@@ -1444,19 +1511,10 @@ namespace {
     }
 
     void
-    modfun(argv& args, deque<node>& tail)
+    powfun(argv& args, deque<node>& tail)
     {
-        node ret(numval::create(args[1].tonum() % args[0].tonum()));
-        args.pop(2);
-        args.push(ret);
-    }
-
-    void
-    mulfun(argv& args, deque<node>& tail)
-    {
-        node ret(numval::create(args[1].tonum() * args[0].tonum()));
-        args.pop(2);
-        args.push(ret);
+        args[1] = numval::create(pow(args[1].tonum(), args[0].tonum()));
+        args.pop();
     }
 
     void
@@ -1470,7 +1528,7 @@ namespace {
     void
     prodfun(argv& args, deque<node>& tail)
     {
-        num prod(1L);
+        num prod(1);
         argv::const_iterator it(args.begin()), end(args.end());
         for (; it != end; ++it) {
             if (NOOP == it->type()) {
@@ -1484,9 +1542,15 @@ namespace {
     }
 
     void
+    sqrtfun(argv& args, deque<node>& tail)
+    {
+        args[0] = numval::create(sqrt(tod(args[0].tonum())));
+    }
+
+    void
     sumfun(argv& args, deque<node>& tail)
     {
-        num sum(0L);
+        num sum(0);
         argv::const_iterator it(args.begin()), end(args.end());
         for (; it != end; ++it) {
             if (NOOP == it->type()) {
@@ -1502,9 +1566,8 @@ namespace {
     void
     subfun(argv& args, deque<node>& tail)
     {
-        node ret(numval::create(args[1].tonum() - args[0].tonum()));
-        args.pop(2);
-        args.push(ret);
+        args[1] = numval::create(args[1].tonum() -= args[0].tonum());
+        args.pop();
     }
 
     void
@@ -1525,14 +1588,19 @@ namespace {
 int
 main(int argc, char* argv[])
 {
+    defs["abs"] = fun::create(absfun);
     defs["add"] = fun::create(addfun);
     defs["and"] = fun::create(andfun);
+    defs["call"] = fun::create(callfun);
+    defs["ceil"] = fun::create(ceilfun);
     defs["clear"] = fun::create(clearfun);
     defs["dec"] = fun::create(decfun);
     defs["def"] = fun::create(deffun);
     defs["div"] = fun::create(divfun);
     defs["dup"] = fun::create(dupfun);
     defs["eq"] = fun::create(eqfun);
+    defs["exp"] = fun::create(expfun);
+    defs["floor"] = fun::create(floorfun);
     defs["ge"] = fun::create(gefun);
     defs["gt"] = fun::create(gtfun);
     defs["if"] = fun::create(iffun);
@@ -1541,15 +1609,19 @@ main(int argc, char* argv[])
     defs["index"] = fun::create(indexfun);
     defs["le"] = fun::create(lefun);
     defs["lt"] = fun::create(ltfun);
+    defs["log"] = fun::create(logfun);
+    defs["log10"] = fun::create(log10fun);
+    defs["mod"] = fun::create(modfun);
+    defs["mul"] = fun::create(mulfun);
     defs["neq"] = fun::create(neqfun);
     defs["nop"] = fun::create(nopfun);
     defs["not"] = fun::create(notfun);
     defs["or"] = fun::create(orfun);
     defs["pop"] = fun::create(popfun);
+    defs["pow"] = fun::create(powfun);
     defs["print"] = fun::create(printfun);
     defs["prod"] = fun::create(prodfun);
-    defs["mod"] = fun::create(modfun);
-    defs["mul"] = fun::create(mulfun);
+    defs["sqrt"] = fun::create(sqrtfun);
     defs["sub"] = fun::create(subfun);
     defs["sum"] = fun::create(sumfun);
     defs["exch"] = fun::create(exchfun);
@@ -1565,10 +1637,8 @@ main(int argc, char* argv[])
             continue;
         try {
             parse(line, branches);
-#if TRACE_
             if (1 == branches.size() && !branches.top().empty())
-                cout << "top: " << branches.top().back() << endl;
-#endif // TRACE_
+                cout << branches.top().back() << endl;
         } catch (const quit&) {
             break;
         } catch (const exception& e) {
