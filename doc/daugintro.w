@@ -34,17 +34,18 @@
 @* Introduction.
 \DAUG/ is an open source, application server written in \CEE/\AM\CPLUSPLUS/.
 It is designed to simplify the implementation of portable and efficient,
-TCP-based network servers.  It is part of the \pdfURL{\AUG/ project}
-{http://aug.sourceforge.net} which is available for \LINUX/, \WINDOWS/ and
-other \POSIX/-compliant systems.  \DAUG/ takes an unbiased view of the systems
-it supports; it attempts not favour one over another, and runs natively on
-all. \DAUG/ includes support for \IPV6/, \SSL/, \PYTHON/ and \RUBY/.
+TCP-based network servers.  \DAUG/ takes an unbiased view of the systems it
+supports; it attempts not favour one over another, and runs natively on all.
+It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net}, which
+is available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
+\DAUG/ includes modular support for \IPV6/, \SSL/, \PYTHON/ and \RUBY/.
 
 \yskip\noindent
-This document is a brief introduction to building and installing Modules for
-\DAUG/, along with the key benefits.  For further information, please visit the
-\pdfURL{\AUG/ home page}{http://aug.sourceforge.net} or email myself,
-\pdfURL{Mark Aylett}{mailto:mark@@emantic.co.uk}.
+This document offers a brief introduction to building and installing Modules
+for \DAUG/, along with some insight into the application server itself.  For
+further information, please visit the \pdfURL{\AUG/ home
+page}{http://aug.sourceforge.net} or email myself, \pdfURL{Mark
+Aylett}{mailto:mark@@emantic.co.uk}.
 
 @* Event Model.
 
@@ -59,12 +60,13 @@ Using non-blocking I/O, a single thread can be dedicated to the scheduling of
 timers, and the de-multiplexing of network events.  If needed, this ``event
 thread'' can be kept responsive by delegating CPU-intensive tasks to secondary
 threads.  Iteractions between the event thread and secondary threads can be
-confined to the event queue, to minimise the possibility of deadlocks.
+confined to the event queue to minimise the possibility of deadlocks.
 Similar, in fact, to a UI event model.
 
 \yskip\noindent
-The \DAUG/ application server uses an event model, such as this, to
-de-multiplex activity on signal, socket, timer and user-event objects.
+The \DAUG/ application server uses an event model, such as the one described
+above, to de-multiplex activity on signal, socket, timer and user-event
+objects.
 
 @ \DAUG/ delegates event notifications to Modules and, in turn, Sessions.
 Modules are physical components, dynamically loaded into the application
@@ -82,7 +84,7 @@ The separation of physical Modules and logical Sessions allows Modules to
 adapt and extend the host environment as viewed by Sessions.  The \.{augpy}
 and \.{augrb} Modules, for example, adapt the host environment to allow
 Sessions to be written in either \PYTHON/ or \RUBY/.  These language bindings
-are provided by Modules, and are unbeknown to \DAUG/.
+are provided by Modules, and are unbeknown to the application server.
 
 \yskip\noindent
 Modules also help to promote component, rather than source-level reuse:
@@ -91,7 +93,7 @@ allowing Sessions to bridge language boundaries.
 
 \yskip\noindent
 System administrators are presented with a uniform interface across all
-platforms.  Although, on \WINDOWS/, d\ae monised \DAUG/ processes take the
+platforms.  Although, on \WINDOWS/, a d\ae monised \DAUG/ process takes the
 form of an NT service, from a sys-admin perspective, the interface remains the
 same.  As with \LINUX/, the following command can be used to start the service
 from a command prompt:
@@ -129,16 +131,16 @@ names are imported from the |augrt| and |std| namespaces.
 using namespace augrt;@/
 using namespace std;
 
-@ A Session type, |echosession| in this example, is fed into a class template
+@ Session types (|echosession| in this example) are fed into a class template
 which assists with the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>|
-delegates the task of creating Sessions to a factory object, the type, of
-which, is specified by the template argument.  Here, |basic_factory<>| is used
-to create a simple factory for |echosession|.
+delegates the task of creating Sessions to a factory object, specified as a
+template argument.  Here, |basic_factory<>| is used to create a simple factory
+for |echosession|.
 
 \yskip\noindent
 \DAUG/ Modules are required to export two library functions, namely,
-|augrt_init()| and |augrt_term()|.  The |DAUG_MODULE| macro defines these two
-export functions.
+|augrt_init()| and |augrt_term()|.  The |DAUG_MODULE| macro assists with the
+definition of these two export functions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echosession> > sample;@/
@@ -147,7 +149,8 @@ DAUG_MODULE(sample::init, sample::term)
 @ The |echoline| functor handles each line received from the client.
 \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
 implementations for most of |session_base|'s pure virtual functions are
-provided by the |basic_session| class.
+provided by the |basic_session| class.  The following definition shows the
+virtual functions that have been overriden in this example.
 
 @<implement...@>=
 @<echoline functor@>@;
@@ -172,12 +175,12 @@ struct echosession : basic_session {@/
 };@/
 @<member functions@>
 
-@ The |do_start()| function is called to start the Session.  This is where
-Session initialisation is performed.  In this case, a TCP listener is bound to
-a port which is read from the configuration file using the |getenv()|
+@ The |do_start()| virtual function is called to start the Session.  This is
+where Session initialisation is performed.  In this case, a TCP listener is
+bound to a port which is read from the configuration file using the |getenv()|
 function.  If the ``session.echo.serv'' property is missing from both the
-configuration file and environment table, |false| is returned to deactivate
-the Session.
+configuration file and environment table, |false| is returned and the Session
+deactivated.
 
 @<member...@>+=
 bool
@@ -196,9 +199,9 @@ accepted.  The |setuser()| function binds an opaque, user-defined value to an
 \DAUG/ object.  Here, a |string| buffer is assigned to track partial line
 data received from the client.  An initial, {\sc ``HELLO''} message is sent to
 the client.  The call to |setrwtimer()| establishes a timer that will expire
-when there has been no read activity on the |sock| object for a period of 15
-seconds or more.  \DAUG/ will automatically reset the timer when read
-activity occurs.
+when no read activity has occurred on the |sock| object for a period of 15
+seconds --- \DAUG/ will automatically reset the timer whenever read activity
+occurs.
 
 @<member...@>+=
 bool
