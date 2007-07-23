@@ -12,7 +12,7 @@ include AugUtil
 # void dispatch(to, type, user)
 # string getenv(name, def)
 # string getsession()
-# void shutdown(sock)
+# void shutdown(sock, flags)
 # int tcpconnect(host, serv, user)
 # int tcplisten(host, serv, user)
 # void send(sock, buffer buf)
@@ -69,7 +69,7 @@ module RbSkel
     end
     def RbSkel.teardown(sock)
         Log.debug("teardown(): #{sock}")
-        AugRt.shutdown(sock)
+        AugRt.shutdown(sock, 0)
     end
     def RbSkel.accepted(sock, addr, port)
         Log.info("accepted(): #{sock}")
@@ -86,7 +86,7 @@ module RbSkel
             x = @interp.interpret(line)
             if x == QUIT
                 AugRt.send(sock, "+OK goodbye\r\n")
-                AugRt.shutdown(sock)
+                AugRt.shutdown(sock, 0)
             elsif x != nil
                 AugRt.send(sock, x + "\r\n")
             end

@@ -44,7 +44,7 @@ namespace aug {
         do_process(unsigned short events) = 0;
 
         virtual void
-        do_shutdown() = 0;
+        do_shutdown(unsigned flags) = 0;
 
         /**
            Initiate application-level teardown.
@@ -88,9 +88,9 @@ namespace aug {
             return do_process(events);
         }
         void
-        shutdown()
+        shutdown(unsigned flags)
         {
-            do_shutdown();
+            do_shutdown(flags);
         }
         void
         teardown()
@@ -128,6 +128,10 @@ namespace aug {
         sockstate state_;
         bool close_;
 
+        // Since when has data been sitting in write buffer.
+
+        timeval since_;
+
         augrt_object&
         do_get();
 
@@ -156,7 +160,7 @@ namespace aug {
         do_process(unsigned short events);
 
         void
-        do_shutdown();
+        do_shutdown(unsigned flags);
 
         void
         do_teardown();
@@ -216,7 +220,7 @@ namespace aug {
         do_process(unsigned short events);
 
         void
-        do_shutdown();
+        do_shutdown(unsigned flags);
 
         void
         do_teardown();

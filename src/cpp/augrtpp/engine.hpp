@@ -97,7 +97,7 @@ namespace aug {
                  const void* user, size_t size);
 
         void
-        shutdown(augrt_id cid);
+        shutdown(augrt_id cid, unsigned flags);
 
         augrt_id
         tcpconnect(const char* sname, const char* host, const char* port,

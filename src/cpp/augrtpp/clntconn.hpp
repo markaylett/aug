@@ -63,7 +63,7 @@ namespace aug {
         do_process(unsigned short events);
 
         void
-        do_shutdown();
+        do_shutdown(unsigned flags);
 
         void
         do_teardown();

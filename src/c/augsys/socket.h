@@ -19,7 +19,7 @@
 #  define bzero ZeroMemory
 # endif /* !bzero */
 # if !defined(SHUT_RD)
-#  define SHUT_RD SD_RECV
+#  define SHUT_RD SD_RECEIVE
 #  define SHUT_WR SD_SEND
 #  define SHUT_RDWR SD_BOTH
 # endif /* !SHUT_RD */
@@ -107,6 +107,13 @@ AUGSYS_API int
 aug_setsockopt(int s, int level, int optname, const void* optval,
                socklen_t optlen);
 
+/**
+   Shutdown the socket.
+
+   Use #SHUT_WR to gracefully shutdown TCP sockets: a FIN will be sent after
+   all data is sent and acknowledged by the receiver.
+*/
+
 AUGSYS_API int
 aug_shutdown(int s, int how);
 
@@ -146,8 +153,9 @@ aug_inetloopback(int af);
 
 /**
    After a failed call to aug_accept(), this function can be used to determine
-   whether the error was a result of the peer closing the connection.  This
-   can occur when the passive socket is non-blocking.
+   whether the error was a result of the peer closing the connection prior to
+   aug_accept() being called.  This can occur when the passive socket is
+   non-blocking.
 */
 
 AUGSYS_API int

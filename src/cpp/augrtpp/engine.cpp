@@ -510,13 +510,15 @@ engine::dispatch(const char* sname, const char* to, const char* type,
 }
 
 AUGRTPP_API void
-engine::shutdown(augrt_id cid)
+engine::shutdown(augrt_id cid, unsigned flags)
 {
     sockptr sock(impl_->socks_.getbyid(cid));
     connptr cptr(smartptr_cast<conn_base>(sock));
-    if (null != cptr)
-        cptr->shutdown();
-    else
+    if (null != cptr) {
+        cptr->shutdown(flags);
+        if (flags & AUGRT_SHUTNOW)
+            impl_->socks_.erase(*sock);
+    } else
         impl_->socks_.erase(*sock);
 }
 

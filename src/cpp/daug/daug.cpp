@@ -302,11 +302,11 @@ namespace {
     }
 
     int
-    shutdown_(augrt_id cid)
+    shutdown_(augrt_id cid, unsigned flags)
     {
-        AUG_DEBUG2("shutdown(): id=[%d]", cid);
+        AUG_DEBUG2("shutdown(): id=[%d], flags=[%u]", cid, flags);
         try {
-            state_->engine_.shutdown(cid);
+            state_->engine_.shutdown(cid, flags);
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -511,7 +511,7 @@ namespace {
     teardown_(const augrt_object* sock)
     {
         aug_info("teardown defaulting to shutdown");
-        shutdown_(sock->id_);
+        shutdown_(sock->id_, 0);
     }
 
     void

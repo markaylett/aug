@@ -90,16 +90,16 @@ namespace augrt {
     }
 
     inline void
-    shutdown(augrt_id sid)
+    shutdown(augrt_id sid, unsigned flags)
     {
-        if (AUGRT_ERROR == augrt_shutdown(sid))
+        if (AUGRT_ERROR == augrt_shutdown(sid, flags))
             throw error(augrt_error());
     }
 
     inline void
-    shutdown(const augrt_object& sock)
+    shutdown(const augrt_object& sock, unsigned flags)
     {
-        shutdown(sock.id_);
+        shutdown(sock.id_, flags);
     }
 
     inline augrt_id
@@ -463,7 +463,7 @@ namespace augrt {
         do_teardown(const object& sock)
         {
             augrt_writelog(AUGRT_LOGINFO, "teardown defaulting to shutdown");
-            shutdown(sock);
+            shutdown(sock, 0);
         }
         bool
         do_accepted(object& sock, const char* addr, unsigned short port)

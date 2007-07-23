@@ -80,7 +80,7 @@ main(int argc, char* argv[])
     aug_muxer_t muxer;
     aug_atexitinit(&errinfo);
     muxer = aug_createmuxer();
-    test(muxer, 100);
+    test(muxer, 30);
     aug_destroymuxer(muxer);
     return 0;
 }

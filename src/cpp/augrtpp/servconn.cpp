@@ -98,9 +98,9 @@ servconn::do_process(unsigned short events)
 }
 
 void
-servconn::do_shutdown()
+servconn::do_shutdown(unsigned flags)
 {
-    conn_.shutdown();
+    conn_.shutdown(flags);
 }
 
 void

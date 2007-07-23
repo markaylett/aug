@@ -698,7 +698,7 @@ namespace {
                               (getfield(mar, "Connection", size)));
             if (value && size && aug_strcasestr(value, "close")) {
                 aug_info("closing");
-                shutdown(id_);
+                augrt::shutdown(id_, 0);
             }
         }
     };
@@ -760,7 +760,7 @@ namespace {
                 appendmar(parser, static_cast<const char*>(buf),
                           static_cast<unsigned>(len));
             } catch (...) {
-                shutdown(sock);
+                augrt::shutdown(sock, 1);
                 throw;
             }
         }
@@ -768,7 +768,7 @@ namespace {
         do_rdexpire(const object& sock, unsigned& ms)
         {
             aug_info("no data received for 30 seconds");
-            shutdown(sock);
+            shutdown(sock, 0);
         }
         ~httpsession() AUG_NOTHROW
         {

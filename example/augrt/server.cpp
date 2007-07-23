@@ -62,15 +62,21 @@ namespace {
         do_data(const object& sock, const void* buf, size_t len)
         {
             string& tok(*sock.user<string>());
-            tokenise(static_cast<const char*>(buf),
-                     static_cast<const char*>(buf) + len, tok, '\n',
-                     eachline(sock));
+            try {
+                tokenise(static_cast<const char*>(buf),
+                         static_cast<const char*>(buf) + len, tok, '\n',
+                         eachline(sock));
+            } catch (...) {
+                augrt_writelog(AUGRT_LOGINFO, "shutting now...");
+                shutdown(sock, 1);
+                throw;
+            }
         }
         void
         do_rdexpire(const object& sock, unsigned& ms)
         {
             writelog(AUGRT_LOGINFO, "no data received for 15 seconds");
-            shutdown(sock);
+            shutdown(sock, 0);
         }
         bool
         do_authcert(const object& sock, const char* subject,

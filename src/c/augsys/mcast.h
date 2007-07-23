@@ -13,7 +13,9 @@
    fragmentation.
  */
 
-#define AUG_PACKETSIZE 512
+#if !defined(AUG_PACKETSIZE)
+# define AUG_PACKETSIZE 512
+#endif /* !AUG_PACKETSIZE */
 
 AUGSYS_API int
 aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname);

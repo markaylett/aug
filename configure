@@ -20106,11 +20106,9 @@ fi
 
     CFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 -D__USE_W32_SOCKETS $CFLAGS"
     CXXFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 -D__USE_W32_SOCKETS $CXXFLAGS"
-    LDFLAGS="-lws2_32 $LDFLAGS"
     LIBS="-Wl,-lws2_32 $LIBS"
 
     if test x$enable_multicast = xyes; then
-        LDFLAGS="-liphlpapi $LDFLAGS"
         LIBS="-Wl,-liphlpapi $LIBS"
     fi
 

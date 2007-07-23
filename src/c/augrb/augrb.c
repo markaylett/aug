@@ -454,11 +454,11 @@ getsession_(VALUE self)
 }
 
 static VALUE
-shutdown_(VALUE self, VALUE sock)
+shutdown_(VALUE self, VALUE sock, VALUE flags)
 {
     int cid = checkid_(sock);
 
-    if (-1 == augrt_shutdown(cid))
+    if (-1 == augrt_shutdown(cid, NUM2UINT(flags)))
         rb_raise(cerror_, augrt_error());
 
     return Qnil;
@@ -740,7 +740,11 @@ initrb_(VALUE unused)
 
     rb_define_const(maugrt_, "TIMRD", INT2FIX(AUGRT_TIMRD));
     rb_define_const(maugrt_, "TIMWR", INT2FIX(AUGRT_TIMWR));
-    rb_define_const(maugrt_, "TIMBOTH", INT2FIX(AUGRT_TIMBOTH));
+    rb_define_const(maugrt_, "TIMRDWR", INT2FIX(AUGRT_TIMRDWR));
+
+    /* Shutdown constants. */
+
+    rb_define_const(maugrt_, "SHUTNOW", INT2FIX(AUGRT_SHUTNOW));
 
     /* Object methods. */
 
@@ -764,7 +768,7 @@ initrb_(VALUE unused)
     rb_define_module_function(maugrt_, "dispatch", dispatch_, -1);
     rb_define_module_function(maugrt_, "getenv", getenv_, -1);
     rb_define_module_function(maugrt_, "getsession", getsession_, 0);
-    rb_define_module_function(maugrt_, "shutdown", shutdown_, 1);
+    rb_define_module_function(maugrt_, "shutdown", shutdown_, 2);
     rb_define_module_function(maugrt_, "tcpconnect", tcpconnect_, -1);
     rb_define_module_function(maugrt_, "tcplisten", tcplisten_, -1);
     rb_define_module_function(maugrt_, "send", send_, 2);
@@ -859,7 +863,7 @@ teardown_(const struct augrt_object* sock)
     if (session->teardown_)
         funcall1_(teardownid_, user);
     else
-        augrt_shutdown(sock->id_);
+        augrt_shutdown(sock->id_, 0);
 }
 
 static int

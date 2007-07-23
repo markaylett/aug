@@ -81,7 +81,22 @@ enum augrt_loglevel {
    Both read and write timer.
  */
 
-#define AUGRT_TIMBOTH (AUGRT_TIMRD | AUGRT_TIMWR)
+#define AUGRT_TIMRDWR (AUGRT_TIMRD | AUGRT_TIMWR)
+
+/**
+   \}
+ */
+
+/**
+   \defgroup ShutFlags Shut Flags
+   \{
+*/
+
+/**
+   Force immediate shutdown.
+*/
+
+#define AUGRT_SHUTNOW  0x01
 
 /**
    \}
@@ -240,9 +255,11 @@ struct augrt_host {
        Shutdown the connection.
 
        \param cid Connection id.
+       \param flags Use #AUGRT_SHUTNOW to force immediate closure of the
+       connection - do not wait for pending writes.
     */
 
-    int (*shutdown_)(augrt_id cid);
+    int (*shutdown_)(augrt_id cid, unsigned flags);
 
     /**
        Establish tcp connection.

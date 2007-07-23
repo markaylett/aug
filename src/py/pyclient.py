@@ -24,7 +24,7 @@ class State:
             send(self.sock, "hello, world!")
         else:
             log.info("done: shutting client connection")
-            shutdown(self.sock)
+            shutdown(self.sock, 0)
             self.timer = None
             return 0
 

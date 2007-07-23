@@ -356,7 +356,7 @@ teardown_(const struct augrt_object* sock)
             printerr_();
 
     } else
-        augrt_shutdown(sock->id_);
+        augrt_shutdown(sock->id_, 0);
 }
 
 static int

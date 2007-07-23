@@ -1,1 +1,9 @@
 Please see http://aug.sourceforge.net for the latest documentation.
+
+MinGW Build:
+
+Ensure both the mingw and w32api packages are installed.
+Run config.pl in the base directory.
+Be sure to select "cygwin build for mingw host" as the compiler toolset.
+Start by disabling python, ruby and ssl support.
+Run the resulting config.sh, to configure.

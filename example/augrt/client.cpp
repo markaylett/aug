@@ -67,7 +67,7 @@ namespace {
         {
             state& s(*sock_.user<state>());
             if (0 == --s.torecv_)
-                shutdown(sock_);
+                shutdown(sock_, 0);
             else if (0 < s.tosend_--)
                 fn_(sock_);
         }

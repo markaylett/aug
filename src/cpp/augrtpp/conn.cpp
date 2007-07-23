@@ -16,6 +16,12 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
+// Default to a one second write timeout.
+
+#if !defined(AUG_WRTIMEOUT)
+# define AUG_WRTIMEOUT 1000
+#endif // !AUG_WRTIMEOUT
+
 conn_base::~conn_base() AUG_NOTHROW
 {
 }
@@ -47,8 +53,29 @@ connected::do_sfd() const
 void
 connected::do_send(const void* buf, size_t len)
 {
-    buffer_.append(buf, len);
-    setnbeventmask(sfd_, AUG_FDEVENTRDWR);
+    if (buffer_.empty()) {
+
+        // Set timestamp to record when data was queued for write.
+
+        gettimeofday(since_);
+        buffer_.append(buf, len);
+        setnbeventmask(sfd_, AUG_FDEVENTRDWR);
+
+    } else {
+
+        // Perform latency check before appending to buffer.
+
+        timeval now;
+        unsigned ms(tvtoms(tvsub(gettimeofday(now), since_)));
+#if !defined(NDEBUG)
+        if (0 < ms)
+            aug_debug2("write latency: ms=[%u]", ms);
+#endif // !NDEBUG
+        if (AUG_WRTIMEOUT < ms)
+            throw local_error(__FILE__, __LINE__, AUG_ETIMEOUT,
+                              "excessive write latency: ms=[%u]", ms);
+        buffer_.append(buf, len);
+    }
 }
 
 void
@@ -131,12 +158,13 @@ connected::do_process(unsigned short events)
 }
 
 void
-connected::do_shutdown()
+connected::do_shutdown(unsigned flags)
 {
     if (state_ < SHUTDOWN) {
         state_ = SHUTDOWN;
-        if (buffer_.empty()) {
-            AUG_DEBUG2("shutdown(): id=[%d], fd=[%d]", sock_.id_, sfd_.get());
+        if (buffer_.empty() || flags & AUGRT_SHUTNOW) {
+            aug_info("shutting connection: id=[%d], fd=[%d], flags=[%u]",
+                     sock_.id_, sfd_.get(), flags);
             shutdownnbfile(sfd_);
         }
     }
@@ -189,6 +217,7 @@ connected::connected(const sessionptr& session, augrt_object& sock,
       state_(CONNECTED),
       close_(close)
 {
+    gettimeofday(since_);
 }
 
 augrt_object&
@@ -268,7 +297,7 @@ handshake::do_process(unsigned short events)
 }
 
 void
-handshake::do_shutdown()
+handshake::do_shutdown(unsigned flags)
 {
     throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                       AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);

@@ -178,10 +178,11 @@ static PyObject*
 shutdown_(PyObject* self, PyObject* args)
 {
     PyObject* sock;
-    if (!PyArg_ParseTuple(args, "O!:shutdown", type_, &sock))
+    unsigned flags;
+    if (!PyArg_ParseTuple(args, "O!I:shutdown", type_, &sock, &flags))
         return NULL;
 
-    if (-1 == augrt_shutdown(augpy_getid(sock))) {
+    if (-1 == augrt_shutdown(augpy_getid(sock), flags)) {
         PyErr_SetString(PyExc_RuntimeError, augrt_error());
         return NULL;
     }
@@ -523,7 +524,9 @@ augpy_createaugrt(PyTypeObject* type)
 
     PyModule_AddIntConstant(augrt, "TIMRD", AUGRT_TIMRD);
     PyModule_AddIntConstant(augrt, "TIMWR", AUGRT_TIMWR);
-    PyModule_AddIntConstant(augrt, "TIMBOTH", AUGRT_TIMBOTH);
+    PyModule_AddIntConstant(augrt, "TIMRDWR", AUGRT_TIMRDWR);
+
+    PyModule_AddIntConstant(augrt, "SHUTNOW", AUGRT_SHUTNOW);
 
     return augrt;
 }

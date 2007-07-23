@@ -4,85 +4,36 @@
 #include "augnetpp.hpp"
 #include "augsyspp.hpp"
 
-#include <list>
+#include <iostream>
 
 using namespace aug;
 using namespace std;
 
-namespace {
-    class session_base {
-    public:
-        virtual
-        ~session_base() AUG_NOTHROW
-        {
-        }
-    };
-
-    class tcpclient {
-
-        session_base& session_;
-        list<pair<string, string> > hostservs_;
-        auto_ptr<connector> connector_;
-        endpoint ep_;
-        smartfd sfd_;
-
-        tcpclient(const tcpclient&);
-
-        tcpclient&
-        operator =(const tcpclient&);
-
-    public:
-        ~tcpclient() AUG_NOTHROW
-        {
-        }
-        tcpclient(const string& host, const string& serv,
-                  session_base& session)
-            : session_(session),
-              ep_(null),
-              sfd_(null)
-        {
-            hostservs_.push_back(make_pair(host, serv));
-        }
-        void
-        addfailover(const string& host, const string& serv)
-        {
-            hostservs_.push_back(make_pair(host, serv));
-        }
-    };
-}
-
-typedef logic_error error;
-
 int
 main(int argc, char* argv[])
 {
+    static const char MSG[] = "try to exhaust tcp window\n";
+
     struct aug_errinfo errinfo;
     aug_atexitinit(&errinfo);
 
     try {
 
-        endpoint ep(null);
-        connector ctor("127.0.0.1", "10000");
-
-        std::pair<smartfd, bool> xy(tryconnect(ctor, ep));
-        if (!xy.second) {
-
-            muxer mux;
-            setfdeventmask(mux, xy.first, AUG_FDEVENTALL);
-            waitfdevents(mux);
-
-            // Assuming that there is no endpoint, an exception should now be
-            // thrown.
-
-            try {
-                xy = tryconnect(ctor, ep);
-            } catch (...) {
-                if (ECONNREFUSED == aug_errno())
-                    return 0;
-                throw;
-            }
+        if (argc < 3) {
+            aug_error("usage: tcpclient <host> <serv>");
+            return 1;
         }
-        throw error("error not thrown by tryconnect()");
+
+        // Simulate rude client behaviour: continuously send, without
+        // receiving - try to exhaust tcp window and break server.
+
+        endpoint ep(null);
+        smartfd sfd(tcpconnect(argv[1], argv[2], ep));
+        for (int i(0); i < 1000000; ++i) {
+            send(sfd, MSG, sizeof(MSG) - 1, 0);
+            if (0 == i % 1000 && 0 < i)
+                aug_info("%d", i);
+        }
 
     } AUG_PERRINFOCATCH;
     return 1;

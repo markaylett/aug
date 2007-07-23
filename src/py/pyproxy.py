@@ -14,7 +14,7 @@ def closed(sock):
         log.info("closing proxy pair: %s -> %s" % (sock, to))
         del pairs[sock]
         del pairs[to]
-        shutdown(to)
+        shutdown(to, 0)
 
 def accepted(sock, addr, port):
     global pairs

@@ -12,7 +12,7 @@ import log
 # void dispatch(to, type, user)
 # string getenv(name, def)
 # string getsession()
-# void shutdown(sock)
+# void shutdown(sock, flags)
 # int tcpconnect(host, serv, user)
 # int tcplisten(host, serv, user)
 # void send(sock, buffer buf)
@@ -72,7 +72,7 @@ def closed(sock):
 
 def teardown(sock):
     log.debug("teardown(): %s" % sock)
-    shutdown(sock)
+    shutdown(sock, 0)
 
 def accepted(sock, addr, port):
     log.info("accepted(): %s" % sock)
@@ -90,7 +90,7 @@ def data(sock, buf):
         x = interp.interpret(line)
         if x == Quit:
             send(sock, "+OK goodbye\r\n")
-            shutdown(sock)
+            shutdown(sock, 0)
         elif x != None:
             send(sock, x + "\r\n")
 

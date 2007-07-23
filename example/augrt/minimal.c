@@ -38,7 +38,7 @@ static void
 teardown_(const struct augrt_object* sock)
 {
     augrt_writelog(AUGRT_LOGINFO, "teardown_()");
-    augrt_shutdown(sock->id_);
+    augrt_shutdown(sock->id_, 0);
 }
 
 static int
