@@ -65,15 +65,15 @@ servconn::do_sfd() const
 }
 
 void
-servconn::do_send(const void* buf, size_t len)
+servconn::do_send(const void* buf, size_t len, const timeval& now)
 {
-    conn_.send(buf, len);
+    conn_.send(buf, len, now);
 }
 
 void
-servconn::do_sendv(const aug_var& var)
+servconn::do_sendv(const aug_var& var, const timeval& now)
 {
-    conn_.sendv(var);
+    conn_.sendv(var, now);
 }
 
 bool

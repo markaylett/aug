@@ -17,24 +17,24 @@ socks::~socks() AUG_NOTHROW
 }
 
 bool
-socks::send(augrt_id cid, const void* buf, size_t len)
+socks::send(augrt_id cid, const void* buf, size_t len, const timeval& now)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (cptr == null || !sendable(*cptr))
         return false;
 
-    cptr->send(buf, len);
+    cptr->send(buf, len, now);
     return true;
 }
 
 bool
-socks::sendv(augrt_id cid, const aug_var& var)
+socks::sendv(augrt_id cid, const aug_var& var, const timeval& now)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (cptr == null || !sendable(*cptr))
         return false;
 
-    cptr->sendv(var);
+    cptr->sendv(var, now);
     return true;
 }
 

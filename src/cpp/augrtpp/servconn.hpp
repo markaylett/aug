@@ -48,10 +48,10 @@ namespace aug {
         do_sfd() const;
 
         void
-        do_send(const void* buf, size_t size);
+        do_send(const void* buf, size_t size, const timeval& now);
 
         void
-        do_sendv(const aug_var& var);
+        do_sendv(const aug_var& var, const timeval& now);
 
         bool
         do_accepted(const aug_endpoint& ep);

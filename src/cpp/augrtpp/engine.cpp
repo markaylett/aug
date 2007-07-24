@@ -119,6 +119,7 @@ namespace aug {
             nbfiles nbfiles_;
             sessions sessions_;
             socks socks_;
+            timeval now_;
 
             // Grace period on shutdown.
 
@@ -154,6 +155,8 @@ namespace aug {
                   grace_(timers_),
                   state_(STARTED)
             {
+                gettimeofday(now_);
+
                 AUG_DEBUG2("inserting event pipe to list");
                 insertnbfile(nbfiles_, eventrd_, *this);
                 setnbeventmask(eventrd_, AUG_FDEVENTRD);
@@ -437,6 +440,10 @@ engine::run(bool stoponerr)
                     ;
             }
 
+            // Update timestamp after waiting.
+
+            gettimeofday(impl_->now_);
+
             // Notify of any established connections before processing the
             // files: data may have arrived on a newly established connection.
 
@@ -593,7 +600,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
 AUGRTPP_API void
 engine::send(augrt_id cid, const void* buf, size_t len)
 {
-    if (!impl_->socks_.send(cid, buf, len))
+    if (!impl_->socks_.send(cid, buf, len, impl_->now_))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                           "connection has been shutdown");
 }
@@ -601,7 +608,7 @@ engine::send(augrt_id cid, const void* buf, size_t len)
 AUGRTPP_API void
 engine::sendv(augrt_id cid, const aug_var& var)
 {
-    if (!impl_->socks_.sendv(cid, var))
+    if (!impl_->socks_.sendv(cid, var, impl_->now_))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                           "connection has been shutdown");
 }

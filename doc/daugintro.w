@@ -35,9 +35,9 @@
 \DAUG/ is an open source, application server written in \CEE/\AM\CPLUSPLUS/.
 It is designed to simplify the implementation of portable and efficient,
 TCP-based network servers.  \DAUG/ takes an unbiased view of the systems it
-supports; it attempts not favour one over another, and runs natively on all.
-It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net}, which
-is available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
+supports; it attempts not to favour one over another, and runs natively on
+all.  It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net},
+which is available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
 \DAUG/ includes modular support for \IPV6/, \SSL/, \PYTHON/ and \RUBY/.
 
 \yskip\noindent
@@ -76,8 +76,8 @@ Sessions are wired together at configuration-time, not compile-time.
 \yskip\noindent
 All Module calls are dispatched from the event thread.  A Session can,
 therefore, either opt for a simple, single-threaded model, or a suitable
-alternative, such as a thread-pool: whenever possible, \DAUG/ avoids imposing
-artificial constraints on Module implementors.
+alternative, such as a thread-pool --- whenever possible, \DAUG/ avoids
+imposing artificial constraints on Module implementors.
 
 \yskip\noindent
 The separation of physical Modules and logical Sessions allows Modules to

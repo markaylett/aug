@@ -26,8 +26,8 @@ AUGSYS_API int
 aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask);
 
 /**
-   \return either the total number of descriptors set, zero on timeout, or a
-   negative value on error.
+   \return either positive if events have been signalled, zero on timeout, or
+   a negative value on error.
 
    If #SA_RESTART has been set for an interrupting signal, it is
    implementation dependant whether select()/poll() restart or return with

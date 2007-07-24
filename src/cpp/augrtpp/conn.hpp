@@ -16,10 +16,10 @@ namespace aug {
     class conn_base : public sock_base {
 
         virtual void
-        do_send(const void* buf, size_t size) = 0;
+        do_send(const void* buf, size_t size, const timeval& now) = 0;
 
         virtual void
-        do_sendv(const aug_var& var) = 0;
+        do_sendv(const aug_var& var, const timeval& now) = 0;
 
         /**
            Notify of newly accepted connection.
@@ -63,14 +63,14 @@ namespace aug {
         ~conn_base() AUG_NOTHROW;
 
         void
-        send(const void* buf, size_t size)
+        send(const void* buf, size_t size, const timeval& now)
         {
-            do_send(buf, size);
+            do_send(buf, size, now);
         }
         void
-        sendv(const aug_var& var)
+        sendv(const aug_var& var, const timeval& now)
         {
-            do_sendv(var);
+            do_sendv(var, now);
         }
         bool
         accepted(const aug_endpoint& ep)
@@ -145,10 +145,10 @@ namespace aug {
         do_sfd() const;
 
         void
-        do_send(const void* buf, size_t size);
+        do_send(const void* buf, size_t size, const timeval& now);
 
         void
-        do_sendv(const aug_var& var);
+        do_sendv(const aug_var& var, const timeval& now);
 
         bool
         do_accepted(const aug_endpoint& ep);
@@ -205,10 +205,10 @@ namespace aug {
         do_sfd() const;
 
         void
-        do_send(const void* buf, size_t size);
+        do_send(const void* buf, size_t size, const timeval& now);
 
         void
-        do_sendv(const aug_var& var);
+        do_sendv(const aug_var& var, const timeval& now);
 
         bool
         do_accepted(const aug_endpoint& ep);

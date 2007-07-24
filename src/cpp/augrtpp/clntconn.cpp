@@ -65,15 +65,15 @@ clntconn::do_sfd() const
 }
 
 void
-clntconn::do_send(const void* buf, size_t len)
+clntconn::do_send(const void* buf, size_t len, const timeval& now)
 {
-    conn_->send(buf, len);
+    conn_->send(buf, len, now);
 }
 
 void
-clntconn::do_sendv(const aug_var& var)
+clntconn::do_sendv(const aug_var& var, const timeval& now)
 {
-    conn_->sendv(var);
+    conn_->sendv(var, now);
 }
 
 bool

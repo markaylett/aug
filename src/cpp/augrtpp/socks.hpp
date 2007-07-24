@@ -9,6 +9,8 @@
 
 #include <map>
 
+struct timeval;
+
 namespace aug {
 
     class socks {
@@ -30,10 +32,10 @@ namespace aug {
         {
         }
         bool
-        send(augrt_id cid, const void* buf, size_t size);
+        send(augrt_id cid, const void* buf, size_t size, const timeval& now);
 
         bool
-        sendv(augrt_id cid, const aug_var& var);
+        sendv(augrt_id cid, const aug_var& var, const timeval& now);
 
         void
         clear();

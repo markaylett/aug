@@ -13,14 +13,32 @@ AUG_RCSID("$Id$");
 
 #include <cassert>
 
-using namespace aug;
-using namespace std;
-
 // Default to a one second write timeout.
 
 #if !defined(AUG_WRTIMEOUT)
 # define AUG_WRTIMEOUT 1000
 #endif // !AUG_WRTIMEOUT
+
+using namespace aug;
+using namespace std;
+
+
+namespace {
+
+    void
+    checklatency(const timeval& since, const timeval& now)
+    {
+        timeval diff(now);
+        unsigned ms(tvtoms(tvsub(diff, since)));
+#if !defined(NDEBUG)
+        if (0 < ms)
+            aug_debug2("write latency: ms=[%u]", ms);
+#endif // !NDEBUG
+        if (AUG_WRTIMEOUT < ms)
+            throw local_error(__FILE__, __LINE__, AUG_ETIMEOUT,
+                              "excessive write latency: ms=[%u]", ms);
+    }
+}
 
 conn_base::~conn_base() AUG_NOTHROW
 {
@@ -51,13 +69,13 @@ connected::do_sfd() const
 }
 
 void
-connected::do_send(const void* buf, size_t len)
+connected::do_send(const void* buf, size_t len, const timeval& now)
 {
     if (buffer_.empty()) {
 
         // Set timestamp to record when data was queued for write.
 
-        gettimeofday(since_);
+        since_ = now;
         buffer_.append(buf, len);
         setnbeventmask(sfd_, AUG_FDEVENTRDWR);
 
@@ -65,24 +83,29 @@ connected::do_send(const void* buf, size_t len)
 
         // Perform latency check before appending to buffer.
 
-        timeval now;
-        unsigned ms(tvtoms(tvsub(gettimeofday(now), since_)));
-#if !defined(NDEBUG)
-        if (0 < ms)
-            aug_debug2("write latency: ms=[%u]", ms);
-#endif // !NDEBUG
-        if (AUG_WRTIMEOUT < ms)
-            throw local_error(__FILE__, __LINE__, AUG_ETIMEOUT,
-                              "excessive write latency: ms=[%u]", ms);
+        checklatency(since_, now);
         buffer_.append(buf, len);
     }
 }
 
 void
-connected::do_sendv(const aug_var& var)
+connected::do_sendv(const aug_var& var, const timeval& now)
 {
-    buffer_.append(var);
-    setnbeventmask(sfd_, AUG_FDEVENTRDWR);
+    if (buffer_.empty()) {
+
+        // Set timestamp to record when data was queued for write.
+
+        since_ = now;
+        buffer_.append(var);
+        setnbeventmask(sfd_, AUG_FDEVENTRDWR);
+
+    } else {
+
+        // Perform latency check before appending to buffer.
+
+        checklatency(since_, now);
+        buffer_.append(var);
+    }
 }
 
 bool
@@ -245,13 +268,13 @@ handshake::do_sfd() const
 }
 
 void
-handshake::do_send(const void* buf, size_t len)
+handshake::do_send(const void* buf, size_t len, const timeval& now)
 {
     buffer_.append(buf, len);
 }
 
 void
-handshake::do_sendv(const aug_var& var)
+handshake::do_sendv(const aug_var& var, const timeval& now)
 {
     buffer_.append(var);
 }
