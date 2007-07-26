@@ -13,30 +13,78 @@ AUG_RCSID("$Id$");
 
 #include <cassert>
 
-// Default to a one second write timeout.
+// Maximum time that can be spent waiting for writability.
 
-#if !defined(AUG_WRTIMEOUT)
-# define AUG_WRTIMEOUT 1000
-#endif // !AUG_WRTIMEOUT
+#if !defined(AUG_WRMAXWAIT)
+# define AUG_WRMAXWAIT (5 * 1000)
+#endif // !AUG_WRMAXWAIT
+
+// Maximum time that can be spent writing buffer contents.
+
+#if !defined(AUG_WRMAXTIME)
+# define AUG_WRMAXTIME (30 * 1000)
+#endif // !AUG_WRMAXTIME
+
+// Size threshold at which AUG_WRMAXTIME checks begin.
+
+#if !defined(AUG_WRCHECKAT)
+# define AUG_WRCHECKAT (8 * 1024)
+#endif // !AUG_WRCHECKAT
 
 using namespace aug;
 using namespace std;
 
-
 namespace {
 
-    void
-    checklatency(const timeval& since, const timeval& now)
+    unsigned
+    diffms(const timeval& before, const timeval& after)
     {
-        timeval diff(now);
-        unsigned ms(tvtoms(tvsub(diff, since)));
-#if !defined(NDEBUG)
-        if (0 < ms)
-            aug_debug2("write latency: ms=[%u]", ms);
-#endif // !NDEBUG
-        if (AUG_WRTIMEOUT < ms)
+        timeval diff(after);
+        return tvtoms(tvsub(diff, before));
+    }
+
+    void
+    checkmaxwait(size_t size, const timeval& since, const timeval& now)
+    {
+        unsigned ms(diffms(since, now));
+        if (AUG_WRMAXWAIT < ms)
             throw local_error(__FILE__, __LINE__, AUG_ETIMEOUT,
-                              "excessive write latency: ms=[%u]", ms);
+                              "write wait exceeded: pending=[%u], since=[%u]",
+                              static_cast<unsigned>(size), ms);
+        if (AUG_WRMAXWAIT * 2 < ms * 3)
+            aug_warn("write latency: pending=[%u], since=[%u]",
+                     static_cast<unsigned>(size), ms);
+    }
+
+    void
+    checkmaxtime(size_t n, size_t size, const timeval& since,
+                 const timeval& now)
+    {
+        // How long has is taken to perform this write.
+
+        unsigned ms(diffms(since, now));
+        if (0 == ms)
+            return;
+
+        // What does that equate to per ms.
+
+        unsigned perms(n / ms);
+        if (0 == perms)
+            return;
+
+        // How long, therefore, will it take to clear buffer.
+
+        unsigned estms(size / perms);
+        if (0 == estms)
+            return;
+
+        if (AUG_WRMAXTIME < estms)
+            throw local_error(__FILE__, __LINE__, AUG_ETIMEOUT,
+                              "write time exceeded: perms=[%u], estms=[%u]",
+                              perms, estms);
+
+        if (AUG_WRMAXTIME * 2 < ms * 3)
+            aug_warn("write time: perms=[%u], estms=[%u]", perms, estms);
     }
 }
 
@@ -73,7 +121,7 @@ connected::do_send(const void* buf, size_t len, const timeval& now)
 {
     if (buffer_.empty()) {
 
-        // Set timestamp to record when data was queued for write.
+        // Set timestamp to record when data was first queued for write.
 
         since_ = now;
         buffer_.append(buf, len);
@@ -81,9 +129,9 @@ connected::do_send(const void* buf, size_t len, const timeval& now)
 
     } else {
 
-        // Perform latency check before appending to buffer.
+        // Check for write timeout before appending to buffer.
 
-        checklatency(since_, now);
+        checkmaxwait(buffer_.size(), since_, now);
         buffer_.append(buf, len);
     }
 }
@@ -93,7 +141,7 @@ connected::do_sendv(const aug_var& var, const timeval& now)
 {
     if (buffer_.empty()) {
 
-        // Set timestamp to record when data was queued for write.
+        // Set timestamp to record when data was first queued for write.
 
         since_ = now;
         buffer_.append(var);
@@ -101,9 +149,9 @@ connected::do_sendv(const aug_var& var, const timeval& now)
 
     } else {
 
-        // Perform latency check before appending to buffer.
+        // Check for write timeout before appending to buffer.
 
-        checklatency(since_, now);
+        checkmaxwait(buffer_.size(), since_, now);
         buffer_.append(var);
     }
 }
@@ -125,7 +173,7 @@ connected::do_connected(const aug_endpoint& ep)
 }
 
 bool
-connected::do_process(unsigned short events)
+connected::do_process(unsigned short events, const timeval& now)
 {
     if (events & AUG_FDEVENTRD) {
 
@@ -158,13 +206,13 @@ connected::do_process(unsigned short events)
         AUG_DEBUG2("handling write event: id=[%d], fd=[%d]", sock_.id_,
                    sfd_.get());
 
-        bool done(buffer_.writesome(sfd_));
+        size_t n(buffer_.writesome(sfd_));
 
         // Data has been written: reset write timer.
 
         rwtimer_.resetrwtimer(AUGRT_TIMWR);
 
-        if (done) {
+        if (buffer_.empty()) {
 
             // No more (buffered) data to be written.
 
@@ -174,7 +222,30 @@ connected::do_process(unsigned short events)
 
             if (SHUTDOWN <= state_)
                 shutdownnbfile(sfd_);
+
+        } else {
+
+            AUG_DEBUG2("partial write: written=[%u], remaining=[%u]",
+                       static_cast<unsigned>(n),
+                       static_cast<unsigned>(buffer_.size()));
+
+            // If size threshold has been exceeded, check if buffer can be
+            // cleared in acceptable timeframe.
+
+            if (AUG_WRCHECKAT < buffer_.size())
+                checkmaxtime(n, buffer_.size(), since_, now);
+
+            // Partial write.  Reset wait since time.
+
+            since_ = now;
         }
+
+    } else {
+
+        // Not writable.  Check max wait if write buffer is not empty.
+
+        if (!buffer_.empty())
+            checkmaxwait(buffer_.size(), since_, now);
     }
 
     return false;
@@ -293,7 +364,7 @@ handshake::do_connected(const aug_endpoint& ep)
 }
 
 bool
-handshake::do_process(unsigned short events)
+handshake::do_process(unsigned short events, const timeval& now)
 {
     try {
 

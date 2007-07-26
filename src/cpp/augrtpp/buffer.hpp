@@ -28,10 +28,11 @@ namespace aug {
 
     class buffer {
         writer writer_;
-    public:
         vecarg arg_;
         bool usevec_;
+        size_t size_;
 
+    public:
         ~buffer() AUG_NOTHROW;
 
         explicit
@@ -43,13 +44,32 @@ namespace aug {
         void
         append(const void* buf, size_t size);
 
-        bool
+        /**
+           write, at least some, of the buffered data.
+
+           \return bytes written.
+         */
+
+        size_t
         writesome(fdref ref);
 
         bool
         empty() const
         {
             return writer_.empty();
+        }
+
+        /**
+           Bytes to be written.
+
+           This value may be inaccurate if the appended var buffers are
+           allowed to mutate - they should not.
+        */
+
+        size_t
+        size() const
+        {
+            return size_;
         }
     };
 }

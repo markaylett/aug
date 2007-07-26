@@ -92,9 +92,9 @@ servconn::do_connected(const aug_endpoint& ep)
 }
 
 bool
-servconn::do_process(unsigned short events)
+servconn::do_process(unsigned short events, const timeval& now)
 {
-    return conn_.process(events);
+    return conn_.process(events, now);
 }
 
 void

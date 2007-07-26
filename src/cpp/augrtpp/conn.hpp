@@ -41,7 +41,7 @@ namespace aug {
          */
 
         virtual bool
-        do_process(unsigned short events) = 0;
+        do_process(unsigned short events, const timeval& now) = 0;
 
         virtual void
         do_shutdown(unsigned flags) = 0;
@@ -83,9 +83,9 @@ namespace aug {
             do_connected(ep);
         }
         bool
-        process(unsigned short events)
+        process(unsigned short events, const timeval& now)
         {
-            return do_process(events);
+            return do_process(events, now);
         }
         void
         shutdown(unsigned flags)
@@ -128,7 +128,9 @@ namespace aug {
         sockstate state_;
         bool close_;
 
-        // Since when has data been sitting in write buffer.
+        /**
+           Waiting for writability since.
+        */
 
         timeval since_;
 
@@ -157,7 +159,7 @@ namespace aug {
         do_connected(const aug_endpoint& ep);
 
         bool
-        do_process(unsigned short events);
+        do_process(unsigned short events, const timeval& now);
 
         void
         do_shutdown(unsigned flags);
@@ -217,7 +219,7 @@ namespace aug {
         do_connected(const aug_endpoint& ep);
 
         bool
-        do_process(unsigned short events);
+        do_process(unsigned short events, const timeval& now);
 
         void
         do_shutdown(unsigned flags);

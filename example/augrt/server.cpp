@@ -54,7 +54,6 @@ namespace {
                 setsslserver(sock, sslctx);
             }
             sock.setuser(new string());
-            send(sock, "hello\r\n", 7);
             setrwtimer(sock, 15000, AUGRT_TIMRD);
             return true;
         }

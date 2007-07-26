@@ -138,9 +138,31 @@ aug_appendwriter(aug_writer_t writer, const struct aug_var* var)
 }
 
 AUGNET_API int
-aug_emptywriter(aug_writer_t writer)
+aug_writerempty(aug_writer_t writer)
 {
     return AUG_EMPTY(&writer->bufs_);
+}
+
+AUGNET_API ssize_t
+aug_writersize(aug_writer_t writer)
+{
+    struct aug_buf* it;
+    size_t size = 0;
+
+    AUG_FOREACH(it, &writer->bufs_) {
+
+        size_t len;
+        if (!aug_varbuf(&it->var_, &len)) {
+            aug_seterrinfo
+                (NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EDOMAIN,
+                 AUG_MSG("failed conversion from var to buffer"));
+            return -1;
+        }
+
+        size += len;
+    }
+
+    return (ssize_t)size;
 }
 
 AUGNET_API ssize_t
@@ -164,8 +186,12 @@ aug_writesome(aug_writer_t writer, int fd)
     i = 0;
     AUG_FOREACH(it, &writer->bufs_) {
 
-        if (!(iov[i].iov_base = (void*)aug_varbuf(&it->var_, &len)))
+        if (!(iov[i].iov_base = (void*)aug_varbuf(&it->var_, &len))) {
+            aug_seterrinfo
+                (NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EDOMAIN,
+                 AUG_MSG("failed conversion from var to buffer"));
             return -1;
+        }
 
         iov[i].iov_len = (int)len;
         if (++i == size)

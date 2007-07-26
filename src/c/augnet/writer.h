@@ -22,7 +22,14 @@ AUGNET_API int
 aug_appendwriter(aug_writer_t writer, const struct aug_var* var);
 
 AUGNET_API int
-aug_emptywriter(aug_writer_t writer);
+aug_writerempty(aug_writer_t writer);
+
+/**
+   Dynamically calculate total size in bytes.
+ */
+
+AUGNET_API ssize_t
+aug_writersize(aug_writer_t writer);
 
 AUGNET_API ssize_t
 aug_writesome(aug_writer_t writer, int fd);

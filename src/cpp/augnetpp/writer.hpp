@@ -46,7 +46,13 @@ namespace aug {
         bool
         empty() const
         {
-            return aug_emptywriter(writer_) ? true : false;
+            return aug_writerempty(writer_) ? true : false;
+        }
+
+        size_t
+        size() const
+        {
+            return verify(aug_writersize(writer_));
         }
     };
 
@@ -56,7 +62,7 @@ namespace aug {
         verify(aug_appendwriter(writer, &var));
     }
 
-    inline ssize_t
+    inline size_t
     writesome(aug_writer_t writer, fdref ref)
     {
         return verify(aug_writesome(writer, ref.get()));

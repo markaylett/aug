@@ -66,7 +66,8 @@ buffer::~buffer() AUG_NOTHROW
 
 buffer::buffer(size_t size)
     : arg_(size),
-      usevec_(true)
+      usevec_(true),
+      size_(0)
 {
 }
 
@@ -75,6 +76,8 @@ buffer::append(const aug_var& var)
 {
     appendwriter(writer_, var);
     usevec_ = false;
+
+    size_ += varsize(var);
 }
 
 void
@@ -97,6 +100,10 @@ buffer::append(const void* buf, size_t len)
 
     } else {
 
+        // This block will be executed when a var has been appended that may
+        // not have been written.  This should be relatively rare, and so the
+        // malloc() is deemed acceptable.
+
         copyarg* arg(static_cast<copyarg*>(malloc(sizeof(copyarg)
                                                   + len - 1)));
         arg->size_ = len;
@@ -105,15 +112,26 @@ buffer::append(const void* buf, size_t len)
         aug_var var;
         appendwriter(writer_, bindvar<copytype>(var, *arg));
     }
+
+    size_ += len;
 }
 
-bool
+size_t
 buffer::writesome(fdref ref)
 {
-    aug::writesome(writer_, ref);
+    size_t size(aug::writesome(writer_, ref));
+
+    // Once appended, vars must not vary.  AUG_MIN is used here as a defensive
+    // measure.
+
+    size_ -= AUG_MIN(size_, size);
+
     if (writer_.empty()) {
+
+        // Safe to use vector: all vars have been written.
+
         usevec_ = true;
-        return true;
     }
-    return false;
+
+    return size;
 }

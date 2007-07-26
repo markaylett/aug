@@ -60,7 +60,7 @@ namespace aug {
         do_connected(const aug_endpoint& ep);
 
         bool
-        do_process(unsigned short events);
+        do_process(unsigned short events, const timeval& now);
 
         void
         do_shutdown(unsigned flags);

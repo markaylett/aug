@@ -139,6 +139,14 @@ namespace aug {
     {
         return static_cast<const T*>(varbuf(var));
     }
+
+    inline size_t
+    varsize(const aug_var& var)
+    {
+        size_t size;
+        varbuf(var, size);
+        return size;
+    }
 }
 
 inline bool

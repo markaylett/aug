@@ -89,9 +89,9 @@ clntconn::do_connected(const aug_endpoint& ep)
 }
 
 bool
-clntconn::do_process(unsigned short events)
+clntconn::do_process(unsigned short events, const timeval& now)
 {
-    if (!conn_->process(events))
+    if (!conn_->process(events, now))
         return false;
 
     if (CONNECTED == conn_->state()) {
