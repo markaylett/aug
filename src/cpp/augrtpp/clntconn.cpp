@@ -77,15 +77,15 @@ clntconn::do_sendv(const aug_var& var, const timeval& now)
 }
 
 bool
-clntconn::do_accepted(const aug_endpoint& ep)
+clntconn::do_accepted(const aug_endpoint& ep, const timeval& now)
 {
-    return conn_->accepted(ep);
+    return conn_->accepted(ep, now);
 }
 
 void
-clntconn::do_connected(const aug_endpoint& ep)
+clntconn::do_connected(const aug_endpoint& ep, const timeval& now)
 {
-    conn_->connected(ep);
+    conn_->connected(ep, now);
 }
 
 bool
@@ -113,15 +113,15 @@ clntconn::do_process(unsigned short events, const timeval& now)
 }
 
 void
-clntconn::do_shutdown(unsigned flags)
+clntconn::do_shutdown(unsigned flags, const timeval& now)
 {
-    conn_->shutdown(flags);
+    conn_->shutdown(flags, now);
 }
 
 void
-clntconn::do_teardown()
+clntconn::do_teardown(const timeval& now)
 {
-    conn_->teardown();
+    conn_->teardown(now);
 }
 
 bool

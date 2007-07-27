@@ -77,18 +77,18 @@ servconn::do_sendv(const aug_var& var, const timeval& now)
 }
 
 bool
-servconn::do_accepted(const aug_endpoint& ep)
+servconn::do_accepted(const aug_endpoint& ep, const timeval& now)
 {
-    return conn_.accepted(ep);
+    return conn_.accepted(ep, now);
 }
 
 void
-servconn::do_connected(const aug_endpoint& ep)
+servconn::do_connected(const aug_endpoint& ep, const timeval& now)
 {
     // BUG: workaround for bug in gcc version 3.4.4.
 
     conn_base& r(conn_);
-    r.connected(ep);
+    r.connected(ep, now);
 }
 
 bool
@@ -98,15 +98,15 @@ servconn::do_process(unsigned short events, const timeval& now)
 }
 
 void
-servconn::do_shutdown(unsigned flags)
+servconn::do_shutdown(unsigned flags, const timeval& now)
 {
-    conn_.shutdown(flags);
+    conn_.shutdown(flags, now);
 }
 
 void
-servconn::do_teardown()
+servconn::do_teardown(const timeval& now)
 {
-    conn_.teardown();
+    conn_.teardown(now);
 }
 
 bool

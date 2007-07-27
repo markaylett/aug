@@ -62,9 +62,6 @@ namespace aug {
         void
         run(bool stoponerr);
 
-        void
-        teardown();
-
         // Thread-safe host interface.
 
         void

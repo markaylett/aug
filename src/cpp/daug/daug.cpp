@@ -681,9 +681,16 @@ namespace {
         void
         run()
         {
+            if (!daemon_) {
+                state_->engine_.run(true);  // Stop on error.
+                return;
+            }
+
+            // Only set reopen timer when running as daemon.
+
             timer t(state_->timers_);
-            t.set(15000, timercb<reopencb_>, null);
-            state_->engine_.run(!daemon_);
+            t.set(60000, timercb<reopencb_>, null);
+            state_->engine_.run(false); // Continue on error.
         }
 
         void

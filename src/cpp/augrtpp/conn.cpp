@@ -43,14 +43,25 @@ namespace {
         return tvtoms(tvsub(diff, before));
     }
 
+    // Two safety checks designed to deal with misbehaving clients.  Close
+    // connection if:
+
+    // 1. Data is pending in write buffer, and a significant amount of time
+    // has elapsed waiting for the socket to become writable.
+
+    // 2. The last write was a partial write, and it is estimated that the
+    // contents of the buffer cannot be cleared in a timely fashion.
+
     void
     checkmaxwait(size_t size, const timeval& since, const timeval& now)
     {
         unsigned ms(diffms(since, now));
+
         if (AUG_WRMAXWAIT < ms)
             throw local_error(__FILE__, __LINE__, AUG_ETIMEOUT,
                               "write wait exceeded: pending=[%u], since=[%u]",
                               static_cast<unsigned>(size), ms);
+
         if (AUG_WRMAXWAIT * 2 < ms * 3)
             aug_warn("write latency: pending=[%u], since=[%u]",
                      static_cast<unsigned>(size), ms);
@@ -83,7 +94,7 @@ namespace {
                               "write time exceeded: perms=[%u], estms=[%u]",
                               perms, estms);
 
-        if (AUG_WRMAXTIME * 2 < ms * 3)
+        if (AUG_WRMAXTIME * 2 < estms * 3)
             aug_warn("write time: perms=[%u], estms=[%u]", perms, estms);
     }
 }
@@ -124,16 +135,10 @@ connected::do_send(const void* buf, size_t len, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        buffer_.append(buf, len);
         setnbeventmask(sfd_, AUG_FDEVENTRDWR);
-
-    } else {
-
-        // Check for write timeout before appending to buffer.
-
-        checkmaxwait(buffer_.size(), since_, now);
-        buffer_.append(buf, len);
     }
+
+    buffer_.append(buf, len);
 }
 
 void
@@ -144,20 +149,14 @@ connected::do_sendv(const aug_var& var, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        buffer_.append(var);
         setnbeventmask(sfd_, AUG_FDEVENTRDWR);
-
-    } else {
-
-        // Check for write timeout before appending to buffer.
-
-        checkmaxwait(buffer_.size(), since_, now);
-        buffer_.append(var);
     }
+
+    buffer_.append(var);
 }
 
 bool
-connected::do_accepted(const aug_endpoint& ep)
+connected::do_accepted(const aug_endpoint& ep, const timeval& now)
 {
     inetaddr addr(null);
     return close_ = session_
@@ -165,7 +164,7 @@ connected::do_accepted(const aug_endpoint& ep)
 }
 
 void
-connected::do_connected(const aug_endpoint& ep)
+connected::do_connected(const aug_endpoint& ep, const timeval& now)
 {
     inetaddr addr(null);
     session_->connected(sock_, inetntop(getinetaddr(ep, addr)).c_str(),
@@ -252,7 +251,7 @@ connected::do_process(unsigned short events, const timeval& now)
 }
 
 void
-connected::do_shutdown(unsigned flags)
+connected::do_shutdown(unsigned flags, const timeval& now)
 {
     if (state_ < SHUTDOWN) {
         state_ = SHUTDOWN;
@@ -265,7 +264,7 @@ connected::do_shutdown(unsigned flags)
 }
 
 void
-connected::do_teardown()
+connected::do_teardown(const timeval& now)
 {
     if (state_ < TEARDOWN) {
         state_ = TEARDOWN;
@@ -351,13 +350,13 @@ handshake::do_sendv(const aug_var& var, const timeval& now)
 }
 
 bool
-handshake::do_accepted(const aug_endpoint& ep)
+handshake::do_accepted(const aug_endpoint& ep, const timeval& now)
 {
     return false;
 }
 
 void
-handshake::do_connected(const aug_endpoint& ep)
+handshake::do_connected(const aug_endpoint& ep, const timeval& now)
 {
     throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                       AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
@@ -391,14 +390,14 @@ handshake::do_process(unsigned short events, const timeval& now)
 }
 
 void
-handshake::do_shutdown(unsigned flags)
+handshake::do_shutdown(unsigned flags, const timeval& now)
 {
     throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                       AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
 void
-handshake::do_teardown()
+handshake::do_teardown(const timeval& now)
 {
     // TODO: call shutdown() here?
 

@@ -54,19 +54,19 @@ namespace aug {
         do_sendv(const aug_var& var, const timeval& now);
 
         bool
-        do_accepted(const aug_endpoint& ep);
+        do_accepted(const aug_endpoint& ep, const timeval& now);
 
         void
-        do_connected(const aug_endpoint& ep);
+        do_connected(const aug_endpoint& ep, const timeval& now);
 
         bool
         do_process(unsigned short events, const timeval& now);
 
         void
-        do_shutdown(unsigned flags);
+        do_shutdown(unsigned flags, const timeval& now);
 
         void
-        do_teardown();
+        do_teardown(const timeval& now);
 
         bool
         do_authcert(const char* subject, const char* issuer);

@@ -82,7 +82,7 @@ namespace {
     }
 
     void
-    setconnected(conn_base& conn)
+    setconnected(conn_base& conn, const timeval& now)
     {
         // Connection has now been established.
 
@@ -98,7 +98,7 @@ namespace {
 
         // Notify session of establishment.
 
-        conn.connected(ep);
+        conn.connected(ep, now);
     }
 }
 
@@ -119,7 +119,6 @@ namespace aug {
             nbfiles nbfiles_;
             sessions sessions_;
             socks socks_;
-            timeval now_;
 
             // Grace period on shutdown.
 
@@ -132,6 +131,8 @@ namespace aug {
             // Pending calls to connected().
 
             pending pending_;
+
+            timeval now_;
 
             enum {
                 STARTED,
@@ -167,7 +168,7 @@ namespace aug {
                 if (STARTED == state_) {
 
                     state_ = TEARDOWN;
-                    socks_.teardown();
+                    socks_.teardown(now_);
 
                     // Initiate grace period.
 
@@ -210,7 +211,7 @@ namespace aug {
 
                 // Session may reject the connection by returning false.
 
-                if (cptr->accepted(ep))
+                if (cptr->accepted(ep, now_))
                     si.commit();
             }
             bool
@@ -252,7 +253,7 @@ namespace aug {
                         // Was connecting, now established: notify module of
                         // connection establishment.
 
-                        setconnected(*cptr);
+                        setconnected(*cptr, now_);
                         break;
                     case CLOSED:
                         socks_.erase(*cptr);
@@ -448,7 +449,7 @@ engine::run(bool stoponerr)
             // files: data may have arrived on a newly established connection.
 
             while (!impl_->pending_.empty()) {
-                setconnected(*impl_->pending_.front());
+                setconnected(*impl_->pending_.front(), impl_->now_);
                 impl_->pending_.pop();
             }
 
@@ -462,14 +463,8 @@ engine::run(bool stoponerr)
         // When running in foreground, stop on error.
 
         if (stoponerr)
-            teardown();
+            impl_->socks_.teardown(impl_->now_);
     }
-}
-
-AUGRTPP_API void
-engine::teardown()
-{
-    impl_->socks_.teardown();
 }
 
 AUGRTPP_API void
@@ -522,7 +517,10 @@ engine::shutdown(augrt_id cid, unsigned flags)
     sockptr sock(impl_->socks_.getbyid(cid));
     connptr cptr(smartptr_cast<conn_base>(sock));
     if (null != cptr) {
-        cptr->shutdown(flags);
+        cptr->shutdown(flags, impl_->now_);
+
+        // Forced shutdown: may be used on misbehaving clients.
+
         if (flags & AUGRT_SHUTNOW)
             impl_->socks_.erase(*sock);
     } else

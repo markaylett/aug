@@ -76,7 +76,7 @@ socks::update(const sockptr& sock, fdref prev)
 }
 
 void
-socks::teardown()
+socks::teardown(const timeval& now)
 {
     // Ids are stored in reverse order using the the greater<> predicate.
 
@@ -95,7 +95,7 @@ socks::teardown()
         if (null != cptr) {
             ++rit;
             try {
-                cptr->teardown();
+                cptr->teardown(now);
             } AUG_PERRINFOCATCH;
             continue;
         }

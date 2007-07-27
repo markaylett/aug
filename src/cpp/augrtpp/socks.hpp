@@ -50,7 +50,7 @@ namespace aug {
         update(const sockptr& sock, fdref prev);
 
         void
-        teardown();
+        teardown(const timeval& tv);
 
         sockptr
         getbyfd(fdref fd) const;
