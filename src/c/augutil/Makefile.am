@@ -15,6 +15,7 @@ modinclude_HEADERS = \
 	log.h \
 	md5.h \
 	path.h \
+	ptimer.h \
 	pwd.h \
 	strbuf.h \
 	timer.h \
@@ -36,6 +37,7 @@ libaugutil_la_SOURCES = \
 	log.c \
 	md5.c \
 	path.c \
+	ptimer.c \
 	pwd.c \
 	strbuf.c \
 	timer.c \

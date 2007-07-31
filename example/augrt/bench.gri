@@ -1,0 +1,18 @@
+open bench.dat
+read columns x y
+close
+
+set color black
+set x name "elapsed/sec"
+set y name "roundtrip/ms"
+set y axis 0 50 5
+draw axes
+draw title "benchmark"
+
+set color blue
+#set symbol size 0.2
+#draw symbol bullet
+#convert columns to spline
+draw curve
+
+quit

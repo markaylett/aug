@@ -156,6 +156,14 @@ aug_tvtoms(const struct timeval* tv)
     return ms;
 }
 
+AUGSYS_API unsigned long
+aug_tvtousec(const struct timeval* tv)
+{
+    unsigned long usec = tv->tv_sec * 1000000;
+    usec += tv->tv_usec;
+    return usec;
+}
+
 AUGSYS_API struct timeval*
 aug_tvadd(struct timeval* dst, const struct timeval* src)
 {

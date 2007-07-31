@@ -6,6 +6,7 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	bench.conf \
+	bench.gri \
 	modules.mk \
 	test.conf
 
@@ -29,6 +30,7 @@ mod_LTLIBRARIES = \
 modclient_la_SOURCES = client.cpp
 modclient_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modclient_la_LIBADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 modhttp_la_SOURCES = http.cpp

@@ -11,6 +11,7 @@
 #include "augutilpp/file.hpp"
 #include "augutilpp/log.hpp"
 #include "augutilpp/path.hpp"
+#include "augutilpp/ptimer.hpp"
 #include "augutilpp/timer.hpp"
 #include "augutilpp/var.hpp"
 

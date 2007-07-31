@@ -8,6 +8,7 @@ modinclude_HEADERS = \
 	file.hpp \
 	log.hpp \
 	path.hpp \
+	ptimer.hpp \
 	timer.hpp \
 	var.hpp
 
@@ -20,6 +21,7 @@ libaugutilpp_la_SOURCES = \
 	file.cpp \
 	log.cpp \
 	path.cpp \
+	ptimer.cpp \
 	timer.cpp \
 	var.cpp
 

@@ -55,7 +55,7 @@ libaugutilpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugutilpp_la_OBJECTS = config.lo conv.lo event.lo file.lo log.lo \
-	path.lo timer.lo var.lo
+	path.lo ptimer.lo timer.lo var.lo
 libaugutilpp_la_OBJECTS = $(am_libaugutilpp_la_OBJECTS)
 am_augutilpp_test_OBJECTS = test.$(OBJEXT)
 augutilpp_test_OBJECTS = $(am_augutilpp_test_OBJECTS)
@@ -224,6 +224,7 @@ modinclude_HEADERS = \
 	file.hpp \
 	log.hpp \
 	path.hpp \
+	ptimer.hpp \
 	timer.hpp \
 	var.hpp
 
@@ -235,6 +236,7 @@ libaugutilpp_la_SOURCES = \
 	file.cpp \
 	log.cpp \
 	path.cpp \
+	ptimer.cpp \
 	timer.cpp \
 	var.cpp
 
@@ -324,6 +326,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ptimer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/var.Plo@am__quote@

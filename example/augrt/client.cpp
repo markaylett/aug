@@ -3,7 +3,10 @@
 */
 #include "augrtpp.hpp"
 
+#include "augutilpp.hpp"
 #include "augsyspp.hpp"
+
+#include <fstream>
 
 using namespace augrt;
 using namespace std;
@@ -42,9 +45,41 @@ namespace {
         sendv(sock, var);
     }
 
+    void
+    pushxy(map<unsigned long, unsigned long>& xy,
+           const vector<unsigned long>& usecs)
+    {
+        if (usecs.empty())
+            return;
+
+        vector<unsigned long>::const_iterator it(usecs.begin()),
+            end(usecs.end());
+
+        unsigned long first(*it);
+        for (++it; it != end; ++it) {
+
+            unsigned long second(*it - first);
+            first = *it;
+            xy.insert(make_pair(first, second));
+        }
+    }
+
+    void
+    writexy(const map<unsigned long, unsigned long>& xy)
+    {
+        ofstream os("bench.dat");
+        map<unsigned long, unsigned long>::const_iterator it(xy.begin()),
+            end(xy.end());
+        for (; it != end; ++it)
+            os << static_cast<double>(it->first) / 1000000.0
+               << ' ' << static_cast<double>(it->second) / 1000.0
+               << endl;
+    }
+
     struct state {
         string tok_;
         unsigned tosend_, torecv_;
+        vector<unsigned long> usecs_;
         explicit
         state(int echos)
             : tosend_(echos),
@@ -56,16 +91,22 @@ namespace {
     struct eachline {
         void (*fn_)(object&);
         object sock_;
+        const aug::ptimer* ptimer_;
+        vector<unsigned long>& usecs_;
         explicit
-        eachline(void (*fn)(object&), const object& sock)
+        eachline(void (*fn)(object&), const object& sock,
+                 const aug::ptimer& ptimer, vector<unsigned long>& usecs)
             : fn_(fn),
-              sock_(sock)
+              sock_(sock),
+              ptimer_(&ptimer),
+              usecs_(usecs)
         {
         }
         void
         operator ()(std::string& tok)
         {
             state& s(*sock_.user<state>());
+            usecs_.push_back(ptimer_->now());
             if (0 == --s.torecv_)
                 shutdown(sock_, 0);
             else if (0 < s.tosend_--)
@@ -77,7 +118,8 @@ namespace {
         void (*send_)(object&);
         unsigned conns_, estab_, echos_;
         size_t bytes_;
-        timeval start_;
+        aug::ptimer ptimer_;
+        map<unsigned long, unsigned long> xy_;
         bool
         do_start(const char* sname)
         {
@@ -105,8 +147,6 @@ namespace {
             augrt_writelog(AUGRT_LOGINFO, "conns: %d", conns_);
             augrt_writelog(AUGRT_LOGINFO, "echos: %d", echos_);
 
-            aug::gettimeofday(start_);
-
             for (; estab_ < conns_; ++estab_)
                 tcpconnect(host, serv, new state(echos_));
             return true;
@@ -114,17 +154,16 @@ namespace {
         void
         do_closed(const object& sock)
         {
-            delete sock.user<state>();
+            state& s(*sock.user<state>());
+            pushxy(xy_, s.usecs_);
+            delete &s;
             if (0 < --estab_) {
                 augrt_writelog(AUGRT_LOGINFO, "%d established", estab_);
                 return;
             }
 
-            timeval tv;
-            aug::gettimeofday(tv);
-            aug::tvsub(tv, start_);
-
-            double ms(static_cast<double>(aug::tvtoms(tv)));
+            unsigned long end(ptimer_.now());
+            double ms(end / 1000.0);
 
             augrt_writelog(AUGRT_LOGINFO, "total time: %f ms", ms);
 
@@ -138,6 +177,8 @@ namespace {
             augrt_writelog(AUGRT_LOGINFO, "total size: %f k", k);
 
             stopall();
+
+            writexy(xy_);
         }
         void
         do_connected(object& sock, const char* addr, unsigned short port)
@@ -147,7 +188,9 @@ namespace {
                 writelog(AUGRT_LOGINFO, "sslcontext: %s", sslctx);
                 setsslclient(sock, sslctx);
             }
+
             state& s(*sock.user<state>());
+            s.usecs_.push_back(ptimer_.now());
             send_(sock);
             --s.tosend_;
         }
@@ -158,7 +201,7 @@ namespace {
             state& s(*sock.user<state>());
             tokenise(static_cast<const char*>(buf),
                      static_cast<const char*>(buf) + len, s.tok_, '\n',
-                     eachline(send_, sock));
+                     eachline(send_, sock, ptimer_, s.usecs_));
         }
         bool
         do_authcert(const object& sock, const char* subject,
@@ -166,6 +209,9 @@ namespace {
         {
             augrt_writelog(AUGRT_LOGINFO, "checking subject...");
             return true;
+        }
+        ~benchsession() AUGRT_NOTHROW
+        {
         }
         benchsession()
             : conns_(0),

@@ -60,6 +60,12 @@ namespace aug {
         return aug_tvtoms(&tv);
     }
 
+    inline unsigned long
+    tvtousec(const timeval& tv)
+    {
+        return aug_tvtousec(&tv);
+    }
+
     inline timeval&
     tvadd(timeval& dst, const timeval& src)
     {

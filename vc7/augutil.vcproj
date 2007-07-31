@@ -159,6 +159,9 @@
 				RelativePath="..\src\c\augutil\path.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augutil\ptimer.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augutil\pwd.c">
 			</File>
 			<File
@@ -207,6 +210,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\path.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augutil\ptimer.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\pwd.h">

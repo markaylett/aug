@@ -79,13 +79,13 @@ namespace {
 
         // What does that equate to per ms.
 
-        unsigned perms(n / ms);
+        unsigned perms(static_cast<unsigned>(n) / ms);
         if (0 == perms)
             return;
 
         // How long, therefore, will it take to clear buffer.
 
-        unsigned estms(size / perms);
+        unsigned estms(static_cast<unsigned>(size) / perms);
         if (0 == estms)
             return;
 
