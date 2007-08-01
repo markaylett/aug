@@ -7,10 +7,38 @@
 #include "augutilpp/config.hpp"
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/time.hpp"
 
 #include "augutil/ptimer.h"
 
 namespace aug {
+
+    inline void
+    resetptimer(aug_ptimer_t ptimer)
+    {
+        verify(aug_resetptimer(ptimer));
+    }
+
+    inline timeval&
+    elapsed(aug_ptimer_t ptimer, timeval& tv)
+    {
+        verify(aug_elapsed(ptimer, &tv));
+        return tv;
+    }
+
+    inline unsigned
+    elapsedms(aug_ptimer_t ptimer)
+    {
+        timeval tv;
+        return tvtoms(elapsed(ptimer, tv));
+    }
+
+    inline unsigned long
+    elapsedusec(aug_ptimer_t ptimer)
+    {
+        timeval tv;
+        return tvtousec(elapsed(ptimer, tv));
+    }
 
     class ptimer {
 
@@ -34,10 +62,15 @@ namespace aug {
             verify(ptimer_);
         }
 
-        unsigned long
-        now() const
+        operator aug_ptimer_t()
         {
-            return aug_ptimernow(ptimer_);
+            return ptimer_;
+        }
+
+        aug_ptimer_t
+        get()
+        {
+            return ptimer_;
         }
     };
 }

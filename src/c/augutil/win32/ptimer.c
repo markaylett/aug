@@ -39,25 +39,32 @@ aug_destroyptimer(aug_ptimer_t ptimer)
     return 0;
 }
 
-AUGUTIL_API unsigned long
-aug_ptimernow(aug_ptimer_t ptimer)
+AUGUTIL_API int
+aug_resetptimer(aug_ptimer_t ptimer)
 {
-    LARGE_INTEGER ticks;
-    unsigned long usec;
+    QueryPerformanceCounter(&ptimer->start_);
+    return 0;
+}
 
-    QueryPerformanceCounter(&ticks);
+AUGUTIL_API struct timeval*
+aug_elapsed(aug_ptimer_t ptimer, struct timeval* tv)
+{
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
 
     /* Ticks relative to start. */
 
-    ticks.QuadPart -= ptimer->start_.QuadPart;
+    now.QuadPart -= ptimer->start_.QuadPart;
 
     /* Multiple before dividing. */
 
-    usec = (unsigned long)ticks.QuadPart * 1000000;
+    now.QuadPart *= 1000000;
 
     /* Ticks to microseconds. */
 
-    usec /= (unsigned long)ptimer->freq_.QuadPart;
+    now.QuadPart /= ptimer->freq_.QuadPart;
 
-    return usec;
+    tv->tv_sec = now.QuadPart / 1000000;
+    tv->tv_usec = now.QuadPart % 1000000;
+    return tv;
 }

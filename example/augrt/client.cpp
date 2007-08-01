@@ -7,6 +7,7 @@
 #include "augsyspp.hpp"
 
 #include <fstream>
+#include <memory> // auto_ptr<>
 
 using namespace augrt;
 using namespace std;
@@ -91,11 +92,11 @@ namespace {
     struct eachline {
         void (*fn_)(object&);
         object sock_;
-        const aug::ptimer* ptimer_;
+        aug::ptimer* ptimer_;
         vector<unsigned long>& usecs_;
         explicit
         eachline(void (*fn)(object&), const object& sock,
-                 const aug::ptimer& ptimer, vector<unsigned long>& usecs)
+                 aug::ptimer& ptimer, vector<unsigned long>& usecs)
             : fn_(fn),
               sock_(sock),
               ptimer_(&ptimer),
@@ -106,7 +107,7 @@ namespace {
         operator ()(std::string& tok)
         {
             state& s(*sock_.user<state>());
-            usecs_.push_back(ptimer_->now());
+            usecs_.push_back(elapsedusec(*ptimer_));
             if (0 == --s.torecv_)
                 shutdown(sock_, 0);
             else if (0 < s.tosend_--)
@@ -154,16 +155,14 @@ namespace {
         void
         do_closed(const object& sock)
         {
-            state& s(*sock.user<state>());
-            pushxy(xy_, s.usecs_);
-            delete &s;
+            auto_ptr<state> s(sock.user<state>());
+            pushxy(xy_, s->usecs_);
             if (0 < --estab_) {
                 augrt_writelog(AUGRT_LOGINFO, "%d established", estab_);
                 return;
             }
 
-            unsigned long end(ptimer_.now());
-            double ms(end / 1000.0);
+            double ms(static_cast<double>(elapsedms(ptimer_)));
 
             augrt_writelog(AUGRT_LOGINFO, "total time: %f ms", ms);
 
@@ -190,7 +189,7 @@ namespace {
             }
 
             state& s(*sock.user<state>());
-            s.usecs_.push_back(ptimer_.now());
+            s.usecs_.push_back(elapsedusec(ptimer_));
             send_(sock);
             --s.tosend_;
         }

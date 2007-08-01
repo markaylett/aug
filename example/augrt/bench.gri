@@ -1,18 +1,25 @@
-open bench.dat
+open "cat |"
 read columns x y
 close
 
 set color black
 set x name "elapsed/sec"
+set x axis 0 ..xright.. 1 .1
 set y name "roundtrip/ms"
-set y axis 0 50 5
+set y axis 0 ..ytop.. 5 1
 draw axes
-draw title "benchmark"
+draw title "echo server"
 
 set color blue
 #set symbol size 0.2
 #draw symbol bullet
 #convert columns to spline
 draw curve
+
+show "min = " { rpn y min }
+show "max = " { rpn y max }
+show "mean = " { rpn y mean }
+show "stddev = " { rpn y stddev }
+show "time = " { rpn x max }
 
 quit
