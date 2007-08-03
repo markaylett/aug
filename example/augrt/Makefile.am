@@ -6,7 +6,6 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	bench.conf \
-	bench.gri \
 	bench.sh \
 	modules.mk \
 	test.conf
