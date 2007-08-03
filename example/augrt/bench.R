@@ -1,4 +1,5 @@
-xy <- read.table(file='stdin')
-png(filename='bench.png')
+args <- commandArgs(TRUE)
+xy <- read.table(file=args[1])
+png(filename=args[2])
 plot(xy, col='blue', main='echo server', pch=20, xlab='elapsed/sec', ylab='roundtrip/ms')
 dev.off()

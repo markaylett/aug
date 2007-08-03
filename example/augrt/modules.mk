@@ -27,9 +27,8 @@ include $(AUG_HOME)/etc/aug.mk
 bench: all
 	$(AUG_HOME)/bin/daug -f bench.conf test
 
-%.png: %.dat
-	gri -output $(<:%.dat=%.ps) bench.gri <$< \
-	  && pstopnm -portrait -stdout $(<:%.dat=%.ps) | pnmtopng >$@
-
 test: all
 	$(AUG_HOME)/bin/daug -f test.conf test
+
+%.png: %.dat
+	Rscript bench.R <$ $@
