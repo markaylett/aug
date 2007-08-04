@@ -3,6 +3,9 @@
 
 AUG_RCSID("$Id$");
 
+#include "sys/unistd.h" /* chdir() */
+#include "augrt.h"
+
 #if defined(_WIN32)
 # define HAVE_ISINF 1
 # if !defined(_MSC_VER)
@@ -18,7 +21,6 @@ rb_w32_getcwd(char* buffer, int size);
 #include <assert.h>
 #include <ctype.h> /* tolower() */
 
-#include "augrt.h"
 #include "ruby.h"
 
 /* The bit fields indicate those functions implemented by the session. */

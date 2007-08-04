@@ -7,6 +7,7 @@
 #define MSG2_ "second chunk"
 
 #include <stdio.h>
+#include <stdlib.h> /* exit() */
 
 static void
 test(aug_muxer_t muxer, int n)

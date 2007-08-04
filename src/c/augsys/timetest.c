@@ -4,6 +4,7 @@
 #include "augsys.h"
 
 #include <stdio.h>
+#include <stdlib.h> /* exit() */
 
 static void
 test(void)
