@@ -13,8 +13,12 @@
 # include <direct.h>
 # include <io.h>
 # include <process.h>
-# define ftruncate _chsize
-# define fsync _commit
+# if !defined(ftruncate)
+#  define ftruncate _chsize
+# endif /* ftruncate */
+# if !defined(fsync)
+#  define fsync _commit
+# endif /* fsync */
 #endif /* _WIN32 */
 
 AUGSYS_API int

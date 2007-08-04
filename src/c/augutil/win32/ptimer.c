@@ -64,7 +64,7 @@ aug_elapsed(aug_ptimer_t ptimer, struct timeval* tv)
 
     now.QuadPart /= ptimer->freq_.QuadPart;
 
-    tv->tv_sec = now.QuadPart / 1000000;
-    tv->tv_usec = now.QuadPart % 1000000;
+    tv->tv_sec = (long)(now.QuadPart / 1000000);
+    tv->tv_usec = (long)(now.QuadPart % 1000000);
     return tv;
 }
