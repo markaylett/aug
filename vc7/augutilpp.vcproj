@@ -132,6 +132,9 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath="..\src\cpp\augutilpp\clock.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augutilpp\config.cpp">
 			</File>
 			<File
@@ -150,9 +153,6 @@
 				RelativePath="..\src\cpp\augutilpp\path.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augutilpp\ptimer.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augutilpp\timer.cpp">
 			</File>
 			<File
@@ -163,6 +163,9 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath="..\src\cpp\augutilpp\clock.hpp">
+			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\config.hpp">
 			</File>
@@ -180,9 +183,6 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\path.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\ptimer.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\timer.hpp">

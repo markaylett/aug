@@ -8,41 +8,41 @@
 #include <errno.h>  /* ENOMEM */
 #include <stdlib.h> /* malloc() */
 
-struct aug_ptimer_ {
+struct aug_clock_ {
     LARGE_INTEGER freq_, start_;
 };
 
-AUGUTIL_API aug_ptimer_t
-aug_createptimer(void)
+AUGUTIL_API aug_clock_t
+aug_createclock(void)
 {
-    aug_ptimer_t ptimer = malloc(sizeof(struct aug_ptimer_));
-	if (!ptimer) {
+    aug_clock_t clock = malloc(sizeof(struct aug_clock_));
+	if (!clock) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
 		return NULL;
     }
 
-    if (!QueryPerformanceFrequency(&ptimer->freq_)
-        || !QueryPerformanceCounter(&ptimer->start_)) {
+    if (!QueryPerformanceFrequency(&clock->freq_)
+        || !QueryPerformanceCounter(&clock->start_)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
-        free(ptimer);
+        free(clock);
         return NULL;
     }
 
-	return ptimer;
+	return clock;
 }
 
 AUGUTIL_API int
-aug_destroyptimer(aug_ptimer_t ptimer)
+aug_destroyclock(aug_clock_t clock)
 {
-	if (ptimer)
-		free(ptimer);
+	if (clock)
+		free(clock);
     return 0;
 }
 
 AUGUTIL_API int
-aug_resetptimer(aug_ptimer_t ptimer)
+aug_resetclock(aug_clock_t clock)
 {
-    if (!QueryPerformanceCounter(&ptimer->start_)) {
+    if (!QueryPerformanceCounter(&clock->start_)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
@@ -50,7 +50,7 @@ aug_resetptimer(aug_ptimer_t ptimer)
 }
 
 AUGUTIL_API int
-aug_elapsed(aug_ptimer_t ptimer, double* secs)
+aug_elapsed(aug_clock_t clock, double* secs)
 {
     LARGE_INTEGER now;
     if (!QueryPerformanceCounter(&now)) {
@@ -60,7 +60,7 @@ aug_elapsed(aug_ptimer_t ptimer, double* secs)
 
     /* Ticks relative to start. */
 
-    now.QuadPart -= ptimer->start_.QuadPart;
-    *secs = (double)now.QuadPart / (double)ptimer->freq_.QuadPart;
+    now.QuadPart -= clock->start_.QuadPart;
+    *secs = (double)now.QuadPart / (double)clock->freq_.QuadPart;
     return 0;
 }

@@ -86,14 +86,14 @@ namespace {
     struct eachline {
         void (*fn_)(object&);
         object sock_;
-        aug::ptimer* ptimer_;
+        aug::clock* clock_;
         vector<double>& secs_;
         explicit
         eachline(void (*fn)(object&), const object& sock,
-                 aug::ptimer& ptimer, vector<double>& secs)
+                 aug::clock& clock, vector<double>& secs)
             : fn_(fn),
               sock_(sock),
-              ptimer_(&ptimer),
+              clock_(&clock),
               secs_(secs)
         {
         }
@@ -101,7 +101,7 @@ namespace {
         operator ()(std::string& tok)
         {
             state& s(*sock_.user<state>());
-            secs_.push_back(elapsed(*ptimer_));
+            secs_.push_back(elapsed(*clock_));
             if (0 == --s.torecv_)
                 shutdown(sock_, 0);
             else if (0 < s.tosend_--)
@@ -113,7 +113,7 @@ namespace {
         void (*send_)(object&);
         unsigned conns_, estab_, echos_;
         size_t bytes_;
-        aug::ptimer ptimer_;
+        aug::clock clock_;
         map<double, double> xy_;
         bool
         do_start(const char* sname)
@@ -156,7 +156,7 @@ namespace {
                 return;
             }
 
-            double ms(elapsed(ptimer_) * 1000.0);
+            double ms(elapsed(clock_) * 1000.0);
 
             augrt_writelog(AUGRT_LOGINFO, "total time: %f ms", ms);
 
@@ -183,7 +183,7 @@ namespace {
             }
 
             state& s(*sock.user<state>());
-            s.secs_.push_back(elapsed(ptimer_));
+            s.secs_.push_back(elapsed(clock_));
             send_(sock);
             --s.tosend_;
         }
@@ -194,7 +194,7 @@ namespace {
             state& s(*sock.user<state>());
             tokenise(static_cast<const char*>(buf),
                      static_cast<const char*>(buf) + len, s.tok_, '\n',
-                     eachline(send_, sock, ptimer_, s.secs_));
+                     eachline(send_, sock, clock_, s.secs_));
         }
         bool
         do_authcert(const object& sock, const char* subject,

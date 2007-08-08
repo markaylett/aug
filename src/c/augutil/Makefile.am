@@ -5,6 +5,7 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
+	clock.h \
 	config.h \
 	conv.h \
 	event.h \
@@ -15,7 +16,6 @@ modinclude_HEADERS = \
 	log.h \
 	md5.h \
 	path.h \
-	ptimer.h \
 	pwd.h \
 	strbuf.h \
 	timer.h \
@@ -27,6 +27,7 @@ noinst_HEADERS =
 lib_LTLIBRARIES = libaugutil.la
 
 libaugutil_la_SOURCES = \
+	clock.c \
 	config.c \
 	conv.c \
 	event.c \
@@ -37,7 +38,6 @@ libaugutil_la_SOURCES = \
 	log.c \
 	md5.c \
 	path.c \
-	ptimer.c \
 	pwd.c \
 	strbuf.c \
 	timer.c \

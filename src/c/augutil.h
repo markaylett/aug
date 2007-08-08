@@ -4,6 +4,7 @@
 #ifndef AUGUTIL_H
 #define AUGUTIL_H
 
+#include "augutil/clock.h"
 #include "augutil/conv.h"
 #include "augutil/event.h"
 #include "augutil/file.h"
@@ -13,7 +14,6 @@
 #include "augutil/log.h"
 #include "augutil/md5.h"
 #include "augutil/path.h"
-#include "augutil/ptimer.h"
 #include "augutil/pwd.h"
 #include "augutil/strbuf.h"
 #include "augutil/timer.h"

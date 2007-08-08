@@ -61,9 +61,9 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugutil_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugutil_la_OBJECTS = config.lo conv.lo event.lo file.lo \
-	getopt.lo lexer.lo list.lo log.lo md5.lo path.lo ptimer.lo \
-	pwd.lo strbuf.lo timer.lo tmspec.lo var.lo
+am_libaugutil_la_OBJECTS = clock.lo config.lo conv.lo event.lo file.lo \
+	getopt.lo lexer.lo list.lo log.lo md5.lo path.lo pwd.lo \
+	strbuf.lo timer.lo tmspec.lo var.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
 am_augutil_test_OBJECTS = test.$(OBJEXT)
 augutil_test_OBJECTS = $(am_augutil_test_OBJECTS)
@@ -222,6 +222,7 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
+	clock.h \
 	config.h \
 	conv.h \
 	event.h \
@@ -232,7 +233,6 @@ modinclude_HEADERS = \
 	log.h \
 	md5.h \
 	path.h \
-	ptimer.h \
 	pwd.h \
 	strbuf.h \
 	timer.h \
@@ -242,6 +242,7 @@ modinclude_HEADERS = \
 noinst_HEADERS = 
 lib_LTLIBRARIES = libaugutil.la
 libaugutil_la_SOURCES = \
+	clock.c \
 	config.c \
 	conv.c \
 	event.c \
@@ -252,7 +253,6 @@ libaugutil_la_SOURCES = \
 	log.c \
 	md5.c \
 	path.c \
-	ptimer.c \
 	pwd.c \
 	strbuf.c \
 	timer.c \
@@ -350,6 +350,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
@@ -360,7 +361,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md5.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ptimer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pwd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strbuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@

@@ -168,7 +168,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	ptimer.c \
+	clock.c \
 	pwd.c
 
 all: all-am

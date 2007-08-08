@@ -1,3 +1,3 @@
 EXTRA_DIST = \
-	ptimer.c \
+	clock.c \
 	pwd.c

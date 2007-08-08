@@ -2,26 +2,26 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 modincludedir = $(includedir)/augutilpp
 modinclude_HEADERS = \
+	clock.hpp \
 	config.hpp \
 	conv.hpp \
 	event.hpp \
 	file.hpp \
 	log.hpp \
 	path.hpp \
-	ptimer.hpp \
 	timer.hpp \
 	var.hpp
 
 noinst_LTLIBRARIES = libaugutilpp.la
 
 libaugutilpp_la_SOURCES = \
+	clock.cpp \
 	config.cpp \
 	conv.cpp \
 	event.cpp \
 	file.cpp \
 	log.cpp \
 	path.cpp \
-	ptimer.cpp \
 	timer.cpp \
 	var.cpp
 
