@@ -47,40 +47,34 @@ namespace {
     }
 
     void
-    pushxy(map<unsigned long, unsigned long>& xy,
-           const vector<unsigned long>& usecs)
+    pushxy(map<double, double>& xy, const vector<double>& secs)
     {
-        if (usecs.empty())
+        if (secs.empty())
             return;
 
-        vector<unsigned long>::const_iterator it(usecs.begin()),
-            end(usecs.end());
-
-        unsigned long first(*it);
+        vector<double>::const_iterator it(secs.begin()), end(secs.end());
+        double first(*it);
         for (++it; it != end; ++it) {
 
-            unsigned long second(*it - first);
+            double second(*it - first);
             first = *it;
             xy.insert(make_pair(first, second));
         }
     }
 
     void
-    writexy(const map<unsigned long, unsigned long>& xy)
+    writexy(const map<double, double>& xy)
     {
         ofstream os("bench.dat");
-        map<unsigned long, unsigned long>::const_iterator it(xy.begin()),
-            end(xy.end());
+        map<double, double>::const_iterator it(xy.begin()), end(xy.end());
         for (; it != end; ++it)
-            os << static_cast<double>(it->first) / 1000000.0
-               << ' ' << static_cast<double>(it->second) / 1000.0
-               << endl;
+            os << it->first << ' ' << it->second * 1000.0 << endl;
     }
 
     struct state {
         string tok_;
         unsigned tosend_, torecv_;
-        vector<unsigned long> usecs_;
+        vector<double> secs_;
         explicit
         state(int echos)
             : tosend_(echos),
@@ -93,21 +87,21 @@ namespace {
         void (*fn_)(object&);
         object sock_;
         aug::ptimer* ptimer_;
-        vector<unsigned long>& usecs_;
+        vector<double>& secs_;
         explicit
         eachline(void (*fn)(object&), const object& sock,
-                 aug::ptimer& ptimer, vector<unsigned long>& usecs)
+                 aug::ptimer& ptimer, vector<double>& secs)
             : fn_(fn),
               sock_(sock),
               ptimer_(&ptimer),
-              usecs_(usecs)
+              secs_(secs)
         {
         }
         void
         operator ()(std::string& tok)
         {
             state& s(*sock_.user<state>());
-            usecs_.push_back(elapsedusec(*ptimer_));
+            secs_.push_back(elapsed(*ptimer_));
             if (0 == --s.torecv_)
                 shutdown(sock_, 0);
             else if (0 < s.tosend_--)
@@ -120,7 +114,7 @@ namespace {
         unsigned conns_, estab_, echos_;
         size_t bytes_;
         aug::ptimer ptimer_;
-        map<unsigned long, unsigned long> xy_;
+        map<double, double> xy_;
         bool
         do_start(const char* sname)
         {
@@ -156,13 +150,13 @@ namespace {
         do_closed(const object& sock)
         {
             auto_ptr<state> s(sock.user<state>());
-            pushxy(xy_, s->usecs_);
+            pushxy(xy_, s->secs_);
             if (0 < --estab_) {
                 augrt_writelog(AUGRT_LOGINFO, "%d established", estab_);
                 return;
             }
 
-            double ms(static_cast<double>(elapsedms(ptimer_)));
+            double ms(elapsed(ptimer_) * 1000.0);
 
             augrt_writelog(AUGRT_LOGINFO, "total time: %f ms", ms);
 
@@ -172,7 +166,7 @@ namespace {
             ms /= static_cast<double>(echos_);
             augrt_writelog(AUGRT_LOGINFO, "echos per sec: %f", 1000.0 / ms);
 
-            double k(static_cast<double>(bytes_) / 1024);
+            double k(static_cast<double>(bytes_) / 1024.00);
             augrt_writelog(AUGRT_LOGINFO, "total size: %f k", k);
 
             stopall();
@@ -189,7 +183,7 @@ namespace {
             }
 
             state& s(*sock.user<state>());
-            s.usecs_.push_back(elapsedusec(ptimer_));
+            s.secs_.push_back(elapsed(ptimer_));
             send_(sock);
             --s.tosend_;
         }
@@ -200,7 +194,7 @@ namespace {
             state& s(*sock.user<state>());
             tokenise(static_cast<const char*>(buf),
                      static_cast<const char*>(buf) + len, s.tok_, '\n',
-                     eachline(send_, sock, ptimer_, s.usecs_));
+                     eachline(send_, sock, ptimer_, s.secs_));
         }
         bool
         do_authcert(const object& sock, const char* subject,

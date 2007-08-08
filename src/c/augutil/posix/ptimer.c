@@ -6,9 +6,10 @@
 
 #include <errno.h>  /* ENOMEM */
 #include <stdlib.h> /* malloc() */
+#include <time.h>
 
 struct aug_ptimer_ {
-    struct timeval start_;
+    clock_t start_;
 };
 
 AUGUTIL_API aug_ptimer_t
@@ -20,7 +21,8 @@ aug_createptimer(void)
 		return NULL;
     }
 
-    if (-1 == aug_gettimeofday(&ptimer->start_, NULL)) {
+    if (-1 == (ptimer->start_ = clock())) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         free(ptimer);
         return NULL;
     }
@@ -39,15 +41,22 @@ aug_destroyptimer(aug_ptimer_t ptimer)
 AUGUTIL_API int
 aug_resetptimer(aug_ptimer_t ptimer)
 {
-    return aug_gettimeofday(&ptimer->start_, NULL);
+    if (-1 == (ptimer->start_ = clock())) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        return -1;
+    }
+    return 0;
 }
 
-AUGUTIL_API struct timeval*
-aug_elapsed(aug_ptimer_t ptimer, struct timeval* tv)
+AUGUTIL_API int
+aug_elapsed(aug_ptimer_t ptimer, double* secs)
 {
-    if (-1 == aug_gettimeofday(tv, NULL))
-        return NULL;
-
-    aug_tvsub(tv, &ptimer->start_);
-    return tv;
+    clock_t now = clock();
+    if (-1 == now) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        return -1;
+    }
+    now -= ptimer->start_;
+    *secs = (double)now / (double)CLOCKS_PER_SEC;
+    return 0;
 }

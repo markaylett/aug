@@ -19,25 +19,19 @@ namespace aug {
         verify(aug_resetptimer(ptimer));
     }
 
-    inline timeval&
-    elapsed(aug_ptimer_t ptimer, timeval& tv)
+    inline double&
+    elapsed(aug_ptimer_t ptimer, double& secs)
     {
-        verify(aug_elapsed(ptimer, &tv));
-        return tv;
+        verify(aug_elapsed(ptimer, &secs));
+        return secs;
     }
 
-    inline unsigned
-    elapsedms(aug_ptimer_t ptimer)
+    inline double
+    elapsed(aug_ptimer_t ptimer)
     {
-        timeval tv;
-        return tvtoms(elapsed(ptimer, tv));
-    }
-
-    inline unsigned long
-    elapsedusec(aug_ptimer_t ptimer)
-    {
-        timeval tv;
-        return tvtousec(elapsed(ptimer, tv));
+        double secs;
+        elapsed(ptimer, secs);
+        return secs;
     }
 
     class ptimer {

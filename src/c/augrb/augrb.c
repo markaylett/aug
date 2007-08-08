@@ -3,7 +3,9 @@
 
 AUG_RCSID("$Id$");
 
-#if defined(_WIN32)
+#if !defined(_WIN32)
+# include <unistd.h>
+#else /* _WIN32 */
 # define HAVE_ISINF 1
 # if !defined(_MSC_VER)
 #  define _MSC_VER 1200
@@ -13,18 +15,12 @@ AUG_RCSID("$Id$");
 char*
 rb_w32_getcwd(char* buffer, int size);
 #endif /* _WIN32 */
-#include <ruby.h>
 
-/* fsync is defined in ruby.h, the following headers must be included
-   after. */
-
-#include "augsys/unistd.h" /* chdir() */
 #include "augrt.h"
 
 #include <assert.h>
 #include <ctype.h> /* tolower() */
-
-#include "ruby.h"
+#include <ruby.h>
 
 /* The bit fields indicate those functions implemented by the session. */
 

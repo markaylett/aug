@@ -6,8 +6,6 @@
 
 #include "augutil/config.h"
 
-#include "augsys/time.h" /* struct timeval */
-
 typedef struct aug_ptimer_* aug_ptimer_t;
 
 AUGUTIL_API aug_ptimer_t
@@ -19,7 +17,11 @@ aug_destroyptimer(aug_ptimer_t ptimer);
 AUGUTIL_API int
 aug_resetptimer(aug_ptimer_t ptimer);
 
-AUGUTIL_API struct timeval*
-aug_elapsed(aug_ptimer_t ptimer, struct timeval* tv);
+/**
+   Elapsed time is seconds.
+*/
+
+AUGUTIL_API int
+aug_elapsed(aug_ptimer_t ptimer, double* secs);
 
 #endif /* AUGUTIL_PTIMER_H */

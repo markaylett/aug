@@ -42,29 +42,25 @@ aug_destroyptimer(aug_ptimer_t ptimer)
 AUGUTIL_API int
 aug_resetptimer(aug_ptimer_t ptimer)
 {
-    QueryPerformanceCounter(&ptimer->start_);
+    if (!QueryPerformanceCounter(&ptimer->start_)) {
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+        return -1;
+    }
     return 0;
 }
 
-AUGUTIL_API struct timeval*
-aug_elapsed(aug_ptimer_t ptimer, struct timeval* tv)
+AUGUTIL_API int
+aug_elapsed(aug_ptimer_t ptimer, double* secs)
 {
     LARGE_INTEGER now;
-    QueryPerformanceCounter(&now);
+    if (!QueryPerformanceCounter(&now)) {
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+        return -1;
+    }
 
     /* Ticks relative to start. */
 
     now.QuadPart -= ptimer->start_.QuadPart;
-
-    /* Multiple before dividing. */
-
-    now.QuadPart *= 1000000;
-
-    /* Ticks to microseconds. */
-
-    now.QuadPart /= ptimer->freq_.QuadPart;
-
-    tv->tv_sec = (long)(now.QuadPart / 1000000);
-    tv->tv_usec = (long)(now.QuadPart % 1000000);
-    return tv;
+    *secs = (double)now.QuadPart / (double)ptimer->freq_.QuadPart;
+    return 0;
 }
