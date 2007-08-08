@@ -21,7 +21,7 @@ aug_resetclock(aug_clock_t clck);
    Elapsed time is seconds.
 */
 
-AUGUTIL_API int
+AUGUTIL_API double*
 aug_elapsed(aug_clock_t clck, double* secs);
 
 #endif /* AUGUTIL_CLOCK_H */

@@ -48,15 +48,15 @@ aug_resetclock(aug_clock_t clck)
     return 0;
 }
 
-AUGUTIL_API int
+AUGUTIL_API double*
 aug_elapsed(aug_clock_t clck, double* secs)
 {
     clock_t now = clock();
     if (-1 == now) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
-        return -1;
+        return NULL;
     }
     now -= clck->start_;
     *secs = (double)now / (double)CLOCKS_PER_SEC;
-    return 0;
+    return secs;
 }

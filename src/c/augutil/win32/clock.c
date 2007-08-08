@@ -49,18 +49,18 @@ aug_resetclock(aug_clock_t clck)
     return 0;
 }
 
-AUGUTIL_API int
+AUGUTIL_API double*
 aug_elapsed(aug_clock_t clck, double* secs)
 {
     LARGE_INTEGER now;
     if (!QueryPerformanceCounter(&now)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
-        return -1;
+        return NULL;
     }
 
     /* Ticks relative to start. */
 
     now.QuadPart -= clck->start_.QuadPart;
     *secs = (double)now.QuadPart / (double)clck->freq_.QuadPart;
-    return 0;
+    return secs;
 }

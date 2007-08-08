@@ -30,8 +30,7 @@ namespace aug {
     elapsed(aug_clock_t clock)
     {
         double secs;
-        elapsed(clock, secs);
-        return secs;
+        return elapsed(clock, secs);
     }
 
     class clock {

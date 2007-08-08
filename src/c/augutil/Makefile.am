@@ -51,9 +51,18 @@ libaugutil_la_LDFLAGS = \
 libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = augutil-test
-TESTS = augutil-test
+check_PROGRAMS = \
+	augutil-clocktest \
+	augutil-eventtest
 
-augutil_test_SOURCES = test.c
-augutil_test_LDADD = \
+TESTS =  \
+	augutil-clocktest \
+	augutil-eventtest
+
+augutil_clocktest_SOURCES = clocktest.c
+augutil_clocktest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
+
+augutil_eventtest_SOURCES = eventtest.c
+augutil_eventtest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la
