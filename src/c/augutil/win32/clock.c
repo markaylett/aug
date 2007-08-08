@@ -15,34 +15,34 @@ struct aug_clock_ {
 AUGUTIL_API aug_clock_t
 aug_createclock(void)
 {
-    aug_clock_t clock = malloc(sizeof(struct aug_clock_));
-	if (!clock) {
+    aug_clock_t clck = malloc(sizeof(struct aug_clock_));
+	if (!clck) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
 		return NULL;
     }
 
-    if (!QueryPerformanceFrequency(&clock->freq_)
-        || !QueryPerformanceCounter(&clock->start_)) {
+    if (!QueryPerformanceFrequency(&clck->freq_)
+        || !QueryPerformanceCounter(&clck->start_)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
-        free(clock);
+        free(clck);
         return NULL;
     }
 
-	return clock;
+	return clck;
 }
 
 AUGUTIL_API int
-aug_destroyclock(aug_clock_t clock)
+aug_destroyclock(aug_clock_t clck)
 {
-	if (clock)
-		free(clock);
+    if (clck)
+        free(clck);
     return 0;
 }
 
 AUGUTIL_API int
-aug_resetclock(aug_clock_t clock)
+aug_resetclock(aug_clock_t clck)
 {
-    if (!QueryPerformanceCounter(&clock->start_)) {
+    if (!QueryPerformanceCounter(&clck->start_)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         return -1;
     }
@@ -50,7 +50,7 @@ aug_resetclock(aug_clock_t clock)
 }
 
 AUGUTIL_API int
-aug_elapsed(aug_clock_t clock, double* secs)
+aug_elapsed(aug_clock_t clck, double* secs)
 {
     LARGE_INTEGER now;
     if (!QueryPerformanceCounter(&now)) {
@@ -60,7 +60,7 @@ aug_elapsed(aug_clock_t clock, double* secs)
 
     /* Ticks relative to start. */
 
-    now.QuadPart -= clock->start_.QuadPart;
-    *secs = (double)now.QuadPart / (double)clock->freq_.QuadPart;
+    now.QuadPart -= clck->start_.QuadPart;
+    *secs = (double)now.QuadPart / (double)clck->freq_.QuadPart;
     return 0;
 }

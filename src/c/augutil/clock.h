@@ -12,16 +12,16 @@ AUGUTIL_API aug_clock_t
 aug_createclock(void);
 
 AUGUTIL_API int
-aug_destroyclock(aug_clock_t clock);
+aug_destroyclock(aug_clock_t clck);
 
 AUGUTIL_API int
-aug_resetclock(aug_clock_t clock);
+aug_resetclock(aug_clock_t clck);
 
 /**
    Elapsed time is seconds.
 */
 
 AUGUTIL_API int
-aug_elapsed(aug_clock_t clock, double* secs);
+aug_elapsed(aug_clock_t clck, double* secs);
 
 #endif /* AUGUTIL_CLOCK_H */

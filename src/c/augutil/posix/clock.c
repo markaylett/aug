@@ -15,33 +15,33 @@ struct aug_clock_ {
 AUGUTIL_API aug_clock_t
 aug_createclock(void)
 {
-    aug_clock_t clock = malloc(sizeof(struct aug_clock_));
-	if (!clock) {
+    aug_clock_t clck = malloc(sizeof(struct aug_clock_));
+	if (!clck) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
 		return NULL;
     }
 
-    if (-1 == (clock->start_ = clock())) {
+    if (-1 == (clck->start_ = clock())) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
-        free(clock);
+        free(clck);
         return NULL;
     }
 
-	return clock;
+	return clck;
 }
 
 AUGUTIL_API int
-aug_destroyclock(aug_clock_t clock)
+aug_destroyclock(aug_clock_t clck)
 {
-	if (clock)
-		free(clock);
+    if (clck)
+        free(clck);
     return 0;
 }
 
 AUGUTIL_API int
-aug_resetclock(aug_clock_t clock)
+aug_resetclock(aug_clock_t clck)
 {
-    if (-1 == (clock->start_ = clock())) {
+    if (-1 == (clck->start_ = clock())) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
@@ -49,14 +49,14 @@ aug_resetclock(aug_clock_t clock)
 }
 
 AUGUTIL_API int
-aug_elapsed(aug_clock_t clock, double* secs)
+aug_elapsed(aug_clock_t clck, double* secs)
 {
     clock_t now = clock();
     if (-1 == now) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
-    now -= clock->start_;
+    now -= clck->start_;
     *secs = (double)now / (double)CLOCKS_PER_SEC;
     return 0;
 }
