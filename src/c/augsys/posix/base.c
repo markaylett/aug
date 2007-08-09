@@ -108,7 +108,7 @@ aug_init(struct aug_errinfo* errinfo)
     }
 
     if ((loglevel = getenv("AUG_LOGLEVEL")))
-        aug_setloglevel(atoi(loglevel));
+        loglevel_ = atoi(loglevel);
 
     return 0;
 }
