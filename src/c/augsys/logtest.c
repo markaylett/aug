@@ -24,6 +24,7 @@ main(int argc, char* argv[])
 {
     struct aug_errinfo errinfo;
     aug_atexitinit(&errinfo);
+    return 0;
 
     aug_setlogger(logger_);
     aug_setloglevel(AUG_LOGINFO);

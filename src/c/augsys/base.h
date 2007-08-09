@@ -19,6 +19,17 @@ struct aug_fdtype {
     int (*setnonblock_)(int, int);
 };
 
+#if defined(AUGSYS_BUILD)
+AUG_EXTERNC int
+aug_setloglevel_(int loglevel);
+
+AUG_EXTERNC aug_logger_t
+aug_setlogger_(aug_logger_t logger);
+
+AUG_EXTERNC int
+aug_loglevel_(aug_logger_t* logger);
+#endif /* AUGSYS_BUILD */
+
 /**
    Initialise use of aug libraries.
 
@@ -69,21 +80,6 @@ aug_exit(int status);
 
 AUGSYS_API long
 aug_timezone(void);
-
-/**
-   Set log-level.
-
-   The default log-level is #AUG_LOGINFO.  The "AUG_LOGLEVEL" environment
-   variable can be used to override this default.
-
-   \sa aug_loglevel()
-*/
-
-AUGSYS_API void
-aug_setloglevel(int loglevel);
-
-AUGSYS_API int
-aug_loglevel(void);
 
 AUGSYS_API int
 aug_nextid(void);

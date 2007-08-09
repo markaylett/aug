@@ -22,8 +22,6 @@ AUG_RCSID("$Id$");
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
 
-static volatile aug_logger_t logger_ = aug_stdiologger;
-
 AUGSYS_API int
 aug_stdiologger(int loglevel, const char* format, va_list args)
 {
@@ -47,22 +45,39 @@ aug_stdiologger(int loglevel, const char* format, va_list args)
     return 0;
 }
 
+AUGSYS_API int
+aug_setloglevel(int loglevel)
+{
+    return aug_setloglevel_(loglevel);
+}
+
 AUGSYS_API aug_logger_t
 aug_setlogger(aug_logger_t logger)
 {
-    aug_logger_t old = logger_;
-    logger_ = logger ? logger : aug_stdiologger;
-    return old;
+    logger = aug_setlogger_(logger);
+    return logger ? logger : aug_stdiologger;
+}
+
+AUGSYS_API int
+aug_loglevel(void)
+{
+    return aug_loglevel_(NULL);
 }
 
 AUGSYS_API int
 aug_vwritelog(int loglevel, const char* format, va_list args)
 {
+    aug_logger_t logger;
     assert(format);
-    if (aug_loglevel() < loglevel)
+    if (aug_loglevel_(&logger) < loglevel)
         return 0;
 
-    return (*logger_)(loglevel, format, args);
+    /* Fallback to default. */
+
+    if (!logger)
+        logger = aug_stdiologger;
+
+    return (*logger)(loglevel, format, args);
 }
 
 AUGSYS_API int

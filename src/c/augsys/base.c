@@ -13,7 +13,6 @@ AUG_RCSID("$Id$");
 
 #define PROCEED_ 1
 
-static int loglevel_ = AUG_LOGINFO;
 static unsigned refs_ = 0;
 
 static int
@@ -61,6 +60,9 @@ struct file_ {
 
 static struct file_* files_ = NULL;
 static size_t size_ = 0;
+
+static int loglevel_ = AUG_LOGINFO;
+static aug_logger_t logger_ = NULL;
 
 static void
 term_(void)
@@ -251,6 +253,40 @@ getfdtype_(int fd)
     return files_[fd].fdtype_;
 }
 
+AUG_EXTERNC int
+aug_setloglevel_(int loglevel)
+{
+    int prev;
+    aug_lock();
+    prev = loglevel_;
+    loglevel_ = loglevel;
+    aug_unlock();
+    return prev;
+}
+
+AUG_EXTERNC aug_logger_t
+aug_setlogger_(aug_logger_t logger)
+{
+    aug_logger_t prev;
+    aug_lock();
+    prev = logger_;
+    logger_ = logger;
+    aug_unlock();
+    return prev;
+}
+
+AUG_EXTERNC int
+aug_loglevel_(aug_logger_t* logger)
+{
+    int loglevel;
+    aug_lock();
+    loglevel = loglevel_;
+    if (logger)
+        *logger = logger_;
+    aug_unlock();
+    return loglevel;
+}
+
 AUGSYS_API int
 aug_atexitinit(struct aug_errinfo* errinfo)
 {
@@ -293,24 +329,6 @@ aug_nextid(void)
     aug_unlock();
 
     return id;
-}
-
-AUGSYS_API void
-aug_setloglevel(int loglevel)
-{
-    aug_lock();
-    loglevel_ = loglevel;
-    aug_unlock();
-}
-
-AUGSYS_API int
-aug_loglevel(void)
-{
-    int loglevel;
-    aug_lock();
-    loglevel = loglevel_;
-    aug_unlock();
-    return loglevel;
 }
 
 AUGSYS_API int

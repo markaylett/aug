@@ -7,23 +7,42 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
-#include <stdarg.h>
-
 /**
    All functions in this module set errno, and not errinfo.
 */
-
-typedef int (*aug_logger_t)(int, const char*, va_list);
 
 AUGSYS_API int
 aug_stdiologger(int loglevel, const char* format, va_list args);
 
 /**
+   Set log-level.
+
+   The default log-level is #AUG_LOGINFO.  The "AUG_LOGLEVEL" environment
+   variable can be used to override this default.
+
+   \return previous log-level.
+
+   \sa aug_loglevel()
+*/
+
+AUGSYS_API int
+aug_setloglevel(int loglevel);
+
+/**
    If the logger argument is NULL, the default logger is re-installed.
+
+   \return previous logger.
 */
 
 AUGSYS_API aug_logger_t
 aug_setlogger(aug_logger_t logger);
+
+/**
+   Get log-level.
+ */
+
+AUGSYS_API int
+aug_loglevel(void);
 
 AUGSYS_API int
 aug_vwritelog(int loglevel, const char* format, va_list args);

@@ -104,7 +104,7 @@ aug_init(struct aug_errinfo* errinfo)
     }
 
     if ((loglevel = getenv("AUG_LOGLEVEL")))
-        loglevel_ = atoi(loglevel);
+        aug_setloglevel_(atoi(loglevel));
 
     return 0;
 }
@@ -116,7 +116,7 @@ aug_term(void)
     if (PROCEED_ != ret)
         return ret;
 
-    aug_setlogger(NULL);
+    aug_setlogger_(NULL);
 
     if (SOCKET_ERROR == WSACleanup()) {
         aug_setwin32errno(WSAGetLastError());

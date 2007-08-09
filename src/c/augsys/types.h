@@ -4,6 +4,7 @@
 #ifndef AUGSYS_TYPES_H
 #define AUGSYS_TYPES_H
 
+#include <stdarg.h>
 #include <stddef.h> /* size_t */
 #include <sys/types.h>
 
@@ -35,5 +36,7 @@ enum aug_loglevel {
     AUG_LOGINFO,
     AUG_LOGDEBUG0
 };
+
+typedef int (*aug_logger_t)(int, const char*, va_list);
 
 #endif /* AUGSYS_TYPES_H */

@@ -37,7 +37,7 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (0.001 < stop - start && stop - start < 0.003) {
+    if (stop - start < 0.001 || 0.003 < stop - start) {
         aug_error("unexpected interval: start=%0.6f, stop=%0.6f",
                   start, stop);
         return 1;
