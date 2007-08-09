@@ -16,9 +16,9 @@ AUGUTIL_API aug_clock_t
 aug_createclock(void)
 {
     aug_clock_t clck = malloc(sizeof(struct aug_clock_));
-	if (!clck) {
+    if (!clck) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
-		return NULL;
+        return NULL;
     }
 
     if (!QueryPerformanceFrequency(&clck->freq_)
@@ -28,7 +28,7 @@ aug_createclock(void)
         return NULL;
     }
 
-	return clck;
+    return clck;
 }
 
 AUGUTIL_API int
@@ -50,7 +50,7 @@ aug_resetclock(aug_clock_t clck)
 }
 
 AUGUTIL_API double*
-aug_elapsed(aug_clock_t clck, double* secs)
+aug_elapsed(aug_clock_t clck, double* sec)
 {
     LARGE_INTEGER now;
     if (!QueryPerformanceCounter(&now)) {
@@ -61,6 +61,6 @@ aug_elapsed(aug_clock_t clck, double* secs)
     /* Ticks relative to start. */
 
     now.QuadPart -= clck->start_.QuadPart;
-    *secs = (double)now.QuadPart / (double)clck->freq_.QuadPart;
-    return secs;
+    *sec = (double)now.QuadPart / (double)clck->freq_.QuadPart;
+    return sec;
 }

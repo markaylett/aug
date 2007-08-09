@@ -3,31 +3,31 @@
 */
 
 #include "augsys/errinfo.h"
+#include "augsys/time.h"
 
 #include <errno.h>  /* ENOMEM */
 #include <stdlib.h> /* malloc() */
-#include <time.h>
 
 struct aug_clock_ {
-    clock_t start_;
+    struct timeval start_;
 };
 
 AUGUTIL_API aug_clock_t
 aug_createclock(void)
 {
     aug_clock_t clck = malloc(sizeof(struct aug_clock_));
-	if (!clck) {
+    if (!clck) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
-		return NULL;
+        return NULL;
     }
 
-    if (-1 == (clck->start_ = clock())) {
+    if (-1 == aug_gettimeofday(&clck->start_, NULL)) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         free(clck);
         return NULL;
     }
 
-	return clck;
+    return clck;
 }
 
 AUGUTIL_API int
@@ -41,7 +41,7 @@ aug_destroyclock(aug_clock_t clck)
 AUGUTIL_API int
 aug_resetclock(aug_clock_t clck)
 {
-    if (-1 == (clck->start_ = clock())) {
+    if (-1 == aug_gettimeofday(&clck->start_, NULL)) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
@@ -49,14 +49,14 @@ aug_resetclock(aug_clock_t clck)
 }
 
 AUGUTIL_API double*
-aug_elapsed(aug_clock_t clck, double* secs)
+aug_elapsed(aug_clock_t clck, double* sec)
 {
-    clock_t now = clock();
-    if (-1 == now) {
+    struct timeval now;
+    if (-1 == aug_gettimeofday(&now, NULL)) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;
     }
-    now -= clck->start_;
-    *secs = (double)now / (double)CLOCKS_PER_SEC;
-    return secs;
+    aug_tvsub(&now, &clck->start_);
+    *sec = (double)now.tv_sec + ((double)now.tv_usec / 1000000.0);
+    return sec;
 }

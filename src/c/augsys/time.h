@@ -52,9 +52,6 @@ aug_mstotv(struct timeval* tv, unsigned ms);
 AUGSYS_API unsigned
 aug_tvtoms(const struct timeval* tv);
 
-AUGSYS_API unsigned long
-aug_tvtousec(const struct timeval* tv);
-
 AUGSYS_API struct timeval*
 aug_tvadd(struct timeval* dst, const struct timeval* src);
 

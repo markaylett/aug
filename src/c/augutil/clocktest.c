@@ -26,20 +26,20 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    /* Sleep for 2 ms. */
+    /* Sleep for 500 ms. */
 
-    aug_msleep(2);
-
-    /* 1ms tollerance. */
+    aug_msleep(500);
 
     if (!aug_elapsed(clck, &stop)) {
         aug_perrinfo(NULL, "aug_elapsed() failed");
         return 1;
     }
 
-    if (stop - start < 0.001 || 0.003 < stop - start) {
-        aug_error("unexpected interval: start=%0.6f, stop=%0.6f",
-                  start, stop);
+    /* Allow 20ms tollerance. */
+
+    stop -= start;
+    if (stop < 0.48 || 0.52 < stop) {
+        aug_error("unexpected interval: stop=%0.6f", stop);
         return 1;
     }
 
