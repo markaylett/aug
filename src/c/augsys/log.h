@@ -44,6 +44,13 @@ aug_setlogger(aug_logger_t logger);
 AUGSYS_API int
 aug_loglevel(void);
 
+/**
+   Get logger.
+*/
+
+AUGSYS_API aug_logger_t
+aug_logger(void);
+
 AUGSYS_API int
 aug_vwritelog(int loglevel, const char* format, va_list args);
 

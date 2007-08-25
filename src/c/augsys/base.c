@@ -54,7 +54,7 @@ retain_(void)
 #define BLOCKSIZE_ 256
 
 struct file_ {
-    size_t refs_;
+    size_t refs_;   /* number of references held. */
     const struct aug_fdtype* fdtype_;
 };
 
@@ -281,7 +281,7 @@ aug_loglevel_(aug_logger_t* logger)
     int loglevel;
     aug_lock();
     loglevel = loglevel_;
-    if (logger)
+    if (logger) /* optional */
         *logger = logger_;
     aug_unlock();
     return loglevel;

@@ -64,6 +64,14 @@ aug_loglevel(void)
     return aug_loglevel_(NULL);
 }
 
+AUGSYS_API aug_logger_t
+aug_logger(void)
+{
+    aug_logger_t logger;
+    aug_loglevel_(&logger);
+    return logger ? logger : aug_stdiologger;
+}
+
 AUGSYS_API int
 aug_vwritelog(int loglevel, const char* format, va_list args)
 {
