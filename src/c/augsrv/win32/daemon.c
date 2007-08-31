@@ -5,11 +5,12 @@
 #include "augsrv/options.h"
 
 #include "augutil/event.h"
-#include "augutil/path.h" /* aug_gethome(), aug_gettmp() */
+#include "augutil/path.h"   /* aug_gethome(), aug_gettmp() */
 
 #include "augsys/errinfo.h"
 #include "augsys/limits.h"
 #include "augsys/log.h"
+#include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h"
 
 #include <assert.h>
