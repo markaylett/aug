@@ -3,9 +3,9 @@
 */
 #include "augsys/errinfo.h"
 #include "augsys/lock.h"
+#include "augsys/log.h"
 
 #include <fcntl.h>
-#include <stdlib.h> /* getenv() */
 #include <time.h>   /* tzset() */
 #include <unistd.h>
 
@@ -89,7 +89,6 @@ static struct aug_fdtype fdtype_ = {
 AUGSYS_API int
 aug_init(struct aug_errinfo* errinfo)
 {
-    const char* loglevel;
     int ret = retain_();
     if (PROCEED_ != ret)
         return ret;
@@ -106,8 +105,7 @@ aug_init(struct aug_errinfo* errinfo)
         return -1;
     }
 
-    if ((loglevel = getenv("AUG_LOGLEVEL")))
-        aug_setloglevel_(atoi(loglevel));
+    aug_initlog_();
 
     return 0;
 }
@@ -119,7 +117,7 @@ aug_term(void)
     if (PROCEED_ != ret)
         return ret;
 
-    aug_setlogger_(NULL);
+    aug_termlog_();
 
     if (-1 == aug_termerrinfo_()) {
         aug_termlock_();

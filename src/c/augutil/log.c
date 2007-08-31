@@ -9,6 +9,7 @@ AUG_RCSID("$Id$");
 
 #include "augsys/errinfo.h"
 #include "augsys/lock.h"
+#include "augsys/log.h"
 #include "augsys/time.h"
 #include "augsys/unistd.h"  /* write() */
 #include "augsys/utility.h" /* aug_threadid() */

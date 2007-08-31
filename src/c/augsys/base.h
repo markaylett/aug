@@ -19,34 +19,6 @@ struct aug_fdtype {
     int (*setnonblock_)(int, int);
 };
 
-#if defined(AUGSYS_BUILD)
-
-/**
-   Set log-level.
-
-   \return previous log-level.
- */
-
-AUG_EXTERNC int
-aug_setloglevel_(int loglevel);
-
-/**
-   Set logger.
-
-   \return previous logger.
- */
-
-AUG_EXTERNC aug_logger_t
-aug_setlogger_(aug_logger_t logger);
-
-/**
-   Obtain logger information.
-*/
-
-AUG_EXTERNC int
-aug_loglevel_(aug_logger_t* logger);
-#endif /* AUGSYS_BUILD */
-
 /**
    Initialise use of aug libraries.
 

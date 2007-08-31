@@ -3,6 +3,7 @@
 */
 #include "augsys/errinfo.h"
 #include "augsys/lock.h"
+#include "augsys/log.h"
 
 #include <io.h>
 #include <time.h> /* tzset() */
@@ -80,7 +81,6 @@ AUGSYS_API int
 aug_init(struct aug_errinfo* errinfo)
 {
     WSADATA data;
-    const char* loglevel;
     int err, ret = retain_();
 
     if (PROCEED_ != ret)
@@ -102,8 +102,7 @@ aug_init(struct aug_errinfo* errinfo)
         return -1;
     }
 
-    if ((loglevel = getenv("AUG_LOGLEVEL")))
-        aug_setloglevel_(atoi(loglevel));
+    aug_initlog_();
 
     return 0;
 }
@@ -115,7 +114,7 @@ aug_term(void)
     if (PROCEED_ != ret)
         return ret;
 
-    aug_setlogger_(NULL);
+    aug_termlog_();
 
     if (SOCKET_ERROR == WSACleanup()) {
         aug_setwin32errno(WSAGetLastError());

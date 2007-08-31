@@ -28,15 +28,4 @@ typedef unsigned __int64 uint64_t;
 
 typedef unsigned aug_len_t;
 
-enum aug_loglevel {
-    AUG_LOGCRIT,
-    AUG_LOGERROR,
-    AUG_LOGWARN,
-    AUG_LOGNOTICE,
-    AUG_LOGINFO,
-    AUG_LOGDEBUG0
-};
-
-typedef int (*aug_logger_t)(int, const char*, va_list);
-
 #endif /* AUGSYS_TYPES_H */

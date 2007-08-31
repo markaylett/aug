@@ -6,9 +6,7 @@
 
 #include "augutil/config.h"
 
-#include "augsys/types.h"
-
-#include <stdarg.h>
+#include "augsys/types.h" /* size_t */
 
 AUGUTIL_API const char*
 aug_loglabel(int loglevel);

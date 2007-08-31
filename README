@@ -7,20 +7,3 @@ MinGW Build:
    a) "cygwin build for mingw host" is selected as the compiler toolset.
    b) where unavailable, python, ruby and ssl support are disabled.
 3. Run the resulting config.sh, to configure.
-
-Cyclic Dependencies
-
-Care must be taken not to introduce cyclic dependencies, especially between:
-
-utility -> log -> base -> errinfo -> string
-
-utility - aug_perrinfo() and aug_perror() are placed here to break cycles
-between the remaining components.
-
-log - loglevel is intialised in aug_init() and protected by aug_lock().
-
-base - uses aug_seterrinfo().
-
-errinfo - uses aug_strerror().
-
-string - lowest level component.

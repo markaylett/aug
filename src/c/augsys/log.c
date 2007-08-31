@@ -7,7 +7,6 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/base.h" /* aug_loglevel() */
 #include "augsys/lock.h"
 
 #if defined(_WIN32)
@@ -17,10 +16,31 @@ AUG_RCSID("$Id$");
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h> /* getenv() */
 
 #if defined(_WIN32)
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
+
+static int loglevel_ = AUG_LOGINFO;
+static aug_logger_t logger_ = aug_stdiologger;
+
+AUG_EXTERNC int
+aug_initlog_(void)
+{
+    const char* s = getenv("AUG_LOGLEVEL");
+    if (s)
+        loglevel_ = atoi(s);
+    return 0;
+}
+
+AUG_EXTERNC int
+aug_termlog_(void)
+{
+    loglevel_ = AUG_LOGINFO;
+    logger_ = aug_stdiologger;
+    return 0;
+}
 
 AUGSYS_API int
 aug_stdiologger(int loglevel, const char* format, va_list args)
@@ -48,44 +68,59 @@ aug_stdiologger(int loglevel, const char* format, va_list args)
 AUGSYS_API int
 aug_setloglevel(int loglevel)
 {
-    return aug_setloglevel_(loglevel);
+    int prev;
+    aug_lock();
+    prev = loglevel_;
+    loglevel_ = loglevel;
+    aug_unlock();
+    return prev;
 }
 
 AUGSYS_API aug_logger_t
 aug_setlogger(aug_logger_t logger)
 {
-    logger = aug_setlogger_(logger);
-    return logger ? logger : aug_stdiologger;
+    aug_logger_t prev;
+    if (!logger)
+        logger = aug_stdiologger;
+
+    aug_lock();
+    prev = logger_;
+    logger_ = logger;
+    aug_unlock();
+    return prev;
 }
 
 AUGSYS_API int
 aug_loglevel(void)
 {
-    return aug_loglevel_(NULL);
+    int loglevel;
+    aug_lock();
+    loglevel = loglevel_;
+    aug_unlock();
+    return loglevel;
 }
 
 AUGSYS_API aug_logger_t
 aug_logger(void)
 {
     aug_logger_t logger;
-    aug_loglevel_(&logger);
-    return logger ? logger : aug_stdiologger;
+    aug_lock();
+    logger = logger_;
+    aug_unlock();
+    return logger;
 }
 
 AUGSYS_API int
 aug_vwritelog(int loglevel, const char* format, va_list args)
 {
-    aug_logger_t logger;
+    aug_logger_t logger = NULL;
     assert(format);
-    if (aug_loglevel_(&logger) < loglevel)
-        return 0;
+    aug_lock();
+    if (loglevel <= loglevel_)
+        logger = logger_;
+    aug_unlock();
 
-    /* Fallback to default. */
-
-    if (!logger)
-        logger = aug_stdiologger;
-
-    return (*logger)(loglevel, format, args);
+    return logger ? (*logger)(loglevel, format, args) : 0;
 }
 
 AUGSYS_API int

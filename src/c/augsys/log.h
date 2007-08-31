@@ -5,11 +5,33 @@
 #define AUGSYS_LOG_H
 
 #include "augsys/config.h"
-#include "augsys/types.h"
+
+#include <stdarg.h>
 
 /**
    All functions in this module set errno, and not errinfo.
 */
+
+enum aug_loglevel {
+    AUG_LOGCRIT,
+    AUG_LOGERROR,
+    AUG_LOGWARN,
+    AUG_LOGNOTICE,
+    AUG_LOGINFO,
+    AUG_LOGDEBUG0
+};
+
+typedef int (*aug_logger_t)(int, const char*, va_list);
+
+#if defined(AUGSYS_BUILD)
+
+AUG_EXTERNC int
+aug_initlog_(void);
+
+AUG_EXTERNC int
+aug_termlog_(void);
+
+#endif /* AUGSYS_BUILD */
 
 AUGSYS_API int
 aug_stdiologger(int loglevel, const char* format, va_list args);
