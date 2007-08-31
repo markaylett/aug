@@ -16,9 +16,10 @@ AUG_RCSID("$Id$");
 #include "augsys/errinfo.h"
 #include "augsys/string.h"
 #include "augsys/unistd.h"
+#include "augsys/utility.h" /* AUG_PERROR() */
 
 #include <errno.h>
-#include <stdio.h>         /* fflush() */
+#include <stdio.h>          /* fflush() */
 #include <fcntl.h>
 
 #if !defined(STDOUT_FILENO)

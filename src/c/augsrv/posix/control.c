@@ -8,12 +8,13 @@
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/string.h"
+#include "augsys/utility.h" /* AUG_PERROR() */
 
 #include <sys/types.h>
 #include <errno.h>
-#include <fcntl.h>         /* struct flock */
-#include <signal.h>        /* kill() */
-#include <strings.h>       /* bzero() */
+#include <fcntl.h>          /* struct flock */
+#include <signal.h>         /* kill() */
+#include <strings.h>        /* bzero() */
 #include <unistd.h>
 
 #define VERIFYCLOSE_(x) \

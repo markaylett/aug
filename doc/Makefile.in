@@ -505,6 +505,11 @@ gif:
 		(cd $(top_srcdir)/src/c && \
 			../pl/dotdepend -I. `find $$l -name "*.c"`) \
 			| dot -Tgif >$$l.gif; \
+	done;
+	for l in augsyspp augmarpp augutilpp augsrvpp augnetpp; do \
+		(cd $(top_srcdir)/src/cpp && \
+			../pl/dotdepend -I. `find $$l -name "*.cpp"`) \
+			| dot -Tgif >$$l.gif; \
 	done
 
 modsample.cpp: daugintro.w

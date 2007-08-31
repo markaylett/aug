@@ -8,6 +8,7 @@
 
 #include "augsyspp/exception.hpp"
 #include "augsyspp/time.hpp"
+#include "augsyspp/utility.hpp" // perrinfo()
 
 #include "augutil/clock.h"
 

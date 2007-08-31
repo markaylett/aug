@@ -7,17 +7,18 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsrv/base.h"   /* aug_basename() */
+#include "augsrv/base.h"    /* aug_basename() */
 
-#include "augutil/path.h"  /* aug_basename() */
+#include "augutil/path.h"   /* aug_basename() */
 #include "augutil/getopt.h"
 
-#include "augsys/defs.h"   /* AUG_MKSTR */
+#include "augsys/defs.h"    /* AUG_MKSTR */
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/string.h"
+#include "augsys/utility.h" /* aug_perrinfo() */
 
-#include <stdio.h>         /* EOF */
+#include <stdio.h>          /* EOF */
 #include <string.h>
 
 static void

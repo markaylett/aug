@@ -7,7 +7,9 @@
 #include "augsyspp/errinfo.hpp"
 #include "augsyspp/types.hpp"
 
-#include <cstring> // memcpy()
+#include "augsys/utility.h" // aug_perrinfo()
+
+#include <cstring>          // memcpy()
 #include <exception>
 
 namespace aug {
@@ -199,15 +201,15 @@ namespace aug {
 #define AUG_PERRINFOCATCH                                               \
     catch (const aug::errinfo_error& e) {                               \
         e.seterrinfo();                                                 \
-        aug::perrinfo(e, "aug::errinfo_error");                         \
+        aug_perrinfo(&e.errinfo(), "aug::errinfo_error");               \
     } catch (const std::exception& e) {                                 \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
                        AUG_ECXX, e.what());                             \
-        aug::perrinfo("std::exception");                                \
+        aug_perrinfo(0, "std::exception");                              \
     } catch (...) {                                                     \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
                        AUG_ECXX, "no description available");           \
-        aug::perrinfo("unknown");                                       \
+        aug_perrinfo(0, "unknown");                                     \
     } do { } while (0)
 
 #define AUG_SETERRINFOCATCH                                             \

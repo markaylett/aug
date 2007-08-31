@@ -8,6 +8,7 @@
 
 #include "augsyspp/errinfo.hpp"
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp" // perrinfo()
 
 #include "augutil/var.h"
 

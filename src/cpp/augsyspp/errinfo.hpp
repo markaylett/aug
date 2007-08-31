@@ -10,22 +10,6 @@
 
 namespace aug {
 
-    /**
-       perrinfo() can be safely called from destructors and catch blocks.
-    */
-
-    inline int
-    perrinfo(const char* s) AUG_NOTHROW
-    {
-        return aug_perrinfo(0, s);
-    }
-
-    inline int
-    perrinfo(const aug_errinfo& errinfo, const char* s) AUG_NOTHROW
-    {
-        return aug_perrinfo(&errinfo, s);
-    }
-
     inline const char*
     errfile(const aug_errinfo& errinfo)
     {

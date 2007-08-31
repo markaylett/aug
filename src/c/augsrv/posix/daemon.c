@@ -10,18 +10,19 @@
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/string.h"
+#include "augsys/utility.h" /* AUG_PERROR() */
 
 #include <assert.h>
 #if HAVE_ALLOCA_H
 # include <alloca.h>
 #endif /* HAVE_ALLOCA_H */
-#include <fcntl.h>         /* struct flock */
-#include <math.h>          /* log10() */
-#include <stdio.h>         /* snprintf() */
-#include <strings.h>       /* bzero() */
-#include <unistd.h>        /* getdtablesize() */
-#include <sys/types.h>     /* umask() */
-#include <sys/stat.h>      /* umask() */
+#include <fcntl.h>          /* struct flock */
+#include <math.h>           /* log10() */
+#include <stdio.h>          /* snprintf() */
+#include <strings.h>        /* bzero() */
+#include <unistd.h>         /* getdtablesize() */
+#include <sys/types.h>      /* umask() */
+#include <sys/stat.h>       /* umask() */
 
 #define VERIFYCLOSE_(x) \
     AUG_PERROR(close(x), "close() failed")

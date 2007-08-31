@@ -7,6 +7,7 @@
 #include "augsrvpp/config.hpp"
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp" // perrinfo()
 
 #include "augsrv/signal.h"
 

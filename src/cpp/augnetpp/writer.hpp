@@ -5,6 +5,7 @@
 #define AUGNETPP_WRITER_HPP
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp" // perrinfo()
 
 #include "augnet/writer.h"
 

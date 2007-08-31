@@ -12,8 +12,9 @@
 #include "augmarpp/types.hpp"
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp" // perrinfo()
 
-#include <algorithm> // swap()
+#include <algorithm>            // swap()
 
 namespace aug {
 

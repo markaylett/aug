@@ -16,6 +16,7 @@ AUG_RCSID("$Id$");
 
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
+#include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h" /* GetStdHandle() */
 
 #include <assert.h>

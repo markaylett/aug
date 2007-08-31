@@ -11,6 +11,7 @@ AUG_RCSID("$Id$");
 #include "augsys/debug.h"
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
+#include "augsys/utility.h" /* aug_perrinfo() */
 
 #include <stdlib.h>
 #include <string.h>

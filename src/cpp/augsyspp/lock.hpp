@@ -5,6 +5,7 @@
 #define AUGSYSPP_LOCK_HPP
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp" // perrinfo()
 
 #include "augsys/lock.h"
 #include "augsys/mutex.h"

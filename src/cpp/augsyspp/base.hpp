@@ -9,8 +9,9 @@
 
 #include "augsys/base.h"
 #include "augsys/errno.h"
-#include "augsys/string.h" // aug_perror()
+#include "augsys/string.h" // aug_strerror()
 
+#include <iostream>
 #include <stdexcept>
 
 namespace aug {
@@ -105,7 +106,7 @@ namespace aug {
         ~scoped_init() AUG_NOTHROW
         {
             if (-1 == aug_term())
-                aug_perror("aug_term() failed");
+                std::cerr << "aug_term() failed\n";
         }
         explicit
         scoped_init(aug_errinfo& errinfo)

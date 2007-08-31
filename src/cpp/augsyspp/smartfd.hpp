@@ -6,8 +6,9 @@
 
 #include "augsyspp/base.hpp"
 #include "augsyspp/types.hpp"
+#include "augsyspp/utility.hpp" // perrinfo()
 
-#include <algorithm> // swap()
+#include <algorithm>            // swap()
 
 namespace aug {
 

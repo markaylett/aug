@@ -7,11 +7,12 @@
 
 AUG_RCSID("$Id$");
 
+#include "augsys/base.h"
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/lock.h"
 #include "augsys/time.h"
-#include "augsys/base.h"
+#include "augsys/utility.h" /* aug_perrinfo() */
 
 #include <stdlib.h>
 

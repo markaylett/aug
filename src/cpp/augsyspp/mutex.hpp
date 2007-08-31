@@ -5,6 +5,7 @@
 #define AUGSYSPP_MUTEX_HPP
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp" // perrinfo()
 
 #include "augsys/mutex.h"
 
