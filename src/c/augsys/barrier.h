@@ -6,47 +6,51 @@
 
 #include "augsys/lock.h"
 
-/**
-   Portable memory barrier implemented in terms of mutex lock.
-*/
-
-#define AUG_MB()                                \
-    do {                                        \
-        aug_lock();                             \
-        aug_unlock();                           \
+#if !ENABLE_THREADS
+# define AUG_MB()
+#else /* ENABLE_THREADS */
+# if defined(__GNUC__)
+#  if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)
+#   define AUG_MB() __sync_synchronize()
+#  elif defined(__PPC__)
+#   define AUG_MB() __asm__ __volatile__("sync":::"memory")
+#  elif defined(__i386__) || defined(__i486__) || defined(__i586__) \
+    || defined(__i686__) || defined(__x86_64__)
+#   define AUG_MB()  __asm__ __volatile__("mfence":::"memory")
+#   define AUG_RMB() __asm__ __volatile__("lfence":::"memory")
+#   define AUG_WMB() __asm__ __volatile__("sfence":::"memory")
+#  else
+#   define AUG_MB()                               \
+    do {                                          \
+        aug_lock();                               \
+        aug_unlock();                             \
     } while (0)
+#  endif
+# elif defined(_MSC_VER)
+#  if (_MSC_VER >= 1400)
+#   include <intrin.h>
+#  else /* _MSC_VER < 1400 */
+AUG_EXTERNC void _ReadWriteBarrier(void);
+#  endif /* _MSC_VER < 1400 */
+#  pragma intrinsic(_ReadWriteBarrier)
+# elif defined(__APPLE__) || defined(__MACH__)
+#  include <libkern/OSAtomic.h>
+#  define AUG_MB() OSMemoryBarrier()
+# else
+#  define AUG_MB()                               \
+    do {                                         \
+        aug_lock();                              \
+        aug_unlock();                            \
+    } while (0)
+# endif
+#endif/* ENABLE_THREADS */
 
-#define AUG_RMB AUG_MB
-#define AUG_WMB AUG_MB
+#if !defined(AUG_RMB)
+# define AUG_RMB AUG_MB
+#endif /* !AUG_RMB */
 
-/**
-   Possible specializations for GCC.
-*/
-
-#if 0
-
-/* GCC/UP */
-
-#define AUG_MB()                                \
-    __asm__ __volatile__("":::"memory")
-
-#define AUG_RMB()                               \
-    __asm__ __volatile__("":::"memory")
-
-#define AUG_WMB()                               \
-    __asm__ __volatile__("":::"memory")
-
-/* GCC/MP */
-
-#define AUG_MB()                                \
-    __asm__ __volatile__("mfence":::"memory")
-
-#define AUG_RMB()                               \
-    __asm__ __volatile__("lfence":::"memory")
-
-#define AUG_WMB()                               \
-    __asm__ __volatile__("sfence":::"memory")
-
-#endif /* 0 */
+#if !defined(AUG_WMB)
+# define AUG_WMB AUG_MB
+#endif /* !AUG_WMB */
 
 #endif /* AUGSYS_BARRIER_H */

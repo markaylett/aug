@@ -27,7 +27,7 @@
 # define AUG_RCSID(x)                           \
     static const char rcsid[] = x
 #else /* __GNUC__ */
-# define AUG_RCSID(x)                                       \
+# define AUG_RCSID(x)                                   \
     static const char rcsid[] __attribute__((used)) = x
 #endif /* __GNUC__ */
 

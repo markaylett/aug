@@ -44,8 +44,8 @@ static struct aug_errinfo*
 geterrinfo_(void)
 {
     void* errinfo;
-    if (!init_ || -1 == aug_gettlsvalue_(tlskey_, &errinfo))
-        return NULL;
+    if (-1 == aug_gettlsvalue_(tlskey_, &errinfo))
+        errinfo = NULL;
 
     return errinfo;
 }
@@ -86,11 +86,6 @@ aug_termerrinfo_(void)
 AUGSYS_API int
 aug_initerrinfo(struct aug_errinfo* errinfo)
 {
-    if (!init_) {
-        errno = EINVAL;
-        return -1;
-    }
-
     if (-1 == aug_settlsvalue_(tlskey_, errinfo))
         return -1;
 
