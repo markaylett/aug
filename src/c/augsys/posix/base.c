@@ -3,7 +3,6 @@
 */
 #include "augsys/errinfo.h"
 #include "augsys/lock.h"
-#include "augsys/log.h"
 
 #include <fcntl.h>
 #include <stdlib.h> /* getenv() */

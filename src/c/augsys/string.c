@@ -17,8 +17,6 @@ AUG_RCSID("$Id$");
 # define strncasecmp _strnicmp
 #endif /* _WIN32 */
 
-#include "augsys/log.h"
-
 #include <ctype.h>
 #include <errno.h>
 
@@ -29,12 +27,6 @@ aug_memfrob(void* dst, size_t size)
     while (size)
         ptr[--size] ^= 42;
     return dst;
-}
-
-AUGSYS_API int
-aug_perror(const char* s)
-{
-    return aug_error("%s: %s", s, aug_strerror(errno));
 }
 
 AUGSYS_API size_t

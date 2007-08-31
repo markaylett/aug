@@ -7,8 +7,16 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
+struct aug_errinfo;
+
 AUGSYS_API int
 aug_filesize(int fd, size_t* size);
+
+AUGSYS_API int
+aug_perrinfo(const struct aug_errinfo* errinfo, const char* s);
+
+AUGSYS_API int
+aug_perror(const char* s);
 
 AUGSYS_API long
 aug_rand(void);
@@ -26,5 +34,11 @@ aug_setnonblock(int fd, int on);
 
 AUGSYS_API unsigned
 aug_threadid(void);
+
+#define AUG_PERROR(x, s) \
+do { \
+    if (-1 == x) \
+        aug_perror(s); \
+} while (0)
 
 #endif /* AUGSYS_UTILITY_H */

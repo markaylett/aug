@@ -18,9 +18,6 @@ aug_strerror(int errnum);
 AUGSYS_API void*
 aug_memfrob(void* dst, size_t size);
 
-AUGSYS_API int
-aug_perror(const char* s);
-
 AUGSYS_API size_t
 aug_strlcpy(char* dst, const char* src, size_t size);
 
@@ -32,11 +29,5 @@ aug_strncasecmp(const char* lhs, const char* rhs, size_t size);
 
 AUGSYS_API const char*
 aug_strcasestr(const char* haystack, const char* needle);
-
-#define AUG_PERROR(x, s) \
-do { \
-    if (-1 == x) \
-        aug_perror(s); \
-} while (0)
 
 #endif /* AUGSYS_STRING_H */

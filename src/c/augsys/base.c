@@ -391,8 +391,6 @@ aug_releasefd(int fd)
     /* The prev structure now contains the state of the file prior to the
        release operation (including ref count). */
 
-    AUG_DEBUG3("aug_releasefd(): fd=[%d], refs=[%d]", fd, prev.refs_ - 1);
-
     if (1 < prev.refs_ || !prev.fdtype_->close_)
         return  0;
 

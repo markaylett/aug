@@ -8,7 +8,6 @@
 AUG_RCSID("$Id$");
 
 #include "augsys/errno.h"
-#include "augsys/log.h"
 #include "augsys/string.h"
 
 #include <stdio.h>
@@ -32,24 +31,6 @@ vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line, int src,
     if (0 > vsnprintf(errinfo->desc_, sizeof(errinfo->desc_), format, args))
         aug_strlcpy(errinfo->desc_, "no message: bad format",
                     sizeof(errinfo->desc_));
-}
-
-static void
-vwritelog_(const char* file, int line, int src, int num, const char* format,
-           va_list args)
-{
-    struct aug_errinfo errinfo;
-
-    aug_strlcpy(errinfo.file_, file, sizeof(errinfo.file_));
-    errinfo.line_ = line;
-    errinfo.src_ = src;
-    errinfo.num_ = num;
-
-    if (0 > vsnprintf(errinfo.desc_, sizeof(errinfo.desc_), format, args))
-        aug_strlcpy(errinfo.desc_, "no message: bad format",
-                    sizeof(errinfo.desc_));
-
-    aug_error("%s: %d: %s", errinfo.file_, (int)errinfo.line_, errinfo.desc_);
 }
 
 #if ENABLE_THREADS
@@ -155,8 +136,6 @@ aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 {
     if (errinfo || (errinfo = geterrinfo_()))
         vseterrinfo_(errinfo, file, line, src, num, format, args);
-    else
-        vwritelog_(file, line, src, num, format, args);
     return num;
 }
 
@@ -219,30 +198,6 @@ aug_iserrinfo(const struct aug_errinfo* errinfo, int src, int num)
     if (!errinfo)
         errinfo = geterrinfo_();
     return errinfo && errinfo->src_ == src && errinfo->num_ == num;
-}
-
-AUGSYS_API int
-aug_perrinfo(const struct aug_errinfo* errinfo, const char* s)
-{
-    const char* file;
-    if ((!errinfo && !(errinfo = geterrinfo_())) || 0 == errinfo->num_) {
-        aug_error("%s: no description available", s);
-        return 0;
-    }
-
-    for (file = errinfo->file_;; ++file)
-        switch (*file) {
-        case '.':
-        case '/':
-        case '\\':
-            break;
-        default:
-            goto done;
-        }
- done:
-    return aug_error("%s: [src=%d, num=0x%.8x (%d)] %s at %s line %d.", s,
-                     errinfo->src_, (int)errinfo->num_, (int)errinfo->num_,
-                     errinfo->desc_, file, (int)errinfo->line_);
 }
 
 AUGSYS_API const struct aug_errinfo*

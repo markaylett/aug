@@ -14,6 +14,42 @@ AUG_RCSID("$Id$");
 #endif /* _WIN32 */
 
 #include "augsys/base.h"
+#include "augsys/errinfo.h"
+#include "augsys/log.h"
+#include "augsys/string.h" /* aug_strerror() */
+
+AUGSYS_API int
+aug_perrinfo(const struct aug_errinfo* errinfo, const char* s)
+{
+    const char* file;
+    if (!errinfo)
+        errinfo = aug_geterrinfo();
+
+    if (0 == errinfo->num_) {
+        aug_error("%s: no description available", s);
+        return 0;
+    }
+
+    for (file = errinfo->file_;; ++file)
+        switch (*file) {
+        case '.':
+        case '/':
+        case '\\':
+            break;
+        default:
+            goto done;
+        }
+ done:
+    return aug_error("%s: [src=%d, num=0x%.8x (%d)] %s at %s line %d.", s,
+                     errinfo->src_, (int)errinfo->num_, (int)errinfo->num_,
+                     errinfo->desc_, file, (int)errinfo->line_);
+}
+
+AUGSYS_API int
+aug_perror(const char* s)
+{
+    return aug_error("%s: %s", s, aug_strerror(errno));
+}
 
 AUGSYS_API int
 aug_setnonblock(int fd, int on)

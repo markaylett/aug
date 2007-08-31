@@ -96,9 +96,6 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
 AUGSYS_API int
 aug_iserrinfo(const struct aug_errinfo* errinfo, int src, int num);
 
-AUGSYS_API int
-aug_perrinfo(const struct aug_errinfo* errinfo, const char* s);
-
 AUGSYS_API const struct aug_errinfo*
 aug_geterrinfo(void);
 
