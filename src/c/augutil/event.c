@@ -7,6 +7,7 @@
 
 AUG_RCSID("$Id$");
 
+#include "augsys/barrier.h"
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/unistd.h"
@@ -84,12 +85,16 @@ aug_readevent(int fd, struct aug_event* event)
 {
     if (-1 == readall_(fd, (char*)event, sizeof(*event)))
         return NULL;
+    /* Ensure writes are visible. */
+    AUG_RMB();
     return event;
 }
 
 AUGUTIL_API const struct aug_event*
 aug_writeevent(int fd, const struct aug_event* event)
 {
+    /* Flush pending writes to main memory. */
+    AUG_WMB();
     if (-1 == writeall_(fd, (const char*)event, sizeof(*event)))
         return NULL;
     return event;

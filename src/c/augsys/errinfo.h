@@ -65,14 +65,18 @@ struct aug_errinfo {
 */
 
 #if defined(AUGSYS_BUILD)
-AUG_EXTERNC int
+AUG_EXTERNC struct aug_errinfo*
 aug_initerrinfo_(struct aug_errinfo* errinfo);
 
 AUG_EXTERNC int
 aug_termerrinfo_(void);
 #endif /* AUGSYS_BUILD */
 
-AUGSYS_API int
+/**
+   Initialise errinfo for secondary thread.
+*/
+
+AUGSYS_API struct aug_errinfo*
 aug_initerrinfo(struct aug_errinfo* errinfo);
 
 AUGSYS_API int

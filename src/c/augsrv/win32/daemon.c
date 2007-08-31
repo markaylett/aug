@@ -78,53 +78,69 @@ handler_(DWORD code)
 static void WINAPI
 start_(DWORD argc, char** argv)
 {
+    struct aug_errinfo errinfo;
     const char* sname;
     struct aug_options options;
     char home[AUG_PATH_MAX + 1];
 
+    /* Ensure writes performed on main thread are visible. */
+
+    AUG_RMB();
+
+    if (!aug_initerrinfo(&errinfo)) {
+        aug_error("aug_initerrinfo() failed");
+        goto done;
+    }
+
     /* Fallback to tmp. */
 
     if (!aug_gethome(home, sizeof(home))
-        && !aug_gettmp(home, sizeof(home)))
-        return;
+        && !aug_gettmp(home, sizeof(home))) {
+        aug_error("failed to determine home directory");
+        goto done;
+    }
 
     /* Move away from system32. */
 
     if (!SetCurrentDirectory(home)) {
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
-        return;
+        aug_perrinfo(NULL, "SetCurrentDirectory() failed");
+        goto done;
     }
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
-        return;
+        aug_perrinfo(NULL, "getserviceopt() failed");
+        goto done;
     }
 
+    /* aug_readopts() calls aug_error(). */
+
     if (-1 == aug_readopts(&options, argc, argv))
-        return;
+        goto done;
 
     if (AUG_CMDDEFAULT != options.command_) {
 
         /* Commands other than AUG_CMDDEFAULT are invalid in this context. */
 
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
-                       AUG_MSG("invalid argument(s)"));
-        aug_perrinfo(NULL, "failed to read options");
-        return;
+                       AUG_MSG("unexpected command value"));
+        aug_perrinfo(NULL, "invalid options");
+        goto done;
     }
 
     if (-1 == aug_readserviceconf(*options.conffile_
                                   ? options.conffile_ : NULL, 0, 1)) {
         aug_perrinfo(NULL, "aug_readserviceconf() failed");
-        return;
+        goto done;
     }
 
     if (!(ssh_ = RegisterServiceCtrlHandler(sname, handler_))) {
 
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
         aug_perrinfo(NULL, "RegisterServiceCtrlHandler() failed");
-        return;
+        goto done;
     }
 
     setstatus_(SERVICE_START_PENDING);
@@ -133,7 +149,7 @@ start_(DWORD argc, char** argv)
 
         aug_perrinfo(NULL, "aug_initservice() failed");
         setstatus_(SERVICE_STOPPED);
-        return;
+        goto done;
     }
 
     aug_notice("daemon started");
@@ -151,6 +167,12 @@ start_(DWORD argc, char** argv)
        main thread. */
 
     /*aug_termservice();*/
+
+ done:
+
+    /* Flush pending writes to main memory. */
+
+    AUG_WMB();
 }
 
 AUGSRV_API int
@@ -171,6 +193,13 @@ aug_daemonise(void)
 
     table[0].lpServiceName = (char*)sname;
 
+    /* The service control dispatcher creates a new thread to execute the
+       ServiceMain function of the service being started. */
+
+    /* Flush pending writes to main memory. */
+
+    AUG_WMB();
+
     if (!StartServiceCtrlDispatcher(table)) {
 
         DWORD err = GetLastError();
@@ -182,6 +211,9 @@ aug_daemonise(void)
         }
     }
 
+    /* Ensure writes performed on service thread are visible. */
+
+    AUG_RMB();
     aug_termservice();
     return ret;
 }

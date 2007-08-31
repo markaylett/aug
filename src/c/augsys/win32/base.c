@@ -90,7 +90,7 @@ aug_init(struct aug_errinfo* errinfo)
     if (-1 == settimezone_() || -1 == aug_initlock_())
         return -1;
 
-    if (-1 == aug_initerrinfo_(errinfo)) {
+    if (!aug_initerrinfo_(errinfo)) {
         aug_termlock_();
         return -1;
     }

@@ -7,15 +7,15 @@
 #include "augsys/lock.h"
 
 #if !ENABLE_THREADS
-# define AUG_MB()
+# define AUG_MB() /* no-op */
 #else /* ENABLE_THREADS */
 # if defined(__GNUC__)
 #  if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)
-#   define AUG_MB() __sync_synchronize()
+#   define AUG_MB()  __sync_synchronize()
 #  elif defined(__PPC__)
-#   define AUG_MB() __asm__ __volatile__("sync":::"memory")
+#   define AUG_MB()  __asm__ __volatile__("sync":::"memory")
 #  elif defined(__i386__) || defined(__i486__) || defined(__i586__) \
-    || defined(__i686__) || defined(__x86_64__)
+     || defined(__i686__) || defined(__x86_64__)
 #   define AUG_MB()  __asm__ __volatile__("mfence":::"memory")
 #   define AUG_RMB() __asm__ __volatile__("lfence":::"memory")
 #   define AUG_WMB() __asm__ __volatile__("sfence":::"memory")
@@ -45,9 +45,17 @@ AUG_EXTERNC void _ReadWriteBarrier(void);
 # endif
 #endif/* ENABLE_THREADS */
 
+/**
+   If not defined, define read barrier in terms of full barrier.
+*/
+
 #if !defined(AUG_RMB)
 # define AUG_RMB AUG_MB
 #endif /* !AUG_RMB */
+
+/**
+   If not defined, define write barrier in terms of full barrier.
+*/
 
 #if !defined(AUG_WMB)
 # define AUG_WMB AUG_MB

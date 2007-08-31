@@ -50,25 +50,25 @@ geterrinfo_(void)
     return errinfo;
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC struct aug_errinfo*
 aug_initerrinfo_(struct aug_errinfo* errinfo)
 {
     if (init_) {
         errno = EINVAL;
-        return -1;
+        return NULL;
     }
 
     if (-1 == aug_createtlskey_(&tlskey_))
-        return -1;
+        return NULL;
 
     if (-1 == aug_settlsvalue_(tlskey_, errinfo)) {
         aug_destroytlskey_(tlskey_);
-        return -1;
+        return NULL;
     }
 
     memset(errinfo, 0, sizeof(*errinfo));
     init_ = 1;
-    return 0;
+    return errinfo;
 }
 
 AUG_EXTERNC int
@@ -83,14 +83,14 @@ aug_termerrinfo_(void)
     return aug_destroytlskey_(tlskey_);
 }
 
-AUGSYS_API int
+AUGSYS_API struct aug_errinfo*
 aug_initerrinfo(struct aug_errinfo* errinfo)
 {
     if (-1 == aug_settlsvalue_(tlskey_, errinfo))
-        return -1;
+        return NULL;
 
     memset(errinfo, 0, sizeof(*errinfo));
-    return 0;
+    return errinfo;
 }
 
 #else /* !ENABLE_THREADS */
@@ -103,7 +103,7 @@ geterrinfo_(void)
     return errinfo_ ? errinfo_ : 0;
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC struct aug_errinfo*
 aug_initerrinfo_(struct aug_errinfo* errinfo)
 {
     return aug_initerrinfo(errinfo);
@@ -115,12 +115,12 @@ aug_termerrinfo_(void)
     return 0;
 }
 
-AUGSYS_API int
+AUGSYS_API struct aug_errinfo*
 aug_initerrinfo(struct aug_errinfo* errinfo)
 {
     memset(errinfo, 0, sizeof(*errinfo));
     errinfo_ = errinfo;
-    return 0;
+    return errinfo;
 }
 
 #endif /* !ENABLE_THREADS */
