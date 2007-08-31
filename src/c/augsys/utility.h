@@ -35,10 +35,10 @@ aug_setnonblock(int fd, int on);
 AUGSYS_API unsigned
 aug_threadid(void);
 
-#define AUG_PERROR(x, s) \
-do { \
-    if (-1 == x) \
-        aug_perror(s); \
-} while (0)
+#define AUG_PERROR(x, s)                        \
+    do {                                        \
+        if (-1 == x)                            \
+            aug_perror(s);                      \
+    } while (0)
 
 #endif /* AUGSYS_UTILITY_H */

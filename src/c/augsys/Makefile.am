@@ -6,6 +6,7 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
+	barrier.h \
 	base.h \
 	config.h \
 	debug.h \
@@ -37,6 +38,7 @@ noinst_HEADERS = \
 lib_LTLIBRARIES = libaugsys.la
 
 libaugsys_la_SOURCES = \
+	barrier.c \
 	base.c \
 	config.c \
 	debug.c \

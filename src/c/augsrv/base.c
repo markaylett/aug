@@ -9,6 +9,7 @@ AUG_RCSID("$Id$");
 
 #include "augsrv/signal.h"
 
+#include "augsys/barrier.h"
 #include "augsys/base.h"    /* aug_exit() */
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
@@ -23,8 +24,8 @@ AUG_RCSID("$Id$");
 #include <stdlib.h>         /* NULL */
 #include <string.h>         /* memcpy() */
 
-/* No protection is required around these statics: they are only set once,
-   from aug_main().
+/* No protection is required around these statics: they are set once from
+   aug_main().
 
    On Windows, the Service Manager calls the service entry point on a separate
    thread: automatic variables on the main thread's stack will not be visible

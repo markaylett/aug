@@ -4,6 +4,7 @@
 #ifndef AUGSYS_H
 #define AUGSYS_H
 
+#include "augsys/barrier.h"
 #include "augsys/base.h"
 #include "augsys/debug.h"
 #include "augsys/defs.h"

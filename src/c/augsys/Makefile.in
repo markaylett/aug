@@ -63,10 +63,11 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES =
-am_libaugsys_la_OBJECTS = base.lo config.lo debug.lo defs.lo dlfcn.lo \
-	endian.lo errinfo.lo errno.lo limits.lo lock.lo log.lo \
-	mcast.lo mmap.lo mutex.lo muxer.lo socket.lo string.lo time.lo \
-	types.lo uio.lo unistd.lo utility.lo windows.lo tls_.lo
+am_libaugsys_la_OBJECTS = barrier.lo base.lo config.lo debug.lo \
+	defs.lo dlfcn.lo endian.lo errinfo.lo errno.lo limits.lo \
+	lock.lo log.lo mcast.lo mmap.lo mutex.lo muxer.lo socket.lo \
+	string.lo time.lo types.lo uio.lo unistd.lo utility.lo \
+	windows.lo tls_.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_augsys_basetest_OBJECTS = basetest.$(OBJEXT)
 augsys_basetest_OBJECTS = $(am_augsys_basetest_OBJECTS)
@@ -262,6 +263,7 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
+	barrier.h \
 	base.h \
 	config.h \
 	debug.h \
@@ -292,6 +294,7 @@ noinst_HEADERS = \
 
 lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
+	barrier.c \
 	base.c \
 	config.c \
 	debug.c \
@@ -464,6 +467,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/barrier.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/basetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
