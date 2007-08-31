@@ -9,18 +9,19 @@ AUG_RCSID("$Id$");
 
 #include "augsrv/signal.h"
 
-#include "augsys/base.h"   /* aug_exit() */
+#include "augsys/base.h"    /* aug_exit() */
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/muxer.h"
-#include "augsys/unistd.h" /* aug_close() */
+#include "augsys/unistd.h"  /* aug_close() */
+#include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h"
 
-#include "augutil/event.h" /* struct aug_event */
+#include "augutil/event.h"  /* struct aug_event */
 
 #include <assert.h>
-#include <stdlib.h>        /* NULL */
-#include <string.h>        /* memcpy() */
+#include <stdlib.h>         /* NULL */
+#include <string.h>         /* memcpy() */
 
 /* No protection is required around these statics: they are only set once,
    from aug_main().
