@@ -7,6 +7,7 @@
 #include "augutil/event.h"
 #include "augutil/path.h"   /* aug_gethome(), aug_gettmp() */
 
+#include "augsys/barrier.h"
 #include "augsys/errinfo.h"
 #include "augsys/limits.h"
 #include "augsys/log.h"
