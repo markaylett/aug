@@ -17,6 +17,9 @@
 /* Define to 1 for ruby support. */
 #undef ENABLE_RUBY
 
+/* Define to 1 for smp support. */
+#undef ENABLE_SMP
+
 /* Define to 1 for ssl support. */
 #undef ENABLE_SSL
 

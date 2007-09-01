@@ -31,7 +31,7 @@ namespace aug {
     inline void
     init(aug_errinfo& errinfo)
     {
-        if (-1 == aug_init(&errinfo))
+        if (!aug_init(&errinfo))
             throw std::runtime_error(detail::join("aug_init() failed",
                                                   aug_strerror(errno)));
     }
@@ -45,7 +45,7 @@ namespace aug {
     inline void
     atexitinit(aug_errinfo& errinfo)
     {
-        if (-1 == aug_atexitinit(&errinfo))
+        if (!aug_atexitinit(&errinfo))
             throw std::runtime_error(detail::join("aug_atexitinit() failed",
                                                   aug_strerror(errno)));
     }

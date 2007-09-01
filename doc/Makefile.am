@@ -16,7 +16,7 @@ EXTRA_DIST = \
 gif:
 	for l in augsys augmar augutil augsrv augnet; do \
 		(cd $(top_srcdir)/src/c && \
-			../pl/dotdepend -I. `find $$l -name "*.c"`) \
+			../pl/dotdepend -I. `find $$l -name "*.c" | grep -v '[.]libs'`) \
 			| dot -Tgif >$$l.gif; \
 	done
 

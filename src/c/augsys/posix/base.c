@@ -86,28 +86,27 @@ static struct aug_fdtype fdtype_ = {
     setnonblock_
 };
 
-AUGSYS_API int
+AUGSYS_API struct aug_errinfo*
 aug_init(struct aug_errinfo* errinfo)
 {
     int ret = retain_();
     if (PROCEED_ != ret)
-        return ret;
+        return errinfo;
 
     /* Set timezone now in case of later chroot(). */
 
     tzset();
 
     if (-1 == aug_initlock_())
-        return -1;
+        return NULL;
 
     if (!aug_initerrinfo_(errinfo)) {
         aug_termlock_();
-        return -1;
+        return NULL;
     }
 
     aug_initlog_();
-
-    return 0;
+    return errinfo;
 }
 
 AUGSYS_API int

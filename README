@@ -7,3 +7,9 @@ MinGW Build:
    a) "cygwin build for mingw host" is selected as the compiler toolset.
    b) where unavailable, python, ruby and ssl support are disabled.
 3. Run the resulting config.sh, to configure.
+
+Thread Safety Classifications
+
+thread-safe
+thread-compatible
+single-only

@@ -82,6 +82,7 @@ my (
     $multicast,
     $python,
     $ruby,
+    $smp,
     $ssl,
     $threads,
     $libtype
@@ -133,6 +134,7 @@ $debug = valueask ("debug build", 'n');
 $multicast = valueask ("multicast support", 'y');
 $python = valueask ("python support", 'n');
 $ruby = valueask ("ruby support", 'n');
+$ssl = valueask ("smp support", 'y');
 $ssl = valueask ("ssl support", 'y');
 $threads = valueask ("thread support", 'y');
 $libtype = listask ("library type", $BOTH, \%LIBTYPE);
@@ -176,6 +178,8 @@ $options .= " \\\n\t--enable-python"
     if is $python;
 $options .= " \\\n\t--enable-ruby"
     if is $ruby;
+$options .= " \\\n\t--disable-smp"
+    unless is $smp;
 $options .= " \\\n\t--disable-ssl"
     unless is $ssl;
 $options .= " \\\n\t--disable-threads"

@@ -8,6 +8,8 @@
 # include "auglocal.h"
 #else /*!HAVE_CONFIG_H */
 
+/* Select reasonable defaults when config is not available. */
+
 # if !defined(ENABLE_MULTICAST)
 #  define ENABLE_MULTICAST 1
 # endif /* !ENABLE_MULTICAST */
@@ -17,6 +19,10 @@
 # endif /* !ENABLE_PYTHON */
 
 /* #undef ENABLE_RUBY */
+
+# if !defined(ENABLE_SMP)
+#  define ENABLE_SMP 1
+# endif /* !ENABLE_SMP */
 
 # if !defined(ENABLE_SSL)
 #  define ENABLE_SSL 1

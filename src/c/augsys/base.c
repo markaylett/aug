@@ -250,18 +250,18 @@ getfdtype_(int fd)
     return files_[fd].fdtype_;
 }
 
-AUGSYS_API int
+AUGSYS_API struct aug_errinfo*
 aug_atexitinit(struct aug_errinfo* errinfo)
 {
-    if (-1 == aug_init(errinfo))
-        return -1;
+    if (!aug_init(errinfo))
+        return NULL;
 
     if (-1 == atexit(term_)) {
         aug_term();
-        return -1;
+        return NULL;
     }
 
-    return 0;
+    return errinfo;
 }
 
 AUGSYS_API void

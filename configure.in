@@ -60,6 +60,19 @@ if test x$enable_ruby = xyes; then
     AC_DEFINE(ENABLE_RUBY, 1, [Define to 1 for ruby support.])
 fi
 
+AC_ARG_ENABLE(smp,
+[  --enable-smp            enable smp support @<:@default=yes@:>@], [
+    case x$enableval in
+        xyes) enable_smp=yes;;
+        xno)  enable_smp=no;;
+        *) AC_MSG_ERROR(bad value $enableval for --enable-smp);;
+    esac
+], [enable_smp=yes])
+AM_CONDITIONAL(ENABLE_SMP, test x$enable_smp = xyes)
+if test x$enable_smp = xyes; then
+    AC_DEFINE(ENABLE_SMP, 1, [Define to 1 for smp support.])
+fi
+
 AC_ARG_ENABLE(ssl,
 [  --enable-ssl            enable ssl support @<:@default=yes@:>@], [
     case x$enableval in

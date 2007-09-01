@@ -30,21 +30,21 @@ struct aug_fdtype {
    formalised to facilitate initialisation from functions such as DllMain.
 */
 
-AUGSYS_API int
+AUGSYS_API struct aug_errinfo*
 aug_init(struct aug_errinfo* errinfo);
 
 /**
    Terminate use of aug libraries.
 
    For safety reasons, aug_term() will re-install the default logger.  The
-   default logger is garaunteed to be safe even if aug_init() has not been
+   default logger is guaranteed to be safe even if aug_init() has not been
    called.  This function sets errno, and not errinfo, on failure.
 */
 
 AUGSYS_API int
 aug_term(void);
 
-AUGSYS_API int
+AUGSYS_API struct aug_errinfo*
 aug_atexitinit(struct aug_errinfo* errinfo);
 
 /**

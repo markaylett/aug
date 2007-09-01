@@ -6,10 +6,10 @@
 
 #include "augsys/lock.h"
 
-#if !ENABLE_THREADS
-/* Prevent any compiler re-ordering. */
+#if !ENABLE_SMP
+/* Prevent compiler re-ordering. */
 # define AUG_MB() __asm__ __volatile__("":::"memory")
-#else /* ENABLE_THREADS */
+#else /* ENABLE_SMP*/
 # if defined(__GNUC__)
 #  if defined(__i386__) || defined(__i486__)
 #   define AUG_MB()  __asm__ __volatile__("lock; addl $0,0(%%esp)":::"memory")
@@ -67,7 +67,7 @@ AUG_EXTERNC void _ReadWriteBarrier(void);
         aug_unlock();                            \
     } while (0)
 # endif
-#endif/* ENABLE_THREADS */
+#endif /* ENABLE_SMP */
 
 /**
    If not defined, define read barrier in terms of full barrier.

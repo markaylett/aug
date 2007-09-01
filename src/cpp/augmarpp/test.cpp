@@ -366,7 +366,7 @@ main(int argc, char* argv[])
     char dst[] = "dst.XXXXXX";
     char src[] = "src.XXXXXX";
 
-    if (-1 == aug_atexitinit(&errinfo)) {
+    if (!aug_atexitinit(&errinfo)) {
         cerr << "aug_atexitinit() failed\n";
         return 1;
     }

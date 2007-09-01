@@ -18,7 +18,7 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_init(&a) || -1 == aug_init(&b) || -1 == aug_init(&c)) {
+    if (!aug_init(&a) || !aug_init(&b) || !aug_init(&c)) {
         aug_perror("aug_init() failed");
         return 1;
     }

@@ -23,11 +23,23 @@ struct aug_nbtype {
     int (*shutdown_)(struct aug_nbfile*);
 };
 
+/**
+   Thread-safe.
+ */
+
 AUGNET_API const struct aug_nbfile*
 aug_setnbfile(int fd, const struct aug_nbfile* nbfile);
 
+/**
+   Thread-safe.
+ */
+
 AUGNET_API struct aug_nbfile*
 aug_getnbfile(int fd, struct aug_nbfile* nbfile);
+
+/**
+   Thread-safe.
+ */
 
 AUGNET_API struct aug_nbfile*
 aug_resetnbfile(int fd, struct aug_nbfile* nbfile);

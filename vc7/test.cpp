@@ -7,7 +7,7 @@ int
 main(int argc, char* argv[])
 {
     struct aug_errinfo errinfo;
-    if (-1 == aug_atexitinit(&errinfo)) {
+    if (!aug_atexitinit(&errinfo)) {
         aug_perror("aug_atexitinit() failed");
         return 1;
     }

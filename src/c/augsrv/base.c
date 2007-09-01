@@ -123,6 +123,11 @@ aug_initservice(void)
     if (-1 == openpipe_())
         return -1;
 
+    /* Flush pending writes to main memory: when init_() the gaurantee of
+       interactions exclusively with the main thread are lost. */
+
+    AUG_WMB();
+
     if (-1 == service_.init_(arg_)) {
         closepipe_();
         return -1;
