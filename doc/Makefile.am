@@ -4,16 +4,11 @@ SUBDIRS = \
 EXTRA_DIST = \
 	daug.txt \
 	daugintro.w \
-	augsys.gif \
-	augmar.gif \
-	augutil.gif \
-	augsrv.gif \
-	augnet.gif \
 	cvs-policy.txt \
 	cwebmac.tex \
 	Doxyfile
 
-gif:
+dotdepend:
 	for l in augsys augmar augutil augsrv augnet; do \
 		(cd $(top_srcdir)/src/c && \
 			../pl/dotdepend -I. `find $$l -name "*.c" | grep -v '[.]libs'`) \

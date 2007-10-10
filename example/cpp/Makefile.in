@@ -39,8 +39,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/cpp/lang.mk
-noinst_PROGRAMS = mplexd$(EXEEXT) calc$(EXEEXT) tcpclient$(EXEEXT) \
-	timerd$(EXEEXT) $(am__EXEEXT_1)
+noinst_PROGRAMS = mplexd$(EXEEXT) tcpclient$(EXEEXT) timerd$(EXEEXT) \
+	$(am__EXEEXT_1)
 @ENABLE_MULTICAST_TRUE@am__append_1 = \
 @ENABLE_MULTICAST_TRUE@	heartbeat \
 @ENABLE_MULTICAST_TRUE@	mcastrecv \
@@ -57,9 +57,6 @@ CONFIG_CLEAN_FILES =
 @ENABLE_MULTICAST_TRUE@am__EXEEXT_1 = heartbeat$(EXEEXT) \
 @ENABLE_MULTICAST_TRUE@	mcastrecv$(EXEEXT) mcastsend$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
-am_calc_OBJECTS = calc.$(OBJEXT)
-calc_OBJECTS = $(am_calc_OBJECTS)
-calc_LDADD = $(LDADD)
 am__heartbeat_SOURCES_DIST = heartbeat.cpp
 @ENABLE_MULTICAST_TRUE@am_heartbeat_OBJECTS = heartbeat.$(OBJEXT)
 heartbeat_OBJECTS = $(am_heartbeat_OBJECTS)
@@ -96,10 +93,10 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(calc_SOURCES) $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
+SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
 	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(tcpclient_SOURCES) \
 	$(timerd_SOURCES)
-DIST_SOURCES = $(calc_SOURCES) $(am__heartbeat_SOURCES_DIST) \
+DIST_SOURCES = $(am__heartbeat_SOURCES_DIST) \
 	$(am__mcastrecv_SOURCES_DIST) $(am__mcastsend_SOURCES_DIST) \
 	$(mplexd_SOURCES) $(tcpclient_SOURCES) $(timerd_SOURCES)
 ETAGS = etags
@@ -243,9 +240,6 @@ mplexd_SOURCES = \
 	mplexd.cpp
 
 mplexd_LDADD = $(AUGLIBS)
-calc_SOURCES = \
-	calc.cpp
-
 tcpclient_SOURCES = \
 	tcpclient.cpp
 
@@ -306,9 +300,6 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-calc$(EXEEXT): $(calc_OBJECTS) $(calc_DEPENDENCIES) 
-	@rm -f calc$(EXEEXT)
-	$(CXXLINK) $(calc_LDFLAGS) $(calc_OBJECTS) $(calc_LDADD) $(LIBS)
 heartbeat$(EXEEXT): $(heartbeat_OBJECTS) $(heartbeat_DEPENDENCIES) 
 	@rm -f heartbeat$(EXEEXT)
 	$(CXXLINK) $(heartbeat_LDFLAGS) $(heartbeat_OBJECTS) $(heartbeat_LDADD) $(LIBS)
@@ -334,7 +325,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/calc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/heartbeat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastrecv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastsend.Po@am__quote@
