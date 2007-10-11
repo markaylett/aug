@@ -12,6 +12,7 @@ EXTRA_DIST = \
 	augutil.vcproj \
 	augutilpp.vcproj \
 	client.vcproj \
+	daug.bat \
 	daug.sln \
 	daug.vcproj \
 	http.vcproj \
