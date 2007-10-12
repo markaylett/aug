@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+aug_home=${1:-$AUG_HOME}
+
+dir=$(pwd)
+mkimplib="$dir/src/sh/mkimplib"
+(cd $aug_home/lib \
+    && $mkimplib ../bin/cygaug*)
+
+(cd $aug_home/bin \
+    && for f in libeay32.dll mingwm10.dll ssleay32.dll; do \
+    echo "copying $f..."; \
+    cp $HOME/bin/$f ./; done)
+
+basedir=$(basename $aug_home)
+(cd $aug_home/.. \
+    && echo "zipping..." \
+    && zip -r $dir/$basedir-win32-i686.zip $basedir)
