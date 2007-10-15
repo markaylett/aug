@@ -468,9 +468,7 @@ INPUT                  = ../src
 # *.c *.cc *.cxx *.cpp *.c++ *.java *.ii *.ixx *.ipp *.i++ *.inl *.h *.hh *.hxx 
 # *.hpp *.h++ *.idl *.odl *.cs *.php *.php3 *.inc *.m *.mm *.py
 
-FILE_PATTERNS          = *.c \
-                         *.cpp \
-                         *.h \
+FILE_PATTERNS          = *.h \
                          *.hpp
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories 
@@ -511,7 +509,10 @@ EXAMPLE_PATH           = ../example/cpp \
 # and *.h) to filter out the source-files in the directories. If left 
 # blank all files are included.
 
-EXAMPLE_PATTERNS       = 
+EXAMPLE_PATTERNS       = *.c \
+                         *.cpp \
+                         *.h \
+                         *.hpp
 
 # If the EXAMPLE_RECURSIVE tag is set to YES then subdirectories will be 
 # searched for input files to be used with the \include or \dontinclude 
@@ -560,7 +561,7 @@ FILTER_SOURCE_FILES    = NO
 # Note: To get rid of all source code in the generated output, make sure also 
 # VERBATIM_HEADERS is set to NO.
 
-SOURCE_BROWSER         = YES
+SOURCE_BROWSER         = NO
 
 # Setting the INLINE_SOURCES tag to YES will include the body 
 # of functions and classes directly in the documentation.

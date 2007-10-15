@@ -36,10 +36,10 @@ aug_destroyvar(const struct aug_var* var);
 /**
    Set destination var from source.
 
-   \param Destination var.
+   \param dst Destination var.
 
-   \param Optional source var.  If NULL, both "type_" and "arg_" of "dst" will
-   be set to NULL.
+   \param src Optional source var.  If NULL, both "type_" and "arg_" of "dst"
+   will be set to NULL.
 
    \return Destination var.
  */
