@@ -5,6 +5,7 @@ EXTRA_DIST = \
 	augnetpp.vcproj \
 	augpy.vcproj \
 	augrb.vcproj \
+	augrtpp.vcproj \
 	augsrv.vcproj \
 	augsrvpp.vcproj \
 	augsys.vcproj \
