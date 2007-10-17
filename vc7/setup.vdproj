@@ -21,12 +21,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_07AE10F5555CE939AEE87DEB456A42E8"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_0B16F77D4AE546D5B9992A5211905EF7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -52,6 +46,12 @@
         "Entry"
         {
         "MsmKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_20D2BB850CAB49D38427D78338B64886"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -105,6 +105,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_36CDE62C8842468F9E032B282C581F62"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3CFD807797304D7581D522BF9805E932"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -147,8 +153,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_59B43AD4F828533E7E2DB10BBB5EB0A1"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmKey" = "8:_5ABDE34760FB4E5F989C4747CF5F86F1"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -201,6 +207,78 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_87425CC478A5A151CF1D04E3028B3B07"
+        "OwnerKey" = "8:_F7088C01FB79463CB66CAE492E54724B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87425CC478A5A151CF1D04E3028B3B07"
+        "OwnerKey" = "8:_B1B6C245021445DBB6D59AFF9971193C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_066BB5B090154238AD74FA0BE08087EF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_36CDE62C8842468F9E032B282C581F62"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_F7088C01FB79463CB66CAE492E54724B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_B1B6C245021445DBB6D59AFF9971193C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_5ABDE34760FB4E5F989C4747CF5F86F1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_20D2BB850CAB49D38427D78338B64886"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87FCFD52620FFCC9AF3BAC54F8A19791"
+        "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -220,6 +298,12 @@
         "Entry"
         {
         "MsmKey" = "8:_8F02B2E63BCC4210B6B0001D45B5F481"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_93EE37E5DB3942548402A812FEA09E43"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -255,25 +339,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A7B4C5AAB427F52322C38E5A209DC67B"
-        "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A7B4C5AAB427F52322C38E5A209DC67B"
-        "OwnerKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A7B4C5AAB427F52322C38E5A209DC67B"
-        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_A7D63EA79A624B0EB9130EAD0AB9CB6C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B1B6C245021445DBB6D59AFF9971193C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -281,6 +353,12 @@
         {
         "MsmKey" = "8:_B78E4B957466F5AA6A3DE2A2F000379D"
         "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B78E4B957466F5AA6A3DE2A2F000379D"
+        "OwnerKey" = "8:_F7088C01FB79463CB66CAE492E54724B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -297,12 +375,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C1C64073F0CF748BFC78D3AB5F878554"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_C30F73F6BF1E452E8D7D696A1565394C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -315,26 +387,20 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C77083D1777A0F30CE269EC525A82BA2"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_CFDF1DF6AAC19582692390307A93D6F6"
         "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_D4A021D7AD7250465EF810517582F154"
-        "OwnerKey" = "8:_066BB5B090154238AD74FA0BE08087EF"
+        "MsmKey" = "8:_CFDF1DF6AAC19582692390307A93D6F6"
+        "OwnerKey" = "8:_F7088C01FB79463CB66CAE492E54724B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_D4A021D7AD7250465EF810517582F154"
-        "OwnerKey" = "8:_BD368259223B4E79A1BB40733BFC9986"
+        "MsmKey" = "8:_CFDF1DF6AAC19582692390307A93D6F6"
+        "OwnerKey" = "8:_B1B6C245021445DBB6D59AFF9971193C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -359,6 +425,12 @@
         {
         "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
         "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
+        "OwnerKey" = "8:_B1B6C245021445DBB6D59AFF9971193C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -405,6 +477,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_F7088C01FB79463CB66CAE492E54724B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_FB19068976255653AB1FDEF3D7FD105C"
         "OwnerKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
         "MsmSig" = "8:_UNDEFINED"
@@ -419,6 +497,36 @@
         {
         "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
         "OwnerKey" = "8:_066BB5B090154238AD74FA0BE08087EF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
+        "OwnerKey" = "8:_36CDE62C8842468F9E032B282C581F62"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
+        "OwnerKey" = "8:_F7088C01FB79463CB66CAE492E54724B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
+        "OwnerKey" = "8:_B1B6C245021445DBB6D59AFF9971193C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
+        "OwnerKey" = "8:_5ABDE34760FB4E5F989C4747CF5F86F1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FFFD0A29FE3ADDD910F1905A9A286236"
+        "OwnerKey" = "8:_20D2BB850CAB49D38427D78338B64886"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -527,26 +635,6 @@
         }
         "File"
         {
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_07AE10F5555CE939AEE87DEB456A42E8"
-            {
-            "SourcePath" = "8:libaugnet-1.dll"
-            "TargetName" = "8:libaugnet-1.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_0B16F77D4AE546D5B9992A5211905EF7"
             {
             "SourcePath" = "8:..\\doc\\daug.txt"
@@ -887,26 +975,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_59B43AD4F828533E7E2DB10BBB5EB0A1"
-            {
-            "SourcePath" = "8:libaugsrv-1.dll"
-            "TargetName" = "8:libaugsrv-1.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_63E2586081D24CDC9DC5F2C4C347F202"
             {
             "SourcePath" = "8:..\\etc\\augres.reg"
@@ -993,6 +1061,26 @@
             "TargetName" = "8:SSLEAY32.dll"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_87FCFD52620FFCC9AF3BAC54F8A19791"
+            {
+            "SourcePath" = "8:libaugsys-1.dll"
+            "TargetName" = "8:libaugsys-1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1167,26 +1255,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_A7B4C5AAB427F52322C38E5A209DC67B"
-            {
-            "SourcePath" = "8:libaugsys-1.dll"
-            "TargetName" = "8:libaugsys-1.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_A7D63EA79A624B0EB9130EAD0AB9CB6C"
             {
             "SourcePath" = "8:..\\example\\augrt\\bench.conf"
@@ -1247,26 +1315,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C1C64073F0CF748BFC78D3AB5F878554"
-            {
-            "SourcePath" = "8:libaugrtpp-1.dll"
-            "TargetName" = "8:libaugrtpp-1.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_C30F73F6BF1E452E8D7D696A1565394C"
             {
             "SourcePath" = "8:..\\example\\augrt\\etc\\clientcert.pem"
@@ -1307,52 +1355,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C77083D1777A0F30CE269EC525A82BA2"
-            {
-            "SourcePath" = "8:libaugutil-1.dll"
-            "TargetName" = "8:libaugutil-1.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_CFDF1DF6AAC19582692390307A93D6F6"
             {
             "SourcePath" = "8:LIBEAY32.dll"
             "TargetName" = "8:LIBEAY32.dll"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_D4A021D7AD7250465EF810517582F154"
-            {
-            "SourcePath" = "8:libaugsys-1.dll"
-            "TargetName" = "8:libaugsys-1.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_FD05A54424E44D7EA973FA56F3B36A88"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2506,6 +2514,34 @@
                 {
                 }
             }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_20D2BB850CAB49D38427D78338B64886"
+            {
+            "SourcePath" = "8:bin\\libaugutil-1.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{63BEF71A-3B15-494E-89B0-3CCDBF48B4E0}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_2CBA7D5CA2064E3E85257E081A709447"
             {
             "SourcePath" = "8:"
@@ -2529,6 +2565,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Symbols"
             "OutputProjectGuid" = "8:{E905FF28-F95F-4125-B153-C67B96CD0C65}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_36CDE62C8842468F9E032B282C581F62"
+            {
+            "SourcePath" = "8:bin\\libaugmar-1.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{01150DDF-A141-4B5B-A4FB-81FD65C964C5}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
@@ -2585,6 +2649,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Symbols"
             "OutputProjectGuid" = "8:{E980D9AD-ACCD-4D21-A2E1-24E00913F725}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_5ABDE34760FB4E5F989C4747CF5F86F1"
+            {
+            "SourcePath" = "8:bin\\libaugsrv-1.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{D71F12D2-E969-4A00-8173-FFA33C1B963E}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
@@ -2786,6 +2878,34 @@
                 {
                 }
             }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_93EE37E5DB3942548402A812FEA09E43"
+            {
+            "SourcePath" = "8:bin\\libaugsys-1.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_96D321AC02DF46FC8CB45673362D6B1C"
             {
             "SourcePath" = "8:"
@@ -2837,6 +2957,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Symbols"
             "OutputProjectGuid" = "8:{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_B1B6C245021445DBB6D59AFF9971193C"
+            {
+            "SourcePath" = "8:bin\\libaugrtpp-1.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
@@ -3061,6 +3209,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Symbols"
             "OutputProjectGuid" = "8:{D71F12D2-E969-4A00-8173-FFA33C1B963E}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_F7088C01FB79463CB66CAE492E54724B"
+            {
+            "SourcePath" = "8:bin\\libaugnet-1.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{A6131AD7-FF69-436D-B4D2-0076969FC276}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
