@@ -141,6 +141,9 @@
 				RelativePath="..\src\cpp\augsyspp\endpoint.hpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augsyspp\errinfo.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsyspp\exception.cpp">
 			</File>
 			<File
@@ -206,6 +209,9 @@
 				RelativePath="..\src\cpp\augsyspp\endpoint.hpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augsyspp\errinfo.hpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsyspp\exception.hpp">
 			</File>
 			<File
@@ -231,6 +237,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\smartfd.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsyspp\smartptr.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\socket.hpp">

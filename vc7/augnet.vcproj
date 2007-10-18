@@ -153,6 +153,9 @@
 				RelativePath="..\src\c\augnet\file.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\fix.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\http.c">
 			</File>
 			<File
@@ -195,6 +198,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\file.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\fix.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\http.h">

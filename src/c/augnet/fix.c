@@ -75,8 +75,7 @@ static int
 fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
 {
     const char* it, * end = buf + size;
-    int digits;
-    unsigned fact, value;
+    unsigned digits, fact, value;
 
     for (it = buf; it != end; ++it)
         if (*it == delim)
@@ -88,11 +87,10 @@ fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
     /* Verify the number of digits found does not exceed the maximum number of
        valid digits. */
 
-    digits = it - buf;
+    digits = (unsigned)(it - buf);
     if (MAX_DIGITS_ < digits) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
-                       AUG_MSG("too many integer digits '%d'"),
-                       (int)digits);
+                       AUG_MSG("too many integer digits '%u'"), digits);
         return -1;
     }
 
@@ -117,7 +115,7 @@ fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
     return digits;
 }
 
-static unsigned
+static int
 getsize_(const char* buf, size_t size)
 {
     /* TODO: Alter the fix parsing logic so that it does not assume a
@@ -136,7 +134,7 @@ getsize_(const char* buf, size_t size)
     /* The beginning of the body length value is located immediately after the
        standard leader. */
 
-    if (0 >= (digits = fixtoui_(&value, buf + HEAD_SIZE_, size, *SOH_)))
+    if ((digits = fixtoui_(&value, buf + HEAD_SIZE_, size, *SOH_)) <= 0)
         return digits; /* -1 or 0. */
 
     /* Return the total number of bytes in the message. */
@@ -203,7 +201,9 @@ aug_destroyfixstream(aug_fixstream_t stream)
 AUGNET_API ssize_t
 aug_readfix(aug_fixstream_t stream, int fd, size_t size)
 {
-    ssize_t rlen, blen, mlen;
+    ssize_t rlen;
+    size_t blen;
+    int mlen;
     const char* ptr;
 
     /* Return on error or end of file. */
@@ -435,9 +435,9 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
     return -1;
  found:
 
-    field->size_ = it - field->value_;
+    field->size_ = (aug_len_t)(it - field->value_);
 
     /* Return number of bytes consumed. */
 
-    return (it - buf) + sizeof(*SOH_);
+    return (ssize_t)((it - buf) + sizeof(*SOH_));
 }

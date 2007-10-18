@@ -285,32 +285,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_782A6B809F944B599B6BE67CF2E277A5"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
-        "OwnerKey" = "8:_2BA44DF489104AB58C5C145BD2D1CA1A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
-        "OwnerKey" = "8:_782A6B809F944B599B6BE67CF2E277A5"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
-        "OwnerKey" = "8:_6002FB9C480945169A4D45C4D95B1ACE"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -364,6 +340,12 @@
         "Entry"
         {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
+        "OwnerKey" = "8:_6002FB9C480945169A4D45C4D95B1ACE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_5ABDE34760FB4E5F989C4747CF5F86F1"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -371,6 +353,12 @@
         {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_36CDE62C8842468F9E032B282C581F62"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
+        "OwnerKey" = "8:_2BA44DF489104AB58C5C145BD2D1CA1A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -2093,6 +2081,17 @@
                                 {
                                 }
                             }
+                            "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_42294630DBFB4752B54D7F08FE5E4C50"
+                            {
+                            "Name" = "8:augrtpp"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_5AA57961D623425F9FB67F73AB692B39"
+                                "Folders"
+                                {
+                                }
+                            }
                             "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_8FB4E104776E49E5A09306F71D2CA52E"
                             {
                             "Name" = "8:augutilpp"
@@ -2333,7 +2332,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:daug"
         "ProductCode" = "8:{210B4079-4AB6-4491-B94D-63BC120D02F0}"
-        "PackageCode" = "8:{40B2651C-367A-46C0-BDC9-0618C5B00B9F}"
+        "PackageCode" = "8:{AE793B28-CA7D-4B63-886F-E676D19133CC}"
         "UpgradeCode" = "8:{89166B9C-C3CB-4DE2-8BE3-DD90993E23EE}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -3654,34 +3653,6 @@
                 {
                 }
             }
-            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_782A6B809F944B599B6BE67CF2E277A5"
-            {
-            "SourcePath" = "8:bin\\mar.exe"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{22A8F7F6-45D1-4C8B-BABC-999CFD177520}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_7DA8AEAFE2EF4033A402DA553BB8A825"
             {
             "SourcePath" = "8:"
@@ -3819,6 +3790,36 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:SourceFiles"
             "OutputProjectGuid" = "8:{D9C66FA8-7D39-4496-AA2A-AA52BF2B7650}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                "ExcludeFilter" = "8:*.cpp"
+                "ExcludeFilter" = "8:*.vcproj"
+                }
+            }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_9855676A9A2D40CB8E2CBDA7A5CFD9AC"
+            {
+            "SourcePath" = "8:"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_42294630DBFB4752B54D7F08FE5E4C50"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:SourceFiles"
+            "OutputProjectGuid" = "8:{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
