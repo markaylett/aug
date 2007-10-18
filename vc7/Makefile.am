@@ -1,4 +1,6 @@
 EXTRA_DIST = \
+	aug.bat \
+	aug.sln \
 	augmar.vcproj \
 	augmarpp.vcproj \
 	augnet.vcproj \
@@ -13,8 +15,6 @@ EXTRA_DIST = \
 	augutil.vcproj \
 	augutilpp.vcproj \
 	client.vcproj \
-	daug.bat \
-	daug.sln \
 	daug.vcproj \
 	htdigest.vcproj \
 	http.vcproj \
