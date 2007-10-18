@@ -87,6 +87,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2BA44DF489104AB58C5C145BD2D1CA1A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_33492F66DC6E47F88CE92712B9B4CAF1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -201,6 +207,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_6002FB9C480945169A4D45C4D95B1ACE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_60BB259C2B7C4117B653105E43E9AFDA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -273,8 +285,32 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_782A6B809F944B599B6BE67CF2E277A5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
+        "OwnerKey" = "8:_2BA44DF489104AB58C5C145BD2D1CA1A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
+        "OwnerKey" = "8:_782A6B809F944B599B6BE67CF2E277A5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
+        "OwnerKey" = "8:_6002FB9C480945169A4D45C4D95B1ACE"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -3099,6 +3135,34 @@
                 {
                 }
             }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_2BA44DF489104AB58C5C145BD2D1CA1A"
+            {
+            "SourcePath" = "8:bin\\mar.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{22A8F7F6-45D1-4C8B-BABC-999CFD177520}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_2CBA7D5CA2064E3E85257E081A709447"
             {
             "SourcePath" = "8:"
@@ -3391,6 +3455,34 @@
                 {
                 }
             }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_6002FB9C480945169A4D45C4D95B1ACE"
+            {
+            "SourcePath" = "8:bin\\htdigest.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{739652B6-6DE1-4EFE-BA3F-1675B801218F}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_674011622D88496592F9F7C2FB1289C1"
             {
             "SourcePath" = "8:"
@@ -3557,6 +3649,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_782A6B809F944B599B6BE67CF2E277A5"
+            {
+            "SourcePath" = "8:bin\\mar.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{22A8F7F6-45D1-4C8B-BABC-999CFD177520}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
@@ -3872,6 +3992,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Symbols"
             "OutputProjectGuid" = "8:{A6131AD7-FF69-436D-B4D2-0076969FC276}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_DA88A118910841B78A65836C19928269"
+            {
+            "SourcePath" = "8:"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Symbols"
+            "OutputProjectGuid" = "8:{739652B6-6DE1-4EFE-BA3F-1675B801218F}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {

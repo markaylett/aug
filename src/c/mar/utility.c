@@ -33,7 +33,7 @@ aug_atofield_(struct aug_field* field, char* src)
 
     field->name_ = src;
     field->value_ = ++value;
-    field->size_ = strlen(value);
+    field->size_ = (unsigned)strlen(value);
     return 0;
 }
 
@@ -68,7 +68,7 @@ aug_insertstream_(aug_mar_t mar, FILE* stream)
 
         size_t size = fread(buf, 1, sizeof(buf), stdin);
         if (size)
-            aug_writemar(mar, buf, size);
+            aug_writemar(mar, buf, (unsigned)size);
     }
     return 0;
 }
@@ -76,7 +76,7 @@ aug_insertstream_(aug_mar_t mar, FILE* stream)
 AUG_EXTERNC ssize_t
 aug_readline_(char* buf, size_t size, FILE* stream)
 {
-    char* p = fgets(buf, size, stream);
+    char* p = fgets(buf, (int)size, stream);
     if (!p) {
 
         if (feof(stream))
@@ -94,7 +94,7 @@ aug_readline_(char* buf, size_t size, FILE* stream)
     }
 
     *p = '\0';
-    return p - buf;
+    return (ssize_t)(p - buf);
 }
 
 AUG_EXTERNC int

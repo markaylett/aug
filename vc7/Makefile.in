@@ -187,7 +187,9 @@ EXTRA_DIST = \
 	daug.bat \
 	daug.sln \
 	daug.vcproj \
+	htdigest.vcproj \
 	http.vcproj \
+	mar.vcproj \
 	minimal.vcproj \
 	sched.vcproj \
 	server.vcproj \

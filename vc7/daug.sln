@@ -84,6 +84,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augrb", "augrb.vcproj", "{A
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mar", "mar.vcproj", "{22A8F7F6-45D1-4C8B-BABC-999CFD177520}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "htdigest", "htdigest.vcproj", "{739652B6-6DE1-4EFE-BA3F-1675B801218F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -169,6 +177,14 @@ Global
 		{AB4EA74B-84B3-4ED6-88FA-49151967A19D}.Debug.Build.0 = Debug|Win32
 		{AB4EA74B-84B3-4ED6-88FA-49151967A19D}.Release.ActiveCfg = Release|Win32
 		{AB4EA74B-84B3-4ED6-88FA-49151967A19D}.Release.Build.0 = Release|Win32
+		{22A8F7F6-45D1-4C8B-BABC-999CFD177520}.Debug.ActiveCfg = Debug|Win32
+		{22A8F7F6-45D1-4C8B-BABC-999CFD177520}.Debug.Build.0 = Debug|Win32
+		{22A8F7F6-45D1-4C8B-BABC-999CFD177520}.Release.ActiveCfg = Release|Win32
+		{22A8F7F6-45D1-4C8B-BABC-999CFD177520}.Release.Build.0 = Release|Win32
+		{739652B6-6DE1-4EFE-BA3F-1675B801218F}.Debug.ActiveCfg = Debug|Win32
+		{739652B6-6DE1-4EFE-BA3F-1675B801218F}.Debug.Build.0 = Debug|Win32
+		{739652B6-6DE1-4EFE-BA3F-1675B801218F}.Release.ActiveCfg = Release|Win32
+		{739652B6-6DE1-4EFE-BA3F-1675B801218F}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

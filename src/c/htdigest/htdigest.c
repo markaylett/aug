@@ -31,7 +31,9 @@ getpass(const char* prompt)
 #endif
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>
+#if !defined(_WIN32)
+# include <unistd.h>
+#endif /* _WIN32 */
 
 #define LF 10
 #define CR 13
@@ -109,7 +111,7 @@ void usage() {
     exit(1);
 }
 
-void interrupted() {
+void interrupted(int sig) {
     fprintf(stderr,"Interrupted.\n");
     if(tn) unlink(tn);
     exit(1);
@@ -127,7 +129,7 @@ int main(int argc, char *argv[]) {
     int found;
 
     tn = NULL;
-    signal(SIGINT,(void (*)())interrupted);
+    signal(SIGINT,(void (*)(int))interrupted);
     if(argc == 5) {
         if(strcmp(argv[1],"-c"))
             usage();

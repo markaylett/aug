@@ -23,10 +23,10 @@
 
 #else /* !_MSC_VER || NDEBUG */
 
-AUG_EXTERNC void
+AUGSYS_API void
 aug_initleakdump_(void);
 
-AUG_EXTERNC void
+AUGSYS_API void
 aug_dumpleaks_(void);
 
 # define AUG_INITLEAKDUMP() aug_initleakdump_()
