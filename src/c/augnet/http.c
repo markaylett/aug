@@ -143,7 +143,7 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
         switch (aug_appendlexer(&parser->lexer_, ptr[i++])) {
         case AUG_TOKERROR:
             return -1;
-        case AUG_TOKNONE:
+        case AUG_TOKAGAIN:
             break;
         case AUG_TOKDELIM:
             if (-1 == name_(parser))
@@ -155,7 +155,7 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
             aug_setlexerdelim(parser->lexer_, NULL);
             break;
 
-        case AUG_TOKLINE:
+        case AUG_TOKWORD:
             if (-1 == tail_(parser))
                 return -1;
 
@@ -163,7 +163,7 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
             aug_setlexerdelim(parser->lexer_, iscolon_);
             break;
 
-        case AUG_TOKBREAK:
+        case AUG_TOKBOUND:
             if (-1 == tail_(parser))
                 return -1;
 

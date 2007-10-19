@@ -10,16 +10,19 @@
 enum aug_token {
 
     AUG_TOKERROR = -1,
-    AUG_TOKNONE = 0,
+    AUG_TOKAGAIN = 0,
 
-    /* Delimited. */
+    /* Delimiter. */
 
     AUG_TOKDELIM,
 
-    /* Logical line. */
+    /* Logical word. */
 
-    AUG_TOKLINE,
-    AUG_TOKBREAK
+    AUG_TOKWORD,
+
+    /* Boundary. */
+
+    AUG_TOKBOUND
 };
 
 typedef int (*aug_isdelim_t)(char);

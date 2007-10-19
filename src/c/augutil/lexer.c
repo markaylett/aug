@@ -136,7 +136,7 @@ aug_appendlexer(aug_lexer_t* lexer, char ch)
     char first;
 
     if ('\0' == ch)
-        return -1 == aug_finishlexer(lexer) ? AUG_TOKERROR : AUG_TOKBREAK;
+        return -1 == aug_finishlexer(lexer) ? AUG_TOKERROR : AUG_TOKBOUND;
 
     switch ((*lexer)->state_) {
     case LTRIM_:
@@ -232,14 +232,14 @@ aug_appendlexer(aug_lexer_t* lexer, char ch)
 
             if ('\n' == ch) {
                 (*lexer)->state_ = LTRIM_;
-                return AUG_TOKBREAK;
+                return AUG_TOKBOUND;
             }
 
             /* Note: The state is set to the first character of the new
                line. */
 
             (*lexer)->state_ = ch;
-            return AUG_TOKLINE;
+            return AUG_TOKWORD;
         }
         break;
 
@@ -261,7 +261,7 @@ aug_appendlexer(aug_lexer_t* lexer, char ch)
 
             (*lexer)->pos_ = 0;
             (*lexer)->state_ = LTRIM_;
-            return AUG_TOKBREAK;
+            return AUG_TOKBOUND;
         }
 
         switch (aug_appendlexer(lexer, first)) {
@@ -274,7 +274,7 @@ aug_appendlexer(aug_lexer_t* lexer, char ch)
             return aug_appendlexer(lexer, ch);
         }
     }
-    return AUG_TOKNONE;
+    return AUG_TOKAGAIN;
 }
 
 AUGUTIL_API int
