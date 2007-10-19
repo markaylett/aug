@@ -146,6 +146,8 @@ aug_appendlexer(aug_lexer_t* lexer, char ch)
         if (islws_(ch))
             break;
 
+        /* State transition. */
+
         (*lexer)->state_ = DATA_;
 
         /* Fall-through */
