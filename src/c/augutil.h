@@ -15,9 +15,9 @@
 #include "augutil/md5.h"
 #include "augutil/path.h"
 #include "augutil/pwd.h"
-#include "augutil/strbuf.h"
 #include "augutil/timer.h"
 #include "augutil/tmspec.h"
 #include "augutil/var.h"
+#include "augutil/xstr.h"
 
 #endif /* AUGUTIL_H */

@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 
 #include "augnet/http.h"
 
-#include "augutil/strbuf.h"
+#include "augutil/xstr.h"
 #include "augutil/var.h"
 
 #include "augmar/mar.h"
@@ -24,7 +24,7 @@ struct aug_marparser_ {
     const struct aug_marhandler* handler_;
     struct aug_var var_;
     aug_httpparser_t http_;
-    aug_strbuf_t initial_;
+    aug_xstr_t initial_;
     aug_mar_t mar_;
 };
 
@@ -32,16 +32,16 @@ static int
 initial_(const struct aug_var* var, const char* initial)
 {
     aug_marparser_t parser = var->arg_;
-    if (!(parser->initial_ = aug_createstrbuf(0)))
+    if (!(parser->initial_ = aug_createxstr(0)))
         return -1;
 
     if (!(parser->mar_ = parser->handler_->create_(&parser->var_, initial))) {
-        aug_destroystrbuf(parser->initial_);
+        aug_destroyxstr(parser->initial_);
         parser->initial_ = NULL;
         return -1;
     }
 
-    aug_setstrbufs(&parser->initial_, initial);
+    aug_xstrcpys(&parser->initial_, initial);
     return 0;
 }
 
@@ -85,12 +85,12 @@ end_(const struct aug_var* var, int commit)
             return 0; /* Blank line. */
 
         ret = parser->handler_
-            ->message_(&parser->var_, aug_getstr(parser->initial_),
+            ->message_(&parser->var_, aug_xstr(parser->initial_),
                        parser->mar_);
     }
 
     if (parser->initial_) {
-        aug_destroystrbuf(parser->initial_);
+        aug_destroyxstr(parser->initial_);
         parser->initial_ = NULL;
     }
 
@@ -145,7 +145,7 @@ aug_destroymarparser(aug_marparser_t parser)
     aug_destroyhttpparser(parser->http_);
 
     if (parser->initial_)
-        aug_destroystrbuf(parser->initial_);
+        aug_destroyxstr(parser->initial_);
 
     if (parser->mar_)
         aug_releasemar(parser->mar_);

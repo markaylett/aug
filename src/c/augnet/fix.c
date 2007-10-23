@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augutil/strbuf.h"
+#include "augutil/xstr.h"
 #include "augutil/var.h"
 
 #include "augsys/errinfo.h"
@@ -67,7 +67,7 @@ AUG_RCSID("$Id$");
 struct aug_fixstream_ {
     aug_fixcb_t cb_;
     struct aug_var var_;
-    aug_strbuf_t strbuf_;
+    aug_xstr_t xstr_;
     size_t mlen_;
 };
 
@@ -98,7 +98,7 @@ fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
        follows:
 
        4 * 1 + 3 * 10 + 2 * 100 + 1 * 1000 = 1234
-     */
+    */
 
     for (fact = 1, value = 0; it-- != buf; fact *= 10) {
 
@@ -170,21 +170,21 @@ AUGNET_API aug_fixstream_t
 aug_createfixstream(size_t size, aug_fixcb_t cb, const struct aug_var* var)
 {
     aug_fixstream_t stream = malloc(sizeof(struct aug_fixstream_));
-    aug_strbuf_t strbuf;
+    aug_xstr_t xstr;
 
     if (!stream) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    if (!(strbuf = aug_createstrbuf(0 == size ? BUFSIZE_ : size))) {
+    if (!(xstr = aug_createxstr(0 == size ? BUFSIZE_ : size))) {
         free(stream);
         return NULL;
     }
 
     stream->cb_ = cb;
     aug_setvar(&stream->var_, var);
-    stream->strbuf_ = strbuf;
+    stream->xstr_ = xstr;
     stream->mlen_ = 0;
     return stream;
 }
@@ -192,7 +192,7 @@ aug_createfixstream(size_t size, aug_fixcb_t cb, const struct aug_var* var)
 AUGNET_API int
 aug_destroyfixstream(aug_fixstream_t stream)
 {
-    int ret = aug_destroystrbuf(stream->strbuf_);
+    int ret = aug_destroyxstr(stream->xstr_);
     aug_destroyvar(&stream->var_);
     free(stream);
     return ret;
@@ -208,13 +208,13 @@ aug_readfix(aug_fixstream_t stream, int fd, size_t size)
 
     /* Return on error or end of file. */
 
-    if (0 >= (rlen = aug_readstrbuf(fd, &stream->strbuf_, size)))
+    if (0 >= (rlen = aug_xstrcatf(fd, &stream->xstr_, size)))
         return rlen;
 
     /* Total number of buffered bytes. */
 
-    blen = aug_strbuflen(stream->strbuf_);
-    ptr = aug_getstr(stream->strbuf_);
+    blen = aug_xstrlen(stream->xstr_);
+    ptr = aug_xstr(stream->xstr_);
 
     if (0 != stream->mlen_)
         goto body;
@@ -246,12 +246,12 @@ aug_readfix(aug_fixstream_t stream, int fd, size_t size)
         stream->mlen_ = 0;
 
         if (0 == blen) {
-            aug_clearstrbuf(&stream->strbuf_);
+            aug_clearxstr(&stream->xstr_);
             break;
         }
 
-        aug_setstrbufsn(&stream->strbuf_, ptr + stream->mlen_, blen);
-        ptr = aug_getstr(stream->strbuf_);
+        aug_xstrcpysn(&stream->xstr_, ptr + stream->mlen_, blen);
+        ptr = aug_xstr(stream->xstr_);
     }
 
     return rlen;
@@ -263,10 +263,10 @@ aug_finishfix(aug_fixstream_t stream)
     /* Test for any partially buffered messages. */
 
     int ret;
-    size_t size = aug_strbuflen(stream->strbuf_);
+    size_t size = aug_xstrlen(stream->xstr_);
     if (size) {
 
-        aug_clearstrbuf(&stream->strbuf_);
+        aug_clearxstr(&stream->xstr_);
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
                        AUG_MSG("fix stream not empty, '%d' bytes"),
                        (int)size);
@@ -287,7 +287,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        ^^
-     */
+    */
 
     if (0 != memcmp(ptr, BEGINSTRING_PREFIX_, BEGINSTRING_PREFIX_SIZE_)) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
@@ -297,7 +297,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        ..^^^^^^^
-     */
+    */
 
     ptr += BEGINSTRING_PREFIX_SIZE_;
     memcpy(fixstd->fixver_, ptr, AUG_FIXVERLEN);
@@ -305,7 +305,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        .........^
-     */
+    */
 
     ptr += AUG_FIXVERLEN;
     if (*SOH_ != *ptr++) {
@@ -316,7 +316,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        ..........^^
-     */
+    */
 
     if (0 != memcmp(ptr, BODYLENGTH_PREFIX_, BODYLENGTH_PREFIX_SIZE_)) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
@@ -326,7 +326,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        .............^
-     */
+    */
 
     /* Move one character past the SOH delimiter. */
 
@@ -339,7 +339,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        ..............^^^^^
-     */
+    */
 
     /* Set body pointer and size. */
 
@@ -349,7 +349,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        ...................^^^
-     */
+    */
 
     if (0 != memcmp(ptr, CHECKSUM_PREFIX_, CHECKSUM_PREFIX_SIZE_)) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
@@ -359,7 +359,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        ...................      ^
-     */
+    */
 
     if (*SOH_ != buf[size - 1]) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
@@ -369,7 +369,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        ......................^^^.
-     */
+    */
 
     /* Get sum contained within message. */
 

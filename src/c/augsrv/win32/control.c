@@ -5,7 +5,7 @@
 #include "augsrv/options.h"
 
 #include "augutil/path.h"
-#include "augutil/strbuf.h"
+#include "augutil/xstr.h"
 
 #include "augsys/errinfo.h"
 #include "augsys/limits.h" /* AUG_PATH_MAX */
@@ -17,12 +17,12 @@
 
 #define OFFSET_ 128
 
-static aug_strbuf_t
+static aug_xstr_t
 makepath_(void)
 {
     const char* program, * conffile;
     char buf[AUG_PATH_MAX + 1];
-    aug_strbuf_t s;
+    aug_xstr_t s;
 
     if (!(program = aug_getserviceopt(AUG_OPTPROGRAM))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
@@ -30,14 +30,14 @@ makepath_(void)
         return NULL;
     }
 
-    if (!(s = aug_createstrbuf(sizeof(buf))))
+    if (!(s = aug_createxstr(sizeof(buf))))
         return NULL;
 
     if (!aug_realpath(buf, program, sizeof(buf)))
         goto fail;
 
-    if (-1 == aug_catstrbufc(&s, '"') || -1 == aug_catstrbufs(&s, buf)
-        || -1 == aug_catstrbufc(&s, '"'))
+    if (-1 == aug_xstrcatc(&s, '"') || -1 == aug_xstrcats(&s, buf)
+        || -1 == aug_xstrcatc(&s, '"'))
         goto fail;
 
     if ((conffile = aug_getserviceopt(AUG_OPTCONFFILE))) {
@@ -45,16 +45,16 @@ makepath_(void)
         if (!aug_realpath(buf, conffile, sizeof(buf)))
             goto fail;
 
-        if (-1 == aug_catstrbufs(&s, " -f \"")
-            || -1 == aug_catstrbufs(&s, buf)
-            || -1 == aug_catstrbufc(&s, '"'))
+        if (-1 == aug_xstrcats(&s, " -f \"")
+            || -1 == aug_xstrcats(&s, buf)
+            || -1 == aug_xstrcatc(&s, '"'))
             goto fail;
     }
 
     return s;
 
  fail:
-    aug_destroystrbuf(s);
+    aug_destroyxstr(s);
     return NULL;
 }
 
@@ -141,7 +141,7 @@ static int
 install_(SC_HANDLE scm)
 {
     const char* lname, * sname;
-    aug_strbuf_t path;
+    aug_xstr_t path;
     SC_HANDLE serv;
     int ret = -1;
 
@@ -166,7 +166,7 @@ install_(SC_HANDLE scm)
     if (!(serv = CreateService(scm, sname, lname, SERVICE_ALL_ACCESS,
                                SERVICE_WIN32_OWN_PROCESS,
                                SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
-                               aug_getstr(path), NULL, NULL, NULL,
+                               aug_xstr(path), NULL, NULL, NULL,
                                "NT Authority\\NetworkService", NULL))) {
 
         aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
@@ -177,7 +177,7 @@ install_(SC_HANDLE scm)
     ret = 0;
 
  done:
-    aug_destroystrbuf(path);
+    aug_destroyxstr(path);
     return ret;
 }
 

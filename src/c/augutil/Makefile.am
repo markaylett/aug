@@ -17,10 +17,10 @@ modinclude_HEADERS = \
 	md5.h \
 	path.h \
 	pwd.h \
-	strbuf.h \
 	timer.h \
 	tmspec.h \
-	var.h
+	var.h \
+	xstr.h
 
 noinst_HEADERS =
 
@@ -39,10 +39,10 @@ libaugutil_la_SOURCES = \
 	md5.c \
 	path.c \
 	pwd.c \
-	strbuf.c \
 	timer.c \
 	tmspec.c \
-	var.c
+	var.c \
+	xstr.c
 
 libaugutil_la_LDFLAGS = \
 	-no-undefined \

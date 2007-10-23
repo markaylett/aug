@@ -8,4 +8,3 @@
 #include "augmar/types.h"
 
 #endif /* AUGMAR_H */
-
