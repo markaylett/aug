@@ -59,6 +59,6 @@ AUGUTIL_API size_t
 aug_xstrlen(aug_xstr_t xstr);
 
 AUGUTIL_API const char*
-aug_getstr(aug_xstr_t xstr);
+aug_xstr(aug_xstr_t xstr);
 
 #endif /* AUGUTIL_XSTR_H */

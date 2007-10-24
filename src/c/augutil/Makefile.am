@@ -15,10 +15,13 @@ modinclude_HEADERS = \
 	list.h \
 	log.h \
 	md5.h \
+	networds.h \
 	path.h \
 	pwd.h \
+	shellwords.h \
 	timer.h \
 	tmspec.h \
+	types.h \
 	var.h \
 	xstr.h
 
@@ -37,8 +40,10 @@ libaugutil_la_SOURCES = \
 	list.c \
 	log.c \
 	md5.c \
+	networds.c \
 	path.c \
 	pwd.c \
+	shellwords.c \
 	timer.c \
 	tmspec.c \
 	var.c \

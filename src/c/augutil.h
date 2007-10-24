@@ -13,10 +13,13 @@
 #include "augutil/list.h"
 #include "augutil/log.h"
 #include "augutil/md5.h"
+#include "augutil/networds.h"
 #include "augutil/path.h"
 #include "augutil/pwd.h"
+#include "augutil/shellwords.h"
 #include "augutil/timer.h"
 #include "augutil/tmspec.h"
+#include "augutil/types.h"
 #include "augutil/var.h"
 #include "augutil/xstr.h"
 

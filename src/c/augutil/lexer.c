@@ -310,3 +310,64 @@ aug_lexertoken(aug_lexer_t lexer)
 {
     return BUFFER_(lexer);
 }
+
+#include "augutil/types.h"
+#include "augutil/xstr.h"
+
+struct aug_lexer2_ {
+    void (*out_)(void*, int, const char*);
+    void* arg_;
+    struct words words_;
+    aug_xstr_t xstr_;
+};
+
+AUGUTIL_API aug_lexer2_t
+aug_createlexer2(size_t size, void (*out)(void*, int, const char*),
+                 void* arg)
+{
+    aug_lexer2_t lexer;
+
+    /* Use default size when size has not been specified. */
+
+    if (0 == size)
+        size = AUG_MAXLINE;
+
+    if (!(lexer = malloc(sizeof(struct aug_lexer2_)))) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        return NULL;
+    }
+
+    lexer->out_ = out;
+    lexer->arg_ = arg;
+    aug_initnetwords(&lexer->words_);
+    if (!(lexer->xstr_ = aug_createxstr(size))) {
+        free(lexer);
+        lexer = NULL;
+    }
+    return lexer;
+}
+
+AUGUTIL_API int
+aug_destroylexer2(aug_lexer2_t lexer)
+{
+    if (lexer)
+        aug_destroyxstr(lexer->xstr_);
+    free(lexer);
+    return 0;
+}
+
+AUGUTIL_API void
+aug_appendlexer2(aug_lexer2_t* lexer, char ch)
+{
+}
+
+AUGUTIL_API void
+aug_finishlexer2(aug_lexer2_t* lexer)
+{
+}
+
+AUGUTIL_API const char*
+aug_lexer2token(aug_lexer2_t lexer)
+{
+    return "";
+}
