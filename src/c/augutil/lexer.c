@@ -7,6 +7,8 @@
 
 AUG_RCSID("$Id$");
 
+#include "augutil/networds.h"
+#include "augutil/shellwords.h"
 #include "augsys/errinfo.h"
 
 #include <ctype.h>       /* isspace() */
@@ -317,13 +319,37 @@ aug_lexertoken(aug_lexer_t lexer)
 struct aug_lexer2_ {
     void (*out_)(void*, int, const char*);
     void* arg_;
-    struct words words_;
+    struct aug_words words_;
+    void (*put_)(struct aug_words*, int);
     aug_xstr_t xstr_;
 };
 
-AUGUTIL_API aug_lexer2_t
-aug_createlexer2(size_t size, void (*out)(void*, int, const char*),
-                 void* arg)
+static void
+append2_(void* arg, int what)
+{
+    aug_lexer2_t lexer = (aug_lexer2_t)arg;
+    switch (what) {
+    case AUG_TOKLABEL:
+    case AUG_TOKWORD:
+        lexer->out_(lexer->arg_, what, aug_xstr(lexer->xstr_));
+        aug_clearxstr(&lexer->xstr_);
+        break;
+    case AUG_TOKPHRASE:
+        lexer->out_(lexer->arg_, what, NULL);
+        break;
+    case AUG_TOKRTRIM:
+        aug_clearxstrn(&lexer->xstr_,
+                       aug_rtrimword(aug_xstr(lexer->xstr_),
+                                     aug_xstrlen(lexer->xstr_)));
+        break;
+    default:
+        aug_xstrcatc(&lexer->xstr_, what);
+        break;
+    }
+}
+
+static aug_lexer2_t
+createlexer2_(size_t size, void (*out)(void*, int, const char*), void* arg)
 {
     aug_lexer2_t lexer;
 
@@ -339,10 +365,33 @@ aug_createlexer2(size_t size, void (*out)(void*, int, const char*),
 
     lexer->out_ = out;
     lexer->arg_ = arg;
-    aug_initnetwords(&lexer->words_);
     if (!(lexer->xstr_ = aug_createxstr(size))) {
         free(lexer);
         lexer = NULL;
+    }
+    return lexer;
+}
+
+AUGUTIL_API aug_lexer2_t
+aug_createnetlexer2(size_t size, void (*out)(void*, int, const char*),
+                    void* arg)
+{
+    aug_lexer2_t lexer = createlexer2_(size, out, arg);
+    if (lexer) {
+        aug_initnetwords(&lexer->words_, append2_, lexer);
+        lexer->put_ = aug_putnetwords;
+    }
+    return lexer;
+}
+
+AUGUTIL_API aug_lexer2_t
+aug_createshelllexer2(size_t size, void (*out)(void*, int, const char*),
+                      void* arg)
+{
+    aug_lexer2_t lexer = createlexer2_(size, out, arg);
+    if (lexer) {
+        aug_initshellwords(&lexer->words_, append2_, lexer);
+        lexer->put_ = aug_putshellwords;
     }
     return lexer;
 }
@@ -357,17 +406,13 @@ aug_destroylexer2(aug_lexer2_t lexer)
 }
 
 AUGUTIL_API void
-aug_appendlexer2(aug_lexer2_t* lexer, char ch)
+aug_appendlexer2(aug_lexer2_t lexer, char ch)
 {
+    lexer->put_(&lexer->words_, ch);
 }
 
 AUGUTIL_API void
-aug_finishlexer2(aug_lexer2_t* lexer)
+aug_finishlexer2(aug_lexer2_t lexer)
 {
-}
-
-AUGUTIL_API const char*
-aug_lexer2token(aug_lexer2_t lexer)
-{
-    return "";
+    lexer->put_(&lexer->words_, '\n');
 }

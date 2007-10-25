@@ -34,13 +34,13 @@ AUG_RCSID("$Id$");
 #include <stdio.h>
 
 static void
-eatws_(struct words*, int);
+eatws_(struct aug_words*, int);
 
 static void
-word_(struct words*, int);
+word_(struct aug_words*, int);
 
 static void
-eatws_(struct words* st, int ch)
+eatws_(struct aug_words* st, int ch)
 {
     if (st->flags_ & AUG_LEXESCAPE) {
         /* Handle escape. */
@@ -78,7 +78,7 @@ eatws_(struct words* st, int ch)
 }
 
 static void
-word_(struct words* st, int ch)
+word_(struct aug_words* st, int ch)
 {
     if (st->flags_ & AUG_LEXNEWLINE) {
         /* Handle newline. */
@@ -147,7 +147,7 @@ word_(struct words* st, int ch)
 }
 
 AUGUTIL_API void
-aug_initnetwords(struct words* st, void (*out)(void*, int), void* arg)
+aug_initnetwords(struct aug_words* st, void (*out)(void*, int), void* arg)
 {
     st->out_ = out;
     st->arg_ = arg;
@@ -156,7 +156,7 @@ aug_initnetwords(struct words* st, void (*out)(void*, int), void* arg)
 }
 
 AUGUTIL_API void
-aug_putnetwords(struct words* st, int ch)
+aug_putnetwords(struct aug_words* st, int ch)
 {
     switch (ch) {
     case EOF:

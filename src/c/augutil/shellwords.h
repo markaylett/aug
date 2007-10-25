@@ -8,9 +8,9 @@
 #include "augutil/types.h"
 
 AUGUTIL_API void
-aug_initshellwords(struct words* st, void (*out)(void*, int), void* arg);
+aug_initshellwords(struct aug_words* st, void (*out)(void*, int), void* arg);
 
 AUGUTIL_API void
-aug_putshellwords(struct words* st, int ch);
+aug_putshellwords(struct aug_words* st, int ch);
 
 #endif /* AUGUTIL_SHELLWORDS_H */

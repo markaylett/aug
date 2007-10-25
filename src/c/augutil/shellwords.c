@@ -39,22 +39,22 @@ AUG_RCSID("$Id$");
 #include <stdio.h>
 
 static void
-eatws_(struct words*, int);
+eatws_(struct aug_words*, int);
 
 static void
-bare_(struct words*, int);
+bare_(struct aug_words*, int);
 
 static void
-squot_(struct words*, int);
+squot_(struct aug_words*, int);
 
 static void
-dquot_(struct words*, int);
+dquot_(struct aug_words*, int);
 
 static void
-comment_(struct words*, int);
+comment_(struct aug_words*, int);
 
 static void
-eatws_(struct words* st, int ch)
+eatws_(struct aug_words* st, int ch)
 {
     if (st->flags_ & AUG_LEXESCAPE) {
         /* Handle escape. */
@@ -107,7 +107,7 @@ eatws_(struct words* st, int ch)
 }
 
 static void
-bare_(struct words* st, int ch)
+bare_(struct aug_words* st, int ch)
 {
     if (st->flags_ & AUG_LEXESCAPE) {
         /* Handle escape. */
@@ -169,7 +169,7 @@ bare_(struct words* st, int ch)
 }
 
 static void
-dquot_(struct words* st, int ch)
+dquot_(struct aug_words* st, int ch)
 {
     if (st->flags_ & AUG_LEXESCAPE) {
         /* Handle escape. */
@@ -204,7 +204,7 @@ dquot_(struct words* st, int ch)
 }
 
 static void
-squot_(struct words* st, int ch)
+squot_(struct aug_words* st, int ch)
 {
     /* No escapes in single quotes. */
 
@@ -218,7 +218,7 @@ squot_(struct words* st, int ch)
 }
 
 static void
-comment_(struct words* st, int ch)
+comment_(struct aug_words* st, int ch)
 {
     /* Ignore until newline. */
 
@@ -229,7 +229,7 @@ comment_(struct words* st, int ch)
 }
 
 AUGUTIL_API void
-aug_initshellwords(struct words* st, void (*out)(void*, int), void* arg)
+aug_initshellwords(struct aug_words* st, void (*out)(void*, int), void* arg)
 {
     st->out_ = out;
     st->arg_ = arg;
@@ -238,7 +238,7 @@ aug_initshellwords(struct words* st, void (*out)(void*, int), void* arg)
 }
 
 AUGUTIL_API void
-aug_putshellwords(struct words* st, int ch)
+aug_putshellwords(struct aug_words* st, int ch)
 {
     st->fn_(st, EOF == ch ? '\n' : ch);
 }

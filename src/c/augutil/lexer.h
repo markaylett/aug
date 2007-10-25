@@ -56,12 +56,9 @@ AUGUTIL_API int
 aug_destroylexer2(aug_lexer2_t lexer);
 
 AUGUTIL_API void
-aug_appendlexer2(aug_lexer2_t* lexer, char ch);
+aug_appendlexer2(aug_lexer2_t lexer, char ch);
 
 AUGUTIL_API void
-aug_finishlexer2(aug_lexer2_t* lexer);
-
-AUGUTIL_API const char*
-aug_lexer2token(aug_lexer2_t lexer);
+aug_finishlexer2(aug_lexer2_t lexer);
 
 #endif /* AUGUTIL_LEXER_H */

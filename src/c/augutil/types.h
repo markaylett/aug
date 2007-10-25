@@ -15,10 +15,10 @@
 #define AUG_TOKWORD   (-4)
 #define AUG_TOKRTRIM  (-5)
 
-struct words {
+struct aug_words {
     void (*out_)(void*, int);
     void* arg_;
-    void (*fn_)(struct words*, int);
+    void (*fn_)(struct aug_words*, int);
     unsigned flags_;
 };
 
