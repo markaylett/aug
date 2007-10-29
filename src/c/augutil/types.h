@@ -4,16 +4,15 @@
 #ifndef AUGUTIL_TYPES_H
 #define AUGUTIL_TYPES_H
 
-#define AUG_LEXESCAPE  0x01
-#define AUG_LEXLABEL   0x02
-#define AUG_LEXNEWLINE 0x04
-
-/** Start from -2 to avoid confusion with ERROR and EOF. */
-
+#define AUG_TOKERROR  (-1)
 #define AUG_TOKPHRASE (-2)
 #define AUG_TOKLABEL  (-3)
 #define AUG_TOKWORD   (-4)
 #define AUG_TOKRTRIM  (-5)
+
+#define AUG_WRDESCAPE  0x01
+#define AUG_WRDLABEL   0x02
+#define AUG_WRDNEWLINE 0x04
 
 struct aug_words {
     void (*out_)(void*, int);

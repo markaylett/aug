@@ -56,9 +56,9 @@ comment_(struct aug_words*, int);
 static void
 eatws_(struct aug_words* st, int ch)
 {
-    if (st->flags_ & AUG_LEXESCAPE) {
+    if (st->flags_ & AUG_WRDESCAPE) {
         /* Handle escape. */
-        st->flags_ &= ~AUG_LEXESCAPE;
+        st->flags_ &= ~AUG_WRDESCAPE;
         switch (ch) {
         case '\n': /* New line. */
             /* Line continuation. */
@@ -95,7 +95,7 @@ eatws_(struct aug_words* st, int ch)
             break;
         case '\\': /* Escape. */
             /* Begin escape. */
-            st->flags_ |= AUG_LEXESCAPE;
+            st->flags_ |= AUG_WRDESCAPE;
             break;
         default:   /* Else. */
             /* Begin bare-word. */
@@ -109,9 +109,9 @@ eatws_(struct aug_words* st, int ch)
 static void
 bare_(struct aug_words* st, int ch)
 {
-    if (st->flags_ & AUG_LEXESCAPE) {
+    if (st->flags_ & AUG_WRDESCAPE) {
         /* Handle escape. */
-        st->flags_ &= ~AUG_LEXESCAPE;
+        st->flags_ &= ~AUG_WRDESCAPE;
         switch (ch) {
         case '\n': /* New line. */
             /* Line continuation. */
@@ -128,7 +128,7 @@ bare_(struct aug_words* st, int ch)
             /* End of bare-word. */
             st->out_(st->arg_, AUG_TOKWORD);
             st->fn_ = eatws_;
-            st->flags_ |= AUG_LEXLABEL;
+            st->flags_ |= AUG_WRDLABEL;
             st->fn_(st, ch);
             break;
         case '\t':
@@ -139,7 +139,7 @@ bare_(struct aug_words* st, int ch)
             /* End of bare-word. */
             st->out_(st->arg_, AUG_TOKWORD);
             st->fn_ = eatws_;
-            st->flags_ |= AUG_LEXLABEL;
+            st->flags_ |= AUG_WRDLABEL;
             break;
         case '"':  /* Double quote. */
             /* Begin double quote. */
@@ -151,14 +151,14 @@ bare_(struct aug_words* st, int ch)
             break;
         case '\\': /* Escape. */
             /* Begin escape. */
-            st->flags_ |= AUG_LEXESCAPE;
+            st->flags_ |= AUG_WRDESCAPE;
             break;
         default:   /* Else. */
-            if ((st->flags_ & AUG_LEXLABEL) && '=' == ch) {
+            if ((st->flags_ & AUG_WRDLABEL) && '=' == ch) {
                 /* Label and reset delim. */
                 st->out_(st->arg_, AUG_TOKLABEL);
                 st->fn_ = eatws_;
-                st->flags_ &= ~AUG_LEXLABEL;
+                st->flags_ &= ~AUG_WRDLABEL;
             } else {
                 /* Append to bare-word. */
                 st->out_(st->arg_, ch);
@@ -171,9 +171,9 @@ bare_(struct aug_words* st, int ch)
 static void
 dquot_(struct aug_words* st, int ch)
 {
-    if (st->flags_ & AUG_LEXESCAPE) {
+    if (st->flags_ & AUG_WRDESCAPE) {
         /* Handle escape. */
-        st->flags_ &= ~AUG_LEXESCAPE;
+        st->flags_ &= ~AUG_WRDESCAPE;
         switch (ch) {
         case '\n': /* New line. */
             /* Line continuation. */
@@ -195,7 +195,7 @@ dquot_(struct aug_words* st, int ch)
             st->fn_ = bare_;
         } else if ('\\' == ch) {
             /* Begin escape. */
-            st->flags_ |= AUG_LEXESCAPE;
+            st->flags_ |= AUG_WRDESCAPE;
         } else {
             /* Append to quoted. */
             st->out_(st->arg_, ch);
@@ -234,7 +234,7 @@ aug_initshellwords(struct aug_words* st, void (*out)(void*, int), void* arg)
     st->out_ = out;
     st->arg_ = arg;
     st->fn_ = eatws_;
-    st->flags_ = AUG_LEXLABEL;
+    st->flags_ = AUG_WRDLABEL;
 }
 
 AUGUTIL_API void
