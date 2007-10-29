@@ -14,9 +14,9 @@ AUG_RCSID("$Id$");
 
 #include "augsys/errinfo.h"
 
-#include <ctype.h>       /* isspace() */
-#include <errno.h>       /* ENOMEM */
-#include <stdlib.h>      /* malloc() */
+#include <ctype.h>  /* isspace() */
+#include <errno.h>  /* ENOMEM */
+#include <stdlib.h> /* malloc() */
 
 struct aug_lexer_ {
     struct aug_words words_;

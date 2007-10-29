@@ -58,11 +58,13 @@ libaugutil_la_LIBADD = \
 
 check_PROGRAMS = \
 	augutil-clocktest \
-	augutil-eventtest
+	augutil-eventtest \
+	augutil-shellwordstest
 
-TESTS =  \
+TESTS = \
 	augutil-clocktest \
-	augutil-eventtest
+	augutil-eventtest \
+	augutil-shellwordstest
 
 augutil_clocktest_SOURCES = clocktest.c
 augutil_clocktest_LDADD = \
@@ -70,4 +72,8 @@ augutil_clocktest_LDADD = \
 
 augutil_eventtest_SOURCES = eventtest.c
 augutil_eventtest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
+
+augutil_shellwordstest_SOURCES = shellwordstest.c
+augutil_shellwordstest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la

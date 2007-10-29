@@ -84,66 +84,93 @@ end_(aug_httpparser_t parser, int commit)
 }
 
 static int
+phrase_(aug_httpparser_t parser)
+{
+    /* Switch to body if Content-Length has been set. */
+
+    if (parser->csize_) {
+        parser->state_ = BODY_;
+    } else {
+
+        /* End of message (with commit). */
+
+        if (-1 == end_(parser, 1))
+            return -1;
+    }
+    return 0;
+}
+
+static int
+label_(aug_httpparser_t parser)
+{
+    /* No label on initial line. */
+
+    if (INITIAL_ == parser->state_) {
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                       AUG_MSG("missing initial line"));
+        return -1;
+    }
+
+    if (-1 == name_(parser))
+        return -1;
+
+    /* The field's value follows its name. */
+
+    parser->state_ = VALUE_;
+    return 0;
+}
+
+static int
+word_(aug_httpparser_t parser)
+{
+    switch (parser->state_) {
+    case INITIAL_:
+        if (-1 == initial_(parser))
+            return -1;
+        parser->state_ = NAME_;
+        break;
+    case NAME_:
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                       AUG_MSG("missing field name"));
+        break;
+    case VALUE_:
+        if (-1 == value_(parser))
+            return -1;
+        parser->state_ = NAME_;
+        break;
+    default:
+        assert(0);
+    }
+    return 0;
+}
+
+static int
 header_(aug_httpparser_t parser, const char* ptr, unsigned size)
 {
     unsigned i = 0;
     while (i < size) {
 
         switch (aug_appendlexer(parser->lexer_, ptr[i++])) {
-        case AUG_TOKPHRASE:
-
-            /* Switch to body if Content-Length has been set. */
-
-            if (parser->csize_) {
-                parser->state_ = BODY_;
-            } else {
-
-                /* End of message (with commit). */
-
-                if (-1 == end_(parser, 1))
-                    return -1;
-            }
+        case AUG_LEXPHRASE:
+            if (-1 == phrase_(parser))
+                return -1;
             goto done;
-        case AUG_TOKLABEL:
-
-            /* No label on initial line. */
-
-            if (INITIAL_ == parser->state_) {
-                aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL,
-                               AUG_EPARSE, AUG_MSG("missing initial line"));
+        case AUG_LEXLABEL:
+            if (-1 == label_(parser))
                 return -1;
-            }
-
-            if (-1 == name_(parser))
+            break;
+        case AUG_LEXWORD:
+            if (-1 == word_(parser))
                 return -1;
-
-            /* The field's value follows its name. */
-
-            parser->state_ = VALUE_;
             break;
-        case AUG_TOKWORD:
-            switch (parser->state_) {
-            case INITIAL_:
-                if (-1 == initial_(parser))
-                    return -1;
-                parser->state_ = NAME_;
-                break;
-            case NAME_:
-                aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL,
-                               AUG_EPARSE, AUG_MSG("missing field name"));
-                break;
-            case VALUE_:
-                if (-1 == value_(parser))
-                    return -1;
-                parser->state_ = NAME_;
-                break;
-            default:
-                assert(0);
-            }
-            break;
+        case AUG_LEXWORD | AUG_LEXPHRASE:
+            if (-1 == word_(parser)
+                || -1 == phrase_(parser))
+                return -1;
+            goto done;
         }
     }
-done:
+ done:
     return (int)i;
 }
 
@@ -176,37 +203,6 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
         return -1;
 
     return size;
-}
-
-static int
-finish_(aug_httpparser_t parser)
-{
-    int ret = 0;
-    switch (parser->state_) {
-    case INITIAL_:
-    case NAME_:
-    case VALUE_:
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
-                       AUG_MSG("failed to parse header"));
-        ret = -1;
-        break;
-    case BODY_:
-
-        /* Check to ensure that the entire body has been parsed. */
-
-        if (0 < parser->csize_) {
-
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
-                           AUG_MSG("failed to parse body"));
-            ret = -1;
-
-        } else if (-1 == parser->csize_) {
-
-            ret = end_(parser, 1);
-        }
-        break;
-    }
-    return ret;
 }
 
 AUGNET_API aug_httpparser_t
@@ -286,11 +282,31 @@ aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
 AUGNET_API int
 aug_finishhttp(aug_httpparser_t parser)
 {
-    if (-1 == aug_finishlexer(parser->lexer_))
-        goto fail;
+    switch (aug_finishlexer(parser->lexer_)) {
+    case AUG_LEXPHRASE:
+        if (-1 == phrase_(parser))
+            goto fail;
+        break;
+    case AUG_LEXLABEL:
+        if (-1 == label_(parser))
+            goto fail;
+        break;
+    case AUG_LEXWORD:
+        if (-1 == word_(parser))
+            goto fail;
+        break;
+    case AUG_LEXWORD | AUG_LEXPHRASE:
+        if (-1 == word_(parser)
+            || -1 == phrase_(parser))
+            goto fail;
+        break;
+    }
 
-    if (-1 == finish_(parser))
+    if (INITIAL_ != parser->state_) {
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+                       AUG_MSG("partial read of http message"));
         goto fail;
+    }
 
     return 0;
 
