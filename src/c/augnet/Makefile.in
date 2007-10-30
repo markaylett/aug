@@ -41,8 +41,8 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = augnet-base64test$(EXEEXT) augnet-fixtest$(EXEEXT) \
-	augnet-httptest$(EXEEXT)
+check_PROGRAMS = base64test$(EXEEXT) fixtest$(EXEEXT) \
+	httptest$(EXEEXT)
 subdir = src/c/augnet
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -68,18 +68,15 @@ am_libaugnet_la_OBJECTS = auth.lo base64.lo config.lo connector.lo \
 	extend.lo file.lo fix.lo http.lo inet.lo mar.lo nbfile.lo \
 	ssl.lo types.lo writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
-am_augnet_base64test_OBJECTS = base64test.$(OBJEXT)
-augnet_base64test_OBJECTS = $(am_augnet_base64test_OBJECTS)
-augnet_base64test_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augnet/libaugnet.la
-am_augnet_fixtest_OBJECTS = fixtest.$(OBJEXT)
-augnet_fixtest_OBJECTS = $(am_augnet_fixtest_OBJECTS)
-augnet_fixtest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augnet/libaugnet.la
-am_augnet_httptest_OBJECTS = httptest.$(OBJEXT)
-augnet_httptest_OBJECTS = $(am_augnet_httptest_OBJECTS)
-augnet_httptest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augnet/libaugnet.la
+am_base64test_OBJECTS = base64test.$(OBJEXT)
+base64test_OBJECTS = $(am_base64test_OBJECTS)
+base64test_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la
+am_fixtest_OBJECTS = fixtest.$(OBJEXT)
+fixtest_OBJECTS = $(am_fixtest_OBJECTS)
+fixtest_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la
+am_httptest_OBJECTS = httptest.$(OBJEXT)
+httptest_OBJECTS = $(am_httptest_OBJECTS)
+httptest_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -90,10 +87,10 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugnet_la_SOURCES) $(augnet_base64test_SOURCES) \
-	$(augnet_fixtest_SOURCES) $(augnet_httptest_SOURCES)
-DIST_SOURCES = $(libaugnet_la_SOURCES) $(augnet_base64test_SOURCES) \
-	$(augnet_fixtest_SOURCES) $(augnet_httptest_SOURCES)
+SOURCES = $(libaugnet_la_SOURCES) $(base64test_SOURCES) \
+	$(fixtest_SOURCES) $(httptest_SOURCES)
+DIST_SOURCES = $(libaugnet_la_SOURCES) $(base64test_SOURCES) \
+	$(fixtest_SOURCES) $(httptest_SOURCES)
 modincludeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(modinclude_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
@@ -268,17 +265,20 @@ libaugnet_la_LIBADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-TESTS = augnet-base64test augnet-httptest
-augnet_base64test_SOURCES = base64test.c
-augnet_base64test_LDADD = \
+TESTS = \
+	base64test \
+	httptest
+
+base64test_SOURCES = base64test.c
+base64test_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
-augnet_fixtest_SOURCES = fixtest.c
-augnet_fixtest_LDADD = \
+fixtest_SOURCES = fixtest.c
+fixtest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
-augnet_httptest_SOURCES = httptest.c
-augnet_httptest_LDADD = \
+httptest_SOURCES = httptest.c
+httptest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
 all: all-am
@@ -350,15 +350,15 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augnet-base64test$(EXEEXT): $(augnet_base64test_OBJECTS) $(augnet_base64test_DEPENDENCIES) 
-	@rm -f augnet-base64test$(EXEEXT)
-	$(LINK) $(augnet_base64test_LDFLAGS) $(augnet_base64test_OBJECTS) $(augnet_base64test_LDADD) $(LIBS)
-augnet-fixtest$(EXEEXT): $(augnet_fixtest_OBJECTS) $(augnet_fixtest_DEPENDENCIES) 
-	@rm -f augnet-fixtest$(EXEEXT)
-	$(LINK) $(augnet_fixtest_LDFLAGS) $(augnet_fixtest_OBJECTS) $(augnet_fixtest_LDADD) $(LIBS)
-augnet-httptest$(EXEEXT): $(augnet_httptest_OBJECTS) $(augnet_httptest_DEPENDENCIES) 
-	@rm -f augnet-httptest$(EXEEXT)
-	$(LINK) $(augnet_httptest_LDFLAGS) $(augnet_httptest_OBJECTS) $(augnet_httptest_LDADD) $(LIBS)
+base64test$(EXEEXT): $(base64test_OBJECTS) $(base64test_DEPENDENCIES) 
+	@rm -f base64test$(EXEEXT)
+	$(LINK) $(base64test_LDFLAGS) $(base64test_OBJECTS) $(base64test_LDADD) $(LIBS)
+fixtest$(EXEEXT): $(fixtest_OBJECTS) $(fixtest_DEPENDENCIES) 
+	@rm -f fixtest$(EXEEXT)
+	$(LINK) $(fixtest_LDFLAGS) $(fixtest_OBJECTS) $(fixtest_LDADD) $(LIBS)
+httptest$(EXEEXT): $(httptest_OBJECTS) $(httptest_DEPENDENCIES) 
+	@rm -f httptest$(EXEEXT)
+	$(LINK) $(httptest_LDFLAGS) $(httptest_OBJECTS) $(httptest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

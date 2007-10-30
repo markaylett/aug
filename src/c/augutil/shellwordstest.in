@@ -1,0 +1,76 @@
+# -*- sh -*-
+# shellword tests
+
+# eatws tests
+
+\ begin\ with\ space
+\;begin\ with\ special
+
+line\ \
+con\
+tinu\
+ation.
+
+# bare tests
+
+bare-word.
+  trim\ leading\ space.
+\e\s\c\a\p\e\ \a\n\y.
+
+key=value
+but\=not\=here
+=ignore\ delim
+ignore=second=delim
+
+# dquot tests
+
+"double quoted."
+  "trim leading space."
+"embedded
+ newline."
+"join"" together."
+
+"join"\
+" across"\
+" lines."
+
+"escapes good for \"double quotes\" and\
+ line continuations."
+"But otherwise \i\g\n\o\r\e\d\."
+
+"continuation\
+ within\
+ double."
+
+# squot tests
+
+'single quoted.'
+  'trim leading space.'
+'embedded
+ newline.'
+'join'' together.'
+
+'join'\
+' across'\
+' lines.'
+
+'escapes\ always\ insignificant.\'
+
+# comment tests
+
+comment\ after\ bare. # \"" \'' \\\ a comment
+"comment after double." # \"" \'' \\\ a comment
+'comment after single.' # \"" \'' \\\ a comment
+
+trailing\ comments\ ... # \"" \'' \\\ a comment
+"should be..." # \"" \'' \\\ a comment
+'ignored.' # \"" \'' \\\ a comment
+
+hash\ in\ bare#word\ is\ not\ comment.
+
+# other
+
+bare\
+" join"" double"\
+' join'' single'\
+\ join\ bare.

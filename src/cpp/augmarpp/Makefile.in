@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-check_PROGRAMS = augmarpp-test$(EXEEXT)
+check_PROGRAMS = maintest$(EXEEXT)
 subdir = src/cpp/augmarpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -58,9 +58,9 @@ am_libaugmarpp_la_OBJECTS = mar.lo compat.lo config.lo header.lo \
 	iterator.lo smartmar.lo stream.lo streambuf.lo swapfile.lo \
 	types.lo
 libaugmarpp_la_OBJECTS = $(am_libaugmarpp_la_OBJECTS)
-am_augmarpp_test_OBJECTS = test.$(OBJEXT)
-augmarpp_test_OBJECTS = $(am_augmarpp_test_OBJECTS)
-augmarpp_test_DEPENDENCIES =  \
+am_maintest_OBJECTS = maintest.$(OBJEXT)
+maintest_OBJECTS = $(am_maintest_OBJECTS)
+maintest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augmarpp/libaugmarpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -73,8 +73,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugmarpp_la_SOURCES) $(augmarpp_test_SOURCES)
-DIST_SOURCES = $(libaugmarpp_la_SOURCES) $(augmarpp_test_SOURCES)
+SOURCES = $(libaugmarpp_la_SOURCES) $(maintest_SOURCES)
+DIST_SOURCES = $(libaugmarpp_la_SOURCES) $(maintest_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -248,9 +248,9 @@ libaugmarpp_la_LIBADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-TESTS = augmarpp-test
-augmarpp_test_SOURCES = test.cpp
-augmarpp_test_LDADD = \
+TESTS = maintest
+maintest_SOURCES = maintest.cpp
+maintest_LDADD = \
 	$(top_builddir)/src/cpp/augmarpp/libaugmarpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la
 
@@ -305,9 +305,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augmarpp-test$(EXEEXT): $(augmarpp_test_OBJECTS) $(augmarpp_test_DEPENDENCIES) 
-	@rm -f augmarpp-test$(EXEEXT)
-	$(CXXLINK) $(augmarpp_test_LDFLAGS) $(augmarpp_test_OBJECTS) $(augmarpp_test_LDADD) $(LIBS)
+maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
+	@rm -f maintest$(EXEEXT)
+	$(CXXLINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -319,12 +319,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/header.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartmar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streambuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/swapfile.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 
 .cpp.o:

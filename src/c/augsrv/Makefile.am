@@ -36,9 +36,9 @@ libaugsrv_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = augsrv-test
-TESTS = augsrv-test
+check_PROGRAMS = maintest
+TESTS = maintest
 
-augsrv_test_SOURCES = test.c
-augsrv_test_LDADD = \
+maintest_SOURCES = maintest.c
+maintest_LDADD = \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la

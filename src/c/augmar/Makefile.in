@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = augmar-test$(EXEEXT)
+check_PROGRAMS = maintest$(EXEEXT)
 subdir = src/c/augmar
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -63,9 +63,9 @@ libaugmar_la_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugmar_la_OBJECTS = config.lo mar.lo types.lo body_.lo file_.lo \
 	flags_.lo format_.lo header_.lo info_.lo mfile_.lo seq_.lo
 libaugmar_la_OBJECTS = $(am_libaugmar_la_OBJECTS)
-am_augmar_test_OBJECTS = test.$(OBJEXT)
-augmar_test_OBJECTS = $(am_augmar_test_OBJECTS)
-augmar_test_DEPENDENCIES = $(top_builddir)/src/c/augmar/libaugmar.la
+am_maintest_OBJECTS = maintest.$(OBJEXT)
+maintest_OBJECTS = $(am_maintest_OBJECTS)
+maintest_DEPENDENCIES = $(top_builddir)/src/c/augmar/libaugmar.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -76,8 +76,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugmar_la_SOURCES) $(augmar_test_SOURCES)
-DIST_SOURCES = $(libaugmar_la_SOURCES) $(augmar_test_SOURCES)
+SOURCES = $(libaugmar_la_SOURCES) $(maintest_SOURCES)
+DIST_SOURCES = $(libaugmar_la_SOURCES) $(maintest_SOURCES)
 modincludeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(modinclude_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
@@ -245,9 +245,9 @@ libaugmar_la_LDFLAGS = \
 libaugmar_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-TESTS = augmar-test
-augmar_test_SOURCES = test.c
-augmar_test_LDADD = \
+TESTS = maintest
+maintest_SOURCES = maintest.c
+maintest_LDADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la
 
 all: all-am
@@ -319,9 +319,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augmar-test$(EXEEXT): $(augmar_test_OBJECTS) $(augmar_test_DEPENDENCIES) 
-	@rm -f augmar-test$(EXEEXT)
-	$(LINK) $(augmar_test_LDFLAGS) $(augmar_test_OBJECTS) $(augmar_test_LDADD) $(LIBS)
+maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
+	@rm -f maintest$(EXEEXT)
+	$(LINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -336,10 +336,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/format_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/header_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/info_.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mfile_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/seq_.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 
 .c.o:

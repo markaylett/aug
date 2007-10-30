@@ -46,17 +46,22 @@ libaugnet_la_LIBADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = augnet-base64test augnet-fixtest augnet-httptest
-TESTS = augnet-base64test augnet-httptest
+check_PROGRAMS = \
+	base64test \
+	fixtest \
+	httptest
+TESTS = \
+	base64test \
+	httptest
 
-augnet_base64test_SOURCES = base64test.c
-augnet_base64test_LDADD = \
+base64test_SOURCES = base64test.c
+base64test_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
-augnet_fixtest_SOURCES = fixtest.c
-augnet_fixtest_LDADD = \
+fixtest_SOURCES = fixtest.c
+fixtest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
-augnet_httptest_SOURCES = httptest.c
-augnet_httptest_LDADD = \
+httptest_SOURCES = httptest.c
+httptest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la

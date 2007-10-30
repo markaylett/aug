@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 bin_PROGRAMS = daug$(EXEEXT)
-check_PROGRAMS = augrtpp-test$(EXEEXT)
+check_PROGRAMS = maintest$(EXEEXT)
 @ENABLE_PYTHON_TRUE@am__append_1 = \
 @ENABLE_PYTHON_TRUE@	test/pytest1 \
 @ENABLE_PYTHON_TRUE@	test/pytest2 \
@@ -71,9 +71,6 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_augrtpp_test_OBJECTS = test.$(OBJEXT)
-augrtpp_test_OBJECTS = $(am_augrtpp_test_OBJECTS)
-augrtpp_test_DEPENDENCIES =
 am_daug_OBJECTS = daug.$(OBJEXT) exception.$(OBJEXT) module.$(OBJEXT) \
 	options.$(OBJEXT) session.$(OBJEXT) ssl.$(OBJEXT) \
 	utility.$(OBJEXT)
@@ -83,6 +80,9 @@ daug_DEPENDENCIES = $(top_builddir)/src/cpp/augrtpp/libaugrtpp.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la
+am_maintest_OBJECTS = maintest.$(OBJEXT)
+maintest_OBJECTS = $(am_maintest_OBJECTS)
+maintest_DEPENDENCIES =
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -93,8 +93,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(augrtpp_test_SOURCES) $(daug_SOURCES)
-DIST_SOURCES = $(augrtpp_test_SOURCES) $(daug_SOURCES)
+SOURCES = $(daug_SOURCES) $(maintest_SOURCES)
+DIST_SOURCES = $(daug_SOURCES) $(maintest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -265,9 +265,9 @@ TESTS_ENVIRONMENT = \
 	AUG_BUILDDIR=$(top_builddir) \
 	AUG_SRCDIR=$(top_srcdir)
 
-TESTS = augrtpp-test $(am__append_1) $(am__append_2)
-augrtpp_test_SOURCES = test.cpp
-augrtpp_test_LDADD = 
+TESTS = maintest $(am__append_1) $(am__append_2)
+maintest_SOURCES = maintest.cpp
+maintest_LDADD = 
 all: all-recursive
 
 .SUFFIXES:
@@ -336,12 +336,12 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augrtpp-test$(EXEEXT): $(augrtpp_test_OBJECTS) $(augrtpp_test_DEPENDENCIES) 
-	@rm -f augrtpp-test$(EXEEXT)
-	$(CXXLINK) $(augrtpp_test_LDFLAGS) $(augrtpp_test_OBJECTS) $(augrtpp_test_LDADD) $(LIBS)
 daug$(EXEEXT): $(daug_OBJECTS) $(daug_DEPENDENCIES) 
 	@rm -f daug$(EXEEXT)
 	$(CXXLINK) $(daug_LDFLAGS) $(daug_OBJECTS) $(daug_LDADD) $(LIBS)
+maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
+	@rm -f maintest$(EXEEXT)
+	$(CXXLINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -351,11 +351,11 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@
 
 .cpp.o:

@@ -71,53 +71,53 @@ libaugsys_la_LDFLAGS = \
 libaugsys_la_LIBADD =
 
 check_PROGRAMS = \
-	augsys-basetest \
-	augsys-errinfotest \
-	augsys-logtest \
-	augsys-mcasttest \
-	augsys-muxertest \
-	augsys-sockettest \
-	augsys-stringtest \
-	augsys-timetest
+	basetest \
+	errinfotest \
+	logtest \
+	mcasttest \
+	muxertest \
+	sockettest \
+	stringtest \
+	timetest
 
 TESTS = \
-	augsys-basetest \
-	augsys-errinfotest \
-	augsys-logtest \
-	augsys-mcasttest \
-	augsys-muxertest \
-	augsys-sockettest \
-	augsys-stringtest \
-	augsys-timetest
+	basetest \
+	errinfotest \
+	logtest \
+	mcasttest \
+	muxertest \
+	sockettest \
+	stringtest \
+	timetest
 
-augsys_basetest_SOURCES = basetest.c
-augsys_basetest_LDADD = \
+basetest_SOURCES = basetest.c
+basetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_errinfotest_SOURCES = errinfotest.c
-augsys_errinfotest_LDADD = \
+errinfotest_SOURCES = errinfotest.c
+errinfotest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_logtest_SOURCES = logtest.c
-augsys_logtest_LDADD = \
+logtest_SOURCES = logtest.c
+logtest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_mcasttest_SOURCES = mcasttest.c
-augsys_mcasttest_LDADD = \
+mcasttest_SOURCES = mcasttest.c
+mcasttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_muxertest_SOURCES = muxertest.c
-augsys_muxertest_LDADD = \
+muxertest_SOURCES = muxertest.c
+muxertest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_sockettest_SOURCES = sockettest.c
-augsys_sockettest_LDADD = \
+sockettest_SOURCES = sockettest.c
+sockettest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_stringtest_SOURCES = stringtest.c
-augsys_stringtest_LDADD = \
+stringtest_SOURCES = stringtest.c
+stringtest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_timetest_SOURCES = timetest.c
-augsys_timetest_LDADD = \
+timetest_SOURCES = timetest.c
+timetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la

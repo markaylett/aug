@@ -35,33 +35,33 @@ libaugnetpp_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	augnetpp-test \
-	augnetpp-base64test \
-	augnetpp-connectortest
+	maintest \
+	base64test \
+	connectortest
 
 TESTS = \
-	augnetpp-test \
-	augnetpp-base64test \
-	augnetpp-connectortest
+	maintest \
+	base64test \
+	connectortest
 
-augnetpp_test_SOURCES = test.cpp
-augnetpp_test_LDADD = \
+maintest_SOURCES = maintest.cpp
+maintest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augnetpp_base64test_SOURCES = base64test.cpp
-augnetpp_base64test_LDADD = \
+base64test_SOURCES = base64test.cpp
+base64test_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augnetpp_connectortest_SOURCES = connectortest.cpp
-augnetpp_connectortest_LDADD = \
+connectortest_SOURCES = connectortest.cpp
+connectortest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \

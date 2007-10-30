@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-check_PROGRAMS = augutilpp-test$(EXEEXT)
+check_PROGRAMS = maintest$(EXEEXT)
 subdir = src/cpp/augutilpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -57,9 +57,9 @@ libaugutilpp_la_DEPENDENCIES =  \
 am_libaugutilpp_la_OBJECTS = clock.lo config.lo conv.lo event.lo \
 	file.lo log.lo path.lo timer.lo var.lo
 libaugutilpp_la_OBJECTS = $(am_libaugutilpp_la_OBJECTS)
-am_augutilpp_test_OBJECTS = test.$(OBJEXT)
-augutilpp_test_OBJECTS = $(am_augutilpp_test_OBJECTS)
-augutilpp_test_DEPENDENCIES =  \
+am_maintest_OBJECTS = maintest.$(OBJEXT)
+maintest_OBJECTS = $(am_maintest_OBJECTS)
+maintest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -77,8 +77,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugutilpp_la_SOURCES) $(augutilpp_test_SOURCES)
-DIST_SOURCES = $(libaugutilpp_la_SOURCES) $(augutilpp_test_SOURCES)
+SOURCES = $(libaugutilpp_la_SOURCES) $(maintest_SOURCES)
+DIST_SOURCES = $(libaugutilpp_la_SOURCES) $(maintest_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -250,9 +250,9 @@ libaugutilpp_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-TESTS = augutilpp-test
-augutilpp_test_SOURCES = test.cpp
-augutilpp_test_LDADD = \
+TESTS = maintest
+maintest_SOURCES = maintest.cpp
+maintest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -312,9 +312,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augutilpp-test$(EXEEXT): $(augutilpp_test_OBJECTS) $(augutilpp_test_DEPENDENCIES) 
-	@rm -f augutilpp-test$(EXEEXT)
-	$(CXXLINK) $(augutilpp_test_LDFLAGS) $(augutilpp_test_OBJECTS) $(augutilpp_test_LDADD) $(LIBS)
+maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
+	@rm -f maintest$(EXEEXT)
+	$(CXXLINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -328,8 +328,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/var.Plo@am__quote@
 

@@ -53,3 +53,46 @@ main(int argc, char* argv[])
     aug_putshellwords(&st, '\n');
     return 0;
 }
+
+#if 0
+static char buf_[256];
+static unsigned i_ = 0;
+
+static void
+out_(void* arg, int what)
+{
+    switch (what) {
+    case TOKLABEL:
+        buf_[i_++] = '\0';
+        printf("'%s'=", buf_);
+        i_ = 0;
+        break;
+    case TOKWORD:
+        buf_[i_++] = '\0';
+        printf("[%s]\n", buf_);
+        i_ = 0;
+        break;
+    case TOKPHRASE:
+        printf("--\n");
+        break;
+    case TOKRTRIM:
+        i_ = rtrim_(buf_, i_);
+        break;
+    default:
+        buf_[i_++] = what;
+        break;
+    }
+}
+
+int
+main(int argc, char* argv[])
+{
+    struct state st;
+    init_(&st, out_, NULL);
+    int ch;
+    while (EOF != (ch = getchar()))
+        append_(&st, ch);
+    append_(&st, '\n');
+    return 0;
+}
+#endif

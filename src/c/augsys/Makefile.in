@@ -41,10 +41,9 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = augsys-basetest$(EXEEXT) augsys-errinfotest$(EXEEXT) \
-	augsys-logtest$(EXEEXT) augsys-mcasttest$(EXEEXT) \
-	augsys-muxertest$(EXEEXT) augsys-sockettest$(EXEEXT) \
-	augsys-stringtest$(EXEEXT) augsys-timetest$(EXEEXT)
+check_PROGRAMS = basetest$(EXEEXT) errinfotest$(EXEEXT) \
+	logtest$(EXEEXT) mcasttest$(EXEEXT) muxertest$(EXEEXT) \
+	sockettest$(EXEEXT) stringtest$(EXEEXT) timetest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -69,38 +68,30 @@ am_libaugsys_la_OBJECTS = barrier.lo base.lo config.lo debug.lo \
 	string.lo time.lo types.lo uio.lo unistd.lo utility.lo \
 	windows.lo tls_.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
-am_augsys_basetest_OBJECTS = basetest.$(OBJEXT)
-augsys_basetest_OBJECTS = $(am_augsys_basetest_OBJECTS)
-augsys_basetest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augsys_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
-augsys_errinfotest_OBJECTS = $(am_augsys_errinfotest_OBJECTS)
-augsys_errinfotest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augsys_logtest_OBJECTS = logtest.$(OBJEXT)
-augsys_logtest_OBJECTS = $(am_augsys_logtest_OBJECTS)
-augsys_logtest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augsys_mcasttest_OBJECTS = mcasttest.$(OBJEXT)
-augsys_mcasttest_OBJECTS = $(am_augsys_mcasttest_OBJECTS)
-augsys_mcasttest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augsys_muxertest_OBJECTS = muxertest.$(OBJEXT)
-augsys_muxertest_OBJECTS = $(am_augsys_muxertest_OBJECTS)
-augsys_muxertest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augsys_sockettest_OBJECTS = sockettest.$(OBJEXT)
-augsys_sockettest_OBJECTS = $(am_augsys_sockettest_OBJECTS)
-augsys_sockettest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augsys_stringtest_OBJECTS = stringtest.$(OBJEXT)
-augsys_stringtest_OBJECTS = $(am_augsys_stringtest_OBJECTS)
-augsys_stringtest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augsys_timetest_OBJECTS = timetest.$(OBJEXT)
-augsys_timetest_OBJECTS = $(am_augsys_timetest_OBJECTS)
-augsys_timetest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+am_basetest_OBJECTS = basetest.$(OBJEXT)
+basetest_OBJECTS = $(am_basetest_OBJECTS)
+basetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
+errinfotest_OBJECTS = $(am_errinfotest_OBJECTS)
+errinfotest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_logtest_OBJECTS = logtest.$(OBJEXT)
+logtest_OBJECTS = $(am_logtest_OBJECTS)
+logtest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_mcasttest_OBJECTS = mcasttest.$(OBJEXT)
+mcasttest_OBJECTS = $(am_mcasttest_OBJECTS)
+mcasttest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_muxertest_OBJECTS = muxertest.$(OBJEXT)
+muxertest_OBJECTS = $(am_muxertest_OBJECTS)
+muxertest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_sockettest_OBJECTS = sockettest.$(OBJEXT)
+sockettest_OBJECTS = $(am_sockettest_OBJECTS)
+sockettest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_stringtest_OBJECTS = stringtest.$(OBJEXT)
+stringtest_OBJECTS = $(am_stringtest_OBJECTS)
+stringtest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_timetest_OBJECTS = timetest.$(OBJEXT)
+timetest_OBJECTS = $(am_timetest_OBJECTS)
+timetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -111,16 +102,14 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
-	$(augsys_errinfotest_SOURCES) $(augsys_logtest_SOURCES) \
-	$(augsys_mcasttest_SOURCES) $(augsys_muxertest_SOURCES) \
-	$(augsys_sockettest_SOURCES) $(augsys_stringtest_SOURCES) \
-	$(augsys_timetest_SOURCES)
-DIST_SOURCES = $(libaugsys_la_SOURCES) $(augsys_basetest_SOURCES) \
-	$(augsys_errinfotest_SOURCES) $(augsys_logtest_SOURCES) \
-	$(augsys_mcasttest_SOURCES) $(augsys_muxertest_SOURCES) \
-	$(augsys_sockettest_SOURCES) $(augsys_stringtest_SOURCES) \
-	$(augsys_timetest_SOURCES)
+SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
+	$(errinfotest_SOURCES) $(logtest_SOURCES) $(mcasttest_SOURCES) \
+	$(muxertest_SOURCES) $(sockettest_SOURCES) \
+	$(stringtest_SOURCES) $(timetest_SOURCES)
+DIST_SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
+	$(errinfotest_SOURCES) $(logtest_SOURCES) $(mcasttest_SOURCES) \
+	$(muxertest_SOURCES) $(sockettest_SOURCES) \
+	$(stringtest_SOURCES) $(timetest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -328,45 +317,45 @@ libaugsys_la_LDFLAGS = \
 
 libaugsys_la_LIBADD = 
 TESTS = \
-	augsys-basetest \
-	augsys-errinfotest \
-	augsys-logtest \
-	augsys-mcasttest \
-	augsys-muxertest \
-	augsys-sockettest \
-	augsys-stringtest \
-	augsys-timetest
+	basetest \
+	errinfotest \
+	logtest \
+	mcasttest \
+	muxertest \
+	sockettest \
+	stringtest \
+	timetest
 
-augsys_basetest_SOURCES = basetest.c
-augsys_basetest_LDADD = \
+basetest_SOURCES = basetest.c
+basetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_errinfotest_SOURCES = errinfotest.c
-augsys_errinfotest_LDADD = \
+errinfotest_SOURCES = errinfotest.c
+errinfotest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_logtest_SOURCES = logtest.c
-augsys_logtest_LDADD = \
+logtest_SOURCES = logtest.c
+logtest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_mcasttest_SOURCES = mcasttest.c
-augsys_mcasttest_LDADD = \
+mcasttest_SOURCES = mcasttest.c
+mcasttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_muxertest_SOURCES = muxertest.c
-augsys_muxertest_LDADD = \
+muxertest_SOURCES = muxertest.c
+muxertest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_sockettest_SOURCES = sockettest.c
-augsys_sockettest_LDADD = \
+sockettest_SOURCES = sockettest.c
+sockettest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_stringtest_SOURCES = stringtest.c
-augsys_stringtest_LDADD = \
+stringtest_SOURCES = stringtest.c
+stringtest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augsys_timetest_SOURCES = timetest.c
-augsys_timetest_LDADD = \
+timetest_SOURCES = timetest.c
+timetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 all: all-recursive
@@ -438,30 +427,30 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augsys-basetest$(EXEEXT): $(augsys_basetest_OBJECTS) $(augsys_basetest_DEPENDENCIES) 
-	@rm -f augsys-basetest$(EXEEXT)
-	$(LINK) $(augsys_basetest_LDFLAGS) $(augsys_basetest_OBJECTS) $(augsys_basetest_LDADD) $(LIBS)
-augsys-errinfotest$(EXEEXT): $(augsys_errinfotest_OBJECTS) $(augsys_errinfotest_DEPENDENCIES) 
-	@rm -f augsys-errinfotest$(EXEEXT)
-	$(LINK) $(augsys_errinfotest_LDFLAGS) $(augsys_errinfotest_OBJECTS) $(augsys_errinfotest_LDADD) $(LIBS)
-augsys-logtest$(EXEEXT): $(augsys_logtest_OBJECTS) $(augsys_logtest_DEPENDENCIES) 
-	@rm -f augsys-logtest$(EXEEXT)
-	$(LINK) $(augsys_logtest_LDFLAGS) $(augsys_logtest_OBJECTS) $(augsys_logtest_LDADD) $(LIBS)
-augsys-mcasttest$(EXEEXT): $(augsys_mcasttest_OBJECTS) $(augsys_mcasttest_DEPENDENCIES) 
-	@rm -f augsys-mcasttest$(EXEEXT)
-	$(LINK) $(augsys_mcasttest_LDFLAGS) $(augsys_mcasttest_OBJECTS) $(augsys_mcasttest_LDADD) $(LIBS)
-augsys-muxertest$(EXEEXT): $(augsys_muxertest_OBJECTS) $(augsys_muxertest_DEPENDENCIES) 
-	@rm -f augsys-muxertest$(EXEEXT)
-	$(LINK) $(augsys_muxertest_LDFLAGS) $(augsys_muxertest_OBJECTS) $(augsys_muxertest_LDADD) $(LIBS)
-augsys-sockettest$(EXEEXT): $(augsys_sockettest_OBJECTS) $(augsys_sockettest_DEPENDENCIES) 
-	@rm -f augsys-sockettest$(EXEEXT)
-	$(LINK) $(augsys_sockettest_LDFLAGS) $(augsys_sockettest_OBJECTS) $(augsys_sockettest_LDADD) $(LIBS)
-augsys-stringtest$(EXEEXT): $(augsys_stringtest_OBJECTS) $(augsys_stringtest_DEPENDENCIES) 
-	@rm -f augsys-stringtest$(EXEEXT)
-	$(LINK) $(augsys_stringtest_LDFLAGS) $(augsys_stringtest_OBJECTS) $(augsys_stringtest_LDADD) $(LIBS)
-augsys-timetest$(EXEEXT): $(augsys_timetest_OBJECTS) $(augsys_timetest_DEPENDENCIES) 
-	@rm -f augsys-timetest$(EXEEXT)
-	$(LINK) $(augsys_timetest_LDFLAGS) $(augsys_timetest_OBJECTS) $(augsys_timetest_LDADD) $(LIBS)
+basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
+	@rm -f basetest$(EXEEXT)
+	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
+errinfotest$(EXEEXT): $(errinfotest_OBJECTS) $(errinfotest_DEPENDENCIES) 
+	@rm -f errinfotest$(EXEEXT)
+	$(LINK) $(errinfotest_LDFLAGS) $(errinfotest_OBJECTS) $(errinfotest_LDADD) $(LIBS)
+logtest$(EXEEXT): $(logtest_OBJECTS) $(logtest_DEPENDENCIES) 
+	@rm -f logtest$(EXEEXT)
+	$(LINK) $(logtest_LDFLAGS) $(logtest_OBJECTS) $(logtest_LDADD) $(LIBS)
+mcasttest$(EXEEXT): $(mcasttest_OBJECTS) $(mcasttest_DEPENDENCIES) 
+	@rm -f mcasttest$(EXEEXT)
+	$(LINK) $(mcasttest_LDFLAGS) $(mcasttest_OBJECTS) $(mcasttest_LDADD) $(LIBS)
+muxertest$(EXEEXT): $(muxertest_OBJECTS) $(muxertest_DEPENDENCIES) 
+	@rm -f muxertest$(EXEEXT)
+	$(LINK) $(muxertest_LDFLAGS) $(muxertest_OBJECTS) $(muxertest_LDADD) $(LIBS)
+sockettest$(EXEEXT): $(sockettest_OBJECTS) $(sockettest_DEPENDENCIES) 
+	@rm -f sockettest$(EXEEXT)
+	$(LINK) $(sockettest_LDFLAGS) $(sockettest_OBJECTS) $(sockettest_LDADD) $(LIBS)
+stringtest$(EXEEXT): $(stringtest_OBJECTS) $(stringtest_DEPENDENCIES) 
+	@rm -f stringtest$(EXEEXT)
+	$(LINK) $(stringtest_LDFLAGS) $(stringtest_OBJECTS) $(stringtest_LDADD) $(LIBS)
+timetest$(EXEEXT): $(timetest_OBJECTS) $(timetest_DEPENDENCIES) 
+	@rm -f timetest$(EXEEXT)
+	$(LINK) $(timetest_LDFLAGS) $(timetest_OBJECTS) $(timetest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

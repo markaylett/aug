@@ -30,7 +30,7 @@ daug_LDADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la
 
 check_PROGRAMS = \
-	augrtpp-test
+	maintest
 
 TESTS_ENVIRONMENT = \
 	AUG_LOGLEVEL=3 \
@@ -38,7 +38,7 @@ TESTS_ENVIRONMENT = \
 	AUG_SRCDIR=$(top_srcdir)
 
 TESTS = \
-	augrtpp-test
+	maintest
 
 if ENABLE_PYTHON
 TESTS += \
@@ -62,5 +62,5 @@ TESTS += \
 	test/rbtest7
 endif
 
-augrtpp_test_SOURCES = test.cpp
-augrtpp_test_LDADD =
+maintest_SOURCES = maintest.cpp
+maintest_LDADD =

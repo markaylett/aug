@@ -1,3 +1,11 @@
+EXTRA_DIST = \
+	shellwordstest.in \
+	shellwordstest.out \
+	shellwordstest.sh \
+	networdstest.in \
+	networdstest.out \
+	networdstest.sh
+
 include $(top_srcdir)/src/c/lang.mk
 SUBDIRS = \
 	posix \
@@ -57,23 +65,29 @@ libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	augutil-clocktest \
-	augutil-eventtest \
-	augutil-shellwordstest
+	clocktest \
+	eventtest \
+	networdstest \
+	shellwordstest
 
 TESTS = \
-	augutil-clocktest \
-	augutil-eventtest \
-	augutil-shellwordstest
+	clocktest \
+	eventtest \
+	networdstest.sh \
+	shellwordstest.sh
 
-augutil_clocktest_SOURCES = clocktest.c
-augutil_clocktest_LDADD = \
+clocktest_SOURCES = clocktest.c
+clocktest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-augutil_eventtest_SOURCES = eventtest.c
-augutil_eventtest_LDADD = \
+eventtest_SOURCES = eventtest.c
+eventtest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-augutil_shellwordstest_SOURCES = shellwordstest.c
-augutil_shellwordstest_LDADD = \
+networdstest_SOURCES = networdstest.c
+networdstest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
+
+shellwordstest_SOURCES = shellwordstest.c
+shellwordstest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la

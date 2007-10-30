@@ -40,8 +40,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-check_PROGRAMS = augnetpp-test$(EXEEXT) augnetpp-base64test$(EXEEXT) \
-	augnetpp-connectortest$(EXEEXT)
+check_PROGRAMS = maintest$(EXEEXT) base64test$(EXEEXT) \
+	connectortest$(EXEEXT)
 subdir = src/cpp/augnetpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -59,25 +59,25 @@ libaugnetpp_la_DEPENDENCIES =  \
 am_libaugnetpp_la_OBJECTS = base64.lo config.lo connector.lo file.lo \
 	http.lo inet.lo mar.lo nbfile.lo writer.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
-am_augnetpp_base64test_OBJECTS = base64test.$(OBJEXT)
-augnetpp_base64test_OBJECTS = $(am_augnetpp_base64test_OBJECTS)
-augnetpp_base64test_DEPENDENCIES =  \
+am_base64test_OBJECTS = base64test.$(OBJEXT)
+base64test_OBJECTS = $(am_base64test_OBJECTS)
+base64test_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augnetpp_connectortest_OBJECTS = connectortest.$(OBJEXT)
-augnetpp_connectortest_OBJECTS = $(am_augnetpp_connectortest_OBJECTS)
-augnetpp_connectortest_DEPENDENCIES =  \
+am_connectortest_OBJECTS = connectortest.$(OBJEXT)
+connectortest_OBJECTS = $(am_connectortest_OBJECTS)
+connectortest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_augnetpp_test_OBJECTS = test.$(OBJEXT)
-augnetpp_test_OBJECTS = $(am_augnetpp_test_OBJECTS)
-augnetpp_test_DEPENDENCIES =  \
+am_maintest_OBJECTS = maintest.$(OBJEXT)
+maintest_OBJECTS = $(am_maintest_OBJECTS)
+maintest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -93,11 +93,10 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugnetpp_la_SOURCES) $(augnetpp_base64test_SOURCES) \
-	$(augnetpp_connectortest_SOURCES) $(augnetpp_test_SOURCES)
-DIST_SOURCES = $(libaugnetpp_la_SOURCES) \
-	$(augnetpp_base64test_SOURCES) \
-	$(augnetpp_connectortest_SOURCES) $(augnetpp_test_SOURCES)
+SOURCES = $(libaugnetpp_la_SOURCES) $(base64test_SOURCES) \
+	$(connectortest_SOURCES) $(maintest_SOURCES)
+DIST_SOURCES = $(libaugnetpp_la_SOURCES) $(base64test_SOURCES) \
+	$(connectortest_SOURCES) $(maintest_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -271,28 +270,28 @@ libaugnetpp_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = \
-	augnetpp-test \
-	augnetpp-base64test \
-	augnetpp-connectortest
+	maintest \
+	base64test \
+	connectortest
 
-augnetpp_test_SOURCES = test.cpp
-augnetpp_test_LDADD = \
+maintest_SOURCES = maintest.cpp
+maintest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augnetpp_base64test_SOURCES = base64test.cpp
-augnetpp_base64test_LDADD = \
+base64test_SOURCES = base64test.cpp
+base64test_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-augnetpp_connectortest_SOURCES = connectortest.cpp
-augnetpp_connectortest_LDADD = \
+connectortest_SOURCES = connectortest.cpp
+connectortest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -350,15 +349,15 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augnetpp-base64test$(EXEEXT): $(augnetpp_base64test_OBJECTS) $(augnetpp_base64test_DEPENDENCIES) 
-	@rm -f augnetpp-base64test$(EXEEXT)
-	$(CXXLINK) $(augnetpp_base64test_LDFLAGS) $(augnetpp_base64test_OBJECTS) $(augnetpp_base64test_LDADD) $(LIBS)
-augnetpp-connectortest$(EXEEXT): $(augnetpp_connectortest_OBJECTS) $(augnetpp_connectortest_DEPENDENCIES) 
-	@rm -f augnetpp-connectortest$(EXEEXT)
-	$(CXXLINK) $(augnetpp_connectortest_LDFLAGS) $(augnetpp_connectortest_OBJECTS) $(augnetpp_connectortest_LDADD) $(LIBS)
-augnetpp-test$(EXEEXT): $(augnetpp_test_OBJECTS) $(augnetpp_test_DEPENDENCIES) 
-	@rm -f augnetpp-test$(EXEEXT)
-	$(CXXLINK) $(augnetpp_test_LDFLAGS) $(augnetpp_test_OBJECTS) $(augnetpp_test_LDADD) $(LIBS)
+base64test$(EXEEXT): $(base64test_OBJECTS) $(base64test_DEPENDENCIES) 
+	@rm -f base64test$(EXEEXT)
+	$(CXXLINK) $(base64test_LDFLAGS) $(base64test_OBJECTS) $(base64test_LDADD) $(LIBS)
+connectortest$(EXEEXT): $(connectortest_OBJECTS) $(connectortest_DEPENDENCIES) 
+	@rm -f connectortest$(EXEEXT)
+	$(CXXLINK) $(connectortest_LDFLAGS) $(connectortest_OBJECTS) $(connectortest_LDADD) $(LIBS)
+maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
+	@rm -f maintest$(EXEEXT)
+	$(CXXLINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -374,9 +373,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nbfile.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Plo@am__quote@
 
 .cpp.o:

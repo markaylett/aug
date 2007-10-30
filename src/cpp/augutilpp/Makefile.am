@@ -33,11 +33,11 @@ libaugutilpp_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = augutilpp-test
-TESTS = augutilpp-test
+check_PROGRAMS = maintest
+TESTS = maintest
 
-augutilpp_test_SOURCES = test.cpp
-augutilpp_test_LDADD = \
+maintest_SOURCES = maintest.cpp
+maintest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \

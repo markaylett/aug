@@ -24,11 +24,11 @@ libaugsrvpp_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = augsrvpp-test
-TESTS = augsrvpp-test
+check_PROGRAMS = maintest
+TESTS = maintest
 
-augsrvpp_test_SOURCES = test.cpp
-augsrvpp_test_LDADD = \
+maintest_SOURCES = maintest.cpp
+maintest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \

@@ -38,9 +38,9 @@ libaugmar_la_LDFLAGS = \
 libaugmar_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = augmar-test
-TESTS = augmar-test
+check_PROGRAMS = maintest
+TESTS = maintest
 
-augmar_test_SOURCES = test.c
-augmar_test_LDADD = \
+maintest_SOURCES = maintest.c
+maintest_LDADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la

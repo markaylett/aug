@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = augsrv-test$(EXEEXT)
+check_PROGRAMS = maintest$(EXEEXT)
 subdir = src/c/augsrv
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -64,9 +64,9 @@ libaugsrv_la_DEPENDENCIES =  \
 am_libaugsrv_la_OBJECTS = base.lo config.lo control.lo daemon.lo \
 	log.lo main.lo options.lo signal.lo types.lo
 libaugsrv_la_OBJECTS = $(am_libaugsrv_la_OBJECTS)
-am_augsrv_test_OBJECTS = test.$(OBJEXT)
-augsrv_test_OBJECTS = $(am_augsrv_test_OBJECTS)
-augsrv_test_DEPENDENCIES = $(top_builddir)/src/c/augsrv/libaugsrv.la
+am_maintest_OBJECTS = maintest.$(OBJEXT)
+maintest_OBJECTS = $(am_maintest_OBJECTS)
+maintest_DEPENDENCIES = $(top_builddir)/src/c/augsrv/libaugsrv.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -77,8 +77,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugsrv_la_SOURCES) $(augsrv_test_SOURCES)
-DIST_SOURCES = $(libaugsrv_la_SOURCES) $(augsrv_test_SOURCES)
+SOURCES = $(libaugsrv_la_SOURCES) $(maintest_SOURCES)
+DIST_SOURCES = $(libaugsrv_la_SOURCES) $(maintest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -252,9 +252,9 @@ libaugsrv_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-TESTS = augsrv-test
-augsrv_test_SOURCES = test.c
-augsrv_test_LDADD = \
+TESTS = maintest
+maintest_SOURCES = maintest.c
+maintest_LDADD = \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la
 
 all: all-recursive
@@ -326,9 +326,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-augsrv-test$(EXEEXT): $(augsrv_test_OBJECTS) $(augsrv_test_DEPENDENCIES) 
-	@rm -f augsrv-test$(EXEEXT)
-	$(LINK) $(augsrv_test_LDFLAGS) $(augsrv_test_OBJECTS) $(augsrv_test_LDADD) $(LIBS)
+maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
+	@rm -f maintest$(EXEEXT)
+	$(LINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -342,9 +342,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daemon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 
 .c.o:
