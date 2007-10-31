@@ -58,6 +58,15 @@ aug_blocksignals(void)
 {
     sigset_t set;
     sigfillset(&set);
+
+    /* Do not block these. */
+
+    sigdelset(&sigs, SIGABRT);
+    sigdelset(&sigs, SIGFPE);
+    sigdelset(&sigs, SIGILL);
+    sigdelset(&sigs, SIGSEGV);
+    sigdelset(&sigs, SIGBUS);
+
 #if ENABLE_THREADS
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
