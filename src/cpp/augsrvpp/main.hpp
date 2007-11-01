@@ -88,7 +88,7 @@ namespace aug {
             getopt(void* arg, enum aug_option opt) AUG_NOTHROW
             {
                 try {
-                    static_cast<T*>(arg)->getopt(opt);
+                    return static_cast<T*>(arg)->getopt(opt);
                 } AUG_SETERRINFOCATCH;
                 return 0;
             }
