@@ -54,12 +54,15 @@
 # endif /* !AUG_NOTHROW */
 #endif /* __cplusplus */
 
-#if !defined(_WIN32)
-# define AUG_EXPORT
-# define AUG_IMPORT
-#else /* _WIN32 */
+#if defined(__CYGWIN__) || defined(__MINGW32__)
+# define AUG_EXPORT __attribute__ ((dllexport))
+# define AUG_IMPORT __attribute__ ((dllimport))
+#elif defined(_MSC_VER)
 # define AUG_EXPORT __declspec(dllexport)
 # define AUG_IMPORT __declspec(dllimport)
-#endif /* _WIN32 */
+#else /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
+# define AUG_EXPORT
+# define AUG_IMPORT
+#endif /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
 
 #endif /* AUGCONFIG_H */
