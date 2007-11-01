@@ -2,16 +2,19 @@
 .SUFFIXES: .c .cpp .dll .exe .so .o
 
 SHELL = /bin/sh
-UNAME := $(shell uname | sed -e 's/CYGWIN.*/WIN32/i' \
-	-e 's/MINGW.*/WIN32/i')
+
+ifndef PLATFORM
+BUILD:=$(shell uname -s | sed -e 's/CYGWIN.*/CYGWIN/i' -e 's/MINGW.*/MINGW/i')
+else
+BUILD:=$(shell echo $(PLATFORM) | tr '[:lower:]' '[:upper:]')
+endif
 
 AR = ar
 CC = gcc
 CXX = g++
 RM = rm
 
-ifeq ($(UNAME), WIN32)
-
+ifeq ($(BUILD), MINGW)
 COPTS = \
 	-mno-cygwin \
 	-mthreads
@@ -53,7 +56,11 @@ COPTS = \
 CDEFS = \
 	-DPIC
 
+ifeq ($(BUILD), CYGWIN)
+DLL_EXT = .dll
+else
 DLL_EXT = .so
+endif
 DLL_LDFLAGS =
 DLL_CLIBS =
 DLL_CXXLIBS =
@@ -94,8 +101,8 @@ DEPS += $$($(1)_OBJS:%.o=%.d)
 OBJS += $$($(1)_OBJS)
 $(1)$(DLL_EXT): $$($(1)_OBJS)
 	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) -shared -Wl,-soname,$(1)$(DLL_EXT) \
-		$(LDFLAGS) $(DLL_LDFLAGS) -o $(1)$(DLL_EXT) $$($(1)_OBJS) \
-		$$($(1)_LIBS:%=-l%) $(DLL_CLIBS)
+		$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) -o $(1)$(DLL_EXT) \
+		$$($(1)_OBJS) $$($(1)_LIBS:%=-l%) $(DLL_CLIBS)
 endef
 
 define CXXMODULE_template
@@ -103,24 +110,26 @@ DEPS += $$($(1)_OBJS:%.o=%.d)
 OBJS += $$($(1)_OBJS)
 $(1)$(DLL_EXT): $(DLL_CXXCRT) $$($(1)_OBJS)
 	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) -shared -Wl,-soname,$(1)$(DLL_EXT) \
-		$(LDFLAGS) $(DLL_LDFLAGS) -o $(1)$(DLL_EXT) $$($(1)_OBJS) \
-		$$($(1)_LIBS:%=-l%) $(DLL_CXXLIBS)
+		$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) -o $(1)$(DLL_EXT) \
+		$$($(1)_OBJS) $$($(1)_LIBS:%=-l%) $(DLL_CXXLIBS)
 endef
 
 define CPROGRAM_template
 DEPS += $$($(1)_OBJS:%.o=%.d)
 OBJS += $$($(1)_OBJS)
 $(1)$(EXE_EXT): $$($(1)_OBJS)
-	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) $(LDFLAGS) $(EXE_LDFLAGS) \
-		-o $(1)$(EXE_EXT) $$($(1)_OBJS) $$($(1)_LIBS:%=-l%) $(EXE_CLIBS)
+	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) $(LDFLAGS) $$($(1)_LDFLAGS) \
+		$(EXE_LDFLAGS) -o $(1)$(EXE_EXT) $$($(1)_OBJS) $$($(1)_LIBS:%=-l%) \
+		$(EXE_CLIBS)
 endef
 
 define CXXPROGRAM_template
 DEPS += $$($(1)_OBJS:%.o=%.d)
 OBJS += $$($(1)_OBJS)
 $(1)$(EXE_EXT): $$($(1)_OBJS)
-	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) $(LDFLAGS) $(EXE_LDFLAGS) \
-		-o $(1)$(EXE_EXT) $$($(1)_OBJS) $$($(1)_LIBS:%=-l%) $(EXE_CXXLIBS)
+	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) $(LDFLAGS) $$($(1)_LDFLAGS) \
+		$(EXE_LDFLAGS) -o $(1)$(EXE_EXT) $$($(1)_OBJS) $$($(1)_LIBS:%=-l%) \
+		$(EXE_CXXLIBS)
 endef
 
 $(foreach x,$(CMODULES),$(eval \
@@ -135,7 +144,7 @@ $(foreach x,$(CPROGRAMS),$(eval \
 $(foreach x,$(CXXPROGRAMS),$(eval \
 	$(call CXXPROGRAM_template,$(x))))
 
-ifeq ($(UNAME), WIN32)
+ifeq ($(BUILD), MINGW)
 $(DLL_CXXCRT): /usr/lib/mingw/dllcrt2.o
 	$(AR) -cr $@ $<
 endif
