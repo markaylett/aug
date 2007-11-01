@@ -6,6 +6,10 @@
 
 #include <stddef.h>
 
+#if !defined(offsetof)
+# define offsetof(s, m) (size_t)&(((s*)0)->m)
+#endif /* !offsetof */
+
 #if !defined(AUG_MAXLINE)
 # define AUG_MAXLINE 1024
 #endif /* !AUG_MAXLINE */
@@ -29,6 +33,39 @@
 #else /* __GNUC__ */
 # define AUG_RCSID(x)                                   \
     static const char rcsid[] __attribute__((used)) = x
+#endif /* __GNUC__ */
+
+#if !defined(__GNUC__)
+# define AUG_DLLMAIN(init, term)                                \
+    BOOL WINAPI                                                 \
+    DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)  \
+    {                                                           \
+        switch (reason) {                                       \
+        case DLL_PROCESS_ATTACH:                                \
+            init();                                             \
+            break;                                              \
+        case DLL_THREAD_ATTACH:                                 \
+            break;                                              \
+        case DLL_THREAD_DETACH:                                 \
+            break;                                              \
+        case DLL_PROCESS_DETACH:                                \
+            term();                                             \
+            break;                                              \
+        }                                                       \
+        return TRUE;                                            \
+    }
+#else /* __GNUC__ */
+# define AUG_DLLMAIN(init, term)                \
+    static void __attribute__ ((constructor))   \
+    aug_dllinit_(void)                          \
+    {                                           \
+        init();                                 \
+    }                                           \
+    static void __attribute__ ((destructor))    \
+    aug_dllterm_(void)                          \
+    {                                           \
+        term();                                 \
+    }
 #endif /* __GNUC__ */
 
 #endif /* AUGSYS_DEFS_H */
