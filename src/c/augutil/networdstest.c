@@ -18,7 +18,7 @@ out_(void* arg, int what)
     case AUG_TOKERROR:
         assert(0);
     case AUG_TOKPHRASE:
-        printf("\n\n");
+        printf("--\n\n");
         break;
     case AUG_TOKLABEL:
         buf_[i_++] = '\0';
