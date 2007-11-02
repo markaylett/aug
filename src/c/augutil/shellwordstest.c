@@ -17,6 +17,9 @@ out_(void* arg, int what)
     switch (what) {
     case AUG_TOKERROR:
         assert(0);
+    case AUG_TOKPHRASE:
+        printf("\n");
+        break;
     case AUG_TOKLABEL:
         buf_[i_++] = '\0';
         printf("'%s'=", buf_);
@@ -26,9 +29,6 @@ out_(void* arg, int what)
         buf_[i_++] = '\0';
         printf("[%s]", buf_);
         i_ = 0;
-        break;
-    case AUG_TOKPHRASE:
-        printf("\n");
         break;
     case AUG_TOKRTRIM:
         assert(0);

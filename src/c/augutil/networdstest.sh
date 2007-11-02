@@ -1,5 +1,5 @@
 #!/bin/sh
-./networdstest <networdstest.in | egrep -v '^[[:space:]]*$' >tmp.$$
+./networdstest <networdstest.in >tmp.$$
 cmp -s tmp.$$ networdstest.out
 ret=$?
 rm -f tmp.$$
