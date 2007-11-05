@@ -14,13 +14,16 @@
 # define AUGRT_EXTERN extern "C"
 #endif /* __cplusplus */
 
-#if !defined(_WIN32)
-# define AUGRT_EXPORT AUGRT_EXTERN
-# define AUGRT_IMPORT AUGRT_EXTERN
-#else /* _WIN32 */
-# define AUGRT_EXPORT AUGRT_EXTERN __declspec(dllexport)
-# define AUGRT_IMPORT AUGRT_EXTERN __declspec(dllimport)
-#endif /* _WIN32 */
+#if defined(__CYGWIN__) || defined(__MINGW32__)
+# define AUG_EXPORT __attribute__ ((dllexport))
+# define AUG_IMPORT __attribute__ ((dllimport))
+#elif defined(_MSC_VER)
+# define AUG_EXPORT __declspec(dllexport)
+# define AUG_IMPORT __declspec(dllimport)
+#else /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
+# define AUG_EXPORT
+# define AUG_IMPORT
+#endif /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
 
 #if !defined(AUGRT_BUILD)
 # define AUGRT_API AUGRT_EXPORT
