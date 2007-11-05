@@ -7,9 +7,9 @@
 #include "augutil/config.h"
 #include "augsys/types.h"
 
-#define AUG_LEXPHRASE 0x01
-#define AUG_LEXLABEL  0x02
-#define AUG_LEXWORD   0x04
+#define AUG_LEXLABEL  0x01
+#define AUG_LEXWORD   0x02
+#define AUG_LEXPHRASE 0x04
 
 typedef struct aug_lexer_* aug_lexer_t;
 

@@ -108,7 +108,7 @@ word_(struct aug_words* st, int ch)
             break;
         default:
             st->out_(st->arg_, AUG_TOKWORD);
-            /* Append to word. */
+            /* Append to new word. */
             st->out_(st->arg_, ch);
             st->flags_ |= AUG_WRDLABEL;
             break;

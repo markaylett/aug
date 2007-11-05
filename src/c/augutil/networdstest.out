@@ -21,6 +21,6 @@
 --
 
 [leading and trailing space on initial and continuing to next line]
-'label'=[  line continuation after label]
+'label'=[ line continuation after label]
 --
 

@@ -151,10 +151,6 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
     while (i < size) {
 
         switch (aug_appendlexer(parser->lexer_, ptr[i++])) {
-        case AUG_LEXPHRASE:
-            if (-1 == phrase_(parser))
-                return -1;
-            goto done;
         case AUG_LEXLABEL:
             if (-1 == label_(parser))
                 return -1;
@@ -166,6 +162,10 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
         case AUG_LEXWORD | AUG_LEXPHRASE:
             if (-1 == word_(parser)
                 || -1 == phrase_(parser))
+                return -1;
+            goto done;
+        case AUG_LEXPHRASE:
+            if (-1 == phrase_(parser))
                 return -1;
             goto done;
         }
@@ -283,10 +283,6 @@ AUGNET_API int
 aug_finishhttp(aug_httpparser_t parser)
 {
     switch (aug_finishlexer(parser->lexer_)) {
-    case AUG_LEXPHRASE:
-        if (-1 == phrase_(parser))
-            goto fail;
-        break;
     case AUG_LEXLABEL:
         if (-1 == label_(parser))
             goto fail;
@@ -298,6 +294,10 @@ aug_finishhttp(aug_httpparser_t parser)
     case AUG_LEXWORD | AUG_LEXPHRASE:
         if (-1 == word_(parser)
             || -1 == phrase_(parser))
+            goto fail;
+        break;
+    case AUG_LEXPHRASE:
+        if (-1 == phrase_(parser))
             goto fail;
         break;
     }

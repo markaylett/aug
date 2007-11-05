@@ -34,6 +34,6 @@ Host: localhost:8080
 Connection: Keep-Alive
 
  leading and trailing space on initial  
-  and continuing to next line
+   and continuing to next line
 label:
   line continuation after label

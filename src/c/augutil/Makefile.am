@@ -1,10 +1,11 @@
 EXTRA_DIST = \
-	shellwordstest.in \
-	shellwordstest.out \
-	shellwordstest.sh \
 	networdstest.in \
 	networdstest.out \
-	networdstest.sh
+	networdstest.sh \
+	shelllexertest.sh \
+	shellwordstest.in \
+	shellwordstest.out \
+	shellwordstest.sh
 
 include $(top_srcdir)/src/c/lang.mk
 SUBDIRS = \
@@ -68,12 +69,14 @@ check_PROGRAMS = \
 	clocktest \
 	eventtest \
 	networdstest \
+	shelllexertest \
 	shellwordstest
 
 TESTS = \
 	clocktest \
 	eventtest \
 	networdstest.sh \
+	shelllexertest.sh \
 	shellwordstest.sh
 
 clocktest_SOURCES = clocktest.c
@@ -86,6 +89,10 @@ eventtest_LDADD = \
 
 networdstest_SOURCES = networdstest.c
 networdstest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
+
+shelllexertest_SOURCES = shelllexertest.c
+shelllexertest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la
 
 shellwordstest_SOURCES = shellwordstest.c

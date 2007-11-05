@@ -5,9 +5,9 @@
 #define AUGUTIL_TYPES_H
 
 #define AUG_TOKERROR  (-1)
-#define AUG_TOKPHRASE (-2)
-#define AUG_TOKLABEL  (-3)
-#define AUG_TOKWORD   (-4)
+#define AUG_TOKLABEL  (-2)
+#define AUG_TOKWORD   (-3)
+#define AUG_TOKPHRASE (-4)
 #define AUG_TOKRTRIM  (-5)
 
 #define AUG_WRDESCAPE  0x01
