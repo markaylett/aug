@@ -568,7 +568,7 @@ authcert_(const struct augmod_object* sock, const char* subject,
     return ret;
 }
 
-static const struct augmod_control control_ = {
+static const struct augmod_proxy proxy_ = {
     stop_,
     start_,
     reconf_,
@@ -584,7 +584,7 @@ static const struct augmod_control control_ = {
     authcert_
 };
 
-static const struct augmod_control*
+static const struct augmod_proxy*
 init_(const char* name)
 {
     augmod_writelog(AUGMOD_LOGINFO, "initialising augpy module");
@@ -592,7 +592,7 @@ init_(const char* name)
     if (initpy_() < 0)
         return NULL;
 
-    return &control_;
+    return &proxy_;
 }
 
 static void

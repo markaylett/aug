@@ -392,7 +392,7 @@ struct augmod_host {
    with a connection, a failure will result in the connection being closed.
 */
 
-struct augmod_control {
+struct augmod_proxy {
 
     /**
        Stop session.
@@ -577,7 +577,7 @@ augmod_gethost(void);
     {                                                               \
         return host_;                                               \
     }                                                               \
-    AUGMOD_API const struct augmod_control*                         \
+    AUGMOD_API const struct augmod_proxy*                           \
     augmod_init(const char* name, const struct augmod_host* host)   \
     {                                                               \
         if (host_)                                                  \
@@ -593,7 +593,7 @@ augmod_gethost(void);
     }
 
 typedef void (*augmod_termfn)(void);
-typedef const struct augmod_control*
+typedef const struct augmod_proxy*
 (*augmod_initfn)(const char*, const struct augmod_host*);
 
 #endif /* AUGMOD_H */

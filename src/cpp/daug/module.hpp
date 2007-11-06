@@ -17,7 +17,7 @@ namespace augrt {
         const std::string name_;
         aug::dlib lib_;
         augmod_termfn termfn_;
-        augmod_control control_;
+        augmod_proxy proxy_;
 
         module(const module&);
 

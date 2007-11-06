@@ -66,7 +66,7 @@ namespace {
 }
 
 void
-augrt::setdefaults(augmod_control& dst, const augmod_control& src,
+augrt::setdefaults(augmod_proxy& dst, const augmod_proxy& src,
                    void (*teardown)(const augmod_object*))
 {
     dst.stop_ = src.stop_ ? src.stop_ : stop;

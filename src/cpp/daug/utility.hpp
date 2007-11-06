@@ -4,13 +4,13 @@
 #ifndef DAUG_UTILITY_HPP
 #define DAUG_UTILITY_HPP
 
-struct augmod_control;
+struct augmod_proxy;
 struct augmod_object;
 
 namespace augrt {
 
     void
-    setdefaults(augmod_control& dst, const augmod_control& src,
+    setdefaults(augmod_proxy& dst, const augmod_proxy& src,
                 void (*teardown)(const augmod_object*));
 }
 
