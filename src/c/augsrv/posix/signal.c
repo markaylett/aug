@@ -61,11 +61,11 @@ aug_blocksignals(void)
 
     /* Do not block these. */
 
-    sigdelset(&sigs, SIGABRT);
-    sigdelset(&sigs, SIGFPE);
-    sigdelset(&sigs, SIGILL);
-    sigdelset(&sigs, SIGSEGV);
-    sigdelset(&sigs, SIGBUS);
+    sigdelset(&set, SIGABRT);
+    sigdelset(&set, SIGFPE);
+    sigdelset(&set, SIGILL);
+    sigdelset(&set, SIGSEGV);
+    sigdelset(&set, SIGBUS);
 
 #if ENABLE_THREADS
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
