@@ -654,7 +654,7 @@ namespace augmod {
         }
 
     public:
-        static const struct augmod_proxy*
+        static const augmod_proxy*
         init(const char* name) AUGMOD_NOTHROW
         {
             static const augmod_proxy local = {

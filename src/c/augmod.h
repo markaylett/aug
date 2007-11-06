@@ -9,9 +9,9 @@
 #include <sys/types.h> /* size_t */
 
 #if !defined(__cplusplus)
-# define AUGMOD_EXTERN extern
+# define AUGMOD_EXTERNC extern
 #else /* __cplusplus */
-# define AUGMOD_EXTERN extern "C"
+# define AUGMOD_EXTERNC extern "C"
 #endif /* __cplusplus */
 
 #if defined(__CYGWIN__) || defined(__MINGW32__)
@@ -26,9 +26,9 @@
 #endif /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
 
 #if !defined(AUGMOD_BUILD)
-# define AUGMOD_API AUGMOD_IMPORT
+# define AUGMOD_API AUGMOD_EXTERNC AUGMOD_IMPORT
 #else /* AUGMOD_BUILD */
-# define AUGMOD_API AUGMOD_EXPORT
+# define AUGMOD_API AUGMOD_EXTERNC AUGMOD_EXPORT
 #endif /* AUGMOD_BUILD */
 
 /* Also defined in augutil/var.h. */
@@ -534,7 +534,7 @@ struct augmod_proxy {
                      const char* issuer);
 };
 
-AUGMOD_EXTERN const struct augmod_host*
+AUGMOD_EXTERNC const struct augmod_host*
 augmod_gethost(void);
 
 /**
@@ -572,7 +572,7 @@ augmod_gethost(void);
 
 #define AUGMOD_ENTRYPOINTS(init, term)                              \
     static const struct augmod_host* host_ = NULL;                  \
-    AUGMOD_EXTERN const struct augmod_host*                         \
+    AUGMOD_EXTERNC const struct augmod_host*                         \
     augmod_gethost(void)                                            \
     {                                                               \
         return host_;                                               \
@@ -583,12 +583,12 @@ augmod_gethost(void);
         if (host_)                                                  \
             return NULL;                                            \
         host_ = host;                                               \
-        return (*init)(name);                                       \
+        return init(name);                                          \
     }                                                               \
     AUGMOD_API void                                                 \
     augmod_term(void)                                               \
     {                                                               \
-        (*term)();                                                  \
+        term();                                                     \
         host_ = NULL;                                               \
     }
 
