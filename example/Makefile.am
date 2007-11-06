@@ -1,3 +1,3 @@
 SUBDIRS = \
-	augrt \
+	augas \
 	cpp

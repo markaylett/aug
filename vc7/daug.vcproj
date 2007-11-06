@@ -120,7 +120,7 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}"
-			Name="augrtpp"/>
+			Name="augaspp"/>
 	</References>
 	<Files>
 		<Filter

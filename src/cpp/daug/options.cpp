@@ -12,7 +12,7 @@ AUG_RCSID("$Id$");
 #include "augutilpp/file.hpp"
 
 using namespace aug;
-using namespace augrt;
+using namespace augas;
 using namespace std;
 
 namespace {

@@ -11,7 +11,7 @@ AUG_RCSID("$Id$");
 
 # include "daug/options.hpp"
 
-# include "augrtpp/conn.hpp"
+# include "augaspp/conn.hpp"
 
 # include "augsys/log.h"
 # include "augsys/string.h"
@@ -22,7 +22,7 @@ AUG_RCSID("$Id$");
 # include <openssl/ssl.h>
 
 using namespace aug;
-using namespace augrt;
+using namespace augas;
 using namespace std;
 
 namespace {
@@ -159,7 +159,7 @@ namespace {
 }
 
 sslctxptr
-augrt::createsslctx(const string& name, const options& options,
+augas::createsslctx(const string& name, const options& options,
                     char* frobpass)
 {
     string s("ssl.context.");
@@ -243,7 +243,7 @@ augrt::createsslctx(const string& name, const options& options,
 }
 
 void
-augrt::createsslctxs(sslctxs& sslctxs, const options& options, char* frobpass)
+augas::createsslctxs(sslctxs& sslctxs, const options& options, char* frobpass)
 {
     const char* contexts = options.get("ssl.contexts", 0);
 

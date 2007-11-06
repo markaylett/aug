@@ -11,7 +11,7 @@ AUG_RCSID("$Id$");
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "augrtpp/engine.hpp"
+#include "augaspp/engine.hpp"
 
 #include "daug/exception.hpp"
 #include "daug/module.hpp"
@@ -29,7 +29,7 @@ AUG_RCSID("$Id$");
 #include <time.h>
 
 using namespace aug;
-using namespace augrt;
+using namespace augas;
 using namespace std;
 
 namespace {
@@ -551,7 +551,7 @@ namespace {
                     aug_info("loading module: name=[%s], path=[%s]",
                              value.c_str(), path.c_str());
                     aug::chdir(rundir_);
-                    moduleptr module(new augrt::module(value, path.c_str(),
+                    moduleptr module(new augas::module(value, path.c_str(),
                                                        host_, teardown_));
                     it = state_->modules_
                         .insert(make_pair(value, module)).first;
@@ -559,7 +559,7 @@ namespace {
 
                 aug_info("creating session: name=[%s]", name.c_str());
                 state_->engine_.insert
-                    (name, sessionptr(new augrt::session(it->second,
+                    (name, sessionptr(new augas::session(it->second,
                                                          name.c_str())),
                      options_.get(base + ".groups", 0));
             }
@@ -569,14 +569,14 @@ namespace {
             // No session list: assume reasonable defaults.
 
             aug_info("loading module: name=[%s]", DEFAULT_NAME);
-            moduleptr module(new augrt::module(DEFAULT_NAME, DEFAULT_MODULE,
+            moduleptr module(new augas::module(DEFAULT_NAME, DEFAULT_MODULE,
                                                host_, teardown_));
             state_->modules_[DEFAULT_NAME] = module;
 
             aug_info("creating session: name=[%s]", DEFAULT_NAME);
             state_->engine_
                 .insert(DEFAULT_NAME,
-                        sessionptr(new augrt::session(module, DEFAULT_NAME)),
+                        sessionptr(new augas::session(module, DEFAULT_NAME)),
                         0);
         }
 

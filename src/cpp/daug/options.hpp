@@ -9,7 +9,7 @@
 
 #include "augsyspp/config.hpp"
 
-namespace augrt {
+namespace augas {
 
     class options {
         std::map<std::string, std::string> options_;

@@ -12,7 +12,7 @@ AUG_RCSID("$Id$");
 #include <stack>
 
 using namespace aug;
-using namespace augrt;
+using namespace augas;
 using namespace std;
 
 namespace {
@@ -157,7 +157,7 @@ session::session(const moduleptr& module, const char* name)
 }
 
 const augmod_session*
-augrt::getsession()
+augas::getsession()
 {
     return stack_.empty() ? 0 : stack_.top();
 }

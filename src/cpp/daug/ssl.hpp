@@ -4,11 +4,11 @@
 #ifndef DAUG_SSL_HPP
 #define DAUG_SSL_HPP
 
-#include "augrtpp/ssl.hpp"
+#include "augaspp/ssl.hpp"
 
 #include <map>
 
-namespace augrt {
+namespace augas {
 
     class options;
 

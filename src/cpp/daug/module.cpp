@@ -15,7 +15,7 @@ AUG_RCSID("$Id$");
 #include <exception>
 
 using namespace aug;
-using namespace augrt;
+using namespace augas;
 using namespace std;
 
 module::~module() AUG_NOTHROW

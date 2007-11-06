@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace augrt {
+namespace augas {
 
     class module {
         const std::string name_;

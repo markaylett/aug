@@ -179,7 +179,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 SUBDIRS = \
-	augrt \
+	augas \
 	cpp
 
 all: all-recursive

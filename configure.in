@@ -246,9 +246,9 @@ AC_CONFIG_FILES([Makefile
                  doc/man/Makefile
                  etc/Makefile
                  example/Makefile
-                 example/augrt/Makefile
-                 example/augrt/etc/Makefile
-                 example/augrt/htdocs/Makefile
+                 example/augas/Makefile
+                 example/augas/etc/Makefile
+                 example/augas/htdocs/Makefile
                  example/cpp/Makefile
                  src/Makefile
                  src/c/Makefile
@@ -257,7 +257,7 @@ AC_CONFIG_FILES([Makefile
                  src/c/augpy/Makefile
                  src/c/augrb/Makefile
                  src/c/augres/Makefile
-                 src/c/augrt/Makefile
+                 src/c/augas/Makefile
                  src/c/augsrv/Makefile
                  src/c/augsrv/posix/Makefile
                  src/c/augsrv/win32/Makefile
@@ -273,7 +273,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/Makefile
                  src/cpp/augmarpp/Makefile
                  src/cpp/augnetpp/Makefile
-                 src/cpp/augrtpp/Makefile
+                 src/cpp/augaspp/Makefile
                  src/cpp/augsrvpp/Makefile
                  src/cpp/augsyspp/Makefile
                  src/cpp/augutilpp/Makefile

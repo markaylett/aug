@@ -7,7 +7,7 @@
 struct augmod_proxy;
 struct augmod_object;
 
-namespace augrt {
+namespace augas {
 
     void
     setdefaults(augmod_proxy& dst, const augmod_proxy& src,

@@ -23,7 +23,7 @@ daug_SOURCES = \
 	utility.cpp
 
 daug_LDADD = \
-	$(top_builddir)/src/cpp/augrtpp/libaugrtpp.la \
+	$(top_builddir)/src/cpp/augaspp/libaugaspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \

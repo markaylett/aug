@@ -6,9 +6,9 @@
 
 #include "daug/module.hpp"
 
-#include "augrtpp/session.hpp"
+#include "augaspp/session.hpp"
 
-namespace augrt {
+namespace augas {
 
     class session : public aug::session_base {
 
