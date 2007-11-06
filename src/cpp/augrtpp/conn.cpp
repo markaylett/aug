@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 
 #include "augrtpp/buffer.hpp"
 
-#include "augrtpp.hpp"
+#include "augmodpp.hpp"
 
 #include <cassert>
 
@@ -103,13 +103,13 @@ conn_base::~conn_base() AUG_NOTHROW
 {
 }
 
-augrt_object&
+augmod_object&
 connected::do_get()
 {
     return sock_;
 }
 
-const augrt_object&
+const augmod_object&
 connected::do_get() const
 {
     return sock_;
@@ -193,7 +193,7 @@ connected::do_process(unsigned short events, const timeval& now)
 
         // Data has been read: reset read timer.
 
-        rwtimer_.resetrwtimer(AUGRT_TIMRD);
+        rwtimer_.resetrwtimer(AUGMOD_TIMRD);
 
         // Notify module of new data.
 
@@ -209,7 +209,7 @@ connected::do_process(unsigned short events, const timeval& now)
 
         // Data has been written: reset write timer.
 
-        rwtimer_.resetrwtimer(AUGRT_TIMWR);
+        rwtimer_.resetrwtimer(AUGMOD_TIMWR);
 
         if (buffer_.empty()) {
 
@@ -255,7 +255,7 @@ connected::do_shutdown(unsigned flags, const timeval& now)
 {
     if (state_ < SHUTDOWN) {
         state_ = SHUTDOWN;
-        if (buffer_.empty() || flags & AUGRT_SHUTNOW) {
+        if (buffer_.empty() || flags & AUGMOD_SHUTNOW) {
             aug_info("shutting connection: id=[%d], fd=[%d], flags=[%u]",
                      sock_.id_, sfd_.get(), flags);
             shutdownnbfile(sfd_);
@@ -298,7 +298,7 @@ connected::~connected() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-connected::connected(const sessionptr& session, augrt_object& sock,
+connected::connected(const sessionptr& session, augmod_object& sock,
                      buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
                      const endpoint& ep, bool close)
     : session_(session),
@@ -313,13 +313,13 @@ connected::connected(const sessionptr& session, augrt_object& sock,
     gettimeofday(since_);
 }
 
-augrt_object&
+augmod_object&
 handshake::do_get()
 {
     return sock_;
 }
 
-const augrt_object&
+const augmod_object&
 handshake::do_get() const
 {
     return sock_;
@@ -432,7 +432,7 @@ handshake::~handshake() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-handshake::handshake(const sessionptr& session, augrt_object& sock,
+handshake::handshake(const sessionptr& session, augmod_object& sock,
                      buffer& buffer, const char* host, const char* port)
     : session_(session),
       sock_(sock),

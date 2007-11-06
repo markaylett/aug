@@ -1203,8 +1203,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_60BB259C2B7C4117B653105E43E9AFDA"
             {
-            "SourcePath" = "8:..\\src\\cpp\\augrtpp.hpp"
-            "TargetName" = "8:augrtpp.hpp"
+            "SourcePath" = "8:..\\src\\cpp\\augmodpp.hpp"
+            "TargetName" = "8:augmodpp.hpp"
             "Tag" = "8:"
             "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
             "Condition" = "8:"
@@ -1823,8 +1823,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_E2AF29C9CC8D48CE938F8D4D86AD54CC"
             {
-            "SourcePath" = "8:..\\src\\c\\augrt.h"
-            "TargetName" = "8:augrt.h"
+            "SourcePath" = "8:..\\src\\c\\augmod.h"
+            "TargetName" = "8:augmod.h"
             "Tag" = "8:"
             "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
             "Condition" = "8:"

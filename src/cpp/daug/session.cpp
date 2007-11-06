@@ -16,27 +16,27 @@ using namespace augrt;
 using namespace std;
 
 namespace {
-    stack<const augrt_session*> stack_;
+    stack<const augmod_session*> stack_;
     struct scoped_frame {
         ~scoped_frame() AUG_NOTHROW
         {
             stack_.pop();
         }
         explicit
-        scoped_frame(const augrt_session* session)
+        scoped_frame(const augmod_session* session)
         {
             stack_.push(session);
         }
     };
 }
 
-augrt_session&
+augmod_session&
 session::do_get() AUG_NOTHROW
 {
     return session_;
 }
 
-const augrt_session&
+const augmod_session&
 session::do_get() const AUG_NOTHROW
 {
     return session_;
@@ -72,21 +72,21 @@ session::do_event(const char* from, const char* type, const void* user,
 }
 
 void
-session::do_closed(const augrt_object& sock) const AUG_NOTHROW
+session::do_closed(const augmod_object& sock) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
     module_->closed(sock);
 }
 
 void
-session::do_teardown(const augrt_object& sock) const AUG_NOTHROW
+session::do_teardown(const augmod_object& sock) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
     module_->teardown(sock);
 }
 
 bool
-session::do_accepted(augrt_object& sock, const char* addr,
+session::do_accepted(augmod_object& sock, const char* addr,
                      unsigned short port) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -94,7 +94,7 @@ session::do_accepted(augrt_object& sock, const char* addr,
 }
 
 void
-session::do_connected(augrt_object& sock, const char* addr,
+session::do_connected(augmod_object& sock, const char* addr,
                       unsigned short port) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -102,7 +102,7 @@ session::do_connected(augrt_object& sock, const char* addr,
 }
 
 void
-session::do_data(const augrt_object& sock, const char* buf,
+session::do_data(const augmod_object& sock, const char* buf,
                  size_t size) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -110,28 +110,30 @@ session::do_data(const augrt_object& sock, const char* buf,
 }
 
 void
-session::do_rdexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW
+session::do_rdexpire(const augmod_object& sock,
+                     unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
     module_->rdexpire(sock, ms);
 }
 
 void
-session::do_wrexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW
+session::do_wrexpire(const augmod_object& sock,
+                     unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
     module_->wrexpire(sock, ms);
 }
 
 void
-session::do_expire(const augrt_object& timer, unsigned& ms) const AUG_NOTHROW
+session::do_expire(const augmod_object& timer, unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
     module_->expire(timer, ms);
 }
 
 bool
-session::do_authcert(const augrt_object& sock, const char* subject,
+session::do_authcert(const augmod_object& sock, const char* subject,
                      const char* issuer) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -154,7 +156,7 @@ session::session(const moduleptr& module, const char* name)
     session_.user_ = 0;
 }
 
-const augrt_session*
+const augmod_session*
 augrt::getsession()
 {
     return stack_.empty() ? 0 : stack_.top();

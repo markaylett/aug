@@ -1,14 +1,14 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augrtpp.hpp"
+#include "augmodpp.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
 #include <iostream>
 
-using namespace augrt;
+using namespace augmod;
 using namespace std;
 
 namespace {

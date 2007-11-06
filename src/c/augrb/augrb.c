@@ -1,5 +1,9 @@
-#include "augrt.h"
+/* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
+   See the file COPYING for copying permission.
+*/
+#define AUGMOD_BUILD
 #include "augsys/defs.h"
+#include "augmod.h"
 
 AUG_RCSID("$Id$");
 
@@ -15,8 +19,6 @@ AUG_RCSID("$Id$");
 char*
 rb_w32_getcwd(char* buffer, int size);
 #endif /* _WIN32 */
-
-#include "augrt.h"
 
 #include <assert.h>
 #include <ctype.h> /* tolower() */
@@ -48,7 +50,7 @@ static ID stopid_, startid_, reconfid_, eventid_, closedid_,
     teardownid_, acceptedid_, connectedid_, dataid_, rdexpireid_,
     wrexpireid_, expireid_, authcertid_;
 
-static VALUE maugrt_, cobject_, cerror_;
+static VALUE maugrb_, cobject_, cerror_;
 
 /* True if exception was thrown during last call to protect_(). */
 
@@ -73,7 +75,7 @@ dorescue_(VALUE unused, VALUE except)
 {
     except_ = 1;
     except = rb_funcall(except, rb_intern("to_s"), 0);
-    augrt_writelog(AUGRT_LOGERROR, "%s", StringValuePtr(except));
+    augmod_writelog(AUGMOD_LOGERROR, "%s", StringValuePtr(except));
     return Qnil;
 }
 
@@ -89,7 +91,7 @@ protect_(VALUE (*body)(), VALUE args)
 static VALUE
 dofuncall_(VALUE args)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     return Qnil == args
         ? rb_funcall(session->module_, u_.id_, 0)
         : rb_apply(session->module_, u_.id_, args);
@@ -145,7 +147,7 @@ doloadmodule_(VALUE unused)
     char* lower = alloca(strlen(u_.sname_) + 1);
     lowercpy_(lower, u_.sname_);
 
-    augrt_writelog(AUGRT_LOGINFO, "require '%s'", lower);
+    augmod_writelog(AUGMOD_LOGINFO, "require '%s'", lower);
 
     rb_require(lower);
     return rb_const_get(rb_cObject, rb_intern(u_.sname_));
@@ -199,19 +201,19 @@ buf_(void* arg, size_t* size)
     return RSTRING(*ptr)->ptr;
 }
 
-static const struct augrt_vartype vartype_ = {
+static const struct augmod_vartype vartype_ = {
     destroy_,
     buf_
 };
 
-/* AugRt::Object functions. */
+/* AugRb::Object functions. */
 
 static void
 checkobject_(VALUE object)
 {
     if (!rb_obj_is_kind_of(object, cobject_))
         rb_raise(rb_eTypeError,
-                 "wrong argument type %s (expected AugRt::Object)",
+                 "wrong argument type %s (expected AugRb::Object)",
                  rb_obj_classname(object));
 }
 
@@ -280,7 +282,7 @@ static VALUE
 objectstr_(VALUE self)
 {
     char sz[64];
-    sprintf(sz, "#<AugRt::Object:%lx,id=%d>", self,
+    sprintf(sz, "#<AugRb::Object:%lx,id=%d>", self,
             FIX2INT(rb_iv_get(self, "@id")));
     return rb_str_new2(sz);
 }
@@ -354,15 +356,15 @@ createsession_(const char* sname)
 static VALUE
 writelog_(VALUE self, VALUE level, VALUE msg)
 {
-    augrt_writelog(NUM2INT(level), StringValuePtr(msg));
+    augmod_writelog(NUM2INT(level), StringValuePtr(msg));
     return Qnil;
 }
 
 static VALUE
 reconfall_(VALUE self)
 {
-    if (-1 == augrt_reconfall())
-        rb_raise(cerror_, augrt_error());
+    if (-1 == augmod_reconfall())
+        rb_raise(cerror_, augmod_error());
 
     return Qnil;
 }
@@ -370,8 +372,8 @@ reconfall_(VALUE self)
 static VALUE
 stopall_(VALUE self)
 {
-    if (-1 == augrt_stopall())
-        rb_raise(cerror_, augrt_error());
+    if (-1 == augmod_stopall())
+        rb_raise(cerror_, augmod_error());
 
     return Qnil;
 }
@@ -380,7 +382,7 @@ static VALUE
 post_(int argc, VALUE* argv, VALUE self)
 {
     VALUE to, type, buf;
-    struct augrt_var var = { NULL, NULL };
+    struct augmod_var var = { NULL, NULL };
 
     rb_scan_args(argc, argv, "21", &to, &type, &buf);
 
@@ -394,10 +396,10 @@ post_(int argc, VALUE* argv, VALUE self)
         var.arg_ = register_(StringValue(buf));
     }
 
-    if (-1 == augrt_post(RSTRING(to)->ptr, RSTRING(type)->ptr, &var)) {
+    if (-1 == augmod_post(RSTRING(to)->ptr, RSTRING(type)->ptr, &var)) {
         if (var.arg_)
             unregister_(var.arg_);
-        rb_raise(cerror_, augrt_error());
+        rb_raise(cerror_, augmod_error());
     }
 
     return Qnil;
@@ -421,8 +423,8 @@ dispatch_(int argc, VALUE* argv, VALUE self)
         len = RSTRING(user)->len;
     }
 
-    if (-1 == augrt_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr, ptr, len))
-        rb_raise(cerror_, augrt_error());
+    if (-1 == augmod_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr, ptr, len))
+        rb_raise(cerror_, augmod_error());
 
     return Qnil;
 }
@@ -437,7 +439,7 @@ getenv_(int argc, VALUE* argv, VALUE self)
 
     Check_Type(name, T_STRING);
 
-    if (!(value = augrt_getenv(RSTRING(name)->ptr, NULL)))
+    if (!(value = augmod_getenv(RSTRING(name)->ptr, NULL)))
         return def;
 
     return rb_tainted_str_new2(value);
@@ -446,9 +448,9 @@ getenv_(int argc, VALUE* argv, VALUE self)
 static VALUE
 getsession_(VALUE self)
 {
-    const struct augrt_session* session;
+    const struct augmod_session* session;
 
-    if (!(session = augrt_getsession()))
+    if (!(session = augmod_getsession()))
         return Qnil;
 
     return rb_str_new2(session->name_);
@@ -459,8 +461,8 @@ shutdown_(VALUE self, VALUE sock, VALUE flags)
 {
     int cid = checkid_(sock);
 
-    if (-1 == augrt_shutdown(cid, NUM2UINT(flags)))
-        rb_raise(cerror_, augrt_error());
+    if (-1 == augmod_shutdown(cid, NUM2UINT(flags)))
+        rb_raise(cerror_, augmod_error());
 
     return Qnil;
 }
@@ -481,10 +483,10 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
 
     sock = register_(newobject_(INT2FIX(0), user));
 
-    if (-1 == (cid = augrt_tcpconnect(RSTRING(host)->ptr,
+    if (-1 == (cid = augmod_tcpconnect(RSTRING(host)->ptr,
                                       RSTRING(serv)->ptr, sock))) {
         unregister_(sock);
-        rb_raise(cerror_, augrt_error());
+        rb_raise(cerror_, augmod_error());
     }
 
     rb_iv_set(*sock, "@id", INT2FIX(cid));
@@ -507,10 +509,10 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
 
     sock = register_(newobject_(INT2FIX(0), user));
 
-    if (-1 == (cid = augrt_tcplisten(RSTRING(host)->ptr,
+    if (-1 == (cid = augmod_tcplisten(RSTRING(host)->ptr,
                                      RSTRING(serv)->ptr, sock))) {
         unregister_(sock);
-        rb_raise(cerror_, augrt_error());
+        rb_raise(cerror_, augmod_error());
     }
 
     rb_iv_set(*sock, "@id", INT2FIX(cid));
@@ -520,15 +522,15 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
 static VALUE
 send_(VALUE self, VALUE sock, VALUE buf)
 {
-    struct augrt_var var;
+    struct augmod_var var;
     int cid = checkid_(sock);
 
     var.type_ = &vartype_;
     var.arg_ = register_(StringValue(buf));
 
-    if (-1 == augrt_sendv(cid, &var)) {
+    if (-1 == augmod_sendv(cid, &var)) {
         unregister_(var.arg_);
-        rb_raise(cerror_, augrt_error());
+        rb_raise(cerror_, augmod_error());
     }
 
     return Qnil;
@@ -539,8 +541,8 @@ setrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 {
     int cid = checkid_(sock);
 
-    if (-1 == augrt_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags)))
-        rb_raise(cerror_, augrt_error());
+    if (-1 == augmod_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags)))
+        rb_raise(cerror_, augmod_error());
 
     return Qnil;
 }
@@ -552,10 +554,10 @@ resetrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 
     /* Return false if no such timer. */
 
-    switch (augrt_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags))) {
+    switch (augmod_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags))) {
     case -1:
-        rb_raise(cerror_, augrt_error());
-    case AUGRT_NONE:
+        rb_raise(cerror_, augmod_error());
+    case AUGMOD_NONE:
         return Qfalse;
     }
 
@@ -569,10 +571,10 @@ cancelrwtimer_(VALUE self, VALUE sock, VALUE flags)
 
     /* Return false if no such timer. */
 
-    switch (augrt_cancelrwtimer(cid, NUM2UINT(flags))) {
+    switch (augmod_cancelrwtimer(cid, NUM2UINT(flags))) {
     case -1:
-        rb_raise(cerror_, augrt_error());
-    case AUGRT_NONE:
+        rb_raise(cerror_, augmod_error());
+    case AUGMOD_NONE:
         return Qfalse;
     }
 
@@ -586,7 +588,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
     VALUE* timer;
 
     unsigned ui;
-    struct augrt_var var;
+    struct augmod_var var;
     int tid;
 
     rb_scan_args(argc, argv, "11", &ms, &user);
@@ -597,9 +599,9 @@ settimer_(int argc, VALUE* argv, VALUE self)
     var.type_ = &vartype_;
     var.arg_ = timer;
 
-    if (-1 == (tid = augrt_settimer(ui, &var))) {
+    if (-1 == (tid = augmod_settimer(ui, &var))) {
         unregister_(timer);
-        rb_raise(cerror_, augrt_error());
+        rb_raise(cerror_, augmod_error());
     }
 
     rb_iv_set(*timer, "@id", INT2FIX(tid));
@@ -613,10 +615,10 @@ resettimer_(VALUE self, VALUE timer, VALUE ms)
 
     /* Return false if no such timer. */
 
-    switch (augrt_resettimer(tid, NUM2UINT(ms))) {
+    switch (augmod_resettimer(tid, NUM2UINT(ms))) {
     case -1:
-        rb_raise(cerror_, augrt_error());
-    case AUGRT_NONE:
+        rb_raise(cerror_, augmod_error());
+    case AUGMOD_NONE:
         return Qfalse;
     }
 
@@ -630,10 +632,10 @@ canceltimer_(VALUE self, VALUE timer)
 
     /* Return false if no such timer. */
 
-    switch (augrt_canceltimer(tid)) {
+    switch (augmod_canceltimer(tid)) {
     case -1:
-        rb_raise(cerror_, augrt_error());
-    case AUGRT_NONE:
+        rb_raise(cerror_, augmod_error());
+    case AUGMOD_NONE:
         return Qfalse;
     }
 
@@ -647,8 +649,8 @@ setsslclient_(VALUE self, VALUE sock, VALUE ctx)
 
     Check_Type(ctx, T_STRING);
 
-    if (-1 == augrt_setsslclient(cid, RSTRING(ctx)->ptr))
-        rb_raise(cerror_, augrt_error());
+    if (-1 == augmod_setsslclient(cid, RSTRING(ctx)->ptr))
+        rb_raise(cerror_, augmod_error());
 
     return Qnil;
 }
@@ -660,8 +662,8 @@ setsslserver_(VALUE self, VALUE sock, VALUE ctx)
 
     Check_Type(ctx, T_STRING);
 
-    if (-1 == augrt_setsslserver(cid, RSTRING(ctx)->ptr))
-        rb_raise(cerror_, augrt_error());
+    if (-1 == augmod_setsslserver(cid, RSTRING(ctx)->ptr))
+        rb_raise(cerror_, augmod_error());
 
     return Qnil;
 }
@@ -678,11 +680,11 @@ setpath_(void)
 
     /* Path may be relative to run directory. */
 
-    if ((s = augrt_getenv("rundir", NULL)))
+    if ((s = augmod_getenv("rundir", NULL)))
         chdir(s);
 
-    s = augrt_getenv("module.augrb.rubypath", "ruby");
-    augrt_writelog(AUGRT_LOGDEBUG, "module.augrb.rubypath=[%s]", s);
+    s = augmod_getenv("module.augrb.rubypath", "ruby");
+    augmod_writelog(AUGMOD_LOGDEBUG, "module.augrb.rubypath=[%s]", s);
     chdir(s);
 
     /* Append current directory. */
@@ -724,28 +726,28 @@ initrb_(VALUE unused)
     expireid_= rb_intern("expire");
     authcertid_= rb_intern("authcert");
 
-    maugrt_ = rb_define_module("AugRt");
-    cobject_ = rb_define_class_under(maugrt_, "Object", rb_cObject);
-    cerror_ = rb_define_class_under(maugrt_, "Error", rb_eStandardError);
+    maugrb_ = rb_define_module("AugRb");
+    cobject_ = rb_define_class_under(maugrb_, "Object", rb_cObject);
+    cerror_ = rb_define_class_under(maugrb_, "Error", rb_eStandardError);
 
     /* Logger constants. */
 
-    rb_define_const(maugrt_, "LOGCRIT", INT2FIX(AUGRT_LOGCRIT));
-    rb_define_const(maugrt_, "LOGERROR", INT2FIX(AUGRT_LOGERROR));
-    rb_define_const(maugrt_, "LOGWARN", INT2FIX(AUGRT_LOGWARN));
-    rb_define_const(maugrt_, "LOGNOTICE", INT2FIX(AUGRT_LOGNOTICE));
-    rb_define_const(maugrt_, "LOGINFO", INT2FIX(AUGRT_LOGINFO));
-    rb_define_const(maugrt_, "LOGDEBUG", INT2FIX(AUGRT_LOGDEBUG));
+    rb_define_const(maugrb_, "LOGCRIT", INT2FIX(AUGMOD_LOGCRIT));
+    rb_define_const(maugrb_, "LOGERROR", INT2FIX(AUGMOD_LOGERROR));
+    rb_define_const(maugrb_, "LOGWARN", INT2FIX(AUGMOD_LOGWARN));
+    rb_define_const(maugrb_, "LOGNOTICE", INT2FIX(AUGMOD_LOGNOTICE));
+    rb_define_const(maugrb_, "LOGINFO", INT2FIX(AUGMOD_LOGINFO));
+    rb_define_const(maugrb_, "LOGDEBUG", INT2FIX(AUGMOD_LOGDEBUG));
 
     /* Timer constants. */
 
-    rb_define_const(maugrt_, "TIMRD", INT2FIX(AUGRT_TIMRD));
-    rb_define_const(maugrt_, "TIMWR", INT2FIX(AUGRT_TIMWR));
-    rb_define_const(maugrt_, "TIMRDWR", INT2FIX(AUGRT_TIMRDWR));
+    rb_define_const(maugrb_, "TIMRD", INT2FIX(AUGMOD_TIMRD));
+    rb_define_const(maugrb_, "TIMWR", INT2FIX(AUGMOD_TIMWR));
+    rb_define_const(maugrb_, "TIMRDWR", INT2FIX(AUGMOD_TIMRDWR));
 
     /* Shutdown constants. */
 
-    rb_define_const(maugrt_, "SHUTNOW", INT2FIX(AUGRT_SHUTNOW));
+    rb_define_const(maugrb_, "SHUTNOW", INT2FIX(AUGMOD_SHUTNOW));
 
     /* Object methods. */
 
@@ -762,25 +764,25 @@ initrb_(VALUE unused)
 
     /* Host module functions. */
 
-    rb_define_module_function(maugrt_, "writelog", writelog_, 2);
-    rb_define_module_function(maugrt_, "reconfall", reconfall_, 0);
-    rb_define_module_function(maugrt_, "stopall", stopall_, 0);
-    rb_define_module_function(maugrt_, "post", post_, -1);
-    rb_define_module_function(maugrt_, "dispatch", dispatch_, -1);
-    rb_define_module_function(maugrt_, "getenv", getenv_, -1);
-    rb_define_module_function(maugrt_, "getsession", getsession_, 0);
-    rb_define_module_function(maugrt_, "shutdown", shutdown_, 2);
-    rb_define_module_function(maugrt_, "tcpconnect", tcpconnect_, -1);
-    rb_define_module_function(maugrt_, "tcplisten", tcplisten_, -1);
-    rb_define_module_function(maugrt_, "send", send_, 2);
-    rb_define_module_function(maugrt_, "setrwtimer", setrwtimer_, 3);
-    rb_define_module_function(maugrt_, "resetrwtimer", resetrwtimer_, 3);
-    rb_define_module_function(maugrt_, "cancelrwtimer", cancelrwtimer_, 2);
-    rb_define_module_function(maugrt_, "settimer", settimer_, -1);
-    rb_define_module_function(maugrt_, "resettimer", resettimer_, 2);
-    rb_define_module_function(maugrt_, "canceltimer", canceltimer_, 1);
-    rb_define_module_function(maugrt_, "setsslclient", setsslclient_, 2);
-    rb_define_module_function(maugrt_, "setsslserver", setsslserver_, 2);
+    rb_define_module_function(maugrb_, "writelog", writelog_, 2);
+    rb_define_module_function(maugrb_, "reconfall", reconfall_, 0);
+    rb_define_module_function(maugrb_, "stopall", stopall_, 0);
+    rb_define_module_function(maugrb_, "post", post_, -1);
+    rb_define_module_function(maugrb_, "dispatch", dispatch_, -1);
+    rb_define_module_function(maugrb_, "getenv", getenv_, -1);
+    rb_define_module_function(maugrb_, "getsession", getsession_, 0);
+    rb_define_module_function(maugrb_, "shutdown", shutdown_, 2);
+    rb_define_module_function(maugrb_, "tcpconnect", tcpconnect_, -1);
+    rb_define_module_function(maugrb_, "tcplisten", tcplisten_, -1);
+    rb_define_module_function(maugrb_, "send", send_, 2);
+    rb_define_module_function(maugrb_, "setrwtimer", setrwtimer_, 3);
+    rb_define_module_function(maugrb_, "resetrwtimer", resetrwtimer_, 3);
+    rb_define_module_function(maugrb_, "cancelrwtimer", cancelrwtimer_, 2);
+    rb_define_module_function(maugrb_, "settimer", settimer_, -1);
+    rb_define_module_function(maugrb_, "resettimer", resettimer_, 2);
+    rb_define_module_function(maugrb_, "canceltimer", canceltimer_, 1);
+    rb_define_module_function(maugrb_, "setsslclient", setsslclient_, 2);
+    rb_define_module_function(maugrb_, "setsslserver", setsslserver_, 2);
 
     return Qnil;
 }
@@ -788,7 +790,7 @@ initrb_(VALUE unused)
 static void
 stop_(void)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     assert(session);
 
     if (session->open_ && session->stop_)
@@ -798,7 +800,7 @@ stop_(void)
 }
 
 static int
-start_(struct augrt_session* session)
+start_(struct augmod_session* session)
 {
     struct session_* local;
     if (!(local = createsession_(session->name_)))
@@ -821,7 +823,7 @@ start_(struct augrt_session* session)
 static void
 reconf_(void)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     assert(session);
 
     if (session->reconf_)
@@ -831,7 +833,7 @@ reconf_(void)
 static void
 event_(const char* from, const char* type, const void* user, size_t size)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     assert(session);
 
     if (session->event_)
@@ -840,9 +842,9 @@ event_(const char* from, const char* type, const void* user, size_t size)
 }
 
 static void
-closed_(const struct augrt_object* sock)
+closed_(const struct augmod_object* sock)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     assert(session);
     assert(sock->user_);
 
@@ -853,9 +855,9 @@ closed_(const struct augrt_object* sock)
 }
 
 static void
-teardown_(const struct augrt_object* sock)
+teardown_(const struct augmod_object* sock)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -864,13 +866,13 @@ teardown_(const struct augrt_object* sock)
     if (session->teardown_)
         funcall1_(teardownid_, user);
     else
-        augrt_shutdown(sock->id_, 0);
+        augmod_shutdown(sock->id_, 0);
 }
 
 static int
-accepted_(struct augrt_object* sock, const char* addr, unsigned short port)
+accepted_(struct augmod_object* sock, const char* addr, unsigned short port)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -892,9 +894,9 @@ accepted_(struct augrt_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-connected_(struct augrt_object* sock, const char* addr, unsigned short port)
+connected_(struct augmod_object* sock, const char* addr, unsigned short port)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -905,9 +907,9 @@ connected_(struct augrt_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct augrt_object* sock, const void* buf, size_t len)
+data_(const struct augmod_object* sock, const void* buf, size_t len)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -918,9 +920,9 @@ data_(const struct augrt_object* sock, const void* buf, size_t len)
 }
 
 static void
-rdexpire_(const struct augrt_object* sock, unsigned* ms)
+rdexpire_(const struct augmod_object* sock, unsigned* ms)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -934,9 +936,9 @@ rdexpire_(const struct augrt_object* sock, unsigned* ms)
 }
 
 static void
-wrexpire_(const struct augrt_object* sock, unsigned* ms)
+wrexpire_(const struct augmod_object* sock, unsigned* ms)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -950,9 +952,9 @@ wrexpire_(const struct augrt_object* sock, unsigned* ms)
 }
 
 static void
-expire_(const struct augrt_object* timer, unsigned* ms)
+expire_(const struct augmod_object* timer, unsigned* ms)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(timer->user_);
@@ -966,10 +968,10 @@ expire_(const struct augrt_object* timer, unsigned* ms)
 }
 
 static int
-authcert_(const struct augrt_object* sock, const char* subject,
+authcert_(const struct augmod_object* sock, const char* subject,
           const char* issuer)
 {
-    struct session_* session = augrt_getsession()->user_;
+    struct session_* session = augmod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -985,7 +987,7 @@ authcert_(const struct augrt_object* sock, const char* subject,
     return 0;
 }
 
-static const struct augrt_module module_ = {
+static const struct augmod_control control_ = {
     stop_,
     start_,
     reconf_,
@@ -1001,10 +1003,10 @@ static const struct augrt_module module_ = {
     authcert_
 };
 
-static const struct augrt_module*
+static const struct augmod_control*
 init_(const char* name)
 {
-    augrt_writelog(AUGRT_LOGINFO, "initialising augrb module");
+    augmod_writelog(AUGMOD_LOGINFO, "initialising augrb module");
     ruby_init();
 
     /* Catch any exceptions. */
@@ -1018,14 +1020,14 @@ init_(const char* name)
         return NULL;
     }
 
-    return &module_;
+    return &control_;
 }
 
 static void
 term_(void)
 {
-    augrt_writelog(AUGRT_LOGINFO, "terminating augrb module");
+    augmod_writelog(AUGMOD_LOGINFO, "terminating augrb module");
     ruby_finalize();
 }
 
-AUGRT_MODULE(init_, term_)
+AUGMOD_ENTRYPOINTS(init_, term_)

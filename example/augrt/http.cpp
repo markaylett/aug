@@ -1,7 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augrtpp.hpp"
+#define AUGMOD_BUILD
+#include "augmodpp.hpp"
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"
 #include "augmarpp.hpp"
@@ -29,7 +30,7 @@
 #endif // _WIN32
 
 using namespace aug;
-using namespace augrt;
+using namespace augmod;
 using namespace std;
 
 namespace {
@@ -41,9 +42,9 @@ namespace {
     void
     loadcss()
     {
-        const char* css(augrt::getenv("session.http.css"));
+        const char* css(augmod::getenv("session.http.css"));
         if (css) {
-            aug::chdir(augrt::getenv("rundir"));
+            aug::chdir(augmod::getenv("rundir"));
             ifstream fs(css);
             stringstream ss;
             ss << fs.rdbuf();
@@ -78,15 +79,15 @@ namespace {
         mimetypes_["txt"] = "text/plain";
         mimetypes_["xml"] = "text/xml";
 
-        const char* mimetypes(augrt::getenv("session.http.mimetypes"));
+        const char* mimetypes(augmod::getenv("session.http.mimetypes"));
         if (mimetypes) {
-            aug::chdir(augrt::getenv("rundir"));
+            aug::chdir(augmod::getenv("rundir"));
             readconf(mimetypes, confcb<confcb_>, null);
         }
     }
 
     const char*
-    nonce(augrt_id id, const string& addr, aug_md5base64_t base64)
+    nonce(augmod_id id, const string& addr, aug_md5base64_t base64)
     {
         pid_t pid(getpid());
 
@@ -94,7 +95,7 @@ namespace {
         aug_gettimeofday(&tv, 0);
 
         long rand(aug_rand());
-        const char* salt(augrt::getenv("session.http.salt"));
+        const char* salt(augmod::getenv("session.http.salt"));
 
         aug_md5context md5ctx;
         unsigned char digest[16];
@@ -132,7 +133,7 @@ namespace {
     }
 
     string
-    getsessid(augrt_id id, const string& addr, const char* cookie)
+    getsessid(augmod_id id, const string& addr, const char* cookie)
     {
         aug_md5base64_t base64;
 
@@ -234,11 +235,11 @@ namespace {
     bool
     getpass(const string& user, const string& realm, string& digest)
     {
-        const char* passwd(augrt::getenv("session.http.passwd"));
+        const char* passwd(augmod::getenv("session.http.passwd"));
         if (!passwd)
             return false;
 
-        aug::chdir(augrt::getenv("rundir"));
+        aug::chdir(augmod::getenv("rundir"));
         ifstream fs(passwd);
         string line;
         while (getline(fs, line)) {
@@ -475,7 +476,7 @@ namespace {
     typedef vector<pair<string, string> > fields;
 
     void
-    sendfile(augrt_id id, const string& sessid, const string& path)
+    sendfile(augmod_id id, const string& sessid, const string& path)
     {
         auto_ptr<filecontent> ptr(new filecontent(path.c_str()));
 
@@ -496,7 +497,7 @@ namespace {
     vector<string> results_;
 
     void
-    sendresult(augrt_id id, const string& sessid)
+    sendresult(augmod_id id, const string& sessid)
     {
         stringstream content;
         content << "<result>";
@@ -520,7 +521,7 @@ namespace {
     }
 
     void
-    sendstatus(augrt_id id, const string& sessid, int status,
+    sendstatus(augmod_id id, const string& sessid, int status,
                const string& title, const fields& fs = fields())
     {
         stringstream content;
@@ -548,12 +549,12 @@ namespace {
 
     struct session : basic_marnonstatic {
         const string& realm_;
-        augrt_id id_;
+        augmod_id id_;
         string sessid_;
         const string addr_;
         aug_md5base64_t nonce_;
         bool auth_;
-        session(const string& realm, augrt_id id, const string& addr)
+        session(const string& realm, augmod_id id, const string& addr)
             : realm_(realm),
               id_(id),
               addr_(addr),
@@ -698,7 +699,7 @@ namespace {
                               (getfield(mar, "Connection", size)));
             if (value && size && aug_strcasestr(value, "close")) {
                 aug_info("closing");
-                augrt::shutdown(id_, 0);
+                augmod::shutdown(id_, 0);
             }
         }
     };
@@ -709,8 +710,8 @@ namespace {
         do_start(const char* sname)
         {
             aug_info("starting...");
-            const char* serv(augrt::getenv("session.http.serv"));
-            const char* realm(augrt::getenv("session.http.realm"));
+            const char* serv(augmod::getenv("session.http.serv"));
+            const char* realm(augmod::getenv("session.http.realm"));
             if (!serv || !realm)
                 return false;
 
@@ -748,7 +749,7 @@ namespace {
             auto_ptr<marparser> parser(new marparser(0, sess));
 
             sock.setuser(parser.get());
-            setrwtimer(sock, 30000, AUGRT_TIMRD);
+            setrwtimer(sock, 30000, AUGMOD_TIMRD);
             parser.release();
             return true;
         }
@@ -760,7 +761,7 @@ namespace {
                 appendmar(parser, static_cast<const char*>(buf),
                           static_cast<unsigned>(len));
             } catch (...) {
-                augrt::shutdown(sock, 1);
+                augmod::shutdown(sock, 1);
                 throw;
             }
         }
@@ -783,4 +784,4 @@ namespace {
     typedef basic_module<basic_factory<httpsession> > module;
 }
 
-AUGRT_MODULE(module::init, module::term)
+AUGMOD_ENTRYPOINTS(module::init, module::term)

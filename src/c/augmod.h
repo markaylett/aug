@@ -1,35 +1,35 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRT_H
-#define AUGRT_H
+#ifndef AUGMOD_H
+#define AUGMOD_H
 
 #include <stdarg.h>    /* va_list */
 #include <stdlib.h>    /* NULL */
 #include <sys/types.h> /* size_t */
 
 #if !defined(__cplusplus)
-# define AUGRT_EXTERN extern
+# define AUGMOD_EXTERN extern
 #else /* __cplusplus */
-# define AUGRT_EXTERN extern "C"
+# define AUGMOD_EXTERN extern "C"
 #endif /* __cplusplus */
 
 #if defined(__CYGWIN__) || defined(__MINGW32__)
-# define AUG_EXPORT __attribute__ ((dllexport))
-# define AUG_IMPORT __attribute__ ((dllimport))
+# define AUGMOD_EXPORT __attribute__ ((dllexport))
+# define AUGMOD_IMPORT __attribute__ ((dllimport))
 #elif defined(_MSC_VER)
-# define AUG_EXPORT __declspec(dllexport)
-# define AUG_IMPORT __declspec(dllimport)
+# define AUGMOD_EXPORT __declspec(dllexport)
+# define AUGMOD_IMPORT __declspec(dllimport)
 #else /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
-# define AUG_EXPORT
-# define AUG_IMPORT
+# define AUGMOD_EXPORT
+# define AUGMOD_IMPORT
 #endif /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
 
-#if !defined(AUGRT_BUILD)
-# define AUGRT_API AUGRT_EXPORT
-#else /* AUGRT_BUILD */
-# define AUGRT_API AUGRT_IMPORT
-#endif /* AUGRT_BUILD */
+#if !defined(AUGMOD_BUILD)
+# define AUGMOD_API AUGMOD_IMPORT
+#else /* AUGMOD_BUILD */
+# define AUGMOD_API AUGMOD_EXPORT
+#endif /* AUGMOD_BUILD */
 
 /* Also defined in augutil/var.h. */
 
@@ -51,16 +51,16 @@ struct aug_var {
 };
 #endif /* AUG_VAR */
 
-#define augrt_vartype aug_vartype
-#define augrt_var     aug_var
+#define augmod_vartype aug_vartype
+#define augmod_var     aug_var
 
-enum augrt_loglevel {
-    AUGRT_LOGCRIT,
-    AUGRT_LOGERROR,
-    AUGRT_LOGWARN,
-    AUGRT_LOGNOTICE,
-    AUGRT_LOGINFO,
-    AUGRT_LOGDEBUG
+enum augmod_loglevel {
+    AUGMOD_LOGCRIT,
+    AUGMOD_LOGERROR,
+    AUGMOD_LOGWARN,
+    AUGMOD_LOGNOTICE,
+    AUGMOD_LOGINFO,
+    AUGMOD_LOGDEBUG
 };
 
 /**
@@ -70,25 +70,25 @@ enum augrt_loglevel {
 
 /**
    Read timer.
- */
+*/
 
-#define AUGRT_TIMRD    0x01
+#define AUGMOD_TIMRD    0x01
 
 /**
    Write timer.
- */
+*/
 
-#define AUGRT_TIMWR    0x02
+#define AUGMOD_TIMWR    0x02
 
 /**
    Both read and write timer.
- */
+*/
 
-#define AUGRT_TIMRDWR (AUGRT_TIMRD | AUGRT_TIMWR)
+#define AUGMOD_TIMRDWR (AUGMOD_TIMRD | AUGMOD_TIMWR)
 
 /**
    \}
- */
+*/
 
 /**
    \defgroup ShutFlags Shut Flags
@@ -99,11 +99,11 @@ enum augrt_loglevel {
    Force immediate shutdown.
 */
 
-#define AUGRT_SHUTNOW  0x01
+#define AUGMOD_SHUTNOW  0x01
 
 /**
    \}
- */
+*/
 
 /**
    \defgroup ReturnCodes Return Codes
@@ -113,32 +113,32 @@ enum augrt_loglevel {
 
 /**
    Success.
- */
+*/
 
-#define AUGRT_OK      0
+#define AUGMOD_OK      0
 
 /**
    Failure.
- */
+*/
 
-#define AUGRT_ERROR (-1)
+#define AUGMOD_ERROR (-1)
 
 /**
    None, empty or null depending on context.
- */
+*/
 
-#define AUGRT_NONE  (-2)
+#define AUGMOD_NONE  (-2)
 
 /**
    /}
- */
+*/
 
-#define AUGRT_MAXNAME     63
+#define AUGMOD_MAXNAME     63
 
-typedef int augrt_id;
+typedef int augmod_id;
 
-struct augrt_session {
-    char name_[AUGRT_MAXNAME + 1];
+struct augmod_session {
+    char name_[AUGMOD_MAXNAME + 1];
     void* user_;
 };
 
@@ -146,16 +146,16 @@ struct augrt_session {
    Both sockets are timers are represented by objects.
 */
 
-struct augrt_object {
-    augrt_id id_;
+struct augmod_object {
+    augmod_id id_;
     void* user_;
 };
 
-struct augrt_host {
+struct augmod_host {
 
     /**
        The following functions are thread-safe.
-     */
+    */
 
     /**
        Write message to the runtime log.
@@ -163,7 +163,7 @@ struct augrt_host {
        \param level The log level.
        \param format Printf-style specification.
        \param ... Arguments to format specification.
-       \sa #augrt_loglevel, vwritelog_().
+       \sa #augmod_loglevel, vwritelog_().
     */
 
     void (*writelog_)(int level, const char* format, ...);
@@ -174,7 +174,7 @@ struct augrt_host {
        \param level The log level.
        \param format Printf-style specification.
        \param ... Arguments to format specification.
-       \sa #augrt_loglevel, writelog_().
+       \sa #augmod_loglevel, writelog_().
     */
 
     void (*vwritelog_)(int level, const char* format, va_list args);
@@ -216,7 +216,7 @@ struct augrt_host {
     */
 
     int (*post_)(const char* to, const char* type,
-                 const struct augrt_var* var);
+                 const struct augmod_var* var);
 
     /**
        The remaining functions are not thread-safe.
@@ -252,17 +252,17 @@ struct augrt_host {
        Get the active session.
     */
 
-    const struct augrt_session* (*getsession_)(void);
+    const struct augmod_session* (*getsession_)(void);
 
     /**
        Shutdown the connection.
 
        \param cid Connection id.
-       \param flags Use #AUGRT_SHUTNOW to force immediate closure of the
+       \param flags Use #AUGMOD_SHUTNOW to force immediate closure of the
        connection - do not wait for pending writes.
     */
 
-    int (*shutdown_)(augrt_id cid, unsigned flags);
+    int (*shutdown_)(augmod_id cid, unsigned flags);
 
     /**
        Establish tcp connection.
@@ -300,7 +300,7 @@ struct augrt_host {
        \param len Length of data buffer.
     */
 
-    int (*send_)(augrt_id cid, const void* buf, size_t len);
+    int (*send_)(augmod_id cid, const void* buf, size_t len);
 
     /**
        Send data to peer.
@@ -309,7 +309,7 @@ struct augrt_host {
        \param var User data.
     */
 
-    int (*sendv_)(augrt_id cid, const struct augrt_var* var);
+    int (*sendv_)(augmod_id cid, const struct augmod_var* var);
 
     /**
        Set read/write timer.
@@ -319,7 +319,7 @@ struct augrt_host {
        \param flags \ref TimerFlags.
     */
 
-    int (*setrwtimer_)(augrt_id cid, unsigned ms, unsigned flags);
+    int (*setrwtimer_)(augmod_id cid, unsigned ms, unsigned flags);
 
     /**
        Reset read/write timer.
@@ -329,7 +329,7 @@ struct augrt_host {
        \param flags \ref TimerFlags.
     */
 
-    int (*resetrwtimer_)(augrt_id cid, unsigned ms, unsigned flags);
+    int (*resetrwtimer_)(augmod_id cid, unsigned ms, unsigned flags);
 
     /**
        Cancel read/write timer.
@@ -338,7 +338,7 @@ struct augrt_host {
        \param flags \ref TimerFlags.
     */
 
-    int (*cancelrwtimer_)(augrt_id cid, unsigned flags);
+    int (*cancelrwtimer_)(augmod_id cid, unsigned flags);
 
 
     /**
@@ -348,7 +348,7 @@ struct augrt_host {
        \param var User data.
     */
 
-    int (*settimer_)(unsigned ms, const struct augrt_var* var);
+    int (*settimer_)(unsigned ms, const struct augmod_var* var);
 
     /**
        Reset timer.
@@ -357,7 +357,7 @@ struct augrt_host {
        \param ms Timeout value in milliseconds.
     */
 
-    int (*resettimer_)(augrt_id tid, unsigned ms);
+    int (*resettimer_)(augmod_id tid, unsigned ms);
 
     /**
        Cancel timer.
@@ -365,7 +365,7 @@ struct augrt_host {
        \param tid Timer id.
     */
 
-    int (*canceltimer_)(augrt_id tid);
+    int (*canceltimer_)(augmod_id tid);
 
     /**
        Set ssl client.
@@ -374,7 +374,7 @@ struct augrt_host {
        \param ctx SSL context.
     */
 
-    int (*setsslclient_)(augrt_id cid, const char* ctx);
+    int (*setsslclient_)(augmod_id cid, const char* ctx);
 
     /**
        Set ssl server.
@@ -383,16 +383,16 @@ struct augrt_host {
        \param ctx SSL context.
     */
 
-    int (*setsslserver_)(augrt_id cid, const char* ctx);
+    int (*setsslserver_)(augmod_id cid, const char* ctx);
 };
 
 /**
-   Module functions of type int should return either #AUGRT_OK or
-   #AUGRT_ERROR, depending on the result.  For those functions associated with
-   a connection, a failure will result in the connection being closed.
+   Module functions of type int should return either #AUGMOD_OK or
+   #AUGMOD_ERROR, depending on the result.  For those functions associated
+   with a connection, a failure will result in the connection being closed.
 */
 
-struct augrt_module {
+struct augmod_control {
 
     /**
        Stop session.
@@ -403,10 +403,10 @@ struct augrt_module {
     /**
        Start session.
 
-       \return either #AUGRT_OK or #AUGRT_ERROR.
+       \return either #AUGMOD_OK or #AUGMOD_ERROR.
     */
 
-    int (*start_)(struct augrt_session* session);
+    int (*start_)(struct augmod_session* session);
 
     /**
        Re-configure request.
@@ -432,7 +432,7 @@ struct augrt_module {
        \param sock TODO
     */
 
-    void (*closed_)(const struct augrt_object* sock);
+    void (*closed_)(const struct augmod_object* sock);
 
     /**
        Teardown request.
@@ -440,7 +440,7 @@ struct augrt_module {
        \param sock TODO
     */
 
-    void (*teardown_)(const struct augrt_object* sock);
+    void (*teardown_)(const struct augmod_object* sock);
 
     /**
        Acceptance of socket connection.
@@ -452,10 +452,10 @@ struct augrt_module {
        \param addr TODO
        \param port TODO
 
-       \return either #AUGRT_OK or #AUGRT_ERROR.
+       \return either #AUGMOD_OK or #AUGMOD_ERROR.
     */
 
-    int (*accepted_)(struct augrt_object* sock, const char* addr,
+    int (*accepted_)(struct augmod_object* sock, const char* addr,
                      unsigned short port);
 
     /**
@@ -471,7 +471,7 @@ struct augrt_module {
        \sa tcpconnect_()
     */
 
-    void (*connected_)(struct augrt_object* sock, const char* addr,
+    void (*connected_)(struct augmod_object* sock, const char* addr,
                        unsigned short port);
 
     /**
@@ -484,7 +484,7 @@ struct augrt_module {
        \param len Length of data buffer.
     */
 
-    void (*data_)(const struct augrt_object* sock, const void* buf,
+    void (*data_)(const struct augmod_object* sock, const void* buf,
                   size_t len);
 
     /**
@@ -496,7 +496,7 @@ struct augrt_module {
        specify a new value; a value of zero will cancel the timer.
     */
 
-    void (*rdexpire_)(const struct augrt_object* sock, unsigned* ms);
+    void (*rdexpire_)(const struct augmod_object* sock, unsigned* ms);
 
     /**
        Expiry of write timer.
@@ -507,7 +507,7 @@ struct augrt_module {
        specify a new value; a value of zero will cancel the timer.
     */
 
-    void (*wrexpire_)(const struct augrt_object* sock, unsigned* ms);
+    void (*wrexpire_)(const struct augmod_object* sock, unsigned* ms);
 
     /**
        Timer expiry.
@@ -518,7 +518,7 @@ struct augrt_module {
        specify a new value; a value of zero will cancel the timer.
     */
 
-    void (*expire_)(const struct augrt_object* timer, unsigned* ms);
+    void (*expire_)(const struct augmod_object* timer, unsigned* ms);
 
     /**
        Authorisation of peer certificate.
@@ -527,73 +527,73 @@ struct augrt_module {
        \param subject TODO
        \param issuer TODO
 
-       \return either #AUGRT_OK or #AUGRT_ERROR.
+       \return either #AUGMOD_OK or #AUGMOD_ERROR.
     */
 
-    int (*authcert_)(const struct augrt_object* sock, const char* subject,
+    int (*authcert_)(const struct augmod_object* sock, const char* subject,
                      const char* issuer);
 };
 
-AUGRT_EXTERN const struct augrt_host*
-augrt_gethost(void);
+AUGMOD_EXTERN const struct augmod_host*
+augmod_gethost(void);
 
 /**
    Syntactic sugar that allows host functions to be called with a free
    function-like syntax.
- */
+*/
 
-#define augrt_writelog      (augrt_gethost()->writelog_)
-#define augrt_vwritelog     (augrt_gethost()->vwritelog_)
-#define augrt_error         (augrt_gethost()->error_)
-#define augrt_reconfall     (augrt_gethost()->reconfall_)
-#define augrt_stopall       (augrt_gethost()->stopall_)
-#define augrt_post          (augrt_gethost()->post_)
-#define augrt_dispatch      (augrt_gethost()->dispatch_)
-#define augrt_getenv        (augrt_gethost()->getenv_)
-#define augrt_getsession    (augrt_gethost()->getsession_)
-#define augrt_shutdown      (augrt_gethost()->shutdown_)
-#define augrt_tcpconnect    (augrt_gethost()->tcpconnect_)
-#define augrt_tcplisten     (augrt_gethost()->tcplisten_)
-#define augrt_send          (augrt_gethost()->send_)
-#define augrt_sendv         (augrt_gethost()->sendv_)
-#define augrt_setrwtimer    (augrt_gethost()->setrwtimer_)
-#define augrt_resetrwtimer  (augrt_gethost()->resetrwtimer_)
-#define augrt_cancelrwtimer (augrt_gethost()->cancelrwtimer_)
-#define augrt_settimer      (augrt_gethost()->settimer_)
-#define augrt_resettimer    (augrt_gethost()->resettimer_)
-#define augrt_canceltimer   (augrt_gethost()->canceltimer_)
-#define augrt_setsslclient  (augrt_gethost()->setsslclient_)
-#define augrt_setsslserver  (augrt_gethost()->setsslserver_)
+#define augmod_writelog      (augmod_gethost()->writelog_)
+#define augmod_vwritelog     (augmod_gethost()->vwritelog_)
+#define augmod_error         (augmod_gethost()->error_)
+#define augmod_reconfall     (augmod_gethost()->reconfall_)
+#define augmod_stopall       (augmod_gethost()->stopall_)
+#define augmod_post          (augmod_gethost()->post_)
+#define augmod_dispatch      (augmod_gethost()->dispatch_)
+#define augmod_getenv        (augmod_gethost()->getenv_)
+#define augmod_getsession    (augmod_gethost()->getsession_)
+#define augmod_shutdown      (augmod_gethost()->shutdown_)
+#define augmod_tcpconnect    (augmod_gethost()->tcpconnect_)
+#define augmod_tcplisten     (augmod_gethost()->tcplisten_)
+#define augmod_send          (augmod_gethost()->send_)
+#define augmod_sendv         (augmod_gethost()->sendv_)
+#define augmod_setrwtimer    (augmod_gethost()->setrwtimer_)
+#define augmod_resetrwtimer  (augmod_gethost()->resetrwtimer_)
+#define augmod_cancelrwtimer (augmod_gethost()->cancelrwtimer_)
+#define augmod_settimer      (augmod_gethost()->settimer_)
+#define augmod_resettimer    (augmod_gethost()->resettimer_)
+#define augmod_canceltimer   (augmod_gethost()->canceltimer_)
+#define augmod_setsslclient  (augmod_gethost()->setsslclient_)
+#define augmod_setsslserver  (augmod_gethost()->setsslserver_)
 
 /**
-   This macro defines the module's entry points.  augrt_init() should return
+   This macro defines the module's entry points.  augmod_init() should return
    NULL on failure.
 */
 
-#define AUGRT_MODULE(init, term)                                      \
-    static const struct augrt_host* host_ = NULL;                     \
-    AUGRT_EXTERN const struct augrt_host*                             \
-    augrt_gethost(void)                                               \
-    {                                                                 \
-        return host_;                                                 \
-    }                                                                 \
-    AUGRT_API const struct augrt_module*                              \
-    augrt_init(const char* name, const struct augrt_host* host)       \
-    {                                                                 \
-        if (host_)                                                    \
-            return NULL;                                              \
-        host_ = host;                                                 \
-        return (*init)(name);                                         \
-    }                                                                 \
-    AUGRT_API void                                                    \
-    augrt_term(void)                                                  \
-    {                                                                 \
-        (*term)();                                                    \
-        host_ = NULL;                                                 \
+#define AUGMOD_ENTRYPOINTS(init, term)                              \
+    static const struct augmod_host* host_ = NULL;                  \
+    AUGMOD_EXTERN const struct augmod_host*                         \
+    augmod_gethost(void)                                            \
+    {                                                               \
+        return host_;                                               \
+    }                                                               \
+    AUGMOD_API const struct augmod_control*                         \
+    augmod_init(const char* name, const struct augmod_host* host)   \
+    {                                                               \
+        if (host_)                                                  \
+            return NULL;                                            \
+        host_ = host;                                               \
+        return (*init)(name);                                       \
+    }                                                               \
+    AUGMOD_API void                                                 \
+    augmod_term(void)                                               \
+    {                                                               \
+        (*term)();                                                  \
+        host_ = NULL;                                               \
     }
 
-typedef void (*augrt_termfn)(void);
-typedef const struct augrt_module* (*augrt_initfn)(const char*,
-                                                   const struct augrt_host*);
+typedef void (*augmod_termfn)(void);
+typedef const struct augmod_control*
+(*augmod_initfn)(const char*, const struct augmod_host*);
 
-#endif /* AUGRT_H */
+#endif /* AUGMOD_H */

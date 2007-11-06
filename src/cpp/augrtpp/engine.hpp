@@ -8,7 +8,7 @@
 
 #include "augnetpp/nbfile.hpp"
 
-#include "augrt.h"
+#include "augmod.h"
 
 namespace aug {
 
@@ -94,56 +94,56 @@ namespace aug {
                  const void* user, size_t size);
 
         void
-        shutdown(augrt_id cid, unsigned flags);
+        shutdown(augmod_id cid, unsigned flags);
 
-        augrt_id
+        augmod_id
         tcpconnect(const char* sname, const char* host, const char* port,
                    void* user);
 
-        augrt_id
+        augmod_id
         tcplisten(const char* sname, const char* host, const char* port,
                   void* user);
 
         void
-        send(augrt_id cid, const void* buf, size_t len);
+        send(augmod_id cid, const void* buf, size_t len);
 
         void
-        sendv(augrt_id cid, const aug_var& var);
+        sendv(augmod_id cid, const aug_var& var);
 
         void
-        setrwtimer(augrt_id cid, unsigned ms, unsigned flags);
+        setrwtimer(augmod_id cid, unsigned ms, unsigned flags);
 
         bool
-        resetrwtimer(augrt_id cid, unsigned ms, unsigned flags);
+        resetrwtimer(augmod_id cid, unsigned ms, unsigned flags);
 
         bool
-        cancelrwtimer(augrt_id cid, unsigned flags);
+        cancelrwtimer(augmod_id cid, unsigned flags);
 
-        augrt_id
+        augmod_id
         settimer(const char* sname, unsigned ms, const aug_var* var);
 
-        augrt_id
+        augmod_id
         settimer(const char* sname, unsigned ms, const aug_var& var)
         {
             return settimer(sname, ms, &var);
         }
-        augrt_id
+        augmod_id
         settimer(const char* sname, unsigned ms, const null_&)
         {
             return settimer(sname, ms, 0);
         }
 
         bool
-        resettimer(augrt_id tid, unsigned ms);
+        resettimer(augmod_id tid, unsigned ms);
 
         bool
-        canceltimer(augrt_id tid);
+        canceltimer(augmod_id tid);
 
         void
-        setsslclient(augrt_id cid, sslctx& ctx);
+        setsslclient(augmod_id cid, sslctx& ctx);
 
         void
-        setsslserver(augrt_id cid, sslctx& ctx);
+        setsslserver(augmod_id cid, sslctx& ctx);
 
         bool
         stopping() const;

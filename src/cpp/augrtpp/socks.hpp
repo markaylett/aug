@@ -15,7 +15,7 @@ namespace aug {
 
     class socks {
 
-        typedef std::map<augrt_id, int, std::greater<augrt_id> > idtofd;
+        typedef std::map<augmod_id, int, std::greater<augmod_id> > idtofd;
 
         std::map<int, sockptr> socks_;
         idtofd idtofd_;
@@ -32,10 +32,10 @@ namespace aug {
         {
         }
         bool
-        send(augrt_id cid, const void* buf, size_t size, const timeval& now);
+        send(augmod_id cid, const void* buf, size_t size, const timeval& now);
 
         bool
-        sendv(augrt_id cid, const aug_var& var, const timeval& now);
+        sendv(augmod_id cid, const aug_var& var, const timeval& now);
 
         void
         clear();
@@ -56,7 +56,7 @@ namespace aug {
         getbyfd(fdref fd) const;
 
         sockptr
-        getbyid(augrt_id id) const;
+        getbyid(augmod_id id) const;
 
         bool
         empty() const;

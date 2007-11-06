@@ -1,10 +1,10 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_HPP
-#define AUGRTPP_HPP
+#ifndef AUGMODPP_HPP
+#define AUGMODPP_HPP
 
-#include "augrt.h"
+#include "augmod.h"
 
 #include <algorithm>
 #include <cctype>
@@ -18,19 +18,19 @@
 #include <vector>
 #include <functional>
 
-#if !defined(AUGRT_NOTHROW)
-# define AUGRT_NOTHROW throw()
-#endif // !AUGRT_NOTHROW
+#if !defined(AUGMOD_NOTHROW)
+# define AUGMOD_NOTHROW throw()
+#endif // !AUGMOD_NOTHROW
 
-#define AUGRT_WRITELOGCATCH                                     \
+#define AUGMOD_WRITELOGCATCH                                    \
     catch (const std::exception& e) {                           \
-        augrt_writelog(AUGRT_LOGERROR,                          \
-                       "std::exception: %s", e.what());         \
+        augmod_writelog(AUGMOD_LOGERROR,                        \
+                        "std::exception: %s", e.what());        \
     } catch (...) {                                             \
-        augrt_writelog(AUGRT_LOGERROR, "unknown exception");    \
+        augmod_writelog(AUGMOD_LOGERROR, "unknown exception");  \
     } do { } while (0)
 
-namespace augrt {
+namespace augmod {
 
     typedef std::runtime_error error;
 
@@ -39,229 +39,229 @@ namespace augrt {
     {
         va_list args;
         va_start(args, format);
-        augrt_vwritelog(level, format, args);
+        augmod_vwritelog(level, format, args);
         va_end(args);
     }
 
     inline void
     vwritelog(int level, const char* format, va_list args)
     {
-        augrt_vwritelog(level, format, args);
+        augmod_vwritelog(level, format, args);
     }
 
     inline void
     reconfall()
     {
-        if (AUGRT_ERROR == augrt_reconfall())
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_reconfall())
+            throw error(augmod_error());
     }
 
     inline void
     stopall()
     {
-        if (AUGRT_ERROR == augrt_stopall())
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_stopall())
+            throw error(augmod_error());
     }
 
     inline void
-    post(const char* to, const char* type, const augrt_var& var)
+    post(const char* to, const char* type, const augmod_var& var)
     {
-        if (AUGRT_ERROR == augrt_post(to, type, &var))
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_post(to, type, &var))
+            throw error(augmod_error());
     }
 
     inline void
     dispatch(const char* to, const char* type, const void* user, size_t size)
     {
-        if (AUGRT_ERROR == augrt_dispatch(to, type, user, size))
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_dispatch(to, type, user, size))
+            throw error(augmod_error());
     }
 
     inline const char*
     getenv(const char* name, const char* def = 0)
     {
-        return augrt_getenv(name, def);
+        return augmod_getenv(name, def);
     }
 
-    inline const augrt_session*
+    inline const augmod_session*
     getsession()
     {
-        return augrt_getsession();
+        return augmod_getsession();
     }
 
     inline void
-    shutdown(augrt_id sid, unsigned flags)
+    shutdown(augmod_id sid, unsigned flags)
     {
-        if (AUGRT_ERROR == augrt_shutdown(sid, flags))
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_shutdown(sid, flags))
+            throw error(augmod_error());
     }
 
     inline void
-    shutdown(const augrt_object& sock, unsigned flags)
+    shutdown(const augmod_object& sock, unsigned flags)
     {
         shutdown(sock.id_, flags);
     }
 
-    inline augrt_id
+    inline augmod_id
     tcpconnect(const char* host, const char* port, void* user = 0)
     {
-        int ret(augrt_tcpconnect(host, port, user));
-        if (AUGRT_ERROR == ret)
-            throw error(augrt_error());
-        return static_cast<augrt_id>(ret);
+        int ret(augmod_tcpconnect(host, port, user));
+        if (AUGMOD_ERROR == ret)
+            throw error(augmod_error());
+        return static_cast<augmod_id>(ret);
     }
 
-    inline augrt_id
+    inline augmod_id
     tcplisten(const char* host, const char* port, void* user = 0)
     {
-        int ret(augrt_tcplisten(host, port, user));
-        if (AUGRT_ERROR == ret)
-            throw error(augrt_error());
-        return static_cast<augrt_id>(ret);
+        int ret(augmod_tcplisten(host, port, user));
+        if (AUGMOD_ERROR == ret)
+            throw error(augmod_error());
+        return static_cast<augmod_id>(ret);
     }
 
     inline void
-    send(augrt_id cid, const void* buf, size_t size)
+    send(augmod_id cid, const void* buf, size_t size)
     {
-        if (AUGRT_ERROR == augrt_send(cid, buf, size))
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_send(cid, buf, size))
+            throw error(augmod_error());
     }
 
     inline void
-    send(const augrt_object& conn, const void* buf, size_t size)
+    send(const augmod_object& conn, const void* buf, size_t size)
     {
         send(conn.id_, buf, size);
     }
 
     inline void
-    sendv(augrt_id cid, const augrt_var& var)
+    sendv(augmod_id cid, const augmod_var& var)
     {
-        if (AUGRT_ERROR == augrt_sendv(cid, &var))
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_sendv(cid, &var))
+            throw error(augmod_error());
     }
 
     inline void
-    sendv(const augrt_object& conn, const augrt_var& var)
+    sendv(const augmod_object& conn, const augmod_var& var)
     {
         sendv(conn.id_, var);
     }
 
     inline void
-    setrwtimer(augrt_id cid, unsigned ms, unsigned flags)
+    setrwtimer(augmod_id cid, unsigned ms, unsigned flags)
     {
-        if (AUGRT_ERROR == augrt_setrwtimer(cid, ms, flags))
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_setrwtimer(cid, ms, flags))
+            throw error(augmod_error());
     }
 
     inline void
-    setrwtimer(const augrt_object& conn, unsigned ms, unsigned flags)
+    setrwtimer(const augmod_object& conn, unsigned ms, unsigned flags)
     {
         setrwtimer(conn.id_, ms, flags);
     }
 
     inline bool
-    resetrwtimer(augrt_id cid, unsigned ms, unsigned flags)
+    resetrwtimer(augmod_id cid, unsigned ms, unsigned flags)
     {
-        switch (augrt_resetrwtimer(cid, ms, flags)) {
-        case AUGRT_ERROR:
-            throw error(augrt_error());
-        case AUGRT_NONE:
+        switch (augmod_resetrwtimer(cid, ms, flags)) {
+        case AUGMOD_ERROR:
+            throw error(augmod_error());
+        case AUGMOD_NONE:
             return false;
         }
         return true;
     }
 
     inline bool
-    retsetrwtimer(const augrt_object& conn, unsigned ms, unsigned flags)
+    retsetrwtimer(const augmod_object& conn, unsigned ms, unsigned flags)
     {
         return resetrwtimer(conn.id_, ms, flags);
     }
 
     inline bool
-    cancelrwtimer(augrt_id cid, unsigned flags)
+    cancelrwtimer(augmod_id cid, unsigned flags)
     {
-        switch (augrt_cancelrwtimer(cid, flags)) {
-        case AUGRT_ERROR:
-            throw error(augrt_error());
-        case AUGRT_NONE:
+        switch (augmod_cancelrwtimer(cid, flags)) {
+        case AUGMOD_ERROR:
+            throw error(augmod_error());
+        case AUGMOD_NONE:
             return false;
         }
         return true;
     }
 
     inline bool
-    cancelrwtimer(const augrt_object& conn, unsigned flags)
+    cancelrwtimer(const augmod_object& conn, unsigned flags)
     {
         return cancelrwtimer(conn.id_, flags);
     }
 
-    inline augrt_id
-    settimer(unsigned ms, const augrt_var& var)
+    inline augmod_id
+    settimer(unsigned ms, const augmod_var& var)
     {
-        int ret(augrt_settimer(ms, &var));
-        if (AUGRT_ERROR == ret)
-            throw error(augrt_error());
-        return static_cast<augrt_id>(ret);
+        int ret(augmod_settimer(ms, &var));
+        if (AUGMOD_ERROR == ret)
+            throw error(augmod_error());
+        return static_cast<augmod_id>(ret);
     }
 
     inline bool
-    resettimer(augrt_id tid, unsigned ms)
+    resettimer(augmod_id tid, unsigned ms)
     {
-        switch (augrt_resettimer(tid, ms)) {
-        case AUGRT_ERROR:
-            throw error(augrt_error());
-        case AUGRT_NONE:
+        switch (augmod_resettimer(tid, ms)) {
+        case AUGMOD_ERROR:
+            throw error(augmod_error());
+        case AUGMOD_NONE:
             return false;
         }
         return true;
     }
 
     inline bool
-    resettimer(const augrt_object& timer, unsigned ms)
+    resettimer(const augmod_object& timer, unsigned ms)
     {
         return resettimer(timer.id_, ms);
     }
 
     inline bool
-    canceltimer(augrt_id tid)
+    canceltimer(augmod_id tid)
     {
-        switch (augrt_canceltimer(tid)) {
-        case AUGRT_ERROR:
-            throw error(augrt_error());
-        case AUGRT_NONE:
+        switch (augmod_canceltimer(tid)) {
+        case AUGMOD_ERROR:
+            throw error(augmod_error());
+        case AUGMOD_NONE:
             return false;
         }
         return true;
     }
 
     inline bool
-    canceltimer(const augrt_object& timer, unsigned ms)
+    canceltimer(const augmod_object& timer, unsigned ms)
     {
         return resettimer(timer.id_, ms);
     }
 
     inline void
-    setsslclient(augrt_id cid, const char* ctx)
+    setsslclient(augmod_id cid, const char* ctx)
     {
-        if (AUGRT_ERROR == augrt_setsslclient(cid, ctx))
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_setsslclient(cid, ctx))
+            throw error(augmod_error());
     }
 
     inline void
-    setsslclient(const augrt_object& conn, const char* ctx)
+    setsslclient(const augmod_object& conn, const char* ctx)
     {
         setsslclient(conn.id_, ctx);
     }
 
     inline void
-    setsslserver(augrt_id cid, const char* ctx)
+    setsslserver(augmod_id cid, const char* ctx)
     {
-        if (AUGRT_ERROR == augrt_setsslserver(cid, ctx))
-            throw error(augrt_error());
+        if (AUGMOD_ERROR == augmod_setsslserver(cid, ctx))
+            throw error(augmod_error());
     }
 
     inline void
-    setsslserver(const augrt_object& conn, const char* ctx)
+    setsslserver(const augmod_object& conn, const char* ctx)
     {
         setsslserver(conn.id_, ctx);
     }
@@ -269,13 +269,13 @@ namespace augrt {
     namespace detail {
         class stringtype {
             static int
-            destroy(void* arg) AUGRT_NOTHROW
+            destroy(void* arg) AUGMOD_NOTHROW
             {
                 delete static_cast<std::string*>(arg);
                 return 0;
             }
             static const void*
-            buf(void* arg, size_t* size) AUGRT_NOTHROW
+            buf(void* arg, size_t* size) AUGMOD_NOTHROW
             {
                 std::string* s(static_cast<std::string*>(arg));
                 if (size)
@@ -283,10 +283,10 @@ namespace augrt {
                 return s->data();
             }
         public:
-            static const augrt_vartype&
+            static const augmod_vartype&
             get()
             {
-                static const augrt_vartype local = {
+                static const augmod_vartype local = {
                     destroy,
                     buf
                 };
@@ -304,19 +304,19 @@ namespace augrt {
     }
 
     class object {
-        const augrt_object& object_;
+        const augmod_object& object_;
     public:
         explicit
-        object(const augrt_object& object)
+        object(const augmod_object& object)
             : object_(object)
         {
         }
         void
         setuser(void* user)
         {
-            const_cast<augrt_object&>(object_).user_ = user;
+            const_cast<augmod_object&>(object_).user_ = user;
         }
-        augrt_id
+        augmod_id
         id() const
         {
             return object_.id_;
@@ -332,7 +332,7 @@ namespace augrt {
         {
             return static_cast<T*>(object_.user_);
         }
-        operator const augrt_object&() const
+        operator const augmod_object&() const
         {
             return object_;
         }
@@ -379,7 +379,7 @@ namespace augrt {
 
     public:
         virtual
-        ~session_base() AUGRT_NOTHROW
+        ~session_base() AUGMOD_NOTHROW
         {
         }
         bool
@@ -462,7 +462,7 @@ namespace augrt {
         void
         do_teardown(const object& sock)
         {
-            augrt_writelog(AUGRT_LOGINFO, "teardown defaulting to shutdown");
+            augmod_writelog(AUGMOD_LOGINFO, "teardown defaulting to shutdown");
             shutdown(sock, 0);
         }
         bool
@@ -498,7 +498,7 @@ namespace augrt {
         }
     public:
         virtual
-        ~basic_session() AUGRT_NOTHROW
+        ~basic_session() AUGMOD_NOTHROW
         {
         }
     };
@@ -526,14 +526,14 @@ namespace augrt {
         explicit
         basic_factory(const char* module)
         {
-            augrt_writelog(AUGRT_LOGINFO, "creating factory: module=[%s]",
-                           module);
+            augmod_writelog(AUGMOD_LOGINFO, "creating factory: module=[%s]",
+                            module);
         }
         session_base*
         create(const char* sname)
         {
-            augrt_writelog(AUGRT_LOGINFO, "creating session: name=[%s]",
-                           sname);
+            augmod_writelog(AUGMOD_LOGINFO, "creating session: name=[%s]",
+                            sname);
             return listT::create(sname);
         }
     };
@@ -549,115 +549,115 @@ namespace augrt {
         static int
         result(bool x)
         {
-            return x ? AUGRT_OK : AUGRT_ERROR;
+            return x ? AUGMOD_OK : AUGMOD_ERROR;
         }
         static void
-        stop() AUGRT_NOTHROW
+        stop() AUGMOD_NOTHROW
         {
             delete getbase();
         }
         static int
-        start(augrt_session* session) AUGRT_NOTHROW
+        start(augmod_session* session) AUGMOD_NOTHROW
         {
             try {
                 session->user_ = factory_->create(session->name_);
                 return result(getbase()->start(session->name_));
-            } AUGRT_WRITELOGCATCH;
-            return AUGRT_ERROR;
+            } AUGMOD_WRITELOGCATCH;
+            return AUGMOD_ERROR;
         }
         static void
-        reconf() AUGRT_NOTHROW
+        reconf() AUGMOD_NOTHROW
         {
             try {
                 getbase()->reconf();
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
         }
         static void
         event(const char* from, const char* type, const void* user,
-              size_t size) AUGRT_NOTHROW
+              size_t size) AUGMOD_NOTHROW
         {
             try {
                 getbase()->event(from, type, user, size);
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
         }
         static void
-        closed(const augrt_object* sock) AUGRT_NOTHROW
+        closed(const augmod_object* sock) AUGMOD_NOTHROW
         {
             try {
                 getbase()->closed(object(*sock));
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
         }
         static void
-        teardown(const augrt_object* sock) AUGRT_NOTHROW
+        teardown(const augmod_object* sock) AUGMOD_NOTHROW
         {
             try {
                 getbase()->teardown(object(*sock));
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
         }
         static int
-        accepted(augrt_object* sock, const char* addr,
-                 unsigned short port) AUGRT_NOTHROW
+        accepted(augmod_object* sock, const char* addr,
+                 unsigned short port) AUGMOD_NOTHROW
         {
             try {
                 object o(*sock);
                 return result(getbase()->accepted(o, addr, port));
-            } AUGRT_WRITELOGCATCH;
-            return AUGRT_ERROR;
+            } AUGMOD_WRITELOGCATCH;
+            return AUGMOD_ERROR;
         }
         static void
-        connected(augrt_object* sock, const char* addr,
-                  unsigned short port) AUGRT_NOTHROW
+        connected(augmod_object* sock, const char* addr,
+                  unsigned short port) AUGMOD_NOTHROW
         {
             try {
                 object o(*sock);
                 getbase()->connected(o, addr, port);
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
         }
         static void
-        data(const augrt_object* sock, const void* buf,
-             size_t size) AUGRT_NOTHROW
+        data(const augmod_object* sock, const void* buf,
+             size_t size) AUGMOD_NOTHROW
         {
             try {
                 getbase()->data(object(*sock), buf, size);
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
         }
         static void
-        rdexpire(const augrt_object* sock, unsigned* ms) AUGRT_NOTHROW
+        rdexpire(const augmod_object* sock, unsigned* ms) AUGMOD_NOTHROW
         {
             try {
                 getbase()->rdexpire(object(*sock), *ms);
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
         }
         static void
-        wrexpire(const augrt_object* sock, unsigned* ms) AUGRT_NOTHROW
+        wrexpire(const augmod_object* sock, unsigned* ms) AUGMOD_NOTHROW
         {
             try {
                 getbase()->wrexpire(object(*sock), *ms);
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
         }
         static void
-        expire(const augrt_object* timer, unsigned* ms) AUGRT_NOTHROW
+        expire(const augmod_object* timer, unsigned* ms) AUGMOD_NOTHROW
         {
             try {
                 getbase()->expire(object(*timer), *ms);
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
         }
         static int
-        authcert(const augrt_object* sock, const char* subject,
+        authcert(const augmod_object* sock, const char* subject,
                  const char* issuer)
         {
             try {
                 object o(*sock);
                 return result(getbase()->authcert(o, subject, issuer));
-            } AUGRT_WRITELOGCATCH;
-            return AUGRT_ERROR;
+            } AUGMOD_WRITELOGCATCH;
+            return AUGMOD_ERROR;
         }
 
     public:
-        static const struct augrt_module*
-        init(const char* name) AUGRT_NOTHROW
+        static const struct augmod_control*
+        init(const char* name) AUGMOD_NOTHROW
         {
-            static const augrt_module local = {
+            static const augmod_control local = {
                 stop,
                 start,
                 reconf,
@@ -675,11 +675,11 @@ namespace augrt {
             try {
                 factory_ = new T(name);
                 return &local;
-            } AUGRT_WRITELOGCATCH;
+            } AUGMOD_WRITELOGCATCH;
             return 0; // Error.
         }
         static void
-        term() AUGRT_NOTHROW
+        term() AUGMOD_NOTHROW
         {
             delete factory_;
             factory_ = 0;
@@ -1040,4 +1040,4 @@ namespace augrt {
     }
 }
 
-#endif // AUGRTPP_HPP
+#endif // AUGMODPP_HPP

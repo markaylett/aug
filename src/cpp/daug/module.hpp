@@ -4,7 +4,7 @@
 #ifndef DAUG_MODULE_HPP
 #define DAUG_MODULE_HPP
 
-#include "augrt.h"
+#include "augmod.h"
 
 #include "augsyspp/dlfcn.hpp"
 #include "augsyspp/smartptr.hpp"
@@ -16,8 +16,8 @@ namespace augrt {
     class module {
         const std::string name_;
         aug::dlib lib_;
-        augrt_termfn termfn_;
-        augrt_module module_;
+        augmod_termfn termfn_;
+        augmod_control control_;
 
         module(const module&);
 
@@ -28,13 +28,14 @@ namespace augrt {
         ~module() AUG_NOTHROW;
 
         module(const std::string& name, const char* path,
-               const augrt_host& host, void (*teardown)(const augrt_object*));
+               const augmod_host& host,
+               void (*teardown)(const augmod_object*));
 
         void
         stop() const AUG_NOTHROW;
 
         bool
-        start(augrt_session& session) const AUG_NOTHROW;
+        start(augmod_session& session) const AUG_NOTHROW;
 
         void
         reconf() const AUG_NOTHROW;
@@ -44,34 +45,34 @@ namespace augrt {
               size_t size) const AUG_NOTHROW;
 
         void
-        closed(const augrt_object& sock) const AUG_NOTHROW;
+        closed(const augmod_object& sock) const AUG_NOTHROW;
 
         void
-        teardown(const augrt_object& sock) const AUG_NOTHROW;
+        teardown(const augmod_object& sock) const AUG_NOTHROW;
 
         bool
-        accepted(augrt_object& sock, const char* addr,
+        accepted(augmod_object& sock, const char* addr,
                  unsigned short port) const AUG_NOTHROW;
 
         void
-        connected(augrt_object& sock, const char* addr,
+        connected(augmod_object& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW;
 
         void
-        data(const augrt_object& sock, const char* buf,
+        data(const augmod_object& sock, const char* buf,
              size_t size) const AUG_NOTHROW;
 
         void
-        rdexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW;
+        rdexpire(const augmod_object& sock, unsigned& ms) const AUG_NOTHROW;
 
         void
-        wrexpire(const augrt_object& sock, unsigned& ms) const AUG_NOTHROW;
+        wrexpire(const augmod_object& sock, unsigned& ms) const AUG_NOTHROW;
 
         void
-        expire(const augrt_object& timer, unsigned& ms) const AUG_NOTHROW;
+        expire(const augmod_object& timer, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        authcert(const augrt_object& sock, const char* subject,
+        authcert(const augmod_object& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW;
     };
 

@@ -1,4 +1,4 @@
-from augrt import *
+from augpy import *
 
 def crit(s):
     writelog(LOGCRIT, s)

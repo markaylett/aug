@@ -6,19 +6,19 @@
 
 #include "augrtpp/session.hpp"
 
-#include "augrt.h"
+#include "augmod.h"
 
 namespace aug {
 
     class object_base {
     public:
-        typedef augrt_object ctype;
+        typedef augmod_object ctype;
     private:
 
-        virtual augrt_object&
+        virtual augmod_object&
         do_get() = 0;
 
-        virtual const augrt_object&
+        virtual const augmod_object&
         do_get() const = 0;
 
         virtual const sessionptr&
@@ -28,12 +28,12 @@ namespace aug {
         virtual
         ~object_base() AUG_NOTHROW;
 
-        augrt_object&
+        augmod_object&
         get()
         {
             return do_get();
         }
-        const augrt_object&
+        const augmod_object&
         get() const
         {
             return do_get();
@@ -43,11 +43,11 @@ namespace aug {
         {
             return do_session();
         }
-        operator augrt_object&()
+        operator augmod_object&()
         {
             return do_get();
         }
-        operator const augrt_object&() const
+        operator const augmod_object&() const
         {
             return do_get();
         }
@@ -55,14 +55,14 @@ namespace aug {
 
     typedef smartptr<object_base> objectptr;
 
-    inline augrt_id
-    id(const augrt_object& ref)
+    inline augmod_id
+    id(const augmod_object& ref)
     {
         return ref.id_;
     }
 
     inline void*
-    user(const augrt_object& ref)
+    user(const augmod_object& ref)
     {
         return ref.user_;
     }

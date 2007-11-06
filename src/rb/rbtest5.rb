@@ -11,8 +11,8 @@ module RbTest5
     end
     def RbTest5.start(sname)
         Log.debug("start(): #{sname}")
-        @listener = AugRt.tcplisten("0.0.0.0", "1234", nil)
-        @client = AugRt.tcpconnect("127.0.0.1", "1234", nil)
+        @listener = AugRb.tcplisten("0.0.0.0", "1234", nil)
+        @client = AugRb.tcpconnect("127.0.0.1", "1234", nil)
         @server = nil
     end
     def RbTest5.closed(sock)
@@ -26,7 +26,7 @@ module RbTest5
     def RbTest5.connected(sock, addr, port)
         Log.debug("connected(): #{sock}")
         sock.user = LineParser.new
-        AugRt.send(@server, "hello, world!\n")
+        AugRb.send(@server, "hello, world!\n")
     end
     def RbTest5.data(sock, buf)
         Log.debug("data(): #{sock}")
@@ -38,9 +38,9 @@ module RbTest5
             end
 
             if sock == @server
-                AugRt.send(sock, line + "\n")
+                AugRb.send(sock, line + "\n")
             else
-                AugRt.stopall
+                AugRb.stopall
             end
         end
     end

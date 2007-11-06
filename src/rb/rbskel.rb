@@ -56,7 +56,7 @@ module RbSkel
     def RbSkel.start(sname)
         @interp = Interpreter.new(Handler.new)
         Log.debug("start(): #{sname}")
-        AugRt.tcplisten("0.0.0.0", AugRt.getenv("session.RbSkel.serv"), nil)
+        AugRb.tcplisten("0.0.0.0", AugRb.getenv("session.RbSkel.serv"), nil)
     end
     def RbSkel.reconf
         Log.debug("reconf()")
@@ -69,13 +69,13 @@ module RbSkel
     end
     def RbSkel.teardown(sock)
         Log.debug("teardown(): #{sock}")
-        AugRt.shutdown(sock, 0)
+        AugRb.shutdown(sock, 0)
     end
     def RbSkel.accepted(sock, addr, port)
         Log.info("accepted(): #{sock}")
         sock.user = LineParser.new
-        AugRt.setrwtimer(sock, 15000, AugRt::TIMRD)
-        AugRt.send(sock, "+OK hello\r\n")
+        AugRb.setrwtimer(sock, 15000, AugRb::TIMRD)
+        AugRb.send(sock, "+OK hello\r\n")
     end
     def RbSkel.connected(sock, addr, port)
         Log.debug("connected(): #{sock}")
@@ -85,16 +85,16 @@ module RbSkel
         sock.user.parse(buf) do |line|
             x = @interp.interpret(line)
             if x == QUIT
-                AugRt.send(sock, "+OK goodbye\r\n")
-                AugRt.shutdown(sock, 0)
+                AugRb.send(sock, "+OK goodbye\r\n")
+                AugRb.shutdown(sock, 0)
             elsif x != nil
-                AugRt.send(sock, x + "\r\n")
+                AugRb.send(sock, x + "\r\n")
             end
         end
     end
     def RbSkel.rdexpire(sock, ms)
         Log.debug("rdexpire(): #{sock}")
-        AugRt.send(sock, "+OK hello\r\n")
+        AugRb.send(sock, "+OK hello\r\n")
     end
     def RbSkel.wrexpire(sock, ms)
         Log.debug("wrexpire(): #{sock}")

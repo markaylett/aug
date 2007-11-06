@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augrt.h"
+#include "augmod.h"
 
 namespace {
 
@@ -16,7 +16,7 @@ namespace {
     {
     }
     int
-    start(augrt_session* session)
+    start(augmod_session* session)
     {
         return 0;
     }
@@ -29,36 +29,36 @@ namespace {
     {
     }
     void
-    closed(const augrt_object* sock)
+    closed(const augmod_object* sock)
     {
     }
     int
-    accepted(augrt_object* sock, const char* addr, unsigned short port)
+    accepted(augmod_object* sock, const char* addr, unsigned short port)
     {
         return 0;
     }
     void
-    connected(augrt_object* sock, const char* addr, unsigned short port)
+    connected(augmod_object* sock, const char* addr, unsigned short port)
     {
     }
     void
-    data(const augrt_object* sock, const void* buf, size_t len)
+    data(const augmod_object* sock, const void* buf, size_t len)
     {
     }
     void
-    rdexpire(const augrt_object* sock, unsigned* ms)
+    rdexpire(const augmod_object* sock, unsigned* ms)
     {
     }
     void
-    wrexpire(const augrt_object* sock, unsigned* ms)
+    wrexpire(const augmod_object* sock, unsigned* ms)
     {
     }
     void
-    expire(const augrt_object* timer, unsigned* ms)
+    expire(const augmod_object* timer, unsigned* ms)
     {
     }
     int
-    authcert(const augrt_object* sock, const char* subject,
+    authcert(const augmod_object* sock, const char* subject,
              const char* issuer)
     {
         return 0;
@@ -66,8 +66,8 @@ namespace {
 }
 
 void
-augrt::setdefaults(augrt_module& dst, const augrt_module& src,
-                   void (*teardown)(const augrt_object*))
+augrt::setdefaults(augmod_control& dst, const augmod_control& src,
+                   void (*teardown)(const augmod_object*))
 {
     dst.stop_ = src.stop_ ? src.stop_ : stop;
     dst.start_ = src.start_ ? src.start_ : start;

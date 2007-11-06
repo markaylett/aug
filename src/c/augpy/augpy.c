@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGPY_BUILD
+#define AUGMOD_BUILD
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 #include "augpy/host.h"
 #include "augpy/object.h"
 
-#include "augrt.h"
+#include "augmod.h"
 
 #if defined(_WIN32)
 # include <direct.h>
@@ -33,7 +33,7 @@ struct import_ {
     int open_;
 };
 
-static PyObject* augrt_ = NULL;
+static PyObject* augpy_ = NULL;
 static PyTypeObject* type_ = NULL;
 
 static void
@@ -49,11 +49,11 @@ setpath_(void)
 
     /* Path may be relative to run directory. */
 
-    if ((s = augrt_getenv("rundir", NULL)))
+    if ((s = augmod_getenv("rundir", NULL)))
         chdir(s);
 
-    s = augrt_getenv("module.augpy.pythonpath", "python");
-    augrt_writelog(AUGRT_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
+    s = augmod_getenv("module.augpy.pythonpath", "python");
+    augmod_writelog(AUGMOD_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
     chdir(s);
 
     if ((sys = PyImport_ImportModule("sys"))) {
@@ -68,7 +68,8 @@ setpath_(void)
 
             if ((dir = PyString_FromString(buf))) {
 
-                augrt_writelog(AUGRT_LOGDEBUG, "adding to sys.path: %s", buf);
+                augmod_writelog(AUGMOD_LOGDEBUG, "adding to sys.path: %s",
+                                buf);
 
                 PyList_Append(path, dir);
 
@@ -107,7 +108,7 @@ printerr_(void)
         empty = PyString_FromString("");
         message = PyObject_CallMethod(empty, "join", "O", list);
 
-        augrt_writelog(AUGRT_LOGERROR, "%s", PyString_AsString(message));
+        augmod_writelog(AUGMOD_LOGERROR, "%s", PyString_AsString(message));
 
         Py_DECREF(message);
         Py_DECREF(empty);
@@ -135,7 +136,7 @@ getmethod_(PyObject* module, const char* name)
             x = NULL;
         }
     } else {
-        augrt_writelog(AUGRT_LOGDEBUG, "no binding for %s()", name);
+        augmod_writelog(AUGMOD_LOGDEBUG, "no binding for %s()", name);
         PyErr_Clear();
     }
     return x;
@@ -169,7 +170,7 @@ createimport_(const char* sname)
     if (!import)
         return NULL;
 
-     if (!(import->module_ = PyImport_ImportModule((char*)sname))) {
+    if (!(import->module_ = PyImport_ImportModule((char*)sname))) {
         printerr_();
         goto fail;
     }
@@ -204,27 +205,27 @@ termpy_(void)
     if (!Py_IsInitialized())
         return;
 
-    augrt_writelog(AUGRT_LOGDEBUG, "finalising python interpreter");
+    augmod_writelog(AUGMOD_LOGDEBUG, "finalising python interpreter");
     Py_Finalize();
 
     objects = augpy_objects();
-    level = objects ? AUGRT_LOGERROR : AUGRT_LOGINFO;
-    augrt_writelog(level, "allocated objects: %d", objects);
+    level = objects ? AUGMOD_LOGERROR : AUGMOD_LOGINFO;
+    augmod_writelog(level, "allocated objects: %d", objects);
 }
 
 static int
 initpy_(void)
 {
-    augrt_writelog(AUGRT_LOGDEBUG, "initialising python interpreter");
+    augmod_writelog(AUGMOD_LOGDEBUG, "initialising python interpreter");
     Py_Initialize();
     /* Py_VerboseFlag = 1; */
     setpath_();
 
-    augrt_writelog(AUGRT_LOGDEBUG, "initialising augrt module");
+    augmod_writelog(AUGMOD_LOGDEBUG, "initialising augmod module");
     if (!(type_ = augpy_createtype()))
         goto fail;
 
-    if (!(augrt_ = augpy_createaugrt(type_)))
+    if (!(augpy_ = augpy_createhost(type_)))
         goto fail;
     return 0;
 
@@ -236,7 +237,7 @@ initpy_(void)
 static void
 stop_(void)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     assert(import);
 
     if (import->open_ && import->stop_) {
@@ -252,7 +253,7 @@ stop_(void)
 }
 
 static int
-start_(struct augrt_session* session)
+start_(struct augmod_session* session)
 {
     struct import_* import;
     if (!(import = createimport_(session->name_)))
@@ -279,7 +280,7 @@ start_(struct augrt_session* session)
 static void
 reconf_(void)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     assert(import);
 
     if (import->reconf_) {
@@ -295,7 +296,7 @@ reconf_(void)
 static void
 event_(const char* from, const char* type, const void* user, size_t size)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     assert(import);
 
     if (import->event_) {
@@ -319,9 +320,9 @@ event_(const char* from, const char* type, const void* user, size_t size)
 }
 
 static void
-closed_(const struct augrt_object* sock)
+closed_(const struct augmod_object* sock)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     PyObject* x = sock->user_;
     assert(import);
     assert(x);
@@ -339,9 +340,9 @@ closed_(const struct augrt_object* sock)
 }
 
 static void
-teardown_(const struct augrt_object* sock)
+teardown_(const struct augmod_object* sock)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -356,13 +357,13 @@ teardown_(const struct augrt_object* sock)
             printerr_();
 
     } else
-        augrt_shutdown(sock->id_, 0);
+        augmod_shutdown(sock->id_, 0);
 }
 
 static int
-accepted_(struct augrt_object* sock, const char* addr, unsigned short port)
+accepted_(struct augmod_object* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     PyObject* x, * y;
     int ret = 0;
     assert(import);
@@ -395,8 +396,8 @@ accepted_(struct augrt_object* sock, const char* addr, unsigned short port)
 
         if (z == Py_False) {
 
-            augrt_writelog(AUGRT_LOGDEBUG,
-                           "accepted() handler returned false");
+            augmod_writelog(AUGMOD_LOGDEBUG,
+                            "accepted() handler returned false");
 
             /* closed() will not be called if accepted() fails. */
 
@@ -415,9 +416,9 @@ accepted_(struct augrt_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-connected_(struct augrt_object* sock, const char* addr, unsigned short port)
+connected_(struct augmod_object* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -437,9 +438,9 @@ connected_(struct augrt_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct augrt_object* sock, const void* buf, size_t len)
+data_(const struct augmod_object* sock, const void* buf, size_t len)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -459,9 +460,9 @@ data_(const struct augrt_object* sock, const void* buf, size_t len)
 }
 
 static void
-rdexpire_(const struct augrt_object* sock, unsigned* ms)
+rdexpire_(const struct augmod_object* sock, unsigned* ms)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -473,8 +474,8 @@ rdexpire_(const struct augrt_object* sock, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                augrt_writelog(AUGRT_LOGDEBUG,
-                               "handler returned new timeout value");
+                augmod_writelog(AUGMOD_LOGDEBUG,
+                                "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
@@ -486,9 +487,9 @@ rdexpire_(const struct augrt_object* sock, unsigned* ms)
 }
 
 static void
-wrexpire_(const struct augrt_object* sock, unsigned* ms)
+wrexpire_(const struct augmod_object* sock, unsigned* ms)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -500,8 +501,8 @@ wrexpire_(const struct augrt_object* sock, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                augrt_writelog(AUGRT_LOGDEBUG,
-                               "handler returned new timeout value");
+                augmod_writelog(AUGMOD_LOGDEBUG,
+                                "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
@@ -513,9 +514,9 @@ wrexpire_(const struct augrt_object* sock, unsigned* ms)
 }
 
 static void
-expire_(const struct augrt_object* timer, unsigned* ms)
+expire_(const struct augmod_object* timer, unsigned* ms)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     assert(import);
     assert(timer->user_);
 
@@ -528,8 +529,8 @@ expire_(const struct augrt_object* timer, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                augrt_writelog(AUGRT_LOGDEBUG,
-                               "handler returned new timeout value");
+                augmod_writelog(AUGMOD_LOGDEBUG,
+                                "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
@@ -541,10 +542,10 @@ expire_(const struct augrt_object* timer, unsigned* ms)
 }
 
 static int
-authcert_(const struct augrt_object* sock, const char* subject,
+authcert_(const struct augmod_object* sock, const char* subject,
           const char* issuer)
 {
-    struct import_* import = augrt_getsession()->user_;
+    struct import_* import = augmod_getsession()->user_;
     int ret = 0;
     assert(import);
     assert(sock->user_);
@@ -567,7 +568,7 @@ authcert_(const struct augrt_object* sock, const char* subject,
     return ret;
 }
 
-static const struct augrt_module module_ = {
+static const struct augmod_control control_ = {
     stop_,
     start_,
     reconf_,
@@ -583,22 +584,22 @@ static const struct augrt_module module_ = {
     authcert_
 };
 
-static const struct augrt_module*
+static const struct augmod_control*
 init_(const char* name)
 {
-    augrt_writelog(AUGRT_LOGINFO, "initialising augpy module");
+    augmod_writelog(AUGMOD_LOGINFO, "initialising augpy module");
 
     if (initpy_() < 0)
         return NULL;
 
-    return &module_;
+    return &control_;
 }
 
 static void
 term_(void)
 {
-    augrt_writelog(AUGRT_LOGINFO, "terminating augpy module");
+    augmod_writelog(AUGMOD_LOGINFO, "terminating augpy module");
     termpy_();
 }
 
-AUGRT_MODULE(init_, term_)
+AUGMOD_ENTRYPOINTS(init_, term_)

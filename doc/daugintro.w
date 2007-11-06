@@ -20,7 +20,7 @@
 
 @s std int @s string int
 
-@s augrt int
+@s augmod int
 @s basic_factory int
 @s basic_module int
 @s basic_session int
@@ -121,14 +121,15 @@ namespace {@/
 }@/
 @<declare export table@>
 
-@ The \.{<augrtpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
+@ The \.{<augmodpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
 implementations.  Modules can also be written in standard \CEE/.  A \CEE/
-implementation would use the \.{<augrt.h>} header, instead.  For convenience,
-names are imported from the |augrt| and |std| namespaces.
+implementation would use the \.{<augmod.h>} header, instead.  For convenience,
+names are imported from the |augmod| and |std| namespaces.
 
 @<include...@>=
-#include <augrtpp.hpp>@/
-using namespace augrt;@/
+#define AUGMOD_BUILD
+#include <augmodpp.hpp>@/
+using namespace augmod;@/
 using namespace std;
 
 @ Session types (|echosession| in this example) are fed into a class template
@@ -139,12 +140,12 @@ for |echosession|.
 
 \yskip\noindent
 \DAUG/ Modules are required to export two library functions, namely,
-|augrt_init()| and |augrt_term()|.  The |DAUG_MODULE| macro assists with the
-definition of these two export functions.
+|augmod_init()| and |augmod_term()|.  The |AUGMOD_ENTRYPOINTS| macro assists
+with the definition of these two export functions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echosession> > sample;@/
-DAUG_MODULE(sample::init, sample::term)
+AUGMOD_ENTRYPOINTS(sample::init, sample::term)
 
 @ The |echoline| functor handles each line received from the client.
 \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
@@ -187,7 +188,7 @@ bool
 echosession::do_start(const char* sname)
 {
   writelog(DAUG_LOGINFO, "starting session [%s]", sname);
-  const char* serv = augrt::getenv("session.echo.serv");
+  const char* serv = augmod::getenv("session.echo.serv");
   if (!serv)
     return false;
   tcplisten("0.0.0.0", serv);

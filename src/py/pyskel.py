@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #import sys
-from augrt import *
+from augpy import *
 from augutil import *
 import log
 

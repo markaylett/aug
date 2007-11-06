@@ -205,7 +205,7 @@ include_HEADERS = \
 	augutilpp.hpp \
 	augsrvpp.hpp \
 	augnetpp.hpp \
-	augrtpp.hpp
+	augmodpp.hpp
 
 all: all-recursive
 

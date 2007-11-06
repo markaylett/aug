@@ -1,13 +1,13 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGPY_BUILD
+#define AUGMOD_BUILD
 #include "augpy/object.h"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
-#include "augrt.h"
+#include "augmod.h"
 
 #include <structmember.h>
 
@@ -18,7 +18,7 @@ static int objects_ = 0;
 
 typedef struct {
     PyObject_HEAD
-    char name_[AUGRT_MAXNAME + 1];
+    char name_[AUGMOD_MAXNAME + 1];
     int id_;
     PyObject* user_;
 } object_;
@@ -46,9 +46,9 @@ static void
 dealloc_(object_* self)
 {
     --objects_;
-    augrt_writelog(AUGRT_LOGDEBUG,
-                   "deallocated: <augrt.Object at %p, id=%d>",
-                   (void*)self, self->id_);
+    augmod_writelog(AUGMOD_LOGDEBUG,
+                    "deallocated: <augpy.Object at %p, id=%d>",
+                    (void*)self, self->id_);
 
     clear_(self);
     self->ob_type->tp_free((PyObject*)self);
@@ -70,7 +70,7 @@ compare_(object_* lhs, object_* rhs)
 static PyObject*
 repr_(object_* self)
 {
-    return PyString_FromFormat("<augrt.Object at %p, id=%d>",
+    return PyString_FromFormat("<augpy.Object at %p, id=%d>",
                                (void*)self, self->id_);
 }
 
@@ -138,9 +138,9 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
     }
 
     ++objects_;
-    augrt_writelog(AUGRT_LOGDEBUG,
-                   "allocated: <augrt.Object at %p, id=%d>",
-                   (void*)self, self->id_);
+    augmod_writelog(AUGMOD_LOGDEBUG,
+                    "allocated: <augpy.Object at %p, id=%d>",
+                    (void*)self, self->id_);
     return (PyObject*)self;
 }
 
@@ -160,7 +160,7 @@ static PyGetSetDef getset_[] = {
 static PyTypeObject pytype_ = {
     PyObject_HEAD_INIT(NULL)
     0,                       /*ob_size*/
-    "augrt.Object",          /*tp_name*/
+    "augpy.Object",          /*tp_name*/
     sizeof(object_),         /*tp_basicsize*/
     0,                       /*tp_itemsize*/
     (destructor)dealloc_,    /*tp_dealloc*/
@@ -225,9 +225,9 @@ augpy_createobject(PyTypeObject* type, int id, PyObject* user)
     self->user_ = user;
 
     ++objects_;
-    augrt_writelog(AUGRT_LOGDEBUG,
-                   "allocated: <augrt.Object at %p, id=%d>",
-                   (void*)self, self->id_);
+    augmod_writelog(AUGMOD_LOGDEBUG,
+                    "allocated: <augpy.Object at %p, id=%d>",
+                    (void*)self, self->id_);
     return (PyObject*)self;
 }
 

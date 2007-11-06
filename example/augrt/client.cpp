@@ -1,7 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augrtpp.hpp"
+#define AUGMOD_BUILD
+#include "augmodpp.hpp"
 
 #include "augutilpp.hpp"
 #include "augsyspp.hpp"
@@ -9,7 +10,7 @@
 #include <fstream>
 #include <memory> // auto_ptr<>
 
-using namespace augrt;
+using namespace augmod;
 using namespace std;
 
 namespace {
@@ -24,12 +25,12 @@ namespace {
         return MSG;
     }
 
-    const struct augrt_vartype vartype = {
+    const struct augmod_vartype vartype = {
         NULL,
         buf
     };
 
-    const struct augrt_var var = {
+    const struct augmod_var var = {
         &vartype,
         NULL
     };
@@ -118,29 +119,29 @@ namespace {
         bool
         do_start(const char* sname)
         {
-            writelog(AUGRT_LOGINFO, "starting...");
+            writelog(AUGMOD_LOGINFO, "starting...");
 
-            if (atoi(augrt::getenv("session.bench.sendv", "1"))) {
+            if (atoi(augmod::getenv("session.bench.sendv", "1"))) {
                 send_ = dosendv;
-                augrt_writelog(AUGRT_LOGINFO, "sendv: yes");
+                augmod_writelog(AUGMOD_LOGINFO, "sendv: yes");
             } else {
                 send_ = dosend;
-                augrt_writelog(AUGRT_LOGINFO, "sendv: no");
+                augmod_writelog(AUGMOD_LOGINFO, "sendv: no");
             }
 
-            const char* serv = augrt::getenv("session.bench.serv");
+            const char* serv = augmod::getenv("session.bench.serv");
             if (!serv)
                 return false;
 
-            const char* host = augrt::getenv("session.bench.host",
-                                             "localhost");
-            conns_ = atoi(augrt::getenv("session.bench.conns", "100"));
-            echos_ = atoi(augrt::getenv("session.bench.echos", "1000"));
+            const char* host = augmod::getenv("session.bench.host",
+                                              "localhost");
+            conns_ = atoi(augmod::getenv("session.bench.conns", "100"));
+            echos_ = atoi(augmod::getenv("session.bench.echos", "1000"));
 
-            augrt_writelog(AUGRT_LOGINFO, "host: %s", host);
-            augrt_writelog(AUGRT_LOGINFO, "serv: %s", serv);
-            augrt_writelog(AUGRT_LOGINFO, "conns: %d", conns_);
-            augrt_writelog(AUGRT_LOGINFO, "echos: %d", echos_);
+            augmod_writelog(AUGMOD_LOGINFO, "host: %s", host);
+            augmod_writelog(AUGMOD_LOGINFO, "serv: %s", serv);
+            augmod_writelog(AUGMOD_LOGINFO, "conns: %d", conns_);
+            augmod_writelog(AUGMOD_LOGINFO, "echos: %d", echos_);
 
             for (; estab_ < conns_; ++estab_)
                 tcpconnect(host, serv, new state(echos_));
@@ -152,22 +153,22 @@ namespace {
             auto_ptr<state> s(sock.user<state>());
             pushxy(xy_, s->secs_);
             if (0 < --estab_) {
-                augrt_writelog(AUGRT_LOGINFO, "%d established", estab_);
+                augmod_writelog(AUGMOD_LOGINFO, "%d established", estab_);
                 return;
             }
 
             double ms(elapsed(clock_) * 1000.0);
 
-            augrt_writelog(AUGRT_LOGINFO, "total time: %f ms", ms);
+            augmod_writelog(AUGMOD_LOGINFO, "total time: %f ms", ms);
 
             ms /= static_cast<double>(conns_);
-            augrt_writelog(AUGRT_LOGINFO, "time per conn: %f ms", ms);
+            augmod_writelog(AUGMOD_LOGINFO, "time per conn: %f ms", ms);
 
             ms /= static_cast<double>(echos_);
-            augrt_writelog(AUGRT_LOGINFO, "echos per sec: %f", 1000.0 / ms);
+            augmod_writelog(AUGMOD_LOGINFO, "echos per sec: %f", 1000.0 / ms);
 
             double k(static_cast<double>(bytes_) / 1024.00);
-            augrt_writelog(AUGRT_LOGINFO, "total size: %f k", k);
+            augmod_writelog(AUGMOD_LOGINFO, "total size: %f k", k);
 
             stopall();
 
@@ -176,9 +177,10 @@ namespace {
         void
         do_connected(object& sock, const char* addr, unsigned short port)
         {
-            const char* sslctx = augrt::getenv("session.bench.sslcontext", 0);
+            const char* sslctx = augmod::getenv("session.bench.sslcontext",
+                                                0);
             if (sslctx) {
-                writelog(AUGRT_LOGINFO, "sslcontext: %s", sslctx);
+                writelog(AUGMOD_LOGINFO, "sslcontext: %s", sslctx);
                 setsslclient(sock, sslctx);
             }
 
@@ -200,10 +202,10 @@ namespace {
         do_authcert(const object& sock, const char* subject,
                     const char* issuer)
         {
-            augrt_writelog(AUGRT_LOGINFO, "checking subject...");
+            augmod_writelog(AUGMOD_LOGINFO, "checking subject...");
             return true;
         }
-        ~benchsession() AUGRT_NOTHROW
+        ~benchsession() AUGMOD_NOTHROW
         {
         }
         benchsession()
@@ -222,4 +224,4 @@ namespace {
     typedef basic_module<basic_factory<benchsession> > module;
 }
 
-AUGRT_MODULE(module::init, module::term)
+AUGMOD_ENTRYPOINTS(module::init, module::term)

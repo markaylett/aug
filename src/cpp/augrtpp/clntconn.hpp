@@ -11,7 +11,7 @@ namespace aug {
 
     class clntconn : public rwtimer_base, public conn_base {
 
-        augrt_object sock_;
+        augmod_object sock_;
         buffer buffer_;
         rwtimer rwtimer_;
         connptr conn_;
@@ -35,10 +35,10 @@ namespace aug {
 
         // conn_base.
 
-        augrt_object&
+        augmod_object&
         do_get();
 
-        const augrt_object&
+        const augmod_object&
         do_get() const;
 
         const sessionptr&
