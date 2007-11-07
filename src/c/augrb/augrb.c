@@ -381,19 +381,19 @@ stopall_(VALUE self)
 static VALUE
 post_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE to, type, buf;
+    VALUE to, type, user;
     struct augmod_var var = { NULL, NULL };
 
-    rb_scan_args(argc, argv, "21", &to, &type, &buf);
+    rb_scan_args(argc, argv, "21", &to, &type, &user);
 
     /* Type-check now to ensure string operations succeed. */
 
     Check_Type(to, T_STRING);
     Check_Type(type, T_STRING);
 
-    if (buf != Qnil) {
+    if (user != Qnil) {
         var.type_ = &vartype_;
-        var.arg_ = register_(StringValue(buf));
+        var.arg_ = register_(StringValue(user));
     }
 
     if (-1 == augmod_post(RSTRING(to)->ptr, RSTRING(type)->ptr, &var)) {

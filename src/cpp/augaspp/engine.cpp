@@ -483,7 +483,7 @@ engine::stopall()
 
 AUGRTPP_API void
 engine::post(const char* sname, const char* to, const char* type,
-             const aug_var* var)
+             const aug_var* user)
 {
     auto_ptr<postevent> arg(new postevent(sname, to, type));
     aug_event e;
@@ -494,7 +494,7 @@ engine::post(const char* sname, const char* to, const char* type,
 
     // Event takes ownership of var when post cannot fail.
 
-    aug_setvar(&arg->var_, var);
+    aug_setvar(&arg->var_, user);
     arg.release();
 }
 

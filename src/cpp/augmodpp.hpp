@@ -64,9 +64,9 @@ namespace augmod {
     }
 
     inline void
-    post(const char* to, const char* type, const augmod_var& var)
+    post(const char* to, const char* type, const augmod_var& user)
     {
-        if (AUGMOD_ERROR == augmod_post(to, type, &var))
+        if (AUGMOD_ERROR == augmod_post(to, type, &user))
             throw error(augmod_error());
     }
 

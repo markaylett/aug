@@ -243,12 +243,12 @@ namespace {
     // Thread-safe.
 
     int
-    post_(const char* to, const char* type, const augmod_var* var)
+    post_(const char* to, const char* type, const augmod_var* user)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s]", sname, to, type);
         try {
-            state_->engine_.post(sname, to, type, var);
+            state_->engine_.post(sname, to, type, user);
             return 0;
 
         } AUG_SETERRINFOCATCH;

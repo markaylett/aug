@@ -94,15 +94,15 @@ static PyObject*
 post_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
-    PyObject* buf = NULL;
+    PyObject* user = NULL;
     struct augmod_var var = { NULL, NULL };
 
-    if (!PyArg_ParseTuple(args, "ss|O:post", &to, &type, &buf))
+    if (!PyArg_ParseTuple(args, "ss|O:post", &to, &type, &user))
         return NULL;
 
-    if (buf && buf != Py_None) {
+    if (user && user != Py_None) {
 
-        if (!PyObject_CheckReadBuffer(buf)) {
+        if (!PyObject_CheckReadBuffer(user)) {
 
             PyErr_SetString(PyExc_TypeError,
                             "post() argument 3 must be string or read-only"
@@ -111,7 +111,7 @@ post_(PyObject* self, PyObject* args)
         }
 
         var.type_ = &vartype_;
-        var.arg_ = buf;
+        var.arg_ = user;
     }
 
     if (-1 == augmod_post(to, type, &var)) {
@@ -123,8 +123,8 @@ post_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    if (buf)
-        Py_INCREF(buf);
+    if (user)
+        Py_INCREF(user);
     return incret_(Py_None);
 }
 

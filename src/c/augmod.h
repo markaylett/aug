@@ -211,12 +211,12 @@ struct augmod_host {
 
        \param to Target session name.
        \param type Type name associated with "var".
-       \param var User data.
+       \param user User data.
        \sa dispatch_()
     */
 
     int (*post_)(const char* to, const char* type,
-                 const struct augmod_var* var);
+                 const struct augmod_var* user);
 
     /**
        The remaining functions are not thread-safe.

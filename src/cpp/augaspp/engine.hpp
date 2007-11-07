@@ -72,13 +72,13 @@ namespace aug {
 
         void
         post(const char* sname, const char* to, const char* type,
-             const aug_var* var);
+             const aug_var* user);
 
         void
         post(const char* sname, const char* to, const char* type,
-             const aug_var& var)
+             const aug_var& user)
         {
-            post(sname, to, type, &var);
+            post(sname, to, type, &user);
         }
         void
         post(const char* sname, const char* to, const char* type,
