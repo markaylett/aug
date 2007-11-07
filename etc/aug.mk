@@ -89,11 +89,11 @@ BINS = \
 	$(CPROGRAMS:%=%$(EXE_EXT)) \
 	$(CXXPROGRAMS:%=%$(EXE_EXT))
 
-.PHONY: all clean
+.PHONY: all all-aug clean clean-aug
 
-all: $(BINS)
+all-aug: $(BINS)
 
-clean:
+clean-aug:
 	$(RM) -f $(DEPS) $(BINS) $(DLL_CXXCRT) $(OBJS) *~
 
 define CMODULE_template

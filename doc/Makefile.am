@@ -3,6 +3,7 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	daug.txt \
+	daugintro.mk \
 	daugintro.w \
 	cvs-policy.txt \
 	cwebmac.tex \
@@ -15,14 +16,17 @@ dotdepend:
 			| dot -Tgif >$$l.gif; \
 	done
 
-modsample.cpp: daugintro.w
-	ctangle $< - $@
-
-daugintro.tex: daugintro.w
-	cweave $<
+daugintro.pdf: daugintro.dvi
+	dvipdfm $<
 
 daugintro.dvi: daugintro.tex
 	tex "\let\pdf+ \input $<"
 
-daugintro.pdf: daugintro.dvi
-	dvipdfm $<
+daugintro.tex: daugintro.w
+	cweave $<
+
+daugintro: daugintro.cpp
+	$(MAKE) -f daugintro.mk TOP_SRCDIR=$(top_srcdir)
+
+daugintro.cpp: daugintro.w
+	ctangle $< - $@

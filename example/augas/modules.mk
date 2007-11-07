@@ -22,7 +22,9 @@ modsched_LIBS = augnet augutil augsys
 
 modserver_OBJS = server.o
 
-include $(AUG_HOME)/etc/aug.mk
+all: all-aug
+
+clean: clean-aug
 
 bench: all
 	$(AUG_HOME)/bin/daug -f bench.conf test
@@ -32,3 +34,5 @@ test: all
 
 %.png: %.dat
 	Rscript bench.R <$ $@
+
+include $(AUG_HOME)/etc/aug.mk

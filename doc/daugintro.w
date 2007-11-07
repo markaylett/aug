@@ -187,7 +187,7 @@ deactivated.
 bool
 echosession::do_start(const char* sname)
 {
-  writelog(DAUG_LOGINFO, "starting session [%s]", sname);
+  writelog(AUGMOD_LOGINFO, "starting session [%s]", sname);
   const char* serv = augmod::getenv("session.echo.serv");
   if (!serv)
     return false;
@@ -210,7 +210,7 @@ echosession::do_accepted(object& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
-  setrwtimer(sock, 15000, DAUG_TIMRD);
+  setrwtimer(sock, 15000, AUGMOD_TIMRD);
   return true;
 }
 
@@ -250,7 +250,7 @@ delivered to the Session.
 void
 echosession::do_rdexpire(const object& sock, unsigned& ms)
 {
-  shutdown(sock);
+  shutdown(sock, 0);
 }
 
 @ The |basic_factory| template requires that Session classes define a static
@@ -275,7 +275,7 @@ struct echoline {
   {
   }
   void
-  operator ()(std::string& line)
+  operator ()(string& line)
   {
     @<prepare response@>@;
     send(sock_, line.c_str(), line.size());
@@ -305,6 +305,10 @@ Here is the complete \.{Makefile}:
 
 \.{modsample\_OBJS = modsample.o}
 
+\.{all: all-aug}
+
+\.{clean: clean-aug}
+
 \.{include \$(AUG\_HOME)/etc/aug.mk}
 
 @ First, the list of \CPLUSPLUS/ Modules to build are assigned to the
@@ -314,7 +318,7 @@ Here is the complete \.{Makefile}:
 \.{CXXMODULES = modsample}
 
 \yskip\noindent
-Each Module can specify a list of |OBJS| and |LIBS|:
+Each Module can specify a list of |OBJS|, |LDFLAGS| and |LIBS|:
 
 \yskip
 \.{modsample\_OBJS = modsample.o}
@@ -323,6 +327,10 @@ Each Module can specify a list of |OBJS| and |LIBS|:
 Finally, include the template makefile:
 
 \yskip
+\.{all: all-aug}
+
+\.{clean: clean-aug}
+
 \.{include \$(AUG\_HOME)/etc/aug.mk}
 
 @ To configure the new Module, first add the name of the Session to the
@@ -341,8 +349,8 @@ properties required by the Session implementation:
 \.{session.echo.serv = 5000}
 
 \yskip\noindent
-Finally, specify the path to the Module.  The file extension defaults to |.dll|
-on \WINDOWS/, and |.so| otherwise:
+Finally, specify the path to the Module.  The file extension defaults to
+|.dll| on \WINDOWS/, and |.so| otherwise:
 
 \yskip
 \.{module.sample.path = ./modsample}
