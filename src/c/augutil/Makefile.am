@@ -55,6 +55,7 @@ libaugutil_la_SOURCES = \
 	shellwords.c \
 	timer.c \
 	tmspec.c \
+	types.c \
 	var.c \
 	xstr.c
 
