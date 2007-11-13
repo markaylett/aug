@@ -396,12 +396,20 @@ struct augmod_proxy {
 
     /**
        Stop session.
+
+       The current session can be retrieved using getsession_().  All
+       resources associated with the session should be released in this
+       handler.  stop_() will only be called for a session if start_()
+       returned #AUGMOD_OK.
     */
 
     void (*stop_)(void);
 
     /**
        Start session.
+
+       User-state associated with the session may be assigned to
+       "session->user_".
 
        \return either #AUGMOD_OK or #AUGMOD_ERROR.
     */
@@ -410,6 +418,9 @@ struct augmod_proxy {
 
     /**
        Re-configure request.
+
+       Called in response to a #AUG_EVENTRECONF event, which are raise in
+       response to either a #SIGHUP, or a call to reconfall_().
     */
 
     void (*reconf_)(void);
