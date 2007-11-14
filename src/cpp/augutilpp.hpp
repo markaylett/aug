@@ -13,6 +13,7 @@
 #include "augutilpp/lexer.hpp"
 #include "augutilpp/log.hpp"
 #include "augutilpp/path.hpp"
+#include "augutilpp/shellparser.hpp"
 #include "augutilpp/timer.hpp"
 #include "augutilpp/var.hpp"
 

@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="augutilpp"
-	ProjectGUID="{91B6CDD3-4C09-428D-BBC8-09FCC9A4AAC4}"
+	Name="command"
+	ProjectGUID="{00693485-BCE3-4FCA-910E-3D2A2099F756}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -12,8 +12,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="bin"
-			IntermediateDirectory="debug/augutilpp"
+			OutputDirectory="mod"
+			IntermediateDirectory="debug/command"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -26,7 +26,6 @@
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)/vc70.pdb"
 				WarningLevel="3"
 				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -36,10 +35,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
-				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
+				OutputFile="$(OutDir)/mod$(ProjectName).dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName)-1.pdb"
+				ProgramDatabaseFile="$(OutDir)/mod$(ProjectName).pdb"
 				SubSystem="2"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
@@ -67,8 +67,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="bin"
-			IntermediateDirectory="release/augutilpp"
+			OutputDirectory="mod"
+			IntermediateDirectory="release/command"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -78,7 +78,6 @@
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(OutDir)/vc70.pdb"
 				WarningLevel="3"
 				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -88,10 +87,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
-				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
+				OutputFile="$(OutDir)/mod$(ProjectName).dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName)-1.pdb"
+				ProgramDatabaseFile="$(OutDir)/mod$(ProjectName).pdb"
 				SubSystem="2"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
@@ -132,76 +132,13 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\cpp\augutilpp\clock.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\config.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\conv.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\event.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\file.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\lexer.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\log.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\path.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\shellparser.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\timer.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\var.cpp">
+				RelativePath="..\example\augas\command.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
-				RelativePath="..\src\cpp\augutilpp\clock.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\config.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\conv.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\event.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\file.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\lexer.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\log.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\path.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\shellparser.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\timer.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\var.hpp">
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

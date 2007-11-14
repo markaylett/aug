@@ -122,6 +122,9 @@
 		<ProjectReference
 			ReferencedProjectIdentifier="{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
 			Name="augsys"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{63BEF71A-3B15-494E-89B0-3CCDBF48B4E0}"
+			Name="augutil"/>
 	</References>
 	<Files>
 		<Filter

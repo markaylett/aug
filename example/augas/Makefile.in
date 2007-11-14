@@ -62,6 +62,11 @@ modclient_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_modclient_la_OBJECTS = client.lo
 modclient_la_OBJECTS = $(am_modclient_la_OBJECTS)
+modcommand_la_DEPENDENCIES =  \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+am_modcommand_la_OBJECTS = command.lo
+modcommand_la_OBJECTS = $(am_modcommand_la_OBJECTS)
 modhttp_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
@@ -97,12 +102,12 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(modclient_la_SOURCES) $(modhttp_la_SOURCES) \
-	$(modminimal_la_SOURCES) $(modsched_la_SOURCES) \
-	$(modserver_la_SOURCES)
-DIST_SOURCES = $(modclient_la_SOURCES) $(modhttp_la_SOURCES) \
-	$(modminimal_la_SOURCES) $(modsched_la_SOURCES) \
-	$(modserver_la_SOURCES)
+SOURCES = $(modclient_la_SOURCES) $(modcommand_la_SOURCES) \
+	$(modhttp_la_SOURCES) $(modminimal_la_SOURCES) \
+	$(modsched_la_SOURCES) $(modserver_la_SOURCES)
+DIST_SOURCES = $(modclient_la_SOURCES) $(modcommand_la_SOURCES) \
+	$(modhttp_la_SOURCES) $(modminimal_la_SOURCES) \
+	$(modsched_la_SOURCES) $(modserver_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -257,6 +262,7 @@ exampledir = $(prefix)/example/augas
 example_DATA = \
 	$(EXTRA_DIST) \
 	client.cpp \
+	command.cpp \
 	http.cpp \
 	minimal.c \
 	sched.cpp \
@@ -265,6 +271,7 @@ example_DATA = \
 moddir = $(prefix)/mod
 mod_LTLIBRARIES = \
 	modclient.la \
+	modcommand.la \
 	modhttp.la \
 	modminimal.la \
 	modsched.la \
@@ -273,6 +280,12 @@ mod_LTLIBRARIES = \
 modclient_la_SOURCES = client.cpp
 modclient_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modclient_la_LIBADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+modcommand_la_SOURCES = command.cpp
+modcommand_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
+modcommand_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
@@ -359,6 +372,8 @@ clean-modLTLIBRARIES:
 	done
 modclient.la: $(modclient_la_OBJECTS) $(modclient_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(moddir) $(modclient_la_LDFLAGS) $(modclient_la_OBJECTS) $(modclient_la_LIBADD) $(LIBS)
+modcommand.la: $(modcommand_la_OBJECTS) $(modcommand_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(moddir) $(modcommand_la_LDFLAGS) $(modcommand_la_OBJECTS) $(modcommand_la_LIBADD) $(LIBS)
 modhttp.la: $(modhttp_la_OBJECTS) $(modhttp_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(moddir) $(modhttp_la_LDFLAGS) $(modhttp_la_OBJECTS) $(modhttp_la_LIBADD) $(LIBS)
 modminimal.la: $(modminimal_la_OBJECTS) $(modminimal_la_DEPENDENCIES) 
@@ -375,6 +390,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minimal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sched.Plo@am__quote@

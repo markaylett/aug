@@ -7,10 +7,18 @@ CXXFLAGS = $(CFLAGS)
 LDFLAGS = -L$(AUG_HOME)/lib
 
 CMODULES = modminimal
-CXXMODULES = modclient modhttp modsched modserver
+CXXMODULES = \
+	modclient \
+	modcommand \
+	modhttp \
+	modsched \
+	modserver
 
 modclient_OBJS = client.o
 modclient_LIBS = augutil augsys
+
+modcommand_OBJS = command.o
+modcommand_LIBS = augutil augsys
 
 modhttp_OBJS = http.o
 modhttp_LIBS = augnet augutil augmar augsys

@@ -10,6 +10,7 @@ modinclude_HEADERS = \
 	lexer.hpp \
 	log.hpp \
 	path.hpp \
+	shellparser.hpp \
 	timer.hpp \
 	var.hpp
 
@@ -24,6 +25,7 @@ libaugutilpp_la_SOURCES = \
 	lexer.cpp \
 	log.cpp \
 	path.cpp \
+	shellparser.cpp \
 	timer.cpp \
 	var.cpp
 
@@ -36,22 +38,22 @@ libaugutilpp_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	lexertest \
-	maintest
+	maintest \
+	shellparsertest
 
 TESTS = \
-	lexertest \
-	maintest
+	maintest \
+	shellparsertest
 
-lexertest_SOURCES = lexertest.cpp
-lexertest_LDADD = \
+maintest_SOURCES = maintest.cpp
+maintest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-maintest_SOURCES = maintest.cpp
-maintest_LDADD = \
+shellparsertest_SOURCES = shellparsertest.cpp
+shellparsertest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \

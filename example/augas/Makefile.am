@@ -15,6 +15,7 @@ exampledir = $(prefix)/example/augas
 example_DATA = \
 	$(EXTRA_DIST) \
 	client.cpp \
+	command.cpp \
 	http.cpp \
 	minimal.c \
 	sched.cpp \
@@ -23,6 +24,7 @@ example_DATA = \
 moddir = $(prefix)/mod
 mod_LTLIBRARIES = \
 	modclient.la \
+	modcommand.la \
 	modhttp.la \
 	modminimal.la \
 	modsched.la \
@@ -31,6 +33,12 @@ mod_LTLIBRARIES = \
 modclient_la_SOURCES = client.cpp
 modclient_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modclient_la_LIBADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+modcommand_la_SOURCES = command.cpp
+modcommand_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
+modcommand_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 

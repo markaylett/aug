@@ -49,6 +49,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augpy", "augpy.vcproj", "{B
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "setup", "setup.vdproj", "{97C445E8-0294-4624-BC15-5FB6DF76439A}"
 	ProjectSection(ProjectDependencies) = postProject
+		{00693485-BCE3-4FCA-910E-3D2A2099F756} = {00693485-BCE3-4FCA-910E-3D2A2099F756}
 		{B21A518A-F567-4619-9A4F-2FFF73F380BA} = {B21A518A-F567-4619-9A4F-2FFF73F380BA}
 		{15EE05A5-19E3-497A-AFFF-B5AADAF9C49F} = {15EE05A5-19E3-497A-AFFF-B5AADAF9C49F}
 		{D9C66FA8-7D39-4496-AA2A-AA52BF2B7650} = {D9C66FA8-7D39-4496-AA2A-AA52BF2B7650}
@@ -89,6 +90,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mar", "mar.vcproj", "{22A8F
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "htdigest", "htdigest.vcproj", "{739652B6-6DE1-4EFE-BA3F-1675B801218F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "command", "command.vcproj", "{00693485-BCE3-4FCA-910E-3D2A2099F756}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -185,6 +190,10 @@ Global
 		{739652B6-6DE1-4EFE-BA3F-1675B801218F}.Debug.Build.0 = Debug|Win32
 		{739652B6-6DE1-4EFE-BA3F-1675B801218F}.Release.ActiveCfg = Release|Win32
 		{739652B6-6DE1-4EFE-BA3F-1675B801218F}.Release.Build.0 = Release|Win32
+		{00693485-BCE3-4FCA-910E-3D2A2099F756}.Debug.ActiveCfg = Debug|Win32
+		{00693485-BCE3-4FCA-910E-3D2A2099F756}.Debug.Build.0 = Debug|Win32
+		{00693485-BCE3-4FCA-910E-3D2A2099F756}.Release.ActiveCfg = Release|Win32
+		{00693485-BCE3-4FCA-910E-3D2A2099F756}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
