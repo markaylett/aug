@@ -11,6 +11,8 @@
 #define AUG_LEXWORD   0x02
 #define AUG_LEXPHRASE 0x04
 
+#define AUG_LEXWORDPHRASE (AUG_LEXWORD | AUG_LEXPHRASE)
+
 typedef struct aug_lexer_* aug_lexer_t;
 
 AUGUTIL_API aug_lexer_t

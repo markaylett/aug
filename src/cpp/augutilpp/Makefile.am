@@ -7,6 +7,7 @@ modinclude_HEADERS = \
 	conv.hpp \
 	event.hpp \
 	file.hpp \
+	lexer.hpp \
 	log.hpp \
 	path.hpp \
 	timer.hpp \
@@ -20,6 +21,7 @@ libaugutilpp_la_SOURCES = \
 	conv.cpp \
 	event.cpp \
 	file.cpp \
+	lexer.cpp \
 	log.cpp \
 	path.cpp \
 	timer.cpp \
@@ -33,15 +35,24 @@ libaugutilpp_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-check_PROGRAMS = maintest
-TESTS = maintest
+check_PROGRAMS = \
+	lexertest \
+	maintest
+
+TESTS = \
+	lexertest \
+	maintest
+
+lexertest_SOURCES = lexertest.cpp
+lexertest_LDADD = \
+	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 maintest_SOURCES = maintest.cpp
 maintest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
-	$(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la

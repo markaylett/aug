@@ -355,11 +355,11 @@ namespace {
     }
 
     int
-    sendv_(augmod_id cid, const augmod_var* var)
+    sendv_(augmod_id cid, const augmod_var* user)
     {
         AUG_DEBUG2("sendv(): id=[%d]", cid);
         try {
-            state_->engine_.sendv(cid, *var);
+            state_->engine_.sendv(cid, *user);
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -405,12 +405,12 @@ namespace {
     }
 
     int
-    settimer_(unsigned ms, const augmod_var* var)
+    settimer_(unsigned ms, const augmod_var* user)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
-            return (int)state_->engine_.settimer(sname, ms, var);
+            return (int)state_->engine_.settimer(sname, ms, user);
 
         } AUG_SETERRINFOCATCH;
         return -1;

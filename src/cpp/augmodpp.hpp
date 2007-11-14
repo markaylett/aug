@@ -134,16 +134,16 @@ namespace augmod {
     }
 
     inline void
-    sendv(augmod_id cid, const augmod_var& var)
+    sendv(augmod_id cid, const augmod_var& user)
     {
-        if (AUGMOD_ERROR == augmod_sendv(cid, &var))
+        if (AUGMOD_ERROR == augmod_sendv(cid, &user))
             throw error(augmod_error());
     }
 
     inline void
-    sendv(const augmod_object& conn, const augmod_var& var)
+    sendv(const augmod_object& conn, const augmod_var& user)
     {
-        sendv(conn.id_, var);
+        sendv(conn.id_, user);
     }
 
     inline void
@@ -196,9 +196,9 @@ namespace augmod {
     }
 
     inline augmod_id
-    settimer(unsigned ms, const augmod_var& var)
+    settimer(unsigned ms, const augmod_var& user)
     {
-        int ret(augmod_settimer(ms, &var));
+        int ret(augmod_settimer(ms, &user));
         if (AUGMOD_ERROR == ret)
             throw error(augmod_error());
         return static_cast<augmod_id>(ret);

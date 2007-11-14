@@ -147,6 +147,9 @@
 				RelativePath="..\src\cpp\augutilpp\file.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augutilpp\lexer.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augutilpp\log.cpp">
 			</File>
 			<File
@@ -177,6 +180,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\file.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augutilpp\lexer.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\log.hpp">

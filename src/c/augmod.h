@@ -161,8 +161,11 @@ struct augmod_host {
        Write message to the runtime log.
 
        \param level The log level.
+
        \param format Printf-style specification.
+
        \param ... Arguments to format specification.
+
        \sa #augmod_loglevel, vwritelog_().
     */
 
@@ -172,8 +175,11 @@ struct augmod_host {
        Write message to the runtime log.
 
        \param level The log level.
+
        \param format Printf-style specification.
+
        \param ... Arguments to format specification.
+
        \sa #augmod_loglevel, writelog_().
     */
 
@@ -210,8 +216,11 @@ struct augmod_host {
        Post an event to the event queue.
 
        \param to Target session name.
+
        \param type Type name associated with "var".
-       \param user User data.
+
+       \param user Optional user data.
+
        \sa dispatch_()
     */
 
@@ -226,9 +235,13 @@ struct augmod_host {
        Dispatch event to peer session.
 
        \param to Target session name.
+
        \param type Type name associated with "user".
-       \param user User data.
-       \param size Size of user data.
+
+       \param user Optional user data.
+
+       \param size Size of optional user data.
+
        \sa post_()
     */
 
@@ -242,7 +255,9 @@ struct augmod_host {
        attempt will be made to read the value from the environment table.
 
        \param name Name or key of desired value.
-       \param def The value to return by default.
+
+       \param def Optional default value to be returned.
+
        \return The default value if no value exists for name.
     */
 
@@ -258,6 +273,7 @@ struct augmod_host {
        Shutdown the connection.
 
        \param cid Connection id.
+
        \param flags Use #AUGMOD_SHUTNOW to force immediate closure of the
        connection - do not wait for pending writes.
     */
@@ -271,8 +287,12 @@ struct augmod_host {
        module is notified of connection establishment.
 
        \param host Ip address or host name.
+
        \param port Port or session name.
-       \param user User data to be associated with the resulting connection.
+
+       \param user Optional user data to be associated with the resulting
+       connection.
+
        \return The connection id.
     */
 
@@ -282,8 +302,10 @@ struct augmod_host {
        Bind tcp listener socket.
 
        \param host Host to be bound.
+
        \param port Port to be bound.
-       \param user User data.
+
+       \param user Optional user data.
     */
 
     int (*tcplisten_)(const char* host, const char* port, void* user);
@@ -296,7 +318,9 @@ struct augmod_host {
        the connection has been established.
 
        \param cid Connection id.
+
        \param buf Data buffer.
+
        \param len Length of data buffer.
     */
 
@@ -306,16 +330,19 @@ struct augmod_host {
        Send data to peer.
 
        \param cid Connection id.
-       \param var User data.
+
+       \param user User data.
     */
 
-    int (*sendv_)(augmod_id cid, const struct augmod_var* var);
+    int (*sendv_)(augmod_id cid, const struct augmod_var* user);
 
     /**
        Set read/write timer.
 
        \param cid Connection id.
+
        \param ms Timeout value in milliseconds.
+
        \param flags \ref TimerFlags.
     */
 
@@ -325,7 +352,9 @@ struct augmod_host {
        Reset read/write timer.
 
        \param cid Connection id.
+
        \param ms Timeout value in milliseconds.
+
        \param flags \ref TimerFlags.
     */
 
@@ -335,6 +364,7 @@ struct augmod_host {
        Cancel read/write timer.
 
        \param cid Connection id.
+
        \param flags \ref TimerFlags.
     */
 
@@ -345,15 +375,17 @@ struct augmod_host {
        Create new timer.
 
        \param ms Timeout value in milliseconds.
-       \param var User data.
+
+       \param user Optional user data.
     */
 
-    int (*settimer_)(unsigned ms, const struct augmod_var* var);
+    int (*settimer_)(unsigned ms, const struct augmod_var* user);
 
     /**
        Reset timer.
 
        \param tid Timer id.
+
        \param ms Timeout value in milliseconds.
     */
 
@@ -371,6 +403,7 @@ struct augmod_host {
        Set ssl client.
 
        \param cid Connection id.
+
        \param ctx SSL context.
     */
 
@@ -380,6 +413,7 @@ struct augmod_host {
        Set ssl server.
 
        \param cid Connection id.
+
        \param ctx SSL context.
     */
 
@@ -428,10 +462,13 @@ struct augmod_proxy {
     /**
        Custom event notification.
 
-       \param from TODO
-       \param type TODO
-       \param user TODO
-       \param size TODO
+       \param from Source session name.
+
+       \param type Event type.
+
+       \param user User data.
+
+       \param size Size of user data.
     */
 
     void (*event_)(const char* from, const char* type, const void* user,
@@ -440,7 +477,7 @@ struct augmod_proxy {
     /**
        Connection closure.
 
-       \param sock TODO
+       \param sock The closed socket.
     */
 
     void (*closed_)(const struct augmod_object* sock);
@@ -460,7 +497,9 @@ struct augmod_proxy {
        socket.
 
        \param sock TODO
+
        \param addr TODO
+
        \param port TODO
 
        \return either #AUGMOD_OK or #AUGMOD_ERROR.
@@ -476,7 +515,9 @@ struct augmod_proxy {
        tcpconnect_(), becomes established.
 
        \param sock TODO
+
        \param addr TODO
+
        \param port TODO
 
        \sa tcpconnect_()
@@ -535,7 +576,9 @@ struct augmod_proxy {
        Authorisation of peer certificate.
 
        \param sock TODO
+
        \param subject TODO
+
        \param issuer TODO
 
        \return either #AUGMOD_OK or #AUGMOD_ERROR.
@@ -549,7 +592,7 @@ AUGMOD_EXTERNC const struct augmod_host*
 augmod_gethost(void);
 
 /**
-   Syntactic sugar that allows host functions to be called with a free
+   Syntactic sugar that allows host functions to be called with a
    function-like syntax.
 */
 
@@ -583,7 +626,7 @@ augmod_gethost(void);
 
 #define AUGMOD_ENTRYPOINTS(init, term)                              \
     static const struct augmod_host* host_ = NULL;                  \
-    AUGMOD_EXTERNC const struct augmod_host*                         \
+    AUGMOD_EXTERNC const struct augmod_host*                        \
     augmod_gethost(void)                                            \
     {                                                               \
         return host_;                                               \
