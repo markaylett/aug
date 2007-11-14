@@ -28,8 +28,9 @@ namespace {
             return flags & AUG_LEXPHRASE;
         }
     public:
-        shellparser()
-            : lexer_(0, shellwords, false)
+        explicit
+        shellparser(bool pairs = false)
+            : lexer_(0, shellwords, pairs)
         {
         }
         bool
@@ -49,6 +50,26 @@ namespace {
             words_.clear();
         }
     };
+
+    // For consistency with httpparser.
+
+    inline bool
+    appendshell(shellparser& parser, char ch)
+    {
+        return parser.append(ch);
+    }
+
+    inline bool
+    finishshell(shellparser& parser)
+    {
+        return parser.finish();
+    }
+
+    inline void
+    resetshell(shellparser& parser, vector<string>& words)
+    {
+        parser.reset(words);
+    }
 
     string
     join(shellparser& parser)
