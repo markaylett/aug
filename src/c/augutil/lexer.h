@@ -19,7 +19,7 @@ AUGUTIL_API aug_lexer_t
 aug_createnetlexer(size_t size);
 
 AUGUTIL_API aug_lexer_t
-aug_createshelllexer(size_t size);
+aug_createshelllexer(size_t size, int pairs);
 
 AUGUTIL_API int
 aug_destroylexer(aug_lexer_t lexer);

@@ -13,6 +13,7 @@
 #define AUG_WRDESCAPE  0x01
 #define AUG_WRDLABEL   0x02
 #define AUG_WRDNEWLINE 0x04
+#define AUG_WRDPAIRS   0x08
 
 struct aug_words {
     void (*out_)(void*, int);

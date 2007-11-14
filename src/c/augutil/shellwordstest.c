@@ -46,7 +46,7 @@ main(int argc, char* argv[])
     int ch;
 
     aug_atexitinit(&errinfo);
-    aug_initshellwords(&st, out_, NULL);
+    aug_initshellwords(&st, 1, out_, NULL);
 
     while (EOF != (ch = getchar()))
         aug_putshellwords(&st, ch);

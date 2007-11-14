@@ -128,7 +128,8 @@ bare_(struct aug_words* st, int ch)
             /* End of bare-word. */
             st->out_(st->arg_, AUG_TOKWORD);
             st->fn_ = eatws_;
-            st->flags_ |= AUG_WRDLABEL;
+            if ((st->flags_ & AUG_WRDPAIRS))
+                st->flags_ |= AUG_WRDLABEL;
             st->fn_(st, ch);
             break;
         case '\t':
@@ -139,7 +140,8 @@ bare_(struct aug_words* st, int ch)
             /* End of bare-word. */
             st->out_(st->arg_, AUG_TOKWORD);
             st->fn_ = eatws_;
-            st->flags_ |= AUG_WRDLABEL;
+            if ((st->flags_ & AUG_WRDPAIRS))
+                st->flags_ |= AUG_WRDLABEL;
             break;
         case '"':  /* Double quote. */
             /* Begin double quote. */
@@ -229,12 +231,13 @@ comment_(struct aug_words* st, int ch)
 }
 
 AUGUTIL_API void
-aug_initshellwords(struct aug_words* st, void (*out)(void*, int), void* arg)
+aug_initshellwords(struct aug_words* st, int pairs,
+                   void (*out)(void*, int), void* arg)
 {
     st->out_ = out;
     st->arg_ = arg;
     st->fn_ = eatws_;
-    st->flags_ = AUG_WRDLABEL;
+    st->flags_ = pairs ? (AUG_WRDLABEL | AUG_WRDPAIRS) : 0;
 }
 
 AUGUTIL_API void

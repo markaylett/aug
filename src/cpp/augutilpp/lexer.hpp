@@ -36,9 +36,9 @@ namespace aug {
             verify(lexer_ = aug_createnetlexer(size));
         }
 
-        lexer(unsigned size, const shellwords_&)
+        lexer(unsigned size, const shellwords_&, bool pairs)
         {
-            verify(lexer_ = aug_createshelllexer(size));
+            verify(lexer_ = aug_createshelllexer(size, pairs ? 1 : 0));
         }
 
         operator aug_lexer_t()

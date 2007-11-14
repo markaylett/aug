@@ -34,7 +34,7 @@ main(int argc, char* argv[])
     char ch;
     aug_atexitinit(&errinfo);
 
-    lexer_ = aug_createshelllexer(0);
+    lexer_ = aug_createshelllexer(0, 1);
     assert(lexer_);
     while (EOF != (ch = getchar()))
         out_(aug_appendlexer(lexer_, ch));

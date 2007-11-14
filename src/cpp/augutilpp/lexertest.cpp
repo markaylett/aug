@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iterator>
 #include <sstream>
+#include <stdexcept>
 #include <vector>
 
 using namespace aug;
@@ -14,19 +15,21 @@ using namespace std;
 
 namespace {
 
-    class parser {
+    typedef logic_error error;
+
+    class shellparser {
         lexer lexer_;
         vector<string> words_;
         bool
         consume(unsigned flags)
         {
-            if ((flags & AUG_LEXLABEL) || (flags & AUG_LEXWORD))
+            if ((flags & (AUG_LEXLABEL | AUG_LEXWORD)))
                 words_.push_back(lexertoken(lexer_));
             return flags & AUG_LEXPHRASE;
         }
     public:
-        parser()
-            : lexer_(0, shellwords)
+        shellparser()
+            : lexer_(0, shellwords, false)
         {
         }
         bool
@@ -48,27 +51,27 @@ namespace {
     };
 
     string
-    join(parser& p)
+    join(shellparser& parser)
     {
         vector<string> words;
         stringstream ss;
-        p.reset(words);
+        parser.reset(words);
         copy(words.begin(), words.end(),
-             ostream_iterator<string>(ss, ":"));
+             ostream_iterator<string>(ss, "]["));
         string s(ss.str());
-        return s.substr(0, s.size() - 1);
+        return s.erase(s.size() - 1).insert(0, "[");
     }
 
     void
     test(const string& s)
     {
-        parser p;
+        shellparser parser;
         string::const_iterator it(s.begin()), end(s.end());
         for (; it != end; ++it)
-            if (p.append(*it))
-                cout << join(p) << endl;
-        if (p.finish())
-            cout << join(p) << endl;
+            if (parser.append(*it))
+                cout << join(parser) << endl;
+        if (parser.finish())
+            cout << join(parser) << endl;
     }
 }
 
@@ -76,9 +79,9 @@ int
 main(int argc, char* argv[])
 {
     try {
-        test("\"aaa a\" 'b''bb' ccc");
+        test("x=\"aaa a\" 'b''bb' ccc\\\n xyz");
     } catch (const exception& e) {
-        cerr << e.what() << endl;
+        cerr << "error: " << e.what() << endl;
         return 1;
     }
     return 0;

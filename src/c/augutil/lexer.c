@@ -90,11 +90,11 @@ aug_createnetlexer(size_t size)
 }
 
 AUGUTIL_API aug_lexer_t
-aug_createshelllexer(size_t size)
+aug_createshelllexer(size_t size, int pairs)
 {
     aug_lexer_t lexer = createlexer_(size);
     if (lexer) {
-        aug_initshellwords(&lexer->words_, out_, lexer);
+        aug_initshellwords(&lexer->words_, pairs, out_, lexer);
         lexer->put_ = aug_putshellwords;
     }
     return lexer;
