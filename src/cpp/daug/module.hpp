@@ -17,7 +17,7 @@ namespace augas {
         const std::string name_;
         aug::dlib lib_;
         maud_termfn termfn_;
-        maud_proxy proxy_;
+        maud_module module_;
 
         module(const module&);
 
