@@ -4,14 +4,14 @@
 #ifndef DAUG_UTILITY_HPP
 #define DAUG_UTILITY_HPP
 
-struct augmod_proxy;
-struct augmod_object;
+struct maud_module;
+struct maud_object;
 
 namespace augas {
 
     void
-    setdefaults(augmod_proxy& dst, const augmod_proxy& src,
-                void (*teardown)(const augmod_object*));
+    setdefaults(maud_module& dst, const maud_module& src,
+                void (*teardown)(const maud_object*));
 }
 
 #endif // DAUG_UTILITY_HPP

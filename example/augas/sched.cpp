@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGMOD_BUILD
-#include "augmodpp.hpp"
+#define MAUD_BUILD
+#include "maudpp.hpp"
 
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"
@@ -12,7 +12,7 @@
 #include <sstream>
 
 using namespace aug;
-using namespace augmod;
+using namespace maud;
 using namespace std;
 
 namespace {
@@ -20,11 +20,11 @@ namespace {
     enum tmtz { TMLOCAL, TMUTC };
 
     struct tmevent {
-        const augmod_id id_;
+        const maud_id id_;
         const string name_, spec_;
         const tmtz tz_;
         aug_tmspec tmspec_;
-        tmevent(augmod_id id, const string& name, const string& spec, tmtz tz)
+        tmevent(maud_id id, const string& name, const string& spec, tmtz tz)
             : id_(id),
               name_(name),
               spec_(spec),
@@ -78,9 +78,9 @@ namespace {
     pushevent(tmqueue& q, time_t now, const string& name, tmtz tz)
     {
         const char* tmspecs
-            (augmod::getenv(string("session.sched.event.").append(name)
-                            .append(TMUTC == tz ? ".utc" : ".local")
-                            .c_str()));
+            (maud::getenv(string("session.sched.event.").append(name)
+                          .append(TMUTC == tz ? ".utc" : ".local")
+                          .c_str()));
         if (!tmspecs)
             return;
 
@@ -97,7 +97,7 @@ namespace {
     void
     pushevents(tmqueue& q, time_t now)
     {
-        const char* events(augmod::getenv("session.sched.events"));
+        const char* events(maud::getenv("session.sched.events"));
         if (!events)
             return;
 
@@ -110,7 +110,7 @@ namespace {
     }
 
     void
-    eraseevent(tmqueue& q, augmod_id id)
+    eraseevent(tmqueue& q, maud_id id)
     {
         tmqueue::iterator it(q.begin()), end(q.end());
         for (; it != end; ++it)
@@ -155,7 +155,7 @@ namespace {
     }
 
     struct schedsession : basic_session {
-        augmod_id timer_;
+        maud_id timer_;
         tmqueue queue_;
         void
         checkexpired(const timeval& tv)
@@ -166,7 +166,7 @@ namespace {
 
                 tmeventptr ptr(queue_.begin()->second);
                 queue_.erase(queue_.begin());
-                augmod_post("schedclient", ptr->name_.c_str(), 0);
+                maud_post("schedclient", ptr->name_.c_str(), 0);
                 pushevent(queue_, now, ptr);
             }
         }
@@ -180,8 +180,8 @@ namespace {
                 if (-1 != timer_)
                     resettimer(timer_, ms);
                 else {
-                    augmod_var var = AUG_VARNULL;
-                    timer_ = augmod::settimer(ms, var);
+                    maud_var var = AUG_VARNULL;
+                    timer_ = maud::settimer(ms, var);
                 }
                 aug_info("next expiry in %d ms", ms);
             } else if (-1 != timer_) {
@@ -192,7 +192,7 @@ namespace {
         void
         delevent(const map<string, string>& params)
         {
-            augmod_id id(getvalue<augmod_id>(params, "id"));
+            maud_id id(getvalue<maud_id>(params, "id"));
 
             aug_info("deleting event: id=[%d]", (int)id);
             eraseevent(queue_, id);
@@ -204,7 +204,7 @@ namespace {
         void
         putevent(const map<string, string>& params)
         {
-            augmod_id id(getvalue<augmod_id>(params, "id"));
+            maud_id id(getvalue<maud_id>(params, "id"));
 
             if (id) {
                 aug_info("updating event: id=[%d]", id);
@@ -286,7 +286,7 @@ namespace {
             map<string, string>::const_iterator jt(fields.begin()),
                 end(fields.end());
             for (; jt != end; ++jt)
-                writelog(AUGMOD_LOGINFO, "%s=%s", jt->first.c_str(),
+                writelog(MAUD_LOGINFO, "%s=%s", jt->first.c_str(),
                          jt->second.c_str());
 
             respond(from, type, fields["content"]);
@@ -302,7 +302,7 @@ namespace {
             ms = timerms(queue_, tv);
             aug_info("next expiry in %d ms", ms);
         }
-        ~schedsession() AUGMOD_NOTHROW
+        ~schedsession() MAUD_NOTHROW
         {
         }
         schedsession()
@@ -319,4 +319,4 @@ namespace {
     typedef basic_module<basic_factory<schedsession> > module;
 }
 
-AUGMOD_ENTRYPOINTS(module::init, module::term)
+MAUD_ENTRYPOINTS(module::init, module::term)

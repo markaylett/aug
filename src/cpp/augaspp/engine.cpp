@@ -51,7 +51,7 @@ struct sessiontimer {
 namespace {
 
     typedef smartptr<sessiontimer> sessiontimerptr;
-    typedef map<augmod_id, sessiontimerptr> sessiontimers;
+    typedef map<maud_id, sessiontimerptr> sessiontimers;
 
     struct postevent {
         string from_, to_, type_;
@@ -340,7 +340,7 @@ namespace aug {
 
                 sessiontimers::iterator it(sessiontimers_.find(id));
                 sessiontimerptr tptr(it->second);
-                augmod_object timer = { id, tptr->var_.arg_ };
+                maud_object timer = { id, tptr->var_.arg_ };
                 tptr->session_->expire(timer, ms);
 
                 if (0 == ms) {
@@ -512,7 +512,7 @@ engine::dispatch(const char* sname, const char* to, const char* type,
 }
 
 AUGRTPP_API void
-engine::shutdown(augmod_id cid, unsigned flags)
+engine::shutdown(maud_id cid, unsigned flags)
 {
     sockptr sock(impl_->socks_.getbyid(cid));
     connptr cptr(smartptr_cast<conn_base>(sock));
@@ -521,13 +521,13 @@ engine::shutdown(augmod_id cid, unsigned flags)
 
         // Forced shutdown: may be used on misbehaving clients.
 
-        if (flags & AUGMOD_SHUTNOW)
+        if (flags & MAUD_SHUTNOW)
             impl_->socks_.erase(*sock);
     } else
         impl_->socks_.erase(*sock);
 }
 
-AUGRTPP_API augmod_id
+AUGRTPP_API maud_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
                    void* user)
 {
@@ -568,7 +568,7 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     return id(*cptr);
 }
 
-AUGRTPP_API augmod_id
+AUGRTPP_API maud_id
 engine::tcplisten(const char* sname, const char* host, const char* port,
                   void* user)
 {
@@ -596,7 +596,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
 }
 
 AUGRTPP_API void
-engine::send(augmod_id cid, const void* buf, size_t len)
+engine::send(maud_id cid, const void* buf, size_t len)
 {
     if (!impl_->socks_.send(cid, buf, len, impl_->now_))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
@@ -604,7 +604,7 @@ engine::send(augmod_id cid, const void* buf, size_t len)
 }
 
 AUGRTPP_API void
-engine::sendv(augmod_id cid, const aug_var& var)
+engine::sendv(maud_id cid, const aug_var& var)
 {
     if (!impl_->socks_.sendv(cid, var, impl_->now_))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
@@ -612,7 +612,7 @@ engine::sendv(augmod_id cid, const aug_var& var)
 }
 
 AUGRTPP_API void
-engine::setrwtimer(augmod_id cid, unsigned ms, unsigned flags)
+engine::setrwtimer(maud_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
@@ -623,7 +623,7 @@ engine::setrwtimer(augmod_id cid, unsigned ms, unsigned flags)
 }
 
 AUGRTPP_API bool
-engine::resetrwtimer(augmod_id cid, unsigned ms, unsigned flags)
+engine::resetrwtimer(maud_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
@@ -635,7 +635,7 @@ engine::resetrwtimer(augmod_id cid, unsigned ms, unsigned flags)
 }
 
 AUGRTPP_API bool
-engine::cancelrwtimer(augmod_id cid, unsigned flags)
+engine::cancelrwtimer(maud_id cid, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
@@ -645,10 +645,10 @@ engine::cancelrwtimer(augmod_id cid, unsigned flags)
     return rwtimer->cancelrwtimer(flags);
 }
 
-AUGRTPP_API augmod_id
+AUGRTPP_API maud_id
 engine::settimer(const char* sname, unsigned ms, const aug_var* var)
 {
-    augmod_id id(aug_nextid());
+    maud_id id(aug_nextid());
     aug_var local = { 0, impl_ };
 
     // If aug_settimer() succeeds, aug_destroyvar() will be called on var when
@@ -667,13 +667,13 @@ engine::settimer(const char* sname, unsigned ms, const aug_var* var)
 }
 
 AUGRTPP_API bool
-engine::resettimer(augmod_id tid, unsigned ms)
+engine::resettimer(maud_id tid, unsigned ms)
 {
     return aug::resettimer(impl_->timers_, tid, ms);
 }
 
 AUGRTPP_API bool
-engine::canceltimer(augmod_id tid)
+engine::canceltimer(maud_id tid)
 {
     bool ret(aug::canceltimer(impl_->timers_, tid));
 
@@ -687,7 +687,7 @@ engine::canceltimer(augmod_id tid)
 }
 
 AUGRTPP_API void
-engine::setsslclient(augmod_id cid, sslctx& ctx)
+engine::setsslclient(maud_id cid, sslctx& ctx)
 {
 #if ENABLE_SSL
     connptr cptr(smartptr_cast<
@@ -704,7 +704,7 @@ engine::setsslclient(augmod_id cid, sslctx& ctx)
 }
 
 AUGRTPP_API void
-engine::setsslserver(augmod_id cid, sslctx& ctx)
+engine::setsslserver(maud_id cid, sslctx& ctx)
 {
 #if ENABLE_SSL
     connptr cptr(smartptr_cast<

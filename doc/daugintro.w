@@ -20,7 +20,7 @@
 
 @s std int @s string int
 
-@s augmod int
+@s maud int
 @s basic_factory int
 @s basic_module int
 @s basic_session int
@@ -121,15 +121,15 @@ namespace {@/
 }@/
 @<declare export table@>
 
-@ The \.{<augmodpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
+@ The \.{<maudpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
 implementations.  Modules can also be written in standard \CEE/.  A \CEE/
-implementation would use the \.{<augmod.h>} header, instead.  For convenience,
-names are imported from the |augmod| and |std| namespaces.
+implementation would use the \.{<maud.h>} header, instead.  For convenience,
+names are imported from the |maud| and |std| namespaces.
 
 @<include...@>=
-#define AUGMOD_BUILD
-#include <augmodpp.hpp>@/
-using namespace augmod;@/
+#define MAUD_BUILD
+#include <maudpp.hpp>@/
+using namespace maud;@/
 using namespace std;
 
 @ Session types (|echosession| in this example) are fed into a class template
@@ -140,12 +140,12 @@ for |echosession|.
 
 \yskip\noindent
 \DAUG/ Modules are required to export two library functions, namely,
-|augmod_init()| and |augmod_term()|.  The |AUGMOD_ENTRYPOINTS| macro assists
+|maud_init()| and |maud_term()|.  The |MAUD_ENTRYPOINTS| macro assists
 with the definition of these two export functions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echosession> > sample;@/
-AUGMOD_ENTRYPOINTS(sample::init, sample::term)
+MAUD_ENTRYPOINTS(sample::init, sample::term)
 
 @ The |echoline| functor handles each line received from the client.
 \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
@@ -187,8 +187,8 @@ deactivated.
 bool
 echosession::do_start(const char* sname)
 {
-  writelog(AUGMOD_LOGINFO, "starting session [%s]", sname);
-  const char* serv = augmod::getenv("session.echo.serv");
+  writelog(MAUD_LOGINFO, "starting session [%s]", sname);
+  const char* serv = maud::getenv("session.echo.serv");
   if (!serv)
     return false;
   tcplisten("0.0.0.0", serv);
@@ -210,7 +210,7 @@ echosession::do_accepted(object& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
-  setrwtimer(sock, 15000, AUGMOD_TIMRD);
+  setrwtimer(sock, 15000, MAUD_TIMRD);
   return true;
 }
 

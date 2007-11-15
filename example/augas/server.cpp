@@ -2,11 +2,11 @@
    See the file COPYING for copying permission.
 */
 #define AUGMOD_BUILD
-#include "augmodpp.hpp"
+#include "maudpp.hpp"
 
 #include <map>
 
-using namespace augmod;
+using namespace maud;
 using namespace std;
 
 namespace {
@@ -33,8 +33,8 @@ namespace {
         bool
         do_start(const char* sname)
         {
-            writelog(AUGMOD_LOGINFO, "starting...");
-            const char* serv = augmod::getenv("session.echo.serv");
+            writelog(MAUD_LOGINFO, "starting...");
+            const char* serv = maud::getenv("session.echo.serv");
             if (!serv)
                 return false;
 
@@ -49,13 +49,13 @@ namespace {
         bool
         do_accepted(object& sock, const char* addr, unsigned short port)
         {
-            const char* sslctx = augmod::getenv("session.echo.sslcontext", 0);
+            const char* sslctx = maud::getenv("session.echo.sslcontext", 0);
             if (sslctx) {
-                writelog(AUGMOD_LOGINFO, "sslcontext: %s", sslctx);
+                writelog(MAUD_LOGINFO, "sslcontext: %s", sslctx);
                 setsslserver(sock, sslctx);
             }
             sock.setuser(new string());
-            setrwtimer(sock, 15000, AUGMOD_TIMRD);
+            setrwtimer(sock, 15000, MAUD_TIMRD);
             return true;
         }
         void
@@ -67,7 +67,7 @@ namespace {
                          static_cast<const char*>(buf) + len, tok, '\n',
                          eachline(sock));
             } catch (...) {
-                augmod_writelog(AUGMOD_LOGINFO, "shutting now...");
+                maud_writelog(MAUD_LOGINFO, "shutting now...");
                 shutdown(sock, 1);
                 throw;
             }
@@ -75,14 +75,14 @@ namespace {
         void
         do_rdexpire(const object& sock, unsigned& ms)
         {
-            writelog(AUGMOD_LOGINFO, "no data received for 15 seconds");
+            writelog(MAUD_LOGINFO, "no data received for 15 seconds");
             shutdown(sock, 0);
         }
         bool
         do_authcert(const object& sock, const char* subject,
                     const char* issuer)
         {
-            augmod_writelog(AUGMOD_LOGINFO, "checking subject...");
+            maud_writelog(MAUD_LOGINFO, "checking subject...");
             return true;
         }
         static session_base*
@@ -95,4 +95,4 @@ namespace {
     typedef basic_module<basic_factory<echosession> > module;
 }
 
-AUGMOD_ENTRYPOINTS(module::init, module::term)
+MAUD_ENTRYPOINTS(module::init, module::term)

@@ -14,4 +14,4 @@ include_HEADERS = \
 	augutilpp.hpp \
 	augsrvpp.hpp \
 	augnetpp.hpp \
-	augmodpp.hpp
+	maudpp.hpp

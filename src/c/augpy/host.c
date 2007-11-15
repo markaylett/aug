@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 
 #include "augpy/object.h"
 
-#include "augmod.h"
+#include "maud.h"
 
 static PyTypeObject* type_ = NULL;
 
@@ -37,7 +37,7 @@ buf_(void* arg, size_t* size)
     return buf;
 }
 
-static const struct augmod_vartype vartype_ = {
+static const struct maud_vartype vartype_ = {
     destroy_,
     buf_
 };
@@ -58,7 +58,7 @@ writelog_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "is:writelog", &level, &msg))
         return NULL;
 
-    augmod_writelog(level, "%s", msg);
+    maud_writelog(level, "%s", msg);
     return incret_(Py_None);
 }
 
@@ -68,8 +68,8 @@ reconfall_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, ":reconfall"))
         return NULL;
 
-    if (-1 == augmod_reconfall()) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == maud_reconfall()) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
@@ -82,8 +82,8 @@ stopall_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, ":stopall"))
         return NULL;
 
-    if (-1 == augmod_stopall()) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == maud_stopall()) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
@@ -95,7 +95,7 @@ post_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
     PyObject* user = NULL;
-    struct augmod_var var = { NULL, NULL };
+    struct maud_var var = { NULL, NULL };
 
     if (!PyArg_ParseTuple(args, "ss|O:post", &to, &type, &user))
         return NULL;
@@ -114,12 +114,12 @@ post_(PyObject* self, PyObject* args)
         var.arg_ = user;
     }
 
-    if (-1 == augmod_post(to, type, &var)) {
+    if (-1 == maud_post(to, type, &var)) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
 
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
@@ -137,8 +137,8 @@ dispatch_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "ss|z#:dispatch", &to, &type, &user, &size))
         return NULL;
 
-    if (-1 == augmod_dispatch(to, type, user, size)) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == maud_dispatch(to, type, user, size)) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
@@ -154,7 +154,7 @@ getenv_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "s|O:getenv", &name, &def))
         return NULL;
 
-    if (!(value = augmod_getenv(name, NULL)))
+    if (!(value = maud_getenv(name, NULL)))
         return incret_(def);
 
     return Py_BuildValue("s", value);
@@ -163,12 +163,12 @@ getenv_(PyObject* self, PyObject* args)
 static PyObject*
 getsession_(PyObject* self, PyObject* args)
 {
-    const struct augmod_session* session;
+    const struct maud_session* session;
 
     if (!PyArg_ParseTuple(args, ":getsession"))
         return NULL;
 
-    if (!(session = augmod_getsession()))
+    if (!(session = maud_getsession()))
         return incret_(Py_None);
 
     return Py_BuildValue("s", session->name_);
@@ -182,8 +182,8 @@ shutdown_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!I:shutdown", type_, &sock, &flags))
         return NULL;
 
-    if (-1 == augmod_shutdown(augpy_getid(sock), flags)) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == maud_shutdown(augpy_getid(sock), flags)) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
@@ -203,8 +203,8 @@ tcpconnect_(PyObject* self, PyObject* args)
     if (!(sock = augpy_createobject(type_, 0, user)))
         return NULL;
 
-    if (-1 == (cid = augmod_tcpconnect(host, serv, sock))) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == (cid = maud_tcpconnect(host, serv, sock))) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         Py_DECREF(sock);
         return NULL;
     }
@@ -226,8 +226,8 @@ tcplisten_(PyObject* self, PyObject* args)
     if (!(sock = augpy_createobject(type_, 0, user)))
         return NULL;
 
-    if (-1 == (lid = augmod_tcplisten(host, serv, sock))) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == (lid = maud_tcplisten(host, serv, sock))) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         Py_DECREF(sock);
         return NULL;
     }
@@ -240,7 +240,7 @@ static PyObject*
 send_(PyObject* self, PyObject* args)
 {
     PyObject* sock, * buf;
-    struct augmod_var var = { NULL, NULL };
+    struct maud_var var = { NULL, NULL };
 
     if (!PyArg_ParseTuple(args, "O!O:send", type_, &sock, &buf))
         return NULL;
@@ -256,8 +256,8 @@ send_(PyObject* self, PyObject* args)
     var.type_ = &vartype_;
     var.arg_ = buf;
 
-    if (-1 == augmod_sendv(augpy_getid(sock), &var)) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == maud_sendv(augpy_getid(sock), &var)) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
@@ -275,8 +275,8 @@ setrwtimer_(PyObject* self, PyObject* args)
                           type_, &sock, &ms, &flags))
         return NULL;
 
-    if (-1 == augmod_setrwtimer(augpy_getid(sock), ms, flags)) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == maud_setrwtimer(augpy_getid(sock), ms, flags)) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
@@ -293,11 +293,11 @@ resetrwtimer_(PyObject* self, PyObject* args)
                           type_, &sock, &ms, &flags))
         return NULL;
 
-    switch (augmod_resetrwtimer(augpy_getid(sock), ms, flags)) {
+    switch (maud_resetrwtimer(augpy_getid(sock), ms, flags)) {
     case -1:
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
-    case AUGMOD_NONE:
+    case MAUD_NONE:
         return incret_(Py_False);
     }
 
@@ -313,11 +313,11 @@ cancelrwtimer_(PyObject* self, PyObject* args)
                           type_, &sock, &flags))
         return NULL;
 
-    switch (augmod_cancelrwtimer(augpy_getid(sock), flags)) {
+    switch (maud_cancelrwtimer(augpy_getid(sock), flags)) {
     case -1:
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
-    case AUGMOD_NONE:
+    case MAUD_NONE:
         return incret_(Py_False);
     }
 
@@ -329,7 +329,7 @@ settimer_(PyObject* self, PyObject* args)
 {
     unsigned ms;
     PyObject* user = NULL, * timer;
-    struct augmod_var var;
+    struct maud_var var;
     int tid;
 
     if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &user))
@@ -341,8 +341,8 @@ settimer_(PyObject* self, PyObject* args)
     var.type_ = &vartype_;
     var.arg_ = timer;
 
-    if (-1 == (tid = augmod_settimer(ms, &var))) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == (tid = maud_settimer(ms, &var))) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         Py_DECREF(timer);
         return NULL;
     }
@@ -360,11 +360,11 @@ resettimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!I:resettimer", type_, &timer, &ms))
         return NULL;
 
-    switch (augmod_resettimer(augpy_getid(timer), ms)) {
+    switch (maud_resettimer(augpy_getid(timer), ms)) {
     case -1:
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
-    case AUGMOD_NONE:
+    case MAUD_NONE:
         return incret_(Py_False);
     }
 
@@ -379,11 +379,11 @@ canceltimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!:canceltimer", type_, &timer))
         return NULL;
 
-    switch (augmod_canceltimer(augpy_getid(timer))) {
+    switch (maud_canceltimer(augpy_getid(timer))) {
     case -1:
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
-    case AUGMOD_NONE:
+    case MAUD_NONE:
         return incret_(Py_False);
     }
 
@@ -399,8 +399,8 @@ setsslclient_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!s:setsslclient", type_, &sock, &ctx))
         return NULL;
 
-    if (-1 == augmod_setsslclient(augpy_getid(sock), ctx)) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == maud_setsslclient(augpy_getid(sock), ctx)) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
@@ -416,8 +416,8 @@ setsslserver_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!s:setsslserver", type_, &sock, &ctx))
         return NULL;
 
-    if (-1 == augmod_setsslserver(augpy_getid(sock), ctx)) {
-        PyErr_SetString(PyExc_RuntimeError, augmod_error());
+    if (-1 == maud_setsslserver(augpy_getid(sock), ctx)) {
+        PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
@@ -515,18 +515,18 @@ augpy_createhost(PyTypeObject* type)
 
     PyModule_AddObject(host, "Object", (PyObject*)type_);
 
-    PyModule_AddIntConstant(host, "LOGCRIT", AUGMOD_LOGCRIT);
-    PyModule_AddIntConstant(host, "LOGERROR", AUGMOD_LOGERROR);
-    PyModule_AddIntConstant(host, "LOGWARN", AUGMOD_LOGWARN);
-    PyModule_AddIntConstant(host, "LOGNOTICE", AUGMOD_LOGNOTICE);
-    PyModule_AddIntConstant(host, "LOGINFO", AUGMOD_LOGINFO);
-    PyModule_AddIntConstant(host, "LOGDEBUG", AUGMOD_LOGDEBUG);
+    PyModule_AddIntConstant(host, "LOGCRIT", MAUD_LOGCRIT);
+    PyModule_AddIntConstant(host, "LOGERROR", MAUD_LOGERROR);
+    PyModule_AddIntConstant(host, "LOGWARN", MAUD_LOGWARN);
+    PyModule_AddIntConstant(host, "LOGNOTICE", MAUD_LOGNOTICE);
+    PyModule_AddIntConstant(host, "LOGINFO", MAUD_LOGINFO);
+    PyModule_AddIntConstant(host, "LOGDEBUG", MAUD_LOGDEBUG);
 
-    PyModule_AddIntConstant(host, "TIMRD", AUGMOD_TIMRD);
-    PyModule_AddIntConstant(host, "TIMWR", AUGMOD_TIMWR);
-    PyModule_AddIntConstant(host, "TIMRDWR", AUGMOD_TIMRDWR);
+    PyModule_AddIntConstant(host, "TIMRD", MAUD_TIMRD);
+    PyModule_AddIntConstant(host, "TIMWR", MAUD_TIMWR);
+    PyModule_AddIntConstant(host, "TIMRDWR", MAUD_TIMRDWR);
 
-    PyModule_AddIntConstant(host, "SHUTNOW", AUGMOD_SHUTNOW);
+    PyModule_AddIntConstant(host, "SHUTNOW", MAUD_SHUTNOW);
 
     return host;
 }

@@ -11,7 +11,7 @@ namespace aug {
 
     class servconn : public rwtimer_base, public conn_base {
 
-        augmod_object sock_;
+        maud_object sock_;
         buffer buffer_;
         rwtimer rwtimer_;
         aug::connected conn_;
@@ -35,10 +35,10 @@ namespace aug {
 
         // conn_base.
 
-        augmod_object&
+        maud_object&
         do_get();
 
-        const augmod_object&
+        const maud_object&
         do_get() const;
 
         const sessionptr&

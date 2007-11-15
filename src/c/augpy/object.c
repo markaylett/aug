@@ -1,13 +1,13 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGMOD_BUILD
+#define MAUD_BUILD
 #include "augpy/object.h"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
-#include "augmod.h"
+#include "maud.h"
 
 #include <structmember.h>
 
@@ -18,7 +18,7 @@ static int objects_ = 0;
 
 typedef struct {
     PyObject_HEAD
-    char name_[AUGMOD_MAXNAME + 1];
+    char name_[MAUD_MAXNAME + 1];
     int id_;
     PyObject* user_;
 } object_;
@@ -46,9 +46,8 @@ static void
 dealloc_(object_* self)
 {
     --objects_;
-    augmod_writelog(AUGMOD_LOGDEBUG,
-                    "deallocated: <augpy.Object at %p, id=%d>",
-                    (void*)self, self->id_);
+    maud_writelog(MAUD_LOGDEBUG, "deallocated: <augpy.Object at %p, id=%d>",
+                  (void*)self, self->id_);
 
     clear_(self);
     self->ob_type->tp_free((PyObject*)self);
@@ -138,9 +137,8 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
     }
 
     ++objects_;
-    augmod_writelog(AUGMOD_LOGDEBUG,
-                    "allocated: <augpy.Object at %p, id=%d>",
-                    (void*)self, self->id_);
+    maud_writelog(MAUD_LOGDEBUG, "allocated: <augpy.Object at %p, id=%d>",
+                  (void*)self, self->id_);
     return (PyObject*)self;
 }
 
@@ -225,9 +223,8 @@ augpy_createobject(PyTypeObject* type, int id, PyObject* user)
     self->user_ = user;
 
     ++objects_;
-    augmod_writelog(AUGMOD_LOGDEBUG,
-                    "allocated: <augpy.Object at %p, id=%d>",
-                    (void*)self, self->id_);
+    maud_writelog(MAUD_LOGDEBUG, "allocated: <augpy.Object at %p, id=%d>",
+                  (void*)self, self->id_);
     return (PyObject*)self;
 }
 

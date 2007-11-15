@@ -6,19 +6,19 @@
 
 #include "augaspp/session.hpp"
 
-#include "augmod.h"
+#include "maud.h"
 
 namespace aug {
 
     class object_base {
     public:
-        typedef augmod_object ctype;
+        typedef maud_object ctype;
     private:
 
-        virtual augmod_object&
+        virtual maud_object&
         do_get() = 0;
 
-        virtual const augmod_object&
+        virtual const maud_object&
         do_get() const = 0;
 
         virtual const sessionptr&
@@ -28,12 +28,12 @@ namespace aug {
         virtual
         ~object_base() AUG_NOTHROW;
 
-        augmod_object&
+        maud_object&
         get()
         {
             return do_get();
         }
-        const augmod_object&
+        const maud_object&
         get() const
         {
             return do_get();
@@ -43,11 +43,11 @@ namespace aug {
         {
             return do_session();
         }
-        operator augmod_object&()
+        operator maud_object&()
         {
             return do_get();
         }
-        operator const augmod_object&() const
+        operator const maud_object&() const
         {
             return do_get();
         }
@@ -55,14 +55,14 @@ namespace aug {
 
     typedef smartptr<object_base> objectptr;
 
-    inline augmod_id
-    id(const augmod_object& ref)
+    inline maud_id
+    id(const maud_object& ref)
     {
         return ref.id_;
     }
 
     inline void*
-    user(const augmod_object& ref)
+    user(const maud_object& ref)
     {
         return ref.user_;
     }

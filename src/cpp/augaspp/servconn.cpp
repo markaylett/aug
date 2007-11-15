@@ -40,13 +40,13 @@ servconn::do_cancelrwtimer(unsigned flags)
     return rwtimer_.cancelrwtimer(flags);
 }
 
-augmod_object&
+maud_object&
 servconn::do_get()
 {
     return conn_.get();
 }
 
-const augmod_object&
+const maud_object&
 servconn::do_get() const
 {
     return conn_.get();

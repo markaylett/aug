@@ -2,9 +2,9 @@
    See the file COPYING for copying permission.
 */
 #define AUGMOD_BUILD
-#include "augmodpp.hpp"
+#include "maudpp.hpp"
 
-using namespace augmod;
+using namespace maud;
 using namespace std;
 
 namespace {
@@ -50,8 +50,8 @@ namespace {
     bool
     echosession::do_start(const char* sname)
     {
-        writelog(AUGMOD_LOGINFO, "starting session [%s]", sname);
-        const char* serv= augmod::getenv("session.echo.serv");
+        writelog(MAUD_LOGINFO, "starting session [%s]", sname);
+        const char* serv= maud::getenv("session.echo.serv");
         if (!serv)
             return false;
         tcplisten("0.0.0.0", serv);
@@ -64,7 +64,7 @@ namespace {
     {
         sock.setuser(new string());
         send(sock, "HELLO\r\n", 7);
-        setrwtimer(sock, 15000, AUGMOD_TIMRD);
+        setrwtimer(sock, 15000, MAUD_TIMRD);
         return true;
     }
 
@@ -97,4 +97,4 @@ namespace {
 }
 
 typedef basic_module<basic_factory<echosession> > sample;
-AUGMOD_ENTRYPOINTS(sample::init, sample::term)
+MAUD_ENTRYPOINTS(sample::init, sample::term)

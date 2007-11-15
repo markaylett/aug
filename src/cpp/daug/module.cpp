@@ -27,41 +27,41 @@ module::~module() AUG_NOTHROW
 }
 
 module::module(const string& name, const char* path,
-               const struct augmod_host& host,
-               void (*teardown)(const augmod_object*))
+               const struct maud_host& host,
+               void (*teardown)(const maud_object*))
     : name_(name),
       lib_(path)
 {
     AUG_DEBUG2("resolving symbols in module: name=[%s]", name_.c_str());
-    augmod_initfn initfn(dlsym<augmod_initfn>(lib_, "augmod_init"));
-    termfn_ = dlsym<augmod_termfn>(lib_, "augmod_term");
+    maud_initfn initfn(dlsym<maud_initfn>(lib_, "maud_init"));
+    termfn_ = dlsym<maud_termfn>(lib_, "maud_term");
 
     AUG_DEBUG2("initialising module: name=[%s]", name_.c_str());
-    const struct augmod_proxy* ptr(initfn(name_.c_str(), &host));
+    const struct maud_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
-        throw error(__FILE__, __LINE__, EMODCALL, "augmod_init() failed");
-    setdefaults(proxy_, *ptr, teardown);
+        throw error(__FILE__, __LINE__, EMODCALL, "maud_init() failed");
+    setdefaults(module_, *ptr, teardown);
 }
 
 void
 module::stop() const AUG_NOTHROW
 {
     AUG_DEBUG2("stop()");
-    proxy_.stop_();
+    module_.stop_();
 }
 
 bool
-module::start(augmod_session& session) const AUG_NOTHROW
+module::start(maud_session& session) const AUG_NOTHROW
 {
     AUG_DEBUG2("start(): sname=[%s]", session.name_);
-    return AUGMOD_OK == proxy_.start_(&session);
+    return MAUD_OK == module_.start_(&session);
 }
 
 void
 module::reconf() const AUG_NOTHROW
 {
     AUG_DEBUG2("reconf()");
-    proxy_.reconf_();
+    module_.reconf_();
 }
 
 void
@@ -69,74 +69,74 @@ module::event(const char* from, const char* type, const void* user,
               size_t size) const AUG_NOTHROW
 {
     AUG_DEBUG2("event(): from=[%s], type=[%s]", from, type);
-    proxy_.event_(from, type, user, size);
+    module_.event_(from, type, user, size);
 }
 
 void
-module::closed(const augmod_object& sock) const AUG_NOTHROW
+module::closed(const maud_object& sock) const AUG_NOTHROW
 {
     AUG_DEBUG2("closed(): id=[%d]", sock.id_);
-    proxy_.closed_(&sock);
+    module_.closed_(&sock);
 }
 
 void
-module::teardown(const augmod_object& sock) const AUG_NOTHROW
+module::teardown(const maud_object& sock) const AUG_NOTHROW
 {
     AUG_DEBUG2("teardown(): id=[%d]", sock.id_);
-    proxy_.teardown_(&sock);
+    module_.teardown_(&sock);
 }
 
 bool
-module::accepted(augmod_object& sock, const char* addr,
+module::accepted(maud_object& sock, const char* addr,
                  unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("accept(): id=[%d], addr=[%s], port=[%u]",
                sock.id_, addr, (unsigned)port);
-    return AUGMOD_OK == proxy_.accepted_(&sock, addr, port);
+    return MAUD_OK == module_.accepted_(&sock, addr, port);
 }
 
 void
-module::connected(augmod_object& sock, const char* addr,
+module::connected(maud_object& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("connected(): id=[%d], addr=[%s], port=[%u]",
                sock.id_, addr, (unsigned)port);
-    proxy_.connected_(&sock, addr, port);
+    module_.connected_(&sock, addr, port);
 }
 
 void
-module::data(const augmod_object& sock, const char* buf,
+module::data(const maud_object& sock, const char* buf,
              size_t size) const AUG_NOTHROW
 {
     AUG_DEBUG2("data(): id=[%d]", sock.id_);
-    proxy_.data_(&sock, buf, size);
+    module_.data_(&sock, buf, size);
 }
 
 void
-module::rdexpire(const augmod_object& sock, unsigned& ms) const AUG_NOTHROW
+module::rdexpire(const maud_object& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("rdexpire(): id=[%d], ms=[%u]", sock.id_, ms);
-    proxy_.rdexpire_(&sock, &ms);
+    module_.rdexpire_(&sock, &ms);
 }
 
 void
-module::wrexpire(const augmod_object& sock, unsigned& ms) const AUG_NOTHROW
+module::wrexpire(const maud_object& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("wrexpire(): id=[%d], ms=[%u]", sock.id_, ms);
-    proxy_.wrexpire_(&sock, &ms);
+    module_.wrexpire_(&sock, &ms);
 }
 
 void
-module::expire(const augmod_object& timer, unsigned& ms) const AUG_NOTHROW
+module::expire(const maud_object& timer, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("expire(): id=[%d], ms=[%u]", timer.id_, ms);
-    proxy_.expire_(&timer, &ms);
+    module_.expire_(&timer, &ms);
 }
 
 bool
-module::authcert(const augmod_object& sock, const char* subject,
+module::authcert(const maud_object& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW
 {
     AUG_DEBUG2("authcert(): id=[%d]", sock.id_);
-    return AUGMOD_OK == proxy_.authcert_(&sock, subject, issuer);
+    return MAUD_OK == module_.authcert_(&sock, subject, issuer);
 }

@@ -13,13 +13,13 @@ namespace augas {
     class session : public aug::session_base {
 
         moduleptr module_;
-        augmod_session session_;
+        maud_session session_;
         bool active_;
 
-        augmod_session&
+        maud_session&
         do_get() AUG_NOTHROW;
 
-        const augmod_session&
+        const maud_session&
         do_get() const AUG_NOTHROW;
 
         bool
@@ -36,36 +36,36 @@ namespace augas {
                  size_t size) const AUG_NOTHROW;
 
         void
-        do_closed(const augmod_object& sock) const AUG_NOTHROW;
+        do_closed(const maud_object& sock) const AUG_NOTHROW;
 
         void
-        do_teardown(const augmod_object& sock) const AUG_NOTHROW;
+        do_teardown(const maud_object& sock) const AUG_NOTHROW;
 
         bool
-        do_accepted(augmod_object& sock, const char* addr,
+        do_accepted(maud_object& sock, const char* addr,
                     unsigned short port) const AUG_NOTHROW;
 
         void
-        do_connected(augmod_object& sock, const char* addr,
+        do_connected(maud_object& sock, const char* addr,
                      unsigned short port) const AUG_NOTHROW;
 
         void
-        do_data(const augmod_object& sock, const char* buf,
+        do_data(const maud_object& sock, const char* buf,
                 size_t size) const AUG_NOTHROW;
 
         void
-        do_rdexpire(const augmod_object& sock,
+        do_rdexpire(const maud_object& sock,
                     unsigned& ms) const AUG_NOTHROW;
 
         void
-        do_wrexpire(const augmod_object& sock,
+        do_wrexpire(const maud_object& sock,
                     unsigned& ms) const AUG_NOTHROW;
 
         void
-        do_expire(const augmod_object& timer, unsigned& ms) const AUG_NOTHROW;
+        do_expire(const maud_object& timer, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        do_authcert(const augmod_object& sock, const char* subject,
+        do_authcert(const maud_object& sock, const char* subject,
                     const char* issuer) const AUG_NOTHROW;
 
     public:
@@ -74,7 +74,7 @@ namespace augas {
         session(const moduleptr& module, const char* name);
     };
 
-    const augmod_session*
+    const maud_session*
     getsession();
 }
 

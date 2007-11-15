@@ -243,7 +243,7 @@ namespace {
     // Thread-safe.
 
     int
-    post_(const char* to, const char* type, const augmod_var* user)
+    post_(const char* to, const char* type, const maud_var* user)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s]", sname, to, type);
@@ -292,7 +292,7 @@ namespace {
         return 0;
     }
 
-    const augmod_session*
+    const maud_session*
     getsession_()
     {
         try {
@@ -302,7 +302,7 @@ namespace {
     }
 
     int
-    shutdown_(augmod_id cid, unsigned flags)
+    shutdown_(maud_id cid, unsigned flags)
     {
         AUG_DEBUG2("shutdown(): id=[%d], flags=[%u]", cid, flags);
         try {
@@ -343,7 +343,7 @@ namespace {
     }
 
     int
-    send_(augmod_id cid, const void* buf, size_t len)
+    send_(maud_id cid, const void* buf, size_t len)
     {
         AUG_DEBUG2("send(): id=[%d]", cid);
         try {
@@ -355,7 +355,7 @@ namespace {
     }
 
     int
-    sendv_(augmod_id cid, const augmod_var* user)
+    sendv_(maud_id cid, const maud_var* user)
     {
         AUG_DEBUG2("sendv(): id=[%d]", cid);
         try {
@@ -367,7 +367,7 @@ namespace {
     }
 
     int
-    setrwtimer_(augmod_id cid, unsigned ms, unsigned flags)
+    setrwtimer_(maud_id cid, unsigned ms, unsigned flags)
     {
         AUG_DEBUG2("setrwtimer(): id=[%d], ms=[%u], flags=[%x]",
                    cid, ms, flags);
@@ -380,32 +380,32 @@ namespace {
     }
 
     int
-    resetrwtimer_(augmod_id cid, unsigned ms, unsigned flags)
+    resetrwtimer_(maud_id cid, unsigned ms, unsigned flags)
     {
         AUG_DEBUG2("resetrwtimer(): id=[%d], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
             return state_->engine_.resetrwtimer(cid, ms, flags)
-                ? 0 : AUGMOD_NONE;
+                ? 0 : MAUD_NONE;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
-    cancelrwtimer_(augmod_id cid, unsigned flags)
+    cancelrwtimer_(maud_id cid, unsigned flags)
     {
         AUG_DEBUG2("cancelrwtimer(): id=[%d], flags=[%x]", cid, flags);
         try {
             return state_->engine_.cancelrwtimer(cid, flags)
-                ? 0 : AUGMOD_NONE;
+                ? 0 : MAUD_NONE;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
-    settimer_(unsigned ms, const augmod_var* user)
+    settimer_(unsigned ms, const maud_var* user)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
@@ -417,29 +417,29 @@ namespace {
     }
 
     int
-    resettimer_(augmod_id tid, unsigned ms)
+    resettimer_(maud_id tid, unsigned ms)
     {
         AUG_DEBUG2("resettimer(): id=[%d], ms=[%u]", tid, ms);
         try {
-            return state_->engine_.resettimer(tid, ms) ? 0 : AUGMOD_NONE;
+            return state_->engine_.resettimer(tid, ms) ? 0 : MAUD_NONE;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
-    canceltimer_(augmod_id tid)
+    canceltimer_(maud_id tid)
     {
         AUG_DEBUG2("canceltimer(): id=[%d]", tid);
         try {
-            return state_->engine_.canceltimer(tid) ? 0 : AUGMOD_NONE;
+            return state_->engine_.canceltimer(tid) ? 0 : MAUD_NONE;
 
         } AUG_SETERRINFOCATCH;
         return -1;
     }
 
     int
-    setsslclient_(augmod_id cid, const char* ctx)
+    setsslclient_(maud_id cid, const char* ctx)
     {
         AUG_DEBUG2("setsslclient(): id=[%d], ctx=[%s]", cid, ctx);
 #if ENABLE_SSL
@@ -461,7 +461,7 @@ namespace {
     }
 
     int
-    setsslserver_(augmod_id cid, const char* ctx)
+    setsslserver_(maud_id cid, const char* ctx)
     {
         AUG_DEBUG2("setsslserver(): id=[%d], ctx=[%s]", cid, ctx);
 #if ENABLE_SSL
@@ -482,7 +482,7 @@ namespace {
         return -1;
     }
 
-    const augmod_host host_ = {
+    const maud_host host_ = {
         writelog_,
         vwritelog_,
         error_,
@@ -508,7 +508,7 @@ namespace {
     };
 
     void
-    teardown_(const augmod_object* sock)
+    teardown_(const maud_object* sock)
     {
         aug_info("teardown defaulting to shutdown");
         shutdown_(sock->id_, 0);

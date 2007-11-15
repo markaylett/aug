@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGMOD_BUILD
-#include "augmodpp.hpp"
+#include "maudpp.hpp"
 
 #include "augutilpp.hpp"
 #include "augsyspp.hpp"
@@ -10,7 +10,7 @@
 #include <fstream>
 #include <memory> // auto_ptr<>
 
-using namespace augmod;
+using namespace maud;
 using namespace std;
 
 namespace {
@@ -25,12 +25,12 @@ namespace {
         return MSG;
     }
 
-    const struct augmod_vartype vartype = {
+    const struct maud_vartype vartype = {
         NULL,
         buf
     };
 
-    const struct augmod_var var = {
+    const struct maud_var var = {
         &vartype,
         NULL
     };
@@ -119,29 +119,29 @@ namespace {
         bool
         do_start(const char* sname)
         {
-            writelog(AUGMOD_LOGINFO, "starting...");
+            writelog(MAUD_LOGINFO, "starting...");
 
-            if (atoi(augmod::getenv("session.bench.sendv", "1"))) {
+            if (atoi(maud::getenv("session.bench.sendv", "1"))) {
                 send_ = dosendv;
-                augmod_writelog(AUGMOD_LOGINFO, "sendv: yes");
+                maud_writelog(MAUD_LOGINFO, "sendv: yes");
             } else {
                 send_ = dosend;
-                augmod_writelog(AUGMOD_LOGINFO, "sendv: no");
+                maud_writelog(MAUD_LOGINFO, "sendv: no");
             }
 
-            const char* serv = augmod::getenv("session.bench.serv");
+            const char* serv = maud::getenv("session.bench.serv");
             if (!serv)
                 return false;
 
-            const char* host = augmod::getenv("session.bench.host",
-                                              "localhost");
-            conns_ = atoi(augmod::getenv("session.bench.conns", "100"));
-            echos_ = atoi(augmod::getenv("session.bench.echos", "1000"));
+            const char* host = maud::getenv("session.bench.host",
+                                            "localhost");
+            conns_ = atoi(maud::getenv("session.bench.conns", "100"));
+            echos_ = atoi(maud::getenv("session.bench.echos", "1000"));
 
-            augmod_writelog(AUGMOD_LOGINFO, "host: %s", host);
-            augmod_writelog(AUGMOD_LOGINFO, "serv: %s", serv);
-            augmod_writelog(AUGMOD_LOGINFO, "conns: %d", conns_);
-            augmod_writelog(AUGMOD_LOGINFO, "echos: %d", echos_);
+            maud_writelog(MAUD_LOGINFO, "host: %s", host);
+            maud_writelog(MAUD_LOGINFO, "serv: %s", serv);
+            maud_writelog(MAUD_LOGINFO, "conns: %d", conns_);
+            maud_writelog(MAUD_LOGINFO, "echos: %d", echos_);
 
             for (; estab_ < conns_; ++estab_)
                 tcpconnect(host, serv, new state(echos_));
@@ -153,22 +153,22 @@ namespace {
             auto_ptr<state> s(sock.user<state>());
             pushxy(xy_, s->secs_);
             if (0 < --estab_) {
-                augmod_writelog(AUGMOD_LOGINFO, "%d established", estab_);
+                maud_writelog(MAUD_LOGINFO, "%d established", estab_);
                 return;
             }
 
             double ms(elapsed(clock_) * 1000.0);
 
-            augmod_writelog(AUGMOD_LOGINFO, "total time: %f ms", ms);
+            maud_writelog(MAUD_LOGINFO, "total time: %f ms", ms);
 
             ms /= static_cast<double>(conns_);
-            augmod_writelog(AUGMOD_LOGINFO, "time per conn: %f ms", ms);
+            maud_writelog(MAUD_LOGINFO, "time per conn: %f ms", ms);
 
             ms /= static_cast<double>(echos_);
-            augmod_writelog(AUGMOD_LOGINFO, "echos per sec: %f", 1000.0 / ms);
+            maud_writelog(MAUD_LOGINFO, "echos per sec: %f", 1000.0 / ms);
 
             double k(static_cast<double>(bytes_) / 1024.00);
-            augmod_writelog(AUGMOD_LOGINFO, "total size: %f k", k);
+            maud_writelog(MAUD_LOGINFO, "total size: %f k", k);
 
             stopall();
 
@@ -177,10 +177,9 @@ namespace {
         void
         do_connected(object& sock, const char* addr, unsigned short port)
         {
-            const char* sslctx = augmod::getenv("session.bench.sslcontext",
-                                                0);
+            const char* sslctx = maud::getenv("session.bench.sslcontext", 0);
             if (sslctx) {
-                writelog(AUGMOD_LOGINFO, "sslcontext: %s", sslctx);
+                writelog(MAUD_LOGINFO, "sslcontext: %s", sslctx);
                 setsslclient(sock, sslctx);
             }
 
@@ -202,10 +201,10 @@ namespace {
         do_authcert(const object& sock, const char* subject,
                     const char* issuer)
         {
-            augmod_writelog(AUGMOD_LOGINFO, "checking subject...");
+            maud_writelog(MAUD_LOGINFO, "checking subject...");
             return true;
         }
-        ~benchsession() AUGMOD_NOTHROW
+        ~benchsession() MAUD_NOTHROW
         {
         }
         benchsession()
@@ -224,4 +223,4 @@ namespace {
     typedef basic_module<basic_factory<benchsession> > module;
 }
 
-AUGMOD_ENTRYPOINTS(module::init, module::term)
+MAUD_ENTRYPOINTS(module::init, module::term)

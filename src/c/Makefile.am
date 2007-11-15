@@ -18,4 +18,4 @@ include_HEADERS = \
 	augutil.h \
 	augsrv.h \
 	augnet.h \
-	augmod.h
+	maud.h

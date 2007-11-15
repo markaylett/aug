@@ -13,13 +13,13 @@ namespace aug {
     class listener : public sock_base {
 
         sessionptr session_;
-        augmod_object sock_;
+        maud_object sock_;
         smartfd sfd_;
 
-        augmod_object&
+        maud_object&
         do_get();
 
-        const augmod_object&
+        const maud_object&
         do_get() const;
 
         const sessionptr&
