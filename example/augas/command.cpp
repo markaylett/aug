@@ -12,6 +12,18 @@ using namespace std;
 
 namespace {
 
+    string
+    join(shellparser& parser)
+    {
+        vector<string> words;
+        stringstream ss;
+        parser.reset(words);
+        copy(words.begin(), words.end(),
+             ostream_iterator<string>(ss, "]["));
+        string s(ss.str());
+        return s.erase(s.size() - 1).insert(0, "[");
+    }
+
     struct command : basic_session {
 
         bool
@@ -29,7 +41,7 @@ namespace {
         do_accepted(object& sock, const char* addr, unsigned short port)
         {
             sock.setuser(new shellparser());
-            send(sock, "$ \r\n", 4);
+            send(sock, "HELLO\r\n", 7);
             setrwtimer(sock, 15000, MAUD_TIMRD);
             return true;
         }
@@ -44,6 +56,13 @@ namespace {
         do_data(const object& sock, const void* buf, size_t size)
         {
             shellparser& parser(*sock.user<shellparser>());
+            const char* ptr(static_cast<const char*>(buf));
+            for (size_t i(0); i < size; ++i)
+                if (parser.append(ptr[i])) {
+                    string s(join(parser));
+                    s += "\r\n";
+                    send(sock, s.c_str(), s.size());
+                }
         }
 
         void

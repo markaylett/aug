@@ -704,7 +704,7 @@ namespace {
         }
     };
 
-    struct httpsession : basic_session {
+    struct http : basic_session {
         string realm_;
         bool
         do_start(const char* sname)
@@ -771,17 +771,17 @@ namespace {
             aug_info("no data received for 30 seconds");
             shutdown(sock, 0);
         }
-        ~httpsession() AUG_NOTHROW
+        ~http() AUG_NOTHROW
         {
         }
         static session_base*
         create(const char* sname)
         {
-            return new httpsession();
+            return new http();
         }
     };
 
-    typedef basic_module<basic_factory<httpsession> > module;
+    typedef basic_module<basic_factory<http> > module;
 }
 
 MAUD_ENTRYPOINTS(module::init, module::term)

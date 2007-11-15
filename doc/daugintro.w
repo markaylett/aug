@@ -24,7 +24,7 @@
 @s basic_factory int
 @s basic_module int
 @s basic_session int
-@s echosession int
+@s echo int
 @s object int
 @s session_base int
 @s user int
@@ -132,11 +132,11 @@ names are imported from the |maud| and |std| namespaces.
 using namespace maud;@/
 using namespace std;
 
-@ Session types (|echosession| in this example) are fed into a class template
-which assists with the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>|
-delegates the task of creating Sessions to a factory object, specified as a
-template argument.  Here, |basic_factory<>| is used to create a simple factory
-for |echosession|.
+@ Session types (|echo| in this example) are fed into a class template which
+assists with the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>| delegates
+the task of creating Sessions to a factory object, specified as a template
+argument.  Here, |basic_factory<>| is used to create a simple factory for
+|echo|.
 
 \yskip\noindent
 \DAUG/ Modules are required to export two library functions, namely,
@@ -144,8 +144,8 @@ for |echosession|.
 with the definition of these two export functions.
 
 @<declare...@>=
-typedef basic_module<basic_factory<echosession> > sample;@/
-MAUD_ENTRYPOINTS(sample::init, sample::term)
+typedef basic_module<basic_factory<echo> > module;@/
+MAUD_ENTRYPOINTS(module::init, module::term)
 
 @ The |echoline| functor handles each line received from the client.
 \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
@@ -155,7 +155,7 @@ virtual functions that have been overriden in this example.
 
 @<implement...@>=
 @<echoline functor@>@;
-struct echosession : basic_session {@/
+struct echo : basic_session {@/
   bool
   do_start(const char* sname);
 
@@ -185,7 +185,7 @@ deactivated.
 
 @<member...@>+=
 bool
-echosession::do_start(const char* sname)
+echo::do_start(const char* sname)
 {
   writelog(MAUD_LOGINFO, "starting session [%s]", sname);
   const char* serv = maud::getenv("session.echo.serv");
@@ -206,7 +206,7 @@ occurs.
 
 @<member...@>+=
 bool
-echosession::do_accepted(object& sock, const char* addr, unsigned short port)
+echo::do_accepted(object& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
@@ -219,7 +219,7 @@ object is deleted.
 
 @<member...@>+=
 void
-echosession::do_closed(const object& sock)
+echo::do_closed(const object& sock)
 {
   delete sock.user<string>();
 }
@@ -232,7 +232,7 @@ before |tok| is cleared.
 
 @<member...@>+=
 void
-echosession::do_data(const object& sock, const void* buf, size_t size)
+echo::do_data(const object& sock, const void* buf, size_t size)
 {
   string& tok(*sock.user<string>());
   tokenise(static_cast<const char*>(buf),
@@ -248,7 +248,7 @@ delivered to the Session.
 
 @<member...@>+=
 void
-echosession::do_rdexpire(const object& sock, unsigned& ms)
+echo::do_rdexpire(const object& sock, unsigned& ms)
 {
   shutdown(sock, 0);
 }
@@ -258,9 +258,9 @@ echosession::do_rdexpire(const object& sock, unsigned& ms)
 
 @<member...@>+=
 session_base*
-echosession::create(const char* sname)
+echo::create(const char* sname)
 {
-  return 0 == strcmp(sname, "echo") ? new echosession() : 0;
+  return 0 == strcmp(sname, "echo") ? new echo() : 0;
 }
 
 @ Each time the |echoline| functor is called, a response is prepared and sent

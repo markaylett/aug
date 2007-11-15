@@ -6,6 +6,8 @@ CFLAGS = -I$(AUG_HOME)/include
 CXXFLAGS = $(CFLAGS)
 LDFLAGS = -L$(AUG_HOME)/lib
 
+PLATFORM = MINGW
+
 CMODULES = modminimal
 CXXMODULES = \
 	modclient \

@@ -110,7 +110,7 @@ namespace {
         }
     };
 
-    struct benchsession : basic_session {
+    struct bench : basic_session {
         void (*send_)(object&);
         unsigned conns_, estab_, echos_;
         size_t bytes_;
@@ -204,10 +204,10 @@ namespace {
             maud_writelog(MAUD_LOGINFO, "checking subject...");
             return true;
         }
-        ~benchsession() MAUD_NOTHROW
+        ~bench() MAUD_NOTHROW
         {
         }
-        benchsession()
+        bench()
             : conns_(0),
               estab_(0),
               bytes_(0)
@@ -216,11 +216,11 @@ namespace {
         static session_base*
         create(const char* sname)
         {
-            return new benchsession();
+            return new bench();
         }
     };
 
-    typedef basic_module<basic_factory<benchsession> > module;
+    typedef basic_module<basic_factory<bench> > module;
 }
 
 MAUD_ENTRYPOINTS(module::init, module::term)

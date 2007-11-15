@@ -29,7 +29,7 @@ namespace {
         }
     };
 
-    struct echosession : basic_session {
+    struct echo : basic_session {
         bool
         do_start(const char* sname)
         {
@@ -88,11 +88,11 @@ namespace {
         static session_base*
         create(const char* sname)
         {
-            return new echosession();
+            return new echo();
         }
     };
 
-    typedef basic_module<basic_factory<echosession> > module;
+    typedef basic_module<basic_factory<echo> > module;
 }
 
 MAUD_ENTRYPOINTS(module::init, module::term)

@@ -154,7 +154,7 @@ namespace {
         return os;
     }
 
-    struct schedsession : basic_session {
+    struct sched : basic_session {
         maud_id timer_;
         tmqueue queue_;
         void
@@ -302,21 +302,21 @@ namespace {
             ms = timerms(queue_, tv);
             aug_info("next expiry in %d ms", ms);
         }
-        ~schedsession() MAUD_NOTHROW
+        ~sched() MAUD_NOTHROW
         {
         }
-        schedsession()
+        sched()
             : timer_(-1)
         {
         }
         static session_base*
         create(const char* sname)
         {
-            return new schedsession();
+            return new sched();
         }
     };
 
-    typedef basic_module<basic_factory<schedsession> > module;
+    typedef basic_module<basic_factory<sched> > module;
 }
 
 MAUD_ENTRYPOINTS(module::init, module::term)
