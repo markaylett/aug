@@ -7,13 +7,13 @@
 #include "augutilpp/lexer.hpp"
 
 #include <string>
-#include <vector>
+#include <deque>
 
 namespace aug {
 
     class shellparser {
         lexer lexer_;
-        std::vector<std::string> words_;
+        std::deque<std::string> words_;
         bool
         consume(unsigned flags)
         {
@@ -38,7 +38,7 @@ namespace aug {
             return consume(finishlexer(lexer_));
         }
         void
-        reset(std::vector<std::string>& words)
+        reset(std::deque<std::string>& words)
         {
             words.swap(words_);
             words_.clear();
@@ -60,7 +60,7 @@ namespace aug {
     }
 
     inline void
-    resetshell(shellparser& parser, std::vector<std::string>& words)
+    resetshell(shellparser& parser, std::deque<std::string>& words)
     {
         parser.reset(words);
     }

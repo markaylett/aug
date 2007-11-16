@@ -243,5 +243,15 @@ aug_initshellwords(struct aug_words* st, int pairs,
 AUGUTIL_API void
 aug_putshellwords(struct aug_words* st, int ch)
 {
-    st->fn_(st, EOF == ch ? '\n' : ch);
+    switch (ch) {
+    case EOF:
+        st->fn_(st, '\n');
+        break;
+    case '\r':
+        /* Ignore. */
+        break;
+    default:
+        st->fn_(st, ch);
+        break;
+    }
 }

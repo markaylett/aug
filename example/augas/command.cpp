@@ -4,6 +4,7 @@
 #define MAUD_BUILD
 #include "maudpp.hpp"
 
+#include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
 using namespace aug;
@@ -12,16 +13,40 @@ using namespace std;
 
 namespace {
 
+    class method_base {
+        virtual bool
+        do_call(ostream& os, const deque<string>& args) = 0;
+    public:
+        virtual
+        ~method_base() MAUD_NOTHROW
+        {
+        }
+        bool
+        call(ostream& os, const deque<string>& args)
+        {
+            return do_call(os, args);
+        }
+        bool
+        operator ()(ostream& os, const deque<string>& args)
+        {
+            return do_call(os, args);
+        }
+    };
+
+    typedef smartptr<method_base> methodptr;
+
     string
     join(shellparser& parser)
     {
-        vector<string> words;
+        deque<string> words;
         stringstream ss;
         parser.reset(words);
         copy(words.begin(), words.end(),
              ostream_iterator<string>(ss, "]["));
         string s(ss.str());
-        return s.erase(s.size() - 1).insert(0, "[");
+        // Insert before erase for empty strings.
+        s.insert(0, "[");
+        return s.erase(s.size() - 1);
     }
 
     struct command : basic_session {
