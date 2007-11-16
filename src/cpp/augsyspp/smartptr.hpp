@@ -28,7 +28,12 @@ namespace aug {
     class smartptr {
 
         template <typename V, typename W>
-        friend class smartptr;
+        friend void
+        release(smartptr<V, W>&);
+
+        template <typename V, typename W>
+        friend void
+        retain(smartptr<V, W>&);
 
         typedef U scoped_lock;
         T* ptr_;
@@ -159,6 +164,20 @@ namespace aug {
             return ptr_;
         }
     };
+
+    template <typename T, typename U>
+    void
+    retain(smartptr<T, U>& sptr)
+    {
+        sptr.retain();
+    }
+
+    template <typename T, typename U>
+    void
+    release(smartptr<T, U>& sptr)
+    {
+        sptr.release();
+    }
 
     template <typename T, typename U, typename V, typename W>
     smartptr<T, U>

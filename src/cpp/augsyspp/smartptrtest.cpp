@@ -47,6 +47,8 @@ main(int argc, char* argv[])
         if (null != p2)
             throw error("comparison to null failed");
         p2 = testptr(new test(202));
+        retain(p2);
+        release(p2);
         if (free_ || 202 != p2->i_)
             throw error("failed to assign smartptr");
         p2 = null;
