@@ -4,7 +4,9 @@
 #ifndef AUGUTIL_EVENT_H
 #define AUGUTIL_EVENT_H
 
-#include "augutil/var.h"
+#include "augutil/config.h"
+
+#include "augobj.h"
 
 #define AUG_EVENTRECONF 1
 #define AUG_EVENTSTATUS 2
@@ -20,7 +22,7 @@
 
 struct aug_event {
     int type_;
-    struct aug_var var_;
+    aug_object_t user_;
 };
 
 /**

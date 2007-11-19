@@ -25,6 +25,7 @@ modinclude_HEADERS = \
 	log.h \
 	md5.h \
 	networds.h \
+	object.h \
 	path.h \
 	pwd.h \
 	shellwords.h \
@@ -50,6 +51,7 @@ libaugutil_la_SOURCES = \
 	log.c \
 	md5.c \
 	networds.c \
+	object.c \
 	path.c \
 	pwd.c \
 	shellwords.c \

@@ -35,6 +35,9 @@ namespace aug {
         friend void
         retain(smartptr<V, W>&);
 
+        template <typename V, typename W>
+        friend class smartptr;
+
         typedef U scoped_lock;
         T* ptr_;
         unsigned* refs_;
@@ -74,7 +77,7 @@ namespace aug {
             release();
         }
         smartptr(const null_&) AUG_NOTHROW
-        : ptr_(0),
+        :   ptr_(0),
             refs_(0)
         {
         }

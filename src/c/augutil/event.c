@@ -7,6 +7,8 @@
 
 AUG_RCSID("$Id$");
 
+#include "augutil/object.h"
+
 #include "augsys/barrier.h"
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
@@ -75,8 +77,7 @@ aug_setsigevent(struct aug_event* event, int sig)
     default:
         event->type_ = AUG_EVENTSIGNAL;
     }
-    event->var_.type_ = NULL;
-    event->var_.arg_ = aug_itop(sig);
+    event->user_ = (aug_object_t)aug_createintobj(sig, NULL);
     return event;
 }
 

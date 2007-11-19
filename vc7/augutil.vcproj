@@ -162,6 +162,9 @@
 				RelativePath="..\src\c\augutil\networds.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augutil\object.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augutil\path.c">
 			</File>
 			<File
@@ -222,6 +225,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\networds.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augutil\object.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\path.h">

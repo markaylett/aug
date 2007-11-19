@@ -64,9 +64,9 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugutil_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugutil_la_OBJECTS = clock.lo config.lo conv.lo event.lo file.lo \
-	getopt.lo lexer.lo list.lo log.lo md5.lo networds.lo path.lo \
-	pwd.lo shellwords.lo timer.lo tmspec.lo types.lo var.lo \
-	xstr.lo
+	getopt.lo lexer.lo list.lo log.lo md5.lo networds.lo object.lo \
+	path.lo pwd.lo shellwords.lo timer.lo tmspec.lo types.lo \
+	var.lo xstr.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
 am_clocktest_OBJECTS = clocktest.$(OBJEXT)
 clocktest_OBJECTS = $(am_clocktest_OBJECTS)
@@ -265,6 +265,7 @@ modinclude_HEADERS = \
 	log.h \
 	md5.h \
 	networds.h \
+	object.h \
 	path.h \
 	pwd.h \
 	shellwords.h \
@@ -288,6 +289,7 @@ libaugutil_la_SOURCES = \
 	log.c \
 	md5.c \
 	networds.c \
+	object.c \
 	path.c \
 	pwd.c \
 	shellwords.c \
@@ -436,6 +438,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md5.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/networds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/networdstest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pwd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shelllexertest.Po@am__quote@

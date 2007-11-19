@@ -14,6 +14,7 @@
 #include "augutil/log.h"
 #include "augutil/md5.h"
 #include "augutil/networds.h"
+#include "augutil/object.h"
 #include "augutil/path.h"
 #include "augutil/pwd.h"
 #include "augutil/shellwords.h"

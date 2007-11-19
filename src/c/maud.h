@@ -4,6 +4,8 @@
 #ifndef MAUD_H
 #define MAUD_H
 
+#include "augobj.h"
+
 #include <stdarg.h>    /* va_list */
 #include <stdlib.h>    /* NULL */
 #include <sys/types.h> /* size_t */
@@ -30,29 +32,6 @@
 #else /* MAUD_BUILD */
 # define MAUD_API MAUD_EXTERNC MAUD_EXPORT
 #endif /* MAUD_BUILD */
-
-/* Also defined in augutil/var.h. */
-
-#if !defined(AUG_VARTYPE)
-# define AUG_VARTYPE
-struct aug_vartype {
-    int (*destroy_)(void*);
-    const void* (*buf_)(void*, size_t*);
-};
-#endif /* !AUG_VARTYPE */
-
-/* Also defined in augutil/var.h. */
-
-#if !defined(AUG_VAR)
-# define AUG_VAR
-struct aug_var {
-    const struct aug_vartype* type_;
-    void* arg_;
-};
-#endif /* AUG_VAR */
-
-#define maud_vartype aug_vartype
-#define maud_var     aug_var
 
 enum maud_loglevel {
     MAUD_LOGCRIT,
@@ -139,16 +118,16 @@ typedef int maud_id;
 
 struct maud_session {
     char name_[MAUD_MAXNAME + 1];
-    void* user_;
+    aug_object_t user_;
 };
 
 /**
    Both sockets are timers are represented by objects.
 */
 
-struct maud_object {
+struct maud_handle {
     maud_id id_;
-    void* user_;
+    aug_object_t user_;
 };
 
 struct maud_host {
@@ -224,8 +203,7 @@ struct maud_host {
        \sa dispatch_()
     */
 
-    int (*post_)(const char* to, const char* type,
-                 const struct maud_var* user);
+    int (*post_)(const char* to, const char* type, aug_object_t user);
 
     /**
        The remaining functions are not thread-safe.
@@ -240,13 +218,10 @@ struct maud_host {
 
        \param user Optional user data.
 
-       \param size Size of optional user data.
-
        \sa post_()
     */
 
-    int (*dispatch_)(const char* to, const char* type, const void* user,
-                     size_t size);
+    int (*dispatch_)(const char* to, const char* type, aug_object_t user);
 
     /**
        Read a configuration value.
@@ -296,7 +271,7 @@ struct maud_host {
        \return The connection id.
     */
 
-    int (*tcpconnect_)(const char* host, const char* port, void* user);
+    int (*tcpconnect_)(const char* host, const char* port, aug_object_t user);
 
     /**
        Bind tcp listener socket.
@@ -308,7 +283,7 @@ struct maud_host {
        \param user Optional user data.
     */
 
-    int (*tcplisten_)(const char* host, const char* port, void* user);
+    int (*tcplisten_)(const char* host, const char* port, aug_object_t user);
 
     /**
        Send data to peer.
@@ -334,7 +309,7 @@ struct maud_host {
        \param user User data.
     */
 
-    int (*sendv_)(maud_id cid, const struct maud_var* user);
+    int (*sendv_)(maud_id cid, aug_blob_t blob);
 
     /**
        Set read/write timer.
@@ -379,7 +354,7 @@ struct maud_host {
        \param user Optional user data.
     */
 
-    int (*settimer_)(unsigned ms, const struct maud_var* user);
+    int (*settimer_)(unsigned ms, aug_object_t user);
 
     /**
        Reset timer.
@@ -467,12 +442,9 @@ struct maud_module {
        \param type Event type.
 
        \param user User data.
-
-       \param size Size of user data.
     */
 
-    void (*event_)(const char* from, const char* type, const void* user,
-                   size_t size);
+    void (*event_)(const char* from, const char* type, aug_object_t user);
 
     /**
        Connection closure.
@@ -480,7 +452,7 @@ struct maud_module {
        \param sock The closed socket.
     */
 
-    void (*closed_)(const struct maud_object* sock);
+    void (*closed_)(const struct maud_handle* sock);
 
     /**
        Teardown request.
@@ -488,7 +460,7 @@ struct maud_module {
        \param sock TODO
     */
 
-    void (*teardown_)(const struct maud_object* sock);
+    void (*teardown_)(const struct maud_handle* sock);
 
     /**
        Acceptance of socket connection.
@@ -505,7 +477,7 @@ struct maud_module {
        \return either #MAUD_OK or #MAUD_ERROR.
     */
 
-    int (*accepted_)(struct maud_object* sock, const char* addr,
+    int (*accepted_)(struct maud_handle* sock, const char* addr,
                      unsigned short port);
 
     /**
@@ -523,7 +495,7 @@ struct maud_module {
        \sa tcpconnect_()
     */
 
-    void (*connected_)(struct maud_object* sock, const char* addr,
+    void (*connected_)(struct maud_handle* sock, const char* addr,
                        unsigned short port);
 
     /**
@@ -536,7 +508,7 @@ struct maud_module {
        \param len Length of data buffer.
     */
 
-    void (*data_)(const struct maud_object* sock, const void* buf,
+    void (*data_)(const struct maud_handle* sock, const void* buf,
                   size_t len);
 
     /**
@@ -548,7 +520,7 @@ struct maud_module {
        specify a new value; a value of zero will cancel the timer.
     */
 
-    void (*rdexpire_)(const struct maud_object* sock, unsigned* ms);
+    void (*rdexpire_)(const struct maud_handle* sock, unsigned* ms);
 
     /**
        Expiry of write timer.
@@ -559,7 +531,7 @@ struct maud_module {
        specify a new value; a value of zero will cancel the timer.
     */
 
-    void (*wrexpire_)(const struct maud_object* sock, unsigned* ms);
+    void (*wrexpire_)(const struct maud_handle* sock, unsigned* ms);
 
     /**
        Timer expiry.
@@ -570,7 +542,7 @@ struct maud_module {
        specify a new value; a value of zero will cancel the timer.
     */
 
-    void (*expire_)(const struct maud_object* timer, unsigned* ms);
+    void (*expire_)(const struct maud_handle* timer, unsigned* ms);
 
     /**
        Authorisation of peer certificate.
@@ -584,7 +556,7 @@ struct maud_module {
        \return either #MAUD_OK or #MAUD_ERROR.
     */
 
-    int (*authcert_)(const struct maud_object* sock, const char* subject,
+    int (*authcert_)(const struct maud_handle* sock, const char* subject,
                      const char* issuer);
 };
 

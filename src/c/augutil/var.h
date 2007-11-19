@@ -8,25 +8,15 @@
 
 #include "augsys/types.h"
 
-/* Also defined in maud.h. */
-
-#if !defined(AUG_VARTYPE)
-# define AUG_VARTYPE
 struct aug_vartype {
     int (*destroy_)(void*);
     const void* (*buf_)(void*, size_t*);
 };
-#endif /* !AUG_VARTYPE */
 
-/* Also defined in maud.h. */
-
-#if !defined(AUG_VAR)
-# define AUG_VAR
 struct aug_var {
     const struct aug_vartype* type_;
     void* arg_;
 };
-#endif /* AUG_VAR */
 
 #define AUG_VARNULL { NULL, NULL }
 
