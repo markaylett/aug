@@ -16,7 +16,7 @@ namespace aug {
         fdref ref_;
 
         smartfd(fdref ref, bool retain) AUG_NOTHROW
-        : ref_(ref)
+            : ref_(ref)
         {
             if (retain && null != ref)
                 retainfd(ref.get());

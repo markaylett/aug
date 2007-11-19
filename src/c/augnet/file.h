@@ -7,8 +7,7 @@
 #include "augnet/config.h"
 
 #include "augutil/list.h"
-
-struct aug_var;
+#include "augutil/object.h"
 
 /**
    #AUG_INIT should be used to initialise the aug_files structure.
@@ -21,12 +20,12 @@ AUG_HEAD(aug_files, aug_file_);
    Callback function has a boolean return value: returning false removes the
    file.
 */
-typedef int (*aug_filecb_t)(const struct aug_var*, int);
+typedef int (*aug_filecb_t)(aug_object_t, int);
 
 /**
    Destroy each file in the list.
 
-   aug_destroyvar() is called for each var associated with each file.
+   aug_releaseobject() is called for each obj associated with each file.
 
    \param files List of files to be destroyed.
  */
@@ -37,18 +36,17 @@ aug_destroyfiles(struct aug_files* files);
 /**
    Insert file into file list.
 
-   If aug_insertfile() succeeds, aug_destroyvar() will be called when the file is
-   removed.
+   If aug_insertfile() succeeds, aug_retainobject() will be called on "user".
 
    \param files The file list.
    \param fd File descriptor.
    \param cb Callback to be called during aug_foreachfile() iterations.
-   \param var User variable; may be NULL.
+   \param user Optional user variable.
 */
 
 AUGNET_API int
 aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
-               const struct aug_var* var);
+               aug_object_t user);
 
 /**
    Remove file from list.

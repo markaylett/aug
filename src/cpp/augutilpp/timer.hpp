@@ -4,8 +4,6 @@
 #ifndef AUGUTILPP_TIMER_HPP
 #define AUGUTILPP_TIMER_HPP
 
-#include "augutilpp/var.hpp"
-
 #include "augsyspp/exception.hpp"
 
 #include "augutil/list.h"

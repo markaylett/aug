@@ -19,44 +19,39 @@
     int (*retain_)(struct type*);               \
     int (*release_)(struct type*)
 
-typedef struct aug_object* aug_object_t;
+struct aug_objectvtbl;
+
+typedef struct aug_object {
+    const struct aug_objectvtbl* vtbl_;
+}* aug_object_t;
+
+#define aug_objecttype() "aug_object"
 
 struct aug_objectvtbl {
     AUG_OBJECT(aug_object);
 };
 
-struct aug_object {
-    const struct aug_objectvtbl* vtbl_;
-};
+#define aug_castobject(obj, type)                           \
+    ((aug_object_t)(obj))->vtbl_->cast_((void*)obj, type)
 
-#define aug_castobject(obj, type)               \
-    (obj)->vtbl_->cast_(obj, type)
+#define aug_retainobject(obj)                           \
+    ((aug_object_t)(obj))->vtbl_->retain_((void*)obj)
 
-#define aug_retainobject(obj)                   \
-    (obj)->vtbl_->retain_(obj)
+#define aug_releaseobject(obj)                          \
+    ((aug_object_t)(obj))->vtbl_->release_((void*)obj)
 
-#define aug_releaseobject(obj)                  \
-    (obj)->vtbl_->release_(obj)
+struct aug_blobvtbl;
 
-typedef struct aug_blob* aug_blob_t;
+typedef struct aug_blob {
+    const struct aug_blobvtbl* vtbl_;
+}* aug_blob_t;
+
+#define aug_blobtype() "aug_blob"
 
 struct aug_blobvtbl {
     AUG_OBJECT(aug_blob);
     const void* (*data_)(aug_blob_t, size_t*);
 };
-
-struct aug_blob {
-    const struct aug_blobvtbl* vtbl_;
-};
-
-#define aug_castblob(obj, type)                 \
-    (obj)->vtbl_->cast_(obj, type)
-
-#define aug_retainblob(obj)                     \
-    (obj)->vtbl_->retain_(obj)
-
-#define aug_releaseblob(obj)                    \
-    (obj)->vtbl_->release_(obj)
 
 #define aug_blobdata(obj, size)                 \
     (obj)->vtbl_->data_(obj, size)

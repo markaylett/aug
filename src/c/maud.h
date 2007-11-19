@@ -196,7 +196,7 @@ struct maud_host {
 
        \param to Target session name.
 
-       \param type Type name associated with "var".
+       \param type Type name associated with "user".
 
        \param user Optional user data.
 

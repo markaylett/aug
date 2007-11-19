@@ -149,11 +149,11 @@ static const struct aug_fdtype fdtype_ = {
 };
 
 static int
-nbfilecb_(const struct aug_var* var, struct aug_nbfile* nbfile)
+nbfilecb_(aug_object_t user, struct aug_nbfile* nbfile)
 {
     int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
     return events
-        ? nbfile->cb_(var, nbfile->fd_, (unsigned short)events) : 1;
+        ? nbfile->cb_(user, nbfile->fd_, (unsigned short)events) : 1;
 }
 
 static int
@@ -189,12 +189,12 @@ static const struct aug_nbtype nbtype_ = {
 };
 
 static int
-filecb_(const struct aug_var* var, int fd)
+filecb_(aug_object_t user, int fd)
 {
     struct aug_nbfile nbfile;
     if (!aug_getnbfile(fd, &nbfile))
         return 0; /* Not found so remove. */
-    return nbfile.type_->filecb_(var, &nbfile);
+    return nbfile.type_->filecb_(user, &nbfile);
 }
 
 AUGNET_API aug_nbfiles_t
@@ -226,7 +226,7 @@ aug_destroynbfiles(aug_nbfiles_t nbfiles)
 
 AUGNET_API int
 aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
-                 const struct aug_var* var)
+                 aug_object_t user)
 {
     struct aug_nbfile nbfile;
 
@@ -239,7 +239,7 @@ aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
     nbfile.ext_ = NULL;
 
     if (!aug_setnbfile(fd, &nbfile)
-        || -1 == aug_insertfile(&nbfiles->files_, fd, filecb_, var)) {
+        || -1 == aug_insertfile(&nbfiles->files_, fd, filecb_, user)) {
 
         /* On failure, restore original file type. */
 

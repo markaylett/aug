@@ -21,7 +21,7 @@ AUG_RCSID("$Id$");
 
 struct aug_httpparser_ {
     const struct aug_httphandler* handler_;
-    struct aug_var var_;
+    aug_object_t user_;
     aug_lexer_t lexer_;
     char name_[AUG_MAXLINE];
     enum {
@@ -40,7 +40,7 @@ initial_(aug_httpparser_t parser)
        reached. */
 
     return parser->handler_
-        ->initial_(&parser->var_, aug_lexertoken(parser->lexer_));
+        ->initial_(parser->user_, aug_lexertoken(parser->lexer_));
 }
 
 static int
@@ -67,11 +67,11 @@ value_(aug_httpparser_t parser)
                 return -1;
 
             parser->csize_ = (int)csize;
-            return parser->handler_->csize_(&parser->var_, csize);
+            return parser->handler_->csize_(parser->user_, csize);
         }
     }
 
-    return parser->handler_->field_(&parser->var_, parser->name_,
+    return parser->handler_->field_(parser->user_, parser->name_,
                                     aug_lexertoken(parser->lexer_));
 }
 
@@ -80,7 +80,7 @@ end_(aug_httpparser_t parser, int commit)
 {
     parser->state_ = INITIAL_;
     parser->csize_ = 0;
-    return parser->handler_->end_(&parser->var_, commit);
+    return parser->handler_->end_(parser->user_, commit);
 }
 
 static int
@@ -183,7 +183,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
         parser->csize_ -= size;
 
-        if (-1 == parser->handler_->cdata_(&parser->var_, buf, size))
+        if (-1 == parser->handler_->cdata_(parser->user_, buf, size))
             return -1;
 
         /* Entire buffer consumed. */
@@ -194,7 +194,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
     /* Consume enough of the buffer to fulfil content. */
 
     if ((size = parser->csize_)
-        && -1 == parser->handler_->cdata_(&parser->var_, buf, size))
+        && -1 == parser->handler_->cdata_(parser->user_, buf, size))
         return -1;
 
     /* End of message (with commit). */
@@ -207,7 +207,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
 AUGNET_API aug_httpparser_t
 aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
-                     const struct aug_var* var)
+                     aug_object_t user)
 {
     aug_httpparser_t parser = malloc(sizeof(struct aug_httpparser_));
     aug_lexer_t lexer;
@@ -223,7 +223,8 @@ aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
     }
 
     parser->handler_ = handler;
-    aug_setvar(&parser->var_, var);
+    if ((parser->user_ = user))
+        aug_retainobject(user);
     parser->lexer_ = lexer;
     parser->name_[0] = '\0';
     parser->state_ = INITIAL_;
@@ -235,7 +236,8 @@ AUGNET_API int
 aug_destroyhttpparser(aug_httpparser_t parser)
 {
     int ret = aug_destroylexer(parser->lexer_);
-    aug_destroyvar(&parser->var_);
+    if (parser->user_)
+        aug_releaseobject(parser->user_);
     free(parser);
     return ret;
 }

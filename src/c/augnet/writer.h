@@ -6,9 +6,9 @@
 
 #include "augnet/config.h"
 
-#include "augsys/types.h"
+#include "augutil/object.h"
 
-struct aug_var;
+#include "augsys/types.h"
 
 typedef struct aug_writer_* aug_writer_t;
 
@@ -19,7 +19,7 @@ AUGNET_API int
 aug_destroywriter(aug_writer_t writer);
 
 AUGNET_API int
-aug_appendwriter(aug_writer_t writer, const struct aug_var* var);
+aug_appendwriter(aug_writer_t writer, aug_blob_t blob);
 
 AUGNET_API int
 aug_writerempty(aug_writer_t writer);

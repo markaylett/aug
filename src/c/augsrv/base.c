@@ -64,7 +64,7 @@ signalhandler_(int sig)
 static BOOL WINAPI
 ctrlhandler_(DWORD ctrl)
 {
-    struct aug_event event = { AUG_EVENTSTOP, AUG_VARNULL };
+    struct aug_event event = { AUG_EVENTSTOP, NULL };
     aug_info("handling console interrupt");
     if (!aug_writeevent(fds_[1], &event))
         aug_perrinfo(NULL, "aug_writeevent() failed");

@@ -51,7 +51,7 @@ handler_(DWORD code)
 {
     /* TODO: restore original status on failure to write event. */
 
-    struct aug_event event = { 0, AUG_VARNULL };
+    struct aug_event event = { 0, NULL };
     switch (code) {
     case RECONF_:
         event.type_ = AUG_EVENTRECONF;

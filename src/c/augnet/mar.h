@@ -6,26 +6,27 @@
 
 #include "augnet/config.h"
 
+#include "augutil/object.h"
+
 #include "augmar/types.h"
+
 #include "augsys/types.h"
 
-struct aug_var;
-
 struct aug_marhandler {
-    aug_mar_t (*create_)(const struct aug_var*, const char*);
-    int (*message_)(const struct aug_var*, const char*, aug_mar_t);
+    aug_mar_t (*create_)(aug_object_t, const char*);
+    int (*message_)(aug_object_t, const char*, aug_mar_t);
 };
 
 typedef struct aug_marparser_* aug_marparser_t;
 
 /**
-   If aug_createmarparser() succeeds, aug_destroyvar() will be called from
+   If aug_createmarparser() succeeds, aug_releaseobject() will be called from
    aug_destroymarparser().
 */
 
 AUGNET_API aug_marparser_t
 aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
-                    const struct aug_var* var);
+                    aug_object_t user);
 
 AUGNET_API int
 aug_destroymarparser(aug_marparser_t parser);

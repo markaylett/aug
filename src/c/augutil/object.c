@@ -7,6 +7,9 @@
 
 AUG_RCSID("$Id$");
 
+#include "augsys/errinfo.h"
+#include "augsys/errno.h"
+
 #include <stdlib.h> /* malloc() */
 #include <string.h>
 
@@ -20,7 +23,7 @@ struct intobjimpl_ {
 static void*
 castintobj_(aug_intobj_t obj, const char* type)
 {
-    if (0 == strcmp(type, "object") || 0 == strcmp(type, "intobj")) {
+    if (0 == strcmp(type, "aug.object") || 0 == strcmp(type, "aug.intobj")) {
         obj->vtbl_->retain_(obj);
         return obj;
     }
@@ -62,6 +65,10 @@ AUGUTIL_API aug_intobj_t
 aug_createintobj(int i, void (*destroy)(int))
 {
     struct intobjimpl_* impl = malloc(sizeof(struct intobjimpl_));
+    if (!impl) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        return NULL;
+    }
 
     impl->intobj_.vtbl_ = &intobjvtbl_;
     impl->refs_ = 1;
@@ -69,6 +76,19 @@ aug_createintobj(int i, void (*destroy)(int))
     impl->i_ = i;
 
     return &impl->intobj_;
+}
+
+AUGUTIL_API int
+aug_objtoint(aug_object_t obj)
+{
+    int i;
+    aug_intobj_t tmp;
+    if (obj && (tmp = aug_castobject(obj, "aug.intobj"))) {
+        i = aug_getintobj(tmp);
+        aug_releaseobject(tmp);
+    } else
+        i = 0;
+    return i;
 }
 
 struct ptrobjimpl_ {
@@ -81,7 +101,7 @@ struct ptrobjimpl_ {
 static void*
 castptrobj_(aug_ptrobj_t obj, const char* type)
 {
-    if (0 == strcmp(type, "object") || 0 == strcmp(type, "ptrobj")) {
+    if (0 == strcmp(type, "aug.object") || 0 == strcmp(type, "aug.ptrobj")) {
         obj->vtbl_->retain_(obj);
         return obj;
     }
@@ -123,6 +143,10 @@ AUGUTIL_API aug_ptrobj_t
 aug_createptrobj(void* p, void (*destroy)(void*))
 {
     struct ptrobjimpl_* impl = malloc(sizeof(struct ptrobjimpl_));
+    if (!impl) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        return NULL;
+    }
 
     impl->ptrobj_.vtbl_ = &ptrobjvtbl_;
     impl->refs_ = 1;
@@ -130,4 +154,17 @@ aug_createptrobj(void* p, void (*destroy)(void*))
     impl->p_ = p;
 
     return &impl->ptrobj_;
+}
+
+AUGUTIL_API void*
+aug_objtoptr(aug_object_t obj)
+{
+    void* p;
+    aug_ptrobj_t tmp;
+    if (obj && (tmp = aug_castobject(obj, "aug.ptrobj"))) {
+        p = aug_getptrobj(tmp);
+        aug_releaseobject(tmp);
+    } else
+        p = NULL;
+    return p;
 }

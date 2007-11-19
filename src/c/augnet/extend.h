@@ -16,7 +16,7 @@ struct aug_nbfiles_ {
 };
 
 struct aug_nbtype {
-    int (*filecb_)(const struct aug_var*, struct aug_nbfile*);
+    int (*filecb_)(aug_object_t, struct aug_nbfile*);
     int (*seteventmask_)(struct aug_nbfile*, unsigned short);
     int (*eventmask_)(struct aug_nbfile*);
     int (*events_)(struct aug_nbfile*);

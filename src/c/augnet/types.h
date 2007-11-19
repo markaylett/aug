@@ -4,14 +4,15 @@
 #ifndef AUGNET_TYPES_H
 #define AUGNET_TYPES_H
 
+#include "augutil/object.h"
+
 #include "augsys/types.h"
 
 struct aug_files;
 struct aug_nbtype;
-struct aug_var;
 
 typedef struct aug_nbfiles_* aug_nbfiles_t;
-typedef int (*aug_nbfilecb_t)(const struct aug_var*, int, unsigned short);
+typedef int (*aug_nbfilecb_t)(aug_object_t, int, unsigned short);
 
 struct aug_nbfile {
     aug_nbfiles_t nbfiles_;

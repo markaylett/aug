@@ -27,7 +27,7 @@ AUG_RCSID("$Id$");
 
 struct aug_buf {
     AUG_ENTRY(aug_buf);
-    struct aug_var var_;
+    aug_blob_t blob_;
 };
 
 AUG_HEAD(aug_bufs, aug_buf);
@@ -42,7 +42,7 @@ struct aug_writer_ {
 };
 
 static struct aug_buf*
-createbuf_(const struct aug_var* var)
+createbuf_(aug_blob_t blob)
 {
     struct aug_buf* buf;
 
@@ -53,13 +53,19 @@ createbuf_(const struct aug_var* var)
     }
     aug_unlock();
 
-    aug_setvar(&buf->var_, var);
+    if (blob)
+        aug_retainobject(blob);
     return buf;
 }
 
 static void
 destroybufs_(struct aug_bufs* bufs)
 {
+    struct aug_buf* it;
+    AUG_FOREACH(it, bufs)
+        if (it->blob_)
+            aug_releaseobject(it->blob_);
+
     if (!AUG_EMPTY(bufs)) {
         aug_lock();
         AUG_CONCAT(&free_, bufs);
@@ -70,6 +76,9 @@ destroybufs_(struct aug_bufs* bufs)
 static void
 destroybuf_(struct aug_buf* buf)
 {
+    if (buf->blob_)
+        aug_releaseobject(buf->blob_);
+
     aug_lock();
     AUG_INSERT_TAIL(&free_, buf);
     aug_unlock();
@@ -84,7 +93,6 @@ popbufs_(aug_writer_t writer, const struct iovec* iov, size_t num)
         assert(it);
         AUG_REMOVE_HEAD(&writer->bufs_);
 
-        aug_destroyvar(&it->var_);
         destroybuf_(it);
 
         --writer->size_;
@@ -116,7 +124,7 @@ aug_destroywriter(aug_writer_t writer)
 {
     struct aug_buf* it;
     AUG_FOREACH(it, &writer->bufs_) {
-        aug_destroyvar(&it->var_);
+        aug_releaseobject(it->blob_);
     }
 
     /* Destroy in single batch to avoid multiple calls to aug_lock(). */
@@ -126,10 +134,11 @@ aug_destroywriter(aug_writer_t writer)
 }
 
 AUGNET_API int
-aug_appendwriter(aug_writer_t writer, const struct aug_var* var)
+aug_appendwriter(aug_writer_t writer, aug_blob_t blob)
 {
-    struct aug_buf* buf = createbuf_(var);
-    if (!buf)
+    struct aug_buf* buf;
+    assert(blob);
+    if (!(buf = createbuf_(blob)))
         return -1;
 
     AUG_INSERT_TAIL(&writer->bufs_, buf);
@@ -152,7 +161,7 @@ aug_writersize(aug_writer_t writer)
     AUG_FOREACH(it, &writer->bufs_) {
 
         size_t len;
-        if (!aug_varbuf(&it->var_, &len)) {
+        if (!aug_blobdata(it->blob_, &len)) {
             aug_seterrinfo
                 (NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EDOMAIN,
                  AUG_MSG("failed conversion from var to buffer"));
@@ -186,7 +195,7 @@ aug_writesome(aug_writer_t writer, int fd)
     i = 0;
     AUG_FOREACH(it, &writer->bufs_) {
 
-        if (!(iov[i].iov_base = (void*)aug_varbuf(&it->var_, &len))) {
+        if (!(iov[i].iov_base = (void*)aug_blobdata(it->blob_, &len))) {
             aug_seterrinfo
                 (NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EDOMAIN,
                  AUG_MSG("failed conversion from var to buffer"));

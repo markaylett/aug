@@ -145,7 +145,7 @@ flush_(aug_base64_t base64)
     size_t pos = base64->pos_;
     base64->pos_ = 0;
     base64->buf_[pos] = '\0';
-    return base64->cb_(&base64->var_, base64->buf_, pos);
+    return base64->cb_(base64->user_, base64->buf_, pos);
 }
 
 static int
@@ -557,7 +557,8 @@ aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb,
 AUGNET_API int
 aug_destroybase64(aug_base64_t base64)
 {
-    aug_destroyvar(&base64->var_);
+    if (base64->user_)
+        aug_releaseobject(base64->user_);
     free(base64);
     return 0;
 }

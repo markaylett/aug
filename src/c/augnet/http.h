@@ -6,28 +6,28 @@
 
 #include "augnet/config.h"
 
+#include "augutil/object.h"
+
 #include "augsys/types.h"
 
-struct aug_var;
-
 struct aug_httphandler {
-    int (*initial_)(const struct aug_var*, const char*);
-    int (*field_)(const struct aug_var*, const char*, const char*);
-    int (*csize_)(const struct aug_var*, unsigned);
-    int (*cdata_)(const struct aug_var*, const void*, unsigned);
-    int (*end_)(const struct aug_var*, int);
+    int (*initial_)(aug_object_t, const char*);
+    int (*field_)(aug_object_t, const char*, const char*);
+    int (*csize_)(aug_object_t, unsigned);
+    int (*cdata_)(aug_object_t, const void*, unsigned);
+    int (*end_)(aug_object_t, int);
 };
 
 typedef struct aug_httpparser_* aug_httpparser_t;
 
 /**
-   If aug_createhttpparser() succeeds, aug_destroyvar() will be called from
+   If aug_createhttpparser() succeeds, aug_releaseobject() will be called from
    aug_destroyhttpparser().
 */
 
 AUGNET_API aug_httpparser_t
 aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
-                     const struct aug_var* var);
+                     aug_object_t user);
 
 AUGNET_API int
 aug_destroyhttpparser(aug_httpparser_t parser);
