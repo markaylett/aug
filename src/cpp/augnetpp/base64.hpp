@@ -6,9 +6,10 @@
 
 #include "augnetpp/config.hpp"
 
-#include "augutilpp/var.hpp"
+#include "augutilpp/object.hpp"
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp"
 
 #include "augnet/base64.h"
 
@@ -101,15 +102,15 @@ namespace aug {
 
     namespace detail {
         inline void
-        base64os(const aug_var& var, const char* buf, size_t len)
+        base64os(aug_object_t user, const char* buf, size_t len)
         {
-            std::ostream& os(*static_cast<std::ostream*>(var.arg_));
+            std::ostream& os(*objtoptr<std::ostream*>(user));
 			os.write(buf, static_cast<std::streamsize>(len));
         }
         inline void
-        base64str(const aug_var& var, const char* buf, size_t len)
+        base64str(aug_object_t user, const char* buf, size_t len)
         {
-            std::string& str(*static_cast<std::string*>(var.arg_));
+            std::string& str(*objtoptr<std::string*>(user));
             str.append(buf, static_cast<std::streamsize>(len));
         }
     }
@@ -117,8 +118,8 @@ namespace aug {
     inline std::ostream&
     filterbase64(std::ostream& os, std::istream& is, aug_base64mode mode)
     {
-        aug_var var = { 0, &os };
-        base64 b64(mode, base64cb<detail::base64os>, var);
+        smartobj<aug_ptrobj_t> sobj(createptrobj(&os, 0));
+        base64 b64(mode, base64cb<detail::base64os>, sobj);
         char buf[AUG_MAXLINE];
         do {
             is.read(buf, sizeof(buf));
@@ -133,8 +134,8 @@ namespace aug {
     filterbase64(const char* buf, size_t len, aug_base64mode mode)
     {
         std::string s;
-        aug_var var = { 0, &s };
-        base64 b64(mode, base64cb<detail::base64str>, var);
+        smartobj<aug_ptrobj_t> sobj(createptrobj(&s, 0));
+        base64 b64(mode, base64cb<detail::base64str>, sobj);
         appendbase64(b64, buf, len);
         finishbase64(b64);
         return s;

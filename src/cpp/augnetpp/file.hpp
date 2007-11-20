@@ -6,8 +6,6 @@
 
 #include "augnetpp/config.hpp"
 
-#include "augutilpp/var.hpp"
-
 #include "augsyspp/exception.hpp"
 #include "augsyspp/smartfd.hpp"
 
@@ -22,12 +20,12 @@
 
 namespace aug {
 
-    template <bool (*T)(const aug_var&, int)>
+    template <bool (*T)(aug_object_t, int)>
     int
-    filecb(const aug_var* var, int fd) AUG_NOTHROW
+    filecb(aug_object_t user, int fd) AUG_NOTHROW
     {
         try {
-            return T(*var, fd) ? 1 : 0;
+            return T(user, fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
 
         /**
@@ -39,20 +37,20 @@ namespace aug {
 
     template <typename T, bool (T::*U)(int)>
     int
-    filememcb(const aug_var* var, int fd) AUG_NOTHROW
+    filememcb(aug_object_t user, int fd) AUG_NOTHROW
     {
         try {
-            return (static_cast<T*>(var->arg_)->*U)(fd) ? 1 : 0;
+            return (objtoptr<T*>(user)->*U)(fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
 
     template <typename T>
     int
-    filememcb(const aug_var* var, int fd) AUG_NOTHROW
+    filememcb(aug_object_t user, int fd) AUG_NOTHROW
     {
         try {
-            return static_cast<T*>(var->arg_)->filecb(fd) ? 1 : 0;
+            return objtoptr<T*>(user)->filecb(fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
@@ -96,9 +94,9 @@ namespace aug {
 
     inline void
     insertfile(aug_files& files, fdref ref, aug_filecb_t cb,
-               const aug_var& var)
+               aug_object_t user)
     {
-        verify(aug_insertfile(&files, ref.get(), cb, &var));
+        verify(aug_insertfile(&files, ref.get(), cb, user));
     }
 
     inline void

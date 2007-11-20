@@ -7,50 +7,58 @@
 #include <stddef.h>
 #include <sys/types.h> /* size_t */
 
+/*
+  The offsetof() macro can only be used for PODs.  GCC will emit the following
+  warning when used on non-POD types:
+
+  warning: (perhaps the `offsetof' macro was used incorrectly)
+ */
+
 #if !defined(offsetof)
 # define offsetof(s, m) (size_t)&(((s*)0)->m)
 #endif /* !offsetof */
 
-#define AUG_IMPL(s, m, ptr)                             \
+#define AUG_PODIMPL(s, m, ptr)                          \
     (ptr ? (s*)((char*)(ptr) - offsetof(s, m)) : NULL)
 
+#if !defined(AUG_MKSTR)
+# define AUG_MKSTR_(x) #x
+# define AUG_MKSTR(x) AUG_MKSTR_(x)
+#endif /* !AUG_MKSTR */
+
+#define AUG_OBJECTDECL(type)                        \
+    struct type##vtbl;                              \
+    typedef struct {                                \
+            const struct type##vtbl* vtbl_;         \
+            void* impl_;                            \
+    } type;                                         \
+    static const char type##id[] = AUG_MKSTR(type)
+
 #define AUG_OBJECT(type)                        \
-    void* (*cast_)(struct type*, const char*);  \
-    int (*retain_)(struct type*);               \
-    int (*release_)(struct type*)
+    void* (*cast_)(type*, const char*);         \
+    int (*retain_)(type*);                      \
+    int (*release_)(type*)
 
-struct aug_objectvtbl;
-
-typedef struct aug_object {
-    const struct aug_objectvtbl* vtbl_;
-}* aug_object_t;
-
-#define aug_objecttype() "aug_object"
+AUG_OBJECTDECL(aug_object);
 
 struct aug_objectvtbl {
     AUG_OBJECT(aug_object);
 };
 
 #define aug_castobject(obj, type)                                   \
-    ((aug_object_t)(obj))->vtbl_->cast_((aug_object_t)(obj), type)
+    ((aug_object*)(obj))->vtbl_->cast_((aug_object*)(obj), type)
 
 #define aug_retainobject(obj)                                   \
-    ((aug_object_t)(obj))->vtbl_->retain_((aug_object_t)(obj))
+    ((aug_object*)(obj))->vtbl_->retain_((aug_object*)(obj))
 
 #define aug_releaseobject(obj)                                  \
-    ((aug_object_t)(obj))->vtbl_->release_((aug_object_t)(obj))
+    ((aug_object*)(obj))->vtbl_->release_((aug_object*)(obj))
 
-struct aug_blobvtbl;
-
-typedef struct aug_blob {
-    const struct aug_blobvtbl* vtbl_;
-}* aug_blob_t;
-
-#define aug_blobtype() "aug_blob"
+AUG_OBJECTDECL(aug_blob);
 
 struct aug_blobvtbl {
     AUG_OBJECT(aug_blob);
-    const void* (*data_)(aug_blob_t, size_t*);
+    const void* (*data_)(aug_blob*, size_t*);
 };
 
 #define aug_blobdata(obj, size)                 \

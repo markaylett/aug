@@ -17,11 +17,14 @@ struct null_;
 namespace aug {
 
     template <typename T>
-    class smartobj {
+    class smartobj;
 
-        T obj_;
+    template <>
+    class smartobj<aug_object> {
 
-        smartobj(T obj, bool retain) AUG_NOTHROW
+        aug_object* obj_;
+
+        smartobj(aug_object* obj, bool retain) AUG_NOTHROW
             : obj_(obj)
         {
             if (obj && retain)
@@ -44,7 +47,7 @@ namespace aug {
             : obj_(rhs.obj_)
         {
             if (obj_)
-                retainobject(obj_);
+                aug_retainobject(obj_);
         }
 
         smartobj&
@@ -72,33 +75,124 @@ namespace aug {
         release()
         {
             if (obj_) {
-                T obj(obj_);
+                aug_object* obj(obj_);
                 obj_ = 0;
-                releaseobject(obj);
+                aug_releaseobject(obj);
             }
         }
 
         static smartobj
-        attach(T obj)
+        attach(aug_object* obj)
         {
             return smartobj(obj, false);
         }
 
         static smartobj
-        retain(T obj)
+        retain(aug_object* obj)
         {
             return smartobj(obj, true);
         }
 
-        T
+        aug_object*
         get() const
         {
             return obj_;
         }
 
-        operator T() const
+        operator aug_object*() const
         {
             return get();
+        }
+    };
+
+    template <typename T>
+    class smartobj {
+
+        T* obj_;
+
+        smartobj(T* obj, bool retain) AUG_NOTHROW
+            : obj_(obj)
+        {
+            if (obj && retain)
+                aug_retainobject(obj);
+        }
+
+    public:
+        ~smartobj() AUG_NOTHROW
+        {
+            if (obj_)
+                aug_releaseobject(obj_);
+        }
+
+        smartobj(const null_&) AUG_NOTHROW
+           : obj_(0)
+        {
+        }
+
+        smartobj(const smartobj& rhs)
+            : obj_(rhs.obj_)
+        {
+            if (obj_)
+                aug_retainobject(obj_);
+        }
+
+        smartobj&
+        operator =(const null_&) AUG_NOTHROW
+        {
+            *this = smartobj::retain(0);
+            return *this;
+        }
+
+        smartobj&
+        operator =(const smartobj& rhs)
+        {
+            smartobj tmp(rhs);
+            swap(tmp);
+            return *this;
+        }
+
+        void
+        swap(smartobj& rhs) AUG_NOTHROW
+        {
+            std::swap(obj_, rhs.obj_);
+        }
+
+        void
+        release()
+        {
+            if (obj_) {
+                T* obj(obj_);
+                obj_ = 0;
+                aug_releaseobject(obj);
+            }
+        }
+
+        static smartobj
+        attach(T* obj)
+        {
+            return smartobj(obj, false);
+        }
+
+        static smartobj
+        retain(T* obj)
+        {
+            return smartobj(obj, true);
+        }
+
+        T*
+        get() const
+        {
+            return obj_;
+        }
+
+        operator T*() const
+        {
+            return get();
+        }
+
+        operator aug_object*() const
+        {
+            return reinterpret_cast<aug_object*>(get());
         }
     };
 
@@ -124,7 +218,7 @@ namespace aug {
     }
 
     inline const void*
-    blobdata(aug_blob_t obj, size_t& size)
+    blobdata(aug_blob* obj, size_t& size)
     {
         return obj->vtbl_->data_(obj, &size);
     }

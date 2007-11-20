@@ -42,8 +42,11 @@ static int
 releaseintobj_(aug_intobj_t obj)
 {
     struct intobjimpl_* impl = AUG_IMPL(struct intobjimpl_, intobj_, obj);
-    if (0 == --impl->refs_ && impl->destroy_)
-        impl->destroy_(impl->i_);
+    if (0 == --impl->refs_) {
+        if (impl->destroy_)
+            impl->destroy_(impl->i_);
+        free(impl);
+    }
     return 0;
 }
 
@@ -120,8 +123,11 @@ static int
 releaseptrobj_(aug_ptrobj_t obj)
 {
     struct ptrobjimpl_* impl = AUG_IMPL(struct ptrobjimpl_, ptrobj_, obj);
-    if (0 == --impl->refs_ && impl->destroy_)
-        impl->destroy_(impl->p_);
+    if (0 == --impl->refs_) {
+        if (impl->destroy_)
+            impl->destroy_(impl->p_);
+        free(impl);
+    }
     return 0;
 }
 
