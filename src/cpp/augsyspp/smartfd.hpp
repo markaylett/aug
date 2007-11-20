@@ -18,7 +18,7 @@ namespace aug {
         smartfd(fdref ref, bool retain) AUG_NOTHROW
             : ref_(ref)
         {
-            if (retain && null != ref)
+            if (null != ref && retain)
                 retainfd(ref.get());
         }
 
@@ -44,7 +44,7 @@ namespace aug {
         smartfd&
         operator =(const null_&) AUG_NOTHROW
         {
-            ref_ = null;
+            *this = smartfd(null);
             return *this;
         }
 
@@ -84,15 +84,15 @@ namespace aug {
             return smartfd(fd, true);
         }
 
-        operator fdref() const
-        {
-            return ref_;
-        }
-
         int
         get() const
         {
             return ref_.get();
+        }
+
+        operator fdref() const
+        {
+            return ref_;
         }
     };
 }

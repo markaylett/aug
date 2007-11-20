@@ -31,14 +31,14 @@ struct aug_objectvtbl {
     AUG_OBJECT(aug_object);
 };
 
-#define aug_castobject(obj, type)                           \
-    ((aug_object_t)(obj))->vtbl_->cast_((void*)obj, type)
+#define aug_castobject(obj, type)                                   \
+    ((aug_object_t)(obj))->vtbl_->cast_((aug_object_t)(obj), type)
 
-#define aug_retainobject(obj)                           \
-    ((aug_object_t)(obj))->vtbl_->retain_((void*)obj)
+#define aug_retainobject(obj)                                   \
+    ((aug_object_t)(obj))->vtbl_->retain_((aug_object_t)(obj))
 
-#define aug_releaseobject(obj)                          \
-    ((aug_object_t)(obj))->vtbl_->release_((void*)obj)
+#define aug_releaseobject(obj)                                  \
+    ((aug_object_t)(obj))->vtbl_->release_((aug_object_t)(obj))
 
 struct aug_blobvtbl;
 

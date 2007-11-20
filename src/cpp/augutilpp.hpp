@@ -12,8 +12,10 @@
 #include "augutilpp/file.hpp"
 #include "augutilpp/lexer.hpp"
 #include "augutilpp/log.hpp"
+#include "augutilpp/object.hpp"
 #include "augutilpp/path.hpp"
 #include "augutilpp/shellparser.hpp"
+#include "augutilpp/smartobj.hpp"
 #include "augutilpp/timer.hpp"
 #include "augutilpp/var.hpp"
 

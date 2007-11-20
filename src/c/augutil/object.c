@@ -23,7 +23,7 @@ struct intobjimpl_ {
 static void*
 castintobj_(aug_intobj_t obj, const char* type)
 {
-    if (0 == strcmp(type, "aug.object") || 0 == strcmp(type, "aug.intobj")) {
+    if (0 == strcmp(type, "aug_object") || 0 == strcmp(type, "aug_intobj")) {
         obj->vtbl_->retain_(obj);
         return obj;
     }
@@ -83,7 +83,7 @@ aug_objtoint(aug_object_t obj)
 {
     int i;
     aug_intobj_t tmp;
-    if (obj && (tmp = aug_castobject(obj, "aug.intobj"))) {
+    if (obj && (tmp = aug_castobject(obj, "aug_intobj"))) {
         i = aug_getintobj(tmp);
         aug_releaseobject(tmp);
     } else
@@ -101,7 +101,7 @@ struct ptrobjimpl_ {
 static void*
 castptrobj_(aug_ptrobj_t obj, const char* type)
 {
-    if (0 == strcmp(type, "aug.object") || 0 == strcmp(type, "aug.ptrobj")) {
+    if (0 == strcmp(type, "aug_object") || 0 == strcmp(type, "aug_ptrobj")) {
         obj->vtbl_->retain_(obj);
         return obj;
     }
@@ -161,7 +161,7 @@ aug_objtoptr(aug_object_t obj)
 {
     void* p;
     aug_ptrobj_t tmp;
-    if (obj && (tmp = aug_castobject(obj, "aug.ptrobj"))) {
+    if (obj && (tmp = aug_castobject(obj, "aug_objptr"))) {
         p = aug_getptrobj(tmp);
         aug_releaseobject(tmp);
     } else

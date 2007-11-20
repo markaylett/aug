@@ -55,7 +55,8 @@ libaugutilpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugutilpp_la_OBJECTS = clock.lo config.lo conv.lo event.lo \
-	file.lo lexer.lo log.lo path.lo shellparser.lo timer.lo var.lo
+	file.lo lexer.lo log.lo object.lo path.lo shellparser.lo \
+	timer.lo var.lo
 libaugutilpp_la_OBJECTS = $(am_libaugutilpp_la_OBJECTS)
 am_maintest_OBJECTS = maintest.$(OBJEXT)
 maintest_OBJECTS = $(am_maintest_OBJECTS)
@@ -233,6 +234,7 @@ modinclude_HEADERS = \
 	file.hpp \
 	lexer.hpp \
 	log.hpp \
+	object.hpp \
 	path.hpp \
 	shellparser.hpp \
 	timer.hpp \
@@ -247,6 +249,7 @@ libaugutilpp_la_SOURCES = \
 	file.cpp \
 	lexer.cpp \
 	log.cpp \
+	object.cpp \
 	path.cpp \
 	shellparser.cpp \
 	timer.cpp \
@@ -350,6 +353,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shellparser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shellparsertest.Po@am__quote@

@@ -4,7 +4,12 @@
 #ifndef AUGUTILPP_TIMER_HPP
 #define AUGUTILPP_TIMER_HPP
 
+#include "augutilpp/object.hpp"
+
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp"
+
+#include "augobjpp.hpp"
 
 #include "augutil/list.h"
 #include "augutil/timer.h"
@@ -12,34 +17,32 @@
 #include "augsys/errno.h"
 #include "augsys/log.h"
 
-#include <memory> // auto_ptr<>
-
 namespace aug {
 
-    template <void (*T)(const aug_var&, int, unsigned&)>
+    template <void (*T)(aug_object_t, int, unsigned&)>
     void
-    timercb(const aug_var* var, int id, unsigned* ms) AUG_NOTHROW
+    timercb(aug_object_t user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            T(*var, id, *ms);
+            T(user, id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
     template <typename T, void (T::*U)(int, unsigned&)>
     void
-    timermemcb(const aug_var* var, int id, unsigned* ms) AUG_NOTHROW
+    timermemcb(aug_object_t user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            (static_cast<T*>(var->arg_)->*U)(id, *ms);
+            (objtoptr<T*>(user)->*U)(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
     template <typename T>
     void
-    timermemcb(const aug_var* var, int id, unsigned* ms) AUG_NOTHROW
+    timermemcb(aug_object_t user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            static_cast<T*>(var->arg_)->timercb(id, *ms);
+            objtoptr<T*>(user)->timercb(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
@@ -88,9 +91,9 @@ namespace aug {
 
     inline int
     settimer(aug_timers& timers, idref ref, unsigned ms, aug_timercb_t cb,
-             const aug_var& var)
+             aug_object_t user)
     {
-        return verify(aug_settimer(&timers, ref.get(), ms, cb, &var));
+        return verify(aug_settimer(&timers, ref.get(), ms, cb, user));
     }
 
     inline int
@@ -98,26 +101,6 @@ namespace aug {
              const null_&)
     {
         return verify(aug_settimer(&timers, ref.get(), ms, cb, 0));
-    }
-
-    template <typename T>
-    int
-    settimer(aug_timers& timers, idref ref, unsigned ms, T& x)
-    {
-        aug_var var = { 0, &x };
-        return verify(aug_settimer(&timers, ref.get(), ms,
-                                   timermemcb<T>, &var));
-    }
-
-    template <typename T>
-    int
-    settimer(aug_timers& timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
-    {
-        aug_var var;
-        int id(verify(aug_settimer(&timers, ref.get(), ms, timermemcb<T>,
-                                   &bindvar<deletearg<T> >(var, *x))));
-        x.release();
-        return id;
     }
 
     inline bool
@@ -184,29 +167,15 @@ namespace aug {
         }
 
         void
-        set(unsigned ms, aug_timercb_t cb, const aug_var& var)
+        set(unsigned ms, aug_timercb_t cb, aug_object_t user)
         {
-            ref_ = settimer(timers_, ref_, ms, cb, var);
+            ref_ = settimer(timers_, ref_, ms, cb, user);
         }
 
         void
         set(unsigned ms, aug_timercb_t cb, const null_&)
         {
             ref_ = settimer(timers_, ref_, ms, cb, null);
-        }
-
-        template <typename T>
-        void
-        set(unsigned ms, T& x)
-        {
-            ref_ = settimer(timers_, ref_, ms, x);
-        }
-
-        template <typename T>
-        void
-        set(unsigned ms, std::auto_ptr<T>& x)
-        {
-            ref_ = settimer(timers_, ref_, ms, x);
         }
 
         bool

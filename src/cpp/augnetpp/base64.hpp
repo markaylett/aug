@@ -12,17 +12,16 @@
 
 #include "augnet/base64.h"
 
-#include <memory> // auto_ptr<>
 #include <sstream>
 
 namespace aug {
 
-    template <void (*T)(const aug_var&, const char*, size_t)>
+    template <void (*T)(aug_object_t, const char*, size_t)>
     int
-    base64cb(const aug_var* var, const char* buf, size_t len) AUG_NOTHROW
+    base64cb(aug_object_t user, const char* buf, size_t len) AUG_NOTHROW
     {
         try {
-            T(*var, buf, len);
+            T(user, buf, len);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -30,10 +29,10 @@ namespace aug {
 
     template <typename T, void (T::*U)(const char*, size_t)>
     int
-    base64memcb(const aug_var* var, const char* buf, size_t len) AUG_NOTHROW
+    base64memcb(aug_object_t user, const char* buf, size_t len) AUG_NOTHROW
     {
         try {
-            (static_cast<T*>(var->arg_)->*U)(buf, len);
+            (static_cast<T*>(aug_objtoptr(user))->*U)(buf, len);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -41,10 +40,10 @@ namespace aug {
 
     template <typename T>
     int
-    base64memcb(const aug_var* var, const char* buf, size_t len) AUG_NOTHROW
+    base64memcb(aug_object_t user, const char* buf, size_t len) AUG_NOTHROW
     {
         try {
-            static_cast<T*>(var->arg_)->base64cb(buf, len);
+            static_cast<T*>(aug_objtoptr(user))->base64cb(buf, len);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -66,32 +65,14 @@ namespace aug {
                 perrinfo("aug_destroybase64() failed");
         }
 
-        base64(aug_base64mode mode, aug_base64cb_t cb, const aug_var& var)
+        base64(aug_base64mode mode, aug_base64cb_t cb, aug_object_t user)
         {
-            verify(base64_ = aug_createbase64(mode, cb, &var));
+            verify(base64_ = aug_createbase64(mode, cb, user));
         }
 
         base64(aug_base64mode mode, aug_base64cb_t cb, const null_&)
         {
             verify(base64_ = aug_createbase64(mode, cb, 0));
-        }
-
-        template <typename T>
-        base64(aug_base64mode mode, T& x)
-        {
-            aug_var var = { 0, &x };
-            verify(base64_
-                   = aug_createbase64(mode, base64memcb<T>, &var));
-        }
-
-        template <typename T>
-        base64(aug_base64mode mode, std::auto_ptr<T>& x)
-        {
-            aug_var var;
-            verify(base64_
-                   = aug_createbase64(mode, base64memcb<T>,
-                                      &bindvar<deletearg<T> >(var, *x)));
-            x.release();
         }
 
         operator aug_base64_t()

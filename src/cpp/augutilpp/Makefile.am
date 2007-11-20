@@ -9,6 +9,7 @@ modinclude_HEADERS = \
 	file.hpp \
 	lexer.hpp \
 	log.hpp \
+	object.hpp \
 	path.hpp \
 	shellparser.hpp \
 	timer.hpp \
@@ -24,6 +25,7 @@ libaugutilpp_la_SOURCES = \
 	file.cpp \
 	lexer.cpp \
 	log.cpp \
+	object.cpp \
 	path.cpp \
 	shellparser.cpp \
 	timer.cpp \
