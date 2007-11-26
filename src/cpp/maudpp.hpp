@@ -18,9 +18,9 @@
 #include <vector>
 #include <functional>
 
-#if !defined(MAUD_NOTHROW)
-# define MAUD_NOTHROW throw()
-#endif // !MAUD_NOTHROW
+#if !defined(AUG_NOTHROW)
+# define AUG_NOTHROW throw()
+#endif // !AUG_NOTHROW
 
 #define MAUD_WRITELOGCATCH                                  \
     catch (const std::exception& e) {                       \
@@ -30,9 +30,75 @@
         maud_writelog(MAUD_LOGERROR, "unknown exception");  \
     } do { } while (0)
 
+namespace aug {
+
+    template <>
+    struct object_traits<maud_blob> {
+        static const char*
+        id()
+        {
+            return maud_blobid;
+        }
+    };
+}
+
 namespace maud {
 
     typedef std::runtime_error error;
+
+    inline const void*
+    blobdata(maud_blob* obj, size_t* size) AUG_NOTHROW
+    {
+        return obj->vtbl_->data_(obj, size);
+    }
+
+    template <typename T>
+    class blob_base {
+
+        static void*
+        cast_(maud_blob* obj, const char* id) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->cast(id);
+        }
+
+        static int
+        incref_(maud_blob* obj) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->incref();
+        }
+
+        static int
+        decref_(maud_blob* obj) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->decref();
+        }
+
+        static const void*
+        data_(maud_blob* obj, size_t* size) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->blobdata(size);
+        }
+
+    protected:
+        ~blob_base() AUG_NOTHROW
+        {
+        }
+        static const maud_blobvtbl*
+        blobvtbl()
+        {
+            static const maud_blobvtbl local = {
+                cast_,
+                incref_,
+                decref_,
+                data_
+            };
+            return &local;
+        }
+    };
 
     inline void
     writelog(int level, const char* format, ...)
@@ -269,13 +335,13 @@ namespace maud {
     namespace detail {
         class stringtype {
             static int
-            destroy(void* arg) MAUD_NOTHROW
+            destroy(void* arg) AUG_NOTHROW
             {
                 delete static_cast<std::string*>(arg);
                 return 0;
             }
             static const void*
-            buf(void* arg, size_t* size) MAUD_NOTHROW
+            buf(void* arg, size_t* size) AUG_NOTHROW
             {
                 std::string* s(static_cast<std::string*>(arg));
                 if (size)
@@ -379,7 +445,7 @@ namespace maud {
 
     public:
         virtual
-        ~session_base() MAUD_NOTHROW
+        ~session_base() AUG_NOTHROW
         {
         }
         bool
@@ -498,7 +564,7 @@ namespace maud {
         }
     public:
         virtual
-        ~basic_session() MAUD_NOTHROW
+        ~basic_session() AUG_NOTHROW
         {
         }
     };
@@ -552,12 +618,12 @@ namespace maud {
             return x ? MAUD_OK : MAUD_ERROR;
         }
         static void
-        stop() MAUD_NOTHROW
+        stop() AUG_NOTHROW
         {
             delete getbase();
         }
         static int
-        start(maud_session* session) MAUD_NOTHROW
+        start(maud_session* session) AUG_NOTHROW
         {
             try {
                 session->user_ = factory_->create(session->name_);
@@ -566,7 +632,7 @@ namespace maud {
             return MAUD_ERROR;
         }
         static void
-        reconf() MAUD_NOTHROW
+        reconf() AUG_NOTHROW
         {
             try {
                 getbase()->reconf();
@@ -574,21 +640,21 @@ namespace maud {
         }
         static void
         event(const char* from, const char* type, const void* user,
-              size_t size) MAUD_NOTHROW
+              size_t size) AUG_NOTHROW
         {
             try {
                 getbase()->event(from, type, user, size);
             } MAUD_WRITELOGCATCH;
         }
         static void
-        closed(const maud_object* sock) MAUD_NOTHROW
+        closed(const maud_object* sock) AUG_NOTHROW
         {
             try {
                 getbase()->closed(object(*sock));
             } MAUD_WRITELOGCATCH;
         }
         static void
-        teardown(const maud_object* sock) MAUD_NOTHROW
+        teardown(const maud_object* sock) AUG_NOTHROW
         {
             try {
                 getbase()->teardown(object(*sock));
@@ -596,7 +662,7 @@ namespace maud {
         }
         static int
         accepted(maud_object* sock, const char* addr,
-                 unsigned short port) MAUD_NOTHROW
+                 unsigned short port) AUG_NOTHROW
         {
             try {
                 object o(*sock);
@@ -606,7 +672,7 @@ namespace maud {
         }
         static void
         connected(maud_object* sock, const char* addr,
-                  unsigned short port) MAUD_NOTHROW
+                  unsigned short port) AUG_NOTHROW
         {
             try {
                 object o(*sock);
@@ -615,28 +681,28 @@ namespace maud {
         }
         static void
         data(const maud_object* sock, const void* buf,
-             size_t size) MAUD_NOTHROW
+             size_t size) AUG_NOTHROW
         {
             try {
                 getbase()->data(object(*sock), buf, size);
             } MAUD_WRITELOGCATCH;
         }
         static void
-        rdexpire(const maud_object* sock, unsigned* ms) MAUD_NOTHROW
+        rdexpire(const maud_object* sock, unsigned* ms) AUG_NOTHROW
         {
             try {
                 getbase()->rdexpire(object(*sock), *ms);
             } MAUD_WRITELOGCATCH;
         }
         static void
-        wrexpire(const maud_object* sock, unsigned* ms) MAUD_NOTHROW
+        wrexpire(const maud_object* sock, unsigned* ms) AUG_NOTHROW
         {
             try {
                 getbase()->wrexpire(object(*sock), *ms);
             } MAUD_WRITELOGCATCH;
         }
         static void
-        expire(const maud_object* timer, unsigned* ms) MAUD_NOTHROW
+        expire(const maud_object* timer, unsigned* ms) AUG_NOTHROW
         {
             try {
                 getbase()->expire(object(*timer), *ms);
@@ -655,7 +721,7 @@ namespace maud {
 
     public:
         static const maud_module*
-        init(const char* name) MAUD_NOTHROW
+        init(const char* name) AUG_NOTHROW
         {
             static const maud_module local = {
                 stop,
@@ -679,7 +745,7 @@ namespace maud {
             return 0; // Error.
         }
         static void
-        term() MAUD_NOTHROW
+        term() AUG_NOTHROW
         {
             delete factory_;
             factory_ = 0;

@@ -77,7 +77,7 @@ aug_setsigevent(struct aug_event* event, int sig)
     default:
         event->type_ = AUG_EVENTSIGNAL;
     }
-    event->user_ = (aug_object_t)aug_createintobj(sig, NULL);
+    event->user_ = (aug_object*)aug_createintobj(sig, NULL);
     return event;
 }
 
@@ -104,11 +104,11 @@ aug_writeevent(int fd, const struct aug_event* event)
     AUG_WMB();
 
     if (event->user_)
-        aug_retainobject(event->user_);
+        aug_decref(event->user_);
 
     if (-1 == writeall_(fd, (const char*)event, sizeof(*event))) {
         if (event->user_)
-            aug_releaseobject(event->user_);
+            aug_incref(event->user_);
         return NULL;
     }
 

@@ -9,8 +9,6 @@ AUG_RCSID("$Id$");
 #include "augpy/host.h"
 #include "augpy/object.h"
 
-#include "maud.h"
-
 #if defined(_WIN32)
 # include <direct.h>
 #endif /* _WIN32 */
@@ -293,21 +291,23 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, const void* user, size_t size)
+event_(const char* from, const char* type, aug_object* user)
 {
     struct import_* import = maud_getsession()->user_;
     assert(import);
 
     if (import->event_) {
 
+        size_t size;
+        const void* data = augpy_blobdata(user, &size);
         PyObject* y;
-        if (user) {
+
+        if (data)
             y = PyObject_CallFunction(import->event_, "ssz#", from, type,
-                                      (const char*)user, size);
-        } else {
+                                      (const char*)data, size);
+        else
             y = PyObject_CallFunction(import->event_, "ssO", from, type,
                                       Py_None);
-        }
 
         if (y) {
             Py_DECREF(y);
@@ -319,7 +319,7 @@ event_(const char* from, const char* type, const void* user, size_t size)
 }
 
 static void
-closed_(const struct maud_object* sock)
+closed_(const struct maud_handle* sock)
 {
     struct import_* import = maud_getsession()->user_;
     PyObject* x = sock->user_;
@@ -339,7 +339,7 @@ closed_(const struct maud_object* sock)
 }
 
 static void
-teardown_(const struct maud_object* sock)
+teardown_(const struct maud_handle* sock)
 {
     struct import_* import = maud_getsession()->user_;
     assert(import);
@@ -360,7 +360,7 @@ teardown_(const struct maud_object* sock)
 }
 
 static int
-accepted_(struct maud_object* sock, const char* addr, unsigned short port)
+accepted_(struct maud_handle* sock, const char* addr, unsigned short port)
 {
     struct import_* import = maud_getsession()->user_;
     PyObject* x, * y;
@@ -415,7 +415,7 @@ accepted_(struct maud_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-connected_(struct maud_object* sock, const char* addr, unsigned short port)
+connected_(struct maud_handle* sock, const char* addr, unsigned short port)
 {
     struct import_* import = maud_getsession()->user_;
     assert(import);
@@ -437,7 +437,7 @@ connected_(struct maud_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct maud_object* sock, const void* buf, size_t len)
+data_(const struct maud_handle* sock, const void* buf, size_t len)
 {
     struct import_* import = maud_getsession()->user_;
     assert(import);
@@ -459,7 +459,7 @@ data_(const struct maud_object* sock, const void* buf, size_t len)
 }
 
 static void
-rdexpire_(const struct maud_object* sock, unsigned* ms)
+rdexpire_(const struct maud_handle* sock, unsigned* ms)
 {
     struct import_* import = maud_getsession()->user_;
     assert(import);
@@ -486,7 +486,7 @@ rdexpire_(const struct maud_object* sock, unsigned* ms)
 }
 
 static void
-wrexpire_(const struct maud_object* sock, unsigned* ms)
+wrexpire_(const struct maud_handle* sock, unsigned* ms)
 {
     struct import_* import = maud_getsession()->user_;
     assert(import);
@@ -513,7 +513,7 @@ wrexpire_(const struct maud_object* sock, unsigned* ms)
 }
 
 static void
-expire_(const struct maud_object* timer, unsigned* ms)
+expire_(const struct maud_handle* timer, unsigned* ms)
 {
     struct import_* import = maud_getsession()->user_;
     assert(import);
@@ -541,7 +541,7 @@ expire_(const struct maud_object* timer, unsigned* ms)
 }
 
 static int
-authcert_(const struct maud_object* sock, const char* subject,
+authcert_(const struct maud_handle* sock, const char* subject,
           const char* issuer)
 {
     struct import_* import = maud_getsession()->user_;

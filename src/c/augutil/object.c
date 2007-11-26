@@ -14,16 +14,16 @@ AUG_RCSID("$Id$");
 #include <string.h>
 
 struct intobjimpl_ {
-    struct aug_intobj intobj_;
+    aug_intobj intobj_;
     unsigned refs_;
     void (*destroy_)(int);
     int i_;
 };
 
 static void*
-castintobj_(aug_intobj_t obj, const char* type)
+castintobj_(aug_intobj* obj, const char* id)
 {
-    if (0 == strcmp(type, "aug_object") || 0 == strcmp(type, "aug_intobj")) {
+    if (0 == strcmp(id, "aug_object") || 0 == strcmp(id, "aug_intobj")) {
         obj->vtbl_->retain_(obj);
         return obj;
     }
@@ -95,16 +95,16 @@ aug_objtoint(aug_object_t obj)
 }
 
 struct ptrobjimpl_ {
-    struct aug_ptrobj ptrobj_;
+    aug_ptrobj ptrobj_;
     unsigned refs_;
     void (*destroy_)(void*);
     void* p_;
 };
 
 static void*
-castptrobj_(aug_ptrobj_t obj, const char* type)
+castptrobj_(aug_ptrobj_t obj, const char* id)
 {
-    if (0 == strcmp(type, "aug_object") || 0 == strcmp(type, "aug_ptrobj")) {
+    if (0 == strcmp(id, "aug_object") || 0 == strcmp(id, "aug_ptrobj")) {
         obj->vtbl_->retain_(obj);
         return obj;
     }
@@ -132,7 +132,7 @@ releaseptrobj_(aug_ptrobj_t obj)
 }
 
 static void*
-getptrobj_(aug_ptrobj_t obj)
+getptrobj_(aug_ptrobj* obj)
 {
     struct ptrobjimpl_* impl = AUG_IMPL(struct ptrobjimpl_, ptrobj_, obj);
     return impl->p_;
@@ -163,7 +163,7 @@ aug_createptrobj(void* p, void (*destroy)(void*))
 }
 
 AUGUTIL_API void*
-aug_objtoptr(aug_object_t obj)
+aug_objtoptr(aug_object* obj)
 {
     void* p;
     aug_ptrobj_t tmp;

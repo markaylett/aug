@@ -58,8 +58,8 @@ am__installdirs = "$(DESTDIR)$(moddir)"
 modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
 modaugrb_la_DEPENDENCIES =
-am__modaugrb_la_SOURCES_DIST = augrb.c
-@ENABLE_RUBY_TRUE@am_modaugrb_la_OBJECTS = augrb.lo
+am__modaugrb_la_SOURCES_DIST = augrb.c object.c
+@ENABLE_RUBY_TRUE@am_modaugrb_la_OBJECTS = augrb.lo object.lo
 modaugrb_la_OBJECTS = $(am_modaugrb_la_OBJECTS)
 @ENABLE_RUBY_TRUE@am_modaugrb_la_rpath = -rpath $(moddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -210,7 +210,8 @@ moddir = $(prefix)/mod
 @ENABLE_RUBY_TRUE@noinst_HEADERS = 
 @ENABLE_RUBY_TRUE@mod_LTLIBRARIES = modaugrb.la
 @ENABLE_RUBY_TRUE@modaugrb_la_SOURCES = \
-@ENABLE_RUBY_TRUE@	augrb.c
+@ENABLE_RUBY_TRUE@	augrb.c \
+@ENABLE_RUBY_TRUE@	object.c
 
 @ENABLE_RUBY_TRUE@modaugrb_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(RB_LDFLAGS)
 @ENABLE_RUBY_TRUE@modaugrb_la_LIBADD = 
@@ -284,6 +285,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augrb.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

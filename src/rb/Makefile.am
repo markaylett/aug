@@ -1,4 +1,5 @@
 EXTRA_DIST = \
+	augidl \
 	augutil.rb  \
 	log.rb \
 	rbecho.rb \

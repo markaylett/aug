@@ -3,26 +3,13 @@
 */
 #define MAUD_BUILD
 #include "augsys/defs.h"
-#include "maud.h"
 
 AUG_RCSID("$Id$");
 
-#if !defined(_WIN32)
-# include <unistd.h>
-#else /* _WIN32 */
-# define HAVE_ISINF 1
-# if !defined(_MSC_VER)
-#  define _MSC_VER 1200
-# else /* _MSC_VER */
-#  pragma comment(lib, "msvcrt-ruby18.lib")
-# endif /* _MSC_VER */
-char*
-rb_w32_getcwd(char* buffer, int size);
-#endif /* _WIN32 */
+#include "augrb/object.h"
 
 #include <assert.h>
 #include <ctype.h> /* tolower() */
-#include <ruby.h>
 
 /* The bit fields indicate those functions implemented by the session. */
 
@@ -182,29 +169,6 @@ register_(VALUE value)
     rb_gc_register_address(ptr);
     return ptr;
 }
-
-static int
-destroy_(void* arg)
-{
-    unregister_(arg);
-    return 0;
-}
-
-static const void*
-buf_(void* arg, size_t* size)
-{
-    /* arg is malloc()-ed VALUE created by register_(). */
-
-    VALUE* ptr = arg;
-    if (size)
-        *size = RSTRING(*ptr)->len;
-    return RSTRING(*ptr)->ptr;
-}
-
-static const struct maud_vartype vartype_ = {
-    destroy_,
-    buf_
-};
 
 /* AugRb::Object functions. */
 
@@ -382,7 +346,8 @@ static VALUE
 post_(int argc, VALUE* argv, VALUE self)
 {
     VALUE to, type, user;
-    struct maud_var var = { NULL, NULL };
+    maud_blob* blob = NULL;
+    int ret;
 
     rb_scan_args(argc, argv, "21", &to, &type, &user);
 
@@ -391,16 +356,15 @@ post_(int argc, VALUE* argv, VALUE self)
     Check_Type(to, T_STRING);
     Check_Type(type, T_STRING);
 
-    if (user != Qnil) {
-        var.type_ = &vartype_;
-        var.arg_ = register_(StringValue(user));
-    }
+    if (user != Qnil)
+        blob = augrb_createblob(StringValue(user));
 
-    if (-1 == maud_post(RSTRING(to)->ptr, RSTRING(type)->ptr, &var)) {
-        if (var.arg_)
-            unregister_(var.arg_);
+    ret = maud_post(RSTRING(to)->ptr, RSTRING(type)->ptr, (aug_object*)blob);
+    if (blob)
+        aug_decref(blob);
+
+    if (-1 == ret)
         rb_raise(cerror_, maud_error());
-    }
 
     return Qnil;
 }
@@ -409,21 +373,23 @@ static VALUE
 dispatch_(int argc, VALUE* argv, VALUE self)
 {
     VALUE to, type, user;
-    const void* ptr = NULL;
-    size_t len = 0;
+    maud_blob* blob = NULL;
+    int ret;
 
     rb_scan_args(argc, argv, "21", &to, &type, &user);
 
     Check_Type(to, T_STRING);
     Check_Type(type, T_STRING);
 
-    if (user != Qnil) {
-        user = StringValue(user);
-        ptr = RSTRING(user)->ptr;
-        len = RSTRING(user)->len;
-    }
+    if (user != Qnil)
+        blob = augrb_createblob(StringValue(user));
 
-    if (-1 == maud_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr, ptr, len))
+    ret = maud_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr,
+                        (aug_object*)blob);
+    if (blob)
+        aug_decref(blob);
+
+    if (-1 == ret)
         rb_raise(cerror_, maud_error());
 
     return Qnil;
@@ -522,16 +488,15 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
 static VALUE
 send_(VALUE self, VALUE sock, VALUE buf)
 {
-    struct maud_var var;
-    int cid = checkid_(sock);
+    maud_blob* blob;
+    int cid = checkid_(sock), ret;
 
-    var.type_ = &vartype_;
-    var.arg_ = register_(StringValue(buf));
+    blob = augrb_createblob(StringValue(buf));
+    ret = maud_sendv(cid, blob);
+    aug_decref(blob);
 
-    if (-1 == maud_sendv(cid, &var)) {
-        unregister_(var.arg_);
+    if (-1 == ret)
         rb_raise(cerror_, maud_error());
-    }
 
     return Qnil;
 }
@@ -584,28 +549,26 @@ cancelrwtimer_(VALUE self, VALUE sock, VALUE flags)
 static VALUE
 settimer_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE ms, user;
-    VALUE* timer;
+    VALUE ms, user, timer;
 
     unsigned ui;
-    struct maud_var var;
+    maud_blob* blob;
     int tid;
 
     rb_scan_args(argc, argv, "11", &ms, &user);
 
     ui = NUM2UINT(ms);
-    timer = register_(newobject_(INT2FIX(0), user));
 
-    var.type_ = &vartype_;
-    var.arg_ = timer;
+    timer = newobject_(INT2FIX(0), user);
+    blob = augrb_createblob(timer);
+    tid = maud_settimer(ui, (aug_object*)blob);
+    aug_decref(blob);
 
-    if (-1 == (tid = maud_settimer(ui, &var))) {
-        unregister_(timer);
+    if (-1 == tid)
         rb_raise(cerror_, maud_error());
-    }
 
-    rb_iv_set(*timer, "@id", INT2FIX(tid));
-    return *timer;
+    rb_iv_set(timer, "@id", INT2FIX(tid));
+    return timer;
 }
 
 static VALUE
@@ -831,18 +794,22 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, const void* user, size_t size)
+event_(const char* from, const char* type, aug_object* user)
 {
     struct session_* session = maud_getsession()->user_;
     assert(session);
 
-    if (session->event_)
-        funcall3_(eventid_, rb_str_new2(from), rb_str_new2(type),
-                  user ? rb_tainted_str_new(user, (long)size) : Qnil);
+    if (session->event_) {
+
+        size_t size;
+        const void* data = augrb_blobdata(user, &size);
+        VALUE x = data ? rb_tainted_str_new(user, (long)size) : Qnil;
+        funcall3_(eventid_, rb_str_new2(from), rb_str_new2(type), x);
+    }
 }
 
 static void
-closed_(const struct maud_object* sock)
+closed_(const struct maud_handle* sock)
 {
     struct session_* session = maud_getsession()->user_;
     assert(session);
@@ -855,7 +822,7 @@ closed_(const struct maud_object* sock)
 }
 
 static void
-teardown_(const struct maud_object* sock)
+teardown_(const struct maud_handle* sock)
 {
     struct session_* session = maud_getsession()->user_;
     VALUE user;
@@ -870,7 +837,7 @@ teardown_(const struct maud_object* sock)
 }
 
 static int
-accepted_(struct maud_object* sock, const char* addr, unsigned short port)
+accepted_(struct maud_handle* sock, const char* addr, unsigned short port)
 {
     struct session_* session = maud_getsession()->user_;
     VALUE user;
@@ -894,7 +861,7 @@ accepted_(struct maud_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-connected_(struct maud_object* sock, const char* addr, unsigned short port)
+connected_(struct maud_handle* sock, const char* addr, unsigned short port)
 {
     struct session_* session = maud_getsession()->user_;
     VALUE user;
@@ -907,7 +874,7 @@ connected_(struct maud_object* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct maud_object* sock, const void* buf, size_t len)
+data_(const struct maud_handle* sock, const void* buf, size_t len)
 {
     struct session_* session = maud_getsession()->user_;
     VALUE user;
@@ -920,7 +887,7 @@ data_(const struct maud_object* sock, const void* buf, size_t len)
 }
 
 static void
-rdexpire_(const struct maud_object* sock, unsigned* ms)
+rdexpire_(const struct maud_handle* sock, unsigned* ms)
 {
     struct session_* session = maud_getsession()->user_;
     VALUE user;
@@ -936,7 +903,7 @@ rdexpire_(const struct maud_object* sock, unsigned* ms)
 }
 
 static void
-wrexpire_(const struct maud_object* sock, unsigned* ms)
+wrexpire_(const struct maud_handle* sock, unsigned* ms)
 {
     struct session_* session = maud_getsession()->user_;
     VALUE user;
@@ -952,7 +919,7 @@ wrexpire_(const struct maud_object* sock, unsigned* ms)
 }
 
 static void
-expire_(const struct maud_object* timer, unsigned* ms)
+expire_(const struct maud_handle* timer, unsigned* ms)
 {
     struct session_* session = maud_getsession()->user_;
     VALUE user;
@@ -968,7 +935,7 @@ expire_(const struct maud_object* timer, unsigned* ms)
 }
 
 static int
-authcert_(const struct maud_object* sock, const char* subject,
+authcert_(const struct maud_handle* sock, const char* subject,
           const char* issuer)
 {
     struct session_* session = maud_getsession()->user_;

@@ -11,7 +11,8 @@ noinst_HEADERS =
 
 mod_LTLIBRARIES = modaugrb.la
 modaugrb_la_SOURCES = \
-	augrb.c
+	augrb.c \
+	object.c
 modaugrb_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(RB_LDFLAGS)
 modaugrb_la_LIBADD =
 endif

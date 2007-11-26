@@ -116,9 +116,19 @@ enum maud_loglevel {
 
 typedef int maud_id;
 
+AUG_OBJECTDECL(maud_blob);
+
+struct maud_blobvtbl {
+    AUG_OBJECT(maud_blob);
+    const void* (*data_)(maud_blob*, size_t*);
+};
+
+#define maud_blobdata(obj, size) \
+    ((maud_blob*)obj)->vtbl_->data_(obj, size)
+
 struct maud_session {
     char name_[MAUD_MAXNAME + 1];
-    aug_object_t user_;
+    void* user_;
 };
 
 /**
@@ -127,7 +137,7 @@ struct maud_session {
 
 struct maud_handle {
     maud_id id_;
-    aug_object_t user_;
+    void* user_;
 };
 
 struct maud_host {
@@ -203,7 +213,7 @@ struct maud_host {
        \sa dispatch_()
     */
 
-    int (*post_)(const char* to, const char* type, aug_object_t user);
+    int (*post_)(const char* to, const char* type, aug_object* user);
 
     /**
        The remaining functions are not thread-safe.
@@ -221,7 +231,7 @@ struct maud_host {
        \sa post_()
     */
 
-    int (*dispatch_)(const char* to, const char* type, aug_object_t user);
+    int (*dispatch_)(const char* to, const char* type, aug_object* user);
 
     /**
        Read a configuration value.
@@ -271,7 +281,7 @@ struct maud_host {
        \return The connection id.
     */
 
-    int (*tcpconnect_)(const char* host, const char* port, aug_object_t user);
+    int (*tcpconnect_)(const char* host, const char* port, void* user);
 
     /**
        Bind tcp listener socket.
@@ -283,7 +293,7 @@ struct maud_host {
        \param user Optional user data.
     */
 
-    int (*tcplisten_)(const char* host, const char* port, aug_object_t user);
+    int (*tcplisten_)(const char* host, const char* port, void* user);
 
     /**
        Send data to peer.
@@ -309,7 +319,7 @@ struct maud_host {
        \param user User data.
     */
 
-    int (*sendv_)(maud_id cid, aug_blob_t blob);
+    int (*sendv_)(maud_id cid, maud_blob* blob);
 
     /**
        Set read/write timer.
@@ -354,7 +364,7 @@ struct maud_host {
        \param user Optional user data.
     */
 
-    int (*settimer_)(unsigned ms, aug_object_t user);
+    int (*settimer_)(unsigned ms, aug_object* user);
 
     /**
        Reset timer.
@@ -444,7 +454,7 @@ struct maud_module {
        \param user User data.
     */
 
-    void (*event_)(const char* from, const char* type, aug_object_t user);
+    void (*event_)(const char* from, const char* type, aug_object* user);
 
     /**
        Connection closure.

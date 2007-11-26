@@ -10,7 +10,7 @@
 
 #if !defined(AUG_NOTHROW)
 # define AUG_NOTHROW throw()
-#endif // AUG_NOTHROW
+#endif // !AUG_NOTHROW
 
 struct null_;
 
@@ -24,18 +24,18 @@ namespace aug {
 
         aug_object* obj_;
 
-        smartobj(aug_object* obj, bool retain) AUG_NOTHROW
+        smartobj(aug_object* obj, bool incref) AUG_NOTHROW
             : obj_(obj)
         {
-            if (obj && retain)
-                aug_retainobject(obj);
+            if (obj && incref)
+                aug_incref(obj);
         }
 
     public:
         ~smartobj() AUG_NOTHROW
         {
             if (obj_)
-                aug_releaseobject(obj_);
+                aug_decref(obj_);
         }
 
         smartobj(const null_&) AUG_NOTHROW
@@ -47,13 +47,13 @@ namespace aug {
             : obj_(rhs.obj_)
         {
             if (obj_)
-                aug_retainobject(obj_);
+                aug_incref(obj_);
         }
 
         smartobj&
         operator =(const null_&) AUG_NOTHROW
         {
-            *this = smartobj::retain(0);
+            *this = smartobj::incref(0);
             return *this;
         }
 
@@ -77,7 +77,7 @@ namespace aug {
             if (obj_) {
                 aug_object* obj(obj_);
                 obj_ = 0;
-                aug_releaseobject(obj);
+                aug_decref(obj);
             }
         }
 
@@ -88,7 +88,7 @@ namespace aug {
         }
 
         static smartobj
-        retain(aug_object* obj)
+        incref(aug_object* obj)
         {
             return smartobj(obj, true);
         }
@@ -110,18 +110,18 @@ namespace aug {
 
         T* obj_;
 
-        smartobj(T* obj, bool retain) AUG_NOTHROW
+        smartobj(T* obj, bool incref) AUG_NOTHROW
             : obj_(obj)
         {
-            if (obj && retain)
-                aug_retainobject(obj);
+            if (obj && incref)
+                aug_incref(obj);
         }
 
     public:
         ~smartobj() AUG_NOTHROW
         {
             if (obj_)
-                aug_releaseobject(obj_);
+                aug_decref(obj_);
         }
 
         smartobj(const null_&) AUG_NOTHROW
@@ -133,13 +133,13 @@ namespace aug {
             : obj_(rhs.obj_)
         {
             if (obj_)
-                aug_retainobject(obj_);
+                aug_incref(obj_);
         }
 
         smartobj&
         operator =(const null_&) AUG_NOTHROW
         {
-            *this = smartobj::retain(0);
+            *this = smartobj::incref(0);
             return *this;
         }
 
@@ -163,7 +163,7 @@ namespace aug {
             if (obj_) {
                 T* obj(obj_);
                 obj_ = 0;
-                aug_releaseobject(obj);
+                aug_decref(obj);
             }
         }
 
@@ -174,7 +174,7 @@ namespace aug {
         }
 
         static smartobj
-        retain(T* obj)
+        incref(T* obj)
         {
             return smartobj(obj, true);
         }
@@ -197,30 +197,51 @@ namespace aug {
     };
 
     template <typename T>
+    struct object_traits;
+
+    template <>
+    struct object_traits<aug_object> {
+        static const char*
+        id()
+        {
+            return aug_objectid;
+        }
+    };
+
+    template <typename T>
     smartobj<T>
-    castobject(T obj, const char* type)
+    object_attach(T* obj)
     {
-        return smartobj<T>::attach(obj->vtbl_->cast_(obj, type));
+        return smartobj<T>::attach(obj);
+    }
+
+    template <typename T, typename U>
+    smartobj<T>
+    object_cast(U* obj)
+    {
+        return smartobj<T>::attach
+            (static_cast<T*>(obj->vtbl_->cast_(obj, object_traits<T>::id())));
+    }
+
+    template <typename T, typename U>
+    smartobj<T>
+    object_cast(const smartobj<U>& sobj)
+    {
+        return object_cast<T, U>(static_cast<U*>(sobj));
     }
 
     template <typename T>
     int
-    retainobject(T obj)
+    incref(T* obj)
     {
-        return obj->vtbl_->retain_(obj);
+        return obj->vtbl_->incref_(obj);
     }
 
     template <typename T>
     int
-    releaseobject(T obj)
+    decref(T* obj)
     {
-        return obj->vtbl_->release_(obj);
-    }
-
-    inline const void*
-    blobdata(aug_blob* obj, size_t& size)
-    {
-        return obj->vtbl_->data_(obj, &size);
+        return obj->vtbl_->decref_(obj);
     }
 }
 

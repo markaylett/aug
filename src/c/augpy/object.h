@@ -8,7 +8,22 @@
 # undef _DEBUG
 #endif /* _WIN32 */
 
+#include "maud.h"
+
 #include <Python.h>
+
+AUG_OBJECTDECL(augpy_blob);
+
+struct augpy_blobvtbl {
+    AUG_OBJECT(augpy_blob);
+    PyObject* (*get_)(augpy_blob*);
+};
+
+maud_blob*
+augpy_createblob(PyObject* pyobj);
+
+const void*
+augpy_blobdata(aug_object* obj, size_t* size);
 
 PyTypeObject*
 augpy_createtype(void);

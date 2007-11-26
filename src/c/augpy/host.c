@@ -9,38 +9,7 @@ AUG_RCSID("$Id$");
 
 #include "augpy/object.h"
 
-#include "maud.h"
-
 static PyTypeObject* type_ = NULL;
-
-static int
-destroy_(void* arg)
-{
-    Py_DECREF((PyObject*)arg);
-    return 0;
-}
-
-static const void*
-buf_(void* arg, size_t* size)
-{
-    const void* buf;
-    int len;
-
-    if (-1 == PyObject_AsReadBuffer((PyObject*)arg, &buf, &len)) {
-        if (size)
-            *size = 0;
-        return NULL;
-    }
-
-    if (size)
-        *size = len;
-    return buf;
-}
-
-static const struct maud_vartype vartype_ = {
-    destroy_,
-    buf_
-};
 
 static PyObject*
 incret_(PyObject* x)
@@ -95,7 +64,8 @@ post_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
     PyObject* user = NULL;
-    struct maud_var var = { NULL, NULL };
+    maud_blob* blob = NULL;
+    int ret;
 
     if (!PyArg_ParseTuple(args, "ss|O:post", &to, &type, &user))
         return NULL;
@@ -105,16 +75,18 @@ post_(PyObject* self, PyObject* args)
         if (!PyObject_CheckReadBuffer(user)) {
 
             PyErr_SetString(PyExc_TypeError,
-                            "post() argument 3 must be string or read-only"
-                            " buffer");
+                            "post() argument 3 must be string or"
+                            " read-only buffer");
             return NULL;
         }
-
-        var.type_ = &vartype_;
-        var.arg_ = user;
+        blob = augpy_createblob(user);
     }
 
-    if (-1 == maud_post(to, type, &var)) {
+    ret = maud_post(to, type, (aug_object*)blob);
+    if (blob)
+        aug_decref(blob);
+
+    if (-1 == ret) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
@@ -123,21 +95,41 @@ post_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    if (user)
-        Py_INCREF(user);
     return incret_(Py_None);
 }
 
 static PyObject*
 dispatch_(PyObject* self, PyObject* args)
 {
-    const char* to, * type, * user = NULL;
-    int size = 0;
+    const char* to, * type;
+    PyObject* user = NULL;
+    maud_blob* blob = NULL;
+    int ret;
 
-    if (!PyArg_ParseTuple(args, "ss|z#:dispatch", &to, &type, &user, &size))
+    if (!PyArg_ParseTuple(args, "ss|O:dispatch", &to, &type, &user))
         return NULL;
 
-    if (-1 == maud_dispatch(to, type, user, size)) {
+    if (user && user != Py_None) {
+
+        if (!PyObject_CheckReadBuffer(user)) {
+
+            PyErr_SetString(PyExc_TypeError,
+                            "dispatch() argument 3 must be string or"
+                            " read-only buffer");
+            return NULL;
+        }
+        blob = augpy_createblob(user);
+    }
+
+    ret = maud_dispatch(to, type, (aug_object*)blob);
+    if (blob)
+        aug_decref(blob);
+
+    if (-1 == ret) {
+
+        /* Examples show that PyExc_RuntimeError does not need to be
+           Py_INCREF()-ed. */
+
         PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
@@ -240,7 +232,8 @@ static PyObject*
 send_(PyObject* self, PyObject* args)
 {
     PyObject* sock, * buf;
-    struct maud_var var = { NULL, NULL };
+    maud_blob* blob;
+    int ret;
 
     if (!PyArg_ParseTuple(args, "O!O:send", type_, &sock, &buf))
         return NULL;
@@ -253,15 +246,19 @@ send_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    var.type_ = &vartype_;
-    var.arg_ = buf;
+    if (!(blob = augpy_createblob(buf)))
+        return NULL;
 
-    if (-1 == maud_sendv(augpy_getid(sock), &var)) {
+    /* maud_sendv() takes ownership. */
+
+    ret = maud_sendv(augpy_getid(sock), blob);
+    aug_decref(blob);
+
+    if (-1 == ret) {
         PyErr_SetString(PyExc_RuntimeError, maud_error());
         return NULL;
     }
 
-    Py_INCREF(buf);
     return incret_(Py_None);
 }
 
@@ -329,7 +326,7 @@ settimer_(PyObject* self, PyObject* args)
 {
     unsigned ms;
     PyObject* user = NULL, * timer;
-    struct maud_var var;
+    maud_blob* blob;
     int tid;
 
     if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &user))
@@ -338,17 +335,26 @@ settimer_(PyObject* self, PyObject* args)
     if (!(timer = augpy_createobject(type_, 0, user)))
         return NULL;
 
-    var.type_ = &vartype_;
-    var.arg_ = timer;
+    /* Both blob and this function hold reference to sock. */
 
-    if (-1 == (tid = maud_settimer(ms, &var))) {
+    if (!(blob = augpy_createblob(timer))) {
+        Py_DECREF(timer);
+        return NULL;
+    }
+
+    /* maud_settimer() takes ownership. */
+
+    tid = maud_settimer(ms, (aug_object*)blob);
+    aug_decref(blob);
+
+    if (-1 == tid) {
         PyErr_SetString(PyExc_RuntimeError, maud_error());
         Py_DECREF(timer);
         return NULL;
     }
 
     augpy_setid(timer, tid);
-    return incret_(timer);
+    return timer; /* Ref already held; no need to incref_(). */
 }
 
 static PyObject*

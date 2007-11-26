@@ -7,9 +7,157 @@
 
 AUG_RCSID("$Id$");
 
-#include "maud.h"
-
 #include <structmember.h>
+
+struct blobimpl_ {
+    maud_blob blob_;
+    augpy_blob pyblob_;
+    unsigned refs_;
+    PyObject* pyobj_;
+};
+
+static void*
+castblob_(maud_blob* obj, const char* id)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, maud_blobid)) {
+        aug_incref(&impl->blob_);
+        return &impl->blob_;
+    } else if (AUG_EQUALID(id, augpy_blobid)) {
+        aug_incref(&impl->pyblob_);
+        return &impl->pyblob_;
+    }
+    return NULL;
+}
+
+static int
+increfblob_(maud_blob* obj)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    ++impl->refs_;
+    return 0;
+}
+
+static int
+decrefblob_(maud_blob* obj)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    if (0 == --impl->refs_) {
+        Py_DECREF(impl->pyobj_);
+        free(impl);
+    }
+    return 0;
+}
+
+static const void*
+blobdata_(maud_blob* obj, size_t* size)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    const void* data;
+    int len;
+
+    if (-1 == PyObject_AsReadBuffer(impl->pyobj_, &data, &len)) {
+        if (size)
+            *size = 0;
+        return NULL;
+    }
+
+    if (size)
+        *size = len;
+    return data;
+}
+
+static const struct maud_blobvtbl blobvtbl_ = {
+    castblob_,
+    increfblob_,
+    decrefblob_,
+    blobdata_
+};
+
+static void*
+castpyblob_(augpy_blob* obj, const char* id)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, obj);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augpy_blobid)) {
+        aug_incref(&impl->pyblob_);
+        return &impl->pyblob_;
+    } else if (AUG_EQUALID(id, maud_blobid)) {
+        aug_incref(&impl->blob_);
+        return &impl->blob_;
+    }
+    return NULL;
+}
+
+static int
+increfpyblob_(augpy_blob* obj)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, obj);
+    ++impl->refs_;
+    return 0;
+}
+
+static int
+decrefpyblob_(augpy_blob* obj)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, obj);
+    if (0 == --impl->refs_) {
+        Py_DECREF(impl->pyobj_);
+        free(impl);
+    }
+    return 0;
+}
+
+static PyObject*
+getpyblob_(augpy_blob* obj)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, obj);
+    Py_INCREF(impl->pyobj_);
+    return impl->pyobj_;
+}
+
+static const struct augpy_blobvtbl pyblobvtbl_ = {
+    castpyblob_,
+    increfpyblob_,
+    decrefpyblob_,
+    getpyblob_
+};
+
+maud_blob*
+augpy_createblob(PyObject* pyobj)
+{
+    struct blobimpl_* impl = malloc(sizeof(struct blobimpl_));
+    if (!impl)
+        return NULL;
+
+    if (!pyobj)
+        pyobj = Py_None;
+
+    impl->blob_.vtbl_ = &blobvtbl_;
+    impl->blob_.impl_ = NULL;
+
+    impl->pyblob_.vtbl_ = &pyblobvtbl_;
+    impl->pyblob_.impl_ = NULL;
+
+    impl->refs_ = 1;
+    impl->pyobj_ = pyobj;
+
+    Py_INCREF(impl->pyobj_);
+    return &impl->blob_;
+}
+
+const void*
+augpy_blobdata(aug_object* obj, size_t* size)
+{
+    const void* data = NULL;
+    if (obj) {
+        maud_blob* blob = aug_cast(obj, maud_blobid);
+        if (blob) {
+            data = maud_blobdata(blob, size);
+            aug_decref(blob);
+        }
+    }
+    return data;
+}
 
 /* Implementation note: always reassign members before decrementing reference
    counts. */

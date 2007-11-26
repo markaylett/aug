@@ -18,6 +18,9 @@
 # define offsetof(s, m) (size_t)&(((s*)0)->m)
 #endif /* !offsetof */
 
+#define AUG_EQUALID(a, b)                       \
+    (0 == strcmp(a, b))
+
 #define AUG_PODIMPL(s, m, ptr)                          \
     (ptr ? (s*)((char*)(ptr) - offsetof(s, m)) : NULL)
 
@@ -36,8 +39,8 @@
 
 #define AUG_OBJECT(type)                        \
     void* (*cast_)(type*, const char*);         \
-    int (*retain_)(type*);                      \
-    int (*release_)(type*)
+    int (*incref_)(type*);                      \
+    int (*decref_)(type*)
 
 AUG_OBJECTDECL(aug_object);
 
@@ -45,23 +48,13 @@ struct aug_objectvtbl {
     AUG_OBJECT(aug_object);
 };
 
-#define aug_castobject(obj, type)                                   \
+#define aug_cast(obj, type) \
     ((aug_object*)(obj))->vtbl_->cast_((aug_object*)(obj), type)
 
-#define aug_retainobject(obj)                                   \
-    ((aug_object*)(obj))->vtbl_->retain_((aug_object*)(obj))
+#define aug_incref(obj) \
+    ((aug_object*)(obj))->vtbl_->incref_((aug_object*)(obj))
 
-#define aug_releaseobject(obj)                                  \
-    ((aug_object*)(obj))->vtbl_->release_((aug_object*)(obj))
-
-AUG_OBJECTDECL(aug_blob);
-
-struct aug_blobvtbl {
-    AUG_OBJECT(aug_blob);
-    const void* (*data_)(aug_blob*, size_t*);
-};
-
-#define aug_blobdata(obj, size)                 \
-    (obj)->vtbl_->data_(obj, size)
+#define aug_decref(obj) \
+    ((aug_object*)(obj))->vtbl_->decref_((aug_object*)(obj))
 
 #endif /* AUGOBJ_H */
