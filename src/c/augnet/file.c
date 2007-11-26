@@ -19,7 +19,7 @@ struct aug_file_ {
     AUG_ENTRY(aug_file_);
     int trash_, fd_;
     aug_filecb_t cb_;
-    aug_object_t user_;
+    aug_object* user_;
 };
 
 static struct aug_files free_ = AUG_HEAD_INITIALIZER(free_);
@@ -86,7 +86,7 @@ aug_destroyfiles(struct aug_files* files)
     struct aug_file_* it;
     AUG_FOREACH(it, files)
         if (!it->trash_ && it->user_)
-            aug_releaseobject(it->user_);
+            aug_decref(it->user_);
 
     if (!AUG_EMPTY(files)) {
 
@@ -99,7 +99,7 @@ aug_destroyfiles(struct aug_files* files)
 
 AUGNET_API int
 aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
-               aug_object_t user)
+               aug_object* user)
 {
     struct aug_file_* file;
 
@@ -114,7 +114,7 @@ aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
     file->fd_ = fd;
     file->cb_ = cb;
     if ((file->user_ = user))
-        aug_retainobject(user);
+        aug_incref(user);
 
     AUG_INSERT_TAIL(files, file);
     return 0;
@@ -137,7 +137,7 @@ aug_removefile(struct aug_files* files, int fd)
     }
 
     if (it->user_)
-        aug_releaseobject(it->user_);
+        aug_decref(it->user_);
 
     if (locked_(files)) {
 
@@ -182,7 +182,7 @@ aug_foreachfile(struct aug_files* files)
         if (!(it->cb_(it->user_, it->fd_))) {
 
             if (it->user_)
-                aug_releaseobject(it->user_);
+                aug_decref(it->user_);
             it->trash_ = 1;
         }
 

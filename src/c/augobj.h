@@ -12,7 +12,7 @@
   warning when used on non-POD types:
 
   warning: (perhaps the `offsetof' macro was used incorrectly)
- */
+*/
 
 #if !defined(offsetof)
 # define offsetof(s, m) (size_t)&(((s*)0)->m)
@@ -48,13 +48,23 @@ struct aug_objectvtbl {
     AUG_OBJECT(aug_object);
 };
 
-#define aug_cast(obj, type) \
+#define aug_cast(obj, type)                                         \
     ((aug_object*)(obj))->vtbl_->cast_((aug_object*)(obj), type)
 
-#define aug_incref(obj) \
+#define aug_incref(obj)                                         \
     ((aug_object*)(obj))->vtbl_->incref_((aug_object*)(obj))
 
-#define aug_decref(obj) \
+#define aug_decref(obj)                                         \
     ((aug_object*)(obj))->vtbl_->decref_((aug_object*)(obj))
+
+AUG_OBJECTDECL(aug_blob);
+
+struct aug_blobvtbl {
+    AUG_OBJECT(aug_blob);
+    const void* (*data_)(aug_blob*, size_t*);
+};
+
+#define aug_blobdata(obj, size)                 \
+    ((aug_blob*)obj)->vtbl_->data_(obj, size)
 
 #endif /* AUGOBJ_H */

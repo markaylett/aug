@@ -64,7 +64,7 @@ post_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
     PyObject* user = NULL;
-    maud_blob* blob = NULL;
+    aug_blob* blob = NULL;
     int ret;
 
     if (!PyArg_ParseTuple(args, "ss|O:post", &to, &type, &user))
@@ -103,7 +103,7 @@ dispatch_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
     PyObject* user = NULL;
-    maud_blob* blob = NULL;
+    aug_blob* blob = NULL;
     int ret;
 
     if (!PyArg_ParseTuple(args, "ss|O:dispatch", &to, &type, &user))
@@ -232,7 +232,7 @@ static PyObject*
 send_(PyObject* self, PyObject* args)
 {
     PyObject* sock, * buf;
-    maud_blob* blob;
+    aug_blob* blob;
     int ret;
 
     if (!PyArg_ParseTuple(args, "O!O:send", type_, &sock, &buf))
@@ -326,7 +326,7 @@ settimer_(PyObject* self, PyObject* args)
 {
     unsigned ms;
     PyObject* user = NULL, * timer;
-    maud_blob* blob;
+    aug_blob* blob;
     int tid;
 
     if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &user))

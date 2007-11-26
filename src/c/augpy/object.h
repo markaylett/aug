@@ -19,7 +19,7 @@ struct augpy_blobvtbl {
     PyObject* (*get_)(augpy_blob*);
 };
 
-maud_blob*
+aug_blob*
 augpy_createblob(PyObject* pyobj);
 
 const void*

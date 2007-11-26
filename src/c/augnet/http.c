@@ -21,7 +21,7 @@ AUG_RCSID("$Id$");
 
 struct aug_httpparser_ {
     const struct aug_httphandler* handler_;
-    aug_object_t user_;
+    aug_object* user_;
     aug_lexer_t lexer_;
     char name_[AUG_MAXLINE];
     enum {
@@ -207,7 +207,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
 AUGNET_API aug_httpparser_t
 aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
-                     aug_object_t user)
+                     aug_object* user)
 {
     aug_httpparser_t parser = malloc(sizeof(struct aug_httpparser_));
     aug_lexer_t lexer;
@@ -224,7 +224,7 @@ aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
 
     parser->handler_ = handler;
     if ((parser->user_ = user))
-        aug_retainobject(user);
+        aug_incref(user);
     parser->lexer_ = lexer;
     parser->name_[0] = '\0';
     parser->state_ = INITIAL_;
@@ -237,7 +237,7 @@ aug_destroyhttpparser(aug_httpparser_t parser)
 {
     int ret = aug_destroylexer(parser->lexer_);
     if (parser->user_)
-        aug_releaseobject(parser->user_);
+        aug_decref(parser->user_);
     free(parser);
     return ret;
 }

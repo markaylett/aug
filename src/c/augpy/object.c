@@ -10,17 +10,17 @@ AUG_RCSID("$Id$");
 #include <structmember.h>
 
 struct blobimpl_ {
-    maud_blob blob_;
+    aug_blob blob_;
     augpy_blob pyblob_;
     unsigned refs_;
     PyObject* pyobj_;
 };
 
 static void*
-castblob_(maud_blob* obj, const char* id)
+castblob_(aug_blob* obj, const char* id)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, maud_blobid)) {
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
         aug_incref(&impl->blob_);
         return &impl->blob_;
     } else if (AUG_EQUALID(id, augpy_blobid)) {
@@ -31,7 +31,7 @@ castblob_(maud_blob* obj, const char* id)
 }
 
 static int
-increfblob_(maud_blob* obj)
+increfblob_(aug_blob* obj)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
     ++impl->refs_;
@@ -39,7 +39,7 @@ increfblob_(maud_blob* obj)
 }
 
 static int
-decrefblob_(maud_blob* obj)
+decrefblob_(aug_blob* obj)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
     if (0 == --impl->refs_) {
@@ -50,7 +50,7 @@ decrefblob_(maud_blob* obj)
 }
 
 static const void*
-blobdata_(maud_blob* obj, size_t* size)
+blobdata_(aug_blob* obj, size_t* size)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
     const void* data;
@@ -67,7 +67,7 @@ blobdata_(maud_blob* obj, size_t* size)
     return data;
 }
 
-static const struct maud_blobvtbl blobvtbl_ = {
+static const struct aug_blobvtbl blobvtbl_ = {
     castblob_,
     increfblob_,
     decrefblob_,
@@ -81,7 +81,7 @@ castpyblob_(augpy_blob* obj, const char* id)
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augpy_blobid)) {
         aug_incref(&impl->pyblob_);
         return &impl->pyblob_;
-    } else if (AUG_EQUALID(id, maud_blobid)) {
+    } else if (AUG_EQUALID(id, aug_blobid)) {
         aug_incref(&impl->blob_);
         return &impl->blob_;
     }
@@ -122,7 +122,7 @@ static const struct augpy_blobvtbl pyblobvtbl_ = {
     getpyblob_
 };
 
-maud_blob*
+aug_blob*
 augpy_createblob(PyObject* pyobj)
 {
     struct blobimpl_* impl = malloc(sizeof(struct blobimpl_));
@@ -150,9 +150,9 @@ augpy_blobdata(aug_object* obj, size_t* size)
 {
     const void* data = NULL;
     if (obj) {
-        maud_blob* blob = aug_cast(obj, maud_blobid);
+        aug_blob* blob = aug_cast(obj, aug_blobid);
         if (blob) {
-            data = maud_blobdata(blob, size);
+            data = aug_blobdata(blob, size);
             aug_decref(blob);
         }
     }

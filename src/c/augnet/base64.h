@@ -9,7 +9,7 @@
 #include "augutil/object.h"
 #include "augsys/types.h"
 
-typedef int (*aug_base64cb_t)(aug_object_t, const char*, size_t);
+typedef int (*aug_base64cb_t)(aug_object*, const char*, size_t);
 
 typedef struct aug_base64_* aug_base64_t;
 
@@ -20,7 +20,7 @@ enum aug_base64mode {
 
 AUGNET_API aug_base64_t
 aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb,
-                 aug_object_t user);
+                 aug_object* user);
 
 AUGNET_API int
 aug_destroybase64(aug_base64_t base64);

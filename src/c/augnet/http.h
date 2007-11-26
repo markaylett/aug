@@ -11,11 +11,11 @@
 #include "augsys/types.h"
 
 struct aug_httphandler {
-    int (*initial_)(aug_object_t, const char*);
-    int (*field_)(aug_object_t, const char*, const char*);
-    int (*csize_)(aug_object_t, unsigned);
-    int (*cdata_)(aug_object_t, const void*, unsigned);
-    int (*end_)(aug_object_t, int);
+    int (*initial_)(aug_object*, const char*);
+    int (*field_)(aug_object*, const char*, const char*);
+    int (*csize_)(aug_object*, unsigned);
+    int (*cdata_)(aug_object*, const void*, unsigned);
+    int (*end_)(aug_object*, int);
 };
 
 typedef struct aug_httpparser_* aug_httpparser_t;
@@ -27,7 +27,7 @@ typedef struct aug_httpparser_* aug_httpparser_t;
 
 AUGNET_API aug_httpparser_t
 aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
-                     aug_object_t user);
+                     aug_object* user);
 
 AUGNET_API int
 aug_destroyhttpparser(aug_httpparser_t parser);

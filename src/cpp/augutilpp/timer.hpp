@@ -19,9 +19,9 @@
 
 namespace aug {
 
-    template <void (*T)(aug_object_t, int, unsigned&)>
+    template <void (*T)(aug_object*, int, unsigned&)>
     void
-    timercb(aug_object_t user, int id, unsigned* ms) AUG_NOTHROW
+    timercb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
             T(user, id, *ms);
@@ -30,7 +30,7 @@ namespace aug {
 
     template <typename T, void (T::*U)(int, unsigned&)>
     void
-    timermemcb(aug_object_t user, int id, unsigned* ms) AUG_NOTHROW
+    timermemcb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
             (objtoptr<T*>(user)->*U)(id, *ms);
@@ -39,7 +39,7 @@ namespace aug {
 
     template <typename T>
     void
-    timermemcb(aug_object_t user, int id, unsigned* ms) AUG_NOTHROW
+    timermemcb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
             objtoptr<T*>(user)->timercb(id, *ms);
@@ -91,7 +91,7 @@ namespace aug {
 
     inline int
     settimer(aug_timers& timers, idref ref, unsigned ms, aug_timercb_t cb,
-             aug_object_t user)
+             aug_object* user)
     {
         return verify(aug_settimer(&timers, ref.get(), ms, cb, user));
     }
@@ -167,7 +167,7 @@ namespace aug {
         }
 
         void
-        set(unsigned ms, aug_timercb_t cb, aug_object_t user)
+        set(unsigned ms, aug_timercb_t cb, aug_object* user)
         {
             ref_ = settimer(timers_, ref_, ms, cb, user);
         }

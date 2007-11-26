@@ -12,13 +12,13 @@ namespace aug {
 
     const struct deleter_ { } deleter = deleter_();
 
-    inline smartobj<aug_ptrobj_t>
+    inline smartobj<aug_ptrobj>
     createptrobj(void* p, void (*destroy)(void*))
     {
-        return smartobj<aug_ptrobj_t>::attach(aug_createptrobj(p, destroy));
+        return object_attach(aug_createptrobj(p, destroy));
     }
 
-    inline smartobj<aug_ptrobj_t>
+    inline smartobj<aug_ptrobj>
     createptrobj(void* p, const deleter_&)
     {
         return createptrobj(p, ::operator delete);
@@ -26,7 +26,7 @@ namespace aug {
 
     template <typename T>
     T
-    objtoptr(aug_object_t obj)
+    objtoptr(aug_object* obj)
     {
         return static_cast<T>(aug_objtoptr(obj));
     }

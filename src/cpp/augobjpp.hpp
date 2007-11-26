@@ -199,6 +199,19 @@ namespace aug {
     template <typename T>
     struct object_traits;
 
+    inline bool
+    equalid(const char* lhs, const char* rhs)
+    {
+        return AUG_EQUALID(lhs, rhs);
+    }
+
+    template <typename T>
+    bool
+    equalid(const char* id)
+    {
+        return equalid(object_traits<T>::id(), id);
+    }
+
     template <>
     struct object_traits<aug_object> {
         static const char*
@@ -243,6 +256,69 @@ namespace aug {
     {
         return obj->vtbl_->decref_(obj);
     }
+
+    template <>
+    struct object_traits<aug_blob> {
+        static const char*
+        id()
+        {
+            return aug_blobid;
+        }
+    };
+
+    inline const void*
+    blobdata(aug_blob* obj, size_t* size) AUG_NOTHROW
+    {
+        return obj->vtbl_->data_(obj, size);
+    }
+
+    template <typename T>
+    class blob_base {
+
+        static void*
+        cast_(aug_blob* obj, const char* id) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->cast(id);
+        }
+
+        static int
+        incref_(aug_blob* obj) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->incref();
+        }
+
+        static int
+        decref_(aug_blob* obj) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->decref();
+        }
+
+        static const void*
+        data_(aug_blob* obj, size_t* size) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->blobdata(size);
+        }
+
+    protected:
+        ~blob_base() AUG_NOTHROW
+        {
+        }
+        static const aug_blobvtbl*
+        blobvtbl()
+        {
+            static const aug_blobvtbl local = {
+                cast_,
+                incref_,
+                decref_,
+                data_
+            };
+            return &local;
+        }
+    };
 }
 
 template <typename T>

@@ -23,25 +23,25 @@ struct intobjimpl_ {
 static void*
 castintobj_(aug_intobj* obj, const char* id)
 {
-    if (0 == strcmp(id, "aug_object") || 0 == strcmp(id, "aug_intobj")) {
-        obj->vtbl_->retain_(obj);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_intobjid)) {
+        aug_incref(obj);
         return obj;
     }
     return NULL;
 }
 
 static int
-retainintobj_(aug_intobj_t obj)
+increfintobj_(aug_intobj* obj)
 {
-    struct intobjimpl_* impl = AUG_IMPL(struct intobjimpl_, intobj_, obj);
+    struct intobjimpl_* impl = AUG_PODIMPL(struct intobjimpl_, intobj_, obj);
     ++impl->refs_;
     return 0;
 }
 
 static int
-releaseintobj_(aug_intobj_t obj)
+decrefintobj_(aug_intobj* obj)
 {
-    struct intobjimpl_* impl = AUG_IMPL(struct intobjimpl_, intobj_, obj);
+    struct intobjimpl_* impl = AUG_PODIMPL(struct intobjimpl_, intobj_, obj);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
             impl->destroy_(impl->i_);
@@ -51,20 +51,20 @@ releaseintobj_(aug_intobj_t obj)
 }
 
 static int
-getintobj_(aug_intobj_t obj)
+getintobj_(aug_intobj* obj)
 {
-    struct intobjimpl_* impl = AUG_IMPL(struct intobjimpl_, intobj_, obj);
+    struct intobjimpl_* impl = AUG_PODIMPL(struct intobjimpl_, intobj_, obj);
     return impl->i_;
 }
 
 static const struct aug_intobjvtbl intobjvtbl_ = {
     castintobj_,
-    retainintobj_,
-    releaseintobj_,
+    increfintobj_,
+    decrefintobj_,
     getintobj_
 };
 
-AUGUTIL_API aug_intobj_t
+AUGUTIL_API aug_intobj*
 aug_createintobj(int i, void (*destroy)(int))
 {
     struct intobjimpl_* impl = malloc(sizeof(struct intobjimpl_));
@@ -82,13 +82,13 @@ aug_createintobj(int i, void (*destroy)(int))
 }
 
 AUGUTIL_API int
-aug_objtoint(aug_object_t obj)
+aug_objtoint(aug_object* obj)
 {
     int i;
-    aug_intobj_t tmp;
-    if (obj && (tmp = aug_castobject(obj, "aug_intobj"))) {
+    aug_intobj* tmp;
+    if (obj && (tmp = aug_cast(obj, aug_intobjid))) {
         i = aug_getintobj(tmp);
-        aug_releaseobject(tmp);
+        aug_decref(tmp);
     } else
         i = 0;
     return i;
@@ -102,27 +102,27 @@ struct ptrobjimpl_ {
 };
 
 static void*
-castptrobj_(aug_ptrobj_t obj, const char* id)
+castptrobj_(aug_ptrobj* obj, const char* id)
 {
-    if (0 == strcmp(id, "aug_object") || 0 == strcmp(id, "aug_ptrobj")) {
-        obj->vtbl_->retain_(obj);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_ptrobjid)) {
+        aug_incref(obj);
         return obj;
     }
     return NULL;
 }
 
 static int
-retainptrobj_(aug_ptrobj_t obj)
+increfptrobj_(aug_ptrobj* obj)
 {
-    struct ptrobjimpl_* impl = AUG_IMPL(struct ptrobjimpl_, ptrobj_, obj);
+    struct ptrobjimpl_* impl = AUG_PODIMPL(struct ptrobjimpl_, ptrobj_, obj);
     ++impl->refs_;
     return 0;
 }
 
 static int
-releaseptrobj_(aug_ptrobj_t obj)
+decrefptrobj_(aug_ptrobj* obj)
 {
-    struct ptrobjimpl_* impl = AUG_IMPL(struct ptrobjimpl_, ptrobj_, obj);
+    struct ptrobjimpl_* impl = AUG_PODIMPL(struct ptrobjimpl_, ptrobj_, obj);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
             impl->destroy_(impl->p_);
@@ -134,18 +134,18 @@ releaseptrobj_(aug_ptrobj_t obj)
 static void*
 getptrobj_(aug_ptrobj* obj)
 {
-    struct ptrobjimpl_* impl = AUG_IMPL(struct ptrobjimpl_, ptrobj_, obj);
+    struct ptrobjimpl_* impl = AUG_PODIMPL(struct ptrobjimpl_, ptrobj_, obj);
     return impl->p_;
 }
 
 static const struct aug_ptrobjvtbl ptrobjvtbl_ = {
     castptrobj_,
-    retainptrobj_,
-    releaseptrobj_,
+    increfptrobj_,
+    decrefptrobj_,
     getptrobj_
 };
 
-AUGUTIL_API aug_ptrobj_t
+AUGUTIL_API aug_ptrobj*
 aug_createptrobj(void* p, void (*destroy)(void*))
 {
     struct ptrobjimpl_* impl = malloc(sizeof(struct ptrobjimpl_));
@@ -166,10 +166,10 @@ AUGUTIL_API void*
 aug_objtoptr(aug_object* obj)
 {
     void* p;
-    aug_ptrobj_t tmp;
-    if (obj && (tmp = aug_castobject(obj, "aug_objptr"))) {
+    aug_ptrobj* tmp;
+    if (obj && (tmp = aug_cast(obj, aug_ptrobjid))) {
         p = aug_getptrobj(tmp);
-        aug_releaseobject(tmp);
+        aug_decref(tmp);
     } else
         p = NULL;
     return p;

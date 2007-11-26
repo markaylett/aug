@@ -6,6 +6,8 @@
 
 #include "augnetpp/config.hpp"
 
+#include "augutilpp/object.hpp"
+
 #include "augsyspp/exception.hpp"
 #include "augsyspp/smartfd.hpp"
 
@@ -20,9 +22,9 @@
 
 namespace aug {
 
-    template <bool (*T)(aug_object_t, int)>
+    template <bool (*T)(aug_object*, int)>
     int
-    filecb(aug_object_t user, int fd) AUG_NOTHROW
+    filecb(aug_object* user, int fd) AUG_NOTHROW
     {
         try {
             return T(user, fd) ? 1 : 0;
@@ -37,7 +39,7 @@ namespace aug {
 
     template <typename T, bool (T::*U)(int)>
     int
-    filememcb(aug_object_t user, int fd) AUG_NOTHROW
+    filememcb(aug_object* user, int fd) AUG_NOTHROW
     {
         try {
             return (objtoptr<T*>(user)->*U)(fd) ? 1 : 0;
@@ -47,7 +49,7 @@ namespace aug {
 
     template <typename T>
     int
-    filememcb(aug_object_t user, int fd) AUG_NOTHROW
+    filememcb(aug_object* user, int fd) AUG_NOTHROW
     {
         try {
             return objtoptr<T*>(user)->filecb(fd) ? 1 : 0;
@@ -94,7 +96,7 @@ namespace aug {
 
     inline void
     insertfile(aug_files& files, fdref ref, aug_filecb_t cb,
-               aug_object_t user)
+               aug_object* user)
     {
         verify(aug_insertfile(&files, ref.get(), cb, user));
     }

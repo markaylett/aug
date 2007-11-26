@@ -346,7 +346,7 @@ static VALUE
 post_(int argc, VALUE* argv, VALUE self)
 {
     VALUE to, type, user;
-    maud_blob* blob = NULL;
+    aug_blob* blob = NULL;
     int ret;
 
     rb_scan_args(argc, argv, "21", &to, &type, &user);
@@ -373,7 +373,7 @@ static VALUE
 dispatch_(int argc, VALUE* argv, VALUE self)
 {
     VALUE to, type, user;
-    maud_blob* blob = NULL;
+    aug_blob* blob = NULL;
     int ret;
 
     rb_scan_args(argc, argv, "21", &to, &type, &user);
@@ -488,7 +488,7 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
 static VALUE
 send_(VALUE self, VALUE sock, VALUE buf)
 {
-    maud_blob* blob;
+    aug_blob* blob;
     int cid = checkid_(sock), ret;
 
     blob = augrb_createblob(StringValue(buf));
@@ -552,7 +552,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
     VALUE ms, user, timer;
 
     unsigned ui;
-    maud_blob* blob;
+    aug_blob* blob;
     int tid;
 
     rb_scan_args(argc, argv, "11", &ms, &user);

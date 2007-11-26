@@ -13,8 +13,8 @@
 #include "augsys/types.h"
 
 struct aug_marhandler {
-    aug_mar_t (*create_)(aug_object_t, const char*);
-    int (*message_)(aug_object_t, const char*, aug_mar_t);
+    aug_mar_t (*create_)(aug_object*, const char*);
+    int (*message_)(aug_object*, const char*, aug_mar_t);
 };
 
 typedef struct aug_marparser_* aug_marparser_t;
@@ -26,7 +26,7 @@ typedef struct aug_marparser_* aug_marparser_t;
 
 AUGNET_API aug_marparser_t
 aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
-                    aug_object_t user);
+                    aug_object* user);
 
 AUGNET_API int
 aug_destroymarparser(aug_marparser_t parser);

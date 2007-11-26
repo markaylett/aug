@@ -116,16 +116,6 @@ enum maud_loglevel {
 
 typedef int maud_id;
 
-AUG_OBJECTDECL(maud_blob);
-
-struct maud_blobvtbl {
-    AUG_OBJECT(maud_blob);
-    const void* (*data_)(maud_blob*, size_t*);
-};
-
-#define maud_blobdata(obj, size) \
-    ((maud_blob*)obj)->vtbl_->data_(obj, size)
-
 struct maud_session {
     char name_[MAUD_MAXNAME + 1];
     void* user_;
@@ -319,7 +309,7 @@ struct maud_host {
        \param user User data.
     */
 
-    int (*sendv_)(maud_id cid, maud_blob* blob);
+    int (*sendv_)(maud_id cid, aug_blob* blob);
 
     /**
        Set read/write timer.

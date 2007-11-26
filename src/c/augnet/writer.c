@@ -12,7 +12,7 @@ AUG_RCSID("$Id$");
 #include "augsys/errno.h"
 #include "augsys/uio.h"
 #include "augutil/list.h"
-#include "augutil/var.h"
+#include "augobj.h"
 
 #if !defined(_WIN32)
 # if HAVE_ALLOCA_H
@@ -27,7 +27,7 @@ AUG_RCSID("$Id$");
 
 struct aug_buf {
     AUG_ENTRY(aug_buf);
-    aug_blob_t blob_;
+    aug_blob* blob_;
 };
 
 AUG_HEAD(aug_bufs, aug_buf);
@@ -42,9 +42,10 @@ struct aug_writer_ {
 };
 
 static struct aug_buf*
-createbuf_(aug_blob_t blob)
+createbuf_(aug_blob* blob)
 {
     struct aug_buf* buf;
+    assert(blob);
 
     aug_lock();
     if (!(buf = allocate_())) {
@@ -53,8 +54,7 @@ createbuf_(aug_blob_t blob)
     }
     aug_unlock();
 
-    if (blob)
-        aug_retainobject(blob);
+    aug_incref(blob);
     return buf;
 }
 
@@ -63,8 +63,7 @@ destroybufs_(struct aug_bufs* bufs)
 {
     struct aug_buf* it;
     AUG_FOREACH(it, bufs)
-        if (it->blob_)
-            aug_releaseobject(it->blob_);
+        aug_decref(it->blob_);
 
     if (!AUG_EMPTY(bufs)) {
         aug_lock();
@@ -76,8 +75,7 @@ destroybufs_(struct aug_bufs* bufs)
 static void
 destroybuf_(struct aug_buf* buf)
 {
-    if (buf->blob_)
-        aug_releaseobject(buf->blob_);
+    aug_decref(buf->blob_);
 
     aug_lock();
     AUG_INSERT_TAIL(&free_, buf);
@@ -124,7 +122,7 @@ aug_destroywriter(aug_writer_t writer)
 {
     struct aug_buf* it;
     AUG_FOREACH(it, &writer->bufs_) {
-        aug_releaseobject(it->blob_);
+        aug_decref(it->blob_);
     }
 
     /* Destroy in single batch to avoid multiple calls to aug_lock(). */
@@ -134,7 +132,7 @@ aug_destroywriter(aug_writer_t writer)
 }
 
 AUGNET_API int
-aug_appendwriter(aug_writer_t writer, aug_blob_t blob)
+aug_appendwriter(aug_writer_t writer, aug_blob* blob)
 {
     struct aug_buf* buf;
     assert(blob);

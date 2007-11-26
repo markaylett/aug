@@ -12,7 +12,7 @@ struct aug_files;
 struct aug_nbtype;
 
 typedef struct aug_nbfiles_* aug_nbfiles_t;
-typedef int (*aug_nbfilecb_t)(aug_object_t, int, unsigned short);
+typedef int (*aug_nbfilecb_t)(aug_object*, int, unsigned short);
 
 struct aug_nbfile {
     aug_nbfiles_t nbfiles_;

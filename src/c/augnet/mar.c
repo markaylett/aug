@@ -21,14 +21,14 @@ AUG_RCSID("$Id$");
 
 struct aug_marparser_ {
     const struct aug_marhandler* handler_;
-    aug_object_t user_;
+    aug_object* user_;
     aug_httpparser_t http_;
     aug_xstr_t initial_;
     aug_mar_t mar_;
 };
 
 static int
-initial_(aug_object_t user, const char* initial)
+initial_(aug_object* user, const char* initial)
 {
     aug_marparser_t parser = aug_objtoptr(user);
     if (!(parser->initial_ = aug_createxstr(0)))
@@ -45,7 +45,7 @@ initial_(aug_object_t user, const char* initial)
 }
 
 static int
-field_(aug_object_t user, const char* name, const char* value)
+field_(aug_object* user, const char* name, const char* value)
 {
     aug_marparser_t parser = aug_objtoptr(user);
     struct aug_field field;
@@ -58,7 +58,7 @@ field_(aug_object_t user, const char* name, const char* value)
 }
 
 static int
-csize_(aug_object_t user, unsigned csize)
+csize_(aug_object* user, unsigned csize)
 {
     aug_marparser_t parser = aug_objtoptr(user);
     if (-1 == aug_truncatemar(parser->mar_, csize))
@@ -67,14 +67,14 @@ csize_(aug_object_t user, unsigned csize)
 }
 
 static int
-cdata_(aug_object_t user, const void* buf, unsigned len)
+cdata_(aug_object* user, const void* buf, unsigned len)
 {
     aug_marparser_t parser = aug_objtoptr(user);
     return aug_writemar(parser->mar_, buf, len);
 }
 
 static int
-end_(aug_object_t user, int commit)
+end_(aug_object* user, int commit)
 {
     aug_marparser_t parser = aug_objtoptr(user);
     int ret = 0;
@@ -115,7 +115,7 @@ destroy_(void* ptr)
     aug_marparser_t parser = ptr;
 
     if (parser->user_)
-        aug_releaseobject(parser->user_);
+        aug_decref(parser->user_);
 
     if (parser->http_)
         aug_destroyhttpparser(parser->http_);
@@ -131,23 +131,23 @@ destroy_(void* ptr)
 
 AUGNET_API aug_marparser_t
 aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
-                    aug_object_t user)
+                    aug_object* user)
 {
     aug_marparser_t parser = malloc(sizeof(struct aug_marparser_));
-    aug_object_t obj;
+    aug_object* obj;
 
     if (!parser) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    if (!(obj = (aug_object_t)aug_createptrobj(parser, destroy_))) {
+    if (!(obj = (aug_object*)aug_createptrobj(parser, destroy_))) {
         free(parser);
         return NULL;
     }
 
     if ((parser->user_ = user))
-        aug_retainobject(user);
+        aug_incref(user);
     parser->http_ = aug_createhttpparser(size, &handler_, obj);
     parser->initial_ = NULL;
     parser->mar_ = NULL;
@@ -155,7 +155,7 @@ aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
     /* If created, http parser will hold reference.  Otherwise, it will be
        destroyed now. */
 
-    aug_releaseobject(obj);
+    aug_decref(obj);
 
     return parser->http_ ? parser : NULL;
 }

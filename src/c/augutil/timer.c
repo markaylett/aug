@@ -24,7 +24,7 @@ struct aug_timer_ {
     unsigned ms_;
     struct timeval tv_;
     aug_timercb_t cb_;
-    aug_object_t user_;
+    aug_object* user_;
 };
 
 static struct aug_timers free_ = AUG_HEAD_INITIALIZER(free_);
@@ -69,7 +69,7 @@ aug_destroytimers(struct aug_timers* timers)
     struct aug_timer_* it;
     AUG_FOREACH(it, timers)
         if (it->user_)
-            aug_releaseobject(it->user_);
+            aug_decref(it->user_);
 
     if (!AUG_EMPTY(timers)) {
 
@@ -82,7 +82,7 @@ aug_destroytimers(struct aug_timers* timers)
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, aug_object_t user)
+             aug_timercb_t cb, aug_object* user)
 {
     struct timeval tv;
     struct aug_timer_* timer;
@@ -108,7 +108,7 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
     timer->tv_.tv_usec = tv.tv_usec;
     timer->cb_ = cb;
     if ((timer->user_ = user))
-        aug_retainobject(user);
+        aug_incref(user);
     insert_(timers, timer);
     return id;
 }
@@ -130,7 +130,7 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
             if (-1 == expiry_(&it->tv_, it->ms_)) {
 
                 if (it->user_)
-                    aug_releaseobject(it->user_);
+                    aug_decref(it->user_);
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
                 aug_unlock();
@@ -159,7 +159,7 @@ aug_canceltimer(struct aug_timers* timers, int id)
             AUG_REMOVE_PREVPTR(it, prev, timers);
 
             if (it->user_)
-                aug_releaseobject(it->user_);
+                aug_decref(it->user_);
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
             aug_unlock();
@@ -223,7 +223,7 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
                 /* A zero ms value cancels the timer. */
 
                 if (it->user_)
-                    aug_releaseobject(it->user_);
+                    aug_decref(it->user_);
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
                 aug_unlock();

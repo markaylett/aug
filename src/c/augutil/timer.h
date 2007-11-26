@@ -12,7 +12,7 @@ struct timeval;
 struct aug_timer_;
 AUG_HEAD(aug_timers, aug_timer_);
 
-typedef void (*aug_timercb_t)(aug_object_t, int, unsigned*);
+typedef void (*aug_timercb_t)(aug_object*, int, unsigned*);
 
 AUGUTIL_API int
 aug_destroytimers(struct aug_timers* timers);
@@ -36,7 +36,7 @@ aug_destroytimers(struct aug_timers* timers);
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, aug_object_t user);
+             aug_timercb_t cb, aug_object* user);
 
 /**
    On failure, the timer will be removed.

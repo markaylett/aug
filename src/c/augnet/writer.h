@@ -19,7 +19,7 @@ AUGNET_API int
 aug_destroywriter(aug_writer_t writer);
 
 AUGNET_API int
-aug_appendwriter(aug_writer_t writer, aug_blob_t blob);
+aug_appendwriter(aug_writer_t writer, aug_blob* blob);
 
 AUGNET_API int
 aug_writerempty(aug_writer_t writer);
