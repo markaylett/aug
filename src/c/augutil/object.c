@@ -13,17 +13,17 @@ AUG_RCSID("$Id$");
 #include <stdlib.h> /* malloc() */
 #include <string.h>
 
-struct intobjimpl_ {
-    aug_intobj intobj_;
+struct longobimpl_ {
+    aug_longob longob_;
     unsigned refs_;
-    void (*destroy_)(int);
-    int i_;
+    void (*destroy_)(long);
+    long l_;
 };
 
 static void*
-castintobj_(aug_intobj* obj, const char* id)
+castlongob_(aug_longob* obj, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_intobjid)) {
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_longobid)) {
         aug_incref(obj);
         return obj;
     }
@@ -31,80 +31,80 @@ castintobj_(aug_intobj* obj, const char* id)
 }
 
 static int
-increfintobj_(aug_intobj* obj)
+increflongob_(aug_longob* obj)
 {
-    struct intobjimpl_* impl = AUG_PODIMPL(struct intobjimpl_, intobj_, obj);
+    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, obj);
     ++impl->refs_;
     return 0;
 }
 
 static int
-decrefintobj_(aug_intobj* obj)
+decreflongob_(aug_longob* obj)
 {
-    struct intobjimpl_* impl = AUG_PODIMPL(struct intobjimpl_, intobj_, obj);
+    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, obj);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
-            impl->destroy_(impl->i_);
+            impl->destroy_(impl->l_);
         free(impl);
     }
     return 0;
 }
 
-static int
-getintobj_(aug_intobj* obj)
+static long
+getlongob_(aug_longob* obj)
 {
-    struct intobjimpl_* impl = AUG_PODIMPL(struct intobjimpl_, intobj_, obj);
-    return impl->i_;
+    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, obj);
+    return impl->l_;
 }
 
-static const struct aug_intobjvtbl intobjvtbl_ = {
-    castintobj_,
-    increfintobj_,
-    decrefintobj_,
-    getintobj_
+static const struct aug_longobvtbl longobvtbl_ = {
+    castlongob_,
+    increflongob_,
+    decreflongob_,
+    getlongob_
 };
 
-AUGUTIL_API aug_intobj*
-aug_createintobj(int i, void (*destroy)(int))
+AUGUTIL_API aug_longob*
+aug_createlongob(long l, void (*destroy)(long))
 {
-    struct intobjimpl_* impl = malloc(sizeof(struct intobjimpl_));
+    struct longobimpl_* impl = malloc(sizeof(struct longobimpl_));
     if (!impl) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    impl->intobj_.vtbl_ = &intobjvtbl_;
+    impl->longob_.vtbl_ = &longobvtbl_;
     impl->refs_ = 1;
     impl->destroy_ = destroy;
-    impl->i_ = i;
+    impl->l_ = l;
 
-    return &impl->intobj_;
+    return &impl->longob_;
 }
 
-AUGUTIL_API int
-aug_objtoint(aug_object* obj)
+AUGUTIL_API long
+aug_obtolong(aug_object* obj)
 {
-    int i;
-    aug_intobj* tmp;
-    if (obj && (tmp = aug_cast(obj, aug_intobjid))) {
-        i = aug_getintobj(tmp);
+    long l;
+    aug_longob* tmp;
+    if (obj && (tmp = aug_cast(obj, aug_longobid))) {
+        l = aug_getlongob(tmp);
         aug_decref(tmp);
     } else
-        i = 0;
-    return i;
+        l = 0;
+    return l;
 }
 
-struct ptrobjimpl_ {
-    aug_ptrobj ptrobj_;
+struct addrobimpl_ {
+    aug_addrob addrob_;
     unsigned refs_;
     void (*destroy_)(void*);
     void* p_;
 };
 
 static void*
-castptrobj_(aug_ptrobj* obj, const char* id)
+castaddrob_(aug_addrob* obj, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_ptrobjid)) {
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_addrobid)) {
         aug_incref(obj);
         return obj;
     }
@@ -112,17 +112,17 @@ castptrobj_(aug_ptrobj* obj, const char* id)
 }
 
 static int
-increfptrobj_(aug_ptrobj* obj)
+increfaddrob_(aug_addrob* obj)
 {
-    struct ptrobjimpl_* impl = AUG_PODIMPL(struct ptrobjimpl_, ptrobj_, obj);
+    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, obj);
     ++impl->refs_;
     return 0;
 }
 
 static int
-decrefptrobj_(aug_ptrobj* obj)
+decrefaddrob_(aug_addrob* obj)
 {
-    struct ptrobjimpl_* impl = AUG_PODIMPL(struct ptrobjimpl_, ptrobj_, obj);
+    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, obj);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
             impl->destroy_(impl->p_);
@@ -132,43 +132,43 @@ decrefptrobj_(aug_ptrobj* obj)
 }
 
 static void*
-getptrobj_(aug_ptrobj* obj)
+getaddrob_(aug_addrob* obj)
 {
-    struct ptrobjimpl_* impl = AUG_PODIMPL(struct ptrobjimpl_, ptrobj_, obj);
+    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, obj);
     return impl->p_;
 }
 
-static const struct aug_ptrobjvtbl ptrobjvtbl_ = {
-    castptrobj_,
-    increfptrobj_,
-    decrefptrobj_,
-    getptrobj_
+static const struct aug_addrobvtbl addrobvtbl_ = {
+    castaddrob_,
+    increfaddrob_,
+    decrefaddrob_,
+    getaddrob_
 };
 
-AUGUTIL_API aug_ptrobj*
-aug_createptrobj(void* p, void (*destroy)(void*))
+AUGUTIL_API aug_addrob*
+aug_createaddrob(void* p, void (*destroy)(void*))
 {
-    struct ptrobjimpl_* impl = malloc(sizeof(struct ptrobjimpl_));
+    struct addrobimpl_* impl = malloc(sizeof(struct addrobimpl_));
     if (!impl) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    impl->ptrobj_.vtbl_ = &ptrobjvtbl_;
+    impl->addrob_.vtbl_ = &addrobvtbl_;
     impl->refs_ = 1;
     impl->destroy_ = destroy;
     impl->p_ = p;
 
-    return &impl->ptrobj_;
+    return &impl->addrob_;
 }
 
 AUGUTIL_API void*
-aug_objtoptr(aug_object* obj)
+aug_obtoaddr(aug_object* obj)
 {
     void* p;
-    aug_ptrobj* tmp;
-    if (obj && (tmp = aug_cast(obj, aug_ptrobjid))) {
-        p = aug_getptrobj(tmp);
+    aug_addrob* tmp;
+    if (obj && (tmp = aug_cast(obj, aug_addrobid))) {
+        p = aug_getaddrob(tmp);
         aug_decref(tmp);
     } else
         p = NULL;

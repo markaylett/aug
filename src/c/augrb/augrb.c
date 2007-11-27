@@ -803,7 +803,7 @@ event_(const char* from, const char* type, aug_object* user)
 
         size_t size;
         const void* data = augrb_blobdata(user, &size);
-        VALUE x = data ? rb_tainted_str_new(user, (long)size) : Qnil;
+        VALUE x = data ? rb_tainted_str_new(data, (long)size) : Qnil;
         funcall3_(eventid_, rb_str_new2(from), rb_str_new2(type), x);
     }
 }

@@ -33,7 +33,7 @@ namespace aug {
     timermemcb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            (objtoptr<T*>(user)->*U)(id, *ms);
+            (obtoaddr<T*>(user)->*U)(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
@@ -42,7 +42,7 @@ namespace aug {
     timermemcb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            objtoptr<T*>(user)->timercb(id, *ms);
+            obtoaddr<T*>(user)->timercb(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
@@ -101,6 +101,25 @@ namespace aug {
              const null_&)
     {
         return verify(aug_settimer(&timers, ref.get(), ms, cb, 0));
+    }
+
+    template <typename T>
+    int
+    settimer(aug_timers& timers, idref ref, unsigned ms, T& x)
+    {
+        scoped_addrob obj(&x);
+        return verify(aug_settimer(&timers, ref.get(), ms,
+                                   timermemcb<T>, &obj));
+    }
+
+    template <typename T>
+    int
+    settimer(aug_timers& timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
+    {
+        scoped_addrob obj(x.release());
+        int id(verify(aug_settimer(&timers, ref.get(), ms, timermemcb<T>,
+                                   obj)));
+        return id;
     }
 
     inline bool
@@ -176,6 +195,20 @@ namespace aug {
         set(unsigned ms, aug_timercb_t cb, const null_&)
         {
             ref_ = settimer(timers_, ref_, ms, cb, null);
+        }
+
+        template <typename T>
+        void
+        set(unsigned ms, T& x)
+        {
+            ref_ = settimer(timers_, ref_, ms, x);
+        }
+
+        template <typename T>
+        void
+        set(unsigned ms, std::auto_ptr<T>& x)
+        {
+            ref_ = settimer(timers_, ref_, ms, x);
         }
 
         bool

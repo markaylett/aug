@@ -30,7 +30,7 @@ struct aug_marparser_ {
 static int
 initial_(aug_object* user, const char* initial)
 {
-    aug_marparser_t parser = aug_objtoptr(user);
+    aug_marparser_t parser = aug_obtoaddr(user);
     if (!(parser->initial_ = aug_createxstr(0)))
         return -1;
 
@@ -47,7 +47,7 @@ initial_(aug_object* user, const char* initial)
 static int
 field_(aug_object* user, const char* name, const char* value)
 {
-    aug_marparser_t parser = aug_objtoptr(user);
+    aug_marparser_t parser = aug_obtoaddr(user);
     struct aug_field field;
 
     field.name_ = name;
@@ -60,7 +60,7 @@ field_(aug_object* user, const char* name, const char* value)
 static int
 csize_(aug_object* user, unsigned csize)
 {
-    aug_marparser_t parser = aug_objtoptr(user);
+    aug_marparser_t parser = aug_obtoaddr(user);
     if (-1 == aug_truncatemar(parser->mar_, csize))
         return -1;
     return aug_seekmar(parser->mar_, AUG_SET, 0);
@@ -69,14 +69,14 @@ csize_(aug_object* user, unsigned csize)
 static int
 cdata_(aug_object* user, const void* buf, unsigned len)
 {
-    aug_marparser_t parser = aug_objtoptr(user);
+    aug_marparser_t parser = aug_obtoaddr(user);
     return aug_writemar(parser->mar_, buf, len);
 }
 
 static int
 end_(aug_object* user, int commit)
 {
-    aug_marparser_t parser = aug_objtoptr(user);
+    aug_marparser_t parser = aug_obtoaddr(user);
     int ret = 0;
     if (commit) {
 
@@ -141,7 +141,7 @@ aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
         return NULL;
     }
 
-    if (!(obj = (aug_object*)aug_createptrobj(parser, destroy_))) {
+    if (!(obj = (aug_object*)aug_createaddrob(parser, destroy_))) {
         free(parser);
         return NULL;
     }

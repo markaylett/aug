@@ -8,40 +8,40 @@
 
 #include "augobj.h"
 
-/* aug_intobj */
+/* aug_longob */
 
-AUG_OBJECTDECL(aug_intobj);
+AUG_OBJECTDECL(aug_longob);
 
-struct aug_intobjvtbl {
-    AUG_OBJECT(aug_intobj);
-    int (*get_)(aug_intobj*);
+struct aug_longobvtbl {
+    AUG_OBJECT(aug_longob);
+    long (*get_)(aug_longob*);
 };
 
-#define aug_getintobj(obj)                      \
-    ((aug_intobj*)obj)->vtbl_->get_(obj)
+#define aug_getlongob(obj) \
+    ((aug_longob*)obj)->vtbl_->get_(obj)
 
-AUGUTIL_API aug_intobj*
-aug_createintobj(int i, void (*destroy)(int));
+AUGUTIL_API aug_longob*
+aug_createlongob(long l, void (*destroy)(long));
 
-AUGUTIL_API int
-aug_objtoint(aug_object* obj);
+AUGUTIL_API long
+aug_obtolong(aug_object* obj);
 
-/* aug_ptrobj */
+/* aug_addrob */
 
-AUG_OBJECTDECL(aug_ptrobj);
+AUG_OBJECTDECL(aug_addrob);
 
-struct aug_ptrobjvtbl {
-    AUG_OBJECT(aug_ptrobj);
-    void* (*get_)(aug_ptrobj*);
+struct aug_addrobvtbl {
+    AUG_OBJECT(aug_addrob);
+    void* (*get_)(aug_addrob*);
 };
 
-#define aug_getptrobj(obj)                      \
-    ((aug_ptrobj*)obj)->vtbl_->get_(obj)
+#define aug_getaddrob(obj) \
+    ((aug_addrob*)obj)->vtbl_->get_(obj)
 
-AUGUTIL_API aug_ptrobj*
-aug_createptrobj(void* p, void (*destroy)(void*));
+AUGUTIL_API aug_addrob*
+aug_createaddrob(void* p, void (*destroy)(void*));
 
 AUGUTIL_API void*
-aug_objtoptr(aug_object* obj);
+aug_obtoaddr(aug_object* obj);
 
 #endif /* AUGUTIL_OBJECT_H */
