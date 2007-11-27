@@ -6,9 +6,10 @@
 
 #include "augnetpp/config.hpp"
 
-#include "augutilpp/var.hpp"
+#include "augutilpp/object.hpp"
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp"
 
 #include "augnet/mar.h"
 
@@ -25,7 +26,7 @@ namespace aug {
         }
     public:
         static aug_mar_t
-        create(const aug_var& var, const char* initial)
+        create(aug_object* user, const char* initial)
         {
             return aug_createmar();
         }
@@ -50,19 +51,19 @@ namespace aug {
         class marstatic {
 
             static aug_mar_t
-            create(const aug_var* var, const char* initial)
+            create(aug_object* user, const char* initial)
             {
                 try {
-                    return T::create(*var, initial);
+                    return T::create(user, initial);
                 } AUG_SETERRINFOCATCH;
                 return 0;
             }
 
             static int
-            message(const aug_var* var, const char* initial, aug_mar_t mar)
+            message(aug_object* user, const char* initial, aug_mar_t mar)
             {
                 try {
-                    T::message(*var, initial, mar);
+                    T::message(user, initial, mar);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -84,19 +85,19 @@ namespace aug {
         class marnonstatic {
 
             static aug_mar_t
-            create(const aug_var* var, const char* initial)
+            create(aug_object* user, const char* initial)
             {
                 try {
-                    return static_cast<T*>(var->arg_)->create(initial);
+                    return obtoaddr<T*>(user)->create(initial);
                 } AUG_SETERRINFOCATCH;
                 return 0;
             }
 
             static int
-            message(const aug_var* var, const char* initial, aug_mar_t mar)
+            message(aug_object* user, const char* initial, aug_mar_t mar)
             {
                 try {
-                    static_cast<T*>(var->arg_)->message(initial, mar);
+                    obtoaddr<T*>(user)->message(initial, mar);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -146,10 +147,10 @@ namespace aug {
         }
 
         marparser(unsigned size, const aug_marhandler& handler,
-                  const aug_var& var)
+                  aug_object* user)
         {
             verify(marparser_
-                   = aug_createmarparser(size, &handler, &var));
+                   = aug_createmarparser(size, &handler, user));
         }
 
         marparser(unsigned size, const aug_marhandler& handler, const null_&)
@@ -161,19 +162,18 @@ namespace aug {
         template <typename T>
         marparser(unsigned size, T& x)
         {
-            aug_var var = { 0, &x };
+            scoped_addrob obj(&x, 0);
             verify(marparser_
-                   = aug_createmarparser(size, &marnonstatic<T>(), &var));
+                   = aug_createmarparser(size, &marnonstatic<T>(),
+                                         obj.object()));
         }
 
         template <typename T>
         marparser(unsigned size, std::auto_ptr<T>& x)
         {
-            aug_var var;
+            scoped_addrob obj(x.release(), deleter<T>);
             verify(marparser_ = aug_createmarparser
-                   (size, &marnonstatic<T>(),
-                    &bindvar<deletearg<T> >(var, *x)));
-            x.release();
+                   (size, &marnonstatic<T>(), obj.object()));
         }
 
         operator aug_marparser_t()

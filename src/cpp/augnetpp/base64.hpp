@@ -136,7 +136,7 @@ namespace aug {
     filterbase64(std::ostream& os, std::istream& is, aug_base64mode mode)
     {
         scoped_addrob obj(&os, 0);
-        base64 b64(mode, base64cb<detail::base64os>, obj.addrob());
+        base64 b64(mode, base64cb<detail::base64os>, obj.object());
         char buf[AUG_MAXLINE];
         do {
             is.read(buf, sizeof(buf));
@@ -151,8 +151,8 @@ namespace aug {
     filterbase64(const char* buf, size_t len, aug_base64mode mode)
     {
         std::string s;
-        smartobj<aug_ptrobj> sobj(createptrobj(&s, 0));
-        base64 b64(mode, base64cb<detail::base64str>, sobj);
+        scoped_addrob obj(&s, 0);
+        base64 b64(mode, base64cb<detail::base64str>, obj.object());
         appendbase64(b64, buf, len);
         finishbase64(b64);
         return s;

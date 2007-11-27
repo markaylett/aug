@@ -42,7 +42,7 @@ namespace aug {
     filememcb(aug_object* user, int fd) AUG_NOTHROW
     {
         try {
-            return (objtoptr<T*>(user)->*U)(fd) ? 1 : 0;
+            return (obtoaddr<T*>(user)->*U)(fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
@@ -52,7 +52,7 @@ namespace aug {
     filememcb(aug_object* user, int fd) AUG_NOTHROW
     {
         try {
-            return objtoptr<T*>(user)->filecb(fd) ? 1 : 0;
+            return obtoaddr<T*>(user)->filecb(fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
@@ -111,18 +111,16 @@ namespace aug {
     void
     insertfile(aug_files& files, fdref ref, T& x)
     {
-        aug_var var = { 0, &x };
-        verify(aug_insertfile(&files, ref.get(), filememcb<T>, &var));
+        scoped_addrob obj(&x, 0);
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj.object()));
     }
 
     template <typename T>
     void
     insertfile(aug_files& files, fdref ref, std::auto_ptr<T>& x)
     {
-        aug_var var;
-        verify(aug_insertfile(&files, ref.get(), filememcb<T>,
-                              &bindvar<deletearg<T> >(var, *x)));
-        x.release();
+        scoped_addrob obj(x.release(), deleter<T>);
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj.object()));
     }
 
     inline void

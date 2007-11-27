@@ -6,9 +6,10 @@
 
 #include "augnetpp/config.hpp"
 
-#include "augutilpp/var.hpp"
+#include "augutilpp/object.hpp"
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/utility.hpp"
 
 #include "augnet/http.h"
 
@@ -21,48 +22,48 @@ namespace aug {
         template <typename T>
         class httpstatic {
             static int
-            initial(const aug_var* var, const char* value) AUG_NOTHROW
+            initial(aug_object* user, const char* value) AUG_NOTHROW
             {
                 try {
-                    T::initial(*var, value);
+                    T::initial(user, value);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
             }
             static int
-            field(const aug_var* var, const char* name,
+            field(aug_object* user, const char* name,
                   const char* value) AUG_NOTHROW
             {
                 try {
-                    T::field(*var, name, value);
+                    T::field(user, name, value);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
             }
             static int
-            csize(const aug_var* var, unsigned csize) AUG_NOTHROW
+            csize(aug_object* user, unsigned csize) AUG_NOTHROW
             {
                 try {
-                    T::csize(*var, csize);
+                    T::csize(user, csize);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
             }
             static int
-            cdata(const aug_var* var, const void* cdata,
+            cdata(aug_object* user, const void* cdata,
                   unsigned csize) AUG_NOTHROW
             {
                 try {
-                    T::cdata(*var, cdata, csize);
+                    T::cdata(user, cdata, csize);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
             }
             static int
-            end(const aug_var* var, int commit) AUG_NOTHROW
+            end(aug_object* user, int commit) AUG_NOTHROW
             {
                 try {
-                    T::end(*var, commit ? true : false);
+                    T::end(user, commit ? true : false);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -86,48 +87,48 @@ namespace aug {
         template <typename T>
         class httpnonstatic {
             static int
-            initial(const aug_var* var, const char* value) AUG_NOTHROW
+            initial(aug_object* user, const char* value) AUG_NOTHROW
             {
                 try {
-                    static_cast<T*>(var->arg_)->initial(value);
+                    obtoaddr<T*>(user)->initial(value);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
             }
             static int
-            field(const aug_var* var, const char* name,
+            field(aug_object* user, const char* name,
                   const char* value) AUG_NOTHROW
             {
                 try {
-                    static_cast<T*>(var->arg_)->field(name, value);
+                    obtoaddr<T*>(user)->field(name, value);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
             }
             static int
-            csize(const aug_var* var, unsigned csize) AUG_NOTHROW
+            csize(aug_object* user, unsigned csize) AUG_NOTHROW
             {
                 try {
-                    static_cast<T*>(var->arg_)->csize(csize);
+                    obtoaddr<T*>(user)->csize(csize);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
             }
             static int
-            cdata(const aug_var* var, const void* cdata,
+            cdata(aug_object* user, const void* cdata,
                   unsigned csize) AUG_NOTHROW
             {
                 try {
-                    static_cast<T*>(var->arg_)->cdata(cdata, csize);
+                    obtoaddr<T*>(user)->cdata(cdata, csize);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
             }
             static int
-            end(const aug_var* var, int commit) AUG_NOTHROW
+            end(aug_object* user, int commit) AUG_NOTHROW
             {
                 try {
-                    static_cast<T*>(var->arg_)->end(commit ? true : false);
+                    obtoaddr<T*>(user)->end(commit ? true : false);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -180,10 +181,10 @@ namespace aug {
         }
 
         httpparser(unsigned size, const aug_httphandler& handler,
-                   const aug_var& var)
+                   aug_object* user)
         {
             verify(httpparser_
-                   = aug_createhttpparser(size, &handler, &var));
+                   = aug_createhttpparser(size, &handler, user));
         }
 
         httpparser(unsigned size, const aug_httphandler& handler,
@@ -196,19 +197,17 @@ namespace aug {
         template <typename T>
         httpparser(unsigned size, T& x)
         {
-            aug_var var = { 0, &x };
+            scoped_addrob obj(&x, 0);
             verify(httpparser_ = aug_createhttpparser
-                   (size, &httpnonstatic<T>(), &var));
+                   (size, &httpnonstatic<T>(), obj.object()));
         }
 
         template <typename T>
         httpparser(unsigned size, std::auto_ptr<T>& x)
         {
-            aug_var var;
+            scoped_addrob obj(x.release(), deleter<T>);
             verify(httpparser_ = aug_createhttpparser
-                   (size, &httpnonstatic<T>(),
-                    &bindvar<deletearg<T> >(var, *x)));
-            x.release();
+                   (size, &httpnonstatic<T>(), obj.object()));
         }
 
         operator aug_httpparser_t()
