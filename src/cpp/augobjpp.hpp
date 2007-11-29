@@ -4,6 +4,7 @@
 #ifndef AUGOBJPP_HPP
 #define AUGOBJPP_HPP
 
+#include "augnullpp.hpp"
 #include "augobj.h"
 
 #include <algorithm> // swap()
@@ -12,187 +13,156 @@
 # define AUG_NOTHROW throw()
 #endif // !AUG_NOTHROW
 
-struct null_;
-
 namespace aug {
 
     template <typename T>
-    class smartobj;
+    class obref;
 
     template <>
-    class smartobj<aug_object> {
-
-        aug_object* obj_;
-
-        smartobj(aug_object* obj, bool incref) AUG_NOTHROW
-            : obj_(obj)
+    class obref<aug_object> {
+    protected:
+        void* ptr_;
+        obref(void* ptr)
+            : ptr_(ptr)
         {
-            if (obj && incref)
-                aug_incref(obj);
         }
-
     public:
-        ~smartobj() AUG_NOTHROW
-        {
-            if (obj_)
-                aug_decref(obj_);
-        }
-
-        smartobj(const null_&) AUG_NOTHROW
-           : obj_(0)
+        obref(const null_&)
+            : ptr_(0)
         {
         }
-
-        smartobj(const smartobj& rhs)
-            : obj_(rhs.obj_)
+        obref(aug_object* ptr)
+            : ptr_(ptr)
         {
-            if (obj_)
-                aug_incref(obj_);
         }
-
-        smartobj&
-        operator =(const null_&) AUG_NOTHROW
-        {
-            *this = smartobj::incref(0);
-            return *this;
-        }
-
-        smartobj&
-        operator =(const smartobj& rhs)
-        {
-            smartobj tmp(rhs);
-            swap(tmp);
-            return *this;
-        }
-
-        void
-        swap(smartobj& rhs) AUG_NOTHROW
-        {
-            std::swap(obj_, rhs.obj_);
-        }
-
-        void
-        release()
-        {
-            if (obj_) {
-                aug_object* obj(obj_);
-                obj_ = 0;
-                aug_decref(obj);
-            }
-        }
-
-        static smartobj
-        attach(aug_object* obj)
-        {
-            return smartobj(obj, false);
-        }
-
-        static smartobj
-        incref(aug_object* obj)
-        {
-            return smartobj(obj, true);
-        }
-
         aug_object*
         get() const
         {
-            return obj_;
-        }
-
-        operator aug_object*() const
-        {
-            return get();
+            return static_cast<aug_object*>(ptr_);
         }
     };
 
     template <typename T>
-    class smartobj {
-
-        T* obj_;
-
-        smartobj(T* obj, bool incref) AUG_NOTHROW
-            : obj_(obj)
+    class obref : public obref<aug_object> {
+    public:
+        obref(const null_&)
+            : obref<aug_object>(null)
         {
-            if (obj && incref)
-                aug_incref(obj);
+        }
+        obref(T* ptr)
+            : obref<aug_object>(ptr)
+        {
+        }
+        T*
+        get() const
+        {
+            return static_cast<T*>(ptr_);
+        }
+    };
+
+    template <typename T>
+    obref<T>
+    makeref(T* ptr)
+    {
+        return obref<T>(ptr);
+    }
+
+    template <typename T>
+    int
+    incref(obref<T> ref)
+    {
+        return ref.get()->vtbl_->incref_(ref.get());
+    }
+
+    template <typename T>
+    int
+    decref(obref<T> ref)
+    {
+        return ref.get()->vtbl_->decref_(ref.get());
+    }
+
+    template <typename T>
+    class smartob {
+
+        obref<T> ref_;
+
+        smartob(obref<T> ref, bool inc) AUG_NOTHROW
+            : ref_(ref)
+        {
+            if (null != ref && inc)
+                incref(ref);
         }
 
     public:
-        ~smartobj() AUG_NOTHROW
+        ~smartob() AUG_NOTHROW
         {
-            if (obj_)
-                aug_decref(obj_);
+            if (null != ref_)
+                decref(ref_);
         }
 
-        smartobj(const null_&) AUG_NOTHROW
-           : obj_(0)
+        smartob(const null_&) AUG_NOTHROW
+            : ref_(null)
         {
         }
 
-        smartobj(const smartobj& rhs)
-            : obj_(rhs.obj_)
+        smartob(const smartob& rhs)
+            : ref_(rhs.ref_)
         {
-            if (obj_)
-                aug_incref(obj_);
+            if (null != ref_)
+                incref(ref_);
         }
 
-        smartobj&
+        smartob&
         operator =(const null_&) AUG_NOTHROW
         {
-            *this = smartobj::incref(0);
+            *this = smartob(null);
             return *this;
         }
 
-        smartobj&
-        operator =(const smartobj& rhs)
+        smartob&
+        operator =(const smartob& rhs)
         {
-            smartobj tmp(rhs);
+            smartob tmp(rhs);
             swap(tmp);
             return *this;
         }
-
         void
-        swap(smartobj& rhs) AUG_NOTHROW
+        swap(smartob& rhs) AUG_NOTHROW
         {
-            std::swap(obj_, rhs.obj_);
+            std::swap(ref_, rhs.ref_);
         }
 
         void
         release()
         {
-            if (obj_) {
-                T* obj(obj_);
-                obj_ = 0;
-                aug_decref(obj);
+            if (ref_) {
+                T* ref(ref_);
+                ref_ = 0;
+                aug_decref(ref);
             }
         }
 
-        static smartobj
-        attach(T* obj)
+        static smartob
+        attach(obref<T> ref)
         {
-            return smartobj(obj, false);
+            return smartob(ref, false);
         }
 
-        static smartobj
-        incref(T* obj)
+        static smartob
+        incref(obref<T> ref)
         {
-            return smartobj(obj, true);
+            return smartob(ref, true);
         }
 
         T*
         get() const
         {
-            return obj_;
+            return ref_.get();
         }
 
-        operator T*() const
+        operator obref<T>() const
         {
-            return get();
-        }
-
-        operator aug_object*() const
-        {
-            return reinterpret_cast<aug_object*>(get());
+            return ref_;
         }
     };
 
@@ -222,40 +192,47 @@ namespace aug {
     };
 
     template <typename T>
-    smartobj<T>
-    object_attach(T* obj)
+    smartob<T>
+    object_attach(obref<T> ref)
     {
-        return smartobj<T>::attach(obj);
+        return smartob<T>::attach(ref);
     }
 
     template <typename T, typename U>
-    smartobj<T>
-    object_cast(U* obj)
+    smartob<T>
+    object_cast(obref<U> ref)
     {
-        return smartobj<T>::attach
-            (static_cast<T*>(obj->vtbl_->cast_(obj, object_traits<T>::id())));
+        return smartob<T>::attach
+            (static_cast<T*>(ref.get()->vtbl_->cast_
+                             (ref.get(), object_traits<T>::id())));
     }
 
-    template <typename T, typename U>
-    smartobj<T>
-    object_cast(const smartobj<U>& sobj)
-    {
-        return object_cast<T, U>(static_cast<U*>(sobj));
-    }
-
-    template <typename T>
-    int
-    incref(T* obj)
-    {
-        return obj->vtbl_->incref_(obj);
-    }
-
-    template <typename T>
-    int
-    decref(T* obj)
-    {
-        return obj->vtbl_->decref_(obj);
-    }
+    class ref_base {
+        unsigned refs_;
+    protected:
+        virtual
+        ~ref_base()
+        {
+        }
+        ref_base()
+            : refs_(0)
+        {
+        }
+    public:
+        int
+        incref()
+        {
+            ++refs_;
+            return 0;
+        }
+        int
+        decref()
+        {
+            if (0 == --refs_)
+                delete this;
+            return 0;
+        }
+    };
 
     template <>
     struct object_traits<aug_blob> {
@@ -323,7 +300,14 @@ namespace aug {
 
 template <typename T>
 bool
-isnull(const aug::smartobj<T>& sobj)
+isnull(aug::obref<T> ref)
+{
+    return 0 == ref.get();
+}
+
+template <typename T>
+bool
+isnull(const aug::smartob<T>& sobj)
 {
     return 0 == sobj.get();
 }

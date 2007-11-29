@@ -73,15 +73,15 @@ namespace aug {
         }
 
         static smartfd
-        attach(int fd)
+        attach(fdref ref)
         {
-            return smartfd(fd, false);
+            return smartfd(ref, false);
         }
 
         static smartfd
-        retain(int fd)
+        retain(fdref ref)
         {
-            return smartfd(fd, true);
+            return smartfd(ref, true);
         }
 
         int
