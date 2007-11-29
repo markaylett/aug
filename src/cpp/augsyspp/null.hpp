@@ -4,8 +4,6 @@
 #ifndef AUGSYSPP_NULL_HPP
 #define AUGSYSPP_NULL_HPP
 
-#include "augsyspp/config.hpp"
-
 const struct null_ { } null = null_();
 
 template <typename typeT>

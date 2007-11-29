@@ -4,7 +4,6 @@
 #ifndef AUGOBJPP_HPP
 #define AUGOBJPP_HPP
 
-#include "augnullpp.hpp"
 #include "augobj.h"
 
 #include <algorithm> // swap()
@@ -12,6 +11,41 @@
 #if !defined(AUG_NOTHROW)
 # define AUG_NOTHROW throw()
 #endif // !AUG_NOTHROW
+
+#ifndef AUGSYSPP_NULL_HPP
+#define AUGSYSPP_NULL_HPP
+
+const struct null_ { } null = null_();
+
+template <typename typeT>
+inline bool
+operator ==(const typeT& lhs, const null_&)
+{
+    return isnull(lhs);
+}
+
+template <typename typeT>
+inline bool
+operator ==(const null_&, const typeT& rhs)
+{
+    return isnull(rhs);
+}
+
+template <typename typeT>
+inline bool
+operator !=(const typeT& lhs, const null_&)
+{
+    return !isnull(lhs);
+}
+
+template <typename typeT>
+inline bool
+operator !=(const null_&, const typeT& rhs)
+{
+    return !isnull(rhs);
+}
+
+#endif // AUGSYSPP_NULL_HPP
 
 namespace aug {
 
@@ -89,15 +123,15 @@ namespace aug {
         smartob(obref<T> ref, bool inc) AUG_NOTHROW
             : ref_(ref)
         {
-            if (null != ref && inc)
-                incref(ref);
+            if (ref.get() && inc)
+                aug::incref(ref);
         }
 
     public:
         ~smartob() AUG_NOTHROW
         {
             if (null != ref_)
-                decref(ref_);
+				aug::decref(ref_);
         }
 
         smartob(const null_&) AUG_NOTHROW
@@ -109,7 +143,7 @@ namespace aug {
             : ref_(rhs.ref_)
         {
             if (null != ref_)
-                incref(ref_);
+                aug::incref(ref_);
         }
 
         smartob&
@@ -138,7 +172,7 @@ namespace aug {
             if (ref_) {
                 T* ref(ref_);
                 ref_ = 0;
-                aug_decref(ref);
+                aug::decref(ref);
             }
         }
 
