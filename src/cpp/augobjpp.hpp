@@ -12,9 +12,8 @@
 # define AUG_NOTHROW throw()
 #endif // !AUG_NOTHROW
 
-#ifndef AUGSYSPP_NULL_HPP
-#define AUGSYSPP_NULL_HPP
-
+#if !defined(AUG_NULL)
+# define AUG_NULL
 const struct null_ { } null = null_();
 
 template <typename typeT>
@@ -44,8 +43,7 @@ operator !=(const null_&, const typeT& rhs)
 {
     return !isnull(rhs);
 }
-
-#endif // AUGSYSPP_NULL_HPP
+#endif // AUG_NULL
 
 namespace aug {
 
@@ -245,7 +243,7 @@ namespace aug {
         unsigned refs_;
     protected:
         virtual
-        ~ref_base()
+        ~ref_base() AUG_NOTHROW
         {
         }
         ref_base()
@@ -265,69 +263,6 @@ namespace aug {
             if (0 == --refs_)
                 delete this;
             return 0;
-        }
-    };
-
-    template <>
-    struct object_traits<aug_blob> {
-        static const char*
-        id()
-        {
-            return aug_blobid;
-        }
-    };
-
-    inline const void*
-    blobdata(aug_blob* obj, size_t* size) AUG_NOTHROW
-    {
-        return obj->vtbl_->data_(obj, size);
-    }
-
-    template <typename T>
-    class blob_base {
-
-        static void*
-        cast_(aug_blob* obj, const char* id) AUG_NOTHROW
-        {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->cast(id);
-        }
-
-        static int
-        incref_(aug_blob* obj) AUG_NOTHROW
-        {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->incref();
-        }
-
-        static int
-        decref_(aug_blob* obj) AUG_NOTHROW
-        {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->decref();
-        }
-
-        static const void*
-        data_(aug_blob* obj, size_t* size) AUG_NOTHROW
-        {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->blobdata(size);
-        }
-
-    protected:
-        ~blob_base() AUG_NOTHROW
-        {
-        }
-        static const aug_blobvtbl*
-        blobvtbl()
-        {
-            static const aug_blobvtbl local = {
-                cast_,
-                incref_,
-                decref_,
-                data_
-            };
-            return &local;
         }
     };
 }

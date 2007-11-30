@@ -31,7 +31,7 @@
 
 #define AUG_OBJECTDECL(type)                        \
     struct type##vtbl;                              \
-    typedef struct {                                \
+    typedef struct type##_ {                        \
             const struct type##vtbl* vtbl_;         \
             void* impl_;                            \
     } type;                                         \
@@ -43,28 +43,17 @@
     int (*decref_)(type*)
 
 AUG_OBJECTDECL(aug_object);
-
 struct aug_objectvtbl {
     AUG_OBJECT(aug_object);
 };
 
-#define aug_cast(obj, type)                                         \
-    ((aug_object*)(obj))->vtbl_->cast_((aug_object*)(obj), type)
+#define aug_cast(obj, type)                                     \
+    ((aug_object*)obj)->vtbl_->cast_((aug_object*)obj, type)
 
-#define aug_incref(obj)                                         \
-    ((aug_object*)(obj))->vtbl_->incref_((aug_object*)(obj))
+#define aug_incref(obj)                                     \
+    ((aug_object*)obj)->vtbl_->incref_((aug_object*)obj)
 
-#define aug_decref(obj)                                         \
-    ((aug_object*)(obj))->vtbl_->decref_((aug_object*)(obj))
-
-AUG_OBJECTDECL(aug_blob);
-
-struct aug_blobvtbl {
-    AUG_OBJECT(aug_blob);
-    const void* (*data_)(aug_blob*, size_t*);
-};
-
-#define aug_blobdata(obj, size)                 \
-    ((aug_blob*)obj)->vtbl_->data_(obj, size)
+#define aug_decref(obj)                                     \
+    ((aug_object*)obj)->vtbl_->decref_((aug_object*)obj)
 
 #endif /* AUGOBJ_H */

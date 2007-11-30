@@ -1,0 +1,9 @@
+<package name="aug">
+
+  <interface name="blob">
+    <method name="data" type="const void*" qname="blobdata">
+      <param name="size" type="size_t*"/>
+    </method>
+  </interface>
+
+</package>

@@ -1,0 +1,7 @@
+<package name="aug">
+
+  <interface name="addrob">
+    <method name="get" type="void*"/>
+  </interface>
+
+</package>

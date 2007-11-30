@@ -64,36 +64,6 @@ static const struct aug_longobvtbl longobvtbl_ = {
     getlongob_
 };
 
-AUGUTIL_API aug_longob*
-aug_createlongob(long l, void (*destroy)(long))
-{
-    struct longobimpl_* impl = malloc(sizeof(struct longobimpl_));
-    if (!impl) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
-        return NULL;
-    }
-
-    impl->longob_.vtbl_ = &longobvtbl_;
-    impl->refs_ = 1;
-    impl->destroy_ = destroy;
-    impl->l_ = l;
-
-    return &impl->longob_;
-}
-
-AUGUTIL_API long
-aug_obtolong(aug_object* obj)
-{
-    long l;
-    aug_longob* tmp;
-    if (obj && (tmp = aug_cast(obj, aug_longobid))) {
-        l = aug_getlongob(tmp);
-        aug_decref(tmp);
-    } else
-        l = 0;
-    return l;
-}
-
 struct addrobimpl_ {
     aug_addrob addrob_;
     unsigned refs_;
@@ -144,6 +114,36 @@ static const struct aug_addrobvtbl addrobvtbl_ = {
     decrefaddrob_,
     getaddrob_
 };
+
+AUGUTIL_API aug_longob*
+aug_createlongob(long l, void (*destroy)(long))
+{
+    struct longobimpl_* impl = malloc(sizeof(struct longobimpl_));
+    if (!impl) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        return NULL;
+    }
+
+    impl->longob_.vtbl_ = &longobvtbl_;
+    impl->refs_ = 1;
+    impl->destroy_ = destroy;
+    impl->l_ = l;
+
+    return &impl->longob_;
+}
+
+AUGUTIL_API long
+aug_obtolong(aug_object* obj)
+{
+    long l;
+    aug_longob* tmp;
+    if (obj && (tmp = aug_cast(obj, aug_longobid))) {
+        l = aug_getlongob(tmp);
+        aug_decref(tmp);
+    } else
+        l = 0;
+    return l;
+}
 
 AUGUTIL_API aug_addrob*
 aug_createaddrob(void* p, void (*destroy)(void*))

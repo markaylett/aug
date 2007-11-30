@@ -30,75 +30,9 @@
         maud_writelog(MAUD_LOGERROR, "unknown exception");  \
     } do { } while (0)
 
-namespace aug {
-
-    template <>
-    struct object_traits<maud_blob> {
-        static const char*
-        id()
-        {
-            return maud_blobid;
-        }
-    };
-}
-
 namespace maud {
 
     typedef std::runtime_error error;
-
-    inline const void*
-    blobdata(maud_blob* obj, size_t* size) AUG_NOTHROW
-    {
-        return obj->vtbl_->data_(obj, size);
-    }
-
-    template <typename T>
-    class blob_base {
-
-        static void*
-        cast_(maud_blob* obj, const char* id) AUG_NOTHROW
-        {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->cast(id);
-        }
-
-        static int
-        incref_(maud_blob* obj) AUG_NOTHROW
-        {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->incref();
-        }
-
-        static int
-        decref_(maud_blob* obj) AUG_NOTHROW
-        {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->decref();
-        }
-
-        static const void*
-        data_(maud_blob* obj, size_t* size) AUG_NOTHROW
-        {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->blobdata(size);
-        }
-
-    protected:
-        ~blob_base() AUG_NOTHROW
-        {
-        }
-        static const maud_blobvtbl*
-        blobvtbl()
-        {
-            static const maud_blobvtbl local = {
-                cast_,
-                incref_,
-                decref_,
-                data_
-            };
-            return &local;
-        }
-    };
 
     inline void
     writelog(int level, const char* format, ...)

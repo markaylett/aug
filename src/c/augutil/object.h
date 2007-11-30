@@ -8,10 +8,7 @@
 
 #include "augobj.h"
 
-/* aug_longob */
-
 AUG_OBJECTDECL(aug_longob);
-
 struct aug_longobvtbl {
     AUG_OBJECT(aug_longob);
     long (*get_)(aug_longob*);
@@ -20,16 +17,7 @@ struct aug_longobvtbl {
 #define aug_getlongob(obj) \
     ((aug_longob*)obj)->vtbl_->get_(obj)
 
-AUGUTIL_API aug_longob*
-aug_createlongob(long l, void (*destroy)(long));
-
-AUGUTIL_API long
-aug_obtolong(aug_object* obj);
-
-/* aug_addrob */
-
 AUG_OBJECTDECL(aug_addrob);
-
 struct aug_addrobvtbl {
     AUG_OBJECT(aug_addrob);
     void* (*get_)(aug_addrob*);
@@ -37,6 +25,12 @@ struct aug_addrobvtbl {
 
 #define aug_getaddrob(obj) \
     ((aug_addrob*)obj)->vtbl_->get_(obj)
+
+AUGUTIL_API aug_longob*
+aug_createlongob(long l, void (*destroy)(long));
+
+AUGUTIL_API long
+aug_obtolong(aug_object* obj);
 
 AUGUTIL_API aug_addrob*
 aug_createaddrob(void* p, void (*destroy)(void*));

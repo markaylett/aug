@@ -4,8 +4,6 @@
 #ifndef MAUD_H
 #define MAUD_H
 
-#include "augobj.h"
-
 #include <stdarg.h>    /* va_list */
 #include <stdlib.h>    /* NULL */
 #include <sys/types.h> /* size_t */
@@ -32,6 +30,9 @@
 #else /* MAUD_BUILD */
 # define MAUD_API MAUD_EXTERNC MAUD_EXPORT
 #endif /* MAUD_BUILD */
+
+struct aug_blob_;
+struct aug_object_;
 
 enum maud_loglevel {
     MAUD_LOGCRIT,
@@ -203,7 +204,7 @@ struct maud_host {
        \sa dispatch_()
     */
 
-    int (*post_)(const char* to, const char* type, aug_object* user);
+    int (*post_)(const char* to, const char* type, struct aug_object_* user);
 
     /**
        The remaining functions are not thread-safe.
@@ -221,7 +222,8 @@ struct maud_host {
        \sa post_()
     */
 
-    int (*dispatch_)(const char* to, const char* type, aug_object* user);
+    int (*dispatch_)(const char* to, const char* type,
+                     struct aug_object_* user);
 
     /**
        Read a configuration value.
@@ -309,7 +311,7 @@ struct maud_host {
        \param user User data.
     */
 
-    int (*sendv_)(maud_id cid, aug_blob* blob);
+    int (*sendv_)(maud_id cid, struct aug_blob_* blob);
 
     /**
        Set read/write timer.
@@ -354,7 +356,7 @@ struct maud_host {
        \param user Optional user data.
     */
 
-    int (*settimer_)(unsigned ms, aug_object* user);
+    int (*settimer_)(unsigned ms, struct aug_object_* user);
 
     /**
        Reset timer.
@@ -444,7 +446,8 @@ struct maud_module {
        \param user User data.
     */
 
-    void (*event_)(const char* from, const char* type, aug_object* user);
+    void (*event_)(const char* from, const char* type,
+                   struct aug_object_* user);
 
     /**
        Connection closure.

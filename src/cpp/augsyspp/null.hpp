@@ -4,6 +4,10 @@
 #ifndef AUGSYSPP_NULL_HPP
 #define AUGSYSPP_NULL_HPP
 
+#include "augsyspp/config.hpp"
+
+#if !defined(AUG_NULL)
+# define AUG_NULL
 const struct null_ { } null = null_();
 
 template <typename typeT>
@@ -33,5 +37,6 @@ operator !=(const null_&, const typeT& rhs)
 {
     return !isnull(rhs);
 }
+#endif // AUG_NULL
 
 #endif // AUGSYSPP_NULL_HPP

@@ -1,0 +1,7 @@
+<package name="aug">
+
+  <interface name="longob">
+    <method name="get" type="long"/>
+  </interface>
+
+</package>

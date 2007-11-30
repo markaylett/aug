@@ -35,22 +35,12 @@ class Method_
     end
 end
 
-$cast = Method_.new("cast", "void*")
-$cast.push_param(Param.new("id", "const char*"))
-$incref = Method_.new("incref", "int")
-$decref = Method_.new("decref", "int")
-
-def base?(method)
-    method.equal?($cast) || method.equal?($incref) \
-        || method.equal?($decref)
-end
-
 class Interface
     attr_reader :pkg, :name
     def initialize(pkg, name)
         @pkg = pkg
         @name = name
-        @methods = [$cast, $incref, $decref]
+        @methods = []
     end
     def each_method(&action)
         @methods.each &action
@@ -73,13 +63,31 @@ def getarglist(iface, method)
     ls.join(", ")
 end
 
+def getarglistref(iface, method)
+    ls = ["aug::obref<#{iface.cname}> ref"]
+    method.each_param {|param| ls << "#{param.type} #{param.name}"}
+    ls.join(", ")
+end
+
+def getarglistpp(iface, method)
+    ls = []
+    method.each_param {|param| ls << "#{param.type} #{param.name}"}
+    ls.join(", ")
+end
+
 def getnamelist(method)
     ls = ["obj"]
     method.each_param {|param| ls << param.name}
     ls.join(", ")
 end
 
-def getnamepplist(method)
+def getnamelistref(method)
+    ls = ["ref"]
+    method.each_param {|param| ls << param.name}
+    ls.join(", ")
+end
+
+def getnamelistpp(method)
     ls = []
     method.each_param {|param| ls << param.name}
     ls.join(", ")
@@ -94,7 +102,7 @@ end
 def getmethodlist(iface)
     ls = []
     iface.each_method {|method| ls << "#{' ' * 16}#{method.name}_"}
-    ls.join(",\n")
+    ",\n" + ls.join(",\n")
 end
 
 def getparam(node)
@@ -142,7 +150,6 @@ def putcmethod(iface, method)
 end
 
 def putcdefine(iface, method)
-    return if base?(method)
     namelist = getnamelist(method)
     puts <<END
 
@@ -152,15 +159,14 @@ END
 end
 
 def putinline(iface, method)
-    return if base?(method)
-
-    arglist = getarglist(iface, method)
+    arglist = getarglistref(iface, method)
     namelist = getnamelist(method)
     puts <<END
 
     inline #{method.type}
     #{method.qname(iface.name)}(#{arglist}) AUG_NOTHROW
     {
+        #{iface.cname}* obj(ref.get());
         #{getreturn method}obj->vtbl_->#{method.name}_(#{namelist});
     }
 END
@@ -168,19 +174,26 @@ end
 
 def putstatic(iface, method)
     arglist = getarglist(iface, method)
-    namelist = getnamepplist(method)
-    if base?(method) then
-        qname = method.name
-    else
-        qname = method.qname(iface.name)
-    end
+    namelist = getnamelistpp(method)
     puts <<END
-
         static #{method.type}
         #{method.name}_(#{arglist}) AUG_NOTHROW
         {
             T* impl = static_cast<T*>(obj->impl_);
-            #{getreturn method}impl->#{qname}(#{namelist});
+            #{getreturn method}impl->#{method.qname(iface.name)}(#{namelist});
+        }
+END
+end
+
+def putforward(iface, method)
+    arglist = getarglistpp(iface, method)
+    namelist = getnamelistpp(method)
+    qname = method.qname(iface.name)
+    puts <<END
+        #{method.type}
+        #{qname}(#{arglist}) AUG_NOTHROW
+        {
+            #{getreturn method}impl_.#{qname}(#{namelist});
         }
 END
 end
@@ -188,14 +201,9 @@ end
 def putinterface(iface)
     puts <<END
 
-struct #{iface.cname}vtbl;
-typedef struct {
-    const struct #{iface.cname}vtbl* vtbl_;
-    void* impl_;
-} #{iface.cname};
-static const char #{iface.cname}id[] = "#{iface.cname}";
-
+AUG_OBJECTDECL(#{iface.cname});
 struct #{iface.cname}vtbl {
+    AUG_OBJECT(#{iface.cname});
 END
 
     iface.each_method {|x| putcmethod iface, x}
@@ -222,22 +230,152 @@ END
     puts <<END
 
     template <typename T>
-    class #{iface.name}_base {
+    class #{iface.name} {
+
+        #{iface.cname} #{iface.name}_;
+
+        #{iface.name}(const #{iface.name}&);
+
+        #{iface.name}&
+        operator =(const #{iface.name}&);
+
+        static void*
+        cast_(#{iface.cname}* obj, const char* id) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->cast(id).get();
+        }
+        static int
+        incref_(#{iface.cname}* obj) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->incref();
+        }
+        static int
+        decref_(#{iface.cname}* obj) AUG_NOTHROW
+        {
+            T* impl = static_cast<T*>(obj->impl_);
+            return impl->decref();
+        }
 END
     iface.each_method {|x| putstatic iface, x}
     puts <<END
-
-    protected:
-        ~#{iface.name}_base() AUG_NOTHROW
-        {
-        }
         static const #{iface.cname}vtbl*
-        #{iface.name}vtbl()
+        vtbl()
         {
             static const #{iface.cname}vtbl local = {
-#{getmethodlist(iface)}
+                cast_,
+                incref_,
+                decref_#{getmethodlist(iface)}
             };
             return &local;
+        }
+    public:
+        explicit
+        #{iface.name}(T* impl = 0)
+        {
+            #{iface.name}_.vtbl_ = vtbl();
+            #{iface.name}_.impl_ = impl;
+        }
+        void
+        reset(T* impl)
+        {
+            #{iface.name}_.impl_ = impl;
+        }
+        #{iface.cname}*
+        get()
+        {
+            return &#{iface.name}_;
+        }
+        operator aug::obref<#{iface.cname}>()
+        {
+            return get();
+        }
+    };
+
+    template <typename T>
+    class basic_#{iface.name} {
+        #{iface.name}<basic_#{iface.name}<T> > #{iface.name}_;
+        T impl_;
+        unsigned refs_;
+        explicit
+        basic_#{iface.name}(const T& impl)
+            : impl_(impl),
+              refs_(1)
+        {
+            #{iface.name}_.reset(this);
+        }
+    public:
+        aug::obref<aug_object>
+        cast(const char* id) AUG_NOTHROW
+        {
+            if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.cname}>(id))
+                return #{iface.name}_;
+            return null;
+        }
+        int
+        incref() AUG_NOTHROW
+        {
+            ++refs_;
+            return 0;
+        }
+        int
+        decref() AUG_NOTHROW
+        {
+            if (0 == --refs_)
+                delete this;
+            return 0;
+        }
+END
+    iface.each_method {|x| putforward iface, x}
+    puts <<END
+        static aug::smartob<#{iface.cname}>
+        create(const T& impl = T())
+        {
+            basic_#{iface.name}* ptr(new basic_#{iface.name}(impl));
+            return aug::object_attach<#{iface.cname}>(ptr->#{iface.name}_);
+        }
+    };
+
+    template <typename T>
+    class scoped_#{iface.name} {
+        #{iface.name}<scoped_#{iface.name}<T> > #{iface.name}_;
+        T impl_;
+    public:
+        explicit
+        scoped_#{iface.name}(const T& impl = T())
+            : impl_(impl)
+        {
+            #{iface.name}_.reset(this);
+        }
+        aug::obref<aug_object>
+        cast(const char* id) AUG_NOTHROW
+        {
+            if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.cname}>(id))
+                return #{iface.name}_;
+            return null;
+        }
+        int
+        incref() AUG_NOTHROW
+        {
+            return 0;
+        }
+        int
+        decref() AUG_NOTHROW
+        {
+            return 0;
+        }
+END
+    iface.each_method {|x| putforward iface, x}
+    puts <<END
+        #{iface.cname}*
+        get()
+        {
+            return #{iface.name}_.get();
+        }
+        operator aug::obref<#{iface.cname}>()
+        {
+            return #{iface.name}_;
         }
     };
 }
@@ -258,9 +396,23 @@ def putpackage(file, node)
 
 #if defined(__cplusplus)
 
+#include "augobjpp.hpp"
+
 # if !defined(AUG_NOTHROW)
 #  define AUG_NOTHROW throw()
 # endif /* !AUG_NOTHROW */
+
+// For pointer conversions, see 4.10/2:
+
+// "An rvalue of type 'pointer to cv T,' where T is an object type, can be
+// converted to an rvalue of type 'pointer to cv void.' The result of
+// converting a 'pointer to cv T' to a 'pointer to cv void' points to the
+// start of the storage location where the object of type T resides, as if the
+// object is a most derived object (1.8) of type T (that is, not a base class
+// subobject)."
+
+// So the void * will point to the beginning of your class B. And since B is
+// not guaranteed to start with the POD, you may not get what you want.
 
 namespace aug {
     template <typename T>
@@ -296,6 +448,16 @@ opts = OptionParser.new do |opts|
 end
 
 opts.parse!(ARGV)
-doc = Document.new($stdin)
-node = doc.root
-putpackage(file, node)
+
+if ARGV.empty? then
+    doc = Document.new($stdin)
+    node = doc.root
+    putpackage(file, node)
+else
+    ARGV.each do |x|
+        xml = File.new(x)
+        doc = Document.new(xml)
+        node = doc.root
+        putpackage(file, node)
+    end
+end
