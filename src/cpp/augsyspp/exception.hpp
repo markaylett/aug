@@ -38,7 +38,7 @@ namespace aug {
             va_end(args);
         }
         const char*
-        what() const AUG_NOTHROW
+        what() const throw() // required by gcc.
         {
             return errinfo_.desc_;
         }

@@ -6,11 +6,11 @@
 
 #include "augnet/config.h"
 
-#include "augutil/object.h"
-
 #include "augmar/types.h"
 
 #include "augsys/types.h"
+
+#include "augobj.h"
 
 struct aug_marhandler {
     aug_mar_t (*create_)(aug_object*, const char*);

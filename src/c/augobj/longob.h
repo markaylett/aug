@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
-#ifndef AUG_ADDROB_H
-#define AUG_ADDROB_H
+#ifndef AUG_LONGOB_H
+#define AUG_LONGOB_H
 
 #include "augobj.h"
 
@@ -9,20 +9,20 @@
 #include "augobjpp.hpp"
 
 # if !defined(AUG_NOTHROW)
-#  define AUG_NOTHROW throw()
+#  define AUG_NOTHROW
 # endif /* !AUG_NOTHROW */
 
-// For pointer conversions, see 4.10/2:
+/* For pointer conversions, see 4.10/2:
 
-// "An rvalue of type 'pointer to cv T,' where T is an object type, can be
-// converted to an rvalue of type 'pointer to cv void.' The result of
-// converting a 'pointer to cv T' to a 'pointer to cv void' points to the
-// start of the storage location where the object of type T resides, as if the
-// object is a most derived object (1.8) of type T (that is, not a base class
-// subobject)."
+   "An rvalue of type 'pointer to cv T,' where T is an object type, can be
+   converted to an rvalue of type 'pointer to cv void.' The result of
+   converting a 'pointer to cv T' to a 'pointer to cv void' points to the
+   start of the storage location where the object of type T resides, as if the
+   object is a most derived object (1.8) of type T (that is, not a base class
+   subobject)."
 
-// So the void * will point to the beginning of your class B. And since B is
-// not guaranteed to start with the POD, you may not get what you want.
+   So the void * will point to the beginning of your class B. And since B is
+   not guaranteed to start with the POD, you may not get what you want. */
 
 namespace aug {
     template <typename T>
@@ -44,6 +44,7 @@ struct aug_longobvtbl {
 namespace aug {
     template <>
     struct object_traits<aug_longob> {
+        typedef aug_longobvtbl vtbl;
         static const char*
         id()
         {
@@ -54,8 +55,10 @@ namespace aug {
 
 namespace aug {
 
+    typedef aug::obref<aug_longob> longobref;
+
     inline long
-    getlongob(aug::obref<aug_longob> ref) AUG_NOTHROW
+    getlongob(longobref ref) AUG_NOTHROW
     {
         aug_longob* obj(ref.get());
         return obj->vtbl_->get_(obj);
@@ -123,7 +126,7 @@ namespace aug {
         {
             return &longob_;
         }
-        operator aug::obref<aug_longob>()
+        operator longobref()
         {
             return get();
         }
@@ -142,7 +145,7 @@ namespace aug {
             longob_.reset(this);
         }
     public:
-        aug::obref<aug_object>
+        objectref
         cast(const char* id) AUG_NOTHROW
         {
             if (aug::equalid<aug_object>(id) || aug::equalid<aug_longob>(id))
@@ -186,7 +189,7 @@ namespace aug {
         {
             longob_.reset(this);
         }
-        aug::obref<aug_object>
+        objectref
         cast(const char* id) AUG_NOTHROW
         {
             if (aug::equalid<aug_object>(id) || aug::equalid<aug_longob>(id))
@@ -213,7 +216,7 @@ namespace aug {
         {
             return longob_.get();
         }
-        operator aug::obref<aug_longob>()
+        operator longobref()
         {
             return longob_;
         }
@@ -221,4 +224,4 @@ namespace aug {
 }
 #endif /* __cplusplus */
 
-#endif /* AUG_ADDROB_H */
+#endif /* AUG_LONGOB_H */

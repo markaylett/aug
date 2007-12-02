@@ -197,17 +197,17 @@ namespace aug {
         template <typename T>
         httpparser(unsigned size, T& x)
         {
-            scoped_addrob obj(&x, 0);
+            scoped_addrob<simple_addrob> obj(&x);
             verify(httpparser_ = aug_createhttpparser
-                   (size, &httpnonstatic<T>(), obj.object()));
+                   (size, &httpnonstatic<T>(), obj));
         }
 
         template <typename T>
         httpparser(unsigned size, std::auto_ptr<T>& x)
         {
-            scoped_addrob obj(x.release(), deleter<T>);
+            smartob<aug_addrob> obj(createaddrob(x));
             verify(httpparser_ = aug_createhttpparser
-                   (size, &httpnonstatic<T>(), obj.object()));
+                   (size, &httpnonstatic<T>(), obj));
         }
 
         operator aug_httpparser_t()

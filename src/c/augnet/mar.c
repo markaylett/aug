@@ -9,6 +9,7 @@ AUG_RCSID("$Id$");
 
 #include "augnet/http.h"
 
+#include "augutil/object.h"
 #include "augutil/xstr.h"
 
 #include "augmar/mar.h"

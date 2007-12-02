@@ -7,7 +7,8 @@
 #include "augnet/config.h"
 
 #include "augutil/list.h"
-#include "augutil/object.h"
+
+#include "augobj.h"
 
 /**
    #AUG_INIT should be used to initialise the aug_files structure.

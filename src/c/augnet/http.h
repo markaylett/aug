@@ -6,9 +6,9 @@
 
 #include "augnet/config.h"
 
-#include "augutil/object.h"
-
 #include "augsys/types.h"
+
+#include "augobj.h"
 
 struct aug_httphandler {
     int (*initial_)(aug_object*, const char*);

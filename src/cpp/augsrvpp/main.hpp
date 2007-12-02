@@ -9,8 +9,6 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
 
-#include "augutilpp/var.hpp"
-
 #include "augsys/errno.h"
 #include "augsys/log.h"
 #include "augsrv/main.h"

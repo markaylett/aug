@@ -4,9 +4,9 @@
 #ifndef AUGNET_TYPES_H
 #define AUGNET_TYPES_H
 
-#include "augutil/object.h"
-
 #include "augsys/types.h"
+
+#include "augobj.h"
 
 struct aug_files;
 struct aug_nbtype;

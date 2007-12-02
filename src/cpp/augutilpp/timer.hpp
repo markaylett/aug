@@ -19,7 +19,7 @@
 
 namespace aug {
 
-    template <void (*T)(aug_object*, int, unsigned&)>
+    template <void (*T)(objectref, int, unsigned&)>
     void
     timercb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
@@ -91,9 +91,9 @@ namespace aug {
 
     inline int
     settimer(aug_timers& timers, idref ref, unsigned ms, aug_timercb_t cb,
-             aug_object* user)
+             objectref obj)
     {
-        return verify(aug_settimer(&timers, ref.get(), ms, cb, user));
+        return verify(aug_settimer(&timers, ref.get(), ms, cb, obj.get()));
     }
 
     inline int
@@ -107,16 +107,16 @@ namespace aug {
     int
     settimer(aug_timers& timers, idref ref, unsigned ms, T& x)
     {
-        scoped_addrob obj(&x);
+        scoped_addrob<simple_addrob> obj(&x);
         return verify(aug_settimer(&timers, ref.get(), ms,
-                                   timermemcb<T>, &obj));
+                                   timermemcb<T>, obj));
     }
 
     template <typename T>
     int
     settimer(aug_timers& timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
     {
-        scoped_addrob obj(x.release());
+        smartob<aug_addrob> obj(createaddrob(x));
         int id(verify(aug_settimer(&timers, ref.get(), ms, timermemcb<T>,
                                    obj)));
         return id;
@@ -186,9 +186,9 @@ namespace aug {
         }
 
         void
-        set(unsigned ms, aug_timercb_t cb, aug_object* user)
+        set(unsigned ms, aug_timercb_t cb, objectref ref)
         {
-            ref_ = settimer(timers_, ref_, ms, cb, user);
+            ref_ = settimer(timers_, ref_, ms, cb, ref);
         }
 
         void

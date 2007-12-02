@@ -6,9 +6,9 @@
 
 #include "augnet/config.h"
 
-#include "augutil/object.h"
-
 #include "augsys/types.h"
+
+#include "augobj/blob.h"
 
 typedef struct aug_writer_* aug_writer_t;
 
@@ -20,6 +20,10 @@ aug_destroywriter(aug_writer_t writer);
 
 AUGNET_API int
 aug_appendwriter(aug_writer_t writer, aug_blob* blob);
+
+/**
+   Empty if there are no more blobs to write.
+ */
 
 AUGNET_API int
 aug_writerempty(aug_writer_t writer);

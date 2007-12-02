@@ -103,13 +103,13 @@ conn_base::~conn_base() AUG_NOTHROW
 {
 }
 
-maud_object&
+maud_handle&
 connected::do_get()
 {
     return sock_;
 }
 
-const maud_object&
+const maud_handle&
 connected::do_get() const
 {
     return sock_;
@@ -142,7 +142,7 @@ connected::do_send(const void* buf, size_t len, const timeval& now)
 }
 
 void
-connected::do_sendv(const aug_var& var, const timeval& now)
+connected::do_sendv(blobref ref, const timeval& now)
 {
     if (buffer_.empty()) {
 
@@ -152,7 +152,7 @@ connected::do_sendv(const aug_var& var, const timeval& now)
         setnbeventmask(sfd_, AUG_FDEVENTRDWR);
     }
 
-    buffer_.append(var);
+    buffer_.append(ref);
 }
 
 bool
@@ -298,7 +298,7 @@ connected::~connected() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-connected::connected(const sessionptr& session, maud_object& sock,
+connected::connected(const sessionptr& session, maud_handle& sock,
                      buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
                      const endpoint& ep, bool close)
     : session_(session),
@@ -313,13 +313,13 @@ connected::connected(const sessionptr& session, maud_object& sock,
     gettimeofday(since_);
 }
 
-maud_object&
+maud_handle&
 handshake::do_get()
 {
     return sock_;
 }
 
-const maud_object&
+const maud_handle&
 handshake::do_get() const
 {
     return sock_;
@@ -344,9 +344,9 @@ handshake::do_send(const void* buf, size_t len, const timeval& now)
 }
 
 void
-handshake::do_sendv(const aug_var& var, const timeval& now)
+handshake::do_sendv(blobref ref, const timeval& now)
 {
-    buffer_.append(var);
+    buffer_.append(ref);
 }
 
 bool
@@ -432,7 +432,7 @@ handshake::~handshake() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-handshake::handshake(const sessionptr& session, maud_object& sock,
+handshake::handshake(const sessionptr& session, maud_handle& sock,
                      buffer& buffer, const char* host, const char* port)
     : session_(session),
       sock_(sock),

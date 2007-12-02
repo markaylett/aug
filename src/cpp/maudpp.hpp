@@ -19,8 +19,8 @@
 #include <functional>
 
 #if !defined(AUG_NOTHROW)
-# define AUG_NOTHROW throw()
-#endif // !AUG_NOTHROW
+# define AUG_NOTHROW
+#endif /* !AUG_NOTHROW */
 
 #define MAUD_WRITELOGCATCH                                  \
     catch (const std::exception& e) {                       \
@@ -64,16 +64,16 @@ namespace maud {
     }
 
     inline void
-    post(const char* to, const char* type, const maud_var& user)
+    post(const char* to, const char* type, struct aug_object_* user)
     {
-        if (MAUD_ERROR == maud_post(to, type, &user))
+        if (MAUD_ERROR == maud_post(to, type, user))
             throw error(maud_error());
     }
 
     inline void
-    dispatch(const char* to, const char* type, const void* user, size_t size)
+    dispatch(const char* to, const char* type, struct aug_object_* user)
     {
-        if (MAUD_ERROR == maud_dispatch(to, type, user, size))
+        if (MAUD_ERROR == maud_dispatch(to, type, user))
             throw error(maud_error());
     }
 
@@ -97,7 +97,7 @@ namespace maud {
     }
 
     inline void
-    shutdown(const maud_object& sock, unsigned flags)
+    shutdown(const maud_handle& sock, unsigned flags)
     {
         shutdown(sock.id_, flags);
     }
@@ -128,22 +128,22 @@ namespace maud {
     }
 
     inline void
-    send(const maud_object& conn, const void* buf, size_t size)
+    send(const maud_handle& conn, const void* buf, size_t size)
     {
         send(conn.id_, buf, size);
     }
 
     inline void
-    sendv(maud_id cid, const maud_var& user)
+    sendv(maud_id cid, struct aug_blob_* blob)
     {
-        if (MAUD_ERROR == maud_sendv(cid, &user))
+        if (MAUD_ERROR == maud_sendv(cid, blob))
             throw error(maud_error());
     }
 
     inline void
-    sendv(const maud_object& conn, const maud_var& user)
+    sendv(const maud_handle& conn, struct aug_blob_* blob)
     {
-        sendv(conn.id_, user);
+        sendv(conn.id_, blob);
     }
 
     inline void
@@ -154,7 +154,7 @@ namespace maud {
     }
 
     inline void
-    setrwtimer(const maud_object& conn, unsigned ms, unsigned flags)
+    setrwtimer(const maud_handle& conn, unsigned ms, unsigned flags)
     {
         setrwtimer(conn.id_, ms, flags);
     }
@@ -172,7 +172,7 @@ namespace maud {
     }
 
     inline bool
-    retsetrwtimer(const maud_object& conn, unsigned ms, unsigned flags)
+    retsetrwtimer(const maud_handle& conn, unsigned ms, unsigned flags)
     {
         return resetrwtimer(conn.id_, ms, flags);
     }
@@ -190,15 +190,15 @@ namespace maud {
     }
 
     inline bool
-    cancelrwtimer(const maud_object& conn, unsigned flags)
+    cancelrwtimer(const maud_handle& conn, unsigned flags)
     {
         return cancelrwtimer(conn.id_, flags);
     }
 
     inline maud_id
-    settimer(unsigned ms, const maud_var& user)
+    settimer(unsigned ms, struct aug_object_* user)
     {
-        int ret(maud_settimer(ms, &user));
+        int ret(maud_settimer(ms, user));
         if (MAUD_ERROR == ret)
             throw error(maud_error());
         return static_cast<maud_id>(ret);
@@ -217,7 +217,7 @@ namespace maud {
     }
 
     inline bool
-    resettimer(const maud_object& timer, unsigned ms)
+    resettimer(const maud_handle& timer, unsigned ms)
     {
         return resettimer(timer.id_, ms);
     }
@@ -235,7 +235,7 @@ namespace maud {
     }
 
     inline bool
-    canceltimer(const maud_object& timer, unsigned ms)
+    canceltimer(const maud_handle& timer, unsigned ms)
     {
         return resettimer(timer.id_, ms);
     }
@@ -248,7 +248,7 @@ namespace maud {
     }
 
     inline void
-    setsslclient(const maud_object& conn, const char* ctx)
+    setsslclient(const maud_handle& conn, const char* ctx)
     {
         setsslclient(conn.id_, ctx);
     }
@@ -261,80 +261,43 @@ namespace maud {
     }
 
     inline void
-    setsslserver(const maud_object& conn, const char* ctx)
+    setsslserver(const maud_handle& conn, const char* ctx)
     {
         setsslserver(conn.id_, ctx);
     }
 
-    namespace detail {
-        class stringtype {
-            static int
-            destroy(void* arg) AUG_NOTHROW
-            {
-                delete static_cast<std::string*>(arg);
-                return 0;
-            }
-            static const void*
-            buf(void* arg, size_t* size) AUG_NOTHROW
-            {
-                std::string* s(static_cast<std::string*>(arg));
-                if (size)
-                    *size = s->size();
-                return s->data();
-            }
-        public:
-            static const maud_vartype&
-            get()
-            {
-                static const maud_vartype local = {
-                    destroy,
-                    buf
-                };
-                return local;
-            }
-        };
-    }
-
-    inline aug_var&
-    stringvar(aug_var& var, const std::auto_ptr<std::string>& ptr)
-    {
-        var.type_ = &detail::stringtype::get();
-        var.arg_ = ptr.get();
-        return var;
-    }
-
-    class object {
-        const maud_object& object_;
+    class handle {
+        const maud_handle& handle_;
     public:
         explicit
-        object(const maud_object& object)
-            : object_(object)
+        handle(const maud_handle& handle)
+            : handle_(handle)
         {
         }
         void
         setuser(void* user)
         {
-            const_cast<maud_object&>(object_).user_ = user;
+            const_cast<maud_handle&>(handle_).user_ = user;
         }
         maud_id
         id() const
         {
-            return object_.id_;
+            return handle_.id_;
         }
         void*
         user() const
         {
-            return object_.user_;
+            return handle_.user_;
         }
         template <typename T>
         T*
         user() const
         {
-            return static_cast<T*>(object_.user_);
+            return static_cast<T*>(handle_.user_);
         }
-        operator const maud_object&() const
+        operator const maud_handle&() const
         {
-            return object_;
+            return handle_;
         }
     };
 
@@ -350,31 +313,31 @@ namespace maud {
                  size_t size) = 0;
 
         virtual void
-        do_closed(const object& sock) = 0;
+        do_closed(const handle& sock) = 0;
 
         virtual void
-        do_teardown(const object& sock) = 0;
+        do_teardown(const handle& sock) = 0;
 
         virtual bool
-        do_accepted(object& sock, const char* addr, unsigned short port) = 0;
+        do_accepted(handle& sock, const char* addr, unsigned short port) = 0;
 
         virtual void
-        do_connected(object& sock, const char* addr, unsigned short port) = 0;
+        do_connected(handle& sock, const char* addr, unsigned short port) = 0;
 
         virtual void
-        do_data(const object& sock, const void* buf, size_t size) = 0;
+        do_data(const handle& sock, const void* buf, size_t size) = 0;
 
         virtual void
-        do_rdexpire(const object& sock, unsigned& ms) = 0;
+        do_rdexpire(const handle& sock, unsigned& ms) = 0;
 
         virtual void
-        do_wrexpire(const object& sock, unsigned& ms) = 0;
+        do_wrexpire(const handle& sock, unsigned& ms) = 0;
 
         virtual void
-        do_expire(const object& timer, unsigned& ms) = 0;
+        do_expire(const handle& timer, unsigned& ms) = 0;
 
         virtual bool
-        do_authcert(const object& sock, const char* subject,
+        do_authcert(const handle& sock, const char* subject,
                     const char* issuer) = 0;
 
     public:
@@ -399,47 +362,47 @@ namespace maud {
             do_event(from, type, user, size);
         }
         void
-        closed(const object& sock)
+        closed(const handle& sock)
         {
             do_closed(sock);
         }
         void
-        teardown(const object& sock)
+        teardown(const handle& sock)
         {
             do_teardown(sock);
         }
         bool
-        accepted(object& sock, const char* addr, unsigned short port)
+        accepted(handle& sock, const char* addr, unsigned short port)
         {
             return do_accepted(sock, addr, port);
         }
         void
-        connected(object& sock, const char* addr, unsigned short port)
+        connected(handle& sock, const char* addr, unsigned short port)
         {
             do_connected(sock, addr, port);
         }
         void
-        data(const object& sock, const void* buf, size_t size)
+        data(const handle& sock, const void* buf, size_t size)
         {
             do_data(sock, buf, size);
         }
         void
-        rdexpire(const object& sock, unsigned& ms)
+        rdexpire(const handle& sock, unsigned& ms)
         {
             do_rdexpire(sock, ms);
         }
         void
-        wrexpire(const object& sock, unsigned& ms)
+        wrexpire(const handle& sock, unsigned& ms)
         {
             do_wrexpire(sock, ms);
         }
         void
-        expire(const object& timer, unsigned& ms)
+        expire(const handle& timer, unsigned& ms)
         {
             do_expire(timer, ms);
         }
         bool
-        authcert(const object& sock, const char* subject, const char* issuer)
+        authcert(const handle& sock, const char* subject, const char* issuer)
         {
             return do_authcert(sock, subject, issuer);
         }
@@ -456,42 +419,42 @@ namespace maud {
         {
         }
         void
-        do_closed(const object& sock)
+        do_closed(const handle& sock)
         {
         }
         void
-        do_teardown(const object& sock)
+        do_teardown(const handle& sock)
         {
             maud_writelog(MAUD_LOGINFO, "teardown defaulting to shutdown");
             shutdown(sock, 0);
         }
         bool
-        do_accepted(object& sock, const char* addr, unsigned short port)
+        do_accepted(handle& sock, const char* addr, unsigned short port)
         {
             return true;
         }
         void
-        do_connected(object& sock, const char* addr, unsigned short port)
+        do_connected(handle& sock, const char* addr, unsigned short port)
         {
         }
         void
-        do_data(const object& sock, const void* buf, size_t size)
+        do_data(const handle& sock, const void* buf, size_t size)
         {
         }
         void
-        do_rdexpire(const object& sock, unsigned& ms)
+        do_rdexpire(const handle& sock, unsigned& ms)
         {
         }
         void
-        do_wrexpire(const object& sock, unsigned& ms)
+        do_wrexpire(const handle& sock, unsigned& ms)
         {
         }
         void
-        do_expire(const object& timer, unsigned& ms)
+        do_expire(const handle& timer, unsigned& ms)
         {
         }
         bool
-        do_authcert(const object& sock, const char* subject,
+        do_authcert(const handle& sock, const char* subject,
                     const char* issuer)
         {
             return true;
@@ -581,74 +544,74 @@ namespace maud {
             } MAUD_WRITELOGCATCH;
         }
         static void
-        closed(const maud_object* sock) AUG_NOTHROW
+        closed(const maud_handle* sock) AUG_NOTHROW
         {
             try {
-                getbase()->closed(object(*sock));
+                getbase()->closed(handle(*sock));
             } MAUD_WRITELOGCATCH;
         }
         static void
-        teardown(const maud_object* sock) AUG_NOTHROW
+        teardown(const maud_handle* sock) AUG_NOTHROW
         {
             try {
-                getbase()->teardown(object(*sock));
+                getbase()->teardown(handle(*sock));
             } MAUD_WRITELOGCATCH;
         }
         static int
-        accepted(maud_object* sock, const char* addr,
+        accepted(maud_handle* sock, const char* addr,
                  unsigned short port) AUG_NOTHROW
         {
             try {
-                object o(*sock);
-                return result(getbase()->accepted(o, addr, port));
+                handle h(*sock);
+                return result(getbase()->accepted(h, addr, port));
             } MAUD_WRITELOGCATCH;
             return MAUD_ERROR;
         }
         static void
-        connected(maud_object* sock, const char* addr,
+        connected(maud_handle* sock, const char* addr,
                   unsigned short port) AUG_NOTHROW
         {
             try {
-                object o(*sock);
-                getbase()->connected(o, addr, port);
+                handle h(*sock);
+                getbase()->connected(h, addr, port);
             } MAUD_WRITELOGCATCH;
         }
         static void
-        data(const maud_object* sock, const void* buf,
+        data(const maud_handle* sock, const void* buf,
              size_t size) AUG_NOTHROW
         {
             try {
-                getbase()->data(object(*sock), buf, size);
+                getbase()->data(handle(*sock), buf, size);
             } MAUD_WRITELOGCATCH;
         }
         static void
-        rdexpire(const maud_object* sock, unsigned* ms) AUG_NOTHROW
+        rdexpire(const maud_handle* sock, unsigned* ms) AUG_NOTHROW
         {
             try {
-                getbase()->rdexpire(object(*sock), *ms);
+                getbase()->rdexpire(handle(*sock), *ms);
             } MAUD_WRITELOGCATCH;
         }
         static void
-        wrexpire(const maud_object* sock, unsigned* ms) AUG_NOTHROW
+        wrexpire(const maud_handle* sock, unsigned* ms) AUG_NOTHROW
         {
             try {
-                getbase()->wrexpire(object(*sock), *ms);
+                getbase()->wrexpire(handle(*sock), *ms);
             } MAUD_WRITELOGCATCH;
         }
         static void
-        expire(const maud_object* timer, unsigned* ms) AUG_NOTHROW
+        expire(const maud_handle* timer, unsigned* ms) AUG_NOTHROW
         {
             try {
-                getbase()->expire(object(*timer), *ms);
+                getbase()->expire(handle(*timer), *ms);
             } MAUD_WRITELOGCATCH;
         }
         static int
-        authcert(const maud_object* sock, const char* subject,
+        authcert(const maud_handle* sock, const char* subject,
                  const char* issuer)
         {
             try {
-                object o(*sock);
-                return result(getbase()->authcert(o, subject, issuer));
+                handle h(*sock);
+                return result(getbase()->authcert(h, subject, issuer));
             } MAUD_WRITELOGCATCH;
             return MAUD_ERROR;
         }

@@ -1,0 +1,13 @@
+<package name="aug">
+
+  <interface name="eventob">
+    <method name="setuser" type="void" qname="seteventobuser">
+      <param name="user" type="aug_object*"/>
+    </method>
+    <method name="from" type="const char*" qname="eventobfrom"/>
+    <method name="to" type="const char*" qname="eventobto"/>
+    <method name="type" type="const char*" qname="eventobtype"/>
+    <method name="user" type="aug_object*" qname="eventobuser"/>
+  </interface>
+
+</package>

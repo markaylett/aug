@@ -15,8 +15,6 @@
 #include "augutilpp/object.hpp"
 #include "augutilpp/path.hpp"
 #include "augutilpp/shellparser.hpp"
-#include "augutilpp/smartobj.hpp"
 #include "augutilpp/timer.hpp"
-#include "augutilpp/var.hpp"
 
 #endif // AUGUTILPP_HPP

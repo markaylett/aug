@@ -11,7 +11,7 @@ namespace aug {
 
     class clntconn : public rwtimer_base, public conn_base {
 
-        maud_object sock_;
+        maud_handle sock_;
         buffer buffer_;
         rwtimer rwtimer_;
         connptr conn_;
@@ -35,10 +35,10 @@ namespace aug {
 
         // conn_base.
 
-        maud_object&
+        maud_handle&
         do_get();
 
-        const maud_object&
+        const maud_handle&
         do_get() const;
 
         const sessionptr&
@@ -51,7 +51,7 @@ namespace aug {
         do_send(const void* buf, size_t size, const timeval& now);
 
         void
-        do_sendv(const aug_var& var, const timeval& now);
+        do_sendv(blobref ref, const timeval& now);
 
         bool
         do_accepted(const aug_endpoint& ep, const timeval& now);

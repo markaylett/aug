@@ -40,13 +40,13 @@ clntconn::do_cancelrwtimer(unsigned flags)
     return rwtimer_.cancelrwtimer(flags);
 }
 
-maud_object&
+maud_handle&
 clntconn::do_get()
 {
     return conn_->get();
 }
 
-const maud_object&
+const maud_handle&
 clntconn::do_get() const
 {
     return conn_->get();
@@ -71,9 +71,9 @@ clntconn::do_send(const void* buf, size_t len, const timeval& now)
 }
 
 void
-clntconn::do_sendv(const aug_var& var, const timeval& now)
+clntconn::do_sendv(blobref ref, const timeval& now)
 {
-    conn_->sendv(var, now);
+    conn_->sendv(ref, now);
 }
 
 bool

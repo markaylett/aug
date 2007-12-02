@@ -9,8 +9,8 @@
 #include <algorithm> // swap()
 
 #if !defined(AUG_NOTHROW)
-# define AUG_NOTHROW throw()
-#endif // !AUG_NOTHROW
+# define AUG_NOTHROW
+#endif /* !AUG_NOTHROW */
 
 #if !defined(AUG_NULL)
 # define AUG_NULL
@@ -74,15 +74,17 @@ namespace aug {
         }
     };
 
+    typedef obref<aug_object> objectref;
+
     template <typename T>
-    class obref : public obref<aug_object> {
+    class obref : public objectref {
     public:
         obref(const null_&)
-            : obref<aug_object>(null)
+            : objectref(null)
         {
         }
         obref(T* ptr)
-            : obref<aug_object>(ptr)
+            : objectref(ptr)
         {
         }
         T*
@@ -201,6 +203,20 @@ namespace aug {
     template <typename T>
     struct object_traits;
 
+    template <typename T>
+    int
+    incref(const smartob<T>& sob)
+    {
+        return incref<T>(static_cast<obref<T> >(sob));
+    }
+
+    template <typename T>
+    int
+    decref(const smartob<T>& sob)
+    {
+        return decref<T>(static_cast<obref<T> >(sob));
+    }
+
     inline bool
     equalid(const char* lhs, const char* rhs)
     {
@@ -216,6 +232,7 @@ namespace aug {
 
     template <>
     struct object_traits<aug_object> {
+        typedef aug_objectvtbl vtbl;
         static const char*
         id()
         {
@@ -237,6 +254,13 @@ namespace aug {
         return smartob<T>::attach
             (static_cast<T*>(ref.get()->vtbl_->cast_
                              (ref.get(), object_traits<T>::id())));
+    }
+
+    template <typename T, typename U>
+    smartob<T>
+    object_cast(const smartob<U>& sob)
+    {
+        return object_cast<T, U>(static_cast<obref<U> >(sob));
     }
 
     class ref_base {

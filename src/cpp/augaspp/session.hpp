@@ -40,37 +40,37 @@ namespace aug {
                  size_t size) const AUG_NOTHROW = 0;
 
         virtual void
-        do_closed(const maud_object& sock) const AUG_NOTHROW = 0;
+        do_closed(const maud_handle& sock) const AUG_NOTHROW = 0;
 
         virtual void
-        do_teardown(const maud_object& sock) const AUG_NOTHROW = 0;
+        do_teardown(const maud_handle& sock) const AUG_NOTHROW = 0;
 
         virtual bool
-        do_accepted(maud_object& sock, const char* addr,
+        do_accepted(maud_handle& sock, const char* addr,
                     unsigned short port) const AUG_NOTHROW = 0;
 
         virtual void
-        do_connected(maud_object& sock, const char* addr,
+        do_connected(maud_handle& sock, const char* addr,
                      unsigned short port) const AUG_NOTHROW = 0;
 
         virtual void
-        do_data(const maud_object& sock, const char* buf,
+        do_data(const maud_handle& sock, const char* buf,
                 size_t size) const AUG_NOTHROW = 0;
 
         virtual void
-        do_rdexpire(const maud_object& sock,
+        do_rdexpire(const maud_handle& sock,
                     unsigned& ms) const AUG_NOTHROW = 0;
 
         virtual void
-        do_wrexpire(const maud_object& sock,
+        do_wrexpire(const maud_handle& sock,
                     unsigned& ms) const AUG_NOTHROW = 0;
 
         virtual void
-        do_expire(const maud_object& timer,
+        do_expire(const maud_handle& timer,
                   unsigned& ms) const AUG_NOTHROW = 0;
 
         virtual bool
-        do_authcert(const maud_object& sock, const char* subject,
+        do_authcert(const maud_handle& sock, const char* subject,
                     const char* issuer) const AUG_NOTHROW = 0;
 
     public:
@@ -109,50 +109,50 @@ namespace aug {
             do_event(from, type, user, size);
         }
         void
-        closed(const maud_object& sock) const AUG_NOTHROW
+        closed(const maud_handle& sock) const AUG_NOTHROW
         {
             do_closed(sock);
         }
         void
-        teardown(const maud_object& sock) const AUG_NOTHROW
+        teardown(const maud_handle& sock) const AUG_NOTHROW
         {
             do_teardown(sock);
         }
         bool
-        accepted(maud_object& sock, const char* addr,
+        accepted(maud_handle& sock, const char* addr,
                  unsigned short port) const AUG_NOTHROW
         {
             return do_accepted(sock, addr, port);
         }
         void
-        connected(maud_object& sock, const char* addr,
+        connected(maud_handle& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW
         {
             do_connected(sock, addr, port);
         }
         void
-        data(const maud_object& sock, const char* buf,
+        data(const maud_handle& sock, const char* buf,
              size_t size) const AUG_NOTHROW
         {
             do_data(sock, buf, size);
         }
         void
-        rdexpire(const maud_object& sock, unsigned& ms) const AUG_NOTHROW
+        rdexpire(const maud_handle& sock, unsigned& ms) const AUG_NOTHROW
         {
             do_rdexpire(sock, ms);
         }
         void
-        wrexpire(const maud_object& sock, unsigned& ms) const AUG_NOTHROW
+        wrexpire(const maud_handle& sock, unsigned& ms) const AUG_NOTHROW
         {
             do_wrexpire(sock, ms);
         }
         void
-        expire(const maud_object& timer, unsigned& ms) const AUG_NOTHROW
+        expire(const maud_handle& timer, unsigned& ms) const AUG_NOTHROW
         {
             do_expire(timer, ms);
         }
         bool
-        authcert(const maud_object& sock, const char* subject,
+        authcert(const maud_handle& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW
         {
             return do_authcert(sock, subject, issuer);

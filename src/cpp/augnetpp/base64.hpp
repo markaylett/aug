@@ -67,9 +67,9 @@ namespace aug {
                 perrinfo("aug_destroybase64() failed");
         }
 
-        base64(aug_base64mode mode, aug_base64cb_t cb, aug_object* user)
+        base64(aug_base64mode mode, aug_base64cb_t cb, obref<aug_object> ref)
         {
-            verify(base64_ = aug_createbase64(mode, cb, user));
+            verify(base64_ = aug_createbase64(mode, cb, ref.get()));
         }
 
         base64(aug_base64mode mode, aug_base64cb_t cb, const null_&)
@@ -80,15 +80,14 @@ namespace aug {
         template <typename T>
         base64(aug_base64mode mode, T& x)
         {
-            scoped_addrob obj(&x);
-            verify(base64_
-                   = aug_createbase64(mode, base64memcb<T>, &obj));
+            scoped_addrob<simple_addrob> obj(&x);
+            verify(base64_ = aug_createbase64(mode, base64memcb<T>, obj));
         }
 
         template <typename T>
         base64(aug_base64mode mode, std::auto_ptr<T>& x)
         {
-            scoped_addrob obj(x.release(), deleter<T>);
+            smartob<aug_addrob> obj(createaddrob(x));
             verify(base64_
                    = aug_createbase64(mode, base64memcb<T>, obj));
         }
@@ -135,8 +134,8 @@ namespace aug {
     inline std::ostream&
     filterbase64(std::ostream& os, std::istream& is, aug_base64mode mode)
     {
-        scoped_addrob obj(&os, 0);
-        base64 b64(mode, base64cb<detail::base64os>, obj.object());
+        scoped_addrob<simple_addrob> obj(&os);
+        base64 b64(mode, base64cb<detail::base64os>, obj);
         char buf[AUG_MAXLINE];
         do {
             is.read(buf, sizeof(buf));
@@ -151,8 +150,8 @@ namespace aug {
     filterbase64(const char* buf, size_t len, aug_base64mode mode)
     {
         std::string s;
-        scoped_addrob obj(&s, 0);
-        base64 b64(mode, base64cb<detail::base64str>, obj.object());
+        scoped_addrob<simple_addrob> obj(&s);
+        base64 b64(mode, base64cb<detail::base64str>, obj);
         appendbase64(b64, buf, len);
         finishbase64(b64);
         return s;

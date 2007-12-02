@@ -111,16 +111,16 @@ namespace aug {
     void
     insertfile(aug_files& files, fdref ref, T& x)
     {
-        scoped_addrob obj(&x, 0);
-        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj.object()));
+        scoped_addrob<simple_addrob> obj(&x);
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj));
     }
 
     template <typename T>
     void
     insertfile(aug_files& files, fdref ref, std::auto_ptr<T>& x)
     {
-        scoped_addrob obj(x.release(), deleter<T>);
-        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj.object()));
+        smartob<aug_addrob> obj(createaddrob(x));
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj));
     }
 
     inline void

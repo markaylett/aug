@@ -162,18 +162,17 @@ namespace aug {
         template <typename T>
         marparser(unsigned size, T& x)
         {
-            scoped_addrob obj(&x, 0);
+            scoped_addrob<simple_addrob> obj(&x);
             verify(marparser_
-                   = aug_createmarparser(size, &marnonstatic<T>(),
-                                         obj.object()));
+                   = aug_createmarparser(size, &marnonstatic<T>(), obj));
         }
 
         template <typename T>
         marparser(unsigned size, std::auto_ptr<T>& x)
         {
-            scoped_addrob obj(x.release(), deleter<T>);
+            smartob<aug_addrob> obj(createaddrob(x));
             verify(marparser_ = aug_createmarparser
-                   (size, &marnonstatic<T>(), obj.object()));
+                   (size, &marnonstatic<T>(), obj));
         }
 
         operator aug_marparser_t()

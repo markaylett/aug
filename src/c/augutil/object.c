@@ -115,6 +115,65 @@ static const struct aug_addrobvtbl addrobvtbl_ = {
     getaddrob_
 };
 
+
+struct blobimpl_ {
+    aug_blob blob_;
+    unsigned refs_;
+    size_t size_;
+    char buf_[1];
+};
+
+static void*
+castblob_(aug_blob* obj, const char* id)
+{
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
+        aug_incref(obj);
+        return obj;
+    }
+    return NULL;
+}
+
+static int
+increfblob_(aug_blob* obj)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    ++impl->refs_;
+    return 0;
+}
+
+static int
+decrefblob_(aug_blob* obj)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    if (0 == --impl->refs_)
+        free(impl);
+    return 0;
+}
+
+static const void*
+blobdata_(aug_blob* obj, size_t* size)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    if (size)
+        *size = impl->size_;
+    return impl->buf_;
+}
+
+static size_t
+blobsize_(aug_blob* obj)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    return impl->size_;
+}
+
+static const struct aug_blobvtbl blobvtbl_ = {
+    castblob_,
+    increfblob_,
+    decrefblob_,
+    blobdata_,
+    blobsize_
+};
+
 AUGUTIL_API aug_longob*
 aug_createlongob(long l, void (*destroy)(long))
 {
@@ -173,4 +232,21 @@ aug_obtoaddr(aug_object* obj)
     } else
         p = NULL;
     return p;
+}
+
+AUGUTIL_API aug_blob*
+aug_createblob(const void* buf, size_t len)
+{
+    struct blobimpl_* impl = malloc(sizeof(struct blobimpl_) + len - 1);
+    if (!impl) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        return NULL;
+    }
+
+    impl->blob_.vtbl_ = &blobvtbl_;
+    impl->refs_ = 1;
+    impl->size_ = len;
+    memcpy(impl->buf_, buf, len);
+
+    return &impl->blob_;
 }

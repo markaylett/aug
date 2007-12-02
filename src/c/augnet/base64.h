@@ -6,8 +6,9 @@
 
 #include "augnet/config.h"
 
-#include "augutil/object.h"
 #include "augsys/types.h"
+
+#include "augobj.h"
 
 typedef int (*aug_base64cb_t)(aug_object*, const char*, size_t);
 

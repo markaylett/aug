@@ -58,9 +58,9 @@ namespace aug {
     };
 
     inline void
-    appendwriter(aug_writer_t writer, const aug_var& var)
+    appendwriter(aug_writer_t writer, blobref ref)
     {
-        verify(aug_appendwriter(writer, &var));
+        verify(aug_appendwriter(writer, ref.get()));
     }
 
     inline size_t

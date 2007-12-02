@@ -9,6 +9,7 @@
 #endif /* _WIN32 */
 
 #include "maud.h"
+#include "augobj/blob.h"
 
 #include <Python.h>
 

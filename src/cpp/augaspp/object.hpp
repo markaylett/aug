@@ -12,13 +12,13 @@ namespace aug {
 
     class object_base {
     public:
-        typedef maud_object ctype;
+        typedef maud_handle ctype;
     private:
 
-        virtual maud_object&
+        virtual maud_handle&
         do_get() = 0;
 
-        virtual const maud_object&
+        virtual const maud_handle&
         do_get() const = 0;
 
         virtual const sessionptr&
@@ -28,12 +28,12 @@ namespace aug {
         virtual
         ~object_base() AUG_NOTHROW;
 
-        maud_object&
+        maud_handle&
         get()
         {
             return do_get();
         }
-        const maud_object&
+        const maud_handle&
         get() const
         {
             return do_get();
@@ -43,11 +43,11 @@ namespace aug {
         {
             return do_session();
         }
-        operator maud_object&()
+        operator maud_handle&()
         {
             return do_get();
         }
-        operator const maud_object&() const
+        operator const maud_handle&() const
         {
             return do_get();
         }
@@ -56,13 +56,13 @@ namespace aug {
     typedef smartptr<object_base> objectptr;
 
     inline maud_id
-    id(const maud_object& ref)
+    id(const maud_handle& ref)
     {
         return ref.id_;
     }
 
     inline void*
-    user(const maud_object& ref)
+    user(const maud_handle& ref)
     {
         return ref.user_;
     }

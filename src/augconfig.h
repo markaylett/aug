@@ -50,7 +50,7 @@
 #else /* __cplusplus */
 # define AUG_EXTERNC extern "C"
 # if !defined(AUG_NOTHROW)
-#  define AUG_NOTHROW throw()
+#  define AUG_NOTHROW
 # endif /* !AUG_NOTHROW */
 #endif /* __cplusplus */
 

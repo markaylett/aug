@@ -72,26 +72,13 @@ namespace aug {
 
         void
         post(const char* sname, const char* to, const char* type,
-             const aug_var* user);
-
-        void
-        post(const char* sname, const char* to, const char* type,
-             const aug_var& user)
-        {
-            post(sname, to, type, &user);
-        }
-        void
-        post(const char* sname, const char* to, const char* type,
-             const null_&)
-        {
-            post(sname, to, type, 0);
-        }
+             objectref ref);
 
         // Thread-unsafe host interface.
 
         void
         dispatch(const char* sname, const char* to, const char* type,
-                 const void* user, size_t size);
+                 objectref ref);
 
         void
         shutdown(maud_id cid, unsigned flags);
@@ -108,7 +95,7 @@ namespace aug {
         send(maud_id cid, const void* buf, size_t len);
 
         void
-        sendv(maud_id cid, const aug_var& var);
+        sendv(maud_id cid, blobref ref);
 
         void
         setrwtimer(maud_id cid, unsigned ms, unsigned flags);
@@ -120,18 +107,7 @@ namespace aug {
         cancelrwtimer(maud_id cid, unsigned flags);
 
         maud_id
-        settimer(const char* sname, unsigned ms, const aug_var* var);
-
-        maud_id
-        settimer(const char* sname, unsigned ms, const aug_var& var)
-        {
-            return settimer(sname, ms, &var);
-        }
-        maud_id
-        settimer(const char* sname, unsigned ms, const null_&)
-        {
-            return settimer(sname, ms, 0);
-        }
+        settimer(const char* sname, unsigned ms, objectref ref);
 
         bool
         resettimer(maud_id tid, unsigned ms);

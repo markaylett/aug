@@ -6,7 +6,7 @@
 
 #include "augnetpp/config.hpp"
 
-#include "augutilpp/var.hpp"
+#include "augutilpp/object.hpp"
 
 #include "augsyspp/exception.hpp"
 #include "augsyspp/smartfd.hpp"
@@ -22,12 +22,12 @@
 
 namespace aug {
 
-    template <bool (*T)(const aug_var&, int, unsigned short)>
+    template <bool (*T)(aug_object*, int, unsigned short)>
     int
-    nbfilecb(const aug_var* var, int fd, unsigned short events) AUG_NOTHROW
+    nbfilecb(aug_object* obj, int fd, unsigned short events) AUG_NOTHROW
     {
         try {
-            return T(*var, fd, events) ? 1 : 0;
+            return T(obj, fd, events) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
 
         /**
@@ -37,22 +37,22 @@ namespace aug {
         return 1;
     }
 
-    template <typename T, bool (T::*U)(const aug_var&, int, unsigned short)>
+    template <typename T, bool (T::*U)(aug_object*, int, unsigned short)>
     int
-    nbfilememcb(const aug_var* var, int fd, unsigned short events) AUG_NOTHROW
+    nbfilememcb(aug_object* obj, int fd, unsigned short events) AUG_NOTHROW
     {
         try {
-            return (static_cast<T*>(var->arg_)->*U)(fd, events) ? 1 : 0;
+            return (obtoaddr<T*>(obj)->*U)(fd, events) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
 
     template <typename T>
     int
-    nbfilememcb(const aug_var* var, int fd, unsigned short events) AUG_NOTHROW
+    nbfilememcb(aug_object* obj, int fd, unsigned short events) AUG_NOTHROW
     {
         try {
-            return static_cast<T*>(var->arg_)->nbfilecb(fd, events) ? 1 : 0;
+            return obtoaddr<T*>(obj)->nbfilecb(fd, events) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
@@ -92,14 +92,14 @@ namespace aug {
 
     inline void
     insertnbfile(aug_nbfiles_t nbfiles, fdref ref, aug_nbfilecb_t cb,
-               const aug_var& var)
+                 aug_object* user)
     {
-        verify(aug_insertnbfile(nbfiles, ref.get(), cb, &var));
+        verify(aug_insertnbfile(nbfiles, ref.get(), cb, user));
     }
 
     inline void
     insertnbfile(aug_nbfiles_t nbfiles, fdref ref, aug_nbfilecb_t cb,
-               const null_&)
+                 const null_&)
     {
         verify(aug_insertnbfile(nbfiles, ref.get(), cb, 0));
     }
@@ -108,18 +108,16 @@ namespace aug {
     void
     insertnbfile(aug_nbfiles_t nbfiles, fdref ref, T& x)
     {
-        aug_var var = { 0, &x };
-        verify(aug_insertnbfile(nbfiles, ref.get(), nbfilememcb<T>, &var));
+        scoped_addrob<simple_addrob> obj(&x);
+        verify(aug_insertnbfile(nbfiles, ref.get(), nbfilememcb<T>, obj));
     }
 
     template <typename T>
     void
     insertnbfile(aug_nbfiles_t nbfiles, fdref ref, std::auto_ptr<T>& x)
     {
-        aug_var var;
-        verify(aug_insertnbfile(nbfiles, ref.get(), nbfilememcb<T>,
-                                &bindvar<deletearg<T> >(var, *x)));
-        x.release();
+        smartob<aug_addrob> obj(createaddrob(x));
+        verify(aug_insertnbfile(nbfiles, ref.get(), nbfilememcb<T>, obj));
     }
 
     inline void

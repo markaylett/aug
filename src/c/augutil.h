@@ -21,7 +21,6 @@
 #include "augutil/timer.h"
 #include "augutil/tmspec.h"
 #include "augutil/types.h"
-#include "augutil/var.h"
 #include "augutil/xstr.h"
 
 #endif /* AUGUTIL_H */

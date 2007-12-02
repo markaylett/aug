@@ -4,8 +4,10 @@
 #ifndef AUGUTIL_TIMER_H
 #define AUGUTIL_TIMER_H
 
+#include "augutil/config.h"
 #include "augutil/list.h"
-#include "augutil/object.h"
+
+#include "augobj.h"
 
 struct timeval;
 

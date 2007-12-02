@@ -19,7 +19,7 @@ namespace aug {
         do_send(const void* buf, size_t size, const timeval& now) = 0;
 
         virtual void
-        do_sendv(const aug_var& var, const timeval& now) = 0;
+        do_sendv(blobref ref, const timeval& now) = 0;
 
         /**
            Notify of newly accepted connection.
@@ -68,9 +68,9 @@ namespace aug {
             do_send(buf, size, now);
         }
         void
-        sendv(const aug_var& var, const timeval& now)
+        sendv(blobref ref, const timeval& now)
         {
-            do_sendv(var, now);
+            do_sendv(ref, now);
         }
         bool
         accepted(const aug_endpoint& ep, const timeval& now)
@@ -120,7 +120,7 @@ namespace aug {
     class connected : public conn_base {
 
         sessionptr session_;
-        maud_object& sock_;
+        maud_handle& sock_;
         buffer& buffer_;
         rwtimer& rwtimer_;
         smartfd sfd_;
@@ -134,10 +134,10 @@ namespace aug {
 
         timeval since_;
 
-        maud_object&
+        maud_handle&
         do_get();
 
-        const maud_object&
+        const maud_handle&
         do_get() const;
 
         const sessionptr&
@@ -150,7 +150,7 @@ namespace aug {
         do_send(const void* buf, size_t size, const timeval& now);
 
         void
-        do_sendv(const aug_var& var, const timeval& now);
+        do_sendv(blobref ref, const timeval& now);
 
         bool
         do_accepted(const aug_endpoint& ep, const timeval& now);
@@ -179,7 +179,7 @@ namespace aug {
     public:
         ~connected() AUG_NOTHROW;
 
-        connected(const sessionptr& session, maud_object& sock,
+        connected(const sessionptr& session, maud_handle& sock,
                   buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
                   const endpoint& ep, bool close);
     };
@@ -187,17 +187,17 @@ namespace aug {
     class handshake : public conn_base {
 
         sessionptr session_;
-        maud_object& sock_;
+        maud_handle& sock_;
         buffer& buffer_;
         connector connector_;
         smartfd sfd_;
         endpoint endpoint_;
         sockstate state_;
 
-        maud_object&
+        maud_handle&
         do_get();
 
-        const maud_object&
+        const maud_handle&
         do_get() const;
 
         const sessionptr&
@@ -210,7 +210,7 @@ namespace aug {
         do_send(const void* buf, size_t size, const timeval& now);
 
         void
-        do_sendv(const aug_var& var, const timeval& now);
+        do_sendv(blobref ref, const timeval& now);
 
         bool
         do_accepted(const aug_endpoint& ep, const timeval& now);
@@ -239,7 +239,7 @@ namespace aug {
     public:
         ~handshake() AUG_NOTHROW;
 
-        handshake(const sessionptr& session, maud_object& sock,
+        handshake(const sessionptr& session, maud_handle& sock,
                   buffer& buffer, const char* host, const char* port);
     };
 }

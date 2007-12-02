@@ -4,6 +4,7 @@
     <method name="data" type="const void*" qname="blobdata">
       <param name="size" type="size_t*"/>
     </method>
+    <method name="size" type="size_t" qname="blobsize"/>
   </interface>
 
 </package>

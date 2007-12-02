@@ -185,12 +185,14 @@ target_alias = @target_alias@
 EXTRA_DIST = \
 	addrob.xml \
 	blob.xml \
+	eventob.xml \
 	longob.xml
 
 modincludedir = $(includedir)/augobj
 modinclude_HEADERS = \
 	addrob.h \
 	blob.h \
+	eventob.h \
 	longob.h
 
 all: all-am
@@ -420,7 +422,7 @@ uninstall-am: uninstall-info-am uninstall-modincludeHEADERS
 
 
 @ENABLE_RUBY_TRUE@%.h: %.xml
-@ENABLE_RUBY_TRUE@	$(top_srcdir)/src/rb/augidl -f addrob <$< >$@
+@ENABLE_RUBY_TRUE@	$(top_srcdir)/src/rb/augidl -f $@ <$< >$@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

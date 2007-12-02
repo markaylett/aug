@@ -35,7 +35,7 @@ namespace aug {
         send(maud_id cid, const void* buf, size_t size, const timeval& now);
 
         bool
-        sendv(maud_id cid, const aug_var& var, const timeval& now);
+        sendv(maud_id cid, blobref ref, const timeval& now);
 
         void
         clear();

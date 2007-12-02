@@ -14,22 +14,83 @@
 
 namespace aug {
 
-    struct vecarg {
-        std::vector<char> vec_;
-        size_t begin_, end_;
-        explicit
-        vecarg(size_t size)
-            : vec_(size),
-              begin_(0),
-              end_(0)
-        {
-        }
-    };
+    namespace detail {
+        class vecblob {
+            blob<vecblob> blob_;
+            std::vector<char> vec_;
+            size_t size_;
+            unsigned refs_;
+        public:
+            explicit
+            vecblob(size_t size)
+                : vec_(size),
+                  size_(0),
+                  refs_(1)
+            {
+                blob_.reset(this);
+            }
+            objectref
+            cast(const char* id) AUG_NOTHROW
+            {
+                if (equalid<aug_object>(id) || equalid<aug_blob>(id))
+                    return blob_;
+                return null;
+            }
+            int
+            incref() AUG_NOTHROW
+            {
+                ++refs_;
+                return 0;
+            }
+            int
+            decref() AUG_NOTHROW
+            {
+                // When only one ref remains, writing must have finished and
+                // vector can be reset.
+
+                if (1 == --refs_)
+                    size_ = 0;
+                return 0;
+            }
+            const void*
+            blobdata(size_t* size) AUG_NOTHROW
+            {
+                if (size)
+                    *size = size_;
+                return &vec_[0];
+            }
+            size_t
+            blobsize() AUG_NOTHROW
+            {
+                return size_;
+            }
+            void
+            append(const void* buf, size_t len)
+            {
+                // Grow buffer if needed.
+
+                if (vec_.size() - size_ < len)
+                    vec_.resize(size_ + len);
+
+                memcpy(&vec_[size_], buf, len);
+                size_ += len;
+            }
+            aug_blob*
+            get()
+            {
+                return blob_.get();
+            }
+            operator blobref()
+            {
+                return blob_;
+            }
+        };
+    }
 
     class buffer {
         writer writer_;
-        vecarg arg_;
-        bool usevec_;
+        detail::vecblob blob_;
+        bool reuse_;
         size_t size_;
 
     public:
@@ -39,7 +100,7 @@ namespace aug {
         buffer(size_t size = 1024);
 
         void
-        append(const aug_var& var);
+        append(blobref ref);
 
         void
         append(const void* buf, size_t size);
@@ -48,7 +109,7 @@ namespace aug {
            write, at least some, of the buffered data.
 
            \return bytes written.
-         */
+        */
 
         size_t
         writesome(fdref ref);

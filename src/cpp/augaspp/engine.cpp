@@ -20,6 +20,8 @@ AUG_RCSID("$Id$");
 
 #include "augutilpp/timer.hpp"
 
+#include "augobj/eventob.h"
+
 #include <map>
 #include <queue>
 
@@ -28,47 +30,77 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-// Definition placed outside anonymous namespace to avoid compiler warnings.
-
-struct sessiontimer {
-    sessionptr session_;
-    aug_var var_;
-    ~sessiontimer() AUG_NOTHROW
-    {
-        try {
-            destroyvar(var_);
-        } AUG_PERRINFOCATCH;
-    }
-    explicit
-    sessiontimer(const sessionptr& session)
-        : session_(session)
-    {
-        var_.type_ = 0;
-        var_.arg_ = 0;
-    }
-};
-
 namespace {
 
-    typedef smartptr<sessiontimer> sessiontimerptr;
-    typedef map<maud_id, sessiontimerptr> sessiontimers;
+    // Definition placed outside anonymous namespace to avoid compiler
+    // warnings.
 
-    struct postevent {
-        string from_, to_, type_;
-        aug_var var_;
-        ~postevent() AUG_NOTHROW
+    struct sessiontimer {
+        sessionptr session_;
+        smartob<aug_object> user_;
+        explicit
+        sessiontimer(const sessionptr& session)
+            : session_(session),
+              user_(null)
         {
-            try {
-                destroyvar(var_);
-            } AUG_PERRINFOCATCH;
         }
+    };
+
+    typedef map<maud_id, sessiontimer> sessiontimers;
+
+    class postevent : public ref_base {
+        eventob<postevent> eventob_;
+        const string from_, to_, type_;
+        smartob<aug_object> user_;
         postevent(const string& from, const string& to, const string& type)
             : from_(from),
               to_(to),
-              type_(type)
+              type_(type),
+              user_(null)
         {
-            var_.type_ = 0;
-            var_.arg_ = 0;
+            eventob_.reset(this);
+        }
+    public:
+        obref<aug_object>
+        cast(const char* id)
+        {
+            if (equalid<aug_object>(id) || equalid<aug_eventob>(id)) {
+                incref();
+                return eventob_;
+            }
+            return null;
+        }
+        void
+        seteventobuser(aug_object* obj) AUG_NOTHROW
+        {
+            user_ = smartob<aug_object>::incref(obj);
+        }
+        const char*
+        eventobfrom() AUG_NOTHROW
+        {
+            return from_.c_str();
+        }
+        const char*
+        eventobto() AUG_NOTHROW
+        {
+            return to_.c_str();
+        }
+        const char*
+        eventobtype() AUG_NOTHROW
+        {
+            return type_.c_str();
+        }
+        aug_object*
+        eventobuser() AUG_NOTHROW
+        {
+            aug::incref(user_);
+            return user_.get();
+        }
+        static smartob<aug_eventob>
+        create(const string& from, const string& to, const string& type)
+        {
+            postevent* ptr = new postevent(from, to, type);
+            return object_attach<aug_eventob>(ptr->eventob_);
         }
     };
 
@@ -172,9 +204,9 @@ namespace aug {
 
                     // Initiate grace period.
 
-                    aug_var var = { 0, this };
+                    smartob<aug_addrob> obj(createaddrob(this, 0));
                     grace_.set(15000, timermemcb<engineimpl,
-                               &engineimpl::stopcb>, var);
+                               &engineimpl::stopcb>, obj);
                 }
             }
             void
@@ -293,11 +325,11 @@ namespace aug {
                 case POSTEVENT_:
                     AUG_DEBUG2("received POSTEVENT_");
                     {
-                        auto_ptr<postevent> ev
-                            (static_cast<postevent*>(event.var_.arg_));
+                        smartob<aug_eventob> ev
+                            (object_cast<aug_eventob>(makeref(event.user_)));
 
                         vector<sessionptr> sessions;
-                        sessions_.getbygroup(sessions, ev->to_);
+                        sessions_.getbygroup(sessions, eventobto(ev));
 
                         size_t size;
                         const void* user(varbuf(ev->var_, size));
