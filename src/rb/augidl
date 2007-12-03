@@ -11,6 +11,17 @@ include REXML
 
 STDOUT.binmode
 
+class Type
+    attr_reader :type
+    def initialize(type, object)
+        @type = type
+        @object = object
+    end
+    def object?
+        @object
+    end
+end
+
 class Param
     attr_reader :name, :type
     def initialize(name, type)
@@ -21,10 +32,10 @@ end
 
 class Method_
     attr_reader :name, :type
-    def initialize(name, type, qname = nil)
+    def initialize(name, qname, type)
         @name = name
-        @type = type
         @qname = qname
+        @type = type
         @params = []
     end
     def each_param(&action)
@@ -43,10 +54,11 @@ class Method_
 end
 
 class Interface
-    attr_reader :pkg, :name
+    attr_reader :pkg, :name, :type
     def initialize(pkg, name)
         @pkg = pkg
         @name = name
+        @type = Type.new("#{pkg}_#{name}", true)
         @methods = []
     end
     def each_method(&action)
@@ -55,55 +67,92 @@ class Interface
     def push_method(method)
         @methods << method
     end
-    def cname
-        "#{@pkg}_#{@name}"
+end
+
+module ParamLists
+    def arg_list(iface, method)
+        args = ["#{param_type(iface.type)} obj"]
+        method.each_param do |param|
+            args << "#{param_type(param.type)} #{param.name}"
+        end
+        args
+    end
+    def name_list(iface, method)
+        args = ["obj"]
+        method.each_param do |param|
+            args << param.name
+        end
+        args
+    end
+    def type_list(iface, method)
+        args = [param_type(iface.type)]
+        method.each_param do |param|
+            args << param_type(param.type)
+        end
+        args
+    end
+end
+
+class CFormat
+    include ParamLists
+    def arg_list(iface, method)
+        args = ["#{param_type(iface.type)} obj"]
+        method.each_param do |param|
+            args << "#{param_type(iface.type)} #{param.name}"
+        end
+        args
+    end
+    def name_list(iface, method)
+    end
+    def type_list(iface, method)
+    end
+    def param_type(type)
+        if type.object? then
+            "#{type.type}*"
+        else
+            type.type
+        end
+    end
+    def return_type(type)
+        if type.object? then
+            "#{type.type}*"
+        else
+            type.type
+        end
+    end
+end
+
+class CppFormat
+    include ParamLists
+    def arg_list(iface, method)
+        args = ["#{param_type(iface.type)} obj"]
+        method.each_param do |param|
+            args << "#{param_type(iface.type)} #{param.name}"
+        end
+        args
+    end
+    def name_list(iface, method)
+    end
+    def type_list(iface, method)
+    end
+    def param_type(type)
+        if type.object? then
+            "obref<#{type.type}>"
+        else
+            type.type
+        end
+    end
+    def return_type(type)
+        if type.object? then
+            "smartob<#{type.type}>"
+        else
+            type.type
+        end
     end
 end
 
 def getreturn(method)
     method.type == "void" ? "" : "return "
-end
-
-def getarglist(iface, method)
-    ls = ["#{iface.cname}* obj"]
-    method.each_param {|param| ls << "#{param.type} #{param.name}"}
-    ls.join(", ")
-end
-
-def getarglistref(iface, method)
-    ls = ["#{iface.name}ref ref"]
-    method.each_param {|param| ls << "#{param.type} #{param.name}"}
-    ls.join(", ")
-end
-
-def getarglistpp(iface, method)
-    ls = []
-    method.each_param {|param| ls << "#{param.type} #{param.name}"}
-    ls.join(", ")
-end
-
-def getnamelist(method)
-    ls = ["obj"]
-    method.each_param {|param| ls << param.name}
-    ls.join(", ")
-end
-
-def getnamelistref(method)
-    ls = ["ref"]
-    method.each_param {|param| ls << param.name}
-    ls.join(", ")
-end
-
-def getnamelistpp(method)
-    ls = []
-    method.each_param {|param| ls << param.name}
-    ls.join(", ")
-end
-
-def gettypelist(iface, method)
-    ls = ["#{iface.cname}*"]
-    method.each_param {|param| ls << param.type}
-    ls.join(", ")
 end
 
 def getmethodlist(iface)
@@ -112,20 +161,29 @@ def getmethodlist(iface)
     ",\n" + ls.join(",\n")
 end
 
+def gettype(node)
+    type = node.attributes["type"].to_s
+    object = false
+    if node.attributes.has_key? "object" then
+        object = node.attributes["object"].to_s == "true"
+    end
+    Type.new(name, object)
+end
+
 def getparam(node)
     name = node.attributes["name"].to_s
-    type = node.attributes["type"].to_s
+    type = gettype(node)
     Param.new(name, type)
 end
 
 def getmethod(node)
     name = node.attributes["name"].to_s
-    type = node.attributes["type"].to_s
     qname = nil
     if node.attributes.has_key? "qname" then
         qname = node.attributes["qname"].to_s
     end
-    method = Method_.new(name, type, qname)
+    type = gettype(node)
+    method = Method_.new(name, qname, type)
     node.elements.each do |child|
         if child.name == "param" then
             param = getparam(child)
@@ -152,7 +210,8 @@ def getinterface(pkg, node)
 end
 
 def putcmethod(iface, method)
-    typelist = gettypelist(iface, method)
+    format = CFormat.new
+    typelist = format.type_list(iface, method).join(", ")
     puts "    #{method.type} (*#{method.name}_)(#{typelist});"
 end
 
