@@ -12,9 +12,9 @@ include REXML
 STDOUT.binmode
 
 class Type
-    attr_reader :type
-    def initialize(type, object)
-        @type = type
+    attr_reader :cname
+    def initialize(cname, object)
+        @cname = cname
         @object = object
     end
     def object?
@@ -69,6 +69,12 @@ class Interface
     end
 end
 
+def method_list(iface)
+    ls = []
+    iface.each_method {|method| ls << "#{' ' * 16}#{method.name}_"}
+    ",\n" + ls.join(",\n")
+end
+
 module ParamLists
     def arg_list(iface, method)
         args = ["#{param_type(iface.type)} obj"]
@@ -91,74 +97,68 @@ module ParamLists
         end
         args
     end
+    def return_expr(type, expr)
+        type.cname == "void" ? expr : "return #{expr}"
+    end
+end
+
+def nothis(ls)
+    ls.shift
+    ls
 end
 
 class CFormat
     include ParamLists
-    def arg_list(iface, method)
-        args = ["#{param_type(iface.type)} obj"]
-        method.each_param do |param|
-            args << "#{param_type(iface.type)} #{param.name}"
-        end
-        args
-    end
-    def name_list(iface, method)
-    end
-    def type_list(iface, method)
-    end
     def param_type(type)
         if type.object? then
-            "#{type.type}*"
+            "#{type.cname}*"
         else
-            type.type
+            type.cname
         end
     end
     def return_type(type)
         if type.object? then
-            "#{type.type}*"
+            "#{type.cname}*"
         else
-            type.type
+            type.cname
         end
     end
 end
 
 class CppFormat
     include ParamLists
-    def arg_list(iface, method)
-        args = ["#{param_type(iface.type)} obj"]
+    def cname_list(iface, method)
+        args = ["obj.get()"]
         method.each_param do |param|
-            args << "#{param_type(iface.type)} #{param.name}"
+            if param.type.object? then
+                args << "#{param.name}.get()"
+            else
+                args << param.name
+            end
         end
         args
     end
-    def name_list(iface, method)
-    end
-    def type_list(iface, method)
+    def creturn_expr(type, expr)
+        if type.object? then
+            "return aug::object_attach<#{type.cname}>(#{expr})";
+        else
+            type.cname == "void" ? expr : "return #{expr}"
+        end
     end
     def param_type(type)
         if type.object? then
-            "obref<#{type.type}>"
+            "aug::obref<#{type.cname}>"
         else
-            type.type
+            type.cname
         end
     end
     def return_type(type)
         if type.object? then
-            "smartob<#{type.type}>"
+            "aug::smartob<#{type.cname}>"
         else
-            type.type
+            type.cname
         end
     end
-end
-
-def getreturn(method)
-    method.type == "void" ? "" : "return "
-end
-
-def getmethodlist(iface)
-    ls = []
-    iface.each_method {|method| ls << "#{' ' * 16}#{method.name}_"}
-    ",\n" + ls.join(",\n")
 end
 
 def gettype(node)
@@ -167,7 +167,7 @@ def gettype(node)
     if node.attributes.has_key? "object" then
         object = node.attributes["object"].to_s == "true"
     end
-    Type.new(name, object)
+    Type.new(type, object)
 end
 
 def getparam(node)
@@ -211,55 +211,63 @@ end
 
 def putcmethod(iface, method)
     format = CFormat.new
-    typelist = format.type_list(iface, method).join(", ")
-    puts "    #{method.type} (*#{method.name}_)(#{typelist});"
+    types = format.type_list(iface, method).join(", ")
+    puts "    #{format.return_type(method.type)} (*#{method.name}_)(#{types});"
 end
 
 def putcdefine(iface, method)
-    namelist = getnamelist(method)
+    format = CFormat.new
+    names = format.name_list(iface, method)
     puts <<END
 
-#define #{iface.pkg}_#{method.qname(iface.name)}(#{namelist}) \\
-    ((#{iface.cname}*)obj)->vtbl_->#{method.name}_(#{namelist})
+#define #{iface.pkg}_#{method.qname(iface.name)}(#{names}) \\
+    ((#{iface.type.cname}*)obj)->vtbl_->#{method.name}_(#{names})
 END
 end
 
 def putinline(iface, method)
-    arglist = getarglistref(iface, method)
-    namelist = getnamelist(method)
+    format = CppFormat.new
+    args = format.arg_list(iface, method).join(", ")
+    names = format.cname_list(iface, method).join(", ")
+    expr = "obj.get()->vtbl_->#{method.name}_(#{names})"
     puts <<END
 
-    inline #{method.type}
-    #{method.qname(iface.name)}(#{arglist}) AUG_NOTHROW
+    inline #{format.return_type(method.type)}
+    #{method.qname(iface.name)}(#{args}) AUG_NOTHROW
     {
-        #{iface.cname}* obj(ref.get());
-        #{getreturn method}obj->vtbl_->#{method.name}_(#{namelist});
+        #{format.creturn_expr(method.type, expr)};
     }
 END
 end
 
 def putstatic(iface, method)
-    arglist = getarglist(iface, method)
-    namelist = getnamelistpp(method)
+    format = CFormat.new
+    args = format.arg_list(iface, method).join(", ")
+    names = nothis(format.name_list(iface, method)).join(", ")
+    expr = "static_cast<T*>(obj->impl_)->#{method.qname(iface.name)}(#{names})"
+    if method.type.object? then
+        expr += ".get()"
+    end
     puts <<END
-        static #{method.type}
-        #{method.name}_(#{arglist}) AUG_NOTHROW
+        static #{format.return_type(method.type)}
+        #{method.name}_(#{args}) AUG_NOTHROW
         {
-            T* impl = static_cast<T*>(obj->impl_);
-            #{getreturn method}impl->#{method.qname(iface.name)}(#{namelist});
+            #{format.return_expr(method.type, expr)};
         }
 END
 end
 
 def putforward(iface, method)
-    arglist = getarglistpp(iface, method)
-    namelist = getnamelistpp(method)
+    format = CppFormat.new
+    args = nothis(format.arg_list(iface, method)).join(", ")
+    names = nothis(format.name_list(iface, method)).join(", ")
     qname = method.qname(iface.name)
+    expr = "impl_.#{qname}(#{names})";
     puts <<END
-        #{method.type}
-        #{qname}(#{arglist}) AUG_NOTHROW
+        #{format.return_type(method.type)}
+        #{qname}(#{args}) AUG_NOTHROW
         {
-            #{getreturn method}impl_.#{qname}(#{namelist});
+            #{format.return_expr(method.type, expr)};
         }
 END
 end
@@ -267,9 +275,9 @@ end
 def putinterface(iface)
     puts <<END
 
-AUG_OBJECTDECL(#{iface.cname});
-struct #{iface.cname}vtbl {
-    AUG_OBJECT(#{iface.cname});
+AUG_OBJECTDECL(#{iface.type.cname});
+struct #{iface.type.cname}vtbl {
+    AUG_OBJECT(#{iface.type.cname});
 END
 
     iface.each_method {|x| putcmethod iface, x}
@@ -281,19 +289,19 @@ END
 #if defined(__cplusplus)
 namespace aug {
     template <>
-    struct object_traits<#{iface.cname}> {
-        typedef #{iface.cname}vtbl vtbl;
+    struct object_traits<#{iface.type.cname}> {
+        typedef #{iface.type.cname}vtbl vtbl;
         static const char*
         id()
         {
-            return #{iface.cname}id;
+            return #{iface.type.cname}id;
         }
     };
 }
 
 namespace #{iface.pkg} {
 
-    typedef aug::obref<#{iface.cname}> #{iface.name}ref;
+    typedef aug::obref<#{iface.type.cname}> #{iface.name}ref;
 END
     iface.each_method {|x| putinline iface, x}
     puts <<END
@@ -301,7 +309,7 @@ END
     template <typename T>
     class #{iface.name} {
 
-        #{iface.cname} #{iface.name}_;
+        #{iface.type.cname} #{iface.name}_;
 
         #{iface.name}(const #{iface.name}&);
 
@@ -309,33 +317,30 @@ END
         operator =(const #{iface.name}&);
 
         static void*
-        cast_(#{iface.cname}* obj, const char* id) AUG_NOTHROW
+        cast_(#{iface.type.cname}* obj, const char* id) AUG_NOTHROW
         {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->cast(id).get();
+            return static_cast<T*>(obj->impl_)->cast(id).get();
         }
         static int
-        incref_(#{iface.cname}* obj) AUG_NOTHROW
+        incref_(#{iface.type.cname}* obj) AUG_NOTHROW
         {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->incref();
+            return static_cast<T*>(obj->impl_)->incref();
         }
         static int
-        decref_(#{iface.cname}* obj) AUG_NOTHROW
+        decref_(#{iface.type.cname}* obj) AUG_NOTHROW
         {
-            T* impl = static_cast<T*>(obj->impl_);
-            return impl->decref();
+            return static_cast<T*>(obj->impl_)->decref();
         }
 END
     iface.each_method {|x| putstatic iface, x}
     puts <<END
-        static const #{iface.cname}vtbl*
+        static const #{iface.type.cname}vtbl*
         vtbl()
         {
-            static const #{iface.cname}vtbl local = {
+            static const #{iface.type.cname}vtbl local = {
                 cast_,
                 incref_,
-                decref_#{getmethodlist(iface)}
+                decref_#{method_list(iface)}
             };
             return &local;
         }
@@ -351,12 +356,12 @@ END
         {
             #{iface.name}_.impl_ = impl;
         }
-        #{iface.cname}*
+        #{iface.type.cname}*
         get()
         {
             return &#{iface.name}_;
         }
-        operator #{iface.name}ref()
+        operator aug::obref<#{iface.type.cname}>()
         {
             return get();
         }
@@ -375,10 +380,10 @@ END
             #{iface.name}_.reset(this);
         }
     public:
-        objectref
+        aug::obref<aug_object>
         cast(const char* id) AUG_NOTHROW
         {
-            if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.cname}>(id))
+            if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.type.cname}>(id))
                 return #{iface.name}_;
             return null;
         }
@@ -398,11 +403,11 @@ END
 END
     iface.each_method {|x| putforward iface, x}
     puts <<END
-        static aug::smartob<#{iface.cname}>
+        static aug::smartob<#{iface.type.cname}>
         create(const T& impl = T())
         {
             basic_#{iface.name}* ptr(new basic_#{iface.name}(impl));
-            return aug::object_attach<#{iface.cname}>(ptr->#{iface.name}_);
+            return aug::object_attach<#{iface.type.cname}>(ptr->#{iface.name}_);
         }
     };
 
@@ -417,10 +422,10 @@ END
         {
             #{iface.name}_.reset(this);
         }
-        objectref
+        aug::obref<aug_object>
         cast(const char* id) AUG_NOTHROW
         {
-            if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.cname}>(id))
+            if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.type.cname}>(id))
                 return #{iface.name}_;
             return null;
         }
@@ -437,12 +442,12 @@ END
 END
     iface.each_method {|x| putforward iface, x}
     puts <<END
-        #{iface.cname}*
+        #{iface.type.cname}*
         get()
         {
             return #{iface.name}_.get();
         }
-        operator #{iface.name}ref()
+        operator aug::obref<#{iface.type.cname}>()
         {
             return #{iface.name}_;
         }

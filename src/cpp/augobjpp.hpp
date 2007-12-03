@@ -166,16 +166,6 @@ namespace aug {
             std::swap(ref_, rhs.ref_);
         }
 
-        void
-        release()
-        {
-            if (ref_) {
-                T* ref(ref_);
-                ref_ = 0;
-                aug::decref(ref);
-            }
-        }
-
         static smartob
         attach(obref<T> ref)
         {
@@ -186,6 +176,13 @@ namespace aug {
         incref(obref<T> ref)
         {
             return smartob(ref, true);
+        }
+
+        smartob&
+        incref()
+        {
+            aug::incref(ref_);
+            return *this;
         }
 
         T*
@@ -271,20 +268,20 @@ namespace aug {
         {
         }
         ref_base()
-            : refs_(0)
+            : refs_(1)
         {
         }
     public:
         int
-        incref()
+        incref_()
         {
             ++refs_;
             return 0;
         }
         int
-        decref()
+        decref_()
         {
-            if (0 == --refs_)
+			if (0 == --refs_)
                 delete this;
             return 0;
         }
