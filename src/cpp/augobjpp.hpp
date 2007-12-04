@@ -52,6 +52,8 @@ namespace aug {
 
     template <>
     class obref<aug_object> {
+    public:
+        typedef aug_object obtype;
     protected:
         void* ptr_;
         obref(void* ptr)
@@ -78,6 +80,7 @@ namespace aug {
 
     template <typename T>
     class obref : public objectref {
+        typedef T obtype;
     public:
         obref(const null_&)
             : objectref(null)
@@ -109,6 +112,14 @@ namespace aug {
     }
 
     template <typename T>
+    T*
+    incget(const obref<T>& ref)
+    {
+        incref(ref);
+        return ref.get();
+    }
+
+    template <typename T>
     int
     decref(obref<T> ref)
     {
@@ -117,7 +128,9 @@ namespace aug {
 
     template <typename T>
     class smartob {
-
+    public:
+        typedef T obtype;
+    private:
         obref<T> ref_;
 
         smartob(obref<T> ref, bool inc) AUG_NOTHROW
@@ -178,13 +191,6 @@ namespace aug {
             return smartob(ref, true);
         }
 
-        smartob&
-        incref()
-        {
-            aug::incref(ref_);
-            return *this;
-        }
-
         T*
         get() const
         {
@@ -205,6 +211,14 @@ namespace aug {
     incref(const smartob<T>& sob)
     {
         return incref<T>(static_cast<obref<T> >(sob));
+    }
+
+    template <typename T>
+    T*
+    incget(const smartob<T>& sob)
+    {
+        incref(sob);
+        return sob.get();
     }
 
     template <typename T>

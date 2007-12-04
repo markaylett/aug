@@ -61,13 +61,11 @@ namespace {
             eventob_.reset(this);
         }
     public:
-        obref<aug_object>
+        smartob<aug_object>
         cast(const char* id)
         {
-            if (equalid<aug_object>(id) || equalid<aug_eventob>(id)) {
-                incref();
-                return eventob_;
-            }
+            if (equalid<aug_object>(id) || equalid<aug_eventob>(id))
+                return object_attach<aug_object>(eventob_);
             return null;
         }
         void
@@ -331,14 +329,16 @@ namespace aug {
                         vector<sessionptr> sessions;
                         sessions_.getbygroup(sessions, eventobto(ev));
 
+                        smartob<aug_blob> blob(object_cast<
+                                               aug_blob>(eventobuser(ev)));
                         size_t size;
-                        const void* user(varbuf(ev->var_, size));
+                        const void* user(blobdata(blob, &size));
 
                         vector<sessionptr>
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
                         for (; it != end; ++it)
-                            (*it)->event(ev->from_.c_str(), ev->type_.c_str(),
+                            (*it)->event(eventobfrom(ev), eventobtype(ev),
                                          user, size);
                     }
                 }

@@ -29,21 +29,21 @@ namespace aug {
             {
                 blob_.reset(this);
             }
-            objectref
-            cast(const char* id) AUG_NOTHROW
+            smartob<aug_object>
+            cast_(const char* id) AUG_NOTHROW
             {
                 if (equalid<aug_object>(id) || equalid<aug_blob>(id))
-                    return blob_;
+                    return object_attach<aug_object>(blob_);
                 return null;
             }
             int
-            incref() AUG_NOTHROW
+            incref_() AUG_NOTHROW
             {
                 ++refs_;
                 return 0;
             }
             int
-            decref() AUG_NOTHROW
+            decref_() AUG_NOTHROW
             {
                 // When only one ref remains, writing must have finished and
                 // vector can be reset.
@@ -53,14 +53,14 @@ namespace aug {
                 return 0;
             }
             const void*
-            blobdata(size_t* size) AUG_NOTHROW
+            blobdata_(size_t* size) AUG_NOTHROW
             {
                 if (size)
                     *size = size_;
                 return &vec_[0];
             }
             size_t
-            blobsize() AUG_NOTHROW
+            blobsize_() AUG_NOTHROW
             {
                 return size_;
             }

@@ -15,7 +15,7 @@ namespace aug {
         {
         }
         void*
-        getaddrob() const
+        getaddrob_() const
         {
             return p_;
         }

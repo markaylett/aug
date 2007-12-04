@@ -5,7 +5,6 @@ require 'rexml/document'
 # TODO:
 # help attribute.
 # getter/setter element.
-# object attribute.
 
 include REXML
 
@@ -77,14 +76,14 @@ end
 
 module ParamLists
     def arg_list(iface, method)
-        args = ["#{param_type(iface.type)} obj"]
+        args = ["#{param_type(iface.type)} this_"]
         method.each_param do |param|
             args << "#{param_type(param.type)} #{param.name}"
         end
         args
     end
     def name_list(iface, method)
-        args = ["obj"]
+        args = ["this_"]
         method.each_param do |param|
             args << param.name
         end
@@ -128,7 +127,7 @@ end
 class CppFormat
     include ParamLists
     def cname_list(iface, method)
-        args = ["obj.get()"]
+        args = ["this_.get()"]
         method.each_param do |param|
             if param.type.object? then
                 args << "#{param.name}.get()"
@@ -217,11 +216,11 @@ end
 
 def putcdefine(iface, method)
     format = CFormat.new
-    names = format.name_list(iface, method)
+    names = format.name_list(iface, method).join(", ")
     puts <<END
 
 #define #{iface.pkg}_#{method.qname(iface.name)}(#{names}) \\
-    ((#{iface.type.cname}*)obj)->vtbl_->#{method.name}_(#{names})
+    ((#{iface.type.cname}*)this_)->vtbl_->#{method.name}_(#{names})
 END
 end
 
@@ -229,7 +228,7 @@ def putinline(iface, method)
     format = CppFormat.new
     args = format.arg_list(iface, method).join(", ")
     names = format.cname_list(iface, method).join(", ")
-    expr = "obj.get()->vtbl_->#{method.name}_(#{names})"
+    expr = "this_.get()->vtbl_->#{method.name}_(#{names})"
     puts <<END
 
     inline #{format.return_type(method.type)}
@@ -244,9 +243,9 @@ def putstatic(iface, method)
     format = CFormat.new
     args = format.arg_list(iface, method).join(", ")
     names = nothis(format.name_list(iface, method)).join(", ")
-    expr = "static_cast<T*>(obj->impl_)->#{method.qname(iface.name)}(#{names})"
+    expr = "static_cast<T*>(this_->impl_)->#{method.qname(iface.name)}_(#{names})"
     if method.type.object? then
-        expr += ".get()"
+        expr = "aug::incget(#{expr})"
     end
     puts <<END
         static #{format.return_type(method.type)}
@@ -262,10 +261,10 @@ def putforward(iface, method)
     args = nothis(format.arg_list(iface, method)).join(", ")
     names = nothis(format.name_list(iface, method)).join(", ")
     qname = method.qname(iface.name)
-    expr = "impl_.#{qname}(#{names})";
+    expr = "this->impl_.#{qname}_(#{names})";
     puts <<END
         #{format.return_type(method.type)}
-        #{qname}(#{args}) AUG_NOTHROW
+        #{qname}_(#{args}) AUG_NOTHROW
         {
             #{format.return_expr(method.type, expr)};
         }
@@ -317,19 +316,19 @@ END
         operator =(const #{iface.name}&);
 
         static void*
-        cast_(#{iface.type.cname}* obj, const char* id) AUG_NOTHROW
+        cast_(#{iface.type.cname}* this_, const char* id) AUG_NOTHROW
         {
-            return static_cast<T*>(obj->impl_)->cast(id).get();
+            return aug::incget(static_cast<T*>(this_->impl_)->cast_(id));
         }
         static int
-        incref_(#{iface.type.cname}* obj) AUG_NOTHROW
+        incref_(#{iface.type.cname}* this_) AUG_NOTHROW
         {
-            return static_cast<T*>(obj->impl_)->incref();
+            return static_cast<T*>(this_->impl_)->incref_();
         }
         static int
-        decref_(#{iface.type.cname}* obj) AUG_NOTHROW
+        decref_(#{iface.type.cname}* this_) AUG_NOTHROW
         {
-            return static_cast<T*>(obj->impl_)->decref();
+            return static_cast<T*>(this_->impl_)->decref_();
         }
 END
     iface.each_method {|x| putstatic iface, x}
@@ -348,22 +347,22 @@ END
         explicit
         #{iface.name}(T* impl = 0)
         {
-            #{iface.name}_.vtbl_ = vtbl();
-            #{iface.name}_.impl_ = impl;
+            this->#{iface.name}_.vtbl_ = this->vtbl();
+            this->#{iface.name}_.impl_ = impl;
         }
         void
         reset(T* impl)
         {
-            #{iface.name}_.impl_ = impl;
+            this->#{iface.name}_.impl_ = impl;
         }
         #{iface.type.cname}*
         get()
         {
-            return &#{iface.name}_;
+            return &this->#{iface.name}_;
         }
         operator aug::obref<#{iface.type.cname}>()
         {
-            return get();
+            return this->get();
         }
     };
 
@@ -377,26 +376,26 @@ END
             : impl_(impl),
               refs_(1)
         {
-            #{iface.name}_.reset(this);
+            this->#{iface.name}_.reset(this);
         }
     public:
-        aug::obref<aug_object>
-        cast(const char* id) AUG_NOTHROW
+        aug::smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
         {
             if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.type.cname}>(id))
-                return #{iface.name}_;
+                return aug::object_attach<aug_object>(this->#{iface.name}_);
             return null;
         }
         int
-        incref() AUG_NOTHROW
+        incref_() AUG_NOTHROW
         {
-            ++refs_;
+            ++this->refs_;
             return 0;
         }
         int
-        decref() AUG_NOTHROW
+        decref_() AUG_NOTHROW
         {
-            if (0 == --refs_)
+            if (0 == --this->refs_)
                 delete this;
             return 0;
         }
@@ -420,22 +419,22 @@ END
         scoped_#{iface.name}(const T& impl = T())
             : impl_(impl)
         {
-            #{iface.name}_.reset(this);
+            this->#{iface.name}_.reset(this);
         }
-        aug::obref<aug_object>
-        cast(const char* id) AUG_NOTHROW
+        aug::smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
         {
             if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.type.cname}>(id))
-                return #{iface.name}_;
+                return aug::object_attach<aug_object>(this->#{iface.name}_);
             return null;
         }
         int
-        incref() AUG_NOTHROW
+        incref_() AUG_NOTHROW
         {
             return 0;
         }
         int
-        decref() AUG_NOTHROW
+        decref_() AUG_NOTHROW
         {
             return 0;
         }
@@ -445,11 +444,11 @@ END
         #{iface.type.cname}*
         get()
         {
-            return #{iface.name}_.get();
+            return this->#{iface.name}_.get();
         }
         operator aug::obref<#{iface.type.cname}>()
         {
-            return #{iface.name}_;
+            return this->#{iface.name}_;
         }
     };
 }
@@ -463,6 +462,9 @@ def putpackage(file, node)
     gaurd = "#{name.upcase}_#{file}_H"
     puts <<END
 /* -*- c++ -*- */
+/* Automatically generated by #{File.basename($0)} */
+/* at #{Time.now} */
+
 #ifndef #{gaurd}
 #define #{gaurd}
 
