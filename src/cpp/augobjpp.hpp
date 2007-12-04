@@ -7,6 +7,7 @@
 #include "augobj.h"
 
 #include <algorithm> // swap()
+#include <cassert>
 
 #if !defined(AUG_NOTHROW)
 # define AUG_NOTHROW
@@ -98,13 +99,6 @@ namespace aug {
     };
 
     template <typename T>
-    obref<T>
-    makeref(T* ptr)
-    {
-        return obref<T>(ptr);
-    }
-
-    template <typename T>
     int
     incref(obref<T> ref)
     {
@@ -127,6 +121,13 @@ namespace aug {
     }
 
     template <typename T>
+    obref<T>
+    object(T* ptr)
+    {
+        return obref<T>(ptr);
+    }
+
+    template <typename T>
     class smartob {
     public:
         typedef T obtype;
@@ -144,7 +145,7 @@ namespace aug {
         ~smartob() AUG_NOTHROW
         {
             if (null != ref_)
-				aug::decref(ref_);
+                aug::decref(ref_);
         }
 
         smartob(const null_&) AUG_NOTHROW
@@ -258,6 +259,13 @@ namespace aug {
         return smartob<T>::attach(ref);
     }
 
+    template <typename T>
+    smartob<T>
+    object_incref(obref<T> ref)
+    {
+        return smartob<T>::incref(ref);
+    }
+
     template <typename T, typename U>
     smartob<T>
     object_cast(obref<U> ref)
@@ -275,7 +283,7 @@ namespace aug {
     }
 
     class ref_base {
-        unsigned refs_;
+        int refs_;
     protected:
         virtual
         ~ref_base() AUG_NOTHROW
@@ -289,13 +297,15 @@ namespace aug {
         int
         incref_()
         {
+            assert(0 < refs_);
             ++refs_;
             return 0;
         }
         int
         decref_()
         {
-			if (0 == --refs_)
+            assert(0 < refs_);
+            if (0 == --refs_)
                 delete this;
             return 0;
         }
