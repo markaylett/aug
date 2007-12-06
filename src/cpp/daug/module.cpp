@@ -28,7 +28,7 @@ module::~module() AUG_NOTHROW
 
 module::module(const string& name, const char* path,
                const struct maud_host& host,
-               void (*teardown)(const maud_object*))
+               void (*teardown)(const maud_handle*))
     : name_(name),
       lib_(path)
 {
@@ -65,29 +65,29 @@ module::reconf() const AUG_NOTHROW
 }
 
 void
-module::event(const char* from, const char* type, const void* user,
-              size_t size) const AUG_NOTHROW
+module::event(const char* from, const char* type,
+              objectref obj) const AUG_NOTHROW
 {
     AUG_DEBUG2("event(): from=[%s], type=[%s]", from, type);
-    module_.event_(from, type, user, size);
+    module_.event_(from, type, obj.get());
 }
 
 void
-module::closed(const maud_object& sock) const AUG_NOTHROW
+module::closed(const maud_handle& sock) const AUG_NOTHROW
 {
     AUG_DEBUG2("closed(): id=[%d]", sock.id_);
     module_.closed_(&sock);
 }
 
 void
-module::teardown(const maud_object& sock) const AUG_NOTHROW
+module::teardown(const maud_handle& sock) const AUG_NOTHROW
 {
     AUG_DEBUG2("teardown(): id=[%d]", sock.id_);
     module_.teardown_(&sock);
 }
 
 bool
-module::accepted(maud_object& sock, const char* addr,
+module::accepted(maud_handle& sock, const char* addr,
                  unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("accept(): id=[%d], addr=[%s], port=[%u]",
@@ -96,7 +96,7 @@ module::accepted(maud_object& sock, const char* addr,
 }
 
 void
-module::connected(maud_object& sock, const char* addr,
+module::connected(maud_handle& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("connected(): id=[%d], addr=[%s], port=[%u]",
@@ -105,7 +105,7 @@ module::connected(maud_object& sock, const char* addr,
 }
 
 void
-module::data(const maud_object& sock, const char* buf,
+module::data(const maud_handle& sock, const char* buf,
              size_t size) const AUG_NOTHROW
 {
     AUG_DEBUG2("data(): id=[%d]", sock.id_);
@@ -113,28 +113,28 @@ module::data(const maud_object& sock, const char* buf,
 }
 
 void
-module::rdexpire(const maud_object& sock, unsigned& ms) const AUG_NOTHROW
+module::rdexpire(const maud_handle& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("rdexpire(): id=[%d], ms=[%u]", sock.id_, ms);
     module_.rdexpire_(&sock, &ms);
 }
 
 void
-module::wrexpire(const maud_object& sock, unsigned& ms) const AUG_NOTHROW
+module::wrexpire(const maud_handle& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("wrexpire(): id=[%d], ms=[%u]", sock.id_, ms);
     module_.wrexpire_(&sock, &ms);
 }
 
 void
-module::expire(const maud_object& timer, unsigned& ms) const AUG_NOTHROW
+module::expire(const maud_handle& timer, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("expire(): id=[%d], ms=[%u]", timer.id_, ms);
     module_.expire_(&timer, &ms);
 }
 
 bool
-module::authcert(const maud_object& sock, const char* subject,
+module::authcert(const maud_handle& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW
 {
     AUG_DEBUG2("authcert(): id=[%d]", sock.id_);

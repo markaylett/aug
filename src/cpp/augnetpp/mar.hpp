@@ -162,9 +162,10 @@ namespace aug {
         template <typename T>
         marparser(unsigned size, T& x)
         {
-            scoped_addrob<simple_addrob> obj(&x);
+            smartob<aug_addrob> obj(&x, 0);
             verify(marparser_
-                   = aug_createmarparser(size, &marnonstatic<T>(), obj));
+                   = aug_createmarparser(size, &marnonstatic<T>(),
+                                         obj.base()));
         }
 
         template <typename T>
@@ -172,7 +173,7 @@ namespace aug {
         {
             smartob<aug_addrob> obj(createaddrob(x));
             verify(marparser_ = aug_createmarparser
-                   (size, &marnonstatic<T>(), obj));
+                   (size, &marnonstatic<T>(), obj.base()));
         }
 
         operator aug_marparser_t()

@@ -18,7 +18,7 @@ namespace {
         do_call(ostream& os, const deque<string>& args) = 0;
     public:
         virtual
-        ~method_base() MAUD_NOTHROW
+        ~method_base() AUG_NOTHROW
         {
         }
         bool
@@ -63,7 +63,7 @@ namespace {
         }
 
         bool
-        do_accepted(object& sock, const char* addr, unsigned short port)
+        do_accepted(handle& sock, const char* addr, unsigned short port)
         {
             sock.setuser(new shellparser());
             send(sock, "HELLO\r\n", 7);
@@ -72,13 +72,13 @@ namespace {
         }
 
         void
-        do_closed(const object& sock)
+        do_closed(const handle& sock)
         {
             delete sock.user<shellparser>();
         }
 
         void
-        do_data(const object& sock, const void* buf, size_t size)
+        do_data(const handle& sock, const void* buf, size_t size)
         {
             shellparser& parser(*sock.user<shellparser>());
             const char* ptr(static_cast<const char*>(buf));
@@ -91,7 +91,7 @@ namespace {
         }
 
         void
-        do_rdexpire(const object& sock, unsigned& ms)
+        do_rdexpire(const handle& sock, unsigned& ms)
         {
             shutdown(sock, 0);
         }

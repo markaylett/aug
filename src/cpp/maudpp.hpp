@@ -18,9 +18,11 @@
 #include <vector>
 #include <functional>
 
-#if !defined(AUG_NOTHROW)
+#if !defined(NDEBUG)
+# define AUG_NOTHROW throw()
+#else /* NDEBUG */
 # define AUG_NOTHROW
-#endif /* !AUG_NOTHROW */
+#endif /* NDEBUG */
 
 #define MAUD_WRITELOGCATCH                                  \
     catch (const std::exception& e) {                       \
@@ -309,8 +311,8 @@ namespace maud {
         do_reconf() = 0;
 
         virtual void
-        do_event(const char* from, const char* type, const void* user,
-                 size_t size) = 0;
+        do_event(const char* from, const char* type,
+                 struct aug_object_* user) = 0;
 
         virtual void
         do_closed(const handle& sock) = 0;
@@ -356,10 +358,9 @@ namespace maud {
             do_reconf();
         }
         void
-        event(const char* from, const char* type, const void* user,
-              size_t size)
+        event(const char* from, const char* type, struct aug_object_* user)
         {
-            do_event(from, type, user, size);
+            do_event(from, type, user);
         }
         void
         closed(const handle& sock)
@@ -414,8 +415,7 @@ namespace maud {
         {
         }
         void
-        do_event(const char* from, const char* type, const void* user,
-                 size_t size)
+        do_event(const char* from, const char* type, struct aug_object_* user)
         {
         }
         void
@@ -536,11 +536,11 @@ namespace maud {
             } MAUD_WRITELOGCATCH;
         }
         static void
-        event(const char* from, const char* type, const void* user,
-              size_t size) AUG_NOTHROW
+        event(const char* from, const char* type,
+              struct aug_object_* user) AUG_NOTHROW
         {
             try {
-                getbase()->event(from, type, user, size);
+                getbase()->event(from, type, user);
             } MAUD_WRITELOGCATCH;
         }
         static void

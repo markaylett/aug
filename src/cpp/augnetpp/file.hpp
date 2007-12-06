@@ -49,7 +49,7 @@ namespace aug {
 
     template <typename T>
     int
-    filememcb(aug_object* user, int fd) AUG_NOTHROW
+    filememcb(obref<aug_object> user, int fd) AUG_NOTHROW
     {
         try {
             return obtoaddr<T*>(user)->filecb(fd) ? 1 : 0;
@@ -96,9 +96,9 @@ namespace aug {
 
     inline void
     insertfile(aug_files& files, fdref ref, aug_filecb_t cb,
-               aug_object* user)
+               obref<aug_object> user)
     {
-        verify(aug_insertfile(&files, ref.get(), cb, user));
+        verify(aug_insertfile(&files, ref.get(), cb, user.get()));
     }
 
     inline void

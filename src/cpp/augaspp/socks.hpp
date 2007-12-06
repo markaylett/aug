@@ -7,6 +7,8 @@
 #include "augaspp/session.hpp"
 #include "augaspp/sock.hpp"
 
+#include "augobj/blob.h"
+
 #include <map>
 
 struct timeval;

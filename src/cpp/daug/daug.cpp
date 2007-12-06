@@ -137,7 +137,7 @@ namespace {
     }
 
     void
-    reopencb_(const aug_var&, int id, unsigned& ms)
+    reopencb_(objectref obj, int id, unsigned& ms)
     {
         AUG_DEBUG2("re-opening log file");
         openlog_();
@@ -243,7 +243,7 @@ namespace {
     // Thread-safe.
 
     int
-    post_(const char* to, const char* type, const maud_var* user)
+    post_(const char* to, const char* type, aug_object* user)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s]", sname, to, type);
@@ -256,13 +256,13 @@ namespace {
     }
 
     int
-    dispatch_(const char* to, const char* type, const void* user, size_t size)
+    dispatch_(const char* to, const char* type, aug_object* user)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("dispatch(): sname=[%s], to=[%s], type=[%s]",
                    sname, to, type);
         try {
-            state_->engine_.dispatch(sname, to, type, user, size);
+            state_->engine_.dispatch(sname, to, type, user);
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -355,11 +355,11 @@ namespace {
     }
 
     int
-    sendv_(maud_id cid, const maud_var* user)
+    sendv_(maud_id cid, aug_blob* blob)
     {
         AUG_DEBUG2("sendv(): id=[%d]", cid);
         try {
-            state_->engine_.sendv(cid, *user);
+            state_->engine_.sendv(cid, blob);
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -405,7 +405,7 @@ namespace {
     }
 
     int
-    settimer_(unsigned ms, const maud_var* user)
+    settimer_(unsigned ms, aug_object* user)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
@@ -508,7 +508,7 @@ namespace {
     };
 
     void
-    teardown_(const maud_object* sock)
+    teardown_(const maud_handle* sock)
     {
         aug_info("teardown defaulting to shutdown");
         shutdown_(sock->id_, 0);
@@ -659,7 +659,6 @@ namespace {
 
             setsrvlogger("daug");
 
-            aug_var var = { 0, this };
             auto_ptr<state> s(new state(frobpass_));
 
             // Assign state so that it is visible to callbacks during load_()

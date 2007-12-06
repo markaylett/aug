@@ -12,9 +12,9 @@ using namespace std;
 namespace {
 
     struct eachline {
-        object sock_;
+        handle sock_;
         explicit
-        eachline(const object& sock)
+        eachline(const handle& sock)
             : sock_(sock)
         {
         }
@@ -42,12 +42,12 @@ namespace {
             return true;
         }
         void
-        do_closed(const object& sock)
+        do_closed(const handle& sock)
         {
             delete sock.user<string>();
         }
         bool
-        do_accepted(object& sock, const char* addr, unsigned short port)
+        do_accepted(handle& sock, const char* addr, unsigned short port)
         {
             const char* sslctx = maud::getenv("session.echo.sslcontext", 0);
             if (sslctx) {
@@ -59,7 +59,7 @@ namespace {
             return true;
         }
         void
-        do_data(const object& sock, const void* buf, size_t len)
+        do_data(const handle& sock, const void* buf, size_t len)
         {
             string& tok(*sock.user<string>());
             try {
@@ -73,13 +73,13 @@ namespace {
             }
         }
         void
-        do_rdexpire(const object& sock, unsigned& ms)
+        do_rdexpire(const handle& sock, unsigned& ms)
         {
             writelog(MAUD_LOGINFO, "no data received for 15 seconds");
             shutdown(sock, 0);
         }
         bool
-        do_authcert(const object& sock, const char* subject,
+        do_authcert(const handle& sock, const char* subject,
                     const char* issuer)
         {
             maud_writelog(MAUD_LOGINFO, "checking subject...");

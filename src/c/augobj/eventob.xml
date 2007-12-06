@@ -2,7 +2,7 @@
 
   <interface name="eventob">
     <method name="setuser" type="void" qname="seteventobuser">
-      <param name="user" type="aug_object*"/>
+      <param name="user" type="aug_object" object="true"/>
     </method>
     <method name="from" type="const char*" qname="eventobfrom"/>
     <method name="to" type="const char*" qname="eventobto"/>

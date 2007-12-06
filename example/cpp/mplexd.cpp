@@ -6,6 +6,8 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
+#include "augobj/eventob.h"
+
 #include <iostream>
 #include <map>
 #include <memory> // auto_ptr<>
@@ -196,7 +198,7 @@ namespace test {
         smartfd sfd_;
         map<int, sessionptr> sfds_;
 
-        state(aug_filecb_t cb, const aug_var& var)
+        state(aug_filecb_t cb, obref<aug_object> user)
             : sfd_(null)
         {
             aug_hostserv hostserv;
@@ -205,10 +207,10 @@ namespace test {
             endpoint ep(null);
             smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
 
-            insertfile(files_, aug_eventrd(), cb, var);
+            insertfile(files_, aug_eventrd(), cb, user);
             setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
 
-            insertfile(files_, sfd, cb, var);
+            insertfile(files_, sfd, cb, user);
             setfdeventmask(muxer_, sfd, AUG_FDEVENTRD);
 
             sfd_ = sfd;
@@ -233,10 +235,14 @@ namespace test {
         bool
         readevent(int fd, aug_files& files)
         {
-            aug_event event;
             AUG_DEBUG2("reading event");
 
-            switch (aug::readevent(aug_eventrd(), event).type_) {
+            aug_event event;
+            aug::readevent(aug_eventrd(), event);
+            smartob<aug_eventob> ev
+                (object_cast<aug_eventob>(obptr(event.user_)));
+
+            switch (event.type_) {
             case AUG_EVENTRECONF:
                 aug_info("received AUG_EVENTRECONF");
                 if (*conffile_) {
@@ -253,7 +259,6 @@ namespace test {
                 quit_ = true;
                 break;
             }
-            aug_destroyvar(&event.var_);
             return true;
         }
 
@@ -360,9 +365,8 @@ namespace test {
             aug_info("initialising daemon process");
 
             setsrvlogger("aug");
-
-            aug_var var = { 0, this };
-            state_.reset(new state(filememcb<service>, var));
+            smartob<aug_addrob> addrob(createaddrob(this, 0));
+            state_.reset(new state(filememcb<service>, ));
         }
 
         void

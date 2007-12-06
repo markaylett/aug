@@ -32,40 +32,40 @@ namespace augas {
         do_reconf() const AUG_NOTHROW;
 
         void
-        do_event(const char* from, const char* type, const void* user,
-                 size_t size) const AUG_NOTHROW;
+        do_event(const char* from, const char* type,
+                 aug::objectref obj) const AUG_NOTHROW;
 
         void
-        do_closed(const maud_object& sock) const AUG_NOTHROW;
+        do_closed(const maud_handle& sock) const AUG_NOTHROW;
 
         void
-        do_teardown(const maud_object& sock) const AUG_NOTHROW;
+        do_teardown(const maud_handle& sock) const AUG_NOTHROW;
 
         bool
-        do_accepted(maud_object& sock, const char* addr,
+        do_accepted(maud_handle& sock, const char* addr,
                     unsigned short port) const AUG_NOTHROW;
 
         void
-        do_connected(maud_object& sock, const char* addr,
+        do_connected(maud_handle& sock, const char* addr,
                      unsigned short port) const AUG_NOTHROW;
 
         void
-        do_data(const maud_object& sock, const char* buf,
+        do_data(const maud_handle& sock, const char* buf,
                 size_t size) const AUG_NOTHROW;
 
         void
-        do_rdexpire(const maud_object& sock,
+        do_rdexpire(const maud_handle& sock,
                     unsigned& ms) const AUG_NOTHROW;
 
         void
-        do_wrexpire(const maud_object& sock,
+        do_wrexpire(const maud_handle& sock,
                     unsigned& ms) const AUG_NOTHROW;
 
         void
-        do_expire(const maud_object& timer, unsigned& ms) const AUG_NOTHROW;
+        do_expire(const maud_handle& timer, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        do_authcert(const maud_object& sock, const char* subject,
+        do_authcert(const maud_handle& sock, const char* subject,
                     const char* issuer) const AUG_NOTHROW;
 
     public:

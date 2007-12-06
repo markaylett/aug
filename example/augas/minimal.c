@@ -24,64 +24,64 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, const void* user, size_t size)
+event_(const char* from, const char* type, struct aug_object_* user)
 {
     maud_writelog(MAUD_LOGINFO, "event_()");
 }
 
 static void
-closed_(const struct maud_object* sock)
+closed_(const struct maud_handle* sock)
 {
     maud_writelog(MAUD_LOGINFO, "closed_()");
 }
 
 static void
-teardown_(const struct maud_object* sock)
+teardown_(const struct maud_handle* sock)
 {
     maud_writelog(MAUD_LOGINFO, "teardown_()");
     maud_shutdown(sock->id_, 0);
 }
 
 static int
-accepted_(struct maud_object* sock, const char* addr, unsigned short port)
+accepted_(struct maud_handle* sock, const char* addr, unsigned short port)
 {
     maud_writelog(MAUD_LOGINFO, "accepted_()");
     return 0;
 }
 
 static void
-connected_(struct maud_object* sock, const char* addr, unsigned short port)
+connected_(struct maud_handle* sock, const char* addr, unsigned short port)
 {
     maud_writelog(MAUD_LOGINFO, "connected_()");
 }
 
 static void
-data_(const struct maud_object* sock, const void* buf, size_t len)
+data_(const struct maud_handle* sock, const void* buf, size_t len)
 {
     maud_writelog(MAUD_LOGINFO, "data_()");
     maud_send(sock->id_, buf, len);
 }
 
 static void
-rdexpire_(const struct maud_object* sock, unsigned* ms)
+rdexpire_(const struct maud_handle* sock, unsigned* ms)
 {
     maud_writelog(MAUD_LOGINFO, "rdexpire_()");
 }
 
 static void
-wrexpire_(const struct maud_object* sock, unsigned* ms)
+wrexpire_(const struct maud_handle* sock, unsigned* ms)
 {
     maud_writelog(MAUD_LOGINFO, "wrexpire_()");
 }
 
 static void
-expire_(const struct maud_object* timer, unsigned* ms)
+expire_(const struct maud_handle* timer, unsigned* ms)
 {
     maud_writelog(MAUD_LOGINFO, "expire_()");
 }
 
 static int
-authcert_(const struct maud_object* sock, const char* subject,
+authcert_(const struct maud_handle* sock, const char* subject,
           const char* issuer)
 {
     maud_writelog(MAUD_LOGINFO, "authcert_()");

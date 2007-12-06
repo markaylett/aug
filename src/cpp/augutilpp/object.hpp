@@ -6,6 +6,8 @@
 
 #include "augutil/object.h"
 
+#include <string>
+
 namespace aug {
 
     struct simple_addrob {
@@ -21,10 +23,30 @@ namespace aug {
         }
     };
 
+    struct stringob {
+        std::string s_;
+        stringob(const std::string& s)
+            : s_(s)
+        {
+        }
+        const void*
+        blobdata_(size_t* size)
+        {
+            if (size)
+                *size = s_.size();
+            return s_.data();
+        }
+        size_t
+        blobsize_()
+        {
+            return s_.size();
+        }
+    };
+
     inline smartob<aug_longob>
     createlongob(long l, void (*destroy)(long))
     {
-        return object_attach(makeref(aug_createlongob(l, destroy)));
+        return object_attach<aug_longob>(aug_createlongob(l, destroy));
     }
 
     template <typename T>
@@ -44,7 +66,7 @@ namespace aug {
     inline smartob<aug_addrob>
     createaddrob(void* p, void (*destroy)(void*))
     {
-        return object_attach(makeref(aug_createaddrob(p, destroy)));
+        return object_attach<aug_addrob>(aug_createaddrob(p, destroy));
     }
 
     template <typename T>
@@ -64,7 +86,7 @@ namespace aug {
     inline smartob<aug_blob>
     createblob(const void* buf, size_t len)
     {
-        return object_attach(makeref(aug_createblob(buf, len)));
+        return object_attach<aug_blob>(aug_createblob(buf, len));
     }
 }
 

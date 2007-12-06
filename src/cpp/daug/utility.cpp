@@ -7,6 +7,7 @@
 
 AUG_RCSID("$Id$");
 
+#include "augobj.h"
 #include "maud.h"
 
 namespace {
@@ -25,40 +26,40 @@ namespace {
     {
     }
     void
-    event(const char* from, const char* type, const void* user, size_t size)
+    event(const char* from, const char* type, aug_object* obj)
     {
     }
     void
-    closed(const maud_object* sock)
+    closed(const maud_handle* sock)
     {
     }
     int
-    accepted(maud_object* sock, const char* addr, unsigned short port)
+    accepted(maud_handle* sock, const char* addr, unsigned short port)
     {
         return 0;
     }
     void
-    connected(maud_object* sock, const char* addr, unsigned short port)
+    connected(maud_handle* sock, const char* addr, unsigned short port)
     {
     }
     void
-    data(const maud_object* sock, const void* buf, size_t len)
+    data(const maud_handle* sock, const void* buf, size_t len)
     {
     }
     void
-    rdexpire(const maud_object* sock, unsigned* ms)
+    rdexpire(const maud_handle* sock, unsigned* ms)
     {
     }
     void
-    wrexpire(const maud_object* sock, unsigned* ms)
+    wrexpire(const maud_handle* sock, unsigned* ms)
     {
     }
     void
-    expire(const maud_object* timer, unsigned* ms)
+    expire(const maud_handle* timer, unsigned* ms)
     {
     }
     int
-    authcert(const maud_object* sock, const char* subject,
+    authcert(const maud_handle* sock, const char* subject,
              const char* issuer)
     {
         return 0;
@@ -67,7 +68,7 @@ namespace {
 
 void
 augas::setdefaults(maud_module& dst, const maud_module& src,
-                   void (*teardown)(const maud_object*))
+                   void (*teardown)(const maud_handle*))
 {
     dst.stop_ = src.stop_ ? src.stop_ : stop;
     dst.start_ = src.start_ ? src.start_ : start;

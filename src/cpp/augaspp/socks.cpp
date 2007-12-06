@@ -28,13 +28,13 @@ socks::send(maud_id cid, const void* buf, size_t len, const timeval& now)
 }
 
 bool
-socks::sendv(maud_id cid, const aug_var& var, const timeval& now)
+socks::sendv(maud_id cid, blobref blob, const timeval& now)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (cptr == null || !sendable(*cptr))
         return false;
 
-    cptr->sendv(var, now);
+    cptr->sendv(blob, now);
     return true;
 }
 

@@ -9,6 +9,8 @@
 #include "augsyspp/dlfcn.hpp"
 #include "augsyspp/smartptr.hpp"
 
+#include "augobjpp.hpp"
+
 #include <string>
 
 namespace augas {
@@ -29,7 +31,7 @@ namespace augas {
 
         module(const std::string& name, const char* path,
                const maud_host& host,
-               void (*teardown)(const maud_object*));
+               void (*teardown)(const maud_handle*));
 
         void
         stop() const AUG_NOTHROW;
@@ -41,38 +43,38 @@ namespace augas {
         reconf() const AUG_NOTHROW;
 
         void
-        event(const char* from, const char* type, const void* user,
-              size_t size) const AUG_NOTHROW;
+        event(const char* from, const char* type,
+              aug::objectref obj) const AUG_NOTHROW;
 
         void
-        closed(const maud_object& sock) const AUG_NOTHROW;
+        closed(const maud_handle& sock) const AUG_NOTHROW;
 
         void
-        teardown(const maud_object& sock) const AUG_NOTHROW;
+        teardown(const maud_handle& sock) const AUG_NOTHROW;
 
         bool
-        accepted(maud_object& sock, const char* addr,
+        accepted(maud_handle& sock, const char* addr,
                  unsigned short port) const AUG_NOTHROW;
 
         void
-        connected(maud_object& sock, const char* addr,
+        connected(maud_handle& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW;
 
         void
-        data(const maud_object& sock, const char* buf,
+        data(const maud_handle& sock, const char* buf,
              size_t size) const AUG_NOTHROW;
 
         void
-        rdexpire(const maud_object& sock, unsigned& ms) const AUG_NOTHROW;
+        rdexpire(const maud_handle& sock, unsigned& ms) const AUG_NOTHROW;
 
         void
-        wrexpire(const maud_object& sock, unsigned& ms) const AUG_NOTHROW;
+        wrexpire(const maud_handle& sock, unsigned& ms) const AUG_NOTHROW;
 
         void
-        expire(const maud_object& timer, unsigned& ms) const AUG_NOTHROW;
+        expire(const maud_handle& timer, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        authcert(const maud_object& sock, const char* subject,
+        authcert(const maud_handle& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW;
     };
 

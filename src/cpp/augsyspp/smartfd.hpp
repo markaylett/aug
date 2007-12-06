@@ -34,7 +34,7 @@ namespace aug {
         {
         }
 
-        smartfd(const smartfd& rhs)
+        smartfd(const smartfd& rhs) AUG_NOTHROW
             : ref_(rhs.ref_)
         {
             if (null != ref_)
@@ -49,7 +49,7 @@ namespace aug {
         }
 
         smartfd&
-        operator =(const smartfd& rhs)
+        operator =(const smartfd& rhs) AUG_NOTHROW
         {
             smartfd tmp(rhs);
             swap(tmp);
@@ -60,16 +60,6 @@ namespace aug {
         swap(smartfd& rhs) AUG_NOTHROW
         {
             std::swap(ref_, rhs.ref_);
-        }
-
-        void
-        release()
-        {
-            if (null != ref_) {
-                fdref ref(ref_);
-                ref_ = null;
-                releasefd(ref.get());
-            }
         }
 
         static smartfd
@@ -85,12 +75,12 @@ namespace aug {
         }
 
         int
-        get() const
+        get() const AUG_NOTHROW
         {
             return ref_.get();
         }
 
-        operator fdref() const
+        operator fdref() const AUG_NOTHROW
         {
             return ref_;
         }

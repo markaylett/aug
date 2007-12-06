@@ -52,6 +52,9 @@ namespace {
         eventob<postevent> eventob_;
         const string from_, to_, type_;
         smartob<aug_object> user_;
+        ~postevent() AUG_NOTHROW
+        {
+        }
         postevent(const string& from, const string& to, const string& type)
             : from_(from),
               to_(to),
@@ -62,37 +65,36 @@ namespace {
         }
     public:
         smartob<aug_object>
-        cast(const char* id)
+        cast_(const char* id) AUG_NOTHROW
         {
             if (equalid<aug_object>(id) || equalid<aug_eventob>(id))
-                return object_attach<aug_object>(eventob_);
+                return object_incref<aug_object>(eventob_);
             return null;
         }
         void
-        seteventobuser(aug_object* obj) AUG_NOTHROW
+        seteventobuser_(objectref user) AUG_NOTHROW
         {
-            user_ = smartob<aug_object>::incref(obj);
+            user_ = object_incref<aug_object>(user);
         }
         const char*
-        eventobfrom() AUG_NOTHROW
+        eventobfrom_() AUG_NOTHROW
         {
             return from_.c_str();
         }
         const char*
-        eventobto() AUG_NOTHROW
+        eventobto_() AUG_NOTHROW
         {
             return to_.c_str();
         }
         const char*
-        eventobtype() AUG_NOTHROW
+        eventobtype_() AUG_NOTHROW
         {
             return type_.c_str();
         }
-        aug_object*
-        eventobuser() AUG_NOTHROW
+        smartob<aug_object>
+        eventobuser_() AUG_NOTHROW
         {
-            aug::incref(user_);
-            return user_.get();
+            return user_;
         }
         static smartob<aug_eventob>
         create(const string& from, const string& to, const string& type)
@@ -297,10 +299,14 @@ namespace aug {
             bool
             readevent()
             {
-                aug_event event;
                 AUG_DEBUG2("reading event");
 
-                switch (aug::readevent(eventrd_, event).type_) {
+                aug_event event;
+                aug::readevent(eventrd_, event);
+                smartob<aug_eventob> ev
+                    (object_cast<aug_eventob>(obptr(event.user_)));
+
+                switch (event.type_) {
                 case AUG_EVENTRECONF:
                     AUG_DEBUG2("received AUG_EVENTRECONF");
                     cb_.reconf();
@@ -323,26 +329,18 @@ namespace aug {
                 case POSTEVENT_:
                     AUG_DEBUG2("received POSTEVENT_");
                     {
-                        smartob<aug_eventob> ev
-                            (object_cast<aug_eventob>(makeref(event.user_)));
-
                         vector<sessionptr> sessions;
                         sessions_.getbygroup(sessions, eventobto(ev));
 
-                        smartob<aug_blob> blob(object_cast<
-                                               aug_blob>(eventobuser(ev)));
-                        size_t size;
-                        const void* user(blobdata(blob, &size));
-
+                        smartob<aug_object> obj(eventobuser(ev));
                         vector<sessionptr>
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
                         for (; it != end; ++it)
                             (*it)->event(eventobfrom(ev), eventobtype(ev),
-                                         user, size);
+                                         obj);
                     }
                 }
-                destroyvar(event.var_);
                 return true;
             }
             bool
@@ -371,9 +369,8 @@ namespace aug {
                 AUG_DEBUG2("custom timer expiry");
 
                 sessiontimers::iterator it(sessiontimers_.find(id));
-                sessiontimerptr tptr(it->second);
-                maud_object timer = { id, tptr->var_.arg_ };
-                tptr->session_->expire(timer, ms);
+                maud_handle timer = { id, it->second.user_.get() };
+                it->second.session_->expire(timer, ms);
 
                 if (0 == ms) {
                     AUG_DEBUG2("removing timer: ms has been set to zero");
@@ -431,7 +428,7 @@ engine::cancelinactive()
     sessiontimers::iterator it(impl_->sessiontimers_.begin()),
         end(impl_->sessiontimers_.end());
     while (it != end) {
-        if (!it->second->session_->active()) {
+        if (!it->second.session_->active()) {
             aug_warn("cancelling timer associated with inactive session");
             aug_canceltimer(cptr(impl_->timers_), it->first);
             impl_->sessiontimers_.erase(it++);
@@ -502,37 +499,33 @@ engine::run(bool stoponerr)
 AUGRTPP_API void
 engine::reconfall()
 {
-    aug_event e = { AUG_EVENTRECONF, AUG_VARNULL };
+    aug_event e = { AUG_EVENTRECONF, 0 };
     writeevent(impl_->eventwr_, e);
 }
 
 AUGRTPP_API void
 engine::stopall()
 {
-    aug_event e = { AUG_EVENTSTOP, AUG_VARNULL };
+    aug_event e = { AUG_EVENTSTOP, 0 };
     writeevent(impl_->eventwr_, e);
 }
 
 AUGRTPP_API void
 engine::post(const char* sname, const char* to, const char* type,
-             const aug_var* user)
+             objectref ref)
 {
-    auto_ptr<postevent> arg(new postevent(sname, to, type));
+    smartob<aug_eventob> ev(postevent::create(sname, to, type));
+    seteventobuser(ev, ref);
     aug_event e;
     e.type_ = POSTEVENT_;
-    e.var_.type_ = 0;
-    e.var_.arg_ = arg.get();
+    e.user_ = ev.base();
+
     writeevent(impl_->eventwr_, e);
-
-    // Event takes ownership of var when post cannot fail.
-
-    aug_setvar(&arg->var_, user);
-    arg.release();
 }
 
 AUGRTPP_API void
 engine::dispatch(const char* sname, const char* to, const char* type,
-                 const void* user, size_t size)
+                 objectref ref)
 {
     vector<sessionptr> sessions;
     impl_->sessions_.getbygroup(sessions, to);
@@ -540,7 +533,7 @@ engine::dispatch(const char* sname, const char* to, const char* type,
     vector<sessionptr>::const_iterator it(sessions.begin()),
         end(sessions.end());
     for (; it != end; ++it)
-        (*it)->event(sname, type, user, size);
+        (*it)->event(sname, type, ref);
 }
 
 AUGRTPP_API void
@@ -582,7 +575,7 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
             // Schedule an event to ensure that connected() is called after
             // this function has returned.
 
-            aug_event e = { AUG_EVENTWAKEUP, AUG_VARNULL };
+            aug_event e = { AUG_EVENTWAKEUP, 0 };
             writeevent(impl_->eventwr_, e);
         }
 
@@ -636,9 +629,9 @@ engine::send(maud_id cid, const void* buf, size_t len)
 }
 
 AUGRTPP_API void
-engine::sendv(maud_id cid, const aug_var& var)
+engine::sendv(maud_id cid, blobref blob)
 {
-    if (!impl_->socks_.sendv(cid, var, impl_->now_))
+    if (!impl_->socks_.sendv(cid, blob, impl_->now_))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
                           "connection has been shutdown");
 }
@@ -678,23 +671,18 @@ engine::cancelrwtimer(maud_id cid, unsigned flags)
 }
 
 AUGRTPP_API maud_id
-engine::settimer(const char* sname, unsigned ms, const aug_var* var)
+engine::settimer(const char* sname, unsigned ms, objectref ref)
 {
     maud_id id(aug_nextid());
-    aug_var local = { 0, impl_ };
-
-    // If aug_settimer() succeeds, aug_destroyvar() will be called on var when
-    // the timer is destroyed.
+    smartob<aug_addrob> local(createaddrob(impl_, 0));
 
     aug::settimer(impl_->timers_, id, ms, timermemcb<detail::engineimpl,
                   &detail::engineimpl::timercb>, local);
 
-    sessiontimerptr tptr(new sessiontimer(impl_->sessions_.getbyname(sname)));
-    impl_->sessiontimers_[id] = tptr;
+    // Insert after settimer() has succeeded.
 
-    // Timer takes ownership of var when settimer cannot fail.
-
-    aug_setvar(&tptr->var_, var);
+    sessiontimer timer(impl_->sessions_.getbyname(sname));
+    impl_->sessiontimers_.insert(make_pair(id, timer));
     return id;
 }
 

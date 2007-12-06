@@ -107,9 +107,9 @@ namespace aug {
     int
     settimer(aug_timers& timers, idref ref, unsigned ms, T& x)
     {
-        scoped_addrob<simple_addrob> obj(&x);
+        smartob<aug_addrob> obj(createaddrob(&x, 0));
         return verify(aug_settimer(&timers, ref.get(), ms,
-                                   timermemcb<T>, obj));
+                                   timermemcb<T>, obj.base()));
     }
 
     template <typename T>
@@ -118,7 +118,7 @@ namespace aug {
     {
         smartob<aug_addrob> obj(createaddrob(x));
         int id(verify(aug_settimer(&timers, ref.get(), ms, timermemcb<T>,
-                                   obj)));
+                                   obj.base())));
         return id;
     }
 

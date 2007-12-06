@@ -7,6 +7,8 @@
 #include "augutilpp.hpp"
 #include "augsyspp.hpp"
 
+#include "augobj/blob.h"
+
 #include <fstream>
 #include <memory> // auto_ptr<>
 
@@ -17,34 +19,33 @@ namespace {
 
     const char MSG[] = "hello, world!\r\n";
 
-    const void*
-    buf(void* arg, size_t* size)
-    {
-        if (size)
-            *size = sizeof(MSG) - 1;
-        return MSG;
-    }
-
-    const struct maud_vartype vartype = {
-        NULL,
-        buf
+    struct helloblob {
+        static const void*
+        blobdata_(size_t* size) AUG_NOTHROW
+        {
+            if (size)
+                *size = blobsize_();
+            return MSG;
+        }
+        static size_t
+        blobsize_() AUG_NOTHROW
+        {
+            return sizeof(MSG) - 1;
+        }
     };
 
-    const struct maud_var var = {
-        &vartype,
-        NULL
-    };
+    aug::scoped_blob<helloblob> hello;
 
     void
-    dosend(object& sock)
+    dosend(handle& sock)
     {
         send(sock, MSG, sizeof(MSG) - 1);
     }
 
     void
-    dosendv(object& sock)
+    dosendv(handle& sock)
     {
-        sendv(sock, var);
+        sendv(sock, hello.get());
     }
 
     void
@@ -85,12 +86,12 @@ namespace {
     };
 
     struct eachline {
-        void (*fn_)(object&);
-        object sock_;
+        void (*fn_)(handle&);
+        handle sock_;
         aug::clock* clock_;
         vector<double>& secs_;
         explicit
-        eachline(void (*fn)(object&), const object& sock,
+        eachline(void (*fn)(handle&), const handle& sock,
                  aug::clock& clock, vector<double>& secs)
             : fn_(fn),
               sock_(sock),
@@ -111,7 +112,7 @@ namespace {
     };
 
     struct bench : basic_session {
-        void (*send_)(object&);
+        void (*send_)(handle&);
         unsigned conns_, estab_, echos_;
         size_t bytes_;
         aug::clock clock_;
@@ -148,7 +149,7 @@ namespace {
             return true;
         }
         void
-        do_closed(const object& sock)
+        do_closed(const handle& sock)
         {
             auto_ptr<state> s(sock.user<state>());
             pushxy(xy_, s->secs_);
@@ -175,7 +176,7 @@ namespace {
             writexy(xy_);
         }
         void
-        do_connected(object& sock, const char* addr, unsigned short port)
+        do_connected(handle& sock, const char* addr, unsigned short port)
         {
             const char* sslctx = maud::getenv("session.bench.sslcontext", 0);
             if (sslctx) {
@@ -189,7 +190,7 @@ namespace {
             --s.tosend_;
         }
         void
-        do_data(const object& sock, const void* buf, size_t len)
+        do_data(const handle& sock, const void* buf, size_t len)
         {
             bytes_ += len;
             state& s(*sock.user<state>());
@@ -198,13 +199,13 @@ namespace {
                      eachline(send_, sock, clock_, s.secs_));
         }
         bool
-        do_authcert(const object& sock, const char* subject,
+        do_authcert(const handle& sock, const char* subject,
                     const char* issuer)
         {
             maud_writelog(MAUD_LOGINFO, "checking subject...");
             return true;
         }
-        ~bench() MAUD_NOTHROW
+        ~bench() AUG_NOTHROW
         {
         }
         bench()

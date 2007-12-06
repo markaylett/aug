@@ -434,42 +434,42 @@ namespace {
         return type;
     }
 
-    class filecontent {
+    class filecontent : public ref_base {
+        blob<filecontent> blob_;
         smartfd sfd_;
         mmap mmap_;
-    public:
-        typedef filecontent arg_type;
         explicit
         filecontent(const char* path)
             : sfd_(aug::open(path, O_RDONLY)),
               mmap_(sfd_, 0, 0, AUG_MMAPRD)
         {
+            blob_.reset(this);
         }
-        void*
-        addr() const
+    public:
+        smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
         {
+            if (equalid<aug_object>(id) || equalid<aug_blob>(id))
+                return object_incref<aug_object>(blob_);
+            return null;
+        }
+        const void*
+        blobdata_(size_t* size) AUG_NOTHROW
+        {
+            if (size)
+                *size = mmap_.len();
             return mmap_.addr();
         }
         size_t
-        size() const
+        blobsize_() AUG_NOTHROW
         {
             return mmap_.len();
         }
-        static void
-        destroy(arg_type* arg)
+        static smartob<aug_blob>
+        create(const char* path)
         {
-            delete arg;
-        }
-        static const void*
-        buf(arg_type& arg, size_t& size)
-        {
-            size = arg.size();
-            return arg.addr();
-        }
-        static const void*
-        buf(arg_type& arg)
-        {
-            return arg.addr();
+            filecontent* ptr = new filecontent(path);
+            return object_attach<aug_blob>(ptr->blob_);
         }
     };
 
@@ -478,20 +478,19 @@ namespace {
     void
     sendfile(maud_id id, const string& sessid, const string& path)
     {
-        auto_ptr<filecontent> ptr(new filecontent(path.c_str()));
+        smartob<aug_blob> blob(filecontent::create(path.c_str()));
+        size_t size(blobsize(blob));
 
         stringstream header;
         header << "HTTP/1.1 200 OK\r\n"
                << "Date: " << utcdate() << "\r\n"
                << "Set-Cookie: AUGSESSID=" << sessid << "\r\n"
                << "Content-Type: " << mimetype(path) << "\r\n"
-               << "Content-Length: " << (unsigned)ptr->size() << "\r\n"
+               << "Content-Length: " << (unsigned)size << "\r\n"
                << "\r\n";
 
         send(id, header.str().c_str(), header.str().size());
-        aug_var var;
-        sendv(id, bindvar<filecontent>(var, *ptr));
-        ptr.release();
+        sendv(id, blob.get());
     }
 
     vector<string> results_;
@@ -671,10 +670,10 @@ namespace {
                         values["content"] = content;
                         values["sessid"] = sessid_;
 
-                        string s(urlpack(values.begin(), values.end()));
+                        scoped_blob<stringob> blob
+                            (urlpack(values.begin(), values.end()));
 
-                        dispatch("httpclient", type.c_str(), s.data(),
-                                 s.size());
+                        dispatch("httpclient", type.c_str(), blob.base());
                     }
 
                     sendresult(id_, sessid_);
@@ -734,7 +733,7 @@ namespace {
             results_.push_back(xml);
         }
         void
-        do_closed(const object& sock)
+        do_closed(const handle& sock)
         {
             aug_info("closed");
             if (sock.user()) {
@@ -743,7 +742,7 @@ namespace {
             }
         }
         bool
-        do_accepted(object& sock, const char* addr, unsigned short port)
+        do_accepted(handle& sock, const char* addr, unsigned short port)
         {
             auto_ptr<session> sess(new session(realm_, sock.id(), addr));
             auto_ptr<marparser> parser(new marparser(0, sess));
@@ -754,7 +753,7 @@ namespace {
             return true;
         }
         void
-        do_data(const object& sock, const void* buf, size_t len)
+        do_data(const handle& sock, const void* buf, size_t len)
         {
             marparser& parser(*sock.user<marparser>());
             try {
@@ -766,7 +765,7 @@ namespace {
             }
         }
         void
-        do_rdexpire(const object& sock, unsigned& ms)
+        do_rdexpire(const handle& sock, unsigned& ms)
         {
             aug_info("no data received for 30 seconds");
             shutdown(sock, 0);

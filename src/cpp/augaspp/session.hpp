@@ -8,6 +8,8 @@
 
 #include "augsyspp/smartptr.hpp"
 
+#include "augobjpp.hpp"
+
 #include "maud.h"
 
 namespace aug {
@@ -36,8 +38,8 @@ namespace aug {
         do_reconf() const AUG_NOTHROW = 0;
 
         virtual void
-        do_event(const char* from, const char* type, const void* user,
-                 size_t size) const AUG_NOTHROW = 0;
+        do_event(const char* from, const char* type,
+                 objectref obj) const AUG_NOTHROW = 0;
 
         virtual void
         do_closed(const maud_handle& sock) const AUG_NOTHROW = 0;
@@ -103,10 +105,10 @@ namespace aug {
             return do_reconf();
         }
         void
-        event(const char* from, const char* type, const void* user,
-              size_t size) const AUG_NOTHROW
+        event(const char* from, const char* type,
+              objectref ref) const AUG_NOTHROW
         {
-            do_event(from, type, user, size);
+            do_event(from, type, ref);
         }
         void
         closed(const maud_handle& sock) const AUG_NOTHROW

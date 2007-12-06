@@ -179,10 +179,8 @@ namespace {
             if (ms) {
                 if (-1 != timer_)
                     resettimer(timer_, ms);
-                else {
-                    maud_var var = AUG_VARNULL;
-                    timer_ = maud::settimer(ms, var);
-                }
+                else
+                    timer_ = maud::settimer(ms, 0);
                 aug_info("next expiry in %d ms", ms);
             } else if (-1 != timer_) {
                 canceltimer(timer_);
@@ -249,7 +247,8 @@ namespace {
 
             stringstream ss;
             toxml(ss, queue_, offset, max_);
-            dispatch(from, "result", ss.str().c_str(), ss.str().size());
+            scoped_blob<stringob> blob(ss.str());
+            dispatch(from, "result", blob.base());
         }
         bool
         do_start(const char* sname)
@@ -292,7 +291,7 @@ namespace {
             respond(from, type, fields["content"]);
         }
         void
-        do_expire(const object& timer, unsigned& ms)
+        do_expire(const handle& timer, unsigned& ms)
         {
             timeval tv;
             gettimeofday(tv);
@@ -302,7 +301,7 @@ namespace {
             ms = timerms(queue_, tv);
             aug_info("next expiry in %d ms", ms);
         }
-        ~sched() MAUD_NOTHROW
+        ~sched() AUG_NOTHROW
         {
         }
         sched()

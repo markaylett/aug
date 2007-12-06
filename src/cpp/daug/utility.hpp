@@ -5,13 +5,13 @@
 #define DAUG_UTILITY_HPP
 
 struct maud_module;
-struct maud_object;
+struct maud_handle;
 
 namespace augas {
 
     void
     setdefaults(maud_module& dst, const maud_module& src,
-                void (*teardown)(const maud_object*));
+                void (*teardown)(const maud_handle*));
 }
 
 #endif // DAUG_UTILITY_HPP

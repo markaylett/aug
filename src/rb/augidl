@@ -164,7 +164,7 @@ def gettype(node)
     type = node.attributes["type"].to_s
     object = false
     if node.attributes.has_key? "object" then
-        object = node.attributes["object"].to_s == "true"
+        object = node.attributes["object"].to_s !~ /false|no|0/i
     end
     Type.new(type, object)
 end
@@ -291,7 +291,7 @@ namespace aug {
     struct object_traits<#{iface.type.cname}> {
         typedef #{iface.type.cname}vtbl vtbl;
         static const char*
-        id()
+        id() AUG_NOTHROW
         {
             return #{iface.type.cname}id;
         }
@@ -356,11 +356,11 @@ END
             this->#{iface.name}_.impl_ = impl;
         }
         #{iface.type.cname}*
-        get()
+        get() AUG_NOTHROW
         {
             return &this->#{iface.name}_;
         }
-        operator aug::obref<#{iface.type.cname}>()
+        operator aug::obref<#{iface.type.cname}>() AUG_NOTHROW
         {
             return this->get();
         }
@@ -370,7 +370,7 @@ END
     class basic_#{iface.name} {
         #{iface.name}<basic_#{iface.name}<T> > #{iface.name}_;
         T impl_;
-        unsigned refs_;
+        int refs_;
         explicit
         basic_#{iface.name}(const T& impl)
             : impl_(impl),
@@ -383,18 +383,20 @@ END
         cast_(const char* id) AUG_NOTHROW
         {
             if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.type.cname}>(id))
-                return aug::object_attach<aug_object>(this->#{iface.name}_);
+                return aug::object_incref<aug_object>(this->#{iface.name}_);
             return null;
         }
         int
         incref_() AUG_NOTHROW
         {
+            assert(0 < this->refs_);
             ++this->refs_;
             return 0;
         }
         int
         decref_() AUG_NOTHROW
         {
+            assert(0 < this->refs_);
             if (0 == --this->refs_)
                 delete this;
             return 0;
@@ -425,7 +427,7 @@ END
         cast_(const char* id) AUG_NOTHROW
         {
             if (aug::equalid<aug_object>(id) || aug::equalid<#{iface.type.cname}>(id))
-                return aug::object_attach<aug_object>(this->#{iface.name}_);
+                return aug::object_incref<aug_object>(this->#{iface.name}_);
             return null;
         }
         int
@@ -441,12 +443,17 @@ END
 END
     iface.each_method {|x| putforward iface, x}
     puts <<END
+        aug_object*
+        base() AUG_NOTHROW
+        {
+            return aug::obref<aug_object>(this->#{iface.name}_).get();
+        }
         #{iface.type.cname}*
-        get()
+        get() AUG_NOTHROW
         {
             return this->#{iface.name}_.get();
         }
-        operator aug::obref<#{iface.type.cname}>()
+        operator aug::obref<#{iface.type.cname}>() AUG_NOTHROW
         {
             return this->#{iface.name}_;
         }
@@ -498,14 +505,18 @@ namespace aug {
 #endif /* __cplusplus */
 END
     node.elements.each do |child|
-        if child.name == "verbatim" then
-            puts
-            puts child.text
-        elsif child.name == "interface" then
-            iface = getinterface(name, child)
-            putinterface(iface)
-        else
-            raise "unknown element '#{x.name}'"
+        case child.name
+            when "anglincl"
+                puts "\#include <#{child.text}>"
+            when "interface"
+                iface = getinterface(name, child)
+                putinterface(iface)
+            when "quotincl"
+                puts "\#include \"#{child.text}\""
+            when "verbatim"
+                puts child.text
+            else
+                raise "unknown element '#{x.name}'"
         end
     end
 

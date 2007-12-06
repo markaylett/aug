@@ -49,9 +49,11 @@
 # define AUG_EXTERNC extern
 #else /* __cplusplus */
 # define AUG_EXTERNC extern "C"
-# if !defined(AUG_NOTHROW)
+# if !defined(NDEBUG)
+#  define AUG_NOTHROW throw()
+# else /* NDEBUG */
 #  define AUG_NOTHROW
-# endif /* !AUG_NOTHROW */
+# endif /* NDEBUG */
 #endif /* __cplusplus */
 
 #if defined(__CYGWIN__) || defined(__MINGW32__)
