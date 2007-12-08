@@ -160,16 +160,16 @@ struct echo : basic_session {@/
   do_start(const char* sname);
 
   bool
-  do_accepted(object& sock, const char* addr, unsigned short port);
+  do_accepted(handle& sock, const char* addr, unsigned short port);
 
   void
-  do_closed(const object& sock);
+  do_closed(const handle& sock);
 
   void
-  do_data(const object& sock, const void* buf, size_t size);
+  do_data(const handle& sock, const void* buf, size_t size);
 
   void
-  do_rdexpire(const object& sock, unsigned& ms);
+  do_rdexpire(const handle& sock, unsigned& ms);
 
   static session_base*
   create(const char* sname);
@@ -197,16 +197,16 @@ echo::do_start(const char* sname)
 
 @ The |do_accepted()| function is called when a new client connection is
 accepted.  The |setuser()| function binds an opaque, user-defined value to an
-\DAUG/ object.  Here, a |string| buffer is assigned to track partial line
+\DAUG/ handle.  Here, a |string| buffer is assigned to track partial line
 data received from the client.  An initial, {\sc ``HELLO''} message is sent to
 the client.  The call to |setrwtimer()| establishes a timer that will expire
-when no read activity has occurred on the |sock| object for a period of 15
+when no read activity has occurred on the |sock| handle for a period of 15
 seconds --- \DAUG/ will automatically reset the timer whenever read activity
 occurs.
 
 @<member...@>+=
 bool
-echo::do_accepted(object& sock, const char* addr, unsigned short port)
+echo::do_accepted(handle& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
@@ -215,11 +215,11 @@ echo::do_accepted(object& sock, const char* addr, unsigned short port)
 }
 
 @ When a connection is closed, the |string| buffer associated with the socket
-object is deleted.
+handle is deleted.
 
 @<member...@>+=
 void
-echo::do_closed(const object& sock)
+echo::do_closed(const handle& sock)
 {
   delete sock.user<string>();
 }
@@ -232,7 +232,7 @@ before |tok| is cleared.
 
 @<member...@>+=
 void
-echo::do_data(const object& sock, const void* buf, size_t size)
+echo::do_data(const handle& sock, const void* buf, size_t size)
 {
   string& tok(*sock.user<string>());
   tokenise(static_cast<const char*>(buf),
@@ -248,7 +248,7 @@ delivered to the Session.
 
 @<member...@>+=
 void
-echo::do_rdexpire(const object& sock, unsigned& ms)
+echo::do_rdexpire(const handle& sock, unsigned& ms)
 {
   shutdown(sock, 0);
 }
@@ -264,13 +264,13 @@ echo::create(const char* sname)
 }
 
 @ Each time the |echoline| functor is called, a response is prepared and sent
-to the client associated with the |sock_| object.
+to the client associated with the |sock_| handle.
 
 @<echoline...@>=
 struct echoline {
-  object sock_;
+  handle sock_;
   explicit
-  echoline(const object& sock)
+  echoline(const handle& sock)
     : sock_(sock)
   {
   }

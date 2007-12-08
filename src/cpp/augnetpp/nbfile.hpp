@@ -109,8 +109,8 @@ namespace aug {
     insertnbfile(aug_nbfiles_t nbfiles, fdref ref, T& x)
     {
         smartob<aug_addrob> obj(createaddrob(&x, 0));
-        verify(aug_insertnbfile(nbfiles, ref.get(), nbfilememcb<T>,
-                                obj.base()));
+        verify(aug_insertnbfile
+               (nbfiles, ref.get(), nbfilememcb<T>, obj.base()));
     }
 
     template <typename T>
@@ -118,7 +118,8 @@ namespace aug {
     insertnbfile(aug_nbfiles_t nbfiles, fdref ref, std::auto_ptr<T>& x)
     {
         smartob<aug_addrob> obj(createaddrob(x));
-        verify(aug_insertnbfile(nbfiles, ref.get(), nbfilememcb<T>, obj));
+        verify(aug_insertnbfile
+               (nbfiles, ref.get(), nbfilememcb<T>, obj.base()));
     }
 
     inline void

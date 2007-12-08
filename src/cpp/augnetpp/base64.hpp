@@ -80,8 +80,9 @@ namespace aug {
         template <typename T>
         base64(aug_base64mode mode, T& x)
         {
-            scoped_addrob<simple_addrob> obj(&x);
-            verify(base64_ = aug_createbase64(mode, base64memcb<T>, obj));
+            smartob<aug_addrob> obj(createaddrob(&x, 0));
+            verify(base64_ = aug_createbase64(mode, base64memcb<T>,
+                                              obj.base()));
         }
 
         template <typename T>
@@ -89,7 +90,8 @@ namespace aug {
         {
             smartob<aug_addrob> obj(createaddrob(x));
             verify(base64_
-                   = aug_createbase64(mode, base64memcb<T>, obj));
+                   = aug_createbase64(mode, base64memcb<T>,
+                                      obj.base()));
         }
 
         operator aug_base64_t()

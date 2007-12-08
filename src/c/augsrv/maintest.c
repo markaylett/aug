@@ -50,7 +50,7 @@ init_(void* arg)
 static int
 run_(void* arg)
 {
-    struct aug_event in = { 1, AUG_VARNULL }, out = { !1, AUG_VARNULL };
+    struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
     if (!aug_writeevent(aug_eventwr(), &in))
         return -1;
@@ -65,7 +65,6 @@ run_(void* arg)
         return -1;
     }
 
-    aug_destroyvar(&out.var_);
     return 0;
 }
 

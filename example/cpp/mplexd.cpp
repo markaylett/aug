@@ -366,7 +366,7 @@ namespace test {
 
             setsrvlogger("aug");
             smartob<aug_addrob> addrob(createaddrob(this, 0));
-            state_.reset(new state(filememcb<service>, ));
+            state_.reset(new state(filememcb<service>, objectref(addrob)));
         }
 
         void

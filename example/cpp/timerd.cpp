@@ -5,6 +5,8 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
+#include "augobj/eventob.h"
+
 #include <memory>
 #include <time.h>
 
@@ -71,16 +73,18 @@ namespace test {
         readevent()
         {
             int fd(aug_eventrd());
-            aug_event event;
-
             AUG_DEBUG2("checking event pipe '%d'", fd);
 
             if (!fdevents(state_->muxer_, fd))
                 return;
 
             AUG_DEBUG2("reading event");
+            aug_event event;
+            aug::readevent(fd, event);
+            smartob<aug_eventob> ev
+                (object_cast<aug_eventob>(obptr(event.user_)));
 
-            switch (aug::readevent(aug_eventrd(), event).type_) {
+            switch (event.type_) {
             case AUG_EVENTRECONF:
                 aug_info("received AUG_EVENTRECONF");
                 if (*conffile_) {
@@ -97,7 +101,6 @@ namespace test {
                 remain_ = 0;
                 break;
             }
-            aug_destroyvar(&event.var_);
         }
 
         void

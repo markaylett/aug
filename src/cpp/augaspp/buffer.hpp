@@ -33,7 +33,7 @@ namespace aug {
             cast_(const char* id) AUG_NOTHROW
             {
                 if (equalid<aug_object>(id) || equalid<aug_blob>(id))
-                    return object_attach<aug_object>(blob_);
+                    return object_incref<aug_object>(blob_);
                 return null;
             }
             int

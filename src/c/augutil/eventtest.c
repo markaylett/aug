@@ -11,7 +11,7 @@ main(int argc, char* argv[])
 {
     struct aug_errinfo errinfo;
     int fds[2];
-    struct aug_event in = { 1, AUG_VARNULL }, out = { !1, AUG_VARNULL };
+    struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
     aug_atexitinit(&errinfo);
 
@@ -34,8 +34,6 @@ main(int argc, char* argv[])
         fprintf(stderr, "unexpected event type from aug_readevent()\n");
         goto fail;
     }
-
-    aug_destroyvar(&out.var_);
 
     if (-1 == aug_close(fds[0]) || -1 == aug_close(fds[1])) {
         aug_perrinfo(NULL, "aug_close() failed");

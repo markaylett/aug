@@ -49,7 +49,7 @@ namespace aug {
 
     template <typename T>
     int
-    filememcb(obref<aug_object> user, int fd) AUG_NOTHROW
+    filememcb(aug_object* user, int fd) AUG_NOTHROW
     {
         try {
             return obtoaddr<T*>(user)->filecb(fd) ? 1 : 0;
@@ -111,8 +111,8 @@ namespace aug {
     void
     insertfile(aug_files& files, fdref ref, T& x)
     {
-        scoped_addrob<simple_addrob> obj(&x);
-        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj));
+        smartob<aug_addrob> obj(createaddrob(&x, 0));
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj.base()));
     }
 
     template <typename T>
@@ -120,7 +120,7 @@ namespace aug {
     insertfile(aug_files& files, fdref ref, std::auto_ptr<T>& x)
     {
         smartob<aug_addrob> obj(createaddrob(x));
-        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj));
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj.base()));
     }
 
     inline void
