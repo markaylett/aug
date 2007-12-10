@@ -26,6 +26,9 @@ augpy_createblob(PyObject* pyobj);
 const void*
 augpy_blobdata(aug_object* obj, size_t* size);
 
+PyObject*
+augpy_getblob(aug_object* obj);
+
 PyTypeObject*
 augpy_createtype(void);
 

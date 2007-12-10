@@ -521,7 +521,7 @@ expire_(const struct maud_handle* timer, unsigned* ms)
 
     if (import->expire_) {
 
-        PyObject* x = timer->user_;
+        PyObject* x = augpy_getblob((aug_object*)timer->user_);
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->expire_, "OO", x, y);
         Py_DECREF(y);

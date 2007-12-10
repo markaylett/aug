@@ -183,9 +183,6 @@
 				RelativePath="..\src\c\augutil\types.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augutil\var.c">
-			</File>
-			<File
 				RelativePath="..\src\c\augutil\xstr.c">
 			</File>
 		</Filter>
@@ -246,9 +243,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\types.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augutil\var.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\xstr.h">

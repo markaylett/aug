@@ -48,8 +48,8 @@ main(int argc, char* argv[])
             throw error("decodebase64() failed");
 
         test x;
-        aug_var var = { 0, &x };
-        base64 b64(AUG_ENCODE64, base64memcb<test, &test::cb>, var);
+        scoped_addrob<simple_addrob> obj(&x);
+        base64 b64(AUG_ENCODE64, base64memcb<test, &test::cb>, obj);
         appendbase64(b64, DECODED, strlen(DECODED));
         finishbase64(b64);
 

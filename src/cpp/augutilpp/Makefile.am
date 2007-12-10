@@ -12,8 +12,7 @@ modinclude_HEADERS = \
 	object.hpp \
 	path.hpp \
 	shellparser.hpp \
-	timer.hpp \
-	var.hpp
+	timer.hpp
 
 noinst_LTLIBRARIES = libaugutilpp.la
 
@@ -28,8 +27,7 @@ libaugutilpp_la_SOURCES = \
 	object.cpp \
 	path.cpp \
 	shellparser.cpp \
-	timer.cpp \
-	var.cpp
+	timer.cpp
 
 libaugutilpp_la_LDFLAGS = \
 	-no-undefined

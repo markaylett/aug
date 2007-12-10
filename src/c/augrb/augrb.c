@@ -346,7 +346,7 @@ static VALUE
 post_(int argc, VALUE* argv, VALUE self)
 {
     VALUE to, type, user;
-    aug_blob* blob = NULL;
+    aug_blob* blob;
     int ret;
 
     rb_scan_args(argc, argv, "21", &to, &type, &user);
@@ -357,11 +357,11 @@ post_(int argc, VALUE* argv, VALUE self)
     Check_Type(type, T_STRING);
 
     if (user != Qnil)
-        blob = augrb_createblob(StringValue(user));
+        user = StringValue(user);
 
+    blob = augrb_createblob(user);
     ret = maud_post(RSTRING(to)->ptr, RSTRING(type)->ptr, (aug_object*)blob);
-    if (blob)
-        aug_decref(blob);
+    aug_decref(blob);
 
     if (-1 == ret)
         rb_raise(cerror_, maud_error());
@@ -382,12 +382,12 @@ dispatch_(int argc, VALUE* argv, VALUE self)
     Check_Type(type, T_STRING);
 
     if (user != Qnil)
-        blob = augrb_createblob(StringValue(user));
+        user = StringValue(user);
 
+    blob = augrb_createblob(user);
     ret = maud_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr,
                         (aug_object*)blob);
-    if (blob)
-        aug_decref(blob);
+    aug_decref(blob);
 
     if (-1 == ret)
         rb_raise(cerror_, maud_error());
@@ -925,7 +925,7 @@ expire_(const struct maud_handle* timer, unsigned* ms)
     VALUE user;
     assert(session);
     assert(timer->user_);
-    user = *(VALUE*)timer->user_;
+    user = augrb_getblob((aug_object*)timer->user_);
 
     if (session->expire_) {
         VALUE ret = funcall2_(expireid_, user, INT2FIX(*ms));

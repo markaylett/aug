@@ -66,7 +66,7 @@ libaugutil_la_DEPENDENCIES =  \
 am_libaugutil_la_OBJECTS = clock.lo config.lo conv.lo event.lo file.lo \
 	getopt.lo lexer.lo list.lo log.lo md5.lo networds.lo object.lo \
 	path.lo pwd.lo shellwords.lo timer.lo tmspec.lo types.lo \
-	var.lo xstr.lo
+	xstr.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
 am_clocktest_OBJECTS = clocktest.$(OBJEXT)
 clocktest_OBJECTS = $(am_clocktest_OBJECTS)
@@ -272,7 +272,6 @@ modinclude_HEADERS = \
 	timer.h \
 	tmspec.h \
 	types.h \
-	var.h \
 	xstr.h
 
 noinst_HEADERS = 
@@ -296,7 +295,6 @@ libaugutil_la_SOURCES = \
 	timer.c \
 	tmspec.c \
 	types.c \
-	var.c \
 	xstr.c
 
 libaugutil_la_LDFLAGS = \
@@ -447,7 +445,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tmspec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/var.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xstr.Plo@am__quote@
 
 .c.o:

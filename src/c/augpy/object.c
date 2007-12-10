@@ -159,6 +159,20 @@ augpy_blobdata(aug_object* obj, size_t* size)
     return data;
 }
 
+PyObject*
+augpy_getblob(aug_object* obj)
+{
+    PyObject* pyobj = NULL;
+    if (obj) {
+        augpy_blob* blob = aug_cast(obj, augpy_blobid);
+        if (blob) {
+            pyobj = blob->vtbl_->get_(blob);
+            aug_decref(blob);
+        }
+    }
+    return pyobj;
+}
+
 /* Implementation note: always reassign members before decrementing reference
    counts. */
 

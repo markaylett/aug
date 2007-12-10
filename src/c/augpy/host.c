@@ -64,7 +64,7 @@ post_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
     PyObject* user = NULL;
-    aug_blob* blob = NULL;
+    aug_blob* blob;
     int ret;
 
     if (!PyArg_ParseTuple(args, "ss|O:post", &to, &type, &user))
@@ -79,12 +79,13 @@ post_(PyObject* self, PyObject* args)
                             " read-only buffer");
             return NULL;
         }
-        blob = augpy_createblob(user);
     }
 
+    if (!(blob = augpy_createblob(user)))
+        return NULL;
+
     ret = maud_post(to, type, (aug_object*)blob);
-    if (blob)
-        aug_decref(blob);
+    aug_decref(blob);
 
     if (-1 == ret) {
 
@@ -103,7 +104,7 @@ dispatch_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
     PyObject* user = NULL;
-    aug_blob* blob = NULL;
+    aug_blob* blob;
     int ret;
 
     if (!PyArg_ParseTuple(args, "ss|O:dispatch", &to, &type, &user))
@@ -118,12 +119,13 @@ dispatch_(PyObject* self, PyObject* args)
                             " read-only buffer");
             return NULL;
         }
-        blob = augpy_createblob(user);
     }
 
+    if (!(blob = augpy_createblob(user)))
+        return NULL;
+
     ret = maud_dispatch(to, type, (aug_object*)blob);
-    if (blob)
-        aug_decref(blob);
+    aug_decref(blob);
 
     if (-1 == ret) {
 

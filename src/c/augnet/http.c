@@ -10,7 +10,6 @@ AUG_RCSID("$Id$");
 #include "augutil/conv.h"
 #include "augutil/lexer.h"
 #include "augutil/types.h"
-#include "augutil/var.h"
 
 #include "augsys/errinfo.h"
 #include "augsys/string.h"

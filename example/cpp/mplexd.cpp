@@ -6,8 +6,6 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "augobj/eventob.h"
-
 #include <iostream>
 #include <map>
 #include <memory> // auto_ptr<>
@@ -239,8 +237,7 @@ namespace test {
 
             aug_event event;
             aug::readevent(aug_eventrd(), event);
-            smartob<aug_eventob> ev
-                (object_cast<aug_eventob>(obptr(event.user_)));
+            smartob<aug_object> obj(object_attach(obptr(event.user_)));
 
             switch (event.type_) {
             case AUG_EVENTRECONF:

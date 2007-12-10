@@ -38,10 +38,10 @@ namespace {
     struct sessiontimer {
         sessionptr session_;
         smartob<aug_object> user_;
-        explicit
-        sessiontimer(const sessionptr& session)
+        sessiontimer(const sessionptr& session,
+                     const smartob<aug_object>& user)
             : session_(session),
-              user_(null)
+              user_(user)
         {
         }
     };
@@ -303,8 +303,7 @@ namespace aug {
 
                 aug_event event;
                 aug::readevent(eventrd_, event);
-                smartob<aug_eventob> ev
-                    (object_cast<aug_eventob>(obptr(event.user_)));
+                smartob<aug_object> obj(object_attach(obptr(event.user_)));
 
                 switch (event.type_) {
                 case AUG_EVENTRECONF:
@@ -329,16 +328,19 @@ namespace aug {
                 case POSTEVENT_:
                     AUG_DEBUG2("received POSTEVENT_");
                     {
+                        smartob<aug_eventob> ev
+                            (object_cast<aug_eventob>(obj));
+
                         vector<sessionptr> sessions;
                         sessions_.getbygroup(sessions, eventobto(ev));
 
-                        smartob<aug_object> obj(eventobuser(ev));
+                        smartob<aug_object> user(eventobuser(ev));
                         vector<sessionptr>
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
                         for (; it != end; ++it)
                             (*it)->event(eventobfrom(ev), eventobtype(ev),
-                                         obj);
+                                         user);
                     }
                 }
                 return true;
@@ -681,7 +683,8 @@ engine::settimer(const char* sname, unsigned ms, objectref ref)
 
     // Insert after settimer() has succeeded.
 
-    sessiontimer timer(impl_->sessions_.getbyname(sname));
+    sessiontimer timer(impl_->sessions_.getbyname(sname),
+                       smartob<aug_object>::incref(ref));
     impl_->sessiontimers_.insert(make_pair(id, timer));
     return id;
 }

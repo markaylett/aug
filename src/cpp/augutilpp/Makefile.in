@@ -56,7 +56,7 @@ libaugutilpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugutilpp_la_OBJECTS = clock.lo config.lo conv.lo event.lo \
 	file.lo lexer.lo log.lo object.lo path.lo shellparser.lo \
-	timer.lo var.lo
+	timer.lo
 libaugutilpp_la_OBJECTS = $(am_libaugutilpp_la_OBJECTS)
 am_maintest_OBJECTS = maintest.$(OBJEXT)
 maintest_OBJECTS = $(am_maintest_OBJECTS)
@@ -237,8 +237,7 @@ modinclude_HEADERS = \
 	object.hpp \
 	path.hpp \
 	shellparser.hpp \
-	timer.hpp \
-	var.hpp
+	timer.hpp
 
 noinst_LTLIBRARIES = libaugutilpp.la
 libaugutilpp_la_SOURCES = \
@@ -252,8 +251,7 @@ libaugutilpp_la_SOURCES = \
 	object.cpp \
 	path.cpp \
 	shellparser.cpp \
-	timer.cpp \
-	var.cpp
+	timer.cpp
 
 libaugutilpp_la_LDFLAGS = \
 	-no-undefined
@@ -358,7 +356,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shellparser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shellparsertest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/var.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

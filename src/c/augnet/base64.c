@@ -7,8 +7,6 @@
 
 AUG_RCSID("$Id$");
 
-#include "augutil/var.h"
-
 #include "augsys/errinfo.h"
 #include "augsys/string.h"
 

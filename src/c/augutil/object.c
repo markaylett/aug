@@ -184,6 +184,7 @@ aug_createlongob(long l, void (*destroy)(long))
     }
 
     impl->longob_.vtbl_ = &longobvtbl_;
+    impl->longob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->destroy_ = destroy;
     impl->l_ = l;
@@ -214,6 +215,7 @@ aug_createaddrob(void* p, void (*destroy)(void*))
     }
 
     impl->addrob_.vtbl_ = &addrobvtbl_;
+    impl->addrob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->destroy_ = destroy;
     impl->p_ = p;

@@ -18,7 +18,7 @@ encode_(aug_object* obj, const char* buf, size_t len)
 }
 
 static int
-decode_(const struct aug_var* var, const char* buf, size_t len)
+decode_(aug_object* obj, const char* buf, size_t len)
 {
     strcat(decoded_, buf);
     return 0;

@@ -164,9 +164,6 @@
 			<File
 				RelativePath="..\src\cpp\augutilpp\timer.cpp">
 			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\var.cpp">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -204,9 +201,6 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\timer.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augutilpp\var.hpp">
 			</File>
 		</Filter>
 		<Filter

@@ -148,7 +148,7 @@ namespace aug {
         smartob(obref<T> ref, bool inc) AUG_NOTHROW
             : ref_(ref)
         {
-            if (ref.get() && inc)
+            if (null != ref && inc)
                 aug::incref(ref);
         }
 

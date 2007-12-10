@@ -5,8 +5,6 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
-#include "augobj/eventob.h"
-
 #include <memory>
 #include <time.h>
 
@@ -81,8 +79,7 @@ namespace test {
             AUG_DEBUG2("reading event");
             aug_event event;
             aug::readevent(fd, event);
-            smartob<aug_eventob> ev
-                (object_cast<aug_eventob>(obptr(event.user_)));
+            smartob<aug_object> obj(object_attach(obptr(event.user_)));
 
             switch (event.type_) {
             case AUG_EVENTRECONF:

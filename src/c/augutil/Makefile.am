@@ -32,7 +32,6 @@ modinclude_HEADERS = \
 	timer.h \
 	tmspec.h \
 	types.h \
-	var.h \
 	xstr.h
 
 noinst_HEADERS =
@@ -58,7 +57,6 @@ libaugutil_la_SOURCES = \
 	timer.c \
 	tmspec.c \
 	types.c \
-	var.c \
 	xstr.c
 
 libaugutil_la_LDFLAGS = \
