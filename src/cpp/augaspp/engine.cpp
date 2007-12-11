@@ -178,6 +178,7 @@ namespace aug {
                 try {
                     removenbfile(eventrd_);
                 } AUG_PERRINFOCATCH;
+                sessiontimers_.clear();
             }
             engineimpl(const smartfd& eventrd, const smartfd& eventwr,
                        timers& timers, enginecb_base& cb)

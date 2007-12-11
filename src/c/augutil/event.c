@@ -104,11 +104,11 @@ aug_writeevent(int fd, const struct aug_event* event)
     AUG_WMB();
 
     if (event->user_)
-        aug_decref(event->user_);
+        aug_incref(event->user_);
 
     if (-1 == writeall_(fd, (const char*)event, sizeof(*event))) {
         if (event->user_)
-            aug_incref(event->user_);
+            aug_decref(event->user_);
         return NULL;
     }
 

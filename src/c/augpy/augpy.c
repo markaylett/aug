@@ -525,6 +525,7 @@ expire_(const struct maud_handle* timer, unsigned* ms)
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->expire_, "OO", x, y);
         Py_DECREF(y);
+        Py_DECREF(x);
 
         if (z) {
             if (PyInt_Check(z)) {

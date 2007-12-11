@@ -113,6 +113,7 @@ namespace aug {
     int
     incref(obref<T> ref) AUG_NOTHROW
     {
+        assert(ref.get());
         return ref.get()->vtbl_->incref_(ref.get());
     }
 
@@ -120,7 +121,8 @@ namespace aug {
     T*
     incget(const obref<T>& ref) AUG_NOTHROW
     {
-        incref(ref);
+        if (ref != null)
+            incref(ref);
         return ref.get();
     }
 
@@ -128,6 +130,7 @@ namespace aug {
     int
     decref(obref<T> ref) AUG_NOTHROW
     {
+        assert(ref.get());
         return ref.get()->vtbl_->decref_(ref.get());
     }
 
@@ -233,8 +236,7 @@ namespace aug {
     T*
     incget(const smartob<T>& sob) AUG_NOTHROW
     {
-        incref(sob);
-        return sob.get();
+        return incget<T>(static_cast<obref<T> >(sob));
     }
 
     template <typename T>
