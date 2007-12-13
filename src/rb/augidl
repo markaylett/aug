@@ -585,18 +585,6 @@ puts <<END
 #  define AUG_NOTHROW
 # endif /* !AUG_NOTHROW */
 
-/* For pointer conversions, see 4.10/2:
-
-   "An rvalue of type 'pointer to cv T,' where T is an object type, can be
-   converted to an rvalue of type 'pointer to cv void.' The result of
-   converting a 'pointer to cv T' to a 'pointer to cv void' points to the
-   start of the storage location where the object of type T resides, as if the
-   object is a most derived object (1.8) of type T (that is, not a base class
-   subobject)."
-
-   So the void * will point to the beginning of your class B. And since B is
-   not guaranteed to start with the POD, you may not get what you want. */
-
 namespace aug {
     template <typename T>
     struct object_traits;

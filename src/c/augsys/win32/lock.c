@@ -28,8 +28,7 @@ aug_createmutex_(void)
 #endif /* _MSC_VER */
 		InitializeCriticalSection(&mutex->handle_);
 #if defined(_MSC_VER)
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER) {
+	} __except (EXCEPTION_EXECUTE_HANDLER) {
 		aug_setwin32errno(ERROR_NOT_ENOUGH_MEMORY);
         free(mutex);
 		return NULL;
