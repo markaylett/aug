@@ -67,11 +67,20 @@ blobdata_(aug_blob* obj, size_t* size)
     return data;
 }
 
+static size_t
+blobsize_(aug_blob* obj)
+{
+    size_t size;
+    blobdata_(obj, &size);
+    return size;
+}
+
 static const struct aug_blobvtbl blobvtbl_ = {
     castblob_,
     increfblob_,
     decrefblob_,
-    blobdata_
+    blobdata_,
+    blobsize_
 };
 
 static void*

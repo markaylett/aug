@@ -57,11 +57,19 @@ blobdata_(aug_blob* obj, size_t* size)
     return RSTRING(impl->rbobj_)->ptr;
 }
 
+static size_t
+blobsize_(aug_blob* obj)
+{
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    return RSTRING(impl->rbobj_)->len;
+}
+
 static const struct aug_blobvtbl blobvtbl_ = {
     castblob_,
     increfblob_,
     decrefblob_,
-    blobdata_
+    blobdata_,
+    blobsize_
 };
 
 static void*

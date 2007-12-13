@@ -83,8 +83,10 @@ aug_destroyfiles(struct aug_files* files)
 {
     struct aug_file_* it;
     AUG_FOREACH(it, files)
-        if (!it->trash_ && it->user_)
+        if (!it->trash_ && it->user_) {
             aug_decref(it->user_);
+            it->user_ = NULL;
+        }
 
     if (!AUG_EMPTY(files)) {
 
@@ -134,8 +136,10 @@ aug_removefile(struct aug_files* files, int fd)
         return -1;
     }
 
-    if (it->user_)
+    if (it->user_) {
         aug_decref(it->user_);
+        it->user_ = NULL;
+    }
 
     if (locked_(files)) {
 
@@ -179,8 +183,10 @@ aug_foreachfile(struct aug_files* files)
 
         if (!(it->cb_(it->user_, it->fd_))) {
 
-            if (it->user_)
+            if (it->user_) {
                 aug_decref(it->user_);
+                it->user_ = NULL;
+            }
             it->trash_ = 1;
         }
 

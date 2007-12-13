@@ -54,6 +54,7 @@ createbuf_(aug_blob* blob)
     }
     aug_unlock();
 
+    buf->blob_ = blob;
     aug_incref(blob);
     return buf;
 }
