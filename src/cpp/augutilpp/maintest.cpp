@@ -2,49 +2,53 @@
    See the file COPYING for copying permission.
 */
 
-#include <cstring>
-#include <iostream>
-#include <string>
+#include "augutilpp/object.hpp"
 
+#include "augobj/blob.h"
+
+#include <iostream>
+#include <stdexcept>
+
+using namespace aug;
 using namespace std;
 
-#if 0
 namespace {
+    typedef logic_error error;
 
-    struct test : basic_vartype<string> {
-        static void
-        destroy(arg_type* arg)
-        {
-            delete arg;
-        }
-        static const void*
-        buf(arg_type& arg, size_t& size)
-        {
-            size = arg.size();
-            return arg.data();
-        }
-        static const void*
-        buf(arg_type& arg)
-        {
-            return arg.data();
-        }
-    };
+    void
+    test(obref<aug_blob> blob, const string& s)
+    {
+        size_t size;
+        const void* data(blobdata(blob, &size));
+
+        if (size != s.size())
+            throw error("size mismatch");
+
+        if (string(static_cast<const char*>(data), size) != s)
+            throw error("data mismatch");
+    }
 }
-#endif
 
 int
 main(int argc, char* argv[])
 {
     try {
-#if 0
-        string* s(new string());
-        aug_var v;
-        bindvar<test>(v, null);
-        bindvar<test>(v, *s);
-        s->assign("test");
-        memcmp(varbuf<char>(v), "test", 4);
-        destroyvar(v);
-#endif
+
+        const string s("some test data");
+
+        smartob<aug_blob> smart(basic_blob<stringob>::create(s));
+        test(smart, s);
+
+        if (null == smart)
+            throw error("bad null equality");
+
+        smart = null;
+        if (null != smart)
+            throw error("bad null inequality");
+
+        scoped_blob<stringob> scoped(s);
+        test(scoped, s);
+
     } catch (const exception& e) {
         cerr << e.what() << endl;
         return 1;
