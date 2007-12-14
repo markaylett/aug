@@ -7,7 +7,8 @@ RB_CFLAGS=`$(top_srcdir)/src/rb/rbflags -c`
 RB_LDFLAGS=`$(top_srcdir)/src/rb/rbflags -l`
 AM_CFLAGS = $(RB_CFLAGS)
 
-noinst_HEADERS =
+noinst_HEADERS = \
+	object.h
 
 mod_LTLIBRARIES = modaugrb.la
 modaugrb_la_SOURCES = \

@@ -36,9 +36,6 @@ namespace {
         eventob<postevent> eventob_;
         const string from_, to_, type_;
         smartob<aug_object> user_;
-        ~postevent() AUG_NOTHROW
-        {
-        }
         postevent(const string& from, const string& to, const string& type)
             : from_(from),
               to_(to),
@@ -46,6 +43,11 @@ namespace {
               user_(null)
         {
             eventob_.reset(this);
+        }
+    protected:
+        ~postevent() AUG_NOTHROW
+        {
+            // Deleted from base.
         }
     public:
         smartob<aug_object>
