@@ -32,22 +32,6 @@ using namespace std;
 
 namespace {
 
-    // Definition placed outside anonymous namespace to avoid compiler
-    // warnings.
-
-    struct sessiontimer {
-        sessionptr session_;
-        smartob<aug_object> user_;
-        sessiontimer(const sessionptr& session,
-                     const smartob<aug_object>& user)
-            : session_(session),
-              user_(user)
-        {
-        }
-    };
-
-    typedef map<maud_id, sessiontimer> sessiontimers;
-
     class postevent : public ref_base {
         eventob<postevent> eventob_;
         const string from_, to_, type_;
@@ -142,6 +126,22 @@ enginecb_base::~enginecb_base() AUG_NOTHROW
 namespace aug {
 
     namespace detail {
+
+        // Definition placed outside anonymous namespace to avoid compiler
+        // warnings.
+
+        struct sessiontimer {
+            sessionptr session_;
+            smartob<aug_object> user_;
+            sessiontimer(const sessionptr& session,
+                         const smartob<aug_object>& user)
+                : session_(session),
+                  user_(user)
+            {
+            }
+        };
+
+        typedef map<maud_id, sessiontimer> sessiontimers;
 
         struct engineimpl {
 
@@ -428,7 +428,7 @@ engine::cancelinactive()
 {
     // Remove any timers allocated to sessions that could not be opened.
 
-    sessiontimers::iterator it(impl_->sessiontimers_.begin()),
+    detail::sessiontimers::iterator it(impl_->sessiontimers_.begin()),
         end(impl_->sessiontimers_.end());
     while (it != end) {
         if (!it->second.session_->active()) {
@@ -684,8 +684,8 @@ engine::settimer(const char* sname, unsigned ms, objectref ref)
 
     // Insert after settimer() has succeeded.
 
-    sessiontimer timer(impl_->sessions_.getbyname(sname),
-                       smartob<aug_object>::incref(ref));
+    detail::sessiontimer timer(impl_->sessions_.getbyname(sname),
+                               smartob<aug_object>::incref(ref));
     impl_->sessiontimers_.insert(make_pair(id, timer));
     return id;
 }

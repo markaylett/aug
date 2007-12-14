@@ -58,6 +58,16 @@ namespace aug {
     template <typename T>
     struct object_traits;
 
+    template <>
+    struct object_traits<aug_object> {
+        typedef aug_objectvtbl vtbl;
+        static const char*
+        id() AUG_NOTHROW
+        {
+            return aug_objectid;
+        }
+    };
+
     template <typename T>
     class obref;
 
@@ -65,6 +75,7 @@ namespace aug {
     class obref<aug_object> {
     public:
         typedef aug_object obtype;
+        typedef object_traits<aug_object>::vtbl vtbl;
     protected:
         void* ptr_;
         obref(void* ptr) AUG_NOTHROW
@@ -161,26 +172,22 @@ namespace aug {
             if (null != ref_)
                 aug::decref(ref_);
         }
-
         smartob(const null_&) AUG_NOTHROW
             : ref_(null)
         {
         }
-
         smartob(const smartob& rhs) AUG_NOTHROW
             : ref_(rhs.ref_)
         {
             if (null != ref_)
                 aug::incref(ref_);
         }
-
         smartob&
         operator =(const null_&) AUG_NOTHROW
         {
             *this = smartob(null);
             return *this;
         }
-
         smartob&
         operator =(const smartob& rhs) AUG_NOTHROW
         {
@@ -188,37 +195,31 @@ namespace aug {
             swap(tmp);
             return *this;
         }
-
         void
         swap(smartob& rhs) AUG_NOTHROW
         {
             std::swap(ref_, rhs.ref_);
         }
-
         static smartob
         attach(obref<T> ref) AUG_NOTHROW
         {
             return smartob(ref, false);
         }
-
         static smartob
         incref(obref<T> ref) AUG_NOTHROW
         {
             return smartob(ref, true);
         }
-
         aug_object*
         base() const AUG_NOTHROW
         {
             return obref<aug_object>(ref_).get();
         }
-
         T*
         get() const AUG_NOTHROW
         {
             return ref_.get();
         }
-
         operator obref<T>() const AUG_NOTHROW
         {
             return ref_;
@@ -258,16 +259,6 @@ namespace aug {
     {
         return equalid(object_traits<T>::id(), id);
     }
-
-    template <>
-    struct object_traits<aug_object> {
-        typedef aug_objectvtbl vtbl;
-        static const char*
-        id() AUG_NOTHROW
-        {
-            return aug_objectid;
-        }
-    };
 
     template <typename T>
     smartob<T>
