@@ -2,15 +2,13 @@
    See the file COPYING for copying permission.
 */
 
-#include "augutilpp/var.hpp"
-
 #include <cstring>
 #include <iostream>
 #include <string>
 
-using namespace aug;
 using namespace std;
 
+#if 0
 namespace {
 
     struct test : basic_vartype<string> {
@@ -32,11 +30,13 @@ namespace {
         }
     };
 }
+#endif
 
 int
 main(int argc, char* argv[])
 {
     try {
+#if 0
         string* s(new string());
         aug_var v;
         bindvar<test>(v, null);
@@ -44,6 +44,7 @@ main(int argc, char* argv[])
         s->assign("test");
         memcmp(varbuf<char>(v), "test", 4);
         destroyvar(v);
+#endif
     } catch (const exception& e) {
         cerr << e.what() << endl;
         return 1;

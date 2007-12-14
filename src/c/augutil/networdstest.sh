@@ -1,5 +1,5 @@
 #!/bin/sh
-./networdstest <networdstest.in >tmp.$$
+./networdstest <networdstest.in | sed '/\r/d' >tmp.$$
 cmp -s tmp.$$ networdstest.out
 ret=$?
 rm -f tmp.$$

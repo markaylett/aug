@@ -164,7 +164,10 @@ aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
 AUGNET_API int
 aug_destroymarparser(aug_marparser_t parser)
 {
-    aug_destroyhttpparser(parser->http_);
+    aug_httpparser_t http = parser->http_;
+    /* Avoid freeing twice, when destroy_() is called. */
+    parser->http_ = NULL;
+    aug_destroyhttpparser(http);
 
     /* destroy_() will be called when "user_" is released. */
 
