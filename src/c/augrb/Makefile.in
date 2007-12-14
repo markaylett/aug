@@ -38,7 +38,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
+DIST_COMMON = $(am__noinst_HEADERS_DIST) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
 subdir = src/c/augrb
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -74,6 +74,7 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(modaugrb_la_SOURCES)
 DIST_SOURCES = $(am__modaugrb_la_SOURCES_DIST)
+am__noinst_HEADERS_DIST = object.h
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -207,7 +208,9 @@ moddir = $(prefix)/mod
 @ENABLE_RUBY_TRUE@RB_CFLAGS = `$(top_srcdir)/src/rb/rbflags -c`
 @ENABLE_RUBY_TRUE@RB_LDFLAGS = `$(top_srcdir)/src/rb/rbflags -l`
 @ENABLE_RUBY_TRUE@AM_CFLAGS = $(RB_CFLAGS)
-@ENABLE_RUBY_TRUE@noinst_HEADERS = 
+@ENABLE_RUBY_TRUE@noinst_HEADERS = \
+@ENABLE_RUBY_TRUE@	object.h
+
 @ENABLE_RUBY_TRUE@mod_LTLIBRARIES = modaugrb.la
 @ENABLE_RUBY_TRUE@modaugrb_la_SOURCES = \
 @ENABLE_RUBY_TRUE@	augrb.c \
