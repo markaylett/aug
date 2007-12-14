@@ -63,8 +63,10 @@ static void
 destroybufs_(struct aug_bufs* bufs)
 {
     struct aug_buf* it;
-    AUG_FOREACH(it, bufs)
+    AUG_FOREACH(it, bufs) {
         aug_decref(it->blob_);
+        it->blob_ = NULL;
+    }
 
     if (!AUG_EMPTY(bufs)) {
         aug_lock();
@@ -77,6 +79,7 @@ static void
 destroybuf_(struct aug_buf* buf)
 {
     aug_decref(buf->blob_);
+    buf->blob_ = NULL;
 
     aug_lock();
     AUG_INSERT_TAIL(&free_, buf);
@@ -124,6 +127,7 @@ aug_destroywriter(aug_writer_t writer)
     struct aug_buf* it;
     AUG_FOREACH(it, &writer->bufs_) {
         aug_decref(it->blob_);
+        it->blob_ = NULL;
     }
 
     /* Destroy in single batch to avoid multiple calls to aug_lock(). */

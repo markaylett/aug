@@ -68,8 +68,10 @@ aug_destroytimers(struct aug_timers* timers)
 {
     struct aug_timer_* it;
     AUG_FOREACH(it, timers)
-        if (it->user_)
+        if (it->user_) {
             aug_decref(it->user_);
+            it->user_ = NULL;
+        }
 
     if (!AUG_EMPTY(timers)) {
 
@@ -129,8 +131,10 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
 
             if (-1 == expiry_(&it->tv_, it->ms_)) {
 
-                if (it->user_)
+                if (it->user_) {
                     aug_decref(it->user_);
+                    it->user_ = NULL;
+                }
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
                 aug_unlock();
@@ -158,8 +162,10 @@ aug_canceltimer(struct aug_timers* timers, int id)
 
             AUG_REMOVE_PREVPTR(it, prev, timers);
 
-            if (it->user_)
+            if (it->user_) {
                 aug_decref(it->user_);
+                it->user_ = NULL;
+            }
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
             aug_unlock();
@@ -222,8 +228,10 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
 
                 /* A zero ms value cancels the timer. */
 
-                if (it->user_)
+                if (it->user_) {
                     aug_decref(it->user_);
+                    it->user_ = NULL;
+                }
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
                 aug_unlock();
