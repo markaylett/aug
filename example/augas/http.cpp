@@ -726,11 +726,11 @@ namespace {
             loadmimetypes();
         }
         void
-        do_event(const char* from, const char* type, const void* user,
-                 size_t size)
+        do_event(const char* from, const char* type, struct aug_object_* ob)
         {
-            string xml(static_cast<const char*>(user), size);
-            results_.push_back(xml);
+            // FIXME
+            //string xml(static_cast<const char*>(ob), size);
+            //results_.push_back(xml);
         }
         void
         do_closed(const handle& sock)

@@ -18,12 +18,12 @@
 
 namespace aug {
 
-    template <void (*T)(aug_object*, const char*, size_t)>
+    template <void (*T)(objectref, const char*, size_t)>
     int
-    base64cb(aug_object* user, const char* buf, size_t len) AUG_NOTHROW
+    base64cb(aug_object* ob, const char* buf, size_t len) AUG_NOTHROW
     {
         try {
-            T(user, buf, len);
+            T(ob, buf, len);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -31,10 +31,10 @@ namespace aug {
 
     template <typename T, void (T::*U)(const char*, size_t)>
     int
-    base64memcb(aug_object* user, const char* buf, size_t len) AUG_NOTHROW
+    base64memcb(aug_object* ob, const char* buf, size_t len) AUG_NOTHROW
     {
         try {
-            (static_cast<T*>(aug_obtoaddr(user))->*U)(buf, len);
+            (obtoaddr<T*>(ob)->*U)(buf, len);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -42,10 +42,10 @@ namespace aug {
 
     template <typename T>
     int
-    base64memcb(aug_object* user, const char* buf, size_t len) AUG_NOTHROW
+    base64memcb(aug_object* ob, const char* buf, size_t len) AUG_NOTHROW
     {
         try {
-            static_cast<T*>(aug_obtoaddr(user))->base64cb(buf, len);
+            obtoaddr<T*>(ob)->base64cb(buf, len);
             return 0;
         } AUG_SETERRINFOCATCH;
         return -1;
@@ -67,9 +67,9 @@ namespace aug {
                 perrinfo("aug_destroybase64() failed");
         }
 
-        base64(aug_base64mode mode, aug_base64cb_t cb, obref<aug_object> ref)
+        base64(aug_base64mode mode, aug_base64cb_t cb, obref<aug_object> ob)
         {
-            verify(base64_ = aug_createbase64(mode, cb, ref.get()));
+            verify(base64_ = aug_createbase64(mode, cb, ob.get()));
         }
 
         base64(aug_base64mode mode, aug_base64cb_t cb, const null_&)
@@ -80,18 +80,17 @@ namespace aug {
         template <typename T>
         base64(aug_base64mode mode, T& x)
         {
-            smartob<aug_addrob> obj(createaddrob(&x, 0));
-            verify(base64_ = aug_createbase64(mode, base64memcb<T>,
-                                              obj.base()));
+            smartob<aug_addrob> ob(createaddrob(&x, 0));
+            verify(base64_ = aug_createbase64
+                   (mode, base64memcb<T>, ob.base()));
         }
 
         template <typename T>
         base64(aug_base64mode mode, std::auto_ptr<T>& x)
         {
-            smartob<aug_addrob> obj(createaddrob(x));
-            verify(base64_
-                   = aug_createbase64(mode, base64memcb<T>,
-                                      obj.base()));
+            smartob<aug_addrob> ob(createaddrob(x));
+            verify(base64_ = aug_createbase64
+                   (mode, base64memcb<T>, ob.base()));
         }
 
         operator aug_base64_t()
@@ -120,15 +119,15 @@ namespace aug {
 
     namespace detail {
         inline void
-        base64os(aug_object* user, const char* buf, size_t len)
+        base64os(objectref ob, const char* buf, size_t len)
         {
-            std::ostream& os(*obtoaddr<std::ostream*>(user));
+            std::ostream& os(*obtoaddr<std::ostream*>(ob));
 			os.write(buf, static_cast<std::streamsize>(len));
         }
         inline void
-        base64str(aug_object* user, const char* buf, size_t len)
+        base64str(objectref ob, const char* buf, size_t len)
         {
-            std::string& str(*obtoaddr<std::string*>(user));
+            std::string& str(*obtoaddr<std::string*>(ob));
             str.append(buf, static_cast<std::streamsize>(len));
         }
     }
@@ -136,8 +135,8 @@ namespace aug {
     inline std::ostream&
     filterbase64(std::ostream& os, std::istream& is, aug_base64mode mode)
     {
-        scoped_addrob<simple_addrob> obj(&os);
-        base64 b64(mode, base64cb<detail::base64os>, obj);
+        scoped_addrob<simple_addrob> ob(&os);
+        base64 b64(mode, base64cb<detail::base64os>, ob);
         char buf[AUG_MAXLINE];
         do {
             is.read(buf, sizeof(buf));
@@ -152,8 +151,8 @@ namespace aug {
     filterbase64(const char* buf, size_t len, aug_base64mode mode)
     {
         std::string s;
-        scoped_addrob<simple_addrob> obj(&s);
-        base64 b64(mode, base64cb<detail::base64str>, obj);
+        scoped_addrob<simple_addrob> ob(&s);
+        base64 b64(mode, base64cb<detail::base64str>, ob);
         appendbase64(b64, buf, len);
         finishbase64(b64);
         return s;

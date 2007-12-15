@@ -22,7 +22,7 @@
 
 struct aug_event {
     int type_;
-    aug_object* user_;
+    aug_object* ob_;
 };
 
 /**

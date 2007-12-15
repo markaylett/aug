@@ -26,7 +26,7 @@ typedef int (*aug_filecb_t)(aug_object*, int);
 /**
    Destroy each file in the list.
 
-   aug_releaseobject() is called for each obj associated with each file.
+   aug_releaseobject() is called for each ob associated with each file.
 
    \param files List of files to be destroyed.
  */
@@ -37,17 +37,17 @@ aug_destroyfiles(struct aug_files* files);
 /**
    Insert file into file list.
 
-   If aug_insertfile() succeeds, aug_retainobject() will be called on "user".
+   If aug_insertfile() succeeds, aug_retainobject() will be called on "ob".
 
    \param files The file list.
    \param fd File descriptor.
    \param cb Callback to be called during aug_foreachfile() iterations.
-   \param user Optional user variable.
+   \param ob Optional object variable.
 */
 
 AUGNET_API int
 aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
-               aug_object* user);
+               aug_object* ob);
 
 /**
    Remove file from list.

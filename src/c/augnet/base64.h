@@ -20,8 +20,7 @@ enum aug_base64mode {
 };
 
 AUGNET_API aug_base64_t
-aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb,
-                 aug_object* user);
+aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aug_object* ob);
 
 AUGNET_API int
 aug_destroybase64(aug_base64_t base64);

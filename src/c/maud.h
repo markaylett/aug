@@ -197,14 +197,14 @@ struct maud_host {
 
        \param to Target session name.
 
-       \param type Type name associated with "user".
+       \param type Type name associated with "ob".
 
-       \param user Optional user data.
+       \param ob Optional object data.
 
        \sa dispatch_()
     */
 
-    int (*post_)(const char* to, const char* type, struct aug_object_* user);
+    int (*post_)(const char* to, const char* type, struct aug_object_* ob);
 
     /**
        The remaining functions are not thread-safe.
@@ -215,15 +215,15 @@ struct maud_host {
 
        \param to Target session name.
 
-       \param type Type name associated with "user".
+       \param type Type name associated with "ob".
 
-       \param user Optional user data.
+       \param ob Optional object data.
 
        \sa post_()
     */
 
     int (*dispatch_)(const char* to, const char* type,
-                     struct aug_object_* user);
+                     struct aug_object_* ob);
 
     /**
        Read a configuration value.
@@ -308,7 +308,7 @@ struct maud_host {
 
        \param cid Connection id.
 
-       \param user User data.
+       \param blob Blob data.
     */
 
     int (*sendv_)(maud_id cid, struct aug_blob_* blob);
@@ -353,10 +353,10 @@ struct maud_host {
 
        \param ms Timeout value in milliseconds.
 
-       \param user Optional user data.
+       \param ob Optional object data.
     */
 
-    int (*settimer_)(unsigned ms, struct aug_object_* user);
+    int (*settimer_)(unsigned ms, struct aug_object_* ob);
 
     /**
        Reset timer.
@@ -443,11 +443,11 @@ struct maud_module {
 
        \param type Event type.
 
-       \param user User data.
+       \param ob Object data.
     */
 
     void (*event_)(const char* from, const char* type,
-                   struct aug_object_* user);
+                   struct aug_object_* ob);
 
     /**
        Connection closure.

@@ -22,20 +22,20 @@ AUG_RCSID("$Id$");
 
 struct aug_marparser_ {
     const struct aug_marhandler* handler_;
-    aug_object* user_;
+    aug_object* ob_;
     aug_httpparser_t http_;
     aug_xstr_t initial_;
     aug_mar_t mar_;
 };
 
 static int
-initial_(aug_object* user, const char* initial)
+initial_(aug_object* ob, const char* initial)
 {
-    aug_marparser_t parser = aug_obtoaddr(user);
+    aug_marparser_t parser = aug_obtoaddr(ob);
     if (!(parser->initial_ = aug_createxstr(0)))
         return -1;
 
-    if (!(parser->mar_ = parser->handler_->create_(parser->user_, initial))) {
+    if (!(parser->mar_ = parser->handler_->create_(parser->ob_, initial))) {
         aug_destroyxstr(parser->initial_);
         parser->initial_ = NULL;
         return -1;
@@ -46,9 +46,9 @@ initial_(aug_object* user, const char* initial)
 }
 
 static int
-field_(aug_object* user, const char* name, const char* value)
+field_(aug_object* ob, const char* name, const char* value)
 {
-    aug_marparser_t parser = aug_obtoaddr(user);
+    aug_marparser_t parser = aug_obtoaddr(ob);
     struct aug_field field;
 
     field.name_ = name;
@@ -59,25 +59,25 @@ field_(aug_object* user, const char* name, const char* value)
 }
 
 static int
-csize_(aug_object* user, unsigned csize)
+csize_(aug_object* ob, unsigned csize)
 {
-    aug_marparser_t parser = aug_obtoaddr(user);
+    aug_marparser_t parser = aug_obtoaddr(ob);
     if (-1 == aug_truncatemar(parser->mar_, csize))
         return -1;
     return aug_seekmar(parser->mar_, AUG_SET, 0);
 }
 
 static int
-cdata_(aug_object* user, const void* buf, unsigned len)
+cdata_(aug_object* ob, const void* buf, unsigned len)
 {
-    aug_marparser_t parser = aug_obtoaddr(user);
+    aug_marparser_t parser = aug_obtoaddr(ob);
     return aug_writemar(parser->mar_, buf, len);
 }
 
 static int
-end_(aug_object* user, int commit)
+end_(aug_object* ob, int commit)
 {
-    aug_marparser_t parser = aug_obtoaddr(user);
+    aug_marparser_t parser = aug_obtoaddr(ob);
     int ret = 0;
     if (commit) {
 
@@ -85,7 +85,7 @@ end_(aug_object* user, int commit)
             return 0; /* Blank line. */
 
         ret = parser->handler_
-            ->message_(parser->user_, aug_xstr(parser->initial_),
+            ->message_(parser->ob_, aug_xstr(parser->initial_),
                        parser->mar_);
     }
 
@@ -115,8 +115,8 @@ destroy_(void* ptr)
 {
     aug_marparser_t parser = ptr;
 
-    if (parser->user_)
-        aug_decref(parser->user_);
+    if (parser->ob_)
+        aug_decref(parser->ob_);
 
     if (parser->http_)
         aug_destroyhttpparser(parser->http_);
@@ -132,31 +132,35 @@ destroy_(void* ptr)
 
 AUGNET_API aug_marparser_t
 aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
-                    aug_object* user)
+                    aug_object* ob)
 {
     aug_marparser_t parser = malloc(sizeof(struct aug_marparser_));
-    aug_object* obj;
+    aug_object* addrob;
 
     if (!parser) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    if (!(obj = (aug_object*)aug_createaddrob(parser, destroy_))) {
+    if (!(addrob = (aug_object*)aug_createaddrob(parser, destroy_))) {
         free(parser);
         return NULL;
     }
 
-    if ((parser->user_ = user))
-        aug_incref(user);
-    parser->http_ = aug_createhttpparser(size, &handler_, obj);
+    /* The addrob now owns this reference: it will be released by
+       destroy_(). */
+
+    if ((parser->ob_ = ob))
+        aug_incref(ob);
+
+    parser->http_ = aug_createhttpparser(size, &handler_, addrob);
     parser->initial_ = NULL;
     parser->mar_ = NULL;
 
     /* If created, http parser will hold reference.  Otherwise, it will be
        destroyed now. */
 
-    aug_decref(obj);
+    aug_decref(addrob);
 
     return parser->http_ ? parser : NULL;
 }
@@ -169,7 +173,7 @@ aug_destroymarparser(aug_marparser_t parser)
     parser->http_ = NULL;
     aug_destroyhttpparser(http);
 
-    /* destroy_() will be called when "user_" is released. */
+    /* destroy_() will be called when "ob_" is released. */
 
     return 0;
 }

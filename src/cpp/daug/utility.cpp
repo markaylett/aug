@@ -26,7 +26,7 @@ namespace {
     {
     }
     void
-    event(const char* from, const char* type, aug_object* obj)
+    event(const char* from, const char* type, aug_object* ob)
     {
     }
     void

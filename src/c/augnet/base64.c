@@ -17,7 +17,7 @@ AUG_RCSID("$Id$");
 
 struct aug_base64_ {
     aug_base64cb_t cb_;
-    aug_object* user_;
+    aug_object* ob_;
     char buf_[AUG_MAXLINE];
 	size_t pos_;
 	int save_[3];
@@ -143,7 +143,7 @@ flush_(aug_base64_t base64)
     size_t pos = base64->pos_;
     base64->pos_ = 0;
     base64->buf_[pos] = '\0';
-    return base64->cb_(base64->user_, base64->buf_, pos);
+    return base64->cb_(base64->ob_, base64->buf_, pos);
 }
 
 static int
@@ -521,8 +521,7 @@ encodefinish_(aug_base64_t base64)
 }
 
 AUGNET_API aug_base64_t
-aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb,
-                 aug_object* user)
+aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aug_object* ob)
 {
     aug_base64_t base64 = malloc(sizeof(struct aug_base64_));
     if (!base64) {
@@ -531,8 +530,8 @@ aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb,
     }
 
     base64->cb_ = cb;
-    if ((base64->user_ = user))
-        aug_incref(user);
+    if ((base64->ob_ = ob))
+        aug_incref(ob);
 
     base64->saved_ = 0;
     base64->pos_ = 0;
@@ -555,8 +554,8 @@ aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb,
 AUGNET_API int
 aug_destroybase64(aug_base64_t base64)
 {
-    if (base64->user_)
-        aug_decref(base64->user_);
+    if (base64->ob_)
+        aug_decref(base64->ob_);
     free(base64);
     return 0;
 }

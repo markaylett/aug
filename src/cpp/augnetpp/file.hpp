@@ -22,12 +22,12 @@
 
 namespace aug {
 
-    template <bool (*T)(aug_object*, int)>
+    template <bool (*T)(objectref, int)>
     int
-    filecb(aug_object* user, int fd) AUG_NOTHROW
+    filecb(aug_object* ob, int fd) AUG_NOTHROW
     {
         try {
-            return T(user, fd) ? 1 : 0;
+            return T(ob, fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
 
         /**
@@ -39,20 +39,20 @@ namespace aug {
 
     template <typename T, bool (T::*U)(int)>
     int
-    filememcb(aug_object* user, int fd) AUG_NOTHROW
+    filememcb(aug_object* ob, int fd) AUG_NOTHROW
     {
         try {
-            return (obtoaddr<T*>(user)->*U)(fd) ? 1 : 0;
+            return (obtoaddr<T*>(ob)->*U)(fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
 
     template <typename T>
     int
-    filememcb(aug_object* user, int fd) AUG_NOTHROW
+    filememcb(aug_object* ob, int fd) AUG_NOTHROW
     {
         try {
-            return obtoaddr<T*>(user)->filecb(fd) ? 1 : 0;
+            return obtoaddr<T*>(ob)->filecb(fd) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
@@ -96,9 +96,9 @@ namespace aug {
 
     inline void
     insertfile(aug_files& files, fdref ref, aug_filecb_t cb,
-               obref<aug_object> user)
+               obref<aug_object> ob)
     {
-        verify(aug_insertfile(&files, ref.get(), cb, user.get()));
+        verify(aug_insertfile(&files, ref.get(), cb, ob.get()));
     }
 
     inline void
@@ -111,16 +111,16 @@ namespace aug {
     void
     insertfile(aug_files& files, fdref ref, T& x)
     {
-        smartob<aug_addrob> obj(createaddrob(&x, 0));
-        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj.base()));
+        smartob<aug_addrob> ob(createaddrob(&x, 0));
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>, ob.base()));
     }
 
     template <typename T>
     void
     insertfile(aug_files& files, fdref ref, std::auto_ptr<T>& x)
     {
-        smartob<aug_addrob> obj(createaddrob(x));
-        verify(aug_insertfile(&files, ref.get(), filememcb<T>, obj.base()));
+        smartob<aug_addrob> ob(createaddrob(x));
+        verify(aug_insertfile(&files, ref.get(), filememcb<T>, ob.base()));
     }
 
     inline void

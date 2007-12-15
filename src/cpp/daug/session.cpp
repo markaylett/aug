@@ -65,10 +65,10 @@ session::do_reconf() const AUG_NOTHROW
 
 void
 session::do_event(const char* from, const char* type,
-                  objectref obj) const AUG_NOTHROW
+                  objectref ob) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
-    module_->event(from, type, obj);
+    module_->event(from, type, ob);
 }
 
 void

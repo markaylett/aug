@@ -24,7 +24,7 @@ struct aug_timer_ {
     unsigned ms_;
     struct timeval tv_;
     aug_timercb_t cb_;
-    aug_object* user_;
+    aug_object* ob_;
 };
 
 static struct aug_timers free_ = AUG_HEAD_INITIALIZER(free_);
@@ -68,9 +68,9 @@ aug_destroytimers(struct aug_timers* timers)
 {
     struct aug_timer_* it;
     AUG_FOREACH(it, timers)
-        if (it->user_) {
-            aug_decref(it->user_);
-            it->user_ = NULL;
+        if (it->ob_) {
+            aug_decref(it->ob_);
+            it->ob_ = NULL;
         }
 
     if (!AUG_EMPTY(timers)) {
@@ -84,7 +84,7 @@ aug_destroytimers(struct aug_timers* timers)
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, aug_object* user)
+             aug_timercb_t cb, aug_object* ob)
 {
     struct timeval tv;
     struct aug_timer_* timer;
@@ -109,8 +109,8 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
     timer->tv_.tv_sec = tv.tv_sec;
     timer->tv_.tv_usec = tv.tv_usec;
     timer->cb_ = cb;
-    if ((timer->user_ = user))
-        aug_incref(user);
+    if ((timer->ob_ = ob))
+        aug_incref(ob);
     insert_(timers, timer);
     return id;
 }
@@ -131,9 +131,9 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
 
             if (-1 == expiry_(&it->tv_, it->ms_)) {
 
-                if (it->user_) {
-                    aug_decref(it->user_);
-                    it->user_ = NULL;
+                if (it->ob_) {
+                    aug_decref(it->ob_);
+                    it->ob_ = NULL;
                 }
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);
@@ -162,9 +162,9 @@ aug_canceltimer(struct aug_timers* timers, int id)
 
             AUG_REMOVE_PREVPTR(it, prev, timers);
 
-            if (it->user_) {
-                aug_decref(it->user_);
-                it->user_ = NULL;
+            if (it->ob_) {
+                aug_decref(it->ob_);
+                it->ob_ = NULL;
             }
             aug_lock();
             AUG_INSERT_TAIL(&free_, it);
@@ -216,7 +216,7 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
 
             AUG_REMOVE_HEAD(timers);
 
-            (*it->cb_)(it->user_, it->id_, &it->ms_);
+            (*it->cb_)(it->ob_, it->id_, &it->ms_);
             if (it->ms_) {
 
                 if (-1 == expiry_(&it->tv_, it->ms_))
@@ -228,9 +228,9 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
 
                 /* A zero ms value cancels the timer. */
 
-                if (it->user_) {
-                    aug_decref(it->user_);
-                    it->user_ = NULL;
+                if (it->ob_) {
+                    aug_decref(it->ob_);
+                    it->ob_ = NULL;
                 }
                 aug_lock();
                 AUG_INSERT_TAIL(&free_, it);

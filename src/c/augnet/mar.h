@@ -20,13 +20,13 @@ struct aug_marhandler {
 typedef struct aug_marparser_* aug_marparser_t;
 
 /**
-   If aug_createmarparser() succeeds, aug_releaseobject() will be called from
+   If aug_createmarparser() succeeds, aug_decref() will be called from
    aug_destroymarparser().
 */
 
 AUGNET_API aug_marparser_t
 aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
-                    aug_object* user);
+                    aug_object* ob);
 
 AUGNET_API int
 aug_destroymarparser(aug_marparser_t parser);

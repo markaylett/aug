@@ -291,7 +291,7 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, aug_object* user)
+event_(const char* from, const char* type, aug_object* ob)
 {
     struct import_* import = maud_getsession()->user_;
     assert(import);
@@ -299,7 +299,7 @@ event_(const char* from, const char* type, aug_object* user)
     if (import->event_) {
 
         size_t size;
-        const void* data = augpy_blobdata(user, &size);
+        const void* data = augpy_blobdata(ob, &size);
         PyObject* y;
 
         if (data)

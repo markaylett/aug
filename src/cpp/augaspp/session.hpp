@@ -39,7 +39,7 @@ namespace aug {
 
         virtual void
         do_event(const char* from, const char* type,
-                 objectref obj) const AUG_NOTHROW = 0;
+                 objectref ob) const AUG_NOTHROW = 0;
 
         virtual void
         do_closed(const maud_handle& sock) const AUG_NOTHROW = 0;
@@ -106,9 +106,9 @@ namespace aug {
         }
         void
         event(const char* from, const char* type,
-              objectref ref) const AUG_NOTHROW
+              objectref ob) const AUG_NOTHROW
         {
-            do_event(from, type, ref);
+            do_event(from, type, ob);
         }
         void
         closed(const maud_handle& sock) const AUG_NOTHROW

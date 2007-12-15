@@ -66,10 +66,10 @@ module::reconf() const AUG_NOTHROW
 
 void
 module::event(const char* from, const char* type,
-              objectref obj) const AUG_NOTHROW
+              objectref ob) const AUG_NOTHROW
 {
     AUG_DEBUG2("event(): from=[%s], type=[%s]", from, type);
-    module_.event_(from, type, obj.get());
+    module_.event_(from, type, ob.get());
 }
 
 void

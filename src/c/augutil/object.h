@@ -14,13 +14,13 @@ AUGUTIL_API aug_longob*
 aug_createlongob(long l, void (*destroy)(long));
 
 AUGUTIL_API long
-aug_obtolong(aug_object* obj);
+aug_obtolong(aug_object* ob);
 
 AUGUTIL_API aug_addrob*
 aug_createaddrob(void* p, void (*destroy)(void*));
 
 AUGUTIL_API void*
-aug_obtoaddr(aug_object* obj);
+aug_obtoaddr(aug_object* ob);
 
 AUGUTIL_API aug_blob*
 aug_createblob(const void* buf, size_t len);

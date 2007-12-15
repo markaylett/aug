@@ -34,7 +34,7 @@ typedef struct aug_fixstream_* aug_fixstream_t;
 */
 
 AUGNET_API aug_fixstream_t
-aug_createfixstream(size_t size, aug_fixcb_t cb, aug_object* user);
+aug_createfixstream(size_t size, aug_fixcb_t cb, aug_object* ob);
 
 AUGNET_API int
 aug_destroyfixstream(aug_fixstream_t stream);

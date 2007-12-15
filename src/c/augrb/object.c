@@ -11,13 +11,13 @@ struct blobimpl_ {
     aug_blob blob_;
     augrb_blob rbblob_;
     unsigned refs_;
-    VALUE rbobj_;
+    VALUE rbob_;
 };
 
 static void*
-castblob_(aug_blob* obj, const char* id)
+castblob_(aug_blob* ob, const char* id)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
         aug_incref(&impl->blob_);
         return &impl->blob_;
@@ -29,39 +29,39 @@ castblob_(aug_blob* obj, const char* id)
 }
 
 static int
-increfblob_(aug_blob* obj)
+increfblob_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
     return 0;
 }
 
 static int
-decrefblob_(aug_blob* obj)
+decrefblob_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (0 == --impl->refs_) {
-        impl->rbobj_ = Qnil; /* Belt and braces. */
-        rb_gc_unregister_address(&impl->rbobj_);
+        impl->rbob_ = Qnil; /* Belt and braces. */
+        rb_gc_unregister_address(&impl->rbob_);
         free(impl);
     }
     return 0;
 }
 
 static const void*
-blobdata_(aug_blob* obj, size_t* size)
+blobdata_(aug_blob* ob, size_t* size)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (size)
-        *size = RSTRING(impl->rbobj_)->len;
-    return RSTRING(impl->rbobj_)->ptr;
+        *size = RSTRING(impl->rbob_)->len;
+    return RSTRING(impl->rbob_)->ptr;
 }
 
 static size_t
-blobsize_(aug_blob* obj)
+blobsize_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
-    return RSTRING(impl->rbobj_)->len;
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
+    return RSTRING(impl->rbob_)->len;
 }
 
 static const struct aug_blobvtbl blobvtbl_ = {
@@ -73,9 +73,9 @@ static const struct aug_blobvtbl blobvtbl_ = {
 };
 
 static void*
-castrbblob_(augrb_blob* obj, const char* id)
+castrbblob_(augrb_blob* ob, const char* id)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augrb_blobid)) {
         aug_incref(&impl->rbblob_);
         return &impl->rbblob_;
@@ -87,30 +87,30 @@ castrbblob_(augrb_blob* obj, const char* id)
 }
 
 static int
-increfrbblob_(augrb_blob* obj)
+increfrbblob_(augrb_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
     ++impl->refs_;
     return 0;
 }
 
 static int
-decrefrbblob_(augrb_blob* obj)
+decrefrbblob_(augrb_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
     if (0 == --impl->refs_) {
-        impl->rbobj_ = Qnil; /* Belt and braces. */
-        rb_gc_unregister_address(&impl->rbobj_);
+        impl->rbob_ = Qnil; /* Belt and braces. */
+        rb_gc_unregister_address(&impl->rbob_);
         free(impl);
     }
     return 0;
 }
 
 static VALUE
-getrbblob_(augrb_blob* obj)
+getrbblob_(augrb_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, obj);
-    return impl->rbobj_;
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
+    return impl->rbob_;
 }
 
 static const struct augrb_blobvtbl rbblobvtbl_ = {
@@ -121,14 +121,14 @@ static const struct augrb_blobvtbl rbblobvtbl_ = {
 };
 
 aug_blob*
-augrb_createblob(VALUE rbobj)
+augrb_createblob(VALUE rbob)
 {
     struct blobimpl_* impl = malloc(sizeof(struct blobimpl_));
     if (!impl)
         return NULL;
 
-    if (!rbobj)
-        rbobj = Qnil;
+    if (!rbob)
+        rbob = Qnil;
 
     impl->blob_.vtbl_ = &blobvtbl_;
     impl->blob_.impl_ = NULL;
@@ -137,20 +137,20 @@ augrb_createblob(VALUE rbobj)
     impl->rbblob_.impl_ = NULL;
 
     impl->refs_ = 1;
-    impl->rbobj_ = rbobj;
+    impl->rbob_ = rbob;
 
     /* Prevent garbage collection. */
 
-    rb_gc_register_address(&impl->rbobj_);
+    rb_gc_register_address(&impl->rbob_);
     return &impl->blob_;
 }
 
 const void*
-augrb_blobdata(aug_object* obj, size_t* size)
+augrb_blobdata(aug_object* ob, size_t* size)
 {
     const void* data = NULL;
-    if (obj) {
-        aug_blob* blob = aug_cast(obj, aug_blobid);
+    if (ob) {
+        aug_blob* blob = aug_cast(ob, aug_blobid);
         if (blob) {
             data = aug_blobdata(blob, size);
             aug_decref(blob);
@@ -160,15 +160,15 @@ augrb_blobdata(aug_object* obj, size_t* size)
 }
 
 VALUE
-augrb_getblob(aug_object* obj)
+augrb_getblob(aug_object* ob)
 {
-    VALUE rbobj = Qnil;
-    if (obj) {
-        augrb_blob* blob = aug_cast(obj, augrb_blobid);
+    VALUE rbob = Qnil;
+    if (ob) {
+        augrb_blob* blob = aug_cast(ob, augrb_blobid);
         if (blob) {
-            rbobj = blob->vtbl_->get_(blob);
+            rbob = blob->vtbl_->get_(blob);
             aug_decref(blob);
         }
     }
-    return rbobj;
+    return rbob;
 }

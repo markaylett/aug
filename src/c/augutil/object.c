@@ -21,27 +21,27 @@ struct longobimpl_ {
 };
 
 static void*
-castlongob_(aug_longob* obj, const char* id)
+castlongob_(aug_longob* ob, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_longobid)) {
-        aug_incref(obj);
-        return obj;
+        aug_incref(ob);
+        return ob;
     }
     return NULL;
 }
 
 static int
-increflongob_(aug_longob* obj)
+increflongob_(aug_longob* ob)
 {
-    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, obj);
+    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
     ++impl->refs_;
     return 0;
 }
 
 static int
-decreflongob_(aug_longob* obj)
+decreflongob_(aug_longob* ob)
 {
-    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, obj);
+    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
             impl->destroy_(impl->l_);
@@ -51,9 +51,9 @@ decreflongob_(aug_longob* obj)
 }
 
 static long
-getlongob_(aug_longob* obj)
+getlongob_(aug_longob* ob)
 {
-    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, obj);
+    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
     return impl->l_;
 }
 
@@ -72,27 +72,27 @@ struct addrobimpl_ {
 };
 
 static void*
-castaddrob_(aug_addrob* obj, const char* id)
+castaddrob_(aug_addrob* ob, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_addrobid)) {
-        aug_incref(obj);
-        return obj;
+        aug_incref(ob);
+        return ob;
     }
     return NULL;
 }
 
 static int
-increfaddrob_(aug_addrob* obj)
+increfaddrob_(aug_addrob* ob)
 {
-    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, obj);
+    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
     ++impl->refs_;
     return 0;
 }
 
 static int
-decrefaddrob_(aug_addrob* obj)
+decrefaddrob_(aug_addrob* ob)
 {
-    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, obj);
+    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
             impl->destroy_(impl->p_);
@@ -102,9 +102,9 @@ decrefaddrob_(aug_addrob* obj)
 }
 
 static void*
-getaddrob_(aug_addrob* obj)
+getaddrob_(aug_addrob* ob)
 {
-    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, obj);
+    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
     return impl->p_;
 }
 
@@ -124,45 +124,45 @@ struct blobimpl_ {
 };
 
 static void*
-castblob_(aug_blob* obj, const char* id)
+castblob_(aug_blob* ob, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
-        aug_incref(obj);
-        return obj;
+        aug_incref(ob);
+        return ob;
     }
     return NULL;
 }
 
 static int
-increfblob_(aug_blob* obj)
+increfblob_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
     return 0;
 }
 
 static int
-decrefblob_(aug_blob* obj)
+decrefblob_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (0 == --impl->refs_)
         free(impl);
     return 0;
 }
 
 static const void*
-blobdata_(aug_blob* obj, size_t* size)
+blobdata_(aug_blob* ob, size_t* size)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (size)
         *size = impl->size_;
     return impl->buf_;
 }
 
 static size_t
-blobsize_(aug_blob* obj)
+blobsize_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, obj);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     return impl->size_;
 }
 
@@ -193,11 +193,11 @@ aug_createlongob(long l, void (*destroy)(long))
 }
 
 AUGUTIL_API long
-aug_obtolong(aug_object* obj)
+aug_obtolong(aug_object* ob)
 {
     long l;
     aug_longob* tmp;
-    if (obj && (tmp = aug_cast(obj, aug_longobid))) {
+    if (ob && (tmp = aug_cast(ob, aug_longobid))) {
         l = aug_getlongob(tmp);
         aug_decref(tmp);
     } else
@@ -224,11 +224,11 @@ aug_createaddrob(void* p, void (*destroy)(void*))
 }
 
 AUGUTIL_API void*
-aug_obtoaddr(aug_object* obj)
+aug_obtoaddr(aug_object* ob)
 {
     void* p;
     aug_addrob* tmp;
-    if (obj && (tmp = aug_cast(obj, aug_addrobid))) {
+    if (ob && (tmp = aug_cast(ob, aug_addrobid))) {
         p = aug_getaddrob(tmp);
         aug_decref(tmp);
     } else

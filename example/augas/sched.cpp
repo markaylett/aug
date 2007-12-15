@@ -267,13 +267,14 @@ namespace {
             settimer(tv);
         }
         void
-        do_event(const char* from, const char* type, const void* user,
-                 size_t size)
+        do_event(const char* from, const char* type, struct aug_object_* ob)
         {
             aug_info("event [%s] triggered", type);
 
             map<string, string> fields;
-            const char* encoded(static_cast<const char*>(user));
+            // FIXME
+            size_t size(0);
+            const char* encoded = "";//(static_cast<const char*>(ob));
             urlunpack(encoded, encoded + size,
                       inserter(fields, fields.begin()));
 

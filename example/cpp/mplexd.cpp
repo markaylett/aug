@@ -196,7 +196,7 @@ namespace test {
         smartfd sfd_;
         map<int, sessionptr> sfds_;
 
-        state(aug_filecb_t cb, obref<aug_object> user)
+        state(aug_filecb_t cb, obref<aug_object> ob)
             : sfd_(null)
         {
             aug_hostserv hostserv;
@@ -205,10 +205,10 @@ namespace test {
             endpoint ep(null);
             smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
 
-            insertfile(files_, aug_eventrd(), cb, user);
+            insertfile(files_, aug_eventrd(), cb, ob);
             setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
 
-            insertfile(files_, sfd, cb, user);
+            insertfile(files_, sfd, cb, ob);
             setfdeventmask(muxer_, sfd, AUG_FDEVENTRD);
 
             sfd_ = sfd;
@@ -237,7 +237,7 @@ namespace test {
 
             aug_event event;
             aug::readevent(aug_eventrd(), event);
-            smartob<aug_object> obj(object_attach(obptr(event.user_)));
+            smartob<aug_object> ob(object_attach(obptr(event.ob_)));
 
             switch (event.type_) {
             case AUG_EVENTRECONF:
@@ -362,8 +362,8 @@ namespace test {
             aug_info("initialising daemon process");
 
             setsrvlogger("aug");
-            smartob<aug_addrob> addrob(createaddrob(this, 0));
-            state_.reset(new state(filememcb<service>, objectref(addrob)));
+            smartob<aug_addrob> ob(createaddrob(this, 0));
+            state_.reset(new state(filememcb<service>, ob));
         }
 
         void

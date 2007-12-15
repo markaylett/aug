@@ -79,7 +79,7 @@ namespace test {
             AUG_DEBUG2("reading event");
             aug_event event;
             aug::readevent(fd, event);
-            smartob<aug_object> obj(object_attach(obptr(event.user_)));
+            smartob<aug_object> ob(object_attach(obptr(event.ob_)));
 
             switch (event.type_) {
             case AUG_EVENTRECONF:

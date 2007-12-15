@@ -33,9 +33,9 @@ aug_blob*
 augrb_createblob(VALUE rbobj);
 
 const void*
-augrb_blobdata(aug_object* obj, size_t* size);
+augrb_blobdata(aug_object* ob, size_t* size);
 
 VALUE
-augrb_getblob(aug_object* obj);
+augrb_getblob(aug_object* ob);
 
 #endif /* AUGRB_OBJECT_H */

@@ -134,11 +134,11 @@ namespace aug {
 
         struct sessiontimer {
             sessionptr session_;
-            smartob<aug_object> user_;
+            smartob<aug_object> ob_;
             sessiontimer(const sessionptr& session,
-                         const smartob<aug_object>& user)
+                         const smartob<aug_object>& ob)
                 : session_(session),
-                  user_(user)
+                  ob_(ob)
             {
             }
         };
@@ -207,9 +207,9 @@ namespace aug {
 
                     // Initiate grace period.
 
-                    smartob<aug_addrob> obj(createaddrob(this, 0));
+                    smartob<aug_addrob> ob(createaddrob(this, 0));
                     grace_.set(15000, timermemcb<engineimpl,
-                               &engineimpl::stopcb>, obj);
+                               &engineimpl::stopcb>, ob);
                 }
             }
             void
@@ -306,7 +306,7 @@ namespace aug {
 
                 aug_event event;
                 aug::readevent(eventrd_, event);
-                smartob<aug_object> obj(object_attach(obptr(event.user_)));
+                smartob<aug_object> ob(object_attach(obptr(event.ob_)));
 
                 switch (event.type_) {
                 case AUG_EVENTRECONF:
@@ -332,7 +332,7 @@ namespace aug {
                     AUG_DEBUG2("received POSTEVENT_");
                     {
                         smartob<aug_eventob> ev
-                            (object_cast<aug_eventob>(obj));
+                            (object_cast<aug_eventob>(ob));
 
                         vector<sessionptr> sessions;
                         sessions_.getbygroup(sessions, eventobto(ev));
@@ -374,7 +374,7 @@ namespace aug {
                 AUG_DEBUG2("custom timer expiry");
 
                 sessiontimers::iterator it(sessiontimers_.find(id));
-                maud_handle timer = { id, it->second.user_.get() };
+                maud_handle timer = { id, it->second.ob_.get() };
                 it->second.session_->expire(timer, ms);
 
                 if (0 == ms) {
@@ -517,20 +517,20 @@ engine::stopall()
 
 AUGRTPP_API void
 engine::post(const char* sname, const char* to, const char* type,
-             objectref ref)
+             objectref ob)
 {
     smartob<aug_eventob> ev(postevent::create(sname, to, type));
-    seteventobuser(ev, ref);
+    seteventobuser(ev, ob);
     aug_event e;
     e.type_ = POSTEVENT_;
-    e.user_ = ev.base();
+    e.ob_ = ev.base();
 
     writeevent(impl_->eventwr_, e);
 }
 
 AUGRTPP_API void
 engine::dispatch(const char* sname, const char* to, const char* type,
-                 objectref ref)
+                 objectref ob)
 {
     vector<sessionptr> sessions;
     impl_->sessions_.getbygroup(sessions, to);
@@ -538,7 +538,7 @@ engine::dispatch(const char* sname, const char* to, const char* type,
     vector<sessionptr>::const_iterator it(sessions.begin()),
         end(sessions.end());
     for (; it != end; ++it)
-        (*it)->event(sname, type, ref);
+        (*it)->event(sname, type, ob);
 }
 
 AUGRTPP_API void
@@ -676,7 +676,7 @@ engine::cancelrwtimer(maud_id cid, unsigned flags)
 }
 
 AUGRTPP_API maud_id
-engine::settimer(const char* sname, unsigned ms, objectref ref)
+engine::settimer(const char* sname, unsigned ms, objectref ob)
 {
     maud_id id(aug_nextid());
     smartob<aug_addrob> local(createaddrob(impl_, 0));
@@ -687,7 +687,7 @@ engine::settimer(const char* sname, unsigned ms, objectref ref)
     // Insert after settimer() has succeeded.
 
     detail::sessiontimer timer(impl_->sessions_.getbyname(sname),
-                               smartob<aug_object>::incref(ref));
+                               smartob<aug_object>::incref(ob));
     impl_->sessiontimers_.insert(make_pair(id, timer));
     return id;
 }

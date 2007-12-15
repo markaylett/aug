@@ -584,7 +584,7 @@ readwrite_(struct aug_nbfile* nbfile, int rw)
 }
 
 static int
-nbfilecb_(aug_object* obj, struct aug_nbfile* nbfile)
+nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
 {
     struct sslext_* x = nbfile->ext_;
     int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
@@ -643,7 +643,7 @@ nbfilecb_(aug_object* obj, struct aug_nbfile* nbfile)
            callback returns. */
 
         aug_retainfd(nbfile->fd_);
-        if ((ret = nbfile->cb_(obj, nbfile->fd_, events))) {
+        if ((ret = nbfile->cb_(ob, nbfile->fd_, events))) {
 
             /* No need to update events if file is being removed - indicated
                by false return. */

@@ -26,7 +26,7 @@ namespace aug {
         }
     public:
         static aug_mar_t
-        create(aug_object* user, const char* initial)
+        create(aug_object* ob, const char* initial)
         {
             return aug_createmar();
         }
@@ -51,19 +51,19 @@ namespace aug {
         class marstatic {
 
             static aug_mar_t
-            create(aug_object* user, const char* initial)
+            create(aug_object* ob, const char* initial)
             {
                 try {
-                    return T::create(user, initial);
+                    return T::create(ob, initial);
                 } AUG_SETERRINFOCATCH;
                 return 0;
             }
 
             static int
-            message(aug_object* user, const char* initial, aug_mar_t mar)
+            message(aug_object* ob, const char* initial, aug_mar_t mar)
             {
                 try {
-                    T::message(user, initial, mar);
+                    T::message(ob, initial, mar);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -85,19 +85,19 @@ namespace aug {
         class marnonstatic {
 
             static aug_mar_t
-            create(aug_object* user, const char* initial)
+            create(aug_object* ob, const char* initial)
             {
                 try {
-                    return obtoaddr<T*>(user)->create(initial);
+                    return obtoaddr<T*>(ob)->create(initial);
                 } AUG_SETERRINFOCATCH;
                 return 0;
             }
 
             static int
-            message(aug_object* user, const char* initial, aug_mar_t mar)
+            message(aug_object* ob, const char* initial, aug_mar_t mar)
             {
                 try {
-                    obtoaddr<T*>(user)->message(initial, mar);
+                    obtoaddr<T*>(ob)->message(initial, mar);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -147,10 +147,10 @@ namespace aug {
         }
 
         marparser(unsigned size, const aug_marhandler& handler,
-                  aug_object* user)
+                  aug_object* ob)
         {
             verify(marparser_
-                   = aug_createmarparser(size, &handler, user));
+                   = aug_createmarparser(size, &handler, ob));
         }
 
         marparser(unsigned size, const aug_marhandler& handler, const null_&)
@@ -162,17 +162,17 @@ namespace aug {
         template <typename T>
         marparser(unsigned size, T& x)
         {
-            smartob<aug_addrob> obj(createaddrob(&x, 0));
+            smartob<aug_addrob> ob(createaddrob(&x, 0));
             verify(marparser_ = aug_createmarparser
-                   (size, &marnonstatic<T>(), obj.base()));
+                   (size, &marnonstatic<T>(), ob.base()));
         }
 
         template <typename T>
         marparser(unsigned size, std::auto_ptr<T>& x)
         {
-            smartob<aug_addrob> obj(createaddrob(x));
+            smartob<aug_addrob> ob(createaddrob(x));
             verify(marparser_ = aug_createmarparser
-                   (size, &marnonstatic<T>(), obj.base()));
+                   (size, &marnonstatic<T>(), ob.base()));
         }
 
         operator aug_marparser_t()

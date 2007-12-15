@@ -137,7 +137,7 @@ namespace {
     }
 
     void
-    reopencb_(objectref obj, int id, unsigned& ms)
+    reopencb_(objectref ob, int id, unsigned& ms)
     {
         AUG_DEBUG2("re-opening log file");
         openlog_();
@@ -243,12 +243,12 @@ namespace {
     // Thread-safe.
 
     int
-    post_(const char* to, const char* type, aug_object* user)
+    post_(const char* to, const char* type, aug_object* ob)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s]", sname, to, type);
         try {
-            state_->engine_.post(sname, to, type, user);
+            state_->engine_.post(sname, to, type, ob);
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -256,13 +256,13 @@ namespace {
     }
 
     int
-    dispatch_(const char* to, const char* type, aug_object* user)
+    dispatch_(const char* to, const char* type, aug_object* ob)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("dispatch(): sname=[%s], to=[%s], type=[%s]",
                    sname, to, type);
         try {
-            state_->engine_.dispatch(sname, to, type, user);
+            state_->engine_.dispatch(sname, to, type, ob);
             return 0;
 
         } AUG_SETERRINFOCATCH;
@@ -405,12 +405,12 @@ namespace {
     }
 
     int
-    settimer_(unsigned ms, aug_object* user)
+    settimer_(unsigned ms, aug_object* ob)
     {
         const char* sname = getsession()->name_;
         AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
-            return (int)state_->engine_.settimer(sname, ms, user);
+            return (int)state_->engine_.settimer(sname, ms, ob);
 
         } AUG_SETERRINFOCATCH;
         return -1;

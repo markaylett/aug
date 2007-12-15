@@ -72,13 +72,13 @@ namespace aug {
 
         void
         post(const char* sname, const char* to, const char* type,
-             objectref ref);
+             objectref ob);
 
         // Thread-unsafe host interface.
 
         void
         dispatch(const char* sname, const char* to, const char* type,
-                 objectref ref);
+                 objectref ob);
 
         void
         shutdown(maud_id cid, unsigned flags);
@@ -107,7 +107,7 @@ namespace aug {
         cancelrwtimer(maud_id cid, unsigned flags);
 
         maud_id
-        settimer(const char* sname, unsigned ms, objectref ref);
+        settimer(const char* sname, unsigned ms, objectref ob);
 
         bool
         resettimer(maud_id tid, unsigned ms);

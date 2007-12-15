@@ -26,19 +26,19 @@ aug_destroytimers(struct aug_timers* timers);
    allocated timer id can be specified.  In which case, any timer with a
    matching id will be cancelled prior to setting the new timer.
 
-   If aug_settimer() succeeds, aug_retainobject() will be called on "user".
+   If aug_settimer() succeeds, aug_incref() will be called on "ob".
 
    \param timers TODO
    \param id TODO
    \param ms TODO
    \param cb TODO
-   \param user TODO
+   \param obj TODO
    \return the timer id.
 */
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, aug_object* user);
+             aug_timercb_t cb, aug_object* ob);
 
 /**
    On failure, the timer will be removed.

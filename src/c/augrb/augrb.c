@@ -792,7 +792,7 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, aug_object* user)
+event_(const char* from, const char* type, aug_object* ob)
 {
     struct session_* session = maud_getsession()->user_;
     assert(session);
@@ -800,7 +800,7 @@ event_(const char* from, const char* type, aug_object* user)
     if (session->event_) {
 
         size_t size;
-        const void* data = augrb_blobdata(user, &size);
+        const void* data = augrb_blobdata(ob, &size);
         VALUE x = data ? rb_tainted_str_new(data, (long)size) : Qnil;
         funcall3_(eventid_, rb_str_new2(from), rb_str_new2(type), x);
     }

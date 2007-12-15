@@ -66,16 +66,16 @@ namespace maud {
     }
 
     inline void
-    post(const char* to, const char* type, struct aug_object_* user)
+    post(const char* to, const char* type, struct aug_object_* ob)
     {
-        if (MAUD_ERROR == maud_post(to, type, user))
+        if (MAUD_ERROR == maud_post(to, type, ob))
             throw error(maud_error());
     }
 
     inline void
-    dispatch(const char* to, const char* type, struct aug_object_* user)
+    dispatch(const char* to, const char* type, struct aug_object_* ob)
     {
-        if (MAUD_ERROR == maud_dispatch(to, type, user))
+        if (MAUD_ERROR == maud_dispatch(to, type, ob))
             throw error(maud_error());
     }
 
@@ -198,9 +198,9 @@ namespace maud {
     }
 
     inline maud_id
-    settimer(unsigned ms, struct aug_object_* user)
+    settimer(unsigned ms, struct aug_object_* ob)
     {
-        int ret(maud_settimer(ms, user));
+        int ret(maud_settimer(ms, ob));
         if (MAUD_ERROR == ret)
             throw error(maud_error());
         return static_cast<maud_id>(ret);
@@ -312,7 +312,7 @@ namespace maud {
 
         virtual void
         do_event(const char* from, const char* type,
-                 struct aug_object_* user) = 0;
+                 struct aug_object_* ob) = 0;
 
         virtual void
         do_closed(const handle& sock) = 0;
@@ -358,9 +358,9 @@ namespace maud {
             do_reconf();
         }
         void
-        event(const char* from, const char* type, struct aug_object_* user)
+        event(const char* from, const char* type, struct aug_object_* ob)
         {
-            do_event(from, type, user);
+            do_event(from, type, ob);
         }
         void
         closed(const handle& sock)
@@ -415,7 +415,7 @@ namespace maud {
         {
         }
         void
-        do_event(const char* from, const char* type, struct aug_object_* user)
+        do_event(const char* from, const char* type, struct aug_object_* ob)
         {
         }
         void
@@ -537,10 +537,10 @@ namespace maud {
         }
         static void
         event(const char* from, const char* type,
-              struct aug_object_* user) AUG_NOTHROW
+              struct aug_object_* ob) AUG_NOTHROW
         {
             try {
-                getbase()->event(from, type, user);
+                getbase()->event(from, type, ob);
             } MAUD_WRITELOGCATCH;
         }
         static void

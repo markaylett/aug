@@ -33,7 +33,7 @@ namespace augas {
 
         void
         do_event(const char* from, const char* type,
-                 aug::objectref obj) const AUG_NOTHROW;
+                 aug::objectref ob) const AUG_NOTHROW;
 
         void
         do_closed(const maud_handle& sock) const AUG_NOTHROW;

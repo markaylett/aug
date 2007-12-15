@@ -24,7 +24,7 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, struct aug_object_* user)
+event_(const char* from, const char* type, struct aug_object_* ob)
 {
     maud_writelog(MAUD_LOGINFO, "event_()");
 }

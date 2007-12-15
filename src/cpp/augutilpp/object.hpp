@@ -78,9 +78,9 @@ namespace aug {
 
     template <typename T>
     T
-    obtoaddr(obref<aug_object> ref)
+    obtoaddr(obref<aug_object> ob)
     {
-        return static_cast<T>(aug_obtoaddr(ref.get()));
+        return static_cast<T>(aug_obtoaddr(ob.get()));
     }
 
     inline smartob<aug_blob>
