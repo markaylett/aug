@@ -298,17 +298,52 @@ event_(const char* from, const char* type, aug_object* ob)
 
     if (import->event_) {
 
-        size_t size;
-        const void* data = augpy_blobdata(ob, &size);
         PyObject* y;
+        if (ob) {
 
-        if (data)
-            y = PyObject_CallFunction(import->event_, "ssz#", from, type,
-                                      (const char*)data, size);
-        else
-            y = PyObject_CallFunction(import->event_, "ssO", from, type,
-                                      Py_None);
+            /* Preference is augpy_blob type. */
 
+            PyObject* x = augpy_getblob(ob);
+            if (x) {
+
+                y = PyObject_CallFunction(import->event_, "ssO", from, type,
+                                          x);
+                Py_DECREF(x);
+                goto done;
+
+            } else {
+
+                /* Fallback to aug_blob type. */
+
+                aug_blob* blob = aug_cast(ob, aug_blobid);
+                if (blob) {
+
+                    size_t size;
+                    const void* data = aug_blobdata(blob, &size);
+
+                    /* Unsafe to release here. */
+
+                    if (data) {
+
+                        /* Blob data obtained. */
+
+                        y = PyObject_CallFunction(import->event_, "ssz#",
+                                                  from, type,
+                                                  (const char*)data, size);
+                        aug_decref(blob);
+                        goto done;
+                    }
+                    aug_decref(blob);
+                }
+            }
+        }
+
+        /* Null or unsupported object type. */
+
+        y = PyObject_CallFunction(import->event_, "ssO", from, type,
+                                  Py_None);
+
+    done:
         if (y) {
             Py_DECREF(y);
         } else

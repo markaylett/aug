@@ -799,9 +799,30 @@ event_(const char* from, const char* type, aug_object* ob)
 
     if (session->event_) {
 
-        size_t size;
-        const void* data = augrb_blobdata(ob, &size);
-        VALUE x = data ? rb_tainted_str_new(data, (long)size) : Qnil;
+        VALUE x = Qnil;
+        if (ob) {
+
+            /* Preference is augpy_blob type. */
+
+            if (Qnil == (x = augrb_getblob(ob))) {
+
+                /* Fallback to aug_blob type. */
+
+                aug_blob* blob = aug_cast(ob, aug_blobid);
+                if (blob) {
+
+                    size_t size;
+                    const void* data = aug_blobdata(blob, &size);
+
+                    /* Unsafe to release here. */
+
+                    if (data)
+                        x = rb_tainted_str_new(data, (long)size);
+
+                    aug_decref(blob);
+                }
+            }
+        }
         funcall3_(eventid_, rb_str_new2(from), rb_str_new2(type), x);
     }
 }

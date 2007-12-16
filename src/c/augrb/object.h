@@ -32,9 +32,6 @@ struct augrb_blobvtbl {
 aug_blob*
 augrb_createblob(VALUE rbobj);
 
-const void*
-augrb_blobdata(aug_object* ob, size_t* size);
-
 VALUE
 augrb_getblob(aug_object* ob);
 

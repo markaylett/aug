@@ -154,20 +154,6 @@ augpy_createblob(PyObject* pyob)
     return &impl->blob_;
 }
 
-const void*
-augpy_blobdata(aug_object* ob, size_t* size)
-{
-    const void* data = NULL;
-    if (ob) {
-        aug_blob* blob = aug_cast(ob, aug_blobid);
-        if (blob) {
-            data = aug_blobdata(blob, size);
-            aug_decref(blob);
-        }
-    }
-    return data;
-}
-
 PyObject*
 augpy_getblob(aug_object* ob)
 {
