@@ -271,10 +271,17 @@ namespace {
         {
             aug_info("event [%s] triggered", type);
 
+            smartob<aug_blob> blob(object_cast<aug_blob>(obptr(ob)));
+            if (null == blob)
+                return;
+
+            size_t size;
+            const char* encoded
+                (static_cast<const char*>(blobdata(blob, &size)));
+            if (!encoded)
+                return;
+
             map<string, string> fields;
-            // FIXME
-            size_t size(0);
-            const char* encoded = "";//(static_cast<const char*>(ob));
             urlunpack(encoded, encoded + size,
                       inserter(fields, fields.begin()));
 

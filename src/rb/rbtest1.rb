@@ -1,6 +1,6 @@
 require 'log'
 
-# stop(), Object()
+# stop(), Handle()
 
 module RbTest1
     def RbTest1.stop
@@ -8,7 +8,7 @@ module RbTest1
     end
     def RbTest1.start(sname)
         Log.debug("start(): #{sname}")
-        o = AugRb::Object.new(101, "our object")
+        o = AugRb::Handle.new(101, "our object")
         Log.debug("to_s(): #{o}")
         if o.id != 101
             Log.error("object returned unexpected id")
@@ -20,7 +20,7 @@ module RbTest1
         if o.user != "new user"
             Log.error("object returned unexpected user")
         end
-        if o != AugRb::Object.new(101, nil)
+        if o != AugRb::Handle.new(101, nil)
             Log.error("comparison operator failed")
         end
         AugRb.stopall

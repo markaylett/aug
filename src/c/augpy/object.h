@@ -33,7 +33,7 @@ PyTypeObject*
 augpy_createtype(void);
 
 PyObject*
-augpy_createobject(PyTypeObject* type, int id, PyObject* user);
+augpy_createhandle(PyTypeObject* type, int id, PyObject* user);
 
 void
 augpy_setid(PyObject* self, int id);
@@ -48,6 +48,6 @@ PyObject*
 augpy_getuser(PyObject* self);
 
 int
-augpy_objects(void);
+augpy_handles(void);
 
 #endif /* AUGPY_OBJECT_H */

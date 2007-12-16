@@ -185,24 +185,24 @@ augpy_getblob(aug_object* ob)
 /* Implementation note: always reassign members before decrementing reference
    counts. */
 
-static int objects_ = 0;
+static int handles_ = 0;
 
 typedef struct {
     PyObject_HEAD
     char name_[MAUD_MAXNAME + 1];
     int id_;
     PyObject* user_;
-} object_;
+} handle_;
 
 static PyMemberDef members_[] = {
     {
-        "user", T_OBJECT_EX, offsetof(object_, user_), 0, "TODO"
+        "user", T_OBJECT_EX, offsetof(handle_, user_), 0, "TODO"
     },
     { NULL }
 };
 
 static int
-clear_(object_* self)
+clear_(handle_* self)
 {
     PyObject* tmp;
 
@@ -214,10 +214,10 @@ clear_(object_* self)
 }
 
 static void
-dealloc_(object_* self)
+dealloc_(handle_* self)
 {
-    --objects_;
-    maud_writelog(MAUD_LOGDEBUG, "deallocated: <augpy.Object at %p, id=%d>",
+    --handles_;
+    maud_writelog(MAUD_LOGDEBUG, "deallocated: <augpy.Handle at %p, id=%d>",
                   (void*)self, self->id_);
 
     clear_(self);
@@ -225,7 +225,7 @@ dealloc_(object_* self)
 }
 
 static int
-compare_(object_* lhs, object_* rhs)
+compare_(handle_* lhs, handle_* rhs)
 {
     int ret;
     if (lhs->id_ < rhs->id_)
@@ -238,14 +238,14 @@ compare_(object_* lhs, object_* rhs)
 }
 
 static PyObject*
-repr_(object_* self)
+repr_(handle_* self)
 {
-    return PyString_FromFormat("<augpy.Object at %p, id=%d>",
+    return PyString_FromFormat("<augpy.Handle at %p, id=%d>",
                                (void*)self, self->id_);
 }
 
 static long
-hash_(object_* self)
+hash_(handle_* self)
 {
     /* Must not return -1. */
 
@@ -253,13 +253,13 @@ hash_(object_* self)
 }
 
 static PyObject*
-str_(object_* self)
+str_(handle_* self)
 {
     return PyString_FromFormat("%d", self->id_);
 }
 
 static int
-traverse_(object_* self, visitproc visit, void* arg)
+traverse_(handle_* self, visitproc visit, void* arg)
 {
     int ret;
 
@@ -273,7 +273,7 @@ traverse_(object_* self, visitproc visit, void* arg)
 }
 
 static int
-init_(object_* self, PyObject* args, PyObject* kwds)
+init_(handle_* self, PyObject* args, PyObject* kwds)
 {
     PyObject* user = NULL, * tmp;
 
@@ -296,9 +296,9 @@ init_(object_* self, PyObject* args, PyObject* kwds)
 static PyObject*
 new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
 {
-    object_* self;
+    handle_* self;
 
-    self = (object_*)type->tp_alloc(type, 0);
+    self = (handle_*)type->tp_alloc(type, 0);
     if (self) {
 
         self->id_ = 0;
@@ -307,14 +307,14 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
         self->user_ = Py_None;
     }
 
-    ++objects_;
-    maud_writelog(MAUD_LOGDEBUG, "allocated: <augpy.Object at %p, id=%d>",
+    ++handles_;
+    maud_writelog(MAUD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
                   (void*)self, self->id_);
     return (PyObject*)self;
 }
 
 static PyObject*
-getid_(object_* self, void *closure)
+getid_(handle_* self, void *closure)
 {
     return Py_BuildValue("i", self->id_);
 }
@@ -329,8 +329,8 @@ static PyGetSetDef getset_[] = {
 static PyTypeObject pytype_ = {
     PyObject_HEAD_INIT(NULL)
     0,                       /*ob_size*/
-    "augpy.Object",          /*tp_name*/
-    sizeof(object_),         /*tp_basicsize*/
+    "augpy.Handle",          /*tp_name*/
+    sizeof(handle_),         /*tp_basicsize*/
     0,                       /*tp_itemsize*/
     (destructor)dealloc_,    /*tp_dealloc*/
     0,                       /*tp_print*/
@@ -380,9 +380,9 @@ augpy_createtype(void)
 }
 
 PyObject*
-augpy_createobject(PyTypeObject* type, int id, PyObject* user)
+augpy_createhandle(PyTypeObject* type, int id, PyObject* user)
 {
-    object_* self = PyObject_GC_New(object_, type);
+    handle_* self = PyObject_GC_New(handle_, type);
     if (!self)
         return NULL;
 
@@ -393,8 +393,8 @@ augpy_createobject(PyTypeObject* type, int id, PyObject* user)
     Py_INCREF(user);
     self->user_ = user;
 
-    ++objects_;
-    maud_writelog(MAUD_LOGDEBUG, "allocated: <augpy.Object at %p, id=%d>",
+    ++handles_;
+    maud_writelog(MAUD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
                   (void*)self, self->id_);
     return (PyObject*)self;
 }
@@ -402,21 +402,21 @@ augpy_createobject(PyTypeObject* type, int id, PyObject* user)
 void
 augpy_setid(PyObject* self, int id)
 {
-    object_* x = (object_*)self;
+    handle_* x = (handle_*)self;
     x->id_ = id;
 }
 
 int
 augpy_getid(PyObject* self)
 {
-    object_* x = (object_*)self;
+    handle_* x = (handle_*)self;
     return x->id_;
 }
 
 void
 augpy_setuser(PyObject* self, PyObject* user)
 {
-    object_* x = (object_*)self;
+    handle_* x = (handle_*)self;
     PyObject* tmp = x->user_;
     Py_INCREF(user);
     x->user_ = user;
@@ -426,13 +426,13 @@ augpy_setuser(PyObject* self, PyObject* user)
 PyObject*
 augpy_getuser(PyObject* self)
 {
-    object_* x = (object_*)self;
+    handle_* x = (handle_*)self;
     Py_INCREF(x->user_);
     return x->user_;
 }
 
 int
-augpy_objects(void)
+augpy_handles(void)
 {
-    return objects_;
+    return handles_;
 }

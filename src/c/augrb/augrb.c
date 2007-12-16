@@ -37,7 +37,7 @@ static ID stopid_, startid_, reconfid_, eventid_, closedid_,
     teardownid_, acceptedid_, connectedid_, dataid_, rdexpireid_,
     wrexpireid_, expireid_, authcertid_;
 
-static VALUE maugrb_, cobject_, cerror_;
+static VALUE maugrb_, chandle_, cerror_;
 
 /* True if exception was thrown during last call to protect_(). */
 
@@ -170,26 +170,26 @@ register_(VALUE value)
     return ptr;
 }
 
-/* AugRb::Object functions. */
+/* AugRb::Handle functions. */
 
 static void
-checkobject_(VALUE object)
+checkhandle_(VALUE handle)
 {
-    if (!rb_obj_is_kind_of(object, cobject_))
+    if (!rb_obj_is_kind_of(handle, chandle_))
         rb_raise(rb_eTypeError,
-                 "wrong argument type %s (expected AugRb::Object)",
-                 rb_obj_classname(object));
+                 "wrong argument type %s (expected AugRb::Handle)",
+                 rb_obj_classname(handle));
 }
 
 static int
-checkid_(VALUE object)
+checkid_(VALUE handle)
 {
-    checkobject_(object);
-    return FIX2INT(rb_iv_get(object, "@id"));
+    checkhandle_(handle);
+    return FIX2INT(rb_iv_get(handle, "@id"));
 }
 
 static VALUE
-initobject_(VALUE self, VALUE id, VALUE user)
+inithandle_(VALUE self, VALUE id, VALUE user)
 {
     Check_Type(id, T_FIXNUM);
     rb_iv_set(self, "@id", id);
@@ -198,30 +198,30 @@ initobject_(VALUE self, VALUE id, VALUE user)
 }
 
 static VALUE
-objectid_(VALUE self)
+handleid_(VALUE self)
 {
     return rb_iv_get(self, "@id");
 }
 
 static VALUE
-objectuser_(VALUE self)
+handleuser_(VALUE self)
 {
     return rb_iv_get(self, "@user");
 }
 
 static VALUE
-setobjectuser_(VALUE self, VALUE user)
+sethandleuser_(VALUE self, VALUE user)
 {
     rb_iv_set(self, "@user", user);
     return self;
 }
 
 static VALUE
-cmpobject_(VALUE self, VALUE other)
+cmphandle_(VALUE self, VALUE other)
 {
     int lhs, rhs, ret;
 
-    checkobject_(other);
+    checkhandle_(other);
 
     lhs = FIX2INT(rb_iv_get(self, "@id"));
     rhs = FIX2INT(rb_iv_get(other, "@id"));
@@ -237,27 +237,27 @@ cmpobject_(VALUE self, VALUE other)
 }
 
 static VALUE
-objecthash_(VALUE self)
+handlehash_(VALUE self)
 {
     return rb_iv_get(self, "@id");
 }
 
 static VALUE
-objectstr_(VALUE self)
+handlestr_(VALUE self)
 {
     char sz[64];
-    sprintf(sz, "#<AugRb::Object:%lx,id=%d>", self,
+    sprintf(sz, "#<AugRb::Handle:%lx,id=%d>", self,
             FIX2INT(rb_iv_get(self, "@id")));
     return rb_str_new2(sz);
 }
 
 static VALUE
-newobject_(VALUE id, VALUE user)
+newhandle_(VALUE id, VALUE user)
 {
     VALUE argv[2];
     argv[0] = id;
     argv[1] = user;
-    return rb_class_new_instance(2, argv, cobject_);
+    return rb_class_new_instance(2, argv, chandle_);
 }
 
 static void
@@ -445,7 +445,7 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
     Check_Type(host, T_STRING);
     serv = StringValue(serv);
 
-    sock = register_(newobject_(INT2FIX(0), user));
+    sock = register_(newhandle_(INT2FIX(0), user));
 
     if (-1 == (cid = maud_tcpconnect(RSTRING(host)->ptr,
                                      RSTRING(serv)->ptr, sock))) {
@@ -471,7 +471,7 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
     Check_Type(host, T_STRING);
     serv = StringValue(serv);
 
-    sock = register_(newobject_(INT2FIX(0), user));
+    sock = register_(newhandle_(INT2FIX(0), user));
 
     if (-1 == (cid = maud_tcplisten(RSTRING(host)->ptr,
                                     RSTRING(serv)->ptr, sock))) {
@@ -557,7 +557,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
 
     ui = NUM2UINT(ms);
 
-    timer = newobject_(INT2FIX(0), user);
+    timer = newhandle_(INT2FIX(0), user);
     blob = augrb_createblob(timer);
     tid = maud_settimer(ui, (aug_object*)blob);
     aug_decref(blob);
@@ -688,7 +688,7 @@ initrb_(VALUE unused)
     authcertid_= rb_intern("authcert");
 
     maugrb_ = rb_define_module("AugRb");
-    cobject_ = rb_define_class_under(maugrb_, "Object", rb_cObject);
+    chandle_ = rb_define_class_under(maugrb_, "Handle", rb_cObject);
     cerror_ = rb_define_class_under(maugrb_, "Error", rb_eStandardError);
 
     /* Logger constants. */
@@ -712,16 +712,16 @@ initrb_(VALUE unused)
 
     /* Object methods. */
 
-    rb_define_method(cobject_, "initialize", initobject_, 2);
-    rb_define_method(cobject_, "id", objectid_, 0);
-    rb_define_method(cobject_, "user", objectuser_, 0);
-    rb_define_method(cobject_, "user=", setobjectuser_, 1);
+    rb_define_method(chandle_, "initialize", inithandle_, 2);
+    rb_define_method(chandle_, "id", handleid_, 0);
+    rb_define_method(chandle_, "user", handleuser_, 0);
+    rb_define_method(chandle_, "user=", sethandleuser_, 1);
 
-    rb_define_method(cobject_, "<=>", cmpobject_, 1);
-    rb_define_method(cobject_, "hash", objecthash_, 0);
-    rb_define_method(cobject_, "to_s", objectstr_, 0);
+    rb_define_method(chandle_, "<=>", cmphandle_, 1);
+    rb_define_method(chandle_, "hash", handlehash_, 0);
+    rb_define_method(chandle_, "to_s", handlestr_, 0);
 
-    rb_include_module(cobject_, rb_mComparable);
+    rb_include_module(chandle_, rb_mComparable);
 
     /* Host module functions. */
 
@@ -844,7 +844,7 @@ accepted_(struct maud_handle* sock, const char* addr, unsigned short port)
 
     /* On entry, sock->user_ is user data belonging to listener. */
 
-    user = newobject_(INT2FIX(sock->id_),
+    user = newhandle_(INT2FIX(sock->id_),
                       rb_iv_get(*(VALUE*)sock->user_, "@user"));
 
     /* Reject if function either returns false, or throws an exception. */

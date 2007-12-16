@@ -205,7 +205,7 @@ termpy_(void)
     maud_writelog(MAUD_LOGDEBUG, "finalising python interpreter");
     Py_Finalize();
 
-    objects = augpy_objects();
+    objects = augpy_handles();
     level = objects ? MAUD_LOGERROR : MAUD_LOGINFO;
     maud_writelog(level, "allocated objects: %d", objects);
 }
@@ -369,7 +369,7 @@ accepted_(struct maud_handle* sock, const char* addr, unsigned short port)
     assert(sock->user_);
 
     x = augpy_getuser(sock->user_);
-    y = augpy_createobject(type_, sock->id_, x);
+    y = augpy_createhandle(type_, sock->id_, x);
     Py_DECREF(x);
 
     if (!y) {

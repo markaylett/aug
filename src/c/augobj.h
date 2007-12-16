@@ -47,13 +47,13 @@ struct aug_objectvtbl {
     AUG_OBJECT(aug_object);
 };
 
-#define aug_cast(obj, type)                                     \
-    ((aug_object*)obj)->vtbl_->cast_((aug_object*)obj, type)
+#define aug_cast(ob, type)                                     \
+    ((aug_object*)ob)->vtbl_->cast_((aug_object*)ob, type)
 
-#define aug_incref(obj)                                     \
-    ((aug_object*)obj)->vtbl_->incref_((aug_object*)obj)
+#define aug_incref(ob)                                     \
+    ((aug_object*)ob)->vtbl_->incref_((aug_object*)ob)
 
-#define aug_decref(obj)                                     \
-    ((aug_object*)obj)->vtbl_->decref_((aug_object*)obj)
+#define aug_decref(ob)                                     \
+    ((aug_object*)ob)->vtbl_->decref_((aug_object*)ob)
 
 #endif /* AUGOBJ_H */

@@ -26,7 +26,7 @@ typedef int (*aug_filecb_t)(aug_object*, int);
 /**
    Destroy each file in the list.
 
-   aug_releaseobject() is called for each ob associated with each file.
+   aug_decref() is called for each ob associated with each file.
 
    \param files List of files to be destroyed.
  */
@@ -37,7 +37,7 @@ aug_destroyfiles(struct aug_files* files);
 /**
    Insert file into file list.
 
-   If aug_insertfile() succeeds, aug_retainobject() will be called on "ob".
+   If aug_insertfile() succeeds, aug_incref() will be called on "ob".
 
    \param files The file list.
    \param fd File descriptor.

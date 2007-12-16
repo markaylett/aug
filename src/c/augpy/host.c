@@ -196,7 +196,7 @@ tcpconnect_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "ss|O:tcpconnect", &host, &serv, &user))
         return NULL;
 
-    if (!(sock = augpy_createobject(type_, 0, user)))
+    if (!(sock = augpy_createhandle(type_, 0, user)))
         return NULL;
 
     if (-1 == (cid = maud_tcpconnect(host, serv, sock))) {
@@ -219,7 +219,7 @@ tcplisten_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "ss|O:tcplisten", &host, &serv, &user))
         return NULL;
 
-    if (!(sock = augpy_createobject(type_, 0, user)))
+    if (!(sock = augpy_createhandle(type_, 0, user)))
         return NULL;
 
     if (-1 == (lid = maud_tcplisten(host, serv, sock))) {
@@ -336,7 +336,7 @@ settimer_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &user))
         return NULL;
 
-    if (!(timer = augpy_createobject(type_, 0, user)))
+    if (!(timer = augpy_createhandle(type_, 0, user)))
         return NULL;
 
     /* Both blob and this function hold reference to sock. */
@@ -523,7 +523,7 @@ augpy_createhost(PyTypeObject* type)
 
     type_ = type;
 
-    PyModule_AddObject(host, "Object", (PyObject*)type_);
+    PyModule_AddObject(host, "Handle", (PyObject*)type_);
 
     PyModule_AddIntConstant(host, "LOGCRIT", MAUD_LOGCRIT);
     PyModule_AddIntConstant(host, "LOGERROR", MAUD_LOGERROR);

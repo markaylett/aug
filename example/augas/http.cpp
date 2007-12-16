@@ -728,9 +728,15 @@ namespace {
         void
         do_event(const char* from, const char* type, struct aug_object_* ob)
         {
-            // FIXME
-            //string xml(static_cast<const char*>(ob), size);
-            //results_.push_back(xml);
+            smartob<aug_blob> blob(object_cast<aug_blob>(obptr(ob)));
+            if (null != blob) {
+                size_t size;
+                const void* data(blobdata(blob, &size));
+                if (data) {
+                    string xml(static_cast<const char*>(data), size);
+                    results_.push_back(xml);
+                }
+            }
         }
         void
         do_closed(const handle& sock)

@@ -29,7 +29,7 @@ typedef void (*aug_fixcb_t)(aug_object*, const char*, size_t);
 typedef struct aug_fixstream_* aug_fixstream_t;
 
 /**
-   If aug_createfixstream() succeeds, aug_releaseobject() will be called from
+   If aug_createfixstream() succeeds, aug_decref() will be called from
    aug_destroyfixstream().
 */
 
