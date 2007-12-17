@@ -1,11 +1,11 @@
 EXTRA_DIST = \
-	networdstest.in \
-	networdstest.out \
 	networdstest.sh \
+	networdstest.stdin \
+	networdstest.stdout \
 	shelllexertest.sh \
-	shellwordstest.in \
-	shellwordstest.out \
-	shellwordstest.sh
+	shellwordstest.sh \
+	shellwordstest.stdin \
+	shellwordstest.stdout
 
 include $(top_srcdir)/src/c/lang.mk
 SUBDIRS = \

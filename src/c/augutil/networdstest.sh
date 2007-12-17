@@ -1,6 +1,6 @@
 #!/bin/sh
-./networdstest <networdstest.in | sed '/\r/d' >tmp.$$
-cmp -s tmp.$$ networdstest.out
+./networdstest <networdstest.stdin | sed '/\r/d' >tmp.$$
+cmp -s tmp.$$ networdstest.stdout
 ret=$?
 rm -f tmp.$$
 exit $ret

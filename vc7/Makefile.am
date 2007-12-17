@@ -15,6 +15,7 @@ EXTRA_DIST = \
 	augutil.vcproj \
 	augutilpp.vcproj \
 	client.vcproj \
+	command.vcproj \
 	daug.vcproj \
 	htdigest.vcproj \
 	http.vcproj \
