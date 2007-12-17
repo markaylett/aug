@@ -247,6 +247,9 @@ namespace {
 
             stringstream ss;
             toxml(ss, queue_, offset, max_);
+
+            // Dispatch is synchronous.
+
             scoped_blob<stringob> blob(ss.str());
             dispatch(from, "result", blob.base());
         }

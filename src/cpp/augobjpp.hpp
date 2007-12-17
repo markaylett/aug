@@ -278,7 +278,7 @@ namespace aug {
     smartob<T>
     object_cast(obref<U> ref) AUG_NOTHROW
     {
-        return smartob<T>::attach
+        return null == ref ? null : smartob<T>::attach
             (static_cast<T*>(ref.get()->vtbl_->cast_
                              (ref.get(), object_traits<T>::id())));
     }

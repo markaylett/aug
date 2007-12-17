@@ -670,6 +670,8 @@ namespace {
                         values["content"] = content;
                         values["sessid"] = sessid_;
 
+                        // Dispatch is synchronous.
+
                         scoped_blob<stringob> blob
                             (urlpack(values.begin(), values.end()));
 

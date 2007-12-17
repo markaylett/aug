@@ -180,7 +180,6 @@ namespace aug {
                 try {
                     removenbfile(eventrd_);
                 } AUG_PERRINFOCATCH;
-                sessiontimers_.clear();
             }
             engineimpl(const smartfd& eventrd, const smartfd& eventwr,
                        timers& timers, enginecb_base& cb)
@@ -304,11 +303,10 @@ namespace aug {
             {
                 AUG_DEBUG2("reading event");
 
-                aug_event event;
-                aug::readevent(eventrd_, event);
-                smartob<aug_object> ob(object_attach(obptr(event.ob_)));
+                pair<int, smartob<aug_object> >
+                    event(aug::readevent(eventrd_));
 
-                switch (event.type_) {
+                switch (event.first) {
                 case AUG_EVENTRECONF:
                     AUG_DEBUG2("received AUG_EVENTRECONF");
                     cb_.reconf();
@@ -332,7 +330,7 @@ namespace aug {
                     AUG_DEBUG2("received POSTEVENT_");
                     {
                         smartob<aug_eventob> ev
-                            (object_cast<aug_eventob>(ob));
+                            (object_cast<aug_eventob>(event.second));
 
                         vector<sessionptr> sessions;
                         sessions_.getbygroup(sessions, eventobto(ev));

@@ -235,11 +235,10 @@ namespace test {
         {
             AUG_DEBUG2("reading event");
 
-            aug_event event;
-            aug::readevent(aug_eventrd(), event);
-            smartob<aug_object> ob(object_attach(obptr(event.ob_)));
+            pair<int, smartob<aug_object> >
+                event(aug::readevent(aug_eventrd()));
 
-            switch (event.type_) {
+            switch (event.first) {
             case AUG_EVENTRECONF:
                 aug_info("received AUG_EVENTRECONF");
                 if (*conffile_) {

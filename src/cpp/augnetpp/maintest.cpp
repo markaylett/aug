@@ -61,7 +61,6 @@ main(int argc, char* argv[])
     aug_atexitinit(&errinfo);
 
     try {
-        /*
         callbacks cbs;
         base64 b64(AUG_ENCODE64, cbs);
 
@@ -70,7 +69,6 @@ main(int argc, char* argv[])
 
         httphandler x;
         httpparser hparser(1024, x);
-        */
 
         marhandler y;
         marparser mparser(1024, y);

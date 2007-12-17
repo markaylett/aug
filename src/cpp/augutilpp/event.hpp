@@ -11,18 +11,31 @@
 
 #include "augutil/event.h"
 
+#include "augobjpp.hpp"
+
+#include <utility> // std::pair<>
+
 namespace aug {
 
-    inline aug_event&
-    readevent(fdref ref, aug_event& sig)
+    inline std::pair<int, smartob<aug_object> >
+    readevent(fdref ref)
     {
-        return *verify(aug_readevent(ref.get(), &sig));
+        aug_event event;
+        verify(aug_readevent(ref.get(), &event));
+        return std::make_pair(event.type_, object_attach(obptr(event.ob_)));
     }
 
     inline const aug_event&
-    writeevent(fdref ref, const aug_event& sig)
+    writeevent(fdref ref, const aug_event& event)
     {
-        return *verify(aug_writeevent(ref.get(), &sig));
+        return *verify(aug_writeevent(ref.get(), &event));
+    }
+
+    inline void
+    writeevent(fdref ref, int type, obref<aug_object> ob)
+    {
+        aug_event event = { type, ob.get() };
+        writeevent(ref, event);
     }
 }
 
