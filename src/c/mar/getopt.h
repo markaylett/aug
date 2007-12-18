@@ -2,8 +2,9 @@
    See the file COPYING for copying permission.
 */
 /**
-   \file getopt.h
-   TODO
+ * @file getopt.h
+ *
+ * TODO
  */
 
 #ifndef MAR_GETOPT_H

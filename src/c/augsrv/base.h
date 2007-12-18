@@ -28,14 +28,14 @@ AUGSRV_API void
 aug_termservice(void);
 
 /**
-   Read-end of event pipe.
+ * Read-end of event pipe.
  */
 
 AUGSRV_API int
 aug_eventrd(void);
 
 /**
-   Write-end of event pipe.
+ * Write-end of event pipe.
  */
 
 AUGSRV_API int

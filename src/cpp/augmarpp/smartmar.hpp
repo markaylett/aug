@@ -2,8 +2,9 @@
    See the file COPYING for copying permission.
 */
 /**
-   \file smartmar.hpp
-   TODO
+ * @file smartmar.hpp
+ *
+ * TODO
  */
 
 #ifndef AUGMARPP_SMARTMAR_HPP

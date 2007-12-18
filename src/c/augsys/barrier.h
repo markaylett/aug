@@ -70,16 +70,16 @@ AUG_EXTERNC void _ReadWriteBarrier(void);
 #endif /* ENABLE_SMP */
 
 /**
-   If not defined, define read barrier in terms of full barrier.
-*/
+ * If not defined, define read barrier in terms of full barrier.
+ */
 
 #if !defined(AUG_RMB)
 # define AUG_RMB AUG_MB
 #endif /* !AUG_RMB */
 
 /**
-   If not defined, define write barrier in terms of full barrier.
-*/
+ * If not defined, define write barrier in terms of full barrier.
+ */
 
 #if !defined(AUG_WMB)
 # define AUG_WMB AUG_MB

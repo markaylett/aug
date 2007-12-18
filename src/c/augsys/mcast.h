@@ -7,10 +7,10 @@
 #include "augsys/socket.h"
 
 /**
-   The minimum size of an IP datagram is 576 bytes.  The maximum IP datagram
-   header size is 60 bytes.  It should, therefore, be reasonable safe to
-   assume that 516 bytes can be sent in a datagram's data section without
-   fragmentation.
+ * The minimum size of an IP datagram is 576 bytes.  The maximum IP datagram
+ * header size is 60 bytes.  It should, therefore, be reasonable safe to
+ * assume that 516 bytes can be sent in a datagram's data section without
+ * fragmentation.
  */
 
 #if !defined(AUG_PACKETSIZE)

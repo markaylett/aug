@@ -7,9 +7,9 @@
 enum aug_option {
 
     /**
-       The following options are required and should remain constant during
-       the call to aug_main().
-    */
+     * The following options are required and should remain constant during
+     * the call to aug_main().
+     */
 
     AUG_OPTLONGNAME = 1,
     AUG_OPTSHORTNAME,
@@ -17,19 +17,19 @@ enum aug_option {
     AUG_OPTEMAIL,
 
     /**
-       The remaining options should remain constant after
-       aug_service.config_() has been called.
-    */
+     * The remaining options should remain constant after
+     * aug_service.config_() has been called.
+     */
 
     /**
-       Configuration file: optional (may be null).
-    */
+     * Configuration file: optional (may be null).
+     */
 
     AUG_OPTCONFFILE,
 
     /**
-       Pid file.
-    */
+     * Pid file.
+     */
 
     AUG_OPTPIDFILE
 };

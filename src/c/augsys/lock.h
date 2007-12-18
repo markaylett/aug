@@ -7,8 +7,8 @@
 #include "augsys/config.h"
 
 /**
-   All functions in this module set errno, and not errinfo.
-*/
+ * All functions in this module set errno, and not errinfo.
+ */
 
 #if defined(AUGSYS_BUILD)
 
@@ -37,15 +37,15 @@ aug_termlock_(void);
 #endif /* AUGSYS_BUILD */
 
 /**
-   Calls abort() on failure.
-*/
+ * Calls abort() on failure.
+ */
 
 AUGSYS_API void
 aug_lock(void);
 
 /**
-   Calls abort() on failure.
-*/
+ * Calls abort() on failure.
+ */
 
 AUGSYS_API void
 aug_unlock(void);

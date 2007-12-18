@@ -24,21 +24,21 @@ struct aug_nbtype {
 };
 
 /**
-   Thread-safe.
+ * Thread-safe.
  */
 
 AUGNET_API const struct aug_nbfile*
 aug_setnbfile(int fd, const struct aug_nbfile* nbfile);
 
 /**
-   Thread-safe.
+ * Thread-safe.
  */
 
 AUGNET_API struct aug_nbfile*
 aug_getnbfile(int fd, struct aug_nbfile* nbfile);
 
 /**
-   Thread-safe.
+ * Thread-safe.
  */
 
 AUGNET_API struct aug_nbfile*

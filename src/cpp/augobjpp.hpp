@@ -71,6 +71,10 @@ namespace aug {
     template <typename T>
     class obref;
 
+    /**
+     * Specialization for base object.
+     */
+
     template <>
     class obref<aug_object> {
     public:
@@ -100,6 +104,12 @@ namespace aug {
 
     typedef obref<aug_object> objectref;
 
+    /**
+     * Generalized implementation is derived from base.
+     *
+     * Slicing allows conversion to base.
+     */
+
     template <typename T>
     class obref : public objectref {
         typedef T type;
@@ -120,6 +130,10 @@ namespace aug {
         }
     };
 
+    /**
+     * Argument must not be null.
+     */
+
     template <typename T>
     int
     incref(obref<T> ref) AUG_NOTHROW
@@ -127,6 +141,10 @@ namespace aug {
         assert(ref.get());
         return ref.get()->vtbl_->incref_(ref.get());
     }
+
+    /**
+     * Argument must not be null.
+     */
 
     template <typename T>
     T*
@@ -136,6 +154,10 @@ namespace aug {
             incref(ref);
         return ref.get();
     }
+
+    /**
+     * Argument must not be null.
+     */
 
     template <typename T>
     int
@@ -225,6 +247,10 @@ namespace aug {
             return ref_;
         }
     };
+
+    /**
+     * Argument may be null.
+     */
 
     template <typename T>
     int

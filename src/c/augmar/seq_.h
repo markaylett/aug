@@ -2,8 +2,9 @@
    See the file COPYING for copying permission.
 */
 /**
-   \file seq.h
-   TODO
+ * @file seq.h
+ *
+ * TODO
  */
 
 #ifndef AUGMAR_SEQ_H_

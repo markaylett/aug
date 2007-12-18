@@ -106,10 +106,10 @@ namespace aug {
         append(const void* buf, size_t size);
 
         /**
-           write, at least some, of the buffered data.
-
-           \return bytes written.
-        */
+         * write, at least some, of the buffered data.
+         *
+         * @return Bytes written.
+         */
 
         size_t
         writesome(fdref ref);
@@ -121,11 +121,11 @@ namespace aug {
         }
 
         /**
-           Bytes to be written.
-
-           This value may be inaccurate if the appended var buffers are
-           allowed to mutate - they should not.
-        */
+         * Bytes to be written.
+         *
+         * This value may be inaccurate if the appended var buffers are
+         * allowed to mutate - they should not.
+         */
 
         size_t
         size() const

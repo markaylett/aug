@@ -2,8 +2,9 @@
    See the file COPYING for copying permission.
 */
 /**
-   \file config.h
-   Definitions of the storage class macros.
+ * @file config.h
+ *
+ * Definitions of the storage class macros.
  */
 #ifndef AUGMAR_CONFIG_H
 #define AUGMAR_CONFIG_H
@@ -11,7 +12,7 @@
 #include "augconfig.h"
 
 /**
-   Integration of configuration information set by Autoconf.
+ * Integration of configuration information set by Autoconf.
  */
 
 #if defined(DLL_EXPORT) || defined(_WINDLL)
@@ -19,7 +20,7 @@
 #endif /* DLL_EXPORT || _WINDLL */
 
 /**
-   The API storage class definition.
+ * The API storage class definition.
  */
 
 #if !defined(AUGMAR_SHARED)

@@ -17,18 +17,18 @@ AUGNET_API int
 aug_destroyconnector(aug_connector_t ctor);
 
 /**
-   Attempt to establish connection without blocking.
-
-   If a connection was established, then "est" flag will be set and a blocking
-   socket returned.  Use aug_setnonblock() to change to non-blocking socket.
-
-   Otherwise, the returned descriptor should be polled before retrying
-   aug_tryconnect().
-
-   The descriptor returned between calls to aug_tryconnect() may change; this
-   occurs as the implementation cycles through the addresses associated with
-   the host.
-*/
+ * Attempt to establish connection without blocking.
+ *
+ * If a connection was established, then "est" flag will be set and a blocking
+ * socket returned.  Use aug_setnonblock() to change to non-blocking socket.
+ *
+ * Otherwise, the returned descriptor should be polled before retrying
+ * aug_tryconnect().
+ *
+ * The descriptor returned between calls to aug_tryconnect() may change; this
+ * occurs as the implementation cycles through the addresses associated with
+ * the host.
+ */
 
 AUGNET_API int
 aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est);

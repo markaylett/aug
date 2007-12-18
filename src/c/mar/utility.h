@@ -2,8 +2,9 @@
    See the file COPYING for copying permission.
 */
 /**
-   \file utility.h
-   TODO
+ * @file utility.h
+ *
+ * TODO
  */
 
 #ifndef MAR_UTILITY_H

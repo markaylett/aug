@@ -2,8 +2,9 @@
    See the file COPYING for copying permission.
 */
 /**
-   \file mar.hpp
-   TODO
+ * @file mar.hpp
+ *
+ * TODO
  */
 
 #ifndef AUGMARPP_MAR_HPP

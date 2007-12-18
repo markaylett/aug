@@ -22,9 +22,9 @@ namespace aug {
         do_sendv(blobref ref, const timeval& now) = 0;
 
         /**
-           Notify of newly accepted connection.
-
-           \return Whether the new connection should be kept.
+         * Notify of newly accepted connection.
+         *
+         * @return Whether the new connection should be kept.
          */
 
         virtual bool
@@ -34,10 +34,10 @@ namespace aug {
         do_connected(const aug_endpoint& ep, const timeval& now) = 0;
 
         /**
-           Process events.
-
-           \return Whether the connection state changed as a result of
-           processing.
+         * Process events.
+         *
+         * @return Whether the connection state changed as a result of
+         * processing.
          */
 
         virtual bool
@@ -47,7 +47,7 @@ namespace aug {
         do_shutdown(unsigned flags, const timeval& now) = 0;
 
         /**
-           Initiate application-level teardown.
+         * Initiate application-level teardown.
          */
 
         virtual void
@@ -129,8 +129,8 @@ namespace aug {
         bool close_;
 
         /**
-           Waiting for writability since.
-        */
+         * Waiting for writability since.
+         */
 
         timeval since_;
 

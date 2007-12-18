@@ -11,6 +11,14 @@
 
 namespace aug {
 
+    /**
+     * Get size of file in bytes.
+     *
+     * @param ref File descriptor.
+     *
+     * @return Size in bytes.
+     */
+
     inline size_t
     filesize(fdref ref)
     {
@@ -20,8 +28,15 @@ namespace aug {
     }
 
     /**
-       perrinfo() can be safely called from destructors and catch blocks.
-    */
+     * Print last error.
+     *
+     * Akin to perror().  Can be safely called from destructors and catch
+     * blocks.
+     *
+     * @param s String to be prepended.
+     *
+     * @return -1 on error.
+     */
 
     inline int
     perrinfo(const char* s) AUG_NOTHROW
@@ -29,11 +44,27 @@ namespace aug {
         return aug_perrinfo(0, s);
     }
 
+    /**
+     * Print last error.
+     *
+     * @param errinfo User supplied error info.
+     *
+     * @param s String to be prepended.
+     *
+     * @return -1 on error.
+     */
+
     inline int
     perrinfo(const aug_errinfo& errinfo, const char* s) AUG_NOTHROW
     {
         return aug_perrinfo(&errinfo, s);
     }
+
+    /**
+     * Get random number.
+     *
+     * @return Next random number.
+     */
 
     inline long
     rand(void)
@@ -41,11 +72,25 @@ namespace aug {
         return aug_rand();
     }
 
+    /**
+     * Seed random number generator.
+     *
+     * @param seed Seed to use.
+     */
+
     inline void
     srand(unsigned seed)
     {
         aug_srand(seed);
     }
+
+    /**
+     * Set file non-blocking on or off.
+     *
+     * @param ref File descriptor.
+     *
+     * @param on On or off.
+     */
 
     inline void
     setnonblock(fdref ref, bool on)

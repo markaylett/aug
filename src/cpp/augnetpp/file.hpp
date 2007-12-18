@@ -31,8 +31,8 @@ namespace aug {
         } AUG_SETERRINFOCATCH;
 
         /**
-           Do not remove the file unless explicitly asked to.
-        */
+         * Do not remove the file unless explicitly asked to.
+         */
 
         return 1;
     }

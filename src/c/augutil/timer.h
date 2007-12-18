@@ -20,80 +20,92 @@ AUGUTIL_API int
 aug_destroytimers(struct aug_timers* timers);
 
 /**
-   Create new timer.
-
-   If id <= 0, a new id will be allocated.  Alternatively, a previously
-   allocated timer id can be specified.  In which case, any timer with a
-   matching id will be cancelled prior to setting the new timer.
-
-   If aug_settimer() succeeds, aug_incref() will be called on "ob".
-
-   \param timers TODO
-   \param id TODO
-   \param ms TODO
-   \param cb TODO
-   \param obj TODO
-   \return the timer id.
-*/
+ * Create new timer.
+ *
+ * If id <= 0, a new id will be allocated.  Alternatively, a previously
+ * allocated timer id can be specified.  In which case, any timer with a
+ * matching id will be cancelled prior to setting the new timer.
+ *
+ * If aug_settimer() succeeds, aug_incref() will be called on "ob".
+ *
+ * @param timers TODO
+ *
+ * @param id TODO
+ *
+ * @param ms TODO
+ *
+ * @param cb TODO
+ *
+ * @param obj TODO
+ *
+ * @return The timer id.
+ */
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
              aug_timercb_t cb, aug_object* ob);
 
 /**
-   On failure, the timer will be removed.
-
-   \param timers The timer list.
-   \param id Timer identifier.
-   \param ms If zero, the previous timeout value will be used.
-
-   \return #AUG_RETNONE if the timer does not exist.
-*/
+ * On failure, the timer will be removed.
+ *
+ * @param timers The timer list.
+ *
+ * @param id Timer identifier.
+ *
+ * @param ms If zero, the previous timeout value will be used.
+ *
+ * @return #AUG_RETNONE if the timer does not exist.
+ */
 
 AUGUTIL_API int
 aug_resettimer(struct aug_timers* timers, int id, unsigned ms);
 
 /**
-   Cancel timer.
-
-   \param timers The timer list.
-   \param id Timer identifier.
-   \return #AUG_RETNONE if the timer does not exist.
-*/
+ * Cancel timer.
+ *
+ * @param timers The timer list.
+ *
+ * @param id Timer identifier.
+ *
+ * @return #AUG_RETNONE if the timer does not exist.
+ */
 
 AUGUTIL_API int
 aug_canceltimer(struct aug_timers* timers, int id);
 
 /**
-   Check whether timer has expired.
-
-   \param timers The timer list.
-   \param id Timer identifier.
-   \return Boolean.
-*/
+ * Check whether timer has expired.
+ *
+ * @param timers The timer list.
+ *
+ * @param id Timer identifier.
+ *
+ * @return Boolean.
+ */
 
 AUGUTIL_API int
 aug_expired(struct aug_timers* timers, int id);
 
 /**
-   Iterate through expired timers.
-
-   The force flag forces, at least, the first timer to expire.  This can be
-   useful when used in conjunction with a call to aug_waitfdevents().  Each
-   expired timer will be removed from the list of timers prior to calling the
-   callback function.  If the callback function returns with a number of
-   milli-seconds greater than zero, the timer will be re-scheduled with the
-   same id.
-
-   \param timers The timer list.
-   \param id Timer identifier.
-
-   \param force Boolean indicated whether first timer should be forced to
-   expire.
-
-   \param next Optional output parameter.  If specified will be populated with
-   next expiry time.
-*/
+ * Iterate through expired timers.
+ *
+ * The force flag forces, at least, the first timer to expire.  This can be
+ * useful when used in conjunction with a call to aug_waitfdevents().  Each
+ * expired timer will be removed from the list of timers prior to calling the
+ * callback function.  If the callback function returns with a number of
+ * milli-seconds greater than zero, the timer will be re-scheduled with the
+ * same id.
+ *
+ * @param timers The timer list.
+ *
+ * @param id Timer identifier.
+ *
+ * @param force Boolean indicated whether first timer should be forced to
+ * expire.
+ *
+ * @param next Optional output parameter.  If specified will be populated with
+ * next expiry time.
+ */
 
 AUGUTIL_API int
 aug_foreachexpired(struct aug_timers* timers, int force,

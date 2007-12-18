@@ -7,10 +7,10 @@
 #include "augsrv/config.h"
 
 /**
-   Called from aug_main().
-
-   \return on Windows, #AUG_RETNONE if the service has not been installed.
-*/
+ * Called from aug_main().
+ *
+ * @return On Windows, #AUG_RETNONE if the service has not been installed.
+ */
 
 AUGSRV_API int
 aug_daemonise(void);

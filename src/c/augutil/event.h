@@ -15,8 +15,8 @@
 #define AUG_EVENTWAKEUP 5
 
 /**
-   Base value for user-defined events.
-*/
+ * Base value for user-defined events.
+ */
 
 #define AUG_EVENTUSER   32
 
@@ -26,11 +26,11 @@ struct aug_event {
 };
 
 /**
-   This function simplifies the mapping of signals to events.  Some signals
-   have cannonical mappings to specific events types.  For example, #SIGHUP
-   maps to the #AUG_EVENTRECONF event type.  Others may get mapped to the more
-   general #AUG_EVENTSIGNAL type.
-*/
+ * This function simplifies the mapping of signals to events.  Some signals
+ * have cannonical mappings to specific events types.  For example, #SIGHUP
+ * maps to the #AUG_EVENTRECONF event type.  Others may get mapped to the more
+ * general #AUG_EVENTSIGNAL type.
+ */
 
 AUGUTIL_API struct aug_event*
 aug_setsigevent(struct aug_event* event, int sig);

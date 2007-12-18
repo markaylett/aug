@@ -2,8 +2,9 @@
    See the file COPYING for copying permission.
 */
 /**
-   \file mfile.h
-   TODO
+ * @file mfile.h
+ *
+ * TODO
  */
 
 #ifndef AUGMAR_MFILE_H_

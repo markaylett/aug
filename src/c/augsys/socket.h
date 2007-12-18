@@ -68,10 +68,10 @@ AUGSYS_API int
 aug_bind(int s, const struct aug_endpoint* ep);
 
 /**
-   Remember that, for non-blocking sockets, connect() may fail with
-   #EINPROGRESS.  Use poll() or select() on write-status to determine
-   completion.
-*/
+ * Remember that, for non-blocking sockets, connect() may fail with
+ * #EINPROGRESS.  Use poll() or select() on write-status to determine
+ * completion.
+ */
 
 AUGSYS_API int
 aug_connect(int s, const struct aug_endpoint* ep);
@@ -108,11 +108,11 @@ aug_setsockopt(int s, int level, int optname, const void* optval,
                socklen_t optlen);
 
 /**
-   Shutdown the socket.
-
-   Use #SHUT_WR to gracefully shutdown TCP sockets: a FIN will be sent after
-   all data is sent and acknowledged by the receiver.
-*/
+ * Shutdown the socket.
+ *
+ * Use #SHUT_WR to gracefully shutdown TCP sockets: a FIN will be sent after
+ * all data is sent and acknowledged by the receiver.
+ */
 
 AUGSYS_API int
 aug_shutdown(int s, int how);
@@ -152,11 +152,11 @@ AUGSYS_API const struct aug_inetaddr*
 aug_inetloopback(int af);
 
 /**
-   After a failed call to aug_accept(), this function can be used to determine
-   whether the error was a result of the peer closing the connection prior to
-   aug_accept() being called.  This can occur when the passive socket is
-   non-blocking.
-*/
+ * After a failed call to aug_accept(), this function can be used to determine
+ * whether the error was a result of the peer closing the connection prior to
+ * aug_accept() being called.  This can occur when the passive socket is
+ * non-blocking.
+ */
 
 AUGSYS_API int
 aug_acceptlost(void);

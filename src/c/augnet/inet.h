@@ -9,9 +9,9 @@
 #include "augsys/socket.h"
 
 /**
-   AUG_MAXSOCKADDR should be large enough to accomodate hostnames: on Linux,
-   MAXHOSTNAMELEN is defined as 64.
-*/
+ * AUG_MAXSOCKADDR should be large enough to accomodate hostnames: on Linux,
+ * MAXHOSTNAMELEN is defined as 64.
+ */
 
 struct aug_hostserv {
     char* host_, * serv_;
@@ -19,11 +19,11 @@ struct aug_hostserv {
 };
 
 /**
-   Implementations of the original, classic functions by Richard Stevens.
-
-   \todo introduce timeout for aug_tcpconnect() by implementing in terms of
-   aug_tryconnect().
-*/
+ * Implementations of the original, classic functions by Richard Stevens.
+ *
+ * @todo introduce timeout for aug_tcpconnect() by implementing in terms of
+ * aug_tryconnect().
+ */
 
 AUGNET_API int
 aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep);

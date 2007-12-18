@@ -21,9 +21,9 @@ struct aug_httphandler {
 typedef struct aug_httpparser_* aug_httpparser_t;
 
 /**
-   If aug_createhttpparser() succeeds, aug_decref() will be called from
-   aug_destroyhttpparser().
-*/
+ * If aug_createhttpparser() succeeds, aug_decref() will be called from
+ * aug_destroyhttpparser().
+ */
 
 AUGNET_API aug_httpparser_t
 aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,

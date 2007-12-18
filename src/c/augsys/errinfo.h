@@ -16,15 +16,15 @@
 #define AUG_SRCSSL   5
 
 /**
-   Base value for user-defined exception sources.
-*/
+ * Base value for user-defined exception sources.
+ */
 
 #define AUG_SRCUSER  32
 
 /**
-   Common exception code for the #AUG_SRCLOCAL domain.  These codes may also
-   be used as return codes for communicating exception conditions.
-*/
+ * Common exception code for the #AUG_SRCLOCAL domain.  These codes may also
+ * be used as return codes for communicating exception conditions.
+ */
 
 #define AUG_NOERROR  0
 #define AUG_ESYSTEM  1
@@ -53,16 +53,16 @@ struct aug_errinfo {
 };
 
 /**
-   Due to the boostrapping process implemented by aug_init(), the errinfo
-   facility is not used by the following modules:
-
-   aug_lock
-   aug_string
-   aug_tls_
-   aug_log
-
-   All functions in this module set errno, and not errinfo.
-*/
+ * Due to the boostrapping process implemented by aug_init(), the errinfo
+ * facility is not used by the following modules:
+ *
+ * aug_lock
+ * aug_string
+ * aug_tls_
+ * aug_log
+ *
+ * All functions in this module set errno, and not errinfo.
+ */
 
 #if defined(AUGSYS_BUILD)
 AUG_EXTERNC struct aug_errinfo*
@@ -73,8 +73,8 @@ aug_termerrinfo_(void);
 #endif /* AUGSYS_BUILD */
 
 /**
-   Initialise errinfo for secondary thread.
-*/
+ * Initialise errinfo for secondary thread.
+ */
 
 AUGSYS_API struct aug_errinfo*
 aug_initerrinfo(struct aug_errinfo* errinfo);

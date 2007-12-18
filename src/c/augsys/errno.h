@@ -69,17 +69,17 @@ aug_setwin32errno(unsigned long win32);
 #endif /* _WIN32 */
 
 /**
-   This function may be necessary in the, undesirable, situation where a
-   client is using different versions of the c-runtime.
-*/
+ * This function may be necessary in the, undesirable, situation where a
+ * client is using different versions of the c-runtime.
+ */
 
 AUGSYS_API void
 aug_seterrno(int err);
 
 /**
-   Where possible, system specific errors, such as win32 errors, will be
-   mapped onto the standard errno value.  aug_errno() should therefore be used
-   when testing for posix error codes.
+ * Where possible, system specific errors, such as win32 errors, will be
+ * mapped onto the standard errno value.  aug_errno() should therefore be used
+ * when testing for posix error codes.
  */
 
 AUGSYS_API int

@@ -22,14 +22,14 @@ AUGNET_API int
 aug_appendwriter(aug_writer_t writer, aug_blob* blob);
 
 /**
-   Empty if there are no more blobs to write.
+ * Empty if there are no more blobs to write.
  */
 
 AUGNET_API int
 aug_writerempty(aug_writer_t writer);
 
 /**
-   Dynamically calculate total size in bytes.
+ * Dynamically calculate total size in bytes.
  */
 
 AUGNET_API ssize_t

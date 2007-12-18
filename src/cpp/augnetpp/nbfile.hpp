@@ -31,8 +31,8 @@ namespace aug {
         } AUG_SETERRINFOCATCH;
 
         /**
-           Do not remove the file unless explicitly asked to.
-        */
+         * Do not remove the file unless explicitly asked to.
+         */
 
         return 1;
     }
@@ -141,8 +141,8 @@ namespace aug {
     }
 
     /**
-       Returns #AUG_RETINTR if the system call was interrupted.
-    */
+     * Returns #AUG_RETINTR if the system call was interrupted.
+     */
 
     inline int
     waitnbevents(aug_nbfiles_t nbfiles, const timeval& timeout)

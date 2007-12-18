@@ -18,8 +18,8 @@ AUGUTIL_API int
 aug_resetclock(aug_clock_t clck);
 
 /**
-   Elapsed time in seconds.
-*/
+ * Elapsed time in seconds.
+ */
 
 AUGUTIL_API double*
 aug_elapsed(aug_clock_t clck, double* sec);

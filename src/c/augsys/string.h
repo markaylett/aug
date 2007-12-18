@@ -9,8 +9,8 @@
 #include <string.h>
 
 /**
-   All functions in this module set errno, and not errinfo.
-*/
+ * All functions in this module set errno, and not errinfo.
+ */
 
 AUGSYS_API const char*
 aug_strerror(int errnum);

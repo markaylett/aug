@@ -9,8 +9,8 @@
 #include <stdarg.h>
 
 /**
-   All functions in this module set errno, and not errinfo.
-*/
+ * All functions in this module set errno, and not errinfo.
+ */
 
 enum aug_loglevel {
     AUG_LOGCRIT,
@@ -37,38 +37,38 @@ AUGSYS_API int
 aug_stdiologger(int loglevel, const char* format, va_list args);
 
 /**
-   Set log-level.
-
-   The default log-level is #AUG_LOGINFO.  The "AUG_LOGLEVEL" environment
-   variable can be used to override this default.
-
-   \return previous log-level.
-
-   \sa aug_loglevel()
-*/
+ * Set log-level.
+ *
+ * The default log-level is #AUG_LOGINFO.  The "AUG_LOGLEVEL" environment
+ * variable can be used to override this default.
+ *
+ * @return Previous log-level.
+ *
+ * @sa aug_loglevel()
+ */
 
 AUGSYS_API int
 aug_setloglevel(int loglevel);
 
 /**
-   If the logger argument is NULL, the default logger is re-installed.
-
-   \return previous logger.
-*/
+ * If the logger argument is NULL, the default logger is re-installed.
+ *
+ * @return Previous logger.
+ */
 
 AUGSYS_API aug_logger_t
 aug_setlogger(aug_logger_t logger);
 
 /**
-   Get log-level.
+ * Get log-level.
  */
 
 AUGSYS_API int
 aug_loglevel(void);
 
 /**
-   Get logger.
-*/
+ * Get logger.
+ */
 
 AUGSYS_API aug_logger_t
 aug_logger(void);
@@ -80,9 +80,9 @@ AUGSYS_API int
 aug_writelog(int loglevel, const char* format, ...);
 
 /**
-   The following functions are essentially convenience wrappers around
-   aug_vwritelog().
-*/
+ * The following functions are essentially convenience wrappers around
+ * aug_vwritelog().
+ */
 
 AUGSYS_API int
 aug_crit(const char* format, ...);
@@ -100,15 +100,15 @@ AUGSYS_API int
 aug_info(const char* format, ...);
 
 /**
-   Guidelines for debug-level use:
-
-   aug_debug0() - user applications;
-   aug_debug1() - user applications;
-   aug_debug2() - aug applications (such as daug and mar);
-   aug_debug3() - aug libraries.
-
-   Note: further levels can be used by calling aug_writelog() directly.
-*/
+ * Guidelines for debug-level use:
+ *
+ * aug_debug0() - user applications;
+ * aug_debug1() - user applications;
+ * aug_debug2() - aug applications (such as daug and mar);
+ * aug_debug3() - aug libraries.
+ *
+ * Note: further levels can be used by calling aug_writelog() directly.
+ */
 
 AUGSYS_API int
 aug_debug0(const char* format, ...);

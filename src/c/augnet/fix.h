@@ -29,9 +29,9 @@ typedef void (*aug_fixcb_t)(aug_object*, const char*, size_t);
 typedef struct aug_fixstream_* aug_fixstream_t;
 
 /**
-   If aug_createfixstream() succeeds, aug_decref() will be called from
-   aug_destroyfixstream().
-*/
+ * If aug_createfixstream() succeeds, aug_decref() will be called from
+ * aug_destroyfixstream().
+ */
 
 AUGNET_API aug_fixstream_t
 aug_createfixstream(size_t size, aug_fixcb_t cb, aug_object* ob);

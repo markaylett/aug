@@ -26,13 +26,13 @@ AUGSYS_API int
 aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask);
 
 /**
-   \return either positive if events have been signalled, zero on timeout, or
-   a negative value on error.
-
-   If #SA_RESTART has been set for an interrupting signal, it is
-   implementation dependant whether select()/poll() restart or return with
-   #EINTR set.
-*/
+ * @return Either positive if events have been signalled, zero on timeout, or
+ * a negative value on error.
+ *
+ * If #SA_RESTART has been set for an interrupting signal, it is
+ * implementation dependant whether select()/poll() restart or return with
+ * #EINTR set.
+ */
 
 AUGSYS_API int
 aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout);
@@ -44,12 +44,11 @@ AUGSYS_API int
 aug_fdevents(aug_muxer_t muxer, int fd);
 
 /**
-   Creates a pipe or socket-pair suitable for use with muxer.  On Windows,
-   only socket descriptors can be used with select(), therefore,
-   aug_muxerpipe() will return a socket-pair.
-
-   \sa aug_socketpair().
-
+ * Creates a pipe or socket-pair suitable for use with muxer.  On Windows,
+ * only socket descriptors can be used with select(), therefore,
+ * aug_muxerpipe() will return a socket-pair.
+ *
+ * @sa aug_socketpair().
  */
 
 AUGSYS_API int

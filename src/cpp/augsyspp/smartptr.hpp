@@ -9,9 +9,9 @@
 #include <algorithm> // swap()
 
 /**
-   A simple shared pointer implementation.  Where available, boost's
-   shared_ptr<> should be preferred.
-*/
+ * A simple shared pointer implementation.  Where available, boost's
+ * shared_ptr<> should be preferred.
+ */
 
 namespace aug {
 
@@ -57,8 +57,8 @@ namespace aug {
             }
 
             /**
-               Release lock before deleting: ~T() may use aug_lock().
-            */
+             * Release lock before deleting: ~T() may use aug_lock().
+             */
 
             delete ptr;
             delete refs;

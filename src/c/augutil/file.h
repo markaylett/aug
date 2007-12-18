@@ -9,11 +9,13 @@
 typedef int (*aug_confcb_t)(void*, const char*, const char*);
 
 /**
-   Read configuration file.
-
-   \param path Path to configuration file.
-   \param cb Callback function called for each name/value pair.
-   \param arg User specfied argument.
+ * Read configuration file.
+ *
+ * @param path Path to configuration file.
+ *
+ * @param cb Callback function called for each name/value pair.
+ *
+ * @param arg User specfied argument.
  */
 
 AUGUTIL_API int

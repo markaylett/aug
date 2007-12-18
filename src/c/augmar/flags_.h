@@ -2,8 +2,9 @@
    See the file COPYING for copying permission.
 */
 /**
-   \file flags.h
-   TODO
+ * @file flags.h
+ *
+ * TODO
  */
 
 #ifndef AUGMAR_FLAGS_H_

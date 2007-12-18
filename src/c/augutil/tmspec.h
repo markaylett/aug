@@ -13,16 +13,16 @@ struct aug_tmspec {
 };
 
 /**
-   Populate structure from specification.
-
-   Specifications can contain the following time components:
-
-   - m - month
-   - d - day of month
-   - H - hour of day
-   - M - minute of hour
-
-   So that, for example, "17H0M" would mean "daily, at 5 o'clock".
+ * Populate structure from specification.
+ *
+ * Specifications can contain the following time components:
+ *
+ * - m - month
+ * - d - day of month
+ * - H - hour of day
+ * - M - minute of hour
+ *
+ * So that, for example, "17H0M" would mean "daily, at 5 o'clock".
  */
 
 AUGUTIL_API struct aug_tmspec*

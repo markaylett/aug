@@ -19,9 +19,9 @@ AUGUTIL_API int
 aug_formatlog(char* buf, size_t* n, int loglevel, const char* format, ...);
 
 /**
-   Logger function intended for use with aug_setlogger().
-
-   Each log line consists of time, label, thread-id and message.
+ * Logger function intended for use with aug_setlogger().
+ *
+ * Each log line consists of time, label, thread-id and message.
  */
 
 AUGUTIL_API int
