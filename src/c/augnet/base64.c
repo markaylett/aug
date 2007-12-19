@@ -531,7 +531,7 @@ aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aug_object* ob)
 
     base64->cb_ = cb;
     if ((base64->ob_ = ob))
-        aug_incref(ob);
+        aug_retain(ob);
 
     base64->saved_ = 0;
     base64->pos_ = 0;
@@ -555,7 +555,7 @@ AUGNET_API int
 aug_destroybase64(aug_base64_t base64)
 {
     if (base64->ob_)
-        aug_decref(base64->ob_);
+        aug_release(base64->ob_);
     free(base64);
     return 0;
 }

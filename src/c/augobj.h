@@ -28,9 +28,16 @@
 #endif /* !AUG_MKSTR */
 
 /**
- * @defgroup ObjectMacros Object Macros
+ * @defgroup Object Object
+ */
+
+/**
+ * @defgroup ObjectMacros Macros
+ *
+ * @ingroup Object
  *
  * Macros to simplify object declarations in c.
+ *
  * @{
  */
 
@@ -50,17 +57,18 @@
 
 #define AUG_OBJECT(type)                        \
     void* (*cast_)(type*, const char*);         \
-    int (*incref_)(type*);                      \
-    int (*decref_)(type*)
+    int (*retain_)(type*);                      \
+    int (*release_)(type*)
+
+/** @} */
 
 /**
- * @}
- */
-
-/**
- * @defgroup ObjectDefinition Object Definition
+ * @defgroup ObjectDefinition Definition
  *
- * Base Object definition.
+ * @ingroup Object
+ *
+ * All objects implement this base interface.
+ *
  * @{
  */
 
@@ -72,14 +80,12 @@ struct aug_objectvtbl {
 #define aug_cast(ob, type)                                     \
     ((aug_object*)ob)->vtbl_->cast_((aug_object*)ob, type)
 
-#define aug_incref(ob)                                     \
-    ((aug_object*)ob)->vtbl_->incref_((aug_object*)ob)
+#define aug_retain(ob)                                     \
+    ((aug_object*)ob)->vtbl_->retain_((aug_object*)ob)
 
-#define aug_decref(ob)                                     \
-    ((aug_object*)ob)->vtbl_->decref_((aug_object*)ob)
+#define aug_release(ob)                                     \
+    ((aug_object*)ob)->vtbl_->release_((aug_object*)ob)
 
-/**
- * @}
- */
+/** @} */
 
 #endif /* AUGOBJ_H */

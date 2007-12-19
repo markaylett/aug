@@ -86,7 +86,7 @@ post_(PyObject* self, PyObject* args)
 
     ret = maud_post(to, type, (aug_object*)blob);
     if (blob)
-        aug_decref(blob);
+        aug_release(blob);
 
     if (-1 == ret) {
 
@@ -127,7 +127,7 @@ dispatch_(PyObject* self, PyObject* args)
 
     ret = maud_dispatch(to, type, (aug_object*)blob);
     if (blob)
-        aug_decref(blob);
+        aug_release(blob);
 
     if (-1 == ret) {
 
@@ -256,7 +256,7 @@ send_(PyObject* self, PyObject* args)
     /* maud_sendv() takes ownership. */
 
     ret = maud_sendv(augpy_getid(sock), blob);
-    aug_decref(blob);
+    aug_release(blob);
 
     if (-1 == ret) {
         PyErr_SetString(PyExc_RuntimeError, maud_error());
@@ -349,7 +349,7 @@ settimer_(PyObject* self, PyObject* args)
     /* maud_settimer() takes ownership. */
 
     tid = maud_settimer(ms, (aug_object*)blob);
-    aug_decref(blob);
+    aug_release(blob);
 
     if (-1 == tid) {
         PyErr_SetString(PyExc_RuntimeError, maud_error());
@@ -358,7 +358,7 @@ settimer_(PyObject* self, PyObject* args)
     }
 
     augpy_setid(timer, tid);
-    return timer; /* Ref already held; no need to incref_(). */
+    return timer; /* Ref already held; no need to retain_(). */
 }
 
 static PyObject*

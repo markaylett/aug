@@ -19,17 +19,17 @@ castblob_(aug_blob* ob, const char* id)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
-        aug_incref(&impl->blob_);
+        aug_retain(&impl->blob_);
         return &impl->blob_;
     } else if (AUG_EQUALID(id, augrb_blobid)) {
-        aug_incref(&impl->rbblob_);
+        aug_retain(&impl->rbblob_);
         return &impl->rbblob_;
     }
     return NULL;
 }
 
 static int
-increfblob_(aug_blob* ob)
+retainblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
@@ -37,7 +37,7 @@ increfblob_(aug_blob* ob)
 }
 
 static int
-decrefblob_(aug_blob* ob)
+releaseblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (0 == --impl->refs_) {
@@ -66,8 +66,8 @@ blobsize_(aug_blob* ob)
 
 static const struct aug_blobvtbl blobvtbl_ = {
     castblob_,
-    increfblob_,
-    decrefblob_,
+    retainblob_,
+    releaseblob_,
     blobdata_,
     blobsize_
 };
@@ -77,17 +77,17 @@ castrbblob_(augrb_blob* ob, const char* id)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augrb_blobid)) {
-        aug_incref(&impl->rbblob_);
+        aug_retain(&impl->rbblob_);
         return &impl->rbblob_;
     } else if (AUG_EQUALID(id, aug_blobid)) {
-        aug_incref(&impl->blob_);
+        aug_retain(&impl->blob_);
         return &impl->blob_;
     }
     return NULL;
 }
 
 static int
-increfrbblob_(augrb_blob* ob)
+retainrbblob_(augrb_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
     ++impl->refs_;
@@ -95,7 +95,7 @@ increfrbblob_(augrb_blob* ob)
 }
 
 static int
-decrefrbblob_(augrb_blob* ob)
+releaserbblob_(augrb_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
     if (0 == --impl->refs_) {
@@ -115,8 +115,8 @@ getrbblob_(augrb_blob* ob)
 
 static const struct augrb_blobvtbl rbblobvtbl_ = {
     castrbblob_,
-    increfrbblob_,
-    decrefrbblob_,
+    retainrbblob_,
+    releaserbblob_,
     getrbblob_
 };
 
@@ -153,7 +153,7 @@ augrb_getblob(aug_object* ob)
         augrb_blob* blob = aug_cast(ob, augrb_blobid);
         if (blob) {
             rbob = blob->vtbl_->get_(blob);
-            aug_decref(blob);
+            aug_release(blob);
         }
     }
     return rbob;

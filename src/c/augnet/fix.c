@@ -183,7 +183,7 @@ aug_createfixstream(size_t size, aug_fixcb_t cb, aug_object* ob)
 
     stream->cb_ = cb;
     if ((stream->ob_ = ob))
-        aug_incref(ob);
+        aug_retain(ob);
     stream->xstr_ = xstr;
     stream->mlen_ = 0;
     return stream;
@@ -194,7 +194,7 @@ aug_destroyfixstream(aug_fixstream_t stream)
 {
     int ret = aug_destroyxstr(stream->xstr_);
     if (stream->ob_)
-        aug_decref(stream->ob_);
+        aug_release(stream->ob_);
     free(stream);
     return ret;
 }

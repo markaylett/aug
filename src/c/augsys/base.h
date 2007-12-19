@@ -10,6 +10,10 @@
 struct iovec;
 struct aug_errinfo;
 
+/**
+ * File type structure.
+ */
+
 struct aug_fdtype {
     int (*close_)(int);
     ssize_t (*read_)(int, void*, size_t);
@@ -27,7 +31,11 @@ struct aug_fdtype {
  * (primary) thread of the process.  They maintain an internal reference count
  * that allows them to be called multiple times.  All but the first call to
  * aug_init() simply updates the reference count.  These semantics have been
- * formalised to facilitate initialisation from functions such as DllMain.
+ * formalised to facilitate initialisation from functions such as DllMain().
+ *
+ * @param errinfo Thread-local error info object.
+ *
+ * @return Null on failure.
  */
 
 AUGSYS_API struct aug_errinfo*
@@ -64,7 +72,7 @@ aug_exit(int status);
 /**
  * Timezone offset.
  *
- * Seconds west of coordinated universal time.
+ * @return Seconds west of coordinated universal time.
  */
 
 AUGSYS_API long

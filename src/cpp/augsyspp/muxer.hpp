@@ -54,8 +54,8 @@ namespace aug {
     }
 
     /**
-       Returns #AUG_RETINTR if the system call was interrupted.
-    */
+     * Returns #AUG_RETINTR if the system call was interrupted.
+     */
 
     inline int
     waitfdevents(aug_muxer_t muxer, const timeval& timeout)

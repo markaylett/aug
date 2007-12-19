@@ -48,6 +48,7 @@ struct aug_field {
 
 /**
  * @defgroup OpenFlags Open Flags
+ *
  * @{
  */
 
@@ -85,12 +86,12 @@ struct aug_field {
  * Error if create and file exists.
  */
 #define AUG_EXCL   O_EXCL
-/**
- * @}
- */
+
+/** @} */
 
 /**
  * @defgroup SeekWhence Seek Whence
+ *
  * @{
  */
 
@@ -108,8 +109,7 @@ struct aug_field {
  * The offset is set to the size of the file plus offset bytes.
  */
 #define AUG_END 2
-/**
- * @}
- */
+
+/** @} */
 
 #endif /* AUGMAR_TYPES_H */

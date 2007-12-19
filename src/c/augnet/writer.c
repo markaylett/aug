@@ -55,7 +55,7 @@ createbuf_(aug_blob* blob)
     aug_unlock();
 
     buf->blob_ = blob;
-    aug_incref(blob);
+    aug_retain(blob);
     return buf;
 }
 
@@ -64,7 +64,7 @@ destroybufs_(struct aug_bufs* bufs)
 {
     struct aug_buf* it;
     AUG_FOREACH(it, bufs) {
-        aug_decref(it->blob_);
+        aug_release(it->blob_);
         it->blob_ = NULL;
     }
 
@@ -78,7 +78,7 @@ destroybufs_(struct aug_bufs* bufs)
 static void
 destroybuf_(struct aug_buf* buf)
 {
-    aug_decref(buf->blob_);
+    aug_release(buf->blob_);
     buf->blob_ = NULL;
 
     aug_lock();
@@ -126,7 +126,7 @@ aug_destroywriter(aug_writer_t writer)
 {
     struct aug_buf* it;
     AUG_FOREACH(it, &writer->bufs_) {
-        aug_decref(it->blob_);
+        aug_release(it->blob_);
         it->blob_ = NULL;
     }
 

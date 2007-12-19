@@ -330,10 +330,10 @@ event_(const char* from, const char* type, aug_object* ob)
                         y = PyObject_CallFunction(import->event_, "ssz#",
                                                   from, type,
                                                   (const char*)data, size);
-                        aug_decref(blob);
+                        aug_release(blob);
                         goto done;
                     }
-                    aug_decref(blob);
+                    aug_release(blob);
                 }
             }
         }

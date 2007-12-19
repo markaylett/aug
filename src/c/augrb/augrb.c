@@ -360,7 +360,7 @@ post_(int argc, VALUE* argv, VALUE self)
         blob = augrb_createblob(StringValue(user));
     ret = maud_post(RSTRING(to)->ptr, RSTRING(type)->ptr, (aug_object*)blob);
     if (blob)
-        aug_decref(blob);
+        aug_release(blob);
 
     if (-1 == ret)
         rb_raise(cerror_, maud_error());
@@ -385,7 +385,7 @@ dispatch_(int argc, VALUE* argv, VALUE self)
     ret = maud_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr,
                         (aug_object*)blob);
     if (blob)
-        aug_decref(blob);
+        aug_release(blob);
 
     if (-1 == ret)
         rb_raise(cerror_, maud_error());
@@ -491,7 +491,7 @@ send_(VALUE self, VALUE sock, VALUE buf)
 
     blob = augrb_createblob(StringValue(buf));
     ret = maud_sendv(cid, blob);
-    aug_decref(blob);
+    aug_release(blob);
 
     if (-1 == ret)
         rb_raise(cerror_, maud_error());
@@ -560,7 +560,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
     timer = newhandle_(INT2FIX(0), user);
     blob = augrb_createblob(timer);
     tid = maud_settimer(ui, (aug_object*)blob);
-    aug_decref(blob);
+    aug_release(blob);
 
     if (-1 == tid)
         rb_raise(cerror_, maud_error());
@@ -819,7 +819,7 @@ event_(const char* from, const char* type, aug_object* ob)
                     if (data)
                         x = rb_tainted_str_new(data, (long)size);
 
-                    aug_decref(blob);
+                    aug_release(blob);
                 }
             }
         }

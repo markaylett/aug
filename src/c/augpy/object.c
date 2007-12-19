@@ -21,17 +21,17 @@ castblob_(aug_blob* ob, const char* id)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
-        aug_incref(&impl->blob_);
+        aug_retain(&impl->blob_);
         return &impl->blob_;
     } else if (AUG_EQUALID(id, augpy_blobid)) {
-        aug_incref(&impl->pyblob_);
+        aug_retain(&impl->pyblob_);
         return &impl->pyblob_;
     }
     return NULL;
 }
 
 static int
-increfblob_(aug_blob* ob)
+retainblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
@@ -39,7 +39,7 @@ increfblob_(aug_blob* ob)
 }
 
 static int
-decrefblob_(aug_blob* ob)
+releaseblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (0 == --impl->refs_) {
@@ -77,8 +77,8 @@ blobsize_(aug_blob* ob)
 
 static const struct aug_blobvtbl blobvtbl_ = {
     castblob_,
-    increfblob_,
-    decrefblob_,
+    retainblob_,
+    releaseblob_,
     blobdata_,
     blobsize_
 };
@@ -88,17 +88,17 @@ castpyblob_(augpy_blob* ob, const char* id)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augpy_blobid)) {
-        aug_incref(&impl->pyblob_);
+        aug_retain(&impl->pyblob_);
         return &impl->pyblob_;
     } else if (AUG_EQUALID(id, aug_blobid)) {
-        aug_incref(&impl->blob_);
+        aug_retain(&impl->blob_);
         return &impl->blob_;
     }
     return NULL;
 }
 
 static int
-increfpyblob_(augpy_blob* ob)
+retainpyblob_(augpy_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
     ++impl->refs_;
@@ -106,7 +106,7 @@ increfpyblob_(augpy_blob* ob)
 }
 
 static int
-decrefpyblob_(augpy_blob* ob)
+releasepyblob_(augpy_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
     if (0 == --impl->refs_) {
@@ -126,8 +126,8 @@ getpyblob_(augpy_blob* ob)
 
 static const struct augpy_blobvtbl pyblobvtbl_ = {
     castpyblob_,
-    increfpyblob_,
-    decrefpyblob_,
+    retainpyblob_,
+    releasepyblob_,
     getpyblob_
 };
 
@@ -162,7 +162,7 @@ augpy_getblob(aug_object* ob)
         augpy_blob* blob = aug_cast(ob, augpy_blobid);
         if (blob) {
             pyob = blob->vtbl_->get_(blob);
-            aug_decref(blob);
+            aug_release(blob);
         }
     }
     return pyob;

@@ -54,13 +54,13 @@ namespace {
         cast_(const char* id) AUG_NOTHROW
         {
             if (equalid<aug_object>(id) || equalid<aug_eventob>(id))
-                return object_incref<aug_object>(eventob_);
+                return object_retain<aug_object>(eventob_);
             return null;
         }
         void
         seteventobuser_(objectref user) AUG_NOTHROW
         {
-            user_ = object_incref<aug_object>(user);
+            user_ = object_retain<aug_object>(user);
         }
         const char*
         eventobfrom_() AUG_NOTHROW
@@ -685,7 +685,7 @@ engine::settimer(const char* sname, unsigned ms, objectref ob)
     // Insert after settimer() has succeeded.
 
     detail::sessiontimer timer(impl_->sessions_.getbyname(sname),
-                               smartob<aug_object>::incref(ob));
+                               smartob<aug_object>::retain(ob));
     impl_->sessiontimers_.insert(make_pair(id, timer));
     return id;
 }

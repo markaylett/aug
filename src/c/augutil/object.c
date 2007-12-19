@@ -24,14 +24,14 @@ static void*
 castlongob_(aug_longob* ob, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_longobid)) {
-        aug_incref(ob);
+        aug_retain(ob);
         return ob;
     }
     return NULL;
 }
 
 static int
-increflongob_(aug_longob* ob)
+retainlongob_(aug_longob* ob)
 {
     struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
     ++impl->refs_;
@@ -39,7 +39,7 @@ increflongob_(aug_longob* ob)
 }
 
 static int
-decreflongob_(aug_longob* ob)
+releaselongob_(aug_longob* ob)
 {
     struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
     if (0 == --impl->refs_) {
@@ -59,8 +59,8 @@ getlongob_(aug_longob* ob)
 
 static const struct aug_longobvtbl longobvtbl_ = {
     castlongob_,
-    increflongob_,
-    decreflongob_,
+    retainlongob_,
+    releaselongob_,
     getlongob_
 };
 
@@ -75,14 +75,14 @@ static void*
 castaddrob_(aug_addrob* ob, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_addrobid)) {
-        aug_incref(ob);
+        aug_retain(ob);
         return ob;
     }
     return NULL;
 }
 
 static int
-increfaddrob_(aug_addrob* ob)
+retainaddrob_(aug_addrob* ob)
 {
     struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
     ++impl->refs_;
@@ -90,7 +90,7 @@ increfaddrob_(aug_addrob* ob)
 }
 
 static int
-decrefaddrob_(aug_addrob* ob)
+releaseaddrob_(aug_addrob* ob)
 {
     struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
     if (0 == --impl->refs_) {
@@ -110,8 +110,8 @@ getaddrob_(aug_addrob* ob)
 
 static const struct aug_addrobvtbl addrobvtbl_ = {
     castaddrob_,
-    increfaddrob_,
-    decrefaddrob_,
+    retainaddrob_,
+    releaseaddrob_,
     getaddrob_
 };
 
@@ -127,14 +127,14 @@ static void*
 castblob_(aug_blob* ob, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
-        aug_incref(ob);
+        aug_retain(ob);
         return ob;
     }
     return NULL;
 }
 
 static int
-increfblob_(aug_blob* ob)
+retainblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
@@ -142,7 +142,7 @@ increfblob_(aug_blob* ob)
 }
 
 static int
-decrefblob_(aug_blob* ob)
+releaseblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (0 == --impl->refs_)
@@ -168,8 +168,8 @@ blobsize_(aug_blob* ob)
 
 static const struct aug_blobvtbl blobvtbl_ = {
     castblob_,
-    increfblob_,
-    decrefblob_,
+    retainblob_,
+    releaseblob_,
     blobdata_,
     blobsize_
 };
@@ -199,7 +199,7 @@ aug_obtolong(aug_object* ob)
     aug_longob* tmp;
     if (ob && (tmp = aug_cast(ob, aug_longobid))) {
         l = aug_getlongob(tmp);
-        aug_decref(tmp);
+        aug_release(tmp);
     } else
         l = 0;
     return l;
@@ -230,7 +230,7 @@ aug_obtoaddr(aug_object* ob)
     aug_addrob* tmp;
     if (ob && (tmp = aug_cast(ob, aug_addrobid))) {
         p = aug_getaddrob(tmp);
-        aug_decref(tmp);
+        aug_release(tmp);
     } else
         p = NULL;
     return p;

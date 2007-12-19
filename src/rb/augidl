@@ -417,14 +417,14 @@ END
             return aug::incget(static_cast<T*>(this_->impl_)->cast_(id));
         }
         static int
-        incref_(#{elem.type.cname}* this_) AUG_NOTHROW
+        retain_(#{elem.type.cname}* this_) AUG_NOTHROW
         {
-            return static_cast<T*>(this_->impl_)->incref_();
+            return static_cast<T*>(this_->impl_)->retain_();
         }
         static int
-        decref_(#{elem.type.cname}* this_) AUG_NOTHROW
+        release_(#{elem.type.cname}* this_) AUG_NOTHROW
         {
-            return static_cast<T*>(this_->impl_)->decref_();
+            return static_cast<T*>(this_->impl_)->release_();
         }
 END
         elem.each_method {|x| putstatic elem, x}
@@ -434,8 +434,8 @@ END
         {
             static const #{elem.type.cname}vtbl local = {
                 cast_,
-                incref_,
-                decref_#{method_list(elem)}
+                retain_,
+                release_#{method_list(elem)}
             };
             return &local;
         }
@@ -479,18 +479,18 @@ END
         cast_(const char* id) AUG_NOTHROW
         {
             if (aug::equalid<aug_object>(id) || aug::equalid<#{elem.type.cname}>(id))
-                return aug::object_incref<aug_object>(this->#{elem.name}_);
+                return aug::object_retain<aug_object>(this->#{elem.name}_);
             return null;
         }
         int
-        incref_() AUG_NOTHROW
+        retain_() AUG_NOTHROW
         {
             assert(0 < this->refs_);
             ++this->refs_;
             return 0;
         }
         int
-        decref_() AUG_NOTHROW
+        release_() AUG_NOTHROW
         {
             assert(0 < this->refs_);
             if (0 == --this->refs_)
@@ -523,16 +523,16 @@ END
         cast_(const char* id) AUG_NOTHROW
         {
             if (aug::equalid<aug_object>(id) || aug::equalid<#{elem.type.cname}>(id))
-                return aug::object_incref<aug_object>(this->#{elem.name}_);
+                return aug::object_retain<aug_object>(this->#{elem.name}_);
             return null;
         }
         int
-        incref_() AUG_NOTHROW
+        retain_() AUG_NOTHROW
         {
             return 0;
         }
         int
-        decref_() AUG_NOTHROW
+        release_() AUG_NOTHROW
         {
             return 0;
         }

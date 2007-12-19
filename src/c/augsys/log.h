@@ -73,15 +73,30 @@ aug_loglevel(void);
 AUGSYS_API aug_logger_t
 aug_logger(void);
 
+/**
+ * @defgroup Logging Logging
+ *
+ * Core logging functions.
+ *
+ * @{
+ */
+
 AUGSYS_API int
 aug_vwritelog(int loglevel, const char* format, va_list args);
 
 AUGSYS_API int
 aug_writelog(int loglevel, const char* format, ...);
 
+/** @} */
+
 /**
+ * @defgroup LoggingWrappers Wrappers
+ * @ingroup Logging
+ *
  * The following functions are essentially convenience wrappers around
  * aug_vwritelog().
+ *
+ * @{
  */
 
 AUGSYS_API int
@@ -98,6 +113,8 @@ aug_notice(const char* format, ...);
 
 AUGSYS_API int
 aug_info(const char* format, ...);
+
+/** @} */
 
 /**
  * Guidelines for debug-level use:

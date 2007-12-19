@@ -223,7 +223,7 @@ aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
 
     parser->handler_ = handler;
     if ((parser->ob_ = ob))
-        aug_incref(ob);
+        aug_retain(ob);
     parser->lexer_ = lexer;
     parser->name_[0] = '\0';
     parser->state_ = INITIAL_;
@@ -236,7 +236,7 @@ aug_destroyhttpparser(aug_httpparser_t parser)
 {
     int ret = aug_destroylexer(parser->lexer_);
     if (parser->ob_)
-        aug_decref(parser->ob_);
+        aug_release(parser->ob_);
     free(parser);
     return ret;
 }

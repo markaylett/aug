@@ -136,10 +136,10 @@ namespace aug {
 
     template <typename T>
     int
-    incref(obref<T> ref) AUG_NOTHROW
+    retain(obref<T> ref) AUG_NOTHROW
     {
         assert(ref.get());
-        return ref.get()->vtbl_->incref_(ref.get());
+        return ref.get()->vtbl_->retain_(ref.get());
     }
 
     /**
@@ -151,7 +151,7 @@ namespace aug {
     incget(const obref<T>& ref) AUG_NOTHROW
     {
         if (ref != null)
-            incref(ref);
+            retain(ref);
         return ref.get();
     }
 
@@ -161,10 +161,10 @@ namespace aug {
 
     template <typename T>
     int
-    decref(obref<T> ref) AUG_NOTHROW
+    release(obref<T> ref) AUG_NOTHROW
     {
         assert(ref.get());
-        return ref.get()->vtbl_->decref_(ref.get());
+        return ref.get()->vtbl_->release_(ref.get());
     }
 
     template <typename T>
@@ -185,14 +185,14 @@ namespace aug {
             : ref_(ref)
         {
             if (null != ref && inc)
-                aug::incref(ref);
+                aug::retain(ref);
         }
 
     public:
         ~smartob() AUG_NOTHROW
         {
             if (null != ref_)
-                aug::decref(ref_);
+                aug::release(ref_);
         }
         smartob(const null_&) AUG_NOTHROW
             : ref_(null)
@@ -202,7 +202,7 @@ namespace aug {
             : ref_(rhs.ref_)
         {
             if (null != ref_)
-                aug::incref(ref_);
+                aug::retain(ref_);
         }
         smartob&
         operator =(const null_&) AUG_NOTHROW
@@ -228,7 +228,7 @@ namespace aug {
             return smartob(ref, false);
         }
         static smartob
-        incref(obref<T> ref) AUG_NOTHROW
+        retain(obref<T> ref) AUG_NOTHROW
         {
             return smartob(ref, true);
         }
@@ -254,9 +254,9 @@ namespace aug {
 
     template <typename T>
     int
-    incref(const smartob<T>& sob) AUG_NOTHROW
+    retain(const smartob<T>& sob) AUG_NOTHROW
     {
-        return incref<T>(static_cast<obref<T> >(sob));
+        return retain<T>(static_cast<obref<T> >(sob));
     }
 
     template <typename T>
@@ -268,9 +268,9 @@ namespace aug {
 
     template <typename T>
     int
-    decref(const smartob<T>& sob) AUG_NOTHROW
+    release(const smartob<T>& sob) AUG_NOTHROW
     {
-        return decref<T>(static_cast<obref<T> >(sob));
+        return release<T>(static_cast<obref<T> >(sob));
     }
 
     inline bool
@@ -295,9 +295,9 @@ namespace aug {
 
     template <typename T>
     smartob<T>
-    object_incref(obref<T> ref) AUG_NOTHROW
+    object_retain(obref<T> ref) AUG_NOTHROW
     {
-        return smartob<T>::incref(ref);
+        return smartob<T>::retain(ref);
     }
 
     template <typename T, typename U>
@@ -329,14 +329,14 @@ namespace aug {
         }
     public:
         int
-        incref_() AUG_NOTHROW
+        retain_() AUG_NOTHROW
         {
             assert(0 < refs_);
             ++refs_;
             return 0;
         }
         int
-        decref_() AUG_NOTHROW
+        release_() AUG_NOTHROW
         {
             assert(0 < refs_);
             if (0 == --refs_)

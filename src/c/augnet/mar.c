@@ -116,7 +116,7 @@ destroy_(void* ptr)
     aug_marparser_t parser = ptr;
 
     if (parser->ob_)
-        aug_decref(parser->ob_);
+        aug_release(parser->ob_);
 
     if (parser->http_)
         aug_destroyhttpparser(parser->http_);
@@ -151,7 +151,7 @@ aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
        destroy_(). */
 
     if ((parser->ob_ = ob))
-        aug_incref(ob);
+        aug_retain(ob);
 
     parser->http_ = aug_createhttpparser(size, &handler_, addrob);
     parser->initial_ = NULL;
@@ -160,7 +160,7 @@ aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
     /* If created, http parser will hold reference.  Otherwise, it will be
        destroyed now. */
 
-    aug_decref(addrob);
+    aug_release(addrob);
 
     return parser->http_ ? parser : NULL;
 }

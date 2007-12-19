@@ -106,11 +106,11 @@ aug_writeevent(int fd, const struct aug_event* event)
     /* Must increment before write. */
 
     if (event->ob_)
-        aug_incref(event->ob_);
+        aug_retain(event->ob_);
 
     if (-1 == writeall_(fd, (const char*)event, sizeof(*event))) {
         if (event->ob_)
-            aug_decref(event->ob_);
+            aug_release(event->ob_);
         return NULL;
     }
 

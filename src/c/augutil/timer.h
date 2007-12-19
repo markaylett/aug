@@ -26,7 +26,7 @@ aug_destroytimers(struct aug_timers* timers);
  * allocated timer id can be specified.  In which case, any timer with a
  * matching id will be cancelled prior to setting the new timer.
  *
- * If aug_settimer() succeeds, aug_incref() will be called on "ob".
+ * If aug_settimer() succeeds, aug_retain() will be called on "ob".
  *
  * @param timers TODO
  *
@@ -36,7 +36,7 @@ aug_destroytimers(struct aug_timers* timers);
  *
  * @param cb TODO
  *
- * @param obj TODO
+ * @param ob TODO
  *
  * @return The timer id.
  */
@@ -80,7 +80,7 @@ aug_canceltimer(struct aug_timers* timers, int id);
  *
  * @param id Timer identifier.
  *
- * @return Boolean.
+ * @return False on failure.
  */
 
 AUGUTIL_API int
@@ -97,8 +97,6 @@ aug_expired(struct aug_timers* timers, int id);
  * same id.
  *
  * @param timers The timer list.
- *
- * @param id Timer identifier.
  *
  * @param force Boolean indicated whether first timer should be forced to
  * expire.

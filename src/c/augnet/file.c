@@ -84,7 +84,7 @@ aug_destroyfiles(struct aug_files* files)
     struct aug_file_* it;
     AUG_FOREACH(it, files)
         if (!it->trash_ && it->ob_) {
-            aug_decref(it->ob_);
+            aug_release(it->ob_);
             it->ob_ = NULL;
         }
 
@@ -114,7 +114,7 @@ aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
     file->fd_ = fd;
     file->cb_ = cb;
     if ((file->ob_ = ob))
-        aug_incref(ob);
+        aug_retain(ob);
 
     AUG_INSERT_TAIL(files, file);
     return 0;
@@ -137,7 +137,7 @@ aug_removefile(struct aug_files* files, int fd)
     }
 
     if (it->ob_) {
-        aug_decref(it->ob_);
+        aug_release(it->ob_);
         it->ob_ = NULL;
     }
 
@@ -184,7 +184,7 @@ aug_foreachfile(struct aug_files* files)
         if (!(it->cb_(it->ob_, it->fd_))) {
 
             if (it->ob_) {
-                aug_decref(it->ob_);
+                aug_release(it->ob_);
                 it->ob_ = NULL;
             }
             it->trash_ = 1;

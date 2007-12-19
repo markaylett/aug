@@ -33,17 +33,17 @@ namespace aug {
             cast_(const char* id) AUG_NOTHROW
             {
                 if (equalid<aug_object>(id) || equalid<aug_blob>(id))
-                    return object_incref<aug_object>(blob_);
+                    return object_retain<aug_object>(blob_);
                 return null;
             }
             int
-            incref_() AUG_NOTHROW
+            retain_() AUG_NOTHROW
             {
                 ++refs_;
                 return 0;
             }
             int
-            decref_() AUG_NOTHROW
+            release_() AUG_NOTHROW
             {
                 // When only one ref remains, writing must have finished and
                 // vector can be reset.

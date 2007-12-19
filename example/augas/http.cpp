@@ -450,7 +450,7 @@ namespace {
         cast_(const char* id) AUG_NOTHROW
         {
             if (equalid<aug_object>(id) || equalid<aug_blob>(id))
-                return object_incref<aug_object>(blob_);
+                return object_retain<aug_object>(blob_);
             return null;
         }
         const void*

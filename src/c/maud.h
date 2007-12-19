@@ -34,6 +34,18 @@
 struct aug_blob_;
 struct aug_object_;
 
+/**
+ * @defgroup Module Module
+ */
+
+/**
+ * @defgroup ModuleLogLevel Log Level
+ *
+ * @ingroup Module
+ *
+ * @sa writelog_(), vwritelog_().
+ */
+
 enum maud_loglevel {
     MAUD_LOGCRIT,
     MAUD_LOGERROR,
@@ -44,7 +56,10 @@ enum maud_loglevel {
 };
 
 /**
- * @defgroup TimerFlags Timer Flags
+ * @defgroup ModuleTimerFlags Timer Flags
+ *
+ * @ingroup Module
+ *
  * @{
  */
 
@@ -66,12 +81,13 @@ enum maud_loglevel {
 
 #define MAUD_TIMRDWR (MAUD_TIMRD | MAUD_TIMWR)
 
-/**
- * @}
- */
+/** @} */
 
 /**
- * @defgroup ShutFlags Shut Flags
+ * @defgroup ModuleShutFlags Shut Flags
+ *
+ * @ingroup Module
+ *
  * @{
  */
 
@@ -81,12 +97,13 @@ enum maud_loglevel {
 
 #define MAUD_SHUTNOW  0x01
 
-/**
- * @}
- */
+/** @} */
 
 /**
- * @defgroup ReturnCodes Return Codes
+ * @defgroup ModuleReturnCodes Return Codes
+ *
+ * @ingroup Module
+ *
  * @{
  */
 
@@ -108,9 +125,7 @@ enum maud_loglevel {
 
 #define MAUD_NONE  (-2)
 
-/**
- * @}
- */
+/** @} */
 
 #define MAUD_MAXNAME     63
 
@@ -123,7 +138,7 @@ struct maud_session {
 
 /**
  * Both sockets and timers are represented by handles.  For timer handles,
- * "user_" will be of type #aug_object.
+ * "user_" will be of type @ref Object.
  *
  * @sa settimer_()
  */
@@ -132,6 +147,14 @@ struct maud_handle {
     maud_id id_;
     void* user_;
 };
+
+/**
+ * @defgroup ModuleHost Host
+ *
+ * @ingroup Module
+ *
+ * @{
+ */
 
 struct maud_host {
 
@@ -322,7 +345,7 @@ struct maud_host {
      *
      * @param ms Timeout value in milliseconds.
      *
-     * @param flags @ref TimerFlags.
+     * @param flags @ref ModuleTimerFlags.
      */
 
     int (*setrwtimer_)(maud_id cid, unsigned ms, unsigned flags);
@@ -334,7 +357,7 @@ struct maud_host {
      *
      * @param ms Timeout value in milliseconds.
      *
-     * @param flags @ref TimerFlags.
+     * @param flags @ref ModuleTimerFlags.
      */
 
     int (*resetrwtimer_)(maud_id cid, unsigned ms, unsigned flags);
@@ -344,7 +367,7 @@ struct maud_host {
      *
      * @param cid Connection id.
      *
-     * @param flags @ref TimerFlags.
+     * @param flags @ref ModuleTimerFlags.
      */
 
     int (*cancelrwtimer_)(maud_id cid, unsigned flags);
@@ -398,10 +421,16 @@ struct maud_host {
     int (*setsslserver_)(maud_id cid, const char* ctx);
 };
 
+/** @} */
+
 /**
+ * @addtogroup Module
+ *
  * Module functions of type int should return either #MAUD_OK or #MAUD_ERROR,
  * depending on the result.  For those functions associated with a connection,
  * a failure will result in the connection being closed.
+ *
+ * @{
  */
 
 struct maud_module {
@@ -409,8 +438,8 @@ struct maud_module {
     /**
      * Stop session.
      *
-     * The current session can be retrieved using getsession_().  All
-     * resources associated with the session should be released in this
+     * The current session can be retrieved using maud_host::getsession_().
+     * All resources associated with the session should be released in this
      * handler.  stop_() will only be called for a session if start_()
      * returned #MAUD_OK.
      */
@@ -421,7 +450,7 @@ struct maud_module {
      * Start session.
      *
      * User-state associated with the session may be assigned to
-     * "session->user_".
+     * #maud_session::user_.
      *
      * @return Either #MAUD_OK or #MAUD_ERROR.
      */
@@ -432,7 +461,7 @@ struct maud_module {
      * Re-configure request.
      *
      * Called in response to a #AUG_EVENTRECONF event, which are raise in
-     * response to either a #SIGHUP, or a call to reconfall_().
+     * response to either a #SIGHUP, or a call to maud_host::reconfall_().
      */
 
     void (*reconf_)(void);
@@ -461,7 +490,7 @@ struct maud_module {
     /**
      * Teardown request.
      *
-     * @param sock TODO
+     * @param sock Socket descriptor.
      */
 
     void (*teardown_)(const struct maud_handle* sock);
@@ -472,11 +501,11 @@ struct maud_module {
      * This function is called when a new connection is accepted on a listener
      * socket.
      *
-     * @param sock TODO
+     * @param sock Socket descriptor.
      *
-     * @param addr TODO
+     * @param addr Peer address.
      *
-     * @param port TODO
+     * @param port Peer port.
      *
      * @return Either #MAUD_OK or #MAUD_ERROR.
      */
@@ -488,15 +517,15 @@ struct maud_module {
      * Completion of client connection handshake.
      *
      * This function is called when a connection, initiated by a call to
-     * tcpconnect_(), becomes established.
+     * maud_host::tcpconnect_(), becomes established.
      *
-     * @param sock TODO
+     * @param sock Socket descriptor.
      *
-     * @param addr TODO
+     * @param addr Peer address.
      *
-     * @param port TODO
+     * @param port Peer port.
      *
-     * @sa tcpconnect_()
+     * @sa maud_host::tcpconnect_().
      */
 
     void (*connected_)(struct maud_handle* sock, const char* addr,
@@ -518,7 +547,7 @@ struct maud_module {
     /**
      * Expiry of read timer.
      *
-     * @param sock TODO
+     * @param sock Socket descriptor.
      *
      * @param ms The current timeout value.  The callee may modify "ms" to
      * specify a new value; a value of zero will cancel the timer.
@@ -529,7 +558,7 @@ struct maud_module {
     /**
      * Expiry of write timer.
      *
-     * @param sock TODO
+     * @param sock Socket descriptor.
      *
      * @param ms The current timeout value.  The callee may modify "ms" to
      * specify a new value; a value of zero will cancel the timer.
@@ -540,7 +569,7 @@ struct maud_module {
     /**
      * Timer expiry.
      *
-     * @param timer TODO
+     * @param timer Timer handle.
      *
      * @param ms The current timeout value.  The callee may modify "ms" to
      * specify a new value; a value of zero will cancel the timer.
@@ -551,11 +580,11 @@ struct maud_module {
     /**
      * Authorisation of peer certificate.
      *
-     * @param sock TODO
+     * @param sock Socket descriptor.
      *
-     * @param subject TODO
+     * @param subject Certificate subject.
      *
-     * @param issuer TODO
+     * @param issuer Certificate issuer.
      *
      * @return Either #MAUD_OK or #MAUD_ERROR.
      */
@@ -563,6 +592,8 @@ struct maud_module {
     int (*authcert_)(const struct maud_handle* sock, const char* subject,
                      const char* issuer);
 };
+
+/** @} */
 
 MAUD_EXTERNC const struct maud_host*
 maud_gethost(void);
