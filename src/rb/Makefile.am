@@ -17,6 +17,7 @@ EXTRA_DIST = \
 if ENABLE_RUBY
 rubydir = $(prefix)/ruby
 ruby_DATA = \
+	augidl \
 	augutil.rb \
 	log.rb \
 	rbecho.rb \

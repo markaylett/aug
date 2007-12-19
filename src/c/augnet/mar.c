@@ -147,6 +147,8 @@ aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
         return NULL;
     }
 
+    parser->handler_ = handler;
+
     /* The addrob now owns this reference: it will be released by
        destroy_(). */
 
