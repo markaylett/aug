@@ -4,6 +4,12 @@
 #ifndef AUGNET_EXTEND_H
 #define AUGNET_EXTEND_H
 
+/**
+ * @file augnet/extend.h
+ *
+ * File type extensions.
+ */
+
 #include "augnet/file.h"
 #include "augnet/types.h"
 

@@ -7,20 +7,18 @@
 #include <stddef.h>
 #include <sys/types.h> /* size_t */
 
-/*
-  The offsetof() macro can only be used for PODs.  GCC will emit the following
-  warning when used on non-POD types:
-
-  warning: (perhaps the 'offsetof' macro was used incorrectly)
-*/
+/**
+ * Calculate offset of member @a m in structure @a s.
+ *
+ * The offsetof() macro can only be used for PODs.  GCC will emit the
+ * following warning when used on non-POD types:
+ *
+ * warning: (perhaps the 'offsetof' macro was used incorrectly)
+ */
 
 #if !defined(offsetof)
 # define offsetof(s, m) (size_t)&(((s*)0)->m)
 #endif /* !offsetof */
-
-/**
- * Compares to object-ids for equality.
- */
 
 #if !defined(AUG_MKSTR)
 # define AUG_MKSTR_(x) #x
@@ -28,13 +26,7 @@
 #endif /* !AUG_MKSTR */
 
 /**
- * @defgroup Object Object
- */
-
-/**
- * @defgroup ObjectMacros Macros
- *
- * @ingroup Object
+ * @defgroup ObjectMacros Object Macros
  *
  * Macros to simplify object declarations in c.
  *
@@ -43,6 +35,10 @@
 
 #define AUG_PODIMPL(s, m, ptr)                          \
     (ptr ? (s*)((char*)(ptr) - offsetof(s, m)) : NULL)
+
+/**
+ * Compares to object-ids @a a and @a b for equality.
+ */
 
 #define AUG_EQUALID(a, b)                       \
     (0 == strcmp(a, b))
@@ -63,7 +59,11 @@
 /** @} */
 
 /**
- * @defgroup ObjectDefinition Definition
+ * @defgroup Object Object
+ */
+
+/**
+ * @defgroup aug_object aug_object
  *
  * @ingroup Object
  *

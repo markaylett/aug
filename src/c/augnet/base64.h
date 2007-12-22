@@ -4,6 +4,12 @@
 #ifndef AUGNET_BASE64_H
 #define AUGNET_BASE64_H
 
+/**
+ * @file augnet/base64.h
+ *
+ * Base 64 encoder and decoder.
+ */
+
 #include "augnet/config.h"
 
 #include "augsys/types.h"

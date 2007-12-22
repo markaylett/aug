@@ -1,12 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-/**
- * @file mfile.h
- *
- * TODO
- */
-
 #ifndef AUGMAR_MFILE_H_
 #define AUGMAR_MFILE_H_
 

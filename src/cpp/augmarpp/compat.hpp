@@ -1,12 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-/**
- * @file compat.hpp
- *
- * TODO
- */
-
 #ifndef AUGMARPP_COMPAT_HPP
 #define AUGMARPP_COMPAT_HPP
 

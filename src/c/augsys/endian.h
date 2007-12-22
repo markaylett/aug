@@ -4,6 +4,12 @@
 #ifndef AUGSYS_ENDIAN_H
 #define AUGSYS_ENDIAN_H
 
+/**
+ * @file augsys/endian.h
+ *
+ * Functions related to byte ordering.
+ */
+
 #include "augsys/config.h"
 #include "augsys/types.h"
 

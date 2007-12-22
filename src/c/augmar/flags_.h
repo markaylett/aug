@@ -1,12 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-/**
- * @file flags.h
- *
- * TODO
- */
-
 #ifndef AUGMAR_FLAGS_H_
 #define AUGMAR_FLAGS_H_
 

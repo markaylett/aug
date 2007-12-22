@@ -138,7 +138,7 @@ struct maud_session {
 
 /**
  * Both sockets and timers are represented by handles.  For timer handles,
- * "user_" will be of type @ref Object.
+ * "user_" will be of type @ref aug_object.
  *
  * @sa settimer_()
  */
@@ -222,7 +222,7 @@ struct maud_host {
      *
      * @param to Target session name.
      *
-     * @param type Event type associated with "ob".
+     * @param type Event type associated with @a ob.
      *
      * @param ob Optional object data.
      *
@@ -240,7 +240,7 @@ struct maud_host {
      *
      * @param to Target session name.
      *
-     * @param type Event type associated with "ob".
+     * @param type Event type associated with @a ob.
      *
      * @param ob Optional object data.
      *
@@ -549,7 +549,7 @@ struct maud_module {
      *
      * @param sock Socket descriptor.
      *
-     * @param ms The current timeout value.  The callee may modify "ms" to
+     * @param ms The current timeout value.  The callee may modify @a ms to
      * specify a new value; a value of zero will cancel the timer.
      */
 
@@ -560,7 +560,7 @@ struct maud_module {
      *
      * @param sock Socket descriptor.
      *
-     * @param ms The current timeout value.  The callee may modify "ms" to
+     * @param ms The current timeout value.  The callee may modify @a ms to
      * specify a new value; a value of zero will cancel the timer.
      */
 
@@ -571,7 +571,7 @@ struct maud_module {
      *
      * @param timer Timer handle.
      *
-     * @param ms The current timeout value.  The callee may modify "ms" to
+     * @param ms The current timeout value.  The callee may modify @a ms to
      * specify a new value; a value of zero will cancel the timer.
      */
 

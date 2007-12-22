@@ -4,6 +4,12 @@
 #ifndef AUGNET_WRITER_H
 #define AUGNET_WRITER_H
 
+/**
+ * @file augnet/writer.h
+ *
+ * Blob writer.
+ */
+
 #include "augnet/config.h"
 
 #include "augsys/types.h"

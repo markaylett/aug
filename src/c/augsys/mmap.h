@@ -4,6 +4,12 @@
 #ifndef AUGSYS_MMAP_H
 #define AUGSYS_MMAP_H
 
+/**
+ * @file augsys/mmap.h
+ *
+ * Memory mapping.
+ */
+
 #include "augsys/config.h"
 #include "augsys/types.h"
 

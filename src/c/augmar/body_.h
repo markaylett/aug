@@ -1,11 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-/**
- * @file body.h
- *
- * TODO
- */
 #ifndef AUGMAR_BODY_H_
 #define AUGMAR_BODY_H_
 

@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_CONV_H
 #define AUGUTIL_CONV_H
 
+/**
+ * @file augutil/conv.h
+ *
+ * String conversion functions.
+ */
+
 #include "augutil/config.h"
 
 AUGUTIL_API int

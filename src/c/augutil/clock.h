@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_CLOCK_H
 #define AUGUTIL_CLOCK_H
 
+/**
+ * @file augutil/clock.h
+ *
+ * High resolution timer.
+ */
+
 #include "augutil/config.h"
 
 typedef struct aug_clock_* aug_clock_t;

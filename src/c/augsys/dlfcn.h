@@ -4,6 +4,12 @@
 #ifndef AUGSYS_DLFCN_H
 #define AUGSYS_DLFCN_H
 
+/**
+ * @file augsys/dlfcn.h
+ *
+ * Dynamic linker support.
+ */
+
 #include "augsys/config.h"
 
 typedef void (*aug_fnptr_t)();

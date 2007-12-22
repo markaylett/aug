@@ -4,6 +4,12 @@
 #ifndef AUGNET_AUTH_H
 #define AUGNET_AUTH_H
 
+/**
+ * @file augnet/auth.h
+ *
+ * Digest-based authentication.
+ */
+
 #include "augnet/config.h"
 
 #include "augutil/md5.h"

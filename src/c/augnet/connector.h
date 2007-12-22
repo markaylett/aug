@@ -4,6 +4,12 @@
 #ifndef AUGNET_CONNECTOR_H
 #define AUGNET_CONNECTOR_H
 
+/**
+ * @file augnet/connector.h
+ *
+ * Non-blocking TCP establishment.
+ */
+
 #include "augnet/config.h"
 
 #include "augsys/socket.h"
@@ -19,8 +25,9 @@ aug_destroyconnector(aug_connector_t ctor);
 /**
  * Attempt to establish connection without blocking.
  *
- * If a connection was established, then "est" flag will be set and a blocking
- * socket returned.  Use aug_setnonblock() to change to non-blocking socket.
+ * If a connection was established, then @a est flag will be set and a
+ * blocking socket returned.  Use aug_setnonblock() to change to non-blocking
+ * socket.
  *
  * Otherwise, the returned descriptor should be polled before retrying
  * aug_tryconnect().

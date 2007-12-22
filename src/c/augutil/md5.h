@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_BASE64_H
 #define AUGUTIL_BASE64_H
 
+/**
+ * @file augutil/base64.h
+ *
+ * Base 64 encoder.
+ */
+
 #include "augutil/config.h"
 
 #include "augsys/types.h"

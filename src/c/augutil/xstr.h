@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_XSTR_H
 #define AUGUTIL_XSTR_H
 
+/**
+ * @file augutil/xstr.h
+ *
+ * Dynamic string type.
+ */
+
 #include "augutil/config.h"
 
 #include "augsys/types.h" /* size_t */

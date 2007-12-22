@@ -4,6 +4,12 @@
 #ifndef AUGSYS_ERRINFO_H
 #define AUGSYS_ERRINFO_H
 
+/**
+ * @file augsys/errinfo.h
+ *
+ * Error handling.
+ */
+
 #include "augsys/config.h"
 #include "augsys/defs.h"
 

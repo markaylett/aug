@@ -1,12 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-/**
- * @file getopt.h
- *
- * TODO
- */
-
 #ifndef MAR_GETOPT_H
 #define MAR_GETOPT_H
 

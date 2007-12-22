@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_LIST_H
 #define AUGUTIL_LIST_H
 
+/**
+ * @file augutil/list.h
+ *
+ * Doubly linked list.
+ */
+
 #include "augsys/queue.h"
 
 /**

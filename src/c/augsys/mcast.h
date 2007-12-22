@@ -4,6 +4,12 @@
 #ifndef AUGSYS_MCAST_H
 #define AUGSYS_MCAST_H
 
+/**
+ * @file augsys/mcast.h
+ *
+ * Multicast sockets.
+ */
+
 #include "augsys/socket.h"
 
 /**

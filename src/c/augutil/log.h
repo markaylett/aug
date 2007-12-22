@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_LOG_H
 #define AUGUTIL_LOG_H
 
+/**
+ * @file augutil/log.h
+ *
+ * Common log format.
+ */
+
 #include "augutil/config.h"
 
 #include "augsys/types.h" /* size_t */

@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_PATH_H
 #define AUGUTIL_PATH_H
 
+/**
+ * @file augutil/object.h
+ *
+ * Pathname functions.
+ */
+
 #include "augutil/config.h"
 
 #include "augsys/types.h"

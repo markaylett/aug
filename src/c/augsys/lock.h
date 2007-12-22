@@ -4,6 +4,12 @@
 #ifndef AUGSYS_LOCK_H
 #define AUGSYS_LOCK_H
 
+/**
+ * @file augsys/lock.h
+ *
+ * Global lock functions.
+ */
+
 #include "augsys/config.h"
 
 /**

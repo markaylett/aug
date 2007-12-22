@@ -1,14 +1,14 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#ifndef AUGMAR_TYPES_H
+#define AUGMAR_TYPES_H
+
 /**
- * @file types.h
+ * @file augmar/types.h
  *
  * External type definitions.
  */
-
-#ifndef AUGMAR_TYPES_H
-#define AUGMAR_TYPES_H
 
 #include "augsys/types.h"
 

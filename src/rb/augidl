@@ -372,6 +372,14 @@ class Visitor
     def visit_interface(elem)
         puts <<END
 
+/**
+ * @defgroup #{elem.type.cname} #{elem.type.cname}
+ *
+ * @ingroup Object
+ *
+ * @{
+ */
+
 AUG_OBJECTDECL(#{elem.type.cname});
 struct #{elem.type.cname}vtbl {
     AUG_OBJECT(#{elem.type.cname});
@@ -380,6 +388,8 @@ END
         puts "};"
         elem.each_method {|x| putcdefine elem, x}
         puts <<END
+
+/** @} */
 
 #if defined(__cplusplus)
 namespace aug {

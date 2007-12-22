@@ -4,6 +4,17 @@
 #ifndef AUGNET_INET_H
 #define AUGNET_INET_H
 
+/**
+ * @file augnet/inet.h
+ *
+ * TCP functions.
+ *
+ * Implementations of the original, classic functions by Richard Stevens.
+ *
+ * @todo introduce timeout for aug_tcpconnect() by implementing in terms of
+ * aug_tryconnect().
+ */
+
 #include "augnet/config.h"
 
 #include "augsys/socket.h"
@@ -17,13 +28,6 @@ struct aug_hostserv {
     char* host_, * serv_;
     char data_[AUG_MAXADDRLEN];
 };
-
-/**
- * Implementations of the original, classic functions by Richard Stevens.
- *
- * @todo introduce timeout for aug_tcpconnect() by implementing in terms of
- * aug_tryconnect().
- */
 
 AUGNET_API int
 aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep);

@@ -4,6 +4,12 @@
 #ifndef AUGNET_HTTP_H
 #define AUGNET_HTTP_H
 
+/**
+ * @file augnet/http.h
+ *
+ * HTTP parser.
+ */
+
 #include "augnet/config.h"
 
 #include "augsys/types.h"

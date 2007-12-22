@@ -4,6 +4,12 @@
 #ifndef AUGSYS_LOG_H
 #define AUGSYS_LOG_H
 
+/**
+ * @file augsys/log.h
+ *
+ * Logging.
+ */
+
 #include "augsys/config.h"
 
 #include <stdarg.h>

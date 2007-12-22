@@ -4,6 +4,12 @@
 #ifndef AUGSYS_STRING_H
 #define AUGSYS_STRING_H
 
+/**
+ * @file augsys/string.h
+ *
+ * Portable c-string functions.
+ */
+
 #include "augsys/config.h"
 
 #include <string.h>

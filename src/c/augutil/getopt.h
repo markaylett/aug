@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_GETOPT_H
 #define AUGUTIL_GETOPT_H
 
+/**
+ * @file augutil/getopt.h
+ *
+ * Command-line arguments.
+ */
+
 #include "augutil/config.h"
 
 AUGUTIL_API char* aug_optarg;

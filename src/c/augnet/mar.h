@@ -4,6 +4,12 @@
 #ifndef AUGNET_MAR_H
 #define AUGNET_MAR_H
 
+/**
+ * @file augnet/mar.h
+ *
+ * Meta ARchive parser.
+ */
+
 #include "augnet/config.h"
 
 #include "augmar/types.h"

@@ -4,6 +4,12 @@
 #ifndef AUGSYS_TLS_H_
 #define AUGSYS_TLS_H_
 
+/**
+ * @file augsys/tls_.h
+ *
+ * Thread-local storage.
+ */
+
 #include "augsys/config.h"
 
 #if !defined(_WIN32)

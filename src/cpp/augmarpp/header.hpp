@@ -1,12 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-/**
- * @file header.hpp
- *
- * TODO
- */
-
 #ifndef AUGMARPP_HEADER_HPP
 #define AUGMARPP_HEADER_HPP
 

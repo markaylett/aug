@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_TMSPEC_H
 #define AUGUTIL_TMSPEC_H
 
+/**
+ * @file augutil/tmspec.h
+ *
+ * Time specifications.
+ */
+
 #include "augutil/config.h"
 
 struct tm;
@@ -23,6 +29,12 @@ struct aug_tmspec {
  * - M - minute of hour
  *
  * So that, for example, "17H0M" would mean "daily, at 5 o'clock".
+ *
+ * @param tms Structure to be populated.
+ *
+ * @param s Specification.
+ *
+ * @return NULL on error.
  */
 
 AUGUTIL_API struct aug_tmspec*

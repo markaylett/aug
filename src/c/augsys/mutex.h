@@ -4,6 +4,12 @@
 #ifndef AUGSYS_MUTEX_H
 #define AUGSYS_MUTEX_H
 
+/**
+ * @file augsys/mutex.h
+ *
+ * Mutex locks.
+ */
+
 #include "augsys/config.h"
 
 typedef struct aug_mutex_* aug_mutex_t;

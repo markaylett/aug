@@ -4,6 +4,12 @@
 #ifndef AUGSYS_SOCKET_H
 #define AUGSYS_SOCKET_H
 
+/**
+ * @file augsys/socket.h
+ *
+ * Sockets.
+ */
+
 #include "augsys/config.h"
 #include "augsys/types.h"
 

@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_EVENT_H
 #define AUGUTIL_EVENT_H
 
+/**
+ * @file augutil/event.h
+ *
+ * Event type.
+ */
+
 #include "augutil/config.h"
 
 #include "augobj.h"

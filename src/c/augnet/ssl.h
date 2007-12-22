@@ -4,6 +4,12 @@
 #ifndef AUGNET_SSL_H
 #define AUGNET_SSL_H
 
+/**
+ * @file augnet/ssl.h
+ *
+ * SSL support.
+ */
+
 #include "augnet/config.h"
 
 struct aug_errinfo;

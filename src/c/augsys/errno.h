@@ -4,6 +4,12 @@
 #ifndef AUGSYS_ERRNO_H
 #define AUGSYS_ERRNO_H
 
+/**
+ * @file augsys/errno.h
+ *
+ * Portable errno support.
+ */
+
 #include "augsys/config.h"
 
 #include <errno.h>

@@ -4,6 +4,12 @@
 #ifndef AUGNET_FIX_H
 #define AUGNET_FIX_H
 
+/**
+ * @file augnet/fix.h
+ *
+ * FIX parser.
+ */
+
 #include "augnet/config.h"
 #include "augnet/types.h"
 

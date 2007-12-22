@@ -4,6 +4,12 @@
 #ifndef AUGSYS_MUXER_H
 #define AUGSYS_MUXER_H
 
+/**
+ * @file augsys/muxer.h
+ *
+ * IO multiplexer.
+ */
+
 #include "augsys/config.h"
 
 #define AUG_FDEVENTRD    0x1

@@ -4,6 +4,12 @@
 #ifndef AUGSYS_TIME_H
 #define AUGSYS_TIME_H
 
+/**
+ * @file augsys/time.h
+ *
+ * Time functions.
+ */
+
 #include "augsys/config.h"
 
 #if !defined(_REENTRANT)

@@ -4,6 +4,12 @@
 #ifndef AUGNET_FILE_H
 #define AUGNET_FILE_H
 
+/**
+ * @file augnet/file.h
+ *
+ * File sets.
+ */
+
 #include "augnet/config.h"
 
 #include "augutil/list.h"
@@ -37,7 +43,7 @@ aug_destroyfiles(struct aug_files* files);
 /**
  * Insert file into file list.
  *
- * If aug_insertfile() succeeds, aug_retain() will be called on "ob".
+ * If aug_insertfile() succeeds, aug_retain() will be called on @a ob.
  *
  * @param files The file list.
  *

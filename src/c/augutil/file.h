@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_FILE_H
 #define AUGUTIL_FILE_H
 
+/**
+ * @file augutil/file.h
+ *
+ * Config parser.
+ */
+
 #include "augutil/config.h"
 
 typedef int (*aug_confcb_t)(void*, const char*, const char*);

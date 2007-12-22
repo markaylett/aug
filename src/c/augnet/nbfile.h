@@ -4,6 +4,12 @@
 #ifndef AUGNET_NBFILE_H
 #define AUGNET_NBFILE_H
 
+/**
+ * @file augnet/nbfile.h
+ *
+ * Non-blocking file sets.
+ */
+
 #include "augnet/config.h"
 #include "augnet/types.h"
 

@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_LEXER_H
 #define AUGUTIL_LEXER_H
 
+/**
+ * @file augutil/lexer.h
+ *
+ * Lexical tokeniser.
+ */
+
 #include "augutil/config.h"
 #include "augsys/types.h"
 

@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_TIMER_H
 #define AUGUTIL_TIMER_H
 
+/**
+ * @file augutil/timer.h
+ *
+ * Timers.
+ */
+
 #include "augutil/config.h"
 #include "augutil/list.h"
 
@@ -26,7 +32,7 @@ aug_destroytimers(struct aug_timers* timers);
  * allocated timer id can be specified.  In which case, any timer with a
  * matching id will be cancelled prior to setting the new timer.
  *
- * If aug_settimer() succeeds, aug_retain() will be called on "ob".
+ * If aug_settimer() succeeds, aug_retain() will be called on @a ob.
  *
  * @param timers TODO
  *

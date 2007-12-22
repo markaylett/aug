@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_PWD_H
 #define AUGUTIL_PWD_H
 
+/**
+ * @file augutil/pwd.h
+ *
+ * Password functions.
+ */
+
 #include "augutil/md5.h"
 
 #define AUG_MAXPASSWORD 128

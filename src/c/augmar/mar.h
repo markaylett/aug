@@ -1,14 +1,14 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-/**
- * @file mar.h
- *
- * The MAR API header file.
- */
-
 #ifndef AUGMAR_MAR_H
 #define AUGMAR_MAR_H
+
+/**
+ * @file augmar/mar.h
+ *
+ * Meta ARchive file format.
+ */
 
 #include "augmar/config.h"
 #include "augmar/types.h"
@@ -46,7 +46,7 @@ aug_createmar(void);
  *
  * @param path A path to the file to be created or opened.
  *
- * @param flags The @ref OpenFlags "flags" used to create or open the file.
+ * @param flags The @ref OpenFlags used to create or open the file.
  *
  * @param ... The permissions used to create a new file.  Required when the
  * #AUG_CREAT flag has been specified, otherwise ignored.
@@ -325,10 +325,9 @@ aug_insertmar(aug_mar_t mar, const char* path);
  *
  * @param mar A handle to the message archive.
  *
- * @param offset The offset calculated according to the @ref SeekWhence
- * "whence" directive.
+ * @param offset The offset calculated according to @a whence.
  *
- * @param whence The @ref SeekWhence "whence" directive.
+ * @param whence The @ref SeekWhence directive.
  *
  * @return The resulting offset location in bytes from the beginning of the
  * content, or -1 on failure, in which case errno can be used to determine the

@@ -4,6 +4,12 @@
 #ifndef AUGSYS_BARRIER_H
 #define AUGSYS_BARRIER_H
 
+/**
+ * @file augsys/barrier.h
+ *
+ * Portable memory barriers.
+ */
+
 #include "augsys/lock.h"
 
 #if !ENABLE_SMP

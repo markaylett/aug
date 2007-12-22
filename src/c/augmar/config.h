@@ -1,13 +1,14 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#ifndef AUGMAR_CONFIG_H
+#define AUGMAR_CONFIG_H
+
 /**
- * @file config.h
+ * @file augmar/config.h
  *
  * Definitions of the storage class macros.
  */
-#ifndef AUGMAR_CONFIG_H
-#define AUGMAR_CONFIG_H
 
 #include "augconfig.h"
 
