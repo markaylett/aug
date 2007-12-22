@@ -7,7 +7,7 @@
 #include "augaspp/session.hpp"
 #include "augaspp/sock.hpp"
 
-#include "augobj/blob.h"
+#include "augob/blob.h"
 
 #include <map>
 
@@ -17,7 +17,7 @@ namespace aug {
 
     class socks {
 
-        typedef std::map<maud_id, int, std::greater<maud_id> > idtofd;
+        typedef std::map<aum_id, int, std::greater<aum_id> > idtofd;
 
         std::map<int, sockptr> socks_;
         idtofd idtofd_;
@@ -34,10 +34,10 @@ namespace aug {
         {
         }
         bool
-        send(maud_id cid, const void* buf, size_t size, const timeval& now);
+        send(aum_id cid, const void* buf, size_t size, const timeval& now);
 
         bool
-        sendv(maud_id cid, blobref ref, const timeval& now);
+        sendv(aum_id cid, blobref ref, const timeval& now);
 
         void
         clear();
@@ -58,7 +58,7 @@ namespace aug {
         getbyfd(fdref fd) const;
 
         sockptr
-        getbyid(maud_id id) const;
+        getbyid(aum_id id) const;
 
         bool
         empty() const;

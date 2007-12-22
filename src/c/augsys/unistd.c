@@ -19,7 +19,7 @@ AUG_RCSID("$Id$");
 AUGSYS_API int
 aug_close(int fd)
 {
-    return aug_releasefd(fd);
+    return aub_releasefd(fd);
 }
 
 AUGSYS_API int

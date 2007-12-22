@@ -165,9 +165,6 @@
 				RelativePath="..\src\cpp\augsyspp\muxer.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augsyspp\null.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augsyspp\smartfd.cpp">
 			</File>
 			<File
@@ -231,9 +228,6 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\muxer.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augsyspp\null.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\smartfd.hpp">

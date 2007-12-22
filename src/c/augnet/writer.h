@@ -14,7 +14,7 @@
 
 #include "augsys/types.h"
 
-#include "augobj/blob.h"
+#include "augob/blob.h"
 
 typedef struct aug_writer_* aug_writer_t;
 

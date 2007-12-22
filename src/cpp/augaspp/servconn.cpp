@@ -40,13 +40,13 @@ servconn::do_cancelrwtimer(unsigned flags)
     return rwtimer_.cancelrwtimer(flags);
 }
 
-maud_handle&
+aum_handle&
 servconn::do_get()
 {
     return conn_.get();
 }
 
-const maud_handle&
+const aum_handle&
 servconn::do_get() const
 {
     return conn_.get();

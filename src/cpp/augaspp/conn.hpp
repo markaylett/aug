@@ -120,7 +120,7 @@ namespace aug {
     class connected : public conn_base {
 
         sessionptr session_;
-        maud_handle& sock_;
+        aum_handle& sock_;
         buffer& buffer_;
         rwtimer& rwtimer_;
         smartfd sfd_;
@@ -134,10 +134,10 @@ namespace aug {
 
         timeval since_;
 
-        maud_handle&
+        aum_handle&
         do_get();
 
-        const maud_handle&
+        const aum_handle&
         do_get() const;
 
         const sessionptr&
@@ -179,7 +179,7 @@ namespace aug {
     public:
         ~connected() AUG_NOTHROW;
 
-        connected(const sessionptr& session, maud_handle& sock,
+        connected(const sessionptr& session, aum_handle& sock,
                   buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
                   const endpoint& ep, bool close);
     };
@@ -187,17 +187,17 @@ namespace aug {
     class handshake : public conn_base {
 
         sessionptr session_;
-        maud_handle& sock_;
+        aum_handle& sock_;
         buffer& buffer_;
         connector connector_;
         smartfd sfd_;
         endpoint endpoint_;
         sockstate state_;
 
-        maud_handle&
+        aum_handle&
         do_get();
 
-        const maud_handle&
+        const aum_handle&
         do_get() const;
 
         const sessionptr&
@@ -239,7 +239,7 @@ namespace aug {
     public:
         ~handshake() AUG_NOTHROW;
 
-        handshake(const sessionptr& session, maud_handle& sock,
+        handshake(const sessionptr& session, aum_handle& sock,
                   buffer& buffer, const char* host, const char* port);
     };
 }

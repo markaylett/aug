@@ -1,94 +1,94 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define MAUD_BUILD
-#include "maud.h"
+#define AUM_BUILD
+#include "aum.h"
 
 static void
 stop_(void)
 {
-    maud_writelog(MAUD_LOGINFO, "stop_()");
+    aum_writelog(AUM_LOGINFO, "stop_()");
 }
 
 static int
-start_(struct maud_session* session)
+start_(struct aum_session* session)
 {
-    maud_writelog(MAUD_LOGINFO, "start_()");
+    aum_writelog(AUM_LOGINFO, "start_()");
     return 0;
 }
 
 static void
 reconf_(void)
 {
-    maud_writelog(MAUD_LOGINFO, "reconf_()");
+    aum_writelog(AUM_LOGINFO, "reconf_()");
 }
 
 static void
-event_(const char* from, const char* type, struct aug_object_* ob)
+event_(const char* from, const char* type, struct aub_object_* ob)
 {
-    maud_writelog(MAUD_LOGINFO, "event_()");
+    aum_writelog(AUM_LOGINFO, "event_()");
 }
 
 static void
-closed_(const struct maud_handle* sock)
+closed_(const struct aum_handle* sock)
 {
-    maud_writelog(MAUD_LOGINFO, "closed_()");
+    aum_writelog(AUM_LOGINFO, "closed_()");
 }
 
 static void
-teardown_(const struct maud_handle* sock)
+teardown_(const struct aum_handle* sock)
 {
-    maud_writelog(MAUD_LOGINFO, "teardown_()");
-    maud_shutdown(sock->id_, 0);
+    aum_writelog(AUM_LOGINFO, "teardown_()");
+    aum_shutdown(sock->id_, 0);
 }
 
 static int
-accepted_(struct maud_handle* sock, const char* addr, unsigned short port)
+accepted_(struct aum_handle* sock, const char* addr, unsigned short port)
 {
-    maud_writelog(MAUD_LOGINFO, "accepted_()");
+    aum_writelog(AUM_LOGINFO, "accepted_()");
     return 0;
 }
 
 static void
-connected_(struct maud_handle* sock, const char* addr, unsigned short port)
+connected_(struct aum_handle* sock, const char* addr, unsigned short port)
 {
-    maud_writelog(MAUD_LOGINFO, "connected_()");
+    aum_writelog(AUM_LOGINFO, "connected_()");
 }
 
 static void
-data_(const struct maud_handle* sock, const void* buf, size_t len)
+data_(const struct aum_handle* sock, const void* buf, size_t len)
 {
-    maud_writelog(MAUD_LOGINFO, "data_()");
-    maud_send(sock->id_, buf, len);
+    aum_writelog(AUM_LOGINFO, "data_()");
+    aum_send(sock->id_, buf, len);
 }
 
 static void
-rdexpire_(const struct maud_handle* sock, unsigned* ms)
+rdexpire_(const struct aum_handle* sock, unsigned* ms)
 {
-    maud_writelog(MAUD_LOGINFO, "rdexpire_()");
+    aum_writelog(AUM_LOGINFO, "rdexpire_()");
 }
 
 static void
-wrexpire_(const struct maud_handle* sock, unsigned* ms)
+wrexpire_(const struct aum_handle* sock, unsigned* ms)
 {
-    maud_writelog(MAUD_LOGINFO, "wrexpire_()");
+    aum_writelog(AUM_LOGINFO, "wrexpire_()");
 }
 
 static void
-expire_(const struct maud_handle* timer, unsigned* ms)
+expire_(const struct aum_handle* timer, unsigned* ms)
 {
-    maud_writelog(MAUD_LOGINFO, "expire_()");
+    aum_writelog(AUM_LOGINFO, "expire_()");
 }
 
 static int
-authcert_(const struct maud_handle* sock, const char* subject,
+authcert_(const struct aum_handle* sock, const char* subject,
           const char* issuer)
 {
-    maud_writelog(MAUD_LOGINFO, "authcert_()");
+    aum_writelog(AUM_LOGINFO, "authcert_()");
     return 0;
 }
 
-static const struct maud_module module_ = {
+static const struct aum_module module_ = {
     stop_,
     start_,
     reconf_,
@@ -104,17 +104,17 @@ static const struct maud_module module_ = {
     authcert_
 };
 
-static const struct maud_module*
+static const struct aum_module*
 init_(const char* name)
 {
-    maud_writelog(MAUD_LOGINFO, "init_()");
+    aum_writelog(AUM_LOGINFO, "init_()");
     return &module_;
 }
 
 static void
 term_(void)
 {
-    maud_writelog(MAUD_LOGINFO, "term_()");
+    aum_writelog(AUM_LOGINFO, "term_()");
 }
 
-MAUD_ENTRYPOINTS(init_, term_)
+AUM_ENTRYPOINTS(init_, term_)

@@ -4,7 +4,9 @@
 #ifndef AUGSYSPP_TYPES_HPP
 #define AUGSYSPP_TYPES_HPP
 
-#include "augsyspp/null.hpp"
+#include "augsyspp/config.hpp"
+
+#include "null.hpp"
 
 namespace aug {
 

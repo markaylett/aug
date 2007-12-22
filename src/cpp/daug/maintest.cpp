@@ -1,14 +1,14 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "maudpp.hpp"
+#include "aumpp.hpp"
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
 
 #include <iostream>
 
-using namespace maud;
+using namespace aum;
 using namespace std;
 
 namespace {

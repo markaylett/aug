@@ -8,6 +8,7 @@
 #include <memory>
 #include <time.h>
 
+using namespace aub;
 using namespace aug;
 using namespace std;
 
@@ -78,7 +79,7 @@ namespace test {
 
             AUG_DEBUG2("reading event");
 
-            pair<int, smartob<aug_object> > event(aug::readevent(fd));
+            pair<int, smartob<aub_object> > event(aug::readevent(fd));
 
             switch (event.first) {
             case AUG_EVENTRECONF:

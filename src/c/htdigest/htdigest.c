@@ -8,6 +8,12 @@
 
 AUG_RCSID("$Id$");
 
+/**
+ * @page htdigest
+ *
+ * TODO.
+ */
+
 #include "augutil/pwd.h"
 
 #if defined(_WIN32)

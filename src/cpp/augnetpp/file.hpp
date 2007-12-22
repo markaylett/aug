@@ -22,9 +22,9 @@
 
 namespace aug {
 
-    template <bool (*T)(objectref, int)>
+    template <bool (*T)(aub::objectref, int)>
     int
-    filecb(aug_object* ob, int fd) AUG_NOTHROW
+    filecb(aub_object* ob, int fd) AUG_NOTHROW
     {
         try {
             return T(ob, fd) ? 1 : 0;
@@ -39,7 +39,7 @@ namespace aug {
 
     template <typename T, bool (T::*U)(int)>
     int
-    filememcb(aug_object* ob, int fd) AUG_NOTHROW
+    filememcb(aub_object* ob, int fd) AUG_NOTHROW
     {
         try {
             return (obtoaddr<T*>(ob)->*U)(fd) ? 1 : 0;
@@ -49,7 +49,7 @@ namespace aug {
 
     template <typename T>
     int
-    filememcb(aug_object* ob, int fd) AUG_NOTHROW
+    filememcb(aub_object* ob, int fd) AUG_NOTHROW
     {
         try {
             return obtoaddr<T*>(ob)->filecb(fd) ? 1 : 0;
@@ -96,7 +96,7 @@ namespace aug {
 
     inline void
     insertfile(aug_files& files, fdref ref, aug_filecb_t cb,
-               obref<aug_object> ob)
+               aub::obref<aub_object> ob)
     {
         verify(aug_insertfile(&files, ref.get(), cb, ob.get()));
     }
@@ -111,7 +111,7 @@ namespace aug {
     void
     insertfile(aug_files& files, fdref ref, T& x)
     {
-        smartob<aug_addrob> ob(createaddrob(&x, 0));
+        aub::smartob<aug_addrob> ob(createaddrob(&x, 0));
         verify(aug_insertfile(&files, ref.get(), filememcb<T>, ob.base()));
     }
 
@@ -119,7 +119,7 @@ namespace aug {
     void
     insertfile(aug_files& files, fdref ref, std::auto_ptr<T>& x)
     {
-        smartob<aug_addrob> ob(createaddrob(x));
+        aub::smartob<aug_addrob> ob(createaddrob(x));
         verify(aug_insertfile(&files, ref.get(), filememcb<T>, ob.base()));
     }
 

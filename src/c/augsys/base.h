@@ -128,7 +128,7 @@ aug_openfds(int fds[2], const struct aug_fdtype* fdtype);
  */
 
 AUGSYS_API int
-aug_releasefd(int fd);
+aub_releasefd(int fd);
 
 /**
  * Increment descriptor's reference count.
@@ -139,7 +139,7 @@ aug_releasefd(int fd);
  */
 
 AUGSYS_API int
-aug_retainfd(int fd);
+aub_retainfd(int fd);
 
 /**
  * Associated new type with file descriptor.

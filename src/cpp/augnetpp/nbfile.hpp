@@ -22,9 +22,9 @@
 
 namespace aug {
 
-    template <bool (*T)(objectref, int, unsigned short)>
+    template <bool (*T)(aub::objectref, int, unsigned short)>
     int
-    nbfilecb(aug_object* ob, int fd, unsigned short events) AUG_NOTHROW
+    nbfilecb(aub_object* ob, int fd, unsigned short events) AUG_NOTHROW
     {
         try {
             return T(ob, fd, events) ? 1 : 0;
@@ -37,9 +37,9 @@ namespace aug {
         return 1;
     }
 
-    template <typename T, bool (T::*U)(objectref, int, unsigned short)>
+    template <typename T, bool (T::*U)(aub::objectref, int, unsigned short)>
     int
-    nbfilememcb(aug_object* ob, int fd, unsigned short events) AUG_NOTHROW
+    nbfilememcb(aub_object* ob, int fd, unsigned short events) AUG_NOTHROW
     {
         try {
             return (obtoaddr<T*>(ob)->*U)(fd, events) ? 1 : 0;
@@ -49,7 +49,7 @@ namespace aug {
 
     template <typename T>
     int
-    nbfilememcb(aug_object* ob, int fd, unsigned short events) AUG_NOTHROW
+    nbfilememcb(aub_object* ob, int fd, unsigned short events) AUG_NOTHROW
     {
         try {
             return obtoaddr<T*>(ob)->nbfilecb(fd, events) ? 1 : 0;
@@ -92,7 +92,7 @@ namespace aug {
 
     inline void
     insertnbfile(aug_nbfiles_t nbfiles, fdref ref, aug_nbfilecb_t cb,
-                 aug_object* ob)
+                 aub_object* ob)
     {
         verify(aug_insertnbfile(nbfiles, ref.get(), cb, ob));
     }
@@ -108,7 +108,7 @@ namespace aug {
     void
     insertnbfile(aug_nbfiles_t nbfiles, fdref ref, T& x)
     {
-        smartob<aug_addrob> ob(createaddrob(&x, 0));
+        aub::smartob<aug_addrob> ob(createaddrob(&x, 0));
         verify(aug_insertnbfile
                (nbfiles, ref.get(), nbfilememcb<T>, ob.base()));
     }
@@ -117,7 +117,7 @@ namespace aug {
     void
     insertnbfile(aug_nbfiles_t nbfiles, fdref ref, std::auto_ptr<T>& x)
     {
-        smartob<aug_addrob> ob(createaddrob(x));
+        aub::smartob<aug_addrob> ob(createaddrob(x));
         verify(aug_insertnbfile
                (nbfiles, ref.get(), nbfilememcb<T>, ob.base()));
     }

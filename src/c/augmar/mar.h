@@ -23,7 +23,7 @@
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @see aug_retainmar().
+ * @see aub_retainmar().
  */
 
 AUGMAR_API int
@@ -35,7 +35,7 @@ aug_copymar(aug_mar_t dst, aug_mar_t src);
  * @return A handle to the newly created message archive or NULL on failure,
  * in which case errno can be used to determine the error.
  *
- * @see aug_openmar() and aug_releasemar().
+ * @see aug_openmar() and aub_releasemar().
  */
 
 AUGMAR_API aug_mar_t
@@ -54,7 +54,7 @@ aug_createmar(void);
  * @return A handle to the newly created message archive or NULL on failure,
  * in which case errno can be used to determine the error.
  *
- * @see aug_createmar() and aug_releasemar().
+ * @see aug_createmar() and aub_releasemar().
  */
 
 AUGMAR_API aug_mar_t
@@ -71,11 +71,11 @@ aug_openmar(const char* path, int flags, ...);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @see aug_createmar(), aug_openmar() and aug_retainmar().
+ * @see aug_createmar(), aug_openmar() and aub_retainmar().
  */
 
 AUGMAR_API int
-aug_releasemar(aug_mar_t mar);
+aub_releasemar(aug_mar_t mar);
 
 /**
  * Retain additional reference to message archive handle.
@@ -85,11 +85,11 @@ aug_releasemar(aug_mar_t mar);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @see aug_copymar() and aug_releasemar().
+ * @see aug_copymar() and aub_releasemar().
  */
 
 AUGMAR_API int
-aug_retainmar(aug_mar_t mar);
+aub_retainmar(aug_mar_t mar);
 
 /**
  * Compact any unused space within message archive.

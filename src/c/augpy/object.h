@@ -8,15 +8,15 @@
 # undef _DEBUG
 #endif /* _WIN32 */
 
-#include "maud.h"
-#include "augobj/blob.h"
+#include "aum.h"
+#include "augob/blob.h"
 
 #include <Python.h>
 
-AUG_OBJECTDECL(augpy_blob);
+AUB_OBJECTDECL(augpy_blob);
 
 struct augpy_blobvtbl {
-    AUG_OBJECT(augpy_blob);
+    AUB_OBJECT(augpy_blob);
     PyObject* (*get_)(augpy_blob*);
 };
 
@@ -24,7 +24,7 @@ aug_blob*
 augpy_createblob(PyObject* pyob);
 
 PyObject*
-augpy_getblob(aug_object* ob);
+augpy_getblob(aub_object* ob);
 
 PyTypeObject*
 augpy_createtype(void);

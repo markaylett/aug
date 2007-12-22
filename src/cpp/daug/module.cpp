@@ -14,8 +14,9 @@ AUG_RCSID("$Id$");
 
 #include <exception>
 
+using namespace aub;
 using namespace aug;
-using namespace augas;
+using namespace daug;
 using namespace std;
 
 module::~module() AUG_NOTHROW
@@ -27,19 +28,19 @@ module::~module() AUG_NOTHROW
 }
 
 module::module(const string& name, const char* path,
-               const struct maud_host& host,
-               void (*teardown)(const maud_handle*))
+               const struct aum_host& host,
+               void (*teardown)(const aum_handle*))
     : name_(name),
       lib_(path)
 {
     AUG_DEBUG2("resolving symbols in module: name=[%s]", name_.c_str());
-    maud_initfn initfn(dlsym<maud_initfn>(lib_, "maud_init"));
-    termfn_ = dlsym<maud_termfn>(lib_, "maud_term");
+    aum_initfn initfn(dlsym<aum_initfn>(lib_, "aum_init"));
+    termfn_ = dlsym<aum_termfn>(lib_, "aum_term");
 
     AUG_DEBUG2("initialising module: name=[%s]", name_.c_str());
-    const struct maud_module* ptr(initfn(name_.c_str(), &host));
+    const struct aum_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
-        throw error(__FILE__, __LINE__, EMODCALL, "maud_init() failed");
+        throw error(__FILE__, __LINE__, EMODCALL, "aum_init() failed");
     setdefaults(module_, *ptr, teardown);
 }
 
@@ -51,10 +52,10 @@ module::stop() const AUG_NOTHROW
 }
 
 bool
-module::start(maud_session& session) const AUG_NOTHROW
+module::start(aum_session& session) const AUG_NOTHROW
 {
     AUG_DEBUG2("start(): sname=[%s]", session.name_);
-    return MAUD_OK == module_.start_(&session);
+    return AUM_OK == module_.start_(&session);
 }
 
 void
@@ -73,30 +74,30 @@ module::event(const char* from, const char* type,
 }
 
 void
-module::closed(const maud_handle& sock) const AUG_NOTHROW
+module::closed(const aum_handle& sock) const AUG_NOTHROW
 {
     AUG_DEBUG2("closed(): id=[%d]", sock.id_);
     module_.closed_(&sock);
 }
 
 void
-module::teardown(const maud_handle& sock) const AUG_NOTHROW
+module::teardown(const aum_handle& sock) const AUG_NOTHROW
 {
     AUG_DEBUG2("teardown(): id=[%d]", sock.id_);
     module_.teardown_(&sock);
 }
 
 bool
-module::accepted(maud_handle& sock, const char* addr,
+module::accepted(aum_handle& sock, const char* addr,
                  unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("accept(): id=[%d], addr=[%s], port=[%u]",
                sock.id_, addr, (unsigned)port);
-    return MAUD_OK == module_.accepted_(&sock, addr, port);
+    return AUM_OK == module_.accepted_(&sock, addr, port);
 }
 
 void
-module::connected(maud_handle& sock, const char* addr,
+module::connected(aum_handle& sock, const char* addr,
                   unsigned short port) const AUG_NOTHROW
 {
     AUG_DEBUG2("connected(): id=[%d], addr=[%s], port=[%u]",
@@ -105,7 +106,7 @@ module::connected(maud_handle& sock, const char* addr,
 }
 
 void
-module::data(const maud_handle& sock, const char* buf,
+module::data(const aum_handle& sock, const char* buf,
              size_t size) const AUG_NOTHROW
 {
     AUG_DEBUG2("data(): id=[%d]", sock.id_);
@@ -113,30 +114,30 @@ module::data(const maud_handle& sock, const char* buf,
 }
 
 void
-module::rdexpire(const maud_handle& sock, unsigned& ms) const AUG_NOTHROW
+module::rdexpire(const aum_handle& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("rdexpire(): id=[%d], ms=[%u]", sock.id_, ms);
     module_.rdexpire_(&sock, &ms);
 }
 
 void
-module::wrexpire(const maud_handle& sock, unsigned& ms) const AUG_NOTHROW
+module::wrexpire(const aum_handle& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("wrexpire(): id=[%d], ms=[%u]", sock.id_, ms);
     module_.wrexpire_(&sock, &ms);
 }
 
 void
-module::expire(const maud_handle& timer, unsigned& ms) const AUG_NOTHROW
+module::expire(const aum_handle& timer, unsigned& ms) const AUG_NOTHROW
 {
     AUG_DEBUG2("expire(): id=[%d], ms=[%u]", timer.id_, ms);
     module_.expire_(&timer, &ms);
 }
 
 bool
-module::authcert(const maud_handle& sock, const char* subject,
+module::authcert(const aum_handle& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW
 {
     AUG_DEBUG2("authcert(): id=[%d]", sock.id_);
-    return MAUD_OK == module_.authcert_(&sock, subject, issuer);
+    return AUM_OK == module_.authcert_(&sock, subject, issuer);
 }

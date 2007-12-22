@@ -584,7 +584,7 @@ readwrite_(struct aug_nbfile* nbfile, int rw)
 }
 
 static int
-nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
+nbfilecb_(aub_object* ob, struct aug_nbfile* nbfile)
 {
     struct sslext_* x = nbfile->ext_;
     int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
@@ -642,7 +642,7 @@ nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
         /* Callback may close file, ensure that it is still available after
            callback returns. */
 
-        aug_retainfd(nbfile->fd_);
+        aub_retainfd(nbfile->fd_);
         if ((ret = nbfile->cb_(ob, nbfile->fd_, events))) {
 
             /* No need to update events if file is being removed - indicated
@@ -650,7 +650,7 @@ nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
 
             updateevents_(nbfile);
         }
-        aug_releasefd(nbfile->fd_);
+        aub_releasefd(nbfile->fd_);
 
     } else {
         AUG_DEBUG3("SSL: nbfilecb_() skipped");

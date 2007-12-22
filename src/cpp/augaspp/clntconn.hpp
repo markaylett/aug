@@ -11,7 +11,7 @@ namespace aug {
 
     class clntconn : public rwtimer_base, public conn_base {
 
-        maud_handle sock_;
+        aum_handle sock_;
         buffer buffer_;
         rwtimer rwtimer_;
         connptr conn_;
@@ -35,10 +35,10 @@ namespace aug {
 
         // conn_base.
 
-        maud_handle&
+        aum_handle&
         do_get();
 
-        const maud_handle&
+        const aum_handle&
         do_get() const;
 
         const sessionptr&

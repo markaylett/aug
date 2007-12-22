@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define MAUD_BUILD
+#define AUM_BUILD
 #include "augpy/object.h"
 #include "augsys/defs.h"
 
@@ -19,12 +19,12 @@ struct blobimpl_ {
 static void*
 castblob_(aug_blob* ob, const char* id)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
-        aug_retain(&impl->blob_);
+    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
+    if (AUB_EQUALID(id, aub_objectid) || AUB_EQUALID(id, aug_blobid)) {
+        aub_retain(&impl->blob_);
         return &impl->blob_;
-    } else if (AUG_EQUALID(id, augpy_blobid)) {
-        aug_retain(&impl->pyblob_);
+    } else if (AUB_EQUALID(id, augpy_blobid)) {
+        aub_retain(&impl->pyblob_);
         return &impl->pyblob_;
     }
     return NULL;
@@ -33,7 +33,7 @@ castblob_(aug_blob* ob, const char* id)
 static int
 retainblob_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
+    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
     return 0;
 }
@@ -41,7 +41,7 @@ retainblob_(aug_blob* ob)
 static int
 releaseblob_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
+    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
     if (0 == --impl->refs_) {
         Py_DECREF(impl->pyob_);
         free(impl);
@@ -52,7 +52,7 @@ releaseblob_(aug_blob* ob)
 static const void*
 blobdata_(aug_blob* ob, size_t* size)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
+    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
     const void* data;
     int len;
 
@@ -86,12 +86,12 @@ static const struct aug_blobvtbl blobvtbl_ = {
 static void*
 castpyblob_(augpy_blob* ob, const char* id)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augpy_blobid)) {
-        aug_retain(&impl->pyblob_);
+    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, pyblob_, ob);
+    if (AUB_EQUALID(id, aub_objectid) || AUB_EQUALID(id, augpy_blobid)) {
+        aub_retain(&impl->pyblob_);
         return &impl->pyblob_;
-    } else if (AUG_EQUALID(id, aug_blobid)) {
-        aug_retain(&impl->blob_);
+    } else if (AUB_EQUALID(id, aug_blobid)) {
+        aub_retain(&impl->blob_);
         return &impl->blob_;
     }
     return NULL;
@@ -100,7 +100,7 @@ castpyblob_(augpy_blob* ob, const char* id)
 static int
 retainpyblob_(augpy_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
+    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, pyblob_, ob);
     ++impl->refs_;
     return 0;
 }
@@ -108,7 +108,7 @@ retainpyblob_(augpy_blob* ob)
 static int
 releasepyblob_(augpy_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
+    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, pyblob_, ob);
     if (0 == --impl->refs_) {
         Py_DECREF(impl->pyob_);
         free(impl);
@@ -119,7 +119,7 @@ releasepyblob_(augpy_blob* ob)
 static PyObject*
 getpyblob_(augpy_blob* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
+    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, pyblob_, ob);
     Py_INCREF(impl->pyob_);
     return impl->pyob_;
 }
@@ -155,14 +155,14 @@ augpy_createblob(PyObject* pyob)
 }
 
 PyObject*
-augpy_getblob(aug_object* ob)
+augpy_getblob(aub_object* ob)
 {
     PyObject* pyob = NULL;
     if (ob) {
-        augpy_blob* blob = aug_cast(ob, augpy_blobid);
+        augpy_blob* blob = aub_cast(ob, augpy_blobid);
         if (blob) {
             pyob = blob->vtbl_->get_(blob);
-            aug_release(blob);
+            aub_release(blob);
         }
     }
     return pyob;
@@ -175,7 +175,7 @@ static int handles_ = 0;
 
 typedef struct {
     PyObject_HEAD
-    char name_[MAUD_MAXNAME + 1];
+    char name_[AUM_MAXNAME + 1];
     int id_;
     PyObject* user_;
 } handle_;
@@ -203,7 +203,7 @@ static void
 dealloc_(handle_* self)
 {
     --handles_;
-    maud_writelog(MAUD_LOGDEBUG, "deallocated: <augpy.Handle at %p, id=%d>",
+    aum_writelog(AUM_LOGDEBUG, "deallocated: <augpy.Handle at %p, id=%d>",
                   (void*)self, self->id_);
 
     clear_(self);
@@ -294,7 +294,7 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
     }
 
     ++handles_;
-    maud_writelog(MAUD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
+    aum_writelog(AUM_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
                   (void*)self, self->id_);
     return (PyObject*)self;
 }
@@ -380,7 +380,7 @@ augpy_createhandle(PyTypeObject* type, int id, PyObject* user)
     self->user_ = user;
 
     ++handles_;
-    maud_writelog(MAUD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
+    aum_writelog(AUM_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
                   (void*)self, self->id_);
     return (PyObject*)self;
 }

@@ -8,7 +8,7 @@
 
 #include "augnetpp/nbfile.hpp"
 
-#include "maud.h"
+#include "aum.h"
 
 namespace aug {
 
@@ -72,54 +72,54 @@ namespace aug {
 
         void
         post(const char* sname, const char* to, const char* type,
-             objectref ob);
+             aub::objectref ob);
 
         // Thread-unsafe host interface.
 
         void
         dispatch(const char* sname, const char* to, const char* type,
-                 objectref ob);
+                 aub::objectref ob);
 
         void
-        shutdown(maud_id cid, unsigned flags);
+        shutdown(aum_id cid, unsigned flags);
 
-        maud_id
+        aum_id
         tcpconnect(const char* sname, const char* host, const char* port,
                    void* user);
 
-        maud_id
+        aum_id
         tcplisten(const char* sname, const char* host, const char* port,
                   void* user);
 
         void
-        send(maud_id cid, const void* buf, size_t len);
+        send(aum_id cid, const void* buf, size_t len);
 
         void
-        sendv(maud_id cid, blobref ref);
+        sendv(aum_id cid, blobref ref);
 
         void
-        setrwtimer(maud_id cid, unsigned ms, unsigned flags);
+        setrwtimer(aum_id cid, unsigned ms, unsigned flags);
 
         bool
-        resetrwtimer(maud_id cid, unsigned ms, unsigned flags);
+        resetrwtimer(aum_id cid, unsigned ms, unsigned flags);
 
         bool
-        cancelrwtimer(maud_id cid, unsigned flags);
+        cancelrwtimer(aum_id cid, unsigned flags);
 
-        maud_id
-        settimer(const char* sname, unsigned ms, objectref ob);
-
-        bool
-        resettimer(maud_id tid, unsigned ms);
+        aum_id
+        settimer(const char* sname, unsigned ms, aub::objectref ob);
 
         bool
-        canceltimer(maud_id tid);
+        resettimer(aum_id tid, unsigned ms);
+
+        bool
+        canceltimer(aum_id tid);
 
         void
-        setsslclient(maud_id cid, sslctx& ctx);
+        setsslclient(aum_id cid, sslctx& ctx);
 
         void
-        setsslserver(maud_id cid, sslctx& ctx);
+        setsslserver(aum_id cid, sslctx& ctx);
 
         bool
         stopping() const;

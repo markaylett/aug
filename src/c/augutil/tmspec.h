@@ -23,12 +23,12 @@ struct aug_tmspec {
  *
  * Specifications can contain the following time components:
  *
- * - m - month
- * - d - day of month
- * - H - hour of day
- * - M - minute of hour
+ * @li m - month
+ * @li d - day of month
+ * @li H - hour of day
+ * @li M - minute of hour
  *
- * So that, for example, "17H0M" would mean "daily, at 5 o'clock".
+ * So that, for example, "17H0M" would be taken to mean "daily, at 5 o'clock".
  *
  * @param tms Structure to be populated.
  *

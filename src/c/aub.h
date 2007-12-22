@@ -1,8 +1,20 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGOBJ_H
-#define AUGOBJ_H
+#ifndef AUB_H
+#define AUB_H
+
+/**
+ * @page aub
+ *
+ * TODO.
+ */
+
+/**
+ * @page aubidl
+ *
+ * TODO.
+ */
 
 #include <stddef.h>
 #include <sys/types.h> /* size_t */
@@ -20,10 +32,8 @@
 # define offsetof(s, m) (size_t)&(((s*)0)->m)
 #endif /* !offsetof */
 
-#if !defined(AUG_MKSTR)
-# define AUG_MKSTR_(x) #x
-# define AUG_MKSTR(x) AUG_MKSTR_(x)
-#endif /* !AUG_MKSTR */
+#define AUB_MKSTR_(x) #x
+#define AUB_MKSTR(x) AUB_MKSTR_(x)
 
 /**
  * @defgroup ObjectMacros Object Macros
@@ -33,25 +43,25 @@
  * @{
  */
 
-#define AUG_PODIMPL(s, m, ptr)                          \
+#define AUB_PODIMPL(s, m, ptr)                          \
     (ptr ? (s*)((char*)(ptr) - offsetof(s, m)) : NULL)
 
 /**
  * Compares to object-ids @a a and @a b for equality.
  */
 
-#define AUG_EQUALID(a, b)                       \
+#define AUB_EQUALID(a, b)                       \
     (0 == strcmp(a, b))
 
-#define AUG_OBJECTDECL(type)                        \
+#define AUB_OBJECTDECL(type)                        \
     struct type##vtbl;                              \
     typedef struct type##_ {                        \
             const struct type##vtbl* vtbl_;         \
             void* impl_;                            \
     } type;                                         \
-    static const char type##id[] = AUG_MKSTR(type)
+    static const char type##id[] = AUB_MKSTR(type)
 
-#define AUG_OBJECT(type)                        \
+#define AUB_OBJECT(type)                        \
     void* (*cast_)(type*, const char*);         \
     int (*retain_)(type*);                      \
     int (*release_)(type*)
@@ -63,7 +73,7 @@
  */
 
 /**
- * @defgroup aug_object aug_object
+ * @defgroup aub_object aub_object
  *
  * @ingroup Object
  *
@@ -72,20 +82,20 @@
  * @{
  */
 
-AUG_OBJECTDECL(aug_object);
-struct aug_objectvtbl {
-    AUG_OBJECT(aug_object);
+AUB_OBJECTDECL(aub_object);
+struct aub_objectvtbl {
+    AUB_OBJECT(aub_object);
 };
 
-#define aug_cast(ob, type)                                     \
-    ((aug_object*)ob)->vtbl_->cast_((aug_object*)ob, type)
+#define aub_cast(ob, type)                                     \
+    ((aub_object*)ob)->vtbl_->cast_((aub_object*)ob, type)
 
-#define aug_retain(ob)                                     \
-    ((aug_object*)ob)->vtbl_->retain_((aug_object*)ob)
+#define aub_retain(ob)                                     \
+    ((aub_object*)ob)->vtbl_->retain_((aub_object*)ob)
 
-#define aug_release(ob)                                     \
-    ((aug_object*)ob)->vtbl_->release_((aug_object*)ob)
+#define aub_release(ob)                                     \
+    ((aub_object*)ob)->vtbl_->release_((aub_object*)ob)
 
 /** @} */
 
-#endif /* AUGOBJ_H */
+#endif /* AUB_H */

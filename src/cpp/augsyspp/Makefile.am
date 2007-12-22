@@ -14,7 +14,6 @@ modinclude_HEADERS = \
 	mmap.hpp \
 	mutex.hpp \
 	muxer.hpp \
-	null.hpp \
 	smartfd.hpp \
 	smartptr.hpp \
 	socket.hpp \
@@ -39,7 +38,6 @@ libaugsyspp_la_SOURCES = \
 	mmap.cpp \
 	mutex.cpp \
 	muxer.cpp \
-	null.cpp \
 	smartfd.cpp \
 	smartptr.cpp \
 	socket.cpp \

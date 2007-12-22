@@ -335,7 +335,7 @@ aug_openfds(int fds[2], const struct aug_fdtype* fdtype)
 }
 
 AUGSYS_API int
-aug_releasefd(int fd)
+aub_releasefd(int fd)
 {
     struct file_ prev;
 
@@ -361,7 +361,7 @@ aug_releasefd(int fd)
 }
 
 AUGSYS_API int
-aug_retainfd(int fd)
+aub_retainfd(int fd)
 {
     int ret;
 

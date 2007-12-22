@@ -254,7 +254,7 @@ AC_CONFIG_FILES([Makefile
                  src/c/Makefile
                  src/c/augmar/Makefile
                  src/c/augnet/Makefile
-                 src/c/augobj/Makefile
+                 src/c/augob/Makefile
                  src/c/augpy/Makefile
                  src/c/augrb/Makefile
                  src/c/augres/Makefile

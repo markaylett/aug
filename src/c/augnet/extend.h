@@ -22,7 +22,7 @@ struct aug_nbfiles_ {
 };
 
 struct aug_nbtype {
-    int (*filecb_)(aug_object*, struct aug_nbfile*);
+    int (*filecb_)(aub_object*, struct aug_nbfile*);
     int (*seteventmask_)(struct aug_nbfile*, unsigned short);
     int (*eventmask_)(struct aug_nbfile*);
     int (*events_)(struct aug_nbfile*);

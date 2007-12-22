@@ -1,18 +1,18 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define MAUD_BUILD
-#include "maudpp.hpp"
+#define AUM_BUILD
+#include "aumpp.hpp"
 
 #include "augutilpp.hpp"
 #include "augsyspp.hpp"
 
-#include "augobj/blob.h"
+#include "augob/blob.h"
 
 #include <fstream>
 #include <memory> // auto_ptr<>
 
-using namespace maud;
+using namespace aum;
 using namespace std;
 
 namespace {
@@ -120,29 +120,29 @@ namespace {
         bool
         do_start(const char* sname)
         {
-            writelog(MAUD_LOGINFO, "starting...");
+            writelog(AUM_LOGINFO, "starting...");
 
-            if (atoi(maud::getenv("session.bench.sendv", "1"))) {
+            if (atoi(aum::getenv("session.bench.sendv", "1"))) {
                 send_ = dosendv;
-                maud_writelog(MAUD_LOGINFO, "sendv: yes");
+                aum_writelog(AUM_LOGINFO, "sendv: yes");
             } else {
                 send_ = dosend;
-                maud_writelog(MAUD_LOGINFO, "sendv: no");
+                aum_writelog(AUM_LOGINFO, "sendv: no");
             }
 
-            const char* serv = maud::getenv("session.bench.serv");
+            const char* serv = aum::getenv("session.bench.serv");
             if (!serv)
                 return false;
 
-            const char* host = maud::getenv("session.bench.host",
+            const char* host = aum::getenv("session.bench.host",
                                             "localhost");
-            conns_ = atoi(maud::getenv("session.bench.conns", "100"));
-            echos_ = atoi(maud::getenv("session.bench.echos", "1000"));
+            conns_ = atoi(aum::getenv("session.bench.conns", "100"));
+            echos_ = atoi(aum::getenv("session.bench.echos", "1000"));
 
-            maud_writelog(MAUD_LOGINFO, "host: %s", host);
-            maud_writelog(MAUD_LOGINFO, "serv: %s", serv);
-            maud_writelog(MAUD_LOGINFO, "conns: %d", conns_);
-            maud_writelog(MAUD_LOGINFO, "echos: %d", echos_);
+            aum_writelog(AUM_LOGINFO, "host: %s", host);
+            aum_writelog(AUM_LOGINFO, "serv: %s", serv);
+            aum_writelog(AUM_LOGINFO, "conns: %d", conns_);
+            aum_writelog(AUM_LOGINFO, "echos: %d", echos_);
 
             for (; estab_ < conns_; ++estab_)
                 tcpconnect(host, serv, new state(echos_));
@@ -154,22 +154,22 @@ namespace {
             auto_ptr<state> s(sock.user<state>());
             pushxy(xy_, s->secs_);
             if (0 < --estab_) {
-                maud_writelog(MAUD_LOGINFO, "%d established", estab_);
+                aum_writelog(AUM_LOGINFO, "%d established", estab_);
                 return;
             }
 
             double ms(elapsed(clock_) * 1000.0);
 
-            maud_writelog(MAUD_LOGINFO, "total time: %f ms", ms);
+            aum_writelog(AUM_LOGINFO, "total time: %f ms", ms);
 
             ms /= static_cast<double>(conns_);
-            maud_writelog(MAUD_LOGINFO, "time per conn: %f ms", ms);
+            aum_writelog(AUM_LOGINFO, "time per conn: %f ms", ms);
 
             ms /= static_cast<double>(echos_);
-            maud_writelog(MAUD_LOGINFO, "echos per sec: %f", 1000.0 / ms);
+            aum_writelog(AUM_LOGINFO, "echos per sec: %f", 1000.0 / ms);
 
             double k(static_cast<double>(bytes_) / 1024.00);
-            maud_writelog(MAUD_LOGINFO, "total size: %f k", k);
+            aum_writelog(AUM_LOGINFO, "total size: %f k", k);
 
             stopall();
 
@@ -178,9 +178,9 @@ namespace {
         void
         do_connected(handle& sock, const char* addr, unsigned short port)
         {
-            const char* sslctx = maud::getenv("session.bench.sslcontext", 0);
+            const char* sslctx = aum::getenv("session.bench.sslcontext", 0);
             if (sslctx) {
-                writelog(MAUD_LOGINFO, "sslcontext: %s", sslctx);
+                writelog(AUM_LOGINFO, "sslcontext: %s", sslctx);
                 setsslclient(sock, sslctx);
             }
 
@@ -202,7 +202,7 @@ namespace {
         do_authcert(const handle& sock, const char* subject,
                     const char* issuer)
         {
-            maud_writelog(MAUD_LOGINFO, "checking subject...");
+            aum_writelog(AUM_LOGINFO, "checking subject...");
             return true;
         }
         ~bench() AUG_NOTHROW
@@ -224,4 +224,4 @@ namespace {
     typedef basic_module<basic_factory<bench> > module;
 }
 
-MAUD_ENTRYPOINTS(module::init, module::term)
+AUM_ENTRYPOINTS(module::init, module::term)

@@ -20,7 +20,7 @@
 
 @s std int @s string int
 
-@s maud int
+@s aum int
 @s basic_factory int
 @s basic_module int
 @s basic_session int
@@ -121,15 +121,15 @@ namespace {@/
 }@/
 @<declare export table@>
 
-@ The \.{<maudpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
+@ The \.{<aumpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
 implementations.  Modules can also be written in standard \CEE/.  A \CEE/
-implementation would use the \.{<maud.h>} header, instead.  For convenience,
-names are imported from the |maud| and |std| namespaces.
+implementation would use the \.{<aum.h>} header, instead.  For convenience,
+names are imported from the |aum| and |std| namespaces.
 
 @<include...@>=
-#define MAUD_BUILD
-#include <maudpp.hpp>@/
-using namespace maud;@/
+#define AUM_BUILD
+#include <aumpp.hpp>@/
+using namespace aum;@/
 using namespace std;
 
 @ Session types (|echo| in this example) are fed into a class template which
@@ -140,12 +140,12 @@ argument.  Here, |basic_factory<>| is used to create a simple factory for
 
 \yskip\noindent
 \DAUG/ Modules are required to export two library functions, namely,
-|maud_init()| and |maud_term()|.  The |MAUD_ENTRYPOINTS| macro assists
-with the definition of these two export functions.
+|aum_init()| and |aum_term()|.  The |AUM_ENTRYPOINTS| macro assists with the
+definition of these two export functions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echo> > module;@/
-MAUD_ENTRYPOINTS(module::init, module::term)
+AUM_ENTRYPOINTS(module::init, module::term)
 
 @ The |echoline| functor handles each line received from the client.
 \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
@@ -187,8 +187,8 @@ deactivated.
 bool
 echo::do_start(const char* sname)
 {
-  writelog(MAUD_LOGINFO, "starting session [%s]", sname);
-  const char* serv = maud::getenv("session.echo.serv");
+  writelog(AUM_LOGINFO, "starting session [%s]", sname);
+  const char* serv = aum::getenv("session.echo.serv");
   if (!serv)
     return false;
   tcplisten("0.0.0.0", serv);
@@ -210,7 +210,7 @@ echo::do_accepted(handle& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
-  setrwtimer(sock, 15000, MAUD_TIMRD);
+  setrwtimer(sock, 15000, AUM_TIMRD);
   return true;
 }
 

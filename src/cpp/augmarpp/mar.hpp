@@ -51,12 +51,12 @@ namespace aug {
     inline void
     releasemar(aug_mar_t m)
     {
-        verify(aug_releasemar(m));
+        verify(aub_releasemar(m));
     }
     inline void
     retainmar(aug_mar_t m)
     {
-        verify(aug_retainmar(m));
+        verify(aub_retainmar(m));
     }
     inline void
     compactmar(marref ref)

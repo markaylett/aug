@@ -16,23 +16,23 @@
 
 #include "augsys/types.h"
 
-#include "augobj.h"
+#include "aub.h"
 
 struct aug_marhandler {
-    aug_mar_t (*create_)(aug_object*, const char*);
-    int (*message_)(aug_object*, const char*, aug_mar_t);
+    aug_mar_t (*create_)(aub_object*, const char*);
+    int (*message_)(aub_object*, const char*, aug_mar_t);
 };
 
 typedef struct aug_marparser_* aug_marparser_t;
 
 /**
- * If aug_createmarparser() succeeds, aug_release() will be called from
+ * If aug_createmarparser() succeeds, aub_release() will be called from
  * aug_destroymarparser().
  */
 
 AUGNET_API aug_marparser_t
 aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
-                    aug_object* ob);
+                    aub_object* ob);
 
 AUGNET_API int
 aug_destroymarparser(aug_marparser_t parser);

@@ -17,7 +17,7 @@ AUG_RCSID("$Id$");
 
 struct aug_base64_ {
     aug_base64cb_t cb_;
-    aug_object* ob_;
+    aub_object* ob_;
     char buf_[AUG_MAXLINE];
 	size_t pos_;
 	int save_[3];
@@ -521,7 +521,7 @@ encodefinish_(aug_base64_t base64)
 }
 
 AUGNET_API aug_base64_t
-aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aug_object* ob)
+aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aub_object* ob)
 {
     aug_base64_t base64 = malloc(sizeof(struct aug_base64_));
     if (!base64) {
@@ -531,7 +531,7 @@ aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aug_object* ob)
 
     base64->cb_ = cb;
     if ((base64->ob_ = ob))
-        aug_retain(ob);
+        aub_retain(ob);
 
     base64->saved_ = 0;
     base64->pos_ = 0;
@@ -555,7 +555,7 @@ AUGNET_API int
 aug_destroybase64(aug_base64_t base64)
 {
     if (base64->ob_)
-        aug_release(base64->ob_);
+        aub_release(base64->ob_);
     free(base64);
     return 0;
 }

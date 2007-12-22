@@ -43,15 +43,15 @@ namespace aug {
         }
     };
 
-    inline smartob<aug_longob>
+    inline aub::smartob<aug_longob>
     createlongob(long l, void (*destroy)(long))
     {
-        return object_attach<aug_longob>(aug_createlongob(l, destroy));
+        return aub::object_attach<aug_longob>(aug_createlongob(l, destroy));
     }
 
     template <typename T>
     T
-    obtolong(obref<aug_object> ref)
+    obtolong(aub::obref<aub_object> ref)
     {
         return static_cast<T>(aug_obtolong(ref.get()));
     }
@@ -63,14 +63,14 @@ namespace aug {
         delete static_cast<T*>(ptr);
     }
 
-    inline smartob<aug_addrob>
+    inline aub::smartob<aug_addrob>
     createaddrob(void* p, void (*destroy)(void*))
     {
-        return object_attach<aug_addrob>(aug_createaddrob(p, destroy));
+        return aub::object_attach<aug_addrob>(aug_createaddrob(p, destroy));
     }
 
     template <typename T>
-    smartob<aug_addrob>
+    aub::smartob<aug_addrob>
     createaddrob(std::auto_ptr<T>& x)
     {
         return createaddrob(x.release(), deleter<T>);
@@ -78,15 +78,15 @@ namespace aug {
 
     template <typename T>
     T
-    obtoaddr(obref<aug_object> ob)
+    obtoaddr(aub::obref<aub_object> ob)
     {
         return static_cast<T>(aug_obtoaddr(ob.get()));
     }
 
-    inline smartob<aug_blob>
+    inline aub::smartob<aug_blob>
     createblob(const void* buf, size_t len)
     {
-        return object_attach<aug_blob>(aug_createblob(buf, len));
+        return aub::object_attach<aug_blob>(aug_createblob(buf, len));
     }
 }
 

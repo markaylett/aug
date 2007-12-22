@@ -8,7 +8,7 @@
 
 #include <map>
 
-namespace augas {
+namespace daug {
 
     class options;
 

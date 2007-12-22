@@ -16,7 +16,6 @@
 #include "augsyspp/mmap.hpp"
 #include "augsyspp/mutex.hpp"
 #include "augsyspp/muxer.hpp"
-#include "augsyspp/null.hpp"
 #include "augsyspp/smartfd.hpp"
 #include "augsyspp/smartptr.hpp"
 #include "augsyspp/socket.hpp"

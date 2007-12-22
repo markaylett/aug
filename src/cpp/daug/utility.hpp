@@ -4,14 +4,14 @@
 #ifndef DAUG_UTILITY_HPP
 #define DAUG_UTILITY_HPP
 
-struct maud_module;
-struct maud_handle;
+struct aum_module;
+struct aum_handle;
 
-namespace augas {
+namespace daug {
 
     void
-    setdefaults(maud_module& dst, const maud_module& src,
-                void (*teardown)(const maud_handle*));
+    setdefaults(aum_module& dst, const aum_module& src,
+                void (*teardown)(const aum_handle*));
 }
 
 #endif // DAUG_UTILITY_HPP

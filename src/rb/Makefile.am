@@ -1,5 +1,5 @@
 EXTRA_DIST = \
-	augidl \
+	aubidl \
 	augutil.rb  \
 	log.rb \
 	rbecho.rb \
@@ -14,10 +14,12 @@ EXTRA_DIST = \
 	rbtest6.rb \
 	rbtest7.rb
 
+bin_SCRIPTS = \
+	aubidl
+
 if ENABLE_RUBY
 rubydir = $(prefix)/ruby
 ruby_DATA = \
-	augidl \
 	augutil.rb \
 	log.rb \
 	rbecho.rb \

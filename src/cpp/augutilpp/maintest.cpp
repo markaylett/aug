@@ -4,11 +4,12 @@
 
 #include "augutilpp/object.hpp"
 
-#include "augobj/blob.h"
+#include "augob/blob.h"
 
 #include <iostream>
 #include <stdexcept>
 
+using namespace aub;
 using namespace aug;
 using namespace std;
 

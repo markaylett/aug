@@ -12,15 +12,15 @@
 
 #include "augutil/config.h"
 
-#include "augobj/addrob.h"
-#include "augobj/blob.h"
-#include "augobj/longob.h"
+#include "augob/addrob.h"
+#include "augob/blob.h"
+#include "augob/longob.h"
 
 AUGUTIL_API aug_longob*
 aug_createlongob(long l, void (*destroy)(long));
 
 AUGUTIL_API long
-aug_obtolong(aug_object* ob);
+aug_obtolong(aub_object* ob);
 
 /**
  * Create object wrapper for plain pointer.
@@ -44,7 +44,7 @@ aug_createaddrob(void* p, void (*destroy)(void*));
  */
 
 AUGUTIL_API void*
-aug_obtoaddr(aug_object* ob);
+aug_obtoaddr(aub_object* ob);
 
 AUGUTIL_API aug_blob*
 aug_createblob(const void* buf, size_t len);

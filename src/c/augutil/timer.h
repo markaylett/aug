@@ -13,14 +13,14 @@
 #include "augutil/config.h"
 #include "augutil/list.h"
 
-#include "augobj.h"
+#include "aub.h"
 
 struct timeval;
 
 struct aug_timer_;
 AUG_HEAD(aug_timers, aug_timer_);
 
-typedef void (*aug_timercb_t)(aug_object*, int, unsigned*);
+typedef void (*aug_timercb_t)(aub_object*, int, unsigned*);
 
 AUGUTIL_API int
 aug_destroytimers(struct aug_timers* timers);
@@ -32,7 +32,7 @@ aug_destroytimers(struct aug_timers* timers);
  * allocated timer id can be specified.  In which case, any timer with a
  * matching id will be cancelled prior to setting the new timer.
  *
- * If aug_settimer() succeeds, aug_retain() will be called on @a ob.
+ * If aug_settimer() succeeds, aub_retain() will be called on @a ob.
  *
  * @param timers TODO
  *
@@ -49,7 +49,7 @@ aug_destroytimers(struct aug_timers* timers);
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, aug_object* ob);
+             aug_timercb_t cb, aub_object* ob);
 
 /**
  * On failure, the timer will be removed.

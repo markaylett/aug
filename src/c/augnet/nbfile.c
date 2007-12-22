@@ -149,7 +149,7 @@ static const struct aug_fdtype fdtype_ = {
 };
 
 static int
-nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
+nbfilecb_(aub_object* ob, struct aug_nbfile* nbfile)
 {
     int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
     return events ? nbfile->cb_(ob, nbfile->fd_, (unsigned short)events) : 1;
@@ -188,7 +188,7 @@ static const struct aug_nbtype nbtype_ = {
 };
 
 static int
-filecb_(aug_object* ob, int fd)
+filecb_(aub_object* ob, int fd)
 {
     struct aug_nbfile nbfile;
     if (!aug_getnbfile(fd, &nbfile))
@@ -225,7 +225,7 @@ aug_destroynbfiles(aug_nbfiles_t nbfiles)
 
 AUGNET_API int
 aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
-                 aug_object* ob)
+                 aub_object* ob)
 {
     struct aug_nbfile nbfile;
 

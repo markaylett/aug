@@ -12,7 +12,7 @@
 
 #include "augutil/config.h"
 
-#include "augobj.h"
+#include "aub.h"
 
 #define AUG_EVENTRECONF 1
 #define AUG_EVENTSTATUS 2
@@ -28,7 +28,7 @@
 
 struct aug_event {
     int type_;
-    aug_object* ob_;
+    aub_object* ob_;
 };
 
 /**

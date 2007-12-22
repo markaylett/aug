@@ -10,13 +10,13 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
-maud_handle&
+aum_handle&
 listener::do_get()
 {
     return sock_;
 }
 
-const maud_handle&
+const aum_handle&
 listener::do_get() const
 {
     return sock_;

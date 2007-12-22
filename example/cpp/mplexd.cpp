@@ -13,6 +13,7 @@
 
 #include <time.h>
 
+using namespace aub;
 using namespace aug;
 using namespace std;
 
@@ -196,7 +197,7 @@ namespace test {
         smartfd sfd_;
         map<int, sessionptr> sfds_;
 
-        state(aug_filecb_t cb, obref<aug_object> ob)
+        state(aug_filecb_t cb, obref<aub_object> ob)
             : sfd_(null)
         {
             aug_hostserv hostserv;
@@ -235,7 +236,7 @@ namespace test {
         {
             AUG_DEBUG2("reading event");
 
-            pair<int, smartob<aug_object> >
+            pair<int, smartob<aub_object> >
                 event(aug::readevent(aug_eventrd()));
 
             switch (event.first) {

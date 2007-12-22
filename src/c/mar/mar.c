@@ -5,6 +5,12 @@
 
 AUG_RCSID("$Id$");
 
+/**
+ * @page mar
+ *
+ * TODO.
+ */
+
 #include "mar/getopt.h"
 #include "mar/utility.h"
 
@@ -375,10 +381,10 @@ run_(int argc, char* argv[], const char* archivename)
             goto fail;
         }
 
-    return aug_releasemar(mar);
+    return aub_releasemar(mar);
 
  fail:
-    aug_releasemar(mar);
+    aub_releasemar(mar);
     return -1;
 }
 

@@ -65,7 +65,7 @@ AUG_RCSID("$Id$");
 
 struct aug_fixstream_ {
     aug_fixcb_t cb_;
-    aug_object* ob_;
+    aub_object* ob_;
     aug_xstr_t xstr_;
     size_t mlen_;
 };
@@ -166,7 +166,7 @@ getsum_(const char* buf, size_t size)
 }
 
 AUGNET_API aug_fixstream_t
-aug_createfixstream(size_t size, aug_fixcb_t cb, aug_object* ob)
+aug_createfixstream(size_t size, aug_fixcb_t cb, aub_object* ob)
 {
     aug_fixstream_t stream = malloc(sizeof(struct aug_fixstream_));
     aug_xstr_t xstr;
@@ -183,7 +183,7 @@ aug_createfixstream(size_t size, aug_fixcb_t cb, aug_object* ob)
 
     stream->cb_ = cb;
     if ((stream->ob_ = ob))
-        aug_retain(ob);
+        aub_retain(ob);
     stream->xstr_ = xstr;
     stream->mlen_ = 0;
     return stream;
@@ -194,7 +194,7 @@ aug_destroyfixstream(aug_fixstream_t stream)
 {
     int ret = aug_destroyxstr(stream->xstr_);
     if (stream->ob_)
-        aug_release(stream->ob_);
+        aub_release(stream->ob_);
     free(stream);
     return ret;
 }
