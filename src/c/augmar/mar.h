@@ -23,7 +23,7 @@
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_retainmar().
+ * @see aug_retainmar().
  */
 
 AUGMAR_API int
@@ -35,7 +35,7 @@ aug_copymar(aug_mar_t dst, aug_mar_t src);
  * @return A handle to the newly created message archive or NULL on failure,
  * in which case errno can be used to determine the error.
  *
- * @sa aug_openmar() and aug_releasemar().
+ * @see aug_openmar() and aug_releasemar().
  */
 
 AUGMAR_API aug_mar_t
@@ -54,7 +54,7 @@ aug_createmar(void);
  * @return A handle to the newly created message archive or NULL on failure,
  * in which case errno can be used to determine the error.
  *
- * @sa aug_createmar() and aug_releasemar().
+ * @see aug_createmar() and aug_releasemar().
  */
 
 AUGMAR_API aug_mar_t
@@ -71,7 +71,7 @@ aug_openmar(const char* path, int flags, ...);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_createmar(), aug_openmar() and aug_retainmar().
+ * @see aug_createmar(), aug_openmar() and aug_retainmar().
  */
 
 AUGMAR_API int
@@ -85,7 +85,7 @@ aug_releasemar(aug_mar_t mar);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_copymar() and aug_releasemar().
+ * @see aug_copymar() and aug_releasemar().
  */
 
 AUGMAR_API int
@@ -99,7 +99,7 @@ aug_retainmar(aug_mar_t mar);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_truncatemar().
+ * @see aug_truncatemar().
  */
 
 AUGMAR_API int
@@ -113,7 +113,7 @@ aug_compactmar(aug_mar_t mar);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_unsetbyname() and aug_unsetbyord().
+ * @see aug_unsetbyname() and aug_unsetbyord().
  */
 
 AUGMAR_API int
@@ -133,7 +133,7 @@ aug_removefields(aug_mar_t mar);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_setvalue().
+ * @see aug_setvalue().
  */
 
 AUGMAR_API int
@@ -153,7 +153,7 @@ aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_setfield().
+ * @see aug_setfield().
  */
 
 AUGMAR_API int
@@ -172,7 +172,7 @@ aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size);
  * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
  * -1 on failure, in which case errno can be used to determine the error.
  *
- * @sa aug_removefields(), aug_unsetbyord() and aug_ordtoname().
+ * @see aug_removefields(), aug_unsetbyord() and aug_ordtoname().
  */
 
 AUGMAR_API int
@@ -188,7 +188,7 @@ aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord);
  * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
  * -1 on failure, in which case errno can be used to determine the error.
  *
- * @sa aug_removefields(), aug_unsetbyname() and aug_nametoord().
+ * @see aug_removefields(), aug_unsetbyname() and aug_nametoord().
  */
 
 AUGMAR_API int
@@ -207,7 +207,7 @@ aug_unsetbyord(aug_mar_t mar, unsigned ord);
  * @return A pointer to the field value or NULL on failure, in which case
  * errno can be used to determine the error.
  *
- * @sa aug_valuebyord(), aug_getfield() and aug_ordtoname().
+ * @see aug_valuebyord(), aug_getfield() and aug_ordtoname().
  */
 
 AUGMAR_API const void*
@@ -226,7 +226,7 @@ aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size);
  * @return A pointer to the field value or NULL on failure, in which case
  * errno can be used to determine the error.
  *
- * @sa aug_valuebyname(), aug_getfield() and aug_nametoord().
+ * @see aug_valuebyname(), aug_getfield() and aug_nametoord().
  */
 
 AUGMAR_API const void*
@@ -244,7 +244,7 @@ aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size);
  * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
  * -1 on failure, in which case errno can be used to determine the error.
  *
- * @sa aug_valuebyname(), aug_valuebyord() and aug_getfields().
+ * @see aug_valuebyname(), aug_valuebyord() and aug_getfields().
  */
 
 AUGMAR_API int
@@ -261,7 +261,7 @@ aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_getfield().
+ * @see aug_getfield().
  */
 
 AUGMAR_API int
@@ -279,7 +279,7 @@ aug_getfields(aug_mar_t mar, unsigned* size);
  * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
  * -1 on failure, in which case errno can be used to determine the error.
  *
- * @sa aug_unsetbyname(), aug_valuebyname() and aug_nametoord().
+ * @see aug_unsetbyname(), aug_valuebyname() and aug_nametoord().
  */
 
 AUGMAR_API int
@@ -298,7 +298,7 @@ aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord);
  * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
  * -1 on failure, in which case errno can be used to determine the error.
  *
- * @sa aug_unsetbyord(), aug_valuebyord() and aug_ordtoname().
+ * @see aug_unsetbyord(), aug_valuebyord() and aug_ordtoname().
 */
 
 AUGMAR_API int
@@ -314,7 +314,7 @@ aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_setcontent() and aug_writemar().
+ * @see aug_setcontent() and aug_writemar().
  */
 
 AUGMAR_API int
@@ -333,7 +333,7 @@ aug_insertmar(aug_mar_t mar, const char* path);
  * content, or -1 on failure, in which case errno can be used to determine the
  * error.
  *
- * @sa aug_readmar() and aug_writemar().
+ * @see aug_readmar() and aug_writemar().
  */
 
 AUGMAR_API off_t
@@ -351,7 +351,7 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_insertmar() and aug_writemar().
+ * @see aug_insertmar() and aug_writemar().
  */
 
 AUGMAR_API int
@@ -395,7 +395,7 @@ aug_truncatemar(aug_mar_t mar, unsigned size);
  * @return The number of bytes actually written or -1 on failure, in which
  * case errno can be used to determine the error.
  *
- * @sa aug_insertmar(), aug_seekmar() and aug_setcontent().
+ * @see aug_insertmar(), aug_seekmar() and aug_setcontent().
  */
 
 AUGMAR_API int
@@ -411,7 +411,7 @@ aug_writemar(aug_mar_t mar, const void* buf, unsigned len);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_readmar() and aug_content().
+ * @see aug_readmar() and aug_content().
  */
 
 AUGMAR_API int
@@ -428,7 +428,7 @@ aug_extractmar(aug_mar_t mar, const char* path);
  * @return A pointer to the content or NULL on failure, in which case errno
  * can be used to determine the error.
  *
- * @sa aug_readmar(), aug_extractmar() and aug_contentsize().
+ * @see aug_readmar(), aug_extractmar() and aug_contentsize().
  */
 
 AUGMAR_API const void*
@@ -447,7 +447,7 @@ aug_content(aug_mar_t mar, unsigned* size);
  * -1 is returned on failure, in which case errno can be used to determine the
  * error.
  *
- * @sa aug_seekmar(), aug_extractmar() and aug_content().
+ * @see aug_seekmar(), aug_extractmar() and aug_content().
  */
 
 AUGMAR_API int
@@ -464,7 +464,7 @@ aug_readmar(aug_mar_t mar, void* buf, unsigned len);
  * @return Zero on success or -1 on failure, in which case errno can be used
  * to determine the error.
  *
- * @sa aug_content().
+ * @see aug_content().
  */
 
 AUGMAR_API int

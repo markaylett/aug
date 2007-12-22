@@ -36,13 +36,13 @@ AUG_RCSID("$Id$");
 # define AUG_TIMEFORMAT "%b %d %H:%M:%S"
 #endif /* !AUG_TIMEFORMAT */
 
-static const char LABELS_[][7] = {
-    "CRIT  ",
-    "ERROR ",
-    "WARN  ",
+static const char* LABELS_[] = {
+    "CRIT",
+    "ERROR",
+    "WARN",
     "NOTICE",
-    "INFO  ",
-    "DEBUG "
+    "INFO",
+    "DEBUG"
 };
 
 static int
@@ -125,14 +125,14 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
        value, indicating an error. */
 
 #if ENABLE_THREADS
-    if (0 > (ret = snprintf(buf, size, ".%03d %08x %s ", ms, aug_threadid(),
-                            aug_loglabel(loglevel)))) {
+    if (0 > (ret = snprintf(buf, size, ".%03d %08x %-6s ", ms,
+                            aug_threadid(), aug_loglabel(loglevel)))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("broken format specification"));
         return -1;
     }
 #else /* !ENABLE_THREADS */
-    if (0 > (ret = snprintf(buf, size, ".%03d %s ", ms,
+    if (0 > (ret = snprintf(buf, size, ".%03d %-6s ", ms,
                             aug_loglabel(loglevel)))) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("broken format specification"));

@@ -50,7 +50,7 @@ aug_stdiologger(int loglevel, const char* format, va_list args);
  *
  * @return Previous log-level.
  *
- * @sa aug_loglevel()
+ * @see aug_loglevel()
  */
 
 AUGSYS_API int

@@ -54,7 +54,7 @@ aug_fdevents(aug_muxer_t muxer, int fd);
  * only socket descriptors can be used with select(), therefore,
  * aug_muxerpipe() will return a socket-pair.
  *
- * @sa aug_socketpair().
+ * @see aug_socketpair().
  */
 
 AUGSYS_API int

@@ -43,7 +43,7 @@ struct aug_object_;
  *
  * @ingroup Module
  *
- * @sa writelog_(), vwritelog_().
+ * @see writelog_(), vwritelog_().
  */
 
 enum maud_loglevel {
@@ -140,7 +140,7 @@ struct maud_session {
  * Both sockets and timers are represented by handles.  For timer handles,
  * "user_" will be of type @ref aug_object.
  *
- * @sa settimer_()
+ * @see settimer_()
  */
 
 struct maud_handle {
@@ -171,7 +171,7 @@ struct maud_host {
      *
      * @param ... Arguments to format specification.
      *
-     * @sa #maud_loglevel, vwritelog_().
+     * @see #maud_loglevel, vwritelog_().
      */
 
     void (*writelog_)(int level, const char* format, ...);
@@ -185,7 +185,7 @@ struct maud_host {
      *
      * @param ... Arguments to format specification.
      *
-     * @sa #maud_loglevel, writelog_().
+     * @see #maud_loglevel, writelog_().
      */
 
     void (*vwritelog_)(int level, const char* format, va_list args);
@@ -204,7 +204,7 @@ struct maud_host {
     /**
      * Re-configure the host and all loaded modules.
      *
-     * @sa stopall_().
+     * @see stopall_().
      */
 
     int (*reconfall_)(void);
@@ -212,7 +212,7 @@ struct maud_host {
     /**
      * Stop the host environment.
      *
-     * @sa reconfall_().
+     * @see reconfall_().
      */
 
     int (*stopall_)(void);
@@ -226,7 +226,7 @@ struct maud_host {
      *
      * @param ob Optional object data.
      *
-     * @sa dispatch_()
+     * @see dispatch_()
      */
 
     int (*post_)(const char* to, const char* type, struct aug_object_* ob);
@@ -244,7 +244,7 @@ struct maud_host {
      *
      * @param ob Optional object data.
      *
-     * @sa post_()
+     * @see post_()
      */
 
     int (*dispatch_)(const char* to, const char* type,
@@ -525,7 +525,7 @@ struct maud_module {
      *
      * @param port Peer port.
      *
-     * @sa maud_host::tcpconnect_().
+     * @see maud_host::tcpconnect_().
      */
 
     void (*connected_)(struct maud_handle* sock, const char* addr,
