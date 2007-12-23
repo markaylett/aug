@@ -4,6 +4,12 @@
 #ifndef AUGSRV_H
 #define AUGSRV_H
 
+/**
+ * @file augsrv.h
+ *
+ * Support for process daemonisation and NT services.
+ */
+
 #include "augsrv/base.h"
 #include "augsrv/control.h"
 #include "augsrv/daemon.h"

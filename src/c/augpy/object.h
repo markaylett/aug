@@ -13,10 +13,10 @@
 
 #include <Python.h>
 
-AUB_OBJECTDECL(augpy_blob);
+AUB_INTERFACE(augpy_blob);
 
 struct augpy_blobvtbl {
-    AUB_OBJECT(augpy_blob);
+    AUB_VTBL(augpy_blob);
     PyObject* (*get_)(augpy_blob*);
 };
 

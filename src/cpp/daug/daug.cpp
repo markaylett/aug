@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 /**
  * @page daug
  *
- * TODO.
+ * Aug application server.
  */
 
 #include "augnetpp.hpp"

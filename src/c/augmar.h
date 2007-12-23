@@ -4,6 +4,12 @@
 #ifndef AUGMAR_H
 #define AUGMAR_H
 
+/**
+ * @file augmar.h
+ *
+ * Meta ARchive.
+ */
+
 #include "augmar/mar.h"
 #include "augmar/types.h"
 

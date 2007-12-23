@@ -380,9 +380,10 @@ class Visitor
  * @{
  */
 
-AUB_OBJECTDECL(#{elem.type.cname});
+AUB_INTERFACE(#{elem.type.cname});
+
 struct #{elem.type.cname}vtbl {
-    AUB_OBJECT(#{elem.type.cname});
+    AUB_VTBL(#{elem.type.cname});
 END
         elem.each_method {|x| putcmethod elem, x}
         puts "};"

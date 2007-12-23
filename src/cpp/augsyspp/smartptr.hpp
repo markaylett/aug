@@ -9,8 +9,11 @@
 #include <algorithm> // swap()
 
 /**
- * A simple shared pointer implementation.  Where available, boost's
- * shared_ptr<> should be preferred.
+ * @file augsyspp/smartptr.hpp
+ *
+ * A simple shared pointer implementation.
+ *
+ * Where available, boost's shared_ptr<> should be preferred.
  */
 
 namespace aug {

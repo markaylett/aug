@@ -22,10 +22,10 @@ rb_w32_getcwd(char* buffer, int size);
 
 #include <ruby.h>
 
-AUB_OBJECTDECL(augrb_blob);
+AUB_INTERFACE(augrb_blob);
 
 struct augrb_blobvtbl {
-    AUB_OBJECT(augrb_blob);
+    AUB_VTBL(augrb_blob);
     VALUE (*get_)(augrb_blob*);
 };
 

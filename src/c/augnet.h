@@ -4,6 +4,12 @@
 #ifndef AUGNET_H
 #define AUGNET_H
 
+/**
+ * @file augnet.h
+ *
+ * Networking library.
+ */
+
 #include "augnet/auth.h"
 #include "augnet/base64.h"
 #include "augnet/connector.h"

@@ -4,6 +4,12 @@
 #ifndef AUGOB_H
 #define AUGOB_H
 
+/**
+ * @file augob.h
+ *
+ * Object interface library.
+ */
+
 #include "augob/addrob.h"
 #include "augob/blob.h"
 #include "augob/eventob.h"

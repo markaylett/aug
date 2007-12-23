@@ -5,15 +5,15 @@
 #define AUB_H
 
 /**
- * @page aub
+ * @file aub.h
  *
- * TODO.
+ * Binary compatible interfaces.
  */
 
 /**
  * @page aubidl
  *
- * TODO.
+ * Tool for creating interfaces from XML.
  */
 
 #include <stddef.h>
@@ -43,6 +43,11 @@
  * @{
  */
 
+/**
+ * Get the containing object of type @a s, with interface member @a m, from
+ * interface pointer @a ptr,
+ */
+
 #define AUB_PODIMPL(s, m, ptr)                          \
     (ptr ? (s*)((char*)(ptr) - offsetof(s, m)) : NULL)
 
@@ -53,18 +58,26 @@
 #define AUB_EQUALID(a, b)                       \
     (0 == strcmp(a, b))
 
-#define AUB_OBJECTDECL(type)                        \
-    struct type##vtbl;                              \
-    typedef struct type##_ {                        \
-            const struct type##vtbl* vtbl_;         \
-            void* impl_;                            \
-    } type;                                         \
-    static const char type##id[] = AUB_MKSTR(type)
+/**
+ * Declare an interface called @a name.
+ */
 
-#define AUB_OBJECT(type)                        \
-    void* (*cast_)(type*, const char*);         \
-    int (*retain_)(type*);                      \
-    int (*release_)(type*)
+#define AUB_INTERFACE(name)                         \
+    struct name##vtbl;                              \
+    typedef struct name##_ {                        \
+            const struct name##vtbl* vtbl_;         \
+            void* impl_;                            \
+    } name;                                         \
+    static const char name##id[] = AUB_MKSTR(name)
+
+/**
+ * Declare base members of vtable for interface @a iface.
+ */
+
+#define AUB_VTBL(iface)                          \
+    void* (*cast_)(iface*, const char*);         \
+    int (*retain_)(iface*);                      \
+    int (*release_)(iface*)
 
 /** @} */
 
@@ -82,9 +95,10 @@
  * @{
  */
 
-AUB_OBJECTDECL(aub_object);
+AUB_INTERFACE(aub_object);
+
 struct aub_objectvtbl {
-    AUB_OBJECT(aub_object);
+    AUB_VTBL(aub_object);
 };
 
 #define aub_cast(ob, type)                                     \

@@ -4,6 +4,12 @@
 #ifndef AUGUTIL_H
 #define AUGUTIL_H
 
+/**
+ * @file augutil.h
+ *
+ * General utility library.
+ */
+
 #include "augutil/clock.h"
 #include "augutil/conv.h"
 #include "augutil/event.h"

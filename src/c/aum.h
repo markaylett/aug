@@ -5,9 +5,9 @@
 #define AUM_H
 
 /**
- * @page aum
+ * @file aum.h
  *
- * TODO.
+ * Application server modules.
  */
 
 #include <stdarg.h>    /* va_list */
@@ -466,7 +466,7 @@ struct aum_module {
     /**
      * Re-configure request.
      *
-     * Called in response to a #AUM_EVENTRECONF event, which are raise in
+     * Called in response to a #AUG_EVENTRECONF event, which are raise in
      * response to either a #SIGHUP, or a call to aum_host::reconfall_().
      */
 

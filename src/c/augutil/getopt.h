@@ -6,8 +6,9 @@
 
 /**
  * @file augutil/getopt.h
+ * @author Henry Spencer
  *
- * Command-line arguments.
+ * Get option letter from argv.
  */
 
 #include "augutil/config.h"

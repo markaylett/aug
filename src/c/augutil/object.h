@@ -36,7 +36,7 @@ AUGUTIL_API aug_addrob*
 aug_createaddrob(void* p, void (*destroy)(void*));
 
 /**
- * Cast to #aug_addrob and return plain pointer.
+ * Cast to @ref aug_addrob and return plain pointer.
  *
  * @param ob Base object address.
  *

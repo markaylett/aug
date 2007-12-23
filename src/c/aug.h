@@ -5,26 +5,30 @@
 #define AUG_H
 
 /**
- * @mainpage A simple manual
+ * @file aug.h
  *
- * Some general info.
+ * Aug libraries:
+ * @li augmar.h
+ * @li augnet.h
+ * @li augob.h
+ * @li augsrv.h
+ * @li augsys.h
+ * @li augutil.h
+ */
+
+/**
+ * @mainpage AUG
  *
- * This manual is divided in the following sections:
- * @li @subpage aub
- * @li @subpage aug
- * @li @subpage aum
+ * This package is partioned into the following namespaces:
+ * @li aub.h
+ * @li aug.h
+ * @li aum.h
  *
- * Tools:
+ * Tools within aug package are:
  * @li @subpage aubidl
  * @li @subpage daug
  * @li @subpage htdigest
  * @li @subpage mar
- */
-
-/**
- * @page aug
- *
- * TODO.
  */
 
 #include "augmar.h"

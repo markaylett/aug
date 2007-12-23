@@ -8,7 +8,7 @@ AUG_RCSID("$Id$");
 /**
  * @page mar
  *
- * TODO.
+ * Tool for manipulating Meta ARchive files.
  */
 
 #include "mar/getopt.h"

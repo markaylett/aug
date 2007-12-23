@@ -10,8 +10,9 @@ AUG_RCSID("$Id$");
 
 /**
  * @page htdigest
+ * @author Alexei Kosut, based on htpasswd.c, by Rob McCool.
  *
- * TODO.
+ * Simple program for manipulating digest passwd file for Apache.
  */
 
 #include "augutil/pwd.h"

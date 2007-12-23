@@ -4,6 +4,12 @@
 #ifndef AUGSYS_H
 #define AUGSYS_H
 
+/**
+ * @file augsys.h
+ *
+ * Portable system interface.
+ */
+
 #include "augsys/barrier.h"
 #include "augsys/base.h"
 #include "augsys/debug.h"
