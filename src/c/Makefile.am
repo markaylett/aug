@@ -18,6 +18,7 @@ include_HEADERS = \
 	aug.h \
 	augsys.h \
 	augmar.h \
+	augob.h \
 	augutil.h \
 	augsrv.h \
 	augnet.h \
