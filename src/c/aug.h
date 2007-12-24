@@ -7,7 +7,7 @@
 /**
  * @file aug.h
  *
- * The =aug= package consists of the following libraries:
+ * The aug package consists of the following libraries:
  * @li augmar.h
  * @li augnet.h
  * @li augob.h
@@ -23,7 +23,7 @@
 /**
  * @mainpage aug
  *
- * =aug= - a framework for building network servers.
+ * aug - a framework for building network servers.
  *
  * This package is partioned into the following namespaces:
  * @li aub.h

@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 /**
  * @page daug
  *
- * daug= - a cross between the Dachshund and the Pug!  And, of course, the aug
+ * daug - a cross between the Dachshund and the Pug!  And, of course, the aug
  * application server.
  */
 
