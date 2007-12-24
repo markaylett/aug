@@ -7,17 +7,23 @@
 /**
  * @file aug.h
  *
- * Aug libraries:
+ * The =aug= package consists of the following libraries:
  * @li augmar.h
  * @li augnet.h
  * @li augob.h
  * @li augsrv.h
  * @li augsys.h
  * @li augutil.h
+ *
+ * These libraries are written in standard C.  They are targeted at Windows
+ * and other POSIX-compliant OS-es.  On Windows, service applications run as
+ * NT services; on Linux, they run as daemon processes.
  */
 
 /**
- * @mainpage AUG
+ * @mainpage aug
+ *
+ * =aug= - a framework for building network servers.
  *
  * This package is partioned into the following namespaces:
  * @li aub.h

@@ -9,7 +9,8 @@ AUG_RCSID("$Id$");
 /**
  * @page daug
  *
- * Aug application server.
+ * daug= - a cross between the Dachshund and the Pug!  And, of course, the aug
+ * application server.
  */
 
 #include "augnetpp.hpp"
