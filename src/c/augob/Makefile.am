@@ -2,14 +2,17 @@ EXTRA_DIST = \
 	addrob.xml \
 	blob.xml \
 	eventob.xml \
-	longob.xml
+	longob.xml \
+	varrayob.xml
 
-modincludedir = $(includedir)/augobj
+modincludedir = $(includedir)/augob
 modinclude_HEADERS = \
 	addrob.h \
 	blob.h \
 	eventob.h \
-	longob.h
+	longob.h \
+	types.h \
+	varrayob.h
 
 if ENABLE_RUBY
 %.h: %.xml

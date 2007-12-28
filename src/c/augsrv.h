@@ -8,6 +8,9 @@
  * @file augsrv.h
  *
  * Support for process daemonisation and NT services.
+ *
+ * On Windows, service applications run as NT services; on Linux, they run as
+ * daemonised processes.
  */
 
 #include "augsrv/base.h"

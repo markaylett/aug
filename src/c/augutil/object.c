@@ -239,7 +239,7 @@ aug_obtoaddr(aub_object* ob)
 AUGUTIL_API aug_blob*
 aug_createblob(const void* buf, size_t len)
 {
-    struct blobimpl_* impl = malloc(sizeof(struct blobimpl_) + len - 1);
+    struct blobimpl_* impl = malloc(sizeof(struct blobimpl_) + len);
     if (!impl) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
@@ -249,6 +249,7 @@ aug_createblob(const void* buf, size_t len)
     impl->refs_ = 1;
     impl->size_ = len;
     memcpy(impl->buf_, buf, len);
+    impl->buf_[len] = '\0'; /* Null terminator. */
 
     return &impl->blob_;
 }

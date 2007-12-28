@@ -1,0 +1,13 @@
+<package name="aug">
+
+  <verbatim>struct aug_var;</verbatim>
+
+  <interface name="varrayob">
+    <method name="get" type="struct aug_var*" qname="getvarrayob">
+      <param name="var" type="struct aug_var*"/>
+      <param name="i" type="unsigned"/>
+    </method>
+    <method name="size" type="int" qname="varrayobsize"/>
+  </interface>
+
+</package>

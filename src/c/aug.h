@@ -16,8 +16,7 @@
  * @li augutil.h
  *
  * These libraries are written in standard C.  They are targeted at Windows
- * and other POSIX-compliant OS-es.  On Windows, service applications run as
- * NT services; on Linux, they run as daemon processes.
+ * and other POSIX-compliant OS-es.
  */
 
 /**
