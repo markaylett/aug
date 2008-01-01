@@ -1,33 +1,15 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGOB_TYPES_H
-#define AUGOB_TYPES_H
+#ifndef AUGOB_VAR_H
+#define AUGOB_VAR_H
+
+#include "augconfig.h"
 
 #include "augob/blob.h"
+#include "augob/seqob.h"
 
 #include <time.h>
-
-#if !defined(AUG_INTTYPES)
-# define AUG_INTTYPES
-# if !defined(_MSC_VER)
-#  include <inttypes.h>
-# else /* _MSC_VER */
-
-typedef __int8 int8_t;
-typedef unsigned __int8 uint8_t;
-
-typedef __int16 int16_t;
-typedef unsigned __int16 uint16_t;
-
-typedef __int32 int32_t;
-typedef unsigned __int32 uint32_t;
-
-typedef __int64 int64_t;
-typedef unsigned __int64 uint64_t;
-
-# endif /* _MSC_VER */
-#endif /* AUG_INTTYPES */
 
 enum aug_vartype {
     AUG_VTNULL,
@@ -37,8 +19,10 @@ enum aug_vartype {
     AUG_VTBOOL,
     AUG_VTDOUBLE,
     AUG_VTTIME,
-    AUG_VTSTRING,
     AUG_VTOBJECT,
+    AUG_VTSTRING,
+    AUG_VTBLOB,
+    AUG_VTSEQ
 };
 
 struct aug_var {
@@ -49,8 +33,9 @@ struct aug_var {
         int64_t i64_;
         double dbl_;
         time_t utc_;
-        aug_blob* str_;
         aub_object* ob_;
+        aug_blob* blob_;
+        aug_seqob* seq_;
     } u_;
 };
 
@@ -60,12 +45,20 @@ struct aug_var {
 #define AUG_VARBOOL(x) ((x)->u_.int_)
 #define AUG_VARDOUBLE(x) ((x)->u_.dbl_)
 #define AUG_VARTIME(x) ((x)->u_.utc_)
-#define AUG_VARSTRING(x) ((x)->u_.str_)
 #define AUG_VAROBJECT(x) ((x)->u_.ob_)
+#define AUG_VARSTRING(x) ((x)->u_.blob_)
+#define AUG_VARBLOB(x) ((x)->u_.blob_)
+#define AUG_VARSEQ(x) ((x)->u_.seq_)
+
+#define AUG_RETAINVAR(x) \
+do { \
+    if (AUG_VTOBJECT <= (x)->type_ && (x)->u_.ob_) \
+        aub_retain((x)->u_.ob_); \
+} while (0)
 
 #define AUG_RELEASEVAR(x) \
 do { \
-    if (AUG_VTOBJECT == (x)->type_ || AUG_VTSTRING == (x)->type_) { \
+    if (AUG_VTOBJECT <= (x)->type_) { \
         if ((x)->u_.ob_) { \
             aub_release((x)->u_.ob_); \
             (x)->u_.ob_ = NULL; \
@@ -74,4 +67,4 @@ do { \
     } \
 } while (0)
 
-#endif /* AUGOB_TYPES_H */
+#endif /* AUGOB_VAR_H */

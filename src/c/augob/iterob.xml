@@ -1,0 +1,16 @@
+<package name="aug">
+
+  <verbatim>struct aug_var;</verbatim>
+
+  <interface name="iterob">
+    <method name="end" type="int" qname="iterobend"/>
+    <method name="next" type="int" qname="nextiterob"/>
+    <method name="key" type="void" qname="iterobkey">
+      <param name="var" type="struct aug_var*"/>
+    </method>
+    <method name="value" type="void" qname="iterobvalue">
+      <param name="var" type="struct aug_var*"/>
+    </method>
+  </interface>
+
+</package>

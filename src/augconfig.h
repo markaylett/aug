@@ -34,7 +34,9 @@
 
 #endif /* !HAVE_CONFIG_H */
 
-#if defined(_MSC_VER)
+#if !defined(_MSC_VER)
+# include <inttypes.h>
+#else /* _MSC_VER */
 
 # if !defined(HAVE_IPV6)
 #  define HAVE_IPV6 1
@@ -42,6 +44,23 @@
 
 # define __func__ __FUNCTION__
 # define PACKAGE_BUGREPORT "mark@emantic.co.uk"
+
+typedef int mode_t;
+typedef int pid_t;
+typedef int ssize_t;
+typedef void* caddr_t;
+
+typedef __int8 int8_t;
+typedef unsigned __int8 uint8_t;
+
+typedef __int16 int16_t;
+typedef unsigned __int16 uint16_t;
+
+typedef __int32 int32_t;
+typedef unsigned __int32 uint32_t;
+
+typedef __int64 int64_t;
+typedef unsigned __int64 uint64_t;
 
 #endif /* _MSC_VER */
 

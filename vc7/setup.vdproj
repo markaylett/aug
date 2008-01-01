@@ -105,6 +105,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2CA3110B2FD04F59810225C28E1EFE39"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2FB4A0D431F941F19B59FCC1C488B8E5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -274,6 +280,12 @@
         "Entry"
         {
         "MsmKey" = "8:_6593CC6426FE4DE7A5B3538C6C5E9DFC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_68AB0077754C44B1861055D523B7CA2D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -537,6 +549,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_AC725EB74CCA47D6B055F8F9586A3E22"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_ADDF497F62714E4A9D31CAAA71A4E635"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -717,12 +735,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_FA5B799AE7B040E1B4712CF1DC4241E7"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_FAD18212712842BD82F7C5C5F972E268"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -799,8 +811,8 @@
         {
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_036CC66D0DAA47CB8D05E56ACC818357"
             {
-            "SourcePath" = "8:..\\src\\c\\augob\\types.h"
-            "TargetName" = "8:types.h"
+            "SourcePath" = "8:..\\src\\c\\augob\\var.h"
+            "TargetName" = "8:var.h"
             "Tag" = "8:"
             "Folder" = "8:_4B2255F93F2A494E8DBE0549C9D6321C"
             "Condition" = "8:"
@@ -983,6 +995,26 @@
             "TargetName" = "8:serverreq.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_2CA3110B2FD04F59810225C28E1EFE39"
+            {
+            "SourcePath" = "8:..\\src\\c\\augob\\rpcob.h"
+            "TargetName" = "8:rpcob.h"
+            "Tag" = "8:"
+            "Folder" = "8:_4B2255F93F2A494E8DBE0549C9D6321C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1517,6 +1549,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_68AB0077754C44B1861055D523B7CA2D"
+            {
+            "SourcePath" = "8:..\\src\\c\\augob\\iterob.h"
+            "TargetName" = "8:iterob.h"
+            "Tag" = "8:"
+            "Folder" = "8:_4B2255F93F2A494E8DBE0549C9D6321C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_6B333BA101FD48128999215F7E60C862"
             {
             "SourcePath" = "8:..\\src\\cpp\\augnetpp.hpp"
@@ -1897,6 +1949,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_AC725EB74CCA47D6B055F8F9586A3E22"
+            {
+            "SourcePath" = "8:..\\src\\c\\augob\\seqob.h"
+            "TargetName" = "8:seqob.h"
+            "Tag" = "8:"
+            "Folder" = "8:_4B2255F93F2A494E8DBE0549C9D6321C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_ADDF497F62714E4A9D31CAAA71A4E635"
             {
             "SourcePath" = "8:..\\src\\c\\augmar.h"
@@ -2263,26 +2335,6 @@
             "TargetName" = "8:libaugmar.lib"
             "Tag" = "8:"
             "Folder" = "8:_9E7D976658F7456C89D72630A688CC17"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_FA5B799AE7B040E1B4712CF1DC4241E7"
-            {
-            "SourcePath" = "8:..\\src\\c\\augob\\varrayob.h"
-            "TargetName" = "8:varrayob.h"
-            "Tag" = "8:"
-            "Folder" = "8:_4B2255F93F2A494E8DBE0549C9D6321C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

@@ -1,0 +1,10 @@
+<package name="aug">
+
+  <quotincl>augob/seqob.h</quotincl>
+
+  <interface name="rpcob">
+    <method name="method" type="const char*" qname="rpcobmethod"/>
+    <method name="args" type="aug_seqob" object="true" qname="rpcobargs"/>
+  </interface>
+
+</package>
