@@ -82,8 +82,8 @@ class Param
 end
 
 class Method_
-    attr_reader :name, :type, :qname
-    def initialize(iface, name, type, qname)
+    attr_reader :name, :type, :qname, :help
+    def initialize(iface, name, type, qname, help)
         @name = name
         @type = type
         if qname.nil? then
@@ -91,6 +91,7 @@ class Method_
         else
             @qname = qname
         end
+        @help = help
         @params = []
     end
     def each_param(&action)
@@ -106,7 +107,8 @@ class Method_
         if node.attributes.has_key? "qname" then
             qname = node.attributes["qname"].to_s
         end
-        method = Method_.new(iface, name, type, qname)
+        help = node.text
+        method = Method_.new(iface, name, type, qname, help)
         node.elements.each do |child|
             if child.name == "param" then
                 param = Param.parse(child)
@@ -126,10 +128,11 @@ def method_list(iface)
 end
 
 class Interface
-    attr_reader :pkg, :name, :type
-    def initialize(pkg, name)
+    attr_reader :pkg, :name, :help, :type
+    def initialize(pkg, name, help)
         @pkg = pkg
         @name = name
+        @help = help
         @type = Type.new("#{pkg}_#{name}", true)
         @methods = []
     end
@@ -144,7 +147,8 @@ class Interface
     end
     def Interface.parse(pkg, node)
         name = node.attributes["name"].to_s
-        interface = Interface.new(pkg, name)
+        help = node.text
+        interface = Interface.new(pkg, name, help)
         node.elements.each do |child|
             if child.name == "method" then
                 method = Method_.parse(name, child)
@@ -303,6 +307,18 @@ def nothis(ls)
     ls
 end
 
+def puthelp(help)
+    unless help.nil? || help.empty? then
+        puts
+        puts "/**"
+        help.each_line do |x|
+            x.strip!
+            puts " * #{x}" unless x.empty?
+        end
+        puts " */"
+    end
+end
+
 def putcmethod(iface, method)
     format = CFormat.new
     types = format.type_list(iface, method).join(", ")
@@ -312,6 +328,7 @@ end
 def putcdefine(iface, method)
     format = CFormat.new
     names = format.name_list(iface, method).join(", ")
+    puthelp(method.help)
     puts <<END
 
 #define #{iface.pkg}_#{method.qname}(#{names}) \\
@@ -381,6 +398,9 @@ class Visitor
  */
 
 AUB_INTERFACE(#{elem.type.cname});
+END
+        puthelp(elem.help)
+        puts <<END
 
 struct #{elem.type.cname}vtbl {
     AUB_VTBL(#{elem.type.cname});
