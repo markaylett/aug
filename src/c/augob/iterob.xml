@@ -4,7 +4,7 @@
 
   <interface name="iterob">
     <method name="end" type="int" qname="iterobend"/>
-    <method name="next" type="int" qname="nextiterob"/>
+    <method name="next" type="void" qname="nextiterob"/>
     <method name="key" type="void" qname="iterobkey">
       <param name="var" type="struct aug_var*"/>
     </method>

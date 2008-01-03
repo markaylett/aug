@@ -30,15 +30,14 @@ castblob_(aug_blob* ob, const char* id)
     return NULL;
 }
 
-static int
+static void
 retainblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
-    return 0;
 }
 
-static int
+static void
 releaseblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
@@ -46,7 +45,6 @@ releaseblob_(aug_blob* ob)
         Py_DECREF(impl->pyob_);
         free(impl);
     }
-    return 0;
 }
 
 static const void*
@@ -97,15 +95,14 @@ castpyblob_(augpy_blob* ob, const char* id)
     return NULL;
 }
 
-static int
+static void
 retainpyblob_(augpy_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, pyblob_, ob);
     ++impl->refs_;
-    return 0;
 }
 
-static int
+static void
 releasepyblob_(augpy_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, pyblob_, ob);
@@ -113,7 +110,6 @@ releasepyblob_(augpy_blob* ob)
         Py_DECREF(impl->pyob_);
         free(impl);
     }
-    return 0;
 }
 
 static PyObject*

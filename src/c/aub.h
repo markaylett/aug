@@ -76,10 +76,19 @@
 
 #define AUB_VTBL(iface)                          \
     void* (*cast_)(iface*, const char*);         \
-    int (*retain_)(iface*);                      \
-    int (*release_)(iface*)
+    void (*retain_)(iface*);                     \
+    void (*release_)(iface*)
 
 /** @} */
+
+/**
+ * Used to convey the following conventions:
+ * less than zero: negated errno value.
+ * equal to zero: success.
+ * greater than zero: user defined.
+ */
+
+typedef int aub_result;
 
 /**
  * @defgroup Object Object

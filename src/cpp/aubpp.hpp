@@ -103,11 +103,11 @@ namespace aub {
      */
 
     template <typename T>
-    int
+    void
     retain(obref<T> ref) AUB_NOTHROW
     {
         assert(ref.get());
-        return ref.get()->vtbl_->retain_(ref.get());
+        ref.get()->vtbl_->retain_(ref.get());
     }
 
     /**
@@ -128,11 +128,11 @@ namespace aub {
      */
 
     template <typename T>
-    int
+    void
     release(obref<T> ref) AUB_NOTHROW
     {
         assert(ref.get());
-        return ref.get()->vtbl_->release_(ref.get());
+        ref.get()->vtbl_->release_(ref.get());
     }
 
     template <typename T>
@@ -221,10 +221,10 @@ namespace aub {
      */
 
     template <typename T>
-    int
+    void
     retain(const smartob<T>& sob) AUB_NOTHROW
     {
-        return retain<T>(static_cast<obref<T> >(sob));
+        retain<T>(static_cast<obref<T> >(sob));
     }
 
     template <typename T>
@@ -235,10 +235,10 @@ namespace aub {
     }
 
     template <typename T>
-    int
+    void
     release(const smartob<T>& sob) AUB_NOTHROW
     {
-        return release<T>(static_cast<obref<T> >(sob));
+        release<T>(static_cast<obref<T> >(sob));
     }
 
     inline bool
@@ -296,20 +296,18 @@ namespace aub {
         {
         }
     public:
-        int
+        void
         retain_() AUB_NOTHROW
         {
             assert(0 < refs_);
             ++refs_;
-            return 0;
         }
-        int
+        void
         release_() AUB_NOTHROW
         {
             assert(0 < refs_);
             if (0 == --refs_)
                 delete this;
-            return 0;
         }
     };
 }

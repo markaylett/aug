@@ -308,11 +308,16 @@ def nothis(ls)
 end
 
 def puthelp(help)
-    unless help.nil? || help.empty? then
+    unless help.nil? || help.strip!.empty? then
         puts
         puts "/**"
+        param = false
         help.each_line do |x|
             x.strip!
+            if !param && x =~ /^@param/ then
+                puts " * @param this_ The object."
+                param = true
+            end
             puts " * #{x}" unless x.empty?
         end
         puts " */"
@@ -447,15 +452,15 @@ END
         {
             return aub::incget(static_cast<T*>(this_->impl_)->cast_(id));
         }
-        static int
+        static void
         retain_(#{elem.type.cname}* this_) AUB_NOTHROW
         {
-            return static_cast<T*>(this_->impl_)->retain_();
+            static_cast<T*>(this_->impl_)->retain_();
         }
-        static int
+        static void
         release_(#{elem.type.cname}* this_) AUB_NOTHROW
         {
-            return static_cast<T*>(this_->impl_)->release_();
+            static_cast<T*>(this_->impl_)->release_();
         }
 END
         elem.each_method {|x| putstatic elem, x}
@@ -513,20 +518,18 @@ END
                 return aub::object_retain<aub_object>(this->#{elem.name}_);
             return null;
         }
-        int
+        void
         retain_() AUB_NOTHROW
         {
             assert(0 < this->refs_);
             ++this->refs_;
-            return 0;
         }
-        int
+        void
         release_() AUB_NOTHROW
         {
             assert(0 < this->refs_);
             if (0 == --this->refs_)
                 delete this;
-            return 0;
         }
 END
         elem.each_method {|x| putforward elem, x}
@@ -557,15 +560,13 @@ END
                 return aub::object_retain<aub_object>(this->#{elem.name}_);
             return null;
         }
-        int
+        void
         retain_() AUB_NOTHROW
         {
-            return 0;
         }
-        int
+        void
         release_() AUB_NOTHROW
         {
-            return 0;
         }
 END
         elem.each_method {|x| putforward elem, x}

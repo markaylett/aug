@@ -4,12 +4,27 @@
 
   <interface name="seqob">
     <method name="find" type="struct aug_var*" qname="findseqob">
+
+      Get item specified by @a key.
+
+      @param value Output value.
+
+      @param key Value's key.
+
+      @return @a value, or NULL on error.
+
       <param name="value" type="struct aug_var*"/>
       <param name="key" type="const struct aug_var*"/>
     </method>
-    <method name="begin" type="aug_iterob" object="true" qname="seqobbegin"/>
+    <method name="begin" type="aug_iterob" object="true" qname="seqobbegin">
+
+      Get first item.
+
+      @return Iterator, or NULL on error.
+
+    </method>
     <method name="empty" type="int" qname="seqobempty"/>
-    <method name="size" type="int" qname="seqobsize"/>
+    <method name="size" type="unsigned" qname="seqobsize"/>
   </interface>
 
 </package>

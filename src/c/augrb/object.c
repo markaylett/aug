@@ -28,15 +28,14 @@ castblob_(aug_blob* ob, const char* id)
     return NULL;
 }
 
-static int
+static void
 retainblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
-    return 0;
 }
 
-static int
+static void
 releaseblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
@@ -45,7 +44,6 @@ releaseblob_(aug_blob* ob)
         rb_gc_unregister_address(&impl->rbob_);
         free(impl);
     }
-    return 0;
 }
 
 static const void*
@@ -86,15 +84,14 @@ castrbblob_(augrb_blob* ob, const char* id)
     return NULL;
 }
 
-static int
+static void
 retainrbblob_(augrb_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, rbblob_, ob);
     ++impl->refs_;
-    return 0;
 }
 
-static int
+static void
 releaserbblob_(augrb_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, rbblob_, ob);
@@ -103,7 +100,6 @@ releaserbblob_(augrb_blob* ob)
         rb_gc_unregister_address(&impl->rbob_);
         free(impl);
     }
-    return 0;
 }
 
 static VALUE

@@ -30,15 +30,14 @@ castlongob_(aug_longob* ob, const char* id)
     return NULL;
 }
 
-static int
+static void
 retainlongob_(aug_longob* ob)
 {
     struct longobimpl_* impl = AUB_PODIMPL(struct longobimpl_, longob_, ob);
     ++impl->refs_;
-    return 0;
 }
 
-static int
+static void
 releaselongob_(aug_longob* ob)
 {
     struct longobimpl_* impl = AUB_PODIMPL(struct longobimpl_, longob_, ob);
@@ -47,7 +46,6 @@ releaselongob_(aug_longob* ob)
             impl->destroy_(impl->l_);
         free(impl);
     }
-    return 0;
 }
 
 static long
@@ -81,15 +79,14 @@ castaddrob_(aug_addrob* ob, const char* id)
     return NULL;
 }
 
-static int
+static void
 retainaddrob_(aug_addrob* ob)
 {
     struct addrobimpl_* impl = AUB_PODIMPL(struct addrobimpl_, addrob_, ob);
     ++impl->refs_;
-    return 0;
 }
 
-static int
+static void
 releaseaddrob_(aug_addrob* ob)
 {
     struct addrobimpl_* impl = AUB_PODIMPL(struct addrobimpl_, addrob_, ob);
@@ -98,7 +95,6 @@ releaseaddrob_(aug_addrob* ob)
             impl->destroy_(impl->p_);
         free(impl);
     }
-    return 0;
 }
 
 static void*
@@ -133,21 +129,19 @@ castblob_(aug_blob* ob, const char* id)
     return NULL;
 }
 
-static int
+static void
 retainblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
-    return 0;
 }
 
-static int
+static void
 releaseblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
     if (0 == --impl->refs_)
         free(impl);
-    return 0;
 }
 
 static const void*
