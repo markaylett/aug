@@ -102,7 +102,7 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
     /* At least one character is needed for the null-terminator. */
 
     if (0 == size) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ERANGE,
                        AUG_MSG("size cannot be zero"));
         return -1;
     }

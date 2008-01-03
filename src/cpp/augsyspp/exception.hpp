@@ -204,11 +204,11 @@ namespace aug {
         aug_perrinfo(&e.errinfo(), "aug::errinfo_error");               \
     } catch (const std::exception& e) {                                 \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
-                       AUG_ECXX, e.what());                             \
+                       AUG_EEXCEPT, e.what());                          \
         aug_perrinfo(0, "std::exception");                              \
     } catch (...) {                                                     \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
-                       AUG_ECXX, "no description available");           \
+                       AUG_EEXCEPT, "no description available");        \
         aug_perrinfo(0, "unknown");                                     \
     } do { } while (0)
 
@@ -217,10 +217,10 @@ namespace aug {
         e.seterrinfo();                                                 \
     } catch (const std::exception& e) {                                 \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
-                       AUG_ECXX, e.what());                             \
+                       AUG_EEXCEPT, e.what());                          \
     } catch (...) {                                                     \
         aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
-                       AUG_ECXX, "no description available");           \
+                       AUG_EEXCEPT, "no description available");        \
     } do { } while (0)
 
 #endif // AUGSYSPP_EXCEPTION_HPP

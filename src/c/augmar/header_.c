@@ -129,14 +129,14 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     if (AUG_NSIZE_MAX < nsize) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
                        AUG_MSG("maximum field-name size exceeded"));
         return -1;
     }
 
     if (AUG_VSIZE_MAX < vsize) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
                        AUG_MSG("maximum field-value size exceeded"));
         return -1;
     }
@@ -215,7 +215,7 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
 
     if (AUG_VSIZE_MAX < vsize) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
                        AUG_MSG("maximum field-value size exceeded"));
         return -1;
     }

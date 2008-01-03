@@ -135,8 +135,8 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 
         if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EACCES,
-                           AUG_MSG("file is not writable"));
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL,
+                           AUG_EPERM, AUG_MSG("file is not writable"));
             return NULL;
         }
 
@@ -185,7 +185,7 @@ aug_truncatemfile_(aug_mfile_t mfile, unsigned size)
     assert(mfile);
     if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EACCES,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPERM,
                        AUG_MSG("file is not writable"));
         return -1;
     }

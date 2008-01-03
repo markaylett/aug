@@ -57,7 +57,7 @@ aug_strtoui(unsigned* dst, const char* src, int base)
 
         /* Bounds exceeded for target type. */
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
                        AUG_MSG("max integer value exceeded"));
         return -1;
     }
@@ -77,7 +77,7 @@ aug_strtous(unsigned short* dst, const char* src, int base)
 
         /* Bounds exceeded for target type. */
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
                        AUG_MSG("max integer value exceeded"));
         return -1;
     }

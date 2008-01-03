@@ -23,6 +23,7 @@
 
 /**
  * Base value for user-defined exception sources.
+
  */
 
 #define AUG_SRCUSER  32
@@ -35,22 +36,27 @@
 #define AUG_NOERROR  0
 #define AUG_ESYSTEM  1
 
-#define AUG_EACCES   2
+#define AUG_EASSERT  2
 #define AUG_EAUTH    3
-#define AUG_EBOUND   4
-#define AUG_EENDOF   5
-#define AUG_ECONFIG  6
-#define AUG_ECXX     7
-#define AUG_EDOMAIN  8
-#define AUG_EEXIST   9
-#define AUG_EFORMAT  10
+#define AUG_ECONFIG  4
+#define AUG_EDOMAIN  5
+#define AUG_EENDOF   6
+#define AUG_EEXCEPT  7
+#define AUG_EEXIST   8
+#define AUG_EFORMAT  9
+#define AUG_EINTR    10
 #define AUG_EINVAL   11
 #define AUG_EIO      12
-#define AUG_ENULL    13
-#define AUG_EPARSE   14
-#define AUG_ESTATE   15
-#define AUG_ESUPPORT 16
-#define AUG_ETIMEOUT 17
+#define AUG_ELIMIT   13
+#define AUG_ENULL    14
+#define AUG_EMEMORY  15
+#define AUG_EPARSE   16
+#define AUG_EPERM    17
+#define AUG_ERANGE   18
+#define AUG_ESTATE   19
+#define AUG_ESUPPORT 20
+#define AUG_ETYPE    21
+#define AUG_ETIMEOUT 22
 
 struct aug_errinfo {
     char file_[AUG_MAXLINE];

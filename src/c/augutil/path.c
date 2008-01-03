@@ -123,7 +123,7 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
             --dirlen;
 
         if (size < dirlen + namelen + extlen + 3) {
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
                            AUG_MSG("buffer size exceeded"));
             return NULL;
         }
@@ -135,7 +135,7 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
         ptr += dirlen + 1;
 
     } else if (size < namelen + extlen + 2) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }
@@ -178,7 +178,7 @@ aug_realpath(char* dst, const char* src, size_t size)
     }
 
     if (size <= strlen(buf)) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }

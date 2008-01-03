@@ -437,7 +437,7 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
     }
     if (local < 0) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EBOUND,
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ERANGE,
                        AUG_MSG("negative file position '%d'"), (int)local);
         return -1;
     }
