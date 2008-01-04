@@ -3,6 +3,10 @@
   <quotincl>augob/iterob.h</quotincl>
 
   <interface name="seqob">
+
+    Read-only, base interface for all container types.  Suitable for both
+    sequential and associative containers.
+
     <method name="find" type="struct aug_var*" qname="findseqob">
 
       Get item specified by @a key.
@@ -23,8 +27,20 @@
       @return Iterator, or NULL on error.
 
     </method>
-    <method name="empty" type="int" qname="seqobempty"/>
-    <method name="size" type="unsigned" qname="seqobsize"/>
+    <method name="empty" type="int" qname="seqobempty">
+
+      Is empty test.
+
+      @return True if empty.
+
+    </method>
+    <method name="size" type="unsigned" qname="seqobsize">
+
+      Get number of items.
+
+      @return Number of items.
+
+    </method>
   </interface>
 
 </package>

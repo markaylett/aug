@@ -81,68 +81,70 @@ COPTS += \
 	-MMD \
 	-MP
 
-BINS = \
-	$(CLIBRARIES:%=%$(DLL_EXT)) \
-	$(CXXLIBRARIES:%=%$(DLL_EXT)) \
-	$(CMODULES:%=%$(DLL_EXT)) \
-	$(CXXMODULES:%=%$(DLL_EXT)) \
-	$(CPROGRAMS:%=%$(EXE_EXT)) \
-	$(CXXPROGRAMS:%=%$(EXE_EXT))
-
-.PHONY: all all-aug clean clean-aug
-
-all-aug: $(BINS)
-
-clean-aug:
-	$(RM) -f $(DEPS) $(BINS) $(DLL_CXXCRT) $(OBJS) *~
-
-define CMODULE_template
+define CLIBRARY_template
+TARGETS += $(1)$(DLL_EXT)
 DEPS += $$($(1)_OBJS:%.o=%.d)
 OBJS += $$($(1)_OBJS)
-$(1)$(DLL_EXT): $$($(1)_OBJS)
+$(1)$(DLL_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
 	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) -shared -Wl,-soname,$(1)$(DLL_EXT) \
 		$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) -o $(1)$(DLL_EXT) \
 		$$($(1)_OBJS) $$($(1)_LIBS:%=-l%) $(DLL_CLIBS)
 endef
 
-define CXXMODULE_template
+define CXXLIBRARY_template
+TARGETS += $(1)$(DLL_EXT)
 DEPS += $$($(1)_OBJS:%.o=%.d)
 OBJS += $$($(1)_OBJS)
-$(1)$(DLL_EXT): $(DLL_CXXCRT) $$($(1)_OBJS)
+$(1)$(DLL_EXT): $(DLL_CXXCRT) $$($(1)_DEPS) $$($(1)_OBJS)
 	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) -shared -Wl,-soname,$(1)$(DLL_EXT) \
 		$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) -o $(1)$(DLL_EXT) \
 		$$($(1)_OBJS) $$($(1)_LIBS:%=-l%) $(DLL_CXXLIBS)
 endef
 
 define CPROGRAM_template
+TARGETS += $(1)$(EXE_EXT)
 DEPS += $$($(1)_OBJS:%.o=%.d)
 OBJS += $$($(1)_OBJS)
-$(1)$(EXE_EXT): $$($(1)_OBJS)
+$(1)$(EXE_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
 	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) $(LDFLAGS) $$($(1)_LDFLAGS) \
 		$(EXE_LDFLAGS) -o $(1)$(EXE_EXT) $$($(1)_OBJS) $$($(1)_LIBS:%=-l%) \
 		$(EXE_CLIBS)
 endef
 
 define CXXPROGRAM_template
+TARGETS += $(1)$(EXE_EXT)
 DEPS += $$($(1)_OBJS:%.o=%.d)
 OBJS += $$($(1)_OBJS)
-$(1)$(EXE_EXT): $$($(1)_OBJS)
+$(1)$(EXE_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
 	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) $(LDFLAGS) $$($(1)_LDFLAGS) \
 		$(EXE_LDFLAGS) -o $(1)$(EXE_EXT) $$($(1)_OBJS) $$($(1)_LIBS:%=-l%) \
 		$(EXE_CXXLIBS)
 endef
 
+$(foreach x,$(CLIBRARIES),$(eval \
+	$(call CLIBRARY_template,$(x))))
+
+$(foreach x,$(CXXLIBRARIES),$(eval \
+	$(call CXXLIBRARY_template,$(x))))
+
 $(foreach x,$(CMODULES),$(eval \
-	$(call CMODULE_template,$(x))))
+	$(call CLIBRARY_template,$(x))))
 
 $(foreach x,$(CXXMODULES),$(eval \
-	$(call CXXMODULE_template,$(x))))
+	$(call CXXLIBRARY_template,$(x))))
 
 $(foreach x,$(CPROGRAMS),$(eval \
 	$(call CPROGRAM_template,$(x))))
 
 $(foreach x,$(CXXPROGRAMS),$(eval \
 	$(call CXXPROGRAM_template,$(x))))
+
+.PHONY: all all-aug clean clean-aug
+
+all-aug: $(TARGETS)
+
+clean-aug:
+	$(RM) -f $(DEPS) $(TARGETS) $(DLL_CXXCRT) $(OBJS) *~
 
 ifeq ($(BUILD), MINGW)
 $(DLL_CXXCRT): /usr/lib/mingw/dllcrt2.o

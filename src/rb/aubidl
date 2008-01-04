@@ -311,12 +311,12 @@ def puthelp(help)
     unless help.nil? || help.strip!.empty? then
         puts
         puts "/**"
-        param = false
+        this = false
         help.each_line do |x|
             x.strip!
-            if !param && x =~ /^@param/ then
+            if !this && x =~ /^@(param|return)/ then
                 puts " * @param this_ The object."
-                param = true
+                this = true
             end
             puts " * #{x}" unless x.empty?
         end
