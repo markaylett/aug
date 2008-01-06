@@ -3,12 +3,13 @@
 
 # Standard tools.
 
-AR = ar
-CC = gcc
-CXX = g++
-INSTALL = install
-RM = rm
-SHELL = /bin/sh
+AR := ar
+CC := gcc
+CXX := g++
+INSTALL := install
+MKDIR := mkdir
+RM := rm
+SHELL := /bin/sh
 
 INSTALLDIRS += bin include lib mod
 
@@ -21,9 +22,9 @@ endif
 #### Platform Specifics ####
 
 ifdef PLATFORM
-BUILD:=$(shell echo $(PLATFORM) | tr '[:lower:]' '[:upper:]')
+BUILD := $(shell echo $(PLATFORM) | tr '[:lower:]' '[:upper:]')
 else
-BUILD:=$(shell uname -s | sed -e 's/CYGWIN.*/CYGWIN/i' -e 's/MINGW.*/MINGW/i')
+BUILD := $(shell uname -s | sed -e 's/CYGWIN.*/CYGWIN/i' -e 's/MINGW.*/MINGW/i')
 endif
 
 ifeq ($(BUILD), MINGW)
@@ -34,7 +35,7 @@ CDEFS = \
 	-DWINVER=0x0501 \
 	-DFD_SETSIZE=256 \
 	-D__USE_W32_SOCKETS
-DLL_EXT = .dll
+DLL_EXT := .dll
 DLL_LDFLAGS = \
 	-L. \
 	-L/usr/lib/mingw \
@@ -53,10 +54,10 @@ DLL_CXXLIBS = \
 	-lkernel32 \
 	-ladvapi32 \
 	-lshell32
-DLL_CXXCRT = \
+DLL_CXXCRT := \
 	libdllcrt2.a
 
-EXE_EXT = .exe
+EXE_EXT := .exe
 EXE_LDFLAGS =
 EXE_CLIBS =
 EXE_CXXLIBS =
@@ -66,20 +67,20 @@ else
 ifeq ($(BUILD), CYGWIN)
 COPTS =
 CDEFS =
-DLL_EXT = .dll
-EXE_EXT = .exe
+DLL_EXT := .dll
+EXE_EXT := .exe
 
 else
 
 # Otherwise assume Unix.
 
-BUILD = UNIX
+BUILD := UNIX
 COPTS = \
 	-fPIC
 CDEFS = \
 	-DPIC
-DLL_EXT = .so
-EXE_EXT =
+DLL_EXT := .so
+EXE_EXT :=
 
 endif
 
@@ -88,7 +89,7 @@ endif
 DLL_LDFLAGS =
 DLL_CLIBS =
 DLL_CXXLIBS =
-DLL_CXXCRT =
+DLL_CXXCRT :=
 
 EXE_LDFLAGS =
 EXE_CLIBS =
@@ -123,24 +124,22 @@ define CLIBRARY_template
 $(1): lib$(1)$(DLL_EXT)
 
 ifeq ($(BUILD), UNIX)
-lib$(1)$(DLL_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) \
-	-shared -Wl,-soname,lib$(1)$(DLL_EXT) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
-	-o lib$(1)$(DLL_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(DLL_CLIBS)
-
-LIBS += lib$(1)$(DLL_EXT)
+$(eval $(1)_IMPLIB :=)
 else
-# Assumes Windows.
+$(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(DLL_EXT).a)
+endif
+
 lib$(1)$(DLL_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
 	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) \
 	-shared -Wl,-soname,lib$(1)$(DLL_EXT) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
 	-o lib$(1)$(DLL_EXT) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(DLL_CLIBS) \
-	-Wl,--out-implib,lib$(1)$(DLL_EXT).a
+	$($(1)_IMPLIB)
 
+ifeq ($(BUILD), UNIX)
+LIBS += lib$(1)$(DLL_EXT)
+else
 BINS += lib$(1)$(DLL_EXT)
 LIBS += lib$(1)$(DLL_EXT).a
 endif
@@ -155,24 +154,22 @@ define CXXLIBRARY_template
 $(1): lib$(1)$(DLL_EXT)
 
 ifeq ($(BUILD), UNIX)
-lib$(1)$(DLL_EXT): $(DLL_CXXCRT) $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) \
-	-shared -Wl,-soname,lib$(1)$(DLL_EXT) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
-	-o lib$(1)$(DLL_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(DLL_CXXLIBS)
-
-LIBS += lib$(1)$(DLL_EXT)
+$(eval $(1)_IMPLIB :=)
 else
-# Assumes Windows.
+$(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(DLL_EXT).a)
+endif
+
 lib$(1)$(DLL_EXT): $(DLL_CXXCRT) $$($(1)_DEPS) $$($(1)_OBJS)
 	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) \
 	-shared -Wl,-soname,lib$(1)$(DLL_EXT) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
 	-o lib$(1)$(DLL_EXT) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(DLL_CXXLIBS) \
-	-Wl,--out-implib,lib$(1)$(DLL_EXT).a
+	$($(1)_IMPLIB)
 
+ifeq ($(BUILD), UNIX)
+LIBS += lib$(1)$(DLL_EXT)
+else
 BINS += lib$(1)$(DLL_EXT)
 LIBS += lib$(1)$(DLL_EXT).a
 endif
@@ -258,44 +255,33 @@ OBJS += $$($(1)_OBJS)
 DEPS += $$($(1)_OBJS:%.o=%.d)
 endef
 
+#### DIR ####
+
+define DIR_template
+$(1)_DIR := $(if $($(1)_DIR),$($(1)_DIR),$(PREFIX)/$(1))
+endef
+
 #### INSTALL ####
 
 define INSTALL_template
 .PHONY: install-$(1)
-ifdef $(1)_DIR
-# Use specified directory.
+
 install-$(1): all-aug
-	@mkdir -p $($(1)_DIR)
+	@$(MKDIR) -p $($(1)_DIR)
 	@for f in $($(1)_FILES); do \
 		$(INSTALL) -pv $$$$f $($(1)_DIR); \
 	done
-else
-# Use default.
-install-$(1): all-aug
-	@mkdir -p $(PREFIX)/$(1)
-	@for f in $($(1)_FILES); do \
-		$(INSTALL) -pv $$$$f $(PREFIX)/$(1); \
-	done
-endif
 endef
 
 #### UNINSTALL ####
 
 define UNINSTALL_template
 .PHONY: uninstall-$(1)
-ifdef $(1)_DIR
-# Use specified directory.
+
 uninstall-$(1):
 	@for f in $($(1)_FILES); do \
 		$(RM) -fv $($(1)_DIR)/$$$$f; \
 	done
-else
-# Use default.
-uninstall-$(1):
-	@for f in $($(1)_FILES); do \
-		$(RM) -fv $(PREFIX)/$(1)/$$$$f; \
-	done
-endif
 endef
 
 #### Template Expansions ####
@@ -325,6 +311,9 @@ lib_FILES += $(LIBS)
 mod_FILES += $(MODS)
 
 # Expand install and uninstall.
+
+$(foreach x,$(INSTALLDIRS),$(eval \
+	$(call DIR_template,$(x))))
 
 $(foreach x,$(INSTALLDIRS),$(eval \
 	$(call INSTALL_template,$(x))))
