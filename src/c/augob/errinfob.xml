@@ -1,0 +1,29 @@
+<package name="aug">
+
+  <interface name="errinfob">
+
+    Detailed error information.
+
+    <method name="num" type="int" qname="errinfobnum">
+
+      Last error number.
+
+      @return Error number.
+
+    </method>
+    <method name="desc" type="char*" qname="errinfobdesc">
+
+      Last error description.
+
+      @param dst Output buffer.
+
+      @param size Size of @a dst.
+
+      @return @a dst output buffer.
+
+      <param name="dst" type="char*"/>
+      <param name="size" type="size_t"/>
+    </method>
+  </interface>
+
+</package>

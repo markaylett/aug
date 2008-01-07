@@ -1,6 +1,7 @@
 EXTRA_DIST = \
 	addrob.xml \
 	blob.xml \
+	errinfob.xml \
 	eventob.xml \
 	iterob.xml \
 	longob.xml \
@@ -11,6 +12,7 @@ modincludedir = $(includedir)/augob
 modinclude_HEADERS = \
 	addrob.h \
 	blob.h \
+	errinfob.h \
 	eventob.h \
 	iterob.h \
 	longob.h \
