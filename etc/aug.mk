@@ -327,7 +327,26 @@ uninstall-$(1):
 	done
 endef
 
+#### SUBDIRS ####
+
+define SUBDIR_template
+.PHONY: $(1)-$(2)
+$(1)-$(2): $$($(2)_DEPS:%=$(1)-%)
+	$(MAKE) -C $(2) $(1)
+endef
+
+define TARGET_template
+$(foreach x,$(SUBDIRS),$(eval \
+	$(call SUBDIR_template,$(1),$(x))))
+
+.PHONY: $(1)-subdirs
+$(1)-subdirs: $$(SUBDIRS:%=$(1)-%)
+endef
+
 #### Template Expansions ####
+
+$(foreach x,all clean install uninstall check,$(eval \
+	$(call TARGET_template,$(x))))
 
 $(foreach x,$(CLIBRARIES),$(eval \
 	$(call CLIBRARY_template,$(x))))
@@ -372,26 +391,26 @@ $(foreach x,$(INSTALLDIRS),$(eval \
 
 #### Common Targets ####
 
-.PHONY: all clean install uninstall
+.PHONY: all clean install uninstall check
 
 .PHONY: all-aug
-all-aug: $(TARGETS)
+all-aug: all-subdirs $(TARGETS)
 
 .PHONY: clean-aug
-clean-aug:
+clean-aug: clean-subdirs
 	$(RM) -f $(BINS) $(LIBS) $(MODS) \
 	$(DLL_CXXCRT) $(CLEAN) $(OBJS) $(DEPS) *~
 
 .PHONY: install-aug
-install-aug: $(INSTALLDIRS:%=install-%)
+install-aug: install-subdirs $(INSTALLDIRS:%=install-%)
 
 .PHONY: uninstall-aug
-uninstall-aug: $(INSTALLDIRS:%=uninstall-%)
+uninstall-aug: uninstall-subdirs $(INSTALLDIRS:%=uninstall-%)
 
 #### Unit Tests ####
 
 .PHONY: check-aug
-check-aug: $(TESTS)
+check-aug: check-subdirs $(TESTS)
 	@all=0; failed=0; \
 	list='$(TESTS)'; \
 	if test -n "$$list"; then \
