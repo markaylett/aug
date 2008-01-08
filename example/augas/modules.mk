@@ -39,6 +39,10 @@ clean: clean-aug
 bench: all
 	$(AUG_HOME)/bin/daug -f bench.conf test
 
+gprof:
+	gprof $(AUG_HOME)/bin/daug gmon.out \
+	| ./gprof2dot.py | dot -Tpng -o gmon.png
+
 test: all
 	$(AUG_HOME)/bin/daug -f test.conf test
 

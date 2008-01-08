@@ -27,7 +27,9 @@ else
 BUILD := $(shell uname -s | sed -e 's/CYGWIN.*/CYGWIN/i' -e 's/MINGW.*/MINGW/i')
 endif
 
-ifeq ($(BUILD), MINGW)
+ifeq ($(BUILD),MINGW)
+
+WIN32 := 1
 COPTS = \
 	-mno-cygwin \
 	-mthreads
@@ -64,7 +66,9 @@ EXE_CXXLIBS =
 
 else
 
-ifeq ($(BUILD), CYGWIN)
+ifeq ($(BUILD),CYGWIN)
+
+WIN32 := 1
 COPTS =
 CDEFS =
 DLL_EXT := .dll
@@ -74,7 +78,7 @@ else
 
 # Otherwise assume Unix.
 
-BUILD := UNIX
+WIN32 :=
 COPTS = \
 	-fPIC
 CDEFS = \
@@ -107,8 +111,6 @@ COPTS += \
 	-MMD \
 	-MP
 
-#### Template Definitions ####
-
 TARGETS = \
 	$(CLIBRARIES) \
 	$(CXXLIBRARIES) \
@@ -117,17 +119,32 @@ TARGETS = \
 	$(CPROGRAMS) \
 	$(CXXPROGRAMS)
 
+#### Function Definitions ####
+
+BINS :=
+LIBS :=
+MODS :=
+
+CLEAN :=
+OBJS :=
+DEPS :=
+
+define win32lib
+BINS += lib$(1)$(DLL_EXT)
+LIBS += lib$(1)$(DLL_EXT).a
+endef
+
+define posixlib
+LIBS += lib$(1)$(DLL_EXT)
+endef
+
 #### CLIBRARY ####
 
 define CLIBRARY_template
 .PHONY: $(1)
 $(1): lib$(1)$(DLL_EXT)
 
-ifeq ($(BUILD), UNIX)
-$(eval $(1)_IMPLIB :=)
-else
 $(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(DLL_EXT).a)
-endif
 
 lib$(1)$(DLL_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
 	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) \
@@ -135,14 +152,10 @@ lib$(1)$(DLL_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
 	-o lib$(1)$(DLL_EXT) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(DLL_CLIBS) \
-	$($(1)_IMPLIB)
+	$(if $(WIN32),$($(1)_IMPLIB),)
 
-ifeq ($(BUILD), UNIX)
-LIBS += lib$(1)$(DLL_EXT)
-else
-BINS += lib$(1)$(DLL_EXT)
-LIBS += lib$(1)$(DLL_EXT).a
-endif
+$(if $(WIN32), $(call win32lib,$(1)), $(call posixlib,$(1)))
+
 OBJS += $$($(1)_OBJS)
 DEPS += $$($(1)_OBJS:%.o=%.d)
 endef
@@ -153,11 +166,7 @@ define CXXLIBRARY_template
 .PHONY: $(1)
 $(1): lib$(1)$(DLL_EXT)
 
-ifeq ($(BUILD), UNIX)
-$(eval $(1)_IMPLIB :=)
-else
 $(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(DLL_EXT).a)
-endif
 
 lib$(1)$(DLL_EXT): $(DLL_CXXCRT) $$($(1)_DEPS) $$($(1)_OBJS)
 	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) \
@@ -165,14 +174,10 @@ lib$(1)$(DLL_EXT): $(DLL_CXXCRT) $$($(1)_DEPS) $$($(1)_OBJS)
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
 	-o lib$(1)$(DLL_EXT) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(DLL_CXXLIBS) \
-	$($(1)_IMPLIB)
+	$(if $(WIN32),$($(1)_IMPLIB),)
 
-ifeq ($(BUILD), UNIX)
-LIBS += lib$(1)$(DLL_EXT)
-else
-BINS += lib$(1)$(DLL_EXT)
-LIBS += lib$(1)$(DLL_EXT).a
-endif
+$(if $(WIN32), $(call win32lib,$(1)), $(call posixlib,$(1)))
+
 OBJS += $$($(1)_OBJS)
 DEPS += $$($(1)_OBJS:%.o=%.d)
 endef
@@ -255,6 +260,44 @@ OBJS += $$($(1)_OBJS)
 DEPS += $$($(1)_OBJS:%.o=%.d)
 endef
 
+#### CTEST ####
+
+define CTEST_template
+ifneq ($(1), $(1)$(EXE_EXT))
+.PHONY: $(1)
+$(1): $(1)$(EXE_EXT)
+endif
+
+$(1)$(EXE_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(EXE_LDFLAGS) \
+	-o $(1)$(EXE_EXT) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(EXE_CLIBS)
+
+CLEAN += $(1)$(EXE_EXT)
+OBJS += $$($(1)_OBJS)
+DEPS += $$($(1)_OBJS:%.o=%.d)
+endef
+
+#### CXXTEST ####
+
+define CXXTEST_template
+ifneq ($(1), $(1)$(EXE_EXT))
+.PHONY: $(1)
+$(1): $(1)$(EXE_EXT)
+endif
+
+$(1)$(EXE_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(EXE_LDFLAGS) \
+	-o $(1)$(EXE_EXT) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(EXE_CXXLIBS)
+
+CLEAN += $(1)$(EXE_EXT)
+OBJS += $$($(1)_OBJS)
+DEPS += $$($(1)_OBJS:%.o=%.d)
+endef
+
 #### DIR ####
 
 define DIR_template
@@ -304,6 +347,12 @@ $(foreach x,$(CPROGRAMS),$(eval \
 $(foreach x,$(CXXPROGRAMS),$(eval \
 	$(call CXXPROGRAM_template,$(x))))
 
+$(foreach x,$(CTESTS),$(eval \
+	$(call CTEST_template,$(x))))
+
+$(foreach x,$(CXXTESTS),$(eval \
+	$(call CXXTEST_template,$(x))))
+
 # Add installable files.
 
 bin_FILES += $(BINS)
@@ -330,7 +379,8 @@ all-aug: $(TARGETS)
 
 .PHONY: clean-aug
 clean-aug:
-	$(RM) -f $(BINS) $(LIBS) $(MODS) $(DLL_CXXCRT) $(OBJS) $(DEPS) *~
+	$(RM) -f $(BINS) $(LIBS) $(MODS) \
+	$(DLL_CXXCRT) $(CLEAN) $(OBJS) $(DEPS) *~
 
 .PHONY: install-aug
 install-aug: $(INSTALLDIRS:%=install-%)
@@ -338,9 +388,34 @@ install-aug: $(INSTALLDIRS:%=install-%)
 .PHONY: uninstall-aug
 uninstall-aug: $(INSTALLDIRS:%=uninstall-%)
 
+#### Unit Tests ####
+
+.PHONY: check-aug
+check-aug: $(TESTS)
+	@all=0; failed=0; \
+	list='$(TESTS)'; \
+	if test -n "$$list"; then \
+	  for t in $$list; do \
+	    if test -f ./$$t; then dir=./; \
+	    else dir=; fi; \
+	    if $${dir}$$t; then \
+	      echo "PASS: $$t"; \
+	    else \
+	      echo "FAIL: $$t"; \
+	      failed=`expr $$failed + 1`; \
+	    fi; \
+	    all=`expr $$all + 1`; \
+	  done; \
+	  if test "$$failed" -eq 0; then \
+	      echo "All $$all tests passed"; \
+	  else \
+	      echo "$$failed of $$all tests failed"; \
+	  fi; \
+	fi
+
 #### Compilation Rules ####
 
-ifeq ($(BUILD), MINGW)
+ifeq ($(BUILD),MINGW)
 $(DLL_CXXCRT): /usr/lib/mingw/dllcrt2.o
 	$(AR) -cr $@ $<
 endif

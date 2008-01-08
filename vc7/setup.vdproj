@@ -159,6 +159,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_39728B2AEB1641AAAC246C6D6E7FF911"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3CFD807797304D7581D522BF9805E932"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -573,6 +579,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B3B199E877BC46E08FF60837512E8010"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B7AEAA90118C4CC497CF2A956B1DA290"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -748,6 +760,12 @@
         "Entry"
         {
         "MsmKey" = "8:_FB98207485BD4764B362E0034F849191"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FD907E8C76F64C70916220BD319E2712"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1155,6 +1173,26 @@
             "TargetName" = "8:augsrvpp.hpp"
             "Tag" = "8:"
             "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_39728B2AEB1641AAAC246C6D6E7FF911"
+            {
+            "SourcePath" = "8:..\\example\\augas\\gprof2dot.py"
+            "TargetName" = "8:gprof2dot.py"
+            "Tag" = "8:"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2009,6 +2047,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_B3B199E877BC46E08FF60837512E8010"
+            {
+            "SourcePath" = "8:..\\example\\augas\\bench.R"
+            "TargetName" = "8:bench.R"
+            "Tag" = "8:"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_B7AEAA90118C4CC497CF2A956B1DA290"
             {
             "SourcePath" = "8:..\\src\\py\\log.py"
@@ -2395,6 +2453,26 @@
             "TargetName" = "8:servercert.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_FD907E8C76F64C70916220BD319E2712"
+            {
+            "SourcePath" = "8:..\\example\\augas\\bench.sh"
+            "TargetName" = "8:bench.sh"
+            "Tag" = "8:"
+            "Folder" = "8:_5BCAC7B63D584ABE91ADDCEE5480201E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
