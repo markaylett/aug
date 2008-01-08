@@ -127,7 +127,6 @@ MODS :=
 
 CLEAN :=
 OBJS :=
-#DEPS :=
 
 define win32lib
 BINS += lib$(1)$(DLL_EXT)
@@ -309,7 +308,7 @@ endef
 define INSTALL_template
 .PHONY: install-$(1)
 
-install-$(1):
+install-$(1): $(TARGETS)
 	@$(MKDIR) -p $($(1)_DIR)
 	@for f in $($(1)_INSTALL); do \
 		$(INSTALL) -pv $$$$f $($(1)_DIR); \
@@ -342,8 +341,6 @@ $(foreach x,$(SUBDIRS),$(eval \
 .PHONY: $(1)-subdirs
 $(1)-subdirs: $$(SUBDIRS:%=$(1)-%)
 endef
-
-# Generate subdir target that delegates to all-subdir.
 
 define SUBDIR_template
 .PHONY: $(1)
