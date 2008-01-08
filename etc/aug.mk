@@ -127,7 +127,7 @@ MODS :=
 
 CLEAN :=
 OBJS :=
-DEPS :=
+#DEPS :=
 
 define win32lib
 BINS += lib$(1)$(DLL_EXT)
@@ -309,9 +309,9 @@ endef
 define INSTALL_template
 .PHONY: install-$(1)
 
-install-$(1): all-aug
+install-$(1):
 	@$(MKDIR) -p $($(1)_DIR)
-	@for f in $($(1)_FILES); do \
+	@for f in $($(1)_INSTALL); do \
 		$(INSTALL) -pv $$$$f $($(1)_DIR); \
 	done
 endef
@@ -322,14 +322,14 @@ define UNINSTALL_template
 .PHONY: uninstall-$(1)
 
 uninstall-$(1):
-	@for f in $($(1)_FILES); do \
+	@for f in $($(1)_INSTALL); do \
 		$(RM) -fv $($(1)_DIR)/$$$$f; \
 	done
 endef
 
 #### SUBDIRS ####
 
-define SUBDIR_template
+define SUBMAKE_template
 .PHONY: $(1)-$(2)
 $(1)-$(2): $$($(2)_DEPS:%=$(1)-%)
 	$(MAKE) -C $(2) $(1)
@@ -337,16 +337,26 @@ endef
 
 define TARGET_template
 $(foreach x,$(SUBDIRS),$(eval \
-	$(call SUBDIR_template,$(1),$(x))))
+	$(call SUBMAKE_template,$(1),$(x))))
 
 .PHONY: $(1)-subdirs
 $(1)-subdirs: $$(SUBDIRS:%=$(1)-%)
+endef
+
+# Generate subdir target that delegates to all-subdir.
+
+define SUBDIR_template
+.PHONY: $(1)
+$(1): all-$(1)
 endef
 
 #### Template Expansions ####
 
 $(foreach x,all clean install uninstall check,$(eval \
 	$(call TARGET_template,$(x))))
+
+$(foreach x,$(SUBDIRS),$(eval \
+	$(call SUBDIR_template,$(x))))
 
 $(foreach x,$(CLIBRARIES),$(eval \
 	$(call CLIBRARY_template,$(x))))
@@ -374,9 +384,9 @@ $(foreach x,$(CXXTESTS),$(eval \
 
 # Add installable files.
 
-bin_FILES += $(BINS)
-lib_FILES += $(LIBS)
-mod_FILES += $(MODS)
+bin_INSTALL += $(BINS)
+lib_INSTALL += $(LIBS)
+mod_INSTALL += $(MODS)
 
 # Expand install and uninstall.
 
@@ -445,4 +455,6 @@ endif
 %.o: %.cpp
 	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) -c -o $@ $<
 
+ifdef DEPS
 -include $(DEPS)
+endif

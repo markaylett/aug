@@ -21,6 +21,8 @@ namespace {
     const unsigned MAX_NAME(32);
 
     /*
+      proto arc start hbint seq state load resv
+
       Heartbeat Protocol
 
       Member MB 0x001
