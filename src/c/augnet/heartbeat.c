@@ -8,17 +8,9 @@
 AUG_RCSID("$Id$");
 
 #include "augsys/endian.h"
-#include "augmar/format_.h"
+#include "augsys/errinfo.h"
 
 #include <string.h>
-
-#define HEAD_OFFSET_ 0
-#define NAME_OFFSET_ (HEAD_OFFSET_ + sizeof(uint32_t))
-#define SEQ_OFFSET_ (NAME_OFFSET_ + AUG_HBNAMELEN)
-#define STATE_OFFSET_ (SEQ_OFFSET_ + sizeof(uint32_t))
-#define LOAD_OFFSET_ (STATE_OFFSET_ + sizeof(uint32_t))
-#define HBINT_OFFSET_ (LOAD_OFFSET_ + sizeof(char))
-#define MSG_OFFSET_ (HBINT_OFFSET_ + sizeof(char))
 
 static void
 packname_(char* buf, const char* name)
@@ -35,28 +27,62 @@ unpackname_(char* name, const char* buf)
     name[AUG_HBNAMELEN] = '\0';
 }
 
+AUGNET_API int
+aug_verifyheartbeat(const struct aug_heartbeat* hb)
+{
+    if ('\0' == hb->name_[0]) {
+
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+                       AUG_MSG("null heartbeat name"));
+        return -1;
+    }
+
+    if (AUG_HBLOAD_MAX < hb->load_) {
+
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
+                       AUG_MSG("maximum heartbeat load size exceeded"));
+        return -1;
+    }
+
+    if (AUG_HBSEC_MAX < hb->sec_) {
+
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
+                       AUG_MSG("maximum heartbeat seconds size exceeded"));
+        return -1;
+    }
+
+    if (AUG_HBMSG_MAX < hb->msg_) {
+
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
+                       AUG_MSG("maximum heartbeat message size exceeded"));
+        return -1;
+    }
+
+    return 0;
+}
+
 AUGNET_API char*
 aug_packheartbeat(char* buf, const struct aug_heartbeat* hb)
 {
-    aug_encode32(buf + HEAD_OFFSET_, (uint32_t)hb->head_);
-    packname_(buf + NAME_OFFSET_, hb->name_);
-    aug_encode32(buf + SEQ_OFFSET_, (uint32_t)hb->seq_);
-    aug_encode32(buf + STATE_OFFSET_, (uint32_t)hb->state_);
-    buf[LOAD_OFFSET_] = hb->load_;
-    buf[HBINT_OFFSET_] = hb->hbint_;
-    aug_encode16(buf + MSG_OFFSET_, (uint16_t)hb->msg_);
+    aug_encode32(buf + AUG_HBHEAD_OFFSET, (uint32_t)hb->head_);
+    packname_(buf + AUG_HBNAME_OFFSET, hb->name_);
+    aug_encode32(buf + AUG_HBSEQ_OFFSET, (uint32_t)hb->seq_);
+    aug_encode32(buf + AUG_HBSTATE_OFFSET, (uint32_t)hb->state_);
+    buf[AUG_HBLOAD_OFFSET] = hb->load_;
+    buf[AUG_HBSEC_OFFSET] = hb->sec_;
+    aug_encode16(buf + AUG_HBMSG_OFFSET, (uint16_t)hb->msg_);
     return buf;
 }
 
 AUGNET_API struct aug_heartbeat*
 aug_unpackheartbeat(struct aug_heartbeat* hb, const char* buf)
 {
-    hb->head_ = aug_decode32(buf + HEAD_OFFSET_);
+    hb->head_ = aug_decode32(buf + AUG_HBHEAD_OFFSET);
     unpackname_(hb->name_, buf);
-    hb->seq_ = aug_decode32(buf + SEQ_OFFSET_);
-    hb->state_ = aug_decode32(buf + STATE_OFFSET_);
-    hb->load_ = buf[LOAD_OFFSET_];
-    hb->hbint_ = buf[HBINT_OFFSET_];
-    hb->msg_ = aug_decode16(buf + MSG_OFFSET_);
+    hb->seq_ = aug_decode32(buf + AUG_HBSEQ_OFFSET);
+    hb->state_ = aug_decode32(buf + AUG_HBSTATE_OFFSET);
+    hb->load_ = buf[AUG_HBLOAD_OFFSET];
+    hb->sec_ = buf[AUG_HBSEC_OFFSET];
+    hb->msg_ = aug_decode16(buf + AUG_HBMSG_OFFSET);
     return hb;
 }
