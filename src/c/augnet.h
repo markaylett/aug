@@ -16,6 +16,7 @@
 #include "augnet/extend.h"
 #include "augnet/file.h"
 #include "augnet/fix.h"
+#include "augnet/heartbeat.h"
 #include "augnet/http.h"
 #include "augnet/inet.h"
 #include "augnet/mar.h"

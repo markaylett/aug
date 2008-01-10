@@ -21,7 +21,7 @@ namespace {
     const unsigned MAX_NAME(32);
 
     /*
-      proto arc start hbint seq state load resv
+      header[4] name[64] seq[4] state[4] load[1] hbint[1] msg[2]
 
       Heartbeat Protocol
 

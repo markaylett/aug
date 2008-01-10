@@ -7,6 +7,7 @@
 
 AUG_RCSID("$Id$");
 
+#include "augmar/format_.h"
 #include "augmar/info_.h"
 
 #include <string.h>

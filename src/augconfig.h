@@ -45,6 +45,18 @@
 # define __func__ __FUNCTION__
 # define PACKAGE_BUGREPORT "mark@emantic.co.uk"
 
+# define INT8_MIN   (-0x80)
+# define INT16_MIN  (-0x8000)
+# define INT32_MIN  (-0x80000000)
+
+# define INT8_MAX   0x7F
+# define INT16_MAX  0x7FFF
+# define INT32_MAX  0x7FFFFFFF
+
+# define UINT8_MAX  0xFF
+# define UINT16_MAX 0xFFFF
+# define UINT32_MAX 0xFFFFFFFF
+
 typedef int mode_t;
 typedef int pid_t;
 typedef int ssize_t;

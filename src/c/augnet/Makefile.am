@@ -9,6 +9,7 @@ modinclude_HEADERS = \
 	extend.h \
 	file.h \
 	fix.h \
+	heartbeat.h \
 	http.h \
 	inet.h \
 	mar.h \
@@ -29,6 +30,7 @@ libaugnet_la_SOURCES = \
 	extend.c \
 	file.c \
 	fix.c \
+	heartbeat.c \
 	http.c \
 	inet.c \
 	mar.c \

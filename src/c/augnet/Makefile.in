@@ -65,8 +65,8 @@ libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugnet_la_OBJECTS = auth.lo base64.lo config.lo connector.lo \
-	extend.lo file.lo fix.lo http.lo inet.lo mar.lo nbfile.lo \
-	ssl.lo types.lo writer.lo
+	extend.lo file.lo fix.lo heartbeat.lo http.lo inet.lo mar.lo \
+	nbfile.lo ssl.lo types.lo writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_base64test_OBJECTS = base64test.$(OBJEXT)
 base64test_OBJECTS = $(am_base64test_OBJECTS)
@@ -230,6 +230,7 @@ modinclude_HEADERS = \
 	extend.h \
 	file.h \
 	fix.h \
+	heartbeat.h \
 	http.h \
 	inet.h \
 	mar.h \
@@ -248,6 +249,7 @@ libaugnet_la_SOURCES = \
 	extend.c \
 	file.c \
 	fix.c \
+	heartbeat.c \
 	http.c \
 	inet.c \
 	mar.c \
@@ -375,6 +377,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixtest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/heartbeat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/httptest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@

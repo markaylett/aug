@@ -16,27 +16,27 @@ typedef uint16_t aug_verno_t;
 typedef uint16_t aug_fields_t;
 #define aug_encodefields aug_encode16
 #define aug_decodefields aug_decode16
-#define AUG_FIELDS_MAX AUG_UINT16_MAX
+#define AUG_FIELDS_MAX UINT16_MAX
 
 typedef uint32_t aug_hsize_t;
 #define aug_encodehsize aug_encode32
 #define aug_decodehsize aug_decode32
-#define AUG_HSIZE_MAX AUG_UINT32_MAX
+#define AUG_HSIZE_MAX UINT32_MAX
 
 typedef uint32_t aug_bsize_t;
 #define aug_encodebsize aug_encode32
 #define aug_decodebsize aug_decode32
-#define AUG_BSIZE_MAX AUG_UINT32_MAX
+#define AUG_BSIZE_MAX UINT32_MAX
 
 typedef uint16_t aug_nsize_t;
 #define aug_encodensize aug_encode16
 #define aug_decodensize aug_decode16
-#define AUG_NSIZE_MAX AUG_UINT16_MAX
+#define AUG_NSIZE_MAX UINT16_MAX
 
 typedef uint16_t aug_vsize_t;
 #define aug_encodevsize aug_encode16
 #define aug_decodevsize aug_decode16
-#define AUG_VSIZE_MAX AUG_UINT16_MAX
+#define AUG_VSIZE_MAX UINT16_MAX
 
 #define AUG_LEADER 0
 #define AUG_VERNO_OFFSET 0

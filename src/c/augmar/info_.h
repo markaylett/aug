@@ -4,7 +4,6 @@
 #ifndef AUGMAR_INFO_H_
 #define AUGMAR_INFO_H_
 
-#include "augmar/format_.h"
 #include "augmar/seq_.h"
 
 struct aug_info_ {

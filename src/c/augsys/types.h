@@ -10,9 +10,6 @@
 #include <stddef.h> /* size_t */
 #include <sys/types.h>
 
-#define AUG_UINT16_MAX 0xffffU
-#define AUG_UINT32_MAX 0xffffffffU
-
 typedef unsigned aug_len_t;
 
 #endif /* AUGSYS_TYPES_H */

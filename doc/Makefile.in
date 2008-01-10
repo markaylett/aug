@@ -501,7 +501,8 @@ uninstall-info: uninstall-info-recursive
 dotdepend:
 	for l in augsys augmar augutil augsrv augnet; do \
 		(cd $(top_srcdir)/src/c && \
-			../pl/dotdepend -I. `find $$l -name "*.c" | grep -v '[.]libs'`) \
+			../pl/dotdepend -I. $$(find $$l -name "*.c" \
+			| egrep -v '([.]libs|test[.]c$$)')) \
 			| dot -Tgif >$$l.gif; \
 	done
 

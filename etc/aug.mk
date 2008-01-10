@@ -310,7 +310,7 @@ define INSTALL_template
 
 install-$(1): $(TARGETS)
 	@$(MKDIR) -p $($(1)_DIR)
-	@for f in $($(1)_INSTALL); do \
+	@for f in $($(1)_FILES); do \
 		$(INSTALL) -pv $$$$f $($(1)_DIR); \
 	done
 endef
@@ -321,7 +321,7 @@ define UNINSTALL_template
 .PHONY: uninstall-$(1)
 
 uninstall-$(1):
-	@for f in $($(1)_INSTALL); do \
+	@for f in $($(1)_FILES); do \
 		$(RM) -fv $($(1)_DIR)/$$$$f; \
 	done
 endef
@@ -381,9 +381,9 @@ $(foreach x,$(CXXTESTS),$(eval \
 
 # Add installable files.
 
-bin_INSTALL += $(BINS)
-lib_INSTALL += $(LIBS)
-mod_INSTALL += $(MODS)
+bin_FILES += $(BINS)
+lib_FILES += $(LIBS)
+mod_FILES += $(MODS)
 
 # Expand install and uninstall.
 
