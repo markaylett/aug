@@ -16,7 +16,8 @@
  * @li augutil.h
  *
  * These libraries are written in standard C.  They are targeted at Windows
- * and other POSIX-compliant OS-es.
+ * and other POSIX-compliant OS-es.  The aug package also contains C++
+ * wrappers for these libraries.
  */
 
 /**

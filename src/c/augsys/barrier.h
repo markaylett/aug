@@ -13,7 +13,9 @@
 #include "augsys/lock.h"
 
 #if !ENABLE_SMP
-/* Prevent compiler re-ordering. */
+/**
+ * Prevent compiler re-ordering.
+ */
 # define AUG_MB() __asm__ __volatile__("":::"memory")
 #else /* ENABLE_SMP*/
 # if defined(__GNUC__)
@@ -38,10 +40,14 @@
 #   define AUG_RMB() __asm__ __volatile__("membar #LoadLoad":::"memory")
 #   define AUG_WMB() __asm__ __volatile__("membar #StoreStore":::"memory")
 #  elif (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)
-/* Use GCC's intrinsics. */
+/**
+ * Use GCC's intrinsics.
+ */
 #   define AUG_MB()  __sync_synchronize()
 #  else
-/* Implement in terms of lock. */
+/**
+ * Implement in terms of lock.
+ */
 #   define AUG_MB()                               \
     do {                                          \
         aug_lock();                               \
@@ -66,7 +72,9 @@ AUG_EXTERNC void _ReadWriteBarrier(void);
 #  include <libkern/OSAtomic.h>
 #  define AUG_MB() OSMemoryBarrier()
 # else
-/* Implement in terms of posix lock. */
+/**
+ * Implement in terms of posix lock.
+ */
 #  define AUG_MB()                               \
     do {                                         \
         aug_lock();                              \

@@ -8,6 +8,10 @@
  * @file aub.h
  *
  * Binary compatible interfaces.
+ *
+ * Components within the aub namespace collectively define a binary layout for
+ * reusable components.  Components that adhere to this specification may
+ * safely cross C/C++ language, and compiler boundaries.
  */
 
 /**
@@ -18,6 +22,16 @@
 
 #include <stddef.h>
 #include <sys/types.h> /* size_t */
+
+/**
+ * @defgroup ObjectMacros Macros
+ *
+ * @ingroup Object
+ *
+ * Macros to simplify object declarations in c.
+ *
+ * @{
+ */
 
 /**
  * Calculate offset of member @a m in structure @a s.
@@ -32,16 +46,12 @@
 # define offsetof(s, m) (size_t)&(((s*)0)->m)
 #endif /* !offsetof */
 
+/**
+ * Stringify.
+ */
+
 #define AUB_MKSTR_(x) #x
 #define AUB_MKSTR(x) AUB_MKSTR_(x)
-
-/**
- * @defgroup ObjectMacros Object Macros
- *
- * Macros to simplify object declarations in c.
- *
- * @{
- */
 
 /**
  * Get the containing object of type @a s, with interface member @a m, from

@@ -8,6 +8,10 @@
  * @file aum.h
  *
  * Application server modules.
+ *
+ * Defines the contract between application servers and modules.  Modules are
+ * the dynamically loaded plugins that provide application server's with their
+ * application specific behaviours.
  */
 
 #include <stdarg.h>    /* va_list */

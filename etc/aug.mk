@@ -22,28 +22,28 @@ endif
 #### Platform Specifics ####
 
 ifdef PLATFORM
-BUILD := $(shell echo $(PLATFORM) | tr '[:lower:]' '[:upper:]')
+build_ := $(shell echo $(PLATFORM) | tr '[:lower:]' '[:upper:]')
 else
-BUILD := $(shell uname -s | sed -e 's/CYGWIN.*/CYGWIN/i' -e 's/MINGW.*/MINGW/i')
+build_ := $(shell uname -s | sed -e 's/CYGWIN.*/CYGWIN/i' -e 's/MINGW.*/MINGW/i')
 endif
 
-ifeq ($(BUILD),MINGW)
+ifeq ($(build_),MINGW)
 
-WIN32 := 1
-COPTS = \
+win32_ := 1
+copts_ = \
 	-mno-cygwin \
 	-mthreads
-CDEFS = \
+cdefs_ = \
 	-DWINVER=0x0501 \
 	-DFD_SETSIZE=256 \
 	-D__USE_W32_SOCKETS
-DLL_EXT := .dll
-DLL_LDFLAGS = \
+dll_ext_ := .dll
+dll_ldflags_ = \
 	-L. \
 	-L/usr/lib/mingw \
 	-Wl,--enable-auto-image-base
-DLL_CLIBS =
-DLL_CXXLIBS = \
+dll_clibs_ =
+dll_cxxlibs_ = \
 	-nostdlib \
 	-ldllcrt2 \
 	-lstdc++ \
@@ -56,62 +56,62 @@ DLL_CXXLIBS = \
 	-lkernel32 \
 	-ladvapi32 \
 	-lshell32
-DLL_CXXCRT := \
+dll_cxxcrt_ := \
 	libdllcrt2.a
 
-EXE_EXT := .exe
-EXE_LDFLAGS =
-EXE_CLIBS =
-EXE_CXXLIBS =
+exe_ext_ := .exe
+exe_ldflags_ =
+exe_clibs =
+exe_cxxlibs_ =
 
 else
 
-ifeq ($(BUILD),CYGWIN)
+ifeq ($(build_),CYGWIN)
 
-WIN32 := 1
-COPTS =
-CDEFS =
-DLL_EXT := .dll
-EXE_EXT := .exe
+win32_ := 1
+copts_ =
+cdefs_ =
+dll_ext_ := .dll
+exe_ext_ := .exe
 
 else
 
 # Otherwise assume Unix.
 
-WIN32 :=
-COPTS = \
+win32_ :=
+copts_ = \
 	-fPIC
-CDEFS = \
+cdefs_ = \
 	-DPIC
-DLL_EXT := .so
-EXE_EXT :=
+dll_ext_ := .so
+exe_ext_ :=
 
 endif
 
 # Common for non-MINGW.
 
-DLL_LDFLAGS =
-DLL_CLIBS =
-DLL_CXXLIBS =
-DLL_CXXCRT :=
+dll_ldflags_ =
+dll_clibs_ =
+dll_cxxlibs_ =
+dll_cxxcrt_ :=
 
-EXE_LDFLAGS =
-EXE_CLIBS =
-EXE_CXXLIBS =
+exe_ldflags_ =
+exe_clibs =
+exe_cxxlibs_ =
 
 endif
 
 # Common for all.
 
-CDEFS += \
+cdefs_ += \
 	-D_MT \
 	-D_REENTRANT
 
-COPTS += \
+copts_ += \
 	-MMD \
 	-MP
 
-TARGETS = \
+targets_ = \
 	$(CLIBRARIES) \
 	$(CXXLIBRARIES) \
 	$(CMODULES) \
@@ -121,180 +121,181 @@ TARGETS = \
 
 #### Function Definitions ####
 
-BINS :=
-LIBS :=
-MODS :=
+bins_ :=
+libs_ :=
+mods_ :=
 
-CLEAN :=
-OBJS :=
+clean_ :=
+objs_ :=
+# defs_ left undefined due to conditional dependency inclusion.
 
 define win32lib
-BINS += lib$(1)$(DLL_EXT)
-LIBS += lib$(1)$(DLL_EXT).a
+bins_ += lib$(1)$(dll_ext_)
+libs_ += lib$(1)$(dll_ext_).a
 endef
 
 define posixlib
-LIBS += lib$(1)$(DLL_EXT)
+libs_ += lib$(1)$(dll_ext_)
 endef
 
 #### CLIBRARY ####
 
 define CLIBRARY_template
 .PHONY: $(1)
-$(1): lib$(1)$(DLL_EXT)
+$(1): lib$(1)$(dll_ext_)
 
-$(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(DLL_EXT).a)
+$(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(dll_ext_).a)
 
-lib$(1)$(DLL_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) \
-	-shared -Wl,-soname,lib$(1)$(DLL_EXT) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
-	-o lib$(1)$(DLL_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(DLL_CLIBS) \
-	$(if $(WIN32),$($(1)_IMPLIB),)
+lib$(1)$(dll_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CC) $(copts_) $(CFLAGS) $(cdefs_) \
+	-shared -Wl,-soname,lib$(1)$(dll_ext_) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(dll_ldflags_) \
+	-o lib$(1)$(dll_ext_) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(dll_clibs_) \
+	$(if $(win32_),$($(1)_IMPLIB),)
 
-$(if $(WIN32), $(call win32lib,$(1)), $(call posixlib,$(1)))
+$(if $(win32_), $(call win32lib,$(1)), $(call posixlib,$(1)))
 
-OBJS += $$($(1)_OBJS)
-DEPS += $$($(1)_OBJS:%.o=%.d)
+objs_ += $$($(1)_OBJS)
+deps_ += $$($(1)_OBJS:%.o=%.d)
 endef
 
 #### CXXLIBRARY ####
 
 define CXXLIBRARY_template
 .PHONY: $(1)
-$(1): lib$(1)$(DLL_EXT)
+$(1): lib$(1)$(dll_ext_)
 
-$(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(DLL_EXT).a)
+$(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(dll_ext_).a)
 
-lib$(1)$(DLL_EXT): $(DLL_CXXCRT) $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) \
-	-shared -Wl,-soname,lib$(1)$(DLL_EXT) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
-	-o lib$(1)$(DLL_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(DLL_CXXLIBS) \
-	$(if $(WIN32),$($(1)_IMPLIB),)
+lib$(1)$(dll_ext_): $(dll_cxxcrt_) $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CXX) $(copts_) $(CXXFLAGS) $(cdefs_) \
+	-shared -Wl,-soname,lib$(1)$(dll_ext_) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(dll_ldflags_) \
+	-o lib$(1)$(dll_ext_) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(dll_cxxlibs_) \
+	$(if $(win32_),$($(1)_IMPLIB),)
 
-$(if $(WIN32), $(call win32lib,$(1)), $(call posixlib,$(1)))
+$(if $(win32_), $(call win32lib,$(1)), $(call posixlib,$(1)))
 
-OBJS += $$($(1)_OBJS)
-DEPS += $$($(1)_OBJS:%.o=%.d)
+objs_ += $$($(1)_OBJS)
+deps_ += $$($(1)_OBJS:%.o=%.d)
 endef
 
 #### CMODULE ####
 
 define CMODULE_template
-ifneq ($(1), $(1)$(DLL_EXT))
+ifneq ($(1), $(1)$(dll_ext_))
 .PHONY: $(1)
-$(1): $(1)$(DLL_EXT)
+$(1): $(1)$(dll_ext_)
 endif
 
-$(1)$(DLL_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) \
-	-shared -Wl,-soname,$(1)$(DLL_EXT) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
-	-o $(1)$(DLL_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(DLL_CLIBS)
+$(1)$(dll_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CC) $(copts_) $(CFLAGS) $(cdefs_) \
+	-shared -Wl,-soname,$(1)$(dll_ext_) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(dll_ldflags_) \
+	-o $(1)$(dll_ext_) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(dll_clibs_)
 
-MODS += $(1)$(DLL_EXT)
-OBJS += $$($(1)_OBJS)
-DEPS += $$($(1)_OBJS:%.o=%.d)
+mods_ += $(1)$(dll_ext_)
+objs_ += $$($(1)_OBJS)
+deps_ += $$($(1)_OBJS:%.o=%.d)
 endef
 
 #### CXXMODULE ####
 
 define CXXMODULE_template
-ifneq ($(1), $(1)$(DLL_EXT))
+ifneq ($(1), $(1)$(dll_ext_))
 .PHONY: $(1)
-$(1): $(1)$(DLL_EXT)
+$(1): $(1)$(dll_ext_)
 endif
 
-$(1)$(DLL_EXT): $(DLL_CXXCRT) $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) \
-	-shared -Wl,-soname,$(1)$(DLL_EXT) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(DLL_LDFLAGS) \
-	-o $(1)$(DLL_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(DLL_CXXLIBS)
+$(1)$(dll_ext_): $(dll_cxxcrt_) $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CXX) $(copts_) $(CXXFLAGS) $(cdefs_) \
+	-shared -Wl,-soname,$(1)$(dll_ext_) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(dll_ldflags_) \
+	-o $(1)$(dll_ext_) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(dll_cxxlibs_)
 
-MODS += $(1)$(DLL_EXT)
-OBJS += $$($(1)_OBJS)
-DEPS += $$($(1)_OBJS:%.o=%.d)
+mods_ += $(1)$(dll_ext_)
+objs_ += $$($(1)_OBJS)
+deps_ += $$($(1)_OBJS:%.o=%.d)
 endef
 
 #### CPROGRAM ####
 
 define CPROGRAM_template
-ifneq ($(1), $(1)$(EXE_EXT))
+ifneq ($(1), $(1)$(exe_ext_))
 .PHONY: $(1)
-$(1): $(1)$(EXE_EXT)
+$(1): $(1)$(exe_ext_)
 endif
 
-$(1)$(EXE_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(EXE_LDFLAGS) \
-	-o $(1)$(EXE_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(EXE_CLIBS)
+$(1)$(exe_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CC) $(copts_) $(CFLAGS) $(cdefs_) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(exe_ldflags_) \
+	-o $(1)$(exe_ext_) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(exe_clibs)
 
-BINS += $(1)$(EXE_EXT)
-OBJS += $$($(1)_OBJS)
-DEPS += $$($(1)_OBJS:%.o=%.d)
+bins_ += $(1)$(exe_ext_)
+objs_ += $$($(1)_OBJS)
+deps_ += $$($(1)_OBJS:%.o=%.d)
 endef
 
 #### CXXPROGRAM ####
 
 define CXXPROGRAM_template
-ifneq ($(1), $(1)$(EXE_EXT))
+ifneq ($(1), $(1)$(exe_ext_))
 .PHONY: $(1)
-$(1): $(1)$(EXE_EXT)
+$(1): $(1)$(exe_ext_)
 endif
 
-$(1)$(EXE_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(EXE_LDFLAGS) \
-	-o $(1)$(EXE_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(EXE_CXXLIBS)
+$(1)$(exe_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CXX) $(copts_) $(CXXFLAGS) $(cdefs_) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(exe_ldflags_) \
+	-o $(1)$(exe_ext_) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(exe_cxxlibs_)
 
-BINS += $(1)$(EXE_EXT)
-OBJS += $$($(1)_OBJS)
-DEPS += $$($(1)_OBJS:%.o=%.d)
+bins_ += $(1)$(exe_ext_)
+objs_ += $$($(1)_OBJS)
+deps_ += $$($(1)_OBJS:%.o=%.d)
 endef
 
 #### CTEST ####
 
 define CTEST_template
-ifneq ($(1), $(1)$(EXE_EXT))
+ifneq ($(1), $(1)$(exe_ext_))
 .PHONY: $(1)
-$(1): $(1)$(EXE_EXT)
+$(1): $(1)$(exe_ext_)
 endif
 
-$(1)$(EXE_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(EXE_LDFLAGS) \
-	-o $(1)$(EXE_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(EXE_CLIBS)
+$(1)$(exe_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CC) $(copts_) $(CFLAGS) $(cdefs_) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(exe_ldflags_) \
+	-o $(1)$(exe_ext_) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(exe_clibs)
 
-CLEAN += $(1)$(EXE_EXT)
-OBJS += $$($(1)_OBJS)
-DEPS += $$($(1)_OBJS:%.o=%.d)
+clean_ += $(1)$(exe_ext_)
+objs_ += $$($(1)_OBJS)
+deps_ += $$($(1)_OBJS:%.o=%.d)
 endef
 
 #### CXXTEST ####
 
 define CXXTEST_template
-ifneq ($(1), $(1)$(EXE_EXT))
+ifneq ($(1), $(1)$(exe_ext_))
 .PHONY: $(1)
-$(1): $(1)$(EXE_EXT)
+$(1): $(1)$(exe_ext_)
 endif
 
-$(1)$(EXE_EXT): $$($(1)_DEPS) $$($(1)_OBJS)
-	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) \
-	$(LDFLAGS) $$($(1)_LDFLAGS) $(EXE_LDFLAGS) \
-	-o $(1)$(EXE_EXT) $$($(1)_OBJS) \
-	$$($(1)_LIBS:%=-l%) $(EXE_CXXLIBS)
+$(1)$(exe_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+	$(CXX) $(copts_) $(CXXFLAGS) $(cdefs_) \
+	$(LDFLAGS) $$($(1)_LDFLAGS) $(exe_ldflags_) \
+	-o $(1)$(exe_ext_) $$($(1)_OBJS) \
+	$$($(1)_LIBS:%=-l%) $(exe_cxxlibs_)
 
-CLEAN += $(1)$(EXE_EXT)
-OBJS += $$($(1)_OBJS)
-DEPS += $$($(1)_OBJS:%.o=%.d)
+clean_ += $(1)$(exe_ext_)
+objs_ += $$($(1)_OBJS)
+deps_ += $$($(1)_OBJS:%.o=%.d)
 endef
 
 #### DIR ####
@@ -308,7 +309,7 @@ endef
 define INSTALL_template
 .PHONY: install-$(1)
 
-install-$(1): $(TARGETS)
+install-$(1): $(targets_)
 	@$(MKDIR) -p $($(1)_DIR)
 	@for f in $($(1)_FILES); do \
 		$(INSTALL) -pv $$$$f $($(1)_DIR); \
@@ -381,9 +382,9 @@ $(foreach x,$(CXXTESTS),$(eval \
 
 # Add installable files.
 
-bin_FILES += $(BINS)
-lib_FILES += $(LIBS)
-mod_FILES += $(MODS)
+bin_FILES += $(bins_)
+lib_FILES += $(libs_)
+mod_FILES += $(mods_)
 
 # Expand install and uninstall.
 
@@ -401,12 +402,12 @@ $(foreach x,$(INSTALLDIRS),$(eval \
 .PHONY: all clean install uninstall check
 
 .PHONY: all-aug
-all-aug: all-subdirs $(TARGETS)
+all-aug: all-subdirs $(targets_)
 
 .PHONY: clean-aug
 clean-aug: clean-subdirs
-	$(RM) -f $(BINS) $(LIBS) $(MODS) \
-	$(DLL_CXXCRT) $(CLEAN) $(OBJS) $(DEPS) *~
+	$(RM) -f $(bins_) $(libs_) $(mods_) \
+	$(dll_cxxcrt_) $(clean_) $(objs_) $(deps_) *~
 
 .PHONY: install-aug
 install-aug: install-subdirs $(INSTALLDIRS:%=install-%)
@@ -441,17 +442,17 @@ check-aug: check-subdirs $(TESTS)
 
 #### Compilation Rules ####
 
-ifeq ($(BUILD),MINGW)
-$(DLL_CXXCRT): /usr/lib/mingw/dllcrt2.o
+ifeq ($(build_),MINGW)
+$(dll_cxxcrt_): /usr/lib/mingw/dllcrt2.o
 	$(AR) -cr $@ $<
 endif
 
 %.o: %.c
-	$(CC) $(COPTS) $(CFLAGS) $(CDEFS) -c -o $@ $<
+	$(CC) $(copts_) $(CFLAGS) $(cdefs_) -c -o $@ $<
 
 %.o: %.cpp
-	$(CXX) $(COPTS) $(CXXFLAGS) $(CDEFS) -c -o $@ $<
+	$(CXX) $(copts_) $(CXXFLAGS) $(cdefs_) -c -o $@ $<
 
-ifdef DEPS
--include $(DEPS)
+ifdef deps_
+-include $(deps_)
 endif

@@ -49,6 +49,8 @@ struct aug_field {
 /**
  * @defgroup OpenFlags Open Flags
  *
+ * @ingroup Constants
+ *
  * @{
  */
 
@@ -91,6 +93,8 @@ struct aug_field {
 
 /**
  * @defgroup SeekWhence Seek Whence
+ *
+ * @ingroup Constants
  *
  * @{
  */
