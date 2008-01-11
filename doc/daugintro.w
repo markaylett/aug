@@ -32,41 +32,45 @@
 @f line normal
 
 @* Introduction.
+
 \DAUG/ is an open source, application server written in \CEE/\AM\CPLUSPLUS/.
-It is designed to simplify the implementation of portable and efficient,
-TCP-based network servers.  \DAUG/ takes an unbiased view of the systems it
-supports; it attempts not to favour one over another, and runs natively on
-all.  It is part of the \pdfURL{\AUG/ project} {http://aug.sourceforge.net},
-which is available for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
-\DAUG/ includes modular support for \IPV6/, \SSL/, \PYTHON/ and \RUBY/.
+It is designed specifically at hosting TCP-based network servers.  \DAUG/ is
+operating system agnostic: it takes a balanced view of the world, does not
+favour one over another, and runs natively on all.  \DAUG/ is part of the
+wider \pdfURL{\AUG/ project} {http://aug.sourceforge.net}, which is available
+for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.  It also includes
+support for \IPV6/, \SSL/, \PYTHON/ and \RUBY/.
 
 \yskip\noindent
-This document offers a brief introduction to building and installing Modules
-for \DAUG/, along with some insight into the application server itself.  For
+
+This document offers a brief introduction to building and installing \DAUG/
+Modules, along with a brief insight into the application server itself.  For
 further information, please visit the \pdfURL{\AUG/ home
 page}{http://aug.sourceforge.net} or email myself, \pdfURL{Mark
 Aylett}{mailto:mark@@emantic.co.uk}.
 
 @* Event Model.
 
-Carefully designed threading models can improve CPU utilisation on
-multi-processor machines.  Similar effects, however, are rarely acheived where
-threads are either used to ``simplify'' coding, or bypass blocking-API calls.
-In such cases, complexity, resource contention and the risk of deadlocks may
-actually increase, and performance degrade.
+Well designed threading models can improve CPU utilisation on multi-processor
+machines.  Similar effects, however, are rarely acheived when threads are
+added either to ``simplify'' coding, or bypass blocking-API calls.  In such
+cases, complexity, resource contention and the risk of deadlocks may actually
+increase, and performance degrade.
 
 \yskip\noindent
-Using non-blocking I/O, a single thread can be dedicated to the scheduling of
-timers, and the de-multiplexing of network events.  If needed, this ``event
-thread'' can be kept responsive by delegating CPU-intensive tasks to secondary
-threads.  Iteractions between the event thread and secondary threads can be
-confined to the event queue to minimise the possibility of deadlocks.
-Similar, in fact, to a UI event model.
+
+Non-blocking I/O allow a single thread to be dedicated to de-multiplexing
+network events.  This ``event thread'' can be kept responsive by delegating
+CPU-intensive tasks to secondary threads.  Iteractions between the event
+thread and secondary threads can be confined to event queues which minimise
+the possibility of deadlocks.  Similar, in fact, to a UI event model.
 
 \yskip\noindent
-The \DAUG/ application server uses an event model, such as the one described
-above, to de-multiplex activity on signal, socket, timer and user-event
-objects.
+
+Although highly efficient, managing the state transitions associated with a
+non-blocking model can be complex, and are best left to components specialised
+for such tasks.  The \DAUG/ application server uses an event model, such as
+the one above, to de-multiplex signal, socket, timer and user-event activity.
 
 @ \DAUG/ delegates event notifications to Modules and, in turn, Sessions.
 Modules are physical components, dynamically loaded into the application
@@ -74,12 +78,14 @@ server at run-time.  Each Module manages one or more Sessions.  Modules and
 Sessions are wired together at configuration-time, not compile-time.
 
 \yskip\noindent
+
 All Module calls are dispatched from the event thread.  A Session can,
 therefore, either opt for a simple, single-threaded model, or a suitable
 alternative, such as a thread-pool --- whenever possible, \DAUG/ avoids
-imposing artificial constraints on Module implementors.
+imposing artificial constraints on Module authors.
 
 \yskip\noindent
+
 The separation of physical Modules and logical Sessions allows Modules to
 adapt and extend the host environment as viewed by Sessions.  The \.{augpy}
 and \.{augrb} Modules, for example, adapt the host environment to allow
@@ -87,11 +93,13 @@ Sessions to be written in either \PYTHON/ or \RUBY/.  These language bindings
 are provided by Modules, and are unbeknown to the application server.
 
 \yskip\noindent
+
 Modules also help to promote component, rather than source-level reuse:
 Sessions can interact with one-another by posting events to the event queue,
 allowing Sessions to bridge language boundaries.
 
 \yskip\noindent
+
 System administrators are presented with a uniform interface across all
 platforms.  Although, on \WINDOWS/, a d\ae monised \DAUG/ process takes the
 form of an NT service, from a sys-admin perspective, the interface remains the
@@ -102,6 +110,7 @@ from a command prompt:
 \.{C:\\> daug -f daug.conf start}
 
 @* Sample Module.
+
 In the sections below, a Module is constructed, in \CPLUSPLUS/, that:
 
 \yskip
@@ -111,6 +120,7 @@ In the sections below, a Module is constructed, in \CPLUSPLUS/, that:
 \item{$\bullet$} disconnects inactive clients.
 
 \yskip\noindent
+
 The Module is implemented in a single source file.  The layout of this file
 is:
 
@@ -197,12 +207,11 @@ echo::do_start(const char* sname)
 
 @ The |do_accepted()| function is called when a new client connection is
 accepted.  The |setuser()| function binds an opaque, user-defined value to an
-\DAUG/ handle.  Here, a |string| buffer is assigned to track partial line
-data received from the client.  An initial, {\sc ``HELLO''} message is sent to
-the client.  The call to |setrwtimer()| establishes a timer that will expire
-when no read activity has occurred on the |sock| handle for a period of 15
-seconds --- \DAUG/ will automatically reset the timer whenever read activity
-occurs.
+\DAUG/ handle.  Here, a |string| buffer is assigned to track partial line data
+received from the client.  An initial, {\sc ``HELLO''} message is sent to the
+client.  The call to |setrwtimer()| establishes a timer that will expire when
+no read activity has occurred on the |sock| handle for a period of 15 seconds
+--- \DAUG/ will automatically reset the timer whenever read activity occurs.
 
 @<member...@>+=
 bool
@@ -293,6 +302,7 @@ transform(line.begin(), line.end(), line.begin(), ucase);
 line += "\r\n";
 
 @* Build and Install.
+
 The \AUG/ package includes a \GNU/ makefile, named \.{aug.mk}, that can be
 used to build Modules.  Simple Modules do not have any link-time dependencies;
 all dependencies are injected into the Module when the Module is initialised.

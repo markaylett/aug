@@ -9,7 +9,7 @@ CXX := g++
 INSTALL := install
 MKDIR := mkdir
 RM := rm
-SHELL := /bin/sh
+SHELL := sh
 
 INSTALLDIRS += bin include lib mod
 
