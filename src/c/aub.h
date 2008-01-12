@@ -46,12 +46,16 @@
 # define offsetof(s, m) (size_t)&(((s*)0)->m)
 #endif /* !offsetof */
 
+/** @{ */
+
 /**
  * Stringify.
  */
 
 #define AUB_MKSTR_(x) #x
 #define AUB_MKSTR(x) AUB_MKSTR_(x)
+
+/** @} */
 
 /**
  * Get the containing object of type @a s, with interface member @a m, from

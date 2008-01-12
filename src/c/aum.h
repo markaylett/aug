@@ -148,7 +148,7 @@ struct aum_session {
 
 /**
  * Both sockets and timers are represented by handles.  For timer handles,
- * "user_" will be of type @ref aub_object.
+ * #aum_handle::user_ will be of type @ref aub_object.
  *
  * @see settimer_()
  */

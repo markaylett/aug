@@ -30,14 +30,12 @@
 # define AUG_MAXLINE 1024
 #endif /* !AUG_MAXLINE */
 
+/** @{ */
+
 /**
- * @defgroup MinMax Min Max
- *
  * @ingroup Macros
  *
  * Portable min and max macros.
- *
- * @{
  */
 
 #define AUG_MIN(a, b) ((a) <= (b) ? (a) : (b))
@@ -53,14 +51,13 @@
 
 #define AUG_MSG(x) x
 
+/** @{ */
+
 /**
- * @defgroup Stringify Stringify
- *
  * @ingroup Macros
  *
  * Stringify macro.
  *
- * @{
  */
 
 #define AUG_MKSTR_(x) #x
