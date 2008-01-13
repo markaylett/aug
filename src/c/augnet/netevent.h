@@ -49,7 +49,8 @@
 #define AUG_NEVLOAD_OFFSET  (AUG_NEVSTATE_OFFSET + sizeof(uint32_t))
 #define AUG_NEVHBINT_OFFSET (AUG_NEVLOAD_OFFSET + sizeof(uint8_t))
 #define AUG_NEVTYPE_OFFSET  (AUG_NEVHBINT_OFFSET + sizeof(uint8_t))
-#define AUG_NEVTEVENT_SIZE  (AUG_NEVTYPE_OFFSET + sizeof(uint16_t))
+
+#define AUG_NETEVENT_SIZE  (AUG_NEVTYPE_OFFSET + sizeof(uint16_t))
 
 /** @} */
 

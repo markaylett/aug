@@ -11,6 +11,23 @@
 using namespace aug;
 using namespace std;
 
+static unsigned seq_ = 0;
+
+static char*
+heartbeat_(char* buf)
+{
+    aug_netevent event;
+    event.head_ = 1;
+    strcpy(event.name_, "test");
+    event.seq_ = ++seq_;
+    event.state_ = 1;
+    event.load_ = 1;
+    event.hbint_ = 1;
+    event.type_ = 1;
+    aug_packnetevent(buf, &event);
+    return buf;
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -32,7 +49,13 @@ main(int argc, char* argv[])
                 setmcastif(sfd, argv[3]);
 
             endpoint ep(in, htons(atoi(argv[2])));
-            sendto(sfd, "test", 4, 0, ep);
+
+            char event[AUG_NETEVENT_SIZE];
+            for (int i(0); i < 3; ++i) {
+                heartbeat_(event);
+                sendto(sfd, event, sizeof(event), 0, ep);
+                aug_msleep(1000);
+            }
 
         } catch (const errinfo_error& e) {
             perrinfo(e, "aug::errorinfo_error");

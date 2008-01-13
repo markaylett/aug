@@ -42,10 +42,14 @@ main(int argc, char* argv[])
                 while (AUG_RETINTR == waitfdevents(mux))
                     ;
 
-                char buf[1024];
+                char buf[AUG_NETEVENT_SIZE];
                 size_t size(read(sfd, buf, sizeof(buf)));
-                buf[size] = '\0';
-                aug_info("recv: [%s]", buf);
+
+                aug_netevent event;
+                aug_unpacknetevent(&event, buf);
+
+                aug_info("recv: name=[%s], seq=[%d]", event.name_,
+                         event.seq_);
             }
 
         } catch (const errinfo_error& e) {

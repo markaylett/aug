@@ -78,7 +78,7 @@ AUGNET_API struct aug_netevent*
 aug_unpacknetevent(struct aug_netevent* event, const char* buf)
 {
     event->head_ = aug_decode32(buf + AUG_NEVHEAD_OFFSET);
-    unpackname_(event->name_, buf);
+    unpackname_(event->name_, buf + AUG_NEVNAME_OFFSET);
     event->seq_ = aug_decode32(buf + AUG_NEVSEQ_OFFSET);
     event->state_ = aug_decode32(buf + AUG_NEVSTATE_OFFSET);
     event->load_ = buf[AUG_NEVLOAD_OFFSET];
