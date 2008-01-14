@@ -24,13 +24,13 @@
  * @{
  */
 
-#define AUG_NEVHEAD_MAX  UINT32_MAX
-#define AUG_NEVNAMELEN   64
-#define AUG_NEVSEQ_MAX   UINT32_MAX
-#define AUG_NEVSTATE_MAX UINT32_MAX
-#define AUG_NEVLOAD_MAX  UINT8_MAX
-#define AUG_NEVHBINT_MAX UINT8_MAX
-#define AUG_NEVTYPE_MAX  UINT16_MAX
+#define AUG_NEVPROTO_MAX  UINT32_MAX
+#define AUG_NEVNAMELEN    64
+#define AUG_NEVSTATE_MAX  UINT32_MAX
+#define AUG_NEVSEQ_MAX    UINT32_MAX
+#define AUG_NEVHBSEC_MAX  UINT8_MAX
+#define AUG_NEVWEIGHT_MAX UINT8_MAX
+#define AUG_NEVTYPE_MAX   UINT16_MAX
 
 /** @} */
 
@@ -42,15 +42,15 @@
  * @{
  */
 
-#define AUG_NEVHEAD_OFFSET   0
-#define AUG_NEVNAME_OFFSET  (AUG_NEVHEAD_OFFSET + sizeof(uint32_t))
-#define AUG_NEVSEQ_OFFSET   (AUG_NEVNAME_OFFSET + AUG_NEVNAMELEN)
-#define AUG_NEVSTATE_OFFSET (AUG_NEVSEQ_OFFSET + sizeof(uint32_t))
-#define AUG_NEVLOAD_OFFSET  (AUG_NEVSTATE_OFFSET + sizeof(uint32_t))
-#define AUG_NEVHBINT_OFFSET (AUG_NEVLOAD_OFFSET + sizeof(uint8_t))
-#define AUG_NEVTYPE_OFFSET  (AUG_NEVHBINT_OFFSET + sizeof(uint8_t))
+#define AUG_NEVPROTO_OFFSET   0
+#define AUG_NEVNAME_OFFSET   (AUG_NEVPROTO_OFFSET + sizeof(uint32_t))
+#define AUG_NEVSTATE_OFFSET  (AUG_NEVNAME_OFFSET + AUG_NEVNAMELEN)
+#define AUG_NEVSEQ_OFFSET    (AUG_NEVSTATE_OFFSET + sizeof(uint32_t))
+#define AUG_NEVHBSEC_OFFSET  (AUG_NEVSEQ_OFFSET + sizeof(uint32_t))
+#define AUG_NEVWEIGHT_OFFSET (AUG_NEVHBSEC_OFFSET + sizeof(uint8_t))
+#define AUG_NEVTYPE_OFFSET   (AUG_NEVWEIGHT_OFFSET + sizeof(uint8_t))
 
-#define AUG_NETEVENT_SIZE  (AUG_NEVTYPE_OFFSET + sizeof(uint16_t))
+#define AUG_NETEVENT_SIZE    (AUG_NEVTYPE_OFFSET + sizeof(uint16_t))
 
 /** @} */
 
@@ -65,9 +65,9 @@
  */
 
 struct aug_netevent {
-    unsigned head_;
+    unsigned proto_;
     char name_[AUG_NEVNAMELEN + 1];
-    unsigned seq_, state_, load_, hbint_, type_;
+    unsigned state_, seq_, hbsec_, weight_, type_;
 };
 
 /**

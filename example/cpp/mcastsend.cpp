@@ -17,12 +17,12 @@ static char*
 heartbeat_(char* buf)
 {
     aug_netevent event;
-    event.head_ = 1;
+    event.proto_ = 1;
     strcpy(event.name_, "test");
-    event.seq_ = ++seq_;
     event.state_ = 1;
-    event.load_ = 1;
-    event.hbint_ = 1;
+    event.seq_ = ++seq_;
+    event.hbsec_ = 1;
+    event.weight_ = 1;
     event.type_ = 1;
     aug_packnetevent(buf, &event);
     return buf;

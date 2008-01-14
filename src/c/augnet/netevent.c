@@ -37,17 +37,17 @@ aug_verifynetevent(const struct aug_netevent* event)
         return -1;
     }
 
-    if (AUG_NEVLOAD_MAX < event->load_) {
+    if (AUG_NEVHBSEC_MAX < event->hbsec_) {
 
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
-                       AUG_MSG("maximum netevent load size exceeded"));
+                       AUG_MSG("maximum netevent hbsec exceeded"));
         return -1;
     }
 
-    if (AUG_NEVHBINT_MAX < event->hbint_) {
+    if (AUG_NEVWEIGHT_MAX < event->weight_) {
 
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
-                       AUG_MSG("maximum netevent hb interval exceeded"));
+                       AUG_MSG("maximum netevent weight size exceeded"));
         return -1;
     }
 
@@ -64,12 +64,12 @@ aug_verifynetevent(const struct aug_netevent* event)
 AUGNET_API char*
 aug_packnetevent(char* buf, const struct aug_netevent* event)
 {
-    aug_encode32(buf + AUG_NEVHEAD_OFFSET, (uint32_t)event->head_);
+    aug_encode32(buf + AUG_NEVPROTO_OFFSET, (uint32_t)event->proto_);
     packname_(buf + AUG_NEVNAME_OFFSET, event->name_);
-    aug_encode32(buf + AUG_NEVSEQ_OFFSET, (uint32_t)event->seq_);
     aug_encode32(buf + AUG_NEVSTATE_OFFSET, (uint32_t)event->state_);
-    buf[AUG_NEVLOAD_OFFSET] = event->load_;
-    buf[AUG_NEVHBINT_OFFSET] = event->hbint_;
+    aug_encode32(buf + AUG_NEVSEQ_OFFSET, (uint32_t)event->seq_);
+    buf[AUG_NEVHBSEC_OFFSET] = event->hbsec_;
+    buf[AUG_NEVWEIGHT_OFFSET] = event->weight_;
     aug_encode16(buf + AUG_NEVTYPE_OFFSET, (uint16_t)event->type_);
     return buf;
 }
@@ -77,12 +77,12 @@ aug_packnetevent(char* buf, const struct aug_netevent* event)
 AUGNET_API struct aug_netevent*
 aug_unpacknetevent(struct aug_netevent* event, const char* buf)
 {
-    event->head_ = aug_decode32(buf + AUG_NEVHEAD_OFFSET);
+    event->proto_ = aug_decode32(buf + AUG_NEVPROTO_OFFSET);
     unpackname_(event->name_, buf + AUG_NEVNAME_OFFSET);
-    event->seq_ = aug_decode32(buf + AUG_NEVSEQ_OFFSET);
     event->state_ = aug_decode32(buf + AUG_NEVSTATE_OFFSET);
-    event->load_ = buf[AUG_NEVLOAD_OFFSET];
-    event->hbint_ = buf[AUG_NEVHBINT_OFFSET];
+    event->seq_ = aug_decode32(buf + AUG_NEVSEQ_OFFSET);
+    event->hbsec_ = buf[AUG_NEVHBSEC_OFFSET];
+    event->weight_ = buf[AUG_NEVWEIGHT_OFFSET];
     event->type_ = aug_decode16(buf + AUG_NEVTYPE_OFFSET);
     return event;
 }

@@ -21,8 +21,6 @@ namespace {
     const unsigned MAX_NAME(32);
 
     /*
-      header[4] name[64] seq[4] state[4] load[1] hbint[1] msg[2]
-
       Heartbeat Protocol
 
       Member MB 0x001
