@@ -8,6 +8,8 @@
  * @file augsys/tls_.h
  *
  * Thread-local storage.
+ *
+ * Functions in this module may set errno, but never errinfo.
  */
 
 #include "augsys/config.h"

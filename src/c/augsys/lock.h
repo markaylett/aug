@@ -8,13 +8,11 @@
  * @file augsys/lock.h
  *
  * Global lock functions.
+ *
+ * Functions in this module may set errno, but never errinfo.
  */
 
 #include "augsys/config.h"
-
-/**
- * All functions in this module set errno, and not errinfo.
- */
 
 #if defined(AUGSYS_BUILD)
 
@@ -43,6 +41,8 @@ aug_termlock_(void);
 #endif /* AUGSYS_BUILD */
 
 /**
+ * Obtain global mutex lock.
+ *
  * Calls abort() on failure.
  */
 
@@ -50,6 +50,8 @@ AUGSYS_API void
 aug_lock(void);
 
 /**
+ * Release global mutex lock.
+ *
  * Calls abort() on failure.
  */
 

@@ -8,12 +8,34 @@
  * @file augsys/errinfo.h
  *
  * Error handling.
+ *
+ * Due to the boostrapping process implemented by aug_init(), the errinfo
+ * facility is not used in the following modules:
+ *
+ * @li augsys/lock.h
+ * @li augsys/string.h
+ * @li augsys/tls_.h
+ * @li augsys/log.h
+ *
+ * Functions in this module may set errno, but never errinfo.
+ */
+
+/**
+ * @defgroup ErrInfo Error Info
  */
 
 #include "augsys/config.h"
 #include "augsys/defs.h"
 
 #include <stdarg.h>
+
+/**
+ * @defgroup ErrInfoSource Error Source
+ *
+ * @ingroup ErrInfo
+ *
+ * @{
+ */
 
 #define AUG_SRCLOCAL 1
 #define AUG_SRCPOSIX 2
@@ -23,14 +45,21 @@
 
 /**
  * Base value for user-defined exception sources.
-
  */
 
 #define AUG_SRCUSER  32
 
+/** @} */
+
 /**
+ * @defgroup ErrInfoLocal Local Error
+ *
+ * @ingroup ErrInfo
+ *
  * Common exception code for the #AUG_SRCLOCAL domain.  These codes may also
  * be used as return codes for communicating exception conditions.
+ *
+ * @{
  */
 
 #define AUG_NOERROR  0
@@ -57,23 +86,13 @@
 #define AUG_ETYPE    20
 #define AUG_ETIMEOUT 21
 
+/** @} */
+
 struct aug_errinfo {
     char file_[AUG_MAXLINE];
     int line_, src_, num_;
     char desc_[AUG_MAXLINE];
 };
-
-/**
- * Due to the boostrapping process implemented by aug_init(), the errinfo
- * facility is not used by the following modules:
- *
- * aug_lock
- * aug_string
- * aug_tls_
- * aug_log
- *
- * All functions in this module set errno, and not errinfo.
- */
 
 #if defined(AUGSYS_BUILD)
 AUG_EXTERNC struct aug_errinfo*

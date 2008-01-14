@@ -14,6 +14,10 @@
  * application specific behaviours.
  */
 
+/**
+ * @defgroup Module Module
+ */
+
 #include <stdarg.h>    /* va_list */
 #include <stdlib.h>    /* NULL */
 #include <sys/types.h> /* size_t */
@@ -43,10 +47,6 @@
 
 struct aub_object_;
 struct aug_blob_;
-
-/**
- * @defgroup Module Module
- */
 
 /**
  * @defgroup ModuleLogLevel Log Level

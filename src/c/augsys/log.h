@@ -8,15 +8,13 @@
  * @file augsys/log.h
  *
  * Logging.
+ *
+ * Functions in this module may set errno, but never errinfo.
  */
 
 #include "augsys/config.h"
 
 #include <stdarg.h>
-
-/**
- * All functions in this module set errno, and not errinfo.
- */
 
 enum aug_loglevel {
     AUG_LOGCRIT,

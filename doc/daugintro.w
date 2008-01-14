@@ -59,10 +59,10 @@ increase, and performance degrade.
 
 \yskip\noindent
 
-Non-blocking I/O allow a single thread to be dedicated to de-multiplexing
+Non-blocking I/O allows dedication of a single thread to de-multiplexing
 network events.  This ``event thread'' can be kept responsive by delegating
 CPU-intensive tasks to secondary threads.  Iteractions between the event
-thread and secondary threads can be confined to event queues which minimise
+thread and secondary threads can be confined to event queues, which minimises
 the possibility of deadlocks.  Similar, in fact, to a UI event model.
 
 \yskip\noindent
@@ -81,16 +81,16 @@ Sessions are wired together at configuration-time, not compile-time.
 
 All Module calls are dispatched from the event thread.  A Session can,
 therefore, either opt for a simple, single-threaded model, or a suitable
-alternative, such as a thread-pool --- whenever possible, \DAUG/ avoids
+alternative such as a thread-pool --- whenever possible, \DAUG/ avoids
 imposing artificial constraints on Module authors.
 
 \yskip\noindent
 
 The separation of physical Modules and logical Sessions allows Modules to
-adapt and extend the host environment as viewed by Sessions.  The \.{augpy}
-and \.{augrb} Modules, for example, adapt the host environment to allow
-Sessions to be written in either \PYTHON/ or \RUBY/.  These language bindings
-are provided by Modules, and are unbeknown to the application server.
+adapt and extend the host environment viewed by Sessions.  The \.{augpy} and
+\.{augrb} Modules, for example, adapt the host environment to allow Sessions
+to be written in either \PYTHON/ or \RUBY/.  These language bindings are
+provided by Modules, and are unbeknown to the application server.
 
 \yskip\noindent
 
@@ -145,8 +145,8 @@ using namespace std;
 @ Session types (|echo| in this example) are fed into a class template which
 assists with the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>| delegates
 the task of creating Sessions to a factory object, specified as a template
-argument.  Here, |basic_factory<>| is used to create a simple factory for
-|echo|.
+argument.  Here, |basic_factory<>| is used to build a factory capable of
+creating |echo| sessions.
 
 \yskip\noindent
 \DAUG/ Modules are required to export two library functions, namely,

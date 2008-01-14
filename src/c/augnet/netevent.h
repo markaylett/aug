@@ -84,7 +84,7 @@ aug_verifynetevent(const struct aug_netevent* event);
 /**
  * Serialise netevent packet to @a buf.
  *
- * @param buf Output buffer.  Must be at least #AUG_NEVTEVENT_SIZE bytes in
+ * @param buf Output buffer.  Must be at least #AUG_NETEVENT_SIZE bytes in
  * length.
  *
  * @param event NetEvent object.
