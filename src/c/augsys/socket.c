@@ -70,6 +70,14 @@ aug_setreuseaddr(int s, int on)
 }
 
 AUGSYS_API struct aug_endpoint*
+aug_getendpoint(const struct addrinfo* addr, struct aug_endpoint* ep)
+{
+    ep->len_ = (socklen_t)addr->ai_addrlen;
+    memcpy(&ep->un_, addr->ai_addr, addr->ai_addrlen);
+    return ep;
+}
+
+AUGSYS_API struct aug_endpoint*
 aug_setinetaddr(struct aug_endpoint* ep, const struct aug_inetaddr* addr)
 {
     switch (ep->un_.family_ = addr->family_) {

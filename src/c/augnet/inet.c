@@ -44,8 +44,7 @@ aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
         if (-1 == fd)
             continue; /* Ignore this one. */
 
-        ep->len_ = (socklen_t)res->ai_addrlen;
-        memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
+        aug_getendpoint(res, ep);
 
         if (0 == aug_connect(fd, ep))
             break; /* Success. */
@@ -90,8 +89,7 @@ aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep)
         if (-1 == aug_setreuseaddr(fd, 1))
             goto fail2;
 
-        ep->len_ = (socklen_t)res->ai_addrlen;
-        memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
+        aug_getendpoint(res, ep);
 
         if (0 == aug_bind(fd, ep))
             break; /* Success. */
@@ -143,8 +141,7 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep)
     if (!res) /* errno set from final aug_socket(). */
         goto fail;
 
-    ep->len_ = (socklen_t)res->ai_addrlen;
-    memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
+    aug_getendpoint(res, ep);
 
     aug_destroyaddrinfo(save);
     return fd;
@@ -174,8 +171,7 @@ aug_udpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
         if (-1 == fd)
             continue; /* Ignore this one. */
 
-        ep->len_ = (socklen_t)res->ai_addrlen;
-        memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
+        aug_getendpoint(res, ep);
 
         if (0 == aug_connect(fd, ep))
             break; /* Success. */
@@ -217,8 +213,7 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
         if (-1 == fd)
             continue; /* Error, try next one. */
 
-        ep->len_ = (socklen_t)res->ai_addrlen;
-        memcpy(&ep->un_, res->ai_addr, res->ai_addrlen);
+        aug_getendpoint(res, ep);
 
         if (0 == aug_bind(fd, ep))
             break; /* Success. */

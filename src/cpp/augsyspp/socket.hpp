@@ -110,7 +110,7 @@ namespace aug {
     inline std::string
     inetntop(const aug_inetaddr& src)
     {
-        char buf[AUG_MAXADDRLEN];
+        char buf[AUG_MAXHOSTNAMELEN + 1];
         verify(aug_inetntop(&src, buf, sizeof(buf)));
         return buf;
     }
@@ -141,6 +141,12 @@ namespace aug {
     {
         int value(on ? 1 : 0);
         verify(aug_setreuseaddr(ref.get(), value));
+    }
+
+    inline aug_endpoint&
+    getendpoint(const addrinfo& addr, aug_endpoint& ep)
+    {
+        return *verify(aug_getendpoint(&addr, &ep));
     }
 
     inline aug_endpoint&

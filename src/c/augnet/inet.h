@@ -26,7 +26,7 @@
 
 struct aug_hostserv {
     char* host_, * serv_;
-    char data_[AUG_MAXADDRLEN];
+    char data_[AUG_MAXHOSTSERVLEN + 1];
 };
 
 AUGNET_API int

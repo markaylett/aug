@@ -34,7 +34,34 @@ typedef int socklen_t;
 # endif /* socklen_t */
 #endif /* _WIN32 */
 
+/**
+ * Maximum sockaddr size.
+ */
+
 #define AUG_MAXADDRLEN 128
+
+/**
+ * Maximum hostname length.
+ *
+ * Defined as 64 on some operating systems.  Large enough to contain the
+ * following formats:
+ *
+ * @li ipv4: 127.0.0.1
+ * @li ipv6: 2001:0db8:85a3:08d3:1319:8a2e:0370:7344
+ */
+
+#define AUG_MAXHOSTNAMELEN 64
+
+/**
+ * Maximum host/port pair length.
+ *
+ * Large enough to contain the following formats:
+ *
+ * @li ipv4: 127.0.0.1:443
+ * @li ipv6: [2001:0db8:85a3:08d3:1319:8a2e:0370:7344]:443
+ */
+
+#define AUG_MAXHOSTSERVLEN 128
 
 struct aug_endpoint {
     socklen_t len_;
@@ -158,6 +185,9 @@ aug_getfamily(int s);
 
 AUGSYS_API int
 aug_setreuseaddr(int s, int on);
+
+AUGSYS_API struct aug_endpoint*
+aug_getendpoint(const struct addrinfo* addr, struct aug_endpoint* ep);
 
 AUGSYS_API struct aug_endpoint*
 aug_setinetaddr(struct aug_endpoint* ep, const struct aug_inetaddr* addr);

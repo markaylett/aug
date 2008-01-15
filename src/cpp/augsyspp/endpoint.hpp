@@ -87,6 +87,12 @@ namespace aug {
         }
 
         explicit
+        endpoint(const addrinfo& addr)
+        {
+            getendpoint(addr, ep_);
+        }
+
+        explicit
         endpoint(const aug_inetaddr& addr, unsigned short port = 0)
         {
             setport(ep_, port);

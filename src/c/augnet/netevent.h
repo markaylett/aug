@@ -12,7 +12,7 @@
 
 #include "augnet/config.h"
 
-#include "augsys/socket.h" /* AUG_MAXADDRLEN */
+#include "augsys/socket.h" /* AUG_MAXHOSTSERVLEN */
 
 /**
  * @defgroup NetEvent NetEvent
@@ -27,12 +27,15 @@
  */
 
 #define AUG_NEVPROTO_MAX  UINT32_MAX
-#define AUG_NEVNAMELEN    64
+#define AUG_NEVNAMELEN    128
+#define AUG_NEVADDRLEN    AUG_MAXHOSTSERVLEN
+#define AUG_NEVTYPE_MAX   UINT32_MAX
 #define AUG_NEVSTATE_MAX  UINT32_MAX
 #define AUG_NEVSEQ_MAX    UINT32_MAX
 #define AUG_NEVHBSEC_MAX  UINT8_MAX
 #define AUG_NEVWEIGHT_MAX UINT8_MAX
-#define AUG_NEVTYPE_MAX   UINT16_MAX
+#define AUG_NEVLOAD_MAX   UINT8_MAX
+#define AUG_NEVRESV_MAX   UINT8_MAX
 
 /** @} */
 
@@ -47,13 +50,15 @@
 #define AUG_NEVPROTO_OFFSET   0
 #define AUG_NEVNAME_OFFSET   (AUG_NEVPROTO_OFFSET + sizeof(uint32_t))
 #define AUG_NEVADDR_OFFSET   (AUG_NEVNAME_OFFSET + AUG_NEVNAMELEN)
-#define AUG_NEVSTATE_OFFSET  (AUG_NEVADDR_OFFSET + AUG_MAXADDRLEN)
+#define AUG_NEVTYPE_OFFSET   (AUG_NEVADDR_OFFSET + AUG_NEVADDRLEN)
+#define AUG_NEVSTATE_OFFSET  (AUG_NEVTYPE_OFFSET + sizeof(uint32_t))
 #define AUG_NEVSEQ_OFFSET    (AUG_NEVSTATE_OFFSET + sizeof(uint32_t))
 #define AUG_NEVHBSEC_OFFSET  (AUG_NEVSEQ_OFFSET + sizeof(uint32_t))
 #define AUG_NEVWEIGHT_OFFSET (AUG_NEVHBSEC_OFFSET + sizeof(uint8_t))
-#define AUG_NEVTYPE_OFFSET   (AUG_NEVWEIGHT_OFFSET + sizeof(uint8_t))
+#define AUG_NEVLOAD_OFFSET   (AUG_NEVWEIGHT_OFFSET + sizeof(uint8_t))
+#define AUG_NEVRESV_OFFSET   (AUG_NEVLOAD_OFFSET + sizeof(uint8_t))
 
-#define AUG_NETEVENT_SIZE    (AUG_NEVTYPE_OFFSET + sizeof(uint16_t))
+#define AUG_NETEVENT_SIZE    (AUG_NEVRESV_OFFSET + sizeof(uint8_t))
 
 /** @} */
 
@@ -70,8 +75,8 @@
 struct aug_netevent {
     unsigned proto_;
     char name_[AUG_NEVNAMELEN + 1];
-    char addr_[AUG_MAXADDRLEN + 1];
-    unsigned state_, seq_, hbsec_, weight_, type_;
+    char addr_[AUG_NEVADDRLEN + 1];
+    unsigned type_, state_, seq_, hbsec_, weight_, load_;
 };
 
 /**

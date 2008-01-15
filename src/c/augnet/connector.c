@@ -101,9 +101,7 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
             /* Established. */
 
-            ep->len_ = (socklen_t)ctor->res_->ai_addrlen;
-            memcpy(&ep->un_, ctor->res_->ai_addr, ctor->res_->ai_addrlen);
-
+            aug_getendpoint(ctor->res_, ep);
             goto done;
 
         case AUG_RETNONE:
@@ -145,8 +143,7 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
             return -1;
         }
 
-        ep->len_ = (socklen_t)ctor->res_->ai_addrlen;
-        memcpy(&ep->un_, ctor->res_->ai_addr, ctor->res_->ai_addrlen);
+        aug_getendpoint(ctor->res_, ep);
 
         if (0 == aug_connect(fd, ep)) {
 
