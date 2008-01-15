@@ -76,6 +76,7 @@ check_PROGRAMS = \
 	logtest \
 	mcasttest \
 	muxertest \
+	sockaddrtest \
 	sockettest \
 	stringtest \
 	timetest
@@ -86,6 +87,7 @@ TESTS = \
 	logtest \
 	mcasttest \
 	muxertest \
+	sockaddrtest \
 	sockettest \
 	stringtest \
 	timetest
@@ -108,6 +110,10 @@ mcasttest_LDADD = \
 
 muxertest_SOURCES = muxertest.c
 muxertest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+sockaddrtest_SOURCES = sockaddrtest.c
+sockaddrtest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 sockettest_SOURCES = sockettest.c

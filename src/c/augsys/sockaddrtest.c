@@ -1,0 +1,34 @@
+/* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
+   See the file COPYING for copying permission.
+*/
+#include "augsys.h"
+
+#include <stdio.h>
+
+#define HOST_ "127.0.0.1"
+#define SERV_ "5000"
+
+int
+main(int argc, char* argv[])
+{
+    struct aug_errinfo errinfo;
+    struct addrinfo hints, * res, * save;
+
+    aug_atexitinit(&errinfo);
+
+    bzero(&hints, sizeof(hints));
+    hints.ai_flags = AI_PASSIVE;
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    if (-1 == aug_getaddrinfo(HOST_, SERV_, &hints, &res)) {
+        aug_perrinfo(NULL, "aug_getaddrinfo() failed");
+        return 1;
+    }
+
+    save = res;
+    do {
+    } while ((res = res->ai_next));
+    aug_destroyaddrinfo(save);
+    return 0;
+}

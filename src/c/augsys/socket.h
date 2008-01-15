@@ -135,6 +135,20 @@ aug_inetpton(int af, const char* src, struct aug_inetaddr* dst);
 AUGSYS_API void
 aug_destroyaddrinfo(struct addrinfo* res);
 
+/**
+ * Protocol independent translation of @a host and @a serv to address list.
+ *
+ * The resulting address list is dynamically allocated, aug_destroyaddrinfo()
+ * should be used to free this list.
+ *
+ * @param host Host part of the address.
+ * @param serv Service or port part of the address
+ * @param hints Hints about the desired socket type.
+ * @param res The output address list.
+ *
+ * @return -1 on failure.
+ */
+
 AUGSYS_API int
 aug_getaddrinfo(const char* host, const char* serv,
                 const struct addrinfo* hints, struct addrinfo** res);

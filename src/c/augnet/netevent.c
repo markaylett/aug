@@ -13,18 +13,18 @@ AUG_RCSID("$Id$");
 #include <string.h>
 
 static void
-packname_(char* buf, const char* name)
+packstring_(char* dst, const char* src, size_t size)
 {
-    size_t size = strlen(name);
-    memcpy(buf, name, size);
-    memset(buf + size, 0, AUG_NEVNAMELEN - size);
+    size_t len = strlen(src);
+    memcpy(dst, src, len);
+    memset(dst + len, 0, size - len);
 }
 
 static void
-unpackname_(char* name, const char* buf)
+unpackstring_(char* dst, const char* src, size_t size)
 {
-    memcpy(name, buf, AUG_NEVNAMELEN);
-    name[AUG_NEVNAMELEN] = '\0';
+    memcpy(dst, src, size);
+    dst[size] = '\0';
 }
 
 AUGNET_API int
@@ -65,7 +65,8 @@ AUGNET_API char*
 aug_packnetevent(char* buf, const struct aug_netevent* event)
 {
     aug_encode32(buf + AUG_NEVPROTO_OFFSET, (uint32_t)event->proto_);
-    packname_(buf + AUG_NEVNAME_OFFSET, event->name_);
+    packstring_(buf + AUG_NEVNAME_OFFSET, event->name_, AUG_NEVNAMELEN);
+    packstring_(buf + AUG_NEVADDR_OFFSET, event->addr_, AUG_MAXADDRLEN);
     aug_encode32(buf + AUG_NEVSTATE_OFFSET, (uint32_t)event->state_);
     aug_encode32(buf + AUG_NEVSEQ_OFFSET, (uint32_t)event->seq_);
     buf[AUG_NEVHBSEC_OFFSET] = event->hbsec_;
@@ -78,7 +79,8 @@ AUGNET_API struct aug_netevent*
 aug_unpacknetevent(struct aug_netevent* event, const char* buf)
 {
     event->proto_ = aug_decode32(buf + AUG_NEVPROTO_OFFSET);
-    unpackname_(event->name_, buf + AUG_NEVNAME_OFFSET);
+    unpackstring_(event->name_, buf + AUG_NEVNAME_OFFSET, AUG_NEVNAMELEN);
+    unpackstring_(event->addr_, buf + AUG_NEVADDR_OFFSET, AUG_MAXADDRLEN);
     event->state_ = aug_decode32(buf + AUG_NEVSTATE_OFFSET);
     event->seq_ = aug_decode32(buf + AUG_NEVSEQ_OFFSET);
     event->hbsec_ = buf[AUG_NEVHBSEC_OFFSET];
