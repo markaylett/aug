@@ -51,10 +51,12 @@ libaugnet_la_LIBADD = \
 check_PROGRAMS = \
 	base64test \
 	fixtest \
-	httptest
+	httptest \
+	neteventtest
 TESTS = \
 	base64test \
-	httptest
+	httptest \
+	neteventtest
 
 base64test_SOURCES = base64test.c
 base64test_LDADD = \
@@ -66,4 +68,8 @@ fixtest_LDADD = \
 
 httptest_SOURCES = httptest.c
 httptest_LDADD = \
+	$(top_builddir)/src/c/augnet/libaugnet.la
+
+neteventtest_SOURCES = neteventtest.c
+neteventtest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la

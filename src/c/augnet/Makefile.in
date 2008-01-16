@@ -42,7 +42,7 @@ DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
 check_PROGRAMS = base64test$(EXEEXT) fixtest$(EXEEXT) \
-	httptest$(EXEEXT)
+	httptest$(EXEEXT) neteventtest$(EXEEXT)
 subdir = src/c/augnet
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -77,6 +77,9 @@ fixtest_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la
 am_httptest_OBJECTS = httptest.$(OBJEXT)
 httptest_OBJECTS = $(am_httptest_OBJECTS)
 httptest_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la
+am_neteventtest_OBJECTS = neteventtest.$(OBJEXT)
+neteventtest_OBJECTS = $(am_neteventtest_OBJECTS)
+neteventtest_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -88,9 +91,9 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugnet_la_SOURCES) $(base64test_SOURCES) \
-	$(fixtest_SOURCES) $(httptest_SOURCES)
+	$(fixtest_SOURCES) $(httptest_SOURCES) $(neteventtest_SOURCES)
 DIST_SOURCES = $(libaugnet_la_SOURCES) $(base64test_SOURCES) \
-	$(fixtest_SOURCES) $(httptest_SOURCES)
+	$(fixtest_SOURCES) $(httptest_SOURCES) $(neteventtest_SOURCES)
 modincludeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(modinclude_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
@@ -269,7 +272,8 @@ libaugnet_la_LIBADD = \
 
 TESTS = \
 	base64test \
-	httptest
+	httptest \
+	neteventtest
 
 base64test_SOURCES = base64test.c
 base64test_LDADD = \
@@ -281,6 +285,10 @@ fixtest_LDADD = \
 
 httptest_SOURCES = httptest.c
 httptest_LDADD = \
+	$(top_builddir)/src/c/augnet/libaugnet.la
+
+neteventtest_SOURCES = neteventtest.c
+neteventtest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
 all: all-am
@@ -361,6 +369,9 @@ fixtest$(EXEEXT): $(fixtest_OBJECTS) $(fixtest_DEPENDENCIES)
 httptest$(EXEEXT): $(httptest_OBJECTS) $(httptest_DEPENDENCIES) 
 	@rm -f httptest$(EXEEXT)
 	$(LINK) $(httptest_LDFLAGS) $(httptest_OBJECTS) $(httptest_LDADD) $(LIBS)
+neteventtest$(EXEEXT): $(neteventtest_OBJECTS) $(neteventtest_DEPENDENCIES) 
+	@rm -f neteventtest$(EXEEXT)
+	$(LINK) $(neteventtest_LDFLAGS) $(neteventtest_OBJECTS) $(neteventtest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -383,6 +394,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nbfile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netevent.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neteventtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Plo@am__quote@

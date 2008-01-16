@@ -154,6 +154,9 @@ AUGSYS_API int
 aug_socketpair(int domain, int type, int protocol, int sv[2]);
 
 AUGSYS_API char*
+aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len);
+
+AUGSYS_API char*
 aug_inetntop(const struct aug_inetaddr* src, char* dst, socklen_t len);
 
 AUGSYS_API struct aug_inetaddr*

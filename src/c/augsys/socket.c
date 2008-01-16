@@ -15,9 +15,13 @@ AUG_RCSID("$Id$");
 # define SETAFNOSUPPORT_()                                      \
     aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEAFNOSUPPORT)
 # include "augsys/win32/socket.c"
+# define snprintf _snprintf
 #endif /* _WIN32 */
 
 #include "augsys/errno.h"
+
+#include <assert.h>
+#include <stdio.h>
 
 struct ipv4_ {
     short family_;
@@ -62,6 +66,55 @@ static const struct ipv6_ ipv6loopback_ = {
     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } }
 };
 #endif /* HAVE_IPV6 */
+
+AUGSYS_API char*
+aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len)
+{
+    struct aug_inetaddr addr;
+    char host[AUG_MAXHOSTNAMELEN + 1];
+    const char* fmt;
+    int ret;
+
+    assert(src && dst && len);
+
+    /* Get the hostname. */
+
+    if (!aug_getinetaddr(src, &addr)
+        || !aug_inetntop(&addr, host, sizeof(host)))
+        return NULL;
+
+    /* Select format based on family. */
+
+    switch (src->un_.family_) {
+    case AF_INET:
+        fmt = "%s:%d";
+        break;
+#if HAVE_IPV6
+    case AF_INET6:
+        fmt = "[%s]:%d";
+        break;
+#endif /* HAVE_IPV6 */
+    default:
+#if !defined(_WIN32)
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAFNOSUPPORT);
+#else /* _WIN32 */
+        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEAFNOSUPPORT);
+#endif /* _WIN32 */
+        return NULL;
+    }
+
+    /* Null termination is _not_ guaranteed by snprintf(). */
+
+    ret = snprintf(dst, len, fmt, host, (int)ntohs(src->un_.all_.port_));
+    AUG_SNTRUNCF(dst, len, ret);
+
+    if (ret < 0) {
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        return NULL;
+    }
+
+    return dst;
+}
 
 AUGSYS_API int
 aug_setreuseaddr(int s, int on)
