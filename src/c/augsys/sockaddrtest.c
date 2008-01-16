@@ -47,14 +47,11 @@ aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len)
 
     /* Null termination is _not_ guaranteed by snprintf(). */
 
-    ret = snprintf(dst, len - 1, fmt, host,
-                   (int)aug_ntoh16(src->un_.all_.port_));
-    AUG_SNSAFEF(dst, len, ret);
+    ret = snprintf(dst, len, fmt, host, (int)aug_ntoh16(src->un_.all_.port_));
+    AUG_SNTRUNCF(dst, len, ret);
 
     if (ret < 0) {
-        aug_info("len: %d", ret);
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
-                       AUG_MSG("endpoint formatting failed"));
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return NULL;
     }
 
@@ -71,7 +68,7 @@ main(int argc, char* argv[])
 
     bzero(&hints, sizeof(hints));
     hints.ai_flags = AI_PASSIVE;
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
 
     if (-1 == aug_getaddrinfo(HOST_, SERV_, &hints, &res)) {
@@ -81,16 +78,18 @@ main(int argc, char* argv[])
 
     save = res;
     do {
-
         struct aug_endpoint ep;
         char buf[AUG_MAXHOSTSERVLEN + 1];
+
         aug_getendpoint(res, &ep);
-        if (aug_endpointntop(&ep, buf, sizeof(buf)))
-            printf("%s\n", buf);
-        else
+        if (!aug_endpointntop(&ep, buf, sizeof(buf))) {
             aug_perrinfo(NULL, "aug_endpointntop() failed");
+            aug_destroyaddrinfo(save);
+            return 1;
+        }
+
+        printf("%s\n", buf);
 
     } while ((res = res->ai_next));
-    aug_destroyaddrinfo(save);
     return 0;
 }

@@ -14,6 +14,7 @@ AUG_RCSID("$Id$");
 #include "augsys/unistd.h"  /* write() */
 #include "augsys/utility.h" /* aug_threadid() */
 
+#include <assert.h>
 #include <errno.h>          /* EINTR */
 #include <stdio.h>
 
@@ -119,28 +120,26 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
     /* Null termination is _not_ guaranteed by snprintf(). */
 
 #if ENABLE_THREADS
-    ret = snprintf(buf, size - 1, ".%03d %08x %-6s ", ms, aug_threadid(),
+    ret = snprintf(buf, size, ".%03d %08x %-6s ", ms, aug_threadid(),
                    aug_loglabel(loglevel));
 #else /* !ENABLE_THREADS */
-    ret = snprintf(buf, size - 1, ".%03d %-6s ", ms, aug_loglabel(loglevel));
+    ret = snprintf(buf, size, ".%03d %-6s ", ms, aug_loglabel(loglevel));
 #endif /* !ENABLE_THREADS */
 
-    AUG_SNSAFEF(buf, size, ret);
+    AUG_SNTRUNCF(buf, size, ret);
 
     if (ret < 0) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
-                       AUG_MSG("broken format specification"));
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 
     buf += ret, size -= ret;
 
-    ret = vsnprintf(buf, size - 1, format, args);
-    AUG_SNSAFEF(buf, size, ret);
+    ret = vsnprintf(buf, size, format, args);
+    AUG_SNTRUNCF(buf, size, ret);
 
     if (ret < 0) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
-                       AUG_MSG("broken format specification '%s'"), format);
+        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
 

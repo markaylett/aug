@@ -51,8 +51,8 @@ aug_stdiologger(int loglevel, const char* format, va_list args)
 
     /* Null termination is _not_ guaranteed by snprintf(). */
 
-    ret = vsnprintf(buf, sizeof(buf) - 1, format, args);
-    AUG_SNSAFEF(buf, sizeof(buf), ret);
+    ret = vsnprintf(buf, sizeof(buf), format, args);
+    AUG_SNTRUNCF(buf, sizeof(buf), ret);
 
     if (ret < 0)
         return -1;

@@ -85,22 +85,25 @@
 /**
  * Safe return code checking for snprintf().
  *
- * The snprintf() function returns -1 if the value was truncated, or the
- * number of characters stored, not including the null terminator.  Null
- * termination is not guaranteed by snprintf().  Some implementations return a
- * value greater than the buffer size when truncation occurs.
+ * This macro ensures that the buffer is always null terminated, and that the
+ * actual number of characters written is stored in @a ret.  It should be used
+ * only when truncation would be acceptable to caller.
  *
- * This macro ensures that -1 is returned when truncation occurs, and that the
- * buffer is always null terminated.
+ * The snprintf() function either returns a negative value, indicating a
+ * formatting error, or the number of characters required, discounting the
+ * null terminator.  A return value greater or equal to size signifies
+ * truncation.
+ *
+ * Some implementations also return -1 to indicate truncation.
  */
 
-#define AUG_SNSAFEF(str, size, ret)             \
+#define AUG_SNTRUNCF(str, size, ret)            \
     do {                                        \
-        if ((size) <= (ret)) {                  \
+        (str)[(size) - 1] = '\0';               \
+        if ((size) <= (ret))                    \
+            ret = (size) - 1;                   \
+        else if ((ret) < 0 && 0 == errno)       \
             errno = EINVAL;                     \
-            ret = -1;                           \
-        } else if (0 <= (ret))                  \
-            (str)[(size) - 1] = '\0';           \
     } while (0)
 
 #if !defined(__GNUC__)
