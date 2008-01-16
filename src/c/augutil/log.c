@@ -96,71 +96,53 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
                va_list args)
 {
     int ms, ret;
-    size_t size = *n;
+    size_t size;
     struct tm tm;
 
     /* At least one character is needed for the null-terminator. */
 
-    if (0 == size) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ERANGE,
-                       AUG_MSG("size cannot be zero"));
-        return -1;
-    }
+    assert(buf && n && *n && format);
+    size = *n;
 
     if (-1 == (ms = localtime_(&tm)))
         return -1;
 
-    /* The return value from the strftime function is either a) the number of
-       characters copied to the buffer, excluding the null terminator, or b)
-       zero, indicating an error. */
+    /* The return value from the strftime() function is either a) the number
+       of characters copied to the buffer, excluding the null terminator, or
+       b) zero, indicating an error. */
 
     if (0 == (ret = (int)strftime(buf, size, AUG_TIMEFORMAT, &tm)))
         goto done;
 
     buf += ret, size -= ret;
 
-
-    /* The return value from the snprintf function is either a) the number of
-       characters required, excluding the null terminator, or b) a negative
-       value, indicating an error. */
+    /* Null termination is _not_ guaranteed by snprintf(). */
 
 #if ENABLE_THREADS
-    if (0 > (ret = snprintf(buf, size, ".%03d %08x %-6s ", ms,
-                            aug_threadid(), aug_loglabel(loglevel)))) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
-                       AUG_MSG("broken format specification"));
-        return -1;
-    }
+    ret = snprintf(buf, size - 1, ".%03d %08x %-6s ", ms, aug_threadid(),
+                   aug_loglabel(loglevel));
 #else /* !ENABLE_THREADS */
-    if (0 > (ret = snprintf(buf, size, ".%03d %-6s ", ms,
-                            aug_loglabel(loglevel)))) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
-                       AUG_MSG("broken format specification"));
-        return -1;
-    }
+    ret = snprintf(buf, size - 1, ".%03d %-6s ", ms, aug_loglabel(loglevel));
 #endif /* !ENABLE_THREADS */
 
-    /* Adjust the return value to be the actual number of characters copied,
-       where truncation has occured. */
+    AUG_SNSAFEF(buf, size, ret);
 
-    if ((size_t)ret >= size) {
-        ret = (int)size - 1;
-        goto done;
+    if (ret < 0) {
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
+                       AUG_MSG("broken format specification"));
+        return -1;
     }
 
     buf += ret, size -= ret;
 
-    if (0 > (ret = vsnprintf(buf, size, format, args))) {
+    ret = vsnprintf(buf, size - 1, format, args);
+    AUG_SNSAFEF(buf, size, ret);
+
+    if (ret < 0) {
         aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("broken format specification '%s'"), format);
         return -1;
     }
-
-    /* Adjust the return value to be the actual number of characters copied,
-       where truncation has occured. */
-
-    if ((size_t)ret >= size)
-        ret = (int)size - 1;
 
  done:
 

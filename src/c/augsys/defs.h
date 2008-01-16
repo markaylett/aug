@@ -82,11 +82,32 @@
 
 /** @} */
 
+/**
+ * Safe return code checking for snprintf().
+ *
+ * The snprintf() function returns -1 if the value was truncated, or the
+ * number of characters stored, not including the null terminator.  Null
+ * termination is not guaranteed by snprintf().  Some implementations return a
+ * value greater than the buffer size when truncation occurs.
+ *
+ * This macro ensures that -1 is returned when truncation occurs, and that the
+ * buffer is always null terminated.
+ */
+
+#define AUG_SNSAFEF(str, size, ret)             \
+    do {                                        \
+        if ((size) <= (ret)) {                  \
+            errno = EINVAL;                     \
+            ret = -1;                           \
+        } else if (0 <= (ret))                  \
+            (str)[(size) - 1] = '\0';           \
+    } while (0)
+
 #if !defined(__GNUC__)
 # define AUG_RCSID(x)                           \
     static const char rcsid[] = x
 #else /* __GNUC__ */
-# define AUG_RCSID(x)                                   \
+# define AUG_RCSID(x)                           \
     static const char rcsid[] __attribute__((used)) = x
 #endif /* __GNUC__ */
 

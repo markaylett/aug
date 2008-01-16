@@ -47,11 +47,15 @@ aug_stdiologger(int loglevel, const char* format, va_list args)
 {
     char buf[AUG_MAXLINE];
     FILE* file = loglevel > AUG_LOGWARN ? stdout : stderr;
+    int ret;
 
-    if (0 > vsnprintf(buf, sizeof(buf), format, args)) {
-        errno = EINVAL;
+    /* Null termination is _not_ guaranteed by snprintf(). */
+
+    ret = vsnprintf(buf, sizeof(buf) - 1, format, args);
+    AUG_SNSAFEF(buf, sizeof(buf), ret);
+
+    if (ret < 0)
         return -1;
-    }
 
 #if defined(_WIN32) && !defined(NDEBUG)
     aug_lock();

@@ -3,31 +3,37 @@
 */
 #include "augsys.h"
 
+#include <assert.h>
 #include <stdio.h>
 
 #define HOST_ "localhost"
 #define SERV_ "5000"
 
+#if defined(_WIN32)
+# define snprintf _snprintf
+#endif /* _WIN32 */
+
 static char*
-tostr_(char* dst, const struct aug_endpoint* ep)
+aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len)
 {
     struct aug_inetaddr addr;
-    char buf[AUG_MAXHOSTNAMELEN + 1];
-    size_t size;
+    char host[AUG_MAXHOSTNAMELEN + 1];
+    const char* fmt;
+    int ret;
 
-    aug_getinetaddr(ep, &addr);
-    aug_inetntop(&addr, buf, sizeof(buf));
-    size = strlen(buf);
+    assert(src && dst && len);
 
-    // []:65536\0
+    if (!aug_getinetaddr(src, &addr)
+        || !aug_inetntop(&addr, host, sizeof(host)))
+        return NULL;
 
-    switch (ep->un_.family_) {
+    switch (src->un_.family_) {
     case AF_INET:
-        sprintf(dst, "%s:%d", buf, (int)aug_ntoh16(ep->un_.all_.port_));
+        fmt = "%s:%d";
         break;
 #if HAVE_IPV6
     case AF_INET6:
-        sprintf(dst, "[%s]:%d", buf, (int)aug_ntoh16(ep->un_.all_.port_));
+        fmt = "[%s]:%d";
         break;
 #endif /* HAVE_IPV6 */
     default:
@@ -38,6 +44,20 @@ tostr_(char* dst, const struct aug_endpoint* ep)
 #endif /* _WIN32 */
         return NULL;
     }
+
+    /* Null termination is _not_ guaranteed by snprintf(). */
+
+    ret = snprintf(dst, len - 1, fmt, host,
+                   (int)aug_ntoh16(src->un_.all_.port_));
+    AUG_SNSAFEF(dst, len, ret);
+
+    if (ret < 0) {
+        aug_info("len: %d", ret);
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
+                       AUG_MSG("endpoint formatting failed"));
+        return NULL;
+    }
+
     return dst;
 }
 
@@ -65,8 +85,10 @@ main(int argc, char* argv[])
         struct aug_endpoint ep;
         char buf[AUG_MAXHOSTSERVLEN + 1];
         aug_getendpoint(res, &ep);
-        tostr_(buf, &ep);
-        printf("%s\n", buf);
+        if (aug_endpointntop(&ep, buf, sizeof(buf)))
+            printf("%s\n", buf);
+        else
+            aug_perrinfo(NULL, "aug_endpointntop() failed");
 
     } while ((res = res->ai_next));
     aug_destroyaddrinfo(save);

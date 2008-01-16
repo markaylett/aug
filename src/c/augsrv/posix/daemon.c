@@ -98,17 +98,17 @@ static int
 writepid_(int fd)
 {
     pid_t pid = getpid();
-    size_t len = digits_(pid) + 1;
+    size_t len = digits_(pid) + 1; /* One for newline. */
     char* str = alloca(sizeof(char) * (len + 1));
     if (!str) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 
-    /* Buffer is always terminated with null byte. */
+    /* Resulting buffer will _not_ be null terminated. */
 
-    if (len != (snprintf(str, len + 1, "%ld\n", (long)pid))) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
+    if (len != (snprintf(str, len, "%ld\n", (long)pid))) {
+        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EFORMAT,
                        AUG_MSG("pid formatting failed"));
         return -1;
     }

@@ -22,13 +22,20 @@ static void
 vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line, int src,
              int num, const char* format, va_list args)
 {
+    int ret;
+
     aug_strlcpy(errinfo->file_, file, sizeof(errinfo->file_));
 
     errinfo->line_ = line;
     errinfo->src_ = src;
     errinfo->num_ = num;
 
-    if (0 > vsnprintf(errinfo->desc_, sizeof(errinfo->desc_), format, args))
+    /* Null termination is _not_ guaranteed by snprintf(). */
+
+    ret = vsnprintf(errinfo->desc_, sizeof(errinfo->desc_) - 1, format, args);
+    AUG_SNSAFEF(errinfo->desc_, sizeof(errinfo->desc_), ret);
+
+    if (ret < 0)
         aug_strlcpy(errinfo->desc_, "no message: bad format",
                     sizeof(errinfo->desc_));
 }

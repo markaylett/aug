@@ -20,7 +20,9 @@ report_(WORD type, const char* format, va_list args)
     const char* msgs[1];
     msgs[0] = msg;
 
-    _vsnprintf(msg, sizeof(msg), format, args);
+    /* Null termination is _not_ guaranteed by snprintf(). */
+
+    _vsnprintf(msg, sizeof(msg) - 1, format, args);
     msg[sizeof(msg) - 1] = '\0';
 
     ReportEvent(eventlog_, type, 0, AUG_MSGID, NULL, 1, 0,
