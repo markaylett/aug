@@ -9,7 +9,8 @@ if ENABLE_MULTICAST
 noinst_PROGRAMS += \
 	heartbeat \
 	mcastrecv \
-	mcastsend
+	mcastsend \
+	netevent
 endif
 
 AUGLIBS= \
@@ -43,4 +44,8 @@ mcastrecv_LDADD = $(AUGLIBS)
 mcastsend_SOURCES = \
 	mcastsend.cpp
 mcastsend_LDADD = $(AUGLIBS)
+
+netevent_SOURCES = \
+	netevent.cpp
+netevent_LDADD = $(AUGLIBS)
 endif

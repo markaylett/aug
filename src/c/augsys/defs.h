@@ -100,8 +100,8 @@
 #define AUG_SNTRUNCF(str, size, ret)            \
     do {                                        \
         (str)[(size) - 1] = '\0';               \
-        if ((size) <= (ret))                    \
-            ret = (size) - 1;                   \
+        if ((int)(size) <= (ret))               \
+            ret = (int)(size) - 1;              \
         else if ((ret) < 0 && 0 == errno)       \
             errno = EINVAL;                     \
     } while (0)
