@@ -108,6 +108,14 @@ namespace aug {
     }
 
     inline std::string
+    endpointntop(const aug_endpoint& src)
+    {
+        char buf[AUG_MAXHOSTSERVLEN + 1];
+        verify(aug_endpointntop(&src, buf, sizeof(buf)));
+        return buf;
+    }
+
+    inline std::string
     inetntop(const aug_inetaddr& src)
     {
         char buf[AUG_MAXHOSTNAMELEN + 1];

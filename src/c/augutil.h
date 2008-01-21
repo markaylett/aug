@@ -10,6 +10,7 @@
  * General utility library.
  */
 
+#include "augutil/alloc.h"
 #include "augutil/clock.h"
 #include "augutil/conv.h"
 #include "augutil/event.h"

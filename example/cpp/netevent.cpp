@@ -12,6 +12,8 @@
 using namespace aug;
 using namespace std;
 
+// netevent test 239.1.1.1 1000 3
+
 namespace {
 
     volatile bool stop_ = false;
@@ -30,17 +32,43 @@ namespace {
         aug_unpacknetevent(&ev, buf);
     }
 
-    size_t
-    sendto(fdref ref, unsigned type, unsigned state, const endpoint& ep)
-    {
-        aug_netevent ev = { 0 };
-        char buf[AUG_NETEVENT_SIZE];
+    class netevent : aug_netevent {
+    public:
+        netevent(const char* name, const char* addr, unsigned hbsec)
+        {
+            proto_ = 1;
+            aug_strlcpy(name_, name, sizeof(name_));
+            aug_strlcpy(addr_, addr, sizeof(addr_));
+            type_ = state_ = seq_ = 0;
+            hbsec_ = hbsec;
+            weight_ = load_ = 0;
+        }
+        void
+        setstate(unsigned state)
+        {
+            state_ = state;
+        }
+        void
+        setweight(unsigned weight)
+        {
+            weight_ = weight;
+        }
+        void
+        setload(unsigned load)
+        {
+            load_ = load;
+        }
+        size_t
+        sendto(fdref ref, int type, const endpoint& ep)
+        {
+            type_ = type;
+            ++seq_;
 
-        ev.type_ = type;
-        ev.state_ = state;
-        aug_packnetevent(buf, &ev);
-        return aug::sendto(ref, buf, sizeof(buf), 0, ep);
-    }
+            char buf[AUG_NETEVENT_SIZE];
+            aug_packnetevent(buf, static_cast<aug_netevent*>(this));
+            return aug::sendto(ref, buf, sizeof(buf), 0, ep);
+        }
+    };
 
     class session {
         const char* const name_;
@@ -70,7 +98,8 @@ namespace {
             if (id == hbwait_.id()) {
 
                 aug_info("hbint timeout");
-                sendto(ref_, 1, 1, ep_);
+                netevent event("test", "test", 2);
+                event.sendto(ref_, 1, ep_);
             }
         }
     };
@@ -78,6 +107,10 @@ namespace {
     void
     run(const char* name, fdref ref, const endpoint& ep)
     {
+        endpoint addr(null);
+        getsockname(ref, addr);
+        aug_info("bound to: [%s]", endpointntop(addr).c_str());
+
         muxer mux;
         timers ts;
         session s(name, ref, ep, ts);

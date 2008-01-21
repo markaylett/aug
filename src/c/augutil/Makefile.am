@@ -14,6 +14,7 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
+	alloc.h \
 	clock.h \
 	config.h \
 	conv.h \
@@ -39,6 +40,7 @@ noinst_HEADERS =
 lib_LTLIBRARIES = libaugutil.la
 
 libaugutil_la_SOURCES = \
+	alloc.c \
 	clock.c \
 	config.c \
 	conv.c \

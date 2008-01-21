@@ -63,10 +63,10 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugutil_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugutil_la_OBJECTS = clock.lo config.lo conv.lo event.lo file.lo \
-	getopt.lo lexer.lo list.lo log.lo md5.lo networds.lo object.lo \
-	path.lo pwd.lo shellwords.lo timer.lo tmspec.lo types.lo \
-	xstr.lo
+am_libaugutil_la_OBJECTS = alloc.lo clock.lo config.lo conv.lo \
+	event.lo file.lo getopt.lo lexer.lo list.lo log.lo md5.lo \
+	networds.lo object.lo path.lo pwd.lo shellwords.lo timer.lo \
+	tmspec.lo types.lo xstr.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
 am_clocktest_OBJECTS = clocktest.$(OBJEXT)
 clocktest_OBJECTS = $(am_clocktest_OBJECTS)
@@ -254,6 +254,7 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
+	alloc.h \
 	clock.h \
 	config.h \
 	conv.h \
@@ -277,6 +278,7 @@ modinclude_HEADERS = \
 noinst_HEADERS = 
 lib_LTLIBRARIES = libaugutil.la
 libaugutil_la_SOURCES = \
+	alloc.c \
 	clock.c \
 	config.c \
 	conv.c \
@@ -422,6 +424,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clocktest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@

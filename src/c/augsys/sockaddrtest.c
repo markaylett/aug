@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-#define HOST_ "localhost"
+#define HOST_ "127.0.0.1"
 #define SERV_ "5000"
 
 int
