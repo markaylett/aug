@@ -28,7 +28,7 @@ struct aug_alloc64 {
 AUG_HEAD(aug_allocs64, aug_alloc64);
 
 AUGUTIL_API void
-aug_destroyallocs32(struct aug_allocs32* allocs32);
+aug_destroyalloc32s(struct aug_allocs32* allocs32);
 
 AUGUTIL_API void
 aug_destroyalloc32(struct aug_alloc32* alloc32);
@@ -37,7 +37,7 @@ AUGUTIL_API struct aug_alloc32*
 aug_createalloc32(void);
 
 AUGUTIL_API void
-aug_destroyallocs64(struct aug_allocs64* allocs64);
+aug_destroyalloc64s(struct aug_allocs64* allocs64);
 
 AUGUTIL_API void
 aug_destroyalloc64(struct aug_alloc64* alloc64);
@@ -46,9 +46,9 @@ AUGUTIL_API struct aug_alloc64*
 aug_createalloc64(void);
 
 AUGUTIL_API void
-aug_free(void* ptr);
+aug_freesmall(void* ptr);
 
 AUGUTIL_API void*
-aug_alloc(size_t size);
+aug_allocsmall(size_t size);
 
 #endif /* AUGUTIL_ALLOC_H */

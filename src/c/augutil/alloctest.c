@@ -10,7 +10,13 @@ int
 main(int argc, char* argv[])
 {
     struct aug_errinfo errinfo;
+    int i;
     aug_atexitinit(&errinfo);
+
+    for (i = 0; i < 5; ++i) {
+        void* x = aug_allocsmall(16);
+        aug_freesmall(x);
+    }
 
     return 0;
 }

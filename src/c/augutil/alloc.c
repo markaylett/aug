@@ -45,7 +45,7 @@ freemem64_(void* ptr)
 }
 
 AUGUTIL_API void
-aug_destroyallocs32(struct aug_allocs32* allocs32)
+aug_destroyalloc32s(struct aug_allocs32* allocs32)
 {
     if (!AUG_EMPTY(allocs32)) {
         aug_lock();
@@ -75,7 +75,7 @@ aug_createalloc32(void)
 }
 
 AUGUTIL_API void
-aug_destroyallocs64(struct aug_allocs64* allocs64)
+aug_destroyalloc64s(struct aug_allocs64* allocs64)
 {
     if (!AUG_EMPTY(allocs64)) {
         aug_lock();
@@ -105,7 +105,7 @@ aug_createalloc64(void)
 }
 
 AUGUTIL_API void
-aug_free(void* ptr)
+aug_freesmall(void* ptr)
 {
     static void (*free_[3])(void*) = {
         freemem32_,
@@ -117,7 +117,7 @@ aug_free(void* ptr)
 }
 
 AUGUTIL_API void*
-aug_alloc(size_t size)
+aug_allocsmall(size_t size)
 {
     char* mem = NULL;
     if (size <= 32 - 1) {
