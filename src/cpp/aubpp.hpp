@@ -210,6 +210,10 @@ namespace aub {
         {
             return ref_.get();
         }
+        operator smartob<aub_object>() const AUB_NOTHROW
+        {
+            return smartob<aub_object>::retain(ref_);
+        }
         operator obref<T>() const AUB_NOTHROW
         {
             return ref_;

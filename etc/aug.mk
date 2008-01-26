@@ -146,13 +146,15 @@ $(1): lib$(1)$(dll_ext_)
 
 $(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(dll_ext_).a)
 
-lib$(1)$(dll_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+lib$(1)$(dll_ext_): $$($(1)_OBJS)
 	$(CC) $(copts_) $(CFLAGS) $(cdefs_) \
 	-shared -Wl,-soname,lib$(1)$(dll_ext_) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(dll_ldflags_) \
 	-o lib$(1)$(dll_ext_) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(dll_clibs_) \
 	$(if $(win32_),$($(1)_IMPLIB),)
+
+$$($(1)_OBJS): $$($(1)_DEPS)
 
 $(if $(win32_), $(call win32lib,$(1)), $(call posixlib,$(1)))
 
@@ -168,13 +170,15 @@ $(1): lib$(1)$(dll_ext_)
 
 $(eval $(1)_IMPLIB := -Wl,--out-implib,lib$(1)$(dll_ext_).a)
 
-lib$(1)$(dll_ext_): $(dll_cxxcrt_) $$($(1)_DEPS) $$($(1)_OBJS)
+lib$(1)$(dll_ext_): $$($(1)_OBJS)
 	$(CXX) $(copts_) $(CXXFLAGS) $(cdefs_) \
 	-shared -Wl,-soname,lib$(1)$(dll_ext_) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(dll_ldflags_) \
 	-o lib$(1)$(dll_ext_) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(dll_cxxlibs_) \
 	$(if $(win32_),$($(1)_IMPLIB),)
+
+$$($(1)_OBJS): $(dll_cxxcrt_) $$($(1)_DEPS)
 
 $(if $(win32_), $(call win32lib,$(1)), $(call posixlib,$(1)))
 
@@ -190,12 +194,14 @@ ifneq ($(1), $(1)$(dll_ext_))
 $(1): $(1)$(dll_ext_)
 endif
 
-$(1)$(dll_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+$(1)$(dll_ext_): $$($(1)_OBJS)
 	$(CC) $(copts_) $(CFLAGS) $(cdefs_) \
 	-shared -Wl,-soname,$(1)$(dll_ext_) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(dll_ldflags_) \
 	-o $(1)$(dll_ext_) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(dll_clibs_)
+
+$$($(1)_OBJS): $$($(1)_DEPS)
 
 mods_ += $(1)$(dll_ext_)
 objs_ += $$($(1)_OBJS)
@@ -210,12 +216,14 @@ ifneq ($(1), $(1)$(dll_ext_))
 $(1): $(1)$(dll_ext_)
 endif
 
-$(1)$(dll_ext_): $(dll_cxxcrt_) $$($(1)_DEPS) $$($(1)_OBJS)
+$(1)$(dll_ext_): $$($(1)_OBJS)
 	$(CXX) $(copts_) $(CXXFLAGS) $(cdefs_) \
 	-shared -Wl,-soname,$(1)$(dll_ext_) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(dll_ldflags_) \
 	-o $(1)$(dll_ext_) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(dll_cxxlibs_)
+
+$$($(1)_OBJS): $(dll_cxxcrt_) $$($(1)_DEPS)
 
 mods_ += $(1)$(dll_ext_)
 objs_ += $$($(1)_OBJS)
@@ -230,11 +238,13 @@ ifneq ($(1), $(1)$(exe_ext_))
 $(1): $(1)$(exe_ext_)
 endif
 
-$(1)$(exe_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+$(1)$(exe_ext_): $$($(1)_OBJS)
 	$(CC) $(copts_) $(CFLAGS) $(cdefs_) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(exe_ldflags_) \
 	-o $(1)$(exe_ext_) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(exe_clibs)
+
+$$($(1)_OBJS): $$($(1)_DEPS)
 
 bins_ += $(1)$(exe_ext_)
 objs_ += $$($(1)_OBJS)
@@ -249,11 +259,13 @@ ifneq ($(1), $(1)$(exe_ext_))
 $(1): $(1)$(exe_ext_)
 endif
 
-$(1)$(exe_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+$(1)$(exe_ext_): $$($(1)_OBJS)
 	$(CXX) $(copts_) $(CXXFLAGS) $(cdefs_) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(exe_ldflags_) \
 	-o $(1)$(exe_ext_) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(exe_cxxlibs_)
+
+$$($(1)_OBJS): $$($(1)_DEPS)
 
 bins_ += $(1)$(exe_ext_)
 objs_ += $$($(1)_OBJS)
@@ -268,11 +280,13 @@ ifneq ($(1), $(1)$(exe_ext_))
 $(1): $(1)$(exe_ext_)
 endif
 
-$(1)$(exe_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+$(1)$(exe_ext_): $$($(1)_OBJS)
 	$(CC) $(copts_) $(CFLAGS) $(cdefs_) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(exe_ldflags_) \
 	-o $(1)$(exe_ext_) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(exe_clibs)
+
+$$($(1)_OBJS): $$($(1)_DEPS)
 
 clean_ += $(1)$(exe_ext_)
 objs_ += $$($(1)_OBJS)
@@ -287,11 +301,13 @@ ifneq ($(1), $(1)$(exe_ext_))
 $(1): $(1)$(exe_ext_)
 endif
 
-$(1)$(exe_ext_): $$($(1)_DEPS) $$($(1)_OBJS)
+$(1)$(exe_ext_): $$($(1)_OBJS)
 	$(CXX) $(copts_) $(CXXFLAGS) $(cdefs_) \
 	$(LDFLAGS) $$($(1)_LDFLAGS) $(exe_ldflags_) \
 	-o $(1)$(exe_ext_) $$($(1)_OBJS) \
 	$$($(1)_LIBS:%=-l%) $(exe_cxxlibs_)
+
+$$($(1)_OBJS): $$($(1)_DEPS)
 
 clean_ += $(1)$(exe_ext_)
 objs_ += $$($(1)_OBJS)
@@ -309,7 +325,7 @@ endef
 define INSTALL_template
 .PHONY: install-$(1)
 
-install-$(1): $(targets_)
+install-$(1): $($(1)_FILES)
 	@$(MKDIR) -p $($(1)_DIR)
 	@for f in $($(1)_FILES); do \
 		$(INSTALL) -pv $$$$f $($(1)_DIR); \
@@ -437,6 +453,7 @@ check-aug: check-subdirs $(TESTS)
 	      echo "All $$all tests passed"; \
 	  else \
 	      echo "$$failed of $$all tests failed"; \
+	      exit 1; \
 	  fi; \
 	fi
 

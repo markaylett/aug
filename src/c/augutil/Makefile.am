@@ -14,7 +14,6 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
-	alloc.h \
 	clock.h \
 	config.h \
 	conv.h \
@@ -40,7 +39,6 @@ noinst_HEADERS =
 lib_LTLIBRARIES = libaugutil.la
 
 libaugutil_la_SOURCES = \
-	alloc.c \
 	clock.c \
 	config.c \
 	conv.c \
@@ -69,7 +67,6 @@ libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	alloctest \
 	clocktest \
 	eventtest \
 	networdstest \
@@ -77,16 +74,11 @@ check_PROGRAMS = \
 	shellwordstest
 
 TESTS = \
-	alloctest \
 	clocktest \
 	eventtest \
 	networdstest.sh \
 	shelllexertest.sh \
 	shellwordstest.sh
-
-alloctest_SOURCES = alloctest.c
-alloctest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
 
 clocktest_SOURCES = clocktest.c
 clocktest_LDADD = \

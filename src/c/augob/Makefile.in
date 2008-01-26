@@ -431,7 +431,7 @@ uninstall-am: uninstall-info-am uninstall-modincludeHEADERS
 
 
 @ENABLE_RUBY_TRUE@%.h: %.xml
-@ENABLE_RUBY_TRUE@	$(top_srcdir)/src/rb/aubidl -f $@ <$< >$@
+@ENABLE_RUBY_TRUE@	$(top_srcdir)/src/rb/aubidl -n $@ <$< >$@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

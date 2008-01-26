@@ -3,6 +3,9 @@ SUBDIRS = \
 	osx \
 	posix \
 	win32
+EXTRA_DIST = \
+	malloc.c \
+	malloc.h
 
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \

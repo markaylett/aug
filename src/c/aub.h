@@ -23,6 +23,23 @@
 #include <stddef.h>
 #include <sys/types.h> /* size_t */
 
+#if !defined(__cplusplus)
+# define AUB_EXTERNC extern
+#else /* __cplusplus */
+# define AUB_EXTERNC extern "C"
+#endif /* __cplusplus */
+
+#if defined(__CYGWIN__) || defined(__MINGW32__)
+# define AUB_EXPORT __attribute__ ((dllexport))
+# define AUB_IMPORT __attribute__ ((dllimport))
+#elif defined(_MSC_VER)
+# define AUB_EXPORT __declspec(dllexport)
+# define AUB_IMPORT __declspec(dllimport)
+#else /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
+# define AUB_EXPORT
+# define AUB_IMPORT
+#endif /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
+
 /**
  * @defgroup ObjectMacros Macros
  *

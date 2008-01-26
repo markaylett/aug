@@ -41,9 +41,9 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = alloctest$(EXEEXT) clocktest$(EXEEXT) \
-	eventtest$(EXEEXT) networdstest$(EXEEXT) \
-	shelllexertest$(EXEEXT) shellwordstest$(EXEEXT)
+check_PROGRAMS = clocktest$(EXEEXT) eventtest$(EXEEXT) \
+	networdstest$(EXEEXT) shelllexertest$(EXEEXT) \
+	shellwordstest$(EXEEXT)
 subdir = src/c/augutil
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -63,14 +63,11 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugutil_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugutil_la_OBJECTS = alloc.lo clock.lo config.lo conv.lo \
-	event.lo file.lo getopt.lo lexer.lo list.lo log.lo md5.lo \
-	networds.lo object.lo path.lo pwd.lo shellwords.lo timer.lo \
-	tmspec.lo types.lo xstr.lo
+am_libaugutil_la_OBJECTS = clock.lo config.lo conv.lo event.lo file.lo \
+	getopt.lo lexer.lo list.lo log.lo md5.lo networds.lo object.lo \
+	path.lo pwd.lo shellwords.lo timer.lo tmspec.lo types.lo \
+	xstr.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
-am_alloctest_OBJECTS = alloctest.$(OBJEXT)
-alloctest_OBJECTS = $(am_alloctest_OBJECTS)
-alloctest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
 am_clocktest_OBJECTS = clocktest.$(OBJEXT)
 clocktest_OBJECTS = $(am_clocktest_OBJECTS)
 clocktest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
@@ -99,14 +96,12 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugutil_la_SOURCES) $(alloctest_SOURCES) \
-	$(clocktest_SOURCES) $(eventtest_SOURCES) \
-	$(networdstest_SOURCES) $(shelllexertest_SOURCES) \
-	$(shellwordstest_SOURCES)
-DIST_SOURCES = $(libaugutil_la_SOURCES) $(alloctest_SOURCES) \
-	$(clocktest_SOURCES) $(eventtest_SOURCES) \
-	$(networdstest_SOURCES) $(shelllexertest_SOURCES) \
-	$(shellwordstest_SOURCES)
+SOURCES = $(libaugutil_la_SOURCES) $(clocktest_SOURCES) \
+	$(eventtest_SOURCES) $(networdstest_SOURCES) \
+	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES)
+DIST_SOURCES = $(libaugutil_la_SOURCES) $(clocktest_SOURCES) \
+	$(eventtest_SOURCES) $(networdstest_SOURCES) \
+	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -259,7 +254,6 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
-	alloc.h \
 	clock.h \
 	config.h \
 	conv.h \
@@ -283,7 +277,6 @@ modinclude_HEADERS = \
 noinst_HEADERS = 
 lib_LTLIBRARIES = libaugutil.la
 libaugutil_la_SOURCES = \
-	alloc.c \
 	clock.c \
 	config.c \
 	conv.c \
@@ -312,16 +305,11 @@ libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = \
-	alloctest \
 	clocktest \
 	eventtest \
 	networdstest.sh \
 	shelllexertest.sh \
 	shellwordstest.sh
-
-alloctest_SOURCES = alloctest.c
-alloctest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
 
 clocktest_SOURCES = clocktest.c
 clocktest_LDADD = \
@@ -412,9 +400,6 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-alloctest$(EXEEXT): $(alloctest_OBJECTS) $(alloctest_DEPENDENCIES) 
-	@rm -f alloctest$(EXEEXT)
-	$(LINK) $(alloctest_LDFLAGS) $(alloctest_OBJECTS) $(alloctest_LDADD) $(LIBS)
 clocktest$(EXEEXT): $(clocktest_OBJECTS) $(clocktest_DEPENDENCIES) 
 	@rm -f clocktest$(EXEEXT)
 	$(LINK) $(clocktest_LDFLAGS) $(clocktest_OBJECTS) $(clocktest_LDADD) $(LIBS)
@@ -437,8 +422,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alloc.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alloctest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clocktest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
