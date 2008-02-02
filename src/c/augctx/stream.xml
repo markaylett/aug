@@ -1,0 +1,30 @@
+<package name="aug">
+
+  <quotincl>augctx/ctx.h</quotincl>
+  <quotincl>augctx/types.h</quotincl>
+
+  <interface name="stream">
+
+    <method name="read" type="ssize_t" qname="read">
+      <param name="buf" type="void*"/>
+      <param name="size" type="size_t"/>
+    </method>
+
+    <method name="readv" type="ssize_t" qname="readv">
+      <param name="iov" type="const struct iovec*"/>
+      <param name="size" type="int"/>
+    </method>
+
+    <method name="write" type="ssize_t" qname="write">
+      <param name="buf" type="const void*"/>
+      <param name="size" type="size_t"/>
+    </method>
+
+    <method name="writev" type="ssize_t" qname="writev">
+      <param name="iov" type="const struct iovec*"/>
+      <param name="size" type="int"/>
+    </method>
+
+  </interface>
+
+</package>

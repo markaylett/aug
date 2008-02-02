@@ -1,5 +1,6 @@
 EXTRA_DIST = lang.mk
 SUBDIRS = \
+	augctx \
 	augob \
 	augsys \
 	augmar \

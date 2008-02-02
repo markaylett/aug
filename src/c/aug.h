@@ -37,6 +37,7 @@
  * @li @subpage mar
  */
 
+#include "augctx.h"
 #include "augmar.h"
 #include "augnet.h"
 #include "augob.h"

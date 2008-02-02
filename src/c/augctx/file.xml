@@ -1,0 +1,18 @@
+<package name="aug">
+
+  <quotincl>augctx/ctx.h</quotincl>
+  <quotincl>augctx/types.h</quotincl>
+
+  <interface name="file">
+
+    <method name="close" type="int" qname="close"/>
+
+    <method name="setnonblock" type="int" qname="setnonblock">
+      <param name="on" type="int"/>
+    </method>
+
+    <method name="getfd" type="aug_fd" qname="getfd"/>
+
+  </interface>
+
+</package>

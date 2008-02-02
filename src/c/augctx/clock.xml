@@ -1,0 +1,15 @@
+<package name="aug">
+
+  <quotincl>augctx/mpool.h</quotincl>
+
+  <interface name="clock">
+
+    <method name="gettimeofday" type="struct timeval*" qname="gettimeofday">
+      <param name="tv" type="struct timeval*"/>
+    </method>
+
+    <method name="gettimezone" type="long" qname="gettimezone"/>
+
+  </interface>
+
+</package>

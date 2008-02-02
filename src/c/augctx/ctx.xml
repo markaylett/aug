@@ -1,0 +1,37 @@
+<package name="aug">
+
+  <quotincl>augctx/clock.h</quotincl>
+  <quotincl>augctx/log.h</quotincl>
+  <quotincl>augctx/mpool.h</quotincl>
+
+  <verbatim>struct aug_errinfo;</verbatim>
+
+  <interface name="ctx">
+
+    <method name="setlog" type="void" qname="setlog">
+      <param name="log" type="aug_log" object="true"/>
+    </method>
+
+    <method name="setloglevel" type="int" qname="setloglevel">
+      <param name="level" type="int"/>
+    </method>
+
+    <method name="vwritelog" type="int" qname="vwritelog">
+      <param name="level" type="int"/>
+      <param name="format" type="const char*"/>
+      <param name="args" type="va_list"/>
+    </method>
+
+    <method name="getmpool" type="aug_mpool" object="true" qname="getmpool"/>
+
+    <method name="getclock" type="aug_clock" object="true" qname="getclock"/>
+
+    <method name="getlog" type="aug_log" object="true" qname="getlog"/>
+
+    <method name="getloglevel" type="int" qname="getloglevel"/>
+
+    <method name="geterrinfo" type="struct aug_errinfo*" qname="geterrinfo"/>
+
+  </interface>
+
+</package>

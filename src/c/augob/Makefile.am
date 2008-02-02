@@ -21,6 +21,16 @@ modinclude_HEADERS = \
 	var.h
 
 if ENABLE_RUBY
+BUILT_SOURCES = \
+	addrob.h \
+	blob.h \
+	errinfob.h \
+	eventob.h \
+	iterob.h \
+	longob.h \
+	rpcob.h \
+	seqob.h
+
 %.h: %.xml
 	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
 endif

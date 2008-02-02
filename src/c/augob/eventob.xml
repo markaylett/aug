@@ -2,12 +2,12 @@
 
   <interface name="eventob">
     <method name="setuser" type="void" qname="seteventobuser">
-      <param name="user" type="aub_object" object="true"/>
+      <param name="user" type="aug_object" object="true"/>
     </method>
     <method name="from" type="const char*" qname="eventobfrom"/>
     <method name="to" type="const char*" qname="eventobto"/>
     <method name="type" type="const char*" qname="eventobtype"/>
-    <method name="user" type="aub_object" object="true" qname="eventobuser"/>
+    <method name="user" type="aug_object" object="true" qname="eventobuser"/>
   </interface>
 
 </package>

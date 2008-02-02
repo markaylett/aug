@@ -191,6 +191,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = lang.mk
 SUBDIRS = \
+	augctx \
 	augob \
 	augsys \
 	augmar \

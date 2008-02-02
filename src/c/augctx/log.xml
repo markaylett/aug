@@ -1,0 +1,16 @@
+<package name="aug">
+
+  <quotincl>augctx/mpool.h</quotincl>
+
+  <anglincl>stdarg.h</anglincl>
+  <interface name="log">
+
+    <method name="vprint" type="int">
+      <param name="level" type="int"/>
+      <param name="format" type="const char*"/>
+      <param name="args" type="va_list"/>
+    </method>
+
+  </interface>
+
+</package>
