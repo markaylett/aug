@@ -14,7 +14,7 @@
 
 #include "augutil/list.h"
 
-#include "aub.h"
+#include "augabi.h"
 
 /**
  * #AUG_INIT should be used to initialise the aug_files structure.
@@ -27,12 +27,12 @@ AUG_HEAD(aug_files, aug_file_);
  * Callback function has a boolean return value: returning false removes the
  * file.
  */
-typedef int (*aug_filecb_t)(aub_object*, int);
+typedef int (*aug_filecb_t)(aug_object*, int);
 
 /**
  * Destroy each file in the list.
  *
- * aub_release() is called for each ob associated with each file.
+ * aug_release() is called for each ob associated with each file.
  *
  * @param files List of files to be destroyed.
  */
@@ -43,7 +43,7 @@ aug_destroyfiles(struct aug_files* files);
 /**
  * Insert file into file list.
  *
- * If aug_insertfile() succeeds, aub_retain() will be called on @a ob.
+ * If aug_insertfile() succeeds, aug_retain() will be called on @a ob.
  *
  * @param files The file list.
  *
@@ -56,7 +56,7 @@ aug_destroyfiles(struct aug_files* files);
 
 AUGNET_API int
 aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
-               aub_object* ob);
+               aug_object* ob);
 
 /**
  * Remove file from list.

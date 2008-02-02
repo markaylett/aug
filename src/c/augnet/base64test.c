@@ -11,14 +11,14 @@ static char encoded_[1024];
 static char decoded_[1024];
 
 static int
-encode_(aub_object* ob, const char* buf, size_t len)
+encode_(aug_object* ob, const char* buf, size_t len)
 {
     strcat(encoded_, buf);
     return 0;
 }
 
 static int
-decode_(aub_object* ob, const char* buf, size_t len)
+decode_(aug_object* ob, const char* buf, size_t len)
 {
     strcat(decoded_, buf);
     return 0;

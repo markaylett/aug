@@ -27,7 +27,7 @@ AUG_RCSID("$Id$");
 
 #define POSTEVENT_ (AUG_EVENTUSER - 1)
 
-using namespace aub;
+using namespace aug;
 using namespace aug;
 using namespace std;
 
@@ -36,7 +36,7 @@ namespace {
     class postevent : public ref_base {
         eventob<postevent> eventob_;
         const string from_, to_, type_;
-        smartob<aub_object> user_;
+        smartob<aug_object> user_;
         postevent(const string& from, const string& to, const string& type)
             : from_(from),
               to_(to),
@@ -51,17 +51,17 @@ namespace {
             // Deleted from base.
         }
     public:
-        smartob<aub_object>
+        smartob<aug_object>
         cast_(const char* id) AUG_NOTHROW
         {
-            if (equalid<aub_object>(id) || equalid<aug_eventob>(id))
-                return object_retain<aub_object>(eventob_);
+            if (equalid<aug_object>(id) || equalid<aug_eventob>(id))
+                return object_retain<aug_object>(eventob_);
             return null;
         }
         void
         seteventobuser_(objectref user) AUG_NOTHROW
         {
-            user_ = object_retain<aub_object>(user);
+            user_ = object_retain<aug_object>(user);
         }
         const char*
         eventobfrom_() AUG_NOTHROW
@@ -78,7 +78,7 @@ namespace {
         {
             return type_.c_str();
         }
-        smartob<aub_object>
+        smartob<aug_object>
         eventobuser_() AUG_NOTHROW
         {
             return user_;
@@ -135,16 +135,16 @@ namespace aug {
 
         struct sessiontimer {
             sessionptr session_;
-            smartob<aub_object> ob_;
+            smartob<aug_object> ob_;
             sessiontimer(const sessionptr& session,
-                         const smartob<aub_object>& ob)
+                         const smartob<aug_object>& ob)
                 : session_(session),
                   ob_(ob)
             {
             }
         };
 
-        typedef map<aum_id, sessiontimer> sessiontimers;
+        typedef map<mod_id, sessiontimer> sessiontimers;
 
         struct engineimpl {
 
@@ -304,7 +304,7 @@ namespace aug {
             {
                 AUG_DEBUG2("reading event");
 
-                pair<int, smartob<aub_object> >
+                pair<int, smartob<aug_object> >
                     event(aug::readevent(eventrd_));
 
                 switch (event.first) {
@@ -336,7 +336,7 @@ namespace aug {
                         vector<sessionptr> sessions;
                         sessions_.getbygroup(sessions, eventobto(ev));
 
-                        smartob<aub_object> user(eventobuser(ev));
+                        smartob<aug_object> user(eventobuser(ev));
                         vector<sessionptr>
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
@@ -373,7 +373,7 @@ namespace aug {
                 AUG_DEBUG2("custom timer expiry");
 
                 sessiontimers::iterator it(sessiontimers_.find(id));
-                aum_handle timer = { id, it->second.ob_.get() };
+                mod_handle timer = { id, it->second.ob_.get() };
                 it->second.session_->expire(timer, ms);
 
                 if (0 == ms) {
@@ -541,7 +541,7 @@ engine::dispatch(const char* sname, const char* to, const char* type,
 }
 
 AUGRTPP_API void
-engine::shutdown(aum_id cid, unsigned flags)
+engine::shutdown(mod_id cid, unsigned flags)
 {
     sockptr sock(impl_->socks_.getbyid(cid));
     connptr cptr(smartptr_cast<conn_base>(sock));
@@ -550,13 +550,13 @@ engine::shutdown(aum_id cid, unsigned flags)
 
         // Forced shutdown: may be used on misbehaving clients.
 
-        if (flags & AUM_SHUTNOW)
+        if (flags & MOD_SHUTNOW)
             impl_->socks_.erase(*sock);
     } else
         impl_->socks_.erase(*sock);
 }
 
-AUGRTPP_API aum_id
+AUGRTPP_API mod_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
                    void* user)
 {
@@ -597,7 +597,7 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     return id(*cptr);
 }
 
-AUGRTPP_API aum_id
+AUGRTPP_API mod_id
 engine::tcplisten(const char* sname, const char* host, const char* port,
                   void* user)
 {
@@ -625,7 +625,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
 }
 
 AUGRTPP_API void
-engine::send(aum_id cid, const void* buf, size_t len)
+engine::send(mod_id cid, const void* buf, size_t len)
 {
     if (!impl_->socks_.send(cid, buf, len, impl_->now_))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
@@ -633,7 +633,7 @@ engine::send(aum_id cid, const void* buf, size_t len)
 }
 
 AUGRTPP_API void
-engine::sendv(aum_id cid, blobref blob)
+engine::sendv(mod_id cid, blobref blob)
 {
     if (!impl_->socks_.sendv(cid, blob, impl_->now_))
         throw local_error(__FILE__, __LINE__, AUG_ESTATE,
@@ -641,7 +641,7 @@ engine::sendv(aum_id cid, blobref blob)
 }
 
 AUGRTPP_API void
-engine::setrwtimer(aum_id cid, unsigned ms, unsigned flags)
+engine::setrwtimer(mod_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
@@ -652,7 +652,7 @@ engine::setrwtimer(aum_id cid, unsigned ms, unsigned flags)
 }
 
 AUGRTPP_API bool
-engine::resetrwtimer(aum_id cid, unsigned ms, unsigned flags)
+engine::resetrwtimer(mod_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
@@ -664,7 +664,7 @@ engine::resetrwtimer(aum_id cid, unsigned ms, unsigned flags)
 }
 
 AUGRTPP_API bool
-engine::cancelrwtimer(aum_id cid, unsigned flags)
+engine::cancelrwtimer(mod_id cid, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
@@ -674,10 +674,10 @@ engine::cancelrwtimer(aum_id cid, unsigned flags)
     return rwtimer->cancelrwtimer(flags);
 }
 
-AUGRTPP_API aum_id
+AUGRTPP_API mod_id
 engine::settimer(const char* sname, unsigned ms, objectref ob)
 {
-    aum_id id(aug_nextid());
+    mod_id id(aug_nextid());
     smartob<aug_addrob> local(createaddrob(impl_, 0));
 
     aug::settimer(impl_->timers_, id, ms, timermemcb<detail::engineimpl,
@@ -686,19 +686,19 @@ engine::settimer(const char* sname, unsigned ms, objectref ob)
     // Insert after settimer() has succeeded.
 
     detail::sessiontimer timer(impl_->sessions_.getbyname(sname),
-                               smartob<aub_object>::retain(ob));
+                               smartob<aug_object>::retain(ob));
     impl_->sessiontimers_.insert(make_pair(id, timer));
     return id;
 }
 
 AUGRTPP_API bool
-engine::resettimer(aum_id tid, unsigned ms)
+engine::resettimer(mod_id tid, unsigned ms)
 {
     return aug::resettimer(impl_->timers_, tid, ms);
 }
 
 AUGRTPP_API bool
-engine::canceltimer(aum_id tid)
+engine::canceltimer(mod_id tid)
 {
     bool ret(aug::canceltimer(impl_->timers_, tid));
 
@@ -712,7 +712,7 @@ engine::canceltimer(aum_id tid)
 }
 
 AUGRTPP_API void
-engine::setsslclient(aum_id cid, sslctx& ctx)
+engine::setsslclient(mod_id cid, sslctx& ctx)
 {
 #if ENABLE_SSL
     connptr cptr(smartptr_cast<
@@ -729,7 +729,7 @@ engine::setsslclient(aum_id cid, sslctx& ctx)
 }
 
 AUGRTPP_API void
-engine::setsslserver(aum_id cid, sslctx& ctx)
+engine::setsslserver(mod_id cid, sslctx& ctx)
 {
 #if ENABLE_SSL
     connptr cptr(smartptr_cast<

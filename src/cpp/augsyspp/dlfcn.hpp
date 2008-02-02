@@ -7,7 +7,7 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/utility.hpp" // perrinfo()
 
-#include "null.hpp"
+#include "augnullpp.hpp"
 
 #include "augsys/dlfcn.h"
 

@@ -9,7 +9,7 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/utility.hpp"
 
-#include "aubpp.hpp"
+#include "augabipp.hpp"
 
 #include "augutil/list.h"
 #include "augutil/timer.h"
@@ -19,9 +19,9 @@
 
 namespace aug {
 
-    template <void (*T)(aub::objectref, int, unsigned&)>
+    template <void (*T)(aug::objectref, int, unsigned&)>
     void
-    timercb(aub_object* user, int id, unsigned* ms) AUG_NOTHROW
+    timercb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
             T(user, id, *ms);
@@ -30,7 +30,7 @@ namespace aug {
 
     template <typename T, void (T::*U)(int, unsigned&)>
     void
-    timermemcb(aub_object* user, int id, unsigned* ms) AUG_NOTHROW
+    timermemcb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
             (obtoaddr<T*>(user)->*U)(id, *ms);
@@ -39,7 +39,7 @@ namespace aug {
 
     template <typename T>
     void
-    timermemcb(aub_object* ob, int id, unsigned* ms) AUG_NOTHROW
+    timermemcb(aug_object* ob, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
             obtoaddr<T*>(ob)->timercb(id, *ms);
@@ -91,7 +91,7 @@ namespace aug {
 
     inline int
     settimer(aug_timers& timers, idref ref, unsigned ms, aug_timercb_t cb,
-             aub::objectref ob)
+             aug::objectref ob)
     {
         return verify(aug_settimer(&timers, ref.get(), ms, cb, ob.get()));
     }
@@ -107,7 +107,7 @@ namespace aug {
     int
     settimer(aug_timers& timers, idref ref, unsigned ms, T& x)
     {
-        aub::smartob<aug_addrob> ob(createaddrob(&x, 0));
+        aug::smartob<aug_addrob> ob(createaddrob(&x, 0));
         return verify(aug_settimer(&timers, ref.get(), ms,
                                    timermemcb<T>, ob.base()));
     }
@@ -116,7 +116,7 @@ namespace aug {
     int
     settimer(aug_timers& timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
     {
-        aub::smartob<aug_addrob> ob(createaddrob(x));
+        aug::smartob<aug_addrob> ob(createaddrob(x));
         int id(verify(aug_settimer(&timers, ref.get(), ms, timermemcb<T>,
                                    ob.base())));
         return id;
@@ -186,7 +186,7 @@ namespace aug {
         }
 
         void
-        set(unsigned ms, aug_timercb_t cb, aub::objectref ob)
+        set(unsigned ms, aug_timercb_t cb, aug::objectref ob)
         {
             ref_ = settimer(timers_, ref_, ms, cb, ob);
         }

@@ -4,7 +4,7 @@
 #ifndef AUGPP_HPP
 #define AUGPP_HPP
 
-#include "aum.h"
+#include "augmod.h"
 
 #include <algorithm>
 #include <cctype>
@@ -19,20 +19,21 @@
 #include <functional>
 
 #if !defined(NDEBUG)
-# define AUM_NOTHROW throw()
+# define MOD_NOTHROW throw()
 #else /* NDEBUG */
-# define AUM_NOTHROW
+# define MOD_NOTHROW
 #endif /* NDEBUG */
 
-#define AUM_WRITELOGCATCH                                   \
+#define MOD_WRITELOGCATCH                                   \
     catch (const std::exception& e) {                       \
-        aum_writelog(AUM_LOGERROR,                          \
+        mod_writelog(MOD_LOGERROR,                          \
                      "std::exception: %s", e.what());       \
     } catch (...) {                                         \
-        aum_writelog(AUM_LOGERROR, "unknown exception");    \
+        mod_writelog(MOD_LOGERROR, "unknown exception");    \
     } do { } while (0)
 
-namespace aum {
+namespace aug {
+namespace mod {
 
     typedef std::runtime_error error;
 
@@ -41,247 +42,247 @@ namespace aum {
     {
         va_list args;
         va_start(args, format);
-        aum_vwritelog(level, format, args);
+        mod_vwritelog(level, format, args);
         va_end(args);
     }
 
     inline void
     vwritelog(int level, const char* format, va_list args)
     {
-        aum_vwritelog(level, format, args);
+        mod_vwritelog(level, format, args);
     }
 
     inline void
     reconfall()
     {
-        if (AUM_ERROR == aum_reconfall())
-            throw error(aum_error());
+        if (MOD_ERROR == mod_reconfall())
+            throw error(mod_error());
     }
 
     inline void
     stopall()
     {
-        if (AUM_ERROR == aum_stopall())
-            throw error(aum_error());
+        if (MOD_ERROR == mod_stopall())
+            throw error(mod_error());
     }
 
     inline void
-    post(const char* to, const char* type, struct aub_object_* ob)
+    post(const char* to, const char* type, struct aug_object_* ob)
     {
-        if (AUM_ERROR == aum_post(to, type, ob))
-            throw error(aum_error());
+        if (MOD_ERROR == mod_post(to, type, ob))
+            throw error(mod_error());
     }
 
     inline void
-    dispatch(const char* to, const char* type, struct aub_object_* ob)
+    dispatch(const char* to, const char* type, struct aug_object_* ob)
     {
-        if (AUM_ERROR == aum_dispatch(to, type, ob))
-            throw error(aum_error());
+        if (MOD_ERROR == mod_dispatch(to, type, ob))
+            throw error(mod_error());
     }
 
     inline const char*
     getenv(const char* name, const char* def = 0)
     {
-        return aum_getenv(name, def);
+        return mod_getenv(name, def);
     }
 
-    inline const aum_session*
+    inline const mod_session*
     getsession()
     {
-        return aum_getsession();
+        return mod_getsession();
     }
 
     inline void
-    shutdown(aum_id sid, unsigned flags)
+    shutdown(mod_id sid, unsigned flags)
     {
-        if (AUM_ERROR == aum_shutdown(sid, flags))
-            throw error(aum_error());
+        if (MOD_ERROR == mod_shutdown(sid, flags))
+            throw error(mod_error());
     }
 
     inline void
-    shutdown(const aum_handle& sock, unsigned flags)
+    shutdown(const mod_handle& sock, unsigned flags)
     {
         shutdown(sock.id_, flags);
     }
 
-    inline aum_id
+    inline mod_id
     tcpconnect(const char* host, const char* port, void* user = 0)
     {
-        int ret(aum_tcpconnect(host, port, user));
-        if (AUM_ERROR == ret)
-            throw error(aum_error());
-        return static_cast<aum_id>(ret);
+        int ret(mod_tcpconnect(host, port, user));
+        if (MOD_ERROR == ret)
+            throw error(mod_error());
+        return static_cast<mod_id>(ret);
     }
 
-    inline aum_id
+    inline mod_id
     tcplisten(const char* host, const char* port, void* user = 0)
     {
-        int ret(aum_tcplisten(host, port, user));
-        if (AUM_ERROR == ret)
-            throw error(aum_error());
-        return static_cast<aum_id>(ret);
+        int ret(mod_tcplisten(host, port, user));
+        if (MOD_ERROR == ret)
+            throw error(mod_error());
+        return static_cast<mod_id>(ret);
     }
 
     inline void
-    send(aum_id cid, const void* buf, size_t size)
+    send(mod_id cid, const void* buf, size_t size)
     {
-        if (AUM_ERROR == aum_send(cid, buf, size))
-            throw error(aum_error());
+        if (MOD_ERROR == mod_send(cid, buf, size))
+            throw error(mod_error());
     }
 
     inline void
-    send(const aum_handle& conn, const void* buf, size_t size)
+    send(const mod_handle& conn, const void* buf, size_t size)
     {
         send(conn.id_, buf, size);
     }
 
     inline void
-    sendv(aum_id cid, struct aug_blob_* blob)
+    sendv(mod_id cid, struct aug_blob_* blob)
     {
-        if (AUM_ERROR == aum_sendv(cid, blob))
-            throw error(aum_error());
+        if (MOD_ERROR == mod_sendv(cid, blob))
+            throw error(mod_error());
     }
 
     inline void
-    sendv(const aum_handle& conn, struct aug_blob_* blob)
+    sendv(const mod_handle& conn, struct aug_blob_* blob)
     {
         sendv(conn.id_, blob);
     }
 
     inline void
-    setrwtimer(aum_id cid, unsigned ms, unsigned flags)
+    setrwtimer(mod_id cid, unsigned ms, unsigned flags)
     {
-        if (AUM_ERROR == aum_setrwtimer(cid, ms, flags))
-            throw error(aum_error());
+        if (MOD_ERROR == mod_setrwtimer(cid, ms, flags))
+            throw error(mod_error());
     }
 
     inline void
-    setrwtimer(const aum_handle& conn, unsigned ms, unsigned flags)
+    setrwtimer(const mod_handle& conn, unsigned ms, unsigned flags)
     {
         setrwtimer(conn.id_, ms, flags);
     }
 
     inline bool
-    resetrwtimer(aum_id cid, unsigned ms, unsigned flags)
+    resetrwtimer(mod_id cid, unsigned ms, unsigned flags)
     {
-        switch (aum_resetrwtimer(cid, ms, flags)) {
-        case AUM_ERROR:
-            throw error(aum_error());
-        case AUM_NONE:
+        switch (mod_resetrwtimer(cid, ms, flags)) {
+        case MOD_ERROR:
+            throw error(mod_error());
+        case MOD_NONE:
             return false;
         }
         return true;
     }
 
     inline bool
-    retsetrwtimer(const aum_handle& conn, unsigned ms, unsigned flags)
+    retsetrwtimer(const mod_handle& conn, unsigned ms, unsigned flags)
     {
         return resetrwtimer(conn.id_, ms, flags);
     }
 
     inline bool
-    cancelrwtimer(aum_id cid, unsigned flags)
+    cancelrwtimer(mod_id cid, unsigned flags)
     {
-        switch (aum_cancelrwtimer(cid, flags)) {
-        case AUM_ERROR:
-            throw error(aum_error());
-        case AUM_NONE:
+        switch (mod_cancelrwtimer(cid, flags)) {
+        case MOD_ERROR:
+            throw error(mod_error());
+        case MOD_NONE:
             return false;
         }
         return true;
     }
 
     inline bool
-    cancelrwtimer(const aum_handle& conn, unsigned flags)
+    cancelrwtimer(const mod_handle& conn, unsigned flags)
     {
         return cancelrwtimer(conn.id_, flags);
     }
 
-    inline aum_id
-    settimer(unsigned ms, struct aub_object_* ob)
+    inline mod_id
+    settimer(unsigned ms, struct aug_object_* ob)
     {
-        int ret(aum_settimer(ms, ob));
-        if (AUM_ERROR == ret)
-            throw error(aum_error());
-        return static_cast<aum_id>(ret);
+        int ret(mod_settimer(ms, ob));
+        if (MOD_ERROR == ret)
+            throw error(mod_error());
+        return static_cast<mod_id>(ret);
     }
 
     inline bool
-    resettimer(aum_id tid, unsigned ms)
+    resettimer(mod_id tid, unsigned ms)
     {
-        switch (aum_resettimer(tid, ms)) {
-        case AUM_ERROR:
-            throw error(aum_error());
-        case AUM_NONE:
+        switch (mod_resettimer(tid, ms)) {
+        case MOD_ERROR:
+            throw error(mod_error());
+        case MOD_NONE:
             return false;
         }
         return true;
     }
 
     inline bool
-    resettimer(const aum_handle& timer, unsigned ms)
+    resettimer(const mod_handle& timer, unsigned ms)
     {
         return resettimer(timer.id_, ms);
     }
 
     inline bool
-    canceltimer(aum_id tid)
+    canceltimer(mod_id tid)
     {
-        switch (aum_canceltimer(tid)) {
-        case AUM_ERROR:
-            throw error(aum_error());
-        case AUM_NONE:
+        switch (mod_canceltimer(tid)) {
+        case MOD_ERROR:
+            throw error(mod_error());
+        case MOD_NONE:
             return false;
         }
         return true;
     }
 
     inline bool
-    canceltimer(const aum_handle& timer, unsigned ms)
+    canceltimer(const mod_handle& timer, unsigned ms)
     {
         return resettimer(timer.id_, ms);
     }
 
     inline void
-    setsslclient(aum_id cid, const char* ctx)
+    setsslclient(mod_id cid, const char* ctx)
     {
-        if (AUM_ERROR == aum_setsslclient(cid, ctx))
-            throw error(aum_error());
+        if (MOD_ERROR == mod_setsslclient(cid, ctx))
+            throw error(mod_error());
     }
 
     inline void
-    setsslclient(const aum_handle& conn, const char* ctx)
+    setsslclient(const mod_handle& conn, const char* ctx)
     {
         setsslclient(conn.id_, ctx);
     }
 
     inline void
-    setsslserver(aum_id cid, const char* ctx)
+    setsslserver(mod_id cid, const char* ctx)
     {
-        if (AUM_ERROR == aum_setsslserver(cid, ctx))
-            throw error(aum_error());
+        if (MOD_ERROR == mod_setsslserver(cid, ctx))
+            throw error(mod_error());
     }
 
     inline void
-    setsslserver(const aum_handle& conn, const char* ctx)
+    setsslserver(const mod_handle& conn, const char* ctx)
     {
         setsslserver(conn.id_, ctx);
     }
 
     class handle {
-        const aum_handle& handle_;
+        const mod_handle& handle_;
     public:
         explicit
-        handle(const aum_handle& handle)
+        handle(const mod_handle& handle)
             : handle_(handle)
         {
         }
         void
         setuser(void* user)
         {
-            const_cast<aum_handle&>(handle_).user_ = user;
+            const_cast<mod_handle&>(handle_).user_ = user;
         }
-        aum_id
+        mod_id
         id() const
         {
             return handle_.id_;
@@ -297,7 +298,7 @@ namespace aum {
         {
             return static_cast<T*>(handle_.user_);
         }
-        operator const aum_handle&() const
+        operator const mod_handle&() const
         {
             return handle_;
         }
@@ -312,7 +313,7 @@ namespace aum {
 
         virtual void
         do_event(const char* from, const char* type,
-                 struct aub_object_* ob) = 0;
+                 struct aug_object_* ob) = 0;
 
         virtual void
         do_closed(const handle& sock) = 0;
@@ -344,7 +345,7 @@ namespace aum {
 
     public:
         virtual
-        ~session_base() AUM_NOTHROW
+        ~session_base() MOD_NOTHROW
         {
         }
         bool
@@ -358,7 +359,7 @@ namespace aum {
             do_reconf();
         }
         void
-        event(const char* from, const char* type, struct aub_object_* ob)
+        event(const char* from, const char* type, struct aug_object_* ob)
         {
             do_event(from, type, ob);
         }
@@ -415,7 +416,7 @@ namespace aum {
         {
         }
         void
-        do_event(const char* from, const char* type, struct aub_object_* ob)
+        do_event(const char* from, const char* type, struct aug_object_* ob)
         {
         }
         void
@@ -425,7 +426,7 @@ namespace aum {
         void
         do_teardown(const handle& sock)
         {
-            aum_writelog(AUM_LOGINFO, "teardown defaulting to shutdown");
+            mod_writelog(MOD_LOGINFO, "teardown defaulting to shutdown");
             shutdown(sock, 0);
         }
         bool
@@ -461,7 +462,7 @@ namespace aum {
         }
     public:
         virtual
-        ~basic_session() AUM_NOTHROW
+        ~basic_session() MOD_NOTHROW
         {
         }
     };
@@ -489,13 +490,13 @@ namespace aum {
         explicit
         basic_factory(const char* module)
         {
-            aum_writelog(AUM_LOGINFO, "creating factory: module=[%s]",
+            mod_writelog(MOD_LOGINFO, "creating factory: module=[%s]",
                          module);
         }
         session_base*
         create(const char* sname)
         {
-            aum_writelog(AUM_LOGINFO, "creating session: name=[%s]",
+            mod_writelog(MOD_LOGINFO, "creating session: name=[%s]",
                          sname);
             return listT::create(sname);
         }
@@ -512,115 +513,115 @@ namespace aum {
         static int
         result(bool x)
         {
-            return x ? AUM_OK : AUM_ERROR;
+            return x ? MOD_OK : MOD_ERROR;
         }
         static void
-        stop() AUM_NOTHROW
+        stop() MOD_NOTHROW
         {
             delete getbase();
         }
         static int
-        start(aum_session* session) AUM_NOTHROW
+        start(mod_session* session) MOD_NOTHROW
         {
             try {
                 session->user_ = factory_->create(session->name_);
                 return result(getbase()->start(session->name_));
-            } AUM_WRITELOGCATCH;
-            return AUM_ERROR;
+            } MOD_WRITELOGCATCH;
+            return MOD_ERROR;
         }
         static void
-        reconf() AUM_NOTHROW
+        reconf() MOD_NOTHROW
         {
             try {
                 getbase()->reconf();
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
         }
         static void
         event(const char* from, const char* type,
-              struct aub_object_* ob) AUM_NOTHROW
+              struct aug_object_* ob) MOD_NOTHROW
         {
             try {
                 getbase()->event(from, type, ob);
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
         }
         static void
-        closed(const aum_handle* sock) AUM_NOTHROW
+        closed(const mod_handle* sock) MOD_NOTHROW
         {
             try {
                 getbase()->closed(handle(*sock));
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
         }
         static void
-        teardown(const aum_handle* sock) AUM_NOTHROW
+        teardown(const mod_handle* sock) MOD_NOTHROW
         {
             try {
                 getbase()->teardown(handle(*sock));
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
         }
         static int
-        accepted(aum_handle* sock, const char* addr,
-                 unsigned short port) AUM_NOTHROW
+        accepted(mod_handle* sock, const char* addr,
+                 unsigned short port) MOD_NOTHROW
         {
             try {
                 handle h(*sock);
                 return result(getbase()->accepted(h, addr, port));
-            } AUM_WRITELOGCATCH;
-            return AUM_ERROR;
+            } MOD_WRITELOGCATCH;
+            return MOD_ERROR;
         }
         static void
-        connected(aum_handle* sock, const char* addr,
-                  unsigned short port) AUM_NOTHROW
+        connected(mod_handle* sock, const char* addr,
+                  unsigned short port) MOD_NOTHROW
         {
             try {
                 handle h(*sock);
                 getbase()->connected(h, addr, port);
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
         }
         static void
-        data(const aum_handle* sock, const void* buf,
-             size_t size) AUM_NOTHROW
+        data(const mod_handle* sock, const void* buf,
+             size_t size) MOD_NOTHROW
         {
             try {
                 getbase()->data(handle(*sock), buf, size);
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
         }
         static void
-        rdexpire(const aum_handle* sock, unsigned* ms) AUM_NOTHROW
+        rdexpire(const mod_handle* sock, unsigned* ms) MOD_NOTHROW
         {
             try {
                 getbase()->rdexpire(handle(*sock), *ms);
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
         }
         static void
-        wrexpire(const aum_handle* sock, unsigned* ms) AUM_NOTHROW
+        wrexpire(const mod_handle* sock, unsigned* ms) MOD_NOTHROW
         {
             try {
                 getbase()->wrexpire(handle(*sock), *ms);
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
         }
         static void
-        expire(const aum_handle* timer, unsigned* ms) AUM_NOTHROW
+        expire(const mod_handle* timer, unsigned* ms) MOD_NOTHROW
         {
             try {
                 getbase()->expire(handle(*timer), *ms);
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
         }
         static int
-        authcert(const aum_handle* sock, const char* subject,
+        authcert(const mod_handle* sock, const char* subject,
                  const char* issuer)
         {
             try {
                 handle h(*sock);
                 return result(getbase()->authcert(h, subject, issuer));
-            } AUM_WRITELOGCATCH;
-            return AUM_ERROR;
+            } MOD_WRITELOGCATCH;
+            return MOD_ERROR;
         }
 
     public:
-        static const aum_module*
-        init(const char* name) AUM_NOTHROW
+        static const mod_module*
+        init(const char* name) MOD_NOTHROW
         {
-            static const aum_module local = {
+            static const mod_module local = {
                 stop,
                 start,
                 reconf,
@@ -638,11 +639,11 @@ namespace aum {
             try {
                 factory_ = new T(name);
                 return &local;
-            } AUM_WRITELOGCATCH;
+            } MOD_WRITELOGCATCH;
             return 0; // Error.
         }
         static void
-        term() AUM_NOTHROW
+        term() MOD_NOTHROW
         {
             delete factory_;
             factory_ = 0;
@@ -1001,6 +1002,6 @@ namespace aum {
         getvalue(pairs, key, value);
         return value;
     }
-}
+}}
 
 #endif // AUGPP_HPP

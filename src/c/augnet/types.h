@@ -6,13 +6,13 @@
 
 #include "augsys/types.h"
 
-#include "aub.h"
+#include "augabi.h"
 
 struct aug_files;
 struct aug_nbtype;
 
 typedef struct aug_nbfiles_* aug_nbfiles_t;
-typedef int (*aug_nbfilecb_t)(aub_object*, int, unsigned short);
+typedef int (*aug_nbfilecb_t)(aug_object*, int, unsigned short);
 
 struct aug_nbfile {
     aug_nbfiles_t nbfiles_;

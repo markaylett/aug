@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUM_BUILD
-#include "aumpp.hpp"
+#define MOD_BUILD
+#include "augmodpp.hpp"
 
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"
@@ -11,9 +11,8 @@
 #include <map>
 #include <sstream>
 
-using namespace aub;
 using namespace aug;
-using namespace aum;
+using namespace mod;
 using namespace std;
 
 namespace {
@@ -21,11 +20,11 @@ namespace {
     enum tmtz { TMLOCAL, TMUTC };
 
     struct tmevent {
-        const aum_id id_;
+        const mod_id id_;
         const string name_, spec_;
         const tmtz tz_;
         aug_tmspec tmspec_;
-        tmevent(aum_id id, const string& name, const string& spec, tmtz tz)
+        tmevent(mod_id id, const string& name, const string& spec, tmtz tz)
             : id_(id),
               name_(name),
               spec_(spec),
@@ -79,7 +78,7 @@ namespace {
     pushevent(tmqueue& q, time_t now, const string& name, tmtz tz)
     {
         const char* tmspecs
-            (aum::getenv(string("session.sched.event.").append(name)
+            (mod::getenv(string("session.sched.event.").append(name)
                           .append(TMUTC == tz ? ".utc" : ".local")
                           .c_str()));
         if (!tmspecs)
@@ -98,7 +97,7 @@ namespace {
     void
     pushevents(tmqueue& q, time_t now)
     {
-        const char* events(aum::getenv("session.sched.events"));
+        const char* events(mod::getenv("session.sched.events"));
         if (!events)
             return;
 
@@ -111,7 +110,7 @@ namespace {
     }
 
     void
-    eraseevent(tmqueue& q, aum_id id)
+    eraseevent(tmqueue& q, mod_id id)
     {
         tmqueue::iterator it(q.begin()), end(q.end());
         for (; it != end; ++it)
@@ -156,7 +155,7 @@ namespace {
     }
 
     struct sched : basic_session {
-        aum_id timer_;
+        mod_id timer_;
         tmqueue queue_;
         void
         checkexpired(const timeval& tv)
@@ -167,7 +166,7 @@ namespace {
 
                 tmeventptr ptr(queue_.begin()->second);
                 queue_.erase(queue_.begin());
-                aum_post("schedclient", ptr->name_.c_str(), 0);
+                mod_post("schedclient", ptr->name_.c_str(), 0);
                 pushevent(queue_, now, ptr);
             }
         }
@@ -181,7 +180,7 @@ namespace {
                 if (-1 != timer_)
                     resettimer(timer_, ms);
                 else
-                    timer_ = aum::settimer(ms, 0);
+                    timer_ = mod::settimer(ms, 0);
                 aug_info("next expiry in %d ms", ms);
             } else if (-1 != timer_) {
                 canceltimer(timer_);
@@ -191,7 +190,7 @@ namespace {
         void
         delevent(const map<string, string>& params)
         {
-            aum_id id(getvalue<aum_id>(params, "id"));
+            mod_id id(getvalue<mod_id>(params, "id"));
 
             aug_info("deleting event: id=[%d]", (int)id);
             eraseevent(queue_, id);
@@ -203,7 +202,7 @@ namespace {
         void
         putevent(const map<string, string>& params)
         {
-            aum_id id(getvalue<aum_id>(params, "id"));
+            mod_id id(getvalue<mod_id>(params, "id"));
 
             if (id) {
                 aug_info("updating event: id=[%d]", id);
@@ -271,7 +270,7 @@ namespace {
             settimer(tv);
         }
         void
-        do_event(const char* from, const char* type, struct aub_object_* ob)
+        do_event(const char* from, const char* type, struct aug_object_* ob)
         {
             aug_info("event [%s] triggered", type);
 
@@ -297,7 +296,7 @@ namespace {
             map<string, string>::const_iterator jt(fields.begin()),
                 end(fields.end());
             for (; jt != end; ++jt)
-                writelog(AUM_LOGINFO, "%s=%s", jt->first.c_str(),
+                writelog(MOD_LOGINFO, "%s=%s", jt->first.c_str(),
                          jt->second.c_str());
 
             respond(from, type, fields["content"]);
@@ -330,4 +329,4 @@ namespace {
     typedef basic_module<basic_factory<sched> > module;
 }
 
-AUM_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term)

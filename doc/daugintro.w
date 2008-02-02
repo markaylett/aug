@@ -20,7 +20,7 @@
 
 @s std int @s string int
 
-@s aum int
+@s mod int
 @s basic_factory int
 @s basic_module int
 @s basic_session int
@@ -131,15 +131,15 @@ namespace {@/
 }@/
 @<declare export table@>
 
-@ The \.{<aumpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
+@ The \.{<augmodpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
 implementations.  Modules can also be written in standard \CEE/.  A \CEE/
-implementation would use the \.{<aum.h>} header, instead.  For convenience,
-names are imported from the |aum| and |std| namespaces.
+implementation would use the \.{<augmod.h>} header, instead.  For convenience,
+names are imported from the |mod| and |std| namespaces.
 
 @<include...@>=
-#define AUM_BUILD
-#include <aumpp.hpp>@/
-using namespace aum;@/
+#define MOD_BUILD
+#include <modpp.hpp>@/
+using namespace mod;@/
 using namespace std;
 
 @ Session types (|echo| in this example) are fed into a class template which
@@ -150,12 +150,12 @@ creating |echo| sessions.
 
 \yskip\noindent
 \DAUG/ Modules are required to export two library functions, namely,
-|aum_init()| and |aum_term()|.  The |AUM_ENTRYPOINTS| macro assists with the
+|mod_init()| and |mod_term()|.  The |MOD_ENTRYPOINTS| macro assists with the
 definition of these two export functions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echo> > module;@/
-AUM_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term)
 
 @ The |echoline| functor handles each line received from the client.
 \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
@@ -197,8 +197,8 @@ deactivated.
 bool
 echo::do_start(const char* sname)
 {
-  writelog(AUM_LOGINFO, "starting session [%s]", sname);
-  const char* serv = aum::getenv("session.echo.serv");
+  writelog(MOD_LOGINFO, "starting session [%s]", sname);
+  const char* serv = mod::getenv("session.echo.serv");
   if (!serv)
     return false;
   tcplisten("0.0.0.0", serv);
@@ -219,7 +219,7 @@ echo::do_accepted(handle& sock, const char* addr, unsigned short port)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
-  setrwtimer(sock, 15000, AUM_TIMRD);
+  setrwtimer(sock, 15000, MOD_TIMRD);
   return true;
 }
 

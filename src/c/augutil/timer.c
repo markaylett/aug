@@ -24,7 +24,7 @@ struct aug_timer_ {
     unsigned ms_;
     struct timeval tv_;
     aug_timercb_t cb_;
-    aub_object* ob_;
+    aug_object* ob_;
 };
 
 static struct aug_timers free_ = AUG_HEAD_INITIALIZER(free_);
@@ -69,7 +69,7 @@ aug_destroytimers(struct aug_timers* timers)
     struct aug_timer_* it;
     AUG_FOREACH(it, timers)
         if (it->ob_) {
-            aub_release(it->ob_);
+            aug_release(it->ob_);
             it->ob_ = NULL;
         }
 
@@ -84,7 +84,7 @@ aug_destroytimers(struct aug_timers* timers)
 
 AUGUTIL_API int
 aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, aub_object* ob)
+             aug_timercb_t cb, aug_object* ob)
 {
     struct timeval tv;
     struct aug_timer_* timer;
@@ -110,7 +110,7 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
     timer->tv_.tv_usec = tv.tv_usec;
     timer->cb_ = cb;
     if ((timer->ob_ = ob))
-        aub_retain(ob);
+        aug_retain(ob);
     insert_(timers, timer);
     return id;
 }
@@ -132,7 +132,7 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
             if (-1 == expiry_(&it->tv_, it->ms_)) {
 
                 if (it->ob_) {
-                    aub_release(it->ob_);
+                    aug_release(it->ob_);
                     it->ob_ = NULL;
                 }
                 aug_lock();
@@ -163,7 +163,7 @@ aug_canceltimer(struct aug_timers* timers, int id)
             AUG_REMOVE_PREVPTR(it, prev, timers);
 
             if (it->ob_) {
-                aub_release(it->ob_);
+                aug_release(it->ob_);
                 it->ob_ = NULL;
             }
             aug_lock();
@@ -229,7 +229,7 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
                 /* A zero ms value cancels the timer. */
 
                 if (it->ob_) {
-                    aub_release(it->ob_);
+                    aug_release(it->ob_);
                     it->ob_ = NULL;
                 }
                 aug_lock();

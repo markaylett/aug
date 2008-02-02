@@ -29,12 +29,12 @@ namespace aug {
             {
                 blob_.reset(this);
             }
-            aub::smartob<aub_object>
+            aug::smartob<aug_object>
             cast_(const char* id) AUG_NOTHROW
             {
-                if (aub::equalid<aub_object>(id)
-                    || aub::equalid<aug_blob>(id))
-                    return aub::object_retain<aub_object>(blob_);
+                if (aug::equalid<aug_object>(id)
+                    || aug::equalid<aug_blob>(id))
+                    return aug::object_retain<aug_object>(blob_);
                 return null;
             }
             int

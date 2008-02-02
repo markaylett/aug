@@ -13,7 +13,7 @@ AUG_RCSID("$Id$");
 #include "augsys/uio.h"
 #include "augutil/list.h"
 
-#include "aub.h"
+#include "augabi.h"
 
 #if !defined(_WIN32)
 # if HAVE_ALLOCA_H
@@ -56,7 +56,7 @@ createbuf_(aug_blob* blob)
     aug_unlock();
 
     buf->blob_ = blob;
-    aub_retain(blob);
+    aug_retain(blob);
     return buf;
 }
 
@@ -65,7 +65,7 @@ destroybufs_(struct aug_bufs* bufs)
 {
     struct aug_buf* it;
     AUG_FOREACH(it, bufs) {
-        aub_release(it->blob_);
+        aug_release(it->blob_);
         it->blob_ = NULL;
     }
 
@@ -79,7 +79,7 @@ destroybufs_(struct aug_bufs* bufs)
 static void
 destroybuf_(struct aug_buf* buf)
 {
-    aub_release(buf->blob_);
+    aug_release(buf->blob_);
     buf->blob_ = NULL;
 
     aug_lock();
@@ -127,7 +127,7 @@ aug_destroywriter(aug_writer_t writer)
 {
     struct aug_buf* it;
     AUG_FOREACH(it, &writer->bufs_) {
-        aub_release(it->blob_);
+        aug_release(it->blob_);
         it->blob_ = NULL;
     }
 

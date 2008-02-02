@@ -4,7 +4,7 @@
 #ifndef AUGRB_OBJECT_H
 #define AUGRB_OBJECT_H
 
-#include "aum.h"
+#include "augmod.h"
 #include "augob/blob.h"
 
 #if !defined(_WIN32)
@@ -22,10 +22,10 @@ rb_w32_getcwd(char* buffer, int size);
 
 #include <ruby.h>
 
-AUB_INTERFACE(augrb_blob);
+AUG_INTERFACE(augrb_blob);
 
 struct augrb_blobvtbl {
-    AUB_VTBL(augrb_blob);
+    AUG_VTBL(augrb_blob);
     VALUE (*get_)(augrb_blob*);
 };
 
@@ -33,6 +33,6 @@ aug_blob*
 augrb_createblob(VALUE rbobj);
 
 VALUE
-augrb_getblob(aub_object* ob);
+augrb_getblob(aug_object* ob);
 
 #endif /* AUGRB_OBJECT_H */

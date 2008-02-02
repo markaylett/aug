@@ -9,7 +9,7 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
 
-#include "aubpp.hpp"
+#include "augabipp.hpp"
 
 #include "augutil/event.h"
 
@@ -17,13 +17,13 @@
 
 namespace aug {
 
-    inline std::pair<int, aub::smartob<aub_object> >
+    inline std::pair<int, aug::smartob<aug_object> >
     readevent(fdref ref)
     {
         aug_event event;
         verify(aug_readevent(ref.get(), &event));
         return std::make_pair(event.type_,
-                              aub::object_attach(aub::obptr(event.ob_)));
+                              aug::object_attach(aug::obptr(event.ob_)));
     }
 
     inline const aug_event&
@@ -33,7 +33,7 @@ namespace aug {
     }
 
     inline void
-    writeevent(fdref ref, int type, aub::obref<aub_object> ob)
+    writeevent(fdref ref, int type, aug::obref<aug_object> ob)
     {
         aug_event event = { type, ob.get() };
         writeevent(ref, event);

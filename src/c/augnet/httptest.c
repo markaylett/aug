@@ -17,34 +17,34 @@ static const char TEST_[] =
 "Connection: Keep-Alive\r\n\r\n";
 
 static int
-setinitial_(aub_object* ob, const char* value)
+setinitial_(aug_object* ob, const char* value)
 {
     aug_info("initial: %s", value);
     return 0;
 }
 
 static int
-setfield_(aub_object* ob, const char* name, const char* value)
+setfield_(aug_object* ob, const char* name, const char* value)
 {
     aug_info("field: %s=%s", name, value);
     return 0;
 }
 
 static int
-setcsize_(aub_object* ob, unsigned size)
+setcsize_(aug_object* ob, unsigned size)
 {
     aug_info("size: %d", (int)size);
     return 0;
 }
 
 static int
-cdata_(aub_object* ob, const void* buf, unsigned len)
+cdata_(aug_object* ob, const void* buf, unsigned len)
 {
     return 0;
 }
 
 static int
-end_(aub_object* ob, int commit)
+end_(aug_object* ob, int commit)
 {
     return 0;
 }

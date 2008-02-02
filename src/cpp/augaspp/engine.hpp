@@ -8,7 +8,7 @@
 
 #include "augnetpp/nbfile.hpp"
 
-#include "aum.h"
+#include "augmod.h"
 
 namespace aug {
 
@@ -72,54 +72,54 @@ namespace aug {
 
         void
         post(const char* sname, const char* to, const char* type,
-             aub::objectref ob);
+             aug::objectref ob);
 
         // Thread-unsafe host interface.
 
         void
         dispatch(const char* sname, const char* to, const char* type,
-                 aub::objectref ob);
+                 aug::objectref ob);
 
         void
-        shutdown(aum_id cid, unsigned flags);
+        shutdown(mod_id cid, unsigned flags);
 
-        aum_id
+        mod_id
         tcpconnect(const char* sname, const char* host, const char* port,
                    void* user);
 
-        aum_id
+        mod_id
         tcplisten(const char* sname, const char* host, const char* port,
                   void* user);
 
         void
-        send(aum_id cid, const void* buf, size_t len);
+        send(mod_id cid, const void* buf, size_t len);
 
         void
-        sendv(aum_id cid, blobref ref);
+        sendv(mod_id cid, blobref ref);
 
         void
-        setrwtimer(aum_id cid, unsigned ms, unsigned flags);
+        setrwtimer(mod_id cid, unsigned ms, unsigned flags);
 
         bool
-        resetrwtimer(aum_id cid, unsigned ms, unsigned flags);
+        resetrwtimer(mod_id cid, unsigned ms, unsigned flags);
 
         bool
-        cancelrwtimer(aum_id cid, unsigned flags);
+        cancelrwtimer(mod_id cid, unsigned flags);
 
-        aum_id
-        settimer(const char* sname, unsigned ms, aub::objectref ob);
-
-        bool
-        resettimer(aum_id tid, unsigned ms);
+        mod_id
+        settimer(const char* sname, unsigned ms, aug::objectref ob);
 
         bool
-        canceltimer(aum_id tid);
+        resettimer(mod_id tid, unsigned ms);
+
+        bool
+        canceltimer(mod_id tid);
 
         void
-        setsslclient(aum_id cid, sslctx& ctx);
+        setsslclient(mod_id cid, sslctx& ctx);
 
         void
-        setsslserver(aum_id cid, sslctx& ctx);
+        setsslserver(mod_id cid, sslctx& ctx);
 
         bool
         stopping() const;

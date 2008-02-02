@@ -13,13 +13,13 @@ namespace daug {
     class session : public aug::session_base {
 
         moduleptr module_;
-        aum_session session_;
+        mod_session session_;
         bool active_;
 
-        aum_session&
+        mod_session&
         do_get() AUG_NOTHROW;
 
-        const aum_session&
+        const mod_session&
         do_get() const AUG_NOTHROW;
 
         bool
@@ -33,39 +33,39 @@ namespace daug {
 
         void
         do_event(const char* from, const char* type,
-                 aub::objectref ob) const AUG_NOTHROW;
+                 aug::objectref ob) const AUG_NOTHROW;
 
         void
-        do_closed(const aum_handle& sock) const AUG_NOTHROW;
+        do_closed(const mod_handle& sock) const AUG_NOTHROW;
 
         void
-        do_teardown(const aum_handle& sock) const AUG_NOTHROW;
+        do_teardown(const mod_handle& sock) const AUG_NOTHROW;
 
         bool
-        do_accepted(aum_handle& sock, const char* addr,
+        do_accepted(mod_handle& sock, const char* addr,
                     unsigned short port) const AUG_NOTHROW;
 
         void
-        do_connected(aum_handle& sock, const char* addr,
+        do_connected(mod_handle& sock, const char* addr,
                      unsigned short port) const AUG_NOTHROW;
 
         void
-        do_data(const aum_handle& sock, const char* buf,
+        do_data(const mod_handle& sock, const char* buf,
                 size_t size) const AUG_NOTHROW;
 
         void
-        do_rdexpire(const aum_handle& sock,
+        do_rdexpire(const mod_handle& sock,
                     unsigned& ms) const AUG_NOTHROW;
 
         void
-        do_wrexpire(const aum_handle& sock,
+        do_wrexpire(const mod_handle& sock,
                     unsigned& ms) const AUG_NOTHROW;
 
         void
-        do_expire(const aum_handle& timer, unsigned& ms) const AUG_NOTHROW;
+        do_expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW;
 
         bool
-        do_authcert(const aum_handle& sock, const char* subject,
+        do_authcert(const mod_handle& sock, const char* subject,
                     const char* issuer) const AUG_NOTHROW;
 
     public:
@@ -74,7 +74,7 @@ namespace daug {
         session(const moduleptr& module, const char* name);
     };
 
-    const aum_session*
+    const mod_session*
     getsession();
 }
 

@@ -6,7 +6,7 @@
 
 #include "augsyspp/config.hpp"
 
-#include "null.hpp"
+#include "augnullpp.hpp"
 
 namespace aug {
 

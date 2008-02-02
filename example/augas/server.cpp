@@ -1,12 +1,14 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUM_BUILD
-#include "aumpp.hpp"
+#define MOD_BUILD
+#include "augmodpp.hpp"
 
 #include <map>
 
-using namespace aum;
+namespace mod = aug::mod;
+
+using namespace mod;
 using namespace std;
 
 namespace {
@@ -33,8 +35,8 @@ namespace {
         bool
         do_start(const char* sname)
         {
-            writelog(AUM_LOGINFO, "starting...");
-            const char* serv = aum::getenv("session.echo.serv");
+            writelog(MOD_LOGINFO, "starting...");
+            const char* serv = mod::getenv("session.echo.serv");
             if (!serv)
                 return false;
 
@@ -49,13 +51,13 @@ namespace {
         bool
         do_accepted(handle& sock, const char* addr, unsigned short port)
         {
-            const char* sslctx = aum::getenv("session.echo.sslcontext", 0);
+            const char* sslctx = mod::getenv("session.echo.sslcontext", 0);
             if (sslctx) {
-                writelog(AUM_LOGINFO, "sslcontext: %s", sslctx);
+                writelog(MOD_LOGINFO, "sslcontext: %s", sslctx);
                 setsslserver(sock, sslctx);
             }
             sock.setuser(new string());
-            setrwtimer(sock, 15000, AUM_TIMRD);
+            setrwtimer(sock, 15000, MOD_TIMRD);
             return true;
         }
         void
@@ -67,7 +69,7 @@ namespace {
                          static_cast<const char*>(buf) + len, tok, '\n',
                          eachline(sock));
             } catch (...) {
-                aum_writelog(AUM_LOGINFO, "shutting now...");
+                mod_writelog(MOD_LOGINFO, "shutting now...");
                 shutdown(sock, 1);
                 throw;
             }
@@ -75,14 +77,14 @@ namespace {
         void
         do_rdexpire(const handle& sock, unsigned& ms)
         {
-            writelog(AUM_LOGINFO, "no data received for 15 seconds");
+            writelog(MOD_LOGINFO, "no data received for 15 seconds");
             shutdown(sock, 0);
         }
         bool
         do_authcert(const handle& sock, const char* subject,
                     const char* issuer)
         {
-            aum_writelog(AUM_LOGINFO, "checking subject...");
+            mod_writelog(MOD_LOGINFO, "checking subject...");
             return true;
         }
         static session_base*
@@ -95,4 +97,4 @@ namespace {
     typedef basic_module<basic_factory<echo> > module;
 }
 
-AUM_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term)

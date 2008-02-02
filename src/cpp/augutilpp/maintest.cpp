@@ -9,7 +9,7 @@
 #include <iostream>
 #include <stdexcept>
 
-using namespace aub;
+using namespace aug;
 using namespace aug;
 using namespace std;
 

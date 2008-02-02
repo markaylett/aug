@@ -20,6 +20,6 @@ main(int argc, char* argv[])
     field.size_ = 2;
     aug_setfield(mar, &field, NULL);
 
-    aub_releasemar(mar);
+    aug_releasemar(mar);
     return 0;
 }

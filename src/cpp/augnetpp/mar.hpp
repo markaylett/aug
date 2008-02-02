@@ -26,7 +26,7 @@ namespace aug {
         }
     public:
         static aug_mar_t
-        create(aub_object* ob, const char* initial)
+        create(aug_object* ob, const char* initial)
         {
             return aug_createmar();
         }
@@ -51,7 +51,7 @@ namespace aug {
         class marstatic {
 
             static aug_mar_t
-            create(aub_object* ob, const char* initial)
+            create(aug_object* ob, const char* initial)
             {
                 try {
                     return T::create(ob, initial);
@@ -60,7 +60,7 @@ namespace aug {
             }
 
             static int
-            message(aub_object* ob, const char* initial, aug_mar_t mar)
+            message(aug_object* ob, const char* initial, aug_mar_t mar)
             {
                 try {
                     T::message(ob, initial, mar);
@@ -85,7 +85,7 @@ namespace aug {
         class marnonstatic {
 
             static aug_mar_t
-            create(aub_object* ob, const char* initial)
+            create(aug_object* ob, const char* initial)
             {
                 try {
                     return obtoaddr<T*>(ob)->create(initial);
@@ -94,7 +94,7 @@ namespace aug {
             }
 
             static int
-            message(aub_object* ob, const char* initial, aug_mar_t mar)
+            message(aug_object* ob, const char* initial, aug_mar_t mar)
             {
                 try {
                     obtoaddr<T*>(ob)->message(initial, mar);
@@ -147,7 +147,7 @@ namespace aug {
         }
 
         marparser(unsigned size, const aug_marhandler& handler,
-                  aub_object* ob)
+                  aug_object* ob)
         {
             verify(marparser_
                    = aug_createmarparser(size, &handler, ob));
@@ -162,7 +162,7 @@ namespace aug {
         template <typename T>
         marparser(unsigned size, T& x)
         {
-            aub::smartob<aug_addrob> ob(createaddrob(&x, 0));
+            aug::smartob<aug_addrob> ob(createaddrob(&x, 0));
             verify(marparser_ = aug_createmarparser
                    (size, &marnonstatic<T>(), ob.base()));
         }
@@ -170,7 +170,7 @@ namespace aug {
         template <typename T>
         marparser(unsigned size, std::auto_ptr<T>& x)
         {
-            aub::smartob<aug_addrob> ob(createaddrob(x));
+            aug::smartob<aug_addrob> ob(createaddrob(x));
             verify(marparser_ = aug_createmarparser
                    (size, &marnonstatic<T>(), ob.base()));
         }

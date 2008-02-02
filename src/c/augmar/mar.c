@@ -189,7 +189,7 @@ aug_openmar(const char* path, int flags, ...)
 }
 
 AUGMAR_API int
-aub_releasemar(aug_mar_t mar)
+aug_releasemar(aug_mar_t mar)
 {
     if (!mar) {
 
@@ -220,7 +220,7 @@ aub_releasemar(aug_mar_t mar)
 }
 
 AUGMAR_API int
-aub_retainmar(aug_mar_t mar)
+aug_retainmar(aug_mar_t mar)
 {
     if (!mar) {
 

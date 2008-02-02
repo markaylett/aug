@@ -381,10 +381,10 @@ run_(int argc, char* argv[], const char* archivename)
             goto fail;
         }
 
-    return aub_releasemar(mar);
+    return aug_releasemar(mar);
 
  fail:
-    aub_releasemar(mar);
+    aug_releasemar(mar);
     return -1;
 }
 

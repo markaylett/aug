@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef NULL_HPP
-#define NULL_HPP
+#ifndef AUGNULL_HPP
+#define AUGNULL_HPP
 
 const struct null_ { } null = null_();
 
@@ -34,4 +34,4 @@ operator !=(const null_&, const typeT& rhs)
     return !isnull(rhs);
 }
 
-#endif // NULL_HPP
+#endif // AUGNULL_HPP

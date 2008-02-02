@@ -9,12 +9,12 @@ SUBDIRS = \
 	daug
 
 include_HEADERS = \
-	aubpp.hpp \
 	augpp.hpp \
+	augabipp.hpp \
+	augmodpp.hpp \
+	augnullpp.hpp \
 	augsyspp.hpp \
-	augmarpp.hpp  \
+	augmarpp.hpp \
 	augutilpp.hpp \
 	augsrvpp.hpp \
-	augnetpp.hpp \
-	aumpp.hpp \
-	null.hpp
+	augnetpp.hpp

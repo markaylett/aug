@@ -28,7 +28,7 @@ aug_destroynbfiles(aug_nbfiles_t nbfiles);
 
 AUGNET_API int
 aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
-                 aub_object* ob);
+                 aug_object* ob);
 
 /**
  * Can be used to remove a file without closing it.

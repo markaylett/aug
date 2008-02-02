@@ -64,7 +64,7 @@ namespace aug {
     class rwtimer : public rwtimer_base {
 
         sessionptr session_;
-        const aum_handle& sock_;
+        const mod_handle& sock_;
         timer rdtimer_;
         timer wrtimer_;
 
@@ -86,7 +86,7 @@ namespace aug {
     public:
         ~rwtimer() AUG_NOTHROW;
 
-        rwtimer(const sessionptr& session, const aum_handle& sock,
+        rwtimer(const sessionptr& session, const mod_handle& sock,
                 timers& timers);
     };
 }

@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUM_BUILD
+#define MOD_BUILD
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -62,7 +62,7 @@ dorescue_(VALUE unused, VALUE except)
 {
     except_ = 1;
     except = rb_funcall(except, rb_intern("to_s"), 0);
-    aum_writelog(AUM_LOGERROR, "%s", StringValuePtr(except));
+    mod_writelog(MOD_LOGERROR, "%s", StringValuePtr(except));
     return Qnil;
 }
 
@@ -78,7 +78,7 @@ protect_(VALUE (*body)(), VALUE args)
 static VALUE
 dofuncall_(VALUE args)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     return Qnil == args
         ? rb_funcall(session->module_, u_.id_, 0)
         : rb_apply(session->module_, u_.id_, args);
@@ -134,7 +134,7 @@ doloadmodule_(VALUE unused)
     char* lower = alloca(strlen(u_.sname_) + 1);
     lowercpy_(lower, u_.sname_);
 
-    aum_writelog(AUM_LOGINFO, "require '%s'", lower);
+    mod_writelog(MOD_LOGINFO, "require '%s'", lower);
 
     rb_require(lower);
     return rb_const_get(rb_cObject, rb_intern(u_.sname_));
@@ -320,15 +320,15 @@ createsession_(const char* sname)
 static VALUE
 writelog_(VALUE self, VALUE level, VALUE msg)
 {
-    aum_writelog(NUM2INT(level), StringValuePtr(msg));
+    mod_writelog(NUM2INT(level), StringValuePtr(msg));
     return Qnil;
 }
 
 static VALUE
 reconfall_(VALUE self)
 {
-    if (-1 == aum_reconfall())
-        rb_raise(cerror_, aum_error());
+    if (-1 == mod_reconfall())
+        rb_raise(cerror_, mod_error());
 
     return Qnil;
 }
@@ -336,8 +336,8 @@ reconfall_(VALUE self)
 static VALUE
 stopall_(VALUE self)
 {
-    if (-1 == aum_stopall())
-        rb_raise(cerror_, aum_error());
+    if (-1 == mod_stopall())
+        rb_raise(cerror_, mod_error());
 
     return Qnil;
 }
@@ -358,12 +358,12 @@ post_(int argc, VALUE* argv, VALUE self)
 
     if (user != Qnil)
         blob = augrb_createblob(StringValue(user));
-    ret = aum_post(RSTRING(to)->ptr, RSTRING(type)->ptr, (aub_object*)blob);
+    ret = mod_post(RSTRING(to)->ptr, RSTRING(type)->ptr, (aug_object*)blob);
     if (blob)
-        aub_release(blob);
+        aug_release(blob);
 
     if (-1 == ret)
-        rb_raise(cerror_, aum_error());
+        rb_raise(cerror_, mod_error());
 
     return Qnil;
 }
@@ -382,13 +382,13 @@ dispatch_(int argc, VALUE* argv, VALUE self)
 
     if (user != Qnil)
         blob = augrb_createblob(StringValue(user));
-    ret = aum_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr,
-                        (aub_object*)blob);
+    ret = mod_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr,
+                        (aug_object*)blob);
     if (blob)
-        aub_release(blob);
+        aug_release(blob);
 
     if (-1 == ret)
-        rb_raise(cerror_, aum_error());
+        rb_raise(cerror_, mod_error());
 
     return Qnil;
 }
@@ -403,7 +403,7 @@ getenv_(int argc, VALUE* argv, VALUE self)
 
     Check_Type(name, T_STRING);
 
-    if (!(value = aum_getenv(RSTRING(name)->ptr, NULL)))
+    if (!(value = mod_getenv(RSTRING(name)->ptr, NULL)))
         return def;
 
     return rb_tainted_str_new2(value);
@@ -412,9 +412,9 @@ getenv_(int argc, VALUE* argv, VALUE self)
 static VALUE
 getsession_(VALUE self)
 {
-    const struct aum_session* session;
+    const struct mod_session* session;
 
-    if (!(session = aum_getsession()))
+    if (!(session = mod_getsession()))
         return Qnil;
 
     return rb_str_new2(session->name_);
@@ -425,8 +425,8 @@ shutdown_(VALUE self, VALUE sock, VALUE flags)
 {
     int cid = checkid_(sock);
 
-    if (-1 == aum_shutdown(cid, NUM2UINT(flags)))
-        rb_raise(cerror_, aum_error());
+    if (-1 == mod_shutdown(cid, NUM2UINT(flags)))
+        rb_raise(cerror_, mod_error());
 
     return Qnil;
 }
@@ -447,10 +447,10 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
 
     sock = register_(newhandle_(INT2FIX(0), user));
 
-    if (-1 == (cid = aum_tcpconnect(RSTRING(host)->ptr,
+    if (-1 == (cid = mod_tcpconnect(RSTRING(host)->ptr,
                                      RSTRING(serv)->ptr, sock))) {
         unregister_(sock);
-        rb_raise(cerror_, aum_error());
+        rb_raise(cerror_, mod_error());
     }
 
     rb_iv_set(*sock, "@id", INT2FIX(cid));
@@ -473,10 +473,10 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
 
     sock = register_(newhandle_(INT2FIX(0), user));
 
-    if (-1 == (cid = aum_tcplisten(RSTRING(host)->ptr,
+    if (-1 == (cid = mod_tcplisten(RSTRING(host)->ptr,
                                     RSTRING(serv)->ptr, sock))) {
         unregister_(sock);
-        rb_raise(cerror_, aum_error());
+        rb_raise(cerror_, mod_error());
     }
 
     rb_iv_set(*sock, "@id", INT2FIX(cid));
@@ -490,11 +490,11 @@ send_(VALUE self, VALUE sock, VALUE buf)
     int cid = checkid_(sock), ret;
 
     blob = augrb_createblob(StringValue(buf));
-    ret = aum_sendv(cid, blob);
-    aub_release(blob);
+    ret = mod_sendv(cid, blob);
+    aug_release(blob);
 
     if (-1 == ret)
-        rb_raise(cerror_, aum_error());
+        rb_raise(cerror_, mod_error());
 
     return Qnil;
 }
@@ -504,8 +504,8 @@ setrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 {
     int cid = checkid_(sock);
 
-    if (-1 == aum_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags)))
-        rb_raise(cerror_, aum_error());
+    if (-1 == mod_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags)))
+        rb_raise(cerror_, mod_error());
 
     return Qnil;
 }
@@ -517,10 +517,10 @@ resetrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 
     /* Return false if no such timer. */
 
-    switch (aum_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags))) {
+    switch (mod_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags))) {
     case -1:
-        rb_raise(cerror_, aum_error());
-    case AUM_NONE:
+        rb_raise(cerror_, mod_error());
+    case MOD_NONE:
         return Qfalse;
     }
 
@@ -534,10 +534,10 @@ cancelrwtimer_(VALUE self, VALUE sock, VALUE flags)
 
     /* Return false if no such timer. */
 
-    switch (aum_cancelrwtimer(cid, NUM2UINT(flags))) {
+    switch (mod_cancelrwtimer(cid, NUM2UINT(flags))) {
     case -1:
-        rb_raise(cerror_, aum_error());
-    case AUM_NONE:
+        rb_raise(cerror_, mod_error());
+    case MOD_NONE:
         return Qfalse;
     }
 
@@ -559,11 +559,11 @@ settimer_(int argc, VALUE* argv, VALUE self)
 
     timer = newhandle_(INT2FIX(0), user);
     blob = augrb_createblob(timer);
-    tid = aum_settimer(ui, (aub_object*)blob);
-    aub_release(blob);
+    tid = mod_settimer(ui, (aug_object*)blob);
+    aug_release(blob);
 
     if (-1 == tid)
-        rb_raise(cerror_, aum_error());
+        rb_raise(cerror_, mod_error());
 
     rb_iv_set(timer, "@id", INT2FIX(tid));
     return timer;
@@ -576,10 +576,10 @@ resettimer_(VALUE self, VALUE timer, VALUE ms)
 
     /* Return false if no such timer. */
 
-    switch (aum_resettimer(tid, NUM2UINT(ms))) {
+    switch (mod_resettimer(tid, NUM2UINT(ms))) {
     case -1:
-        rb_raise(cerror_, aum_error());
-    case AUM_NONE:
+        rb_raise(cerror_, mod_error());
+    case MOD_NONE:
         return Qfalse;
     }
 
@@ -593,10 +593,10 @@ canceltimer_(VALUE self, VALUE timer)
 
     /* Return false if no such timer. */
 
-    switch (aum_canceltimer(tid)) {
+    switch (mod_canceltimer(tid)) {
     case -1:
-        rb_raise(cerror_, aum_error());
-    case AUM_NONE:
+        rb_raise(cerror_, mod_error());
+    case MOD_NONE:
         return Qfalse;
     }
 
@@ -610,8 +610,8 @@ setsslclient_(VALUE self, VALUE sock, VALUE ctx)
 
     Check_Type(ctx, T_STRING);
 
-    if (-1 == aum_setsslclient(cid, RSTRING(ctx)->ptr))
-        rb_raise(cerror_, aum_error());
+    if (-1 == mod_setsslclient(cid, RSTRING(ctx)->ptr))
+        rb_raise(cerror_, mod_error());
 
     return Qnil;
 }
@@ -623,8 +623,8 @@ setsslserver_(VALUE self, VALUE sock, VALUE ctx)
 
     Check_Type(ctx, T_STRING);
 
-    if (-1 == aum_setsslserver(cid, RSTRING(ctx)->ptr))
-        rb_raise(cerror_, aum_error());
+    if (-1 == mod_setsslserver(cid, RSTRING(ctx)->ptr))
+        rb_raise(cerror_, mod_error());
 
     return Qnil;
 }
@@ -641,11 +641,11 @@ setpath_(void)
 
     /* Path may be relative to run directory. */
 
-    if ((s = aum_getenv("rundir", NULL)))
+    if ((s = mod_getenv("rundir", NULL)))
         chdir(s);
 
-    s = aum_getenv("module.augrb.rubypath", "ruby");
-    aum_writelog(AUM_LOGDEBUG, "module.augrb.rubypath=[%s]", s);
+    s = mod_getenv("module.augrb.rubypath", "ruby");
+    mod_writelog(MOD_LOGDEBUG, "module.augrb.rubypath=[%s]", s);
     chdir(s);
 
     /* Append current directory. */
@@ -693,22 +693,22 @@ initrb_(VALUE unused)
 
     /* Logger constants. */
 
-    rb_define_const(maugrb_, "LOGCRIT", INT2FIX(AUM_LOGCRIT));
-    rb_define_const(maugrb_, "LOGERROR", INT2FIX(AUM_LOGERROR));
-    rb_define_const(maugrb_, "LOGWARN", INT2FIX(AUM_LOGWARN));
-    rb_define_const(maugrb_, "LOGNOTICE", INT2FIX(AUM_LOGNOTICE));
-    rb_define_const(maugrb_, "LOGINFO", INT2FIX(AUM_LOGINFO));
-    rb_define_const(maugrb_, "LOGDEBUG", INT2FIX(AUM_LOGDEBUG));
+    rb_define_const(maugrb_, "LOGCRIT", INT2FIX(MOD_LOGCRIT));
+    rb_define_const(maugrb_, "LOGERROR", INT2FIX(MOD_LOGERROR));
+    rb_define_const(maugrb_, "LOGWARN", INT2FIX(MOD_LOGWARN));
+    rb_define_const(maugrb_, "LOGNOTICE", INT2FIX(MOD_LOGNOTICE));
+    rb_define_const(maugrb_, "LOGINFO", INT2FIX(MOD_LOGINFO));
+    rb_define_const(maugrb_, "LOGDEBUG", INT2FIX(MOD_LOGDEBUG));
 
     /* Timer constants. */
 
-    rb_define_const(maugrb_, "TIMRD", INT2FIX(AUM_TIMRD));
-    rb_define_const(maugrb_, "TIMWR", INT2FIX(AUM_TIMWR));
-    rb_define_const(maugrb_, "TIMRDWR", INT2FIX(AUM_TIMRDWR));
+    rb_define_const(maugrb_, "TIMRD", INT2FIX(MOD_TIMRD));
+    rb_define_const(maugrb_, "TIMWR", INT2FIX(MOD_TIMWR));
+    rb_define_const(maugrb_, "TIMRDWR", INT2FIX(MOD_TIMRDWR));
 
     /* Shutdown constants. */
 
-    rb_define_const(maugrb_, "SHUTNOW", INT2FIX(AUM_SHUTNOW));
+    rb_define_const(maugrb_, "SHUTNOW", INT2FIX(MOD_SHUTNOW));
 
     /* Object methods. */
 
@@ -751,7 +751,7 @@ initrb_(VALUE unused)
 static void
 stop_(void)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     assert(session);
 
     if (session->open_ && session->stop_)
@@ -761,7 +761,7 @@ stop_(void)
 }
 
 static int
-start_(struct aum_session* session)
+start_(struct mod_session* session)
 {
     struct session_* local;
     if (!(local = createsession_(session->name_)))
@@ -784,7 +784,7 @@ start_(struct aum_session* session)
 static void
 reconf_(void)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     assert(session);
 
     if (session->reconf_)
@@ -792,9 +792,9 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, aub_object* ob)
+event_(const char* from, const char* type, aug_object* ob)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     assert(session);
 
     if (session->event_) {
@@ -808,7 +808,7 @@ event_(const char* from, const char* type, aub_object* ob)
 
                 /* Fallback to aug_blob type. */
 
-                aug_blob* blob = aub_cast(ob, aug_blobid);
+                aug_blob* blob = aug_cast(ob, aug_blobid);
                 if (blob) {
 
                     size_t size;
@@ -819,7 +819,7 @@ event_(const char* from, const char* type, aub_object* ob)
                     if (data)
                         x = rb_tainted_str_new(data, (long)size);
 
-                    aub_release(blob);
+                    aug_release(blob);
                 }
             }
         }
@@ -828,9 +828,9 @@ event_(const char* from, const char* type, aub_object* ob)
 }
 
 static void
-closed_(const struct aum_handle* sock)
+closed_(const struct mod_handle* sock)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     assert(session);
     assert(sock->user_);
 
@@ -841,9 +841,9 @@ closed_(const struct aum_handle* sock)
 }
 
 static void
-teardown_(const struct aum_handle* sock)
+teardown_(const struct mod_handle* sock)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -852,13 +852,13 @@ teardown_(const struct aum_handle* sock)
     if (session->teardown_)
         funcall1_(teardownid_, user);
     else
-        aum_shutdown(sock->id_, 0);
+        mod_shutdown(sock->id_, 0);
 }
 
 static int
-accepted_(struct aum_handle* sock, const char* addr, unsigned short port)
+accepted_(struct mod_handle* sock, const char* addr, unsigned short port)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -880,9 +880,9 @@ accepted_(struct aum_handle* sock, const char* addr, unsigned short port)
 }
 
 static void
-connected_(struct aum_handle* sock, const char* addr, unsigned short port)
+connected_(struct mod_handle* sock, const char* addr, unsigned short port)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -893,9 +893,9 @@ connected_(struct aum_handle* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct aum_handle* sock, const void* buf, size_t len)
+data_(const struct mod_handle* sock, const void* buf, size_t len)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -906,9 +906,9 @@ data_(const struct aum_handle* sock, const void* buf, size_t len)
 }
 
 static void
-rdexpire_(const struct aum_handle* sock, unsigned* ms)
+rdexpire_(const struct mod_handle* sock, unsigned* ms)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -922,9 +922,9 @@ rdexpire_(const struct aum_handle* sock, unsigned* ms)
 }
 
 static void
-wrexpire_(const struct aum_handle* sock, unsigned* ms)
+wrexpire_(const struct mod_handle* sock, unsigned* ms)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -938,13 +938,13 @@ wrexpire_(const struct aum_handle* sock, unsigned* ms)
 }
 
 static void
-expire_(const struct aum_handle* timer, unsigned* ms)
+expire_(const struct mod_handle* timer, unsigned* ms)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(timer->user_);
-    user = augrb_getblob((aub_object*)timer->user_);
+    user = augrb_getblob((aug_object*)timer->user_);
 
     if (session->expire_) {
         VALUE ret = funcall2_(expireid_, user, INT2FIX(*ms));
@@ -954,10 +954,10 @@ expire_(const struct aum_handle* timer, unsigned* ms)
 }
 
 static int
-authcert_(const struct aum_handle* sock, const char* subject,
+authcert_(const struct mod_handle* sock, const char* subject,
           const char* issuer)
 {
-    struct session_* session = aum_getsession()->user_;
+    struct session_* session = mod_getsession()->user_;
     VALUE user;
     assert(session);
     assert(sock->user_);
@@ -973,7 +973,7 @@ authcert_(const struct aum_handle* sock, const char* subject,
     return 0;
 }
 
-static const struct aum_module module_ = {
+static const struct mod_module module_ = {
     stop_,
     start_,
     reconf_,
@@ -989,10 +989,10 @@ static const struct aum_module module_ = {
     authcert_
 };
 
-static const struct aum_module*
+static const struct mod_module*
 init_(const char* name)
 {
-    aum_writelog(AUM_LOGINFO, "initialising augrb module");
+    mod_writelog(MOD_LOGINFO, "initialising augrb module");
     ruby_init();
 
     /* Catch any exceptions. */
@@ -1012,8 +1012,8 @@ init_(const char* name)
 static void
 term_(void)
 {
-    aum_writelog(AUM_LOGINFO, "terminating augrb module");
+    mod_writelog(MOD_LOGINFO, "terminating augrb module");
     ruby_finalize();
 }
 
-AUM_ENTRYPOINTS(init_, term_)
+MOD_ENTRYPOINTS(init_, term_)

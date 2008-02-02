@@ -17,7 +17,7 @@ socks::~socks() AUG_NOTHROW
 }
 
 bool
-socks::send(aum_id cid, const void* buf, size_t len, const timeval& now)
+socks::send(mod_id cid, const void* buf, size_t len, const timeval& now)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (cptr == null || !sendable(*cptr))
@@ -28,7 +28,7 @@ socks::send(aum_id cid, const void* buf, size_t len, const timeval& now)
 }
 
 bool
-socks::sendv(aum_id cid, blobref blob, const timeval& now)
+socks::sendv(mod_id cid, blobref blob, const timeval& now)
 {
     connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
     if (cptr == null || !sendable(*cptr))
@@ -118,7 +118,7 @@ socks::getbyfd(fdref fd) const
 }
 
 sockptr
-socks::getbyid(aum_id id) const
+socks::getbyid(mod_id id) const
 {
     idtofd::const_iterator it(idtofd_.find(id));
     if (it == idtofd_.end())

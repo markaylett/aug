@@ -14,26 +14,26 @@
 
 #include "augsys/types.h"
 
-#include "aub.h"
+#include "augabi.h"
 
 struct aug_httphandler {
-    int (*initial_)(aub_object*, const char*);
-    int (*field_)(aub_object*, const char*, const char*);
-    int (*csize_)(aub_object*, unsigned);
-    int (*cdata_)(aub_object*, const void*, unsigned);
-    int (*end_)(aub_object*, int);
+    int (*initial_)(aug_object*, const char*);
+    int (*field_)(aug_object*, const char*, const char*);
+    int (*csize_)(aug_object*, unsigned);
+    int (*cdata_)(aug_object*, const void*, unsigned);
+    int (*end_)(aug_object*, int);
 };
 
 typedef struct aug_httpparser_* aug_httpparser_t;
 
 /**
- * If aug_createhttpparser() succeeds, aub_release() will be called from
+ * If aug_createhttpparser() succeeds, aug_release() will be called from
  * aug_destroyhttpparser().
  */
 
 AUGNET_API aug_httpparser_t
 aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
-                     aub_object* ob);
+                     aug_object* ob);
 
 AUGNET_API int
 aug_destroyhttpparser(aug_httpparser_t parser);

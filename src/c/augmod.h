@@ -1,11 +1,11 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUM_H
-#define AUM_H
+#ifndef AUGMOD_H
+#define AUGMOD_H
 
 /**
- * @file aum.h
+ * @file augmod.h
  *
  * Application server modules.
  *
@@ -18,34 +18,21 @@
  * @defgroup Module Module
  */
 
-#include <stdarg.h>    /* va_list */
-#include <stdlib.h>    /* NULL */
-#include <sys/types.h> /* size_t */
+#include "augabi.h"
 
-#if !defined(__cplusplus)
-# define AUM_EXTERNC extern
-#else /* __cplusplus */
-# define AUM_EXTERNC extern "C"
-#endif /* __cplusplus */
+#include <stdarg.h> /* va_list */
+#include <stdlib.h> /* NULL */
 
-#if defined(__CYGWIN__) || defined(__MINGW32__)
-# define AUM_EXPORT __attribute__ ((dllexport))
-# define AUM_IMPORT __attribute__ ((dllimport))
-#elif defined(_MSC_VER)
-# define AUM_EXPORT __declspec(dllexport)
-# define AUM_IMPORT __declspec(dllimport)
-#else /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
-# define AUM_EXPORT
-# define AUM_IMPORT
-#endif /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
+#define MOD_EXTERNC AUG_EXTERNC
+#define MOD_EXPORT  AUG_EXPORT
+#define MOD_IMPORT  AUG_IMPORT
 
-#if !defined(AUM_BUILD)
-# define AUM_API AUM_EXTERNC AUM_IMPORT
-#else /* AUM_BUILD */
-# define AUM_API AUM_EXTERNC AUM_EXPORT
-#endif /* AUM_BUILD */
+#if !defined(MOD_BUILD)
+# define MOD_API MOD_EXTERNC MOD_IMPORT
+#else /* MOD_BUILD */
+# define MOD_API MOD_EXTERNC MOD_EXPORT
+#endif /* MOD_BUILD */
 
-struct aub_object_;
 struct aug_blob_;
 
 /**
@@ -56,13 +43,13 @@ struct aug_blob_;
  * @see writelog_(), vwritelog_().
  */
 
-enum aum_loglevel {
-    AUM_LOGCRIT,
-    AUM_LOGERROR,
-    AUM_LOGWARN,
-    AUM_LOGNOTICE,
-    AUM_LOGINFO,
-    AUM_LOGDEBUG
+enum mod_loglevel {
+    MOD_LOGCRIT,
+    MOD_LOGERROR,
+    MOD_LOGWARN,
+    MOD_LOGNOTICE,
+    MOD_LOGINFO,
+    MOD_LOGDEBUG
 };
 
 /**
@@ -77,19 +64,19 @@ enum aum_loglevel {
  * Read timer.
  */
 
-#define AUM_TIMRD    0x01
+#define MOD_TIMRD    0x01
 
 /**
  * Write timer.
  */
 
-#define AUM_TIMWR    0x02
+#define MOD_TIMWR    0x02
 
 /**
  * Both read and write timer.
  */
 
-#define AUM_TIMRDWR (AUM_TIMRD | AUM_TIMWR)
+#define MOD_TIMRDWR (MOD_TIMRD | MOD_TIMWR)
 
 /** @} */
 
@@ -105,7 +92,7 @@ enum aum_loglevel {
  * Force immediate shutdown.
  */
 
-#define AUM_SHUTNOW  0x01
+#define MOD_SHUTNOW  0x01
 
 /** @} */
 
@@ -121,40 +108,40 @@ enum aum_loglevel {
  * Success.
  */
 
-#define AUM_OK      0
+#define MOD_OK      0
 
 /**
  * Failure.
  */
 
-#define AUM_ERROR (-1)
+#define MOD_ERROR (-1)
 
 /**
  * None, empty or null depending on context.
  */
 
-#define AUM_NONE  (-2)
+#define MOD_NONE  (-2)
 
 /** @} */
 
-#define AUM_MAXNAME     63
+#define MOD_MAXNAME     63
 
-typedef int aum_id;
+typedef int mod_id;
 
-struct aum_session {
-    char name_[AUM_MAXNAME + 1];
+struct mod_session {
+    char name_[MOD_MAXNAME + 1];
     void* user_;
 };
 
 /**
  * Both sockets and timers are represented by handles.  For timer handles,
- * #aum_handle::user_ will be of type @ref aub_object.
+ * #mod_handle::user_ will be of type @ref aug_object.
  *
  * @see settimer_()
  */
 
-struct aum_handle {
-    aum_id id_;
+struct mod_handle {
+    mod_id id_;
     void* user_;
 };
 
@@ -166,7 +153,7 @@ struct aum_handle {
  * @{
  */
 
-struct aum_host {
+struct mod_host {
 
     /**
      * The following functions are thread-safe.
@@ -181,7 +168,7 @@ struct aum_host {
      *
      * @param ... Arguments to format specification.
      *
-     * @see #aum_loglevel, vwritelog_().
+     * @see #mod_loglevel, vwritelog_().
      */
 
     void (*writelog_)(int level, const char* format, ...);
@@ -195,7 +182,7 @@ struct aum_host {
      *
      * @param ... Arguments to format specification.
      *
-     * @see #aum_loglevel, writelog_().
+     * @see #mod_loglevel, writelog_().
      */
 
     void (*vwritelog_)(int level, const char* format, va_list args);
@@ -239,7 +226,7 @@ struct aum_host {
      * @see dispatch_()
      */
 
-    int (*post_)(const char* to, const char* type, struct aub_object_* ob);
+    int (*post_)(const char* to, const char* type, struct aug_object_* ob);
 
     /**
      * The remaining functions are not thread-safe.
@@ -258,7 +245,7 @@ struct aum_host {
      */
 
     int (*dispatch_)(const char* to, const char* type,
-                     struct aub_object_* ob);
+                     struct aug_object_* ob);
 
     /**
      * Read a configuration value.
@@ -279,18 +266,18 @@ struct aum_host {
      * Get the active session.
      */
 
-    const struct aum_session* (*getsession_)(void);
+    const struct mod_session* (*getsession_)(void);
 
     /**
      * Shutdown the connection.
      *
      * @param cid Connection id.
      *
-     * @param flags Use #AUM_SHUTNOW to force immediate closure of the
+     * @param flags Use #MOD_SHUTNOW to force immediate closure of the
      * connection - do not wait for pending writes.
      */
 
-    int (*shutdown_)(aum_id cid, unsigned flags);
+    int (*shutdown_)(mod_id cid, unsigned flags);
 
     /**
      * Establish tcp connection.
@@ -336,7 +323,7 @@ struct aum_host {
      * @param len Length of data buffer.
      */
 
-    int (*send_)(aum_id cid, const void* buf, size_t len);
+    int (*send_)(mod_id cid, const void* buf, size_t len);
 
     /**
      * Send data to peer.
@@ -346,7 +333,7 @@ struct aum_host {
      * @param blob Blob data.
      */
 
-    int (*sendv_)(aum_id cid, struct aug_blob_* blob);
+    int (*sendv_)(mod_id cid, struct aug_blob_* blob);
 
     /**
      * Set read/write timer.
@@ -358,7 +345,7 @@ struct aum_host {
      * @param flags @ref ModuleTimerFlags.
      */
 
-    int (*setrwtimer_)(aum_id cid, unsigned ms, unsigned flags);
+    int (*setrwtimer_)(mod_id cid, unsigned ms, unsigned flags);
 
     /**
      * Reset read/write timer.
@@ -370,7 +357,7 @@ struct aum_host {
      * @param flags @ref ModuleTimerFlags.
      */
 
-    int (*resetrwtimer_)(aum_id cid, unsigned ms, unsigned flags);
+    int (*resetrwtimer_)(mod_id cid, unsigned ms, unsigned flags);
 
     /**
      * Cancel read/write timer.
@@ -380,7 +367,7 @@ struct aum_host {
      * @param flags @ref ModuleTimerFlags.
      */
 
-    int (*cancelrwtimer_)(aum_id cid, unsigned flags);
+    int (*cancelrwtimer_)(mod_id cid, unsigned flags);
 
     /**
      * Create new timer.
@@ -390,7 +377,7 @@ struct aum_host {
      * @param ob Optional object data.
      */
 
-    int (*settimer_)(unsigned ms, struct aub_object_* ob);
+    int (*settimer_)(unsigned ms, struct aug_object_* ob);
 
     /**
      * Reset timer.
@@ -400,7 +387,7 @@ struct aum_host {
      * @param ms Timeout value in milliseconds.
      */
 
-    int (*resettimer_)(aum_id tid, unsigned ms);
+    int (*resettimer_)(mod_id tid, unsigned ms);
 
     /**
      * Cancel timer.
@@ -408,7 +395,7 @@ struct aum_host {
      * @param tid Timer id.
      */
 
-    int (*canceltimer_)(aum_id tid);
+    int (*canceltimer_)(mod_id tid);
 
     /**
      * Set ssl client.
@@ -418,7 +405,7 @@ struct aum_host {
      * @param ctx SSL context.
      */
 
-    int (*setsslclient_)(aum_id cid, const char* ctx);
+    int (*setsslclient_)(mod_id cid, const char* ctx);
 
     /**
      * Set ssl server.
@@ -428,7 +415,7 @@ struct aum_host {
      * @param ctx SSL context.
      */
 
-    int (*setsslserver_)(aum_id cid, const char* ctx);
+    int (*setsslserver_)(mod_id cid, const char* ctx);
 };
 
 /** @} */
@@ -436,22 +423,22 @@ struct aum_host {
 /**
  * @addtogroup Module
  *
- * Module functions of type int should return either #AUM_OK or #AUM_ERROR,
+ * Module functions of type int should return either #MOD_OK or #MOD_ERROR,
  * depending on the result.  For those functions associated with a connection,
  * a failure will result in the connection being closed.
  *
  * @{
  */
 
-struct aum_module {
+struct mod_module {
 
     /**
      * Stop session.
      *
-     * The current session can be retrieved using aum_host::getsession_().
+     * The current session can be retrieved using mod_host::getsession_().
      * All resources associated with the session should be released in this
      * handler.  stop_() will only be called for a session if start_()
-     * returned #AUM_OK.
+     * returned #MOD_OK.
      */
 
     void (*stop_)(void);
@@ -460,18 +447,18 @@ struct aum_module {
      * Start session.
      *
      * User-state associated with the session may be assigned to
-     * #aum_session::user_.
+     * #mod_session::user_.
      *
-     * @return Either #AUM_OK or #AUM_ERROR.
+     * @return Either #MOD_OK or #MOD_ERROR.
      */
 
-    int (*start_)(struct aum_session* session);
+    int (*start_)(struct mod_session* session);
 
     /**
      * Re-configure request.
      *
      * Called in response to a #AUG_EVENTRECONF event, which are raise in
-     * response to either a #SIGHUP, or a call to aum_host::reconfall_().
+     * response to either a #SIGHUP, or a call to mod_host::reconfall_().
      */
 
     void (*reconf_)(void);
@@ -487,7 +474,7 @@ struct aum_module {
      */
 
     void (*event_)(const char* from, const char* type,
-                   struct aub_object_* ob);
+                   struct aug_object_* ob);
 
     /**
      * Connection closure.
@@ -495,7 +482,7 @@ struct aum_module {
      * @param sock The closed socket.
      */
 
-    void (*closed_)(const struct aum_handle* sock);
+    void (*closed_)(const struct mod_handle* sock);
 
     /**
      * Teardown request.
@@ -503,7 +490,7 @@ struct aum_module {
      * @param sock Socket descriptor.
      */
 
-    void (*teardown_)(const struct aum_handle* sock);
+    void (*teardown_)(const struct mod_handle* sock);
 
     /**
      * Acceptance of socket connection.
@@ -517,17 +504,17 @@ struct aum_module {
      *
      * @param port Peer port.
      *
-     * @return Either #AUM_OK or #AUM_ERROR.
+     * @return Either #MOD_OK or #MOD_ERROR.
      */
 
-    int (*accepted_)(struct aum_handle* sock, const char* addr,
+    int (*accepted_)(struct mod_handle* sock, const char* addr,
                      unsigned short port);
 
     /**
      * Completion of client connection handshake.
      *
      * This function is called when a connection, initiated by a call to
-     * aum_host::tcpconnect_(), becomes established.
+     * mod_host::tcpconnect_(), becomes established.
      *
      * @param sock Socket descriptor.
      *
@@ -535,10 +522,10 @@ struct aum_module {
      *
      * @param port Peer port.
      *
-     * @see aum_host::tcpconnect_().
+     * @see mod_host::tcpconnect_().
      */
 
-    void (*connected_)(struct aum_handle* sock, const char* addr,
+    void (*connected_)(struct mod_handle* sock, const char* addr,
                        unsigned short port);
 
     /**
@@ -551,7 +538,7 @@ struct aum_module {
      * @param len Length of data buffer.
      */
 
-    void (*data_)(const struct aum_handle* sock, const void* buf,
+    void (*data_)(const struct mod_handle* sock, const void* buf,
                   size_t len);
 
     /**
@@ -563,7 +550,7 @@ struct aum_module {
      * specify a new value; a value of zero will cancel the timer.
      */
 
-    void (*rdexpire_)(const struct aum_handle* sock, unsigned* ms);
+    void (*rdexpire_)(const struct mod_handle* sock, unsigned* ms);
 
     /**
      * Expiry of write timer.
@@ -574,7 +561,7 @@ struct aum_module {
      * specify a new value; a value of zero will cancel the timer.
      */
 
-    void (*wrexpire_)(const struct aum_handle* sock, unsigned* ms);
+    void (*wrexpire_)(const struct mod_handle* sock, unsigned* ms);
 
     /**
      * Timer expiry.
@@ -585,7 +572,7 @@ struct aum_module {
      * specify a new value; a value of zero will cancel the timer.
      */
 
-    void (*expire_)(const struct aum_handle* timer, unsigned* ms);
+    void (*expire_)(const struct mod_handle* timer, unsigned* ms);
 
     /**
      * Authorisation of peer certificate.
@@ -596,75 +583,75 @@ struct aum_module {
      *
      * @param issuer Certificate issuer.
      *
-     * @return Either #AUM_OK or #AUM_ERROR.
+     * @return Either #MOD_OK or #MOD_ERROR.
      */
 
-    int (*authcert_)(const struct aum_handle* sock, const char* subject,
+    int (*authcert_)(const struct mod_handle* sock, const char* subject,
                      const char* issuer);
 };
 
 /** @} */
 
-AUM_EXTERNC const struct aum_host*
-aum_gethost(void);
+MOD_EXTERNC const struct mod_host*
+mod_gethost(void);
 
 /**
  * Syntactic sugar that allows host functions to be called with a
  * function-like syntax.
  */
 
-#define aum_writelog      (aum_gethost()->writelog_)
-#define aum_vwritelog     (aum_gethost()->vwritelog_)
-#define aum_error         (aum_gethost()->error_)
-#define aum_reconfall     (aum_gethost()->reconfall_)
-#define aum_stopall       (aum_gethost()->stopall_)
-#define aum_post          (aum_gethost()->post_)
-#define aum_dispatch      (aum_gethost()->dispatch_)
-#define aum_getenv        (aum_gethost()->getenv_)
-#define aum_getsession    (aum_gethost()->getsession_)
-#define aum_shutdown      (aum_gethost()->shutdown_)
-#define aum_tcpconnect    (aum_gethost()->tcpconnect_)
-#define aum_tcplisten     (aum_gethost()->tcplisten_)
-#define aum_send          (aum_gethost()->send_)
-#define aum_sendv         (aum_gethost()->sendv_)
-#define aum_setrwtimer    (aum_gethost()->setrwtimer_)
-#define aum_resetrwtimer  (aum_gethost()->resetrwtimer_)
-#define aum_cancelrwtimer (aum_gethost()->cancelrwtimer_)
-#define aum_settimer      (aum_gethost()->settimer_)
-#define aum_resettimer    (aum_gethost()->resettimer_)
-#define aum_canceltimer   (aum_gethost()->canceltimer_)
-#define aum_setsslclient  (aum_gethost()->setsslclient_)
-#define aum_setsslserver  (aum_gethost()->setsslserver_)
+#define mod_writelog      (mod_gethost()->writelog_)
+#define mod_vwritelog     (mod_gethost()->vwritelog_)
+#define mod_error         (mod_gethost()->error_)
+#define mod_reconfall     (mod_gethost()->reconfall_)
+#define mod_stopall       (mod_gethost()->stopall_)
+#define mod_post          (mod_gethost()->post_)
+#define mod_dispatch      (mod_gethost()->dispatch_)
+#define mod_getenv        (mod_gethost()->getenv_)
+#define mod_getsession    (mod_gethost()->getsession_)
+#define mod_shutdown      (mod_gethost()->shutdown_)
+#define mod_tcpconnect    (mod_gethost()->tcpconnect_)
+#define mod_tcplisten     (mod_gethost()->tcplisten_)
+#define mod_send          (mod_gethost()->send_)
+#define mod_sendv         (mod_gethost()->sendv_)
+#define mod_setrwtimer    (mod_gethost()->setrwtimer_)
+#define mod_resetrwtimer  (mod_gethost()->resetrwtimer_)
+#define mod_cancelrwtimer (mod_gethost()->cancelrwtimer_)
+#define mod_settimer      (mod_gethost()->settimer_)
+#define mod_resettimer    (mod_gethost()->resettimer_)
+#define mod_canceltimer   (mod_gethost()->canceltimer_)
+#define mod_setsslclient  (mod_gethost()->setsslclient_)
+#define mod_setsslserver  (mod_gethost()->setsslserver_)
 
 /**
- * This macro defines the module's entry points.  aum_init() should return
+ * This macro defines the module's entry points.  mod_init() should return
  * NULL on failure.
  */
 
-#define AUM_ENTRYPOINTS(init, term)                                 \
-    static const struct aum_host* host_ = NULL;                     \
-    AUM_EXTERNC const struct aum_host*                              \
-    aum_gethost(void)                                               \
+#define MOD_ENTRYPOINTS(init, term)                                 \
+    static const struct mod_host* host_ = NULL;                     \
+    MOD_EXTERNC const struct mod_host*                              \
+    mod_gethost(void)                                               \
     {                                                               \
         return host_;                                               \
     }                                                               \
-    AUM_API const struct aum_module*                                \
-    aum_init(const char* name, const struct aum_host* host)         \
+    MOD_API const struct mod_module*                                \
+    mod_init(const char* name, const struct mod_host* host)         \
     {                                                               \
         if (host_)                                                  \
             return NULL;                                            \
         host_ = host;                                               \
         return init(name);                                          \
     }                                                               \
-    AUM_API void                                                    \
-    aum_term(void)                                                  \
+    MOD_API void                                                    \
+    mod_term(void)                                                  \
     {                                                               \
         term();                                                     \
         host_ = NULL;                                               \
     }
 
-typedef void (*aum_termfn)(void);
-typedef const struct aum_module*
-(*aum_initfn)(const char*, const struct aum_host*);
+typedef void (*mod_termfn)(void);
+typedef const struct mod_module*
+(*mod_initfn)(const char*, const struct mod_host*);
 
-#endif /* AUM_H */
+#endif /* AUGMOD_H */

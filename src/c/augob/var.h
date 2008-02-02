@@ -33,7 +33,7 @@ struct aug_var {
         int64_t i64_;
         double dbl_;
         time_t utc_;
-        aub_object* ob_;
+        aug_object* ob_;
         aug_blob* blob_;
         aug_seqob* seq_;
     } u_;
@@ -53,14 +53,14 @@ struct aug_var {
 #define AUG_RETAINVAR(x) \
 do { \
     if (AUG_VTOBJECT <= (x)->type_ && (x)->u_.ob_) \
-        aub_retain((x)->u_.ob_); \
+        aug_retain((x)->u_.ob_); \
 } while (0)
 
 #define AUG_RELEASEVAR(x) \
 do { \
     if (AUG_VTOBJECT <= (x)->type_) { \
         if ((x)->u_.ob_) { \
-            aub_release((x)->u_.ob_); \
+            aug_release((x)->u_.ob_); \
             (x)->u_.ob_ = NULL; \
         } \
         (x)->type_ = AUG_VTNULL; \

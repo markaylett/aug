@@ -14,12 +14,12 @@ SUBDIRS = \
 	mar
 
 include_HEADERS = \
-	aub.h \
 	aug.h \
+	augabi.h \
+	augmod.h \
 	augsys.h \
 	augmar.h \
 	augob.h \
 	augutil.h \
 	augsrv.h \
-	augnet.h \
-	aum.h
+	augnet.h

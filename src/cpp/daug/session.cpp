@@ -11,33 +11,33 @@ AUG_RCSID("$Id$");
 
 #include <stack>
 
-using namespace aub;
+using namespace aug;
 using namespace aug;
 using namespace daug;
 using namespace std;
 
 namespace {
-    stack<const aum_session*> stack_;
+    stack<const mod_session*> stack_;
     struct scoped_frame {
         ~scoped_frame() AUG_NOTHROW
         {
             stack_.pop();
         }
         explicit
-        scoped_frame(const aum_session* session)
+        scoped_frame(const mod_session* session)
         {
             stack_.push(session);
         }
     };
 }
 
-aum_session&
+mod_session&
 session::do_get() AUG_NOTHROW
 {
     return session_;
 }
 
-const aum_session&
+const mod_session&
 session::do_get() const AUG_NOTHROW
 {
     return session_;
@@ -73,21 +73,21 @@ session::do_event(const char* from, const char* type,
 }
 
 void
-session::do_closed(const aum_handle& sock) const AUG_NOTHROW
+session::do_closed(const mod_handle& sock) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
     module_->closed(sock);
 }
 
 void
-session::do_teardown(const aum_handle& sock) const AUG_NOTHROW
+session::do_teardown(const mod_handle& sock) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
     module_->teardown(sock);
 }
 
 bool
-session::do_accepted(aum_handle& sock, const char* addr,
+session::do_accepted(mod_handle& sock, const char* addr,
                      unsigned short port) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -95,7 +95,7 @@ session::do_accepted(aum_handle& sock, const char* addr,
 }
 
 void
-session::do_connected(aum_handle& sock, const char* addr,
+session::do_connected(mod_handle& sock, const char* addr,
                       unsigned short port) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -103,7 +103,7 @@ session::do_connected(aum_handle& sock, const char* addr,
 }
 
 void
-session::do_data(const aum_handle& sock, const char* buf,
+session::do_data(const mod_handle& sock, const char* buf,
                  size_t size) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -111,7 +111,7 @@ session::do_data(const aum_handle& sock, const char* buf,
 }
 
 void
-session::do_rdexpire(const aum_handle& sock,
+session::do_rdexpire(const mod_handle& sock,
                      unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -119,7 +119,7 @@ session::do_rdexpire(const aum_handle& sock,
 }
 
 void
-session::do_wrexpire(const aum_handle& sock,
+session::do_wrexpire(const mod_handle& sock,
                      unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -127,14 +127,14 @@ session::do_wrexpire(const aum_handle& sock,
 }
 
 void
-session::do_expire(const aum_handle& timer, unsigned& ms) const AUG_NOTHROW
+session::do_expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
     module_->expire(timer, ms);
 }
 
 bool
-session::do_authcert(const aum_handle& sock, const char* subject,
+session::do_authcert(const mod_handle& sock, const char* subject,
                      const char* issuer) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
@@ -157,7 +157,7 @@ session::session(const moduleptr& module, const char* name)
     session_.user_ = 0;
 }
 
-const aum_session*
+const mod_session*
 daug::getsession()
 {
     return stack_.empty() ? 0 : stack_.top();

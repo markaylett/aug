@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUM_BUILD
+#define MOD_BUILD
 #include "augsys/defs.h"
 
 AUG_RCSID("$Id$");
@@ -47,11 +47,11 @@ setpath_(void)
 
     /* Path may be relative to run directory. */
 
-    if ((s = aum_getenv("rundir", NULL)))
+    if ((s = mod_getenv("rundir", NULL)))
         chdir(s);
 
-    s = aum_getenv("module.augpy.pythonpath", "python");
-    aum_writelog(AUM_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
+    s = mod_getenv("module.augpy.pythonpath", "python");
+    mod_writelog(MOD_LOGDEBUG, "module.augpy.pythonpath=[%s]", s);
     chdir(s);
 
     if ((sys = PyImport_ImportModule("sys"))) {
@@ -66,7 +66,7 @@ setpath_(void)
 
             if ((dir = PyString_FromString(buf))) {
 
-                aum_writelog(AUM_LOGDEBUG, "adding to sys.path: %s", buf);
+                mod_writelog(MOD_LOGDEBUG, "adding to sys.path: %s", buf);
 
                 PyList_Append(path, dir);
 
@@ -105,7 +105,7 @@ printerr_(void)
         empty = PyString_FromString("");
         message = PyObject_CallMethod(empty, "join", "O", list);
 
-        aum_writelog(AUM_LOGERROR, "%s", PyString_AsString(message));
+        mod_writelog(MOD_LOGERROR, "%s", PyString_AsString(message));
 
         Py_DECREF(message);
         Py_DECREF(empty);
@@ -133,7 +133,7 @@ getmethod_(PyObject* module, const char* name)
             x = NULL;
         }
     } else {
-        aum_writelog(AUM_LOGDEBUG, "no binding for %s()", name);
+        mod_writelog(MOD_LOGDEBUG, "no binding for %s()", name);
         PyErr_Clear();
     }
     return x;
@@ -202,23 +202,23 @@ termpy_(void)
     if (!Py_IsInitialized())
         return;
 
-    aum_writelog(AUM_LOGDEBUG, "finalising python interpreter");
+    mod_writelog(MOD_LOGDEBUG, "finalising python interpreter");
     Py_Finalize();
 
     objects = augpy_handles();
-    level = objects ? AUM_LOGERROR : AUM_LOGINFO;
-    aum_writelog(level, "allocated objects: %d", objects);
+    level = objects ? MOD_LOGERROR : MOD_LOGINFO;
+    mod_writelog(level, "allocated objects: %d", objects);
 }
 
 static int
 initpy_(void)
 {
-    aum_writelog(AUM_LOGDEBUG, "initialising python interpreter");
+    mod_writelog(MOD_LOGDEBUG, "initialising python interpreter");
     Py_Initialize();
     /* Py_VerboseFlag = 1; */
     setpath_();
 
-    aum_writelog(AUM_LOGDEBUG, "initialising aum module");
+    mod_writelog(MOD_LOGDEBUG, "initialising aug module");
     if (!(type_ = augpy_createtype()))
         goto fail;
 
@@ -234,7 +234,7 @@ initpy_(void)
 static void
 stop_(void)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     assert(import);
 
     if (import->open_ && import->stop_) {
@@ -250,7 +250,7 @@ stop_(void)
 }
 
 static int
-start_(struct aum_session* session)
+start_(struct mod_session* session)
 {
     struct import_* import;
     if (!(import = createimport_(session->name_)))
@@ -277,7 +277,7 @@ start_(struct aum_session* session)
 static void
 reconf_(void)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     assert(import);
 
     if (import->reconf_) {
@@ -291,9 +291,9 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, aub_object* ob)
+event_(const char* from, const char* type, aug_object* ob)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     assert(import);
 
     if (import->event_) {
@@ -315,7 +315,7 @@ event_(const char* from, const char* type, aub_object* ob)
 
                 /* Fallback to aug_blob type. */
 
-                aug_blob* blob = aub_cast(ob, aug_blobid);
+                aug_blob* blob = aug_cast(ob, aug_blobid);
                 if (blob) {
 
                     size_t size;
@@ -330,10 +330,10 @@ event_(const char* from, const char* type, aub_object* ob)
                         y = PyObject_CallFunction(import->event_, "ssz#",
                                                   from, type,
                                                   (const char*)data, size);
-                        aub_release(blob);
+                        aug_release(blob);
                         goto done;
                     }
-                    aub_release(blob);
+                    aug_release(blob);
                 }
             }
         }
@@ -354,9 +354,9 @@ event_(const char* from, const char* type, aub_object* ob)
 }
 
 static void
-closed_(const struct aum_handle* sock)
+closed_(const struct mod_handle* sock)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     PyObject* x = sock->user_;
     assert(import);
     assert(x);
@@ -374,9 +374,9 @@ closed_(const struct aum_handle* sock)
 }
 
 static void
-teardown_(const struct aum_handle* sock)
+teardown_(const struct mod_handle* sock)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -391,13 +391,13 @@ teardown_(const struct aum_handle* sock)
             printerr_();
 
     } else
-        aum_shutdown(sock->id_, 0);
+        mod_shutdown(sock->id_, 0);
 }
 
 static int
-accepted_(struct aum_handle* sock, const char* addr, unsigned short port)
+accepted_(struct mod_handle* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     PyObject* x, * y;
     int ret = 0;
     assert(import);
@@ -430,8 +430,8 @@ accepted_(struct aum_handle* sock, const char* addr, unsigned short port)
 
         if (z == Py_False) {
 
-            aum_writelog(AUM_LOGDEBUG,
-                          "accepted() handler returned false");
+            mod_writelog(MOD_LOGDEBUG,
+                         "accepted() handler returned false");
 
             /* closed() will not be called if accepted() fails. */
 
@@ -450,9 +450,9 @@ accepted_(struct aum_handle* sock, const char* addr, unsigned short port)
 }
 
 static void
-connected_(struct aum_handle* sock, const char* addr, unsigned short port)
+connected_(struct mod_handle* sock, const char* addr, unsigned short port)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -472,9 +472,9 @@ connected_(struct aum_handle* sock, const char* addr, unsigned short port)
 }
 
 static void
-data_(const struct aum_handle* sock, const void* buf, size_t len)
+data_(const struct mod_handle* sock, const void* buf, size_t len)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -494,9 +494,9 @@ data_(const struct aum_handle* sock, const void* buf, size_t len)
 }
 
 static void
-rdexpire_(const struct aum_handle* sock, unsigned* ms)
+rdexpire_(const struct mod_handle* sock, unsigned* ms)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -508,8 +508,8 @@ rdexpire_(const struct aum_handle* sock, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                aum_writelog(AUM_LOGDEBUG,
-                              "handler returned new timeout value");
+                mod_writelog(MOD_LOGDEBUG,
+                             "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
@@ -521,9 +521,9 @@ rdexpire_(const struct aum_handle* sock, unsigned* ms)
 }
 
 static void
-wrexpire_(const struct aum_handle* sock, unsigned* ms)
+wrexpire_(const struct mod_handle* sock, unsigned* ms)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
@@ -535,8 +535,8 @@ wrexpire_(const struct aum_handle* sock, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                aum_writelog(AUM_LOGDEBUG,
-                              "handler returned new timeout value");
+                mod_writelog(MOD_LOGDEBUG,
+                             "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
@@ -548,16 +548,16 @@ wrexpire_(const struct aum_handle* sock, unsigned* ms)
 }
 
 static void
-expire_(const struct aum_handle* timer, unsigned* ms)
+expire_(const struct mod_handle* timer, unsigned* ms)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     assert(import);
     assert(timer->user_);
 
     if (import->expire_) {
 
         PyObject* x, * y, * z;
-        if (!(x = augpy_getblob((aub_object*)timer->user_))) {
+        if (!(x = augpy_getblob((aug_object*)timer->user_))) {
             x = Py_None;
             Py_INCREF(x);
         }
@@ -569,8 +569,8 @@ expire_(const struct aum_handle* timer, unsigned* ms)
 
         if (z) {
             if (PyInt_Check(z)) {
-                aum_writelog(AUM_LOGDEBUG,
-                              "handler returned new timeout value");
+                mod_writelog(MOD_LOGDEBUG,
+                             "handler returned new timeout value");
                 *ms = PyInt_AsLong(z);
             }
             Py_DECREF(z);
@@ -582,10 +582,10 @@ expire_(const struct aum_handle* timer, unsigned* ms)
 }
 
 static int
-authcert_(const struct aum_handle* sock, const char* subject,
+authcert_(const struct mod_handle* sock, const char* subject,
           const char* issuer)
 {
-    struct import_* import = aum_getsession()->user_;
+    struct import_* import = mod_getsession()->user_;
     int ret = 0;
     assert(import);
     assert(sock->user_);
@@ -608,7 +608,7 @@ authcert_(const struct aum_handle* sock, const char* subject,
     return ret;
 }
 
-static const struct aum_module module_ = {
+static const struct mod_module module_ = {
     stop_,
     start_,
     reconf_,
@@ -624,10 +624,10 @@ static const struct aum_module module_ = {
     authcert_
 };
 
-static const struct aum_module*
+static const struct mod_module*
 init_(const char* name)
 {
-    aum_writelog(AUM_LOGINFO, "initialising augpy module");
+    mod_writelog(MOD_LOGINFO, "initialising augpy module");
 
     if (initpy_() < 0)
         return NULL;
@@ -638,8 +638,8 @@ init_(const char* name)
 static void
 term_(void)
 {
-    aum_writelog(AUM_LOGINFO, "terminating augpy module");
+    mod_writelog(MOD_LOGINFO, "terminating augpy module");
     termpy_();
 }
 
-AUM_ENTRYPOINTS(init_, term_)
+MOD_ENTRYPOINTS(init_, term_)

@@ -183,7 +183,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	aubidl \
+	augidl \
 	augutil.rb  \
 	log.rb \
 	rbecho.rb \
@@ -199,7 +199,7 @@ EXTRA_DIST = \
 	rbtest7.rb
 
 bin_SCRIPTS = \
-	aubidl
+	augidl
 
 @ENABLE_RUBY_TRUE@rubydir = $(prefix)/ruby
 @ENABLE_RUBY_TRUE@ruby_DATA = \

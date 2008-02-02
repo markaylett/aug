@@ -1,14 +1,14 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUM_BUILD
-#include "aumpp.hpp"
+#define MOD_BUILD
+#include "augmodpp.hpp"
 
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
 using namespace aug;
-using namespace aum;
+using namespace mod;
 using namespace std;
 
 namespace {
@@ -54,8 +54,8 @@ namespace {
         bool
         do_start(const char* sname)
         {
-            writelog(AUM_LOGINFO, "starting session [%s]", sname);
-            const char* serv= aum::getenv("session.command.serv");
+            writelog(MOD_LOGINFO, "starting session [%s]", sname);
+            const char* serv= mod::getenv("session.command.serv");
             if (!serv)
                 return false;
             tcplisten("0.0.0.0", serv);
@@ -67,7 +67,7 @@ namespace {
         {
             sock.setuser(new shellparser());
             send(sock, "HELLO\r\n", 7);
-            setrwtimer(sock, 15000, AUM_TIMRD);
+            setrwtimer(sock, 15000, MOD_TIMRD);
             return true;
         }
 
@@ -106,4 +106,4 @@ namespace {
     typedef basic_module<basic_factory<command> > module;
 }
 
-AUM_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term)

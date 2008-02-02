@@ -22,5 +22,5 @@ modinclude_HEADERS = \
 
 if ENABLE_RUBY
 %.h: %.xml
-	$(top_srcdir)/src/rb/aubidl -n $@ <$< >$@
+	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
 endif

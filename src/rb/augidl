@@ -281,21 +281,21 @@ class CppFormat
     end
     def creturn_expr(type, expr)
         if type.object? then
-            "return aub::object_attach<#{type.cname}>(#{expr})";
+            "return aug::object_attach<#{type.cname}>(#{expr})";
         else
             type.cname == "void" ? expr : "return #{expr}"
         end
     end
     def param_type(type)
         if type.object? then
-            "aub::obref<#{type.cname}>"
+            "aug::obref<#{type.cname}>"
         else
             type.cname
         end
     end
     def return_type(type)
         if type.object? then
-            "aub::smartob<#{type.cname}>"
+            "aug::smartob<#{type.cname}>"
         else
             type.cname
         end
@@ -337,7 +337,7 @@ def putcdefine(iface, method)
     puts <<END
 
 #define #{iface.pkg}_#{method.qname}(#{names}) \\
-    ((#{iface.type.cname}*)this_)->vtbl_->#{method.name}_(#{names})
+    (this_)->vtbl_->#{method.name}_(#{names})
 END
 end
 
@@ -349,7 +349,7 @@ def putinline(iface, method)
     puts <<END
 
     inline #{format.return_type(method.type)}
-    #{method.qname}(#{args}) AUB_NOTHROW
+    #{method.qname}(#{args}) AUG_NOTHROW
     {
         #{format.creturn_expr(method.type, expr)};
     }
@@ -362,11 +362,11 @@ def putstatic(iface, method)
     names = nothis(format.name_list(iface, method)).join(", ")
     expr = "static_cast<T*>(this_->impl_)->#{method.qname}_(#{names})"
     if method.type.object? then
-        expr = "aub::incget(#{expr})"
+        expr = "aug::incget(#{expr})"
     end
     puts <<END
         static #{format.return_type(method.type)}
-        #{method.name}_(#{args}) AUB_NOTHROW
+        #{method.name}_(#{args}) AUG_NOTHROW
         {
             #{format.return_expr(method.type, expr)};
         }
@@ -380,7 +380,7 @@ def putforward(iface, method)
     expr = "this->impl_.#{method.qname}_(#{names})";
     puts <<END
         #{format.return_type(method.type)}
-        #{method.qname}_(#{args}) AUB_NOTHROW
+        #{method.qname}_(#{args}) AUG_NOTHROW
         {
             #{format.return_expr(method.type, expr)};
         }
@@ -402,13 +402,13 @@ class Visitor
  * @{
  */
 
-AUB_INTERFACE(#{elem.type.cname});
+AUG_INTERFACE(#{elem.type.cname});
 END
         puthelp(elem.help)
         puts <<END
 
 struct #{elem.type.cname}vtbl {
-    AUB_VTBL(#{elem.type.cname});
+    AUG_VTBL(#{elem.type.cname});
 END
         elem.each_method {|x| putcmethod elem, x}
         puts "};"
@@ -418,12 +418,12 @@ END
 /** @} */
 
 #if defined(__cplusplus)
-namespace aub {
+namespace aug {
     template <>
     struct object_traits<#{elem.type.cname}> {
         typedef #{elem.type.cname}vtbl vtbl;
         static const char*
-        id() AUB_NOTHROW
+        id() AUG_NOTHROW
         {
             return #{elem.type.cname}id;
         }
@@ -432,7 +432,7 @@ namespace aub {
 
 namespace #{elem.pkg} {
 
-    typedef aub::obref<#{elem.type.cname}> #{elem.name}ref;
+    typedef aug::obref<#{elem.type.cname}> #{elem.name}ref;
 END
         elem.each_method {|x| putinline elem, x}
         puts <<END
@@ -448,17 +448,17 @@ END
         operator =(const #{elem.name}&);
 
         static void*
-        cast_(#{elem.type.cname}* this_, const char* id) AUB_NOTHROW
+        cast_(#{elem.type.cname}* this_, const char* id) AUG_NOTHROW
         {
-            return aub::incget(static_cast<T*>(this_->impl_)->cast_(id));
+            return aug::incget(static_cast<T*>(this_->impl_)->cast_(id));
         }
         static void
-        retain_(#{elem.type.cname}* this_) AUB_NOTHROW
+        retain_(#{elem.type.cname}* this_) AUG_NOTHROW
         {
             static_cast<T*>(this_->impl_)->retain_();
         }
         static void
-        release_(#{elem.type.cname}* this_) AUB_NOTHROW
+        release_(#{elem.type.cname}* this_) AUG_NOTHROW
         {
             static_cast<T*>(this_->impl_)->release_();
         }
@@ -488,11 +488,11 @@ END
             this->#{elem.name}_.impl_ = impl;
         }
         #{elem.type.cname}*
-        get() AUB_NOTHROW
+        get() AUG_NOTHROW
         {
             return &this->#{elem.name}_;
         }
-        operator aub::obref<#{elem.type.cname}>() AUB_NOTHROW
+        operator aug::obref<#{elem.type.cname}>() AUG_NOTHROW
         {
             return this->get();
         }
@@ -511,21 +511,21 @@ END
             this->#{elem.name}_.reset(this);
         }
     public:
-        aub::smartob<aub_object>
-        cast_(const char* id) AUB_NOTHROW
+        aug::smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
         {
-            if (aub::equalid<aub_object>(id) || aub::equalid<#{elem.type.cname}>(id))
-                return aub::object_retain<aub_object>(this->#{elem.name}_);
+            if (aug::equalid<aug_object>(id) || aug::equalid<#{elem.type.cname}>(id))
+                return aug::object_retain<aug_object>(this->#{elem.name}_);
             return null;
         }
         void
-        retain_() AUB_NOTHROW
+        retain_() AUG_NOTHROW
         {
             assert(0 < this->refs_);
             ++this->refs_;
         }
         void
-        release_() AUB_NOTHROW
+        release_() AUG_NOTHROW
         {
             assert(0 < this->refs_);
             if (0 == --this->refs_)
@@ -534,11 +534,11 @@ END
 END
         elem.each_method {|x| putforward elem, x}
         puts <<END
-        static aub::smartob<#{elem.type.cname}>
+        static aug::smartob<#{elem.type.cname}>
         create(const T& impl = T())
         {
             basic_#{elem.name}* ptr(new basic_#{elem.name}(impl));
-            return aub::object_attach<#{elem.type.cname}>(ptr->#{elem.name}_);
+            return aug::object_attach<#{elem.type.cname}>(ptr->#{elem.name}_);
         }
     };
 
@@ -553,35 +553,35 @@ END
         {
             this->#{elem.name}_.reset(this);
         }
-        aub::smartob<aub_object>
-        cast_(const char* id) AUB_NOTHROW
+        aug::smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
         {
-            if (aub::equalid<aub_object>(id) || aub::equalid<#{elem.type.cname}>(id))
-                return aub::object_retain<aub_object>(this->#{elem.name}_);
+            if (aug::equalid<aug_object>(id) || aug::equalid<#{elem.type.cname}>(id))
+                return aug::object_retain<aug_object>(this->#{elem.name}_);
             return null;
         }
         void
-        retain_() AUB_NOTHROW
+        retain_() AUG_NOTHROW
         {
         }
         void
-        release_() AUB_NOTHROW
+        release_() AUG_NOTHROW
         {
         }
 END
         elem.each_method {|x| putforward elem, x}
         puts <<END
-        aub_object*
-        base() AUB_NOTHROW
+        aug_object*
+        base() AUG_NOTHROW
         {
-            return aub::obref<aub_object>(this->#{elem.name}_).get();
+            return aug::obref<aug_object>(this->#{elem.name}_).get();
         }
         #{elem.type.cname}*
-        get() AUB_NOTHROW
+        get() AUG_NOTHROW
         {
             return this->#{elem.name}_.get();
         }
-        operator aub::obref<#{elem.type.cname}>() AUB_NOTHROW
+        operator aug::obref<#{elem.type.cname}>() AUG_NOTHROW
         {
             return this->#{elem.name}_;
         }
@@ -607,17 +607,13 @@ puts <<END
 #ifndef #{gaurd}
 #define #{gaurd}
 
-#include "aub.h"
+#include "augabi.h"
 
 #if defined(__cplusplus)
 
-#include "aubpp.hpp"
+#include "augabipp.hpp"
 
-# if !defined(AUB_NOTHROW)
-#  define AUB_NOTHROW
-# endif /* !AUB_NOTHROW */
-
-namespace aub {
+namespace aug {
     template <typename T>
     struct object_traits;
 }

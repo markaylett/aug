@@ -26,12 +26,12 @@
  * aug - a framework for building network servers.
  *
  * This package is partioned into the following namespaces:
- * @li aub.h
  * @li aug.h
- * @li aum.h
+ * @li augabi.h
+ * @li augmod.h
  *
  * Tools within aug package are:
- * @li @subpage aubidl
+ * @li @subpage augidl
  * @li @subpage daug
  * @li @subpage htdigest
  * @li @subpage mar

@@ -11,7 +11,7 @@ AUG_RCSID("$Id$");
 
 #include <string>
 
-using namespace aub;
+using namespace aug;
 using namespace aug;
 using namespace std;
 

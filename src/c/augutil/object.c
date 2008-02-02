@@ -23,8 +23,8 @@ struct longobimpl_ {
 static void*
 castlongob_(aug_longob* ob, const char* id)
 {
-    if (AUB_EQUALID(id, aub_objectid) || AUB_EQUALID(id, aug_longobid)) {
-        aub_retain(ob);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_longobid)) {
+        aug_retain(ob);
         return ob;
     }
     return NULL;
@@ -33,14 +33,14 @@ castlongob_(aug_longob* ob, const char* id)
 static void
 retainlongob_(aug_longob* ob)
 {
-    struct longobimpl_* impl = AUB_PODIMPL(struct longobimpl_, longob_, ob);
+    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
     ++impl->refs_;
 }
 
 static void
 releaselongob_(aug_longob* ob)
 {
-    struct longobimpl_* impl = AUB_PODIMPL(struct longobimpl_, longob_, ob);
+    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
             impl->destroy_(impl->l_);
@@ -51,7 +51,7 @@ releaselongob_(aug_longob* ob)
 static long
 getlongob_(aug_longob* ob)
 {
-    struct longobimpl_* impl = AUB_PODIMPL(struct longobimpl_, longob_, ob);
+    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
     return impl->l_;
 }
 
@@ -72,8 +72,8 @@ struct addrobimpl_ {
 static void*
 castaddrob_(aug_addrob* ob, const char* id)
 {
-    if (AUB_EQUALID(id, aub_objectid) || AUB_EQUALID(id, aug_addrobid)) {
-        aub_retain(ob);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_addrobid)) {
+        aug_retain(ob);
         return ob;
     }
     return NULL;
@@ -82,14 +82,14 @@ castaddrob_(aug_addrob* ob, const char* id)
 static void
 retainaddrob_(aug_addrob* ob)
 {
-    struct addrobimpl_* impl = AUB_PODIMPL(struct addrobimpl_, addrob_, ob);
+    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
     ++impl->refs_;
 }
 
 static void
 releaseaddrob_(aug_addrob* ob)
 {
-    struct addrobimpl_* impl = AUB_PODIMPL(struct addrobimpl_, addrob_, ob);
+    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
             impl->destroy_(impl->p_);
@@ -100,7 +100,7 @@ releaseaddrob_(aug_addrob* ob)
 static void*
 getaddrob_(aug_addrob* ob)
 {
-    struct addrobimpl_* impl = AUB_PODIMPL(struct addrobimpl_, addrob_, ob);
+    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
     return impl->p_;
 }
 
@@ -122,8 +122,8 @@ struct blobimpl_ {
 static void*
 castblob_(aug_blob* ob, const char* id)
 {
-    if (AUB_EQUALID(id, aub_objectid) || AUB_EQUALID(id, aug_blobid)) {
-        aub_retain(ob);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
+        aug_retain(ob);
         return ob;
     }
     return NULL;
@@ -132,14 +132,14 @@ castblob_(aug_blob* ob, const char* id)
 static void
 retainblob_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     ++impl->refs_;
 }
 
 static void
 releaseblob_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (0 == --impl->refs_)
         free(impl);
 }
@@ -147,7 +147,7 @@ releaseblob_(aug_blob* ob)
 static const void*
 blobdata_(aug_blob* ob, size_t* size)
 {
-    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (size)
         *size = impl->size_;
     return impl->buf_;
@@ -156,7 +156,7 @@ blobdata_(aug_blob* ob, size_t* size)
 static size_t
 blobsize_(aug_blob* ob)
 {
-    struct blobimpl_* impl = AUB_PODIMPL(struct blobimpl_, blob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     return impl->size_;
 }
 
@@ -187,13 +187,13 @@ aug_createlongob(long l, void (*destroy)(long))
 }
 
 AUGUTIL_API long
-aug_obtolong(aub_object* ob)
+aug_obtolong(aug_object* ob)
 {
     long l;
     aug_longob* tmp;
-    if (ob && (tmp = aub_cast(ob, aug_longobid))) {
+    if (ob && (tmp = aug_cast(ob, aug_longobid))) {
         l = aug_getlongob(tmp);
-        aub_release(tmp);
+        aug_release(tmp);
     } else
         l = 0;
     return l;
@@ -218,13 +218,13 @@ aug_createaddrob(void* p, void (*destroy)(void*))
 }
 
 AUGUTIL_API void*
-aug_obtoaddr(aub_object* ob)
+aug_obtoaddr(aug_object* ob)
 {
     void* p;
     aug_addrob* tmp;
-    if (ob && (tmp = aub_cast(ob, aug_addrobid))) {
+    if (ob && (tmp = aug_cast(ob, aug_addrobid))) {
         p = aug_getaddrob(tmp);
-        aub_release(tmp);
+        aug_release(tmp);
     } else
         p = NULL;
     return p;

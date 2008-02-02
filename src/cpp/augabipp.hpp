@@ -1,38 +1,39 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUBPP_HPP
-#define AUBPP_HPP
+#ifndef AUGABIPP_HPP
+#define AUGABIPP_HPP
 
-#include "aub.h"
-#include "null.hpp"
+#include "augnullpp.hpp"
+
+#include "augabi.h"
 
 #include <algorithm> // swap()
 #include <cassert>
 
-#if !defined(AUB_NOTHROW)
+#if !defined(AUG_NOTHROW)
 # if !defined(NDEBUG)
-#  define AUB_NOTHROW throw()
+#  define AUG_NOTHROW throw()
 # else /* NDEBUG */
-#  define AUB_NOTHROW
+#  define AUG_NOTHROW
 # endif /* NDEBUG */
-#endif /* !AUB_NOTHROW */
+#endif /* !AUG_NOTHROW */
 
-#define AUB_OBJECTASSERT(T) \
-        do { (void)sizeof(aub::object_traits<T>::vtbl); } while (0)
+#define AUG_OBJECTASSERT(T) \
+        do { (void)sizeof(aug::object_traits<T>::vtbl); } while (0)
 
-namespace aub {
+namespace aug {
 
     template <typename T>
     struct object_traits;
 
     template <>
-    struct object_traits<aub_object> {
-        typedef aub_objectvtbl vtbl;
+    struct object_traits<aug_object> {
+        typedef aug_objectvtbl vtbl;
         static const char*
-        id() AUB_NOTHROW
+        id() AUG_NOTHROW
         {
-            return aub_objectid;
+            return aug_objectid;
         }
     };
 
@@ -44,33 +45,33 @@ namespace aub {
      */
 
     template <>
-    class obref<aub_object> {
+    class obref<aug_object> {
     public:
-        typedef aub_object obtype;
-        typedef object_traits<aub_object>::vtbl vtbl;
+        typedef aug_object obtype;
+        typedef object_traits<aug_object>::vtbl vtbl;
     protected:
         void* ptr_;
-        obref(void* ptr) AUB_NOTHROW
+        obref(void* ptr) AUG_NOTHROW
             : ptr_(ptr)
         {
         }
     public:
-        obref(const null_&) AUB_NOTHROW
+        obref(const null_&) AUG_NOTHROW
             : ptr_(0)
         {
         }
-        obref(aub_object* ptr) AUB_NOTHROW
+        obref(aug_object* ptr) AUG_NOTHROW
             : ptr_(ptr)
         {
         }
-        aub_object*
-        get() const AUB_NOTHROW
+        aug_object*
+        get() const AUG_NOTHROW
         {
-            return static_cast<aub_object*>(ptr_);
+            return static_cast<aug_object*>(ptr_);
         }
     };
 
-    typedef obref<aub_object> objectref;
+    typedef obref<aug_object> objectref;
 
     /**
      * Generalized implementation is derived from base.
@@ -83,16 +84,16 @@ namespace aub {
         typedef T type;
         typedef typename object_traits<T>::vtbl vtbl;
     public:
-        obref(const null_&) AUB_NOTHROW
+        obref(const null_&) AUG_NOTHROW
             : objectref(null)
         {
         }
-        obref(T* ptr) AUB_NOTHROW
+        obref(T* ptr) AUG_NOTHROW
             : objectref(ptr)
         {
         }
         T*
-        get() const AUB_NOTHROW
+        get() const AUG_NOTHROW
         {
             return static_cast<T*>(ptr_);
         }
@@ -104,7 +105,7 @@ namespace aub {
 
     template <typename T>
     void
-    retain(obref<T> ref) AUB_NOTHROW
+    retain(obref<T> ref) AUG_NOTHROW
     {
         assert(ref.get());
         ref.get()->vtbl_->retain_(ref.get());
@@ -116,7 +117,7 @@ namespace aub {
 
     template <typename T>
     T*
-    incget(const obref<T>& ref) AUB_NOTHROW
+    incget(const obref<T>& ref) AUG_NOTHROW
     {
         if (ref != null)
             retain(ref);
@@ -129,7 +130,7 @@ namespace aub {
 
     template <typename T>
     void
-    release(obref<T> ref) AUB_NOTHROW
+    release(obref<T> ref) AUG_NOTHROW
     {
         assert(ref.get());
         ref.get()->vtbl_->release_(ref.get());
@@ -137,7 +138,7 @@ namespace aub {
 
     template <typename T>
     obref<T>
-    obptr(T* ptr) AUB_NOTHROW
+    obptr(T* ptr) AUG_NOTHROW
     {
         return obref<T>(ptr);
     }
@@ -149,72 +150,72 @@ namespace aub {
     private:
         obref<T> ref_;
 
-        smartob(obref<T> ref, bool inc) AUB_NOTHROW
+        smartob(obref<T> ref, bool inc) AUG_NOTHROW
             : ref_(ref)
         {
             if (null != ref && inc)
-                aub::retain(ref);
+                aug::retain(ref);
         }
 
     public:
-        ~smartob() AUB_NOTHROW
+        ~smartob() AUG_NOTHROW
         {
             if (null != ref_)
-                aub::release(ref_);
+                aug::release(ref_);
         }
-        smartob(const null_&) AUB_NOTHROW
+        smartob(const null_&) AUG_NOTHROW
             : ref_(null)
         {
         }
-        smartob(const smartob& rhs) AUB_NOTHROW
+        smartob(const smartob& rhs) AUG_NOTHROW
             : ref_(rhs.ref_)
         {
             if (null != ref_)
-                aub::retain(ref_);
+                aug::retain(ref_);
         }
         smartob&
-        operator =(const null_&) AUB_NOTHROW
+        operator =(const null_&) AUG_NOTHROW
         {
             *this = smartob(null);
             return *this;
         }
         smartob&
-        operator =(const smartob& rhs) AUB_NOTHROW
+        operator =(const smartob& rhs) AUG_NOTHROW
         {
             smartob tmp(rhs);
             swap(tmp);
             return *this;
         }
         void
-        swap(smartob& rhs) AUB_NOTHROW
+        swap(smartob& rhs) AUG_NOTHROW
         {
             std::swap(ref_, rhs.ref_);
         }
         static smartob
-        attach(obref<T> ref) AUB_NOTHROW
+        attach(obref<T> ref) AUG_NOTHROW
         {
             return smartob(ref, false);
         }
         static smartob
-        retain(obref<T> ref) AUB_NOTHROW
+        retain(obref<T> ref) AUG_NOTHROW
         {
             return smartob(ref, true);
         }
-        aub_object*
-        base() const AUB_NOTHROW
+        aug_object*
+        base() const AUG_NOTHROW
         {
-            return obref<aub_object>(ref_).get();
+            return obref<aug_object>(ref_).get();
         }
         T*
-        get() const AUB_NOTHROW
+        get() const AUG_NOTHROW
         {
             return ref_.get();
         }
-        operator smartob<aub_object>() const AUB_NOTHROW
+        operator smartob<aug_object>() const AUG_NOTHROW
         {
-            return smartob<aub_object>::retain(ref_);
+            return smartob<aug_object>::retain(ref_);
         }
-        operator obref<T>() const AUB_NOTHROW
+        operator obref<T>() const AUG_NOTHROW
         {
             return ref_;
         }
@@ -226,55 +227,55 @@ namespace aub {
 
     template <typename T>
     void
-    retain(const smartob<T>& sob) AUB_NOTHROW
+    retain(const smartob<T>& sob) AUG_NOTHROW
     {
         retain<T>(static_cast<obref<T> >(sob));
     }
 
     template <typename T>
     T*
-    incget(const smartob<T>& sob) AUB_NOTHROW
+    incget(const smartob<T>& sob) AUG_NOTHROW
     {
         return incget<T>(static_cast<obref<T> >(sob));
     }
 
     template <typename T>
     void
-    release(const smartob<T>& sob) AUB_NOTHROW
+    release(const smartob<T>& sob) AUG_NOTHROW
     {
         release<T>(static_cast<obref<T> >(sob));
     }
 
     inline bool
-    equalid(const char* lhs, const char* rhs) AUB_NOTHROW
+    equalid(const char* lhs, const char* rhs) AUG_NOTHROW
     {
-        return AUB_EQUALID(lhs, rhs);
+        return AUG_EQUALID(lhs, rhs);
     }
 
     template <typename T>
     bool
-    equalid(const char* id) AUB_NOTHROW
+    equalid(const char* id) AUG_NOTHROW
     {
         return equalid(object_traits<T>::id(), id);
     }
 
     template <typename T>
     smartob<T>
-    object_attach(obref<T> ref) AUB_NOTHROW
+    object_attach(obref<T> ref) AUG_NOTHROW
     {
         return smartob<T>::attach(ref);
     }
 
     template <typename T>
     smartob<T>
-    object_retain(obref<T> ref) AUB_NOTHROW
+    object_retain(obref<T> ref) AUG_NOTHROW
     {
         return smartob<T>::retain(ref);
     }
 
     template <typename T, typename U>
     smartob<T>
-    object_cast(obref<U> ref) AUB_NOTHROW
+    object_cast(obref<U> ref) AUG_NOTHROW
     {
         return null == ref ? null : smartob<T>::attach
             (static_cast<T*>(ref.get()->vtbl_->cast_
@@ -283,7 +284,7 @@ namespace aub {
 
     template <typename T, typename U>
     smartob<T>
-    object_cast(const smartob<U>& sob) AUB_NOTHROW
+    object_cast(const smartob<U>& sob) AUG_NOTHROW
     {
         return object_cast<T, U>(static_cast<obref<U> >(sob));
     }
@@ -292,7 +293,7 @@ namespace aub {
         int refs_;
     protected:
         virtual
-        ~ref_base() AUB_NOTHROW
+        ~ref_base() AUG_NOTHROW
         {
         }
         ref_base()
@@ -301,13 +302,13 @@ namespace aub {
         }
     public:
         void
-        retain_() AUB_NOTHROW
+        retain_() AUG_NOTHROW
         {
             assert(0 < refs_);
             ++refs_;
         }
         void
-        release_() AUB_NOTHROW
+        release_() AUG_NOTHROW
         {
             assert(0 < refs_);
             if (0 == --refs_)
@@ -318,16 +319,16 @@ namespace aub {
 
 template <typename T>
 bool
-isnull(aub::obref<T> ref)
+isnull(aug::obref<T> ref)
 {
     return 0 == ref.get();
 }
 
 template <typename T>
 bool
-isnull(const aub::smartob<T>& sobj)
+isnull(const aug::smartob<T>& sobj)
 {
     return 0 == sobj.get();
 }
 
-#endif // AUBPP_HPP
+#endif // AUGABIPP_HPP

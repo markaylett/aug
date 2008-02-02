@@ -62,12 +62,12 @@ namespace aug {
     inline void
     releasefd(int fd)
     {
-        verify(aub_releasefd(fd));
+        verify(aug_releasefd(fd));
     }
     inline void
     retainfd(int fd)
     {
-        verify(aub_retainfd(fd));
+        verify(aug_retainfd(fd));
     }
     inline const aug_fdtype&
     setfdtype(fdref ref, const aug_fdtype& fdtype)

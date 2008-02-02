@@ -7,7 +7,7 @@
 
 #include "augmarpp/config.hpp"
 
-#include "null.hpp"
+#include "augnullpp.hpp"
 
 #include "augmar/mar.h"
 #include "augmar/types.h"

@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUM_BUILD
-#include "aumpp.hpp"
+#define MOD_BUILD
+#include "augmodpp.hpp"
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"
 #include "augmarpp.hpp"
@@ -29,9 +29,8 @@
 # endif // !_S_ISREG
 #endif // _WIN32
 
-using namespace aub;
 using namespace aug;
-using namespace aum;
+using namespace mod;
 using namespace std;
 
 namespace {
@@ -43,9 +42,9 @@ namespace {
     void
     loadcss()
     {
-        const char* css(aum::getenv("session.http.css"));
+        const char* css(mod::getenv("session.http.css"));
         if (css) {
-            aug::chdir(aum::getenv("rundir"));
+            aug::chdir(mod::getenv("rundir"));
             ifstream fs(css);
             stringstream ss;
             ss << fs.rdbuf();
@@ -80,15 +79,15 @@ namespace {
         mimetypes_["txt"] = "text/plain";
         mimetypes_["xml"] = "text/xml";
 
-        const char* mimetypes(aum::getenv("session.http.mimetypes"));
+        const char* mimetypes(mod::getenv("session.http.mimetypes"));
         if (mimetypes) {
-            aug::chdir(aum::getenv("rundir"));
+            aug::chdir(mod::getenv("rundir"));
             readconf(mimetypes, confcb<confcb_>, null);
         }
     }
 
     const char*
-    nonce(aum_id id, const string& addr, aug_md5base64_t base64)
+    nonce(mod_id id, const string& addr, aug_md5base64_t base64)
     {
         pid_t pid(getpid());
 
@@ -96,7 +95,7 @@ namespace {
         aug_gettimeofday(&tv, 0);
 
         long rand(aug_rand());
-        const char* salt(aum::getenv("session.http.salt"));
+        const char* salt(mod::getenv("session.http.salt"));
 
         aug_md5context md5ctx;
         unsigned char digest[16];
@@ -134,7 +133,7 @@ namespace {
     }
 
     string
-    getsessid(aum_id id, const string& addr, const char* cookie)
+    getsessid(mod_id id, const string& addr, const char* cookie)
     {
         aug_md5base64_t base64;
 
@@ -236,11 +235,11 @@ namespace {
     bool
     getpass(const string& user, const string& realm, string& digest)
     {
-        const char* passwd(aum::getenv("session.http.passwd"));
+        const char* passwd(mod::getenv("session.http.passwd"));
         if (!passwd)
             return false;
 
-        aug::chdir(aum::getenv("rundir"));
+        aug::chdir(mod::getenv("rundir"));
         ifstream fs(passwd);
         string line;
         while (getline(fs, line)) {
@@ -447,11 +446,11 @@ namespace {
             blob_.reset(this);
         }
     public:
-        smartob<aub_object>
+        smartob<aug_object>
         cast_(const char* id) AUG_NOTHROW
         {
-            if (equalid<aub_object>(id) || equalid<aug_blob>(id))
-                return object_retain<aub_object>(blob_);
+            if (equalid<aug_object>(id) || equalid<aug_blob>(id))
+                return object_retain<aug_object>(blob_);
             return null;
         }
         const void*
@@ -477,7 +476,7 @@ namespace {
     typedef vector<pair<string, string> > fields;
 
     void
-    sendfile(aum_id id, const string& sessid, const string& path)
+    sendfile(mod_id id, const string& sessid, const string& path)
     {
         smartob<aug_blob> blob(filecontent::create(path.c_str()));
         size_t size(blobsize(blob));
@@ -497,7 +496,7 @@ namespace {
     vector<string> results_;
 
     void
-    sendresult(aum_id id, const string& sessid)
+    sendresult(mod_id id, const string& sessid)
     {
         stringstream content;
         content << "<result>";
@@ -521,7 +520,7 @@ namespace {
     }
 
     void
-    sendstatus(aum_id id, const string& sessid, int status,
+    sendstatus(mod_id id, const string& sessid, int status,
                const string& title, const fields& fs = fields())
     {
         stringstream content;
@@ -549,12 +548,12 @@ namespace {
 
     struct session : basic_marnonstatic {
         const string& realm_;
-        aum_id id_;
+        mod_id id_;
         string sessid_;
         const string addr_;
         aug_md5base64_t nonce_;
         bool auth_;
-        session(const string& realm, aum_id id, const string& addr)
+        session(const string& realm, mod_id id, const string& addr)
             : realm_(realm),
               id_(id),
               addr_(addr),
@@ -701,7 +700,7 @@ namespace {
                               (getfield(mar, "Connection", size)));
             if (value && size && aug_strcasestr(value, "close")) {
                 aug_info("closing");
-                aum::shutdown(id_, 0);
+                mod::shutdown(id_, 0);
             }
         }
     };
@@ -712,8 +711,8 @@ namespace {
         do_start(const char* sname)
         {
             aug_info("starting...");
-            const char* serv(aum::getenv("session.http.serv"));
-            const char* realm(aum::getenv("session.http.realm"));
+            const char* serv(mod::getenv("session.http.serv"));
+            const char* realm(mod::getenv("session.http.realm"));
             if (!serv || !realm)
                 return false;
 
@@ -729,7 +728,7 @@ namespace {
             loadmimetypes();
         }
         void
-        do_event(const char* from, const char* type, struct aub_object_* ob)
+        do_event(const char* from, const char* type, struct aug_object_* ob)
         {
             smartob<aug_blob> blob(object_cast<aug_blob>(obptr(ob)));
             if (null != blob) {
@@ -757,7 +756,7 @@ namespace {
             auto_ptr<marparser> parser(new marparser(0, sess));
 
             sock.setuser(parser.get());
-            setrwtimer(sock, 30000, AUM_TIMRD);
+            setrwtimer(sock, 30000, MOD_TIMRD);
             parser.release();
             return true;
         }
@@ -769,7 +768,7 @@ namespace {
                 appendmar(parser, static_cast<const char*>(buf),
                           static_cast<unsigned>(len));
             } catch (...) {
-                aum::shutdown(sock, 1);
+                mod::shutdown(sock, 1);
                 throw;
             }
         }
@@ -792,4 +791,4 @@ namespace {
     typedef basic_module<basic_factory<http> > module;
 }
 
-AUM_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term)

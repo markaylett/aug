@@ -22,7 +22,7 @@ namespace aug {
         template <typename T>
         class httpstatic {
             static int
-            initial(aub_object* ob, const char* value) AUG_NOTHROW
+            initial(aug_object* ob, const char* value) AUG_NOTHROW
             {
                 try {
                     T::initial(ob, value);
@@ -31,7 +31,7 @@ namespace aug {
                 return -1;
             }
             static int
-            field(aub_object* ob, const char* name,
+            field(aug_object* ob, const char* name,
                   const char* value) AUG_NOTHROW
             {
                 try {
@@ -41,7 +41,7 @@ namespace aug {
                 return -1;
             }
             static int
-            csize(aub_object* ob, unsigned csize) AUG_NOTHROW
+            csize(aug_object* ob, unsigned csize) AUG_NOTHROW
             {
                 try {
                     T::csize(ob, csize);
@@ -50,7 +50,7 @@ namespace aug {
                 return -1;
             }
             static int
-            cdata(aub_object* ob, const void* cdata,
+            cdata(aug_object* ob, const void* cdata,
                   unsigned csize) AUG_NOTHROW
             {
                 try {
@@ -60,7 +60,7 @@ namespace aug {
                 return -1;
             }
             static int
-            end(aub_object* ob, int commit) AUG_NOTHROW
+            end(aug_object* ob, int commit) AUG_NOTHROW
             {
                 try {
                     T::end(ob, commit ? true : false);
@@ -87,7 +87,7 @@ namespace aug {
         template <typename T>
         class httpnonstatic {
             static int
-            initial(aub_object* ob, const char* value) AUG_NOTHROW
+            initial(aug_object* ob, const char* value) AUG_NOTHROW
             {
                 try {
                     obtoaddr<T*>(ob)->initial(value);
@@ -96,7 +96,7 @@ namespace aug {
                 return -1;
             }
             static int
-            field(aub_object* ob, const char* name,
+            field(aug_object* ob, const char* name,
                   const char* value) AUG_NOTHROW
             {
                 try {
@@ -106,7 +106,7 @@ namespace aug {
                 return -1;
             }
             static int
-            csize(aub_object* ob, unsigned csize) AUG_NOTHROW
+            csize(aug_object* ob, unsigned csize) AUG_NOTHROW
             {
                 try {
                     obtoaddr<T*>(ob)->csize(csize);
@@ -115,7 +115,7 @@ namespace aug {
                 return -1;
             }
             static int
-            cdata(aub_object* ob, const void* cdata,
+            cdata(aug_object* ob, const void* cdata,
                   unsigned csize) AUG_NOTHROW
             {
                 try {
@@ -125,7 +125,7 @@ namespace aug {
                 return -1;
             }
             static int
-            end(aub_object* ob, int commit) AUG_NOTHROW
+            end(aug_object* ob, int commit) AUG_NOTHROW
             {
                 try {
                     obtoaddr<T*>(ob)->end(commit ? true : false);
@@ -181,7 +181,7 @@ namespace aug {
         }
 
         httpparser(unsigned size, const aug_httphandler& handler,
-                   aub_object* ob)
+                   aug_object* ob)
         {
             verify(httpparser_
                    = aug_createhttpparser(size, &handler, ob));
@@ -197,7 +197,7 @@ namespace aug {
         template <typename T>
         httpparser(unsigned size, T& x)
         {
-            aub::smartob<aug_addrob> ob(createaddrob(&x, 0));
+            aug::smartob<aug_addrob> ob(createaddrob(&x, 0));
             verify(httpparser_ = aug_createhttpparser
                    (size, &httpnonstatic<T>(), ob.base()));
         }
@@ -205,7 +205,7 @@ namespace aug {
         template <typename T>
         httpparser(unsigned size, std::auto_ptr<T>& x)
         {
-            aub::smartob<aug_addrob> ob(createaddrob(x));
+            aug::smartob<aug_addrob> ob(createaddrob(x));
             verify(httpparser_ = aug_createhttpparser
                    (size, &httpnonstatic<T>(), ob.base()));
         }

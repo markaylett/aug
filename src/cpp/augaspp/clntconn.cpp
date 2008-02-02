@@ -40,13 +40,13 @@ clntconn::do_cancelrwtimer(unsigned flags)
     return rwtimer_.cancelrwtimer(flags);
 }
 
-aum_handle&
+mod_handle&
 clntconn::do_get()
 {
     return conn_->get();
 }
 
-const aum_handle&
+const mod_handle&
 clntconn::do_get() const
 {
     return conn_->get();

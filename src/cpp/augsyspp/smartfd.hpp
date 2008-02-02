@@ -25,8 +25,8 @@ namespace aug {
     public:
         ~smartfd() AUG_NOTHROW
         {
-            if (null != ref_ && -1 == aub_releasefd(ref_.get()))
-                perrinfo("aub_releasefd() failed");
+            if (null != ref_ && -1 == aug_releasefd(ref_.get()))
+                perrinfo("aug_releasefd() failed");
         }
 
         smartfd(const null_&) AUG_NOTHROW

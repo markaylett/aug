@@ -7,8 +7,8 @@
 
 AUG_RCSID("$Id$");
 
-#include "aub.h"
-#include "aum.h"
+#include "augabi.h"
+#include "augmod.h"
 
 namespace {
 
@@ -17,7 +17,7 @@ namespace {
     {
     }
     int
-    start(aum_session* session)
+    start(mod_session* session)
     {
         return 0;
     }
@@ -26,40 +26,40 @@ namespace {
     {
     }
     void
-    event(const char* from, const char* type, aub_object* ob)
+    event(const char* from, const char* type, aug_object* ob)
     {
     }
     void
-    closed(const aum_handle* sock)
+    closed(const mod_handle* sock)
     {
     }
     int
-    accepted(aum_handle* sock, const char* addr, unsigned short port)
+    accepted(mod_handle* sock, const char* addr, unsigned short port)
     {
         return 0;
     }
     void
-    connected(aum_handle* sock, const char* addr, unsigned short port)
+    connected(mod_handle* sock, const char* addr, unsigned short port)
     {
     }
     void
-    data(const aum_handle* sock, const void* buf, size_t len)
+    data(const mod_handle* sock, const void* buf, size_t len)
     {
     }
     void
-    rdexpire(const aum_handle* sock, unsigned* ms)
+    rdexpire(const mod_handle* sock, unsigned* ms)
     {
     }
     void
-    wrexpire(const aum_handle* sock, unsigned* ms)
+    wrexpire(const mod_handle* sock, unsigned* ms)
     {
     }
     void
-    expire(const aum_handle* timer, unsigned* ms)
+    expire(const mod_handle* timer, unsigned* ms)
     {
     }
     int
-    authcert(const aum_handle* sock, const char* subject,
+    authcert(const mod_handle* sock, const char* subject,
              const char* issuer)
     {
         return 0;
@@ -67,8 +67,8 @@ namespace {
 }
 
 void
-daug::setdefaults(aum_module& dst, const aum_module& src,
-                  void (*teardown)(const aum_handle*))
+daug::setdefaults(mod_module& dst, const mod_module& src,
+                  void (*teardown)(const mod_handle*))
 {
     dst.stop_ = src.stop_ ? src.stop_ : stop;
     dst.start_ = src.start_ ? src.start_ : start;

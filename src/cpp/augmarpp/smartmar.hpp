@@ -20,7 +20,7 @@ namespace aug {
             : ref_(ref)
         {
             if (retain && null != ref)
-                verify(aub_retainmar(ref.get()));
+                verify(aug_retainmar(ref.get()));
         }
 
     public:
@@ -29,8 +29,8 @@ namespace aug {
             if (null == ref_)
                 return;
 
-            if (null != ref_ && -1 == aub_releasemar(ref_.get()))
-                perrinfo("aub_releasemar() failed");
+            if (null != ref_ && -1 == aug_releasemar(ref_.get()))
+                perrinfo("aug_releasemar() failed");
         }
 
         smartmar(const null_&) AUG_NOTHROW
@@ -42,7 +42,7 @@ namespace aug {
             : ref_(rhs.ref_)
         {
             if (null != ref_)
-                verify(aub_retainmar(ref_.get()));
+                verify(aug_retainmar(ref_.get()));
         }
 
         smartmar&
@@ -72,7 +72,7 @@ namespace aug {
             if (null != ref_) {
                 marref ref(ref_);
                 ref_ = null;
-                verify(aub_releasemar(ref.get()));
+                verify(aug_releasemar(ref.get()));
             }
         }
 
