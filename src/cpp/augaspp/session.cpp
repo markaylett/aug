@@ -3,7 +3,7 @@
 */
 #define AUGRTPP_BUILD
 #include "augaspp/session.hpp"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 

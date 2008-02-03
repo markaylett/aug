@@ -3,6 +3,6 @@
 */
 #define AUGSRV_BUILD
 #include "augsrv/config.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");

@@ -3,7 +3,7 @@
 */
 #define AUGUTIL_BUILD
 #include "augutil/networds.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 

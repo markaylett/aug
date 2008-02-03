@@ -3,6 +3,6 @@
 */
 #define AUGMAR_BUILD
 #include "mar/config.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");

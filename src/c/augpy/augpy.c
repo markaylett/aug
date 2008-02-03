@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define MOD_BUILD
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 

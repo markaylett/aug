@@ -6,7 +6,7 @@
 
 #include "augutil/log.h"
 
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 #include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/string.h"

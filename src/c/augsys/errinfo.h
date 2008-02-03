@@ -25,7 +25,7 @@
  */
 
 #include "augsys/config.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 #include <stdarg.h>
 

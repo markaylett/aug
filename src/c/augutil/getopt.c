@@ -15,7 +15,7 @@
 
 #define AUGUTIL_BUILD
 #include "augutil/getopt.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 

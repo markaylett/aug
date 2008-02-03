@@ -13,7 +13,7 @@
 #include "augsys/barrier.h"
 #include "augsys/base.h"
 #include "augsys/debug.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 #include "augsys/dlfcn.h"
 #include "augsys/endian.h"
 #include "augsys/errinfo.h"

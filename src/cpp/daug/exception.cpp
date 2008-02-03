@@ -3,6 +3,6 @@
 */
 #define DAUG_BUILD
 #include "daug/exception.hpp"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");

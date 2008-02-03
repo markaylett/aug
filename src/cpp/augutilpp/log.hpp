@@ -10,7 +10,7 @@
 
 #include "augutil/log.h"
 
-#include "augsys/defs.h" // AUG_MAXLINE
+#include "augctx/defs.h" // AUG_MAXLINE
 
 #include <string>
 

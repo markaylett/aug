@@ -3,6 +3,6 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/barrier.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");

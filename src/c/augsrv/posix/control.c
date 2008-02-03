@@ -4,7 +4,7 @@
 #include "augsrv/base.h"
 #include "augsrv/options.h"
 
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/string.h"

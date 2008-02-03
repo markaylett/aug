@@ -3,7 +3,7 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/base.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 
@@ -45,7 +45,7 @@ retain_(void)
 # include "augsys/win32/base.c"
 #endif /* _WIN32 */
 
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 #include "augsys/errno.h"
 
 #include <stdlib.h> /* atexit() */

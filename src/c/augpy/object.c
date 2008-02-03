@@ -3,7 +3,7 @@
 */
 #define MOD_BUILD
 #include "augpy/object.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 

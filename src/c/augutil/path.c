@@ -4,7 +4,7 @@
 #undef __STRICT_ANSI__     /* _fullpath() */
 #define AUGUTIL_BUILD
 #include "augutil/path.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 

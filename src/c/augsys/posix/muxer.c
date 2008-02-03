@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/defs.h"   /* AUG_MAX */
+#include "augctx/defs.h"   /* AUG_MAX */
 #include "augsys/errinfo.h"
 #include "augsys/time.h"   /* aug_tvtoms() */
 #include "augsys/unistd.h" /* aug_pipe() */

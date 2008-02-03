@@ -3,7 +3,7 @@
 */
 #define AUGSRV_BUILD
 #include "augsrv/options.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 
@@ -12,7 +12,7 @@ AUG_RCSID("$Id$");
 #include "augutil/path.h"   /* aug_basename() */
 #include "augutil/getopt.h"
 
-#include "augsys/defs.h"    /* AUG_MKSTR */
+#include "augctx/defs.h"    /* AUG_MKSTR */
 #include "augsys/errinfo.h"
 #include "augsys/log.h"
 #include "augsys/string.h"

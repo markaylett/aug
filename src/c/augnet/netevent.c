@@ -3,7 +3,7 @@
 */
 #define AUGNET_BUILD
 #include "augnet/netevent.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 

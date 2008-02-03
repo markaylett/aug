@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGSYS_DEFS_H
-#define AUGSYS_DEFS_H
+#ifndef AUGCTX_DEFS_H
+#define AUGCTX_DEFS_H
 
 #include <stddef.h>
 
@@ -147,4 +147,4 @@
     }
 #endif /* __GNUC__ */
 
-#endif /* AUGSYS_DEFS_H */
+#endif /* AUGCTX_DEFS_H */

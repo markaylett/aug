@@ -7,7 +7,7 @@
 #include "augmarpp/compat.hpp"
 #include "augmarpp/mar.hpp"
 
-#include "augsys/defs.h" // AUG_MAX
+#include "augctx/defs.h" // AUG_MAX
 
 #include <iostream>
 

@@ -3,7 +3,7 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/mmap.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 

@@ -3,7 +3,7 @@
 */
 #define AUGSYS_BUILD
 #include "augsys/mutex.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 #include "augsys/errinfo.h"
 #include "augsys/lock.h"

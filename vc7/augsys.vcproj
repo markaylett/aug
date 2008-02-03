@@ -138,9 +138,6 @@
 				RelativePath="..\src\c\augsys\debug.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augsys\defs.c">
-			</File>
-			<File
 				RelativePath="..\src\c\augsys\dlfcn.c">
 			</File>
 			<File
@@ -216,9 +213,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\debug.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augsys\defs.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\dlfcn.h">

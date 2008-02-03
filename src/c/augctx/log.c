@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augctx/types.h"
+#include "augctx/types.h" /* AUG_LOGWARN */
 
 #include <assert.h>
 #include <errno.h>
@@ -57,7 +57,7 @@ release_(aug_log* obj)
 static int
 vprint_(aug_log* obj, int level, const char* format, va_list args)
 {
-    char buf[1024];
+    char buf[AUG_MAXLINE];
     FILE* file = level > AUG_LOGWARN ? stdout : stderr;
     int ret;
 

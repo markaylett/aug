@@ -4,7 +4,7 @@
 #undef __STRICT_ANSI__ /* _stricmp() */
 #define AUGSYS_BUILD
 #include "augsys/string.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 

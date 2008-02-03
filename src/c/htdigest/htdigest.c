@@ -4,7 +4,7 @@
  * by Alexei Kosut, based on htpasswd.c, by Rob McCool
  */
 #include "augutil/md5.h"
-#include "augsys/defs.h"
+#include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 
