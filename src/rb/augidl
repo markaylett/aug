@@ -594,7 +594,7 @@ END
         puts "\#include \"#{elem.text}\""
     end
     def visit_verbatim(elem)
-        puts elem.text
+        puts elem.text.strip
     end
 end
 

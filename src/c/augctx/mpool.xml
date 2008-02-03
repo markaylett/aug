@@ -24,4 +24,12 @@
 
   </interface>
 
+  <verbatim>
+AUGCTX_API aug_mpool*
+aug_createcmalloc(void);
+
+AUGCTX_API aug_mpool*
+aug_createdlmalloc(void);
+  </verbatim>
+
 </package>

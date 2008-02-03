@@ -27,4 +27,9 @@
 
   </interface>
 
+  <verbatim>
+AUGCTX_API aug_stream*
+aug_createstream(aug_ctx* ctx);
+  </verbatim>
+
 </package>

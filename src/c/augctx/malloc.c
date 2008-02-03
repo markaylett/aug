@@ -2686,7 +2686,7 @@ static void do_check_smallbin(mstate m, bindex_t i) {
 static int bin_find(mstate m, mchunkptr x) {
   size_t size = chunksize(x);
   if (is_small(size)) {
-    bindex_t sidx = small_index(size);
+    bindex_t sidx = (bindex_t)small_index(size);
     sbinptr b = smallbin_at(m, sidx);
     if (smallmap_is_marked(m, sidx)) {
       mchunkptr p = b;
@@ -2864,7 +2864,7 @@ static void internal_malloc_stats(mstate m) {
 
 /* Link a free chunk into a smallbin  */
 #define insert_small_chunk(M, P, S) {\
-  bindex_t I  = small_index(S);\
+  bindex_t I  = (bindex_t)small_index(S);\
   mchunkptr B = smallbin_at(M, I);\
   mchunkptr F = B;\
   assert(S >= MIN_CHUNK_SIZE);\
@@ -2885,7 +2885,7 @@ static void internal_malloc_stats(mstate m) {
 #define unlink_small_chunk(M, P, S) {\
   mchunkptr F = P->fd;\
   mchunkptr B = P->bk;\
-  bindex_t I = small_index(S);\
+  bindex_t I = (bindex_t)small_index(S);\
   assert(P != B);\
   assert(P != F);\
   assert(chunksize(P) == small_index2size(I));\
@@ -4051,7 +4051,7 @@ void* dlmalloc(size_t bytes) {
       bindex_t idx;
       binmap_t smallbits;
       nb = (bytes < MIN_REQUEST)? MIN_CHUNK_SIZE : pad_request(bytes);
-      idx = small_index(nb);
+      idx = (bindex_t)small_index(nb);
       smallbits = gm->smallmap >> idx;
 
       if ((smallbits & 0x3U) != 0) { /* Remainderless fit to a smallbin. */
@@ -4458,7 +4458,7 @@ void* mspace_malloc(mspace msp, size_t bytes) {
       bindex_t idx;
       binmap_t smallbits;
       nb = (bytes < MIN_REQUEST)? MIN_CHUNK_SIZE : pad_request(bytes);
-      idx = small_index(nb);
+      idx = (bindex_t)small_index(nb);
       smallbits = ms->smallmap >> idx;
 
       if ((smallbits & 0x3U) != 0) { /* Remainderless fit to a smallbin. */

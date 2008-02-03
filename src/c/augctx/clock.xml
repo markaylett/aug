@@ -12,4 +12,12 @@
 
   </interface>
 
+  <verbatim>
+AUGCTX_API aug_clock*
+aug_createclock(aug_mpool* mpool, long tz);
+
+AUGCTX_API long*
+aug_timezone(long* tz);
+  </verbatim>
+
 </package>

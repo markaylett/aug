@@ -20,4 +20,8 @@
 # endif /* AUGCTX_BUILD */
 #endif /* AUGCTX_SHARED */
 
+#if defined(_MSC_VER)
+# pragma comment(lib, "ws2_32.lib")
+#endif /* _MSC_VER */
+
 #endif /* AUGCTX_CONFIG_H */

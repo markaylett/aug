@@ -13,6 +13,10 @@ AUG_RCSID("$Id$");
 #include <stdio.h>
 #include <string.h>
 
+#if defined(_WIN32)
+# define vsnprintf _vsnprintf
+#endif /* _WIN32 */
+
 AUGCTX_API size_t
 aug_strlcpy(char* dst, const char* src, size_t size)
 {

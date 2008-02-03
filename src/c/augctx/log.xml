@@ -13,4 +13,9 @@
 
   </interface>
 
+  <verbatim>
+AUGCTX_API aug_log*
+aug_createstdlog(aug_mpool* mpool);
+  </verbatim>
+
 </package>
