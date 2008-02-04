@@ -1,4 +1,4 @@
-<package name="aug">
+<package name="aug" dir="augctx">
 
   <quotincl>augctx/clock.h</quotincl>
   <quotincl>augctx/log.h</quotincl>

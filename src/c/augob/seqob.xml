@@ -1,4 +1,4 @@
-<package name="aug">
+<package name="aug" dir="augob">
 
   <quotincl>augob/iterob.h</quotincl>
 

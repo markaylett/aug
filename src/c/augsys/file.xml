@@ -1,4 +1,6 @@
-<package name="aug">
+<package name="aug" dir="augsys">
+
+  <quotincl>augsys/config.h</quotincl>
 
   <quotincl>augctx/ctx.h</quotincl>
   <quotincl>augctx/types.h</quotincl>
@@ -16,7 +18,7 @@
   </interface>
 
   <verbatim>
-AUGCTX_API aug_file*
+AUGSYS_API aug_file*
 aug_createfile(aug_ctx* ctx, const char* path);
   </verbatim>
 

@@ -60,8 +60,8 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugctx_la_DEPENDENCIES =
-am_libaugctx_la_OBJECTS = clock.lo ctx.lo defs.lo file.lo log.lo \
-	malloc.lo mpool.lo stream.lo utility.lo
+am_libaugctx_la_OBJECTS = clock.lo ctx.lo defs.lo log.lo malloc.lo \
+	mpool.lo utility.lo
 libaugctx_la_OBJECTS = $(am_libaugctx_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -208,20 +208,16 @@ DEFAULT_INCLUDES = \
 EXTRA_DIST = \
 	clock.xml \
 	ctx.xml \
-	file.xml \
 	log.xml \
-	mpool.xml \
-	stream.xml
+	mpool.xml
 
 modincludedir = $(includedir)/augctx
 modinclude_HEADERS = \
 	clock.h \
 	ctx.h \
 	defs.h \
-	file.h \
 	log.h \
 	mpool.h \
-	stream.h \
 	types.h \
 	utility.h
 
@@ -233,11 +229,9 @@ libaugctx_la_SOURCES = \
 	clock.c \
 	ctx.c \
 	defs.c \
-	file.c \
 	log.c \
 	malloc.c \
 	mpool.c \
-	stream.c \
 	utility.c
 
 libaugctx_la_LDFLAGS = \
@@ -249,10 +243,8 @@ TESTS =
 @ENABLE_RUBY_TRUE@BUILT_SOURCES = \
 @ENABLE_RUBY_TRUE@	clock.h \
 @ENABLE_RUBY_TRUE@	ctx.h \
-@ENABLE_RUBY_TRUE@	file.h \
 @ENABLE_RUBY_TRUE@	log.h \
-@ENABLE_RUBY_TRUE@	mpool.h \
-@ENABLE_RUBY_TRUE@	stream.h
+@ENABLE_RUBY_TRUE@	mpool.h
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -334,11 +326,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ctx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defs.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/malloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpool.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Plo@am__quote@
 
 .c.o:

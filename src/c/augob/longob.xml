@@ -1,4 +1,4 @@
-<package name="aug">
+<package name="aug" dir="augob">
 
   <interface name="longob">
     <method name="get" type="long"/>

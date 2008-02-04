@@ -4,8 +4,8 @@ SUBDIRS = \
 	posix \
 	win32
 EXTRA_DIST = \
-	malloc.c \
-	malloc.h
+	file.xml \
+	stream.xml
 
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
@@ -17,6 +17,7 @@ modinclude_HEADERS = \
 	endian.h \
 	errinfo.h \
 	errno.h \
+	file.h \
 	limits.h \
 	lock.h \
 	log.h \
@@ -26,6 +27,7 @@ modinclude_HEADERS = \
 	muxer.h \
 	queue.h \
 	socket.h \
+	stream.h \
 	string.h \
 	time.h \
 	types.h \
@@ -48,6 +50,7 @@ libaugsys_la_SOURCES = \
 	endian.c \
 	errinfo.c \
 	errno.c \
+	file.c \
 	limits.c \
 	lock.c \
 	log.c \
@@ -56,6 +59,7 @@ libaugsys_la_SOURCES = \
 	mutex.c \
 	muxer.c \
 	socket.c \
+	stream.c \
 	string.c \
 	time.c \
 	types.c \
@@ -128,3 +132,12 @@ stringtest_LDADD = \
 timetest_SOURCES = timetest.c
 timetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
+
+if ENABLE_RUBY
+BUILT_SOURCES = \
+	file.h \
+	stream.h
+
+%.h: %.xml
+	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
+endif

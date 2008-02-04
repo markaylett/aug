@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGCTX_BUILD
-#include "augctx/stream.h"
+#include "augsys/file.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
@@ -13,19 +13,19 @@ AUG_RCSID("$Id$");
 #include <string.h>
 
 struct impl_ {
-    aug_stream stream_;
+    aug_file file_;
     int refs_;
     aug_ctx* ctx_;
 };
 
 static void*
-cast_(aug_stream* obj, const char* id)
+cast_(aug_file* obj, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_streamid)) {
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_fileid)) {
         aug_retain(obj);
         return obj;
     } else if (AUG_EQUALID(id, aug_ctxid)) {
-        struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+        struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
         aug_retain(impl->ctx_);
         return impl->ctx_;
     }
@@ -33,17 +33,17 @@ cast_(aug_stream* obj, const char* id)
 }
 
 static void
-retain_(aug_stream* obj)
+retain_(aug_file* obj)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
     assert(0 < impl->refs_);
     ++impl->refs_;
 }
 
 static void
-release_(aug_stream* obj)
+release_(aug_file* obj)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
         aug_ctx* ctx = impl->ctx_;
@@ -54,42 +54,38 @@ release_(aug_stream* obj)
     }
 }
 
-static ssize_t
-read_(aug_stream* obj, void* buf, size_t size)
+static int
+close_(aug_file* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
+    aug_seterrinfo(aug_geterrinfo(impl->ctx_), __FILE__, __LINE__,
+                   "augctx", 1, "%s", "oops - not really open!");
+    return -1;
+}
+
+static int
+setnonblock_(aug_file* obj, int on)
 {
     return 0;
 }
 
-static ssize_t
-readv_(aug_stream* obj, const struct iovec* iov, int size)
+static aug_fd
+getfd_(aug_file* obj)
 {
     return 0;
 }
 
-static ssize_t
-write_(aug_stream* obj, const void* buf, size_t size)
-{
-    return 0;
-}
-
-static ssize_t
-writev_(aug_stream* obj, const struct iovec* iov, int size)
-{
-    return 0;
-}
-
-static const struct aug_streamvtbl vtbl_ = {
+static const struct aug_filevtbl vtbl_ = {
     cast_,
     retain_,
     release_,
-    read_,
-    readv_,
-    write_,
-    writev_
+    close_,
+    setnonblock_,
+    getfd_
 };
 
-AUGCTX_API aug_stream*
-aug_createstream(aug_ctx* ctx)
+AUGSYS_API aug_file*
+aug_createfile(aug_ctx* ctx, const char* path)
 {
     struct impl_* impl;
     aug_mpool* mpool;
@@ -102,13 +98,13 @@ aug_createstream(aug_ctx* ctx)
     if (!impl)
         return NULL;
 
-    impl->stream_.vtbl_ = &vtbl_;
-    impl->stream_.impl_ = NULL;
+    impl->file_.vtbl_ = &vtbl_;
+    impl->file_.impl_ = NULL;
     impl->refs_ = 1;
 
     aug_retain(ctx);
 
     impl->ctx_ = ctx;
 
-    return &impl->stream_;
+    return &impl->file_;
 }

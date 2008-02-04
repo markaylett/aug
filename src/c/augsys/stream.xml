@@ -1,4 +1,6 @@
-<package name="aug">
+<package name="aug" dir="augsys">
+
+  <quotincl>augsys/config.h</quotincl>
 
   <quotincl>augctx/ctx.h</quotincl>
   <quotincl>augctx/types.h</quotincl>
@@ -28,7 +30,7 @@
   </interface>
 
   <verbatim>
-AUGCTX_API aug_stream*
+AUGSYS_API aug_stream*
 aug_createstream(aug_ctx* ctx);
   </verbatim>
 

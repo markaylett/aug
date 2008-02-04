@@ -64,10 +64,10 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES =
 am_libaugsys_la_OBJECTS = barrier.lo base.lo config.lo debug.lo \
-	dlfcn.lo endian.lo errinfo.lo errno.lo limits.lo lock.lo \
-	log.lo mcast.lo mmap.lo mutex.lo muxer.lo socket.lo string.lo \
-	time.lo types.lo uio.lo unistd.lo utility.lo windows.lo \
-	tls_.lo
+	dlfcn.lo endian.lo errinfo.lo errno.lo file.lo limits.lo \
+	lock.lo log.lo mcast.lo mmap.lo mutex.lo muxer.lo socket.lo \
+	stream.lo string.lo time.lo types.lo uio.lo unistd.lo \
+	utility.lo windows.lo tls_.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
@@ -259,8 +259,8 @@ SUBDIRS = \
 	win32
 
 EXTRA_DIST = \
-	malloc.c \
-	malloc.h
+	file.xml \
+	stream.xml
 
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
@@ -272,6 +272,7 @@ modinclude_HEADERS = \
 	endian.h \
 	errinfo.h \
 	errno.h \
+	file.h \
 	limits.h \
 	lock.h \
 	log.h \
@@ -281,6 +282,7 @@ modinclude_HEADERS = \
 	muxer.h \
 	queue.h \
 	socket.h \
+	stream.h \
 	string.h \
 	time.h \
 	types.h \
@@ -302,6 +304,7 @@ libaugsys_la_SOURCES = \
 	endian.c \
 	errinfo.c \
 	errno.c \
+	file.c \
 	limits.c \
 	lock.c \
 	log.c \
@@ -310,6 +313,7 @@ libaugsys_la_SOURCES = \
 	mutex.c \
 	muxer.c \
 	socket.c \
+	stream.c \
 	string.c \
 	time.c \
 	types.c \
@@ -371,7 +375,12 @@ timetest_SOURCES = timetest.c
 timetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-all: all-recursive
+@ENABLE_RUBY_TRUE@BUILT_SOURCES = \
+@ENABLE_RUBY_TRUE@	file.h \
+@ENABLE_RUBY_TRUE@	stream.h
+
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -484,6 +493,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errno.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
@@ -497,6 +507,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockaddrtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockettest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Plo@am__quote@
@@ -807,14 +818,16 @@ distdir: $(DISTFILES)
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-recursive
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-recursive
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: install-recursive
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
@@ -838,6 +851,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-recursive
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -909,6 +923,9 @@ uninstall-info: uninstall-info-recursive
 	uninstall-info-am uninstall-libLTLIBRARIES \
 	uninstall-modincludeHEADERS
 
+
+@ENABLE_RUBY_TRUE@%.h: %.xml
+@ENABLE_RUBY_TRUE@	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
