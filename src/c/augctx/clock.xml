@@ -2,6 +2,8 @@
 
   <quotincl>augctx/mpool.h</quotincl>
 
+  <verbatim>struct timeval;</verbatim>
+
   <interface name="clock">
 
     <method name="gettimeofday" type="struct timeval*" qname="gettimeofday">
