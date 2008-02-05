@@ -150,6 +150,9 @@
 				RelativePath="..\src\c\augsys\errno.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\file.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\limits.c">
 			</File>
 			<File
@@ -172,6 +175,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\socket.c">
+			</File>
+			<File
+				RelativePath="..\src\c\augsys\stream.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\string.c">
@@ -227,6 +233,9 @@
 				RelativePath="..\src\c\augsys\errno.h">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\file.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\limits.h">
 			</File>
 			<File
@@ -252,6 +261,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\socket.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augsys\stream.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\string.h">

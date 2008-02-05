@@ -253,6 +253,8 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/c/Makefile
                  src/c/augctx/Makefile
+                 src/c/augctx/posix/Makefile
+                 src/c/augctx/win32/Makefile
                  src/c/augmar/Makefile
                  src/c/augnet/Makefile
                  src/c/augob/Makefile

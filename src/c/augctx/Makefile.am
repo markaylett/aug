@@ -1,4 +1,7 @@
 include $(top_srcdir)/src/c/lang.mk
+SUBDIRS = \
+	posix \
+	win32
 EXTRA_DIST = \
 	clock.xml \
 	ctx.xml \
@@ -10,13 +13,15 @@ modinclude_HEADERS = \
 	clock.h \
 	ctx.h \
 	defs.h \
+	lock.h \
 	log.h \
 	mpool.h \
 	types.h \
 	utility.h
 
 noinst_HEADERS = \
-	malloc.h
+	malloc.h \
+	tls_.h
 
 lib_LTLIBRARIES = libaugctx.la
 
@@ -24,10 +29,12 @@ libaugctx_la_SOURCES = \
 	clock.c \
 	ctx.c \
 	defs.c \
+	lock.c \
 	log.c \
-	malloc.c \
 	mpool.c \
-	utility.c
+	utility.c \
+	malloc.c \
+	tls_.c
 
 libaugctx_la_LDFLAGS = \
 	-no-undefined \

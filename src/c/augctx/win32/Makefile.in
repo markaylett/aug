@@ -19,7 +19,7 @@ VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = ..
+top_builddir = ../../../..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = @INSTALL@
 install_sh_DATA = $(install_sh) -c -m 644
@@ -36,7 +36,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-subdir = vc7
+subdir = src/c/augctx/win32
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -170,38 +170,8 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	aug.bat \
-	aug.sln \
-	augctx.vcproj \
-	augmar.vcproj \
-	augmarpp.vcproj \
-	augnet.vcproj \
-	augnetpp.vcproj \
-	augpy.vcproj \
-	augrb.vcproj \
-	augaspp.vcproj \
-	augsrv.vcproj \
-	augsrvpp.vcproj \
-	augsys.vcproj \
-	augsyspp.vcproj \
-	augutil.vcproj \
-	augutilpp.vcproj \
-	client.vcproj \
-	command.vcproj \
-	daug.vcproj \
-	htdigest.vcproj \
-	http.vcproj \
-	mar.vcproj \
-	minimal.vcproj \
-	sched.vcproj \
-	server.vcproj \
-	setup.vdproj \
-	install.bat \
-	reconf.bat \
-	start.bat \
-	stop.bat \
-	test.bat \
-	uninstall.bat
+	lock.c \
+	tls.c
 
 all: all-am
 
@@ -215,9 +185,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  vc7/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/c/augctx/win32/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  vc7/Makefile
+	  $(AUTOMAKE) --foreign  src/c/augctx/win32/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

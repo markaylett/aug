@@ -138,7 +138,7 @@
 				RelativePath="..\src\c\augctx\defs.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augctx\file.c">
+				RelativePath="..\src\c\augctx\lock.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\log.c">
@@ -147,7 +147,7 @@
 				RelativePath="..\src\c\augctx\mpool.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augctx\stream.c">
+				RelativePath="..\src\c\augctx\tls_.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\utility.c">
@@ -170,7 +170,7 @@
 				RelativePath="..\src\c\augctx\defs.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augctx\file.h">
+				RelativePath="..\src\c\augctx\lock.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\log.h">
@@ -179,7 +179,7 @@
 				RelativePath="..\src\c\augctx\mpool.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augctx\stream.h">
+				RelativePath="..\src\c\augctx\tls_.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\types.h">
