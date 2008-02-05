@@ -4,6 +4,18 @@
 #ifndef AUGCTX_BASE_H
 #define AUGCTX_BASE_H
 
-#include "augctx/config.h"
+#include "augctx/ctx.h"
+
+AUGCTX_API void
+aug_init(void);
+
+AUGCTX_API void
+aug_term(void);
+
+AUGCTX_API void
+aug_setctx(aug_ctx* ctx);
+
+AUGCTX_API aug_ctx*
+aug_getctx(void);
 
 #endif /* AUGCTX_BASE_H */

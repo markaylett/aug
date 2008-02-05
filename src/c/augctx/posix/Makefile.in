@@ -171,7 +171,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
 	lock.c \
-	tls_.c
+	tls.c
 
 all: all-am
 

@@ -12,6 +12,7 @@ modincludedir = $(includedir)/augctx
 modinclude_HEADERS = \
 	base.h \
 	clock.h \
+	config.h \
 	ctx.h \
 	defs.h \
 	lock.h \
@@ -29,6 +30,7 @@ lib_LTLIBRARIES = libaugctx.la
 libaugctx_la_SOURCES = \
 	base.c \
 	clock.c \
+	config.c \
 	ctx.c \
 	defs.c \
 	lock.c \

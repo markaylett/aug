@@ -13,7 +13,9 @@ AUG_RCSID("$Id$");
 #include <string.h>
 #include <time.h> /* tzset() */
 
-#if defined(_WIN32)
+#if !defined(_WIN32)
+# include <sys/time.h>
+#else /* _WIN32 */
 # include <sys/timeb.h>
 # include <windows.h>
 #endif /* _WIN32 */

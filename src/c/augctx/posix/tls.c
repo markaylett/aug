@@ -1,6 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#include <stdlib.h> /* abort() */
+
 AUG_EXTERNC void
 aug_createtlskey_(aug_tlskey_t* tlskey)
 {
