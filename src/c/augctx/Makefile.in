@@ -60,8 +60,8 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugctx_la_DEPENDENCIES =
-am_libaugctx_la_OBJECTS = clock.lo ctx.lo defs.lo lock.lo log.lo \
-	mpool.lo utility.lo malloc.lo tls_.lo
+am_libaugctx_la_OBJECTS = base.lo clock.lo ctx.lo defs.lo lock.lo \
+	log.lo mpool.lo utility.lo malloc.lo tls_.lo
 libaugctx_la_OBJECTS = $(am_libaugctx_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -224,6 +224,7 @@ EXTRA_DIST = \
 
 modincludedir = $(includedir)/augctx
 modinclude_HEADERS = \
+	base.h \
 	clock.h \
 	ctx.h \
 	defs.h \
@@ -239,6 +240,7 @@ noinst_HEADERS = \
 
 lib_LTLIBRARIES = libaugctx.la
 libaugctx_la_SOURCES = \
+	base.c \
 	clock.c \
 	ctx.c \
 	defs.c \
@@ -338,6 +340,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ctx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defs.Plo@am__quote@

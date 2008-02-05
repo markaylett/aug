@@ -10,6 +10,7 @@ EXTRA_DIST = \
 
 modincludedir = $(includedir)/augctx
 modinclude_HEADERS = \
+	base.h \
 	clock.h \
 	ctx.h \
 	defs.h \
@@ -26,6 +27,7 @@ noinst_HEADERS = \
 lib_LTLIBRARIES = libaugctx.la
 
 libaugctx_la_SOURCES = \
+	base.c \
 	clock.c \
 	ctx.c \
 	defs.c \
