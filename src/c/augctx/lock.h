@@ -8,14 +8,13 @@
  * @file augctx/lock.h
  *
  * Global lock functions.
- *
- * Functions in this module may set errno, but never errinfo.
  */
 
 #include "augctx/config.h"
+#include "augctx/types.h"
 
 #if defined(AUGCTX_BUILD)
-AUG_EXTERNC void
+AUG_EXTERNC aug_bool
 aug_initlock_(void);
 #endif /* AUGCTX_BUILD */
 

@@ -15,10 +15,12 @@ AUG_RCSID("$Id$");
 # endif /* _WIN32 */
 #else /* !ENABLE_THREADS */
 
-AUG_EXTERNC int
+/* Single-threaded stubs. */
+
+AUG_EXTERNC aug_bool
 aug_initlock_(void)
 {
-    return 0;
+    return AUG_TRUE;
 }
 
 AUGCTX_API void

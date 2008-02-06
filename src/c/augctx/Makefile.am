@@ -46,9 +46,15 @@ libaugctx_la_LDFLAGS = \
 
 libaugctx_la_LIBADD =
 
-check_PROGRAMS =
+check_PROGRAMS = \
+	basetest
 
-TESTS =
+TESTS = \
+	basetest
+
+basetest_SOURCES = basetest.c
+basetest_LDADD = \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 if ENABLE_RUBY
 BUILT_SOURCES = \

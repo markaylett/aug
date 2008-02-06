@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS =
+check_PROGRAMS = basetest$(EXEEXT)
 subdir = src/c/augctx
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -60,9 +60,12 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugctx_la_DEPENDENCIES =
-am_libaugctx_la_OBJECTS = base.lo clock.lo ctx.lo defs.lo lock.lo \
-	log.lo mpool.lo utility.lo malloc.lo tls_.lo
+am_libaugctx_la_OBJECTS = base.lo clock.lo config.lo ctx.lo defs.lo \
+	lock.lo log.lo mpool.lo utility.lo malloc.lo tls_.lo
 libaugctx_la_OBJECTS = $(am_libaugctx_la_OBJECTS)
+am_basetest_OBJECTS = basetest.$(OBJEXT)
+basetest_OBJECTS = $(am_basetest_OBJECTS)
+basetest_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -73,8 +76,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugctx_la_SOURCES)
-DIST_SOURCES = $(libaugctx_la_SOURCES)
+SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES)
+DIST_SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -258,7 +261,13 @@ libaugctx_la_LDFLAGS = \
 	-version-info 1:0:0
 
 libaugctx_la_LIBADD = 
-TESTS = 
+TESTS = \
+	basetest
+
+basetest_SOURCES = basetest.c
+basetest_LDADD = \
+	$(top_builddir)/src/c/augctx/libaugctx.la
+
 @ENABLE_RUBY_TRUE@BUILT_SOURCES = \
 @ENABLE_RUBY_TRUE@	clock.h \
 @ENABLE_RUBY_TRUE@	ctx.h \
@@ -335,6 +344,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
+	@rm -f basetest$(EXEEXT)
+	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -343,7 +355,9 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/basetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ctx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@

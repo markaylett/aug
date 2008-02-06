@@ -117,7 +117,7 @@ namespace aug {
 
     template <typename T>
     T*
-    incget(const obref<T>& ref) AUG_NOTHROW
+    retget(const obref<T>& ref) AUG_NOTHROW
     {
         if (ref != null)
             retain(ref);
@@ -150,10 +150,10 @@ namespace aug {
     private:
         obref<T> ref_;
 
-        smartob(obref<T> ref, bool inc) AUG_NOTHROW
+        smartob(obref<T> ref, bool ret) AUG_NOTHROW
             : ref_(ref)
         {
-            if (null != ref && inc)
+            if (null != ref && ret)
                 aug::retain(ref);
         }
 
@@ -234,9 +234,9 @@ namespace aug {
 
     template <typename T>
     T*
-    incget(const smartob<T>& sob) AUG_NOTHROW
+    retget(const smartob<T>& sob) AUG_NOTHROW
     {
-        return incget<T>(static_cast<obref<T> >(sob));
+        return retget<T>(static_cast<obref<T> >(sob));
     }
 
     template <typename T>

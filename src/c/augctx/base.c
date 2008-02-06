@@ -22,7 +22,7 @@ struct tls_ {
 
 # include "augctx/tls_.h"
 
-static int init_ = 0;
+static aug_bool init_ = AUG_FALSE;
 static aug_tlskey_t tlskey_;
 
 static struct tls_*
@@ -31,24 +31,36 @@ gettls_(void)
     return aug_gettlsvalue_(tlskey_);
 }
 
-static void
+static aug_bool
 inittls_(void)
 {
+    /* Lock held. */
+
     struct tls_* tls;
     if (!init_) {
-        aug_createtlskey_(&tlskey_);
-        init_ = 1;
+
+        /* TLS key must be initialised on first call. */
+
+        if (!aug_createtlskey_(&tlskey_))
+            return AUG_FALSE;
+
+        init_ = AUG_TRUE;
         goto skip;
     }
+
     if (!(tls = gettls_())) {
     skip:
+        /* First call on this thread. */
+
         if (!(tls = malloc(sizeof(struct tls_))))
-            abort();
+            return AUG_FALSE;
+
         tls->refs_ = 0;
         tls->ctx_ = NULL;
         aug_settlsvalue_(tlskey_, tls);
     }
     ++tls->refs_;
+    return AUG_TRUE;
 }
 
 static void
@@ -57,6 +69,9 @@ termtls_(void)
     struct tls_* tls = gettls_();
     assert(0 < tls->refs_);
     if (0 == --tls->refs_) {
+
+        /* Free resources associated with thread. */
+
         aug_settlsvalue_(tlskey_, NULL);
         if (tls->ctx_) {
             aug_release(tls->ctx_);
@@ -68,6 +83,8 @@ termtls_(void)
 
 #else /* !ENABLE_THREADS */
 
+/* Single-threaded. */
+
 static struct tls_ tls_ = { 0, NULL };
 
 static struct tls_*
@@ -76,41 +93,41 @@ gettls_(void)
     return &tls_;
 }
 
-static void
+static aug_bool
 inittls_(void)
 {
-    struct tls_* tls = gettls_();
-    ++tls->refs_;
+    ++tls_.refs_;
+    return AUG_TRUE;
 }
 
 static void
 termtls_(void)
 {
-    struct tls_* tls = gettls_();
-    assert(0 < tls->refs_);
-    if (0 == --tls->refs_ && tls->ctx_) {
-        aug_release(tls->ctx_);
-        tls->ctx_ = NULL;
+    assert(0 < tls_.refs_);
+    if (0 == --tls_.refs_ && tls_.ctx_) {
+        aug_release(tls_.ctx_);
+        tls_.ctx_ = NULL;
     }
 }
 
 #endif /* !ENABLE_THREADS */
 
-AUGCTX_API void
+AUGCTX_API aug_bool
 aug_init(void)
 {
-    aug_initlock_();
-    aug_lock();
-    inittls_();
-    aug_unlock();
+    aug_bool ret = aug_initlock_();
+    if (ret) {
+        aug_lock();
+        ret = inittls_();
+        aug_unlock();
+    }
+    return ret;
 }
 
 AUGCTX_API void
 aug_term(void)
 {
-    aug_lock();
     termtls_();
-    aug_unlock();
 }
 
 AUGCTX_API void
@@ -133,4 +150,10 @@ aug_getctx(void)
     if (tls->ctx_)
         aug_retain(tls->ctx_);
     return tls->ctx_;
+}
+
+AUGCTX_API aug_ctx*
+aug_usectx(void)
+{
+    return gettls_()->ctx_;
 }

@@ -7,12 +7,14 @@
 
 static LPCRITICAL_SECTION cs_ = NULL;
 
-AUG_EXTERNC void
+AUG_EXTERNC aug_bool
 aug_initlock_(void)
 {
+    /* Create singleton mutex object. */
+
     LPCRITICAL_SECTION cs = malloc(sizeof(*cs));
     if (!cs)
-        abort();
+        return AUG_FALSE;
 
 	/* In low memory situations, InitializeCriticalSection() can raise a
        STATUS_NO_MEMORY exception. */
@@ -29,6 +31,7 @@ aug_initlock_(void)
         DeleteCriticalSection(cs);
         free(cs);
     }
+    return AUG_TRUE;
 }
 
 AUGCTX_API void

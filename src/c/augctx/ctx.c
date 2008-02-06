@@ -188,13 +188,6 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level)
 }
 
 AUGCTX_API int
-aug_loglevel(void)
-{
-    const char* s = getenv("AUG_LOGLEVEL");
-    return s ? atoi(s) : AUG_LOGINFO;
-}
-
-AUGCTX_API int
 aug_writelog(aug_ctx* ctx, int level, const char* format, ...)
 {
     int ret;

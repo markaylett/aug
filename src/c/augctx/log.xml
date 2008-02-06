@@ -14,6 +14,14 @@
   </interface>
 
   <verbatim>
+/**
+ * Create a standard logger.
+ *
+ * @param mpool The memory pool from which memory will be allocated.
+ *
+ * @return An interface to the newly created log, or NULL on error.
+ */
+
 AUGCTX_API aug_log*
 aug_createstdlog(aug_mpool* mpool);
   </verbatim>

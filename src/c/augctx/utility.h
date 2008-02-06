@@ -22,4 +22,7 @@ AUGCTX_API void
 aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                const char* src, int num, const char* format, ...);
 
+AUGCTX_API int
+aug_loglevel(void);
+
 #endif /* AUGCTX_UTILITY_H */

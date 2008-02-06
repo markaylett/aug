@@ -3,11 +3,11 @@
 */
 #include <stdlib.h> /* abort() */
 
-AUG_EXTERNC void
+AUG_EXTERNC aug_bool
 aug_createtlskey_(aug_tlskey_t* tlskey)
 {
-    if (0 != pthread_key_create(tlskey, NULL))
-        abort();
+    return 0 != pthread_key_create(tlskey, NULL)
+        ? AUG_FALSE : AUG_TRUE:
 }
 
 AUG_EXTERNC void

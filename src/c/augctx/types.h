@@ -4,6 +4,11 @@
 #ifndef AUGCTX_TYPES_H
 #define AUGCTX_TYPES_H
 
+typedef enum {
+    AUG_FALSE,
+    AUG_TRUE
+} aug_bool;
+
 enum aug_loglevel {
     AUG_LOGCRIT,
     AUG_LOGERROR,

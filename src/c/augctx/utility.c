@@ -11,6 +11,7 @@ AUG_RCSID("$Id$");
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h> /* getenv() */
 #include <string.h>
 
 #if defined(_WIN32)
@@ -61,4 +62,11 @@ aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     va_start(args, format);
     aug_vseterrinfo(errinfo, file, line, src, num, format, args);
     va_end(args);
+}
+
+AUGCTX_API int
+aug_loglevel(void)
+{
+    const char* s = getenv("AUG_LOGLEVEL");
+    return s ? atoi(s) : AUG_LOGINFO;
 }

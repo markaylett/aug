@@ -39,9 +39,6 @@ AUGCTX_API aug_ctx*
 aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level);
 
 AUGCTX_API int
-aug_loglevel(void);
-
-AUGCTX_API int
 aug_writelog(aug_ctx* ctx, int level, const char* format, ...);
   </verbatim>
 
