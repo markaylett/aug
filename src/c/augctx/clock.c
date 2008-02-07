@@ -8,16 +8,14 @@
 AUG_RCSID("$Id$");
 
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h> /* tzset() */
 
 #if !defined(_WIN32)
 # include <sys/time.h>
 #else /* _WIN32 */
-# include <sys/timeb.h>
-# include <windows.h>
+# include <sys/timeb.h> /* _ftime() */
+# include <windows.h>   /* struct timeval */
 #endif /* _WIN32 */
 
 struct impl_ {
@@ -107,29 +105,3 @@ aug_createclock(aug_mpool* mpool, long tz)
 
     return &impl->clock_;
 }
-
-#if !defined(_WIN32)
-AUGCTX_API long*
-aug_timezone(long* tz)
-{
-    tzset();
-    *tz = timezone;
-    return tz;
-}
-#else /* _WIN32 */
-AUGCTX_API long*
-aug_timezone(long* tz)
-{
-	TIME_ZONE_INFORMATION tzi;
-    switch (GetTimeZoneInformation(&tzi)) {
-    case TIME_ZONE_ID_INVALID:
-    case TIME_ZONE_ID_UNKNOWN:
-        return NULL;
-    case TIME_ZONE_ID_STANDARD:
-    case TIME_ZONE_ID_DAYLIGHT:
-        break;
-    }
-    *tz = (tzi.Bias + tzi.StandardBias) * 60;
-    return tz;
-}
-#endif /* _WIN32 */

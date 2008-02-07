@@ -11,10 +11,12 @@ AUG_RCSID("$Id$");
 
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h> /* getenv() */
+#include <stdlib.h>   /* getenv() */
 #include <string.h>
+#include <time.h>     /* tzset() */
 
 #if defined(_WIN32)
+# include <windows.h> /* GetTimeZoneInformation() */
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
 
@@ -70,3 +72,29 @@ aug_loglevel(void)
     const char* s = getenv("AUG_LOGLEVEL");
     return s ? atoi(s) : AUG_LOGINFO;
 }
+
+#if !defined(_WIN32)
+AUGCTX_API long*
+aug_timezone(long* tz)
+{
+    tzset();
+    *tz = timezone;
+    return tz;
+}
+#else /* _WIN32 */
+AUGCTX_API long*
+aug_timezone(long* tz)
+{
+	TIME_ZONE_INFORMATION tzi;
+    switch (GetTimeZoneInformation(&tzi)) {
+    case TIME_ZONE_ID_INVALID:
+    case TIME_ZONE_ID_UNKNOWN:
+        return NULL;
+    case TIME_ZONE_ID_STANDARD:
+    case TIME_ZONE_ID_DAYLIGHT:
+        break;
+    }
+    *tz = (tzi.Bias + tzi.StandardBias) * 60;
+    return tz;
+}
+#endif /* _WIN32 */

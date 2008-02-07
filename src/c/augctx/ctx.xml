@@ -16,12 +16,6 @@
       <param name="level" type="int"/>
     </method>
 
-    <method name="vwritelog" type="int" qname="vwritelog">
-      <param name="level" type="int"/>
-      <param name="format" type="const char*"/>
-      <param name="args" type="va_list"/>
-    </method>
-
     <method name="getmpool" type="aug_mpool" object="true" qname="getmpool"/>
 
     <method name="getclock" type="aug_clock" object="true" qname="getclock"/>
@@ -35,11 +29,13 @@
   </interface>
 
   <verbatim>
+#if defined(AUGCTX_BUILD)
+AUG_EXTERNC int
+aug_vwritectx_(aug_ctx* obj, int level, const char* format, va_list args);
+#endif /* AUGCTX_BUILD */
+
 AUGCTX_API aug_ctx*
 aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level);
-
-AUGCTX_API int
-aug_writelog(aug_ctx* ctx, int level, const char* format, ...);
   </verbatim>
 
 </package>

@@ -70,8 +70,9 @@ setlog_(aug_ctx* obj, aug_log* log)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
     assert(log);
-    aug_release(impl->log_);
+    /* Retain before release - avoiding issues with self assignment. */
     aug_retain(log);
+    aug_release(impl->log_);
     impl->log_ = log;
 }
 
@@ -82,15 +83,6 @@ setloglevel_(aug_ctx* obj, int level)
     int prev = impl->level_;
     impl->level_ = level;
     return prev;
-}
-
-static int
-vwritelog_(aug_ctx* obj, int level, const char* format, va_list args)
-{
-    struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
-    if (level <= impl->level_)
-        return aug_vprintlog(impl->log_, level, format, args);
-    return 0;
 }
 
 static aug_mpool*
@@ -137,13 +129,20 @@ static const struct aug_ctxvtbl vtbl_ = {
     release_,
     setlog_,
     setloglevel_,
-    vwritelog_,
     getmpool_,
     getclock_,
     getlog_,
     getloglevel_,
     geterrinfo_
 };
+
+AUG_EXTERNC int
+aug_vwritectx_(aug_ctx* obj, int level, const char* format, va_list args)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
+    return level <= impl->level_
+        ? aug_vwritelog(impl->log_, level, format, args) : 0;
+}
 
 AUGCTX_API aug_ctx*
 aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level)
@@ -185,15 +184,4 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level)
     memset(&impl->errinfo_, 0, sizeof(impl->errinfo_));
 
     return &impl->ctx_;
-}
-
-AUGCTX_API int
-aug_writelog(aug_ctx* ctx, int level, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vwritelog(ctx, level, format, args);
-    va_end(args);
-    return ret;
 }

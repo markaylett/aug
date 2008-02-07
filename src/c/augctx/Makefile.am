@@ -3,6 +3,8 @@ SUBDIRS = \
 	posix \
 	win32
 EXTRA_DIST = \
+	malloc.c \
+	malloc.h \
 	clock.xml \
 	ctx.xml \
 	log.xml \
@@ -22,7 +24,6 @@ modinclude_HEADERS = \
 	utility.h
 
 noinst_HEADERS = \
-	malloc.h \
 	tls_.h
 
 lib_LTLIBRARIES = libaugctx.la
@@ -36,8 +37,8 @@ libaugctx_la_SOURCES = \
 	lock.c \
 	log.c \
 	mpool.c \
+	types.c \
 	utility.c \
-	malloc.c \
 	tls_.c
 
 libaugctx_la_LDFLAGS = \

@@ -16,6 +16,12 @@ aug_term(void);
 AUGCTX_API void
 aug_setctx(aug_ctx* ctx);
 
+AUGCTX_API int
+aug_vwritectx(aug_ctx* ctx, int level, const char* format, va_list args);
+
+AUGCTX_API int
+aug_writectx(aug_ctx* ctx, int level, const char* format, ...);
+
 /**
  * Obtain reference to thread-local context.
  *

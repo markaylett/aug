@@ -135,11 +135,36 @@ aug_setctx(aug_ctx* ctx)
 {
     struct tls_* tls = gettls_();
     assert(0 < tls->refs_);
-    if (tls->ctx_)
-        aug_release(tls->ctx_);
+    /* Retain before release - avoiding issues with self assignment. */
     if (ctx)
         aug_retain(ctx);
+    if (tls->ctx_)
+        aug_release(tls->ctx_);
     tls->ctx_ = ctx;
+}
+
+AUGCTX_API int
+aug_vwritectx(aug_ctx* ctx, int level, const char* format, va_list args)
+{
+    if (!ctx)
+        ctx = aug_usectx();
+    return ctx ? aug_vwritectx_(ctx, level, format, args) : 0;
+}
+
+AUGCTX_API int
+aug_writectx(aug_ctx* ctx, int level, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    if (!ctx)
+        ctx = aug_usectx();
+    if (ctx) {
+        va_start(args, format);
+        ret = aug_vwritectx_(ctx, level, format, args);
+        va_end(args);
+    } else
+        ctx = 0;
+    return ret;
 }
 
 AUGCTX_API aug_ctx*

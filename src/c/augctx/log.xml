@@ -5,7 +5,7 @@
   <anglincl>stdarg.h</anglincl>
   <interface name="log">
 
-    <method name="vprint" type="int">
+    <method name="vwrite" type="int">
       <param name="level" type="int"/>
       <param name="format" type="const char*"/>
       <param name="args" type="va_list"/>

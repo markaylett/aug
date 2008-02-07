@@ -25,4 +25,7 @@ aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 AUGCTX_API int
 aug_loglevel(void);
 
+AUGCTX_API long*
+aug_timezone(long* tz);
+
 #endif /* AUGCTX_UTILITY_H */
