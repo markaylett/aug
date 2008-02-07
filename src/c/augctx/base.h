@@ -16,12 +16,6 @@ aug_term(void);
 AUGCTX_API void
 aug_setctx(aug_ctx* ctx);
 
-AUGCTX_API int
-aug_vwritectx(aug_ctx* ctx, int level, const char* format, va_list args);
-
-AUGCTX_API int
-aug_writectx(aug_ctx* ctx, int level, const char* format, ...);
-
 /**
  * Obtain reference to thread-local context.
  *
@@ -45,6 +39,10 @@ aug_getctx(void);
 AUGCTX_API aug_ctx*
 aug_usectx(void);
 
-#define aug_havectx() (aug_usectx() ? AUG_TRUE : AUG_FALSE)
+AUGCTX_API int
+aug_vctxlog(aug_ctx* ctx, int level, const char* format, va_list args);
+
+AUGCTX_API int
+aug_ctxlog(aug_ctx* ctx, int level, const char* format, ...);
 
 #endif /* AUGCTX_BASE_H */

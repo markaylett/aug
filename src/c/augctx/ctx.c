@@ -136,14 +136,6 @@ static const struct aug_ctxvtbl vtbl_ = {
     geterrinfo_
 };
 
-AUG_EXTERNC int
-aug_vwritectx_(aug_ctx* obj, int level, const char* format, va_list args)
-{
-    struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
-    return level <= impl->level_
-        ? aug_vwritelog(impl->log_, level, format, args) : 0;
-}
-
 AUGCTX_API aug_ctx*
 aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level)
 {

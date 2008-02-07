@@ -28,4 +28,13 @@ aug_loglevel(void);
 AUGCTX_API long*
 aug_timezone(long* tz);
 
+#define aug_die_(file, line, what) \
+(fprintf(stderr, "%s:%d: %s\n", file, line, what), abort())
+
+#define aug_die(what) \
+aug_die_(__FILE__, __LINE__, what)
+
+#define aug_check(expr) \
+(expr) ? (void)0 : aug_die("check [" #expr "] failed.")
+
 #endif /* AUGCTX_UTILITY_H */

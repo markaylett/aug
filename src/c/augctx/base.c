@@ -112,6 +112,21 @@ termtls_(void)
 
 #endif /* !ENABLE_THREADS */
 
+static int
+vctxlog_(aug_ctx* ctx, int level, const char* format, va_list args)
+{
+    int ret = 0;
+    assert(ctx);
+    if (level <= aug_getloglevel(ctx)) {
+        aug_log* log = aug_getlog(ctx);
+        if (log) {
+            ret = aug_vwritelog(log, level, format, args);
+            aug_release(log);
+        }
+    }
+    return ret;
+}
+
 AUGCTX_API aug_bool
 aug_init(void)
 {
@@ -143,30 +158,6 @@ aug_setctx(aug_ctx* ctx)
     tls->ctx_ = ctx;
 }
 
-AUGCTX_API int
-aug_vwritectx(aug_ctx* ctx, int level, const char* format, va_list args)
-{
-    if (!ctx)
-        ctx = aug_usectx();
-    return ctx ? aug_vwritectx_(ctx, level, format, args) : 0;
-}
-
-AUGCTX_API int
-aug_writectx(aug_ctx* ctx, int level, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    if (!ctx)
-        ctx = aug_usectx();
-    if (ctx) {
-        va_start(args, format);
-        ret = aug_vwritectx_(ctx, level, format, args);
-        va_end(args);
-    } else
-        ctx = 0;
-    return ret;
-}
-
 AUGCTX_API aug_ctx*
 aug_getctx(void)
 {
@@ -181,4 +172,28 @@ AUGCTX_API aug_ctx*
 aug_usectx(void)
 {
     return gettls_()->ctx_;
+}
+
+AUGCTX_API int
+aug_vctxlog(aug_ctx* ctx, int level, const char* format, va_list args)
+{
+    if (!ctx)
+        ctx = aug_usectx();
+    return ctx ? vctxlog_(ctx, level, format, args) : 0;
+}
+
+AUGCTX_API int
+aug_ctxlog(aug_ctx* ctx, int level, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    if (!ctx)
+        ctx = aug_usectx();
+    if (ctx) {
+        va_start(args, format);
+        ret = vctxlog_(ctx, level, format, args);
+        va_end(args);
+    } else
+        ret = 0;
+    return ret;
 }

@@ -29,11 +29,6 @@
   </interface>
 
   <verbatim>
-#if defined(AUGCTX_BUILD)
-AUG_EXTERNC int
-aug_vwritectx_(aug_ctx* obj, int level, const char* format, va_list args);
-#endif /* AUGCTX_BUILD */
-
 AUGCTX_API aug_ctx*
 aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level);
   </verbatim>

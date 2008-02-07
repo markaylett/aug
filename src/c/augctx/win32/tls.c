@@ -2,6 +2,11 @@
    See the file COPYING for copying permission.
 */
 
+#include "augctx/utility.h" /* aug_check() */
+
+#include <stdio.h>
+#include <stdlib.h>         /* abort() */
+
 AUG_EXTERNC aug_bool
 aug_createtlskey_(aug_tlskey_t* tlskey)
 {
@@ -12,15 +17,13 @@ aug_createtlskey_(aug_tlskey_t* tlskey)
 AUG_EXTERNC void
 aug_destroytlskey_(aug_tlskey_t tlskey)
 {
-    if (!TlsFree(tlskey))
-        abort();
+    aug_check(TlsFree(tlskey));
 }
 
 AUG_EXTERNC void
 aug_settlsvalue_(aug_tlskey_t tlskey, void* value)
 {
-    if (!TlsSetValue(tlskey, value))
-        abort();
+    aug_check(TlsSetValue(tlskey, value));
 }
 
 AUG_EXTERNC void*

@@ -1,7 +1,10 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include <stdlib.h> /* abort() */
+#include "augctx/utility.h" /* aug_check() */
+
+#include <stdio.h>
+#include <stdlib.h>         /* abort() */
 
 AUG_EXTERNC aug_bool
 aug_createtlskey_(aug_tlskey_t* tlskey)
@@ -13,15 +16,13 @@ aug_createtlskey_(aug_tlskey_t* tlskey)
 AUG_EXTERNC void
 aug_destroytlskey_(aug_tlskey_t tlskey)
 {
-    if (0 != pthread_key_delete(tlskey))
-        abort();
+    aug_check(0 == pthread_key_delete(tlskey));
 }
 
 AUG_EXTERNC void
 aug_settlsvalue_(aug_tlskey_t tlskey, void* value)
 {
-    if (0 != pthread_setspecific(tlskey, value))
-        abort();
+    aug_check(0 == pthread_setspecific(tlskey, value));
 }
 
 AUG_EXTERNC void*

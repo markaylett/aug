@@ -17,13 +17,11 @@ aug_initlock_(void)
 AUGCTX_API void
 aug_lock(void)
 {
-    if (0 != pthread_mutex_lock(&mutex_))
-        abort();
+    aug_check(0 == pthread_mutex_lock(&mutex_));
 }
 
 AUGCTX_API void
 aug_unlock(void)
 {
-    if (0 != pthread_mutex_unlock(&mutex_))
-        abort();
+    aug_check(0 == pthread_mutex_unlock(&mutex_));
 }
