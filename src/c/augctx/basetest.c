@@ -6,33 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static aug_ctx*
-createctx_(long tz, int level)
-{
-    aug_mpool* mpool;
-    aug_clock* clock;
-    aug_log* log;
-    aug_ctx* ctx;
-
-    mpool = aug_createdlmalloc();
-    aug_check(mpool);
-
-    clock = aug_createclock(mpool, tz);
-    aug_check(clock);
-
-    log = aug_createstdlog(mpool);
-    aug_check(log);
-
-    ctx = aug_createctx(mpool, clock, log, level);
-    aug_check(ctx);
-
-    aug_release(log);
-    aug_release(clock);
-    aug_release(mpool);
-
-    return ctx;
-}
-
 int
 main(int argc, char* argv[])
 {
@@ -42,11 +15,11 @@ main(int argc, char* argv[])
         long tz;
         aug_ctx* ctx;
         aug_timezone(&tz);
-        ctx = createctx_(tz, aug_loglevel());
+        ctx = aug_createbasicctx(tz, aug_loglevel());
         aug_setctx(ctx);
         aug_release(ctx);
     }
-    aug_ctxlog(NULL, AUG_LOGINFO, "%s", "a test message");
+    aug_ctxinfo(NULL, "%s", "a test message");
     aug_term();
     aug_term();
 

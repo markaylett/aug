@@ -141,6 +141,9 @@
 				RelativePath="..\src\c\augctx\defs.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augctx\errinfo.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augctx\lock.c">
 			</File>
 			<File
@@ -150,10 +153,10 @@
 				RelativePath="..\src\c\augctx\mpool.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augctx\tls_.c">
+				RelativePath="..\src\c\augctx\string.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augctx\types.c">
+				RelativePath="..\src\c\augctx\tls_.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\utility.c">
@@ -179,6 +182,9 @@
 				RelativePath="..\src\c\augctx\defs.h">
 			</File>
 			<File
+				RelativePath="..\src\c\augctx\errinfo.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augctx\lock.h">
 			</File>
 			<File
@@ -188,10 +194,10 @@
 				RelativePath="..\src\c\augctx\mpool.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augctx\tls_.h">
+				RelativePath="..\src\c\augctx\string.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augctx\types.h">
+				RelativePath="..\src\c\augctx\tls_.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\utility.h">

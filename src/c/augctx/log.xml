@@ -1,8 +1,19 @@
 <package name="aug" dir="augctx">
 
   <quotincl>augctx/mpool.h</quotincl>
-
   <anglincl>stdarg.h</anglincl>
+
+  <verbatim>
+enum aug_loglevel {
+    AUG_LOGCRIT,
+    AUG_LOGERROR,
+    AUG_LOGWARN,
+    AUG_LOGNOTICE,
+    AUG_LOGINFO,
+    AUG_LOGDEBUG0
+};
+  </verbatim>
+
   <interface name="log">
 
     <method name="vwrite" type="int">

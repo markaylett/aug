@@ -13,10 +13,11 @@
 #include "augctx/config.h"
 #include "augctx/ctx.h"
 #include "augctx/defs.h"
+#include "augctx/errinfo.h"
 #include "augctx/lock.h"
 #include "augctx/log.h"
 #include "augctx/mpool.h"
-#include "augctx/types.h"
+#include "augctx/string.h"
 #include "augctx/utility.h"
 
 #endif /* AUGCTX_H */

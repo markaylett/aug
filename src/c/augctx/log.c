@@ -7,8 +7,6 @@
 
 AUG_RCSID("$Id$");
 
-#include "augctx/types.h" /* AUG_LOGWARN */
-
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>

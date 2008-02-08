@@ -61,7 +61,8 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugctx_la_DEPENDENCIES =
 am_libaugctx_la_OBJECTS = base.lo clock.lo config.lo ctx.lo defs.lo \
-	lock.lo log.lo mpool.lo types.lo utility.lo tls_.lo
+	errinfo.lo lock.lo log.lo mpool.lo string.lo utility.lo \
+	tls_.lo
 libaugctx_la_OBJECTS = $(am_libaugctx_la_OBJECTS)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
@@ -234,10 +235,11 @@ modinclude_HEADERS = \
 	config.h \
 	ctx.h \
 	defs.h \
+	errinfo.h \
 	lock.h \
 	log.h \
 	mpool.h \
-	types.h \
+	string.h \
 	utility.h
 
 noinst_HEADERS = \
@@ -250,10 +252,11 @@ libaugctx_la_SOURCES = \
 	config.c \
 	ctx.c \
 	defs.c \
+	errinfo.c \
 	lock.c \
 	log.c \
 	mpool.c \
-	types.c \
+	string.c \
 	utility.c \
 	tls_.c
 
@@ -361,11 +364,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ctx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpool.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tls_.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Plo@am__quote@
 
 .c.o:

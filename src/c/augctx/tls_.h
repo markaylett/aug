@@ -13,7 +13,7 @@
  */
 
 #include "augctx/config.h"
-#include "augctx/types.h"
+#include "augbool.h"
 
 #if !defined(_WIN32)
 # include <pthread.h>

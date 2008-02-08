@@ -197,3 +197,102 @@ aug_ctxlog(aug_ctx* ctx, int level, const char* format, ...)
         ret = 0;
     return ret;
 }
+
+AUGCTX_API int
+aug_ctxcrit(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vctxlog(ctx, AUG_LOGCRIT, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxerror(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vctxlog(ctx, AUG_LOGERROR, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxwarn(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vctxlog(ctx, AUG_LOGWARN, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxnotice(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vctxlog(ctx, AUG_LOGNOTICE, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxinfo(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vctxlog(ctx, AUG_LOGINFO, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxdebug0(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vctxlog(ctx, AUG_LOGDEBUG0, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxdebug1(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vctxlog(ctx, AUG_LOGDEBUG0 + 1, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxdebug2(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vctxlog(ctx, AUG_LOGDEBUG0 + 2, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxdebug3(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = aug_vctxlog(ctx, AUG_LOGDEBUG0 + 3, format, args);
+    va_end(args);
+    return ret;
+}

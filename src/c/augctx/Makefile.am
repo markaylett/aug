@@ -17,10 +17,11 @@ modinclude_HEADERS = \
 	config.h \
 	ctx.h \
 	defs.h \
+	errinfo.h \
 	lock.h \
 	log.h \
 	mpool.h \
-	types.h \
+	string.h \
 	utility.h
 
 noinst_HEADERS = \
@@ -34,10 +35,11 @@ libaugctx_la_SOURCES = \
 	config.c \
 	ctx.c \
 	defs.c \
+	errinfo.c \
 	lock.c \
 	log.c \
 	mpool.c \
-	types.c \
+	string.c \
 	utility.c \
 	tls_.c
 

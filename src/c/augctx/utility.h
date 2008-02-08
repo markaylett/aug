@@ -11,23 +11,6 @@
 
 struct aug_errinfo;
 
-AUGCTX_API size_t
-aug_strlcpy(char* dst, const char* src, size_t size);
-
-AUGCTX_API void
-aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                const char* src, int num, const char* format, va_list args);
-
-AUGCTX_API void
-aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-               const char* src, int num, const char* format, ...);
-
-AUGCTX_API int
-aug_loglevel(void);
-
-AUGCTX_API long*
-aug_timezone(long* tz);
-
 #define aug_die_(file, line, what) \
 (fprintf(stderr, "%s:%d: %s\n", file, line, what), abort())
 
@@ -36,5 +19,20 @@ aug_die_(__FILE__, __LINE__, what)
 
 #define aug_check(expr) \
 (expr) ? (void)0 : aug_die("check [" #expr "] failed.")
+
+/**
+ * Get default log-level.
+ *
+ * The log-level specified by the "AUG_LOGLEVEL" environment variable, or
+ * #AUG_LOGINFO if not set.
+ *
+ * @return The log-level.
+ */
+
+AUGCTX_API int
+aug_loglevel(void);
+
+AUGCTX_API long*
+aug_timezone(long* tz);
 
 #endif /* AUGCTX_UTILITY_H */

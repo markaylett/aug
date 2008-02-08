@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augctx/types.h"
+#include "augctx/errinfo.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -24,7 +24,7 @@ struct impl_ {
     aug_mpool* mpool_;
     aug_clock* clock_;
     aug_log* log_;
-    int level_;
+    int loglevel_;
     struct aug_errinfo errinfo_;
 };
 
@@ -80,8 +80,8 @@ static int
 setloglevel_(aug_ctx* obj, int level)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
-    int prev = impl->level_;
-    impl->level_ = level;
+    int prev = impl->loglevel_;
+    impl->loglevel_ = level;
     return prev;
 }
 
@@ -113,7 +113,7 @@ static int
 getloglevel_(aug_ctx* obj)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
-    return impl->level_;
+    return impl->loglevel_;
 }
 
 static struct aug_errinfo*
@@ -137,7 +137,7 @@ static const struct aug_ctxvtbl vtbl_ = {
 };
 
 AUGCTX_API aug_ctx*
-aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level)
+aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int loglevel)
 {
     struct impl_* impl;
     assert(mpool);
@@ -172,8 +172,35 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level)
     impl->clock_ = clock;
     impl->log_ = log;
 
-    impl->level_ = level;
+    impl->loglevel_ = loglevel;
     memset(&impl->errinfo_, 0, sizeof(impl->errinfo_));
 
     return &impl->ctx_;
+}
+
+AUGCTX_API aug_ctx*
+aug_createbasicctx(long tz, int level)
+{
+    aug_mpool* mpool;
+    aug_clock* clock;
+    aug_log* log;
+    aug_ctx* ctx = NULL;
+
+    if (!(mpool = aug_createdlmalloc()))
+        return NULL;
+
+    if (!(clock = aug_createclock(mpool, tz)))
+        goto fail1;
+
+    if (!(log = aug_createstdlog(mpool)))
+        goto fail2;
+
+    ctx = aug_createctx(mpool, clock, log, level);
+
+    aug_release(log);
+ fail2:
+    aug_release(clock);
+ fail1:
+    aug_release(mpool);
+    return ctx;
 }

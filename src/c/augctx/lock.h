@@ -11,7 +11,7 @@
  */
 
 #include "augctx/config.h"
-#include "augctx/types.h"
+#include "augbool.h"
 
 #if defined(AUGCTX_BUILD)
 AUG_EXTERNC aug_bool

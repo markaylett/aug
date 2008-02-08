@@ -10,7 +10,7 @@ EXTRA_DIST = \
 	Doxyfile
 
 dotdepend:
-	for l in augsys augmar augutil augsrv augnet; do \
+	for l in augctx augsys augmar augutil augsrv augnet; do \
 		(cd $(top_srcdir)/src/c && \
 			../pl/dotdepend -I. $$(find $$l -name "*.c" \
 			| egrep -v '([.]libs|test[.]c$$)')) \
