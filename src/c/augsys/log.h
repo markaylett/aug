@@ -55,7 +55,7 @@ AUGSYS_API int
 aug_setloglevel(int loglevel);
 
 /**
- * If the logger argument is NULL, the default logger is re-installed.
+ * If the logger argument is null, the default logger is re-installed.
  *
  * @return Previous logger.
  */

@@ -625,7 +625,7 @@ mod_gethost(void);
 
 /**
  * This macro defines the module's entry points.  mod_init() should return
- * NULL on failure.
+ * null on failure.
  */
 
 #define MOD_ENTRYPOINTS(init, term)                                 \

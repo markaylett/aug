@@ -29,7 +29,7 @@ aug_obtolong(aug_object* ob);
  *
  * @param destroy Destructor to be called when reference count reaches zero.
  *
- * @return Address of new object, or NULL on error.
+ * @return Address of new object, or null on error.
  */
 
 AUGUTIL_API aug_addrob*
@@ -40,7 +40,7 @@ aug_createaddrob(void* p, void (*destroy)(void*));
  *
  * @param ob Base object address.
  *
- * @return Plain pointer, or NULL if not @ref aug_addrob type.
+ * @return Plain pointer, or null if not @ref aug_addrob type.
  */
 
 AUGUTIL_API void*

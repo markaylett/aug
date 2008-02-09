@@ -98,7 +98,7 @@ aug_verifynetevent(const struct aug_netevent* event);
  *
  * @param event NetEvent object.
  *
- * @return @a buf, or NULL on error.
+ * @return @a buf, or null on error.
  */
 
 AUGNET_API char*
@@ -111,7 +111,7 @@ aug_packnetevent(char* buf, const struct aug_netevent* event);
  *
  * @param buf Input buffer.
  *
- * @return @a event, or NULL on error.
+ * @return @a event, or null on error.
  */
 
 AUGNET_API struct aug_netevent*

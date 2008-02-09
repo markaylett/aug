@@ -7,6 +7,7 @@
 
 AUG_RCSID("$Id$");
 
+#include "augctx/errinfo.h"
 #include "augctx/lock.h"
 #include "augctx/tls_.h"
 
@@ -145,8 +146,151 @@ aug_term(void)
     termtls_();
 }
 
+AUGCTX_API int
+aug_vctxlog(aug_ctx* ctx, int level, const char* format, va_list args)
+{
+    return vctxlog_(ctx, level, format, args);
+}
+
+AUGCTX_API int
+aug_ctxlog(aug_ctx* ctx, int level, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, level, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxcrit(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, AUG_LOGCRIT, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxerror(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, AUG_LOGERROR, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxwarn(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, AUG_LOGWARN, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxnotice(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, AUG_LOGNOTICE, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxinfo(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, AUG_LOGINFO, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxdebug0(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, AUG_LOGDEBUG0, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxdebug1(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, AUG_LOGDEBUG0 + 1, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxdebug2(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, AUG_LOGDEBUG0 + 2, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_ctxdebug3(aug_ctx* ctx, const char* format, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, format);
+    ret = vctxlog_(ctx, AUG_LOGDEBUG0 + 3, format, args);
+    va_end(args);
+    return ret;
+}
+
+AUGCTX_API int
+aug_perrinfo(aug_ctx* ctx, const char* s)
+{
+    struct aug_errinfo* errinfo = aug_geterrinfo(ctx);
+    const char* file;
+
+    if (0 == errinfo->num_) {
+        aug_ctxerror(ctx, "%s: no description available", s);
+        return 0;
+    }
+
+    for (file = errinfo->file_; ; ++file)
+        switch (*file) {
+        case '.':
+        case '/':
+        case '\\':
+            break;
+        default:
+            goto done;
+        }
+ done:
+    return aug_ctxerror(ctx, "%s:%d: %s: [src=%s, num=0x%.8x (%d)] %s",
+                        file, (int)errinfo->line_, s, errinfo->src_,
+                        (int)errinfo->num_, (int)errinfo->num_,
+                        errinfo->desc_);
+}
+
 AUGCTX_API void
-aug_setctx(aug_ctx* ctx)
+aug_settlx(aug_ctx* ctx)
 {
     struct tls_* tls = gettls_();
     assert(0 < tls->refs_);
@@ -159,7 +303,7 @@ aug_setctx(aug_ctx* ctx)
 }
 
 AUGCTX_API aug_ctx*
-aug_getctx(void)
+aug_gettlx(void)
 {
     struct tls_* tls = gettls_();
     assert(0 < tls->refs_);
@@ -169,130 +313,7 @@ aug_getctx(void)
 }
 
 AUGCTX_API aug_ctx*
-aug_usectx(void)
+aug_tlx_(void)
 {
     return gettls_()->ctx_;
-}
-
-AUGCTX_API int
-aug_vctxlog(aug_ctx* ctx, int level, const char* format, va_list args)
-{
-    if (!ctx)
-        ctx = aug_usectx();
-    return ctx ? vctxlog_(ctx, level, format, args) : 0;
-}
-
-AUGCTX_API int
-aug_ctxlog(aug_ctx* ctx, int level, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    if (!ctx)
-        ctx = aug_usectx();
-    if (ctx) {
-        va_start(args, format);
-        ret = vctxlog_(ctx, level, format, args);
-        va_end(args);
-    } else
-        ret = 0;
-    return ret;
-}
-
-AUGCTX_API int
-aug_ctxcrit(aug_ctx* ctx, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vctxlog(ctx, AUG_LOGCRIT, format, args);
-    va_end(args);
-    return ret;
-}
-
-AUGCTX_API int
-aug_ctxerror(aug_ctx* ctx, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vctxlog(ctx, AUG_LOGERROR, format, args);
-    va_end(args);
-    return ret;
-}
-
-AUGCTX_API int
-aug_ctxwarn(aug_ctx* ctx, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vctxlog(ctx, AUG_LOGWARN, format, args);
-    va_end(args);
-    return ret;
-}
-
-AUGCTX_API int
-aug_ctxnotice(aug_ctx* ctx, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vctxlog(ctx, AUG_LOGNOTICE, format, args);
-    va_end(args);
-    return ret;
-}
-
-AUGCTX_API int
-aug_ctxinfo(aug_ctx* ctx, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vctxlog(ctx, AUG_LOGINFO, format, args);
-    va_end(args);
-    return ret;
-}
-
-AUGCTX_API int
-aug_ctxdebug0(aug_ctx* ctx, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vctxlog(ctx, AUG_LOGDEBUG0, format, args);
-    va_end(args);
-    return ret;
-}
-
-AUGCTX_API int
-aug_ctxdebug1(aug_ctx* ctx, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vctxlog(ctx, AUG_LOGDEBUG0 + 1, format, args);
-    va_end(args);
-    return ret;
-}
-
-AUGCTX_API int
-aug_ctxdebug2(aug_ctx* ctx, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vctxlog(ctx, AUG_LOGDEBUG0 + 2, format, args);
-    va_end(args);
-    return ret;
-}
-
-AUGCTX_API int
-aug_ctxdebug3(aug_ctx* ctx, const char* format, ...)
-{
-    int ret;
-    va_list args;
-    va_start(args, format);
-    ret = aug_vctxlog(ctx, AUG_LOGDEBUG0 + 3, format, args);
-    va_end(args);
-    return ret;
 }

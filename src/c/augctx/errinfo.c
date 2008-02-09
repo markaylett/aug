@@ -13,6 +13,8 @@ AUG_RCSID("$Id$");
 #include <stdio.h>
 
 #if defined(_WIN32)
+# include "augsys/windows.h"
+# include <ctype.h>
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
 
@@ -46,3 +48,36 @@ aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     aug_vseterrinfo(errinfo, file, line, src, num, format, args);
     va_end(args);
 }
+
+AUGCTX_API void
+aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    int err)
+{
+    aug_seterrinfo(errinfo, file, line, "posix", err, strerror(err));
+}
+
+#if defined(_WIN32)
+AUGCTX_API void
+aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                    unsigned long err)
+{
+    char desc[AUG_MAXLINE];
+    DWORD i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
+                            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                            desc, sizeof(desc), NULL);
+
+    /* Remove trailing whitespace. */
+
+    while (i && isspace(desc[i - 1]))
+        --i;
+
+    /* Remove trailing full-stop. */
+
+    if (i && '.' == desc[i - 1])
+        --i;
+
+    desc[i] = '\0';
+    aug_seterrinfo(errinfo, file, line, "win32", (int)err,
+                   i ? desc : AUG_MSG("no description available"));
+}
+#endif /* _WIN32 */

@@ -32,7 +32,7 @@ aug_copymar(aug_mar_t dst, aug_mar_t src);
 /**
  * Create an in-memory message archive.
  *
- * @return A handle to the newly created message archive or NULL on failure,
+ * @return A handle to the newly created message archive or null on failure,
  * in which case errno can be used to determine the error.
  *
  * @see aug_openmar() and aug_releasemar().
@@ -51,7 +51,7 @@ aug_createmar(void);
  * @param ... The permissions used to create a new file.  Required when the
  * #AUG_CREAT flag has been specified, otherwise ignored.
  *
- * @return A handle to the newly created message archive or NULL on failure,
+ * @return A handle to the newly created message archive or null on failure,
  * in which case errno can be used to determine the error.
  *
  * @see aug_createmar() and aug_releasemar().
@@ -204,7 +204,7 @@ aug_unsetbyord(aug_mar_t mar, unsigned ord);
  * @param size An optional output parameter, in which, the size of the field
  * value is set.
  *
- * @return A pointer to the field value or NULL on failure, in which case
+ * @return A pointer to the field value or null on failure, in which case
  * errno can be used to determine the error.
  *
  * @see aug_valuebyord(), aug_getfield() and aug_ordtoname().
@@ -223,7 +223,7 @@ aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size);
  * @param size An optional output parameter, in which, the size of the field
  * value is set.
  *
- * @return A pointer to the field value or NULL on failure, in which case
+ * @return A pointer to the field value or null on failure, in which case
  * errno can be used to determine the error.
  *
  * @see aug_valuebyname(), aug_getfield() and aug_nametoord().
@@ -425,7 +425,7 @@ aug_extractmar(aug_mar_t mar, const char* path);
  * @param size An optional output parameter, in which, the size of the content
  * is set.
  *
- * @return A pointer to the content or NULL on failure, in which case errno
+ * @return A pointer to the content or null on failure, in which case errno
  * can be used to determine the error.
  *
  * @see aug_readmar(), aug_extractmar() and aug_contentsize().

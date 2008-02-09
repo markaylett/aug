@@ -234,7 +234,7 @@ namespace aug {
  *
  * @param mpool The memory pool from which memory will be allocated.
  *
- * @return An interface to the newly created log, or NULL on error.
+ * @return An interface to the newly created log, or null on error.
  */
 
 AUGCTX_API aug_log*

@@ -35,7 +35,7 @@ struct aug_fdtype {
  *
  * @param errinfo Thread-local error info object.
  *
- * @return NULL on failure.
+ * @return null on failure.
  */
 
 AUGSYS_API struct aug_errinfo*
@@ -155,7 +155,7 @@ aug_setfdtype(int fd, const struct aug_fdtype* fdtype);
  *
  * @param fd File descriptor.
  *
- * @return File type, or NULL on error.
+ * @return File type, or null on error.
  */
 
 AUGSYS_API const struct aug_fdtype*
@@ -169,7 +169,7 @@ aug_extfdtype(struct aug_fdtype* derived, const struct aug_fdtype* base);
  *
  * Cannot fail.
  *
- * @return File type, or NULL on error.
+ * @return File type, or null on error.
  */
 
 AUGSYS_API const struct aug_fdtype*

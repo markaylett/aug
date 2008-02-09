@@ -47,7 +47,7 @@ struct aug_seqobvtbl {
  * @param this_ The object.
  * @param value Output value.
  * @param key Value's key.
- * @return @a value, or NULL on error.
+ * @return @a value, or null on error.
  */
 
 #define aug_findseqob(this_, value, key) \
@@ -56,7 +56,7 @@ struct aug_seqobvtbl {
 /**
  * Get first item.
  * @param this_ The object.
- * @return Iterator, or NULL on error.
+ * @return Iterator, or null on error.
  */
 
 #define aug_seqobbegin(this_) \

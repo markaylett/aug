@@ -34,7 +34,7 @@ struct aug_tmspec {
  *
  * @param s Specification.
  *
- * @return NULL on error.
+ * @return null on error.
  */
 
 AUGUTIL_API struct aug_tmspec*
