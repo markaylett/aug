@@ -31,6 +31,9 @@
 AUGCTX_API aug_bool
 aug_init(void);
 
+AUGCTX_API aug_bool
+aug_initbasicctx(void);
+
 /**
  * Terminate use of library.
  *

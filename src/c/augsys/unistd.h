@@ -17,7 +17,7 @@
 #  define ftruncate _chsize
 # endif /* ftruncate */
 # if !defined(fsync)
-#  define fsync _commit
+#  define fsync _commit /* FlushFileBuffers() */
 # endif /* fsync */
 #endif /* _WIN32 */
 

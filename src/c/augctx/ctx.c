@@ -8,6 +8,7 @@
 AUG_RCSID("$Id$");
 
 #include "augctx/errinfo.h"
+#include "augctx/utility.h" /* aug_timezone() */
 
 #include <assert.h>
 #include <stdio.h>
@@ -194,12 +195,16 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int loglevel)
 }
 
 AUGCTX_API aug_ctx*
-aug_createbasicctx(long tz, int level)
+aug_createbasicctx(void)
 {
+    long tz;
     aug_mpool* mpool;
     aug_clock* clock;
     aug_log* log;
     aug_ctx* ctx = NULL;
+
+    if (!aug_timezone(&tz))
+        return NULL;
 
     if (!(mpool = aug_createdlmalloc()))
         return NULL;
@@ -210,7 +215,7 @@ aug_createbasicctx(long tz, int level)
     if (!(log = aug_createstdlog(mpool)))
         goto fail2;
 
-    ctx = aug_createctx(mpool, clock, log, level);
+    ctx = aug_createctx(mpool, clock, log, aug_loglevel());
 
     aug_release(log);
  fail2:

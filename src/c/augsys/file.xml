@@ -1,17 +1,9 @@
 <package name="aug" dir="augsys">
 
   <quotincl>augsys/config.h</quotincl>
+  <quotincl>augsys/types.h</quotincl>
 
   <quotincl>augctx/ctx.h</quotincl>
-
-  <verbatim>
-#if !defined(_WIN32)
-typedef int aug_fd;
-#else /* _WIN32 */
-typedef void* aug_fd;
-#endif /* _WIN32 */
-#define AUG_BADFD ((aug_fd)-1)
-  </verbatim>
 
   <interface name="file">
 

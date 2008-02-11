@@ -124,6 +124,20 @@ aug_init(void)
     return ret;
 }
 
+AUGCTX_API aug_bool
+aug_initbasicctx(void)
+{
+    if (!aug_init())
+        return AUG_FALSE;
+
+    if (!aug_tlx) {
+        aug_ctx* ctx = aug_createbasicctx();
+        aug_settlx(ctx);
+        aug_release(ctx);
+    }
+    return AUG_TRUE;
+}
+
 AUGCTX_API void
 aug_term(void)
 {

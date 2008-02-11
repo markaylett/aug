@@ -16,7 +16,6 @@ AUG_RCSID("$Id$");
 #include <windows.h>
 #include <fcntl.h>
 #include <io.h>
-#include <sys/stat.h>
 
 static DWORD*
 access_(DWORD* dst, int src)
@@ -35,6 +34,9 @@ access_(DWORD* dst, int src)
     default:
         return NULL;
     }
+    if (src & _O_APPEND)
+        access |= FILE_APPEND_DATA;
+
     *dst = access;
     return dst;
 }
@@ -102,8 +104,9 @@ vopen_(aug_ctx* ctx, const char* path, int flags, va_list args)
 
     if (flags & _O_CREAT) {
         mode_t mode = va_arg(args, int);
-        attr = (mode & _S_IWRITE)
-            ? FILE_ATTRIBUTE_NORMAL : FILE_ATTRIBUTE_READONLY;
+        /* Read-only if no write bits set. */
+        attr = (0 == (mode & 0222))
+            ? FILE_ATTRIBUTE_READONLY : FILE_ATTRIBUTE_NORMAL;
     } else
         attr = FILE_ATTRIBUTE_NORMAL;
 
@@ -112,7 +115,7 @@ vopen_(aug_ctx* ctx, const char* path, int flags, va_list args)
                            | FILE_SHARE_WRITE, &sa, create_(flags), attr,
                            NULL))) {
         aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            ERROR_NOT_SUPPORTED);
+                            GetLastError());
         return INVALID_HANDLE_VALUE;
     }
     return h;

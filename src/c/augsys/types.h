@@ -12,4 +12,11 @@
 
 typedef unsigned aug_len_t;
 
+#if !defined(_WIN32)
+typedef int aug_fd;
+#else /* _WIN32 */
+typedef void* aug_fd;
+#endif /* _WIN32 */
+#define AUG_BADFD ((aug_fd)-1)
+
 #endif /* AUGSYS_TYPES_H */
