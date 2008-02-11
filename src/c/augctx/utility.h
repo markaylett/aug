@@ -9,8 +9,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-struct aug_errinfo;
-
 #define aug_die_(file, line, what) \
 (fprintf(stderr, "%s:%d: %s\n", file, line, what), abort())
 
@@ -21,7 +19,7 @@ aug_die_(__FILE__, __LINE__, what)
 (expr) ? (void)0 : aug_die("check [" #expr "] failed.")
 
 /**
- * Get default log-level.
+ * Get the default log-level.
  *
  * The log-level specified by the "AUG_LOGLEVEL" environment variable, or
  * #AUG_LOGINFO if not set.
@@ -31,6 +29,19 @@ aug_die_(__FILE__, __LINE__, what)
 
 AUGCTX_API int
 aug_loglevel(void);
+
+/**
+ * Get timezone offset.
+ *
+ * Attempt to determine current timezone as seconds west of coordinated
+ * universal time.  If a process intends to call chroot(), it should call this
+ * function first and cache the result: timezone information may be
+ * inaccessible to a jailed process.
+ *
+ * @param tz Output variable to which timezone will be written.
+ *
+ * @return The @a tz argument, or null on error.
+ */
 
 AUGCTX_API long*
 aug_timezone(long* tz);

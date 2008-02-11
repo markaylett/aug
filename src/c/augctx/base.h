@@ -23,7 +23,7 @@
  * termination only happens when this count reaches zero.
  *
  * A thread must ensure the thread-local context is set after calling
- * aug_init(), as some library functions may depend on it.
+ * aug_init() as some library functions may depend on it.
  *
  * @return @ref AUG_TRUE on success, otherwise @ref AUG_FALSE.
  */
@@ -35,10 +35,9 @@ aug_init(void);
  * Terminate use of library.
  *
  * Informs the library that the calling thread has finished with it, and that
- * associated resources can may now be freed.
+ * any associated resources may now be freed.
  *
- * When freeing resources, aug_term() will also call aug_release() on the
- * thread-local context.
+ * When freeing resources, aug_term() will release the thread-local context.
  */
 
 AUGCTX_API void
@@ -48,6 +47,8 @@ aug_term(void);
  * Set thread-local context.
  *
  * The context will be retained in thread-local storage.
+ *
+ * @param ctx The context to be retained.
  */
 
 AUGCTX_API void

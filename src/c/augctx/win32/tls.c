@@ -30,8 +30,6 @@ AUG_EXTERNC void*
 aug_gettlsvalue_(aug_tlskey_t tlskey)
 {
     void* ret = TlsGetValue(tlskey);
-    if (!ret && NO_ERROR != GetLastError())
-        abort();
-
+    aug_check(ret || NO_ERROR == GetLastError());
     return ret;
 }

@@ -10,6 +10,7 @@ typedef int aug_fd;
 #else /* _WIN32 */
 typedef void* aug_fd;
 #endif /* _WIN32 */
+#define AUG_BADFD ((aug_fd)-1)
   </verbatim>
 
   <interface name="file">
@@ -26,7 +27,7 @@ typedef void* aug_fd;
 
   <verbatim>
 AUGSYS_API aug_file*
-aug_createfile(aug_ctx* ctx, const char* path);
+aug_createfile(aug_ctx* ctx, const char* path, int flags, ...);
   </verbatim>
 
 </package>
