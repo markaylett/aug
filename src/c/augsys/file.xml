@@ -20,12 +20,6 @@
   <verbatim>
 AUGSYS_API aug_file*
 aug_createfile(aug_ctx* ctx, const char* path, int flags, ...);
-
-AUGSYS_API int
-aug_fsync(aug_ctx* ctx, aug_fd fd);
-
-AUGSYS_API int
-aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size);
   </verbatim>
 
 </package>

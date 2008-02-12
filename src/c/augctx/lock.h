@@ -11,10 +11,10 @@
  */
 
 #include "augctx/config.h"
-#include "augbool.h"
+#include "augtypes.h"
 
 #if defined(AUGCTX_BUILD)
-AUG_EXTERNC aug_bool
+AUG_EXTERNC aug_status
 aug_initlock_(void);
 #endif /* AUGCTX_BUILD */
 

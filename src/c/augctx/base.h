@@ -5,7 +5,7 @@
 #define AUGCTX_BASE_H
 
 #include "augctx/ctx.h"
-#include "augbool.h"
+#include "augtypes.h"
 
 /**
  * @file augctx/base.h
@@ -28,10 +28,10 @@
  * @return @ref AUG_TRUE on success, otherwise @ref AUG_FALSE.
  */
 
-AUGCTX_API aug_bool
+AUGCTX_API aug_status
 aug_init(void);
 
-AUGCTX_API aug_bool
+AUGCTX_API aug_status
 aug_initbasicctx(void);
 
 /**

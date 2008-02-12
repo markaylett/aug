@@ -13,7 +13,7 @@
  */
 
 #include "augctx/config.h"
-#include "augbool.h"
+#include "augtypes.h"
 
 #if !defined(_WIN32)
 # include <pthread.h>
@@ -23,7 +23,7 @@ typedef pthread_key_t aug_tlskey_t;
 typedef DWORD aug_tlskey_t;
 #endif /* _WIN32 */
 
-AUG_EXTERNC aug_bool
+AUG_EXTERNC aug_status
 aug_createtlskey_(aug_tlskey_t* tlskey);
 
 AUG_EXTERNC void

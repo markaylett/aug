@@ -18,7 +18,7 @@ include_HEADERS = \
 	aug.h \
 	augabi.h \
 	augmod.h \
-	augtype.h \
+	augtypes.h \
 	augctx.h \
 	augob.h \
 	augsys.h \

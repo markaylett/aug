@@ -6,12 +6,12 @@
 
 static pthread_mutex_t mutex_ = PTHREAD_MUTEX_INITIALIZER;
 
-AUG_EXTERNC aug_bool
+AUG_EXTERNC aug_status
 aug_initlock_(void)
 {
     /* Mutex is initialised statically. */
 
-    return AUG_TRUE;
+    return AUG_SUCCESS;
 }
 
 AUGCTX_API void

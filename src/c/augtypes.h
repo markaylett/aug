@@ -1,20 +1,20 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGTYPE_H
-#define AUGTYPE_H
+#ifndef AUGTYPES_H
+#define AUGTYPES_H
 
-#define AUG_SUCCESS  0
-#define AUG_ESYSTEM  1
+#define AUG_SUCCESS   0
+#define AUG_FAILURE (-1)
 
-#define AUG_EASSERT  2
-#define AUG_EAUTH    3
-#define AUG_ECONFIG  4
-#define AUG_EDOMAIN  5
-#define AUG_EENDOF   6
-#define AUG_EEXCEPT  7
-#define AUG_EEXIST   8
-#define AUG_EFORMAT  9
+#define AUG_EASSERT   2
+#define AUG_EAUTH     3
+#define AUG_ECONFIG   4
+#define AUG_EDOMAIN   5
+#define AUG_EENDOF    6
+#define AUG_EEXCEPT   7
+#define AUG_EEXIST    8
+#define AUG_EFORMAT   9
 #define AUG_EINVAL   10
 #define AUG_EIO      11
 #define AUG_ELIMIT   12
@@ -39,4 +39,4 @@ enum aug_bool_ {
 typedef int aug_bool;
 typedef int aug_status;
 
-#endif /* AUGTYPE_H */
+#endif /* AUGTYPES_H */
