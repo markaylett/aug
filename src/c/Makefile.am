@@ -17,8 +17,8 @@ SUBDIRS = \
 include_HEADERS = \
 	aug.h \
 	augabi.h \
-	augbool.h \
 	augmod.h \
+	augtype.h \
 	augctx.h \
 	augob.h \
 	augsys.h \

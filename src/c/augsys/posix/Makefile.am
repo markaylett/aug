@@ -9,4 +9,5 @@ EXTRA_DIST = \
 	string.c \
 	time.c \
 	tls.c \
+	unistd.c \
 	utility.c

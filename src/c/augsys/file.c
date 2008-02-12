@@ -8,6 +8,7 @@
 AUG_RCSID("$Id$");
 
 #include "augctx/errinfo.h"
+#include "augctx/lock.h"
 #include "augctx/utility.h"
 
 #include <assert.h>
@@ -237,4 +238,51 @@ aug_createfile(aug_ctx* ctx, const char* path, int flags, ...)
     file = vcreatefile_(ctx, path, flags, args);
     va_end(args);
     return file;
+}
+
+AUGSYS_API int
+aug_fsync(aug_ctx* ctx, aug_fd fd)
+{
+    if (!FlushFileBuffers(fd)) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            GetLastError());
+        return -1;
+    }
+    return 0;
+}
+
+AUGSYS_API int
+aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size)
+{
+    int ret;
+    LARGE_INTEGER li, orig;
+    aug_lock();
+
+    li.QuadPart = 0;
+    if (!SetFilePointerEx(fd, li, &orig, FILE_CURRENT)) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            GetLastError());
+        return -1;
+    }
+
+    li.QuadPart = (LONGLONG)size;
+    if (!SetFilePointerEx(fd, li, NULL, FILE_BEGIN)) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            GetLastError());
+        return -1;
+    }
+
+    /* File pointer has now been moved, and must later be restored. */
+
+    if (!SetEndOfFile(fd)) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            GetLastError());
+        ret = -1;
+    } else
+        ret = 0;
+
+    SetFilePointerEx(fd, orig, NULL, FILE_BEGIN);
+
+    aug_unlock();
+    return ret;
 }
