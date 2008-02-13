@@ -112,15 +112,6 @@
 /** @} */
 
 /**
- * Used to convey the following conventions:
- * less than zero: negated errno value.
- * equal to zero: success.
- * greater than zero: user defined.
- */
-
-typedef int aug_result;
-
-/**
  * @defgroup Object Object
  */
 

@@ -14,7 +14,7 @@
 #include "augtypes.h"
 
 #if defined(AUGCTX_BUILD)
-AUG_EXTERNC aug_status
+AUG_EXTERNC aug_result
 aug_initlock_(void);
 #endif /* AUGCTX_BUILD */
 

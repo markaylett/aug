@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>         /* abort() */
 
-AUG_EXTERNC aug_status
+AUG_EXTERNC aug_result
 aug_createtlskey_(aug_tlskey_t* tlskey)
 {
     return 0xffffffff == (*tlskey = TlsAlloc())

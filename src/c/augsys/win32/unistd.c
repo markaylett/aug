@@ -61,8 +61,8 @@ create_(int flags)
     return create;
 }
 
-AUGSYS_API aug_status
-aug_close(aug_ctx* ctx, aug_fd fd)
+AUGSYS_API aug_result
+aug_fclose(aug_ctx* ctx, aug_fd fd)
 {
     if (!CloseHandle(fd)) {
         aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
@@ -71,8 +71,99 @@ aug_close(aug_ctx* ctx, aug_fd fd)
     }
     return AUG_SUCCESS;
 }
+AUGSYS_API aug_fd
+aug_vfopen(aug_ctx* ctx, const char* path, int flags, va_list args)
+{
+    DWORD access, attr;
+    SECURITY_ATTRIBUTES sa;
+    HANDLE h;
 
-AUGSYS_API aug_status
+    if (!access_(&access, flags)) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            ERROR_NOT_SUPPORTED);
+        return INVALID_HANDLE_VALUE;
+    }
+
+    if (flags & _O_CREAT) {
+        mode_t mode = va_arg(args, int);
+        /* Read-only if no write bits set. */
+        attr = (0 == (mode & 0222))
+            ? FILE_ATTRIBUTE_READONLY : FILE_ATTRIBUTE_NORMAL;
+    } else
+        attr = FILE_ATTRIBUTE_NORMAL;
+
+    sa.nLength = sizeof(sa);
+    sa.bInheritHandle = TRUE;
+    sa.lpSecurityDescriptor = NULL;
+
+    if (INVALID_HANDLE_VALUE
+        == (h = CreateFile(path, access, FILE_SHARE_DELETE | FILE_SHARE_READ
+                           | FILE_SHARE_WRITE, &sa, create_(flags), attr,
+                           NULL))) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            GetLastError());
+    }
+    return h;
+}
+
+AUGSYS_API aug_fd
+aug_fopen(aug_ctx* ctx, const char* path, int flags, ...)
+{
+    aug_fd fd;
+    va_list args;
+    va_start(args, flags);
+    fd = aug_vfopen(ctx, path, flags, args);
+    va_end(args);
+    return fd;
+}
+
+AUGSYS_API aug_result
+aug_fpipe(aug_ctx* ctx, aug_fd fds[2])
+{
+    aug_fd rd, wr;
+    SECURITY_ATTRIBUTES sa;
+
+    sa.nLength = sizeof(sa);
+    sa.bInheritHandle = TRUE;
+    sa.lpSecurityDescriptor = NULL;
+
+    if (!CreatePipe(&rd, &wr, &sa, 0)) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            GetLastError());
+        return AUG_FAILURE;
+    }
+
+    fds[0] = rd;
+    fds[1] = wr;
+
+    return AUG_SUCCESS;
+}
+
+AUGSYS_API ssize_t
+aug_fread(aug_ctx* ctx, aug_fd fd, void* buf, size_t size)
+{
+    DWORD ret;
+    if (!ReadFile(fd, buf, (DWORD)size, &ret, NULL)) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            GetLastError());
+        return -1;
+    }
+    return (ssize_t)ret;
+}
+
+AUGSYS_API ssize_t
+aug_fwrite(aug_ctx* ctx, aug_fd fd, const void* buf, size_t size)
+{
+    DWORD ret;
+    if (!WriteFile(fd, buf, (DWORD)size, &ret, NULL)) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            GetLastError());
+        return -1;
+    }
+    return (ssize_t)ret;
+}
+
+AUGSYS_API aug_result
 aug_fsync(aug_ctx* ctx, aug_fd fd)
 {
     if (!FlushFileBuffers(fd)) {
@@ -83,10 +174,10 @@ aug_fsync(aug_ctx* ctx, aug_fd fd)
     return AUG_SUCCESS;
 }
 
-AUGSYS_API aug_status
+AUGSYS_API aug_result
 aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size)
 {
-    aug_status ret;
+    aug_result ret;
     LARGE_INTEGER li, orig;
 
     /* Store current position for later restoration. */
@@ -120,71 +211,6 @@ aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size)
 
     SetFilePointerEx(fd, orig, NULL, FILE_BEGIN);
     return ret;
-}
-
-AUGSYS_API aug_fd
-aug_vopen(aug_ctx* ctx, const char* path, int flags, va_list args)
-{
-    HANDLE h;
-    SECURITY_ATTRIBUTES sa;
-    DWORD access, attr;
-
-    if (!access_(&access, flags)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            ERROR_NOT_SUPPORTED);
-        return INVALID_HANDLE_VALUE;
-    }
-
-    sa.nLength = sizeof(sa);
-    sa.bInheritHandle = TRUE;
-    sa.lpSecurityDescriptor = NULL;
-
-    if (flags & _O_CREAT) {
-        mode_t mode = va_arg(args, int);
-        /* Read-only if no write bits set. */
-        attr = (0 == (mode & 0222))
-            ? FILE_ATTRIBUTE_READONLY : FILE_ATTRIBUTE_NORMAL;
-    } else
-        attr = FILE_ATTRIBUTE_NORMAL;
-
-    if (INVALID_HANDLE_VALUE
-        == (h = CreateFile(path, access, FILE_SHARE_DELETE | FILE_SHARE_READ
-                           | FILE_SHARE_WRITE, &sa, create_(flags), attr,
-                           NULL))) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
-        return INVALID_HANDLE_VALUE;
-    }
-    return h;
-}
-
-AUGSYS_API aug_fd
-aug_open(aug_ctx* ctx, const char* path, int flags, ...)
-{
-    aug_fd fd;
-    va_list args;
-    va_start(args, flags);
-    fd = aug_vopen(ctx, path, flags, args);
-    va_end(args);
-    return fd;
-}
-
-AUGSYS_API aug_status
-aug_pipe(aug_ctx* ctx, aug_fd fds[2])
-{
-    return AUG_SUCCESS;
-}
-
-AUGSYS_API ssize_t
-aug_read(aug_ctx* ctx, aug_fd fd, void* buf, size_t size)
-{
-    return 0;
-}
-
-AUGSYS_API ssize_t
-aug_write(aug_ctx* ctx, aug_fd fd, const void* buf, size_t size)
-{
-    return 0;
 }
 
 AUGSYS_API void

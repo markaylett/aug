@@ -5,11 +5,13 @@
 
   <quotincl>augctx/ctx.h</quotincl>
 
+  <quotincl>augtypes.h</quotincl>
+
   <interface name="file">
 
-    <method name="close" type="int" qname="close"/>
+    <method name="close" type="aug_result" qname="close"/>
 
-    <method name="setnonblock" type="int" qname="setnonblock">
+    <method name="setnonblock" type="aug_result" qname="setnonblock">
       <param name="on" type="int"/>
     </method>
 

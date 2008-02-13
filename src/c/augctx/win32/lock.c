@@ -7,7 +7,7 @@
 
 static LPCRITICAL_SECTION cs_ = NULL;
 
-AUG_EXTERNC aug_status
+AUG_EXTERNC aug_result
 aug_initlock_(void)
 {
     /* Create singleton mutex object. */

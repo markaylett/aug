@@ -31,7 +31,7 @@ gettls_(void)
     return aug_gettlsvalue_(tlskey_);
 }
 
-static aug_status
+static aug_result
 inittls_(void)
 {
     /* Lock held. */
@@ -41,9 +41,9 @@ inittls_(void)
 
         /* TLS key must be initialised on first call. */
 
-        aug_status status = aug_createtlskey_(&tlskey_);
-        if (status < 0)
-            return status;
+        aug_result result = aug_createtlskey_(&tlskey_);
+        if (result < 0)
+            return result;
 
         init_ = AUG_TRUE;
         goto skip;
@@ -94,7 +94,7 @@ gettls_(void)
     return &tls_;
 }
 
-static aug_status
+static aug_result
 inittls_(void)
 {
     ++tls_.refs_;
@@ -113,24 +113,24 @@ termtls_(void)
 
 #endif /* !ENABLE_THREADS */
 
-AUGCTX_API aug_status
+AUGCTX_API aug_result
 aug_init(void)
 {
-    aug_status status = aug_initlock_();
-    if (0 <= status) {
+    aug_result result = aug_initlock_();
+    if (0 <= result) {
         aug_lock();
-        status = inittls_();
+        result = inittls_();
         aug_unlock();
     }
-    return status;
+    return result;
 }
 
-AUGCTX_API aug_status
+AUGCTX_API aug_result
 aug_initbasicctx(void)
 {
-    aug_status status = aug_init();
-    if (status < 0)
-        return status;
+    aug_result result = aug_init();
+    if (result < 0)
+        return result;
 
     if (!aug_tlx) {
         aug_ctx* ctx = aug_createbasicctx();
