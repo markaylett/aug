@@ -152,6 +152,14 @@ aug_fread(aug_ctx* ctx, aug_fd fd, void* buf, size_t size)
 }
 
 AUGSYS_API ssize_t
+aug_freadv(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size)
+{
+    aug_seterrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, "aug",
+                   AUG_ESUPPORT, AUG_MSG("aug_freadv() not supported"));
+    return -1;
+}
+
+AUGSYS_API ssize_t
 aug_fwrite(aug_ctx* ctx, aug_fd fd, const void* buf, size_t size)
 {
     DWORD ret;
@@ -161,6 +169,14 @@ aug_fwrite(aug_ctx* ctx, aug_fd fd, const void* buf, size_t size)
         return -1;
     }
     return (ssize_t)ret;
+}
+
+AUGSYS_API ssize_t
+aug_fwritev(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size)
+{
+    aug_seterrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, "aug",
+                   AUG_ESUPPORT, AUG_MSG("aug_fwritev() not supported"));
+    return -1;
 }
 
 AUGSYS_API aug_result

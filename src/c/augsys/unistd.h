@@ -26,7 +26,13 @@ AUGSYS_API ssize_t
 aug_fread(aug_ctx* ctx, aug_fd fd, void* buf, size_t size);
 
 AUGSYS_API ssize_t
+aug_freadv(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size);
+
+AUGSYS_API ssize_t
 aug_fwrite(aug_ctx* ctx, aug_fd fd, const void* buf, size_t size);
+
+AUGSYS_API ssize_t
+aug_fwritev(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size);
 
 AUGSYS_API aug_result
 aug_fsync(aug_ctx* ctx, aug_fd fd);

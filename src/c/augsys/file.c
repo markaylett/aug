@@ -135,26 +135,29 @@ stream_release_(aug_stream* obj)
 static ssize_t
 stream_read_(aug_stream* obj, void* buf, size_t size)
 {
-    printf("just testing\n");
-    return 0;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    return aug_fread(impl->ctx_, impl->fd_, buf, size);
 }
 
 static ssize_t
-stream_readv_(aug_stream* this_, const struct iovec* iov, int size)
+stream_readv_(aug_stream* obj, const struct iovec* iov, int size)
 {
-    return 0;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    return aug_freadv(impl->ctx_, impl->fd_, iov, size);
 }
 
 static ssize_t
-stream_write_(aug_stream* this_, const void* buf, size_t size)
+stream_write_(aug_stream* obj, const void* buf, size_t size)
 {
-    return 0;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    return aug_fwrite(impl->ctx_, impl->fd_, buf, size);
 }
 
 static ssize_t
 stream_writev_(aug_stream* obj, const struct iovec* iov, int size)
 {
-    return 0;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    return aug_fwritev(impl->ctx_, impl->fd_, iov, size);
 }
 
 static const struct aug_streamvtbl stream_vtbl_ = {

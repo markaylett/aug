@@ -12,19 +12,20 @@ main(int argc, char* argv[])
 {
     aug_file* file;
     aug_stream* stream;
-    char buf[100];
     aug_initbasicctx();
 
-    if (!(file = aug_createfile(aug_tlx, "filetest.txt", O_CREAT | O_RDONLY)))
+    if ((file = aug_createfile(aug_tlx, "filetest.txt",
+                               O_CREAT | O_TRUNC | O_RDWR, 0666))) {
+
+        stream = aug_cast(file, aug_streamid);
+        aug_release(file);
+
+        aug_write(stream, "test\n", 5);
+        aug_release(stream);
+
+    } else
         aug_perrinfo(aug_tlx, "failed to open file");
 
-    stream = aug_cast(file, aug_streamid);
-    aug_release(file);
-
-    aug_read(stream, buf, 100);
-    aug_release(stream);
-
     aug_term();
-
     return 0;
 }
