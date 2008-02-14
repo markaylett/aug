@@ -31,9 +31,6 @@
 AUGCTX_API aug_result
 aug_init(void);
 
-AUGCTX_API aug_result
-aug_basicinit(void);
-
 /**
  * Terminate use of library.
  *
@@ -56,6 +53,14 @@ aug_term(void);
 
 AUGCTX_API void
 aug_settlx(aug_ctx* ctx);
+
+/**
+ * Set thread-local with basic context.
+ *
+ * Use aug_createbasicctx() to create context, and assign to thread-local.
+ *
+ * See @ref TypesResult.
+ */
 
 AUGCTX_API aug_result
 aug_setbasictlx(void);
@@ -90,5 +95,17 @@ AUGCTX_API aug_ctx*
 aug_tlx_(void);
 
 /** @} */
+
+/**
+ * Convenience wrapper for aug_init(), aug_createbasicctx() and aug_term().
+ *
+ * If one does not exist, a thread-local context is created using
+ * aug_createbasicctx().  Library termination is scheduled using atexit().
+ *
+ * @return See @ref TypesResult.
+ */
+
+AUGCTX_API aug_result
+aug_start(void);
 
 #endif /* AUGCTX_BASE_H */

@@ -125,25 +125,6 @@ aug_init(void)
     return result;
 }
 
-AUGCTX_API aug_result
-aug_basicinit(void)
-{
-    aug_result result = aug_init();
-    if (result < 0)
-        goto done;
-
-    if (!aug_tlx) {
-        result = aug_setbasictlx();
-        if (result < 0) {
-            aug_term();
-            goto done;
-        }
-    }
-    atexit(aug_term);
-done:
-    return result;
-}
-
 AUGCTX_API void
 aug_term(void)
 {
@@ -188,4 +169,23 @@ AUGCTX_API aug_ctx*
 aug_tlx_(void)
 {
     return gettls_()->ctx_;
+}
+
+AUGCTX_API aug_result
+aug_start(void)
+{
+    aug_result result = aug_init();
+    if (result < 0)
+        goto done;
+
+    if (!aug_tlx) {
+        result = aug_setbasictlx();
+        if (result < 0) {
+            aug_term();
+            goto done;
+        }
+    }
+    atexit(aug_term);
+ done:
+    return result;
 }

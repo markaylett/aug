@@ -8,9 +8,9 @@
 int
 main(int argc, char* argv[])
 {
-    aug_initbasicctx();
+    if (aug_start() < 0)
+        return 1;
     aug_setposixerrinfo(aug_geterrinfo(aug_tlx), __FILE__, __LINE__, ENOMEM);
     aug_perrinfo(aug_tlx, "operation failed");
-    aug_term();
     return 0;
 }

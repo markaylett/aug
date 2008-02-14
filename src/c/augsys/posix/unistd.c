@@ -1,6 +1,7 @@
 #include "augctx/errinfo.h"
 
 #include <errno.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 AUGSYS_API aug_result
@@ -37,7 +38,7 @@ aug_fopen(aug_ctx* ctx, const char* path, int flags, ...)
     aug_fd fd;
     va_list args;
     va_start(args, flags);
-    fd = aug_vopen(ctx, path, flags, args);
+    fd = aug_vfopen(ctx, path, flags, args);
     va_end(args);
     return fd;
 }
