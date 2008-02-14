@@ -60,7 +60,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugsys_la_OBJECTS = file.lo stream.lo unistd.lo
+am_libaugsys_la_OBJECTS = file.lo stream.lo uio.lo unistd.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_filetest_OBJECTS = filetest.$(OBJEXT)
 filetest_OBJECTS = $(am_filetest_OBJECTS)
@@ -259,6 +259,7 @@ lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
 	file.c \
 	stream.c \
+	uio.c \
 	unistd.c
 
 
@@ -448,6 +449,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unistd.Plo@am__quote@
 
 .c.o:

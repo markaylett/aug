@@ -13,14 +13,9 @@
 typedef unsigned aug_len_t;
 
 #if !defined(_WIN32)
-# include <sys/uio.h>
 typedef int aug_fd;
 #else /* _WIN32 */
 typedef void* aug_fd;
-struct iovec {
-    void* iov_base;
-    int iov_len;
-};
 #endif /* _WIN32 */
 #define AUG_BADFD ((aug_fd)-1)
 

@@ -64,17 +64,6 @@ aug_fread(aug_ctx* ctx, aug_fd fd, void* buf, size_t size)
 }
 
 AUGSYS_API ssize_t
-aug_freadv(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size)
-{
-    ssize_t ret;
-    if (-1 == (ret = readv(fd, iov, size))) {
-        aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
-        return -1;
-    }
-    return ret;
-}
-
-AUGSYS_API ssize_t
 aug_fwrite(aug_ctx* ctx, aug_fd fd, const void* buf, size_t size)
 {
     ssize_t ret;
@@ -85,15 +74,26 @@ aug_fwrite(aug_ctx* ctx, aug_fd fd, const void* buf, size_t size)
     return ret;
 }
 
-AUGSYS_API ssize_t
-aug_fwritev(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size)
+AUGSYS_API aug_result
+aug_fsetnonblock(aug_ctx* ctx, aug_fd fd, aug_bool on)
 {
-    ssize_t ret;
-    if (-1 == (ret = writev(fd, iov, size))) {
+    int flags = fcntl(fd, F_GETFL);
+    if (-1 == flags) {
         aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
-        return -1;
+        return AUG_FAILURE;
     }
-    return ret;
+
+    if (on)
+        flags |= O_NONBLOCK;
+    else
+        flags &= ~O_NONBLOCK;
+
+    if (-1 == fcntl(fd, F_SETFL, flags)) {
+        aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
+        return AUG_FAILURE;
+    }
+
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API aug_result

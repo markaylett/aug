@@ -5,6 +5,50 @@
 #define AUGTYPES_H
 
 /**
+ * @defgroup Types Types
+ */
+
+/**
+ * @defgroup TypesBool Boolean Values
+ *
+ * @ingroup Types
+ *
+ * @{
+ */
+
+/**
+ * Boolean type.
+ *
+ * C++ enums are not guaranteed to have sizeof(int) so int is used instead.
+ */
+
+typedef int aug_bool;
+
+enum aug_bool_ {
+    AUG_FALSE,
+    AUG_TRUE
+};
+
+/** @} */
+
+/**
+ * @defgroup TypesResult Result Codes
+ *
+ * @ingroup Types
+ *
+ * @{
+ */
+
+/**
+ * Standard result type.
+ *
+ * Used to convey the following conventions: less than zero for errors; zero
+ * for success; greater than zero for success with info.
+ */
+
+typedef int aug_result;
+
+/**
  * Success and failure function return codes.  Akin to #EXIT_SUCCESS and
  * #EXIT_FAILURE.
  */
@@ -12,9 +56,17 @@
 #define AUG_SUCCESS   0
 #define AUG_FAILURE (-1)
 
+/** @} */
+
 /**
+ * @defgroup TypesException Exception Codes
+ *
+ * @ingroup Types
+ *
  * When returned as status codes, the negated form of the following exception
  * codes should be used.
+ *
+ * @{
  */
 
 /**
@@ -137,23 +189,6 @@
 
 #define AUG_ETIMEOUT 21
 
-/* C++ enums are not guaranteed to have sizeof(int).  Therefore, int is used
-   instead. */
-
-enum aug_bool_ {
-    AUG_FALSE,
-    AUG_TRUE
-};
-
-typedef int aug_bool;
-
-/**
- * Standard result type.
- *
- * Used to convey the following conventions: less than zero for errors; zero
- * for success; greater than zero for success with info.
- */
-
-typedef int aug_result;
+/** @} */
 
 #endif /* AUGTYPES_H */

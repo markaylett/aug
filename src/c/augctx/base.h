@@ -23,7 +23,7 @@
  * termination only happens when this count reaches zero.
  *
  * A thread must ensure the thread-local context is set after calling
- * aug_init() as some library functions may depend on it.
+ * aug_init(), as some library functions may depend on it.
  *
  * @return Either @ref AUG_SUCCESS or @ref AUG_FAILURE.
  */
@@ -32,7 +32,7 @@ AUGCTX_API aug_result
 aug_init(void);
 
 AUGCTX_API aug_result
-aug_initbasicctx(void);
+aug_basicinit(void);
 
 /**
  * Terminate use of library.
@@ -57,6 +57,9 @@ aug_term(void);
 AUGCTX_API void
 aug_settlx(aug_ctx* ctx);
 
+AUGCTX_API aug_result
+aug_setbasictlx(void);
+
 /**
  * Obtain reference to thread-local context.
  *
@@ -67,6 +70,8 @@ aug_settlx(aug_ctx* ctx);
 
 AUGCTX_API aug_ctx*
 aug_gettlx(void);
+
+/** @{ */
 
 /**
  * Obtain reference to thread-local context, without retaining a reference to
@@ -83,5 +88,7 @@ aug_gettlx(void);
 
 AUGCTX_API aug_ctx*
 aug_tlx_(void);
+
+/** @} */
 
 #endif /* AUGCTX_BASE_H */

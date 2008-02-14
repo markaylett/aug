@@ -12,7 +12,7 @@
     <method name="close" type="aug_result" qname="close"/>
 
     <method name="setnonblock" type="aug_result" qname="setnonblock">
-      <param name="on" type="int"/>
+      <param name="on" type="aug_bool"/>
     </method>
 
     <method name="getfd" type="aug_fd" qname="getfd"/>

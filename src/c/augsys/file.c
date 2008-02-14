@@ -8,6 +8,7 @@
 AUG_RCSID("$Id$");
 
 #include "augsys/stream.h"
+#include "augsys/uio.h"
 #include "augsys/unistd.h"
 
 #include <assert.h>
@@ -90,9 +91,10 @@ file_close_(aug_file* obj)
 }
 
 static aug_result
-file_setnonblock_(aug_file* obj, int on)
+file_setnonblock_(aug_file* obj, aug_bool on)
 {
-    return AUG_SUCCESS;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
+    return aug_fsetnonblock(impl->ctx_, impl->fd_, on);
 }
 
 static aug_fd

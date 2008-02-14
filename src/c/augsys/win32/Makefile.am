@@ -9,6 +9,7 @@ EXTRA_DIST = \
 	string.c \
 	time.c \
 	tls.c \
+	uio.c \
 	unistd.c \
 	utility.c \
 	iptypes_.h

@@ -40,6 +40,10 @@
 #endif /* !__CYGWIN__ && !__MINGW__ && !__MSC_VER */
 
 /**
+ * @defgroup Object Object
+ */
+
+/**
  * @defgroup ObjectMacros Macros
  *
  * @ingroup Object
@@ -110,10 +114,6 @@
     void (*release_)(iface*)
 
 /** @} */
-
-/**
- * @defgroup Object Object
- */
 
 /**
  * @defgroup aug_object aug_object

@@ -10,6 +10,15 @@
 #include "augctx/ctx.h"
 #include "augtypes.h"
 
+/**
+ * Close file.
+ *
+ * @param ctx Context.
+ * @param fd File descriptor.
+ *
+ * @return See @ref TypesResult.
+ */
+
 AUGSYS_API aug_result
 aug_fclose(aug_ctx* ctx, aug_fd fd);
 
@@ -26,16 +35,18 @@ AUGSYS_API ssize_t
 aug_fread(aug_ctx* ctx, aug_fd fd, void* buf, size_t size);
 
 AUGSYS_API ssize_t
-aug_freadv(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size);
-
-AUGSYS_API ssize_t
 aug_fwrite(aug_ctx* ctx, aug_fd fd, const void* buf, size_t size);
 
-AUGSYS_API ssize_t
-aug_fwritev(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size);
+AUGSYS_API aug_result
+aug_fsetnonblock(aug_ctx* ctx, aug_fd fd, aug_bool on);
 
 AUGSYS_API aug_result
 aug_fsync(aug_ctx* ctx, aug_fd fd);
+
+/**
+ * Similar to POSIX semantics except that gaps, in extended files, are not
+ * guaranteed to be zero-filled.
+ */
 
 AUGSYS_API aug_result
 aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size);

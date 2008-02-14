@@ -126,18 +126,22 @@ aug_init(void)
 }
 
 AUGCTX_API aug_result
-aug_initbasicctx(void)
+aug_basicinit(void)
 {
     aug_result result = aug_init();
     if (result < 0)
-        return result;
+        goto done;
 
     if (!aug_tlx) {
-        aug_ctx* ctx = aug_createbasicctx();
-        aug_settlx(ctx);
-        aug_release(ctx);
+        result = aug_setbasictlx();
+        if (result < 0) {
+            aug_term();
+            goto done;
+        }
     }
-    return AUG_SUCCESS;
+    atexit(aug_term);
+done:
+    return result;
 }
 
 AUGCTX_API void
@@ -157,6 +161,17 @@ aug_settlx(aug_ctx* ctx)
     if (tls->ctx_)
         aug_release(tls->ctx_);
     tls->ctx_ = ctx;
+}
+
+AUGCTX_API aug_result
+aug_setbasictlx(void)
+{
+    aug_ctx* ctx = aug_createbasicctx();
+    if (!ctx)
+        return AUG_FAILURE;
+    aug_settlx(ctx);
+    aug_release(ctx);
+    return AUG_SUCCESS;
 }
 
 AUGCTX_API aug_ctx*

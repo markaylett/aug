@@ -7,8 +7,8 @@
 
 AUG_RCSID("$Id$");
 
-# if !defined(_WIN32)
-#  include "augsys/posix/unistd.c"
-# else /* _WIN32 */
-#  include "augsys/win32/unistd.c"
-# endif /* _WIN32 */
+#if !defined(_WIN32)
+# include "augsys/posix/unistd.c"
+#else /* _WIN32 */
+# include "augsys/win32/unistd.c"
+#endif /* _WIN32 */

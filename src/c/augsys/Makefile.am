@@ -44,6 +44,7 @@ lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
 	file.c \
 	stream.c \
+	uio.c \
 	unistd.c
 
 # libaugsys_la_SOURCES = \
