@@ -1,6 +1,8 @@
 <package name="aug" dir="augctx">
 
   <quotincl>augctx/mpool.h</quotincl>
+  <quotincl>augtypes.h</quotincl>
+
   <anglincl>stdarg.h</anglincl>
 
   <verbatim>
@@ -16,7 +18,7 @@ enum aug_loglevel {
 
   <interface name="log">
 
-    <method name="vwrite" type="int">
+    <method name="vwrite" type="aug_result">
       <param name="level" type="int"/>
       <param name="format" type="const char*"/>
       <param name="args" type="va_list"/>

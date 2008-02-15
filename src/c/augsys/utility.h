@@ -7,25 +7,26 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
-struct aug_errinfo;
+/**
+ * Scramble or unscramble @a dst buffer.
+ *
+ * Useful for hiding memory contents, but not true encryption.
+ *
+ * @param dst The buffer.
+ *
+ * @param size Size of @a dst buffer.
+ *
+ * @return @a dst buffer.
+ */
 
-AUGSYS_API int
-aug_filesize(int fd, size_t* size);
-
-AUGSYS_API int
-aug_perrinfo(const struct aug_errinfo* errinfo, const char* s);
-
-AUGSYS_API int
-aug_perror(const char* s);
+AUGSYS_API void*
+aug_memfrob(void* dst, size_t size);
 
 AUGSYS_API long
 aug_rand(void);
 
 AUGSYS_API void
 aug_srand(unsigned seed);
-
-AUGSYS_API int
-aug_setnonblock(int fd, int on);
 
 /**
  * @return Thread identifier, or 0 if the library has been compiled without
@@ -34,11 +35,5 @@ aug_setnonblock(int fd, int on);
 
 AUGSYS_API unsigned
 aug_threadid(void);
-
-#define AUG_PERROR(x, s)                        \
-    do {                                        \
-        if (-1 == x)                            \
-            aug_perror(s);                      \
-    } while (0)
 
 #endif /* AUGSYS_UTILITY_H */

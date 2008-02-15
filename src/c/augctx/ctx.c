@@ -137,19 +137,19 @@ static const struct aug_ctxvtbl vtbl_ = {
     geterrinfo_
 };
 
-static int
+static aug_result
 vctxlog_(aug_ctx* ctx, int level, const char* format, va_list args)
 {
-    int ret = 0;
+    aug_result result = AUG_SUCCESS;
     assert(ctx);
     if (level <= aug_getloglevel(ctx)) {
         aug_log* log = aug_getlog(ctx);
         if (log) {
-            ret = aug_vwritelog(log, level, format, args);
+            result = aug_vwritelog(log, level, format, args);
             aug_release(log);
         }
     }
-    return ret;
+    return result;
 }
 
 AUGCTX_API aug_ctx*
@@ -225,123 +225,123 @@ aug_createbasicctx(void)
     return ctx;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_vctxlog(aug_ctx* ctx, int level, const char* format, va_list args)
 {
     return vctxlog_(ctx, level, format, args);
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxlog(aug_ctx* ctx, int level, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, level, format, args);
+    result = vctxlog_(ctx, level, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxcrit(aug_ctx* ctx, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, AUG_LOGCRIT, format, args);
+    result = vctxlog_(ctx, AUG_LOGCRIT, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxerror(aug_ctx* ctx, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, AUG_LOGERROR, format, args);
+    result = vctxlog_(ctx, AUG_LOGERROR, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxwarn(aug_ctx* ctx, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, AUG_LOGWARN, format, args);
+    result = vctxlog_(ctx, AUG_LOGWARN, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxnotice(aug_ctx* ctx, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, AUG_LOGNOTICE, format, args);
+    result = vctxlog_(ctx, AUG_LOGNOTICE, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxinfo(aug_ctx* ctx, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, AUG_LOGINFO, format, args);
+    result = vctxlog_(ctx, AUG_LOGINFO, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxdebug0(aug_ctx* ctx, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, AUG_LOGDEBUG0, format, args);
+    result = vctxlog_(ctx, AUG_LOGDEBUG0, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxdebug1(aug_ctx* ctx, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, AUG_LOGDEBUG0 + 1, format, args);
+    result = vctxlog_(ctx, AUG_LOGDEBUG0 + 1, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxdebug2(aug_ctx* ctx, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, AUG_LOGDEBUG0 + 2, format, args);
+    result = vctxlog_(ctx, AUG_LOGDEBUG0 + 2, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_ctxdebug3(aug_ctx* ctx, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
     va_start(args, format);
-    ret = vctxlog_(ctx, AUG_LOGDEBUG0 + 3, format, args);
+    result = vctxlog_(ctx, AUG_LOGDEBUG0 + 3, format, args);
     va_end(args);
-    return ret;
+    return result;
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_perrinfo(aug_ctx* ctx, const char* s)
 {
     struct aug_errinfo* errinfo = aug_geterrinfo(ctx);

@@ -45,7 +45,8 @@ libaugsys_la_SOURCES = \
 	file.c \
 	stream.c \
 	uio.c \
-	unistd.c
+	unistd.c \
+	utility.c
 
 # libaugsys_la_SOURCES = \
 # 	barrier.c \

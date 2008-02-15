@@ -51,6 +51,9 @@ aug_fsync(aug_ctx* ctx, aug_fd fd);
 AUGSYS_API aug_result
 aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size);
 
+AUGSYS_API aug_result
+aug_fsize(aug_ctx* ctx, aug_fd fd, size_t* size);
+
 AUGSYS_API void
 aug_msleep(aug_ctx* ctx, unsigned ms);
 

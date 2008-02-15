@@ -4,6 +4,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <sys/stat.h>
+
 AUGSYS_API aug_result
 aug_fclose(aug_ctx* ctx, aug_fd fd)
 {
@@ -114,6 +116,19 @@ aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size)
         aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
         return AUG_FAILURE;
     }
+    return AUG_SUCCESS;
+}
+
+AUGSYS_API aug_result
+aug_fsize(aug_ctx* ctx, aug_fd fd, size_t* size)
+{
+    struct stat s;
+    if (-1 == fstat(fd, &s)) {
+        aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
+        return AUG_FAILURE;
+    }
+
+    *size = s.st_size;
     return AUG_SUCCESS;
 }
 

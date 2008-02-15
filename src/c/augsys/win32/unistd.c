@@ -221,6 +221,21 @@ aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size)
     return ret;
 }
 
+AUGSYS_API aug_result
+aug_fsize(aug_ctx* ctx, aug_fd fd, size_t* size)
+{
+    LARGE_INTEGER li;
+
+    if (!GetFileSizeEx(fd, &li)) {
+        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+                            GetLastError());
+        return AUG_FAILURE;
+    }
+
+    *size = (size_t)li.QuadPart;
+    return AUG_SUCCESS;
+}
+
 AUGSYS_API void
 aug_msleep(aug_ctx* ctx, unsigned ms)
 {

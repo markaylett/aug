@@ -52,7 +52,7 @@ release_(aug_log* obj)
     }
 }
 
-static int
+static aug_result
 vwritelog_(aug_log* obj, int level, const char* format, va_list args)
 {
     char buf[AUG_MAXLINE];
@@ -65,11 +65,11 @@ vwritelog_(aug_log* obj, int level, const char* format, va_list args)
     AUG_SNTRUNCF(buf, sizeof(buf), ret);
 
     if (ret < 0)
-        return -1;
+        return AUG_FAILURE;
 
     fprintf(file, "%s\n", buf);
     fflush(file);
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static const struct aug_logvtbl vtbl_ = {
