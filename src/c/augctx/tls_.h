@@ -19,6 +19,9 @@
 # include <pthread.h>
 typedef pthread_key_t aug_tlskey_t;
 #else /* _WIN32 */
+# if !defined(WIN32_LEAN_AND_MEAN)
+#  define WIN32_LEAN_AND_MEAN
+# endif /* !WIN32_LEAN_AND_MEAN */
 # include <windows.h>
 typedef DWORD aug_tlskey_t;
 #endif /* _WIN32 */

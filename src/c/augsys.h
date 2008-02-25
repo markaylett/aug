@@ -29,7 +29,6 @@
 #include "augsys/queue.h"
 #include "augsys/socket.h"
 #include "augsys/stream.h"
-#include "augsys/string.h"
 #include "augsys/time.h"
 #include "augsys/types.h"
 #include "augsys/uio.h"

@@ -7,6 +7,20 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
+AUGSYS_API long
+aug_rand(void);
+
+AUGSYS_API void
+aug_srand(unsigned seed);
+
+/**
+ * @return Thread identifier, or 0 if the library has been compiled without
+ * thread support.
+ */
+
+AUGSYS_API unsigned
+aug_threadid(void);
+
 /**
  * Scramble or unscramble @a dst buffer.
  *
@@ -21,19 +35,5 @@
 
 AUGSYS_API void*
 aug_memfrob(void* dst, size_t size);
-
-AUGSYS_API long
-aug_rand(void);
-
-AUGSYS_API void
-aug_srand(unsigned seed);
-
-/**
- * @return Thread identifier, or 0 if the library has been compiled without
- * thread support.
- */
-
-AUGSYS_API unsigned
-aug_threadid(void);
 
 #endif /* AUGSYS_UTILITY_H */

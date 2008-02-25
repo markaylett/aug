@@ -3,6 +3,10 @@
 */
 #include <assert.h>
 #include <stdlib.h> /* malloc() */
+
+#if !defined(WIN32_LEAN_AND_MEAN)
+# define WIN32_LEAN_AND_MEAN
+#endif /* !WIN32_LEAN_AND_MEAN */
 #include <windows.h>
 
 static LPCRITICAL_SECTION cs_ = NULL;

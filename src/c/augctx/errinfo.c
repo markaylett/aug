@@ -13,7 +13,10 @@ AUG_RCSID("$Id$");
 #include <stdio.h>
 
 #if defined(_WIN32)
-# include "augsys/windows.h"
+# if !defined(WIN32_LEAN_AND_MEAN)
+#  define WIN32_LEAN_AND_MEAN
+# endif /* !WIN32_LEAN_AND_MEAN */
+# include <windows.h>
 # include <ctype.h>
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */

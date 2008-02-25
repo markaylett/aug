@@ -6,7 +6,6 @@ EXTRA_DIST = \
 	mmap.c \
 	muxer.c \
 	socket.c \
-	string.c \
 	time.c \
 	tls.c \
 	uio.c \

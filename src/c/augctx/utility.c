@@ -11,6 +11,9 @@ AUG_RCSID("$Id$");
 #include <time.h>     /* tzset() */
 
 #if defined(_WIN32)
+# if !defined(WIN32_LEAN_AND_MEAN)
+#  define WIN32_LEAN_AND_MEAN
+# endif /* !WIN32_LEAN_AND_MEAN */
 # include <windows.h> /* GetTimeZoneInformation() */
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */

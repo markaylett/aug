@@ -15,7 +15,7 @@ AUG_RCSID("$Id$");
 # include <sys/time.h>
 #else /* _WIN32 */
 # include <sys/timeb.h> /* _ftime() */
-# include <windows.h>   /* struct timeval */
+# include <winsock2.h>  /* struct timeval */
 #endif /* _WIN32 */
 
 struct impl_ {

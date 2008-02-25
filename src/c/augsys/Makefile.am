@@ -28,7 +28,6 @@ modinclude_HEADERS = \
 	queue.h \
 	socket.h \
 	stream.h \
-	string.h \
 	time.h \
 	types.h \
 	uio.h \
