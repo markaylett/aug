@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = filetest$(EXEEXT)
+check_PROGRAMS = filetest$(EXEEXT) utilitytest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -60,12 +60,15 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugsys_la_OBJECTS = file.lo stream.lo uio.lo unistd.lo \
-	utility.lo
+am_libaugsys_la_OBJECTS = barrier.lo config.lo debug.lo dlfcn.lo \
+	endian.lo file.lo stream.lo uio.lo unistd.lo utility.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_filetest_OBJECTS = filetest.$(OBJEXT)
 filetest_OBJECTS = $(am_filetest_OBJECTS)
 filetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_utilitytest_OBJECTS = utilitytest.$(OBJEXT)
+utilitytest_OBJECTS = $(am_utilitytest_OBJECTS)
+utilitytest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -76,8 +79,10 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugsys_la_SOURCES) $(filetest_SOURCES)
-DIST_SOURCES = $(libaugsys_la_SOURCES) $(filetest_SOURCES)
+SOURCES = $(libaugsys_la_SOURCES) $(filetest_SOURCES) \
+	$(utilitytest_SOURCES)
+DIST_SOURCES = $(libaugsys_la_SOURCES) $(filetest_SOURCES) \
+	$(utilitytest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -227,7 +232,6 @@ EXTRA_DIST = \
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
 	barrier.h \
-	base.h \
 	config.h \
 	debug.h \
 	dlfcn.h \
@@ -257,6 +261,11 @@ noinst_HEADERS = \
 
 lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
+	barrier.c \
+	config.c \
+	debug.c \
+	dlfcn.c \
+	endian.c \
 	file.c \
 	stream.c \
 	uio.c \
@@ -265,7 +274,6 @@ libaugsys_la_SOURCES = \
 
 
 # libaugsys_la_SOURCES = \
-# 	barrier.c \
 # 	base.c \
 # 	config.c \
 # 	debug.c \
@@ -299,10 +307,15 @@ libaugsys_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 TESTS = \
-	filetest
+	filetest \
+	utilitytest
 
 filetest_SOURCES = filetest.c
 filetest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+utilitytest_SOURCES = utilitytest.c
+utilitytest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 
@@ -440,6 +453,9 @@ clean-checkPROGRAMS:
 filetest$(EXEEXT): $(filetest_OBJECTS) $(filetest_DEPENDENCIES) 
 	@rm -f filetest$(EXEEXT)
 	$(LINK) $(filetest_LDFLAGS) $(filetest_OBJECTS) $(filetest_LDADD) $(LIBS)
+utilitytest$(EXEEXT): $(utilitytest_OBJECTS) $(utilitytest_DEPENDENCIES) 
+	@rm -f utilitytest$(EXEEXT)
+	$(LINK) $(utilitytest_LDFLAGS) $(utilitytest_OBJECTS) $(utilitytest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -447,12 +463,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/barrier.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlfcn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endian.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unistd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utilitytest.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

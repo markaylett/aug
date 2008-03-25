@@ -24,7 +24,7 @@ seterrinfo_(const char* file, int line)
     aug_seterrinfo(NULL, file, line, AUG_SRCDLFCN, 1, dlerror());
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_dlclose(aug_dlib_t dlib)
 {
     void* handle = dlib->handle_;
@@ -37,7 +37,7 @@ aug_dlclose(aug_dlib_t dlib)
 }
 
 AUGSYS_API aug_dlib_t
-aug_dlopen(const char* path)
+aug_dlopen(aug_ctx* ctx, const char* path)
 {
     aug_dlib_t dlib = malloc(sizeof(struct aug_dlib_));
     if (!dlib) {

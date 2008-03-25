@@ -10,7 +10,6 @@ EXTRA_DIST = \
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
 	barrier.h \
-	base.h \
 	config.h \
 	debug.h \
 	dlfcn.h \
@@ -41,6 +40,11 @@ noinst_HEADERS = \
 lib_LTLIBRARIES = libaugsys.la
 
 libaugsys_la_SOURCES = \
+	barrier.c \
+	config.c \
+	debug.c \
+	dlfcn.c \
+	endian.c \
 	file.c \
 	stream.c \
 	uio.c \
@@ -48,7 +52,6 @@ libaugsys_la_SOURCES = \
 	utility.c
 
 # libaugsys_la_SOURCES = \
-# 	barrier.c \
 # 	base.c \
 # 	config.c \
 # 	debug.c \
@@ -83,13 +86,19 @@ libaugsys_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 check_PROGRAMS = \
-	filetest
+	filetest \
+	utilitytest
 
 TESTS = \
-	filetest
+	filetest \
+	utilitytest
 
 filetest_SOURCES = filetest.c
 filetest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+utilitytest_SOURCES = utilitytest.c
+utilitytest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 # check_PROGRAMS = \

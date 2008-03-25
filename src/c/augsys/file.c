@@ -176,16 +176,17 @@ static aug_file*
 vcreatefile_(aug_ctx* ctx, const char* path, int flags, va_list args)
 {
     aug_fd fd;
-    aug_mpool* mpool;
     struct impl_* impl;
     assert(ctx);
 
     if (AUG_BADFD == (fd = aug_vfopen(ctx, path, flags, args)))
         return NULL;
 
-    mpool = aug_getmpool(ctx);
-    impl = aug_malloc(mpool, sizeof(struct impl_));
-    aug_release(mpool);
+    {
+        aug_mpool* mpool = aug_getmpool(ctx);
+        impl = aug_malloc(mpool, sizeof(struct impl_));
+        aug_release(mpool);
+    }
 
     if (!impl) {
         aug_fclose(ctx, fd);
