@@ -83,7 +83,7 @@ aug_gettlx(void);
  * it.
  *
  * The returned reference is not retained.  The caller must _not_, therefore,
- * release it.  This function can be used to test the existence of the
+ * release it.  This function can also be used to test the existence of a
  * thread-local context.
  *
  * @return A borrowed context reference.

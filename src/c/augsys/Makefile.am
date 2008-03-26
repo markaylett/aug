@@ -46,37 +46,27 @@ libaugsys_la_SOURCES = \
 	dlfcn.c \
 	endian.c \
 	file.c \
+	limits.c \
 	stream.c \
+	types.c \
 	uio.c \
 	unistd.c \
-	utility.c
+	utility.c \
+	windows.c
 
 # libaugsys_la_SOURCES = \
-# 	base.c \
-# 	config.c \
-# 	debug.c \
-# 	dlfcn.c \
-# 	endian.c \
-# 	errinfo.c \
-# 	errno.c \
-# 	file.c \
-# 	limits.c \
-# 	lock.c \
-# 	log.c \
-# 	mcast.c \
-# 	mmap.c \
-# 	mutex.c \
-# 	muxer.c \
-# 	socket.c \
-# 	stream.c \
-# 	string.c \
-# 	time.c \
-# 	types.c \
-# 	uio.c \
-# 	unistd.c \
-# 	utility.c \
-# 	windows.c \
-# 	tls_.c
+# 	base.c \ deprecated
+# 	errinfo.c \ deprecated
+# 	errno.c \ deprecated
+# 	lock.c \ deprecated
+# 	log.c \ deprecated
+# 	mcast.c \ deprecated
+# 	mmap.c \ deprecated
+# 	mutex.c \ deprecated
+# 	muxer.c \ deprecated
+# 	socket.c \ deprecated
+# 	time.c \ deprecated
+# 	tls_.c deprecated
 
 libaugsys_la_LDFLAGS = \
 	-no-undefined \

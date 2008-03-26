@@ -92,12 +92,13 @@ AUGSYS_API aug_stream*
 aug_createstream(aug_ctx* ctx)
 {
     struct impl_* impl;
-    aug_mpool* mpool;
     assert(ctx);
 
-    mpool = aug_getmpool(ctx);
-    impl = aug_malloc(mpool, sizeof(struct impl_));
-    aug_release(mpool);
+    {
+        aug_mpool* mpool = aug_getmpool(ctx);
+        impl = aug_malloc(mpool, sizeof(struct impl_));
+        aug_release(mpool);
+    }
 
     if (!impl)
         return NULL;

@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#if defined(_WIN32) && defined(AUGMAR_SHARED)
+#if defined(_WIN32) && defined(AUGSYS_SHARED)
 # include "augsys/debug.h"
 AUG_EXTERNC BOOL WINAPI
 DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
@@ -26,4 +26,4 @@ DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
     };
     return TRUE;
 }
-#endif /* _WIN32 && AUGMAR_SHARED */
+#endif /* _WIN32 && AUGSYS_SHARED */

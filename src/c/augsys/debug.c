@@ -7,7 +7,9 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/log.h"
+#include "augctx/ctx.h"
+
+#include <stdio.h>
 
 #if defined(_MSC_VER) && !defined(NDEBUG)
 
@@ -16,9 +18,15 @@ dumpclient_(void* userdata, size_t size)
 {
     char* file;
     int line;
+    aug_ctx* ctx;
     _ASSERTE(_CrtIsMemoryBlock(userdata, (unsigned)size, NULL, &file, &line));
-    aug_warn("%s(%d) : Memory leak detected at 0x%p, %d byes long",
-             file, (int)line, userdata, (int)size);
+    if ((ctx = aug_tlx))
+        aug_ctxwarn(ctx,
+                    "%s(%d) : Memory leak detected at 0x%p, %d byes long",
+                    file, (int)line, userdata, (int)size);
+    else
+        fprintf(stderr, "%s(%d) : Memory leak detected at 0x%p, %d byes long",
+                file, (int)line, userdata, (int)size);
 }
 
 AUGSYS_API void

@@ -61,7 +61,8 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugsys_la_OBJECTS = barrier.lo config.lo debug.lo dlfcn.lo \
-	endian.lo file.lo stream.lo uio.lo unistd.lo utility.lo
+	endian.lo file.lo limits.lo stream.lo types.lo uio.lo \
+	unistd.lo utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_filetest_OBJECTS = filetest.$(OBJEXT)
 filetest_OBJECTS = $(am_filetest_OBJECTS)
@@ -267,38 +268,28 @@ libaugsys_la_SOURCES = \
 	dlfcn.c \
 	endian.c \
 	file.c \
+	limits.c \
 	stream.c \
+	types.c \
 	uio.c \
 	unistd.c \
-	utility.c
+	utility.c \
+	windows.c
 
 
 # libaugsys_la_SOURCES = \
-# 	base.c \
-# 	config.c \
-# 	debug.c \
-# 	dlfcn.c \
-# 	endian.c \
-# 	errinfo.c \
-# 	errno.c \
-# 	file.c \
-# 	limits.c \
-# 	lock.c \
-# 	log.c \
-# 	mcast.c \
-# 	mmap.c \
-# 	mutex.c \
-# 	muxer.c \
-# 	socket.c \
-# 	stream.c \
-# 	string.c \
-# 	time.c \
-# 	types.c \
-# 	uio.c \
-# 	unistd.c \
-# 	utility.c \
-# 	windows.c \
-# 	tls_.c
+# 	base.c \ deprecated
+# 	errinfo.c \ deprecated
+# 	errno.c \ deprecated
+# 	lock.c \ deprecated
+# 	log.c \ deprecated
+# 	mcast.c \ deprecated
+# 	mmap.c \ deprecated
+# 	mutex.c \ deprecated
+# 	muxer.c \ deprecated
+# 	socket.c \ deprecated
+# 	time.c \ deprecated
+# 	tls_.c deprecated
 libaugsys_la_LDFLAGS = \
 	-no-undefined \
 	-version-info 1:0:0
@@ -470,11 +461,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endian.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filetest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unistd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utilitytest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

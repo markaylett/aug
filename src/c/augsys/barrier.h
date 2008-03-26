@@ -10,7 +10,7 @@
  * Portable memory barriers.
  */
 
-#include "augsys/lock.h"
+#include "augctx/lock.h"
 
 #if !ENABLE_SMP
 /**
