@@ -61,8 +61,8 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugsys_la_OBJECTS = barrier.lo config.lo debug.lo dlfcn.lo \
-	endian.lo file.lo limits.lo stream.lo types.lo uio.lo \
-	unistd.lo utility.lo windows.lo
+	endian.lo file.lo limits.lo socket.lo stream.lo types.lo \
+	uio.lo unistd.lo utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_filetest_OBJECTS = filetest.$(OBJEXT)
 filetest_OBJECTS = $(am_filetest_OBJECTS)
@@ -269,6 +269,7 @@ libaugsys_la_SOURCES = \
 	endian.c \
 	file.c \
 	limits.c \
+	socket.c \
 	stream.c \
 	types.c \
 	uio.c \
@@ -287,7 +288,6 @@ libaugsys_la_SOURCES = \
 # 	mmap.c \ deprecated
 # 	mutex.c \ deprecated
 # 	muxer.c \ deprecated
-# 	socket.c \ deprecated
 # 	time.c \ deprecated
 # 	tls_.c deprecated
 libaugsys_la_LDFLAGS = \
@@ -462,6 +462,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uio.Plo@am__quote@

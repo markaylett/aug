@@ -2,13 +2,13 @@
    See the file COPYING for copying permission.
 */
 #define AUGUTIL_BUILD
-#include "augutil/clock.h"
+#include "augutil/hires.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
-# include "augutil/posix/clock.c"
+# include "augutil/posix/hires.c"
 #else /* _WIN32 */
-# include "augutil/win32/clock.c"
+# include "augutil/win32/hires.c"
 #endif /* _WIN32 */

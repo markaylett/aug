@@ -1,3 +1,3 @@
 EXTRA_DIST = \
-	clock.c \
+	hires.c \
 	pwd.c

@@ -170,7 +170,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	clock.c \
+	hires.c \
 	pwd.c
 
 all: all-am

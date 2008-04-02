@@ -11,17 +11,17 @@ main(int argc, char* argv[])
 {
     struct aug_errinfo errinfo;
 
-    aug_clock_t clck;
+    aug_hires_t hires;
     double start, stop;
 
     aug_atexitinit(&errinfo);
 
-    if (!(clck = aug_createclock())) {
-        aug_perrinfo(NULL, "aug_createclock() failed");
+    if (!(hires = aug_createhires())) {
+        aug_perrinfo(NULL, "aug_createhires() failed");
         return 1;
     }
 
-    if (!aug_elapsed(clck, &start)) {
+    if (!aug_elapsed(hires, &start)) {
         aug_perrinfo(NULL, "aug_elapsed() failed");
         return 1;
     }
@@ -30,7 +30,7 @@ main(int argc, char* argv[])
 
     aug_msleep(500);
 
-    if (!aug_elapsed(clck, &stop)) {
+    if (!aug_elapsed(hires, &stop)) {
         aug_perrinfo(NULL, "aug_elapsed() failed");
         return 1;
     }
@@ -43,8 +43,8 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_destroyclock(clck)) {
-        aug_perrinfo(NULL, "aug_destroyclock() failed");
+    if (-1 == aug_destroyhires(hires)) {
+        aug_perrinfo(NULL, "aug_destroyhires() failed");
         return 1;
     }
 

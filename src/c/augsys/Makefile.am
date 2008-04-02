@@ -47,6 +47,7 @@ libaugsys_la_SOURCES = \
 	endian.c \
 	file.c \
 	limits.c \
+	socket.c \
 	stream.c \
 	types.c \
 	uio.c \
@@ -64,7 +65,6 @@ libaugsys_la_SOURCES = \
 # 	mmap.c \ deprecated
 # 	mutex.c \ deprecated
 # 	muxer.c \ deprecated
-# 	socket.c \ deprecated
 # 	time.c \ deprecated
 # 	tls_.c deprecated
 

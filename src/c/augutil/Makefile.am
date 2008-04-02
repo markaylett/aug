@@ -14,12 +14,12 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
-	clock.h \
 	config.h \
 	conv.h \
 	event.h \
 	file.h \
 	getopt.h \
+	hires.h \
 	lexer.h \
 	list.h \
 	log.h \
@@ -39,12 +39,12 @@ noinst_HEADERS =
 lib_LTLIBRARIES = libaugutil.la
 
 libaugutil_la_SOURCES = \
-	clock.c \
 	config.c \
 	conv.c \
 	event.c \
 	file.c \
 	getopt.c \
+	hires.c \
 	lexer.c \
 	list.c \
 	log.c \
@@ -67,25 +67,25 @@ libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	clocktest \
 	eventtest \
+	hirestest \
 	networdstest \
 	shelllexertest \
 	shellwordstest
 
 TESTS = \
-	clocktest \
 	eventtest \
+	hirestest \
 	networdstest.sh \
 	shelllexertest.sh \
 	shellwordstest.sh
 
-clocktest_SOURCES = clocktest.c
-clocktest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
-
 eventtest_SOURCES = eventtest.c
 eventtest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
+
+hirestest_SOURCES = hirestest.c
+hirestest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la
 
 networdstest_SOURCES = networdstest.c

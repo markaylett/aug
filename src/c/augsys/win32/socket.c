@@ -11,9 +11,9 @@
 #include <malloc.h> /* _alloca() */
 
 static void
-setbadfd_(const char* file, int line)
+setbadfd_(aug_ctx* ctx, const char* file, int line)
 {
-    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EINVAL,
+    aug_seterrinfo(ctx, file, line, "aug", AUG_EINVAL,
                    AUG_MSG("invalid file descriptor"));
 }
 
@@ -286,12 +286,13 @@ dgrampair_(int protocol, int sv[2])
 	return -1;
 }
 
-AUGSYS_API int
-aug_socket(int domain, int type, int protocol)
+AUGSYS_API aug_fd
+aug_socket(aug_ctx* ctx, int domain, int type, int protocol)
 {
     SOCKET h = socket(domain, type, protocol);
     if (INVALID_SOCKET == h) {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAGetLastError());
+        aug_setwin32errinfo(get_errinfo(ctx), __FILE__, __LINE__,
+                            WSAGetLastError());
         return -1;
     }
 

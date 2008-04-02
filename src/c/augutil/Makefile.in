@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = clocktest$(EXEEXT) eventtest$(EXEEXT) \
+check_PROGRAMS = eventtest$(EXEEXT) hirestest$(EXEEXT) \
 	networdstest$(EXEEXT) shelllexertest$(EXEEXT) \
 	shellwordstest$(EXEEXT)
 subdir = src/c/augutil
@@ -63,17 +63,17 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugutil_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugutil_la_OBJECTS = clock.lo config.lo conv.lo event.lo file.lo \
-	getopt.lo lexer.lo list.lo log.lo md5.lo networds.lo object.lo \
-	path.lo pwd.lo shellwords.lo timer.lo tmspec.lo types.lo \
-	xstr.lo
+am_libaugutil_la_OBJECTS = config.lo conv.lo event.lo file.lo \
+	getopt.lo hires.lo lexer.lo list.lo log.lo md5.lo networds.lo \
+	object.lo path.lo pwd.lo shellwords.lo timer.lo tmspec.lo \
+	types.lo xstr.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
-am_clocktest_OBJECTS = clocktest.$(OBJEXT)
-clocktest_OBJECTS = $(am_clocktest_OBJECTS)
-clocktest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
 am_eventtest_OBJECTS = eventtest.$(OBJEXT)
 eventtest_OBJECTS = $(am_eventtest_OBJECTS)
 eventtest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
+am_hirestest_OBJECTS = hirestest.$(OBJEXT)
+hirestest_OBJECTS = $(am_hirestest_OBJECTS)
+hirestest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
 am_networdstest_OBJECTS = networdstest.$(OBJEXT)
 networdstest_OBJECTS = $(am_networdstest_OBJECTS)
 networdstest_DEPENDENCIES =  \
@@ -96,11 +96,11 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugutil_la_SOURCES) $(clocktest_SOURCES) \
-	$(eventtest_SOURCES) $(networdstest_SOURCES) \
+SOURCES = $(libaugutil_la_SOURCES) $(eventtest_SOURCES) \
+	$(hirestest_SOURCES) $(networdstest_SOURCES) \
 	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES)
-DIST_SOURCES = $(libaugutil_la_SOURCES) $(clocktest_SOURCES) \
-	$(eventtest_SOURCES) $(networdstest_SOURCES) \
+DIST_SOURCES = $(libaugutil_la_SOURCES) $(eventtest_SOURCES) \
+	$(hirestest_SOURCES) $(networdstest_SOURCES) \
 	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -254,12 +254,12 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
-	clock.h \
 	config.h \
 	conv.h \
 	event.h \
 	file.h \
 	getopt.h \
+	hires.h \
 	lexer.h \
 	list.h \
 	log.h \
@@ -277,12 +277,12 @@ modinclude_HEADERS = \
 noinst_HEADERS = 
 lib_LTLIBRARIES = libaugutil.la
 libaugutil_la_SOURCES = \
-	clock.c \
 	config.c \
 	conv.c \
 	event.c \
 	file.c \
 	getopt.c \
+	hires.c \
 	lexer.c \
 	list.c \
 	log.c \
@@ -305,18 +305,18 @@ libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = \
-	clocktest \
 	eventtest \
+	hirestest \
 	networdstest.sh \
 	shelllexertest.sh \
 	shellwordstest.sh
 
-clocktest_SOURCES = clocktest.c
-clocktest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
-
 eventtest_SOURCES = eventtest.c
 eventtest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
+
+hirestest_SOURCES = hirestest.c
+hirestest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la
 
 networdstest_SOURCES = networdstest.c
@@ -400,12 +400,12 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-clocktest$(EXEEXT): $(clocktest_OBJECTS) $(clocktest_DEPENDENCIES) 
-	@rm -f clocktest$(EXEEXT)
-	$(LINK) $(clocktest_LDFLAGS) $(clocktest_OBJECTS) $(clocktest_LDADD) $(LIBS)
 eventtest$(EXEEXT): $(eventtest_OBJECTS) $(eventtest_DEPENDENCIES) 
 	@rm -f eventtest$(EXEEXT)
 	$(LINK) $(eventtest_LDFLAGS) $(eventtest_OBJECTS) $(eventtest_LDADD) $(LIBS)
+hirestest$(EXEEXT): $(hirestest_OBJECTS) $(hirestest_DEPENDENCIES) 
+	@rm -f hirestest$(EXEEXT)
+	$(LINK) $(hirestest_LDFLAGS) $(hirestest_OBJECTS) $(hirestest_LDADD) $(LIBS)
 networdstest$(EXEEXT): $(networdstest_OBJECTS) $(networdstest_DEPENDENCIES) 
 	@rm -f networdstest$(EXEEXT)
 	$(LINK) $(networdstest_LDFLAGS) $(networdstest_OBJECTS) $(networdstest_LDADD) $(LIBS)
@@ -422,14 +422,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clocktest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eventtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hires.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hirestest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@

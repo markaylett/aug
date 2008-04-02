@@ -17,7 +17,10 @@ AUGSYS_API aug_result
 aug_dlclose(aug_dlib_t dlib)
 {
     aug_result result = AUG_SUCCESS;
-    aug_ctx* ctx = dlib->ctx_;
+    aug_ctx* ctx;
+    assert(dlib);
+
+    ctx = dlib->ctx_;
 
     if (!FreeLibrary(dlib->handle_)) {
         aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,

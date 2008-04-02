@@ -16,6 +16,8 @@ AUG_RCSID("$Id$");
 #else /* _WIN32 */
 # include <sys/timeb.h> /* _ftime() */
 # include <winsock2.h>  /* struct timeval */
+# define ftime _ftime
+# define timeb _timeb
 #endif /* _WIN32 */
 
 struct impl_ {
@@ -62,8 +64,8 @@ gettimeofday_(aug_clock* obj, struct timeval* tv)
     if (-1 == gettimeofday(tv, NULL))
         return NULL;
 #else /* _WIN32 */
-    struct _timeb tb;
-    _ftime(&tb);
+    struct timeb tb;
+    ftime(&tb);
     tv->tv_sec = (long)tb.time;
     tv->tv_usec = tb.millitm * 1000;
 #endif /* _WIN32 */

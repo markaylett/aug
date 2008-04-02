@@ -19,16 +19,16 @@ tofd_(int fd)
     return fd;
 }
 
-AUGSYS_API int
-aug_socket(int domain, int type, int protocol)
+AUGSYS_API aug_fd
+aug_socket(aug_ctx* ctx, int domain, int type, int protocol)
 {
     int fd = socket(domain, type, protocol);
     if (-1 == fd) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
         return -1;
     }
 
-    return tofd_(fd);
+    return fd;
 }
 
 AUGSYS_API int
