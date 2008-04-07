@@ -3,6 +3,7 @@
 */
 #include "augctx/errinfo.h"
 
+#include <assert.h>
 #include <stdlib.h> /* NULL */
 
 #if !defined(__APPLE__) || !defined(__MACH__)
@@ -31,7 +32,7 @@ aug_dlclose(aug_dlib_t dlib)
     aug_ctx* ctx = dlib->ctx_;
 
     if (0 != dlclose(dlib->handle_)) {
-        seterrinfo_(__FILE__, __LINE__);
+        seterrinfo_(ctx, __FILE__, __LINE__);
         result = AUG_FAILURE;
     }
 
@@ -54,7 +55,7 @@ aug_dlopen(aug_ctx* ctx, const char* path)
     assert(ctx);
 
     if (!(handle = dlopen(path, RTLD_LAZY))) {
-        seterrinfo_(__FILE__, __LINE__);
+        seterrinfo_(ctx, __FILE__, __LINE__);
         return NULL;
     }
 
@@ -84,7 +85,7 @@ aug_dlsym(aug_dlib_t dlib, const char* symbol)
     } local;
 
     if (!(local.in_ = dlsym(dlib->handle_, symbol))) {
-        seterrinfo_(__FILE__, __LINE__);
+        seterrinfo_(dlib->ctx_, __FILE__, __LINE__);
         return NULL;
     }
 

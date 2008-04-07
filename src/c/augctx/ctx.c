@@ -15,9 +15,9 @@ AUG_RCSID("$Id$");
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(_WIN32)
+#if defined(AUG_WIN32)
 # include <winsock2.h>
-#endif /* _WIN32 */
+#endif /* AUG_WIN32 */
 
 struct impl_ {
     aug_ctx ctx_;
@@ -60,9 +60,9 @@ release_(aug_ctx* obj)
         aug_release(log);
         aug_release(clock);
         aug_release(mpool);
-#if defined(_WIN32)
+#if defined(AUG_WIN32)
         WSACleanup();
-#endif /* _WIN32 */
+#endif /* AUG_WIN32 */
     }
 }
 
@@ -160,19 +160,19 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int loglevel)
     assert(clock);
     assert(log);
 
-#if defined(_WIN32)
+#if defined(AUG_WIN32)
     {
         WSADATA data;
         int err = WSAStartup(MAKEWORD(2, 2), &data);
         if (0 != err)
             return NULL;
     }
-#endif /* _WIN32 */
+#endif /* AUG_WIN32 */
 
     if (!(impl = aug_malloc(mpool, sizeof(struct impl_)))) {
-#if defined(_WIN32)
+#if defined(AUG_WIN32)
         WSACleanup();
-#endif /* _WIN32 */
+#endif /* AUG_WIN32 */
         return NULL;
     }
 

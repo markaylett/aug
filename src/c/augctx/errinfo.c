@@ -12,14 +12,14 @@ AUG_RCSID("$Id$");
 #include <errno.h>
 #include <stdio.h>
 
-#if defined(_WIN32)
+#if defined(AUG_WIN32)
 # if !defined(WIN32_LEAN_AND_MEAN)
 #  define WIN32_LEAN_AND_MEAN
 # endif /* !WIN32_LEAN_AND_MEAN */
 # include <windows.h>
 # include <ctype.h>
 # define vsnprintf _vsnprintf
-#endif /* _WIN32 */
+#endif /* AUG_WIN32 */
 
 AUGCTX_API void
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
@@ -59,7 +59,7 @@ aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     aug_seterrinfo(errinfo, file, line, "posix", err, strerror(err));
 }
 
-#if defined(_WIN32)
+#if defined(AUG_WIN32)
 AUGCTX_API void
 aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     unsigned long err)
@@ -83,4 +83,4 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
     aug_seterrinfo(errinfo, file, line, "win32", (int)err,
                    i ? desc : AUG_MSG("no description available"));
 }
-#endif /* _WIN32 */
+#endif /* AUG_WIN32 */

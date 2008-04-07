@@ -109,7 +109,22 @@ if test x$enable_threads = xyes; then
 fi
 
 case $host in
-*-*-cygwin* | *-*-mingw*)
+*-*-cygwin*)
+
+    if test x$enable_ssl = xyes; then
+        AC_SEARCH_LIBS(SSL_library_init, [ssleay32])
+        AC_SEARCH_LIBS(BIO_new, [eay32])
+    fi
+
+    CFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 $CFLAGS"
+    CXXFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 $CXXFLAGS"
+    LIBS="-Wl,-lws2_32 $LIBS"
+
+    if test x$enable_multicast = xyes; then
+        LIBS="-Wl,-liphlpapi $LIBS"
+    fi
+    ;;
+*-*-mingw*)
 
     # cp c:/WINNT/system32/ssleay32.dll c:/WINNT/system32/libssleay32.dll 
     # cd c:/OpenSSL/lib/MinGW/

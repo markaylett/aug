@@ -8,12 +8,12 @@
 
 AUG_RCSID("$Id$");
 
-#if !defined(_WIN32)
+#if !defined(AUG_WIN32)
 # include <strings.h> /* strncasecmp() */
-#else /* _WIN32 */
+#else /* AUG_WIN32 */
 # define strcasecmp  _stricmp
 # define strncasecmp _strnicmp
-#endif /* _WIN32 */
+#endif /* AUG_WIN32 */
 
 #include <ctype.h>
 

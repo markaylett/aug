@@ -5,6 +5,7 @@
 #define AUGCTX_ERRINFO_H
 
 #include "augctx/config.h"
+#include "augctx/defs.h" /* #AUG_WIN32 */
 
 #include <stdarg.h>
 
@@ -28,10 +29,10 @@ AUGCTX_API void
 aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     int err);
 
-#if defined(_WIN32)
+#if defined(AUG_WIN32)
 AUGCTX_API void
 aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     unsigned long err);
-#endif /* _WIN32 */
+#endif /* AUG_WIN32 */
 
 #endif /* AUGCTX_ERRINFO_H */

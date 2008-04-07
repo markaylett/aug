@@ -1,7 +1,9 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include <stdlib.h> /* abort() */
+#include "augctx/utility.h" /* aug_check() */
+#include <stdio.h>          /* fprintf() */
+#include <stdlib.h>         /* abort() */
 #include <pthread.h>
 
 static pthread_mutex_t mutex_ = PTHREAD_MUTEX_INITIALIZER;

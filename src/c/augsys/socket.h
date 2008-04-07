@@ -14,6 +14,8 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
+#include "augctx/ctx.h"
+
 #if !defined(_WIN32)
 # include <sys/socket.h>
 # include <netinet/in.h>

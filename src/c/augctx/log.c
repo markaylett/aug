@@ -12,9 +12,9 @@ AUG_RCSID("$Id$");
 #include <stdio.h>
 #include <string.h>
 
-#if defined(_WIN32)
+#if defined(AUG_WIN32)
 # define vsnprintf _vsnprintf
-#endif /* _WIN32 */
+#endif /* AUG_WIN32 */
 
 struct impl_ {
     aug_log log_;

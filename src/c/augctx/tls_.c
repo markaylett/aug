@@ -8,9 +8,9 @@
 AUG_RCSID("$Id$");
 
 #if ENABLE_THREADS
-# if !defined(_WIN32)
+# if !defined(AUG_WIN32)
 #  include "augctx/posix/tls.c"
-# else /* _WIN32 */
+# else /* AUG_WIN32 */
 #  include "augctx/win32/tls.c"
-# endif /* _WIN32 */
+# endif /* AUG_WIN32 */
 #endif /* ENABLE_THREADS */
