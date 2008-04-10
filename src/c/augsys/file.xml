@@ -3,8 +3,6 @@
   <quotincl>augsys/config.h</quotincl>
   <quotincl>augsys/types.h</quotincl>
 
-  <quotincl>augctx/ctx.h</quotincl>
-
   <quotincl>augtypes.h</quotincl>
 
   <interface name="file">
@@ -21,7 +19,7 @@
 
   <verbatim>
 AUGSYS_API aug_file*
-aug_createfile(aug_ctx* ctx, const char* path, int flags, ...);
+aug_createfile(const char* path, int flags, ...);
   </verbatim>
 
 </package>

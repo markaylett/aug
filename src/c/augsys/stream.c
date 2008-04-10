@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augctx/utility.h"
+#include "augctx/base.h"
 
 #include <assert.h>
 #include <string.h>
@@ -15,7 +15,7 @@ AUG_RCSID("$Id$");
 struct impl_ {
     aug_stream stream_;
     int refs_;
-    aug_ctx* ctx_;
+    aug_mpool* mpool_;
 };
 
 static void*
@@ -24,10 +24,6 @@ cast_(aug_stream* obj, const char* id)
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_streamid)) {
         aug_retain(obj);
         return obj;
-    } else if (AUG_EQUALID(id, aug_ctxid)) {
-        struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
-        aug_retain(impl->ctx_);
-        return impl->ctx_;
     }
     return NULL;
 }
@@ -46,11 +42,9 @@ release_(aug_stream* obj)
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
-        aug_ctx* ctx = impl->ctx_;
-        aug_mpool* mpool = aug_getmpool(ctx);
+        aug_mpool* mpool = impl->mpool_;
         aug_free(mpool, impl);
         aug_release(mpool);
-        aug_release(ctx);
     }
 }
 
@@ -89,27 +83,20 @@ static const struct aug_streamvtbl vtbl_ = {
 };
 
 AUGSYS_API aug_stream*
-aug_createstream(aug_ctx* ctx)
+aug_createstream(void)
 {
-    struct impl_* impl;
-    assert(ctx);
+    aug_mpool* mpool = aug_getmpool(aug_tlx);
+    struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
 
-    {
-        aug_mpool* mpool = aug_getmpool(ctx);
-        impl = aug_malloc(mpool, sizeof(struct impl_));
+    if (!impl) {
         aug_release(mpool);
-    }
-
-    if (!impl)
         return NULL;
+    }
 
     impl->stream_.vtbl_ = &vtbl_;
     impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
-
-    aug_retain(ctx);
-
-    impl->ctx_ = ctx;
+    impl->mpool_ = mpool;
 
     return &impl->stream_;
 }

@@ -2,8 +2,6 @@
 
   <quotincl>augsys/config.h</quotincl>
 
-  <quotincl>augctx/ctx.h</quotincl>
-
   <verbatim>
 struct iovec;
   </verbatim>
@@ -34,7 +32,7 @@ struct iovec;
 
   <verbatim>
 AUGSYS_API aug_stream*
-aug_createstream(aug_ctx* ctx);
+aug_createstream(void);
   </verbatim>
 
 </package>

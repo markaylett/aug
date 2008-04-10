@@ -1,10 +1,12 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/errinfo.h"
 #include "augsys/errno.h"
-#include "augsys/utility.h" /* aug_filesize() */
+#include "augsys/unistd.h" /* aug_fsize() */
 #include "augsys/windows.h"
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
 
 #include <io.h>
 #include <stdlib.h>         /* free() */
@@ -36,7 +38,7 @@ toaccess_(DWORD* to, int from)
     return 0;
 
  fail:
-    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                    AUG_MSG("invalid access flags '%d'"), (int)from);
     return -1;
 }
@@ -60,7 +62,7 @@ toprot_(DWORD* to, int from)
     return 0;
 
  fail:
-    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                    AUG_MSG("invalid protection flags '%d'"), (int)from);
     return -1;
 }
@@ -72,7 +74,7 @@ verify_(size_t size, size_t offset, size_t len)
        should not be greater than the file size. */
 
     if (!size || size < (offset + len)) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid file map size '%d'"), (int)size);
         return -1;
     }
@@ -80,7 +82,7 @@ verify_(size_t size, size_t offset, size_t len)
     /* The offset, if specified, must occur on an allocation size boundary. */
 
     if (offset && (offset % aug_granularity())) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid file map offset '%d'"), (int)offset);
         return -1;
     }
@@ -97,7 +99,7 @@ createmmap_(impl_t impl, size_t offset, size_t len)
     intptr_t file;
 
     if (-1 == impl->fd_) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EBADF);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EBADF);
         return -1;
     }
 
@@ -132,7 +134,7 @@ createmmap_(impl_t impl, size_t offset, size_t len)
     if (INVALID_HANDLE_VALUE == impl->mapping_)
         CloseHandle(mapping);
  fail1:
-    aug_setwin32errinfo(NULL, __FILE__, __LINE__, err);
+    aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
     return -1;
 }
 
@@ -149,7 +151,7 @@ destroymmap_(impl_t impl)
         err = GetLastError();
 
     if (err) {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, err);
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
         return -1;
     }
     return 0;
@@ -177,14 +179,14 @@ aug_createmmap(int fd, size_t offset, size_t len, int flags)
     if (-1 == toaccess_(&access, flags))
         return NULL;
 
-    if (-1 == aug_filesize(fd, &size))
+    if (AUG_FAILURE == aug_fsize((aug_fd)_get_osfhandle(fd), &size))
         return NULL;
 
     if (-1 == verify_(size, offset, len))
         return NULL;
 
     if (!(impl = (impl_t)malloc(sizeof(struct impl_)))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -211,7 +213,7 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
     impl->mmap_.addr_ = NULL;
 
     if (addr && !UnmapViewOfFile(addr)) {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return -1;
     }
 
@@ -221,11 +223,12 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
         impl->mapping_ = INVALID_HANDLE_VALUE;
 
         if (INVALID_HANDLE_VALUE != mapping && !CloseHandle(mapping)) {
-            aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+            aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                GetLastError());
             return -1;
         }
 
-        if (-1 == aug_filesize(impl->fd_, &impl->size_))
+        if (-1 == aug_fsize((aug_fd)_get_osfhandle(impl->fd_), &impl->size_))
             return -1;
     }
 
@@ -241,7 +244,7 @@ aug_syncmmap(const struct aug_mmap* mm)
     impl_t impl = (impl_t)mm;
 
     if (!FlushViewOfFile(impl->mmap_.addr_, impl->mmap_.len_)) {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return -1;
     }
     return 0;

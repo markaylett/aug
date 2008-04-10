@@ -11,14 +11,14 @@ AUG_RCSID("$Id$");
 #include <stdlib.h>
 #include <string.h>
 
-#if !defined(AUG_WIN32)
+#if !defined(_WIN32)
 # include <sys/time.h>
-#else /* AUG_WIN32 */
+#else /* _WIN32 */
 # include <sys/timeb.h> /* _ftime() */
 # include <winsock2.h>  /* struct timeval */
 # define ftime _ftime
 # define timeb _timeb
-#endif /* AUG_WIN32 */
+#endif /* _WIN32 */
 
 struct impl_ {
     aug_clock clock_;
@@ -60,15 +60,15 @@ release_(aug_clock* obj)
 static struct timeval*
 gettimeofday_(aug_clock* obj, struct timeval* tv)
 {
-#if !defined(AUG_WIN32)
+#if !defined(_WIN32)
     if (-1 == gettimeofday(tv, NULL))
         return NULL;
-#else /* AUG_WIN32 */
+#else /* _WIN32 */
     struct timeb tb;
     ftime(&tb);
     tv->tv_sec = (long)tb.time;
     tv->tv_usec = tb.millitm * 1000;
-#endif /* AUG_WIN32 */
+#endif /* _WIN32 */
     return tv;
 }
 

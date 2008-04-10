@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = basetest$(EXEEXT)
+check_PROGRAMS = basetest$(EXEEXT) logtest$(EXEEXT)
 subdir = src/c/augctx
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -67,6 +67,9 @@ libaugctx_la_OBJECTS = $(am_libaugctx_la_OBJECTS)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
 basetest_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
+am_logtest_OBJECTS = logtest.$(OBJEXT)
+logtest_OBJECTS = $(am_logtest_OBJECTS)
+logtest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -77,8 +80,10 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES)
-DIST_SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES)
+SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES) \
+	$(logtest_SOURCES)
+DIST_SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES) \
+	$(logtest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -266,11 +271,16 @@ libaugctx_la_LDFLAGS = \
 
 libaugctx_la_LIBADD = 
 TESTS = \
-	basetest
+	basetest \
+	logtest
 
 basetest_SOURCES = basetest.c
 basetest_LDADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
+
+logtest_SOURCES = logtest.c
+logtest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 @ENABLE_RUBY_TRUE@BUILT_SOURCES = \
 @ENABLE_RUBY_TRUE@	clock.h \
@@ -351,6 +361,9 @@ clean-checkPROGRAMS:
 basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
 	@rm -f basetest$(EXEEXT)
 	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
+logtest$(EXEEXT): $(logtest_OBJECTS) $(logtest_DEPENDENCIES) 
+	@rm -f logtest$(EXEEXT)
+	$(LINK) $(logtest_LDFLAGS) $(logtest_OBJECTS) $(logtest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -367,6 +380,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpool.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tls_.Plo@am__quote@

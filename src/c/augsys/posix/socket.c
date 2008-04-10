@@ -1,9 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/base.h"
-#include "augsys/errinfo.h"
-
 #include <errno.h>
 #include <string.h> /* memcpy() */
 #include <unistd.h>
@@ -19,12 +16,12 @@ tofd_(int fd)
     return fd;
 }
 
-AUGSYS_API aug_fd
-aug_socket(aug_ctx* ctx, int domain, int type, int protocol)
+AUGSYS_API int
+aug_socket(int domain, int type, int protocol)
 {
     int fd = socket(domain, type, protocol);
     if (-1 == fd) {
-        aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 

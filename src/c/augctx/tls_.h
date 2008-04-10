@@ -13,19 +13,18 @@
  */
 
 #include "augctx/config.h"
-#include "augctx/defs.h" /* #AUG_WIN32 */
 #include "augtypes.h"
 
-#if !defined(AUG_WIN32)
+#if !defined(_WIN32)
 # include <pthread.h>
 typedef pthread_key_t aug_tlskey_t;
-#else /* AUG_WIN32 */
+#else /* _WIN32 */
 # if !defined(WIN32_LEAN_AND_MEAN)
 #  define WIN32_LEAN_AND_MEAN
 # endif /* !WIN32_LEAN_AND_MEAN */
 # include <windows.h>
 typedef DWORD aug_tlskey_t;
-#endif /* AUG_WIN32 */
+#endif /* _WIN32 */
 
 AUG_EXTERNC aug_result
 aug_createtlskey_(aug_tlskey_t* tlskey);

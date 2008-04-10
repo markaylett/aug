@@ -1,7 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#error deprecated
 #ifndef AUGSYS_SOCKET_H
 #define AUGSYS_SOCKET_H
 
@@ -13,8 +12,6 @@
 
 #include "augsys/config.h"
 #include "augsys/types.h"
-
-#include "augctx/ctx.h"
 
 #if !defined(_WIN32)
 # include <sys/socket.h>
@@ -94,14 +91,14 @@ struct aug_inetaddr {
     } un_;
 };
 
-AUGSYS_API aug_fd
-aug_socket(aug_ctx* ctx, int domain, int type, int protocol);
+AUGSYS_API int
+aug_socket(int domain, int type, int protocol);
 
-AUGSYS_API aug_result
-aug_accept(aug_ctx* ctx, aug_fd sd, struct aug_endpoint* ep);
+AUGSYS_API int
+aug_accept(int s, struct aug_endpoint* ep);
 
-AUGSYS_API aug_result
-aug_bind(aug_ctx* ctx, aug_fd sd, const struct aug_endpoint* ep);
+AUGSYS_API int
+aug_bind(int s, const struct aug_endpoint* ep);
 
 /**
  * Remember that, for non-blocking sockets, connect() may fail with
@@ -109,39 +106,39 @@ aug_bind(aug_ctx* ctx, aug_fd sd, const struct aug_endpoint* ep);
  * completion.
  */
 
-AUGSYS_API aug_result
-aug_connect(aug_ctx* ctx, aug_fd sd, const struct aug_endpoint* ep);
+AUGSYS_API int
+aug_connect(int s, const struct aug_endpoint* ep);
 
 AUGSYS_API struct aug_endpoint*
-aug_getpeername(aug_ctx* ctx, aug_fd sd, struct aug_endpoint* ep);
+aug_getpeername(int s, struct aug_endpoint* ep);
 
 AUGSYS_API struct aug_endpoint*
-aug_getsockname(aug_ctx* ctx, aug_fd sd, struct aug_endpoint* ep);
+aug_getsockname(int s, struct aug_endpoint* ep);
 
-AUGSYS_API aug_result
-aug_listen(aug_ctx* ctx, aug_fd sd, int backlog);
-
-AUGSYS_API ssize_t
-aug_recv(aug_ctx* ctx, aug_fd sd, void* buf, size_t len, int flags);
+AUGSYS_API int
+aug_listen(int s, int backlog);
 
 AUGSYS_API ssize_t
-aug_recvfrom(aug_ctx* ctx, aug_fd sd, void* buf, size_t len, int flags,
+aug_recv(int s, void* buf, size_t len, int flags);
+
+AUGSYS_API ssize_t
+aug_recvfrom(int s, void* buf, size_t len, int flags,
              struct aug_endpoint* ep);
 
 AUGSYS_API ssize_t
-aug_send(aug_ctx* ctx, aug_fd sd, const void* buf, size_t len, int flags);
+aug_send(int s, const void* buf, size_t len, int flags);
 
 AUGSYS_API ssize_t
-aug_sendto(aug_ctx* ctx, aug_fd sd, const void* buf, size_t len, int flags,
+aug_sendto(int s, const void* buf, size_t len, int flags,
            const struct aug_endpoint* ep);
 
-AUGSYS_API aug_result
-aug_getsockopt(aug_ctx* ctx, aug_fd sd, int level, int optname, void* optval,
+AUGSYS_API int
+aug_getsockopt(int s, int level, int optname, void* optval,
                socklen_t* optlen);
 
-AUGSYS_API aug_result
-aug_setsockopt(aug_ctx* ctx, aug_fd sd, int level, int optname,
-               const void* optval, socklen_t optlen);
+AUGSYS_API int
+aug_setsockopt(int s, int level, int optname, const void* optval,
+               socklen_t optlen);
 
 /**
  * Shutdown the socket.
@@ -150,26 +147,23 @@ aug_setsockopt(aug_ctx* ctx, aug_fd sd, int level, int optname,
  * all data is sent and acknowledged by the receiver.
  */
 
-AUGSYS_API aug_result
-aug_shutdown(aug_ctx* ctx, aug_fd sd, int how);
+AUGSYS_API int
+aug_shutdown(int s, int how);
 
-AUGSYS_API aug_result
-aug_socketpair(aug_ctx* ctx, int domain, int type, int protocol,
-               aug_fd sv[2]);
-
-AUGSYS_API char*
-aug_endpointntop(aug_ctx* ctx, const struct aug_endpoint* src, char* dst,
-                 socklen_t len);
+AUGSYS_API int
+aug_socketpair(int domain, int type, int protocol, int sv[2]);
 
 AUGSYS_API char*
-aug_inetntop(aug_ctx* ctx, const struct aug_inetaddr* src, char* dst,
-             socklen_t len);
+aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len);
+
+AUGSYS_API char*
+aug_inetntop(const struct aug_inetaddr* src, char* dst, socklen_t len);
 
 AUGSYS_API struct aug_inetaddr*
-aug_inetpton(aug_ctx* ctx, int af, const char* src, struct aug_inetaddr* dst);
+aug_inetpton(int af, const char* src, struct aug_inetaddr* dst);
 
 AUGSYS_API void
-aug_destroyaddrinfo(aug_ctx* ctx, struct addrinfo* res);
+aug_destroyaddrinfo(struct addrinfo* res);
 
 /**
  * Protocol independent translation of @a host and @a serv to address list.
@@ -185,33 +179,30 @@ aug_destroyaddrinfo(aug_ctx* ctx, struct addrinfo* res);
  * @return -1 on failure.
  */
 
-AUGSYS_API aug_result
-aug_getaddrinfo(aug_ctx* ctx, const char* host, const char* serv,
+AUGSYS_API int
+aug_getaddrinfo(const char* host, const char* serv,
                 const struct addrinfo* hints, struct addrinfo** res);
 
 AUGSYS_API int
-aug_getfamily(aug_ctx* ctx, aug_fd s);
+aug_getfamily(int s);
 
-AUGSYS_API aug_result
-aug_setreuseaddr(aug_ctx* ctx, aug_fd s, int on);
-
-AUGSYS_API struct aug_endpoint*
-aug_getendpoint(aug_ctx* ctx, const struct addrinfo* addr,
-                struct aug_endpoint* ep);
+AUGSYS_API int
+aug_setreuseaddr(int s, int on);
 
 AUGSYS_API struct aug_endpoint*
-aug_setinetaddr(aug_ctx* ctx, struct aug_endpoint* ep,
-                const struct aug_inetaddr* addr);
+aug_getendpoint(const struct addrinfo* addr, struct aug_endpoint* ep);
+
+AUGSYS_API struct aug_endpoint*
+aug_setinetaddr(struct aug_endpoint* ep, const struct aug_inetaddr* addr);
 
 AUGSYS_API struct aug_inetaddr*
-aug_getinetaddr(aug_ctx* ctx, const struct aug_endpoint* ep,
-                struct aug_inetaddr* addr);
+aug_getinetaddr(const struct aug_endpoint* ep, struct aug_inetaddr* addr);
 
 AUGSYS_API const struct aug_inetaddr*
-aug_inetany(aug_ctx* ctx, int af);
+aug_inetany(int af);
 
 AUGSYS_API const struct aug_inetaddr*
-aug_inetloopback(aug_ctx* ctx, int af);
+aug_inetloopback(int af);
 
 /**
  * After a failed call to aug_accept(), this function can be used to determine
@@ -220,7 +211,7 @@ aug_inetloopback(aug_ctx* ctx, int af);
  * non-blocking.
  */
 
-AUGSYS_API aug_bool
-aug_acceptlost(aug_ctx* ctx);
+AUGSYS_API int
+aug_acceptlost(void);
 
 #endif /* AUGSYS_SOCKET_H */

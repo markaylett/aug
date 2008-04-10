@@ -11,6 +11,8 @@ AUG_RCSID("$Id$");
 #include "augsys/uio.h"
 #include "augsys/unistd.h"
 
+#include "augctx/base.h"
+
 #include <assert.h>
 #include <string.h>
 
@@ -18,7 +20,7 @@ struct impl_ {
     aug_file file_;
     aug_stream stream_;
     int refs_;
-    aug_ctx* ctx_;
+    aug_mpool* mpool_;
     aug_fd fd_;
 };
 
@@ -31,9 +33,6 @@ cast_(struct impl_* impl, const char* id)
     } else if (AUG_EQUALID(id, aug_streamid)) {
         aug_retain(&impl->stream_);
         return &impl->stream_;
-    } else if (AUG_EQUALID(id, aug_ctxid)) {
-        aug_retain(impl->ctx_);
-        return impl->ctx_;
     }
     return NULL;
 }
@@ -50,13 +49,11 @@ release_(struct impl_* impl)
 {
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
-        aug_ctx* ctx = impl->ctx_;
-        aug_mpool* mpool = aug_getmpool(ctx);
+        aug_mpool* mpool = impl->mpool_;
         if (AUG_BADFD != impl->fd_)
-            aug_fclose(ctx, impl->fd_);
+            aug_fclose(impl->fd_);
         aug_free(mpool, impl);
         aug_release(mpool);
-        aug_release(ctx);
     }
 }
 
@@ -85,7 +82,7 @@ static aug_result
 file_close_(aug_file* obj)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
-    aug_result result = aug_fclose(impl->ctx_, impl->fd_);
+    aug_result result = aug_fclose(impl->fd_);
     impl->fd_ = AUG_BADFD;
     return result;
 }
@@ -94,7 +91,7 @@ static aug_result
 file_setnonblock_(aug_file* obj, aug_bool on)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
-    return aug_fsetnonblock(impl->ctx_, impl->fd_, on);
+    return aug_fsetnonblock(impl->fd_, on);
 }
 
 static aug_fd
@@ -138,28 +135,28 @@ static ssize_t
 stream_read_(aug_stream* obj, void* buf, size_t size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
-    return aug_fread(impl->ctx_, impl->fd_, buf, size);
+    return aug_fread(impl->fd_, buf, size);
 }
 
 static ssize_t
 stream_readv_(aug_stream* obj, const struct iovec* iov, int size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
-    return aug_freadv(impl->ctx_, impl->fd_, iov, size);
+    return aug_freadv(impl->fd_, iov, size);
 }
 
 static ssize_t
 stream_write_(aug_stream* obj, const void* buf, size_t size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
-    return aug_fwrite(impl->ctx_, impl->fd_, buf, size);
+    return aug_fwrite(impl->fd_, buf, size);
 }
 
 static ssize_t
 stream_writev_(aug_stream* obj, const struct iovec* iov, int size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
-    return aug_fwritev(impl->ctx_, impl->fd_, iov, size);
+    return aug_fwritev(impl->fd_, iov, size);
 }
 
 static const struct aug_streamvtbl stream_vtbl_ = {
@@ -173,23 +170,20 @@ static const struct aug_streamvtbl stream_vtbl_ = {
 };
 
 static aug_file*
-vcreatefile_(aug_ctx* ctx, const char* path, int flags, va_list args)
+vcreatefile_(const char* path, int flags, va_list args)
 {
     aug_fd fd;
-    struct impl_* impl;
-    assert(ctx);
-
-    if (AUG_BADFD == (fd = aug_vfopen(ctx, path, flags, args)))
-        return NULL;
-
-    {
-        aug_mpool* mpool = aug_getmpool(ctx);
-        impl = aug_malloc(mpool, sizeof(struct impl_));
-        aug_release(mpool);
-    }
+    aug_mpool* mpool = aug_getmpool(aug_tlx);
+    struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
 
     if (!impl) {
-        aug_fclose(ctx, fd);
+        aug_release(mpool);
+        return NULL;
+    }
+
+    if (AUG_BADFD == (fd = aug_vfopen(path, flags, args))) {
+        aug_free(mpool, impl);
+        aug_release(mpool);
         return NULL;
     }
 
@@ -198,22 +192,19 @@ vcreatefile_(aug_ctx* ctx, const char* path, int flags, va_list args)
     impl->stream_.vtbl_ = &stream_vtbl_;
     impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
-
-    aug_retain(ctx);
-
-    impl->ctx_ = ctx;
+    impl->mpool_ = mpool;
     impl->fd_ = fd;
 
     return &impl->file_;
 }
 
 AUGSYS_API aug_file*
-aug_createfile(aug_ctx* ctx, const char* path, int flags, ...)
+aug_createfile(const char* path, int flags, ...)
 {
     aug_file* file;
     va_list args;
     va_start(args, flags);
-    file = vcreatefile_(ctx, path, flags, args);
+    file = vcreatefile_(path, flags, args);
     va_end(args);
     return file;
 }

@@ -1,13 +1,15 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/base.h"
-#include "augsys/errinfo.h"
 #include "augsys/errno.h"
 #include "augsys/socket.h"
 #include "augsys/time.h" /* aug_tvtoms() */
-#include "augsys/unistd.h"
+#include "augsys/windows.h"
 
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+
+#include <io.h>
 #include <stdlib.h>      /* malloc() */
 
 struct set_ {
@@ -93,7 +95,7 @@ aug_createmuxer(void)
 {
     aug_muxer_t muxer = malloc(sizeof(struct aug_muxer_));
     if (!muxer) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -114,12 +116,12 @@ AUGSYS_API int
 aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask)
 {
     if (FD_SETSIZE == muxer->out_.rd_.fd_count) {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEMFILE);
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEMFILE);
         return -1;
     }
 
     if (mask & ~AUG_FDEVENTALL) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid fdevent mask"));
         return -1;
     }
@@ -144,7 +146,7 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
     if (SOCKET_ERROR ==
         (ret = select(-1, &muxer->out_.rd_, &muxer->out_.wr_,
                       &muxer->out_.ex_, timeout))) {
-        if (WSAEINTR == aug_setwin32errinfo(NULL, __FILE__, __LINE__,
+        if (WSAEINTR == aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                                             WSAGetLastError()))
             ret = AUG_RETINTR;
     }

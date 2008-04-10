@@ -1,7 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#error deprecated
 #ifndef AUGSYS_BASE_H
 #define AUGSYS_BASE_H
 
@@ -24,60 +23,7 @@ struct aug_fdtype {
     int (*setnonblock_)(int, int);
 };
 
-/**
- * Initialise use of aug libraries.
- *
- * On failure, aug_init(), aug_term() and aug_atexitinit() functions set
- * errno, and not #aug_errinfo.  These functions must be called from the main
- * (primary) thread of the process.  They maintain an internal reference count
- * that allows them to be called multiple times.  All but the first call to
- * aug_init() simply updates the reference count.  These semantics have been
- * formalised to facilitate initialisation from functions such as DllMain().
- *
- * @param errinfo Thread-local error info object.
- *
- * @return null on failure.
- */
-
-AUGSYS_API struct aug_errinfo*
-aug_init(struct aug_errinfo* errinfo);
-
-/**
- * Terminate use of aug libraries.
- *
- * For safety reasons, aug_term() will re-install the default logger.  The
- * default logger is guaranteed to be safe even if aug_init() has not been
- * called.  This function sets errno, and not errinfo, on failure.
- */
-
-AUGSYS_API int
-aug_term(void);
-
-AUGSYS_API struct aug_errinfo*
-aug_atexitinit(struct aug_errinfo* errinfo);
-
-/**
- * Exit process.
- *
- * Force termination of aug libraries, regardless of reference count, before
- * calling exit().
- *
- * @param status The exit status.
- */
-
-AUGSYS_API void
-aug_exit(int status);
-
 /* The remaining functions will set errinfo on failure. */
-
-/**
- * Timezone offset.
- *
- * @return Seconds west of coordinated universal time.
- */
-
-AUGSYS_API long
-aug_timezone(void);
 
 /**
  * Get next id.

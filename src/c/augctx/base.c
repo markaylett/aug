@@ -171,6 +171,12 @@ aug_tlx_(void)
     return gettls_()->ctx_;
 }
 
+AUGCTX_API struct aug_errinfo*
+aug_tlerr_(void)
+{
+    return aug_geterrinfo(aug_tlx_());
+}
+
 AUGCTX_API aug_result
 aug_start(void)
 {

@@ -8,14 +8,12 @@
 AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
-# define SETAFNOSUPPORT_(ctx) \
-    aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, \
-    EAFNOSUPPORT)
+# define SETAFNOSUPPORT_() \
+    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT)
 # include "augsys/posix/socket.c"
 #else /* _WIN32 */
-# define SETAFNOSUPPORT_(ctx) \
-    aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, \
-    WSAEAFNOSUPPORT)
+# define SETAFNOSUPPORT_() \
+    aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEAFNOSUPPORT)
 # include "augsys/win32/socket.c"
 # define snprintf _snprintf
 #endif /* _WIN32 */

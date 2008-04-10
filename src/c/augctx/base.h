@@ -89,12 +89,17 @@ aug_gettlx(void);
  * @return A borrowed context reference.
  */
 
-#define aug_tlx aug_tlx_()
+#define aug_tlx   aug_tlx_()
 
 AUGCTX_API aug_ctx*
 aug_tlx_(void);
 
 /** @} */
+
+#define aug_tlerr aug_tlerr_()
+
+AUGCTX_API struct aug_errinfo*
+aug_tlerr_(void);
 
 /**
  * Convenience wrapper for aug_init(), aug_createbasicctx() and aug_term().

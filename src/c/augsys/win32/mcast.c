@@ -2,7 +2,8 @@
    See the file COPYING for copying permission.
 */
 
-#include "augsys/errinfo.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
 
 #if defined(__GNUC__)
 # include "iptypes_.h"
@@ -49,14 +50,14 @@ findif_(int af, unsigned ifindex,
         if (it)
             i = fn(arg, ifindex, it);
         else {
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
                            AUG_MSG("interface '%d' does not exist"),
                            (int)ifindex);
             i = -1;
         }
 
     } else {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, ret);
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, ret);
         i = -1;
     }
 
@@ -82,7 +83,7 @@ ifaddr_(void* arg, unsigned ifindex, PIP_ADAPTER_ADDRESSES adapter)
             return 0;
         }
 
-    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
                    AUG_MSG("no address for interface '%d'"), (int)ifindex);
     return -1;
 }
@@ -103,7 +104,7 @@ ifindex_(void* arg, unsigned ifindex, PIP_ADAPTER_ADDRESSES adapter)
             return 0;
         }
 
-    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
                    AUG_MSG("no address for interface '%d'"), (int)ifindex);
     return -1;
 }
@@ -114,7 +115,7 @@ getifaddr_(struct in_addr* addr, const char* ifname)
 {
     unsigned ifindex = atoi(ifname);
     if (0 == ifindex) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid interface index '%s'"), ifname);
         return -1;
     }
@@ -127,7 +128,7 @@ getifindex_(DWORD* index, const char* ifname)
 {
     unsigned ifindex = atoi(ifname);
     if (0 == ifindex) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid interface index '%s'"), ifname);
         return -1;
     }
@@ -183,7 +184,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEAFNOSUPPORT);
+    aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEAFNOSUPPORT);
     return -1;
 }
 
@@ -235,7 +236,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEAFNOSUPPORT);
+    aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEAFNOSUPPORT);
     return -1;
 }
 
@@ -272,7 +273,7 @@ aug_setmcastif(int s, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEAFNOSUPPORT);
+    aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEAFNOSUPPORT);
     return -1;
 }
 
@@ -296,7 +297,7 @@ aug_setmcastloop(int s, int on)
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEAFNOSUPPORT);
+    aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEAFNOSUPPORT);
     return -1;
 }
 
@@ -320,6 +321,6 @@ aug_setmcastttl(int s, int ttl)
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEAFNOSUPPORT);
+    aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEAFNOSUPPORT);
     return -1;
 }

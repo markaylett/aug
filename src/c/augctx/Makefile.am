@@ -50,14 +50,20 @@ libaugctx_la_LDFLAGS = \
 libaugctx_la_LIBADD =
 
 check_PROGRAMS = \
-	basetest
+	basetest \
+	logtest
 
 TESTS = \
-	basetest
+	basetest \
+	logtest
 
 basetest_SOURCES = basetest.c
 basetest_LDADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
+
+logtest_SOURCES = logtest.c
+logtest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 if ENABLE_RUBY
 BUILT_SOURCES = \

@@ -4,6 +4,8 @@
 #ifndef AUGSYS_LIMITS_H
 #define AUGSYS_LIMITS_H
 
+#include "augconfig.h"
+
 #if !defined(_WIN32)
 # include <limits.h>
 # if !defined(PATH_MAX)

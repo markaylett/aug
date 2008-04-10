@@ -7,8 +7,6 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
-#include "augctx/ctx.h"
-
 #if !defined(_WIN32)
 # include <sys/uio.h>
 #else /* _WIN32 */
@@ -19,9 +17,9 @@ struct iovec {
 #endif /* _WIN32 */
 
 AUGSYS_API ssize_t
-aug_freadv(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size);
+aug_freadv(aug_fd fd, const struct iovec* iov, int size);
 
 AUGSYS_API ssize_t
-aug_fwritev(aug_ctx* ctx, aug_fd fd, const struct iovec* iov, int size);
+aug_fwritev(aug_fd fd, const struct iovec* iov, int size);
 
 #endif /* AUGSYS_UIO_H */

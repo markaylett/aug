@@ -38,10 +38,12 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = filetest$(EXEEXT) utilitytest$(EXEEXT)
+DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
+check_PROGRAMS = basetest$(EXEEXT) errinfotest$(EXEEXT) \
+	filetest$(EXEEXT) mcasttest$(EXEEXT) muxertest$(EXEEXT) \
+	sockaddrtest$(EXEEXT) sockettest$(EXEEXT) stringtest$(EXEEXT) \
+	timetest$(EXEEXT) utilitytest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -60,13 +62,38 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugsys_la_OBJECTS = barrier.lo config.lo debug.lo dlfcn.lo \
-	endian.lo file.lo limits.lo socket.lo stream.lo types.lo \
-	uio.lo unistd.lo utility.lo windows.lo
+am_libaugsys_la_OBJECTS = barrier.lo base.lo config.lo debug.lo \
+	dlfcn.lo endian.lo errno.lo file.lo limits.lo mcast.lo mmap.lo \
+	muxer.lo queue.lo socket.lo stream.lo time.lo types.lo uio.lo \
+	unistd.lo utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
+am_basetest_OBJECTS = basetest.$(OBJEXT)
+basetest_OBJECTS = $(am_basetest_OBJECTS)
+basetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
+errinfotest_OBJECTS = $(am_errinfotest_OBJECTS)
+errinfotest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_filetest_OBJECTS = filetest.$(OBJEXT)
 filetest_OBJECTS = $(am_filetest_OBJECTS)
 filetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_mcasttest_OBJECTS = mcasttest.$(OBJEXT)
+mcasttest_OBJECTS = $(am_mcasttest_OBJECTS)
+mcasttest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_muxertest_OBJECTS = muxertest.$(OBJEXT)
+muxertest_OBJECTS = $(am_muxertest_OBJECTS)
+muxertest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_sockaddrtest_OBJECTS = sockaddrtest.$(OBJEXT)
+sockaddrtest_OBJECTS = $(am_sockaddrtest_OBJECTS)
+sockaddrtest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_sockettest_OBJECTS = sockettest.$(OBJEXT)
+sockettest_OBJECTS = $(am_sockettest_OBJECTS)
+sockettest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_stringtest_OBJECTS = stringtest.$(OBJEXT)
+stringtest_OBJECTS = $(am_stringtest_OBJECTS)
+stringtest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_timetest_OBJECTS = timetest.$(OBJEXT)
+timetest_OBJECTS = $(am_timetest_OBJECTS)
+timetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_utilitytest_OBJECTS = utilitytest.$(OBJEXT)
 utilitytest_OBJECTS = $(am_utilitytest_OBJECTS)
 utilitytest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
@@ -80,9 +107,17 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugsys_la_SOURCES) $(filetest_SOURCES) \
+SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
+	$(errinfotest_SOURCES) $(filetest_SOURCES) \
+	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
+	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
+	$(stringtest_SOURCES) $(timetest_SOURCES) \
 	$(utilitytest_SOURCES)
-DIST_SOURCES = $(libaugsys_la_SOURCES) $(filetest_SOURCES) \
+DIST_SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
+	$(errinfotest_SOURCES) $(filetest_SOURCES) \
+	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
+	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
+	$(stringtest_SOURCES) $(timetest_SOURCES) \
 	$(utilitytest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -91,7 +126,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	pdf-recursive ps-recursive uninstall-info-recursive \
 	uninstall-recursive
 modincludeHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(modinclude_HEADERS) $(noinst_HEADERS)
+HEADERS = $(modinclude_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
@@ -233,19 +268,16 @@ EXTRA_DIST = \
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
 	barrier.h \
+	base.h \
 	config.h \
 	debug.h \
 	dlfcn.h \
 	endian.h \
-	errinfo.h \
 	errno.h \
 	file.h \
 	limits.h \
-	lock.h \
-	log.h \
 	mcast.h \
 	mmap.h \
-	mutex.h \
 	muxer.h \
 	queue.h \
 	socket.h \
@@ -257,39 +289,30 @@ modinclude_HEADERS = \
 	utility.h \
 	windows.h
 
-noinst_HEADERS = \
-	tls_.h
-
 lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
 	barrier.c \
+	base.c \
 	config.c \
 	debug.c \
 	dlfcn.c \
 	endian.c \
+	errno.c \
 	file.c \
 	limits.c \
+	mcast.c \
+	mmap.c \
+	muxer.c \
+	queue.c \
 	socket.c \
 	stream.c \
+	time.c \
 	types.c \
 	uio.c \
 	unistd.c \
 	utility.c \
 	windows.c
 
-
-# libaugsys_la_SOURCES = \
-# 	base.c \ deprecated
-# 	errinfo.c \ deprecated
-# 	errno.c \ deprecated
-# 	lock.c \ deprecated
-# 	log.c \ deprecated
-# 	mcast.c \ deprecated
-# 	mmap.c \ deprecated
-# 	mutex.c \ deprecated
-# 	muxer.c \ deprecated
-# 	time.c \ deprecated
-# 	tls_.c deprecated
 libaugsys_la_LDFLAGS = \
 	-no-undefined \
 	-version-info 1:0:0
@@ -298,75 +321,57 @@ libaugsys_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 TESTS = \
+	basetest \
+	errinfotest \
 	filetest \
+	mcasttest \
+	muxertest \
+	sockaddrtest \
+	sockettest \
+	stringtest \
+	timetest \
 	utilitytest
+
+basetest_SOURCES = basetest.c
+basetest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+errinfotest_SOURCES = errinfotest.c
+errinfotest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 
 filetest_SOURCES = filetest.c
 filetest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+mcasttest_SOURCES = mcasttest.c
+mcasttest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+muxertest_SOURCES = muxertest.c
+muxertest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+sockaddrtest_SOURCES = sockaddrtest.c
+sockaddrtest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+sockettest_SOURCES = sockettest.c
+sockettest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+stringtest_SOURCES = stringtest.c
+stringtest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+timetest_SOURCES = timetest.c
+timetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 utilitytest_SOURCES = utilitytest.c
 utilitytest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-
-# check_PROGRAMS = \
-# 	basetest \
-# 	errinfotest \
-# 	logtest \
-# 	mcasttest \
-# 	muxertest \
-# 	sockaddrtest \
-# 	sockettest \
-# 	stringtest \
-# 	timetest
-
-# TESTS = \
-# 	basetest \
-# 	errinfotest \
-# 	logtest \
-# 	mcasttest \
-# 	muxertest \
-# 	sockaddrtest \
-# 	sockettest \
-# 	stringtest \
-# 	timetest
-
-# basetest_SOURCES = basetest.c
-# basetest_LDADD = \
-# 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-# errinfotest_SOURCES = errinfotest.c
-# errinfotest_LDADD = \
-# 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-# logtest_SOURCES = logtest.c
-# logtest_LDADD = \
-# 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-# mcasttest_SOURCES = mcasttest.c
-# mcasttest_LDADD = \
-# 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-# muxertest_SOURCES = muxertest.c
-# muxertest_LDADD = \
-# 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-# sockaddrtest_SOURCES = sockaddrtest.c
-# sockaddrtest_LDADD = \
-# 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-# sockettest_SOURCES = sockettest.c
-# sockettest_LDADD = \
-# 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-# stringtest_SOURCES = stringtest.c
-# stringtest_LDADD = \
-# 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-# timetest_SOURCES = timetest.c
-# timetest_LDADD = \
-# 	$(top_builddir)/src/c/augsys/libaugsys.la
 @ENABLE_RUBY_TRUE@BUILT_SOURCES = \
 @ENABLE_RUBY_TRUE@	file.h \
 @ENABLE_RUBY_TRUE@	stream.h
@@ -441,9 +446,33 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
+	@rm -f basetest$(EXEEXT)
+	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
+errinfotest$(EXEEXT): $(errinfotest_OBJECTS) $(errinfotest_DEPENDENCIES) 
+	@rm -f errinfotest$(EXEEXT)
+	$(LINK) $(errinfotest_LDFLAGS) $(errinfotest_OBJECTS) $(errinfotest_LDADD) $(LIBS)
 filetest$(EXEEXT): $(filetest_OBJECTS) $(filetest_DEPENDENCIES) 
 	@rm -f filetest$(EXEEXT)
 	$(LINK) $(filetest_LDFLAGS) $(filetest_OBJECTS) $(filetest_LDADD) $(LIBS)
+mcasttest$(EXEEXT): $(mcasttest_OBJECTS) $(mcasttest_DEPENDENCIES) 
+	@rm -f mcasttest$(EXEEXT)
+	$(LINK) $(mcasttest_LDFLAGS) $(mcasttest_OBJECTS) $(mcasttest_LDADD) $(LIBS)
+muxertest$(EXEEXT): $(muxertest_OBJECTS) $(muxertest_DEPENDENCIES) 
+	@rm -f muxertest$(EXEEXT)
+	$(LINK) $(muxertest_LDFLAGS) $(muxertest_OBJECTS) $(muxertest_LDADD) $(LIBS)
+sockaddrtest$(EXEEXT): $(sockaddrtest_OBJECTS) $(sockaddrtest_DEPENDENCIES) 
+	@rm -f sockaddrtest$(EXEEXT)
+	$(LINK) $(sockaddrtest_LDFLAGS) $(sockaddrtest_OBJECTS) $(sockaddrtest_LDADD) $(LIBS)
+sockettest$(EXEEXT): $(sockettest_OBJECTS) $(sockettest_DEPENDENCIES) 
+	@rm -f sockettest$(EXEEXT)
+	$(LINK) $(sockettest_LDFLAGS) $(sockettest_OBJECTS) $(sockettest_LDADD) $(LIBS)
+stringtest$(EXEEXT): $(stringtest_OBJECTS) $(stringtest_DEPENDENCIES) 
+	@rm -f stringtest$(EXEEXT)
+	$(LINK) $(stringtest_LDFLAGS) $(stringtest_OBJECTS) $(stringtest_LDADD) $(LIBS)
+timetest$(EXEEXT): $(timetest_OBJECTS) $(timetest_DEPENDENCIES) 
+	@rm -f timetest$(EXEEXT)
+	$(LINK) $(timetest_LDFLAGS) $(timetest_OBJECTS) $(timetest_LDADD) $(LIBS)
 utilitytest$(EXEEXT): $(utilitytest_OBJECTS) $(utilitytest_DEPENDENCIES) 
 	@rm -f utilitytest$(EXEEXT)
 	$(LINK) $(utilitytest_LDFLAGS) $(utilitytest_OBJECTS) $(utilitytest_LDADD) $(LIBS)
@@ -455,15 +484,30 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/barrier.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/basetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlfcn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endian.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errno.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcasttest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxertest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/queue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockaddrtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockettest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unistd.Plo@am__quote@

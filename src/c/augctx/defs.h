@@ -147,8 +147,4 @@
     }
 #endif /* __GNUC__ */
 
-#if defined(_WIN32) && !defined(__CYGWIN__)
-# define AUG_WIN32 1
-#endif /* _WIN32 && !__CYGWIN__ */
-
 #endif /* AUGCTX_DEFS_H */

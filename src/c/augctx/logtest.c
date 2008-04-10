@@ -6,7 +6,7 @@
 # define NDEBUG
 #endif /* !NDEBUG */
 
-#include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 
@@ -22,9 +22,8 @@ logger_(int loglevel, const char* format, va_list args)
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
-    aug_atexitinit(&errinfo);
-    return 0;
+    if (aug_start() < 0)
+        return 1;
 
     aug_setlogger(logger_);
     aug_setloglevel(AUG_LOGINFO);

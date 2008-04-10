@@ -1,6 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
+#include "augctx/base.h"
 #include "augctx/errinfo.h"
 
 #include <assert.h>
@@ -15,60 +16,54 @@
 #endif /* __APPLE__ && __MACH__ */
 
 struct aug_dlib_ {
+    aug_mpool* mpool_;
     void* handle_;
-    aug_ctx* ctx_;
 };
 
 static void
-seterrinfo_(aug_ctx* ctx, const char* file, int line)
+seterrinfo_(const char* file, int line)
 {
-    aug_seterrinfo(aug_geterrinfo(ctx), file, line, "dlfcn", 1, dlerror());
+    aug_seterrinfo(aug_tlerr, file, line, "dlfcn", 1, dlerror());
 }
 
 AUGSYS_API aug_result
 aug_dlclose(aug_dlib_t dlib)
 {
     aug_result result = AUG_SUCCESS;
-    aug_ctx* ctx = dlib->ctx_;
+    aug_mpool* mpool = dlib->mpool_;
 
     if (0 != dlclose(dlib->handle_)) {
-        seterrinfo_(ctx, __FILE__, __LINE__);
+        seterrinfo_(__FILE__, __LINE__);
         result = AUG_FAILURE;
     }
 
-    {
-        aug_mpool* mpool = aug_getmpool(ctx);
-        aug_free(mpool, dlib);
-        aug_release(mpool);
-    }
-
-    aug_release(ctx);
+    aug_free(mpool, dlib);
+    aug_release(mpool);
 
     return result;
 }
 
 AUGSYS_API aug_dlib_t
-aug_dlopen(aug_ctx* ctx, const char* path)
+aug_dlopen(const char* path)
 {
+    aug_mpool* mpool = aug_getmpool(aug_tlx);
+    aug_dlib_t dlib = aug_malloc(mpool, sizeof(struct aug_dlib_));
     void* handle;
-    aug_dlib_t dlib;
-    assert(ctx);
 
-    if (!(handle = dlopen(path, RTLD_LAZY))) {
-        seterrinfo_(ctx, __FILE__, __LINE__);
+    if (!dlib) {
+        aug_release(mpool);
         return NULL;
     }
 
-    {
-        aug_mpool* mpool = aug_getmpool(ctx);
-        dlib = aug_malloc(mpool, sizeof(struct aug_dlib_));
+    if (!(handle = dlopen(path, RTLD_LAZY))) {
+        seterrinfo_(__FILE__, __LINE__);
+        aug_free(mpool, dlib);
         aug_release(mpool);
+        return NULL;
     }
 
+    dlib->mpool_ = mpool;
     dlib->handle_ = handle;
-
-    aug_retain(ctx);
-    dlib->ctx_ = ctx;
 
     return dlib;
 }
@@ -85,7 +80,7 @@ aug_dlsym(aug_dlib_t dlib, const char* symbol)
     } local;
 
     if (!(local.in_ = dlsym(dlib->handle_, symbol))) {
-        seterrinfo_(dlib->ctx_, __FILE__, __LINE__);
+        seterrinfo_(__FILE__, __LINE__);
         return NULL;
     }
 

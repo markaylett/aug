@@ -7,47 +7,16 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errno.h"
-
-#include <limits.h> /* INT_MAX */
-
-#define PROCEED_ 1
-
-static unsigned refs_ = 0;
-
-static int
-release_(void)
-{
-    switch (refs_) {
-    case 0:
-        /* Already released: do nothing. */
-        break;
-
-    case 1:
-        refs_ = 0;
-        return PROCEED_;
-
-    default: /* 1 < refs_ */
-        --refs_;
-    }
-    return 0;
-}
-
-static int
-retain_(void)
-{
-    return 1 == ++refs_ ? PROCEED_ : 0;
-}
-
 #if !defined(_WIN32)
 # include "augsys/posix/base.c"
 #else /* _WIN32 */
 # include "augsys/win32/base.c"
 #endif /* _WIN32 */
 
-#include "augctx/defs.h"
-#include "augsys/errno.h"
+#include "augctx/lock.h"
 
+#include <errno.h>
+#include <limits.h> /* #INT_MAX */
 #include <stdlib.h> /* atexit() */
 #include <string.h> /* memcpy() */
 
@@ -62,29 +31,23 @@ static struct file_* files_ = NULL;
 static size_t size_ = 0;
 
 static void
-term_(void)
-{
-    aug_term();
-}
-
-static void
 setalreadyreg_(const char* file, int line, int fd)
 {
-    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EEXIST,
+    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EEXIST,
                    AUG_MSG("descriptor '%d' already registered"), (int)fd);
 }
 
 static void
 setbadfd_(const char* file, int line)
 {
-    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EINVAL,
+    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EINVAL,
                    AUG_MSG("invalid file descriptor"));
 }
 
 static void
 setnotreg_(const char* file, int line, int fd)
 {
-    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EEXIST,
+    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EEXIST,
                    AUG_MSG("descriptor '%d' not registered"), (int)fd);
 }
 
@@ -116,7 +79,7 @@ growfiles_(size_t size)
         files = malloc(size * sizeof(struct file_));
 
     if (!files) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 
@@ -248,33 +211,6 @@ getfdtype_(int fd)
     }
 
     return files_[fd].fdtype_;
-}
-
-AUGSYS_API struct aug_errinfo*
-aug_atexitinit(struct aug_errinfo* errinfo)
-{
-    if (!aug_init(errinfo))
-        return NULL;
-
-    if (-1 == atexit(term_)) {
-        aug_term();
-        return NULL;
-    }
-
-    return errinfo;
-}
-
-AUGSYS_API void
-aug_exit(int status)
-{
-    /* If initialised, terminate now. */
-
-    if (0 < refs_) {
-        refs_ = 1;
-        aug_term();
-    }
-
-    exit(status);
 }
 
 AUGSYS_API int

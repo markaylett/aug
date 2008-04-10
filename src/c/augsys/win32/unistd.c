@@ -1,3 +1,4 @@
+#include "augctx/base.h"
 #include "augctx/errinfo.h"
 
 #include "augsys/windows.h"
@@ -62,24 +63,23 @@ create_(int flags)
 }
 
 AUGSYS_API aug_result
-aug_fclose(aug_ctx* ctx, aug_fd fd)
+aug_fclose(aug_fd fd)
 {
     if (!CloseHandle(fd)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return AUG_FAILURE;
     }
     return AUG_SUCCESS;
 }
 AUGSYS_API aug_fd
-aug_vfopen(aug_ctx* ctx, const char* path, int flags, va_list args)
+aug_vfopen(const char* path, int flags, va_list args)
 {
     DWORD access, attr;
     SECURITY_ATTRIBUTES sa;
     HANDLE h;
 
     if (!access_(&access, flags)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                             ERROR_NOT_SUPPORTED);
         return INVALID_HANDLE_VALUE;
     }
@@ -100,25 +100,24 @@ aug_vfopen(aug_ctx* ctx, const char* path, int flags, va_list args)
         == (h = CreateFile(path, access, FILE_SHARE_DELETE | FILE_SHARE_READ
                            | FILE_SHARE_WRITE, &sa, create_(flags), attr,
                            NULL))) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
     }
     return h;
 }
 
 AUGSYS_API aug_fd
-aug_fopen(aug_ctx* ctx, const char* path, int flags, ...)
+aug_fopen(const char* path, int flags, ...)
 {
     aug_fd fd;
     va_list args;
     va_start(args, flags);
-    fd = aug_vfopen(ctx, path, flags, args);
+    fd = aug_vfopen(path, flags, args);
     va_end(args);
     return fd;
 }
 
 AUGSYS_API aug_result
-aug_fpipe(aug_ctx* ctx, aug_fd fds[2])
+aug_fpipe(aug_fd fds[2])
 {
     aug_fd rd, wr;
     SECURITY_ATTRIBUTES sa;
@@ -128,8 +127,7 @@ aug_fpipe(aug_ctx* ctx, aug_fd fds[2])
     sa.lpSecurityDescriptor = NULL;
 
     if (!CreatePipe(&rd, &wr, &sa, 0)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return AUG_FAILURE;
     }
 
@@ -140,50 +138,47 @@ aug_fpipe(aug_ctx* ctx, aug_fd fds[2])
 }
 
 AUGSYS_API ssize_t
-aug_fread(aug_ctx* ctx, aug_fd fd, void* buf, size_t size)
+aug_fread(aug_fd fd, void* buf, size_t size)
 {
     DWORD ret;
     if (!ReadFile(fd, buf, (DWORD)size, &ret, NULL)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return -1;
     }
     return (ssize_t)ret;
 }
 
 AUGSYS_API ssize_t
-aug_fwrite(aug_ctx* ctx, aug_fd fd, const void* buf, size_t size)
+aug_fwrite(aug_fd fd, const void* buf, size_t size)
 {
     DWORD ret;
     if (!WriteFile(fd, buf, (DWORD)size, &ret, NULL)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return -1;
     }
     return (ssize_t)ret;
 }
 
 AUGSYS_API aug_result
-aug_fsetnonblock(aug_ctx* ctx, aug_fd fd, aug_bool on)
+aug_fsetnonblock(aug_fd fd, aug_bool on)
 {
-    aug_seterrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, "aug",
-                   AUG_ESUPPORT, AUG_MSG("aug_fsetnonblock() not supported"));
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
+                   AUG_MSG("aug_fsetnonblock() not supported"));
     return AUG_FAILURE;
 }
 
 AUGSYS_API aug_result
-aug_fsync(aug_ctx* ctx, aug_fd fd)
+aug_fsync(aug_fd fd)
 {
     if (!FlushFileBuffers(fd)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return AUG_FAILURE;
     }
     return AUG_SUCCESS;
 }
 
 AUGSYS_API aug_result
-aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size)
+aug_ftruncate(aug_fd fd, off_t size)
 {
     aug_result ret;
     LARGE_INTEGER li, orig;
@@ -192,8 +187,7 @@ aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size)
 
     li.QuadPart = 0;
     if (!SetFilePointerEx(fd, li, &orig, FILE_CURRENT)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return AUG_FAILURE;
     }
 
@@ -201,16 +195,14 @@ aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size)
 
     li.QuadPart = (LONGLONG)size;
     if (!SetFilePointerEx(fd, li, NULL, FILE_BEGIN)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return AUG_FAILURE;
     }
 
     /* Truncate.  Note: this will not fill the gap with zeros. */
 
     if (!SetEndOfFile(fd)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         ret = AUG_FAILURE;
     } else
         ret = AUG_SUCCESS;
@@ -222,13 +214,12 @@ aug_ftruncate(aug_ctx* ctx, aug_fd fd, off_t size)
 }
 
 AUGSYS_API aug_result
-aug_fsize(aug_ctx* ctx, aug_fd fd, size_t* size)
+aug_fsize(aug_fd fd, size_t* size)
 {
     LARGE_INTEGER li;
 
     if (!GetFileSizeEx(fd, &li)) {
-        aug_setwin32errinfo(aug_geterrinfo(ctx), __FILE__, __LINE__,
-                            GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return AUG_FAILURE;
     }
 
@@ -237,7 +228,7 @@ aug_fsize(aug_ctx* ctx, aug_fd fd, size_t* size)
 }
 
 AUGSYS_API void
-aug_msleep(aug_ctx* ctx, unsigned ms)
+aug_msleep(unsigned ms)
 {
     Sleep(ms);
 }

@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augctx/ctx.h"
+#include "augctx/base.h"
 
 #include <stdio.h>
 
