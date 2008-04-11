@@ -10,9 +10,11 @@ AUG_RCSID("$Id$");
 #include "augutil/object.h"
 
 #include "augsys/barrier.h"
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
+#include "augsys/base.h" /* aug_getosfd() */
 #include "augsys/unistd.h"
+
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
 
 #include <errno.h>
 #include <signal.h>
@@ -29,7 +31,7 @@ readall_(int fd, char* buf, size_t n)
 
     while (0 != n) {
 
-        int ret = aug_read(fd, buf, n);
+        int ret = aug_fread(aug_getosfd(fd), buf, n);
         if (-1 == ret) {
             if (EINTR == aug_errno())
                 continue;
@@ -48,7 +50,7 @@ writeall_(int fd, const char* buf, size_t n)
 
     while (0 != n) {
 
-        int ret = aug_write(fd, buf, n);
+        int ret = aug_fwrite(aug_getosfd(fd), buf, n);
         if (-1 == ret) {
             if (EINTR == aug_errno())
                 continue;

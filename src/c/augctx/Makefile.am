@@ -17,6 +17,7 @@ modinclude_HEADERS = \
 	config.h \
 	ctx.h \
 	defs.h \
+	errno.h \
 	errinfo.h \
 	lock.h \
 	log.h \
@@ -36,6 +37,7 @@ libaugctx_la_SOURCES = \
 	ctx.c \
 	defs.c \
 	errinfo.c \
+	errno.c \
 	lock.c \
 	log.c \
 	mpool.c \

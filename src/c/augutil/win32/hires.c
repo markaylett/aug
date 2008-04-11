@@ -1,22 +1,30 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-
-#include "augsys/errinfo.h"
 #include "augsys/windows.h"
+#include "augctx/errinfo.h"
 
 #include <errno.h>  /* ENOMEM */
 #include <stdlib.h> /* malloc() */
 
 struct aug_hires_ {
     LARGE_INTEGER freq_, start_;
-    aug_ctx* ctx_;
+    aug_mpool* mpool_;
 };
 
 AUGUTIL_API aug_hires_t
 aug_createhires(aug_ctx* ctx)
 {
-    struct aug_hires local;
+    aug_mpool* mpool = aug_getmpool(aug_tlx);
+    struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
+    aug_fd fd;
+
+    if (!impl) {
+        aug_release(mpool);
+        return NULL;
+    }
+
+    struct aug_hires_ local;
     aug_hires_t hires;
     assert(ctx);
 

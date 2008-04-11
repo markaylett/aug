@@ -15,7 +15,6 @@ modinclude_HEADERS = \
 	debug.h \
 	dlfcn.h \
 	endian.h \
-	errno.h \
 	file.h \
 	limits.h \
 	mcast.h \
@@ -40,13 +39,11 @@ libaugsys_la_SOURCES = \
 	debug.c \
 	dlfcn.c \
 	endian.c \
-	errno.c \
 	file.c \
 	limits.c \
 	mcast.c \
 	mmap.c \
 	muxer.c \
-	queue.c \
 	socket.c \
 	stream.c \
 	time.c \

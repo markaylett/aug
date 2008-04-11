@@ -7,6 +7,8 @@
 
 AUG_RCSID("$Id$");
 
+#include "augctx/errno.h"
+
 #if !defined(_WIN32)
 # define SETAFNOSUPPORT_() \
     aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT)
@@ -17,8 +19,6 @@ AUG_RCSID("$Id$");
 # include "augsys/win32/socket.c"
 # define snprintf _snprintf
 #endif /* _WIN32 */
-
-#include "augsys/errno.h"
 
 #include <assert.h>
 #include <stdio.h>

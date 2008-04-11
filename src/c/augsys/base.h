@@ -129,7 +129,7 @@ aug_posixfdtype(void);
 #if !defined(_WIN32)
 # define aug_getosfd(x) (x)
 #else /* _WIN32 */
-AUGSYS_API intptr_t
+AUGSYS_API aug_fd
 aug_getosfd(int fd);
 #endif /* _WIN32 */
 

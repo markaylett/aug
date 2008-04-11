@@ -16,7 +16,6 @@
 #include "augsys/debug.h"
 #include "augsys/dlfcn.h"
 #include "augsys/endian.h"
-#include "augsys/errno.h"
 #include "augsys/file.h"
 #include "augsys/limits.h"
 #include "augsys/mcast.h"

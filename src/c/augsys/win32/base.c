@@ -60,8 +60,8 @@ aug_posixfdtype(void)
     return &fdtype_;
 }
 
-AUGSYS_API intptr_t
+AUGSYS_API aug_fd
 aug_getosfd(int fd)
 {
-    return (long)_get_osfhandle(fd);
+    return (aug_fd)_get_osfhandle(fd);
 }

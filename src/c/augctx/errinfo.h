@@ -16,20 +16,20 @@ struct aug_errinfo {
     char desc_[512];
 };
 
-AUGCTX_API void
+AUGCTX_API int
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                 const char* src, int num, const char* format, va_list args);
 
-AUGCTX_API void
+AUGCTX_API int
 aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                const char* src, int num, const char* format, ...);
 
-AUGCTX_API void
+AUGCTX_API int
 aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     int err);
 
 #if defined(_WIN32)
-AUGCTX_API void
+AUGCTX_API int
 aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     unsigned long err);
 #endif /* _WIN32 */

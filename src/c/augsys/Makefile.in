@@ -63,9 +63,9 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugsys_la_OBJECTS = barrier.lo base.lo config.lo debug.lo \
-	dlfcn.lo endian.lo errno.lo file.lo limits.lo mcast.lo mmap.lo \
-	muxer.lo queue.lo socket.lo stream.lo time.lo types.lo uio.lo \
-	unistd.lo utility.lo windows.lo
+	dlfcn.lo endian.lo file.lo limits.lo mcast.lo mmap.lo muxer.lo \
+	socket.lo stream.lo time.lo types.lo uio.lo unistd.lo \
+	utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
@@ -273,7 +273,6 @@ modinclude_HEADERS = \
 	debug.h \
 	dlfcn.h \
 	endian.h \
-	errno.h \
 	file.h \
 	limits.h \
 	mcast.h \
@@ -297,13 +296,11 @@ libaugsys_la_SOURCES = \
 	debug.c \
 	dlfcn.c \
 	endian.c \
-	errno.c \
 	file.c \
 	limits.c \
 	mcast.c \
 	mmap.c \
 	muxer.c \
-	queue.c \
 	socket.c \
 	stream.c \
 	time.c \
@@ -491,7 +488,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlfcn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endian.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errno.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
@@ -500,7 +496,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxertest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/queue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockaddrtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockettest.Po@am__quote@

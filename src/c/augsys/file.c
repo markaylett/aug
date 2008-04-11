@@ -172,9 +172,9 @@ static const struct aug_streamvtbl stream_vtbl_ = {
 static aug_file*
 vcreatefile_(const char* path, int flags, va_list args)
 {
-    aug_fd fd;
     aug_mpool* mpool = aug_getmpool(aug_tlx);
     struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
+    aug_fd fd;
 
     if (!impl) {
         aug_release(mpool);

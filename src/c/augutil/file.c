@@ -7,8 +7,10 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
+
+#include "augtypes.h" /* #AUG_EPARSE */
 
 #include <ctype.h>
 #include <stdio.h>
@@ -59,7 +61,7 @@ aug_readconf(const char* path, aug_confcb_t cb, void* arg)
 
         if (!(value = strchr(name, '='))) {
 
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, "aug", AUG_EPARSE,
                            AUG_MSG("missing token separator"));
             ret = -1;
             break;
@@ -70,7 +72,7 @@ aug_readconf(const char* path, aug_confcb_t cb, void* arg)
 
         name[rtrim_(name, value - name)] = '\0';
         if ('\0' == *name) {
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(NULL, __FILE__, __LINE__, "aug", AUG_EPARSE,
                            AUG_MSG("missing name part"));
             ret = -1;
             break;

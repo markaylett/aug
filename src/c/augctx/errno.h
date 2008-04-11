@@ -1,16 +1,16 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGSYS_ERRNO_H
-#define AUGSYS_ERRNO_H
+#ifndef AUGCTX_ERRNO_H
+#define AUGCTX_ERRNO_H
 
 /**
- * @file augsys/errno.h
+ * @file augctx/errno.h
  *
  * Portable errno support.
  */
 
-#include "augsys/config.h"
+#include "augctx/config.h"
 
 #include <errno.h>
 
@@ -66,29 +66,35 @@
 # define EIOPENDING (AUG_ERRNOBASE + 109)
 # define EOPERATIONABORTED (AUG_ERRNOBASE + 110)
 
-AUGSYS_API int
+AUGCTX_API int
 aug_win32errno(unsigned long win32);
 
-AUGSYS_API int
+AUGCTX_API int
 aug_setwin32errno(unsigned long win32);
 
 #endif /* _WIN32 */
 
 /**
- * This function may be necessary in the, undesirable, situation where a
- * client is using different versions of the c-runtime.
+ * Set errno value.
+ *
+ * This function may be required where a client is using different versions of
+ * the c-runtime.
  */
 
-AUGSYS_API void
+AUGCTX_API void
 aug_seterrno(int err);
 
 /**
+ * Get errno value.
+ *
  * Where possible, system specific errors, such as win32 errors, will be
  * mapped onto the standard errno value.  aug_errno() should therefore be used
  * when testing for posix error codes.
+ *
+ * @return errno value.
  */
 
-AUGSYS_API int
+AUGCTX_API int
 aug_errno(void);
 
-#endif /* AUGSYS_ERRNO_H */
+#endif /* AUGCTX_ERRNO_H */

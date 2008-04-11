@@ -7,6 +7,7 @@
 
 AUG_RCSID("$Id$");
 
+#include "augctx/errno.h"
 #include "augctx/string.h"
 
 #include <errno.h>
@@ -21,7 +22,7 @@ AUG_RCSID("$Id$");
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
 
-AUGCTX_API void
+AUGCTX_API int
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                 const char* src, int num, const char* format, va_list args)
 {
@@ -40,9 +41,11 @@ aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     if (ret < 0)
         aug_strlcpy(errinfo->desc_, "no message - bad format",
                     sizeof(errinfo->desc_));
+
+    return num;
 }
 
-AUGCTX_API void
+AUGCTX_API int
 aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                const char* src, int num, const char* format, ...)
 {
@@ -50,17 +53,19 @@ aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     va_start(args, format);
     aug_vseterrinfo(errinfo, file, line, src, num, format, args);
     va_end(args);
+    return num;
 }
 
-AUGCTX_API void
+AUGCTX_API int
 aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     int err)
 {
     aug_seterrinfo(errinfo, file, line, "posix", err, strerror(err));
+    return errno = err;
 }
 
 #if defined(_WIN32)
-AUGCTX_API void
+AUGCTX_API int
 aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     unsigned long err)
 {
@@ -82,5 +87,10 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
     desc[i] = '\0';
     aug_seterrinfo(errinfo, file, line, "win32", (int)err,
                    i ? desc : AUG_MSG("no description available"));
+
+    /* Map to errno for completeness. */
+
+    aug_setwin32errno(err);
+    return (int)err;
 }
 #endif /* _WIN32 */

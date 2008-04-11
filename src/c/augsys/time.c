@@ -7,15 +7,10 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/base.h"
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
-
-#if !defined(_WIN32)
-# include "augsys/posix/time.c"
-#else /* _WIN32 */
-# include "augsys/win32/time.c"
-#endif /* _WIN32 */
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
+#include "augctx/utility.h" /* aug_timezone() */
 
 AUGSYS_API time_t
 aug_timegm(struct tm* tm)
@@ -31,6 +26,8 @@ aug_timegm(struct tm* tm)
 #else /* !HAVE_TIMEGM */
 
     struct tm gm = { 0 };
+    long tz;
+
     gm.tm_sec = tm->tm_sec;
     gm.tm_min = tm->tm_min;
     gm.tm_hour = tm->tm_hour;
@@ -47,7 +44,7 @@ aug_timegm(struct tm* tm)
 
     /* mktime() assumes localtime; adjust for gmt. */
 
-    ret -= aug_timezone();
+    ret -= *aug_timezone(&tz);
 
 #endif /* !HAVE_TIMEGM */
 

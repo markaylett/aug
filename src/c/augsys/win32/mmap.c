@@ -1,12 +1,12 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/errno.h"
 #include "augsys/unistd.h" /* aug_fsize() */
 #include "augsys/windows.h"
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
+#include "augctx/errno.h"
 
 #include <io.h>
 #include <stdlib.h>         /* free() */

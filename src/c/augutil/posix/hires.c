@@ -16,7 +16,7 @@ struct aug_hires_ {
 AUGUTIL_API aug_hires_t
 aug_createhires(aug_ctx* ctx)
 {
-    struct aug_hires local;
+    struct aug_hires_ local;
     aug_hires_t hires;
     assert(ctx);
 

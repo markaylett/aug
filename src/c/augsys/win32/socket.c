@@ -2,7 +2,6 @@
    See the file COPYING for copying permission.
 */
 #include "augsys/base.h"
-#include "augsys/errno.h"
 #include "augsys/uio.h" /* struct iovec */
 
 #include "augctx/base.h"

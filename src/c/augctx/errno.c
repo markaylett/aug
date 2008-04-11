@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGSYS_BUILD
-#include "augsys/errno.h"
+#define AUGCTX_BUILD
+#include "augctx/errno.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
@@ -129,7 +129,7 @@ static const struct errormap_ ERRORMAP_[] = {
 #define EACCES_BEGIN_ ERROR_WRITE_PROTECT
 #define EACCES_END_ ERROR_SHARING_BUFFER_EXCEEDED
 
-AUGSYS_API int
+AUGCTX_API int
 aug_win32errno(unsigned long win32)
 {
     int i;
@@ -146,7 +146,7 @@ aug_win32errno(unsigned long win32)
     return EINVAL;
 }
 
-AUGSYS_API int
+AUGCTX_API int
 aug_setwin32errno(unsigned long win32)
 {
     int err = aug_win32errno(win32);
@@ -156,13 +156,13 @@ aug_setwin32errno(unsigned long win32)
 
 #endif /* _WIN32 */
 
-AUGSYS_API void
+AUGCTX_API void
 aug_seterrno(int err)
 {
     errno = err;
 }
 
-AUGSYS_API int
+AUGCTX_API int
 aug_errno(void)
 {
     return errno;

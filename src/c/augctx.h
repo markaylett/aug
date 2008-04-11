@@ -14,6 +14,7 @@
 #include "augctx/ctx.h"
 #include "augctx/defs.h"
 #include "augctx/errinfo.h"
+#include "augctx/errno.h"
 #include "augctx/lock.h"
 #include "augctx/log.h"
 #include "augctx/mpool.h"
