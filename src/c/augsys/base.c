@@ -16,7 +16,7 @@ AUG_RCSID("$Id$");
 #include "augctx/lock.h"
 
 #include <errno.h>
-#include <limits.h> /* #INT_MAX */
+#include <limits.h> /* INT_MAX */
 #include <stdlib.h> /* atexit() */
 #include <string.h> /* memcpy() */
 

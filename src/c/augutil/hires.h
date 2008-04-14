@@ -12,13 +12,12 @@
 
 #include "augutil/config.h"
 
-#include "augctx/ctx.h"
 #include "augtypes.h"
 
 typedef struct aug_hires_* aug_hires_t;
 
 AUGUTIL_API aug_hires_t
-aug_createhires(aug_ctx* ctx);
+aug_createhires(void);
 
 AUGUTIL_API aug_result
 aug_destroyhires(aug_hires_t hires);

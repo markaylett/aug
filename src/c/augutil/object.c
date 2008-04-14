@@ -7,8 +7,8 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
 
 #include <stdlib.h> /* malloc() */
 #include <string.h>

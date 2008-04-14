@@ -9,12 +9,14 @@ AUG_RCSID("$Id$");
 
 #include "augutil/object.h"
 
-#include "augsys/base.h"
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
-#include "augsys/lock.h"
+#include "augsys/base.h"    /* aug_nextid() */
 #include "augsys/time.h"
 #include "augsys/utility.h" /* aug_perrinfo() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
+#include "augctx/lock.h"
 
 #include <stdlib.h>
 
@@ -34,7 +36,11 @@ static int
 expiry_(struct timeval* tv, unsigned ms)
 {
     struct timeval local;
-    if (-1 == aug_gettimeofday(tv, NULL))
+    aug_clock* clock = aug_getclock(aug_tlx);
+    struct timeval* ret = aug_gettimeofday(clock, &local);
+    aug_release(clock);
+
+    if (!ret)
         return -1;
 
     aug_tvadd(tv, aug_mstotv(&local, ms));

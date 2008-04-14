@@ -12,15 +12,13 @@
 
 #include "augutil/config.h"
 
-#include "augctx/ctx.h"
-
 AUGUTIL_API unsigned long*
-aug_strtoul(aug_ctx* ctx, unsigned long* dst, const char* src, int base);
+aug_strtoul(unsigned long* dst, const char* src, int base);
 
 AUGUTIL_API unsigned*
-aug_strtoui(aug_ctx* ctx, unsigned* dst, const char* src, int base);
+aug_strtoui(unsigned* dst, const char* src, int base);
 
 AUGUTIL_API unsigned short*
-aug_strtous(aug_ctx* ctx, unsigned short* dst, const char* src, int base);
+aug_strtous(unsigned short* dst, const char* src, int base);
 
 #endif /* AUGUTIL_CONV_H */

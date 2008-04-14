@@ -8,11 +8,13 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
 #include "augsys/limits.h" /* AUG_PATH_MAX */
-#include "augsys/string.h"
 #include "augsys/windows.h"
-#include "augsys/unistd.h"
+#include "augsys/unistd.h" /* chdir() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/string.h"
 
 #include <ctype.h>         /* isalpha() */
 #include <errno.h>
@@ -79,7 +81,7 @@ aug_gethome(char* dst, size_t size)
         home = getenv("APPDATA");
 #endif /* _WIN32 */
     if (!home) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
                        AUG_MSG("failed to determine home directory"));
         return NULL;
     }
@@ -123,7 +125,7 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
             --dirlen;
 
         if (size < dirlen + namelen + extlen + 3) {
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                            AUG_MSG("buffer size exceeded"));
             return NULL;
         }
@@ -135,7 +137,7 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
         ptr += dirlen + 1;
 
     } else if (size < namelen + extlen + 2) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }

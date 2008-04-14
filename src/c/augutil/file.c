@@ -10,7 +10,7 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
 
-#include "augtypes.h" /* #AUG_EPARSE */
+#include "augtypes.h" /* AUG_EPARSE */
 
 #include <ctype.h>
 #include <stdio.h>

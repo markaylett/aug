@@ -7,6 +7,7 @@
 
 AUG_RCSID("$Id$");
 
+#include "augctx/base.h"
 #include "augctx/errinfo.h"
 
 #include <errno.h>
@@ -14,7 +15,7 @@ AUG_RCSID("$Id$");
 #include <stdlib.h> /* strtoul() */
 
 AUGUTIL_API unsigned long*
-aug_strtoul(aug_ctx* ctx, unsigned long* dst, const char* src, int base)
+aug_strtoul(unsigned long* dst, const char* src, int base)
 {
     char* end;
     unsigned long ul;
@@ -24,14 +25,14 @@ aug_strtoul(aug_ctx* ctx, unsigned long* dst, const char* src, int base)
 
     if (0 != errno) {
 
-        aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         dst = NULL;
 
     } else if ('\0' != *end) {
 
         /* The string was only partially processed. */
 
-        aug_seterrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, "aug",
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
                        AUG_EPARSE, AUG_MSG("partial conversion"));
         dst = NULL;
 
@@ -45,17 +46,17 @@ aug_strtoul(aug_ctx* ctx, unsigned long* dst, const char* src, int base)
 }
 
 AUGUTIL_API unsigned*
-aug_strtoui(aug_ctx* ctx, unsigned* dst, const char* src, int base)
+aug_strtoui(unsigned* dst, const char* src, int base)
 {
     unsigned long ul;
-    if (!aug_strtoul(ctx, &ul, src, base))
+    if (!aug_strtoul(&ul, src, base))
         return NULL;
 
     if (UINT_MAX < ul) {
 
         /* Bounds exceeded for target type. */
 
-        aug_seterrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, "aug",
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
                        AUG_ELIMIT, AUG_MSG("max integer value exceeded"));
         return NULL;
     }
@@ -65,17 +66,17 @@ aug_strtoui(aug_ctx* ctx, unsigned* dst, const char* src, int base)
 }
 
 AUGUTIL_API unsigned short*
-aug_strtous(aug_ctx* ctx, unsigned short* dst, const char* src, int base)
+aug_strtous(unsigned short* dst, const char* src, int base)
 {
     unsigned long ul;
-    if (!aug_strtoul(ctx, &ul, src, base))
+    if (!aug_strtoul(&ul, src, base))
         return NULL;
 
     if (USHRT_MAX < ul) {
 
         /* Bounds exceeded for target type. */
 
-        aug_seterrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, "aug",
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
                        AUG_ELIMIT, AUG_MSG("max integer value exceeded"));
         return NULL;
     }

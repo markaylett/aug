@@ -9,6 +9,20 @@
 
 #include "augtypes.h"
 
+#if !defined(_WIN32)
+# include <unistd.h>
+#else /* _WIN32 */
+# include <direct.h>
+# include <io.h>
+# include <process.h>
+# if !defined(ftruncate)
+#  define ftruncate _chsize
+# endif /* ftruncate */
+# if !defined(fsync)
+#  define fsync _commit
+# endif /* fsync */
+#endif /* _WIN32 */
+
 /**
  * Close file.
  *

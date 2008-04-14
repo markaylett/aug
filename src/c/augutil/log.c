@@ -7,18 +7,21 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
-#include "augsys/lock.h"
-#include "augsys/log.h"
 #include "augsys/time.h"
-#include "augsys/unistd.h"  /* write() */
 #include "augsys/utility.h" /* aug_threadid() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/lock.h"
 
 #include <assert.h>
 #include <errno.h>          /* EINTR */
 #include <stdio.h>
 
-#if defined(_WIN32)
+#if !defined(_WIN32)
+# include <unistd.h>
+#else /* _WIN32 */
+# include <io.h>
 # define snprintf _snprintf
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
@@ -50,7 +53,11 @@ static int
 localtime_(struct tm* res)
 {
     struct timeval tv;
-    if (-1 == aug_gettimeofday(&tv, NULL))
+    aug_clock* clock = aug_getclock(aug_tlx);
+    struct timeval* ret = aug_gettimeofday(clock, &tv);
+    aug_release(clock);
+
+    if (!ret)
         return -1;
 
     if (!aug_localtime(&tv.tv_sec, res))

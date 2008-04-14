@@ -12,7 +12,8 @@ AUG_RCSID("$Id$");
 #include "augutil/types.h"
 #include "augutil/xstr.h"
 
-#include "augsys/errinfo.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
 
 #include <ctype.h>  /* isspace() */
 #include <errno.h>  /* ENOMEM */

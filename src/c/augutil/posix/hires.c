@@ -1,59 +1,46 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-
-#include "augsys/errinfo.h"
 #include "augsys/time.h"
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
 
 #include <errno.h>  /* ENOMEM */
 #include <stdlib.h> /* malloc() */
 
 struct aug_hires_ {
     struct timeval start_;
-    aug_ctx* ctx_;
+    aug_mpool* mpool_;
 };
 
 AUGUTIL_API aug_hires_t
-aug_createhires(aug_ctx* ctx)
+aug_createhires(void)
 {
-    struct aug_hires_ local;
-    aug_hires_t hires;
-    assert(ctx);
+    aug_mpool* mpool = aug_getmpool(aug_tlx);
+    aug_hires_t hires = aug_malloc(mpool, sizeof(struct aug_hires_));
 
-    if (-1 == aug_gettimeofday(&local.start_, NULL)) {
-        aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
+    if (!hires) {
+        aug_release(mpool);
         return NULL;
     }
 
-    {
-        aug_mpool* mpool = aug_getmpool(ctx);
-        hires = aug_malloc(mpool, sizeof(struct aug_hires_));
+    if (-1 == aug_gettimeofday(&local.start_, NULL)) {
+        aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
+        aug_free(mpool, hires);
         aug_release(mpool);
+        return NULL;
     }
 
-    aug_retain(ctx);
-    local.ctx_ = ctx;
-
-    memcpy(hires, &local, sizeof(*hires));
     return hires;
 }
 
 AUGUTIL_API int
 aug_destroyhires(aug_hires_t hires)
 {
-    aug_ctx* ctx;
-    assert(hires);
-
-    ctx = hires->ctx_;
-
-    {
-        aug_mpool* mpool = aug_getmpool(ctx);
-        aug_free(mpool, hires);
-        aug_release(mpool);
-    }
-
-    aug_release(ctx);
-
+    aug_mpool* mpool = hires->mpool_;
+    aug_free(mpool, hires);
+    aug_release(mpool);
     return AUG_SUCCESS;
 }
 
@@ -61,8 +48,7 @@ AUGUTIL_API aug_result
 aug_resethires(aug_hires_t hires)
 {
     if (-1 == aug_gettimeofday(&hires->start_, NULL)) {
-        aug_setposixerrinfo(aug_geterrinfo(hires->ctx_), __FILE__, __LINE__,
-                            errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return AUG_FAILURE;
     }
     return AUG_SUCCESS;
@@ -73,8 +59,7 @@ aug_elapsed(aug_hires_t hires, double* sec)
 {
     struct timeval now;
     if (-1 == aug_gettimeofday(&now, NULL)) {
-        aug_setposixerrinfo(aug_geterrinfo(hires->ctx_), __FILE__, __LINE__,
-                            errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return NULL;
     }
     aug_tvsub(&now, &hires->start_);
