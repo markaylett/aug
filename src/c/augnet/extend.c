@@ -7,9 +7,10 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
-#include "augsys/lock.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
+#include "augctx/lock.h"
 
 #include <stdlib.h> /* malloc() */
 #include <string.h> /* memcpy() */
@@ -22,7 +23,7 @@ static size_t size_ = 0;
 static void
 setbadfd_(const char* file, int line)
 {
-    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EINVAL,
+    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EINVAL,
                    AUG_MSG("invalid file descriptor"));
 }
 
@@ -63,7 +64,7 @@ growfiles_(size_t size)
         files = malloc(size * sizeof(struct aug_nbfile));
 
     if (!files) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 

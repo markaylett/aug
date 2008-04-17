@@ -34,7 +34,8 @@ libaugsrv_la_LDFLAGS = \
 
 libaugsrv_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 check_PROGRAMS = maintest
 TESTS = maintest

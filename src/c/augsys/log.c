@@ -7,11 +7,11 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/lock.h"
-
 #if defined(_WIN32)
 # include "augsys/windows.h"
 #endif /* _WIN32 */
+
+#include "augctx/lock.h"
 
 #include <assert.h>
 #include <errno.h>

@@ -6,9 +6,3 @@ aug_setsrvlogger(const char* sname)
 {
     return 0;
 }
-
-AUGSRV_API int
-aug_unsetsrvlogger(void)
-{
-    return 0;
-}

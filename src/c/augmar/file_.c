@@ -10,8 +10,10 @@ AUG_RCSID("$Id$");
 #include "augmar/flags_.h"
 #include "augmar/format_.h"
 
-#include "augsys/errinfo.h"
 #include "augsys/unistd.h" /* fsync() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -21,7 +23,7 @@ AUG_EXTERNC int
 aug_closefile_(int fd)
 {
     if (-1 == close(fd)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -36,7 +38,7 @@ aug_openfile_(const char* path, int flags, mode_t mode)
         return -1;
 
     if (-1 == (fd = open(path, local, mode))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -64,31 +66,31 @@ aug_extendfile_(int fd, unsigned size)
     /* Store current file pointer for later restoration. */
 
     if (-1 == (cur = lseek(fd, 0, SEEK_CUR))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 
     if (-1 == lseek(fd, (off_t)(size - 1), SEEK_END)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 
     if (1 != write(fd, &ZERO, 1)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         goto fail;
     }
 
     /* Ensure that gap is filled with zeros. */
 
     if (-1 == fsync(fd)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         goto fail;
     }
 
     /* Restore original file pointer. */
 
     if (-1 == lseek(fd, cur, SEEK_SET)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -103,7 +105,7 @@ AUG_EXTERNC int
 aug_syncfile_(int fd)
 {
     if (-1 == fsync(fd)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
     return 0;
@@ -113,7 +115,7 @@ AUG_EXTERNC int
 aug_truncatefile_(int fd, off_t size)
 {
     if (-1 == ftruncate(fd, size)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
     return 0;

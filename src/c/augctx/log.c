@@ -7,7 +7,6 @@
 
 AUG_RCSID("$Id$");
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,12 +14,6 @@ AUG_RCSID("$Id$");
 #if defined(_WIN32)
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
-
-struct impl_ {
-    aug_log log_;
-    int refs_;
-    aug_mpool* mpool_;
-};
 
 static void*
 cast_(aug_log* obj, const char* id)
@@ -35,21 +28,11 @@ cast_(aug_log* obj, const char* id)
 static void
 retain_(aug_log* obj)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, log_, obj);
-    assert(0 < impl->refs_);
-    ++impl->refs_;
 }
 
 static void
 release_(aug_log* obj)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, log_, obj);
-    assert(0 < impl->refs_);
-    if (0 == --impl->refs_) {
-        aug_mpool* mpool = impl->mpool_;
-        aug_free(mpool, impl);
-        aug_release(mpool);
-    }
 }
 
 static aug_result
@@ -79,22 +62,10 @@ static const struct aug_logvtbl vtbl_ = {
     vwritelog_
 };
 
+static aug_log stdlog_ = { &vtbl_, NULL };
+
 AUGCTX_API aug_log*
-aug_createstdlog(aug_mpool* mpool)
+aug_getstdlog(void)
 {
-    struct impl_* impl;
-    assert(mpool);
-
-    if (!(impl = aug_malloc(mpool, sizeof(struct impl_))))
-        return NULL;
-
-    impl->log_.vtbl_ = &vtbl_;
-    impl->log_.impl_ = NULL;
-    impl->refs_ = 1;
-
-    aug_retain(mpool);
-
-    impl->mpool_ = mpool;
-
-    return &impl->log_;
+    return &stdlog_;
 }

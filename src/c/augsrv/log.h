@@ -12,7 +12,4 @@ aug_openlog(const char* path);
 AUGSRV_API int
 aug_setsrvlogger(const char* sname);
 
-AUGSRV_API int
-aug_unsetsrvlogger(void);
-
 #endif /* AUGSRV_LOG_H */

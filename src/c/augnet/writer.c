@@ -7,11 +7,14 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/lock.h"
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
+#include "augsys/base.h" /* aug_getosfd() */
 #include "augsys/uio.h"
 #include "augutil/list.h"
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
+#include "augctx/lock.h"
 
 #include "augabi.h"
 
@@ -166,9 +169,8 @@ aug_writersize(aug_writer_t writer)
 
         size_t len;
         if (!aug_blobdata(it->blob_, &len)) {
-            aug_seterrinfo
-                (NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EDOMAIN,
-                 AUG_MSG("failed conversion from var to buffer"));
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
+                           AUG_MSG("failed conversion from var to buffer"));
             return -1;
         }
 
@@ -200,9 +202,8 @@ aug_writesome(aug_writer_t writer, int fd)
     AUG_FOREACH(it, &writer->bufs_) {
 
         if (!(iov[i].iov_base = (void*)aug_blobdata(it->blob_, &len))) {
-            aug_seterrinfo
-                (NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EDOMAIN,
-                 AUG_MSG("failed conversion from var to buffer"));
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
+                           AUG_MSG("failed conversion from var to buffer"));
             return -1;
         }
 
@@ -216,7 +217,7 @@ aug_writesome(aug_writer_t writer, int fd)
     iov->iov_base = (char*)iov->iov_base + writer->part_;
     iov->iov_len -= (int)writer->part_;
 
-    if (-1 != (ret = aug_writev(fd, iov, size))) {
+    if (-1 != (ret = aug_fwritev(aug_getosfd(fd), iov, size))) {
 
         /* Pop any completed buffers from queue. */
 

@@ -7,13 +7,14 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
-#include "augsys/string.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/string.h"
 
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>       /* ENOMEM */
-#include <stdlib.h>      /* malloc() */
+#include <errno.h>  /* ENOMEM */
+#include <stdlib.h> /* malloc() */
 
 struct aug_base64_ {
     aug_base64cb_t cb_;
@@ -126,14 +127,14 @@ typedef int aug_chunk_t[4];
 static void
 seterrinvalid_(const char* file, int line, char ch)
 {
-    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EPARSE,
+    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EPARSE,
                    AUG_MSG("invalid character '%c'"), ch);
 }
 
 static void
 seterralign_(const char* file, int line)
 {
-    aug_seterrinfo(NULL, file, line, AUG_SRCLOCAL, AUG_EENDOF,
+    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EENDOF,
                    AUG_MSG("misaligned base64 sequence"));
 }
 
@@ -525,7 +526,7 @@ aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aug_object* ob)
 {
     aug_base64_t base64 = malloc(sizeof(struct aug_base64_));
     if (!base64) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 

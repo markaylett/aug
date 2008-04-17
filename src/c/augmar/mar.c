@@ -13,8 +13,9 @@ AUG_RCSID("$Id$");
 #include "augmar/info_.h"
 #include "augmar/mfile_.h"
 
-#include "augsys/errinfo.h"
-#include "augsys/log.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/log.h"
 
 #include <assert.h>
 #include <stdarg.h>
@@ -65,7 +66,7 @@ init_(aug_seq_t seq, struct aug_info_* info)
 
         if (VERNO != info->verno_) {
 
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                            AUG_MSG("invalid version number '%d'"),
                            (int)info->verno_);
             return -1;
@@ -97,14 +98,14 @@ aug_copymar(aug_mar_t dst, aug_mar_t src)
 {
     if (!WRITABLE_(dst)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid destination archive handle"));
         return -1;
     }
 
     if (!READABLE_(src)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid source archive handle"));
         return -1;
     }
@@ -193,7 +194,7 @@ aug_releasemar(aug_mar_t mar)
 {
     if (!mar) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
                        AUG_MSG("null archive handle"));
         return -1;
     }
@@ -224,7 +225,7 @@ aug_retainmar(aug_mar_t mar)
 {
     if (!mar) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
                        AUG_MSG("null archive handle"));
         return -1;
     }
@@ -237,7 +238,7 @@ aug_compactmar(aug_mar_t mar)
 {
     if (!WRITABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -249,7 +250,7 @@ aug_removefields(aug_mar_t mar)
 {
     if (!WRITABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -261,7 +262,7 @@ aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord)
 {
     if (!WRITABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -273,7 +274,7 @@ aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size)
 {
     if (!WRITABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -285,7 +286,7 @@ aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord)
 {
     if (!WRITABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -297,7 +298,7 @@ aug_unsetbyord(aug_mar_t mar, unsigned ord)
 {
     if (!WRITABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -309,7 +310,7 @@ aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size)
 {
     if (!READABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return NULL;
     }
@@ -321,7 +322,7 @@ aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size)
 {
     if (!READABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return NULL;
     }
@@ -333,7 +334,7 @@ aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord)
 {
     if (!READABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -345,13 +346,13 @@ aug_getfields(aug_mar_t mar, unsigned* size)
 {
     if (!mar) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
                        AUG_MSG("null archive handle"));
         return -1;
     }
     if (!size) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
                        AUG_MSG("null size pointer"));
         return -1;
     }
@@ -364,7 +365,7 @@ aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord)
 {
     if (!READABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -376,7 +377,7 @@ aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name)
 {
     if (!READABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -415,7 +416,7 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
 
     if (!mar) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
                        AUG_MSG("null archive handle"));
         return -1;
     }
@@ -431,13 +432,13 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
         local = (off_t)(mar->info_.bsize_ + offset);
         break;
     default:
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid whence value '%d'"), (int)whence);
         return -1;
     }
     if (local < 0) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ERANGE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ERANGE,
                        AUG_MSG("negative file position '%d'"), (int)local);
         return -1;
     }
@@ -451,7 +452,7 @@ aug_setcontent(aug_mar_t mar, const void* cdata, unsigned size)
 {
     if (!WRITABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -463,7 +464,7 @@ aug_syncmar(aug_mar_t mar)
 {
     if (!mar) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
                        AUG_MSG("null archive handle"));
         return -1;
     }
@@ -475,7 +476,7 @@ aug_truncatemar(aug_mar_t mar, unsigned size)
 {
     if (!WRITABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -493,7 +494,7 @@ aug_writemar(aug_mar_t mar, const void* buf, unsigned len)
 
     if (!WRITABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -547,7 +548,7 @@ aug_content(aug_mar_t mar, unsigned* size)
 {
     if (!READABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return NULL;
     }
@@ -563,7 +564,7 @@ aug_readmar(aug_mar_t mar, void* buf, unsigned len)
 
     if (!READABLE_(mar)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
         return -1;
     }
@@ -581,7 +582,7 @@ aug_contentsize(aug_mar_t mar, unsigned* size)
 {
     if (!mar) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
                        AUG_MSG("null archive handle"));
         return -1;
     }

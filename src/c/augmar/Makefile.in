@@ -59,7 +59,8 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libaugmar_la_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+libaugmar_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugmar_la_OBJECTS = config.lo mar.lo types.lo body_.lo file_.lo \
 	flags_.lo format_.lo header_.lo info_.lo mfile_.lo seq_.lo
 libaugmar_la_OBJECTS = $(am_libaugmar_la_OBJECTS)
@@ -243,6 +244,7 @@ libaugmar_la_LDFLAGS = \
 	-version-info 1:0:0
 
 libaugmar_la_LIBADD = \
+	$(top_builddir)/src/c/augctx/libaugctx.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = maintest

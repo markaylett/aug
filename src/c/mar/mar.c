@@ -15,9 +15,11 @@ AUG_RCSID("$Id$");
 #include "mar/utility.h"
 
 #include "augsys/debug.h"
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
-#include "augsys/utility.h" /* aug_perrinfo() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
+#include "augctx/utility.h" /* aug_perrinfo() */
 
 #include <stdlib.h>
 #include <string.h>
@@ -300,7 +302,7 @@ run_(int argc, char* argv[], const char* archivename)
     }
 
     if (!(mar = aug_openmar(archivename, flags, mode))) {
-        aug_perrinfo(NULL, "aug_openmar() failed");
+        aug_perrinfo(aug_tlx, "aug_openmar() failed");
         return -1;
     }
 
@@ -308,7 +310,7 @@ run_(int argc, char* argv[], const char* archivename)
         switch (ch) {
         case 'c':
             if (-1 == aug_compactmar(mar)) {
-                aug_perrinfo(NULL, "failed to " COMPACTTEXT_);
+                aug_perrinfo(aug_tlx, "failed to " COMPACTTEXT_);
                 goto fail;
             }
             break;

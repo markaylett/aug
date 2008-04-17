@@ -14,10 +14,12 @@ AUG_RCSID("$Id$");
 
 #include "augutil/log.h"
 
-#include "augsys/errinfo.h"
-#include "augsys/log.h"
 #include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h" /* GetStdHandle() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/log.h"
 
 #include <assert.h>
 #include <setjmp.h>
@@ -134,7 +136,7 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
         /* Note: aug_readopts() will be called from the main service
            function. */
 
-        aug_setlogger(aug_daemonlogger);
+        aug_setlog(aug_tlx, aug_getdaemonlog());
         daemonise_();
         return 0;
     }
@@ -168,11 +170,11 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
     case AUG_CMDEXIT:
         assert(0);
     case AUG_CMDINSTALL:
-        aug_info("installing daemon process");
+        aug_ctxinfo(aug_tlx, "installing daemon process");
         install_();
         break;
     case AUG_CMDRECONF:
-        aug_info("re-configuring daemon process");
+        aug_ctxinfo(aug_tlx, "re-configuring daemon process");
         control_(AUG_EVENTRECONF);
         break;
     case AUG_CMDSTART:
@@ -183,18 +185,18 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
 #endif /* _WIN32 */
         break;
     case AUG_CMDSTATUS:
-        aug_info("getting status of daemon process");
+        aug_ctxinfo(aug_tlx, "getting status of daemon process");
         control_(AUG_EVENTSTATUS);
         break;
     case AUG_CMDSTOP:
-        aug_info("stopping daemon process");
+        aug_ctxinfo(aug_tlx, "stopping daemon process");
         control_(AUG_EVENTSTOP);
         break;
     case AUG_CMDTEST:
         foreground_();
         break;
     case AUG_CMDUNINSTALL:
-        aug_info("uninstalling daemon process");
+        aug_ctxinfo(aug_tlx, "uninstalling daemon process");
         uninstall_();
         break;
     }

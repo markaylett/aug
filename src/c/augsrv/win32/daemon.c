@@ -8,13 +8,16 @@
 #include "augutil/path.h"   /* aug_gethome(), aug_gettmp() */
 
 #include "augsys/barrier.h"
-#include "augsys/errinfo.h"
 #include "augsys/limits.h"
-#include "augsys/log.h"
 #include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h"
 
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/log.h"
+
 #include <assert.h>
+#include <stdio.h>
 
 /* Users can define codes in the range 128 to 255. */
 
@@ -56,12 +59,12 @@ handler_(DWORD code)
     case RECONF_:
         event.type_ = AUG_EVENTRECONF;
         if (!aug_writeevent(aug_eventwr(), &event))
-            aug_perrinfo(NULL, "aug_writeevent() failed");
+            aug_perrinfo(aug_tlx, "aug_writeevent() failed");
         break;
     case STATUS_:
         event.type_ = AUG_EVENTSTATUS;
         if (!aug_writeevent(aug_eventwr(), &event))
-            aug_perrinfo(NULL, "aug_writeevent() failed");
+            aug_perrinfo(aug_tlx, "aug_writeevent() failed");
         break;
     case STOP_:
     case SERVICE_CONTROL_STOP:
@@ -69,7 +72,7 @@ handler_(DWORD code)
         setstatus_(SERVICE_STOP_PENDING);
         event.type_ = AUG_EVENTSTOP;
         if (!aug_writeevent(aug_eventwr(), &event)) {
-            aug_perrinfo(NULL, "aug_writeevent() failed");
+            aug_perrinfo(aug_tlx, "aug_writeevent() failed");
             setstatus_(SERVICE_RUNNING);
         }
         break;
@@ -79,7 +82,6 @@ handler_(DWORD code)
 static void WINAPI
 start_(DWORD argc, char** argv)
 {
-    struct aug_errinfo errinfo;
     const char* sname;
     struct aug_options options;
     char home[AUG_PATH_MAX + 1];
@@ -88,31 +90,31 @@ start_(DWORD argc, char** argv)
 
     AUG_RMB();
 
-    if (!aug_initerrinfo(&errinfo)) {
-        aug_error("aug_initerrinfo() failed");
-        goto done;
+    if (aug_initbasictlx() < 0) {
+        fprintf(stderr, "aug_initerrinfo() failed");
+        return;
     }
 
     /* Fallback to tmp. */
 
     if (!aug_gethome(home, sizeof(home))
         && !aug_gettmp(home, sizeof(home))) {
-        aug_error("failed to determine home directory");
+        aug_ctxerror(aug_tlx, "failed to determine home directory");
         goto done;
     }
 
     /* Move away from system32. */
 
     if (!SetCurrentDirectory(home)) {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
-        aug_perrinfo(NULL, "SetCurrentDirectory() failed");
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_perrinfo(aug_tlx, "SetCurrentDirectory() failed");
         goto done;
     }
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
-        aug_perrinfo(NULL, "getserviceopt() failed");
+        aug_perrinfo(aug_tlx, "getserviceopt() failed");
         goto done;
     }
 
@@ -125,22 +127,22 @@ start_(DWORD argc, char** argv)
 
         /* Commands other than AUG_CMDDEFAULT are invalid in this context. */
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("unexpected command value"));
-        aug_perrinfo(NULL, "invalid options");
+        aug_perrinfo(aug_tlx, "invalid options");
         goto done;
     }
 
     if (-1 == aug_readserviceconf(*options.conffile_
                                   ? options.conffile_ : NULL, 0, 1)) {
-        aug_perrinfo(NULL, "aug_readserviceconf() failed");
+        aug_perrinfo(aug_tlx, "aug_readserviceconf() failed");
         goto done;
     }
 
     if (!(ssh_ = RegisterServiceCtrlHandler(sname, handler_))) {
 
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
-        aug_perrinfo(NULL, "RegisterServiceCtrlHandler() failed");
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_perrinfo(aug_tlx, "RegisterServiceCtrlHandler() failed");
         goto done;
     }
 
@@ -148,18 +150,18 @@ start_(DWORD argc, char** argv)
 
     if (-1 == aug_initservice()) {
 
-        aug_perrinfo(NULL, "aug_initservice() failed");
+        aug_perrinfo(aug_tlx, "aug_initservice() failed");
         setstatus_(SERVICE_STOPPED);
         goto done;
     }
 
-    aug_notice("daemon started");
+    aug_ctxnotice(aug_tlx, "daemon started");
     setstatus_(SERVICE_RUNNING);
 
     if (-1 == aug_runservice())
-        aug_perrinfo(NULL, "aug_runservice() failed");
+        aug_perrinfo(aug_tlx, "aug_runservice() failed");
 
-    aug_notice("daemon stopped");
+    aug_ctxnotice(aug_tlx, "daemon stopped");
     setstatus_(SERVICE_STOPPED);
 
     /* This function will be called on the Service Manager's thread.  Given
@@ -174,6 +176,7 @@ start_(DWORD argc, char** argv)
     /* Flush pending writes to main memory. */
 
     AUG_WMB();
+    aug_term();
 }
 
 AUGSRV_API int
@@ -187,7 +190,7 @@ aug_daemonise(void)
     };
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
@@ -207,7 +210,7 @@ aug_daemonise(void)
         if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == err)
             ret = AUG_RETNONE;
         else {
-            aug_setwin32errinfo(NULL, __FILE__, __LINE__, err);
+            aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
             ret = -1;
         }
     }

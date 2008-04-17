@@ -11,8 +11,9 @@ AUG_RCSID("$Id$");
 #include "augutil/lexer.h"
 #include "augutil/types.h"
 
-#include "augsys/errinfo.h"
-#include "augsys/string.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/string.h"
 
 #include <assert.h>
 #include <errno.h>  /* ENOMEM */
@@ -62,7 +63,7 @@ value_(aug_httpparser_t parser)
     case 'c':
         if (0 == aug_strcasecmp(parser->name_ + 1, "ontent-Length")) {
 
-            if (-1 == aug_strtoui(&csize, aug_lexertoken(parser->lexer_), 10))
+            if (!aug_strtoui(&csize, aug_lexertoken(parser->lexer_), 10))
                 return -1;
 
             parser->csize_ = (int)csize;
@@ -105,7 +106,7 @@ label_(aug_httpparser_t parser)
     /* No label on initial line. */
 
     if (INITIAL_ == parser->state_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing initial line"));
         return -1;
     }
@@ -129,7 +130,7 @@ word_(aug_httpparser_t parser)
         parser->state_ = NAME_;
         break;
     case NAME_:
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing field name"));
         break;
     case VALUE_:
@@ -212,7 +213,7 @@ aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
     aug_lexer_t lexer;
 
     if (!parser) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -304,7 +305,7 @@ aug_finishhttp(aug_httpparser_t parser)
     }
 
     if (INITIAL_ != parser->state_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("partial read of http message"));
         goto fail;
     }

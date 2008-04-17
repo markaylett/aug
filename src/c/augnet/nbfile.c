@@ -9,11 +9,12 @@ AUG_RCSID("$Id$");
 
 #include "augnet/extend.h"
 
-#include "augsys/base.h"
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
-#include "augsys/log.h"
+#include "augsys/base.h"   /* struct aug_fdtype */
 #include "augsys/socket.h" /* aug_shutdown() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
 
 #include <stdlib.h>        /* malloc() */
 
@@ -22,7 +23,7 @@ removenbfile_(struct aug_nbfile* nbfile)
 {
     struct aug_nbfile* ret = nbfile;
 
-    AUG_DEBUG3("clearing io-event mask: fd=[%d]", nbfile->fd_);
+    AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: fd=[%d]", nbfile->fd_);
 
     if (-1 == aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_, 0))
         ret = NULL;
@@ -39,7 +40,7 @@ close_(int fd)
     struct aug_nbfile nbfile;
     int ret = 0;
 
-    AUG_DEBUG3("nbfile close");
+    AUG_CTXDEBUG3(aug_tlx, "nbfile close");
 
     if (!aug_resetnbfile(fd, &nbfile))
         return -1;
@@ -48,7 +49,7 @@ close_(int fd)
         ret = -1;
 
     if (!nbfile.base_->close_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_close() not supported"));
         return -1;
     }
@@ -67,7 +68,7 @@ read_(int fd, void* buf, size_t size)
         return -1;
 
     if (!nbfile.base_->read_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_read() not supported"));
         return -1;
     }
@@ -83,7 +84,7 @@ readv_(int fd, const struct iovec* iov, int size)
         return -1;
 
     if (!nbfile.base_->readv_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_readv() not supported"));
         return -1;
     }
@@ -99,7 +100,7 @@ write_(int fd, const void* buf, size_t len)
         return -1;
 
     if (!nbfile.base_->write_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_write() not supported"));
         return -1;
     }
@@ -115,7 +116,7 @@ writev_(int fd, const struct iovec* iov, int size)
         return -1;
 
     if (!nbfile.base_->writev_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_writev() not supported"));
         return -1;
     }
@@ -131,7 +132,7 @@ setnonblock_(int fd, int on)
         return -1;
 
     if (!nbfile.base_->setnonblock_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_setnonblock() not supported"));
         return -1;
     }
@@ -201,7 +202,7 @@ aug_createnbfiles(void)
 {
     aug_nbfiles_t nbfiles = malloc(sizeof(struct aug_nbfiles_));
     if (!nbfiles) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
     if (!(nbfiles->muxer_ = aug_createmuxer())) {
@@ -255,7 +256,7 @@ aug_removenbfile(int fd)
     struct aug_nbfile nbfile;
     int ret = 0;
 
-    AUG_DEBUG3("aug_removenbfile()");
+    AUG_CTXDEBUG3(aug_tlx, "aug_removenbfile()");
 
     if (!aug_resetnbfile(fd, &nbfile))
         return -1;
@@ -272,7 +273,7 @@ aug_removenbfile(int fd)
 AUGNET_API int
 aug_foreachnbfile(aug_nbfiles_t nbfiles)
 {
-    AUG_DEBUG3("aug_foreachnbfile()");
+    AUG_CTXDEBUG3(aug_tlx, "aug_foreachnbfile()");
     return aug_foreachfile(&nbfiles->files_);
 }
 
@@ -288,7 +289,7 @@ aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout)
     static const struct timeval nowait = { 0, 0 };
     int ret;
 
-    AUG_DEBUG3("aug_waitnbevents()");
+    AUG_CTXDEBUG3(aug_tlx, "aug_waitnbevents()");
 
     if (nbfiles->nowait_) {
         nbfiles->nowait_ = 0;

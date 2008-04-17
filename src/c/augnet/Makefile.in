@@ -63,7 +63,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugnet_la_OBJECTS = auth.lo base64.lo config.lo connector.lo \
 	extend.lo file.lo fix.lo http.lo inet.lo mar.lo nbfile.lo \
 	netevent.lo ssl.lo types.lo writer.lo
@@ -268,7 +269,8 @@ libaugnet_la_LDFLAGS = \
 libaugnet_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 TESTS = \
 	base64test \

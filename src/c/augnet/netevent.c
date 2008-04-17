@@ -7,8 +7,10 @@
 
 AUG_RCSID("$Id$");
 
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+
 #include "augsys/endian.h"
-#include "augsys/errinfo.h"
 
 #include <string.h>
 
@@ -32,28 +34,28 @@ aug_verifynetevent(const struct aug_netevent* event)
 {
     if ('\0' == event->name_[0]) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ENULL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
                        AUG_MSG("null netevent name"));
         return -1;
     }
 
     if (AUG_NEVHBSEC_MAX < event->hbsec_) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("maximum netevent hbsec exceeded"));
         return -1;
     }
 
     if (AUG_NEVWEIGHT_MAX < event->weight_) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("maximum netevent weight size exceeded"));
         return -1;
     }
 
     if (AUG_NEVLOAD_MAX < event->load_) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("maximum netevent load size exceeded"));
         return -1;
     }

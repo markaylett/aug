@@ -10,8 +10,9 @@ AUG_RCSID("$Id$");
 #include "augmar/format_.h"
 #include "augmar/mfile_.h"
 
-#include "augsys/errinfo.h"
-#include "augsys/log.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/log.h"
 
 #include <errno.h> /* ENOMEM */
 #include <stdlib.h>
@@ -302,7 +303,7 @@ aug_setregion_(aug_seq_t seq, unsigned offset, unsigned len)
     unsigned total = (*seq->impl_->size_)(seq);
     if (total < (offset + len)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ERANGE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ERANGE,
                        AUG_MSG("sequence overrun by %d bytes"),
                        (int)((offset + len) - total));
         return -1;

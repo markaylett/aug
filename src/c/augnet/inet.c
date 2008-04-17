@@ -7,11 +7,14 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
+#include "augsys/base.h"   /* aug_getosfd() */
 #include "augsys/socket.h"
-#include "augsys/string.h" /* aug_strlcpy() */
 #include "augsys/unistd.h" /* aug_close() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
+#include "augctx/string.h" /* aug_strlcpy() */
 
 #if !defined(_WIN32)
 # if HAVE_ALLOCA_H
@@ -49,7 +52,7 @@ aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
         if (0 == aug_connect(fd, ep))
             break; /* Success. */
 
-        if (-1 == aug_close(fd)) /* Ignore this one. */
+        if (-1 == aug_fclose(aug_getosfd(fd))) /* Ignore this one. */
             goto fail;
 
     } while ((res = res->ai_next));
@@ -94,7 +97,8 @@ aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep)
         if (0 == aug_bind(fd, ep))
             break; /* Success. */
 
-        if (-1 == aug_close(fd)) /* Bind error, close and try next one. */
+        if (-1 == aug_fclose(aug_getosfd(fd))) /* Bind error, close and try
+                                                  next one. */
             goto fail1;
 
     } while ((res = res->ai_next));
@@ -109,7 +113,7 @@ aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep)
     return fd;
 
  fail2:
-    aug_close(fd);
+    aug_fclose(aug_getosfd(fd));
 
  fail1:
     aug_destroyaddrinfo(save);
@@ -176,7 +180,7 @@ aug_udpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
         if (0 == aug_connect(fd, ep))
             break; /* Success. */
 
-        if (-1 == aug_close(fd)) /* Ignore this one. */
+        if (-1 == aug_fclose(aug_getosfd(fd))) /* Ignore this one. */
             goto fail;
 
     } while ((res = res->ai_next));
@@ -218,7 +222,8 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
         if (0 == aug_bind(fd, ep))
             break; /* Success. */
 
-        if (-1 == aug_close(fd)) /* bind error, close and try next one */
+        if (-1 == aug_fclose(aug_getosfd(fd))) /* bind error, close and try
+                                                  next one */
             goto fail;
 
     } while ((res = res->ai_next));
@@ -245,7 +250,7 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     /* Locate host and serv separator. */
 
     if (!(serv = strrchr(dst->data_, ':'))) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing separator '%s'"), src);
         return NULL;
     }
@@ -257,13 +262,13 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     /* Ensure host and serv parts exists. */
 
     if (!len) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing host part '%s'"), src);
         return NULL;
     }
 
     if ('\0' == *++serv) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing service part '%s'"), src);
         return NULL;
     }
@@ -274,7 +279,7 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     if ('[' == dst->data_[0]) {
 
         if (']' != dst->data_[len - 1]) {
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                            AUG_MSG("unmatched brackets '%s'"), src);
             return NULL;
         }

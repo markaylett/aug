@@ -9,6 +9,8 @@
 
 #include "augsys/utility.h" // aug_perrinfo()
 
+#include "augctx/base.h"
+
 #include <cstring>          // memcpy()
 #include <exception>
 
@@ -22,14 +24,14 @@ namespace aug {
     public:
         errinfo_error()
         {
-            memcpy(&errinfo_, aug_geterrinfo(), sizeof(errinfo_));
+            memcpy(&errinfo_, aug_tlerr, sizeof(errinfo_));
         }
-        errinfo_error(const char* file, int line, int src, int num,
+        errinfo_error(const char* file, int line, const char* src, int num,
                       const char* format, va_list args)
         {
             aug_vseterrinfo(&errinfo_, file, line, src, num, format, args);
         }
-        errinfo_error(const char* file, int line, int src, int num,
+        errinfo_error(const char* file, int line, const char* src, int num,
                       const char* format, ...)
         {
             va_list args;

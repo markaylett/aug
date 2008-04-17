@@ -13,10 +13,9 @@ AUG_RCSID("$Id$");
 # include "augsrv/win32/log.c"
 #endif /* _WIN32 */
 
-#include "augsys/errinfo.h"
-#include "augsys/string.h"
-#include "augsys/unistd.h"
-#include "augsys/utility.h" /* AUG_PERROR() */
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/string.h"
 
 #include <errno.h>
 #include <stdio.h>          /* fflush() */
@@ -29,9 +28,6 @@ AUG_RCSID("$Id$");
 #if !defined(STDERR_FILENO)
 # define STDERR_FILENO 2
 #endif /* !STDERR_FILENO */
-
-#define VERIFYCLOSE_(x) \
-    AUG_PERROR(close(x), "close() failed")
 
 static int
 redirectout_(int fd)
@@ -66,7 +62,8 @@ redirectout_(int fd)
 
         /* Restore the original descriptor. */
 
-        AUG_PERROR(dup2(old, STDOUT_FILENO), "dup2() failed");
+        if (-1 == dup2(old, STDOUT_FILENO))
+            aug_ctxerror(aug_tlx, "dup2() failed");
         goto done;
     }
 
@@ -75,7 +72,8 @@ redirectout_(int fd)
     ret = 0;
 
  done:
-    VERIFYCLOSE_(old);
+    if (-1 == close(old))
+        aug_ctxerror(aug_tlx, "close() failed");
     return ret;
 }
 
@@ -92,6 +90,7 @@ aug_openlog(const char* path)
     if (-1 == redirectout_(fd))
         ret = -1;
 
-    VERIFYCLOSE_(fd);
+    if (-1 == close(fd))
+        aug_ctxerror(aug_tlx, "close() failed");
     return ret;
 }

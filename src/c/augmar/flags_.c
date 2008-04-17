@@ -9,8 +9,9 @@ AUG_RCSID("$Id$");
 
 #include "augmar/types.h"
 
-#include "augsys/errinfo.h"
-#include "augsys/log.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/log.h"
 
 #include <assert.h>
 
@@ -61,7 +62,7 @@ aug_toflags_(int* to, int from)
     return 0;
 
  fail:
-    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                    AUG_MSG("invalid open flags"));
     return -1;
 }

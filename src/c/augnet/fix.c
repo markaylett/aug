@@ -9,8 +9,9 @@ AUG_RCSID("$Id$");
 
 #include "augutil/xstr.h"
 
-#include "augsys/errinfo.h"
-#include "augsys/string.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/string.h"
 
 #include <ctype.h>  /* isdigit() */
 #include <errno.h>  /* ENOMEM */
@@ -88,7 +89,7 @@ fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
 
     digits = (unsigned)(it - buf);
     if (MAX_DIGITS_ < digits) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("too many integer digits '%u'"), digits);
         return -1;
     }
@@ -102,7 +103,7 @@ fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
     for (fact = 1, value = 0; it-- != buf; fact *= 10) {
 
         if (!isdigit(*it)) {
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                            AUG_MSG("non-digit '%c' in integer"), *it);
             return -1;
         }
@@ -152,7 +153,7 @@ getsum_(const char* buf, size_t size)
     ch = buf[size - 4]; /* Hundreds. */
 
     if (!isdigit(cu) || !isdigit(ct) || !isdigit(ch)) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("non-digit in checksum '%.3s'"),
                        buf + (size - 4));
         return -1;
@@ -172,7 +173,7 @@ aug_createfixstream(size_t size, aug_fixcb_t cb, aug_object* ob)
     aug_xstr_t xstr;
 
     if (!stream) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -268,7 +269,7 @@ aug_finishfix(aug_fixstream_t stream)
     if (size) {
 
         aug_clearxstr(&stream->xstr_);
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
                        AUG_MSG("fix stream not empty, '%d' bytes"),
                        (int)size);
         ret = -1;
@@ -291,7 +292,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     */
 
     if (0 != memcmp(ptr, BEGINSTRING_PREFIX_, BEGINSTRING_PREFIX_SIZE_)) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("invalid beginstring tag"));
         return -1;
     }
@@ -310,7 +311,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     ptr += AUG_FIXVERLEN;
     if (*SOH_ != *ptr++) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("beginstring field delimiter not found"));
         return -1;
     }
@@ -320,7 +321,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     */
 
     if (0 != memcmp(ptr, BODYLENGTH_PREFIX_, BODYLENGTH_PREFIX_SIZE_)) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("invalid bodylength tag"));
         return -1;
     }
@@ -353,7 +354,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     */
 
     if (0 != memcmp(ptr, CHECKSUM_PREFIX_, CHECKSUM_PREFIX_SIZE_)) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("invalid checksum tag"));
         return -1;
     }
@@ -363,7 +364,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     */
 
     if (*SOH_ != buf[size - 1]) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("checksum field delimiter not found"));
         return -1;
     }
@@ -382,7 +383,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     sum2 = aug_checksum(buf, size - TAIL_SIZE_);
 
     if (sum1 != sum2) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("invalid checksum '%03d', expected '%03d'"),
                        sum1, sum2);
         return -1;
@@ -414,7 +415,7 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
         return -1;
 
     if (0 == digits) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("tag not found"));
         return -1;
     }
@@ -430,7 +431,7 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
         if (*it == *SOH_)
             goto found;
 
-    aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                    AUG_MSG("field '%d' delimiter not found"),
                    (int)field->tag_);
     return -1;

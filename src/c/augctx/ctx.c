@@ -212,7 +212,7 @@ aug_createbasicctx(void)
     if (!(clock = aug_createclock(mpool, tz)))
         goto fail1;
 
-    if (!(log = aug_createstdlog(mpool)))
+    if (!(log = aug_getstdlog()))
         goto fail2;
 
     ctx = aug_createctx(mpool, clock, log, aug_loglevel());

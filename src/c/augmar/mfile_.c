@@ -10,13 +10,16 @@ AUG_RCSID("$Id$");
 #include "augmar/file_.h"
 #include "augmar/format_.h"
 
-#include "augsys/errinfo.h"
-#include "augsys/log.h"
+#include "augsys/base.h"   /* aug_getosfd() */
 #include "augsys/mmap.h"
-#include "augsys/utility.h" /* aug_filesize() */
+#include "augsys/unistd.h" /* aug_fsize() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/log.h"
 
 #include <assert.h>
-#include <errno.h>          /* ENOMEM */
+#include <errno.h>         /* ENOMEM */
 #include <stdlib.h>
 
 struct aug_mfile_ {
@@ -97,7 +100,7 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
     if (-1 == (fd = aug_openfile_(path, flags & ~AUG_APPEND, mode)))
         return NULL;
 
-    if (-1 == aug_filesize(fd, &size))
+    if (-1 == aug_fsize(aug_getosfd(fd), &size))
         return NULL;
 
     if (!(mfile = (aug_mfile_t)malloc(sizeof(struct aug_mfile_) + tail))) {
@@ -135,7 +138,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 
         if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-            aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL,
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
                            AUG_EPERM, AUG_MSG("file is not writable"));
             return NULL;
         }
@@ -185,7 +188,7 @@ aug_truncatemfile_(aug_mfile_t mfile, unsigned size)
     assert(mfile);
     if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPERM,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPERM,
                        AUG_MSG("file is not writable"));
         return -1;
     }

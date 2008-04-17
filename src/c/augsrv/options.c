@@ -13,10 +13,11 @@ AUG_RCSID("$Id$");
 #include "augutil/getopt.h"
 
 #include "augctx/defs.h"    /* AUG_MKSTR */
-#include "augsys/errinfo.h"
-#include "augsys/log.h"
-#include "augsys/string.h"
 #include "augsys/utility.h" /* aug_perrinfo() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/string.h"
 
 #include <stdio.h>          /* EOF */
 #include <string.h>
@@ -29,13 +30,13 @@ usage_(void)
     const char* email = aug_getserviceopt(AUG_OPTEMAIL);
 
     if (lname)
-        aug_info("%s\n", lname);
+        aug_ctxinfo(aug_tlx, "%s\n", lname);
 
     if (program)
-        aug_info("usage:\n"
-                 "  %s [options] command\n", aug_basename(program));
+        aug_ctxinfo(aug_tlx, "usage:\n"
+                    "  %s [options] command\n", aug_basename(program));
 
-    aug_info("options:\n"
+    aug_ctxinfo(aug_tlx, "options:\n"
              "  -b         batch mode - no interactive prompts\n"
              "  -f <conf>  specify path to configuration file\n"
              "  -h         display this usage summary and exit\n"
@@ -49,7 +50,7 @@ usage_(void)
              "  uninstall  uninstall program\n");
 
     if (email)
-        aug_info("report bugs to: %s\n", email);
+        aug_ctxinfo(aug_tlx, "report bugs to: %s\n", email);
 }
 
 AUGSRV_API int
@@ -107,13 +108,13 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         case 'f':
             if (aug_optind == argc || !(conffile = argv[aug_optind++])) {
                 usage_();
-                aug_error("missing path argument");
+                aug_ctxerror(aug_tlx, "missing path argument");
                 return -1;
             }
             if (!aug_realpath(options->conffile_, conffile,
                               sizeof(options->conffile_))) {
                 usage_();
-                aug_perrinfo(NULL, "aug_realpath() failed");
+                aug_perrinfo(aug_tlx, "aug_realpath() failed");
                 return -1;
             }
             break;
@@ -124,7 +125,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         case '?':
         default:
             usage_();
-            aug_error("unknown option '%c'", aug_optopt);
+            aug_ctxerror(aug_tlx, "unknown option '%c'", aug_optopt);
             return -1;
         }
 
@@ -136,14 +137,14 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         if (-1 == (ret = aug_tocommand(argv[aug_optind]))) {
 
             usage_();
-            aug_error("invalid command '%s'", argv[aug_optind]);
+            aug_ctxerror(aug_tlx, "invalid command '%s'", argv[aug_optind]);
             return -1;
         }
         options->command_ = ret;
         break;
     default:
         usage_();
-        aug_error("too many arguments");
+        aug_ctxerror(aug_tlx, "too many arguments");
         return -1;
     }
 

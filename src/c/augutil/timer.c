@@ -202,7 +202,11 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
 
     if ((it = AUG_FIRST(timers))) {
 
-        if (-1 == aug_gettimeofday(&now, NULL))
+        aug_clock* clock = aug_getclock(aug_tlx);
+        struct timeval* ret = aug_gettimeofday(clock, &now);
+        aug_release(clock);
+
+        if (!ret)
             return -1;
 
         /* Force, at least, the first timer to expire. */

@@ -90,17 +90,68 @@ writeall_(int fd, const char* buf, size_t n)
     return 0;
 }
 
-AUGUTIL_API const char*
-aug_loglabel(int loglevel)
+static void*
+cast_(aug_log* obj, const char* id)
 {
-    if (sizeof(LABELS_) / sizeof(LABELS_[0]) <= (size_t)loglevel)
-        loglevel = AUG_LOGDEBUG0;
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_logid)) {
+        aug_retain(obj);
+        return obj;
+    }
+    return NULL;
+}
 
-    return LABELS_[loglevel];
+static void
+retain_(aug_log* obj)
+{
+}
+
+static void
+release_(aug_log* obj)
+{
+}
+
+static aug_result
+vwritelog_(aug_log* obj, int level, const char* format, va_list args)
+{
+    char buf[AUG_MAXLINE];
+    size_t n = sizeof(buf);
+
+    if (-1 == aug_vformatlog(buf, &n, level, format, args))
+        return -1;
+
+#if defined(_WIN32) && !defined(NDEBUG)
+    aug_lock();
+    OutputDebugString(buf);
+    OutputDebugString("\n");
+    aug_unlock();
+#endif /* _WIN32 && !NDEBUG */
+
+    buf[n] = '\n';
+    return writeall_(level > AUG_LOGWARN ? STDOUT_FILENO : STDERR_FILENO,
+                     buf, n + 1);
+}
+
+static const struct aug_logvtbl vtbl_ = {
+    cast_,
+    retain_,
+    release_,
+    vwritelog_
+};
+
+static aug_log daemonlog_ = { &vtbl_, NULL };
+
+
+AUGUTIL_API const char*
+aug_loglabel(int level)
+{
+    if (sizeof(LABELS_) / sizeof(LABELS_[0]) <= (size_t)level)
+        level = AUG_LOGDEBUG0;
+
+    return LABELS_[level];
 }
 
 AUGUTIL_API int
-aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
+aug_vformatlog(char* buf, size_t* n, int level, const char* format,
                va_list args)
 {
     int ms, ret;
@@ -128,9 +179,9 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
 
 #if ENABLE_THREADS
     ret = snprintf(buf, size, ".%03d %08x %-6s ", ms, aug_threadid(),
-                   aug_loglabel(loglevel));
+                   aug_loglabel(level));
 #else /* !ENABLE_THREADS */
-    ret = snprintf(buf, size, ".%03d %-6s ", ms, aug_loglabel(loglevel));
+    ret = snprintf(buf, size, ".%03d %-6s ", ms, aug_loglabel(level));
 #endif /* !ENABLE_THREADS */
 
     AUG_SNTRUNCF(buf, size, ret);
@@ -162,35 +213,20 @@ aug_vformatlog(char* buf, size_t* n, int loglevel, const char* format,
 }
 
 AUGUTIL_API int
-aug_formatlog(char* buf, size_t* n, int loglevel, const char* format, ...)
+aug_formatlog(char* buf, size_t* n, int level, const char* format, ...)
 {
     int ret;
     va_list args;
 
     va_start(args, format);
-    ret = aug_vformatlog(buf, n, loglevel, format, args);
+    ret = aug_vformatlog(buf, n, level, format, args);
     va_end(args);
 
     return ret;
 }
 
-AUGUTIL_API int
-aug_daemonlogger(int loglevel, const char* format, va_list args)
+AUGUTIL_API aug_log*
+aug_getdaemonlog(void)
 {
-    char buf[AUG_MAXLINE];
-    size_t n = sizeof(buf);
-
-    if (-1 == aug_vformatlog(buf, &n, loglevel, format, args))
-        return -1;
-
-#if defined(_WIN32) && !defined(NDEBUG)
-    aug_lock();
-    OutputDebugString(buf);
-    OutputDebugString("\n");
-    aug_unlock();
-#endif /* _WIN32 && !NDEBUG */
-
-    buf[n] = '\n';
-    return writeall_(loglevel > AUG_LOGWARN ? STDOUT_FILENO : STDERR_FILENO,
-                     buf, n + 1);
+    return &daemonlog_;
 }

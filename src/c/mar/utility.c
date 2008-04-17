@@ -6,7 +6,8 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
 
 #include <errno.h>
 #include <string.h>
@@ -23,7 +24,7 @@ aug_atofield_(struct aug_field* field, char* src)
 
     if (NULL == value) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("empty value part"));
         return -1;
     }
@@ -88,7 +89,7 @@ aug_readline_(char* buf, size_t size, FILE* stream)
 
     if (!(p = strchr(buf, '\n'))) {
 
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EPARSE,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("newline character expected"));
         return -1;
     }
@@ -128,7 +129,7 @@ aug_writevalue_(FILE* stream, const void* value, size_t size)
     if (size != fwrite(value, 1, size, stream)
         || 1 != fwrite(&NL_, 1, 1, stream)) {
 
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 

@@ -11,11 +11,13 @@ AUG_RCSID("$Id$");
 
 # include "augnet/extend.h"
 
-# include "augsys/base.h"
-# include "augsys/errinfo.h"
-# include "augsys/log.h"
+# include "augsys/base.h"   /* struct aug_fdtype */
 # include "augsys/socket.h" /* aug_shutdown() */
 # include "augsys/uio.h"
+
+# include "augctx/base.h"
+# include "augctx/errinfo.h"
+# include "augctx/log.h"
 
 # include <openssl/err.h>
 # include <openssl/ssl.h>
@@ -163,12 +165,12 @@ shutwr_(struct aug_nbfile* nbfile)
     struct sslext_* x = nbfile->ext_;
     int ret;
 
-    AUG_DEBUG3("SSL: shutdown");
+    AUG_CTXDEBUG3(aug_tlx, "SSL: shutdown");
     ret = SSL_shutdown(x->ssl_);
     aug_shutdown(nbfile->fd_, SHUT_WR);
 
     if (ret < 0) {
-        aug_setsslerrinfo(NULL, __FILE__, __LINE__, ERR_get_error());
+        aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
         return -1;
     }
     return 0;
@@ -182,7 +184,7 @@ sslread_(SSL* ssl, struct buf_* x)
     const char* end = x->buf_ + sizeof(x->buf_);
     int n = (int)(end - x->wr_);
     if (n) {
-        AUG_DEBUG3("SSL: ssl read to input buffer");
+        AUG_CTXDEBUG3(aug_tlx, "SSL: ssl read to input buffer");
         n = SSL_read(ssl, x->wr_, n);
         if (0 < n)
             x->wr_ += n;
@@ -190,7 +192,7 @@ sslread_(SSL* ssl, struct buf_* x)
 
         /* Input buffer is full, try handshake. */
 
-        AUG_DEBUG3("SSL: handshake without read");
+        AUG_CTXDEBUG3(aug_tlx, "SSL: handshake without read");
         n = SSL_do_handshake(ssl);
     }
     return n;
@@ -203,7 +205,7 @@ sslwrite_(SSL* ssl, struct buf_* x)
 
     int n = (int)(x->wr_ - x->rd_);
     if (n) {
-        AUG_DEBUG3("SSL: ssl write from output buffer");
+        AUG_CTXDEBUG3(aug_tlx, "SSL: ssl write from output buffer");
         n = SSL_write(ssl, x->rd_, n);
         if (0 < n) {
             x->rd_ += n;
@@ -217,7 +219,7 @@ sslwrite_(SSL* ssl, struct buf_* x)
 
         /* Output buffer is empty, try handshake. */
 
-        AUG_DEBUG3("SSL: handshake without write");
+        AUG_CTXDEBUG3(aug_tlx, "SSL: handshake without write");
         n = SSL_do_handshake(ssl);
     }
     return n;
@@ -288,8 +290,9 @@ updateevents_(struct aug_nbfile* nbfile)
         || (RDPEND == x->state_ && !buffull_(&x->inbuf_)))
         nbfile->nbfiles_->nowait_ = 1;
 
-    AUG_DEBUG3("SSL: events: fd=[%d], realmask=[%d], usermask=[%d],"
-               " userevents=[%d]", nbfile->fd_, real, x->mask_, user);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: events: fd=[%d], realmask=[%d],"
+                  " usermask=[%d], userevents=[%d]",
+                  nbfile->fd_, real, x->mask_, user);
 }
 
 static struct aug_nbfile*
@@ -297,7 +300,7 @@ removenbfile_(struct aug_nbfile* nbfile)
 {
     struct aug_nbfile* ret = nbfile;
 
-    AUG_DEBUG3("clearing io-event mask: fd=[%d]", nbfile->fd_);
+    AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: fd=[%d]", nbfile->fd_);
 
     if (-1 == aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_, 0))
         ret = NULL;
@@ -315,7 +318,7 @@ close_(int fd)
     struct sslext_* x;
     int ret = 0;
 
-    AUG_DEBUG3("nbfile close");
+    AUG_CTXDEBUG3(aug_tlx, "nbfile close");
 
     if (!aug_resetnbfile(fd, &nbfile))
         return -1;
@@ -328,7 +331,7 @@ close_(int fd)
     free(x);
 
     if (!nbfile.base_->close_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_close() not supported"));
         return -1;
     }
@@ -362,11 +365,11 @@ read_(int fd, void* buf, size_t size)
     /* Fail with EAGAIN is non-blocking operation would have blocked. */
 
     if (bufempty_(&x->inbuf_)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAGAIN);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
         return -1;
     }
 
-    AUG_DEBUG3("SSL: user read from input buffer: fd=[%d]", fd);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user read from input buffer: fd=[%d]", fd);
 
     ret = (ssize_t)readbuf_(&x->inbuf_, buf, size);
     updateevents_(&nbfile);
@@ -396,11 +399,11 @@ readv_(int fd, const struct iovec* iov, int size)
     /* Fail with EAGAIN is non-blocking operation would have blocked. */
 
     if (bufempty_(&x->inbuf_)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAGAIN);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
         return -1;
     }
 
-    AUG_DEBUG3("SSL: user readv from input buffer: fd=[%d]", fd);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user readv from input buffer: fd=[%d]", fd);
 
     ret = (ssize_t)readbufv_(&x->inbuf_, iov, size);
     updateevents_(&nbfile);
@@ -422,20 +425,20 @@ write_(int fd, const void* buf, size_t len)
     /* Fail with EAGAIN is non-blocking operation would have blocked. */
 
     if (buffull_(&x->outbuf_)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAGAIN);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
         return -1;
     }
 
     if (x->shutdown_) {
 #if !defined(_WIN32)
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ESHUTDOWN);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
 #else /* _WIN32 */
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAESHUTDOWN);
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAESHUTDOWN);
 #endif /* _WIN32 */
         return -1;
     }
 
-    AUG_DEBUG3("SSL: user write to output buffer: fd=[%d]", fd);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user write to output buffer: fd=[%d]", fd);
 
     ret = (ssize_t)writebuf_(&x->outbuf_, buf, len);
     updateevents_(&nbfile);
@@ -457,20 +460,20 @@ writev_(int fd, const struct iovec* iov, int size)
     /* Fail with EAGAIN is non-blocking operation would have blocked. */
 
     if (buffull_(&x->outbuf_)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAGAIN);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
         return -1;
     }
 
     if (x->shutdown_) {
 #if !defined(_WIN32)
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ESHUTDOWN);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
 #else /* _WIN32 */
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAESHUTDOWN);
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAESHUTDOWN);
 #endif /* _WIN32 */
         return -1;
     }
 
-    AUG_DEBUG3("SSL: user writev to output buffer: fd=[%d]", fd);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user writev to output buffer: fd=[%d]", fd);
 
     ret = (ssize_t)writebufv_(&x->outbuf_, iov, size);
     updateevents_(&nbfile);
@@ -486,7 +489,7 @@ setnonblock_(int fd, int on)
         return -1;
 
     if (!nbfile.base_->setnonblock_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_setnonblock() not supported"));
         return -1;
     }
@@ -517,32 +520,33 @@ readwrite_(struct aug_nbfile* nbfile, int rw)
         ret = sslread_(x->ssl_, &x->inbuf_);
         switch (SSL_get_error(x->ssl_, ret)) {
         case SSL_ERROR_NONE:
-            AUG_DEBUG3("SSL: %d bytes read to input buffer", ret);
+            AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes read to input buffer", ret);
             if ((ret = SSL_pending(x->ssl_))) {
-                AUG_DEBUG3("SSL: %d bytes pending for immediate read", ret);
+                AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes pending for immediate"
+                              " read", ret);
                 x->state_ = RDPEND;
                 goto done;
             }
             x->state_ = NORMAL;
             break;
         case SSL_ERROR_ZERO_RETURN:
-            AUG_DEBUG3("SSL: end of data");
+            AUG_CTXDEBUG3(aug_tlx, "SSL: end of data");
             if (!x->shutdown_) {
-                AUG_DEBUG3("SSL: shutting-down", ret);
+                AUG_CTXDEBUG3(aug_tlx, "SSL: shutting-down", ret);
                 SSL_shutdown(x->ssl_);
             }
             x->state_ = RDZERO;
             goto done;
         case SSL_ERROR_WANT_READ:
-            AUG_DEBUG3("SSL: read wants read");
+            AUG_CTXDEBUG3(aug_tlx, "SSL: read wants read");
             x->state_ = RDWANTRD;
             goto done;
         case SSL_ERROR_WANT_WRITE:
-            AUG_DEBUG3("SSL: read wants write");
+            AUG_CTXDEBUG3(aug_tlx, "SSL: read wants write");
             x->state_ = RDWANTWR;
             goto done;
         default:
-            aug_setsslerrinfo(NULL, __FILE__, __LINE__, ERR_get_error());
+            aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
             x->state_ = SSLERR;
             goto done;
         }
@@ -556,19 +560,20 @@ readwrite_(struct aug_nbfile* nbfile, int rw)
         ret = sslwrite_(x->ssl_, &x->outbuf_);
         switch (SSL_get_error(x->ssl_, ret)) {
         case SSL_ERROR_NONE:
-            AUG_DEBUG3("SSL: %d bytes written from output buffer", ret);
+            AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes written from output buffer",
+                          ret);
             x->state_ = NORMAL;
             break;
         case SSL_ERROR_WANT_WRITE:
-            AUG_DEBUG3("SSL: write wants write");
+            AUG_CTXDEBUG3(aug_tlx, "SSL: write wants write");
             x->state_ = WRWANTWR;
             break;
         case SSL_ERROR_WANT_READ:
-            AUG_DEBUG3("SSL: write wants read");
+            AUG_CTXDEBUG3(aug_tlx, "SSL: write wants read");
             x->state_ = WRWANTRD;
             break;
         default:
-            aug_setsslerrinfo(NULL, __FILE__, __LINE__, ERR_get_error());
+            aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
             x->state_ = SSLERR;
             break;
         }
@@ -632,12 +637,12 @@ nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
     if (rw)
         readwrite_(nbfile, rw);
     else
-        AUG_DEBUG3("SSL: readwrite_() skipped");
+        AUG_CTXDEBUG3(aug_tlx, "SSL: readwrite_() skipped");
 
     if ((events = userevents_(nbfile))) {
 
-        AUG_DEBUG3("SSL: nbfilecb_(): fd=[%d], events=[%d]",
-                   nbfile->fd_, events);
+        AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_(): fd=[%d], events=[%d]",
+                      nbfile->fd_, events);
 
         /* Callback may close file, ensure that it is still available after
            callback returns. */
@@ -653,7 +658,7 @@ nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
         aug_releasefd(nbfile->fd_);
 
     } else {
-        AUG_DEBUG3("SSL: nbfilecb_() skipped");
+        AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_() skipped");
         ret = 1;
     }
 
@@ -665,8 +670,8 @@ seteventmask_(struct aug_nbfile* nbfile, unsigned short mask)
 {
     struct sslext_* x = nbfile->ext_;
 
-    AUG_DEBUG3("SSL: setting event mask: fd=[%d], mask=[%d]",
-               nbfile->fd_, (int)mask);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: setting event mask: fd=[%d], mask=[%d]",
+                  nbfile->fd_, (int)mask);
 
     x->mask_ = mask;
     updateevents_(nbfile);
@@ -711,7 +716,7 @@ createsslext_(aug_nbfiles_t nbfiles, int fd, SSL* ssl)
 {
     struct sslext_* x = malloc(sizeof(struct sslext_));
     if (!x) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -748,7 +753,7 @@ AUGNET_API void
 aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                   unsigned long err)
 {
-    aug_seterrinfo(errinfo, file, line, AUG_SRCSSL, err,
+    aug_seterrinfo(errinfo, file, line, "ssl", err,
                    "%s: %s: %s",
                    ERR_lib_error_string(err),
                    ERR_func_error_string(err),
@@ -757,10 +762,10 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     /* Log those that are not set in errinfo record. */
 
     while ((err = ERR_get_error()))
-        aug_error("%s: %s: %s",
-                  ERR_lib_error_string(err),
-                  ERR_func_error_string(err),
-                  ERR_reason_error_string(err));
+        aug_ctxerror(aug_tlx, "%s: %s: %s",
+                     ERR_lib_error_string(err),
+                     ERR_func_error_string(err),
+                     ERR_reason_error_string(err));
 }
 
 AUGNET_API int

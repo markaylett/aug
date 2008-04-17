@@ -367,7 +367,7 @@ def putstatic(iface, method)
     names = nothis(format.name_list(iface, method)).join(", ")
     expr = "static_cast<T*>(this_->impl_)->#{method.qname}_(#{names})"
     if method.type.object? then
-        expr = "aug::incget(#{expr})"
+        expr = "aug::retget(#{expr})"
     end
     puts <<END
         static #{format.return_type(method.type)}
@@ -455,7 +455,7 @@ END
         static void*
         cast_(#{elem.type.cname}* this_, const char* id) AUG_NOTHROW
         {
-            return aug::incget(static_cast<T*>(this_->impl_)->cast_(id));
+            return aug::retget(static_cast<T*>(this_->impl_)->cast_(id));
         }
         static void
         retain_(#{elem.type.cname}* this_) AUG_NOTHROW

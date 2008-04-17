@@ -4,11 +4,12 @@
 #define AUGNET_BUILD
 #include "augnet/auth.h"
 #include "augctx/defs.h"
-#include "augsys/string.h"
 
 AUG_RCSID("$Id$");
 
 #include "augutil/md5.h"
+
+#include "augctx/string.h"
 
 /* Derived from example in rfc2617 - HTTP Authentication: Basic and Digest
    Access Authentication.

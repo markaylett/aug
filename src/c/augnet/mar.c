@@ -14,8 +14,9 @@ AUG_RCSID("$Id$");
 
 #include "augmar/mar.h"
 
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
 
 #include <stdlib.h>
 #include <string.h>

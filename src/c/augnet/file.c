@@ -7,9 +7,10 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
-#include "augsys/lock.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
+#include "augctx/lock.h"
 
 #include <stdlib.h>
 
@@ -131,7 +132,7 @@ aug_removefile(struct aug_files* files, int fd)
             break;
 
     if (!it) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EEXIST,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
                        AUG_MSG("no file for descriptor '%d'"), (int)fd);
         return -1;
     }

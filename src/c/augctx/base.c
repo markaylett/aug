@@ -178,7 +178,7 @@ aug_tlerr_(void)
 }
 
 AUGCTX_API aug_result
-aug_start(void)
+aug_initbasictlx(void)
 {
     aug_result result = aug_init();
     if (result < 0)
@@ -191,7 +191,15 @@ aug_start(void)
             goto done;
         }
     }
-    atexit(aug_term);
  done:
+    return result;
+}
+
+AUGCTX_API aug_result
+aug_start(void)
+{
+    aug_result result = aug_initbasictlx();
+    if (0 <= result)
+        atexit(aug_term);
     return result;
 }

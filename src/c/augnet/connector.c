@@ -7,13 +7,16 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
-#include "augsys/string.h"  /* bzero() */
+#include "augnet/inet.h"    /* aug_established() */
+
+#include "augsys/base.h"    /* aug_getosfd() */
 #include "augsys/unistd.h"  /* aug_close() */
 #include "augsys/utility.h" /* aug_setnonblock() */
 
-#include "augnet/inet.h"    /* aug_established() */
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
+#include "augctx/string.h"  /* bzero() */
 
 #include <assert.h>
 #include <stdlib.h>         /* malloc() */
@@ -62,7 +65,7 @@ AUGNET_API int
 aug_destroyconnector(aug_connector_t ctor)
 {
     if (-1 != ctor->fd_)
-        aug_close(ctor->fd_);
+        aug_fclose(aug_getosfd(ctor->fd_));
 
     aug_destroyaddrinfo(ctor->save_);
     free(ctor);
@@ -80,7 +83,7 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
     if (!ctor->res_) {
         assert(-1 == fd);
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("address-list exhausted"));
         return -1;
     }
@@ -94,7 +97,7 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
             /* Error testing for establishment. */
 
-            aug_close(fd);
+            aug_fclose(aug_getosfd(fd));
             return -1;
 
         case 0:
@@ -112,7 +115,7 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
                 /* Try next address. */
 
-                if (-1 == aug_close(fd))
+                if (-1 == aug_fclose(aug_getosfd(fd)))
                     return -1;
                 break;
             }
@@ -122,8 +125,8 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
             {
                 int err = ECONNREFUSED;
                 getsockerr_(fd, &err);
-                aug_close(fd); /* May set errno */
-                aug_setposixerrinfo(NULL, __FILE__, __LINE__, err);
+                aug_fclose(aug_getosfd(fd)); /* May set errno */
+                aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, err);
             }
             return -1;
         }
@@ -138,8 +141,8 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
         if (-1 == fd)
             continue; /* Ignore this one. */
 
-        if (-1 == aug_setnonblock(fd, 1)) {
-            aug_close(fd);
+        if (-1 == aug_fsetnonblock(aug_getosfd(fd), 1)) {
+            aug_fclose(aug_getosfd(fd));
             return -1;
         }
 
@@ -162,7 +165,7 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
         /* Failed for other reason. */
 
-        if (-1 == aug_close(fd)) /* Ignore this one. */
+        if (-1 == aug_fclose(aug_getosfd(fd))) /* Ignore this one. */
             return -1;
 
     } while ((ctor->res_ = ctor->res_->ai_next));
@@ -175,8 +178,8 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
     /* Set back to blocking. */
 
-    if (-1 == aug_setnonblock(fd, 0)) {
-        aug_close(fd);
+    if (-1 == aug_fsetnonblock(aug_getosfd(fd), 0)) {
+        aug_fclose(aug_getosfd(fd));
         return -1;
     }
 

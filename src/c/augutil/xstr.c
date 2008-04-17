@@ -7,8 +7,11 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/errinfo.h"
-#include "augsys/unistd.h" /* aug_read() */
+#include "augsys/base.h"   /* aug_getosfd() */
+#include "augsys/unistd.h" /* aug_fread() */
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
 
 #include <errno.h>         /* ENOMEM */
 #include <stdlib.h>        /* malloc() */
@@ -171,7 +174,8 @@ aug_xstrcatf(int fd, aug_xstr_t* xstr, size_t size)
 	if (-1 == reserve_(xstr, (*xstr)->len_ + size))
 		return -1;
 
-    if (-1 == (ret = aug_read(fd, (*xstr)->data_ + (*xstr)->len_, size)))
+    if (-1 == (ret = aug_fread(aug_getosfd(fd),
+                               (*xstr)->data_ + (*xstr)->len_, size)))
         return -1;
 
 	(*xstr)->len_ += ret;

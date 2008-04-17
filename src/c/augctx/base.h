@@ -23,7 +23,7 @@
  * termination only happens when this count reaches zero.
  *
  * A thread must ensure the thread-local context is set after calling
- * aug_init(), as some library functions may depend on it.
+ * aug_init(), as many library functions will depend on it.
  *
  * @return Either @ref AUG_SUCCESS or @ref AUG_FAILURE.
  */
@@ -89,7 +89,7 @@ aug_gettlx(void);
  * @return A borrowed context reference.
  */
 
-#define aug_tlx   aug_tlx_()
+#define aug_tlx aug_tlx_()
 
 AUGCTX_API aug_ctx*
 aug_tlx_(void);
@@ -100,6 +100,17 @@ aug_tlx_(void);
 
 AUGCTX_API struct aug_errinfo*
 aug_tlerr_(void);
+
+/**
+ * Initialise with basic context.
+ *
+ * Initialise and, if not set, set basic context using aug_setbasictlx().
+ *
+ * See @ref TypesResult.
+ */
+
+AUGCTX_API aug_result
+aug_initbasictlx(void);
 
 /**
  * Convenience wrapper for aug_init(), aug_createbasicctx() and aug_term().

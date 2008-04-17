@@ -6,7 +6,7 @@
 
 #include "augsyspp/config.hpp"
 
-#include "augsys/errinfo.h"
+#include "augctx/errinfo.h"
 
 namespace aug {
 
@@ -22,7 +22,7 @@ namespace aug {
         return errinfo.line_;
     }
 
-    inline int
+    inline const char*
     errsrc(const aug_errinfo& errinfo)
     {
         return errinfo.src_;

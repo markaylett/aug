@@ -64,6 +64,7 @@ libaugutil_la_LDFLAGS = \
 	-version-info 1:0:0
 
 libaugutil_la_LIBADD = \
+	$(top_builddir)/src/c/augctx/libaugctx.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \

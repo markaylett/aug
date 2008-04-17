@@ -10,13 +10,15 @@ AUG_RCSID("$Id$");
 #include "augsrv/signal.h"
 
 #include "augsys/barrier.h"
-#include "augsys/base.h"    /* aug_exit() */
-#include "augsys/errinfo.h"
-#include "augsys/log.h"
+#include "augsys/base.h"    /* aug_getosfd() */
 #include "augsys/muxer.h"
-#include "augsys/unistd.h"  /* aug_close() */
+#include "augsys/unistd.h"  /* aug_fclose() */
 #include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h"
+
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/log.h"
 
 #include "augutil/event.h"  /* struct aug_event */
 
@@ -43,9 +45,12 @@ static void
 closepipe_(void)
 {
     if (-1 != fds_[0])
-        AUG_PERRINFO(aug_close(fds_[0]), NULL, "aug_close() failed");
+        if (-1 == aug_fclose(aug_getosfd(fds_[0])))
+            aug_perrinfo(aug_tlx, "aug_fclose() failed");
+
     if (-1 != fds_[1])
-        AUG_PERRINFO(aug_close(fds_[1]), NULL, "aug_close() failed");
+        if (-1 == aug_fclose(aug_getosfd(fds_[1])))
+            aug_perrinfo(aug_tlx, "aug_fclose() failed");
 
     fds_[0] = -1;
     fds_[1] = -1;
@@ -55,9 +60,9 @@ static void
 signalhandler_(int sig)
 {
     struct aug_event event;
-    aug_info("handling signal interrupt");
+    aug_ctxinfo(aug_tlx, "handling signal interrupt");
     if (!aug_writeevent(fds_[1], aug_setsigevent(&event, sig)))
-        aug_perrinfo(NULL, "aug_writeevent() failed");
+        aug_perrinfo(aug_tlx, "aug_writeevent() failed");
 }
 
 #if defined(_WIN32)
@@ -65,9 +70,9 @@ static BOOL WINAPI
 ctrlhandler_(DWORD ctrl)
 {
     struct aug_event event = { AUG_EVENTSTOP, NULL };
-    aug_info("handling console interrupt");
+    aug_ctxinfo(aug_tlx, "handling console interrupt");
     if (!aug_writeevent(fds_[1], &event))
-        aug_perrinfo(NULL, "aug_writeevent() failed");
+        aug_perrinfo(aug_tlx, "aug_writeevent() failed");
     return TRUE;
 }
 #endif /* _WIN32 */

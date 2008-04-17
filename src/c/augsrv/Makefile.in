@@ -60,7 +60,8 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsrv_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugsrv_la_OBJECTS = base.lo config.lo control.lo daemon.lo \
 	log.lo main.lo options.lo signal.lo types.lo
 libaugsrv_la_OBJECTS = $(am_libaugsrv_la_OBJECTS)
@@ -250,7 +251,8 @@ libaugsrv_la_LDFLAGS = \
 
 libaugsrv_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 TESTS = maintest
 maintest_SOURCES = maintest.c

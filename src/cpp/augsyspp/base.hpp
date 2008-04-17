@@ -7,47 +7,29 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
 
-#include "augsys/base.h"
-#include "augsys/errno.h"
-#include "augsys/string.h" // aug_strerror()
+#include "augctx/base.h"
 
-#include <iostream>
 #include <stdexcept>
 
 namespace aug {
 
-    namespace detail {
-
-        inline std::string
-        join(const std::string& lhs, const std::string& rhs)
-        {
-            std::string s(lhs);
-            s += ": ";
-            s += rhs;
-            return s;
-        }
-    }
-
     inline void
     init(aug_errinfo& errinfo)
     {
-        if (!aug_init(&errinfo))
-            throw std::runtime_error(detail::join("aug_init() failed",
-                                                  aug_strerror(errno)));
+        if (aug_init(&errinfo) < 0)
+            throw std::runtime_error("aug_init() failed");
     }
     inline void
     term()
     {
-        if (-1 == aug_term())
-            throw std::runtime_error(detail::join("aug_term() failed",
-                                                  aug_strerror(errno)));
+        if (aug_term() < 0)
+            throw std::runtime_error("aug_term() failed");
     }
     inline void
-    atexitinit(aug_errinfo& errinfo)
+    start()
     {
-        if (!aug_atexitinit(&errinfo))
-            throw std::runtime_error(detail::join("aug_atexitinit() failed",
-                                                  aug_strerror(errno)));
+        if (aug_start() < 0)
+            throw std::runtime_error("aug_start() failed");
     }
     inline void
     openfd(int fd, const aug_fdtype* fdtype)
@@ -105,13 +87,11 @@ namespace aug {
     public:
         ~scoped_init() AUG_NOTHROW
         {
-            if (-1 == aug_term())
-                std::cerr << "aug_term() failed\n";
+            aug_term();
         }
-        explicit
-        scoped_init(aug_errinfo& errinfo)
+        scoped_init()
         {
-            init(errinfo);
+            init();
         }
     };
 }
