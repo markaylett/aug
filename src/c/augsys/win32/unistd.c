@@ -71,6 +71,15 @@ aug_fclose(aug_fd fd)
     }
     return AUG_SUCCESS;
 }
+
+AUGSYS_API aug_result
+aug_fsetnonblock(aug_fd fd, aug_bool on)
+{
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
+                   AUG_MSG("aug_fsetnonblock() not supported"));
+    return AUG_FAILURE;
+}
+
 AUGSYS_API aug_fd
 aug_vfopen(const char* path, int flags, va_list args)
 {
@@ -157,14 +166,6 @@ aug_fwrite(aug_fd fd, const void* buf, size_t size)
         return -1;
     }
     return (ssize_t)ret;
-}
-
-AUGSYS_API aug_result
-aug_fsetnonblock(aug_fd fd, aug_bool on)
-{
-    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                   AUG_MSG("aug_fsetnonblock() not supported"));
-    return AUG_FAILURE;
 }
 
 AUGSYS_API aug_result

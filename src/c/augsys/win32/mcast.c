@@ -137,7 +137,7 @@ getifindex_(DWORD* index, const char* ifname)
 #endif /* HAVE_IPV6 */
 
 AUGSYS_API int
-aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
+aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
@@ -161,7 +161,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
         } else
             un.ipv4_.imr_interface.s_addr = htonl(INADDR_ANY);
 
-        return aug_setsockopt(s, IPPROTO_IP, IP_ADD_MEMBERSHIP, &un.ipv4_,
+        return aug_setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &un.ipv4_,
                               sizeof(un.ipv4_));
 #if HAVE_IPV6
     case AF_INET6:
@@ -179,7 +179,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
         } else
 			un.ipv6_.ipv6mr_interface = 0;
 
-        return aug_setsockopt(s, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,
+        return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,
                               &un.ipv6_, sizeof(un.ipv6_));
 #endif /* HAVE_IPV6 */
     }
@@ -189,7 +189,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 }
 
 AUGSYS_API int
-aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
+aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
@@ -213,7 +213,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
         } else
             un.ipv4_.imr_interface.s_addr = htonl(INADDR_ANY);
 
-        return aug_setsockopt(s, IPPROTO_IP, IP_DROP_MEMBERSHIP, &un.ipv4_,
+        return aug_setsockopt(sd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &un.ipv4_,
                               sizeof(un.ipv4_));
 #if HAVE_IPV6
     case AF_INET6:
@@ -231,7 +231,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
         } else
 			un.ipv6_.ipv6mr_interface = 0;
 
-        return aug_setsockopt(s, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
+        return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
                               &un.ipv6_, sizeof(un.ipv6_));
 #endif /* HAVE_IPV6 */
     }
@@ -241,7 +241,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 }
 
 AUGSYS_API int
-aug_setmcastif(int s, const char* ifname)
+aug_setmcastif(aug_sd sd, const char* ifname)
 {
     int af;
     union {
@@ -251,7 +251,7 @@ aug_setmcastif(int s, const char* ifname)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (-1 == (af = aug_getfamily(s)))
+    if (-1 == (af = aug_getfamily(sd)))
         return -1;
 
     switch (af) {
@@ -260,7 +260,7 @@ aug_setmcastif(int s, const char* ifname)
         if (-1 == getifaddr_(&un.ipv4_, ifname))
             return -1;
 
-        return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_IF, &un.ipv4_,
+        return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_IF, &un.ipv4_,
                               sizeof(un.ipv4_));
 #if HAVE_IPV6
     case AF_INET6:
@@ -268,7 +268,7 @@ aug_setmcastif(int s, const char* ifname)
         if (-1 == getifindex_(&un.ipv6_, ifname))
             return -1;
 
-        return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_IF,
+        return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_MULTICAST_IF,
                               &un.ipv6_, sizeof(un.ipv6_));
 #endif /* HAVE_IPV6 */
     }
@@ -278,9 +278,9 @@ aug_setmcastif(int s, const char* ifname)
 }
 
 AUGSYS_API int
-aug_setmcastloop(int s, int on)
+aug_setmcastloop(aug_sd sd, int on)
 {
-    int af = aug_getfamily(s);
+    int af = aug_getfamily(sd);
     if (-1 == af)
         return -1;
 
@@ -288,11 +288,11 @@ aug_setmcastloop(int s, int on)
 
     switch (af) {
     case AF_INET:
-        return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_LOOP, &on,
+        return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_LOOP, &on,
                               sizeof(on));
 #if HAVE_IPV6
     case AF_INET6:
-        return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
+        return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
                               &on, sizeof(on));
 #endif /* HAVE_IPV6 */
     }
@@ -302,9 +302,9 @@ aug_setmcastloop(int s, int on)
 }
 
 AUGSYS_API int
-aug_setmcastttl(int s, int ttl)
+aug_setmcastttl(aug_sd sd, int ttl)
 {
-    int af = aug_getfamily(s);
+    int af = aug_getfamily(sd);
     if (-1 == af)
         return -1;
 
@@ -312,11 +312,11 @@ aug_setmcastttl(int s, int ttl)
 
     switch (af) {
     case AF_INET:
-        return aug_setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
+        return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl,
                               sizeof(ttl));
 #if HAVE_IPV6
     case AF_INET6:
-        return aug_setsockopt(s, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+        return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
                               &ttl, sizeof(ttl));
 #endif /* HAVE_IPV6 */
     }

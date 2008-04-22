@@ -11,16 +11,9 @@
 namespace aug {
 
     inline timeval&
-    gettimeofday(timeval& tv, struct timezone& tz)
-    {
-        verify(aug_gettimeofday(&tv, &tz));
-        return tv;
-    }
-
-    inline timeval&
     gettimeofday(timeval& tv)
     {
-        verify(aug_gettimeofday(&tv, 0));
+        verify(gettimeofday(getclock(aug_tlx), &tv));
         return tv;
     }
 

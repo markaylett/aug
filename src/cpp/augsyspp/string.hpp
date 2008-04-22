@@ -4,7 +4,7 @@
 #ifndef AUGSYSPP_STRING_HPP
 #define AUGSYSPP_STRING_HPP
 
-#include "augsys/string.h"
+#include "augctx/string.h"
 
 #include <cctype>
 #include <functional>

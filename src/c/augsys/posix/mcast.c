@@ -16,7 +16,7 @@
 #endif /* HAVE_SYS_SOCKIO_H */
 
 static int
-getifaddr_(int s, struct in_addr* addr, const char* ifname)
+getifaddr_(aug_sd sd, struct in_addr* addr, const char* ifname)
 {
     struct ifreq ifreq;
     aug_strlcpy(ifreq.ifr_name, ifname, sizeof(ifreq.ifr_name));
@@ -41,7 +41,7 @@ getifindex_(unsigned* index, const char* ifname)
 }
 
 AUGSYS_API int
-aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
+aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
@@ -87,7 +87,7 @@ aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 }
 
 AUGSYS_API int
-aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
+aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
         struct ip_mreq ipv4_;
@@ -133,7 +133,7 @@ aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname)
 }
 
 AUGSYS_API int
-aug_setmcastif(int s, const char* ifname)
+aug_setmcastif(aug_sd sd, const char* ifname)
 {
     int af;
     union {
@@ -171,7 +171,7 @@ aug_setmcastif(int s, const char* ifname)
 }
 
 AUGSYS_API int
-aug_setmcastloop(int s, int on)
+aug_setmcastloop(aug_sd sd, int on)
 {
     int af;
     union {
@@ -202,7 +202,7 @@ aug_setmcastloop(int s, int on)
 }
 
 AUGSYS_API int
-aug_setmcastttl(int s, int ttl)
+aug_setmcastttl(aug_sd sd, int ttl)
 {
     int af;
     union {

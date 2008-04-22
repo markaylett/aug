@@ -7,6 +7,8 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
 
+#include "augsys/base.h"   // aug_getosfd()
+#include "augsys/unistd.h" // aug_fsize()
 #include "augsys/utility.h"
 
 namespace aug {
@@ -20,10 +22,10 @@ namespace aug {
      */
 
     inline size_t
-    filesize(fdref ref)
+    fsize(fdref ref)
     {
         size_t size;
-        verify(aug_filesize(ref.get(), &size));
+        verify(aug_fsize(aug_getosfd(ref.get()), &size));
         return size;
     }
 
@@ -38,26 +40,26 @@ namespace aug {
      * @return -1 on error.
      */
 
-    inline int
+    inline aug_result
     perrinfo(const char* s) AUG_NOTHROW
     {
-        return aug_perrinfo(0, s);
+        return aug_perrinfo(aug_tlx, s);
     }
 
     /**
      * Print last error.
      *
-     * @param errinfo User supplied error info.
+     * @param ctx Context.
      *
      * @param s String to be prepended.
      *
      * @return -1 on error.
      */
 
-    inline int
-    perrinfo(const aug_errinfo& errinfo, const char* s) AUG_NOTHROW
+    inline aug_result
+    perrinfo(aug_ctx* ctx, const char* s) AUG_NOTHROW
     {
-        return aug_perrinfo(&errinfo, s);
+        return aug_perrinfo(ctx, s);
     }
 
     /**
@@ -95,7 +97,7 @@ namespace aug {
     inline void
     setnonblock(fdref ref, bool on)
     {
-        verify(aug_setnonblock(ref.get(), on ? 1 : 0));
+        verify(aug_fsetnonblock(aug_getosfd(ref.get()), on ? 1 : 0));
     }
 }
 

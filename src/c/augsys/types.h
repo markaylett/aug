@@ -14,9 +14,18 @@ typedef unsigned aug_len_t;
 
 #if !defined(_WIN32)
 typedef int aug_fd;
+typedef int aug_sd;
+# define AUG_BADFD (-1)
+# define AUG_BADSD (-1)
 #else /* _WIN32 */
-typedef void* aug_fd;
+#include <winsock2.h>
+typedef HANDLE aug_fd;
+typedef SOCKET aug_sd;
+# define AUG_BADFD INVALID_HANDLE_VALUE
+# define AUG_BADSD INVALID_SOCKET
 #endif /* _WIN32 */
-#define AUG_BADFD ((aug_fd)-1)
+
+typedef aug_sd aug_md;
+#define AUG_BADMD AUG_BADSD
 
 #endif /* AUGSYS_TYPES_H */

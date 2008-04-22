@@ -70,32 +70,40 @@ namespace aug {
         }
     };
 
-    template <int srcT, typename baseT = errinfo_error>
-    class basic_error : public baseT {
+    class aug_error : public errinfo_error {
     public:
-        basic_error()
+        aug_error()
         {
         }
-        basic_error(const char* file, int line, int num, const char* format,
-                    va_list args)
+        aug_error(const char* file, int line, int num, const char* format,
+                  va_list args)
         {
-            aug_vseterrinfo(cptr(*this), file, line, srcT, num, format,
+            aug_vseterrinfo(cptr(*this), file, line, "aug", num, format,
                             args);
         }
-        basic_error(const char* file, int line, int num, const char* format,
-                    ...)
+        aug_error(const char* file, int line, int num, const char* format,
+                  ...)
         {
             va_list args;
             va_start(args, format);
-            aug_vseterrinfo(cptr(*this), file, line, srcT, num, format,
+            aug_vseterrinfo(cptr(*this), file, line, "aug", num, format,
                             args);
             va_end(args);
         }
     };
 
-    typedef basic_error<AUG_SRCLOCAL> local_error;
-
     class system_error : public errinfo_error { };
+
+    class dlfcn_error : public system_error {
+    public:
+        dlfcn_error()
+        {
+        }
+        dlfcn_error(const char* file, int line, const char* desc)
+        {
+            aug_seterrinfo(cptr(*this), file, line, "dlfcn", 1, desc);
+        }
+    };
 
     class posix_error : public system_error {
     public:
@@ -121,34 +129,31 @@ namespace aug {
     };
 #endif // _WIN32
 
-    class dlfcn_error : public system_error {
-    public:
-        dlfcn_error()
-        {
-        }
-        dlfcn_error(const char* file, int line, const char* desc)
-        {
-            aug_seterrinfo(cptr(*this), file, line, AUG_SRCDLFCN, 1, desc);
-        }
-    };
-
     inline void
     fail()
     {
-        switch (aug_errsrc) {
-        case AUG_SRCLOCAL:
-            throw local_error();
-        case AUG_SRCPOSIX:
-            throw posix_error();
+        const char* src = errsrc(*aug_tlerr);
+        switch (src[0]) {
+        case 'a':
+            if (0 == strcmp(src + 1, "ug"))
+                throw aug_error();
+            break;
+        case 'd':
+            if (0 == strcmp(src + 1, "lfcn"))
+                throw dlfcn_error();
+            break;
+        case 'p':
+            if (0 == strcmp(src + 1, "osix"))
+                throw posix_error();
+            break;
+        case 'w':
 #if defined(_WIN32)
-        case AUG_SRCWIN32:
-            throw win32_error();
+            if (0 == strcmp(src + 1, "in32"))
+                throw win32_error();
 #endif // _WIN32
-        case AUG_SRCDLFCN:
-            throw dlfcn_error();
-        default:
-            throw errinfo_error();
+            break;
         }
+        throw errinfo_error();
     }
 
     namespace detail {
@@ -158,7 +163,7 @@ namespace aug {
             static T
             verify(T result)
             {
-                if (-1 == result)
+                if (result < 0)
                     fail();
                 return result;
             }
@@ -205,11 +210,11 @@ namespace aug {
         e.seterrinfo();                                                 \
         aug_perrinfo(&e.errinfo(), "aug::errinfo_error");               \
     } catch (const std::exception& e) {                                 \
-        aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
                        AUG_EEXCEPT, e.what());                          \
         aug_perrinfo(0, "std::exception");                              \
     } catch (...) {                                                     \
-        aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
                        AUG_EEXCEPT, "no description available");        \
         aug_perrinfo(0, "unknown");                                     \
     } do { } while (0)
@@ -218,10 +223,10 @@ namespace aug {
     catch (const aug::errinfo_error& e) {                               \
         e.seterrinfo();                                                 \
     } catch (const std::exception& e) {                                 \
-        aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
                        AUG_EEXCEPT, e.what());                          \
     } catch (...) {                                                     \
-        aug_seterrinfo(0, __FILE__, __LINE__, AUG_SRCLOCAL,             \
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
                        AUG_EEXCEPT, "no description available");        \
     } do { } while (0)
 

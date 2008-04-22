@@ -8,6 +8,8 @@
 
 #include "augnullpp.hpp"
 
+#include "augsys/types.h"
+
 namespace aug {
 
     // Helper functions for types that encapsulate c value types.
@@ -40,62 +42,127 @@ namespace aug {
         return &static_cast<typename T::ctype&>(x);
     }
 
-    class idref {
-        int id_;
+    template <typename T>
+    class basic_ref {
+        typename T::ref ref_;
     public:
-        idref(const null_&) AUG_NOTHROW
-        : id_(-1)
+        basic_ref(const null_&) AUG_NOTHROW
+        : ref_(T::bad())
         {
         }
-        idref(int id) AUG_NOTHROW
-        : id_(id)
+        basic_ref(typename T::ref ref) AUG_NOTHROW
+        : ref_(ref)
         {
         }
-        int
+        typename T::ref
         get() const AUG_NOTHROW
         {
-            return id_;
+            return ref_;
         }
     };
 
-    inline bool
-    operator ==(idref lhs, idref rhs)
+    template <typename T>
+    bool
+    operator ==(basic_ref<T> lhs, basic_ref<T> rhs)
     {
-        return lhs.get() == rhs.get();
+        return 0 == T::compare(lhs.get(), rhs.get());
     }
-    inline bool
-    operator !=(idref lhs, idref rhs)
+    template <typename T>
+    bool
+    operator !=(basic_ref<T> lhs, basic_ref<T> rhs)
     {
-        return lhs.get() != rhs.get();
+        return 0 != T::compare(lhs.get(), rhs.get());
     }
-    inline bool
-    operator >=(idref lhs, idref rhs)
+    template <typename T>
+    bool
+    operator >=(basic_ref<T> lhs, basic_ref<T> rhs)
     {
-        return lhs.get() >= rhs.get();
+        return 0 <= T::compare(lhs.get(), rhs.get());
     }
-    inline bool
-    operator >(idref lhs, idref rhs)
+    template <typename T>
+    bool
+    operator >(basic_ref<T> lhs, basic_ref<T> rhs)
     {
-        return lhs.get() > rhs.get();
+        return 0 < T::compare(lhs.get(), rhs.get());
     }
-    inline bool
-    operator <=(idref lhs, idref rhs)
+    template <typename T>
+    bool
+    operator <=(basic_ref<T> lhs, basic_ref<T> rhs)
     {
-        return lhs.get() <= rhs.get();
+        return T::compare(lhs.get(), rhs.get()) <= 0;
     }
-    inline bool
-    operator <(idref lhs, idref rhs)
+    template <typename T>
+    bool
+    operator <(basic_ref<T> lhs, basic_ref<T> rhs)
     {
-        return lhs.get() < rhs.get();
+        return T::compare(lhs.get(), rhs.get()) < 0;
     }
 
-    typedef idref fdref;
+    struct id_traits {
+        typedef int ref;
+        static int
+        bad() AUG_NOTHROW
+        {
+            return -1;
+        }
+        static int
+        compare(int lhs, int rhs) AUG_NOTHROW
+        {
+            if (lhs < rhs)
+                return -1;
+            if (rhs < lhs)
+                return 1;
+            return 0;
+        }
+    };
+
+    struct fd_traits {
+        typedef aug_fd ref;
+        static aug_fd
+        bad() AUG_NOTHROW
+        {
+            return AUG_BADFD;
+        }
+        static int
+        compare(aug_fd lhs, aug_fd rhs) AUG_NOTHROW
+        {
+            if (lhs < rhs)
+                return -1;
+            if (rhs < lhs)
+                return 1;
+            return 0;
+        }
+    };
+
+    struct sd_traits {
+        typedef aug_sd ref;
+        static aug_sd
+        bad() AUG_NOTHROW
+        {
+            return AUG_BADSD;
+        }
+        static int
+        compare(aug_sd lhs, aug_sd rhs) AUG_NOTHROW
+        {
+            if (lhs < rhs)
+                return -1;
+            if (rhs < lhs)
+                return 1;
+            return 0;
+        }
+    };
+
+    typedef basic_ref<int> idref;
+    typedef basic_ref<aug_fd> fdref;
+    typedef basic_ref<aug_sd> sdref;
+    typedef basic_ref<aug_sd> mdref;
 }
 
-inline bool
-isnull(aug::idref ref)
+template <typename T>
+bool
+isnull(aug::basic_ref<T> ref)
 {
-    return -1 == ref.get();
+    return T::bad() == ref.get();
 }
 
 #endif // AUGSYSPP_TYPES_HPP

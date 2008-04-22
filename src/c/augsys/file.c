@@ -94,11 +94,16 @@ file_setnonblock_(aug_file* obj, aug_bool on)
     return aug_fsetnonblock(impl->fd_, on);
 }
 
-static aug_fd
-file_getfd_(aug_file* obj)
+static aug_md
+file_getmd_(aug_file* obj)
 {
+#if !defined(_WIN32)
     struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
     return impl->fd_;
+#else /* _WIN32 */
+    return AUG_BADMD;
+#endif /* _WIN32 */
+
 }
 
 static const struct aug_filevtbl file_vtbl_ = {
@@ -107,7 +112,7 @@ static const struct aug_filevtbl file_vtbl_ = {
     file_release_,
     file_close_,
     file_setnonblock_,
-    file_getfd_
+    file_getmd_
 };
 
 static void*
@@ -169,29 +174,21 @@ static const struct aug_streamvtbl stream_vtbl_ = {
     stream_writev_
 };
 
-static aug_file*
-vcreatefile_(const char* path, int flags, va_list args)
+AUGSYS_API aug_file*
+aug_attachfd(aug_mpool* mpool, aug_fd fd)
 {
-    aug_mpool* mpool = aug_getmpool(aug_tlx);
     struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
-    aug_fd fd;
-
-    if (!impl) {
-        aug_release(mpool);
+    if (!impl)
         return NULL;
-    }
-
-    if (AUG_BADFD == (fd = aug_vfopen(path, flags, args))) {
-        aug_free(mpool, impl);
-        aug_release(mpool);
-        return NULL;
-    }
 
     impl->file_.vtbl_ = &file_vtbl_;
     impl->file_.impl_ = NULL;
     impl->stream_.vtbl_ = &stream_vtbl_;
     impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
+
+    aug_retain(mpool);
+
     impl->mpool_ = mpool;
     impl->fd_ = fd;
 
@@ -199,12 +196,7 @@ vcreatefile_(const char* path, int flags, va_list args)
 }
 
 AUGSYS_API aug_file*
-aug_createfile(const char* path, int flags, ...)
+aug_attachsd(aug_mpool* mpool, aug_sd sd)
 {
-    aug_file* file;
-    va_list args;
-    va_start(args, flags);
-    file = vcreatefile_(path, flags, args);
-    va_end(args);
-    return file;
+    return NULL;
 }

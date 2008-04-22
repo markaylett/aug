@@ -112,7 +112,7 @@ aug_destroymuxer(aug_muxer_t muxer)
 }
 
 AUGSYS_API int
-aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask)
+aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
     struct pollfd* ptr;
 
@@ -165,13 +165,13 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 }
 
 AUGSYS_API int
-aug_fdeventmask(aug_muxer_t muxer, int fd)
+aug_fdeventmask(aug_muxer_t muxer, aug_md md)
 {
     return external_(muxer->pollfds_[fd].events);
 }
 
 AUGSYS_API int
-aug_fdevents(aug_muxer_t muxer, int fd)
+aug_fdevents(aug_muxer_t muxer, aug_md md)
 {
     return external_(muxer->pollfds_[fd].revents);
 }
@@ -197,7 +197,7 @@ zeroset_(struct set_* p)
 }
 
 static unsigned short
-external_(struct set_* p, int fd)
+external_(struct set_* p, aug_md md)
 {
     unsigned short dst = 0;
 
@@ -214,7 +214,7 @@ external_(struct set_* p, int fd)
 }
 
 static void
-setfdevents_(struct set_* p, int fd, unsigned short mask)
+setfdevents_(struct set_* p, aug_md md, unsigned short mask)
 {
     unsigned short cur = external_(p, fd);
     unsigned short set = ~cur & mask;
@@ -262,7 +262,7 @@ aug_destroymuxer(aug_muxer_t muxer)
 }
 
 AUGSYS_API int
-aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask)
+aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
     if (FD_SETSIZE <= fd) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, EMFILE);
@@ -315,13 +315,13 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 }
 
 AUGSYS_API int
-aug_fdeventmask(aug_muxer_t muxer, int fd)
+aug_fdeventmask(aug_muxer_t muxer, aug_md md)
 {
     return external_(&muxer->in_, fd);
 }
 
 AUGSYS_API int
-aug_fdevents(aug_muxer_t muxer, int fd)
+aug_fdevents(aug_muxer_t muxer, aug_md md)
 {
     return external_(&muxer->out_, fd);
 }
@@ -329,7 +329,13 @@ aug_fdevents(aug_muxer_t muxer, int fd)
 #endif /* !HAVE_POLL */
 
 AUGSYS_API int
-aug_muxerpipe(int fds[2])
+aug_mclose(aug_md md)
+{
+    return aug_fclose(md);
+}
+
+AUGSYS_API int
+aug_muxerpipe(aug_md mds[2])
 {
     return aug_pipe(fds);
 }

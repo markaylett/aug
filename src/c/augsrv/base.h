@@ -7,6 +7,8 @@
 #include "augsrv/config.h"
 #include "augsrv/types.h"
 
+#include "augsys/types.h"
+
 #if defined(AUGSRV_BUILD)
 AUG_EXTERNC void
 aug_setservice_(const struct aug_service* service, void* arg);
@@ -31,14 +33,14 @@ aug_termservice(void);
  * Read-end of event pipe.
  */
 
-AUGSRV_API int
+AUGSRV_API aug_md
 aug_eventrd(void);
 
 /**
  * Write-end of event pipe.
  */
 
-AUGSRV_API int
+AUGSRV_API aug_md
 aug_eventwr(void);
 
 #endif /* AUGSRV_BASE_H */

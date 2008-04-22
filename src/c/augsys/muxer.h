@@ -11,6 +11,7 @@
  */
 
 #include "augsys/config.h"
+#include "augsys/types.h"
 
 #define AUG_FDEVENTRD    0x1
 #define AUG_FDEVENTWR    0x2
@@ -29,7 +30,7 @@ AUGSYS_API int
 aug_destroymuxer(aug_muxer_t muxer);
 
 AUGSYS_API int
-aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask);
+aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
 
 /**
  * @return Either positive if events have been signalled, zero on timeout, or
@@ -44,10 +45,13 @@ AUGSYS_API int
 aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout);
 
 AUGSYS_API int
-aug_fdeventmask(aug_muxer_t muxer, int fd);
+aug_fdeventmask(aug_muxer_t muxer, aug_md md);
 
 AUGSYS_API int
-aug_fdevents(aug_muxer_t muxer, int fd);
+aug_fdevents(aug_muxer_t muxer, aug_md md);
+
+AUGSYS_API int
+aug_mclose(aug_md md);
 
 /**
  * Creates a pipe or socket-pair suitable for use with muxer.  On Windows,
@@ -58,6 +62,6 @@ aug_fdevents(aug_muxer_t muxer, int fd);
  */
 
 AUGSYS_API int
-aug_muxerpipe(int fds[2]);
+aug_muxerpipe(aug_md mds[2]);
 
 #endif /* AUGSYS_MUXER_H */

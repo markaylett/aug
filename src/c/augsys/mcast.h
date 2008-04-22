@@ -24,18 +24,19 @@
 #endif /* !AUG_PACKETSIZE */
 
 AUGSYS_API int
-aug_joinmcast(int s, const struct aug_inetaddr* addr, const char* ifname);
+aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname);
 
 AUGSYS_API int
-aug_leavemcast(int s, const struct aug_inetaddr* addr, const char* ifname);
+aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr,
+               const char* ifname);
 
 AUGSYS_API int
-aug_setmcastif(int s, const char* ifname);
+aug_setmcastif(aug_sd sd, const char* ifname);
 
 AUGSYS_API int
-aug_setmcastloop(int s, int on);
+aug_setmcastloop(aug_sd sd, int on);
 
 AUGSYS_API int
-aug_setmcastttl(int s, int ttl);
+aug_setmcastttl(aug_sd sd, int ttl);
 
 #endif /* AUGSYS_MCAST_H */

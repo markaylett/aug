@@ -34,6 +34,9 @@
 AUGSYS_API aug_result
 aug_fclose(aug_fd fd);
 
+AUGSYS_API aug_result
+aug_fsetnonblock(aug_fd fd, aug_bool on);
+
 AUGSYS_API aug_fd
 aug_vfopen(const char* path, int flags, va_list args);
 
@@ -48,9 +51,6 @@ aug_fread(aug_fd fd, void* buf, size_t size);
 
 AUGSYS_API ssize_t
 aug_fwrite(aug_fd fd, const void* buf, size_t size);
-
-AUGSYS_API aug_result
-aug_fsetnonblock(aug_fd fd, aug_bool on);
 
 AUGSYS_API aug_result
 aug_fsync(aug_fd fd);

@@ -4,7 +4,9 @@
 #ifndef AUGSYSPP_SMARTPTR_HPP
 #define AUGSYSPP_SMARTPTR_HPP
 
-#include "augsyspp/lock.hpp"
+#include "augsyspp/config.hpp"
+
+#include "augnullpp.hpp"
 
 #include <algorithm> // swap()
 
@@ -27,21 +29,20 @@ namespace aug {
         struct cast_tag { };
     }
 
-    template <typename T, typename U = null_>
+    template <typename T>
     class smartptr {
 
-        template <typename V, typename W>
+        template <typename U>
         friend void
-        release(smartptr<V, W>&);
+        release(smartptr<U>&);
 
-        template <typename V, typename W>
+        template <typename U>
         friend void
-        retain(smartptr<V, W>&);
+        retain(smartptr<U>&);
 
-        template <typename V, typename W>
+        template <typename U>
         friend class smartptr;
 
-        typedef U scoped_lock;
         T* ptr_;
         unsigned* refs_;
 
@@ -50,18 +51,12 @@ namespace aug {
         {
             T* ptr(0);
             unsigned* refs(0);
-            {
-                scoped_lock lock;
-                if (!ptr_ || 0 < --*refs_)
-                    return;
 
-                std::swap(ptr_, ptr);
-                std::swap(refs_, refs);
-            }
+            if (!ptr_ || 0 < --*refs_)
+                return;
 
-            /**
-             * Release lock before deleting: ~T() may use aug_lock().
-             */
+            std::swap(ptr_, ptr);
+            std::swap(refs_, refs);
 
             delete ptr;
             delete refs;
@@ -69,7 +64,6 @@ namespace aug {
         void
         retain()
         {
-            scoped_lock lock;
             if (ptr_)
                 ++*refs_;
         }
@@ -96,16 +90,15 @@ namespace aug {
         {
             retain();
         }
-        template <typename V, typename W>
-        smartptr(const smartptr<V, W>& rhs) AUG_NOTHROW
+        template <typename U>
+        smartptr(const smartptr<U>& rhs) AUG_NOTHROW
         :   ptr_(rhs.ptr_),
             refs_(rhs.refs_)
         {
             retain();
         }
-        template <typename V, typename W>
-        smartptr(const smartptr<V, W>& rhs,
-                 const detail::cast_tag&) AUG_NOTHROW
+        template <typename U>
+        smartptr(const smartptr<U>& rhs, const detail::cast_tag&) AUG_NOTHROW
         :   ptr_(dynamic_cast<T*>(rhs.ptr_)),
             refs_(ptr_ ? rhs.refs_ : 0)
         {
@@ -124,9 +117,9 @@ namespace aug {
             swap(sptr);
             return *this;
         }
-        template <typename V, typename W>
+        template <typename U>
         smartptr&
-        operator =(const smartptr<V, W>& rhs) AUG_NOTHROW
+        operator =(const smartptr<U>& rhs) AUG_NOTHROW
         {
             smartptr sptr(rhs);
             swap(sptr);
@@ -141,62 +134,50 @@ namespace aug {
         void
         swap(smartptr& rhs) AUG_NOTHROW
         {
-            scoped_lock lock;
             std::swap(ptr_, rhs.ptr_);
             std::swap(refs_, rhs.refs_);
         }
         unsigned
         refs() const
         {
-            scoped_lock lock;
             return *refs_;
         }
         T*
         get() const AUG_NOTHROW
         {
-            scoped_lock lock;
             return ptr_;
         }
         T&
-        operator*() const AUG_NOTHROW
+        operator *() const AUG_NOTHROW
         {
-            scoped_lock lock;
             return *ptr_;
         }
         T*
-        operator->() const AUG_NOTHROW
+        operator ->() const AUG_NOTHROW
         {
-            scoped_lock lock;
             return ptr_;
         }
     };
 
-    template <typename T, typename U>
+    template <typename T>
     void
-    retain(smartptr<T, U>& sptr)
+    retain(smartptr<T>& sptr)
     {
         sptr.retain();
     }
 
-    template <typename T, typename U>
+    template <typename T>
     void
-    release(smartptr<T, U>& sptr)
+    release(smartptr<T>& sptr)
     {
         sptr.release();
     }
 
-    template <typename T, typename U, typename V, typename W>
-    smartptr<T, U>
-    smartptr_cast(const smartptr<V, W>& sptr)
+    template <typename T, typename U>
+    smartptr<T>
+    smartptr_cast(const smartptr<U>& sptr)
     {
-        return smartptr<T, U>(sptr, detail::cast_tag());
-    }
-
-    template <typename T, typename U, typename V>
-    smartptr<T, U>
-    smartptr_cast(const smartptr<V, U>& sptr)
-    {
-        return smartptr<T, U>(sptr, detail::cast_tag());
+        return smartptr<T>(sptr, detail::cast_tag());
     }
 
 #if defined(_MSC_VER)
@@ -204,9 +185,9 @@ namespace aug {
 #endif // _MSC_VER
 }
 
-template <typename T, typename U>
+template <typename T>
 bool
-isnull(const aug::smartptr<T, U>& sptr)
+isnull(const aug::smartptr<T>& sptr)
 {
     return 0 == sptr.get();
 }

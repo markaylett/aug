@@ -3,6 +3,8 @@
   <quotincl>augsys/config.h</quotincl>
   <quotincl>augsys/types.h</quotincl>
 
+  <quotincl>augctx/mpool.h</quotincl>
+
   <quotincl>augtypes.h</quotincl>
 
   <interface name="file">
@@ -13,13 +15,16 @@
       <param name="on" type="aug_bool"/>
     </method>
 
-    <method name="getfd" type="aug_fd" qname="getfd"/>
+    <method name="getmd" type="aug_md" qname="getmd"/>
 
   </interface>
 
   <verbatim>
 AUGSYS_API aug_file*
-aug_createfile(const char* path, int flags, ...);
+aug_attachfd(aug_mpool* mpool, aug_fd fd);
+
+AUGSYS_API aug_file*
+aug_attachsd(aug_mpool* mpool, aug_sd sd);
   </verbatim>
 
 </package>

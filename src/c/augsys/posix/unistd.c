@@ -15,6 +15,28 @@ aug_fclose(aug_fd fd)
     return AUG_SUCCESS;
 }
 
+AUGSYS_API aug_result
+aug_fsetnonblock(aug_fd fd, aug_bool on)
+{
+    int flags = fcntl(fd, F_GETFL);
+    if (-1 == flags) {
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return AUG_FAILURE;
+    }
+
+    if (on)
+        flags |= O_NONBLOCK;
+    else
+        flags &= ~O_NONBLOCK;
+
+    if (-1 == fcntl(fd, F_SETFL, flags)) {
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return AUG_FAILURE;
+    }
+
+    return AUG_SUCCESS;
+}
+
 AUGSYS_API aug_fd
 aug_vfopen(const char* path, int flags, va_list args)
 {
@@ -74,28 +96,6 @@ aug_fwrite(aug_fd fd, const void* buf, size_t size)
         return -1;
     }
     return ret;
-}
-
-AUGSYS_API aug_result
-aug_fsetnonblock(aug_fd fd, aug_bool on)
-{
-    int flags = fcntl(fd, F_GETFL);
-    if (-1 == flags) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
-    }
-
-    if (on)
-        flags |= O_NONBLOCK;
-    else
-        flags &= ~O_NONBLOCK;
-
-    if (-1 == fcntl(fd, F_SETFL, flags)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
-    }
-
-    return AUG_SUCCESS;
 }
 
 AUGSYS_API aug_result

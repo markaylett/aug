@@ -13,6 +13,8 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
+#include "augtypes.h"
+
 #if !defined(_WIN32)
 # include <sys/socket.h>
 # include <netinet/in.h>
@@ -33,6 +35,8 @@
 typedef int socklen_t;
 # endif /* socklen_t */
 #endif /* _WIN32 */
+
+struct iovec;
 
 /**
  * Maximum sockaddr size.
@@ -91,14 +95,20 @@ struct aug_inetaddr {
     } un_;
 };
 
-AUGSYS_API int
+AUGSYS_API aug_result
+aug_sclose(aug_sd sd);
+
+AUGSYS_API aug_result
+aug_ssetnonblock(aug_sd sd, aug_bool on);
+
+AUGSYS_API aug_sd
 aug_socket(int domain, int type, int protocol);
 
 AUGSYS_API int
-aug_accept(int s, struct aug_endpoint* ep);
+aug_accept(aug_sd sd, struct aug_endpoint* ep);
 
 AUGSYS_API int
-aug_bind(int s, const struct aug_endpoint* ep);
+aug_bind(aug_sd sd, const struct aug_endpoint* ep);
 
 /**
  * Remember that, for non-blocking sockets, connect() may fail with
@@ -107,37 +117,43 @@ aug_bind(int s, const struct aug_endpoint* ep);
  */
 
 AUGSYS_API int
-aug_connect(int s, const struct aug_endpoint* ep);
+aug_connect(aug_sd sd, const struct aug_endpoint* ep);
 
 AUGSYS_API struct aug_endpoint*
-aug_getpeername(int s, struct aug_endpoint* ep);
+aug_getpeername(aug_sd sd, struct aug_endpoint* ep);
 
 AUGSYS_API struct aug_endpoint*
-aug_getsockname(int s, struct aug_endpoint* ep);
+aug_getsockname(aug_sd sd, struct aug_endpoint* ep);
 
 AUGSYS_API int
-aug_listen(int s, int backlog);
+aug_listen(aug_sd sd, int backlog);
 
 AUGSYS_API ssize_t
-aug_recv(int s, void* buf, size_t len, int flags);
+aug_recv(aug_sd sd, void* buf, size_t len, int flags);
 
 AUGSYS_API ssize_t
-aug_recvfrom(int s, void* buf, size_t len, int flags,
+aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
              struct aug_endpoint* ep);
 
 AUGSYS_API ssize_t
-aug_send(int s, const void* buf, size_t len, int flags);
+aug_send(aug_sd sd, const void* buf, size_t len, int flags);
 
 AUGSYS_API ssize_t
-aug_sendto(int s, const void* buf, size_t len, int flags,
+aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
            const struct aug_endpoint* ep);
 
+AUGSYS_API ssize_t
+aug_sreadv(aug_sd sd, const struct iovec* iov, int size);
+
+AUGSYS_API ssize_t
+aug_swritev(aug_sd sd, const struct iovec* iov, int size);
+
 AUGSYS_API int
-aug_getsockopt(int s, int level, int optname, void* optval,
+aug_getsockopt(aug_sd sd, int level, int optname, void* optval,
                socklen_t* optlen);
 
 AUGSYS_API int
-aug_setsockopt(int s, int level, int optname, const void* optval,
+aug_setsockopt(aug_sd sd, int level, int optname, const void* optval,
                socklen_t optlen);
 
 /**
@@ -148,10 +164,10 @@ aug_setsockopt(int s, int level, int optname, const void* optval,
  */
 
 AUGSYS_API int
-aug_shutdown(int s, int how);
+aug_shutdown(aug_sd sd, int how);
 
 AUGSYS_API int
-aug_socketpair(int domain, int type, int protocol, int sv[2]);
+aug_socketpair(int domain, int type, int protocol, aug_sd sv[2]);
 
 AUGSYS_API char*
 aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len);
@@ -184,10 +200,10 @@ aug_getaddrinfo(const char* host, const char* serv,
                 const struct addrinfo* hints, struct addrinfo** res);
 
 AUGSYS_API int
-aug_getfamily(int s);
+aug_getfamily(aug_sd sd);
 
 AUGSYS_API int
-aug_setreuseaddr(int s, int on);
+aug_setreuseaddr(aug_sd sd, int on);
 
 AUGSYS_API struct aug_endpoint*
 aug_getendpoint(const struct addrinfo* addr, struct aug_endpoint* ep);

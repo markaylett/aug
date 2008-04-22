@@ -35,7 +35,7 @@ AUG_RCSID("$Id$");
 
 static struct aug_service service_ = { 0 };
 static void* arg_ = NULL;
-static int fds_[2] = { -1, -1 };
+static aug_md mds_[2] = { AUG_BADMD, AUG_BADMD };
 
 /* closepipe_() should not be called from an atexit() handler: on Windows, the
    pipe is implemented as a socket pair.  The c-runtime may terminate the
@@ -44,16 +44,16 @@ static int fds_[2] = { -1, -1 };
 static void
 closepipe_(void)
 {
-    if (-1 != fds_[0])
-        if (-1 == aug_fclose(aug_getosfd(fds_[0])))
-            aug_perrinfo(aug_tlx, "aug_fclose() failed");
+    if (AUG_BADMD != mds_[0])
+        if (-1 == aug_mclose(mds_[0]))
+            aug_perrinfo(aug_tlx, "aug_mclose() failed");
 
-    if (-1 != fds_[1])
-        if (-1 == aug_fclose(aug_getosfd(fds_[1])))
-            aug_perrinfo(aug_tlx, "aug_fclose() failed");
+    if (AUG_BADMD != mds_[1])
+        if (-1 == aug_mclose(mds_[1]))
+            aug_perrinfo(aug_tlx, "aug_mclose() failed");
 
-    fds_[0] = -1;
-    fds_[1] = -1;
+    mds_[0] = AUG_BADMD;
+    mds_[1] = AUG_BADMD;
 }
 
 static void
@@ -61,7 +61,7 @@ signalhandler_(int sig)
 {
     struct aug_event event;
     aug_ctxinfo(aug_tlx, "handling signal interrupt");
-    if (!aug_writeevent(fds_[1], aug_setsigevent(&event, sig)))
+    if (!aug_writeevent(mds_[1], aug_setsigevent(&event, sig)))
         aug_perrinfo(aug_tlx, "aug_writeevent() failed");
 }
 
@@ -71,7 +71,7 @@ ctrlhandler_(DWORD ctrl)
 {
     struct aug_event event = { AUG_EVENTSTOP, NULL };
     aug_ctxinfo(aug_tlx, "handling console interrupt");
-    if (!aug_writeevent(fds_[1], &event))
+    if (!aug_writeevent(mds_[1], &event))
         aug_perrinfo(aug_tlx, "aug_writeevent() failed");
     return TRUE;
 }
@@ -80,14 +80,14 @@ ctrlhandler_(DWORD ctrl)
 static int
 openpipe_(void)
 {
-    int fds[2];
-    assert(-1 == fds_[0] && -1 == fds_[1]);
+    aug_md mds[2];
+    assert(AUG_BADMD == mds_[0] && AUG_BADMD == mds_[1]);
 
-    if (-1 == aug_muxerpipe(fds))
+    if (-1 == aug_muxerpipe(mds))
         return -1;
 
-    fds_[0] = fds[0];
-    fds_[1] = fds[1];
+    mds_[0] = mds[0];
+    mds_[1] = mds[1];
 
     if (-1 == aug_signalhandler(signalhandler_)) {
         closepipe_();
@@ -151,21 +151,21 @@ aug_runservice(void)
 AUGSRV_API void
 aug_termservice(void)
 {
-    if (-1 != fds_[0]) {
+    if (-1 != mds_[0]) {
         assert(service_.term_);
         service_.term_(arg_);
         closepipe_();
     }
 }
 
-AUGSRV_API int
+AUGSRV_API aug_md
 aug_eventrd(void)
 {
-    return fds_[0];
+    return mds_[0];
 }
 
-AUGSRV_API int
+AUGSRV_API aug_md
 aug_eventwr(void)
 {
-    return fds_[1];
+    return mds_[1];
 }

@@ -54,9 +54,9 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libaugsyspp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugsyspp_la_OBJECTS = base.lo config.lo dlfcn.lo endpoint.lo \
-	errinfo.lo exception.lo inetaddr.lo lock.lo mcast.lo mmap.lo \
-	mutex.lo muxer.lo smartfd.lo smartptr.lo socket.lo string.lo \
-	time.lo types.lo unistd.lo utility.lo
+	errinfo.lo exception.lo inetaddr.lo mcast.lo mmap.lo muxer.lo \
+	smartfd.lo smartptr.lo socket.lo string.lo time.lo types.lo \
+	unistd.lo utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
 am_exceptiontest_OBJECTS = exceptiontest.$(OBJEXT)
 exceptiontest_OBJECTS = $(am_exceptiontest_OBJECTS)
@@ -242,10 +242,8 @@ modinclude_HEADERS = \
 	errinfo.hpp \
 	exception.hpp \
 	inetaddr.hpp \
-	lock.hpp \
 	mcast.hpp \
 	mmap.hpp \
-	mutex.hpp \
 	muxer.hpp \
 	smartfd.hpp \
 	smartptr.hpp \
@@ -265,10 +263,8 @@ libaugsyspp_la_SOURCES = \
 	errinfo.cpp \
 	exception.cpp \
 	inetaddr.cpp \
-	lock.cpp \
 	mcast.cpp \
 	mmap.cpp \
-	mutex.cpp \
 	muxer.cpp \
 	smartfd.cpp \
 	smartptr.cpp \
@@ -389,12 +385,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exceptiontest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inetaddr.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexertest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartfd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartptr.Plo@am__quote@

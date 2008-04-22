@@ -113,7 +113,7 @@ aug_destroymuxer(aug_muxer_t muxer)
 }
 
 AUGSYS_API int
-aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask)
+aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
     if (FD_SETSIZE == muxer->out_.rd_.fd_count) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEMFILE);
@@ -126,7 +126,7 @@ aug_setfdeventmask(aug_muxer_t muxer, int fd, unsigned short mask)
         return -1;
     }
 
-    muxer->bits_ += setfdevents_(&muxer->in_, _get_osfhandle(fd), mask);
+    muxer->bits_ += setfdevents_(&muxer->in_, md, mask);
     return 0;
 }
 
@@ -154,26 +154,25 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 }
 
 AUGSYS_API int
-aug_fdeventmask(aug_muxer_t muxer, int fd)
+aug_fdeventmask(aug_muxer_t muxer, aug_md md)
 {
-    return external_(&muxer->in_, _get_osfhandle(fd));
+    return external_(&muxer->in_, md);
 }
 
 AUGSYS_API int
-aug_fdevents(aug_muxer_t muxer, int fd)
+aug_fdevents(aug_muxer_t muxer, aug_md md)
 {
-    return external_(&muxer->out_, _get_osfhandle(fd));
+    return external_(&muxer->out_, md);
 }
 
 AUGSYS_API int
-aug_muxerpipe(int fds[2])
+aug_mclose(aug_md md)
 {
-    int local[2];
+    return aug_sclose(md);
+}
 
-    if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, local))
-        return -1;
-
-    fds[0] = local[0];
-    fds[1] = local[1];
-    return 0;
+AUGSYS_API int
+aug_muxerpipe(aug_md mds[2])
+{
+    return aug_socketpair(AF_UNIX, SOCK_STREAM, 0, mds);
 }

@@ -7,6 +7,8 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
 
+#include "augsys/base.h"
+
 #include "augctx/base.h"
 
 #include <stdexcept>
@@ -14,16 +16,15 @@
 namespace aug {
 
     inline void
-    init(aug_errinfo& errinfo)
+    init()
     {
-        if (aug_init(&errinfo) < 0)
+        if (aug_init() < 0)
             throw std::runtime_error("aug_init() failed");
     }
     inline void
     term()
     {
-        if (aug_term() < 0)
-            throw std::runtime_error("aug_term() failed");
+        aug_term();
     }
     inline void
     start()
