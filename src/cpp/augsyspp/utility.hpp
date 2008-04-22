@@ -25,7 +25,7 @@ namespace aug {
     fsize(fdref ref)
     {
         size_t size;
-        verify(aug_fsize(aug_getosfd(ref.get()), &size));
+        verify(aug_fsize(ref.get(), &size));
         return size;
     }
 
@@ -97,7 +97,7 @@ namespace aug {
     inline void
     setnonblock(fdref ref, bool on)
     {
-        verify(aug_fsetnonblock(aug_getosfd(ref.get()), on ? 1 : 0));
+        verify(aug_fsetnonblock(ref.get(), on ? 1 : 0));
     }
 }
 

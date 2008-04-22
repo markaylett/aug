@@ -32,51 +32,6 @@ namespace aug {
         if (aug_start() < 0)
             throw std::runtime_error("aug_start() failed");
     }
-    inline void
-    openfd(int fd, const aug_fdtype* fdtype)
-    {
-        verify(aug_openfd(fd, fdtype));
-    }
-    inline void
-    openfds(int fds[2], const aug_fdtype* fdtype)
-    {
-        verify(aug_openfds(fds, fdtype));
-    }
-    inline void
-    releasefd(int fd)
-    {
-        verify(aug_releasefd(fd));
-    }
-    inline void
-    retainfd(int fd)
-    {
-        verify(aug_retainfd(fd));
-    }
-    inline const aug_fdtype&
-    setfdtype(fdref ref, const aug_fdtype& fdtype)
-    {
-        return *verify(aug_setfdtype(ref.get(), &fdtype));
-    }
-    inline const aug_fdtype&
-    setfdtype(fdref ref)
-    {
-        return *verify(aug_setfdtype(ref.get(), 0));
-    }
-    inline const aug_fdtype&
-    getfdtype(fdref ref)
-    {
-        return *verify(aug_getfdtype(ref.get()));
-    }
-    inline aug_fdtype&
-    extfdtype(aug_fdtype& derived, const struct aug_fdtype& base)
-    {
-        return *aug_extfdtype(&derived, &base);
-    }
-    inline aug_fdtype&
-    extfdtype(aug_fdtype& derived)
-    {
-        return *aug_extfdtype(&derived, 0);
-    }
 
     class scoped_init {
 

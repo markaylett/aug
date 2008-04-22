@@ -70,27 +70,36 @@ namespace aug {
         }
     };
 
-    class aug_error : public errinfo_error {
+    template <const char* (*T)(), typename baseT = errinfo_error>
+    class basic_error : public baseT {
     public:
-        aug_error()
+        basic_error()
         {
         }
-        aug_error(const char* file, int line, int num, const char* format,
-                  va_list args)
+        basic_error(const char* file, int line, int num, const char* format,
+                    va_list args)
         {
-            aug_vseterrinfo(cptr(*this), file, line, "aug", num, format,
-                            args);
+            aug_vseterrinfo(cptr(*this), file, line, T(), num, format, args);
         }
-        aug_error(const char* file, int line, int num, const char* format,
-                  ...)
+        basic_error(const char* file, int line, int num, const char* format,
+                    ...)
         {
             va_list args;
             va_start(args, format);
-            aug_vseterrinfo(cptr(*this), file, line, "aug", num, format,
-                            args);
+            aug_vseterrinfo(cptr(*this), file, line, T(), num, format, args);
             va_end(args);
         }
     };
+
+    namespace detail {
+        inline const char*
+        aug_src()
+        {
+            return "aug";
+        }
+    }
+
+    typedef basic_error<detail::aug_src> aug_error;
 
     class system_error : public errinfo_error { };
 

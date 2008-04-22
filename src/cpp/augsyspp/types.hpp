@@ -152,10 +152,10 @@ namespace aug {
         }
     };
 
-    typedef basic_ref<int> idref;
-    typedef basic_ref<aug_fd> fdref;
-    typedef basic_ref<aug_sd> sdref;
-    typedef basic_ref<aug_sd> mdref;
+    typedef basic_ref<id_traits> idref;
+    typedef basic_ref<fd_traits> fdref;
+    typedef basic_ref<sd_traits> sdref;
+    typedef basic_ref<sd_traits> mdref;
 }
 
 template <typename T>
