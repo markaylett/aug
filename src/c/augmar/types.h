@@ -41,12 +41,6 @@ struct aug_field {
 };
 
 /**
- * Return code used by some functions to indicate that no matching item could
- * be found.
- */
-#define AUG_RETNOMATCH (-2)
-
-/**
  * @defgroup OpenFlags Open Flags
  *
  * @ingroup Constants

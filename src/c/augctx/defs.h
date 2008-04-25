@@ -7,7 +7,6 @@
 #include <stddef.h>
 
 /**
- * @defgroup Constants Constants
  * @defgroup Macros Macros
  */
 
@@ -62,23 +61,6 @@
 
 #define AUG_MKSTR_(x) #x
 #define AUG_MKSTR(x)  AUG_MKSTR_(x)
-
-/** @} */
-
-/**
- * @defgroup ReturnCodes Return Codes
- *
- * @ingroup Constants
- *
- * Standard integer return codes.
- *
- * @{
- */
-
-#define AUG_RETOK      0
-#define AUG_RETERROR (-1)
-#define AUG_RETNONE  (-2)
-#define AUG_RETINTR  (-3)
 
 /** @} */
 

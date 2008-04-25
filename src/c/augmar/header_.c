@@ -277,7 +277,7 @@ aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
 
         if (ord)
             *ord = inout;
-        return AUG_RETNOMATCH;
+        return AUG_FAILNONE;
     }
 
     orig = fieldsize_(ptr + offset);
@@ -305,7 +305,7 @@ aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, unsigned ord)
     unsigned offset, orig;
 
     if (ord >= info->fields_)
-        return AUG_RETNOMATCH;
+        return AUG_FAILNONE;
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))
         return -1;
@@ -406,7 +406,7 @@ aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
         field->name_ = NULL;
         field->value_ = NULL;
         field->size_ = 0;
-        return AUG_RETNOMATCH;
+        return AUG_FAILNONE;
     }
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))
@@ -434,7 +434,7 @@ aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
 
     if (ord >= info->fields_) {
         *name = NULL;
-        return AUG_RETNOMATCH;
+        return AUG_FAILNONE;
     }
 
     if (-1 == aug_setregion_(seq, AUG_HEADER, info->hsize_))
@@ -469,5 +469,5 @@ aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, unsigned* ord,
     if (ord)
         *ord = inout;
 
-    return inout == info->fields_ ? AUG_RETNOMATCH : 0;
+    return inout == info->fields_ ? AUG_FAILNONE : 0;
 }

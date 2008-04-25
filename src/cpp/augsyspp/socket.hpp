@@ -11,100 +11,100 @@
 
 namespace aug {
 
-    inline smartfd
+    inline autosd
     socket(int domain, int type, int protocol = 0)
     {
-        return smartfd::attach(verify(aug_socket(domain, type, protocol)));
+        return autosd(verify(aug_socket(domain, type, protocol)));
     }
 
-    inline smartfd
-    accept(fdref ref, aug_endpoint& ep)
+    inline autosd
+    accept(sdref ref, aug_endpoint& ep)
     {
-        return smartfd::attach(verify(aug_accept(ref.get(), &ep)));
+        return autosd(verify(aug_accept(ref.get(), &ep)));
     }
 
     inline void
-    bind(fdref ref, const aug_endpoint& ep)
+    bind(sdref ref, const aug_endpoint& ep)
     {
         verify(aug_bind(ref.get(), &ep));
     }
 
     inline void
-    connect(fdref ref, const aug_endpoint& ep)
+    connect(sdref ref, const aug_endpoint& ep)
     {
         verify(aug_connect(ref.get(), &ep));
     }
 
     inline aug_endpoint&
-    getpeername(fdref ref, aug_endpoint& ep)
+    getpeername(sdref ref, aug_endpoint& ep)
     {
         return *verify(aug_getpeername(ref.get(), &ep));
     }
 
     inline const aug_endpoint&
-    getsockname(fdref ref, aug_endpoint& ep)
+    getsockname(sdref ref, aug_endpoint& ep)
     {
         return *verify(aug_getsockname(ref.get(), &ep));
     }
 
     inline void
-    listen(fdref ref, int backlog)
+    listen(sdref ref, int backlog)
     {
         verify(aug_listen(ref.get(), backlog));
     }
 
     inline size_t
-    recv(fdref ref, void* buf, size_t len, int flags)
+    recv(sdref ref, void* buf, size_t len, int flags)
     {
         return verify(aug_recv(ref.get(), buf, len, flags));
     }
 
     inline size_t
-    recvfrom(fdref ref, void* buf, size_t len, int flags,
+    recvfrom(sdref ref, void* buf, size_t len, int flags,
              aug_endpoint& ep)
     {
         return verify(aug_recvfrom(ref.get(), buf, len, flags, &ep));
     }
 
     inline size_t
-    send(fdref ref, const void* buf, size_t len, int flags)
+    send(sdref ref, const void* buf, size_t len, int flags)
     {
         return verify(aug_send(ref.get(), buf, len, flags));
     }
 
     inline size_t
-    sendto(fdref ref, const void* buf, size_t len, int flags,
+    sendto(sdref ref, const void* buf, size_t len, int flags,
            const aug_endpoint& ep)
     {
         return verify(aug_sendto(ref.get(), buf, len, flags, &ep));
     }
 
     inline void
-    getsockopt(fdref ref, int level, int optname, void* optval,
+    getsockopt(sdref ref, int level, int optname, void* optval,
                socklen_t& optlen)
     {
         verify(aug_getsockopt(ref.get(), level, optname, optval, &optlen));
     }
 
     inline void
-    setsockopt(fdref ref, int level, int optname, const void* optval,
+    setsockopt(sdref ref, int level, int optname, const void* optval,
                socklen_t optlen)
     {
         verify(aug_setsockopt(ref.get(), level, optname, optval, optlen));
     }
 
     inline void
-    shutdown(fdref ref, int how)
+    shutdown(sdref ref, int how)
     {
         verify(aug_shutdown(ref.get(), how));
     }
 
-    inline std::pair<smartfd, smartfd>
+    inline autosds
     socketpair(int domain, int type, int protocol)
     {
-        int sv[2];
+        aug_sd sv[2];
         verify(aug_socketpair(domain, type, protocol, sv));
-        return std::make_pair(smartfd::attach(sv[0]), smartfd::attach(sv[1]));
+        return autosds(sv[0], sv[1]);
     }
 
     inline std::string
@@ -139,13 +139,13 @@ namespace aug {
     }
 
     inline int
-    getfamily(fdref ref)
+    getfamily(sdref ref)
     {
         return verify(aug_getfamily(ref.get()));
     }
 
     inline void
-    setreuseaddr(fdref ref, bool on)
+    setreuseaddr(sdref ref, bool on)
     {
         int value(on ? 1 : 0);
         verify(aug_setreuseaddr(ref.get(), value));

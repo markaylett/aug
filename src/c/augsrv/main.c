@@ -54,7 +54,7 @@ daemonise_(void)
         die_("aug_daemonise() failed");
     case 0:
         break;
-    case AUG_RETNONE:
+    case AUG_FAILNONE:
         foreground_();
         break;
     default:

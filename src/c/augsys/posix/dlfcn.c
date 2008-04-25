@@ -34,7 +34,7 @@ aug_dlclose(aug_dlib_t dlib)
 
     if (0 != dlclose(dlib->handle_)) {
         seterrinfo_(__FILE__, __LINE__);
-        result = AUG_FAILURE;
+        result = AUG_FAILERROR;
     }
 
     aug_free(mpool, dlib);

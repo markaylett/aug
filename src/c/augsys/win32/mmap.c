@@ -15,7 +15,7 @@
 
 typedef struct impl_ {
     struct aug_mmap mmap_;
-    int fd_;
+    aug_fd fd_;
     DWORD prot_, access_;
     size_t size_;
     HANDLE mapping_;
@@ -96,14 +96,11 @@ createmmap_(impl_t impl, size_t offset, size_t len)
     void* addr;
     HANDLE mapping;
     DWORD err;
-    intptr_t file;
 
-    if (-1 == impl->fd_) {
+    if (AUG_BADFD == impl->fd_) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EBADF);
         return -1;
     }
-
-    file = _get_osfhandle(impl->fd_);
 
     if (!len)
         len = impl->size_ - offset;
@@ -112,7 +109,7 @@ createmmap_(impl_t impl, size_t offset, size_t len)
 
     if (INVALID_HANDLE_VALUE == mapping) {
 
-        if (!(mapping = CreateFileMapping((HANDLE)file, NULL, impl->prot_, 0,
+        if (!(mapping = CreateFileMapping(impl->fd_, NULL, impl->prot_, 0,
                                           (DWORD)impl->size_, NULL))) {
             err = GetLastError();
             goto fail1;
@@ -167,7 +164,7 @@ aug_destroymmap(struct aug_mmap* mm)
 }
 
 AUG_EXTERNC struct aug_mmap*
-aug_createmmap(int fd, size_t offset, size_t len, int flags)
+aug_createmmap(aug_fd fd, size_t offset, size_t len, int flags)
 {
     impl_t impl;
     DWORD prot, access;
@@ -179,7 +176,7 @@ aug_createmmap(int fd, size_t offset, size_t len, int flags)
     if (-1 == toaccess_(&access, flags))
         return NULL;
 
-    if (AUG_FAILURE == aug_fsize((aug_fd)_get_osfhandle(fd), &size))
+    if (AUG_FAILERROR == aug_fsize(fd, &size))
         return NULL;
 
     if (-1 == verify_(size, offset, len))
@@ -228,7 +225,7 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
             return -1;
         }
 
-        if (-1 == aug_fsize((aug_fd)_get_osfhandle(impl->fd_), &impl->size_))
+        if (-1 == aug_fsize(impl->fd_, &impl->size_))
             return -1;
     }
 

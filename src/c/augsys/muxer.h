@@ -10,8 +10,19 @@
  * IO multiplexer.
  */
 
-#include "augsys/config.h"
 #include "augsys/types.h"
+
+#if !defined(_WIN32)
+# include "augsys/unistd.h"
+# define aug_mclose aug_fclose
+# define aug_mread  aug_fread
+# define aug_mwrite aug_fwrite
+#else /* _WIN32 */
+# include "augsys/socket.h"
+# define aug_mclose aug_sclose
+# define aug_mread  aug_sread
+# define aug_mwrite aug_swrite
+#endif /* _WIN32 */
 
 #define AUG_FDEVENTRD    0x1
 #define AUG_FDEVENTWR    0x2
@@ -49,9 +60,6 @@ aug_fdeventmask(aug_muxer_t muxer, aug_md md);
 
 AUGSYS_API int
 aug_fdevents(aug_muxer_t muxer, aug_md md);
-
-AUGSYS_API int
-aug_mclose(aug_md md);
 
 /**
  * Creates a pipe or socket-pair suitable for use with muxer.  On Windows,

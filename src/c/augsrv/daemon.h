@@ -9,7 +9,7 @@
 /**
  * Called from aug_main().
  *
- * @return On Windows, #AUG_RETNONE if the service has not been installed.
+ * @return On Windows, #AUG_FAILNONE if the service has not been installed.
  */
 
 AUGSRV_API int

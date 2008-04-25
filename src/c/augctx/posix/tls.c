@@ -10,7 +10,7 @@ AUG_EXTERNC aug_result
 aug_createtlskey_(aug_tlskey_t* tlskey)
 {
     return 0 != pthread_key_create(tlskey, NULL)
-        ? AUG_FAILURE : AUG_SUCCESS;
+        ? AUG_FAILERROR : AUG_SUCCESS;
 }
 
 AUG_EXTERNC void

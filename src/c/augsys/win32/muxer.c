@@ -148,7 +148,7 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
                       &muxer->out_.ex_, timeout))) {
         if (WSAEINTR == aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                                             WSAGetLastError()))
-            ret = AUG_RETINTR;
+            ret = AUG_FAILINTR;
     }
     return ret;
 }
@@ -163,12 +163,6 @@ AUGSYS_API int
 aug_fdevents(aug_muxer_t muxer, aug_md md)
 {
     return external_(&muxer->out_, md);
-}
-
-AUGSYS_API int
-aug_mclose(aug_md md)
-{
-    return aug_sclose(md);
 }
 
 AUGSYS_API int

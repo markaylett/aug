@@ -23,7 +23,8 @@ AUG_RCSID("$Id$");
 #include <stdlib.h>
 
 struct aug_mfile_ {
-    int fd_, flags_;
+    aug_fd fd_;
+    int flags_;
     unsigned resvd_, size_;
     struct aug_mmap* mmap_;
 };
@@ -71,12 +72,12 @@ aug_closemfile_(aug_mfile_t mfile)
 
         if (mfile->resvd_ > mfile->size_) {
 
-            if (-1 == aug_truncatefile_(mfile->fd_, (off_t)mfile->size_))
+            if (aug_ftruncate(mfile->fd_, (off_t)mfile->size_) < 0)
                 ret = -1;
         }
     }
 
-    if (-1 == aug_closefile_(mfile->fd_))
+    if (aug_fclose(mfile->fd_) < 0)
         ret = -1;
 
     free(mfile);
@@ -87,7 +88,7 @@ AUG_EXTERNC aug_mfile_t
 aug_openmfile_(const char* path, int flags, mode_t mode,
                unsigned tail)
 {
-    int fd;
+    aug_fd fd;
     size_t size;
     aug_mfile_t mfile;
     assert(path);
@@ -97,10 +98,10 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
        append flag if set is stripped off before the remaining flags are
        passed to the open file function. */
 
-    if (-1 == (fd = aug_openfile_(path, flags & ~AUG_APPEND, mode)))
+    if (AUG_BADFD == (fd = aug_fopen(path, flags & ~AUG_APPEND, mode)))
         return NULL;
 
-    if (-1 == aug_fsize(aug_getosfd(fd), &size))
+    if (-1 == aug_fsize(fd, &size))
         return NULL;
 
     if (!(mfile = (aug_mfile_t)malloc(sizeof(struct aug_mfile_) + tail))) {
@@ -115,7 +116,7 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
     return mfile;
 
  fail:
-    aug_closefile_(fd);
+    aug_fclose(fd);
     return NULL;
 }
 
@@ -144,7 +145,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
         }
 
         resvd = reserve_(size);
-        if (-1 == aug_extendfile_(mfile->fd_, resvd - mfile->size_))
+        if (-1 == aug_ftruncate(mfile->fd_, resvd - mfile->size_))
             return NULL;
 
         mfile->resvd_ = resvd;
@@ -179,7 +180,7 @@ aug_syncmfile_(aug_mfile_t mfile)
     if (mfile->mmap_)
         return aug_syncmmap(mfile->mmap_);
 
-    return aug_syncfile_(mfile->fd_);
+    return aug_fsync(mfile->fd_);
 }
 
 AUG_EXTERNC int

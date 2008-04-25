@@ -10,7 +10,7 @@ aug_fclose(aug_fd fd)
 {
     if (-1 == close(fd)) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
 }
@@ -21,7 +21,7 @@ aug_fsetnonblock(aug_fd fd, aug_bool on)
     int flags = fcntl(fd, F_GETFL);
     if (-1 == flags) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
 
     if (on)
@@ -31,7 +31,7 @@ aug_fsetnonblock(aug_fd fd, aug_bool on)
 
     if (-1 == fcntl(fd, F_SETFL, flags)) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
 
     return AUG_SUCCESS;
@@ -71,7 +71,7 @@ aug_fpipe(aug_fd fds[2])
 {
     if (-1 == pipe(fds)) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
 }
@@ -103,7 +103,7 @@ aug_fsync(aug_fd fd)
 {
     if (-1 == fsync(fd)) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
 }
@@ -113,7 +113,7 @@ aug_ftruncate(aug_fd fd, off_t size)
 {
     if (-1 == ftruncate(fd, size)) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
 }
@@ -124,7 +124,7 @@ aug_fsize(aug_fd fd, size_t* size)
     struct stat s;
     if (-1 == fstat(fd, &s)) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
 
     *size = s.st_size;

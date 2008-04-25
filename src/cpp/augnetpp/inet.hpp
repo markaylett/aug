@@ -79,7 +79,7 @@ namespace aug {
     inline bool
     established(fdref ref)
     {
-        return AUG_RETNONE == verify(aug_established(ref.get()))
+        return AUG_FAILNONE == verify(aug_established(ref.get()))
             ? false : true;
     }
 }

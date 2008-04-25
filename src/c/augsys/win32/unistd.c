@@ -67,7 +67,7 @@ aug_fclose(aug_fd fd)
 {
     if (!CloseHandle(fd)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
 }
@@ -77,7 +77,7 @@ aug_fsetnonblock(aug_fd fd, aug_bool on)
 {
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                    AUG_MSG("aug_fsetnonblock() not supported"));
-    return AUG_FAILURE;
+    return AUG_FAILERROR;
 }
 
 AUGSYS_API aug_fd
@@ -137,7 +137,7 @@ aug_fpipe(aug_fd fds[2])
 
     if (!CreatePipe(&rd, &wr, &sa, 0)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
 
     fds[0] = rd;
@@ -173,7 +173,7 @@ aug_fsync(aug_fd fd)
 {
     if (!FlushFileBuffers(fd)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
 }
@@ -189,7 +189,7 @@ aug_ftruncate(aug_fd fd, off_t size)
     li.QuadPart = 0;
     if (!SetFilePointerEx(fd, li, &orig, FILE_CURRENT)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
 
     /* Move pointer to required size. */
@@ -197,14 +197,14 @@ aug_ftruncate(aug_fd fd, off_t size)
     li.QuadPart = (LONGLONG)size;
     if (!SetFilePointerEx(fd, li, NULL, FILE_BEGIN)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
 
     /* Truncate.  Note: this will not fill the gap with zeros. */
 
     if (!SetEndOfFile(fd)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        ret = AUG_FAILURE;
+        ret = AUG_FAILERROR;
     } else
         ret = AUG_SUCCESS;
 
@@ -221,7 +221,7 @@ aug_fsize(aug_fd fd, size_t* size)
 
     if (!GetFileSizeEx(fd, &li)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
 
     *size = (size_t)li.QuadPart;

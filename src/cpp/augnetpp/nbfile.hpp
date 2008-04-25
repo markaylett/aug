@@ -141,7 +141,7 @@ namespace aug {
     }
 
     /**
-     * Returns #AUG_RETINTR if the system call was interrupted.
+     * Returns #AUG_FAILINTR if the system call was interrupted.
      */
 
     inline int

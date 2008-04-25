@@ -306,7 +306,7 @@ aug_established(int s)
     int ret;
     struct aug_endpoint ep;
     if (!aug_getpeername(s, &ep))
-        ret = ENOTCONN == aug_errno() ? AUG_RETNONE : -1;
+        ret = ENOTCONN == aug_errno() ? AUG_FAILNONE : -1;
     else
         ret = 0;
 

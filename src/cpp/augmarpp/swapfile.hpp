@@ -9,8 +9,9 @@
 #include "augsyspp/types.hpp"
 
 #include "augsys/limits.h" // AUG_PATH_MAX
-#include "augsys/log.h"
-#include "augsys/string.h" // aug_strlcpy
+
+#include "augctx/log.h"
+#include "augctx/string.h" // aug_strlcpy
 
 namespace aug {
 

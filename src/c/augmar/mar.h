@@ -169,8 +169,8 @@ aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size);
  * @param ord An optional output parameter, in which, the ordinal position of
  * the field is set.
  *
- * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
- * -1 on failure, in which case errno can be used to determine the error.
+ * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
+ * on failure, in which case errno can be used to determine the error.
  *
  * @see aug_removefields(), aug_unsetbyord() and aug_ordtoname().
  */
@@ -185,8 +185,8 @@ aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord);
  *
  * @param ord The ordinal position of the field.
  *
- * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
- * -1 on failure, in which case errno can be used to determine the error.
+ * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
+ * on failure, in which case errno can be used to determine the error.
  *
  * @see aug_removefields(), aug_unsetbyname() and aug_nametoord().
  */
@@ -241,8 +241,8 @@ aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size);
  *
  * @param ord The zero-based ordinal position of the field.
  *
- * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
- * -1 on failure, in which case errno can be used to determine the error.
+ * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
+ * on failure, in which case errno can be used to determine the error.
  *
  * @see aug_valuebyname(), aug_valuebyord() and aug_getfields().
  */
@@ -276,8 +276,8 @@ aug_getfields(aug_mar_t mar, unsigned* size);
  *
  * @param ord The zero-based ordinal position of the name to be returned.
  *
- * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
- * -1 on failure, in which case errno can be used to determine the error.
+ * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
+ * on failure, in which case errno can be used to determine the error.
  *
  * @see aug_unsetbyname(), aug_valuebyname() and aug_nametoord().
  */
@@ -295,8 +295,8 @@ aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord);
  *
  * @param name The name of the field.
  *
- * @return Zero on success, #AUG_RETNOMATCH if there is no matching field, or
- * -1 on failure, in which case errno can be used to determine the error.
+ * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
+ * on failure, in which case errno can be used to determine the error.
  *
  * @see aug_unsetbyord(), aug_valuebyord() and aug_ordtoname().
 */

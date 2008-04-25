@@ -107,7 +107,7 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
             aug_getendpoint(ctor->res_, ep);
             goto done;
 
-        case AUG_RETNONE:
+        case AUG_FAILNONE:
 
             /* Not established. */
 

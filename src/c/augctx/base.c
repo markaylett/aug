@@ -54,7 +54,7 @@ inittls_(void)
         /* First call on this thread. */
 
         if (!(tls = malloc(sizeof(struct tls_))))
-            return AUG_FAILURE;
+            return AUG_FAILERROR;
 
         tls->refs_ = 0;
         tls->ctx_ = NULL;
@@ -149,7 +149,7 @@ aug_setbasictlx(void)
 {
     aug_ctx* ctx = aug_createbasicctx();
     if (!ctx)
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     aug_settlx(ctx);
     aug_release(ctx);
     return AUG_SUCCESS;

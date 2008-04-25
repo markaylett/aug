@@ -159,7 +159,7 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
     if (-1 == (ret = poll(muxer->pollfds_, muxer->nfds_, ms))) {
 
         if (EINTR == aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno))
-            ret = AUG_RETINTR;
+            ret = AUG_FAILINTR;
     }
     return ret;
 }
@@ -309,7 +309,7 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
                             (struct timeval*)timeout))) {
 
         if (EINTR == aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno))
-            ret = AUG_RETINTR;
+            ret = AUG_FAILINTR;
     }
     return ret;
 }
@@ -327,12 +327,6 @@ aug_fdevents(aug_muxer_t muxer, aug_md md)
 }
 
 #endif /* !HAVE_POLL */
-
-AUGSYS_API int
-aug_mclose(aug_md md)
-{
-    return aug_fclose(md);
-}
 
 AUGSYS_API int
 aug_muxerpipe(aug_md mds[2])

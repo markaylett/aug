@@ -208,7 +208,7 @@ aug_daemonise(void)
 
         DWORD err = GetLastError();
         if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == err)
-            ret = AUG_RETNONE;
+            ret = AUG_FAILNONE;
         else {
             aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
             ret = -1;

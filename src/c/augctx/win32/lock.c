@@ -18,7 +18,7 @@ aug_initlock_(void)
 
     LPCRITICAL_SECTION cs = malloc(sizeof(*cs));
     if (!cs)
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
 
 	/* In low memory situations, InitializeCriticalSection() can raise a
        STATUS_NO_MEMORY exception. */

@@ -17,13 +17,14 @@ namespace aug {
         ismatch(int result)
         {
             verify(result);
-            return AUG_RETNOMATCH != result;
+            return AUG_FAILNONE != result;
         }
         inline const void*
         verify(const void* result)
         {
-            if (!result && !(AUG_SRCLOCAL == aug_errsrc
-                             && AUG_EEXIST == aug_errnum))
+            aug_errinfo& ei(*aug_tlerr);
+            if (!result && !(AUG_EEXIST == errnum(ei)
+                             && 0 == strcmp(errsrc(ei), "aug")))
                 fail();
             return result;
         }

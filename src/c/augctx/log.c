@@ -48,7 +48,7 @@ vwritelog_(aug_log* obj, int level, const char* format, va_list args)
     AUG_SNTRUNCF(buf, sizeof(buf), ret);
 
     if (ret < 0)
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
 
     fprintf(file, "%s\n", buf);
     fflush(file);

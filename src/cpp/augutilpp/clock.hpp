@@ -10,61 +10,61 @@
 #include "augsyspp/time.hpp"
 #include "augsyspp/utility.hpp" // perrinfo()
 
-#include "augutil/clock.h"
+#include "augutil/hires.h"
 
 namespace aug {
 
     inline void
-    resetclock(aug_clock_t clock)
+    resethires(aug_hires_t hires)
     {
-        verify(aug_resetclock(clock));
+        verify(aug_resethires(hires));
     }
 
     inline double&
-    elapsed(aug_clock_t clock, double& secs)
+    elapsed(aug_hires_t hires, double& secs)
     {
-        verify(aug_elapsed(clock, &secs));
+        verify(aug_elapsed(hires, &secs));
         return secs;
     }
 
     inline double
-    elapsed(aug_clock_t clock)
+    elapsed(aug_hires_t hires)
     {
         double secs;
-        return elapsed(clock, secs);
+        return elapsed(hires, secs);
     }
 
-    class clock {
+    class hires {
 
-        aug_clock_t clock_;
+        aug_hires_t hires_;
 
-        clock(const clock&);
+        hires(const hires&);
 
-        clock&
-        operator =(const clock&);
+        hires&
+        operator =(const hires&);
 
     public:
-        ~clock() AUG_NOTHROW
+        ~hires() AUG_NOTHROW
         {
-            if (-1 == aug_destroyclock(clock_))
-                perrinfo("aug_destroyclock() failed");
+            if (-1 == aug_destroyhires(hires_))
+                perrinfo("aug_destroyhires() failed");
         }
 
-        clock()
-            : clock_(aug_createclock())
+        hires()
+            : hires_(aug_createhires())
         {
-            verify(clock_);
+            verify(hires_);
         }
 
-        operator aug_clock_t()
+        operator aug_hires_t()
         {
-            return clock_;
+            return hires_;
         }
 
-        aug_clock_t
+        aug_hires_t
         get()
         {
-            return clock_;
+            return hires_;
         }
     };
 }

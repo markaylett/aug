@@ -12,31 +12,31 @@
 namespace aug {
 
     inline void
-    joinmcast(fdref ref, const aug_inetaddr& addr, const char* ifname)
+    joinmcast(sdref ref, const aug_inetaddr& addr, const char* ifname)
     {
         verify(aug_joinmcast(ref.get(), &addr, ifname));
     }
 
     inline void
-    leavemcast(fdref ref, const aug_inetaddr& addr, const char* ifname)
+    leavemcast(sdref ref, const aug_inetaddr& addr, const char* ifname)
     {
         verify(aug_leavemcast(ref.get(), &addr, ifname));
     }
 
     inline void
-    setmcastif(fdref ref, const char* ifname)
+    setmcastif(sdref ref, const char* ifname)
     {
         verify(aug_setmcastif(ref.get(), ifname));
     }
 
     inline void
-    setmcastloop(fdref ref, int on)
+    setmcastloop(sdref ref, int on)
     {
         verify(aug_setmcastloop(ref.get(), on));
     }
 
     inline void
-    setmcastttl(fdref ref, int ttl)
+    setmcastttl(sdref ref, int ttl)
     {
         verify(aug_setmcastttl(ref.get(), ttl));
     }

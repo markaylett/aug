@@ -49,7 +49,7 @@ aug_resethires(aug_hires_t hires)
 {
     if (-1 == aug_gettimeofday(&hires->start_, NULL)) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
 }

@@ -14,7 +14,7 @@
 
 typedef struct impl_ {
     struct aug_mmap mmap_;
-    int fd_, prot_;
+    aug_fd fd_, prot_;
     size_t size_;
 }* impl_t;
 
@@ -106,7 +106,7 @@ aug_destroymmap(struct aug_mmap* mm)
 }
 
 AUG_EXTERNC struct aug_mmap*
-aug_createmmap(int fd, size_t offset, size_t len, int flags)
+aug_createmmap(aug_fd fd, size_t offset, size_t len, int flags)
 {
     impl_t impl;
     int prot;

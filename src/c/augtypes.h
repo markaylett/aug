@@ -36,6 +36,8 @@ enum aug_bool_ {
  *
  * @ingroup Types
  *
+ * Standard integer return codes.
+ *
  * @{
  */
 
@@ -48,13 +50,10 @@ enum aug_bool_ {
 
 typedef int aug_result;
 
-/**
- * Success and failure function return codes.  Akin to #EXIT_SUCCESS and
- * #EXIT_FAILURE.
- */
-
-#define AUG_SUCCESS   0
-#define AUG_FAILURE (-1)
+#define AUG_SUCCESS     0
+#define AUG_FAILERROR (-1)
+#define AUG_FAILNONE  (-2)
+#define AUG_FAILINTR  (-3)
 
 /** @} */
 

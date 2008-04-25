@@ -49,7 +49,7 @@ aug_resethires(aug_hires_t hires)
 {
     if (!QueryPerformanceCounter(&hires->start_)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
 }

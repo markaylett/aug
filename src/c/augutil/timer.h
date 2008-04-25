@@ -60,7 +60,7 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
  *
  * @param ms If zero, the previous timeout value will be used.
  *
- * @return #AUG_RETNONE if the timer does not exist.
+ * @return #AUG_FAILNONE if the timer does not exist.
  */
 
 AUGUTIL_API int
@@ -73,7 +73,7 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms);
  *
  * @param id Timer identifier.
  *
- * @return #AUG_RETNONE if the timer does not exist.
+ * @return #AUG_FAILNONE if the timer does not exist.
  */
 
 AUGUTIL_API int

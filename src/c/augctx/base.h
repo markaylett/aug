@@ -25,7 +25,7 @@
  * A thread must ensure the thread-local context is set after calling
  * aug_init(), as many library functions will depend on it.
  *
- * @return Either @ref AUG_SUCCESS or @ref AUG_FAILURE.
+ * @return Either @ref AUG_SUCCESS or @ref AUG_FAILERROR.
  */
 
 AUGCTX_API aug_result

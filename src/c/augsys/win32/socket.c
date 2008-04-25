@@ -107,7 +107,7 @@ aug_sclose(aug_sd sd)
 {
     if (SOCKET_ERROR == closesocket(sd)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAGetLastError());
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
 }
@@ -119,7 +119,7 @@ aug_ssetnonblock(aug_sd sd, aug_bool on)
 
     if (SOCKET_ERROR == ioctlsocket(sd, FIONBIO, &arg)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAGetLastError());
-        return AUG_FAILURE;
+        return AUG_FAILERROR;
     }
 
     return AUG_SUCCESS;
@@ -246,6 +246,11 @@ aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
     return ret;
 }
 
+AUGSYS_API ssize_t
+aug_sread(aug_sd sd, void* buf, size_t len)
+{
+    return aug_recv(sd, buf, len, 0);
+}
 
 AUGSYS_API ssize_t
 aug_sreadv(aug_sd sd, const struct iovec* iov, int size)
@@ -277,6 +282,12 @@ aug_sreadv(aug_sd sd, const struct iovec* iov, int size)
     }
 
     return (ssize_t)ret;
+}
+
+AUGSYS_API ssize_t
+aug_swrite(aug_sd sd, const void* buf, size_t len)
+{
+    return aug_send(sd, buf, len, 0);
 }
 
 AUGSYS_API ssize_t

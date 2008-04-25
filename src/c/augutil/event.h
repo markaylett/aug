@@ -12,6 +12,8 @@
 
 #include "augutil/config.h"
 
+#include "augsys/types.h"
+
 #include "augabi.h"
 
 #define AUG_EVENTRECONF 1
@@ -42,9 +44,9 @@ AUGUTIL_API struct aug_event*
 aug_setsigevent(struct aug_event* event, int sig);
 
 AUGUTIL_API struct aug_event*
-aug_readevent(int fd, struct aug_event* event);
+aug_readevent(aug_md md, struct aug_event* event);
 
 AUGUTIL_API const struct aug_event*
-aug_writeevent(int fd, const struct aug_event* event);
+aug_writeevent(aug_md md, const struct aug_event* event);
 
 #endif /* AUGUTIL_EVENT_H */

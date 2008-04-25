@@ -14,8 +14,8 @@
 #include "augutil/list.h"
 #include "augutil/timer.h"
 
-#include "augsys/errno.h"
-#include "augsys/log.h"
+#include "augctx/errno.h"
+#include "augctx/log.h"
 
 namespace aug {
 
@@ -125,14 +125,14 @@ namespace aug {
     inline bool
     resettimer(aug_timers& timers, idref ref, unsigned ms = 0)
     {
-        return AUG_RETNONE == verify(aug_resettimer(&timers, ref.get(), ms))
+        return AUG_FAILNONE == verify(aug_resettimer(&timers, ref.get(), ms))
             ? false : true;
     }
 
     inline bool
     canceltimer(aug_timers& timers, idref ref)
     {
-        return AUG_RETNONE == aug_canceltimer(&timers, ref.get())
+        return AUG_FAILNONE == aug_canceltimer(&timers, ref.get())
             ? false : true;
     }
 

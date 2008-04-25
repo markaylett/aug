@@ -153,7 +153,7 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
         } else
             prev = &AUG_NEXT(it);
     }
-    return AUG_RETNONE;
+    return AUG_FAILNONE;
 }
 
 AUGUTIL_API int
@@ -180,7 +180,7 @@ aug_canceltimer(struct aug_timers* timers, int id)
         } else
             prev = &AUG_NEXT(it);
     }
-    return AUG_RETNONE;
+    return AUG_FAILNONE;
 }
 
 AUGUTIL_API int

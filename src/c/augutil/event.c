@@ -11,7 +11,7 @@ AUG_RCSID("$Id$");
 
 #include "augsys/barrier.h"
 #include "augsys/base.h" /* aug_getosfd() */
-#include "augsys/unistd.h"
+#include "augsys/muxer.h"
 
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
@@ -25,13 +25,13 @@ AUG_RCSID("$Id$");
 #endif /* _WIN32 */
 
 static int
-readall_(int fd, char* buf, size_t n)
+readall_(aug_md md, char* buf, size_t n)
 {
     /* Ensure all bytes are read and ignore any interrupts. */
 
     while (0 != n) {
 
-        int ret = aug_fread(aug_getosfd(fd), buf, n);
+        int ret = aug_mread(md, buf, n);
         if (-1 == ret) {
             if (EINTR == aug_errno())
                 continue;
@@ -44,13 +44,13 @@ readall_(int fd, char* buf, size_t n)
 }
 
 static int
-writeall_(int fd, const char* buf, size_t n)
+writeall_(aug_md md, const char* buf, size_t n)
 {
     /* Ensure all bytes are written and ignore any interrupts. */
 
     while (0 != n) {
 
-        int ret = aug_fwrite(aug_getosfd(fd), buf, n);
+        int ret = aug_mwrite(md, buf, n);
         if (-1 == ret) {
             if (EINTR == aug_errno())
                 continue;
@@ -84,9 +84,9 @@ aug_setsigevent(struct aug_event* event, int sig)
 }
 
 AUGUTIL_API struct aug_event*
-aug_readevent(int fd, struct aug_event* event)
+aug_readevent(aug_md md, struct aug_event* event)
 {
-    if (-1 == readall_(fd, (char*)event, sizeof(*event)))
+    if (-1 == readall_(md, (char*)event, sizeof(*event)))
         return NULL;
 
     /* Ensure writes are visible: ensure that any components of the event
@@ -98,7 +98,7 @@ aug_readevent(int fd, struct aug_event* event)
 }
 
 AUGUTIL_API const struct aug_event*
-aug_writeevent(int fd, const struct aug_event* event)
+aug_writeevent(aug_md md, const struct aug_event* event)
 {
     /* Flush pending writes to main memory: ensure that the event object is
        visible to other threads. */
@@ -110,7 +110,7 @@ aug_writeevent(int fd, const struct aug_event* event)
     if (event->ob_)
         aug_retain(event->ob_);
 
-    if (-1 == writeall_(fd, (const char*)event, sizeof(*event))) {
+    if (-1 == writeall_(md, (const char*)event, sizeof(*event))) {
         if (event->ob_)
             aug_release(event->ob_);
         return NULL;

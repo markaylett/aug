@@ -139,7 +139,7 @@ namespace aug {
 #endif // _WIN32
 
     inline void
-    fail()
+    failerror()
     {
         const char* src = errsrc(*aug_tlerr);
         switch (src[0]) {
@@ -172,8 +172,8 @@ namespace aug {
             static T
             verify(T result)
             {
-                if (result < 0)
-                    fail();
+                if (AUG_FAILERROR == result)
+                    failerror();
                 return result;
             }
         };
@@ -184,7 +184,7 @@ namespace aug {
             verify(T* result)
             {
                 if (!result)
-                    fail();
+                    failerror();
                 return result;
             }
         };
@@ -195,7 +195,7 @@ namespace aug {
             verify(bool result)
             {
                 if (!result)
-                    fail();
+                    failerror();
                 return result;
             }
         };

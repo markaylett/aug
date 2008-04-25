@@ -22,7 +22,7 @@ aug_dlclose(aug_dlib_t dlib)
 
     if (!FreeLibrary(dlib->handle_)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        result = AUG_FAILURE;
+        result = AUG_FAILERROR;
     }
 
     aug_free(mpool, dlib);

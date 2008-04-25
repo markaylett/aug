@@ -18,7 +18,7 @@
 namespace aug {
 
     inline std::pair<int, aug::smartob<aug_object> >
-    readevent(fdref ref)
+    readevent(mdref ref)
     {
         aug_event event;
         verify(aug_readevent(ref.get(), &event));
@@ -27,13 +27,13 @@ namespace aug {
     }
 
     inline const aug_event&
-    writeevent(fdref ref, const aug_event& event)
+    writeevent(mdref ref, const aug_event& event)
     {
         return *verify(aug_writeevent(ref.get(), &event));
     }
 
     inline void
-    writeevent(fdref ref, int type, aug::obref<aug_object> ob)
+    writeevent(mdref ref, int type, aug::obref<aug_object> ob)
     {
         aug_event event = { type, ob.get() };
         writeevent(ref, event);

@@ -457,8 +457,8 @@ engine::run(bool stoponerr)
             if (impl_->timers_.empty()) {
 
                 scoped_unblock unblock;
-                while (AUG_RETINTR == (ret = waitnbevents
-                                       (impl_->nbfiles_)))
+                while (AUG_FAILINTR == (ret = waitnbevents
+                                        (impl_->nbfiles_)))
                     ;
 
             } else {
@@ -469,8 +469,8 @@ engine::run(bool stoponerr)
                 foreachexpired(impl_->timers_, 0 == ret, tv);
 
                 scoped_unblock unblock;
-                while (AUG_RETINTR == (ret = waitnbevents
-                                       (impl_->nbfiles_, tv)))
+                while (AUG_FAILINTR == (ret = waitnbevents
+                                        (impl_->nbfiles_, tv)))
                     ;
             }
 

@@ -143,7 +143,13 @@ aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
            const struct aug_endpoint* ep);
 
 AUGSYS_API ssize_t
+aug_sread(aug_sd sd, void* buf, size_t len);
+
+AUGSYS_API ssize_t
 aug_sreadv(aug_sd sd, const struct iovec* iov, int size);
+
+AUGSYS_API ssize_t
+aug_swrite(aug_sd sd, const void* buf, size_t len);
 
 AUGSYS_API ssize_t
 aug_swritev(aug_sd sd, const struct iovec* iov, int size);

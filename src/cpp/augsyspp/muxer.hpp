@@ -48,13 +48,13 @@ namespace aug {
     };
 
     inline void
-    setfdeventmask(aug_muxer_t muxer, fdref ref, unsigned short mask)
+    setfdeventmask(aug_muxer_t muxer, mdref ref, unsigned short mask)
     {
         verify(aug_setfdeventmask(muxer, ref.get(), mask));
     }
 
     /**
-     * Returns #AUG_RETINTR if the system call was interrupted.
+     * Returns #AUG_FAILINTR if the system call was interrupted.
      */
 
     inline int
@@ -70,24 +70,23 @@ namespace aug {
     }
 
     inline unsigned short
-    fdeventmask(aug_muxer_t muxer, fdref ref)
+    fdeventmask(aug_muxer_t muxer, mdref ref)
     {
         return verify(aug_fdeventmask(muxer, ref.get()));
     }
 
     inline unsigned short
-    fdevents(aug_muxer_t muxer, fdref ref)
+    fdevents(aug_muxer_t muxer, mdref ref)
     {
         return verify(aug_fdevents(muxer, ref.get()));
     }
 
-    inline std::pair<smartfd, smartfd>
+    inline autosds
     muxerpipe()
     {
-        int fds[2];
-        verify(aug_muxerpipe(fds));
-        return std::make_pair(smartfd::attach(fds[0]),
-                              smartfd::attach(fds[1]));
+        aug_md mds[2];
+        verify(aug_muxerpipe(mds));
+        return automds(mds[0], mds[1]);
     }
 }
 

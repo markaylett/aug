@@ -8,8 +8,8 @@
 
 #include "augutil/file.h"
 
-#include "augsys/errno.h"
-#include "augsys/log.h"
+#include "augctx/errno.h"
+#include "augctx/log.h"
 
 namespace aug {
 
