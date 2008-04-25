@@ -37,7 +37,7 @@ aug_destroyconnector(aug_connector_t ctor);
  * the host.
  */
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est);
 
 #endif /* AUGNET_CONNECTOR_H */

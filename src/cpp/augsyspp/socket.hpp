@@ -14,7 +14,10 @@ namespace aug {
     inline autosd
     socket(int domain, int type, int protocol = 0)
     {
-        return autosd(verify(aug_socket(domain, type, protocol)));
+        autosd sd(aug_socket(domain, type, protocol));
+        if (null == sd)
+            failerror();
+        return sd;
     }
 
     inline autosd
@@ -134,7 +137,7 @@ namespace aug {
     {
         if (!aug_inetpton(AF_INET, src, &dst)
             && !aug_inetpton(AF_INET6, src, &dst))
-            fail();
+            failerror();
         return dst;
     }
 

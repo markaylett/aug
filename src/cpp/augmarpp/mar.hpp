@@ -23,9 +23,9 @@ namespace aug {
         verify(const void* result)
         {
             aug_errinfo& ei(*aug_tlerr);
-            if (!result && !(AUG_EEXIST == errnum(ei)
-                             && 0 == strcmp(errsrc(ei), "aug")))
-                fail();
+            if (!result && !(0 == strcmp(errsrc(ei), "aug")
+                             && AUG_EEXIST == errnum(ei)))
+                failerror();
             return result;
         }
     }

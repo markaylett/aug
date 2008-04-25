@@ -23,14 +23,14 @@ AUG_RCSID("$Id$");
 
 struct aug_connector_ {
     struct addrinfo* res_, *save_;
-    int fd_;
+    aug_sd sd_;
 };
 
 static int
-getsockerr_(int s, int* err)
+getsockerr_(aug_sd sd, int* err)
 {
     socklen_t len = sizeof(*err);
-    if (-1 == aug_getsockopt(s, SOL_SOCKET, SO_ERROR, err, &len))
+    if (-1 == aug_getsockopt(sd, SOL_SOCKET, SO_ERROR, err, &len))
         return -1;
 
     return 0;
@@ -57,48 +57,48 @@ aug_createconnector(const char* host, const char* serv)
     }
 
     ctor->res_ = ctor->save_ = res;
-    ctor->fd_ = -1;
+    ctor->sd_ = AUG_BADSD;
     return ctor;
 }
 
 AUGNET_API int
 aug_destroyconnector(aug_connector_t ctor)
 {
-    if (-1 != ctor->fd_)
-        aug_fclose(aug_getosfd(ctor->fd_));
+    if (AUG_BADSD != ctor->sd_)
+        aug_sclose(ctor->sd_);
 
     aug_destroyaddrinfo(ctor->save_);
     free(ctor);
     return 0;
 }
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 {
-    int fd = ctor->fd_;
-    ctor->fd_ = -1;
+    aug_sd sd = ctor->sd_;
+    ctor->sd_ = AUG_BADSD;
 
     /* Handle case where user has called after all connection attempts have
        failed. */
 
     if (!ctor->res_) {
-        assert(-1 == fd);
+        assert(AUG_BADSD == sd);
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("address-list exhausted"));
-        return -1;
+        return AUG_BADSD;
     }
 
-    if (-1 != fd) {
+    if (AUG_BADSD != sd) {
 
         /* Check status of pending connection. */
 
-        switch (aug_established(fd)) {
+        switch (aug_established(sd)) {
         case -1:
 
             /* Error testing for establishment. */
 
-            aug_fclose(aug_getosfd(fd));
-            return -1;
+            aug_sclose(sd);
+            return AUG_BADSD;
 
         case 0:
 
@@ -115,8 +115,8 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
                 /* Try next address. */
 
-                if (-1 == aug_fclose(aug_getosfd(fd)))
-                    return -1;
+                if (-1 == aug_sclose(sd))
+                    return AUG_BADSD;
                 break;
             }
 
@@ -124,11 +124,11 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
             {
                 int err = ECONNREFUSED;
-                getsockerr_(fd, &err);
-                aug_fclose(aug_getosfd(fd)); /* May set errno */
+                getsockerr_(sd, &err);
+                aug_sclose(sd); /* May set errno */
                 aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, err);
             }
-            return -1;
+            return AUG_BADSD;
         }
     }
 
@@ -136,19 +136,19 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
         /* Create socket for next address. */
 
-        fd = aug_socket(ctor->res_->ai_family, ctor->res_->ai_socktype,
+        sd = aug_socket(ctor->res_->ai_family, ctor->res_->ai_socktype,
                         ctor->res_->ai_protocol);
-        if (-1 == fd)
+        if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
-        if (-1 == aug_fsetnonblock(aug_getosfd(fd), 1)) {
-            aug_fclose(aug_getosfd(fd));
-            return -1;
+        if (-1 == aug_ssetnonblock(sd, 1)) {
+            aug_sclose(sd);
+            return AUG_BADSD;
         }
 
         aug_getendpoint(ctor->res_, ep);
 
-        if (0 == aug_connect(fd, ep)) {
+        if (0 == aug_connect(sd, ep)) {
 
             /* Immediate establishment. */
 
@@ -160,12 +160,12 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
             /* Connection pending. */
 
             *est = 0;
-            return ctor->fd_ = fd;
+            return ctor->sd_ = sd;
         }
 
         /* Failed for other reason. */
 
-        if (-1 == aug_fclose(aug_getosfd(fd))) /* Ignore this one. */
+        if (-1 == aug_sclose(sd)) /* Ignore this one. */
             return -1;
 
     } while ((ctor->res_ = ctor->res_->ai_next));
@@ -178,11 +178,11 @@ aug_tryconnect(aug_connector_t ctor, struct aug_endpoint* ep, int* est)
 
     /* Set back to blocking. */
 
-    if (-1 == aug_fsetnonblock(aug_getosfd(fd), 0)) {
-        aug_fclose(aug_getosfd(fd));
+    if (-1 == aug_ssetnonblock(sd, 0)) {
+        aug_sclose(sd);
         return -1;
     }
 
     *est = 1;
-    return fd;
+    return sd;
 }

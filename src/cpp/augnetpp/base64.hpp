@@ -13,7 +13,9 @@
 
 #include "augnet/base64.h"
 
-#include <memory> // auto_ptr<>
+#include "augctx/defs.h" // AUG_MAXLINE
+
+#include <memory>        // auto_ptr<>
 #include <sstream>
 
 namespace aug {

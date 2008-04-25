@@ -49,10 +49,12 @@ namespace aug {
         }
     };
 
-    inline std::pair<smartfd, bool>
+    inline std::pair<autosd, bool>
     tryconnect(aug_connector_t ctor, aug_endpoint& ep)
     {
         int est;
+        autosd sd(aug_tryconnect(ctor, &ep, &est));
+        if (null == sd)
         int ret(verify(aug_tryconnect(ctor, &ep, &est)));
 
         // When established, aug_tryconnect() will release ownership of the

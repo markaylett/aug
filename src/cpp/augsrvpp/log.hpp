@@ -23,12 +23,6 @@ namespace aug {
     {
         verify(aug_setsrvlogger(sname));
     }
-
-    inline void
-    unsetsrvlogger()
-    {
-        verify(aug_unsetsrvlogger());
-    }
 }
 
 #endif // AUGSRVPP_LOG_HPP

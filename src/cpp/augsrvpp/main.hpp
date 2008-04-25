@@ -9,10 +9,11 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
 
-#include "augsys/errno.h"
-#include "augsys/log.h"
 #include "augsrv/main.h"
 #include "augsrv/types.h"
+
+#include "augctx/errno.h"
+#include "augctx/log.h"
 
 namespace aug {
 

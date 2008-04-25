@@ -64,41 +64,41 @@ namespace aug {
         }
     };
 
-    template <typename T>
+    template <typename traitsT>
     bool
-    operator ==(basic_ref<T> lhs, basic_ref<T> rhs)
+    operator ==(basic_ref<traitsT> lhs, basic_ref<traitsT> rhs)
     {
-        return 0 == T::compare(lhs.get(), rhs.get());
+        return 0 == traitsT::compare(lhs.get(), rhs.get());
     }
-    template <typename T>
+    template <typename traitsT>
     bool
-    operator !=(basic_ref<T> lhs, basic_ref<T> rhs)
+    operator !=(basic_ref<traitsT> lhs, basic_ref<traitsT> rhs)
     {
-        return 0 != T::compare(lhs.get(), rhs.get());
+        return 0 != traitsT::compare(lhs.get(), rhs.get());
     }
-    template <typename T>
+    template <typename traitsT>
     bool
-    operator >=(basic_ref<T> lhs, basic_ref<T> rhs)
+    operator >=(basic_ref<traitsT> lhs, basic_ref<traitsT> rhs)
     {
-        return 0 <= T::compare(lhs.get(), rhs.get());
+        return 0 <= traitsT::compare(lhs.get(), rhs.get());
     }
-    template <typename T>
+    template <typename traitsT>
     bool
-    operator >(basic_ref<T> lhs, basic_ref<T> rhs)
+    operator >(basic_ref<traitsT> lhs, basic_ref<traitsT> rhs)
     {
-        return 0 < T::compare(lhs.get(), rhs.get());
+        return 0 < traitsT::compare(lhs.get(), rhs.get());
     }
-    template <typename T>
+    template <typename traitsT>
     bool
-    operator <=(basic_ref<T> lhs, basic_ref<T> rhs)
+    operator <=(basic_ref<traitsT> lhs, basic_ref<traitsT> rhs)
     {
-        return T::compare(lhs.get(), rhs.get()) <= 0;
+        return traitsT::compare(lhs.get(), rhs.get()) <= 0;
     }
-    template <typename T>
+    template <typename traitsT>
     bool
-    operator <(basic_ref<T> lhs, basic_ref<T> rhs)
+    operator <(basic_ref<traitsT> lhs, basic_ref<traitsT> rhs)
     {
-        return T::compare(lhs.get(), rhs.get()) < 0;
+        return traitsT::compare(lhs.get(), rhs.get()) < 0;
     }
 
     struct id_traits {

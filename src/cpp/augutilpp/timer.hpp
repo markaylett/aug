@@ -167,7 +167,7 @@ namespace aug {
     public:
         ~timer() AUG_NOTHROW
         {
-            if (0 < ref_)
+            if (idref(0) < ref_)
                 canceltimer(timers_, ref_);
         }
 
