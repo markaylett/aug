@@ -177,7 +177,7 @@ namespace aug {
         ~httpparser() AUG_NOTHROW
         {
             if (-1 == aug_destroyhttpparser(httpparser_))
-                perrinfo("aug_destroyhttpparser() failed");
+                perrinfo(aug_tlx, "aug_destroyhttpparser() failed");
         }
 
         httpparser(unsigned size, const aug_httphandler& handler,

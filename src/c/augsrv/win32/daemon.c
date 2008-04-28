@@ -59,12 +59,12 @@ handler_(DWORD code)
     case RECONF_:
         event.type_ = AUG_EVENTRECONF;
         if (!aug_writeevent(aug_eventwr(), &event))
-            aug_perrinfo(aug_tlx, "aug_writeevent() failed");
+            aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
         break;
     case STATUS_:
         event.type_ = AUG_EVENTSTATUS;
         if (!aug_writeevent(aug_eventwr(), &event))
-            aug_perrinfo(aug_tlx, "aug_writeevent() failed");
+            aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
         break;
     case STOP_:
     case SERVICE_CONTROL_STOP:
@@ -72,7 +72,7 @@ handler_(DWORD code)
         setstatus_(SERVICE_STOP_PENDING);
         event.type_ = AUG_EVENTSTOP;
         if (!aug_writeevent(aug_eventwr(), &event)) {
-            aug_perrinfo(aug_tlx, "aug_writeevent() failed");
+            aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
             setstatus_(SERVICE_RUNNING);
         }
         break;
@@ -107,14 +107,14 @@ start_(DWORD argc, char** argv)
 
     if (!SetCurrentDirectory(home)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        aug_perrinfo(aug_tlx, "SetCurrentDirectory() failed");
+        aug_perrinfo(aug_tlx, "SetCurrentDirectory() failed", NULL);
         goto done;
     }
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
-        aug_perrinfo(aug_tlx, "getserviceopt() failed");
+        aug_perrinfo(aug_tlx, "getserviceopt() failed", NULL);
         goto done;
     }
 
@@ -129,20 +129,20 @@ start_(DWORD argc, char** argv)
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("unexpected command value"));
-        aug_perrinfo(aug_tlx, "invalid options");
+        aug_perrinfo(aug_tlx, "invalid options", NULL);
         goto done;
     }
 
     if (-1 == aug_readserviceconf(*options.conffile_
                                   ? options.conffile_ : NULL, 0, 1)) {
-        aug_perrinfo(aug_tlx, "aug_readserviceconf() failed");
+        aug_perrinfo(aug_tlx, "aug_readserviceconf() failed", NULL);
         goto done;
     }
 
     if (!(ssh_ = RegisterServiceCtrlHandler(sname, handler_))) {
 
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        aug_perrinfo(aug_tlx, "RegisterServiceCtrlHandler() failed");
+        aug_perrinfo(aug_tlx, "RegisterServiceCtrlHandler() failed", NULL);
         goto done;
     }
 
@@ -150,7 +150,7 @@ start_(DWORD argc, char** argv)
 
     if (-1 == aug_initservice()) {
 
-        aug_perrinfo(aug_tlx, "aug_initservice() failed");
+        aug_perrinfo(aug_tlx, "aug_initservice() failed", NULL);
         setstatus_(SERVICE_STOPPED);
         goto done;
     }
@@ -159,7 +159,7 @@ start_(DWORD argc, char** argv)
     setstatus_(SERVICE_RUNNING);
 
     if (-1 == aug_runservice())
-        aug_perrinfo(aug_tlx, "aug_runservice() failed");
+        aug_perrinfo(aug_tlx, "aug_runservice() failed", NULL);
 
     aug_ctxnotice(aug_tlx, "daemon stopped");
     setstatus_(SERVICE_STOPPED);

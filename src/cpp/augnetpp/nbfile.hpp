@@ -15,19 +15,19 @@
 
 #include "augutil/list.h"
 
-#include "augsys/errno.h"
-#include "augsys/log.h"
+#include "augctx/errno.h"
+#include "augctx/log.h"
 
 #include <memory> // auto_ptr<>
 
 namespace aug {
 
-    template <bool (*T)(aug::objectref, int, unsigned short)>
+    template <bool (*T)(aug::objectref, mdref, unsigned short)>
     int
-    nbfilecb(aug_object* ob, int fd, unsigned short events) AUG_NOTHROW
+    nbfilecb(aug_object* ob, aug_md md, unsigned short events) AUG_NOTHROW
     {
         try {
-            return T(ob, fd, events) ? 1 : 0;
+            return T(ob, md, events) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
 
         /**
@@ -39,20 +39,20 @@ namespace aug {
 
     template <typename T, bool (T::*U)(aug::objectref, int, unsigned short)>
     int
-    nbfilememcb(aug_object* ob, int fd, unsigned short events) AUG_NOTHROW
+    nbfilememcb(aug_object* ob, aug_md md, unsigned short events) AUG_NOTHROW
     {
         try {
-            return (obtoaddr<T*>(ob)->*U)(fd, events) ? 1 : 0;
+            return (obtoaddr<T*>(ob)->*U)(md, events) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
 
     template <typename T>
     int
-    nbfilememcb(aug_object* ob, int fd, unsigned short events) AUG_NOTHROW
+    nbfilememcb(aug_object* ob, aug_md md, unsigned short events) AUG_NOTHROW
     {
         try {
-            return obtoaddr<T*>(ob)->nbfilecb(fd, events) ? 1 : 0;
+            return obtoaddr<T*>(ob)->nbfilecb(md, events) ? 1 : 0;
         } AUG_SETERRINFOCATCH;
         return 1;
     }
@@ -70,7 +70,7 @@ namespace aug {
         ~nbfiles() AUG_NOTHROW
         {
             if (-1 == aug_destroynbfiles(nbfiles_))
-                perrinfo("aug_destroynbfiles() failed");
+                perrinfo(aug_tlx, "aug_destroynbfiles() failed");
         }
 
         nbfiles()
@@ -91,14 +91,14 @@ namespace aug {
     };
 
     inline void
-    insertnbfile(aug_nbfiles_t nbfiles, fdref ref, aug_nbfilecb_t cb,
+    insertnbfile(aug_nbfiles_t nbfiles, mdref ref, aug_nbfilecb_t cb,
                  aug_object* ob)
     {
         verify(aug_insertnbfile(nbfiles, ref.get(), cb, ob));
     }
 
     inline void
-    insertnbfile(aug_nbfiles_t nbfiles, fdref ref, aug_nbfilecb_t cb,
+    insertnbfile(aug_nbfiles_t nbfiles, mdref ref, aug_nbfilecb_t cb,
                  const null_&)
     {
         verify(aug_insertnbfile(nbfiles, ref.get(), cb, 0));
@@ -106,7 +106,7 @@ namespace aug {
 
     template <typename T>
     void
-    insertnbfile(aug_nbfiles_t nbfiles, fdref ref, T& x)
+    insertnbfile(aug_nbfiles_t nbfiles, mdref ref, T& x)
     {
         aug::smartob<aug_addrob> ob(createaddrob(&x, 0));
         verify(aug_insertnbfile
@@ -115,7 +115,7 @@ namespace aug {
 
     template <typename T>
     void
-    insertnbfile(aug_nbfiles_t nbfiles, fdref ref, std::auto_ptr<T>& x)
+    insertnbfile(aug_nbfiles_t nbfiles, mdref ref, std::auto_ptr<T>& x)
     {
         aug::smartob<aug_addrob> ob(createaddrob(x));
         verify(aug_insertnbfile
@@ -123,7 +123,7 @@ namespace aug {
     }
 
     inline void
-    removenbfile(fdref ref)
+    removenbfile(mdref ref)
     {
         verify(aug_removenbfile(ref.get()));
     }
@@ -157,25 +157,25 @@ namespace aug {
     }
 
     inline void
-    shutdownnbfile(fdref ref)
+    shutdownnbfile(mdref ref)
     {
         verify(aug_shutdownnbfile(ref.get()));
     }
 
     inline void
-    setnbeventmask(fdref ref, unsigned short mask)
+    setnbeventmask(mdref ref, unsigned short mask)
     {
         verify(aug_setnbeventmask(ref.get(), mask));
     }
 
     inline unsigned short
-    nbeventmask(fdref ref)
+    nbeventmask(mdref ref)
     {
         return verify(aug_nbeventmask(ref.get()));
     }
 
     inline unsigned short
-    nbevents(fdref ref)
+    nbevents(mdref ref)
     {
         return verify(aug_nbevents(ref.get()));
     }

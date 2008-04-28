@@ -7,60 +7,61 @@
 #include "augnetpp/config.hpp"
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/socket.hpp" // close()
 #include "augsyspp/smartfd.hpp"
 
 #include "augnet/inet.h"
 
 namespace aug {
 
-    inline smartfd
+    inline autosd
     tcpconnect(const char* host, const char* serv, aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_tcpconnect(host, serv, &ep)));
-        if (null == sfd)
-            fail();
+        autosd sd(aug_tcpconnect(host, serv, &ep), close);
+        if (null == sd)
+            failerror();
 
-        return sfd;
+        return sd;
     }
 
-    inline smartfd
+    inline autosd
     tcplisten(const char* host, const char* serv, aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_tcplisten(host, serv, &ep)));
-        if (null == sfd)
-            fail();
+        autosd sd(aug_tcplisten(host, serv, &ep), close);
+        if (null == sd)
+            failerror();
 
-        return sfd;
+        return sd;
     }
 
-    inline smartfd
+    inline autosd
     udpclient(const char* host, const char* serv, aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_udpclient(host, serv, &ep)));
-        if (null == sfd)
-            fail();
+        autosd sd(aug_udpclient(host, serv, &ep), close);
+        if (null == sd)
+            failerror();
 
-        return sfd;
+        return sd;
     }
 
-    inline smartfd
+    inline autosd
     udpconnect(const char* host, const char* serv, aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_udpconnect(host, serv, &ep)));
-        if (null == sfd)
-            fail();
+        autosd sd(aug_udpconnect(host, serv, &ep), close);
+        if (null == sd)
+            failerror();
 
-        return sfd;
+        return sd;
     }
 
-    inline smartfd
+    inline autosd
     udpserver(const char* host, const char* serv, aug_endpoint& ep)
     {
-        smartfd sfd(smartfd::attach(aug_udpserver(host, serv, &ep)));
-        if (null == sfd)
-            fail();
+        autosd sd(aug_udpserver(host, serv, &ep), close);
+        if (null == sd)
+            failerror();
 
-        return sfd;
+        return sd;
     }
 
     inline aug_hostserv&
@@ -70,14 +71,14 @@ namespace aug {
     }
 
     inline void
-    setnodelay(fdref ref, bool on)
+    setnodelay(sdref ref, bool on)
     {
         int value(on ? 1 : 0);
         verify(aug_setnodelay(ref.get(), value));
     }
 
     inline bool
-    established(fdref ref)
+    established(sdref ref)
     {
         return AUG_FAILNONE == verify(aug_established(ref.get()))
             ? false : true;

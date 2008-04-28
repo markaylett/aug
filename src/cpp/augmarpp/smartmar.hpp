@@ -30,7 +30,7 @@ namespace aug {
                 return;
 
             if (null != ref_ && -1 == aug_releasemar(ref_.get()))
-                perrinfo("aug_releasemar() failed");
+                perrinfo(aug_tlx, "aug_releasemar() failed");
         }
 
         smartmar(const null_&) AUG_NOTHROW

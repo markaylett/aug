@@ -28,7 +28,7 @@ namespace aug {
         ~lexer() AUG_NOTHROW
         {
             if (-1 == aug_destroylexer(lexer_))
-                perrinfo("aug_destroylexer() failed");
+                perrinfo(aug_tlx, "aug_destroylexer() failed");
         }
 
         lexer(unsigned size, const networds_&)

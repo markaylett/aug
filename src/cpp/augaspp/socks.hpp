@@ -17,10 +17,10 @@ namespace aug {
 
     class socks {
 
-        typedef std::map<mod_id, int, std::greater<mod_id> > idtofd;
+        typedef std::map<mod_id, sdref, std::greater<mod_id> > idtosd;
 
-        std::map<int, sockptr> socks_;
-        idtofd idtofd_;
+        std::map<sdref, sockptr> socks_;
+        idtosd idtosd_;
 
         socks(const socks& rhs);
 
@@ -49,13 +49,13 @@ namespace aug {
         insert(const sockptr& sock);
 
         void
-        update(const sockptr& sock, fdref prev);
+        update(const sockptr& sock, sdref prev);
 
         void
         teardown(const timeval& tv);
 
         sockptr
-        getbyfd(fdref fd) const;
+        getbysd(sdref sd) const;
 
         sockptr
         getbyid(mod_id id) const;

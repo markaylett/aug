@@ -21,8 +21,11 @@ namespace aug {
 
     class sock_base : public object_base {
 
-        virtual smartfd
-        do_sfd() const = 0;
+        virtual autosd
+        do_release() = 0;
+
+        virtual sdref
+        do_sd() const = 0;
 
         virtual sockstate
         do_state() const = 0;
@@ -31,10 +34,15 @@ namespace aug {
         virtual
         ~sock_base() AUG_NOTHROW;
 
-        smartfd
-        sfd() const
+        autosd
+        release()
         {
-            return do_sfd();
+            return do_release();
+        }
+        sdref
+        sd() const
+        {
+            return do_sd();
         }
         sockstate
         state() const

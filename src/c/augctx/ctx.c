@@ -342,10 +342,11 @@ aug_ctxdebug3(aug_ctx* ctx, const char* format, ...)
 }
 
 AUGCTX_API aug_result
-aug_perrinfo(aug_ctx* ctx, const char* s)
+aug_perrinfo(aug_ctx* ctx, const char* s, const struct aug_errinfo* errinfo)
 {
-    struct aug_errinfo* errinfo = aug_geterrinfo(ctx);
     const char* file;
+    if (!errinfo)
+        errinfo = aug_geterrinfo(ctx);
 
     if (0 == errinfo->num_) {
         aug_ctxerror(ctx, "%s: no description available", s);

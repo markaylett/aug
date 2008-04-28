@@ -47,7 +47,7 @@ namespace aug {
         ~hires() AUG_NOTHROW
         {
             if (-1 == aug_destroyhires(hires_))
-                perrinfo("aug_destroyhires() failed");
+                perrinfo(aug_tlx, "aug_destroyhires() failed");
         }
 
         hires()

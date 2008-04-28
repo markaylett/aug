@@ -14,7 +14,7 @@ namespace aug {
     class rwtimer_base {
 
         virtual void
-        do_timercb(int id, unsigned& ms) = 0;
+        do_timercb(idref id, unsigned& ms) = 0;
 
         virtual void
         do_setrwtimer(unsigned ms, unsigned flags) = 0;
@@ -33,7 +33,7 @@ namespace aug {
         ~rwtimer_base() AUG_NOTHROW;
 
         void
-        timercb(int id, unsigned& ms)
+        timercb(idref id, unsigned& ms)
         {
             do_timercb(id, ms);
         }
@@ -69,7 +69,7 @@ namespace aug {
         timer wrtimer_;
 
         void
-        do_timercb(int id, unsigned& ms);
+        do_timercb(idref id, unsigned& ms);
 
         void
         do_setrwtimer(unsigned ms, unsigned flags);

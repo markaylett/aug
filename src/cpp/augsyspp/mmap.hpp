@@ -44,7 +44,7 @@ namespace aug {
         ~mmap() AUG_NOTHROW
         {
             if (-1 == aug_destroymmap(mmap_))
-                perrinfo("aug_destroymmap() failed");
+                perrinfo(aug_tlx, "aug_destroymmap() failed");
         }
 
         mmap(fdref ref, size_t offset, size_t len, int flags)

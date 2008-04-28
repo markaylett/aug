@@ -10,11 +10,11 @@
  * General utility library.
  */
 
-#include "augutil/clock.h"
 #include "augutil/conv.h"
 #include "augutil/event.h"
 #include "augutil/file.h"
 #include "augutil/getopt.h"
+#include "augutil/hires.h"
 #include "augutil/lexer.h"
 #include "augutil/list.h"
 #include "augutil/log.h"

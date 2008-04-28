@@ -11,10 +11,30 @@
 
 namespace aug {
 
+    inline void
+    close(sdref ref)
+    {
+        verify(aug_sclose(ref.get()));
+    }
+
+    /**
+     * Set socket non-blocking on or off.
+     *
+     * @param ref Socket descriptor.
+     *
+     * @param on On or off.
+     */
+
+    inline void
+    setnonblock(sdref ref, bool on)
+    {
+        verify(aug_ssetnonblock(ref.get(), on ? 1 : 0));
+    }
+
     inline autosd
     socket(int domain, int type, int protocol = 0)
     {
-        autosd sd(aug_socket(domain, type, protocol));
+        autosd sd(aug_socket(domain, type, protocol), close);
         if (null == sd)
             failerror();
         return sd;
@@ -23,7 +43,7 @@ namespace aug {
     inline autosd
     accept(sdref ref, aug_endpoint& ep)
     {
-        return autosd(verify(aug_accept(ref.get(), &ep)));
+        return autosd(verify(aug_accept(ref.get(), &ep)), close);
     }
 
     inline void
@@ -82,6 +102,30 @@ namespace aug {
         return verify(aug_sendto(ref.get(), buf, len, flags, &ep));
     }
 
+    inline ssize_t
+    read(sdref ref, void* buf, size_t len)
+    {
+        return verify(aug_sread(ref.get(), buf, len));
+    }
+
+    inline ssize_t
+    readv(sdref ref, const struct iovec* iov, int size)
+    {
+        return verify(aug_sreadv(ref.get(), iov, size));
+    }
+
+    inline ssize_t
+    write(sdref ref, const void* buf, size_t len)
+    {
+        return verify(aug_swrite(ref.get(), buf, len));
+    }
+
+    inline ssize_t
+    writev(sdref ref, const struct iovec* iov, int size)
+    {
+        return verify(aug_swritev(ref.get(), iov, size));
+    }
+
     inline void
     getsockopt(sdref ref, int level, int optname, void* optval,
                socklen_t& optlen)
@@ -107,7 +151,7 @@ namespace aug {
     {
         aug_sd sv[2];
         verify(aug_socketpair(domain, type, protocol, sv));
-        return autosds(sv[0], sv[1]);
+        return autosds(sv[0], sv[1], close);
     }
 
     inline std::string

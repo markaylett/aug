@@ -62,7 +62,8 @@ libaugaspp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugaspp_la_OBJECTS = buffer.lo clntconn.lo config.lo conn.lo \
 	engine.lo listener.lo object.lo rwtimer.lo servconn.lo \
 	session.lo sessions.lo ssl.lo sock.lo socks.lo
@@ -254,7 +255,8 @@ libaugaspp_la_LIBADD = \
 	$(top_builddir)/src/c/augsrv/libaugsrv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 all: all-am
 

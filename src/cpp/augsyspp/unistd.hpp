@@ -17,16 +17,30 @@ namespace aug {
         verify(aug_fclose(ref.get()));
     }
 
+    /**
+     * Set file non-blocking on or off.
+     *
+     * @param ref File descriptor.
+     *
+     * @param on On or off.
+     */
+
+    inline void
+    setnonblock(fdref ref, bool on)
+    {
+        verify(aug_fsetnonblock(ref.get(), on ? 1 : 0));
+    }
+
     inline autofd
     open(const char* path, int flags)
     {
-        return autofd(verify(aug_fopen(path, flags)));
+        return autofd(verify(aug_fopen(path, flags)), close);
     }
 
     inline autofd
     open(const char* path, int flags, mode_t mode)
     {
-        return autofd(verify(aug_fopen(path, flags, mode)));
+        return autofd(verify(aug_fopen(path, flags, mode)), close);
     }
 
     inline autofds
@@ -34,7 +48,7 @@ namespace aug {
     {
         aug_fd fds[2];
         verify(aug_fpipe(fds));
-        return autofds(fds[0], fds[1]);
+        return autofds(fds[0], fds[1], close);
     }
 
     inline size_t

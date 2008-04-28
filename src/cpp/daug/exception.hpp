@@ -8,14 +8,21 @@
 
 namespace daug {
 
-    const int SRCDAUG(AUG_SRCUSER + 0);
     const int ECONFIG(1);
     const int EHOSTCALL(2);
     const int EMODCALL(3);
     const int ESSLCTX(4);
     const int ESTATE(5);
 
-    typedef aug::basic_error<SRCDAUG> error;
+    namespace detail {
+        inline const char*
+        daug_src()
+        {
+            return "daug";
+        }
+    }
+
+    typedef aug::basic_error<detail::daug_src> daug_error;
 }
 
 #endif // DAUG_EXCEPTION_HPP

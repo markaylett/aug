@@ -15,16 +15,16 @@
 
 #include "augutil/list.h"
 
-#include "augsys/errno.h"
-#include "augsys/log.h"
+#include "augctx/errno.h"
+#include "augctx/log.h"
 
 #include <memory> // auto_ptr<>
 
 namespace aug {
 
-    template <bool (*T)(aug::objectref, int)>
+    template <bool (*T)(aug::objectref, fdref)>
     int
-    filecb(aug_object* ob, int fd) AUG_NOTHROW
+    filecb(aug_object* ob, aug_fd fd) AUG_NOTHROW
     {
         try {
             return T(ob, fd) ? 1 : 0;
@@ -62,7 +62,7 @@ namespace aug {
         typedef aug_files ctype;
     private:
 
-        friend class file;
+        //friend class file;
 
         aug_files files_;
 
@@ -75,7 +75,7 @@ namespace aug {
         ~files() AUG_NOTHROW
         {
             if (-1 == aug_destroyfiles(&files_))
-                perrinfo("aug_destroyfiles() failed");
+                perrinfo(aug_tlx, "aug_destroyfiles() failed");
         }
 
         files()
@@ -95,21 +95,21 @@ namespace aug {
     };
 
     inline void
-    insertfile(aug_files& files, fdref ref, aug_filecb_t cb,
+    insertfile(aug_files& files, mdref ref, aug_filecb_t cb,
                aug::obref<aug_object> ob)
     {
         verify(aug_insertfile(&files, ref.get(), cb, ob.get()));
     }
 
     inline void
-    insertfile(aug_files& files, fdref ref, aug_filecb_t cb, const null_&)
+    insertfile(aug_files& files, mdref ref, aug_filecb_t cb, const null_&)
     {
         verify(aug_insertfile(&files, ref.get(), cb, 0));
     }
 
     template <typename T>
     void
-    insertfile(aug_files& files, fdref ref, T& x)
+    insertfile(aug_files& files, mdref ref, T& x)
     {
         aug::smartob<aug_addrob> ob(createaddrob(&x, 0));
         verify(aug_insertfile(&files, ref.get(), filememcb<T>, ob.base()));
@@ -117,14 +117,14 @@ namespace aug {
 
     template <typename T>
     void
-    insertfile(aug_files& files, fdref ref, std::auto_ptr<T>& x)
+    insertfile(aug_files& files, mdref ref, std::auto_ptr<T>& x)
     {
         aug::smartob<aug_addrob> ob(createaddrob(x));
         verify(aug_insertfile(&files, ref.get(), filememcb<T>, ob.base()));
     }
 
     inline void
-    removefile(aug_files& files, fdref ref)
+    removefile(aug_files& files, mdref ref)
     {
         verify(aug_removefile(&files, ref.get()));
     }

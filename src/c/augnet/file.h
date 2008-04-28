@@ -27,7 +27,7 @@ AUG_HEAD(aug_files, aug_file_);
  * Callback function has a boolean return value: returning false removes the
  * file.
  */
-typedef int (*aug_filecb_t)(aug_object*, int);
+typedef int (*aug_filecb_t)(aug_object*, aug_md);
 
 /**
  * Destroy each file in the list.
@@ -55,7 +55,7 @@ aug_destroyfiles(struct aug_files* files);
  */
 
 AUGNET_API int
-aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
+aug_insertfile(struct aug_files* files, aug_md md, aug_filecb_t cb,
                aug_object* ob);
 
 /**
@@ -67,7 +67,7 @@ aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
  */
 
 AUGNET_API int
-aug_removefile(struct aug_files* files, int fd);
+aug_removefile(struct aug_files* files, aug_md md);
 
 /**
  * Iterate list of files.

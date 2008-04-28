@@ -119,20 +119,12 @@ namespace aug {
         }
     };
 
-    AUGSYS_API aug_result
-    aug_fclose(aug_fd fd);
-
     struct fd_traits {
         typedef aug_fd ref;
         static aug_fd
         bad() AUG_NOTHROW
         {
             return AUG_BADFD;
-        }
-        static aug_result
-        close(aug_fd fd)
-        {
-            return aug_fclose(fd);
         }
         static int
         compare(aug_fd lhs, aug_fd rhs) AUG_NOTHROW
@@ -145,20 +137,12 @@ namespace aug {
         }
     };
 
-    AUGSYS_API aug_result
-    aug_sclose(aug_sd sd);
-
     struct sd_traits {
         typedef aug_sd ref;
         static aug_sd
         bad() AUG_NOTHROW
         {
             return AUG_BADSD;
-        }
-        static aug_result
-        close(aug_sd sd)
-        {
-            return aug_sclose(sd);
         }
         static int
         compare(aug_sd lhs, aug_sd rhs) AUG_NOTHROW

@@ -55,7 +55,7 @@ options::get(const string& name) const
 {
     map<string, string>::const_iterator it(options_.find(name));
     if (options_.find(name) == options_.end())
-        throw error(__FILE__, __LINE__, ECONFIG, "missing option: name=[%s]",
-                    name.c_str());
+        throw daug_error(__FILE__, __LINE__, ECONFIG,
+                         "missing option: name=[%s]", name.c_str());
     return it->second;
 }

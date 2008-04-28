@@ -27,7 +27,7 @@ aug_destroynbfiles(aug_nbfiles_t nbfiles);
  */
 
 AUGNET_API int
-aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
+aug_insertnbfile(aug_nbfiles_t nbfiles, aug_md md, aug_nbfilecb_t cb,
                  aug_object* ob);
 
 /**
@@ -35,7 +35,7 @@ aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
  */
 
 AUGNET_API int
-aug_removenbfile(int fd);
+aug_removenbfile(aug_md md);
 
 AUGNET_API int
 aug_foreachnbfile(aug_nbfiles_t nbfiles);
@@ -52,15 +52,15 @@ AUGNET_API int
 aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout);
 
 AUGNET_API int
-aug_shutdownnbfile(int fd);
+aug_shutdownnbfile(aug_md md);
 
 AUGNET_API int
-aug_setnbeventmask(int fd, unsigned short mask);
+aug_setnbeventmask(aug_md md, unsigned short mask);
 
 AUGNET_API int
-aug_nbeventmask(int fd);
+aug_nbeventmask(aug_md md);
 
 AUGNET_API int
-aug_nbevents(int fd);
+aug_nbevents(aug_md md);
 
 #endif /* AUGNET_NBFILE_H */

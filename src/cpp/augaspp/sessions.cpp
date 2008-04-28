@@ -7,6 +7,8 @@
 
 AUG_RCSID("$Id$");
 
+#include "augsyspp/exception.hpp"
+
 #include <sstream>
 
 using namespace aug;
@@ -78,9 +80,9 @@ sessions::getbyname(const string& name) const
 {
     map<string, sessionptr>::const_iterator it(sessions_.find(name));
     if (it == sessions_.end())
-        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          AUG_MSG("session not found: sname=[%s]"),
-                          name.c_str());
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        AUG_MSG("session not found: sname=[%s]"),
+                        name.c_str());
     return it->second;
 }
 

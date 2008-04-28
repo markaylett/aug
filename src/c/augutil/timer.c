@@ -230,7 +230,7 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
             if (it->ms_) {
 
                 if (-1 == expiry_(&it->tv_, it->ms_))
-                    aug_perrinfo(NULL, "expiry_() failed");
+                    aug_perrinfo(aug_tlx, "expiry_() failed", NULL);
                 else
                     insert_(timers, it);
 

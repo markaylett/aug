@@ -24,7 +24,7 @@ namespace aug {
         ~writer() AUG_NOTHROW
         {
             if (-1 == aug_destroywriter(writer_))
-                perrinfo("aug_destroywriter() failed");
+                perrinfo(aug_tlx, "aug_destroywriter() failed");
         }
 
         writer()
@@ -64,7 +64,7 @@ namespace aug {
     }
 
     inline size_t
-    writesome(aug_writer_t writer, fdref ref)
+    writesome(aug_writer_t writer, mdref ref)
     {
         return verify(aug_writesome(writer, ref.get()));
     }

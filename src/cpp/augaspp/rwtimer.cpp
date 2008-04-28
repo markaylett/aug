@@ -17,13 +17,13 @@ rwtimer_base::~rwtimer_base() AUG_NOTHROW
 }
 
 void
-rwtimer::do_timercb(int id, unsigned& ms)
+rwtimer::do_timercb(idref id, unsigned& ms)
 {
     if (rdtimer_.id() == id) {
-        AUG_DEBUG2("read timer expiry");
+        AUG_CTXDEBUG2(aug_tlx, "read timer expiry");
         session_->rdexpire(sock_, ms);
     } else if (wrtimer_.id() == id) {
-        AUG_DEBUG2("write timer expiry");
+        AUG_CTXDEBUG2(aug_tlx, "write timer expiry");
         session_->wrexpire(sock_, ms);
     } else
         assert(0);

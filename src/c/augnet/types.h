@@ -12,11 +12,11 @@ struct aug_files;
 struct aug_nbtype;
 
 typedef struct aug_nbfiles_* aug_nbfiles_t;
-typedef int (*aug_nbfilecb_t)(aug_object*, int, unsigned short);
+typedef int (*aug_nbfilecb_t)(aug_object*, aug_md, unsigned short);
 
 struct aug_nbfile {
     aug_nbfiles_t nbfiles_;
-    int fd_;
+    aug_md md_;
     aug_nbfilecb_t cb_;
     const struct aug_fdtype* base_;
     const struct aug_nbtype* type_;

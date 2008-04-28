@@ -58,13 +58,13 @@ namespace {
         unsigned ms(diffms(since, now));
 
         if (AUG_WRMAXWAIT < ms)
-            throw local_error(__FILE__, __LINE__, AUG_ETIMEOUT,
-                              "write wait exceeded: pending=[%u], since=[%u]",
-                              static_cast<unsigned>(size), ms);
+            throw aug_error(__FILE__, __LINE__, AUG_ETIMEOUT,
+                            "write wait exceeded: pending=[%u], since=[%u]",
+                            static_cast<unsigned>(size), ms);
 
         if (AUG_WRMAXWAIT * 2 < ms * 3)
-            aug_warn("write latency: pending=[%u], since=[%u]",
-                     static_cast<unsigned>(size), ms);
+            aug_ctxwarn(aug_tlx, "write latency: pending=[%u], since=[%u]",
+                        static_cast<unsigned>(size), ms);
     }
 
     void
@@ -90,12 +90,13 @@ namespace {
             return;
 
         if (AUG_WRMAXTIME < estms)
-            throw local_error(__FILE__, __LINE__, AUG_ETIMEOUT,
-                              "write time exceeded: perms=[%u], estms=[%u]",
-                              perms, estms);
+            throw aug_error(__FILE__, __LINE__, AUG_ETIMEOUT,
+                            "write time exceeded: perms=[%u], estms=[%u]",
+                            perms, estms);
 
         if (AUG_WRMAXTIME * 2 < estms * 3)
-            aug_warn("write time: perms=[%u], estms=[%u]", perms, estms);
+            aug_ctxwarn(aug_tlx, "write time: perms=[%u], estms=[%u]", perms,
+                        estms);
     }
 }
 
@@ -121,10 +122,16 @@ connected::do_session() const
     return session_;
 }
 
-smartfd
-connected::do_sfd() const
+autosd
+connected::do_release()
 {
-    return sfd_;
+    return sd_;
+}
+
+sdref
+connected::do_sd() const
+{
+    return sd_;
 }
 
 void
@@ -135,7 +142,7 @@ connected::do_send(const void* buf, size_t len, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setnbeventmask(sfd_, AUG_FDEVENTRDWR);
+        setnbeventmask(sd_, AUG_FDEVENTRDWR);
     }
 
     buffer_.append(buf, len);
@@ -149,7 +156,7 @@ connected::do_sendv(blobref ref, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setnbeventmask(sfd_, AUG_FDEVENTRDWR);
+        setnbeventmask(sd_, AUG_FDEVENTRDWR);
     }
 
     buffer_.append(ref);
@@ -176,17 +183,17 @@ connected::do_process(unsigned short events, const timeval& now)
 {
     if (events & AUG_FDEVENTRD) {
 
-        AUG_DEBUG2("handling read event: id=[%d], fd=[%d]", sock_.id_,
-                   sfd_.get());
+        AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%d], fd=[%d]",
+                      sock_.id_, sd_.get());
 
         char buf[4096];
-        size_t size(aug::read(sfd_, buf, sizeof(buf)));
+        size_t size(aug::read(sd_, buf, sizeof(buf)));
         if (0 == size) {
 
             // Connection closed.
 
-            AUG_DEBUG2("closing connection: id=[%d], fd=[%d]", sock_.id_,
-                       sfd_.get());
+            AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%d], fd=[%d]",
+                          sock_.id_, sd_.get());
             state_ = CLOSED;
             return true;
         }
@@ -202,10 +209,10 @@ connected::do_process(unsigned short events, const timeval& now)
 
     if (events & AUG_FDEVENTWR) {
 
-        AUG_DEBUG2("handling write event: id=[%d], fd=[%d]", sock_.id_,
-                   sfd_.get());
+        AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%d], fd=[%d]",
+                      sock_.id_, sd_.get());
 
-        size_t n(buffer_.writesome(sfd_));
+        size_t n(buffer_.writesome(sd_));
 
         // Data has been written: reset write timer.
 
@@ -215,18 +222,19 @@ connected::do_process(unsigned short events, const timeval& now)
 
             // No more (buffered) data to be written.
 
-            setnbeventmask(sfd_, AUG_FDEVENTRD);
+            setnbeventmask(sd_, AUG_FDEVENTRD);
 
             // If flagged for shutdown, send FIN and disable writes.
 
             if (SHUTDOWN <= state_)
-                shutdownnbfile(sfd_);
+                shutdownnbfile(sd_);
 
         } else {
 
-            AUG_DEBUG2("partial write: written=[%u], remaining=[%u]",
-                       static_cast<unsigned>(n),
-                       static_cast<unsigned>(buffer_.size()));
+            AUG_CTXDEBUG2(aug_tlx,
+                          "partial write: written=[%u], remaining=[%u]",
+                          static_cast<unsigned>(n),
+                          static_cast<unsigned>(buffer_.size()));
 
             // If size threshold has been exceeded, check if buffer can be
             // cleared in acceptable timeframe.
@@ -256,9 +264,10 @@ connected::do_shutdown(unsigned flags, const timeval& now)
     if (state_ < SHUTDOWN) {
         state_ = SHUTDOWN;
         if (buffer_.empty() || flags & MOD_SHUTNOW) {
-            aug_info("shutting connection: id=[%d], fd=[%d], flags=[%u]",
-                     sock_.id_, sfd_.get(), flags);
-            shutdownnbfile(sfd_);
+            aug_ctxinfo(aug_tlx,
+                        "shutting connection: id=[%d], fd=[%d], flags=[%u]",
+                        sock_.id_, sd_.get(), flags);
+            shutdownnbfile(sd_);
         }
     }
 }
@@ -299,13 +308,13 @@ connected::~connected() AUG_NOTHROW
 }
 
 connected::connected(const sessionptr& session, mod_handle& sock,
-                     buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
+                     buffer& buffer, rwtimer& rwtimer, autosd& sd,
                      const endpoint& ep, bool close)
     : session_(session),
       sock_(sock),
       buffer_(buffer),
       rwtimer_(rwtimer),
-      sfd_(sfd),
+      sd_(sd),
       endpoint_(ep),
       state_(CONNECTED),
       close_(close)
@@ -331,10 +340,16 @@ handshake::do_session() const
     return session_;
 }
 
-smartfd
-handshake::do_sfd() const
+autosd
+handshake::do_release()
 {
-    return sfd_;
+    return sd_;
+}
+
+sdref
+handshake::do_sd() const
+{
+    return sd_;
 }
 
 void
@@ -358,8 +373,8 @@ handshake::do_accepted(const aug_endpoint& ep, const timeval& now)
 void
 handshake::do_connected(const aug_endpoint& ep, const timeval& now)
 {
-    throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                      AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
+    throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                    AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
 bool
@@ -367,12 +382,12 @@ handshake::do_process(unsigned short events, const timeval& now)
 {
     try {
 
-        pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
-        sfd_ = xy.first;
+        bool est;
+        sd_ = tryconnect(connector_, endpoint_, est);
 
         // Check to see if connection was established.
 
-        if (xy.second) {
+        if (est) {
             state_ = CONNECTED;
             return true;
         }
@@ -381,7 +396,7 @@ handshake::do_process(unsigned short events, const timeval& now)
 
     } catch (const errinfo_error& e) {
 
-        perrinfo(e, "connection failed");
+        perrinfo(aug_tlx, "connection failed", e);
         state_ = CLOSED;
         return true;
     }
@@ -392,8 +407,8 @@ handshake::do_process(unsigned short events, const timeval& now)
 void
 handshake::do_shutdown(unsigned flags, const timeval& now)
 {
-    throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                      AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
+    throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                    AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
 void
@@ -401,15 +416,15 @@ handshake::do_teardown(const timeval& now)
 {
     // TODO: call shutdown() here?
 
-    throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                      AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
+    throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                    AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
 bool
 handshake::do_authcert(const char* subject, const char* issuer)
 {
-    throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                      AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
+    throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                    AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
 }
 
 const endpoint&
@@ -438,11 +453,11 @@ handshake::handshake(const sessionptr& session, mod_handle& sock,
       sock_(sock),
       buffer_(buffer),
       connector_(host, port),
-      sfd_(null),
+      sd_(null),
       endpoint_(null),
       state_(CLOSED)
 {
-    pair<smartfd, bool> xy(tryconnect(connector_, endpoint_));
-    sfd_ = xy.first;
-    state_ = xy.second ? CONNECTED : HANDSHAKE;
+    bool est;
+    sd_ = tryconnect(connector_, endpoint_, est);
+    state_ = est ? CONNECTED : HANDSHAKE;
 }

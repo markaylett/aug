@@ -167,7 +167,7 @@ shutwr_(struct aug_nbfile* nbfile)
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: shutdown");
     ret = SSL_shutdown(x->ssl_);
-    aug_shutdown(nbfile->fd_, SHUT_WR);
+    aug_shutdown(nbfile->md_, SHUT_WR);
 
     if (ret < 0) {
         aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
@@ -283,7 +283,7 @@ updateevents_(struct aug_nbfile* nbfile)
     struct sslext_* x = nbfile->ext_;
     int real, user;
 
-    aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_,
+    aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->md_,
                        (real = realmask_(nbfile)));
 
     if ((user = userevents_(nbfile))
@@ -292,7 +292,7 @@ updateevents_(struct aug_nbfile* nbfile)
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: events: fd=[%d], realmask=[%d],"
                   " usermask=[%d], userevents=[%d]",
-                  nbfile->fd_, real, x->mask_, user);
+                  nbfile->md_, real, x->mask_, user);
 }
 
 static struct aug_nbfile*
@@ -300,12 +300,12 @@ removenbfile_(struct aug_nbfile* nbfile)
 {
     struct aug_nbfile* ret = nbfile;
 
-    AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: fd=[%d]", nbfile->fd_);
+    AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: fd=[%d]", nbfile->md_);
 
-    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_, 0))
+    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->md_, 0))
         ret = NULL;
 
-    if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->fd_))
+    if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->md_))
         ret = NULL;
 
     return ret;
@@ -592,7 +592,7 @@ static int
 nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
 {
     struct sslext_* x = nbfile->ext_;
-    int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
+    int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->md_);
     int ret, rw = 0;
 
     /* Determine which SSL operations are to be performed. */
@@ -642,20 +642,20 @@ nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
     if ((events = userevents_(nbfile))) {
 
         AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_(): fd=[%d], events=[%d]",
-                      nbfile->fd_, events);
+                      nbfile->md_, events);
 
         /* Callback may close file, ensure that it is still available after
            callback returns. */
 
-        aug_retainfd(nbfile->fd_);
-        if ((ret = nbfile->cb_(ob, nbfile->fd_, events))) {
+        aug_retainfd(nbfile->md_);
+        if ((ret = nbfile->cb_(ob, nbfile->md_, events))) {
 
             /* No need to update events if file is being removed - indicated
                by false return. */
 
             updateevents_(nbfile);
         }
-        aug_releasefd(nbfile->fd_);
+        aug_releasefd(nbfile->md_);
 
     } else {
         AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_() skipped");
@@ -671,7 +671,7 @@ seteventmask_(struct aug_nbfile* nbfile, unsigned short mask)
     struct sslext_* x = nbfile->ext_;
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: setting event mask: fd=[%d], mask=[%d]",
-                  nbfile->fd_, (int)mask);
+                  nbfile->md_, (int)mask);
 
     x->mask_ = mask;
     updateevents_(nbfile);
@@ -732,19 +732,19 @@ createsslext_(aug_nbfiles_t nbfiles, int fd, SSL* ssl)
 }
 
 static struct sslext_*
-setsslext_(int fd, SSL* ssl)
+setsslext_(aug_sd sd, SSL* ssl)
 {
     struct aug_nbfile nbfile;
     struct sslext_* x;
 
-    if (!aug_getnbfile(fd, &nbfile)
-        || !(x = createsslext_(nbfile.nbfiles_, fd, ssl)))
+    if (!aug_getnbfile(sd, &nbfile)
+        || !(x = createsslext_(nbfile.nbfiles_, sd, ssl)))
         return NULL;
 
-    aug_setfdtype(fd, &sslfdtype_);
+    aug_setfdtype(sd, &sslfdtype_);
     nbfile.type_ = &nbtype_;
     nbfile.ext_ = x;
-    aug_setnbfile(fd, &nbfile);
+    aug_setnbfile(sd, &nbfile);
 
     return x;
 }
@@ -769,9 +769,9 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 }
 
 AUGNET_API int
-aug_setsslclient(int fd, struct ssl_st* ssl)
+aug_setsslclient(aug_sd sd, struct ssl_st* ssl)
 {
-    struct sslext_* x = setsslext_(fd, ssl);
+    struct sslext_* x = setsslext_(sd, ssl);
     if (!x)
         return -1;
 
@@ -784,9 +784,9 @@ aug_setsslclient(int fd, struct ssl_st* ssl)
 }
 
 AUGNET_API int
-aug_setsslserver(int fd, struct ssl_st* ssl)
+aug_setsslserver(aug_sd sd, struct ssl_st* ssl)
 {
-    struct sslext_* x = setsslext_(fd, ssl);
+    struct sslext_* x = setsslext_(sd, ssl);
     if (!x)
         return -1;
 

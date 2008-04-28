@@ -29,28 +29,28 @@ struct aug_hostserv {
     char data_[AUG_MAXHOSTSERVLEN + 1];
 };
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep);
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep);
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep);
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_udpconnect(const char* host, const char* serv, struct aug_endpoint* ep);
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep);
 
 AUGNET_API struct aug_hostserv*
 aug_parsehostserv(const char* src, struct aug_hostserv* dst);
 
 AUGNET_API int
-aug_setnodelay(int fd, int on);
+aug_setnodelay(aug_sd sd, int on);
 
 AUGNET_API int
-aug_established(int s);
+aug_established(aug_sd sd);
 
 #endif /* AUGNET_INET_H */

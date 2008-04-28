@@ -46,7 +46,7 @@ namespace aug {
     public:
         ~engine() AUG_NOTHROW;
 
-        engine(const smartfd& eventrd, const smartfd& eventwr, timers& timers,
+        engine(mdref eventrd, mdref eventwr, timers& timers,
                enginecb_base& cb);
 
         void

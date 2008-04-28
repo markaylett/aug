@@ -19,7 +19,7 @@ namespace aug {
         // rwtimer_base.
 
         void
-        do_timercb(int id, unsigned& ms);
+        do_timercb(idref id, unsigned& ms);
 
         void
         do_setrwtimer(unsigned ms, unsigned flags);
@@ -44,8 +44,11 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        smartfd
-        do_sfd() const;
+        autosd
+        do_release();
+
+        sdref
+        do_sd() const;
 
         void
         do_send(const void* buf, size_t size, const timeval& now);

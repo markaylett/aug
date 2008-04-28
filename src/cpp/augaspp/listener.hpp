@@ -14,7 +14,7 @@ namespace aug {
 
         sessionptr session_;
         mod_handle sock_;
-        smartfd sfd_;
+        autosd sd_;
 
         mod_handle&
         do_get();
@@ -25,8 +25,11 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        smartfd
-        do_sfd() const;
+        autosd
+        do_release();
+
+        sdref
+        do_sd() const;
 
         sockstate
         do_state() const;
@@ -34,7 +37,7 @@ namespace aug {
     public:
         ~listener() AUG_NOTHROW;
 
-        listener(const sessionptr& session, void* user, const smartfd& sfd);
+        listener(const sessionptr& session, void* user, autosd& sd);
     };
 
     typedef smartptr<listener> listenerptr;

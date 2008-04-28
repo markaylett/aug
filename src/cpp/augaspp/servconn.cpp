@@ -11,7 +11,7 @@ using namespace aug;
 using namespace std;
 
 void
-servconn::do_timercb(int id, unsigned& ms)
+servconn::do_timercb(idref id, unsigned& ms)
 {
     rwtimer_.timercb(id, ms);
 }
@@ -58,10 +58,16 @@ servconn::do_session() const
     return conn_.session();
 }
 
-smartfd
-servconn::do_sfd() const
+autosd
+servconn::do_release()
 {
-    return conn_.sfd();
+    return conn_.release();
+}
+
+sdref
+servconn::do_sd() const
+{
+    return conn_.sd();
 }
 
 void
@@ -132,9 +138,9 @@ servconn::~servconn() AUG_NOTHROW
 }
 
 servconn::servconn(const sessionptr& session, void* user, timers& timers,
-                   const smartfd& sfd, const endpoint& ep)
+                   autosd& sd, const endpoint& ep)
     : rwtimer_(session, sock_, timers),
-      conn_(session, sock_, buffer_, rwtimer_, sfd, ep, false)
+      conn_(session, sock_, buffer_, rwtimer_, sd, ep, false)
 {
     sock_.id_ = aug_nextid();
     sock_.user_ = user;

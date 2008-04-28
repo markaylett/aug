@@ -5,6 +5,7 @@
 #define AUGSYSPP_MUXER_HPP
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/socket.hpp" // close()
 #include "augsyspp/smartfd.hpp"
 
 #include "augsys/muxer.h"
@@ -26,7 +27,7 @@ namespace aug {
         ~muxer() AUG_NOTHROW
         {
             if (-1 == aug_destroymuxer(muxer_))
-                perrinfo("aug_destroymuxer() failed");
+                perrinfo(aug_tlx, "aug_destroymuxer() failed");
         }
 
         muxer()
@@ -86,7 +87,7 @@ namespace aug {
     {
         aug_md mds[2];
         verify(aug_muxerpipe(mds));
-        return automds(mds[0], mds[1]);
+        return automds(mds[0], mds[1], close);
     }
 }
 

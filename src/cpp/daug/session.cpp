@@ -9,6 +9,8 @@ AUG_RCSID("$Id$");
 
 #include "augsys.h"
 
+#include "augctx/string.h"
+
 #include <stack>
 
 using namespace aug;

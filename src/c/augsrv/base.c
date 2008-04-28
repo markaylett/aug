@@ -46,11 +46,11 @@ closepipe_(void)
 {
     if (AUG_BADMD != mds_[0])
         if (-1 == aug_mclose(mds_[0]))
-            aug_perrinfo(aug_tlx, "aug_mclose() failed");
+            aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
 
     if (AUG_BADMD != mds_[1])
         if (-1 == aug_mclose(mds_[1]))
-            aug_perrinfo(aug_tlx, "aug_mclose() failed");
+            aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
 
     mds_[0] = AUG_BADMD;
     mds_[1] = AUG_BADMD;
@@ -62,7 +62,7 @@ signalhandler_(int sig)
     struct aug_event event;
     aug_ctxinfo(aug_tlx, "handling signal interrupt");
     if (!aug_writeevent(mds_[1], aug_setsigevent(&event, sig)))
-        aug_perrinfo(aug_tlx, "aug_writeevent() failed");
+        aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
 }
 
 #if defined(_WIN32)
@@ -70,9 +70,9 @@ static BOOL WINAPI
 ctrlhandler_(DWORD ctrl)
 {
     struct aug_event event = { AUG_EVENTSTOP, NULL };
-    aug_ctxinfo(aug_tlx, "handling console interrupt");
+    aug_ctxinfo(aug_tlx, "handling console interrupt", NULL);
     if (!aug_writeevent(mds_[1], &event))
-        aug_perrinfo(aug_tlx, "aug_writeevent() failed");
+        aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
     return TRUE;
 }
 #endif /* _WIN32 */

@@ -28,10 +28,16 @@ listener::do_session() const
     return session_;
 }
 
-smartfd
-listener::do_sfd() const
+autosd
+listener::do_release()
 {
-    return sfd_;
+    return sd_;
+}
+
+sdref
+listener::do_sd() const
+{
+    return sd_;
 }
 
 sockstate
@@ -47,9 +53,9 @@ listener::~listener() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-listener::listener(const sessionptr& session, void* user, const smartfd& sfd)
+listener::listener(const sessionptr& session, void* user, autosd& sd)
     : session_(session),
-      sfd_(sfd)
+      sd_(sd)
 {
     sock_.id_ = aug_nextid();
     sock_.user_ = user;

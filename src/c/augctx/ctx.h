@@ -459,6 +459,6 @@ aug_ctxdebug3(aug_ctx* ctx, const char* format, ...);
 #endif /* NDEBUG */
 
 AUGCTX_API aug_result
-aug_perrinfo(aug_ctx* ctx, const char* s);
+aug_perrinfo(aug_ctx* ctx, const char* s, const struct aug_errinfo* errinfo);
 
 #endif /* AUGCTX_CTX_H */

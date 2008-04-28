@@ -66,7 +66,7 @@ namespace aug {
         ~base64() AUG_NOTHROW
         {
             if (-1 == aug_destroybase64(base64_))
-                perrinfo("aug_destroybase64() failed");
+                perrinfo(aug_tlx, "aug_destroybase64() failed");
         }
 
         base64(aug_base64mode mode, aug_base64cb_t cb,

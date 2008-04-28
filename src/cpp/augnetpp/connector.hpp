@@ -7,6 +7,7 @@
 #include "augnetpp/config.hpp"
 
 #include "augsyspp/exception.hpp"
+#include "augsyspp/socket.hpp" // close()
 #include "augsyspp/smartfd.hpp"
 
 #include "augnet/connector.h"
@@ -28,7 +29,7 @@ namespace aug {
         ~connector() AUG_NOTHROW
         {
             if (-1 == aug_destroyconnector(connector_))
-                perrinfo("aug_destroyconnector() failed");
+                perrinfo(aug_tlx, "aug_destroyconnector() failed");
         }
 
         connector(const char* host, const char* serv)
@@ -49,21 +50,24 @@ namespace aug {
         }
     };
 
-    inline std::pair<autosd, bool>
-    tryconnect(aug_connector_t ctor, aug_endpoint& ep)
+    inline autosd
+    tryconnect(aug_connector_t ctor, aug_endpoint& ep, bool& est)
     {
-        int est;
-        autosd sd(aug_tryconnect(ctor, &ep, &est));
-        if (null == sd)
-        int ret(verify(aug_tryconnect(ctor, &ep, &est)));
+        int local;
+        sdref ref(aug_tryconnect(ctor, &ep, &local));
+        if (null == ref)
+            failerror();
 
         // When established, aug_tryconnect() will release ownership of the
         // returned socket descriptor - it will not call aug_close() on it.
 
-        if (est)
-            return std::make_pair(smartfd::attach(ret), true);
+        if (local) {
+            est = true;
+            return autosd(ref, close);
+        }
 
-        return std::make_pair(smartfd::retain(ret), false);
+        est = false;
+        return autosd(ref, 0);
     }
 }
 

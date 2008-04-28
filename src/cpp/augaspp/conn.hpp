@@ -123,7 +123,7 @@ namespace aug {
         mod_handle& sock_;
         buffer& buffer_;
         rwtimer& rwtimer_;
-        smartfd sfd_;
+        autosd sd_;
         endpoint endpoint_;
         sockstate state_;
         bool close_;
@@ -143,8 +143,11 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        smartfd
-        do_sfd() const;
+        autosd
+        do_release();
+
+        sdref
+        do_sd() const;
 
         void
         do_send(const void* buf, size_t size, const timeval& now);
@@ -180,7 +183,7 @@ namespace aug {
         ~connected() AUG_NOTHROW;
 
         connected(const sessionptr& session, mod_handle& sock,
-                  buffer& buffer, rwtimer& rwtimer, const smartfd& sfd,
+                  buffer& buffer, rwtimer& rwtimer, autosd& sd,
                   const endpoint& ep, bool close);
     };
 
@@ -190,7 +193,7 @@ namespace aug {
         mod_handle& sock_;
         buffer& buffer_;
         connector connector_;
-        smartfd sfd_;
+        autosd sd_;
         endpoint endpoint_;
         sockstate state_;
 
@@ -203,8 +206,11 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        smartfd
-        do_sfd() const;
+        autosd
+        do_release();
+
+        sdref
+        do_sd() const;
 
         void
         do_send(const void* buf, size_t size, const timeval& now);

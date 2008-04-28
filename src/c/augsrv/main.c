@@ -29,7 +29,7 @@ static jmp_buf mark_;
 static void
 die_(const char* s)
 {
-    aug_perrinfo(NULL, s);
+    aug_perrinfo(aug_tlx, s, NULL);
     longjmp(mark_, 1);
 }
 

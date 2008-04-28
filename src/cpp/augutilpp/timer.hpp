@@ -19,7 +19,7 @@
 
 namespace aug {
 
-    template <void (*T)(aug::objectref, int, unsigned&)>
+    template <void (*T)(aug::objectref, idref, unsigned&)>
     void
     timercb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
@@ -28,7 +28,7 @@ namespace aug {
         } AUG_SETERRINFOCATCH;
     }
 
-    template <typename T, void (T::*U)(int, unsigned&)>
+    template <typename T, void (T::*U)(idref, unsigned&)>
     void
     timermemcb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
@@ -64,7 +64,7 @@ namespace aug {
         ~timers() AUG_NOTHROW
         {
             if (-1 == aug_destroytimers(&timers_))
-                perrinfo("aug_destroytimers() failed");
+                perrinfo(aug_tlx, "aug_destroytimers() failed");
         }
 
         timers()

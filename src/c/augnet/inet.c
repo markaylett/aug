@@ -7,7 +7,6 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/base.h"   /* aug_getosfd() */
 #include "augsys/socket.h"
 #include "augsys/unistd.h" /* aug_close() */
 
@@ -27,10 +26,10 @@ AUG_RCSID("$Id$");
 
 #include <string.h>        /* strchr() */
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
 {
-    int fd;
+    aug_sd sd;
     struct addrinfo hints, * res, * save;
 
     bzero(&hints, sizeof(hints));
@@ -38,21 +37,21 @@ aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_socktype = SOCK_STREAM;
 
     if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
-        return -1;
+        return AUG_BADSD;
 
     save = res;
 
     do {
-        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-        if (-1 == fd)
+        sd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
         aug_getendpoint(res, ep);
 
-        if (0 == aug_connect(fd, ep))
+        if (0 == aug_connect(sd, ep))
             break; /* Success. */
 
-        if (-1 == aug_fclose(aug_getosfd(fd))) /* Ignore this one. */
+        if (-1 == aug_sclose(sd)) /* Ignore this one. */
             goto fail;
 
     } while ((res = res->ai_next));
@@ -61,17 +60,17 @@ aug_tcpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
         goto fail;
 
     aug_destroyaddrinfo(save);
-    return fd;
+    return sd;
 
  fail:
     aug_destroyaddrinfo(save);
-    return -1;
+    return AUG_BADSD;
 }
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep)
 {
-    int fd;
+    aug_sd sd;
     struct addrinfo hints, * res, * save;
 
     bzero(&hints, sizeof(hints));
@@ -80,25 +79,24 @@ aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_socktype = SOCK_STREAM;
 
     if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
-        return -1;
+        return AUG_BADSD;
 
     save = res;
 
     do {
-        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-        if (-1 == fd)
+        sd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (AUG_BADSD == sd)
             continue; /* Error, try next one. */
 
-        if (-1 == aug_setreuseaddr(fd, 1))
+        if (-1 == aug_setreuseaddr(sd, 1))
             goto fail2;
 
         aug_getendpoint(res, ep);
 
-        if (0 == aug_bind(fd, ep))
+        if (0 == aug_bind(sd, ep))
             break; /* Success. */
 
-        if (-1 == aug_fclose(aug_getosfd(fd))) /* Bind error, close and try
-                                                  next one. */
+        if (-1 == aug_sclose(sd)) /* Bind error, close and try next one. */
             goto fail1;
 
     } while ((res = res->ai_next));
@@ -106,24 +104,24 @@ aug_tcplisten(const char* host, const char* serv, struct aug_endpoint* ep)
     if (!res) /* errno from final aug_socket() or aug_bind(). */
         goto fail1;
 
-    if (-1 == aug_listen(fd, SOMAXCONN))
+    if (-1 == aug_listen(sd, SOMAXCONN))
         goto fail2;
 
     aug_destroyaddrinfo(save);
-    return fd;
+    return sd;
 
  fail2:
-    aug_fclose(aug_getosfd(fd));
+    aug_sclose(sd);
 
  fail1:
     aug_destroyaddrinfo(save);
-    return -1;
+    return AUG_BADSD;
 }
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep)
 {
-    int fd;
+    aug_sd sd;
     struct addrinfo hints, * res, * save;
 
     bzero(&hints, sizeof(hints));
@@ -131,13 +129,13 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_socktype = SOCK_DGRAM;
 
     if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
-        return -1;
+        return AUG_BADSD;
 
     save = res;
 
     do {
-        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-        if (-1 != fd)
+        sd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (AUG_BADSD != sd)
             break; /* Success. */
 
     } while ((res = res->ai_next));
@@ -148,17 +146,17 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep)
     aug_getendpoint(res, ep);
 
     aug_destroyaddrinfo(save);
-    return fd;
+    return sd;
 
  fail:
     aug_destroyaddrinfo(save);
-    return -1;
+    return AUG_BADSD;
 }
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_udpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
 {
-    int fd;
+    aug_sd sd;
     struct addrinfo hints, * res, * save;
 
     bzero(&hints, sizeof(hints));
@@ -166,40 +164,40 @@ aug_udpconnect(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_socktype = SOCK_DGRAM;
 
     if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
-        return -1;
+        return AUG_BADSD;
 
     save = res;
 
     do {
-        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-        if (-1 == fd)
+        sd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
         aug_getendpoint(res, ep);
 
-        if (0 == aug_connect(fd, ep))
+        if (0 == aug_connect(sd, ep))
             break; /* Success. */
 
-        if (-1 == aug_fclose(aug_getosfd(fd))) /* Ignore this one. */
+        if (-1 == aug_sclose(sd)) /* Ignore this one. */
             goto fail;
 
     } while ((res = res->ai_next));
 
     if (!res) /* errno set from final aug_connect() */
-        return -1;
+        return AUG_BADSD;
 
     aug_destroyaddrinfo(save);
-    return fd;
+    return sd;
 
  fail:
     aug_destroyaddrinfo(save);
-    return -1;
+    return AUG_BADSD;
 }
 
-AUGNET_API int
+AUGNET_API aug_sd
 aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 {
-    int fd;
+    aug_sd sd;
     struct addrinfo hints, * res, * save;
 
     bzero(&hints, sizeof(hints));
@@ -208,35 +206,34 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_socktype = SOCK_DGRAM;
 
     if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
-        return -1;
+        return AUG_BADSD;
 
     save = res;
 
     do {
-        fd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-        if (-1 == fd)
+        sd = aug_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (AUG_BADSD == sd)
             continue; /* Error, try next one. */
 
         aug_getendpoint(res, ep);
 
-        if (0 == aug_bind(fd, ep))
+        if (0 == aug_bind(sd, ep))
             break; /* Success. */
 
-        if (-1 == aug_fclose(aug_getosfd(fd))) /* bind error, close and try
-                                                  next one */
+        if (-1 == aug_sclose(sd)) /* bind error, close and try next one */
             goto fail;
 
     } while ((res = res->ai_next));
 
     if (!res) /* errno from final aug_socket() or aug_bind(). */
-        return -1;
+        return AUG_BADSD;
 
     aug_destroyaddrinfo(save);
-    return fd;
+    return sd;
 
  fail:
     aug_destroyaddrinfo(save);
-    return -1;
+    return AUG_BADSD;
 }
 
 AUGNET_API struct aug_hostserv*
@@ -295,17 +292,17 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
 }
 
 AUGNET_API int
-aug_setnodelay(int fd, int on)
+aug_setnodelay(aug_sd sd, int on)
 {
-    return aug_setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
+    return aug_setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
 }
 
 AUGNET_API int
-aug_established(int s)
+aug_established(aug_sd sd)
 {
     int ret;
     struct aug_endpoint ep;
-    if (!aug_getpeername(s, &ep))
+    if (!aug_getpeername(sd, &ep))
         ret = ENOTCONN == aug_errno() ? AUG_FAILNONE : -1;
     else
         ret = 0;

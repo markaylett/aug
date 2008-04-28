@@ -13,8 +13,8 @@ AUG_RCSID("$Id$");
 
 # include "augaspp/conn.hpp"
 
-# include "augsys/log.h"
-# include "augsys/string.h"
+# include "augctx/log.h"
+# include "augctx/string.h"
 
 # include <sstream>
 
@@ -58,7 +58,8 @@ namespace {
             // Callback has been called to indicate state change inside a
             // loop.
 
-            aug_debug2("SSL: %s loop: %s", str, SSL_state_string_long(ssl));
+            aug_ctxdebug2(aug_tlx, "SSL: %s loop: %s", str,
+                          SSL_state_string_long(ssl));
 
         } else if (where & SSL_CB_ALERT) {
 
@@ -66,9 +67,9 @@ namespace {
             // received.
 
             str = (where & SSL_CB_READ) ? "read" : "write";
-            aug_debug2("SSL: %s %s: %s", str,
-                       SSL_alert_type_string_long(ret),
-                       SSL_alert_desc_string_long(ret));
+            aug_ctxdebug2(aug_tlx, "SSL: %s %s: %s", str,
+                          SSL_alert_type_string_long(ret),
+                          SSL_alert_desc_string_long(ret));
 
         } else if (where & SSL_CB_EXIT) {
 
@@ -77,11 +78,11 @@ namespace {
             // setups.)
 
             if (0 == ret) {
-                aug_debug2("SSL: %s failed: %s", str,
-                           SSL_state_string_long(ssl));
+                aug_ctxdebug2(aug_tlx, "SSL: %s failed: %s", str,
+                              SSL_state_string_long(ssl));
             } else if (ret < 0) {
-                aug_debug2("SSL: %s error: %s", str,
-                           SSL_state_string_long(ssl));
+                aug_ctxdebug2(aug_tlx, "SSL: %s error: %s", str,
+                              SSL_state_string_long(ssl));
             }
         }
     }
@@ -96,7 +97,7 @@ namespace {
 
         X509_NAME_get_text_by_NID(name, nid, buf, sizeof(buf));
         if (buf[0])
-            aug_info("%s=[%s]", s, buf);
+            aug_ctxinfo(aug_tlx, "%s=[%s]", s, buf);
     }
 
     int
@@ -107,11 +108,11 @@ namespace {
 
         char subject[256];
         X509_NAME_oneline(name, subject, sizeof(subject));
-        aug_info("subject: %s", subject);
+        aug_ctxinfo(aug_tlx, "subject: %s", subject);
 
         char issuer[256];
         X509_NAME_oneline(X509_get_issuer_name(peer), issuer, sizeof(issuer));
-        aug_info("issuer: %s", issuer);
+        aug_ctxinfo(aug_tlx, "issuer: %s", issuer);
 
         lognid_("country", name, NID_countryName);
         lognid_("state or province", name, NID_stateOrProvinceName);
@@ -122,8 +123,8 @@ namespace {
         lognid_("email address", name, NID_pkcs9_emailAddress);
 
         if (!preverify_ok) {
-            aug_warn("verification failed: %s",
-                     X509_verify_cert_error_string(x509_ctx->error));
+            aug_ctxwarn(aug_tlx, "verification failed: %s",
+                        X509_verify_cert_error_string(x509_ctx->error));
             return 0;
         }
 

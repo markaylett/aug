@@ -41,38 +41,43 @@ socks::sendv(mod_id cid, blobref blob, const timeval& now)
 void
 socks::clear()
 {
-    idtofd_.clear();
+    idtosd_.clear();
     socks_.clear();
 }
 
 void
 socks::erase(const sock_base& sock)
 {
-    AUG_DEBUG2("removing sock: id=[%d], fd=[%d]", id(sock), sock.sfd().get());
+    AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%d], fd=[%d]", id(sock),
+                  sock.sd().get());
 
-    idtofd_.erase(id(sock));
-    socks_.erase(sock.sfd().get());
+    idtosd_.erase(id(sock));
+    socks_.erase(sock.sd());
 }
 
 void
 socks::insert(const sockptr& sock)
 {
-    AUG_DEBUG2("adding sock: id=[%d], fd=[%d]", id(*sock), sock->sfd().get());
+    AUG_CTXDEBUG2(aug_tlx, "adding sock: id=[%d], fd=[%d]", id(*sock),
+                  sock->sd().get());
 
-    socks_.insert(make_pair(sock->sfd().get(), sock));
-    idtofd_.insert(make_pair(id(*sock), sock->sfd().get()));
+    socks_.insert(make_pair(sock->sd(), sock));
+    idtosd_.insert(make_pair(id(*sock), sock->sd()));
 }
 
 void
-socks::update(const sockptr& sock, fdref prev)
+socks::update(const sockptr& sock, sdref prev)
 {
-    AUG_DEBUG2("updating sock: id=[%d], fd=[%d], prev=[%d]", id(*sock),
-               sock->sfd().get(), prev.get());
+    AUG_CTXDEBUG2(aug_tlx, "updating sock: id=[%d], fd=[%d], prev=[%d]",
+                  id(*sock), sock->sd().get(), prev.get());
 
-    socks_.insert(make_pair(sock->sfd().get(), sock));
-    socks_.erase(prev.get());
+    socks_.insert(make_pair(sock->sd(), sock));
+    socks_.erase(prev);
 
-    idtofd_[id(*sock)] = sock->sfd().get();
+    pair<idtosd::iterator, bool> xy
+        (idtosd_.insert(make_pair(id(*sock), sock->sd())));
+    if (!xy.second)
+        xy.first->second = sock->sd();
 }
 
 void
@@ -80,16 +85,17 @@ socks::teardown(const timeval& now)
 {
     // Ids are stored in reverse order using the the greater<> predicate.
 
-    idtofd::iterator rit(idtofd_.begin()), rend(idtofd_.end());
+    idtosd::iterator rit(idtosd_.begin()), rend(idtosd_.end());
     while (rit != rend) {
 
-        AUG_DEBUG2("teardown: id=[%d], fd=[%d]", rit->first, rit->second);
+        AUG_CTXDEBUG2(aug_tlx, "teardown: id=[%d], fd=[%d]", rit->first,
+                      rit->second.get());
 
-        map<int, sockptr>::iterator it(socks_.find(rit->second));
+        map<sdref, sockptr>::iterator it(socks_.find(rit->second));
         if (it == socks_.end())
-            throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                              AUG_MSG("sock not found: fd=[%d]"),
-                              rit->second);
+            throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                            AUG_MSG("sock not found: fd=[%d]"),
+                            rit->second.get());
 
         connptr cptr(smartptr_cast<conn_base>(it->second));
         if (null != cptr) {
@@ -102,29 +108,29 @@ socks::teardown(const timeval& now)
 
         // Erase listener.
 
-        idtofd_.erase(rit++);
+        idtosd_.erase(rit++);
         socks_.erase(it);
     }
 }
 
 sockptr
-socks::getbyfd(fdref fd) const
+socks::getbysd(sdref sd) const
 {
-    map<int, sockptr>::const_iterator it(socks_.find(fd.get()));
+    map<sdref, sockptr>::const_iterator it(socks_.find(sd));
     if (it == socks_.end())
-        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          AUG_MSG("sock not found: fd=[%d]"), fd.get());
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        AUG_MSG("sock not found: fd=[%d]"), sd.get());
     return it->second;
 }
 
 sockptr
 socks::getbyid(mod_id id) const
 {
-    idtofd::const_iterator it(idtofd_.find(id));
-    if (it == idtofd_.end())
-        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          AUG_MSG("sock not found: id=[%d]"), id);
-    return getbyfd(it->second);
+    idtosd::const_iterator it(idtosd_.find(id));
+    if (it == idtosd_.end())
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        AUG_MSG("sock not found: id=[%d]"), id);
+    return getbysd(it->second);
 }
 
 bool

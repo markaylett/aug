@@ -41,9 +41,9 @@ namespace aug {
      */
 
     inline aug_result
-    perrinfo(const char* s) AUG_NOTHROW
+    perrinfo(aug_ctx* ctx, const char* s) AUG_NOTHROW
     {
-        return aug_perrinfo(aug_tlx, s);
+        return aug_perrinfo(ctx, s, NULL);
     }
 
     /**
@@ -57,9 +57,10 @@ namespace aug {
      */
 
     inline aug_result
-    perrinfo(aug_ctx* ctx, const char* s) AUG_NOTHROW
+    perrinfo(aug_ctx* ctx, const char* s,
+             const struct aug_errinfo& errinfo) AUG_NOTHROW
     {
-        return aug_perrinfo(ctx, s);
+        return aug_perrinfo(ctx, s, &errinfo);
     }
 
     /**
@@ -84,20 +85,6 @@ namespace aug {
     srand(unsigned seed)
     {
         aug_srand(seed);
-    }
-
-    /**
-     * Set file non-blocking on or off.
-     *
-     * @param ref File descriptor.
-     *
-     * @param on On or off.
-     */
-
-    inline void
-    setnonblock(fdref ref, bool on)
-    {
-        verify(aug_fsetnonblock(ref.get(), on ? 1 : 0));
     }
 }
 

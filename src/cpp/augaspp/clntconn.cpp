@@ -11,7 +11,7 @@ using namespace aug;
 using namespace std;
 
 void
-clntconn::do_timercb(int id, unsigned& ms)
+clntconn::do_timercb(idref id, unsigned& ms)
 {
     rwtimer_.timercb(id, ms);
 }
@@ -58,10 +58,16 @@ clntconn::do_session() const
     return conn_->session();
 }
 
-smartfd
-clntconn::do_sfd() const
+autosd
+clntconn::do_release()
 {
-    return conn_->sfd();
+    return conn_->release();
+}
+
+sdref
+clntconn::do_sd() const
+{
+    return conn_->sd();
 }
 
 void
@@ -100,13 +106,15 @@ clntconn::do_process(unsigned short events, const timeval& now)
         // writing then set the write event-mask.
 
         if (!buffer_.empty())
-            setnbeventmask(conn_->sfd(), AUG_FDEVENTRDWR);
+            setnbeventmask(conn_->sd(), AUG_FDEVENTRDWR);
 
-        AUG_DEBUG2("connection now established, assuming new state");
+        AUG_CTXDEBUG2(aug_tlx,
+                      "connection now established, assuming new state");
 
+        autosd sd(conn_->release());
         conn_ = connptr(new aug::connected
-                        (conn_->session(), sock_, buffer_, rwtimer_,
-                         conn_->sfd(), conn_->peername(), true));
+                        (conn_->session(), sock_, buffer_, rwtimer_, sd,
+                         conn_->peername(), true));
     }
 
     return true;
@@ -156,10 +164,12 @@ clntconn::clntconn(const sessionptr& session, void* user, timers& timers,
 
     if (CONNECTED == conn_->state()) {
 
-        AUG_DEBUG2("connection now established, assuming new state");
+        AUG_CTXDEBUG2(aug_tlx,
+                      "connection now established, assuming new state");
 
+        autosd sd(conn_->release());
         conn_ = connptr(new aug::connected
-                        (conn_->session(), sock_, buffer_, rwtimer_,
-                         conn_->sfd(), conn_->peername(), true));
+                        (conn_->session(), sock_, buffer_, rwtimer_, sd,
+                         conn_->peername(), true));
     }
 }

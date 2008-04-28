@@ -31,7 +31,7 @@ static void
 zerofile(struct aug_nbfile* nbfile)
 {
     nbfile->nbfiles_ = NULL;
-    nbfile->fd_ = -1;
+    nbfile->md_ = AUG_BADMD;
     nbfile->cb_ = NULL;
     nbfile->base_ = NULL;
     nbfile->type_ = NULL;

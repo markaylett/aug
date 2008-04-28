@@ -143,7 +143,7 @@ namespace aug {
         ~marparser() AUG_NOTHROW
         {
             if (-1 == aug_destroymarparser(marparser_))
-                perrinfo("aug_destroymarparser() failed");
+                perrinfo(aug_tlx, "aug_destroymarparser() failed");
         }
 
         marparser(unsigned size, const aug_marhandler& handler,

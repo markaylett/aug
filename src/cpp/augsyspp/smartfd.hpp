@@ -14,89 +14,111 @@
 namespace aug {
 
     template <typename traitsT>
+    struct autoclose_proxy {
+        basic_ref<traitsT> ref_;
+        void (*close_)(basic_ref<traitsT> ref_);
+        autoclose_proxy(basic_ref<traitsT> ref,
+                        void (*close)(basic_ref<traitsT>))
+            : ref_(ref),
+              close_(close)
+        {
+        }
+    };
+
+    template <typename traitsT>
     class autoclose {
-        struct proxy {
-            typename traitsT::ref ref_;
-            explicit
-            proxy(typename traitsT::ref ref)
-                : ref_(ref)
-            {
-            }
-        };
-        typename traitsT::ref ref_;
+        basic_ref<traitsT> ref_;
+        void (*close_)(basic_ref<traitsT> ref_);
     public:
         ~autoclose()
         {
-            if (ref_ != traitsT::bad())
-                traitsT::close(ref_);
+            if (null != ref_ && close_)
+                try {
+                    close_(ref_);
+                } AUG_PERRINFOCATCH;
         }
-        explicit
-        autoclose(typename traitsT::ref ref = traitsT::bad())
-            : ref_(ref)
+        autoclose(const null_&)
+            : ref_(null),
+              close_(0)
+        {
+        }
+        autoclose(basic_ref<traitsT> ref, void (*close)(basic_ref<traitsT>))
+            : ref_(ref),
+              close_(close)
         {
         }
         autoclose(autoclose& rhs)
-            : ref_(rhs.release())
+            : ref_(rhs.release()),
+              close_(rhs.close_)
         {
         }
-        autoclose(const proxy& rhs)
-            : ref_(rhs.ref_)
+        autoclose(const autoclose_proxy<traitsT>& rhs)
+            : ref_(rhs.ref_),
+              close_(rhs.close_)
         {
         }
         autoclose&
         operator =(autoclose& rhs)
         {
-            reset(rhs.release());
+            reset(rhs.release(), rhs.close_);
             return *this;
         }
         autoclose&
-        operator =(const proxy& rhs)
+        operator =(const autoclose_proxy<traitsT>& rhs)
         {
-            reset(rhs.ref_);
+            reset(rhs.ref_, rhs.close_);
             return *this;
         }
         void
-        reset(typename traitsT::ref ref = traitsT::bad())
+        reset(basic_ref<traitsT> ref, void (*close)(basic_ref<traitsT>))
         {
-            if (ref != ref_ && ref_ != traitsT::bad())
-                traitsT::close(ref_);
+            if (ref != ref_ && null != ref_ && close_)
+                close_(ref_);
             ref_ = ref;
+            close_ = close;
         }
-        typename traitsT::ref
+        basic_ref<traitsT>
         release()
         {
-            typename traitsT::ref tmp(ref_);
-            ref_ = traitsT::bad();
+            basic_ref<traitsT> tmp(ref_);
+            ref_ = null;
+            close_ = 0;
             return tmp;
         }
-        operator proxy()
+        operator autoclose_proxy<traitsT>()
         {
-            return proxy(release());
+            return autoclose_proxy<traitsT>(release(), close_);
+        }
+        operator basic_ref<traitsT>() const
+        {
+            return ref_;
         }
         typename traitsT::ref
         get() const
         {
-            return ref_;
+            return ref_.get();
         }
     };
 
     template <typename traitsT>
     class autoclose2 {
         struct proxy {
-            typename traitsT::ref first_;
-            typename traitsT::ref second_;
-            proxy(typename traitsT::ref first, typename traitsT::ref second)
+            autoclose_proxy<traitsT> first_;
+            autoclose_proxy<traitsT> second_;
+            proxy(autoclose_proxy<traitsT> first,
+                  autoclose_proxy<traitsT> second)
                 : first_(first),
                   second_(second)
             {
             }
         };
-        autoclose<traitsT> first_;
-        autoclose<traitsT> second_;
+        autoclose_proxy<traitsT> first_;
+        autoclose_proxy<traitsT> second_;
     public:
-        autoclose2(typename traitsT::ref first, typename traitsT::ref second)
-            : first_(first),
-              second_(second)
+        autoclose2(basic_ref<traitsT> first, basic_ref<traitsT> second,
+                   void (*close)(basic_ref<traitsT>))
+            : first_(first, close),
+              second_(second, close)
         {
         }
         autoclose2(autoclose2& rhs)
@@ -125,7 +147,7 @@ namespace aug {
         }
         operator proxy()
         {
-            return proxy(first_.release(), second_.release());
+            return proxy(first_, second_);
         }
         autoclose<traitsT>&
         operator [](unsigned i)

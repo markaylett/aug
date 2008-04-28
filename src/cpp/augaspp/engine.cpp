@@ -94,10 +94,10 @@ namespace {
     typedef std::queue<connptr> pending;
 
     void
-    setsockopts(const smartfd& sfd)
+    setsockopts(sdref ref)
     {
-        setnodelay(sfd, true);
-        setnonblock(sfd, true);
+        setnodelay(ref, true);
+        setnonblock(ref, true);
     }
 
     void
@@ -105,15 +105,15 @@ namespace {
     {
         // Connection has now been established.
 
-        setsockopts(conn.sfd());
+        setsockopts(conn.sd());
 
         const endpoint& ep(conn.peername());
         inetaddr addr(null);
-        AUG_DEBUG2("connected: host=[%s], port=[%d]",
-                   inetntop(getinetaddr(ep, addr)).c_str(),
-                   static_cast<int>(ntohs(port(ep))));
+        AUG_CTXDEBUG2(aug_tlx, "connected: host=[%s], port=[%d]",
+                      inetntop(getinetaddr(ep, addr)).c_str(),
+                      static_cast<int>(ntohs(port(ep))));
 
-        setnbeventmask(conn.sfd(), AUG_FDEVENTRD);
+        setnbeventmask(conn.sd(), AUG_FDEVENTRD);
 
         // Notify session of establishment.
 
@@ -148,7 +148,7 @@ namespace aug {
 
         struct engineimpl {
 
-            smartfd eventrd_, eventwr_;
+            mdref eventrd_, eventwr_;
             timers& timers_;
             enginecb_base& cb_;
             nbfiles nbfiles_;
@@ -177,13 +177,13 @@ namespace aug {
 
             ~engineimpl() AUG_NOTHROW
             {
-                AUG_DEBUG2("removing event pipe from list");
+                AUG_CTXDEBUG2(aug_tlx, "removing event pipe from list");
                 try {
                     removenbfile(eventrd_);
                 } AUG_PERRINFOCATCH;
             }
-            engineimpl(const smartfd& eventrd, const smartfd& eventwr,
-                       timers& timers, enginecb_base& cb)
+            engineimpl(mdref eventrd, mdref eventwr, timers& timers,
+                       enginecb_base& cb)
                 : eventrd_(eventrd),
                   eventwr_(eventwr),
                   timers_(timers),
@@ -193,7 +193,7 @@ namespace aug {
             {
                 gettimeofday(now_);
 
-                AUG_DEBUG2("inserting event pipe to list");
+                AUG_CTXDEBUG2(aug_tlx, "inserting event pipe to list");
                 insertnbfile(nbfiles_, eventrd_, *this);
                 setnbeventmask(eventrd_, AUG_FDEVENTRD);
             }
@@ -217,32 +217,33 @@ namespace aug {
             {
                 endpoint ep(null);
 
-                AUG_DEBUG2("accepting connection");
+                AUG_CTXDEBUG2(aug_tlx, "accepting connection");
 
-                smartfd sfd(null);
+                autosd sd(null);
                 try {
 
-                    sfd = aug::accept(sock.sfd(), ep);
+                    sd = aug::accept(sock.sd(), ep);
 
                 } catch (const errinfo_error& e) {
 
                     if (aug_acceptlost()) {
-                        aug_warn("accept() failed: %s", e.what());
+                        aug_ctxwarn(aug_tlx, "accept() failed: %s", e.what());
                         return;
                     }
                     throw;
                 }
 
-                insertnbfile(nbfiles_, sfd, *this);
-                setnbeventmask(sfd, AUG_FDEVENTRD);
+                insertnbfile(nbfiles_, sd, *this);
+                setnbeventmask(sd, AUG_FDEVENTRD);
 
-                setsockopts(sfd);
+                setsockopts(sd);
                 connptr cptr(new servconn(sock.session(), user(sock),
-                                          timers_, sfd, ep));
+                                          timers_, sd, ep));
 
                 scoped_insert si(socks_, cptr);
-                AUG_DEBUG2("initialising connection: id=[%d], fd=[%d]",
-                           id(*cptr), sfd.get());
+                AUG_CTXDEBUG2(aug_tlx,
+                              "initialising connection: id=[%d], fd=[%d]",
+                              id(*cptr), sd.get());
 
                 // Session may reject the connection by returning false.
 
@@ -250,7 +251,7 @@ namespace aug {
                     si.commit();
             }
             bool
-            process(const connptr& cptr, int fd, unsigned short events)
+            process(const connptr& cptr, mdref md, unsigned short events)
             {
                 bool changed = false, ok = false;
                 try {
@@ -275,10 +276,10 @@ namespace aug {
                     // The associated file descriptor may change as connection
                     // attempts fail and alternative addresses are tried.
 
-                    insertnbfile(nbfiles_, cptr->sfd(), *this);
-                    setnbeventmask(cptr->sfd(), AUG_FDEVENTALL);
+                    insertnbfile(nbfiles_, cptr->sd(), *this);
+                    setnbeventmask(cptr->sd(), AUG_FDEVENTALL);
 
-                    socks_.update(cptr, fd);
+                    socks_.update(cptr, md);
 
                 } else if (changed)
 
@@ -302,33 +303,33 @@ namespace aug {
             bool
             readevent()
             {
-                AUG_DEBUG2("reading event");
+                AUG_CTXDEBUG2(aug_tlx, "reading event");
 
                 pair<int, smartob<aug_object> >
                     event(aug::readevent(eventrd_));
 
                 switch (event.first) {
                 case AUG_EVENTRECONF:
-                    AUG_DEBUG2("received AUG_EVENTRECONF");
+                    AUG_CTXDEBUG2(aug_tlx, "received AUG_EVENTRECONF");
                     cb_.reconf();
                     sessions_.reconf();
                     break;
                 case AUG_EVENTSTATUS:
-                    AUG_DEBUG2("received AUG_EVENTSTATUS");
+                    AUG_CTXDEBUG2(aug_tlx, "received AUG_EVENTSTATUS");
                     break;
                 case AUG_EVENTSTOP:
-                    AUG_DEBUG2("received AUG_EVENTSTOP");
+                    AUG_CTXDEBUG2(aug_tlx, "received AUG_EVENTSTOP");
                     teardown();
                     break;
                 case AUG_EVENTSIGNAL:
-                    AUG_DEBUG2("received AUG_EVENTSIGNAL");
+                    AUG_CTXDEBUG2(aug_tlx, "received AUG_EVENTSIGNAL");
                     break;
                 case AUG_EVENTWAKEUP:
-                    AUG_DEBUG2("received AUG_EVENTWAKEUP");
+                    AUG_CTXDEBUG2(aug_tlx, "received AUG_EVENTWAKEUP");
                     // Actual handling is performed in do_run().
                     break;
                 case POSTEVENT_:
-                    AUG_DEBUG2("received POSTEVENT_");
+                    AUG_CTXDEBUG2(aug_tlx, "received POSTEVENT_");
                     {
                         smartob<aug_eventob> ev
                             (object_cast<aug_eventob>(event.second));
@@ -348,46 +349,47 @@ namespace aug {
                 return true;
             }
             bool
-            nbfilecb(int fd, unsigned short events)
+            nbfilecb(mdref md, unsigned short events)
             {
                 // Intercept activity on event pipe.
 
-                if (fd == eventrd_)
+                if (md == eventrd_)
                     return readevent();
 
-                sockptr sock(socks_.getbyfd(fd));
+                sockptr sock(socks_.getbysd(md));
                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
-                AUG_DEBUG2("processing sock: id=[%d], fd=[%d]",
-                           id(*sock), fd);
+                AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%d], fd=[%d]",
+                              id(*sock), md.get());
 
                 if (null != cptr)
-                    return process(cptr, fd, events);
+                    return process(cptr, md, events);
 
                 accept(*sock);
                 return true;
             }
             void
-            timercb(int id, unsigned& ms)
+            timercb(idref id, unsigned& ms)
             {
-                AUG_DEBUG2("custom timer expiry");
+                AUG_CTXDEBUG2(aug_tlx, "custom timer expiry");
 
-                sessiontimers::iterator it(sessiontimers_.find(id));
-                mod_handle timer = { id, it->second.ob_.get() };
+                sessiontimers::iterator it(sessiontimers_.find(id.get()));
+                mod_handle timer = { id.get(), it->second.ob_.get() };
                 it->second.session_->expire(timer, ms);
 
                 if (0 == ms) {
-                    AUG_DEBUG2("removing timer: ms has been set to zero");
+                    AUG_CTXDEBUG2(aug_tlx,
+                                  "removing timer: ms has been set to zero");
                     sessiontimers_.erase(it);
                 }
             }
             void
-            stopcb(int id, unsigned& ms)
+            stopcb(idref id, unsigned& ms)
             {
                 // Called by grace timer when excessive time has been spent in
                 // teardown state.
 
-                aug_info("giving-up, closing connections");
+                aug_ctxinfo(aug_tlx, "giving-up, closing connections");
                 state_ = STOPPED;
             }
         };
@@ -401,7 +403,7 @@ engine::~engine() AUG_NOTHROW
 }
 
 AUGRTPP_API
-engine::engine(const smartfd& eventrd, const smartfd& eventwr, timers& timers,
+engine::engine(mdref eventrd, mdref eventwr, timers& timers,
                enginecb_base& cb)
     : impl_(new detail::engineimpl(eventrd, eventwr, timers, cb))
 {
@@ -433,7 +435,8 @@ engine::cancelinactive()
         end(impl_->sessiontimers_.end());
     while (it != end) {
         if (!it->second.session_->active()) {
-            aug_warn("cancelling timer associated with inactive session");
+            aug_ctxwarn(aug_tlx,
+                        "cancelling timer associated with inactive session");
             aug_canceltimer(cptr(impl_->timers_), it->first);
             impl_->sessiontimers_.erase(it++);
         } else
@@ -444,7 +447,7 @@ engine::cancelinactive()
 AUGRTPP_API void
 engine::run(bool stoponerr)
 {
-    AUG_DEBUG2("running daemon process");
+    AUG_CTXDEBUG2(aug_tlx, "running daemon process");
 
     int ret(!0);
     while (!stopping() || !impl_->socks_.empty()) {
@@ -463,7 +466,7 @@ engine::run(bool stoponerr)
 
             } else {
 
-                AUG_DEBUG2("processing timers");
+                AUG_CTXDEBUG2(aug_tlx, "processing timers");
 
                 timeval tv;
                 foreachexpired(impl_->timers_, 0 == ret, tv);
@@ -486,7 +489,7 @@ engine::run(bool stoponerr)
                 impl_->pending_.pop();
             }
 
-            AUG_DEBUG2("processing files");
+            AUG_CTXDEBUG2(aug_tlx, "processing files");
 
             foreachnbfile(impl_->nbfiles_);
             continue;
@@ -571,8 +574,8 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
 
         // connected() must only be called after this function has returned.
 
-        insertnbfile(impl_->nbfiles_, cptr->sfd(), *impl_);
-        setnbeventmask(cptr->sfd(), AUG_FDEVENTRD);
+        insertnbfile(impl_->nbfiles_, cptr->sd(), *impl_);
+        setnbeventmask(cptr->sd(), AUG_FDEVENTRD);
 
         if (impl_->pending_.empty()) {
 
@@ -589,8 +592,8 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
 
     } else {
 
-        insertnbfile(impl_->nbfiles_, cptr->sfd(),  *impl_);
-        setnbeventmask(cptr->sfd(), AUG_FDEVENTALL);
+        insertnbfile(impl_->nbfiles_, cptr->sd(),  *impl_);
+        setnbeventmask(cptr->sd(), AUG_FDEVENTALL);
     }
 
     si.commit();
@@ -604,20 +607,20 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     // Bind listener socket.
 
     endpoint ep(null);
-    smartfd sfd(aug::tcplisten(host, port, ep));
+    autosd sd(aug::tcplisten(host, port, ep));
 
-    insertnbfile(impl_->nbfiles_, sfd, *impl_);
-    setnbeventmask(sfd, AUG_FDEVENTRD);
+    insertnbfile(impl_->nbfiles_, sd, *impl_);
+    setnbeventmask(sd, AUG_FDEVENTRD);
 
     inetaddr addr(null);
-    AUG_DEBUG2("listening: interface=[%s], port=[%d]",
-               inetntop(getinetaddr(ep, addr)).c_str(),
-               static_cast<int>(ntohs(aug::port(ep))));
+    AUG_CTXDEBUG2(aug_tlx, "listening: interface=[%s], port=[%d]",
+                  inetntop(getinetaddr(ep, addr)).c_str(),
+                  static_cast<int>(ntohs(aug::port(ep))));
 
     // Prepare state.
 
     sessionptr session(impl_->sessions_.getbyname(sname));
-    listenerptr lptr(new listener(session, user, sfd));
+    listenerptr lptr(new listener(session, user, sd));
     scoped_insert si(impl_->socks_, lptr);
 
     si.commit();
@@ -628,16 +631,16 @@ AUGRTPP_API void
 engine::send(mod_id cid, const void* buf, size_t len)
 {
     if (!impl_->socks_.send(cid, buf, len, impl_->now_))
-        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          "connection has been shutdown");
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        "connection has been shutdown");
 }
 
 AUGRTPP_API void
 engine::sendv(mod_id cid, blobref blob)
 {
     if (!impl_->socks_.sendv(cid, blob, impl_->now_))
-        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          "connection has been shutdown");
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        "connection has been shutdown");
 }
 
 AUGRTPP_API void
@@ -646,8 +649,8 @@ engine::setrwtimer(mod_id cid, unsigned ms, unsigned flags)
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
     if (null == rwtimer)
-        throw local_error(__FILE__, __LINE__, AUG_EEXIST,
-                          "connection not found: id=[%d]", cid);
+        throw aug_error(__FILE__, __LINE__, AUG_EEXIST,
+                        "connection not found: id=[%d]", cid);
     rwtimer->setrwtimer(ms, flags);
 }
 
@@ -657,8 +660,8 @@ engine::resetrwtimer(mod_id cid, unsigned ms, unsigned flags)
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
     if (null == rwtimer)
-        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          "connection not found: id=[%d]", cid);
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        "connection not found: id=[%d]", cid);
 
     return rwtimer->resetrwtimer(ms, flags);
 }
@@ -669,8 +672,8 @@ engine::cancelrwtimer(mod_id cid, unsigned flags)
     rwtimerptr rwtimer(smartptr_cast<
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
     if (null == rwtimer)
-        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          "connection not found: id=[%d]", cid);
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        "connection not found: id=[%d]", cid);
     return rwtimer->cancelrwtimer(flags);
 }
 
@@ -718,13 +721,13 @@ engine::setsslclient(mod_id cid, sslctx& ctx)
     connptr cptr(smartptr_cast<
                  conn_base>(impl_->socks_.getbyid(cid)));
     if (null == cptr)
-        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          "connection not found: id=[%d]", cid);
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        "connection not found: id=[%d]", cid);
 
     aug::setsslclient(*cptr, ctx);
 #else // !ENABLE_SSL
-    throw local_error(__FILE__, __LINE__, AUG_ESUPPORT,
-                      AUG_MSG("aug_setsslclient() not supported"));
+    throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
+                    AUG_MSG("aug_setsslclient() not supported"));
 #endif // !ENABLE_SSL
 }
 
@@ -735,13 +738,13 @@ engine::setsslserver(mod_id cid, sslctx& ctx)
     connptr cptr(smartptr_cast<
                  conn_base>(impl_->socks_.getbyid(cid)));
     if (null == cptr)
-        throw local_error(__FILE__, __LINE__, AUG_ESTATE,
-                          "connection not found: id=[%d]", cid);
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        "connection not found: id=[%d]", cid);
 
     aug::setsslserver(*cptr, ctx);
 #else // !ENABLE_SSL
-    throw local_error(__FILE__, __LINE__, AUG_ESUPPORT,
-                      AUG_MSG("aug_setsslserver() not supported"));
+    throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
+                    AUG_MSG("aug_setsslserver() not supported"));
 #endif // !ENABLE_SSL
 }
 

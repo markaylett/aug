@@ -107,7 +107,8 @@ namespace {
     reconf_()
     {
         if (*conffile_) {
-            AUG_DEBUG2("reading config-file: path=[%s]", conffile_);
+            AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]",
+                          conffile_);
             options_.read(conffile_);
         }
 
@@ -118,8 +119,8 @@ namespace {
 
         if ((value = options_.get("loglevel", 0))) {
             unsigned level(strtoui(value, 10));
-            AUG_DEBUG2("setting log level: level=[%d]", level);
-            aug_setloglevel(level);
+            AUG_CTXDEBUG2(aug_tlx, "setting log level: level=[%d]", level);
+            aug_setloglevel(aug_tlx, level);
         }
 
         // Other config directories may be specified relative to the run
@@ -140,14 +141,14 @@ namespace {
             openlog_();
         }
 
-        aug_info("loglevel=[%d]", aug_loglevel());
-        aug_info("rundir=[%s]", rundir_);
+        aug_ctxinfo(aug_tlx, "loglevel=[%d]", aug_getloglevel(aug_tlx));
+        aug_ctxinfo(aug_tlx, "rundir=[%s]", rundir_);
     }
 
     void
-    reopencb_(objectref ob, int id, unsigned& ms)
+    reopencb_(objectref ob, idref id, unsigned& ms)
     {
-        AUG_DEBUG2("re-opening log file");
+        AUG_CTXDEBUG2(aug_tlx, "re-opening log file");
         openlog_();
     }
 
@@ -156,7 +157,8 @@ namespace {
         do_reconf()
         {
             if (*conffile_) {
-                AUG_DEBUG2("reading config-file: path=[%s]", conffile_);
+                AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]",
+                              conffile_);
                 options_.read(conffile_);
             }
             reconf_();
@@ -177,8 +179,7 @@ namespace {
 
         explicit
         state(char* frobpass)
-            : engine_(smartfd::retain(aug_eventrd()),
-                      smartfd::retain(aug_eventwr()), timers_, enginecb_)
+            : engine_(aug_eventrd(), aug_eventwr(), timers_, enginecb_)
         {
 #if ENABLE_SSL
             initssl();
@@ -198,7 +199,7 @@ namespace {
 
         va_list args;
         va_start(args, format);
-        aug_vwritelog(level, format, args);
+        aug_vctxlog(aug_tlx, level, format, args);
         va_end(args);
     }
 
@@ -209,7 +210,7 @@ namespace {
     {
         // Cannot throw.
 
-        aug_vwritelog(level, format, args);
+        aug_vctxlog(aug_tlx, level, format, args);
     }
 
     // Thread-safe.
@@ -217,7 +218,7 @@ namespace {
     const char*
     error_()
     {
-        return aug_errdesc;
+        return aug_tlerr->desc_;
     }
 
     // Thread-safe.
@@ -225,7 +226,7 @@ namespace {
     int
     reconfall_()
     {
-        AUG_DEBUG2("reconfall()");
+        AUG_CTXDEBUG2(aug_tlx, "reconfall()");
         try {
             state_->engine_.reconfall();
             return 0;
@@ -239,7 +240,7 @@ namespace {
     int
     stopall_()
     {
-        AUG_DEBUG2("stopall()");
+        AUG_CTXDEBUG2(aug_tlx, "stopall()");
         try {
             state_->engine_.stopall();
             return 0;
@@ -254,7 +255,8 @@ namespace {
     post_(const char* to, const char* type, aug_object* ob)
     {
         const char* sname = getsession()->name_;
-        AUG_DEBUG2("post(): sname=[%s], to=[%s], type=[%s]", sname, to, type);
+        AUG_CTXDEBUG2(aug_tlx, "post(): sname=[%s], to=[%s], type=[%s]",
+                      sname, to, type);
         try {
             state_->engine_.post(sname, to, type, ob);
             return 0;
@@ -267,8 +269,8 @@ namespace {
     dispatch_(const char* to, const char* type, aug_object* ob)
     {
         const char* sname = getsession()->name_;
-        AUG_DEBUG2("dispatch(): sname=[%s], to=[%s], type=[%s]",
-                   sname, to, type);
+        AUG_CTXDEBUG2(aug_tlx, "dispatch(): sname=[%s], to=[%s], type=[%s]",
+                      sname, to, type);
         try {
             state_->engine_.dispatch(sname, to, type, ob);
             return 0;
@@ -312,7 +314,7 @@ namespace {
     int
     shutdown_(mod_id cid, unsigned flags)
     {
-        AUG_DEBUG2("shutdown(): id=[%d], flags=[%u]", cid, flags);
+        AUG_CTXDEBUG2(aug_tlx, "shutdown(): id=[%d], flags=[%u]", cid, flags);
         try {
             state_->engine_.shutdown(cid, flags);
             return 0;
@@ -325,8 +327,9 @@ namespace {
     tcpconnect_(const char* host, const char* port, void* user)
     {
         const char* sname = getsession()->name_;
-        AUG_DEBUG2("tcpconnect(): sname=[%s], host=[%s], port=[%s]",
-                   sname, host, port);
+        AUG_CTXDEBUG2(aug_tlx,
+                      "tcpconnect(): sname=[%s], host=[%s], port=[%s]",
+                      sname, host, port);
         try {
             return (int)state_->engine_.tcpconnect(sname, host, port, user);
 
@@ -338,8 +341,9 @@ namespace {
     tcplisten_(const char* host, const char* port, void* user)
     {
         const char* sname = getsession()->name_;
-        AUG_DEBUG2("tcplisten(): sname=[%s], host=[%s], port=[%s]",
-                   sname, host, port);
+        AUG_CTXDEBUG2(aug_tlx,
+                      "tcplisten(): sname=[%s], host=[%s], port=[%s]",
+                      sname, host, port);
         try {
 
             // TODO: temporarily regain root privileges.
@@ -353,7 +357,7 @@ namespace {
     int
     send_(mod_id cid, const void* buf, size_t len)
     {
-        AUG_DEBUG2("send(): id=[%d]", cid);
+        AUG_CTXDEBUG2(aug_tlx, "send(): id=[%d]", cid);
         try {
             state_->engine_.send(cid, buf, len);
             return 0;
@@ -365,7 +369,7 @@ namespace {
     int
     sendv_(mod_id cid, aug_blob* blob)
     {
-        AUG_DEBUG2("sendv(): id=[%d]", cid);
+        AUG_CTXDEBUG2(aug_tlx, "sendv(): id=[%d]", cid);
         try {
             state_->engine_.sendv(cid, blob);
             return 0;
@@ -377,7 +381,7 @@ namespace {
     int
     setrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
-        AUG_DEBUG2("setrwtimer(): id=[%d], ms=[%u], flags=[%x]",
+        AUG_CTXDEBUG2(aug_tlx, "setrwtimer(): id=[%d], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
             state_->engine_.setrwtimer(cid, ms, flags);
@@ -390,7 +394,7 @@ namespace {
     int
     resetrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
-        AUG_DEBUG2("resetrwtimer(): id=[%d], ms=[%u], flags=[%x]",
+        AUG_CTXDEBUG2(aug_tlx, "resetrwtimer(): id=[%d], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
             return state_->engine_.resetrwtimer(cid, ms, flags)
@@ -403,7 +407,7 @@ namespace {
     int
     cancelrwtimer_(mod_id cid, unsigned flags)
     {
-        AUG_DEBUG2("cancelrwtimer(): id=[%d], flags=[%x]", cid, flags);
+        AUG_CTXDEBUG2(aug_tlx, "cancelrwtimer(): id=[%d], flags=[%x]", cid, flags);
         try {
             return state_->engine_.cancelrwtimer(cid, flags)
                 ? 0 : MOD_NONE;
@@ -416,7 +420,7 @@ namespace {
     settimer_(unsigned ms, aug_object* ob)
     {
         const char* sname = getsession()->name_;
-        AUG_DEBUG2("settimer(): sname=[%s], ms=[%u]", sname, ms);
+        AUG_CTXDEBUG2(aug_tlx, "settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
             return (int)state_->engine_.settimer(sname, ms, ob);
 
@@ -427,7 +431,7 @@ namespace {
     int
     resettimer_(mod_id tid, unsigned ms)
     {
-        AUG_DEBUG2("resettimer(): id=[%d], ms=[%u]", tid, ms);
+        AUG_CTXDEBUG2(aug_tlx, "resettimer(): id=[%d], ms=[%u]", tid, ms);
         try {
             return state_->engine_.resettimer(tid, ms) ? 0 : MOD_NONE;
 
@@ -438,7 +442,7 @@ namespace {
     int
     canceltimer_(mod_id tid)
     {
-        AUG_DEBUG2("canceltimer(): id=[%d]", tid);
+        AUG_CTXDEBUG2(aug_tlx, "canceltimer(): id=[%d]", tid);
         try {
             return state_->engine_.canceltimer(tid) ? 0 : MOD_NONE;
 
@@ -449,13 +453,13 @@ namespace {
     int
     setsslclient_(mod_id cid, const char* ctx)
     {
-        AUG_DEBUG2("setsslclient(): id=[%d], ctx=[%s]", cid, ctx);
+        AUG_CTXDEBUG2(aug_tlx, "setsslclient(): id=[%d], ctx=[%s]", cid, ctx);
 #if ENABLE_SSL
         try {
             sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
             if (it == state_->sslctxs_.end())
-                throw error(__FILE__, __LINE__, ESSLCTX,
-                            "SSL context [%s] not initialised", ctx);
+                throw daug_error(__FILE__, __LINE__, ESSLCTX,
+                                 "SSL context [%s] not initialised", ctx);
 
             state_->engine_.setsslclient(cid, *it->second);
             return 0;
@@ -471,13 +475,13 @@ namespace {
     int
     setsslserver_(mod_id cid, const char* ctx)
     {
-        AUG_DEBUG2("setsslserver(): id=[%d], ctx=[%s]", cid, ctx);
+        AUG_CTXDEBUG2(aug_tlx, "setsslserver(): id=[%d], ctx=[%s]", cid, ctx);
 #if ENABLE_SSL
         try {
             sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
             if (it == state_->sslctxs_.end())
-                throw error(__FILE__, __LINE__, ESSLCTX,
-                            "SSL context [%s] not initialised", ctx);
+                throw daug_error(__FILE__, __LINE__, ESSLCTX,
+                                 "SSL context [%s] not initialised", ctx);
 
             state_->engine_.setsslclient(cid, *it->second);
             return 0;
@@ -518,14 +522,14 @@ namespace {
     void
     teardown_(const mod_handle* sock)
     {
-        aug_info("teardown defaulting to shutdown");
+        aug_ctxinfo(aug_tlx, "teardown defaulting to shutdown");
         shutdown_(sock->id_, 0);
     }
 
     void
     load_()
     {
-        AUG_DEBUG2("loading sessions");
+        AUG_CTXDEBUG2(aug_tlx, "loading sessions");
 
         // TODO: allow each session to specify a list of sessions on which it
         // depends.
@@ -556,8 +560,9 @@ namespace {
                     if (!withext_(path))
                         path += MODEXT;
 
-                    aug_info("loading module: name=[%s], path=[%s]",
-                             value.c_str(), path.c_str());
+                    aug_ctxinfo(aug_tlx,
+                                "loading module: name=[%s], path=[%s]",
+                                value.c_str(), path.c_str());
                     aug::chdir(rundir_);
                     moduleptr module(new daug::module(value, path.c_str(),
                                                       host_, teardown_));
@@ -565,7 +570,8 @@ namespace {
                         .insert(make_pair(value, module)).first;
                 }
 
-                aug_info("creating session: name=[%s]", name.c_str());
+                aug_ctxinfo(aug_tlx,
+                            "creating session: name=[%s]", name.c_str());
                 state_->engine_.insert
                     (name, sessionptr(new daug::session(it->second,
                                                         name.c_str())),
@@ -576,12 +582,12 @@ namespace {
 
             // No session list: assume reasonable defaults.
 
-            aug_info("loading module: name=[%s]", DEFAULT_NAME);
+            aug_ctxinfo(aug_tlx, "loading module: name=[%s]", DEFAULT_NAME);
             moduleptr module(new daug::module(DEFAULT_NAME, DEFAULT_MODULE,
                                               host_, teardown_));
             state_->modules_[DEFAULT_NAME] = module;
 
-            aug_info("creating session: name=[%s]", DEFAULT_NAME);
+            aug_ctxinfo(aug_tlx, "creating session: name=[%s]", DEFAULT_NAME);
             state_->engine_
                 .insert(DEFAULT_NAME,
                         sessionptr(new daug::session(module, DEFAULT_NAME)),
@@ -630,7 +636,7 @@ namespace {
 
             if (conffile) {
 
-                AUG_DEBUG2("reading config-file: path=[%s]", conffile);
+                AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]", conffile);
                 options_.read(conffile);
 
                 // Store the absolute path to service any reconf requests.
@@ -663,7 +669,7 @@ namespace {
         void
         init()
         {
-            AUG_DEBUG2("initialising daemon process");
+            AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
 
             setsrvlogger("daug");
 
@@ -703,7 +709,7 @@ namespace {
         void
         term()
         {
-            AUG_DEBUG2("terminating daemon process");
+            AUG_CTXDEBUG2(aug_tlx, "terminating daemon process");
 
             // Clear services first.
 
@@ -725,8 +731,7 @@ main(int argc, char* argv[])
 
          // Initialise aug libraries.
 
-        aug_errinfo errinfo;
-        scoped_init init(errinfo);
+        scoped_init init;
 
         // Seed random number generator.
 

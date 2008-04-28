@@ -23,26 +23,26 @@ removenbfile_(struct aug_nbfile* nbfile)
 {
     struct aug_nbfile* ret = nbfile;
 
-    AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: fd=[%d]", nbfile->fd_);
+    AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: fd=[%d]", nbfile->md_);
 
-    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_, 0))
+    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->md_, 0))
         ret = NULL;
 
-    if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->fd_))
+    if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->md_))
         ret = NULL;
 
     return ret;
 }
 
 static int
-close_(int fd)
+close_(aug_md md)
 {
     struct aug_nbfile nbfile;
     int ret = 0;
 
     AUG_CTXDEBUG3(aug_tlx, "nbfile close");
 
-    if (!aug_resetnbfile(fd, &nbfile))
+    if (!aug_resetnbfile(md, &nbfile))
         return -1;
 
     if (!removenbfile_(&nbfile))
@@ -54,17 +54,17 @@ close_(int fd)
         return -1;
     }
 
-    if (-1 == nbfile.base_->close_(fd))
+    if (-1 == nbfile.base_->close_(md))
         ret = -1;
 
     return ret;
 }
 
 static ssize_t
-read_(int fd, void* buf, size_t size)
+read_(aug_md md, void* buf, size_t size)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return -1;
 
     if (!nbfile.base_->read_) {
@@ -73,14 +73,14 @@ read_(int fd, void* buf, size_t size)
         return -1;
     }
 
-    return nbfile.base_->read_(fd, buf, size);
+    return nbfile.base_->read_(md, buf, size);
 }
 
 static ssize_t
-readv_(int fd, const struct iovec* iov, int size)
+readv_(aug_md md, const struct iovec* iov, int size)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return -1;
 
     if (!nbfile.base_->readv_) {
@@ -89,14 +89,14 @@ readv_(int fd, const struct iovec* iov, int size)
         return -1;
     }
 
-    return nbfile.base_->readv_(fd, iov, size);
+    return nbfile.base_->readv_(md, iov, size);
 }
 
 static ssize_t
-write_(int fd, const void* buf, size_t len)
+write_(aug_md md, const void* buf, size_t len)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return -1;
 
     if (!nbfile.base_->write_) {
@@ -105,14 +105,14 @@ write_(int fd, const void* buf, size_t len)
         return -1;
     }
 
-    return nbfile.base_->write_(fd, buf, len);
+    return nbfile.base_->write_(md, buf, len);
 }
 
 static ssize_t
-writev_(int fd, const struct iovec* iov, int size)
+writev_(aug_md md, const struct iovec* iov, int size)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return -1;
 
     if (!nbfile.base_->writev_) {
@@ -121,14 +121,14 @@ writev_(int fd, const struct iovec* iov, int size)
         return -1;
     }
 
-    return nbfile.base_->writev_(fd, iov, size);
+    return nbfile.base_->writev_(md, iov, size);
 }
 
 static int
-setnonblock_(int fd, int on)
+setnonblock_(aug_md md, int on)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return -1;
 
     if (!nbfile.base_->setnonblock_) {
@@ -137,7 +137,7 @@ setnonblock_(int fd, int on)
         return -1;
     }
 
-    return nbfile.base_->setnonblock_(fd, on);
+    return nbfile.base_->setnonblock_(md, on);
 }
 
 static const struct aug_fdtype fdtype_ = {
@@ -152,32 +152,32 @@ static const struct aug_fdtype fdtype_ = {
 static int
 nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
 {
-    int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
-    return events ? nbfile->cb_(ob, nbfile->fd_, (unsigned short)events) : 1;
+    int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->md_);
+    return events ? nbfile->cb_(ob, nbfile->md_, (unsigned short)events) : 1;
 }
 
 static int
 seteventmask_(struct aug_nbfile* nbfile, unsigned short mask)
 {
-    return aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_, mask);
+    return aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->md_, mask);
 }
 
 static int
 eventmask_(struct aug_nbfile* nbfile)
 {
-    return aug_fdeventmask(nbfile->nbfiles_->muxer_, nbfile->fd_);
+    return aug_fdeventmask(nbfile->nbfiles_->muxer_, nbfile->md_);
 }
 
 static int
 events_(struct aug_nbfile* nbfile)
 {
-    return aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->fd_);
+    return aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->md_);
 }
 
 static int
 shutdown_(struct aug_nbfile* nbfile)
 {
-    return aug_shutdown(nbfile->fd_, SHUT_WR);
+    return aug_shutdown(nbfile->md_, SHUT_WR);
 }
 
 static const struct aug_nbtype nbtype_ = {
@@ -189,10 +189,10 @@ static const struct aug_nbtype nbtype_ = {
 };
 
 static int
-filecb_(aug_object* ob, int fd)
+filecb_(aug_object* ob, aug_md md)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return 0; /* Not found so remove. */
     return nbfile.type_->filecb_(ob, &nbfile);
 }
@@ -225,25 +225,25 @@ aug_destroynbfiles(aug_nbfiles_t nbfiles)
 }
 
 AUGNET_API int
-aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
+aug_insertnbfile(aug_nbfiles_t nbfiles, aug_md md, aug_nbfilecb_t cb,
                  aug_object* ob)
 {
     struct aug_nbfile nbfile;
 
     nbfile.nbfiles_ = nbfiles;
-    nbfile.fd_ = fd;
+    nbfile.md_ = md;
     nbfile.cb_ = cb;
-    if (!(nbfile.base_ = aug_setfdtype(fd, &fdtype_)))
+    if (!(nbfile.base_ = aug_setfdtype(md, &fdtype_)))
         return -1;
     nbfile.type_ = &nbtype_;
     nbfile.ext_ = NULL;
 
-    if (!aug_setnbfile(fd, &nbfile)
-        || -1 == aug_insertfile(&nbfiles->files_, fd, filecb_, ob)) {
+    if (!aug_setnbfile(md, &nbfile)
+        || -1 == aug_insertfile(&nbfiles->files_, md, filecb_, ob)) {
 
         /* On failure, restore original file type. */
 
-        aug_setfdtype(fd, nbfile.base_);
+        aug_setfdtype(md, nbfile.base_);
         return -1;
     }
 
@@ -251,20 +251,20 @@ aug_insertnbfile(aug_nbfiles_t nbfiles, int fd, aug_nbfilecb_t cb,
 }
 
 AUGNET_API int
-aug_removenbfile(int fd)
+aug_removenbfile(aug_md md)
 {
     struct aug_nbfile nbfile;
     int ret = 0;
 
     AUG_CTXDEBUG3(aug_tlx, "aug_removenbfile()");
 
-    if (!aug_resetnbfile(fd, &nbfile))
+    if (!aug_resetnbfile(md, &nbfile))
         return -1;
 
     if (!removenbfile_(&nbfile))
         ret = -1;
 
-    if (!aug_setfdtype(nbfile.fd_, nbfile.base_))
+    if (!aug_setfdtype(nbfile.md_, nbfile.base_))
         ret = -1;
 
     return ret;
@@ -302,37 +302,37 @@ aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout)
 }
 
 AUGNET_API int
-aug_shutdownnbfile(int fd)
+aug_shutdownnbfile(aug_md md)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return -1;
     return nbfile.type_->shutdown_(&nbfile);
 }
 
 AUGNET_API int
-aug_setnbeventmask(int fd, unsigned short mask)
+aug_setnbeventmask(aug_md md, unsigned short mask)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return -1;
     return nbfile.type_->seteventmask_(&nbfile, mask);
 }
 
 AUGNET_API int
-aug_nbeventmask(int fd)
+aug_nbeventmask(aug_md md)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return -1;
     return nbfile.type_->eventmask_(&nbfile);
 }
 
 AUGNET_API int
-aug_nbevents(int fd)
+aug_nbevents(aug_md md)
 {
     struct aug_nbfile nbfile;
-    if (!aug_getnbfile(fd, &nbfile))
+    if (!aug_getnbfile(md, &nbfile))
         return -1;
     return nbfile.type_->events_(&nbfile);
 }

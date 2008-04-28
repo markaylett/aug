@@ -16,7 +16,8 @@ AUG_RCSID("$Id$");
 
 struct aug_file_ {
     AUG_ENTRY(aug_file_);
-    int trash_, fd_;
+    int trash_;
+    aug_md md_;
     aug_filecb_t cb_;
     aug_object* ob_;
 };
@@ -99,7 +100,7 @@ aug_destroyfiles(struct aug_files* files)
 }
 
 AUGNET_API int
-aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
+aug_insertfile(struct aug_files* files, aug_md md, aug_filecb_t cb,
                aug_object* ob)
 {
     struct aug_file_* file;
@@ -112,7 +113,7 @@ aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
     aug_unlock();
 
     file->trash_ = 0;
-    file->fd_ = fd;
+    file->md_ = md;
     file->cb_ = cb;
     if ((file->ob_ = ob))
         aug_retain(ob);
@@ -122,18 +123,18 @@ aug_insertfile(struct aug_files* files, int fd, aug_filecb_t cb,
 }
 
 AUGNET_API int
-aug_removefile(struct aug_files* files, int fd)
+aug_removefile(struct aug_files* files, aug_md md)
 {
     /* Locate the matching entry. */
 
     struct aug_file_* it;
     AUG_FOREACH(it, files)
-        if (it->fd_ == fd && !it->trash_)
+        if (it->md_ == md && !it->trash_)
             break;
 
     if (!it) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("no file for descriptor '%d'"), (int)fd);
+                       AUG_MSG("no file for descriptor '%d'"), (int)md);
         return -1;
     }
 
@@ -181,8 +182,7 @@ aug_foreachfile(struct aug_files* files)
 
         if (it == LOCKFILE_ || it->trash_)
             continue;
-
-        if (!(it->cb_(it->ob_, it->fd_))) {
+        if (!(it->cb_(it->ob_, it->md_))) {
 
             if (it->ob_) {
                 aug_release(it->ob_);
