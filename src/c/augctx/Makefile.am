@@ -53,19 +53,25 @@ libaugctx_la_LIBADD =
 
 check_PROGRAMS = \
 	basetest \
+	errinfotest \
 	logtest
 
 TESTS = \
 	basetest \
+	errinfotest \
 	logtest
 
 basetest_SOURCES = basetest.c
 basetest_LDADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
+errinfotest_SOURCES = errinfotest.c
+errinfotest_LDADD = \
+	$(top_builddir)/src/c/augctx/libaugctx.la
+
 logtest_SOURCES = logtest.c
 logtest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 if ENABLE_RUBY
 BUILT_SOURCES = \

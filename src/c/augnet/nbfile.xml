@@ -1,0 +1,61 @@
+<package name="aug" dir="augnet">
+
+  <quotincl>augnet/extend.h</quotincl>
+
+  <interface name="nbfile">
+
+    <method name="process" type="aug_bool" qname="processnb">
+      <param name="ob" type="aug_object" object="true"/>
+    </method>
+
+    <method name="shutdown" type="int" qname="shutdownnb"/>
+
+    <method name="seteventmask" type="int" qname="setnbeventmask">
+      <param name="mask" type="unsigned short"/>
+    </method>
+
+    <method name="eventmask" type="int" qname="nbeventmask"/>
+
+    <method name="events" type="int" qname="nbevents"/>
+
+  </interface>
+
+  <verbatim>
+AUGNET_API aug_nbfiles_t
+aug_createnbfiles(void);
+
+AUGNET_API int
+aug_destroynbfiles(aug_nbfiles_t nbfiles);
+
+/**
+ * Once inserted, a call to aug_close() will remove the file from the nbfiles
+ * set.
+ */
+
+AUGNET_API int
+aug_insertnbfile(aug_nbfiles_t nbfiles, aug_md md, aug_nbfilecb_t cb,
+                 aug_object* ob);
+
+/**
+ * Can be used to remove a file without closing it.
+ */
+
+AUGNET_API int
+aug_removenbfile(aug_md md);
+
+AUGNET_API int
+aug_foreachnbfile(aug_nbfiles_t nbfiles);
+
+AUGNET_API int
+aug_emptynbfiles(aug_nbfiles_t nbfiles);
+
+/**
+ * @return A positive value if events are pending: there is no gaurantee this
+ * this value be representative of the actual number of events pending.
+ */
+
+AUGNET_API int
+aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout);
+  </verbatim>
+
+</package>

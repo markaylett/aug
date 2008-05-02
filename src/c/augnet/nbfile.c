@@ -300,39 +300,3 @@ aug_waitnbevents(aug_nbfiles_t nbfiles, const struct timeval* timeout)
 
     return ret;
 }
-
-AUGNET_API int
-aug_shutdownnbfile(aug_md md)
-{
-    struct aug_nbfile nbfile;
-    if (!aug_getnbfile(md, &nbfile))
-        return -1;
-    return nbfile.type_->shutdown_(&nbfile);
-}
-
-AUGNET_API int
-aug_setnbeventmask(aug_md md, unsigned short mask)
-{
-    struct aug_nbfile nbfile;
-    if (!aug_getnbfile(md, &nbfile))
-        return -1;
-    return nbfile.type_->seteventmask_(&nbfile, mask);
-}
-
-AUGNET_API int
-aug_nbeventmask(aug_md md)
-{
-    struct aug_nbfile nbfile;
-    if (!aug_getnbfile(md, &nbfile))
-        return -1;
-    return nbfile.type_->eventmask_(&nbfile);
-}
-
-AUGNET_API int
-aug_nbevents(aug_md md)
-{
-    struct aug_nbfile nbfile;
-    if (!aug_getnbfile(md, &nbfile))
-        return -1;
-    return nbfile.type_->events_(&nbfile);
-}

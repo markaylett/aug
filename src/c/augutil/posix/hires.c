@@ -10,28 +10,26 @@
 #include <stdlib.h> /* malloc() */
 
 struct aug_hires_ {
-    struct timeval start_;
     aug_mpool* mpool_;
+    struct timeval start_;
 };
 
 AUGUTIL_API aug_hires_t
-aug_createhires(void)
+aug_createhires(aug_mpool* mpool)
 {
-    aug_mpool* mpool = aug_getmpool(aug_tlx);
     aug_hires_t hires = aug_malloc(mpool, sizeof(struct aug_hires_));
-
-    if (!hires) {
-        aug_release(mpool);
+    if (!hires)
         return NULL;
-    }
+
+    hires->mpool_ = mpool;
 
     if (-1 == aug_gettimeofday(&local.start_, NULL)) {
         aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
         aug_free(mpool, hires);
-        aug_release(mpool);
         return NULL;
     }
 
+    aug_retain(mpool);
     return hires;
 }
 

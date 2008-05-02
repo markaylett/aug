@@ -10,7 +10,6 @@ AUG_RCSID("$Id$");
 #include "augsrv/signal.h"
 
 #include "augsys/barrier.h"
-#include "augsys/base.h"    /* aug_getosfd() */
 #include "augsys/muxer.h"
 #include "augsys/unistd.h"  /* aug_fclose() */
 #include "augsys/utility.h" /* aug_perrinfo() */

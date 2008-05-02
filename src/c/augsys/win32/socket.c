@@ -11,14 +11,6 @@
 #include <malloc.h>     /* _alloca() */
 
 static int
-tofds_(SOCKET rd, SOCKET wr, aug_sd sv[2])
-{
-	sv[0] = rd;
-	sv[1] = wr;
-    return 0;
-}
-
-static int
 streampair_(int protocol, aug_sd sv[2])
 {
 	socklen_t len;
@@ -53,7 +45,9 @@ streampair_(int protocol, aug_sd sv[2])
 		goto fail3;
 
 	closesocket(l);
-	return tofds_(s, c, sv);
+    sv[0] = s;
+    sv[1] = c;
+	return 0;
 
  fail3:
 	closesocket(c);
@@ -91,7 +85,9 @@ dgrampair_(int protocol, aug_sd sv[2])
 	if (SOCKET_ERROR == connect(c, (struct sockaddr*)&addr, sizeof(addr)))
 		goto fail3;
 
-	return tofds_(s, c, sv);
+    sv[0] = s;
+    sv[1] = c;
+	return 0;
 
  fail3:
 	closesocket(c);

@@ -9,29 +9,27 @@
 #include <errno.h>  /* ENOMEM */
 
 struct aug_hires_ {
-    LARGE_INTEGER freq_, start_;
     aug_mpool* mpool_;
+    LARGE_INTEGER freq_, start_;
 };
 
 AUGUTIL_API aug_hires_t
-aug_createhires(void)
+aug_createhires(aug_mpool* mpool)
 {
-    aug_mpool* mpool = aug_getmpool(aug_tlx);
     aug_hires_t hires = aug_malloc(mpool, sizeof(struct aug_hires_));
-
-    if (!hires) {
-        aug_release(mpool);
+    if (!hires)
         return NULL;
-    }
+
+    hires->mpool_ = mpool;
 
     if (!QueryPerformanceFrequency(&hires->freq_)
         || !QueryPerformanceCounter(&hires->start_)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         aug_free(mpool, hires);
-        aug_release(mpool);
         return NULL;
     }
 
+    aug_retain(mpool);
     return hires;
 }
 

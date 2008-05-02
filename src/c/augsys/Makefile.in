@@ -40,10 +40,10 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = basetest$(EXEEXT) errinfotest$(EXEEXT) \
-	filetest$(EXEEXT) mcasttest$(EXEEXT) muxertest$(EXEEXT) \
-	sockaddrtest$(EXEEXT) sockettest$(EXEEXT) stringtest$(EXEEXT) \
-	timetest$(EXEEXT) utilitytest$(EXEEXT)
+check_PROGRAMS = basetest$(EXEEXT) filetest$(EXEEXT) \
+	mcasttest$(EXEEXT) muxertest$(EXEEXT) sockaddrtest$(EXEEXT) \
+	sockettest$(EXEEXT) stringtest$(EXEEXT) timetest$(EXEEXT) \
+	utilitytest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -70,9 +70,6 @@ libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
 basetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
-am_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
-errinfotest_OBJECTS = $(am_errinfotest_OBJECTS)
-errinfotest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_filetest_OBJECTS = filetest.$(OBJEXT)
 filetest_OBJECTS = $(am_filetest_OBJECTS)
 filetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
@@ -108,14 +105,12 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
-	$(errinfotest_SOURCES) $(filetest_SOURCES) \
-	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
+	$(filetest_SOURCES) $(mcasttest_SOURCES) $(muxertest_SOURCES) \
 	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
 	$(stringtest_SOURCES) $(timetest_SOURCES) \
 	$(utilitytest_SOURCES)
 DIST_SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
-	$(errinfotest_SOURCES) $(filetest_SOURCES) \
-	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
+	$(filetest_SOURCES) $(mcasttest_SOURCES) $(muxertest_SOURCES) \
 	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
 	$(stringtest_SOURCES) $(timetest_SOURCES) \
 	$(utilitytest_SOURCES)
@@ -319,7 +314,6 @@ libaugsys_la_LIBADD = \
 
 TESTS = \
 	basetest \
-	errinfotest \
 	filetest \
 	mcasttest \
 	muxertest \
@@ -331,10 +325,6 @@ TESTS = \
 
 basetest_SOURCES = basetest.c
 basetest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-
-errinfotest_SOURCES = errinfotest.c
-errinfotest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 filetest_SOURCES = filetest.c
@@ -446,9 +436,6 @@ clean-checkPROGRAMS:
 basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
 	@rm -f basetest$(EXEEXT)
 	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
-errinfotest$(EXEEXT): $(errinfotest_OBJECTS) $(errinfotest_DEPENDENCIES) 
-	@rm -f errinfotest$(EXEEXT)
-	$(LINK) $(errinfotest_LDFLAGS) $(errinfotest_OBJECTS) $(errinfotest_LDADD) $(LIBS)
 filetest$(EXEEXT): $(filetest_OBJECTS) $(filetest_DEPENDENCIES) 
 	@rm -f filetest$(EXEEXT)
 	$(LINK) $(filetest_LDFLAGS) $(filetest_OBJECTS) $(filetest_LDADD) $(LIBS)
@@ -487,7 +474,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlfcn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endian.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@

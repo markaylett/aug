@@ -7,7 +7,6 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/base.h" /* aug_getosfd() */
 #include "augsys/uio.h"
 #include "augutil/list.h"
 
@@ -34,13 +33,13 @@ struct aug_buf {
     aug_blob* blob_;
 };
 
-AUG_HEAD(aug_bufs, aug_buf);
+AUG_HEAD(bufs_, aug_buf);
 
-static struct aug_bufs free_ = AUG_HEAD_INITIALIZER(free_);
+static struct bufs_ free_ = AUG_HEAD_INITIALIZER(free_);
 AUG_ALLOCATOR(allocate_, &free_, aug_buf, 64)
 
 struct aug_writer_ {
-    struct aug_bufs bufs_;
+    struct bufs_ bufs_;
     size_t part_;
     unsigned size_;
 };
@@ -64,7 +63,7 @@ createbuf_(aug_blob* blob)
 }
 
 static void
-destroybufs_(struct aug_bufs* bufs)
+destroybufs_(struct bufs_* bufs)
 {
     struct aug_buf* it;
     AUG_FOREACH(it, bufs) {
@@ -181,7 +180,7 @@ aug_writersize(aug_writer_t writer)
 }
 
 AUGNET_API ssize_t
-aug_writesome(aug_writer_t writer, int fd)
+aug_writesome(aug_writer_t writer, aug_md md)
 {
     ssize_t ret;
     struct iovec* iov;
@@ -217,7 +216,7 @@ aug_writesome(aug_writer_t writer, int fd)
     iov->iov_base = (char*)iov->iov_base + writer->part_;
     iov->iov_len -= (int)writer->part_;
 
-    if (-1 != (ret = aug_fwritev(aug_getosfd(fd), iov, size))) {
+    if (-1 != (ret = aug_fwritev(md, iov, size))) {
 
         /* Pop any completed buffers from queue. */
 

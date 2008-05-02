@@ -59,9 +59,3 @@ aug_posixfdtype(void)
 {
     return &fdtype_;
 }
-
-AUGSYS_API aug_fd
-aug_getosfd(int fd)
-{
-    return (aug_fd)_get_osfhandle(fd);
-}

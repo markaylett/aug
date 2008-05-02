@@ -41,9 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = eventtest$(EXEEXT) hirestest$(EXEEXT) \
-	networdstest$(EXEEXT) shelllexertest$(EXEEXT) \
-	shellwordstest$(EXEEXT)
+check_PROGRAMS = taskstest$(EXEEXT)
 subdir = src/c/augutil
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -66,27 +64,12 @@ libaugutil_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugutil_la_OBJECTS = config.lo conv.lo event.lo file.lo \
 	getopt.lo hires.lo lexer.lo list.lo log.lo md5.lo networds.lo \
-	object.lo path.lo pwd.lo shellwords.lo timer.lo tmspec.lo \
-	types.lo xstr.lo
+	object.lo path.lo pwd.lo shellwords.lo tasks.lo timer.lo \
+	tmspec.lo types.lo xstr.lo
 libaugutil_la_OBJECTS = $(am_libaugutil_la_OBJECTS)
-am_eventtest_OBJECTS = eventtest.$(OBJEXT)
-eventtest_OBJECTS = $(am_eventtest_OBJECTS)
-eventtest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
-am_hirestest_OBJECTS = hirestest.$(OBJEXT)
-hirestest_OBJECTS = $(am_hirestest_OBJECTS)
-hirestest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
-am_networdstest_OBJECTS = networdstest.$(OBJEXT)
-networdstest_OBJECTS = $(am_networdstest_OBJECTS)
-networdstest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augutil/libaugutil.la
-am_shelllexertest_OBJECTS = shelllexertest.$(OBJEXT)
-shelllexertest_OBJECTS = $(am_shelllexertest_OBJECTS)
-shelllexertest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augutil/libaugutil.la
-am_shellwordstest_OBJECTS = shellwordstest.$(OBJEXT)
-shellwordstest_OBJECTS = $(am_shellwordstest_OBJECTS)
-shellwordstest_DEPENDENCIES =  \
-	$(top_builddir)/src/c/augutil/libaugutil.la
+am_taskstest_OBJECTS = taskstest.$(OBJEXT)
+taskstest_OBJECTS = $(am_taskstest_OBJECTS)
+taskstest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -97,12 +80,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugutil_la_SOURCES) $(eventtest_SOURCES) \
-	$(hirestest_SOURCES) $(networdstest_SOURCES) \
-	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES)
-DIST_SOURCES = $(libaugutil_la_SOURCES) $(eventtest_SOURCES) \
-	$(hirestest_SOURCES) $(networdstest_SOURCES) \
-	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES)
+SOURCES = $(libaugutil_la_SOURCES) $(taskstest_SOURCES)
+DIST_SOURCES = $(libaugutil_la_SOURCES) $(taskstest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -270,6 +249,7 @@ modinclude_HEADERS = \
 	path.h \
 	pwd.h \
 	shellwords.h \
+	tasks.h \
 	timer.h \
 	tmspec.h \
 	types.h \
@@ -293,6 +273,7 @@ libaugutil_la_SOURCES = \
 	path.c \
 	pwd.c \
 	shellwords.c \
+	tasks.c \
 	timer.c \
 	tmspec.c \
 	types.c \
@@ -306,31 +287,41 @@ libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
+# 	eventtest
+# 	hirestest
+# 	networdstest
+# 	shelllexertest
+# 	shellwordstest
 TESTS = \
-	eventtest \
-	hirestest \
-	networdstest.sh \
-	shelllexertest.sh \
-	shellwordstest.sh
+	taskstest
 
-eventtest_SOURCES = eventtest.c
-eventtest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
+# 	eventtest
+# 	hirestest
+# 	networdstest.sh
+# 	shelllexertest.sh
+# 	shellwordstest.sh
 
-hirestest_SOURCES = hirestest.c
-hirestest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
+# eventtest_SOURCES = eventtest.c
+# eventtest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-networdstest_SOURCES = networdstest.c
-networdstest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
+# hirestest_SOURCES = hirestest.c
+# hirestest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-shelllexertest_SOURCES = shelllexertest.c
-shelllexertest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
+# networdstest_SOURCES = networdstest.c
+# networdstest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-shellwordstest_SOURCES = shellwordstest.c
-shellwordstest_LDADD = \
+# shelllexertest_SOURCES = shelllexertest.c
+# shelllexertest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
+
+# shellwordstest_SOURCES = shellwordstest.c
+# shellwordstest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
+taskstest_SOURCES = taskstest.c
+taskstest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la
 
 all: all-recursive
@@ -402,21 +393,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-eventtest$(EXEEXT): $(eventtest_OBJECTS) $(eventtest_DEPENDENCIES) 
-	@rm -f eventtest$(EXEEXT)
-	$(LINK) $(eventtest_LDFLAGS) $(eventtest_OBJECTS) $(eventtest_LDADD) $(LIBS)
-hirestest$(EXEEXT): $(hirestest_OBJECTS) $(hirestest_DEPENDENCIES) 
-	@rm -f hirestest$(EXEEXT)
-	$(LINK) $(hirestest_LDFLAGS) $(hirestest_OBJECTS) $(hirestest_LDADD) $(LIBS)
-networdstest$(EXEEXT): $(networdstest_OBJECTS) $(networdstest_DEPENDENCIES) 
-	@rm -f networdstest$(EXEEXT)
-	$(LINK) $(networdstest_LDFLAGS) $(networdstest_OBJECTS) $(networdstest_LDADD) $(LIBS)
-shelllexertest$(EXEEXT): $(shelllexertest_OBJECTS) $(shelllexertest_DEPENDENCIES) 
-	@rm -f shelllexertest$(EXEEXT)
-	$(LINK) $(shelllexertest_LDFLAGS) $(shelllexertest_OBJECTS) $(shelllexertest_LDADD) $(LIBS)
-shellwordstest$(EXEEXT): $(shellwordstest_OBJECTS) $(shellwordstest_DEPENDENCIES) 
-	@rm -f shellwordstest$(EXEEXT)
-	$(LINK) $(shellwordstest_LDFLAGS) $(shellwordstest_OBJECTS) $(shellwordstest_LDADD) $(LIBS)
+taskstest$(EXEEXT): $(taskstest_OBJECTS) $(taskstest_DEPENDENCIES) 
+	@rm -f taskstest$(EXEEXT)
+	$(LINK) $(taskstest_LDFLAGS) $(taskstest_OBJECTS) $(taskstest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -427,23 +406,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eventtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hires.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hirestest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md5.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/networds.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/networdstest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pwd.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shelllexertest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shellwords.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shellwordstest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tasks.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/taskstest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tmspec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@

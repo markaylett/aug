@@ -12,6 +12,8 @@
 
 #include "augsys/config.h"
 
+#include "augctx/mpool.h"
+
 #include "augtypes.h"
 
 typedef void (*aug_fnptr_t)();
@@ -21,7 +23,7 @@ AUGSYS_API aug_result
 aug_dlclose(aug_dlib_t dlib);
 
 AUGSYS_API aug_dlib_t
-aug_dlopen(const char* path);
+aug_dlopen(aug_mpool* mpool, const char* path);
 
 AUGSYS_API aug_fnptr_t
 aug_dlsym(aug_dlib_t dlib, const char* symbol);

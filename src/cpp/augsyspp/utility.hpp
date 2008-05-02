@@ -7,7 +7,6 @@
 #include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
 
-#include "augsys/base.h"   // aug_getosfd()
 #include "augsys/unistd.h" // aug_fsize()
 #include "augsys/utility.h"
 

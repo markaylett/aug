@@ -1,4 +1,6 @@
 include $(top_srcdir)/src/c/lang.mk
+EXTRA_DIST = \
+	nbfile.xml
 
 modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
@@ -74,3 +76,11 @@ httptest_LDADD = \
 neteventtest_SOURCES = neteventtest.c
 neteventtest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
+
+if ENABLE_RUBY
+BUILT_SOURCES = \
+	nbfile.h
+
+%.h: %.xml
+	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
+endif

@@ -647,7 +647,7 @@ nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
         /* Callback may close file, ensure that it is still available after
            callback returns. */
 
-        aug_retainfd(nbfile->md_);
+        /*aug_retainfd(nbfile->md_);*/
         if ((ret = nbfile->cb_(ob, nbfile->md_, events))) {
 
             /* No need to update events if file is being removed - indicated
@@ -655,7 +655,7 @@ nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
 
             updateevents_(nbfile);
         }
-        aug_releasefd(nbfile->md_);
+        /*aug_releasefd(nbfile->md_);*/
 
     } else {
         AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_() skipped");

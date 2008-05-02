@@ -1,6 +1,8 @@
 <package name="aug" dir="augsys">
 
   <quotincl>augsys/config.h</quotincl>
+  <quotincl>augctx/mpool.h</quotincl>
+  <quotincl>augtypes.h</quotincl>
 
   <verbatim>
 struct iovec;
@@ -32,7 +34,7 @@ struct iovec;
 
   <verbatim>
 AUGSYS_API aug_stream*
-aug_createstream(void);
+aug_createstream(aug_mpool* mpool);
   </verbatim>
 
 </package>

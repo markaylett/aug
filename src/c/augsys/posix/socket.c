@@ -230,13 +230,6 @@ aug_socketpair(int domain, int type, int protocol, aug_sd sv[2])
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
         return -1;
     }
-
-    if (-1 == aug_openfds(sv, aug_posixfdtype())) {
-        close(sv[0]);
-        close(sv[1]);
-        return -1;
-    }
-
     return 0;
 }
 

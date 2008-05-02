@@ -83,20 +83,17 @@ static const struct aug_streamvtbl vtbl_ = {
 };
 
 AUGSYS_API aug_stream*
-aug_createstream(void)
+aug_createstream(aug_mpool* mpool)
 {
-    aug_mpool* mpool = aug_getmpool(aug_tlx);
     struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
-
-    if (!impl) {
-        aug_release(mpool);
+    if (!impl)
         return NULL;
-    }
 
     impl->stream_.vtbl_ = &vtbl_;
     impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
 
+    aug_retain(mpool);
     return &impl->stream_;
 }

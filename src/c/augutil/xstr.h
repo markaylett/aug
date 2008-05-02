@@ -53,7 +53,7 @@ AUGUTIL_API int
 aug_xstrcatc(aug_xstr_t* xstr, char ch);
 
 AUGUTIL_API ssize_t
-aug_xstrcatf(int fd, aug_xstr_t* xstr, size_t size);
+aug_xstrcatf(aug_fd fd, aug_xstr_t* xstr, size_t size);
 
 AUGUTIL_API int
 aug_xstrcpycn(aug_xstr_t* xstr, char ch, size_t num);

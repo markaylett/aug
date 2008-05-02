@@ -24,6 +24,7 @@
 #include "augutil/path.h"
 #include "augutil/pwd.h"
 #include "augutil/shellwords.h"
+#include "augutil/tasks.h"
 #include "augutil/timer.h"
 #include "augutil/tmspec.h"
 #include "augutil/types.h"

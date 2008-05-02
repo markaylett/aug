@@ -90,20 +90,16 @@ static const struct aug_clockvtbl vtbl_ = {
 AUGCTX_API aug_clock*
 aug_createclock(aug_mpool* mpool, long tz)
 {
-    struct impl_* impl;
-    assert(mpool);
-
-    if (!(impl = aug_malloc(mpool, sizeof(struct impl_))))
+    struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
+    if (!impl)
         return NULL;
 
     impl->clock_.vtbl_ = &vtbl_;
     impl->clock_.impl_ = NULL;
     impl->refs_ = 1;
-
-    aug_retain(mpool);
-
     impl->mpool_ = mpool;
     impl->timezone_ = tz;
 
+    aug_retain(mpool);
     return &impl->clock_;
 }

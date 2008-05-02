@@ -42,6 +42,6 @@ AUGNET_API ssize_t
 aug_writersize(aug_writer_t writer);
 
 AUGNET_API ssize_t
-aug_writesome(aug_writer_t writer, int fd);
+aug_writesome(aug_writer_t writer, aug_md md);
 
 #endif /* AUGNET_WRITER_H */

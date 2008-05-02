@@ -115,14 +115,12 @@ createsrvlog_(aug_mpool* mpool, const char* sname, aug_log* inner)
     impl->log_.vtbl_ = &vtbl_;
     impl->log_.impl_ = NULL;
     impl->refs_ = 1;
-
-    aug_retain(mpool);
-    aug_retain(inner);
-
     impl->mpool_ = mpool;
     impl->inner_ = inner;
     impl->handle_ = handle;
 
+    aug_retain(mpool);
+    aug_retain(inner);
     return &impl->log_;
 }
 

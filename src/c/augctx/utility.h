@@ -10,7 +10,7 @@
 #include <stddef.h>
 
 #define aug_die_(file, line, what) \
-(fprintf(stderr, "%s:%d: %s\n", file, line, what), abort())
+(fprintf(stderr, "%s:%d: %s\n", file, line, what), fflush(NULL), exit(1))
 
 #define aug_die(what) \
 aug_die_(__FILE__, __LINE__, what)

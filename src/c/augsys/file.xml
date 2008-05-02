@@ -15,8 +15,6 @@
       <param name="on" type="aug_bool"/>
     </method>
 
-    <method name="getmd" type="aug_md" qname="getmd"/>
-
   </interface>
 
   <verbatim>

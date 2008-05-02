@@ -41,7 +41,8 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = basetest$(EXEEXT) logtest$(EXEEXT)
+check_PROGRAMS = basetest$(EXEEXT) errinfotest$(EXEEXT) \
+	logtest$(EXEEXT)
 subdir = src/c/augctx
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -67,9 +68,12 @@ libaugctx_la_OBJECTS = $(am_libaugctx_la_OBJECTS)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
 basetest_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
+am_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
+errinfotest_OBJECTS = $(am_errinfotest_OBJECTS)
+errinfotest_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
 am_logtest_OBJECTS = logtest.$(OBJEXT)
 logtest_OBJECTS = $(am_logtest_OBJECTS)
-logtest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+logtest_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -81,9 +85,9 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES) \
-	$(logtest_SOURCES)
+	$(errinfotest_SOURCES) $(logtest_SOURCES)
 DIST_SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES) \
-	$(logtest_SOURCES)
+	$(errinfotest_SOURCES) $(logtest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -274,15 +278,20 @@ libaugctx_la_LDFLAGS = \
 libaugctx_la_LIBADD = 
 TESTS = \
 	basetest \
+	errinfotest \
 	logtest
 
 basetest_SOURCES = basetest.c
 basetest_LDADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
+errinfotest_SOURCES = errinfotest.c
+errinfotest_LDADD = \
+	$(top_builddir)/src/c/augctx/libaugctx.la
+
 logtest_SOURCES = logtest.c
 logtest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 @ENABLE_RUBY_TRUE@BUILT_SOURCES = \
 @ENABLE_RUBY_TRUE@	clock.h \
@@ -363,6 +372,9 @@ clean-checkPROGRAMS:
 basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
 	@rm -f basetest$(EXEEXT)
 	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
+errinfotest$(EXEEXT): $(errinfotest_OBJECTS) $(errinfotest_DEPENDENCIES) 
+	@rm -f errinfotest$(EXEEXT)
+	$(LINK) $(errinfotest_LDFLAGS) $(errinfotest_OBJECTS) $(errinfotest_LDADD) $(LIBS)
 logtest$(EXEEXT): $(logtest_OBJECTS) $(logtest_DEPENDENCIES) 
 	@rm -f logtest$(EXEEXT)
 	$(LINK) $(logtest_LDFLAGS) $(logtest_OBJECTS) $(logtest_LDADD) $(LIBS)
@@ -380,6 +392,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ctx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/defs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errno.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@

@@ -62,7 +62,6 @@ libaugsys_la_LIBADD = \
 
 check_PROGRAMS = \
 	basetest \
-	errinfotest \
 	filetest \
 	mcasttest \
 	muxertest \
@@ -74,7 +73,6 @@ check_PROGRAMS = \
 
 TESTS = \
 	basetest \
-	errinfotest \
 	filetest \
 	mcasttest \
 	muxertest \
@@ -86,10 +84,6 @@ TESTS = \
 
 basetest_SOURCES = basetest.c
 basetest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-
-errinfotest_SOURCES = errinfotest.c
-errinfotest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 filetest_SOURCES = filetest.c

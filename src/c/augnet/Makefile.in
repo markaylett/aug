@@ -225,6 +225,9 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/c
 
+EXTRA_DIST = \
+	nbfile.xml
+
 modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
 	auth.h \
@@ -293,7 +296,11 @@ neteventtest_SOURCES = neteventtest.c
 neteventtest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
-all: all-am
+@ENABLE_RUBY_TRUE@BUILT_SOURCES = \
+@ENABLE_RUBY_TRUE@	nbfile.h
+
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -601,13 +608,15 @@ distdir: $(DISTFILES)
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -631,6 +640,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -697,6 +707,9 @@ uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES \
 	tags uninstall uninstall-am uninstall-info-am \
 	uninstall-libLTLIBRARIES uninstall-modincludeHEADERS
 
+
+@ENABLE_RUBY_TRUE@%.h: %.xml
+@ENABLE_RUBY_TRUE@	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

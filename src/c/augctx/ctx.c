@@ -179,18 +179,15 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int loglevel)
     impl->ctx_.vtbl_ = &vtbl_;
     impl->ctx_.impl_ = NULL;
     impl->refs_ = 1;
+    impl->mpool_ = mpool;
+    impl->clock_ = clock;
+    impl->log_ = log;
+    impl->loglevel_ = loglevel;
+    memset(&impl->errinfo_, 0, sizeof(impl->errinfo_));
 
     aug_retain(mpool);
     aug_retain(clock);
     aug_retain(log);
-
-    impl->mpool_ = mpool;
-    impl->clock_ = clock;
-    impl->log_ = log;
-
-    impl->loglevel_ = loglevel;
-    memset(&impl->errinfo_, 0, sizeof(impl->errinfo_));
-
     return &impl->ctx_;
 }
 

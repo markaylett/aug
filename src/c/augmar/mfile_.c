@@ -10,7 +10,6 @@ AUG_RCSID("$Id$");
 #include "augmar/file_.h"
 #include "augmar/format_.h"
 
-#include "augsys/base.h"   /* aug_getosfd() */
 #include "augsys/mmap.h"
 #include "augsys/unistd.h" /* aug_fsize() */
 

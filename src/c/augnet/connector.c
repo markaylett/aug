@@ -9,7 +9,6 @@ AUG_RCSID("$Id$");
 
 #include "augnet/inet.h"    /* aug_established() */
 
-#include "augsys/base.h"    /* aug_getosfd() */
 #include "augsys/unistd.h"  /* aug_close() */
 #include "augsys/utility.h" /* aug_setnonblock() */
 

@@ -32,27 +32,24 @@ aug_dlclose(aug_dlib_t dlib)
 }
 
 AUGSYS_API aug_dlib_t
-aug_dlopen(const char* path)
+aug_dlopen(aug_mpool* mpool, const char* path)
 {
-    aug_mpool* mpool = aug_getmpool(aug_tlx);
     aug_dlib_t dlib = aug_malloc(mpool, sizeof(struct aug_dlib_));
     void* handle;
 
-    if (!dlib) {
-        aug_release(mpool);
+    if (!dlib)
         return NULL;
-    }
 
     if (!(handle = LoadLibrary(path))) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         aug_free(mpool, dlib);
-        aug_release(mpool);
         return NULL;
     }
 
     dlib->mpool_ = mpool;
     dlib->handle_ = handle;
 
+    aug_retain(mpool);
     return dlib;
 }
 

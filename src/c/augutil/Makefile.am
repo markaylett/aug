@@ -29,6 +29,7 @@ modinclude_HEADERS = \
 	path.h \
 	pwd.h \
 	shellwords.h \
+	tasks.h \
 	timer.h \
 	tmspec.h \
 	types.h \
@@ -54,6 +55,7 @@ libaugutil_la_SOURCES = \
 	path.c \
 	pwd.c \
 	shellwords.c \
+	tasks.c \
 	timer.c \
 	tmspec.c \
 	types.c \
@@ -68,35 +70,41 @@ libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	eventtest \
-	hirestest \
-	networdstest \
-	shelllexertest \
-	shellwordstest
+	taskstest
+# 	eventtest
+# 	hirestest
+# 	networdstest
+# 	shelllexertest
+# 	shellwordstest
 
 TESTS = \
-	eventtest \
-	hirestest \
-	networdstest.sh \
-	shelllexertest.sh \
-	shellwordstest.sh
+	taskstest
+# 	eventtest
+# 	hirestest
+# 	networdstest.sh
+# 	shelllexertest.sh
+# 	shellwordstest.sh
 
-eventtest_SOURCES = eventtest.c
-eventtest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
+# eventtest_SOURCES = eventtest.c
+# eventtest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-hirestest_SOURCES = hirestest.c
-hirestest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
+# hirestest_SOURCES = hirestest.c
+# hirestest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-networdstest_SOURCES = networdstest.c
-networdstest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
+# networdstest_SOURCES = networdstest.c
+# networdstest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-shelllexertest_SOURCES = shelllexertest.c
-shelllexertest_LDADD = \
-	$(top_builddir)/src/c/augutil/libaugutil.la
+# shelllexertest_SOURCES = shelllexertest.c
+# shelllexertest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-shellwordstest_SOURCES = shellwordstest.c
-shellwordstest_LDADD = \
+# shellwordstest_SOURCES = shellwordstest.c
+# shellwordstest_LDADD = \
+# 	$(top_builddir)/src/c/augutil/libaugutil.la
+
+taskstest_SOURCES = taskstest.c
+taskstest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la

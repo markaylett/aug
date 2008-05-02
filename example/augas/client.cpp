@@ -90,14 +90,14 @@ namespace {
     struct eachline {
         void (*fn_)(handle&);
         handle sock_;
-        aug::clock* clock_;
+        aug::hires* hires_;
         vector<double>& secs_;
         explicit
         eachline(void (*fn)(handle&), const handle& sock,
-                 aug::clock& clock, vector<double>& secs)
+                 aug::hires& hires, vector<double>& secs)
             : fn_(fn),
               sock_(sock),
-              clock_(&clock),
+              hires_(&hires),
               secs_(secs)
         {
         }
@@ -105,7 +105,7 @@ namespace {
         operator ()(std::string& tok)
         {
             state& s(*sock_.user<state>());
-            secs_.push_back(elapsed(*clock_));
+            secs_.push_back(elapsed(*hires_));
             if (0 == --s.torecv_)
                 shutdown(sock_, 0);
             else if (0 < s.tosend_--)
@@ -117,7 +117,7 @@ namespace {
         void (*send_)(handle&);
         unsigned conns_, estab_, echos_;
         size_t bytes_;
-        aug::clock clock_;
+        aug::hires hires_;
         map<double, double> xy_;
         bool
         do_start(const char* sname)
@@ -160,7 +160,7 @@ namespace {
                 return;
             }
 
-            double ms(elapsed(clock_) * 1000.0);
+            double ms(elapsed(hires_) * 1000.0);
 
             mod_writelog(MOD_LOGINFO, "total time: %f ms", ms);
 
@@ -187,7 +187,7 @@ namespace {
             }
 
             state& s(*sock.user<state>());
-            s.secs_.push_back(elapsed(clock_));
+            s.secs_.push_back(elapsed(hires_));
             send_(sock);
             --s.tosend_;
         }
@@ -198,7 +198,7 @@ namespace {
             state& s(*sock.user<state>());
             tokenise(static_cast<const char*>(buf),
                      static_cast<const char*>(buf) + len, s.tok_, '\n',
-                     eachline(send_, sock, clock_, s.secs_));
+                     eachline(send_, sock, hires_, s.secs_));
         }
         bool
         do_authcert(const handle& sock, const char* subject,
