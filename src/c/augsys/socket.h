@@ -170,7 +170,7 @@ aug_setsockopt(aug_sd sd, int level, int optname, const void* optval,
  */
 
 AUGSYS_API int
-aug_shutdown(aug_sd sd, int how);
+aug_sshutdown(aug_sd sd, int how);
 
 AUGSYS_API int
 aug_socketpair(int domain, int type, int protocol, aug_sd sv[2]);

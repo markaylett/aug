@@ -93,18 +93,21 @@ main(int argc, char* argv[])
     aug_check(3 == refs_);
 
     foreach_(tasks);
+    aug_check(3 == aug_gettasks(tasks));
     aug_check(3 == count_);
     aug_check(3 == last_);
 
     /* Fairness rotation. */
 
     foreach_(tasks);
+    aug_check(3 == aug_gettasks(tasks));
     aug_check(3 == count_);
     aug_check(1 == last_);
 
     /* Fairness rotation. */
 
     foreach_(tasks);
+    aug_check(3 == aug_gettasks(tasks));
     aug_check(3 == count_);
     aug_check(2 == last_);
 
@@ -113,8 +116,13 @@ main(int argc, char* argv[])
     aug_check(0 <= aug_removetask(tasks, &task2_));
 
     foreach_(tasks);
+    aug_check(2 == aug_gettasks(tasks));
     aug_check(2 == count_);
     aug_check(3 == last_);
+
+    /* No longer exists. */
+
+    aug_check(AUG_FAILNONE == aug_removetask(tasks, &task2_));
 
     /* Remove during loop. */
 
@@ -125,6 +133,7 @@ main(int argc, char* argv[])
     aug_check(AUG_FAILNONE == aug_removetask(tasks, &task1_));
 
     foreach_(tasks);
+    aug_check(1 == aug_gettasks(tasks));
     aug_check(1 == count_);
     aug_check(3 == last_);
 
@@ -132,6 +141,7 @@ main(int argc, char* argv[])
 
      /* Objects released. */
 
+    aug_check(0 == aug_gettasks(tasks));
     aug_check(0 == refs_);
     aug_release(mpool);
     return 0;

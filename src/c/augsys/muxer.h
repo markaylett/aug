@@ -40,12 +40,16 @@ aug_createmuxer(void);
 AUGSYS_API int
 aug_destroymuxer(aug_muxer_t muxer);
 
+AUGSYS_API void
+aug_setnowait(aug_muxer_t muxer, unsigned nowait);
+
 AUGSYS_API int
 aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
 
 /**
  * @return Either positive if events have been signalled, zero on timeout, or
- * a negative value on error.
+ * a negative value on error.  A positive return may not be representative of
+ * the actual number of signalled events.
  *
  * If #SA_RESTART has been set for an interrupting signal, it is
  * implementation dependant whether select()/poll() restart or return with

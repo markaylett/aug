@@ -59,7 +59,7 @@ aug_settlx(aug_ctx* ctx);
  *
  * Use aug_createbasicctx() to create context, and assign to thread-local.
  *
- * See @ref TypesResult.
+ * @return See @ref TypesResult.
  */
 
 AUGCTX_API aug_result
@@ -106,7 +106,7 @@ aug_tlerr_(void);
  *
  * Initialise and, if not set, set basic context using aug_setbasictlx().
  *
- * See @ref TypesResult.
+ * @return See @ref TypesResult.
  */
 
 AUGCTX_API aug_result

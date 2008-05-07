@@ -12,7 +12,7 @@
 
 #include "augnet/config.h"
 
-#include "augsys/types.h"
+#include "augsys/file.h"
 
 struct aug_errinfo;
 struct ssl_st;
@@ -21,10 +21,12 @@ AUGNET_API void
 aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                   unsigned long err);
 
-AUGNET_API int
-aug_setsslclient(aug_sd sd, struct ssl_st* ssl);
+AUGNET_API aug_file*
+aug_attachsslclient(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
+                    struct ssl_st* ssl);
 
-AUGNET_API int
-aug_setsslserver(aug_sd sd, struct ssl_st* ssl);
+AUGNET_API aug_file*
+aug_attachsslserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
+                    struct ssl_st* ssl);
 
 #endif /* AUGNET_SSL_H */

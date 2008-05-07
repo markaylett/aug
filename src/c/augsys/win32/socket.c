@@ -351,7 +351,7 @@ aug_setsockopt(aug_sd sd, int level, int optname, const void* optval,
 }
 
 AUGSYS_API int
-aug_shutdown(aug_sd sd, int how)
+aug_sshutdown(aug_sd sd, int how)
 {
     if (SOCKET_ERROR == shutdown(sd, how)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAGetLastError());

@@ -48,6 +48,12 @@ release_(aug_stream* obj)
     }
 }
 
+static aug_result
+shutdown_(aug_stream* obj)
+{
+    return AUG_SUCCESS;
+}
+
 static ssize_t
 read_(aug_stream* obj, void* buf, size_t size)
 {
@@ -76,6 +82,7 @@ static const struct aug_streamvtbl vtbl_ = {
     cast_,
     retain_,
     release_,
+    shutdown_,
     read_,
     readv_,
     write_,

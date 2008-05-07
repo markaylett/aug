@@ -7,6 +7,8 @@
 
 AUG_RCSID("$Id$");
 
+static const struct timeval NOWAIT_ = { 0, 0 };
+
 #if !defined(_WIN32)
 # include "augsys/posix/muxer.c"
 #else /* _WIN32 */

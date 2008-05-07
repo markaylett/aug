@@ -1,28 +1,40 @@
 <package name="aug" dir="augsys">
 
-  <quotincl>augsys/config.h</quotincl>
-  <quotincl>augsys/types.h</quotincl>
+  <quotincl>augsys/muxer.h</quotincl>
 
   <quotincl>augctx/mpool.h</quotincl>
 
-  <quotincl>augtypes.h</quotincl>
+  <verbatim>struct aug_file_;</verbatim>
+  <verbatim>typedef aug_bool (*aug_filecb_t)(struct aug_file_*);</verbatim>
 
   <interface name="file">
 
     <method name="close" type="aug_result" qname="close"/>
 
+    <method name="dispatch" type="aug_bool" qname="dispatch">
+      <param name="cb" type="aug_filecb_t"/>
+    </method>
+
     <method name="setnonblock" type="aug_result" qname="setnonblock">
       <param name="on" type="aug_bool"/>
     </method>
+
+    <method name="seteventmask" type="aug_result" qname="seteventmask">
+      <param name="mask" type="unsigned short"/>
+    </method>
+
+    <method name="eventmask" type="int" qname="eventmask"/>
+
+    <method name="events" type="int" qname="events"/>
 
   </interface>
 
   <verbatim>
 AUGSYS_API aug_file*
-aug_attachfd(aug_mpool* mpool, aug_fd fd);
+aug_attachfd(aug_mpool* mpool, aug_muxer_t muxer, aug_fd fd);
 
 AUGSYS_API aug_file*
-aug_attachsd(aug_mpool* mpool, aug_sd sd);
+aug_attachsd(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd);
   </verbatim>
 
 </package>

@@ -9,10 +9,9 @@ AUG_RCSID("$Id$");
 
 #if ENABLE_SSL
 
-# include "augnet/extend.h"
-
 # include "augsys/base.h"   /* struct aug_fdtype */
 # include "augsys/socket.h" /* aug_shutdown() */
+# include "augsys/stream.h"
 # include "augsys/uio.h"
 
 # include "augctx/base.h"
@@ -22,6 +21,7 @@ AUG_RCSID("$Id$");
 # include <openssl/err.h>
 # include <openssl/ssl.h>
 
+# include <assert.h>
 # include <string.h>        /* memcpy() */
 
 # define SSLREAD_  0x01
@@ -49,7 +49,13 @@ enum sslstate_ {
     SSLERR
 };
 
-struct sslext_ {
+struct impl_ {
+    aug_file file_;
+    aug_stream stream_;
+    int refs_;
+    aug_mpool* mpool_;
+    aug_muxer_t muxer_;
+    aug_sd sd_;
     SSL* ssl_;
     struct buf_ inbuf_, outbuf_;
     enum sslstate_ state_;
@@ -160,20 +166,19 @@ writebufv_(struct buf_* x, const struct iovec* iov, int size)
 }
 
 static int
-shutwr_(struct aug_nbfile* nbfile)
+shutwr_(struct impl_* impl)
 {
-    struct sslext_* x = nbfile->ext_;
     int ret;
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: shutdown");
-    ret = SSL_shutdown(x->ssl_);
-    aug_shutdown(nbfile->md_, SHUT_WR);
+    ret = SSL_shutdown(impl->ssl_);
+    aug_sshutdown(impl->sd_, SHUT_WR);
 
     if (ret < 0) {
         aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
-        return -1;
+        return AUG_FAILERROR;
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static int
@@ -226,16 +231,15 @@ sslwrite_(SSL* ssl, struct buf_* x)
 }
 
 static int
-realmask_(struct aug_nbfile* nbfile)
+realmask_(struct impl_* impl)
 {
     /* Calculate the real mask to be used by the muxer. */
 
-    struct sslext_* x = nbfile->ext_;
     int mask = 0;
 
-    switch (x->state_) {
+    switch (impl->state_) {
     case NORMAL:
-        if (!bufempty_(&x->outbuf_))
+        if (!bufempty_(&impl->outbuf_))
             mask = AUG_FDEVENTRDWR;
         else
             mask = AUG_FDEVENTRD;
@@ -259,257 +263,42 @@ realmask_(struct aug_nbfile* nbfile)
 }
 
 static int
-userevents_(struct aug_nbfile* nbfile)
+userevents_(struct impl_* impl)
 {
-    struct sslext_* x = nbfile->ext_;
     int events = 0;
 
     /* End of data and errors are communicated via aug_read(). */
 
-    if ((x->mask_ & AUG_FDEVENTRD)
-        && (!bufempty_(&x->inbuf_) || RDZERO == x->state_
-            || SSLERR == x->state_))
+    if ((impl->mask_ & AUG_FDEVENTRD)
+        && (!bufempty_(&impl->inbuf_) || RDZERO == impl->state_
+            || SSLERR == impl->state_))
         events |= AUG_FDEVENTRD;
 
-    if ((x->mask_ & AUG_FDEVENTWR) && !buffull_(&x->outbuf_))
+    if ((impl->mask_ & AUG_FDEVENTWR) && !buffull_(&impl->outbuf_))
         events |= AUG_FDEVENTWR;
 
     return events;
 }
 
 static void
-updateevents_(struct aug_nbfile* nbfile)
+updateevents_(struct impl_* impl)
 {
-    struct sslext_* x = nbfile->ext_;
     int real, user;
 
-    aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->md_,
-                       (real = realmask_(nbfile)));
+    aug_setfdeventmask(impl->muxer_, impl->sd_, (real = realmask_(impl)));
 
-    if ((user = userevents_(nbfile))
-        || (RDPEND == x->state_ && !buffull_(&x->inbuf_)))
-        nbfile->nbfiles_->nowait_ = 1;
+    if ((user = userevents_(impl))
+        || (RDPEND == impl->state_ && !buffull_(&impl->inbuf_)))
+        aug_setnowait(impl->muxer_, 1);
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: events: fd=[%d], realmask=[%d],"
                   " usermask=[%d], userevents=[%d]",
-                  nbfile->md_, real, x->mask_, user);
+                  impl->sd_, real, impl->mask_, user);
 }
-
-static struct aug_nbfile*
-removenbfile_(struct aug_nbfile* nbfile)
-{
-    struct aug_nbfile* ret = nbfile;
-
-    AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: fd=[%d]", nbfile->md_);
-
-    if (-1 == aug_setfdeventmask(nbfile->nbfiles_->muxer_, nbfile->md_, 0))
-        ret = NULL;
-
-    if (-1 == aug_removefile(&nbfile->nbfiles_->files_, nbfile->md_))
-        ret = NULL;
-
-    return ret;
-}
-
-static int
-close_(int fd)
-{
-    struct aug_nbfile nbfile;
-    struct sslext_* x;
-    int ret = 0;
-
-    AUG_CTXDEBUG3(aug_tlx, "nbfile close");
-
-    if (!aug_resetnbfile(fd, &nbfile))
-        return -1;
-
-    if (!removenbfile_(&nbfile))
-        ret = -1;
-
-    x = nbfile.ext_;
-    SSL_free(x->ssl_);
-    free(x);
-
-    if (!nbfile.base_->close_) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                       AUG_MSG("aug_close() not supported"));
-        return -1;
-    }
-
-    if (-1 == nbfile.base_->close_(fd))
-        ret = -1;
-
-    return ret;
-}
-
-static ssize_t
-read_(int fd, void* buf, size_t size)
-{
-    struct aug_nbfile nbfile;
-    struct sslext_* x;
-    ssize_t ret;
-
-    if (!aug_getnbfile(fd, &nbfile))
-        return -1;
-
-    x = nbfile.ext_;
-
-    if (SSLERR == x->state_)
-        return -1;
-
-    /* Only return end once all data has been read from buffer. */
-
-    if (RDZERO == x->state_ && bufempty_(&x->inbuf_))
-        return 0;
-
-    /* Fail with EAGAIN is non-blocking operation would have blocked. */
-
-    if (bufempty_(&x->inbuf_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
-        return -1;
-    }
-
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user read from input buffer: fd=[%d]", fd);
-
-    ret = (ssize_t)readbuf_(&x->inbuf_, buf, size);
-    updateevents_(&nbfile);
-    return ret;
-}
-
-static ssize_t
-readv_(int fd, const struct iovec* iov, int size)
-{
-    struct aug_nbfile nbfile;
-    struct sslext_* x;
-    ssize_t ret;
-
-    if (!aug_getnbfile(fd, &nbfile))
-        return -1;
-
-    x = nbfile.ext_;
-
-    if (SSLERR == x->state_)
-        return -1;
-
-    /* Only return end once all data has been read from buffer. */
-
-    if (RDZERO == x->state_ && bufempty_(&x->inbuf_))
-        return 0;
-
-    /* Fail with EAGAIN is non-blocking operation would have blocked. */
-
-    if (bufempty_(&x->inbuf_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
-        return -1;
-    }
-
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user readv from input buffer: fd=[%d]", fd);
-
-    ret = (ssize_t)readbufv_(&x->inbuf_, iov, size);
-    updateevents_(&nbfile);
-    return ret;
-}
-
-static ssize_t
-write_(int fd, const void* buf, size_t len)
-{
-    struct aug_nbfile nbfile;
-    struct sslext_* x;
-    ssize_t ret;
-
-    if (!aug_getnbfile(fd, &nbfile))
-        return -1;
-
-    x = nbfile.ext_;
-
-    /* Fail with EAGAIN is non-blocking operation would have blocked. */
-
-    if (buffull_(&x->outbuf_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
-        return -1;
-    }
-
-    if (x->shutdown_) {
-#if !defined(_WIN32)
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
-#else /* _WIN32 */
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAESHUTDOWN);
-#endif /* _WIN32 */
-        return -1;
-    }
-
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user write to output buffer: fd=[%d]", fd);
-
-    ret = (ssize_t)writebuf_(&x->outbuf_, buf, len);
-    updateevents_(&nbfile);
-    return ret;
-}
-
-static ssize_t
-writev_(int fd, const struct iovec* iov, int size)
-{
-    struct aug_nbfile nbfile;
-    struct sslext_* x;
-    ssize_t ret;
-
-    if (!aug_getnbfile(fd, &nbfile))
-        return -1;
-
-    x = nbfile.ext_;
-
-    /* Fail with EAGAIN is non-blocking operation would have blocked. */
-
-    if (buffull_(&x->outbuf_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
-        return -1;
-    }
-
-    if (x->shutdown_) {
-#if !defined(_WIN32)
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
-#else /* _WIN32 */
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAESHUTDOWN);
-#endif /* _WIN32 */
-        return -1;
-    }
-
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user writev to output buffer: fd=[%d]", fd);
-
-    ret = (ssize_t)writebufv_(&x->outbuf_, iov, size);
-    updateevents_(&nbfile);
-    return ret;
-}
-
-static int
-setnonblock_(int fd, int on)
-{
-    struct aug_nbfile nbfile;
-
-    if (!aug_getnbfile(fd, &nbfile))
-        return -1;
-
-    if (!nbfile.base_->setnonblock_) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                       AUG_MSG("aug_setnonblock() not supported"));
-        return -1;
-    }
-
-    return nbfile.base_->setnonblock_(fd, on);
-}
-
-static const struct aug_fdtype sslfdtype_ = {
-    close_,
-    read_,
-    readv_,
-    write_,
-    writev_,
-    setnonblock_
-};
 
 static void
-readwrite_(struct aug_nbfile* nbfile, int rw)
+readwrite_(struct impl_* impl, int rw)
 {
-    struct sslext_* x = nbfile->ext_;
     int ret;
 
     if (rw & SSLREAD_) {
@@ -517,37 +306,37 @@ readwrite_(struct aug_nbfile* nbfile, int rw)
         /* Perform read operation.  If input buffer is full, sslread_() will
            perform SSL_do_handshake(). */
 
-        ret = sslread_(x->ssl_, &x->inbuf_);
-        switch (SSL_get_error(x->ssl_, ret)) {
+        ret = sslread_(impl->ssl_, &impl->inbuf_);
+        switch (SSL_get_error(impl->ssl_, ret)) {
         case SSL_ERROR_NONE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes read to input buffer", ret);
-            if ((ret = SSL_pending(x->ssl_))) {
+            if ((ret = SSL_pending(impl->ssl_))) {
                 AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes pending for immediate"
                               " read", ret);
-                x->state_ = RDPEND;
+                impl->state_ = RDPEND;
                 goto done;
             }
-            x->state_ = NORMAL;
+            impl->state_ = NORMAL;
             break;
         case SSL_ERROR_ZERO_RETURN:
             AUG_CTXDEBUG3(aug_tlx, "SSL: end of data");
-            if (!x->shutdown_) {
+            if (!impl->shutdown_) {
                 AUG_CTXDEBUG3(aug_tlx, "SSL: shutting-down", ret);
-                SSL_shutdown(x->ssl_);
+                SSL_shutdown(impl->ssl_);
             }
-            x->state_ = RDZERO;
+            impl->state_ = RDZERO;
             goto done;
         case SSL_ERROR_WANT_READ:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants read");
-            x->state_ = RDWANTRD;
+            impl->state_ = RDWANTRD;
             goto done;
         case SSL_ERROR_WANT_WRITE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants write");
-            x->state_ = RDWANTWR;
+            impl->state_ = RDWANTWR;
             goto done;
         default:
             aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
-            x->state_ = SSLERR;
+            impl->state_ = SSLERR;
             goto done;
         }
     }
@@ -557,49 +346,50 @@ readwrite_(struct aug_nbfile* nbfile, int rw)
         /* Perform write operation.  If output buffer is empty, sslwrite_()
            will perform SSL_do_handshake(). */
 
-        ret = sslwrite_(x->ssl_, &x->outbuf_);
-        switch (SSL_get_error(x->ssl_, ret)) {
+        ret = sslwrite_(impl->ssl_, &impl->outbuf_);
+        switch (SSL_get_error(impl->ssl_, ret)) {
         case SSL_ERROR_NONE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes written from output buffer",
                           ret);
-            x->state_ = NORMAL;
+            impl->state_ = NORMAL;
             break;
         case SSL_ERROR_WANT_WRITE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: write wants write");
-            x->state_ = WRWANTWR;
+            impl->state_ = WRWANTWR;
             break;
         case SSL_ERROR_WANT_READ:
             AUG_CTXDEBUG3(aug_tlx, "SSL: write wants read");
-            x->state_ = WRWANTRD;
+            impl->state_ = WRWANTRD;
             break;
         default:
             aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
-            x->state_ = SSLERR;
+            impl->state_ = SSLERR;
             break;
         }
 
         /* If shutdown is pending and output buffer is now empty, do
            shutdown. */
 
-        if (x->shutdown_ && bufempty_(&x->outbuf_) && -1 == shutwr_(nbfile))
-            x->state_ = SSLERR;
+        if (impl->shutdown_ && bufempty_(&impl->outbuf_)
+            && -1 == shutwr_(impl))
+            impl->state_ = SSLERR;
     }
  done:
     return;
 }
 
+#if 0
 static int
-nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
+nbfilecb_(aug_object* ob, struct impl_* impl)
 {
-    struct sslext_* x = nbfile->ext_;
-    int events = aug_fdevents(nbfile->nbfiles_->muxer_, nbfile->md_);
+    int events = aug_fdevents(impl->muxer_, impl->md_);
     int ret, rw = 0;
 
     /* Determine which SSL operations are to be performed. */
 
-    switch (x->state_) {
+    switch (impl->state_) {
     case RDPEND:
-        if (!buffull_(&x->inbuf_)) {
+        if (!buffull_(&impl->inbuf_)) {
 
             /* Data is available for immediate read to input buffer. */
             break;
@@ -635,27 +425,27 @@ nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
     }
 
     if (rw)
-        readwrite_(nbfile, rw);
+        readwrite_(impl, rw);
     else
         AUG_CTXDEBUG3(aug_tlx, "SSL: readwrite_() skipped");
 
-    if ((events = userevents_(nbfile))) {
+    if ((events = userevents_(impl))) {
 
         AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_(): fd=[%d], events=[%d]",
-                      nbfile->md_, events);
+                      impl->md_, events);
 
         /* Callback may close file, ensure that it is still available after
            callback returns. */
 
-        /*aug_retainfd(nbfile->md_);*/
-        if ((ret = nbfile->cb_(ob, nbfile->md_, events))) {
+        retain_(impl);
+        if ((ret = nbfile->cb_(ob, impl->md_, events))) {
 
             /* No need to update events if file is being removed - indicated
                by false return. */
 
-            updateevents_(nbfile);
+            updateevents_(impl);
         }
-        /*aug_releasefd(nbfile->md_);*/
+        release_(impl);
 
     } else {
         AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_() skipped");
@@ -664,89 +454,320 @@ nbfilecb_(aug_object* ob, struct aug_nbfile* nbfile)
 
     return ret;
 }
+#endif
 
-static int
-seteventmask_(struct aug_nbfile* nbfile, unsigned short mask)
+static aug_result
+close_(struct impl_* impl)
 {
-    struct sslext_* x = nbfile->ext_;
+    AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: fd=[%d]", impl->sd_);
+    aug_setfdeventmask(impl->muxer_, impl->sd_, 0);
+    return aug_sclose(impl->sd_);
+}
+
+static void*
+cast_(struct impl_* impl, const char* id)
+{
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_fileid)) {
+        aug_retain(&impl->file_);
+        return &impl->file_;
+    } else if (AUG_EQUALID(id, aug_streamid)) {
+        aug_retain(&impl->stream_);
+        return &impl->stream_;
+    }
+    return NULL;
+}
+
+static void
+retain_(struct impl_* impl)
+{
+    assert(0 < impl->refs_);
+    ++impl->refs_;
+}
+
+static void
+release_(struct impl_* impl)
+{
+    assert(0 < impl->refs_);
+    if (0 == --impl->refs_) {
+        aug_mpool* mpool = impl->mpool_;
+        if (AUG_BADSD != impl->sd_)
+            close_(impl);
+        SSL_free(impl->ssl_);
+        aug_free(mpool, impl);
+        aug_release(mpool);
+    }
+}
+
+static void*
+fcast_(aug_file* obj, const char* id)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
+    return cast_(impl, id);
+}
+
+static void
+fretain_(aug_file* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
+    retain_(impl);
+}
+
+static void
+frelease_(aug_file* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
+    release_(impl);
+}
+
+static aug_result
+fclose_(aug_file* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
+    aug_result result;
+    AUG_CTXDEBUG3(aug_tlx, "nbfile close");
+    result = close_(impl);
+    impl->sd_ = AUG_BADSD;
+    return result;
+}
+
+static aug_result
+fsetnonblock_(aug_file* obj, aug_bool on)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
+    return aug_ssetnonblock(impl->sd_, on);
+}
+
+static aug_result
+fseteventmask_(aug_file* obj, unsigned short mask)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: setting event mask: fd=[%d], mask=[%d]",
-                  nbfile->md_, (int)mask);
+                  impl->sd_, (int)mask);
 
-    x->mask_ = mask;
-    updateevents_(nbfile);
+    impl->mask_ = mask;
+    updateevents_(impl);
     return 0;
 }
 
 static int
-eventmask_(struct aug_nbfile* nbfile)
+feventmask_(aug_file* obj)
 {
-    struct sslext_* x = nbfile->ext_;
-    return x->mask_;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
+
+
+    return impl->mask_;
 }
 
 static int
-events_(struct aug_nbfile* nbfile)
+fevents_(aug_file* obj)
 {
-    return userevents_(nbfile);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, file_, obj);
+    return userevents_(impl);
 }
 
-static int
-shutdown_(struct aug_nbfile* nbfile)
+static const struct aug_filevtbl fvtbl_ = {
+    fcast_,
+    fretain_,
+    frelease_,
+    fclose_,
+    fsetnonblock_,
+    fseteventmask_,
+    feventmask_,
+    fevents_
+};
+
+static void*
+scast_(aug_stream* obj, const char* id)
 {
-    struct sslext_* x = nbfile->ext_;
-    x->shutdown_ = 1;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    return cast_(impl, id);
+}
+
+static void
+sretain_(aug_stream* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    retain_(impl);
+}
+
+static void
+srelease_(aug_stream* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    release_(impl);
+}
+
+static aug_result
+sshutdown_(aug_stream* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+
+    impl->shutdown_ = 1;
 
     /* If the output buffer is not empty, the shutdown call will be delayed
        until the remaining data has been written. */
 
-    return bufempty_(&x->outbuf_) ? shutwr_(nbfile) : 0;
+    return bufempty_(&impl->outbuf_) ? shutwr_(impl) : 0;
 }
 
-static const struct aug_nbtype nbtype_ = {
-    nbfilecb_,
-    seteventmask_,
-    eventmask_,
-    events_,
-    shutdown_
-};
-
-static struct sslext_*
-createsslext_(aug_nbfiles_t nbfiles, int fd, SSL* ssl)
+static ssize_t
+sread_(aug_stream* obj, void* buf, size_t size)
 {
-    struct sslext_* x = malloc(sizeof(struct sslext_));
-    if (!x) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
-        return NULL;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    ssize_t ret;
+
+    if (SSLERR == impl->state_)
+        return -1;
+
+    /* Only return end once all data has been read from buffer. */
+
+    if (RDZERO == impl->state_ && bufempty_(&impl->inbuf_))
+        return 0;
+
+    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+
+    if (bufempty_(&impl->inbuf_)) {
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
+        return -1;
     }
 
-    x->ssl_ = ssl;
-    clearbuf_(&x->inbuf_);
-    clearbuf_(&x->outbuf_);
-    x->state_ = NORMAL;
-    x->shutdown_ = 0;
-    x->mask_ = aug_fdeventmask(nbfiles->muxer_, fd);
-    aug_setfdeventmask(nbfiles->muxer_, fd, AUG_FDEVENTRDWR);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user read from input buffer: fd=[%d]",
+                  impl->sd_);
 
-    return x;
+    ret = (ssize_t)readbuf_(&impl->inbuf_, buf, size);
+    updateevents_(impl);
+    return ret;
 }
 
-static struct sslext_*
-setsslext_(aug_sd sd, SSL* ssl)
+static ssize_t
+sreadv_(aug_stream* obj, const struct iovec* iov, int size)
 {
-    struct aug_nbfile nbfile;
-    struct sslext_* x;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    ssize_t ret;
 
-    if (!aug_getnbfile(sd, &nbfile)
-        || !(x = createsslext_(nbfile.nbfiles_, sd, ssl)))
+    if (SSLERR == impl->state_)
+        return -1;
+
+    /* Only return end once all data has been read from buffer. */
+
+    if (RDZERO == impl->state_ && bufempty_(&impl->inbuf_))
+        return 0;
+
+    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+
+    if (bufempty_(&impl->inbuf_)) {
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
+        return -1;
+    }
+
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user readv from input buffer: fd=[%d]",
+                  impl->sd_);
+
+    ret = (ssize_t)readbufv_(&impl->inbuf_, iov, size);
+    updateevents_(impl);
+    return ret;
+}
+
+static ssize_t
+swrite_(aug_stream* obj, const void* buf, size_t size)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    ssize_t ret;
+
+    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+
+    if (buffull_(&impl->outbuf_)) {
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
+        return -1;
+    }
+
+    if (impl->shutdown_) {
+#if !defined(_WIN32)
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
+#else /* _WIN32 */
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAESHUTDOWN);
+#endif /* _WIN32 */
+        return -1;
+    }
+
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user write to output buffer: fd=[%d]",
+                  impl->sd_);
+
+    ret = (ssize_t)writebuf_(&impl->outbuf_, buf, size);
+    updateevents_(impl);
+    return ret;
+}
+
+static ssize_t
+swritev_(aug_stream* obj, const struct iovec* iov, int size)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, obj);
+    ssize_t ret;
+
+    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+
+    if (buffull_(&impl->outbuf_)) {
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
+        return -1;
+    }
+
+    if (impl->shutdown_) {
+#if !defined(_WIN32)
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
+#else /* _WIN32 */
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAESHUTDOWN);
+#endif /* _WIN32 */
+        return -1;
+    }
+
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user writev to output buffer: fd=[%d]",
+                  impl->sd_);
+
+    ret = (ssize_t)writebufv_(&impl->outbuf_, iov, size);
+    updateevents_(impl);
+    return ret;
+}
+
+static const struct aug_streamvtbl svtbl_ = {
+    scast_,
+    sretain_,
+    srelease_,
+    sshutdown_,
+    sread_,
+    sreadv_,
+    swrite_,
+    swritev_
+};
+
+static struct impl_*
+attachssl_(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd, struct ssl_st* ssl)
+{
+    struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
+    if (!impl)
         return NULL;
 
-    aug_setfdtype(sd, &sslfdtype_);
-    nbfile.type_ = &nbtype_;
-    nbfile.ext_ = x;
-    aug_setnbfile(sd, &nbfile);
+    impl->file_.vtbl_ = &fvtbl_;
+    impl->file_.impl_ = NULL;
+    impl->stream_.vtbl_ = &svtbl_;
+    impl->stream_.impl_ = NULL;
+    impl->refs_ = 1;
+    impl->mpool_ = mpool;
+    impl->muxer_ = muxer;
+    impl->sd_ = sd;
 
-    return x;
+    /* SSL state */
+
+    impl->ssl_ = ssl;
+    clearbuf_(&impl->inbuf_);
+    clearbuf_(&impl->outbuf_);
+    impl->state_ = NORMAL;
+    impl->shutdown_ = 0;
+    impl->mask_ = aug_fdeventmask(impl->muxer_, sd);
+    aug_setfdeventmask(impl->muxer_, sd, AUG_FDEVENTRDWR);
+
+    aug_retain(mpool);
+    return impl;
 }
 
 AUGNET_API void
@@ -768,34 +789,36 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                      ERR_reason_error_string(err));
 }
 
-AUGNET_API int
-aug_setsslclient(aug_sd sd, struct ssl_st* ssl)
+AUGNET_API aug_file*
+aug_attachsslclient(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
+                    struct ssl_st* ssl)
 {
-    struct sslext_* x = setsslext_(sd, ssl);
-    if (!x)
-        return -1;
+    struct impl_* impl = attachssl_(mpool, muxer, sd, ssl);
+    if (!impl)
+        return NULL;
 
     /* Write client-initiated handshake. */
 
-    x->state_ = WRWANTWR;
+    impl->state_ = WRWANTWR;
 
     SSL_set_connect_state(ssl);
-    return 0;
+    return &impl->file_;
 }
 
-AUGNET_API int
-aug_setsslserver(aug_sd sd, struct ssl_st* ssl)
+AUGNET_API aug_file*
+aug_attachsslserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
+                    struct ssl_st* ssl)
 {
-    struct sslext_* x = setsslext_(sd, ssl);
-    if (!x)
-        return -1;
+    struct impl_* impl = attachssl_(mpool, muxer, sd, ssl);
+    if (!impl)
+        return NULL;
 
     /* Read client-initiated handshake. */
 
-    x->state_ = RDWANTRD;
+    impl->state_ = RDWANTRD;
 
     SSL_set_accept_state(ssl);
-    return 0;
+    return &impl->file_;
 }
 
 #endif /* ENABLE_SSL */

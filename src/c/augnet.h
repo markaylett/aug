@@ -13,8 +13,6 @@
 #include "augnet/auth.h"
 #include "augnet/base64.h"
 #include "augnet/connector.h"
-#include "augnet/extend.h"
-#include "augnet/file.h"
 #include "augnet/fix.h"
 #include "augnet/http.h"
 #include "augnet/inet.h"

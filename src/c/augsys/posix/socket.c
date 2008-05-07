@@ -213,7 +213,7 @@ aug_setsockopt(aug_sd sd, int level, int optname, const void* optval,
 }
 
 AUGSYS_API int
-aug_shutdown(aug_sd sd, int how)
+aug_sshutdown(aug_sd sd, int how)
 {
     if (-1 == shutdown(s, how)) {
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);

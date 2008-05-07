@@ -1,6 +1,4 @@
 include $(top_srcdir)/src/c/lang.mk
-EXTRA_DIST = \
-	nbfile.xml
 
 modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
@@ -8,13 +6,10 @@ modinclude_HEADERS = \
 	base64.h \
 	config.h \
 	connector.h \
-	extend.h \
-	file.h \
 	fix.h \
 	http.h \
 	inet.h \
 	mar.h \
-	nbfile.h \
 	netevent.h \
 	ssl.h \
 	types.h \
@@ -29,13 +24,10 @@ libaugnet_la_SOURCES = \
 	base64.c \
 	config.c \
 	connector.c \
-	extend.c \
-	file.c \
 	fix.c \
 	http.c \
 	inet.c \
 	mar.c \
-	nbfile.c \
 	netevent.c \
 	ssl.c \
 	types.c \
@@ -76,11 +68,3 @@ httptest_LDADD = \
 neteventtest_SOURCES = neteventtest.c
 neteventtest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
-
-if ENABLE_RUBY
-BUILT_SOURCES = \
-	nbfile.h
-
-%.h: %.xml
-	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
-endif

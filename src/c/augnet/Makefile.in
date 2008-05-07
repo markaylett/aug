@@ -66,8 +66,8 @@ libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugnet_la_OBJECTS = auth.lo base64.lo config.lo connector.lo \
-	extend.lo file.lo fix.lo http.lo inet.lo mar.lo nbfile.lo \
-	netevent.lo ssl.lo types.lo writer.lo
+	fix.lo http.lo inet.lo mar.lo netevent.lo ssl.lo types.lo \
+	writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_base64test_OBJECTS = base64test.$(OBJEXT)
 base64test_OBJECTS = $(am_base64test_OBJECTS)
@@ -225,22 +225,16 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/c
 
-EXTRA_DIST = \
-	nbfile.xml
-
 modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
 	auth.h \
 	base64.h \
 	config.h \
 	connector.h \
-	extend.h \
-	file.h \
 	fix.h \
 	http.h \
 	inet.h \
 	mar.h \
-	nbfile.h \
 	netevent.h \
 	ssl.h \
 	types.h \
@@ -253,13 +247,10 @@ libaugnet_la_SOURCES = \
 	base64.c \
 	config.c \
 	connector.c \
-	extend.c \
-	file.c \
 	fix.c \
 	http.c \
 	inet.c \
 	mar.c \
-	nbfile.c \
 	netevent.c \
 	ssl.c \
 	types.c \
@@ -296,11 +287,7 @@ neteventtest_SOURCES = neteventtest.c
 neteventtest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
-@ENABLE_RUBY_TRUE@BUILT_SOURCES = \
-@ENABLE_RUBY_TRUE@	nbfile.h
-
-all: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -393,15 +380,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connector.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/extend.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/httptest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nbfile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netevent.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neteventtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Plo@am__quote@
@@ -608,15 +592,13 @@ distdir: $(DISTFILES)
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) check-am
+check: check-am
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) install-am
+install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -640,7 +622,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -707,9 +688,6 @@ uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES \
 	tags uninstall uninstall-am uninstall-info-am \
 	uninstall-libLTLIBRARIES uninstall-modincludeHEADERS
 
-
-@ENABLE_RUBY_TRUE@%.h: %.xml
-@ENABLE_RUBY_TRUE@	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

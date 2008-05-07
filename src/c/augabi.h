@@ -99,8 +99,8 @@
 #define AUG_INTERFACE(name)                         \
     struct name##vtbl;                              \
     typedef struct name##_ {                        \
-            const struct name##vtbl* vtbl_;         \
-            void* impl_;                            \
+        const struct name##vtbl* vtbl_;             \
+        void* impl_;                                \
     } name;                                         \
     static const char name##id[] = AUG_MKSTR(name)
 
@@ -131,14 +131,26 @@ struct aug_objectvtbl {
     AUG_VTBL(aug_object);
 };
 
-#define aug_cast(ob, type)                                     \
-    ((aug_object*)ob)->vtbl_->cast_((aug_object*)ob, type)
+#define aug_cast(ob, type)                                      \
+    ((aug_object*)(ob))->vtbl_->cast_((aug_object*)(ob), type)
 
-#define aug_retain(ob)                                     \
-    ((aug_object*)ob)->vtbl_->retain_((aug_object*)ob)
+#define aug_retain(ob)                                      \
+    ((aug_object*)(ob))->vtbl_->retain_((aug_object*)(ob))
 
 #define aug_release(ob)                                     \
-    ((aug_object*)ob)->vtbl_->release_((aug_object*)ob)
+    ((aug_object*)(ob))->vtbl_->release_((aug_object*)(ob))
+
+/**
+ * Invalidate pointer before calling release, avoiding any potential
+ * reentrancy issues.
+ */
+
+#define aug_saferelease(ob)                         \
+    do {                                            \
+        aug_object* aug_tmp = (aug_object*)(ob);    \
+        (ob) = NULL;                                \
+        aug_release(aug_tmp);                       \
+    } while (0)
 
 /** @} */
 

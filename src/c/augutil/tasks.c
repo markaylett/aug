@@ -16,7 +16,7 @@ AUG_RCSID("$Id$");
 
 struct entry_ {
     AUG_ENTRY(entry_);
-    aug_object* task_;
+    aug_file* task_;
 };
 
 AUG_HEAD(head_, entry_);
@@ -24,8 +24,16 @@ AUG_HEAD(head_, entry_);
 struct aug_tasks_ {
     aug_mpool* mpool_;
     struct head_ head_;
+    unsigned size_;
     int locks_;
 };
+
+static void
+release_(aug_tasks_t tasks, struct entry_* it)
+{
+    --tasks->size_;
+    aug_saferelease(it->task_);
+}
 
 static void
 trash_(aug_tasks_t tasks)
@@ -56,6 +64,7 @@ aug_createtasks(aug_mpool* mpool)
 
     tasks->mpool_ = mpool;
     AUG_INIT(&tasks->head_);
+    tasks->size_ = 0;
     tasks->locks_ = 0;
 
     aug_retain(mpool);
@@ -71,7 +80,7 @@ aug_destroytasks(aug_tasks_t tasks)
     while ((it = AUG_FIRST(&tasks->head_))) {
         AUG_REMOVE_HEAD(&tasks->head_);
         if (it->task_)
-            aug_release(it->task_);
+            release_(tasks, it);
         aug_free(mpool, it);
     }
 
@@ -80,7 +89,7 @@ aug_destroytasks(aug_tasks_t tasks)
 }
 
 AUGUTIL_API aug_result
-aug_inserttask(aug_tasks_t tasks, aug_object* task)
+aug_inserttask(aug_tasks_t tasks, aug_file* task)
 {
     struct entry_* entry = aug_malloc(tasks->mpool_, sizeof(struct entry_));
     if (!entry)
@@ -90,11 +99,12 @@ aug_inserttask(aug_tasks_t tasks, aug_object* task)
     aug_retain(task);
 
     AUG_INSERT_TAIL(&tasks->head_, entry);
+    ++tasks->size_;
     return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_result
-aug_removetask(aug_tasks_t tasks, aug_object* task)
+aug_removetask(aug_tasks_t tasks, aug_file* task)
 {
     /* Locate the matching entry. */
 
@@ -102,7 +112,7 @@ aug_removetask(aug_tasks_t tasks, aug_object* task)
     AUG_FOREACH(it, &tasks->head_) {
 
         if (!it->task_) /* Already marked for removal. */
-            goto done;
+            continue;
 
         if (it->task_ == task)
             break;
@@ -116,24 +126,28 @@ aug_removetask(aug_tasks_t tasks, aug_object* task)
         /* Items are merely marked for removal while a aug_foreachtask()
            operation is in progress. */
 
-        aug_release(it->task_);
-        it->task_ = NULL;
+        release_(tasks, it);
 
     } else {
 
         /* Otherwise, free immediately. */
 
+        release_(tasks, it);
         AUG_REMOVE(&tasks->head_, it, entry_);
-        aug_release(it->task_);
         aug_free(tasks->mpool_, it);
     }
 
- done:
     return AUG_SUCCESS;
 }
 
+AUGUTIL_API unsigned
+aug_gettasks(aug_tasks_t tasks)
+{
+    return tasks->size_;
+}
+
 AUGUTIL_API void
-aug_foreachtask(aug_tasks_t tasks, aug_taskcb_t cb)
+aug_foreachtask(aug_tasks_t tasks, aug_filecb_t cb)
 {
     struct entry_* it, * end;
 
@@ -150,10 +164,8 @@ aug_foreachtask(aug_tasks_t tasks, aug_taskcb_t cb)
         if (!it->task_)
             continue;
 
-        if (!cb(it->task_)) {
-            aug_release(it->task_);
-            it->task_ = NULL;
-        }
+        if (!aug_dispatch(it->task_, cb))
+            release_(tasks, it);
 
         /* Avoid iterating over items beyond those that were there at the
            start. */

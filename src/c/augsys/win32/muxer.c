@@ -19,6 +19,7 @@ struct set_ {
 struct aug_muxer_ {
     struct set_ in_, out_;
     size_t bits_;
+    unsigned nowait_;
 };
 
 static void
@@ -102,6 +103,7 @@ aug_createmuxer(void)
     zeroset_(&muxer->in_);
     zeroset_(&muxer->out_);
     muxer->bits_ = 0;
+    muxer->nowait_ = 0;
     return muxer;
 }
 
@@ -110,6 +112,12 @@ aug_destroymuxer(aug_muxer_t muxer)
 {
     free(muxer);
     return 0;
+}
+
+AUGSYS_API void
+aug_setnowait(aug_muxer_t muxer, unsigned nowait)
+{
+    muxer->nowait_ += nowait;
 }
 
 AUGSYS_API int
@@ -134,6 +142,16 @@ AUGSYS_API int
 aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
     int ret;
+
+    if (0 < muxer->nowait_) {
+        unsigned nowait = muxer->nowait_;
+        muxer->nowait_ = 0;
+        ret = aug_waitfdevents(muxer, &NOWAIT_);
+        if (0 <= ret)
+            ret += nowait; /* At least one. */
+        return ret;
+    }
+
     muxer->out_ = muxer->in_;
 
     if (0 == muxer->bits_) {

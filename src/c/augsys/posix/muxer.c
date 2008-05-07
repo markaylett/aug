@@ -16,6 +16,7 @@
 struct aug_muxer_ {
     struct pollfd* pollfds_;
     size_t nfds_, size_;
+    unsigned nowait_;
 };
 
 static unsigned short
@@ -94,6 +95,7 @@ aug_createmuxer(void)
 
     muxer->pollfds_ = NULL;
     muxer->nfds_ = muxer->size_ = 0;
+    muxer->nowait_ = 0;
 
     if (-1 == resize_(muxer, INIT_SIZE_)) {
         free(muxer);
@@ -109,6 +111,12 @@ aug_destroymuxer(aug_muxer_t muxer)
     free(muxer->pollfds_);
     free(muxer);
     return 0;
+}
+
+AUGSYS_API void
+aug_setnowait(aug_muxer_t muxer, unsigned nowait)
+{
+    muxer->nowait_ += nowait;
 }
 
 AUGSYS_API int
@@ -154,6 +162,15 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
     int ms, ret;
 
+    if (0 < muxer->nowait_) {
+        unsigned nowait = muxer->nowait_;
+        muxer->nowait_ = 0;
+        ret = aug_waitfdevents(muxer, &NOWAIT_);
+        if (0 <= ret)
+            ret += nowait; /* At least one. */
+        return ret;
+    }
+
     ms = timeout ? aug_tvtoms(timeout) : -1;
 
     if (-1 == (ret = poll(muxer->pollfds_, muxer->nfds_, ms))) {
@@ -186,6 +203,7 @@ struct set_ {
 struct aug_muxer_ {
     struct set_ in_, out_;
     int maxfd_;
+    unsigned nowait_;
 };
 
 static void
@@ -251,6 +269,7 @@ aug_createmuxer(void)
     /* A maxfd of -1 will result in a zero nfds value. */
 
     muxer->maxfd_ = -1;
+    muxer->nowait_ = 0;
     return muxer;
 }
 
@@ -259,6 +278,12 @@ aug_destroymuxer(aug_muxer_t muxer)
 {
     free(muxer);
     return 0;
+}
+
+AUGSYS_API void
+aug_setnowait(aug_muxer_t muxer, unsigned nowait)
+{
+    muxer->nowait_ += nowait;
 }
 
 AUGSYS_API int
@@ -302,6 +327,16 @@ AUGSYS_API int
 aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
     int ret;
+
+    if (0 < muxer->nowait_) {
+        unsigned nowait = muxer->nowait_;
+        muxer->nowait_ = 0;
+        ret = aug_waitfdevents(muxer, &NOWAIT_);
+        if (0 <= ret)
+            ret += nowait; /* At least one. */
+        return ret;
+    }
+
     muxer->out_ = muxer->in_;
 
     if (-1 == (ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_,
