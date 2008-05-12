@@ -1,0 +1,31 @@
+<package name="aug" dir="augob">
+
+  <quotincl>augob/streamob.h</quotincl>
+
+  <verbatim>typedef aug_bool
+    (*aug_channelcb_t)(aug_streamob*, unsigned short);</verbatim>
+
+  <interface name="channelob">
+
+    <method name="close" type="aug_result" qname="close"/>
+
+    <method name="process" type="aug_channelob" object="true" qname="process">
+      <param name="cb" type="aug_channelcb_t"/>
+      <param name="fork" type="aug_bool*"/>
+    </method>
+
+    <method name="setnonblock" type="aug_result" qname="setnonblock">
+      <param name="on" type="aug_bool"/>
+    </method>
+
+    <method name="seteventmask" type="aug_result" qname="seteventmask">
+      <param name="mask" type="unsigned short"/>
+    </method>
+
+    <method name="eventmask" type="int" qname="eventmask"/>
+
+    <method name="events" type="int" qname="events"/>
+
+  </interface>
+
+</package>

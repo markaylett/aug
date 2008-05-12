@@ -47,10 +47,9 @@ namespace aug {
         {
         }
 
-        explicit
-        dlib(const char* path)
+        dlib(aug_mpool* mpool, const char* path)
         {
-            open(path);
+            open(mpool, path);
         }
 
         void
@@ -64,9 +63,10 @@ namespace aug {
         }
 
         void
-        open(const char* path)
+        open(aug_mpool* mpool, const char* path)
         {
-            verify(dlib_ = aug_dlopen(path));
+            close(); // FIXME: copy-swap.
+            verify(dlib_ = aug_dlopen(mpool, path));
         }
 
         dlib&

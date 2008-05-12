@@ -2,6 +2,7 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 modincludedir = $(includedir)/augutilpp
 modinclude_HEADERS = \
+	channels.hpp \
 	clock.hpp \
 	config.hpp \
 	conv.hpp \
@@ -17,6 +18,7 @@ modinclude_HEADERS = \
 noinst_LTLIBRARIES = libaugutilpp.la
 
 libaugutilpp_la_SOURCES = \
+	channels.cpp \
 	clock.cpp \
 	config.cpp \
 	conv.cpp \

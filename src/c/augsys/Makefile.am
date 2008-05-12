@@ -3,9 +3,6 @@ SUBDIRS = \
 	osx \
 	posix \
 	win32
-EXTRA_DIST = \
-	file.xml \
-	stream.xml
 
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
@@ -15,14 +12,13 @@ modinclude_HEADERS = \
 	debug.h \
 	dlfcn.h \
 	endian.h \
-	file.h \
 	limits.h \
 	mcast.h \
 	mmap.h \
 	muxer.h \
+	object.h \
 	queue.h \
 	socket.h \
-	stream.h \
 	time.h \
 	types.h \
 	uio.h \
@@ -39,13 +35,12 @@ libaugsys_la_SOURCES = \
 	debug.c \
 	dlfcn.c \
 	endian.c \
-	file.c \
 	limits.c \
 	mcast.c \
 	mmap.c \
 	muxer.c \
+	object.c \
 	socket.c \
-	stream.c \
 	time.c \
 	types.c \
 	uio.c \
@@ -62,9 +57,9 @@ libaugsys_la_LIBADD = \
 
 check_PROGRAMS = \
 	basetest \
-	filetest \
 	mcasttest \
 	muxertest \
+	objecttest \
 	sockaddrtest \
 	sockettest \
 	stringtest \
@@ -73,9 +68,9 @@ check_PROGRAMS = \
 
 TESTS = \
 	basetest \
-	filetest \
 	mcasttest \
 	muxertest \
+	objecttest \
 	sockaddrtest \
 	sockettest \
 	stringtest \
@@ -86,16 +81,16 @@ basetest_SOURCES = basetest.c
 basetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-filetest_SOURCES = filetest.c
-filetest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-
 mcasttest_SOURCES = mcasttest.c
 mcasttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 muxertest_SOURCES = muxertest.c
 muxertest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+objecttest_SOURCES = objecttest.c
+objecttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 sockaddrtest_SOURCES = sockaddrtest.c
@@ -117,12 +112,3 @@ timetest_LDADD = \
 utilitytest_SOURCES = utilitytest.c
 utilitytest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-
-if ENABLE_RUBY
-BUILT_SOURCES = \
-	file.h \
-	stream.h
-
-%.h: %.xml
-	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
-endif

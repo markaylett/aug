@@ -185,34 +185,40 @@ target_alias = @target_alias@
 EXTRA_DIST = \
 	addrob.xml \
 	blob.xml \
+	channelob.xml \
 	errinfob.xml \
 	eventob.xml \
 	iterob.xml \
 	longob.xml \
 	rpcob.xml \
-	seqob.xml
+	seqob.xml \
+	streamob.xml
 
 modincludedir = $(includedir)/augob
 modinclude_HEADERS = \
 	addrob.h \
 	blob.h \
+	channelob.h \
 	errinfob.h \
 	eventob.h \
 	iterob.h \
 	longob.h \
 	rpcob.h \
 	seqob.h \
+	streamob.h \
 	var.h
 
 @ENABLE_RUBY_TRUE@BUILT_SOURCES = \
 @ENABLE_RUBY_TRUE@	addrob.h \
 @ENABLE_RUBY_TRUE@	blob.h \
+@ENABLE_RUBY_TRUE@	channelob.h \
 @ENABLE_RUBY_TRUE@	errinfob.h \
 @ENABLE_RUBY_TRUE@	eventob.h \
 @ENABLE_RUBY_TRUE@	iterob.h \
 @ENABLE_RUBY_TRUE@	longob.h \
 @ENABLE_RUBY_TRUE@	rpcob.h \
-@ENABLE_RUBY_TRUE@	seqob.h
+@ENABLE_RUBY_TRUE@	seqob.h \
+@ENABLE_RUBY_TRUE@	streamob.h
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am

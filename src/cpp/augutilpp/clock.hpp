@@ -50,8 +50,9 @@ namespace aug {
                 perrinfo(aug_tlx, "aug_destroyhires() failed");
         }
 
-        hires()
-            : hires_(aug_createhires())
+        explicit
+        hires(aug_mpool* mpool)
+            : hires_(aug_createhires(mpool))
         {
             verify(hires_);
         }

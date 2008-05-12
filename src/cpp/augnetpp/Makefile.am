@@ -5,11 +5,9 @@ modinclude_HEADERS = \
 	base64.hpp \
 	config.hpp \
 	connector.hpp \
-	file.hpp \
 	http.hpp \
 	inet.hpp \
 	mar.hpp \
-	nbfile.hpp \
 	writer.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -18,11 +16,9 @@ libaugnetpp_la_SOURCES = \
 	base64.cpp \
 	config.cpp \
 	connector.cpp \
-	file.cpp \
 	http.cpp \
 	inet.cpp \
 	mar.cpp \
-	nbfile.cpp \
 	writer.cpp
 
 libaugnetpp_la_LDFLAGS = \

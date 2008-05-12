@@ -5,13 +5,14 @@ modinclude_HEADERS = \
 	auth.h \
 	base64.h \
 	config.h \
-	connector.h \
 	fix.h \
 	http.h \
 	inet.h \
 	mar.h \
 	netevent.h \
+	object.h \
 	ssl.h \
+	tcpclient.h \
 	types.h \
 	writer.h
 
@@ -23,13 +24,14 @@ libaugnet_la_SOURCES = \
 	auth.c \
 	base64.c \
 	config.c \
-	connector.c \
 	fix.c \
 	http.c \
 	inet.c \
 	mar.c \
 	netevent.c \
+	object.c \
 	ssl.c \
+	tcpclient.c \
 	types.c \
 	writer.c
 

@@ -10,6 +10,7 @@
  * General utility library.
  */
 
+#include "augutil/channels.h"
 #include "augutil/conv.h"
 #include "augutil/event.h"
 #include "augutil/file.h"
@@ -24,7 +25,6 @@
 #include "augutil/path.h"
 #include "augutil/pwd.h"
 #include "augutil/shellwords.h"
-#include "augutil/tasks.h"
 #include "augutil/timer.h"
 #include "augutil/tmspec.h"
 #include "augutil/types.h"

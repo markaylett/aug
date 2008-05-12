@@ -12,14 +12,14 @@
 
 #include "augnet/auth.h"
 #include "augnet/base64.h"
-#include "augnet/connector.h"
 #include "augnet/fix.h"
 #include "augnet/http.h"
 #include "augnet/inet.h"
 #include "augnet/mar.h"
-#include "augnet/nbfile.h"
 #include "augnet/netevent.h"
+#include "augnet/object.h"
 #include "augnet/ssl.h"
+#include "augnet/tcpclient.h"
 #include "augnet/types.h"
 #include "augnet/writer.h"
 

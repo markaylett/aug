@@ -143,7 +143,7 @@ namespace aug {
     inline void
     shutdown(sdref ref, int how)
     {
-        verify(aug_shutdown(ref.get(), how));
+        verify(aug_sshutdown(ref.get(), how));
     }
 
     inline autosds

@@ -14,6 +14,7 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
+	channels.h \
 	config.h \
 	conv.h \
 	event.h \
@@ -29,7 +30,6 @@ modinclude_HEADERS = \
 	path.h \
 	pwd.h \
 	shellwords.h \
-	tasks.h \
 	timer.h \
 	tmspec.h \
 	types.h \
@@ -40,6 +40,7 @@ noinst_HEADERS =
 lib_LTLIBRARIES = libaugutil.la
 
 libaugutil_la_SOURCES = \
+	channels.c \
 	config.c \
 	conv.c \
 	event.c \
@@ -55,7 +56,6 @@ libaugutil_la_SOURCES = \
 	path.c \
 	pwd.c \
 	shellwords.c \
-	tasks.c \
 	timer.c \
 	tmspec.c \
 	types.c \
@@ -70,7 +70,7 @@ libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	taskstest
+	channelstest
 # 	eventtest
 # 	hirestest
 # 	networdstest
@@ -78,7 +78,7 @@ check_PROGRAMS = \
 # 	shellwordstest
 
 TESTS = \
-	taskstest
+	channelstest
 # 	eventtest
 # 	hirestest
 # 	networdstest.sh
@@ -105,6 +105,6 @@ TESTS = \
 # shellwordstest_LDADD = \
 # 	$(top_builddir)/src/c/augutil/libaugutil.la
 
-taskstest_SOURCES = taskstest.c
-taskstest_LDADD = \
+channelstest_SOURCES = channelstest.c
+channelstest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la

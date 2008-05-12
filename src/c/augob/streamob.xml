@@ -1,14 +1,12 @@
-<package name="aug" dir="augsys">
+<package name="aug" dir="augob">
 
-  <quotincl>augsys/config.h</quotincl>
-  <quotincl>augctx/mpool.h</quotincl>
   <quotincl>augtypes.h</quotincl>
 
   <verbatim>
 struct iovec;
   </verbatim>
 
-  <interface name="stream">
+  <interface name="streamob">
 
     <method name="shutdown" type="aug_result" qname="shutdown"/>
 
@@ -33,10 +31,5 @@ struct iovec;
     </method>
 
   </interface>
-
-  <verbatim>
-AUGSYS_API aug_stream*
-aug_createstream(aug_mpool* mpool);
-  </verbatim>
 
 </package>

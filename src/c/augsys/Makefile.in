@@ -40,8 +40,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = basetest$(EXEEXT) filetest$(EXEEXT) \
-	mcasttest$(EXEEXT) muxertest$(EXEEXT) sockaddrtest$(EXEEXT) \
+check_PROGRAMS = basetest$(EXEEXT) mcasttest$(EXEEXT) \
+	muxertest$(EXEEXT) objecttest$(EXEEXT) sockaddrtest$(EXEEXT) \
 	sockettest$(EXEEXT) stringtest$(EXEEXT) timetest$(EXEEXT) \
 	utilitytest$(EXEEXT)
 subdir = src/c/augsys
@@ -63,22 +63,22 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugsys_la_OBJECTS = barrier.lo base.lo config.lo debug.lo \
-	dlfcn.lo endian.lo file.lo limits.lo mcast.lo mmap.lo muxer.lo \
-	socket.lo stream.lo time.lo types.lo uio.lo unistd.lo \
+	dlfcn.lo endian.lo limits.lo mcast.lo mmap.lo muxer.lo \
+	object.lo socket.lo time.lo types.lo uio.lo unistd.lo \
 	utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
 basetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
-am_filetest_OBJECTS = filetest.$(OBJEXT)
-filetest_OBJECTS = $(am_filetest_OBJECTS)
-filetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_mcasttest_OBJECTS = mcasttest.$(OBJEXT)
 mcasttest_OBJECTS = $(am_mcasttest_OBJECTS)
 mcasttest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_muxertest_OBJECTS = muxertest.$(OBJEXT)
 muxertest_OBJECTS = $(am_muxertest_OBJECTS)
 muxertest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_objecttest_OBJECTS = objecttest.$(OBJEXT)
+objecttest_OBJECTS = $(am_objecttest_OBJECTS)
+objecttest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_sockaddrtest_OBJECTS = sockaddrtest.$(OBJEXT)
 sockaddrtest_OBJECTS = $(am_sockaddrtest_OBJECTS)
 sockaddrtest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
@@ -105,15 +105,15 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
-	$(filetest_SOURCES) $(mcasttest_SOURCES) $(muxertest_SOURCES) \
-	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
-	$(stringtest_SOURCES) $(timetest_SOURCES) \
-	$(utilitytest_SOURCES)
+	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
+	$(objecttest_SOURCES) $(sockaddrtest_SOURCES) \
+	$(sockettest_SOURCES) $(stringtest_SOURCES) \
+	$(timetest_SOURCES) $(utilitytest_SOURCES)
 DIST_SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
-	$(filetest_SOURCES) $(mcasttest_SOURCES) $(muxertest_SOURCES) \
-	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
-	$(stringtest_SOURCES) $(timetest_SOURCES) \
-	$(utilitytest_SOURCES)
+	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
+	$(objecttest_SOURCES) $(sockaddrtest_SOURCES) \
+	$(sockettest_SOURCES) $(stringtest_SOURCES) \
+	$(timetest_SOURCES) $(utilitytest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -256,10 +256,6 @@ SUBDIRS = \
 	posix \
 	win32
 
-EXTRA_DIST = \
-	file.xml \
-	stream.xml
-
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
 	barrier.h \
@@ -268,14 +264,13 @@ modinclude_HEADERS = \
 	debug.h \
 	dlfcn.h \
 	endian.h \
-	file.h \
 	limits.h \
 	mcast.h \
 	mmap.h \
 	muxer.h \
+	object.h \
 	queue.h \
 	socket.h \
-	stream.h \
 	time.h \
 	types.h \
 	uio.h \
@@ -291,13 +286,12 @@ libaugsys_la_SOURCES = \
 	debug.c \
 	dlfcn.c \
 	endian.c \
-	file.c \
 	limits.c \
 	mcast.c \
 	mmap.c \
 	muxer.c \
+	object.c \
 	socket.c \
-	stream.c \
 	time.c \
 	types.c \
 	uio.c \
@@ -314,9 +308,9 @@ libaugsys_la_LIBADD = \
 
 TESTS = \
 	basetest \
-	filetest \
 	mcasttest \
 	muxertest \
+	objecttest \
 	sockaddrtest \
 	sockettest \
 	stringtest \
@@ -327,16 +321,16 @@ basetest_SOURCES = basetest.c
 basetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-filetest_SOURCES = filetest.c
-filetest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-
 mcasttest_SOURCES = mcasttest.c
 mcasttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 muxertest_SOURCES = muxertest.c
 muxertest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+objecttest_SOURCES = objecttest.c
+objecttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 sockaddrtest_SOURCES = sockaddrtest.c
@@ -359,12 +353,7 @@ utilitytest_SOURCES = utilitytest.c
 utilitytest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-@ENABLE_RUBY_TRUE@BUILT_SOURCES = \
-@ENABLE_RUBY_TRUE@	file.h \
-@ENABLE_RUBY_TRUE@	stream.h
-
-all: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+all: all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -436,15 +425,15 @@ clean-checkPROGRAMS:
 basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
 	@rm -f basetest$(EXEEXT)
 	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
-filetest$(EXEEXT): $(filetest_OBJECTS) $(filetest_DEPENDENCIES) 
-	@rm -f filetest$(EXEEXT)
-	$(LINK) $(filetest_LDFLAGS) $(filetest_OBJECTS) $(filetest_LDADD) $(LIBS)
 mcasttest$(EXEEXT): $(mcasttest_OBJECTS) $(mcasttest_DEPENDENCIES) 
 	@rm -f mcasttest$(EXEEXT)
 	$(LINK) $(mcasttest_LDFLAGS) $(mcasttest_OBJECTS) $(mcasttest_LDADD) $(LIBS)
 muxertest$(EXEEXT): $(muxertest_OBJECTS) $(muxertest_DEPENDENCIES) 
 	@rm -f muxertest$(EXEEXT)
 	$(LINK) $(muxertest_LDFLAGS) $(muxertest_OBJECTS) $(muxertest_LDADD) $(LIBS)
+objecttest$(EXEEXT): $(objecttest_OBJECTS) $(objecttest_DEPENDENCIES) 
+	@rm -f objecttest$(EXEEXT)
+	$(LINK) $(objecttest_LDFLAGS) $(objecttest_OBJECTS) $(objecttest_LDADD) $(LIBS)
 sockaddrtest$(EXEEXT): $(sockaddrtest_OBJECTS) $(sockaddrtest_DEPENDENCIES) 
 	@rm -f sockaddrtest$(EXEEXT)
 	$(LINK) $(sockaddrtest_LDFLAGS) $(sockaddrtest_OBJECTS) $(sockaddrtest_LDADD) $(LIBS)
@@ -474,18 +463,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlfcn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endian.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/limits.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcasttest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxertest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/objecttest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockaddrtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockettest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timetest.Po@am__quote@
@@ -795,16 +783,14 @@ distdir: $(DISTFILES)
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) check-recursive
+check: check-recursive
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) install-recursive
+install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
@@ -828,7 +814,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-recursive
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -900,9 +885,6 @@ uninstall-info: uninstall-info-recursive
 	uninstall-info-am uninstall-libLTLIBRARIES \
 	uninstall-modincludeHEADERS
 
-
-@ENABLE_RUBY_TRUE@%.h: %.xml
-@ENABLE_RUBY_TRUE@	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

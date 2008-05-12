@@ -65,9 +65,9 @@ libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugnet_la_OBJECTS = auth.lo base64.lo config.lo connector.lo \
-	fix.lo http.lo inet.lo mar.lo netevent.lo ssl.lo types.lo \
-	writer.lo
+am_libaugnet_la_OBJECTS = auth.lo base64.lo config.lo fix.lo http.lo \
+	inet.lo mar.lo netevent.lo object.lo ssl.lo tcpclient.lo \
+	types.lo writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_base64test_OBJECTS = base64test.$(OBJEXT)
 base64test_OBJECTS = $(am_base64test_OBJECTS)
@@ -230,13 +230,14 @@ modinclude_HEADERS = \
 	auth.h \
 	base64.h \
 	config.h \
-	connector.h \
 	fix.h \
 	http.h \
 	inet.h \
 	mar.h \
 	netevent.h \
+	object.h \
 	ssl.h \
+	tcpclient.h \
 	types.h \
 	writer.h
 
@@ -246,13 +247,14 @@ libaugnet_la_SOURCES = \
 	auth.c \
 	base64.c \
 	config.c \
-	connector.c \
 	fix.c \
 	http.c \
 	inet.c \
 	mar.c \
 	netevent.c \
+	object.c \
 	ssl.c \
+	tcpclient.c \
 	types.c \
 	writer.c
 
@@ -379,7 +381,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
@@ -388,7 +389,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netevent.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neteventtest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpclient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Plo@am__quote@
 

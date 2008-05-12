@@ -56,8 +56,8 @@ libaugnetpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugnetpp_la_OBJECTS = base64.lo config.lo connector.lo file.lo \
-	http.lo inet.lo mar.lo nbfile.lo writer.lo
+am_libaugnetpp_la_OBJECTS = base64.lo config.lo connector.lo http.lo \
+	inet.lo mar.lo writer.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
 am_base64test_OBJECTS = base64test.$(OBJEXT)
 base64test_OBJECTS = $(am_base64test_OBJECTS)
@@ -241,11 +241,9 @@ modinclude_HEADERS = \
 	base64.hpp \
 	config.hpp \
 	connector.hpp \
-	file.hpp \
 	http.hpp \
 	inet.hpp \
 	mar.hpp \
-	nbfile.hpp \
 	writer.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -253,11 +251,9 @@ libaugnetpp_la_SOURCES = \
 	base64.cpp \
 	config.cpp \
 	connector.cpp \
-	file.cpp \
 	http.cpp \
 	inet.cpp \
 	mar.cpp \
-	nbfile.cpp \
 	writer.cpp
 
 libaugnetpp_la_LDFLAGS = \
@@ -370,12 +366,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/connectortest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nbfile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Plo@am__quote@
 
 .cpp.o:
