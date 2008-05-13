@@ -215,6 +215,8 @@ aug_inetloopback(int af)
 AUGSYS_API int
 aug_acceptlost(void)
 {
+    /* FIXME: would be better if aug_tlerr were used. */
+
     switch (aug_errno()) {
     case ECONNABORTED:
 #if defined(EPROTO)

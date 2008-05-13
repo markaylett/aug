@@ -422,28 +422,28 @@ release_(struct impl_* impl)
 }
 
 static void*
-fcast_(aug_channelob* ob, const char* id)
+ccast_(aug_channelob* ob, const char* id)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     return cast_(impl, id);
 }
 
 static void
-fretain_(aug_channelob* ob)
+cretain_(aug_channelob* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     retain_(impl);
 }
 
 static void
-frelease_(aug_channelob* ob)
+crelease_(aug_channelob* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     release_(impl);
 }
 
 static aug_result
-fclose_(aug_channelob* ob)
+cclose_(aug_channelob* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     aug_result result;
@@ -454,7 +454,7 @@ fclose_(aug_channelob* ob)
 }
 
 static aug_channelob*
-fprocess_(aug_channelob* ob, aug_channelcb_t cb)
+cprocess_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     int events = aug_fdevents(impl->muxer_, impl->sd_);
@@ -534,14 +534,14 @@ fprocess_(aug_channelob* ob, aug_channelcb_t cb)
 }
 
 static aug_result
-fsetnonblock_(aug_channelob* ob, aug_bool on)
+csetnonblock_(aug_channelob* ob, aug_bool on)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     return aug_ssetnonblock(impl->sd_, on);
 }
 
 static aug_result
-fseteventmask_(aug_channelob* ob, unsigned short mask)
+cseteventmask_(aug_channelob* ob, unsigned short mask)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
 
@@ -554,7 +554,7 @@ fseteventmask_(aug_channelob* ob, unsigned short mask)
 }
 
 static int
-feventmask_(aug_channelob* ob)
+ceventmask_(aug_channelob* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
 
@@ -563,22 +563,22 @@ feventmask_(aug_channelob* ob)
 }
 
 static int
-fevents_(aug_channelob* ob)
+cevents_(aug_channelob* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     return userevents_(impl);
 }
 
 static const struct aug_channelobvtbl fvtbl_ = {
-    fcast_,
-    fretain_,
-    frelease_,
-    fclose_,
-    fprocess_,
-    fsetnonblock_,
-    fseteventmask_,
-    feventmask_,
-    fevents_
+    ccast_,
+    cretain_,
+    crelease_,
+    cclose_,
+    cprocess_,
+    csetnonblock_,
+    cseteventmask_,
+    ceventmask_,
+    cevents_
 };
 
 static void*

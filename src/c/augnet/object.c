@@ -21,9 +21,10 @@ struct cimpl_ {
     aug_channelob channelob_;
     int refs_;
     aug_mpool* mpool_;
+    aug_muxer_t muxer_;
     aug_tcpclient_t client_;
     aug_sd sd_;
-    aug_muxer_t muxer_;
+    unsigned short mask_;
 };
 
 static aug_result
@@ -110,8 +111,14 @@ cchannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
             || aug_setfdeventmask(impl->muxer_, sd, AUG_FDEVENTRD) < 0)
             return NULL;
 
-        if (est)
-            return aug_createplain(impl->mpool_, sd, impl->muxer_);
+        if (est) {
+
+            ob = aug_createplain(impl->mpool_, sd, impl->muxer_);
+
+            /* Transfer event mask to new object. */
+
+            aug_seteventmask(ob, impl->mask_);
+        }
 
         impl->sd_ = sd;
     }
@@ -131,21 +138,21 @@ static aug_result
 cchannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
-    return aug_setfdeventmask(impl->muxer_, impl->sd_, mask);
+    impl->mask_ = mask;
+    return AUG_SUCCESS;
 }
 
 static int
 cchannelob_eventmask_(aug_channelob* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
-    return aug_fdeventmask(impl->muxer_, impl->sd_);
+    return impl->mask_;
 }
 
 static int
 cchannelob_events_(aug_channelob* ob)
 {
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
-    return aug_fdevents(impl->muxer_, impl->sd_);
+    return 0;
 }
 
 static const struct aug_channelobvtbl cchannelobvtbl_ = {
@@ -158,6 +165,157 @@ static const struct aug_channelobvtbl cchannelobvtbl_ = {
     cchannelob_seteventmask_,
     cchannelob_eventmask_,
     cchannelob_events_
+};
+
+struct simpl_ {
+    aug_channelob channelob_;
+    int refs_;
+    aug_mpool* mpool_;
+    aug_muxer_t muxer_;
+    aug_tcpclient_t client_;
+    aug_sd sd_;
+    unsigned short mask_;
+};
+
+static aug_result
+sclose_(struct simpl_* impl)
+{
+    aug_setfdeventmask(impl->muxer_, impl->sd_, 0);
+    return aug_sclose(impl->sd_);
+}
+
+static void*
+scast_(struct simpl_* impl, const char* id)
+{
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_channelobid)) {
+        aug_retain(&impl->channelob_);
+        return &impl->channelob_;
+    }
+    return NULL;
+}
+
+static void
+sretain_(struct simpl_* impl)
+{
+    assert(0 < impl->refs_);
+    ++impl->refs_;
+}
+
+static void
+srelease_(struct simpl_* impl)
+{
+    assert(0 < impl->refs_);
+    if (0 == --impl->refs_) {
+        aug_mpool* mpool = impl->mpool_;
+        if (AUG_BADSD != impl->sd_)
+            sclose_(impl);
+        aug_destroytcpclient(impl->client_);
+        aug_free(mpool, impl);
+        aug_release(mpool);
+    }
+}
+
+static void*
+schannelob_cast_(aug_channelob* ob, const char* id)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    return scast_(impl, id);
+}
+
+static void
+schannelob_retain_(aug_channelob* ob)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    sretain_(impl);
+}
+
+static void
+schannelob_release_(aug_channelob* ob)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    srelease_(impl);
+}
+
+static aug_result
+schannelob_close_(aug_channelob* ob)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    aug_result result = sclose_(impl);
+    impl->sd_ = AUG_BADSD;
+    return result;
+}
+
+static aug_channelob*
+schannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+
+    if ((AUG_FDEVENTRD & aug_fdevents(impl->muxer_, impl->sd_))) {
+
+        aug_sd sd;
+        struct aug_endpoint ep;
+
+        if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
+
+            if (!aug_acceptlost())
+                return NULL; /* Error on listener. */
+
+            aug_ctxwarn(aug_tlx, "accept() failed: %s", aug_tlerr->desc_);
+
+        } else {
+
+            ob = aug_createplain(impl->mpool_, sd, impl->muxer_);
+
+            /* Transfer event mask to new object. */
+
+            aug_seteventmask(ob, impl->mask_);
+
+            *fork = AUG_TRUE;
+        }
+    }
+
+    sretain_(impl);
+    return ob;
+}
+
+static aug_result
+schannelob_setnonblock_(aug_channelob* ob, aug_bool on)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    return aug_ssetnonblock(impl->sd_, on);
+}
+
+static aug_result
+schannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    impl->mask_ = mask;
+    return AUG_SUCCESS;
+}
+
+static int
+schannelob_eventmask_(aug_channelob* ob)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    return impl->mask_;
+}
+
+static int
+schannelob_events_(aug_channelob* ob)
+{
+    return 0;
+}
+
+static const struct aug_channelobvtbl schannelobvtbl_ = {
+    schannelob_cast_,
+    schannelob_retain_,
+    schannelob_release_,
+    schannelob_close_,
+    schannelob_process_,
+    schannelob_setnonblock_,
+    schannelob_seteventmask_,
+    schannelob_eventmask_,
+    schannelob_events_
 };
 
 struct pimpl_ {
@@ -395,9 +553,10 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     impl->channelob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
+    impl->muxer_ = muxer;
     impl->client_ = client;
     impl->sd_ = sd;
-    impl->muxer_ = muxer;
+    impl->mask_ = 0;
 
     aug_retain(mpool);
     return &impl->channelob_;
@@ -413,7 +572,20 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 AUGNET_API aug_channelob*
 aug_createserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer)
 {
-    return NULL;
+    struct simpl_* impl = aug_malloc(mpool, sizeof(struct simpl_));
+    if (!impl)
+        return NULL;
+
+    impl->channelob_.vtbl_ = &pchannelobvtbl_;
+    impl->channelob_.impl_ = NULL;
+    impl->refs_ = 1;
+    impl->mpool_ = mpool;
+    impl->sd_ = sd;
+    impl->muxer_ = muxer;
+    impl->mask_ = 0;
+
+    aug_retain(mpool);
+    return &impl->channelob_;
 }
 
 AUGNET_API aug_channelob*

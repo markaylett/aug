@@ -138,6 +138,8 @@ aug_tryconnect(aug_tcpclient_t client, struct aug_endpoint* ep, int* est)
         }
     }
 
+    /* Previous socket closed at this point. */
+
     do {
 
         /* Create socket for next address. */
