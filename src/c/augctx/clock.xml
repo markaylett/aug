@@ -2,12 +2,14 @@
 
   <quotincl>augctx/mpool.h</quotincl>
 
+  <quotincl>augtypes.h</quotincl>
+
   <verbatim>struct timeval;</verbatim>
 
   <interface name="clock">
 
-    <method name="gettimeofday" type="struct timeval*" qname="gettimeofday">
-      <param name="tv" type="struct timeval*"/>
+    <method name="gettimeofday" type="aug_result" qname="gettimeofday">
+      <param name="tv" type="struct timeval&"/>
     </method>
 
     <method name="gettimezone" type="long" qname="gettimezone"/>

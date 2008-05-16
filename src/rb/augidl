@@ -50,21 +50,34 @@ class Verbatim
 end
 
 class Type
-    attr_reader :cname
-    def initialize(cname, object)
+    NONE = 0
+    OBJECT = 1
+    REF = 2
+    attr_reader :cname, :style
+    def initialize(cname, style)
         @cname = cname
-        @object = object
+        @style = style
     end
     def object?
-        @object
+        @style == OBJECT
+    end
+    def ref?
+        @style == REF
     end
     def Type.parse(node)
         type = node.attributes["type"].to_s
-        object = false
+        style = NONE
         if node.attributes.has_key? "object" then
-            object = node.attributes["object"].to_s !~ /false|no|0/i
+            if node.attributes["object"].to_s !~ /false|no|0/i then
+                style = OBJECT
+                type.sub!(/[&*]+$/, '')
+            end
         end
-        Type.new(type, object)
+        if style == NONE && type =~ /[&]$/ then
+            style = REF
+            type.chop!
+        end
+        Type.new(type, style)
     end
 end
 
@@ -133,7 +146,7 @@ class Interface
         @pkg = pkg
         @name = name
         @help = help
-        @type = Type.new("#{pkg}_#{name}", true)
+        @type = Type.new("#{pkg}_#{name}", Type::OBJECT)
         @methods = []
     end
     def each_method(&action)
@@ -249,22 +262,26 @@ module ParamLists
         args
     end
     def return_expr(type, expr)
-        type.cname == "void" ? expr : "return #{expr}"
+        if type.cname == "void" && !type.ref? then
+            expr
+        else
+            "return #{expr}"
+        end
     end
 end
 
 class CFormat
     include ParamLists
     def param_type(type)
-        if type.object? then
-            "#{type.cname}*"
+        if type.object? || type.ref? then
+            type.cname + '*'
         else
             type.cname
         end
     end
     def return_type(type)
-        if type.object? then
-            "#{type.cname}*"
+        if type.object? || type.ref? then
+            type.cname + '*'
         else
             type.cname
         end
@@ -276,24 +293,32 @@ class CppFormat
     def cname_list(iface, method)
         args = ["this_.get()"]
         method.each_param do |param|
-            if param.type.object? then
-                args << "#{param.name}.get()"
-            else
-                args << param.name
-            end
+            args << if param.type.object? then
+                        "#{param.name}.get()"
+                    elsif param.type.ref? then
+                        "&#{param.name}"
+                    else
+                        param.name
+                    end
         end
         args
     end
     def creturn_expr(type, expr)
         if type.object? then
             "return aug::object_attach<#{type.cname}>(#{expr})";
+        elsif type.ref? then
+            "return *#{expr}"
+        elsif type.cname == "void" then
+            expr
         else
-            type.cname == "void" ? expr : "return #{expr}"
+            "return #{expr}"
         end
     end
     def param_type(type)
         if type.object? then
             "aug::obref<#{type.cname}>"
+        elsif type.ref?
+            type.cname + '&'
         else
             type.cname
         end
@@ -301,6 +326,8 @@ class CppFormat
     def return_type(type)
         if type.object? then
             "aug::smartob<#{type.cname}>"
+        elsif type.ref?
+            type.cname + '&'
         else
             type.cname
         end
@@ -365,7 +392,11 @@ def putstatic(iface, method)
     format = CFormat.new
     args = format.arg_list(iface, method).join(", ")
     names = nothis(format.name_list(iface, method)).join(", ")
-    expr = "static_cast<T*>(this_->impl_)->#{method.qname}_(#{names})"
+    expr = ''
+    if method.type.ref? then
+        expr << '&'
+    end
+    expr << "static_cast<T*>(this_->impl_)->#{method.qname}_(#{names})"
     if method.type.object? then
         expr = "aug::retget(#{expr})"
     end

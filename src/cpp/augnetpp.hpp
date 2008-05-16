@@ -7,10 +7,10 @@
 #include "augnet.h"
 
 #include "augnetpp/base64.hpp"
-#include "augnetpp/connector.hpp"
 #include "augnetpp/http.hpp"
 #include "augnetpp/inet.hpp"
 #include "augnetpp/mar.hpp"
+#include "augnetpp/tcpclient.hpp"
 #include "augnetpp/writer.hpp"
 
 #endif // AUGNETPP_HPP

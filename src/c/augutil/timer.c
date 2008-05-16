@@ -37,10 +37,10 @@ expiry_(struct timeval* tv, unsigned ms)
 {
     struct timeval local;
     aug_clock* clock = aug_getclock(aug_tlx);
-    struct timeval* ret = aug_gettimeofday(clock, &local);
+    aug_result result = aug_gettimeofday(clock, &local);
     aug_release(clock);
 
-    if (!ret)
+    if (result < 0)
         return -1;
 
     aug_tvadd(tv, aug_mstotv(&local, ms));
@@ -203,10 +203,10 @@ aug_foreachexpired(struct aug_timers* timers, int force, struct timeval* next)
     if ((it = AUG_FIRST(timers))) {
 
         aug_clock* clock = aug_getclock(aug_tlx);
-        struct timeval* ret = aug_gettimeofday(clock, &now);
+        aug_result result = aug_gettimeofday(clock, &now);
         aug_release(clock);
 
-        if (!ret)
+        if (result < 0)
             return -1;
 
         /* Force, at least, the first timer to expire. */

@@ -113,10 +113,10 @@ channelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 
     /* Lock here to prevent release during callback. */
 
-    retain_(ob);
+    retain_(impl);
 
     if (events < 0 || !cb(&impl->streamob_, events)) {
-        release_(ob);
+        release_(impl);
         return NULL;
     }
 

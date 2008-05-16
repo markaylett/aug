@@ -7,7 +7,7 @@
     Read-only, base interface for all container types.  Suitable for both
     sequential and associative containers.
 
-    <method name="find" type="struct aug_var*" qname="findseqob">
+    <method name="find" type="aug_result" qname="findseqob">
 
       Get item specified by @a key.
 
@@ -15,10 +15,10 @@
 
       @param key Value's key.
 
-      @return @a value, or NULL on error.
+      @return See @ref TypesResult.
 
-      <param name="value" type="struct aug_var*"/>
-      <param name="key" type="const struct aug_var*"/>
+      <param name="value" type="struct aug_var&"/>
+      <param name="key" type="const struct aug_var&"/>
     </method>
     <method name="begin" type="aug_iterob" object="true" qname="seqobbegin">
 

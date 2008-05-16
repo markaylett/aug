@@ -171,9 +171,8 @@ struct simpl_ {
     aug_channelob channelob_;
     int refs_;
     aug_mpool* mpool_;
-    aug_muxer_t muxer_;
-    aug_tcpclient_t client_;
     aug_sd sd_;
+    aug_muxer_t muxer_;
     unsigned short mask_;
 };
 
@@ -209,7 +208,6 @@ srelease_(struct simpl_* impl)
         aug_mpool* mpool = impl->mpool_;
         if (AUG_BADSD != impl->sd_)
             sclose_(impl);
-        aug_destroytcpclient(impl->client_);
         aug_free(mpool, impl);
         aug_release(mpool);
     }
@@ -255,14 +253,7 @@ schannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
         aug_sd sd;
         struct aug_endpoint ep;
 
-        if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
-
-            if (!aug_acceptlost())
-                return NULL; /* Error on listener. */
-
-            aug_ctxwarn(aug_tlx, "accept() failed: %s", aug_tlerr->desc_);
-
-        } else {
+        if (AUG_BADSD != (sd = aug_accept(impl->sd_, &ep))) {
 
             ob = aug_createplain(impl->mpool_, sd, impl->muxer_);
 
@@ -271,6 +262,13 @@ schannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
             aug_seteventmask(ob, impl->mask_);
 
             *fork = AUG_TRUE;
+
+        } else {
+
+            if (!aug_acceptlost())
+                return NULL; /* Error. */
+
+            aug_ctxwarn(aug_tlx, "accept() failed: %s", aug_tlerr->desc_);
         }
     }
 
@@ -549,7 +547,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     if (!(impl = aug_malloc(mpool, sizeof(struct cimpl_))))
         goto fail2;
 
-    impl->channelob_.vtbl_ = &pchannelobvtbl_;
+    impl->channelob_.vtbl_ = &cchannelobvtbl_;
     impl->channelob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
@@ -576,7 +574,7 @@ aug_createserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer)
     if (!impl)
         return NULL;
 
-    impl->channelob_.vtbl_ = &pchannelobvtbl_;
+    impl->channelob_.vtbl_ = &schannelobvtbl_;
     impl->channelob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;

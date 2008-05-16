@@ -54,10 +54,10 @@ localtime_(struct tm* res)
 {
     struct timeval tv;
     aug_clock* clock = aug_getclock(aug_tlx);
-    struct timeval* ret = aug_gettimeofday(clock, &tv);
+    aug_result result = aug_gettimeofday(clock, &tv);
     aug_release(clock);
 
-    if (!ret)
+    if (result < 0)
         return -1;
 
     if (!aug_localtime(&tv.tv_sec, res))

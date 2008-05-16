@@ -192,7 +192,7 @@ namespace aug {
         sessionptr session_;
         mod_handle& sock_;
         buffer& buffer_;
-        connector connector_;
+        tcpclient client_;
         autosd sd_;
         endpoint endpoint_;
         sockstate state_;

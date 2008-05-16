@@ -106,7 +106,8 @@ clntconn::do_process(unsigned short events, const timeval& now)
         // writing then set the write event-mask.
 
         if (!buffer_.empty())
-            setnbeventmask(conn_->sd(), AUG_FDEVENTRDWR);
+            ; // FIXME: replace setnbeventmask() call.
+        //setnbeventmask(conn_->sd(), AUG_FDEVENTRDWR);
 
         AUG_CTXDEBUG2(aug_tlx,
                       "connection now established, assuming new state");

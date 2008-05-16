@@ -4,10 +4,10 @@ modincludedir = $(includedir)/augnetpp
 modinclude_HEADERS = \
 	base64.hpp \
 	config.hpp \
-	connector.hpp \
 	http.hpp \
 	inet.hpp \
 	mar.hpp \
+	tcpclient.hpp \
 	writer.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -15,10 +15,10 @@ noinst_LTLIBRARIES = libaugnetpp.la
 libaugnetpp_la_SOURCES = \
 	base64.cpp \
 	config.cpp \
-	connector.cpp \
 	http.cpp \
 	inet.cpp \
 	mar.cpp \
+	tcpclient.cpp \
 	writer.cpp
 
 libaugnetpp_la_LDFLAGS = \

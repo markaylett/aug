@@ -11,7 +11,7 @@
 
     <method name="process" type="aug_channelob" object="true" qname="process">
       <param name="cb" type="aug_channelcb_t"/>
-      <param name="fork" type="aug_bool*"/>
+      <param name="fork" type="aug_bool&"/>
     </method>
 
     <method name="setnonblock" type="aug_result" qname="setnonblock">

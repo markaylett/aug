@@ -5,11 +5,11 @@
   <interface name="iterob">
     <method name="end" type="int" qname="iterobend"/>
     <method name="next" type="int" qname="nextiterob"/>
-    <method name="key" type="struct aug_var*" qname="iterobkey">
-      <param name="var" type="struct aug_var*"/>
+    <method name="key" type="aug_result" qname="iterobkey">
+      <param name="var" type="struct aug_var&"/>
     </method>
-    <method name="value" type="struct aug_var*" qname="iterobvalue">
-      <param name="var" type="struct aug_var*"/>
+    <method name="value" type="aug_result" qname="iterobvalue">
+      <param name="var" type="struct aug_var&"/>
     </method>
   </interface>
 
