@@ -47,9 +47,13 @@ createclient_(aug_channelob* ob, aug_channelcb_t cb, aug_mpool* mpool,
               unsigned short mask)
 {
     aug_streamob* streamob;
+#if ENABLE_SSL
     aug_channelob* channelob = ssl
         ? aug_createsslclient(mpool, id, sd, muxer, ssl)
         : aug_createplain(mpool, id, sd, muxer);
+#else /* !ENABLE_SSL */
+    aug_channelob* channelob = aug_createplain(mpool, id, sd, muxer);
+#endif /* !ENABLE_SSL */
 
     if (!channelob) {
         aug_sclose(sd);
@@ -184,8 +188,7 @@ cchannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 
         /* Not yet established. */
 
-        aug_setfdeventmask(impl->muxer_, sd, AUG_FDEVENTRD);
-        impl->sd_ = sd;
+        aug_setfdeventmask(impl->muxer_, impl->sd_, AUG_FDEVENTRD);
     }
 
     cretain_(impl);
@@ -341,10 +344,14 @@ schannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 
         id = aug_nextid();
 
+#if ENABLE_SSL
         channelob = impl->ssl_
-            ? aug_createsslserver(impl->mpool_, impl->id_, sd,
+            ? aug_createsslserver(impl->mpool_, id, sd,
                                   impl->muxer_, impl->ssl_)
-            : aug_createplain(impl->mpool_, impl->id_, sd, impl->muxer_);
+            : aug_createplain(impl->mpool_, id, sd, impl->muxer_);
+#else /* !ENABLE_SSL */
+        channelob = aug_createplain(impl->mpool_, id, sd, impl->muxer_);
+#endif /* !ENABLE_SSL */
 
         /* Transfer event mask to new object. */
 
@@ -623,7 +630,6 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     aug_sd sd;
     struct aug_endpoint ep;
     int est;
-    unsigned id;
     struct cimpl_* impl;
 
     if (!(client = aug_createtcpclient(host, serv)))
@@ -631,10 +637,6 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 
     if (AUG_BADSD == (sd = aug_tryconnect(client, &ep, &est)))
         goto fail1;
-
-    if (est)
-        return createclient_(ob, cb, mpool, id, sd,
-                             impl->muxer_, impl->ssl_, impl->mask_);
 
     if (est) {
 
@@ -658,6 +660,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     impl->muxer_ = muxer;
     impl->ssl_ = ssl;
     impl->sd_ = sd;
+    impl->est_ = est;
     impl->mask_ = 0;
 
     aug_retain(mpool);
