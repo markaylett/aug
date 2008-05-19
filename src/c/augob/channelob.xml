@@ -2,10 +2,14 @@
 
   <quotincl>augob/streamob.h</quotincl>
 
-  <verbatim>typedef aug_bool
-    (*aug_channelcb_t)(aug_streamob*, unsigned short);</verbatim>
+  <verbatim>
+    typedef aug_bool (*aug_channelcb_t)(unsigned, aug_streamob*,
+      unsigned short);
+  </verbatim>
 
   <interface name="channelob">
+
+    All channels have non-blocking semantics.
 
     <method name="close" type="aug_result" qname="close"/>
 
@@ -14,13 +18,11 @@
       <param name="fork" type="aug_bool&"/>
     </method>
 
-    <method name="setnonblock" type="aug_result" qname="setnonblock">
-      <param name="on" type="aug_bool"/>
-    </method>
-
     <method name="seteventmask" type="aug_result" qname="seteventmask">
       <param name="mask" type="unsigned short"/>
     </method>
+
+    <method name="getid" type="unsigned" qname="getid"/>
 
     <method name="eventmask" type="int" qname="eventmask"/>
 

@@ -64,7 +64,7 @@ buffer::append(const void* buf, size_t len)
 }
 
 size_t
-buffer::writesome(mdref ref)
+buffer::writesome(streamobref ref)
 {
     size_t size(aug::writesome(writer_, ref));
 

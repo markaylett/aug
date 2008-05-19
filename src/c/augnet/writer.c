@@ -180,7 +180,7 @@ aug_writersize(aug_writer_t writer)
 }
 
 AUGNET_API ssize_t
-aug_writesome(aug_writer_t writer, aug_md md)
+aug_writesome(aug_writer_t writer, aug_streamob* streamob)
 {
     ssize_t ret;
     struct iovec* iov;
@@ -216,7 +216,7 @@ aug_writesome(aug_writer_t writer, aug_md md)
     iov->iov_base = (char*)iov->iov_base + writer->part_;
     iov->iov_len -= (int)writer->part_;
 
-    if (-1 != (ret = aug_fwritev(md, iov, size))) {
+    if (-1 != (ret = aug_writev(streamob, iov, size))) {
 
         /* Pop any completed buffers from queue. */
 

@@ -17,11 +17,11 @@ AUG_RCSID("$Id$");
 
 #include <limits.h>
 
-AUGSYS_API int
+AUGSYS_API unsigned
 aug_nextid(void)
 {
-    static int id_ = 1;
-    int id;
+    static unsigned id_ = 1;
+    unsigned id;
 
     aug_lock();
     if (id_ == INT_MAX) {

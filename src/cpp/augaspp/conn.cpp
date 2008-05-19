@@ -122,16 +122,10 @@ connected::do_session() const
     return session_;
 }
 
-autosd
-connected::do_release()
+channelobptr
+connected::do_channelob() const
 {
-    return sd_;
-}
-
-sdref
-connected::do_sd() const
-{
-    return sd_;
+    return channelob_;
 }
 
 void
@@ -142,7 +136,7 @@ connected::do_send(const void* buf, size_t len, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setnbeventmask(sd_, AUG_FDEVENTRDWR);
+        seteventmask(channelob_, AUG_FDEVENTRDWR);
     }
 
     buffer_.append(buf, len);
@@ -156,7 +150,7 @@ connected::do_sendv(blobref ref, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setnbeventmask(sd_, AUG_FDEVENTRDWR);
+        seteventmask(channelob_, AUG_FDEVENTRDWR);
     }
 
     buffer_.append(ref);
@@ -181,19 +175,19 @@ connected::do_connected(const aug_endpoint& ep, const timeval& now)
 bool
 connected::do_process(unsigned short events, const timeval& now)
 {
+    streamobptr streamob(object_cast<aug_streamob>(channelob_));
+
     if (events & AUG_FDEVENTRD) {
 
-        AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%d], fd=[%d]",
-                      sock_.id_, sd_.get());
+        AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%d]", sock_.id_);
 
         char buf[4096];
-        size_t size(aug::read(sd_, buf, sizeof(buf)));
+        size_t size(read(streamob, buf, sizeof(buf)));
         if (0 == size) {
 
             // Connection closed.
 
-            AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%d], fd=[%d]",
-                          sock_.id_, sd_.get());
+            AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%d]", sock_.id_);
             state_ = CLOSED;
             return true;
         }
@@ -209,10 +203,9 @@ connected::do_process(unsigned short events, const timeval& now)
 
     if (events & AUG_FDEVENTWR) {
 
-        AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%d], fd=[%d]",
-                      sock_.id_, sd_.get());
+        AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%d]", sock_.id_);
 
-        size_t n(buffer_.writesome(sd_));
+        size_t n(buffer_.writesome(streamob));
 
         // Data has been written: reset write timer.
 
@@ -222,12 +215,12 @@ connected::do_process(unsigned short events, const timeval& now)
 
             // No more (buffered) data to be written.
 
-            setnbeventmask(sd_, AUG_FDEVENTRD);
+            seteventmask(channelob_, AUG_FDEVENTRD);
 
             // If flagged for shutdown, send FIN and disable writes.
 
             if (SHUTDOWN <= state_)
-                shutdownnbfile(sd_);
+                aug::shutdown(streamob);
 
         } else {
 
@@ -265,9 +258,10 @@ connected::do_shutdown(unsigned flags, const timeval& now)
         state_ = SHUTDOWN;
         if (buffer_.empty() || flags & MOD_SHUTNOW) {
             aug_ctxinfo(aug_tlx,
-                        "shutting connection: id=[%d], fd=[%d], flags=[%u]",
-                        sock_.id_, sd_.get(), flags);
-            shutdownnbfile(sd_);
+                        "shutting connection: id=[%d], flags=[%u]",
+                        sock_.id_, flags);
+            streamobptr streamob(object_cast<aug_streamob>(channelob_));
+            aug::shutdown(streamob);
         }
     }
 }
@@ -308,13 +302,14 @@ connected::~connected() AUG_NOTHROW
 }
 
 connected::connected(const sessionptr& session, mod_handle& sock,
-                     buffer& buffer, rwtimer& rwtimer, autosd& sd,
-                     const endpoint& ep, bool close)
+                     buffer& buffer, rwtimer& rwtimer,
+                     const channelobptr& channelob, const endpoint& ep,
+                     bool close)
     : session_(session),
       sock_(sock),
       buffer_(buffer),
       rwtimer_(rwtimer),
-      sd_(sd),
+      channelob_(channelob),
       endpoint_(ep),
       state_(CONNECTED),
       close_(close)
@@ -340,16 +335,10 @@ handshake::do_session() const
     return session_;
 }
 
-autosd
-handshake::do_release()
+channelobptr
+handshake::do_channelob() const
 {
-    return sd_;
-}
-
-sdref
-handshake::do_sd() const
-{
-    return sd_;
+    return channelob_;
 }
 
 void

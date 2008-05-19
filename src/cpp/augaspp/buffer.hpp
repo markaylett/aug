@@ -113,7 +113,7 @@ namespace aug {
          */
 
         size_t
-        writesome(mdref ref);
+        writesome(streamobref ref);
 
         bool
         empty() const

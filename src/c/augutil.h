@@ -10,7 +10,6 @@
  * General utility library.
  */
 
-#include "augutil/channels.h"
 #include "augutil/conv.h"
 #include "augutil/event.h"
 #include "augutil/file.h"

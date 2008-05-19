@@ -58,14 +58,8 @@ servconn::do_session() const
     return conn_.session();
 }
 
-autosd
-servconn::do_release()
-{
-    return conn_.release();
-}
-
-sdref
-servconn::do_sd() const
+channelobptr
+servconn::do_channelob() const
 {
     return conn_.sd();
 }

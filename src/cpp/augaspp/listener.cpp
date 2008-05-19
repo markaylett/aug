@@ -28,14 +28,8 @@ listener::do_session() const
     return session_;
 }
 
-autosd
-listener::do_release()
-{
-    return sd_;
-}
-
-sdref
-listener::do_sd() const
+channelobptr
+listener::do_channelob() const
 {
     return sd_;
 }

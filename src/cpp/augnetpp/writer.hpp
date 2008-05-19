@@ -64,7 +64,7 @@ namespace aug {
     }
 
     inline size_t
-    writesome(aug_writer_t writer, mdref ref)
+    writesome(aug_writer_t writer, streamobref ref)
     {
         return verify(aug_writesome(writer, ref.get()));
     }

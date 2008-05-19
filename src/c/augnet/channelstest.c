@@ -1,23 +1,13 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGSYS_BUILD
-#include "augsys/object.h"
-#include "augctx/defs.h"
-
-AUG_RCSID("$Id$");
-
-#include "augsys/base.h" /* aug_nextid() */
-#include "augsys/uio.h"
-#include "augsys/unistd.h"
-
-#include "augctx/base.h"
-#include "augctx/errinfo.h"
-
-#include "augob/streamob.h"
+#include "augnet.h"
+#include "augctx.h"
 
 #include <assert.h>
-#include <string.h>
+#include <stdio.h>
+
+static int refs_ = 0;
 
 struct impl_ {
     aug_channelob channelob_;
@@ -25,18 +15,7 @@ struct impl_ {
     int refs_;
     aug_mpool* mpool_;
     unsigned id_;
-    aug_fd fd_;
-    aug_muxer_t muxer_;
 };
-
-static aug_result
-close_(struct impl_* impl)
-{
-#if !defined(_WIN32)
-    aug_setfdeventmask(impl->muxer_, impl->fd_, 0);
-#endif /* !_WIN32 */
-    return aug_fclose(impl->fd_);
-}
 
 static void*
 cast_(struct impl_* impl, const char* id)
@@ -56,6 +35,7 @@ retain_(struct impl_* impl)
 {
     assert(0 < impl->refs_);
     ++impl->refs_;
+    ++refs_;
 }
 
 static void
@@ -64,11 +44,10 @@ release_(struct impl_* impl)
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
         aug_mpool* mpool = impl->mpool_;
-        if (AUG_BADFD != impl->fd_)
-            close_(impl);
         aug_free(mpool, impl);
         aug_release(mpool);
     }
+    --refs_;
 }
 
 static void*
@@ -95,10 +74,7 @@ channelob_release_(aug_channelob* ob)
 static aug_result
 channelob_close_(aug_channelob* ob)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-    aug_result result = close_(impl);
-    impl->fd_ = AUG_BADFD;
-    return result;
+    return AUG_SUCCESS;
 }
 
 static aug_channelob*
@@ -107,23 +83,11 @@ channelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     int events;
 
-#if !defined(_WIN32)
-    events = aug_fdevents(impl->muxer_, impl->fd_);
-#else /* _WIN32 */
-    events = 0;
-#endif /* _WIN32 */
-
-    /* The callback is not required to set errinfo when returning false.  The
-       errinfo record must therefore be cleared before the callback is made to
-       avoid any confusion with previous errors. */
-
-    aug_clearerrinfo(aug_tlerr);
-
     /* Lock here to prevent release during callback. */
 
     retain_(impl);
 
-    if (events < 0 || !cb(impl->id_, &impl->streamob_, events)) {
+    if (events < 0 || !cb(impl->id_, &impl->streamob_, 0)) {
         release_(impl);
         return NULL;
     }
@@ -134,14 +98,7 @@ channelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 static aug_result
 channelob_seteventmask_(aug_channelob* ob, unsigned short mask)
 {
-#if !defined(_WIN32)
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-    return aug_setfdeventmask(impl->muxer_, impl->fd_, mask);
-#else /* _WIN32 */
-    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                   AUG_MSG("aug_setfdeventmask() not supported"));
-    return AUG_FAILERROR;
-#endif /* _WIN32 */
+    return AUG_SUCCESS;
 }
 
 static unsigned
@@ -154,23 +111,13 @@ channelob_getid_(aug_channelob* ob)
 static int
 channelob_eventmask_(aug_channelob* ob)
 {
-#if !defined(_WIN32)
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-    return aug_fdeventmask(impl->muxer_, impl->fd_);
-#else /* _WIN32 */
     return 0;
-#endif /* _WIN32 */
 }
 
 static int
 channelob_events_(aug_channelob* ob)
 {
-#if !defined(_WIN32)
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-    return aug_fdevents(impl->muxer_, impl->fd_);
-#else /* _WIN32 */
     return 0;
-#endif /* _WIN32 */
 }
 
 static const struct aug_channelobvtbl channelobvtbl_ = {
@@ -215,29 +162,25 @@ streamob_shutdown_(aug_streamob* ob)
 static ssize_t
 streamob_read_(aug_streamob* ob, void* buf, size_t size)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, streamob_, ob);
-    return aug_fread(impl->fd_, buf, size);
+    return 0;
 }
 
 static ssize_t
 streamob_readv_(aug_streamob* ob, const struct iovec* iov, int size)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, streamob_, ob);
-    return aug_freadv(impl->fd_, iov, size);
+    return 0;
 }
 
 static ssize_t
 streamob_write_(aug_streamob* ob, const void* buf, size_t size)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, streamob_, ob);
-    return aug_fwrite(impl->fd_, buf, size);
+    return 0;
 }
 
 static ssize_t
 streamob_writev_(aug_streamob* ob, const struct iovec* iov, int size)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, streamob_, ob);
-    return aug_fwritev(impl->fd_, iov, size);
+    return 0;
 }
 
 static const struct aug_streamobvtbl streamobvtbl_ = {
@@ -251,8 +194,8 @@ static const struct aug_streamobvtbl streamobvtbl_ = {
     streamob_writev_
 };
 
-AUGSYS_API aug_channelob*
-aug_createfile(aug_mpool* mpool, aug_fd fd, aug_muxer_t muxer)
+static aug_channelob*
+create_(aug_mpool* mpool, unsigned id)
 {
     struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
     if (!impl)
@@ -264,10 +207,128 @@ aug_createfile(aug_mpool* mpool, aug_fd fd, aug_muxer_t muxer)
     impl->streamob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->id_ = aug_nextid();
-    impl->fd_ = fd;
-    impl->muxer_ = muxer;
+    impl->id_ = id;
+
+    ++refs_;
 
     aug_retain(mpool);
     return &impl->channelob_;
+}
+
+static int count_ = 0;
+static unsigned last_ = 0;
+
+static aug_bool
+cb_(unsigned id, aug_streamob* ob, unsigned short events)
+{
+    if (3 < id)
+        aug_die("invalid channel");
+    ++count_;
+    last_ = id;
+    return AUG_TRUE;
+}
+
+static void
+foreach_(aug_channels_t channels)
+{
+    count_ = 0;
+    last_ = 0;
+    aug_foreachchannel(channels, cb_);
+}
+
+static aug_bool
+rm1_(unsigned id, aug_streamob* ob, unsigned short events)
+{
+    return 1 == id ? AUG_FALSE : AUG_TRUE;
+}
+
+int
+main(int argc, char* argv[])
+{
+    aug_mpool* mpool;
+    aug_channelob* channelob1;
+    aug_channelob* channelob2;
+    aug_channelob* channelob3;
+    aug_channels_t channels;
+
+    aug_check(0 <= aug_start());
+
+    mpool = aug_getmpool(aug_tlx);
+    aug_check(mpool);
+
+    channelob1 = create_(mpool, 1);
+    aug_check(channelob1);
+
+    channelob2 = create_(mpool, 2);
+    aug_check(channelob2);
+
+    channelob3 = create_(mpool, 3);
+    aug_check(channelob3);
+
+    channels = aug_createchannels(mpool);
+    aug_check(channels);
+
+    aug_check(0 <= aug_insertchannel(channels, channelob1));
+    aug_check(0 <= aug_insertchannel(channels, channelob2));
+    aug_check(0 <= aug_insertchannel(channels, channelob3));
+    aug_check(6 == refs_);
+
+    aug_release(channelob1);
+    aug_release(channelob2);
+    aug_release(channelob3);
+    aug_check(3 == refs_);
+
+    foreach_(channels);
+    aug_check(3 == aug_getchannels(channels));
+    aug_check(3 == count_);
+    aug_check(3 == last_);
+
+    /* Fairness rotation. */
+
+    foreach_(channels);
+    aug_check(3 == aug_getchannels(channels));
+    aug_check(3 == count_);
+    aug_check(1 == last_);
+
+    /* Fairness rotation. */
+
+    foreach_(channels);
+    aug_check(3 == aug_getchannels(channels));
+    aug_check(3 == count_);
+    aug_check(2 == last_);
+
+    /* Remove middle. */
+
+    aug_check(0 <= aug_removechannel(channels, 2));
+
+    foreach_(channels);
+    aug_check(2 == aug_getchannels(channels));
+    aug_check(2 == count_);
+    aug_check(3 == last_);
+
+    /* No longer exists. */
+
+    aug_check(AUG_FAILNONE == aug_removechannel(channels, 2));
+
+    /* Remove during loop. */
+
+    aug_foreachchannel(channels, rm1_);
+
+    /* No longer exists. */
+
+    aug_check(AUG_FAILNONE == aug_removechannel(channels, 1));
+
+    foreach_(channels);
+    aug_check(1 == aug_getchannels(channels));
+    aug_check(1 == count_);
+    aug_check(3 == last_);
+
+    aug_destroychannels(channels);
+
+     /* Objects released. */
+
+    aug_check(0 == aug_getchannels(channels));
+    aug_check(0 == refs_);
+    aug_release(mpool);
+    return 0;
 }

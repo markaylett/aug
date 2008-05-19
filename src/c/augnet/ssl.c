@@ -55,6 +55,7 @@ struct impl_ {
     aug_streamob streamob_;
     int refs_;
     aug_mpool* mpool_;
+    unsigned id_;
     aug_sd sd_;
     aug_muxer_t muxer_;
     SSL* ssl_;
@@ -509,12 +510,18 @@ cprocess_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
         AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_(): fd=[%d], events=[%d]",
                       impl->sd_, events);
 
+        /* The callback is not required to set errinfo when returning false.
+           The errinfo record must therefore be cleared before the callback is
+           made to avoid any confusion with previous errors. */
+
+        aug_clearerrinfo(aug_tlerr);
+
         /* Callback may close file, ensure that it is still available after
            callback returns. */
 
         retain_(impl);
 
-        if (!cb(&impl->streamob_, events)) {
+        if (!cb(impl->id_, &impl->streamob_, events)) {
 
             /* No need to update events if file is being removed - indicated
                by false return. */
@@ -534,13 +541,6 @@ cprocess_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 }
 
 static aug_result
-csetnonblock_(aug_channelob* ob, aug_bool on)
-{
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-    return aug_ssetnonblock(impl->sd_, on);
-}
-
-static aug_result
 cseteventmask_(aug_channelob* ob, unsigned short mask)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
@@ -553,12 +553,17 @@ cseteventmask_(aug_channelob* ob, unsigned short mask)
     return 0;
 }
 
+static unsigned
+cgetid_(aug_channelob* ob)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
+    return impl->id_;
+}
+
 static int
 ceventmask_(aug_channelob* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-
-
     return impl->mask_;
 }
 
@@ -575,8 +580,8 @@ static const struct aug_channelobvtbl fvtbl_ = {
     crelease_,
     cclose_,
     cprocess_,
-    csetnonblock_,
     cseteventmask_,
+    cgetid_,
     ceventmask_,
     cevents_
 };
@@ -745,7 +750,8 @@ static const struct aug_streamobvtbl svtbl_ = {
 };
 
 static struct impl_*
-createssl_(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer, struct ssl_st* ssl)
+createssl_(aug_mpool* mpool, unsigned id, aug_sd sd, aug_muxer_t muxer,
+           struct ssl_st* ssl)
 {
     struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
     if (!impl)
@@ -757,6 +763,7 @@ createssl_(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer, struct ssl_st* ssl)
     impl->streamob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
+    impl->id_ = id;
     impl->sd_ = sd;
     impl->muxer_ = muxer;
 
@@ -794,10 +801,10 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 }
 
 AUGNET_API aug_channelob*
-aug_createsslclient(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer,
-                    struct ssl_st* ssl)
+aug_createsslclient(aug_mpool* mpool, unsigned id, aug_sd sd,
+                    aug_muxer_t muxer, struct ssl_st* ssl)
 {
-    struct impl_* impl = createssl_(mpool, sd, muxer, ssl);
+    struct impl_* impl = createssl_(mpool, id, sd, muxer, ssl);
     if (!impl)
         return NULL;
 
@@ -810,10 +817,10 @@ aug_createsslclient(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer,
 }
 
 AUGNET_API aug_channelob*
-aug_createsslserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer,
-                    struct ssl_st* ssl)
+aug_createsslserver(aug_mpool* mpool, unsigned id, aug_sd sd,
+                    aug_muxer_t muxer, struct ssl_st* ssl)
 {
-    struct impl_* impl = createssl_(mpool, sd, muxer, ssl);
+    struct impl_* impl = createssl_(mpool, id, sd, muxer, ssl);
     if (!impl)
         return NULL;
 

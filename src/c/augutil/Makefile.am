@@ -14,7 +14,6 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augutil
 modinclude_HEADERS = \
-	channels.h \
 	config.h \
 	conv.h \
 	event.h \
@@ -40,7 +39,6 @@ noinst_HEADERS =
 lib_LTLIBRARIES = libaugutil.la
 
 libaugutil_la_SOURCES = \
-	channels.c \
 	config.c \
 	conv.c \
 	event.c \
@@ -70,41 +68,35 @@ libaugutil_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	channelstest
-# 	eventtest
-# 	hirestest
-# 	networdstest
-# 	shelllexertest
-# 	shellwordstest
+	eventtest \
+	hirestest \
+	networdstest \
+	shelllexertest \
+	shellwordstest
 
 TESTS = \
-	channelstest
-# 	eventtest
-# 	hirestest
-# 	networdstest.sh
-# 	shelllexertest.sh
-# 	shellwordstest.sh
+	eventtest \
+	hirestest \
+	networdstest.sh \
+	shelllexertest.sh \
+	shellwordstest.sh
 
-# eventtest_SOURCES = eventtest.c
-# eventtest_LDADD = \
-# 	$(top_builddir)/src/c/augutil/libaugutil.la
+eventtest_SOURCES = eventtest.c
+eventtest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
 
-# hirestest_SOURCES = hirestest.c
-# hirestest_LDADD = \
-# 	$(top_builddir)/src/c/augutil/libaugutil.la
+hirestest_SOURCES = hirestest.c
+hirestest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
 
-# networdstest_SOURCES = networdstest.c
-# networdstest_LDADD = \
-# 	$(top_builddir)/src/c/augutil/libaugutil.la
+networdstest_SOURCES = networdstest.c
+networdstest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
 
-# shelllexertest_SOURCES = shelllexertest.c
-# shelllexertest_LDADD = \
-# 	$(top_builddir)/src/c/augutil/libaugutil.la
+shelllexertest_SOURCES = shelllexertest.c
+shelllexertest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
 
-# shellwordstest_SOURCES = shellwordstest.c
-# shellwordstest_LDADD = \
-# 	$(top_builddir)/src/c/augutil/libaugutil.la
-
-channelstest_SOURCES = channelstest.c
-channelstest_LDADD = \
+shellwordstest_SOURCES = shellwordstest.c
+shellwordstest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la

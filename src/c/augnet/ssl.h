@@ -25,12 +25,26 @@ AUGNET_API void
 aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                   unsigned long err);
 
-AUGNET_API aug_channelob*
-aug_createsslclient(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer,
-                    struct ssl_st* ssl);
+/**
+ * Create an ssl client channel.
+ *
+ * Must be passed a non-blocking socket.  If successful, will assume
+ * responsibility for calling aug_sclose() on socket.
+ */
 
 AUGNET_API aug_channelob*
-aug_createsslserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer,
-                    struct ssl_st* ssl);
+aug_createsslclient(aug_mpool* mpool, unsigned id, aug_sd sd,
+                    aug_muxer_t muxer, struct ssl_st* ssl);
+
+/**
+ * Create an ssl server channel.
+ *
+ * Must be passed a non-blocking socket.  If successful, will assume
+ * responsibility for calling aug_sclose() on socket.
+ */
+
+AUGNET_API aug_channelob*
+aug_createsslserver(aug_mpool* mpool, unsigned id, aug_sd sd,
+                    aug_muxer_t muxer, struct ssl_st* ssl);
 
 #endif /* AUGNET_SSL_H */

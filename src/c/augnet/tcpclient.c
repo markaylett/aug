@@ -149,7 +149,7 @@ aug_tryconnect(aug_tcpclient_t client, struct aug_endpoint* ep, int* est)
         if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
-        if (-1 == aug_ssetnonblock(sd, 1)) {
+        if (-1 == aug_ssetnonblock(sd, AUG_TRUE)) {
             aug_sclose(sd);
             return AUG_BADSD;
         }
@@ -183,13 +183,6 @@ aug_tryconnect(aug_tcpclient_t client, struct aug_endpoint* ep, int* est)
     return -1;
 
  done:
-
-    /* Set back to blocking. */
-
-    if (-1 == aug_ssetnonblock(sd, 0)) {
-        aug_sclose(sd);
-        return -1;
-    }
 
     *est = 1;
     return sd;

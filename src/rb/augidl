@@ -23,6 +23,19 @@ class AnglIncl
     end
 end
 
+class Comment
+    attr_reader :text
+    def initialize(text)
+        @text = text
+    end
+    def accept(v)
+        v.visit_comment(self)
+    end
+    def Comment.parse(node)
+        Comment.new(node.text)
+    end
+end
+
 class QuotIncl
     attr_reader :text
     def initialize(text)
@@ -95,8 +108,8 @@ class Param
 end
 
 class Method_
-    attr_reader :name, :type, :qname, :help
-    def initialize(iface, name, type, qname, help)
+    attr_reader :name, :type, :qname, :comment
+    def initialize(iface, name, type, qname, comment)
         @name = name
         @type = type
         if qname.nil? then
@@ -104,7 +117,7 @@ class Method_
         else
             @qname = qname
         end
-        @help = help
+        @comment = comment
         @params = []
     end
     def each_param(&action)
@@ -120,8 +133,8 @@ class Method_
         if node.attributes.has_key? "qname" then
             qname = node.attributes["qname"].to_s
         end
-        help = node.text
-        method = Method_.new(iface, name, type, qname, help)
+        comment = node.text
+        method = Method_.new(iface, name, type, qname, comment)
         node.elements.each do |child|
             if child.name == "param" then
                 param = Param.parse(child)
@@ -141,11 +154,11 @@ def method_list(iface)
 end
 
 class Interface
-    attr_reader :pkg, :name, :help, :type
-    def initialize(pkg, name, help)
+    attr_reader :pkg, :name, :comment, :type
+    def initialize(pkg, name, comment)
         @pkg = pkg
         @name = name
-        @help = help
+        @comment = comment
         @type = Type.new("#{pkg}_#{name}", Type::OBJECT)
         @methods = []
     end
@@ -160,8 +173,8 @@ class Interface
     end
     def Interface.parse(pkg, node)
         name = node.attributes["name"].to_s
-        help = node.text
-        interface = Interface.new(pkg, name, help)
+        comment = node.text
+        interface = Interface.new(pkg, name, comment)
         node.elements.each do |child|
             if child.name == "method" then
                 method = Method_.parse(name, child)
@@ -201,6 +214,8 @@ class Package
             case child.name
             when "anglincl"
                 package.push_element(AnglIncl.parse(child))
+            when "comment"
+                package.push_element(Comment.parse(child))
             when "interface"
                 package.push_element(Interface.parse(name, child))
             when "quotincl"
@@ -339,16 +354,15 @@ def nothis(ls)
     ls
 end
 
-def puthelp(help)
-    unless help.nil? || help.strip!.empty? then
+def putcomment(text, this)
+    unless text.nil? || text.strip!.empty? then
         puts
         puts "/**"
-        this = false
-        help.each_line do |x|
+        text.each_line do |x|
             x.strip!
-            if !this && x =~ /^@(param|return)/ then
+            if this && x =~ /^@(param|return)/ then
                 puts " * @param this_ The object."
-                this = true
+                this = false
             end
             puts " * #{x}" unless x.empty?
         end
@@ -365,7 +379,7 @@ end
 def putcdefine(iface, method)
     format = CFormat.new
     names = format.name_list(iface, method).join(", ")
-    puthelp(method.help)
+    putcomment(method.comment, true)
     puts <<END
 
 #define #{iface.pkg}_#{method.qname}(#{names}) \\
@@ -427,6 +441,9 @@ class Visitor
     def visit_anglincl(elem)
         puts "\#include <#{elem.text}>"
     end
+    def visit_comment(elem)
+        putcomment(elem.text, false)
+    end
     def visit_interface(elem)
         puts <<END
 
@@ -440,7 +457,7 @@ class Visitor
 
 AUG_INTERFACE(#{elem.type.cname});
 END
-        puthelp(elem.help)
+        putcomment(elem.comment, true)
         puts <<END
 
 struct #{elem.type.cname}vtbl {
@@ -622,6 +639,8 @@ END
             return this->#{elem.name}_;
         }
     };
+
+    typedef aug::smartob<#{elem.type.cname}> #{elem.name}ptr;
 }
 #endif /* __cplusplus */
 END
@@ -666,3 +685,4 @@ puts <<END
 
 #endif /* #{guard} */
 END
+

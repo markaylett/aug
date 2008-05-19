@@ -57,19 +57,19 @@ release_(aug_clock* obj)
     }
 }
 
-static struct timeval*
+static aug_result
 gettimeofday_(aug_clock* obj, struct timeval* tv)
 {
 #if !defined(_WIN32)
     if (-1 == gettimeofday(tv, NULL))
-        return NULL;
+        return AUG_FAILERROR;
 #else /* _WIN32 */
     struct timeb tb;
     ftime(&tb);
     tv->tv_sec = (long)tb.time;
     tv->tv_usec = tb.millitm * 1000;
 #endif /* _WIN32 */
-    return tv;
+    return AUG_SUCCESS;
 }
 
 static long

@@ -26,15 +26,15 @@ aug_destroytcpclient(aug_tcpclient_t client);
  * Attempt to establish connection without blocking.
  *
  * If a connection was established, then @a est flag will be set and a
- * blocking socket returned.  Use aug_ssetnonblock() to change to non-blocking
- * socket.
+ * non-blocking socket returned.
  *
- * Otherwise, the returned descriptor should be polled before retrying
- * aug_tryconnect().
+ * Otherwise, the returned descriptor should be polled for events before
+ * retrying aug_tryconnect().
  *
  * The descriptor returned between calls to aug_tryconnect() may change; this
  * occurs as the implementation cycles through the addresses associated with
- * the host.
+ * the host.  All but the established descriptor will be closed by the client
+ * instance.
  */
 
 AUGNET_API aug_sd

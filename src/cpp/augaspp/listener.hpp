@@ -25,11 +25,8 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        autosd
-        do_release();
-
-        sdref
-        do_sd() const;
+        channelobptr
+        do_channelob() const;
 
         sockstate
         do_state() const;

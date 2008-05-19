@@ -1,16 +1,16 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGUTIL_CHANNELS_H
-#define AUGUTIL_CHANNELS_H
+#ifndef AUGNET_CHANNELS_H
+#define AUGNET_CHANNELS_H
 
 /**
- * @file augutil/channels.h
+ * @file augnet/channels.h
  *
  * Channel sets.
  */
 
-#include "augutil/config.h"
+#include "augnet/config.h"
 
 #include "augctx/mpool.h"
 
@@ -26,7 +26,7 @@ typedef struct aug_channels_* aug_channels_t;
  * @return New channel list.
  */
 
-AUGUTIL_API aug_channels_t
+AUGNET_API aug_channels_t
 aug_createchannels(aug_mpool* mpool);
 
 /**
@@ -35,7 +35,7 @@ aug_createchannels(aug_mpool* mpool);
  * @param channels Channel list.
  */
 
-AUGUTIL_API void
+AUGNET_API void
 aug_destroychannels(aug_channels_t channels);
 
 /**
@@ -47,20 +47,20 @@ aug_destroychannels(aug_channels_t channels);
  * @return See @ref TypesResult.
  */
 
-AUGUTIL_API aug_result
+AUGNET_API aug_result
 aug_insertchannel(aug_channels_t channels, aug_channelob* ob);
 
 /**
  * Remove first matching @a ob from @a channels list.
  *
  * @param channels Channel list.
- * @param ob Channel to be removed.
+ * @param id Channel to be removed.
  *
  * @return Either @ref AUG_SUCCESS or @ref AUG_FAILNONE.
  */
 
-AUGUTIL_API aug_result
-aug_removechannel(aug_channels_t channels, aug_channelob* ob);
+AUGNET_API aug_result
+aug_removechannel(aug_channels_t channels, unsigned id);
 
 /**
  * Call @a cb function for each channel in list.
@@ -73,7 +73,7 @@ aug_removechannel(aug_channels_t channels, aug_channelob* ob);
  * @param cb Callback function.
  */
 
-AUGUTIL_API void
+AUGNET_API void
 aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb);
 
 /**
@@ -84,7 +84,7 @@ aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb);
  * @return Number of channels.
  */
 
-AUGUTIL_API unsigned
+AUGNET_API unsigned
 aug_getchannels(aug_channels_t channels);
 
-#endif /* AUGUTIL_CHANNELS_H */
+#endif /* AUGNET_CHANNELS_H */

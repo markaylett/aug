@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGUTIL_BUILD
-#include "augutil/channels.h"
+#define AUGNET_BUILD
+#include "augnet/channels.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
@@ -55,7 +55,7 @@ trash_(aug_channels_t channels)
     }
 }
 
-AUGUTIL_API aug_channels_t
+AUGNET_API aug_channels_t
 aug_createchannels(aug_mpool* mpool)
 {
     aug_channels_t channels = aug_malloc(mpool, sizeof(struct aug_channels_));
@@ -71,7 +71,7 @@ aug_createchannels(aug_mpool* mpool)
     return channels;
 }
 
-AUGUTIL_API void
+AUGNET_API void
 aug_destroychannels(aug_channels_t channels)
 {
     aug_mpool* mpool = channels->mpool_;
@@ -88,7 +88,7 @@ aug_destroychannels(aug_channels_t channels)
     aug_release(mpool);
 }
 
-AUGUTIL_API aug_result
+AUGNET_API aug_result
 aug_insertchannel(aug_channels_t channels, aug_channelob* ob)
 {
     struct entry_* entry = aug_malloc(channels->mpool_,
@@ -104,8 +104,8 @@ aug_insertchannel(aug_channels_t channels, aug_channelob* ob)
     return AUG_SUCCESS;
 }
 
-AUGUTIL_API aug_result
-aug_removechannel(aug_channels_t channels, aug_channelob* ob)
+AUGNET_API aug_result
+aug_removechannel(aug_channels_t channels, unsigned id)
 {
     /* Locate the matching entry. */
 
@@ -115,7 +115,7 @@ aug_removechannel(aug_channels_t channels, aug_channelob* ob)
         if (!it->ob_) /* Already marked for removal. */
             continue;
 
-        if (it->ob_ == ob)
+        if (aug_getid(it->ob_) == id)
             break;
     }
 
@@ -141,7 +141,7 @@ aug_removechannel(aug_channels_t channels, aug_channelob* ob)
     return AUG_SUCCESS;
 }
 
-AUGUTIL_API void
+AUGNET_API void
 aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb)
 {
     struct entry_* it, * end;
@@ -218,7 +218,7 @@ aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb)
     }
 }
 
-AUGUTIL_API unsigned
+AUGNET_API unsigned
 aug_getchannels(aug_channels_t channels)
 {
     return channels->size_;

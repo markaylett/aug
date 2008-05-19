@@ -7,7 +7,10 @@
 
 AUG_RCSID("$Id$");
 
+#include "augnet/ssl.h"
 #include "augnet/tcpclient.h"
+
+#include "augsys/base.h" /* aug_nextid() */
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
@@ -17,13 +20,75 @@ AUG_RCSID("$Id$");
 #include <assert.h>
 #include <string.h>
 
+static aug_bool
+safecb_(aug_channelob* channel, aug_channelcb_t cb, unsigned id,
+        aug_streamob* ob, unsigned short events)
+{
+    aug_bool ret;
+
+    /* The callback is not required to set errinfo when returning false.  The
+       errinfo record must therefore be cleared before the callback is made to
+       avoid any confusion with previous errors. */
+
+    aug_clearerrinfo(aug_tlerr);
+
+    /* Lock here to prevent release during callback. */
+
+    aug_retain(channel);
+    ret = cb(id, ob, events);
+    aug_release(channel);
+
+    return ret;
+}
+
+static aug_channelob*
+createclient_(aug_channelob* ob, aug_channelcb_t cb, aug_mpool* mpool,
+              unsigned id, aug_sd sd, aug_muxer_t muxer, struct ssl_st* ssl,
+              unsigned short mask)
+{
+    aug_streamob* streamob;
+    aug_channelob* channelob = ssl
+        ? aug_createsslclient(mpool, id, sd, muxer, ssl)
+        : aug_createplain(mpool, id, sd, muxer);
+
+    if (!channelob) {
+        aug_sclose(sd);
+        return NULL;
+    }
+
+    streamob = aug_cast(channelob, aug_streamobid);
+
+    /* Transfer event mask to new object. */
+
+    aug_seteventmask(channelob, mask);
+
+    /* Zero events indicates new connection. */
+
+    if (!safecb_(ob, cb, id, streamob, 0)) {
+
+        /* Rejected: socket will be closed on release. */
+
+        aug_release(streamob);
+        aug_release(channelob);
+        return NULL;
+    }
+
+    /* Transition to established state. */
+
+    aug_release(streamob);
+    return channelob;
+}
+
 struct cimpl_ {
     aug_channelob channelob_;
     int refs_;
     aug_mpool* mpool_;
-    aug_muxer_t muxer_;
+    unsigned id_;
     aug_tcpclient_t client_;
+    aug_muxer_t muxer_;
+    struct ssl_st* ssl_;
     aug_sd sd_;
+    int est_;
     unsigned short mask_;
 };
 
@@ -31,7 +96,7 @@ static aug_result
 cclose_(struct cimpl_* impl)
 {
     aug_setfdeventmask(impl->muxer_, impl->sd_, 0);
-    return aug_sclose(impl->sd_);
+    return aug_sclose(impl->sd_); /* FIXME */
 }
 
 static void*
@@ -100,26 +165,26 @@ cchannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
 
+    if (impl->est_)
+        return createclient_(ob, cb, impl->mpool_, impl->id_, impl->sd_,
+                             impl->muxer_, impl->ssl_, impl->mask_);
+
     if ((AUG_FDEVENTRD & aug_fdevents(impl->muxer_, impl->sd_))) {
 
-        aug_sd sd;
         struct aug_endpoint ep;
-        int est;
 
         if (aug_setfdeventmask(impl->muxer_, impl->sd_, 0) < 0
-            || AUG_BADSD == (sd = aug_tryconnect(impl->client_, &ep, &est))
-            || aug_setfdeventmask(impl->muxer_, sd, AUG_FDEVENTRD) < 0)
+            || AUG_BADSD == (impl->sd_ = aug_tryconnect(impl->client_, &ep,
+                                                        &impl->est_)))
             return NULL;
 
-        if (est) {
+        if (impl->est_)
+            return createclient_(ob, cb, impl->mpool_, impl->id_, impl->sd_,
+                                 impl->muxer_, impl->ssl_, impl->mask_);
 
-            ob = aug_createplain(impl->mpool_, sd, impl->muxer_);
+        /* Not yet established. */
 
-            /* Transfer event mask to new object. */
-
-            aug_seteventmask(ob, impl->mask_);
-        }
-
+        aug_setfdeventmask(impl->muxer_, sd, AUG_FDEVENTRD);
         impl->sd_ = sd;
     }
 
@@ -128,18 +193,18 @@ cchannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 }
 
 static aug_result
-cchannelob_setnonblock_(aug_channelob* ob, aug_bool on)
-{
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
-    return aug_ssetnonblock(impl->sd_, on);
-}
-
-static aug_result
 cchannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
     impl->mask_ = mask;
     return AUG_SUCCESS;
+}
+
+static unsigned
+cchannelob_getid_(aug_channelob* ob)
+{
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
+    return impl->id_;
 }
 
 static int
@@ -161,8 +226,8 @@ static const struct aug_channelobvtbl cchannelobvtbl_ = {
     cchannelob_release_,
     cchannelob_close_,
     cchannelob_process_,
-    cchannelob_setnonblock_,
     cchannelob_seteventmask_,
+    cchannelob_getid_,
     cchannelob_eventmask_,
     cchannelob_events_
 };
@@ -171,8 +236,10 @@ struct simpl_ {
     aug_channelob channelob_;
     int refs_;
     aug_mpool* mpool_;
+    unsigned id_;
     aug_sd sd_;
     aug_muxer_t muxer_;
+    struct ssl_st* ssl_;
     unsigned short mask_;
 };
 
@@ -252,35 +319,60 @@ schannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 
         aug_sd sd;
         struct aug_endpoint ep;
+        aug_channelob* channelob;
+        aug_streamob* streamob;
+        unsigned id;
 
-        if (AUG_BADSD != (sd = aug_accept(impl->sd_, &ep))) {
-
-            ob = aug_createplain(impl->mpool_, sd, impl->muxer_);
-
-            /* Transfer event mask to new object. */
-
-            aug_seteventmask(ob, impl->mask_);
-
-            *fork = AUG_TRUE;
-
-        } else {
+        if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
 
             if (!aug_acceptlost())
                 return NULL; /* Error. */
 
-            aug_ctxwarn(aug_tlx, "accept() failed: %s", aug_tlerr->desc_);
+            aug_ctxwarn(aug_tlx, "aug_accept() failed: %s", aug_tlerr->desc_);
+            goto done;
         }
+
+        if (-1 == aug_ssetnonblock(sd, AUG_TRUE)) {
+            aug_ctxwarn(aug_tlx, "aug_ssetnonblock() failed: %s",
+                        aug_tlerr->desc_);
+            aug_sclose(sd);
+            goto done;
+        }
+
+        id = aug_nextid();
+
+        channelob = impl->ssl_
+            ? aug_createsslserver(impl->mpool_, impl->id_, sd,
+                                  impl->muxer_, impl->ssl_)
+            : aug_createplain(impl->mpool_, impl->id_, sd, impl->muxer_);
+
+        /* Transfer event mask to new object. */
+
+        aug_seteventmask(channelob, impl->mask_);
+
+        streamob = aug_cast(ob, aug_streamobid);
+
+        /* Zero events indicates new connection. */
+
+        if (!safecb_(ob, cb, id, streamob, 0)) {
+
+            /* Rejected: socket will be closed on release. */
+
+            aug_release(streamob);
+            aug_release(channelob);
+            goto done;
+        }
+
+        /* Newly established connection. */
+
+        *fork = AUG_TRUE;
+        aug_release(streamob);
+        return channelob;
     }
 
+ done:
     sretain_(impl);
     return ob;
-}
-
-static aug_result
-schannelob_setnonblock_(aug_channelob* ob, aug_bool on)
-{
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
-    return aug_ssetnonblock(impl->sd_, on);
 }
 
 static aug_result
@@ -289,6 +381,13 @@ schannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
     impl->mask_ = mask;
     return AUG_SUCCESS;
+}
+
+static unsigned
+schannelob_getid_(aug_channelob* ob)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    return impl->id_;
 }
 
 static int
@@ -310,8 +409,8 @@ static const struct aug_channelobvtbl schannelobvtbl_ = {
     schannelob_release_,
     schannelob_close_,
     schannelob_process_,
-    schannelob_setnonblock_,
     schannelob_seteventmask_,
+    schannelob_getid_,
     schannelob_eventmask_,
     schannelob_events_
 };
@@ -321,6 +420,7 @@ struct pimpl_ {
     aug_streamob streamob_;
     int refs_;
     aug_mpool* mpool_;
+    unsigned id_;
     aug_sd sd_;
     aug_muxer_t muxer_;
 };
@@ -401,23 +501,11 @@ pchannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
     int events = aug_fdevents(impl->muxer_, impl->sd_);
 
-    /* Lock here to prevent release during callback. */
+    if (events < 0 || !safecb_(ob, cb, impl->id_, &impl->streamob_, events))
+        return NULL;
 
     pretain_(impl);
-
-    if (events < 0 || !cb(&impl->streamob_, events)) {
-        prelease_(impl);
-        return NULL;
-    }
-
     return ob;
-}
-
-static aug_result
-pchannelob_setnonblock_(aug_channelob* ob, aug_bool on)
-{
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
-    return aug_ssetnonblock(impl->sd_, on);
 }
 
 static aug_result
@@ -425,6 +513,13 @@ pchannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
     return aug_setfdeventmask(impl->muxer_, impl->sd_, mask);
+}
+
+static unsigned
+pchannelob_getid_(aug_channelob* ob)
+{
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
+    return impl->id_;
 }
 
 static int
@@ -447,8 +542,8 @@ static const struct aug_channelobvtbl pchannelobvtbl_ = {
     pchannelob_release_,
     pchannelob_close_,
     pchannelob_process_,
-    pchannelob_setnonblock_,
     pchannelob_seteventmask_,
+    pchannelob_getid_,
     pchannelob_eventmask_,
     pchannelob_events_
 };
@@ -522,12 +617,13 @@ static const struct aug_streamobvtbl pstreamobvtbl_ = {
 
 AUGNET_API aug_channelob*
 aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
-                 aug_muxer_t muxer)
+                 aug_muxer_t muxer, struct ssl_st* ssl)
 {
     aug_tcpclient_t client;
     aug_sd sd;
     struct aug_endpoint ep;
     int est;
+    unsigned id;
     struct cimpl_* impl;
 
     if (!(client = aug_createtcpclient(host, serv)))
@@ -536,13 +632,19 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     if (AUG_BADSD == (sd = aug_tryconnect(client, &ep, &est)))
         goto fail1;
 
-    if (est) {
-        aug_destroytcpclient(client);
-        return aug_createplain(mpool, sd, muxer);
-    }
+    if (est)
+        return createclient_(ob, cb, mpool, id, sd,
+                             impl->muxer_, impl->ssl_, impl->mask_);
 
-    if (aug_setfdeventmask(muxer, sd, AUG_FDEVENTRD) < 0)
-        goto fail1;
+    if (est) {
+
+        aug_setnowait(impl->muxer_, 1);
+
+    } else {
+
+        if (aug_setfdeventmask(muxer, sd, AUG_FDEVENTRD) < 0)
+            goto fail1;
+    }
 
     if (!(impl = aug_malloc(mpool, sizeof(struct cimpl_))))
         goto fail2;
@@ -551,8 +653,10 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     impl->channelob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->muxer_ = muxer;
+    impl->id_ = aug_nextid();
     impl->client_ = client;
+    impl->muxer_ = muxer;
+    impl->ssl_ = ssl;
     impl->sd_ = sd;
     impl->mask_ = 0;
 
@@ -568,7 +672,8 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 }
 
 AUGNET_API aug_channelob*
-aug_createserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer)
+aug_createserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer,
+                 struct ssl_st* ssl)
 {
     struct simpl_* impl = aug_malloc(mpool, sizeof(struct simpl_));
     if (!impl)
@@ -578,8 +683,10 @@ aug_createserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer)
     impl->channelob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
+    impl->id_ = aug_nextid();
     impl->sd_ = sd;
     impl->muxer_ = muxer;
+    impl->ssl_ = ssl;
     impl->mask_ = 0;
 
     aug_retain(mpool);
@@ -587,7 +694,7 @@ aug_createserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer)
 }
 
 AUGNET_API aug_channelob*
-aug_createplain(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer)
+aug_createplain(aug_mpool* mpool, unsigned id, aug_sd sd, aug_muxer_t muxer)
 {
     struct pimpl_* impl = aug_malloc(mpool, sizeof(struct pimpl_));
     if (!impl)
@@ -599,6 +706,7 @@ aug_createplain(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer)
     impl->streamob_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
+    impl->id_ = id;
     impl->sd_ = sd;
     impl->muxer_ = muxer;
 

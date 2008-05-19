@@ -44,11 +44,8 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        autosd
-        do_release();
-
-        sdref
-        do_sd() const;
+        channelobptr
+        do_channelob() const;
 
         void
         do_send(const void* buf, size_t size, const timeval& now);

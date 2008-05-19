@@ -22,6 +22,16 @@ AUG_RCSID("$Id$");
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
 
+AUGCTX_API void
+aug_clearerrinfo(struct aug_errinfo* errinfo)
+{
+    errinfo->file_[0] = '\0';
+    errinfo->line_ = 0;
+    errinfo->src_[0] = '\0';
+    errinfo->num_ = 0;
+    errinfo->desc_[0] = '\0';
+}
+
 AUGCTX_API int
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                 const char* src, int num, const char* format, va_list args)

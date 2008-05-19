@@ -33,7 +33,7 @@ struct aug_fdtype {
  * @return Next id.
  */
 
-AUGSYS_API int
+AUGSYS_API unsigned
 aug_nextid(void);
 
 /**

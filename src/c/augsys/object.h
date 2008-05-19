@@ -13,7 +13,4 @@
 AUGSYS_API aug_channelob*
 aug_createfile(aug_mpool* mpool, aug_fd fd, aug_muxer_t muxer);
 
-AUGSYS_API aug_channelob*
-aug_createsocket(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer);
-
 #endif /* AUGSYS_OBJECT_H */

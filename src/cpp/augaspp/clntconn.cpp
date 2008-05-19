@@ -58,16 +58,10 @@ clntconn::do_session() const
     return conn_->session();
 }
 
-autosd
-clntconn::do_release()
+channelobptr
+clntconn::do_channelob() const
 {
-    return conn_->release();
-}
-
-sdref
-clntconn::do_sd() const
-{
-    return conn_->sd();
+    return conn_->channelob();
 }
 
 void
@@ -106,15 +100,14 @@ clntconn::do_process(unsigned short events, const timeval& now)
         // writing then set the write event-mask.
 
         if (!buffer_.empty())
-            ; // FIXME: replace setnbeventmask() call.
-        //setnbeventmask(conn_->sd(), AUG_FDEVENTRDWR);
+            seteventmask(conn_->channelob(), AUG_FDEVENTRDWR);
 
         AUG_CTXDEBUG2(aug_tlx,
                       "connection now established, assuming new state");
 
-        autosd sd(conn_->release());
+        channelobptr ob(conn_->channelob());
         conn_ = connptr(new aug::connected
-                        (conn_->session(), sock_, buffer_, rwtimer_, sd,
+                        (conn_->session(), sock_, buffer_, rwtimer_, ob,
                          conn_->peername(), true));
     }
 
@@ -168,9 +161,9 @@ clntconn::clntconn(const sessionptr& session, void* user, timers& timers,
         AUG_CTXDEBUG2(aug_tlx,
                       "connection now established, assuming new state");
 
-        autosd sd(conn_->release());
+        channelobptr ob(conn_->channelob());
         conn_ = connptr(new aug::connected
-                        (conn_->session(), sock_, buffer_, rwtimer_, sd,
+                        (conn_->session(), sock_, buffer_, rwtimer_, ob,
                          conn_->peername(), true));
     }
 }
