@@ -146,11 +146,10 @@ namespace aug {
                 perrinfo(aug_tlx, "aug_destroymarparser() failed");
         }
 
-        marparser(unsigned size, const aug_marhandler& handler,
-                  aug_object* ob)
+        marparser(unsigned size, const aug_marhandler& handler, objectref ob)
         {
             verify(marparser_
-                   = aug_createmarparser(size, &handler, ob));
+                   = aug_createmarparser(size, &handler, ob.get()));
         }
 
         marparser(unsigned size, const aug_marhandler& handler, const null_&)

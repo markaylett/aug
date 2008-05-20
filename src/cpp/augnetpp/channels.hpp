@@ -1,21 +1,22 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGUTILPP_CHANNEL_HPP
-#define AUGUTILPP_CHANNEL_HPP
+#ifndef AUGNETPP_CHANNELS_HPP
+#define AUGNETPP_CHANNELS_HPP
 
 #include "augsyspp/exception.hpp"
 
-#include "augutil/channels.h"
+#include "augnet/channels.h"
 
 namespace aug {
 
-    template <bool (*T)(aug::channelobref)>
+    template <bool (*T)(unsigned, aug::streamobref, unsigned short)>
     aug_bool
-    channelcb(aug_channelob* ob) AUG_NOTHROW
+    channelcb(unsigned id, aug_streamob* streamob,
+              unsigned short events) AUG_NOTHROW
     {
         try {
-            return T(ob) ? AUG_TRUE : AUG_FALSE;
+            return T(id, streamob, events) ? AUG_TRUE : AUG_FALSE;
         } AUG_SETERRINFOCATCH;
 
         /**
@@ -41,8 +42,8 @@ namespace aug {
         }
 
         explicit
-        channels(aug_mpool* mpool)
-            : channels_(aug_createchannels(mpool))
+        channels(mpoolref mpool)
+            : channels_(aug_createchannels(mpool.get()))
         {
             verify(channels_);
         }
@@ -60,15 +61,15 @@ namespace aug {
     };
 
     inline void
-    insertchannel(aug_channels_t channels, aug::obref<aug_channelob> ob)
+    insertchannel(aug_channels_t channels, channelobref channelob)
     {
-        verify(aug_insertchannel(channels, ob.get()));
+        verify(aug_insertchannel(channels, channelob.get()));
     }
 
     inline bool
-    removechannel(aug_channels_t channels, aug::obref<aug_channelob> ob)
+    removechannel(aug_channels_t channels, unsigned id)
     {
-        return AUG_FAILNONE == verify(aug_removechannel(channels, ob.get()))
+        return AUG_FAILNONE == verify(aug_removechannel(channels, id))
             ? false : true;
     }
 
@@ -85,4 +86,4 @@ namespace aug {
     }
 }
 
-#endif // AUGUTILPP_CHANNEL_HPP
+#endif // AUGNETPP_CHANNELS_HPP

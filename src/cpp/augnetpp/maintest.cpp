@@ -16,11 +16,6 @@ namespace {
         base64cb(const char* buf, size_t len)
         {
         }
-        bool
-        filecb(int fd)
-        {
-            return true;
-        }
     };
 
     struct httphandler {
@@ -57,15 +52,11 @@ namespace {
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
-    aug_atexitinit(&errinfo);
-
     try {
+        start();
+
         callbacks cbs;
         base64 b64(AUG_ENCODE64, cbs);
-
-        files fs;
-        insertfile(fs, 0, cbs);
 
         httphandler x;
         httpparser hparser(1024, x);

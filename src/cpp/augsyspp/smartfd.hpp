@@ -112,8 +112,8 @@ namespace aug {
             {
             }
         };
-        autoclose_proxy<traitsT> first_;
-        autoclose_proxy<traitsT> second_;
+        autoclose<traitsT> first_;
+        autoclose<traitsT> second_;
     public:
         autoclose2(basic_ref<traitsT> first, basic_ref<traitsT> second,
                    void (*close)(basic_ref<traitsT>))

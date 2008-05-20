@@ -40,9 +40,9 @@ namespace aug {
      */
 
     inline aug_result
-    perrinfo(aug_ctx* ctx, const char* s) AUG_NOTHROW
+    perrinfo(ctxref ctx, const char* s) AUG_NOTHROW
     {
-        return aug_perrinfo(ctx, s, NULL);
+        return aug_perrinfo(ctx.get(), s, NULL);
     }
 
     /**
@@ -56,10 +56,10 @@ namespace aug {
      */
 
     inline aug_result
-    perrinfo(aug_ctx* ctx, const char* s,
+    perrinfo(ctxref ctx, const char* s,
              const struct aug_errinfo& errinfo) AUG_NOTHROW
     {
-        return aug_perrinfo(ctx, s, &errinfo);
+        return aug_perrinfo(ctx.get(), s, &errinfo);
     }
 
     /**

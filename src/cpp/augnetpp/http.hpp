@@ -181,10 +181,10 @@ namespace aug {
         }
 
         httpparser(unsigned size, const aug_httphandler& handler,
-                   aug_object* ob)
+                   objectref ob)
         {
             verify(httpparser_
-                   = aug_createhttpparser(size, &handler, ob));
+                   = aug_createhttpparser(size, &handler, ob.get()));
         }
 
         httpparser(unsigned size, const aug_httphandler& handler,

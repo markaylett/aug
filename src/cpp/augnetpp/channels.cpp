@@ -1,6 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGUTILPP_BUILD
+#define AUGNETPP_BUILD
 
-#include "augutilpp/file.hpp"
+#include "augnetpp/channels.hpp"

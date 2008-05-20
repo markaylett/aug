@@ -51,8 +51,8 @@ namespace aug {
         }
 
         explicit
-        hires(aug_mpool* mpool)
-            : hires_(aug_createhires(mpool))
+        hires(mpoolref mpool)
+            : hires_(aug_createhires(mpool.get()))
         {
             verify(hires_);
         }

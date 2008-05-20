@@ -6,7 +6,6 @@
 
 #include "augutil.h"
 
-#include "augutilpp/channels.hpp"
 #include "augutilpp/clock.hpp"
 #include "augutilpp/conv.hpp"
 #include "augutilpp/event.hpp"
