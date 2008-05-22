@@ -13,7 +13,7 @@ modinclude_HEADERS = \
 	netevent.h \
 	object.h \
 	ssl.h \
-	tcpclient.h \
+	tcpconnect.h \
 	types.h \
 	writer.h
 
@@ -33,7 +33,7 @@ libaugnet_la_SOURCES = \
 	netevent.c \
 	object.c \
 	ssl.c \
-	tcpclient.c \
+	tcpconnect.c \
 	types.c \
 	writer.c
 

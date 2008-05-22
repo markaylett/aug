@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 check_PROGRAMS = base64test$(EXEEXT) channelstest$(EXEEXT) \
-	maintest$(EXEEXT) tcpclienttest$(EXEEXT)
+	maintest$(EXEEXT) tcpconnecttest$(EXEEXT)
 subdir = src/cpp/augnetpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -57,7 +57,7 @@ libaugnetpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugnetpp_la_OBJECTS = base64.lo channels.lo config.lo http.lo \
-	inet.lo mar.lo object.lo tcpclient.lo writer.lo
+	inet.lo mar.lo object.lo tcpconnect.lo writer.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
 am_base64test_OBJECTS = base64test.$(OBJEXT)
 base64test_OBJECTS = $(am_base64test_OBJECTS)
@@ -83,9 +83,9 @@ maintest_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_tcpclienttest_OBJECTS = tcpclienttest.$(OBJEXT)
-tcpclienttest_OBJECTS = $(am_tcpclienttest_OBJECTS)
-tcpclienttest_DEPENDENCIES =  \
+am_tcpconnecttest_OBJECTS = tcpconnecttest.$(OBJEXT)
+tcpconnecttest_OBJECTS = $(am_tcpconnecttest_OBJECTS)
+tcpconnecttest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -103,10 +103,10 @@ CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugnetpp_la_SOURCES) $(base64test_SOURCES) \
 	$(channelstest_SOURCES) $(maintest_SOURCES) \
-	$(tcpclienttest_SOURCES)
+	$(tcpconnecttest_SOURCES)
 DIST_SOURCES = $(libaugnetpp_la_SOURCES) $(base64test_SOURCES) \
 	$(channelstest_SOURCES) $(maintest_SOURCES) \
-	$(tcpclienttest_SOURCES)
+	$(tcpconnecttest_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -255,7 +255,7 @@ modinclude_HEADERS = \
 	inet.hpp \
 	mar.hpp \
 	object.hpp \
-	tcpclient.hpp \
+	tcpconnect.hpp \
 	writer.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -267,7 +267,7 @@ libaugnetpp_la_SOURCES = \
 	inet.cpp \
 	mar.cpp \
 	object.cpp \
-	tcpclient.cpp \
+	tcpconnect.cpp \
 	writer.cpp
 
 libaugnetpp_la_LDFLAGS = \
@@ -283,7 +283,7 @@ TESTS = \
 	base64test \
 	channelstest \
 	maintest \
-	tcpclienttest
+	tcpconnecttest
 
 base64test_SOURCES = base64test.cpp
 base64test_LDADD = \
@@ -309,8 +309,8 @@ maintest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-tcpclienttest_SOURCES = tcpclienttest.cpp
-tcpclienttest_LDADD = \
+tcpconnecttest_SOURCES = tcpconnecttest.cpp
+tcpconnecttest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -377,9 +377,9 @@ channelstest$(EXEEXT): $(channelstest_OBJECTS) $(channelstest_DEPENDENCIES)
 maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
 	@rm -f maintest$(EXEEXT)
 	$(CXXLINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
-tcpclienttest$(EXEEXT): $(tcpclienttest_OBJECTS) $(tcpclienttest_DEPENDENCIES) 
-	@rm -f tcpclienttest$(EXEEXT)
-	$(CXXLINK) $(tcpclienttest_LDFLAGS) $(tcpclienttest_OBJECTS) $(tcpclienttest_LDADD) $(LIBS)
+tcpconnecttest$(EXEEXT): $(tcpconnecttest_OBJECTS) $(tcpconnecttest_DEPENDENCIES) 
+	@rm -f tcpconnecttest$(EXEEXT)
+	$(CXXLINK) $(tcpconnecttest_LDFLAGS) $(tcpconnecttest_OBJECTS) $(tcpconnecttest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -397,8 +397,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpclient.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpclienttest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpconnect.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpconnecttest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Plo@am__quote@
 
 .cpp.o:

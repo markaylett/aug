@@ -162,17 +162,6 @@ channelob_eventmask_(aug_channelob* ob)
 #endif /* _WIN32 */
 }
 
-static int
-channelob_events_(aug_channelob* ob)
-{
-#if !defined(_WIN32)
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-    return aug_fdevents(impl->muxer_, impl->fd_);
-#else /* _WIN32 */
-    return 0;
-#endif /* _WIN32 */
-}
-
 static const struct aug_channelobvtbl channelobvtbl_ = {
     channelob_cast_,
     channelob_retain_,
@@ -181,8 +170,7 @@ static const struct aug_channelobvtbl channelobvtbl_ = {
     channelob_process_,
     channelob_seteventmask_,
     channelob_getid_,
-    channelob_eventmask_,
-    channelob_events_
+    channelob_eventmask_
 };
 
 static void*

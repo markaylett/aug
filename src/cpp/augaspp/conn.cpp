@@ -372,7 +372,7 @@ handshake::do_process(unsigned short events, const timeval& now)
     try {
 
         bool est;
-        sd_ = tryconnect(connector_, endpoint_, est);
+        sd_ = tcpconnect(connector_, endpoint_, est);
 
         // Check to see if connection was established.
 
@@ -447,6 +447,6 @@ handshake::handshake(const sessionptr& session, mod_handle& sock,
       state_(CLOSED)
 {
     bool est;
-    sd_ = tryconnect(connector_, endpoint_, est);
+    sd_ = tcpconnect(connector_, endpoint_, est);
     state_ = est ? CONNECTED : HANDSHAKE;
 }

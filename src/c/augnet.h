@@ -20,7 +20,7 @@
 #include "augnet/netevent.h"
 #include "augnet/object.h"
 #include "augnet/ssl.h"
-#include "augnet/tcpclient.h"
+#include "augnet/tcpconnect.h"
 #include "augnet/types.h"
 #include "augnet/writer.h"
 

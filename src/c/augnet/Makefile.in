@@ -66,7 +66,7 @@ libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugnet_la_OBJECTS = auth.lo base64.lo channels.lo config.lo \
 	fix.lo http.lo inet.lo mar.lo netevent.lo object.lo ssl.lo \
-	tcpclient.lo types.lo writer.lo
+	tcpconnect.lo types.lo writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_channelstest_OBJECTS = channelstest.$(OBJEXT)
 channelstest_OBJECTS = $(am_channelstest_OBJECTS)
@@ -226,7 +226,7 @@ modinclude_HEADERS = \
 	netevent.h \
 	object.h \
 	ssl.h \
-	tcpclient.h \
+	tcpconnect.h \
 	types.h \
 	writer.h
 
@@ -244,7 +244,7 @@ libaugnet_la_SOURCES = \
 	netevent.c \
 	object.c \
 	ssl.c \
-	tcpclient.c \
+	tcpconnect.c \
 	types.c \
 	writer.c
 
@@ -369,7 +369,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netevent.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpclient.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpconnect.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Plo@am__quote@
 

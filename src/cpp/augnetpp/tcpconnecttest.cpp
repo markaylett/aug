@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augnetpp/tcpclient.hpp"
+#include "augnetpp/tcpconnect.hpp"
 
 #include "augsyspp/base.hpp"
 #include "augsyspp/endpoint.hpp"
@@ -23,10 +23,10 @@ main(int argc, char* argv[])
         start();
 
         endpoint ep(null);
-        tcpclient client("127.0.0.1", "10000");
+        tcpconnect conn("127.0.0.1", "10000");
 
         bool est(false);
-        autosd sd(tryconnect(client, ep, est));
+        autosd sd(tcpconnect(conn, ep, est));
         if (!est) {
 
             muxer mux;
@@ -37,14 +37,14 @@ main(int argc, char* argv[])
             // thrown.
 
             try {
-                sd = tryconnect(client, ep, est);
+                sd = tcpconnect(client, ep, est);
             } catch (...) {
                 if (ECONNREFUSED == aug_errno())
                     return 0;
                 throw;
             }
         }
-        throw error("error not thrown by tryconnect()");
+        throw error("error not thrown by tcpconnect()");
 
     } AUG_PERRINFOCATCH;
     return 1;

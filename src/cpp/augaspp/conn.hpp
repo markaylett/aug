@@ -190,7 +190,7 @@ namespace aug {
         sessionptr session_;
         mod_handle& sock_;
         buffer& buffer_;
-        tcpclient client_;
+        tcpconnect conn_;
         channelobptr channelob_;
         endpoint endpoint_;
         sockstate state_;

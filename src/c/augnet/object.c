@@ -8,7 +8,7 @@
 AUG_RCSID("$Id$");
 
 #include "augnet/ssl.h"
-#include "augnet/tcpclient.h"
+#include "augnet/tcpconnect.h"
 
 #include "augsys/base.h" /* aug_nextid() */
 
@@ -46,7 +46,7 @@ struct cimpl_ {
     int refs_;
     aug_mpool* mpool_;
     unsigned id_;
-    aug_tcpclient_t client_;
+    aug_tcpconnect_t conn_;
     aug_muxer_t muxer_;
     struct ssl_st* ssl_;
     aug_sd sd_;
@@ -78,7 +78,7 @@ establish_(struct cimpl_* impl, aug_channelcb_t cb)
         return NULL;
     }
 
-    /* Transfer event mask from parent channel. */
+    /* Transfer event mask to established channel. */
 
     aug_seteventmask(channelob, impl->mask_);
 
@@ -134,7 +134,7 @@ crelease_(struct cimpl_* impl)
         aug_mpool* mpool = impl->mpool_;
         if (AUG_BADSD != impl->sd_)
             cclose_(impl);
-        aug_destroytcpclient(impl->client_);
+        aug_destroytcpconnect(impl->conn_);
         aug_free(mpool, impl);
         aug_release(mpool);
     }
@@ -191,7 +191,7 @@ cchannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
            establish connection. */
 
         if (aug_setfdeventmask(impl->muxer_, impl->sd_, 0) < 0
-            || AUG_BADSD == (impl->sd_ = aug_tryconnect(impl->client_, &ep,
+            || AUG_BADSD == (impl->sd_ = aug_tcpconnect(impl->conn_, &ep,
                                                         &impl->est_)))
             return NULL;
 
@@ -203,7 +203,8 @@ cchannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
             return establish_(impl, cb);
         }
 
-        /* Not yet established. */
+        /* Not yet established: set mask to poll for connection
+           establishment. */
 
         aug_setfdeventmask(impl->muxer_, impl->sd_, AUG_FDEVENTCONN);
     }
@@ -216,6 +217,9 @@ static aug_result
 cchannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
+
+    /* Mask will be set once the connection is established. */
+
     impl->mask_ = mask;
     return AUG_SUCCESS;
 }
@@ -234,12 +238,6 @@ cchannelob_eventmask_(aug_channelob* ob)
     return impl->mask_;
 }
 
-static int
-cchannelob_events_(aug_channelob* ob)
-{
-    return 0;
-}
-
 static const struct aug_channelobvtbl cchannelobvtbl_ = {
     cchannelob_cast_,
     cchannelob_retain_,
@@ -248,8 +246,7 @@ static const struct aug_channelobvtbl cchannelobvtbl_ = {
     cchannelob_process_,
     cchannelob_seteventmask_,
     cchannelob_getid_,
-    cchannelob_eventmask_,
-    cchannelob_events_
+    cchannelob_eventmask_
 };
 
 struct simpl_ {
@@ -374,6 +371,10 @@ schannelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
             goto done;
         }
 
+        /* Transfer event mask to established channel. */
+
+        aug_seteventmask(channelob, impl->mask_);
+
         streamob = aug_cast(ob, aug_streamobid);
 
         /* Zero events indicates new connection. */
@@ -403,6 +404,9 @@ static aug_result
 schannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+
+    /* Mask will be set for each subsequently accepted connection. */
+
     impl->mask_ = mask;
     return AUG_SUCCESS;
 }
@@ -421,12 +425,6 @@ schannelob_eventmask_(aug_channelob* ob)
     return impl->mask_;
 }
 
-static int
-schannelob_events_(aug_channelob* ob)
-{
-    return 0;
-}
-
 static const struct aug_channelobvtbl schannelobvtbl_ = {
     schannelob_cast_,
     schannelob_retain_,
@@ -435,8 +433,7 @@ static const struct aug_channelobvtbl schannelobvtbl_ = {
     schannelob_process_,
     schannelob_seteventmask_,
     schannelob_getid_,
-    schannelob_eventmask_,
-    schannelob_events_
+    schannelob_eventmask_
 };
 
 struct pimpl_ {
@@ -555,13 +552,6 @@ pchannelob_eventmask_(aug_channelob* ob)
     return aug_fdeventmask(impl->muxer_, impl->sd_);
 }
 
-static int
-pchannelob_events_(aug_channelob* ob)
-{
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
-    return aug_fdevents(impl->muxer_, impl->sd_);
-}
-
 static const struct aug_channelobvtbl pchannelobvtbl_ = {
     pchannelob_cast_,
     pchannelob_retain_,
@@ -570,8 +560,7 @@ static const struct aug_channelobvtbl pchannelobvtbl_ = {
     pchannelob_process_,
     pchannelob_seteventmask_,
     pchannelob_getid_,
-    pchannelob_eventmask_,
-    pchannelob_events_
+    pchannelob_eventmask_
 };
 
 static void*
@@ -645,26 +634,28 @@ AUGNET_API aug_channelob*
 aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
                  aug_muxer_t muxer, struct ssl_st* ssl)
 {
-    aug_tcpclient_t client;
+    aug_tcpconnect_t conn;
     aug_sd sd;
     struct aug_endpoint ep;
     int est;
     struct cimpl_* impl;
 
-    if (!(client = aug_createtcpclient(host, serv)))
+    if (!(conn = aug_createtcpconnect(host, serv)))
         return NULL;
 
-    if (AUG_BADSD == (sd = aug_tryconnect(client, &ep, &est)))
+    if (AUG_BADSD == (sd = aug_tcpconnect(conn, &ep, &est)))
         goto fail1;
 
     if (est) {
 
-        /* Now established.  Force multiplexer to return so that establishment
-           can be finalised in process() function. */
+        /* Now established.  Force multiplexer to return immediately so that
+           establishment can be finalised in process() function. */
 
         aug_setnowait(impl->muxer_, 1);
 
     } else {
+
+        /* Set mask to poll for connection establishment. */
 
         if (aug_setfdeventmask(muxer, sd, AUG_FDEVENTCONN) < 0)
             goto fail1;
@@ -678,7 +669,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     impl->refs_ = 1;
     impl->mpool_ = mpool;
     impl->id_ = aug_nextid();
-    impl->client_ = client;
+    impl->conn_ = conn;
     impl->muxer_ = muxer;
     impl->ssl_ = ssl;
     impl->sd_ = sd;
@@ -692,7 +683,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     aug_setfdeventmask(muxer, sd, 0);
 
  fail1:
-    aug_destroytcpclient(client);
+    aug_destroytcpconnect(conn);
     return NULL;
 }
 

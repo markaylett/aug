@@ -9,7 +9,7 @@ modinclude_HEADERS = \
 	inet.hpp \
 	mar.hpp \
 	object.hpp \
-	tcpclient.hpp \
+	tcpconnect.hpp \
 	writer.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
@@ -22,7 +22,7 @@ libaugnetpp_la_SOURCES = \
 	inet.cpp \
 	mar.cpp \
 	object.cpp \
-	tcpclient.cpp \
+	tcpconnect.cpp \
 	writer.cpp
 
 libaugnetpp_la_LDFLAGS = \
@@ -38,13 +38,13 @@ check_PROGRAMS = \
 	base64test \
 	channelstest \
 	maintest \
-	tcpclienttest
+	tcpconnecttest
 
 TESTS = \
 	base64test \
 	channelstest \
 	maintest \
-	tcpclienttest
+	tcpconnecttest
 
 base64test_SOURCES = base64test.cpp
 base64test_LDADD = \
@@ -70,8 +70,8 @@ maintest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-tcpclienttest_SOURCES = tcpclienttest.cpp
-tcpclienttest_LDADD = \
+tcpconnecttest_SOURCES = tcpconnecttest.cpp
+tcpconnecttest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \

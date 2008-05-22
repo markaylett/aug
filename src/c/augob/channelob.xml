@@ -26,8 +26,6 @@
 
     <method name="eventmask" type="int" qname="eventmask"/>
 
-    <method name="events" type="int" qname="events"/>
-
   </interface>
 
 </package>

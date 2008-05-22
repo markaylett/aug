@@ -567,13 +567,6 @@ ceventmask_(aug_channelob* ob)
     return impl->mask_;
 }
 
-static int
-cevents_(aug_channelob* ob)
-{
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-    return userevents_(impl);
-}
-
 static const struct aug_channelobvtbl fvtbl_ = {
     ccast_,
     cretain_,
@@ -582,8 +575,7 @@ static const struct aug_channelobvtbl fvtbl_ = {
     cprocess_,
     cseteventmask_,
     cgetid_,
-    ceventmask_,
-    cevents_
+    ceventmask_
 };
 
 static void*

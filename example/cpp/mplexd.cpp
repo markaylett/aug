@@ -39,8 +39,8 @@ namespace test {
         } else if (0 == aug_strcasecmp(name, "loglevel")) {
 
             unsigned level(strtoui(value, 10));
-            aug_info("setting log level: %d", level);
-            aug_setloglevel(level);
+            aug_ctxinfo(aug_tlx, "setting log level: %d", level);
+            setloglevel(aug_tlx, level);
 
         } else if (0 == aug_strcasecmp(name, "logfile")) {
 
@@ -76,17 +76,17 @@ namespace test {
         if (daemon_)
             openlog(logfile_);
 
-        aug_info("run directory: %s", rundir_);
-        aug_info("pid file: %s", pidfile_);
-        aug_info("log file: %s", logfile_);
-        aug_info("log level: %d", aug_loglevel());
+        aug_ctxinfo(aug_tlx, "run directory: %s", rundir_);
+        aug_ctxinfo(aug_tlx, "pid file: %s", pidfile_);
+        aug_ctxinfo(aug_tlx, "log file: %s", logfile_);
+        aug_ctxinfo(aug_tlx, "log level: %d", aug_loglevel());
     }
 
     void
     readconf(const char* conffile, bool batch, bool daemon)
     {
         if (conffile) {
-            aug_info("reading: %s", conffile);
+            aug_ctxinfo(aug_tlx, "reading: %s", conffile);
             readconf(conffile, aug::confcb<confcb>, null);
             aug_strlcpy(conffile_, conffile, sizeof(conffile_));
         }
@@ -153,7 +153,7 @@ namespace test {
     struct session {
 
         muxer& muxer_;
-        smartfd sfd_;
+        autosd sd_;
         timer timer_;
         buffer buffer_;
         int heartbeats_;
@@ -161,12 +161,12 @@ namespace test {
         ~session() AUG_NOTHROW
         {
             try {
-                setfdeventmask(muxer_, sfd_, 0);
+                setfdeventmask(muxer_, sd_, 0);
             } AUG_PERRINFOCATCH;
         }
-        session(muxer& muxer, const smartfd& sfd, timers& timers)
+        session(muxer& muxer, autosd& sd, timers& timers)
             : muxer_(muxer),
-              sfd_(sfd),
+              sd_(sd),
               timer_(timers, null),
               heartbeats_(0)
         {
@@ -177,13 +177,13 @@ namespace test {
         {
             ms = 0; // Cancel.
 
-            aug_info("timeout");
+            aug_ctxinfo(aug_tlx, "timeout");
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
-                setfdeventmask(muxer_, sfd_, AUG_FDEVENTRDWR);
+                setfdeventmask(muxer_, sd_, AUG_FDEVENTRDWR);
             } else
-                shutdown(sfd_, SHUT_RDWR);
+                shutdown(sd_, SHUT_RDWR);
         }
     };
 
@@ -191,20 +191,22 @@ namespace test {
 
     struct state {
 
-        files files_;
+        channels channels_;
         timers timers_;
         muxer muxer_;
-        smartfd sfd_;
-        map<int, sessionptr> sfds_;
+        autosd sd_;
+        map<int, sessionptr> sds_;
 
-        state(aug_filecb_t cb, obref<aug_object> ob)
-            : sfd_(null)
+        state(aug_channelcb_t cb, obref<aug_object> ob)
+            : channels_(getmpool(aug_tlx)),
+              sd_(null)
         {
             aug_hostserv hostserv;
             parsehostserv(address_, hostserv);
 
             endpoint ep(null);
-            smartfd sfd(tcplisten(hostserv.host_, hostserv.serv_, ep));
+            autosd sd(tcplisten(hostserv.host_, hostserv.serv_, ep));
+            setnonblock(sd, true);
 
             insertfile(files_, aug_eventrd(), cb, ob);
             setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);

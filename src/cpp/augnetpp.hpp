@@ -12,7 +12,7 @@
 #include "augnetpp/inet.hpp"
 #include "augnetpp/mar.hpp"
 #include "augnetpp/object.hpp"
-#include "augnetpp/tcpclient.hpp"
+#include "augnetpp/tcpconnect.hpp"
 #include "augnetpp/writer.hpp"
 
 #endif // AUGNETPP_HPP

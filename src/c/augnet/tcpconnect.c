@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGNET_BUILD
-#include "augnet/tcpclient.h"
+#include "augnet/tcpconnect.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
@@ -20,7 +20,7 @@ AUG_RCSID("$Id$");
 #include <assert.h>
 #include <stdlib.h>         /* malloc() */
 
-struct aug_tcpclient_ {
+struct aug_tcpconnect_ {
     struct addrinfo* res_, *save_;
     aug_sd sd_;
 };
@@ -35,10 +35,10 @@ getsockerr_(aug_sd sd, int* err)
     return 0;
 }
 
-AUGNET_API aug_tcpclient_t
-aug_createtcpclient(const char* host, const char* serv)
+AUGNET_API aug_tcpconnect_t
+aug_createtcpconnect(const char* host, const char* serv)
 {
-    aug_tcpclient_t client;
+    aug_tcpconnect_t conn;
     struct addrinfo hints, * res;
 
     bzero(&hints, sizeof(hints));
@@ -49,40 +49,40 @@ aug_createtcpclient(const char* host, const char* serv)
     if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
         return NULL;
 
-    if (!(client  = malloc(sizeof(struct aug_tcpclient_)))) {
+    if (!(conn  = malloc(sizeof(struct aug_tcpconnect_)))) {
         aug_destroyaddrinfo(res);
         aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    client->res_ = client->save_ = res;
-    client->sd_ = AUG_BADSD;
-    return client;
+    conn->res_ = conn->save_ = res;
+    conn->sd_ = AUG_BADSD;
+    return conn;
 }
 
 AUGNET_API int
-aug_destroytcpclient(aug_tcpclient_t client)
+aug_destroytcpconnect(aug_tcpconnect_t conn)
 {
-    if (AUG_BADSD != client->sd_)
-        aug_sclose(client->sd_);
+    if (AUG_BADSD != conn->sd_)
+        aug_sclose(conn->sd_);
 
-    aug_destroyaddrinfo(client->save_);
-    free(client);
+    aug_destroyaddrinfo(conn->save_);
+    free(conn);
     return 0;
 }
 
 AUGNET_API aug_sd
-aug_tryconnect(aug_tcpclient_t client, struct aug_endpoint* ep, int* est)
+aug_tcpconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 {
     /* FIXME: needs review against assumptions in object.c. */
 
-    aug_sd sd = client->sd_;
-    client->sd_ = AUG_BADSD;
+    aug_sd sd = conn->sd_;
+    conn->sd_ = AUG_BADSD;
 
     /* Handle case where user has called after all connection attempts have
        failed. */
 
-    if (!client->res_) {
+    if (!conn->res_) {
         assert(AUG_BADSD == sd);
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("address-list exhausted"));
@@ -107,14 +107,14 @@ aug_tryconnect(aug_tcpclient_t client, struct aug_endpoint* ep, int* est)
 
             /* Established. */
 
-            aug_getendpoint(client->res_, ep);
+            aug_getendpoint(conn->res_, ep);
             goto done;
 
         case AUG_FAILNONE:
 
             /* Not established. */
 
-            if ((client->res_ = client->res_->ai_next)) {
+            if ((conn->res_ = conn->res_->ai_next)) {
 
                 /* Try next address. */
 
@@ -144,8 +144,8 @@ aug_tryconnect(aug_tcpclient_t client, struct aug_endpoint* ep, int* est)
 
         /* Create socket for next address. */
 
-        sd = aug_socket(client->res_->ai_family, client->res_->ai_socktype,
-                        client->res_->ai_protocol);
+        sd = aug_socket(conn->res_->ai_family, conn->res_->ai_socktype,
+                        conn->res_->ai_protocol);
         if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
@@ -154,7 +154,7 @@ aug_tryconnect(aug_tcpclient_t client, struct aug_endpoint* ep, int* est)
             return AUG_BADSD;
         }
 
-        aug_getendpoint(client->res_, ep);
+        aug_getendpoint(conn->res_, ep);
 
         if (0 == aug_connect(sd, ep)) {
 
@@ -168,7 +168,7 @@ aug_tryconnect(aug_tcpclient_t client, struct aug_endpoint* ep, int* est)
             /* Connection pending. */
 
             *est = 0;
-            return client->sd_ = sd;
+            return conn->sd_ = sd;
         }
 
         /* Failed for other reason. */
@@ -176,7 +176,7 @@ aug_tryconnect(aug_tcpclient_t client, struct aug_endpoint* ep, int* est)
         if (-1 == aug_sclose(sd)) /* Ignore this one. */
             return -1;
 
-    } while ((client->res_ = client->res_->ai_next));
+    } while ((conn->res_ = conn->res_->ai_next));
 
     /* Error set from last aug_connect() attempt. */
 

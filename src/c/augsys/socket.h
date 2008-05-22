@@ -208,6 +208,8 @@ aug_getaddrinfo(const char* host, const char* serv,
 AUGSYS_API int
 aug_getfamily(aug_sd sd);
 
+/* FIXME: change to aug_bool. */
+
 AUGSYS_API int
 aug_setreuseaddr(aug_sd sd, int on);
 
