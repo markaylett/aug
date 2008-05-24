@@ -30,7 +30,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
  */
 
 AUGNET_API aug_channelob*
-aug_createserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer,
+aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
                  struct ssl_st* ssl);
 
 /**
@@ -41,6 +41,7 @@ aug_createserver(aug_mpool* mpool, aug_sd sd, aug_muxer_t muxer,
  */
 
 AUGNET_API aug_channelob*
-aug_createplain(aug_mpool* mpool, unsigned id, aug_sd sd, aug_muxer_t muxer);
+aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
+                unsigned short mask);
 
 #endif /* AUGNET_OBJECT_H */

@@ -4,19 +4,55 @@
 #ifndef AUGNETPP_CHANNELS_HPP
 #define AUGNETPP_CHANNELS_HPP
 
+#include "augutilpp/object.hpp"
+
 #include "augsyspp/exception.hpp"
 
 #include "augnet/channels.h"
 
 namespace aug {
 
-    template <bool (*T)(unsigned, aug::streamobref, unsigned short)>
+    template <bool (*T)(objectref, unsigned, streamobref, unsigned short)>
     aug_bool
-    channelcb(unsigned id, aug_streamob* streamob,
+    channelcb(aug_object* ob, unsigned id, aug_streamob* streamob,
               unsigned short events) AUG_NOTHROW
     {
         try {
-            return T(id, streamob, events) ? AUG_TRUE : AUG_FALSE;
+            return T(ob, id, streamob, events) ? AUG_TRUE : AUG_FALSE;
+        } AUG_SETERRINFOCATCH;
+
+        /**
+         * Do not remove the channel unless explicitly asked to.
+         */
+
+        return AUG_TRUE;
+    }
+
+    template <typename T, bool (T::*U)(unsigned, streamobref, unsigned short)>
+    aug_bool
+    channelmemcb(aug_object* ob, unsigned id, aug_streamob* streamob,
+                 unsigned short events) AUG_NOTHROW
+    {
+        try {
+            return (obtoaddr<T*>(ob)->*U)(id, streamob, events)
+                ? AUG_TRUE : AUG_FALSE;
+        } AUG_SETERRINFOCATCH;
+
+        /**
+         * Do not remove the channel unless explicitly asked to.
+         */
+
+        return AUG_TRUE;
+    }
+
+    template <typename T>
+    aug_bool
+    channelmemcb(aug_object* ob, unsigned id, aug_streamob* streamob,
+                 unsigned short events) AUG_NOTHROW
+    {
+        try {
+            return obtoaddr<T*>(ob)->channelcb(id, streamob, events)
+                ? AUG_TRUE : AUG_FALSE;
         } AUG_SETERRINFOCATCH;
 
         /**
@@ -74,9 +110,31 @@ namespace aug {
     }
 
     inline void
-    foreachchannel(aug_channels_t channels, aug_channelcb_t cb)
+    foreachchannel(aug_channels_t channels, aug_channelcb_t cb, objectref ob)
     {
-        aug_foreachchannel(channels, cb);
+        aug_foreachchannel(channels, cb, ob.get());
+    }
+
+    inline void
+    foreachchannel(aug_channels_t channels, aug_channelcb_t cb, const null_&)
+    {
+        aug_foreachchannel(channels, cb, 0);
+    }
+
+    template <typename T, bool (T::*U)(unsigned, streamobref, unsigned short)>
+    void
+    foreachchannel(aug_channels_t channels, T& x)
+    {
+        scoped_addrob<simple_addrob> ob(&x);
+        aug_foreachchannel(channels, channelmemcb<T, U>, ob.base());
+    }
+
+    template <typename T>
+    void
+    foreachchannel(aug_channels_t channels, T& x)
+    {
+        scoped_addrob<simple_addrob> ob(&x);
+        aug_foreachchannel(channels, channelmemcb<T>, ob.base());
     }
 
     inline unsigned

@@ -194,27 +194,29 @@ namespace test {
         channels channels_;
         timers timers_;
         muxer muxer_;
-        autosd sd_;
+        channelobptr serv_;
         map<int, sessionptr> sds_;
 
-        state(aug_channelcb_t cb, obref<aug_object> ob)
+        state()
             : channels_(getmpool(aug_tlx)),
-              sd_(null)
+              serv_(null)
         {
+            setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
+
             aug_hostserv hostserv;
             parsehostserv(address_, hostserv);
 
             endpoint ep(null);
-            autosd sd(tcplisten(hostserv.host_, hostserv.serv_, ep));
+            autosd sd(tcpserver(hostserv.host_, hostserv.serv_, ep));
             setnonblock(sd, true);
 
-            insertfile(files_, aug_eventrd(), cb, ob);
-            setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
+            channelobptr serv(createserver(getmpool(aug_tlx), muxer_, sd));
+            sd.release();
 
-            insertfile(files_, sfd, cb, ob);
-            setfdeventmask(muxer_, sfd, AUG_FDEVENTRD);
+            insertchannel(channels_, serv);
+            seteventmask(serv, AUG_FDEVENTRD);
 
-            sfd_ = sfd;
+            serv_ = serv;
         }
     };
 
@@ -223,110 +225,32 @@ namespace test {
         auto_ptr<state> state_;
 
         void
-        setfdhook(fdref ref, unsigned short mask)
+        readevent()
         {
-            insertfile(state_->files_, ref, *this);
-            try {
-                setfdeventmask(state_->muxer_, ref, mask);
-            } catch (...) {
-                removefile(state_->files_, ref);
-            }
-        }
-
-        bool
-        readevent(int fd, aug_files& files)
-        {
-            AUG_DEBUG2("reading event");
+            AUG_CTXDEBUG2(aug_tlx, "reading event");
 
             pair<int, smartob<aug_object> >
                 event(aug::readevent(aug_eventrd()));
 
             switch (event.first) {
             case AUG_EVENTRECONF:
-                aug_info("received AUG_EVENTRECONF");
+                aug_ctxinfo(aug_tlx, "received AUG_EVENTRECONF");
                 if (*conffile_) {
-                    aug_info("reading: %s", conffile_);
+                    aug_ctxinfo(aug_tlx, "reading: %s", conffile_);
                     aug::readconf(conffile_, aug::confcb<confcb>, null);
                 }
                 reconf();
                 break;
             case AUG_EVENTSTATUS:
-                aug_info("received AUG_EVENTSTATUS");
+                aug_ctxinfo(aug_tlx, "received AUG_EVENTSTATUS");
                 break;
             case AUG_EVENTSTOP:
-                aug_info("received AUG_EVENTSTOP");
+                aug_ctxinfo(aug_tlx, "received AUG_EVENTSTOP");
                 quit_ = true;
                 break;
             }
-            return true;
         }
 
-        bool
-        listener(int fd, aug_files& files)
-        {
-            aug_endpoint ep;
-
-            AUG_DEBUG2("accepting connection");
-
-            smartfd sfd(null);
-            try {
-
-                sfd = accept(state_->sfd_, ep);
-
-            } catch (const errinfo_error& e) {
-
-                if (aug_acceptlost()) {
-                    aug_warn("accept() failed: %s", e.what());
-                    return true;
-                }
-                throw;
-            }
-
-            aug_info("initialising connection '%d'", sfd.get());
-
-            setnodelay(sfd, true);
-            setnonblock(sfd, true);
-            setfdhook(sfd, AUG_FDEVENTRD);
-
-            state_->sfds_.insert(make_pair
-                                 (sfd.get(), sessionptr
-                                  (new session(state_->muxer_, sfd,
-                                               state_->timers_))));
-            return true;
-        }
-
-        bool
-        connection(int fd, aug_files& files)
-        {
-            sessionptr ptr(state_->sfds_[fd]);
-            unsigned short bits(fdevents(state_->muxer_, fd));
-
-            if (bits & AUG_FDEVENTRD) {
-
-                AUG_DEBUG2("handling read event '%d'", fd);
-
-                if (!ptr->buffer_.readsome(fd)) {
-
-                    aug_info("closing connection '%d'", fd);
-                    state_->sfds_.erase(fd);
-                    return false;
-                }
-
-                setfdeventmask(state_->muxer_, fd, AUG_FDEVENTRDWR);
-                ptr->timer_.cancel();
-                ptr->heartbeats_ = 0;
-            }
-
-            if (bits & AUG_FDEVENTWR) {
-
-                if (!ptr->buffer_.writesome(fd)) {
-                    setfdeventmask(state_->muxer_, fd, AUG_FDEVENTRD);
-                    ptr->timer_.reset(5000);
-                }
-            }
-
-            return true;
-        }
     public:
         ~service() AUG_NOTHROW
         {
@@ -361,11 +285,10 @@ namespace test {
         void
         init()
         {
-            aug_info("initialising daemon process");
+            aug_ctxinfo(aug_tlx, "initialising daemon process");
 
             setsrvlogger("aug");
-            smartob<aug_addrob> ob(createaddrob(this, 0));
-            state_.reset(new state(filememcb<service>, ob));
+            state_.reset(new state());
         }
 
         void
@@ -373,7 +296,7 @@ namespace test {
         {
             timeval tv;
 
-            aug_info("running daemon process");
+            aug_ctxinfo(aug_tlx, "running daemon process");
 
             int ret(!0);
             while (!quit_) {
@@ -381,8 +304,8 @@ namespace test {
                 if (state_->timers_.empty()) {
 
                     scoped_unblock unblock;
-                    while (AUG_RETINTR == (ret = waitfdevents(state_
-                                                              ->muxer_)))
+                    while (AUG_FAILINTR == (ret = waitfdevents(state_
+                                                               ->muxer_)))
                         ;
 
                 } else {
@@ -390,36 +313,61 @@ namespace test {
                     foreachexpired(state_->timers_, 0 == ret, tv);
 
                     scoped_unblock unblock;
-                    while (AUG_RETINTR == (ret = waitfdevents(state_
-                                                              ->muxer_,
-                                                              tv)))
+                    while (AUG_FAILINTR == (ret = waitfdevents(state_
+                                                               ->muxer_, tv)))
                         ;
                 }
 
-                foreachfile(state_->files_);
+                if (aug_fdevents(state_->muxer_, aug_eventrd()))
+                    readevent();
+
+                foreachchannel(state_->channels_, *this);
             }
         }
 
         void
         term()
         {
-            aug_info("terminating daemon process");
+            aug_ctxinfo(aug_tlx, "terminating daemon process");
             state_.reset();
         }
 
         bool
-        filecb(int fd)
+        channelcb(unsigned id, streamobref streamob, unsigned short events)
         {
-            if (!fdevents(state_->muxer_, fd))
-                return true;
+//             state_->sfds_.insert(make_pair
+//                                  (sfd.get(), sessionptr
+//                                   (new session(state_->muxer_, sfd,
+//                                                state_->timers_))));
 
-            if (fd == aug_eventrd())
-                return readevent(fd, state_->files_);
+//             sessionptr ptr(state_->sds_[fd]);
+//             unsigned short bits(fdevents(state_->muxer_, fd));
 
-            if (fd == state_->sfd_.get())
-                return listener(fd, state_->files_);
+//             if (bits & AUG_FDEVENTRD) {
 
-            return connection(fd, state_->files_);
+//                 AUG_DEBUG2("handling read event '%d'", fd);
+
+//                 if (!ptr->buffer_.readsome(fd)) {
+
+//                     aug_info("closing connection '%d'", fd);
+//                     state_->sfds_.erase(fd);
+//                     return false;
+//                 }
+
+//                 setfdeventmask(state_->muxer_, fd, AUG_FDEVENTRDWR);
+//                 ptr->timer_.cancel();
+//                 ptr->heartbeats_ = 0;
+//             }
+
+//             if (bits & AUG_FDEVENTWR) {
+
+//                 if (!ptr->buffer_.writesome(fd)) {
+//                     setfdeventmask(state_->muxer_, fd, AUG_FDEVENTRD);
+//                     ptr->timer_.reset(5000);
+//                 }
+//             }
+
+            return true;
         }
     };
 }
@@ -431,8 +379,7 @@ main(int argc, char* argv[])
 
     try {
 
-        aug_errinfo errinfo;
-        scoped_init init(errinfo);
+        aug_start();
         try {
 
             service serv;
@@ -442,9 +389,9 @@ main(int argc, char* argv[])
             return main(argc, argv, serv);
 
         } catch (const errinfo_error& e) {
-            perrinfo(e, "aug::errorinfo_error");
+            perrinfo(aug_tlx, "aug::errorinfo_error", e);
         } catch (const exception& e) {
-            aug_error("std::exception: %s", e.what());
+            aug_ctxerror(aug_tlx, "std::exception: %s", e.what());
         }
     } catch (const exception& e) {
         cerr << e.what() << endl;

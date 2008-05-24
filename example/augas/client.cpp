@@ -147,7 +147,7 @@ namespace {
             mod_writelog(MOD_LOGINFO, "echos: %d", echos_);
 
             for (; estab_ < conns_; ++estab_)
-                tcpconnect(host, serv, new state(echos_));
+                tryconnect(host, serv, new state(echos_));
             return true;
         }
         void

@@ -102,7 +102,8 @@ channelob_close_(aug_channelob* ob)
 }
 
 static aug_channelob*
-channelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
+channelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
+                   aug_object* cbob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     int events;
@@ -123,7 +124,7 @@ channelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 
     retain_(impl);
 
-    if (events < 0 || !cb(impl->id_, &impl->streamob_, events)) {
+    if (events < 0 || !cb(cbob, impl->id_, &impl->streamob_, events)) {
         release_(impl);
         return NULL;
     }

@@ -142,7 +142,8 @@ aug_removechannel(aug_channels_t channels, unsigned id)
 }
 
 AUGNET_API void
-aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb)
+aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb,
+                   aug_object* cbob)
 {
     struct entry_* it, * end;
 
@@ -164,7 +165,7 @@ aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb)
         for (;;) {
 
             aug_bool fork = AUG_FALSE;
-            ob = aug_process(ob, cb, &fork);
+            ob = aug_process(ob, &fork, cb, cbob);
 
             /* Null return removes entry. */
 

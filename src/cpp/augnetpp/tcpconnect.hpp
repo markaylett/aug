@@ -51,14 +51,14 @@ namespace aug {
     };
 
     inline autosd
-    tcpconnect(aug_tcpconnect_t conn, aug_endpoint& ep, bool& est)
+    tryconnect(aug_tcpconnect_t conn, aug_endpoint& ep, bool& est)
     {
         int local;
-        sdref ref(aug_tcpconnect(conn, &ep, &local));
+        sdref ref(aug_tryconnect(conn, &ep, &local));
         if (null == ref)
             failerror();
 
-        // When established, aug_tcpconnect() will release ownership of the
+        // When established, aug_tryconnect() will release ownership of the
         // returned socket descriptor - it will not call aug_sclose() on it.
 
         if (local) {

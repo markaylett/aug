@@ -28,7 +28,7 @@ main(int argc, char* argv[])
         // echo-like server - try to exhaust tcp window and break server.
 
         endpoint ep(null);
-        smartfd sfd(tcpconnect(argv[1], argv[2], ep));
+        smartfd sfd(tryconnect(argv[1], argv[2], ep));
         for (int i(0); i < 1000000; ++i) {
             send(sfd, MSG, sizeof(MSG) - 1, 0);
             if (0 == i % 3 && 0 < i) {

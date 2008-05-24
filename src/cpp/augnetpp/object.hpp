@@ -20,25 +20,26 @@ namespace aug {
 
     inline channelobptr
     createclient(mpoolref mpool, const char* host, const char* serv,
-                 aug_muxer_t muxer, struct ssl_st* ssl)
+                 aug_muxer_t muxer, struct ssl_st* ssl = 0)
     {
         return object_attach<aug_channelob>
             (verify(aug_createclient(mpool.get(), host, serv, muxer, ssl)));
     }
 
     inline channelobptr
-    aug_createserver(mpoolref mpool, sdref sd, aug_muxer_t muxer,
-                     struct ssl_st* ssl)
+    createserver(mpoolref mpool, aug_muxer_t muxer, sdref sd,
+                 struct ssl_st* ssl = 0)
     {
         return object_attach<aug_channelob>
-            (verify(aug_createserver(mpool.get(), sd.get(), muxer, ssl)));
+            (verify(aug_createserver(mpool.get(), muxer, sd.get(), ssl)));
     }
 
     inline channelobptr
-    createplain(mpoolref mpool, unsigned id, sdref sd, aug_muxer_t muxer)
+    createplain(mpoolref mpool, unsigned id, aug_muxer_t muxer, sdref sd,
+                unsigned short mask)
     {
         return object_attach<aug_channelob>
-            (verify(aug_createplain(mpool.get(), id, sd.get(), muxer)));
+            (verify(aug_createplain(mpool.get(), id, muxer, sd.get(), mask)));
     }
 }
 

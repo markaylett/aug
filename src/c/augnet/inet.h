@@ -12,7 +12,7 @@
  * Implementations of the original, classic functions by Richard Stevens.
  *
  * @todo introduce timeout for aug_tcpclient() by implementing in terms of
- * aug_tcpconnect().
+ * aug_tryconnect().
  */
 
 #include "augnet/config.h"

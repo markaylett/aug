@@ -15,9 +15,9 @@
 namespace aug {
 
     inline autosd
-    tcpconnect(const char* host, const char* serv, aug_endpoint& ep)
+    tcpclient(const char* host, const char* serv, aug_endpoint& ep)
     {
-        autosd sd(aug_tcpconnect(host, serv, &ep), close);
+        autosd sd(aug_tcpclient(host, serv, &ep), close);
         if (null == sd)
             failerror();
 
@@ -25,9 +25,9 @@ namespace aug {
     }
 
     inline autosd
-    tcplisten(const char* host, const char* serv, aug_endpoint& ep)
+    tcpserver(const char* host, const char* serv, aug_endpoint& ep)
     {
-        autosd sd(aug_tcplisten(host, serv, &ep), close);
+        autosd sd(aug_tcpserver(host, serv, &ep), close);
         if (null == sd)
             failerror();
 
@@ -35,19 +35,11 @@ namespace aug {
     }
 
     inline autosd
-    udpclient(const char* host, const char* serv, aug_endpoint& ep)
+    udpclient(const char* host, const char* serv, aug_endpoint& ep,
+              bool connect)
     {
-        autosd sd(aug_udpclient(host, serv, &ep), close);
-        if (null == sd)
-            failerror();
-
-        return sd;
-    }
-
-    inline autosd
-    udpconnect(const char* host, const char* serv, aug_endpoint& ep)
-    {
-        autosd sd(aug_udpconnect(host, serv, &ep), close);
+        autosd sd(aug_udpclient(host, serv, &ep,
+                                connect ? AUG_TRUE : AUG_FALSE), close);
         if (null == sd)
             failerror();
 

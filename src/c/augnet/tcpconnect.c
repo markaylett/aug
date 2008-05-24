@@ -72,7 +72,7 @@ aug_destroytcpconnect(aug_tcpconnect_t conn)
 }
 
 AUGNET_API aug_sd
-aug_tcpconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
+aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 {
     /* FIXME: needs review against assumptions in object.c. */
 

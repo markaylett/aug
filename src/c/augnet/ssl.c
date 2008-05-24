@@ -56,16 +56,16 @@ struct impl_ {
     int refs_;
     aug_mpool* mpool_;
     unsigned id_;
-    aug_sd sd_;
     aug_muxer_t muxer_;
-    SSL* ssl_;
-    struct buf_ inbuf_, outbuf_;
-    enum sslstate_ state_;
-    int shutdown_;
+    aug_sd sd_;
 
     /* The event mask from the user's perspective. */
 
     unsigned short mask_;
+    SSL* ssl_;
+    struct buf_ inbuf_, outbuf_;
+    enum sslstate_ state_;
+    int shutdown_;
 };
 
 static int
@@ -455,7 +455,8 @@ cclose_(aug_channelob* ob)
 }
 
 static aug_channelob*
-cprocess_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
+cprocess_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
+          aug_object* cbob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
     int events = aug_fdevents(impl->muxer_, impl->sd_);
@@ -521,7 +522,7 @@ cprocess_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
 
         retain_(impl);
 
-        if (!cb(impl->id_, &impl->streamob_, events)) {
+        if (!cb(cbob, impl->id_, &impl->streamob_, events)) {
 
             /* No need to update events if file is being removed - indicated
                by false return. */
@@ -742,12 +743,18 @@ static const struct aug_streamobvtbl svtbl_ = {
 };
 
 static struct impl_*
-createssl_(aug_mpool* mpool, unsigned id, aug_sd sd, aug_muxer_t muxer,
-           struct ssl_st* ssl)
+createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
+           unsigned short mask, struct ssl_st* ssl)
 {
     struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
-    if (!impl)
+
+    if (aug_setfdeventmask(muxer, sd, AUG_FDEVENTRDWR) < 0)
         return NULL;
+
+    if (!(impl = aug_malloc(mpool, sizeof(struct impl_)))) {
+        aug_setfdeventmask(muxer, sd, 0);
+        return NULL;
+    }
 
     impl->channelob_.vtbl_ = &fvtbl_;
     impl->channelob_.impl_ = NULL;
@@ -756,8 +763,9 @@ createssl_(aug_mpool* mpool, unsigned id, aug_sd sd, aug_muxer_t muxer,
     impl->refs_ = 1;
     impl->mpool_ = mpool;
     impl->id_ = id;
-    impl->sd_ = sd;
     impl->muxer_ = muxer;
+    impl->sd_ = sd;
+    impl->mask_ = mask;
 
     /* SSL state */
 
@@ -766,8 +774,6 @@ createssl_(aug_mpool* mpool, unsigned id, aug_sd sd, aug_muxer_t muxer,
     clearbuf_(&impl->outbuf_);
     impl->state_ = NORMAL;
     impl->shutdown_ = 0;
-    impl->mask_ = aug_fdeventmask(impl->muxer_, sd);
-    aug_setfdeventmask(impl->muxer_, sd, AUG_FDEVENTRDWR);
 
     aug_retain(mpool);
     return impl;
@@ -793,10 +799,10 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 }
 
 AUGNET_API aug_channelob*
-aug_createsslclient(aug_mpool* mpool, unsigned id, aug_sd sd,
-                    aug_muxer_t muxer, struct ssl_st* ssl)
+aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
+                    aug_sd sd, unsigned short mask, struct ssl_st* ssl)
 {
-    struct impl_* impl = createssl_(mpool, id, sd, muxer, ssl);
+    struct impl_* impl = createssl_(mpool, id, muxer, sd, mask, ssl);
     if (!impl)
         return NULL;
 
@@ -809,10 +815,10 @@ aug_createsslclient(aug_mpool* mpool, unsigned id, aug_sd sd,
 }
 
 AUGNET_API aug_channelob*
-aug_createsslserver(aug_mpool* mpool, unsigned id, aug_sd sd,
-                    aug_muxer_t muxer, struct ssl_st* ssl)
+aug_createsslserver(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
+                    aug_sd sd, unsigned short mask, struct ssl_st* ssl)
 {
-    struct impl_* impl = createssl_(mpool, id, sd, muxer, ssl);
+    struct impl_* impl = createssl_(mpool, id, muxer, sd, mask, ssl);
     if (!impl)
         return NULL;
 

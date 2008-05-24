@@ -71,10 +71,12 @@ aug_removechannel(aug_channels_t channels, unsigned id);
  *
  * @param channels Channel list.
  * @param cb Callback function.
+ * @param ob Callback object.
  */
 
 AUGNET_API void
-aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb);
+aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb,
+                   aug_object* cbob);
 
 /**
  * Get number of channels.

@@ -230,6 +230,8 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     return dst;
 }
 
+/* FIXME: switch to aug_bool. */
+
 AUGNET_API int
 aug_setnodelay(aug_sd sd, int on)
 {

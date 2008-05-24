@@ -26,7 +26,7 @@ main(int argc, char* argv[])
         tcpconnect conn("127.0.0.1", "10000");
 
         bool est(false);
-        autosd sd(tcpconnect(conn, ep, est));
+        autosd sd(tryconnect(conn, ep, est));
         if (!est) {
 
             muxer mux;
@@ -37,14 +37,14 @@ main(int argc, char* argv[])
             // thrown.
 
             try {
-                sd = tcpconnect(client, ep, est);
+                sd = tryconnect(conn, ep, est);
             } catch (...) {
                 if (ECONNREFUSED == aug_errno())
                     return 0;
                 throw;
             }
         }
-        throw error("error not thrown by tcpconnect()");
+        throw error("error not thrown by tryconnect()");
 
     } AUG_PERRINFOCATCH;
     return 1;

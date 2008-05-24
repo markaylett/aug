@@ -20,7 +20,7 @@
 
 namespace aug {
 
-    template <void (*T)(aug::objectref, const char*, size_t)>
+    template <void (*T)(objectref, const char*, size_t)>
     int
     base64cb(aug_object* ob, const char* buf, size_t len) AUG_NOTHROW
     {
@@ -122,13 +122,13 @@ namespace aug {
 
     namespace detail {
         inline void
-        base64os(aug::objectref ob, const char* buf, size_t len)
+        base64os(objectref ob, const char* buf, size_t len)
         {
             std::ostream& os(*obtoaddr<std::ostream*>(ob));
 			os.write(buf, static_cast<std::streamsize>(len));
         }
         inline void
-        base64str(aug::objectref ob, const char* buf, size_t len)
+        base64str(objectref ob, const char* buf, size_t len)
         {
             std::string& str(*obtoaddr<std::string*>(ob));
             str.append(buf, static_cast<std::streamsize>(len));

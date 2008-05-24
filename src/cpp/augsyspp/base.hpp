@@ -50,6 +50,12 @@ namespace aug {
             init();
         }
     };
+
+    inline unsigned
+    nextid()
+    {
+        return aug_nextid();
+    }
 }
 
 #endif // AUGSYSPP_BASE_HPP

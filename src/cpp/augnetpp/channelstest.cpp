@@ -18,26 +18,30 @@ namespace {
         autosds sds(socketpair(AF_UNIX, SOCK_STREAM, 0));
         setnonblock(sds[0], true);
         setnonblock(sds[1], true);
-        return make_pair(createplain(mpool, aug_nextid(), sds[0], muxer),
-                         createplain(mpool, aug_nextid(), sds[1], muxer));
+        return make_pair(createplain(mpool, nextid(), muxer, sds[0],
+                                     AUG_FDEVENTRD),
+                         createplain(mpool, nextid(), muxer, sds[1],
+                                     AUG_FDEVENTWR));
     }
 
     unsigned rd_, wr_;
     bool done_ = false;
 
-    bool
-    cb(unsigned id, streamobref streamob,  unsigned short events)
-    {
-        if (id == rd_) {
-            char ch;
-            read(streamob, &ch, 1);
-            if ('A' == ch)
-                done_ = true;
-        } else if (id == wr_) {
-            write(streamob, "A", 1);
+    struct test {
+        bool
+        cb(unsigned id, streamobref streamob, unsigned short events)
+        {
+            if (id == rd_) {
+                char ch;
+                read(streamob, &ch, 1);
+                if ('A' == ch)
+                    done_ = true;
+            } else if (id == wr_) {
+                write(streamob, "A", 1);
+            }
+            return true;
         }
-        return true;
-    }
+    };
 }
 
 int
@@ -53,15 +57,14 @@ main(int argc, char* argv[])
 
         wr_ = getid(xy.second);
         insertchannel(channs, xy.second);
-        seteventmask(xy.second, AUG_FDEVENTWR);
 
         rd_ = getid(xy.first);
         insertchannel(channs, xy.first);
-        seteventmask(xy.first, AUG_FDEVENTRD);
 
+        test x;
         while (!done_) {
             waitfdevents(mux);
-            foreachchannel(channs, channelcb<cb>);
+            foreachchannel<test, &test::cb>(channs, x);
         }
 
     } catch (const exception& e) {

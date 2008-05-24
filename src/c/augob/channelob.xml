@@ -3,7 +3,7 @@
   <quotincl>augob/streamob.h</quotincl>
 
   <verbatim>
-    typedef aug_bool (*aug_channelcb_t)(unsigned, aug_streamob*,
+    typedef aug_bool (*aug_channelcb_t)(aug_object*, unsigned, aug_streamob*,
       unsigned short);
   </verbatim>
 
@@ -14,8 +14,9 @@
     <method name="close" type="aug_result" qname="close"/>
 
     <method name="process" type="aug_channelob" object="true" qname="process">
-      <param name="cb" type="aug_channelcb_t"/>
       <param name="fork" type="aug_bool&"/>
+      <param name="cb" type="aug_channelcb_t"/>
+      <param name="ob" type="aug_object" object="true"/>
     </method>
 
     <method name="seteventmask" type="aug_result" qname="seteventmask">

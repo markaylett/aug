@@ -29,9 +29,9 @@ aug_destroytcpconnect(aug_tcpconnect_t conn);
  * non-blocking socket returned.
  *
  * Otherwise, the returned descriptor should be polled for #AUG_FDEVENTCONN
- * events before retrying aug_tcpconnect().
+ * events before retrying aug_tryconnect().
  *
- * The descriptor returned between calls to aug_tcpconnect() may change; this
+ * The descriptor returned between calls to aug_tryconnect() may change; this
  * occurs as the implementation cycles through the addresses associated with
  * the host.  All but the established descriptor will be closed by the
  * aug_tcpconnect_t instance.
@@ -40,6 +40,6 @@ aug_destroytcpconnect(aug_tcpconnect_t conn);
 /* FIXME: change to aug_bool. */
 
 AUGNET_API aug_sd
-aug_tcpconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est);
+aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est);
 
 #endif /* AUGNET_TCPCONNECT_H */
