@@ -1,8 +1,9 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/errinfo.h"
-#include "augsys/errno.h"
+#include "augctx/base.h"
+#include "augctx/errinfo.h"
+#include "augctx/errno.h"
 
 #include <signal.h>
 #include <stdlib.h>  /* NULL */
@@ -46,7 +47,7 @@ aug_signalhandler(void (*handler)(int))
     for (i = 0; i < sizeof(handlers_) / sizeof(handlers_[0]); ++i) {
         sethandler_(&sa, handlers_[i].dfl_ ? SIG_DFL : handler);
         if (-1 == sigaction(handlers_[i].sig_, &sa, NULL)) {
-            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
             return -1;
         }
     }
@@ -69,12 +70,12 @@ aug_blocksignals(void)
 
 #if ENABLE_THREADS
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 #else /* !ENABLE_THREADS */
     if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 #endif /* !ENABLE_THREADS */
@@ -88,12 +89,12 @@ aug_unblocksignals(void)
     sigemptyset(&set);
 #if ENABLE_THREADS
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 #else /* !ENABLE_THREADS */
     if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 #endif /* !ENABLE_THREADS */

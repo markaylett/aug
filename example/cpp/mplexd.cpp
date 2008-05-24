@@ -378,21 +378,14 @@ main(int argc, char* argv[])
     using namespace test;
 
     try {
+        start();
 
-        aug_start();
-        try {
+        service serv;
+        program_ = argv[0];
 
-            service serv;
-            program_ = argv[0];
+        blocksignals();
+        return main(argc, argv, serv);
 
-            blocksignals();
-            return main(argc, argv, serv);
-
-        } catch (const errinfo_error& e) {
-            perrinfo(aug_tlx, "aug::errorinfo_error", e);
-        } catch (const exception& e) {
-            aug_ctxerror(aug_tlx, "std::exception: %s", e.what());
-        }
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }

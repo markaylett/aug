@@ -114,7 +114,7 @@ aug_createwriter(void)
 {
     aug_writer_t writer = malloc(sizeof(struct aug_writer_));
     if (!writer) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 

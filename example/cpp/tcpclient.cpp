@@ -14,13 +14,12 @@ main(int argc, char* argv[])
 {
     static const char MSG[] = "try to exhaust tcp window\r\n";
 
-    struct aug_errinfo errinfo;
-    aug_atexitinit(&errinfo);
-
     try {
 
+        start();
+
         if (argc < 3) {
-            aug_error("usage: tcpclient <host> <serv>");
+            aug_ctxerror(aug_tlx, "usage: tcpclient <host> <serv>");
             return 1;
         }
 
@@ -28,7 +27,7 @@ main(int argc, char* argv[])
         // echo-like server - try to exhaust tcp window and break server.
 
         endpoint ep(null);
-        smartfd sfd(tryconnect(argv[1], argv[2], ep));
+        autosd sfd(tcpclient(argv[1], argv[2], ep));
         for (int i(0); i < 1000000; ++i) {
             send(sfd, MSG, sizeof(MSG) - 1, 0);
             if (0 == i % 3 && 0 < i) {
@@ -40,7 +39,7 @@ main(int argc, char* argv[])
                 recv(sfd, buf, sizeof(buf), 0);
             }
             if (0 == i % 1000 && 0 < i)
-                aug_info("%d", i);
+                aug_ctxinfo(aug_tlx, "%d", i);
         }
 
         shutdown(sfd, SHUT_WR);
@@ -50,6 +49,10 @@ main(int argc, char* argv[])
                 break;
         }
 
-    } AUG_PERRINFOCATCH;
+        return 0;
+
+    } catch (const exception& e) {
+        cerr << e.what() << endl;
+    }
     return 1;
 }

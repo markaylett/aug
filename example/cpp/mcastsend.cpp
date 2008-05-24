@@ -33,35 +33,29 @@ main(int argc, char* argv[])
 {
     try {
 
-        aug_errinfo errinfo;
-        scoped_init init(errinfo);
+        start();
 
-        try {
-
-            if (argc < 3) {
-                aug_error("usage: mcastsend <mcast> <serv> [ifname]");
-                return 1;
-            }
-
-            inetaddr in(argv[1]);
-            smartfd sfd(aug::socket(family(in), SOCK_DGRAM));
-            if (4 == argc)
-                setmcastif(sfd, argv[3]);
-
-            endpoint ep(in, htons(atoi(argv[2])));
-
-            char event[AUG_NETEVENT_SIZE];
-            for (int i(0); i < 3; ++i) {
-                heartbeat_(event);
-                sendto(sfd, event, sizeof(event), 0, ep);
-                aug_msleep(1000);
-            }
-
-        } catch (const errinfo_error& e) {
-            perrinfo(e, "aug::errorinfo_error");
-        } catch (const exception& e) {
-            aug_error("std::exception: %s", e.what());
+        if (argc < 3) {
+            aug_ctxerror(aug_tlx, "usage: mcastsend <mcast> <serv> [ifname]");
+            return 1;
         }
+
+        inetaddr in(argv[1]);
+        autosd sfd(aug::socket(family(in), SOCK_DGRAM));
+        if (4 == argc)
+            setmcastif(sfd, argv[3]);
+
+        endpoint ep(in, htons(atoi(argv[2])));
+
+        char event[AUG_NETEVENT_SIZE];
+        for (int i(0); i < 3; ++i) {
+            heartbeat_(event);
+            sendto(sfd, event, sizeof(event), 0, ep);
+            aug_msleep(1000);
+        }
+
+        return 0;
+
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }

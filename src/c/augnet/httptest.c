@@ -66,22 +66,22 @@ main(int argc, char* argv[])
     aug_atexitinit(&errinfo);
 
     if (!(parser = aug_createhttpparser(1024, &handler_, NULL))) {
-        aug_perrinfo(NULL, "aug_createhttpparser() failed");
+        aug_perrinfo(aug_tlerr, "aug_createhttpparser() failed");
         return 1;
     }
 
     if (-1 == aug_appendhttp(parser, TEST_, sizeof(TEST_) - 1)) {
-        aug_perrinfo(NULL, "aug_appendhttp() failed");
+        aug_perrinfo(aug_tlerr, "aug_appendhttp() failed");
         goto fail;
     }
 
     if (-1 == aug_finishhttp(parser)) {
-        aug_perrinfo(NULL, "aug_finishhttp() failed");
+        aug_perrinfo(aug_tlerr, "aug_finishhttp() failed");
         goto fail;
     }
 
     if (-1 == aug_destroyhttpparser(parser)) {
-        aug_perrinfo(NULL, "aug_destroyhttpparser() failed");
+        aug_perrinfo(aug_tlerr, "aug_destroyhttpparser() failed");
         return 1;
     }
     return 0;

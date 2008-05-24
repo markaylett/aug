@@ -96,9 +96,9 @@ aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len)
 #endif /* HAVE_IPV6 */
     default:
 #if !defined(_WIN32)
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EAFNOSUPPORT);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
 #else /* _WIN32 */
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, WSAEAFNOSUPPORT);
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEAFNOSUPPORT);
 #endif /* _WIN32 */
         return NULL;
     }
@@ -109,7 +109,7 @@ aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len)
     AUG_SNTRUNCF(dst, len, ret);
 
     if (ret < 0) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return NULL;
     }
 

@@ -104,7 +104,7 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
         return NULL;
 
     if (!(mfile = (aug_mfile_t)malloc(sizeof(struct aug_mfile_) + tail))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         goto fail;
     }
 

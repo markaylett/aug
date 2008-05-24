@@ -11,33 +11,47 @@
 
 struct aug_hires_ {
     aug_mpool* mpool_;
+    aug_clock* clock_;
     struct timeval start_;
 };
 
 AUGUTIL_API aug_hires_t
 aug_createhires(aug_mpool* mpool)
 {
-    aug_hires_t hires = aug_malloc(mpool, sizeof(struct aug_hires_));
-    if (!hires)
+    aug_clock* clock;
+    aug_hires_t hires;
+
+    if (!(clock = aug_createclock(mpool, 0)))
         return NULL;
+
+    if (!(hires = aug_malloc(mpool, sizeof(struct aug_hires_))))
+        goto fail1;
 
     hires->mpool_ = mpool;
+    hires->clock_ = clock;
 
-    if (-1 == aug_gettimeofday(&local.start_, NULL)) {
-        aug_setposixerrinfo(aug_geterrinfo(ctx), __FILE__, __LINE__, errno);
-        aug_free(mpool, hires);
-        return NULL;
-    }
+    if (aug_gettimeofday(clock, &hires->start_) < 0)
+        goto fail2;
+
+    /* Success. */
 
     aug_retain(mpool);
     return hires;
+
+ fail2:
+    aug_free(mpool, hires);
+ fail1:
+    aug_release(clock);
+    return NULL;
 }
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_destroyhires(aug_hires_t hires)
 {
     aug_mpool* mpool = hires->mpool_;
+    aug_clock* clock = hires->clock_;
     aug_free(mpool, hires);
+    aug_release(clock);
     aug_release(mpool);
     return AUG_SUCCESS;
 }
@@ -45,21 +59,15 @@ aug_destroyhires(aug_hires_t hires)
 AUGUTIL_API aug_result
 aug_resethires(aug_hires_t hires)
 {
-    if (-1 == aug_gettimeofday(&hires->start_, NULL)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILERROR;
-    }
-    return AUG_SUCCESS;
+    return aug_gettimeofday(hires->clock_, &hires->start_);
 }
 
 AUGUTIL_API double*
 aug_elapsed(aug_hires_t hires, double* sec)
 {
     struct timeval now;
-    if (-1 == aug_gettimeofday(&now, NULL)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+    if (aug_gettimeofday(hires->clock_, &now) < 0)
         return NULL;
-    }
     aug_tvsub(&now, &hires->start_);
     *sec = (double)now.tv_sec + ((double)now.tv_usec / 1000000.0);
     return sec;

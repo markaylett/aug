@@ -16,12 +16,12 @@ test(void)
     aug_info("timezone=[%ld]", aug_timezone());
 
     if (!aug_gmtime(&in, &tm)) {
-        aug_perrinfo(NULL, "aug_gmtime() failed");
+        aug_perrinfo(aug_tlerr, "aug_gmtime() failed");
         exit(1);
     }
 
     if (-1 == (out = aug_timegm(&tm))) {
-        aug_perrinfo(NULL, "aug_timegm() failed");
+        aug_perrinfo(aug_tlerr, "aug_timegm() failed");
         exit(1);
     }
 

@@ -17,6 +17,7 @@ AUG_RCSID("$Id$");
 #include <assert.h>
 #include <errno.h>          /* EINTR */
 #include <stdio.h>
+#include <string.h>         /* strcmp() */
 
 #if !defined(_WIN32)
 # include <unistd.h>
@@ -82,7 +83,7 @@ writeall_(int fd, const char* buf, size_t n)
             if (EINTR == errno)
                 continue;
 
-            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
             return -1;
         }
         buf += ret, n -= ret;
@@ -187,7 +188,7 @@ aug_vformatlog(char* buf, size_t* n, int level, const char* format,
     AUG_SNTRUNCF(buf, size, ret);
 
     if (ret < 0) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -197,7 +198,7 @@ aug_vformatlog(char* buf, size_t* n, int level, const char* format,
     AUG_SNTRUNCF(buf, size, ret);
 
     if (ret < 0) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 

@@ -1,3 +1,4 @@
+#include "augctx/base.h"
 #include "augctx/errinfo.h"
 
 #include <errno.h>

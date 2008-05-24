@@ -83,7 +83,7 @@ aug_readline_(char* buf, size_t size, FILE* stream)
         if (feof(stream))
             return -2;
 
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 

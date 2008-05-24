@@ -43,7 +43,7 @@ setstatus_(DWORD state)
     status.dwWaitHint = 0;
 
     if (!SetServiceStatus(ssh_, &status)) {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return -1;
     }
     return 0;

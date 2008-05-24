@@ -20,7 +20,7 @@ test(aug_muxer_t muxer, int n)
         return;
 
     if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {
-        aug_perrinfo(NULL, "aug_socketpair() failed");
+        aug_perrinfo(aug_tlerr, "aug_socketpair() failed");
         exit(1);
     }
 
@@ -31,31 +31,31 @@ test(aug_muxer_t muxer, int n)
 
     if (-1 == aug_setfdeventmask(muxer, sv[0], AUG_FDEVENTRDWR)
         || -1 == aug_setfdeventmask(muxer, sv[1], AUG_FDEVENTRD)) {
-        aug_perrinfo(NULL, "aug_setfdeventmask() failed");
+        aug_perrinfo(aug_tlerr, "aug_setfdeventmask() failed");
         exit(1);
     }
 
     if (AUG_FDEVENTRDWR != aug_fdeventmask(muxer, sv[0])
         || AUG_FDEVENTRD != aug_fdeventmask(muxer, sv[1])) {
-        aug_perrinfo(NULL, "aug_fdeventmask() failed");
+        aug_perrinfo(aug_tlerr, "aug_fdeventmask() failed");
         exit(1);
     }
 
     if (-1 == aug_writev(sv[0], iov, 2)) {
-        aug_perrinfo(NULL, "aug_writev() failed");
+        aug_perrinfo(aug_tlerr, "aug_writev() failed");
         exit(1);
     }
 
     if (-1 == aug_waitfdevents(muxer, NULL)) {
         aug_writelog(AUG_LOGINFO, "sv[0]=[%d], sv[1]=[%d]", sv[0], sv[1]);
-        aug_perrinfo(NULL, "aug_waitfdevents() failed");
+        aug_perrinfo(aug_tlerr, "aug_waitfdevents() failed");
         exit(1);
     }
 
     test(muxer, n - 1);
 
     if (-1 == aug_read(sv[1], buf, iov[0].iov_len + iov[1].iov_len)) {
-        aug_perrinfo(NULL, "aug_read() failed");
+        aug_perrinfo(aug_tlerr, "aug_read() failed");
         exit(1);
     }
 
@@ -66,7 +66,7 @@ test(aug_muxer_t muxer, int n)
 
     if (-1 == aug_setfdeventmask(muxer, sv[0], 0)
         || -1 == aug_setfdeventmask(muxer, sv[1], 0)) {
-        aug_perrinfo(NULL, "aug_setfdeventmask() failed");
+        aug_perrinfo(aug_tlerr, "aug_setfdeventmask() failed");
         exit(1);
     }
 

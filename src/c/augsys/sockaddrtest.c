@@ -22,7 +22,7 @@ main(int argc, char* argv[])
     hints.ai_socktype = SOCK_STREAM;
 
     if (-1 == aug_getaddrinfo(HOST_, SERV_, &hints, &res)) {
-        aug_perrinfo(NULL, "aug_getaddrinfo() failed");
+        aug_perrinfo(aug_tlerr, "aug_getaddrinfo() failed");
         return 1;
     }
 
@@ -33,7 +33,7 @@ main(int argc, char* argv[])
 
         aug_getendpoint(res, &ep);
         if (!aug_endpointntop(&ep, buf, sizeof(buf))) {
-            aug_perrinfo(NULL, "aug_endpointntop() failed");
+            aug_perrinfo(aug_tlerr, "aug_endpointntop() failed");
             goto fail;
         }
 

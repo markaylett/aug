@@ -7,6 +7,7 @@
 
 AUG_RCSID("$Id$");
 
+#include "augctx/base.h"
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
 
@@ -173,7 +174,7 @@ aug_createlongob(long l, void (*destroy)(long))
 {
     struct longobimpl_* impl = malloc(sizeof(struct longobimpl_));
     if (!impl) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -204,7 +205,7 @@ aug_createaddrob(void* p, void (*destroy)(void*))
 {
     struct addrobimpl_* impl = malloc(sizeof(struct addrobimpl_));
     if (!impl) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -235,7 +236,7 @@ aug_createblob(const void* buf, size_t len)
 {
     struct blobimpl_* impl = malloc(sizeof(struct blobimpl_) + len);
     if (!impl) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 

@@ -63,7 +63,7 @@ fileset_(aug_mar_t mar, const char* filename)
     } else {
 
         if (!(stream = fopen(filename, "r"))) {
-            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
             return -1;
         }
 
@@ -71,7 +71,7 @@ fileset_(aug_mar_t mar, const char* filename)
             goto fail;
 
         if (0 != fclose(stream)) {
-            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
             return -1;
         }
     }
@@ -94,7 +94,7 @@ extract_(aug_mar_t mar, const char* filename)
             return -1;
 
         if (size != fwrite(body, 1, size, stdout)) {
-            aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
             return -1;
         }
 
@@ -167,7 +167,7 @@ names_(aug_mar_t mar)
         printf("%s\n", name);
     }
     if (EOF == fflush(stdout)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -204,7 +204,7 @@ list_(aug_mar_t mar)
     }
 
     if (EOF == fflush(stdout)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 
@@ -224,7 +224,7 @@ get_(aug_mar_t mar, const char* name)
         return -1;
 
     if (EOF == fflush(stdout)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
 

@@ -33,7 +33,7 @@ resize_(aug_xstr_t* xstr, size_t size)
 {
 	aug_xstr_t local = realloc(*xstr, sizeof(struct aug_xstr_) + size);
     if (!local) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 
@@ -64,7 +64,7 @@ aug_createxstr(size_t size)
 	size = AUG_MAX(MINSIZE_, size);
 
 	if (!(xstr = malloc(sizeof(struct aug_xstr_) + size))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
 		return NULL;
     }
 

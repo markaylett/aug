@@ -51,7 +51,7 @@ aug_createtcpconnect(const char* host, const char* serv)
 
     if (!(conn  = malloc(sizeof(struct aug_tcpconnect_)))) {
         aug_destroyaddrinfo(res);
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 

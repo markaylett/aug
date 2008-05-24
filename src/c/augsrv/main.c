@@ -153,7 +153,7 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
 
         /* Install daemon logger prior to opening log file. */
 
-        aug_setlogger(aug_daemonlogger);
+        aug_setlog(aug_tlx, aug_getdaemonlog());
         daemon = 1;
     }
 #endif /* !_WIN32 */

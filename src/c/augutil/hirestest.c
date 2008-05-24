@@ -17,12 +17,12 @@ main(int argc, char* argv[])
     aug_atexitinit(&errinfo);
 
     if (!(hires = aug_createhires())) {
-        aug_perrinfo(NULL, "aug_createhires() failed");
+        aug_perrinfo(aug_tlerr, "aug_createhires() failed");
         return 1;
     }
 
     if (!aug_elapsed(hires, &start)) {
-        aug_perrinfo(NULL, "aug_elapsed() failed");
+        aug_perrinfo(aug_tlerr, "aug_elapsed() failed");
         return 1;
     }
 
@@ -31,7 +31,7 @@ main(int argc, char* argv[])
     aug_msleep(500);
 
     if (!aug_elapsed(hires, &stop)) {
-        aug_perrinfo(NULL, "aug_elapsed() failed");
+        aug_perrinfo(aug_tlerr, "aug_elapsed() failed");
         return 1;
     }
 
@@ -44,7 +44,7 @@ main(int argc, char* argv[])
     }
 
     if (-1 == aug_destroyhires(hires)) {
-        aug_perrinfo(NULL, "aug_destroyhires() failed");
+        aug_perrinfo(aug_tlerr, "aug_destroyhires() failed");
         return 1;
     }
 

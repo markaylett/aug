@@ -76,7 +76,7 @@ name(void) \
     if (AUG_EMPTY((head))) { \
         struct type* end; \
         if (!(it = (struct type*)malloc(sizeof(struct type) * (bsize)))) { \
-            aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);       \
+            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM); \
             return NULL; \
         } \
         for (end = it + (bsize); it < end; ++it) \

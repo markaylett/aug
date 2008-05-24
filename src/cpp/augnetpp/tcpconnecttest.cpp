@@ -44,8 +44,10 @@ main(int argc, char* argv[])
                 throw;
             }
         }
-        throw error("error not thrown by tryconnect()");
+        cerr << "error not thrown by tryconnect()\n";
 
-    } AUG_PERRINFOCATCH;
+    } catch (const exception& e) {
+        cerr << e.what() << endl;
+    }
     return 1;
 }

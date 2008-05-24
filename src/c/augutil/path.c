@@ -52,7 +52,7 @@ AUGUTIL_API int
 aug_chdir(const char* path)
 {
     if (-1 == chdir(path)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return -1;
     }
     return 0;
@@ -66,7 +66,7 @@ aug_getcwd(char* dst, size_t size)
 #else /* _WIN32 */
     if (!getcwd(dst, (int)size)) {
 #endif /* _WIN32 */
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return NULL;
     }
     return dst;
@@ -97,7 +97,7 @@ aug_gettmp(char* dst, size_t size)
 #else /* _WIN32 */
     char buf[MAX_PATH + 1]; /* Ensure required buffer space. */
     if (0 == GetTempPath(sizeof(buf), buf)) {
-        aug_setwin32errinfo(NULL, __FILE__, __LINE__, GetLastError());
+        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         return NULL;
     }
     aug_strlcpy(dst, buf, size);
@@ -165,22 +165,22 @@ aug_realpath(char* dst, const char* src, size_t size)
        of realpath().  Verify that this is indeed the case. */
 
     if (-1 == (pathmax = pathconf(src, _PC_PATH_MAX))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return NULL;
     }
 
     if (!(buf = alloca(pathmax + 1))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
     if (!realpath(src, buf)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return NULL;
     }
 
     if (size <= strlen(buf)) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ELIMIT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }
@@ -189,7 +189,7 @@ aug_realpath(char* dst, const char* src, size_t size)
     return dst;
 #else /* _WIN32 */
     if (!_fullpath(dst, src, size)) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return NULL;
     }
     return dst;

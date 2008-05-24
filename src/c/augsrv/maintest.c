@@ -59,9 +59,8 @@ run_(void* arg)
         return -1;
 
     if (in.type_ != out.type_) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EIO,
-                       AUG_MSG("unexpected event type from"
-                               " aug_readevent()"));
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
+                       AUG_MSG("unexpected event type from aug_readevent()"));
         return -1;
     }
 

@@ -466,7 +466,7 @@ namespace {
 
         } AUG_SETERRINFOCATCH;
 #else // !ENABLE_SSL
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_setsslserver() not supported"));
 #endif // !ENABLE_SSL
         return -1;
@@ -488,7 +488,7 @@ namespace {
 
         } AUG_SETERRINFOCATCH;
 #else // !ENABLE_SSL
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_ESUPPORT,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                        AUG_MSG("aug_setsslserver() not supported"));
 #endif // !ENABLE_SSL
         return -1;

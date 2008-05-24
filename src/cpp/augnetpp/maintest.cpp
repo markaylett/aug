@@ -64,9 +64,10 @@ main(int argc, char* argv[])
         marhandler y;
         marparser mparser(1024, y);
 
+        return 0;
+
     } catch (const exception& e) {
         cerr << e.what() << endl;
-        return 1;
     }
-    return 0;
+    return 1;
 }

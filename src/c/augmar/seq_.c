@@ -68,7 +68,7 @@ resizemem_(aug_seq_t seq, unsigned size, unsigned tail)
     if (!memseq->addr_) {
 
         if (!(addr = calloc(size, 1))) {
-            aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
             return NULL;
         }
 
@@ -78,7 +78,7 @@ resizemem_(aug_seq_t seq, unsigned size, unsigned tail)
     } else if (size > memseq->len_) {
 
         if (!(addr = realloc(memseq->addr_, size))) {
-            aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
             return NULL;
         }
 
@@ -239,7 +239,7 @@ aug_createseq_(unsigned tail)
 {
     struct memseq_* memseq;
     if (!(memseq = (struct memseq_*)malloc(sizeof(struct memseq_) + tail))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 

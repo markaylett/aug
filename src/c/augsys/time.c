@@ -20,7 +20,7 @@ aug_timegm(struct tm* tm)
 #if HAVE_TIMEGM
 
     if ((time_t)-1 == (ret = timegm(tm)))
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
 
 #else /* !HAVE_TIMEGM */
@@ -37,7 +37,7 @@ aug_timegm(struct tm* tm)
     gm.tm_isdst = 0; /* No daylight adjustment. */
 
     if ((time_t)-1 == (ret = mktime(&gm))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
         return ret;
     }
@@ -56,7 +56,7 @@ aug_timelocal(struct tm* tm)
 {
     time_t ret = mktime(tm);
     if (ret == (time_t)-1)
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
     return ret;
 }
@@ -94,7 +94,7 @@ aug_gmtime(const time_t* clock, struct tm* res)
     return res;
 
  fail:
-    aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
                         ? EINVAL : errno);
     return NULL;
 }
@@ -132,7 +132,7 @@ aug_localtime(const time_t* clock, struct tm* res)
     return res;
 
  fail:
-    aug_setposixerrinfo(NULL, __FILE__, __LINE__, 0 == errno
+    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
                         ? EINVAL : errno);
     return NULL;
 }

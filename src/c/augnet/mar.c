@@ -139,7 +139,7 @@ aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
     aug_object* addrob;
 
     if (!parser) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 

@@ -67,9 +67,10 @@ main(int argc, char* argv[])
             foreachchannel<test, &test::cb>(channs, x);
         }
 
+        return 0;
+
     } catch (const exception& e) {
         cerr << e.what() << endl;
-        return 1;
     }
-    return 0;
+    return 1;
 }

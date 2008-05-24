@@ -66,7 +66,7 @@ createlexer_(size_t size)
         size = AUG_MAXLINE;
 
     if (!(lexer = malloc(sizeof(struct aug_lexer_)))) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 

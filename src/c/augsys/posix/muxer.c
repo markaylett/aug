@@ -1,10 +1,12 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augctx/defs.h"   /* AUG_MAX */
-#include "augsys/errinfo.h"
 #include "augsys/time.h"   /* aug_tvtoms() */
 #include "augsys/unistd.h" /* aug_pipe() */
+
+#include "augctx/base.h"
+#include "augctx/defs.h"   /* AUG_MAX */
+#include "augctx/errinfo.h"
 
 #include <errno.h>
 #include <stdlib.h>        /* malloc() */
@@ -74,7 +76,7 @@ resize_(aug_muxer_t muxer, size_t size)
     struct pollfd* ptr = realloc(muxer->pollfds_,
                                  sizeof(struct pollfd) * size);
     if (!ptr) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return -1;
     }
 
@@ -89,7 +91,7 @@ aug_createmuxer(void)
 {
     aug_muxer_t muxer = malloc(sizeof(struct aug_muxer_));
     if (!muxer) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -125,33 +127,33 @@ aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
     struct pollfd* ptr;
 
     if (mask & ~AUG_FDEVENTALL) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid fdevent mask '%d'"), (int)mask);
         return -1;
     }
 
-    if (muxer->size_ <= fd)
-        if (-1 == resize_(muxer, AUG_MAX(fd + 1, muxer->size_ * 2)))
+    if (muxer->size_ <= md)
+        if (-1 == resize_(muxer, AUG_MAX(md + 1, muxer->size_ * 2)))
             return -1;
 
-    ptr = muxer->pollfds_ + fd;
+    ptr = muxer->pollfds_ + md;
     if (mask) {
 
-        ptr->fd = fd;
+        ptr->fd = md;
         ptr->events = internal_(mask);
 
-        if (muxer->nfds_ <= fd)
-            muxer->nfds_ = fd + 1;
+        if (muxer->nfds_ <= md)
+            muxer->nfds_ = md + 1;
 
     } else {
 
         initpollfd_(ptr);
 
-        if (muxer->nfds_ == fd + 1) {
+        if (muxer->nfds_ == md + 1) {
 
-            for (--fd; fd >= 0 && -1 == muxer->pollfds_[fd].fd; --fd)
+            for (--md; md >= 0 && -1 == muxer->pollfds_[md].fd; --md)
                 ;
-            muxer->nfds_ = fd + 1;
+            muxer->nfds_ = md + 1;
         }
     }
     return 0;
@@ -175,7 +177,8 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 
     if (-1 == (ret = poll(muxer->pollfds_, muxer->nfds_, ms))) {
 
-        if (EINTR == aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno))
+        if (EINTR == aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+                                         errno))
             ret = AUG_FAILINTR;
     }
     return ret;
@@ -184,13 +187,13 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 AUGSYS_API int
 aug_fdeventmask(aug_muxer_t muxer, aug_md md)
 {
-    return external_(muxer->pollfds_[fd].events);
+    return external_(muxer->pollfds_[md].events);
 }
 
 AUGSYS_API int
 aug_fdevents(aug_muxer_t muxer, aug_md md)
 {
-    return external_(muxer->pollfds_[fd].revents);
+    return external_(muxer->pollfds_[md].revents);
 }
 
 #else /* !HAVE_POLL */
@@ -219,13 +222,13 @@ external_(struct set_* p, aug_md md)
 {
     unsigned short dst = 0;
 
-    if (FD_ISSET(fd, &p->rd_))
+    if (FD_ISSET(md, &p->rd_))
         dst |= AUG_FDEVENTRD;
 
-    if (FD_ISSET(fd, &p->wr_))
+    if (FD_ISSET(md, &p->wr_))
         dst |= AUG_FDEVENTWR;
 
-    if (FD_ISSET(fd, &p->ex_))
+    if (FD_ISSET(md, &p->ex_))
         dst |= AUG_FDEVENTEX;
 
     return dst;
@@ -234,24 +237,24 @@ external_(struct set_* p, aug_md md)
 static void
 setfdevents_(struct set_* p, aug_md md, unsigned short mask)
 {
-    unsigned short cur = external_(p, fd);
+    unsigned short cur = external_(p, md);
     unsigned short set = ~cur & mask;
     unsigned short unset = cur & ~mask;
 
     if (set & AUG_FDEVENTRD)
-        FD_SET(fd, &p->rd_);
+        FD_SET(md, &p->rd_);
     else if (unset & AUG_FDEVENTRD)
-        FD_CLR(fd, &p->rd_);
+        FD_CLR(md, &p->rd_);
 
     if (set & AUG_FDEVENTWR)
-        FD_SET(fd, &p->wr_);
+        FD_SET(md, &p->wr_);
     else if (unset & AUG_FDEVENTWR)
-        FD_CLR(fd, &p->wr_);
+        FD_CLR(md, &p->wr_);
 
     if (set & AUG_FDEVENTEX)
-        FD_SET(fd, &p->ex_);
+        FD_SET(md, &p->ex_);
     else if (unset & AUG_FDEVENTEX)
-        FD_CLR(fd, &p->ex_);
+        FD_CLR(md, &p->ex_);
 }
 
 AUGSYS_API aug_muxer_t
@@ -259,7 +262,7 @@ aug_createmuxer(void)
 {
     aug_muxer_t muxer = malloc(sizeof(struct aug_muxer_));
     if (!muxer) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
@@ -289,35 +292,35 @@ aug_setnowait(aug_muxer_t muxer, unsigned nowait)
 AUGSYS_API int
 aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
-    if (FD_SETSIZE <= fd) {
-        aug_setposixerrinfo(NULL, __FILE__, __LINE__, EMFILE);
+    if (FD_SETSIZE <= md) {
+        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EMFILE);
         return -1;
     }
 
     if (mask & ~AUG_FDEVENTALL) {
-        aug_seterrinfo(NULL, __FILE__, __LINE__, AUG_SRCLOCAL, AUG_EINVAL,
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid fdevent mask"));
         return -1;
     }
 
-    setfdevents_(&muxer->in_, fd, mask);
+    setfdevents_(&muxer->in_, md, mask);
 
     /* Update maxfd. */
 
-    if (muxer->maxfd_ <= fd) {
+    if (muxer->maxfd_ <= md) {
 
         /* Use fd a starting point to find the highest fd with events set. */
 
         do {
 
-            if (FD_ISSET(fd, &muxer->in_.rd_)
-                || FD_ISSET(fd, &muxer->in_.wr_)
-                || FD_ISSET(fd, &muxer->in_.ex_))
+            if (FD_ISSET(md, &muxer->in_.rd_)
+                || FD_ISSET(md, &muxer->in_.wr_)
+                || FD_ISSET(md, &muxer->in_.ex_))
                 break;
 
-        } while (-1 != --fd);
+        } while (-1 != --md);
 
-        muxer->maxfd_ = fd;
+        muxer->maxfd_ = md;
     }
 
     return 0;
@@ -343,7 +346,8 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
                             &muxer->out_.wr_, &muxer->out_.ex_,
                             (struct timeval*)timeout))) {
 
-        if (EINTR == aug_setposixerrinfo(NULL, __FILE__, __LINE__, errno))
+        if (EINTR == aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+                                         errno))
             ret = AUG_FAILINTR;
     }
     return ret;
@@ -352,13 +356,13 @@ aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 AUGSYS_API int
 aug_fdeventmask(aug_muxer_t muxer, aug_md md)
 {
-    return external_(&muxer->in_, fd);
+    return external_(&muxer->in_, md);
 }
 
 AUGSYS_API int
 aug_fdevents(aug_muxer_t muxer, aug_md md)
 {
-    return external_(&muxer->out_, fd);
+    return external_(&muxer->out_, md);
 }
 
 #endif /* !HAVE_POLL */
@@ -366,5 +370,5 @@ aug_fdevents(aug_muxer_t muxer, aug_md md)
 AUGSYS_API int
 aug_muxerpipe(aug_md mds[2])
 {
-    return aug_pipe(fds);
+    return aug_fpipe(mds);
 }

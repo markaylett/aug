@@ -6,6 +6,8 @@
 
 #include "augctx/config.h"
 
+#include "augtypes.h" /* aug_bool */
+
 #include <stdarg.h>
 
 struct aug_errinfo {
@@ -18,6 +20,9 @@ struct aug_errinfo {
 
 AUGCTX_API void
 aug_clearerrinfo(struct aug_errinfo* errinfo);
+
+AUGCTX_API aug_bool
+aug_iserrinfo(const struct aug_errinfo* errinfo, const char* src, int num);
 
 AUGCTX_API int
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,

@@ -61,6 +61,7 @@ static aug_result
 gettimeofday_(aug_clock* obj, struct timeval* tv)
 {
 #if !defined(_WIN32)
+    /* FIXME: policy for setting errinfo? */
     if (-1 == gettimeofday(tv, NULL))
         return AUG_FAILERROR;
 #else /* _WIN32 */

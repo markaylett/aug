@@ -158,7 +158,7 @@ namespace {
           LEAD: none - already leader
           CAND: become leader
           MEMB: become candidate: set RESPONSE_MS
-         */
+        */
     }
 
     void
@@ -166,7 +166,7 @@ namespace {
     {
         /*
           ALL: broadcast status
-         */
+        */
     }
 
     void
@@ -176,7 +176,7 @@ namespace {
           LEAD: none - already leader
           CAND: become leader
           MEMB: become leader
-         */
+        */
     }
 
     void
@@ -186,7 +186,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -196,7 +196,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -206,7 +206,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -216,7 +216,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -226,7 +226,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -236,7 +236,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -246,7 +246,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -256,7 +256,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -266,7 +266,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -276,7 +276,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -286,7 +286,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -296,7 +296,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -306,7 +306,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -316,7 +316,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -326,7 +326,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -336,7 +336,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     void
@@ -346,7 +346,7 @@ namespace {
           LEAD:
           CAND:
           MEMB:
-         */
+        */
     }
 
     enum msgtype {
@@ -453,7 +453,7 @@ namespace {
     }
 
     void
-    recvfrom(fdref ref, packet& p, endpoint& ep)
+    recvfrom(sdref ref, packet& p, endpoint& ep)
     {
         char buf[MAX_NAME + 1];
         aug::recvfrom(ref, buf, sizeof(buf), 0, ep);
@@ -462,7 +462,7 @@ namespace {
     }
 
     size_t
-    sendto(fdref ref, const char* node, msgtype type, const endpoint& ep)
+    sendto(sdref ref, const char* node, msgtype type, const endpoint& ep)
     {
         char buf[MAX_NAME + 1];
         fixedcpy(buf, node, MAX_NAME);
@@ -472,7 +472,7 @@ namespace {
 
     class session {
         const char* const node_;
-        fdref ref_;
+        sdref ref_;
         const endpoint& ep_;
         state state_;
         timer hbwait_;
@@ -485,7 +485,7 @@ namespace {
         void
         becomeslave()
         {
-            aug_info("becoming slave");
+            aug_ctxinfo(aug_tlx, "becoming slave");
             state_ = SLAVE;
             mwait_.reset(mwaitms_ = mwaitms());
             sendto(ref_, node_, SLAVEUP, ep_);
@@ -496,15 +496,15 @@ namespace {
         {
             switch (state_) {
             case MASTER:
-                aug_info("broadcasting or sending master-up");
+                aug_ctxinfo(aug_tlx, "broadcasting or sending master-up");
                 sendto(ref_, node_, MASTERUP, ep);
                 break;
             case CANDID:
-                aug_info("broadcasting or sending candidate-up");
+                aug_ctxinfo(aug_tlx, "broadcasting or sending candidate-up");
                 sendto(ref_, node_, CANDIDUP, ep);
                 break;
             case SLAVE:
-                aug_info("broadcasting or sending slave-up");
+                aug_ctxinfo(aug_tlx, "broadcasting or sending slave-up");
                 sendto(ref_, node_, SLAVEUP, ep);
                 break;
             }
@@ -518,15 +518,15 @@ namespace {
 
             if (MASTER == state_ && null != slave_) {
                 try {
-                    aug_info("sending handover");
+                    aug_ctxinfo(aug_tlx, "sending handover");
                     sendto(ref_, node_, HANDOVER, slave_);
                 } AUG_PERRINFOCATCH;
             }
 
-            aug_info("broadcasting node down");
+            aug_ctxinfo(aug_tlx, "broadcasting node down");
             sendto(ref_, node_, NODEDOWN, ep_);
         }
-        session(const char* node, fdref ref, const endpoint& ep, timers& ts)
+        session(const char* node, sdref ref, const endpoint& ep, timers& ts)
             : node_(node),
               ref_(ref),
               ep_(ep),
@@ -540,7 +540,7 @@ namespace {
             // When a node starts, it sends a query to determine the current
             // master (if any).
 
-            aug_info("broadcasting slave-up and query");
+            aug_ctxinfo(aug_tlx, "broadcasting slave-up and query");
             sendto(ref, node_, SLAVEUP, ep);
             sendto(ref, node_, QUERY, ep);
 
@@ -550,8 +550,8 @@ namespace {
         void
         recv(const packet& p, const endpoint& from)
         {
-            aug_info("received: msgtype='%s', state='%s'", tostring(p.type_),
-                     tostring(state_));
+            aug_ctxinfo(aug_tlx, "received: msgtype='%s', state='%s'",
+                        tostring(p.type_), tostring(state_));
 
             // The following message types can be handled in a uniform manner,
             // regardless of the current state.
@@ -564,7 +564,7 @@ namespace {
                 // up message.
 
                 if (MASTER == state_) {
-                    aug_info("becoming master");
+                    aug_ctxinfo(aug_tlx, "becoming master");
                     state_ = MASTER;
                     sendto(ref_, node_, MASTERUP, ep_);
                 }
@@ -576,7 +576,7 @@ namespace {
                 // Whenever a node receives a packet from a slave, the address
                 // is stored so that a handover can be performed if need be.
 
-                aug_info("storing slave address");
+                aug_ctxinfo(aug_tlx, "storing slave address");
                 slave_ = from;
                 return;
 
@@ -586,11 +586,11 @@ namespace {
                 // Whenever a node receives a packet from a master, the time
                 // is recorded.
 
-                aug_info("storing time of master activity");
+                aug_ctxinfo(aug_tlx, "storing time of master activity");
                 mseen_ = true;
                 aug::gettimeofday(mlast_);
 
-                aug_info("resetting mwait timer");
+                aug_ctxinfo(aug_tlx, "resetting mwait timer");
                 mwait_.reset(mwaitms_);
 
                 break; // Other actions may still need to be performed.
@@ -601,7 +601,7 @@ namespace {
                 // All nodes should respond to a query by sending an up
                 // message to the sender.
 
-                aug_info("responding to nodeup/query");
+                aug_ctxinfo(aug_tlx, "responding to nodeup/query");
                 sendup(from);
                 return; // Done.
 
@@ -622,7 +622,7 @@ namespace {
                 // When a candidate detects another candidate, it asks them to
                 // stand-down.
 
-                aug_info("sending stand-down");
+                aug_ctxinfo(aug_tlx, "sending stand-down");
                 sendto(ref_, node_, STANDDOWN, from);
                 break;
 
@@ -646,7 +646,7 @@ namespace {
                 // When a master detects either a candidate or another master,
                 // it asks them to stand-down.
 
-                aug_info("sending stand-down");
+                aug_ctxinfo(aug_tlx, "sending stand-down");
                 sendto(ref_, node_, STANDDOWN, from);
                 break;
 
@@ -671,7 +671,7 @@ namespace {
                     gettimeofday(tv);
                     unsigned ms(tvtoms(tvsub(tv, mlast_)));
                     if (ms < HB_MS) {
-                        aug_info("sending stand-down");
+                        aug_ctxinfo(aug_tlx, "sending stand-down");
                         sendto(ref_, node_, STANDDOWN, from);
                     }
                 }
@@ -688,31 +688,33 @@ namespace {
         void
         timercb(int id, unsigned& ms)
         {
-            if (id == hbwait_.id()) {
+            if (idref(id) == hbwait_.id()) {
 
-                aug_info("hbint timeout: state='%s'", tostring(state_));
+                aug_ctxinfo(aug_tlx, "hbint timeout: state='%s'",
+                            tostring(state_));
 
                 // Candidates for master will still heartbeat as slaves.
 
                 if (MASTER == state_) {
-                    aug_info("broadcasting master hb");
+                    aug_ctxinfo(aug_tlx, "broadcasting master hb");
                     sendto(ref_, node_, MASTERHB, ep_);
                 } else {
-                    aug_info("broadcasting slave hb");
+                    aug_ctxinfo(aug_tlx, "broadcasting slave hb");
                     sendto(ref_, node_, SLAVEHB, ep_);
                 }
 
-            } else if (id == mwait_.id()) {
+            } else if (idref(id) == mwait_.id()) {
 
-                aug_info("wait timeout: state='%s'", tostring(state_));
+                aug_ctxinfo(aug_tlx, "wait timeout: state='%s'",
+                            tostring(state_));
 
                 if (CANDID == state_) {
-                    aug_info("becoming master");
+                    aug_ctxinfo(aug_tlx, "becoming master");
                     ms = 0; // Cancel timer.
                     state_ = MASTER;
                     sendto(ref_, node_, MASTERUP, ep_);
                 } else {
-                    aug_info("becoming candidate");
+                    aug_ctxinfo(aug_tlx, "becoming candidate");
                     ms = RESPONSE_MS;
                     state_ = CANDID;
                     sendto(ref_, node_, CANDIDUP, ep_);
@@ -722,7 +724,7 @@ namespace {
     };
 
     void
-    run(const char* node, fdref ref, const endpoint& ep)
+    run(const char* node, sdref ref, const endpoint& ep)
     {
         muxer mux;
         timers ts;
@@ -734,13 +736,13 @@ namespace {
         while (!stop_) {
 
             foreachexpired(ts, 0 == ret, tv);
-            aug_info("timeout in: tv_sec=%d, tv_usec=%d", (int)tv.tv_sec,
-                     (int)tv.tv_usec);
+            aug_ctxinfo(aug_tlx, "timeout in: tv_sec=%d, tv_usec=%d",
+                        (int)tv.tv_sec, (int)tv.tv_usec);
 
-            while (AUG_RETINTR == (ret = waitfdevents(mux, tv)))
+            while (AUG_FAILINTR == (ret = waitfdevents(mux, tv)))
                 ;
 
-            aug_info("waitfdevents: %d", ret);
+            aug_ctxinfo(aug_tlx, "waitfdevents: %d", ret);
 
             if (0 < ret) {
                 packet p;
@@ -749,7 +751,7 @@ namespace {
                 if (0 != strcmp(node, p.node_))
                     s.recv(p, from);
                 else
-                    aug_info("ignoring packet from self");
+                    aug_ctxinfo(aug_tlx, "ignoring packet from self");
             }
         }
     }
@@ -762,44 +764,38 @@ main(int argc, char* argv[])
 
     try {
 
-        aug_errinfo errinfo;
-        scoped_init init(errinfo);
-        aug_setlogger(aug_daemonlogger);
+        start();
+        aug_setlog(aug_tlx, aug_getdaemonlog());
 
-        try {
+        timeval tv;
+        aug::gettimeofday(tv);
+        aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
 
-            timeval tv;
-            aug::gettimeofday(tv);
-            aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
-
-            if (argc < 4) {
-                aug_error("usage: heartbeat <node> <mcast> <serv> [ifname]");
-                return 1;
-            }
-
-            inetaddr in(argv[2]);
-            smartfd sfd(aug::socket(family(in), SOCK_DGRAM));
-            setreuseaddr(sfd, true);
-
-            // Set outgoing multicast interface.
-
-            if (5 == argc)
-                setmcastif(sfd, argv[4]);
-
-            // Don't receive packets from self.
-
-            endpoint ep(inetany(family(in)), htons(atoi(argv[3])));
-            aug::bind(sfd, ep);
-
-            joinmcast(sfd, in, 5 == argc ? argv[4] : 0);
-            setinetaddr(ep, in);
-            run(argv[1], sfd, ep);
-
-        } catch (const errinfo_error& e) {
-            perrinfo(e, "aug::errorinfo_error");
-        } catch (const exception& e) {
-            aug_error("std::exception: %s", e.what());
+        if (argc < 4) {
+            aug_ctxerror(aug_tlx,
+                         "usage: heartbeat <node> <mcast> <serv> [ifname]");
+            return 1;
         }
+
+        inetaddr in(argv[2]);
+        autosd sfd(aug::socket(family(in), SOCK_DGRAM));
+        setreuseaddr(sfd, true);
+
+        // Set outgoing multicast interface.
+
+        if (5 == argc)
+            setmcastif(sfd, argv[4]);
+
+        // Don't receive packets from self.
+
+        endpoint ep(inetany(family(in)), htons(atoi(argv[3])));
+        aug::bind(sfd, ep);
+
+        joinmcast(sfd, in, 5 == argc ? argv[4] : 0);
+        setinetaddr(ep, in);
+        run(argv[1], sfd, ep);
+        return 0;
+
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }

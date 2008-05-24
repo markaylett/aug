@@ -147,7 +147,7 @@ namespace {
             mod_writelog(MOD_LOGINFO, "echos: %d", echos_);
 
             for (; estab_ < conns_; ++estab_)
-                tryconnect(host, serv, new state(echos_));
+                tcpconnect(host, serv, new state(echos_));
             return true;
         }
         void
@@ -213,7 +213,8 @@ namespace {
         bench()
             : conns_(0),
               estab_(0),
-              bytes_(0)
+              bytes_(0),
+              hires_(aug::getmpool(aug_tlx))
         {
         }
         static session_base*

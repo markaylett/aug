@@ -29,11 +29,11 @@ testencode_(aug_base64_t encoder, const char* in, const char* out)
 {
     encoded_[0] = '\0';
     if (-1 == aug_appendbase64(encoder, in, strlen(in))) {
-        aug_perrinfo(NULL, "aug_appendbase64() failed");
+        aug_perrinfo(aug_tlerr, "aug_appendbase64() failed");
         return -1;
     }
     if (-1 == aug_finishbase64(encoder)) {
-        aug_perrinfo(NULL, "aug_endbase64() failed");
+        aug_perrinfo(aug_tlerr, "aug_endbase64() failed");
         return -1;
     }
     if (0 != strcmp(encoded_, out)) {
@@ -48,11 +48,11 @@ testdecode_(aug_base64_t decoder, const char* in, const char* out)
 {
     decoded_[0] = '\0';
     if (-1 == aug_appendbase64(decoder, in, strlen(in))) {
-        aug_perrinfo(NULL, "aug_appendbase64() failed");
+        aug_perrinfo(aug_tlerr, "aug_appendbase64() failed");
         return -1;
     }
     if (-1 == aug_finishbase64(decoder)) {
-        aug_perrinfo(NULL, "aug_endbase64() failed");
+        aug_perrinfo(aug_tlerr, "aug_endbase64() failed");
         return -1;
     }
     if (0 != strcmp(decoded_, out)) {
@@ -70,12 +70,12 @@ main(int argc, char* argv[])
     aug_atexitinit(&errinfo);
 
     if (!(encoder = aug_createbase64(AUG_ENCODE64, encode_, NULL))) {
-        aug_perrinfo(NULL, "aug_createbase64() failed");
+        aug_perrinfo(aug_tlerr, "aug_createbase64() failed");
         return 1;
     }
 
     if (!(decoder = aug_createbase64(AUG_DECODE64, decode_, NULL))) {
-        aug_perrinfo(NULL, "aug_createbase64() failed");
+        aug_perrinfo(aug_tlerr, "aug_createbase64() failed");
         goto fail1;
     }
 
@@ -98,12 +98,12 @@ main(int argc, char* argv[])
         goto fail2;
 
     if (-1 == aug_destroybase64(decoder)) {
-        aug_perrinfo(NULL, "aug_destroybase64() failed");
+        aug_perrinfo(aug_tlerr, "aug_destroybase64() failed");
         goto fail1;
     }
 
     if (-1 == aug_destroybase64(encoder)) {
-        aug_perrinfo(NULL, "aug_destroybase64() failed");
+        aug_perrinfo(aug_tlerr, "aug_destroybase64() failed");
         return 1;
     }
     return 0;

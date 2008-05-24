@@ -5,7 +5,9 @@
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
 
+#include <iostream>
 #include <memory>
+
 #include <time.h>
 
 using namespace aug;
@@ -27,8 +29,8 @@ namespace test {
         if (0 == aug_strcasecmp(name, "loglevel")) {
 
             unsigned level(strtoui(value, 10));
-            aug_info("setting log level: %d", level);
-            aug_setloglevel(level);
+            aug_ctxinfo(aug_tlx, "setting log level: %d", level);
+            aug_setloglevel(aug_tlx, level);
 
         } else if (0 == aug_strcasecmp(name, "logfile")) {
 
@@ -72,29 +74,29 @@ namespace test {
         readevent()
         {
             int fd(aug_eventrd());
-            AUG_DEBUG2("checking event pipe '%d'", fd);
+            AUG_CTXDEBUG2(aug_tlx, "checking event pipe '%d'", fd);
 
             if (!fdevents(state_->muxer_, fd))
                 return;
 
-            AUG_DEBUG2("reading event");
+            AUG_CTXDEBUG2(aug_tlx, "reading event");
 
             pair<int, smartob<aug_object> > event(aug::readevent(fd));
 
             switch (event.first) {
             case AUG_EVENTRECONF:
-                aug_info("received AUG_EVENTRECONF");
+                aug_ctxinfo(aug_tlx, "received AUG_EVENTRECONF");
                 if (*conffile_) {
-                    aug_info("reading: %s", conffile_);
+                    aug_ctxinfo(aug_tlx, "reading: %s", conffile_);
                     aug::readconf(conffile_, aug::confcb<confcb>, null);
                 }
                 reconf();
                 break;
             case AUG_EVENTSTATUS:
-                aug_info("received AUG_EVENTSTATUS");
+                aug_ctxinfo(aug_tlx, "received AUG_EVENTSTATUS");
                 break;
             case AUG_EVENTSTOP:
-                aug_info("received AUG_EVENTSTOP");
+                aug_ctxinfo(aug_tlx, "received AUG_EVENTSTOP");
                 remain_ = 0;
                 break;
             }
@@ -108,10 +110,10 @@ namespace test {
             if (daemon_)
                 openlog(logfile_);
 
-            aug_info("run directory: %s", rundir_);
-            aug_info("pid file: %s", pidfile_);
-            aug_info("log file: %s", logfile_);
-            aug_info("log level: %d", aug_loglevel());
+            aug_ctxinfo(aug_tlx, "run directory: %s", rundir_);
+            aug_ctxinfo(aug_tlx, "pid file: %s", pidfile_);
+            aug_ctxinfo(aug_tlx, "log file: %s", logfile_);
+            aug_ctxinfo(aug_tlx, "log level: %d", aug_loglevel());
         }
 
     public:
@@ -149,7 +151,7 @@ namespace test {
         readconf(const char* conffile, bool batch, bool daemon)
         {
             if (conffile) {
-                aug_info("reading: %s", conffile);
+                aug_ctxinfo(aug_tlx, "reading: %s", conffile);
                 aug::readconf(conffile, aug::confcb<confcb>, null);
                 aug_strlcpy(conffile_, conffile, sizeof(conffile_));
             }
@@ -167,7 +169,7 @@ namespace test {
         void
         init()
         {
-            aug_info("initialising daemon process");
+            aug_ctxinfo(aug_tlx, "initialising daemon process");
 
             verify(aug_setsrvlogger("aug"));
 
@@ -181,7 +183,7 @@ namespace test {
         {
             timeval tv;
 
-            aug_info("running daemon process");
+            aug_ctxinfo(aug_tlx, "running daemon process");
 
             state_->timer_.set(5000, *this);
 
@@ -190,16 +192,16 @@ namespace test {
 
                 if (state_->timers_.empty()) {
 
-                    while (AUG_RETINTR == (ret = waitfdevents(state_
-                                                              ->muxer_)))
+                    while (AUG_FAILINTR == (ret = waitfdevents(state_
+                                                               ->muxer_)))
                         ;
 
                 } else {
 
                     foreachexpired(state_->timers_, 0 == ret, tv);
-                    while (AUG_RETINTR == (ret = waitfdevents(state_
-                                                              ->muxer_,
-                                                              tv)))
+                    while (AUG_FAILINTR == (ret = waitfdevents(state_
+                                                               ->muxer_,
+                                                               tv)))
                         ;
                 }
 
@@ -210,14 +212,14 @@ namespace test {
         void
         term()
         {
-            aug_info("terminating daemon process");
+            aug_ctxinfo(aug_tlx, "terminating daemon process");
             state_.reset();
         }
 
         void
         timercb(int id, unsigned& ms)
         {
-            aug_info("timer fired");
+            aug_ctxinfo(aug_tlx, "timer fired");
             --remain_;
         }
     };
@@ -230,8 +232,7 @@ main(int argc, char* argv[])
 
     try {
 
-        aug_errinfo errinfo;
-        scoped_init init(errinfo);
+        start();
 		service serv;
 
         program_ = argv[0];
@@ -239,8 +240,7 @@ main(int argc, char* argv[])
         return main(argc, argv, serv);
 
     } catch (const exception& e) {
-
-        aug_error("%s", e.what());
+        cerr << e.what() << endl;
     }
 
     return 1; // aug_main() does not return.

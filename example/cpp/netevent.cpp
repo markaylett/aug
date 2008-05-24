@@ -25,7 +25,7 @@ namespace {
     }
 
     void
-    recvfrom(fdref ref, aug_netevent& ev, endpoint& ep)
+    recvfrom(sdref ref, aug_netevent& ev, endpoint& ep)
     {
         char buf[AUG_NETEVENT_SIZE];
         aug::recvfrom(ref, buf, sizeof(buf), 0, ep);
@@ -59,7 +59,7 @@ namespace {
             load_ = load;
         }
         size_t
-        sendto(fdref ref, int type, const endpoint& ep)
+        sendto(sdref ref, int type, const endpoint& ep)
         {
             type_ = type;
             ++seq_;
@@ -72,7 +72,7 @@ namespace {
 
     class session {
         const char* const name_;
-        fdref ref_;
+        sdref ref_;
         const endpoint& ep_;
         timer hbwait_;
 
@@ -80,7 +80,7 @@ namespace {
         ~session() AUG_NOTHROW
         {
         }
-        session(const char* name, fdref ref, const endpoint& ep, timers& ts)
+        session(const char* name, sdref ref, const endpoint& ep, timers& ts)
             : name_(name),
               ref_(ref),
               ep_(ep),
@@ -95,9 +95,9 @@ namespace {
         void
         timercb(int id, unsigned& ms)
         {
-            if (id == hbwait_.id()) {
+            if (idref(id) == hbwait_.id()) {
 
-                aug_info("hbint timeout");
+                aug_ctxinfo(aug_tlx, "hbint timeout");
                 netevent event("test", "test", 2);
                 event.sendto(ref_, 1, ep_);
             }
@@ -105,11 +105,11 @@ namespace {
     };
 
     void
-    run(const char* name, fdref ref, const endpoint& ep)
+    run(const char* name, sdref ref, const endpoint& ep)
     {
         endpoint addr(null);
         getsockname(ref, addr);
-        aug_info("bound to: [%s]", endpointntop(addr).c_str());
+        aug_ctxinfo(aug_tlx, "bound to: [%s]", endpointntop(addr).c_str());
 
         muxer mux;
         timers ts;
@@ -121,13 +121,13 @@ namespace {
         while (!stop_) {
 
             foreachexpired(ts, 0 == ret, tv);
-            aug_info("timeout in: tv_sec=%d, tv_usec=%d", (int)tv.tv_sec,
-                     (int)tv.tv_usec);
+            aug_ctxinfo(aug_tlx, "timeout in: tv_sec=%d, tv_usec=%d",
+                        (int)tv.tv_sec, (int)tv.tv_usec);
 
-            while (AUG_RETINTR == (ret = waitfdevents(mux, tv)))
+            while (AUG_FAILINTR == (ret = waitfdevents(mux, tv)))
                 ;
 
-            aug_info("waitfdevents: %d", ret);
+            aug_ctxinfo(aug_tlx, "waitfdevents: %d", ret);
 
             if (0 < ret) {
                 aug_netevent ev;
@@ -146,43 +146,37 @@ main(int argc, char* argv[])
 
     try {
 
-        aug_errinfo errinfo;
-        scoped_init init(errinfo);
-        aug_setlogger(aug_daemonlogger);
+        start();
+        aug_setlog(aug_tlx, aug_getdaemonlog());
 
-        try {
+        timeval tv;
+        aug::gettimeofday(tv);
 
-            timeval tv;
-            aug::gettimeofday(tv);
-
-            if (argc < 4) {
-                aug_error("usage: heartbeat <name> <mcast> <serv> [ifname]");
-                return 1;
-            }
-
-            inetaddr in(argv[2]);
-            smartfd sfd(aug::socket(family(in), SOCK_DGRAM));
-            setreuseaddr(sfd, true);
-
-            // Set outgoing multicast interface.
-
-            if (5 == argc)
-                setmcastif(sfd, argv[4]);
-
-            // Don't receive packets from self.
-
-            endpoint ep(inetany(family(in)), htons(atoi(argv[3])));
-            aug::bind(sfd, ep);
-
-            joinmcast(sfd, in, 5 == argc ? argv[4] : 0);
-            setinetaddr(ep, in);
-            run(argv[1], sfd, ep);
-
-        } catch (const errinfo_error& e) {
-            perrinfo(e, "aug::errorinfo_error");
-        } catch (const exception& e) {
-            aug_error("std::exception: %s", e.what());
+        if (argc < 4) {
+            aug_ctxerror(aug_tlx,
+                         "usage: heartbeat <name> <mcast> <serv> [ifname]");
+            return 1;
         }
+
+        inetaddr in(argv[2]);
+        autosd sfd(aug::socket(family(in), SOCK_DGRAM));
+        setreuseaddr(sfd, true);
+
+        // Set outgoing multicast interface.
+
+        if (5 == argc)
+            setmcastif(sfd, argv[4]);
+
+        // Don't receive packets from self.
+
+        endpoint ep(inetany(family(in)), htons(atoi(argv[3])));
+        aug::bind(sfd, ep);
+
+        joinmcast(sfd, in, 5 == argc ? argv[4] : 0);
+        setinetaddr(ep, in);
+        run(argv[1], sfd, ep);
+        return 0;
+
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }
