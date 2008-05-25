@@ -17,6 +17,12 @@
 
 namespace aug {
 
+    inline aug_event&
+    setsigevent(aug_event& event, int sig)
+    {
+        return *aug_setsigevent(&event, sig);
+    }
+
     inline std::pair<int, aug::smartob<aug_object> >
     readevent(mdref ref)
     {

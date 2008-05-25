@@ -82,7 +82,7 @@ namespace aug {
         return verify(aug_fdevents(muxer, ref.get()));
     }
 
-    inline autosds
+    inline automds
     muxerpipe()
     {
         aug_md mds[2];

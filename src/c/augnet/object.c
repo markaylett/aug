@@ -705,9 +705,15 @@ AUGNET_API aug_channelob*
 aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
                  struct ssl_st* ssl)
 {
-    struct simpl_* impl = aug_malloc(mpool, sizeof(struct simpl_));
-    if (!impl)
+    struct simpl_* impl;
+
+    if (aug_setfdeventmask(muxer, sd, AUG_FDEVENTRD) < 0)
         return NULL;
+
+    if (!(impl = aug_malloc(mpool, sizeof(struct simpl_)))) {
+        aug_setfdeventmask(muxer, sd, 0);
+        return NULL;
+    }
 
     impl->channelob_.vtbl_ = &schannelobvtbl_;
     impl->channelob_.impl_ = NULL;

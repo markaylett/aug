@@ -3,6 +3,7 @@ include $(top_srcdir)/src/cpp/lang.mk
 noinst_PROGRAMS = \
 	mplexd \
 	tcpclient \
+	tcpserver \
 	timerd
 
 if ENABLE_MULTICAST
@@ -27,6 +28,10 @@ mplexd_LDADD = $(AUGLIBS)
 tcpclient_SOURCES = \
 	tcpclient.cpp
 tcpclient_LDADD = $(AUGLIBS)
+
+tcpserver_SOURCES = \
+	tcpserver.cpp
+tcpserver_LDADD = $(AUGLIBS)
 
 timerd_SOURCES = \
 	timerd.cpp
