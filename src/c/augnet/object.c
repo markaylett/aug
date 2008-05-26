@@ -385,7 +385,7 @@ schannelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
 
         aug_seteventmask(channelob, impl->mask_);
 
-        streamob = aug_cast(ob, aug_streamobid);
+        streamob = aug_cast(channelob, aug_streamobid);
 
         /* Zero events indicates new connection. */
 

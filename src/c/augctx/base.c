@@ -196,7 +196,7 @@ aug_initbasictlx(void)
 }
 
 AUGCTX_API aug_result
-aug_start(void)
+aug_atbasixtlx(void)
 {
     aug_result result = aug_initbasictlx();
     if (0 <= result)

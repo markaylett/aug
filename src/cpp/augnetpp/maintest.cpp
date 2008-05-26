@@ -53,7 +53,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        start();
+        atbasixtlx();
 
         callbacks cbs;
         base64 b64(AUG_ENCODE64, cbs);

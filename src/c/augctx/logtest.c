@@ -51,7 +51,7 @@ static aug_log log_ = { &vtbl_, NULL };
 int
 main(int argc, char* argv[])
 {
-    if (aug_start() < 0)
+    if (aug_atbasixtlx() < 0)
         return 1;
 
     aug_setlog(aug_tlx, &log_);

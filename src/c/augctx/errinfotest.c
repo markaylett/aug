@@ -8,7 +8,7 @@
 int
 main(int argc, char* argv[])
 {
-    aug_start();
+    aug_atbasixtlx();
 
     aug_setposixerrinfo(aug_tlerr, __FILE__, 101, EINVAL);
 

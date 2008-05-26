@@ -19,7 +19,11 @@ AUG_RCSID("$Id$");
 
 #include <errno.h>
 #include <stdio.h>          /* fflush() */
+
 #include <fcntl.h>
+#if !defined(_WIN32)
+#include <unistd.h>         /* dup() */
+#endif /* !_WIN32 */
 
 #if !defined(STDOUT_FILENO)
 # define STDOUT_FILENO 1

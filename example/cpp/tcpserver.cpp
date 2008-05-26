@@ -70,13 +70,24 @@ namespace {
         channelcb(unsigned id, streamobref streamob, unsigned short events)
         {
             cout << "id: " << id << endl;
+            if (0 == events) {
+                cout << "new connection\n";
+            } else if (events & AUG_FDEVENTRD) {
+                char buf[1024];
+                ssize_t n = read(streamob, buf, sizeof(buf));
+                if (0 == n) {
+                    cout << "closing\n";
+                    return false;
+                }
+                buf[n] = '\0';
+                cout << buf << endl;
+            }
             return true;
         }
         void
         run()
         {
             while (!quit_) {
-
                 {
                     scoped_unblock unblock;
                     while (AUG_FAILINTR == waitfdevents(muxer_))
@@ -97,7 +108,7 @@ main(int argc, char* argv[])
 {
     try {
 
-        start();
+        atbasixtlx();
 
         if (argc < 3) {
             aug_ctxerror(aug_tlx, "usage: tcpserver <host> <serv>");
@@ -105,10 +116,14 @@ main(int argc, char* argv[])
         }
 
         autosds sds(muxerpipe());
+        rd_ = sds[0];
+        wr_ = sds[1];
+
         signalhandler(sighandler);
 
         scoped_block block;
         server serv(argv[1], argv[2]);
+        serv.run();
         return 0;
 
     } catch (const exception& e) {

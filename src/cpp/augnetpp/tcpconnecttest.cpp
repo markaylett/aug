@@ -20,7 +20,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        start();
+        atbasixtlx();
 
         endpoint ep(null);
         tcpconnect conn("127.0.0.1", "10000");

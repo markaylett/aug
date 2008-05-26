@@ -16,7 +16,7 @@ main(int argc, char* argv[])
 {
     try {
 
-        start();
+        atbasixtlx();
 
         if (argc < 3) {
             aug_ctxerror(aug_tlx, "usage: mcastrecv <mcast> <serv> [ifname]");
