@@ -18,6 +18,7 @@ EXTRA_DIST = \
 	client.vcproj \
 	command.vcproj \
 	daug.vcproj \
+	example.vcproj \
 	htdigest.vcproj \
 	http.vcproj \
 	mar.vcproj \
@@ -30,4 +31,5 @@ EXTRA_DIST = \
 	start.bat \
 	stop.bat \
 	test.bat \
-	uninstall.bat
+	uninstall.bat \
+	example.cpp

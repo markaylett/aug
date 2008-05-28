@@ -78,6 +78,9 @@ AUGNET_API void
 aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb,
                    aug_object* cbob);
 
+AUGNET_API void
+aug_dumpchannels(aug_channels_t channels);
+
 /**
  * Get number of channels.
  *

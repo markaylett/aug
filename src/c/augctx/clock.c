@@ -52,7 +52,7 @@ release_(aug_clock* obj)
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
         aug_mpool* mpool = impl->mpool_;
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         aug_release(mpool);
     }
 }
@@ -91,7 +91,7 @@ static const struct aug_clockvtbl vtbl_ = {
 AUGCTX_API aug_clock*
 aug_createclock(aug_mpool* mpool, long tz)
 {
-    struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
+    struct impl_* impl = aug_allocmem(mpool, sizeof(struct impl_));
     if (!impl)
         return NULL;
 

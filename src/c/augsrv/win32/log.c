@@ -64,7 +64,7 @@ release_(aug_log* obj)
         aug_mpool* mpool = impl->mpool_;
         DeregisterEventSource(impl->handle_);
         aug_release(impl->inner_);
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         aug_release(mpool);
     }
 }
@@ -103,12 +103,12 @@ createsrvlog_(aug_mpool* mpool, const char* sname, aug_log* inner)
     assert(mpool);
     assert(inner);
 
-    if (!(impl = aug_malloc(mpool, sizeof(struct impl_))))
+    if (!(impl = aug_allocmem(mpool, sizeof(struct impl_))))
         return NULL;
 
     if (!(handle = RegisterEventSource(NULL, sname))) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         return NULL;
     }
 

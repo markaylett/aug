@@ -66,7 +66,7 @@ release_(struct impl_* impl)
         aug_mpool* mpool = impl->mpool_;
         if (AUG_BADFD != impl->fd_)
             close_(impl);
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         aug_release(mpool);
     }
 }
@@ -243,7 +243,7 @@ static const struct aug_streamobvtbl streamobvtbl_ = {
 AUGSYS_API aug_channelob*
 aug_createfile(aug_mpool* mpool, aug_fd fd, aug_muxer_t muxer)
 {
-    struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
+    struct impl_* impl = aug_allocmem(mpool, sizeof(struct impl_));
     if (!impl)
         return NULL;
 

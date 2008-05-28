@@ -16,7 +16,7 @@ struct aug_hires_ {
 AUGUTIL_API aug_hires_t
 aug_createhires(aug_mpool* mpool)
 {
-    aug_hires_t hires = aug_malloc(mpool, sizeof(struct aug_hires_));
+    aug_hires_t hires = aug_allocmem(mpool, sizeof(struct aug_hires_));
     if (!hires)
         return NULL;
 
@@ -25,7 +25,7 @@ aug_createhires(aug_mpool* mpool)
     if (!QueryPerformanceFrequency(&hires->freq_)
         || !QueryPerformanceCounter(&hires->start_)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        aug_free(mpool, hires);
+        aug_freemem(mpool, hires);
         return NULL;
     }
 
@@ -37,7 +37,7 @@ AUGUTIL_API aug_result
 aug_destroyhires(aug_hires_t hires)
 {
     aug_mpool* mpool = hires->mpool_;
-    aug_free(mpool, hires);
+    aug_freemem(mpool, hires);
     aug_release(mpool);
     return AUG_SUCCESS;
 }

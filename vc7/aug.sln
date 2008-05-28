@@ -101,6 +101,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augctx", "augctx.vcproj", "
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "example", "example.vcproj", "{AD58749B-0EB1-437E-91DF-1E8AE52605B4}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -202,6 +206,10 @@ Global
 		{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}.Debug.Build.0 = Debug|Win32
 		{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}.Release.ActiveCfg = Release|Win32
 		{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}.Release.Build.0 = Release|Win32
+		{AD58749B-0EB1-437E-91DF-1E8AE52605B4}.Debug.ActiveCfg = Debug|Win32
+		{AD58749B-0EB1-437E-91DF-1E8AE52605B4}.Debug.Build.0 = Debug|Win32
+		{AD58749B-0EB1-437E-91DF-1E8AE52605B4}.Release.ActiveCfg = Release|Win32
+		{AD58749B-0EB1-437E-91DF-1E8AE52605B4}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

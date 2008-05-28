@@ -15,7 +15,7 @@ AUG_RCSID("$Id$");
 #include <string.h>
 
 static void*
-ccast_(aug_mpool* obj, const char* id)
+crtcast_(aug_mpool* obj, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_mpoolid)) {
         aug_retain(obj);
@@ -25,56 +25,50 @@ ccast_(aug_mpool* obj, const char* id)
 }
 
 static void
-cretain_(aug_mpool* obj)
+crtretain_(aug_mpool* obj)
 {
 }
 
 static void
-crelease_(aug_mpool* obj)
+crtrelease_(aug_mpool* obj)
 {
 }
 
 static void*
-cmalloc_(aug_mpool* obj, size_t size)
+crtallocmem_(aug_mpool* obj, size_t size)
 {
     return malloc(size);
 }
 
 static void
-cfree_(aug_mpool* obj, void* ptr)
+crtfreemem_(aug_mpool* obj, void* ptr)
 {
     free(ptr);
 }
 
 static void*
-crealloc_(aug_mpool* obj, void* ptr, size_t size)
+crtreallocmem_(aug_mpool* obj, void* ptr, size_t size)
 {
     return realloc(ptr, size);
 }
 
 static void*
-ccalloc_(aug_mpool* obj, size_t nmemb, size_t size)
+crtcallocmem_(aug_mpool* obj, size_t nmemb, size_t size)
 {
     return calloc(nmemb, size);
 }
 
-static const struct aug_mpoolvtbl cvtbl_ = {
-    ccast_,
-    cretain_,
-    crelease_,
-    cmalloc_,
-    cfree_,
-    crealloc_,
-    ccalloc_
+static const struct aug_mpoolvtbl crtvtbl_ = {
+    crtcast_,
+    crtretain_,
+    crtrelease_,
+    crtallocmem_,
+    crtfreemem_,
+    crtreallocmem_,
+    crtcallocmem_
 };
 
-static aug_mpool mpool_ = { &cvtbl_, NULL };
-
-AUGCTX_API aug_mpool*
-aug_createcmalloc(void)
-{
-    return &mpool_;
-}
+static aug_mpool mpool_ = { &crtvtbl_, NULL };
 
 struct dlimpl_ {
     aug_mpool mpool_;
@@ -117,28 +111,28 @@ dlrelease_(aug_mpool* obj)
 }
 
 static void*
-dlmalloc_(aug_mpool* obj, size_t size)
+dlallocmem_(aug_mpool* obj, size_t size)
 {
     struct dlimpl_* impl = AUG_PODIMPL(struct dlimpl_, mpool_, obj);
     return mspace_malloc(impl->mspace_, size);
 }
 
 static void
-dlfree_(aug_mpool* obj, void* ptr)
+dlfreemem_(aug_mpool* obj, void* ptr)
 {
     struct dlimpl_* impl = AUG_PODIMPL(struct dlimpl_, mpool_, obj);
     mspace_free(impl->mspace_, ptr);
 }
 
 static void*
-dlrealloc_(aug_mpool* obj, void* ptr, size_t size)
+dlreallocmem_(aug_mpool* obj, void* ptr, size_t size)
 {
     struct dlimpl_* impl = AUG_PODIMPL(struct dlimpl_, mpool_, obj);
     return mspace_realloc(impl->mspace_, ptr, size);
 }
 
 static void*
-dlcalloc_(aug_mpool* obj, size_t nmemb, size_t size)
+dlcallocmem_(aug_mpool* obj, size_t nmemb, size_t size)
 {
     struct dlimpl_* impl = AUG_PODIMPL(struct dlimpl_, mpool_, obj);
     return mspace_calloc(impl->mspace_, nmemb, size);
@@ -148,11 +142,17 @@ static const struct aug_mpoolvtbl dlvtbl_ = {
     dlcast_,
     dlretain_,
     dlrelease_,
-    dlmalloc_,
-    dlfree_,
-    dlrealloc_,
-    dlcalloc_
+    dlallocmem_,
+    dlfreemem_,
+    dlreallocmem_,
+    dlcallocmem_
 };
+
+AUGCTX_API aug_mpool*
+aug_createcrtmalloc(void)
+{
+    return &mpool_;
+}
 
 AUGCTX_API aug_mpool*
 aug_createdlmalloc(void)

@@ -34,7 +34,7 @@ aug_socket(int domain, int type, int protocol)
     return fd;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_sd
 aug_accept(aug_sd sd, struct aug_endpoint* ep)
 {
     int fd;

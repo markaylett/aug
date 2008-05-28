@@ -46,7 +46,7 @@ AUGNET_API int
 aug_destroyfixstream(aug_fixstream_t stream);
 
 AUGNET_API ssize_t
-aug_readfix(aug_fixstream_t stream, int fd, size_t size);
+aug_readfix(aug_fixstream_t stream, aug_fd fd, size_t size);
 
 AUGNET_API int
 aug_finishfix(aug_fixstream_t stream);

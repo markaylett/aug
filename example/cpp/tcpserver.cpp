@@ -69,14 +69,14 @@ namespace {
         bool
         channelcb(unsigned id, streamobref streamob, unsigned short events)
         {
-            cout << "id: " << id << endl;
+            aug_ctxinfo(aug_tlx, "id: %u", id);
             if (0 == events) {
-                cout << "new connection\n";
+                aug_ctxinfo(aug_tlx, "new connection");
             } else if (events & AUG_FDEVENTRD) {
                 char buf[1024];
-                ssize_t n = read(streamob, buf, sizeof(buf));
-                if (0 == n) {
-                    cout << "closing\n";
+                ssize_t n = read(streamob, buf, sizeof(buf) - 1);
+                if (n <= 0) {
+                    aug_ctxinfo(aug_tlx, "closing connection");
                     return false;
                 }
                 buf[n] = '\0';
@@ -97,7 +97,11 @@ namespace {
                 if (fdevents(muxer_, rd_))
                     readevent();
 
+                aug_ctxinfo(aug_tlx, "before");
+                dumpchannels(channels_);
                 foreachchannel(channels_, *this);
+                dumpchannels(channels_);
+                aug_ctxinfo(aug_tlx, "after");
             }
         }
     };
@@ -109,6 +113,7 @@ main(int argc, char* argv[])
     try {
 
         atbasixtlx();
+        setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
         if (argc < 3) {
             aug_ctxerror(aug_tlx, "usage: tcpserver <host> <serv>");

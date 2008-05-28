@@ -56,7 +56,7 @@ release_(aug_ctx* obj)
         aug_mpool* mpool = impl->mpool_;
         aug_clock* clock = impl->clock_;
         aug_log* log = impl->log_;
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         aug_release(log);
         aug_release(clock);
         aug_release(mpool);
@@ -169,7 +169,7 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int loglevel)
     }
 #endif /* _WIN32 */
 
-    if (!(impl = aug_malloc(mpool, sizeof(struct impl_)))) {
+    if (!(impl = aug_allocmem(mpool, sizeof(struct impl_)))) {
 #if defined(_WIN32)
         WSACleanup();
 #endif /* _WIN32 */

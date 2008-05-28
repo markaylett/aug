@@ -24,7 +24,7 @@ aug_createhires(aug_mpool* mpool)
     if (!(clock = aug_createclock(mpool, 0)))
         return NULL;
 
-    if (!(hires = aug_malloc(mpool, sizeof(struct aug_hires_))))
+    if (!(hires = aug_allocmem(mpool, sizeof(struct aug_hires_))))
         goto fail1;
 
     hires->mpool_ = mpool;
@@ -39,7 +39,7 @@ aug_createhires(aug_mpool* mpool)
     return hires;
 
  fail2:
-    aug_free(mpool, hires);
+    aug_freemem(mpool, hires);
  fail1:
     aug_release(clock);
     return NULL;
@@ -50,7 +50,7 @@ aug_destroyhires(aug_hires_t hires)
 {
     aug_mpool* mpool = hires->mpool_;
     aug_clock* clock = hires->clock_;
-    aug_free(mpool, hires);
+    aug_freemem(mpool, hires);
     aug_release(clock);
     aug_release(mpool);
     return AUG_SUCCESS;

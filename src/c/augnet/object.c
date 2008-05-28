@@ -136,7 +136,7 @@ crelease_(struct cimpl_* impl)
         if (AUG_BADSD != impl->sd_)
             cclose_(impl);
         aug_destroytcpconnect(impl->conn_);
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         aug_release(mpool);
     }
 }
@@ -294,7 +294,7 @@ srelease_(struct simpl_* impl)
         aug_mpool* mpool = impl->mpool_;
         if (AUG_BADSD != impl->sd_)
             sclose_(impl);
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         aug_release(mpool);
     }
 }
@@ -491,7 +491,7 @@ prelease_(struct pimpl_* impl)
         aug_mpool* mpool = impl->mpool_;
         if (AUG_BADSD != impl->sd_)
             pclose_(impl);
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         aug_release(mpool);
     }
 }
@@ -662,7 +662,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
         /* Now established.  Force multiplexer to return immediately so that
            establishment can be finalised in process() function. */
 
-        aug_setnowait(impl->muxer_, 1);
+        aug_setnowait(muxer, 1);
 
     } else {
 
@@ -672,7 +672,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
             goto fail1;
     }
 
-    if (!(impl = aug_malloc(mpool, sizeof(struct cimpl_))))
+    if (!(impl = aug_allocmem(mpool, sizeof(struct cimpl_))))
         goto fail2;
 
     impl->channelob_.vtbl_ = &cchannelobvtbl_;
@@ -710,7 +710,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     if (aug_setfdeventmask(muxer, sd, AUG_FDEVENTRD) < 0)
         return NULL;
 
-    if (!(impl = aug_malloc(mpool, sizeof(struct simpl_)))) {
+    if (!(impl = aug_allocmem(mpool, sizeof(struct simpl_)))) {
         aug_setfdeventmask(muxer, sd, 0);
         return NULL;
     }
@@ -741,7 +741,7 @@ aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
     if (aug_setfdeventmask(muxer, sd, mask) < 0)
         return NULL;
 
-    if (!(impl = aug_malloc(mpool, sizeof(struct pimpl_)))) {
+    if (!(impl = aug_allocmem(mpool, sizeof(struct pimpl_)))) {
         aug_setfdeventmask(muxer, sd, 0);
         return NULL;
     }

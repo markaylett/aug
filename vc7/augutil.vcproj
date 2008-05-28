@@ -120,6 +120,9 @@
 	</Configurations>
 	<References>
 		<ProjectReference
+			ReferencedProjectIdentifier="{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}"
+			Name="augctx"/>
+		<ProjectReference
 			ReferencedProjectIdentifier="{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
 			Name="augsys"/>
 	</References>
@@ -128,9 +131,6 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
-			<File
-				RelativePath="..\src\c\augutil\clock.c">
-			</File>
 			<File
 				RelativePath="..\src\c\augutil\config.c">
 			</File>
@@ -145,6 +145,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\getopt.c">
+			</File>
+			<File
+				RelativePath="..\src\c\augutil\hires.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\lexer.c">
@@ -191,9 +194,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\c\augutil\clock.h">
-			</File>
-			<File
 				RelativePath="..\src\c\augutil\config.h">
 			</File>
 			<File
@@ -207,6 +207,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\getopt.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augutil\hires.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augutil\lexer.h">

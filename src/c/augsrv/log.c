@@ -22,8 +22,10 @@ AUG_RCSID("$Id$");
 
 #include <fcntl.h>
 #if !defined(_WIN32)
-#include <unistd.h>         /* dup() */
-#endif /* !_WIN32 */
+# include <unistd.h>        /* dup() */
+#else /* _WIN32 */
+# include <io.h>            /* dup() */
+#endif /* _WIN32 */
 
 #if !defined(STDOUT_FILENO)
 # define STDOUT_FILENO 1

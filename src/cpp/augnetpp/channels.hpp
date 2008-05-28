@@ -137,6 +137,12 @@ namespace aug {
         aug_foreachchannel(channels, channelmemcb<T>, ob.base());
     }
 
+    inline void
+    dumpchannels(aug_channels_t channels)
+    {
+        aug_dumpchannels(channels);
+    }
+
     inline unsigned
     getchannels(aug_channels_t channels)
     {

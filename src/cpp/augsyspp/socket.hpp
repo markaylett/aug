@@ -43,7 +43,10 @@ namespace aug {
     inline autosd
     accept(sdref ref, aug_endpoint& ep)
     {
-        return autosd(verify(aug_accept(ref.get(), &ep)), close);
+        autosd sd(aug_accept(ref.get(), &ep), close);
+        if (null == sd)
+            failerror();
+        return sd;
     }
 
     inline void

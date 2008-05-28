@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../src;../src/c"
-				PreprocessorDefinitions="WIN32;_DEBUG;FD_SETSIZE=256"
+				PreprocessorDefinitions="USE_DL_PREFIX"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -74,7 +74,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../src;../src/c"
-				PreprocessorDefinitions="WIN32;NDEBUG;FD_SETSIZE=256"
+				PreprocessorDefinitions="USE_DL_PREFIX"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
@@ -144,10 +144,16 @@
 				RelativePath="..\src\c\augctx\errinfo.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augctx\errno.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augctx\lock.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\log.c">
+			</File>
+			<File
+				RelativePath="..\src\c\augctx\malloc.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\mpool.c">
@@ -185,10 +191,16 @@
 				RelativePath="..\src\c\augctx\errinfo.h">
 			</File>
 			<File
+				RelativePath="..\src\c\augctx\errno.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augctx\lock.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\log.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augctx\malloc.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augctx\mpool.h">

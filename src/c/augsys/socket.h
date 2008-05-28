@@ -104,7 +104,7 @@ aug_ssetnonblock(aug_sd sd, aug_bool on);
 AUGSYS_API aug_sd
 aug_socket(int domain, int type, int protocol);
 
-AUGSYS_API int
+AUGSYS_API aug_sd
 aug_accept(aug_sd sd, struct aug_endpoint* ep);
 
 AUGSYS_API int

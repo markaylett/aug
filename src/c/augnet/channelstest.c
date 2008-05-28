@@ -44,7 +44,7 @@ release_(struct impl_* impl)
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
         aug_mpool* mpool = impl->mpool_;
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         aug_release(mpool);
     }
     --refs_;
@@ -78,16 +78,16 @@ channelob_close_(aug_channelob* ob)
 }
 
 static aug_channelob*
-channelob_process_(aug_channelob* ob, aug_channelcb_t cb, aug_bool* fork)
+channelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
+                   aug_object* cbob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-    int events;
 
     /* Lock here to prevent release during callback. */
 
     retain_(impl);
 
-    if (events < 0 || !cb(impl->id_, &impl->streamob_, 0)) {
+    if (!cb(cbob, impl->id_, &impl->streamob_, 0)) {
         release_(impl);
         return NULL;
     }
@@ -114,12 +114,6 @@ channelob_eventmask_(aug_channelob* ob)
     return 0;
 }
 
-static int
-channelob_events_(aug_channelob* ob)
-{
-    return 0;
-}
-
 static const struct aug_channelobvtbl channelobvtbl_ = {
     channelob_cast_,
     channelob_retain_,
@@ -128,8 +122,7 @@ static const struct aug_channelobvtbl channelobvtbl_ = {
     channelob_process_,
     channelob_seteventmask_,
     channelob_getid_,
-    channelob_eventmask_,
-    channelob_events_
+    channelob_eventmask_
 };
 
 static void*
@@ -197,7 +190,7 @@ static const struct aug_streamobvtbl streamobvtbl_ = {
 static aug_channelob*
 create_(aug_mpool* mpool, unsigned id)
 {
-    struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
+    struct impl_* impl = aug_allocmem(mpool, sizeof(struct impl_));
     if (!impl)
         return NULL;
 
@@ -219,7 +212,8 @@ static int count_ = 0;
 static unsigned last_ = 0;
 
 static aug_bool
-cb_(unsigned id, aug_streamob* ob, unsigned short events)
+cb_(aug_object* cbob, unsigned id, aug_streamob* streamob,
+    unsigned short events)
 {
     if (3 < id)
         aug_die("invalid channel");
@@ -233,11 +227,12 @@ foreach_(aug_channels_t channels)
 {
     count_ = 0;
     last_ = 0;
-    aug_foreachchannel(channels, cb_);
+    aug_foreachchannel(channels, cb_, NULL);
 }
 
 static aug_bool
-rm1_(unsigned id, aug_streamob* ob, unsigned short events)
+rm1_(aug_object* cbob, unsigned id, aug_streamob* streamob,
+     unsigned short events)
 {
     return 1 == id ? AUG_FALSE : AUG_TRUE;
 }
@@ -252,6 +247,7 @@ main(int argc, char* argv[])
     aug_channels_t channels;
 
     aug_check(0 <= aug_atbasixtlx());
+    aug_setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
     mpool = aug_getmpool(aug_tlx);
     aug_check(mpool);
@@ -312,7 +308,7 @@ main(int argc, char* argv[])
 
     /* Remove during loop. */
 
-    aug_foreachchannel(channels, rm1_);
+    aug_foreachchannel(channels, rm1_, NULL);
 
     /* No longer exists. */
 

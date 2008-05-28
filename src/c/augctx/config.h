@@ -21,6 +21,9 @@
 #endif /* AUGCTX_SHARED */
 
 #if defined(_MSC_VER)
+# if !defined(AUGCTX_BUILD)
+#  pragma comment(lib, "libaugctx.lib")
+# endif /* AUGCTX_BUILD */
 # pragma comment(lib, "ws2_32.lib")
 #endif /* _MSC_VER */
 

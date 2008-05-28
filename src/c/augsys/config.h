@@ -21,7 +21,9 @@
 #endif /* AUGSYS_SHARED */
 
 #if defined(_MSC_VER)
-# pragma comment(lib, "ws2_32.lib")
+# if !defined(AUGSYS_BUILD)
+#  pragma comment(lib, "libaugsys.lib")
+# endif /* AUGSYS_BUILD */
 # pragma comment(lib, "iphlpapi.lib")
 #endif /* _MSC_VER */
 

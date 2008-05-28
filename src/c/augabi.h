@@ -141,15 +141,16 @@ struct aug_objectvtbl {
     ((aug_object*)(ob))->vtbl_->release_((aug_object*)(ob))
 
 /**
- * Invalidate pointer before calling release, avoiding any potential
- * reentrancy issues.
+ * Assign pointer before calling release, avoiding potential reentrancy
+ * issues.
  */
 
-#define aug_saferelease(ob)                         \
-    do {                                            \
-        aug_object* aug_tmp = (aug_object*)(ob);    \
-        (ob) = NULL;                                \
-        aug_release(aug_tmp);                       \
+#define aug_safeassign(lhs, rhs)                        \
+    do {                                                \
+        aug_object* aug_tmp = (aug_object*)(lhs);       \
+        (lhs) = (rhs);                                  \
+        if (aug_tmp)                                    \
+            aug_release(aug_tmp);                       \
     } while (0)
 
 /** @} */

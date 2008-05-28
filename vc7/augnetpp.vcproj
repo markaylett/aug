@@ -120,6 +120,9 @@
 	</Configurations>
 	<References>
 		<ProjectReference
+			ReferencedProjectIdentifier="{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}"
+			Name="augctx"/>
+		<ProjectReference
 			ReferencedProjectIdentifier="{01150DDF-A141-4B5B-A4FB-81FD65C964C5}"
 			Name="augmar"/>
 		<ProjectReference
@@ -141,13 +144,10 @@
 				RelativePath="..\src\cpp\augnetpp\base64.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augnetpp\channels.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augnetpp\config.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\connector.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\file.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\http.cpp">
@@ -159,7 +159,10 @@
 				RelativePath="..\src\cpp\augnetpp\mar.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\nbfile.cpp">
+				RelativePath="..\src\cpp\augnetpp\object.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augnetpp\tcpconnect.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\writer.cpp">
@@ -173,13 +176,10 @@
 				RelativePath="..\src\cpp\augnetpp\base64.hpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augnetpp\channels.hpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augnetpp\config.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\connector.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\file.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\http.hpp">
@@ -191,7 +191,10 @@
 				RelativePath="..\src\cpp\augnetpp\mar.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\nbfile.hpp">
+				RelativePath="..\src\cpp\augnetpp\object.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augnetpp\tcpconnect.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\writer.hpp">

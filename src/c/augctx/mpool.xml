@@ -4,20 +4,20 @@
 
   <interface name="mpool">
 
-    <method name="malloc" type="void*" qname="malloc">
+    <method name="allocmem" type="void*" qname="allocmem">
       <param name="size" type="size_t"/>
     </method>
 
-    <method name="free" type="void" qname="free">
+    <method name="freemem" type="void" qname="freemem">
       <param name="ptr" type="void*"/>
     </method>
 
-    <method name="realloc" type="void*" qname="realloc">
+    <method name="reallocmem" type="void*" qname="reallocmem">
       <param name="ptr" type="void*"/>
       <param name="size" type="size_t"/>
     </method>
 
-    <method name="calloc" type="void*" qname="calloc">
+    <method name="callocmem" type="void*" qname="callocmem">
       <param name="nmemb" type="size_t"/>
       <param name="size" type="size_t"/>
     </method>
@@ -26,7 +26,7 @@
 
   <verbatim>
 AUGCTX_API aug_mpool*
-aug_createcmalloc(void);
+aug_createcrtmalloc(void);
 
 AUGCTX_API aug_mpool*
 aug_createdlmalloc(void);

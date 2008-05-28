@@ -120,6 +120,9 @@
 	</Configurations>
 	<References>
 		<ProjectReference
+			ReferencedProjectIdentifier="{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}"
+			Name="augctx"/>
+		<ProjectReference
 			ReferencedProjectIdentifier="{01150DDF-A141-4B5B-A4FB-81FD65C964C5}"
 			Name="augmar"/>
 		<ProjectReference

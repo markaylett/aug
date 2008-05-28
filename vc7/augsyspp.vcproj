@@ -120,6 +120,9 @@
 	</Configurations>
 	<References>
 		<ProjectReference
+			ReferencedProjectIdentifier="{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}"
+			Name="augctx"/>
+		<ProjectReference
 			ReferencedProjectIdentifier="{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
 			Name="augsys"/>
 	</References>
@@ -138,7 +141,7 @@
 				RelativePath="..\src\cpp\augsyspp\dlfcn.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augsyspp\endpoint.hpp">
+				RelativePath="..\src\cpp\augsyspp\endpoint.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\errinfo.cpp">
@@ -147,19 +150,13 @@
 				RelativePath="..\src\cpp\augsyspp\exception.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augsyspp\inetaddr.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augsyspp\lock.cpp">
+				RelativePath="..\src\cpp\augsyspp\inetaddr.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\mcast.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\mmap.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augsyspp\mutex.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\muxer.cpp">
@@ -215,16 +212,10 @@
 				RelativePath="..\src\cpp\augsyspp\inetaddr.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augsyspp\lock.hpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augsyspp\mcast.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\mmap.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augsyspp\mutex.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\muxer.hpp">

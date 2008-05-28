@@ -417,7 +417,7 @@ release_(struct impl_* impl)
         if (AUG_BADSD != impl->sd_)
             close_(impl);
         SSL_free(impl->ssl_);
-        aug_free(mpool, impl);
+        aug_freemem(mpool, impl);
         aug_release(mpool);
     }
 }
@@ -746,12 +746,12 @@ static struct impl_*
 createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
            unsigned short mask, struct ssl_st* ssl)
 {
-    struct impl_* impl = aug_malloc(mpool, sizeof(struct impl_));
+    struct impl_* impl;
 
     if (aug_setfdeventmask(muxer, sd, AUG_FDEVENTRDWR) < 0)
         return NULL;
 
-    if (!(impl = aug_malloc(mpool, sizeof(struct impl_)))) {
+    if (!(impl = aug_allocmem(mpool, sizeof(struct impl_)))) {
         aug_setfdeventmask(muxer, sd, 0);
         return NULL;
     }

@@ -120,6 +120,9 @@
 	</Configurations>
 	<References>
 		<ProjectReference
+			ReferencedProjectIdentifier="{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}"
+			Name="augctx"/>
+		<ProjectReference
 			ReferencedProjectIdentifier="{01150DDF-A141-4B5B-A4FB-81FD65C964C5}"
 			Name="augmar"/>
 		<ProjectReference
@@ -141,16 +144,10 @@
 				RelativePath="..\src\c\augnet\base64.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\channels.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\config.c">
-			</File>
-			<File
-				RelativePath="..\src\c\augnet\connector.c">
-			</File>
-			<File
-				RelativePath="..\src\c\augnet\extend.c">
-			</File>
-			<File
-				RelativePath="..\src\c\augnet\file.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\fix.c">
@@ -165,13 +162,16 @@
 				RelativePath="..\src\c\augnet\mar.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\nbfile.c">
-			</File>
-			<File
 				RelativePath="..\src\c\augnet\netevent.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\object.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\ssl.c">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\tcpconnect.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\types.c">
@@ -191,16 +191,10 @@
 				RelativePath="..\src\c\augnet\base64.h">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\channels.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\config.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augnet\connector.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augnet\extend.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augnet\file.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\fix.h">
@@ -215,13 +209,16 @@
 				RelativePath="..\src\c\augnet\mar.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\nbfile.h">
-			</File>
-			<File
 				RelativePath="..\src\c\augnet\netevent.h">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\object.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\ssl.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augnet\tcpconnect.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\types.h">
