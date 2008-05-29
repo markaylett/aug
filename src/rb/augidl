@@ -287,6 +287,17 @@ end
 
 class CFormat
     include ParamLists
+    def coerce_list(iface, method)
+        args = ["this_"]
+        method.each_param do |param|
+            args << if param.type.ref? then
+                        "*#{param.name}"
+                    else
+                        param.name
+                    end
+        end
+        args
+    end
     def param_type(type)
         if type.object? || type.ref? then
             type.cname + '*'
@@ -305,7 +316,7 @@ end
 
 class CppFormat
     include ParamLists
-    def cname_list(iface, method)
+    def coerce_list(iface, method)
         args = ["this_.get()"]
         method.each_param do |param|
             args << if param.type.object? then
@@ -390,7 +401,7 @@ end
 def putinline(iface, method)
     format = CppFormat.new
     args = format.arg_list(iface, method).join(", ")
-    names = format.cname_list(iface, method).join(", ")
+    names = format.coerce_list(iface, method).join(", ")
     expr = "this_.get()->vtbl_->#{method.name}_(#{names})"
     puts <<END
 
@@ -405,7 +416,7 @@ end
 def putstatic(iface, method)
     format = CFormat.new
     args = format.arg_list(iface, method).join(", ")
-    names = nothis(format.name_list(iface, method)).join(", ")
+    names = nothis(format.coerce_list(iface, method)).join(", ")
     expr = ''
     if method.type.ref? then
         expr << '&'
