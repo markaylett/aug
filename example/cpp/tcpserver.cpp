@@ -80,7 +80,7 @@ namespace {
                     return false;
                 }
                 buf[n] = '\0';
-                cout << buf << endl;
+                aug_ctxinfo(aug_tlx, "data: %s", buf);
             }
             return true;
         }
