@@ -112,7 +112,7 @@ main(int argc, char* argv[])
 {
     try {
 
-        atbasixtlx();
+        autobasictlx();
         setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
         if (argc < 3) {

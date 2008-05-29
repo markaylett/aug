@@ -122,6 +122,6 @@ aug_initbasictlx(void);
  */
 
 AUGCTX_API aug_result
-aug_atbasixtlx(void);
+aug_autobasictlx(void);
 
 #endif /* AUGCTX_BASE_H */

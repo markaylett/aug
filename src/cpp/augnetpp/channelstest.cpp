@@ -48,7 +48,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        atbasixtlx();
+        autobasictlx();
 
         mpoolptr mp(getmpool(aug_tlx));
         muxer mux;

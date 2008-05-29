@@ -378,7 +378,7 @@ main(int argc, char* argv[])
     using namespace test;
 
     try {
-        atbasixtlx();
+        autobasictlx();
 
         service serv;
         program_ = argv[0];

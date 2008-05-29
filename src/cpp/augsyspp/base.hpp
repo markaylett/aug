@@ -27,10 +27,10 @@ namespace aug {
         aug_term();
     }
     inline void
-    atbasixtlx()
+    autobasictlx()
     {
-        if (aug_atbasixtlx() < 0)
-            throw std::runtime_error("aug_atbasictlx() failed");
+        if (aug_autobasictlx() < 0)
+            throw std::runtime_error("aug_autobasictlx() failed");
     }
 
     class scoped_init {

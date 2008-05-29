@@ -146,7 +146,7 @@ main(int argc, char* argv[])
 
     try {
 
-        atbasixtlx();
+        autobasictlx();
         aug_setlog(aug_tlx, aug_getdaemonlog());
 
         timeval tv;

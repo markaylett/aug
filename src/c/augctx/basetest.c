@@ -8,7 +8,7 @@
 int
 main(int argc, char* argv[])
 {
-    if (aug_atbasixtlx() < 0)
+    if (aug_autobasictlx() < 0)
         return 1;
     aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
     aug_perrinfo(aug_tlx, "operation failed", NULL);

@@ -246,7 +246,7 @@ main(int argc, char* argv[])
     aug_channelob* channelob3;
     aug_channels_t channels;
 
-    aug_check(0 <= aug_atbasixtlx());
+    aug_check(0 <= aug_autobasictlx());
     aug_setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
     mpool = aug_getmpool(aug_tlx);

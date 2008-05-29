@@ -33,7 +33,7 @@ main(int argc, char* argv[])
 {
     try {
 
-        atbasixtlx();
+        autobasictlx();
 
         if (argc < 3) {
             aug_ctxerror(aug_tlx, "usage: mcastsend <mcast> <serv> [ifname]");

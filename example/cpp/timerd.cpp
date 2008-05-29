@@ -232,7 +232,7 @@ main(int argc, char* argv[])
 
     try {
 
-        atbasixtlx();
+        autobasictlx();
 		service serv;
 
         program_ = argv[0];
