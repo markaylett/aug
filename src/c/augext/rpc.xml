@@ -1,0 +1,10 @@
+<package name="aug" dir="augext">
+
+  <quotincl>augext/seqob.h</quotincl>
+
+  <interface name="rpc">
+    <method name="getmethod" type="const char*" qname="getrpcmethod"/>
+    <method name="getargs" type="aug_seqob" object="true" qname="getrpcargs"/>
+  </interface>
+
+</package>

@@ -1,6 +1,4 @@
-<package name="aug" dir="augctx">
-
-  <quotincl>augctx/config.h</quotincl>
+<package name="aug" dir="augext">
 
   <interface name="mpool">
 
@@ -23,13 +21,5 @@
     </method>
 
   </interface>
-
-  <verbatim>
-AUGCTX_API aug_mpool*
-aug_createcrtmalloc(void);
-
-AUGCTX_API aug_mpool*
-aug_createdlmalloc(void);
-  </verbatim>
 
 </package>

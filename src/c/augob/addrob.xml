@@ -1,7 +1,0 @@
-<package name="aug" dir="augob">
-
-  <interface name="addrob">
-    <method name="get" type="void*"/>
-  </interface>
-
-</package>

@@ -1,0 +1,37 @@
+<package name="aug" dir="augext">
+
+  <quotincl>augext/stream.h</quotincl>
+
+  <verbatim>
+    typedef aug_bool (*aug_chancb_t)(aug_object*, unsigned, aug_stream*,
+      unsigned short);
+  </verbatim>
+
+  <interface name="chan">
+
+    All channels have non-blocking semantics.
+
+    <method name="close" type="aug_result" qname="closechan"/>
+
+    <method name="process" type="aug_chan" object="true" qname="processchan">
+      <param name="fork" type="aug_bool&"/>
+      <param name="cb" type="aug_chancb_t"/>
+      <param name="ob" type="aug_object" object="true"/>
+    </method>
+
+    <method name="setmask" type="aug_result" qname="setchanmask">
+      <param name="mask" type="unsigned short"/>
+    </method>
+
+    <method name="getmask" type="int" qname="getchanmask"/>
+
+    <method name="getid" type="unsigned" qname="getchanid"/>
+
+    <method name="getname" type="char*" qname="getchanname">
+      <param name="dst" type="char*"/>
+      <param name="size" type="unsigned"/>
+    </method>
+
+  </interface>
+
+</package>

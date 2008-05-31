@@ -4,11 +4,7 @@ SUBDIRS = \
 	win32
 EXTRA_DIST = \
 	malloc.c \
-	malloc.h \
-	clock.xml \
-	ctx.xml \
-	log.xml \
-	mpool.xml
+	malloc.h
 
 modincludedir = $(includedir)/augctx
 modinclude_HEADERS = \
@@ -72,14 +68,3 @@ errinfotest_LDADD = \
 logtest_SOURCES = logtest.c
 logtest_LDADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-
-if ENABLE_RUBY
-BUILT_SOURCES = \
-	clock.h \
-	ctx.h \
-	log.h \
-	mpool.h
-
-%.h: %.xml
-	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
-endif

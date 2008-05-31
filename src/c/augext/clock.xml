@@ -1,6 +1,4 @@
-<package name="aug" dir="augctx">
-
-  <quotincl>augctx/mpool.h</quotincl>
+<package name="aug" dir="augext">
 
   <quotincl>augtypes.h</quotincl>
 
@@ -15,10 +13,5 @@
     <method name="gettimezone" type="long" qname="gettimezone"/>
 
   </interface>
-
-  <verbatim>
-AUGCTX_API aug_clock*
-aug_createclock(aug_mpool* mpool, long tz);
-  </verbatim>
 
 </package>

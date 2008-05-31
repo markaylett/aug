@@ -1,4 +1,4 @@
-<package name="aug" dir="augob">
+<package name="aug" dir="augext">
 
   <quotincl>augtypes.h</quotincl>
 
@@ -6,7 +6,7 @@
 struct iovec;
   </verbatim>
 
-  <interface name="streamob">
+  <interface name="stream">
 
     <method name="shutdown" type="aug_result" qname="shutdown"/>
 

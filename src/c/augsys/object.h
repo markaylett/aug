@@ -8,9 +8,9 @@
 
 #include "augctx/mpool.h"
 
-#include "augob/channelob.h"
+#include "augext/chan.h"
 
-AUGSYS_API aug_channelob*
+AUGSYS_API aug_chan*
 aug_createfile(aug_mpool* mpool, aug_fd fd, aug_muxer_t muxer);
 
 #endif /* AUGSYS_OBJECT_H */

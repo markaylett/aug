@@ -9,7 +9,7 @@
 #endif /* _WIN32 */
 
 #include "augmod.h"
-#include "augob/blob.h"
+#include "augext/blob.h"
 
 #include <Python.h>
 

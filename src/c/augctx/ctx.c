@@ -7,7 +7,10 @@
 
 AUG_RCSID("$Id$");
 
+#include "augctx/clock.h"
 #include "augctx/errinfo.h"
+#include "augctx/log.h"
+#include "augctx/mpool.h"
 #include "augctx/utility.h" /* aug_timezone() */
 
 #include <assert.h>

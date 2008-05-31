@@ -1,13 +1,13 @@
-<package name="aug" dir="augob">
+<package name="aug" dir="augext">
 
-  <quotincl>augob/iterob.h</quotincl>
+  <quotincl>augext/iter.h</quotincl>
 
-  <interface name="seqob">
+  <interface name="seq">
 
     Read-only, base interface for all container types.  Suitable for both
     sequential and associative containers.
 
-    <method name="find" type="aug_result" qname="findseqob">
+    <method name="getvalue" type="aug_result" qname="getseqvalue">
 
       Get item specified by @a key.
 
@@ -20,21 +20,21 @@
       <param name="value" type="struct aug_var&"/>
       <param name="key" type="const struct aug_var&"/>
     </method>
-    <method name="begin" type="aug_iterob" object="true" qname="seqobbegin">
+    <method name="getfirst" type="aug_iter" object="true" qname="getseqfirst">
 
       Get first item.
 
       @return Iterator, or NULL on error.
 
     </method>
-    <method name="empty" type="int" qname="seqobempty">
+    <method name="isempty" type="int" qname="isseqempty">
 
       Is empty test.
 
       @return True if empty.
 
     </method>
-    <method name="size" type="unsigned" qname="seqobsize">
+    <method name="getsize" type="unsigned" qname="getseqsize">
 
       Get number of items.
 

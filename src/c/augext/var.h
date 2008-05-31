@@ -1,13 +1,13 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGOB_VAR_H
-#define AUGOB_VAR_H
+#ifndef AUGEXT_VAR_H
+#define AUGEXT_VAR_H
 
 #include "augconfig.h"
 
-#include "augob/blob.h"
-#include "augob/seqob.h"
+#include "augext/blob.h"
+#include "augext/seq.h"
 
 #include <time.h>
 
@@ -35,7 +35,7 @@ struct aug_var {
         time_t utc_;
         aug_object* ob_;
         aug_blob* blob_;
-        aug_seqob* seq_;
+        aug_seq* seq_;
     } u_;
 };
 
@@ -67,4 +67,4 @@ do { \
     } \
 } while (0)
 
-#endif /* AUGOB_VAR_H */
+#endif /* AUGEXT_VAR_H */

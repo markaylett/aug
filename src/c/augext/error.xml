@@ -1,17 +1,17 @@
-<package name="aug" dir="augob">
+<package name="aug" dir="augext">
 
-  <interface name="errinfob">
+  <interface name="error">
 
     Detailed error information.
 
-    <method name="num" type="int" qname="errinfobnum">
+    <method name="getnum" type="int" qname="geterrornum">
 
       Last error number.
 
       @return Error number.
 
     </method>
-    <method name="desc" type="char*" qname="errinfobdesc">
+    <method name="getdesc" type="char*" qname="geterrordesc">
 
       Last error description.
 

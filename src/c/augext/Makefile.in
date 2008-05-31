@@ -37,7 +37,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-subdir = src/c/augob
+subdir = src/c/augext
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -183,42 +183,54 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	addrob.xml \
 	blob.xml \
-	channelob.xml \
-	errinfob.xml \
-	eventob.xml \
-	iterob.xml \
-	longob.xml \
-	rpcob.xml \
-	seqob.xml \
-	streamob.xml
+	chan.xml \
+	clock.xml \
+	ctx.xml \
+	error.xml \
+	intbox.xml \
+	iter.xml \
+	log.xml \
+	mpool.xml \
+	msg.xml \
+	ptrbox.xml \
+	rpc.xml \
+	seq.xml \
+	stream.xml
 
-modincludedir = $(includedir)/augob
+modincludedir = $(includedir)/augext
 modinclude_HEADERS = \
-	addrob.h \
 	blob.h \
-	channelob.h \
-	errinfob.h \
-	eventob.h \
-	iterob.h \
-	longob.h \
-	rpcob.h \
-	seqob.h \
-	streamob.h \
+	chan.h \
+	clock.h \
+	ctx.h \
+	error.h \
+	intbox.h \
+	iter.h \
+	log.h \
+	mpool.h  \
+	msg.h \
+	ptrbox.h \
+	rpc.h \
+	seq.h \
+	stream.h \
 	var.h
 
 @ENABLE_RUBY_TRUE@BUILT_SOURCES = \
-@ENABLE_RUBY_TRUE@	addrob.h \
 @ENABLE_RUBY_TRUE@	blob.h \
-@ENABLE_RUBY_TRUE@	channelob.h \
-@ENABLE_RUBY_TRUE@	errinfob.h \
-@ENABLE_RUBY_TRUE@	eventob.h \
-@ENABLE_RUBY_TRUE@	iterob.h \
-@ENABLE_RUBY_TRUE@	longob.h \
-@ENABLE_RUBY_TRUE@	rpcob.h \
-@ENABLE_RUBY_TRUE@	seqob.h \
-@ENABLE_RUBY_TRUE@	streamob.h
+@ENABLE_RUBY_TRUE@	chan.h \
+@ENABLE_RUBY_TRUE@	clock.h \
+@ENABLE_RUBY_TRUE@	ctx.h \
+@ENABLE_RUBY_TRUE@	error.h \
+@ENABLE_RUBY_TRUE@	intbox.h \
+@ENABLE_RUBY_TRUE@	iter.h \
+@ENABLE_RUBY_TRUE@	log.h \
+@ENABLE_RUBY_TRUE@	mpool.h  \
+@ENABLE_RUBY_TRUE@	msg.h \
+@ENABLE_RUBY_TRUE@	ptrbox.h \
+@ENABLE_RUBY_TRUE@	rpc.h \
+@ENABLE_RUBY_TRUE@	seq.h \
+@ENABLE_RUBY_TRUE@	stream.h
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -233,9 +245,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/c/augob/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/c/augext/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  src/c/augob/Makefile
+	  $(AUTOMAKE) --foreign  src/c/augext/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

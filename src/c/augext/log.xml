@@ -1,6 +1,4 @@
-<package name="aug" dir="augctx">
-
-  <quotincl>augctx/config.h</quotincl>
+<package name="aug" dir="augext">
 
   <quotincl>augtypes.h</quotincl>
 
@@ -26,16 +24,5 @@ enum aug_loglevel {
     </method>
 
   </interface>
-
-  <verbatim>
-/**
- * The standard logger.
- *
- * @return An interface to the standard logger.
- */
-
-AUGCTX_API aug_log*
-aug_getstdlog(void);
-  </verbatim>
 
 </package>

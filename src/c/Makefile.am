@@ -1,7 +1,7 @@
 EXTRA_DIST = lang.mk
 SUBDIRS = \
+	augext \
 	augctx \
-	augob \
 	augsys \
 	augmar \
 	augpy \
@@ -19,8 +19,8 @@ include_HEADERS = \
 	augabi.h \
 	augmod.h \
 	augtypes.h \
+	augext.h \
 	augctx.h \
-	augob.h \
 	augsys.h \
 	augmar.h \
 	augutil.h \
