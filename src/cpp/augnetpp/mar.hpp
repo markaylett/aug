@@ -88,7 +88,7 @@ namespace aug {
             create(aug_object* ob, const char* initial)
             {
                 try {
-                    return obtoaddr<T*>(ob)->create(initial);
+                    return obtop<T*>(ob)->create(initial);
                 } AUG_SETERRINFOCATCH;
                 return 0;
             }
@@ -97,7 +97,7 @@ namespace aug {
             message(aug_object* ob, const char* initial, aug_mar_t mar)
             {
                 try {
-                    obtoaddr<T*>(ob)->message(initial, mar);
+                    obtop<T*>(ob)->message(initial, mar);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -161,7 +161,7 @@ namespace aug {
         template <typename T>
         marparser(unsigned size, T& x)
         {
-            aug::smartob<aug_addrob> ob(createaddrob(&x, 0));
+            aug::smartob<aug_boxptr> ob(createboxptr(&x, 0));
             verify(marparser_ = aug_createmarparser
                    (size, &marnonstatic<T>(), ob.base()));
         }
@@ -169,7 +169,7 @@ namespace aug {
         template <typename T>
         marparser(unsigned size, std::auto_ptr<T>& x)
         {
-            aug::smartob<aug_addrob> ob(createaddrob(x));
+            aug::smartob<aug_boxptr> ob(createboxptr(x));
             verify(marparser_ = aug_createmarparser
                    (size, &marnonstatic<T>(), ob.base()));
         }

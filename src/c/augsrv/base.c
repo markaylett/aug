@@ -17,7 +17,8 @@ AUG_RCSID("$Id$");
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
-#include "augctx/log.h"
+
+#include "augext/log.h"
 
 #include "augutil/event.h"  /* struct aug_event */
 

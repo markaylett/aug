@@ -10,7 +10,7 @@ AUG_RCSID("$Id$");
 #include "daug/exception.hpp"
 #include "daug/utility.hpp"
 
-#include "augctx/log.h"
+#include "augext/log.h"
 
 #include <exception>
 

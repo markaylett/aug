@@ -12,33 +12,32 @@
 
 #include "augsys/muxer.h"
 
-#include "augob/channelob.h"
-
-#include "augctx/mpool.h"
+#include "augext/chan.h"
+#include "augext/mpool.h"
 
 namespace aug {
 
-    inline channelobptr
+    inline chanptr
     createclient(mpoolref mpool, const char* host, const char* serv,
                  aug_muxer_t muxer, struct ssl_st* ssl = 0)
     {
-        return object_attach<aug_channelob>
+        return object_attach<aug_chan>
             (verify(aug_createclient(mpool.get(), host, serv, muxer, ssl)));
     }
 
-    inline channelobptr
+    inline chanptr
     createserver(mpoolref mpool, aug_muxer_t muxer, sdref sd,
                  struct ssl_st* ssl = 0)
     {
-        return object_attach<aug_channelob>
+        return object_attach<aug_chan>
             (verify(aug_createserver(mpool.get(), muxer, sd.get(), ssl)));
     }
 
-    inline channelobptr
+    inline chanptr
     createplain(mpoolref mpool, unsigned id, aug_muxer_t muxer, sdref sd,
                 unsigned short mask)
     {
-        return object_attach<aug_channelob>
+        return object_attach<aug_chan>
             (verify(aug_createplain(mpool.get(), id, muxer, sd.get(), mask)));
     }
 }

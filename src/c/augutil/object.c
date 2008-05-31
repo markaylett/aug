@@ -14,17 +14,17 @@ AUG_RCSID("$Id$");
 #include <stdlib.h> /* malloc() */
 #include <string.h>
 
-struct longobimpl_ {
-    aug_longob longob_;
+struct boxintimpl_ {
+    aug_boxint boxint_;
     unsigned refs_;
-    void (*destroy_)(long);
-    long l_;
+    void (*destroy_)(int);
+    int i_;
 };
 
 static void*
-castlongob_(aug_longob* ob, const char* id)
+castboxint_(aug_boxint* ob, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_longobid)) {
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_boxintid)) {
         aug_retain(ob);
         return ob;
     }
@@ -32,48 +32,48 @@ castlongob_(aug_longob* ob, const char* id)
 }
 
 static void
-retainlongob_(aug_longob* ob)
+retainboxint_(aug_boxint* ob)
 {
-    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
+    struct boxintimpl_* impl = AUG_PODIMPL(struct boxintimpl_, boxint_, ob);
     ++impl->refs_;
 }
 
 static void
-releaselongob_(aug_longob* ob)
+releaseboxint_(aug_boxint* ob)
 {
-    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
+    struct boxintimpl_* impl = AUG_PODIMPL(struct boxintimpl_, boxint_, ob);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
-            impl->destroy_(impl->l_);
+            impl->destroy_(impl->i_);
         free(impl);
     }
 }
 
-static long
-getlongob_(aug_longob* ob)
+static int
+getboxint_(aug_boxint* ob)
 {
-    struct longobimpl_* impl = AUG_PODIMPL(struct longobimpl_, longob_, ob);
-    return impl->l_;
+    struct boxintimpl_* impl = AUG_PODIMPL(struct boxintimpl_, boxint_, ob);
+    return impl->i_;
 }
 
-static const struct aug_longobvtbl longobvtbl_ = {
-    castlongob_,
-    retainlongob_,
-    releaselongob_,
-    getlongob_
+static const struct aug_boxintvtbl boxintvtbl_ = {
+    castboxint_,
+    retainboxint_,
+    releaseboxint_,
+    getboxint_
 };
 
-struct addrobimpl_ {
-    aug_addrob addrob_;
+struct boxptrimpl_ {
+    aug_boxptr boxptr_;
     unsigned refs_;
     void (*destroy_)(void*);
     void* p_;
 };
 
 static void*
-castaddrob_(aug_addrob* ob, const char* id)
+castboxptr_(aug_boxptr* ob, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_addrobid)) {
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_boxptrid)) {
         aug_retain(ob);
         return ob;
     }
@@ -81,16 +81,16 @@ castaddrob_(aug_addrob* ob, const char* id)
 }
 
 static void
-retainaddrob_(aug_addrob* ob)
+retainboxptr_(aug_boxptr* ob)
 {
-    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
+    struct boxptrimpl_* impl = AUG_PODIMPL(struct boxptrimpl_, boxptr_, ob);
     ++impl->refs_;
 }
 
 static void
-releaseaddrob_(aug_addrob* ob)
+releaseboxptr_(aug_boxptr* ob)
 {
-    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
+    struct boxptrimpl_* impl = AUG_PODIMPL(struct boxptrimpl_, boxptr_, ob);
     if (0 == --impl->refs_) {
         if (impl->destroy_)
             impl->destroy_(impl->p_);
@@ -99,17 +99,17 @@ releaseaddrob_(aug_addrob* ob)
 }
 
 static void*
-getaddrob_(aug_addrob* ob)
+getboxptr_(aug_boxptr* ob)
 {
-    struct addrobimpl_* impl = AUG_PODIMPL(struct addrobimpl_, addrob_, ob);
+    struct boxptrimpl_* impl = AUG_PODIMPL(struct boxptrimpl_, boxptr_, ob);
     return impl->p_;
 }
 
-static const struct aug_addrobvtbl addrobvtbl_ = {
-    castaddrob_,
-    retainaddrob_,
-    releaseaddrob_,
-    getaddrob_
+static const struct aug_boxptrvtbl boxptrvtbl_ = {
+    castboxptr_,
+    retainboxptr_,
+    releaseboxptr_,
+    getboxptr_
 };
 
 
@@ -146,7 +146,7 @@ releaseblob_(aug_blob* ob)
 }
 
 static const void*
-blobdata_(aug_blob* ob, size_t* size)
+getblobdata_(aug_blob* ob, size_t* size)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (size)
@@ -155,7 +155,7 @@ blobdata_(aug_blob* ob, size_t* size)
 }
 
 static size_t
-blobsize_(aug_blob* ob)
+getblobsize_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     return impl->size_;
@@ -165,66 +165,66 @@ static const struct aug_blobvtbl blobvtbl_ = {
     castblob_,
     retainblob_,
     releaseblob_,
-    blobdata_,
-    blobsize_
+    getblobdata_,
+    getblobsize_
 };
 
-AUGUTIL_API aug_longob*
-aug_createlongob(long l, void (*destroy)(long))
+AUGUTIL_API aug_boxint*
+aug_createboxint(int i, void (*destroy)(int))
 {
-    struct longobimpl_* impl = malloc(sizeof(struct longobimpl_));
+    struct boxintimpl_* impl = malloc(sizeof(struct boxintimpl_));
     if (!impl) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    impl->longob_.vtbl_ = &longobvtbl_;
-    impl->longob_.impl_ = NULL;
+    impl->boxint_.vtbl_ = &boxintvtbl_;
+    impl->boxint_.impl_ = NULL;
     impl->refs_ = 1;
     impl->destroy_ = destroy;
-    impl->l_ = l;
+    impl->i_ = i;
 
-    return &impl->longob_;
+    return &impl->boxint_;
 }
 
-AUGUTIL_API long
-aug_obtolong(aug_object* ob)
+AUGUTIL_API int
+aug_obtoi(aug_object* ob)
 {
-    long l;
-    aug_longob* tmp;
-    if (ob && (tmp = aug_cast(ob, aug_longobid))) {
-        l = aug_getlongob(tmp);
+    int i;
+    aug_boxint* tmp;
+    if (ob && (tmp = aug_cast(ob, aug_boxintid))) {
+        i = aug_getboxint(tmp);
         aug_release(tmp);
     } else
-        l = 0;
-    return l;
+        i = 0;
+    return i;
 }
 
-AUGUTIL_API aug_addrob*
-aug_createaddrob(void* p, void (*destroy)(void*))
+AUGUTIL_API aug_boxptr*
+aug_createboxptr(void* p, void (*destroy)(void*))
 {
-    struct addrobimpl_* impl = malloc(sizeof(struct addrobimpl_));
+    struct boxptrimpl_* impl = malloc(sizeof(struct boxptrimpl_));
     if (!impl) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    impl->addrob_.vtbl_ = &addrobvtbl_;
-    impl->addrob_.impl_ = NULL;
+    impl->boxptr_.vtbl_ = &boxptrvtbl_;
+    impl->boxptr_.impl_ = NULL;
     impl->refs_ = 1;
     impl->destroy_ = destroy;
     impl->p_ = p;
 
-    return &impl->addrob_;
+    return &impl->boxptr_;
 }
 
 AUGUTIL_API void*
-aug_obtoaddr(aug_object* ob)
+aug_obtop(aug_object* ob)
 {
     void* p;
-    aug_addrob* tmp;
-    if (ob && (tmp = aug_cast(ob, aug_addrobid))) {
-        p = aug_getaddrob(tmp);
+    aug_boxptr* tmp;
+    if (ob && (tmp = aug_cast(ob, aug_boxptrid))) {
+        p = aug_getboxptr(tmp);
         aug_release(tmp);
     } else
         p = NULL;

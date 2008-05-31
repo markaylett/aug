@@ -19,8 +19,8 @@ namespace aug {
 
     class sock_base : public object_base {
 
-        virtual channelobptr
-        do_channelob() const = 0;
+        virtual chanptr
+        do_chan() const = 0;
 
         virtual sockstate
         do_state() const = 0;
@@ -29,10 +29,10 @@ namespace aug {
         virtual
         ~sock_base() AUG_NOTHROW;
 
-        channelobptr
-        channelob() const
+        chanptr
+        chan() const
         {
-            return do_channelob();
+            return do_chan();
         }
         sockstate
         state() const

@@ -4,10 +4,11 @@
 #include "augsys/time.h"
 
 #include "augctx/base.h"
+#include "augctx/clock.h" /* aug_createclock() */
 #include "augctx/errinfo.h"
 
-#include <errno.h>  /* ENOMEM */
-#include <stdlib.h> /* malloc() */
+#include <errno.h>        /* ENOMEM */
+#include <stdlib.h>       /* malloc() */
 
 struct aug_hires_ {
     aug_mpool* mpool_;
@@ -20,6 +21,9 @@ aug_createhires(aug_mpool* mpool)
 {
     aug_clock* clock;
     aug_hires_t hires;
+
+    /* Create clock rather than reuse the tlx version to ensure high
+       precision. */
 
     if (!(clock = aug_createclock(mpool, 0)))
         return NULL;

@@ -78,7 +78,7 @@ aug_setsigevent(struct aug_event* event, int sig)
     default:
         event->type_ = AUG_EVENTSIGNAL;
     }
-    event->ob_ = (aug_object*)aug_createlongob(sig, NULL);
+    event->ob_ = (aug_object*)aug_createboxint(sig, NULL);
     return event;
 }
 

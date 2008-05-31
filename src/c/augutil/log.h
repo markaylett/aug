@@ -12,7 +12,7 @@
 
 #include "augutil/config.h"
 
-#include "augctx/log.h"
+#include "augext/log.h"
 
 /**
  * Get textual description of log label.

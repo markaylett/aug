@@ -90,7 +90,7 @@ namespace aug {
             initial(aug_object* ob, const char* value) AUG_NOTHROW
             {
                 try {
-                    obtoaddr<T*>(ob)->initial(value);
+                    obtop<T*>(ob)->initial(value);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -100,7 +100,7 @@ namespace aug {
                   const char* value) AUG_NOTHROW
             {
                 try {
-                    obtoaddr<T*>(ob)->field(name, value);
+                    obtop<T*>(ob)->field(name, value);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -109,7 +109,7 @@ namespace aug {
             csize(aug_object* ob, unsigned csize) AUG_NOTHROW
             {
                 try {
-                    obtoaddr<T*>(ob)->csize(csize);
+                    obtop<T*>(ob)->csize(csize);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -119,7 +119,7 @@ namespace aug {
                   unsigned csize) AUG_NOTHROW
             {
                 try {
-                    obtoaddr<T*>(ob)->cdata(cdata, csize);
+                    obtop<T*>(ob)->cdata(cdata, csize);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -128,7 +128,7 @@ namespace aug {
             end(aug_object* ob, int commit) AUG_NOTHROW
             {
                 try {
-                    obtoaddr<T*>(ob)->end(commit ? true : false);
+                    obtop<T*>(ob)->end(commit ? true : false);
                     return 0;
                 } AUG_SETERRINFOCATCH;
                 return -1;
@@ -197,7 +197,7 @@ namespace aug {
         template <typename T>
         httpparser(unsigned size, T& x)
         {
-            aug::smartob<aug_addrob> ob(createaddrob(&x, 0));
+            aug::smartob<aug_boxptr> ob(createboxptr(&x, 0));
             verify(httpparser_ = aug_createhttpparser
                    (size, &httpnonstatic<T>(), ob.base()));
         }
@@ -205,7 +205,7 @@ namespace aug {
         template <typename T>
         httpparser(unsigned size, std::auto_ptr<T>& x)
         {
-            aug::smartob<aug_addrob> ob(createaddrob(x));
+            aug::smartob<aug_boxptr> ob(createboxptr(x));
             verify(httpparser_ = aug_createhttpparser
                    (size, &httpnonstatic<T>(), ob.base()));
         }

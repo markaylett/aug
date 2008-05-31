@@ -6,8 +6,9 @@
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
-#include "augctx/log.h"
 #include "augctx/string.h"
+
+#include "augext/log.h"
 
 #include <sys/types.h>
 #include <errno.h>

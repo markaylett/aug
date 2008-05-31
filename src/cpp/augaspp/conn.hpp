@@ -123,7 +123,7 @@ namespace aug {
         mod_handle& sock_;
         buffer& buffer_;
         rwtimer& rwtimer_;
-        channelobptr channelob_;
+        chanptr chan_;
         endpoint endpoint_;
         sockstate state_;
         bool close_;
@@ -143,8 +143,8 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        channelobptr
-        do_channelob() const;
+        chanptr
+        do_chan() const;
 
         void
         do_send(const void* buf, size_t size, const timeval& now);
@@ -181,7 +181,7 @@ namespace aug {
 
         connected(const sessionptr& session, mod_handle& sock,
                   buffer& buffer, rwtimer& rwtimer,
-                  const channelobptr& channelob, const endpoint& ep,
+                  const chanptr& chan, const endpoint& ep,
                   bool close);
     };
 
@@ -191,7 +191,7 @@ namespace aug {
         mod_handle& sock_;
         buffer& buffer_;
         tcpconnect conn_;
-        channelobptr channelob_;
+        chanptr chan_;
         endpoint endpoint_;
         sockstate state_;
 
@@ -204,8 +204,8 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        channelobptr
-        do_channelob() const;
+        chanptr
+        do_chan() const;
 
         void
         do_send(const void* buf, size_t size, const timeval& now);

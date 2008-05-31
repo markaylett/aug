@@ -1,7 +1,0 @@
-<package name="aug" dir="augext">
-
-  <interface name="ptrbox">
-    <method name="getptr" type="void*" qname="getptr"/>
-  </interface>
-
-</package>

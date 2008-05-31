@@ -54,14 +54,14 @@ namespace aug {
                 return 0;
             }
             const void*
-            blobdata_(size_t* size) AUG_NOTHROW
+            getblobdata_(size_t* size) AUG_NOTHROW
             {
                 if (size)
                     *size = size_;
                 return &vec_[0];
             }
             size_t
-            blobsize_() AUG_NOTHROW
+            getblobsize_() AUG_NOTHROW
             {
                 return size_;
             }
@@ -113,7 +113,7 @@ namespace aug {
          */
 
         size_t
-        writesome(streamobref ref);
+        writesome(streamref ref);
 
         bool
         empty() const

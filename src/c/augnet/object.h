@@ -8,9 +8,8 @@
 
 #include "augsys/muxer.h"
 
-#include "augctx/mpool.h"
-
-#include "augob/channelob.h"
+#include "augext/chan.h"
+#include "augext/mpool.h"
 
 struct ssl_st* ssl;
 
@@ -18,7 +17,7 @@ struct ssl_st* ssl;
  * Create a client socket channel.
  */
 
-AUGNET_API aug_channelob*
+AUGNET_API aug_chan*
 aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
                  aug_muxer_t muxer, struct ssl_st* ssl);
 
@@ -29,7 +28,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
  * responsibility for calling aug_sclose() on socket.
  */
 
-AUGNET_API aug_channelob*
+AUGNET_API aug_chan*
 aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
                  struct ssl_st* ssl);
 
@@ -40,7 +39,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
  * responsibility for calling aug_sclose() on socket.
  */
 
-AUGNET_API aug_channelob*
+AUGNET_API aug_chan*
 aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
                 unsigned short mask);
 

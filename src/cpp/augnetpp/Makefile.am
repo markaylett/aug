@@ -3,7 +3,7 @@ include $(top_srcdir)/src/cpp/lang.mk
 modincludedir = $(includedir)/augnetpp
 modinclude_HEADERS = \
 	base64.hpp \
-	channels.hpp \
+	chans.hpp \
 	config.hpp \
 	http.hpp \
 	inet.hpp \
@@ -16,7 +16,7 @@ noinst_LTLIBRARIES = libaugnetpp.la
 
 libaugnetpp_la_SOURCES = \
 	base64.cpp \
-	channels.cpp \
+	chans.cpp \
 	config.cpp \
 	http.cpp \
 	inet.cpp \
@@ -36,13 +36,13 @@ libaugnetpp_la_LIBADD = \
 
 check_PROGRAMS = \
 	base64test \
-	channelstest \
+	chanstest \
 	maintest \
 	tcpconnecttest
 
 TESTS = \
 	base64test \
-	channelstest \
+	chanstest \
 	maintest \
 	tcpconnecttest
 
@@ -54,8 +54,8 @@ base64test_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-channelstest_SOURCES = channelstest.cpp
-channelstest_LDADD = \
+chanstest_SOURCES = chanstest.cpp
+chanstest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \

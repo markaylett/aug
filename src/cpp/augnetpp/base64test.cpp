@@ -48,7 +48,7 @@ main(int argc, char* argv[])
             throw error("decodebase64() failed");
 
         test x;
-        scoped_addrob<simple_addrob> ob(&x);
+        scoped_boxptr<simple_boxptr> ob(&x);
         base64 b64(AUG_ENCODE64, base64memcb<test, &test::cb>, ob);
         appendbase64(b64, DECODED, strlen(DECODED));
         finishbase64(b64);

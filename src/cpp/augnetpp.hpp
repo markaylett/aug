@@ -7,7 +7,7 @@
 #include "augnet.h"
 
 #include "augnetpp/base64.hpp"
-#include "augnetpp/channels.hpp"
+#include "augnetpp/chans.hpp"
 #include "augnetpp/http.hpp"
 #include "augnetpp/inet.hpp"
 #include "augnetpp/mar.hpp"

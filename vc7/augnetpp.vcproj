@@ -144,7 +144,7 @@
 				RelativePath="..\src\cpp\augnetpp\base64.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\channels.cpp">
+				RelativePath="..\src\cpp\augnetpp\chans.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\config.cpp">
@@ -176,7 +176,7 @@
 				RelativePath="..\src\cpp\augnetpp\base64.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\channels.hpp">
+				RelativePath="..\src\cpp\augnetpp\chans.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augnetpp\config.hpp">

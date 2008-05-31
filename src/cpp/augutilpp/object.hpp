@@ -10,14 +10,14 @@
 
 namespace aug {
 
-    struct simple_addrob {
+    struct simple_boxptr {
         void* p_;
-        simple_addrob(void* p)
+        simple_boxptr(void* p)
             : p_(p)
         {
         }
         void*
-        getaddrob_() const
+        getboxptr_() const
         {
             return p_;
         }
@@ -43,17 +43,17 @@ namespace aug {
         }
     };
 
-    inline aug::smartob<aug_longob>
-    createlongob(long l, void (*destroy)(long))
+    inline aug::smartob<aug_boxint>
+    createboxint(int i, void (*destroy)(int))
     {
-        return aug::object_attach<aug_longob>(aug_createlongob(l, destroy));
+        return aug::object_attach<aug_boxint>(aug_createboxint(i, destroy));
     }
 
     template <typename T>
     T
-    obtolong(aug::obref<aug_object> ref)
+    obtoi(aug::obref<aug_object> ref)
     {
-        return static_cast<T>(aug_obtolong(ref.get()));
+        return static_cast<T>(aug_obtoi(ref.get()));
     }
 
     template <typename T>
@@ -63,24 +63,24 @@ namespace aug {
         delete static_cast<T*>(ptr);
     }
 
-    inline aug::smartob<aug_addrob>
-    createaddrob(void* p, void (*destroy)(void*))
+    inline aug::smartob<aug_boxptr>
+    createboxptr(void* p, void (*destroy)(void*))
     {
-        return aug::object_attach<aug_addrob>(aug_createaddrob(p, destroy));
+        return aug::object_attach<aug_boxptr>(aug_createboxptr(p, destroy));
     }
 
     template <typename T>
-    aug::smartob<aug_addrob>
-    createaddrob(std::auto_ptr<T>& x)
+    aug::smartob<aug_boxptr>
+    createboxptr(std::auto_ptr<T>& x)
     {
-        return createaddrob(x.release(), deleter<T>);
+        return createboxptr(x.release(), deleter<T>);
     }
 
     template <typename T>
     T
-    obtoaddr(aug::obref<aug_object> ob)
+    obtop(aug::obref<aug_object> ob)
     {
-        return static_cast<T>(aug_obtoaddr(ob.get()));
+        return static_cast<T>(aug_obtop(ob.get()));
     }
 
     inline aug::smartob<aug_blob>

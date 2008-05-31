@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGNET_BUILD
-#include "augnet/channels.h"
+#include "augnet/chans.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
@@ -17,12 +17,12 @@ AUG_RCSID("$Id$");
 
 struct entry_ {
     AUG_ENTRY(entry_);
-    aug_channelob* ob_;
+    aug_chan* ob_;
 };
 
 AUG_HEAD(head_, entry_);
 
-struct aug_channels_ {
+struct aug_chans_ {
     aug_mpool* mpool_;
     struct head_ head_;
     unsigned size_;
@@ -30,102 +30,100 @@ struct aug_channels_ {
 };
 
 static void
-release_(aug_channels_t channels, struct entry_* it)
+release_(aug_chans_t chans, struct entry_* it)
 {
-    AUG_CTXDEBUG3(aug_tlx, "releasing channel: %u", aug_getid(it->ob_));
-    --channels->size_;
+    AUG_CTXDEBUG3(aug_tlx, "releasing channel: %u", aug_getchanid(it->ob_));
+    --chans->size_;
     aug_safeassign(it->ob_, NULL);
 }
 
 static void
-swap_(aug_channelob** lhs, aug_channelob** rhs)
+swap_(aug_chan** lhs, aug_chan** rhs)
 {
-    aug_channelob* tmp = *lhs;
+    aug_chan* tmp = *lhs;
     *lhs = *rhs;
     *rhs = tmp;
 }
 
 static void
-trash_(aug_channels_t channels)
+trash_(aug_chans_t chans)
 {
     struct entry_* it, ** prev;
 
     /* Moved all trashed items to trash list. */
 
-    prev = &AUG_FIRST(&channels->head_);
+    prev = &AUG_FIRST(&chans->head_);
     while ((it = *prev)) {
 
         if (!it->ob_) {
 
             AUG_CTXDEBUG3(aug_tlx, "removing trashed entry");
 
-            AUG_REMOVE_PREVPTR(it, prev, &channels->head_);
-            aug_freemem(channels->mpool_, it);
+            AUG_REMOVE_PREVPTR(it, prev, &chans->head_);
+            aug_freemem(chans->mpool_, it);
 
         } else
             prev = &AUG_NEXT(it);
     }
 }
 
-AUGNET_API aug_channels_t
-aug_createchannels(aug_mpool* mpool)
+AUGNET_API aug_chans_t
+aug_createchans(aug_mpool* mpool)
 {
-    aug_channels_t channels = aug_allocmem(mpool,
-                                           sizeof(struct aug_channels_));
-    if (!channels)
+    aug_chans_t chans = aug_allocmem(mpool, sizeof(struct aug_chans_));
+    if (!chans)
         return NULL;
 
-    channels->mpool_ = mpool;
-    AUG_INIT(&channels->head_);
-    channels->size_ = 0;
-    channels->locks_ = 0;
+    chans->mpool_ = mpool;
+    AUG_INIT(&chans->head_);
+    chans->size_ = 0;
+    chans->locks_ = 0;
 
     aug_retain(mpool);
-    return channels;
+    return chans;
 }
 
 AUGNET_API void
-aug_destroychannels(aug_channels_t channels)
+aug_destroychans(aug_chans_t chans)
 {
-    aug_mpool* mpool = channels->mpool_;
+    aug_mpool* mpool = chans->mpool_;
     struct entry_* it;
 
-    while ((it = AUG_FIRST(&channels->head_))) {
-        AUG_REMOVE_HEAD(&channels->head_);
+    while ((it = AUG_FIRST(&chans->head_))) {
+        AUG_REMOVE_HEAD(&chans->head_);
         if (it->ob_)
-            release_(channels, it);
+            release_(chans, it);
         aug_freemem(mpool, it);
     }
 
-    aug_freemem(mpool, channels);
+    aug_freemem(mpool, chans);
     aug_release(mpool);
 }
 
 AUGNET_API aug_result
-aug_insertchannel(aug_channels_t channels, aug_channelob* ob)
+aug_insertchan(aug_chans_t chans, aug_chan* ob)
 {
-    struct entry_* entry = aug_allocmem(channels->mpool_,
-                                        sizeof(struct entry_));
+    struct entry_* entry = aug_allocmem(chans->mpool_, sizeof(struct entry_));
     if (!entry)
         return AUG_FAILERROR;
 
-    AUG_CTXDEBUG3(aug_tlx, "retaining channel: %u", aug_getid(ob));
+    AUG_CTXDEBUG3(aug_tlx, "retaining channel: %u", aug_getchanid(ob));
 
     entry->ob_ = ob;
     aug_retain(ob);
 
-    AUG_INSERT_HEAD(&channels->head_, entry);
-    ++channels->size_;
+    AUG_INSERT_HEAD(&chans->head_, entry);
+    ++chans->size_;
     return AUG_SUCCESS;
 }
 
 AUGNET_API aug_result
-aug_removechannel(aug_channels_t channels, unsigned id)
+aug_removechan(aug_chans_t chans, unsigned id)
 {
     /* Locate the matching entry. */
 
     struct entry_* it;
-    AUG_FOREACH(it, &channels->head_) {
+    AUG_FOREACH(it, &chans->head_) {
 
         if (!it->ob_) {
 
@@ -135,7 +133,7 @@ aug_removechannel(aug_channels_t channels, unsigned id)
             continue;
         }
 
-        if (aug_getid(it->ob_) == id)
+        if (aug_getchanid(it->ob_) == id)
             goto match;
     }
 
@@ -143,14 +141,14 @@ aug_removechannel(aug_channels_t channels, unsigned id)
 
  match:
 
-    if (0 < channels->locks_) {
+    if (0 < chans->locks_) {
 
         /* Items are merely marked for removal while a aug_foreachchannel()
            operation is in progress. */
 
         AUG_CTXDEBUG3(aug_tlx, "channels locked: delayed removal");
 
-        release_(channels, it);
+        release_(chans, it);
 
     } else {
 
@@ -158,38 +156,37 @@ aug_removechannel(aug_channels_t channels, unsigned id)
 
         AUG_CTXDEBUG3(aug_tlx, "channels unlocked: immediate removal");
 
-        release_(channels, it);
-        AUG_REMOVE(&channels->head_, it, entry_);
-        aug_freemem(channels->mpool_, it);
+        release_(chans, it);
+        AUG_REMOVE(&chans->head_, it, entry_);
+        aug_freemem(chans->mpool_, it);
     }
 
     return AUG_SUCCESS;
 }
 
 AUGNET_API void
-aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb,
-                   aug_object* cbob)
+aug_foreachchan(aug_chans_t chans, aug_chancb_t cb, aug_object* cbob)
 {
     struct entry_* it;
 
     /* Ensure list is locked so that no entries are actually removed during
        iteration. */
 
-    if (1 == ++channels->locks_) {
+    if (1 == ++chans->locks_) {
 
         /* Rotate channels to promote fairness.  This is not done for nested
            calls to avoid having the same entries processed twice by outer
            iterations. */
 
-        if ((it = AUG_FIRST(&channels->head_))) {
-            AUG_REMOVE_HEAD(&channels->head_);
-            AUG_INSERT_TAIL(&channels->head_, it);
+        if ((it = AUG_FIRST(&chans->head_))) {
+            AUG_REMOVE_HEAD(&chans->head_);
+            AUG_INSERT_TAIL(&chans->head_, it);
         }
     }
 
-    AUG_FOREACH(it, &channels->head_) {
+    AUG_FOREACH(it, &chans->head_) {
 
-        aug_channelob* ob = it->ob_;
+        aug_chan* ob = it->ob_;
         aug_bool fork = AUG_FALSE;
 
         /* Ignore trashed entries. */
@@ -200,23 +197,23 @@ aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb,
         }
 
         AUG_CTXDEBUG3(aug_tlx, "processing channel: entry=[%p], id=[%u]", it,
-                      aug_getid(ob));
+                      aug_getchanid(ob));
 
         /* Note: the current entry may be marked for removal during this
            call. */
 
-        ob = aug_process(ob, &fork, cb, cbob);
+        ob = aug_processchan(ob, &fork, cb, cbob);
 
         if (fork) {
 
             AUG_CTXDEBUG3(aug_tlx, "forking new channel: id=[%u]",
-                          aug_getid(ob));
+                          aug_getchanid(ob));
 
             /* The forked channel is inserted at the head of the list, this
                avoids visitation of the new channel during the current
                iteration. */
 
-            aug_insertchannel(channels, ob);
+            aug_insertchan(chans, ob);
             aug_release(ob);
             continue; /* Done. */
         }
@@ -238,42 +235,41 @@ aug_foreachchannel(aug_channels_t channels, aug_channelcb_t cb,
            reflect the correct size. */
 
         if (!it->ob_)
-            --channels->size_;
+            --chans->size_;
 
         /* Release previous value stored in entry. */
 
         aug_release(ob);
     }
 
-    if (0 == --channels->locks_) {
+    if (0 == --chans->locks_) {
 
         /* Trash when iterations complete. */
 
-        trash_(channels);
-
+        trash_(chans);
     }
 }
 
 AUGNET_API void
-aug_dumpchannels(aug_channels_t channels)
+aug_dumpchans(aug_chans_t chans)
 {
     struct entry_* it;
 
     aug_ctxinfo(aug_tlx, "dumping channels: size=[%u], locks=[%d]",
-                channels->size_, channels->locks_);
+                chans->size_, chans->locks_);
 
-    AUG_FOREACH(it, &channels->head_) {
+    AUG_FOREACH(it, &chans->head_) {
 
         if (it->ob_)
             aug_ctxinfo(aug_tlx, "active: entry=[%p], id=[%u]", it,
-                        aug_getid(it->ob_));
+                        aug_getchanid(it->ob_));
         else
             aug_ctxinfo(aug_tlx, "trash: entry=[%p]", it);
     }
 }
 
 AUGNET_API unsigned
-aug_getchannels(aug_channels_t channels)
+aug_getchans(aug_chans_t chans)
 {
-    return channels->size_;
+    return chans->size_;
 }

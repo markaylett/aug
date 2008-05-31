@@ -12,7 +12,7 @@
 
 #include "augsys/config.h"
 
-#include "augctx/mpool.h"
+#include "augext/mpool.h"
 
 #include "augtypes.h"
 

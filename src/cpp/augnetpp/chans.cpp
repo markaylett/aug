@@ -3,4 +3,4 @@
 */
 #define AUGNETPP_BUILD
 
-#include "augnetpp/channels.hpp"
+#include "augnetpp/chans.hpp"

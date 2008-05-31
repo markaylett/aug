@@ -58,10 +58,10 @@ clntconn::do_session() const
     return conn_->session();
 }
 
-channelobptr
-clntconn::do_channelob() const
+chanptr
+clntconn::do_chan() const
 {
-    return conn_->channelob();
+    return conn_->chan();
 }
 
 void
@@ -100,12 +100,12 @@ clntconn::do_process(unsigned short events, const timeval& now)
         // writing then set the write event-mask.
 
         if (!buffer_.empty())
-            seteventmask(conn_->channelob(), AUG_FDEVENTRDWR);
+            setchanmask(conn_->chan(), AUG_FDEVENTRDWR);
 
         AUG_CTXDEBUG2(aug_tlx,
                       "connection now established, assuming new state");
 
-        channelobptr ob(conn_->channelob());
+        chanptr ob(conn_->chan());
         conn_ = connptr(new aug::connected
                         (conn_->session(), sock_, buffer_, rwtimer_, ob,
                          conn_->peername(), true));
@@ -161,7 +161,7 @@ clntconn::clntconn(const sessionptr& session, void* user, timers& timers,
         AUG_CTXDEBUG2(aug_tlx,
                       "connection now established, assuming new state");
 
-        channelobptr ob(conn_->channelob());
+        chanptr ob(conn_->chan());
         conn_ = connptr(new aug::connected
                         (conn_->session(), sock_, buffer_, rwtimer_, ob,
                          conn_->peername(), true));

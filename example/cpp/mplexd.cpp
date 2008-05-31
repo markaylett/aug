@@ -191,14 +191,14 @@ namespace test {
 
     struct state {
 
-        channels channels_;
+        chans chans_;
         timers timers_;
         muxer muxer_;
-        channelobptr serv_;
+        chanptr serv_;
         map<int, sessionptr> sds_;
 
         state()
-            : channels_(getmpool(aug_tlx)),
+            : chans_(getmpool(aug_tlx)),
               serv_(null)
         {
             setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
@@ -210,11 +210,11 @@ namespace test {
             autosd sd(tcpserver(hostserv.host_, hostserv.serv_, ep));
             setnonblock(sd, true);
 
-            channelobptr serv(createserver(getmpool(aug_tlx), muxer_, sd));
+            chanptr serv(createserver(getmpool(aug_tlx), muxer_, sd));
             sd.release();
 
-            insertchannel(channels_, serv);
-            seteventmask(serv, AUG_FDEVENTRD);
+            insertchan(chans_, serv);
+            setchanmask(serv, AUG_FDEVENTRD);
 
             serv_ = serv;
         }
@@ -321,7 +321,7 @@ namespace test {
                 if (aug_fdevents(state_->muxer_, aug_eventrd()))
                     readevent();
 
-                foreachchannel(state_->channels_, *this);
+                foreachchan(state_->chans_, *this);
             }
         }
 
@@ -333,7 +333,7 @@ namespace test {
         }
 
         bool
-        channelcb(unsigned id, streamobref streamob, unsigned short events)
+        chancb(unsigned id, streamref stream, unsigned short events)
         {
 //             state_->sfds_.insert(make_pair
 //                                  (sfd.get(), sessionptr

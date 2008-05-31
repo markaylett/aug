@@ -28,8 +28,8 @@ namespace {
 
     class server {
         muxer muxer_;
-        channels channels_;
-        channelobptr serv_;
+        chans chans_;
+        chanptr serv_;
         bool quit_;
         void
         readevent()
@@ -51,7 +51,7 @@ namespace {
         }
     public:
         server(const char* host, const char* serv)
-            : channels_(getmpool(aug_tlx)),
+            : chans_(getmpool(aug_tlx)),
               serv_(null),
               quit_(false)
         {
@@ -61,20 +61,20 @@ namespace {
             autosd sd(tcpserver(host, serv, ep));
             setnonblock(sd, true);
 
-            channelobptr ob(createserver(getmpool(aug_tlx), muxer_, sd));
+            chanptr ob(createserver(getmpool(aug_tlx), muxer_, sd));
             sd.release();
 
-            insertchannel(channels_, ob);
+            insertchan(chans_, ob);
         }
         bool
-        channelcb(unsigned id, streamobref streamob, unsigned short events)
+        chancb(unsigned id, streamref stream, unsigned short events)
         {
             aug_ctxinfo(aug_tlx, "id: %u", id);
             if (0 == events) {
                 aug_ctxinfo(aug_tlx, "new connection");
             } else if (events & AUG_FDEVENTRD) {
                 char buf[1024];
-                ssize_t n = read(streamob, buf, sizeof(buf) - 1);
+                ssize_t n = read(stream, buf, sizeof(buf) - 1);
                 if (n <= 0) {
                     aug_ctxinfo(aug_tlx, "closing connection");
                     return false;
@@ -98,9 +98,9 @@ namespace {
                     readevent();
 
                 aug_ctxinfo(aug_tlx, "before");
-                dumpchannels(channels_);
-                foreachchannel(channels_, *this);
-                dumpchannels(channels_);
+                dumpchans(chans_);
+                foreachchan(chans_, *this);
+                dumpchans(chans_);
                 aug_ctxinfo(aug_tlx, "after");
             }
         }

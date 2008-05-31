@@ -14,9 +14,8 @@
 
 #include "augsys/muxer.h"
 
-#include "augctx/mpool.h"
-
-#include "augob/channelob.h"
+#include "augext/chan.h"
+#include "augext/mpool.h"
 
 struct aug_errinfo;
 struct ssl_st;
@@ -32,7 +31,7 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
  * responsibility for calling aug_sclose() on socket.
  */
 
-AUGNET_API aug_channelob*
+AUGNET_API aug_chan*
 aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
                     aug_sd sd, unsigned short mask, struct ssl_st* ssl);
 
@@ -43,7 +42,7 @@ aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
  * responsibility for calling aug_sclose() on socket.
  */
 
-AUGNET_API aug_channelob*
+AUGNET_API aug_chan*
 aug_createsslserver(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
                     aug_sd sd, unsigned short mask, struct ssl_st* ssl);
 

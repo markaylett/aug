@@ -812,7 +812,7 @@ event_(const char* from, const char* type, aug_object* ob)
                 if (blob) {
 
                     size_t size;
-                    const void* data = aug_blobdata(blob, &size);
+                    const void* data = aug_getblobdata(blob, &size);
 
                     /* Unsafe to release here. */
 

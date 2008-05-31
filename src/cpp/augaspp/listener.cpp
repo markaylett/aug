@@ -28,8 +28,8 @@ listener::do_session() const
     return session_;
 }
 
-channelobptr
-listener::do_channelob() const
+chanptr
+listener::do_chan() const
 {
     return sd_;
 }

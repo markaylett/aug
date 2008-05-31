@@ -16,14 +16,14 @@ AUG_RCSID("$Id$");
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
 
-#include "augob/streamob.h"
+#include "augext/stream.h"
 
 #include <assert.h>
 #include <string.h>
 
 static aug_bool
-safecb_(aug_channelob* channel, aug_channelcb_t cb, aug_object* cbob,
-        unsigned id, aug_streamob* ob, unsigned short events)
+safecb_(aug_chan* chan, aug_chancb_t cb, aug_object* cbob,
+        unsigned id, aug_stream* ob, unsigned short events)
 {
     aug_bool ret;
 
@@ -35,15 +35,15 @@ safecb_(aug_channelob* channel, aug_channelcb_t cb, aug_object* cbob,
 
     /* Lock here to prevent release during callback. */
 
-    aug_retain(channel);
+    aug_retain(chan);
     ret = cb(cbob, id, ob, events);
-    aug_release(channel);
+    aug_release(chan);
 
     return ret;
 }
 
 struct cimpl_ {
-    aug_channelob channelob_;
+    aug_chan chan_;
     int refs_;
     aug_mpool* mpool_;
     unsigned id_;
@@ -55,19 +55,19 @@ struct cimpl_ {
     int est_;
 };
 
-static aug_channelob*
-establish_(struct cimpl_* impl, aug_channelcb_t cb, aug_object* cbob)
+static aug_chan*
+establish_(struct cimpl_* impl, aug_chancb_t cb, aug_object* cbob)
 {
     aug_sd sd = impl->sd_;
-    aug_channelob* channelob;
-    aug_streamob* streamob;
+    aug_chan* chan;
+    aug_stream* stream;
 
     /* Ensure connection establishment happens only once. */
 
     impl->sd_ = AUG_BADSD;
     impl->est_ = 0;
 
-    channelob =
+    chan =
 #if ENABLE_SSL
         impl->ssl_ ? aug_createsslclient(impl->mpool_, impl->id_,
                                          impl->muxer_, sd, impl->mask_,
@@ -76,30 +76,30 @@ establish_(struct cimpl_* impl, aug_channelcb_t cb, aug_object* cbob)
         aug_createplain(impl->mpool_, impl->id_, impl->muxer_, sd,
                         impl->mask_);
 
-    if (!channelob) {
+    if (!chan) {
         aug_sclose(sd);
         return NULL;
     }
 
     /* Transfer event mask to established channel. */
 
-    streamob = aug_cast(channelob, aug_streamobid);
+    stream = aug_cast(chan, aug_streamid);
 
     /* Zero events indicates new connection. */
 
-    if (!safecb_(&impl->channelob_, cb, cbob, impl->id_, streamob, 0)) {
+    if (!safecb_(&impl->chan_, cb, cbob, impl->id_, stream, 0)) {
 
         /* Rejected: socket will be closed on release. */
 
-        aug_release(streamob);
-        aug_release(channelob);
+        aug_release(stream);
+        aug_release(chan);
         return NULL;
     }
 
     /* Transition to established state. */
 
-    aug_release(streamob);
-    return channelob;
+    aug_release(stream);
+    return chan;
 }
 
 static aug_result
@@ -113,9 +113,9 @@ cclose_(struct cimpl_* impl)
 static void*
 ccast_(struct cimpl_* impl, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_channelobid)) {
-        aug_retain(&impl->channelob_);
-        return &impl->channelob_;
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_chanid)) {
+        aug_retain(&impl->chan_);
+        return &impl->chan_;
     }
     return NULL;
 }
@@ -142,40 +142,40 @@ crelease_(struct cimpl_* impl)
 }
 
 static void*
-cchannelob_cast_(aug_channelob* ob, const char* id)
+cchan_cast_(aug_chan* ob, const char* id)
 {
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
     return ccast_(impl, id);
 }
 
 static void
-cchannelob_retain_(aug_channelob* ob)
+cchan_retain_(aug_chan* ob)
 {
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
     cretain_(impl);
 }
 
 static void
-cchannelob_release_(aug_channelob* ob)
+cchan_release_(aug_chan* ob)
 {
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
     crelease_(impl);
 }
 
 static aug_result
-cchannelob_close_(aug_channelob* ob)
+cchan_close_(aug_chan* ob)
 {
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
     aug_result result = cclose_(impl);
     impl->sd_ = AUG_BADSD;
     return result;
 }
 
-static aug_channelob*
-cchannelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
-                    aug_object* cbob)
+static aug_chan*
+cchan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb,
+               aug_object* cbob)
 {
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
 
     if (impl->est_) {
 
@@ -216,9 +216,9 @@ cchannelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
 }
 
 static aug_result
-cchannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
+cchan_setmask_(aug_chan* ob, unsigned short mask)
 {
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
 
     /* Mask will be set once the connection is established. */
 
@@ -226,33 +226,41 @@ cchannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
     return AUG_SUCCESS;
 }
 
-static unsigned
-cchannelob_getid_(aug_channelob* ob)
-{
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
-    return impl->id_;
-}
-
 static int
-cchannelob_eventmask_(aug_channelob* ob)
+cchan_getmask_(aug_chan* ob)
 {
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, channelob_, ob);
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
     return impl->mask_;
 }
 
-static const struct aug_channelobvtbl cchannelobvtbl_ = {
-    cchannelob_cast_,
-    cchannelob_retain_,
-    cchannelob_release_,
-    cchannelob_close_,
-    cchannelob_process_,
-    cchannelob_seteventmask_,
-    cchannelob_getid_,
-    cchannelob_eventmask_
+static unsigned
+cchan_getid_(aug_chan* ob)
+{
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+    return impl->id_;
+}
+
+static char*
+cchan_getname_(aug_chan* ob, char* dst, unsigned size)
+{
+    strcpy(dst, "test");
+    return dst;
+}
+
+static const struct aug_chanvtbl cchanvtbl_ = {
+    cchan_cast_,
+    cchan_retain_,
+    cchan_release_,
+    cchan_close_,
+    cchan_process_,
+    cchan_setmask_,
+    cchan_getmask_,
+    cchan_getid_,
+    cchan_getname_
 };
 
 struct simpl_ {
-    aug_channelob channelob_;
+    aug_chan chan_;
     int refs_;
     aug_mpool* mpool_;
     unsigned id_;
@@ -272,9 +280,9 @@ sclose_(struct simpl_* impl)
 static void*
 scast_(struct simpl_* impl, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_channelobid)) {
-        aug_retain(&impl->channelob_);
-        return &impl->channelob_;
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_chanid)) {
+        aug_retain(&impl->chan_);
+        return &impl->chan_;
     }
     return NULL;
 }
@@ -300,47 +308,47 @@ srelease_(struct simpl_* impl)
 }
 
 static void*
-schannelob_cast_(aug_channelob* ob, const char* id)
+schan_cast_(aug_chan* ob, const char* id)
 {
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
     return scast_(impl, id);
 }
 
 static void
-schannelob_retain_(aug_channelob* ob)
+schan_retain_(aug_chan* ob)
 {
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
     sretain_(impl);
 }
 
 static void
-schannelob_release_(aug_channelob* ob)
+schan_release_(aug_chan* ob)
 {
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
     srelease_(impl);
 }
 
 static aug_result
-schannelob_close_(aug_channelob* ob)
+schan_close_(aug_chan* ob)
 {
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
     aug_result result = sclose_(impl);
     impl->sd_ = AUG_BADSD;
     return result;
 }
 
-static aug_channelob*
-schannelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
-                    aug_object* cbob)
+static aug_chan*
+schan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb,
+               aug_object* cbob)
 {
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
 
     if ((AUG_FDEVENTRD & aug_fdevents(impl->muxer_, impl->sd_))) {
 
         aug_sd sd;
         struct aug_endpoint ep;
-        aug_channelob* channelob;
-        aug_streamob* streamob;
+        aug_chan* chan;
+        aug_stream* stream;
         unsigned id;
 
         if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
@@ -367,14 +375,14 @@ schannelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
         }
 
         id = aug_nextid();
-        channelob =
+        chan =
 #if ENABLE_SSL
             impl->ssl_ ? aug_createsslserver(impl->mpool_, id, impl->muxer_,
                                              sd, impl->mask_, impl->ssl_) :
 #endif /* ENABLE_SSL */
             aug_createplain(impl->mpool_, id, impl->muxer_, sd, impl->mask_);
 
-        if (!channelob) {
+        if (!chan) {
             aug_ctxwarn(aug_tlx, "aug_createplain() or aug_createsslserver()"
                         " failed: %s", aug_tlerr->desc_);
             aug_sclose(sd);
@@ -383,26 +391,26 @@ schannelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
 
         /* Transfer event mask to established channel. */
 
-        aug_seteventmask(channelob, impl->mask_);
+        aug_setchanmask(chan, impl->mask_);
 
-        streamob = aug_cast(channelob, aug_streamobid);
+        stream = aug_cast(chan, aug_streamid);
 
         /* Zero events indicates new connection. */
 
-        if (!safecb_(ob, cb, cbob, id, streamob, 0)) {
+        if (!safecb_(ob, cb, cbob, id, stream, 0)) {
 
             /* Rejected: socket will be closed on release. */
 
-            aug_release(streamob);
-            aug_release(channelob);
+            aug_release(stream);
+            aug_release(chan);
             goto done;
         }
 
         /* Newly established connection. */
 
         *fork = AUG_TRUE;
-        aug_release(streamob);
-        return channelob;
+        aug_release(stream);
+        return chan;
     }
 
  done:
@@ -411,9 +419,9 @@ schannelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
 }
 
 static aug_result
-schannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
+schan_setmask_(aug_chan* ob, unsigned short mask)
 {
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
 
     /* Mask will be set for each subsequently accepted connection. */
 
@@ -421,34 +429,42 @@ schannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
     return AUG_SUCCESS;
 }
 
-static unsigned
-schannelob_getid_(aug_channelob* ob)
-{
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
-    return impl->id_;
-}
-
 static int
-schannelob_eventmask_(aug_channelob* ob)
+schan_getmask_(aug_chan* ob)
 {
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, channelob_, ob);
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
     return impl->mask_;
 }
 
-static const struct aug_channelobvtbl schannelobvtbl_ = {
-    schannelob_cast_,
-    schannelob_retain_,
-    schannelob_release_,
-    schannelob_close_,
-    schannelob_process_,
-    schannelob_seteventmask_,
-    schannelob_getid_,
-    schannelob_eventmask_
+static unsigned
+schan_getid_(aug_chan* ob)
+{
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
+    return impl->id_;
+}
+
+static char*
+schan_getname_(aug_chan* ob, char* dst, unsigned size)
+{
+    strcpy(dst, "test");
+    return dst;
+}
+
+static const struct aug_chanvtbl schanvtbl_ = {
+    schan_cast_,
+    schan_retain_,
+    schan_release_,
+    schan_close_,
+    schan_process_,
+    schan_setmask_,
+    schan_getmask_,
+    schan_getid_,
+    schan_getname_
 };
 
 struct pimpl_ {
-    aug_channelob channelob_;
-    aug_streamob streamob_;
+    aug_chan chan_;
+    aug_stream stream_;
     int refs_;
     aug_mpool* mpool_;
     unsigned id_;
@@ -466,12 +482,12 @@ pclose_(struct pimpl_* impl)
 static void*
 pcast_(struct pimpl_* impl, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_channelobid)) {
-        aug_retain(&impl->channelob_);
-        return &impl->channelob_;
-    } else if (AUG_EQUALID(id, aug_streamobid)) {
-        aug_retain(&impl->streamob_);
-        return &impl->streamob_;
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_chanid)) {
+        aug_retain(&impl->chan_);
+        return &impl->chan_;
+    } else if (AUG_EQUALID(id, aug_streamid)) {
+        aug_retain(&impl->stream_);
+        return &impl->stream_;
     }
     return NULL;
 }
@@ -497,45 +513,45 @@ prelease_(struct pimpl_* impl)
 }
 
 static void*
-pchannelob_cast_(aug_channelob* ob, const char* id)
+pchan_cast_(aug_chan* ob, const char* id)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     return pcast_(impl, id);
 }
 
 static void
-pchannelob_retain_(aug_channelob* ob)
+pchan_retain_(aug_chan* ob)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     pretain_(impl);
 }
 
 static void
-pchannelob_release_(aug_channelob* ob)
+pchan_release_(aug_chan* ob)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     prelease_(impl);
 }
 
 static aug_result
-pchannelob_close_(aug_channelob* ob)
+pchan_close_(aug_chan* ob)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     aug_result result = pclose_(impl);
     impl->sd_ = AUG_BADSD;
     return result;
 }
 
-static aug_channelob*
-pchannelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
-                    aug_object* cbob)
+static aug_chan*
+pchan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb,
+               aug_object* cbob)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     int events = aug_fdevents(impl->muxer_, impl->sd_);
     if (events < 0)
         return NULL;
 
-    if (events && !safecb_(ob, cb, cbob, impl->id_, &impl->streamob_, events))
+    if (events && !safecb_(ob, cb, cbob, impl->id_, &impl->stream_, events))
         return NULL;
 
     pretain_(impl);
@@ -543,105 +559,113 @@ pchannelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
 }
 
 static aug_result
-pchannelob_seteventmask_(aug_channelob* ob, unsigned short mask)
+pchan_setmask_(aug_chan* ob, unsigned short mask)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     return aug_setfdeventmask(impl->muxer_, impl->sd_, mask);
 }
 
-static unsigned
-pchannelob_getid_(aug_channelob* ob)
-{
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
-    return impl->id_;
-}
-
 static int
-pchannelob_eventmask_(aug_channelob* ob)
+pchan_getmask_(aug_chan* ob)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, channelob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     return aug_fdeventmask(impl->muxer_, impl->sd_);
 }
 
-static const struct aug_channelobvtbl pchannelobvtbl_ = {
-    pchannelob_cast_,
-    pchannelob_retain_,
-    pchannelob_release_,
-    pchannelob_close_,
-    pchannelob_process_,
-    pchannelob_seteventmask_,
-    pchannelob_getid_,
-    pchannelob_eventmask_
+static unsigned
+pchan_getid_(aug_chan* ob)
+{
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
+    return impl->id_;
+}
+
+static char*
+pchan_getname_(aug_chan* ob, char* dst, unsigned size)
+{
+    strcpy(dst, "test");
+    return dst;
+}
+
+static const struct aug_chanvtbl pchanvtbl_ = {
+    pchan_cast_,
+    pchan_retain_,
+    pchan_release_,
+    pchan_close_,
+    pchan_process_,
+    pchan_setmask_,
+    pchan_getmask_,
+    pchan_getid_,
+    pchan_getname_
 };
 
 static void*
-pstreamob_cast_(aug_streamob* ob, const char* id)
+pstream_cast_(aug_stream* ob, const char* id)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, streamob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     return pcast_(impl, id);
 }
 
 static void
-pstreamob_retain_(aug_streamob* ob)
+pstream_retain_(aug_stream* ob)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, streamob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     pretain_(impl);
 }
 
 static void
-pstreamob_release_(aug_streamob* ob)
+pstream_release_(aug_stream* ob)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, streamob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     prelease_(impl);
 }
 
 static aug_result
-pstreamob_shutdown_(aug_streamob* ob)
+pstream_shutdown_(aug_stream* ob)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, streamob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     return aug_sshutdown(impl->sd_, SHUT_WR);
 }
 
 static ssize_t
-pstreamob_read_(aug_streamob* ob, void* buf, size_t size)
+pstream_read_(aug_stream* ob, void* buf, size_t size)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, streamob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     return aug_sread(impl->sd_, buf, size);
 }
 
 static ssize_t
-pstreamob_readv_(aug_streamob* ob, const struct iovec* iov, int size)
+pstream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, streamob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     return aug_sreadv(impl->sd_, iov, size);
 }
 
 static ssize_t
-pstreamob_write_(aug_streamob* ob, const void* buf, size_t size)
+pstream_write_(aug_stream* ob, const void* buf, size_t size)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, streamob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     return aug_swrite(impl->sd_, buf, size);
 }
 
 static ssize_t
-pstreamob_writev_(aug_streamob* ob, const struct iovec* iov, int size)
+pstream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, streamob_, ob);
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     return aug_swritev(impl->sd_, iov, size);
 }
 
-static const struct aug_streamobvtbl pstreamobvtbl_ = {
-    pstreamob_cast_,
-    pstreamob_retain_,
-    pstreamob_release_,
-    pstreamob_shutdown_,
-    pstreamob_read_,
-    pstreamob_readv_,
-    pstreamob_write_,
-    pstreamob_writev_
+static const struct aug_streamvtbl pstreamvtbl_ = {
+    pstream_cast_,
+    pstream_retain_,
+    pstream_release_,
+    pstream_shutdown_,
+    pstream_read_,
+    pstream_readv_,
+    pstream_write_,
+    pstream_writev_
 };
 
-AUGNET_API aug_channelob*
+AUGNET_API aug_chan*
 aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
                  aug_muxer_t muxer, struct ssl_st* ssl)
 {
@@ -675,8 +699,8 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     if (!(impl = aug_allocmem(mpool, sizeof(struct cimpl_))))
         goto fail2;
 
-    impl->channelob_.vtbl_ = &cchannelobvtbl_;
-    impl->channelob_.impl_ = NULL;
+    impl->chan_.vtbl_ = &cchanvtbl_;
+    impl->chan_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
     impl->id_ = aug_nextid();
@@ -691,7 +715,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     impl->est_ = est;
 
     aug_retain(mpool);
-    return &impl->channelob_;
+    return &impl->chan_;
 
  fail2:
     aug_setfdeventmask(muxer, sd, 0);
@@ -701,7 +725,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     return NULL;
 }
 
-AUGNET_API aug_channelob*
+AUGNET_API aug_chan*
 aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
                  struct ssl_st* ssl)
 {
@@ -715,8 +739,8 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
         return NULL;
     }
 
-    impl->channelob_.vtbl_ = &schannelobvtbl_;
-    impl->channelob_.impl_ = NULL;
+    impl->chan_.vtbl_ = &schanvtbl_;
+    impl->chan_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
     impl->id_ = aug_nextid();
@@ -729,10 +753,10 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     impl->ssl_ = ssl;
 
     aug_retain(mpool);
-    return &impl->channelob_;
+    return &impl->chan_;
 }
 
-AUGNET_API aug_channelob*
+AUGNET_API aug_chan*
 aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
                 unsigned short mask)
 {
@@ -746,10 +770,10 @@ aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
         return NULL;
     }
 
-    impl->channelob_.vtbl_ = &pchannelobvtbl_;
-    impl->channelob_.impl_ = NULL;
-    impl->streamob_.vtbl_ = &pstreamobvtbl_;
-    impl->streamob_.impl_ = NULL;
+    impl->chan_.vtbl_ = &pchanvtbl_;
+    impl->chan_.impl_ = NULL;
+    impl->stream_.vtbl_ = &pstreamvtbl_;
+    impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
     impl->id_ = id;
@@ -757,5 +781,5 @@ aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
     impl->sd_ = sd;
 
     aug_retain(mpool);
-    return &impl->channelob_;
+    return &impl->chan_;
 }

@@ -15,7 +15,8 @@
 #include "augutil/timer.h"
 
 #include "augctx/errno.h"
-#include "augctx/log.h"
+
+#include "augext/log.h"
 
 namespace aug {
 
@@ -33,7 +34,7 @@ namespace aug {
     timermemcb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            (obtoaddr<T*>(user)->*U)(id, *ms);
+            (obtop<T*>(user)->*U)(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
@@ -42,7 +43,7 @@ namespace aug {
     timermemcb(aug_object* ob, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            obtoaddr<T*>(ob)->timercb(id, *ms);
+            obtop<T*>(ob)->timercb(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
@@ -107,7 +108,7 @@ namespace aug {
     int
     settimer(aug_timers& timers, idref ref, unsigned ms, T& x)
     {
-        aug::smartob<aug_addrob> ob(createaddrob(&x, 0));
+        aug::smartob<aug_boxptr> ob(createboxptr(&x, 0));
         return verify(aug_settimer(&timers, ref.get(), ms,
                                    timermemcb<T>, ob.base()));
     }
@@ -116,7 +117,7 @@ namespace aug {
     int
     settimer(aug_timers& timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
     {
-        aug::smartob<aug_addrob> ob(createaddrob(x));
+        aug::smartob<aug_boxptr> ob(createboxptr(x));
         int id(verify(aug_settimer(&timers, ref.get(), ms, timermemcb<T>,
                                    ob.base())));
         return id;

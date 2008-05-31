@@ -12,7 +12,7 @@
 
 #include "augnet/auth.h"
 #include "augnet/base64.h"
-#include "augnet/channels.h"
+#include "augnet/chans.h"
 #include "augnet/fix.h"
 #include "augnet/http.h"
 #include "augnet/inet.h"

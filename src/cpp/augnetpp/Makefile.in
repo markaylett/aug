@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-check_PROGRAMS = base64test$(EXEEXT) channelstest$(EXEEXT) \
+check_PROGRAMS = base64test$(EXEEXT) chanstest$(EXEEXT) \
 	maintest$(EXEEXT) tcpconnecttest$(EXEEXT)
 subdir = src/cpp/augnetpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -56,7 +56,7 @@ libaugnetpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugnetpp_la_OBJECTS = base64.lo channels.lo config.lo http.lo \
+am_libaugnetpp_la_OBJECTS = base64.lo chans.lo config.lo http.lo \
 	inet.lo mar.lo object.lo tcpconnect.lo writer.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
 am_base64test_OBJECTS = base64test.$(OBJEXT)
@@ -67,9 +67,9 @@ base64test_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_channelstest_OBJECTS = channelstest.$(OBJEXT)
-channelstest_OBJECTS = $(am_channelstest_OBJECTS)
-channelstest_DEPENDENCIES =  \
+am_chanstest_OBJECTS = chanstest.$(OBJEXT)
+chanstest_OBJECTS = $(am_chanstest_OBJECTS)
+chanstest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -102,10 +102,10 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugnetpp_la_SOURCES) $(base64test_SOURCES) \
-	$(channelstest_SOURCES) $(maintest_SOURCES) \
+	$(chanstest_SOURCES) $(maintest_SOURCES) \
 	$(tcpconnecttest_SOURCES)
 DIST_SOURCES = $(libaugnetpp_la_SOURCES) $(base64test_SOURCES) \
-	$(channelstest_SOURCES) $(maintest_SOURCES) \
+	$(chanstest_SOURCES) $(maintest_SOURCES) \
 	$(tcpconnecttest_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -249,7 +249,7 @@ DEFAULT_INCLUDES = \
 modincludedir = $(includedir)/augnetpp
 modinclude_HEADERS = \
 	base64.hpp \
-	channels.hpp \
+	chans.hpp \
 	config.hpp \
 	http.hpp \
 	inet.hpp \
@@ -261,7 +261,7 @@ modinclude_HEADERS = \
 noinst_LTLIBRARIES = libaugnetpp.la
 libaugnetpp_la_SOURCES = \
 	base64.cpp \
-	channels.cpp \
+	chans.cpp \
 	config.cpp \
 	http.cpp \
 	inet.cpp \
@@ -281,7 +281,7 @@ libaugnetpp_la_LIBADD = \
 
 TESTS = \
 	base64test \
-	channelstest \
+	chanstest \
 	maintest \
 	tcpconnecttest
 
@@ -293,8 +293,8 @@ base64test_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-channelstest_SOURCES = channelstest.cpp
-channelstest_LDADD = \
+chanstest_SOURCES = chanstest.cpp
+chanstest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -371,9 +371,9 @@ clean-checkPROGRAMS:
 base64test$(EXEEXT): $(base64test_OBJECTS) $(base64test_DEPENDENCIES) 
 	@rm -f base64test$(EXEEXT)
 	$(CXXLINK) $(base64test_LDFLAGS) $(base64test_OBJECTS) $(base64test_LDADD) $(LIBS)
-channelstest$(EXEEXT): $(channelstest_OBJECTS) $(channelstest_DEPENDENCIES) 
-	@rm -f channelstest$(EXEEXT)
-	$(CXXLINK) $(channelstest_LDFLAGS) $(channelstest_OBJECTS) $(channelstest_LDADD) $(LIBS)
+chanstest$(EXEEXT): $(chanstest_OBJECTS) $(chanstest_DEPENDENCIES) 
+	@rm -f chanstest$(EXEEXT)
+	$(CXXLINK) $(chanstest_LDFLAGS) $(chanstest_OBJECTS) $(chanstest_LDADD) $(LIBS)
 maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
 	@rm -f maintest$(EXEEXT)
 	$(CXXLINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
@@ -389,8 +389,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/channels.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/channelstest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chans.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chanstest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@

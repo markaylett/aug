@@ -144,7 +144,7 @@
 				RelativePath="..\src\c\augnet\base64.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\channels.c">
+				RelativePath="..\src\c\augnet\chans.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\config.c">
@@ -191,7 +191,7 @@
 				RelativePath="..\src\c\augnet\base64.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\channels.h">
+				RelativePath="..\src\c\augnet\chans.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\config.h">

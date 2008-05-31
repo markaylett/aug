@@ -32,7 +32,7 @@ buffer::append(blobref ref)
     appendwriter(writer_, ref);
     reuse_ = false;
 
-    size_ += blobsize(ref);
+    size_ += getblobsize(ref);
 }
 
 void
@@ -64,7 +64,7 @@ buffer::append(const void* buf, size_t len)
 }
 
 size_t
-buffer::writesome(streamobref ref)
+buffer::writesome(streamref ref)
 {
     size_t size(aug::writesome(writer_, ref));
 

@@ -47,7 +47,7 @@ releaseblob_(aug_blob* ob)
 }
 
 static const void*
-blobdata_(aug_blob* ob, size_t* size)
+getblobdata_(aug_blob* ob, size_t* size)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     if (size)
@@ -56,7 +56,7 @@ blobdata_(aug_blob* ob, size_t* size)
 }
 
 static size_t
-blobsize_(aug_blob* ob)
+getblobsize_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
     return RSTRING(impl->rbob_)->len;
@@ -66,8 +66,8 @@ static const struct aug_blobvtbl blobvtbl_ = {
     castblob_,
     retainblob_,
     releaseblob_,
-    blobdata_,
-    blobsize_
+    getblobdata_,
+    getblobsize_
 };
 
 static void*

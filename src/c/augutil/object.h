@@ -12,15 +12,33 @@
 
 #include "augutil/config.h"
 
-#include "augob/addrob.h"
-#include "augob/blob.h"
-#include "augob/longob.h"
+#include "augext/blob.h"
+#include "augext/boxint.h"
+#include "augext/boxptr.h"
 
-AUGUTIL_API aug_longob*
-aug_createlongob(long l, void (*destroy)(long));
+/**
+ * Create object wrapper for integer.
+ *
+ * @param i Integer.
+ *
+ * @param destroy Destructor to be called when reference count reaches zero.
+ *
+ * @return Address of new object, or null on error.
+ */
 
-AUGUTIL_API long
-aug_obtolong(aug_object* ob);
+AUGUTIL_API aug_boxint*
+aug_createboxint(int i, void (*destroy)(int));
+
+/**
+ * Cast to @ref aug_boxint and return boxed integer.
+ *
+ * @param ob Base object address.
+ *
+ * @return Boxed integer, or zero if not @ref aug_boxint type.
+ */
+
+AUGUTIL_API int
+aug_obtoi(aug_object* ob);
 
 /**
  * Create object wrapper for plain pointer.
@@ -32,19 +50,19 @@ aug_obtolong(aug_object* ob);
  * @return Address of new object, or null on error.
  */
 
-AUGUTIL_API aug_addrob*
-aug_createaddrob(void* p, void (*destroy)(void*));
+AUGUTIL_API aug_boxptr*
+aug_createboxptr(void* p, void (*destroy)(void*));
 
 /**
- * Cast to @ref aug_addrob and return plain pointer.
+ * Cast to @ref aug_boxptr and return plain pointer.
  *
  * @param ob Base object address.
  *
- * @return Plain pointer, or null if not @ref aug_addrob type.
+ * @return Plain pointer, or null if not @ref aug_boxptr type.
  */
 
 AUGUTIL_API void*
-aug_obtoaddr(aug_object* ob);
+aug_obtop(aug_object* ob);
 
 AUGUTIL_API aug_blob*
 aug_createblob(const void* buf, size_t len);

@@ -13,8 +13,9 @@ AUG_RCSID("$Id$");
 
 # include "augaspp/conn.hpp"
 
-# include "augctx/log.h"
 # include "augctx/string.h"
+
+# include "augext/log.h"
 
 # include <sstream>
 

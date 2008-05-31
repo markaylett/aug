@@ -14,7 +14,8 @@
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
-#include "augctx/log.h"
+
+#include "augext/log.h"
 
 #include <assert.h>
 #include <stdio.h>

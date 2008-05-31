@@ -6,7 +6,8 @@
 #include "augctx/base.h"
 #include "augctx/defs.h" /* AUG_MAXLINE */
 #include "augctx/errinfo.h"
-#include "augctx/log.h"
+
+#include "augext/log.h"
 
 #include <assert.h>
 #include <stdio.h>       /* _vsnprintf() */

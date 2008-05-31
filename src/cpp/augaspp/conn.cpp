@@ -122,10 +122,10 @@ connected::do_session() const
     return session_;
 }
 
-channelobptr
-connected::do_channelob() const
+chanptr
+connected::do_chan() const
 {
-    return channelob_;
+    return chan_;
 }
 
 void
@@ -136,7 +136,7 @@ connected::do_send(const void* buf, size_t len, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        seteventmask(channelob_, AUG_FDEVENTRDWR);
+        setchanmask(chan_, AUG_FDEVENTRDWR);
     }
 
     buffer_.append(buf, len);
@@ -150,7 +150,7 @@ connected::do_sendv(blobref ref, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        seteventmask(channelob_, AUG_FDEVENTRDWR);
+        setchanmask(chan_, AUG_FDEVENTRDWR);
     }
 
     buffer_.append(ref);
@@ -175,14 +175,14 @@ connected::do_connected(const aug_endpoint& ep, const timeval& now)
 bool
 connected::do_process(unsigned short events, const timeval& now)
 {
-    streamobptr streamob(object_cast<aug_streamob>(channelob_));
+    streamptr stream(object_cast<aug_stream>(chan_));
 
     if (events & AUG_FDEVENTRD) {
 
         AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%d]", sock_.id_);
 
         char buf[4096];
-        size_t size(read(streamob, buf, sizeof(buf)));
+        size_t size(read(stream, buf, sizeof(buf)));
         if (0 == size) {
 
             // Connection closed.
@@ -205,7 +205,7 @@ connected::do_process(unsigned short events, const timeval& now)
 
         AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%d]", sock_.id_);
 
-        size_t n(buffer_.writesome(streamob));
+        size_t n(buffer_.writesome(stream));
 
         // Data has been written: reset write timer.
 
@@ -215,12 +215,12 @@ connected::do_process(unsigned short events, const timeval& now)
 
             // No more (buffered) data to be written.
 
-            seteventmask(channelob_, AUG_FDEVENTRD);
+            setchanmask(chan_, AUG_FDEVENTRD);
 
             // If flagged for shutdown, send FIN and disable writes.
 
             if (SHUTDOWN <= state_)
-                aug::shutdown(streamob);
+                aug::shutdown(stream);
 
         } else {
 
@@ -260,8 +260,8 @@ connected::do_shutdown(unsigned flags, const timeval& now)
             aug_ctxinfo(aug_tlx,
                         "shutting connection: id=[%d], flags=[%u]",
                         sock_.id_, flags);
-            streamobptr streamob(object_cast<aug_streamob>(channelob_));
-            aug::shutdown(streamob);
+            streamptr stream(object_cast<aug_stream>(chan_));
+            aug::shutdown(stream);
         }
     }
 }
@@ -303,13 +303,13 @@ connected::~connected() AUG_NOTHROW
 
 connected::connected(const sessionptr& session, mod_handle& sock,
                      buffer& buffer, rwtimer& rwtimer,
-                     const channelobptr& channelob, const endpoint& ep,
+                     const chanptr& chan, const endpoint& ep,
                      bool close)
     : session_(session),
       sock_(sock),
       buffer_(buffer),
       rwtimer_(rwtimer),
-      channelob_(channelob),
+      chan_(chan),
       endpoint_(ep),
       state_(CONNECTED),
       close_(close)
@@ -335,10 +335,10 @@ handshake::do_session() const
     return session_;
 }
 
-channelobptr
-handshake::do_channelob() const
+chanptr
+handshake::do_chan() const
 {
-    return channelob_;
+    return chan_;
 }
 
 void

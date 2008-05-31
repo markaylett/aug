@@ -5,7 +5,7 @@
 #define AUGRB_OBJECT_H
 
 #include "augmod.h"
-#include "augob/blob.h"
+#include "augext/blob.h"
 
 #if !defined(_WIN32)
 # include <unistd.h>

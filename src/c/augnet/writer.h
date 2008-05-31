@@ -14,8 +14,8 @@
 
 #include "augsys/types.h"
 
-#include "augob/blob.h"
-#include "augob/streamob.h"
+#include "augext/blob.h"
+#include "augext/stream.h"
 
 typedef struct aug_writer_* aug_writer_t;
 
@@ -43,6 +43,6 @@ AUGNET_API ssize_t
 aug_writersize(aug_writer_t writer);
 
 AUGNET_API ssize_t
-aug_writesome(aug_writer_t writer, aug_streamob* streamob);
+aug_writesome(aug_writer_t writer, aug_stream* stream);
 
 #endif /* AUGNET_WRITER_H */

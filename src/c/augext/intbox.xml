@@ -1,7 +1,0 @@
-<package name="aug" dir="augext">
-
-  <interface name="intbox">
-    <method name="getint" type="int" qname="getint"/>
-  </interface>
-
-</package>

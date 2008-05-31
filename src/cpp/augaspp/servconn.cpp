@@ -58,8 +58,8 @@ servconn::do_session() const
     return conn_.session();
 }
 
-channelobptr
-servconn::do_channelob() const
+chanptr
+servconn::do_chan() const
 {
     return conn_.sd();
 }

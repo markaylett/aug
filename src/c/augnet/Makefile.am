@@ -4,7 +4,7 @@ modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
 	auth.h \
 	base64.h \
-	channels.h \
+	chans.h \
 	config.h \
 	fix.h \
 	http.h \
@@ -24,7 +24,7 @@ lib_LTLIBRARIES = libaugnet.la
 libaugnet_la_SOURCES = \
 	auth.c \
 	base64.c \
-	channels.c \
+	chans.c \
 	config.c \
 	fix.c \
 	http.c \
@@ -48,16 +48,16 @@ libaugnet_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 check_PROGRAMS = \
-	channelstest
+	chanstest
 # 	base64test
-# 	channelstest
+# 	chanstest
 # 	fixtest
 # 	httptest
 # 	neteventtest
 TESTS = \
-	channelstest
+	chanstest
 # 	base64test
-# 	channelstest
+# 	chanstest
 # 	httptest
 # 	neteventtest
 
@@ -65,8 +65,8 @@ TESTS = \
 # base64test_LDADD = \
 # 	$(top_builddir)/src/c/augnet/libaugnet.la
 
-channelstest_SOURCES = channelstest.c
-channelstest_LDADD = \
+chanstest_SOURCES = chanstest.c
+chanstest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
 # fixtest_SOURCES = fixtest.c

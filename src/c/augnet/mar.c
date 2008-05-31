@@ -32,7 +32,7 @@ struct aug_marparser_ {
 static int
 initial_(aug_object* ob, const char* initial)
 {
-    aug_marparser_t parser = aug_obtoaddr(ob);
+    aug_marparser_t parser = aug_obtop(ob);
     if (!(parser->initial_ = aug_createxstr(0)))
         return -1;
 
@@ -49,7 +49,7 @@ initial_(aug_object* ob, const char* initial)
 static int
 field_(aug_object* ob, const char* name, const char* value)
 {
-    aug_marparser_t parser = aug_obtoaddr(ob);
+    aug_marparser_t parser = aug_obtop(ob);
     struct aug_field field;
 
     field.name_ = name;
@@ -62,7 +62,7 @@ field_(aug_object* ob, const char* name, const char* value)
 static int
 csize_(aug_object* ob, unsigned csize)
 {
-    aug_marparser_t parser = aug_obtoaddr(ob);
+    aug_marparser_t parser = aug_obtop(ob);
     if (-1 == aug_truncatemar(parser->mar_, csize))
         return -1;
     return aug_seekmar(parser->mar_, AUG_SET, 0);
@@ -71,14 +71,14 @@ csize_(aug_object* ob, unsigned csize)
 static int
 cdata_(aug_object* ob, const void* buf, unsigned len)
 {
-    aug_marparser_t parser = aug_obtoaddr(ob);
+    aug_marparser_t parser = aug_obtop(ob);
     return aug_writemar(parser->mar_, buf, len);
 }
 
 static int
 end_(aug_object* ob, int commit)
 {
-    aug_marparser_t parser = aug_obtoaddr(ob);
+    aug_marparser_t parser = aug_obtop(ob);
     int ret = 0;
     if (commit) {
 
@@ -136,34 +136,34 @@ aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
                     aug_object* ob)
 {
     aug_marparser_t parser = malloc(sizeof(struct aug_marparser_));
-    aug_object* addrob;
+    aug_object* boxptr;
 
     if (!parser) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
-    if (!(addrob = (aug_object*)aug_createaddrob(parser, destroy_))) {
+    if (!(boxptr = (aug_object*)aug_createboxptr(parser, destroy_))) {
         free(parser);
         return NULL;
     }
 
     parser->handler_ = handler;
 
-    /* The addrob now owns this reference: it will be released by
+    /* The boxptr now owns this reference: it will be released by
        destroy_(). */
 
     if ((parser->ob_ = ob))
         aug_retain(ob);
 
-    parser->http_ = aug_createhttpparser(size, &handler_, addrob);
+    parser->http_ = aug_createhttpparser(size, &handler_, boxptr);
     parser->initial_ = NULL;
     parser->mar_ = NULL;
 
     /* If created, http parser will hold reference.  Otherwise, it will be
        destroyed now. */
 
-    aug_release(addrob);
+    aug_release(boxptr);
 
     return parser->http_ ? parser : NULL;
 }

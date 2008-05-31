@@ -167,7 +167,7 @@ aug_writersize(aug_writer_t writer)
     AUG_FOREACH(it, &writer->bufs_) {
 
         size_t len;
-        if (!aug_blobdata(it->blob_, &len)) {
+        if (!aug_getblobdata(it->blob_, &len)) {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
                            AUG_MSG("failed conversion from var to buffer"));
             return -1;
@@ -180,7 +180,7 @@ aug_writersize(aug_writer_t writer)
 }
 
 AUGNET_API ssize_t
-aug_writesome(aug_writer_t writer, aug_streamob* streamob)
+aug_writesome(aug_writer_t writer, aug_stream* stream)
 {
     ssize_t ret;
     struct iovec* iov;
@@ -200,7 +200,7 @@ aug_writesome(aug_writer_t writer, aug_streamob* streamob)
     i = 0;
     AUG_FOREACH(it, &writer->bufs_) {
 
-        if (!(iov[i].iov_base = (void*)aug_blobdata(it->blob_, &len))) {
+        if (!(iov[i].iov_base = (void*)aug_getblobdata(it->blob_, &len))) {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
                            AUG_MSG("failed conversion from var to buffer"));
             return -1;
@@ -216,7 +216,7 @@ aug_writesome(aug_writer_t writer, aug_streamob* streamob)
     iov->iov_base = (char*)iov->iov_base + writer->part_;
     iov->iov_len -= (int)writer->part_;
 
-    if (-1 != (ret = aug_writev(streamob, iov, size))) {
+    if (-1 != (ret = aug_writev(stream, iov, size))) {
 
         /* Pop any completed buffers from queue. */
 

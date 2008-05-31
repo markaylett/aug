@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = channelstest$(EXEEXT)
+check_PROGRAMS = chanstest$(EXEEXT)
 subdir = src/c/augnet
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -64,13 +64,13 @@ libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugnet_la_OBJECTS = auth.lo base64.lo channels.lo config.lo \
+am_libaugnet_la_OBJECTS = auth.lo base64.lo chans.lo config.lo \
 	fix.lo http.lo inet.lo mar.lo netevent.lo object.lo ssl.lo \
 	tcpconnect.lo types.lo writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
-am_channelstest_OBJECTS = channelstest.$(OBJEXT)
-channelstest_OBJECTS = $(am_channelstest_OBJECTS)
-channelstest_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la
+am_chanstest_OBJECTS = chanstest.$(OBJEXT)
+chanstest_OBJECTS = $(am_chanstest_OBJECTS)
+chanstest_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -81,8 +81,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugnet_la_SOURCES) $(channelstest_SOURCES)
-DIST_SOURCES = $(libaugnet_la_SOURCES) $(channelstest_SOURCES)
+SOURCES = $(libaugnet_la_SOURCES) $(chanstest_SOURCES)
+DIST_SOURCES = $(libaugnet_la_SOURCES) $(chanstest_SOURCES)
 modincludeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(modinclude_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
@@ -217,7 +217,7 @@ modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
 	auth.h \
 	base64.h \
-	channels.h \
+	chans.h \
 	config.h \
 	fix.h \
 	http.h \
@@ -235,7 +235,7 @@ lib_LTLIBRARIES = libaugnet.la
 libaugnet_la_SOURCES = \
 	auth.c \
 	base64.c \
-	channels.c \
+	chans.c \
 	config.c \
 	fix.c \
 	http.c \
@@ -259,23 +259,23 @@ libaugnet_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 # 	base64test
-# 	channelstest
+# 	chanstest
 # 	fixtest
 # 	httptest
 # 	neteventtest
 TESTS = \
-	channelstest
+	chanstest
 
 # 	base64test
-# 	channelstest
+# 	chanstest
 # 	httptest
 # 	neteventtest
 
 # base64test_SOURCES = base64test.c
 # base64test_LDADD = \
 # 	$(top_builddir)/src/c/augnet/libaugnet.la
-channelstest_SOURCES = channelstest.c
-channelstest_LDADD = \
+chanstest_SOURCES = chanstest.c
+chanstest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
 all: all-am
@@ -347,9 +347,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-channelstest$(EXEEXT): $(channelstest_OBJECTS) $(channelstest_DEPENDENCIES) 
-	@rm -f channelstest$(EXEEXT)
-	$(LINK) $(channelstest_LDFLAGS) $(channelstest_OBJECTS) $(channelstest_LDADD) $(LIBS)
+chanstest$(EXEEXT): $(chanstest_OBJECTS) $(chanstest_DEPENDENCIES) 
+	@rm -f chanstest$(EXEEXT)
+	$(LINK) $(chanstest_LDFLAGS) $(chanstest_OBJECTS) $(chanstest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -359,8 +359,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/auth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/channels.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/channelstest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chans.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chanstest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
