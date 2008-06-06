@@ -856,7 +856,7 @@ teardown_(const struct mod_handle* sock)
 }
 
 static int
-accepted_(struct mod_handle* sock, const char* addr, unsigned short port)
+accepted_(struct mod_handle* sock, const char* name)
 {
     struct session_* session = mod_getsession()->user_;
     VALUE user;
@@ -871,8 +871,8 @@ accepted_(struct mod_handle* sock, const char* addr, unsigned short port)
     /* Reject if function either returns false, or throws an exception. */
 
     if (session->accepted_)
-        if (Qfalse == funcall3_(acceptedid_, user, rb_str_new2(addr),
-                                INT2FIX(port)) || except_)
+        if (Qfalse == funcall2_(acceptedid_, user, rb_str_new2(name))
+            || except_)
             return -1;
 
     sock->user_ = register_(user);
@@ -880,7 +880,7 @@ accepted_(struct mod_handle* sock, const char* addr, unsigned short port)
 }
 
 static void
-connected_(struct mod_handle* sock, const char* addr, unsigned short port)
+connected_(struct mod_handle* sock, const char* name)
 {
     struct session_* session = mod_getsession()->user_;
     VALUE user;
@@ -889,7 +889,7 @@ connected_(struct mod_handle* sock, const char* addr, unsigned short port)
     user = *(VALUE*)sock->user_;
 
     if (session->connected_)
-        funcall3_(connectedid_, user, rb_str_new2(addr), INT2FIX(port));
+        funcall2_(connectedid_, user, rb_str_new2(name));
 }
 
 static void

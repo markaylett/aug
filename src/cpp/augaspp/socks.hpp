@@ -7,7 +7,7 @@
 #include "augaspp/session.hpp"
 #include "augaspp/sock.hpp"
 
-#include "augob/blob.h"
+#include "augext/blob.h"
 
 #include <map>
 

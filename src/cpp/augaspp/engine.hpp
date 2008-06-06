@@ -6,7 +6,9 @@
 
 #include "augaspp/session.hpp"
 
-#include "augnetpp/nbfile.hpp"
+#include "augsyspp/types.hpp"
+
+#include "augext/blob.h"
 
 #include "augmod.h"
 

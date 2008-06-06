@@ -42,7 +42,7 @@ AUGSYS_API int
 aug_destroymuxer(aug_muxer_t muxer);
 
 AUGSYS_API void
-aug_setnowait(aug_muxer_t muxer, unsigned nowait);
+aug_setnowait(aug_muxer_t muxer, int nowait);
 
 AUGSYS_API int
 aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);

@@ -13,6 +13,7 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
 
+#include <assert.h>
 #include <stdlib.h>
 
 struct entry_ {
@@ -24,6 +25,7 @@ AUG_HEAD(head_, entry_);
 
 struct aug_chans_ {
     aug_mpool* mpool_;
+    aug_chandler* handler_;
     struct head_ head_;
     unsigned size_;
     int locks_;
@@ -32,9 +34,15 @@ struct aug_chans_ {
 static void
 release_(aug_chans_t chans, struct entry_* it)
 {
-    AUG_CTXDEBUG3(aug_tlx, "releasing channel: %u", aug_getchanid(it->ob_));
+    unsigned id = aug_getchanid(it->ob_);
+
+    AUG_CTXDEBUG3(aug_tlx, "releasing channel: %u", id);
     --chans->size_;
     aug_safeassign(it->ob_, NULL);
+
+    /* Notify after entry has been removed. */
+
+    aug_clearchan(chans->handler_, id);
 }
 
 static void
@@ -68,18 +76,20 @@ trash_(aug_chans_t chans)
 }
 
 AUGNET_API aug_chans_t
-aug_createchans(aug_mpool* mpool)
+aug_createchans(aug_mpool* mpool, aug_chandler* handler)
 {
     aug_chans_t chans = aug_allocmem(mpool, sizeof(struct aug_chans_));
     if (!chans)
         return NULL;
 
     chans->mpool_ = mpool;
+    chans->handler_ = handler;
     AUG_INIT(&chans->head_);
     chans->size_ = 0;
     chans->locks_ = 0;
 
     aug_retain(mpool);
+    aug_retain(handler);
     return chans;
 }
 
@@ -87,7 +97,10 @@ AUGNET_API void
 aug_destroychans(aug_chans_t chans)
 {
     aug_mpool* mpool = chans->mpool_;
+    aug_chandler* handler = chans->handler_;
     struct entry_* it;
+
+    assert(0 == chans->locks_);
 
     while ((it = AUG_FIRST(&chans->head_))) {
         AUG_REMOVE_HEAD(&chans->head_);
@@ -97,6 +110,7 @@ aug_destroychans(aug_chans_t chans)
     }
 
     aug_freemem(mpool, chans);
+    aug_release(handler);
     aug_release(mpool);
 }
 
@@ -165,7 +179,7 @@ aug_removechan(aug_chans_t chans, unsigned id)
 }
 
 AUGNET_API void
-aug_foreachchan(aug_chans_t chans, aug_chancb_t cb, aug_object* cbob)
+aug_processchans(aug_chans_t chans)
 {
     struct entry_* it;
 
@@ -202,7 +216,7 @@ aug_foreachchan(aug_chans_t chans, aug_chancb_t cb, aug_object* cbob)
         /* Note: the current entry may be marked for removal during this
            call. */
 
-        ob = aug_processchan(ob, &fork, cb, cbob);
+        ob = aug_processchan(ob, chans->handler_, &fork);
 
         if (fork) {
 

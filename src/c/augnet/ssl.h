@@ -29,6 +29,9 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
  *
  * Must be passed a non-blocking socket.  If successful, will assume
  * responsibility for calling aug_sclose() on socket.
+ *
+ * Assumes that @ref aug_chandler has already been notified of connection
+ * establishment for @a id.
  */
 
 AUGNET_API aug_chan*
@@ -40,6 +43,9 @@ aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
  *
  * Must be passed a non-blocking socket.  If successful, will assume
  * responsibility for calling aug_sclose() on socket.
+ *
+ * Assumes that @ref aug_chandler has already been notified of connection
+ * establishment for @a id.
  */
 
 AUGNET_API aug_chan*

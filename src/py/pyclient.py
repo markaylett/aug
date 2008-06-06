@@ -37,7 +37,7 @@ def closed(sock):
     if sock.user != None:
         sock.user.cancel()
 
-def connected(sock, addr, port):
+def connected(sock, name):
     log.info("client established, starting timer")
     sock.user = State(sock)
 

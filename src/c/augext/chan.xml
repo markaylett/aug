@@ -1,11 +1,25 @@
 <package name="aug" dir="augext">
 
   <quotincl>augext/stream.h</quotincl>
+  <quotincl>augtypes.h</quotincl>
 
   <verbatim>
-    typedef aug_bool (*aug_chancb_t)(aug_object*, unsigned, aug_stream*,
-      unsigned short);
+#define AUG_MAXCHANNAMELEN 255
   </verbatim>
+
+  <interface name="chandler">
+
+    <method name="clear" type="void" qname="clearchan">
+      <param name="id" type="unsigned"/>
+    </method>
+
+    <method name="ready" type="aug_bool" qname="readychan">
+      <param name="id" type="unsigned"/>
+      <param name="stream" type="aug_stream" object="true"/>
+      <param name="events" type="unsigned short"/>
+    </method>
+
+  </interface>
 
   <interface name="chan">
 
@@ -14,9 +28,8 @@
     <method name="close" type="aug_result" qname="closechan"/>
 
     <method name="process" type="aug_chan" object="true" qname="processchan">
+      <param name="handler" type="aug_chandler" object="true"/>
       <param name="fork" type="aug_bool&"/>
-      <param name="cb" type="aug_chancb_t"/>
-      <param name="ob" type="aug_object" object="true"/>
     </method>
 
     <method name="setmask" type="aug_result" qname="setchanmask">

@@ -9,8 +9,8 @@
 namespace aug {
 
     enum sockstate {
-        HANDSHAKE,
-        CONNECTED,
+        CONNECTING,
+        ESTABLISHED,
         LISTENING,
         TEARDOWN,
         SHUTDOWN,

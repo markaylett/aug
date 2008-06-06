@@ -16,11 +16,9 @@ AUG_RCSID("$Id$");
 
 #include "augsrvpp/signal.hpp"
 
-#include "augnetpp/nbfile.hpp"
-
 #include "augutilpp/timer.hpp"
 
-#include "augob/eventob.h"
+#include "augext/msg.h"
 
 #include <map>
 #include <queue>
@@ -33,20 +31,20 @@ using namespace std;
 
 namespace {
 
-    class postevent : public ref_base {
-        eventob<postevent> eventob_;
+    class msgevent : public ref_base {
+        msg<msgevent> msg_;
         const string from_, to_, type_;
-        smartob<aug_object> user_;
-        postevent(const string& from, const string& to, const string& type)
+        smartob<aug_object> payload_;
+        msgevent(const string& from, const string& to, const string& type)
             : from_(from),
               to_(to),
               type_(type),
-              user_(null)
+              payload_(null)
         {
-            eventob_.reset(this);
+            msg_.reset(this);
         }
     protected:
-        ~postevent() AUG_NOTHROW
+        ~msgevent() AUG_NOTHROW
         {
             // Deleted from base.
         }
@@ -54,70 +52,61 @@ namespace {
         smartob<aug_object>
         cast_(const char* id) AUG_NOTHROW
         {
-            if (equalid<aug_object>(id) || equalid<aug_eventob>(id))
-                return object_retain<aug_object>(eventob_);
+            if (equalid<aug_object>(id) || equalid<aug_msg>(id))
+                return object_retain<aug_object>(msg_);
             return null;
         }
         void
-        seteventobuser_(objectref user) AUG_NOTHROW
+        setpayload_(objectref payload) AUG_NOTHROW
         {
-            user_ = object_retain<aug_object>(user);
+            payload_ = object_retain<aug_object>(payload);
         }
         const char*
-        eventobfrom_() AUG_NOTHROW
+        getfrom_() AUG_NOTHROW
         {
             return from_.c_str();
         }
         const char*
-        eventobto_() AUG_NOTHROW
+        getto_() AUG_NOTHROW
         {
             return to_.c_str();
         }
         const char*
-        eventobtype_() AUG_NOTHROW
+        gettype_() AUG_NOTHROW
         {
             return type_.c_str();
         }
         smartob<aug_object>
-        eventobuser_() AUG_NOTHROW
+        getpayload_() AUG_NOTHROW
         {
-            return user_;
+            return payload_;
         }
-        static smartob<aug_eventob>
+        static smartob<aug_msg>
         create(const string& from, const string& to, const string& type)
         {
-            postevent* ptr = new postevent(from, to, type);
-            return object_attach<aug_eventob>(ptr->eventob_);
+            msgevent* ptr = new msgevent(from, to, type);
+            return object_attach<aug_msg>(ptr->msg_);
         }
     };
 
     typedef std::queue<connptr> pending;
 
     void
-    setsockopts(sdref ref)
-    {
-        setnodelay(ref, true);
-        setnonblock(ref, true);
-    }
-
-    void
     setconnected(conn_base& conn, const timeval& now)
     {
         // Connection has now been established.
 
-        setsockopts(conn.sd());
+        //setsockopts(conn.sd());
 
-        const endpoint& ep(conn.peername());
+        string name(conn.peername());
         inetaddr addr(null);
-        AUG_CTXDEBUG2(aug_tlx, "connected: host=[%s], port=[%d]",
-                      inetntop(getinetaddr(ep, addr)).c_str(),
-                      static_cast<int>(ntohs(port(ep))));
+        AUG_CTXDEBUG2(aug_tlx, "connected: name=[%s]", name.c_str());
 
-        setnbeventmask(conn.sd(), AUG_FDEVENTRD);
+        //setnbeventmask(conn.sd(), AUG_FDEVENTRD);
 
         // Notify session of establishment.
 
-        conn.connected(ep, now);
+        conn.connected(name, now);
     }
 }
 
@@ -151,7 +140,8 @@ namespace aug {
             mdref eventrd_, eventwr_;
             timers& timers_;
             enginecb_base& cb_;
-            nbfiles nbfiles_;
+            muxer muxer_;
+            chans chans_;
             sessions sessions_;
             socks socks_;
 
@@ -175,27 +165,18 @@ namespace aug {
                 STOPPED
             } state_;
 
-            ~engineimpl() AUG_NOTHROW
-            {
-                AUG_CTXDEBUG2(aug_tlx, "removing event pipe from list");
-                try {
-                    removenbfile(eventrd_);
-                } AUG_PERRINFOCATCH;
-            }
             engineimpl(mdref eventrd, mdref eventwr, timers& timers,
                        enginecb_base& cb)
                 : eventrd_(eventrd),
                   eventwr_(eventwr),
                   timers_(timers),
                   cb_(cb),
+                  chans_(getmpool(aug_tlx)),
                   grace_(timers_),
                   state_(STARTED)
             {
                 gettimeofday(now_);
-
-                AUG_CTXDEBUG2(aug_tlx, "inserting event pipe to list");
-                insertnbfile(nbfiles_, eventrd_, *this);
-                setnbeventmask(eventrd_, AUG_FDEVENTRD);
+                setfdeventmask(muxer_, eventrd_, AUG_FDEVENTRD);
             }
             void
             teardown()
@@ -351,11 +332,6 @@ namespace aug {
             bool
             nbfilecb(mdref md, unsigned short events)
             {
-                // Intercept activity on event pipe.
-
-                if (md == eventrd_)
-                    return readevent();
-
                 sockptr sock(socks_.getbysd(md));
                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
@@ -489,9 +465,15 @@ engine::run(bool stoponerr)
                 impl_->pending_.pop();
             }
 
+            AUG_CTXDEBUG2(aug_tlx, "processing events");
+
+            if (fdevents(muxer_, rd_))
+                readevent();
+
             AUG_CTXDEBUG2(aug_tlx, "processing files");
 
             foreachnbfile(impl_->nbfiles_);
+
             continue;
 
         } AUG_PERRINFOCATCH;

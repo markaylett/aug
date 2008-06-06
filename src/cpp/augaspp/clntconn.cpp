@@ -43,105 +43,88 @@ clntconn::do_cancelrwtimer(unsigned flags)
 mod_handle&
 clntconn::do_get()
 {
-    return conn_->get();
+    return conn_.get();
 }
 
 const mod_handle&
 clntconn::do_get() const
 {
-    return conn_->get();
+    return conn_.get();
 }
 
 const sessionptr&
 clntconn::do_session() const
 {
-    return conn_->session();
+    return conn_.session();
 }
 
 chanptr
 clntconn::do_chan() const
 {
-    return conn_->chan();
+    return conn_.chan();
 }
 
 void
 clntconn::do_send(const void* buf, size_t len, const timeval& now)
 {
-    conn_->send(buf, len, now);
+    conn_.send(buf, len, now);
 }
 
 void
 clntconn::do_sendv(blobref ref, const timeval& now)
 {
-    conn_->sendv(ref, now);
+    conn_.sendv(ref, now);
 }
 
 bool
-clntconn::do_accepted(const aug_endpoint& ep, const timeval& now)
+clntconn::do_accepted(const string& name, const timeval& now)
 {
-    return conn_->accepted(ep, now);
+    return conn_.accepted(name, now);
 }
 
 void
-clntconn::do_connected(const aug_endpoint& ep, const timeval& now)
+clntconn::do_connected(const string& name, const timeval& now)
 {
-    conn_->connected(ep, now);
+    // BUG: workaround for bug in gcc version 3.4.4.
+
+    conn_base& r(conn_);
+    r.connected(name, now);
 }
 
 bool
 clntconn::do_process(unsigned short events, const timeval& now)
 {
-    if (!conn_->process(events, now))
-        return false;
-
-    if (CONNECTED == conn_->state()) {
-
-        // Connection is now established.  If data has been buffered for
-        // writing then set the write event-mask.
-
-        if (!buffer_.empty())
-            setchanmask(conn_->chan(), AUG_FDEVENTRDWR);
-
-        AUG_CTXDEBUG2(aug_tlx,
-                      "connection now established, assuming new state");
-
-        chanptr ob(conn_->chan());
-        conn_ = connptr(new aug::connected
-                        (conn_->session(), sock_, buffer_, rwtimer_, ob,
-                         conn_->peername(), true));
-    }
-
-    return true;
+    return conn_.process(events, now);
 }
 
 void
 clntconn::do_shutdown(unsigned flags, const timeval& now)
 {
-    conn_->shutdown(flags, now);
+    conn_.shutdown(flags, now);
 }
 
 void
 clntconn::do_teardown(const timeval& now)
 {
-    conn_->teardown(now);
+    conn_.teardown(now);
 }
 
 bool
 clntconn::do_authcert(const char* subject, const char* issuer)
 {
-    return conn_->authcert(subject, issuer);
+    return conn_.authcert(subject, issuer);
 }
 
-const endpoint&
+string
 clntconn::do_peername() const
 {
-    return conn_->peername();
+    return conn_.peername();
 }
 
 sockstate
 clntconn::do_state() const
 {
-    return conn_->state();
+    return conn_.state();
 }
 
 clntconn::~clntconn() AUG_NOTHROW
@@ -149,21 +132,10 @@ clntconn::~clntconn() AUG_NOTHROW
 }
 
 clntconn::clntconn(const sessionptr& session, void* user, timers& timers,
-                   const char* host, const char* port)
+                   const chanptr& chan)
     : rwtimer_(session, sock_, timers),
-      conn_(new handshake(session, sock_, buffer_, host, port))
+      conn_(session, sock_, buffer_, rwtimer_, chan, true)
 {
     sock_.id_ = aug_nextid();
     sock_.user_ = user;
-
-    if (CONNECTED == conn_->state()) {
-
-        AUG_CTXDEBUG2(aug_tlx,
-                      "connection now established, assuming new state");
-
-        chanptr ob(conn_->chan());
-        conn_ = connptr(new aug::connected
-                        (conn_->session(), sock_, buffer_, rwtimer_, ob,
-                         conn_->peername(), true));
-    }
 }

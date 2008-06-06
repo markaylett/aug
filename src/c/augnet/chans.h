@@ -22,11 +22,13 @@ typedef struct aug_chans_* aug_chans_t;
  *
  * @param mpool Memory pool.
  *
+ * @param handler Channel event handler.
+ *
  * @return New channel list.
  */
 
 AUGNET_API aug_chans_t
-aug_createchans(aug_mpool* mpool);
+aug_createchans(aug_mpool* mpool, aug_chandler* handler);
 
 /**
  * Destroy @chans list.
@@ -62,19 +64,16 @@ AUGNET_API aug_result
 aug_removechan(aug_chans_t chans, unsigned id);
 
 /**
- * Call @a cb function for each channel in list.
+ * Process each channel.
  *
- * If the @a cb function returns @ref AUG_FALSE, the item is removed from the
- * list.  Other functions can be called safely during iteration, including
- * recursive calls to aug_foreachchannel().
+ * Other functions associated with @a chans can be safely called during
+ * iteration, including recursive calls to aug_processchans().
  *
  * @param chans Channel list.
- * @param cb Callback function.
- * @param ob Callback object.
  */
 
 AUGNET_API void
-aug_foreachchan(aug_chans_t chans, aug_chancb_t cb, aug_object* cbob);
+aug_processchans(aug_chans_t chans);
 
 AUGNET_API void
 aug_dumpchans(aug_chans_t chans);

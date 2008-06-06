@@ -22,8 +22,8 @@ AUG_RCSID("$Id$");
 #include <string.h>
 
 static aug_bool
-safecb_(aug_chan* chan, aug_chancb_t cb, aug_object* cbob,
-        unsigned id, aug_stream* ob, unsigned short events)
+readychan_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_stream* ob,
+           unsigned short events)
 {
     aug_bool ret;
 
@@ -36,7 +36,7 @@ safecb_(aug_chan* chan, aug_chancb_t cb, aug_object* cbob,
     /* Lock here to prevent release during callback. */
 
     aug_retain(chan);
-    ret = cb(cbob, id, ob, events);
+    ret = aug_readychan(handler, id, ob, events);
     aug_release(chan);
 
     return ret;
@@ -49,6 +49,7 @@ struct cimpl_ {
     unsigned id_;
     aug_muxer_t muxer_;
     aug_sd sd_;
+    char name_[AUG_MAXCHANNAMELEN + 1];
     unsigned short mask_;
     struct ssl_st* ssl_;
     aug_tcpconnect_t conn_;
@@ -56,7 +57,7 @@ struct cimpl_ {
 };
 
 static aug_chan*
-establish_(struct cimpl_* impl, aug_chancb_t cb, aug_object* cbob)
+establish_(struct cimpl_* impl, aug_chandler* handler)
 {
     aug_sd sd = impl->sd_;
     aug_chan* chan;
@@ -85,9 +86,9 @@ establish_(struct cimpl_* impl, aug_chancb_t cb, aug_object* cbob)
 
     stream = aug_cast(chan, aug_streamid);
 
-    /* Zero events indicates new connection. */
+    /* Zero events indicates channel establishment. */
 
-    if (!safecb_(&impl->chan_, cb, cbob, impl->id_, stream, 0)) {
+    if (!readychan_(&impl->chan_, handler, impl->id_, stream, 0)) {
 
         /* Rejected: socket will be closed on release. */
 
@@ -172,8 +173,7 @@ cchan_close_(aug_chan* ob)
 }
 
 static aug_chan*
-cchan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb,
-               aug_object* cbob)
+cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
 
@@ -182,7 +182,7 @@ cchan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb,
         /* Descriptor will either be owned by new object or closed on
            error. */
 
-        return establish_(impl, cb, cbob);
+        return establish_(impl, handler);
     }
 
     if ((AUG_FDEVENTRD & aug_fdevents(impl->muxer_, impl->sd_))) {
@@ -197,12 +197,16 @@ cchan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb,
                                                         &impl->est_)))
             return NULL;
 
+        /* Update name based on new address. */
+
+        aug_endpointntop(&ep, impl->name_, sizeof(impl->name_));
+
         if (impl->est_) {
 
             /* Descriptor will either be owned by new object or closed on
                error. */
 
-            return establish_(impl, cb, cbob);
+            return establish_(impl, handler);
         }
 
         /* Not yet established: set mask to poll for connection
@@ -243,8 +247,8 @@ cchan_getid_(aug_chan* ob)
 static char*
 cchan_getname_(aug_chan* ob, char* dst, unsigned size)
 {
-    strcpy(dst, "test");
-    return dst;
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+    return impl->name_;
 }
 
 static const struct aug_chanvtbl cchanvtbl_ = {
@@ -338,8 +342,7 @@ schan_close_(aug_chan* ob)
 }
 
 static aug_chan*
-schan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb,
-               aug_object* cbob)
+schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
 
@@ -397,7 +400,7 @@ schan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb,
 
         /* Zero events indicates new connection. */
 
-        if (!safecb_(ob, cb, cbob, id, stream, 0)) {
+        if (!readychan_(ob, handler, id, stream, 0)) {
 
             /* Rejected: socket will be closed on release. */
 
@@ -446,7 +449,12 @@ schan_getid_(aug_chan* ob)
 static char*
 schan_getname_(aug_chan* ob, char* dst, unsigned size)
 {
-    strcpy(dst, "test");
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
+    struct aug_endpoint ep;
+
+    if (!aug_getsockname(impl->sd_, &ep) && !aug_endpointntop(&ep, dst, size))
+        return NULL;
+
     return dst;
 }
 
@@ -543,15 +551,14 @@ pchan_close_(aug_chan* ob)
 }
 
 static aug_chan*
-pchan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb,
-               aug_object* cbob)
+pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     int events = aug_fdevents(impl->muxer_, impl->sd_);
     if (events < 0)
         return NULL;
 
-    if (events && !safecb_(ob, cb, cbob, impl->id_, &impl->stream_, events))
+    if (events && !readychan_(ob, handler, impl->id_, &impl->stream_, events))
         return NULL;
 
     pretain_(impl);
@@ -582,7 +589,12 @@ pchan_getid_(aug_chan* ob)
 static char*
 pchan_getname_(aug_chan* ob, char* dst, unsigned size)
 {
-    strcpy(dst, "test");
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
+    struct aug_endpoint ep;
+
+    if (!aug_getpeername(impl->sd_, &ep) && !aug_endpointntop(&ep, dst, size))
+        return NULL;
+
     return dst;
 }
 
@@ -671,6 +683,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 {
     aug_tcpconnect_t conn;
     aug_sd sd;
+    char name[AUG_MAXCHANNAMELEN + 1];
     struct aug_endpoint ep;
     int est;
     struct cimpl_* impl;
@@ -680,6 +693,9 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 
     if (AUG_BADSD == (sd = aug_tryconnect(conn, &ep, &est)))
         goto fail1;
+
+    if (!(aug_endpointntop(&ep, name, sizeof(name))))
+        goto fail2;
 
     if (est) {
 
@@ -693,11 +709,11 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
         /* Set mask to poll for connection establishment. */
 
         if (aug_setfdeventmask(muxer, sd, AUG_FDEVENTCONN) < 0)
-            goto fail1;
+            goto fail2;
     }
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct cimpl_))))
-        goto fail2;
+        goto fail3;
 
     impl->chan_.vtbl_ = &cchanvtbl_;
     impl->chan_.impl_ = NULL;
@@ -706,6 +722,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     impl->id_ = aug_nextid();
     impl->muxer_ = muxer;
     impl->sd_ = sd;
+    strcpy(impl->name_, name);
 
     /* Default when established. */
 
@@ -717,8 +734,19 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     aug_retain(mpool);
     return &impl->chan_;
 
+ fail3:
+
+    if (est)
+        aug_setnowait(muxer, -1);
+    else
+        aug_setfdeventmask(muxer, sd, 0);
+
  fail2:
-    aug_setfdeventmask(muxer, sd, 0);
+
+    /* Owned by caller when established. */
+
+    if (est)
+        aug_sclose(sd);
 
  fail1:
     aug_destroytcpconnect(conn);

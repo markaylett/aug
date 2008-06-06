@@ -10,8 +10,8 @@
 static int refs_ = 0;
 
 struct impl_ {
-    aug_channelob channelob_;
-    aug_streamob streamob_;
+    aug_chan chan_;
+    aug_stream stream_;
     int refs_;
     aug_mpool* mpool_;
     unsigned id_;
@@ -20,12 +20,12 @@ struct impl_ {
 static void*
 cast_(struct impl_* impl, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_channelobid)) {
-        aug_retain(&impl->channelob_);
-        return &impl->channelob_;
-    } else if (AUG_EQUALID(id, aug_streamobid)) {
-        aug_retain(&impl->streamob_);
-        return &impl->streamob_;
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_chanid)) {
+        aug_retain(&impl->chan_);
+        return &impl->chan_;
+    } else if (AUG_EQUALID(id, aug_streamid)) {
+        aug_retain(&impl->stream_);
+        return &impl->stream_;
     }
     return NULL;
 }
@@ -51,43 +51,42 @@ release_(struct impl_* impl)
 }
 
 static void*
-channelob_cast_(aug_channelob* ob, const char* id)
+chan_cast_(aug_chan* ob, const char* id)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
     return cast_(impl, id);
 }
 
 static void
-channelob_retain_(aug_channelob* ob)
+chan_retain_(aug_chan* ob)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
     retain_(impl);
 }
 
 static void
-channelob_release_(aug_channelob* ob)
+chan_release_(aug_chan* ob)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
     release_(impl);
 }
 
 static aug_result
-channelob_close_(aug_channelob* ob)
+chan_close_(aug_chan* ob)
 {
     return AUG_SUCCESS;
 }
 
-static aug_channelob*
-channelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
-                   aug_object* cbob)
+static aug_chan*
+chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
 
     /* Lock here to prevent release during callback. */
 
     retain_(impl);
 
-    if (!cb(cbob, impl->id_, &impl->streamob_, 0)) {
+    if (!aug_readychan(handler, impl->id_, &impl->stream_, 0)) {
         release_(impl);
         return NULL;
     }
@@ -96,108 +95,116 @@ channelob_process_(aug_channelob* ob, aug_bool* fork, aug_channelcb_t cb,
 }
 
 static aug_result
-channelob_seteventmask_(aug_channelob* ob, unsigned short mask)
+chan_setmask_(aug_chan* ob, unsigned short mask)
 {
     return AUG_SUCCESS;
 }
 
-static unsigned
-channelob_getid_(aug_channelob* ob)
-{
-    struct impl_* impl = AUG_PODIMPL(struct impl_, channelob_, ob);
-    return impl->id_;
-}
-
 static int
-channelob_eventmask_(aug_channelob* ob)
+chan_getmask_(aug_chan* ob)
 {
     return 0;
 }
 
-static const struct aug_channelobvtbl channelobvtbl_ = {
-    channelob_cast_,
-    channelob_retain_,
-    channelob_release_,
-    channelob_close_,
-    channelob_process_,
-    channelob_seteventmask_,
-    channelob_getid_,
-    channelob_eventmask_
+static unsigned
+chan_getid_(aug_chan* ob)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
+    return impl->id_;
+}
+
+static char*
+chan_getname_(aug_chan* ob, char* dst, unsigned size)
+{
+    strcpy(dst, "test");
+    return dst;
+}
+
+static const struct aug_chanvtbl chanvtbl_ = {
+    chan_cast_,
+    chan_retain_,
+    chan_release_,
+    chan_close_,
+    chan_process_,
+    chan_setmask_,
+    chan_getmask_,
+    chan_getid_,
+    chan_getname_
 };
 
 static void*
-streamob_cast_(aug_streamob* ob, const char* id)
+stream_cast_(aug_stream* ob, const char* id)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, streamob_, ob);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     return cast_(impl, id);
 }
 
 static void
-streamob_retain_(aug_streamob* ob)
+stream_retain_(aug_stream* ob)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, streamob_, ob);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     retain_(impl);
 }
 
 static void
-streamob_release_(aug_streamob* ob)
+stream_release_(aug_stream* ob)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, streamob_, ob);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     release_(impl);
 }
 
 static aug_result
-streamob_shutdown_(aug_streamob* ob)
+stream_shutdown_(aug_stream* ob)
 {
     return AUG_SUCCESS;
 }
 
 static ssize_t
-streamob_read_(aug_streamob* ob, void* buf, size_t size)
+stream_read_(aug_stream* ob, void* buf, size_t size)
 {
     return 0;
 }
 
 static ssize_t
-streamob_readv_(aug_streamob* ob, const struct iovec* iov, int size)
+stream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     return 0;
 }
 
 static ssize_t
-streamob_write_(aug_streamob* ob, const void* buf, size_t size)
+stream_write_(aug_stream* ob, const void* buf, size_t size)
 {
     return 0;
 }
 
 static ssize_t
-streamob_writev_(aug_streamob* ob, const struct iovec* iov, int size)
+stream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     return 0;
 }
 
-static const struct aug_streamobvtbl streamobvtbl_ = {
-    streamob_cast_,
-    streamob_retain_,
-    streamob_release_,
-    streamob_shutdown_,
-    streamob_read_,
-    streamob_readv_,
-    streamob_write_,
-    streamob_writev_
+static const struct aug_streamvtbl streamvtbl_ = {
+    stream_cast_,
+    stream_retain_,
+    stream_release_,
+    stream_shutdown_,
+    stream_read_,
+    stream_readv_,
+    stream_write_,
+    stream_writev_
 };
 
-static aug_channelob*
+static aug_chan*
 create_(aug_mpool* mpool, unsigned id)
 {
     struct impl_* impl = aug_allocmem(mpool, sizeof(struct impl_));
     if (!impl)
         return NULL;
 
-    impl->channelob_.vtbl_ = &channelobvtbl_;
-    impl->channelob_.impl_ = NULL;
-    impl->streamob_.vtbl_ = &streamobvtbl_;
-    impl->streamob_.impl_ = NULL;
+    impl->chan_.vtbl_ = &chanvtbl_;
+    impl->chan_.impl_ = NULL;
+    impl->stream_.vtbl_ = &streamvtbl_;
+    impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
     impl->id_ = id;
@@ -205,15 +212,59 @@ create_(aug_mpool* mpool, unsigned id)
     ++refs_;
 
     aug_retain(mpool);
-    return &impl->channelob_;
+    return &impl->chan_;
 }
+
+static aug_bool (*cb_)(unsigned, aug_stream*, unsigned short) = NULL;
+
+static void*
+chandler_cast_(aug_chandler* ob, const char* id)
+{
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_chandlerid)) {
+        aug_retain(ob);
+        return ob;
+    }
+    return NULL;
+}
+
+static void
+chandler_retain_(aug_chandler* ob)
+{
+}
+
+static void
+chandler_release_(aug_chandler* ob)
+{
+}
+
+static void
+chandler_clear_(aug_chandler* ob, unsigned id)
+{
+    aug_ctxinfo(aug_tlx, "clearing id: %u", id);
+}
+
+static aug_bool
+chandler_ready_(aug_chandler* ob, unsigned id, aug_stream* stream,
+                unsigned short events)
+{
+    return cb_(id, stream, events);
+}
+
+static const struct aug_chandlervtbl chandlervtbl_ = {
+    chandler_cast_,
+    chandler_retain_,
+    chandler_release_,
+    chandler_clear_,
+    chandler_ready_
+};
+
+static aug_chandler chandler_ = { &chandlervtbl_, NULL };
 
 static int count_ = 0;
 static unsigned last_ = 0;
 
 static aug_bool
-cb_(aug_object* cbob, unsigned id, aug_streamob* streamob,
-    unsigned short events)
+stats_(unsigned id, aug_stream* stream, unsigned short events)
 {
     if (3 < id)
         aug_die("invalid channel");
@@ -222,29 +273,29 @@ cb_(aug_object* cbob, unsigned id, aug_streamob* streamob,
     return AUG_TRUE;
 }
 
-static void
-foreach_(aug_channels_t channels)
-{
-    count_ = 0;
-    last_ = 0;
-    aug_foreachchannel(channels, cb_, NULL);
-}
-
 static aug_bool
-rm1_(aug_object* cbob, unsigned id, aug_streamob* streamob,
-     unsigned short events)
+rm1_(unsigned id, aug_stream* stream, unsigned short events)
 {
     return 1 == id ? AUG_FALSE : AUG_TRUE;
+}
+
+static void
+foreach_(aug_chans_t chans)
+{
+    cb_ = stats_;
+    count_ = 0;
+    last_ = 0;
+    aug_processchans(chans);
 }
 
 int
 main(int argc, char* argv[])
 {
     aug_mpool* mpool;
-    aug_channelob* channelob1;
-    aug_channelob* channelob2;
-    aug_channelob* channelob3;
-    aug_channels_t channels;
+    aug_chan* chan1;
+    aug_chan* chan2;
+    aug_chan* chan3;
+    aug_chans_t chans;
 
     aug_check(0 <= aug_autobasictlx());
     aug_setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
@@ -252,78 +303,90 @@ main(int argc, char* argv[])
     mpool = aug_getmpool(aug_tlx);
     aug_check(mpool);
 
-    channelob1 = create_(mpool, 1);
-    aug_check(channelob1);
+    chan1 = create_(mpool, 1);
+    aug_check(chan1);
 
-    channelob2 = create_(mpool, 2);
-    aug_check(channelob2);
+    chan2 = create_(mpool, 2);
+    aug_check(chan2);
 
-    channelob3 = create_(mpool, 3);
-    aug_check(channelob3);
+    chan3 = create_(mpool, 3);
+    aug_check(chan3);
 
-    channels = aug_createchannels(mpool);
-    aug_check(channels);
+    chans = aug_createchans(mpool, &chandler_);
+    aug_check(chans);
 
-    aug_check(0 <= aug_insertchannel(channels, channelob1));
-    aug_check(0 <= aug_insertchannel(channels, channelob2));
-    aug_check(0 <= aug_insertchannel(channels, channelob3));
+    aug_check(0 <= aug_insertchan(chans, chan1));
+    aug_check(0 <= aug_insertchan(chans, chan2));
+    aug_check(0 <= aug_insertchan(chans, chan3));
     aug_check(6 == refs_);
 
-    aug_release(channelob1);
-    aug_release(channelob2);
-    aug_release(channelob3);
+    aug_release(chan1);
+    aug_release(chan2);
+    aug_release(chan3);
     aug_check(3 == refs_);
 
-    foreach_(channels);
-    aug_check(3 == aug_getchannels(channels));
+    /* 3 2 1 */
+    foreach_(chans);
+    /* 2 1 3 */
+    aug_check(3 == aug_getchans(chans));
     aug_check(3 == count_);
     aug_check(3 == last_);
 
     /* Fairness rotation. */
 
-    foreach_(channels);
-    aug_check(3 == aug_getchannels(channels));
-    aug_check(3 == count_);
-    aug_check(1 == last_);
-
-    /* Fairness rotation. */
-
-    foreach_(channels);
-    aug_check(3 == aug_getchannels(channels));
+    /* 2 1 3 */
+    foreach_(chans);
+    /* 1 3 2 */
+    aug_check(3 == aug_getchans(chans));
     aug_check(3 == count_);
     aug_check(2 == last_);
 
+    /* Fairness rotation. */
+
+    /* 1 3 2 */
+    foreach_(chans);
+    /* 3 2 1 */
+    aug_check(3 == aug_getchans(chans));
+    aug_check(3 == count_);
+    aug_check(1 == last_);
+
     /* Remove middle. */
 
-    aug_check(0 <= aug_removechannel(channels, 2));
+    aug_check(0 <= aug_removechan(chans, 2));
 
-    foreach_(channels);
-    aug_check(2 == aug_getchannels(channels));
+    /* 3 1 */
+    foreach_(chans);
+    /* 1 3 */
+    aug_check(2 == aug_getchans(chans));
     aug_check(2 == count_);
     aug_check(3 == last_);
 
     /* No longer exists. */
 
-    aug_check(AUG_FAILNONE == aug_removechannel(channels, 2));
+    aug_check(AUG_FAILNONE == aug_removechan(chans, 2));
 
     /* Remove during loop. */
 
-    aug_foreachchannel(channels, rm1_, NULL);
+    cb_ = rm1_;
+    aug_processchans(chans);
 
     /* No longer exists. */
 
-    aug_check(AUG_FAILNONE == aug_removechannel(channels, 1));
+    aug_check(AUG_FAILNONE == aug_removechan(chans, 1));
 
-    foreach_(channels);
-    aug_check(1 == aug_getchannels(channels));
+    /* 3 */
+    foreach_(chans);
+    /* 3 */
+    aug_check(1 == aug_getchans(chans));
     aug_check(1 == count_);
     aug_check(3 == last_);
 
-    aug_destroychannels(channels);
+    aug_dumpchans(chans);
+    aug_destroychans(chans);
 
      /* Objects released. */
 
-    aug_check(0 == aug_getchannels(channels));
+    aug_check(0 == aug_getchans(chans));
     aug_check(0 == refs_);
     aug_release(mpool);
     return 0;

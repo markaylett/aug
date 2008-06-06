@@ -19,7 +19,7 @@ struct set_ {
 struct aug_muxer_ {
     struct set_ in_, out_;
     size_t bits_;
-    unsigned nowait_;
+    int nowait_;
 };
 
 static void
@@ -115,7 +115,7 @@ aug_destroymuxer(aug_muxer_t muxer)
 }
 
 AUGSYS_API void
-aug_setnowait(aug_muxer_t muxer, unsigned nowait)
+aug_setnowait(aug_muxer_t muxer, int nowait)
 {
     muxer->nowait_ += nowait;
 }
@@ -141,11 +141,10 @@ aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 AUGSYS_API int
 aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
-    int ret;
+    int ret, nowait = muxer->nowait_;
+    muxer->nowait_ = 0;
 
-    if (0 < muxer->nowait_) {
-        unsigned nowait = muxer->nowait_;
-        muxer->nowait_ = 0;
+    if (0 < nowait) {
         ret = aug_waitfdevents(muxer, &NOWAIT_);
         if (0 <= ret)
             ret += nowait; /* At least one. */

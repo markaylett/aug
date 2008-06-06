@@ -500,15 +500,12 @@ struct mod_module {
      *
      * @param sock Socket descriptor.
      *
-     * @param addr Peer address.
-     *
-     * @param port Peer port.
+     * @param name Peer address.
      *
      * @return Either #MOD_OK or #MOD_ERROR.
      */
 
-    int (*accepted_)(struct mod_handle* sock, const char* addr,
-                     unsigned short port);
+    int (*accepted_)(struct mod_handle* sock, const char* name);
 
     /**
      * Completion of client connection handshake.
@@ -518,15 +515,12 @@ struct mod_module {
      *
      * @param sock Socket descriptor.
      *
-     * @param addr Peer address.
-     *
-     * @param port Peer port.
+     * @param name Peer address.
      *
      * @see mod_host::tcpconnect_().
      */
 
-    void (*connected_)(struct mod_handle* sock, const char* addr,
-                       unsigned short port);
+    void (*connected_)(struct mod_handle* sock, const char* name);
 
     /**
      * Inbound data.

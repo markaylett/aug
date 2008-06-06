@@ -18,12 +18,12 @@ module RbTest5
     def RbTest5.closed(sock)
         Log.debug("closed(): #{sock}")
     end
-    def RbTest5.accepted(sock, addr, port)
+    def RbTest5.accepted(sock, name)
         Log.debug("accepted(): #{sock}")
         sock.user = LineParser.new
         @server = sock
     end
-    def RbTest5.connected(sock, addr, port)
+    def RbTest5.connected(sock, name)
         Log.debug("connected(): #{sock}")
         sock.user = LineParser.new
         AugRb.send(@server, "hello, world!\n")

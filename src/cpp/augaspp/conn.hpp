@@ -28,10 +28,10 @@ namespace aug {
          */
 
         virtual bool
-        do_accepted(const aug_endpoint& ep, const timeval& now) = 0;
+        do_accepted(const std::string& name, const timeval& now) = 0;
 
         virtual void
-        do_connected(const aug_endpoint& ep, const timeval& now) = 0;
+        do_connected(const std::string& name, const timeval& now) = 0;
 
         /**
          * Process events.
@@ -56,7 +56,7 @@ namespace aug {
         virtual bool
         do_authcert(const char* subject, const char* issuer) = 0;
 
-        virtual const endpoint&
+        virtual std::string
         do_peername() const = 0;
 
     public:
@@ -73,14 +73,14 @@ namespace aug {
             do_sendv(ref, now);
         }
         bool
-        accepted(const aug_endpoint& ep, const timeval& now)
+        accepted(const std::string& name, const timeval& now)
         {
-            return do_accepted(ep, now);
+            return do_accepted(name, now);
         }
         void
-        connected(const aug_endpoint& ep, const timeval& now)
+        connected(const std::string& name, const timeval& now)
         {
-            do_connected(ep, now);
+            do_connected(name, now);
         }
         bool
         process(unsigned short events, const timeval& now)
@@ -102,7 +102,7 @@ namespace aug {
         {
             return do_authcert(subject, issuer);
         }
-        const endpoint&
+        std::string
         peername() const
         {
             return do_peername();
@@ -124,7 +124,6 @@ namespace aug {
         buffer& buffer_;
         rwtimer& rwtimer_;
         chanptr chan_;
-        endpoint endpoint_;
         sockstate state_;
         bool close_;
 
@@ -153,10 +152,10 @@ namespace aug {
         do_sendv(blobref ref, const timeval& now);
 
         bool
-        do_accepted(const aug_endpoint& ep, const timeval& now);
+        do_accepted(const std::string& name, const timeval& now);
 
         void
-        do_connected(const aug_endpoint& ep, const timeval& now);
+        do_connected(const std::string& name, const timeval& now);
 
         bool
         do_process(unsigned short events, const timeval& now);
@@ -170,7 +169,7 @@ namespace aug {
         bool
         do_authcert(const char* subject, const char* issuer);
 
-        const endpoint&
+        std::string
         do_peername() const;
 
         sockstate
@@ -181,67 +180,7 @@ namespace aug {
 
         connected(const sessionptr& session, mod_handle& sock,
                   buffer& buffer, rwtimer& rwtimer,
-                  const chanptr& chan, const endpoint& ep,
-                  bool close);
-    };
-
-    class handshake : public conn_base {
-
-        sessionptr session_;
-        mod_handle& sock_;
-        buffer& buffer_;
-        tcpconnect conn_;
-        chanptr chan_;
-        endpoint endpoint_;
-        sockstate state_;
-
-        mod_handle&
-        do_get();
-
-        const mod_handle&
-        do_get() const;
-
-        const sessionptr&
-        do_session() const;
-
-        chanptr
-        do_chan() const;
-
-        void
-        do_send(const void* buf, size_t size, const timeval& now);
-
-        void
-        do_sendv(blobref ref, const timeval& now);
-
-        bool
-        do_accepted(const aug_endpoint& ep, const timeval& now);
-
-        void
-        do_connected(const aug_endpoint& ep, const timeval& now);
-
-        bool
-        do_process(unsigned short events, const timeval& now);
-
-        void
-        do_shutdown(unsigned flags, const timeval& now);
-
-        void
-        do_teardown(const timeval& now);
-
-        bool
-        do_authcert(const char* subject, const char* issuer);
-
-        const endpoint&
-        do_peername() const;
-
-        sockstate
-        do_state() const;
-
-    public:
-        ~handshake() AUG_NOTHROW;
-
-        handshake(const sessionptr& session, mod_handle& sock,
-                  buffer& buffer, const char* host, const char* port);
+                  const chanptr& chan, bool close);
     };
 }
 

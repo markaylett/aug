@@ -395,7 +395,7 @@ teardown_(const struct mod_handle* sock)
 }
 
 static int
-accepted_(struct mod_handle* sock, const char* addr, unsigned short port)
+accepted_(struct mod_handle* sock, const char* name)
 {
     struct import_* import = mod_getsession()->user_;
     PyObject* x, * y;
@@ -416,8 +416,7 @@ accepted_(struct mod_handle* sock, const char* addr, unsigned short port)
 
     } else if (import->accepted_) {
 
-        PyObject* z = PyObject_CallFunction(import->accepted_, "OsH",
-                                            y, addr, port);
+        PyObject* z = PyObject_CallFunction(import->accepted_, "Os", y, name);
 
         if (!z) {
 
@@ -450,7 +449,7 @@ accepted_(struct mod_handle* sock, const char* addr, unsigned short port)
 }
 
 static void
-connected_(struct mod_handle* sock, const char* addr, unsigned short port)
+connected_(struct mod_handle* sock, const char* name)
 {
     struct import_* import = mod_getsession()->user_;
     assert(import);
@@ -459,8 +458,8 @@ connected_(struct mod_handle* sock, const char* addr, unsigned short port)
     if (import->connected_) {
 
         PyObject* x = sock->user_;
-        PyObject* y = PyObject_CallFunction(import->connected_, "OsH",
-                                            x, addr, port);
+        PyObject* y = PyObject_CallFunction(import->connected_, "Os", x,
+                                            name);
 
         if (y) {
             Py_DECREF(y);

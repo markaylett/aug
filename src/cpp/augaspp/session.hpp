@@ -48,12 +48,11 @@ namespace aug {
         do_teardown(const mod_handle& sock) const AUG_NOTHROW = 0;
 
         virtual bool
-        do_accepted(mod_handle& sock, const char* addr,
-                    unsigned short port) const AUG_NOTHROW = 0;
+        do_accepted(mod_handle& sock, const char* name) const AUG_NOTHROW = 0;
 
         virtual void
-        do_connected(mod_handle& sock, const char* addr,
-                     unsigned short port) const AUG_NOTHROW = 0;
+        do_connected(mod_handle& sock,
+                     const char* name) const AUG_NOTHROW = 0;
 
         virtual void
         do_data(const mod_handle& sock, const char* buf,
@@ -121,16 +120,14 @@ namespace aug {
             do_teardown(sock);
         }
         bool
-        accepted(mod_handle& sock, const char* addr,
-                 unsigned short port) const AUG_NOTHROW
+        accepted(mod_handle& sock, const char* name) const AUG_NOTHROW
         {
-            return do_accepted(sock, addr, port);
+            return do_accepted(sock, name);
         }
         void
-        connected(mod_handle& sock, const char* addr,
-                  unsigned short port) const AUG_NOTHROW
+        connected(mod_handle& sock, const char* name) const AUG_NOTHROW
         {
-            do_connected(sock, addr, port);
+            do_connected(sock, name);
         }
         void
         data(const mod_handle& sock, const char* buf,

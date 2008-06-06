@@ -26,7 +26,37 @@ namespace {
         }
     }
 
+    struct handler {
+
+        void
+        clearchan_(unsigned id)
+        {
+            aug_ctxinfo(aug_tlx, "clear connection");
+        }
+
+        aug_bool
+        readychan_(unsigned id, streamref stream, unsigned short events)
+        {
+            aug_ctxinfo(aug_tlx, "id: %u", id);
+            if (0 == events) {
+                aug_ctxinfo(aug_tlx, "new connection");
+            } else if (events & AUG_FDEVENTRD) {
+                char buf[1024];
+                ssize_t n = read(stream, buf, sizeof(buf) - 1);
+                if (n <= 0) {
+                    aug_ctxinfo(aug_tlx, "closing connection");
+                    return AUG_FALSE;
+                }
+                buf[n] = '\0';
+                aug_ctxinfo(aug_tlx, "data: %s", buf);
+            }
+            return AUG_TRUE;
+        }
+    };
+
+
     class server {
+        chandler<scoped_chandler<T> > chandler_;
         muxer muxer_;
         chans chans_;
         chanptr serv_;
@@ -51,10 +81,12 @@ namespace {
         }
     public:
         server(const char* host, const char* serv)
-            : chans_(getmpool(aug_tlx)),
+            : chans_(getmpool(aug_tlx), handler_),
               serv_(null),
               quit_(false)
         {
+            chandler_.reset(this);
+
             setfdeventmask(muxer_, rd_, AUG_FDEVENTRD);
 
             endpoint ep(null);
@@ -65,24 +97,6 @@ namespace {
             sd.release();
 
             insertchan(chans_, ob);
-        }
-        bool
-        chancb(unsigned id, streamref stream, unsigned short events)
-        {
-            aug_ctxinfo(aug_tlx, "id: %u", id);
-            if (0 == events) {
-                aug_ctxinfo(aug_tlx, "new connection");
-            } else if (events & AUG_FDEVENTRD) {
-                char buf[1024];
-                ssize_t n = read(stream, buf, sizeof(buf) - 1);
-                if (n <= 0) {
-                    aug_ctxinfo(aug_tlx, "closing connection");
-                    return false;
-                }
-                buf[n] = '\0';
-                aug_ctxinfo(aug_tlx, "data: %s", buf);
-            }
-            return true;
         }
         void
         run()
@@ -99,7 +113,7 @@ namespace {
 
                 aug_ctxinfo(aug_tlx, "before");
                 dumpchans(chans_);
-                foreachchan(chans_, *this);
+                processchans(chans_);
                 dumpchans(chans_);
                 aug_ctxinfo(aug_tlx, "after");
             }

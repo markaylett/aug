@@ -144,15 +144,15 @@ namespace aug {
     }
 
     inline void
-    foreachexpired(aug_timers& timers, bool force)
+    processexpired(aug_timers& timers, bool force)
     {
-        verify(aug_foreachexpired(&timers, force ? 1 : 0, 0));
+        verify(aug_processexpired(&timers, force ? 1 : 0, 0));
     }
 
     inline void
-    foreachexpired(aug_timers& timers, bool force, timeval& next)
+    processexpired(aug_timers& timers, bool force, timeval& next)
     {
-        verify(aug_foreachexpired(&timers, force ? 1 : 0, &next));
+        verify(aug_processexpired(&timers, force ? 1 : 0, &next));
     }
 
     class timer {

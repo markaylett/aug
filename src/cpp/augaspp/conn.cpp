@@ -157,19 +157,15 @@ connected::do_sendv(blobref ref, const timeval& now)
 }
 
 bool
-connected::do_accepted(const aug_endpoint& ep, const timeval& now)
+connected::do_accepted(const string& name, const timeval& now)
 {
-    inetaddr addr(null);
-    return close_ = session_
-        ->accepted(sock_, inetntop(getinetaddr(ep, addr)).c_str(), port(ep));
+    return close_ = session_->accepted(sock_, name.c_str());
 }
 
 void
-connected::do_connected(const aug_endpoint& ep, const timeval& now)
+connected::do_connected(const string& name, const timeval& now)
 {
-    inetaddr addr(null);
-    session_->connected(sock_, inetntop(getinetaddr(ep, addr)).c_str(),
-                        port(ep));
+    session_->connected(sock_, name.c_str());
 }
 
 bool
@@ -281,10 +277,16 @@ connected::do_authcert(const char* subject, const char* issuer)
     return session_->authcert(sock_, subject, issuer);
 }
 
-const endpoint&
+string
 connected::do_peername() const
 {
-    return endpoint_;
+    string name;
+
+    char buf[AUG_MAXCHANNAMELEN + 1];
+    if (aug_getchanname(chan_.get(), buf, sizeof(buf)))
+        name = buf;
+
+    return name;
 }
 
 sockstate
@@ -303,150 +305,14 @@ connected::~connected() AUG_NOTHROW
 
 connected::connected(const sessionptr& session, mod_handle& sock,
                      buffer& buffer, rwtimer& rwtimer,
-                     const chanptr& chan, const endpoint& ep,
-                     bool close)
+                     const chanptr& chan, bool close)
     : session_(session),
       sock_(sock),
       buffer_(buffer),
       rwtimer_(rwtimer),
       chan_(chan),
-      endpoint_(ep),
-      state_(CONNECTED),
+      state_(ESTABLISHED),
       close_(close)
 {
     gettimeofday(since_);
-}
-
-mod_handle&
-handshake::do_get()
-{
-    return sock_;
-}
-
-const mod_handle&
-handshake::do_get() const
-{
-    return sock_;
-}
-
-const sessionptr&
-handshake::do_session() const
-{
-    return session_;
-}
-
-chanptr
-handshake::do_chan() const
-{
-    return chan_;
-}
-
-void
-handshake::do_send(const void* buf, size_t len, const timeval& now)
-{
-    buffer_.append(buf, len);
-}
-
-void
-handshake::do_sendv(blobref ref, const timeval& now)
-{
-    buffer_.append(ref);
-}
-
-bool
-handshake::do_accepted(const aug_endpoint& ep, const timeval& now)
-{
-    return false;
-}
-
-void
-handshake::do_connected(const aug_endpoint& ep, const timeval& now)
-{
-    throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                    AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
-}
-
-bool
-handshake::do_process(unsigned short events, const timeval& now)
-{
-    try {
-
-        bool est;
-        sd_ = tcpconnect(connector_, endpoint_, est);
-
-        // Check to see if connection was established.
-
-        if (est) {
-            state_ = CONNECTED;
-            return true;
-        }
-
-        // Otherwise, try next endpoint associated with address.
-
-    } catch (const errinfo_error& e) {
-
-        perrinfo(aug_tlx, "connection failed", e);
-        state_ = CLOSED;
-        return true;
-    }
-
-    return false;
-}
-
-void
-handshake::do_shutdown(unsigned flags, const timeval& now)
-{
-    throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                    AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
-}
-
-void
-handshake::do_teardown(const timeval& now)
-{
-    // TODO: call shutdown() here?
-
-    throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                    AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
-}
-
-bool
-handshake::do_authcert(const char* subject, const char* issuer)
-{
-    throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                    AUG_MSG("handshake in progress: id=[%d]"), sock_.id_);
-}
-
-const endpoint&
-handshake::do_peername() const
-{
-    return endpoint_;
-}
-
-sockstate
-handshake::do_state() const
-{
-    return state_;
-}
-
-handshake::~handshake() AUG_NOTHROW
-{
-    try {
-        if (CLOSED == state_)
-            session_->closed(sock_);
-    } AUG_PERRINFOCATCH;
-}
-
-handshake::handshake(const sessionptr& session, mod_handle& sock,
-                     buffer& buffer, const char* host, const char* port)
-    : session_(session),
-      sock_(sock),
-      buffer_(buffer),
-      connector_(host, port),
-      sd_(null),
-      endpoint_(null),
-      state_(CLOSED)
-{
-    bool est;
-    sd_ = tcpconnect(connector_, endpoint_, est);
-    state_ = est ? CONNECTED : HANDSHAKE;
 }

@@ -14,11 +14,11 @@ module RbTest6
     def RbTest6.closed(sock)
         Log.debug("closed(): #{sock}")
     end
-    def RbTest6.accepted(sock, addr, port)
+    def RbTest6.accepted(sock, name)
         Log.debug("accepted(): #{sock}")
         false
     end
-    def RbTest6.connected(sock, addr, port)
+    def RbTest6.connected(sock, name)
         Log.debug("connected(): #{sock}")
     end
 end

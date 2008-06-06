@@ -322,10 +322,10 @@ namespace mod {
         do_teardown(const handle& sock) = 0;
 
         virtual bool
-        do_accepted(handle& sock, const char* addr, unsigned short port) = 0;
+        do_accepted(handle& sock, const char* name) = 0;
 
         virtual void
-        do_connected(handle& sock, const char* addr, unsigned short port) = 0;
+        do_connected(handle& sock, const char* name) = 0;
 
         virtual void
         do_data(const handle& sock, const void* buf, size_t size) = 0;
@@ -374,14 +374,14 @@ namespace mod {
             do_teardown(sock);
         }
         bool
-        accepted(handle& sock, const char* addr, unsigned short port)
+        accepted(handle& sock, const char* name)
         {
-            return do_accepted(sock, addr, port);
+            return do_accepted(sock, name);
         }
         void
-        connected(handle& sock, const char* addr, unsigned short port)
+        connected(handle& sock, const char* name)
         {
-            do_connected(sock, addr, port);
+            do_connected(sock, name);
         }
         void
         data(const handle& sock, const void* buf, size_t size)
@@ -430,12 +430,12 @@ namespace mod {
             shutdown(sock, 0);
         }
         bool
-        do_accepted(handle& sock, const char* addr, unsigned short port)
+        do_accepted(handle& sock, const char* name)
         {
             return true;
         }
         void
-        do_connected(handle& sock, const char* addr, unsigned short port)
+        do_connected(handle& sock, const char* name)
         {
         }
         void
@@ -559,22 +559,20 @@ namespace mod {
             } MOD_WRITELOGCATCH;
         }
         static int
-        accepted(mod_handle* sock, const char* addr,
-                 unsigned short port) MOD_NOTHROW
+        accepted(mod_handle* sock, const char* name) MOD_NOTHROW
         {
             try {
                 handle h(*sock);
-                return result(getbase()->accepted(h, addr, port));
+                return result(getbase()->accepted(h, name));
             } MOD_WRITELOGCATCH;
             return MOD_ERROR;
         }
         static void
-        connected(mod_handle* sock, const char* addr,
-                  unsigned short port) MOD_NOTHROW
+        connected(mod_handle* sock, const char* name) MOD_NOTHROW
         {
             try {
                 handle h(*sock);
-                getbase()->connected(h, addr, port);
+                getbase()->connected(h, name);
             } MOD_WRITELOGCATCH;
         }
         static void

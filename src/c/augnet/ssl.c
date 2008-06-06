@@ -455,7 +455,7 @@ cclose_(aug_chan* ob)
 }
 
 static aug_chan*
-cprocess_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb, aug_object* cbob)
+cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
     int events = aug_fdevents(impl->muxer_, impl->sd_);
@@ -521,7 +521,7 @@ cprocess_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb, aug_object* cbob)
 
         retain_(impl);
 
-        if (!cb(cbob, impl->id_, &impl->stream_, events)) {
+        if (!aug_readychan(handler, impl->id_, &impl->stream_, events)) {
 
             /* No need to update events if file is being removed - indicated
                by false return. */
@@ -570,7 +570,12 @@ cgetid_(aug_chan* ob)
 static char*
 cgetname_(aug_chan* ob, char* dst, unsigned size)
 {
-    strcpy(dst, "test");
+    struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
+    struct aug_endpoint ep;
+
+    if (!aug_getpeername(impl->sd_, &ep) && !aug_endpointntop(&ep, dst, size))
+        return NULL;
+
     return dst;
 }
 

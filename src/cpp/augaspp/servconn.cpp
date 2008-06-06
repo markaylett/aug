@@ -77,18 +77,18 @@ servconn::do_sendv(blobref blob, const timeval& now)
 }
 
 bool
-servconn::do_accepted(const aug_endpoint& ep, const timeval& now)
+servconn::do_accepted(const string& name, const timeval& now)
 {
-    return conn_.accepted(ep, now);
+    return conn_.accepted(name, now);
 }
 
 void
-servconn::do_connected(const aug_endpoint& ep, const timeval& now)
+servconn::do_connected(const string& name, const timeval& now)
 {
     // BUG: workaround for bug in gcc version 3.4.4.
 
     conn_base& r(conn_);
-    r.connected(ep, now);
+    r.connected(name, now);
 }
 
 bool
@@ -115,7 +115,7 @@ servconn::do_authcert(const char* subject, const char* issuer)
     return conn_.authcert(subject, issuer);
 }
 
-const endpoint&
+string
 servconn::do_peername() const
 {
     return conn_.peername();

@@ -14,9 +14,9 @@ def start(sname):
 def closed(sock):
     log.debug("closed(): %s" % sock)
 
-def accepted(sock, addr, port):
+def accepted(sock, name):
     log.debug("accepted(): %s" % sock)
     return False
 
-def connected(sock, addr, port):
+def connected(sock, name):
     log.debug("connected(): %s" % sock)

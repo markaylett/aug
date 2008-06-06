@@ -49,6 +49,12 @@ namespace aug {
     };
 
     inline void
+    setnowait(aug_muxer_t muxer, int nowait)
+    {
+        aug_setnowait(muxer, nowait);
+    }
+
+    inline void
     setfdeventmask(aug_muxer_t muxer, mdref ref, unsigned short mask)
     {
         verify(aug_setfdeventmask(muxer, ref.get(), mask));

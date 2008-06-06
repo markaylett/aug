@@ -11,6 +11,7 @@
 #include "augext/chan.h"
 
 AUGSYS_API aug_chan*
-aug_createfile(aug_mpool* mpool, aug_fd fd, aug_muxer_t muxer);
+aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,
+               aug_muxer_t muxer);
 
 #endif /* AUGSYS_OBJECT_H */

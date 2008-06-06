@@ -448,16 +448,44 @@ def putforward(iface, method)
 END
 end
 
-class Visitor
+class InclVisitor
     def visit_anglincl(elem)
         puts "\#include <#{elem.text}>"
     end
     def visit_comment(elem)
+    end
+    def visit_interface(elem)
+    end
+    def visit_quotincl(elem)
+        puts "\#include \"#{elem.text}\""
+    end
+    def visit_verbatim(elem)
+    end
+end
+
+class DeclVisitor
+    def visit_anglincl(elem)
+    end
+    def visit_comment(elem)
+    end
+    def visit_interface(elem)
+        puts "AUG_INTERFACE(#{elem.type.cname});"
+    end
+    def visit_quotincl(elem)
+    end
+    def visit_verbatim(elem)
+    end
+end
+
+class DefnVisitor
+    def visit_anglincl(elem)
+    end
+    def visit_comment(elem)
         putcomment(elem.text, false)
+        puts
     end
     def visit_interface(elem)
         puts <<END
-
 /**
  * @defgroup #{elem.type.cname} #{elem.type.cname}
  *
@@ -465,8 +493,6 @@ class Visitor
  *
  * @{
  */
-
-AUG_INTERFACE(#{elem.type.cname});
 END
         putcomment(elem.comment, true)
         puts <<END
@@ -654,13 +680,14 @@ END
     typedef aug::smartob<#{elem.type.cname}> #{elem.name}ptr;
 }
 #endif /* __cplusplus */
+
 END
     end
     def visit_quotincl(elem)
-        puts "\#include \"#{elem.text}\""
     end
     def visit_verbatim(elem)
         puts elem.text.strip
+        puts
     end
 end
 
@@ -688,12 +715,22 @@ namespace aug {
 }
 
 #endif /* __cplusplus */
+
 END
 
-package.each_accept(Visitor.new)
+puts "/* Includes. */"
+puts
+package.each_accept(InclVisitor.new)
+puts
+puts "/* Interface declarations. */"
+puts
+package.each_accept(DeclVisitor.new)
+puts
+puts "/* Interface definitions. */"
+puts
+package.each_accept(DefnVisitor.new)
 
 puts <<END
-
 #endif /* #{guard} */
 END
 

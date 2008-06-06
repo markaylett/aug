@@ -71,13 +71,13 @@ module RbSkel
         Log.debug("teardown(): #{sock}")
         AugRb.shutdown(sock, 0)
     end
-    def RbSkel.accepted(sock, addr, port)
+    def RbSkel.accepted(sock, name)
         Log.info("accepted(): #{sock}")
         sock.user = LineParser.new
         AugRb.setrwtimer(sock, 15000, AugRb::TIMRD)
         AugRb.send(sock, "+OK hello\r\n")
     end
-    def RbSkel.connected(sock, addr, port)
+    def RbSkel.connected(sock, name)
         Log.debug("connected(): #{sock}")
     end
     def RbSkel.data(sock, buf)

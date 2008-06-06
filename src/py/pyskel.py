@@ -74,13 +74,13 @@ def teardown(sock):
     log.debug("teardown(): %s" % sock)
     shutdown(sock, 0)
 
-def accepted(sock, addr, port):
+def accepted(sock, name):
     log.info("accepted(): %s" % sock)
     sock.user = LineParser()
     setrwtimer(sock, 15000, TIMRD)
     send(sock, "+OK hello\r\n")
 
-def connected(sock, addr, port):
+def connected(sock, name):
     log.debug("connected(): %s" % sock)
 
 def data(sock, buf):

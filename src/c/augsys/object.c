@@ -7,12 +7,13 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/base.h" /* aug_nextid() */
+#include "augsys/base.h"   /* aug_nextid() */
 #include "augsys/uio.h"
 #include "augsys/unistd.h"
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
+#include "augctx/string.h" /* aug_strlcpy() */
 
 #include "augext/stream.h"
 
@@ -25,8 +26,10 @@ struct impl_ {
     int refs_;
     aug_mpool* mpool_;
     unsigned id_;
-    aug_fd fd_;
     aug_muxer_t muxer_;
+    aug_fd fd_;
+    char name_[AUG_MAXCHANNAMELEN + 1];
+    aug_bool init_;
 };
 
 static aug_result
@@ -102,16 +105,30 @@ chan_close_(aug_chan* ob)
 }
 
 static aug_chan*
-chan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb, aug_object* cbob)
+chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
     int events;
 
+    if (!impl->init_) {
+
+        /* Events will be zero on initial call.  This is used to signify
+           channel establishment. */
+
+        impl->init_ = AUG_TRUE;
+        events = 0;
+
+    } else {
 #if !defined(_WIN32)
-    events = aug_fdevents(impl->muxer_, impl->fd_);
+        events = aug_fdevents(impl->muxer_, impl->fd_);
 #else /* _WIN32 */
-    events = 0;
+        events = 0;
 #endif /* _WIN32 */
+        if (0 == events) {
+            retain_(impl);
+            return ob;
+        }
+    }
 
     /* The callback is not required to set errinfo when returning false.  The
        errinfo record must therefore be cleared before the callback is made to
@@ -123,7 +140,7 @@ chan_process_(aug_chan* ob, aug_bool* fork, aug_chancb_t cb, aug_object* cbob)
 
     retain_(impl);
 
-    if (events < 0 || !cb(cbob, impl->id_, &impl->stream_, events)) {
+    if (!aug_readychan(handler, impl->id_, &impl->stream_, events)) {
         release_(impl);
         return NULL;
     }
@@ -248,11 +265,17 @@ static const struct aug_streamvtbl streamvtbl_ = {
 };
 
 AUGSYS_API aug_chan*
-aug_createfile(aug_mpool* mpool, aug_fd fd, aug_muxer_t muxer)
+aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,
+               aug_muxer_t muxer)
 {
     struct impl_* impl = aug_allocmem(mpool, sizeof(struct impl_));
     if (!impl)
         return NULL;
+
+    /* Now established.  Force multiplexer to return immediately so that
+       establishment can be finalised in process() function. */
+
+    aug_setnowait(muxer, 1);
 
     impl->chan_.vtbl_ = &chanvtbl_;
     impl->chan_.impl_ = NULL;
@@ -261,8 +284,10 @@ aug_createfile(aug_mpool* mpool, aug_fd fd, aug_muxer_t muxer)
     impl->refs_ = 1;
     impl->mpool_ = mpool;
     impl->id_ = aug_nextid();
-    impl->fd_ = fd;
     impl->muxer_ = muxer;
+    impl->fd_ = fd;
+    aug_strlcpy(impl->name_, name, sizeof(impl->name_));
+    impl->init_ = AUG_FALSE;
 
     aug_retain(mpool);
     return &impl->chan_;

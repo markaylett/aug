@@ -54,10 +54,10 @@ namespace aug {
         do_sendv(blobref ref, const timeval& now);
 
         bool
-        do_accepted(const aug_endpoint& ep, const timeval& now);
+        do_accepted(const std::string& name, const timeval& now);
 
         void
-        do_connected(const aug_endpoint& ep, const timeval& now);
+        do_connected(const std::string& name, const timeval& now);
 
         bool
         do_process(unsigned short events, const timeval& now);
@@ -71,7 +71,7 @@ namespace aug {
         bool
         do_authcert(const char* subject, const char* issuer);
 
-        const endpoint&
+        std::string
         do_peername() const;
 
         sockstate

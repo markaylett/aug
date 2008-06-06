@@ -15,6 +15,9 @@ struct ssl_st* ssl;
 
 /**
  * Create a client socket channel.
+ *
+ * Will notify @ref aug_chandler of connection establishment when handshake is
+ * complete.
  */
 
 AUGNET_API aug_chan*
@@ -26,6 +29,9 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
  *
  * Must be passed a non-blocking socket.  If successful, will assume
  * responsibility for calling aug_sclose() on socket.
+ *
+ * Will notify @ref aug_chandler of connection establishment whenever a new
+ * connection is accepted.
  */
 
 AUGNET_API aug_chan*
@@ -37,6 +43,9 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
  *
  * Must be passed a non-blocking socket.  If successful, will assume
  * responsibility for calling aug_sclose() on socket.
+ *
+ * Assumes that @ref aug_chandler has already been notified of connection
+ * establishment for @a id.
  */
 
 AUGNET_API aug_chan*

@@ -735,7 +735,7 @@ namespace {
         int ret(!0);
         while (!stop_) {
 
-            foreachexpired(ts, 0 == ret, tv);
+            processexpired(ts, 0 == ret, tv);
             aug_ctxinfo(aug_tlx, "timeout in: tv_sec=%d, tv_usec=%d",
                         (int)tv.tv_sec, (int)tv.tv_usec);
 

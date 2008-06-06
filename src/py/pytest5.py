@@ -18,13 +18,13 @@ def start(sname):
 def closed(sock):
     log.debug("closed(): %s" % sock)
 
-def accepted(sock, addr, port):
+def accepted(sock, name):
     global server
     log.debug("accepted(): %s" % sock)
     sock.user = LineParser()
     server = sock
 
-def connected(sock, addr, port):
+def connected(sock, name):
     global server
     log.debug("connected(): %s" % sock)
     sock.user = LineParser()

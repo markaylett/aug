@@ -198,7 +198,7 @@ namespace test {
 
                 } else {
 
-                    foreachexpired(state_->timers_, 0 == ret, tv);
+                    processexpired(state_->timers_, 0 == ret, tv);
                     while (AUG_FAILINTR == (ret = waitfdevents(state_
                                                                ->muxer_,
                                                                tv)))
