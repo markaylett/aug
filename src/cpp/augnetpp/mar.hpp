@@ -142,8 +142,13 @@ namespace aug {
     public:
         ~marparser() AUG_NOTHROW
         {
-            if (-1 == aug_destroymarparser(marparser_))
+            if (marparser_ && -1 == aug_destroymarparser(marparser_))
                 perrinfo(aug_tlx, "aug_destroymarparser() failed");
+        }
+
+        marparser(const null_&) AUG_NOTHROW
+           : marparser_(0)
+        {
         }
 
         marparser(unsigned size, const aug_marhandler& handler, objectref ob)
@@ -174,6 +179,12 @@ namespace aug {
                    (size, &marnonstatic<T>(), ob.base()));
         }
 
+        void
+        swap(marparser& rhs) AUG_NOTHROW
+        {
+            std::swap(marparser_, rhs.marparser_);
+        }
+
         operator aug_marparser_t()
         {
             return marparser_;
@@ -185,6 +196,12 @@ namespace aug {
             return marparser_;
         }
     };
+
+    inline void
+    swap(marparser& lhs, marparser& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
 
     inline void
     appendmar(aug_marparser_t parser, const char* buf, unsigned size)

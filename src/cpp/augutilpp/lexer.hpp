@@ -27,8 +27,13 @@ namespace aug {
     public:
         ~lexer() AUG_NOTHROW
         {
-            if (-1 == aug_destroylexer(lexer_))
+            if (lexer_ && -1 == aug_destroylexer(lexer_))
                 perrinfo(aug_tlx, "aug_destroylexer() failed");
+        }
+
+        lexer(const null_&) AUG_NOTHROW
+           : lexer_(0)
+        {
         }
 
         lexer(unsigned size, const networds_&)
@@ -39,6 +44,12 @@ namespace aug {
         lexer(unsigned size, const shellwords_&, bool pairs)
         {
             verify(lexer_ = aug_createshelllexer(size, pairs ? 1 : 0));
+        }
+
+        void
+        swap(lexer& rhs) AUG_NOTHROW
+        {
+            std::swap(lexer_, rhs.lexer_);
         }
 
         operator aug_lexer_t()
@@ -52,6 +63,12 @@ namespace aug {
             return lexer_;
         }
     };
+
+    inline void
+    swap(lexer& lhs, lexer& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
 
     inline unsigned
     appendlexer(aug_lexer_t lexer, char ch)

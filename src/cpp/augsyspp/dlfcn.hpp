@@ -14,16 +14,16 @@
 namespace aug {
 
     inline aug_fnptr_t
-    dlsym(aug_dlib_t dlib, const char* symbol)
+    dlsym(aug_dlib_t dl, const char* symbol)
     {
-        return verify(aug_dlsym(dlib, symbol));
+        return verify(aug_dlsym(dl, symbol));
     }
 
     template <typename fnT>
     fnT
-    dlsym(aug_dlib_t dlib, const char* symbol)
+    dlsym(aug_dlib_t dl, const char* symbol)
     {
-        return (fnT)dlsym(dlib, symbol);
+        return (fnT)dlsym(dl, symbol);
     }
 
     class dlib {
@@ -35,19 +35,28 @@ namespace aug {
         dlib&
         operator =(const dlib&);
 
-    public:
-        ~dlib() AUG_NOTHROW
+        void
+        reset(aug_dlib_t dl) AUG_NOTHROW
         {
-            if (-1 == aug_dlclose(dlib_))
+            aug_dlib_t prev(dlib_);
+            dlib_ = dl;
+            if (prev && -1 == aug_dlclose(prev))
                 perrinfo(aug_tlx, "aug_dlclose() failed");
         }
 
+    public:
+        ~dlib() AUG_NOTHROW
+        {
+            reset(0);
+        }
+
         dlib(const null_&) AUG_NOTHROW
-        : dlib_(0)
+            : dlib_(0)
         {
         }
 
         dlib(mpoolref mpool, const char* path)
+            : dlib_(0)
         {
             open(mpool, path);
         }
@@ -56,17 +65,18 @@ namespace aug {
         close()
         {
             if (dlib_) {
-                aug_dlib_t dlib(dlib_);
+                aug_dlib_t prev(dlib_);
                 dlib_ = 0;
-                verify(aug_dlclose(dlib));
+                verify(aug_dlclose(prev));
             }
         }
 
         void
         open(mpoolref mpool, const char* path)
         {
-            close(); // FIXME: copy-swap.
-            verify(dlib_ = aug_dlopen(mpool.get(), path));
+            aug_dlib_t dl(aug_dlopen(mpool.get(), path));
+            verify(dl);
+            reset(dl);
         }
 
         dlib&
@@ -90,9 +100,9 @@ namespace aug {
 }
 
 inline bool
-isnull(aug_dlib_t dlib)
+isnull(aug_dlib_t dl)
 {
-    return 0 == dlib;
+    return 0 == dl;
 }
 
 #endif // AUGSYSPP_DLFCN_HPP

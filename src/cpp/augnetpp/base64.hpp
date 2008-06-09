@@ -65,8 +65,13 @@ namespace aug {
     public:
         ~base64() AUG_NOTHROW
         {
-            if (-1 == aug_destroybase64(base64_))
+            if (base64_ && -1 == aug_destroybase64(base64_))
                 perrinfo(aug_tlx, "aug_destroybase64() failed");
+        }
+
+        base64(const null_&) AUG_NOTHROW
+           : base64_(0)
+        {
         }
 
         base64(aug_base64mode mode, aug_base64cb_t cb,
@@ -96,6 +101,12 @@ namespace aug {
                    (mode, base64memcb<T>, ob.base()));
         }
 
+        void
+        swap(base64& rhs) AUG_NOTHROW
+        {
+            std::swap(base64_, rhs.base64_);
+        }
+
         operator aug_base64_t()
         {
             return base64_;
@@ -107,6 +118,12 @@ namespace aug {
             return base64_;
         }
     };
+
+    inline void
+    swap(base64& lhs, base64& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
 
     inline void
     appendbase64(aug_base64_t base64, const char* buf, size_t size)

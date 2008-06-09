@@ -24,13 +24,25 @@ namespace aug {
     public:
         ~chans() AUG_NOTHROW
         {
-            aug_destroychans(chans_);
+            if (chans_)
+                aug_destroychans(chans_);
+        }
+
+        chans(const null_&) AUG_NOTHROW
+           : chans_(0)
+        {
         }
 
         chans(mpoolref mpool, chandlerref chandler)
             : chans_(aug_createchans(mpool.get(), chandler.get()))
         {
             verify(chans_);
+        }
+
+        void
+        swap(chans& rhs) AUG_NOTHROW
+        {
+            std::swap(chans_, rhs.chans_);
         }
 
         operator aug_chans_t()
@@ -44,6 +56,12 @@ namespace aug {
             return chans_;
         }
     };
+
+    inline void
+    swap(chans& lhs, chans& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
 
     inline void
     insertchan(aug_chans_t chans, chanref chan)

@@ -26,37 +26,8 @@ namespace {
         }
     }
 
-    struct handler {
-
-        void
-        clearchan_(unsigned id)
-        {
-            aug_ctxinfo(aug_tlx, "clear connection");
-        }
-
-        aug_bool
-        readychan_(unsigned id, streamref stream, unsigned short events)
-        {
-            aug_ctxinfo(aug_tlx, "id: %u", id);
-            if (0 == events) {
-                aug_ctxinfo(aug_tlx, "new connection");
-            } else if (events & AUG_FDEVENTRD) {
-                char buf[1024];
-                ssize_t n = read(stream, buf, sizeof(buf) - 1);
-                if (n <= 0) {
-                    aug_ctxinfo(aug_tlx, "closing connection");
-                    return AUG_FALSE;
-                }
-                buf[n] = '\0';
-                aug_ctxinfo(aug_tlx, "data: %s", buf);
-            }
-            return AUG_TRUE;
-        }
-    };
-
-
     class server {
-        chandler<scoped_chandler<T> > chandler_;
+        chandler<server> chandler_;
         muxer muxer_;
         chans chans_;
         chanptr serv_;
@@ -81,11 +52,13 @@ namespace {
         }
     public:
         server(const char* host, const char* serv)
-            : chans_(getmpool(aug_tlx), handler_),
+            : chans_(null),
               serv_(null),
               quit_(false)
         {
             chandler_.reset(this);
+            chans tmp(getmpool(aug_tlx), chandler_);
+            chans_.swap(tmp);
 
             setfdeventmask(muxer_, rd_, AUG_FDEVENTRD);
 
@@ -97,6 +70,45 @@ namespace {
             sd.release();
 
             insertchan(chans_, ob);
+        }
+        smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
+        {
+            if (equalid<aug_object>(id) || equalid<aug_chandler>(id))
+                return object_retain<aug_object>(chandler_);
+            return null;
+        }
+        void
+        retain_() AUG_NOTHROW
+        {
+        }
+        void
+        release_() AUG_NOTHROW
+        {
+        }
+        void
+        clearchan_(unsigned id) AUG_NOTHROW
+        {
+            aug_ctxinfo(aug_tlx, "clear connection");
+        }
+        aug_bool
+        readychan_(unsigned id, obref<aug_stream> stream,
+                   unsigned short events) AUG_NOTHROW
+        {
+            aug_ctxinfo(aug_tlx, "id: %u", id);
+            if (0 == events) {
+                aug_ctxinfo(aug_tlx, "new connection");
+            } else if (events & AUG_FDEVENTRD) {
+                char buf[1024];
+                ssize_t n = read(stream, buf, sizeof(buf) - 1);
+                if (n <= 0) {
+                    aug_ctxinfo(aug_tlx, "closing connection");
+                    return AUG_FALSE;
+                }
+                buf[n] = '\0';
+                aug_ctxinfo(aug_tlx, "data: %s", buf);
+            }
+            return AUG_TRUE;
         }
         void
         run()

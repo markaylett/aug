@@ -46,8 +46,13 @@ namespace aug {
     public:
         ~hires() AUG_NOTHROW
         {
-            if (-1 == aug_destroyhires(hires_))
+            if (hires_ && -1 == aug_destroyhires(hires_))
                 perrinfo(aug_tlx, "aug_destroyhires() failed");
+        }
+
+        hires(const null_&) AUG_NOTHROW
+           : hires_(0)
+        {
         }
 
         explicit
@@ -55,6 +60,12 @@ namespace aug {
             : hires_(aug_createhires(mpool.get()))
         {
             verify(hires_);
+        }
+
+        void
+        swap(hires& rhs) AUG_NOTHROW
+        {
+            std::swap(hires_, rhs.hires_);
         }
 
         operator aug_hires_t()
@@ -68,6 +79,12 @@ namespace aug {
             return hires_;
         }
     };
+
+    inline void
+    swap(hires& lhs, hires& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
 }
 
 #endif // AUGUTILPP_CLOCK_HPP

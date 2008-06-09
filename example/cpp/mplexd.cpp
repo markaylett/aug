@@ -189,55 +189,9 @@ namespace test {
 
     typedef smartptr<session> sessionptr;
 
-    struct handler {
-
-        void
-        clearchan_(unsigned id)
-        {
-        }
-
-        aug_bool
-        readychan_(unsigned id, streamref stream, unsigned short events)
-        {
-//             state_->sfds_.insert(make_pair
-//                                  (sfd.get(), sessionptr
-//                                   (new session(state_->muxer_, sfd,
-//                                                state_->timers_))));
-
-//             sessionptr ptr(state_->sds_[fd]);
-//             unsigned short bits(fdevents(state_->muxer_, fd));
-
-//             if (bits & AUG_FDEVENTRD) {
-
-//                 AUG_DEBUG2("handling read event '%d'", fd);
-
-//                 if (!ptr->buffer_.readsome(fd)) {
-
-//                     aug_info("closing connection '%d'", fd);
-//                     state_->sfds_.erase(fd);
-//                     return false;
-//                 }
-
-//                 setfdeventmask(state_->muxer_, fd, AUG_FDEVENTRDWR);
-//                 ptr->timer_.cancel();
-//                 ptr->heartbeats_ = 0;
-//             }
-
-//             if (bits & AUG_FDEVENTWR) {
-
-//                 if (!ptr->buffer_.writesome(fd)) {
-//                     setfdeventmask(state_->muxer_, fd, AUG_FDEVENTRD);
-//                     ptr->timer_.reset(5000);
-//                 }
-//             }
-
-            return AUG_TRUE;
-        }
-    };
-
     struct state {
 
-        scoped_chandler<handler> handler_;
+        chandler<state> chandler_;
         chans chans_;
         timers timers_;
         muxer muxer_;
@@ -245,9 +199,13 @@ namespace test {
         map<int, sessionptr> sds_;
 
         state()
-            : chans_(getmpool(aug_tlx), handler_),
+            : chans_(null),
               serv_(null)
         {
+            chandler_.reset(this);
+            chans tmp(getmpool(aug_tlx), chandler_);
+            chans_.swap(tmp);
+
             setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
 
             aug_hostserv hostserv;
@@ -264,6 +222,62 @@ namespace test {
             setchanmask(serv, AUG_FDEVENTRD);
 
             serv_ = serv;
+        }
+        smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
+        {
+            if (equalid<aug_object>(id) || equalid<aug_chandler>(id))
+                return object_retain<aug_object>(chandler_);
+            return null;
+        }
+        void
+        retain_() AUG_NOTHROW
+        {
+        }
+        void
+        release_() AUG_NOTHROW
+        {
+        }
+        void
+        clearchan_(unsigned id) AUG_NOTHROW
+        {
+            aug_ctxinfo(aug_tlx, "clear connection");
+        }
+        aug_bool
+        readychan_(unsigned id, obref<aug_stream> stream,
+                   unsigned short events) AUG_NOTHROW
+        {
+            sds_.insert(make_pair(sfd.get(), sessionptr
+                                  (new session(muxer_, sfd, timers_))));
+
+            sessionptr ptr(sds_[fd]);
+            unsigned short bits(fdevents(muxer_, fd));
+
+            if (bits & AUG_FDEVENTRD) {
+
+                AUG_DEBUG2("handling read event '%d'", fd);
+
+                if (!ptr->buffer_.readsome(fd)) {
+
+                    aug_info("closing connection '%d'", fd);
+                    sfds_.erase(fd);
+                    return AUG_FALSE;
+                }
+
+                setfdeventmask(muxer_, fd, AUG_FDEVENTRDWR);
+                ptr->timer_.cancel();
+                ptr->heartbeats_ = 0;
+            }
+
+            if (bits & AUG_FDEVENTWR) {
+
+                if (!ptr->buffer_.writesome(fd)) {
+                    setfdeventmask(muxer_, fd, AUG_FDEVENTRD);
+                    ptr->timer_.reset(5000);
+                }
+            }
+
+            return AUG_TRUE;
         }
     };
 

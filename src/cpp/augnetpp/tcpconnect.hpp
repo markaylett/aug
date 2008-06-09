@@ -28,14 +28,25 @@ namespace aug {
     public:
         ~tcpconnect() AUG_NOTHROW
         {
-            if (-1 == aug_destroytcpconnect(conn_))
+            if (conn_ && -1 == aug_destroytcpconnect(conn_))
                 perrinfo(aug_tlx, "aug_destroytcpconnect() failed");
+        }
+
+        tcpconnect(const null_&) AUG_NOTHROW
+           : conn_(0)
+        {
         }
 
         tcpconnect(const char* host, const char* serv)
             : conn_(aug_createtcpconnect(host, serv))
         {
             verify(conn_);
+        }
+
+        void
+        swap(tcpconnect& rhs) AUG_NOTHROW
+        {
+            std::swap(conn_, rhs.conn_);
         }
 
         operator aug_tcpconnect_t()
@@ -49,6 +60,12 @@ namespace aug {
             return conn_;
         }
     };
+
+    inline void
+    swap(tcpconnect& lhs, tcpconnect& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
 
     inline autosd
     tryconnect(aug_tcpconnect_t conn, aug_endpoint& ep, bool& est)

@@ -23,14 +23,25 @@ namespace aug {
     public:
         ~writer() AUG_NOTHROW
         {
-            if (-1 == aug_destroywriter(writer_))
+            if (writer_ && -1 == aug_destroywriter(writer_))
                 perrinfo(aug_tlx, "aug_destroywriter() failed");
+        }
+
+        writer(const null_&) AUG_NOTHROW
+           : writer_(0)
+        {
         }
 
         writer()
             : writer_(aug_createwriter())
         {
             verify(writer_);
+        }
+
+        void
+        swap(writer& rhs) AUG_NOTHROW
+        {
+            std::swap(writer_, rhs.writer_);
         }
 
         operator aug_writer_t()
@@ -56,6 +67,12 @@ namespace aug {
             return verify(aug_writersize(writer_));
         }
     };
+
+    inline void
+    swap(writer& lhs, writer& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
 
     inline void
     appendwriter(aug_writer_t writer, blobref ref)

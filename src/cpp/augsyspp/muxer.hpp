@@ -26,14 +26,25 @@ namespace aug {
     public:
         ~muxer() AUG_NOTHROW
         {
-            if (-1 == aug_destroymuxer(muxer_))
+            if (muxer_ && -1 == aug_destroymuxer(muxer_))
                 perrinfo(aug_tlx, "aug_destroymuxer() failed");
+        }
+
+        muxer(const null_&) AUG_NOTHROW
+           : muxer_(0)
+        {
         }
 
         muxer()
             : muxer_(aug_createmuxer())
         {
             verify(muxer_);
+        }
+
+        void
+        swap(muxer& rhs) AUG_NOTHROW
+        {
+            std::swap(muxer_, rhs.muxer_);
         }
 
         operator aug_muxer_t()
@@ -47,6 +58,12 @@ namespace aug {
             return muxer_;
         }
     };
+
+    inline void
+    swap(muxer& lhs, muxer& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
 
     inline void
     setnowait(aug_muxer_t muxer, int nowait)

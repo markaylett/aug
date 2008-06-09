@@ -176,8 +176,13 @@ namespace aug {
     public:
         ~httpparser() AUG_NOTHROW
         {
-            if (-1 == aug_destroyhttpparser(httpparser_))
+            if (httpparser_ && -1 == aug_destroyhttpparser(httpparser_))
                 perrinfo(aug_tlx, "aug_destroyhttpparser() failed");
+        }
+
+        httpparser(const null_&) AUG_NOTHROW
+           : httpparser_(0)
+        {
         }
 
         httpparser(unsigned size, const aug_httphandler& handler,
@@ -210,6 +215,12 @@ namespace aug {
                    (size, &httpnonstatic<T>(), ob.base()));
         }
 
+        void
+        swap(httpparser& rhs) AUG_NOTHROW
+        {
+            std::swap(httpparser_, rhs.httpparser_);
+        }
+
         operator aug_httpparser_t()
         {
             return httpparser_;
@@ -221,6 +232,12 @@ namespace aug {
             return httpparser_;
         }
     };
+
+    inline void
+    swap(httpparser& lhs, httpparser& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
 
     inline void
     appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
