@@ -43,14 +43,14 @@ teardown_(const struct mod_handle* sock)
 }
 
 static int
-accepted_(struct mod_handle* sock, const char* addr, unsigned short port)
+accepted_(struct mod_handle* sock, const char* name)
 {
     mod_writelog(MOD_LOGINFO, "accepted_()");
     return 0;
 }
 
 static void
-connected_(struct mod_handle* sock, const char* addr, unsigned short port)
+connected_(struct mod_handle* sock, const char* name)
 {
     mod_writelog(MOD_LOGINFO, "connected_()");
 }

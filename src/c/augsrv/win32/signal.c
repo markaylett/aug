@@ -4,7 +4,7 @@
 #include <signal.h>
 
 AUGSRV_API int
-aug_signalhandler(void (*handler)(int))
+aug_setsighandler(void (*handler)(int))
 {
     signal(SIGINT, handler);
     signal(SIGTERM, handler);

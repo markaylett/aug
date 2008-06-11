@@ -168,7 +168,9 @@ aug_gettlx(void)
 AUGCTX_API aug_ctx*
 aug_tlx_(void)
 {
-    return gettls_()->ctx_;
+    struct tls_* tls = gettls_();
+    assert(tls && 0 < tls->refs_);
+    return tls->ctx_;
 }
 
 AUGCTX_API struct aug_errinfo*

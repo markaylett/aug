@@ -56,13 +56,15 @@ closepipe_(void)
     mds_[1] = AUG_BADMD;
 }
 
+/* On Windows, signal handlers are not called on the main thread.  The main
+   thread's context will, therefore, be unavailble. */
+
 static void
-signalhandler_(int sig)
+sighandler_(int sig)
 {
     struct aug_event event;
-    aug_ctxinfo(aug_tlx, "handling signal interrupt");
     if (!aug_writeevent(mds_[1], aug_setsigevent(&event, sig)))
-        aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
+        abort();
 }
 
 #if defined(_WIN32)
@@ -70,9 +72,8 @@ static BOOL WINAPI
 ctrlhandler_(DWORD ctrl)
 {
     struct aug_event event = { AUG_EVENTSTOP, NULL };
-    aug_ctxinfo(aug_tlx, "handling console interrupt", NULL);
     if (!aug_writeevent(mds_[1], &event))
-        aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
+        abort();
     return TRUE;
 }
 #endif /* _WIN32 */
@@ -89,7 +90,7 @@ openpipe_(void)
     mds_[0] = mds[0];
     mds_[1] = mds[1];
 
-    if (-1 == aug_signalhandler(signalhandler_)) {
+    if (-1 == aug_setsighandler(sighandler_)) {
         closepipe_();
         return -1;
     }

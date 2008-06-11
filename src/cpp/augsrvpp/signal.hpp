@@ -14,9 +14,9 @@
 namespace aug {
 
     inline void
-    signalhandler(void (*handler)(int))
+    setsighandler(void (*handler)(int))
     {
-        verify(aug_signalhandler(handler));
+        verify(aug_setsighandler(handler));
     }
 
     inline void

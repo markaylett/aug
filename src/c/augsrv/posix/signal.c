@@ -36,7 +36,7 @@ sethandler_(struct sigaction* sa, void (*handler)(int))
 }
 
 AUGSRV_API int
-aug_signalhandler(void (*handler)(int))
+aug_setsighandler(void (*handler)(int))
 {
     int i;
     struct sigaction sa;

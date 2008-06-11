@@ -22,6 +22,8 @@ namespace {
         try {
             writeevent(wr_, setsigevent(event, sig));
         } catch (...) {
+            // On Windows, signal handlers are not called on the main thread.
+            // The main thread's context will, therefore, be unavailble.
             abort();
         }
     }
@@ -30,7 +32,6 @@ namespace {
         chandler<server> chandler_;
         muxer muxer_;
         chans chans_;
-        chanptr serv_;
         bool quit_;
         void
         readevent()
@@ -53,12 +54,9 @@ namespace {
     public:
         server(const char* host, const char* serv)
             : chans_(null),
-              serv_(null),
               quit_(false)
         {
             chandler_.reset(this);
-            chans tmp(getmpool(aug_tlx), chandler_);
-            chans_.swap(tmp);
 
             setfdeventmask(muxer_, rd_, AUG_FDEVENTRD);
 
@@ -68,6 +66,9 @@ namespace {
 
             chanptr ob(createserver(getmpool(aug_tlx), muxer_, sd));
             sd.release();
+
+            chans tmp(getmpool(aug_tlx), chandler_);
+            chans_.swap(tmp);
 
             insertchan(chans_, ob);
         }
@@ -150,10 +151,11 @@ main(int argc, char* argv[])
         rd_ = sds[0];
         wr_ = sds[1];
 
-        signalhandler(sighandler);
+        setsighandler(sighandler);
 
         scoped_block block;
         server serv(argv[1], argv[2]);
+
         serv.run();
         return 0;
 

@@ -34,15 +34,20 @@ struct aug_chans_ {
 static void
 release_(aug_chans_t chans, struct entry_* it)
 {
-    unsigned id = aug_getchanid(it->ob_);
+    aug_chan* ob = it->ob_;
+    unsigned id = aug_getchanid(ob);
 
     AUG_CTXDEBUG3(aug_tlx, "releasing channel: %u", id);
     --chans->size_;
-    aug_safeassign(it->ob_, NULL);
+    it->ob_ = NULL;
 
     /* Notify after entry has been removed. */
 
     aug_clearchan(chans->handler_, id);
+
+    /* Release after callback to avoid dangling references during callback. */
+
+    aug_release(ob);
 }
 
 static void

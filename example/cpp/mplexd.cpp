@@ -27,7 +27,7 @@ namespace test {
     cstring rundir_ = "";
     cstring pidfile_ = "mplexd.pid";
     cstring logfile_ = "mplexd.log";
-    cstring address_ = "127.0.0.1:8080";
+    cstring address_ = "0.0.0.0:44308";
 
     void
     confcb(void* arg, const char* name, const char* value)
@@ -87,7 +87,7 @@ namespace test {
     {
         if (conffile) {
             aug_ctxinfo(aug_tlx, "reading: %s", conffile);
-            readconf(conffile, aug::confcb<confcb>, null);
+			aug::readconf(conffile, aug::confcb<confcb>, null);
             aug_strlcpy(conffile_, conffile, sizeof(conffile_));
         }
 
@@ -122,7 +122,7 @@ namespace test {
             end_ += len;
         }
         bool
-        readsome(fdref ref)
+        readsome(streamref ref)
         {
             char buf[4096];
             size_t size(read(ref, buf, sizeof(buf) - 1));
@@ -133,7 +133,7 @@ namespace test {
             return true;
         }
         bool
-        writesome(fdref ref)
+        writesome(streamref ref)
         {
             size_t size(end_ - begin_);
             size = write(ref, &vec_[begin_], size);
@@ -152,21 +152,13 @@ namespace test {
 
     struct session {
 
-        muxer& muxer_;
-        autosd sd_;
+        chanref chan_;
         timer timer_;
         buffer buffer_;
         int heartbeats_;
 
-        ~session() AUG_NOTHROW
-        {
-            try {
-                setfdeventmask(muxer_, sd_, 0);
-            } AUG_PERRINFOCATCH;
-        }
-        session(muxer& muxer, autosd& sd, timers& timers)
-            : muxer_(muxer),
-              sd_(sd),
+        session(const chanref& chan, timers& timers)
+            : chan_(chan),
               timer_(timers, null),
               heartbeats_(0)
         {
@@ -181,9 +173,11 @@ namespace test {
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
-                setfdeventmask(muxer_, sd_, AUG_FDEVENTRDWR);
-            } else
-                shutdown(sd_, SHUT_RDWR);
+                setchanmask(chan_, AUG_FDEVENTRDWR);
+            } else {
+                streamptr strm(object_cast<aug_stream>(chan_));
+                shutdown(strm);
+            }
         }
     };
 
@@ -192,19 +186,15 @@ namespace test {
     struct state {
 
         chandler<state> chandler_;
-        chans chans_;
+        map<unsigned, sessionptr> sessions_;
         timers timers_;
         muxer muxer_;
-        chanptr serv_;
-        map<int, sessionptr> sds_;
+        chans chans_;
 
         state()
-            : chans_(null),
-              serv_(null)
+            : chans_(null)
         {
             chandler_.reset(this);
-            chans tmp(getmpool(aug_tlx), chandler_);
-            chans_.swap(tmp);
 
             setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
 
@@ -218,10 +208,10 @@ namespace test {
             chanptr serv(createserver(getmpool(aug_tlx), muxer_, sd));
             sd.release();
 
-            insertchan(chans_, serv);
-            setchanmask(serv, AUG_FDEVENTRD);
+            chans tmp(getmpool(aug_tlx), chandler_);
+            chans_.swap(tmp);
 
-            serv_ = serv;
+            insertchan(chans_, serv);
         }
         smartob<aug_object>
         cast_(const char* id) AUG_NOTHROW
@@ -241,39 +231,43 @@ namespace test {
         void
         clearchan_(unsigned id) AUG_NOTHROW
         {
-            aug_ctxinfo(aug_tlx, "clear connection");
+            aug_ctxinfo(aug_tlx, "clearing connection");
+            sessions_.erase(id);
         }
         aug_bool
         readychan_(unsigned id, obref<aug_stream> stream,
                    unsigned short events) AUG_NOTHROW
         {
-            sds_.insert(make_pair(sfd.get(), sessionptr
-                                  (new session(muxer_, sfd, timers_))));
+            chanptr ptr(object_cast<aug_chan>(stream));
+            if (0 == events) {
+                aug_ctxinfo(aug_tlx, "inserting connection");
+                sessions_.insert(make_pair(id, sessionptr
+                                           (new session(ptr, timers_))));
+                return AUG_TRUE;
+            }
 
-            sessionptr ptr(sds_[fd]);
-            unsigned short bits(fdevents(muxer_, fd));
+            sessionptr sess(sessions_[id]);
 
-            if (bits & AUG_FDEVENTRD) {
+            if (events & AUG_FDEVENTRD) {
 
-                AUG_DEBUG2("handling read event '%d'", fd);
+                AUG_CTXDEBUG2(aug_tlx, "handling read event '%d'", id);
 
-                if (!ptr->buffer_.readsome(fd)) {
+                if (!sess->buffer_.readsome(stream)) {
 
-                    aug_info("closing connection '%d'", fd);
-                    sfds_.erase(fd);
+                    aug_ctxinfo(aug_tlx, "closing connection '%d'", id);
                     return AUG_FALSE;
                 }
 
-                setfdeventmask(muxer_, fd, AUG_FDEVENTRDWR);
-                ptr->timer_.cancel();
-                ptr->heartbeats_ = 0;
+                setchanmask(ptr, AUG_FDEVENTRDWR);
+                sess->timer_.cancel();
+                sess->heartbeats_ = 0;
             }
 
-            if (bits & AUG_FDEVENTWR) {
+            if (events & AUG_FDEVENTWR) {
 
-                if (!ptr->buffer_.writesome(fd)) {
-                    setfdeventmask(muxer_, fd, AUG_FDEVENTRD);
-                    ptr->timer_.reset(5000);
+                if (!sess->buffer_.writesome(stream)) {
+                    setchanmask(ptr, AUG_FDEVENTRD);
+                    sess->timer_.reset(5000);
                 }
             }
 
@@ -402,6 +396,7 @@ main(int argc, char* argv[])
 
     try {
         autobasictlx();
+        setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
         service serv;
         program_ = argv[0];

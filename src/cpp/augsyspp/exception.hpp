@@ -44,12 +44,6 @@ namespace aug {
         {
             return errinfo_.desc_;
         }
-        void
-        seterrinfo() const
-        {
-            aug_seterrinfo(0, errinfo_.file_, errinfo_.line_, errinfo_.src_,
-                           errinfo_.num_, errinfo_.desc_);
-        }
         aug_errinfo&
         errinfo()
         {
@@ -58,6 +52,13 @@ namespace aug {
         operator aug_errinfo& ()
         {
             return errinfo_;
+        }
+        aug_errinfo&
+        errinfo(aug_errinfo& dst) const
+        {
+            aug_seterrinfo(&dst, errinfo_.file_, errinfo_.line_,
+                           errinfo_.src_, errinfo_.num_, errinfo_.desc_);
+            return dst;
         }
         const aug_errinfo&
         errinfo() const
@@ -216,7 +217,7 @@ namespace aug {
 
 #define AUG_PERRINFOCATCH                                               \
     catch (const aug::errinfo_error& e) {                               \
-        e.seterrinfo();                                                 \
+        e.errinfo(*aug_tlerr);                                          \
         aug_perrinfo(aug_tlx, "aug::errinfo_error", &e.errinfo());      \
     } catch (const std::exception& e) {                                 \
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
@@ -230,7 +231,7 @@ namespace aug {
 
 #define AUG_SETERRINFOCATCH                                             \
     catch (const aug::errinfo_error& e) {                               \
-        e.seterrinfo();                                                 \
+        e.errinfo(*aug_tlerr);                                          \
     } catch (const std::exception& e) {                                 \
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
                        AUG_EEXCEPT, e.what());                          \
