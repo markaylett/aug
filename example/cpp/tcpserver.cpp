@@ -57,6 +57,8 @@ namespace {
               quit_(false)
         {
             chandler_.reset(this);
+            chans tmp(getmpool(aug_tlx), chandler_);
+            chans_.swap(tmp);
 
             setfdeventmask(muxer_, rd_, AUG_FDEVENTRD);
 
@@ -66,9 +68,6 @@ namespace {
 
             chanptr ob(createserver(getmpool(aug_tlx), muxer_, sd));
             sd.release();
-
-            chans tmp(getmpool(aug_tlx), chandler_);
-            chans_.swap(tmp);
 
             insertchan(chans_, ob);
         }

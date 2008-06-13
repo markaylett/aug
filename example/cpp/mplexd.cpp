@@ -195,6 +195,8 @@ namespace test {
             : chans_(null)
         {
             chandler_.reset(this);
+            chans tmp(getmpool(aug_tlx), chandler_);
+            chans_.swap(tmp);
 
             setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
 
@@ -207,9 +209,6 @@ namespace test {
 
             chanptr serv(createserver(getmpool(aug_tlx), muxer_, sd));
             sd.release();
-
-            chans tmp(getmpool(aug_tlx), chandler_);
-            chans_.swap(tmp);
 
             insertchan(chans_, serv);
         }

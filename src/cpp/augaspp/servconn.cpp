@@ -132,9 +132,9 @@ servconn::~servconn() AUG_NOTHROW
 }
 
 servconn::servconn(const sessionptr& session, void* user, timers& timers,
-                   autosd& sd, const endpoint& ep)
+                   const chanptr& chan, const endpoint& ep)
     : rwtimer_(session, sock_, timers),
-      conn_(session, sock_, buffer_, rwtimer_, sd, ep, false)
+      conn_(session, sock_, buffer_, rwtimer_, chan, ep, false)
 {
     sock_.id_ = aug_nextid();
     sock_.user_ = user;

@@ -137,6 +137,7 @@ namespace aug {
 
         struct engineimpl {
 
+            chandler<engineimpl> chandler_;
             mdref eventrd_, eventwr_;
             timers& timers_;
             enginecb_base& cb_;
@@ -171,69 +172,54 @@ namespace aug {
                   eventwr_(eventwr),
                   timers_(timers),
                   cb_(cb),
-                  chans_(getmpool(aug_tlx)),
+                  chans_(null),
                   grace_(timers_),
                   state_(STARTED)
             {
+                chandler_.reset(this);
+                chans tmp(getmpool(aug_tlx), chandler_);
+                chans_.swap(tmp);
+
                 gettimeofday(now_);
                 setfdeventmask(muxer_, eventrd_, AUG_FDEVENTRD);
             }
-            void
-            teardown()
+            smartob<aug_object>
+            cast_(const char* id) AUG_NOTHROW
             {
-                if (STARTED == state_) {
-
-                    state_ = TEARDOWN;
-                    socks_.teardown(now_);
-
-                    // Initiate grace period.
-
-                    smartob<aug_boxptr> ob(createboxptr(this, 0));
-                    grace_.set(15000, timermemcb<engineimpl,
-                               &engineimpl::stopcb>, ob);
-                }
+                if (equalid<aug_object>(id) || equalid<aug_chandler>(id))
+                    return object_retain<aug_object>(chandler_);
+                return null;
             }
             void
-            accept(const sock_base& sock)
+            retain_() AUG_NOTHROW
             {
-                endpoint ep(null);
-
-                AUG_CTXDEBUG2(aug_tlx, "accepting connection");
-
-                autosd sd(null);
-                try {
-
-                    sd = aug::accept(sock.sd(), ep);
-
-                } catch (const errinfo_error& e) {
-
-                    if (aug_acceptlost()) {
-                        aug_ctxwarn(aug_tlx, "accept() failed: %s", e.what());
-                        return;
-                    }
-                    throw;
-                }
-
-                insertnbfile(nbfiles_, sd, *this);
-                setnbeventmask(sd, AUG_FDEVENTRD);
-
-                setsockopts(sd);
-                connptr cptr(new servconn(sock.session(), user(sock),
-                                          timers_, sd, ep));
-
-                scoped_insert si(socks_, cptr);
-                AUG_CTXDEBUG2(aug_tlx,
-                              "initialising connection: id=[%d], fd=[%d]",
-                              id(*cptr), sd.get());
-
-                // Session may reject the connection by returning false.
-
-                if (cptr->accepted(ep, now_))
-                    si.commit();
             }
-            bool
-            process(const connptr& cptr, mdref md, unsigned short events)
+            void
+            release_() AUG_NOTHROW
             {
+            }
+            void
+            clearchan_(unsigned id) AUG_NOTHROW
+            {
+            }
+            aug_bool
+            readychan_(unsigned id, obref<aug_stream> stream,
+                       unsigned short events) AUG_NOTHROW
+            {
+                sockptr sock(socks_.getbysd(md));
+                connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
+
+                AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%u]", id);
+
+                if (0 == events) {
+
+                    if (null == ptr)
+                        return accept();
+
+                    return AUG_TRUE;
+                }
+                //-
+
                 bool changed = false, ok = false;
                 try {
                     changed = cptr->process(events, now_);
@@ -249,7 +235,7 @@ namespace aug {
                     // processing.
 
                     socks_.erase(*cptr);
-                    return false;
+                    return AUG_FALSE;
                 }
 
                 if (HANDSHAKE == cptr->state()) {
@@ -274,11 +260,47 @@ namespace aug {
                         break;
                     case CLOSED:
                         socks_.erase(*cptr);
-                        return false;
+                        return AUG_FALSE;
                     default:
                         break;
                     }
 
+                return AUG_TRUE;
+            }
+            void
+            teardown()
+            {
+                if (STARTED == state_) {
+
+                    state_ = TEARDOWN;
+                    socks_.teardown(now_);
+
+                    // Initiate grace period.
+
+                    smartob<aug_boxptr> ob(createboxptr(this, 0));
+                    grace_.set(15000, timermemcb<engineimpl,
+                               &engineimpl::stopcb>, ob);
+                }
+            }
+            bool
+            accept(const sock_base& sock)
+            {
+                AUG_CTXDEBUG2(aug_tlx, "accepting connection");
+
+                connptr cptr(new servconn(sock.session(), user(sock),
+                                          timers_, sd, ep));
+
+                scoped_insert si(socks_, cptr);
+                AUG_CTXDEBUG2(aug_tlx,
+                              "initialising connection: id=[%d], fd=[%d]",
+                              id(*cptr), sd.get());
+
+                // Session may reject the connection by returning false.
+
+                if (!cptr->accepted(ep, now_))
+                    return false;
+
+                si.commit();
                 return true;
             }
             bool

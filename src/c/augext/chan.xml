@@ -13,6 +13,12 @@
       <param name="id" type="unsigned"/>
     </method>
 
+    <method name="estab" type="aug_bool" qname="estabchan">
+      <param name="id" type="unsigned"/>
+      <param name="stream" type="aug_stream" object="true"/>
+      <param name="parent" type="unsigned"/>
+    </method>
+
     <method name="ready" type="aug_bool" qname="readychan">
       <param name="id" type="unsigned"/>
       <param name="stream" type="aug_stream" object="true"/>
