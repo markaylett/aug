@@ -22,6 +22,27 @@ AUG_RCSID("$Id$");
 #include <string.h>
 
 static aug_bool
+estabchan_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_stream* ob,
+           unsigned parent)
+{
+    aug_bool ret;
+
+    /* The callback is not required to set errinfo when returning false.  The
+       errinfo record must therefore be cleared before the callback is made,
+       to avoid any confusion with previous errors. */
+
+    aug_clearerrinfo(aug_tlerr);
+
+    /* Lock here to prevent release during callback. */
+
+    aug_retain(chan);
+    ret = aug_estabchan(handler, id, ob, parent);
+    aug_release(chan);
+
+    return ret;
+}
+
+static aug_bool
 readychan_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_stream* ob,
            unsigned short events)
 {
@@ -57,7 +78,7 @@ struct cimpl_ {
 };
 
 static aug_chan*
-establish_(struct cimpl_* impl, aug_chandler* handler)
+estabclient_(struct cimpl_* impl, aug_chandler* handler)
 {
     aug_sd sd = impl->sd_;
     aug_chan* chan;
@@ -86,9 +107,9 @@ establish_(struct cimpl_* impl, aug_chandler* handler)
 
     stream = aug_cast(chan, aug_streamid);
 
-    /* Zero events indicates channel establishment. */
+    /* Notification of connection establishment. */
 
-    if (!readychan_(&impl->chan_, handler, impl->id_, stream, 0)) {
+    if (!estabchan_(&impl->chan_, handler, impl->id_, stream, impl->id_)) {
 
         /* Rejected: socket will be closed on release. */
 
@@ -182,7 +203,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         /* Descriptor will either be owned by new object or closed on
            error. */
 
-        return establish_(impl, handler);
+        return estabclient_(impl, handler);
     }
 
     if ((AUG_FDEVENTRD & aug_fdevents(impl->muxer_, impl->sd_))) {
@@ -206,7 +227,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             /* Descriptor will either be owned by new object or closed on
                error. */
 
-            return establish_(impl, handler);
+            return estabclient_(impl, handler);
         }
 
         /* Not yet established: set mask to poll for connection
@@ -398,9 +419,9 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         stream = aug_cast(chan, aug_streamid);
 
-        /* Zero events indicates new connection. */
+        /* Notification of connection establishment. */
 
-        if (!readychan_(ob, handler, id, stream, 0)) {
+        if (!estabchan_(ob, handler, id, stream, impl->id_)) {
 
             /* Rejected: socket will be closed on release. */
 

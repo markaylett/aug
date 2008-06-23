@@ -206,7 +206,7 @@ namespace aug {
             readychan_(unsigned id, obref<aug_stream> stream,
                        unsigned short events) AUG_NOTHROW
             {
-                sockptr sock(socks_.getbysd(md));
+                sockptr sock(socks_.getbyid(id));
                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
                 AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%u]", id);
