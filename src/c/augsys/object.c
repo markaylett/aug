@@ -108,7 +108,6 @@ static aug_chan*
 chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
-    int events;
 
     if (!impl->init_) {
 
@@ -116,35 +115,30 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
            channel establishment. */
 
         impl->init_ = AUG_TRUE;
-        events = 0;
+
+        if (!aug_safeestab(ob, handler, impl->id_, &impl->stream_,
+                           impl->id_))
+            return NULL;
 
     } else {
+
 #if !defined(_WIN32)
-        events = aug_fdevents(impl->muxer_, impl->fd_);
+        int events = aug_fdevents(impl->muxer_, impl->fd_);
 #else /* _WIN32 */
-        events = 0;
+        int events = 0;
 #endif /* _WIN32 */
-        if (0 == events) {
-            retain_(impl);
-            return ob;
-        }
+
+        if (events < 0)
+            return NULL;
+
+        /* Lock here to prevent release during callback. */
+
+        if (events && !aug_safeready(ob, handler, impl->id_, &impl->stream_,
+                                     events))
+            return NULL;
     }
-
-    /* The callback is not required to set errinfo when returning false.  The
-       errinfo record must therefore be cleared before the callback is made to
-       avoid any confusion with previous errors. */
-
-    aug_clearerrinfo(aug_tlerr);
-
-    /* Lock here to prevent release during callback. */
 
     retain_(impl);
-
-    if (!aug_readychan(handler, impl->id_, &impl->stream_, events)) {
-        release_(impl);
-        return NULL;
-    }
-
     return ob;
 }
 
@@ -263,6 +257,48 @@ static const struct aug_streamvtbl streamvtbl_ = {
     stream_write_,
     stream_writev_
 };
+
+AUGSYS_API aug_bool
+aug_safeestab(aug_chan* chan, aug_chandler* handler, unsigned id,
+              aug_stream* ob, unsigned parent)
+{
+    aug_bool ret;
+
+    /* The callback is not required to set errinfo when returning false.  The
+       errinfo record must therefore be cleared before the callback is made,
+       to avoid any confusion with previous errors. */
+
+    aug_clearerrinfo(aug_tlerr);
+
+    /* Lock here to prevent release during callback. */
+
+    aug_retain(chan);
+    ret = aug_estabchan(handler, id, ob, parent);
+    aug_release(chan);
+
+    return ret;
+}
+
+AUGSYS_API aug_bool
+aug_safeready(aug_chan* chan, aug_chandler* handler, unsigned id,
+              aug_stream* ob, unsigned short events)
+{
+    aug_bool ret;
+
+    /* The callback is not required to set errinfo when returning false.  The
+       errinfo record must therefore be cleared before the callback is made,
+       to avoid any confusion with previous errors. */
+
+    aug_clearerrinfo(aug_tlerr);
+
+    /* Lock here to prevent release during callback. */
+
+    aug_retain(chan);
+    ret = aug_readychan(handler, id, ob, events);
+    aug_release(chan);
+
+    return ret;
+}
 
 AUGSYS_API aug_chan*
 aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,

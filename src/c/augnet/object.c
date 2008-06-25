@@ -7,11 +7,12 @@
 
 AUG_RCSID("$Id$");
 
-#include "augnet/inet.h" /* aug_setnodelay() */
+#include "augnet/inet.h"   /* aug_setnodelay() */
 #include "augnet/ssl.h"
 #include "augnet/tcpconnect.h"
 
-#include "augsys/base.h" /* aug_nextid() */
+#include "augsys/base.h"   /* aug_nextid() */
+#include "augsys/object.h" /* aug_safeestab() */
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
@@ -20,48 +21,6 @@ AUG_RCSID("$Id$");
 
 #include <assert.h>
 #include <string.h>
-
-static aug_bool
-estabchan_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_stream* ob,
-           unsigned parent)
-{
-    aug_bool ret;
-
-    /* The callback is not required to set errinfo when returning false.  The
-       errinfo record must therefore be cleared before the callback is made,
-       to avoid any confusion with previous errors. */
-
-    aug_clearerrinfo(aug_tlerr);
-
-    /* Lock here to prevent release during callback. */
-
-    aug_retain(chan);
-    ret = aug_estabchan(handler, id, ob, parent);
-    aug_release(chan);
-
-    return ret;
-}
-
-static aug_bool
-readychan_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_stream* ob,
-           unsigned short events)
-{
-    aug_bool ret;
-
-    /* The callback is not required to set errinfo when returning false.  The
-       errinfo record must therefore be cleared before the callback is made,
-       to avoid any confusion with previous errors. */
-
-    aug_clearerrinfo(aug_tlerr);
-
-    /* Lock here to prevent release during callback. */
-
-    aug_retain(chan);
-    ret = aug_readychan(handler, id, ob, events);
-    aug_release(chan);
-
-    return ret;
-}
 
 struct cimpl_ {
     aug_chan chan_;
@@ -83,6 +42,7 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
     aug_sd sd = impl->sd_;
     aug_chan* chan;
     aug_stream* stream;
+    aug_bool ret;
 
     /* Ensure connection establishment happens only once. */
 
@@ -109,18 +69,17 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
 
     /* Notification of connection establishment. */
 
-    if (!estabchan_(&impl->chan_, handler, impl->id_, stream, impl->id_)) {
+    ret = aug_safeestab(&impl->chan_, handler, impl->id_, stream, impl->id_);
+    aug_release(stream);
+
+    if (!ret) {
 
         /* Rejected: socket will be closed on release. */
 
-        aug_release(stream);
         aug_release(chan);
         return NULL;
     }
 
-    /* Transition to established state. */
-
-    aug_release(stream);
     return chan;
 }
 
@@ -374,6 +333,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         aug_chan* chan;
         aug_stream* stream;
         unsigned id;
+        aug_bool ret;
 
         if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
 
@@ -421,11 +381,13 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         /* Notification of connection establishment. */
 
-        if (!estabchan_(ob, handler, id, stream, impl->id_)) {
+        ret = aug_safeestab(ob, handler, id, stream, impl->id_);
+        aug_release(stream);
+
+        if (!ret) {
 
             /* Rejected: socket will be closed on release. */
 
-            aug_release(stream);
             aug_release(chan);
             goto done;
         }
@@ -579,7 +541,8 @@ pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     if (events < 0)
         return NULL;
 
-    if (events && !readychan_(ob, handler, impl->id_, &impl->stream_, events))
+    if (events && !aug_safeready(ob, handler, impl->id_, &impl->stream_,
+                                 events))
         return NULL;
 
     pretain_(impl);

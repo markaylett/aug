@@ -10,6 +10,7 @@ AUG_RCSID("$Id$");
 #if ENABLE_SSL
 
 # include "augsys/base.h"   /* struct aug_fdtype */
+# include "augsys/object.h" /* aug_safeready() */
 # include "augsys/socket.h" /* aug_shutdown() */
 # include "augsys/uio.h"
 
@@ -510,33 +511,20 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_(): fd=[%d], events=[%d]",
                       impl->sd_, events);
 
-        /* The callback is not required to set errinfo when returning false.
-           The errinfo record must therefore be cleared before the callback is
-           made to avoid any confusion with previous errors. */
-
-        aug_clearerrinfo(aug_tlerr);
-
-        /* Callback may close file, ensure that it is still available after
-           callback returns. */
-
-        retain_(impl);
-
-        if (!aug_readychan(handler, impl->id_, &impl->stream_, events)) {
+        if (!aug_safeready(ob, handler, impl->id_, &impl->stream_, events)) {
 
             /* No need to update events if file is being removed - indicated
                by false return. */
 
-            release_(impl);
-            ob = NULL;
-
-        } else
-            updateevents_(impl);
+            return NULL;
+        }
+        updateevents_(impl);
 
     } else {
         AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_() skipped");
-        aug_retain(ob);
     }
 
+    retain_(impl);
     return ob;
 }
 

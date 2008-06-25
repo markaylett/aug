@@ -10,6 +10,14 @@
 
 #include "augext/chan.h"
 
+AUGSYS_API aug_bool
+aug_safeestab(aug_chan* chan, aug_chandler* handler, unsigned id,
+              aug_stream* ob, unsigned parent);
+
+AUGSYS_API aug_bool
+aug_safeready(aug_chan* chan, aug_chandler* handler, unsigned id,
+              aug_stream* ob, unsigned short events);
+
 AUGSYS_API aug_chan*
 aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,
                aug_muxer_t muxer);

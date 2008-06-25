@@ -15,7 +15,7 @@ main(int argc, char* argv[])
     aug_initbasicctx();
 
     if (!(file = aug_createfile(aug_tlx, "filetest.txt",
-                               O_CREAT | O_TRUNC | O_RDWR, 0666))) {
+                                O_CREAT | O_TRUNC | O_RDWR, 0666))) {
         aug_perrinfo(aug_tlx, "failed to open file");
         aug_term();
         return 1;
