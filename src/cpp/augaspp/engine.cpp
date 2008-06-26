@@ -203,6 +203,12 @@ namespace aug {
             {
             }
             aug_bool
+            estabchan_(unsigned id, obref<aug_stream> stream,
+                       unsigned parent) AUG_NOTHROW
+            {
+                return AUG_TRUE;
+            }
+            aug_bool
             readychan_(unsigned id, obref<aug_stream> stream,
                        unsigned short events) AUG_NOTHROW
             {

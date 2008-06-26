@@ -92,13 +92,19 @@ namespace {
             aug_ctxinfo(aug_tlx, "clear connection");
         }
         aug_bool
+        estabchan_(unsigned id, obref<aug_stream> stream,
+                   unsigned parent) AUG_NOTHROW
+        {
+            aug_ctxinfo(aug_tlx, "id: %u", id);
+            aug_ctxinfo(aug_tlx, "new connection");
+            return AUG_TRUE;
+        }
+        aug_bool
         readychan_(unsigned id, obref<aug_stream> stream,
                    unsigned short events) AUG_NOTHROW
         {
             aug_ctxinfo(aug_tlx, "id: %u", id);
-            if (0 == events) {
-                aug_ctxinfo(aug_tlx, "new connection");
-            } else if (events & AUG_FDEVENTRD) {
+            if (events & AUG_FDEVENTRD) {
                 char buf[1024];
                 ssize_t n = read(stream, buf, sizeof(buf) - 1);
                 if (n <= 0) {

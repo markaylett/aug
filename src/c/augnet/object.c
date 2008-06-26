@@ -395,7 +395,6 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         /* Newly established connection. */
 
         *fork = AUG_TRUE;
-        aug_release(stream);
         return chan;
     }
 

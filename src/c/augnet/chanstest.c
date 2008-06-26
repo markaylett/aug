@@ -244,6 +244,13 @@ chandler_clear_(aug_chandler* ob, unsigned id)
 }
 
 static aug_bool
+chandler_estab_(aug_chandler* ob, unsigned id, aug_stream* stream,
+                unsigned parent)
+{
+    return AUG_TRUE;
+}
+
+static aug_bool
 chandler_ready_(aug_chandler* ob, unsigned id, aug_stream* stream,
                 unsigned short events)
 {
@@ -255,6 +262,7 @@ static const struct aug_chandlervtbl chandlervtbl_ = {
     chandler_retain_,
     chandler_release_,
     chandler_clear_,
+    chandler_estab_,
     chandler_ready_
 };
 
