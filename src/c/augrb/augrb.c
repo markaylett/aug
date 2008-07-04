@@ -434,7 +434,7 @@ shutdown_(VALUE self, VALUE sock, VALUE flags)
 static VALUE
 tcpconnect_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE host, serv, user;
+    VALUE host, serv, sslctx, user;
     const char* ptr;
     VALUE* sock;
     int cid;
@@ -617,32 +617,6 @@ canceltimer_(VALUE self, VALUE timer)
     return Qtrue;
 }
 
-static VALUE
-setsslclient_(VALUE self, VALUE sock, VALUE ctx)
-{
-    int cid = checkid_(sock);
-
-    Check_Type(ctx, T_STRING);
-
-    if (-1 == mod_setsslclient(cid, RSTRING(ctx)->ptr))
-        rb_raise(cerror_, mod_error());
-
-    return Qnil;
-}
-
-static VALUE
-setsslserver_(VALUE self, VALUE sock, VALUE ctx)
-{
-    int cid = checkid_(sock);
-
-    Check_Type(ctx, T_STRING);
-
-    if (-1 == mod_setsslserver(cid, RSTRING(ctx)->ptr))
-        rb_raise(cerror_, mod_error());
-
-    return Qnil;
-}
-
 static void
 setpath_(void)
 {
@@ -756,8 +730,6 @@ initrb_(VALUE unused)
     rb_define_module_function(maugrb_, "settimer", settimer_, -1);
     rb_define_module_function(maugrb_, "resettimer", resettimer_, 2);
     rb_define_module_function(maugrb_, "canceltimer", canceltimer_, 1);
-    rb_define_module_function(maugrb_, "setsslclient", setsslclient_, 2);
-    rb_define_module_function(maugrb_, "setsslserver", setsslserver_, 2);
 
     return Qnil;
 }

@@ -11,7 +11,7 @@
 #include "augext/chan.h"
 #include "augext/mpool.h"
 
-struct ssl_st* ssl;
+struct ssl_st;
 
 /**
  * Create a client socket channel.

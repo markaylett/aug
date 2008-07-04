@@ -41,43 +41,21 @@ socks::sendv(mod_id cid, blobref blob, const timeval& now)
 void
 socks::clear()
 {
-    idtosd_.clear();
     socks_.clear();
 }
 
 void
 socks::erase(const sock_base& sock)
 {
-    AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%d], fd=[%d]", id(sock),
-                  sock.sd().get());
-
-    idtosd_.erase(id(sock));
-    socks_.erase(sock.sd());
+    AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%u]", id(sock));
+    socks_.erase(id(sock));
 }
 
 void
 socks::insert(const sockptr& sock)
 {
-    AUG_CTXDEBUG2(aug_tlx, "adding sock: id=[%d], fd=[%d]", id(*sock),
-                  sock->sd().get());
-
-    socks_.insert(make_pair(sock->sd(), sock));
-    idtosd_.insert(make_pair(id(*sock), sock->sd()));
-}
-
-void
-socks::update(const sockptr& sock, sdref prev)
-{
-    AUG_CTXDEBUG2(aug_tlx, "updating sock: id=[%d], fd=[%d], prev=[%d]",
-                  id(*sock), sock->sd().get(), prev.get());
-
-    socks_.insert(make_pair(sock->sd(), sock));
-    socks_.erase(prev);
-
-    pair<idtosd::iterator, bool> xy
-        (idtosd_.insert(make_pair(id(*sock), sock->sd())));
-    if (!xy.second)
-        xy.first->second = sock->sd();
+    AUG_CTXDEBUG2(aug_tlx, "adding sock: id=[%u]", id(*sock));
+    socks_.insert(make_pair(id(*sock), sock));
 }
 
 void
@@ -85,21 +63,14 @@ socks::teardown(const timeval& now)
 {
     // Ids are stored in reverse order using the the greater<> predicate.
 
-    idtosd::iterator rit(idtosd_.begin()), rend(idtosd_.end());
-    while (rit != rend) {
+    container::iterator it(socks_.begin()), end(socks_.end());
+    while (it != end) {
 
-        AUG_CTXDEBUG2(aug_tlx, "teardown: id=[%d], fd=[%d]", rit->first,
-                      rit->second.get());
-
-        map<sdref, sockptr>::iterator it(socks_.find(rit->second));
-        if (it == socks_.end())
-            throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                            AUG_MSG("sock not found: fd=[%d]"),
-                            rit->second.get());
+        AUG_CTXDEBUG2(aug_tlx, "teardown: id=[%u]", it->first);
 
         connptr cptr(smartptr_cast<conn_base>(it->second));
         if (null != cptr) {
-            ++rit;
+            ++it;
             try {
                 cptr->teardown(now);
             } AUG_PERRINFOCATCH;
@@ -108,29 +79,18 @@ socks::teardown(const timeval& now)
 
         // Erase listener.
 
-        idtosd_.erase(rit++);
-        socks_.erase(it);
+        socks_.erase(it++);
     }
-}
-
-sockptr
-socks::getbysd(sdref sd) const
-{
-    map<sdref, sockptr>::const_iterator it(socks_.find(sd));
-    if (it == socks_.end())
-        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                        AUG_MSG("sock not found: fd=[%d]"), sd.get());
-    return it->second;
 }
 
 sockptr
 socks::getbyid(mod_id id) const
 {
-    idtosd::const_iterator it(idtosd_.find(id));
-    if (it == idtosd_.end())
+    container::const_iterator it(socks_.find(id));
+    if (it == socks_.end())
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                        AUG_MSG("sock not found: id=[%d]"), id);
-    return getbysd(it->second);
+                        AUG_MSG("sock not found: id=[%u]"), id);
+    return it->second;
 }
 
 bool

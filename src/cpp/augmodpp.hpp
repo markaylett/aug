@@ -245,32 +245,6 @@ namespace mod {
         return resettimer(timer.id_, ms);
     }
 
-    inline void
-    setsslclient(mod_id cid, const char* ctx)
-    {
-        if (MOD_ERROR == mod_setsslclient(cid, ctx))
-            throw error(mod_error());
-    }
-
-    inline void
-    setsslclient(const mod_handle& conn, const char* ctx)
-    {
-        setsslclient(conn.id_, ctx);
-    }
-
-    inline void
-    setsslserver(mod_id cid, const char* ctx)
-    {
-        if (MOD_ERROR == mod_setsslserver(cid, ctx))
-            throw error(mod_error());
-    }
-
-    inline void
-    setsslserver(const mod_handle& conn, const char* ctx)
-    {
-        setsslserver(conn.id_, ctx);
-    }
-
     class handle {
         const mod_handle& handle_;
     public:

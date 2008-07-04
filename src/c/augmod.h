@@ -126,7 +126,7 @@ enum mod_loglevel {
 
 #define MOD_MAXNAME     63
 
-typedef int mod_id;
+typedef unsigned mod_id;
 
 struct mod_session {
     char name_[MOD_MAXNAME + 1];

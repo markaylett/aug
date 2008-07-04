@@ -87,11 +87,11 @@ namespace aug {
 
         mod_id
         tcpconnect(const char* sname, const char* host, const char* port,
-                   sslctx& ctx, void* user);
+                   sslctx* ctx, void* user);
 
         mod_id
         tcplisten(const char* sname, const char* host, const char* port,
-                  sslctx& ctx, void* user);
+                  sslctx* ctx, void* user);
 
         void
         send(mod_id cid, const void* buf, size_t len);

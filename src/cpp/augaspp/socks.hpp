@@ -17,7 +17,9 @@ namespace aug {
 
     class socks {
 
-        std::map<unsigned, sockptr> socks_;
+        typedef std::map<mod_id, sockptr, std::greater<mod_id> > container;
+
+        container socks_;
 
         socks(const socks& rhs);
 
@@ -31,10 +33,10 @@ namespace aug {
         {
         }
         bool
-        send(unsigned id, const void* buf, size_t size, const timeval& now);
+        send(mod_id id, const void* buf, size_t size, const timeval& now);
 
         bool
-        sendv(unsigned id, blobref ref, const timeval& now);
+        sendv(mod_id id, blobref ref, const timeval& now);
 
         void
         clear();
@@ -46,13 +48,10 @@ namespace aug {
         insert(const sockptr& sock);
 
         void
-        update(const sockptr& sock, sdref prev);
-
-        void
         teardown(const timeval& tv);
 
         sockptr
-        getbyid(unsigned id) const;
+        getbyid(mod_id id) const;
 
         bool
         empty() const;
