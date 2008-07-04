@@ -37,10 +37,13 @@ namespace {
         {
             writelog(MOD_LOGINFO, "starting...");
             const char* serv = mod::getenv("session.echo.serv");
+            const char* sslctx = mod::getenv("session.echo.sslcontext", 0);
             if (!serv)
                 return false;
+            if (sslctx)
+                writelog(MOD_LOGINFO, "sslcontext: %s", sslctx);
 
-            tcplisten("0.0.0.0", serv);
+            tcplisten("0.0.0.0", serv, sslctx);
             return true;
         }
         void
@@ -51,11 +54,6 @@ namespace {
         bool
         do_accepted(handle& sock, const char* addr, unsigned short port)
         {
-            const char* sslctx = mod::getenv("session.echo.sslcontext", 0);
-            if (sslctx) {
-                writelog(MOD_LOGINFO, "sslcontext: %s", sslctx);
-                setsslserver(sock, sslctx);
-            }
             sock.setuser(new string());
             setrwtimer(sock, 15000, MOD_TIMRD);
             return true;

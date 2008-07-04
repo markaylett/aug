@@ -23,21 +23,21 @@ namespace aug {
         }
     };
 
-    struct stringob {
+    struct sblob {
         std::string s_;
-        stringob(const std::string& s)
+        sblob(const std::string& s)
             : s_(s)
         {
         }
         const void*
-        blobdata_(size_t* size)
+        getblobdata_(size_t* size)
         {
             if (size)
                 *size = s_.size();
             return s_.data();
         }
         size_t
-        blobsize_()
+        getblobsize_()
         {
             return s_.size();
         }

@@ -34,12 +34,12 @@ namespace {
     {
     }
     int
-    accepted(mod_handle* sock, const char* addr, unsigned short port)
+    accepted(mod_handle* sock, const char* name)
     {
         return 0;
     }
     void
-    connected(mod_handle* sock, const char* addr, unsigned short port)
+    connected(mod_handle* sock, const char* name)
     {
     }
     void

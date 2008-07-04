@@ -175,7 +175,7 @@ connected::do_process(unsigned short events, const timeval& now)
 
     if (events & AUG_FDEVENTRD) {
 
-        AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%d]", sock_.id_);
+        AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%u]", sock_.id_);
 
         char buf[4096];
         size_t size(read(stream, buf, sizeof(buf)));
@@ -183,7 +183,7 @@ connected::do_process(unsigned short events, const timeval& now)
 
             // Connection closed.
 
-            AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%d]", sock_.id_);
+            AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%u]", sock_.id_);
             state_ = CLOSED;
             return true;
         }
@@ -199,7 +199,7 @@ connected::do_process(unsigned short events, const timeval& now)
 
     if (events & AUG_FDEVENTWR) {
 
-        AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%d]", sock_.id_);
+        AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%u]", sock_.id_);
 
         size_t n(buffer_.writesome(stream));
 
@@ -254,7 +254,7 @@ connected::do_shutdown(unsigned flags, const timeval& now)
         state_ = SHUTDOWN;
         if (buffer_.empty() || flags & MOD_SHUTNOW) {
             aug_ctxinfo(aug_tlx,
-                        "shutting connection: id=[%d], flags=[%u]",
+                        "shutting connection: id=[%u], flags=[%u]",
                         sock_.id_, flags);
             streamptr stream(object_cast<aug_stream>(chan_));
             aug::shutdown(stream);

@@ -7,7 +7,7 @@
 #include "augutilpp.hpp"
 #include "augsyspp.hpp"
 
-#include "augob/blob.h"
+#include "augext/blob.h"
 
 #include <fstream>
 #include <memory> // auto_ptr<>
@@ -23,14 +23,14 @@ namespace {
 
     struct helloblob {
         static const void*
-        blobdata_(size_t* size) AUG_NOTHROW
+        getblobdata_(size_t* size) AUG_NOTHROW
         {
             if (size)
-                *size = blobsize_();
+                *size = getblobsize_();
             return MSG;
         }
         static size_t
-        blobsize_() AUG_NOTHROW
+        getblobsize_() AUG_NOTHROW
         {
             return sizeof(MSG) - 1;
         }
@@ -137,17 +137,21 @@ namespace {
                 return false;
 
             const char* host = mod::getenv("session.bench.host",
-                                            "localhost");
+                                           "localhost");
+            const char* sslctx = mod::getenv("session.bench.sslcontext", 0);
+
             conns_ = atoi(mod::getenv("session.bench.conns", "100"));
             echos_ = atoi(mod::getenv("session.bench.echos", "1000"));
 
             mod_writelog(MOD_LOGINFO, "host: %s", host);
             mod_writelog(MOD_LOGINFO, "serv: %s", serv);
+            if (sslctx)
+                writelog(MOD_LOGINFO, "sslcontext: %s", sslctx);
             mod_writelog(MOD_LOGINFO, "conns: %d", conns_);
             mod_writelog(MOD_LOGINFO, "echos: %d", echos_);
 
             for (; estab_ < conns_; ++estab_)
-                tcpconnect(host, serv, new state(echos_));
+                tcpconnect(host, serv, sslctx, new state(echos_));
             return true;
         }
         void
@@ -178,14 +182,8 @@ namespace {
             writexy(xy_);
         }
         void
-        do_connected(handle& sock, const char* addr, unsigned short port)
+        do_connected(handle& sock, const char* name)
         {
-            const char* sslctx = mod::getenv("session.bench.sslcontext", 0);
-            if (sslctx) {
-                writelog(MOD_LOGINFO, "sslcontext: %s", sslctx);
-                setsslclient(sock, sslctx);
-            }
-
             state& s(*sock.user<state>());
             s.secs_.push_back(elapsed(hires_));
             send_(sock);

@@ -657,7 +657,7 @@ engine::setrwtimer(mod_id cid, unsigned ms, unsigned flags)
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
     if (null == rwtimer)
         throw aug_error(__FILE__, __LINE__, AUG_EEXIST,
-                        "connection not found: id=[%d]", cid);
+                        "connection not found: id=[%u]", cid);
     rwtimer->setrwtimer(ms, flags);
 }
 
@@ -668,7 +668,7 @@ engine::resetrwtimer(mod_id cid, unsigned ms, unsigned flags)
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
     if (null == rwtimer)
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                        "connection not found: id=[%d]", cid);
+                        "connection not found: id=[%u]", cid);
 
     return rwtimer->resetrwtimer(ms, flags);
 }
@@ -680,7 +680,7 @@ engine::cancelrwtimer(mod_id cid, unsigned flags)
                        rwtimer_base>(impl_->socks_.getbyid(cid)));
     if (null == rwtimer)
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                        "connection not found: id=[%d]", cid);
+                        "connection not found: id=[%u]", cid);
     return rwtimer->cancelrwtimer(flags);
 }
 

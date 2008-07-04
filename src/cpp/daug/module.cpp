@@ -32,7 +32,7 @@ module::module(const string& name, const char* path,
                const struct mod_host& host,
                void (*teardown)(const mod_handle*))
     : name_(name),
-      lib_(path)
+      lib_(getmpool(aug_tlx), path)
 {
     AUG_CTXDEBUG2(aug_tlx, "resolving symbols in module: name=[%s]",
                   name_.c_str());
@@ -78,61 +78,57 @@ module::event(const char* from, const char* type,
 void
 module::closed(const mod_handle& sock) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "closed(): id=[%d]", sock.id_);
+    AUG_CTXDEBUG2(aug_tlx, "closed(): id=[%u]", sock.id_);
     module_.closed_(&sock);
 }
 
 void
 module::teardown(const mod_handle& sock) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "teardown(): id=[%d]", sock.id_);
+    AUG_CTXDEBUG2(aug_tlx, "teardown(): id=[%u]", sock.id_);
     module_.teardown_(&sock);
 }
 
 bool
-module::accepted(mod_handle& sock, const char* addr,
-                 unsigned short port) const AUG_NOTHROW
+module::accepted(mod_handle& sock, const char* name) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "accept(): id=[%d], addr=[%s], port=[%u]",
-               sock.id_, addr, (unsigned)port);
-    return MOD_OK == module_.accepted_(&sock, addr, port);
+    AUG_CTXDEBUG2(aug_tlx, "accept(): id=[%u], name=[%s]", sock.id_, name);
+    return MOD_OK == module_.accepted_(&sock, name);
 }
 
 void
-module::connected(mod_handle& sock, const char* addr,
-                  unsigned short port) const AUG_NOTHROW
+module::connected(mod_handle& sock, const char* name) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "connected(): id=[%d], addr=[%s], port=[%u]",
-               sock.id_, addr, (unsigned)port);
-    module_.connected_(&sock, addr, port);
+    AUG_CTXDEBUG2(aug_tlx, "connected(): id=[%u], name=[%s]", sock.id_, name);
+    module_.connected_(&sock, name);
 }
 
 void
 module::data(const mod_handle& sock, const char* buf,
              size_t size) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "data(): id=[%d]", sock.id_);
+    AUG_CTXDEBUG2(aug_tlx, "data(): id=[%u]", sock.id_);
     module_.data_(&sock, buf, size);
 }
 
 void
 module::rdexpire(const mod_handle& sock, unsigned& ms) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "rdexpire(): id=[%d], ms=[%u]", sock.id_, ms);
+    AUG_CTXDEBUG2(aug_tlx, "rdexpire(): id=[%u], ms=[%u]", sock.id_, ms);
     module_.rdexpire_(&sock, &ms);
 }
 
 void
 module::wrexpire(const mod_handle& sock, unsigned& ms) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "wrexpire(): id=[%d], ms=[%u]", sock.id_, ms);
+    AUG_CTXDEBUG2(aug_tlx, "wrexpire(): id=[%u], ms=[%u]", sock.id_, ms);
     module_.wrexpire_(&sock, &ms);
 }
 
 void
 module::expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "expire(): id=[%d], ms=[%u]", timer.id_, ms);
+    AUG_CTXDEBUG2(aug_tlx, "expire(): id=[%u], ms=[%u]", timer.id_, ms);
     module_.expire_(&timer, &ms);
 }
 
@@ -140,6 +136,6 @@ bool
 module::authcert(const mod_handle& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "authcert(): id=[%d]", sock.id_);
+    AUG_CTXDEBUG2(aug_tlx, "authcert(): id=[%u]", sock.id_);
     return MOD_OK == module_.authcert_(&sock, subject, issuer);
 }

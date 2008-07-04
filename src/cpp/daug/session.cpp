@@ -89,19 +89,17 @@ session::do_teardown(const mod_handle& sock) const AUG_NOTHROW
 }
 
 bool
-session::do_accepted(mod_handle& sock, const char* addr,
-                     unsigned short port) const AUG_NOTHROW
+session::do_accepted(mod_handle& sock, const char* name) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
-    return module_->accepted(sock, addr, port);
+    return module_->accepted(sock, name);
 }
 
 void
-session::do_connected(mod_handle& sock, const char* addr,
-                      unsigned short port) const AUG_NOTHROW
+session::do_connected(mod_handle& sock, const char* name) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
-    module_->connected(sock, addr, port);
+    module_->connected(sock, name);
 }
 
 void

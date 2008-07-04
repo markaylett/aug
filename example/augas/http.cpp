@@ -92,7 +92,8 @@ namespace {
         pid_t pid(getpid());
 
         timeval tv;
-        aug_gettimeofday(&tv, 0);
+        clockptr clock(getclock(aug_tlx));
+        gettimeofday(clock, tv);
 
         long rand(aug_rand());
         const char* salt(mod::getenv("session.http.salt"));
@@ -267,7 +268,7 @@ namespace {
         xy = filterbase64(encoded.data(), encoded.size(), AUG_DECODE64);
         split2(xy.begin(), xy.end(), x, y, ':');
 
-        aug_info("authenticating user [%s]", x.c_str());
+        aug_ctxinfo(aug_tlx, "authenticating user [%s]", x.c_str());
 
         string digest;
         if (!getpass(x, realm, digest))
@@ -286,7 +287,8 @@ namespace {
         map<string, string> pairs;
         splitlist(pairs, list, ',');
 
-        aug_info("authenticating user [%s]", pairs["username"].c_str());
+        aug_ctxinfo(aug_tlx, "authenticating user [%s]",
+                    pairs["username"].c_str());
 
         string digest;
         if (!getpass(pairs["username"], pairs["realm"], digest))
@@ -303,7 +305,7 @@ namespace {
                            response);
 
         if (pairs["response"] != response) {
-            aug_info("access denied: expected=[%s]", response);
+            aug_ctxinfo(aug_tlx, "access denied: expected=[%s]", response);
             return false;
         }
 
@@ -436,8 +438,11 @@ namespace {
 
     class filecontent : public ref_base {
         blob<filecontent> blob_;
-        smartfd sfd_;
+        autofd sfd_;
         mmap mmap_;
+        ~filecontent() AUG_NOTHROW
+        {
+        }
         explicit
         filecontent(const char* path)
             : sfd_(aug::open(path, O_RDONLY)),
@@ -454,14 +459,14 @@ namespace {
             return null;
         }
         const void*
-        blobdata_(size_t* size) AUG_NOTHROW
+        getblobdata_(size_t* size) AUG_NOTHROW
         {
             if (size)
                 *size = mmap_.len();
             return mmap_.addr();
         }
         size_t
-        blobsize_() AUG_NOTHROW
+        getblobsize_() AUG_NOTHROW
         {
             return mmap_.len();
         }
@@ -479,7 +484,7 @@ namespace {
     sendfile(mod_id id, const string& sessid, const string& path)
     {
         smartob<aug_blob> blob(filecontent::create(path.c_str()));
-        size_t size(blobsize(blob));
+        size_t size(getblobsize(blob));
 
         stringstream header;
         header << "HTTP/1.1 200 OK\r\n"
@@ -560,7 +565,7 @@ namespace {
               auth_(false)
         {
             nonce(id_, addr_, nonce_);
-            aug_info("nonce: [%s]", nonce_);
+            aug_ctxinfo(aug_tlx, "nonce: [%s]", nonce_);
         }
         void
         message(const char* initial, aug_mar_t mar)
@@ -573,20 +578,20 @@ namespace {
 
             try {
 
-                aug_info("%s", initial);
+                aug_ctxinfo(aug_tlx, "%s", initial);
 
                 request r;
                 splitrequest(r, initial);
-                aug_info("method: [%s]", r.method_.c_str());
-                aug_info("uri: [%s]", r.uri_.c_str());
-                aug_info("version: [%s]", r.version_.c_str());
+                aug_ctxinfo(aug_tlx, "method: [%s]", r.method_.c_str());
+                aug_ctxinfo(aug_tlx, "uri: [%s]", r.uri_.c_str());
+                aug_ctxinfo(aug_tlx, "version: [%s]", r.version_.c_str());
 
                 uri u;
                 splituri(u, r.uri_);
 
-                aug_info("base: [%s]", u.base_.c_str());
-                aug_info("path: [%s]", u.path_.c_str());
-                aug_info("query: [%s]", u.query_.c_str());
+                aug_ctxinfo(aug_tlx, "base: [%s]", u.base_.c_str());
+                aug_ctxinfo(aug_tlx, "path: [%s]", u.path_.c_str());
+                aug_ctxinfo(aug_tlx, "query: [%s]", u.query_.c_str());
 
                 string contenttype, content;
 
@@ -620,7 +625,7 @@ namespace {
                     const char* value
                         (static_cast<const char*>(header.getfield(it, size)));
 
-                    aug_info("%s: %s", *it, value);
+                    aug_ctxinfo(aug_tlx, "%s: %s", *it, value);
 
                     if (0 == strcmp(*it, "Authorization")) {
 
@@ -672,7 +677,7 @@ namespace {
 
                         // Dispatch is synchronous.
 
-                        scoped_blob<stringob> blob
+                        scoped_blob<sblob> blob
                             (urlpack(values.begin(), values.end()));
 
                         dispatch("httpclient", type.c_str(), blob.base());
@@ -683,12 +688,12 @@ namespace {
                 } else {
 
                     string path(joinpath(ROOT, nodes));
-                    aug_info("path [%s]", path.c_str());
+                    aug_ctxinfo(aug_tlx, "path [%s]", path.c_str());
                     sendfile(id_, sessid_, path);
                 }
 
             } catch (const http_error& e) {
-                aug_error("%d: %s", e.status(), e.what());
+                aug_ctxerror(aug_tlx, "%d: %s", e.status(), e.what());
                 sendstatus(id_, sessid_, e.status(), e.what());
             } catch (const exception&) {
                 sendstatus(id_, sessid_, 500, "Internal Server Error");
@@ -699,7 +704,7 @@ namespace {
             const char* value(static_cast<const char*>
                               (getfield(mar, "Connection", size)));
             if (value && size && aug_strcasestr(value, "close")) {
-                aug_info("closing");
+                aug_ctxinfo(aug_tlx, "closing");
                 mod::shutdown(id_, 0);
             }
         }
@@ -710,7 +715,7 @@ namespace {
         bool
         do_start(const char* sname)
         {
-            aug_info("starting...");
+            aug_ctxinfo(aug_tlx, "starting...");
             const char* serv(mod::getenv("session.http.serv"));
             const char* realm(mod::getenv("session.http.realm"));
             if (!serv || !realm)
@@ -733,7 +738,7 @@ namespace {
             smartob<aug_blob> blob(object_cast<aug_blob>(obptr(ob)));
             if (null != blob) {
                 size_t size;
-                const void* data(blobdata(blob, &size));
+                const void* data(getblobdata(blob, &size));
                 if (data) {
                     string xml(static_cast<const char*>(data), size);
                     results_.push_back(xml);
@@ -743,7 +748,7 @@ namespace {
         void
         do_closed(const handle& sock)
         {
-            aug_info("closed");
+            aug_ctxinfo(aug_tlx, "closed");
             if (sock.user()) {
                 auto_ptr<marparser> parser(sock.user<marparser>());
                 finishmar(*parser);
@@ -775,7 +780,7 @@ namespace {
         void
         do_rdexpire(const handle& sock, unsigned& ms)
         {
-            aug_info("no data received for 30 seconds");
+            aug_ctxinfo(aug_tlx, "no data received for 30 seconds");
             shutdown(sock, 0);
         }
         ~http() AUG_NOTHROW

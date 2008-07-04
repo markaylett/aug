@@ -314,7 +314,7 @@ namespace {
     int
     shutdown_(mod_id cid, unsigned flags)
     {
-        AUG_CTXDEBUG2(aug_tlx, "shutdown(): id=[%d], flags=[%u]", cid, flags);
+        AUG_CTXDEBUG2(aug_tlx, "shutdown(): id=[%u], flags=[%u]", cid, flags);
         try {
             state_->engine_.shutdown(cid, flags);
             return 0;
@@ -324,40 +324,63 @@ namespace {
     }
 
     int
-    tcpconnect_(const char* host, const char* port, void* user)
+    tcpconnect_(const char* host, const char* port, const char* sslctx,
+                void* user)
     {
         const char* sname = getsession()->name_;
         AUG_CTXDEBUG2(aug_tlx,
                       "tcpconnect(): sname=[%s], host=[%s], port=[%s]",
                       sname, host, port);
+#if ENABLE_SSL
         try {
-            return (int)state_->engine_.tcpconnect(sname, host, port, user);
+            sslctxs::const_iterator it(state_->sslctxs_.find(sslctx));
+            if (it == state_->sslctxs_.end())
+                throw daug_error(__FILE__, __LINE__, ESSLCTX,
+                                 "SSL context [%s] not initialised", sslctx);
+
+            return (int)state_->engine_
+                .tcpconnect(sname, host, port, it->second.get(), user);
 
         } AUG_SETERRINFOCATCH;
+#else // !ENABLE_SSL
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
+                       AUG_MSG("ssl not supported"));
+#endif // !ENABLE_SSL
         return -1;
     }
 
     int
-    tcplisten_(const char* host, const char* port, void* user)
+    tcplisten_(const char* host, const char* port, const char* sslctx,
+               void* user)
     {
         const char* sname = getsession()->name_;
         AUG_CTXDEBUG2(aug_tlx,
                       "tcplisten(): sname=[%s], host=[%s], port=[%s]",
                       sname, host, port);
+#if ENABLE_SSL
         try {
+            sslctxs::const_iterator it(state_->sslctxs_.find(sslctx));
+            if (it == state_->sslctxs_.end())
+                throw daug_error(__FILE__, __LINE__, ESSLCTX,
+                                 "SSL context [%s] not initialised", sslctx);
 
             // TODO: temporarily regain root privileges.
 
-            return (int)state_->engine_.tcplisten(sname, host, port, user);
+            return (int)state_->engine_
+                .tcplisten(sname, host, port, it->second.get(), user);
 
         } AUG_SETERRINFOCATCH;
+#else // !ENABLE_SSL
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
+                       AUG_MSG("ssl not supported"));
+#endif // !ENABLE_SSL
         return -1;
     }
 
     int
     send_(mod_id cid, const void* buf, size_t len)
     {
-        AUG_CTXDEBUG2(aug_tlx, "send(): id=[%d]", cid);
+        AUG_CTXDEBUG2(aug_tlx, "send(): id=[%u]", cid);
         try {
             state_->engine_.send(cid, buf, len);
             return 0;
@@ -369,7 +392,7 @@ namespace {
     int
     sendv_(mod_id cid, aug_blob* blob)
     {
-        AUG_CTXDEBUG2(aug_tlx, "sendv(): id=[%d]", cid);
+        AUG_CTXDEBUG2(aug_tlx, "sendv(): id=[%u]", cid);
         try {
             state_->engine_.sendv(cid, blob);
             return 0;
@@ -381,7 +404,7 @@ namespace {
     int
     setrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
-        AUG_CTXDEBUG2(aug_tlx, "setrwtimer(): id=[%d], ms=[%u], flags=[%x]",
+        AUG_CTXDEBUG2(aug_tlx, "setrwtimer(): id=[%u], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
             state_->engine_.setrwtimer(cid, ms, flags);
@@ -394,7 +417,7 @@ namespace {
     int
     resetrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
-        AUG_CTXDEBUG2(aug_tlx, "resetrwtimer(): id=[%d], ms=[%u], flags=[%x]",
+        AUG_CTXDEBUG2(aug_tlx, "resetrwtimer(): id=[%u], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
             return state_->engine_.resetrwtimer(cid, ms, flags)
@@ -407,7 +430,8 @@ namespace {
     int
     cancelrwtimer_(mod_id cid, unsigned flags)
     {
-        AUG_CTXDEBUG2(aug_tlx, "cancelrwtimer(): id=[%d], flags=[%x]", cid, flags);
+        AUG_CTXDEBUG2(aug_tlx, "cancelrwtimer(): id=[%d], flags=[%x]",
+                      cid, flags);
         try {
             return state_->engine_.cancelrwtimer(cid, flags)
                 ? 0 : MOD_NONE;
@@ -431,7 +455,7 @@ namespace {
     int
     resettimer_(mod_id tid, unsigned ms)
     {
-        AUG_CTXDEBUG2(aug_tlx, "resettimer(): id=[%d], ms=[%u]", tid, ms);
+        AUG_CTXDEBUG2(aug_tlx, "resettimer(): id=[%u], ms=[%u]", tid, ms);
         try {
             return state_->engine_.resettimer(tid, ms) ? 0 : MOD_NONE;
 
@@ -442,55 +466,11 @@ namespace {
     int
     canceltimer_(mod_id tid)
     {
-        AUG_CTXDEBUG2(aug_tlx, "canceltimer(): id=[%d]", tid);
+        AUG_CTXDEBUG2(aug_tlx, "canceltimer(): id=[%u]", tid);
         try {
             return state_->engine_.canceltimer(tid) ? 0 : MOD_NONE;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
-    }
-
-    int
-    setsslclient_(mod_id cid, const char* ctx)
-    {
-        AUG_CTXDEBUG2(aug_tlx, "setsslclient(): id=[%d], ctx=[%s]", cid, ctx);
-#if ENABLE_SSL
-        try {
-            sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
-            if (it == state_->sslctxs_.end())
-                throw daug_error(__FILE__, __LINE__, ESSLCTX,
-                                 "SSL context [%s] not initialised", ctx);
-
-            state_->engine_.setsslclient(cid, *it->second);
-            return 0;
-
-        } AUG_SETERRINFOCATCH;
-#else // !ENABLE_SSL
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                       AUG_MSG("aug_setsslserver() not supported"));
-#endif // !ENABLE_SSL
-        return -1;
-    }
-
-    int
-    setsslserver_(mod_id cid, const char* ctx)
-    {
-        AUG_CTXDEBUG2(aug_tlx, "setsslserver(): id=[%d], ctx=[%s]", cid, ctx);
-#if ENABLE_SSL
-        try {
-            sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
-            if (it == state_->sslctxs_.end())
-                throw daug_error(__FILE__, __LINE__, ESSLCTX,
-                                 "SSL context [%s] not initialised", ctx);
-
-            state_->engine_.setsslclient(cid, *it->second);
-            return 0;
-
-        } AUG_SETERRINFOCATCH;
-#else // !ENABLE_SSL
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                       AUG_MSG("aug_setsslserver() not supported"));
-#endif // !ENABLE_SSL
         return -1;
     }
 
@@ -514,9 +494,7 @@ namespace {
         cancelrwtimer_,
         settimer_,
         resettimer_,
-        canceltimer_,
-        setsslclient_,
-        setsslserver_
+        canceltimer_
     };
 
     void

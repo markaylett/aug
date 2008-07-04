@@ -70,8 +70,9 @@ namespace {
             q.insert(make_pair(now = aug_timelocal(&tm), ptr));
         }
 
-        aug_info("event [%s] scheduled for %s", ptr->name_.c_str(),
-                 tmstring(*aug_localtime(&now, &tm)).c_str());
+        aug_ctxinfo(aug_tlx, "event [%s] scheduled for %s",
+                    ptr->name_.c_str(),
+                    tmstring(*aug_localtime(&now, &tm)).c_str());
     }
 
     void
@@ -177,14 +178,14 @@ namespace {
 
             unsigned ms(timerms(queue_, tv));
             if (ms) {
-                if (-1 != timer_)
+                if (timer_)
                     resettimer(timer_, ms);
                 else
                     timer_ = mod::settimer(ms, 0);
-                aug_info("next expiry in %d ms", ms);
-            } else if (-1 != timer_) {
+                aug_ctxinfo(aug_tlx, "next expiry in %d ms", ms);
+            } else if (timer_) {
                 canceltimer(timer_);
-                timer_ = -1;
+                timer_ = 0;
             }
         }
         void
@@ -192,7 +193,7 @@ namespace {
         {
             mod_id id(getvalue<mod_id>(params, "id"));
 
-            aug_info("deleting event: id=[%d]", (int)id);
+            aug_ctxinfo(aug_tlx, "deleting event: id=[%u]", id);
             eraseevent(queue_, id);
 
             timeval tv;
@@ -205,10 +206,10 @@ namespace {
             mod_id id(getvalue<mod_id>(params, "id"));
 
             if (id) {
-                aug_info("updating event: id=[%d]", id);
+                aug_ctxinfo(aug_tlx, "updating event: id=[%u]", id);
                 eraseevent(queue_, id);
             } else {
-                aug_info("inserting new event");
+                aug_ctxinfo(aug_tlx, "inserting new event");
                 id = aug_nextid();
             }
 
@@ -250,7 +251,7 @@ namespace {
 
             // Dispatch is synchronous.
 
-            scoped_blob<stringob> blob(ss.str());
+            scoped_blob<sblob> blob(ss.str());
             dispatch(from, "result", blob.base());
         }
         bool
@@ -272,7 +273,7 @@ namespace {
         void
         do_event(const char* from, const char* type, struct aug_object_* ob)
         {
-            aug_info("event [%s] triggered", type);
+            aug_ctxinfo(aug_tlx, "event [%s] triggered", type);
 
             smartob<aug_blob> blob(object_cast<aug_blob>(obptr(ob)));
             if (null == blob)
@@ -280,7 +281,7 @@ namespace {
 
             size_t size;
             const char* encoded
-                (static_cast<const char*>(blobdata(blob, &size)));
+                (static_cast<const char*>(getblobdata(blob, &size)));
             if (!encoded)
                 return;
 
@@ -310,13 +311,13 @@ namespace {
             checkexpired(tv);
 
             ms = timerms(queue_, tv);
-            aug_info("next expiry in %d ms", ms);
+            aug_ctxinfo(aug_tlx, "next expiry in %d ms", ms);
         }
         ~sched() AUG_NOTHROW
         {
         }
         sched()
-            : timer_(-1)
+            : timer_(0)
         {
         }
         static session_base*

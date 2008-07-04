@@ -42,12 +42,10 @@ namespace daug {
         do_teardown(const mod_handle& sock) const AUG_NOTHROW;
 
         bool
-        do_accepted(mod_handle& sock, const char* addr,
-                    unsigned short port) const AUG_NOTHROW;
+        do_accepted(mod_handle& sock, const char* name) const AUG_NOTHROW;
 
         void
-        do_connected(mod_handle& sock, const char* addr,
-                     unsigned short port) const AUG_NOTHROW;
+        do_connected(mod_handle& sock, const char* name) const AUG_NOTHROW;
 
         void
         do_data(const mod_handle& sock, const char* buf,
