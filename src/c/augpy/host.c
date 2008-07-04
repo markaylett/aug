@@ -189,17 +189,18 @@ shutdown_(PyObject* self, PyObject* args)
 static PyObject*
 tcpconnect_(PyObject* self, PyObject* args)
 {
-    const char* host, * serv;
+    const char* host, * serv, * sslctx = NULL;
     PyObject* user = NULL, * sock;
     int cid;
 
-    if (!PyArg_ParseTuple(args, "ss|O:tcpconnect", &host, &serv, &user))
+    if (!PyArg_ParseTuple(args, "ss|sO:tcpconnect", &host, &serv, &sslctx,
+                          &user))
         return NULL;
 
     if (!(sock = augpy_createhandle(type_, 0, user)))
         return NULL;
 
-    if (-1 == (cid = mod_tcpconnect(host, serv, sock))) {
+    if (-1 == (cid = mod_tcpconnect(host, serv, sslctx, sock))) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         Py_DECREF(sock);
         return NULL;
@@ -212,17 +213,18 @@ tcpconnect_(PyObject* self, PyObject* args)
 static PyObject*
 tcplisten_(PyObject* self, PyObject* args)
 {
-    const char* host, * serv;
+    const char* host, * serv, * sslctx = NULL;
     PyObject* user = NULL, * sock;
     int lid;
 
-    if (!PyArg_ParseTuple(args, "ss|O:tcplisten", &host, &serv, &user))
+    if (!PyArg_ParseTuple(args, "ss|sO:tcplisten", &host, &serv, &sslctx,
+                          &user))
         return NULL;
 
     if (!(sock = augpy_createhandle(type_, 0, user)))
         return NULL;
 
-    if (-1 == (lid = mod_tcplisten(host, serv, sock))) {
+    if (-1 == (lid = mod_tcplisten(host, serv, sslctx, sock))) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         Py_DECREF(sock);
         return NULL;
@@ -400,40 +402,6 @@ canceltimer_(PyObject* self, PyObject* args)
     return incret_(Py_True);
 }
 
-static PyObject*
-setsslclient_(PyObject* self, PyObject* args)
-{
-    PyObject* sock;
-    const char* ctx;
-
-    if (!PyArg_ParseTuple(args, "O!s:setsslclient", type_, &sock, &ctx))
-        return NULL;
-
-    if (-1 == mod_setsslclient(augpy_getid(sock), ctx)) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
-        return NULL;
-    }
-
-    return incret_(Py_None);
-}
-
-static PyObject*
-setsslserver_(PyObject* self, PyObject* args)
-{
-    PyObject* sock;
-    const char* ctx;
-
-    if (!PyArg_ParseTuple(args, "O!s:setsslserver", type_, &sock, &ctx))
-        return NULL;
-
-    if (-1 == mod_setsslserver(augpy_getid(sock), ctx)) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
-        return NULL;
-    }
-
-    return incret_(Py_None);
-}
-
 static PyMethodDef methods_[] = {
     {
         "writelog", writelog_, METH_VARARGS,
@@ -501,14 +469,6 @@ static PyMethodDef methods_[] = {
     },
     {
         "canceltimer", canceltimer_, METH_VARARGS,
-        "TODO"
-    },
-    {
-        "setsslclient", setsslclient_, METH_VARARGS,
-        "TODO"
-    },
-    {
-        "setsslserver", setsslserver_, METH_VARARGS,
         "TODO"
     },
     { NULL }

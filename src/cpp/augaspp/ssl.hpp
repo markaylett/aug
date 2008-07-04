@@ -56,11 +56,11 @@ namespace aug {
     AUGRTPP_API void
     initssl();
 
-    AUGRTPP_API void
-    setsslclient(conn_base& conn, sslctx& ctx);
+//     AUGRTPP_API void
+//     setsslclient(conn_base& conn, sslctx& ctx);
 
-    AUGRTPP_API void
-    setsslserver(conn_base& conn, sslctx& ctx);
+//     AUGRTPP_API void
+//     setsslserver(conn_base& conn, sslctx& ctx);
 }
 
 #endif // AUGRTPP_SSL_HPP

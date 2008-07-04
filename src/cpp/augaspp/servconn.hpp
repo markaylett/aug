@@ -81,7 +81,7 @@ namespace aug {
         ~servconn() AUG_NOTHROW;
 
         servconn(const sessionptr& session, void* user, timers& timers,
-                 const chanptr& chan, const endpoint& ep);
+                 const chanptr& chan);
     };
 }
 

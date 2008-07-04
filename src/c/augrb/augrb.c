@@ -435,20 +435,27 @@ static VALUE
 tcpconnect_(int argc, VALUE* argv, VALUE self)
 {
     VALUE host, serv, user;
+    const char* ptr;
     VALUE* sock;
     int cid;
 
-    rb_scan_args(argc, argv, "21", &host, &serv, &user);
+    rb_scan_args(argc, argv, "22", &host, &serv, &sslctx, &user);
 
     /* Type-check now to ensure string operations succeed. */
 
     Check_Type(host, T_STRING);
     serv = StringValue(serv);
+    if (sslctx == Qnil)
+        ptr = NULL;
+    else {
+        Check_Type(sslctx, T_STRING);
+        ptr = RSTRING(sslctx)->ptr;
+    }
 
     sock = register_(newhandle_(INT2FIX(0), user));
 
-    if (-1 == (cid = mod_tcpconnect(RSTRING(host)->ptr,
-                                     RSTRING(serv)->ptr, sock))) {
+    if (-1 == (cid = mod_tcpconnect(RSTRING(host)->ptr, RSTRING(serv)->ptr,
+                                    ptr, sock))) {
         unregister_(sock);
         rb_raise(cerror_, mod_error());
     }
@@ -460,21 +467,28 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
 static VALUE
 tcplisten_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE host, serv, user;
+    VALUE host, serv, sslctx, user;
+    const char* ptr;
     VALUE* sock;
     int cid;
 
-    rb_scan_args(argc, argv, "21", &host, &serv, &user);
+    rb_scan_args(argc, argv, "22", &host, &serv, &sslctx, &user);
 
     /* Type-check now to ensure string operations succeed. */
 
     Check_Type(host, T_STRING);
     serv = StringValue(serv);
+    if (sslctx == Qnil)
+        ptr = NULL;
+    else {
+        Check_Type(sslctx, T_STRING);
+        ptr = RSTRING(sslctx)->ptr;
+    }
 
     sock = register_(newhandle_(INT2FIX(0), user));
 
-    if (-1 == (cid = mod_tcplisten(RSTRING(host)->ptr,
-                                    RSTRING(serv)->ptr, sock))) {
+    if (-1 == (cid = mod_tcplisten(RSTRING(host)->ptr, RSTRING(serv)->ptr,
+                                   ptr, sock))) {
         unregister_(sock);
         rb_raise(cerror_, mod_error());
     }

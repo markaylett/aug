@@ -57,27 +57,27 @@ namespace {
             return null;
         }
         void
-        setpayload_(objectref payload) AUG_NOTHROW
+        setmsgpayload_(objectref payload) AUG_NOTHROW
         {
             payload_ = object_retain<aug_object>(payload);
         }
         const char*
-        getfrom_() AUG_NOTHROW
+        getmsgfrom_() AUG_NOTHROW
         {
             return from_.c_str();
         }
         const char*
-        getto_() AUG_NOTHROW
+        getmsgto_() AUG_NOTHROW
         {
             return to_.c_str();
         }
         const char*
-        gettype_() AUG_NOTHROW
+        getmsgtype_() AUG_NOTHROW
         {
             return type_.c_str();
         }
         smartob<aug_object>
-        getpayload_() AUG_NOTHROW
+        getmsgpayload_() AUG_NOTHROW
         {
             return payload_;
         }
@@ -201,11 +201,26 @@ namespace aug {
             void
             clearchan_(unsigned id) AUG_NOTHROW
             {
+                sockptr sock(socks_.getbyid(id));
+                socks_.erase(*sock);
             }
             aug_bool
             estabchan_(unsigned id, obref<aug_stream> stream,
                        unsigned parent) AUG_NOTHROW
             {
+                sockptr sock(socks_.getbyid(id));
+                connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
+
+                if (id == parent) {
+
+                    // Was connecting, now established: notify module of
+                    // connection establishment.
+
+                    setconnected(*cptr, now_);
+
+                }
+
+                //return accept(*sock) ? AUG_TRUE : AUG_FALSE;
                 return AUG_TRUE;
             }
             aug_bool
@@ -216,15 +231,6 @@ namespace aug {
                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
                 AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%u]", id);
-
-                if (0 == events) {
-
-                    if (null == ptr)
-                        return accept();
-
-                    return AUG_TRUE;
-                }
-                //-
 
                 bool changed = false, ok = false;
                 try {
@@ -240,36 +246,11 @@ namespace aug {
                     // Connection is closed if an exception is thrown during
                     // processing.
 
-                    socks_.erase(*cptr);
                     return AUG_FALSE;
                 }
 
-                if (HANDSHAKE == cptr->state()) {
-
-                    // The associated file descriptor may change as connection
-                    // attempts fail and alternative addresses are tried.
-
-                    insertnbfile(nbfiles_, cptr->sd(), *this);
-                    setnbeventmask(cptr->sd(), AUG_FDEVENTALL);
-
-                    socks_.update(cptr, md);
-
-                } else if (changed)
-
-                    switch (cptr->state()) {
-                    case CONNECTED:
-
-                        // Was connecting, now established: notify module of
-                        // connection establishment.
-
-                        setconnected(*cptr, now_);
-                        break;
-                    case CLOSED:
-                        socks_.erase(*cptr);
-                        return AUG_FALSE;
-                    default:
-                        break;
-                    }
+                if (changed && CLOSED == cptr->state())
+                    return AUG_FALSE;
 
                 return AUG_TRUE;
             }
@@ -288,27 +269,27 @@ namespace aug {
                                &engineimpl::stopcb>, ob);
                 }
             }
-            bool
-            accept(const sock_base& sock)
-            {
-                AUG_CTXDEBUG2(aug_tlx, "accepting connection");
+//             bool
+//             accept(const sock_base& sock)
+//             {
+//                 AUG_CTXDEBUG2(aug_tlx, "accepting connection");
 
-                connptr cptr(new servconn(sock.session(), user(sock),
-                                          timers_, sd, ep));
+//                 connptr cptr(new servconn(sock.session(), user(sock),
+//                                           timers_, sd, ep));
 
-                scoped_insert si(socks_, cptr);
-                AUG_CTXDEBUG2(aug_tlx,
-                              "initialising connection: id=[%d], fd=[%d]",
-                              id(*cptr), sd.get());
+//                 scoped_insert si(socks_, cptr);
+//                 AUG_CTXDEBUG2(aug_tlx,
+//                               "initialising connection: id=[%d], fd=[%d]",
+//                               id(*cptr), sd.get());
 
-                // Session may reject the connection by returning false.
+//                 // Session may reject the connection by returning false.
 
-                if (!cptr->accepted(ep, now_))
-                    return false;
+//                 if (!cptr->accepted(ep, now_))
+//                     return false;
 
-                si.commit();
-                return true;
-            }
+//                 si.commit();
+//                 return true;
+//             }
             bool
             readevent()
             {
@@ -340,38 +321,38 @@ namespace aug {
                 case POSTEVENT_:
                     AUG_CTXDEBUG2(aug_tlx, "received POSTEVENT_");
                     {
-                        smartob<aug_eventob> ev
-                            (object_cast<aug_eventob>(event.second));
+                        smartob<aug_msg> msg
+                            (object_cast<aug_msg>(event.second));
 
                         vector<sessionptr> sessions;
-                        sessions_.getbygroup(sessions, eventobto(ev));
+                        sessions_.getbygroup(sessions, getmsgto(msg));
 
-                        smartob<aug_object> user(eventobuser(ev));
+                        smartob<aug_object> payload(getmsgpayload(msg));
                         vector<sessionptr>
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
                         for (; it != end; ++it)
-                            (*it)->event(eventobfrom(ev), eventobtype(ev),
-                                         user);
+                            (*it)->event(getmsgfrom(msg), getmsgtype(msg),
+                                         payload);
                     }
                 }
                 return true;
             }
-            bool
-            nbfilecb(mdref md, unsigned short events)
-            {
-                sockptr sock(socks_.getbysd(md));
-                connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
+//             bool
+//             nbfilecb(mdref md, unsigned short events)
+//             {
+//                 sockptr sock(socks_.getbysd(md));
+//                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
-                AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%d], fd=[%d]",
-                              id(*sock), md.get());
+//                 AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%d], fd=[%d]",
+//                               id(*sock), md.get());
 
-                if (null != cptr)
-                    return process(cptr, md, events);
+//                 if (null != cptr)
+//                     return process(cptr, md, events);
 
-                accept(*sock);
-                return true;
-            }
+//                 accept(*sock);
+//                 return true;
+//             }
             void
             timercb(idref id, unsigned& ms)
             {
@@ -464,8 +445,7 @@ engine::run(bool stoponerr)
             if (impl_->timers_.empty()) {
 
                 scoped_unblock unblock;
-                while (AUG_FAILINTR == (ret = waitnbevents
-                                        (impl_->nbfiles_)))
+                while (AUG_FAILINTR == (ret = waitfdevents(impl_->muxer_)))
                     ;
 
             } else {
@@ -473,11 +453,11 @@ engine::run(bool stoponerr)
                 AUG_CTXDEBUG2(aug_tlx, "processing timers");
 
                 timeval tv;
-                foreachexpired(impl_->timers_, 0 == ret, tv);
+                processexpired(impl_->timers_, 0 == ret, tv);
 
                 scoped_unblock unblock;
-                while (AUG_FAILINTR == (ret = waitnbevents
-                                        (impl_->nbfiles_, tv)))
+                while (AUG_FAILINTR == (ret = waitfdevents(impl_
+                                                           ->muxer_, tv)))
                     ;
             }
 
@@ -495,13 +475,12 @@ engine::run(bool stoponerr)
 
             AUG_CTXDEBUG2(aug_tlx, "processing events");
 
-            if (fdevents(muxer_, rd_))
-                readevent();
+            if (fdevents(impl_->muxer_, impl_->eventrd_))
+                impl_->readevent();
 
             AUG_CTXDEBUG2(aug_tlx, "processing files");
 
-            foreachnbfile(impl_->nbfiles_);
-
+            processchans(impl_->chans_);
             continue;
 
         } AUG_PERRINFOCATCH;
@@ -531,11 +510,11 @@ AUGRTPP_API void
 engine::post(const char* sname, const char* to, const char* type,
              objectref ob)
 {
-    smartob<aug_eventob> ev(postevent::create(sname, to, type));
-    seteventobuser(ev, ob);
+    smartob<aug_msg> msg(msgevent::create(sname, to, type));
+    setmsgpayload(msg, ob);
     aug_event e;
     e.type_ = POSTEVENT_;
-    e.ob_ = ev.base();
+    e.ob_ = msg.base();
 
     writeevent(impl_->eventwr_, e);
 }
@@ -574,37 +553,42 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
                    void* user)
 {
     sessionptr session(impl_->sessions_.getbyname(sname));
-    connptr cptr(new clntconn(session, user, impl_->timers_, host, port));
+
+    // TODO: add SSL context here.
+
+    chanptr chan(createclient(getmpool(aug_tlx), host, port,
+                              impl_->muxer_));
+    connptr cptr(new clntconn(session, user, impl_->timers_, chan));
 
     // Remove on exception.
 
     scoped_insert si(impl_->socks_, cptr);
 
-    if (CONNECTED == cptr->state()) {
+//     if (CONNECTED == cptr->state()) {
 
-        // connected() must only be called after this function has returned.
+//         // connected() must only be called after this function has returned.
 
-        insertnbfile(impl_->nbfiles_, cptr->sd(), *impl_);
-        setnbeventmask(cptr->sd(), AUG_FDEVENTRD);
+//         insertnbfile(impl_->nbfiles_, cptr->sd(), *impl_);
+//         setnbeventmask(cptr->sd(), AUG_FDEVENTRD);
 
-        if (impl_->pending_.empty()) {
+//         if (impl_->pending_.empty()) {
 
-            // Schedule an event to ensure that connected() is called after
-            // this function has returned.
+//             // Schedule an event to ensure that connected() is called after
+//             // this function has returned.
 
-            aug_event e = { AUG_EVENTWAKEUP, 0 };
-            writeevent(impl_->eventwr_, e);
-        }
+//             aug_event e = { AUG_EVENTWAKEUP, 0 };
+//             writeevent(impl_->eventwr_, e);
+//         }
 
-        // Add to pending queue.
+//         // Add to pending queue.
 
-        impl_->pending_.push(cptr);
+//         impl_->pending_.push(cptr);
 
-    } else {
+//     } else {
 
-        insertnbfile(impl_->nbfiles_, cptr->sd(),  *impl_);
-        setnbeventmask(cptr->sd(), AUG_FDEVENTALL);
-    }
+//         insertnbfile(impl_->nbfiles_, cptr->sd(),  *impl_);
+//         setnbeventmask(cptr->sd(), AUG_FDEVENTALL);
+//     }
 
     si.commit();
     return id(*cptr);
@@ -617,10 +601,11 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     // Bind listener socket.
 
     endpoint ep(null);
-    autosd sd(aug::tcplisten(host, port, ep));
+    autosd sd(tcpserver(host, port, ep));
+    setnonblock(sd, true);
 
-    insertnbfile(impl_->nbfiles_, sd, *impl_);
-    setnbeventmask(sd, AUG_FDEVENTRD);
+    chanptr chan(createserver(getmpool(aug_tlx), impl_->muxer_, sd));
+    sd.release();
 
     inetaddr addr(null);
     AUG_CTXDEBUG2(aug_tlx, "listening: interface=[%s], port=[%d]",
@@ -630,7 +615,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     // Prepare state.
 
     sessionptr session(impl_->sessions_.getbyname(sname));
-    listenerptr lptr(new listener(session, user, sd));
+    listenerptr lptr(new listener(session, user, chan));
     scoped_insert si(impl_->socks_, lptr);
 
     si.commit();

@@ -87,11 +87,11 @@ namespace aug {
 
         mod_id
         tcpconnect(const char* sname, const char* host, const char* port,
-                   void* user);
+                   sslctx& ctx, void* user);
 
         mod_id
         tcplisten(const char* sname, const char* host, const char* port,
-                  void* user);
+                  sslctx& ctx, void* user);
 
         void
         send(mod_id cid, const void* buf, size_t len);
@@ -116,12 +116,6 @@ namespace aug {
 
         bool
         canceltimer(mod_id tid);
-
-        void
-        setsslclient(mod_id cid, sslctx& ctx);
-
-        void
-        setsslserver(mod_id cid, sslctx& ctx);
 
         bool
         stopping() const;

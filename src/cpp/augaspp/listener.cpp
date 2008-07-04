@@ -31,7 +31,7 @@ listener::do_session() const
 chanptr
 listener::do_chan() const
 {
-    return sd_;
+    return chan_;
 }
 
 sockstate
@@ -47,9 +47,9 @@ listener::~listener() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-listener::listener(const sessionptr& session, void* user, autosd& sd)
+listener::listener(const sessionptr& session, void* user, const chanptr& chan)
     : session_(session),
-      sd_(sd)
+      chan_(chan)
 {
     sock_.id_ = aug_nextid();
     sock_.user_ = user;

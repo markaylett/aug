@@ -289,13 +289,16 @@ struct mod_host {
      *
      * @param port Port or session name.
      *
+     * @param sslctx Optional name of ssl context.
+     *
      * @param user Optional user data to be associated with the resulting
      * connection.
      *
      * @return The connection id.
      */
 
-    int (*tcpconnect_)(const char* host, const char* port, void* user);
+    int (*tcpconnect_)(const char* host, const char* port, const char* sslctx,
+                       void* user);
 
     /**
      * Bind tcp listener socket.
@@ -304,10 +307,13 @@ struct mod_host {
      *
      * @param port Port to be bound.
      *
+     * @param sslctx Optional name of ssl context.
+     *
      * @param user Optional user data.
      */
 
-    int (*tcplisten_)(const char* host, const char* port, void* user);
+    int (*tcplisten_)(const char* host, const char* port, const char* sslctx,
+                      void* user);
 
     /**
      * Send data to peer.
@@ -396,26 +402,6 @@ struct mod_host {
      */
 
     int (*canceltimer_)(mod_id tid);
-
-    /**
-     * Set ssl client.
-     *
-     * @param cid Connection id.
-     *
-     * @param ctx SSL context.
-     */
-
-    int (*setsslclient_)(mod_id cid, const char* ctx);
-
-    /**
-     * Set ssl server.
-     *
-     * @param cid Connection id.
-     *
-     * @param ctx SSL context.
-     */
-
-    int (*setsslserver_)(mod_id cid, const char* ctx);
 };
 
 /** @} */
@@ -614,8 +600,6 @@ mod_gethost(void);
 #define mod_settimer      (mod_gethost()->settimer_)
 #define mod_resettimer    (mod_gethost()->resettimer_)
 #define mod_canceltimer   (mod_gethost()->canceltimer_)
-#define mod_setsslclient  (mod_gethost()->setsslclient_)
-#define mod_setsslserver  (mod_gethost()->setsslserver_)
 
 /**
  * This macro defines the module's entry points.  mod_init() should return

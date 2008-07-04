@@ -14,6 +14,7 @@ dotdepend:
 		(cd $(top_srcdir)/src/c && \
 			../pl/dotdepend -I. $$(find $$l -name "*.c" \
 			| egrep -v '([.]libs|test[.]c$$)')) \
+			| tee $$l.dot \
 			| dot -Tgif >$$l.gif; \
 	done
 

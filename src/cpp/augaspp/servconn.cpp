@@ -61,7 +61,7 @@ servconn::do_session() const
 chanptr
 servconn::do_chan() const
 {
-    return conn_.sd();
+    return conn_.chan();
 }
 
 void
@@ -132,9 +132,9 @@ servconn::~servconn() AUG_NOTHROW
 }
 
 servconn::servconn(const sessionptr& session, void* user, timers& timers,
-                   const chanptr& chan, const endpoint& ep)
+                   const chanptr& chan)
     : rwtimer_(session, sock_, timers),
-      conn_(session, sock_, buffer_, rwtimer_, chan, ep, false)
+      conn_(session, sock_, buffer_, rwtimer_, chan, false)
 {
     sock_.id_ = aug_nextid();
     sock_.user_ = user;

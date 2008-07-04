@@ -106,18 +106,20 @@ namespace mod {
     }
 
     inline mod_id
-    tcpconnect(const char* host, const char* port, void* user = 0)
+    tcpconnect(const char* host, const char* port, const char* sslctx = 0,
+               void* user = 0)
     {
-        int ret(mod_tcpconnect(host, port, user));
+        int ret(mod_tcpconnect(host, port, sslctx, user));
         if (MOD_ERROR == ret)
             throw error(mod_error());
         return static_cast<mod_id>(ret);
     }
 
     inline mod_id
-    tcplisten(const char* host, const char* port, void* user = 0)
+    tcplisten(const char* host, const char* port, const char* sslctx = 0,
+              void* user = 0)
     {
-        int ret(mod_tcplisten(host, port, user));
+        int ret(mod_tcplisten(host, port, sslctx, user));
         if (MOD_ERROR == ret)
             throw error(mod_error());
         return static_cast<mod_id>(ret);

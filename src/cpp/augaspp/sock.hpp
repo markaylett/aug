@@ -6,6 +6,8 @@
 
 #include "augaspp/object.hpp"
 
+#include "augext/chan.h"
+
 namespace aug {
 
     enum sockstate {
