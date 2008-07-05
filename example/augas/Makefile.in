@@ -59,18 +59,21 @@ modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
 modclient_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 am_modclient_la_OBJECTS = client.lo
 modclient_la_OBJECTS = $(am_modclient_la_OBJECTS)
 modcommand_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 am_modcommand_la_OBJECTS = command.lo
 modcommand_la_OBJECTS = $(am_modcommand_la_OBJECTS)
 modhttp_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 am_modhttp_la_OBJECTS = http.lo
 modhttp_la_OBJECTS = $(am_modhttp_la_OBJECTS)
 modminimal_la_DEPENDENCIES =
@@ -78,7 +81,8 @@ am_modminimal_la_OBJECTS = minimal.lo
 modminimal_la_OBJECTS = $(am_modminimal_la_OBJECTS)
 modsched_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 am_modsched_la_OBJECTS = sched.lo
 modsched_la_OBJECTS = $(am_modsched_la_OBJECTS)
 modserver_la_DEPENDENCIES =
@@ -282,13 +286,15 @@ modclient_la_SOURCES = client.cpp
 modclient_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modclient_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 modcommand_la_SOURCES = command.cpp
 modcommand_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modcommand_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 modhttp_la_SOURCES = http.cpp
 modhttp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
@@ -296,7 +302,8 @@ modhttp_la_LIBADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 modminimal_la_SOURCES = minimal.c
 modminimal_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
@@ -306,7 +313,8 @@ modsched_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modsched_la_LIBADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la
+	$(top_builddir)/src/c/augsys/libaugsys.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 modserver_la_SOURCES = server.cpp
 modserver_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
