@@ -399,7 +399,7 @@ engine::clear()
 {
     impl_->socks_.clear();
 
-    // TODO: erase the sessions in reverse order to which they were added.
+    // FIXME: erase the sessions in reverse order to which they were added.
 
     impl_->sessions_.clear();
 }
@@ -550,7 +550,7 @@ engine::shutdown(mod_id cid, unsigned flags)
 
 AUGRTPP_API mod_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
-                   sslctx* ctx, void* user)
+                   sslctx* sslctx, void* user)
 {
 #if !ENABLE_SSL
     if (ctx)

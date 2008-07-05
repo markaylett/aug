@@ -21,8 +21,8 @@ struct ssl_st;
  */
 
 AUGNET_API aug_chan*
-aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
-                 aug_muxer_t muxer, struct ssl_st* ssl);
+aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
+                 const char* serv, struct ssl_st* ssl);
 
 /**
  * Create a server socket channel.
@@ -49,7 +49,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
  */
 
 AUGNET_API aug_chan*
-aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
+aug_createplain(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
                 unsigned short mask);
 
 #endif /* AUGNET_OBJECT_H */

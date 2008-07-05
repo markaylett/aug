@@ -118,7 +118,7 @@ fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
 static int
 getsize_(const char* buf, size_t size)
 {
-    /* TODO: Alter the fix parsing logic so that it does not assume a
+    /* FIXME: Alter the fix parsing logic so that it does not assume a
        static header with a constant begin string value. */
 
     int digits;

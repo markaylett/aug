@@ -56,8 +56,8 @@ struct impl_ {
     aug_stream stream_;
     int refs_;
     aug_mpool* mpool_;
-    unsigned id_;
     aug_muxer_t muxer_;
+    unsigned id_;
     aug_sd sd_;
 
     /* The event mask from the user's perspective. */
@@ -743,7 +743,7 @@ static const struct aug_streamvtbl svtbl_ = {
 };
 
 static struct impl_*
-createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
+createssl_(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
            unsigned short mask, struct ssl_st* ssl)
 {
     struct impl_* impl;
@@ -762,8 +762,8 @@ createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
     impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->id_ = id;
     impl->muxer_ = muxer;
+    impl->id_ = id;
     impl->sd_ = sd;
     impl->mask_ = mask;
 
@@ -799,10 +799,10 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 }
 
 AUGNET_API aug_chan*
-aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
+aug_createsslclient(aug_mpool* mpool, aug_muxer_t muxer, unsigned id,
                     aug_sd sd, unsigned short mask, struct ssl_st* ssl)
 {
-    struct impl_* impl = createssl_(mpool, id, muxer, sd, mask, ssl);
+    struct impl_* impl = createssl_(mpool, muxer, id, sd, mask, ssl);
     if (!impl)
         return NULL;
 
@@ -815,10 +815,10 @@ aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
 }
 
 AUGNET_API aug_chan*
-aug_createsslserver(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
+aug_createsslserver(aug_mpool* mpool, aug_muxer_t muxer, unsigned id,
                     aug_sd sd, unsigned short mask, struct ssl_st* ssl)
 {
-    struct impl_* impl = createssl_(mpool, id, muxer, sd, mask, ssl);
+    struct impl_* impl = createssl_(mpool, muxer, id, sd, mask, ssl);
     if (!impl)
         return NULL;
 

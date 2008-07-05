@@ -53,7 +53,7 @@ setstatus_(DWORD state)
 static void WINAPI
 handler_(DWORD code)
 {
-    /* TODO: restore original status on failure to write event. */
+    /* FIXME: restore original status on failure to write event. */
 
     struct aug_event event = { 0, NULL };
     switch (code) {

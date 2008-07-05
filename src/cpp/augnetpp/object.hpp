@@ -18,11 +18,11 @@
 namespace aug {
 
     inline chanptr
-    createclient(mpoolref mpool, const char* host, const char* serv,
-                 aug_muxer_t muxer, struct ssl_st* ssl = 0)
+    createclient(mpoolref mpool, aug_muxer_t muxer, const char* host,
+                 const char* serv, struct ssl_st* ssl = 0)
     {
         return object_attach<aug_chan>
-            (verify(aug_createclient(mpool.get(), host, serv, muxer, ssl)));
+            (verify(aug_createclient(mpool.get(), muxer, host, serv, ssl)));
     }
 
     inline chanptr
@@ -34,11 +34,11 @@ namespace aug {
     }
 
     inline chanptr
-    createplain(mpoolref mpool, unsigned id, aug_muxer_t muxer, sdref sd,
+    createplain(mpoolref mpool, aug_muxer_t muxer, unsigned id, sdref sd,
                 unsigned short mask)
     {
         return object_attach<aug_chan>
-            (verify(aug_createplain(mpool.get(), id, muxer, sd.get(), mask)));
+            (verify(aug_createplain(mpool.get(), muxer, id, sd.get(), mask)));
     }
 }
 

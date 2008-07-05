@@ -161,7 +161,7 @@ aug_realpath(char* dst, const char* src, size_t size)
     int pathmax;
     char* buf;
 
-    /* TODO: The following sequence attempts to provide a safe implementation
+    /* FIXME: The following sequence attempts to provide a safe implementation
        of realpath().  Verify that this is indeed the case. */
 
     if (-1 == (pathmax = pathconf(src, _PC_PATH_MAX))) {

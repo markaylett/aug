@@ -26,8 +26,8 @@ struct cimpl_ {
     aug_chan chan_;
     int refs_;
     aug_mpool* mpool_;
-    unsigned id_;
     aug_muxer_t muxer_;
+    unsigned id_;
     aug_sd sd_;
     char name_[AUG_MAXCHANNAMELEN + 1];
     unsigned short mask_;
@@ -51,11 +51,11 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
 
     chan =
 #if ENABLE_SSL
-        impl->ssl_ ? aug_createsslclient(impl->mpool_, impl->id_,
-                                         impl->muxer_, sd, impl->mask_,
+        impl->ssl_ ? aug_createsslclient(impl->mpool_, impl->muxer_,
+                                         impl->id_, sd, impl->mask_,
                                          impl->ssl_) :
 #endif /* ENABLE_SSL */
-        aug_createplain(impl->mpool_, impl->id_, impl->muxer_, sd,
+        aug_createplain(impl->mpool_, impl->muxer_, impl->id_, sd,
                         impl->mask_);
 
     if (!chan) {
@@ -247,8 +247,8 @@ struct simpl_ {
     aug_chan chan_;
     int refs_;
     aug_mpool* mpool_;
-    unsigned id_;
     aug_muxer_t muxer_;
+    unsigned id_;
     aug_sd sd_;
     unsigned short mask_;
     struct ssl_st* ssl_;
@@ -361,10 +361,10 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         id = aug_nextid();
         chan =
 #if ENABLE_SSL
-            impl->ssl_ ? aug_createsslserver(impl->mpool_, id, impl->muxer_,
+            impl->ssl_ ? aug_createsslserver(impl->mpool_, impl->muxer_, id,
                                              sd, impl->mask_, impl->ssl_) :
 #endif /* ENABLE_SSL */
-            aug_createplain(impl->mpool_, id, impl->muxer_, sd, impl->mask_);
+            aug_createplain(impl->mpool_, impl->muxer_, id, sd, impl->mask_);
 
         if (!chan) {
             aug_ctxwarn(aug_tlx, "aug_createplain() or aug_createsslserver()"
@@ -457,8 +457,8 @@ struct pimpl_ {
     aug_stream stream_;
     int refs_;
     aug_mpool* mpool_;
-    unsigned id_;
     aug_muxer_t muxer_;
+    unsigned id_;
     aug_sd sd_;
 };
 
@@ -661,8 +661,8 @@ static const struct aug_streamvtbl pstreamvtbl_ = {
 };
 
 AUGNET_API aug_chan*
-aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
-                 aug_muxer_t muxer, struct ssl_st* ssl)
+aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
+                 const char* serv, struct ssl_st* ssl)
 {
     aug_tcpconnect_t conn;
     aug_sd sd;
@@ -702,8 +702,8 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     impl->chan_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->id_ = aug_nextid();
     impl->muxer_ = muxer;
+    impl->id_ = aug_nextid();
     impl->sd_ = sd;
     strcpy(impl->name_, name);
 
@@ -754,8 +754,8 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     impl->chan_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->id_ = aug_nextid();
     impl->muxer_ = muxer;
+    impl->id_ = aug_nextid();
     impl->sd_ = sd;
 
     /* Default for new connections. */
@@ -768,7 +768,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
 }
 
 AUGNET_API aug_chan*
-aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
+aug_createplain(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
                 unsigned short mask)
 {
     struct pimpl_* impl;
@@ -787,8 +787,8 @@ aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
     impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->id_ = id;
     impl->muxer_ = muxer;
+    impl->id_ = id;
     impl->sd_ = sd;
 
     aug_retain(mpool);
