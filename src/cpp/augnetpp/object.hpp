@@ -19,18 +19,19 @@ namespace aug {
 
     inline chanptr
     createclient(mpoolref mpool, aug_muxer_t muxer, const char* host,
-                 const char* serv, struct ssl_st* ssl = 0)
+                 const char* serv, struct ssl_ctx_st* sslctx = 0)
     {
         return object_attach<aug_chan>
-            (verify(aug_createclient(mpool.get(), muxer, host, serv, ssl)));
+            (verify(aug_createclient(mpool.get(), muxer, host, serv,
+                                     sslctx)));
     }
 
     inline chanptr
     createserver(mpoolref mpool, aug_muxer_t muxer, sdref sd,
-                 struct ssl_st* ssl = 0)
+                 struct ssl_ctx_st* sslctx = 0)
     {
         return object_attach<aug_chan>
-            (verify(aug_createserver(mpool.get(), muxer, sd.get(), ssl)));
+            (verify(aug_createserver(mpool.get(), muxer, sd.get(), sslctx)));
     }
 
     inline chanptr

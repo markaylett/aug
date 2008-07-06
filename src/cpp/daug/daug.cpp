@@ -430,7 +430,7 @@ namespace {
     int
     cancelrwtimer_(mod_id cid, unsigned flags)
     {
-        AUG_CTXDEBUG2(aug_tlx, "cancelrwtimer(): id=[%d], flags=[%x]",
+        AUG_CTXDEBUG2(aug_tlx, "cancelrwtimer(): id=[%u], flags=[%x]",
                       cid, flags);
         try {
             return state_->engine_.cancelrwtimer(cid, flags)

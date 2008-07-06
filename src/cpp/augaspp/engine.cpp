@@ -550,7 +550,7 @@ engine::shutdown(mod_id cid, unsigned flags)
 
 AUGRTPP_API mod_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
-                   sslctx* sslctx, void* user)
+                   sslctx* ctx, void* user)
 {
 #if !ENABLE_SSL
     if (ctx)
@@ -560,10 +560,8 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
 
     sessionptr session(impl_->sessions_.getbyname(sname));
 
-    // TODO: add SSL context here.
-
-    chanptr chan(createclient(getmpool(aug_tlx), host, port,
-                              impl_->muxer_));
+    chanptr chan(createclient(getmpool(aug_tlx), impl_->muxer_, host, port,
+                              ctx ? ctx->get() : 0));
     connptr cptr(new clntconn(session, user, impl_->timers_, chan));
 
     // Remove on exception.
@@ -616,7 +614,8 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     autosd sd(tcpserver(host, port, ep));
     setnonblock(sd, true);
 
-    chanptr chan(createserver(getmpool(aug_tlx), impl_->muxer_, sd));
+    chanptr chan(createserver(getmpool(aug_tlx), impl_->muxer_, sd,
+                              ctx ? ctx->get() : 0));
     sd.release();
 
     inetaddr addr(null);
@@ -720,40 +719,6 @@ engine::canceltimer(mod_id tid)
         impl_->sessiontimers_.erase(tid);
     return ret;
 }
-
-// AUGRTPP_API void
-// engine::setsslclient(mod_id cid, sslctx& ctx)
-// {
-// #if ENABLE_SSL
-//     connptr cptr(smartptr_cast<
-//                  conn_base>(impl_->socks_.getbyid(cid)));
-//     if (null == cptr)
-//         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-//                         "connection not found: id=[%d]", cid);
-
-//     aug::setsslclient(*cptr, ctx);
-// #else // !ENABLE_SSL
-//     throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
-//                     AUG_MSG("aug_setsslclient() not supported"));
-// #endif // !ENABLE_SSL
-// }
-
-// AUGRTPP_API void
-// engine::setsslserver(mod_id cid, sslctx& ctx)
-// {
-// #if ENABLE_SSL
-//     connptr cptr(smartptr_cast<
-//                  conn_base>(impl_->socks_.getbyid(cid)));
-//     if (null == cptr)
-//         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-//                         "connection not found: id=[%d]", cid);
-
-//     aug::setsslserver(*cptr, ctx);
-// #else // !ENABLE_SSL
-//     throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
-//                     AUG_MSG("aug_setsslserver() not supported"));
-// #endif // !ENABLE_SSL
-// }
 
 AUGRTPP_API bool
 engine::stopping() const

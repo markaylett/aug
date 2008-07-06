@@ -31,7 +31,7 @@ struct cimpl_ {
     aug_sd sd_;
     char name_[AUG_MAXCHANNAMELEN + 1];
     unsigned short mask_;
-    struct ssl_st* ssl_;
+    struct ssl_ctx_st* sslctx_;
     aug_tcpconnect_t conn_;
     int est_;
 };
@@ -51,9 +51,9 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
 
     chan =
 #if ENABLE_SSL
-        impl->ssl_ ? aug_createsslclient(impl->mpool_, impl->muxer_,
-                                         impl->id_, sd, impl->mask_,
-                                         impl->ssl_) :
+        impl->sslctx_ ?
+        aug_createsslclient(impl->mpool_, impl->muxer_, impl->id_, sd,
+                            impl->mask_, impl->sslctx_) :
 #endif /* ENABLE_SSL */
         aug_createplain(impl->mpool_, impl->muxer_, impl->id_, sd,
                         impl->mask_);
@@ -251,7 +251,7 @@ struct simpl_ {
     unsigned id_;
     aug_sd sd_;
     unsigned short mask_;
-    struct ssl_st* ssl_;
+    struct ssl_ctx_st* sslctx_;
 };
 
 static aug_result
@@ -361,8 +361,9 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         id = aug_nextid();
         chan =
 #if ENABLE_SSL
-            impl->ssl_ ? aug_createsslserver(impl->mpool_, impl->muxer_, id,
-                                             sd, impl->mask_, impl->ssl_) :
+            impl->sslctx_ ?
+            aug_createsslserver(impl->mpool_, impl->muxer_, id, sd,
+                                impl->mask_, impl->sslctx_) :
 #endif /* ENABLE_SSL */
             aug_createplain(impl->mpool_, impl->muxer_, id, sd, impl->mask_);
 
@@ -662,7 +663,7 @@ static const struct aug_streamvtbl pstreamvtbl_ = {
 
 AUGNET_API aug_chan*
 aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
-                 const char* serv, struct ssl_st* ssl)
+                 const char* serv, struct ssl_ctx_st* sslctx)
 {
     aug_tcpconnect_t conn;
     aug_sd sd;
@@ -710,7 +711,7 @@ aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
     /* Default when established. */
 
     impl->mask_ = AUG_FDEVENTRD;
-    impl->ssl_ = ssl;
+    impl->sslctx_ = sslctx;
     impl->conn_ = conn;
     impl->est_ = est;
 
@@ -738,7 +739,7 @@ aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
 
 AUGNET_API aug_chan*
 aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
-                 struct ssl_st* ssl)
+                 struct ssl_ctx_st* sslctx)
 {
     struct simpl_* impl;
 
@@ -761,7 +762,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     /* Default for new connections. */
 
     impl->mask_ = AUG_FDEVENTRD;
-    impl->ssl_ = ssl;
+    impl->sslctx_ = sslctx;
 
     aug_retain(mpool);
     return &impl->chan_;

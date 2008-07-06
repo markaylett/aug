@@ -11,7 +11,7 @@
 #include "augext/chan.h"
 #include "augext/mpool.h"
 
-struct ssl_st;
+struct ssl_ctx_st;
 
 /**
  * Create a client socket channel.
@@ -22,7 +22,7 @@ struct ssl_st;
 
 AUGNET_API aug_chan*
 aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
-                 const char* serv, struct ssl_st* ssl);
+                 const char* serv, struct ssl_ctx_st* sslctx);
 
 /**
  * Create a server socket channel.
@@ -36,7 +36,7 @@ aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
 
 AUGNET_API aug_chan*
 aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
-                 struct ssl_st* ssl);
+                 struct ssl_ctx_st* sslctx);
 
 /**
  * Create a plain socket channel.

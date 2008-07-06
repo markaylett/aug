@@ -18,7 +18,7 @@
 #include "augext/mpool.h"
 
 struct aug_errinfo;
-struct ssl_st;
+struct ssl_ctx_st;
 
 AUGNET_API void
 aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
@@ -36,7 +36,8 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 
 AUGNET_API aug_chan*
 aug_createsslclient(aug_mpool* mpool, aug_muxer_t muxer, unsigned id,
-                    aug_sd sd, unsigned short mask, struct ssl_st* ssl);
+                    aug_sd sd, unsigned short mask,
+                    struct ssl_ctx_st* sslctx);
 
 /**
  * Create an ssl server channel.
@@ -50,6 +51,7 @@ aug_createsslclient(aug_mpool* mpool, aug_muxer_t muxer, unsigned id,
 
 AUGNET_API aug_chan*
 aug_createsslserver(aug_mpool* mpool, aug_muxer_t muxer, unsigned id,
-                    aug_sd sd, unsigned short mask, struct ssl_st* ssl);
+                    aug_sd sd, unsigned short mask,
+                    struct ssl_ctx_st* ctxssl);
 
 #endif /* AUGNET_SSL_H */
