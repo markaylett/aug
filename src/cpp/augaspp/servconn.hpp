@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_SERVCONN_HPP
-#define AUGRTPP_SERVCONN_HPP
+#ifndef AUGASPP_SERVCONN_HPP
+#define AUGASPP_SERVCONN_HPP
 
 #include "augaspp/buffer.hpp"
 #include "augaspp/conn.hpp"
@@ -85,4 +85,4 @@ namespace aug {
     };
 }
 
-#endif // AUGRTPP_SERVCONN_HPP
+#endif // AUGASPP_SERVCONN_HPP

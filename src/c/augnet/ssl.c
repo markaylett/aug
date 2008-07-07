@@ -772,7 +772,7 @@ createssl_(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
     /* SSL state */
 
     ssl = SSL_new(sslctx);
-    bio = BIO_new_socket(sd, BIO_NOCLOSE);
+    bio = BIO_new_socket((int)sd, BIO_NOCLOSE);
     SSL_set_bio(ssl, bio, bio);
 
     impl->ssl_ = ssl;

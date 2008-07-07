@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_SOCK_HPP
-#define AUGRTPP_SOCK_HPP
+#ifndef AUGASPP_SOCK_HPP
+#define AUGASPP_SOCK_HPP
 
 #include "augaspp/object.hpp"
 
@@ -46,4 +46,4 @@ namespace aug {
     typedef smartptr<sock_base> sockptr;
 }
 
-#endif // AUGRTPP_SOCK_HPP
+#endif // AUGASPP_SOCK_HPP

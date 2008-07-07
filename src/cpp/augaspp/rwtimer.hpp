@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_RWTIMER_HPP
-#define AUGRTPP_RWTIMER_HPP
+#ifndef AUGASPP_RWTIMER_HPP
+#define AUGASPP_RWTIMER_HPP
 
 #include "augaspp/session.hpp"
 
@@ -91,4 +91,4 @@ namespace aug {
     };
 }
 
-#endif // AUGRTPP_RWTIMER_HPP
+#endif // AUGASPP_RWTIMER_HPP

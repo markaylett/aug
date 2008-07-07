@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGRTPP_BUILD
+#define AUGASPP_BUILD
 #include "augaspp/engine.hpp"
 #include "augctx/defs.h"
 
@@ -88,29 +88,9 @@ namespace {
             return object_attach<aug_msg>(ptr->msg_);
         }
     };
-
-    typedef std::queue<connptr> pending;
-
-    void
-    setconnected(conn_base& conn, const timeval& now)
-    {
-        // Connection has now been established.
-
-        //setsockopts(conn.sd());
-
-        string name(conn.peername());
-        inetaddr addr(null);
-        AUG_CTXDEBUG2(aug_tlx, "connected: name=[%s]", name.c_str());
-
-        //setnbeventmask(conn.sd(), AUG_FDEVENTRD);
-
-        // Notify session of establishment.
-
-        conn.connected(name, now);
-    }
 }
 
-AUGRTPP_API
+AUGASPP_API
 enginecb_base::~enginecb_base() AUG_NOTHROW
 {
 }
@@ -153,10 +133,6 @@ namespace aug {
             // Mapping of timer-ids to sessions.
 
             sessiontimers sessiontimers_;
-
-            // Pending calls to connected().
-
-            pending pending_;
 
             timeval now_;
 
@@ -208,19 +184,47 @@ namespace aug {
             estabchan_(unsigned id, obref<aug_stream> stream,
                        unsigned parent) AUG_NOTHROW
             {
-                sockptr sock(socks_.getbyid(id));
-                connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
-
                 if (id == parent) {
 
                     // Was connecting, now established: notify module of
                     // connection establishment.
 
-                    setconnected(*cptr, now_);
+                    sockptr sock(socks_.getbyid(id));
+                    connptr conn(smartptr_cast<conn_base>(sock)); // Downcast.
 
+                    // Connection has now been established.
+
+                    string name(conn->peername());
+                    AUG_CTXDEBUG2(aug_tlx, "connected: name=[%s]",
+                                  name.c_str());
+
+                    // Notify session of establishment.
+
+                    conn->connected(name, now_);
+                    return AUG_TRUE;
                 }
 
-                //return accept(*sock) ? AUG_TRUE : AUG_FALSE;
+                AUG_CTXDEBUG2(aug_tlx, "accepting connection");
+
+                sockptr sock(socks_.getbyid(parent));
+                chanptr chan(object_cast<aug_chan>(stream));
+                connptr conn(new servconn(sock->session(), user(*sock),
+                                          timers_, chan));
+                scoped_insert si(socks_, conn);
+
+                // Connection has now been established.
+
+                string name(conn->peername());
+                AUG_CTXDEBUG2(aug_tlx,
+                              "initialising connection: id=[%u], name=[%s]",
+                              aug::id(*conn), name.c_str());
+
+                // Session may reject the connection by returning false.
+
+                if (!conn->accepted(name, now_))
+                    return AUG_FALSE;
+
+                si.commit();
                 return AUG_TRUE;
             }
             aug_bool
@@ -269,27 +273,6 @@ namespace aug {
                                &engineimpl::stopcb>, ob);
                 }
             }
-//             bool
-//             accept(const sock_base& sock)
-//             {
-//                 AUG_CTXDEBUG2(aug_tlx, "accepting connection");
-
-//                 connptr cptr(new servconn(sock.session(), user(sock),
-//                                           timers_, sd, ep));
-
-//                 scoped_insert si(socks_, cptr);
-//                 AUG_CTXDEBUG2(aug_tlx,
-//                               "initialising connection: id=[%d], fd=[%d]",
-//                               id(*cptr), sd.get());
-
-//                 // Session may reject the connection by returning false.
-
-//                 if (!cptr->accepted(ep, now_))
-//                     return false;
-
-//                 si.commit();
-//                 return true;
-//             }
             bool
             readevent()
             {
@@ -338,21 +321,6 @@ namespace aug {
                 }
                 return true;
             }
-//             bool
-//             nbfilecb(mdref md, unsigned short events)
-//             {
-//                 sockptr sock(socks_.getbysd(md));
-//                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
-
-//                 AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%d], fd=[%d]",
-//                               id(*sock), md.get());
-
-//                 if (null != cptr)
-//                     return process(cptr, md, events);
-
-//                 accept(*sock);
-//                 return true;
-//             }
             void
             timercb(idref id, unsigned& ms)
             {
@@ -381,20 +349,20 @@ namespace aug {
     }
 }
 
-AUGRTPP_API
+AUGASPP_API
 engine::~engine() AUG_NOTHROW
 {
     delete impl_;
 }
 
-AUGRTPP_API
+AUGASPP_API
 engine::engine(mdref eventrd, mdref eventwr, timers& timers,
                enginecb_base& cb)
     : impl_(new detail::engineimpl(eventrd, eventwr, timers, cb))
 {
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::clear()
 {
     impl_->socks_.clear();
@@ -404,14 +372,14 @@ engine::clear()
     impl_->sessions_.clear();
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::insert(const string& name, const sessionptr& session,
                const char* groups)
 {
     impl_->sessions_.insert(name, session, groups);
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::cancelinactive()
 {
     // Remove any timers allocated to sessions that could not be opened.
@@ -429,7 +397,7 @@ engine::cancelinactive()
     }
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::run(bool stoponerr)
 {
     AUG_CTXDEBUG2(aug_tlx, "running daemon process");
@@ -465,14 +433,6 @@ engine::run(bool stoponerr)
 
             gettimeofday(impl_->now_);
 
-            // Notify of any established connections before processing the
-            // files: data may have arrived on a newly established connection.
-
-            while (!impl_->pending_.empty()) {
-                setconnected(*impl_->pending_.front(), impl_->now_);
-                impl_->pending_.pop();
-            }
-
             AUG_CTXDEBUG2(aug_tlx, "processing events");
 
             if (fdevents(impl_->muxer_, impl_->eventrd_))
@@ -492,21 +452,21 @@ engine::run(bool stoponerr)
     }
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::reconfall()
 {
     aug_event e = { AUG_EVENTRECONF, 0 };
     writeevent(impl_->eventwr_, e);
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::stopall()
 {
     aug_event e = { AUG_EVENTSTOP, 0 };
     writeevent(impl_->eventwr_, e);
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::post(const char* sname, const char* to, const char* type,
              objectref ob)
 {
@@ -519,7 +479,7 @@ engine::post(const char* sname, const char* to, const char* type,
     writeevent(impl_->eventwr_, e);
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::dispatch(const char* sname, const char* to, const char* type,
                  objectref ob)
 {
@@ -532,7 +492,7 @@ engine::dispatch(const char* sname, const char* to, const char* type,
         (*it)->event(sname, type, ob);
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::shutdown(mod_id cid, unsigned flags)
 {
     sockptr sock(impl_->socks_.getbyid(cid));
@@ -548,7 +508,7 @@ engine::shutdown(mod_id cid, unsigned flags)
         impl_->socks_.erase(*sock);
 }
 
-AUGRTPP_API mod_id
+AUGASPP_API mod_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
                    sslctx* ctx, void* user)
 {
@@ -562,43 +522,12 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
 
     chanptr chan(createclient(getmpool(aug_tlx), impl_->muxer_, host, port,
                               ctx ? ctx->get() : 0));
-    connptr cptr(new clntconn(session, user, impl_->timers_, chan));
-
-    // Remove on exception.
-
-    scoped_insert si(impl_->socks_, cptr);
-
-//     if (CONNECTED == cptr->state()) {
-
-//         // connected() must only be called after this function has returned.
-
-//         insertnbfile(impl_->nbfiles_, cptr->sd(), *impl_);
-//         setnbeventmask(cptr->sd(), AUG_FDEVENTRD);
-
-//         if (impl_->pending_.empty()) {
-
-//             // Schedule an event to ensure that connected() is called after
-//             // this function has returned.
-
-//             aug_event e = { AUG_EVENTWAKEUP, 0 };
-//             writeevent(impl_->eventwr_, e);
-//         }
-
-//         // Add to pending queue.
-
-//         impl_->pending_.push(cptr);
-
-//     } else {
-
-//         insertnbfile(impl_->nbfiles_, cptr->sd(),  *impl_);
-//         setnbeventmask(cptr->sd(), AUG_FDEVENTALL);
-//     }
-
-    si.commit();
-    return id(*cptr);
+    connptr conn(new clntconn(session, user, impl_->timers_, chan));
+    impl_->socks_.insert(conn);
+    return id(*conn);
 }
 
-AUGRTPP_API mod_id
+AUGASPP_API mod_id
 engine::tcplisten(const char* sname, const char* host, const char* port,
                   sslctx* ctx, void* user)
 {
@@ -633,7 +562,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     return id(*lptr);
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::send(mod_id cid, const void* buf, size_t len)
 {
     if (!impl_->socks_.send(cid, buf, len, impl_->now_))
@@ -641,7 +570,7 @@ engine::send(mod_id cid, const void* buf, size_t len)
                         "connection has been shutdown");
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::sendv(mod_id cid, blobref blob)
 {
     if (!impl_->socks_.sendv(cid, blob, impl_->now_))
@@ -649,7 +578,7 @@ engine::sendv(mod_id cid, blobref blob)
                         "connection has been shutdown");
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 engine::setrwtimer(mod_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
@@ -660,7 +589,7 @@ engine::setrwtimer(mod_id cid, unsigned ms, unsigned flags)
     rwtimer->setrwtimer(ms, flags);
 }
 
-AUGRTPP_API bool
+AUGASPP_API bool
 engine::resetrwtimer(mod_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
@@ -672,7 +601,7 @@ engine::resetrwtimer(mod_id cid, unsigned ms, unsigned flags)
     return rwtimer->resetrwtimer(ms, flags);
 }
 
-AUGRTPP_API bool
+AUGASPP_API bool
 engine::cancelrwtimer(mod_id cid, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
@@ -683,7 +612,7 @@ engine::cancelrwtimer(mod_id cid, unsigned flags)
     return rwtimer->cancelrwtimer(flags);
 }
 
-AUGRTPP_API mod_id
+AUGASPP_API mod_id
 engine::settimer(const char* sname, unsigned ms, objectref ob)
 {
     mod_id id(aug_nextid());
@@ -700,13 +629,13 @@ engine::settimer(const char* sname, unsigned ms, objectref ob)
     return id;
 }
 
-AUGRTPP_API bool
+AUGASPP_API bool
 engine::resettimer(mod_id tid, unsigned ms)
 {
     return aug::resettimer(impl_->timers_, tid, ms);
 }
 
-AUGRTPP_API bool
+AUGASPP_API bool
 engine::canceltimer(mod_id tid)
 {
     bool ret(aug::canceltimer(impl_->timers_, tid));
@@ -720,7 +649,7 @@ engine::canceltimer(mod_id tid)
     return ret;
 }
 
-AUGRTPP_API bool
+AUGASPP_API bool
 engine::stopping() const
 {
     return detail::engineimpl::STARTED != impl_->state_;

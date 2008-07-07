@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_ENGINE_HPP
-#define AUGRTPP_ENGINE_HPP
+#ifndef AUGASPP_ENGINE_HPP
+#define AUGASPP_ENGINE_HPP
 
 #include "augaspp/session.hpp"
 
@@ -12,16 +12,18 @@
 
 #include "augmod.h"
 
+#include <string>
+
 namespace aug {
 
-    class AUGRTPP_API sslctx;
+    class AUGASPP_API sslctx;
     class timers;
 
     namespace detail {
         struct engineimpl;
     }
 
-    class AUGRTPP_API enginecb_base {
+    class AUGASPP_API enginecb_base {
         virtual void
         do_reconf() = 0;
 
@@ -36,7 +38,7 @@ namespace aug {
         }
     };
 
-    class AUGRTPP_API engine {
+    class AUGASPP_API engine {
 
         detail::engineimpl* const impl_;
 
@@ -122,4 +124,4 @@ namespace aug {
     };
 }
 
-#endif // AUGRTPP_ENGINE_HPP
+#endif // AUGASPP_ENGINE_HPP

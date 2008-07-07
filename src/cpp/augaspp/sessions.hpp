@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_SESSIONS_HPP
-#define AUGRTPP_SESSIONS_HPP
+#ifndef AUGASPP_SESSIONS_HPP
+#define AUGASPP_SESSIONS_HPP
 
 #include "augaspp/session.hpp"
 
@@ -49,4 +49,4 @@ namespace aug {
     };
 }
 
-#endif // AUGRTPP_SESSIONS_HPP
+#endif // AUGASPP_SESSIONS_HPP

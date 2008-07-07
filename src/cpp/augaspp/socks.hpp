@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_SOCKS_HPP
-#define AUGRTPP_SOCKS_HPP
+#ifndef AUGASPP_SOCKS_HPP
+#define AUGASPP_SOCKS_HPP
 
 #include "augaspp/session.hpp"
 #include "augaspp/sock.hpp"
@@ -87,4 +87,4 @@ namespace aug {
     };
 }
 
-#endif // AUGRTPP_SOCKS_HPP
+#endif // AUGASPP_SOCKS_HPP

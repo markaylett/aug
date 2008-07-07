@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_SSL_HPP
-#define AUGRTPP_SSL_HPP
+#ifndef AUGASPP_SSL_HPP
+#define AUGASPP_SSL_HPP
 
 #include "augaspp/config.hpp"
 #include "augsyspp/exception.hpp"
@@ -26,7 +26,7 @@ namespace aug {
         }
     };
 
-    class AUGRTPP_API sslctx {
+    class AUGASPP_API sslctx {
 
         ssl_ctx_st* const ctx_;
 
@@ -53,14 +53,14 @@ namespace aug {
 
     typedef smartptr<sslctx> sslctxptr;
 
-    AUGRTPP_API void
+    AUGASPP_API void
     initssl();
 
-//     AUGRTPP_API void
+//     AUGASPP_API void
 //     setsslclient(conn_base& conn, sslctx& ctx);
 
-//     AUGRTPP_API void
+//     AUGASPP_API void
 //     setsslserver(conn_base& conn, sslctx& ctx);
 }
 
-#endif // AUGRTPP_SSL_HPP
+#endif // AUGASPP_SSL_HPP

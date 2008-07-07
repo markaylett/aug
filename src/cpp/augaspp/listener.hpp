@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_LISTENER_HPP
-#define AUGRTPP_LISTENER_HPP
+#ifndef AUGASPP_LISTENER_HPP
+#define AUGASPP_LISTENER_HPP
 
 #include "augaspp/sock.hpp"
 
@@ -40,4 +40,4 @@ namespace aug {
     typedef smartptr<listener> listenerptr;
 }
 
-#endif // AUGRTPP_LISTENER_HPP
+#endif // AUGASPP_LISTENER_HPP

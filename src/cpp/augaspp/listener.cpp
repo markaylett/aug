@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGRTPP_BUILD
+#define AUGASPP_BUILD
 #include "augaspp/listener.hpp"
 #include "augctx/defs.h"
 
@@ -51,6 +51,6 @@ listener::listener(const sessionptr& session, void* user, const chanptr& chan)
     : session_(session),
       chan_(chan)
 {
-    sock_.id_ = aug_nextid();
+    sock_.id_ = getchanid(chan);
     sock_.user_ = user;
 }

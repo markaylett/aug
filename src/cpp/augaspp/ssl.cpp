@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGRTPP_BUILD
+#define AUGASPP_BUILD
 #include "augaspp/ssl.hpp"
 #include "augctx/defs.h"
 
@@ -16,13 +16,13 @@ AUG_RCSID("$Id$");
 
 using namespace aug;
 
-AUGRTPP_API
+AUGASPP_API
 sslctx::~sslctx() AUG_NOTHROW
 {
     SSL_CTX_free(ctx_);
 }
 
-AUGRTPP_API
+AUGASPP_API
 sslctx::sslctx()
     : ctx_(SSL_CTX_new(SSLv23_method()))
 {
@@ -30,7 +30,7 @@ sslctx::sslctx()
         throw ssl_error(__FILE__, __LINE__, ERR_get_error());
 }
 
-AUGRTPP_API void
+AUGASPP_API void
 aug::initssl()
 {
     // Global system initialization.
@@ -39,7 +39,7 @@ aug::initssl()
     SSL_load_error_strings();
 }
 
-// AUGRTPP_API void
+// AUGASPP_API void
 // aug::setsslclient(conn_base& conn, sslctx& ctx)
 // {
 //     SSL* ssl = SSL_new(ctx);
@@ -49,7 +49,7 @@ aug::initssl()
 //     aug_setsslclient(conn.sd().get(), ssl);
 // }
 
-// AUGRTPP_API void
+// AUGASPP_API void
 // aug::setsslserver(conn_base& conn, sslctx& ctx)
 // {
 //     SSL* ssl = SSL_new(ctx);

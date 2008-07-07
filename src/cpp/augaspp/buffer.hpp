@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_BUFFER_HPP
-#define AUGRTPP_BUFFER_HPP
+#ifndef AUGASPP_BUFFER_HPP
+#define AUGASPP_BUFFER_HPP
 
 #include "augaspp/config.hpp"
 #include "augsyspp/types.hpp"
@@ -136,4 +136,4 @@ namespace aug {
     };
 }
 
-#endif // AUGRTPP_BUFFER_HPP
+#endif // AUGASPP_BUFFER_HPP

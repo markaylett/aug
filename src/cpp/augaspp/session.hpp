@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_SESSION_HPP
-#define AUGRTPP_SESSION_HPP
+#ifndef AUGASPP_SESSION_HPP
+#define AUGASPP_SESSION_HPP
 
 #include "augaspp/config.hpp"
 
@@ -14,7 +14,7 @@
 
 namespace aug {
 
-    class AUGRTPP_API session_base {
+    class AUGASPP_API session_base {
     public:
         typedef mod_session ctype;
     private:
@@ -169,4 +169,4 @@ namespace aug {
     typedef smartptr<session_base> sessionptr;
 }
 
-#endif // AUGRTPP_SESSION_HPP
+#endif // AUGASPP_SESSION_HPP

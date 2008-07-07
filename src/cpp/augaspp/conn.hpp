@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_CONN_HPP
-#define AUGRTPP_CONN_HPP
+#ifndef AUGASPP_CONN_HPP
+#define AUGASPP_CONN_HPP
 
 #include "augaspp/rwtimer.hpp"
 #include "augaspp/sock.hpp"
@@ -184,4 +184,4 @@ namespace aug {
     };
 }
 
-#endif // AUGRTPP_CONN_HPP
+#endif // AUGASPP_CONN_HPP

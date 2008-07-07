@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#define AUGRTPP_BUILD
+#define AUGASPP_BUILD
 #include "augaspp/clntconn.hpp"
 #include "augctx/defs.h"
 
@@ -136,6 +136,6 @@ clntconn::clntconn(const sessionptr& session, void* user, timers& timers,
     : rwtimer_(session, sock_, timers),
       conn_(session, sock_, buffer_, rwtimer_, chan, true)
 {
-    sock_.id_ = aug_nextid();
+    sock_.id_ = getchanid(chan);
     sock_.user_ = user;
 }

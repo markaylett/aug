@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGRTPP_OBJECT_HPP
-#define AUGRTPP_OBJECT_HPP
+#ifndef AUGASPP_OBJECT_HPP
+#define AUGASPP_OBJECT_HPP
 
 #include "augaspp/session.hpp"
 
@@ -68,4 +68,4 @@ namespace aug {
     }
 }
 
-#endif // AUGRTPP_OBJECT_HPP
+#endif // AUGASPP_OBJECT_HPP
