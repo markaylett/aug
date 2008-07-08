@@ -555,16 +555,16 @@ namespace {
         const string& realm_;
         mod_id id_;
         string sessid_;
-        const string addr_;
+        const string name_;
         aug_md5base64_t nonce_;
         bool auth_;
-        session(const string& realm, mod_id id, const string& addr)
+        session(const string& realm, mod_id id, const string& name)
             : realm_(realm),
               id_(id),
-              addr_(addr),
+              name_(name),
               auth_(false)
         {
-            nonce(id_, addr_, nonce_);
+            nonce(id_, name_, nonce_);
             aug_ctxinfo(aug_tlx, "nonce: [%s]", nonce_);
         }
         void
@@ -573,7 +573,7 @@ namespace {
             static const char ROOT[] = "./htdocs";
 
             if (sessid_.empty())
-                sessid_ = getsessid(id_, addr_, static_cast<
+                sessid_ = getsessid(id_, name_, static_cast<
                                     const char*>(getfield(mar, "Cookie")));
 
             try {
@@ -755,9 +755,9 @@ namespace {
             }
         }
         bool
-        do_accepted(handle& sock, const char* addr, unsigned short port)
+        do_accepted(handle& sock, const char* name)
         {
-            auto_ptr<session> sess(new session(realm_, sock.id(), addr));
+            auto_ptr<session> sess(new session(realm_, sock.id(), name));
             auto_ptr<marparser> parser(new marparser(0, sess));
 
             sock.setuser(parser.get());

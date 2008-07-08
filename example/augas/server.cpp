@@ -52,7 +52,7 @@ namespace {
             delete sock.user<string>();
         }
         bool
-        do_accepted(handle& sock, const char* addr, unsigned short port)
+        do_accepted(handle& sock, const char* name)
         {
             sock.setuser(new string());
             setrwtimer(sock, 15000, MOD_TIMRD);

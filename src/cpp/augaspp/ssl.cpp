@@ -39,24 +39,4 @@ aug::initssl()
     SSL_load_error_strings();
 }
 
-// AUGASPP_API void
-// aug::setsslclient(conn_base& conn, sslctx& ctx)
-// {
-//     SSL* ssl = SSL_new(ctx);
-//     BIO* sbio = BIO_new_socket((int)conn.sd().get(), BIO_NOCLOSE);
-//     SSL_set_bio(ssl, sbio, sbio);
-//     SSL_set_app_data(ssl, &conn);
-//     aug_setsslclient(conn.sd().get(), ssl);
-// }
-
-// AUGASPP_API void
-// aug::setsslserver(conn_base& conn, sslctx& ctx)
-// {
-//     SSL* ssl = SSL_new(ctx);
-//     BIO* sbio = BIO_new_socket((int)conn.sd().get(), BIO_NOCLOSE);
-//     SSL_set_bio(ssl, sbio, sbio);
-//     SSL_set_app_data(ssl, &conn);
-//     aug_setsslserver(conn.sd().get(), ssl);
-// }
-
 #endif // ENABLE_SSL

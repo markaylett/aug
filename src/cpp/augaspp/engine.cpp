@@ -523,7 +523,9 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     chanptr chan(createclient(getmpool(aug_tlx), impl_->muxer_, host, port,
                               ctx ? ctx->get() : 0));
     connptr conn(new clntconn(session, user, impl_->timers_, chan));
+
     impl_->socks_.insert(conn);
+    insertchan(impl_->chans_, chan);
     return id(*conn);
 }
 
@@ -555,11 +557,11 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     // Prepare state.
 
     sessionptr session(impl_->sessions_.getbyname(sname));
-    listenerptr lptr(new listener(session, user, chan));
-    scoped_insert si(impl_->socks_, lptr);
+    listenerptr conn(new listener(session, user, chan));
 
-    si.commit();
-    return id(*lptr);
+    impl_->socks_.insert(conn);
+    insertchan(impl_->chans_, chan);
+    return id(*conn);
 }
 
 AUGASPP_API void

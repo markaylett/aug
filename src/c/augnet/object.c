@@ -435,7 +435,7 @@ schan_getname_(aug_chan* ob, char* dst, unsigned size)
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
     struct aug_endpoint ep;
 
-    if (!aug_getsockname(impl->sd_, &ep) && !aug_endpointntop(&ep, dst, size))
+    if (!aug_getsockname(impl->sd_, &ep) || !aug_endpointntop(&ep, dst, size))
         return NULL;
 
     return dst;
@@ -576,7 +576,7 @@ pchan_getname_(aug_chan* ob, char* dst, unsigned size)
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     struct aug_endpoint ep;
 
-    if (!aug_getpeername(impl->sd_, &ep) && !aug_endpointntop(&ep, dst, size))
+    if (!aug_getpeername(impl->sd_, &ep) || !aug_endpointntop(&ep, dst, size))
         return NULL;
 
     return dst;

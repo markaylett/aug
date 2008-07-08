@@ -324,56 +324,57 @@ namespace {
     }
 
     int
-    tcpconnect_(const char* host, const char* port, const char* sslctx,
+    tcpconnect_(const char* host, const char* port, const char* ctx,
                 void* user)
     {
         const char* sname = getsession()->name_;
         AUG_CTXDEBUG2(aug_tlx,
                       "tcpconnect(): sname=[%s], host=[%s], port=[%s]",
                       sname, host, port);
-#if ENABLE_SSL
         try {
-            sslctxs::const_iterator it(state_->sslctxs_.find(sslctx));
-            if (it == state_->sslctxs_.end())
-                throw daug_error(__FILE__, __LINE__, ESSLCTX,
-                                 "SSL context [%s] not initialised", sslctx);
-
+            sslctx* ptr(0);
+#if ENABLE_SSL
+            if (ctx) {
+                sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
+                if (it == state_->sslctxs_.end())
+                    throw daug_error(__FILE__, __LINE__, ESSLCTX,
+                                     "SSL context [%s] not initialised", ctx);
+                ptr = it->second.get();
+            }
+#endif // ENABLE_SSL
             return (int)state_->engine_
-                .tcpconnect(sname, host, port, it->second.get(), user);
+                .tcpconnect(sname, host, port, ptr, user);
 
         } AUG_SETERRINFOCATCH;
-#else // !ENABLE_SSL
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                       AUG_MSG("ssl not supported"));
-#endif // !ENABLE_SSL
         return -1;
     }
 
     int
-    tcplisten_(const char* host, const char* port, const char* sslctx,
+    tcplisten_(const char* host, const char* port, const char* ctx,
                void* user)
     {
         const char* sname = getsession()->name_;
         AUG_CTXDEBUG2(aug_tlx,
                       "tcplisten(): sname=[%s], host=[%s], port=[%s]",
                       sname, host, port);
-#if ENABLE_SSL
         try {
-            sslctxs::const_iterator it(state_->sslctxs_.find(sslctx));
-            if (it == state_->sslctxs_.end())
-                throw daug_error(__FILE__, __LINE__, ESSLCTX,
-                                 "SSL context [%s] not initialised", sslctx);
+            sslctx* ptr(0);
+#if ENABLE_SSL
+            if (ctx) {
+                sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
+                if (it == state_->sslctxs_.end())
+                    throw daug_error(__FILE__, __LINE__, ESSLCTX,
+                                     "SSL context [%s] not initialised", ctx);
+                ptr = it->second.get();
+            }
+#endif // ENABLE_SSL
 
             // TODO: temporarily regain root privileges.
 
             return (int)state_->engine_
-                .tcplisten(sname, host, port, it->second.get(), user);
+                .tcplisten(sname, host, port, ptr, user);
 
         } AUG_SETERRINFOCATCH;
-#else // !ENABLE_SSL
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                       AUG_MSG("ssl not supported"));
-#endif // !ENABLE_SSL
         return -1;
     }
 
@@ -709,7 +710,7 @@ main(int argc, char* argv[])
 
          // Initialise aug libraries.
 
-        scoped_init init;
+        autobasictlx();
 
         // Seed random number generator.
 

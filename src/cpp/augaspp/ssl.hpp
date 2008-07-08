@@ -55,12 +55,6 @@ namespace aug {
 
     AUGASPP_API void
     initssl();
-
-//     AUGASPP_API void
-//     setsslclient(conn_base& conn, sslctx& ctx);
-
-//     AUGASPP_API void
-//     setsslserver(conn_base& conn, sslctx& ctx);
 }
 
 #endif // AUGASPP_SSL_HPP

@@ -63,7 +63,7 @@ namespace {
         }
 
         bool
-        do_accepted(handle& sock, const char* addr, unsigned short port)
+        do_accepted(handle& sock, const char* name)
         {
             sock.setuser(new shellparser());
             send(sock, "HELLO\r\n", 7);
