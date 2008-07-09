@@ -253,8 +253,17 @@ aug_processchans(aug_chans_t chans)
            released.  Decrement prior to release so that reentrant calls
            reflect the correct size. */
 
-        if (!it->ob_)
+        if (!it->ob_) {
+
+            unsigned id = aug_getchanid(ob);
+
+            AUG_CTXDEBUG3(aug_tlx, "releasing channel: %u", id);
             --chans->size_;
+
+            /* Notify after entry has been removed. */
+
+            aug_clearchan(chans->handler_, id);
+        }
 
         /* Release previous value stored in entry. */
 

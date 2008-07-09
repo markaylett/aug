@@ -710,7 +710,7 @@ main(int argc, char* argv[])
 
          // Initialise aug libraries.
 
-        autobasictlx();
+        scoped_init init;
 
         // Seed random number generator.
 

@@ -37,7 +37,7 @@ expiry_(struct timeval* tv, unsigned ms)
 {
     struct timeval local;
     aug_clock* clock = aug_getclock(aug_tlx);
-    aug_result result = aug_gettimeofday(clock, &local);
+    aug_result result = aug_gettimeofday(clock, tv);
     aug_release(clock);
 
     if (result < 0)

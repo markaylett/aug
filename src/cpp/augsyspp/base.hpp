@@ -22,6 +22,12 @@ namespace aug {
             throw std::runtime_error("aug_init() failed");
     }
     inline void
+    initbasictlx()
+    {
+        if (aug_initbasictlx() < 0)
+            throw std::runtime_error("aug_initbasictlx() failed");
+    }
+    inline void
     term()
     {
         aug_term();
@@ -47,7 +53,9 @@ namespace aug {
         }
         scoped_init()
         {
-            init();
+            // FIXME: improve init() support.
+            //init();
+            initbasictlx();
         }
     };
 

@@ -177,8 +177,11 @@ namespace aug {
             void
             clearchan_(unsigned id) AUG_NOTHROW
             {
-                sockptr sock(socks_.getbyid(id));
-                socks_.erase(*sock);
+                try {
+                    // FIXME: listener will not exist after teardown.
+                    sockptr sock(socks_.getbyid(id));
+                    socks_.erase(*sock);
+                } AUG_PERRINFOCATCH;
             }
             aug_bool
             estabchan_(unsigned id, obref<aug_stream> stream,
@@ -365,6 +368,13 @@ engine::engine(mdref eventrd, mdref eventwr, timers& timers,
 AUGASPP_API void
 engine::clear()
 {
+    {
+        chans tmp(null);
+        impl_->chans_.swap(tmp);
+    }
+
+    // FIXME: assert that socks are already clear?
+
     impl_->socks_.clear();
 
     // FIXME: erase the sessions in reverse order to which they were added.
