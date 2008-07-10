@@ -169,9 +169,10 @@ connected::do_connected(const string& name, const timeval& now)
 }
 
 bool
-connected::do_process(unsigned short events, const timeval& now)
+connected::do_process(obref<aug_stream> stream, unsigned short events,
+                      const timeval& now)
 {
-    streamptr stream(object_cast<aug_stream>(chan_));
+    chan_ = object_cast<aug_chan>(stream);
 
     if (events & AUG_FDEVENTRD) {
 

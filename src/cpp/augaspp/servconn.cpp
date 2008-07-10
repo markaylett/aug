@@ -92,9 +92,10 @@ servconn::do_connected(const string& name, const timeval& now)
 }
 
 bool
-servconn::do_process(unsigned short events, const timeval& now)
+servconn::do_process(obref<aug_stream> stream, unsigned short events,
+                     const timeval& now)
 {
-    return conn_.process(events, now);
+    return conn_.process(stream, events, now);
 }
 
 void

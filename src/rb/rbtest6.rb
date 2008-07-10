@@ -8,8 +8,8 @@ module RbTest6
     end
     def RbTest6.start(sname)
         Log.debug("start(): #{sname}")
-        AugRb.tcplisten("0.0.0.0", "1234", nil)
-        AugRb.tcpconnect("127.0.0.1", "1234", nil)
+        AugRb.tcplisten("0.0.0.0", "1234", nil, nil)
+        AugRb.tcpconnect("127.0.0.1", "1234", nil, nil)
     end
     def RbTest6.closed(sock)
         Log.debug("closed(): #{sock}")

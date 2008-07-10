@@ -11,8 +11,8 @@ module RbTest5
     end
     def RbTest5.start(sname)
         Log.debug("start(): #{sname}")
-        @listener = AugRb.tcplisten("0.0.0.0", "1234", nil)
-        @client = AugRb.tcpconnect("127.0.0.1", "1234", nil)
+        @listener = AugRb.tcplisten("0.0.0.0", "1234", nil, nil)
+        @client = AugRb.tcpconnect("127.0.0.1", "1234", nil, nil)
         @server = nil
     end
     def RbTest5.closed(sock)

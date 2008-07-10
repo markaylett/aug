@@ -165,7 +165,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         return estabclient_(impl, handler);
     }
 
-    if ((AUG_FDEVENTRD & aug_fdevents(impl->muxer_, impl->sd_))) {
+    if ((AUG_FDEVENTCONN & aug_fdevents(impl->muxer_, impl->sd_))) {
 
         struct aug_endpoint ep;
 

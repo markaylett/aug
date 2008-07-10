@@ -193,7 +193,7 @@ tcpconnect_(PyObject* self, PyObject* args)
     PyObject* user = NULL, * sock;
     int cid;
 
-    if (!PyArg_ParseTuple(args, "ss|sO:tcpconnect", &host, &serv, &sslctx,
+    if (!PyArg_ParseTuple(args, "ss|zO:tcpconnect", &host, &serv, &sslctx,
                           &user))
         return NULL;
 
@@ -217,7 +217,7 @@ tcplisten_(PyObject* self, PyObject* args)
     PyObject* user = NULL, * sock;
     int lid;
 
-    if (!PyArg_ParseTuple(args, "ss|sO:tcplisten", &host, &serv, &sslctx,
+    if (!PyArg_ParseTuple(args, "ss|zO:tcplisten", &host, &serv, &sslctx,
                           &user))
         return NULL;
 

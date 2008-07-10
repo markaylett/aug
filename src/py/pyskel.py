@@ -13,8 +13,8 @@ import log
 # string getenv(name, def)
 # string getsession()
 # void shutdown(sock, flags)
-# int tcpconnect(host, serv, user)
-# int tcplisten(host, serv, user)
+# int tcpconnect(host, serv, sslctx, user)
+# int tcplisten(host, serv, sslctx, user)
 # void send(sock, buffer buf)
 # void setrwtimer(sock, ms, flags)
 # void resetrwtimer(sock, ms, flags)
@@ -59,7 +59,7 @@ def stop():
 
 def start(sname):
     log.debug("start(): %s" % sname)
-    tcplisten("0.0.0.0", getenv("session.pyskel.serv"), None)
+    tcplisten("0.0.0.0", getenv("session.pyskel.serv"), None, None)
 
 def reconf():
     log.debug("reconf()")

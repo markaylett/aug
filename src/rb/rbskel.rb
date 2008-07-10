@@ -13,8 +13,8 @@ include AugUtil
 # string getenv(name, def)
 # string getsession()
 # void shutdown(sock, flags)
-# int tcpconnect(host, serv, user)
-# int tcplisten(host, serv, user)
+# int tcpconnect(host, serv, sslctx, user)
+# int tcplisten(host, serv, sslctx, user)
 # void send(sock, buffer buf)
 # void setrwtimer(sock, ms, flags)
 # void resetrwtimer(sock, ms, flags)
@@ -56,7 +56,7 @@ module RbSkel
     def RbSkel.start(sname)
         @interp = Interpreter.new(Handler.new)
         Log.debug("start(): #{sname}")
-        AugRb.tcplisten("0.0.0.0", AugRb.getenv("session.RbSkel.serv"), nil)
+        AugRb.tcplisten("0.0.0.0", AugRb.getenv("session.RbSkel.serv"), nil, nil)
     end
     def RbSkel.reconf
         Log.debug("reconf()")

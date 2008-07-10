@@ -60,7 +60,8 @@ namespace aug {
         do_connected(const std::string& name, const timeval& now);
 
         bool
-        do_process(unsigned short events, const timeval& now);
+        do_process(obref<aug_stream> stream, unsigned short events,
+                   const timeval& now);
 
         void
         do_shutdown(unsigned flags, const timeval& now);

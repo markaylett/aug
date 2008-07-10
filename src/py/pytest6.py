@@ -8,8 +8,8 @@ def stop():
 
 def start(sname):
     log.debug("start(): %s" % sname)
-    tcplisten("0.0.0.0", "1234", None)
-    tcpconnect("127.0.0.1", "1234", None)
+    tcplisten("0.0.0.0", "1234", None, None)
+    tcpconnect("127.0.0.1", "1234", None, None)
 
 def closed(sock):
     log.debug("closed(): %s" % sock)

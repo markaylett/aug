@@ -41,7 +41,8 @@ namespace aug {
          */
 
         virtual bool
-        do_process(unsigned short events, const timeval& now) = 0;
+        do_process(obref<aug_stream> stream, unsigned short events,
+                   const timeval& now) = 0;
 
         virtual void
         do_shutdown(unsigned flags, const timeval& now) = 0;
@@ -83,9 +84,10 @@ namespace aug {
             do_connected(name, now);
         }
         bool
-        process(unsigned short events, const timeval& now)
+        process(obref<aug_stream> stream, unsigned short events,
+                const timeval& now)
         {
-            return do_process(events, now);
+            return do_process(stream, events, now);
         }
         void
         shutdown(unsigned flags, const timeval& now)
@@ -158,7 +160,8 @@ namespace aug {
         do_connected(const std::string& name, const timeval& now);
 
         bool
-        do_process(unsigned short events, const timeval& now);
+        do_process(obref<aug_stream> stream, unsigned short events,
+                   const timeval& now);
 
         void
         do_shutdown(unsigned flags, const timeval& now);

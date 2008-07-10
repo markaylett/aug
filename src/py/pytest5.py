@@ -12,8 +12,8 @@ def stop():
 def start(sname):
     global client, listener
     log.debug("start(): %s" % sname)
-    listener = tcplisten("0.0.0.0", "1234", None)
-    client = tcpconnect("127.0.0.1", "1234", None)
+    listener = tcplisten("0.0.0.0", "1234", None, None)
+    client = tcpconnect("127.0.0.1", "1234", None, None)
 
 def closed(sock):
     log.debug("closed(): %s" % sock)

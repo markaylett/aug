@@ -241,7 +241,7 @@ namespace aug {
 
                 bool changed = false, ok = false;
                 try {
-                    changed = cptr->process(events, now_);
+                    changed = cptr->process(stream, events, now_);
                     ok = true;
                 } AUG_PERRINFOCATCH;
 

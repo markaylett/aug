@@ -92,9 +92,10 @@ clntconn::do_connected(const string& name, const timeval& now)
 }
 
 bool
-clntconn::do_process(unsigned short events, const timeval& now)
+clntconn::do_process(obref<aug_stream> stream, unsigned short events,
+                     const timeval& now)
 {
-    return conn_.process(events, now);
+    return conn_.process(stream, events, now);
 }
 
 void
