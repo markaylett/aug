@@ -16,6 +16,7 @@ AUG_RCSID("$Id$");
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
+#include "augctx/string.h"
 
 #include "augext/stream.h"
 
@@ -228,7 +229,8 @@ static char*
 cchan_getname_(aug_chan* ob, char* dst, unsigned size)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
-    return impl->name_;
+    aug_strlcpy(dst, impl->name_, size);
+    return dst;
 }
 
 static const struct aug_chanvtbl cchanvtbl_ = {
