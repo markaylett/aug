@@ -2,6 +2,7 @@
    See the file COPYING for copying permission.
 */
 #include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 #include <stdlib.h> /* exit() */
@@ -9,19 +10,25 @@
 static void
 test(void)
 {
+    aug_clock* clock;
+    long tz;
     time_t in, out;
     struct tm tm;
     time(&in);
 
-    aug_info("timezone=[%ld]", aug_timezone());
+    clock = aug_getclock(aug_tlx);
+    tz = aug_gettimezone(clock);
+    aug_release(clock);
+
+    aug_ctxinfo(aug_tlx, "timezone=[%ld]", tz);
 
     if (!aug_gmtime(&in, &tm)) {
-        aug_perrinfo(aug_tlerr, "aug_gmtime() failed");
+        aug_perrinfo(aug_tlx, "aug_gmtime() failed", NULL);
         exit(1);
     }
 
     if (-1 == (out = aug_timegm(&tm))) {
-        aug_perrinfo(aug_tlerr, "aug_timegm() failed");
+        aug_perrinfo(aug_tlx, "aug_timegm() failed", NULL);
         exit(1);
     }
 
@@ -35,8 +42,8 @@ test(void)
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
-    aug_atexitinit(&errinfo);
+    if (aug_initbasictlx() < 0)
+        return 1;
     test();
     return 0;
 }

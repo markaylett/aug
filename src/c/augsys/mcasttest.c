@@ -2,6 +2,7 @@
    See the file COPYING for copying permission.
 */
 #include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -57,12 +58,14 @@ write_(char* dst, const struct header_* src)
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
     struct header_ h;
     char test[255];
-    aug_atexitinit(&errinfo);
-    aug_info("header=%d, status=%d", (int)sizeof(struct header_),
-             (int)sizeof(struct status_));
+
+    if (aug_autobasictlx() < 0)
+        return 1;
+
+    aug_ctxinfo(aug_tlx, "header=%d, status=%d", (int)sizeof(struct header_),
+                (int)sizeof(struct status_));
     strcpy(h.group_, "test");
     write_(test, &h);
     return 0;

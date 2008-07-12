@@ -2,6 +2,7 @@
    See the file COPYING for copying permission.
 */
 #include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 
@@ -11,10 +12,10 @@
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
     struct addrinfo hints, * res, * save;
 
-    aug_atexitinit(&errinfo);
+    if (aug_initbasictlx() < 0)
+        return 1;
 
     bzero(&hints, sizeof(hints));
     hints.ai_flags = AI_PASSIVE;
@@ -22,7 +23,7 @@ main(int argc, char* argv[])
     hints.ai_socktype = SOCK_STREAM;
 
     if (-1 == aug_getaddrinfo(HOST_, SERV_, &hints, &res)) {
-        aug_perrinfo(aug_tlerr, "aug_getaddrinfo() failed");
+        aug_perrinfo(aug_tlx, "aug_getaddrinfo() failed", NULL);
         return 1;
     }
 
@@ -33,7 +34,7 @@ main(int argc, char* argv[])
 
         aug_getendpoint(res, &ep);
         if (!aug_endpointntop(&ep, buf, sizeof(buf))) {
-            aug_perrinfo(aug_tlerr, "aug_endpointntop() failed");
+            aug_perrinfo(aug_tlx, "aug_endpointntop() failed", NULL);
             goto fail;
         }
 

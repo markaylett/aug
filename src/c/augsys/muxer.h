@@ -24,30 +24,36 @@
 # define aug_mwrite aug_swrite
 #endif /* _WIN32 */
 
-#define AUG_FDEVENTRD    0x1
-#define AUG_FDEVENTWR    0x2
-#define AUG_FDEVENTEX    0x4
-#define AUG_FDEVENTRDWR (AUG_FDEVENTRD   | AUG_FDEVENTWR)
-#define AUG_FDEVENTALL  (AUG_FDEVENTRDWR | AUG_FDEVENTEX)
-#define AUG_FDEVENTCONN (AUG_FDEVENTWR   | AUG_FDEVENTEX)
+#include "augext/mpool.h"
+
+#define AUG_MDEVENTRD    0x1
+#define AUG_MDEVENTWR    0x2
+#define AUG_MDEVENTEX    0x4
+#define AUG_MDEVENTRDWR (AUG_MDEVENTRD   | AUG_MDEVENTWR)
+#define AUG_MDEVENTALL  (AUG_MDEVENTRDWR | AUG_MDEVENTEX)
+#define AUG_MDEVENTCONN (AUG_MDEVENTWR   | AUG_MDEVENTEX)
 
 struct timeval;
 
 typedef struct aug_muxer_* aug_muxer_t;
 
 AUGSYS_API aug_muxer_t
-aug_createmuxer(void);
+aug_createmuxer(aug_mpool* mpool);
 
 AUGSYS_API int
 aug_destroymuxer(aug_muxer_t muxer);
 
-AUGSYS_API void
-aug_setnowait(aug_muxer_t muxer, int nowait);
-
 AUGSYS_API int
-aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
+aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
+
+AUGSYS_API void
+aug_setmdevents(aug_muxer_t muxer, int delta);
 
 /**
+ * Wait for events.
+ *
+ * @param timeout Optional timeout value.
+ *
  * @return Either positive if events have been signalled, zero on timeout, or
  * a negative value on error.  A positive return may not be representative of
  * the actual number of signalled events.
@@ -58,13 +64,13 @@ aug_setfdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
  */
 
 AUGSYS_API int
-aug_waitfdevents(aug_muxer_t muxer, const struct timeval* timeout);
+aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout);
 
 AUGSYS_API int
-aug_fdeventmask(aug_muxer_t muxer, aug_md md);
+aug_getmdeventmask(aug_muxer_t muxer, aug_md md);
 
 AUGSYS_API int
-aug_fdevents(aug_muxer_t muxer, aug_md md);
+aug_getmdevents(aug_muxer_t muxer, aug_md md);
 
 /**
  * Creates a pipe or socket-pair suitable for use with muxer.  On Windows,

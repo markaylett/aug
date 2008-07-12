@@ -2,6 +2,7 @@
    See the file COPYING for copying permission.
 */
 #include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 
@@ -10,9 +11,9 @@
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
     char buf[64];
-    aug_atexitinit(&errinfo);
+    if (aug_initbasictlx() < 0)
+        return 1;
 
     strcpy(buf, TEST_);
     aug_memfrob(buf, sizeof(buf) - 1);

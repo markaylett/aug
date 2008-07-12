@@ -258,7 +258,9 @@ connected::do_shutdown(unsigned flags, const timeval& now)
                         "shutting connection: id=[%u], flags=[%u]",
                         sock_.id_, flags);
             streamptr stream(object_cast<aug_stream>(chan_));
-            aug::shutdown(stream);
+            // FIXME: should be avoided if state_ set correctly.
+			if (null != stream)
+				aug::shutdown(stream);
         }
     }
 }

@@ -311,7 +311,7 @@ aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,
     /* Now established.  Force multiplexer to return immediately so that
        establishment can be finalised in process() function. */
 
-    aug_setnowait(muxer, 1);
+    aug_setmdevents(muxer, 1);
 
     impl->chan_.vtbl_ = &chanvtbl_;
     impl->chan_.impl_ = NULL;
