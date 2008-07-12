@@ -30,15 +30,15 @@ test(aug_muxer_t muxer, int n)
     iov[1].iov_base = MSG2_;
     iov[1].iov_len = sizeof(MSG2_);
 
-    if (-1 == aug_setfdeventmask(muxer, sv[0], AUG_FDEVENTRDWR)
-        || -1 == aug_setfdeventmask(muxer, sv[1], AUG_FDEVENTRD)) {
-        aug_perrinfo(aug_tlx, "aug_setfdeventmask() failed", NULL);
+    if (-1 == aug_setmdeventmask(muxer, sv[0], AUG_MDEVENTRDWR)
+        || -1 == aug_setmdeventmask(muxer, sv[1], AUG_MDEVENTRD)) {
+        aug_perrinfo(aug_tlx, "aug_setmdeventmask() failed", NULL);
         exit(1);
     }
 
-    if (AUG_FDEVENTRDWR != aug_fdeventmask(muxer, sv[0])
-        || AUG_FDEVENTRD != aug_fdeventmask(muxer, sv[1])) {
-        aug_perrinfo(aug_tlx, "aug_fdeventmask() failed", NULL);
+    if (AUG_MDEVENTRDWR != aug_getmdeventmask(muxer, sv[0])
+        || AUG_MDEVENTRD != aug_getmdeventmask(muxer, sv[1])) {
+        aug_perrinfo(aug_tlx, "aug_getmdeventmask() failed", NULL);
         exit(1);
     }
 
@@ -47,15 +47,15 @@ test(aug_muxer_t muxer, int n)
         exit(1);
     }
 
-    if (-1 == aug_waitfdevents(muxer, NULL)) {
-        aug_perrinfo(aug_tlx, "aug_waitfdevents() failed", NULL);
+    if (-1 == aug_waitmdevents(muxer, NULL)) {
+        aug_perrinfo(aug_tlx, "aug_waitmdevents() failed", NULL);
         exit(1);
     }
 
     test(muxer, n - 1);
 
     if (-1 == aug_sread(sv[1], buf, iov[0].iov_len + iov[1].iov_len)) {
-        aug_perrinfo(aug_tlx, "aug_read() failed", NULL);
+        aug_perrinfo(aug_tlx, "aug_sread() failed", NULL);
         exit(1);
     }
 
@@ -64,9 +64,9 @@ test(aug_muxer_t muxer, int n)
        exit(1);
     }
 
-    if (-1 == aug_setfdeventmask(muxer, sv[0], 0)
-        || -1 == aug_setfdeventmask(muxer, sv[1], 0)) {
-        aug_perrinfo(aug_tlx, "aug_setfdeventmask() failed", NULL);
+    if (-1 == aug_setmdeventmask(muxer, sv[0], 0)
+        || -1 == aug_setmdeventmask(muxer, sv[1], 0)) {
+        aug_perrinfo(aug_tlx, "aug_setmdeventmask() failed", NULL);
         exit(1);
     }
 
@@ -77,11 +77,15 @@ test(aug_muxer_t muxer, int n)
 int
 main(int argc, char* argv[])
 {
+    aug_mpool* mpool;
     aug_muxer_t muxer;
     if (aug_autobasictlx() < 0)
         return 1;
 
-    muxer = aug_createmuxer();
+    mpool = aug_getmpool(aug_tlx);
+    muxer = aug_createmuxer(mpool);
+    aug_release(mpool);
+
     test(muxer, 30);
     aug_destroymuxer(muxer);
     return 0;

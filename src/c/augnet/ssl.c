@@ -243,19 +243,19 @@ realmask_(struct impl_* impl)
     switch (impl->state_) {
     case NORMAL:
         if (!bufempty_(&impl->outbuf_))
-            mask = AUG_FDEVENTRDWR;
+            mask = AUG_MDEVENTRDWR;
         else
-            mask = AUG_FDEVENTRD;
+            mask = AUG_MDEVENTRD;
         break;
     case RDPEND:
         break;
     case RDWANTRD:
     case WRWANTRD:
-        mask = AUG_FDEVENTRD;
+        mask = AUG_MDEVENTRD;
         break;
     case RDWANTWR:
     case WRWANTWR:
-        mask = AUG_FDEVENTWR;
+        mask = AUG_MDEVENTWR;
         break;
     case RDZERO:
     case SSLERR:
@@ -272,13 +272,13 @@ userevents_(struct impl_* impl)
 
     /* End of data and errors are communicated via aug_read(). */
 
-    if ((impl->mask_ & AUG_FDEVENTRD)
+    if ((impl->mask_ & AUG_MDEVENTRD)
         && (!bufempty_(&impl->inbuf_) || RDZERO == impl->state_
             || SSLERR == impl->state_))
-        events |= AUG_FDEVENTRD;
+        events |= AUG_MDEVENTRD;
 
-    if ((impl->mask_ & AUG_FDEVENTWR) && !buffull_(&impl->outbuf_))
-        events |= AUG_FDEVENTWR;
+    if ((impl->mask_ & AUG_MDEVENTWR) && !buffull_(&impl->outbuf_))
+        events |= AUG_MDEVENTWR;
 
     return events;
 }
@@ -288,11 +288,11 @@ updateevents_(struct impl_* impl)
 {
     int real, user;
 
-    aug_setfdeventmask(impl->muxer_, impl->sd_, (real = realmask_(impl)));
+    aug_setmdeventmask(impl->muxer_, impl->sd_, (real = realmask_(impl)));
 
     if ((user = userevents_(impl))
         || (RDPEND == impl->state_ && !buffull_(&impl->inbuf_)))
-        aug_setnowait(impl->muxer_, 1);
+        aug_setmdevents(impl->muxer_, 1);
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: events: sd=[%d], realmask=[%d],"
                   " usermask=[%d], userevents=[%d]",
@@ -385,7 +385,7 @@ static aug_result
 close_(struct impl_* impl)
 {
     AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: sd=[%d]", impl->sd_);
-    aug_setfdeventmask(impl->muxer_, impl->sd_, 0);
+    aug_setmdeventmask(impl->muxer_, impl->sd_, 0);
     return aug_sclose(impl->sd_);
 }
 
@@ -459,7 +459,7 @@ static aug_chan*
 cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
-    int events = aug_fdevents(impl->muxer_, impl->sd_);
+    int events = aug_getmdevents(impl->muxer_, impl->sd_);
     int rw = 0;
 
     /* Determine which SSL operations are to be performed. */
@@ -475,25 +475,25 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         /* Fall through to normal case. */
 
     case NORMAL:
-        if (events & AUG_FDEVENTRD)
+        if (events & AUG_MDEVENTRD)
             rw = SSLREAD_;
-        if (events & AUG_FDEVENTWR)
+        if (events & AUG_MDEVENTWR)
             rw |= SSLWRITE_;
         break;
     case RDWANTRD:
-        if (events & AUG_FDEVENTRD)
+        if (events & AUG_MDEVENTRD)
             rw = SSLREAD_;
         break;
     case RDWANTWR:
-        if (events & AUG_FDEVENTWR)
+        if (events & AUG_MDEVENTWR)
             rw = SSLREAD_;
         break;
     case WRWANTRD:
-        if (events & AUG_FDEVENTRD)
+        if (events & AUG_MDEVENTRD)
             rw = SSLWRITE_;
         break;
     case WRWANTWR:
-        if (events & AUG_FDEVENTWR)
+        if (events & AUG_MDEVENTWR)
             rw = SSLWRITE_;
         break;
     case RDZERO:
@@ -750,11 +750,11 @@ createssl_(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
     SSL* ssl;
     BIO* bio;
 
-    if (aug_setfdeventmask(muxer, sd, AUG_FDEVENTRDWR) < 0)
+    if (aug_setmdeventmask(muxer, sd, AUG_MDEVENTRDWR) < 0)
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct impl_)))) {
-        aug_setfdeventmask(muxer, sd, 0);
+        aug_setmdeventmask(muxer, sd, 0);
         return NULL;
     }
 

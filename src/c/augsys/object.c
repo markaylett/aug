@@ -36,7 +36,7 @@ static aug_result
 close_(struct impl_* impl)
 {
 #if !defined(_WIN32)
-    aug_setfdeventmask(impl->muxer_, impl->fd_, 0);
+    aug_setmdeventmask(impl->muxer_, impl->fd_, 0);
 #endif /* !_WIN32 */
     return aug_fclose(impl->fd_);
 }
@@ -123,7 +123,7 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     } else {
 
 #if !defined(_WIN32)
-        int events = aug_fdevents(impl->muxer_, impl->fd_);
+        int events = aug_getmdevents(impl->muxer_, impl->fd_);
 #else /* _WIN32 */
         int events = 0;
 #endif /* _WIN32 */
@@ -147,10 +147,10 @@ chan_setmask_(aug_chan* ob, unsigned short mask)
 {
 #if !defined(_WIN32)
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
-    return aug_setfdeventmask(impl->muxer_, impl->fd_, mask);
+    return aug_setmdeventmask(impl->muxer_, impl->fd_, mask);
 #else /* _WIN32 */
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                   AUG_MSG("aug_setfdeventmask() not supported"));
+                   AUG_MSG("aug_setmdeventmask() not supported"));
     return AUG_FAILERROR;
 #endif /* _WIN32 */
 }
@@ -160,7 +160,7 @@ chan_getmask_(aug_chan* ob)
 {
 #if !defined(_WIN32)
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
-    return aug_fdeventmask(impl->muxer_, impl->fd_);
+    return aug_getmdeventmask(impl->muxer_, impl->fd_);
 #else /* _WIN32 */
     return 0;
 #endif /* _WIN32 */

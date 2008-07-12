@@ -136,7 +136,7 @@ connected::do_send(const void* buf, size_t len, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setchanmask(chan_, AUG_FDEVENTRDWR);
+        setchanmask(chan_, AUG_MDEVENTRDWR);
     }
 
     buffer_.append(buf, len);
@@ -150,7 +150,7 @@ connected::do_sendv(blobref ref, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setchanmask(chan_, AUG_FDEVENTRDWR);
+        setchanmask(chan_, AUG_MDEVENTRDWR);
     }
 
     buffer_.append(ref);
@@ -174,7 +174,7 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
 {
     chan_ = object_cast<aug_chan>(stream);
 
-    if (events & AUG_FDEVENTRD) {
+    if (events & AUG_MDEVENTRD) {
 
         AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%u]", sock_.id_);
 
@@ -198,7 +198,7 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
         session_->data(sock_, buf, size);
     }
 
-    if (events & AUG_FDEVENTWR) {
+    if (events & AUG_MDEVENTWR) {
 
         AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%u]", sock_.id_);
 
@@ -212,7 +212,7 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
 
             // No more (buffered) data to be written.
 
-            setchanmask(chan_, AUG_FDEVENTRD);
+            setchanmask(chan_, AUG_MDEVENTRD);
 
             // If flagged for shutdown, send FIN and disable writes.
 

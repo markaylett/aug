@@ -35,8 +35,9 @@ namespace aug {
         {
         }
 
-        muxer()
-            : muxer_(aug_createmuxer())
+        explicit
+        muxer(mpoolref mpool)
+            : muxer_(aug_createmuxer(mpool.get()))
         {
             verify(muxer_);
         }
@@ -66,15 +67,15 @@ namespace aug {
     }
 
     inline void
-    setnowait(aug_muxer_t muxer, int nowait)
+    setmdeventmask(aug_muxer_t muxer, mdref ref, unsigned short mask)
     {
-        aug_setnowait(muxer, nowait);
+        verify(aug_setmdeventmask(muxer, ref.get(), mask));
     }
 
     inline void
-    setfdeventmask(aug_muxer_t muxer, mdref ref, unsigned short mask)
+    setmdevents(aug_muxer_t muxer, int delta)
     {
-        verify(aug_setfdeventmask(muxer, ref.get(), mask));
+        aug_setmdevents(muxer, delta);
     }
 
     /**
@@ -82,27 +83,27 @@ namespace aug {
      */
 
     inline int
-    waitfdevents(aug_muxer_t muxer, const timeval& timeout)
+    waitmdevents(aug_muxer_t muxer, const timeval& timeout)
     {
-        return verify(aug_waitfdevents(muxer, &timeout));
+        return verify(aug_waitmdevents(muxer, &timeout));
     }
 
     inline int
-    waitfdevents(aug_muxer_t muxer)
+    waitmdevents(aug_muxer_t muxer)
     {
-        return verify(aug_waitfdevents(muxer, 0));
+        return verify(aug_waitmdevents(muxer, 0));
     }
 
     inline unsigned short
-    fdeventmask(aug_muxer_t muxer, mdref ref)
+    getmdeventmask(aug_muxer_t muxer, mdref ref)
     {
-        return verify(aug_fdeventmask(muxer, ref.get()));
+        return verify(aug_getmdeventmask(muxer, ref.get()));
     }
 
     inline unsigned short
-    fdevents(aug_muxer_t muxer, mdref ref)
+    getmdevents(aug_muxer_t muxer, mdref ref)
     {
-        return verify(aug_fdevents(muxer, ref.get()));
+        return verify(aug_getmdevents(muxer, ref.get()));
     }
 
     inline automds

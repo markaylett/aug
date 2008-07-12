@@ -173,7 +173,7 @@ namespace test {
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
-                setchanmask(chan_, AUG_FDEVENTRDWR);
+                setchanmask(chan_, AUG_MDEVENTRDWR);
             } else {
                 streamptr strm(object_cast<aug_stream>(chan_));
                 shutdown(strm);
@@ -192,13 +192,14 @@ namespace test {
         chans chans_;
 
         state()
-            : chans_(null)
+            : muxer_(getmpool(aug_tlx)),
+              chans_(null)
         {
             chandler_.reset(this);
             chans tmp(getmpool(aug_tlx), chandler_);
             chans_.swap(tmp);
 
-            setfdeventmask(muxer_, aug_eventrd(), AUG_FDEVENTRD);
+            setmdeventmask(muxer_, aug_eventrd(), AUG_MDEVENTRD);
 
             aug_hostserv hostserv;
             parsehostserv(address_, hostserv);
@@ -250,7 +251,7 @@ namespace test {
             chanptr ptr(object_cast<aug_chan>(stream));
             sessionptr sess(sessions_[id]);
 
-            if (events & AUG_FDEVENTRD) {
+            if (events & AUG_MDEVENTRD) {
 
                 AUG_CTXDEBUG2(aug_tlx, "handling read event '%d'", id);
 
@@ -260,15 +261,15 @@ namespace test {
                     return AUG_FALSE;
                 }
 
-                setchanmask(ptr, AUG_FDEVENTRDWR);
+                setchanmask(ptr, AUG_MDEVENTRDWR);
                 sess->timer_.cancel();
                 sess->heartbeats_ = 0;
             }
 
-            if (events & AUG_FDEVENTWR) {
+            if (events & AUG_MDEVENTWR) {
 
                 if (!sess->buffer_.writesome(stream)) {
-                    setchanmask(ptr, AUG_FDEVENTRD);
+                    setchanmask(ptr, AUG_MDEVENTRD);
                     sess->timer_.reset(5000);
                 }
             }
@@ -361,7 +362,7 @@ namespace test {
                 if (state_->timers_.empty()) {
 
                     scoped_unblock unblock;
-                    while (AUG_FAILINTR == (ret = waitfdevents(state_
+                    while (AUG_FAILINTR == (ret = waitmdevents(state_
                                                                ->muxer_)))
                         ;
 
@@ -370,12 +371,12 @@ namespace test {
                     processexpired(state_->timers_, 0 == ret, tv);
 
                     scoped_unblock unblock;
-                    while (AUG_FAILINTR == (ret = waitfdevents(state_
+                    while (AUG_FAILINTR == (ret = waitmdevents(state_
                                                                ->muxer_, tv)))
                         ;
                 }
 
-                if (fdevents(state_->muxer_, aug_eventrd()))
+                if (getmdevents(state_->muxer_, aug_eventrd()))
                     readevent();
 
                 processchans(state_->chans_);

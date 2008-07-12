@@ -53,14 +53,15 @@ namespace {
         }
     public:
         server(const char* host, const char* serv)
-            : chans_(null),
+            : muxer_(getmpool(aug_tlx)),
+              chans_(null),
               quit_(false)
         {
             chandler_.reset(this);
             chans tmp(getmpool(aug_tlx), chandler_);
             chans_.swap(tmp);
 
-            setfdeventmask(muxer_, rd_, AUG_FDEVENTRD);
+            setmdeventmask(muxer_, rd_, AUG_MDEVENTRD);
 
             endpoint ep(null);
             autosd sd(tcpserver(host, serv, ep));
@@ -104,7 +105,7 @@ namespace {
                    unsigned short events) AUG_NOTHROW
         {
             aug_ctxinfo(aug_tlx, "id: %u", id);
-            if (events & AUG_FDEVENTRD) {
+            if (events & AUG_MDEVENTRD) {
                 char buf[1024];
                 ssize_t n = read(stream, buf, sizeof(buf) - 1);
                 if (n <= 0) {
@@ -122,11 +123,11 @@ namespace {
             while (!quit_) {
                 {
                     scoped_unblock unblock;
-                    while (AUG_FAILINTR == waitfdevents(muxer_))
+                    while (AUG_FAILINTR == waitmdevents(muxer_))
                         ;
                 }
 
-                if (fdevents(muxer_, rd_))
+                if (getmdevents(muxer_, rd_))
                     readevent();
 
                 aug_ctxinfo(aug_tlx, "before");

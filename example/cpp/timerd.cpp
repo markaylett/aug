@@ -61,7 +61,8 @@ namespace test {
             timer timer_;
         public:
             state()
-                : timer_(timers_, null)
+                : muxer_(getmpool(aug_tlx)),
+                  timer_(timers_, null)
             {
             }
         };
@@ -76,7 +77,7 @@ namespace test {
             int fd(aug_eventrd());
             AUG_CTXDEBUG2(aug_tlx, "checking event pipe '%d'", fd);
 
-            if (!fdevents(state_->muxer_, fd))
+            if (!getmdevents(state_->muxer_, fd))
                 return;
 
             AUG_CTXDEBUG2(aug_tlx, "reading event");
@@ -174,7 +175,7 @@ namespace test {
             verify(aug_setsrvlogger("aug"));
 
             auto_ptr<state> ptr(new state());
-            setfdeventmask(ptr->muxer_, aug_eventrd(), AUG_FDEVENTRD);
+            setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRD);
             state_ = ptr;
         }
 
@@ -192,14 +193,14 @@ namespace test {
 
                 if (state_->timers_.empty()) {
 
-                    while (AUG_FAILINTR == (ret = waitfdevents(state_
+                    while (AUG_FAILINTR == (ret = waitmdevents(state_
                                                                ->muxer_)))
                         ;
 
                 } else {
 
                     processexpired(state_->timers_, 0 == ret, tv);
-                    while (AUG_FAILINTR == (ret = waitfdevents(state_
+                    while (AUG_FAILINTR == (ret = waitmdevents(state_
                                                                ->muxer_,
                                                                tv)))
                         ;

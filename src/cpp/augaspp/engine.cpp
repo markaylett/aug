@@ -148,6 +148,7 @@ namespace aug {
                   eventwr_(eventwr),
                   timers_(timers),
                   cb_(cb),
+                  muxer_(getmpool(aug_tlx)),
                   chans_(null),
                   grace_(timers_),
                   state_(STARTED)
@@ -157,7 +158,7 @@ namespace aug {
                 chans_.swap(tmp);
 
                 gettimeofday(now_);
-                setfdeventmask(muxer_, eventrd_, AUG_FDEVENTRD);
+                setmdeventmask(muxer_, eventrd_, AUG_MDEVENTRD);
             }
             smartob<aug_object>
             cast_(const char* id) AUG_NOTHROW
@@ -423,7 +424,7 @@ engine::run(bool stoponerr)
             if (impl_->timers_.empty()) {
 
                 scoped_unblock unblock;
-                while (AUG_FAILINTR == (ret = waitfdevents(impl_->muxer_)))
+                while (AUG_FAILINTR == (ret = waitmdevents(impl_->muxer_)))
                     ;
 
             } else {
@@ -434,7 +435,7 @@ engine::run(bool stoponerr)
                 processexpired(impl_->timers_, 0 == ret, tv);
 
                 scoped_unblock unblock;
-                while (AUG_FAILINTR == (ret = waitfdevents(impl_
+                while (AUG_FAILINTR == (ret = waitmdevents(impl_
                                                            ->muxer_, tv)))
                     ;
             }
@@ -445,7 +446,7 @@ engine::run(bool stoponerr)
 
             AUG_CTXDEBUG2(aug_tlx, "processing events");
 
-            if (fdevents(impl_->muxer_, impl_->eventrd_))
+            if (getmdevents(impl_->muxer_, impl_->eventrd_))
                 impl_->readevent();
 
             AUG_CTXDEBUG2(aug_tlx, "processing files");

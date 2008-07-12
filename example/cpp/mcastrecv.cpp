@@ -32,11 +32,11 @@ main(int argc, char* argv[])
 
         joinmcast(sfd, in, 4 == argc ? argv[3] : 0);
 
-        muxer mux;
-        setfdeventmask(mux, sfd, AUG_FDEVENTRD);
+        muxer mux(getmpool(aug_tlx));
+        setmdeventmask(mux, sfd, AUG_MDEVENTRD);
 
         for (;;) {
-            while (AUG_FAILINTR == waitfdevents(mux))
+            while (AUG_FAILINTR == waitmdevents(mux))
                 ;
 
             char buf[AUG_NETEVENT_SIZE];

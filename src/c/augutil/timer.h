@@ -96,7 +96,7 @@ aug_expired(struct aug_timers* timers, int id);
  * Iterate through expired timers.
  *
  * The force flag forces, at least, the first timer to expire.  This can be
- * useful when used in conjunction with a call to aug_waitfdevents().  Each
+ * useful when used in conjunction with a call to aug_waitmdevents().  Each
  * expired timer will be removed from the list of timers prior to calling the
  * callback function.  If the callback function returns with a number of
  * milli-seconds greater than zero, the timer will be re-scheduled with the

@@ -127,7 +127,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid fdevent mask"));
+                       AUG_MSG("invalid mdevent mask"));
         return -1;
     }
 

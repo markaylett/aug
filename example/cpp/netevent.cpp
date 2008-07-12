@@ -111,10 +111,10 @@ namespace {
         getsockname(ref, addr);
         aug_ctxinfo(aug_tlx, "bound to: [%s]", endpointntop(addr).c_str());
 
-        muxer mux;
+        muxer mux(getmpool(aug_tlx));
         timers ts;
         session s(name, ref, ep, ts);
-        setfdeventmask(mux, ref, AUG_FDEVENTRD);
+        setmdeventmask(mux, ref, AUG_MDEVENTRD);
 
         timeval tv;
         int ret(!0);
@@ -124,10 +124,10 @@ namespace {
             aug_ctxinfo(aug_tlx, "timeout in: tv_sec=%d, tv_usec=%d",
                         (int)tv.tv_sec, (int)tv.tv_usec);
 
-            while (AUG_FAILINTR == (ret = waitfdevents(mux, tv)))
+            while (AUG_FAILINTR == (ret = waitmdevents(mux, tv)))
                 ;
 
-            aug_ctxinfo(aug_tlx, "waitfdevents: %d", ret);
+            aug_ctxinfo(aug_tlx, "waitmdevents: %d", ret);
 
             if (0 < ret) {
                 aug_netevent ev;

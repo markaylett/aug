@@ -31,8 +31,8 @@ main(int argc, char* argv[])
         if (!est) {
 
             muxer mux;
-            setfdeventmask(mux, sd, AUG_FDEVENTCONN);
-            waitfdevents(mux);
+            setmdeventmask(mux, sd, AUG_MDEVENTCONN);
+            waitmdevents(mux);
 
             // Assuming that there is no endpoint, an exception should now be
             // thrown.

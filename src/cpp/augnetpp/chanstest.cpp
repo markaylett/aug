@@ -19,9 +19,9 @@ namespace {
         setnonblock(sds[0], true);
         setnonblock(sds[1], true);
         return make_pair(createplain(mpool, nextid(), muxer, sds[0],
-                                     AUG_FDEVENTRD),
+                                     AUG_MDEVENTRD),
                          createplain(mpool, nextid(), muxer, sds[1],
-                                     AUG_FDEVENTWR));
+                                     AUG_MDEVENTWR));
     }
 
     unsigned rd_, wr_;
@@ -63,7 +63,7 @@ main(int argc, char* argv[])
 
         test x;
         while (!done_) {
-            waitfdevents(mux);
+            waitmdevents(mux);
             foreachchannel<test, &test::cb>(channs, x);
         }
 

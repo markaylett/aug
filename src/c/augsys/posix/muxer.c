@@ -15,6 +15,7 @@
 # define INIT_SIZE_ 64
 
 struct aug_muxer_ {
+    aug_mpool* mpool_;
     struct pollfd* pollfds_;
     size_t nfds_, size_;
     int ready_;
@@ -72,7 +73,7 @@ initpollfds_(struct pollfd* ptr, size_t size)
 static int
 resize_(aug_muxer_t muxer, size_t size)
 {
-    struct pollfd* ptr = aug_reallocmem(muxer->pollfds_,
+    struct pollfd* ptr = aug_reallocmem(muxer->mpool_, muxer->pollfds_,
                                         sizeof(struct pollfd) * size);
     if (!ptr)
         return -1;
@@ -90,23 +91,27 @@ aug_createmuxer(aug_mpool* mpool)
     if (!muxer)
         return NULL;
 
+    muxer->mpool_ = mpool;
     muxer->pollfds_ = NULL;
     muxer->nfds_ = muxer->size_ = 0;
     muxer->ready_ = 0;
 
     if (-1 == resize_(muxer, INIT_SIZE_)) {
-        aug_freemem(muxer);
+        aug_freemem(mpool, muxer);
         return NULL;
     }
 
+    aug_retain(mpool);
     return muxer;
 }
 
 AUGSYS_API int
 aug_destroymuxer(aug_muxer_t muxer)
 {
-    aug_freemem(muxer->pollfds_);
-    aug_freemem(muxer);
+    aug_mpool* mpool = muxer->mpool_;
+    aug_freemem(mpool, muxer->pollfds_);
+    aug_freemem(mpool, muxer);
+    aug_release(mpool);
     return 0;
 }
 
@@ -117,7 +122,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid fdevent mask '%d'"), (int)mask);
+                       AUG_MSG("invalid mdevent mask '%d'"), (int)mask);
         return -1;
     }
 
@@ -161,7 +166,7 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
     muxer->ready_ = 0;
 
     if (0 < ready) {
-        ret = aug_waitfdevents(muxer, &NOWAIT_);
+        ret = aug_waitmdevents(muxer, &NOWAIT_);
         if (0 <= ret)
             ret += ready; /* At least one. */
         return ret;
@@ -198,6 +203,7 @@ struct set_ {
 };
 
 struct aug_muxer_ {
+    aug_mpool* mpool_;
     struct set_ in_, out_;
     int maxfd_;
     int ready_;
@@ -258,6 +264,7 @@ aug_createmuxer(aug_mpool* mpool)
     if (!muxer)
         return NULL;
 
+    muxer->mpool_ = mpool;
     zeroset_(&muxer->in_);
     zeroset_(&muxer->out_);
 
@@ -265,13 +272,17 @@ aug_createmuxer(aug_mpool* mpool)
 
     muxer->maxfd_ = -1;
     muxer->ready_ = 0;
+
+    aug_retain(mpool);
     return muxer;
 }
 
 AUGSYS_API int
 aug_destroymuxer(aug_muxer_t muxer)
 {
-    aug_freemem(muxer);
+    aug_mpool* mpool = muxer->mpool_;
+    aug_freemem(mpool, muxer);
+    aug_release(mpool);
     return 0;
 }
 
@@ -285,11 +296,11 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid fdevent mask"));
+                       AUG_MSG("invalid mdevent mask"));
         return -1;
     }
 
-    setfdevents_(&muxer->in_, md, mask);
+    setmdevents_(&muxer->in_, md, mask);
 
     /* Update maxfd. */
 
@@ -325,7 +336,7 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
     muxer->ready_ = 0;
 
     if (0 < ready) {
-        ret = aug_waitfdevents(muxer, &NOWAIT_);
+        ret = aug_waitmdevents(muxer, &NOWAIT_);
         if (0 <= ret)
             ret += ready; /* At least one. */
         return ret;

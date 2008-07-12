@@ -28,7 +28,7 @@ aug_destroytcpconnect(aug_tcpconnect_t conn);
  * If a connection was established, then @a est flag will be set and a
  * non-blocking socket returned.
  *
- * Otherwise, the returned descriptor should be polled for #AUG_FDEVENTCONN
+ * Otherwise, the returned descriptor should be polled for #AUG_MDEVENTCONN
  * events before retrying aug_tryconnect().
  *
  * The descriptor returned between calls to aug_tryconnect() may change; this
