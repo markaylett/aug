@@ -12,6 +12,7 @@ AUG_RCSID("$Id$");
 #include "augsys/barrier.h"
 #include "augsys/muxer.h"
 
+#include "augctx/base.h"
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
 
@@ -64,6 +65,7 @@ writeall_(aug_md md, const char* buf, size_t n)
 AUGUTIL_API struct aug_event*
 aug_setsigevent(struct aug_event* event, int sig)
 {
+    aug_mpool* mpool = aug_getmpool(aug_tlx);
     switch (sig) {
     case SIGHUP:
         event->type_ = AUG_EVENTRECONF;
@@ -78,7 +80,8 @@ aug_setsigevent(struct aug_event* event, int sig)
     default:
         event->type_ = AUG_EVENTSIGNAL;
     }
-    event->ob_ = (aug_object*)aug_createboxint(sig, NULL);
+    event->ob_ = (aug_object*)aug_createboxint(mpool, sig, NULL);
+    aug_release(mpool);
     return event;
 }
 

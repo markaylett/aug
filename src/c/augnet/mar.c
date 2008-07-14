@@ -18,10 +18,10 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
 
-#include <stdlib.h>
 #include <string.h>
 
 struct aug_marparser_ {
+    aug_mpool* mpool_;
     const struct aug_marhandler* handler_;
     aug_object* ob_;
     aug_httpparser_t http_;
@@ -115,6 +115,7 @@ static void
 destroy_(void* ptr)
 {
     aug_marparser_t parser = ptr;
+    aug_mpool* mpool = parser->mpool_;
 
     if (parser->ob_)
         aug_release(parser->ob_);
@@ -128,51 +129,58 @@ destroy_(void* ptr)
     if (parser->mar_)
         aug_releasemar(parser->mar_);
 
-    free(parser);
+    aug_freemem(mpool, parser);
+    aug_release(mpool);
 }
 
 AUGNET_API aug_marparser_t
-aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
-                    aug_object* ob)
+aug_createmarparser(aug_mpool* mpool, unsigned size,
+                    const struct aug_marhandler* handler, aug_object* ob)
 {
-    aug_marparser_t parser = malloc(sizeof(struct aug_marparser_));
+    aug_marparser_t parser = aug_allocmem(mpool,
+                                          sizeof(struct aug_marparser_));
     aug_object* boxptr;
+    aug_httpparser_t http;
 
-    if (!parser) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    if (!parser)
+        return NULL;
+
+    if (!(boxptr = (aug_object*)aug_createboxptr(mpool, parser, destroy_))) {
+        aug_freemem(mpool, parser);
         return NULL;
     }
 
-    if (!(boxptr = (aug_object*)aug_createboxptr(parser, destroy_))) {
-        free(parser);
-        return NULL;
-    }
-
-    parser->handler_ = handler;
-
-    /* The boxptr now owns this reference: it will be released by
-       destroy_(). */
-
-    if ((parser->ob_ = ob))
-        aug_retain(ob);
-
-    parser->http_ = aug_createhttpparser(size, &handler_, boxptr);
-    parser->initial_ = NULL;
-    parser->mar_ = NULL;
+    http = aug_createhttpparser(size, &handler_, boxptr);
 
     /* If created, http parser will hold reference.  Otherwise, it will be
        destroyed now. */
 
     aug_release(boxptr);
 
-    return parser->http_ ? parser : NULL;
+    if (!http) {
+        aug_freemem(mpool, parser);
+        return NULL;
+    }
+
+    parser->mpool_ = mpool;
+    parser->handler_ = handler;
+    parser->ob_ = ob;
+    parser->http_ = http;
+    parser->initial_ = NULL;
+    parser->mar_ = NULL;
+
+    aug_retain(mpool);
+    aug_retain(ob);
+    return parser;
 }
 
 AUGNET_API int
 aug_destroymarparser(aug_marparser_t parser)
 {
     aug_httpparser_t http = parser->http_;
+
     /* Avoid freeing twice, when destroy_() is called. */
+
     parser->http_ = NULL;
     aug_destroyhttpparser(http);
 

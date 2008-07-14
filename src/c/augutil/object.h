@@ -15,9 +15,12 @@
 #include "augext/blob.h"
 #include "augext/boxint.h"
 #include "augext/boxptr.h"
+#include "augext/mpool.h"
 
 /**
  * Create object wrapper for integer.
+ *
+ * @param mpool Memory pool.
  *
  * @param i Integer.
  *
@@ -27,7 +30,7 @@
  */
 
 AUGUTIL_API aug_boxint*
-aug_createboxint(int i, void (*destroy)(int));
+aug_createboxint(aug_mpool* mpool, int i, void (*destroy)(int));
 
 /**
  * Cast to @ref aug_boxint and return boxed integer.
@@ -43,6 +46,8 @@ aug_obtoi(aug_object* ob);
 /**
  * Create object wrapper for plain pointer.
  *
+ * @param mpool Memory pool.
+ *
  * @param p Plain pointer.
  *
  * @param destroy Destructor to be called when reference count reaches zero.
@@ -51,7 +56,7 @@ aug_obtoi(aug_object* ob);
  */
 
 AUGUTIL_API aug_boxptr*
-aug_createboxptr(void* p, void (*destroy)(void*));
+aug_createboxptr(aug_mpool* mpool, void* p, void (*destroy)(void*));
 
 /**
  * Cast to @ref aug_boxptr and return plain pointer.
@@ -65,6 +70,6 @@ AUGUTIL_API void*
 aug_obtop(aug_object* ob);
 
 AUGUTIL_API aug_blob*
-aug_createblob(const void* buf, size_t len);
+aug_createblob(aug_mpool* mpool, const void* buf, size_t len);
 
 #endif /* AUGUTIL_OBJECT_H */

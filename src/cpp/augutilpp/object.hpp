@@ -43,15 +43,16 @@ namespace aug {
         }
     };
 
-    inline aug::smartob<aug_boxint>
-    createboxint(int i, void (*destroy)(int))
+    inline smartob<aug_boxint>
+    createboxint(mpoolref mpool, int i, void (*destroy)(int))
     {
-        return aug::object_attach<aug_boxint>(aug_createboxint(i, destroy));
+        return object_attach<aug_boxint>
+            (aug_createboxint(mpool.get(), i, destroy));
     }
 
     template <typename T>
     T
-    obtoi(aug::obref<aug_object> ref)
+    obtoi(obref<aug_object> ref)
     {
         return static_cast<T>(aug_obtoi(ref.get()));
     }
@@ -63,30 +64,31 @@ namespace aug {
         delete static_cast<T*>(ptr);
     }
 
-    inline aug::smartob<aug_boxptr>
-    createboxptr(void* p, void (*destroy)(void*))
+    inline smartob<aug_boxptr>
+    createboxptr(mpoolref mpool, void* p, void (*destroy)(void*))
     {
-        return aug::object_attach<aug_boxptr>(aug_createboxptr(p, destroy));
+        return object_attach<aug_boxptr>
+            (aug_createboxptr(mpool.get(), p, destroy));
     }
 
     template <typename T>
-    aug::smartob<aug_boxptr>
-    createboxptr(std::auto_ptr<T>& x)
+    smartob<aug_boxptr>
+    createboxptr(mpoolref mpool, std::auto_ptr<T>& x)
     {
-        return createboxptr(x.release(), deleter<T>);
+        return createboxptr(mpool, x.release(), deleter<T>);
     }
 
     template <typename T>
     T
-    obtop(aug::obref<aug_object> ob)
+    obtop(obref<aug_object> ob)
     {
         return static_cast<T>(aug_obtop(ob.get()));
     }
 
-    inline aug::smartob<aug_blob>
-    createblob(const void* buf, size_t len)
+    inline smartob<aug_blob>
+    createblob(mpoolref mpool, const void* buf, size_t len)
     {
-        return aug::object_attach<aug_blob>(aug_createblob(buf, len));
+        return object_attach<aug_blob>(aug_createblob(mpool.get(), buf, len));
     }
 }
 

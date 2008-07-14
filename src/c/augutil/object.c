@@ -9,14 +9,13 @@ AUG_RCSID("$Id$");
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
-#include "augctx/errno.h"
 
-#include <stdlib.h> /* malloc() */
 #include <string.h>
 
 struct boxintimpl_ {
     aug_boxint boxint_;
-    unsigned refs_;
+    int refs_;
+    aug_mpool* mpool_;
     void (*destroy_)(int);
     int i_;
 };
@@ -43,9 +42,11 @@ releaseboxint_(aug_boxint* ob)
 {
     struct boxintimpl_* impl = AUG_PODIMPL(struct boxintimpl_, boxint_, ob);
     if (0 == --impl->refs_) {
+        aug_mpool* mpool = impl->mpool_;
         if (impl->destroy_)
             impl->destroy_(impl->i_);
-        free(impl);
+        aug_freemem(mpool, impl);
+        aug_release(mpool);
     }
 }
 
@@ -65,7 +66,8 @@ static const struct aug_boxintvtbl boxintvtbl_ = {
 
 struct boxptrimpl_ {
     aug_boxptr boxptr_;
-    unsigned refs_;
+    int refs_;
+    aug_mpool* mpool_;
     void (*destroy_)(void*);
     void* p_;
 };
@@ -92,9 +94,11 @@ releaseboxptr_(aug_boxptr* ob)
 {
     struct boxptrimpl_* impl = AUG_PODIMPL(struct boxptrimpl_, boxptr_, ob);
     if (0 == --impl->refs_) {
+        aug_mpool* mpool = impl->mpool_;
         if (impl->destroy_)
             impl->destroy_(impl->p_);
-        free(impl);
+        aug_freemem(mpool, impl);
+        aug_release(mpool);
     }
 }
 
@@ -115,7 +119,8 @@ static const struct aug_boxptrvtbl boxptrvtbl_ = {
 
 struct blobimpl_ {
     aug_blob blob_;
-    unsigned refs_;
+    int refs_;
+    aug_mpool* mpool_;
     size_t size_;
     char buf_[1];
 };
@@ -141,8 +146,11 @@ static void
 releaseblob_(aug_blob* ob)
 {
     struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, blob_, ob);
-    if (0 == --impl->refs_)
-        free(impl);
+    if (0 == --impl->refs_) {
+        aug_mpool* mpool = impl->mpool_;
+        aug_freemem(mpool, impl);
+        aug_release(mpool);
+    }
 }
 
 static const void*
@@ -170,20 +178,22 @@ static const struct aug_blobvtbl blobvtbl_ = {
 };
 
 AUGUTIL_API aug_boxint*
-aug_createboxint(int i, void (*destroy)(int))
+aug_createboxint(aug_mpool* mpool, int i, void (*destroy)(int))
 {
-    struct boxintimpl_* impl = malloc(sizeof(struct boxintimpl_));
-    if (!impl) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    struct boxintimpl_* impl = aug_allocmem(mpool,
+                                            sizeof(struct boxintimpl_));
+    if (!impl)
         return NULL;
-    }
 
     impl->boxint_.vtbl_ = &boxintvtbl_;
     impl->boxint_.impl_ = NULL;
     impl->refs_ = 1;
+    impl->mpool_ = mpool;
+
     impl->destroy_ = destroy;
     impl->i_ = i;
 
+    aug_retain(mpool);
     return &impl->boxint_;
 }
 
@@ -201,20 +211,22 @@ aug_obtoi(aug_object* ob)
 }
 
 AUGUTIL_API aug_boxptr*
-aug_createboxptr(void* p, void (*destroy)(void*))
+aug_createboxptr(aug_mpool* mpool, void* p, void (*destroy)(void*))
 {
-    struct boxptrimpl_* impl = malloc(sizeof(struct boxptrimpl_));
-    if (!impl) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    struct boxptrimpl_* impl = aug_allocmem(mpool,
+                                            sizeof(struct boxptrimpl_));
+    if (!impl)
         return NULL;
-    }
 
     impl->boxptr_.vtbl_ = &boxptrvtbl_;
     impl->boxptr_.impl_ = NULL;
     impl->refs_ = 1;
+    impl->mpool_ = mpool;
+
     impl->destroy_ = destroy;
     impl->p_ = p;
 
+    aug_retain(mpool);
     return &impl->boxptr_;
 }
 
@@ -232,19 +244,21 @@ aug_obtop(aug_object* ob)
 }
 
 AUGUTIL_API aug_blob*
-aug_createblob(const void* buf, size_t len)
+aug_createblob(aug_mpool* mpool, const void* buf, size_t len)
 {
-    struct blobimpl_* impl = malloc(sizeof(struct blobimpl_) + len);
-    if (!impl) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    struct blobimpl_* impl = aug_allocmem(mpool,
+                                          sizeof(struct blobimpl_) + len);
+    if (!impl)
         return NULL;
-    }
 
     impl->blob_.vtbl_ = &blobvtbl_;
     impl->refs_ = 1;
+    impl->mpool_ = mpool;
+
     impl->size_ = len;
     memcpy(impl->buf_, buf, len);
     impl->buf_[len] = '\0'; /* Null terminator. */
 
+    aug_retain(mpool);
     return &impl->blob_;
 }

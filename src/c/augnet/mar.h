@@ -16,6 +16,8 @@
 
 #include "augsys/types.h"
 
+#include "augext/mpool.h"
+
 #include "augabi.h"
 
 struct aug_marhandler {
@@ -31,8 +33,8 @@ typedef struct aug_marparser_* aug_marparser_t;
  */
 
 AUGNET_API aug_marparser_t
-aug_createmarparser(unsigned size, const struct aug_marhandler* handler,
-                    aug_object* ob);
+aug_createmarparser(aug_mpool* mpool, unsigned size,
+                    const struct aug_marhandler* handler, aug_object* ob);
 
 AUGNET_API int
 aug_destroymarparser(aug_marparser_t parser);

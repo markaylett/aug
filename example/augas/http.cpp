@@ -758,7 +758,8 @@ namespace {
         do_accepted(handle& sock, const char* name)
         {
             auto_ptr<session> sess(new session(realm_, sock.id(), name));
-            auto_ptr<marparser> parser(new marparser(0, sess));
+            auto_ptr<marparser> parser(new marparser(getmpool(aug_tlx), 0,
+                                                     sess));
 
             sock.setuser(parser.get());
             setrwtimer(sock, 30000, MOD_TIMRD);

@@ -151,32 +151,35 @@ namespace aug {
         {
         }
 
-        marparser(unsigned size, const aug_marhandler& handler, objectref ob)
+        marparser(mpoolref mpool, unsigned size,
+                  const aug_marhandler& handler, objectref ob)
         {
             verify(marparser_
-                   = aug_createmarparser(size, &handler, ob.get()));
+                   = aug_createmarparser(mpool.get(), size, &handler,
+                                         ob.get()));
         }
 
-        marparser(unsigned size, const aug_marhandler& handler, const null_&)
+        marparser(mpoolref mpool, unsigned size,
+                  const aug_marhandler& handler, const null_&)
         {
             verify(marparser_
-                   = aug_createmarparser(size, &handler, 0));
+                   = aug_createmarparser(mpool.get(), size, &handler, 0));
         }
 
         template <typename T>
-        marparser(unsigned size, T& x)
+        marparser(mpoolref mpool, unsigned size, T& x)
         {
-            aug::smartob<aug_boxptr> ob(createboxptr(&x, 0));
+            aug::smartob<aug_boxptr> ob(createboxptr(mpool, &x, 0));
             verify(marparser_ = aug_createmarparser
-                   (size, &marnonstatic<T>(), ob.base()));
+                   (mpool.get(), size, &marnonstatic<T>(), ob.base()));
         }
 
         template <typename T>
-        marparser(unsigned size, std::auto_ptr<T>& x)
+        marparser(mpoolref mpool, unsigned size, std::auto_ptr<T>& x)
         {
-            aug::smartob<aug_boxptr> ob(createboxptr(x));
+            aug::smartob<aug_boxptr> ob(createboxptr(mpool, x));
             verify(marparser_ = aug_createmarparser
-                   (size, &marnonstatic<T>(), ob.base()));
+                   (mpool.get(), size, &marnonstatic<T>(), ob.base()));
         }
 
         void

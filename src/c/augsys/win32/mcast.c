@@ -14,6 +14,7 @@ static int
 findif_(int af, unsigned ifindex,
         int (*fn)(void*, unsigned, PIP_ADAPTER_ADDRESSES), void* arg)
 {
+    aug_mpool* mpool = aug_getmpool(aug_tlx);
     PIP_ADAPTER_ADDRESSES list = NULL;
     ULONG len = 0, ret = 0;
     int i;
@@ -31,9 +32,9 @@ findif_(int af, unsigned ifindex,
             break;
 
         if (list)
-            free(list);
+            aug_freemem(mpool, list);
 
-        list = malloc(len);
+        list = aug_allocmem(mpool, len);
         if (!list) {
             ret = GetLastError();
             break;
@@ -62,7 +63,8 @@ findif_(int af, unsigned ifindex,
     }
 
     if (list)
-        free(list);
+        aug_freemem(mpool, list);
+    aug_release(mpool);
     return i;
 }
 

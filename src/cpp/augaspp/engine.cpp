@@ -272,7 +272,8 @@ namespace aug {
 
                     // Initiate grace period.
 
-                    smartob<aug_boxptr> ob(createboxptr(this, 0));
+                    smartob<aug_boxptr> ob
+                        (createboxptr(aug_getmpool(aug_tlx), this, 0));
                     grace_.set(15000, timermemcb<engineimpl,
                                &engineimpl::stopcb>, ob);
                 }
@@ -629,7 +630,7 @@ AUGASPP_API mod_id
 engine::settimer(const char* sname, unsigned ms, objectref ob)
 {
     mod_id id(aug_nextid());
-    smartob<aug_boxptr> local(createboxptr(impl_, 0));
+    smartob<aug_boxptr> local(createboxptr(getmpool(aug_tlx), impl_, 0));
 
     aug::settimer(impl_->timers_, id, ms, timermemcb<detail::engineimpl,
                   &detail::engineimpl::timercb>, local);
