@@ -32,7 +32,15 @@ makepath_(void)
         return NULL;
     }
 
-    if (!(s = aug_createxstr(sizeof(buf))))
+    /* FIXME: externalise mpool. */
+
+    {
+        aug_mpool* mpool = aug_getmpool(aug_tlx);
+        s = aug_createxstr(mpool, sizeof(buf));
+        aug_release(mpool);
+    }
+
+    if (!s)
         return NULL;
 
     if (!aug_realpath(buf, program, sizeof(buf)))

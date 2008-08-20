@@ -70,7 +70,15 @@ createlexer_(size_t size)
         return NULL;
     }
 
-    if (!(lexer->xstr_ = aug_createxstr(size))) {
+    /* FIXME: externalise mpool. */
+
+    {
+        aug_mpool* mpool = aug_getmpool(aug_tlx);
+        lexer->xstr_ = aug_createxstr(mpool, size);
+        aug_release(mpool);
+    }
+
+    if (!lexer->xstr_) {
         free(lexer);
         lexer = NULL;
     }

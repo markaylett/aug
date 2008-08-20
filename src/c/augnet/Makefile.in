@@ -64,8 +64,8 @@ libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugnet_la_OBJECTS = auth.lo base64.lo chans.lo config.lo \
-	fix.lo http.lo inet.lo mar.lo netevent.lo object.lo ssl.lo \
+am_libaugnet_la_OBJECTS = auth.lo base64.lo chans.lo config.lo fix.lo \
+	http.lo inet.lo mar.lo netevent.lo object.lo ssl.lo \
 	tcpconnect.lo types.lo writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_chanstest_OBJECTS = chanstest.$(OBJEXT)
@@ -112,6 +112,7 @@ CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
+DSYMUTIL = @DSYMUTIL@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -147,6 +148,7 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@

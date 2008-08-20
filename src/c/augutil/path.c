@@ -27,7 +27,7 @@ AUG_RCSID("$Id$");
 # endif /* HAVE_ALLOCA_H */
 # define IS_DIRSEP_(ch) ((ch) == '/')
 #else /* _WIN32 */
-# include <malloc.h>
+# include <malloc.h>       /* alloca() */
 # define IS_DIRSEP_(ch) ((ch) == '/' || (ch) == '\\')
 #endif /* _WIN32 */
 

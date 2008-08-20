@@ -177,7 +177,15 @@ aug_createfixstream(size_t size, aug_fixcb_t cb, aug_object* ob)
         return NULL;
     }
 
-    if (!(xstr = aug_createxstr(0 == size ? BUFSIZE_ : size))) {
+    /* FIXME: externalise mpool. */
+
+    {
+        aug_mpool* mpool = aug_getmpool(aug_tlx);
+        xstr = aug_createxstr(mpool, 0 == size ? BUFSIZE_ : size);
+        aug_release(mpool);
+    }
+
+    if (!xstr) {
         free(stream);
         return NULL;
     }

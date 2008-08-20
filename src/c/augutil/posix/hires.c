@@ -8,7 +8,6 @@
 #include "augctx/errinfo.h"
 
 #include <errno.h>        /* ENOMEM */
-#include <stdlib.h>       /* malloc() */
 
 struct aug_hires_ {
     aug_mpool* mpool_;

@@ -33,7 +33,16 @@ static int
 initial_(aug_object* ob, const char* initial)
 {
     aug_marparser_t parser = aug_obtop(ob);
-    if (!(parser->initial_ = aug_createxstr(0)))
+
+    /* FIXME: externalise mpool. */
+
+    {
+        aug_mpool* mpool = aug_getmpool(aug_tlx);
+        parser->initial_ = aug_createxstr(mpool, 0);
+        aug_release(mpool);
+    }
+
+    if (!parser->initial_)
         return -1;
 
     if (!(parser->mar_ = parser->handler_->create_(parser->ob_, initial))) {
