@@ -98,7 +98,7 @@ namespace aug {
         ~buffer() AUG_NOTHROW;
 
         explicit
-        buffer(size_t size = 1024);
+        buffer(mpoolref mpool, size_t size = 1024);
 
         void
         append(blobref ref);

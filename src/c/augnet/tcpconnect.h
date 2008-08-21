@@ -14,12 +14,16 @@
 
 #include "augsys/socket.h"
 
+#include "augext/mpool.h"
+
+#include "augtypes.h"
+
 typedef struct aug_tcpconnect_* aug_tcpconnect_t;
 
 AUGNET_API aug_tcpconnect_t
-aug_createtcpconnect(const char* host, const char* serv);
+aug_createtcpconnect(aug_mpool* mpool, const char* host, const char* serv);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_destroytcpconnect(aug_tcpconnect_t conn);
 
 /**

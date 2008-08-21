@@ -81,8 +81,8 @@ namespace aug {
     public:
         ~clntconn() AUG_NOTHROW;
 
-        clntconn(const sessionptr& session, void* user, timers& timers,
-                 const chanptr& chan);
+        clntconn(mpoolref mpool, const sessionptr& session, void* user,
+                 timers& timers, const chanptr& chan);
     };
 }
 

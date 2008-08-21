@@ -132,9 +132,10 @@ servconn::~servconn() AUG_NOTHROW
 {
 }
 
-servconn::servconn(const sessionptr& session, void* user, timers& timers,
-                   const chanptr& chan)
-    : rwtimer_(session, sock_, timers),
+servconn::servconn(mpoolref mpool, const sessionptr& session, void* user,
+                   timers& timers, const chanptr& chan)
+    : buffer_(mpool),
+      rwtimer_(session, sock_, timers),
       conn_(session, sock_, buffer_, rwtimer_, chan, false)
 {
     sock_.id_ = getchanid(chan);

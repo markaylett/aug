@@ -13,10 +13,9 @@ AUG_RCSID("$Id$");
 
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>  /* ENOMEM */
-#include <stdlib.h> /* malloc() */
 
 struct aug_base64_ {
+    aug_mpool* mpool_;
     aug_base64cb_t cb_;
     aug_object* ob_;
     char buf_[AUG_MAXLINE];
@@ -522,14 +521,14 @@ encodefinish_(aug_base64_t base64)
 }
 
 AUGNET_API aug_base64_t
-aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aug_object* ob)
+aug_createbase64(aug_mpool* mpool, enum aug_base64mode mode,
+                 aug_base64cb_t cb, aug_object* ob)
 {
-    aug_base64_t base64 = malloc(sizeof(struct aug_base64_));
-    if (!base64) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    aug_base64_t base64;
+    if (!(base64 = aug_allocmem(mpool, sizeof(struct aug_base64_))))
         return NULL;
-    }
 
+    base64->mpool_ = mpool;
     base64->cb_ = cb;
     if ((base64->ob_ = ob))
         aug_retain(ob);
@@ -549,16 +548,19 @@ aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aug_object* ob)
         break;
     }
 
+    aug_retain(mpool);
     return base64;
 }
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_destroybase64(aug_base64_t base64)
 {
+    aug_mpool* mpool = base64->mpool_;
     if (base64->ob_)
         aug_release(base64->ob_);
-    free(base64);
-    return 0;
+    aug_freemem(mpool, base64);
+    aug_release(mpool);
+    return AUG_SUCCESS;
 }
 
 AUGNET_API int

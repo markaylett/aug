@@ -16,7 +16,7 @@ main(int argc, char* argv[])
     struct iovec iov[2];
     char buf[AUG_MAXLINE];
 
-    if (aug_initbasictlx() < 0)
+    if (aug_autobasictlx() < 0)
         return 1;
 
     if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {

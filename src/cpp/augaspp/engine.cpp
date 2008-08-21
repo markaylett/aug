@@ -212,8 +212,8 @@ namespace aug {
 
                 sockptr sock(socks_.getbyid(parent));
                 chanptr chan(object_cast<aug_chan>(stream));
-                connptr conn(new servconn(sock->session(), user(*sock),
-                                          timers_, chan));
+                connptr conn(new servconn(getmpool(aug_tlx), sock->session(),
+                                          user(*sock), timers_, chan));
                 scoped_insert si(socks_, conn);
 
                 // Connection has now been established.
@@ -532,9 +532,10 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
 
     sessionptr session(impl_->sessions_.getbyname(sname));
 
-    chanptr chan(createclient(getmpool(aug_tlx), impl_->muxer_, host, port,
+    mpoolptr mpool(getmpool(aug_tlx));
+    chanptr chan(createclient(mpool, impl_->muxer_, host, port,
                               ctx ? ctx->get() : 0));
-    connptr conn(new clntconn(session, user, impl_->timers_, chan));
+    connptr conn(new clntconn(mpool, session, user, impl_->timers_, chan));
 
     impl_->socks_.insert(conn);
     insertchan(impl_->chans_, chan);

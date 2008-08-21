@@ -11,7 +11,12 @@
  */
 
 #include "augutil/config.h"
+
 #include "augsys/types.h"
+
+#include "augext/mpool.h"
+
+#include "augtypes.h"
 
 #define AUG_LEXLABEL  0x01
 #define AUG_LEXWORD   0x02
@@ -22,12 +27,12 @@
 typedef struct aug_lexer_* aug_lexer_t;
 
 AUGUTIL_API aug_lexer_t
-aug_createnetlexer(size_t size);
+aug_createnetlexer(aug_mpool* mpool, size_t size);
 
 AUGUTIL_API aug_lexer_t
-aug_createshelllexer(size_t size, int pairs);
+aug_createshelllexer(aug_mpool* mpool, size_t size, int pairs);
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_destroylexer(aug_lexer_t lexer);
 
 AUGUTIL_API unsigned

@@ -22,11 +22,11 @@ AUG_RCSID("$Id$");
 #  include <alloca.h>
 # endif /* HAVE_ALLOCA_H */
 #else /* _WIN32 */
-# include <malloc.h>
+# include <malloc.h> /* alloca() */
 #endif /* _WIN32 */
 
 #include <assert.h>
-#include <stdlib.h> /* malloc() */
+#include <stdlib.h>  /* malloc() */
 
 struct aug_buf {
     AUG_ENTRY(aug_buf);
@@ -39,6 +39,7 @@ static struct bufs_ free_ = AUG_HEAD_INITIALIZER(free_);
 AUG_ALLOCATOR(allocate_, &free_, aug_buf, 64)
 
 struct aug_writer_ {
+    aug_mpool* mpool_;
     struct bufs_ bufs_;
     size_t part_;
     unsigned size_;
@@ -110,23 +111,25 @@ popbufs_(aug_writer_t writer, const struct iovec* iov, size_t num)
 }
 
 AUGNET_API aug_writer_t
-aug_createwriter(void)
+aug_createwriter(aug_mpool* mpool)
 {
-    aug_writer_t writer = malloc(sizeof(struct aug_writer_));
-    if (!writer) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    aug_writer_t writer = aug_allocmem(mpool, sizeof(struct aug_writer_));
+    if (!writer)
         return NULL;
-    }
 
+    writer->mpool_ = mpool;
     AUG_INIT(&writer->bufs_);
     writer->part_ = 0;
     writer->size_ = 0;
+
+    aug_retain(mpool);
     return writer;
 }
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_destroywriter(aug_writer_t writer)
 {
+    aug_mpool* mpool = writer->mpool_;
     struct aug_buf* it;
     AUG_FOREACH(it, &writer->bufs_) {
         aug_release(it->blob_);
@@ -136,7 +139,10 @@ aug_destroywriter(aug_writer_t writer)
     /* Destroy in single batch to avoid multiple calls to aug_lock(). */
 
     destroybufs_(&writer->bufs_);
-    return 0;
+
+    aug_freemem(mpool, writer);
+    aug_release(mpool);
+    return AUG_SUCCESS;
 }
 
 AUGNET_API int

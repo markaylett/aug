@@ -674,7 +674,7 @@ aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
     int est;
     struct cimpl_* impl;
 
-    if (!(conn = aug_createtcpconnect(host, serv)))
+    if (!(conn = aug_createtcpconnect(mpool, host, serv)))
         return NULL;
 
     if (AUG_BADSD == (sd = aug_tryconnect(conn, &ep, &est)))

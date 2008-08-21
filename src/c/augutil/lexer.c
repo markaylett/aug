@@ -16,10 +16,9 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 
 #include <ctype.h>  /* isspace() */
-#include <errno.h>  /* ENOMEM */
-#include <stdlib.h> /* malloc() */
 
 struct aug_lexer_ {
+    aug_mpool* mpool_;
     struct aug_words words_;
     void (*put_)(struct aug_words*, int);
     aug_xstr_t xstr_;
@@ -56,7 +55,7 @@ out_(void* arg, int what)
 }
 
 static aug_lexer_t
-createlexer_(size_t size)
+createlexer_(aug_mpool* mpool, size_t size)
 {
     aug_lexer_t lexer;
 
@@ -65,32 +64,26 @@ createlexer_(size_t size)
     if (0 == size)
         size = AUG_MAXLINE;
 
-    if (!(lexer = malloc(sizeof(struct aug_lexer_)))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    if (!(lexer = aug_allocmem(mpool, sizeof(struct aug_lexer_))))
+        return NULL;
+
+    if (!(lexer->xstr_ = aug_createxstr(mpool, size))) {
+        aug_freemem(mpool, lexer);
         return NULL;
     }
 
-    /* FIXME: externalise mpool. */
-
-    {
-        aug_mpool* mpool = aug_getmpool(aug_tlx);
-        lexer->xstr_ = aug_createxstr(mpool, size);
-        aug_release(mpool);
-    }
-
-    if (!lexer->xstr_) {
-        free(lexer);
-        lexer = NULL;
-    }
+    lexer->mpool_ = mpool;
     lexer->what_ = 0;
     lexer->save_ = 0;
+
+    aug_retain(mpool);
     return lexer;
 }
 
 AUGUTIL_API aug_lexer_t
-aug_createnetlexer(size_t size)
+aug_createnetlexer(aug_mpool* mpool, size_t size)
 {
-    aug_lexer_t lexer = createlexer_(size);
+    aug_lexer_t lexer = createlexer_(mpool, size);
     if (lexer) {
         aug_initnetwords(&lexer->words_, out_, lexer);
         lexer->put_ = aug_putnetwords;
@@ -99,9 +92,9 @@ aug_createnetlexer(size_t size)
 }
 
 AUGUTIL_API aug_lexer_t
-aug_createshelllexer(size_t size, int pairs)
+aug_createshelllexer(aug_mpool* mpool, size_t size, int pairs)
 {
-    aug_lexer_t lexer = createlexer_(size);
+    aug_lexer_t lexer = createlexer_(mpool, size);
     if (lexer) {
         aug_initshellwords(&lexer->words_, pairs, out_, lexer);
         lexer->put_ = aug_putshellwords;
@@ -109,13 +102,14 @@ aug_createshelllexer(size_t size, int pairs)
     return lexer;
 }
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_destroylexer(aug_lexer_t lexer)
 {
-    if (lexer)
-        aug_destroyxstr(lexer->xstr_);
-    free(lexer);
-    return 0;
+    aug_mpool* mpool = lexer->mpool_;
+    aug_destroyxstr(lexer->xstr_);
+    aug_freemem(mpool, lexer);
+    aug_release(mpool);
+    return AUG_SUCCESS;
 }
 
 AUGUTIL_API unsigned

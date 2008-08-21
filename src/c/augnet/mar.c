@@ -159,7 +159,7 @@ aug_createmarparser(aug_mpool* mpool, unsigned size,
         return NULL;
     }
 
-    http = aug_createhttpparser(size, &handler_, boxptr);
+    http = aug_createhttpparser(mpool, size, &handler_, boxptr);
 
     /* If created, http parser will hold reference.  Otherwise, it will be
        destroyed now. */

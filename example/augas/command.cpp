@@ -65,7 +65,7 @@ namespace {
         bool
         do_accepted(handle& sock, const char* name)
         {
-            sock.setuser(new shellparser());
+            sock.setuser(new shellparser(getmpool(aug_tlx)));
             send(sock, "HELLO\r\n", 7);
             setrwtimer(sock, 15000, MOD_TIMRD);
             return true;

@@ -21,7 +21,7 @@ AUG_RCSID("$Id$");
 # endif /* HAVE_ALLOCA_H */
 # include <netinet/tcp.h>
 #else /* _WIN32 */
-# include <malloc.h>
+# include <malloc.h>       /* alloca() */
 #endif /* _WIN32 */
 
 #include <string.h>        /* strchr() */

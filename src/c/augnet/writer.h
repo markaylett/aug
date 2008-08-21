@@ -15,14 +15,17 @@
 #include "augsys/types.h"
 
 #include "augext/blob.h"
+#include "augext/mpool.h"
 #include "augext/stream.h"
+
+#include "augtypes.h"
 
 typedef struct aug_writer_* aug_writer_t;
 
 AUGNET_API aug_writer_t
-aug_createwriter(void);
+aug_createwriter(aug_mpool* mpool);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_destroywriter(aug_writer_t writer);
 
 AUGNET_API int

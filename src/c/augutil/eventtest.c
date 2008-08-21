@@ -1,32 +1,33 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys.h"
 #include "augutil.h"
+#include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
-    int fds[2];
+    aug_sd sds[2];
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
-    aug_atexitinit(&errinfo);
+    if (aug_autobasictlx() < 0)
+        return 1;
 
-    if (-1 == aug_muxerpipe(fds)) {
-        aug_perrinfo(aug_tlerr, "aug_term() failed");
+    if (-1 == aug_muxerpipe(sds)) {
+        aug_perrinfo(aug_tlx, "aug_term() failed", NULL);
         return 1;
     }
 
-    if (!aug_writeevent(fds[1], &in)) {
-        aug_perrinfo(aug_tlerr, "aug_writeevent() failed");
+    if (!aug_writeevent(sds[1], &in)) {
+        aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
         goto fail;
     }
 
-    if (!aug_readevent(fds[0], &out)) {
-        aug_perrinfo(aug_tlerr, "aug_readevent() failed");
+    if (!aug_readevent(sds[0], &out)) {
+        aug_perrinfo(aug_tlx, "aug_readevent() failed", NULL);
         goto fail;
     }
 
@@ -35,15 +36,15 @@ main(int argc, char* argv[])
         goto fail;
     }
 
-    if (-1 == aug_close(fds[0]) || -1 == aug_close(fds[1])) {
-        aug_perrinfo(aug_tlerr, "aug_close() failed");
+    if (aug_sclose(sds[0]) < 0 || aug_sclose(sds[1]) < 0) {
+        aug_perrinfo(aug_tlx, "aug_close() failed", NULL);
         return 1;
     }
 
     return 0;
 
  fail:
-    AUG_PERRINFO(aug_close(fds[0]), NULL, "aug_close() failed");
-    AUG_PERRINFO(aug_close(fds[1]), NULL, "aug_close() failed");
+    aug_sclose(sds[0]);
+    aug_sclose(sds[1]);
     return 1;
 }

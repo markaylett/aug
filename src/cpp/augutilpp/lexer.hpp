@@ -36,14 +36,15 @@ namespace aug {
         {
         }
 
-        lexer(unsigned size, const networds_&)
+        lexer(mpoolref mpool, unsigned size, const networds_&)
         {
-            verify(lexer_ = aug_createnetlexer(size));
+            verify(lexer_ = aug_createnetlexer(mpool.get(), size));
         }
 
-        lexer(unsigned size, const shellwords_&, bool pairs)
+        lexer(mpoolref mpool, unsigned size, const shellwords_&, bool pairs)
         {
-            verify(lexer_ = aug_createshelllexer(size, pairs ? 1 : 0));
+            verify(lexer_ = aug_createshelllexer(mpool.get(), size,
+                                                 pairs ? 1 : 0));
         }
 
         void

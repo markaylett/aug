@@ -32,8 +32,9 @@ namespace aug {
         {
         }
 
-        writer()
-            : writer_(aug_createwriter())
+        explicit
+        writer(mpoolref mpool)
+            : writer_(aug_createwriter(mpool.get()))
         {
             verify(writer_);
         }

@@ -14,7 +14,10 @@
 
 #include "augsys/types.h"
 
+#include "augext/mpool.h"
+
 #include "augabi.h"
+#include "augtypes.h"
 
 struct aug_httphandler {
     int (*initial_)(aug_object*, const char*);
@@ -32,10 +35,10 @@ typedef struct aug_httpparser_* aug_httpparser_t;
  */
 
 AUGNET_API aug_httpparser_t
-aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
-                     aug_object* ob);
+aug_createhttpparser(aug_mpool* mpool, unsigned size,
+                     const struct aug_httphandler* handler, aug_object* ob);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_destroyhttpparser(aug_httpparser_t parser);
 
 AUGNET_API int

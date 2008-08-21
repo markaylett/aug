@@ -14,7 +14,10 @@
 
 #include "augsys/types.h"
 
+#include "augext/mpool.h"
+
 #include "augabi.h"
+#include "augtypes.h"
 
 typedef int (*aug_base64cb_t)(aug_object*, const char*, size_t);
 
@@ -26,9 +29,10 @@ enum aug_base64mode {
 };
 
 AUGNET_API aug_base64_t
-aug_createbase64(enum aug_base64mode mode, aug_base64cb_t cb, aug_object* ob);
+aug_createbase64(aug_mpool* mpool, enum aug_base64mode mode,
+                 aug_base64cb_t cb, aug_object* ob);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_destroybase64(aug_base64_t base64);
 
 AUGNET_API int

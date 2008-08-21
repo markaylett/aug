@@ -20,6 +20,15 @@
 #define OFFSET_ 128
 
 static aug_xstr_t
+createxstr_(size_t size)
+{
+    aug_mpool* mpool = aug_getmpool(aug_tlx);
+    aug_xstr_t s = aug_createxstr(mpool, size);
+    aug_release(mpool);
+    return s;
+}
+
+static aug_xstr_t
 makepath_(void)
 {
     const char* program, * conffile;
@@ -32,15 +41,7 @@ makepath_(void)
         return NULL;
     }
 
-    /* FIXME: externalise mpool. */
-
-    {
-        aug_mpool* mpool = aug_getmpool(aug_tlx);
-        s = aug_createxstr(mpool, sizeof(buf));
-        aug_release(mpool);
-    }
-
-    if (!s)
+    if (!(s = createxstr_(sizeof(buf))))
         return NULL;
 
     if (!aug_realpath(buf, program, sizeof(buf)))

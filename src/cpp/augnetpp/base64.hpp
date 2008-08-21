@@ -74,31 +74,33 @@ namespace aug {
         {
         }
 
-        base64(aug_base64mode mode, aug_base64cb_t cb,
+        base64(mpoolref mpool, aug_base64mode mode, aug_base64cb_t cb,
                aug::obref<aug_object> ob)
         {
-            verify(base64_ = aug_createbase64(mode, cb, ob.get()));
+            verify(base64_ = aug_createbase64(mpool.get(), mode, cb,
+                                              ob.get()));
         }
 
-        base64(aug_base64mode mode, aug_base64cb_t cb, const null_&)
+        base64(mpoolref mpool, aug_base64mode mode, aug_base64cb_t cb,
+               const null_&)
         {
-            verify(base64_ = aug_createbase64(mode, cb, 0));
+            verify(base64_ = aug_createbase64(mpool.get(), mode, cb, 0));
         }
 
         template <typename T>
-        base64(aug_base64mode mode, T& x)
+        base64(mpoolref mpool, aug_base64mode mode, T& x)
         {
             aug::smartob<aug_boxptr> ob(createboxptr(&x, 0));
             verify(base64_ = aug_createbase64
-                   (mode, base64memcb<T>, ob.base()));
+                   (mpool.get(), mode, base64memcb<T>, ob.base()));
         }
 
         template <typename T>
-        base64(aug_base64mode mode, std::auto_ptr<T>& x)
+        base64(mpoolref mpool, aug_base64mode mode, std::auto_ptr<T>& x)
         {
             aug::smartob<aug_boxptr> ob(createboxptr(x));
             verify(base64_ = aug_createbase64
-                   (mode, base64memcb<T>, ob.base()));
+                   (mpool.get(), mode, base64memcb<T>, ob.base()));
         }
 
         void
@@ -156,7 +158,7 @@ namespace aug {
     filterbase64(std::ostream& os, std::istream& is, aug_base64mode mode)
     {
         scoped_boxptr<simple_boxptr> ob(&os);
-        base64 b64(mode, base64cb<detail::base64os>, ob);
+        base64 b64(getmpool(aug_tlx), mode, base64cb<detail::base64os>, ob);
         char buf[AUG_MAXLINE];
         do {
             is.read(buf, sizeof(buf));
@@ -172,7 +174,7 @@ namespace aug {
     {
         std::string s;
         scoped_boxptr<simple_boxptr> ob(&s);
-        base64 b64(mode, base64cb<detail::base64str>, ob);
+        base64 b64(getmpool(aug_tlx), mode, base64cb<detail::base64str>, ob);
         appendbase64(b64, buf, len);
         finishbase64(b64);
         return s;

@@ -19,8 +19,9 @@ buffer::~buffer() AUG_NOTHROW
 {
 }
 
-buffer::buffer(size_t size)
-    : blob_(size),
+buffer::buffer(mpoolref mpool, size_t size)
+    : writer_(mpool),
+      blob_(size),
       reuse_(true),
       size_(0)
 {

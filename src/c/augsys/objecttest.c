@@ -16,7 +16,8 @@ main(int argc, char* argv[])
     aug_mpool* mpool;
     aug_chan* chan;
     aug_stream* stream;
-    if (aug_initbasictlx() < 0)
+
+    if (aug_autobasictlx() < 0)
         return 1;
 
     fd = aug_fopen("filetest.txt", O_CREAT | O_TRUNC | O_RDWR, 0666);

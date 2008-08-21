@@ -16,10 +16,9 @@ AUG_RCSID("$Id$");
 #include "augctx/string.h"
 
 #include <assert.h>
-#include <errno.h>  /* ENOMEM */
-#include <stdlib.h> /* malloc() */
 
 struct aug_httpparser_ {
+    aug_mpool* mpool_;
     const struct aug_httphandler* handler_;
     aug_object* ob_;
     aug_lexer_t lexer_;
@@ -206,22 +205,21 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 }
 
 AUGNET_API aug_httpparser_t
-aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
-                     aug_object* ob)
+aug_createhttpparser(aug_mpool* mpool, unsigned size,
+                     const struct aug_httphandler* handler, aug_object* ob)
 {
-    aug_httpparser_t parser = malloc(sizeof(struct aug_httpparser_));
+    aug_httpparser_t parser;
     aug_lexer_t lexer;
 
-    if (!parser) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    if (!(parser = aug_allocmem(mpool, sizeof(struct aug_httpparser_))))
+        return NULL;
+
+    if (!(lexer = aug_createnetlexer(mpool, size))) {
+        aug_freemem(mpool, parser);
         return NULL;
     }
 
-    if (!(lexer = aug_createnetlexer(size))) {
-        free(parser);
-        return NULL;
-    }
-
+    parser->mpool_ = mpool;
     parser->handler_ = handler;
     if ((parser->ob_ = ob))
         aug_retain(ob);
@@ -229,16 +227,20 @@ aug_createhttpparser(unsigned size, const struct aug_httphandler* handler,
     parser->name_[0] = '\0';
     parser->state_ = INITIAL_;
     parser->csize_ = 0;
+
+    aug_retain(mpool);
     return parser;
 }
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_destroyhttpparser(aug_httpparser_t parser)
 {
-    int ret = aug_destroylexer(parser->lexer_);
+    aug_mpool* mpool = parser->mpool_;
+    aug_result ret = aug_destroylexer(parser->lexer_);
     if (parser->ob_)
         aug_release(parser->ob_);
-    free(parser);
+    aug_freemem(mpool, parser);
+    aug_release(mpool);
     return ret;
 }
 

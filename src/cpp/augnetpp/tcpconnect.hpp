@@ -37,8 +37,8 @@ namespace aug {
         {
         }
 
-        tcpconnect(const char* host, const char* serv)
-            : conn_(aug_createtcpconnect(host, serv))
+        tcpconnect(mpoolref mpool, const char* host, const char* serv)
+            : conn_(aug_createtcpconnect(mpool.get(), host, serv))
         {
             verify(conn_);
         }

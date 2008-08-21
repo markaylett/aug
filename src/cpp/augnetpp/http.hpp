@@ -185,18 +185,19 @@ namespace aug {
         {
         }
 
-        httpparser(unsigned size, const aug_httphandler& handler,
-                   objectref ob)
+        httpparser(mpoolref mpool, unsigned size,
+                   const aug_httphandler& handler, objectref ob)
         {
             verify(httpparser_
-                   = aug_createhttpparser(size, &handler, ob.get()));
+                   = aug_createhttpparser(mpool.get(), size, &handler,
+                                          ob.get()));
         }
 
-        httpparser(unsigned size, const aug_httphandler& handler,
-                   const null_&)
+        httpparser(mpoolref mpool, unsigned size,
+                   const aug_httphandler& handler, const null_&)
         {
             verify(httpparser_
-                   = aug_createhttpparser(size, &handler, 0));
+                   = aug_createhttpparser(mpool.get(), size, &handler, 0));
         }
 
         template <typename T>

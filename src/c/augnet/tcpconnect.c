@@ -18,9 +18,9 @@ AUG_RCSID("$Id$");
 #include "augctx/string.h"  /* bzero() */
 
 #include <assert.h>
-#include <stdlib.h>         /* malloc() */
 
 struct aug_tcpconnect_ {
+    aug_mpool* mpool_;
     struct addrinfo* res_, *save_;
     aug_sd sd_;
 };
@@ -36,7 +36,7 @@ getsockerr_(aug_sd sd, int* err)
 }
 
 AUGNET_API aug_tcpconnect_t
-aug_createtcpconnect(const char* host, const char* serv)
+aug_createtcpconnect(aug_mpool* mpool, const char* host, const char* serv)
 {
     aug_tcpconnect_t conn;
     struct addrinfo hints, * res;
@@ -49,26 +49,30 @@ aug_createtcpconnect(const char* host, const char* serv)
     if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
         return NULL;
 
-    if (!(conn  = malloc(sizeof(struct aug_tcpconnect_)))) {
+    if (!(conn  = aug_allocmem(mpool, sizeof(struct aug_tcpconnect_)))) {
         aug_destroyaddrinfo(res);
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
+    conn->mpool_ = mpool;
     conn->res_ = conn->save_ = res;
     conn->sd_ = AUG_BADSD;
+
+    aug_retain(mpool);
     return conn;
 }
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_destroytcpconnect(aug_tcpconnect_t conn)
 {
+    aug_mpool* mpool = conn->mpool_;
     if (AUG_BADSD != conn->sd_)
         aug_sclose(conn->sd_);
 
     aug_destroyaddrinfo(conn->save_);
-    free(conn);
-    return 0;
+    aug_freemem(mpool, conn);
+    aug_release(mpool);
+    return AUG_SUCCESS;
 }
 
 AUGNET_API aug_sd

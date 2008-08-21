@@ -23,8 +23,8 @@ namespace aug {
         }
     public:
         explicit
-        shellparser(bool pairs = false)
-            : lexer_(0, shellwords, pairs)
+        shellparser(mpoolref mpool, bool pairs = false)
+            : lexer_(mpool, 0, shellwords, pairs)
         {
         }
         bool

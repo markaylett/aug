@@ -14,8 +14,6 @@ AUG_RCSID("$Id$");
 #include "augctx/string.h"
 
 #include <ctype.h>  /* isdigit() */
-#include <errno.h>  /* ENOMEM */
-#include <stdlib.h> /* malloc() */
 
 /* All fields (including those of data type data i.e. SecureData, RawData,
    SignatureData, XmlData, etc.) in a FIX message are terminated by a
@@ -65,6 +63,7 @@ AUG_RCSID("$Id$");
 #define MAX_DIGITS_ 10
 
 struct aug_fixstream_ {
+    aug_mpool* mpool_;
     aug_fixcb_t cb_;
     aug_object* ob_;
     aug_xstr_t xstr_;
@@ -167,44 +166,40 @@ getsum_(const char* buf, size_t size)
 }
 
 AUGNET_API aug_fixstream_t
-aug_createfixstream(size_t size, aug_fixcb_t cb, aug_object* ob)
+aug_createfixstream(aug_mpool* mpool, size_t size, aug_fixcb_t cb,
+                    aug_object* ob)
 {
-    aug_fixstream_t stream = malloc(sizeof(struct aug_fixstream_));
+    aug_fixstream_t stream;
     aug_xstr_t xstr;
 
-    if (!stream) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    if (!(stream = aug_allocmem(mpool, sizeof(struct aug_fixstream_))))
+        return NULL;
+
+    if (!(xstr = aug_createxstr(mpool, 0 == size ? BUFSIZE_ : size))) {
+        aug_freemem(mpool, stream);
         return NULL;
     }
 
-    /* FIXME: externalise mpool. */
-
-    {
-        aug_mpool* mpool = aug_getmpool(aug_tlx);
-        xstr = aug_createxstr(mpool, 0 == size ? BUFSIZE_ : size);
-        aug_release(mpool);
-    }
-
-    if (!xstr) {
-        free(stream);
-        return NULL;
-    }
-
+    stream->mpool_ = mpool;
     stream->cb_ = cb;
     if ((stream->ob_ = ob))
         aug_retain(ob);
     stream->xstr_ = xstr;
     stream->mlen_ = 0;
+
+    aug_retain(mpool);
     return stream;
 }
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_destroyfixstream(aug_fixstream_t stream)
 {
-    int ret = aug_destroyxstr(stream->xstr_);
+    aug_mpool* mpool = stream->mpool_;
+    aug_result ret = aug_destroyxstr(stream->xstr_);
     if (stream->ob_)
         aug_release(stream->ob_);
-    free(stream);
+    aug_freemem(mpool, stream);
+    aug_release(mpool);
     return ret;
 }
 
