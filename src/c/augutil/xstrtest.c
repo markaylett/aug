@@ -5,6 +5,7 @@
 #include "augctx.h"
 
 #include <stdio.h>
+#include <stdlib.h> /* exit() */
 
 int
 main(int argc, char* argv[])

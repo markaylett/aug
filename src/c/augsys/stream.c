@@ -12,6 +12,7 @@ AUG_RCSID("$Id$");
 #include "augsys/unistd.h"
 
 #include <assert.h>
+#include <string.h> /* strcmp() */
 
 struct fimpl_ {
     aug_stream stream_;
