@@ -19,6 +19,7 @@ modinclude_HEADERS = \
 	object.h \
 	queue.h \
 	socket.h \
+	stream.h \
 	time.h \
 	types.h \
 	uio.h \
@@ -41,6 +42,7 @@ libaugsys_la_SOURCES = \
 	muxer.c \
 	object.c \
 	socket.c \
+	stream.c \
 	time.c \
 	types.c \
 	uio.c \

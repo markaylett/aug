@@ -1,8 +1,9 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys.h"
 #include "augutil.h"
+#include "augsys.h"
+#include "augctx.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -30,11 +31,15 @@ out_(unsigned flags)
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
+    aug_mpool* mpool;
     char ch;
-    aug_atexitinit(&errinfo);
+    if (aug_autobasictlx() < 0)
+        return 1;
 
-    lexer_ = aug_createshelllexer(0, 1);
+    mpool = aug_getmpool(aug_tlx);
+    lexer_ = aug_createshelllexer(mpool, 0, 1);
+    aug_release(mpool);
+
     assert(lexer_);
     while (EOF != (ch = getchar()))
         out_(aug_appendlexer(lexer_, ch));

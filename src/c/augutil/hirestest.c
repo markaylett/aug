@@ -1,28 +1,34 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys.h"
 #include "augutil.h"
+#include "augsys.h"
+#include "augctx.h"
+#include "augext.h"
 
 #include <stdio.h>
 
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
-
+    aug_mpool* mpool;
     aug_hires_t hires;
     double start, stop;
 
-    aug_atexitinit(&errinfo);
+    if (aug_autobasictlx() < 0)
+        return 1;
 
-    if (!(hires = aug_createhires())) {
-        aug_perrinfo(aug_tlerr, "aug_createhires() failed");
+    mpool = aug_getmpool(aug_tlx);
+    hires = aug_createhires(mpool);
+    aug_release(mpool);
+
+    if (!hires) {
+        aug_perrinfo(aug_tlx, "aug_createhires() failed", NULL);
         return 1;
     }
 
     if (!aug_elapsed(hires, &start)) {
-        aug_perrinfo(aug_tlerr, "aug_elapsed() failed");
+        aug_perrinfo(aug_tlx, "aug_elapsed() failed", NULL);
         return 1;
     }
 
@@ -31,7 +37,7 @@ main(int argc, char* argv[])
     aug_msleep(500);
 
     if (!aug_elapsed(hires, &stop)) {
-        aug_perrinfo(aug_tlerr, "aug_elapsed() failed");
+        aug_perrinfo(aug_tlx, "aug_elapsed() failed", NULL);
         return 1;
     }
 
@@ -39,12 +45,12 @@ main(int argc, char* argv[])
 
     stop -= start;
     if (stop < 0.48 || 0.52 < stop) {
-        aug_error("unexpected interval: stop=%0.6f", stop);
+        aug_ctxerror(aug_tlx, "unexpected interval: stop=%0.6f", stop);
         return 1;
     }
 
     if (-1 == aug_destroyhires(hires)) {
-        aug_perrinfo(aug_tlerr, "aug_destroyhires() failed");
+        aug_perrinfo(aug_tlx, "aug_destroyhires() failed", NULL);
         return 1;
     }
 

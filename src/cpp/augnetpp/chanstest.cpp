@@ -12,15 +12,15 @@ using namespace std;
 
 namespace {
 
-    pair<channelobptr, channelobptr>
+    pair<chanptr, chanptr>
     plainpair(mpoolref mpool, aug_muxer_t muxer)
     {
         autosds sds(socketpair(AF_UNIX, SOCK_STREAM, 0));
         setnonblock(sds[0], true);
         setnonblock(sds[1], true);
-        return make_pair(createplain(mpool, nextid(), muxer, sds[0],
+        return make_pair(createplain(mpool, muxer, nextid(), sds[0],
                                      AUG_MDEVENTRD),
-                         createplain(mpool, nextid(), muxer, sds[1],
+                         createplain(mpool, muxer, nextid(), sds[1],
                                      AUG_MDEVENTWR));
     }
 
@@ -28,18 +28,56 @@ namespace {
     bool done_ = false;
 
     struct test {
-        bool
-        cb(unsigned id, streamobref streamob, unsigned short events)
+
+        chandler<test> chandler_;
+        chans chans_;
+
+        explicit
+        test(mpoolref mpool)
+            : chans_(null)
+        {
+            chandler_.reset(this);
+            chans tmp(getmpool(aug_tlx), chandler_);
+            chans_.swap(tmp);
+        }
+        smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
+        {
+            if (equalid<aug_object>(id) || equalid<aug_chandler>(id))
+                return object_retain<aug_object>(chandler_);
+            return null;
+        }
+        void
+        retain_() AUG_NOTHROW
+        {
+        }
+        void
+        release_() AUG_NOTHROW
+        {
+        }
+        void
+        clearchan_(unsigned id) AUG_NOTHROW
+        {
+        }
+        aug_bool
+        estabchan_(unsigned id, obref<aug_stream> stream,
+                   unsigned parent) AUG_NOTHROW
+        {
+            return AUG_TRUE;
+        }
+        aug_bool
+        readychan_(unsigned id, obref<aug_stream> stream,
+                   unsigned short events) AUG_NOTHROW
         {
             if (id == rd_) {
                 char ch;
-                read(streamob, &ch, 1);
+                read(stream, &ch, 1);
                 if ('A' == ch)
                     done_ = true;
             } else if (id == wr_) {
-                write(streamob, "A", 1);
+                write(stream, "A", 1);
             }
-            return true;
+            return AUG_TRUE;
         }
     };
 }
@@ -51,20 +89,21 @@ main(int argc, char* argv[])
         autobasictlx();
 
         mpoolptr mp(getmpool(aug_tlx));
-        muxer mux;
-        channels channs(mp);
-        pair<channelobptr, channelobptr> xy(plainpair(mp, mux));
 
-        wr_ = getid(xy.second);
-        insertchannel(channs, xy.second);
+        chandler<test> chandler;
+        muxer mux(mp);
+        chans chans(mp, chandler);
+        pair<chanptr, chanptr> xy(plainpair(mp, mux));
 
-        rd_ = getid(xy.first);
-        insertchannel(channs, xy.first);
+        wr_ = getchanid(xy.second);
+        insertchan(chans, xy.second);
 
-        test x;
+        rd_ = getchanid(xy.first);
+        insertchan(chans, xy.first);
+
         while (!done_) {
             waitmdevents(mux);
-            foreachchannel<test, &test::cb>(channs, x);
+            processchans(chans);
         }
 
         return 0;

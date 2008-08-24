@@ -1,8 +1,9 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys.h"
 #include "augutil.h"
+#include "augsys.h"
+#include "augctx.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -41,11 +42,11 @@ out_(void* arg, int what)
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
     struct aug_words st;
     int ch;
 
-    aug_atexitinit(&errinfo);
+    if (aug_autobasictlx() < 0)
+        return 1;
     aug_initshellwords(&st, 1, out_, NULL);
 
     while (EOF != (ch = getchar()))

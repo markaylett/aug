@@ -63,8 +63,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugsys_la_OBJECTS = barrier.lo base.lo config.lo debug.lo \
 	dlfcn.lo endian.lo limits.lo mcast.lo mmap.lo muxer.lo \
-	object.lo socket.lo time.lo types.lo uio.lo unistd.lo \
-	utility.lo windows.lo
+	object.lo socket.lo stream.lo time.lo types.lo uio.lo \
+	unistd.lo utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
@@ -269,6 +269,7 @@ modinclude_HEADERS = \
 	object.h \
 	queue.h \
 	socket.h \
+	stream.h \
 	time.h \
 	types.h \
 	uio.h \
@@ -290,6 +291,7 @@ libaugsys_la_SOURCES = \
 	muxer.c \
 	object.c \
 	socket.c \
+	stream.c \
 	time.c \
 	types.c \
 	uio.c \
@@ -464,6 +466,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockaddrtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockettest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@

@@ -14,6 +14,8 @@
 #include "augnet/types.h"
 
 #include "augext/mpool.h"
+#include "augext/stream.h"
+
 #include "augtypes.h"
 
 #define AUG_FIXVERLEN  7  /* FIX.x.y */
@@ -50,7 +52,7 @@ AUGNET_API aug_result
 aug_destroyfixstream(aug_fixstream_t stream);
 
 AUGNET_API ssize_t
-aug_readfix(aug_fixstream_t stream, aug_fd fd, size_t size);
+aug_readfix(aug_fixstream_t stream, aug_stream* src, size_t size);
 
 AUGNET_API int
 aug_finishfix(aug_fixstream_t stream);

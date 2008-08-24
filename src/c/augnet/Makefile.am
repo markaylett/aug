@@ -48,35 +48,37 @@ libaugnet_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 check_PROGRAMS = \
-	chanstest
-# 	base64test
-# 	chanstest
-# 	fixtest
-# 	httptest
-# 	neteventtest
+	chanstest \
+	base64test \
+	chanstest \
+	fixtest \
+	httptest \
+	neteventtest
 TESTS = \
-	chanstest
-# 	base64test
-# 	chanstest
-# 	httptest
-# 	neteventtest
+	chanstest \
+	base64test \
+	chanstest \
+	fixtest \
+	httptest \
+	neteventtest
 
-# base64test_SOURCES = base64test.c
-# base64test_LDADD = \
-# 	$(top_builddir)/src/c/augnet/libaugnet.la
+base64test_SOURCES = base64test.c
+base64test_LDADD = \
+	$(top_builddir)/src/c/augnet/libaugnet.la
 
 chanstest_SOURCES = chanstest.c
 chanstest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
-# fixtest_SOURCES = fixtest.c
-# fixtest_LDADD = \
-# 	$(top_builddir)/src/c/augnet/libaugnet.la
+fixtest_SOURCES = fixtest.c
+fixtest_LDADD = \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la
 
-# httptest_SOURCES = httptest.c
-# httptest_LDADD = \
-# 	$(top_builddir)/src/c/augnet/libaugnet.la
+httptest_SOURCES = httptest.c
+httptest_LDADD = \
+	$(top_builddir)/src/c/augnet/libaugnet.la
 
-# neteventtest_SOURCES = neteventtest.c
-# neteventtest_LDADD = \
-# 	$(top_builddir)/src/c/augnet/libaugnet.la
+neteventtest_SOURCES = neteventtest.c
+neteventtest_LDADD = \
+	$(top_builddir)/src/c/augnet/libaugnet.la

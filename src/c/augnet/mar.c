@@ -51,7 +51,7 @@ initial_(aug_object* ob, const char* initial)
         return -1;
     }
 
-    aug_xstrcpys(&parser->initial_, initial);
+    aug_xstrcpys(parser->initial_, initial);
     return 0;
 }
 

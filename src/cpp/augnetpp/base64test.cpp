@@ -2,6 +2,7 @@
    See the file COPYING for copying permission.
 */
 #include "augnetpp/base64.hpp"
+#include "augsyspp/base.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -40,6 +41,7 @@ int
 main(int argc, char* argv[])
 {
     try {
+        autobasictlx();
 
         if (filterbase64(DECODED, strlen(DECODED), AUG_ENCODE64) != ENCODED)
             throw error("encodebase64() failed");
@@ -49,7 +51,8 @@ main(int argc, char* argv[])
 
         test x;
         scoped_boxptr<simple_boxptr> ob(&x);
-        base64 b64(AUG_ENCODE64, base64memcb<test, &test::cb>, ob);
+        base64 b64(getmpool(aug_tlx), AUG_ENCODE64,
+                   base64memcb<test, &test::cb>, ob);
         appendbase64(b64, DECODED, strlen(DECODED));
         finishbase64(b64);
 

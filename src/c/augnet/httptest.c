@@ -3,6 +3,7 @@
 */
 #include "augnet.h"
 #include "augsys.h"
+#include "augctx.h"
 
 static const char TEST_[] =
 "GET / HTTP/1.1\r\n"
@@ -19,21 +20,21 @@ static const char TEST_[] =
 static int
 setinitial_(aug_object* ob, const char* value)
 {
-    aug_info("initial: %s", value);
+    aug_ctxinfo(aug_tlx, "initial: %s", value);
     return 0;
 }
 
 static int
 setfield_(aug_object* ob, const char* name, const char* value)
 {
-    aug_info("field: %s=%s", name, value);
+    aug_ctxinfo(aug_tlx, "field: %s=%s", name, value);
     return 0;
 }
 
 static int
 setcsize_(aug_object* ob, unsigned size)
 {
-    aug_info("size: %d", (int)size);
+    aug_ctxinfo(aug_tlx, "size: %d", (int)size);
     return 0;
 }
 
@@ -60,28 +61,33 @@ static const struct aug_httphandler handler_ = {
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
+    aug_mpool* mpool;
     aug_httpparser_t parser;
 
-    aug_atexitinit(&errinfo);
+    if (aug_autobasictlx() < 0)
+        return 1;
 
-    if (!(parser = aug_createhttpparser(1024, &handler_, NULL))) {
-        aug_perrinfo(aug_tlerr, "aug_createhttpparser() failed");
+    mpool = aug_getmpool(aug_tlx);
+    parser = aug_createhttpparser(mpool, 1024, &handler_, NULL);
+    aug_release(mpool);
+
+    if (!parser) {
+        aug_perrinfo(aug_tlx, "aug_createhttpparser() failed", NULL);
         return 1;
     }
 
     if (-1 == aug_appendhttp(parser, TEST_, sizeof(TEST_) - 1)) {
-        aug_perrinfo(aug_tlerr, "aug_appendhttp() failed");
+        aug_perrinfo(aug_tlx, "aug_appendhttp() failed", NULL);
         goto fail;
     }
 
     if (-1 == aug_finishhttp(parser)) {
-        aug_perrinfo(aug_tlerr, "aug_finishhttp() failed");
+        aug_perrinfo(aug_tlx, "aug_finishhttp() failed", NULL);
         goto fail;
     }
 
     if (-1 == aug_destroyhttpparser(parser)) {
-        aug_perrinfo(aug_tlerr, "aug_destroyhttpparser() failed");
+        aug_perrinfo(aug_tlx, "aug_destroyhttpparser() failed", NULL);
         return 1;
     }
     return 0;

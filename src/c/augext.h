@@ -11,18 +11,19 @@
  */
 
 #include "augext/blob.h"
+#include "augext/boxint.h"
+#include "augext/boxptr.h"
 #include "augext/chan.h"
 #include "augext/clock.h"
 #include "augext/ctx.h"
 #include "augext/error.h"
-#include "augext/intbox.h"
 #include "augext/iter.h"
 #include "augext/log.h"
 #include "augext/mpool.h"
 #include "augext/msg.h"
-#include "augext/ptrbox.h"
 #include "augext/rpc.h"
 #include "augext/seq.h"
 #include "augext/stream.h"
+#include "augext/var.h"
 
-#endif // AUGEXT_H
+#endif /* AUGEXT_H */

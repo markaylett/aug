@@ -12,46 +12,88 @@ AUG_RCSID("$Id$");
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
 
-#include <errno.h>         /* ENOMEM */
 #include <string.h>        /* memmove() */
 
-/* The character that forms part of the string's header is used to ensure that
-   there is always enough room for a null-terminator. */
+/* The string's content is initially stored in the local buffer.  If the
+   string grows beyond this size, a new buffer is allocated.  The pointer
+   member will either point to the local buffer or the dynamically allocated
+   buffer.  The local buffer is an optimisation that avoids multiple
+   allocations is many cases. */
 
 struct aug_xstr_ {
     aug_mpool* mpool_;
-	size_t size_, len_;
-	char data_[1];
+	size_t len_, size_;
+    char* ptr_;
+	char local_[1];
 };
 
 #define MINSIZE_ 64
 #define AVAIL_(x) ((x)->size_ - (x)->len_)
+#define ISLOCAL_(x) ((x)->ptr_ == (x)->local_)
 #define TOTAL_(x) (sizeof(struct aug_xstr_) + (x)->size_)
 
 static aug_result
-resize_(aug_xstr_t* xstr, size_t size)
+resize_(aug_xstr_t xstr, size_t size)
 {
-	aug_xstr_t local = aug_reallocmem((*xstr)->mpool_, *xstr,
-                                      sizeof(struct aug_xstr_) + size);
-    if (!local)
-        return AUG_FAILERROR;
+    if (ISLOCAL_(xstr)) {
 
-	local->size_ = size;
-	*xstr = local;
+        /* Switch from local buffer to dynamically allocated one. */
+
+        char* ptr = aug_allocmem(xstr->mpool_, size + 1);
+        if (!ptr)
+            return AUG_FAILERROR;
+
+        /* Copy existing content from local to dynamic. */
+
+        memcpy(ptr, xstr->ptr_, size);
+        xstr->ptr_ = ptr;
+
+    } else {
+
+        /* Already using dynamically allocated buffer. */
+
+        char* ptr = aug_reallocmem(xstr->mpool_, xstr->ptr_, size + 1);
+        if (!ptr)
+            return AUG_FAILERROR;
+    }
+
+	xstr->size_ = size;
 	return AUG_SUCCESS;
 }
 
 static aug_result
-reserve_(aug_xstr_t* xstr, size_t size)
+reserve_(aug_xstr_t xstr, size_t size)
 {
 	size_t min;
-	if (size <= AVAIL_(*xstr))
+	if (size <= AVAIL_(xstr))
 		return AUG_SUCCESS;
 
-	min = (*xstr)->size_ * 2;
+    /* Grow string. */
+
+	min = xstr->size_ * 2;
 	if (resize_(xstr, AUG_MAX(min, size)) < 0)
 		return AUG_FAILERROR;
 
+	return AUG_SUCCESS;
+}
+
+/* This helper function allows the src and destination to be the same string.
+   The length of the src string is specified so that the function can be
+   re-used by strcpy-like calls, where the length is reset to zero. */
+
+static aug_result
+xstrcat_(aug_xstr_t xstr, const aug_xstr_t src, size_t len)
+{
+	if (!len)
+		return AUG_SUCCESS;
+
+	if (reserve_(xstr, xstr->len_ + len) < 0)
+		return AUG_FAILERROR;
+
+    /* Allow copy from overlapping region. */
+
+	memmove(xstr->ptr_ + xstr->len_, src->ptr_, len);
+	xstr->len_ += len;
 	return AUG_SUCCESS;
 }
 
@@ -62,12 +104,17 @@ aug_createxstr(aug_mpool* mpool, size_t size)
 
 	size = AUG_MAX(MINSIZE_, size);
 
+    /* The initial allocation extends the local buffer.  The header already
+       contains one character in the buffer, which is why there is no need for
+       an extra null-terminating character. */
+
     if (!(xstr = aug_allocmem(mpool, sizeof(struct aug_xstr_) + size)))
 		return NULL;
 
     xstr->mpool_ = mpool;
-	xstr->size_ = size;
 	xstr->len_ = 0;
+	xstr->size_ = size;
+    xstr->ptr_ = xstr->local_;
 
     aug_retain(mpool);
 	return xstr;
@@ -77,55 +124,57 @@ AUGUTIL_API aug_result
 aug_destroyxstr(aug_xstr_t xstr)
 {
     aug_mpool* mpool = xstr->mpool_;
+    if (!ISLOCAL_(xstr))
+        aug_freemem(mpool, xstr->ptr_);
     aug_freemem(mpool, xstr);
     aug_release(mpool);
     return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_result
-aug_clearxstrn(aug_xstr_t* xstr, size_t len)
+aug_clearxstrn(aug_xstr_t xstr, size_t len)
 {
-    if (len < (*xstr)->len_)
-        (*xstr)->len_ = len;
+    if (len < xstr->len_)
+        xstr->len_ = len;
 	return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_result
-aug_clearxstr(aug_xstr_t* xstr)
+aug_clearxstr(aug_xstr_t xstr)
 {
     return aug_clearxstrn(xstr, 0);
 }
 
 AUGUTIL_API aug_result
-aug_xstrcatsn(aug_xstr_t* xstr, const char* src, size_t len)
+aug_xstrcatsn(aug_xstr_t xstr, const char* src, size_t len)
 {
 	if (!len)
 		return AUG_SUCCESS;
 
-	if (reserve_(xstr, (*xstr)->len_ + len) < 0)
+	if (reserve_(xstr, xstr->len_ + len) < 0)
 		return AUG_FAILERROR;
 
     /* Allow copy from overlapping region. */
 
-	memmove((*xstr)->data_ + (*xstr)->len_, src, len);
-	(*xstr)->len_ += len;
+	memmove(xstr->ptr_ + xstr->len_, src, len);
+	xstr->len_ += len;
 	return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_result
-aug_xstrcats(aug_xstr_t* xstr, const char* src)
+aug_xstrcats(aug_xstr_t xstr, const char* src)
 {
 	return aug_xstrcatsn(xstr, src, src ? strlen(src) : 0);
 }
 
 AUGUTIL_API aug_result
-aug_xstrcat(aug_xstr_t* xstr, const aug_xstr_t src)
+aug_xstrcat(aug_xstr_t xstr, const aug_xstr_t src)
 {
-	return aug_xstrcatsn(xstr, src->data_, src->len_);
+	return xstrcat_(xstr, src, src->len_);
 }
 
 AUGUTIL_API aug_result
-aug_xstrcpysn(aug_xstr_t* xstr, const char* src, size_t len)
+aug_xstrcpysn(aug_xstr_t xstr, const char* src, size_t len)
 {
 	if (aug_clearxstr(xstr) < 0)
 		return AUG_FAILERROR;
@@ -134,54 +183,47 @@ aug_xstrcpysn(aug_xstr_t* xstr, const char* src, size_t len)
 }
 
 AUGUTIL_API aug_result
-aug_xstrcpys(aug_xstr_t* xstr, const char* src)
+aug_xstrcpys(aug_xstr_t xstr, const char* src)
 {
 	return aug_xstrcpysn(xstr, src, src ? strlen(src) : 0);
 }
 
 AUGUTIL_API aug_result
-aug_xstrcpy(aug_xstr_t* xstr, const aug_xstr_t src)
+aug_xstrcpy(aug_xstr_t xstr, const aug_xstr_t src)
 {
-	return aug_xstrcpysn(xstr, src->data_, src->len_);
+    /* Preserve length prior to resetting. */
+
+    size_t len = src->len_;
+
+	if (aug_clearxstr(xstr) < 0)
+		return AUG_FAILERROR;
+
+	return xstrcat_(xstr, src, len);
 }
 
 AUGUTIL_API aug_result
-aug_xstrcatcn(aug_xstr_t* xstr, char ch, size_t num)
+aug_xstrcatcn(aug_xstr_t xstr, char ch, size_t num)
 {
-	if (reserve_(xstr, (*xstr)->len_ + num) < 0)
+	if (reserve_(xstr, xstr->len_ + num) < 0)
 		return AUG_FAILERROR;
 
 	if (1 == num)
-        (*xstr)->data_[(*xstr)->len_] = ch;
+        xstr->ptr_[xstr->len_] = ch;
 	else
-		memset((*xstr)->data_ + (*xstr)->len_, ch, num);
+		memset(xstr->ptr_ + xstr->len_, ch, num);
 
-	(*xstr)->len_ += num;
+	xstr->len_ += num;
 	return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_result
-aug_xstrcatc(aug_xstr_t* xstr, char ch)
+aug_xstrcatc(aug_xstr_t xstr, char ch)
 {
 	return aug_xstrcatcn(xstr, ch, 1);
 }
 
-AUGUTIL_API ssize_t
-aug_xstrcatf(aug_fd fd, aug_xstr_t* xstr, size_t size)
-{
-    ssize_t ret;
-	if (reserve_(xstr, (*xstr)->len_ + size) < 0)
-		return AUG_FAILERROR;
-
-    if ((ret = aug_fread(fd, (*xstr)->data_ + (*xstr)->len_, size)) < 0)
-        return AUG_FAILERROR;
-
-	(*xstr)->len_ += ret;
-	return ret;
-}
-
 AUGUTIL_API aug_result
-aug_xstrcpycn(aug_xstr_t* xstr, char ch, size_t num)
+aug_xstrcpycn(aug_xstr_t xstr, char ch, size_t num)
 {
 	if (aug_clearxstr(xstr) < 0)
 		return AUG_FAILERROR;
@@ -190,9 +232,23 @@ aug_xstrcpycn(aug_xstr_t* xstr, char ch, size_t num)
 }
 
 AUGUTIL_API aug_result
-aug_xstrcpyc(aug_xstr_t* xstr, char ch)
+aug_xstrcpyc(aug_xstr_t xstr, char ch)
 {
 	return aug_xstrcpycn(xstr, ch, 1);
+}
+
+AUGUTIL_API ssize_t
+aug_xstrread(aug_xstr_t xstr, aug_stream* src, size_t size)
+{
+    ssize_t ret;
+	if (reserve_(xstr, xstr->len_ + size) < 0)
+		return AUG_FAILERROR;
+
+    if ((ret = aug_read(src, xstr->ptr_ + xstr->len_, size)) < 0)
+        return AUG_FAILERROR;
+
+	xstr->len_ += ret;
+	return ret;
 }
 
 AUGUTIL_API size_t
@@ -204,6 +260,6 @@ aug_xstrlen(aug_xstr_t xstr)
 AUGUTIL_API const char*
 aug_xstr(aug_xstr_t xstr)
 {
-	xstr->data_[xstr->len_] = '\0';
-	return xstr->data_;
+	xstr->ptr_[xstr->len_] = '\0';
+	return xstr->ptr_;
 }

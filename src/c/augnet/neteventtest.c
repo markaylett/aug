@@ -3,17 +3,18 @@
 */
 #include "augnet.h"
 #include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
     struct aug_netevent event;
     char buf[AUG_NETEVENT_SIZE];
 
-    aug_atexitinit(&errinfo);
+    if (aug_autobasictlx() < 0)
+        return 1;
 
     event.proto_ = 1;
     strcpy(event.name_, "name");

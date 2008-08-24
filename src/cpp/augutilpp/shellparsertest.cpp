@@ -4,6 +4,8 @@
 
 #include "augutilpp/shellparser.hpp"
 
+#include "augsyspp/base.hpp"
+
 #include <iostream>
 #include <iterator>
 #include <sstream>
@@ -33,7 +35,7 @@ namespace {
     void
     test(const string& s)
     {
-        shellparser parser;
+        shellparser parser(getmpool(aug_tlx));
         string::const_iterator it(s.begin()), end(s.end());
         for (; it != end; ++it)
             if (parser.append(*it))
@@ -47,6 +49,7 @@ int
 main(int argc, char* argv[])
 {
     try {
+        autobasictlx();
         test("x=\"aaa a\" 'b''bb' ccc\\\n xyz");
         test("");
     } catch (const exception& e) {

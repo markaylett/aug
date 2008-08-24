@@ -2,8 +2,8 @@
    See the file COPYING for copying permission.
 */
 #include "augnet.h"
-
 #include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 
@@ -29,11 +29,11 @@ testencode_(aug_base64_t encoder, const char* in, const char* out)
 {
     encoded_[0] = '\0';
     if (-1 == aug_appendbase64(encoder, in, strlen(in))) {
-        aug_perrinfo(aug_tlerr, "aug_appendbase64() failed");
+        aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
         return -1;
     }
     if (-1 == aug_finishbase64(encoder)) {
-        aug_perrinfo(aug_tlerr, "aug_endbase64() failed");
+        aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
         return -1;
     }
     if (0 != strcmp(encoded_, out)) {
@@ -48,11 +48,11 @@ testdecode_(aug_base64_t decoder, const char* in, const char* out)
 {
     decoded_[0] = '\0';
     if (-1 == aug_appendbase64(decoder, in, strlen(in))) {
-        aug_perrinfo(aug_tlerr, "aug_appendbase64() failed");
+        aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
         return -1;
     }
     if (-1 == aug_finishbase64(decoder)) {
-        aug_perrinfo(aug_tlerr, "aug_endbase64() failed");
+        aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
         return -1;
     }
     if (0 != strcmp(decoded_, out)) {
@@ -65,17 +65,24 @@ testdecode_(aug_base64_t decoder, const char* in, const char* out)
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
+    aug_mpool* mpool;
     aug_base64_t encoder, decoder;
-    aug_atexitinit(&errinfo);
 
-    if (!(encoder = aug_createbase64(AUG_ENCODE64, encode_, NULL))) {
-        aug_perrinfo(aug_tlerr, "aug_createbase64() failed");
+    if (aug_autobasictlx() < 0)
+        return 1;
+
+    mpool = aug_getmpool(aug_tlx);
+    encoder = aug_createbase64(mpool, AUG_ENCODE64, encode_, NULL);
+    decoder = aug_createbase64(mpool, AUG_DECODE64, decode_, NULL);
+    aug_release(mpool);
+
+    if (!encoder) {
+        aug_perrinfo(aug_tlx, "aug_createbase64() failed", NULL);
         return 1;
     }
 
-    if (!(decoder = aug_createbase64(AUG_DECODE64, decode_, NULL))) {
-        aug_perrinfo(aug_tlerr, "aug_createbase64() failed");
+    if (!decoder) {
+        aug_perrinfo(aug_tlx, "aug_createbase64() failed", NULL);
         goto fail1;
     }
 
@@ -98,12 +105,12 @@ main(int argc, char* argv[])
         goto fail2;
 
     if (-1 == aug_destroybase64(decoder)) {
-        aug_perrinfo(aug_tlerr, "aug_destroybase64() failed");
+        aug_perrinfo(aug_tlx, "aug_destroybase64() failed", NULL);
         goto fail1;
     }
 
     if (-1 == aug_destroybase64(encoder)) {
-        aug_perrinfo(aug_tlerr, "aug_destroybase64() failed");
+        aug_perrinfo(aug_tlx, "aug_destroybase64() failed", NULL);
         return 1;
     }
     return 0;

@@ -10,21 +10,23 @@
 using namespace aug;
 using namespace std;
 
+enum which {
+    NONE_ = 0,
+    BOOL_,
+    INT_,
+    PTR_
+};
+
 namespace {
 
     typedef logic_error error;
 
-    enum which {
-        NONE = 0,
-        BOOL,
-        INT,
-        PTR
-    } which_ = NONE;
+    which which_ = NONE_;
 
     bool
     verifyproxy(bool result)
     {
-        which_ = BOOL;
+        which_ = BOOL_;
         return verify(result);
     }
 
@@ -32,7 +34,7 @@ namespace {
     T
     verifyproxy(T result)
     {
-        which_ = INT;
+        which_ = INT_;
         return verify(result);
     }
 
@@ -40,15 +42,21 @@ namespace {
     T*
     verifyproxy(T* result)
     {
-        which_ = PTR;
+        which_ = PTR_;
         return verify(result);
+    }
+
+    const char*
+    errorsrc()
+    {
+        return "src";
     }
 
     void
     throwtest()
     {
         try {
-            throw basic_error<AUG_SRCUSER>(__FILE__, __LINE__, 1, "test");
+            throw basic_error<errorsrc>(__FILE__, __LINE__, 1, "test");
         } catch (const aug::errinfo_error& e) {
             if (0 != strcmp("test", errdesc(e)))
                 throw error("invalid error description");
@@ -60,7 +68,7 @@ namespace {
     {
         try {
             try {
-                throw basic_error<AUG_SRCUSER>(__FILE__, __LINE__, 1, "test");
+                throw basic_error<errorsrc>(__FILE__, __LINE__, 1, "test");
             } catch (...) {
                 throw;
             }
@@ -74,35 +82,33 @@ namespace {
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
-    aug_atexitinit(&errinfo);
-
     try {
+        autobasictlx();
 
         bool b(true);
         b = verifyproxy(b);
-        if (BOOL != which_)
+        if (BOOL_ != which_)
             throw error("failed to call bool template");
         if (!b)
             throw error("returned bool differs from original");
 
         int i(101);
         i = verifyproxy(i);
-        if (INT != which_)
+        if (INT_ != which_)
             throw error("failed to call int template");
         if (101 != i)
             throw error("returned int differs from original");
 
         int* p = &i;
         p = verifyproxy(p);
-        if (PTR != which_)
+        if (PTR_ != which_)
             throw error("failed to call pointer template");
         if (&i != p)
             throw error("returned pointer differs from original");
 
         const int* cp = &i;
         cp = verifyproxy(cp);
-        if (PTR != which_)
+        if (PTR_ != which_)
             throw error("failed to call const pointer template");
         if (&i != cp)
             throw error("returned const pointer differs from original");

@@ -204,7 +204,7 @@ aug_destroyfixstream(aug_fixstream_t stream)
 }
 
 AUGNET_API ssize_t
-aug_readfix(aug_fixstream_t stream, aug_fd fd, size_t size)
+aug_readfix(aug_fixstream_t stream, aug_stream* src, size_t size)
 {
     ssize_t rlen;
     size_t blen;
@@ -213,7 +213,7 @@ aug_readfix(aug_fixstream_t stream, aug_fd fd, size_t size)
 
     /* Return on error or end of file. */
 
-    if (0 >= (rlen = aug_xstrcatf(fd, &stream->xstr_, size)))
+    if (0 >= (rlen = aug_xstrread(stream->xstr_, src, size)))
         return rlen;
 
     /* Total number of buffered bytes. */
@@ -251,11 +251,11 @@ aug_readfix(aug_fixstream_t stream, aug_fd fd, size_t size)
         stream->mlen_ = 0;
 
         if (0 == blen) {
-            aug_clearxstr(&stream->xstr_);
+            aug_clearxstr(stream->xstr_);
             break;
         }
 
-        aug_xstrcpysn(&stream->xstr_, ptr + stream->mlen_, blen);
+        aug_xstrcpysn(stream->xstr_, ptr + stream->mlen_, blen);
         ptr = aug_xstr(stream->xstr_);
     }
 
@@ -271,7 +271,7 @@ aug_finishfix(aug_fixstream_t stream)
     size_t size = aug_xstrlen(stream->xstr_);
     if (size) {
 
-        aug_clearxstr(&stream->xstr_);
+        aug_clearxstr(stream->xstr_);
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
                        AUG_MSG("fix stream not empty, '%d' bytes"),
                        (int)size);

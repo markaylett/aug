@@ -4,6 +4,7 @@
 #include "augsrv.h"
 #include "augutil.h"
 #include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 
@@ -75,7 +76,6 @@ term_(void* arg)
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
     struct aug_service service = {
         getopt_,
         config_,
@@ -86,10 +86,8 @@ main(int argc, char* argv[])
 
     program_ = argv[0];
 
-    if (!aug_atexitinit(&errinfo)) {
-        aug_perror("aug_atexitinit() failed");
+    if (aug_autobasictlx() < 0)
         return 1;
-    }
 
     return aug_main(argc, argv, &service, NULL);
 }

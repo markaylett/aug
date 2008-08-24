@@ -4,8 +4,6 @@
 
 #include "augutilpp/object.hpp"
 
-#include "augob/blob.h"
-
 #include <iostream>
 #include <stdexcept>
 
@@ -17,10 +15,10 @@ namespace {
     typedef logic_error error;
 
     void
-    test(obref<aug_blob> blob, const string& s)
+    test(blobref blob, const string& s)
     {
         size_t size;
-        const void* data(blobdata(blob, &size));
+        const void* data(getblobdata(blob, &size));
 
         if (size != s.size())
             throw error("size mismatch");
@@ -37,7 +35,7 @@ main(int argc, char* argv[])
 
         const string s("some test data");
 
-        smartob<aug_blob> smart(basic_blob<stringob>::create(s));
+        smartob<aug_blob> smart(basic_blob<sblob>::create(s));
         test(smart, s);
 
         if (null == smart)
@@ -47,7 +45,7 @@ main(int argc, char* argv[])
         if (null != smart)
             throw error("bad null inequality");
 
-        scoped_blob<stringob> scoped(s);
+        scoped_blob<sblob> scoped(s);
         test(scoped, s);
 
     } catch (const exception& e) {

@@ -201,19 +201,19 @@ namespace aug {
         }
 
         template <typename T>
-        httpparser(unsigned size, T& x)
+        httpparser(mpoolref mpool, unsigned size, T& x)
         {
-            aug::smartob<aug_boxptr> ob(createboxptr(&x, 0));
+            aug::smartob<aug_boxptr> ob(createboxptr(mpool, &x, 0));
             verify(httpparser_ = aug_createhttpparser
-                   (size, &httpnonstatic<T>(), ob.base()));
+                   (mpool.get(), size, &httpnonstatic<T>(), ob.base()));
         }
 
         template <typename T>
-        httpparser(unsigned size, std::auto_ptr<T>& x)
+        httpparser(mpoolref mpool, unsigned size, std::auto_ptr<T>& x)
         {
-            aug::smartob<aug_boxptr> ob(createboxptr(x));
+            aug::smartob<aug_boxptr> ob(createboxptr(mpool, x));
             verify(httpparser_ = aug_createhttpparser
-                   (size, &httpnonstatic<T>(), ob.base()));
+                   (mpool.get(), size, &httpnonstatic<T>(), ob.base()));
         }
 
         void

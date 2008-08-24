@@ -12,6 +12,8 @@
 
 #include "augext/log.h"
 
+#include <iostream>
+
 using namespace aug;
 using namespace std;
 
@@ -23,14 +25,15 @@ main(int argc, char* argv[])
     try {
         autobasictlx();
 
+        mpoolptr mp(getmpool(aug_tlx));
         endpoint ep(null);
-        tcpconnect conn("127.0.0.1", "10000");
+        tcpconnect conn(mp, "127.0.0.1", "10000");
 
         bool est(false);
         autosd sd(tryconnect(conn, ep, est));
         if (!est) {
 
-            muxer mux;
+            muxer mux(mp);
             setmdeventmask(mux, sd, AUG_MDEVENTCONN);
             waitmdevents(mux);
 

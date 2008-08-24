@@ -41,7 +41,7 @@ out_(void* arg, int what)
         lexer->what_ |= AUG_LEXPHRASE;
         break;
     case AUG_TOKRTRIM:
-        aug_clearxstrn(&lexer->xstr_,
+        aug_clearxstrn(lexer->xstr_,
                        aug_rtrimword(aug_xstr(lexer->xstr_),
                                      aug_xstrlen(lexer->xstr_)));
         break;
@@ -49,7 +49,7 @@ out_(void* arg, int what)
         if (lexer->what_)
             lexer->save_ = what;
         else
-            aug_xstrcatc(&lexer->xstr_, what);
+            aug_xstrcatc(lexer->xstr_, what);
         break;
     }
 }
@@ -116,10 +116,10 @@ AUGUTIL_API unsigned
 aug_appendlexer(aug_lexer_t lexer, char ch)
 {
     if (lexer->what_) {
-        aug_clearxstr(&lexer->xstr_);
+        aug_clearxstr(lexer->xstr_);
         lexer->what_ = 0;
         if (lexer->save_) {
-            aug_xstrcatc(&lexer->xstr_, lexer->save_);
+            aug_xstrcatc(lexer->xstr_, lexer->save_);
             lexer->save_ = 0;
         }
     }

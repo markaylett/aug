@@ -56,13 +56,14 @@ main(int argc, char* argv[])
         autobasictlx();
 
         callbacks cbs;
-        base64 b64(AUG_ENCODE64, cbs);
+        mpoolptr mp(getmpool(aug_tlx));
+        base64 b64(mp, AUG_ENCODE64, cbs);
 
         httphandler x;
-        httpparser hparser(1024, x);
+        httpparser hparser(mp, 1024, x);
 
         marhandler y;
-        marparser mparser(1024, y);
+        marparser mparser(mp, 1024, y);
 
         return 0;
 

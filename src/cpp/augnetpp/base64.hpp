@@ -90,7 +90,7 @@ namespace aug {
         template <typename T>
         base64(mpoolref mpool, aug_base64mode mode, T& x)
         {
-            aug::smartob<aug_boxptr> ob(createboxptr(&x, 0));
+            aug::smartob<aug_boxptr> ob(createboxptr(mpool, &x, 0));
             verify(base64_ = aug_createbase64
                    (mpool.get(), mode, base64memcb<T>, ob.base()));
         }
@@ -98,7 +98,7 @@ namespace aug {
         template <typename T>
         base64(mpoolref mpool, aug_base64mode mode, std::auto_ptr<T>& x)
         {
-            aug::smartob<aug_boxptr> ob(createboxptr(x));
+            aug::smartob<aug_boxptr> ob(createboxptr(mpool, x));
             verify(base64_ = aug_createbase64
                    (mpool.get(), mode, base64memcb<T>, ob.base()));
         }

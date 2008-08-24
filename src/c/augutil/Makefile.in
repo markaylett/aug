@@ -43,7 +43,7 @@ DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(top_srcdir)/src/c/lang.mk
 check_PROGRAMS = eventtest$(EXEEXT) hirestest$(EXEEXT) \
 	networdstest$(EXEEXT) shelllexertest$(EXEEXT) \
-	shellwordstest$(EXEEXT)
+	shellwordstest$(EXEEXT) xstrtest$(EXEEXT)
 subdir = src/c/augutil
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -87,6 +87,9 @@ am_shellwordstest_OBJECTS = shellwordstest.$(OBJEXT)
 shellwordstest_OBJECTS = $(am_shellwordstest_OBJECTS)
 shellwordstest_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augutil/libaugutil.la
+am_xstrtest_OBJECTS = xstrtest.$(OBJEXT)
+xstrtest_OBJECTS = $(am_xstrtest_OBJECTS)
+xstrtest_DEPENDENCIES = $(top_builddir)/src/c/augutil/libaugutil.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -99,10 +102,12 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugutil_la_SOURCES) $(eventtest_SOURCES) \
 	$(hirestest_SOURCES) $(networdstest_SOURCES) \
-	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES)
+	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES) \
+	$(xstrtest_SOURCES)
 DIST_SOURCES = $(libaugutil_la_SOURCES) $(eventtest_SOURCES) \
 	$(hirestest_SOURCES) $(networdstest_SOURCES) \
-	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES)
+	$(shelllexertest_SOURCES) $(shellwordstest_SOURCES) \
+	$(xstrtest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -313,7 +318,8 @@ TESTS = \
 	hirestest \
 	networdstest.sh \
 	shelllexertest.sh \
-	shellwordstest.sh
+	shellwordstest.sh \
+	xstrtest
 
 eventtest_SOURCES = eventtest.c
 eventtest_LDADD = \
@@ -333,6 +339,10 @@ shelllexertest_LDADD = \
 
 shellwordstest_SOURCES = shellwordstest.c
 shellwordstest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
+
+xstrtest_SOURCES = xstrtest.c
+xstrtest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la
 
 all: all-recursive
@@ -419,6 +429,9 @@ shelllexertest$(EXEEXT): $(shelllexertest_OBJECTS) $(shelllexertest_DEPENDENCIES
 shellwordstest$(EXEEXT): $(shellwordstest_OBJECTS) $(shellwordstest_DEPENDENCIES) 
 	@rm -f shellwordstest$(EXEEXT)
 	$(LINK) $(shellwordstest_LDFLAGS) $(shellwordstest_OBJECTS) $(shellwordstest_LDADD) $(LIBS)
+xstrtest$(EXEEXT): $(xstrtest_OBJECTS) $(xstrtest_DEPENDENCIES) 
+	@rm -f xstrtest$(EXEEXT)
+	$(LINK) $(xstrtest_LDFLAGS) $(xstrtest_OBJECTS) $(xstrtest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -450,6 +463,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tmspec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xstr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xstrtest.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

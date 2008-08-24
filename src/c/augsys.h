@@ -23,6 +23,7 @@
 #include "augsys/object.h"
 #include "augsys/queue.h"
 #include "augsys/socket.h"
+#include "augsys/stream.h"
 #include "augsys/time.h"
 #include "augsys/types.h"
 #include "augsys/uio.h"

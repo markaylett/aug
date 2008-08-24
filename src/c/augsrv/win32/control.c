@@ -47,8 +47,8 @@ makepath_(void)
     if (!aug_realpath(buf, program, sizeof(buf)))
         goto fail;
 
-    if (-1 == aug_xstrcatc(&s, '"') || -1 == aug_xstrcats(&s, buf)
-        || -1 == aug_xstrcatc(&s, '"'))
+    if (-1 == aug_xstrcatc(s, '"') || -1 == aug_xstrcats(s, buf)
+        || -1 == aug_xstrcatc(s, '"'))
         goto fail;
 
     if ((conffile = aug_getserviceopt(AUG_OPTCONFFILE))) {
@@ -56,9 +56,9 @@ makepath_(void)
         if (!aug_realpath(buf, conffile, sizeof(buf)))
             goto fail;
 
-        if (-1 == aug_xstrcats(&s, " -f \"")
-            || -1 == aug_xstrcats(&s, buf)
-            || -1 == aug_xstrcatc(&s, '"'))
+        if (-1 == aug_xstrcats(s, " -f \"")
+            || -1 == aug_xstrcats(s, buf)
+            || -1 == aug_xstrcatc(s, '"'))
             goto fail;
     }
 

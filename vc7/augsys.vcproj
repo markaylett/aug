@@ -165,6 +165,9 @@
 				RelativePath="..\src\c\augsys\socket.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\stream.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\time.c">
 			</File>
 			<File
@@ -225,6 +228,9 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\socket.h">
+			</File>
+			<File
+				RelativePath="..\src\c\augsys\stream.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\time.h">

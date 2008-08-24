@@ -45,4 +45,4 @@
 #include "augsys.h"
 #include "augutil.h"
 
-#endif // AUG_H
+#endif /* AUG_H */

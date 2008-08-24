@@ -3,6 +3,7 @@
 */
 #include "augnet.h"
 #include "augsys.h"
+#include "augctx.h"
 
 #include <stdio.h>
 #include <stdlib.h> /* exit() */
@@ -41,7 +42,7 @@ handler_(aug_object* ob, const char* buf, size_t size)
     }
 
     if (-1 == aug_checkfix(&fixstd, buf, size)) {
-        aug_perrinfo(aug_tlerr, "aug_checkfix() failed");
+        aug_perrinfo(aug_tlx, "aug_checkfix() failed", NULL);
         exit(1);
     }
 
@@ -53,10 +54,11 @@ handler_(aug_object* ob, const char* buf, size_t size)
     while (fixstd.size_) {
 
         if (-1 == (ret = aug_fixfield(&field, fixstd.body_, fixstd.size_))) {
-            aug_perrinfo(aug_tlerr, "aug_fixfield() failed");
+            aug_perrinfo(aug_tlx, "aug_fixfield() failed", NULL);
             exit(1);
         }
 
+        aug_ctxinfo(aug_tlx, "tag: %u", field.tag_);
         fixstd.body_ += ret;
         fixstd.size_ -= ret;
     }
@@ -67,32 +69,45 @@ handler_(aug_object* ob, const char* buf, size_t size)
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
-
-    int i, sv[2];
+    aug_mpool* mpool;
     aug_fixstream_t stream;
+    aug_sd sv[2];
+    aug_stream* in;
+    int i;
 
-    aug_atexitinit(&errinfo);
+    if (aug_autobasictlx() < 0)
+        return 1;
 
-    if (!(stream = aug_createfixstream(0, handler_, NULL))) {
-        aug_perrinfo(aug_tlerr, "aug_createfixstream() failed");
+    mpool = aug_getmpool(aug_tlx);
+    stream = aug_createfixstream(mpool, 0, handler_, NULL);
+
+    if (!stream) {
+        aug_perrinfo(aug_tlx, "aug_createfixstream() failed", NULL);
         return 1;
     }
 
     if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {
-        aug_perrinfo(aug_tlerr, "aug_socketpair() failed");
+        aug_perrinfo(aug_tlx, "aug_socketpair() failed", NULL);
+        return 1;
+    }
+
+    in = aug_createsstream(mpool, sv[1]);
+    aug_release(mpool);
+
+    if (!in) {
+        aug_perrinfo(aug_tlx, "aug_createsstream() failed", NULL);
         return 1;
     }
 
     for (i = 0; i < TESTLEN_; ++i) {
 
-        if (-1 == aug_write(sv[0], TEST_ + i, 1)) {
-            aug_perrinfo(aug_tlerr, "aug_write() failed");
+        if (-1 == aug_swrite(sv[0], TEST_ + i, 1)) {
+            aug_perrinfo(aug_tlx, "aug_write() failed", NULL);
             return 1;
         }
 
-        if (-1 == aug_readfix(stream, sv[1], 4096)) {
-            aug_perrinfo(aug_tlerr, "aug_parsefix() failed");
+        if (-1 == aug_readfix(stream, in, 4096)) {
+            aug_perrinfo(aug_tlx, "aug_parsefix() failed", NULL);
             return 1;
         }
     }
@@ -102,18 +117,18 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_write(sv[0], TEST_, TESTLEN_)) {
-        aug_perrinfo(aug_tlerr, "aug_write() failed");
+    if (-1 == aug_swrite(sv[0], TEST_, TESTLEN_)) {
+        aug_perrinfo(aug_tlx, "aug_write() failed", NULL);
         return 1;
     }
 
-    if (-1 == aug_write(sv[0], TEST_, TESTLEN_)) {
-        aug_perrinfo(aug_tlerr, "aug_write() failed");
+    if (-1 == aug_swrite(sv[0], TEST_, TESTLEN_)) {
+        aug_perrinfo(aug_tlx, "aug_write() failed", NULL);
         return 1;
     }
 
-    if (-1 == aug_readfix(stream, sv[1], 4096)) {
-        aug_perrinfo(aug_tlerr, "aug_parsefix() failed");
+    if (-1 == aug_readfix(stream, in, 4096)) {
+        aug_perrinfo(aug_tlx, "aug_parsefix() failed", NULL);
         return 1;
     }
 
@@ -122,8 +137,9 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    aug_close(sv[0]);
-    aug_close(sv[1]);
+    aug_release(in);
+    aug_sclose(sv[0]);
+    aug_sclose(sv[1]);
     aug_destroyfixstream(stream);
     return 0;
 }

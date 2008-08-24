@@ -72,14 +72,16 @@ check_PROGRAMS = \
 	hirestest \
 	networdstest \
 	shelllexertest \
-	shellwordstest
+	shellwordstest \
+	xstrtest
 
 TESTS = \
 	eventtest \
 	hirestest \
 	networdstest.sh \
 	shelllexertest.sh \
-	shellwordstest.sh
+	shellwordstest.sh \
+	xstrtest
 
 eventtest_SOURCES = eventtest.c
 eventtest_LDADD = \
@@ -99,4 +101,8 @@ shelllexertest_LDADD = \
 
 shellwordstest_SOURCES = shellwordstest.c
 shellwordstest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
+
+xstrtest_SOURCES = xstrtest.c
+xstrtest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la

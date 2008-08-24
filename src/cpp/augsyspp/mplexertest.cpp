@@ -4,38 +4,25 @@
 #include "augsyspp/muxer.hpp"
 #include "augsyspp/socket.hpp"
 
-#include "augsys/log.h"
-
-#include <vector>
-
 using namespace aug;
 using namespace std;
 
 int
 main(int argc, char* argv[])
 {
-    struct aug_errinfo errinfo;
-    aug_atexitinit(&errinfo);
-
     try {
-        vector<smartfd> v;
-        muxer mux;
+        autobasictlx();
+        muxer mux(getmpool(aug_tlx));
+
         for (int i(0); i < 256; ++i) {
-            pair<smartfd, smartfd> xy(socketpair(AF_UNIX, SOCK_STREAM, 0));
-            try {
-                setmdeventmask(mux, xy.first, AUG_MDEVENTRD);
-                setmdeventmask(mux, xy.second, AUG_MDEVENTRD);
-                v.push_back(xy.first);
-                v.push_back(xy.second);
-            } catch (const system_error& e) {
 
-                // When the muxer is implemented in terms of select(), the
-                // FD_SETSIZE limit may be reached.  In which case, continue
-                // to loop.
+            autosds xy(socketpair(AF_UNIX, SOCK_STREAM, 0));
 
-                if (EMFILE != aug_errno())
-                    throw;
-            }
+            setmdeventmask(mux, xy[0], AUG_MDEVENTRD);
+            setmdeventmask(mux, xy[1], AUG_MDEVENTRD);
+
+            setmdeventmask(mux, xy[1], 0);
+            setmdeventmask(mux, xy[0], 0);
         }
         return 0;
     } AUG_PERRINFOCATCH;
