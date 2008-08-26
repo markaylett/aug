@@ -4,8 +4,10 @@
 #ifndef AUGSYSPP_MMAP_HPP
 #define AUGSYSPP_MMAP_HPP
 
-#include "augsyspp/exception.hpp"
-#include "augsyspp/utility.hpp" // perrinfo()
+#include "augsyspp/types.hpp"
+
+#include "augctxpp/exception.hpp"
+#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augsys/mmap.h"
 

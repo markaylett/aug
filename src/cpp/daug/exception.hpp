@@ -4,7 +4,7 @@
 #ifndef DAUG_EXCEPTION_HPP
 #define DAUG_EXCEPTION_HPP
 
-#include "augsyspp/exception.hpp"
+#include "augctxpp/exception.hpp"
 
 namespace daug {
 

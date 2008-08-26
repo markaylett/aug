@@ -6,7 +6,9 @@
 
 #include "augsyspp/base.hpp"
 #include "augsyspp/types.hpp"
-#include "augsyspp/utility.hpp" // perrinfo()
+
+#include "augctxpp/exception.hpp"
+#include "augctxpp/utility.hpp" // perrinfo()
 
 #include <algorithm>            // swap()
 #include <cassert>

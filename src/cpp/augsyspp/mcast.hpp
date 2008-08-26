@@ -4,8 +4,9 @@
 #ifndef AUGSYSPP_MCAST_HPP
 #define AUGSYSPP_MCAST_HPP
 
-#include "augsyspp/exception.hpp"
 #include "augsyspp/smartfd.hpp"
+
+#include "augctxpp/exception.hpp"
 
 #include "augsys/mcast.h"
 

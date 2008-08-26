@@ -144,6 +144,9 @@
 				RelativePath="..\src\c\augnet\base64.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\chan.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\chans.c">
 			</File>
 			<File
@@ -163,9 +166,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\netevent.c">
-			</File>
-			<File
-				RelativePath="..\src\c\augnet\object.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\ssl.c">
@@ -191,6 +191,9 @@
 				RelativePath="..\src\c\augnet\base64.h">
 			</File>
 			<File
+				RelativePath="..\src\c\augnet\chan.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augnet\chans.h">
 			</File>
 			<File
@@ -210,9 +213,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\netevent.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augnet\object.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\ssl.h">

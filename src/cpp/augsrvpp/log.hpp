@@ -6,7 +6,7 @@
 
 #include "augsrvpp/config.hpp"
 
-#include "augsyspp/exception.hpp"
+#include "augctxpp/exception.hpp"
 
 #include "augsrv/log.h"
 

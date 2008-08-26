@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGNET_BUILD
-#include "augnet/object.h"
+#include "augnet/chan.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
@@ -12,7 +12,7 @@ AUG_RCSID("$Id$");
 #include "augnet/tcpconnect.h"
 
 #include "augsys/base.h"   /* aug_nextid() */
-#include "augsys/object.h" /* aug_safeestab() */
+#include "augsys/chan.h"   /* aug_safeestab() */
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"

@@ -2,4 +2,4 @@
    See the file COPYING for copying permission.
 */
 #define AUGNETPP_BUILD
-#include "augnetpp/object.hpp"
+#include "augnetpp/chan.hpp"

@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="augnetpp"
-	ProjectGUID="{D9C66FA8-7D39-4496-AA2A-AA52BF2B7650}"
+	Name="augctxpp"
+	ProjectGUID="{64616778-30EA-4A2B-AA35-AFE13F2E47AD}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -13,7 +13,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="debug/augnetpp"
+			IntermediateDirectory="debug/augctxpp"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -68,7 +68,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="release/augnetpp"
+			IntermediateDirectory="release/augctxpp"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -122,18 +122,6 @@
 		<ProjectReference
 			ReferencedProjectIdentifier="{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}"
 			Name="augctx"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{01150DDF-A141-4B5B-A4FB-81FD65C964C5}"
-			Name="augmar"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{A6131AD7-FF69-436D-B4D2-0076969FC276}"
-			Name="augnet"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
-			Name="augsys"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{63BEF71A-3B15-494E-89B0-3CCDBF48B4E0}"
-			Name="augutil"/>
 	</References>
 	<Files>
 		<Filter
@@ -141,31 +129,22 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\cpp\augnetpp\base64.cpp">
+				RelativePath="..\src\cpp\augctxpp\base.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\chan.cpp">
+				RelativePath="..\src\cpp\augctxpp\config.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\chans.cpp">
+				RelativePath="..\src\cpp\augctxpp\errinfo.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\config.cpp">
+				RelativePath="..\src\cpp\augctxpp\exception.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\http.cpp">
+				RelativePath="..\src\cpp\augctxpp\types.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\inet.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\mar.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\tcpconnect.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\writer.cpp">
+				RelativePath="..\src\cpp\augctxpp\utility.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -173,31 +152,22 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\cpp\augnetpp\base64.hpp">
+				RelativePath="..\src\cpp\augctxpp\base.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\chan.hpp">
+				RelativePath="..\src\cpp\augctxpp\config.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\chans.hpp">
+				RelativePath="..\src\cpp\augctxpp\errinfo.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\config.hpp">
+				RelativePath="..\src\cpp\augctxpp\exception.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\http.hpp">
+				RelativePath="..\src\cpp\augctxpp\types.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augnetpp\inet.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\mar.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\tcpconnect.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augnetpp\writer.hpp">
+				RelativePath="..\src\cpp\augctxpp\utility.hpp">
 			</File>
 		</Filter>
 		<Filter

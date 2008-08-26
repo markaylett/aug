@@ -10,7 +10,8 @@ AUG_RCSID("$Id$");
 #if ENABLE_SSL
 
 # include "augsys/base.h"   /* struct aug_fdtype */
-# include "augsys/object.h" /* aug_safeready() */
+# include "augsys/chan.h"   /* aug_safeready() */
+
 # include "augsys/socket.h" /* aug_shutdown() */
 # include "augsys/uio.h"
 

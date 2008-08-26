@@ -4,7 +4,7 @@
 #ifndef AUGUTILPP_FILE_HPP
 #define AUGUTILPP_FILE_HPP
 
-#include "augsyspp/exception.hpp"
+#include "augctxpp/exception.hpp"
 
 #include "augutil/file.h"
 

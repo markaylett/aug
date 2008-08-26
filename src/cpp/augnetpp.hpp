@@ -7,11 +7,11 @@
 #include "augnet.h"
 
 #include "augnetpp/base64.hpp"
+#include "augnetpp/chan.hpp"
 #include "augnetpp/chans.hpp"
 #include "augnetpp/http.hpp"
 #include "augnetpp/inet.hpp"
 #include "augnetpp/mar.hpp"
-#include "augnetpp/object.hpp"
 #include "augnetpp/tcpconnect.hpp"
 #include "augnetpp/writer.hpp"
 

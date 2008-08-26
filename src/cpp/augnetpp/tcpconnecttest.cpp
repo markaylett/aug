@@ -1,16 +1,9 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augnetpp/tcpconnect.hpp"
-
-#include "augsyspp/base.hpp"
-#include "augsyspp/endpoint.hpp"
-#include "augsyspp/muxer.hpp"
-#include "augsyspp/unistd.hpp"
-
-#include "augctx/errno.h"
-
-#include "augext/log.h"
+#include "augnetpp.hpp"
+#include "augsyspp.hpp"
+#include "augctxpp.hpp"
 
 #include <iostream>
 

@@ -1,10 +1,10 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGSYSPP_ERRINFO_HPP
-#define AUGSYSPP_ERRINFO_HPP
+#ifndef AUGCTXPP_ERRINFO_HPP
+#define AUGCTXPP_ERRINFO_HPP
 
-#include "augsyspp/config.hpp"
+#include "augctxpp/config.hpp"
 
 #include "augctx/errinfo.h"
 
@@ -41,4 +41,4 @@ namespace aug {
     }
 }
 
-#endif // AUGSYSPP_ERRINFO_HPP
+#endif // AUGCTXPP_ERRINFO_HPP

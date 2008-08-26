@@ -5,8 +5,11 @@
 #define AUGASPP_SSL_HPP
 
 #include "augaspp/config.hpp"
-#include "augsyspp/exception.hpp"
+
 #include "augsyspp/smartptr.hpp"
+
+#include "augctxpp/exception.hpp"
+
 #include "augnet/ssl.h"
 
 struct ssl_ctx_st;

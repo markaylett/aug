@@ -4,11 +4,12 @@
 #ifndef AUGSYSPP_UTILITY_HPP
 #define AUGSYSPP_UTILITY_HPP
 
-#include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
 
-#include "augsys/unistd.h" // aug_fsize()
-#include "augsys/utility.h"
+#include "augctxpp/exception.hpp"
+
+#include "augsys/unistd.h"  // aug_fsize()
+#include "augsys/utility.h" // aug_rand()
 
 namespace aug {
 
@@ -26,40 +27,6 @@ namespace aug {
         size_t size;
         verify(aug_fsize(ref.get(), &size));
         return size;
-    }
-
-    /**
-     * Print last error.
-     *
-     * Akin to perror().  Can be safely called from destructors and catch
-     * blocks.
-     *
-     * @param s String to be prepended.
-     *
-     * @return -1 on error.
-     */
-
-    inline aug_result
-    perrinfo(ctxref ctx, const char* s) AUG_NOTHROW
-    {
-        return aug_perrinfo(ctx.get(), s, NULL);
-    }
-
-    /**
-     * Print last error.
-     *
-     * @param ctx Context.
-     *
-     * @param s String to be prepended.
-     *
-     * @return -1 on error.
-     */
-
-    inline aug_result
-    perrinfo(ctxref ctx, const char* s,
-             const struct aug_errinfo& errinfo) AUG_NOTHROW
-    {
-        return aug_perrinfo(ctx.get(), s, &errinfo);
     }
 
     /**

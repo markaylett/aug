@@ -275,6 +275,7 @@ AC_CONFIG_FILES([Makefile
                  src/c/htdigest/Makefile
                  src/c/mar/Makefile
                  src/cpp/Makefile
+                 src/cpp/augctxpp/Makefile
                  src/cpp/augmarpp/Makefile
                  src/cpp/augnetpp/Makefile
                  src/cpp/augaspp/Makefile

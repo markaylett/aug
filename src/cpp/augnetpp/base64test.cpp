@@ -1,8 +1,9 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augnetpp/base64.hpp"
-#include "augsyspp/base.hpp"
+#include "augnetpp.hpp"
+#include "augsyspp.hpp"
+#include "augctxpp.hpp"
 
 #include <iostream>
 #include <sstream>

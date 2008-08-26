@@ -6,7 +6,7 @@
 
 #include "augutilpp/config.hpp"
 
-#include "augsyspp/exception.hpp"
+#include "augctxpp/exception.hpp"
 
 #include "augutil/conv.h"
 

@@ -66,9 +66,9 @@ libaugnet_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugnet_la_OBJECTS = auth.lo base64.lo chans.lo config.lo fix.lo \
-	http.lo inet.lo mar.lo netevent.lo object.lo ssl.lo \
-	tcpconnect.lo types.lo writer.lo
+am_libaugnet_la_OBJECTS = auth.lo base64.lo chan.lo chans.lo config.lo \
+	fix.lo http.lo inet.lo mar.lo netevent.lo ssl.lo tcpconnect.lo \
+	types.lo writer.lo
 libaugnet_la_OBJECTS = $(am_libaugnet_la_OBJECTS)
 am_base64test_OBJECTS = base64test.$(OBJEXT)
 base64test_OBJECTS = $(am_base64test_OBJECTS)
@@ -238,6 +238,7 @@ modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
 	auth.h \
 	base64.h \
+	chan.h \
 	chans.h \
 	config.h \
 	fix.h \
@@ -245,7 +246,6 @@ modinclude_HEADERS = \
 	inet.h \
 	mar.h \
 	netevent.h \
-	object.h \
 	ssl.h \
 	tcpconnect.h \
 	types.h \
@@ -256,6 +256,7 @@ lib_LTLIBRARIES = libaugnet.la
 libaugnet_la_SOURCES = \
 	auth.c \
 	base64.c \
+	chan.c \
 	chans.c \
 	config.c \
 	fix.c \
@@ -263,7 +264,6 @@ libaugnet_la_SOURCES = \
 	inet.c \
 	mar.c \
 	netevent.c \
-	object.c \
 	ssl.c \
 	tcpconnect.c \
 	types.c \
@@ -402,6 +402,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/auth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chans.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chanstest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
@@ -413,7 +414,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netevent.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neteventtest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpconnect.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@

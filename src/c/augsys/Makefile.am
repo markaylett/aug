@@ -8,6 +8,7 @@ modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
 	barrier.h \
 	base.h \
+	chan.h \
 	config.h \
 	debug.h \
 	dlfcn.h \
@@ -16,7 +17,6 @@ modinclude_HEADERS = \
 	mcast.h \
 	mmap.h \
 	muxer.h \
-	object.h \
 	queue.h \
 	socket.h \
 	stream.h \
@@ -32,6 +32,7 @@ lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
 	barrier.c \
 	base.c \
+	chan.c \
 	config.c \
 	debug.c \
 	dlfcn.c \
@@ -40,7 +41,6 @@ libaugsys_la_SOURCES = \
 	mcast.c \
 	mmap.c \
 	muxer.c \
-	object.c \
 	socket.c \
 	stream.c \
 	time.c \
@@ -59,9 +59,9 @@ libaugsys_la_LIBADD = \
 
 check_PROGRAMS = \
 	basetest \
+	chantest \
 	mcasttest \
 	muxertest \
-	objecttest \
 	sockaddrtest \
 	sockettest \
 	timetest \
@@ -81,16 +81,16 @@ basetest_SOURCES = basetest.c
 basetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
+chantest_SOURCES = chantest.c
+chantest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
 mcasttest_SOURCES = mcasttest.c
 mcasttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 muxertest_SOURCES = muxertest.c
 muxertest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-
-objecttest_SOURCES = objecttest.c
-objecttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 sockaddrtest_SOURCES = sockaddrtest.c

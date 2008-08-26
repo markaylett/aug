@@ -8,14 +8,14 @@
 
 #include "augutilpp/object.hpp"
 
-#include "augsyspp/exception.hpp"
-#include "augsyspp/utility.hpp"
+#include "augctxpp/exception.hpp"
+#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augnet/mar.h"
 
 #include "augmar/mar.h"
 
-#include <memory> // auto_ptr<>
+#include <memory>               // auto_ptr<>
 
 namespace aug {
 

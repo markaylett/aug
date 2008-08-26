@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGNET_OBJECT_H
-#define AUGNET_OBJECT_H
+#ifndef AUGNET_CHAN_H
+#define AUGNET_CHAN_H
 
 #include "augnet/config.h"
 
@@ -52,4 +52,4 @@ AUGNET_API aug_chan*
 aug_createplain(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
                 unsigned short mask);
 
-#endif /* AUGNET_OBJECT_H */
+#endif /* AUGNET_CHAN_H */

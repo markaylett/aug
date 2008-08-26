@@ -2,9 +2,9 @@
    See the file COPYING for copying permission.
 */
 
-#include "augutilpp/shellparser.hpp"
-
-#include "augsyspp/base.hpp"
+#include "augutilpp.hpp"
+#include "augsyspp.hpp"
+#include "augctxpp.hpp"
 
 #include <iostream>
 #include <iterator>

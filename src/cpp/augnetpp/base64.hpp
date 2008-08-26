@@ -8,14 +8,14 @@
 
 #include "augutilpp/object.hpp"
 
-#include "augsyspp/exception.hpp"
-#include "augsyspp/utility.hpp"
+#include "augctxpp/exception.hpp"
+#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augnet/base64.h"
 
-#include "augctx/defs.h" // AUG_MAXLINE
+#include "augctx/defs.h"        // AUG_MAXLINE
 
-#include <memory>        // auto_ptr<>
+#include <memory>               // auto_ptr<>
 #include <sstream>
 
 namespace aug {

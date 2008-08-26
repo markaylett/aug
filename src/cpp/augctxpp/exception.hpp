@@ -1,13 +1,11 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGSYSPP_EXCEPTION_HPP
-#define AUGSYSPP_EXCEPTION_HPP
+#ifndef AUGCTXPP_EXCEPTION_HPP
+#define AUGCTXPP_EXCEPTION_HPP
 
-#include "augsyspp/errinfo.hpp"
-#include "augsyspp/types.hpp"
-
-#include "augsys/utility.h" // aug_perrinfo()
+#include "augctxpp/errinfo.hpp"
+#include "augctxpp/types.hpp"
 
 #include "augctx/base.h"
 
@@ -240,7 +238,4 @@ namespace aug {
                        AUG_EEXCEPT, "no description available");        \
     } do { } while (0)
 
-#endif // AUGSYSPP_EXCEPTION_HPP
-
-
-
+#endif // AUGCTXPP_EXCEPTION_HPP

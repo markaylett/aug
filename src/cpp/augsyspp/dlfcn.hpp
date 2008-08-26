@@ -4,8 +4,8 @@
 #ifndef AUGSYSPP_DLFCN_HPP
 #define AUGSYSPP_DLFCN_HPP
 
-#include "augsyspp/exception.hpp"
-#include "augsyspp/utility.hpp" // perrinfo()
+#include "augctxpp/exception.hpp"
+#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augnullpp.hpp"
 

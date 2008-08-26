@@ -4,10 +4,13 @@
 #ifndef AUGSYSPP_SOCKET_HPP
 #define AUGSYSPP_SOCKET_HPP
 
-#include "augsyspp/exception.hpp"
 #include "augsyspp/smartfd.hpp"
 
+#include "augctxpp/exception.hpp"
+
 #include "augsys/socket.h"
+
+#include <string>
 
 namespace aug {
 

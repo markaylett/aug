@@ -40,8 +40,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = basetest$(EXEEXT) mcasttest$(EXEEXT) \
-	muxertest$(EXEEXT) objecttest$(EXEEXT) sockaddrtest$(EXEEXT) \
+check_PROGRAMS = basetest$(EXEEXT) chantest$(EXEEXT) \
+	mcasttest$(EXEEXT) muxertest$(EXEEXT) sockaddrtest$(EXEEXT) \
 	sockettest$(EXEEXT) timetest$(EXEEXT) utilitytest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -61,23 +61,23 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugsys_la_OBJECTS = barrier.lo base.lo config.lo debug.lo \
-	dlfcn.lo endian.lo limits.lo mcast.lo mmap.lo muxer.lo \
-	object.lo socket.lo stream.lo time.lo types.lo uio.lo \
-	unistd.lo utility.lo windows.lo
+am_libaugsys_la_OBJECTS = barrier.lo base.lo chan.lo config.lo \
+	debug.lo dlfcn.lo endian.lo limits.lo mcast.lo mmap.lo \
+	muxer.lo socket.lo stream.lo time.lo types.lo uio.lo unistd.lo \
+	utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
 basetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_chantest_OBJECTS = chantest.$(OBJEXT)
+chantest_OBJECTS = $(am_chantest_OBJECTS)
+chantest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_mcasttest_OBJECTS = mcasttest.$(OBJEXT)
 mcasttest_OBJECTS = $(am_mcasttest_OBJECTS)
 mcasttest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_muxertest_OBJECTS = muxertest.$(OBJEXT)
 muxertest_OBJECTS = $(am_muxertest_OBJECTS)
 muxertest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
-am_objecttest_OBJECTS = objecttest.$(OBJEXT)
-objecttest_OBJECTS = $(am_objecttest_OBJECTS)
-objecttest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_sockaddrtest_OBJECTS = sockaddrtest.$(OBJEXT)
 sockaddrtest_OBJECTS = $(am_sockaddrtest_OBJECTS)
 sockaddrtest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
@@ -101,15 +101,13 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
-	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
-	$(objecttest_SOURCES) $(sockaddrtest_SOURCES) \
-	$(sockettest_SOURCES) $(timetest_SOURCES) \
-	$(utilitytest_SOURCES)
+	$(chantest_SOURCES) $(mcasttest_SOURCES) $(muxertest_SOURCES) \
+	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
+	$(timetest_SOURCES) $(utilitytest_SOURCES)
 DIST_SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
-	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
-	$(objecttest_SOURCES) $(sockaddrtest_SOURCES) \
-	$(sockettest_SOURCES) $(timetest_SOURCES) \
-	$(utilitytest_SOURCES)
+	$(chantest_SOURCES) $(mcasttest_SOURCES) $(muxertest_SOURCES) \
+	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
+	$(timetest_SOURCES) $(utilitytest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -258,6 +256,7 @@ modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
 	barrier.h \
 	base.h \
+	chan.h \
 	config.h \
 	debug.h \
 	dlfcn.h \
@@ -266,7 +265,6 @@ modinclude_HEADERS = \
 	mcast.h \
 	mmap.h \
 	muxer.h \
-	object.h \
 	queue.h \
 	socket.h \
 	stream.h \
@@ -281,6 +279,7 @@ lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
 	barrier.c \
 	base.c \
+	chan.c \
 	config.c \
 	debug.c \
 	dlfcn.c \
@@ -289,7 +288,6 @@ libaugsys_la_SOURCES = \
 	mcast.c \
 	mmap.c \
 	muxer.c \
-	object.c \
 	socket.c \
 	stream.c \
 	time.c \
@@ -320,16 +318,16 @@ basetest_SOURCES = basetest.c
 basetest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
+chantest_SOURCES = chantest.c
+chantest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
 mcasttest_SOURCES = mcasttest.c
 mcasttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 muxertest_SOURCES = muxertest.c
 muxertest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
-
-objecttest_SOURCES = objecttest.c
-objecttest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 sockaddrtest_SOURCES = sockaddrtest.c
@@ -420,15 +418,15 @@ clean-checkPROGRAMS:
 basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
 	@rm -f basetest$(EXEEXT)
 	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
+chantest$(EXEEXT): $(chantest_OBJECTS) $(chantest_DEPENDENCIES) 
+	@rm -f chantest$(EXEEXT)
+	$(LINK) $(chantest_LDFLAGS) $(chantest_OBJECTS) $(chantest_LDADD) $(LIBS)
 mcasttest$(EXEEXT): $(mcasttest_OBJECTS) $(mcasttest_DEPENDENCIES) 
 	@rm -f mcasttest$(EXEEXT)
 	$(LINK) $(mcasttest_LDFLAGS) $(mcasttest_OBJECTS) $(mcasttest_LDADD) $(LIBS)
 muxertest$(EXEEXT): $(muxertest_OBJECTS) $(muxertest_DEPENDENCIES) 
 	@rm -f muxertest$(EXEEXT)
 	$(LINK) $(muxertest_LDFLAGS) $(muxertest_OBJECTS) $(muxertest_LDADD) $(LIBS)
-objecttest$(EXEEXT): $(objecttest_OBJECTS) $(objecttest_DEPENDENCIES) 
-	@rm -f objecttest$(EXEEXT)
-	$(LINK) $(objecttest_LDFLAGS) $(objecttest_OBJECTS) $(objecttest_LDADD) $(LIBS)
 sockaddrtest$(EXEEXT): $(sockaddrtest_OBJECTS) $(sockaddrtest_DEPENDENCIES) 
 	@rm -f sockaddrtest$(EXEEXT)
 	$(LINK) $(sockaddrtest_LDFLAGS) $(sockaddrtest_OBJECTS) $(sockaddrtest_LDADD) $(LIBS)
@@ -451,6 +449,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/barrier.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/basetest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chantest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlfcn.Plo@am__quote@
@@ -461,8 +461,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxertest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/objecttest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockaddrtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockettest.Po@am__quote@

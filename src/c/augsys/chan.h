@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGSYS_OBJECT_H
-#define AUGSYS_OBJECT_H
+#ifndef AUGSYS_CHAN_H
+#define AUGSYS_CHAN_H
 
 #include "augsys/muxer.h"
 
@@ -22,4 +22,4 @@ AUGSYS_API aug_chan*
 aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,
                aug_muxer_t muxer);
 
-#endif /* AUGSYS_OBJECT_H */
+#endif /* AUGSYS_CHAN_H */

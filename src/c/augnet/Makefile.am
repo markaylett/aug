@@ -4,6 +4,7 @@ modincludedir = $(includedir)/augnet
 modinclude_HEADERS = \
 	auth.h \
 	base64.h \
+	chan.h \
 	chans.h \
 	config.h \
 	fix.h \
@@ -11,7 +12,6 @@ modinclude_HEADERS = \
 	inet.h \
 	mar.h \
 	netevent.h \
-	object.h \
 	ssl.h \
 	tcpconnect.h \
 	types.h \
@@ -24,6 +24,7 @@ lib_LTLIBRARIES = libaugnet.la
 libaugnet_la_SOURCES = \
 	auth.c \
 	base64.c \
+	chan.c \
 	chans.c \
 	config.c \
 	fix.c \
@@ -31,7 +32,6 @@ libaugnet_la_SOURCES = \
 	inet.c \
 	mar.c \
 	netevent.c \
-	object.c \
 	ssl.c \
 	tcpconnect.c \
 	types.c \

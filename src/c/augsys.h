@@ -12,6 +12,7 @@
 
 #include "augsys/barrier.h"
 #include "augsys/base.h"
+#include "augsys/chan.h"
 #include "augsys/config.h"
 #include "augsys/debug.h"
 #include "augsys/dlfcn.h"
@@ -20,7 +21,6 @@
 #include "augsys/mcast.h"
 #include "augsys/mmap.h"
 #include "augsys/muxer.h"
-#include "augsys/object.h"
 #include "augsys/queue.h"
 #include "augsys/socket.h"
 #include "augsys/stream.h"

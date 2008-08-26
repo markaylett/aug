@@ -13,10 +13,11 @@ AUG_RCSID("$Id$");
  * application server.
  */
 
-#include "augnetpp.hpp"
 #include "augsrvpp.hpp"
-#include "augsyspp.hpp"
+#include "augnetpp.hpp"
 #include "augutilpp.hpp"
+#include "augsyspp.hpp"
+#include "augctxpp.hpp"
 
 #include "augaspp/engine.hpp"
 
@@ -710,7 +711,7 @@ main(int argc, char* argv[])
 
          // Initialise aug libraries.
 
-        scoped_init init;
+        scoped_init init(basictlx);
 
         // Seed random number generator.
 

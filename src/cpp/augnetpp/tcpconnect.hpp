@@ -6,13 +6,14 @@
 
 #include "augnetpp/config.hpp"
 
-#include "augsyspp/exception.hpp"
 #include "augsyspp/socket.hpp" // close()
 #include "augsyspp/smartfd.hpp"
 
+#include "augctxpp/exception.hpp"
+
 #include "augnet/tcpconnect.h"
 
-#include <utility> // pair<>
+#include <utility>             // pair<>
 
 namespace aug {
 

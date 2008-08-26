@@ -1,14 +1,16 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#ifndef AUGNETPP_OBJECT_HPP
-#define AUGNETPP_OBJECT_HPP
+#ifndef AUGNETPP_CHAN_HPP
+#define AUGNETPP_CHAN_HPP
 
 #include "augnetpp/config.hpp"
 
-#include "augsyspp/exception.hpp"
+#include "augsyspp/types.hpp" // sdref
 
-#include "augnet/object.h"
+#include "augctxpp/exception.hpp"
+
+#include "augnet/chan.h"
 
 #include "augsys/muxer.h"
 
@@ -43,4 +45,4 @@ namespace aug {
     }
 }
 
-#endif // AUGNETPP_OBJECT_HPP
+#endif // AUGNETPP_CHAN_HPP

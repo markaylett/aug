@@ -26,7 +26,6 @@ AUG_RCSID("$Id$");
 #endif /* _WIN32 */
 
 #include <assert.h>
-#include <stdlib.h>  /* malloc() */
 
 struct aug_buf {
     AUG_ENTRY(aug_buf);

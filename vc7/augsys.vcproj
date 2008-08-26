@@ -135,6 +135,9 @@
 				RelativePath="..\src\c\augsys\base.c">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\chan.c">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\config.c">
 			</File>
 			<File
@@ -157,9 +160,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\muxer.c">
-			</File>
-			<File
-				RelativePath="..\src\c\augsys\object.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\socket.c">
@@ -197,6 +197,9 @@
 				RelativePath="..\src\c\augsys\base.h">
 			</File>
 			<File
+				RelativePath="..\src\c\augsys\chan.h">
+			</File>
+			<File
 				RelativePath="..\src\c\augsys\config.h">
 			</File>
 			<File
@@ -219,9 +222,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\muxer.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augsys\object.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\queue.h">

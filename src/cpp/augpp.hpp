@@ -4,6 +4,7 @@
 #ifndef AUGPP_HPP
 #define AUGPP_HPP
 
+#include "augctxpp.hpp"
 #include "augmarpp.hpp"
 #include "augnetpp.hpp"
 #include "augsrvpp.hpp"

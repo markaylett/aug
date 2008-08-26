@@ -2,7 +2,7 @@
    See the file COPYING for copying permission.
 */
 #define AUGSYS_BUILD
-#include "augsys/object.h"
+#include "augsys/chan.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");

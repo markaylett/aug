@@ -9,8 +9,6 @@
 #include "augsyspp/base.hpp"
 #include "augsyspp/dlfcn.hpp"
 #include "augsyspp/endpoint.hpp"
-#include "augsyspp/errinfo.hpp"
-#include "augsyspp/exception.hpp"
 #include "augsyspp/inetaddr.hpp"
 #include "augsyspp/mcast.hpp"
 #include "augsyspp/mmap.hpp"

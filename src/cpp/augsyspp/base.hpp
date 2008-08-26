@@ -4,60 +4,9 @@
 #ifndef AUGSYSPP_BASE_HPP
 #define AUGSYSPP_BASE_HPP
 
-#include "augsyspp/exception.hpp"
-#include "augsyspp/types.hpp"
-
 #include "augsys/base.h"
 
-#include "augctx/base.h"
-
-#include <stdexcept>
-
 namespace aug {
-
-    inline void
-    init()
-    {
-        if (aug_init() < 0)
-            throw std::runtime_error("aug_init() failed");
-    }
-    inline void
-    initbasictlx()
-    {
-        if (aug_initbasictlx() < 0)
-            throw std::runtime_error("aug_initbasictlx() failed");
-    }
-    inline void
-    term()
-    {
-        aug_term();
-    }
-    inline void
-    autobasictlx()
-    {
-        if (aug_autobasictlx() < 0)
-            throw std::runtime_error("aug_autobasictlx() failed");
-    }
-
-    class scoped_init {
-
-        scoped_init(const scoped_init& rhs);
-
-        scoped_init&
-        operator =(const scoped_init& rhs);
-
-    public:
-        ~scoped_init() AUG_NOTHROW
-        {
-            aug_term();
-        }
-        scoped_init()
-        {
-            // FIXME: improve init() support.
-            //init();
-            initbasictlx();
-        }
-    };
 
     inline unsigned
     nextid()

@@ -4,9 +4,10 @@
 #ifndef AUGSYSPP_MUXER_HPP
 #define AUGSYSPP_MUXER_HPP
 
-#include "augsyspp/exception.hpp"
 #include "augsyspp/socket.hpp" // close()
 #include "augsyspp/smartfd.hpp"
+
+#include "augctxpp/exception.hpp"
 
 #include "augsys/muxer.h"
 

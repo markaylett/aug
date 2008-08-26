@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsyspp/muxer.hpp"
-#include "augsyspp/socket.hpp"
+#include "augsyspp.hpp"
+#include "augctxpp.hpp"
 
 using namespace aug;
 using namespace std;

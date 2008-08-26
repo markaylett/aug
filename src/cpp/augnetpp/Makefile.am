@@ -3,12 +3,12 @@ include $(top_srcdir)/src/cpp/lang.mk
 modincludedir = $(includedir)/augnetpp
 modinclude_HEADERS = \
 	base64.hpp \
+	chan.hpp \
 	chans.hpp \
 	config.hpp \
 	http.hpp \
 	inet.hpp \
 	mar.hpp \
-	object.hpp \
 	tcpconnect.hpp \
 	writer.hpp
 
@@ -16,12 +16,12 @@ noinst_LTLIBRARIES = libaugnetpp.la
 
 libaugnetpp_la_SOURCES = \
 	base64.cpp \
+	chan.cpp \
 	chans.cpp \
 	config.cpp \
 	http.cpp \
 	inet.cpp \
 	mar.cpp \
-	object.cpp \
 	tcpconnect.cpp \
 	writer.cpp
 

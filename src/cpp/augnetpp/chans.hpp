@@ -4,9 +4,7 @@
 #ifndef AUGNETPP_CHANS_HPP
 #define AUGNETPP_CHANS_HPP
 
-#include "augutilpp/object.hpp"
-
-#include "augsyspp/exception.hpp"
+#include "augctxpp/exception.hpp"
 
 #include "augnet/chans.h"
 

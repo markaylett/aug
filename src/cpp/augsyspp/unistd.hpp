@@ -4,8 +4,9 @@
 #ifndef AUGSYSPP_UNISTD_HPP
 #define AUGSYSPP_UNISTD_HPP
 
-#include "augsyspp/exception.hpp"
 #include "augsyspp/smartfd.hpp"
+
+#include "augctxpp/exception.hpp"
 
 #include "augsys/unistd.h"
 

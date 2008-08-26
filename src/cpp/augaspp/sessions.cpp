@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsyspp/exception.hpp"
+#include "augctxpp/exception.hpp"
 
 #include <sstream>
 

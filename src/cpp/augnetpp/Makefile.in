@@ -56,8 +56,8 @@ libaugnetpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugnetpp_la_OBJECTS = base64.lo chans.lo config.lo http.lo \
-	inet.lo mar.lo object.lo tcpconnect.lo writer.lo
+am_libaugnetpp_la_OBJECTS = base64.lo chan.lo chans.lo config.lo \
+	http.lo inet.lo mar.lo tcpconnect.lo writer.lo
 libaugnetpp_la_OBJECTS = $(am_libaugnetpp_la_OBJECTS)
 am_base64test_OBJECTS = base64test.$(OBJEXT)
 base64test_OBJECTS = $(am_base64test_OBJECTS)
@@ -251,24 +251,24 @@ DEFAULT_INCLUDES = \
 modincludedir = $(includedir)/augnetpp
 modinclude_HEADERS = \
 	base64.hpp \
+	chan.hpp \
 	chans.hpp \
 	config.hpp \
 	http.hpp \
 	inet.hpp \
 	mar.hpp \
-	object.hpp \
 	tcpconnect.hpp \
 	writer.hpp
 
 noinst_LTLIBRARIES = libaugnetpp.la
 libaugnetpp_la_SOURCES = \
 	base64.cpp \
+	chan.cpp \
 	chans.cpp \
 	config.cpp \
 	http.cpp \
 	inet.cpp \
 	mar.cpp \
-	object.cpp \
 	tcpconnect.cpp \
 	writer.cpp
 
@@ -391,6 +391,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chans.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chanstest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
@@ -398,7 +399,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpconnect.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpconnecttest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writer.Plo@am__quote@

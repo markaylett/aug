@@ -6,8 +6,9 @@
 
 #include "augutilpp/config.hpp"
 
-#include "augsyspp/exception.hpp"
 #include "augsyspp/types.hpp"
+
+#include "augctxpp/exception.hpp"
 
 #include "augabipp.hpp"
 

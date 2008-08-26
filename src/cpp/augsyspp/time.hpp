@@ -4,7 +4,7 @@
 #ifndef AUGSYSPP_TIME_HPP
 #define AUGSYSPP_TIME_HPP
 
-#include "augsyspp/exception.hpp"
+#include "augctxpp/exception.hpp"
 
 #include "augsys/time.h"
 

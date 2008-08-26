@@ -1,8 +1,8 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsyspp/base.hpp"
-#include "augsyspp/exception.hpp"
+#include "augctxpp/base.hpp"
+#include "augctxpp/exception.hpp"
 
 #include <iostream>
 #include <stdexcept>
