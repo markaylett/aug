@@ -52,8 +52,8 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libaugctxpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugctxpp_la_OBJECTS = base.lo config.lo errinfo.lo types.lo \
-	utility.lo
+am_libaugctxpp_la_OBJECTS = base.lo config.lo errinfo.lo exception.lo \
+	types.lo utility.lo
 libaugctxpp_la_OBJECTS = $(am_libaugctxpp_la_OBJECTS)
 am_exceptiontest_OBJECTS = exceptiontest.$(OBJEXT)
 exceptiontest_OBJECTS = $(am_exceptiontest_OBJECTS)
@@ -225,6 +225,7 @@ modinclude_HEADERS = \
 	base.hpp \
 	config.hpp \
 	errinfo.hpp \
+	exception.hpp \
 	types.hpp \
 	utility.hpp
 
@@ -233,6 +234,7 @@ libaugctxpp_la_SOURCES = \
 	base.cpp \
 	config.cpp \
 	errinfo.cpp \
+	exception.cpp \
 	types.cpp \
 	utility.cpp
 
@@ -323,6 +325,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exceptiontest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@

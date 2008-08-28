@@ -2,6 +2,7 @@ EXTRA_DIST = \
 	aug.bat \
 	aug.sln \
 	augctx.vcproj \
+	augctxpp.vcproj \
 	augmar.vcproj \
 	augmarpp.vcproj \
 	augnet.vcproj \

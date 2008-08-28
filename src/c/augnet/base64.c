@@ -170,7 +170,7 @@ decodealign_(aug_base64_t base64, const char* src, size_t len)
     char in;
     int align, out;
     int* save = base64->save_;
-    aug_chunk_t chunk;
+    aug_chunk_t chunk = { 0 }; /* Suppress warnings. */
 
     /* Copy any previously saved characters to local chunk. */
 
@@ -270,7 +270,7 @@ decodeappend_(aug_base64_t base64, const char* src, size_t len)
 {
     char in;
     int align, i = 0, out;
-    aug_chunk_t chunk;
+    aug_chunk_t chunk = { 0 }; /* Suppress warnings. */
 
     switch (align = decodealign_(base64, src, len)) {
     case END_:

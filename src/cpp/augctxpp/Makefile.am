@@ -5,6 +5,7 @@ modinclude_HEADERS = \
 	base.hpp \
 	config.hpp \
 	errinfo.hpp \
+	exception.hpp \
 	types.hpp \
 	utility.hpp
 
@@ -14,6 +15,7 @@ libaugctxpp_la_SOURCES = \
 	base.cpp \
 	config.cpp \
 	errinfo.cpp \
+	exception.cpp \
 	types.cpp \
 	utility.cpp
 
