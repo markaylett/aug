@@ -27,3 +27,9 @@ Ensure correct use of size_t for 64 bit arch.
 Write pid file on Windows.
 
 Add ability to change user and group.
+
+Review use of safe-assign.
+
+Make destroy() return codes consistent.
+
+Review timer implementation.

@@ -68,25 +68,6 @@ STAILQ_REMOVE_HEAD(head, entries_)
 #define AUG_REMOVE_HEAD_UNTIL(head, elm) \
 STAILQ_REMOVE_HEAD_UNTIL(head, elm, entries_)
 
-#define AUG_ALLOCATOR(name, head, type, bsize) \
-static struct type* \
-name(void) \
-{ \
-    struct type* it; \
-    if (AUG_EMPTY((head))) { \
-        struct type* end; \
-        if (!(it = (struct type*)malloc(sizeof(struct type) * (bsize)))) { \
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM); \
-            return NULL; \
-        } \
-        for (end = it + (bsize); it < end; ++it) \
-            AUG_INSERT_TAIL((head), it); \
-    } \
-    it = AUG_FIRST((head)); \
-    AUG_REMOVE_HEAD((head)); \
-    return it; \
-}
-
 #define	AUG_REMOVE_PREVPTR(var, varp, head) \
 do { \
     if (!AUG_NEXT((var))) \

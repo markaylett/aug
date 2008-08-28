@@ -48,13 +48,8 @@ namespace aug {
     }
 
     class timers {
-    public:
-        typedef aug_timers ctype;
-    private:
 
-        friend class timer;
-
-        aug_timers timers_;
+        aug_timers_t timers_;
 
         timers(const timers&);
 
@@ -64,21 +59,35 @@ namespace aug {
     public:
         ~timers() AUG_NOTHROW
         {
-            if (-1 == aug_destroytimers(&timers_))
+            if (timers_ && -1 == aug_destroytimers(timers_))
                 perrinfo(aug_tlx, "aug_destroytimers() failed");
         }
 
-        timers()
+        timers(const null_&) AUG_NOTHROW
+           : timers_(0)
         {
-            AUG_INIT(&timers_);
         }
 
-        operator aug_timers&()
+        explicit
+        timers(mpoolref mpool)
+            : timers_(aug_createtimers(mpool.get()))
+        {
+            verify(timers_);
+        }
+
+        void
+        swap(timers& rhs) AUG_NOTHROW
+        {
+            std::swap(timers_, rhs.timers_);
+        }
+
+        operator aug_timers_t()
         {
             return timers_;
         }
 
-        operator const aug_timers&() const
+        aug_timers_t
+        get()
         {
             return timers_;
         }
@@ -86,78 +95,85 @@ namespace aug {
         bool
         empty() const
         {
-            return AUG_EMPTY(&timers_);
+            return aug_timersempty(timers_) ? true : false;
         }
     };
 
+    inline void
+    swap(timers& lhs, timers& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
+
     inline int
-    settimer(aug_timers& timers, idref ref, unsigned ms, aug_timercb_t cb,
+    settimer(aug_timers_t timers, idref ref, unsigned ms, aug_timercb_t cb,
              aug::objectref ob)
     {
-        return verify(aug_settimer(&timers, ref.get(), ms, cb, ob.get()));
+        return verify(aug_settimer(timers, ref.get(), ms, cb, ob.get()));
     }
 
     inline int
-    settimer(aug_timers& timers, idref ref, unsigned ms, aug_timercb_t cb,
+    settimer(aug_timers_t timers, idref ref, unsigned ms, aug_timercb_t cb,
              const null_&)
     {
-        return verify(aug_settimer(&timers, ref.get(), ms, cb, 0));
+        return verify(aug_settimer(timers, ref.get(), ms, cb, 0));
     }
 
     template <typename T>
     int
-    settimer(aug_timers& timers, idref ref, unsigned ms, T& x)
+    settimer(aug_timers_t timers, idref ref, unsigned ms, T& x)
     {
         aug::smartob<aug_boxptr> ob(createboxptr(getmpool(aug_tlx), &x, 0));
-        return verify(aug_settimer(&timers, ref.get(), ms,
-                                   timermemcb<T>, ob.base()));
+        return verify(aug_settimer(timers, ref.get(), ms, timermemcb<T>,
+                                   ob.base()));
     }
 
     template <typename T>
     int
-    settimer(aug_timers& timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
+    settimer(aug_timers_t timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
     {
         aug::smartob<aug_boxptr> ob(createboxptr(getmpool(aug_tlx), x));
-        int id(verify(aug_settimer(&timers, ref.get(), ms, timermemcb<T>,
+        int id(verify(aug_settimer(timers, ref.get(), ms, timermemcb<T>,
                                    ob.base())));
         return id;
     }
 
     inline bool
-    resettimer(aug_timers& timers, idref ref, unsigned ms = 0)
+    resettimer(aug_timers_t timers, idref ref, unsigned ms = 0)
     {
-        return AUG_FAILNONE == verify(aug_resettimer(&timers, ref.get(), ms))
+        return AUG_FAILNONE == verify(aug_resettimer(timers, ref.get(), ms))
             ? false : true;
     }
 
     inline bool
-    canceltimer(aug_timers& timers, idref ref)
+    canceltimer(aug_timers_t timers, idref ref)
     {
-        return AUG_FAILNONE == aug_canceltimer(&timers, ref.get())
+        return AUG_FAILNONE == aug_canceltimer(timers, ref.get())
             ? false : true;
     }
 
     inline bool
-    expired(aug_timers& timers, idref ref)
+    expired(aug_timers_t timers, idref ref)
     {
-        return aug_expired(&timers, ref.get()) ? true : false;
+        return aug_expired(timers, ref.get()) ? true : false;
     }
 
     inline void
-    processexpired(aug_timers& timers, bool force)
+    processexpired(aug_timers_t timers, bool force)
     {
-        verify(aug_processexpired(&timers, force ? 1 : 0, 0));
+        verify(aug_processexpired(timers, force ? AUG_TRUE : AUG_FALSE, 0));
     }
 
     inline void
-    processexpired(aug_timers& timers, bool force, timeval& next)
+    processexpired(aug_timers_t timers, bool force, timeval& next)
     {
-        verify(aug_processexpired(&timers, force ? 1 : 0, &next));
+        verify(aug_processexpired(timers, force ? AUG_TRUE : AUG_FALSE,
+                                  &next));
     }
 
     class timer {
 
-        aug_timers& timers_;
+        aug_timers_t timers_;
         idref ref_;
 
         timer(const timer& rhs);
@@ -173,7 +189,7 @@ namespace aug {
         }
 
         explicit
-        timer(aug_timers& timers, idref ref = null)
+        timer(aug_timers_t timers, idref ref = null)
             : timers_(timers),
               ref_(ref)
         {

@@ -11,19 +11,23 @@
  */
 
 #include "augutil/config.h"
-#include "augutil/list.h"
+
+#include "augext/mpool.h"
 
 #include "augabi.h"
+#include "augtypes.h"
 
 struct timeval;
 
-struct aug_timer_;
-AUG_HEAD(aug_timers, aug_timer_);
-
 typedef void (*aug_timercb_t)(aug_object*, int, unsigned*);
 
+typedef struct aug_timers_* aug_timers_t;
+
+AUGUTIL_API aug_timers_t
+aug_createtimers(aug_mpool* mpool);
+
 AUGUTIL_API int
-aug_destroytimers(struct aug_timers* timers);
+aug_destroytimers(aug_timers_t timers);
 
 /**
  * Create new timer.
@@ -48,8 +52,8 @@ aug_destroytimers(struct aug_timers* timers);
  */
 
 AUGUTIL_API int
-aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, aug_object* ob);
+aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
+             aug_object* ob);
 
 /**
  * On failure, the timer will be removed.
@@ -63,8 +67,8 @@ aug_settimer(struct aug_timers* timers, int id, unsigned ms,
  * @return #AUG_FAILNONE if the timer does not exist.
  */
 
-AUGUTIL_API int
-aug_resettimer(struct aug_timers* timers, int id, unsigned ms);
+AUGUTIL_API aug_result
+aug_resettimer(aug_timers_t timers, int id, unsigned ms);
 
 /**
  * Cancel timer.
@@ -76,8 +80,8 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms);
  * @return #AUG_FAILNONE if the timer does not exist.
  */
 
-AUGUTIL_API int
-aug_canceltimer(struct aug_timers* timers, int id);
+AUGUTIL_API aug_result
+aug_canceltimer(aug_timers_t timers, int id);
 
 /**
  * Check whether timer has expired.
@@ -89,8 +93,11 @@ aug_canceltimer(struct aug_timers* timers, int id);
  * @return False on failure.
  */
 
-AUGUTIL_API int
-aug_expired(struct aug_timers* timers, int id);
+AUGUTIL_API aug_bool
+aug_expired(aug_timers_t timers, int id);
+
+AUGUTIL_API aug_bool
+aug_timersempty(aug_timers_t timers);
 
 /**
  * Iterate through expired timers.
@@ -111,8 +118,7 @@ aug_expired(struct aug_timers* timers, int id);
  * next expiry time.
  */
 
-AUGUTIL_API int
-aug_processexpired(struct aug_timers* timers, int force,
-                   struct timeval* next);
+AUGUTIL_API aug_result
+aug_processexpired(aug_timers_t timers, aug_bool force, struct timeval* next);
 
 #endif /* AUGUTIL_TIMER_H */

@@ -188,12 +188,13 @@ namespace test {
 
         chandler<state> chandler_;
         map<unsigned, sessionptr> sessions_;
-        timers timers_;
         muxer muxer_;
+        timers timers_;
         chans chans_;
 
         state()
             : muxer_(getmpool(aug_tlx)),
+              timers_(getmpool(aug_tlx)),
               chans_(null)
         {
             chandler_.reset(this);

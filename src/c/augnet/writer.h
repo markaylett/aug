@@ -28,14 +28,14 @@ aug_createwriter(aug_mpool* mpool);
 AUGNET_API aug_result
 aug_destroywriter(aug_writer_t writer);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_appendwriter(aug_writer_t writer, aug_blob* blob);
 
 /**
  * Empty if there are no more blobs to write.
  */
 
-AUGNET_API int
+AUGNET_API aug_bool
 aug_writerempty(aug_writer_t writer);
 
 /**

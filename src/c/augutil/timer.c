@@ -8,6 +8,7 @@
 AUG_RCSID("$Id$");
 
 #include "augutil/object.h"
+#include "augutil/list.h"
 
 #include "augsys/base.h"    /* aug_nextid() */
 #include "augsys/time.h"
@@ -15,13 +16,12 @@ AUG_RCSID("$Id$");
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
-#include "augctx/errno.h"
-#include "augctx/lock.h"
 
+#include <assert.h>
 #include <stdlib.h>
 
-struct aug_timer_ {
-    AUG_ENTRY(aug_timer_);
+struct timer_ {
+    AUG_ENTRY(timer_);
     int id_;
     unsigned ms_;
     struct timeval tv_;
@@ -29,28 +29,39 @@ struct aug_timer_ {
     aug_object* ob_;
 };
 
-static struct aug_timers free_ = AUG_HEAD_INITIALIZER(free_);
-AUG_ALLOCATOR(allocate_, &free_, aug_timer_, 64)
+AUG_HEAD(timers_, timer_);
 
-static int
-expiry_(struct timeval* tv, unsigned ms)
+struct aug_timers_ {
+    aug_mpool* mpool_;
+    struct timers_ timers_;
+};
+
+static struct timer_*
+createtimer_(aug_mpool* mpool, aug_object* ob)
 {
-    struct timeval local;
-    aug_clock* clock = aug_getclock(aug_tlx);
-    aug_result result = aug_gettimeofday(clock, tv);
-    aug_release(clock);
+    struct timer_* timer;
+    assert(ob);
 
-    if (result < 0)
-        return -1;
+    if (!(timer = aug_allocmem(mpool, sizeof(struct timer_))))
+        return NULL;
 
-    aug_tvadd(tv, aug_mstotv(&local, ms));
-    return 0;
+    if ((timer->ob_ = ob))
+        aug_retain(ob);
+    return timer;
 }
 
 static void
-insert_(struct aug_timers* timers, struct aug_timer_* timer)
+destroytimer_(aug_mpool* mpool, struct timer_* timer)
 {
-    struct aug_timer_* it, * prev;
+    if (timer->ob_)
+        aug_release(timer->ob_);
+    aug_freemem(mpool, timer);
+}
+
+static void
+inserttimer_(struct timers_* timers, struct timer_* timer)
+{
+    struct timer_* it, * prev;
 
     it = AUG_FIRST(timers);
 
@@ -69,85 +80,102 @@ insert_(struct aug_timers* timers, struct aug_timer_* timer)
     }
 }
 
-AUGUTIL_API int
-aug_destroytimers(struct aug_timers* timers)
+static aug_result
+setexpiry_(struct timeval* tv, unsigned ms)
 {
-    struct aug_timer_* it;
-    AUG_FOREACH(it, timers)
-        if (it->ob_) {
-            aug_release(it->ob_);
-            it->ob_ = NULL;
-        }
+    struct timeval local;
+    aug_clock* clock = aug_getclock(aug_tlx);
+    aug_result result = aug_gettimeofday(clock, tv);
+    aug_release(clock);
 
-    if (!AUG_EMPTY(timers)) {
+    if (result < 0)
+        return AUG_FAILERROR;
 
-        aug_lock();
-        AUG_CONCAT(&free_, timers);
-        aug_unlock();
+    aug_tvadd(tv, aug_mstotv(&local, ms));
+    return AUG_SUCCESS;
+}
+
+AUGUTIL_API aug_timers_t
+aug_createtimers(aug_mpool* mpool)
+{
+    aug_timers_t timers = aug_allocmem(mpool, sizeof(struct aug_timers_));
+    if (!timers)
+        return NULL;
+
+    timers->mpool_ = mpool;
+    AUG_INIT(&timers->timers_);
+
+    aug_retain(mpool);
+    return timers;
+}
+
+AUGUTIL_API aug_result
+aug_destroytimers(aug_timers_t timers)
+{
+    aug_mpool* mpool = timers->mpool_;
+    struct timer_* it;
+
+    /* Destroy in single batch to avoid multiple calls to aug_lock(). */
+
+    while ((it = AUG_FIRST(&timers->timers_))) {
+        AUG_REMOVE_HEAD(&timers->timers_);
+        destroytimer_(mpool, it);
     }
-    return 0;
+
+    aug_freemem(mpool, timers);
+    aug_release(mpool);
+    return AUG_SUCCESS;
 }
 
 AUGUTIL_API int
-aug_settimer(struct aug_timers* timers, int id, unsigned ms,
-             aug_timercb_t cb, aug_object* ob)
+aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
+             aug_object* ob)
 {
     struct timeval tv;
-    struct aug_timer_* timer;
+    struct timer_* timer;
 
     if (id <= 0)
         id = aug_nextid();
     else
         aug_canceltimer(timers, id);
 
-    if (-1 == expiry_(&tv, ms))
-        return -1;
+    if (setexpiry_(&tv, ms) < 0)
+        return AUG_FAILERROR;
 
-    aug_lock();
-    if (!(timer = allocate_())) {
-        aug_unlock();
-        return -1;
-    }
-    aug_unlock();
+    if (!(timer = createtimer_(timers->mpool_, ob)))
+        return AUG_FAILERROR;
 
     timer->id_ = id;
     timer->ms_ = ms;
     timer->tv_.tv_sec = tv.tv_sec;
     timer->tv_.tv_usec = tv.tv_usec;
     timer->cb_ = cb;
-    if ((timer->ob_ = ob))
-        aug_retain(ob);
-    insert_(timers, timer);
+
+    inserttimer_(&timers->timers_, timer);
     return id;
 }
 
-AUGUTIL_API int
-aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
+AUGUTIL_API aug_result
+aug_resettimer(aug_timers_t timers, int id, unsigned ms)
 {
-    struct aug_timer_* it, ** prev;
+    struct timer_* it, ** prev;
 
-    prev = &AUG_FIRST(timers);
+    prev = &AUG_FIRST(&timers->timers_);
     while ((it = *prev)) {
 
         if (it->id_ == id) {
 
-            AUG_REMOVE_PREVPTR(it, prev, timers);
+            AUG_REMOVE_PREVPTR(it, prev, &timers->timers_);
             if (ms) /* May be zero. */
                 it->ms_ = ms;
 
-            if (-1 == expiry_(&it->tv_, it->ms_)) {
+            if (setexpiry_(&it->tv_, it->ms_) < 0) {
 
-                if (it->ob_) {
-                    aug_release(it->ob_);
-                    it->ob_ = NULL;
-                }
-                aug_lock();
-                AUG_INSERT_TAIL(&free_, it);
-                aug_unlock();
-                return -1;
+                destroytimer_(timers->mpool_, it);
+                return AUG_FAILERROR;
             }
 
-            insert_(timers, it);
+            inserttimer_(&timers->timers_, it);
             return 0;
 
         } else
@@ -156,26 +184,19 @@ aug_resettimer(struct aug_timers* timers, int id, unsigned ms)
     return AUG_FAILNONE;
 }
 
-AUGUTIL_API int
-aug_canceltimer(struct aug_timers* timers, int id)
+AUGUTIL_API aug_result
+aug_canceltimer(aug_timers_t timers, int id)
 {
-    struct aug_timer_* it, ** prev;
+    struct timer_* it, ** prev;
 
-    prev = &AUG_FIRST(timers);
+    prev = &AUG_FIRST(&timers->timers_);
     while ((it = *prev)) {
 
         if (it->id_ == id) {
 
-            AUG_REMOVE_PREVPTR(it, prev, timers);
-
-            if (it->ob_) {
-                aug_release(it->ob_);
-                it->ob_ = NULL;
-            }
-            aug_lock();
-            AUG_INSERT_TAIL(&free_, it);
-            aug_unlock();
-            return 0;
+            AUG_REMOVE_PREVPTR(it, prev, &timers->timers_);
+            destroytimer_(timers->mpool_, it);
+            return AUG_SUCCESS;
 
         } else
             prev = &AUG_NEXT(it);
@@ -183,31 +204,39 @@ aug_canceltimer(struct aug_timers* timers, int id)
     return AUG_FAILNONE;
 }
 
-AUGUTIL_API int
-aug_expired(struct aug_timers* timers, int id)
+AUGUTIL_API aug_bool
+aug_expired(aug_timers_t timers, int id)
 {
-    struct aug_timer_* it;
-    AUG_FOREACH(it, timers)
+    struct timer_* it;
+    AUG_FOREACH(it, &timers->timers_)
         if (it->id_ == id)
-            return 0;
+            return AUG_FALSE;
 
-    return 1;
+    return AUG_TRUE;
 }
 
-AUGUTIL_API int
-aug_processexpired(struct aug_timers* timers, int force, struct timeval* next)
+AUGUTIL_API aug_bool
+aug_timersempty(aug_timers_t timers)
+{
+    return AUG_EMPTY(&timers->timers_) ? AUG_TRUE : AUG_FALSE;
+}
+
+AUGUTIL_API aug_result
+aug_processexpired(aug_timers_t timers, aug_bool force, struct timeval* next)
 {
     struct timeval now;
-    struct aug_timer_* it;
+    struct timer_* it;
 
-    if ((it = AUG_FIRST(timers))) {
+    if ((it = AUG_FIRST(&timers->timers_))) {
+
+        /* Current time. */
 
         aug_clock* clock = aug_getclock(aug_tlx);
         aug_result result = aug_gettimeofday(clock, &now);
         aug_release(clock);
 
         if (result < 0)
-            return -1;
+            return AUG_FAILERROR;
 
         /* Force, at least, the first timer to expire. */
 
@@ -218,39 +247,39 @@ aug_processexpired(struct aug_timers* timers, int force, struct timeval* next)
 
         do {
 
+            /* Has this timer expired? */
+
             if (timercmp(&now, &it->tv_, <))
                 break;
 
-            /* Remove first to avoid another being added in front of this
-               one. */
+            /* Remove expired timer to prevent a new one from being
+               recursively added in front. */
 
-            AUG_REMOVE_HEAD(timers);
+            AUG_REMOVE_HEAD(&timers->timers_);
 
             (*it->cb_)(it->ob_, it->id_, &it->ms_);
             if (it->ms_) {
 
-                if (-1 == expiry_(&it->tv_, it->ms_))
+                /* Update expiry time and insert. */
+
+                if (setexpiry_(&it->tv_, it->ms_) < 0)
                     aug_perrinfo(aug_tlx, "expiry_() failed", NULL);
                 else
-                    insert_(timers, it);
+                    inserttimer_(&timers->timers_, it);
 
             } else {
 
                 /* A zero ms value cancels the timer. */
 
-                if (it->ob_) {
-                    aug_release(it->ob_);
-                    it->ob_ = NULL;
-                }
-                aug_lock();
-                AUG_INSERT_TAIL(&free_, it);
-                aug_unlock();
+                destroytimer_(timers->mpool_, it);
             }
 
-        } while ((it = AUG_FIRST(timers)));
+        } while ((it = AUG_FIRST(&timers->timers_)));
     }
 
     if (next) {
+
+        /* Set optional output argument. */
 
         if (!it)
             next->tv_sec = next->tv_usec = 0; /* Forever: no timeout. */
@@ -261,5 +290,5 @@ aug_processexpired(struct aug_timers* timers, int force, struct timeval* next)
             aug_tvsub(next, &now);
         }
     }
-    return 0;
+    return AUG_SUCCESS;
 }

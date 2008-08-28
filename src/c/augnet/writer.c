@@ -12,8 +12,6 @@ AUG_RCSID("$Id$");
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
-#include "augctx/errno.h"
-#include "augctx/lock.h"
 
 #include "augabi.h"
 
@@ -27,15 +25,12 @@ AUG_RCSID("$Id$");
 
 #include <assert.h>
 
-struct aug_buf {
-    AUG_ENTRY(aug_buf);
+struct buf_ {
+    AUG_ENTRY(buf_);
     aug_blob* blob_;
 };
 
-AUG_HEAD(bufs_, aug_buf);
-
-static struct bufs_ free_ = AUG_HEAD_INITIALIZER(free_);
-AUG_ALLOCATOR(allocate_, &free_, aug_buf, 64)
+AUG_HEAD(bufs_, buf_);
 
 struct aug_writer_ {
     aug_mpool* mpool_;
@@ -44,18 +39,14 @@ struct aug_writer_ {
     unsigned size_;
 };
 
-static struct aug_buf*
-createbuf_(aug_blob* blob)
+static struct buf_*
+createbuf_(aug_mpool* mpool, aug_blob* blob)
 {
-    struct aug_buf* buf;
+    struct buf_* buf;
     assert(blob);
 
-    aug_lock();
-    if (!(buf = allocate_())) {
-        aug_unlock();
+    if (!(buf = aug_allocmem(mpool, sizeof(struct buf_))))
         return NULL;
-    }
-    aug_unlock();
 
     buf->blob_ = blob;
     aug_retain(blob);
@@ -63,30 +54,10 @@ createbuf_(aug_blob* blob)
 }
 
 static void
-destroybufs_(struct bufs_* bufs)
-{
-    struct aug_buf* it;
-    AUG_FOREACH(it, bufs) {
-        aug_release(it->blob_);
-        it->blob_ = NULL;
-    }
-
-    if (!AUG_EMPTY(bufs)) {
-        aug_lock();
-        AUG_CONCAT(&free_, bufs);
-        aug_unlock();
-    }
-}
-
-static void
-destroybuf_(struct aug_buf* buf)
+destroybuf_(aug_mpool* mpool, struct buf_* buf)
 {
     aug_release(buf->blob_);
-    buf->blob_ = NULL;
-
-    aug_lock();
-    AUG_INSERT_TAIL(&free_, buf);
-    aug_unlock();
+    aug_freemem(mpool, buf);
 }
 
 static void
@@ -94,11 +65,11 @@ popbufs_(aug_writer_t writer, const struct iovec* iov, size_t num)
 {
     while (num && (size_t)iov->iov_len <= num) {
 
-        struct aug_buf* it = AUG_FIRST(&writer->bufs_);
+        struct buf_* it = AUG_FIRST(&writer->bufs_);
         assert(it);
         AUG_REMOVE_HEAD(&writer->bufs_);
 
-        destroybuf_(it);
+        destroybuf_(writer->mpool_, it);
 
         --writer->size_;
         num -= (iov++)->iov_len;
@@ -129,44 +100,43 @@ AUGNET_API aug_result
 aug_destroywriter(aug_writer_t writer)
 {
     aug_mpool* mpool = writer->mpool_;
-    struct aug_buf* it;
-    AUG_FOREACH(it, &writer->bufs_) {
-        aug_release(it->blob_);
-        it->blob_ = NULL;
-    }
+    struct buf_* it;
 
     /* Destroy in single batch to avoid multiple calls to aug_lock(). */
 
-    destroybufs_(&writer->bufs_);
+    while ((it = AUG_FIRST(&writer->bufs_))) {
+        AUG_REMOVE_HEAD(&writer->bufs_);
+        destroybuf_(mpool, it);
+    }
 
     aug_freemem(mpool, writer);
     aug_release(mpool);
     return AUG_SUCCESS;
 }
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_appendwriter(aug_writer_t writer, aug_blob* blob)
 {
-    struct aug_buf* buf;
+    struct buf_* buf;
     assert(blob);
-    if (!(buf = createbuf_(blob)))
-        return -1;
+    if (!(buf = createbuf_(writer->mpool_, blob)))
+        return AUG_FAILERROR;
 
     AUG_INSERT_TAIL(&writer->bufs_, buf);
     ++writer->size_;
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGNET_API int
+AUGNET_API aug_bool
 aug_writerempty(aug_writer_t writer)
 {
-    return AUG_EMPTY(&writer->bufs_);
+    return AUG_EMPTY(&writer->bufs_) ? AUG_TRUE : AUG_FALSE;
 }
 
 AUGNET_API ssize_t
 aug_writersize(aug_writer_t writer)
 {
-    struct aug_buf* it;
+    struct buf_* it;
     size_t size = 0;
 
     AUG_FOREACH(it, &writer->bufs_) {
@@ -189,7 +159,7 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
 {
     ssize_t ret;
     struct iovec* iov;
-    struct aug_buf* it;
+    struct buf_* it;
     unsigned i, size;
     size_t len;
 

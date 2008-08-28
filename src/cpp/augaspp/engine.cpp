@@ -402,7 +402,7 @@ engine::cancelinactive()
         if (!it->second.session_->active()) {
             aug_ctxwarn(aug_tlx,
                         "cancelling timer associated with inactive session");
-            aug_canceltimer(cptr(impl_->timers_), it->first);
+            aug_canceltimer(impl_->timers_, it->first);
             impl_->sessiontimers_.erase(it++);
         } else
             ++it;

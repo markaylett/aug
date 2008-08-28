@@ -180,7 +180,8 @@ namespace {
 
         explicit
         state(char* frobpass)
-            : engine_(aug_eventrd(), aug_eventwr(), timers_, enginecb_)
+            : timers_(getmpool(aug_tlx)),
+              engine_(aug_eventrd(), aug_eventwr(), timers_, enginecb_)
         {
 #if ENABLE_SSL
             initssl();

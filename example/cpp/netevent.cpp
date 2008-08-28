@@ -113,7 +113,7 @@ namespace {
         aug_ctxinfo(aug_tlx, "bound to: [%s]", endpointntop(addr).c_str());
 
         muxer mux(getmpool(aug_tlx));
-        timers ts;
+        timers ts(getmpool(aug_tlx));
         session s(name, ref, ep, ts);
         setmdeventmask(mux, ref, AUG_MDEVENTRD);
 

@@ -728,7 +728,7 @@ namespace {
     run(const char* node, sdref ref, const endpoint& ep)
     {
         muxer mux(getmpool(aug_tlx));
-        timers ts;
+        timers ts(getmpool(aug_tlx));
         session s(node, ref, ep, ts);
         setmdeventmask(mux, ref, AUG_MDEVENTRD);
 
