@@ -31,22 +31,22 @@
 
     All channels have non-blocking semantics.
 
-    <method name="close" type="aug_result" qname="closechan"/>
+    <method name="close" type="aug_result" throws="true" qname="closechan"/>
 
-    <method name="process" type="aug_chan" object="true" qname="processchan">
+    <method name="process" type="aug_chan" object="true" throws="true" qname="processchan">
       <param name="handler" type="aug_chandler" object="true"/>
       <param name="fork" type="aug_bool&"/>
     </method>
 
-    <method name="setmask" type="aug_result" qname="setchanmask">
+    <method name="setmask" type="aug_result" throws="true" qname="setchanmask">
       <param name="mask" type="unsigned short"/>
     </method>
 
-    <method name="getmask" type="int" qname="getchanmask"/>
+    <method name="getmask" type="int" throws="true" qname="getchanmask"/>
 
     <method name="getid" type="unsigned" qname="getchanid"/>
 
-    <method name="getname" type="char*" qname="getchanname">
+    <method name="getname" type="char*" throws="true" qname="getchanname">
       <param name="dst" type="char*"/>
       <param name="size" type="unsigned"/>
     </method>

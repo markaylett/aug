@@ -9,6 +9,8 @@
 
 #include "augctx/base.h"
 
+#include "augext/err.h"
+
 #include <cstring>          // memcpy()
 #include <exception>
 
@@ -23,6 +25,11 @@ namespace aug {
         errinfo_error()
         {
             memcpy(&errinfo_, aug_tlerr, sizeof(errinfo_));
+        }
+        explicit
+        errinfo_error(const aug_errinfo& errinfo)
+        {
+            memcpy(&errinfo_, &errinfo, sizeof(errinfo_));
         }
         errinfo_error(const char* file, int line, const char* src, int num,
                       const char* format, va_list args)
@@ -75,6 +82,11 @@ namespace aug {
         basic_error()
         {
         }
+        explicit
+        basic_error(const aug_errinfo& errinfo)
+            : baseT(errinfo)
+        {
+        }
         basic_error(const char* file, int line, int num, const char* format,
                     va_list args)
         {
@@ -100,11 +112,26 @@ namespace aug {
 
     typedef basic_error<detail::aug_src> aug_error;
 
-    class system_error : public errinfo_error { };
+    class system_error : public errinfo_error {
+    public:
+        system_error()
+        {
+        }
+        explicit
+        system_error(const aug_errinfo& errinfo)
+            : errinfo_error(errinfo)
+        {
+        }
+    };
 
     class dlfcn_error : public system_error {
     public:
         dlfcn_error()
+        {
+        }
+        explicit
+        dlfcn_error(const aug_errinfo& errinfo)
+            : system_error(errinfo)
         {
         }
         dlfcn_error(const char* file, int line, const char* desc)
@@ -116,6 +143,11 @@ namespace aug {
     class posix_error : public system_error {
     public:
         posix_error()
+        {
+        }
+        explicit
+        posix_error(const aug_errinfo& errinfo)
+            : system_error(errinfo)
         {
         }
         posix_error(const char* file, int line, int err)
@@ -130,6 +162,11 @@ namespace aug {
         win32_error()
         {
         }
+        explicit
+        win32_error(const aug_errinfo& errinfo)
+            : system_error(errinfo)
+        {
+        }
         win32_error(const char* file, int line, unsigned long err)
         {
             aug_setwin32errinfo(cptr(*this), file, line, err);
@@ -138,64 +175,63 @@ namespace aug {
 #endif // _WIN32
 
     inline void
-    failerror()
+    throwerror(const aug_errinfo& errinfo)
     {
-        const char* src = errsrc(*aug_tlerr);
+        const char* src = errsrc(errinfo);
         switch (src[0]) {
         case 'a':
             if (0 == strcmp(src + 1, "ug"))
-                throw aug_error();
+                throw aug_error(errinfo);
             break;
         case 'd':
             if (0 == strcmp(src + 1, "lfcn"))
-                throw dlfcn_error();
+                throw dlfcn_error(errinfo);
             break;
         case 'p':
             if (0 == strcmp(src + 1, "osix"))
-                throw posix_error();
+                throw posix_error(errinfo);
             break;
         case 'w':
 #if defined(_WIN32)
             if (0 == strcmp(src + 1, "in32"))
-                throw win32_error();
+                throw win32_error(errinfo);
 #endif // _WIN32
             break;
         }
         throw errinfo_error();
+    }
+    inline void
+    throwerror()
+    {
+        throwerror(*aug_tlerr);
     }
 
     namespace detail {
 
         template <typename T>
         struct result_traits {
-            static T
-            verify(T result)
+            static bool
+            error(T result)
             {
-                if (AUG_FAILERROR == result)
-                    failerror();
-                return result;
+                return AUG_FAILERROR == result;
             }
         };
 
         template <typename T>
         struct result_traits<T*> {
-            static T*
-            verify(T* result)
+            static bool
+            error(T* result)
             {
-                if (!result)
-                    failerror();
-                return result;
+                return 0 == result;
             }
         };
 
         template <>
         struct result_traits<bool> {
             static bool
-            verify(bool result)
+            error(bool result)
             {
-                if (!result)
-                    failerror();
-                return result;
+                return !result;
             }
         };
     }
@@ -204,7 +240,26 @@ namespace aug {
     T
     verify(T result)
     {
-        return detail::result_traits<T>::verify(result);
+        if (detail::result_traits<T>::error(result))
+            throwerror();
+        return result;
+    }
+
+    template <typename T, typename U>
+    T
+    verify(T result, obref<U> src)
+    {
+        if (detail::result_traits<T>::error(result)) {
+
+            errptr ptr(object_cast<aug_err>(src));
+            if (null == ptr)
+                throwerror();
+
+            aug_errinfo errinfo;
+            copyerrinfo(ptr, errinfo);
+            throwerror(errinfo);
+        }
+        return result;
     }
 }
 

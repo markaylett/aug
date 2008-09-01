@@ -39,7 +39,7 @@ namespace aug {
     {
         autosd sd(aug_socket(domain, type, protocol), close);
         if (null == sd)
-            failerror();
+            throwerror();
         return sd;
     }
 
@@ -48,7 +48,7 @@ namespace aug {
     {
         autosd sd(aug_accept(ref.get(), &ep), close);
         if (null == sd)
-            failerror();
+            throwerror();
         return sd;
     }
 
@@ -187,7 +187,7 @@ namespace aug {
     {
         if (!aug_inetpton(AF_INET, src, &dst)
             && !aug_inetpton(AF_INET6, src, &dst))
-            failerror();
+            throwerror();
         return dst;
     }
 

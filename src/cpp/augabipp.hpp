@@ -315,6 +315,12 @@ namespace aug {
                 delete this;
         }
     };
+
+    // Prototype for error verification.
+
+    template <typename T, typename U>
+    T
+    verify(T result, obref<U> src);
 }
 
 template <typename T>

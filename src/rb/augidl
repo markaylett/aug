@@ -18,7 +18,7 @@ class AnglIncl
     def accept(v)
         v.visit_anglincl(self)
     end
-    def AnglIncl.parse(node)
+    def self.parse(node)
         AnglIncl.new(node.text)
     end
 end
@@ -31,7 +31,7 @@ class Comment
     def accept(v)
         v.visit_comment(self)
     end
-    def Comment.parse(node)
+    def self.parse(node)
         Comment.new(node.text)
     end
 end
@@ -44,7 +44,7 @@ class QuotIncl
     def accept(v)
         v.visit_quotincl(self)
     end
-    def QuotIncl.parse(node)
+    def self.parse(node)
         QuotIncl.new(node.text)
     end
 end
@@ -57,7 +57,7 @@ class Verbatim
     def accept(v)
         v.visit_verbatim(self)
     end
-    def Verbatim.parse(node)
+    def self.parse(node)
         Verbatim.new(node.text)
     end
 end
@@ -77,7 +77,7 @@ class Type
     def ref?
         @style == REF
     end
-    def Type.parse(node)
+    def self.parse(node)
         type = node.attributes["type"].to_s
         style = NONE
         if node.attributes.has_key? "object" then
@@ -100,7 +100,7 @@ class Param
         @name = name
         @type = type
     end
-    def Param.parse(node)
+    def self.parse(node)
         name = node.attributes["name"].to_s
         type = Type.parse(node)
         Param.new(name, type)
@@ -108,10 +108,11 @@ class Param
 end
 
 class Method_
-    attr_reader :name, :type, :qname, :comment
-    def initialize(iface, name, type, qname, comment)
+    attr_reader :name, :type, :throws, :qname, :comment
+    def initialize(iface, name, type, throws, qname, comment)
         @name = name
         @type = type
+        @throws = throws
         if qname.nil? then
             @qname = name + iface
         else
@@ -126,15 +127,21 @@ class Method_
     def push_param(param)
         @params << param
     end
-    def Method_.parse(iface, node)
+    def self.parse(iface, node)
         name = node.attributes["name"].to_s
         type = Type.parse(node)
+        throws = false
+        if node.attributes.has_key? "throws" then
+            if node.attributes["throws"].to_s !~ /false|no|0/i then
+                throws = true
+            end
+        end
         qname = nil
         if node.attributes.has_key? "qname" then
             qname = node.attributes["qname"].to_s
         end
         comment = node.text
-        method = Method_.new(iface, name, type, qname, comment)
+        method = Method_.new(iface, name, type, throws, qname, comment)
         node.elements.each do |child|
             if child.name == "param" then
                 param = Param.parse(child)
@@ -171,7 +178,7 @@ class Interface
     def accept(v)
         v.visit_interface(self)
     end
-    def Interface.parse(pkg, node)
+    def self.parse(pkg, node)
         name = node.attributes["name"].to_s
         comment = node.text
         interface = Interface.new(pkg, name, comment)
@@ -203,7 +210,7 @@ class Package
     def each_accept(v)
         @elements.each {|elem| elem.accept(v)}
     end
-    def Package.parse(node)
+    def self.parse(node)
         name = node.attributes["name"].to_s
         dir = nil
         if node.attributes.has_key? "dir" then
@@ -403,10 +410,13 @@ def putinline(iface, method)
     args = format.arg_list(iface, method).join(", ")
     names = format.coerce_list(iface, method).join(", ")
     expr = "this_.get()->vtbl_->#{method.name}_(#{names})"
+    if method.throws then
+        expr = "verify(#{expr}, this_)"
+    end
     puts <<END
 
     inline #{format.return_type(method.type)}
-    #{method.qname}(#{args}) AUG_NOTHROW
+    #{method.qname}(#{args})#{method.throws ? "" : " AUG_NOTHROW"}
     {
         #{format.creturn_expr(method.type, expr)};
     }

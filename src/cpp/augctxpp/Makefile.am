@@ -26,12 +26,19 @@ libaugctxpp_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 check_PROGRAMS = \
+	errinfotest \
 	exceptiontest \
 	maintest
 
 TESTS = \
+	errinfotest \
 	exceptiontest \
 	maintest
+
+errinfotest_SOURCES = errinfotest.cpp
+errinfotest_LDADD = \	
+	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 exceptiontest_SOURCES = exceptiontest.cpp
 exceptiontest_LDADD = \

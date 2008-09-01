@@ -31,7 +31,7 @@ namespace aug {
         int ret(aug_vformatlog(buf, &n, logLevel, format, args));
         va_end(args);
         if (-1 == ret)
-            failerror();
+            throwerror();
     }
 
     inline std::string
@@ -54,7 +54,7 @@ namespace aug {
         int ret(aug_vformatlog(buf, &n, logLevel, format, args));
         va_end(args);
         if (-1 == ret)
-            failerror();
+            throwerror();
 
         return std::string(buf, n);
     }

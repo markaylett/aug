@@ -191,7 +191,7 @@ EXTRA_DIST = \
 	chan.xml \
 	clock.xml \
 	ctx.xml \
-	error.xml \
+	err.xml \
 	iter.xml \
 	log.xml \
 	mpool.xml \
@@ -208,7 +208,7 @@ modinclude_HEADERS = \
 	chan.h \
 	clock.h \
 	ctx.h \
-	error.h \
+	err.h \
 	iter.h \
 	log.h \
 	mpool.h  \
@@ -225,7 +225,7 @@ modinclude_HEADERS = \
 @ENABLE_RUBY_TRUE@	chan.h \
 @ENABLE_RUBY_TRUE@	clock.h \
 @ENABLE_RUBY_TRUE@	ctx.h \
-@ENABLE_RUBY_TRUE@	error.h \
+@ENABLE_RUBY_TRUE@	err.h \
 @ENABLE_RUBY_TRUE@	iter.h \
 @ENABLE_RUBY_TRUE@	log.h \
 @ENABLE_RUBY_TRUE@	mpool.h  \

@@ -5,7 +5,7 @@ EXTRA_DIST = \
 	chan.xml \
 	clock.xml \
 	ctx.xml \
-	error.xml \
+	err.xml \
 	iter.xml \
 	log.xml \
 	mpool.xml \
@@ -22,7 +22,7 @@ modinclude_HEADERS = \
 	chan.h \
 	clock.h \
 	ctx.h \
-	error.h \
+	err.h \
 	iter.h \
 	log.h \
 	mpool.h  \
@@ -40,7 +40,7 @@ BUILT_SOURCES = \
 	chan.h \
 	clock.h \
 	ctx.h \
-	error.h \
+	err.h \
 	iter.h \
 	log.h \
 	mpool.h  \

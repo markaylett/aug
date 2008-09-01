@@ -1,0 +1,17 @@
+<package name="aug" dir="augext">
+
+  <interface name="err">
+
+    Detailed error information.
+
+    <method name="copyerrinfo" type="void" qname="copyerrinfo">
+
+      Last error description.
+
+      @param dst Output buffer.
+
+      <param name="dst" type="struct aug_errinfo&"/>
+    </method>
+  </interface>
+
+</package>

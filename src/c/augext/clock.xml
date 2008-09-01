@@ -6,7 +6,7 @@
 
   <interface name="clock">
 
-    <method name="gettimeofday" type="aug_result" qname="gettimeofday">
+    <method name="gettimeofday" type="aug_result" throws="true" qname="gettimeofday">
       <param name="tv" type="struct timeval&"/>
     </method>
 

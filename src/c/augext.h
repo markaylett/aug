@@ -16,7 +16,7 @@
 #include "augext/chan.h"
 #include "augext/clock.h"
 #include "augext/ctx.h"
-#include "augext/error.h"
+#include "augext/err.h"
 #include "augext/iter.h"
 #include "augext/log.h"
 #include "augext/mpool.h"

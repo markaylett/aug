@@ -25,7 +25,7 @@ namespace aug {
             aug_errinfo& ei(*aug_tlerr);
             if (!result && !(0 == strcmp(errsrc(ei), "aug")
                              && AUG_EEXIST == errnum(ei)))
-                failerror();
+                throwerror();
             return result;
         }
     }

@@ -74,7 +74,7 @@ namespace aug {
         int local;
         sdref ref(aug_tryconnect(conn, &ep, &local));
         if (null == ref)
-            failerror();
+            throwerror();
 
         // When established, aug_tryconnect() will release ownership of the
         // returned socket descriptor - it will not call aug_sclose() on it.

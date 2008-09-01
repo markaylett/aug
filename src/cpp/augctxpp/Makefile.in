@@ -40,7 +40,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-check_PROGRAMS = exceptiontest$(EXEEXT) maintest$(EXEEXT)
+check_PROGRAMS = errinfotest$(EXEEXT) exceptiontest$(EXEEXT) \
+	maintest$(EXEEXT)
 subdir = src/cpp/augctxpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -55,6 +56,11 @@ libaugctxpp_la_DEPENDENCIES =  \
 am_libaugctxpp_la_OBJECTS = base.lo config.lo errinfo.lo exception.lo \
 	types.lo utility.lo
 libaugctxpp_la_OBJECTS = $(am_libaugctxpp_la_OBJECTS)
+am_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
+errinfotest_OBJECTS = $(am_errinfotest_OBJECTS)
+errinfotest_DEPENDENCIES =  \
+	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 am_exceptiontest_OBJECTS = exceptiontest.$(OBJEXT)
 exceptiontest_OBJECTS = $(am_exceptiontest_OBJECTS)
 exceptiontest_DEPENDENCIES =  \
@@ -75,10 +81,10 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugctxpp_la_SOURCES) $(exceptiontest_SOURCES) \
-	$(maintest_SOURCES)
-DIST_SOURCES = $(libaugctxpp_la_SOURCES) $(exceptiontest_SOURCES) \
-	$(maintest_SOURCES)
+SOURCES = $(libaugctxpp_la_SOURCES) $(errinfotest_SOURCES) \
+	$(exceptiontest_SOURCES) $(maintest_SOURCES)
+DIST_SOURCES = $(libaugctxpp_la_SOURCES) $(errinfotest_SOURCES) \
+	$(exceptiontest_SOURCES) $(maintest_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -245,8 +251,14 @@ libaugctxpp_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 TESTS = \
+	errinfotest \
 	exceptiontest \
 	maintest
+
+errinfotest_SOURCES = errinfotest.cpp
+errinfotest_LDADD = \
+	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 
 exceptiontest_SOURCES = exceptiontest.cpp
 exceptiontest_LDADD = \
@@ -309,6 +321,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+errinfotest$(EXEEXT): $(errinfotest_OBJECTS) $(errinfotest_DEPENDENCIES) 
+	@rm -f errinfotest$(EXEEXT)
+	$(CXXLINK) $(errinfotest_LDFLAGS) $(errinfotest_OBJECTS) $(errinfotest_LDADD) $(LIBS)
 exceptiontest$(EXEEXT): $(exceptiontest_OBJECTS) $(exceptiontest_DEPENDENCIES) 
 	@rm -f exceptiontest$(EXEEXT)
 	$(CXXLINK) $(exceptiontest_LDFLAGS) $(exceptiontest_OBJECTS) $(exceptiontest_LDADD) $(LIBS)
@@ -325,6 +340,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exceptiontest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@

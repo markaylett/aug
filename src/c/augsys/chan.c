@@ -15,6 +15,7 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 #include "augctx/string.h" /* aug_strlcpy() */
 
+#include "augext/err.h"
 #include "augext/stream.h"
 
 #include <assert.h>
@@ -23,6 +24,7 @@ AUG_RCSID("$Id$");
 struct impl_ {
     aug_chan chan_;
     aug_stream stream_;
+    aug_err err_;
     int refs_;
     aug_mpool* mpool_;
     unsigned id_;
@@ -50,6 +52,9 @@ cast_(struct impl_* impl, const char* id)
     } else if (AUG_EQUALID(id, aug_streamid)) {
         aug_retain(&impl->stream_);
         return &impl->stream_;
+    } else if (AUG_EQUALID(id, aug_errid)) {
+        aug_retain(&impl->err_);
+        return &impl->err_;
     }
     return NULL;
 }
@@ -258,6 +263,42 @@ static const struct aug_streamvtbl streamvtbl_ = {
     stream_writev_
 };
 
+static void*
+err_cast_(aug_err* ob, const char* id)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, err_, ob);
+    return cast_(impl, id);
+}
+
+static void
+err_retain_(aug_err* ob)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, err_, ob);
+    retain_(impl);
+}
+
+static void
+err_release_(aug_err* ob)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, err_, ob);
+    release_(impl);
+}
+
+static void
+err_copyerrinfo_(aug_err* ob, struct aug_errinfo* dst)
+{
+    const struct aug_errinfo* src = aug_tlerr;
+    aug_seterrinfo(dst, src->file_, src->line_, src->src_, src->num_,
+                   src->desc_);
+}
+
+static const struct aug_errvtbl errvtbl_ = {
+    err_cast_,
+    err_retain_,
+    err_release_,
+    err_copyerrinfo_
+};
+
 AUGSYS_API aug_bool
 aug_safeestab(aug_chan* chan, aug_chandler* handler, unsigned id,
               aug_stream* ob, unsigned parent)
@@ -317,6 +358,8 @@ aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,
     impl->chan_.impl_ = NULL;
     impl->stream_.vtbl_ = &streamvtbl_;
     impl->stream_.impl_ = NULL;
+    impl->err_.vtbl_ = &errvtbl_;
+    impl->err_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
     impl->id_ = aug_nextid();
