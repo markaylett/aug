@@ -40,7 +40,6 @@ static struct timer_*
 createtimer_(aug_mpool* mpool, aug_object* ob)
 {
     struct timer_* timer;
-    assert(ob);
 
     if (!(timer = aug_allocmem(mpool, sizeof(struct timer_))))
         return NULL;

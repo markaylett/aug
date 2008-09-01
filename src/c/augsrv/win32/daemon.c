@@ -86,6 +86,7 @@ start_(DWORD argc, char** argv)
     const char* sname;
     struct aug_options options;
     char home[AUG_PATH_MAX + 1];
+	/* DebugBreak(); */
 
     /* Ensure writes performed on main thread are visible. */
 
