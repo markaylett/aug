@@ -28,7 +28,8 @@ namespace aug {
         static aug_mar_t
         create(aug_object* ob, const char* initial)
         {
-            return aug_createmar();
+            mpoolptr mpool(getmpool(aug_tlx));
+            return aug_createmar(mpool.get());
         }
     };
 
@@ -41,7 +42,8 @@ namespace aug {
         aug_mar_t
         create(const char* initial)
         {
-            return aug_createmar();
+            mpoolptr mpool(getmpool(aug_tlx));
+            return aug_createmar(mpool.get());
         }
     };
 

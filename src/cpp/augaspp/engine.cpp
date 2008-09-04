@@ -115,7 +115,7 @@ namespace aug {
 
         typedef map<mod_id, sessiontimer> sessiontimers;
 
-        struct engineimpl {
+        struct engineimpl : mpool_base {
 
             chandler<engineimpl> chandler_;
             mdref eventrd_, eventwr_;

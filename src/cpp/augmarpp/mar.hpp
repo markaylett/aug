@@ -35,19 +35,21 @@ namespace aug {
         verify(aug_copymar(dst.get(), src.get()));
     }
     inline smartmar
-    createmar()
+    createmar(mpoolref mpool)
     {
-        return smartmar::attach(verify(aug_createmar()));
+        return smartmar::attach(verify(aug_createmar(mpool.get())));
     }
     inline smartmar
-    openmar(const char* path, int flags)
+    openmar(mpoolref mpool, const char* path, int flags)
     {
-        return smartmar::attach(verify(aug_openmar(path, flags)));
+        return smartmar::attach(verify(aug_openmar(mpool.get(), path,
+                                                   flags)));
     }
     inline smartmar
-    openmar(const char* path, int flags, mode_t mode)
+    openmar(mpoolref mpool, const char* path, int flags, mode_t mode)
     {
-        return smartmar::attach(verify(aug_openmar(path, flags, mode)));
+        return smartmar::attach(verify(aug_openmar(mpool.get(), path, flags,
+                                                   mode)));
     }
     inline void
     releasemar(aug_mar_t m)

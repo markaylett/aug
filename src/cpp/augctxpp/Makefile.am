@@ -6,6 +6,7 @@ modinclude_HEADERS = \
 	config.hpp \
 	errinfo.hpp \
 	exception.hpp \
+	mpool.hpp \
 	types.hpp \
 	utility.hpp
 
@@ -16,6 +17,7 @@ libaugctxpp_la_SOURCES = \
 	config.cpp \
 	errinfo.cpp \
 	exception.cpp \
+	mpool.cpp \
 	types.cpp \
 	utility.cpp
 
@@ -28,12 +30,12 @@ libaugctxpp_la_LIBADD = \
 check_PROGRAMS = \
 	errinfotest \
 	exceptiontest \
-	maintest
+	mpooltest
 
 TESTS = \
 	errinfotest \
 	exceptiontest \
-	maintest
+	mpooltest
 
 errinfotest_SOURCES = errinfotest.cpp
 errinfotest_LDADD = \	
@@ -45,7 +47,7 @@ exceptiontest_LDADD = \
 	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
-maintest_SOURCES = maintest.cpp
-maintest_LDADD = \
+mpooltest_SOURCES = mpooltest.cpp
+mpooltest_LDADD = \
 	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la

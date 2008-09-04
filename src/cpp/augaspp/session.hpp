@@ -8,13 +8,15 @@
 
 #include "augsyspp/smartptr.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 #include "augabipp.hpp"
 
 #include "augmod.h"
 
 namespace aug {
 
-    class AUGASPP_API session_base {
+    class AUGASPP_API session_base : public mpool_base {
     public:
         typedef mod_session ctype;
     private:

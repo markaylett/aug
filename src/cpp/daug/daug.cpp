@@ -169,7 +169,7 @@ namespace {
 
     typedef map<string, moduleptr> modules;
 
-    struct state {
+    struct state : mpool_base {
 
         modules modules_;
 #if ENABLE_SSL

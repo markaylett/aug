@@ -2,13 +2,22 @@
    See the file COPYING for copying permission.
 */
 
-#include "augmar/mar.h"
+#include "augmar.h"
+#include "augctx.h"
 
 int
 main(int argc, char* argv[])
 {
+    aug_mpool* mpool;
     struct aug_field field;
-    aug_mar_t mar = aug_createmar();
+    aug_mar_t mar;
+
+    if (aug_autobasictlx() < 0)
+        return 1;
+
+    mpool = aug_getmpool(aug_tlx);
+    mar = aug_createmar(mpool);
+    aug_release(mpool);
 
     field.name_ = "name";
     field.value_ = "Mark";

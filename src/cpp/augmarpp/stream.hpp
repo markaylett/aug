@@ -35,12 +35,12 @@ namespace aug {
                 base_type::setstate(std::ios_base::failbit);
         }
         explicit
-        basic_imarstream(const char* path, int flags = AUG_RDONLY,
-                         mode_t mode = 0444,
+        basic_imarstream(mpoolref mpool, const char* path,
+                         int flags = AUG_RDONLY, mode_t mode = 0444,
                          std::streamsize size = AUG_MAXLINE)
             : base_type(0),
-              streambuf_(aug_openmar(path, flags, mode), std::ios_base::in,
-                         size)
+              streambuf_(aug_openmar(mpool.get(), path, flags, mode),
+                         std::ios_base::in, size)
         {
             rdbuf(&streambuf_);
             if (!streambuf_.is_open())
@@ -82,12 +82,13 @@ namespace aug {
                 base_type::setstate(std::ios_base::failbit);
         }
         explicit
-        basic_omarstream(const char* path, int flags = AUG_WRONLY | AUG_CREAT,
+        basic_omarstream(mpoolref mpool, const char* path,
+                         int flags = AUG_WRONLY | AUG_CREAT,
                          mode_t mode = 0664,
                          std::streamsize size = AUG_MAXLINE)
             : base_type(0),
-              streambuf_(aug_openmar(path, flags, mode), std::ios_base::out,
-                         size)
+              streambuf_(aug_openmar(mpool.get(), path, flags, mode),
+                         std::ios_base::out, size)
         {
             rdbuf(&streambuf_);
             if (!streambuf_.is_open())
@@ -120,11 +121,23 @@ namespace aug {
         streambuf_type streambuf_;
 
     public:
-        explicit
-        basic_iomarstream(const memory_&, std::streamsize size = AUG_MAXLINE)
+        basic_iomarstream(mpoolref mpool, const memory_&,
+                          std::streamsize size = AUG_MAXLINE)
             : base_type(0),
-              streambuf_(aug_createmar(), std::ios_base::in
+              streambuf_(aug_createmar(mpool.get()), std::ios_base::in
                          | std::ios_base::out, size)
+        {
+            rdbuf(&streambuf_);
+            if (!streambuf_.is_open())
+                base_type::setstate(std::ios_base::failbit);
+        }
+        basic_iomarstream(mpoolref mpool, const char* path,
+                          int flags = AUG_RDWR | AUG_CREAT,
+                          mode_t mode = 0664,
+                          std::streamsize size = AUG_MAXLINE)
+            : base_type(0),
+              streambuf_(aug_openmar(mpool.get(), path, flags, mode),
+                         std::ios_base::in | std::ios_base::out, size)
         {
             rdbuf(&streambuf_);
             if (!streambuf_.is_open())
@@ -134,18 +147,6 @@ namespace aug {
         basic_iomarstream(marref ref, std::streamsize size = AUG_MAXLINE)
             : base_type(0),
               streambuf_(ref, std::ios_base::in | std::ios_base::out, size)
-        {
-            rdbuf(&streambuf_);
-            if (!streambuf_.is_open())
-                base_type::setstate(std::ios_base::failbit);
-        }
-        explicit
-        basic_iomarstream(const char* path, int flags = AUG_RDWR | AUG_CREAT,
-                          mode_t mode = 0664,
-                          std::streamsize size = AUG_MAXLINE)
-            : base_type(0),
-              streambuf_(aug_openmar(path, flags, mode),
-                         std::ios_base::in | std::ios_base::out, size)
         {
             rdbuf(&streambuf_);
             if (!streambuf_.is_open())

@@ -8,10 +8,11 @@
 
 #include "augsyspp.hpp"
 #include "augutilpp.hpp"
+#include "augctxpp.hpp"
 
 namespace aug {
 
-    class rwtimer_base {
+    class rwtimer_base : public mpool_base {
 
         virtual void
         do_timercb(idref id, unsigned& ms) = 0;

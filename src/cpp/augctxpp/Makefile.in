@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 check_PROGRAMS = errinfotest$(EXEEXT) exceptiontest$(EXEEXT) \
-	maintest$(EXEEXT)
+	mpooltest$(EXEEXT)
 subdir = src/cpp/augctxpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -54,7 +54,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libaugctxpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugctxpp_la_OBJECTS = base.lo config.lo errinfo.lo exception.lo \
-	types.lo utility.lo
+	mpool.lo types.lo utility.lo
 libaugctxpp_la_OBJECTS = $(am_libaugctxpp_la_OBJECTS)
 am_errinfotest_OBJECTS = errinfotest.$(OBJEXT)
 errinfotest_OBJECTS = $(am_errinfotest_OBJECTS)
@@ -66,9 +66,9 @@ exceptiontest_OBJECTS = $(am_exceptiontest_OBJECTS)
 exceptiontest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-am_maintest_OBJECTS = maintest.$(OBJEXT)
-maintest_OBJECTS = $(am_maintest_OBJECTS)
-maintest_DEPENDENCIES =  \
+am_mpooltest_OBJECTS = mpooltest.$(OBJEXT)
+mpooltest_OBJECTS = $(am_mpooltest_OBJECTS)
+mpooltest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -82,9 +82,9 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugctxpp_la_SOURCES) $(errinfotest_SOURCES) \
-	$(exceptiontest_SOURCES) $(maintest_SOURCES)
+	$(exceptiontest_SOURCES) $(mpooltest_SOURCES)
 DIST_SOURCES = $(libaugctxpp_la_SOURCES) $(errinfotest_SOURCES) \
-	$(exceptiontest_SOURCES) $(maintest_SOURCES)
+	$(exceptiontest_SOURCES) $(mpooltest_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -232,6 +232,7 @@ modinclude_HEADERS = \
 	config.hpp \
 	errinfo.hpp \
 	exception.hpp \
+	mpool.hpp \
 	types.hpp \
 	utility.hpp
 
@@ -241,6 +242,7 @@ libaugctxpp_la_SOURCES = \
 	config.cpp \
 	errinfo.cpp \
 	exception.cpp \
+	mpool.cpp \
 	types.cpp \
 	utility.cpp
 
@@ -253,7 +255,7 @@ libaugctxpp_la_LIBADD = \
 TESTS = \
 	errinfotest \
 	exceptiontest \
-	maintest
+	mpooltest
 
 errinfotest_SOURCES = errinfotest.cpp
 errinfotest_LDADD = \
@@ -265,8 +267,8 @@ exceptiontest_LDADD = \
 	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
-maintest_SOURCES = maintest.cpp
-maintest_LDADD = \
+mpooltest_SOURCES = mpooltest.cpp
+mpooltest_LDADD = \
 	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
@@ -327,9 +329,9 @@ errinfotest$(EXEEXT): $(errinfotest_OBJECTS) $(errinfotest_DEPENDENCIES)
 exceptiontest$(EXEEXT): $(exceptiontest_OBJECTS) $(exceptiontest_DEPENDENCIES) 
 	@rm -f exceptiontest$(EXEEXT)
 	$(CXXLINK) $(exceptiontest_LDFLAGS) $(exceptiontest_OBJECTS) $(exceptiontest_LDADD) $(LIBS)
-maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
-	@rm -f maintest$(EXEEXT)
-	$(CXXLINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
+mpooltest$(EXEEXT): $(mpooltest_OBJECTS) $(mpooltest_DEPENDENCIES) 
+	@rm -f mpooltest$(EXEEXT)
+	$(CXXLINK) $(mpooltest_LDFLAGS) $(mpooltest_OBJECTS) $(mpooltest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -343,7 +345,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/errinfotest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exceptiontest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpool.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpooltest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Plo@am__quote@
 

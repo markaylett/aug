@@ -9,6 +9,7 @@
 #include "augsyspp/smartptr.hpp"
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augnet/ssl.h"
 
@@ -29,7 +30,7 @@ namespace aug {
         }
     };
 
-    class AUGASPP_API sslctx {
+    class AUGASPP_API sslctx : public mpool_base {
 
         ssl_ctx_st* const ctx_;
 

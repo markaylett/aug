@@ -14,7 +14,6 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 #include "augctx/log.h"
 
-#include <errno.h> /* ENOMEM */
 #include <stdlib.h>
 #include <string.h>
 
@@ -29,6 +28,7 @@ struct impl_ {
     void* (*resize_)(aug_seq_t, unsigned, unsigned);
     int (*sync_)(aug_seq_t);
     void* (*addr_)(aug_seq_t);
+    aug_mpool* (*mpool_)(aug_seq_t);
     unsigned (*size_)(aug_seq_t);
     void* (*tail_)(aug_seq_t);
 };
@@ -40,6 +40,7 @@ struct aug_seq_ {
 
 struct memseq_ {
     struct aug_seq_ seq_;
+    aug_mpool* mpool_;
     void* addr_;
     unsigned len_;
 };
@@ -53,9 +54,11 @@ static int
 destroymem_(aug_seq_t seq)
 {
     struct memseq_* memseq = (struct memseq_*)seq;
+    aug_mpool* mpool = memseq->mpool_;
     if (memseq->addr_)
-        free(memseq->addr_);
-    free(memseq);
+        aug_freemem(mpool, memseq->addr_);
+    aug_freemem(mpool, memseq);
+    aug_release(mpool);
     return 0;
 }
 
@@ -67,20 +70,16 @@ resizemem_(aug_seq_t seq, unsigned size, unsigned tail)
 
     if (!memseq->addr_) {
 
-        if (!(addr = calloc(size, 1))) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+        if (!(addr = aug_callocmem(memseq->mpool_, size, 1)))
             return NULL;
-        }
 
         memseq->addr_ = addr;
         memseq->len_ = size;
 
     } else if (size > memseq->len_) {
 
-        if (!(addr = realloc(memseq->addr_, size))) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+        if (!(addr = aug_reallocmem(memseq->mpool_, memseq->addr_, size)))
             return NULL;
-        }
 
         bzero((char*)addr + memseq->len_, size - memseq->len_);
         memmove((char*)addr + (size - tail),
@@ -112,6 +111,14 @@ memaddr_(aug_seq_t seq)
     return memseq->addr_;
 }
 
+static aug_mpool*
+memmpool_(aug_seq_t seq)
+{
+    struct memseq_* memseq = (struct memseq_*)seq;
+    aug_retain(memseq->mpool_);
+    return memseq->mpool_;
+}
+
 static unsigned
 memsize_(aug_seq_t seq)
 {
@@ -131,6 +138,7 @@ static const struct impl_ memimpl_ = {
     resizemem_,
     syncmem_,
     memaddr_,
+    memmpool_,
     memsize_,
     memtail_
 };
@@ -186,6 +194,13 @@ mfileaddr_(aug_seq_t seq)
     return aug_mfileaddr_(mfileseq->mfile_);
 }
 
+static aug_mpool*
+mfilempool_(aug_seq_t seq)
+{
+    struct mfileseq_* mfileseq = (struct mfileseq_*)seq;
+    return aug_mfilempool_(mfileseq->mfile_);
+}
+
 static unsigned
 mfilesize_(aug_seq_t seq)
 {
@@ -205,6 +220,7 @@ static const struct impl_ mfileimpl_ = {
     resizemfile_,
     syncmfile_,
     mfileaddr_,
+    mfilempool_,
     mfilesize_,
     mfiletail_
 };
@@ -235,28 +251,29 @@ aug_copyseq_(aug_seq_t dst, aug_seq_t src)
 }
 
 AUG_EXTERNC aug_seq_t
-aug_createseq_(unsigned tail)
+aug_createseq_(aug_mpool* mpool, unsigned tail)
 {
     struct memseq_* memseq;
-    if (!(memseq = (struct memseq_*)malloc(sizeof(struct memseq_) + tail))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    if (!(memseq = aug_allocmem(mpool, sizeof(struct memseq_) + tail)))
         return NULL;
-    }
 
     memseq->seq_.offset_ = 0;
     memseq->seq_.len_ = 0;
     memseq->seq_.impl_ = &memimpl_;
+    memseq->mpool_ = mpool;
     memseq->addr_ = NULL;
     memseq->len_ = 0;
+    aug_retain(mpool);
     return (aug_seq_t)memseq;
 }
 
 AUG_EXTERNC aug_seq_t
-aug_openseq_(const char* path, int flags, mode_t mode, unsigned tail)
+aug_openseq_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
+             unsigned tail)
 {
     unsigned size;
     struct mfileseq_* mfileseq;
-    struct aug_mfile_* mfile = aug_openmfile_(path, flags, mode,
+    struct aug_mfile_* mfile = aug_openmfile_(mpool, path, flags, mode,
                                               sizeof(struct mfileseq_)
                                               + tail);
     if (!mfile)
@@ -323,6 +340,12 @@ AUG_EXTERNC void*
 aug_seqaddr_(aug_seq_t seq)
 {
     return (char*)(*seq->impl_->addr_)(seq) + seq->offset_;
+}
+
+AUG_EXTERNC aug_mpool*
+aug_seqmpool_(aug_seq_t seq)
+{
+    return (*seq->impl_->mpool_)(seq);
 }
 
 AUG_EXTERNC unsigned

@@ -6,11 +6,13 @@
 
 #include "augaspp/session.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 #include "augmod.h"
 
 namespace aug {
 
-    class object_base {
+    class object_base : public mpool_base {
     public:
         typedef mod_handle ctype;
     private:

@@ -8,9 +8,10 @@
  * @file aug.h
  *
  * The aug package consists of the following libraries:
+ * @li augctx.h
+ * @li augext.h
  * @li augmar.h
  * @li augnet.h
- * @li augob.h
  * @li augsrv.h
  * @li augsys.h
  * @li augutil.h
@@ -38,9 +39,9 @@
  */
 
 #include "augctx.h"
+#include "augext.h"
 #include "augmar.h"
 #include "augnet.h"
-#include "augob.h"
 #include "augsrv.h"
 #include "augsys.h"
 #include "augutil.h"

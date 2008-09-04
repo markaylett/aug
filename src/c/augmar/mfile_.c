@@ -19,10 +19,10 @@ AUG_RCSID("$Id$");
 #include "augext/log.h"
 
 #include <assert.h>
-#include <errno.h>         /* ENOMEM */
 #include <stdlib.h>
 
 struct aug_mfile_ {
+    aug_mpool* mpool_;
     aug_fd fd_;
     int flags_;
     unsigned resvd_, size_;
@@ -62,6 +62,7 @@ reserve_(unsigned size)
 AUG_EXTERNC int
 aug_closemfile_(aug_mfile_t mfile)
 {
+    aug_mpool* mpool = mfile->mpool_;
     int ret = 0;
     assert(mfile);
 
@@ -80,12 +81,13 @@ aug_closemfile_(aug_mfile_t mfile)
     if (aug_fclose(mfile->fd_) < 0)
         ret = -1;
 
-    free(mfile);
+    aug_freemem(mpool, mfile);
+    aug_release(mpool);
     return ret;
 }
 
 AUG_EXTERNC aug_mfile_t
-aug_openmfile_(const char* path, int flags, mode_t mode,
+aug_openmfile_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
                unsigned tail)
 {
     aug_fd fd;
@@ -104,15 +106,15 @@ aug_openmfile_(const char* path, int flags, mode_t mode,
     if (-1 == aug_fsize(fd, &size))
         return NULL;
 
-    if (!(mfile = (aug_mfile_t)malloc(sizeof(struct aug_mfile_) + tail))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    if (!(mfile = aug_allocmem(mpool, sizeof(struct aug_mfile_) + tail)))
         goto fail;
-    }
 
+    mfile->mpool_ = mpool;
     mfile->fd_ = fd;
     mfile->flags_ = toflags_(flags);
     mfile->resvd_ = mfile->size_ = (unsigned)size;
     mfile->mmap_ = NULL;
+    aug_retain(mpool);
     return mfile;
 
  fail:
@@ -212,6 +214,14 @@ aug_mfileresvd_(aug_mfile_t mfile)
 {
     assert(mfile);
     return mfile->resvd_;
+}
+
+AUG_EXTERNC aug_mpool*
+aug_mfilempool_(aug_mfile_t mfile)
+{
+    assert(mfile);
+    aug_retain(mfile->mpool_);
+    return mfile->mpool_;
 }
 
 AUG_EXTERNC unsigned

@@ -128,8 +128,9 @@ namespace {
     void
     headertest(const char* dst, const char* src)
     {
-        headertest(aug::createmar());
-        headertest(aug::openmar(dst, AUG_RDWR | AUG_CREAT, 0664));
+        mpoolptr mpool(getmpool(aug_tlx));
+        headertest(aug::createmar(mpool));
+        headertest(aug::openmar(mpool, dst, AUG_RDWR | AUG_CREAT, 0664));
     }
 
     void
@@ -150,8 +151,9 @@ namespace {
     void
     contenttest(const char* dst, const char* src)
     {
-        contenttest(aug::createmar());
-        contenttest(aug::openmar(dst, AUG_RDWR | AUG_CREAT, 0664));
+        mpoolptr mpool(getmpool(aug_tlx));
+        contenttest(aug::createmar(mpool));
+        contenttest(aug::openmar(mpool, dst, AUG_RDWR | AUG_CREAT, 0664));
     }
 
     void
@@ -178,8 +180,9 @@ namespace {
         strm << STR1 << flush;
         strm.close();
 
-        inserttest(aug::createmar(), src);
-        inserttest(aug::openmar(dst, AUG_RDWR | AUG_CREAT, 0664), src);
+        mpoolptr mpool(getmpool(aug_tlx));
+        inserttest(aug::createmar(mpool), src);
+        inserttest(aug::openmar(mpool, dst, AUG_RDWR | AUG_CREAT, 0664), src);
     }
 
     void
@@ -199,8 +202,10 @@ namespace {
     void
     extracttest(const char* dst, const char* src)
     {
-        extracttest(dst, aug::createmar());
-        extracttest(dst, aug::openmar(src, AUG_RDWR | AUG_CREAT, 0664));
+        mpoolptr mpool(getmpool(aug_tlx));
+        extracttest(dst, aug::createmar(mpool));
+        extracttest(dst, aug::openmar(mpool, src, AUG_RDWR | AUG_CREAT,
+                                      0664));
     }
 
     void
@@ -208,7 +213,8 @@ namespace {
     {
         aug::setcontent(ref, STR1);
 
-        aug::smartmar dst(aug::createmar());
+        mpoolptr mpool(getmpool(aug_tlx));
+        aug::smartmar dst(aug::createmar(mpool));
         aug::copymar(dst, ref);
 
         unsigned size;
@@ -224,16 +230,18 @@ namespace {
     void
     copytest(const char* dst, const char* src)
     {
-        copytest(aug::createmar());
-        copytest(aug::openmar(src, AUG_RDWR | AUG_CREAT, 0664));
+        mpoolptr mpool(getmpool(aug_tlx));
+        copytest(aug::createmar(mpool));
+        copytest(aug::openmar(mpool, src, AUG_RDWR | AUG_CREAT, 0664));
     }
     void
     opencopytest(const char* dst, const char* src)
     {
-        smartmar from(aug::openmar(src, AUG_RDWR | AUG_CREAT, 0664));
+        mpoolptr mpool(getmpool(aug_tlx));
+        smartmar from(aug::openmar(mpool, src, AUG_RDWR | AUG_CREAT, 0664));
         aug::setcontent(from, STR1);
 
-        smartmar to(aug::openmar(dst, AUG_RDWR | AUG_CREAT, 0664));
+        smartmar to(aug::openmar(mpool, dst, AUG_RDWR | AUG_CREAT, 0664));
         aug::copymar(to, from);
 
         unsigned size;
@@ -290,8 +298,9 @@ namespace {
     void
     iteratortest(const char* dst, const char* src)
     {
-        iteratortest(aug::createmar());
-        iteratortest(aug::openmar(dst, AUG_RDWR | AUG_CREAT, 0664));
+        mpoolptr mpool(getmpool(aug_tlx));
+        iteratortest(aug::createmar(mpool));
+        iteratortest(aug::openmar(mpool, dst, AUG_RDWR | AUG_CREAT, 0664));
     }
 
     void
@@ -312,8 +321,9 @@ namespace {
     void
     streamtest(const char* dst, const char* src)
     {
-        streamtest(aug::createmar());
-        streamtest(aug::openmar(dst, AUG_RDWR | AUG_CREAT, 0664));
+        mpoolptr mpool(getmpool(aug_tlx));
+        streamtest(aug::createmar(mpool));
+        streamtest(aug::openmar(mpool, dst, AUG_RDWR | AUG_CREAT, 0664));
     }
 
     struct test {

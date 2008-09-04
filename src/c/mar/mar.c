@@ -278,6 +278,7 @@ exit_(void)
 static int
 run_(int argc, char* argv[], const char* archivename)
 {
+    aug_mpool* mpool;
     int flags = 0;
     mode_t mode = 0;
 
@@ -301,7 +302,11 @@ run_(int argc, char* argv[], const char* archivename)
         mode = 0666;
     }
 
-    if (!(mar = aug_openmar(archivename, flags, mode))) {
+    mpool = aug_getmpool(aug_tlx);
+    mar = aug_openmar(mpool, archivename, flags, mode);
+    aug_release(mpool);
+
+    if (!mar) {
         aug_perrinfo(aug_tlx, "aug_openmar() failed", NULL);
         return -1;
     }
@@ -396,6 +401,9 @@ main(int argc, char* argv[])
     char ch;
     const char* archivename = NULL;
     aug_opterr = 0;
+
+    if (aug_autobasictlx() < 0)
+        return 1;
 
     AUG_INITLEAKDUMP();
 

@@ -13,6 +13,8 @@
 #include "augmar/config.h"
 #include "augmar/types.h"
 
+#include "augext/mpool.h"
+
 /**
  * Copy an existing message archive.
  *
@@ -32,6 +34,8 @@ aug_copymar(aug_mar_t dst, aug_mar_t src);
 /**
  * Create an in-memory message archive.
  *
+ * @param mpool Memory pool.
+ *
  * @return A handle to the newly created message archive or null on failure,
  * in which case errno can be used to determine the error.
  *
@@ -39,10 +43,12 @@ aug_copymar(aug_mar_t dst, aug_mar_t src);
  */
 
 AUGMAR_API aug_mar_t
-aug_createmar(void);
+aug_createmar(aug_mpool* mpool);
 
 /**
  * Create or open a file-based message archive.
+ *
+ * @param mpool Memory pool.
  *
  * @param path A path to the file to be created or opened.
  *
@@ -58,7 +64,7 @@ aug_createmar(void);
  */
 
 AUGMAR_API aug_mar_t
-aug_openmar(const char* path, int flags, ...);
+aug_openmar(aug_mpool* mpool, const char* path, int flags, ...);
 
 /**
  * Release message archive handle.

@@ -9,13 +9,15 @@
 #include "augsyspp/dlfcn.hpp"
 #include "augsyspp/smartptr.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 #include "augabipp.hpp"
 
 #include <string>
 
 namespace daug {
 
-    class module {
+    class module : public aug::mpool_base {
         const std::string name_;
         aug::dlib lib_;
         mod_termfn termfn_;

@@ -9,6 +9,7 @@
 #include "augctxpp/base.hpp"
 #include "augctxpp/errinfo.hpp"
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 #include "augctxpp/types.hpp"
 #include "augctxpp/utility.hpp"
 

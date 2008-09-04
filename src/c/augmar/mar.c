@@ -119,13 +119,13 @@ aug_copymar(aug_mar_t dst, aug_mar_t src)
 }
 
 AUGMAR_API aug_mar_t
-aug_createmar(void)
+aug_createmar(aug_mpool* mpool)
 {
     aug_mar_t mar;
     aug_seq_t seq;
     struct aug_info_ info;
 
-    if (!(seq = aug_createseq_(sizeof(struct aug_mar_))))
+    if (!(seq = aug_createseq_(mpool, sizeof(struct aug_mar_))))
         return NULL;
 
     if (-1 == init_(seq, &info))
@@ -145,7 +145,7 @@ aug_createmar(void)
 }
 
 AUGMAR_API aug_mar_t
-aug_openmar(const char* path, int flags, ...)
+aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
 {
     aug_mar_t mar;
     aug_seq_t seq;
@@ -163,7 +163,7 @@ aug_openmar(const char* path, int flags, ...)
     } else
         mode = 0;
 
-    if (!(seq = aug_openseq_(path, flags & ~AUG_TRUNC, mode,
+    if (!(seq = aug_openseq_(mpool, path, flags & ~AUG_TRUNC, mode,
                              sizeof(struct aug_mar_))))
         return NULL;
 
@@ -388,11 +388,16 @@ aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name)
 AUGMAR_API int
 aug_insertmar(aug_mar_t mar, const char* path)
 {
+    aug_mpool* mpool;
     aug_mfile_t mfile;
     const void* addr;
     unsigned size;
 
-    if (!(mfile = aug_openmfile_(path, AUG_RDONLY, 0, 0)))
+    mpool = aug_seqmpool_(mar->seq_);
+    mfile = aug_openmfile_(mpool, path, AUG_RDONLY, 0, 0);
+    aug_release(mpool);
+
+    if (!mfile)
         return -1;
 
     if (0 != (size = aug_mfileresvd_(mfile))) {
@@ -517,6 +522,7 @@ aug_writemar(aug_mar_t mar, const void* buf, unsigned len)
 AUGMAR_API int
 aug_extractmar(aug_mar_t mar, const char* path)
 {
+    aug_mpool* mpool;
     aug_mfile_t mfile;
     void* dst;
     const void* src;
@@ -525,8 +531,12 @@ aug_extractmar(aug_mar_t mar, const char* path)
     if (!(src = aug_content(mar, &size)))
         return -1;
 
-    if (!(mfile = aug_openmfile_(path, AUG_WRONLY | AUG_CREAT | AUG_TRUNC,
-                                 0666, 0)))
+    mpool = aug_seqmpool_(mar->seq_);
+    mfile = aug_openmfile_(mpool, path, AUG_WRONLY | AUG_CREAT | AUG_TRUNC,
+                           0666, 0);
+    aug_release(mpool);
+
+    if (!mfile)
         return -1;
 
     if (size) {

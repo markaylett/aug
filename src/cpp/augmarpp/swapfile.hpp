@@ -39,11 +39,11 @@ namespace aug {
                 close(false);
             } AUG_PERRINFOCATCH;
         }
-        swapfile(const char* swap, const char* master)
-            : mar_(openmar(swap, AUG_RDWR | AUG_CREAT | AUG_EXCL)),
+        swapfile(mpoolref mpool, const char* swap, const char* master)
+            : mar_(openmar(mpool, swap, AUG_RDWR | AUG_CREAT | AUG_EXCL)),
               done_(false)
         {
-            smartmar src(openmar(master, AUG_RDONLY));
+            smartmar src(openmar(mpool, master, AUG_RDONLY));
             copymar(mar_, src);
 
             aug_strlcpy(swap_, swap, sizeof(swap_));

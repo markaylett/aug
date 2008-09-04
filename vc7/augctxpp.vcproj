@@ -141,6 +141,9 @@
 				RelativePath="..\src\cpp\augctxpp\exception.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augctxpp\mpool.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augctxpp\types.cpp">
 			</File>
 			<File
@@ -162,6 +165,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augctxpp\exception.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augctxpp\mpool.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augctxpp\types.hpp">

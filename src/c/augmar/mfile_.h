@@ -7,13 +7,16 @@
 #include "augmar/config.h"
 #include "augmar/types.h"
 
+#include "augext/mpool.h"
+
 typedef struct aug_mfile_* aug_mfile_t;
 
 AUG_EXTERNC int
 aug_closemfile_(aug_mfile_t mfile);
 
 AUG_EXTERNC aug_mfile_t
-aug_openmfile_(const char* path, int flags, mode_t mode, unsigned tail);
+aug_openmfile_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
+               unsigned tail);
 
 AUG_EXTERNC void*
 aug_mapmfile_(aug_mfile_t mfile, unsigned size);
@@ -29,6 +32,9 @@ aug_mfileaddr_(aug_mfile_t mfile);
 
 AUG_EXTERNC unsigned
 aug_mfileresvd_(aug_mfile_t mfile);
+
+AUG_EXTERNC aug_mpool*
+aug_mfilempool_(aug_mfile_t mfile);
 
 AUG_EXTERNC unsigned
 aug_mfilesize_(aug_mfile_t mfile);
