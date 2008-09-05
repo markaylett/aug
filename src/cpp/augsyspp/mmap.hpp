@@ -49,8 +49,9 @@ namespace aug {
                 perrinfo(aug_tlx, "aug_destroymmap() failed");
         }
 
-        mmap(fdref ref, size_t offset, size_t len, int flags)
-            : mmap_(aug_createmmap(ref.get(), offset, len, flags))
+        mmap(mpoolref mpool, fdref ref, size_t offset, size_t len, int flags)
+            : mmap_(aug_createmmap(mpool.get(), ref.get(), offset, len,
+                                   flags))
         {
             verify(mmap_);
         }

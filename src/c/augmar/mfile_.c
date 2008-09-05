@@ -163,7 +163,8 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
         }
     } else {
 
-        mfile->mmap_ = aug_createmmap(mfile->fd_, 0, size, mfile->flags_);
+        mfile->mmap_ = aug_createmmap(mfile->mpool_, mfile->fd_, 0, size,
+                                      mfile->flags_);
         if (!mfile->mmap_)
             return NULL;
     }

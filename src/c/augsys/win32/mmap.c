@@ -9,12 +9,12 @@
 #include "augctx/errno.h"
 
 #include <io.h>
-#include <stdlib.h>         /* free() */
 
 #define FLAGMASK_ (AUG_MMAPRD | AUG_MMAPWR)
 
 typedef struct impl_ {
     struct aug_mmap mmap_;
+    aug_mpool* mpool_;
     aug_fd fd_;
     DWORD prot_, access_;
     size_t size_;
@@ -158,13 +158,16 @@ AUG_EXTERNC int
 aug_destroymmap(struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
+    aug_mpool* mpool = impl->mpool_;
     int ret = destroymmap_(impl);
-    free(impl);
+    aug_freemem(mpool, impl);
+    aug_release(mpool);
     return ret;
 }
 
 AUG_EXTERNC struct aug_mmap*
-aug_createmmap(aug_fd fd, size_t offset, size_t len, int flags)
+aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
+               int flags)
 {
     impl_t impl;
     DWORD prot, access;
@@ -182,13 +185,12 @@ aug_createmmap(aug_fd fd, size_t offset, size_t len, int flags)
     if (-1 == verify_(size, offset, len))
         return NULL;
 
-    if (!(impl = (impl_t)malloc(sizeof(struct impl_)))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    if (!(impl = aug_allocmem(mpool, sizeof(struct impl_))))
         return NULL;
-    }
 
     impl->mmap_.addr_ = NULL;
     impl->mmap_.len_ = 0;
+    impl->mpool_ = mpool;
     impl->fd_ = fd;
     impl->prot_ = prot;
     impl->access_ = access;
@@ -196,9 +198,10 @@ aug_createmmap(aug_fd fd, size_t offset, size_t len, int flags)
     impl->mapping_ = INVALID_HANDLE_VALUE;
 
     if (-1 == createmmap_(impl, offset, len)) {
-        free(impl);
+        aug_freemem(mpool, impl);
         return NULL;
     }
+    aug_retain(mpool);
     return (struct aug_mmap*)impl;
 }
 
