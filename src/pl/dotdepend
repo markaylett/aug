@@ -5,6 +5,7 @@ use strict;
 
 my $MAKEDEPEND = 'gcc -MM -MG';
 my $TRED = 'tred';
+my $DIR = shift @ARGV;
 
 sub ltrim {
     $_[0] =~ s/^\s+//;
@@ -22,6 +23,7 @@ sub trim {
 sub basename {
     my $path = shift;
     my $i = rindex $path, '/';
+    $i = rindex $path, '/', $i - 1;
     $path = substr($path, $i + 1)
         unless $i == -1;
     return $path;
@@ -63,6 +65,7 @@ foreach (`$MAKEDEPEND @ARGV 2>/dev/null`) {
         next unless $comp;
 
         trim $comp;
+        $comp = "$DIR/$comp";
         $comp = compname $comp;
 
         $comps{$comp} = []
@@ -89,6 +92,7 @@ foreach (`$MAKEDEPEND @ARGV 2>/dev/null`) {
             # file.
 
             $_ = compname $_;
+
             push @{$comps{$comp}}, $_
                 unless $comp eq $_;
         }
@@ -108,7 +112,7 @@ print PIPE "\tnode [shape=box];\n";
 my $deps;
 while (($comp, $deps) = each %comps) {
 
-    $comp =~ s/[.-]//g;
+    $comp =~ s|[-./]|_|g;
 
     my $i = 0;
     if (@$deps > 1) {
@@ -121,7 +125,7 @@ while (($comp, $deps) = each %comps) {
             # known components.
 
             if (exists $comps{$_}) {
-                $_ =~ s/[.-]//g;
+                $_ =~ s|[-./]|_|g;
                 print PIPE "\t$comp -> $_;\n";
                 ++$i;
             }
