@@ -69,9 +69,9 @@ check_PROGRAMS = \
 
 TESTS = \
 	basetest \
+	chantest \
 	mcasttest \
 	muxertest \
-	objecttest \
 	sockaddrtest \
 	sockettest \
 	timetest \

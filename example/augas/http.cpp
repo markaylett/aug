@@ -443,10 +443,9 @@ namespace {
         ~filecontent() AUG_NOTHROW
         {
         }
-        explicit
-        filecontent(const char* path)
+        filecontent(mpoolref mpool, const char* path)
             : sfd_(aug::open(path, O_RDONLY)),
-              mmap_(sfd_, 0, 0, AUG_MMAPRD)
+              mmap_(mpool, sfd_, 0, 0, AUG_MMAPRD)
         {
             blob_.reset(this);
         }
@@ -473,7 +472,7 @@ namespace {
         static smartob<aug_blob>
         create(const char* path)
         {
-            filecontent* ptr = new filecontent(path);
+            filecontent* ptr = new filecontent(getmpool(aug_tlx), path);
             return object_attach<aug_blob>(ptr->blob_);
         }
     };

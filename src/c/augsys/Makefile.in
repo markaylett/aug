@@ -306,9 +306,9 @@ libaugsys_la_LIBADD = \
 
 TESTS = \
 	basetest \
+	chantest \
 	mcasttest \
 	muxertest \
-	objecttest \
 	sockaddrtest \
 	sockettest \
 	timetest \
