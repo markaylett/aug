@@ -6,6 +6,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h> /* exit() */
 
 static int refs_ = 0;
 
