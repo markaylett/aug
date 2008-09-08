@@ -69,6 +69,17 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout);
 AUGSYS_API int
 aug_getmdeventmask(aug_muxer_t muxer, aug_md md);
 
+/**
+ * Return events set for @a md.
+ *
+ * Muxer may signal error if descriptor has been closed.
+ *
+ * @param muxer The multiplexer.
+ * @param md A multiplexer-managed descriptor.
+ *
+ * @return Events set on success, or #AUG_FAILERROR on failure.
+ */
+
 AUGSYS_API int
 aug_getmdevents(aug_muxer_t muxer, aug_md md);
 

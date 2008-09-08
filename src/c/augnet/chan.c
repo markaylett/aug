@@ -157,6 +157,7 @@ static aug_chan*
 cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+    int events;
 
     if (impl->est_) {
 
@@ -166,7 +167,12 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         return estabclient_(impl, handler);
     }
 
-    if ((AUG_MDEVENTCONN & aug_getmdevents(impl->muxer_, impl->sd_))) {
+    /* Muxer may signal error if descriptor has been closed. */
+
+    if ((events = aug_getmdevents(impl->muxer_, impl->sd_)) < 0)
+        return NULL;
+
+    if ((AUG_MDEVENTCONN & events) {
 
         struct aug_endpoint ep;
 
@@ -327,8 +333,14 @@ static aug_chan*
 schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
+    int events = aug_getmdevents(impl->muxer_, impl->sd_);
 
-    if ((AUG_MDEVENTRD & aug_getmdevents(impl->muxer_, impl->sd_))) {
+    /* Muxer may signal error if descriptor has been closed. */
+
+    if (events < 0)
+        return NULL;
+
+    if ((AUG_MDEVENTRD & events)) {
 
         aug_sd sd;
         struct aug_endpoint ep;
@@ -540,6 +552,9 @@ pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     int events = aug_getmdevents(impl->muxer_, impl->sd_);
+
+    /* Muxer may signal error if descriptor has been closed. */
+
     if (events < 0)
         return NULL;
 

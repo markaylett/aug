@@ -133,6 +133,8 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         int events = 0;
 #endif /* _WIN32 */
 
+        /* Muxer may signal error if descriptor has been closed. */
+
         if (events < 0)
             return NULL;
 

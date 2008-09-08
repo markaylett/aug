@@ -36,7 +36,7 @@ external_(short src)
     if (src & POLLNVAL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid request: fd not open"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
 

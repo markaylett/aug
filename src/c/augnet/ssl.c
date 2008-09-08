@@ -463,6 +463,11 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     int events = aug_getmdevents(impl->muxer_, impl->sd_);
     int rw = 0;
 
+    /* Muxer may signal error if descriptor has been closed. */
+
+    if (events < 0)
+        return NULL;
+
     /* Determine which SSL operations are to be performed. */
 
     switch (impl->state_) {
