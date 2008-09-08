@@ -19,10 +19,13 @@ namespace {
         autosds sds(socketpair(AF_UNIX, SOCK_STREAM, 0));
         setnonblock(sds[0], true);
         setnonblock(sds[1], true);
-        return make_pair(createplain(mpool, muxer, nextid(), sds[0],
-                                     AUG_MDEVENTRD),
-                         createplain(mpool, muxer, nextid(), sds[1],
-                                     AUG_MDEVENTWR));
+        pair<chanptr, chanptr>
+            p(make_pair(createplain(mpool, muxer, nextid(), sds[0],
+                                    AUG_MDEVENTRD),
+                        createplain(mpool, muxer, nextid(), sds[1],
+                                    AUG_MDEVENTWR)));
+        sds.release();
+        return p;
     }
 
     unsigned rd_, wr_;

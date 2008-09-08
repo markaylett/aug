@@ -21,10 +21,24 @@ struct aug_muxer_ {
     int ready_;
 };
 
-static unsigned short
+static int
 external_(short src)
 {
+    /* POLLIN   - There is data to read.
+       POLLPRI  - There is urgent data to read.
+       POLLOUT  - Writing now will not block.
+       POLLERR  - Error condition.
+       POLLHUP  - Hung up.
+       POLLNVAL - Invalid request: fd not open. */
+
     unsigned short dst = 0;
+
+    if (src & POLLNVAL) {
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("invalid request: fd not open"));
+        return -1;
+    }
+
 
     if (src & (POLLHUP | POLLIN))
         dst |= AUG_MDEVENTRD;
@@ -172,6 +186,8 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
         return ret;
     }
 
+    /* A negative value means infinite timeout. */
+
     ms = timeout ? aug_tvtoms(timeout) : -1;
 
     if (-1 == (ret = poll(muxer->pollfds_, muxer->nfds_, ms))) {
@@ -296,7 +312,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid mdevent mask"));
+                       AUG_MSG("invalid mdevent mask '%d'"), (int)mask);
         return -1;
     }
 

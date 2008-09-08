@@ -147,6 +147,12 @@ namespace aug {
             second_.reset(rhs.second_);
             return *this;
         }
+        void
+        release()
+        {
+            first_.release();
+            second_.release();
+        }
         operator proxy()
         {
             return proxy(first_, second_);
