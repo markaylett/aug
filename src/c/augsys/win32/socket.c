@@ -323,6 +323,8 @@ AUGSYS_API int
 aug_getsockopt(aug_sd sd, int level, int optname, void* optval,
                socklen_t* optlen)
 {
+    /* MSDN confirms that optval should be type int for SO_ERROR. */
+
     if (SOCKET_ERROR == getsockopt(sd, level, optname, optval, optlen)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAGetLastError());
         return -1;

@@ -70,6 +70,32 @@ struct impl_ {
     int shutdown_;
 };
 
+static aug_bool
+error_(aug_chan* chan, aug_chandler* handler, unsigned id,
+       unsigned short events, aug_sd sd)
+{
+    /* Exceptions may include non-error exceptions, such as high priority
+       data. */
+
+    if ((AUG_MDEVENTEX & events)) {
+
+        /* Set socket-level error if one exists. */
+
+        struct aug_errinfo errinfo;
+        aug_setsockerrinfo(&errinfo, __FILE__, __LINE__, sd);
+
+        if (errinfo.num_) {
+
+            /* Error occurred. */
+
+            aug_safeerror(chan, handler, id, &errinfo);
+            return AUG_TRUE;
+        }
+    }
+
+    return AUG_FALSE;
+}
+
 static int
 bufempty_(struct buf_* x)
 {
@@ -463,10 +489,12 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     int events = aug_getmdevents(impl->muxer_, impl->sd_);
     int rw = 0;
 
-    /* Muxer may signal error if descriptor has been closed. */
+    /* Close socket on error. */
 
-    if (events < 0)
+    if (error_(ob, handler, impl->id_, events, impl->sd_))
         return NULL;
+
+    /* TODO: how should any remaining exceptional events be handled? */
 
     /* Determine which SSL operations are to be performed. */
 

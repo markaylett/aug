@@ -72,8 +72,6 @@ aug_getmdeventmask(aug_muxer_t muxer, aug_md md);
 /**
  * Return events set for @a md.
  *
- * Muxer may signal error if descriptor has been closed.
- *
  * @param muxer The multiplexer.
  * @param md A multiplexer-managed descriptor.
  *

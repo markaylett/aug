@@ -60,6 +60,7 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
                         impl->mask_);
 
     if (!chan) {
+        aug_safeerror(&impl->chan_, handler, impl->id_, aug_tlerr);
         aug_sclose(sd);
         return NULL;
     }
@@ -82,6 +83,32 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
     }
 
     return chan;
+}
+
+static aug_bool
+error_(aug_chan* chan, aug_chandler* handler, unsigned id,
+       unsigned short events, aug_sd sd)
+{
+    /* Exceptions may include non-error exceptions, such as high priority
+       data. */
+
+    if ((AUG_MDEVENTEX & events)) {
+
+        /* Set socket-level error if one exists. */
+
+        struct aug_errinfo errinfo;
+        aug_setsockerrinfo(&errinfo, __FILE__, __LINE__, sd);
+
+        if (errinfo.num_) {
+
+            /* Error occurred. */
+
+            aug_safeerror(chan, handler, id, &errinfo);
+            return AUG_TRUE;
+        }
+    }
+
+    return AUG_FALSE;
 }
 
 static aug_result
@@ -159,6 +186,8 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
     int events;
 
+    /* Was connection established on construction? */
+
     if (impl->est_) {
 
         /* Descriptor will either be owned by new object or closed on
@@ -167,12 +196,14 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         return estabclient_(impl, handler);
     }
 
-    /* Muxer may signal error if descriptor has been closed. */
+    events = aug_getmdevents(impl->muxer_, impl->sd_);
 
-    if ((events = aug_getmdevents(impl->muxer_, impl->sd_)) < 0)
+    /* Close socket on error. */
+
+    if (error_(ob, handler, impl->id_, events, impl->sd_))
         return NULL;
 
-    if ((AUG_MDEVENTCONN & events) {
+    if ((AUG_MDEVENTCONN & events)) {
 
         struct aug_endpoint ep;
 
@@ -181,8 +212,10 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         if (aug_setmdeventmask(impl->muxer_, impl->sd_, 0) < 0
             || AUG_BADSD == (impl->sd_ = aug_tryconnect(impl->conn_, &ep,
-                                                        &impl->est_)))
+                                                        &impl->est_))) {
+            aug_safeerror(ob, handler, impl->id_, aug_tlerr);
             return NULL;
+        }
 
         /* Update name based on new address. */
 
@@ -335,10 +368,12 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
     int events = aug_getmdevents(impl->muxer_, impl->sd_);
 
-    /* Muxer may signal error if descriptor has been closed. */
+    /* Close socket on error. */
 
-    if (events < 0)
+    if (error_(ob, handler, impl->id_, events, impl->sd_))
         return NULL;
+
+    /* Assumption: server sockets do not have exceptional events. */
 
     if ((AUG_MDEVENTRD & events)) {
 
@@ -351,8 +386,10 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
 
-            if (!aug_acceptlost())
-                return NULL; /* Error. */
+            if (!aug_acceptlost()) {
+                aug_safeerror(ob, handler, impl->id_, aug_tlerr);
+                return NULL;
+            }
 
             aug_ctxwarn(aug_tlx, "aug_accept() failed: %s", aug_tlerr->desc_);
             goto done;
@@ -553,9 +590,9 @@ pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     int events = aug_getmdevents(impl->muxer_, impl->sd_);
 
-    /* Muxer may signal error if descriptor has been closed. */
+    /* Close socket on error. */
 
-    if (events < 0)
+    if (error_(ob, handler, impl->id_, events, impl->sd_))
         return NULL;
 
     if (events && !aug_safeready(ob, handler, impl->id_, &impl->stream_,

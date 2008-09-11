@@ -10,9 +10,18 @@
 
 #include "augext/chan.h"
 
+AUGSYS_API void
+aug_safeerror(aug_chan* chan, aug_chandler* handler, unsigned id,
+              struct aug_errinfo* errinfo);
+
 AUGSYS_API aug_bool
 aug_safeestab(aug_chan* chan, aug_chandler* handler, unsigned id,
               aug_stream* ob, unsigned parent);
+
+/**
+ * Error-info is assumed to be set accordingly, prior to calling
+ * aug_safeready().
+ */
 
 AUGSYS_API aug_bool
 aug_safeready(aug_chan* chan, aug_chandler* handler, unsigned id,

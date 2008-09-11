@@ -5,7 +5,6 @@
 #include "augsys/unistd.h"
 
 #include "augctx/base.h"
-#include "augctx/errinfo.h"
 #include "augctx/errno.h"
 
 #include <string.h>     /* memcpy() */

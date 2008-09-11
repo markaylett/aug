@@ -121,8 +121,9 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         impl->init_ = AUG_TRUE;
 
-        if (!aug_safeestab(ob, handler, impl->id_, &impl->stream_,
-                           impl->id_))
+        /* Id and parent-id are the same. */
+
+        if (!aug_safeestab(ob, handler, impl->id_, &impl->stream_, impl->id_))
             return NULL;
 
     } else {
@@ -133,12 +134,7 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         int events = 0;
 #endif /* _WIN32 */
 
-        /* Muxer may signal error if descriptor has been closed. */
-
-        if (events < 0)
-            return NULL;
-
-        /* Lock here to prevent release during callback. */
+        /* Assumption: error events cannot occur on plain files. */
 
         if (events && !aug_safeready(ob, handler, impl->id_, &impl->stream_,
                                      events))
@@ -300,6 +296,19 @@ static const struct aug_errvtbl errvtbl_ = {
     err_release_,
     err_copyerrinfo_
 };
+
+AUGSYS_API void
+aug_safeerror(aug_chan* chan, aug_chandler* handler, unsigned id,
+              struct aug_errinfo* errinfo)
+{
+    aug_clearerrinfo(aug_tlerr);
+
+    /* Lock here to prevent release during callback. */
+
+    aug_retain(chan);
+    aug_errorchan(handler, id, errinfo);
+    aug_release(chan);
+}
 
 AUGSYS_API aug_bool
 aug_safeestab(aug_chan* chan, aug_chandler* handler, unsigned id,

@@ -68,9 +68,12 @@ aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                const char* src, int num, const char* format, ...)
 {
     va_list args;
-    va_start(args, format);
-    aug_vseterrinfo(errinfo, file, line, src, num, format, args);
-    va_end(args);
+    if (num) {
+        va_start(args, format);
+        aug_vseterrinfo(errinfo, file, line, src, num, format, args);
+        va_end(args);
+    } else
+        aug_clearerrinfo(errinfo);
     return num;
 }
 
@@ -78,7 +81,10 @@ AUGCTX_API int
 aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     int err)
 {
-    aug_seterrinfo(errinfo, file, line, "posix", err, strerror(err));
+    if (err)
+        aug_seterrinfo(errinfo, file, line, "posix", err, strerror(err));
+    else
+        aug_clearerrinfo(errinfo);
     return errno = err;
 }
 
@@ -87,24 +93,28 @@ AUGCTX_API int
 aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     unsigned long err)
 {
-    char desc[AUG_MAXLINE];
-    DWORD i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
-                            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                            desc, sizeof(desc), NULL);
+    if (err) {
 
-    /* Remove trailing whitespace. */
+        char desc[AUG_MAXLINE];
+        DWORD i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
+                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                desc, sizeof(desc), NULL);
 
-    while (i && isspace(desc[i - 1]))
-        --i;
+        /* Remove trailing whitespace. */
 
-    /* Remove trailing full-stop. */
+        while (i && isspace(desc[i - 1]))
+            --i;
 
-    if (i && '.' == desc[i - 1])
-        --i;
+        /* Remove trailing full-stop. */
 
-    desc[i] = '\0';
-    aug_seterrinfo(errinfo, file, line, "win32", (int)err,
-                   i ? desc : AUG_MSG("no description available"));
+        if (i && '.' == desc[i - 1])
+            --i;
+
+        desc[i] = '\0';
+        aug_seterrinfo(errinfo, file, line, "win32", (int)err,
+                       i ? desc : AUG_MSG("no description available"));
+    } else
+        aug_clearerrinfo(errinfo);
 
     /* Map to errno for completeness. */
 

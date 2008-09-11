@@ -3,6 +3,8 @@
   <quotincl>augext/stream.h</quotincl>
   <quotincl>augtypes.h</quotincl>
 
+  <verbatim>struct aug_errinfo;</verbatim>
+
   <verbatim>
 #define AUG_MAXCHANNAMELEN 255
   </verbatim>
@@ -11,6 +13,11 @@
 
     <method name="clear" type="void" qname="clearchan">
       <param name="id" type="unsigned"/>
+    </method>
+
+    <method name="error" type="void" qname="errorchan">
+      <param name="id" type="unsigned"/>
+      <param name="errinfo" type="const struct aug_errinfo&" />
     </method>
 
     <method name="estab" type="aug_bool" qname="estabchan">

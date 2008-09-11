@@ -133,6 +133,9 @@ AUGCTX_API int
 aug_win32errno(unsigned long win32)
 {
     int i;
+    if (0 == win32)
+        return 0;
+
     for (i = 0; ERRORMAP_SIZE_ > i; ++i)
         if (win32 == ERRORMAP_[i].win32_)
             return ERRORMAP_[i].errno_;

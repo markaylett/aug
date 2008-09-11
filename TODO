@@ -33,3 +33,5 @@ Review use of safe-assign.
 Make destroy() return codes consistent.
 
 Review timer implementation.
+
+Implement aug_err interface.

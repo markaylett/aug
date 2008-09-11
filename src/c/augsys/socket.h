@@ -36,6 +36,7 @@ typedef int socklen_t;
 # endif /* socklen_t */
 #endif /* _WIN32 */
 
+struct aug_errinfo;
 struct iovec;
 
 /**
@@ -154,6 +155,12 @@ aug_swrite(aug_sd sd, const void* buf, size_t len);
 AUGSYS_API ssize_t
 aug_swritev(aug_sd sd, const struct iovec* iov, int size);
 
+/**
+ * The Windows version of this function will return the posix-mapped version
+ * of #SO_ERROR.  I.e. on return, optval will contain the equivalent errno
+ * value.
+ */
+
 AUGSYS_API int
 aug_getsockopt(aug_sd sd, int level, int optname, void* optval,
                socklen_t* optlen);
@@ -237,5 +244,9 @@ aug_inetloopback(int af);
 
 AUGSYS_API int
 aug_acceptlost(void);
+
+AUGSYS_API int
+aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                   aug_sd sd);
 
 #endif /* AUGSYS_SOCKET_H */

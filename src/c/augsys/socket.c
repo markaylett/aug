@@ -7,6 +7,7 @@
 
 AUG_RCSID("$Id$");
 
+#include "augctx/errinfo.h"
 #include "augctx/errno.h"
 
 #if !defined(_WIN32)
@@ -227,4 +228,24 @@ aug_acceptlost(void)
     }
 
     return 0;
+}
+
+AUGSYS_API int
+aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                   aug_sd sd)
+{
+    int err = 0;
+    socklen_t len = sizeof(err);
+
+    if (aug_getsockopt(sd, SOL_SOCKET, SO_ERROR, &err, &len) < 0) {
+
+        /* Maintain semantics with existing errinfo functions. */
+
+        const struct aug_errinfo* src = aug_tlerr;
+        aug_seterrinfo(errinfo, src->file_, src->line_, src->src_, src->num_,
+                       src->desc_);
+        return src->num_;
+    }
+
+    return aug_setposixerrinfo(errinfo, file, line, err);
 }

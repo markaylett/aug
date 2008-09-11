@@ -184,6 +184,11 @@ namespace aug {
                     socks_.erase(*sock);
                 } AUG_PERRINFOCATCH;
             }
+            void
+            errorchan_(unsigned id, const aug_errinfo& errinfo) AUG_NOTHROW
+            {
+                // FIXME: implement.
+            }
             aug_bool
             estabchan_(unsigned id, obref<aug_stream> stream,
                        unsigned parent) AUG_NOTHROW

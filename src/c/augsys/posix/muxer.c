@@ -14,6 +14,15 @@
 # include <sys/poll.h>
 # define INIT_SIZE_ 64
 
+/* POLLIN   - There is data to read.
+   POLLPRI  - There is urgent data to read.
+   POLLOUT  - Writing now will not block.
+   POLLERR  - Error condition.
+   POLLHUP  - Hung up.
+   POLLNVAL - Invalid request: fd not open. */
+
+#define POLLEX_ (POLLPRI | POLLERR | POLLNVAL)
+
 struct aug_muxer_ {
     aug_mpool* mpool_;
     struct pollfd* pollfds_;
@@ -21,24 +30,10 @@ struct aug_muxer_ {
     int ready_;
 };
 
-static int
+static unsigned short
 external_(short src)
 {
-    /* POLLIN   - There is data to read.
-       POLLPRI  - There is urgent data to read.
-       POLLOUT  - Writing now will not block.
-       POLLERR  - Error condition.
-       POLLHUP  - Hung up.
-       POLLNVAL - Invalid request: fd not open. */
-
     unsigned short dst = 0;
-
-    if (src & POLLNVAL) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid request: fd not open"));
-        return AUG_FAILERROR;
-    }
-
 
     if (src & (POLLHUP | POLLIN))
         dst |= AUG_MDEVENTRD;
@@ -46,7 +41,7 @@ external_(short src)
     if (src & POLLOUT)
         dst |= AUG_MDEVENTWR;
 
-    if (src & POLLPRI)
+    if (src & POLLEX_)
         dst |= AUG_MDEVENTEX;
 
     return dst;
@@ -56,6 +51,8 @@ static short
 internal_(unsigned short src)
 {
     short dst = 0;
+
+    /* POLLERR, POLLHUP and POLLNVAL are implicit. */
 
     if (src & AUG_MDEVENTRD)
         dst |= (POLLHUP | POLLIN);
