@@ -21,9 +21,9 @@ namespace {
         setnonblock(sds[1], true);
         pair<chanptr, chanptr>
             p(make_pair(createplain(mpool, muxer, nextid(), sds[0],
-                                    AUG_MDEVENTRD),
+                                    AUG_MDEVENTRD | AUG_MDEVENTEX),
                         createplain(mpool, muxer, nextid(), sds[1],
-                                    AUG_MDEVENTWR)));
+                                    AUG_MDEVENTWR | AUG_MDEVENTEX)));
         sds.release();
         return p;
     }
@@ -62,6 +62,13 @@ namespace {
         void
         clearchan_(unsigned id) AUG_NOTHROW
         {
+            aug_ctxinfo(aug_tlx, "clearing channel: %u", id);
+        }
+        void
+        errorchan_(unsigned id, const aug_errinfo& errinfo) AUG_NOTHROW
+        {
+            aug_perrinfo(aug_tlx, "socket error", &errinfo);
+            exit(1);
         }
         aug_bool
         estabchan_(unsigned id, obref<aug_stream> stream,

@@ -174,6 +174,8 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
 {
     chan_ = object_cast<aug_chan>(stream);
 
+    // FIXME: handle exceptional events?
+
     if (events & AUG_MDEVENTRD) {
 
         AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%u]", sock_.id_);

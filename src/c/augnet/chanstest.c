@@ -244,6 +244,13 @@ chandler_clear_(aug_chandler* ob, unsigned id)
     aug_ctxinfo(aug_tlx, "clearing id: %u", id);
 }
 
+static void
+chandler_error_(aug_chandler* ob, unsigned id,
+                const struct aug_errinfo* errinfo)
+{
+    aug_perrinfo(aug_tlx, "socket error", errinfo);
+}
+
 static aug_bool
 chandler_estab_(aug_chandler* ob, unsigned id, aug_stream* stream,
                 unsigned parent)
@@ -263,6 +270,7 @@ static const struct aug_chandlervtbl chandlervtbl_ = {
     chandler_retain_,
     chandler_release_,
     chandler_clear_,
+    chandler_error_,
     chandler_estab_,
     chandler_ready_
 };
