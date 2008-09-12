@@ -40,7 +40,7 @@ typedef struct aug_muxer_* aug_muxer_t;
 AUGSYS_API aug_muxer_t
 aug_createmuxer(aug_mpool* mpool);
 
-AUGSYS_API int
+AUGSYS_API void
 aug_destroymuxer(aug_muxer_t muxer);
 
 AUGSYS_API int

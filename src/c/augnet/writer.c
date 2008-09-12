@@ -96,7 +96,7 @@ aug_createwriter(aug_mpool* mpool)
     return writer;
 }
 
-AUGNET_API aug_result
+AUGNET_API void
 aug_destroywriter(aug_writer_t writer)
 {
     aug_mpool* mpool = writer->mpool_;
@@ -111,7 +111,6 @@ aug_destroywriter(aug_writer_t writer)
 
     aug_freemem(mpool, writer);
     aug_release(mpool);
-    return AUG_SUCCESS;
 }
 
 AUGNET_API aug_result

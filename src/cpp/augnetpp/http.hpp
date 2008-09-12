@@ -9,11 +9,10 @@
 #include "augutilpp/object.hpp"
 
 #include "augctxpp/exception.hpp"
-#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augnet/http.h"
 
-#include <memory>               // auto_ptr<>
+#include <memory> // auto_ptr<>
 
 namespace aug {
 
@@ -176,8 +175,8 @@ namespace aug {
     public:
         ~httpparser() AUG_NOTHROW
         {
-            if (httpparser_ && -1 == aug_destroyhttpparser(httpparser_))
-                perrinfo(aug_tlx, "aug_destroyhttpparser() failed");
+            if (httpparser_)
+                aug_destroyhttpparser(httpparser_);
         }
 
         httpparser(const null_&) AUG_NOTHROW

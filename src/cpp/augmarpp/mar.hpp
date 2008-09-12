@@ -54,12 +54,12 @@ namespace aug {
     inline void
     releasemar(aug_mar_t m)
     {
-        verify(aug_releasemar(m));
+        aug_releasemar(m);
     }
     inline void
     retainmar(aug_mar_t m)
     {
-        verify(aug_retainmar(m));
+        aug_retainmar(m);
     }
     inline void
     compactmar(marref ref)
@@ -202,9 +202,7 @@ namespace aug {
     inline unsigned
     contentsize(marref ref)
     {
-        unsigned size;
-        verify(aug_contentsize(ref.get(), &size));
-        return size;
+        return aug_contentsize(ref.get());
     }
 }
 

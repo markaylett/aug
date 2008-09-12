@@ -190,48 +190,31 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
     return NULL;
 }
 
-AUGMAR_API int
+AUGMAR_API void
 aug_releasemar(aug_mar_t mar)
 {
-    if (!mar) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
-                       AUG_MSG("null archive handle"));
-        return -1;
-    }
-
     if (0 < --mar->refs_)
-        return 0;
+        return;
 
     if (WRITABLE_(mar)) {
 
         struct aug_info_ local;
         if (-1 == aug_info_(mar->seq_, &local))
-            goto fail;
+            goto done;
 
         if (0 != memcmp(&local, &mar->info_, sizeof(local))
             && -1 == aug_setinfo_(mar->seq_, &mar->info_))
-            goto fail;
+            goto done;
     }
 
-    return aug_destroyseq_(mar->seq_);
-
- fail:
+ done:
     aug_destroyseq_(mar->seq_);
-    return -1;
 }
 
-AUGMAR_API int
+AUGMAR_API void
 aug_retainmar(aug_mar_t mar)
 {
-    if (!mar) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
-                       AUG_MSG("null archive handle"));
-        return -1;
-    }
     ++mar->refs_;
-    return 0;
 }
 
 AUGMAR_API int
@@ -345,12 +328,6 @@ aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord)
 AUGMAR_API int
 aug_getfields(aug_mar_t mar, unsigned* size)
 {
-    if (!mar) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
-                       AUG_MSG("null archive handle"));
-        return -1;
-    }
     if (!size) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
@@ -420,13 +397,6 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
 {
     off_t local;
 
-    if (!mar) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
-                       AUG_MSG("null archive handle"));
-        return -1;
-    }
-
     switch (whence) {
     case AUG_SET:
         local = offset;
@@ -468,12 +438,6 @@ aug_setcontent(aug_mar_t mar, const void* cdata, unsigned size)
 AUGMAR_API int
 aug_syncmar(aug_mar_t mar)
 {
-    if (!mar) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
-                       AUG_MSG("null archive handle"));
-        return -1;
-    }
     return aug_syncseq_(mar->seq_);
 }
 
@@ -588,15 +552,8 @@ aug_readmar(aug_mar_t mar, void* buf, unsigned len)
     return ret;
 }
 
-AUGMAR_API int
-aug_contentsize(aug_mar_t mar, unsigned* size)
+AUGMAR_API unsigned
+aug_contentsize(aug_mar_t mar)
 {
-    if (!mar) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
-                       AUG_MSG("null archive handle"));
-        return -1;
-    }
-    *size = mar->info_.bsize_;
-    return 0;
+    return mar->info_.bsize_;
 }

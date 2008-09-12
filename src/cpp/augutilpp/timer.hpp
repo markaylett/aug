@@ -7,7 +7,6 @@
 #include "augutilpp/object.hpp"
 
 #include "augctxpp/exception.hpp"
-#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augabipp.hpp"
 
@@ -59,8 +58,8 @@ namespace aug {
     public:
         ~timers() AUG_NOTHROW
         {
-            if (timers_ && -1 == aug_destroytimers(timers_))
-                perrinfo(aug_tlx, "aug_destroytimers() failed");
+            if (timers_)
+                aug_destroytimers(timers_);
         }
 
         timers(const null_&) AUG_NOTHROW

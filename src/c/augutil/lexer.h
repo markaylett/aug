@@ -16,8 +16,6 @@
 
 #include "augext/mpool.h"
 
-#include "augtypes.h"
-
 #define AUG_LEXLABEL  0x01
 #define AUG_LEXWORD   0x02
 #define AUG_LEXPHRASE 0x04
@@ -32,7 +30,7 @@ aug_createnetlexer(aug_mpool* mpool, size_t size);
 AUGUTIL_API aug_lexer_t
 aug_createshelllexer(aug_mpool* mpool, size_t size, int pairs);
 
-AUGUTIL_API aug_result
+AUGUTIL_API void
 aug_destroylexer(aug_lexer_t lexer);
 
 AUGUTIL_API unsigned

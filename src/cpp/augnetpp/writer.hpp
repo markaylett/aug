@@ -5,7 +5,6 @@
 #define AUGNETPP_WRITER_HPP
 
 #include "augctxpp/exception.hpp"
-#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augnet/writer.h"
 
@@ -23,8 +22,8 @@ namespace aug {
     public:
         ~writer() AUG_NOTHROW
         {
-            if (writer_ && -1 == aug_destroywriter(writer_))
-                perrinfo(aug_tlx, "aug_destroywriter() failed");
+            if (writer_)
+                aug_destroywriter(writer_);
         }
 
         writer(const null_&) AUG_NOTHROW

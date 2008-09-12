@@ -9,7 +9,6 @@
 #include "augsyspp/time.hpp"
 
 #include "augctxpp/exception.hpp"
-#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augutil/hires.h"
 
@@ -47,8 +46,8 @@ namespace aug {
     public:
         ~hires() AUG_NOTHROW
         {
-            if (hires_ && -1 == aug_destroyhires(hires_))
-                perrinfo(aug_tlx, "aug_destroyhires() failed");
+            if (hires_)
+                aug_destroyhires(hires_);
         }
 
         hires(const null_&) AUG_NOTHROW

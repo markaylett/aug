@@ -7,7 +7,6 @@
 #include "augsyspp/types.hpp"
 
 #include "augctxpp/exception.hpp"
-#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augsys/mmap.h"
 
@@ -45,8 +44,7 @@ namespace aug {
     public:
         ~mmap() AUG_NOTHROW
         {
-            if (-1 == aug_destroymmap(mmap_))
-                perrinfo(aug_tlx, "aug_destroymmap() failed");
+            aug_destroymmap(mmap_);
         }
 
         mmap(mpoolref mpool, fdref ref, size_t offset, size_t len, int flags)

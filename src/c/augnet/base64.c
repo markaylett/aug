@@ -552,7 +552,7 @@ aug_createbase64(aug_mpool* mpool, enum aug_base64mode mode,
     return base64;
 }
 
-AUGNET_API aug_result
+AUGNET_API void
 aug_destroybase64(aug_base64_t base64)
 {
     aug_mpool* mpool = base64->mpool_;
@@ -560,7 +560,6 @@ aug_destroybase64(aug_base64_t base64)
         aug_release(base64->ob_);
     aug_freemem(mpool, base64);
     aug_release(mpool);
-    return AUG_SUCCESS;
 }
 
 AUGNET_API int

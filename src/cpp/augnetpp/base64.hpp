@@ -9,7 +9,6 @@
 #include "augutilpp/object.hpp"
 
 #include "augctxpp/exception.hpp"
-#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augnet/base64.h"
 
@@ -65,8 +64,8 @@ namespace aug {
     public:
         ~base64() AUG_NOTHROW
         {
-            if (base64_ && -1 == aug_destroybase64(base64_))
-                perrinfo(aug_tlx, "aug_destroybase64() failed");
+            if (base64_)
+                aug_destroybase64(base64_);
         }
 
         base64(const null_&) AUG_NOTHROW

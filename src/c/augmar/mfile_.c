@@ -68,8 +68,7 @@ aug_closemfile_(aug_mfile_t mfile)
 
     if (mfile->mmap_) {
 
-        if (-1 == aug_destroymmap(mfile->mmap_))
-            ret = -1;
+        aug_destroymmap(mfile->mmap_);
 
         if (mfile->resvd_ > mfile->size_) {
 

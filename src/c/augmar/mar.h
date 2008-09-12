@@ -74,13 +74,10 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...);
  *
  * @param mar A handle to the message archive to be released.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
- *
  * @see aug_createmar(), aug_openmar() and aug_retainmar().
  */
 
-AUGMAR_API int
+AUGMAR_API void
 aug_releasemar(aug_mar_t mar);
 
 /**
@@ -88,13 +85,10 @@ aug_releasemar(aug_mar_t mar);
  *
  * @param mar A handle to the message archive.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
- *
  * @see aug_copymar() and aug_releasemar().
  */
 
-AUGMAR_API int
+AUGMAR_API void
 aug_retainmar(aug_mar_t mar);
 
 /**
@@ -464,16 +458,12 @@ aug_readmar(aug_mar_t mar, void* buf, unsigned len);
  *
  * @param mar A handle to the message archive.
  *
- * @param size The output parameter, in which, the size of the content will be
- * returned.
- *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return Content size.
  *
  * @see aug_content().
  */
 
-AUGMAR_API int
-aug_contentsize(aug_mar_t mar, unsigned* size);
+AUGMAR_API unsigned
+aug_contentsize(aug_mar_t mar);
 
 #endif /* AUGMAR_MAR_H */

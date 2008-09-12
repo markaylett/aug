@@ -116,14 +116,13 @@ aug_createmuxer(aug_mpool* mpool)
     return muxer;
 }
 
-AUGSYS_API int
+AUGSYS_API void
 aug_destroymuxer(aug_muxer_t muxer)
 {
     aug_mpool* mpool = muxer->mpool_;
     aug_freemem(mpool, muxer->pollfds_);
     aug_freemem(mpool, muxer);
     aug_release(mpool);
-    return 0;
 }
 
 AUGSYS_API int
@@ -290,13 +289,12 @@ aug_createmuxer(aug_mpool* mpool)
     return muxer;
 }
 
-AUGSYS_API int
+AUGSYS_API void
 aug_destroymuxer(aug_muxer_t muxer)
 {
     aug_mpool* mpool = muxer->mpool_;
     aug_freemem(mpool, muxer);
     aug_release(mpool);
-    return 0;
 }
 
 AUGSYS_API int

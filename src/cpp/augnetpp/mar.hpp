@@ -9,13 +9,12 @@
 #include "augutilpp/object.hpp"
 
 #include "augctxpp/exception.hpp"
-#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augnet/mar.h"
 
 #include "augmar/mar.h"
 
-#include <memory>               // auto_ptr<>
+#include <memory> // auto_ptr<>
 
 namespace aug {
 
@@ -144,8 +143,8 @@ namespace aug {
     public:
         ~marparser() AUG_NOTHROW
         {
-            if (marparser_ && -1 == aug_destroymarparser(marparser_))
-                perrinfo(aug_tlx, "aug_destroymarparser() failed");
+            if (marparser_)
+                aug_destroymarparser(marparser_);
         }
 
         marparser(const null_&) AUG_NOTHROW

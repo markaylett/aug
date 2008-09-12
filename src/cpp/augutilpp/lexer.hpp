@@ -7,7 +7,6 @@
 #include "augutilpp/config.hpp"
 
 #include "augctxpp/exception.hpp"
-#include "augctxpp/utility.hpp" // perrinfo()
 
 #include "augutil/lexer.h"
 
@@ -28,8 +27,8 @@ namespace aug {
     public:
         ~lexer() AUG_NOTHROW
         {
-            if (lexer_ && -1 == aug_destroylexer(lexer_))
-                perrinfo(aug_tlx, "aug_destroylexer() failed");
+            if (lexer_)
+                aug_destroylexer(lexer_);
         }
 
         lexer(const null_&) AUG_NOTHROW

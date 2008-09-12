@@ -23,7 +23,7 @@ struct aug_mmap {
     size_t len_;
 };
 
-AUGSYS_API int
+AUGSYS_API void
 aug_destroymmap(struct aug_mmap* mm);
 
 AUGSYS_API struct aug_mmap*

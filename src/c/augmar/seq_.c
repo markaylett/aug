@@ -225,10 +225,10 @@ static const struct impl_ mfileimpl_ = {
     mfiletail_
 };
 
-AUG_EXTERNC int
+AUG_EXTERNC void
 aug_destroyseq_(aug_seq_t seq)
 {
-    return (*seq->impl_->destroy_)(seq);
+    (*seq->impl_->destroy_)(seq);
 }
 
 AUG_EXTERNC int

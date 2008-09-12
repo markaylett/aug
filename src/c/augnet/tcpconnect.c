@@ -62,7 +62,7 @@ aug_createtcpconnect(aug_mpool* mpool, const char* host, const char* serv)
     return conn;
 }
 
-AUGNET_API aug_result
+AUGNET_API void
 aug_destroytcpconnect(aug_tcpconnect_t conn)
 {
     aug_mpool* mpool = conn->mpool_;
@@ -72,7 +72,6 @@ aug_destroytcpconnect(aug_tcpconnect_t conn)
     aug_destroyaddrinfo(conn->save_);
     aug_freemem(mpool, conn);
     aug_release(mpool);
-    return AUG_SUCCESS;
 }
 
 AUGNET_API aug_sd

@@ -191,16 +191,15 @@ aug_createfixstream(aug_mpool* mpool, size_t size, aug_fixcb_t cb,
     return stream;
 }
 
-AUGNET_API aug_result
+AUGNET_API void
 aug_destroyfixstream(aug_fixstream_t stream)
 {
     aug_mpool* mpool = stream->mpool_;
-    aug_result ret = aug_destroyxstr(stream->xstr_);
+    aug_destroyxstr(stream->xstr_);
     if (stream->ob_)
         aug_release(stream->ob_);
     aug_freemem(mpool, stream);
     aug_release(mpool);
-    return ret;
 }
 
 AUGNET_API ssize_t

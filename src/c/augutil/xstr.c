@@ -120,7 +120,7 @@ aug_createxstr(aug_mpool* mpool, size_t size)
 	return xstr;
 }
 
-AUGUTIL_API aug_result
+AUGUTIL_API void
 aug_destroyxstr(aug_xstr_t xstr)
 {
     aug_mpool* mpool = xstr->mpool_;
@@ -128,7 +128,6 @@ aug_destroyxstr(aug_xstr_t xstr)
         aug_freemem(mpool, xstr->ptr_);
     aug_freemem(mpool, xstr);
     aug_release(mpool);
-    return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_result

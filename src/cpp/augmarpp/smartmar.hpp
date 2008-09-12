@@ -7,7 +7,6 @@
 #include "augmarpp/types.hpp"
 
 #include "augctxpp/exception.hpp"
-#include "augctxpp/utility.hpp" // perrinfo()
 
 #include <algorithm>            // swap()
 
@@ -20,17 +19,14 @@ namespace aug {
             : ref_(ref)
         {
             if (retain && null != ref)
-                verify(aug_retainmar(ref.get()));
+                aug_retainmar(ref.get());
         }
 
     public:
         ~smartmar() AUG_NOTHROW
         {
-            if (null == ref_)
-                return;
-
-            if (null != ref_ && -1 == aug_releasemar(ref_.get()))
-                perrinfo(aug_tlx, "aug_releasemar() failed");
+            if (null != ref_)
+                aug_releasemar(ref_.get());
         }
 
         smartmar(const null_&) AUG_NOTHROW
@@ -42,7 +38,7 @@ namespace aug {
             : ref_(rhs.ref_)
         {
             if (null != ref_)
-                verify(aug_retainmar(ref_.get()));
+                aug_retainmar(ref_.get());
         }
 
         smartmar&
@@ -72,7 +68,7 @@ namespace aug {
             if (null != ref_) {
                 marref ref(ref_);
                 ref_ = null;
-                verify(aug_releasemar(ref.get()));
+                aug_releasemar(ref.get());
             }
         }
 

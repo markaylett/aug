@@ -26,7 +26,7 @@ typedef struct aug_timers_* aug_timers_t;
 AUGUTIL_API aug_timers_t
 aug_createtimers(aug_mpool* mpool);
 
-AUGUTIL_API aug_result
+AUGUTIL_API void
 aug_destroytimers(aug_timers_t timers);
 
 /**

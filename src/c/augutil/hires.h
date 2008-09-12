@@ -21,7 +21,7 @@ typedef struct aug_hires_* aug_hires_t;
 AUGUTIL_API aug_hires_t
 aug_createhires(aug_mpool* mpool);
 
-AUGUTIL_API aug_result
+AUGUTIL_API void
 aug_destroyhires(aug_hires_t hires);
 
 /**

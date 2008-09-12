@@ -11,7 +11,7 @@
 
 typedef struct aug_seq_* aug_seq_t;
 
-AUG_EXTERNC int
+AUG_EXTERNC void
 aug_destroyseq_(aug_seq_t seq);
 
 AUG_EXTERNC int

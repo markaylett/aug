@@ -25,7 +25,7 @@ typedef struct aug_writer_* aug_writer_t;
 AUGNET_API aug_writer_t
 aug_createwriter(aug_mpool* mpool);
 
-AUGNET_API aug_result
+AUGNET_API void
 aug_destroywriter(aug_writer_t writer);
 
 AUGNET_API aug_result

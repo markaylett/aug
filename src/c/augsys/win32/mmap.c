@@ -154,15 +154,14 @@ destroymmap_(impl_t impl)
     return 0;
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC void
 aug_destroymmap(struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
     aug_mpool* mpool = impl->mpool_;
-    int ret = destroymmap_(impl);
+    destroymmap_(impl);
     aug_freemem(mpool, impl);
     aug_release(mpool);
-    return ret;
 }
 
 AUG_EXTERNC struct aug_mmap*

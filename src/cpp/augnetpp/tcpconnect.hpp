@@ -29,8 +29,8 @@ namespace aug {
     public:
         ~tcpconnect() AUG_NOTHROW
         {
-            if (conn_ && -1 == aug_destroytcpconnect(conn_))
-                perrinfo(aug_tlx, "aug_destroytcpconnect() failed");
+            if (conn_)
+                aug_destroytcpconnect(conn_);
         }
 
         tcpconnect(const null_&) AUG_NOTHROW

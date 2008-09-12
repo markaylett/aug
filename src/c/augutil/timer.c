@@ -107,7 +107,7 @@ aug_createtimers(aug_mpool* mpool)
     return timers;
 }
 
-AUGUTIL_API aug_result
+AUGUTIL_API void
 aug_destroytimers(aug_timers_t timers)
 {
     aug_mpool* mpool = timers->mpool_;
@@ -122,7 +122,6 @@ aug_destroytimers(aug_timers_t timers)
 
     aug_freemem(mpool, timers);
     aug_release(mpool);
-    return AUG_SUCCESS;
 }
 
 AUGUTIL_API int

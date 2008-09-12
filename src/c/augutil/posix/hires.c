@@ -48,7 +48,7 @@ aug_createhires(aug_mpool* mpool)
     return NULL;
 }
 
-AUGUTIL_API aug_result
+AUGUTIL_API void
 aug_destroyhires(aug_hires_t hires)
 {
     aug_mpool* mpool = hires->mpool_;
@@ -56,7 +56,6 @@ aug_destroyhires(aug_hires_t hires)
     aug_freemem(mpool, hires);
     aug_release(clock);
     aug_release(mpool);
-    return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_result

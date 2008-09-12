@@ -36,7 +36,7 @@ AUGNET_API aug_marparser_t
 aug_createmarparser(aug_mpool* mpool, unsigned size,
                     const struct aug_marhandler* handler, aug_object* ob);
 
-AUGNET_API int
+AUGNET_API void
 aug_destroymarparser(aug_marparser_t parser);
 
 AUGNET_API int

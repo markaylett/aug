@@ -183,7 +183,7 @@ aug_createmarparser(aug_mpool* mpool, unsigned size,
     return parser;
 }
 
-AUGNET_API int
+AUGNET_API void
 aug_destroymarparser(aug_marparser_t parser)
 {
     aug_httpparser_t http = parser->http_;
@@ -194,8 +194,6 @@ aug_destroymarparser(aug_marparser_t parser)
     aug_destroyhttpparser(http);
 
     /* destroy_() will be called when "ob_" is released. */
-
-    return 0;
 }
 
 AUGNET_API int

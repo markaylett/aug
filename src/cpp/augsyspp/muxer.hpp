@@ -27,8 +27,8 @@ namespace aug {
     public:
         ~muxer() AUG_NOTHROW
         {
-            if (muxer_ && -1 == aug_destroymuxer(muxer_))
-                perrinfo(aug_tlx, "aug_destroymuxer() failed");
+            if (muxer_)
+                aug_destroymuxer(muxer_);
         }
 
         muxer(const null_&) AUG_NOTHROW

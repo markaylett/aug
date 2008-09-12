@@ -232,16 +232,15 @@ aug_createhttpparser(aug_mpool* mpool, unsigned size,
     return parser;
 }
 
-AUGNET_API aug_result
+AUGNET_API void
 aug_destroyhttpparser(aug_httpparser_t parser)
 {
     aug_mpool* mpool = parser->mpool_;
-    aug_result ret = aug_destroylexer(parser->lexer_);
+    aug_destroylexer(parser->lexer_);
     if (parser->ob_)
         aug_release(parser->ob_);
     aug_freemem(mpool, parser);
     aug_release(mpool);
-    return ret;
 }
 
 AUGNET_API int

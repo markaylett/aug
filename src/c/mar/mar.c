@@ -177,11 +177,8 @@ names_(aug_mar_t mar)
 static int
 size_(aug_mar_t mar)
 {
-    unsigned size;
-    if (-1 == aug_contentsize(mar, &size))
-        return -1;
-
-    printf("%d\n", (int)size);
+    unsigned size = aug_contentsize(mar);
+    printf("%u\n", (int)size);
     return 0;
 }
 
@@ -388,7 +385,8 @@ run_(int argc, char* argv[], const char* archivename)
             goto fail;
         }
 
-    return aug_releasemar(mar);
+    aug_releasemar(mar);
+    return 0;
 
  fail:
     aug_releasemar(mar);

@@ -102,14 +102,13 @@ aug_createshelllexer(aug_mpool* mpool, size_t size, int pairs)
     return lexer;
 }
 
-AUGUTIL_API aug_result
+AUGUTIL_API void
 aug_destroylexer(aug_lexer_t lexer)
 {
     aug_mpool* mpool = lexer->mpool_;
     aug_destroyxstr(lexer->xstr_);
     aug_freemem(mpool, lexer);
     aug_release(mpool);
-    return AUG_SUCCESS;
 }
 
 AUGUTIL_API unsigned

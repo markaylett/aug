@@ -24,7 +24,7 @@ typedef struct aug_xstr_* aug_xstr_t;
 AUGUTIL_API aug_xstr_t
 aug_createxstr(aug_mpool* mpool, size_t size);
 
-AUGUTIL_API aug_result
+AUGUTIL_API void
 aug_destroyxstr(aug_xstr_t xstr);
 
 AUGUTIL_API aug_result
