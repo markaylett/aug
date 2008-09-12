@@ -61,14 +61,14 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugsys_la_OBJECTS = barrier.lo base.lo chan.lo config.lo \
-	debug.lo dlfcn.lo endian.lo limits.lo mcast.lo mmap.lo \
-	muxer.lo socket.lo stream.lo time.lo types.lo uio.lo unistd.lo \
+am_libaugsys_la_OBJECTS = barrier.lo chan.lo config.lo debug.lo \
+	dlfcn.lo endian.lo limits.lo mcast.lo mmap.lo muxer.lo \
+	socket.lo stream.lo time.lo types.lo uio.lo unistd.lo \
 	utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
-am_basetest_OBJECTS = basetest.$(OBJEXT)
-basetest_OBJECTS = $(am_basetest_OBJECTS)
-basetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+basetest_SOURCES = basetest.c
+basetest_OBJECTS = basetest.$(OBJEXT)
+basetest_LDADD = $(LDADD)
 am_chantest_OBJECTS = chantest.$(OBJEXT)
 chantest_OBJECTS = $(am_chantest_OBJECTS)
 chantest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
@@ -100,12 +100,12 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
-	$(chantest_SOURCES) $(mcasttest_SOURCES) $(muxertest_SOURCES) \
+SOURCES = $(libaugsys_la_SOURCES) basetest.c $(chantest_SOURCES) \
+	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
 	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
 	$(timetest_SOURCES) $(utilitytest_SOURCES)
-DIST_SOURCES = $(libaugsys_la_SOURCES) $(basetest_SOURCES) \
-	$(chantest_SOURCES) $(mcasttest_SOURCES) $(muxertest_SOURCES) \
+DIST_SOURCES = $(libaugsys_la_SOURCES) basetest.c $(chantest_SOURCES) \
+	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
 	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
 	$(timetest_SOURCES) $(utilitytest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -255,7 +255,6 @@ SUBDIRS = \
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
 	barrier.h \
-	base.h \
 	chan.h \
 	config.h \
 	debug.h \
@@ -278,7 +277,6 @@ modinclude_HEADERS = \
 lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
 	barrier.c \
-	base.c \
 	chan.c \
 	config.c \
 	debug.c \
@@ -313,10 +311,6 @@ TESTS = \
 	sockettest \
 	timetest \
 	utilitytest
-
-basetest_SOURCES = basetest.c
-basetest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
 
 chantest_SOURCES = chantest.c
 chantest_LDADD = \
@@ -447,7 +441,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/barrier.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/basetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chantest.Po@am__quote@

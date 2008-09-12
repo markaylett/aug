@@ -32,14 +32,6 @@ aug_clearerrinfo(struct aug_errinfo* errinfo)
     errinfo->desc_[0] = '\0';
 }
 
-AUGCTX_API aug_bool
-aug_iserrinfo(const struct aug_errinfo* errinfo, const char* src, int num)
-{
-    return errinfo->num_ == num
-        && 0 == aug_strncasecmp(errinfo->src_, src, sizeof(errinfo->src_))
-        ? AUG_TRUE : AUG_FALSE;
-}
-
 AUGCTX_API int
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                 const char* src, int num, const char* format, va_list args)
@@ -116,9 +108,20 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
     } else
         aug_clearerrinfo(errinfo);
 
-    /* Map to errno for completeness. */
-
-    aug_setwin32errno(err);
     return (int)err;
 }
 #endif /* _WIN32 */
+
+AUGCTX_API int
+aug_geterrno(const struct aug_errinfo* errinfo)
+{
+    if (0 == aug_strncasecmp(errinfo->src_, "posix", sizeof(errinfo->src_)))
+        return errinfo->num_;
+
+#if defined(_WIN32)
+    if (0 == aug_strncasecmp(errinfo->src_, "win32", sizeof(errinfo->src_)))
+        return aug_win32posix(errinfo->num_);
+#endif /* _WIN32 */
+
+    return 0;
+}

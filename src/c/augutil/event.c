@@ -33,7 +33,7 @@ readall_(aug_md md, char* buf, size_t n)
 
         int ret = aug_mread(md, buf, n);
         if (-1 == ret) {
-            if (EINTR == aug_errno())
+            if (EINTR == aug_geterrno(aug_tlerr))
                 continue;
 
             return -1;
@@ -52,7 +52,7 @@ writeall_(aug_md md, const char* buf, size_t n)
 
         int ret = aug_mwrite(md, buf, n);
         if (-1 == ret) {
-            if (EINTR == aug_errno())
+            if (EINTR == aug_geterrno(aug_tlerr))
                 continue;
 
             return -1;

@@ -7,7 +7,6 @@ SUBDIRS = \
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
 	barrier.h \
-	base.h \
 	chan.h \
 	config.h \
 	debug.h \
@@ -31,7 +30,6 @@ lib_LTLIBRARIES = libaugsys.la
 
 libaugsys_la_SOURCES = \
 	barrier.c \
-	base.c \
 	chan.c \
 	config.c \
 	debug.c \
@@ -76,10 +74,6 @@ TESTS = \
 	sockettest \
 	timetest \
 	utilitytest
-
-basetest_SOURCES = basetest.c
-basetest_LDADD = \
-	$(top_builddir)/src/c/augsys/libaugsys.la
 
 chantest_SOURCES = chantest.c
 chantest_LDADD = \

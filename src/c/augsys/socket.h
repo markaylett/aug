@@ -242,8 +242,8 @@ aug_inetloopback(int af);
  * non-blocking.
  */
 
-AUGSYS_API int
-aug_acceptlost(void);
+AUGSYS_API aug_bool
+aug_acceptlost(struct aug_errinfo* errinfo);
 
 AUGSYS_API int
 aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,

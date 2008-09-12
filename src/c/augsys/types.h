@@ -10,8 +10,6 @@
 #include <stddef.h> /* size_t */
 #include <sys/types.h>
 
-typedef unsigned aug_len_t;
-
 #if !defined(_WIN32)
 typedef int aug_fd;
 typedef int aug_sd;

@@ -52,9 +52,9 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libaugsyspp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugsyspp_la_OBJECTS = base.lo config.lo dlfcn.lo endpoint.lo \
-	inetaddr.lo mcast.lo mmap.lo muxer.lo smartfd.lo smartptr.lo \
-	socket.lo string.lo time.lo types.lo unistd.lo utility.lo
+am_libaugsyspp_la_OBJECTS = config.lo dlfcn.lo endpoint.lo inetaddr.lo \
+	mcast.lo mmap.lo muxer.lo smartfd.lo smartptr.lo socket.lo \
+	string.lo time.lo types.lo unistd.lo utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
 am_mplexertest_OBJECTS = mplexertest.$(OBJEXT)
 mplexertest_OBJECTS = $(am_mplexertest_OBJECTS)
@@ -223,7 +223,6 @@ DEFAULT_INCLUDES = \
 
 modincludedir = $(includedir)/augsyspp
 modinclude_HEADERS = \
-	base.hpp \
 	config.hpp \
 	dlfcn.hpp \
 	endpoint.hpp \
@@ -242,7 +241,6 @@ modinclude_HEADERS = \
 
 noinst_LTLIBRARIES = libaugsyspp.la
 libaugsyspp_la_SOURCES = \
-	base.cpp \
 	config.cpp \
 	dlfcn.cpp \
 	endpoint.cpp \
@@ -343,7 +341,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlfcn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/endpoint.Plo@am__quote@

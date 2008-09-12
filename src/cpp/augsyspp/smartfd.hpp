@@ -4,7 +4,6 @@
 #ifndef AUGSYSPP_SMARTFD_HPP
 #define AUGSYSPP_SMARTFD_HPP
 
-#include "augsyspp/base.hpp"
 #include "augsyspp/types.hpp"
 
 #include "augctxpp/exception.hpp"

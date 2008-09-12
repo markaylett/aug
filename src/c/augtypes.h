@@ -32,6 +32,12 @@ enum aug_bool_ {
 /** @} */
 
 /**
+ * Equivalent to socklen_t.
+ */
+
+typedef unsigned aug_len_t;
+
+/**
  * @defgroup TypesResult Result Codes
  *
  * @ingroup Types
@@ -52,8 +58,9 @@ typedef int aug_result;
 
 #define AUG_SUCCESS     0
 #define AUG_FAILERROR (-1)
-#define AUG_FAILNONE  (-2)
-#define AUG_FAILINTR  (-3)
+#define AUG_FAILNONE  (-2) /* ENOENT */
+#define AUG_FAILINTR  (-3) /* EINTR */
+#define AUG_FAILBLOCK (-4) /* EWOULDBLOCK */
 
 /** @} */
 

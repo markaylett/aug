@@ -172,7 +172,6 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	base.c \
 	dlfcn.c \
 	mcast.c \
 	mmap.c \

@@ -174,9 +174,6 @@
 				RelativePath="..\src\c\augnet\tcpconnect.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\types.c">
-			</File>
-			<File
 				RelativePath="..\src\c\augnet\writer.c">
 			</File>
 		</Filter>
@@ -219,9 +216,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\tcpconnect.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augnet\types.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\writer.h">

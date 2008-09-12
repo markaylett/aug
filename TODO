@@ -32,10 +32,8 @@ Review timer implementation.
 
 Implement aug_err interface.
 
-Remove aug_errno().
-
-aug_errinfo to posix errno. i.e. if win32 then map.
-
 Assume edge-triggered semantics, including EAGAIN.
 
 Add support for epoll().
+
+Replace EINTR checks with AUG_FAILINTR.

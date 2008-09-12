@@ -64,6 +64,22 @@ namespace aug {
         return verify(aug_fwrite(ref.get(), buf, size));
     }
 
+    /**
+     * Get size of file in bytes.
+     *
+     * @param ref File descriptor.
+     *
+     * @return Size in bytes.
+     */
+
+    inline size_t
+    fsize(fdref ref)
+    {
+        size_t size;
+        verify(aug_fsize(ref.get(), &size));
+        return size;
+    }
+
     inline void
     msleep(unsigned ms)
     {

@@ -214,20 +214,20 @@ aug_inetloopback(int af)
 }
 
 AUGSYS_API int
-aug_acceptlost(void)
+aug_acceptlost(struct aug_errinfo* errinfo)
 {
     /* FIXME: would be better if aug_tlerr were used. */
 
-    switch (aug_errno()) {
+    switch (aug_geterrno(errinfo)) {
     case ECONNABORTED:
 #if defined(EPROTO)
     case EPROTO:
 #endif /* EPROTO */
     case EWOULDBLOCK:
-        return 1;
+        return AUG_TRUE;
     }
 
-    return 0;
+    return AUG_FALSE;
 }
 
 AUGSYS_API int

@@ -14,7 +14,6 @@ modinclude_HEADERS = \
 	netevent.h \
 	ssl.h \
 	tcpconnect.h \
-	types.h \
 	writer.h
 
 noinst_HEADERS =
@@ -34,7 +33,6 @@ libaugnet_la_SOURCES = \
 	netevent.c \
 	ssl.c \
 	tcpconnect.c \
-	types.c \
 	writer.c
 
 libaugnet_la_LDFLAGS = \

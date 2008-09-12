@@ -21,9 +21,6 @@ struct aug_errinfo {
 AUGCTX_API void
 aug_clearerrinfo(struct aug_errinfo* errinfo);
 
-AUGCTX_API aug_bool
-aug_iserrinfo(const struct aug_errinfo* errinfo, const char* src, int num);
-
 AUGCTX_API int
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                 const char* src, int num, const char* format, va_list args);
@@ -41,5 +38,16 @@ AUGCTX_API int
 aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     unsigned long err);
 #endif /* _WIN32 */
+
+/**
+ * Get equivalent errno value.
+ *
+ * @param errinfo Error info.
+ *
+ * @return Errno value or zero.
+ */
+
+AUGCTX_API int
+aug_geterrno(const struct aug_errinfo* errinfo);
 
 #endif /* AUGCTX_ERRINFO_H */

@@ -7,12 +7,12 @@
 
 AUG_RCSID("$Id$");
 
-#include "augnet/inet.h"   /* aug_setnodelay() */
+#include "augnet/inet.h"    /* aug_setnodelay() */
 #include "augnet/ssl.h"
 #include "augnet/tcpconnect.h"
 
-#include "augsys/base.h"   /* aug_nextid() */
-#include "augsys/chan.h"   /* aug_safeestab() */
+#include "augsys/chan.h"    /* aug_safeestab() */
+#include "augsys/utility.h" /* aug_nextid() */
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
@@ -386,7 +386,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
 
-            if (!aug_acceptlost()) {
+            if (!aug_acceptlost(aug_tlerr)) {
                 aug_safeerror(ob, handler, impl->id_, aug_tlerr);
                 return NULL;
             }

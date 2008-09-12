@@ -146,6 +146,8 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 
     do {
 
+        int err;
+
         /* Create socket for next address. */
 
         sd = aug_socket(conn->res_->ai_family, conn->res_->ai_socktype,
@@ -167,7 +169,9 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
             goto done;
         }
 
-        if (EINPROGRESS == aug_errno() || EWOULDBLOCK == aug_errno()) {
+        err = aug_geterrno(aug_tlerr);
+
+        if (EINPROGRESS == err || EWOULDBLOCK == err) {
 
             /* Connection pending. */
 

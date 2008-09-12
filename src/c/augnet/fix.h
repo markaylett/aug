@@ -11,7 +11,6 @@
  */
 
 #include "augnet/config.h"
-#include "augnet/types.h"
 
 #include "augext/mpool.h"
 #include "augext/stream.h"

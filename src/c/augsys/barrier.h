@@ -17,7 +17,7 @@
  * Prevent compiler re-ordering.
  */
 # define AUG_MB() __asm__ __volatile__("":::"memory")
-#else /* ENABLE_SMP*/
+#else /* ENABLE_SMP */
 # if defined(__GNUC__)
 #  if defined(__i386__) || defined(__i486__)
 #   define AUG_MB()  __asm__ __volatile__("lock; addl $0,0(%%esp)":::"memory")

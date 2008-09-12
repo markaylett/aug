@@ -132,9 +132,6 @@
 				RelativePath="..\src\c\augsys\barrier.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augsys\base.c">
-			</File>
-			<File
 				RelativePath="..\src\c\augsys\chan.c">
 			</File>
 			<File
@@ -192,9 +189,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath="..\src\c\augsys\barrier.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augsys\base.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augsys\chan.h">

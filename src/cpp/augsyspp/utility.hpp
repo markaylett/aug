@@ -8,25 +8,20 @@
 
 #include "augctxpp/exception.hpp"
 
-#include "augsys/unistd.h"  // aug_fsize()
 #include "augsys/utility.h" // aug_rand()
 
 namespace aug {
 
     /**
-     * Get size of file in bytes.
+     * Get next process-unique id.
      *
-     * @param ref File descriptor.
-     *
-     * @return Size in bytes.
+     * @return Next id.
      */
 
-    inline size_t
-    fsize(fdref ref)
+    inline unsigned
+    nextid()
     {
-        size_t size;
-        verify(aug_fsize(ref.get(), &size));
-        return size;
+        return aug_nextid();
     }
 
     /**

@@ -9,7 +9,6 @@ AUG_RCSID("$Id$");
 
 #if ENABLE_SSL
 
-# include "augsys/base.h"   /* struct aug_fdtype */
 # include "augsys/chan.h"   /* aug_safeready() */
 
 # include "augsys/socket.h" /* aug_shutdown() */
@@ -200,7 +199,7 @@ shutwr_(struct impl_* impl)
 {
     int ret;
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: shutdown");
+    AUG_CTXDEBUG3(aug_tlx, "SSL: shutdown: id=[%u]", impl->id_);
     ret = SSL_shutdown(impl->ssl_);
     aug_sshutdown(impl->sd_, SHUT_WR);
 
@@ -321,9 +320,9 @@ updateevents_(struct impl_* impl)
         || (RDPEND == impl->state_ && !buffull_(&impl->inbuf_)))
         aug_setmdevents(impl->muxer_, 1);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: events: sd=[%d], realmask=[%d],"
+    AUG_CTXDEBUG3(aug_tlx, "SSL: events: id=[%u], realmask=[%d],"
                   " usermask=[%d], userevents=[%d]",
-                  impl->sd_, real, impl->mask_, user);
+                  impl->id_, real, impl->mask_, user);
 }
 
 static void
@@ -411,7 +410,7 @@ readwrite_(struct impl_* impl, int rw)
 static aug_result
 close_(struct impl_* impl)
 {
-    AUG_CTXDEBUG3(aug_tlx, "clearing io-event mask: sd=[%d]", impl->sd_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: clearing io-event mask: id=[%u]", impl->id_);
     aug_setmdeventmask(impl->muxer_, impl->sd_, 0);
     return aug_sclose(impl->sd_);
 }
@@ -476,7 +475,7 @@ cclose_(aug_chan* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
     aug_result result;
-    AUG_CTXDEBUG3(aug_tlx, "nbfile close");
+    AUG_CTXDEBUG3(aug_tlx, "SSL: closing file: id=[%u]", impl->id_);
     result = close_(impl);
     impl->sd_ = AUG_BADSD;
     return result;
@@ -540,10 +539,11 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     else
         AUG_CTXDEBUG3(aug_tlx, "SSL: readwrite_() skipped");
 
-    if ((events = userevents_(impl))) {
+    events = userevents_(impl);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: userevents_(): id=[%u], events=[%d]",
+                  impl->id_, events);
 
-        AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_(): sd=[%d], events=[%d]",
-                      impl->sd_, events);
+    if (events) {
 
         if (!aug_safeready(ob, handler, impl->id_, &impl->stream_, events)) {
 
@@ -554,8 +554,6 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         }
         updateevents_(impl);
 
-    } else {
-        AUG_CTXDEBUG3(aug_tlx, "SSL: nbfilecb_() skipped");
     }
 
     retain_(impl);
@@ -567,8 +565,8 @@ csetmask_(aug_chan* ob, unsigned short mask)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: setting event mask: sd=[%d], mask=[%d]",
-                  impl->sd_, (int)mask);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: setting event mask: id=[%u], mask=[%d]",
+                  impl->id_, (int)mask);
 
     impl->mask_ = mask;
     updateevents_(impl);
@@ -668,8 +666,8 @@ sread_(aug_stream* ob, void* buf, size_t size)
         return -1;
     }
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user read from input buffer: sd=[%d]",
-                  impl->sd_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user read from input buffer: id=[%u]",
+                  impl->id_);
 
     ret = (ssize_t)readbuf_(&impl->inbuf_, buf, size);
     updateevents_(impl);
@@ -697,8 +695,8 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
         return -1;
     }
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user readv from input buffer: sd=[%d]",
-                  impl->sd_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user readv from input buffer: id=[%u]",
+                  impl->id_);
 
     ret = (ssize_t)readbufv_(&impl->inbuf_, iov, size);
     updateevents_(impl);
@@ -727,8 +725,8 @@ swrite_(aug_stream* ob, const void* buf, size_t size)
         return -1;
     }
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user write to output buffer: sd=[%d]",
-                  impl->sd_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user write to output buffer: id=[%u]",
+                  impl->id_);
 
     ret = (ssize_t)writebuf_(&impl->outbuf_, buf, size);
     updateevents_(impl);
@@ -757,8 +755,8 @@ swritev_(aug_stream* ob, const struct iovec* iov, int size)
         return -1;
     }
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user writev to output buffer: sd=[%d]",
-                  impl->sd_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: user writev to output buffer: id=[%u]",
+                  impl->id_);
 
     ret = (ssize_t)writebufv_(&impl->outbuf_, iov, size);
     updateevents_(impl);

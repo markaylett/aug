@@ -130,7 +130,7 @@ static const struct errormap_ ERRORMAP_[] = {
 #define EACCES_END_ ERROR_SHARING_BUFFER_EXCEEDED
 
 AUGCTX_API int
-aug_win32errno(unsigned long win32)
+aug_win32posix(unsigned long win32)
 {
     int i;
     if (0 == win32)
@@ -149,24 +149,4 @@ aug_win32errno(unsigned long win32)
     return EINVAL;
 }
 
-AUGCTX_API int
-aug_setwin32errno(unsigned long win32)
-{
-    int err = aug_win32errno(win32);
-    errno = err;
-    return err;
-}
-
 #endif /* _WIN32 */
-
-AUGCTX_API void
-aug_seterrno(int err)
-{
-    errno = err;
-}
-
-AUGCTX_API int
-aug_errno(void)
-{
-    return errno;
-}

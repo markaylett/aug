@@ -21,7 +21,6 @@
 #include "augnet/netevent.h"
 #include "augnet/ssl.h"
 #include "augnet/tcpconnect.h"
-#include "augnet/types.h"
 #include "augnet/writer.h"
 
 #endif /* AUGNET_H */

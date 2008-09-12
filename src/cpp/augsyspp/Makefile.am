@@ -2,7 +2,6 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 modincludedir = $(includedir)/augsyspp
 modinclude_HEADERS = \
-	base.hpp \
 	config.hpp \
 	dlfcn.hpp \
 	endpoint.hpp \
@@ -22,7 +21,6 @@ modinclude_HEADERS = \
 noinst_LTLIBRARIES = libaugsyspp.la
 
 libaugsyspp_la_SOURCES = \
-	base.cpp \
 	config.cpp \
 	dlfcn.cpp \
 	endpoint.cpp \

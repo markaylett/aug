@@ -11,7 +11,6 @@
  */
 
 #include "augsys/barrier.h"
-#include "augsys/base.h"
 #include "augsys/chan.h"
 #include "augsys/config.h"
 #include "augsys/debug.h"

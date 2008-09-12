@@ -66,35 +66,17 @@
 # define EIOPENDING (AUG_ERRNOBASE + 109)
 # define EOPERATIONABORTED (AUG_ERRNOBASE + 110)
 
-AUGCTX_API int
-aug_win32errno(unsigned long win32);
+/**
+ * Where possible, map Win32 specific error code to equivalent posix value.
+ *
+ * @param win32 Win32 error code.
+ *
+ * @return Equivalent posix errno value.
+ */
 
 AUGCTX_API int
-aug_setwin32errno(unsigned long win32);
+aug_win32posix(unsigned long win32);
 
 #endif /* _WIN32 */
-
-/**
- * Set errno value.
- *
- * This function may be required where a client is using different versions of
- * the c-runtime.
- */
-
-AUGCTX_API void
-aug_seterrno(int err);
-
-/**
- * Get errno value.
- *
- * Where possible, system specific errors, such as win32 errors, will be
- * mapped onto the standard errno value.  aug_errno() should therefore be used
- * when testing for posix error codes.
- *
- * @return errno value.
- */
-
-AUGCTX_API int
-aug_errno(void);
 
 #endif /* AUGCTX_ERRNO_H */

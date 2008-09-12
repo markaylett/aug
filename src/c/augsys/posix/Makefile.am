@@ -1,5 +1,4 @@
 EXTRA_DIST = \
-	base.c \
 	dlfcn.c \
 	mcast.c \
 	mmap.c \

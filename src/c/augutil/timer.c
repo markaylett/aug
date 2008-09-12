@@ -10,9 +10,8 @@ AUG_RCSID("$Id$");
 #include "augutil/object.h"
 #include "augutil/list.h"
 
-#include "augsys/base.h"    /* aug_nextid() */
 #include "augsys/time.h"
-#include "augsys/utility.h" /* aug_perrinfo() */
+#include "augsys/utility.h" /* aug_nextid() */
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"

@@ -7,13 +7,13 @@
 
 AUG_RCSID("$Id$");
 
-#include "augsys/base.h"   /* aug_nextid() */
 #include "augsys/uio.h"
 #include "augsys/unistd.h"
+#include "augsys/utility.h" /* aug_nextid() */
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
-#include "augctx/string.h" /* aug_strlcpy() */
+#include "augctx/string.h"  /* aug_strlcpy() */
 
 #include "augext/err.h"
 #include "augext/stream.h"

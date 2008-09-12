@@ -1,7 +1,6 @@
 /* Copyright (c) 2004-2007, Mark Aylett <mark@emantic.co.uk>
    See the file COPYING for copying permission.
 */
-#include "augsys/base.h"
 #include "augsys/uio.h" /* struct iovec */
 
 #include "augctx/base.h"
@@ -334,7 +333,7 @@ aug_getsockopt(aug_sd sd, int level, int optname, void* optval,
 
     if (SOL_SOCKET == level && SO_ERROR == optname) {
         int* err = optval;
-        *err = aug_win32errno(*err);
+        *err = aug_win32posix(*err);
     }
 
     return 0;
