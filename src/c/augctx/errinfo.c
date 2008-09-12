@@ -22,19 +22,20 @@ AUG_RCSID("$Id$");
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
 
-AUGCTX_API void
-aug_clearerrinfo(struct aug_errinfo* errinfo)
+static void
+seterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+            const char* src, int num, const char* desc)
 {
-    errinfo->file_[0] = '\0';
-    errinfo->line_ = 0;
-    errinfo->src_[0] = '\0';
-    errinfo->num_ = 0;
-    errinfo->desc_[0] = '\0';
+    aug_strlcpy(errinfo->file_, file, sizeof(errinfo->file_));
+    errinfo->line_ = line;
+    aug_strlcpy(errinfo->src_, src, sizeof(errinfo->src_));
+    errinfo->num_ = num;
+    aug_strlcpy(errinfo->desc_, src, sizeof(errinfo->desc_));
 }
 
-AUGCTX_API int
-aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                const char* src, int num, const char* format, va_list args)
+static void
+vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+             const char* src, int num, const char* format, va_list args)
 {
     int ret;
 
@@ -51,64 +52,109 @@ aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     if (ret < 0)
         aug_strlcpy(errinfo->desc_, "no message - bad format",
                     sizeof(errinfo->desc_));
-
-    return num;
 }
 
-AUGCTX_API int
+AUGCTX_API void
+aug_clearerrinfo(struct aug_errinfo* errinfo)
+{
+    errinfo->file_[0] = '\0';
+    errinfo->line_ = 0;
+    errinfo->src_[0] = '\0';
+    errinfo->num_ = 0;
+    errinfo->desc_[0] = '\0';
+}
+
+AUGCTX_API void
+aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                const char* src, int num, const char* format, va_list args)
+{
+    if (!num) {
+        aug_clearerrinfo(errinfo);
+        return;
+    }
+
+    vseterrinfo_(errinfo, file, line, src, num, format, args);
+}
+
+AUGCTX_API void
 aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                const char* src, int num, const char* format, ...)
 {
     va_list args;
-    if (num) {
-        va_start(args, format);
-        aug_vseterrinfo(errinfo, file, line, src, num, format, args);
-        va_end(args);
-    } else
+
+    if (!num) {
         aug_clearerrinfo(errinfo);
-    return num;
+        return;
+    }
+
+    va_start(args, format);
+    vseterrinfo_(errinfo, file, line, src, num, format, args);
+    va_end(args);
 }
 
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                    int err)
+                    int num)
 {
-    if (err)
-        aug_seterrinfo(errinfo, file, line, "posix", err, strerror(err));
-    else
+    if (!num) {
         aug_clearerrinfo(errinfo);
-    return errno = err;
+        return AUG_SUCCESS;
+    }
+
+    seterrinfo_(errinfo, file, line, "posix", num, strerror(num));
+
+    /* Map to exception code. */
+
+    switch (num) {
+    case EINTR:
+        return AUG_FAILINTR;
+    case EWOULDBLOCK:
+        return AUG_FAILBLOCK;
+    }
+    return AUG_FAILERROR;
 }
 
 #if defined(_WIN32)
-AUGCTX_API int
+AUGCTX_API aug_result
 aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                    unsigned long err)
+                    unsigned long num)
 {
-    if (err) {
+    char desc[AUG_MAXLINE];
+    DWORD i;
 
-        char desc[AUG_MAXLINE];
-        DWORD i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
-                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                desc, sizeof(desc), NULL);
-
-        /* Remove trailing whitespace. */
-
-        while (i && isspace(desc[i - 1]))
-            --i;
-
-        /* Remove trailing full-stop. */
-
-        if (i && '.' == desc[i - 1])
-            --i;
-
-        desc[i] = '\0';
-        aug_seterrinfo(errinfo, file, line, "win32", (int)err,
-                       i ? desc : AUG_MSG("no description available"));
-    } else
+    if (!num) {
         aug_clearerrinfo(errinfo);
+        return AUG_SUCCESS;
+    }
 
-    return (int)err;
+    i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, num,
+                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                      desc, sizeof(desc), NULL);
+
+    /* Remove trailing whitespace. */
+
+    while (i && isspace(desc[i - 1]))
+        --i;
+
+    /* Remove trailing full-stop. */
+
+    if (i && '.' == desc[i - 1])
+        --i;
+
+    desc[i] = '\0';
+
+    seterrinfo_(errinfo, file, line, "win32", (int)num,
+                i ? desc : AUG_MSG("no description available"));
+
+    /* Map to exception code. */
+
+    switch (num) {
+    case WSAEINTR:
+        return AUG_FAILINTR;
+    case WSAEWOULDBLOCK:
+        return AUG_FAILBLOCK;
+    }
+    return AUG_FAILERROR;
 }
 #endif /* _WIN32 */
 

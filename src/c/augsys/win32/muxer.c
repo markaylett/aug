@@ -166,9 +166,9 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
     if (SOCKET_ERROR ==
         (ret = select(-1, &muxer->out_.rd_, &muxer->out_.wr_,
                       &muxer->out_.ex_, timeout))) {
-        if (WSAEINTR == aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
-                                            WSAGetLastError()))
-            ret = AUG_FAILINTR;
+
+        ret = aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                  WSAGetLastError());
     }
     return ret;
 }

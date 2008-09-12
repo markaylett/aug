@@ -21,22 +21,31 @@ struct aug_errinfo {
 AUGCTX_API void
 aug_clearerrinfo(struct aug_errinfo* errinfo);
 
-AUGCTX_API int
+AUGCTX_API void
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                 const char* src, int num, const char* format, va_list args);
 
-AUGCTX_API int
+AUGCTX_API void
 aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                const char* src, int num, const char* format, ...);
 
-AUGCTX_API int
+/**
+ * @return Exception code or zero.
+ */
+
+AUGCTX_API aug_result
 aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                    int err);
+                    int num);
 
 #if defined(_WIN32)
-AUGCTX_API int
+
+/**
+ * @return Exception code or zero.
+ */
+
+AUGCTX_API aug_result
 aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                    unsigned long err);
+                    unsigned long num);
 #endif /* _WIN32 */
 
 /**

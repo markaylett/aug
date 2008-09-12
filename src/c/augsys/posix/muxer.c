@@ -188,9 +188,7 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
 
     if (-1 == (ret = poll(muxer->pollfds_, muxer->nfds_, ms))) {
 
-        if (EINTR == aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
-                                         errno))
-            ret = AUG_FAILINTR;
+        ret = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
     }
     return ret;
 }
@@ -359,9 +357,7 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
                             &muxer->out_.wr_, &muxer->out_.ex_,
                             (struct timeval*)timeout))) {
 
-        if (EINTR == aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
-                                         errno))
-            ret = AUG_FAILINTR;
+        ret = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
     }
     return ret;
 }

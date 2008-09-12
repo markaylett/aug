@@ -50,8 +50,14 @@ typedef unsigned aug_len_t;
 /**
  * Standard result type.
  *
- * Used to convey the following conventions: less than zero for errors; zero
- * for success; greater than zero for success with info.
+ * The @ref aug_result type should be used instead of int, where functions
+ * return 0 or -1 to indicate success or failure.  The type helps to
+ * communicate intent.
+ *
+ * Negative aug_result values indicate exceptions.  Not all exceptions are
+ * errors.  The posix errno values @ref EINTR and @ref EWOULDBLOCK are good
+ * examples of this.  Equivalents of these are @ref AUG_FAILINTR and @ref
+ * AUG_FAILBLOCK.
  */
 
 typedef int aug_result;
@@ -59,8 +65,8 @@ typedef int aug_result;
 #define AUG_SUCCESS     0
 #define AUG_FAILERROR (-1)
 #define AUG_FAILNONE  (-2) /* ENOENT */
-#define AUG_FAILINTR  (-3) /* EINTR */
-#define AUG_FAILBLOCK (-4) /* EWOULDBLOCK */
+#define AUG_FAILINTR  (-3) /* EINTR, WSAEINTR */
+#define AUG_FAILBLOCK (-4) /* EWOULDBLOCK, WSAEWOULDBLOCK */
 
 /** @} */
 
