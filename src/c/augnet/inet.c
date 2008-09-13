@@ -241,12 +241,14 @@ aug_setnodelay(aug_sd sd, int on)
 AUGNET_API int
 aug_established(aug_sd sd)
 {
-    int ret;
     struct aug_endpoint ep;
+    int ret;
+
     if (!aug_getpeername(sd, &ep))
-        ret = ENOTCONN == aug_geterrno(aug_tlerr) ? AUG_FAILNONE : -1;
+        ret = ENOTCONN == aug_geterrno(aug_tlerr)
+            ? AUG_FAILNONE : AUG_FAILERROR;
     else
-        ret = 0;
+        ret = AUG_SUCCESS;
 
     return ret;
 }

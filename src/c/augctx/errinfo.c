@@ -30,7 +30,7 @@ seterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
     errinfo->line_ = line;
     aug_strlcpy(errinfo->src_, src, sizeof(errinfo->src_));
     errinfo->num_ = num;
-    aug_strlcpy(errinfo->desc_, src, sizeof(errinfo->desc_));
+    aug_strlcpy(errinfo->desc_, desc, sizeof(errinfo->desc_));
 }
 
 static void

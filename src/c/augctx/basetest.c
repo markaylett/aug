@@ -3,7 +3,7 @@
 */
 #include "augctx.h"
 
-#include <errno.h>
+#include <errno.h> /* ENOMEM */
 #include <stdio.h>
 
 int
