@@ -6,13 +6,15 @@
 
 #include "augsrv/config.h"
 
-AUGSRV_API int
+#include "augtypes.h"
+
+AUGSRV_API aug_result
 aug_setsighandler(void (*handler)(int));
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_blocksignals(void);
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_unblocksignals(void);
 
 #endif /* AUGSRV_SIGNAL_H */

@@ -27,19 +27,17 @@ rtrim_(const char* s, size_t n)
     return n;
 }
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_readconf(const char* path, aug_confcb_t cb, void* arg)
 {
     char buf[AUG_MAXLINE];
     char* name;
     const char* value;
-    int ret = 0;
+    aug_result result = AUG_SUCCESS;
 
     FILE* fp = fopen(path, "r");
-    if (!fp) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (!fp)
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     while (fgets(buf, sizeof(buf), fp)) {
 
@@ -64,7 +62,7 @@ aug_readconf(const char* path, aug_confcb_t cb, void* arg)
 
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                            AUG_MSG("missing token separator"));
-            ret = -1;
+            result = AUG_FAILERROR;
             break;
         }
 
@@ -75,7 +73,7 @@ aug_readconf(const char* path, aug_confcb_t cb, void* arg)
         if ('\0' == *name) {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                            AUG_MSG("missing name part"));
-            ret = -1;
+            result = AUG_FAILERROR;
             break;
         }
 
@@ -87,12 +85,10 @@ aug_readconf(const char* path, aug_confcb_t cb, void* arg)
 
         value += strspn(value, SPACE_);
 
-        if (-1 == (*cb)(arg, name, value)) {
-            ret = -1;
+        if ((result = (*cb)(arg, name, value)) < 0)
             break;
-        }
     }
 
     fclose(fp);
-    return ret;
+    return result;
 }

@@ -17,13 +17,13 @@ aug_setservice_(const struct aug_service* service, void* arg);
 AUGSRV_API const char*
 aug_getserviceopt(enum aug_option opt);
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_readserviceconf(const char* conffile, int batch, int daemon);
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_initservice(void);
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_runservice(void);
 
 AUGSRV_API void

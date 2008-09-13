@@ -16,11 +16,12 @@ using namespace daug;
 using namespace std;
 
 namespace {
-    void
+    aug_result
     cb(void* arg, const char* name, const char* value)
     {
         map<string, string>& x(*static_cast<map<string, string>*>(arg));
         x[name] = value;
+        return AUG_SUCCESS;
     }
 }
 

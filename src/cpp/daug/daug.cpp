@@ -609,7 +609,7 @@ namespace {
             return 0;
         }
 
-        void
+        aug_result
         readconf(const char* conffile, bool batch, bool daemon)
         {
             // The conffile is optional, if specified it will be an absolute
@@ -617,7 +617,8 @@ namespace {
 
             if (conffile) {
 
-                AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]", conffile);
+                AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]",
+                              conffile);
                 options_.read(conffile);
 
                 // Store the absolute path to service any reconf requests.
@@ -645,9 +646,11 @@ namespace {
                 aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
             }
 #endif // ENABLE_SSL
+
+            return AUG_SUCCESS;
         }
 
-        void
+        aug_result
         init()
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
@@ -670,21 +673,25 @@ namespace {
                 s->engine_.clear();
                 throw;
             }
+
+            return AUG_SUCCESS;
         }
 
-        void
+        aug_result
         run()
         {
-            if (!daemon_) {
+            if (daemon_) {
+
+                // Only set reopen timer when running as daemon.
+
+                timer t(state_->timers_);
+                t.set(60000, timercb<reopencb_>, null);
+                state_->engine_.run(false); // Continue on error.
+
+            } else
                 state_->engine_.run(true);  // Stop on error.
-                return;
-            }
 
-            // Only set reopen timer when running as daemon.
-
-            timer t(state_->timers_);
-            t.set(60000, timercb<reopencb_>, null);
-            state_->engine_.run(false); // Continue on error.
+            return AUG_SUCCESS;
         }
 
         void

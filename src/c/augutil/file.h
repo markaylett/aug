@@ -12,10 +12,15 @@
 
 #include "augutil/config.h"
 
-typedef int (*aug_confcb_t)(void*, const char*, const char*);
+#include "augtypes.h"
+
+typedef aug_result (*aug_confcb_t)(void*, const char*, const char*);
 
 /**
  * Read configuration file.
+ *
+ * A negative callback result (an exception) will cause aug_readconf() to exit
+ * with the same result.
  *
  * @param path Path to configuration file.
  *
@@ -24,7 +29,7 @@ typedef int (*aug_confcb_t)(void*, const char*, const char*);
  * @param arg User specfied argument.
  */
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_readconf(const char* path, aug_confcb_t cb, void* arg);
 
 #endif /* AUGUTIL_FILE_H */

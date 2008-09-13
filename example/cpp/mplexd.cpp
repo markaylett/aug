@@ -30,7 +30,7 @@ namespace test {
     cstring logfile_ = "mplexd.log";
     cstring address_ = "0.0.0.0:44308";
 
-    void
+    aug_result
     confcb(void* arg, const char* name, const char* value)
     {
         if (0 == aug_strcasecmp(name, "address")) {
@@ -64,6 +64,8 @@ namespace test {
             s += name;
             throw runtime_error("option not supported");
         }
+
+        return AUG_SUCCESS;
     }
 
     bool daemon_(false);
@@ -341,22 +343,24 @@ namespace test {
             return 0;
         }
 
-        void
+        aug_result
         readconf(const char* conffile, bool batch, bool daemon)
         {
             test::readconf(conffile, batch, daemon);
+            return AUG_SUCCESS;
         }
 
-        void
+        aug_result
         init()
         {
             aug_ctxinfo(aug_tlx, "initialising daemon process");
 
             setsrvlogger("aug");
             state_.reset(new state());
+            return AUG_SUCCESS;
         }
 
-        void
+        aug_result
         run()
         {
             timeval tv;
@@ -388,6 +392,8 @@ namespace test {
 
                 processchans(state_->chans_);
             }
+
+            return AUG_SUCCESS;
         }
 
         void

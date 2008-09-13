@@ -29,34 +29,31 @@ namespace aug {
                 } AUG_SETERRINFOCATCH;
                 return 0;
             }
-            static int
+            static aug_result
             readconf(void* arg, const char* conffile, int batch,
                      int daemon) AUG_NOTHROW
             {
                 try {
-                    T::readconf(arg, conffile, batch ? true : false,
-                                daemon ? true : false);
-                    return 0;
+                    return T::readconf(arg, conffile, batch ? true : false,
+                                       daemon ? true : false);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             init(void* arg) AUG_NOTHROW
             {
                 try {
-                    T::init(arg);
-                    return 0;
+                    return T::init(arg);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             run(void* arg) AUG_NOTHROW
             {
                 try {
-                    T::run(arg);
-                    return 0;
+                    return T::run(arg);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
             static void
             term(void* arg) AUG_NOTHROW
@@ -91,35 +88,32 @@ namespace aug {
                 } AUG_SETERRINFOCATCH;
                 return 0;
             }
-            static int
+            static aug_result
             readconf(void* arg, const char* conffile, int batch,
                      int daemon) AUG_NOTHROW
             {
                 try {
-                    static_cast<T*>(arg)
+                    return static_cast<T*>(arg)
                         ->readconf(conffile, batch ? true : false,
                                    daemon ? true : false);
-                    return 0;
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             init(void* arg) AUG_NOTHROW
             {
                 try {
-                    static_cast<T*>(arg)->init();
-                    return 0;
+                    return static_cast<T*>(arg)->init();
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             run(void* arg) AUG_NOTHROW
             {
                 try {
-                    static_cast<T*>(arg)->run();
-                    return 0;
+                    return static_cast<T*>(arg)->run();
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
             static void
             term(void* arg) AUG_NOTHROW

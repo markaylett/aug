@@ -3,22 +3,22 @@
 */
 #include <signal.h>
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_setsighandler(void (*handler)(int))
 {
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_blocksignals(void)
 {
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_unblocksignals(void)
 {
-    return 0;
+    return AUG_SUCCESS;
 }

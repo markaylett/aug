@@ -14,56 +14,53 @@
 
 namespace aug {
 
-    template <void (*T)(void*, const char*, const char*)>
-    int
+    template <aug_result (*T)(void*, const char*, const char*)>
+    aug_result
     confcb(void* arg, const char* name, const char* value) AUG_NOTHROW
     {
         try {
-            T(arg, name, value);
-            return 0;
+            return T(arg, name, value);
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return AUG_FAILERROR;
     }
 
-    template <typename T, void (T::*U)(const char*, const char*)>
-    int
+    template <typename T, aug_result (T::*U)(const char*, const char*)>
+    aug_result
     confmemcb(void* arg, const char* name, const char* value) AUG_NOTHROW
     {
         try {
-            (static_cast<T*>(arg)->*U)(name, value);
-            return 0;
+            return (static_cast<T*>(arg)->*U)(name, value);
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return AUG_FAILERROR;
     }
 
     template <typename T>
-    int
+    aug_result
     confmemcb(void* arg, const char* name, const char* value) AUG_NOTHROW
     {
         try {
-            static_cast<T*>(arg)->confcb(name, value);
-            return 0;
+            return static_cast<T*>(arg)->confcb(name, value);
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return AUG_FAILERROR;
     }
 
-    inline void
+    inline aug_result
     readconf(const char* path, aug_confcb_t cb, void* arg)
     {
-        verify(aug_readconf(path, cb, arg));
+        return verify(aug_readconf(path, cb, arg));
     }
 
-    inline void
+    inline aug_result
     readconf(const char* path, aug_confcb_t cb, const null_&)
     {
-        verify(aug_readconf(path, cb, 0));
+        return verify(aug_readconf(path, cb, 0));
     }
 
     template <typename T>
-    void
+    aug_result
     readconf(const char* path, T& x)
     {
-        verify(aug_readconf(path, confmemcb<T>, &x));
+        return verify(aug_readconf(path, confmemcb<T>, &x));
     }
 }
 

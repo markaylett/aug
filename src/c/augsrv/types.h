@@ -4,6 +4,8 @@
 #ifndef AUGSRV_TYPES_H
 #define AUGSRV_TYPES_H
 
+#include "augtypes.h"
+
 enum aug_option {
 
     /**
@@ -36,9 +38,9 @@ enum aug_option {
 
 struct aug_service {
     const char* (*getopt_)(void*, enum aug_option);
-    int (*readconf_)(void*, const char*, int, int);
-    int (*init_)(void*);
-    int (*run_)(void*);
+    aug_result (*readconf_)(void*, const char*, int, int);
+    aug_result (*init_)(void*);
+    aug_result (*run_)(void*);
     void (*term_)(void*);
 };
 

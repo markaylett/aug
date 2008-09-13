@@ -24,7 +24,7 @@ namespace test {
     char pidfile_[AUG_PATH_MAX + 1] = "timerd.pid";
     char logfile_[AUG_PATH_MAX + 1] = "timerd.log";
 
-    void
+    aug_result
     confcb(void* arg, const char* name, const char* value)
     {
         if (0 == aug_strcasecmp(name, "loglevel")) {
@@ -52,6 +52,8 @@ namespace test {
 
             throw runtime_error("option not supported");
         }
+
+        return AUG_SUCCESS;
     }
 
     class service {
@@ -150,7 +152,7 @@ namespace test {
             return 0;
         }
 
-        void
+        aug_result
         readconf(const char* conffile, bool batch, bool daemon)
         {
             if (conffile) {
@@ -167,9 +169,10 @@ namespace test {
                 realpath(rundir_, getcwd().c_str(), sizeof(rundir_));
 
             reconf();
+            return AUG_SUCCESS;
         }
 
-        void
+        aug_result
         init()
         {
             aug_ctxinfo(aug_tlx, "initialising daemon process");
@@ -179,9 +182,10 @@ namespace test {
             auto_ptr<state> ptr(new state());
             setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRD);
             state_ = ptr;
+            return AUG_SUCCESS;
         }
 
-        void
+        aug_result
         run()
         {
             timeval tv;
@@ -210,6 +214,7 @@ namespace test {
 
                 readevent();
             }
+            return AUG_SUCCESS;
         }
 
         void

@@ -32,20 +32,20 @@ getopt_(void* arg, enum aug_option opt)
     return NULL;
 }
 
-static int
+static aug_result
 config_(void* arg, const char* conffile, int batch, int daemon)
 {
     if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
-        return -1;
+        return AUG_FAILERROR;
 
     daemon_ = daemon;
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 init_(void* arg)
 {
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static int
@@ -54,18 +54,18 @@ run_(void* arg)
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
     if (!aug_writeevent(aug_eventwr(), &in))
-        return -1;
+        return AUG_FAILERROR;
 
     if (!aug_readevent(aug_eventrd(), &out))
-        return -1;
+        return AUG_FAILERROR;
 
     if (in.type_ != out.type_) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
                        AUG_MSG("unexpected event type from aug_readevent()"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static void

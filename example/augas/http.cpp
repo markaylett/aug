@@ -53,10 +53,11 @@ namespace {
             css_.clear();
     }
 
-    void
+    aug_result
     confcb_(void* arg, const char* name, const char* value)
     {
         mimetypes_[name] = value;
+        return AUG_SUCCESS;
     }
 
     void

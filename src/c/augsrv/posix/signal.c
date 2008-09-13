@@ -32,10 +32,10 @@ sethandler_(struct sigaction* sa, void (*handler)(int))
 #else /* __CYGWIN__ */
     /* sa_handler is not defined when using -std=c99.  Cygwin bug? */
     *(void (**)(int))sa = handler;
-#endif
+#endif /* __CYGWIN__ */
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_setsighandler(void (*handler)(int))
 {
     int i;
@@ -46,15 +46,13 @@ aug_setsighandler(void (*handler)(int))
 
     for (i = 0; i < sizeof(handlers_) / sizeof(handlers_[0]); ++i) {
         sethandler_(&sa, handlers_[i].dfl_ ? SIG_DFL : handler);
-        if (-1 == sigaction(handlers_[i].sig_, &sa, NULL)) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
-        }
+        if (-1 == sigaction(handlers_[i].sig_, &sa, NULL))
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_blocksignals(void)
 {
     sigset_t set;
@@ -69,34 +67,28 @@ aug_blocksignals(void)
     sigdelset(&set, SIGBUS);
 
 #if ENABLE_THREADS
-    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+
 #else /* !ENABLE_THREADS */
-    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 #endif /* !ENABLE_THREADS */
-    return 0;
+
+    return AUG_SUCCESS;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_unblocksignals(void)
 {
     sigset_t set;
     sigemptyset(&set);
 #if ENABLE_THREADS
-    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 #else /* !ENABLE_THREADS */
-    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == sigprocmask(SIG_SETMASK, &set, NULL))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 #endif /* !ENABLE_THREADS */
-    return 0;
+    return AUG_SUCCESS;
 }
