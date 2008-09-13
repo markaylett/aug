@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = basetest$(EXEEXT) chantest$(EXEEXT) \
+check_PROGRAMS = chantest$(EXEEXT) \
 	mcasttest$(EXEEXT) muxertest$(EXEEXT) sockaddrtest$(EXEEXT) \
 	sockettest$(EXEEXT) timetest$(EXEEXT) utilitytest$(EXEEXT)
 subdir = src/c/augsys
@@ -66,9 +66,6 @@ am_libaugsys_la_OBJECTS = barrier.lo chan.lo config.lo debug.lo \
 	socket.lo stream.lo time.lo types.lo uio.lo unistd.lo \
 	utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
-basetest_SOURCES = basetest.c
-basetest_OBJECTS = basetest.$(OBJEXT)
-basetest_LDADD = $(LDADD)
 am_chantest_OBJECTS = chantest.$(OBJEXT)
 chantest_OBJECTS = $(am_chantest_OBJECTS)
 chantest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
@@ -100,11 +97,11 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugsys_la_SOURCES) basetest.c $(chantest_SOURCES) \
+SOURCES = $(libaugsys_la_SOURCES) $(chantest_SOURCES) \
 	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
 	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
 	$(timetest_SOURCES) $(utilitytest_SOURCES)
-DIST_SOURCES = $(libaugsys_la_SOURCES) basetest.c $(chantest_SOURCES) \
+DIST_SOURCES = $(libaugsys_la_SOURCES) $(chantest_SOURCES) \
 	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
 	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
 	$(timetest_SOURCES) $(utilitytest_SOURCES)
@@ -303,7 +300,6 @@ libaugsys_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 TESTS = \
-	basetest \
 	chantest \
 	mcasttest \
 	muxertest \
@@ -409,9 +405,6 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
-	@rm -f basetest$(EXEEXT)
-	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
 chantest$(EXEEXT): $(chantest_OBJECTS) $(chantest_DEPENDENCIES) 
 	@rm -f chantest$(EXEEXT)
 	$(LINK) $(chantest_LDFLAGS) $(chantest_OBJECTS) $(chantest_LDADD) $(LIBS)
@@ -441,7 +434,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/barrier.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/basetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chantest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@

@@ -486,7 +486,8 @@ namespace aug {
                 && -1 == aug_syncmar(mar_.get()))
                 ret = -1;
 
-            return -1 == aug_releasemar(mar_.get()) ? -1 : ret;
+            aug_releasemar(mar_.get());
+            return ret;
         }
         bool
         is_open() const

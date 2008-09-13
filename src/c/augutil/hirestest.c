@@ -49,10 +49,6 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_destroyhires(hires)) {
-        aug_perrinfo(aug_tlx, "aug_destroyhires() failed", NULL);
-        return 1;
-    }
-
+    aug_destroyhires(hires);
     return 0;
 }

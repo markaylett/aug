@@ -104,15 +104,8 @@ main(int argc, char* argv[])
     if (-1 == testdecode_(decoder, "cGVhcnM=", "pears"))
         goto fail2;
 
-    if (-1 == aug_destroybase64(decoder)) {
-        aug_perrinfo(aug_tlx, "aug_destroybase64() failed", NULL);
-        goto fail1;
-    }
-
-    if (-1 == aug_destroybase64(encoder)) {
-        aug_perrinfo(aug_tlx, "aug_destroybase64() failed", NULL);
-        return 1;
-    }
+    aug_destroybase64(decoder);
+    aug_destroybase64(encoder);
     return 0;
 
  fail2:

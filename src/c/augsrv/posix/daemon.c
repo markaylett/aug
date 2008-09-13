@@ -154,10 +154,10 @@ lockfile_(const char* path)
 
     if (-1 == flock_(&fl, fd, F_SETLK, F_WRLCK)) {
 
-        if (!aug_iserrinfo(aug_tlerr, "posix", EAGAIN))
+        if (EWOULDBLOCK == aug_geterrno(aug_tlerr))
             goto fail;
 
-        /* EAGAIN indicates that another process has locked the file. */
+        /* EWOULDBLOCK indicates that another process has locked the file. */
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
                        AUG_MSG("pidfile still in use: %s"), path);

@@ -86,10 +86,7 @@ main(int argc, char* argv[])
         goto fail;
     }
 
-    if (-1 == aug_destroyhttpparser(parser)) {
-        aug_perrinfo(aug_tlx, "aug_destroyhttpparser() failed", NULL);
-        return 1;
-    }
+    aug_destroyhttpparser(parser);
     return 0;
 
  fail:

@@ -56,7 +56,6 @@ libaugsys_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 check_PROGRAMS = \
-	basetest \
 	chantest \
 	mcasttest \
 	muxertest \
@@ -66,7 +65,6 @@ check_PROGRAMS = \
 	utilitytest
 
 TESTS = \
-	basetest \
 	chantest \
 	mcasttest \
 	muxertest \
