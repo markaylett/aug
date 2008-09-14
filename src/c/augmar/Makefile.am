@@ -8,7 +8,6 @@ modinclude_HEADERS = \
 
 noinst_HEADERS = \
 	body_.h \
-	file_.h \
 	flags_.h \
 	format_.h \
 	header_.h \
@@ -23,7 +22,6 @@ libaugmar_la_SOURCES = \
 	mar.c \
 	types.c \
 	body_.c \
-	file_.c \
 	flags_.c \
 	format_.c \
 	header_.c \
