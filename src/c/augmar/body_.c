@@ -47,7 +47,7 @@ aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
         return -1;
 
     memcpy(addr, data, size);
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUG_EXTERNC int
@@ -62,16 +62,16 @@ aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
 {
     char* addr = resize_(seq, info, offset + len, 0);
     if (!addr)
-        return -1;
+        return AUG_FAILERROR;
 
     memcpy(addr + offset, buf, len);
     return (int)len;
 }
 
 AUG_EXTERNC const void*
-aug_content_(aug_seq_t seq, const struct aug_info_* info)
+aug_getcontent_(aug_seq_t seq, const struct aug_info_* info)
 {
-    if (-1 == aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_))
+    if (aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_) < 0)
         return NULL;
 
     return aug_seqaddr_(seq);
@@ -88,14 +88,14 @@ aug_read_(aug_seq_t seq, const struct aug_info_* info, unsigned offset,
        end of file. */
 
     if (0 == len || bsize <= offset)
-        return 0;
+        return AUG_SUCCESS;
 
     bsize -= offset;
     if (bsize < len)
         len = bsize;
 
-    if (!(addr = aug_content_(seq, info)))
-        return -1;
+    if (!(addr = aug_getcontent_(seq, info)))
+        return AUG_FAILERROR;
 
     memcpy(buf, addr + offset, len);
     return (int)len;

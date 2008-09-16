@@ -125,15 +125,18 @@ createsrvlog_(aug_mpool* mpool, const char* sname, aug_log* inner)
     return &impl->log_;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_setsrvlogger(const char* sname)
 {
     aug_mpool* mpool = aug_getmpool(aug_tlx);
     aug_log* inner = aug_getlog(aug_tlx);
     aug_log* outer = createsrvlog_(mpool, sname, inner);
+    if (!outer)
+        return AUG_FAILERROR;
+
     aug_setlog(aug_tlx, outer);
     aug_release(outer);
     aug_release(inner);
     aug_release(mpool);
-    return 0;
+    return AUG_SUCCESS;
 }

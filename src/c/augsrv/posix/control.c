@@ -17,7 +17,7 @@
 #include <strings.h>        /* bzero() */
 #include <unistd.h>
 
-static int
+static aug_result
 flock_(struct flock* fl, int fd, int cmd, int type)
 {
     bzero(fl, sizeof(*fl));
@@ -27,44 +27,34 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_start = 0;
     fl->l_len = 0;
 
-    if (-1 == fcntl(fd, cmd, fl)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == fcntl(fd, cmd, fl))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 send_(int fd, pid_t pid, int event)
 {
     struct flock fl;
 
     switch (event) {
     case AUG_EVENTRECONF:
-        if (-1 == kill(pid, SIGHUP)) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
-        }
+        if (-1 == kill(pid, SIGHUP))
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         break;
     case AUG_EVENTSTATUS:
-        if (-1 == kill(pid, SIGUSR1)) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
-        }
+        if (-1 == kill(pid, SIGUSR1))
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         break;
     case AUG_EVENTSTOP:
-        if (-1 == kill(pid, SIGTERM)) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
-        }
+        if (-1 == kill(pid, SIGTERM))
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
         /* Wait for daemon process to release lock. */
 
-        if (-1 == flock_(&fl, fd, F_SETLKW, F_RDLCK)) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
-        }
+        if (-1 == flock_(&fl, fd, F_SETLKW, F_RDLCK))
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
         /* The lock has been obtained; daemon process must have stopped. */
 
@@ -75,9 +65,9 @@ send_(int fd, pid_t pid, int event)
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid control command '%d'"), (int)event);
-        return -1;
+        return AUG_FAILERROR;
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGSRV_API int

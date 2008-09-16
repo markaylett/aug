@@ -20,7 +20,7 @@ aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
            const void* buf, unsigned len);
 
 AUG_EXTERNC const void*
-aug_content_(aug_seq_t seq, const struct aug_info_* info);
+aug_getcontent_(aug_seq_t seq, const struct aug_info_* info);
 
 AUG_EXTERNC int
 aug_read_(aug_seq_t seq, const struct aug_info_* info, unsigned offset,

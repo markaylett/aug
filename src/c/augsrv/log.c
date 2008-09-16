@@ -35,36 +35,35 @@ AUG_RCSID("$Id$");
 # define STDERR_FILENO 2
 #endif /* !STDERR_FILENO */
 
-static int
+static aug_result
 redirectout_(int fd)
 {
-    int old, ret = -1;
+    int old;
+    aug_result result;
 
 #if !defined(_WIN32)
     if (EOF == fflush(NULL))
-        return -1;
+        return AUG_FAILERROR;
 #else /* _WIN32 */
     fflush(NULL);
 #endif /*_WIN32 */
 
     /* Duplicate stdout descriptor so that it can be restored on failure. */
 
-    if (-1 == (old = dup(STDOUT_FILENO))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == (old = dup(STDOUT_FILENO)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     /* Assumption: If dup2 fails for any reason, the original descriptor's
        state will remain unchanged. */
 
     if (-1 == dup2(fd, STDOUT_FILENO)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         goto done;
     }
 
     if (-1 == dup2(fd, STDERR_FILENO)) {
 
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
         /* Restore the original descriptor. */
 
@@ -75,28 +74,28 @@ redirectout_(int fd)
 
     /* Success */
 
-    ret = 0;
+    result = AUG_SUCCESS;
 
  done:
     if (-1 == close(old))
         aug_ctxerror(aug_tlx, "close() failed");
-    return ret;
+
+    return result;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_openlog(const char* path)
 {
-    int fd, ret = 0;
+    int fd;
+    aug_result result;
 
-    if (-1 == (fd = open(path, O_APPEND | O_CREAT | O_WRONLY, 0640))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == (fd = open(path, O_APPEND | O_CREAT | O_WRONLY, 0640)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    if (-1 == redirectout_(fd))
-        ret = -1;
+    result = redirectout_(fd);
 
     if (-1 == close(fd))
         aug_ctxerror(aug_tlx, "close() failed");
-    return ret;
+
+    return result;
 }

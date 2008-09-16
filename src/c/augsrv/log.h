@@ -6,10 +6,12 @@
 
 #include "augsrv/config.h"
 
-AUGSRV_API int
+#include "augtypes.h"
+
+AUGSRV_API aug_result
 aug_openlog(const char* path);
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_setsrvlogger(const char* sname);
 
 #endif /* AUGSRV_LOG_H */

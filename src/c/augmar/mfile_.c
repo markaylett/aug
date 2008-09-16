@@ -58,11 +58,11 @@ reserve_(unsigned size)
     return pages * pagesize;
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_closemfile_(aug_mfile_t mfile)
 {
     aug_mpool* mpool = mfile->mpool_;
-    int ret = 0;
+    aug_result result;
     assert(mfile);
 
     if (mfile->mmap_) {
@@ -71,17 +71,20 @@ aug_closemfile_(aug_mfile_t mfile)
 
         if (mfile->resvd_ > mfile->size_) {
 
-            if (aug_ftruncate(mfile->fd_, (off_t)mfile->size_) < 0)
-                ret = -1;
+            if ((result = aug_ftruncate(mfile->fd_,
+                                        (off_t)mfile->size_)) < 0) {
+                aug_fclose(mfile->fd_);
+                goto last;
+            }
         }
     }
 
-    if (aug_fclose(mfile->fd_) < 0)
-        ret = -1;
+    result = aug_fclose(mfile->fd_);
 
+ last:
     aug_freemem(mpool, mfile);
     aug_release(mpool);
-    return ret;
+    return result;
 }
 
 AUG_EXTERNC aug_mfile_t
@@ -101,7 +104,7 @@ aug_openmfile_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
     if (AUG_BADFD == (fd = aug_fopen(path, flags & ~AUG_APPEND, mode)))
         return NULL;
 
-    if (-1 == aug_fsize(fd, &size))
+    if (aug_fsize(fd, &size) < 0)
         return NULL;
 
     if (!(mfile = aug_allocmem(mpool, sizeof(struct aug_mfile_) + tail)))
@@ -145,7 +148,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
         }
 
         resvd = reserve_(size);
-        if (-1 == aug_ftruncate(mfile->fd_, resvd - mfile->size_))
+        if (aug_ftruncate(mfile->fd_, resvd - mfile->size_) < 0)
             return NULL;
 
         mfile->resvd_ = resvd;
@@ -153,7 +156,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 
     if (mfile->mmap_) {
 
-        if (-1 == aug_remmap(mfile->mmap_, 0, size)) {
+        if (aug_remmap(mfile->mmap_, 0, size) < 0) {
 
             aug_destroymmap(mfile->mmap_);
             mfile->mmap_ = NULL;
@@ -174,7 +177,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
     return mfile->mmap_->addr_;
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_syncmfile_(aug_mfile_t mfile)
 {
     assert(mfile);
@@ -184,7 +187,7 @@ aug_syncmfile_(aug_mfile_t mfile)
     return aug_fsync(mfile->fd_);
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_truncatemfile_(aug_mfile_t mfile, unsigned size)
 {
     assert(mfile);
@@ -192,10 +195,10 @@ aug_truncatemfile_(aug_mfile_t mfile, unsigned size)
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPERM,
                        AUG_MSG("file is not writable"));
-        return -1;
+        return AUG_FAILERROR;
     }
     mfile->size_ = size;
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUG_EXTERNC void*

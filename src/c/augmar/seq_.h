@@ -9,12 +9,14 @@
 
 #include "augext/mpool.h"
 
+#include "augtypes.h"
+
 typedef struct aug_seq_* aug_seq_t;
 
 AUG_EXTERNC void
 aug_destroyseq_(aug_seq_t seq);
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_copyseq_(aug_seq_t dst, aug_seq_t src);
 
 AUG_EXTERNC aug_seq_t
@@ -27,10 +29,10 @@ aug_openseq_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
 AUG_EXTERNC void*
 aug_resizeseq_(aug_seq_t seq, unsigned size);
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_setregion_(aug_seq_t seq, unsigned offset, unsigned len);
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_syncseq_(aug_seq_t seq);
 
 AUG_EXTERNC void*

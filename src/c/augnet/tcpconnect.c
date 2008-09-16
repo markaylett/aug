@@ -181,13 +181,13 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
         /* Failed for other reason. */
 
         if (-1 == aug_sclose(sd)) /* Ignore this one. */
-            return -1;
+            return AUG_BADSD;
 
     } while ((conn->res_ = conn->res_->ai_next));
 
     /* Error set from last aug_connect() attempt. */
 
-    return -1;
+    return AUG_BADSD;
 
  done:
 

@@ -16,6 +16,7 @@ AUG_RCSID("$Id$");
 
 # include "augctx/base.h"
 # include "augctx/errinfo.h"
+# include "augctx/errno.h"
 
 # include "augext/log.h"
 # include "augext/stream.h"
@@ -210,13 +211,13 @@ shutwr_(struct impl_* impl)
     return AUG_SUCCESS;
 }
 
-static int
+static ssize_t
 sslread_(SSL* ssl, struct buf_* x)
 {
     /* Read bytes into buffer at write pointer. */
 
     const char* end = x->buf_ + sizeof(x->buf_);
-    int n = (int)(end - x->wr_);
+    ssize_t n = (ssize_t)(end - x->wr_);
     if (n) {
         AUG_CTXDEBUG3(aug_tlx, "SSL: ssl read to input buffer");
         n = SSL_read(ssl, x->wr_, n);
@@ -232,12 +233,12 @@ sslread_(SSL* ssl, struct buf_* x)
     return n;
 }
 
-static int
+static ssize_t
 sslwrite_(SSL* ssl, struct buf_* x)
 {
     /* Write bytes from buffer at read pointer. */
 
-    int n = (int)(x->wr_ - x->rd_);
+    ssize_t n = (ssize_t)(x->wr_ - x->rd_);
     if (n) {
         AUG_CTXDEBUG3(aug_tlx, "SSL: ssl write from output buffer");
         n = SSL_write(ssl, x->rd_, n);
@@ -328,7 +329,7 @@ updateevents_(struct impl_* impl)
 static void
 readwrite_(struct impl_* impl, int rw)
 {
-    int ret;
+    size_t ret;
 
     if (rw & SSLREAD_) {
 
@@ -338,7 +339,8 @@ readwrite_(struct impl_* impl, int rw)
         ret = sslread_(impl->ssl_, &impl->inbuf_);
         switch (SSL_get_error(impl->ssl_, ret)) {
         case SSL_ERROR_NONE:
-            AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes read to input buffer", ret);
+            AUG_CTXDEBUG3(aug_tlx, "SSL: %ld bytes read to input buffer",
+                          (long)ret);
             if ((ret = SSL_pending(impl->ssl_))) {
                 AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes pending for immediate"
                               " read", ret);
@@ -652,19 +654,18 @@ sread_(aug_stream* ob, void* buf, size_t size)
     ssize_t ret;
 
     if (SSLERR == impl->state_)
-        return -1;
+        return AUG_FAILERROR;
 
     /* Only return end once all data has been read from buffer. */
 
     if (RDZERO == impl->state_ && bufempty_(&impl->inbuf_))
-        return 0;
+        return AUG_SUCCESS;
 
-    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+    /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
-    if (bufempty_(&impl->inbuf_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
-        return -1;
-    }
+    if (bufempty_(&impl->inbuf_))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+                                   EWOULDBLOCK);
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: user read from input buffer: id=[%u]",
                   impl->id_);
@@ -681,19 +682,18 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
     ssize_t ret;
 
     if (SSLERR == impl->state_)
-        return -1;
+        return AUG_FAILERROR;
 
     /* Only return end once all data has been read from buffer. */
 
     if (RDZERO == impl->state_ && bufempty_(&impl->inbuf_))
         return 0;
 
-    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+    /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
-    if (bufempty_(&impl->inbuf_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
-        return -1;
-    }
+    if (bufempty_(&impl->inbuf_))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+                                   EWOULDBLOCK);
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: user readv from input buffer: id=[%u]",
                   impl->id_);
@@ -709,21 +709,19 @@ swrite_(aug_stream* ob, const void* buf, size_t size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     ssize_t ret;
 
-    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+    /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
-    if (buffull_(&impl->outbuf_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
-        return -1;
-    }
+    if (buffull_(&impl->outbuf_))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+                                   EWOULDBLOCK);
 
-    if (impl->shutdown_) {
+    if (impl->shutdown_)
 #if !defined(_WIN32)
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
 #else /* _WIN32 */
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAESHUTDOWN);
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   WSAESHUTDOWN);
 #endif /* _WIN32 */
-        return -1;
-    }
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: user write to output buffer: id=[%u]",
                   impl->id_);
@@ -739,21 +737,19 @@ swritev_(aug_stream* ob, const struct iovec* iov, int size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     ssize_t ret;
 
-    /* Fail with EAGAIN is non-blocking operation would have blocked. */
+    /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
-    if (buffull_(&impl->outbuf_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAGAIN);
-        return -1;
-    }
+    if (buffull_(&impl->outbuf_))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+                                   EWOULDBLOCK);
 
-    if (impl->shutdown_) {
+    if (impl->shutdown_)
 #if !defined(_WIN32)
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
 #else /* _WIN32 */
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAESHUTDOWN);
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   WSAESHUTDOWN);
 #endif /* _WIN32 */
-        return -1;
-    }
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: user writev to output buffer: id=[%u]",
                   impl->id_);

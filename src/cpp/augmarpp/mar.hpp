@@ -128,9 +128,7 @@ namespace aug {
     inline unsigned
     getfields(marref ref)
     {
-        unsigned size;
-        verify(aug_getfields(ref.get(), &size));
-        return size;
+        return aug_getfields(ref.get());
     }
     inline bool
     toname(marref ref, const char*& s, unsigned ord)
@@ -185,14 +183,14 @@ namespace aug {
         verify(aug_extractmar(ref.get(), path));
     }
     inline const void*
-    content(marref ref, unsigned& size)
+    getcontent(marref ref, unsigned& size)
     {
-        return verify(aug_content(ref.get(), &size));
+        return verify(aug_getcontent(ref.get(), &size));
     }
     inline const void*
-    content(marref ref)
+    getcontent(marref ref)
     {
-        return verify(aug_content(ref.get(), 0));
+        return verify(aug_getcontent(ref.get(), 0));
     }
     inline unsigned
     readmar(marref ref, void* buf, unsigned size)
@@ -200,9 +198,9 @@ namespace aug {
         return verify(aug_readmar(ref.get(), buf, size));
     }
     inline unsigned
-    contentsize(marref ref)
+    getcontentsize(marref ref)
     {
-        return aug_contentsize(ref.get());
+        return aug_getcontentsize(ref.get());
     }
 }
 

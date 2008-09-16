@@ -55,13 +55,14 @@ init_(aug_seq_t seq, struct aug_info_* info)
 {
     static const aug_verno_t VERNO = 2U;
     unsigned size = aug_seqsize_(seq);
+    aug_result result;
 
     /* An existing archive will be at least as big as the minimum size. */
 
     if (AUG_LEADER_SIZE <= size) {
 
-        if (-1 == aug_info_(seq, info))
-            return -1;
+        if ((result = aug_info_(seq, info)) < 0)
+            return result;
 
         /* Verify version number embedded within header. */
 
@@ -70,16 +71,16 @@ init_(aug_seq_t seq, struct aug_info_* info)
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                            AUG_MSG("invalid version number '%d'"),
                            (int)info->verno_);
-            return -1;
+            return AUG_FAILERROR;
         }
     } else {
 
         char* ptr;
-        if (-1 == aug_setregion_(seq, 0, size))
-            return -1;
+        if ((result = aug_setregion_(seq, 0, size)) < 0)
+            return result;
 
         if (!(ptr = aug_resizeseq_(seq, AUG_LEADER_SIZE)))
-            return -1;
+            return AUG_FAILERROR;
 
         aug_encodeverno(ptr + AUG_VERNO_OFFSET,
                         (aug_verno_t)(info->verno_ = VERNO));
@@ -91,31 +92,32 @@ init_(aug_seq_t seq, struct aug_info_* info)
                         (aug_bsize_t)(info->bsize_ = 0));
     }
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_copymar(aug_mar_t dst, aug_mar_t src)
 {
+    aug_result result;
+
     if (!WRITABLE_(dst)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid destination archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
     if (!READABLE_(src)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid source archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
-    if (-1 == aug_copyseq_(dst->seq_, src->seq_))
-        return -1;
+    if (0 <= (result = aug_copyseq_(dst->seq_, src->seq_)))
+        memcpy(&dst->info_, &src->info_, sizeof(dst->info_));
 
-    memcpy(&dst->info_, &src->info_, sizeof(dst->info_));
-    return 0;
+    return result;
 }
 
 AUGMAR_API aug_mar_t
@@ -128,7 +130,7 @@ aug_createmar(aug_mpool* mpool)
     if (!(seq = aug_createseq_(mpool, sizeof(struct aug_mar_))))
         return NULL;
 
-    if (-1 == init_(seq, &info))
+    if (init_(seq, &info) < 0)
         goto fail;
 
     mar = (aug_mar_t)aug_seqtail_(seq);
@@ -167,7 +169,7 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
                              sizeof(struct aug_mar_))))
         return NULL;
 
-    if (-1 == init_(seq, &info))
+    if (init_(seq, &info) < 0)
         goto fail;
 
     mar = (aug_mar_t)aug_seqtail_(seq);
@@ -180,7 +182,7 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
     if (flags & AUG_TRUNC) {
 
         assert(AUG_TRUNC == (flags & AUG_TRUNC));
-        if (-1 == aug_truncatemar(mar, 0))
+        if (aug_truncatemar(mar, 0) < 0)
             goto fail;
     }
     return mar;
@@ -198,12 +200,15 @@ aug_releasemar(aug_mar_t mar)
 
     if (WRITABLE_(mar)) {
 
+        /* TODO: warn about corruption if either of these two operations
+           fail. */
+
         struct aug_info_ local;
-        if (-1 == aug_info_(mar->seq_, &local))
+        if (aug_info_(mar->seq_, &local) < 0)
             goto done;
 
         if (0 != memcmp(&local, &mar->info_, sizeof(local))
-            && -1 == aug_setinfo_(mar->seq_, &mar->info_))
+            && aug_setinfo_(mar->seq_, &mar->info_) < 0)
             goto done;
     }
 
@@ -217,74 +222,74 @@ aug_retainmar(aug_mar_t mar)
     ++mar->refs_;
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_compactmar(aug_mar_t mar)
 {
     if (!WRITABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
-    return 0; /* Not implemented. */
+    return AUG_SUCCESS; /* Not implemented. */
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_removefields(aug_mar_t mar)
 {
     if (!WRITABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
     return aug_removefields_(mar->seq_, &mar->info_);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord)
 {
     if (!WRITABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
     return aug_setfield_(mar->seq_, &mar->info_, field, ord);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size)
 {
     if (!WRITABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
     return aug_setvalue_(mar->seq_, &mar->info_, ord, value, size);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord)
 {
     if (!WRITABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
     return aug_unsetbyname_(mar->seq_, &mar->info_, name, ord);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_unsetbyord(aug_mar_t mar, unsigned ord)
 {
     if (!WRITABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
     return aug_unsetbyord_(mar->seq_, &mar->info_, ord);
 }
@@ -313,56 +318,49 @@ aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size)
     return aug_valuebyord_(mar->seq_, &mar->info_, ord, size);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord)
 {
     if (!READABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
     return aug_getfield_(mar->seq_, &mar->info_, field, ord);
 }
 
-AUGMAR_API int
-aug_getfields(aug_mar_t mar, unsigned* size)
+AUGMAR_API unsigned
+aug_getfields(aug_mar_t mar)
 {
-    if (!size) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
-                       AUG_MSG("null size pointer"));
-        return -1;
-    }
-    *size = mar->info_.fields_;
-    return 0;
+    return mar->info_.fields_;
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord)
 {
     if (!READABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
     return aug_ordtoname_(mar->seq_, &mar->info_, name, ord);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name)
 {
     if (!READABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
     return aug_nametoord_(mar->seq_, &mar->info_, ord, name);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_insertmar(aug_mar_t mar, const char* path)
 {
     aug_mpool* mpool;
@@ -375,21 +373,24 @@ aug_insertmar(aug_mar_t mar, const char* path)
     aug_release(mpool);
 
     if (!mfile)
-        return -1;
+        return AUG_FAILERROR;
 
     if (0 != (size = aug_mfileresvd_(mfile))) {
 
-        if (!(addr = aug_mapmfile_(mfile, size)))
-            goto fail;
+        aug_result result;
 
-        if (-1 == aug_setcontent(mar, addr, size))
-            goto fail;
+        if (!(addr = aug_mapmfile_(mfile, size))) {
+            aug_closemfile_(mfile);
+            return AUG_FAILERROR;
+        }
+
+        if ((result = aug_setcontent(mar, addr, size)) < 0) {
+            aug_closemfile_(mfile);
+            return result;
+        }
     }
-    return aug_closemfile_(mfile);
 
- fail:
-    aug_closemfile_(mfile);
-    return -1;
+    return aug_closemfile_(mfile);
 }
 
 AUGMAR_API off_t
@@ -410,45 +411,48 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
     default:
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid whence value '%d'"), (int)whence);
-        return -1;
+        return AUG_FAILERROR;
     }
+
     if (local < 0) {
+
+        /* Assertion? */
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ERANGE,
                        AUG_MSG("negative file position '%d'"), (int)local);
-        return -1;
+        return AUG_FAILERROR;
     }
 
     mar->offset_ = local;
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_setcontent(aug_mar_t mar, const void* cdata, unsigned size)
 {
     if (!WRITABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
     return aug_setcontent_(mar->seq_, &mar->info_, cdata, size);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_syncmar(aug_mar_t mar)
 {
     return aug_syncseq_(mar->seq_);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_truncatemar(aug_mar_t mar, unsigned size)
 {
     if (!WRITABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
     /* In keeping with the semantics of ftruncate, this function does not
@@ -460,30 +464,31 @@ aug_truncatemar(aug_mar_t mar, unsigned size)
 AUGMAR_API int
 aug_writemar(aug_mar_t mar, const void* buf, unsigned len)
 {
-    int ret;
+    int result;
 
     if (!WRITABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
     if (mar->flags_ & AUG_APPEND) {
+
         assert(AUG_APPEND == (mar->flags_ & AUG_APPEND));
-        if (-1 == aug_seekmar(mar, 0, AUG_END))
-            return -1;
+
+        if ((result = aug_seekmar(mar, 0, AUG_END)) < 0)
+            return result;
     }
 
-    if (-1 == (ret = aug_write_(mar->seq_, &mar->info_, mar->offset_, buf,
-                                len)))
-        return -1;
+    if (0 <= (result = aug_write_(mar->seq_, &mar->info_, mar->offset_, buf,
+                                  len)))
+        mar->offset_ += result;
 
-    mar->offset_ += ret;
-    return ret;
+    return result;
 }
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_extractmar(aug_mar_t mar, const char* path)
 {
     aug_mpool* mpool;
@@ -492,8 +497,8 @@ aug_extractmar(aug_mar_t mar, const char* path)
     const void* src;
     unsigned size;
 
-    if (!(src = aug_content(mar, &size)))
-        return -1;
+    if (!(src = aug_getcontent(mar, &size)))
+        return AUG_FAILERROR;
 
     mpool = aug_seqmpool_(mar->seq_);
     mfile = aug_openmfile_(mpool, path, AUG_WRONLY | AUG_CREAT | AUG_TRUNC,
@@ -501,7 +506,7 @@ aug_extractmar(aug_mar_t mar, const char* path)
     aug_release(mpool);
 
     if (!mfile)
-        return -1;
+        return AUG_FAILERROR;
 
     if (size) {
 
@@ -515,11 +520,11 @@ aug_extractmar(aug_mar_t mar, const char* path)
 
  fail:
     aug_closemfile_(mfile);
-    return -1;
+    return AUG_FAILERROR;
 }
 
 AUGMAR_API const void*
-aug_content(aug_mar_t mar, unsigned* size)
+aug_getcontent(aug_mar_t mar, unsigned* size)
 {
     if (!READABLE_(mar)) {
 
@@ -529,31 +534,30 @@ aug_content(aug_mar_t mar, unsigned* size)
     }
 
     *size = mar->info_.bsize_;
-    return aug_content_(mar->seq_, &mar->info_);
+    return aug_getcontent_(mar->seq_, &mar->info_);
 }
 
 AUGMAR_API int
 aug_readmar(aug_mar_t mar, void* buf, unsigned len)
 {
-    int ret;
+    int result;
 
     if (!READABLE_(mar)) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid archive handle"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
-    if (-1 == (ret = aug_read_(mar->seq_, &mar->info_, mar->offset_, buf,
-                               len)))
-        return -1;
+    if (0 <= (result = aug_read_(mar->seq_, &mar->info_, mar->offset_, buf,
+                                 len)))
+        mar->offset_ += result;
 
-    mar->offset_ += ret;
-    return ret;
+    return result;
 }
 
 AUGMAR_API unsigned
-aug_contentsize(aug_mar_t mar)
+aug_getcontentsize(aug_mar_t mar)
 {
     return mar->info_.bsize_;
 }

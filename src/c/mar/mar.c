@@ -62,10 +62,8 @@ fileset_(aug_mar_t mar, const char* filename)
 
     } else {
 
-        if (!(stream = fopen(filename, "r"))) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
-        }
+        if (!(stream = fopen(filename, "r")))
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
         if (-1 == aug_streamset_(mar, stream))
             goto fail;
@@ -90,7 +88,7 @@ extract_(aug_mar_t mar, const char* filename)
         const void* body;
         unsigned size;
 
-        if (!(body = aug_content(mar, &size)))
+        if (!(body = aug_getcontent(mar, &size)))
             return -1;
 
         if (size != fwrite(body, 1, size, stdout)) {
@@ -177,8 +175,8 @@ names_(aug_mar_t mar)
 static int
 size_(aug_mar_t mar)
 {
-    unsigned size = aug_contentsize(mar);
-    printf("%u\n", (int)size);
+    unsigned size = aug_getcontentsize(mar);
+    printf("%u\n", size);
     return 0;
 }
 

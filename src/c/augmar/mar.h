@@ -15,6 +15,8 @@
 
 #include "augext/mpool.h"
 
+#include "augtypes.h"
+
 /**
  * Copy an existing message archive.
  *
@@ -22,13 +24,12 @@
  *
  * @param src A handle to the source message archive.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  *
  * @see aug_retainmar().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_copymar(aug_mar_t dst, aug_mar_t src);
 
 /**
@@ -96,13 +97,12 @@ aug_retainmar(aug_mar_t mar);
  *
  * @param mar A handle to the message archive.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  *
  * @see aug_truncatemar().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_compactmar(aug_mar_t mar);
 
 /**
@@ -110,13 +110,12 @@ aug_compactmar(aug_mar_t mar);
  *
  * @param mar A handle to the message archive.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  *
  * @see aug_unsetbyname() and aug_unsetbyord().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_removefields(aug_mar_t mar);
 
 /**
@@ -130,13 +129,12 @@ aug_removefields(aug_mar_t mar);
  * @param ord An optional output parameter, in which, the ordinal position of
  * the field will be set.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  *
  * @see aug_setvalue().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord);
 
 /**
@@ -150,13 +148,12 @@ aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord);
  *
  * @param size The size of the field value to be assigned.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  *
  * @see aug_setfield().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size);
 
 /**
@@ -169,13 +166,12 @@ aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size);
  * @param ord An optional output parameter, in which, the ordinal position of
  * the field is set.
  *
- * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_removefields(), aug_unsetbyord() and aug_ordtoname().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord);
 
 /**
@@ -185,13 +181,12 @@ aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord);
  *
  * @param ord The ordinal position of the field.
  *
- * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_removefields(), aug_unsetbyname() and aug_nametoord().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_unsetbyord(aug_mar_t mar, unsigned ord);
 
 /**
@@ -241,13 +236,12 @@ aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size);
  *
  * @param ord The zero-based ordinal position of the field.
  *
- * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_valuebyname(), aug_valuebyord() and aug_getfields().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord);
 
 /**
@@ -255,17 +249,13 @@ aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord);
  *
  * @param mar A handle to the message archive.
  *
- * @param size The output parameter, in which, the number of fields will be
- * returned.
- *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  *
  * @see aug_getfield().
  */
 
-AUGMAR_API int
-aug_getfields(aug_mar_t mar, unsigned* size);
+AUGMAR_API unsigned
+aug_getfields(aug_mar_t mar);
 
 /**
  * Obtain field name from ordinal position in message archive.
@@ -276,13 +266,12 @@ aug_getfields(aug_mar_t mar, unsigned* size);
  *
  * @param ord The zero-based ordinal position of the name to be returned.
  *
- * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_unsetbyname(), aug_valuebyname() and aug_nametoord().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord);
 
 /**
@@ -295,13 +284,12 @@ aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord);
  *
  * @param name The name of the field.
  *
- * @return Zero on success, #AUG_FAILNONE if there is no matching field, or -1
- * on failure, in which case errno can be used to determine the error.
+ * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_unsetbyord(), aug_valuebyord() and aug_ordtoname().
 */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name);
 
 /**
@@ -311,13 +299,12 @@ aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name);
  *
  * @param path A path to the file from which the content is read.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  *
  * @see aug_setcontent() and aug_writemar().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_insertmar(aug_mar_t mar, const char* path);
 
 /**
@@ -329,9 +316,8 @@ aug_insertmar(aug_mar_t mar, const char* path);
  *
  * @param whence The @ref SeekWhence directive.
  *
- * @return The resulting offset location in bytes from the beginning of the
- * content, or -1 on failure, in which case errno can be used to determine the
- * error.
+ * @return See @ref TypesResult.  If positive, the resulting location offset,
+ * in bytes, from the beginning of content.
  *
  * @see aug_readmar() and aug_writemar().
  */
@@ -348,13 +334,12 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence);
  *
  * @param size The size of the content to be copied.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  *
  * @see aug_insertmar() and aug_writemar().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_setcontent(aug_mar_t mar, const void* cdata, unsigned size);
 
 /**
@@ -362,11 +347,10 @@ aug_setcontent(aug_mar_t mar, const void* cdata, unsigned size);
  *
  * @param mar A handle to the message archive.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_syncmar(aug_mar_t mar);
 
 /**
@@ -376,11 +360,10 @@ aug_syncmar(aug_mar_t mar);
  *
  * @param size The size to which the content will be truncated.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_truncatemar(aug_mar_t mar, unsigned size);
 
 /**
@@ -392,8 +375,8 @@ aug_truncatemar(aug_mar_t mar, unsigned size);
  *
  * @param len The number of bytes to be written.
  *
- * @return The number of bytes actually written or -1 on failure, in which
- * case errno can be used to determine the error.
+ * @return See @ref TypesResult.  If positive, the number of bytes actually
+ * written.
  *
  * @see aug_insertmar(), aug_seekmar() and aug_setcontent().
  */
@@ -408,13 +391,12 @@ aug_writemar(aug_mar_t mar, const void* buf, unsigned len);
  *
  * @param path A path to the file into which the content will be written.
  *
- * @return Zero on success or -1 on failure, in which case errno can be used
- * to determine the error.
+ * @return See @ref TypesResult.
  *
- * @see aug_readmar() and aug_content().
+ * @see aug_readmar() and aug_getcontent().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_result
 aug_extractmar(aug_mar_t mar, const char* path);
 
 /**
@@ -428,11 +410,11 @@ aug_extractmar(aug_mar_t mar, const char* path);
  * @return A pointer to the content or null on failure, in which case errno
  * can be used to determine the error.
  *
- * @see aug_readmar(), aug_extractmar() and aug_contentsize().
+ * @see aug_readmar(), aug_extractmar() and aug_getcontentsize().
  */
 
 AUGMAR_API const void*
-aug_content(aug_mar_t mar, unsigned* size);
+aug_getcontent(aug_mar_t mar, unsigned* size);
 
 /**
  * Read content from message archive.
@@ -443,11 +425,10 @@ aug_content(aug_mar_t mar, unsigned* size);
  *
  * @param len The number of bytes to be read.
  *
- * @return The number of bytes actually read, or zero to signal end-of-file.
- * -1 is returned on failure, in which case errno can be used to determine the
- * error.
+ * @return See @ref TypesResult.  If positive, the number of bytes actually
+ * read; zero if end-of-file.
  *
- * @see aug_seekmar(), aug_extractmar() and aug_content().
+ * @see aug_seekmar(), aug_extractmar() and aug_getcontent().
  */
 
 AUGMAR_API int
@@ -460,10 +441,10 @@ aug_readmar(aug_mar_t mar, void* buf, unsigned len);
  *
  * @return Content size.
  *
- * @see aug_content().
+ * @see aug_getcontent().
  */
 
 AUGMAR_API unsigned
-aug_contentsize(aug_mar_t mar);
+aug_getcontentsize(aug_mar_t mar);
 
 #endif /* AUGMAR_MAR_H */
