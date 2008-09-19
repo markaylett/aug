@@ -117,7 +117,7 @@ aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len)
     return dst;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setreuseaddr(aug_sd sd, int on)
 {
     return aug_setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
@@ -213,12 +213,12 @@ aug_inetloopback(int af)
     return addr;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_bool
 aug_acceptlost(struct aug_errinfo* errinfo)
 {
     /* FIXME: would be better if aug_tlerr were used. */
 
-    switch (aug_geterrno(errinfo)) {
+    switch (aug_errno(errinfo)) {
     case ECONNABORTED:
 #if defined(EPROTO)
     case EPROTO:
@@ -230,21 +230,21 @@ aug_acceptlost(struct aug_errinfo* errinfo)
     return AUG_FALSE;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                    aug_sd sd)
 {
     int err = 0;
     socklen_t len = sizeof(err);
 
-    if (aug_getsockopt(sd, SOL_SOCKET, SO_ERROR, &err, &len) < 0) {
+    if (AUG_ISFAIL(aug_getsockopt(sd, SOL_SOCKET, SO_ERROR, &err, &len))) {
 
         /* Maintain semantics with existing errinfo functions. */
 
         const struct aug_errinfo* src = aug_tlerr;
         aug_seterrinfo(errinfo, src->file_, src->line_, src->src_, src->num_,
                        src->desc_);
-        return src->num_;
+        return AUG_FAILERROR;
     }
 
     return aug_setposixerrinfo(errinfo, file, line, err);

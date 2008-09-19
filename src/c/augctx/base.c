@@ -42,7 +42,7 @@ inittls_(void)
         /* TLS key must be initialised on first call. */
 
         aug_result result = aug_createtlskey_(&tlskey_);
-        if (result < 0)
+        if (AUG_ISFAIL(result))
             return result;
 
         init_ = AUG_TRUE;
@@ -117,7 +117,7 @@ AUGCTX_API aug_result
 aug_init(void)
 {
     aug_result result = aug_initlock_();
-    if (0 <= result) {
+    if (!AUG_ISFAIL(result)) {
         aug_lock();
         result = inittls_();
         aug_unlock();
@@ -183,12 +183,12 @@ AUGCTX_API aug_result
 aug_initbasictlx(void)
 {
     aug_result result = aug_init();
-    if (result < 0)
+    if (AUG_ISFAIL(result))
         goto done;
 
     if (!aug_tlx) {
         result = aug_setbasictlx();
-        if (result < 0) {
+        if (AUG_ISFAIL(result)) {
             aug_term();
             goto done;
         }
@@ -201,7 +201,7 @@ AUGCTX_API aug_result
 aug_autobasictlx(void)
 {
     aug_result result = aug_initbasictlx();
-    if (0 <= result)
+    if (!AUG_ISFAIL(result))
         atexit(aug_term);
     return result;
 }

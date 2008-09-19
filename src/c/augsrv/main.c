@@ -37,84 +37,55 @@ die_(const char* s)
 static void
 foreground_(void)
 {
-    int ret;
-    if (-1 == aug_initservice())
+    aug_result result;
+    if (AUG_ISFAIL(aug_initservice()))
         die_("aug_initservice() failed");
 
-    ret = aug_runservice();
+    result = aug_runservice();
     aug_termservice();
-    if (-1 == ret)
+    if (AUG_ISFAIL(result))
         die_("aug_runservice() failed");
 }
 
 static void
 daemonise_(void)
 {
-    switch (aug_daemonise()) {
-    case -1:
-        die_("aug_daemonise() failed");
-    case 0:
-        break;
-    case AUG_FAILNONE:
+    aug_result result = aug_daemonise();
+
+    if (AUG_ISNONE(result))
         foreground_();
-        break;
-    default:
-        assert(0);
-    }
+    else if (AUG_ISFAIL(result))
+        die_("aug_daemonise() failed");
 }
 
 #if defined(_WIN32)
 static void
 start_(void)
 {
-    switch (aug_start()) {
-    case -1:
+    if (AUG_ISFAIL(aug_start()))
         die_("aug_start() failed");
-    case 0:
-        break;
-    default:
-        assert(0);
-    }
 }
 #endif /* _WIN32 */
 
 static void
 control_(int sigtype)
 {
-    switch (aug_control(sigtype)) {
-    case -1:
+    if (AUG_ISFAIL(aug_control(sigtype)))
         die_("aug_control() failed");
-    case 0:
-        break;
-    default:
-        assert(0);
-    }
 }
 
 static void
 install_(void)
 {
-    switch (aug_install()) {
-    case -1:
+    if (AUG_ISFAIL(aug_install()))
         die_("aug_install() failed");
-    case 0:
-        break;
-    default:
-        assert(0);
-    }
 }
 
 static void
 uninstall_(void)
 {
-    switch (aug_uninstall()) {
-    case -1:
+    if (AUG_ISFAIL(aug_uninstall()))
         die_("aug_uninstall() failed");
-    case 0:
-        break;
-    default:
-        assert(0);
-    }
 }
 
 AUGSRV_API int
@@ -139,15 +110,17 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
 
         aug_setlog(aug_tlx, aug_getdaemonlog());
         daemonise_();
-        return 0;
+        return EXIT_SUCCESS;
     }
 #endif /* _WIN32 */
 
-    if (-1 == aug_readopts(&options, argc, argv))
-        return 1;
+    if (AUG_ISFAIL(aug_readopts(&options, argc, argv))) {
+        aug_perrinfo(aug_tlx, "getreadopts() failed", NULL);
+        return EXIT_FAILURE;
+    }
 
     if (AUG_CMDEXIT == options.command_)
-        return 0;
+        return EXIT_SUCCESS;
 
 #if !defined(_WIN32)
     if (AUG_CMDSTART == options.command_) {
@@ -159,9 +132,9 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
     }
 #endif /* !_WIN32 */
 
-    if (-1 == aug_readserviceconf(*options.conffile_
-                                  ? options.conffile_ : NULL,
-                                  options.batch_, daemon))
+    if (AUG_ISFAIL(aug_readserviceconf(*options.conffile_
+                                       ? options.conffile_ : NULL,
+                                       options.batch_, daemon)))
         die_("aug_readserviceconf() failed");
 
     switch (options.command_) {
@@ -201,5 +174,5 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
         uninstall_();
         break;
     }
-    return 0;
+    return EXIT_SUCCESS;
 }

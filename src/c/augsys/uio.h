@@ -7,6 +7,8 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
+#include "augtypes.h"
+
 #if !defined(_WIN32)
 # include <sys/uio.h>
 #else /* _WIN32 */
@@ -16,10 +18,10 @@ struct iovec {
 };
 #endif /* _WIN32 */
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_freadv(aug_fd fd, const struct iovec* iov, int size);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_fwritev(aug_fd fd, const struct iovec* iov, int size);
 
 #endif /* AUGSYS_UIO_H */

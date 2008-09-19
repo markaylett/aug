@@ -77,7 +77,7 @@ aug_fpipe(aug_fd fds[2])
     return AUG_SUCCESS;
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_fread(aug_fd fd, void* buf, size_t size)
 {
     ssize_t ret;
@@ -88,7 +88,7 @@ aug_fread(aug_fd fd, void* buf, size_t size)
     return ret;
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_fwrite(aug_fd fd, const void* buf, size_t size)
 {
     ssize_t ret;

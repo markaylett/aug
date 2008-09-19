@@ -15,6 +15,8 @@
 
 #include "augext/mpool.h"
 
+#include "augtypes.h"
+
 #define AUG_MMAPRD 0x01
 #define AUG_MMAPWR 0x02
 
@@ -30,10 +32,10 @@ AUGSYS_API struct aug_mmap*
 aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
                int flags);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_remmap(struct aug_mmap* mm, size_t offset, size_t len);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_syncmmap(const struct aug_mmap* mm);
 
 AUGSYS_API size_t

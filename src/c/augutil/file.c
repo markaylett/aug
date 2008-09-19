@@ -85,7 +85,7 @@ aug_readconf(const char* path, aug_confcb_t cb, void* arg)
 
         value += strspn(value, SPACE_);
 
-        if ((result = (*cb)(arg, name, value)) < 0)
+        if (AUG_ISFAIL(result = (*cb)(arg, name, value)))
             break;
     }
 

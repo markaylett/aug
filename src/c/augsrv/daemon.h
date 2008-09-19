@@ -6,13 +6,15 @@
 
 #include "augsrv/config.h"
 
+#include "augtypes.h"
+
 /**
  * Called from aug_main().
  *
  * @return On Windows, #AUG_FAILNONE if the service has not been installed.
  */
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_daemonise(void);
 
 #endif /* AUGSRV_DAEMON_H */

@@ -71,10 +71,7 @@ reserve_(aug_xstr_t xstr, size_t size)
     /* Grow string. */
 
 	min = xstr->size_ * 2;
-	if (resize_(xstr, AUG_MAX(min, size)) < 0)
-		return AUG_FAILERROR;
-
-	return AUG_SUCCESS;
+	return resize_(xstr, AUG_MAX(min, size));
 }
 
 /* This helper function allows the src and destination to be the same string.
@@ -84,11 +81,13 @@ reserve_(aug_xstr_t xstr, size_t size)
 static aug_result
 xstrcat_(aug_xstr_t xstr, const aug_xstr_t src, size_t len)
 {
+    aug_result result;
+
 	if (!len)
 		return AUG_SUCCESS;
 
-	if (reserve_(xstr, xstr->len_ + len) < 0)
-		return AUG_FAILERROR;
+	if (AUG_ISFAIL(result = reserve_(xstr, xstr->len_ + len)))
+		return result;
 
     /* Allow copy from overlapping region. */
 
@@ -147,11 +146,13 @@ aug_clearxstr(aug_xstr_t xstr)
 AUGUTIL_API aug_result
 aug_xstrcatsn(aug_xstr_t xstr, const char* src, size_t len)
 {
+    aug_result result;
+
 	if (!len)
 		return AUG_SUCCESS;
 
-	if (reserve_(xstr, xstr->len_ + len) < 0)
-		return AUG_FAILERROR;
+	if (AUG_ISFAIL(result = reserve_(xstr, xstr->len_ + len)))
+		return result;
 
     /* Allow copy from overlapping region. */
 
@@ -175,8 +176,10 @@ aug_xstrcat(aug_xstr_t xstr, const aug_xstr_t src)
 AUGUTIL_API aug_result
 aug_xstrcpysn(aug_xstr_t xstr, const char* src, size_t len)
 {
-	if (aug_clearxstr(xstr) < 0)
-		return AUG_FAILERROR;
+    aug_result result = aug_clearxstr(xstr);
+
+	if (AUG_ISFAIL(result))
+		return result;
 
 	return aug_xstrcatsn(xstr, src, len);
 }
@@ -193,9 +196,10 @@ aug_xstrcpy(aug_xstr_t xstr, const aug_xstr_t src)
     /* Preserve length prior to resetting. */
 
     size_t len = src->len_;
+    aug_result result = aug_clearxstr(xstr);
 
-	if (aug_clearxstr(xstr) < 0)
-		return AUG_FAILERROR;
+	if (AUG_ISFAIL(result))
+		return result;
 
 	return xstrcat_(xstr, src, len);
 }
@@ -203,8 +207,10 @@ aug_xstrcpy(aug_xstr_t xstr, const aug_xstr_t src)
 AUGUTIL_API aug_result
 aug_xstrcatcn(aug_xstr_t xstr, char ch, size_t num)
 {
-	if (reserve_(xstr, xstr->len_ + num) < 0)
-		return AUG_FAILERROR;
+    aug_result result = reserve_(xstr, xstr->len_ + num);
+
+	if (AUG_ISFAIL(result))
+		return result;
 
 	if (1 == num)
         xstr->ptr_[xstr->len_] = ch;
@@ -224,8 +230,10 @@ aug_xstrcatc(aug_xstr_t xstr, char ch)
 AUGUTIL_API aug_result
 aug_xstrcpycn(aug_xstr_t xstr, char ch, size_t num)
 {
-	if (aug_clearxstr(xstr) < 0)
-		return AUG_FAILERROR;
+    aug_result result = aug_clearxstr(xstr);
+
+	if (AUG_ISFAIL(result))
+		return result;
 
 	return aug_xstrcatcn(xstr, ch, num);
 }
@@ -236,18 +244,19 @@ aug_xstrcpyc(aug_xstr_t xstr, char ch)
 	return aug_xstrcpycn(xstr, ch, 1);
 }
 
-AUGUTIL_API ssize_t
+AUGUTIL_API aug_rsize
 aug_xstrread(aug_xstr_t xstr, aug_stream* src, size_t size)
 {
-    ssize_t ret;
-	if (reserve_(xstr, xstr->len_ + size) < 0)
-		return AUG_FAILERROR;
+    aug_rsize rsize = reserve_(xstr, xstr->len_ + size);
 
-    if ((ret = aug_read(src, xstr->ptr_ + xstr->len_, size)) < 0)
-        return AUG_FAILERROR;
+	if (AUG_ISFAIL(rsize))
+		return rsize;
 
-	xstr->len_ += ret;
-	return ret;
+    if (AUG_ISFAIL(rsize = aug_read(src, xstr->ptr_ + xstr->len_, size)))
+        return rsize;
+
+	xstr->len_ += AUG_RESULT(rsize);
+	return rsize;
 }
 
 AUGUTIL_API size_t

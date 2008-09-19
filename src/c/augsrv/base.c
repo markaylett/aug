@@ -45,11 +45,11 @@ static void
 closepipe_(void)
 {
     if (AUG_BADMD != mds_[0])
-        if (AUG_FAILERROR == aug_mclose(mds_[0]))
+        if (AUG_ISFAIL(aug_mclose(mds_[0])))
             aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
 
     if (AUG_BADMD != mds_[1])
-        if (AUG_FAILERROR == aug_mclose(mds_[1]))
+        if (AUG_ISFAIL(aug_mclose(mds_[1])))
             aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
 
     mds_[0] = AUG_BADMD;
@@ -86,13 +86,13 @@ openpipe_(void)
 
     assert(AUG_BADMD == mds_[0] && AUG_BADMD == mds_[1]);
 
-    if ((result = aug_muxerpipe(mds)) < 0)
+    if (AUG_ISFAIL(result = aug_muxerpipe(mds)))
         return result;
 
     mds_[0] = mds[0];
     mds_[1] = mds[1];
 
-    if ((result = aug_setsighandler(sighandler_)) < 0) {
+    if (AUG_ISFAIL(result = aug_setsighandler(sighandler_))) {
         closepipe_();
         return result;
     }
@@ -130,7 +130,7 @@ aug_initservice(void)
     aug_result result;
     assert(service_.init_);
 
-    if ((result = openpipe_()) < 0)
+    if (AUG_ISFAIL(result = openpipe_()))
         return result;
 
     /* Flush pending writes to main memory: when init_() is called, the
@@ -138,7 +138,7 @@ aug_initservice(void)
 
     AUG_WMB();
 
-    if ((result = service_.init_(arg_)) < 0) {
+    if (AUG_ISFAIL(result = service_.init_(arg_))) {
         closepipe_();
         return result;
     }

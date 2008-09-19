@@ -116,22 +116,20 @@ aug_destroymuxer(aug_muxer_t muxer)
     aug_release(mpool);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
-    if (FD_SETSIZE == muxer->out_.rd_.fd_count) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEMFILE);
-        return -1;
-    }
+    if (FD_SETSIZE == muxer->out_.rd_.fd_count)
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEMFILE);
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid mdevent mask"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
     muxer->bits_ += setmdevents_(&muxer->in_, md, mask);
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API void
@@ -140,52 +138,56 @@ aug_setmdevents(aug_muxer_t muxer, int delta)
     muxer->ready_ += delta;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
     int ret, ready = muxer->ready_;
     muxer->ready_ = 0;
 
     if (0 < ready) {
+
         /* Recurse. */
-        ret = aug_waitmdevents(muxer, &NOWAIT_);
-        if (0 <= ret)
-            ret += ready; /* At least one. */
-        return ret;
+
+        aug_result rint = aug_waitmdevents(muxer, &NOWAIT_);
+        if (AUG_ISFAIL(rint))
+            return rint;
+
+        /* At least one. */
+
+        return AUG_MKRESULT(AUG_RESULT(rint) + ready);
     }
 
     muxer->out_ = muxer->in_;
 
     if (0 == muxer->bits_) {
         Sleep(timeout ? aug_tvtoms(timeout) : INFINITE);
-        return 0;
+        return AUG_SUCCESS;
     }
 
     /* Note: WinSock ignores the nfds argument. */
 
     if (SOCKET_ERROR ==
         (ret = select(-1, &muxer->out_.rd_, &muxer->out_.wr_,
-                      &muxer->out_.ex_, timeout))) {
+                      &muxer->out_.ex_, timeout)))
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   WSAGetLastError());
 
-        ret = aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
-                                  WSAGetLastError());
-    }
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
-AUGSYS_API int
+AUGSYS_API unsigned short
 aug_getmdeventmask(aug_muxer_t muxer, aug_md md)
 {
     return external_(&muxer->in_, md);
 }
 
-AUGSYS_API int
+AUGSYS_API unsigned short
 aug_getmdevents(aug_muxer_t muxer, aug_md md)
 {
     return external_(&muxer->out_, md);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_muxerpipe(aug_md mds[2])
 {
     return aug_socketpair(AF_UNIX, SOCK_STREAM, 0, mds);

@@ -104,7 +104,7 @@ aug_listen(aug_sd sd, int backlog)
     return 0;
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_recv(aug_sd sd, void* buf, size_t len, int flags)
 {
     ssize_t ret;
@@ -114,7 +114,7 @@ aug_recv(aug_sd sd, void* buf, size_t len, int flags)
     return ret;
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
              struct aug_endpoint* ep)
 {
@@ -126,7 +126,7 @@ aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
     return ret;
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_send(aug_sd sd, const void* buf, size_t len, int flags)
 {
     ssize_t ret;
@@ -136,7 +136,7 @@ aug_send(aug_sd sd, const void* buf, size_t len, int flags)
     return ret;
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
            const struct aug_endpoint* ep)
 {
@@ -147,25 +147,25 @@ aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
     return ret;
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_sread(aug_sd sd, void* buf, size_t len)
 {
     return aug_fread(sd, buf, len);
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_sreadv(aug_sd sd, const struct iovec* iov, int size)
 {
     return aug_freadv(sd, iov, size);
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_swrite(aug_sd sd, const void* buf, size_t len)
 {
     return aug_fwrite(sd, buf, len);
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_swritev(aug_sd sd, const struct iovec* iov, int size)
 {
     return aug_fwritev(sd, iov, size);
@@ -216,15 +216,13 @@ aug_setsockopt(aug_sd sd, int level, int optname, const void* optval,
     return 0;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_sshutdown(aug_sd sd, int how)
 {
-    if (-1 == shutdown(sd, how)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == shutdown(sd, how))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API int

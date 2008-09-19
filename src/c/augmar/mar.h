@@ -322,7 +322,7 @@ aug_insertmar(aug_mar_t mar, const char* path);
  * @see aug_readmar() and aug_writemar().
  */
 
-AUGMAR_API off_t
+AUGMAR_API aug_rsize
 aug_seekmar(aug_mar_t mar, off_t offset, int whence);
 
 /**
@@ -381,7 +381,7 @@ aug_truncatemar(aug_mar_t mar, unsigned size);
  * @see aug_insertmar(), aug_seekmar() and aug_setcontent().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_rsize
 aug_writemar(aug_mar_t mar, const void* buf, unsigned len);
 
 /**
@@ -431,7 +431,7 @@ aug_getcontent(aug_mar_t mar, unsigned* size);
  * @see aug_seekmar(), aug_extractmar() and aug_getcontent().
  */
 
-AUGMAR_API int
+AUGMAR_API aug_rsize
 aug_readmar(aug_mar_t mar, void* buf, unsigned len);
 
 /**

@@ -92,7 +92,7 @@ start_(DWORD argc, char** argv)
 
     AUG_RMB();
 
-    if (aug_initbasictlx() < 0) {
+    if (AUG_ISFAIL(aug_initbasictlx())) {
         fprintf(stderr, "aug_initerrinfo() failed");
         return;
     }
@@ -120,10 +120,10 @@ start_(DWORD argc, char** argv)
         goto done;
     }
 
-    /* aug_readopts() calls aug_error(). */
-
-    if (-1 == aug_readopts(&options, argc, argv))
+    if (AUG_ISFAIL(aug_readopts(&options, argc, argv))) {
+        aug_perrinfo(aug_tlx, "getreadopts() failed", NULL);
         goto done;
+    }
 
     if (AUG_CMDDEFAULT != options.command_) {
 
@@ -135,8 +135,8 @@ start_(DWORD argc, char** argv)
         goto done;
     }
 
-    if (-1 == aug_readserviceconf(*options.conffile_
-                                  ? options.conffile_ : NULL, 0, 1)) {
+    if (AUG_ISFAIL(aug_readserviceconf(*options.conffile_
+                                       ? options.conffile_ : NULL, 0, 1))) {
         aug_perrinfo(aug_tlx, "aug_readserviceconf() failed", NULL);
         goto done;
     }
@@ -150,7 +150,7 @@ start_(DWORD argc, char** argv)
 
     setstatus_(SERVICE_START_PENDING);
 
-    if (-1 == aug_initservice()) {
+    if (AUG_ISFAIL(aug_initservice())) {
 
         aug_perrinfo(aug_tlx, "aug_initservice() failed", NULL);
         setstatus_(SERVICE_STOPPED);
@@ -160,7 +160,7 @@ start_(DWORD argc, char** argv)
     aug_ctxnotice(aug_tlx, "daemon started");
     setstatus_(SERVICE_RUNNING);
 
-    if (-1 == aug_runservice())
+    if (AUG_ISFAIL(aug_runservice()))
         aug_perrinfo(aug_tlx, "aug_runservice() failed", NULL);
 
     aug_ctxnotice(aug_tlx, "daemon stopped");
@@ -181,20 +181,20 @@ start_(DWORD argc, char** argv)
     aug_term();
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_daemonise(void)
 {
-    int ret = 0;
     const char* sname;
     SERVICE_TABLE_ENTRY table[] = {
         { NULL,  start_ },
         { NULL, NULL }
     };
+    aug_result result;
 
     if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
     table[0].lpServiceName = (char*)sname;
@@ -206,20 +206,23 @@ aug_daemonise(void)
 
     AUG_WMB();
 
-    if (!StartServiceCtrlDispatcher(table)) {
+    if (StartServiceCtrlDispatcher(table)) {
+
+        result = AUG_SUCCESS;
+
+    } else {
 
         DWORD err = GetLastError();
-        if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == err)
-            ret = AUG_FAILNONE;
-        else {
-            aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
-            ret = -1;
-        }
+        if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == err) {
+            aug_clearerrinfo(aug_tlerr);
+            result = AUG_FAILNONE;
+        } else
+            result = aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
     }
 
     /* Ensure writes performed on service thread are visible. */
 
     AUG_RMB();
     aug_termservice();
-    return ret;
+    return result;
 }

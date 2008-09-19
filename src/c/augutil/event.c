@@ -24,42 +24,44 @@ AUG_RCSID("$Id$");
 # define SIGUSR1 10
 #endif /* _WIN32 */
 
-static int
+static aug_result
 readall_(aug_md md, char* buf, size_t n)
 {
     /* Ensure all bytes are read and ignore any interrupts. */
 
     while (0 != n) {
 
-        int ret = aug_mread(md, buf, n);
-        if (-1 == ret) {
-            if (EINTR == aug_geterrno(aug_tlerr))
+        aug_result result = aug_mread(md, buf, n);
+        if (AUG_ISFAIL(result)) {
+
+            if (AUG_ISINTR(result))
                 continue;
 
-            return -1;
+            return result;
         }
-        buf += ret, n -= ret;
+        buf += AUG_RESULT(result), n -= AUG_RESULT(result);
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 writeall_(aug_md md, const char* buf, size_t n)
 {
     /* Ensure all bytes are written and ignore any interrupts. */
 
     while (0 != n) {
 
-        int ret = aug_mwrite(md, buf, n);
-        if (-1 == ret) {
-            if (EINTR == aug_geterrno(aug_tlerr))
+        aug_result result = aug_mwrite(md, buf, n);
+        if (AUG_ISFAIL(result)) {
+
+            if (AUG_ISINTR(result))
                 continue;
 
-            return -1;
+            return result;
         }
-        buf += ret, n -= ret;
+        buf += AUG_RESULT(result), n -= AUG_RESULT(result);
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGUTIL_API struct aug_event*
@@ -88,7 +90,7 @@ aug_setsigevent(struct aug_event* event, int sig)
 AUGUTIL_API struct aug_event*
 aug_readevent(aug_md md, struct aug_event* event)
 {
-    if (-1 == readall_(md, (char*)event, sizeof(*event)))
+    if (AUG_ISFAIL(readall_(md, (char*)event, sizeof(*event))))
         return NULL;
 
     /* Ensure writes are visible: ensure that any components of the event
@@ -112,7 +114,7 @@ aug_writeevent(aug_md md, const struct aug_event* event)
     if (event->ob_)
         aug_retain(event->ob_);
 
-    if (-1 == writeall_(md, (const char*)event, sizeof(*event))) {
+    if (AUG_ISFAIL(writeall_(md, (const char*)event, sizeof(*event)))) {
         if (event->ob_)
             aug_release(event->ob_);
         return NULL;

@@ -38,10 +38,10 @@ aug_loglabel(int level);
  *
  * @param args @a format arguments.
  *
- * @return -1 on error.
+ * @return See @ref TypesResult.
  */
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_vformatlog(char* buf, size_t* n, int level, const char* format,
                va_list args);
 
@@ -49,7 +49,7 @@ aug_vformatlog(char* buf, size_t* n, int level, const char* format,
  * @see aug_vformatlog().
  */
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_formatlog(char* buf, size_t* n, int level, const char* format, ...);
 
 /**

@@ -159,7 +159,7 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
 #endif /* _WIN32 */
 
 AUGCTX_API int
-aug_geterrno(const struct aug_errinfo* errinfo)
+aug_errno(const struct aug_errinfo* errinfo)
 {
     if (0 == aug_strncasecmp(errinfo->src_, "posix", sizeof(errinfo->src_)))
         return errinfo->num_;

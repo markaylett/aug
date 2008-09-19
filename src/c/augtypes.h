@@ -24,10 +24,8 @@
 
 typedef int aug_bool;
 
-enum aug_bool_ {
-    AUG_FALSE,
-    AUG_TRUE
-};
+#define AUG_TRUE  (1 == 1)
+#define AUG_FALSE (1 != 1)
 
 /** @} */
 
@@ -60,13 +58,45 @@ typedef unsigned aug_len_t;
  * AUG_FAILBLOCK.
  */
 
-typedef int aug_result;
+struct aug_strict_ {
+    long val_;
+};
 
-#define AUG_SUCCESS     0
-#define AUG_FAILERROR (-1)
-#define AUG_FAILNONE  (-2) /* ENOENT */
-#define AUG_FAILINTR  (-3) /* EINTR, WSAEINTR */
-#define AUG_FAILBLOCK (-4) /* EWOULDBLOCK, WSAEWOULDBLOCK */
+typedef struct aug_strict_ aug_result;
+typedef struct aug_strict_ aug_rint;
+typedef struct aug_strict_ aug_rsize;
+
+static aug_result
+AUG_MKRESULT(long val)
+{
+    aug_result x;
+    x.val_ = val;
+    return x;
+}
+
+#define AUG_RESULT(x) (x).val_
+
+/*typedef int aug_result;*/
+/*typedef int aug_rint;*/
+/*typedef ssize_t aug_rsize;*/
+
+#define AUG_SUCCESS   AUG_MKRESULT( 0)
+#define AUG_FAILERROR AUG_MKRESULT(-1)
+
+/* Non-error exceptions.  aug_clearerrinfo() should be called before returning
+   athese .*/
+
+#define AUG_FAILNONE  AUG_MKRESULT(-2) /* ENOENT */
+#define AUG_FAILINTR  AUG_MKRESULT(-3) /* EINTR, WSAEINTR */
+#define AUG_FAILBLOCK AUG_MKRESULT(-4) /* EWOULDBLOCK, WSAEWOULDBLOCK */
+
+#define AUG_ISFAIL(x)    (AUG_RESULT(x) < 0)
+#define AUG_ISSUCCESS(x) (!AUG_ISFAIL(x))
+
+#define AUG_ISERROR(x)  (-1 == AUG_RESULT(x))
+#define AUG_ISNONE(x)   (-2 == AUG_RESULT(x))
+#define AUG_ISINTR(x)   (-3 == AUG_RESULT(x))
+#define AUG_ISBLOCK(x)  (-4 == AUG_RESULT(x))
 
 /** @} */
 

@@ -57,6 +57,6 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
  */
 
 AUGCTX_API int
-aug_geterrno(const struct aug_errinfo* errinfo);
+aug_errno(const struct aug_errinfo* errinfo);
 
 #endif /* AUGCTX_ERRINFO_H */

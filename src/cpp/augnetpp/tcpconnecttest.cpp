@@ -36,7 +36,7 @@ main(int argc, char* argv[])
             try {
                 sd = tryconnect(conn, ep, est);
             } catch (...) {
-                if (ECONNREFUSED == aug_geterrno(aug_tlerr))
+                if (ECONNREFUSED == aug_errno(aug_tlerr))
                     return 0;
                 throw;
             }

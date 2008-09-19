@@ -21,7 +21,7 @@ typedef struct impl_ {
     size_t size_;
 }* impl_t;
 
-static int
+static aug_result
 toprot_(int* to, int from)
 {
     int prot = 0;
@@ -38,15 +38,15 @@ toprot_(int* to, int from)
         prot = PROT_NONE;
 
     *to = prot;
-    return 0;
+    return AUG_SUCCESS;
 
  fail:
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                    AUG_MSG("invalid protection flags '%d'"), (int)from);
-    return -1;
+    return AUG_FAILERROR;
 }
 
-static int
+static aug_result
 verify_(size_t size, size_t offset, size_t len)
 {
     /* An empty file cannot be mapped, in addition, the size to be mapped
@@ -55,7 +55,7 @@ verify_(size_t size, size_t offset, size_t len)
     if (!size || size < (offset + len)) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid file map size '%d'"), (int)size);
-        return -1;
+        return AUG_FAILERROR;
     }
 
     /* The offset if specified must occur on an allocation size boundary. */
@@ -63,13 +63,13 @@ verify_(size_t size, size_t offset, size_t len)
     if (offset && (offset % aug_granularity())) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid file map offset '%d'"), (int)offset);
-        return -1;
+        return AUG_FAILERROR;
     }
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 createmmap_(impl_t impl, size_t offset, size_t len)
 {
     void* addr;
@@ -78,28 +78,25 @@ createmmap_(impl_t impl, size_t offset, size_t len)
         len = impl->size_ - offset;
 
     if (MAP_FAILED == (addr = mmap(NULL, len, impl->prot_, MAP_SHARED,
-                                   impl->fd_, (off_t)offset))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+                                   impl->fd_, (off_t)offset)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     impl->mmap_.addr_ = addr;
     impl->mmap_.len_ = len;
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 destroymmap_(impl_t impl)
 {
     if (impl->mmap_.addr_
-        && -1 == munmap(impl->mmap_.addr_, impl->mmap_.len_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
-    return 0;
+        && -1 == munmap(impl->mmap_.addr_, impl->mmap_.len_))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+
+    return AUG_SUCCESS;
 }
 
-AUG_EXTERNC void
+AUGSYS_API void
 aug_destroymmap(struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
@@ -109,7 +106,7 @@ aug_destroymmap(struct aug_mmap* mm)
     aug_release(mpool);
 }
 
-AUG_EXTERNC struct aug_mmap*
+AUGSYS_API struct aug_mmap*
 aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
                int flags)
 {
@@ -117,13 +114,13 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     int prot;
     size_t size;
 
-    if (-1 == toprot_(&prot, flags))
+    if (AUG_ISFAIL(toprot_(&prot, flags)))
         return NULL;
 
-    if (-1 == aug_fsize(fd, &size))
+    if (AUG_ISFAIL(aug_fsize(fd, &size)))
         return NULL;
 
-    if (-1 == verify_(size, offset, len))
+    if (AUG_ISFAIL(verify_(size, offset, len)))
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct impl_))))
@@ -136,7 +133,7 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     impl->prot_ = prot;
     impl->size_ = size;
 
-    if (-1 == createmmap_(impl, offset, len)) {
+    if (AUG_ISFAIL(createmmap_(impl, offset, len))) {
         aug_freemem(mpool, impl);
         return NULL;
     }
@@ -144,49 +141,47 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     return (struct aug_mmap*)impl;
 }
 
-AUG_EXTERNC int
+AUGSYS_API aug_result
 aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
 {
     impl_t impl = (impl_t)mm;
     void* addr = impl->mmap_.addr_;
+    aug_result result;
+
     impl->mmap_.addr_ = NULL;
 
-    if (addr && -1 == munmap(addr, impl->mmap_.len_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (addr && -1 == munmap(addr, impl->mmap_.len_))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     if (impl->size_ < (offset + len)) {
 
-        if (-1 == aug_fsize(impl->fd_, &impl->size_))
-            return -1;
+        if (AUG_ISFAIL(result = aug_fsize(impl->fd_, &impl->size_)))
+            return result;
     }
 
-    if (-1 == verify_(impl->size_, offset, len))
-        return -1;
+    if (AUG_ISFAIL(result = verify_(impl->size_, offset, len)))
+        return result;
 
     return createmmap_(impl, offset, len);
 }
 
-AUG_EXTERNC int
+AUGSYS_API aug_result
 aug_syncmmap(const struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
-    if (-1 == msync(impl->mmap_.addr_, impl->mmap_.len_, MS_SYNC)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
-    return 0;
+    if (-1 == msync(impl->mmap_.addr_, impl->mmap_.len_, MS_SYNC))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+    return AUG_SUCCESS;
 }
 
-AUG_EXTERNC size_t
+AUGSYS_API size_t
 aug_mmapsize(const struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
     return impl->size_;
 }
 
-AUG_EXTERNC unsigned
+AUGSYS_API unsigned
 aug_granularity(void)
 {
     /* Not documented to return an error. */
@@ -194,7 +189,7 @@ aug_granularity(void)
     return getpagesize();
 }
 
-AUG_EXTERNC unsigned
+AUGSYS_API unsigned
 aug_pagesize(void)
 {
     /* Not documented to return an error. */

@@ -23,20 +23,20 @@
 # define AUG_PACKETSIZE 512
 #endif /* !AUG_PACKETSIZE */
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr,
                const char* ifname);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmcastif(aug_sd sd, const char* ifname);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmcastloop(aug_sd sd, int on);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmcastttl(aug_sd sd, int ttl);
 
 #endif /* AUGSYS_MCAST_H */

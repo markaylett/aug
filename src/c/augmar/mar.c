@@ -50,7 +50,7 @@ torw_(int from)
     return 0;
 }
 
-static int
+static aug_result
 init_(aug_seq_t seq, struct aug_info_* info)
 {
     static const aug_verno_t VERNO = 2U;
@@ -61,7 +61,7 @@ init_(aug_seq_t seq, struct aug_info_* info)
 
     if (AUG_LEADER_SIZE <= size) {
 
-        if ((result = aug_info_(seq, info)) < 0)
+        if (AUG_ISFAIL(result = aug_info_(seq, info)))
             return result;
 
         /* Verify version number embedded within header. */
@@ -76,7 +76,7 @@ init_(aug_seq_t seq, struct aug_info_* info)
     } else {
 
         char* ptr;
-        if ((result = aug_setregion_(seq, 0, size)) < 0)
+        if (AUG_ISFAIL(result = aug_setregion_(seq, 0, size)))
             return result;
 
         if (!(ptr = aug_resizeseq_(seq, AUG_LEADER_SIZE)))
@@ -114,7 +114,7 @@ aug_copymar(aug_mar_t dst, aug_mar_t src)
         return AUG_FAILERROR;
     }
 
-    if (0 <= (result = aug_copyseq_(dst->seq_, src->seq_)))
+    if (!AUG_ISFAIL(result = aug_copyseq_(dst->seq_, src->seq_)))
         memcpy(&dst->info_, &src->info_, sizeof(dst->info_));
 
     return result;
@@ -130,7 +130,7 @@ aug_createmar(aug_mpool* mpool)
     if (!(seq = aug_createseq_(mpool, sizeof(struct aug_mar_))))
         return NULL;
 
-    if (init_(seq, &info) < 0)
+    if (AUG_ISFAIL(init_(seq, &info)))
         goto fail;
 
     mar = (aug_mar_t)aug_seqtail_(seq);
@@ -169,7 +169,7 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
                              sizeof(struct aug_mar_))))
         return NULL;
 
-    if (init_(seq, &info) < 0)
+    if (AUG_ISFAIL(init_(seq, &info)))
         goto fail;
 
     mar = (aug_mar_t)aug_seqtail_(seq);
@@ -182,7 +182,7 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
     if (flags & AUG_TRUNC) {
 
         assert(AUG_TRUNC == (flags & AUG_TRUNC));
-        if (aug_truncatemar(mar, 0) < 0)
+        if (AUG_ISFAIL(aug_truncatemar(mar, 0)))
             goto fail;
     }
     return mar;
@@ -204,11 +204,11 @@ aug_releasemar(aug_mar_t mar)
            fail. */
 
         struct aug_info_ local;
-        if (aug_info_(mar->seq_, &local) < 0)
+        if (AUG_ISFAIL(aug_info_(mar->seq_, &local)))
             goto done;
 
         if (0 != memcmp(&local, &mar->info_, sizeof(local))
-            && aug_setinfo_(mar->seq_, &mar->info_) < 0)
+            && AUG_ISFAIL(aug_setinfo_(mar->seq_, &mar->info_)))
             goto done;
     }
 
@@ -384,7 +384,7 @@ aug_insertmar(aug_mar_t mar, const char* path)
             return AUG_FAILERROR;
         }
 
-        if ((result = aug_setcontent(mar, addr, size)) < 0) {
+        if (AUG_ISFAIL(result = aug_setcontent(mar, addr, size))) {
             aug_closemfile_(mfile);
             return result;
         }
@@ -393,7 +393,7 @@ aug_insertmar(aug_mar_t mar, const char* path)
     return aug_closemfile_(mfile);
 }
 
-AUGMAR_API off_t
+AUGMAR_API aug_rsize
 aug_seekmar(aug_mar_t mar, off_t offset, int whence)
 {
     off_t local;
@@ -424,7 +424,7 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
     }
 
     mar->offset_ = local;
-    return AUG_SUCCESS;
+    return AUG_MKRESULT(local);
 }
 
 AUGMAR_API aug_result
@@ -461,10 +461,10 @@ aug_truncatemar(aug_mar_t mar, unsigned size)
     return aug_truncate_(mar->seq_, &mar->info_, size);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_rsize
 aug_writemar(aug_mar_t mar, const void* buf, unsigned len)
 {
-    int result;
+    aug_rsize rsize;
 
     if (!WRITABLE_(mar)) {
 
@@ -477,15 +477,15 @@ aug_writemar(aug_mar_t mar, const void* buf, unsigned len)
 
         assert(AUG_APPEND == (mar->flags_ & AUG_APPEND));
 
-        if ((result = aug_seekmar(mar, 0, AUG_END)) < 0)
-            return result;
+        if (AUG_ISFAIL(rsize = aug_seekmar(mar, 0, AUG_END)))
+            return rsize;
     }
 
-    if (0 <= (result = aug_write_(mar->seq_, &mar->info_, mar->offset_, buf,
-                                  len)))
-        mar->offset_ += result;
+    if (!AUG_ISFAIL(rsize = aug_write_(mar->seq_, &mar->info_, mar->offset_,
+                                       buf, len)))
+        mar->offset_ += AUG_RESULT(rsize);
 
-    return result;
+    return rsize;
 }
 
 AUGMAR_API aug_result
@@ -537,10 +537,10 @@ aug_getcontent(aug_mar_t mar, unsigned* size)
     return aug_getcontent_(mar->seq_, &mar->info_);
 }
 
-AUGMAR_API int
+AUGMAR_API aug_rsize
 aug_readmar(aug_mar_t mar, void* buf, unsigned len)
 {
-    int result;
+    aug_rsize rsize;
 
     if (!READABLE_(mar)) {
 
@@ -549,11 +549,11 @@ aug_readmar(aug_mar_t mar, void* buf, unsigned len)
         return AUG_FAILERROR;
     }
 
-    if (0 <= (result = aug_read_(mar->seq_, &mar->info_, mar->offset_, buf,
-                                 len)))
-        mar->offset_ += result;
+    if (!AUG_ISFAIL(rsize = aug_read_(mar->seq_, &mar->info_, mar->offset_,
+                                      buf, len)))
+        mar->offset_ += AUG_RESULT(rsize);
 
-    return result;
+    return rsize;
 }
 
 AUGMAR_API unsigned

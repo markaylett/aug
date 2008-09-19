@@ -53,47 +53,51 @@ usage_(void)
         aug_ctxinfo(aug_tlx, "report bugs to: %s\n", email);
 }
 
-AUGSRV_API int
-aug_tocommand(const char* s)
+static aug_rint
+tocommand_(const char* s)
 {
     if (!s)
-        return AUG_CMDDEFAULT;
+        return AUG_MKRESULT(AUG_CMDDEFAULT);
 
     switch (*s) {
     case 'i':
-        if (0 == strcmp(s + 1, "nstall"))
-            return AUG_CMDINSTALL;
+        if (0 == strcasecmp(s + 1, "nstall"))
+            return AUG_MKRESULT(AUG_CMDINSTALL);
         break;
     case 'r':
-        if (0 == strcmp(s + 1, "econf"))
-            return AUG_CMDRECONF;
+        if (0 == strcasecmp(s + 1, "econf"))
+            return AUG_MKRESULT(AUG_CMDRECONF);
         break;
     case 's':
-        if (0 == strcmp(s + 1, "tart"))
-            return AUG_CMDSTART;
+        if (0 == strcasecmp(s + 1, "tart"))
+            return AUG_MKRESULT(AUG_CMDSTART);
 
-        if (0 == strcmp(s + 1, "tatus"))
-            return AUG_CMDSTATUS;
+        if (0 == strcasecmp(s + 1, "tatus"))
+            return AUG_MKRESULT(AUG_CMDSTATUS);
 
-        if (0 == strcmp(s + 1, "top"))
-            return AUG_CMDSTOP;
+        if (0 == strcasecmp(s + 1, "top"))
+            return AUG_MKRESULT(AUG_CMDSTOP);
         break;
     case 't':
-        if (0 == strcmp(s + 1, "est"))
-            return AUG_CMDTEST;
+        if (0 == strcasecmp(s + 1, "est"))
+            return AUG_MKRESULT(AUG_CMDTEST);
     case 'u':
-        if (0 == strcmp(s + 1, "ninstall"))
-            return AUG_CMDUNINSTALL;
+        if (0 == strcasecmp(s + 1, "ninstall"))
+            return AUG_MKRESULT(AUG_CMDUNINSTALL);
         break;
     }
-    return -1;
+
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                   AUG_MSG("invalid command '%s'"), s);
+    return AUG_FAILERROR;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_readopts(struct aug_options* options, int argc, char* argv[])
 {
-    int ch, ret;
+    int ch;
     const char* conffile;
+    aug_rint rint;
     options->conffile_[0] = '\0';
     options->batch_ = 0;
 
@@ -108,25 +112,27 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         case 'f':
             if (aug_optind == argc || !(conffile = argv[aug_optind++])) {
                 usage_();
-                aug_ctxerror(aug_tlx, "missing path argument");
-                return -1;
+                aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
+                               AUG_EINVAL, AUG_MSG("missing path argument"));
+                return AUG_FAILERROR;
             }
             if (!aug_realpath(options->conffile_, conffile,
                               sizeof(options->conffile_))) {
                 usage_();
-                aug_perrinfo(aug_tlx, "aug_realpath() failed", NULL);
-                return -1;
+                return AUG_FAILERROR;
             }
             break;
         case 'h':
             options->command_ = AUG_CMDEXIT;
             usage_();
-            return 0;
+            return AUG_SUCCESS;
         case '?':
         default:
             usage_();
-            aug_ctxerror(aug_tlx, "unknown option '%c'", aug_optopt);
-            return -1;
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
+                           AUG_EINVAL, AUG_MSG("unknown option '%c'"),
+                           aug_optopt);
+            return AUG_FAILERROR;
         }
 
     switch (argc - aug_optind) {
@@ -134,19 +140,18 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         options->command_ = AUG_CMDDEFAULT;
         break;
     case 1:
-        if (-1 == (ret = aug_tocommand(argv[aug_optind]))) {
-
+        if (AUG_ISFAIL(rint = tocommand_(argv[aug_optind]))) {
             usage_();
-            aug_ctxerror(aug_tlx, "invalid command '%s'", argv[aug_optind]);
-            return -1;
+            return rint;
         }
-        options->command_ = ret;
+        options->command_ = AUG_RESULT(rint);
         break;
     default:
         usage_();
-        aug_ctxerror(aug_tlx, "too many arguments");
-        return -1;
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
+                       AUG_EINVAL, AUG_MSG("too many arguments"));
+        return AUG_FAILERROR;
     }
 
-    return 0;
+    return AUG_SUCCESS;
 }

@@ -50,7 +50,7 @@ static const char* LABELS_[] = {
     "DEBUG"
 };
 
-static int
+static aug_rsize
 localtime_(struct tm* res)
 {
     struct timeval tv;
@@ -58,16 +58,16 @@ localtime_(struct tm* res)
     aug_result result = aug_gettimeofday(clock, &tv);
     aug_release(clock);
 
-    if (result < 0)
-        return -1;
+    if (AUG_ISFAIL(result))
+        return result;
 
     if (!aug_localtime(&tv.tv_sec, res))
-        return -1;
+        return AUG_FAILERROR;
 
-    return tv.tv_usec / 1000;
+    return AUG_MKRESULT(tv.tv_usec / 1000);
 }
 
-static int
+static aug_result
 writeall_(int fd, const char* buf, size_t n)
 {
     /* Ensure all bytes are written and ignore any interrupts. */
@@ -83,12 +83,11 @@ writeall_(int fd, const char* buf, size_t n)
             if (EINTR == errno)
                 continue;
 
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         }
         buf += ret, n -= ret;
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static void*
@@ -116,9 +115,10 @@ vwritelog_(aug_log* obj, int level, const char* format, va_list args)
 {
     char buf[AUG_MAXLINE];
     size_t n = sizeof(buf);
+    aug_result result;
 
-    if (-1 == aug_vformatlog(buf, &n, level, format, args))
-        return -1;
+    if (AUG_ISFAIL(result = aug_vformatlog(buf, &n, level, format, args)))
+        return result;
 
 #if defined(_WIN32) && !defined(NDEBUG)
     aug_lock();
@@ -141,7 +141,6 @@ static const struct aug_logvtbl vtbl_ = {
 
 static aug_log daemonlog_ = { &vtbl_, NULL };
 
-
 AUGUTIL_API const char*
 aug_loglabel(int level)
 {
@@ -151,21 +150,22 @@ aug_loglabel(int level)
     return LABELS_[level];
 }
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_vformatlog(char* buf, size_t* n, int level, const char* format,
                va_list args)
 {
-    int ms, ret;
     size_t size;
     struct tm tm;
+    aug_rsize ms;
+    int ret;
 
     /* At least one character is needed for the null-terminator. */
 
     assert(buf && n && *n && format);
     size = *n;
 
-    if (-1 == (ms = localtime_(&tm)))
-        return -1;
+    if (AUG_ISFAIL(ms = localtime_(&tm)))
+        return ms;
 
     /* The return value from the strftime() function is either a) the number
        of characters copied to the buffer, excluding the null terminator, or
@@ -179,28 +179,25 @@ aug_vformatlog(char* buf, size_t* n, int level, const char* format,
     /* Null termination is _not_ guaranteed by snprintf(). */
 
 #if ENABLE_THREADS
-    ret = snprintf(buf, size, ".%03d %08x %-6s ", ms, aug_threadid(),
-                   aug_loglabel(level));
+    ret = snprintf(buf, size, ".%03d %08x %-6s ", AUG_RESULT(ms),
+                   aug_threadid(), aug_loglabel(level));
 #else /* !ENABLE_THREADS */
-    ret = snprintf(buf, size, ".%03d %-6s ", ms, aug_loglabel(level));
+    ret = snprintf(buf, size, ".%03d %-6s ", AUG_RESULT(ms),
+                   aug_loglabel(level));
 #endif /* !ENABLE_THREADS */
 
     AUG_SNTRUNCF(buf, size, ret);
 
-    if (ret < 0) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (ret < 0)
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     buf += ret, size -= ret;
 
     ret = vsnprintf(buf, size, format, args);
     AUG_SNTRUNCF(buf, size, ret);
 
-    if (ret < 0) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (ret < 0)
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
  done:
 
@@ -210,20 +207,20 @@ aug_vformatlog(char* buf, size_t* n, int level, const char* format,
     /* Set output parameter to be total number of characters copied. */
 
     *n -= size;
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_formatlog(char* buf, size_t* n, int level, const char* format, ...)
 {
-    int ret;
+    aug_result result;
     va_list args;
 
     va_start(args, format);
-    ret = aug_vformatlog(buf, n, level, format, args);
+    result = aug_vformatlog(buf, n, level, format, args);
     va_end(args);
 
-    return ret;
+    return result;
 }
 
 AUGUTIL_API aug_log*

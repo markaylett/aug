@@ -108,7 +108,7 @@ aug_socket(int domain, int type, int protocol);
 AUGSYS_API aug_sd
 aug_accept(aug_sd sd, struct aug_endpoint* ep);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_bind(aug_sd sd, const struct aug_endpoint* ep);
 
 /**
@@ -117,7 +117,7 @@ aug_bind(aug_sd sd, const struct aug_endpoint* ep);
  * completion.
  */
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_connect(aug_sd sd, const struct aug_endpoint* ep);
 
 AUGSYS_API struct aug_endpoint*
@@ -126,33 +126,33 @@ aug_getpeername(aug_sd sd, struct aug_endpoint* ep);
 AUGSYS_API struct aug_endpoint*
 aug_getsockname(aug_sd sd, struct aug_endpoint* ep);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_listen(aug_sd sd, int backlog);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_recv(aug_sd sd, void* buf, size_t len, int flags);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
              struct aug_endpoint* ep);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_send(aug_sd sd, const void* buf, size_t len, int flags);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
            const struct aug_endpoint* ep);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_sread(aug_sd sd, void* buf, size_t len);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_sreadv(aug_sd sd, const struct iovec* iov, int size);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_swrite(aug_sd sd, const void* buf, size_t len);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_swritev(aug_sd sd, const struct iovec* iov, int size);
 
 /**
@@ -161,11 +161,11 @@ aug_swritev(aug_sd sd, const struct iovec* iov, int size);
  * value.
  */
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_getsockopt(aug_sd sd, int level, int optname, void* optval,
                socklen_t* optlen);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setsockopt(aug_sd sd, int level, int optname, const void* optval,
                socklen_t optlen);
 
@@ -176,10 +176,10 @@ aug_setsockopt(aug_sd sd, int level, int optname, const void* optval,
  * all data is sent and acknowledged by the receiver.
  */
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_sshutdown(aug_sd sd, int how);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_socketpair(int domain, int type, int protocol, aug_sd sv[2]);
 
 AUGSYS_API char*
@@ -201,23 +201,26 @@ aug_destroyaddrinfo(struct addrinfo* res);
  * should be used to free this list.
  *
  * @param host Host part of the address.
+ *
  * @param serv Service or port part of the address
+ *
  * @param hints Hints about the desired socket type.
+ *
  * @param res The output address list.
  *
- * @return -1 on failure.
+ * @return See @ref TypesResult.
  */
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_getaddrinfo(const char* host, const char* serv,
                 const struct addrinfo* hints, struct addrinfo** res);
 
-AUGSYS_API int
+AUGSYS_API aug_rint
 aug_getfamily(aug_sd sd);
 
 /* FIXME: change to aug_bool. */
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setreuseaddr(aug_sd sd, int on);
 
 AUGSYS_API struct aug_endpoint*
@@ -245,7 +248,7 @@ aug_inetloopback(int af);
 AUGSYS_API aug_bool
 aug_acceptlost(struct aug_errinfo* errinfo);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                    aug_sd sd);
 

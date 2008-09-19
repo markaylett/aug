@@ -222,28 +222,28 @@ stream_shutdown_(aug_stream* ob)
     return AUG_SUCCESS;
 }
 
-static ssize_t
+static aug_rsize
 stream_read_(aug_stream* ob, void* buf, size_t size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     return aug_fread(impl->fd_, buf, size);
 }
 
-static ssize_t
+static aug_rsize
 stream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     return aug_freadv(impl->fd_, iov, size);
 }
 
-static ssize_t
+static aug_rsize
 stream_write_(aug_stream* ob, const void* buf, size_t size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     return aug_fwrite(impl->fd_, buf, size);
 }
 
-static ssize_t
+static aug_rsize
 stream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);

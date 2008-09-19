@@ -43,7 +43,7 @@ aug_createmuxer(aug_mpool* mpool);
 AUGSYS_API void
 aug_destroymuxer(aug_muxer_t muxer);
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
 
 AUGSYS_API void
@@ -63,10 +63,10 @@ aug_setmdevents(aug_muxer_t muxer, int delta);
  * #EINTR set.
  */
 
-AUGSYS_API int
+AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout);
 
-AUGSYS_API int
+AUGSYS_API unsigned short
 aug_getmdeventmask(aug_muxer_t muxer, aug_md md);
 
 /**
@@ -75,10 +75,10 @@ aug_getmdeventmask(aug_muxer_t muxer, aug_md md);
  * @param muxer The multiplexer.
  * @param md A multiplexer-managed descriptor.
  *
- * @return Events set on success, or #AUG_FAILERROR on failure.
+ * @return Events set.
  */
 
-AUGSYS_API int
+AUGSYS_API unsigned short
 aug_getmdevents(aug_muxer_t muxer, aug_md md);
 
 /**
@@ -89,7 +89,7 @@ aug_getmdevents(aug_muxer_t muxer, aug_md md);
  * @see aug_socketpair().
  */
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_muxerpipe(aug_md mds[2]);
 
 #endif /* AUGSYS_MUXER_H */

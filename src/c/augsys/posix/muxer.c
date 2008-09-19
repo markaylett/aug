@@ -193,13 +193,13 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
     return ret;
 }
 
-AUGSYS_API int
+AUGSYS_API unsigned short
 aug_getmdeventmask(aug_muxer_t muxer, aug_md md)
 {
     return external_(muxer->pollfds_[md].events);
 }
 
-AUGSYS_API int
+AUGSYS_API unsigned short
 aug_getmdevents(aug_muxer_t muxer, aug_md md)
 {
     return external_(muxer->pollfds_[md].revents);
@@ -362,13 +362,13 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
     return ret;
 }
 
-AUGSYS_API int
+AUGSYS_API unsigned short
 aug_getmdeventmask(aug_muxer_t muxer, aug_md md)
 {
     return external_(&muxer->in_, md);
 }
 
-AUGSYS_API int
+AUGSYS_API unsigned short
 aug_getmdevents(aug_muxer_t muxer, aug_md md)
 {
     return external_(&muxer->out_, md);

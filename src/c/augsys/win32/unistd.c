@@ -65,10 +65,9 @@ create_(int flags)
 AUGSYS_API aug_result
 aug_fclose(aug_fd fd)
 {
-    if (!CloseHandle(fd)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILERROR;
-    }
+    if (!CloseHandle(fd))
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   GetLastError());
     return AUG_SUCCESS;
 }
 
@@ -135,10 +134,9 @@ aug_fpipe(aug_fd fds[2])
     sa.bInheritHandle = TRUE;
     sa.lpSecurityDescriptor = NULL;
 
-    if (!CreatePipe(&rd, &wr, &sa, 0)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILERROR;
-    }
+    if (!CreatePipe(&rd, &wr, &sa, 0))
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   GetLastError());
 
     fds[0] = rd;
     fds[1] = wr;
@@ -146,72 +144,70 @@ aug_fpipe(aug_fd fds[2])
     return AUG_SUCCESS;
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_fread(aug_fd fd, void* buf, size_t size)
 {
     DWORD ret;
-    if (!ReadFile(fd, buf, (DWORD)size, &ret, NULL)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return -1;
-    }
-    return (ssize_t)ret;
+    if (!ReadFile(fd, buf, (DWORD)size, &ret, NULL))
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   GetLastError());
+
+    return AUG_MKRESULT((ssize_t)ret);
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_fwrite(aug_fd fd, const void* buf, size_t size)
 {
     DWORD ret;
-    if (!WriteFile(fd, buf, (DWORD)size, &ret, NULL)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return -1;
-    }
-    return (ssize_t)ret;
+    if (!WriteFile(fd, buf, (DWORD)size, &ret, NULL))
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   GetLastError());
+
+    return AUG_MKRESULT((ssize_t)ret);
 }
 
 AUGSYS_API aug_result
 aug_fsync(aug_fd fd)
 {
-    if (!FlushFileBuffers(fd)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILERROR;
-    }
+    if (!FlushFileBuffers(fd))
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   GetLastError());
+
     return AUG_SUCCESS;
 }
 
 AUGSYS_API aug_result
 aug_ftruncate(aug_fd fd, off_t size)
 {
-    aug_result ret;
     LARGE_INTEGER li, orig;
+    aug_result result;
 
     /* Store current position for later restoration. */
 
     li.QuadPart = 0;
-    if (!SetFilePointerEx(fd, li, &orig, FILE_CURRENT)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILERROR;
-    }
+    if (!SetFilePointerEx(fd, li, &orig, FILE_CURRENT))
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   GetLastError());
 
     /* Move pointer to required size. */
 
     li.QuadPart = (LONGLONG)size;
-    if (!SetFilePointerEx(fd, li, NULL, FILE_BEGIN)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILERROR;
-    }
+    if (!SetFilePointerEx(fd, li, NULL, FILE_BEGIN))
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   GetLastError());
 
     /* Truncate.  Note: this will not fill the gap with zeros. */
 
-    if (!SetEndOfFile(fd)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        ret = AUG_FAILERROR;
-    } else
-        ret = AUG_SUCCESS;
+    if (SetEndOfFile(fd))
+        result = AUG_SUCCESS;
+    else
+        result = aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                     GetLastError());
 
     /* Restore original position. */
 
     SetFilePointerEx(fd, orig, NULL, FILE_BEGIN);
-    return ret;
+    return result;
 }
 
 AUGSYS_API aug_result
@@ -219,10 +215,9 @@ aug_fsize(aug_fd fd, size_t* size)
 {
     LARGE_INTEGER li;
 
-    if (!GetFileSizeEx(fd, &li)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILERROR;
-    }
+    if (!GetFileSizeEx(fd, &li))
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   GetLastError());
 
     *size = (size_t)li.QuadPart;
     return AUG_SUCCESS;

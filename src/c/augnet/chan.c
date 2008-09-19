@@ -210,7 +210,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         /* De-register existing descriptor from multiplexer, and attempt to
            establish connection. */
 
-        if (aug_setmdeventmask(impl->muxer_, impl->sd_, 0) < 0
+        if (AUG_ISFAIL(aug_setmdeventmask(impl->muxer_, impl->sd_, 0))
             || AUG_BADSD == (impl->sd_ = aug_tryconnect(impl->conn_, &ep,
                                                         &impl->est_))) {
             aug_safeerror(ob, handler, impl->id_, aug_tlerr);
@@ -402,7 +402,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             goto done;
         }
 
-        if (-1 == aug_ssetnonblock(sd, AUG_TRUE)) {
+        if (AUG_ISFAIL(aug_ssetnonblock(sd, AUG_TRUE))) {
             aug_ctxwarn(aug_tlx, "aug_ssetnonblock() failed: %s",
                         aug_tlerr->desc_);
             aug_sclose(sd);
@@ -676,28 +676,28 @@ pstream_shutdown_(aug_stream* ob)
     return aug_sshutdown(impl->sd_, SHUT_WR);
 }
 
-static ssize_t
+static aug_rsize
 pstream_read_(aug_stream* ob, void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     return aug_sread(impl->sd_, buf, size);
 }
 
-static ssize_t
+static aug_rsize
 pstream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     return aug_sreadv(impl->sd_, iov, size);
 }
 
-static ssize_t
+static aug_rsize
 pstream_write_(aug_stream* ob, const void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     return aug_swrite(impl->sd_, buf, size);
 }
 
-static ssize_t
+static aug_rsize
 pstream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
@@ -746,7 +746,7 @@ aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
 
         /* Set mask to poll for connection establishment. */
 
-        if (aug_setmdeventmask(muxer, sd, AUG_MDEVENTCONN) < 0)
+        if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTCONN)))
             goto fail2;
     }
 
@@ -797,7 +797,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
 {
     struct simpl_* impl;
 
-    if (aug_setmdeventmask(muxer, sd, AUG_MDEVENTRD) < 0)
+    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTRD)))
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct simpl_)))) {
@@ -828,7 +828,7 @@ aug_createplain(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
 {
     struct pimpl_* impl;
 
-    if (aug_setmdeventmask(muxer, sd, mask) < 0)
+    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, mask)))
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct pimpl_)))) {

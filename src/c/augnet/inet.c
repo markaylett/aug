@@ -36,7 +36,7 @@ aug_tcpclient(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
+    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
         return AUG_BADSD;
 
     save = res;
@@ -48,7 +48,7 @@ aug_tcpclient(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
-        if (0 == aug_connect(sd, ep))
+        if (!AUG_ISFAIL(aug_connect(sd, ep)))
             break; /* Success. */
 
         /* Try next if aug_connect() failed. */
@@ -73,7 +73,7 @@ aug_tcpserver(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
+    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
         return AUG_BADSD;
 
     save = res;
@@ -112,7 +112,7 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep,
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
 
-    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
+    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
         return AUG_BADSD;
 
     save = res;
@@ -149,7 +149,7 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
 
-    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
+    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
         return AUG_BADSD;
 
     save = res;
@@ -244,10 +244,11 @@ aug_established(aug_sd sd)
     struct aug_endpoint ep;
     int ret;
 
-    if (!aug_getpeername(sd, &ep))
-        ret = ENOTCONN == aug_geterrno(aug_tlerr)
+    if (!aug_getpeername(sd, &ep)) {
+
+        ret = ENOTCONN == aug_errno(aug_tlerr)
             ? AUG_FAILNONE : AUG_FAILERROR;
-    else
+    } else
         ret = AUG_SUCCESS;
 
     return ret;

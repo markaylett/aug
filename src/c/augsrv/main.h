@@ -13,6 +13,8 @@ struct aug_service;
  * thread - automatic variables on the main thread's stack will not be visible
  * from the service thread.  A shallow copy of the service structure is,
  * therefore, performed by aug_main().
+ *
+ * @return #EXIT_SUCCESS or #EXIT_FAILURE.
  */
 
 AUGSRV_API int

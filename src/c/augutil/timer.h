@@ -51,7 +51,7 @@ aug_destroytimers(aug_timers_t timers);
  * @return The timer id.
  */
 
-AUGUTIL_API int
+AUGUTIL_API aug_rint
 aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
              aug_object* ob);
 

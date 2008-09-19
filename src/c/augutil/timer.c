@@ -86,8 +86,8 @@ setexpiry_(struct timeval* tv, unsigned ms)
     aug_result result = aug_gettimeofday(clock, tv);
     aug_release(clock);
 
-    if (result < 0)
-        return AUG_FAILERROR;
+    if (AUG_ISFAIL(result))
+        return result;
 
     aug_tvadd(tv, aug_mstotv(&local, ms));
     return AUG_SUCCESS;
@@ -124,11 +124,12 @@ aug_destroytimers(aug_timers_t timers)
     aug_release(mpool);
 }
 
-AUGUTIL_API int
+AUGUTIL_API aug_rint
 aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
              aug_object* ob)
 {
     struct timeval tv;
+    aug_result result;
     struct timer_* timer;
 
     if (id <= 0)
@@ -136,8 +137,8 @@ aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
     else
         aug_canceltimer(timers, id);
 
-    if (setexpiry_(&tv, ms) < 0)
-        return AUG_FAILERROR;
+    if (AUG_ISFAIL(result = setexpiry_(&tv, ms)))
+        return result;
 
     if (!(timer = createtimer_(timers->mpool_, ob)))
         return AUG_FAILERROR;
@@ -149,7 +150,7 @@ aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
     timer->cb_ = cb;
 
     inserttimer_(&timers->timers_, timer);
-    return id;
+    return AUG_MKRESULT(id);
 }
 
 AUGUTIL_API aug_result
@@ -162,22 +163,26 @@ aug_resettimer(aug_timers_t timers, int id, unsigned ms)
 
         if (it->id_ == id) {
 
+            aug_result result;
+
             AUG_REMOVE_PREVPTR(it, prev, &timers->timers_);
             if (ms) /* May be zero. */
                 it->ms_ = ms;
 
-            if (setexpiry_(&it->tv_, it->ms_) < 0) {
+            if (AUG_ISFAIL(result = setexpiry_(&it->tv_, it->ms_))) {
 
                 destroytimer_(timers->mpool_, it);
-                return AUG_FAILERROR;
+                return result;
             }
 
             inserttimer_(&timers->timers_, it);
-            return 0;
+            return AUG_SUCCESS;
 
         } else
             prev = &AUG_NEXT(it);
     }
+
+    aug_clearerrinfo(aug_tlerr);
     return AUG_FAILNONE;
 }
 
@@ -198,6 +203,8 @@ aug_canceltimer(aug_timers_t timers, int id)
         } else
             prev = &AUG_NEXT(it);
     }
+
+    aug_clearerrinfo(aug_tlerr);
     return AUG_FAILNONE;
 }
 
@@ -232,8 +239,8 @@ aug_processexpired(aug_timers_t timers, aug_bool force, struct timeval* next)
         aug_result result = aug_gettimeofday(clock, &now);
         aug_release(clock);
 
-        if (result < 0)
-            return AUG_FAILERROR;
+        if (AUG_ISFAIL(result))
+            return result;
 
         /* Force, at least, the first timer to expire. */
 
@@ -259,7 +266,7 @@ aug_processexpired(aug_timers_t timers, aug_bool force, struct timeval* next)
 
                 /* Update expiry time and insert. */
 
-                if (setexpiry_(&it->tv_, it->ms_) < 0)
+                if (AUG_ISFAIL(setexpiry_(&it->tv_, it->ms_)))
                     aug_perrinfo(aug_tlx, "expiry_() failed", NULL);
                 else
                     inserttimer_(&timers->timers_, it);

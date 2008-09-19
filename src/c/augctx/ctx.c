@@ -350,7 +350,7 @@ aug_perrinfo(aug_ctx* ctx, const char* s, const struct aug_errinfo* errinfo)
 
     if (0 == errinfo->num_) {
         aug_ctxerror(ctx, "%s: no description available", s);
-        return 0;
+        return AUG_SUCCESS;
     }
 
     for (file = errinfo->file_; ; ++file)

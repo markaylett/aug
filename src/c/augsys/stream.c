@@ -58,28 +58,28 @@ fstream_shutdown_(aug_stream* ob)
     return AUG_SUCCESS;
 }
 
-static ssize_t
+static aug_rsize
 fstream_read_(aug_stream* ob, void* buf, size_t size)
 {
     struct fimpl_* impl = AUG_PODIMPL(struct fimpl_, stream_, ob);
     return aug_fread(impl->fd_, buf, size);
 }
 
-static ssize_t
+static aug_rsize
 fstream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct fimpl_* impl = AUG_PODIMPL(struct fimpl_, stream_, ob);
     return aug_freadv(impl->fd_, iov, size);
 }
 
-static ssize_t
+static aug_rsize
 fstream_write_(aug_stream* ob, const void* buf, size_t size)
 {
     struct fimpl_* impl = AUG_PODIMPL(struct fimpl_, stream_, ob);
     return aug_fwrite(impl->fd_, buf, size);
 }
 
-static ssize_t
+static aug_rsize
 fstream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct fimpl_* impl = AUG_PODIMPL(struct fimpl_, stream_, ob);
@@ -142,28 +142,28 @@ sstream_shutdown_(aug_stream* ob)
     return aug_sshutdown(impl->sd_, SHUT_WR);
 }
 
-static ssize_t
+static aug_rsize
 sstream_read_(aug_stream* ob, void* buf, size_t size)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, stream_, ob);
     return aug_sread(impl->sd_, buf, size);
 }
 
-static ssize_t
+static aug_rsize
 sstream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, stream_, ob);
     return aug_sreadv(impl->sd_, iov, size);
 }
 
-static ssize_t
+static aug_rsize
 sstream_write_(aug_stream* ob, const void* buf, size_t size)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, stream_, ob);
     return aug_swrite(impl->sd_, buf, size);
 }
 
-static ssize_t
+static aug_rsize
 sstream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, stream_, ob);

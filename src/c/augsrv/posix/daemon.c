@@ -154,7 +154,7 @@ lockfile_(const char* path)
 
     if (-1 == flock_(&fl, fd, F_SETLK, F_WRLCK)) {
 
-        if (EWOULDBLOCK == aug_geterrno(aug_tlerr))
+        if (EWOULDBLOCK == aug_errno(aug_tlerr))
             goto fail;
 
         /* EWOULDBLOCK indicates that another process has locked the file. */

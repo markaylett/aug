@@ -48,19 +48,19 @@ aug_createfixstream(aug_mpool* mpool, size_t size, aug_fixcb_t cb,
 AUGNET_API void
 aug_destroyfixstream(aug_fixstream_t stream);
 
-AUGNET_API ssize_t
+AUGNET_API aug_rsize
 aug_readfix(aug_fixstream_t stream, aug_stream* src, size_t size);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_finishfix(aug_fixstream_t stream);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size);
 
 AUGNET_API aug_len_t
 aug_checksum(const char* buf, size_t size);
 
-AUGNET_API ssize_t
+AUGNET_API aug_rsize
 aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size);
 
 #endif /* AUGNET_FIX_H */

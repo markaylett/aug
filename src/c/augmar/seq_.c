@@ -24,9 +24,9 @@ AUG_RCSID("$Id$");
 #endif /* _WIN32 */
 
 struct impl_ {
-    int (*destroy_)(aug_seq_t);
+    void (*destroy_)(aug_seq_t);
     void* (*resize_)(aug_seq_t, unsigned, unsigned);
-    int (*sync_)(aug_seq_t);
+    aug_result (*sync_)(aug_seq_t);
     void* (*addr_)(aug_seq_t);
     aug_mpool* (*mpool_)(aug_seq_t);
     unsigned (*size_)(aug_seq_t);
@@ -50,7 +50,7 @@ struct mfileseq_ {
     aug_mfile_t mfile_;
 };
 
-static int
+static void
 destroymem_(aug_seq_t seq)
 {
     struct memseq_* memseq = (struct memseq_*)seq;
@@ -59,7 +59,6 @@ destroymem_(aug_seq_t seq)
         aug_freemem(mpool, memseq->addr_);
     aug_freemem(mpool, memseq);
     aug_release(mpool);
-    return 0;
 }
 
 static void*
@@ -98,10 +97,10 @@ resizemem_(aug_seq_t seq, unsigned size, unsigned tail)
     return memseq->addr_;
 }
 
-static int
+static aug_result
 syncmem_(aug_seq_t seq)
 {
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static void*
@@ -143,11 +142,11 @@ static const struct impl_ memimpl_ = {
     memtail_
 };
 
-static int
+static void
 destroymfile_(aug_seq_t seq)
 {
     struct mfileseq_* mfileseq = (struct mfileseq_*)seq;
-    return aug_closemfile_(mfileseq->mfile_);
+    aug_closemfile_(mfileseq->mfile_);
 }
 
 static void*
@@ -174,13 +173,13 @@ resizemfile_(aug_seq_t seq, unsigned size, unsigned tail)
         memmove((char*)addr + (size - tail),
                 (char*)addr + (len - tail), tail);
 
-        if (-1 == aug_truncatemfile_(mfileseq->mfile_, size))
+        if (AUG_ISFAIL(aug_truncatemfile_(mfileseq->mfile_, size)))
             return NULL;
     }
     return addr;
 }
 
-static int
+static aug_result
 syncmfile_(aug_seq_t seq)
 {
     struct mfileseq_* mfileseq = (struct mfileseq_*)seq;
@@ -238,10 +237,10 @@ aug_copyseq_(aug_seq_t dst, aug_seq_t src)
     aug_result result;
     void* addr;
 
-    if ((result = aug_setregion_(src, 0, size)) < 0)
+    if (AUG_ISFAIL(result = aug_setregion_(src, 0, size)))
         return result;
 
-    if ((result = aug_setregion_(dst, 0, aug_seqsize_(dst))) < 0)
+    if (AUG_ISFAIL(result = aug_setregion_(dst, 0, aug_seqsize_(dst))))
         return result;
 
     if (!(addr = aug_resizeseq_(dst, size)))

@@ -3,7 +3,7 @@
 
 #include <errno.h>
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_freadv(aug_fd fd, const struct iovec* iov, int size)
 {
     ssize_t ret;
@@ -14,7 +14,7 @@ aug_freadv(aug_fd fd, const struct iovec* iov, int size)
     return ret;
 }
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_fwritev(aug_fd fd, const struct iovec* iov, int size)
 {
     ssize_t ret;

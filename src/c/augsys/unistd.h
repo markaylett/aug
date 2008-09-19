@@ -46,10 +46,10 @@ aug_fopen(const char* path, int flags, ...);
 AUGSYS_API aug_result
 aug_fpipe(aug_fd fds[2]);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_fread(aug_fd fd, void* buf, size_t size);
 
-AUGSYS_API ssize_t
+AUGSYS_API aug_rsize
 aug_fwrite(aug_fd fd, const void* buf, size_t size);
 
 AUGSYS_API aug_result

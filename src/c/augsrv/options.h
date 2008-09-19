@@ -8,6 +8,8 @@
 
 #include "augsys/limits.h" /* AUG_PATH_MAX */
 
+#include "augtypes.h"
+
 enum aug_command {
 
     AUG_CMDDEFAULT,
@@ -27,7 +29,7 @@ struct aug_options {
     enum aug_command command_;
 };
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_readopts(struct aug_options* options, int argc, char* argv[]);
 
 #endif /* AUGSRV_OPTIONS_H */

@@ -71,8 +71,8 @@ aug_closemfile_(aug_mfile_t mfile)
 
         if (mfile->resvd_ > mfile->size_) {
 
-            if ((result = aug_ftruncate(mfile->fd_,
-                                        (off_t)mfile->size_)) < 0) {
+            if (AUG_ISFAIL(result = aug_ftruncate(mfile->fd_,
+                                                  (off_t)mfile->size_))) {
                 aug_fclose(mfile->fd_);
                 goto last;
             }
@@ -104,7 +104,7 @@ aug_openmfile_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
     if (AUG_BADFD == (fd = aug_fopen(path, flags & ~AUG_APPEND, mode)))
         return NULL;
 
-    if (aug_fsize(fd, &size) < 0)
+    if (AUG_ISFAIL(aug_fsize(fd, &size)))
         return NULL;
 
     if (!(mfile = aug_allocmem(mpool, sizeof(struct aug_mfile_) + tail)))
@@ -148,7 +148,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
         }
 
         resvd = reserve_(size);
-        if (aug_ftruncate(mfile->fd_, resvd - mfile->size_) < 0)
+        if (AUG_ISFAIL(aug_ftruncate(mfile->fd_, resvd - mfile->size_)))
             return NULL;
 
         mfile->resvd_ = resvd;
@@ -156,7 +156,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 
     if (mfile->mmap_) {
 
-        if (aug_remmap(mfile->mmap_, 0, size) < 0) {
+        if (AUG_ISFAIL(aug_remmap(mfile->mmap_, 0, size))) {
 
             aug_destroymmap(mfile->mmap_);
             mfile->mmap_ = NULL;

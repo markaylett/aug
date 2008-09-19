@@ -168,7 +168,7 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
             goto done;
         }
 
-        err = aug_geterrno(aug_tlerr);
+        err = aug_errno(aug_tlerr);
 
         if (EINPROGRESS == err || EWOULDBLOCK == err) {
 
