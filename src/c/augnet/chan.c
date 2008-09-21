@@ -395,7 +395,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             goto done;
         }
 
-        if (-1 == aug_setnodelay(sd, AUG_TRUE)) {
+        if (AUG_ISFAIL(aug_setnodelay(sd, AUG_TRUE))) {
             aug_ctxwarn(aug_tlx, "aug_setnodelay() failed: %s",
                         aug_tlerr->desc_);
             aug_sclose(sd);

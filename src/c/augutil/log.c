@@ -179,10 +179,10 @@ aug_vformatlog(char* buf, size_t* n, int level, const char* format,
     /* Null termination is _not_ guaranteed by snprintf(). */
 
 #if ENABLE_THREADS
-    ret = snprintf(buf, size, ".%03d %08x %-6s ", AUG_RESULT(ms),
+    ret = snprintf(buf, size, ".%03d %08x %-6s ", (int)AUG_RESULT(ms),
                    aug_threadid(), aug_loglabel(level));
 #else /* !ENABLE_THREADS */
-    ret = snprintf(buf, size, ".%03d %-6s ", AUG_RESULT(ms),
+    ret = snprintf(buf, size, ".%03d %-6s ", (int)AUG_RESULT(ms),
                    aug_loglabel(level));
 #endif /* !ENABLE_THREADS */
 

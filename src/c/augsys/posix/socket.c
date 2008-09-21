@@ -38,35 +38,27 @@ aug_accept(aug_sd sd, struct aug_endpoint* ep)
 {
     int fd;
     ep->len_ = AUG_MAXADDRLEN;
-    fd = accept(sd,  &ep->un_.sa_, &ep->len_);
-    if (-1 == fd) {
+    if (-1 == (fd = accept(sd,  &ep->un_.sa_, &ep->len_)))
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
-
     return fd;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_bind(aug_sd sd, const struct aug_endpoint* ep)
 {
-    if (-1 == bind(sd, &ep->un_.sa_, ep->len_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == bind(sd, &ep->un_.sa_, ep->len_))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_connect(aug_sd sd, const struct aug_endpoint* ep)
 {
-    if (-1 == connect(sd, &ep->un_.sa_, ep->len_)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == connect(sd, &ep->un_.sa_, ep->len_))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API struct aug_endpoint*
@@ -93,25 +85,23 @@ aug_getsockname(aug_sd sd, struct aug_endpoint* ep)
     return ep;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_listen(aug_sd sd, int backlog)
 {
-    if (-1 == listen(sd, backlog)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == listen(sd, backlog))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API aug_rsize
 aug_recv(aug_sd sd, void* buf, size_t len, int flags)
 {
-    ssize_t ret;
-    if (-1 == (ret = recv(sd, buf, len, flags)))
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+    ssize_t ret = recv(sd, buf, len, flags);
+    if (-1 == ret)
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
 AUGSYS_API aug_rsize
@@ -121,30 +111,30 @@ aug_recvfrom(aug_sd sd, void* buf, size_t len, int flags,
     ssize_t ret;
     ep->len_ = AUG_MAXADDRLEN;
     if (-1 == (ret = recvfrom(sd, buf, len, flags, &ep->un_.sa_, &ep->len_)))
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
 AUGSYS_API aug_rsize
 aug_send(aug_sd sd, const void* buf, size_t len, int flags)
 {
-    ssize_t ret;
-    if (-1 == (ret = send(sd, buf, len, flags)))
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+    ssize_t ret = send(sd, buf, len, flags);
+    if (-1 == ret)
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
 AUGSYS_API aug_rsize
 aug_sendto(aug_sd sd, const void* buf, size_t len, int flags,
            const struct aug_endpoint* ep)
 {
-    ssize_t ret;
-    if (-1 == (ret = sendto(sd, buf, len, flags, &ep->un_.sa_, ep->len_)))
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+    ssize_t ret = sendto(sd, buf, len, flags, &ep->un_.sa_, ep->len_);
+    if (-1 == ret)
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
 AUGSYS_API aug_rsize
@@ -171,7 +161,7 @@ aug_swritev(aug_sd sd, const struct iovec* iov, int size)
     return aug_fwritev(sd, iov, size);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_getsockopt(aug_sd sd, int level, int optname, void* optval,
                socklen_t* optlen)
 {
@@ -193,27 +183,20 @@ aug_getsockopt(aug_sd sd, int level, int optname, void* optval,
             break;
         }
 
-    } else {
+    } else if (-1 == ret)
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-        if (-1 == ret) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
-        }
-    }
-
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setsockopt(aug_sd sd, int level, int optname, const void* optval,
                socklen_t optlen)
 {
-    if (-1 == setsockopt(sd, level, optname, optval, optlen)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == setsockopt(sd, level, optname, optval, optlen))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API aug_result
@@ -225,14 +208,13 @@ aug_sshutdown(aug_sd sd, int how)
     return AUG_SUCCESS;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_socketpair(int domain, int type, int protocol, aug_sd sv[2])
 {
-    if (-1 == socketpair(domain, type, protocol, sv)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
-    return 0;
+    if (-1 == socketpair(domain, type, protocol, sv))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+
+    return AUG_SUCCESS;
 }
 
 
@@ -270,7 +252,7 @@ aug_destroyaddrinfo(struct addrinfo* res)
     freeaddrinfo(res);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_getaddrinfo(const char* host, const char* serv,
                 const struct addrinfo* hints, struct addrinfo** res)
 {
@@ -278,17 +260,17 @@ aug_getaddrinfo(const char* host, const char* serv,
     if (0 != ret) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "posix", ret,
                        gai_strerror(ret));
-        return -1;
+        return AUG_FAILERROR;
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_rint
 aug_getfamily(aug_sd sd)
 {
     struct aug_endpoint ep;
     if (!aug_getsockname(sd, &ep))
-        return -1;
+        return AUG_FAILERROR;
 
-    return ep.un_.family_;
+    return AUG_MKRESULT(ep.un_.family_);
 }

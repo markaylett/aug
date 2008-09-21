@@ -45,10 +45,10 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep);
 AUGNET_API struct aug_hostserv*
 aug_parsehostserv(const char* src, struct aug_hostserv* dst);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_setnodelay(aug_sd sd, int on);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_established(aug_sd sd);
 
 #endif /* AUGNET_INET_H */

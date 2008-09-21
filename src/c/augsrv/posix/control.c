@@ -37,6 +37,7 @@ static aug_result
 send_(int fd, pid_t pid, int event)
 {
     struct flock fl;
+    aug_result result;
 
     switch (event) {
     case AUG_EVENTRECONF:
@@ -53,8 +54,8 @@ send_(int fd, pid_t pid, int event)
 
         /* Wait for daemon process to release lock. */
 
-        if (-1 == flock_(&fl, fd, F_SETLKW, F_RDLCK))
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        if (AUG_ISFAIL(result = flock_(&fl, fd, F_SETLKW, F_RDLCK)))
+            return result;
 
         /* The lock has been obtained; daemon process must have stopped. */
 
@@ -70,25 +71,26 @@ send_(int fd, pid_t pid, int event)
     return AUG_SUCCESS;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_start(void)
 {
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                    AUG_MSG("aug_start() not supported"));
-    return -1;
+    return AUG_FAILERROR;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_control(int event)
 {
     const char* pidfile;
     struct flock fl;
-    int fd, ret = -1;
+    int fd;
+    aug_result result;
 
     if (!(pidfile = aug_getserviceopt(AUG_OPTPIDFILE))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
     /* Check for existence of file. */
@@ -96,38 +98,35 @@ aug_control(int event)
     if (-1 == access(pidfile, F_OK)) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
                        AUG_MSG("pidfile does not exist: %s"), pidfile);
-        return -1;
+        return AUG_FAILERROR;
     }
 
-	if (-1 == (fd = open(pidfile, O_RDONLY))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+	if (-1 == (fd = open(pidfile, O_RDONLY)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     /* Attempt to obtain shared lock. */
 
-    if (-1 == flock_(&fl, fd, F_SETLK, F_RDLCK)) {
+    if (AUG_ISFAIL(flock_(&fl, fd, F_SETLK, F_RDLCK))) {
 
         /* As expected, the daemon process has an exclusive lock on the pid
            file.  Use F_GETLK to obtain the pid of the daemon process. */
 
-        if (-1 == flock_(&fl, fd, F_GETLK, F_RDLCK))
-            goto done;
+        if (AUG_ISSUCCESS(result = flock_(&fl, fd, F_GETLK, F_RDLCK))) {
 
-        /* Although a lock-manager allows locking over NFS, the returned pid
-           is probably zero because it could be the pid of a process on
-           another node. */
+            /* Although a lock-manager allows locking over NFS, the returned
+               pid is probably zero because it could be the pid of a process
+               on another node. */
 
-        if (0 == fl.l_pid) {
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
-                           AUG_MSG("lockfile on NFS mount: %s"), pidfile);
-            return -1;
+            if (0 == fl.l_pid) {
+
+                aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
+                               AUG_MSG("lockfile on NFS mount: %s"), pidfile);
+                result = AUG_FAILERROR;
+
+            } else
+                result = send_(fd, fl.l_pid, event);
+
         }
-
-        if (-1 == send_(fd, fl.l_pid, event))
-            goto done;
-
-        ret = 0;
 
     } else {
 
@@ -135,28 +134,28 @@ aug_control(int event)
            running. */
 
         if (-1 == unlink(pidfile)) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            goto done;
-        }
+            result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+                                         errno);
+        } else {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("server process is not running"));
-        ret = -1;
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
+                           AUG_MSG("server process is not running"));
+            result = AUG_FAILERROR;
+        }
     }
 
- done:
     close(fd);
-    return ret;
+    return result;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_install(void)
 {
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_uninstall(void)
 {
-    return 0;
+    return AUG_SUCCESS;
 }

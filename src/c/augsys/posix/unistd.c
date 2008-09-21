@@ -81,22 +81,20 @@ AUGSYS_API aug_rsize
 aug_fread(aug_fd fd, void* buf, size_t size)
 {
     ssize_t ret;
-    if (-1 == (ret = read(fd, buf, size))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
-    return ret;
+    if (-1 == (ret = read(fd, buf, size)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+
+    return AUG_MKRESULT(ret);
 }
 
 AUGSYS_API aug_rsize
 aug_fwrite(aug_fd fd, const void* buf, size_t size)
 {
     ssize_t ret;
-    if (-1 == (ret = write(fd, buf, size))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
-    return ret;
+    if (-1 == (ret = write(fd, buf, size)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+
+    return AUG_MKRESULT(ret);
 }
 
 AUGSYS_API aug_result

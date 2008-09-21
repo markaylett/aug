@@ -55,7 +55,7 @@ initial_(aug_object* ob, const char* initial)
     return 0;
 }
 
-static int
+static aug_result
 field_(aug_object* ob, const char* name, const char* value)
 {
     aug_marparser_t parser = aug_obtop(ob);
@@ -68,16 +68,17 @@ field_(aug_object* ob, const char* name, const char* value)
     return aug_setfield(parser->mar_, &field, NULL);
 }
 
-static int
+static aug_rsize
 csize_(aug_object* ob, unsigned csize)
 {
     aug_marparser_t parser = aug_obtop(ob);
-    if (-1 == aug_truncatemar(parser->mar_, csize))
-        return -1;
+    aug_result result;
+    if (AUG_ISFAIL(result = aug_truncatemar(parser->mar_, csize)))
+        return result;
     return aug_seekmar(parser->mar_, AUG_SET, 0);
 }
 
-static int
+static aug_rsize
 cdata_(aug_object* ob, const void* buf, unsigned len)
 {
     aug_marparser_t parser = aug_obtop(ob);

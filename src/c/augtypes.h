@@ -66,15 +66,16 @@ typedef struct aug_strict_ aug_result;
 typedef struct aug_strict_ aug_rint;
 typedef struct aug_strict_ aug_rsize;
 
-static aug_result
-AUG_MKRESULT(long val)
+static inline aug_result
+aug_mkresult_(long val)
 {
     aug_result x;
     x.val_ = val;
     return x;
 }
 
-#define AUG_RESULT(x) (x).val_
+#define AUG_MKRESULT(x) aug_mkresult_(x)
+#define AUG_RESULT(x)   (x).val_
 
 /*typedef int aug_result;*/
 /*typedef int aug_rint;*/

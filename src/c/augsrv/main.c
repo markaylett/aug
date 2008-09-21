@@ -24,6 +24,7 @@ AUG_RCSID("$Id$");
 
 #include <assert.h>
 #include <setjmp.h>
+#include <stdlib.h>         /* EXIT_FAILURE */
 
 static jmp_buf mark_;
 

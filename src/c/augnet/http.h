@@ -17,13 +17,14 @@
 #include "augext/mpool.h"
 
 #include "augabi.h"
+#include "augtypes.h"
 
 struct aug_httphandler {
-    int (*initial_)(aug_object*, const char*);
-    int (*field_)(aug_object*, const char*, const char*);
-    int (*csize_)(aug_object*, unsigned);
-    int (*cdata_)(aug_object*, const void*, unsigned);
-    int (*end_)(aug_object*, int);
+    aug_result (*initial_)(aug_object*, const char*);
+    aug_result (*field_)(aug_object*, const char*, const char*);
+    aug_result (*csize_)(aug_object*, unsigned);
+    aug_result (*cdata_)(aug_object*, const void*, unsigned);
+    aug_result (*end_)(aug_object*, int);
 };
 
 typedef struct aug_httpparser_* aug_httpparser_t;
@@ -40,10 +41,10 @@ aug_createhttpparser(aug_mpool* mpool, unsigned size,
 AUGNET_API void
 aug_destroyhttpparser(aug_httpparser_t parser);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_appendhttp(aug_httpparser_t parser, const char*, unsigned size);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_finishhttp(aug_httpparser_t parser);
 
 #endif /* AUGNET_HTTP_H */

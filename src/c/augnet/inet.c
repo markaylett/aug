@@ -85,9 +85,9 @@ aug_tcpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
-        if (0 == aug_setreuseaddr(sd, 1)
-            && 0 == aug_bind(sd, ep)
-            && 0 == aug_listen(sd, SOMAXCONN))
+        if (AUG_ISSUCCESS(aug_setreuseaddr(sd, 1))
+            && AUG_ISSUCCESS(aug_bind(sd, ep))
+            && AUG_ISSUCCESS(aug_listen(sd, SOMAXCONN)))
             break; /* Success. */
 
         /* Try next if failed. */
@@ -124,7 +124,7 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep,
 
         aug_getendpoint(res, ep);
 
-        if (!connect || 0 == aug_connect(sd, ep))
+        if (!connect || AUG_ISSUCCESS(aug_connect(sd, ep)))
             break; /* Success. */
 
         /* Try next if aug_connect() failed. */
@@ -161,7 +161,7 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
-        if (0 == aug_bind(sd, ep))
+        if (AUG_ISSUCCESS(aug_bind(sd, ep)))
             break; /* Success. */
 
         /* Try next if aug_bind() failed. */
@@ -232,24 +232,24 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
 
 /* FIXME: switch to aug_bool. */
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_setnodelay(aug_sd sd, int on)
 {
     return aug_setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
 }
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_established(aug_sd sd)
 {
     struct aug_endpoint ep;
-    int ret;
+    aug_result result;
 
     if (!aug_getpeername(sd, &ep)) {
 
-        ret = ENOTCONN == aug_errno(aug_tlerr)
+        result = ENOTCONN == aug_errno(aug_tlerr)
             ? AUG_FAILNONE : AUG_FAILERROR;
     } else
-        ret = AUG_SUCCESS;
+        result = AUG_SUCCESS;
 
-    return ret;
+    return result;
 }

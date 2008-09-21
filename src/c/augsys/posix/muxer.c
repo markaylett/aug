@@ -10,7 +10,7 @@
 
 #include <errno.h>
 
-#if HAVE_POLL
+#if HAVE_POLLx
 # include <sys/poll.h>
 # define INIT_SIZE_ 64
 
@@ -81,18 +81,18 @@ initpollfds_(struct pollfd* ptr, size_t size)
         initpollfd_(ptr + i);
 }
 
-static int
+static aug_result
 resize_(aug_muxer_t muxer, size_t size)
 {
     struct pollfd* ptr = aug_reallocmem(muxer->mpool_, muxer->pollfds_,
                                         sizeof(struct pollfd) * size);
     if (!ptr)
-        return -1;
+        return AUG_FAILERROR;
 
     initpollfds_(ptr + muxer->size_, size - muxer->size_);
     muxer->pollfds_ = ptr;
     muxer->size_ = size;
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API aug_muxer_t
@@ -107,7 +107,7 @@ aug_createmuxer(aug_mpool* mpool)
     muxer->nfds_ = muxer->size_ = 0;
     muxer->ready_ = 0;
 
-    if (-1 == resize_(muxer, INIT_SIZE_)) {
+    if (AUG_ISFAIL(resize_(muxer, INIT_SIZE_))) {
         aug_freemem(mpool, muxer);
         return NULL;
     }
@@ -125,7 +125,7 @@ aug_destroymuxer(aug_muxer_t muxer)
     aug_release(mpool);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
     struct pollfd* ptr;
@@ -133,12 +133,15 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
     if (mask & ~AUG_MDEVENTALL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid mdevent mask '%d'"), (int)mask);
-        return -1;
+        return AUG_FAILERROR;
     }
 
-    if (muxer->size_ <= md)
-        if (-1 == resize_(muxer, AUG_MAX(md + 1, muxer->size_ * 2)))
-            return -1;
+    if (muxer->size_ <= md) {
+
+        aug_result result = resize_(muxer, AUG_MAX(md + 1, muxer->size_ * 2));
+        if (AUG_ISFAIL(result))
+            return result;
+    }
 
     ptr = muxer->pollfds_ + md;
     if (mask) {
@@ -160,7 +163,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
             muxer->nfds_ = md + 1;
         }
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API void
@@ -169,28 +172,33 @@ aug_setmdevents(aug_muxer_t muxer, int delta)
     muxer->ready_ += delta;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
     int ms, ret, ready = muxer->ready_;
     muxer->ready_ = 0;
 
     if (0 < ready) {
-        ret = aug_waitmdevents(muxer, &NOWAIT_);
-        if (0 <= ret)
-            ret += ready; /* At least one. */
-        return ret;
+
+        /* Recurse. */
+
+        aug_result rint = aug_waitmdevents(muxer, &NOWAIT_);
+        if (AUG_ISFAIL(rint))
+            return rint;
+
+        /* At least one. */
+
+        return AUG_MKRESULT(AUG_RESULT(rint) + ready);
     }
 
     /* A negative value means infinite timeout. */
 
     ms = timeout ? aug_tvtoms(timeout) : -1;
 
-    if (-1 == (ret = poll(muxer->pollfds_, muxer->nfds_, ms))) {
+    if (-1 == (ret = poll(muxer->pollfds_, muxer->nfds_, ms)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-        ret = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-    }
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
 AUGSYS_API unsigned short
@@ -295,18 +303,16 @@ aug_destroymuxer(aug_muxer_t muxer)
     aug_release(mpool);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
-    if (FD_SETSIZE <= md) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EMFILE);
-        return -1;
-    }
+    if (FD_SETSIZE <= md)
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EMFILE);
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid mdevent mask '%d'"), (int)mask);
-        return -1;
+        return AUG_FAILERROR;
     }
 
     setmdevents_(&muxer->in_, md, mask);
@@ -329,7 +335,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
         muxer->maxfd_ = md;
     }
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API void
@@ -338,28 +344,33 @@ aug_setmdevents(aug_muxer_t muxer, int delta)
     muxer->ready_ += delta;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
     int ret, ready = muxer->ready_;
     muxer->ready_ = 0;
 
     if (0 < ready) {
-        ret = aug_waitmdevents(muxer, &NOWAIT_);
-        if (0 <= ret)
-            ret += ready; /* At least one. */
-        return ret;
+
+        /* Recurse. */
+
+        aug_result rint = aug_waitmdevents(muxer, &NOWAIT_);
+        if (AUG_ISFAIL(rint))
+            return rint;
+
+        /* At least one. */
+
+        return AUG_MKRESULT(AUG_RESULT(rint) + ready);
     }
 
     muxer->out_ = muxer->in_;
 
     if (-1 == (ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_,
                             &muxer->out_.wr_, &muxer->out_.ex_,
-                            (struct timeval*)timeout))) {
+                            (struct timeval*)timeout)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-        ret = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-    }
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
 AUGSYS_API unsigned short
@@ -376,7 +387,7 @@ aug_getmdevents(aug_muxer_t muxer, aug_md md)
 
 #endif /* !HAVE_POLL */
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_muxerpipe(aug_md mds[2])
 {
     return aug_fpipe(mds);

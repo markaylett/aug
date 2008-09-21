@@ -23,25 +23,22 @@
 #include <sys/types.h>      /* umask() */
 #include <sys/stat.h>       /* umask() */
 
-static int
+static void
 closeall_(int next)
 {
     int limit = getdtablesize();
     for (; next <= limit; ++next)
         close(next);
-
-    return 0;
 }
 
-static int
+static aug_result
 daemonise_(void)
 {
     switch (fork()) {
     case 0:
         break;
     case -1:
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
     default:
         /* Use system version of exit to avoid flushing standard
            streams. */
@@ -51,10 +48,8 @@ daemonise_(void)
     /* Detach from controlling terminal by making process a session
        leader. */
 
-    if (-1 == setsid()) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == setsid())
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     /* Forking again ensures that the daemon process is not a session leader,
        and therefore cannot regain access to a controlling terminal. */
@@ -63,8 +58,7 @@ daemonise_(void)
     case 0:
         break;
     case -1:
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
     default:
         /* Use system version of exit to avoid flushing standard streams. */
         _exit(0);
@@ -78,10 +72,8 @@ daemonise_(void)
     /* Leave both the standard file descriptors (3), and the signal pipe
        descriptors (2) open. */
 
-    if (-1 == closeall_(3 + 2))
-        return -1;
-
-    return 0;
+    closeall_(3 + 2);
+    return AUG_SUCCESS;
 }
 
 size_t
@@ -90,39 +82,30 @@ digits_(unsigned long n)
     return 0 == n ? 1 : ((int)log10((double)n)) + 1;
 }
 
-static int
+static aug_result
 writepid_(int fd)
 {
     pid_t pid = getpid();
     size_t len = digits_(pid) + 1; /* One for newline. */
     char* str = alloca(sizeof(char) * (len + 1));
-    if (!str) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
-        return -1;
-    }
+    if (!str)
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
 
     /* Resulting buffer will _not_ be null terminated. */
 
     if (len != (snprintf(str, len, "%ld\n", (long)pid))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EFORMAT,
                        AUG_MSG("pid formatting failed"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
-    if (len != write(fd, str, len)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (len != write(fd, str, len) || -1 == fsync(fd))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    if (-1 == fsync(fd)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
-
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 flock_(struct flock* fl, int fd, int cmd, int type)
 {
     bzero(fl, sizeof(*fl));
@@ -132,96 +115,93 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_start = 0;
     fl->l_len = 0;
 
-    if (-1 == fcntl(fd, cmd, fl)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == fcntl(fd, cmd, fl))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 lockfile_(const char* path)
 {
     struct flock fl;
-    int fd = open(path, O_CREAT | O_WRONLY, 0640);
-    if (-1 == fd) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    int fd;
+    aug_result result;
+
+    if (-1 == (fd = open(path, O_CREAT | O_WRONLY, 0640)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     /* Attempt to obtain exclusive lock. */
 
-    if (-1 == flock_(&fl, fd, F_SETLK, F_WRLCK)) {
+    if (AUG_ISFAIL(result = flock_(&fl, fd, F_SETLK, F_WRLCK))) {
 
-        if (EWOULDBLOCK == aug_errno(aug_tlerr))
-            goto fail;
+        if (AUG_ISBLOCK(result)) {
 
-        /* EWOULDBLOCK indicates that another process has locked the file. */
+            /* EWOULDBLOCK indicates that another process has locked the
+               file. */
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("pidfile still in use: %s"), path);
-
-        close(fd);
-        return -1;
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
+                           AUG_MSG("pidfile still in use: %s"), path);
+        }
+        goto fail;
     }
 
     /* Truncate any existing pid value. */
 
     if (-1 == ftruncate(fd, 0)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         goto fail;
     }
 
-    if (-1 == writepid_(fd))
+    if (AUG_ISFAIL(result = writepid_(fd)))
         goto fail;
 
     /* Success: do not close the file - this would release the lock. */
 
-    return 0;
+    return AUG_SUCCESS;
 
  fail:
     close(fd);
-    return -1;
+    return result;
 }
 
-static int
+static aug_result
 closein_(void)
 {
-    int fd = open("/dev/null", O_RDONLY), ret = -1;
-	if (-1 == fd) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    int fd;
+    aug_result result;
+
+	if (-1 == (fd = open("/dev/null", O_RDONLY)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     if (-1 == dup2(fd, STDIN_FILENO))
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
     else
-        ret = 0;
+        result = AUG_SUCCESS;
 
     close(fd);
-    return ret;
+    return result;
 }
 
-AUGSRV_API int
+AUGSRV_API aug_result
 aug_daemonise(void)
 {
     const char* pidfile;
-    int ret;
+    aug_result result;
 
     if (!(pidfile = aug_getserviceopt(AUG_OPTPIDFILE))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
-    if (-1 == daemonise_()
-        || -1 == lockfile_(pidfile)
-        || -1 == closein_()
-        || -1 == aug_initservice())
-        return -1;
+    if (AUG_ISFAIL(result = daemonise_())
+        || AUG_ISFAIL(result = lockfile_(pidfile))
+        || AUG_ISFAIL(result = closein_())
+        || AUG_ISFAIL(result = aug_initservice()))
+        return result;
 
-    ret = aug_runservice();
+    result = aug_runservice();
     aug_termservice();
-    return ret;
+    return result;
 }

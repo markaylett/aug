@@ -16,32 +16,28 @@
 # include <sys/sockio.h> /* SIOCGIFADDR */
 #endif /* HAVE_SYS_SOCKIO_H */
 
-static int
+static aug_result
 getifaddr_(aug_sd sd, struct in_addr* addr, const char* ifname)
 {
     struct ifreq ifreq;
     aug_strlcpy(ifreq.ifr_name, ifname, sizeof(ifreq.ifr_name));
 
-    if (-1 == ioctl(sd, SIOCGIFADDR, &ifreq)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (-1 == ioctl(sd, SIOCGIFADDR, &ifreq))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     addr->s_addr = ((struct sockaddr_in*)&ifreq.ifr_addr)->sin_addr.s_addr;
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 getifindex_(unsigned* index, const char* ifname)
 {
-    if (!(*index = if_nametoindex(ifname))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENODEV);
-        return -1;
-    }
-    return 0;
+    if (!(*index = if_nametoindex(ifname)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENODEV);
+    return AUG_SUCCESS;
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
@@ -58,8 +54,11 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 
         if (ifname) {
 
-            if (-1 == getifaddr_(sd, &un.ipv4_.imr_interface, ifname))
-                return -1;
+            aug_result result = getifaddr_(sd, &un.ipv4_.imr_interface,
+                                           ifname);
+            if (AUG_ISFAIL(result))
+                return result;
+
         } else
             un.ipv4_.imr_interface.s_addr = htonl(INADDR_ANY);
 
@@ -73,8 +72,12 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 			   sizeof(addr->un_.ipv6_));
 
         if (ifname) {
-            if (-1 == getifindex_(&un.ipv6_.ipv6mr_interface, ifname))
-                return -1;
+
+            aug_result result = getifindex_(&un.ipv6_.ipv6mr_interface,
+                                            ifname);
+            if (AUG_ISFAIL(result))
+                return result;
+
         } else
             un.ipv6_.ipv6mr_interface = 0;
 
@@ -83,11 +86,10 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
-    return -1;
+    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 {
     union {
@@ -104,8 +106,11 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 
         if (ifname) {
 
-            if (-1 == getifaddr_(sd, &un.ipv4_.imr_interface, ifname))
-                return -1;
+            aug_result result = getifaddr_(sd, &un.ipv4_.imr_interface,
+                                           ifname);
+            if (AUG_ISFAIL(result))
+                return result;
+
         } else
             un.ipv4_.imr_interface.s_addr = htonl(INADDR_ANY);
 
@@ -119,8 +124,12 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 			   sizeof(addr->un_.ipv6_));
 
         if (ifname) {
-            if (-1 == getifindex_(&un.ipv6_.ipv6mr_interface, ifname))
-                return -1;
+
+            aug_result result = getifindex_(&un.ipv6_.ipv6mr_interface,
+                                            ifname);
+            if (AUG_ISFAIL(result))
+                return result;
+
         } else
             un.ipv6_.ipv6mr_interface = 0;
 
@@ -129,14 +138,13 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
-    return -1;
+    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmcastif(aug_sd sd, const char* ifname)
 {
-    int af;
+    aug_result result;
     union {
         struct in_addr ipv4_;
 #if HAVE_IPV6
@@ -144,14 +152,14 @@ aug_setmcastif(aug_sd sd, const char* ifname)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (-1 == (af = aug_getfamily(sd)))
-        return -1;
+    if (AUG_ISFAIL(result = aug_getfamily(sd)))
+        return result;
 
-    switch (af) {
+    switch (AUG_RESULT(result)) {
     case AF_INET:
 
-        if (-1 == getifaddr_(sd, &un.ipv4_, ifname))
-            return -1;
+        if (AUG_ISFAIL(result = getifaddr_(sd, &un.ipv4_, ifname)))
+            return result;
 
         return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_IF, &un.ipv4_,
                               sizeof(un.ipv4_));
@@ -159,22 +167,21 @@ aug_setmcastif(aug_sd sd, const char* ifname)
 #if HAVE_IPV6
     case AF_INET6:
 
-        if (-1 == getifindex_(&un.ipv6_, ifname))
-            return -1;
+        if (AUG_ISFAIL(result = getifindex_(&un.ipv6_, ifname)))
+            return result;
 
         return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_MULTICAST_IF,
                               &un.ipv6_, sizeof(un.ipv6_));
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
-    return -1;
+    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmcastloop(aug_sd sd, int on)
 {
-    int af;
+    aug_result af;
     union {
         u_char ipv4_;
 #if HAVE_IPV6
@@ -182,10 +189,10 @@ aug_setmcastloop(aug_sd sd, int on)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (-1 == (af = aug_getfamily(sd)))
-        return -1;
+    if (AUG_ISFAIL(af = aug_getfamily(sd)))
+        return af;
 
-    switch (af) {
+    switch (AUG_RESULT(af)) {
     case AF_INET:
         un.ipv4_ = on;
         return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_LOOP, &un.ipv4_,
@@ -198,14 +205,13 @@ aug_setmcastloop(aug_sd sd, int on)
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
-    return -1;
+    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
 }
 
-AUGSYS_API int
+AUGSYS_API aug_result
 aug_setmcastttl(aug_sd sd, int ttl)
 {
-    int af;
+    aug_rint af;
     union {
         u_char ipv4_;
 #if HAVE_IPV6
@@ -213,10 +219,10 @@ aug_setmcastttl(aug_sd sd, int ttl)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (-1 == (af = aug_getfamily(sd)))
-        return -1;
+    if (AUG_ISFAIL(af = aug_getfamily(sd)))
+        return af;
 
-    switch (af) {
+    switch (AUG_RESULT(af)) {
     case AF_INET:
         un.ipv4_ = ttl;
         return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_TTL, &un.ipv4_,
@@ -229,6 +235,5 @@ aug_setmcastttl(aug_sd sd, int ttl)
 #endif /* HAVE_IPV6 */
     }
 
-    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
-    return -1;
+    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
 }

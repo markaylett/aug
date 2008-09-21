@@ -134,8 +134,7 @@ aug_accept(aug_sd sd, struct aug_endpoint* ep)
 {
     SOCKET h;
     ep->len_ = AUG_MAXADDRLEN;
-    h = accept(sd, &ep->un_.sa_, &ep->len_);
-    if (INVALID_SOCKET == h)
+    if (INVALID_SOCKET == (h = accept(sd, &ep->un_.sa_, &ep->len_)))
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAGetLastError());
     return h;
 }
