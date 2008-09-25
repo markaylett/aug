@@ -41,7 +41,7 @@ namespace aug {
     public:
         ~scoped_block() AUG_NOTHROW
         {
-            if (-1 == aug_unblocksignals())
+            if (AUG_ISFAIL(aug_unblocksignals()))
                 perrinfo(aug_tlx, "aug_unblocksignals() failed");
         }
 
@@ -61,7 +61,7 @@ namespace aug {
     public:
         ~scoped_unblock() AUG_NOTHROW
         {
-            if (-1 == aug_blocksignals())
+            if (AUG_ISFAIL(aug_blocksignals()))
                 perrinfo(aug_tlx, "aug_blocksignals() failed");
         }
 

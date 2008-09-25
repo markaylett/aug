@@ -216,7 +216,7 @@ uninstall_(SC_HANDLE scm)
             result = aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
     }
 
-    if (!DeleteService(serv) && AUG_SUCCESS(result))
+    if (!DeleteService(serv) && AUG_ISSUCCESS(result))
         result = aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                                      GetLastError());
 

@@ -206,7 +206,6 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
 {
     impl_t impl = (impl_t)mm;
     void* addr = impl->mmap_.addr_;
-    aug_result result;
 
     impl->mmap_.addr_ = NULL;
 
@@ -223,13 +222,10 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
             return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                                        GetLastError());
 
-        if (AUG_ISFAIL(result = aug_fsize(impl->fd_, &impl->size_)))
-            return result;
+        aug_verify(aug_fsize(impl->fd_, &impl->size_));
     }
 
-    if (AUG_ISFAIL(result = verify_(impl->size_, offset, len)))
-        return result;
-
+    aug_verify(verify_(impl->size_, offset, len));
     return createmmap_(impl, offset, len);
 }
 

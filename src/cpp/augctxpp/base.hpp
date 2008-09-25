@@ -15,7 +15,7 @@ namespace aug {
     inline void
     init()
     {
-        if (aug_init() < 0)
+        if (AUG_ISFAIL(aug_init()))
             throw std::runtime_error("aug_init() failed");
     }
     inline void
@@ -26,13 +26,13 @@ namespace aug {
     inline void
     initbasictlx()
     {
-        if (aug_initbasictlx() < 0)
+        if (AUG_ISFAIL(aug_initbasictlx()))
             throw std::runtime_error("aug_initbasictlx() failed");
     }
     inline void
     autobasictlx()
     {
-        if (aug_autobasictlx() < 0)
+        if (AUG_ISFAIL(aug_autobasictlx()))
             throw std::runtime_error("aug_autobasictlx() failed");
     }
 

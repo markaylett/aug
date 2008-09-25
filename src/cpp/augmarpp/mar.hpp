@@ -12,23 +12,6 @@
 
 namespace aug {
 
-    namespace detail {
-        inline bool
-        ismatch(int result)
-        {
-            verify(result);
-            return AUG_FAILNONE != result;
-        }
-        inline const void*
-        verify(const void* result)
-        {
-            aug_errinfo& ei(*aug_tlerr);
-            if (!result && !(0 == strcmp(errsrc(ei), "aug")
-                             && AUG_EEXIST == errnum(ei)))
-                throwerror();
-            return result;
-        }
-    }
     inline void
     copymar(marref dst, marref src)
     {
@@ -88,59 +71,59 @@ namespace aug {
     {
         setfield(ref, ord, cdata, (unsigned)strlen(cdata));
     }
-    inline std::pair<unsigned, bool>
+    inline unsigned
     unsetfield(marref ref, const char* name)
     {
         unsigned ord;
-        bool match(detail::ismatch(aug_unsetbyname(ref.get(), name, &ord)));
-        return std::make_pair(ord, match);
+        verify(aug_unsetbyname(ref.get(), name, &ord));
+        return ord;
     }
-    inline bool
+    inline void
     unsetfield(marref ref, unsigned ord)
     {
-        return detail::ismatch(aug_unsetbyord(ref.get(), ord));
+        verify(aug_unsetbyord(ref.get(), ord));
     }
     inline const void*
     getfield(marref ref, const char* name)
     {
-        return detail::verify(aug_valuebyname(ref.get(), name, 0));
+        return verify(aug_valuebyname(ref.get(), name, 0));
     }
     inline const void*
     getfield(marref ref, const char* name, unsigned& size)
     {
-        return detail::verify(aug_valuebyname(ref.get(), name, &size));
+        return verify(aug_valuebyname(ref.get(), name, &size));
     }
     inline const void*
     getfield(marref ref, unsigned ord, unsigned& size)
     {
-        return detail::verify(aug_valuebyord(ref.get(), ord, &size));
+        return verify(aug_valuebyord(ref.get(), ord, &size));
     }
     inline const void*
     getfield(marref ref, unsigned ord)
     {
-        return detail::verify(aug_valuebyord(ref.get(), ord, 0));
+        return verify(aug_valuebyord(ref.get(), ord, 0));
     }
-    inline bool
+    inline void
     getfield(marref ref, aug_field& f, unsigned ord)
     {
-        return detail::ismatch(aug_getfield(ref.get(), &f, ord));
+        verify(aug_getfield(ref.get(), &f, ord));
     }
     inline unsigned
     getfields(marref ref)
     {
         return aug_getfields(ref.get());
     }
-    inline bool
+    inline void
     toname(marref ref, const char*& s, unsigned ord)
     {
-        return detail::ismatch(aug_ordtoname(ref.get(), &s, ord));
+        verify(aug_ordtoname(ref.get(), &s, ord));
     }
-    inline std::pair<unsigned, bool>
+    inline unsigned
     toord(marref ref, const char* name)
     {
         unsigned ord;
-        bool match(detail::ismatch(aug_nametoord(ref.get(), &ord, name)));
-        return std::make_pair(ord, match);
+        verify(aug_nametoord(ref.get(), &ord, name));
+        return ord;
     }
     inline void
     insertmar(marref ref, const char* path)
@@ -150,7 +133,7 @@ namespace aug {
     inline off_t
     seekmar(marref ref, off_t offset, int whence)
     {
-        return verify(aug_seekmar(ref.get(), offset, whence));
+        return AUG_RESULT(verify(aug_seekmar(ref.get(), offset, whence)));
     }
     inline void
     setcontent(marref ref, const void* cdata, unsigned size)
@@ -175,7 +158,7 @@ namespace aug {
     inline unsigned
     writemar(marref ref, const void* buf, unsigned size)
     {
-        return verify(aug_writemar(ref.get(), buf, size));
+        return AUG_RESULT(verify(aug_writemar(ref.get(), buf, size)));
     }
     inline void
     extractmar(marref ref, const char* path)
@@ -195,7 +178,7 @@ namespace aug {
     inline unsigned
     readmar(marref ref, void* buf, unsigned size)
     {
-        return verify(aug_readmar(ref.get(), buf, size));
+        return AUG_RESULT(verify(aug_readmar(ref.get(), buf, size)));
     }
     inline unsigned
     getcontentsize(marref ref)

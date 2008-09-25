@@ -37,3 +37,5 @@ Assume edge-triggered semantics, including EAGAIN.
 Add support for epoll().
 
 Replace EINTR checks with AUG_FAILINTR.
+
+Use aug_rsize instead of optional outputs in mar.

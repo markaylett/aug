@@ -50,37 +50,34 @@ AUG_RCSID("$Id$");
 
 static unsigned options_ = 0;
 
-static int
+static aug_result
 fileset_(aug_mar_t mar, const char* filename)
 {
-    FILE* stream;
-
     if (0 == strcmp(filename, "-")) {
 
-        if (-1 == aug_streamset_(mar, stdin))
-            return -1;
+        aug_verify(aug_streamset_(mar, stdin));
 
     } else {
+
+        FILE* stream;
+        aug_result result;
 
         if (!(stream = fopen(filename, "r")))
             return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-        if (-1 == aug_streamset_(mar, stream))
-            goto fail;
-
-        if (0 != fclose(stream)) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
+        if (AUG_ISFAIL(result = aug_streamset_(mar, stream))) {
+            fclose(stream);
+            return AUG_FAILERROR;
         }
-    }
-    return 0;
 
- fail:
-    fclose(stream);
-    return -1;
+        if (0 != fclose(stream))
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+    }
+
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 extract_(aug_mar_t mar, const char* filename)
 {
     if (0 == strcmp(filename, "-")) {
@@ -89,19 +86,16 @@ extract_(aug_mar_t mar, const char* filename)
         unsigned size;
 
         if (!(body = aug_getcontent(mar, &size)))
-            return -1;
+            return AUG_FAILERROR;
 
-        if (size != fwrite(body, 1, size, stdout)) {
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-            return -1;
-        }
+        if (size != fwrite(body, 1, size, stdout))
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     } else {
 
-        if (-1 == aug_extractmar(mar, filename))
-            return -1;
+        aug_verify(aug_extractmar(mar, filename));
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static void
@@ -133,133 +127,129 @@ help_(void)
 }
 
 
-static int
+static aug_result
 insert_(aug_mar_t mar, const char* filename)
 {
+    aug_result result;
+
     if (0 == strcmp(filename, "-")) {
 
-        if (-1 == aug_insertstream_(mar, stdin))
-            return -1;
+        result = aug_insertstream_(mar, stdin);
 
     } else {
 
-        if (-1 == aug_insertmar(mar, filename))
-            return -1;
+        result = aug_insertmar(mar, filename);
     }
-    return 0;
+
+    return AUG_ISFAIL(result) ? result : AUG_SUCCESS;
 }
 
-static int
+static aug_result
 names_(aug_mar_t mar)
 {
     int i;
     for (i = 0; ; ++i) {
 
         const char* name;
-        if (-1 == aug_ordtoname(mar, &name, i))
-            return -1;
+        aug_verify(aug_ordtoname(mar, &name, i));
 
         if (NULL == name)
             break;
 
         printf("%s\n", name);
     }
-    if (EOF == fflush(stdout)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (EOF == fflush(stdout))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static void
 size_(aug_mar_t mar)
 {
     unsigned size = aug_getcontentsize(mar);
     printf("%u\n", size);
-    return 0;
 }
 
-static int
+static aug_result
 list_(aug_mar_t mar)
 {
     int i;
     for (i = 0; ; ++i) {
 
         struct aug_field field;
-        if (-1 == aug_getfield(mar, &field, i))
-            return -1;
+
+        aug_verify(aug_getfield(mar, &field, i));
 
         if (!field.value_)
             break;
 
         printf("%s=", field.name_);
-        if (-1 == aug_writevalue_(stdout, field.value_, field.size_))
-            return -1;
+
+        aug_verify(aug_writevalue_(stdout, field.value_, field.size_));
     }
 
-    if (EOF == fflush(stdout)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (EOF == fflush(stdout))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 get_(aug_mar_t mar, const char* name)
 {
     const void* value;
     unsigned size;
 
     if (!(value = aug_valuebyname(mar, name, &size)))
-        return -1;
+        return AUG_FAILERROR;
 
-    if (-1 == aug_writevalue_(stdout, value, size))
-        return -1;
+    aug_verify(aug_writevalue_(stdout, value, size));
 
-    if (EOF == fflush(stdout)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
+    if (EOF == fflush(stdout))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 remove_(aug_mar_t mar)
 {
     if (!FORCE_ && !aug_confirm_(REMOVETEXT_))
-        return 0;
+        return AUG_SUCCESS;
 
     return aug_removefields(mar);
 }
 
-static int
+static aug_result
 set_(aug_mar_t mar, char* src)
 {
     struct aug_field field;
 
-    if (-1 == aug_atofield_(&field, src))
+    if (AUG_ISFAIL(aug_atofield_(&field, src))) {
+
+        /* Not a pair, so assume file name. */
+
         return fileset_(mar, src);
+    }
 
     return aug_setfield(mar, &field, NULL);
 }
 
-static int
+static aug_result
 unset_(aug_mar_t mar, const char* name)
 {
     if (!FORCE_ && !aug_confirm_(UNSETTEXT_))
-        return 0;
+        return AUG_SUCCESS;
 
     return aug_unsetbyname(mar, name, NULL);
 }
 
-static int
+static aug_result
 zero_(aug_mar_t mar)
 {
     if (!FORCE_ && !aug_confirm_(ZEROTEXT_))
-        return 0;
+        return AUG_SUCCESS;
 
     return aug_truncatemar(mar, 0);
 }
@@ -270,7 +260,7 @@ exit_(void)
     AUG_DUMPLEAKS();
 }
 
-static int
+static aug_result
 run_(int argc, char* argv[], const char* archivename)
 {
     aug_mpool* mpool;
@@ -303,13 +293,13 @@ run_(int argc, char* argv[], const char* archivename)
 
     if (!mar) {
         aug_perrinfo(aug_tlx, "aug_openmar() failed", NULL);
-        return -1;
+        return AUG_FAILERROR;
     }
 
     while (-1 != (ch = aug_getopt(argc, argv, OPTIONS_)))
         switch (ch) {
         case 'c':
-            if (-1 == aug_compactmar(mar)) {
+            if (AUG_ISFAIL(aug_compactmar(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " COMPACTTEXT_, NULL);
                 goto fail;
             }
@@ -317,61 +307,58 @@ run_(int argc, char* argv[], const char* archivename)
         case 'f':
             break;
         case 'g':
-            if (-1 == get_(mar, aug_optarg)) {
+            if (AUG_ISFAIL(get_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " GETTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'i':
-            if (-1 == insert_(mar, aug_optarg)) {
+            if (AUG_ISFAIL(insert_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " INSERTTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'l':
-            if (-1 == names_(mar)) {
+            if (AUG_ISFAIL(names_(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " NAMESTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'n':
-            if (-1 == size_(mar)) {
-                aug_perrinfo(aug_tlx, "failed to " SIZETEXT_, NULL);
-                goto fail;
-            }
+            size_(mar);
             break;
         case 'r':
-            if (-1 == remove_(mar)) {
+            if (AUG_ISFAIL(remove_(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " REMOVETEXT_, NULL);
                 goto fail;
             }
             break;
         case 's':
-            if (-1 == set_(mar, aug_optarg)) {
+            if (AUG_ISFAIL(set_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " SETTEXT_, NULL);
                 goto fail;
             }
             break;
         case 't':
-            if (-1 == list_(mar)) {
+            if (AUG_ISFAIL(list_(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " LISTTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'u':
-            if (-1 == unset_(mar, aug_optarg)) {
+            if (AUG_ISFAIL(unset_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " UNSETTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'x':
-            if (-1 == extract_(mar, aug_optarg)) {
+            if (AUG_ISFAIL(extract_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " EXTRACTTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'z':
-            if (-1 == zero_(mar)) {
+            if (AUG_ISFAIL(zero_(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " ZEROTEXT_, NULL);
                 goto fail;
             }
@@ -384,11 +371,11 @@ run_(int argc, char* argv[], const char* archivename)
         }
 
     aug_releasemar(mar);
-    return 0;
+    return AUG_SUCCESS;
 
  fail:
     aug_releasemar(mar);
-    return -1;
+    return AUG_FAILERROR;
 }
 
 int
@@ -398,7 +385,7 @@ main(int argc, char* argv[])
     const char* archivename = NULL;
     aug_opterr = 0;
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     AUG_INITLEAKDUMP();
@@ -462,7 +449,7 @@ main(int argc, char* argv[])
     archivename = argv[aug_optind];
     aug_optind = 0;
 
-    if (-1 == run_(argc, argv, archivename))
+    if (AUG_ISFAIL(run_(argc, argv, archivename)))
         goto fail;
 
     return 0;

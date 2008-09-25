@@ -49,7 +49,7 @@
       <param name="mask" type="unsigned short"/>
     </method>
 
-    <method name="getmask" type="int" throws="true" qname="getchanmask"/>
+    <method name="getmask" type="unsigned short" qname="getchanmask"/>
 
     <method name="getid" type="unsigned" qname="getchanid"/>
 

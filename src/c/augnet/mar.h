@@ -19,10 +19,11 @@
 #include "augext/mpool.h"
 
 #include "augabi.h"
+#include "augtypes.h"
 
 struct aug_marhandler {
     aug_mar_t (*create_)(aug_object*, const char*);
-    int (*message_)(aug_object*, const char*, aug_mar_t);
+    aug_result (*message_)(aug_object*, const char*, aug_mar_t);
 };
 
 typedef struct aug_marparser_* aug_marparser_t;
@@ -39,10 +40,10 @@ aug_createmarparser(aug_mpool* mpool, unsigned size,
 AUGNET_API void
 aug_destroymarparser(aug_marparser_t parser);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_appendmar(aug_marparser_t parser, const char*, unsigned size);
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_finishmar(aug_marparser_t parser);
 
 #endif /* AUGNET_MAR_H */

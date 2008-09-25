@@ -483,10 +483,8 @@ aug_getfamily(aug_sd sd)
 {
     WSAPROTOCOL_INFO info = { 0 };
     socklen_t len = sizeof(info);
-    aug_result result = aug_getsockopt(sd, SOL_SOCKET, SO_PROTOCOL_INFO,
-                                       &info, &len);
-    if (AUG_ISFAIL(result))
-        return result;
+
+    aug_verify(aug_getsockopt(sd, SOL_SOCKET, SO_PROTOCOL_INFO, &info, &len));
 
     return AUG_MKRESULT(info.iAddressFamily);
 }

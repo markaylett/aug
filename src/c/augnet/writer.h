@@ -42,10 +42,10 @@ aug_writerempty(aug_writer_t writer);
  * Dynamically calculate total size in bytes.
  */
 
-AUGNET_API ssize_t
+AUGNET_API aug_rsize
 aug_writersize(aug_writer_t writer);
 
-AUGNET_API ssize_t
+AUGNET_API aug_rsize
 aug_writesome(aug_writer_t writer, aug_stream* stream);
 
 #endif /* AUGNET_WRITER_H */

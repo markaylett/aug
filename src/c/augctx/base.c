@@ -41,9 +41,7 @@ inittls_(void)
 
         /* TLS key must be initialised on first call. */
 
-        aug_result result = aug_createtlskey_(&tlskey_);
-        if (AUG_ISFAIL(result))
-            return result;
+        aug_verify(aug_createtlskey_(&tlskey_));
 
         init_ = AUG_TRUE;
         goto skip;

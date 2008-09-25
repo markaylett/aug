@@ -67,11 +67,10 @@ namespace aug {
         verify(aug_insertchan(chans, chan.get()));
     }
 
-    inline bool
+    inline void
     removechan(aug_chans_t chans, unsigned id)
     {
-        return AUG_FAILNONE == verify(aug_removechan(chans, id))
-            ? false : true;
+        verify(aug_removechan(chans, id));
     }
 
     inline void

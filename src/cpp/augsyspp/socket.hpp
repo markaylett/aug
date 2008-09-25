@@ -85,51 +85,53 @@ namespace aug {
     inline size_t
     recv(sdref ref, void* buf, size_t len, int flags)
     {
-        return verify(aug_recv(ref.get(), buf, len, flags));
+        return AUG_RESULT(verify(aug_recv(ref.get(), buf, len, flags)));
     }
 
     inline size_t
     recvfrom(sdref ref, void* buf, size_t len, int flags,
              aug_endpoint& ep)
     {
-        return verify(aug_recvfrom(ref.get(), buf, len, flags, &ep));
+        return AUG_RESULT(verify(aug_recvfrom(ref.get(), buf, len, flags,
+                                              &ep)));
     }
 
     inline size_t
     send(sdref ref, const void* buf, size_t len, int flags)
     {
-        return verify(aug_send(ref.get(), buf, len, flags));
+        return AUG_RESULT(verify(aug_send(ref.get(), buf, len, flags)));
     }
 
     inline size_t
     sendto(sdref ref, const void* buf, size_t len, int flags,
            const aug_endpoint& ep)
     {
-        return verify(aug_sendto(ref.get(), buf, len, flags, &ep));
+        return AUG_RESULT(verify(aug_sendto(ref.get(), buf, len, flags,
+                                            &ep)));
     }
 
-    inline ssize_t
+    inline size_t
     read(sdref ref, void* buf, size_t len)
     {
-        return verify(aug_sread(ref.get(), buf, len));
+        return AUG_RESULT(verify(aug_sread(ref.get(), buf, len)));
     }
 
-    inline ssize_t
+    inline size_t
     readv(sdref ref, const struct iovec* iov, int size)
     {
-        return verify(aug_sreadv(ref.get(), iov, size));
+        return AUG_RESULT(verify(aug_sreadv(ref.get(), iov, size)));
     }
 
-    inline ssize_t
+    inline size_t
     write(sdref ref, const void* buf, size_t len)
     {
-        return verify(aug_swrite(ref.get(), buf, len));
+        return AUG_RESULT(verify(aug_swrite(ref.get(), buf, len)));
     }
 
-    inline ssize_t
+    inline size_t
     writev(sdref ref, const struct iovec* iov, int size)
     {
-        return verify(aug_swritev(ref.get(), iov, size));
+        return AUG_RESULT(verify(aug_swritev(ref.get(), iov, size)));
     }
 
     inline void
@@ -194,7 +196,7 @@ namespace aug {
     inline int
     getfamily(sdref ref)
     {
-        return verify(aug_getfamily(ref.get()));
+        return AUG_RESULT(verify(aug_getfamily(ref.get())));
     }
 
     inline void

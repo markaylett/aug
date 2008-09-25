@@ -50,7 +50,7 @@ namespace aug {
         const_iterator
         unsetfield(const char* name)
         {
-            return const_iterator(mar_, aug::unsetfield(mar_, name).first);
+            return const_iterator(mar_, aug::unsetfield(mar_, name));
         }
         const_iterator
         unsetfield(const const_iterator& it)
@@ -96,7 +96,7 @@ namespace aug {
         const_iterator
         find(const char* name) const
         {
-            return const_iterator(mar_, toord(mar_, name).first);
+            return const_iterator(mar_, toord(mar_, name));
         }
         const_iterator
         begin() const

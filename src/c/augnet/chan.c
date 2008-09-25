@@ -250,7 +250,7 @@ cchan_setmask_(aug_chan* ob, unsigned short mask)
     return AUG_SUCCESS;
 }
 
-static int
+static unsigned short
 cchan_getmask_(aug_chan* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
@@ -466,7 +466,7 @@ schan_setmask_(aug_chan* ob, unsigned short mask)
     return AUG_SUCCESS;
 }
 
-static int
+static unsigned short
 schan_getmask_(aug_chan* ob)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
@@ -610,7 +610,7 @@ pchan_setmask_(aug_chan* ob, unsigned short mask)
     return aug_setmdeventmask(impl->muxer_, impl->sd_, mask);
 }
 
-static int
+static unsigned short
 pchan_getmask_(aug_chan* ob)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);

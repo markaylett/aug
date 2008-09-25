@@ -55,14 +55,12 @@ init_(aug_seq_t seq, struct aug_info_* info)
 {
     static const aug_verno_t VERNO = 2U;
     unsigned size = aug_seqsize_(seq);
-    aug_result result;
 
     /* An existing archive will be at least as big as the minimum size. */
 
     if (AUG_LEADER_SIZE <= size) {
 
-        if (AUG_ISFAIL(result = aug_info_(seq, info)))
-            return result;
+        aug_verify(aug_info_(seq, info));
 
         /* Verify version number embedded within header. */
 
@@ -76,8 +74,8 @@ init_(aug_seq_t seq, struct aug_info_* info)
     } else {
 
         char* ptr;
-        if (AUG_ISFAIL(result = aug_setregion_(seq, 0, size)))
-            return result;
+
+        aug_verify(aug_setregion_(seq, 0, size));
 
         if (!(ptr = aug_resizeseq_(seq, AUG_LEADER_SIZE)))
             return AUG_FAILERROR;
@@ -114,7 +112,7 @@ aug_copymar(aug_mar_t dst, aug_mar_t src)
         return AUG_FAILERROR;
     }
 
-    if (!AUG_ISFAIL(result = aug_copyseq_(dst->seq_, src->seq_)))
+    if (AUG_ISSUCCESS(result = aug_copyseq_(dst->seq_, src->seq_)))
         memcpy(&dst->info_, &src->info_, sizeof(dst->info_));
 
     return result;
@@ -481,8 +479,8 @@ aug_writemar(aug_mar_t mar, const void* buf, unsigned len)
             return rsize;
     }
 
-    if (!AUG_ISFAIL(rsize = aug_write_(mar->seq_, &mar->info_, mar->offset_,
-                                       buf, len)))
+    if (AUG_ISSUCCESS(rsize = aug_write_(mar->seq_, &mar->info_, mar->offset_,
+                                         buf, len)))
         mar->offset_ += AUG_RESULT(rsize);
 
     return rsize;
@@ -549,8 +547,8 @@ aug_readmar(aug_mar_t mar, void* buf, unsigned len)
         return AUG_FAILERROR;
     }
 
-    if (!AUG_ISFAIL(rsize = aug_read_(mar->seq_, &mar->info_, mar->offset_,
-                                      buf, len)))
+    if (AUG_ISSUCCESS(rsize = aug_read_(mar->seq_, &mar->info_, mar->offset_,
+                                        buf, len)))
         mar->offset_ += AUG_RESULT(rsize);
 
     return rsize;

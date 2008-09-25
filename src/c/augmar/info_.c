@@ -14,13 +14,11 @@ AUG_RCSID("$Id$");
 AUG_EXTERNC aug_result
 aug_setinfo_(aug_seq_t seq, const struct aug_info_* info)
 {
-    aug_result result;
     char* addr;
 
     assert(seq && info);
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, 0, AUG_LEADER_SIZE)))
-        return result;
+    aug_verify(aug_setregion_(seq, 0, AUG_LEADER_SIZE));
 
     if (!(addr = (char*)aug_seqaddr_(seq)))
         return AUG_FAILERROR;
@@ -36,13 +34,11 @@ aug_setinfo_(aug_seq_t seq, const struct aug_info_* info)
 AUG_EXTERNC aug_result
 aug_info_(aug_seq_t seq, struct aug_info_* info)
 {
-    aug_result result;
     char* addr;
 
     assert(seq && info);
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, 0, AUG_LEADER_SIZE)))
-        return result;
+    aug_verify(aug_setregion_(seq, 0, AUG_LEADER_SIZE));
 
     if (!(addr = (char*)aug_seqaddr_(seq)))
         return AUG_FAILERROR;

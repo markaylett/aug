@@ -104,7 +104,7 @@ bufempty_(struct buf_* x)
     return x->rd_ == x->wr_;
 }
 
-static int
+static aug_bool
 buffull_(struct buf_* x)
 {
     /* Return true if the buffer is full. */
@@ -195,7 +195,7 @@ writebufv_(struct buf_* x, const struct iovec* iov, int size)
     return ret;
 }
 
-static int
+static aug_result
 shutwr_(struct impl_* impl)
 {
     int ret;
@@ -402,7 +402,7 @@ readwrite_(struct impl_* impl, int rw)
            shutdown. */
 
         if (impl->shutdown_ && bufempty_(&impl->outbuf_)
-            && -1 == shutwr_(impl))
+            && AUG_ISFAIL(shutwr_(impl)))
             impl->state_ = SSLERR;
     }
  done:
@@ -572,10 +572,10 @@ csetmask_(aug_chan* ob, unsigned short mask)
 
     impl->mask_ = mask;
     updateevents_(impl);
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static unsigned short
 cgetmask_(aug_chan* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
@@ -644,10 +644,10 @@ sshutdown_(aug_stream* ob)
     /* If the output buffer is not empty, the shutdown call will be delayed
        until the remaining data has been written. */
 
-    return bufempty_(&impl->outbuf_) ? shutwr_(impl) : 0;
+    return bufempty_(&impl->outbuf_) ? shutwr_(impl) : AUG_SUCCESS;
 }
 
-static ssize_t
+static aug_rsize
 sread_(aug_stream* ob, void* buf, size_t size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
@@ -672,10 +672,10 @@ sread_(aug_stream* ob, void* buf, size_t size)
 
     ret = (ssize_t)readbuf_(&impl->inbuf_, buf, size);
     updateevents_(impl);
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
-static ssize_t
+static aug_rsize
 sreadv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
@@ -687,7 +687,7 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
     /* Only return end once all data has been read from buffer. */
 
     if (RDZERO == impl->state_ && bufempty_(&impl->inbuf_))
-        return 0;
+        return AUG_SUCCESS;
 
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
@@ -700,10 +700,10 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
 
     ret = (ssize_t)readbufv_(&impl->inbuf_, iov, size);
     updateevents_(impl);
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
-static ssize_t
+static aug_rsize
 swrite_(aug_stream* ob, const void* buf, size_t size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
@@ -728,10 +728,10 @@ swrite_(aug_stream* ob, const void* buf, size_t size)
 
     ret = (ssize_t)writebuf_(&impl->outbuf_, buf, size);
     updateevents_(impl);
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
-static ssize_t
+static aug_rsize
 swritev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
@@ -756,7 +756,7 @@ swritev_(aug_stream* ob, const struct iovec* iov, int size)
 
     ret = (ssize_t)writebufv_(&impl->outbuf_, iov, size);
     updateevents_(impl);
-    return ret;
+    return AUG_MKRESULT(ret);
 }
 
 static const struct aug_streamvtbl svtbl_ = {
@@ -778,7 +778,7 @@ createssl_(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
     SSL* ssl;
     BIO* bio;
 
-    if (aug_setmdeventmask(muxer, sd, AUG_MDEVENTRDWR) < 0)
+    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTRDWR)))
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct impl_)))) {

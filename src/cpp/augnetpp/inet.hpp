@@ -73,8 +73,11 @@ namespace aug {
     inline bool
     established(sdref ref)
     {
-        return AUG_FAILNONE == verify(aug_established(ref.get()))
-            ? false : true;
+        aug_result result(aug_established(ref.get()));
+        if (AUG_ISNONE(result))
+            return false;
+        verify(result); // Possible error.
+        return true;
     }
 }
 

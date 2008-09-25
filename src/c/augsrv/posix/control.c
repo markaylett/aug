@@ -37,7 +37,6 @@ static aug_result
 send_(int fd, pid_t pid, int event)
 {
     struct flock fl;
-    aug_result result;
 
     switch (event) {
     case AUG_EVENTRECONF:
@@ -54,8 +53,7 @@ send_(int fd, pid_t pid, int event)
 
         /* Wait for daemon process to release lock. */
 
-        if (AUG_ISFAIL(result = flock_(&fl, fd, F_SETLKW, F_RDLCK)))
-            return result;
+        aug_verify(flock_(&fl, fd, F_SETLKW, F_RDLCK));
 
         /* The lock has been obtained; daemon process must have stopped. */
 

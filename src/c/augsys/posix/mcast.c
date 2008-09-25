@@ -52,14 +52,9 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 
         un.ipv4_.imr_multiaddr.s_addr = addr->un_.ipv4_.s_addr;
 
-        if (ifname) {
-
-            aug_result result = getifaddr_(sd, &un.ipv4_.imr_interface,
-                                           ifname);
-            if (AUG_ISFAIL(result))
-                return result;
-
-        } else
+        if (ifname)
+            aug_verify(getifaddr_(sd, &un.ipv4_.imr_interface, ifname));
+        else
             un.ipv4_.imr_interface.s_addr = htonl(INADDR_ANY);
 
         return aug_setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &un.ipv4_,
@@ -71,14 +66,9 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 		memcpy(&un.ipv6_.ipv6mr_multiaddr, &addr->un_.ipv6_,
 			   sizeof(addr->un_.ipv6_));
 
-        if (ifname) {
-
-            aug_result result = getifindex_(&un.ipv6_.ipv6mr_interface,
-                                            ifname);
-            if (AUG_ISFAIL(result))
-                return result;
-
-        } else
+        if (ifname)
+            aug_verify(getifindex_(&un.ipv6_.ipv6mr_interface, ifname));
+        else
             un.ipv6_.ipv6mr_interface = 0;
 
         return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,
@@ -104,14 +94,9 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 
         un.ipv4_.imr_multiaddr.s_addr = addr->un_.ipv4_.s_addr;
 
-        if (ifname) {
-
-            aug_result result = getifaddr_(sd, &un.ipv4_.imr_interface,
-                                           ifname);
-            if (AUG_ISFAIL(result))
-                return result;
-
-        } else
+        if (ifname)
+            aug_verify(getifaddr_(sd, &un.ipv4_.imr_interface, ifname));
+        else
             un.ipv4_.imr_interface.s_addr = htonl(INADDR_ANY);
 
         return aug_setsockopt(sd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &un.ipv4_,
@@ -123,14 +108,9 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 		memcpy(&un.ipv6_.ipv6mr_multiaddr, &addr->un_.ipv6_,
 			   sizeof(addr->un_.ipv6_));
 
-        if (ifname) {
-
-            aug_result result = getifindex_(&un.ipv6_.ipv6mr_interface,
-                                            ifname);
-            if (AUG_ISFAIL(result))
-                return result;
-
-        } else
+        if (ifname)
+            aug_verify(getifindex_(&un.ipv6_.ipv6mr_interface, ifname));
+        else
             un.ipv6_.ipv6mr_interface = 0;
 
         return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP,
@@ -144,7 +124,7 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 AUGSYS_API aug_result
 aug_setmcastif(aug_sd sd, const char* ifname)
 {
-    aug_result result;
+    aug_result af;
     union {
         struct in_addr ipv4_;
 #if HAVE_IPV6
@@ -152,24 +132,20 @@ aug_setmcastif(aug_sd sd, const char* ifname)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (AUG_ISFAIL(result = aug_getfamily(sd)))
-        return result;
+    if (AUG_ISFAIL(af = aug_getfamily(sd)))
+        return af;
 
-    switch (AUG_RESULT(result)) {
+    switch (AUG_RESULT(af) {
     case AF_INET:
 
-        if (AUG_ISFAIL(result = getifaddr_(sd, &un.ipv4_, ifname)))
-            return result;
-
+        aug_verify(getifaddr_(sd, &un.ipv4_, ifname));
         return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_IF, &un.ipv4_,
                               sizeof(un.ipv4_));
 
 #if HAVE_IPV6
     case AF_INET6:
 
-        if (AUG_ISFAIL(result = getifindex_(&un.ipv6_, ifname)))
-            return result;
-
+        aug_verify(getifindex_(&un.ipv6_, ifname));
         return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_MULTICAST_IF,
                               &un.ipv6_, sizeof(un.ipv6_));
 #endif /* HAVE_IPV6 */

@@ -419,7 +419,7 @@ engine::run(bool stoponerr)
 {
     AUG_CTXDEBUG2(aug_tlx, "running daemon process");
 
-    int ret(!0);
+    unsigned events(!0);
     while (!stopping() || !impl_->socks_.empty()) {
 
         if (detail::engineimpl::STOPPED == impl_->state_)
@@ -430,20 +430,31 @@ engine::run(bool stoponerr)
             if (impl_->timers_.empty()) {
 
                 scoped_unblock unblock;
-                while (AUG_FAILINTR == (ret = waitmdevents(impl_->muxer_)))
-                    ;
+                for (;;) {
+                    try {
+                        events = waitmdevents(impl_->muxer_);
+                        break;
+                    } catch (const intr_exception&) {
+                        // While interrupted.
+                    }
+                }
 
             } else {
 
                 AUG_CTXDEBUG2(aug_tlx, "processing timers");
 
                 timeval tv;
-                processexpired(impl_->timers_, 0 == ret, tv);
+                processexpired(impl_->timers_, 0 == events, tv);
 
                 scoped_unblock unblock;
-                while (AUG_FAILINTR == (ret = waitmdevents(impl_
-                                                           ->muxer_, tv)))
-                    ;
+                for (;;) {
+                    try {
+                        events = waitmdevents(impl_->muxer_, tv);
+                        break;
+                    } catch (const intr_exception&) {
+                        // While interrupted.
+                    }
+                }
             }
 
             // Update timestamp after waiting.

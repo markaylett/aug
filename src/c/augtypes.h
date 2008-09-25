@@ -99,6 +99,13 @@ aug_mkresult_(long val)
 #define AUG_ISINTR(x)   (-3 == AUG_RESULT(x))
 #define AUG_ISBLOCK(x)  (-4 == AUG_RESULT(x))
 
+#define aug_verify(x)                                                   \
+    do {                                                                \
+        aug_result aug_tmp;                                             \
+        if (AUG_ISFAIL(aug_tmp = (x)))                                  \
+            return aug_tmp;                                             \
+    } while (0)
+
 /** @} */
 
 /**

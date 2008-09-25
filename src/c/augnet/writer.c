@@ -132,7 +132,7 @@ aug_writerempty(aug_writer_t writer)
     return AUG_EMPTY(&writer->bufs_) ? AUG_TRUE : AUG_FALSE;
 }
 
-AUGNET_API ssize_t
+AUGNET_API aug_rsize
 aug_writersize(aug_writer_t writer)
 {
     struct buf_* it;
@@ -144,28 +144,28 @@ aug_writersize(aug_writer_t writer)
         if (!aug_getblobdata(it->blob_, &len)) {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
                            AUG_MSG("failed conversion from var to buffer"));
-            return -1;
+            return AUG_FAILERROR;
         }
 
         size += len;
     }
 
-    return (ssize_t)size;
+    return AUG_MKRESULT((ssize_t)size);
 }
 
-AUGNET_API ssize_t
+AUGNET_API aug_rsize
 aug_writesome(aug_writer_t writer, aug_stream* stream)
 {
-    ssize_t ret;
+    unsigned i, size;
     struct iovec* iov;
     struct buf_* it;
-    unsigned i, size;
     size_t len;
+    aug_rsize rsize;
 
     /* As a precaution, limit use of stack space. */
 
     if (0 == (size = AUG_MIN(writer->size_, 64)))
-        return 0;
+        return AUG_MKRESULT(0);
 
     iov = alloca(sizeof(struct iovec) * size);
 
@@ -177,7 +177,7 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
         if (!(iov[i].iov_base = (void*)aug_getblobdata(it->blob_, &len))) {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
                            AUG_MSG("failed conversion from var to buffer"));
-            return -1;
+            return AUG_FAILERROR;
         }
 
         iov[i].iov_len = (int)len;
@@ -190,12 +190,12 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
     iov->iov_base = (char*)iov->iov_base + writer->part_;
     iov->iov_len -= (int)writer->part_;
 
-    if (-1 != (ret = aug_writev(stream, iov, size))) {
+    if (AUG_ISSUCCESS(rsize = aug_writev(stream, iov, size))) {
 
         /* Pop any completed buffers from queue. */
 
-        popbufs_(writer, iov, ret);
+        popbufs_(writer, iov, AUG_RESULT(rsize));
     }
 
-    return ret;
+    return rsize;
 }

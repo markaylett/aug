@@ -97,11 +97,9 @@ offsetbyname_(void* begin, const char* name, unsigned* inout)
 AUG_EXTERNC aug_result
 aug_removefields_(aug_seq_t seq, struct aug_info_* info)
 {
-    aug_result result;
     assert(seq && info);
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!aug_resizeseq_(seq, 0))
         return AUG_FAILERROR;
@@ -115,7 +113,6 @@ AUG_EXTERNC aug_result
 aug_setfield_(aug_seq_t seq, struct aug_info_* info,
               const struct aug_field* field, unsigned* ord)
 {
-    aug_result result;
     unsigned nsize, vsize, fsize, inout, offset, orig;
     char* ptr;
 
@@ -147,8 +144,7 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     fsize = AUG_FIELD_SIZE(nsize, vsize);
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!(ptr = aug_seqaddr_(seq)))
         return AUG_FAILERROR;
@@ -160,8 +156,7 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     orig = inout == info->fields_ ? 0 : fieldsize_(ptr + offset);
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER + offset, orig)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER + offset, orig));
 
     if (!(ptr = aug_resizeseq_(seq, fsize)))
         return AUG_FAILERROR;
@@ -202,7 +197,6 @@ AUG_EXTERNC aug_result
 aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
               const void* value, unsigned size)
 {
-    aug_result result;
     unsigned offset, nsize, vsize, orig;
     char* ptr;
 
@@ -226,8 +220,7 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
         return AUG_FAILERROR;
     }
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!(ptr = aug_seqaddr_(seq)))
         return AUG_FAILERROR;
@@ -238,9 +231,8 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
     nsize = nsize_(ptr);
     orig = vsize_(ptr);
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER + offset,
-                                           AUG_FIELD_SIZE(nsize, orig))))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER + offset,
+                              AUG_FIELD_SIZE(nsize, orig)));
 
     if (!(ptr = aug_resizeseq_(seq, AUG_FIELD_SIZE(nsize, vsize))))
         return AUG_FAILERROR;
@@ -265,13 +257,11 @@ AUG_EXTERNC aug_result
 aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
                  unsigned* ord)
 {
-    aug_result result;
     unsigned inout, offset, orig;
     char* ptr;
     assert(seq && info && name);
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!(ptr = aug_seqaddr_(seq)))
         return AUG_FAILERROR;
@@ -288,8 +278,7 @@ aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
     }
 
     orig = fieldsize_(ptr + offset);
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER + offset, orig)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER + offset, orig));
 
     if (!(ptr = aug_resizeseq_(seq, 0)))
         return AUG_FAILERROR;
@@ -308,7 +297,6 @@ aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
 AUG_EXTERNC aug_result
 aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, unsigned ord)
 {
-    aug_result result;
     unsigned offset, orig;
     char* ptr;
 
@@ -317,8 +305,7 @@ aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, unsigned ord)
         return AUG_FAILNONE;
     }
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!(ptr = aug_seqaddr_(seq)))
         return AUG_FAILERROR;
@@ -326,8 +313,7 @@ aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, unsigned ord)
     offset = offsetbyord_(ptr, ord);
     orig = fieldsize_(ptr + offset);
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER + offset, orig)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER + offset, orig));
 
     if (!(ptr = aug_resizeseq_(seq, 0)))
         return AUG_FAILERROR;
@@ -409,7 +395,6 @@ AUG_EXTERNC aug_result
 aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
               struct aug_field* field, unsigned ord)
 {
-    aug_result result;
     char* ptr;
 
     if (ord >= info->fields_) {
@@ -424,8 +409,7 @@ aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
         return AUG_FAILNONE;
     }
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!(ptr = aug_seqaddr_(seq)))
         return AUG_FAILERROR;
@@ -444,7 +428,6 @@ AUG_EXTERNC aug_result
 aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
                unsigned ord)
 {
-    aug_result result;
     char* ptr;
 
     assert(seq && info && name);
@@ -456,8 +439,7 @@ aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
         return AUG_FAILNONE;
     }
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!(ptr = aug_seqaddr_(seq)))
         return AUG_FAILERROR;
@@ -470,14 +452,12 @@ AUG_EXTERNC aug_result
 aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, unsigned* ord,
                const char* name)
 {
-    aug_result result;
     char* ptr;
     unsigned inout;
 
     assert(seq && info && name);
 
-    if (AUG_ISFAIL(result = aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return result;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!(ptr = aug_seqaddr_(seq)))
         return AUG_FAILERROR;

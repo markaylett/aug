@@ -28,10 +28,9 @@ namespace aug {
     {
         va_list args;
         va_start(args, format);
-        int ret(aug_vformatlog(buf, &n, logLevel, format, args));
+        aug_result result(aug_vformatlog(buf, &n, logLevel, format, args));
         va_end(args);
-        if (-1 == ret)
-            throwerror();
+        verify(result);
     }
 
     inline std::string
@@ -51,10 +50,9 @@ namespace aug {
 
         va_list args;
         va_start(args, format);
-        int ret(aug_vformatlog(buf, &n, logLevel, format, args));
+        aug_result result(aug_vformatlog(buf, &n, logLevel, format, args));
         va_end(args);
-        if (-1 == ret)
-            throwerror();
+        verify(result);
 
         return std::string(buf, n);
     }

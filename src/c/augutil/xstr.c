@@ -81,13 +81,10 @@ reserve_(aug_xstr_t xstr, size_t size)
 static aug_result
 xstrcat_(aug_xstr_t xstr, const aug_xstr_t src, size_t len)
 {
-    aug_result result;
-
 	if (!len)
 		return AUG_SUCCESS;
 
-	if (AUG_ISFAIL(result = reserve_(xstr, xstr->len_ + len)))
-		return result;
+	aug_verify(reserve_(xstr, xstr->len_ + len));
 
     /* Allow copy from overlapping region. */
 
@@ -146,13 +143,10 @@ aug_clearxstr(aug_xstr_t xstr)
 AUGUTIL_API aug_result
 aug_xstrcatsn(aug_xstr_t xstr, const char* src, size_t len)
 {
-    aug_result result;
-
 	if (!len)
 		return AUG_SUCCESS;
 
-	if (AUG_ISFAIL(result = reserve_(xstr, xstr->len_ + len)))
-		return result;
+	aug_verify(reserve_(xstr, xstr->len_ + len));
 
     /* Allow copy from overlapping region. */
 
@@ -176,11 +170,7 @@ aug_xstrcat(aug_xstr_t xstr, const aug_xstr_t src)
 AUGUTIL_API aug_result
 aug_xstrcpysn(aug_xstr_t xstr, const char* src, size_t len)
 {
-    aug_result result = aug_clearxstr(xstr);
-
-	if (AUG_ISFAIL(result))
-		return result;
-
+    aug_verify(aug_clearxstr(xstr));
 	return aug_xstrcatsn(xstr, src, len);
 }
 
@@ -196,10 +186,7 @@ aug_xstrcpy(aug_xstr_t xstr, const aug_xstr_t src)
     /* Preserve length prior to resetting. */
 
     size_t len = src->len_;
-    aug_result result = aug_clearxstr(xstr);
-
-	if (AUG_ISFAIL(result))
-		return result;
+    aug_verify(aug_clearxstr(xstr));
 
 	return xstrcat_(xstr, src, len);
 }
@@ -207,10 +194,7 @@ aug_xstrcpy(aug_xstr_t xstr, const aug_xstr_t src)
 AUGUTIL_API aug_result
 aug_xstrcatcn(aug_xstr_t xstr, char ch, size_t num)
 {
-    aug_result result = reserve_(xstr, xstr->len_ + num);
-
-	if (AUG_ISFAIL(result))
-		return result;
+    aug_verify(reserve_(xstr, xstr->len_ + num));
 
 	if (1 == num)
         xstr->ptr_[xstr->len_] = ch;
@@ -230,11 +214,7 @@ aug_xstrcatc(aug_xstr_t xstr, char ch)
 AUGUTIL_API aug_result
 aug_xstrcpycn(aug_xstr_t xstr, char ch, size_t num)
 {
-    aug_result result = aug_clearxstr(xstr);
-
-	if (AUG_ISFAIL(result))
-		return result;
-
+    aug_verify(aug_clearxstr(xstr));
 	return aug_xstrcatcn(xstr, ch, num);
 }
 

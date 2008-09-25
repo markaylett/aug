@@ -14,10 +14,12 @@
 
 #include "augsys/types.h"
 
+#include "augtypes.h"
+
 AUGUTIL_API const char*
 aug_basename(const char* path);
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_chdir(const char* path);
 
 AUGUTIL_API char*

@@ -14,7 +14,7 @@ AUG_RCSID("$Id$");
 
 static const char NL_ = '\n';
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_atofield_(struct aug_field* field, char* src)
 {
     /* Split field in the form of "name=value". */
@@ -26,7 +26,7 @@ aug_atofield_(struct aug_field* field, char* src)
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("empty value part"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
     size = value - src;
@@ -35,10 +35,10 @@ aug_atofield_(struct aug_field* field, char* src)
     field->name_ = src;
     field->value_ = ++value;
     field->size_ = (unsigned)strlen(value);
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_bool
 aug_confirm_(const char* prompt)
 {
     char buf[3];
@@ -46,22 +46,22 @@ aug_confirm_(const char* prompt)
     printf("%s? (y or [n]): ", prompt);
     fflush(stdout);
 
-    switch (aug_readline_(buf, sizeof(buf), stdin)) {
-    case 1:
+    switch (AUG_RESULT(aug_readline_(buf, sizeof(buf), stdin))) {
+    case 1: /* One character. */
         break;
     default:
-        return 0;
+        return AUG_FALSE;
     }
 
     switch (buf[0]) {
     case 'y':
     case 'Y':
-        return 1;
+        return AUG_TRUE;
     }
-    return 0;
+    return AUG_FALSE;
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_insertstream_(aug_mar_t mar, FILE* stream)
 {
     char buf[AUG_MAXLINE];
@@ -69,36 +69,35 @@ aug_insertstream_(aug_mar_t mar, FILE* stream)
 
         size_t size = fread(buf, 1, sizeof(buf), stdin);
         if (size)
-            aug_writemar(mar, buf, (unsigned)size);
+            aug_verify(aug_writemar(mar, buf, (unsigned)size));
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
-AUG_EXTERNC ssize_t
+AUG_EXTERNC aug_rsize
 aug_readline_(char* buf, size_t size, FILE* stream)
 {
     char* p = fgets(buf, (int)size, stream);
     if (!p) {
 
         if (feof(stream))
-            return -2;
+            return AUG_FAILNONE;
 
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
     }
 
     if (!(p = strchr(buf, '\n'))) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("newline character expected"));
-        return -1;
+        return AUG_FAILERROR;
     }
 
     *p = '\0';
-    return (ssize_t)(p - buf);
+    return AUG_MKRESULT((ssize_t)(p - buf));
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_streamset_(aug_mar_t mar, FILE* stream)
 {
     char buf[AUG_MAXLINE];
@@ -106,32 +105,30 @@ aug_streamset_(aug_mar_t mar, FILE* stream)
 
     for (;;) {
 
-        switch (aug_readline_(buf, sizeof(buf), stream)) {
-        case -1:
-            return -1;
-        case AUG_EENDOF:
-            goto eof;
+        aug_rsize rsize = aug_readline_(buf, sizeof(buf), stream);
+        if (AUG_ISFAIL(rsize)) {
+
+            if (AUG_ISNONE(rsize))
+                break;
+
+            return rsize;
         }
 
-        if (-1 == aug_atofield_(&field, buf))
-            return -1;
+        /* Split name/value. */
 
-        if (-1 == aug_setfield(mar, &field, NULL))
-            return -1;
+        aug_verify(aug_atofield_(&field, buf));
+        aug_verify(aug_setfield(mar, &field, NULL));
     }
- eof:
-    return 0;
+
+    return AUG_SUCCESS;
 }
 
-AUG_EXTERNC int
+AUG_EXTERNC aug_result
 aug_writevalue_(FILE* stream, const void* value, size_t size)
 {
     if (size != fwrite(value, 1, size, stream)
-        || 1 != fwrite(&NL_, 1, 1, stream)) {
+        || 1 != fwrite(&NL_, 1, 1, stream))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
-
-    return 0;
+    return AUG_SUCCESS;
 }

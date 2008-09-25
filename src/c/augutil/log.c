@@ -115,10 +115,8 @@ vwritelog_(aug_log* obj, int level, const char* format, va_list args)
 {
     char buf[AUG_MAXLINE];
     size_t n = sizeof(buf);
-    aug_result result;
 
-    if (AUG_ISFAIL(result = aug_vformatlog(buf, &n, level, format, args)))
-        return result;
+    aug_verify(aug_vformatlog(buf, &n, level, format, args));
 
 #if defined(_WIN32) && !defined(NDEBUG)
     aug_lock();

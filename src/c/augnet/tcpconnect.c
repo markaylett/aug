@@ -25,14 +25,11 @@ struct aug_tcpconnect_ {
     aug_sd sd_;
 };
 
-static int
+static aug_result
 getsockerr_(aug_sd sd, int* err)
 {
     socklen_t len = sizeof(*err);
-    if (-1 == aug_getsockopt(sd, SOL_SOCKET, SO_ERROR, err, &len))
-        return -1;
-
-    return 0;
+    return aug_getsockopt(sd, SOL_SOCKET, SO_ERROR, err, &len);
 }
 
 AUGNET_API aug_tcpconnect_t
@@ -46,7 +43,7 @@ aug_createtcpconnect(aug_mpool* mpool, const char* host, const char* serv)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (-1 == aug_getaddrinfo(host, serv, &hints, &res))
+    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
         return NULL;
 
     if (!(conn  = aug_allocmem(mpool, sizeof(struct aug_tcpconnect_)))) {
@@ -98,46 +95,48 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 
         /* Check status of pending connection. */
 
-        switch (aug_established(sd)) {
-        case -1:
+        aug_result result = aug_established(sd);
 
-            /* Error testing for establishment. */
+        if (AUG_ISFAIL(result)) {
 
-            aug_sclose(sd);
-            return AUG_BADSD;
+            if (AUG_ISNONE(result)) {
 
-        case 0:
+                /* Not established. */
+
+                if ((conn->res_ = conn->res_->ai_next)) {
+
+                    /* Try next address. */
+
+                    if (AUG_ISFAIL(aug_sclose(sd)))
+                        return AUG_BADSD;
+
+                } else {
+
+                    /* No more addresses: set error to connection failure
+                       reason. */
+
+                    int err = ECONNREFUSED;
+                    getsockerr_(sd, &err);
+                    aug_sclose(sd); /* May set errno */
+                    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, err);
+                    return AUG_BADSD;
+                }
+
+            } else {
+
+
+                /* Error testing for establishment. */
+
+                aug_sclose(sd);
+                return AUG_BADSD;
+            }
+
+        } else {
 
             /* Established. */
 
             aug_getendpoint(conn->res_, ep);
             goto done;
-
-        case AUG_FAILNONE:
-
-            /* Not established. */
-
-            if ((conn->res_ = conn->res_->ai_next)) {
-
-                /* Try next address. */
-
-                if (-1 == aug_sclose(sd))
-                    return AUG_BADSD;
-                break;
-            }
-
-            /* No more addresses: set error to connection failure reason. */
-
-            {
-                int err = ECONNREFUSED;
-                getsockerr_(sd, &err);
-                aug_sclose(sd); /* May set errno */
-                aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, err);
-            }
-            return AUG_BADSD;
-
-        default:
-            assert(!"unexpected return from aug_established()");
         }
     }
 
@@ -154,14 +153,14 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
         if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
-        if (-1 == aug_ssetnonblock(sd, AUG_TRUE)) {
+        if (AUG_ISFAIL(aug_ssetnonblock(sd, AUG_TRUE))) {
             aug_sclose(sd);
             return AUG_BADSD;
         }
 
         aug_getendpoint(conn->res_, ep);
 
-        if (0 == aug_connect(sd, ep)) {
+        if (AUG_ISSUCCESS(aug_connect(sd, ep))) {
 
             /* Immediate establishment. */
 
@@ -180,7 +179,7 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 
         /* Failed for other reason. */
 
-        if (-1 == aug_sclose(sd)) /* Ignore this one. */
+        if (AUG_ISFAIL(aug_sclose(sd))) /* Ignore this one. */
             return AUG_BADSD;
 
     } while ((conn->res_ = conn->res_->ai_next));

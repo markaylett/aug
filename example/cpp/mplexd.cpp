@@ -367,24 +367,34 @@ namespace test {
 
             aug_ctxinfo(aug_tlx, "running daemon process");
 
-            int ret(!0);
+            unsigned events(!0);
             while (!quit_) {
 
                 if (state_->timers_.empty()) {
 
                     scoped_unblock unblock;
-                    while (AUG_FAILINTR == (ret = waitmdevents(state_
-                                                               ->muxer_)))
-                        ;
+                    for (;;) {
+                        try {
+                            events = waitmdevents(state_->muxer_);
+                            break;
+                        } catch (const intr_exception&) {
+                            // While interrupted.
+                        }
+                    }
 
                 } else {
 
-                    processexpired(state_->timers_, 0 == ret, tv);
+                    processexpired(state_->timers_, 0 == events, tv);
 
                     scoped_unblock unblock;
-                    while (AUG_FAILINTR == (ret = waitmdevents(state_
-                                                               ->muxer_, tv)))
-                        ;
+                    for (;;) {
+                        try {
+                            events = waitmdevents(state_->muxer_, tv);
+                            break;
+                        } catch (const intr_exception&) {
+                            // While interrupted.
+                        }
+                    }
                 }
 
                 if (getmdevents(state_->muxer_, aug_eventrd()))

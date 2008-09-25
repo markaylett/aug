@@ -194,22 +194,32 @@ namespace test {
 
             state_->timer_.set(5000, *this);
 
-            int ret(!0);
+            unsigned events(!0);
             while (0 < remain_) {
 
                 if (state_->timers_.empty()) {
 
-                    while (AUG_FAILINTR == (ret = waitmdevents(state_
-                                                               ->muxer_)))
-                        ;
+                    for (;;) {
+                        try {
+                            events = waitmdevents(state_->muxer_);
+                            break;
+                        } catch (const intr_exception&) {
+                            // While interrupted.
+                        }
+                    }
 
                 } else {
 
-                    processexpired(state_->timers_, 0 == ret, tv);
-                    while (AUG_FAILINTR == (ret = waitmdevents(state_
-                                                               ->muxer_,
-                                                               tv)))
-                        ;
+                    processexpired(state_->timers_, 0 == events, tv);
+
+                    for (;;) {
+                        try {
+                            events = waitmdevents(state_->muxer_, tv);
+                            break;
+                        } catch (const intr_exception&) {
+                            // While interrupted.
+                        }
+                    }
                 }
 
                 readevent();

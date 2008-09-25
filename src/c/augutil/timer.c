@@ -129,7 +129,6 @@ aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
              aug_object* ob)
 {
     struct timeval tv;
-    aug_result result;
     struct timer_* timer;
 
     if (id <= 0)
@@ -137,8 +136,7 @@ aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
     else
         aug_canceltimer(timers, id);
 
-    if (AUG_ISFAIL(result = setexpiry_(&tv, ms)))
-        return result;
+    aug_verify(setexpiry_(&tv, ms));
 
     if (!(timer = createtimer_(timers->mpool_, ob)))
         return AUG_FAILERROR;

@@ -733,19 +733,25 @@ namespace {
         setmdeventmask(mux, ref, AUG_MDEVENTRD);
 
         timeval tv;
-        int ret(!0);
+        unsigned events(!0);
         while (!stop_) {
 
-            processexpired(ts, 0 == ret, tv);
+            processexpired(ts, 0 == events, tv);
             aug_ctxinfo(aug_tlx, "timeout in: tv_sec=%d, tv_usec=%d",
                         (int)tv.tv_sec, (int)tv.tv_usec);
 
-            while (AUG_FAILINTR == (ret = waitmdevents(mux, tv)))
-                ;
+            for (;;) {
+                try {
+                    events = waitmdevents(mux, tv);
+                    break;
+                } catch (const intr_exception&) {
+                    // While interrupted.
+                }
+            }
 
-            aug_ctxinfo(aug_tlx, "waitmdevents: %d", ret);
+            aug_ctxinfo(aug_tlx, "waitmdevents: %u", events);
 
-            if (0 < ret) {
+            if (0 < events) {
                 packet p;
                 endpoint from(null);
                 recvfrom(ref, p, from);

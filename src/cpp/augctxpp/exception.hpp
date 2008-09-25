@@ -16,6 +16,30 @@
 
 namespace aug {
 
+    struct none_exception : std::exception {
+        const char*
+        what() const throw() // required by gcc.
+        {
+            return "aug::none_exception";
+        }
+    };
+
+    struct intr_exception : std::exception {
+        const char*
+        what() const throw() // required by gcc.
+        {
+            return "aug::intr_exception";
+        }
+    };
+
+    struct block_exception : std::exception {
+        const char*
+        what() const throw() // required by gcc.
+        {
+            return "aug::block_exception";
+        }
+    };
+
     class errinfo_error : public std::exception {
     public:
         typedef aug_errinfo ctype;
@@ -210,43 +234,73 @@ namespace aug {
 
         template <typename T>
         struct result_traits {
+            typedef size_t return_type;
             static bool
             error(T result)
             {
-                return AUG_FAILERROR == result;
+                if (AUG_ISSUCCESS(result))
+                    return false;
+
+                if (AUG_ISNONE(result))
+                    throw none_exception();
+
+                if (AUG_ISINTR(result))
+                    throw intr_exception();
+
+                if (AUG_ISBLOCK(result))
+                    throw block_exception();
+
+                return true;
+            }
+            static return_type
+            get(T result)
+            {
+                return AUG_RESULT(result);
             }
         };
 
         template <typename T>
         struct result_traits<T*> {
+            typedef T* return_type;
             static bool
             error(T* result)
             {
                 return 0 == result;
             }
+            static return_type
+            get(T* result)
+            {
+                return result;
+            }
         };
 
         template <>
         struct result_traits<bool> {
+            typedef bool return_type;
             static bool
             error(bool result)
             {
                 return !result;
             }
-        };
+            static return_type
+            get(bool result)
+            {
+                return result;
+            }
+       };
     }
 
     template <typename T>
-    T
+    typename detail::result_traits<T>::result_type
     verify(T result)
     {
         if (detail::result_traits<T>::error(result))
             throwerror();
-        return result;
+        return detail::result_traits<T>::get(result);
     }
 
     template <typename T, typename U>
-    T
+    typename detail::result_traits<T>::result_type
     verify(T result, obref<U> src)
     {
         if (detail::result_traits<T>::error(result)) {
@@ -259,7 +313,7 @@ namespace aug {
             copyerrinfo(ptr, errinfo);
             throwerror(errinfo);
         }
-        return result;
+        return detail::result_traits<T>::get(result);
     }
 }
 

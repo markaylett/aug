@@ -158,7 +158,7 @@ chan_setmask_(aug_chan* ob, unsigned short mask)
 #endif /* _WIN32 */
 }
 
-static int
+static unsigned short
 chan_getmask_(aug_chan* ob)
 {
 #if !defined(_WIN32)

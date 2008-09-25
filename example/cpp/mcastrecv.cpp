@@ -37,8 +37,12 @@ main(int argc, char* argv[])
         setmdeventmask(mux, sfd, AUG_MDEVENTRD);
 
         for (;;) {
-            while (AUG_FAILINTR == waitmdevents(mux))
-                ;
+
+            try {
+                waitmdevents(mux);
+            } catch (const intr_exception&) {
+                continue; // While interrupted.
+            }
 
             char buf[AUG_NETEVENT_SIZE];
             size_t size(read(sfd, buf, sizeof(buf)));

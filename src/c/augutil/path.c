@@ -48,14 +48,13 @@ aug_basename(const char* path)
     return base;
 }
 
-AUGUTIL_API int
+AUGUTIL_API aug_result
 aug_chdir(const char* path)
 {
-    if (-1 == chdir(path)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return -1;
-    }
-    return 0;
+    if (-1 == chdir(path))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+
+    return AUG_SUCCESS;
 }
 
 AUGUTIL_API char*

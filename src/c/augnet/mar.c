@@ -29,7 +29,7 @@ struct aug_marparser_ {
     aug_mar_t mar_;
 };
 
-static int
+static aug_result
 initial_(aug_object* ob, const char* initial)
 {
     aug_marparser_t parser = aug_obtop(ob);
@@ -43,16 +43,16 @@ initial_(aug_object* ob, const char* initial)
     }
 
     if (!parser->initial_)
-        return -1;
+        return AUG_FAILERROR; /* Allocation failed. */
 
     if (!(parser->mar_ = parser->handler_->create_(parser->ob_, initial))) {
         aug_destroyxstr(parser->initial_);
         parser->initial_ = NULL;
-        return -1;
+        return AUG_FAILERROR;
     }
 
     aug_xstrcpys(parser->initial_, initial);
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static aug_result
@@ -68,37 +68,45 @@ field_(aug_object* ob, const char* name, const char* value)
     return aug_setfield(parser->mar_, &field, NULL);
 }
 
-static aug_rsize
+static aug_result
 csize_(aug_object* ob, unsigned csize)
 {
     aug_marparser_t parser = aug_obtop(ob);
-    aug_result result;
-    if (AUG_ISFAIL(result = aug_truncatemar(parser->mar_, csize)))
-        return result;
-    return aug_seekmar(parser->mar_, AUG_SET, 0);
+
+    aug_verify(aug_truncatemar(parser->mar_, csize));
+    aug_verify(aug_seekmar(parser->mar_, AUG_SET, 0));
+
+    return AUG_SUCCESS;
 }
 
-static aug_rsize
+static aug_result
 cdata_(aug_object* ob, const void* buf, unsigned len)
 {
     aug_marparser_t parser = aug_obtop(ob);
-    return aug_writemar(parser->mar_, buf, len);
+
+    /* Returns aug_rsize. */
+
+    aug_verify(aug_writemar(parser->mar_, buf, len));
+
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 end_(aug_object* ob, int commit)
 {
     aug_marparser_t parser = aug_obtop(ob);
-    int ret = 0;
+    aug_result result;
+
     if (commit) {
 
         if (!parser->initial_)
-            return 0; /* Blank line. */
+            return AUG_SUCCESS; /* Blank line. */
 
-        ret = parser->handler_
+        result = parser->handler_
             ->message_(parser->ob_, aug_xstr(parser->initial_),
                        parser->mar_);
-    }
+    } else
+        result = AUG_SUCCESS;
 
     if (parser->initial_) {
         aug_destroyxstr(parser->initial_);
@@ -110,7 +118,7 @@ end_(aug_object* ob, int commit)
         parser->mar_ = NULL;
     }
 
-    return ret;
+    return result;
 }
 
 static const struct aug_httphandler handler_ = {
@@ -197,13 +205,13 @@ aug_destroymarparser(aug_marparser_t parser)
     /* destroy_() will be called when "ob_" is released. */
 }
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_appendmar(aug_marparser_t parser, const char* buf, unsigned size)
 {
     return aug_appendhttp(parser->http_, buf, size);
 }
 
-AUGNET_API int
+AUGNET_API aug_result
 aug_finishmar(aug_marparser_t parser)
 {
     return aug_finishhttp(parser->http_);

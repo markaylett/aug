@@ -80,31 +80,35 @@ namespace aug {
     }
 
     /**
-     * Returns #AUG_FAILINTR if the system call was interrupted.
+     * Throws intr_exception if the system call was interrupted.
      */
 
-    inline int
+    inline unsigned
     waitmdevents(aug_muxer_t muxer, const timeval& timeout)
     {
-        return verify(aug_waitmdevents(muxer, &timeout));
+        return AUG_RESULT(verify(aug_waitmdevents(muxer, &timeout)));
     }
 
-    inline int
+    /**
+     * Throws intr_exception if the system call was interrupted.
+     */
+
+    inline unsigned
     waitmdevents(aug_muxer_t muxer)
     {
-        return verify(aug_waitmdevents(muxer, 0));
+        return AUG_RESULT(verify(aug_waitmdevents(muxer, 0)));
     }
 
     inline unsigned short
     getmdeventmask(aug_muxer_t muxer, mdref ref)
     {
-        return verify(aug_getmdeventmask(muxer, ref.get()));
+        return aug_getmdeventmask(muxer, ref.get());
     }
 
     inline unsigned short
     getmdevents(aug_muxer_t muxer, mdref ref)
     {
-        return verify(aug_getmdevents(muxer, ref.get()));
+        return aug_getmdevents(muxer, ref.get());
     }
 
     inline automds

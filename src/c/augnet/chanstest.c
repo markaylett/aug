@@ -101,7 +101,7 @@ chan_setmask_(aug_chan* ob, unsigned short mask)
     return AUG_SUCCESS;
 }
 
-static int
+static unsigned short
 chan_getmask_(aug_chan* ob)
 {
     return 0;

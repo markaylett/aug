@@ -242,14 +242,16 @@ AUGNET_API aug_result
 aug_established(aug_sd sd)
 {
     struct aug_endpoint ep;
-    aug_result result;
 
     if (!aug_getpeername(sd, &ep)) {
 
-        result = ENOTCONN == aug_errno(aug_tlerr)
-            ? AUG_FAILNONE : AUG_FAILERROR;
-    } else
-        result = AUG_SUCCESS;
+        if (ENOTCONN != aug_errno(aug_tlerr))
+            return AUG_FAILERROR;
 
-    return result;
+        /* ENOTCONN */
+
+        aug_clearerrinfo(aug_tlerr);
+        return AUG_FAILNONE;
+    }
+    return AUG_SUCCESS;
 }

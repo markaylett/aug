@@ -129,8 +129,14 @@ namespace {
             while (!quit_) {
                 {
                     scoped_unblock unblock;
-                    while (AUG_FAILINTR == waitmdevents(muxer_))
-                        ;
+                    for (;;) {
+                        try {
+                            waitmdevents(muxer_, tv);
+                            break;
+                        } catch (const intr_exception&) {
+                            // While interrupted.
+                        }
+                    }
                 }
 
                 if (getmdevents(muxer_, rd_))

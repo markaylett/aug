@@ -108,14 +108,15 @@ namespace aug {
     settimer(aug_timers_t timers, idref ref, unsigned ms, aug_timercb_t cb,
              aug::objectref ob)
     {
-        return verify(aug_settimer(timers, ref.get(), ms, cb, ob.get()));
+        return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms, cb,
+                                              ob.get())));
     }
 
     inline int
     settimer(aug_timers_t timers, idref ref, unsigned ms, aug_timercb_t cb,
              const null_&)
     {
-        return verify(aug_settimer(timers, ref.get(), ms, cb, 0));
+        return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms, cb, 0)));
     }
 
     template <typename T>
@@ -123,8 +124,8 @@ namespace aug {
     settimer(aug_timers_t timers, idref ref, unsigned ms, T& x)
     {
         aug::smartob<aug_boxptr> ob(createboxptr(getmpool(aug_tlx), &x, 0));
-        return verify(aug_settimer(timers, ref.get(), ms, timermemcb<T>,
-                                   ob.base()));
+        return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms,
+                                              timermemcb<T>, ob.base())));
     }
 
     template <typename T>
@@ -132,23 +133,20 @@ namespace aug {
     settimer(aug_timers_t timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
     {
         aug::smartob<aug_boxptr> ob(createboxptr(getmpool(aug_tlx), x));
-        int id(verify(aug_settimer(timers, ref.get(), ms, timermemcb<T>,
-                                   ob.base())));
-        return id;
+        return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms,
+                                              timermemcb<T>, ob.base())));
     }
 
-    inline bool
+    inline void
     resettimer(aug_timers_t timers, idref ref, unsigned ms = 0)
     {
-        return AUG_FAILNONE == verify(aug_resettimer(timers, ref.get(), ms))
-            ? false : true;
+        verify(aug_resettimer(timers, ref.get(), ms));
     }
 
-    inline bool
+    inline void
     canceltimer(aug_timers_t timers, idref ref)
     {
-        return AUG_FAILNONE == aug_canceltimer(timers, ref.get())
-            ? false : true;
+        verify(aug_canceltimer(timers, ref.get()));
     }
 
     inline bool
@@ -183,8 +181,12 @@ namespace aug {
     public:
         ~timer() AUG_NOTHROW
         {
-            if (idref(0) < ref_)
-                canceltimer(timers_, ref_);
+            if (idref(0) < ref_) {
+                try {
+                    canceltimer(timers_, ref_);
+                } catch (const none_exception&) {
+                }
+            }
         }
 
         explicit
@@ -197,7 +199,10 @@ namespace aug {
         timer&
         operator =(const null_&)
         {
-            cancel();
+            try {
+                cancel();
+            } catch (const none_exception&) {
+            }
             return *this;
         }
 
@@ -227,29 +232,29 @@ namespace aug {
             ref_ = settimer(timers_, ref_, ms, x);
         }
 
-        bool
+        void
         reset(unsigned ms = 0)
         {
             if (null == ref_)
-                return false;
+                throw none_exception();
 
-            if (!resettimer(timers_, ref_, ms)) {
+            try {
+                resettimer(timers_, ref_, ms);
+            } catch (const none_exception&) {
                 ref_ = null;
-                return false;
+                throw;
             }
-
-            return true;
         }
 
-        bool
+        void
         cancel()
         {
             if (null == ref_)
-                return false;
+                throw none_exception();
 
             idref ref(ref_);
             ref_ = null;
-            return canceltimer(timers_, ref);
+            canceltimer(timers_, ref);
         }
 
         bool

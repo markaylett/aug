@@ -234,14 +234,10 @@ AUG_EXTERNC aug_result
 aug_copyseq_(aug_seq_t dst, aug_seq_t src)
 {
     unsigned size = aug_seqsize_(src);
-    aug_result result;
     void* addr;
 
-    if (AUG_ISFAIL(result = aug_setregion_(src, 0, size)))
-        return result;
-
-    if (AUG_ISFAIL(result = aug_setregion_(dst, 0, aug_seqsize_(dst))))
-        return result;
+    aug_verify(aug_setregion_(src, 0, size));
+    aug_verify(aug_setregion_(dst, 0, aug_seqsize_(dst)));
 
     if (!(addr = aug_resizeseq_(dst, size)))
         return AUG_FAILERROR;
