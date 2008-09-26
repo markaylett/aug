@@ -483,7 +483,7 @@ namespace aug {
             int ret(sync());
 
             if (buffer_.openmode(std::ios_base::out)
-                && -1 == aug_syncmar(mar_.get()))
+                && AUG_ISFAIL(aug_syncmar(mar_.get())))
                 ret = -1;
 
             aug_releasemar(mar_.get());

@@ -35,13 +35,19 @@ namespace aug {
     inline autofd
     open(const char* path, int flags)
     {
-        return autofd(verify(aug_fopen(path, flags)), close);
+        autofd fd(aug_fopen(path, flags), close);
+        if (null == fd)
+            throwerror();
+        return fd;
     }
 
     inline autofd
     open(const char* path, int flags, mode_t mode)
     {
-        return autofd(verify(aug_fopen(path, flags, mode)), close);
+        autofd fd(aug_fopen(path, flags, mode), close);
+        if (null == fd)
+            throwerror();
+        return fd;
     }
 
     inline autofds

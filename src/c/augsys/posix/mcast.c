@@ -135,7 +135,7 @@ aug_setmcastif(aug_sd sd, const char* ifname)
     if (AUG_ISFAIL(af = aug_getfamily(sd)))
         return af;
 
-    switch (AUG_RESULT(af) {
+    switch (AUG_RESULT(af)) {
     case AF_INET:
 
         aug_verify(getifaddr_(sd, &un.ipv4_, ifname));
