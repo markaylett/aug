@@ -8,24 +8,24 @@ struct iovec;
 
   <interface name="stream">
 
-    <method name="shutdown" type="aug_result" throws="true" qname="shutdown"/>
+    <method name="shutdown" type="aug_result" qname="shutdown"/>
 
-    <method name="read" type="aug_rsize" throws="true" qname="read">
+    <method name="read" type="aug_rsize" qname="read">
       <param name="buf" type="void*"/>
       <param name="size" type="size_t"/>
     </method>
 
-    <method name="readv" type="aug_rsize" throws="true" qname="readv">
+    <method name="readv" type="aug_rsize" qname="readv">
       <param name="iov" type="const struct iovec*"/>
       <param name="size" type="int"/>
     </method>
 
-    <method name="write" type="aug_rsize" throws="true" qname="write">
+    <method name="write" type="aug_rsize" qname="write">
       <param name="buf" type="const void*"/>
       <param name="size" type="size_t"/>
     </method>
 
-    <method name="writev" type="aug_rsize" throws="true" qname="writev">
+    <method name="writev" type="aug_rsize" qname="writev">
       <param name="iov" type="const struct iovec*"/>
       <param name="size" type="int"/>
     </method>

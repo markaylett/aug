@@ -131,7 +131,7 @@ namespace {
                     scoped_unblock unblock;
                     for (;;) {
                         try {
-                            waitmdevents(muxer_, tv);
+                            waitmdevents(muxer_);
                             break;
                         } catch (const intr_exception&) {
                             // While interrupted.

@@ -234,7 +234,6 @@ namespace aug {
 
         template <typename T>
         struct result_traits {
-            typedef size_t return_type;
             static bool
             error(T result)
             {
@@ -252,55 +251,38 @@ namespace aug {
 
                 return true;
             }
-            static return_type
-            get(T result)
-            {
-                return AUG_RESULT(result);
-            }
         };
 
         template <typename T>
         struct result_traits<T*> {
-            typedef T* return_type;
             static bool
             error(T* result)
             {
                 return 0 == result;
             }
-            static return_type
-            get(T* result)
-            {
-                return result;
-            }
         };
 
         template <>
         struct result_traits<bool> {
-            typedef bool return_type;
             static bool
             error(bool result)
             {
                 return !result;
             }
-            static return_type
-            get(bool result)
-            {
-                return result;
-            }
        };
     }
 
     template <typename T>
-    typename detail::result_traits<T>::result_type
+    T
     verify(T result)
     {
         if (detail::result_traits<T>::error(result))
             throwerror();
-        return detail::result_traits<T>::get(result);
+        return result;
     }
 
     template <typename T, typename U>
-    typename detail::result_traits<T>::result_type
+    T
     verify(T result, obref<U> src)
     {
         if (detail::result_traits<T>::error(result)) {
@@ -313,7 +295,7 @@ namespace aug {
             copyerrinfo(ptr, errinfo);
             throwerror(errinfo);
         }
-        return detail::result_traits<T>::get(result);
+        return result;
     }
 }
 

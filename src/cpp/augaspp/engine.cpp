@@ -663,21 +663,31 @@ engine::settimer(const char* sname, unsigned ms, objectref ob)
 AUGASPP_API bool
 engine::resettimer(mod_id tid, unsigned ms)
 {
-    return aug::resettimer(impl_->timers_, tid, ms);
+    try {
+        aug::resettimer(impl_->timers_, tid, ms);
+    } catch (const none_exception&) {
+        return false;
+    }
+    return true;
 }
 
 AUGASPP_API bool
 engine::canceltimer(mod_id tid)
 {
-    bool ret(aug::canceltimer(impl_->timers_, tid));
+    try {
 
-    // Only erase if aug_canceltimer() returns true: it may be in the midst of
-    // a aug_foreachexpired() call, in which case, aug_canceltimer() will
-    // return false for the timer being expired.
+        aug::canceltimer(impl_->timers_, tid);
 
-    if (ret)
+        // Only erase if aug_canceltimer() succeeded: it may be in the midst
+        // of a aug_foreachexpired() call, in which case, aug_canceltimer()
+        // will throw for the timer being expired.
+
         impl_->sessiontimers_.erase(tid);
-    return ret;
+
+    } catch (const none_exception&) {
+        return false;
+    }
+    return true;
 }
 
 AUGASPP_API bool

@@ -45,12 +45,18 @@ rwtimer::do_resetrwtimer(unsigned ms, unsigned flags)
     bool exists(true);
 
     if (flags & MOD_TIMRD)
-        if (!rdtimer_.reset(ms))
+        try {
+            rdtimer_.reset(ms);
+        } catch (const none_exception&) {
             exists = false;
+        }
 
     if (flags & MOD_TIMWR)
-        if (!wrtimer_.reset(ms))
+        try {
+            wrtimer_.reset(ms);
+        } catch (const none_exception&) {
             exists = false;
+        }
 
     return exists;
 }
@@ -61,12 +67,18 @@ rwtimer::do_resetrwtimer(unsigned flags)
     bool exists(true);
 
     if (flags & MOD_TIMRD)
-        if (!rdtimer_.reset())
+        try {
+            rdtimer_.reset();
+        } catch (const none_exception&) {
             exists = false;
+        }
 
     if (flags & MOD_TIMWR)
-        if (!wrtimer_.reset())
+        try {
+            wrtimer_.reset();
+        } catch (const none_exception&) {
             exists = false;
+        }
 
     return exists;
 }
@@ -77,12 +89,18 @@ rwtimer::do_cancelrwtimer(unsigned flags)
     bool exists(true);
 
     if (flags & MOD_TIMRD)
-        if (!rdtimer_.cancel())
+        try {
+            rdtimer_.cancel();
+        } catch (const none_exception&) {
             exists = false;
+        }
 
     if (flags & MOD_TIMWR)
-        if (!wrtimer_.cancel())
+        try {
+            wrtimer_.cancel();
+        } catch (const none_exception&) {
             exists = false;
+        }
 
     return exists;
 }

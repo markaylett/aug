@@ -108,11 +108,11 @@ class Param
 end
 
 class Method_
-    attr_reader :name, :type, :throws, :qname, :comment
-    def initialize(iface, name, type, throws, qname, comment)
+    attr_reader :name, :type, :verify, :qname, :comment
+    def initialize(iface, name, type, verify, qname, comment)
         @name = name
         @type = type
-        @throws = throws
+        @verify = verify
         if qname.nil? then
             @qname = name + iface
         else
@@ -130,18 +130,20 @@ class Method_
     def self.parse(iface, node)
         name = node.attributes["name"].to_s
         type = Type.parse(node)
-        throws = false
-        if node.attributes.has_key? "throws" then
-            if node.attributes["throws"].to_s !~ /false|no|0/i then
-                throws = true
+        verify = false
+        if node.attributes.has_key? "verify" then
+            if node.attributes["verify"].to_s !~ /false|no|0/i then
+                verify = true
             end
+        elsif type.cname =~ /^(aug_result|aug_rint|aug_rsize)$/ then
+            verify = true
         end
         qname = nil
         if node.attributes.has_key? "qname" then
             qname = node.attributes["qname"].to_s
         end
         comment = node.text
-        method = Method_.new(iface, name, type, throws, qname, comment)
+        method = Method_.new(iface, name, type, verify, qname, comment)
         node.elements.each do |child|
             if child.name == "param" then
                 param = Param.parse(child)
@@ -341,8 +343,12 @@ class CppFormat
             "return aug::object_attach<#{type.cname}>(#{expr})";
         elsif type.ref? then
             "return *#{expr}"
-        elsif type.cname == "void" then
+        elsif type.cname =~ /^(void|aug_result)$/ then
             expr
+        elsif type.cname == 'aug_rint' then
+            "return static_cast<unsigned>(AUG_RESULT(#{expr}))"
+        elsif type.cname == 'aug_rsize' then
+            "return static_cast<size_t>(AUG_RESULT(#{expr}))"
         else
             "return #{expr}"
         end
@@ -361,6 +367,12 @@ class CppFormat
             "aug::smartob<#{type.cname}>"
         elsif type.ref?
             type.cname + '&'
+        elsif type.cname == 'aug_result'
+            'void'
+        elsif type.cname == 'aug_rint'
+            'unsigned'
+        elsif type.cname == 'aug_rsize'
+            'size_t'
         else
             type.cname
         end
@@ -410,13 +422,13 @@ def putinline(iface, method)
     args = format.arg_list(iface, method).join(", ")
     names = format.coerce_list(iface, method).join(", ")
     expr = "this_.get()->vtbl_->#{method.name}_(#{names})"
-    if method.throws then
+    if method.verify then
         expr = "verify(#{expr}, this_)"
     end
     puts <<END
 
     inline #{format.return_type(method.type)}
-    #{method.qname}(#{args})#{method.throws ? "" : " AUG_NOTHROW"}
+    #{method.qname}(#{args})#{method.verify ? "" : " AUG_NOTHROW"}
     {
         #{format.creturn_expr(method.type, expr)};
     }

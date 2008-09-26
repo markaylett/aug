@@ -127,7 +127,7 @@ namespace {
 
             for (;;) {
                 try {
-                    events = waitmdevents(mux_, tv);
+                    events = waitmdevents(mux, tv);
                     break;
                 } catch (const intr_exception&) {
                     // While interrupted.

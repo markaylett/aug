@@ -13,7 +13,7 @@ namespace aug {
     inline timeval&
     gettimeofday(timeval& tv)
     {
-        verify(gettimeofday(getclock(aug_tlx), tv));
+        gettimeofday(getclock(aug_tlx), tv);
         return tv;
     }
 

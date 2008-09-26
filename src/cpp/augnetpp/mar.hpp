@@ -60,14 +60,13 @@ namespace aug {
                 return 0;
             }
 
-            static int
+            static aug_result
             message(aug_object* ob, const char* initial, aug_mar_t mar)
             {
                 try {
-                    T::message(ob, initial, mar);
-                    return 0;
+                    return T::message(ob, initial, mar);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
 
         public:
@@ -94,14 +93,13 @@ namespace aug {
                 return 0;
             }
 
-            static int
+            static aug_result
             message(aug_object* ob, const char* initial, aug_mar_t mar)
             {
                 try {
-                    obtop<T*>(ob)->message(initial, mar);
-                    return 0;
+                    return obtop<T*>(ob)->message(initial, mar);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
 
         public:

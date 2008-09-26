@@ -567,7 +567,7 @@ namespace {
             nonce(id_, name_, nonce_);
             aug_ctxinfo(aug_tlx, "nonce: [%s]", nonce_);
         }
-        void
+        aug_result
         message(const char* initial, aug_mar_t mar)
         {
             static const char ROOT[] = "./htdocs";
@@ -601,7 +601,7 @@ namespace {
                         (getfield(mar, "Content-Type"));
 
                     unsigned size;
-                    const void* ptr(aug::content(mar, size));
+                    const void* ptr(aug::getcontent(mar, size));
                     content = filterbase64(static_cast<const char*>(ptr),
                                            size, AUG_ENCODE64);
 
@@ -637,7 +637,6 @@ namespace {
                             auth_ = digestauth(y, realm_, r.method_);
                         else
                             throw http_error(501, "Not Implemented");
-
                     }
                 }
 
@@ -707,6 +706,8 @@ namespace {
                 aug_ctxinfo(aug_tlx, "closing");
                 mod::shutdown(id_, 0);
             }
+
+            return AUG_SUCCESS;
         }
     };
 
