@@ -38,7 +38,7 @@ TESTS = \
 	mpooltest
 
 errinfotest_SOURCES = errinfotest.cpp
-errinfotest_LDADD = \	
+errinfotest_LDADD = \
 	$(top_builddir)/src/cpp/augctxpp/libaugctxpp.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 

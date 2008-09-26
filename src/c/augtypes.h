@@ -4,6 +4,8 @@
 #ifndef AUGTYPES_H
 #define AUGTYPES_H
 
+#include "augconfig.h"
+
 /**
  * @defgroup Types Types
  */
@@ -58,6 +60,8 @@ typedef unsigned aug_len_t;
  * AUG_FAILBLOCK.
  */
 
+#if ENABLE_STRICT
+
 struct aug_strict_ {
     long val_;
 };
@@ -74,12 +78,19 @@ aug_mkresult_(long val)
     return x;
 }
 
-#define AUG_MKRESULT(x) aug_mkresult_(x)
-#define AUG_RESULT(x)   (x).val_
+# define AUG_MKRESULT(x) aug_mkresult_(x)
+# define AUG_RESULT(x)   (x).val_
 
-/*typedef int aug_result;*/
-/*typedef int aug_rint;*/
-/*typedef ssize_t aug_rsize;*/
+#else /* !ENABLE_STRICT */
+
+typedef int aug_result;
+typedef int aug_rint;
+typedef ssize_t aug_rsize;
+
+# define AUG_MKRESULT(x) x
+# define AUG_RESULT(x)   x
+
+#endif /* !ENABLE_STRICT */
 
 #define AUG_SUCCESS   AUG_MKRESULT( 0)
 #define AUG_FAILERROR AUG_MKRESULT(-1)

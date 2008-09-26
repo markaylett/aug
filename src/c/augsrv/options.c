@@ -61,28 +61,28 @@ tocommand_(const char* s)
 
     switch (*s) {
     case 'i':
-        if (0 == strcasecmp(s + 1, "nstall"))
+        if (0 == aug_strcasecmp(s + 1, "nstall"))
             return AUG_MKRESULT(AUG_CMDINSTALL);
         break;
     case 'r':
-        if (0 == strcasecmp(s + 1, "econf"))
+        if (0 == aug_strcasecmp(s + 1, "econf"))
             return AUG_MKRESULT(AUG_CMDRECONF);
         break;
     case 's':
-        if (0 == strcasecmp(s + 1, "tart"))
+        if (0 == aug_strcasecmp(s + 1, "tart"))
             return AUG_MKRESULT(AUG_CMDSTART);
 
-        if (0 == strcasecmp(s + 1, "tatus"))
+        if (0 == aug_strcasecmp(s + 1, "tatus"))
             return AUG_MKRESULT(AUG_CMDSTATUS);
 
-        if (0 == strcasecmp(s + 1, "top"))
+        if (0 == aug_strcasecmp(s + 1, "top"))
             return AUG_MKRESULT(AUG_CMDSTOP);
         break;
     case 't':
-        if (0 == strcasecmp(s + 1, "est"))
+        if (0 == aug_strcasecmp(s + 1, "est"))
             return AUG_MKRESULT(AUG_CMDTEST);
     case 'u':
-        if (0 == strcasecmp(s + 1, "ninstall"))
+        if (0 == aug_strcasecmp(s + 1, "ninstall"))
             return AUG_MKRESULT(AUG_CMDUNINSTALL);
         break;
     }

@@ -40,9 +40,9 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = chantest$(EXEEXT) \
-	mcasttest$(EXEEXT) muxertest$(EXEEXT) sockaddrtest$(EXEEXT) \
-	sockettest$(EXEEXT) timetest$(EXEEXT) utilitytest$(EXEEXT)
+check_PROGRAMS = chantest$(EXEEXT) mcasttest$(EXEEXT) \
+	muxertest$(EXEEXT) sockaddrtest$(EXEEXT) sockettest$(EXEEXT) \
+	timetest$(EXEEXT) utilitytest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -157,6 +157,8 @@ ENABLE_SMP_FALSE = @ENABLE_SMP_FALSE@
 ENABLE_SMP_TRUE = @ENABLE_SMP_TRUE@
 ENABLE_SSL_FALSE = @ENABLE_SSL_FALSE@
 ENABLE_SSL_TRUE = @ENABLE_SSL_TRUE@
+ENABLE_STRICT_FALSE = @ENABLE_STRICT_FALSE@
+ENABLE_STRICT_TRUE = @ENABLE_STRICT_TRUE@
 ENABLE_THREADS_FALSE = @ENABLE_THREADS_FALSE@
 ENABLE_THREADS_TRUE = @ENABLE_THREADS_TRUE@
 EXEEXT = @EXEEXT@

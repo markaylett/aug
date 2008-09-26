@@ -77,13 +77,14 @@ my (
     $toolset,
     $maintainer,
     $gcc,
-    $strict,
+    $pedantic,
     $debug,
     $multicast,
     $python,
     $ruby,
     $smp,
     $ssl,
+    $strict,
     $threads,
     $libtype
     );
@@ -129,13 +130,14 @@ if ($CYGWIN_MINGW == $toolset) {
 } else {
     $gcc = valueask ("GCC compiler", 'y');
 }
-$strict = valueask ("strict build", 'n');
+$pedantic = valueask ("pedantic warnings", 'n');
 $debug = valueask ("debug build", 'n');
 $multicast = valueask ("multicast support", 'y');
 $python = valueask ("python support", 'n');
 $ruby = valueask ("ruby support", 'n');
 $smp = valueask ("smp support", 'y');
 $ssl = valueask ("ssl support", 'y');
+$strict = valueask ("strict types", 'n');
 $threads = valueask ("thread support", 'y');
 $libtype = listask ("library type", $BOTH, \%LIBTYPE);
 
@@ -153,7 +155,7 @@ if (is $gcc) {
     $flags .= ' -Wno-long-long -fno-strict-aliasing -Wno-unused-value';
     $cflags = "$flags";
     $cxxflags = "$flags -Wno-deprecated -Wno-unused-variable";
-    if (is $strict) {
+    if (is $pedantic) {
         $cflags = "-Wall -pedantic $cflags";
         $cxxflags = "-Wall -pedantic $cxxflags";
     }
@@ -184,6 +186,8 @@ $options .= " \\\n\t--disable-smp"
     unless is $smp;
 $options .= " \\\n\t--disable-ssl"
     unless is $ssl;
+$options .= " \\\n\t--enable-strict"
+    if is $strict;
 $options .= " \\\n\t--disable-threads"
     unless is $threads;
 

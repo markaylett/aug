@@ -23,6 +23,9 @@
 /* Define to 1 for ssl support. */
 #undef ENABLE_SSL
 
+/* Define to 1 for strict types. */
+#undef ENABLE_STRICT
+
 /* Define to 1 for threads support. */
 #undef ENABLE_THREADS
 

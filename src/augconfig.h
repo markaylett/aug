@@ -28,6 +28,10 @@
 #  define ENABLE_SSL 1
 # endif /* !ENABLE_SSL */
 
+# if !defined(ENABLE_STRICT)
+#  define ENABLE_STRICT 0
+# endif /* !ENABLE_STRICT */
+
 # if !defined(ENABLE_THREADS)
 #  define ENABLE_THREADS 1
 # endif /* !ENABLE_THREADS */
