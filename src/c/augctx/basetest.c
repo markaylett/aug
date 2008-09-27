@@ -12,7 +12,8 @@ main(int argc, char* argv[])
     /* Ensure that the initialisation functions can be called multiple
        times. */
 
-    if (aug_init() < 0 || aug_init() < 0 || aug_init() < 0) {
+    if (AUG_ISFAIL(aug_init()) || AUG_ISFAIL(aug_init())
+        || AUG_ISFAIL(aug_init())) {
         fprintf(stderr, "aug_init() failed\n");
         return 1;
     }
@@ -21,7 +22,7 @@ main(int argc, char* argv[])
     aug_term();
     aug_term();
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);

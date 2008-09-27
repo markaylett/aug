@@ -13,10 +13,10 @@ main(int argc, char* argv[])
     aug_sd sds[2];
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
-    if (-1 == aug_muxerpipe(sds)) {
+    if (AUG_ISFAIL(aug_muxerpipe(sds))) {
         aug_perrinfo(aug_tlx, "aug_term() failed", NULL);
         return 1;
     }
@@ -36,7 +36,7 @@ main(int argc, char* argv[])
         goto fail;
     }
 
-    if (aug_sclose(sds[0]) < 0 || aug_sclose(sds[1]) < 0) {
+    if (AUG_ISFAIL(aug_sclose(sds[0])) || AUG_ISFAIL(aug_sclose(sds[1]))) {
         aug_perrinfo(aug_tlx, "aug_close() failed", NULL);
         return 1;
     }

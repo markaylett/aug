@@ -46,7 +46,7 @@ main(int argc, char* argv[])
     struct aug_words st;
     int ch;
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
     aug_initnetwords(&st, out_, NULL);
 

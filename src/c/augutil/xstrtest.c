@@ -15,7 +15,7 @@ main(int argc, char* argv[])
     const char* s;
     int i;
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     mp = aug_getmpool(aug_tlx);
@@ -30,7 +30,7 @@ main(int argc, char* argv[])
 
     for (i = 0; i < 26; ++i) {
         aug_check(i == strlen(aug_xstr(xs)));
-        aug_check(AUG_SUCCESS == aug_xstrcatc(xs, 'A' + i));
+        aug_check(AUG_ISSUCCESS(aug_xstrcatc(xs, 'A' + i)));
     }
 
     /* Verify content. */
@@ -49,7 +49,7 @@ main(int argc, char* argv[])
     /* Force re-allocation. */
 
     for (i = 0; i < 10; ++i)
-        aug_xstrcat(xs, xs);;
+        aug_xstrcat(xs, xs);
 
     /* Re-allocation should have occurred. */
 

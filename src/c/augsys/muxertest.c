@@ -20,7 +20,7 @@ test(aug_muxer_t muxer, int n)
     if (0 == n)
         return;
 
-    if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {
+    if (AUG_ISFAIL(aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv))) {
         aug_perrinfo(aug_tlx, "aug_socketpair() failed", NULL);
         exit(1);
     }
@@ -30,8 +30,8 @@ test(aug_muxer_t muxer, int n)
     iov[1].iov_base = MSG2_;
     iov[1].iov_len = sizeof(MSG2_);
 
-    if (-1 == aug_setmdeventmask(muxer, sv[0], AUG_MDEVENTRDWR)
-        || -1 == aug_setmdeventmask(muxer, sv[1], AUG_MDEVENTRD)) {
+    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sv[0], AUG_MDEVENTRDWR))
+        || AUG_ISFAIL(aug_setmdeventmask(muxer, sv[1], AUG_MDEVENTRD))) {
         aug_perrinfo(aug_tlx, "aug_setmdeventmask() failed", NULL);
         exit(1);
     }
@@ -42,19 +42,19 @@ test(aug_muxer_t muxer, int n)
         exit(1);
     }
 
-    if (-1 == aug_swritev(sv[0], iov, 2)) {
+    if (AUG_ISFAIL(aug_swritev(sv[0], iov, 2))) {
         aug_perrinfo(aug_tlx, "aug_writev() failed", NULL);
         exit(1);
     }
 
-    if (-1 == aug_waitmdevents(muxer, NULL)) {
+    if (AUG_ISFAIL(aug_waitmdevents(muxer, NULL))) {
         aug_perrinfo(aug_tlx, "aug_waitmdevents() failed", NULL);
         exit(1);
     }
 
     test(muxer, n - 1);
 
-    if (-1 == aug_sread(sv[1], buf, iov[0].iov_len + iov[1].iov_len)) {
+    if (AUG_ISFAIL(aug_sread(sv[1], buf, iov[0].iov_len + iov[1].iov_len))) {
         aug_perrinfo(aug_tlx, "aug_sread() failed", NULL);
         exit(1);
     }
@@ -64,8 +64,8 @@ test(aug_muxer_t muxer, int n)
        exit(1);
     }
 
-    if (-1 == aug_setmdeventmask(muxer, sv[0], 0)
-        || -1 == aug_setmdeventmask(muxer, sv[1], 0)) {
+    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sv[0], 0))
+        || AUG_ISFAIL(aug_setmdeventmask(muxer, sv[1], 0))) {
         aug_perrinfo(aug_tlx, "aug_setmdeventmask() failed", NULL);
         exit(1);
     }
@@ -79,7 +79,7 @@ main(int argc, char* argv[])
 {
     aug_mpool* mpool;
     aug_muxer_t muxer;
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     mpool = aug_getmpool(aug_tlx);

@@ -16,10 +16,10 @@ main(int argc, char* argv[])
     struct iovec iov[2];
     char buf[AUG_MAXLINE];
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
-    if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {
+    if (AUG_ISFAIL(aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv))) {
         aug_perrinfo(aug_tlx, "aug_socketpair() failed", NULL);
         return 1;
     }
@@ -29,12 +29,12 @@ main(int argc, char* argv[])
     iov[1].iov_base = MSG2_;
     iov[1].iov_len = sizeof(MSG2_);
 
-    if (-1 == aug_swritev(sv[0], iov, 2)) {
+    if (AUG_ISFAIL(aug_swritev(sv[0], iov, 2))) {
         aug_perrinfo(aug_tlx, "aug_writev() failed", NULL);
         return 1;
     }
 
-    if (-1 == aug_sread(sv[1], buf, iov[0].iov_len + iov[1].iov_len)) {
+    if (AUG_ISFAIL(aug_sread(sv[1], buf, iov[0].iov_len + iov[1].iov_len))) {
         aug_perrinfo(aug_tlx, "aug_read() failed", NULL);
         return 1;
     }

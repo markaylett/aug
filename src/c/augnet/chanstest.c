@@ -160,28 +160,28 @@ stream_shutdown_(aug_stream* ob)
     return AUG_SUCCESS;
 }
 
-static ssize_t
+static aug_rsize
 stream_read_(aug_stream* ob, void* buf, size_t size)
 {
-    return 0;
+    return AUG_ZERO;
 }
 
-static ssize_t
+static aug_rsize
 stream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
-    return 0;
+    return AUG_ZERO;
 }
 
-static ssize_t
+static aug_rsize
 stream_write_(aug_stream* ob, const void* buf, size_t size)
 {
-    return 0;
+    return AUG_ZERO;
 }
 
-static ssize_t
+static aug_rsize
 stream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
-    return 0;
+    return AUG_ZERO;
 }
 
 static const struct aug_streamvtbl streamvtbl_ = {
@@ -314,7 +314,7 @@ main(int argc, char* argv[])
     aug_chan* chan3;
     aug_chans_t chans;
 
-    aug_check(0 <= aug_autobasictlx());
+    aug_check(AUG_ISSUCCESS(aug_autobasictlx()));
     aug_setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
     mpool = aug_getmpool(aug_tlx);
@@ -332,9 +332,9 @@ main(int argc, char* argv[])
     chans = aug_createchans(mpool, &chandler_);
     aug_check(chans);
 
-    aug_check(0 <= aug_insertchan(chans, chan1));
-    aug_check(0 <= aug_insertchan(chans, chan2));
-    aug_check(0 <= aug_insertchan(chans, chan3));
+    aug_check(AUG_ISSUCCESS(aug_insertchan(chans, chan1)));
+    aug_check(AUG_ISSUCCESS(aug_insertchan(chans, chan2)));
+    aug_check(AUG_ISSUCCESS(aug_insertchan(chans, chan3)));
     aug_check(6 == refs_);
 
     aug_release(chan1);
@@ -369,7 +369,7 @@ main(int argc, char* argv[])
 
     /* Remove middle. */
 
-    aug_check(0 <= aug_removechan(chans, 2));
+    aug_check(AUG_ISSUCCESS(aug_removechan(chans, 2)));
 
     /* 3 1 */
     foreach_(chans);
@@ -380,7 +380,7 @@ main(int argc, char* argv[])
 
     /* No longer exists. */
 
-    aug_check(AUG_FAILNONE == aug_removechan(chans, 2));
+    aug_check(AUG_ISNONE(aug_removechan(chans, 2)));
 
     /* Remove during loop. */
 
@@ -389,7 +389,7 @@ main(int argc, char* argv[])
 
     /* No longer exists. */
 
-    aug_check(AUG_FAILNONE == aug_removechan(chans, 1));
+    aug_check(AUG_ISFAIL(aug_removechan(chans, 1)));
 
     /* 3 */
     foreach_(chans);

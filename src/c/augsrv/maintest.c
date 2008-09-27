@@ -48,7 +48,7 @@ init_(void* arg)
     return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 run_(void* arg)
 {
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
@@ -86,7 +86,7 @@ main(int argc, char* argv[])
 
     program_ = argv[0];
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     return aug_main(argc, argv, &service, NULL);

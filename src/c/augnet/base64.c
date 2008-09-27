@@ -187,7 +187,7 @@ decodealign_(aug_base64_t base64, const char* src, size_t len)
         chunk[0] = save[0];
         break;
     default:
-        return AUG_MKRESULT(0);
+        return AUG_ZERO;
     }
 
     /* Attempt to read remaining characters required to complete the
@@ -437,7 +437,7 @@ encodealign_(aug_base64_t base64, const char* src, size_t len)
             return AUG_MKRESULT(2);
         }
     }
-    return AUG_MKRESULT(0);
+    return AUG_ZERO;
 }
 
 static aug_result

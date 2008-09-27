@@ -80,7 +80,7 @@ fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
         if (*it == delim)
             goto found;
 
-    return AUG_MKRESULT(0);
+    return AUG_ZERO;
  found:
 
     /* Verify the number of digits found does not exceed the maximum number of
@@ -128,7 +128,7 @@ getsize_(const char* buf, size_t size)
        delimiter character. */
 
     if (size < HEAD_SIZE_ + sizeof('0') + sizeof(*SOH_))
-        return AUG_MKRESULT(0);
+        return AUG_ZERO;
 
     /* The beginning of the body length value is located immediately after the
        standard leader. */

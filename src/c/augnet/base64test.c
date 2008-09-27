@@ -10,56 +10,56 @@
 static char encoded_[1024];
 static char decoded_[1024];
 
-static int
+static aug_result
 encode_(aug_object* ob, const char* buf, size_t len)
 {
     strcat(encoded_, buf);
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 decode_(aug_object* ob, const char* buf, size_t len)
 {
     strcat(decoded_, buf);
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 testencode_(aug_base64_t encoder, const char* in, const char* out)
 {
     encoded_[0] = '\0';
-    if (-1 == aug_appendbase64(encoder, in, strlen(in))) {
+    if (AUG_ISFAIL(aug_appendbase64(encoder, in, strlen(in)))) {
         aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
-        return -1;
+        return AUG_FAILERROR;
     }
-    if (-1 == aug_finishbase64(encoder)) {
+    if (AUG_ISFAIL(aug_finishbase64(encoder))) {
         aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
-        return -1;
+        return AUG_FAILERROR;
     }
     if (0 != strcmp(encoded_, out)) {
         fprintf(stderr, "unexpected encoding: %s\n", encoded_);
-        return -1;
+        return AUG_FAILERROR;
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 testdecode_(aug_base64_t decoder, const char* in, const char* out)
 {
     decoded_[0] = '\0';
-    if (-1 == aug_appendbase64(decoder, in, strlen(in))) {
+    if (AUG_ISFAIL(aug_appendbase64(decoder, in, strlen(in)))) {
         aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
-        return -1;
+        return AUG_FAILERROR;
     }
-    if (-1 == aug_finishbase64(decoder)) {
+    if (AUG_ISFAIL(aug_finishbase64(decoder))) {
         aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
-        return -1;
+        return AUG_FAILERROR;
     }
     if (0 != strcmp(decoded_, out)) {
         fprintf(stderr, "unexpected decoding: %s\n", decoded_);
-        return -1;
+        return AUG_FAILERROR;
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
 int
@@ -68,7 +68,7 @@ main(int argc, char* argv[])
     aug_mpool* mpool;
     aug_base64_t encoder, decoder;
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     mpool = aug_getmpool(aug_tlx);
@@ -86,22 +86,22 @@ main(int argc, char* argv[])
         goto fail1;
     }
 
-    if (-1 == testencode_(encoder, "apples", "YXBwbGVz"))
+    if (AUG_ISFAIL(testencode_(encoder, "apples", "YXBwbGVz")))
         goto fail2;
 
-    if (-1 == testdecode_(decoder, "YXBwbGVz", "apples"))
+    if (AUG_ISFAIL(testdecode_(decoder, "YXBwbGVz", "apples")))
         goto fail2;
 
-    if (-1 == testencode_(encoder, "oranges", "b3Jhbmdlcw=="))
+    if (AUG_ISFAIL(testencode_(encoder, "oranges", "b3Jhbmdlcw==")))
         goto fail2;
 
-    if (-1 == testdecode_(decoder, "b3Jhbmdlcw==", "oranges"))
+    if (AUG_ISFAIL(testdecode_(decoder, "b3Jhbmdlcw==", "oranges")))
         goto fail2;
 
-    if (-1 == testencode_(encoder, "pears", "cGVhcnM="))
+    if (AUG_ISFAIL(testencode_(encoder, "pears", "cGVhcnM=")))
         goto fail2;
 
-    if (-1 == testdecode_(decoder, "cGVhcnM=", "pears"))
+    if (AUG_ISFAIL(testdecode_(decoder, "cGVhcnM=", "pears")))
         goto fail2;
 
     aug_destroybase64(decoder);

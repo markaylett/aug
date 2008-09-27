@@ -12,7 +12,7 @@ int
 main(int argc, char* argv[])
 {
     char buf[64];
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     strcpy(buf, TEST_);

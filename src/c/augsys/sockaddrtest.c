@@ -14,7 +14,7 @@ main(int argc, char* argv[])
 {
     struct addrinfo hints, * res, * save;
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     bzero(&hints, sizeof(hints));
@@ -22,7 +22,7 @@ main(int argc, char* argv[])
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (-1 == aug_getaddrinfo(HOST_, SERV_, &hints, &res)) {
+    if (AUG_ISFAIL(aug_getaddrinfo(HOST_, SERV_, &hints, &res))) {
         aug_perrinfo(aug_tlx, "aug_getaddrinfo() failed", NULL);
         return 1;
     }

@@ -165,7 +165,7 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
     /* As a precaution, limit use of stack space. */
 
     if (0 == (size = AUG_MIN(writer->size_, 64)))
-        return AUG_MKRESULT(0);
+        return AUG_ZERO;
 
     iov = alloca(sizeof(struct iovec) * size);
 

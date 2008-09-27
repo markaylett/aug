@@ -41,7 +41,7 @@ handler_(aug_object* ob, const char* buf, size_t size)
         exit(1);
     }
 
-    if (-1 == aug_checkfix(&fixstd, buf, size)) {
+    if (AUG_ISFAIL(aug_checkfix(&fixstd, buf, size))) {
         aug_perrinfo(aug_tlx, "aug_checkfix() failed", NULL);
         exit(1);
     }
@@ -53,14 +53,16 @@ handler_(aug_object* ob, const char* buf, size_t size)
 
     while (fixstd.size_) {
 
-        if (-1 == (ret = aug_fixfield(&field, fixstd.body_, fixstd.size_))) {
+        aug_rsize rsize = aug_fixfield(&field, fixstd.body_, fixstd.size_);
+
+        if (AUG_ISFAIL(rsize)) {
             aug_perrinfo(aug_tlx, "aug_fixfield() failed", NULL);
             exit(1);
         }
 
         aug_ctxinfo(aug_tlx, "tag: %u", field.tag_);
-        fixstd.body_ += ret;
-        fixstd.size_ -= ret;
+        fixstd.body_ += AUG_RESULT(rsize);
+        fixstd.size_ -= AUG_RESULT(rsize);
     }
 
     ++received_;

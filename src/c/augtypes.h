@@ -95,6 +95,8 @@ typedef ssize_t aug_rsize;
 #define AUG_SUCCESS   AUG_MKRESULT( 0)
 #define AUG_FAILERROR AUG_MKRESULT(-1)
 
+#define AUG_ZERO      AUG_SUCCESS
+
 /* Non-error exceptions.  aug_clearerrinfo() should be called before returning
    athese .*/
 
