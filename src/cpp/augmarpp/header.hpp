@@ -96,7 +96,10 @@ namespace aug {
         const_iterator
         find(const char* name) const
         {
-            return const_iterator(mar_, toord(mar_, name));
+            try {
+                return const_iterator(mar_, toord(mar_, name));
+            } catch (const none_exception&) { }
+            return end();
         }
         const_iterator
         begin() const

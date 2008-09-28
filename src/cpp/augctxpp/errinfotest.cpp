@@ -35,25 +35,25 @@ namespace {
         {
             return AUG_FAILERROR;
         }
-        ssize_t
+        aug_rsize
         read_(void* buf, size_t size) AUG_NOTHROW
         {
-            return size;
+            return AUG_MKRESULT(size);
         }
-        ssize_t
+        aug_rsize
         readv_(const struct iovec* iov, int size) AUG_NOTHROW
         {
-            return size;
+            return AUG_MKRESULT(size);
         }
-        ssize_t
+        aug_rsize
         write_(const void* buf, size_t size) AUG_NOTHROW
         {
-            return size;
+            return AUG_MKRESULT(size);
         }
-        ssize_t
+        aug_rsize
         writev_(const struct iovec* iov, int size) AUG_NOTHROW
         {
-            return size;
+            return AUG_MKRESULT(size);
         }
         void
         copyerrinfo_(struct aug_errinfo& dst) AUG_NOTHROW

@@ -14,39 +14,46 @@ using namespace std;
 namespace {
 
     struct callbacks {
-        void
+        aug_result
         base64cb(const char* buf, size_t len)
         {
+            return AUG_SUCCESS;
         }
     };
 
     struct httphandler {
-        void
+        aug_result
         initial(const char* value)
         {
+            return AUG_SUCCESS;
         }
-        void
+        aug_result
         field(const char* name, const char* value)
         {
+            return AUG_SUCCESS;
         }
-        void
+        aug_result
         csize(unsigned csize)
         {
+            return AUG_SUCCESS;
         }
-        void
+        aug_result
         cdata(const void* cdata, unsigned csize)
         {
+            return AUG_SUCCESS;
         }
-        void
+        aug_result
         end(bool commit)
         {
+            return AUG_SUCCESS;
         }
     };
 
     struct marhandler : basic_marnonstatic {
-        void
+        aug_result
         message(const char* initial, aug_mar_t mar)
         {
+            return AUG_SUCCESS;
         }
     };
 }

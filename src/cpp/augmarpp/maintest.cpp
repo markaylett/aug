@@ -98,8 +98,7 @@ namespace {
         for (i = 0; FIELDS_SIZE > i; ++i) {
 
             const char* name;
-            if (!aug::toname(ref, name, i))
-                throw error(__LINE__);
+            aug::toname(ref, name, i);
 
             if (!iequal(name, FIELDS[i].name_))
                 throw error(__LINE__);
@@ -113,12 +112,14 @@ namespace {
 
         checkheader(ref);
 
-        unsigned ord(aug::unsetfield(ref, FIELDS[1].name_).first);
+        unsigned ord(aug::unsetfield(ref, FIELDS[1].name_));
         if (1 != ord)
             throw error(__LINE__);
 
-        if (aug::getfield(ref, FIELDS[1].name_))
+        try {
+            aug::getfield(ref, FIELDS[1].name_);
             throw error(__LINE__);
+        } catch (const errinfo_error&) { }
 
         aug::removefields(ref);
         if (0 != aug::getfields(ref))
@@ -140,7 +141,7 @@ namespace {
 
         unsigned size;
         const char* content = static_cast<
-            const char*>(aug::content(ref, size));
+            const char*>(aug::getcontent(ref, size));
 
         if (size != STRLEN1)
             throw error(__LINE__);
@@ -162,7 +163,7 @@ namespace {
         aug::insertmar(ref, src);
         unsigned size;
         const char* content = static_cast<
-            const char*>(aug::content(ref, size));
+            const char*>(aug::getcontent(ref, size));
 
         if (size != STRLEN1)
             throw error(__LINE__);
@@ -219,7 +220,7 @@ namespace {
 
         unsigned size;
         const char* content = static_cast<
-            const char*>(aug::content(dst, size));
+            const char*>(aug::getcontent(dst, size));
 
         if (size != STRLEN1)
             throw error(__LINE__);
@@ -246,7 +247,7 @@ namespace {
 
         unsigned size;
         const char* content = static_cast<
-            const char*>(aug::content(to, size));
+            const char*>(aug::getcontent(to, size));
 
         if (size != STRLEN1)
             throw error(__LINE__);
@@ -375,7 +376,7 @@ main(int argc, char* argv[])
     char dst[] = "dst.XXXXXX";
     char src[] = "src.XXXXXX";
 
-    if (aug_autobasictlx() < 0) {
+    if (AUG_ISFAIL(aug_autobasictlx())) {
         cerr << "aug_atexitinit() failed\n";
         return 1;
     }

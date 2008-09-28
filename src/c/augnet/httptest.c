@@ -17,37 +17,37 @@ static const char TEST_[] =
 "Host: localhost:8080\r\n"
 "Connection: Keep-Alive\r\n\r\n";
 
-static int
+static aug_result
 setinitial_(aug_object* ob, const char* value)
 {
     aug_ctxinfo(aug_tlx, "initial: %s", value);
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 setfield_(aug_object* ob, const char* name, const char* value)
 {
     aug_ctxinfo(aug_tlx, "field: %s=%s", name, value);
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 setcsize_(aug_object* ob, unsigned size)
 {
     aug_ctxinfo(aug_tlx, "size: %d", (int)size);
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 cdata_(aug_object* ob, const void* buf, unsigned len)
 {
-    return 0;
+    return AUG_SUCCESS;
 }
 
-static int
+static aug_result
 end_(aug_object* ob, int commit)
 {
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static const struct aug_httphandler handler_ = {
@@ -64,7 +64,7 @@ main(int argc, char* argv[])
     aug_mpool* mpool;
     aug_httpparser_t parser;
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     mpool = aug_getmpool(aug_tlx);
@@ -76,12 +76,12 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_appendhttp(parser, TEST_, sizeof(TEST_) - 1)) {
+    if (AUG_ISFAIL(aug_appendhttp(parser, TEST_, sizeof(TEST_) - 1))) {
         aug_perrinfo(aug_tlx, "aug_appendhttp() failed", NULL);
         goto fail;
     }
 
-    if (-1 == aug_finishhttp(parser)) {
+    if (AUG_ISFAIL(aug_finishhttp(parser))) {
         aug_perrinfo(aug_tlx, "aug_finishhttp() failed", NULL);
         goto fail;
     }

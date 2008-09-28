@@ -26,7 +26,6 @@ static size_t received_ = 0;
 static void
 handler_(aug_object* ob, const char* buf, size_t size)
 {
-    ssize_t ret;
     struct aug_fixfield_ field;
     struct aug_fixstd_ fixstd;
 
@@ -77,7 +76,7 @@ main(int argc, char* argv[])
     aug_stream* in;
     int i;
 
-    if (aug_autobasictlx() < 0)
+    if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
     mpool = aug_getmpool(aug_tlx);
@@ -88,7 +87,7 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {
+    if (AUG_ISFAIL(aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv))) {
         aug_perrinfo(aug_tlx, "aug_socketpair() failed", NULL);
         return 1;
     }
@@ -103,12 +102,12 @@ main(int argc, char* argv[])
 
     for (i = 0; i < TESTLEN_; ++i) {
 
-        if (-1 == aug_swrite(sv[0], TEST_ + i, 1)) {
+        if (AUG_ISFAIL(aug_swrite(sv[0], TEST_ + i, 1))) {
             aug_perrinfo(aug_tlx, "aug_write() failed", NULL);
             return 1;
         }
 
-        if (-1 == aug_readfix(stream, in, 4096)) {
+        if (AUG_ISFAIL(aug_readfix(stream, in, 4096))) {
             aug_perrinfo(aug_tlx, "aug_parsefix() failed", NULL);
             return 1;
         }
@@ -119,17 +118,17 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (-1 == aug_swrite(sv[0], TEST_, TESTLEN_)) {
+    if (AUG_ISFAIL(aug_swrite(sv[0], TEST_, TESTLEN_))) {
         aug_perrinfo(aug_tlx, "aug_write() failed", NULL);
         return 1;
     }
 
-    if (-1 == aug_swrite(sv[0], TEST_, TESTLEN_)) {
+    if (AUG_ISFAIL(aug_swrite(sv[0], TEST_, TESTLEN_))) {
         aug_perrinfo(aug_tlx, "aug_write() failed", NULL);
         return 1;
     }
 
-    if (-1 == aug_readfix(stream, in, 4096)) {
+    if (AUG_ISFAIL(aug_readfix(stream, in, 4096))) {
         aug_perrinfo(aug_tlx, "aug_parsefix() failed", NULL);
         return 1;
     }

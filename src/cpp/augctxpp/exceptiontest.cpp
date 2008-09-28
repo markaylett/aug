@@ -13,7 +13,7 @@ using namespace std;
 enum which {
     NONE_ = 0,
     BOOL_,
-    INT_,
+    RESULT_,
     PTR_
 };
 
@@ -34,7 +34,7 @@ namespace {
     T
     verifyproxy(T result)
     {
-        which_ = INT_;
+        which_ = RESULT_;
         return verify(result);
     }
 
@@ -92,13 +92,14 @@ main(int argc, char* argv[])
         if (!b)
             throw error("returned bool differs from original");
 
-        int i(101);
-        i = verifyproxy(i);
-        if (INT_ != which_)
-            throw error("failed to call int template");
-        if (101 != i)
-            throw error("returned int differs from original");
+        aug_result r(AUG_MKRESULT(101));
+        r = verifyproxy(r);
+        if (RESULT_ != which_)
+            throw error("failed to call result template");
+        if (101 != AUG_RESULT(r))
+            throw error("returned result differs from original");
 
+        int i(101);
         int* p = &i;
         p = verifyproxy(p);
         if (PTR_ != which_)
