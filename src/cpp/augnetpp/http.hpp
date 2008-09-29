@@ -20,52 +20,48 @@ namespace aug {
 
         template <typename T>
         class httpstatic {
-            static int
+            static aug_result
             initial(aug_object* ob, const char* value) AUG_NOTHROW
             {
                 try {
-                    T::initial(ob, value);
-                    return 0;
+                    return T::initial(ob, value);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             field(aug_object* ob, const char* name,
                   const char* value) AUG_NOTHROW
             {
                 try {
-                    T::field(ob, name, value);
-                    return 0;
+                    return T::field(ob, name, value);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             csize(aug_object* ob, unsigned csize) AUG_NOTHROW
             {
                 try {
-                    T::csize(ob, csize);
-                    return 0;
+                    return T::csize(ob, csize);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
+
             }
-            static int
+            static aug_result
             cdata(aug_object* ob, const void* cdata,
                   unsigned csize) AUG_NOTHROW
             {
                 try {
-                    T::cdata(ob, cdata, csize);
-                    return 0;
+                    return T::cdata(ob, cdata, csize);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             end(aug_object* ob, int commit) AUG_NOTHROW
             {
                 try {
-                    T::end(ob, commit ? true : false);
-                    return 0;
+                    return T::end(ob, commit ? true : false);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
 
         public:
@@ -85,52 +81,47 @@ namespace aug {
 
         template <typename T>
         class httpnonstatic {
-            static int
+            static aug_result
             initial(aug_object* ob, const char* value) AUG_NOTHROW
             {
                 try {
-                    obtop<T*>(ob)->initial(value);
-                    return 0;
+                    return obtop<T*>(ob)->initial(value);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             field(aug_object* ob, const char* name,
                   const char* value) AUG_NOTHROW
             {
                 try {
-                    obtop<T*>(ob)->field(name, value);
-                    return 0;
+                    return obtop<T*>(ob)->field(name, value);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             csize(aug_object* ob, unsigned csize) AUG_NOTHROW
             {
                 try {
-                    obtop<T*>(ob)->csize(csize);
-                    return 0;
+                    return obtop<T*>(ob)->csize(csize);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             cdata(aug_object* ob, const void* cdata,
                   unsigned csize) AUG_NOTHROW
             {
                 try {
-                    obtop<T*>(ob)->cdata(cdata, csize);
-                    return 0;
+                    return obtop<T*>(ob)->cdata(cdata, csize);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
-            static int
+            static aug_result
             end(aug_object* ob, int commit) AUG_NOTHROW
             {
                 try {
-                    obtop<T*>(ob)->end(commit ? true : false);
-                    return 0;
+                    return obtop<T*>(ob)->end(commit ? true : false);
                 } AUG_SETERRINFOCATCH;
-                return -1;
+                return AUG_FAILERROR;
             }
 
         public:

@@ -329,7 +329,7 @@ updateevents_(struct impl_* impl)
 static void
 readwrite_(struct impl_* impl, int rw)
 {
-    size_t ret;
+    ssize_t ret;
 
     if (rw & SSLREAD_) {
 
