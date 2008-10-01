@@ -18,6 +18,7 @@ modinclude_HEADERS = \
 	muxer.h \
 	queue.h \
 	socket.h \
+	sticky.h \
 	stream.h \
 	time.h \
 	types.h \
@@ -39,6 +40,7 @@ libaugsys_la_SOURCES = \
 	mcast.c \
 	mmap.c \
 	muxer.c \
+	sticky.c \
 	socket.c \
 	stream.c \
 	time.c \

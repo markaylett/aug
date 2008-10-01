@@ -14,7 +14,7 @@ AUG_RCSID("$Id$");
 #endif /* _WIN32 */
 
 AUGSYS_API size_t
-aug_iovsum(const struct iovec* iov, int size);
+aug_iovsum(const struct iovec* iov, int size)
 {
     int i;
     size_t sum = 0;

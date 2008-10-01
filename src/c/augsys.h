@@ -22,6 +22,7 @@
 #include "augsys/muxer.h"
 #include "augsys/queue.h"
 #include "augsys/socket.h"
+#include "augsys/sticky.h"
 #include "augsys/stream.h"
 #include "augsys/time.h"
 #include "augsys/types.h"
