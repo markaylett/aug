@@ -24,4 +24,7 @@ aug_freadv(aug_fd fd, const struct iovec* iov, int size);
 AUGSYS_API aug_rsize
 aug_fwritev(aug_fd fd, const struct iovec* iov, int size);
 
+AUGSYS_API size_t
+aug_iovsum(const struct iovec* iov, int size);
+
 #endif /* AUGSYS_UIO_H */

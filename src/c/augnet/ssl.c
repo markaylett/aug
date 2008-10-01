@@ -265,7 +265,7 @@ realmask_(struct impl_* impl)
 {
     /* Calculate the real mask to be used by the muxer. */
 
-    int mask = 0;
+    unsigned short mask = 0;
 
     switch (impl->state_) {
     case NORMAL:
@@ -292,10 +292,10 @@ realmask_(struct impl_* impl)
     return mask;
 }
 
-static int
+static unsigned short
 userevents_(struct impl_* impl)
 {
-    int events = 0;
+    unsigned short events = 0;
 
     /* End of data and errors are communicated via aug_read(). */
 
@@ -313,7 +313,7 @@ userevents_(struct impl_* impl)
 static void
 updateevents_(struct impl_* impl)
 {
-    int real, user;
+    unsigned short real, user;
 
     aug_setmdeventmask(impl->muxer_, impl->sd_, (real = realmask_(impl)));
 
@@ -321,9 +321,10 @@ updateevents_(struct impl_* impl)
         || (RDPEND == impl->state_ && !buffull_(&impl->inbuf_)))
         aug_setmdevents(impl->muxer_, 1);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: events: id=[%u], realmask=[%d],"
-                  " usermask=[%d], userevents=[%d]",
-                  impl->id_, real, impl->mask_, user);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: events: id=[%u], realmask=[%u],"
+                  " usermask=[%u], userevents=[%u]",
+                  impl->id_, (unsigned)real, (unsigned)impl->mask_,
+                  (unsigned)user);
 }
 
 static void
@@ -487,7 +488,7 @@ static aug_chan*
 cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
-    int events = aug_getmdevents(impl->muxer_, impl->sd_);
+    unsigned short events = aug_getmdevents(impl->muxer_, impl->sd_);
     int rw = 0;
 
     /* Close socket on error. */
@@ -542,8 +543,8 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         AUG_CTXDEBUG3(aug_tlx, "SSL: readwrite_() skipped");
 
     events = userevents_(impl);
-    AUG_CTXDEBUG3(aug_tlx, "SSL: userevents_(): id=[%u], events=[%d]",
-                  impl->id_, events);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: userevents_(): id=[%u], events=[%u]",
+                  impl->id_, (unsigned)events);
 
     if (events) {
 
@@ -567,8 +568,8 @@ csetmask_(aug_chan* ob, unsigned short mask)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: setting event mask: id=[%u], mask=[%d]",
-                  impl->id_, (int)mask);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: setting event mask: id=[%u], mask=[%u]",
+                  impl->id_, (unsigned)mask);
 
     impl->mask_ = mask;
     updateevents_(impl);

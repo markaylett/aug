@@ -129,9 +129,9 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     } else {
 
 #if !defined(_WIN32)
-        int events = aug_getmdevents(impl->muxer_, impl->fd_);
+        unsigned short events = aug_getmdevents(impl->muxer_, impl->fd_);
 #else /* _WIN32 */
-        int events = 0;
+        unsigned short events = 0;
 #endif /* _WIN32 */
 
         /* Assumption: error events cannot occur on plain files. */

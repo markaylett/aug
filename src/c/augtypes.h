@@ -83,12 +83,16 @@ aug_mkresult_(long val)
 
 #else /* !ENABLE_STRICT */
 
+# if HAVE_SYS_TYPES_H
+#  include <sys/types.h> /* ssize_t */
+# endif /* HAVE_SYS_TYPES_H */
+
 typedef int aug_result;
 typedef int aug_rint;
 typedef ssize_t aug_rsize;
 
-# define AUG_MKRESULT(x) x
-# define AUG_RESULT(x)   x
+# define AUG_MKRESULT(x) (x)
+# define AUG_RESULT(x)   (x)
 
 #endif /* !ENABLE_STRICT */
 
