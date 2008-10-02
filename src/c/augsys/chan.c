@@ -27,10 +27,10 @@ struct impl_ {
     aug_err err_;
     int refs_;
     aug_mpool* mpool_;
+    char name_[AUG_MAXCHANNAMELEN + 1];
     unsigned id_;
     aug_muxer_t muxer_;
     aug_fd fd_;
-    char name_[AUG_MAXCHANNAMELEN + 1];
     aug_bool init_;
 };
 
@@ -353,8 +353,8 @@ aug_safeready(aug_chan* chan, aug_chandler* handler, unsigned id,
 }
 
 AUGSYS_API aug_chan*
-aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,
-               aug_muxer_t muxer)
+aug_createfile(aug_mpool* mpool, const char* name, aug_muxer_t muxer,
+               aug_fd fd)
 {
     struct impl_* impl = aug_allocmem(mpool, sizeof(struct impl_));
     if (!impl)
@@ -373,10 +373,10 @@ aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,
     impl->err_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
+    aug_strlcpy(impl->name_, name, sizeof(impl->name_));
     impl->id_ = aug_nextid();
     impl->muxer_ = muxer;
     impl->fd_ = fd;
-    aug_strlcpy(impl->name_, name, sizeof(impl->name_));
     impl->init_ = AUG_FALSE;
 
     aug_retain(mpool);

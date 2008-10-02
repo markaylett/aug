@@ -12,7 +12,9 @@ AUG_RCSID("$Id$");
 #include "augnet/tcpconnect.h"
 
 #include "augsys/chan.h"    /* aug_safeestab() */
+#include "augsys/sticky.h"
 #include "augsys/utility.h" /* aug_nextid() */
+#include "augsys/uio.h"     /* struct aug_iovsum */
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
@@ -27,10 +29,10 @@ struct cimpl_ {
     aug_chan chan_;
     int refs_;
     aug_mpool* mpool_;
-    aug_muxer_t muxer_;
-    unsigned id_;
-    aug_sd sd_;
     char name_[AUG_MAXCHANNAMELEN + 1];
+    unsigned id_;
+    aug_muxer_t muxer_;
+    aug_sd sd_;
     unsigned short mask_;
     struct ssl_ctx_st* sslctx_;
     aug_tcpconnect_t conn_;
@@ -53,10 +55,10 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
     chan =
 #if ENABLE_SSL
         impl->sslctx_ ?
-        aug_createsslclient(impl->mpool_, impl->muxer_, impl->id_, sd,
+        aug_createsslclient(impl->mpool_, impl->id_, impl->muxer_, sd,
                             impl->mask_, impl->sslctx_) :
 #endif /* ENABLE_SSL */
-        aug_createplain(impl->mpool_, impl->muxer_, impl->id_, sd,
+        aug_createplain(impl->mpool_, impl->id_, impl->muxer_, sd,
                         impl->mask_);
 
     if (!chan) {
@@ -86,8 +88,8 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
 }
 
 static aug_bool
-error_(aug_chan* chan, aug_chandler* handler, unsigned id,
-       unsigned short events, aug_sd sd)
+error_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_sd sd,
+       unsigned short events)
 {
     /* Exceptions may include non-error exceptions, such as high priority
        data. */
@@ -184,7 +186,7 @@ static aug_chan*
 cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
-    int events;
+    unsigned short events;
 
     /* Was connection established on construction? */
 
@@ -288,8 +290,8 @@ struct simpl_ {
     aug_chan chan_;
     int refs_;
     aug_mpool* mpool_;
-    aug_muxer_t muxer_;
     unsigned id_;
+    aug_muxer_t muxer_;
     aug_sd sd_;
     unsigned short mask_;
     struct ssl_ctx_st* sslctx_;
@@ -366,7 +368,7 @@ static aug_chan*
 schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
-    int events = aug_getmdevents(impl->muxer_, impl->sd_);
+    unsigned short events = aug_getmdevents(impl->muxer_, impl->sd_);
 
     /* Close socket on error. */
 
@@ -413,10 +415,10 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         chan =
 #if ENABLE_SSL
             impl->sslctx_ ?
-            aug_createsslserver(impl->mpool_, impl->muxer_, id, sd,
+            aug_createsslserver(impl->mpool_, id, impl->muxer_, sd,
                                 impl->mask_, impl->sslctx_) :
 #endif /* ENABLE_SSL */
-            aug_createplain(impl->mpool_, impl->muxer_, id, sd, impl->mask_);
+            aug_createplain(impl->mpool_, id, impl->muxer_, sd, impl->mask_);
 
         if (!chan) {
             aug_ctxwarn(aug_tlx, "aug_createplain() or aug_createsslserver()"
@@ -509,16 +511,16 @@ struct pimpl_ {
     aug_stream stream_;
     int refs_;
     aug_mpool* mpool_;
-    aug_muxer_t muxer_;
     unsigned id_;
-    aug_sd sd_;
+    struct aug_sticky sticky_;
 };
 
 static aug_result
 pclose_(struct pimpl_* impl)
 {
-    aug_setmdeventmask(impl->muxer_, impl->sd_, 0);
-    return aug_sclose(impl->sd_);
+    aug_sd sd = impl->sticky_.md_;
+    aug_termsticky(&impl->sticky_);
+    return aug_sclose(sd);
 }
 
 static void*
@@ -547,7 +549,7 @@ prelease_(struct pimpl_* impl)
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
         aug_mpool* mpool = impl->mpool_;
-        if (AUG_BADSD != impl->sd_)
+        if (AUG_BADMD != impl->sticky_.md_)
             pclose_(impl);
         aug_freemem(mpool, impl);
         aug_release(mpool);
@@ -579,20 +581,18 @@ static aug_result
 pchan_close_(aug_chan* ob)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
-    aug_result result = pclose_(impl);
-    impl->sd_ = AUG_BADSD;
-    return result;
+    return pclose_(impl);
 }
 
 static aug_chan*
 pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
-    int events = aug_getmdevents(impl->muxer_, impl->sd_);
+    unsigned short events = aug_getsticky(&impl->sticky_);
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, events, impl->sd_))
+    if (error_(ob, handler, impl->id_, impl->sticky_.md_, events))
         return NULL;
 
     if (events && !aug_safeready(ob, handler, impl->id_, &impl->stream_,
@@ -607,14 +607,14 @@ static aug_result
 pchan_setmask_(aug_chan* ob, unsigned short mask)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
-    return aug_setmdeventmask(impl->muxer_, impl->sd_, mask);
+    return aug_setsticky(&impl->sticky_, mask);
 }
 
 static unsigned short
 pchan_getmask_(aug_chan* ob)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
-    return aug_getmdeventmask(impl->muxer_, impl->sd_);
+    return aug_getmdeventmask(impl->sticky_.muxer_, impl->sticky_.md_);
 }
 
 static unsigned
@@ -630,7 +630,8 @@ pchan_getname_(aug_chan* ob, char* dst, unsigned size)
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
     struct aug_endpoint ep;
 
-    if (!aug_getpeername(impl->sd_, &ep) || !aug_endpointntop(&ep, dst, size))
+    if (!aug_getpeername(impl->sticky_.md_, &ep)
+        || !aug_endpointntop(&ep, dst, size))
         return NULL;
 
     return dst;
@@ -673,35 +674,43 @@ static aug_result
 pstream_shutdown_(aug_stream* ob)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
-    return aug_sshutdown(impl->sd_, SHUT_WR);
+    return aug_sshutdown(impl->sticky_.md_, SHUT_WR);
 }
 
 static aug_rsize
 pstream_read_(aug_stream* ob, void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
-    return aug_sread(impl->sd_, buf, size);
+    aug_rsize rsize = aug_sread(impl->sticky_.md_, buf, size);
+    aug_stickyrd(&impl->sticky_, rsize, size);
+    return rsize;
 }
 
 static aug_rsize
 pstream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
-    return aug_sreadv(impl->sd_, iov, size);
+    aug_rsize rsize = aug_sreadv(impl->sticky_.md_, iov, size);
+    aug_stickyrd(&impl->sticky_, rsize, aug_iovsum(iov, size));
+    return rsize;
 }
 
 static aug_rsize
 pstream_write_(aug_stream* ob, const void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
-    return aug_swrite(impl->sd_, buf, size);
+    aug_rsize rsize = aug_swrite(impl->sticky_.md_, buf, size);
+    aug_stickywr(&impl->sticky_, rsize, size);
+    return rsize;
 }
 
 static aug_rsize
 pstream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
-    return aug_swritev(impl->sd_, iov, size);
+    aug_rsize rsize = aug_swritev(impl->sticky_.md_, iov, size);
+    aug_stickywr(&impl->sticky_, rsize, aug_iovsum(iov, size));
+    return rsize;
 }
 
 static const struct aug_streamvtbl pstreamvtbl_ = {
@@ -716,8 +725,8 @@ static const struct aug_streamvtbl pstreamvtbl_ = {
 };
 
 AUGNET_API aug_chan*
-aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
-                 const char* serv, struct ssl_ctx_st* sslctx)
+aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
+                 aug_muxer_t muxer, struct ssl_ctx_st* sslctx)
 {
     aug_tcpconnect_t conn;
     aug_sd sd;
@@ -757,10 +766,10 @@ aug_createclient(aug_mpool* mpool, aug_muxer_t muxer, const char* host,
     impl->chan_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->muxer_ = muxer;
-    impl->id_ = aug_nextid();
-    impl->sd_ = sd;
     strcpy(impl->name_, name);
+    impl->id_ = aug_nextid();
+    impl->muxer_ = muxer;
+    impl->sd_ = sd;
 
     /* Default when established. */
 
@@ -809,8 +818,8 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     impl->chan_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->muxer_ = muxer;
     impl->id_ = aug_nextid();
+    impl->muxer_ = muxer;
     impl->sd_ = sd;
 
     /* Default for new connections. */
@@ -823,18 +832,12 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
 }
 
 AUGNET_API aug_chan*
-aug_createplain(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
+aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
                 unsigned short mask)
 {
-    struct pimpl_* impl;
-
-    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, mask)))
+    struct pimpl_* impl = aug_allocmem(mpool, sizeof(struct pimpl_));
+    if (!impl)
         return NULL;
-
-    if (!(impl = aug_allocmem(mpool, sizeof(struct pimpl_)))) {
-        aug_setmdeventmask(muxer, sd, 0);
-        return NULL;
-    }
 
     impl->chan_.vtbl_ = &pchanvtbl_;
     impl->chan_.impl_ = NULL;
@@ -842,9 +845,12 @@ aug_createplain(aug_mpool* mpool, aug_muxer_t muxer, unsigned id, aug_sd sd,
     impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->muxer_ = muxer;
     impl->id_ = id;
-    impl->sd_ = sd;
+
+    if (AUG_ISFAIL(aug_initsticky(&impl->sticky_, muxer, sd, mask))) {
+        aug_freemem(mpool, impl);
+        return NULL;
+    }
 
     aug_retain(mpool);
     return &impl->chan_;

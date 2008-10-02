@@ -29,7 +29,7 @@ main(int argc, char* argv[])
     muxer = aug_createmuxer(mpool);
     aug_check(muxer);
 
-    chan = aug_createfile(mpool, fd, "chantest", muxer);
+    chan = aug_createfile(mpool, "chantest", muxer, fd);
     aug_check(chan);
 
     aug_release(mpool);

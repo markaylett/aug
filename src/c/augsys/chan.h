@@ -28,7 +28,7 @@ aug_safeready(aug_chan* chan, aug_chandler* handler, unsigned id,
               aug_stream* ob, unsigned short events);
 
 AUGSYS_API aug_chan*
-aug_createfile(aug_mpool* mpool, aug_fd fd, const char* name,
-               aug_muxer_t muxer);
+aug_createfile(aug_mpool* mpool, const char* name, aug_muxer_t muxer,
+               aug_fd fd);
 
 #endif /* AUGSYS_CHAN_H */
