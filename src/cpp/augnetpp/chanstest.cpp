@@ -13,6 +13,8 @@ using namespace std;
 
 namespace {
 
+    const char ALPHABET[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
     pair<chanptr, chanptr>
     plainpair(mpoolref mpool, aug_muxer_t muxer)
     {
@@ -29,40 +31,22 @@ namespace {
     }
 
     unsigned rd_, wr_;
-    bool done_ = false;
+    int recv_ = 0;
 
     struct test {
 
-        chandler<test> chandler_;
-        chans chans_;
+        chanptr wrchan_;
 
-        explicit
-        test(mpoolref mpool)
-            : chans_(null)
-        {
-            chandler_.reset(this);
-            chans tmp(getmpool(aug_tlx), chandler_);
-            chans_.swap(tmp);
-        }
-        smartob<aug_object>
-        cast_(const char* id) AUG_NOTHROW
-        {
-            if (equalid<aug_object>(id) || equalid<aug_chandler>(id))
-                return object_retain<aug_object>(chandler_);
-            return null;
-        }
-        void
-        retain_() AUG_NOTHROW
-        {
-        }
-        void
-        release_() AUG_NOTHROW
+        test()
+            : wrchan_(null)
         {
         }
         void
         clearchan_(unsigned id) AUG_NOTHROW
         {
             aug_ctxinfo(aug_tlx, "clearing channel: %u", id);
+            if (id == wr_)
+                wrchan_ = null;
         }
         void
         errorchan_(unsigned id, const aug_errinfo& errinfo) AUG_NOTHROW
@@ -83,10 +67,17 @@ namespace {
             if (id == rd_) {
                 char ch;
                 read(stream, &ch, 1);
-                if ('A' == ch)
-                    done_ = true;
+                const char expect('A' + recv_++ % 26);
+                if (ch != expect) {
+                    aug_ctxerror(aug_tlx, "unexpected character '%c'", ch);
+                    exit(1);
+                }
+                if ('Z' == ch && recv_ < 260)
+                    setchanmask(wrchan_, AUG_MDEVENTRDWR);
             } else if (id == wr_) {
-                write(stream, "A", 1);
+                write(stream, ALPHABET, 26);
+                wrchan_ = object_cast<aug_chan>(stream);
+                setchanmask(wrchan_, AUG_MDEVENTRD);
             }
             return AUG_TRUE;
         }
@@ -101,7 +92,7 @@ main(int argc, char* argv[])
 
         mpoolptr mp(getmpool(aug_tlx));
 
-        chandler<test> chandler;
+        scoped_chandler<test> chandler;
         muxer mux(mp);
         chans chans(mp, chandler);
         pair<chanptr, chanptr> xy(plainpair(mp, mux));
@@ -112,7 +103,7 @@ main(int argc, char* argv[])
         rd_ = getchanid(xy.first);
         insertchan(chans, xy.first);
 
-        while (!done_) {
+        while (recv_ < 26 * 10) {
             waitmdevents(mux);
             processchans(chans);
         }
