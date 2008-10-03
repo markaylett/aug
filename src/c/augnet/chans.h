@@ -89,4 +89,7 @@ aug_dumpchans(aug_chans_t chans);
 AUGNET_API unsigned
 aug_getchans(aug_chans_t chans);
 
+AUGNET_API aug_bool
+aug_allblocked(aug_chans_t chans);
+
 #endif /* AUGNET_CHANS_H */

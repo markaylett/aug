@@ -602,6 +602,12 @@ cgetname_(aug_chan* ob, char* dst, unsigned size)
     return dst;
 }
 
+static aug_bool
+cisblocked_(aug_chan* ob)
+{
+    return AUG_TRUE;
+}
+
 static const struct aug_chanvtbl cvtbl_ = {
     ccast_,
     cretain_,
@@ -611,7 +617,8 @@ static const struct aug_chanvtbl cvtbl_ = {
     csetmask_,
     cgetmask_,
     cgetid_,
-    cgetname_
+    cgetname_,
+    cisblocked_
 };
 
 static void*

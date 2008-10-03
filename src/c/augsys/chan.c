@@ -183,6 +183,12 @@ chan_getname_(aug_chan* ob, char* dst, unsigned size)
     return dst;
 }
 
+static aug_bool
+chan_isblocked_(aug_chan* ob)
+{
+    return AUG_TRUE;
+}
+
 static const struct aug_chanvtbl chanvtbl_ = {
     chan_cast_,
     chan_retain_,
@@ -192,7 +198,8 @@ static const struct aug_chanvtbl chanvtbl_ = {
     chan_setmask_,
     chan_getmask_,
     chan_getid_,
-    chan_getname_
+    chan_getname_,
+    chan_isblocked_
 };
 
 static void*

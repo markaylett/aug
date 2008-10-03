@@ -90,6 +90,12 @@ namespace aug {
     {
         return aug_getchans(chans);
     }
+
+    inline bool
+    allblocked(aug_chans_t chans)
+    {
+        return aug_allblocked(chans) ? true : false;
+    }
 }
 
 #endif // AUGNETPP_CHANS_HPP

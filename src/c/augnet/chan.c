@@ -274,6 +274,12 @@ cchan_getname_(aug_chan* ob, char* dst, unsigned size)
     return dst;
 }
 
+static aug_bool
+cchan_isblocked_(aug_chan* ob)
+{
+    return AUG_TRUE;
+}
+
 static const struct aug_chanvtbl cchanvtbl_ = {
     cchan_cast_,
     cchan_retain_,
@@ -283,7 +289,8 @@ static const struct aug_chanvtbl cchanvtbl_ = {
     cchan_setmask_,
     cchan_getmask_,
     cchan_getid_,
-    cchan_getname_
+    cchan_getname_,
+    cchan_isblocked_
 };
 
 struct simpl_ {
@@ -494,6 +501,12 @@ schan_getname_(aug_chan* ob, char* dst, unsigned size)
     return dst;
 }
 
+static aug_bool
+schan_isblocked_(aug_chan* ob)
+{
+    return AUG_TRUE;
+}
+
 static const struct aug_chanvtbl schanvtbl_ = {
     schan_cast_,
     schan_retain_,
@@ -503,7 +516,8 @@ static const struct aug_chanvtbl schanvtbl_ = {
     schan_setmask_,
     schan_getmask_,
     schan_getid_,
-    schan_getname_
+    schan_getname_,
+    schan_isblocked_
 };
 
 struct pimpl_ {
@@ -637,6 +651,13 @@ pchan_getname_(aug_chan* ob, char* dst, unsigned size)
     return dst;
 }
 
+static aug_bool
+pchan_isblocked_(aug_chan* ob)
+{
+    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
+    return impl->sticky_.events_ ? AUG_FALSE : AUG_TRUE;
+}
+
 static const struct aug_chanvtbl pchanvtbl_ = {
     pchan_cast_,
     pchan_retain_,
@@ -646,7 +667,8 @@ static const struct aug_chanvtbl pchanvtbl_ = {
     pchan_setmask_,
     pchan_getmask_,
     pchan_getid_,
-    pchan_getname_
+    pchan_getname_,
+    pchan_isblocked_
 };
 
 static void*

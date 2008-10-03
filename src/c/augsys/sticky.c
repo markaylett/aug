@@ -78,5 +78,5 @@ aug_getsticky(struct aug_sticky* sticky)
     /* Set sticky events. */
 
     sticky->events_ |= (events & AUG_MDEVENTRDWR);
-    return events;
+    return sticky->events_ | events;
 }

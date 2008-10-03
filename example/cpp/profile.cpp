@@ -68,11 +68,8 @@ namespace {
                 aug_ctxinfo(aug_tlx, "reader events: %u", (unsigned)events);
                 char ch;
                 try {
+                    read(stream, &ch, 1);
                     const char expect('A' + recv_++ % 26);
-					if ('Z' == expect)
-						read(stream, &ch, 1);
-					else
-						read(stream, &ch, 1);
                     if (ch != expect) {
                         aug_ctxerror(aug_tlx, "unexpected character '%c'",
                                      ch);
@@ -114,7 +111,10 @@ main(int argc, char* argv[])
         insertchan(chans, xy.first);
 
         while (recv_ < 26 * 10) {
-            waitmdevents(mux);
+            if (allblocked(chans))
+                waitmdevents(mux);
+            else
+                aug_ctxinfo(aug_tlx, "all is not blocked");
             processchans(chans);
             msleep(100);
         }
