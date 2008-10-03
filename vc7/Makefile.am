@@ -33,4 +33,4 @@ EXTRA_DIST = \
 	stop.bat \
 	test.bat \
 	uninstall.bat \
-	example.cpp
+	scratch.cpp

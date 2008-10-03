@@ -549,7 +549,7 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     sessionptr session(impl_->sessions_.getbyname(sname));
 
     mpoolptr mpool(getmpool(aug_tlx));
-    chanptr chan(createclient(mpool, impl_->muxer_, host, port,
+    chanptr chan(createclient(mpool, host, port, impl_->muxer_,
                               ctx ? ctx->get() : 0));
     connptr conn(new clntconn(mpool, session, user, impl_->timers_, chan));
 

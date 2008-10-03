@@ -58,6 +58,8 @@
       <param name="size" type="unsigned"/>
     </method>
 
+    <method name="isblocked" type="aug_bool" qname="isblocked"/>
+
   </interface>
 
 </package>

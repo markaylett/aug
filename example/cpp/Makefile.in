@@ -39,7 +39,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/cpp/lang.mk
-noinst_PROGRAMS = mplexd$(EXEEXT) tcpclient$(EXEEXT) \
+noinst_PROGRAMS = mplexd$(EXEEXT) profile$(EXEEXT) tcpclient$(EXEEXT) \
 	tcpserver$(EXEEXT) timerd$(EXEEXT) $(am__EXEEXT_1)
 @ENABLE_MULTICAST_TRUE@am__append_1 = \
 @ENABLE_MULTICAST_TRUE@	heartbeat \
@@ -83,6 +83,9 @@ am__netevent_SOURCES_DIST = netevent.cpp
 @ENABLE_MULTICAST_TRUE@am_netevent_OBJECTS = netevent.$(OBJEXT)
 netevent_OBJECTS = $(am_netevent_OBJECTS)
 @ENABLE_MULTICAST_TRUE@netevent_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_profile_OBJECTS = profile.$(OBJEXT)
+profile_OBJECTS = $(am_profile_OBJECTS)
+profile_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_tcpclient_OBJECTS = tcpclient.$(OBJEXT)
 tcpclient_OBJECTS = $(am_tcpclient_OBJECTS)
 tcpclient_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -104,11 +107,13 @@ CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
 	$(mcastsend_SOURCES) $(mplexd_SOURCES) $(netevent_SOURCES) \
-	$(tcpclient_SOURCES) $(tcpserver_SOURCES) $(timerd_SOURCES)
+	$(profile_SOURCES) $(tcpclient_SOURCES) $(tcpserver_SOURCES) \
+	$(timerd_SOURCES)
 DIST_SOURCES = $(am__heartbeat_SOURCES_DIST) \
 	$(am__mcastrecv_SOURCES_DIST) $(am__mcastsend_SOURCES_DIST) \
 	$(mplexd_SOURCES) $(am__netevent_SOURCES_DIST) \
-	$(tcpclient_SOURCES) $(tcpserver_SOURCES) $(timerd_SOURCES)
+	$(profile_SOURCES) $(tcpclient_SOURCES) $(tcpserver_SOURCES) \
+	$(timerd_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -254,6 +259,10 @@ mplexd_SOURCES = \
 	mplexd.cpp
 
 mplexd_LDADD = $(AUGLIBS)
+profile_SOURCES = \
+	profile.cpp
+
+profile_LDADD = $(AUGLIBS)
 tcpclient_SOURCES = \
 	tcpclient.cpp
 
@@ -337,6 +346,9 @@ mplexd$(EXEEXT): $(mplexd_OBJECTS) $(mplexd_DEPENDENCIES)
 netevent$(EXEEXT): $(netevent_OBJECTS) $(netevent_DEPENDENCIES) 
 	@rm -f netevent$(EXEEXT)
 	$(CXXLINK) $(netevent_LDFLAGS) $(netevent_OBJECTS) $(netevent_LDADD) $(LIBS)
+profile$(EXEEXT): $(profile_OBJECTS) $(profile_DEPENDENCIES) 
+	@rm -f profile$(EXEEXT)
+	$(CXXLINK) $(profile_LDFLAGS) $(profile_OBJECTS) $(profile_LDADD) $(LIBS)
 tcpclient$(EXEEXT): $(tcpclient_OBJECTS) $(tcpclient_DEPENDENCIES) 
 	@rm -f tcpclient$(EXEEXT)
 	$(CXXLINK) $(tcpclient_LDFLAGS) $(tcpclient_OBJECTS) $(tcpclient_LDADD) $(LIBS)
@@ -358,6 +370,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastsend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netevent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/profile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpclient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpserver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timerd.Po@am__quote@

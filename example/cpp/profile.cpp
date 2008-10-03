@@ -23,9 +23,9 @@ namespace {
         setnonblock(sds[1], true);
         pair<chanptr, chanptr>
             p(make_pair(createplain(mpool, nextid(), muxer, sds[0],
-                                    AUG_MDEVENTRD | AUG_MDEVENTEX),
+                                    AUG_MDEVENTRD),
                         createplain(mpool, nextid(), muxer, sds[1],
-                                    AUG_MDEVENTWR | AUG_MDEVENTEX)));
+                                    AUG_MDEVENTWR)));
         sds.release();
         return p;
     }
@@ -65,19 +65,29 @@ namespace {
                    unsigned short events) AUG_NOTHROW
         {
             if (id == rd_) {
+                aug_ctxinfo(aug_tlx, "reader events: %u", (unsigned)events);
                 char ch;
-                read(stream, &ch, 1);
-                const char expect('A' + recv_++ % 26);
-                if (ch != expect) {
-                    aug_ctxerror(aug_tlx, "unexpected character '%c'", ch);
-                    exit(1);
+                try {
+                    const char expect('A' + recv_++ % 26);
+					if ('Z' == expect)
+						read(stream, &ch, 1);
+					else
+						read(stream, &ch, 1);
+                    if (ch != expect) {
+                        aug_ctxerror(aug_tlx, "unexpected character '%c'",
+                                     ch);
+                        exit(1);
+                    }
+                    aug_ctxinfo(aug_tlx, "read character '%c'", ch);
+                } catch (const block_exception&) {
+                    aug_ctxinfo(aug_tlx, "read blocked; need write");
+					setchanmask(wrchan_, AUG_MDEVENTWR);
                 }
-                if ('Z' == ch && recv_ < 260)
-                    setchanmask(wrchan_, AUG_MDEVENTRDWR);
             } else if (id == wr_) {
+                aug_ctxinfo(aug_tlx, "writer events: %u", (unsigned)events);
                 write(stream, ALPHABET, 26);
                 wrchan_ = object_cast<aug_chan>(stream);
-                setchanmask(wrchan_, AUG_MDEVENTRD);
+                setchanmask(wrchan_, 0);
             }
             return AUG_TRUE;
         }
@@ -106,6 +116,7 @@ main(int argc, char* argv[])
         while (recv_ < 26 * 10) {
             waitmdevents(mux);
             processchans(chans);
+            msleep(100);
         }
 
         return 0;

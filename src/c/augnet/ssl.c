@@ -837,7 +837,7 @@ AUGNET_API aug_chan*
 aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
                     aug_sd sd, unsigned short mask, struct ssl_ctx_st* sslctx)
 {
-    struct impl_* impl = createssl_(mpool, muxer, id, sd, mask, sslctx);
+    struct impl_* impl = createssl_(mpool, id, muxer, sd, mask, sslctx);
     if (!impl)
         return NULL;
 
@@ -853,7 +853,7 @@ AUGNET_API aug_chan*
 aug_createsslserver(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
                     aug_sd sd, unsigned short mask, struct ssl_ctx_st* sslctx)
 {
-    struct impl_* impl = createssl_(mpool, muxer, id, sd, mask, sslctx);
+    struct impl_* impl = createssl_(mpool, id, muxer, sd, mask, sslctx);
     if (!impl)
         return NULL;
 

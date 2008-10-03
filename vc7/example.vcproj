@@ -140,7 +140,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\example.cpp">
+				RelativePath=".\scratch.cpp">
 				<FileConfiguration
 					Name="Debug|Win32"
 					ExcludedFromBuild="TRUE">
@@ -202,7 +202,8 @@
 			<File
 				RelativePath="..\example\cpp\mplexd.cpp">
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="Debug|Win32"
+					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCLCompilerTool"/>
 				</FileConfiguration>
@@ -229,6 +230,19 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\example\cpp\profile.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\example\cpp\tcpclient.cpp">
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -247,6 +261,12 @@
 				RelativePath="..\example\cpp\tcpserver.cpp">
 				<FileConfiguration
 					Name="Debug|Win32"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCLCompilerTool"/>

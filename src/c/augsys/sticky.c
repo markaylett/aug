@@ -33,7 +33,13 @@ aug_setsticky(struct aug_sticky* sticky, unsigned short mask)
 
     unsigned short orig = aug_getmdeventmask(sticky->muxer_, sticky->md_);
 
-    aug_verify(aug_setmdeventmask(sticky->muxer_, sticky->md_, mask));
+    aug_verify(aug_setmdeventmask(sticky->muxer_, sticky->md_,
+                                  AUG_MDEVENTRD | AUG_MDEVENTEX | mask));
+
+    /* Only read and write are sticky. */
+
+    orig &= AUG_MDEVENTRDWR;
+    mask &= AUG_MDEVENTRDWR;
 
     /* Remove events that are not in the new mask. */
 
@@ -67,5 +73,10 @@ aug_stickywr(struct aug_sticky* sticky, aug_rsize rsize, size_t expected)
 AUGSYS_API unsigned short
 aug_getsticky(struct aug_sticky* sticky)
 {
-    return sticky->events_ | aug_getmdevents(sticky->muxer_, sticky->md_);
+    unsigned short events = aug_getmdevents(sticky->muxer_, sticky->md_);
+
+    /* Set sticky events. */
+
+    sticky->events_ |= (events & AUG_MDEVENTRDWR);
+    return events;
 }

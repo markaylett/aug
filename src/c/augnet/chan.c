@@ -202,7 +202,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, events, impl->sd_))
+    if (error_(ob, handler, impl->id_, impl->sd_, events))
         return NULL;
 
     if ((AUG_MDEVENTCONN & events)) {
@@ -372,7 +372,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, events, impl->sd_))
+    if (error_(ob, handler, impl->id_, impl->sd_, events))
         return NULL;
 
     /* Assumption: server sockets do not have exceptional events. */
