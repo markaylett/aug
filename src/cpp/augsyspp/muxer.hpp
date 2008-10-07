@@ -99,6 +99,12 @@ namespace aug {
         return AUG_RESULT(verify(aug_waitmdevents(muxer, 0)));
     }
 
+    inline unsigned
+    pollmdevents(aug_muxer_t muxer)
+    {
+        return AUG_RESULT(verify(aug_pollmdevents(muxer)));
+    }
+
     inline unsigned short
     getmdeventmask(aug_muxer_t muxer, mdref ref)
     {

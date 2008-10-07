@@ -53,6 +53,8 @@ run_(void* arg)
 {
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
+    // Sticky events not required for fixed length blocking read.
+
     if (!aug_writeevent(aug_eventwr(), &in))
         return AUG_FAILERROR;
 

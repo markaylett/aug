@@ -37,6 +37,8 @@ namespace {
         void
         readevent()
         {
+            // Sticky events not required for fixed length blocking read.
+
             pair<int, smartob<aug_object> > event(aug::readevent(rd_));
 
             switch (event.first) {
@@ -127,17 +129,15 @@ namespace {
         run()
         {
             while (!quit_) {
-                {
+
+                try {
                     scoped_unblock unblock;
-                    for (;;) {
-                        try {
-                            waitmdevents(muxer_);
-                            break;
-                        } catch (const intr_exception&) {
-                            // While interrupted.
-                        }
-                    }
+                    waitmdevents(muxer_);
+                } catch (const intr_exception&) {
+                    continue;
                 }
+
+                // Sticky events not required for fixed length blocking read.
 
                 if (getmdevents(muxer_, rd_))
                     readevent();

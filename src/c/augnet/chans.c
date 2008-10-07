@@ -302,15 +302,15 @@ aug_getchans(aug_chans_t chans)
     return chans->size_;
 }
 
-AUGNET_API aug_bool
-aug_allblocked(aug_chans_t chans)
+AUGNET_API unsigned
+aug_getblockedchans(aug_chans_t chans)
 {
-    aug_bool isblocked = AUG_TRUE;
+    unsigned blocked = 0;
     struct entry_* it;
     AUG_FOREACH(it, &chans->head_) {
 
         if (it->ob_ && !aug_isblocked(it->ob_))
-            isblocked = AUG_FALSE;
+            ++blocked;
     }
-    return isblocked;
+    return blocked;
 }

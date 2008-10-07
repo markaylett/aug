@@ -288,6 +288,8 @@ namespace aug {
             {
                 AUG_CTXDEBUG2(aug_tlx, "reading event");
 
+                // Sticky events not required for fixed length blocking read.
+
                 pair<int, smartob<aug_object> >
                     event(aug::readevent(eventrd_));
 
@@ -419,7 +421,7 @@ engine::run(bool stoponerr)
 {
     AUG_CTXDEBUG2(aug_tlx, "running daemon process");
 
-    unsigned events(!0);
+    unsigned ready(!0);
     while (!stopping() || !impl_->socks_.empty()) {
 
         if (detail::engineimpl::STOPPED == impl_->state_)
@@ -427,34 +429,38 @@ engine::run(bool stoponerr)
 
         try {
 
-            if (impl_->timers_.empty()) {
+            AUG_CTXDEBUG2(aug_tlx, "processing timers");
+
+            timeval tv;
+            processexpired(impl_->timers_, 0 == ready, tv);
+
+            try {
 
                 scoped_unblock unblock;
-                for (;;) {
-                    try {
-                        events = waitmdevents(impl_->muxer_);
-                        break;
-                    } catch (const intr_exception&) {
-                        // While interrupted.
-                    }
+
+                unsigned blocked(getblockedchans(impl_->chans_));
+                if (blocked < getchans(impl_->chans_)) {
+
+                    // Not all are blocked so don't wait.
+
+                    ready = pollmdevents(impl_->muxer_);
+
+                } else if (impl_->timers_.empty()) {
+
+                    // No timers so wait indefinitely.
+
+                    ready = waitmdevents(impl_->muxer_);
+
+                } else {
+
+                    // Wait upto next timer expiry.
+
+                    ready = waitmdevents(impl_->muxer_, tv);
                 }
 
-            } else {
-
-                AUG_CTXDEBUG2(aug_tlx, "processing timers");
-
-                timeval tv;
-                processexpired(impl_->timers_, 0 == events, tv);
-
-                scoped_unblock unblock;
-                for (;;) {
-                    try {
-                        events = waitmdevents(impl_->muxer_, tv);
-                        break;
-                    } catch (const intr_exception&) {
-                        // While interrupted.
-                    }
-                }
+            } catch (const intr_exception&) {
+                ready = !0; // Not timeout.
+                continue;
             }
 
             // Update timestamp after waiting.
@@ -462,6 +468,8 @@ engine::run(bool stoponerr)
             gettimeofday(impl_->now_);
 
             AUG_CTXDEBUG2(aug_tlx, "processing events");
+
+            // Sticky events not required for fixed length blocking read.
 
             if (getmdevents(impl_->muxer_, impl_->eventrd_))
                 impl_->readevent();

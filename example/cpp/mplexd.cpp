@@ -296,6 +296,8 @@ namespace test {
         {
             AUG_CTXDEBUG2(aug_tlx, "reading event");
 
+            // Sticky events not required for fixed length blocking read.
+
             pair<int, smartob<aug_object> >
                 event(aug::readevent(aug_eventrd()));
 
@@ -367,35 +369,34 @@ namespace test {
 
             aug_ctxinfo(aug_tlx, "running daemon process");
 
-            unsigned events(!0);
+            unsigned ready(!0);
             while (!quit_) {
 
-                if (state_->timers_.empty()) {
+                processexpired(state_->timers_, 0 == ready, tv);
+
+                try {
 
                     scoped_unblock unblock;
-                    for (;;) {
-                        try {
-                            events = waitmdevents(state_->muxer_);
-                            break;
-                        } catch (const intr_exception&) {
-                            // While interrupted.
-                        }
+
+                    if (state_->timers_.empty()) {
+
+                        // No timers so wait indefinitely.
+
+                        ready = waitmdevents(state_->muxer_);
+
+                    } else {
+
+                        // Wait upto next timer expiry.
+
+                        ready = waitmdevents(state_->muxer_, tv);
                     }
 
-                } else {
-
-                    processexpired(state_->timers_, 0 == events, tv);
-
-                    scoped_unblock unblock;
-                    for (;;) {
-                        try {
-                            events = waitmdevents(state_->muxer_, tv);
-                            break;
-                        } catch (const intr_exception&) {
-                            // While interrupted.
-                        }
-                    }
+                } catch (const intr_exception&) {
+                    ready = !0; // Not timeout.
+                    continue;
                 }
+
+                // Sticky events not required for fixed length blocking read.
 
                 if (getmdevents(state_->muxer_, aug_eventrd()))
                     readevent();

@@ -111,7 +111,8 @@ main(int argc, char* argv[])
         insertchan(chans, xy.first);
 
         while (recv_ < 26 * 10) {
-            if (allblocked(chans))
+            // If all blocked.
+            if (getblockedchans(chans) == getchans(chans))
                 waitmdevents(mux);
             else
                 aug_ctxinfo(aug_tlx, "all is not blocked");

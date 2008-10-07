@@ -86,6 +86,8 @@ namespace test {
 
             AUG_CTXDEBUG2(aug_tlx, "reading event");
 
+            // Sticky events not required for fixed length blocking read.
+
             pair<int, smartob<aug_object> > event(aug::readevent(fd));
 
             switch (event.first) {
@@ -194,33 +196,34 @@ namespace test {
 
             state_->timer_.set(5000, *this);
 
-            unsigned events(!0);
+            unsigned ready(!0);
             while (0 < remain_) {
 
-                if (state_->timers_.empty()) {
+                processexpired(state_->timers_, 0 == ready, tv);
 
-                    for (;;) {
-                        try {
-                            events = waitmdevents(state_->muxer_);
-                            break;
-                        } catch (const intr_exception&) {
-                            // While interrupted.
-                        }
+                try {
+
+                    scoped_unblock unblock;
+
+                    if (impl_->timers_.empty()) {
+
+                        // No timers so wait indefinitely.
+
+                        ready = waitmdevents(impl_->muxer_);
+
+                    } else {
+
+                        // Wait upto next timer expiry.
+
+                        ready = waitmdevents(impl_->muxer_, tv);
                     }
 
-                } else {
-
-                    processexpired(state_->timers_, 0 == events, tv);
-
-                    for (;;) {
-                        try {
-                            events = waitmdevents(state_->muxer_, tv);
-                            break;
-                        } catch (const intr_exception&) {
-                            // While interrupted.
-                        }
-                    }
+                } catch (const intr_exception&) {
+                    ready = !0; // Not timeout.
+                    continue;
                 }
+
+                // Sticky events not required for fixed length blocking read.
 
                 readevent();
             }

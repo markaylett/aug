@@ -52,7 +52,8 @@ aug_setmdevents(aug_muxer_t muxer, int delta);
 /**
  * Wait for events.
  *
- * @param timeout Optional timeout value.
+ * @param timeout Optional timeout value; a null timeout causes the function
+ * to block until an event occurs.
  *
  * @return Either positive if events have been signalled, zero on timeout, or
  * a negative value on error.  A positive return may not be representative of
@@ -65,6 +66,13 @@ aug_setmdevents(aug_muxer_t muxer, int delta);
 
 AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout);
+
+/**
+ * Poll events without waiting.
+ */
+
+AUGSYS_API aug_rint
+aug_pollmdevents(aug_muxer_t muxer);
 
 AUGSYS_API unsigned short
 aug_getmdeventmask(aug_muxer_t muxer, aug_md md);

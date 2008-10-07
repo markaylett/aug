@@ -14,3 +14,9 @@ static const struct timeval NOWAIT_ = { 0, 0 };
 #else /* _WIN32 */
 # include "augsys/win32/muxer.c"
 #endif /* _WIN32 */
+
+AUGSYS_API aug_rint
+aug_pollmdevents(aug_muxer_t muxer)
+{
+    return aug_waitmdevents(muxer, &NOWAIT_);
+}

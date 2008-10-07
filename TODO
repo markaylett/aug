@@ -39,3 +39,7 @@ Add support for epoll().
 Replace EINTR checks with AUG_FAILINTR.
 
 Use aug_rsize instead of optional outputs in mar.
+
+readevent() starvation while not allblocked().
+
+Replace enums with ints.

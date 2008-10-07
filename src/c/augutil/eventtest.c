@@ -21,6 +21,8 @@ main(int argc, char* argv[])
         return 1;
     }
 
+    // Sticky events not required for fixed length blocking read.
+
     if (!aug_writeevent(sds[1], &in)) {
         aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
         goto fail;

@@ -36,6 +36,9 @@ main(int argc, char* argv[])
         muxer mux(getmpool(aug_tlx));
         setmdeventmask(mux, sfd, AUG_MDEVENTRD);
 
+        // FIXME: implementation assumes a level-triggered interface, which it
+        // is not.
+
         for (;;) {
 
             try {

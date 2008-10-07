@@ -91,10 +91,10 @@ namespace aug {
         return aug_getchans(chans);
     }
 
-    inline bool
-    allblocked(aug_chans_t chans)
+    inline unsigned
+    getblockedchans(aug_chans_t chans)
     {
-        return aug_allblocked(chans) ? true : false;
+        return aug_getblockedchans(chans);
     }
 }
 
