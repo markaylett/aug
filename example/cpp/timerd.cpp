@@ -205,17 +205,17 @@ namespace test {
 
                     scoped_unblock unblock;
 
-                    if (impl_->timers_.empty()) {
+                    if (state_->timers_.empty()) {
 
                         // No timers so wait indefinitely.
 
-                        ready = waitmdevents(impl_->muxer_);
+                        ready = waitmdevents(state_->muxer_);
 
                     } else {
 
                         // Wait upto next timer expiry.
 
-                        ready = waitmdevents(impl_->muxer_, tv);
+                        ready = waitmdevents(state_->muxer_, tv);
                     }
 
                 } catch (const intr_exception&) {
