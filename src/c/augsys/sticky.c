@@ -33,6 +33,8 @@ aug_setsticky(struct aug_sticky* sticky, unsigned short mask)
 
     unsigned short orig = aug_getmdeventmask(sticky->muxer_, sticky->md_);
 
+    /* Always want exceptions and readability. */
+
     aug_verify(aug_setmdeventmask(sticky->muxer_, sticky->md_,
                                   AUG_MDEVENTRD | AUG_MDEVENTEX | mask));
 

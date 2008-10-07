@@ -249,6 +249,8 @@ namespace aug {
                 try {
                     changed = cptr->process(stream, events, now_);
                     ok = true;
+                } catch (const block_exception&) {
+                    return AUG_TRUE; // EWOULDBLOCK.
                 } AUG_PERRINFOCATCH;
 
                 // If an exception was thrown, "ok" will still have its
