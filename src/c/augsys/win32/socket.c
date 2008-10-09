@@ -318,18 +318,28 @@ AUGSYS_API aug_result
 aug_getsockopt(aug_sd sd, int level, int optname, void* optval,
                socklen_t* optlen)
 {
-    /* MSDN confirms that optval should be type int for SO_ERROR. */
-
-    if (SOCKET_ERROR == getsockopt(sd, level, optname, optval, optlen))
-        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
-                                   WSAGetLastError());
-
-    /* Map Winsock error to Posix error. */
+    int ret = getsockopt(sd, level, optname, optval, optlen);
 
     if (SOL_SOCKET == level && SO_ERROR == optname) {
+
+        /* MSDN confirms that optval should be type int for SO_ERROR. */
+
         int* err = optval;
+
+        /* If getsockopt() call failed. */
+
+        if (SOCKET_ERROR == ret) {
+            *err = WSAGetLastError();
+            WSASetLastError(0);
+        }
+
+        /* Map Winsock error to Posix error. */
+
         *err = aug_win32posix(*err);
-    }
+
+    } else if (SOCKET_ERROR == ret)
+        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
+                                   WSAGetLastError());
 
     return AUG_SUCCESS;
 }

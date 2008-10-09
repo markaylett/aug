@@ -214,15 +214,46 @@ aug_inetloopback(int af)
 }
 
 AUGSYS_API aug_bool
-aug_acceptlost(struct aug_errinfo* errinfo)
+aug_acceptagain(struct aug_errinfo* errinfo)
 {
     /* FIXME: would be better if aug_tlerr were used. */
 
     switch (aug_errno(errinfo)) {
     case ECONNABORTED:
+
+    /* Linux accept() passes already-pending network errors on the new socket
+       as an error code from accept().  This behaviour differs from other BSD
+       socket implementations.  For reliable operation the application should
+       detect the network errors defined for the protocol after accept() and
+       treat them like EAGAIN by retrying.  In case of TCP/IP these are
+       ENETDOWN, EPROTO, ENOPROTOOPT, EHOSTDOWN, ENONET, EHOSTUNREACH,
+       EOPNOTSUPP, and ENETUNREACH. */
+
+#if defined(ENETDOWN)
+    case ENETDOWN:
+#endif /* ENETDOWN */
 #if defined(EPROTO)
     case EPROTO:
 #endif /* EPROTO */
+#if defined(ENOPROTOOPT)
+    case ENOPROTOOPT:
+#endif /* ENOPROTOOPT */
+#if defined(EHOSTDOWN)
+    case EHOSTDOWN:
+#endif /* EHOSTDOWN */
+#if defined(ENONET)
+    case ENONET:
+#endif /* ENONET */
+#if defined(EHOSTUNREACH)
+    case EHOSTUNREACH:
+#endif /* EHOSTUNREACH */
+#if defined(EOPNOTSUPP)
+    case EOPNOTSUPP:
+#endif /* EOPNOTSUPP */
+#if defined(ENETUNREACH)
+    case ENETUNREACH:
+#endif /* ENETUNREACH */
+
     case EWOULDBLOCK:
         return AUG_TRUE;
     }
@@ -230,22 +261,21 @@ aug_acceptlost(struct aug_errinfo* errinfo)
     return AUG_FALSE;
 }
 
-AUGSYS_API aug_result
-aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                   aug_sd sd)
+AUGSYS_API int
+aug_getsockerr(aug_sd sd)
 {
     int err = 0;
     socklen_t len = sizeof(err);
 
-    if (AUG_ISFAIL(aug_getsockopt(sd, SOL_SOCKET, SO_ERROR, &err, &len))) {
+    /* All errors returned in err. */
 
-        /* Maintain semantics with existing errinfo functions. */
+    aug_getsockopt(sd, SOL_SOCKET, SO_ERROR, &err, &len);
+    return err;
+}
 
-        const struct aug_errinfo* src = aug_tlerr;
-        aug_seterrinfo(errinfo, src->file_, src->line_, src->src_, src->num_,
-                       src->desc_);
-        return AUG_FAILERROR;
-    }
-
-    return aug_setposixerrinfo(errinfo, file, line, err);
+AUGSYS_API aug_result
+aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
+                   aug_sd sd)
+{
+    return aug_setposixerrinfo(errinfo, file, line, aug_getsockerr(sd));
 }

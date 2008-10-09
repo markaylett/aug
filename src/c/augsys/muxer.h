@@ -26,6 +26,34 @@
 
 #include "augext/mpool.h"
 
+/**
+   Muxer events.
+
+   Notes from Linux man pages:
+
+   send(): The select(2) or poll(2) call may be used to determine when it is
+   possible to send more data.
+
+   recv(): The select(2) or poll(2) call may be used to determine when more
+   data arrives.
+
+   accept(): In order to be notified of incoming connections on a socket, you
+   can use select(2) or poll(2).  A readable event will be delivered when a
+   new connection is attempted and you may then call accept() to get a socket
+   for that connection.
+
+   connect(): It is possible to select(2) or poll(2) for completion by
+   selecting the socket for writing.  After select(2) indicates writability,
+   use getsockopt(2) to read the SO_ERROR option at level SOL_SOCKET to
+   determine whether connect() completed successfully (SO_ERROR is zero) or
+   unsuccessfully.
+
+   Winsock specific: failure of connection attempt is communicated as an
+   exception event.
+
+   FIXME: is this safe for non-winsock clients?
+*/
+
 #define AUG_MDEVENTRD    0x1
 #define AUG_MDEVENTWR    0x2
 #define AUG_MDEVENTEX    0x4

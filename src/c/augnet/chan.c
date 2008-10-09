@@ -399,7 +399,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
 
-            if (!aug_acceptlost(aug_tlerr)) {
+            if (!aug_acceptagain(aug_tlerr)) {
                 aug_safeerror(ob, handler, impl->id_, aug_tlerr);
                 return NULL;
             }

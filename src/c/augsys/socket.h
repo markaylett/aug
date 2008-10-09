@@ -156,9 +156,13 @@ AUGSYS_API aug_rsize
 aug_swritev(aug_sd sd, const struct iovec* iov, int size);
 
 /**
- * The Windows version of this function will return the posix-mapped version
- * of #SO_ERROR.  I.e. on return, optval will contain the equivalent errno
- * value.
+ * The Windows version of this function will return the posix-mapped errno for
+ * #SOL_SOCKET/#SO_ERROR.  I.e. on return, optval will contain the equivalent
+ * errno value.
+ *
+ * Further, #SOL_SOCKET/#SO_ERROR will always return #AUG_SUCCESS, with any
+ * errno value stored in optval.  The getsockerr() function is designed to
+ * re-enforce these semantics.
  */
 
 AUGSYS_API aug_result
@@ -239,14 +243,22 @@ AUGSYS_API const struct aug_inetaddr*
 aug_inetloopback(int af);
 
 /**
- * After a failed call to aug_accept(), this function can be used to determine
- * whether the error was a result of the peer closing the connection prior to
- * aug_accept() being called.  This can occur when the passive socket is
- * non-blocking.
+ * This function determines whether a failed aug_accept() call was due to a
+ * transient failure.
+ *
+ * This can occur, for example, when a peer closes the connection before
+ * aug_accept() is actually called.
+ *
+ * Linux also passes any already-pending network errors on the new socket as
+ * an error code from aug_accept().  This function will also return true for
+ * these transient cases.
  */
 
 AUGSYS_API aug_bool
-aug_acceptlost(struct aug_errinfo* errinfo);
+aug_acceptagain(struct aug_errinfo* errinfo);
+
+AUGSYS_API int
+aug_getsockerr(aug_sd sd);
 
 AUGSYS_API aug_result
 aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
