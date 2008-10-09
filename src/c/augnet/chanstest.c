@@ -122,9 +122,9 @@ chan_getname_(aug_chan* ob, char* dst, unsigned size)
 }
 
 static aug_bool
-chan_isblocked_(aug_chan* ob)
+chan_isready_(aug_chan* ob)
 {
-    return AUG_TRUE;
+    return AUG_FALSE;
 }
 
 static const struct aug_chanvtbl chanvtbl_ = {
@@ -137,7 +137,7 @@ static const struct aug_chanvtbl chanvtbl_ = {
     chan_getmask_,
     chan_getid_,
     chan_getname_,
-    chan_isblocked_
+    chan_isready_
 };
 
 static void*
@@ -300,7 +300,7 @@ stats_(unsigned id, aug_stream* stream, unsigned short events)
 static aug_bool
 rm1_(unsigned id, aug_stream* stream, unsigned short events)
 {
-    return 1 == id ? AUG_FALSE : AUG_TRUE;
+    return 1 != id;
 }
 
 static void

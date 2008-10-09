@@ -19,7 +19,6 @@ struct aug_muxer_ {
     aug_mpool* mpool_;
     struct set_ in_, out_;
     size_t bits_;
-    int ready_;
 };
 
 static void
@@ -102,7 +101,6 @@ aug_createmuxer(aug_mpool* mpool)
     zeroset_(&muxer->in_);
     zeroset_(&muxer->out_);
     muxer->bits_ = 0;
-    muxer->ready_ = 0;
 
     aug_retain(mpool);
     return muxer;
@@ -132,31 +130,10 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
     return AUG_SUCCESS;
 }
 
-AUGSYS_API void
-aug_setmdevents(aug_muxer_t muxer, int delta)
-{
-    muxer->ready_ += delta;
-}
-
 AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
-    int ret, ready = muxer->ready_;
-    muxer->ready_ = 0;
-
-    if (0 < ready) {
-
-        /* Recurse. */
-
-        aug_result rint = aug_waitmdevents(muxer, &NOWAIT_);
-        if (AUG_ISFAIL(rint))
-            return rint;
-
-        /* At least one. */
-
-        return AUG_MKRESULT(AUG_RESULT(rint) + ready);
-    }
-
+    int ret;
     muxer->out_ = muxer->in_;
 
     if (0 == muxer->bits_) {

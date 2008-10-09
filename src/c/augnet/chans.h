@@ -90,6 +90,6 @@ AUGNET_API unsigned
 aug_getchans(aug_chans_t chans);
 
 AUGNET_API unsigned
-aug_getblockedchans(aug_chans_t chans);
+aug_getreadychans(aug_chans_t chans);
 
 #endif /* AUGNET_CHANS_H */

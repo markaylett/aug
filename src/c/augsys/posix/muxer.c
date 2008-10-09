@@ -27,7 +27,6 @@ struct aug_muxer_ {
     aug_mpool* mpool_;
     struct pollfd* pollfds_;
     size_t nfds_, size_;
-    int ready_;
 };
 
 static unsigned short
@@ -105,7 +104,6 @@ aug_createmuxer(aug_mpool* mpool)
     muxer->mpool_ = mpool;
     muxer->pollfds_ = NULL;
     muxer->nfds_ = muxer->size_ = 0;
-    muxer->ready_ = 0;
 
     if (AUG_ISFAIL(resize_(muxer, INIT_SIZE_))) {
         aug_freemem(mpool, muxer);
@@ -162,30 +160,10 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
     return AUG_SUCCESS;
 }
 
-AUGSYS_API void
-aug_setmdevents(aug_muxer_t muxer, int delta)
-{
-    muxer->ready_ += delta;
-}
-
 AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
-    int ms, ret, ready = muxer->ready_;
-    muxer->ready_ = 0;
-
-    if (0 < ready) {
-
-        /* Recurse. */
-
-        aug_result rint = aug_waitmdevents(muxer, &NOWAIT_);
-        if (AUG_ISFAIL(rint))
-            return rint;
-
-        /* At least one. */
-
-        return AUG_MKRESULT(AUG_RESULT(rint) + ready);
-    }
+    int ms, ret;
 
     /* A negative value means infinite timeout. */
 
@@ -220,7 +198,6 @@ struct aug_muxer_ {
     aug_mpool* mpool_;
     struct set_ in_, out_;
     int maxfd_;
-    int ready_;
 };
 
 static void
@@ -285,7 +262,6 @@ aug_createmuxer(aug_mpool* mpool)
     /* A maxfd of -1 will result in a zero nfds value. */
 
     muxer->maxfd_ = -1;
-    muxer->ready_ = 0;
 
     aug_retain(mpool);
     return muxer;
@@ -334,31 +310,10 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
     return AUG_SUCCESS;
 }
 
-AUGSYS_API void
-aug_setmdevents(aug_muxer_t muxer, int delta)
-{
-    muxer->ready_ += delta;
-}
-
 AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
 {
-    int ret, ready = muxer->ready_;
-    muxer->ready_ = 0;
-
-    if (0 < ready) {
-
-        /* Recurse. */
-
-        aug_result rint = aug_waitmdevents(muxer, &NOWAIT_);
-        if (AUG_ISFAIL(rint))
-            return rint;
-
-        /* At least one. */
-
-        return AUG_MKRESULT(AUG_RESULT(rint) + ready);
-    }
-
+    int ret;
     muxer->out_ = muxer->in_;
 
     if (-1 == (ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_,

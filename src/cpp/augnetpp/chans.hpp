@@ -92,9 +92,9 @@ namespace aug {
     }
 
     inline unsigned
-    getblockedchans(aug_chans_t chans)
+    getreadychans(aug_chans_t chans)
     {
-        return aug_getblockedchans(chans);
+        return aug_getreadychans(chans);
     }
 }
 

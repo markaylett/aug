@@ -52,6 +52,8 @@ enum sslstate_ {
     SSLERR
 };
 
+/* FIXME: add sticky handling. */
+
 struct impl_ {
     aug_chan chan_;
     aug_stream stream_;
@@ -315,11 +317,10 @@ updateevents_(struct impl_* impl)
 {
     unsigned short real, user;
 
-    aug_setmdeventmask(impl->muxer_, impl->sd_, (real = realmask_(impl)));
+    real = realmask_(impl);
+    user = userevents_(impl);
 
-    if ((user = userevents_(impl))
-        || (RDPEND == impl->state_ && !buffull_(&impl->inbuf_)))
-        aug_setmdevents(impl->muxer_, 1);
+    aug_setmdeventmask(impl->muxer_, impl->sd_, real);
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: events: id=[%u], realmask=[%u],"
                   " usermask=[%u], userevents=[%u]",
@@ -603,9 +604,11 @@ cgetname_(aug_chan* ob, char* dst, unsigned size)
 }
 
 static aug_bool
-cisblocked_(aug_chan* ob)
+cisready_(aug_chan* ob)
 {
-    return AUG_TRUE;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
+    return userevents_(impl)
+        || (RDPEND == impl->state_ && !buffull_(&impl->inbuf_));
 }
 
 static const struct aug_chanvtbl cvtbl_ = {
@@ -618,7 +621,7 @@ static const struct aug_chanvtbl cvtbl_ = {
     cgetmask_,
     cgetid_,
     cgetname_,
-    cisblocked_
+    cisready_
 };
 
 static void*

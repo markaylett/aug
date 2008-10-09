@@ -25,13 +25,6 @@ struct aug_tcpconnect_ {
     aug_sd sd_;
 };
 
-static aug_result
-getsockerr_(aug_sd sd, int* err)
-{
-    socklen_t len = sizeof(*err);
-    return aug_getsockopt(sd, SOL_SOCKET, SO_ERROR, err, &len);
-}
-
 AUGNET_API aug_tcpconnect_t
 aug_createtcpconnect(aug_mpool* mpool, const char* host, const char* serv)
 {
@@ -115,10 +108,8 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
                     /* No more addresses: set error to connection failure
                        reason. */
 
-                    int err = ECONNREFUSED;
-                    getsockerr_(sd, &err);
+                    aug_setsockerrinfo(aug_tlerr, __FILE__, __LINE__, sd);
                     aug_sclose(sd); /* May set errno */
-                    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, err);
                     return AUG_BADSD;
                 }
 

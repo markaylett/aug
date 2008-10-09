@@ -275,9 +275,13 @@ cchan_getname_(aug_chan* ob, char* dst, unsigned size)
 }
 
 static aug_bool
-cchan_isblocked_(aug_chan* ob)
+cchan_isready_(aug_chan* ob)
 {
-    return AUG_TRUE;
+    /* The established flag may have been set on construction.  In which case,
+       a process call is required to notify of establishment. */
+
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+    return impl->est_ ? AUG_TRUE : AUG_FALSE;
 }
 
 static const struct aug_chanvtbl cchanvtbl_ = {
@@ -290,7 +294,7 @@ static const struct aug_chanvtbl cchanvtbl_ = {
     cchan_getmask_,
     cchan_getid_,
     cchan_getname_,
-    cchan_isblocked_
+    cchan_isready_
 };
 
 struct simpl_ {
@@ -502,9 +506,9 @@ schan_getname_(aug_chan* ob, char* dst, unsigned size)
 }
 
 static aug_bool
-schan_isblocked_(aug_chan* ob)
+schan_isready_(aug_chan* ob)
 {
-    return AUG_TRUE;
+    return AUG_FALSE;
 }
 
 static const struct aug_chanvtbl schanvtbl_ = {
@@ -517,7 +521,7 @@ static const struct aug_chanvtbl schanvtbl_ = {
     schan_getmask_,
     schan_getid_,
     schan_getname_,
-    schan_isblocked_
+    schan_isready_
 };
 
 struct pimpl_ {
@@ -652,10 +656,10 @@ pchan_getname_(aug_chan* ob, char* dst, unsigned size)
 }
 
 static aug_bool
-pchan_isblocked_(aug_chan* ob)
+pchan_isready_(aug_chan* ob)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
-    return impl->sticky_.events_ ? AUG_FALSE : AUG_TRUE;
+    return impl->sticky_.events_ ? AUG_TRUE : AUG_FALSE;
 }
 
 static const struct aug_chanvtbl pchanvtbl_ = {
@@ -668,7 +672,7 @@ static const struct aug_chanvtbl pchanvtbl_ = {
     pchan_getmask_,
     pchan_getid_,
     pchan_getname_,
-    pchan_isblocked_
+    pchan_isready_
 };
 
 static void*
@@ -766,14 +770,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     if (!(aug_endpointntop(&ep, name, sizeof(name))))
         goto fail2;
 
-    if (est) {
-
-        /* Now established.  Force multiplexer to return immediately so that
-           establishment can be finalised in process() function. */
-
-        aug_setmdevents(muxer, 1);
-
-    } else {
+    if (!est) {
 
         /* Set mask to poll for connection establishment. */
 
@@ -805,9 +802,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 
  fail3:
 
-    if (est)
-        aug_setmdevents(muxer, -1);
-    else
+    if (!est)
         aug_setmdeventmask(muxer, sd, 0);
 
  fail2:

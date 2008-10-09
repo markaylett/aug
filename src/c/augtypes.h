@@ -26,8 +26,8 @@
 
 typedef int aug_bool;
 
-#define AUG_TRUE  (1 == 1)
-#define AUG_FALSE (1 != 1)
+#define AUG_FALSE (0 != 0)
+#define AUG_TRUE  (0 == 0)
 
 /** @} */
 

@@ -111,11 +111,21 @@ main(int argc, char* argv[])
         insertchan(chans, xy.first);
 
         while (recv_ < 26 * 10) {
-            // If all blocked.
-            if (getblockedchans(chans) == getchans(chans))
+
+            unsigned ready(getreadychans(chans));
+            if (ready) {
+
+                // Some are ready so don't block.
+
+                pollmdevents(mux);
+
+            } else {
+
+                // No timers so wait indefinitely.
+
                 waitmdevents(mux);
-            else
-                aug_ctxinfo(aug_tlx, "all is not blocked");
+            }
+
             processchans(chans);
             msleep(100);
         }

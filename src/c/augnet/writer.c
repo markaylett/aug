@@ -129,7 +129,7 @@ aug_appendwriter(aug_writer_t writer, aug_blob* blob)
 AUGNET_API aug_bool
 aug_writerempty(aug_writer_t writer)
 {
-    return AUG_EMPTY(&writer->bufs_) ? AUG_TRUE : AUG_FALSE;
+    return AUG_EMPTY(&writer->bufs_);
 }
 
 AUGNET_API aug_rsize

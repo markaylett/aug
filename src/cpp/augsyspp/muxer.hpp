@@ -73,12 +73,6 @@ namespace aug {
         verify(aug_setmdeventmask(muxer, ref.get(), mask));
     }
 
-    inline void
-    setmdevents(aug_muxer_t muxer, int delta)
-    {
-        aug_setmdevents(muxer, delta);
-    }
-
     /**
      * Throws intr_exception if the system call was interrupted.
      */

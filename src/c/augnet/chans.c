@@ -303,14 +303,14 @@ aug_getchans(aug_chans_t chans)
 }
 
 AUGNET_API unsigned
-aug_getblockedchans(aug_chans_t chans)
+aug_getreadychans(aug_chans_t chans)
 {
-    unsigned blocked = 0;
+    unsigned ready = 0;
     struct entry_* it;
     AUG_FOREACH(it, &chans->head_) {
 
-        if (it->ob_ && !aug_isblocked(it->ob_))
-            ++blocked;
+        if (it->ob_ && !aug_ischanready(it->ob_))
+            ++ready;
     }
-    return blocked;
+    return ready;
 }

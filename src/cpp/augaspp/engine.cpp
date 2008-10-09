@@ -440,12 +440,12 @@ engine::run(bool stoponerr)
 
                 scoped_unblock unblock;
 
-                unsigned blocked(getblockedchans(impl_->chans_));
-                if (blocked < getchans(impl_->chans_)) {
+                ready = getreadychans(impl_->chans_);
+                if (ready) {
 
-                    // Not all are blocked so don't wait.
+                    // Some are ready so don't block.
 
-                    ready = pollmdevents(impl_->muxer_);
+                    pollmdevents(impl_->muxer_);
 
                 } else if (impl_->timers_.empty()) {
 

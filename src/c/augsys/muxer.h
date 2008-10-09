@@ -46,9 +46,6 @@ aug_destroymuxer(aug_muxer_t muxer);
 AUGSYS_API aug_result
 aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
 
-AUGSYS_API void
-aug_setmdevents(aug_muxer_t muxer, int delta);
-
 /**
  * Wait for events.
  *

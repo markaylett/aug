@@ -184,9 +184,13 @@ chan_getname_(aug_chan* ob, char* dst, unsigned size)
 }
 
 static aug_bool
-chan_isblocked_(aug_chan* ob)
+chan_isready_(aug_chan* ob)
 {
-    return AUG_TRUE;
+    /* If not initialised, then force processing so that establishment can be
+       finalised in process() function. */
+
+    struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
+    return !impl->init_;
 }
 
 static const struct aug_chanvtbl chanvtbl_ = {
@@ -199,7 +203,7 @@ static const struct aug_chanvtbl chanvtbl_ = {
     chan_getmask_,
     chan_getid_,
     chan_getname_,
-    chan_isblocked_
+    chan_isready_
 };
 
 static void*
@@ -366,11 +370,6 @@ aug_createfile(aug_mpool* mpool, const char* name, aug_muxer_t muxer,
     struct impl_* impl = aug_allocmem(mpool, sizeof(struct impl_));
     if (!impl)
         return NULL;
-
-    /* Now established.  Force multiplexer to return immediately so that
-       establishment can be finalised in process() function. */
-
-    aug_setmdevents(muxer, 1);
 
     impl->chan_.vtbl_ = &chanvtbl_;
     impl->chan_.impl_ = NULL;

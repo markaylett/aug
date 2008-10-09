@@ -220,7 +220,7 @@ aug_expired(aug_timers_t timers, int id)
 AUGUTIL_API aug_bool
 aug_timersempty(aug_timers_t timers)
 {
-    return AUG_EMPTY(&timers->timers_) ? AUG_TRUE : AUG_FALSE;
+    return AUG_EMPTY(&timers->timers_);
 }
 
 AUGUTIL_API aug_result
