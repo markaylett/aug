@@ -823,6 +823,9 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
 {
     struct simpl_* impl;
 
+    /* A readable event will be delivered when a new connection is
+       attempted. */
+
     if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTRD)))
         return NULL;
 
@@ -839,7 +842,12 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     impl->muxer_ = muxer;
     impl->sd_ = sd;
 
-    /* Default for new connections. */
+    /* Default mask for new connections.
+
+       Sticky events used by plain sockets ensure that readability is always
+       set.  However, AUG_MDEVENTRD is still used both for safety and ssl
+       support.
+     */
 
     impl->mask_ = AUG_MDEVENTRD;
     impl->sslctx_ = sslctx;
@@ -863,6 +871,8 @@ aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
     impl->refs_ = 1;
     impl->mpool_ = mpool;
     impl->id_ = id;
+
+    /* Sticky event flags are used for edge-triggered interfaces. */
 
     if (AUG_ISFAIL(aug_initsticky(&impl->sticky_, muxer, sd, mask))) {
         aug_freemem(mpool, impl);

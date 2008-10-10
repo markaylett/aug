@@ -6,6 +6,10 @@
 
 #include "augsys/muxer.h"
 
+/**
+   Simplifies support for edge-triggered interfaces on plain sockets.
+ */
+
 struct aug_sticky {
     aug_muxer_t muxer_;
     aug_md md_;

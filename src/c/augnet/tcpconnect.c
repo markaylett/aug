@@ -86,7 +86,15 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 
     if (AUG_BADSD != sd) {
 
-        /* Check status of pending connection. */
+        /* Check status of pending connection.
+
+           The Linux man page suggests that once writability has been
+           indicated, aug_getsockopt() should be used to read the SO_ERROR
+           option at level SOL_SOCKET to determine whether aug_connect()
+           completed successfully (SO_ERROR is zero) or unsuccessfully.
+
+           FIXME: is this aug_established() approach equally valid?
+        */
 
         aug_result result = aug_established(sd);
 
@@ -114,7 +122,6 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
                 }
 
             } else {
-
 
                 /* Error testing for establishment. */
 

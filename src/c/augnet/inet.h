@@ -48,6 +48,10 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst);
 AUGNET_API aug_result
 aug_setnodelay(aug_sd sd, int on);
 
+/**
+   Returns #AUG_FAILNONE if connection is not established.
+*/
+
 AUGNET_API aug_result
 aug_established(aug_sd sd);
 

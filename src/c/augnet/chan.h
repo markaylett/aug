@@ -41,6 +41,8 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
 /**
  * Create a plain socket channel.
  *
+ * A plain socket is one that is already established.
+ *
  * Must be passed a non-blocking socket.  If successful, will assume
  * responsibility for calling aug_sclose() on socket.
  *
