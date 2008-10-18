@@ -273,8 +273,9 @@ aug_setmcastif(aug_sd sd, const char* ifname)
 }
 
 AUGSYS_API aug_result
-aug_setmcastloop(aug_sd sd, int on)
+aug_setmcastloop(aug_sd sd, aug_bool on)
 {
+    int opt = on ? 1 : 0;
     aug_rint af = aug_getfamily(sd);
     if (AUG_ISFAIL(af))
         return af;
@@ -283,12 +284,12 @@ aug_setmcastloop(aug_sd sd, int on)
 
     switch (AUG_RESULT(af)) {
     case AF_INET:
-        return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_LOOP, &on,
-                              sizeof(on));
+        return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_LOOP, &opt,
+                              sizeof(opt));
 #if HAVE_IPV6
     case AF_INET6:
         return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
-                              &on, sizeof(on));
+                              &opt, sizeof(opt));
 #endif /* HAVE_IPV6 */
     }
 

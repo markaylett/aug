@@ -33,8 +33,12 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr,
 AUGSYS_API aug_result
 aug_setmcastif(aug_sd sd, const char* ifname);
 
+/**
+ * True if multicast traffic should be looped-back to originating host.
+ */
+
 AUGSYS_API aug_result
-aug_setmcastloop(aug_sd sd, int on);
+aug_setmcastloop(aug_sd sd, aug_bool on);
 
 AUGSYS_API aug_result
 aug_setmcastttl(aug_sd sd, int ttl);

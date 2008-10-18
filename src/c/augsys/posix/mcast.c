@@ -155,7 +155,7 @@ aug_setmcastif(aug_sd sd, const char* ifname)
 }
 
 AUGSYS_API aug_result
-aug_setmcastloop(aug_sd sd, int on)
+aug_setmcastloop(aug_sd sd, aug_bool on)
 {
     aug_result af;
     union {
@@ -170,12 +170,12 @@ aug_setmcastloop(aug_sd sd, int on)
 
     switch (AUG_RESULT(af)) {
     case AF_INET:
-        un.ipv4_ = on;
+        un.ipv4_ = on ? 1 : 0;
         return aug_setsockopt(sd, IPPROTO_IP, IP_MULTICAST_LOOP, &un.ipv4_,
                               sizeof(un.ipv4_));
 #if HAVE_IPV6
     case AF_INET6:
-        un.ipv6_ = on;
+        un.ipv6_ = on ? 1 : 0;
         return aug_setsockopt(sd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
                               &un.ipv6_, sizeof(un.ipv6_));
 #endif /* HAVE_IPV6 */

@@ -31,9 +31,9 @@ namespace aug {
     }
 
     inline void
-    setmcastloop(sdref ref, int on)
+    setmcastloop(sdref ref, bool on)
     {
-        verify(aug_setmcastloop(ref.get(), on));
+        verify(aug_setmcastloop(ref.get(), on ? AUG_TRUE : AUG_FALSE));
     }
 
     inline void
