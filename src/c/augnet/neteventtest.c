@@ -46,32 +46,32 @@ main(int argc, char* argv[])
     }
 
     if (2 != event.type_) {
-        fprintf(stderr, "unexpected type  [%d]\n", event.type_);
+        fprintf(stderr, "unexpected type [%d]\n", event.type_);
         return 1;
     }
 
     if (3 != event.state_) {
-        fprintf(stderr, "unexpected state  [%d]\n", event.state_);
+        fprintf(stderr, "unexpected state [%d]\n", event.state_);
         return 1;
     }
 
     if (4 != event.seq_) {
-        fprintf(stderr, "unexpected seq  [%d]\n", event.seq_);
+        fprintf(stderr, "unexpected seq [%d]\n", event.seq_);
         return 1;
     }
 
     if (5 != event.hbsec_) {
-        fprintf(stderr, "unexpected hbsec  [%d]\n", event.hbsec_);
+        fprintf(stderr, "unexpected hbsec [%d]\n", event.hbsec_);
         return 1;
     }
 
     if (6 != event.weight_) {
-        fprintf(stderr, "unexpected weight  [%d]\n", event.weight_);
+        fprintf(stderr, "unexpected weight [%d]\n", event.weight_);
         return 1;
     }
 
     if (7 != event.load_) {
-        fprintf(stderr, "unexpected load  [%d]\n", event.load_);
+        fprintf(stderr, "unexpected load [%d]\n", event.load_);
         return 1;
     }
 
