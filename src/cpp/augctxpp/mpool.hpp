@@ -5,10 +5,23 @@
 #define AUGCTXPP_MPOOL_HPP
 
 #include "augctx/base.h"
+#include "augctx/mpool.h"
 
 #include <new>
 
 namespace aug {
+
+    inline mpoolptr
+    getcrtmalloc()
+    {
+        return object_attach<aug_mpool>(aug_getcrtmalloc());
+    }
+
+    inline mpoolptr
+    createdlmalloc()
+    {
+        return object_attach<aug_mpool>(aug_createdlmalloc());
+    }
 
     class mpool_base {
     protected:

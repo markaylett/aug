@@ -38,6 +38,16 @@ aug_init(void);
  * any associated resources may now be freed.
  *
  * When freeing resources, aug_term() will release the thread-local context.
+ *
+ * If the thread-local context has not been initialised, then this function
+ * will have no effect.  This is required to handle the situation highlighted
+ * in the following paragraph.
+ *
+ * On Windows, signal or console handlers do not run on the main thread.  The
+ * thread-local context is therefore unlikely to be available during execution
+ * of these handlers.  If the handler exits the application, perhaps via an
+ * abort(), then the atexit() handlers will be called from this thread, which
+ * may include the atexit() handler installed by aug_autobasictlx().
  */
 
 AUGCTX_API void

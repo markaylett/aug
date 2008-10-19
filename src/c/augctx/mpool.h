@@ -9,7 +9,7 @@
 #include "augext/mpool.h"
 
 AUGCTX_API aug_mpool*
-aug_createcrtmalloc(void);
+aug_getcrtmalloc(void);
 
 AUGCTX_API aug_mpool*
 aug_createdlmalloc(void);
