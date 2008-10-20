@@ -55,6 +55,9 @@ namespace aug {
 
         bool
         empty() const;
+
+        bool
+        exists(mod_id id) const;
     };
 
     class scoped_insert {
@@ -82,7 +85,7 @@ namespace aug {
         void
         commit()
         {
-            sock_ = sockptr();
+            sock_ = null;
         }
     };
 }

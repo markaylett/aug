@@ -52,6 +52,8 @@ main(int argc, char* argv[])
         if (free_ || 202 != p2->i_)
             throw error("failed to assign smartptr");
         p2 = null;
+        if (null != p2)
+            throw error("failed null assignment");
         if (!free_)
             throw error("failed to destroy smartptr");
 

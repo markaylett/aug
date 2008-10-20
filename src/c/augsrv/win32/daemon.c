@@ -29,7 +29,7 @@
 
 static SERVICE_STATUS_HANDLE ssh_;
 
-static int
+static aug_result
 setstatus_(DWORD state)
 {
     SERVICE_STATUS status;
@@ -45,9 +45,9 @@ setstatus_(DWORD state)
 
     if (!SetServiceStatus(ssh_, &status)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return -1;
+        return AUG_FAILERROR;
     }
-    return 0;
+    return AUG_SUCCESS;
 }
 
 static void WINAPI
@@ -59,33 +59,30 @@ handler_(DWORD code)
     switch (code) {
     case RECONF_:
         event.type_ = AUG_EVENTRECONF;
-        if (!aug_writeevent(aug_eventwr(), &event))
-            aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
         break;
     case STATUS_:
         event.type_ = AUG_EVENTSTATUS;
-        if (!aug_writeevent(aug_eventwr(), &event))
-            aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
         break;
     case STOP_:
     case SERVICE_CONTROL_STOP:
     case SERVICE_CONTROL_SHUTDOWN:
         setstatus_(SERVICE_STOP_PENDING);
         event.type_ = AUG_EVENTSTOP;
-        if (!aug_writeevent(aug_eventwr(), &event)) {
-            aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
-            setstatus_(SERVICE_RUNNING);
-        }
         break;
     }
+    if (!aug_writeevent(aug_eventwr(), &event))
+        abort();
 }
 
 static void WINAPI
 start_(DWORD argc, char** argv)
 {
+    /* Service thread. */
+
     const char* sname;
     struct aug_options options;
     char home[AUG_PATH_MAX + 1];
+
 	/* DebugBreak(); */
 
     /* Ensure writes performed on main thread are visible. */
@@ -93,7 +90,7 @@ start_(DWORD argc, char** argv)
     AUG_RMB();
 
     if (AUG_ISFAIL(aug_initbasictlx())) {
-        fprintf(stderr, "aug_initerrinfo() failed");
+        fprintf(stderr, "aug_initerrinfo() failed\n");
         return;
     }
 

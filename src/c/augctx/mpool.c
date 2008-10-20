@@ -18,7 +18,9 @@ static void*
 crtcast_(aug_mpool* obj, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_mpoolid)) {
-        aug_retain(obj);
+
+        /* Singleton instance, so no aug_retain() required here. */
+
         return obj;
     }
     return NULL;
@@ -149,7 +151,7 @@ static const struct aug_mpoolvtbl dlvtbl_ = {
 };
 
 AUGCTX_API aug_mpool*
-aug_createcrtmalloc(void)
+aug_getcrtmalloc(void)
 {
     return &mpool_;
 }

@@ -98,3 +98,9 @@ socks::empty() const
 {
     return socks_.empty();
 }
+
+bool
+socks::exists(mod_id id) const
+{
+    return socks_.find(id) != socks_.end();
+}

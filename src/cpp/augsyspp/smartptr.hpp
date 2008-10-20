@@ -52,11 +52,15 @@ namespace aug {
             T* ptr(0);
             unsigned* refs(0);
 
-            if (!ptr_ || 0 < --*refs_)
-                return;
+            // Swap instance state to locals.
 
-            std::swap(ptr_, ptr);
-            std::swap(refs_, refs);
+            std::swap(ptr, ptr_);
+            std::swap(refs, refs_);
+
+            // Instance now null.
+
+            if (!ptr || 0 < --*refs)
+                return;
 
             delete ptr;
             delete refs;

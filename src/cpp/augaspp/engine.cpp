@@ -84,6 +84,9 @@ namespace {
         static smartob<aug_msg>
         create(const string& from, const string& to, const string& type)
         {
+            // Events can be posted between threads.  The event object is
+            // allocated on the freestore to avoid use of aug_tlx.
+
             msgevent* ptr = new msgevent(from, to, type);
             return object_attach<aug_msg>(ptr->msg_);
         }
@@ -250,7 +253,11 @@ namespace aug {
                     changed = cptr->process(stream, events, now_);
                     ok = true;
                 } catch (const block_exception&) {
-                    return AUG_TRUE; // EWOULDBLOCK.
+
+                    // FIXME: shutdown may have removed.
+
+                    return socks_.exists(id)
+                        ? AUG_TRUE : AUG_FALSE; // EWOULDBLOCK.
                 } AUG_PERRINFOCATCH;
 
                 // If an exception was thrown, "ok" will still have its
@@ -267,7 +274,9 @@ namespace aug {
                 if (changed && CLOSED == cptr->state())
                     return AUG_FALSE;
 
-                return AUG_TRUE;
+                // FIXME: shutdown may have removed.
+
+                return socks_.exists(id) ? AUG_TRUE : AUG_FALSE;
             }
             void
             teardown()
@@ -493,6 +502,8 @@ engine::run(bool stoponerr)
 AUGASPP_API void
 engine::reconfall()
 {
+    // Thread-safe.
+
     aug_event e = { AUG_EVENTRECONF, 0 };
     writeevent(impl_->eventwr_, e);
 }
@@ -500,6 +511,8 @@ engine::reconfall()
 AUGASPP_API void
 engine::stopall()
 {
+    // Thread-safe.
+
     aug_event e = { AUG_EVENTSTOP, 0 };
     writeevent(impl_->eventwr_, e);
 }
@@ -508,6 +521,8 @@ AUGASPP_API void
 engine::post(const char* sname, const char* to, const char* type,
              objectref ob)
 {
+    // Thread-safe.
+
     smartob<aug_msg> msg(msgevent::create(sname, to, type));
     setmsgpayload(msg, ob);
     aug_event e;

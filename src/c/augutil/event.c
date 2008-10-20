@@ -12,9 +12,9 @@ AUG_RCSID("$Id$");
 #include "augsys/barrier.h"
 #include "augsys/muxer.h"
 
-#include "augctx/base.h"
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
+#include "augctx/mpool.h" /* aug_getcrtmalloc() */
 
 #include <errno.h>
 #include <signal.h>
@@ -67,7 +67,10 @@ writeall_(aug_md md, const char* buf, size_t n)
 AUGUTIL_API struct aug_event*
 aug_setsigevent(struct aug_event* event, int sig)
 {
-    aug_mpool* mpool = aug_getmpool(aug_tlx);
+    /* Must use standard c-malloc to ensure safety from signal handler;
+       aug_tlx may not have been initialised on signal handler's thread. */
+
+    aug_mpool* mpool = aug_getcrtmalloc();
     switch (sig) {
     case SIGHUP:
         event->type_ = AUG_EVENTRECONF;

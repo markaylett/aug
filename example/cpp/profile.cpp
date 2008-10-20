@@ -65,7 +65,7 @@ namespace {
                    unsigned short events) AUG_NOTHROW
         {
             if (id == rd_) {
-                aug_ctxinfo(aug_tlx, "reader events: %u", (unsigned)events);
+                AUG_CTXDEBUG0(aug_tlx, "reader events: %u", (unsigned)events);
                 char ch;
                 try {
                     read(stream, &ch, 1);
@@ -75,7 +75,7 @@ namespace {
                                      ch);
                         exit(1);
                     }
-                    aug_ctxinfo(aug_tlx, "read character '%c'", ch);
+                    AUG_CTXDEBUG0(aug_tlx, "read character '%c'", ch);
                 } catch (const block_exception&) {
                     aug_ctxinfo(aug_tlx, "read blocked; need write");
 					setchanmask(wrchan_, AUG_MDEVENTWR);
@@ -127,7 +127,6 @@ main(int argc, char* argv[])
             }
 
             processchans(chans);
-            msleep(100);
         }
 
         return 0;

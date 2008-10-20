@@ -25,7 +25,8 @@ dumpclient_(void* userdata, size_t size)
                     "%s(%d) : Memory leak detected at 0x%p, %d byes long",
                     file, (int)line, userdata, (int)size);
     else
-        fprintf(stderr, "%s(%d) : Memory leak detected at 0x%p, %d byes long",
+        fprintf(stderr,
+                "%s(%d) : Memory leak detected at 0x%p, %d byes long\n",
                 file, (int)line, userdata, (int)size);
 }
 

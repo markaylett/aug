@@ -66,6 +66,9 @@ static void
 termtls_(void)
 {
     struct tls_* tls = gettls_();
+    if (!tls)
+        return;
+
     assert(0 < tls->refs_);
     if (0 == --tls->refs_) {
 
