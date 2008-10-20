@@ -55,6 +55,9 @@ namespace aug {
 
         bool
         empty() const;
+
+        bool
+        exists(mod_id id) const;
     };
 
     class scoped_insert {

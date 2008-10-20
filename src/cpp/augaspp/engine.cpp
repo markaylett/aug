@@ -253,7 +253,11 @@ namespace aug {
                     changed = cptr->process(stream, events, now_);
                     ok = true;
                 } catch (const block_exception&) {
-                    return AUG_TRUE; // EWOULDBLOCK.
+
+                    // FIXME: shutdown may have removed.
+
+                    return socks_.exists(id)
+                        ? AUG_TRUE : AUG_FALSE; // EWOULDBLOCK.
                 } AUG_PERRINFOCATCH;
 
                 // If an exception was thrown, "ok" will still have its
@@ -270,7 +274,9 @@ namespace aug {
                 if (changed && CLOSED == cptr->state())
                     return AUG_FALSE;
 
-                return AUG_TRUE;
+                // FIXME: shutdown may have removed.
+
+                return socks_.exists(id) ? AUG_TRUE : AUG_FALSE;
             }
             void
             teardown()
