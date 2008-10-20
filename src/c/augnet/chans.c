@@ -309,7 +309,7 @@ aug_getreadychans(aug_chans_t chans)
     struct entry_* it;
     AUG_FOREACH(it, &chans->head_) {
 
-        if (it->ob_ && !aug_ischanready(it->ob_))
+        if (it->ob_ && aug_ischanready(it->ob_))
             ++ready;
     }
     return ready;

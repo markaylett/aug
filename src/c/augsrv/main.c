@@ -69,9 +69,9 @@ start_(void)
 #endif /* _WIN32 */
 
 static void
-control_(int sigtype)
+control_(int sig)
 {
-    if (AUG_ISFAIL(aug_control(sigtype)))
+    if (AUG_ISFAIL(aug_control(sig)))
         die_("aug_control() failed");
 }
 

@@ -82,7 +82,7 @@ namespace aug {
         void
         commit()
         {
-            sock_ = sockptr();
+            sock_ = null;
         }
     };
 }
