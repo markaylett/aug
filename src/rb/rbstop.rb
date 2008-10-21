@@ -1,8 +1,8 @@
 module RbStop
-    def RbStop.start(sname)
+    def self.start(sname)
         AugRb.settimer(5000, nil)
     end
-    def RbStop.expire(timer, ms)
+    def self.expire(timer, ms)
         AugRb.stopall
     end
 end

@@ -36,6 +36,17 @@ enum aug_option {
     AUG_OPTPIDFILE
 };
 
+/**
+ * Service callbacks.
+ *
+ * Called by the framework in the following order:
+ *
+ * @li readconf_()
+ * @li init_()
+ * @li run_()
+ * @li term_()
+ */
+
 struct aug_service {
     const char* (*getopt_)(void*, enum aug_option);
     aug_result (*readconf_)(void*, const char*, int, int);

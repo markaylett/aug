@@ -3,14 +3,14 @@ require 'log'
 # settimer()
 
 module RbTest4
-    def RbTest4.stop
+    def self.stop
         Log.debug("stop()")
     end
-    def RbTest4.start(sname)
+    def self.start(sname)
         Log.debug("start(): #{sname}")
         AugRb.settimer(1000, "our timer")
     end
-    def RbTest4.expire(timer, ms)
+    def self.expire(timer, ms)
         Log.debug("expire(): #{timer}")
         if timer.user != "our timer"
             Log.error("unexpected user in expire()")

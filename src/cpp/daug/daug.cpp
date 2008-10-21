@@ -92,7 +92,8 @@ namespace {
     void
     openlog_()
     {
-        // The current date is appended to the log file name.
+        // The current date is appended to the log file name.  This provides a
+        // convenient mechanism for rotating log files.
 
         tm tm;
         aug::gmtime(tm);
@@ -101,6 +102,9 @@ namespace {
            << setw(4) << tm.tm_year + 1900
            << setw(2) << tm.tm_mon + 1
            << setw(2) << tm.tm_mday;
+
+        // Re-direct standard handles.
+
         openlog(makepath(logdir_, ss.str().c_str(), "log").c_str());
     }
 
@@ -149,6 +153,8 @@ namespace {
     void
     reopencb_(objectref ob, idref id, unsigned& ms)
     {
+        // Called by timer when running as daemon.
+
         AUG_CTXDEBUG2(aug_tlx, "re-opening log file");
         openlog_();
     }
@@ -503,6 +509,8 @@ namespace {
     void
     teardown_(const mod_handle* sock)
     {
+        // Teardown is a protocol-level shutdown.
+
         aug_ctxinfo(aug_tlx, "teardown defaulting to shutdown");
         shutdown_(sock->id_, 0);
     }
@@ -510,12 +518,14 @@ namespace {
     void
     load_()
     {
+        // Called from init().
+
         AUG_CTXDEBUG2(aug_tlx, "loading sessions");
 
         // TODO: allow each session to specify a list of sessions on which it
         // depends.
 
-        // Obtain list of sessions.
+        // Obtain list of sessions from config.  Default is null.
 
         const char* value(options_.get("sessions", 0));
         if (value) {
@@ -534,16 +544,24 @@ namespace {
                 modules::iterator it(state_->modules_.find(value));
                 if (it == state_->modules_.end()) {
 
-                    // Load module.
+                    // Module does not yet exist, so load now.
 
                     string path(options_.get(string("module.").append(value)
                                              .append(".path")));
+
+                    // Allow modules to be specified with or without a file
+                    // extension.  This aids portability.
+
                     if (!withext_(path))
                         path += MODEXT;
 
                     aug_ctxinfo(aug_tlx,
                                 "loading module: name=[%s], path=[%s]",
                                 value.c_str(), path.c_str());
+
+                    // Module can assume to be in run directory during
+                    // intialisation.
+
                     aug::chdir(rundir_);
                     moduleptr module(new daug::module(value, path.c_str(),
                                                       host_, teardown_));
@@ -561,7 +579,7 @@ namespace {
 
         } else {
 
-            // No session list: assume reasonable defaults.
+            // No session list: user reasonable defaults.
 
             aug_ctxinfo(aug_tlx, "loading module: name=[%s]", DEFAULT_NAME);
             moduleptr module(new daug::module(DEFAULT_NAME, DEFAULT_MODULE,
@@ -574,6 +592,11 @@ namespace {
                         sessionptr(new daug::session(module, DEFAULT_NAME)),
                         0);
         }
+
+        // A session is active once start() has returned true.
+
+        // Sessions may create timers during start().  If start() subsequently
+        // fails, these timers will need to be cancelled.
 
         state_->engine_.cancelinactive();
     }
@@ -626,6 +649,8 @@ namespace {
                 aug_strlcpy(conffile_, conffile, sizeof(conffile_));
             }
 
+            // Remember if daemonising or not.
+
             daemon_ = daemon;
 
             // Once set, the run directory should not change.
@@ -659,12 +684,15 @@ namespace {
 
             auto_ptr<state> s(new state(frobpass_));
 
-            // Assign state so that it is visible to callbacks during load_()
-            // call.
+            // Assign state so that it is visible to callbacks during load_().
 
             state_ = s;
             try {
+
+                // Load modules are start sessions.
+
                 load_();
+
             } catch (...) {
 
                 // Ownership back to local for cleanup.
@@ -682,11 +710,12 @@ namespace {
         {
             if (daemon_) {
 
-                // Only set reopen timer when running as daemon.
+                // Only set re-open timer when running as daemon.
 
                 timer t(state_->timers_);
                 t.set(60000, timercb<reopencb_>, null);
-                state_->engine_.run(false); // Continue on error.
+
+                state_->engine_.run(false); // Not stop on error.
 
             } else
                 state_->engine_.run(true);  // Stop on error.

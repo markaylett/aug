@@ -33,14 +33,6 @@ namespace aug {
     class smartptr {
 
         template <typename U>
-        friend void
-        release(smartptr<U>&);
-
-        template <typename U>
-        friend void
-        retain(smartptr<U>&);
-
-        template <typename U>
         friend class smartptr;
 
         T* ptr_;
@@ -162,20 +154,6 @@ namespace aug {
             return ptr_;
         }
     };
-
-    template <typename T>
-    void
-    retain(smartptr<T>& sptr)
-    {
-        sptr.retain();
-    }
-
-    template <typename T>
-    void
-    release(smartptr<T>& sptr)
-    {
-        sptr.release();
-    }
 
     template <typename T, typename U>
     smartptr<T>

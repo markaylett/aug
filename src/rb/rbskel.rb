@@ -50,37 +50,37 @@ class Handler
 end
 
 module RbSkel
-    def RbSkel.stop
+    def self.stop
         Log.debug("stop()")
     end
-    def RbSkel.start(sname)
+    def self.start(sname)
         @interp = Interpreter.new(Handler.new)
         Log.debug("start(): #{sname}")
         AugRb.tcplisten("0.0.0.0", AugRb.getenv("session.RbSkel.serv"), nil, nil)
     end
-    def RbSkel.reconf
+    def self.reconf
         Log.debug("reconf()")
     end
-    def RbSkel.event(frm, type, user)
+    def self.event(frm, type, user)
         Log.debug("event()")
     end
-    def RbSkel.closed(sock)
+    def self.closed(sock)
         Log.info("closed(): #{sock}")
     end
-    def RbSkel.teardown(sock)
+    def self.teardown(sock)
         Log.debug("teardown(): #{sock}")
         AugRb.shutdown(sock, 0)
     end
-    def RbSkel.accepted(sock, name)
+    def self.accepted(sock, name)
         Log.info("accepted(): #{sock}")
         sock.user = LineParser.new
         AugRb.setrwtimer(sock, 15000, AugRb::TIMRD)
         AugRb.send(sock, "+OK hello\r\n")
     end
-    def RbSkel.connected(sock, name)
+    def self.connected(sock, name)
         Log.debug("connected(): #{sock}")
     end
-    def RbSkel.data(sock, buf)
+    def self.data(sock, buf)
         Log.debug("data(): #{sock}")
         sock.user.parse(buf) do |line|
             x = @interp.interpret(line)
@@ -92,14 +92,14 @@ module RbSkel
             end
         end
     end
-    def RbSkel.rdexpire(sock, ms)
+    def self.rdexpire(sock, ms)
         Log.debug("rdexpire(): #{sock}")
         AugRb.send(sock, "+OK hello\r\n")
     end
-    def RbSkel.wrexpire(sock, ms)
+    def self.wrexpire(sock, ms)
         Log.debug("wrexpire(): #{sock}")
     end
-    def RbSkel.expire(timer, ms)
+    def self.expire(timer, ms)
         Log.debug("expire(): #{sock}")
     end
 end

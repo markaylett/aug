@@ -42,6 +42,9 @@ namespace aug {
         clear();
 
         void
+        erase(mod_id id);
+
+        void
         erase(const sock_base& sock);
 
         void
@@ -50,14 +53,16 @@ namespace aug {
         void
         teardown(const timeval& tv);
 
-        sockptr
-        getbyid(mod_id id) const;
-
         bool
         empty() const;
 
         bool
         exists(mod_id id) const;
+
+        // Throws if id does not exist.
+
+        sockptr
+        get(mod_id id) const;
     };
 
     class scoped_insert {

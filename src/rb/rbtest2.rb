@@ -3,15 +3,15 @@ require 'log'
 # post(), dispatch()
 
 module RbTest2
-    def RbTest2.stop
+    def self.stop
         Log.debug("stop()")
     end
-    def RbTest2.start(sname)
+    def self.start(sname)
         Log.debug("start(): #{sname}")
         AugRb.dispatch("group1", "foo", 101.to_s)
         AugRb.post(sname, "nil", nil)
     end 
-    def RbTest2.event(frm, type, user)
+    def self.event(frm, type, user)
         Log.debug("event(): #{user}")
         if type == "foo"
             if user.to_i != 101

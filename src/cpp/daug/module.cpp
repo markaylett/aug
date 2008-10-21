@@ -39,10 +39,15 @@ module::module(const string& name, const char* path,
     mod_initfn initfn(dlsym<mod_initfn>(lib_, "mod_init"));
     termfn_ = dlsym<mod_termfn>(lib_, "mod_term");
 
+    // On success, mod_init() returns a table of function pointers.
+
     AUG_CTXDEBUG2(aug_tlx, "initialising module: name=[%s]", name_.c_str());
     const struct mod_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
         throw daug_error(__FILE__, __LINE__, EMODCALL, "mod_init() failed");
+
+    // Fill-in optional function pointers with default stubs.
+
     setdefaults(module_, *ptr, teardown);
 }
 

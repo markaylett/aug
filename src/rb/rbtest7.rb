@@ -1,10 +1,10 @@
 require 'log'
 
 module RbTest7
-    def RbTest7.stop
+    def self.stop
         Log.debug("stop()")
     end
-    def RbTest7.start(sname)
+    def self.start(sname)
         Log.debug("start(): #{sname}")
         AugRb.stopall
     end

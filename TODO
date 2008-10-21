@@ -8,7 +8,7 @@ Remove dead code from base libraries.
 
 Add augctxpp library.
 
-Write maintainer guidelines.
+Write design document.
 
 Add clean hook for vc7 directories.
 
@@ -40,7 +40,7 @@ Replace EINTR checks with AUG_FAILINTR.
 
 Use aug_rsize instead of optional outputs in mar.
 
-readevent() starvation while not allblocked().
+Migrate event queue to list-based channel.
 
 Replace enums with ints.
 

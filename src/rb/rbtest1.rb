@@ -3,10 +3,10 @@ require 'log'
 # stop(), Handle()
 
 module RbTest1
-    def RbTest1.stop
+    def self.stop
         Log.debug("stop()")
     end
-    def RbTest1.start(sname)
+    def self.start(sname)
         Log.debug("start(): #{sname}")
         o = AugRb::Handle.new(101, "our object")
         Log.debug("to_s(): #{o}")

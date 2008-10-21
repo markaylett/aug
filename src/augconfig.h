@@ -47,7 +47,7 @@
 # endif /* !HAVE_IPV6 */
 
 # define __func__ __FUNCTION__
-# define PACKAGE_BUGREPORT "mark@emantic.co.uk"
+# define PACKAGE_BUGREPORT "mark.aylett@gmail.com"
 
 # if !defined(INT32_MIN)
 #  define INT8_MIN   (-0x80)
