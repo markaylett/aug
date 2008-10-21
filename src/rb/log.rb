@@ -1,20 +1,20 @@
 module Log
-    def Log.crit(s)
+    def self.crit(s)
         AugRb.writelog(AugRb::LOGCRIT, s)
     end
-    def Log.error(s)
+    def self.error(s)
         AugRb.writelog(AugRb::LOGERROR, s)
     end
-    def Log.warn(s)
+    def self.warn(s)
         AugRb.writelog(AugRb::LOGWARN, s)
     end
-    def Log.notice(s)
+    def self.notice(s)
         AugRb.writelog(AugRb::LOGNOTICE, s)
     end
-    def Log.info(s)
+    def self.info(s)
         AugRb.writelog(AugRb::LOGINFO, s)
     end
-    def Log.debug(s)
+    def self.debug(s)
         AugRb.writelog(AugRb::LOGDEBUG, s)
     end
 end

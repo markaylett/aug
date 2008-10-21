@@ -6,29 +6,29 @@ include AugUtil
 # tcplisten(), tcpconnect()
 
 module RbTest5
-    def RbTest5.stop
+    def self.stop
         Log.info("stop()")
     end
-    def RbTest5.start(sname)
+    def self.start(sname)
         Log.debug("start(): #{sname}")
         @listener = AugRb.tcplisten("0.0.0.0", "1234", nil, nil)
         @client = AugRb.tcpconnect("127.0.0.1", "1234", nil, nil)
         @server = nil
     end
-    def RbTest5.closed(sock)
+    def self.closed(sock)
         Log.debug("closed(): #{sock}")
     end
-    def RbTest5.accepted(sock, name)
+    def self.accepted(sock, name)
         Log.debug("accepted(): #{sock}")
         sock.user = LineParser.new
         @server = sock
     end
-    def RbTest5.connected(sock, name)
+    def self.connected(sock, name)
         Log.debug("connected(): #{sock}")
         sock.user = LineParser.new
         AugRb.send(@server, "hello, world!\n")
     end
-    def RbTest5.data(sock, buf)
+    def self.data(sock, buf)
         Log.debug("data(): #{sock}")
         sock.user.parse(buf) do |line|
 

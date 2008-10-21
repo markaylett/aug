@@ -92,7 +92,8 @@ namespace {
     void
     openlog_()
     {
-        // The current date is appended to the log file name.
+        // The current date is appended to the log file name.  This provides a
+        // convenient mechanism for rotating log files.
 
         tm tm;
         aug::gmtime(tm);
@@ -101,6 +102,9 @@ namespace {
            << setw(4) << tm.tm_year + 1900
            << setw(2) << tm.tm_mon + 1
            << setw(2) << tm.tm_mday;
+
+        // Re-direct standard handles.
+
         openlog(makepath(logdir_, ss.str().c_str(), "log").c_str());
     }
 
@@ -149,6 +153,8 @@ namespace {
     void
     reopencb_(objectref ob, idref id, unsigned& ms)
     {
+        // Called by timer when running as daemon.
+
         AUG_CTXDEBUG2(aug_tlx, "re-opening log file");
         openlog_();
     }
@@ -704,11 +710,12 @@ namespace {
         {
             if (daemon_) {
 
-                // Only set reopen timer when running as daemon.
+                // Only set re-open timer when running as daemon.
 
                 timer t(state_->timers_);
                 t.set(60000, timercb<reopencb_>, null);
-                state_->engine_.run(false); // Continue on error.
+
+                state_->engine_.run(false); // Not stop on error.
 
             } else
                 state_->engine_.run(true);  // Stop on error.

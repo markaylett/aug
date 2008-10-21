@@ -3,10 +3,10 @@ require 'log'
 # getenv()
 
 module RbTest3
-    def RbTest3.stop
+    def self.stop
         Log.debug("stop()")
     end
-    def RbTest3.start(sname)
+    def self.start(sname)
         Log.debug("start() #{sname}")
         if AugRb.getenv("RbTest3") != "test value"
             Log.error("unexpected value from getenv()")

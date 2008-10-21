@@ -252,7 +252,7 @@ namespace aug {
                     threw = false;
                 } catch (const block_exception&) {
 
-                    // FIXME: shutdown may have removed.
+                    // FIXME: shutdown may have removed socket.
 
                     return socks_.exists(id)
                         ? AUG_TRUE : AUG_FALSE; // EWOULDBLOCK.
@@ -273,7 +273,7 @@ namespace aug {
                 if (changed && CLOSED == cptr->state())
                     return AUG_FALSE;
 
-                // FIXME: shutdown may have removed.
+                // FIXME: shutdown may have removed socket.
 
                 return socks_.exists(id) ? AUG_TRUE : AUG_FALSE;
             }
@@ -285,7 +285,8 @@ namespace aug {
                     state_ = TEARDOWN;
                     socks_.teardown(now_);
 
-                    // Initiate grace period.
+                    // Allow grace period before forcefully stopping the
+                    // application.
 
                     smartob<aug_boxptr> ob
                         (createboxptr(aug_getmpool(aug_tlx), this, 0));
@@ -430,12 +431,13 @@ AUGASPP_API void
 engine::run(bool stoponerr)
 {
     AUG_CTXDEBUG2(aug_tlx, "running daemon process");
-
     unsigned ready(!0);
-    while (!stopping() || !impl_->socks_.empty()) {
+    while (!(stopping() && impl_->socks_.empty())) {
 
-        if (detail::engineimpl::STOPPED == impl_->state_)
+        if (detail::engineimpl::STOPPED == impl_->state_) {
+            // Forcefully stopped.
             break;
+        }
 
         try {
 

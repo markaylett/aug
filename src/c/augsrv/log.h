@@ -8,6 +8,10 @@
 
 #include "augtypes.h"
 
+/**
+ * Re-direct standard file handles to specified log.
+ */
+
 AUGSRV_API aug_result
 aug_openlog(const char* path);
 
