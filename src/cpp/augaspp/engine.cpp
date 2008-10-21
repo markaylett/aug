@@ -181,11 +181,9 @@ namespace aug {
             void
             clearchan_(unsigned id) AUG_NOTHROW
             {
-                try {
-                    // FIXME: listener will not exist after teardown.
-                    sockptr sock(socks_.getbyid(id));
-                    socks_.erase(*sock);
-                } AUG_PERRINFOCATCH;
+                // FIXME: listener will not exist after teardown.
+
+                socks_.erase(id);
             }
             void
             errorchan_(unsigned id, const aug_errinfo& errinfo) AUG_NOTHROW
@@ -201,7 +199,7 @@ namespace aug {
                     // Was connecting, now established: notify module of
                     // connection establishment.
 
-                    sockptr sock(socks_.getbyid(id));
+                    sockptr sock(socks_.get(id));
                     connptr conn(smartptr_cast<conn_base>(sock)); // Downcast.
 
                     // Connection has now been established.
@@ -218,7 +216,7 @@ namespace aug {
 
                 AUG_CTXDEBUG2(aug_tlx, "accepting connection");
 
-                sockptr sock(socks_.getbyid(parent));
+                sockptr sock(socks_.get(parent));
                 chanptr chan(object_cast<aug_chan>(stream));
                 connptr conn(new servconn(getmpool(aug_tlx), sock->session(),
                                           user(*sock), timers_, chan));
@@ -243,27 +241,28 @@ namespace aug {
             readychan_(unsigned id, obref<aug_stream> stream,
                        unsigned short events) AUG_NOTHROW
             {
-                sockptr sock(socks_.getbyid(id));
+                sockptr sock(socks_.get(id));
                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
                 AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%u]", id);
 
-                bool changed = false, ok = false;
+                bool changed = false, threw = true;
                 try {
                     changed = cptr->process(stream, events, now_);
-                    ok = true;
+                    threw = false;
                 } catch (const block_exception&) {
 
                     // FIXME: shutdown may have removed.
 
                     return socks_.exists(id)
                         ? AUG_TRUE : AUG_FALSE; // EWOULDBLOCK.
+
                 } AUG_PERRINFOCATCH;
 
                 // If an exception was thrown, "ok" will still have its
                 // original value of false.
 
-                if (!ok) {
+                if (threw) {
 
                     // Connection is closed if an exception is thrown during
                     // processing.
@@ -548,7 +547,7 @@ engine::dispatch(const char* sname, const char* to, const char* type,
 AUGASPP_API void
 engine::shutdown(mod_id cid, unsigned flags)
 {
-    sockptr sock(impl_->socks_.getbyid(cid));
+    sockptr sock(impl_->socks_.get(cid));
     connptr cptr(smartptr_cast<conn_base>(sock));
     if (null != cptr) {
         cptr->shutdown(flags, impl_->now_);
@@ -638,7 +637,7 @@ AUGASPP_API void
 engine::setrwtimer(mod_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
-                       rwtimer_base>(impl_->socks_.getbyid(cid)));
+                       rwtimer_base>(impl_->socks_.get(cid)));
     if (null == rwtimer)
         throw aug_error(__FILE__, __LINE__, AUG_EEXIST,
                         "connection not found: id=[%u]", cid);
@@ -649,7 +648,7 @@ AUGASPP_API bool
 engine::resetrwtimer(mod_id cid, unsigned ms, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
-                       rwtimer_base>(impl_->socks_.getbyid(cid)));
+                       rwtimer_base>(impl_->socks_.get(cid)));
     if (null == rwtimer)
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
                         "connection not found: id=[%u]", cid);
@@ -661,7 +660,7 @@ AUGASPP_API bool
 engine::cancelrwtimer(mod_id cid, unsigned flags)
 {
     rwtimerptr rwtimer(smartptr_cast<
-                       rwtimer_base>(impl_->socks_.getbyid(cid)));
+                       rwtimer_base>(impl_->socks_.get(cid)));
     if (null == rwtimer)
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
                         "connection not found: id=[%u]", cid);

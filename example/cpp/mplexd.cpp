@@ -332,7 +332,7 @@ namespace test {
             case AUG_OPTCONFFILE:
                 return *conffile_ ? conffile_ : 0;
             case AUG_OPTEMAIL:
-                return "Mark Aylett <mark@emantic.co.uk>";
+                return "Mark Aylett <mark.aylett@gmail.com>";
             case AUG_OPTLONGNAME:
                 return "Multiplexer Daemon";
             case AUG_OPTPIDFILE:

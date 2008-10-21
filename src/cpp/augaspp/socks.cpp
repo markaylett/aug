@@ -19,8 +19,8 @@ socks::~socks() AUG_NOTHROW
 bool
 socks::send(mod_id cid, const void* buf, size_t len, const timeval& now)
 {
-    connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
-    if (cptr == null || !sendable(*cptr))
+    connptr cptr(smartptr_cast<conn_base>(get(cid)));
+    if (null == cptr || !sendable(*cptr))
         return false;
 
     cptr->send(buf, len, now);
@@ -30,8 +30,8 @@ socks::send(mod_id cid, const void* buf, size_t len, const timeval& now)
 bool
 socks::sendv(mod_id cid, blobref blob, const timeval& now)
 {
-    connptr cptr(smartptr_cast<conn_base>(getbyid(cid)));
-    if (cptr == null || !sendable(*cptr))
+    connptr cptr(smartptr_cast<conn_base>(get(cid)));
+    if (null == cptr || !sendable(*cptr))
         return false;
 
     cptr->sendv(blob, now);
@@ -42,6 +42,16 @@ void
 socks::clear()
 {
     socks_.clear();
+}
+
+void
+socks::erase(mod_id id)
+{
+    container::iterator it(socks_.find(id));
+    if (it != socks_.end()) {
+        AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%u]", id);
+        socks_.erase(it);
+    }
 }
 
 void
@@ -61,7 +71,7 @@ socks::insert(const sockptr& sock)
 void
 socks::teardown(const timeval& now)
 {
-    // Ids are stored in reverse order using the the greater<> predicate.
+    // Ids are stored in reverse order using the greater<> predicate.
 
     container::iterator it(socks_.begin()), end(socks_.end());
     while (it != end) {
@@ -83,16 +93,6 @@ socks::teardown(const timeval& now)
     }
 }
 
-sockptr
-socks::getbyid(mod_id id) const
-{
-    container::const_iterator it(socks_.find(id));
-    if (it == socks_.end())
-        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                        AUG_MSG("sock not found: id=[%u]"), id);
-    return it->second;
-}
-
 bool
 socks::empty() const
 {
@@ -103,4 +103,14 @@ bool
 socks::exists(mod_id id) const
 {
     return socks_.find(id) != socks_.end();
+}
+
+sockptr
+socks::get(mod_id id) const
+{
+    container::const_iterator it(socks_.find(id));
+    if (it == socks_.end())
+        throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
+                        AUG_MSG("sock not found: id=[%u]"), id);
+    return it->second;
 }

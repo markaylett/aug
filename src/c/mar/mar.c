@@ -123,7 +123,7 @@ help_(void)
            "\nusage:\n"
            "  mar option... archivename\n"
            "\noptions:\n%s"
-           "\nreport bugs to <mark@emantic.co.uk>\n", OPTIONHELP_);
+           "\nreport bugs to <mark.aylett@gmail.com>\n", OPTIONHELP_);
 }
 
 

@@ -19,7 +19,11 @@ using namespace daug;
 using namespace std;
 
 namespace {
+
+    // A stack is maintained so that the calling session is always known.
+
     stack<const mod_session*> stack_;
+
     struct scoped_frame {
         ~scoped_frame() AUG_NOTHROW
         {

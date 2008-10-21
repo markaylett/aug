@@ -19,7 +19,7 @@ getopt_(void* arg, enum aug_option opt)
     case AUG_OPTCONFFILE:
         return *conffile_ ? conffile_ : NULL;
     case AUG_OPTEMAIL:
-        return "Mark Aylett <mark@emantic.co.uk>";
+        return "Mark Aylett <mark.aylett@gmail.com>";
     case AUG_OPTLONGNAME:
         return "Test Program";
     case AUG_OPTPIDFILE:
@@ -53,7 +53,7 @@ run_(void* arg)
 {
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
-    // Sticky events not required for fixed length blocking read.
+    /* Sticky events not required for fixed length blocking read. */
 
     if (!aug_writeevent(aug_eventwr(), &in))
         return AUG_FAILERROR;
