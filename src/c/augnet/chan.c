@@ -438,10 +438,6 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             goto done;
         }
 
-        /* Transfer event mask to established channel. */
-
-        aug_setchanmask(chan, impl->mask_);
-
         stream = aug_cast(chan, aug_streamid);
 
         /* Notification of connection establishment. */

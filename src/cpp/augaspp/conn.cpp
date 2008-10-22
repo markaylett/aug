@@ -176,28 +176,37 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
 
     // FIXME: handle exceptional events?
 
+    bool block(false);
+
     if (events & AUG_MDEVENTRD) {
 
         AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%u]", sock_.id_);
 
-        char buf[4096];
-        size_t size(read(stream, buf, sizeof(buf)));
-        if (0 == size) {
+        try {
+            char buf[4096];
+            size_t size(read(stream, buf, sizeof(buf)));
+            if (0 == size) {
 
-            // Connection closed.
+                // Connection closed.
 
-            AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%u]", sock_.id_);
-            state_ = CLOSED;
-            return true;
+                AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%u]",
+                              sock_.id_);
+                state_ = CLOSED;
+                return true;
+            }
+
+            // Data has been read: reset read timer.
+
+            rwtimer_.resetrwtimer(MOD_TIMRD);
+
+            // Notify module of new data.
+
+            session_->data(sock_, buf, size);
+
+        } catch (const block_exception&) {
+            // FIXME: temporary measure to ensure write events are serviced.
+            block = true;
         }
-
-        // Data has been read: reset read timer.
-
-        rwtimer_.resetrwtimer(MOD_TIMRD);
-
-        // Notify module of new data.
-
-        session_->data(sock_, buf, size);
     }
 
     if (events & AUG_MDEVENTWR) {
@@ -246,6 +255,11 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
         if (!buffer_.empty())
             checkmaxwait(buffer_.size(), since_, now);
     }
+
+    // FIXME: see above.
+
+    if (block)
+        throw block_exception();
 
     return false;
 }

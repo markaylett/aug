@@ -244,13 +244,18 @@ namespace aug {
                 sockptr sock(socks_.get(id));
                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
-                AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%u]", id);
+                AUG_CTXDEBUG2(aug_tlx,
+                              "processing sock: id=[%u], events=[%u]",
+                              id, (unsigned)events);
 
                 bool changed = false, threw = true;
                 try {
                     changed = cptr->process(stream, events, now_);
                     threw = false;
                 } catch (const block_exception&) {
+
+                    AUG_CTXDEBUG2(aug_tlx, "operation would block: id=[%u]",
+                                  id);
 
                     // FIXME: shutdown may have removed socket.
 

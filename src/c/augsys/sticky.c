@@ -7,6 +7,8 @@
 
 AUG_RCSID("$Id$");
 
+#include "augctx/base.h" /* aug_tlx */
+
 AUGSYS_API aug_result
 aug_initsticky(struct aug_sticky* sticky, aug_muxer_t muxer, aug_md md,
                unsigned short mask)
@@ -29,7 +31,7 @@ aug_termsticky(struct aug_sticky* sticky)
 AUGSYS_API aug_result
 aug_setsticky(struct aug_sticky* sticky, unsigned short mask)
 {
-    /* Store original event mask before setting new. */
+    /* Remember original event mask before setting new. */
 
     unsigned short orig = aug_getmdeventmask(sticky->muxer_, sticky->md_);
 
@@ -51,6 +53,8 @@ aug_setsticky(struct aug_sticky* sticky, unsigned short mask)
 
     sticky->events_ |= (mask & ~orig);
 
+    AUG_CTXDEBUG2(aug_tlx, "set sticky: mask=[%u], sticky=[%u]",
+                  (unsigned)mask, (unsigned)sticky->events_);
     return AUG_SUCCESS;
 }
 
