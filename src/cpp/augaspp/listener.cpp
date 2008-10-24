@@ -28,12 +28,6 @@ listener::do_session() const
     return session_;
 }
 
-chanptr
-listener::do_chan() const
-{
-    return chan_;
-}
-
 sockstate
 listener::do_state() const
 {

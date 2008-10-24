@@ -58,22 +58,17 @@ servconn::do_session() const
     return conn_.session();
 }
 
-chanptr
-servconn::do_chan() const
+void
+servconn::do_send(chanref chan, const void* buf, size_t len,
+                  const timeval& now)
 {
-    return conn_.chan();
+    conn_.send(chan, buf, len, now);
 }
 
 void
-servconn::do_send(const void* buf, size_t len, const timeval& now)
+servconn::do_sendv(chanref chan, blobref blob, const timeval& now)
 {
-    conn_.send(buf, len, now);
-}
-
-void
-servconn::do_sendv(blobref blob, const timeval& now)
-{
-    conn_.sendv(blob, now);
+    conn_.sendv(chan, blob, now);
 }
 
 bool
@@ -99,9 +94,9 @@ servconn::do_process(obref<aug_stream> stream, unsigned short events,
 }
 
 void
-servconn::do_shutdown(unsigned flags, const timeval& now)
+servconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
 {
-    conn_.shutdown(flags, now);
+    conn_.shutdown(chan, flags, now);
 }
 
 void
@@ -117,9 +112,9 @@ servconn::do_authcert(const char* subject, const char* issuer)
 }
 
 string
-servconn::do_peername() const
+servconn::do_peername(chanref chan) const
 {
-    return conn_.peername();
+    return conn_.peername(chan);
 }
 
 sockstate
@@ -133,11 +128,11 @@ servconn::~servconn() AUG_NOTHROW
 }
 
 servconn::servconn(mpoolref mpool, const sessionptr& session, void* user,
-                   timers& timers, const chanptr& chan)
+                   timers& timers, unsigned id)
     : buffer_(mpool),
       rwtimer_(session, sock_, timers),
-      conn_(session, sock_, buffer_, rwtimer_, chan, false)
+      conn_(session, sock_, buffer_, rwtimer_, false)
 {
-    sock_.id_ = getchanid(chan);
+    sock_.id_ = id;
     sock_.user_ = user;
 }

@@ -16,10 +16,11 @@ namespace aug {
     class conn_base : public sock_base {
 
         virtual void
-        do_send(const void* buf, size_t size, const timeval& now) = 0;
+        do_send(chanref chan, const void* buf, size_t size,
+                const timeval& now) = 0;
 
         virtual void
-        do_sendv(blobref ref, const timeval& now) = 0;
+        do_sendv(chanref chan, blobref blob, const timeval& now) = 0;
 
         /**
          * Notify of newly accepted connection.
@@ -45,7 +46,7 @@ namespace aug {
                    const timeval& now) = 0;
 
         virtual void
-        do_shutdown(unsigned flags, const timeval& now) = 0;
+        do_shutdown(chanref chan, unsigned flags, const timeval& now) = 0;
 
         /**
          * Initiate application-level teardown.
@@ -58,20 +59,20 @@ namespace aug {
         do_authcert(const char* subject, const char* issuer) = 0;
 
         virtual std::string
-        do_peername() const = 0;
+        do_peername(chanref chan) const = 0;
 
     public:
         ~conn_base() AUG_NOTHROW;
 
         void
-        send(const void* buf, size_t size, const timeval& now)
+        send(chanref chan, const void* buf, size_t size, const timeval& now)
         {
-            do_send(buf, size, now);
+            do_send(chan, buf, size, now);
         }
         void
-        sendv(blobref ref, const timeval& now)
+        sendv(chanref chan, blobref blob, const timeval& now)
         {
-            do_sendv(ref, now);
+            do_sendv(chan, blob, now);
         }
         bool
         accepted(const std::string& name, const timeval& now)
@@ -90,9 +91,9 @@ namespace aug {
             return do_process(stream, events, now);
         }
         void
-        shutdown(unsigned flags, const timeval& now)
+        shutdown(chanref chan, unsigned flags, const timeval& now)
         {
-            do_shutdown(flags, now);
+            do_shutdown(chan, flags, now);
         }
         void
         teardown(const timeval& now)
@@ -105,9 +106,9 @@ namespace aug {
             return do_authcert(subject, issuer);
         }
         std::string
-        peername() const
+        peername(chanref chan) const
         {
-            return do_peername();
+            return do_peername(chan);
         }
     };
 
@@ -125,7 +126,6 @@ namespace aug {
         mod_handle& sock_;
         buffer& buffer_;
         rwtimer& rwtimer_;
-        chanptr chan_;
         sockstate state_;
         bool close_;
 
@@ -144,14 +144,12 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        chanptr
-        do_chan() const;
+        void
+        do_send(chanref chan, const void* buf, size_t size,
+                const timeval& now);
 
         void
-        do_send(const void* buf, size_t size, const timeval& now);
-
-        void
-        do_sendv(blobref ref, const timeval& now);
+        do_sendv(chanref chan, blobref blob, const timeval& now);
 
         bool
         do_accepted(const std::string& name, const timeval& now);
@@ -164,7 +162,7 @@ namespace aug {
                    const timeval& now);
 
         void
-        do_shutdown(unsigned flags, const timeval& now);
+        do_shutdown(chanref chan, unsigned flags, const timeval& now);
 
         void
         do_teardown(const timeval& now);
@@ -173,7 +171,7 @@ namespace aug {
         do_authcert(const char* subject, const char* issuer);
 
         std::string
-        do_peername() const;
+        do_peername(chanref chan) const;
 
         sockstate
         do_state() const;
@@ -182,8 +180,7 @@ namespace aug {
         ~connected() AUG_NOTHROW;
 
         connected(const sessionptr& session, mod_handle& sock,
-                  buffer& buffer, rwtimer& rwtimer,
-                  const chanptr& chan, bool close);
+                  buffer& buffer, rwtimer& rwtimer, bool close);
     };
 }
 

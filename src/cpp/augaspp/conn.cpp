@@ -122,38 +122,33 @@ connected::do_session() const
     return session_;
 }
 
-chanptr
-connected::do_chan() const
-{
-    return chan_;
-}
-
 void
-connected::do_send(const void* buf, size_t len, const timeval& now)
+connected::do_send(chanref chan, const void* buf, size_t len,
+                   const timeval& now)
 {
     if (buffer_.empty()) {
 
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setchanmask(chan_, AUG_MDEVENTRDWR);
+        setchanmask(chan, AUG_MDEVENTRDWR);
     }
 
     buffer_.append(buf, len);
 }
 
 void
-connected::do_sendv(blobref ref, const timeval& now)
+connected::do_sendv(chanref chan, blobref blob, const timeval& now)
 {
     if (buffer_.empty()) {
 
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setchanmask(chan_, AUG_MDEVENTRDWR);
+        setchanmask(chan, AUG_MDEVENTRDWR);
     }
 
-    buffer_.append(ref);
+    buffer_.append(blob);
 }
 
 bool
@@ -172,7 +167,7 @@ bool
 connected::do_process(obref<aug_stream> stream, unsigned short events,
                       const timeval& now)
 {
-    chan_ = object_cast<aug_chan>(stream);
+    chanptr chan(object_cast<aug_chan>(stream));
 
     // FIXME: handle exceptional events?
 
@@ -223,7 +218,7 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
 
             // No more (buffered) data to be written.
 
-            setchanmask(chan_, AUG_MDEVENTRD);
+            setchanmask(chan, AUG_MDEVENTRD);
 
             // If flagged for shutdown, send FIN and disable writes.
 
@@ -265,7 +260,7 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
 }
 
 void
-connected::do_shutdown(unsigned flags, const timeval& now)
+connected::do_shutdown(chanref chan, unsigned flags, const timeval& now)
 {
     if (state_ < SHUTDOWN) {
         state_ = SHUTDOWN;
@@ -273,7 +268,7 @@ connected::do_shutdown(unsigned flags, const timeval& now)
             aug_ctxinfo(aug_tlx,
                         "shutting connection: id=[%u], flags=[%u]",
                         sock_.id_, flags);
-            streamptr stream(object_cast<aug_stream>(chan_));
+            streamptr stream(object_cast<aug_stream>(chan));
             // FIXME: should be avoided if state_ set correctly.
 			if (null != stream)
 				aug::shutdown(stream);
@@ -297,12 +292,12 @@ connected::do_authcert(const char* subject, const char* issuer)
 }
 
 string
-connected::do_peername() const
+connected::do_peername(chanref chan) const
 {
     string name;
 
     char buf[AUG_MAXCHANNAMELEN + 1];
-    if (aug_getchanname(chan_.get(), buf, sizeof(buf)))
+    if (aug_getchanname(chan.get(), buf, sizeof(buf)))
         name = buf;
 
     return name;
@@ -323,13 +318,11 @@ connected::~connected() AUG_NOTHROW
 }
 
 connected::connected(const sessionptr& session, mod_handle& sock,
-                     buffer& buffer, rwtimer& rwtimer,
-                     const chanptr& chan, bool close)
+                     buffer& buffer, rwtimer& rwtimer, bool close)
     : session_(session),
       sock_(sock),
       buffer_(buffer),
       rwtimer_(rwtimer),
-      chan_(chan),
       state_(ESTABLISHED),
       close_(close)
 {

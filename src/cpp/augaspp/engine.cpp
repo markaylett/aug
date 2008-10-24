@@ -194,6 +194,8 @@ namespace aug {
             estabchan_(unsigned id, obref<aug_stream> stream,
                        unsigned parent) AUG_NOTHROW
             {
+                chanptr chan(object_cast<aug_chan>(stream));
+
                 if (id == parent) {
 
                     // Was connecting, now established: notify module of
@@ -204,7 +206,7 @@ namespace aug {
 
                     // Connection has now been established.
 
-                    string name(conn->peername());
+                    string name(conn->peername(chan));
                     AUG_CTXDEBUG2(aug_tlx, "connected: name=[%s]",
                                   name.c_str());
 
@@ -217,14 +219,14 @@ namespace aug {
                 AUG_CTXDEBUG2(aug_tlx, "accepting connection");
 
                 sockptr sock(socks_.get(parent));
-                chanptr chan(object_cast<aug_chan>(stream));
                 connptr conn(new servconn(getmpool(aug_tlx), sock->session(),
-                                          user(*sock), timers_, chan));
+                                          user(*sock), timers_,
+                                          getchanid(chan)));
                 scoped_insert si(socks_, conn);
 
                 // Connection has now been established.
 
-                string name(conn->peername());
+                string name(conn->peername(chan));
                 AUG_CTXDEBUG2(aug_tlx,
                               "initialising connection: id=[%u], name=[%s]",
                               aug::id(*conn), name.c_str());
@@ -556,8 +558,9 @@ engine::shutdown(mod_id cid, unsigned flags)
 {
     sockptr sock(impl_->socks_.get(cid));
     connptr cptr(smartptr_cast<conn_base>(sock));
+    chanptr chan(findchan(impl_->chans_, cid));
     if (null != cptr) {
-        cptr->shutdown(flags, impl_->now_);
+        cptr->shutdown(chan, flags, impl_->now_);
 
         // Forced shutdown: may be used on misbehaving clients.
 
@@ -582,7 +585,8 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     mpoolptr mpool(getmpool(aug_tlx));
     chanptr chan(createclient(mpool, host, port, impl_->muxer_,
                               ctx ? ctx->get() : 0));
-    connptr conn(new clntconn(mpool, session, user, impl_->timers_, chan));
+    connptr conn(new clntconn(mpool, session, user, impl_->timers_,
+                              getchanid(chan)));
 
     impl_->socks_.insert(conn);
     insertchan(impl_->chans_, chan);
@@ -627,17 +631,29 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
 AUGASPP_API void
 engine::send(mod_id cid, const void* buf, size_t len)
 {
-    if (!impl_->socks_.send(cid, buf, len, impl_->now_))
+    sockptr sock(impl_->socks_.get(cid));
+    connptr cptr(smartptr_cast<conn_base>(sock));
+    chanptr chan(findchan(impl_->chans_, cid));
+
+    if (null == cptr || !sendable(*cptr))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
                         "connection has been shutdown");
+
+    cptr->send(chan, buf, len, impl_->now_);
 }
 
 AUGASPP_API void
 engine::sendv(mod_id cid, blobref blob)
 {
-    if (!impl_->socks_.sendv(cid, blob, impl_->now_))
+    sockptr sock(impl_->socks_.get(cid));
+    connptr cptr(smartptr_cast<conn_base>(sock));
+    chanptr chan(findchan(impl_->chans_, cid));
+
+    if (null == cptr || !sendable(*cptr))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
                         "connection has been shutdown");
+
+    cptr->sendv(chan, blob, impl_->now_);
 }
 
 AUGASPP_API void

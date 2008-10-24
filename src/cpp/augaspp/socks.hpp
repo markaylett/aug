@@ -4,10 +4,7 @@
 #ifndef AUGASPP_SOCKS_HPP
 #define AUGASPP_SOCKS_HPP
 
-#include "augaspp/session.hpp"
 #include "augaspp/sock.hpp"
-
-#include "augext/blob.h"
 
 #include <map>
 
@@ -32,11 +29,6 @@ namespace aug {
         socks()
         {
         }
-        bool
-        send(mod_id id, const void* buf, size_t size, const timeval& now);
-
-        bool
-        sendv(mod_id id, blobref ref, const timeval& now);
 
         void
         clear();

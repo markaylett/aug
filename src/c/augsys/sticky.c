@@ -53,7 +53,7 @@ aug_setsticky(struct aug_sticky* sticky, unsigned short mask)
 
     sticky->events_ |= (mask & ~orig);
 
-    AUG_CTXDEBUG2(aug_tlx, "set sticky: mask=[%u], sticky=[%u]",
+    AUG_CTXDEBUG3(aug_tlx, "set sticky: mask=[%u], sticky=[%u]",
                   (unsigned)mask, (unsigned)sticky->events_);
     return AUG_SUCCESS;
 }

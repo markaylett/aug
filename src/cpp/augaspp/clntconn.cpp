@@ -58,22 +58,17 @@ clntconn::do_session() const
     return conn_.session();
 }
 
-chanptr
-clntconn::do_chan() const
+void
+clntconn::do_send(chanref chan, const void* buf, size_t len,
+                  const timeval& now)
 {
-    return conn_.chan();
+    conn_.send(chan, buf, len, now);
 }
 
 void
-clntconn::do_send(const void* buf, size_t len, const timeval& now)
+clntconn::do_sendv(chanref chan, blobref blob, const timeval& now)
 {
-    conn_.send(buf, len, now);
-}
-
-void
-clntconn::do_sendv(blobref ref, const timeval& now)
-{
-    conn_.sendv(ref, now);
+    conn_.sendv(chan, blob, now);
 }
 
 bool
@@ -99,9 +94,9 @@ clntconn::do_process(obref<aug_stream> stream, unsigned short events,
 }
 
 void
-clntconn::do_shutdown(unsigned flags, const timeval& now)
+clntconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
 {
-    conn_.shutdown(flags, now);
+    conn_.shutdown(chan, flags, now);
 }
 
 void
@@ -117,9 +112,9 @@ clntconn::do_authcert(const char* subject, const char* issuer)
 }
 
 string
-clntconn::do_peername() const
+clntconn::do_peername(chanref chan) const
 {
-    return conn_.peername();
+    return conn_.peername(chan);
 }
 
 sockstate
@@ -133,11 +128,11 @@ clntconn::~clntconn() AUG_NOTHROW
 }
 
 clntconn::clntconn(mpoolref mpool, const sessionptr& session, void* user,
-                   timers& timers, const chanptr& chan)
+                   timers& timers, unsigned id)
     : buffer_(mpool),
       rwtimer_(session, sock_, timers),
-      conn_(session, sock_, buffer_, rwtimer_, chan, true)
+      conn_(session, sock_, buffer_, rwtimer_, true)
 {
-    sock_.id_ = getchanid(chan);
+    sock_.id_ = id;
     sock_.user_ = user;
 }

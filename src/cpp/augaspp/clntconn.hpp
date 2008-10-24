@@ -44,14 +44,12 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        chanptr
-        do_chan() const;
+        void
+        do_send(chanref chan, const void* buf, size_t size,
+                const timeval& now);
 
         void
-        do_send(const void* buf, size_t size, const timeval& now);
-
-        void
-        do_sendv(blobref ref, const timeval& now);
+        do_sendv(chanref chan, blobref blob, const timeval& now);
 
         bool
         do_accepted(const std::string& name, const timeval& now);
@@ -64,7 +62,7 @@ namespace aug {
                    const timeval& now);
 
         void
-        do_shutdown(unsigned flags, const timeval& now);
+        do_shutdown(chanref chan, unsigned flags, const timeval& now);
 
         void
         do_teardown(const timeval& now);
@@ -73,7 +71,7 @@ namespace aug {
         do_authcert(const char* subject, const char* issuer);
 
         std::string
-        do_peername() const;
+        do_peername(chanref chan) const;
 
         sockstate
         do_state() const;
@@ -82,7 +80,7 @@ namespace aug {
         ~clntconn() AUG_NOTHROW;
 
         clntconn(mpoolref mpool, const sessionptr& session, void* user,
-                 timers& timers, const chanptr& chan);
+                 timers& timers, unsigned id);
     };
 }
 

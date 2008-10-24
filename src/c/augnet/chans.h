@@ -52,7 +52,7 @@ AUGNET_API aug_result
 aug_insertchan(aug_chans_t chans, aug_chan* ob);
 
 /**
- * Remove first matching @a ob from @a chans list.
+ * Remove first matching @a id in @a chans list.
  *
  * @param chans Channel list.
  * @param id Channel to be removed.
@@ -62,6 +62,18 @@ aug_insertchan(aug_chans_t chans, aug_chan* ob);
 
 AUGNET_API aug_result
 aug_removechan(aug_chans_t chans, unsigned id);
+
+/**
+ * Find first matching @a id in @a chans list.
+ *
+ * @param chans Channel list.
+ * @param id Channel to be found.
+ *
+ * @return Either channel or null if not found.
+ */
+
+AUGNET_API aug_chan*
+aug_findchan(aug_chans_t chans, unsigned id);
 
 /**
  * Process each channel.
