@@ -79,7 +79,7 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
     /* Notify of connection establishment.  Parent-id is the same as
        channel-id for client connections. */
 
-    if (!aug_clearestab(handler, &impl->chan_, impl->id_)) {
+    if (!aug_clearestab(handler, impl->fwd_, impl->id_)) {
 
         /* Forward pointer still has retained channel.  The forward pointer
            represents the new state, even if rejected.  It will be released on
@@ -506,7 +506,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         /* Notification of connection establishment. */
 
-        if (!aug_clearestab(handler, &impl->chan_, impl->id_)) {
+        if (!aug_clearestab(handler, chan, impl->id_)) {
 
             /* Rejected: socket will be closed on release. */
 

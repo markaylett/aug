@@ -200,19 +200,25 @@ namespace aug {
             void
             clearchan_(unsigned id) AUG_NOTHROW
             {
+                AUG_CTXDEBUG2(aug_tlx, "clear channel: id=[%u]", id);
+
                 // FIXME: listener will not exist after teardown.
 
                 socks_.erase(id);
             }
             void
-            errorchan_(obref<aug_chan> chan, const aug_errinfo& errinfo) AUG_NOTHROW
+            errorchan_(chanref chan, const aug_errinfo& errinfo) AUG_NOTHROW
             {
+                const unsigned id(getchanid(chan));
+                AUG_CTXDEBUG2(aug_tlx, "error channel: id=[%u]", id);
                 // FIXME: implement.
             }
             aug_bool
-            estabchan_(obref<aug_chan> chan, unsigned parent) AUG_NOTHROW
+            estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
             {
                 const unsigned id(getchanid(chan));
+                AUG_CTXDEBUG2(aug_tlx, "established channel: id=[%u]", id);
+
                 scoped_assign scoped(chan_, chan);
 
                 if (id == parent) {
@@ -221,7 +227,9 @@ namespace aug {
                     // connection establishment.
 
                     sockptr sock(socks_.get(id));
+                    assert(null != sock);
                     connptr conn(smartptr_cast<conn_base>(sock)); // Downcast.
+                    assert(null != conn);
 
                     // Connection has now been established.
 
@@ -258,12 +266,15 @@ namespace aug {
                 return AUG_TRUE;
             }
             aug_bool
-            readychan_(obref<aug_chan> chan,
-                       unsigned short events) AUG_NOTHROW
+            readychan_(chanref chan, unsigned short events) AUG_NOTHROW
             {
                 const unsigned id(getchanid(chan));
+                AUG_CTXDEBUG2(aug_tlx, "readychannel: id=[%u]", id);
+
                 sockptr sock(socks_.get(id));
-                connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
+                assert(null != sock);
+                connptr conn(smartptr_cast<conn_base>(sock)); // Downcast.
+                assert(null != conn);
 
                 AUG_CTXDEBUG2(aug_tlx,
                               "processing sock: id=[%u], events=[%u]",
@@ -271,7 +282,7 @@ namespace aug {
 
                 bool changed = false, threw = true;
                 try {
-                    changed = cptr->process(chan, events, now_);
+                    changed = conn->process(chan, events, now_);
                     threw = false;
                 } catch (const block_exception&) {
 
@@ -296,7 +307,7 @@ namespace aug {
                     return AUG_FALSE;
                 }
 
-                if (changed && CLOSED == cptr->state())
+                if (changed && CLOSED == conn->state())
                     return AUG_FALSE;
 
                 // FIXME: shutdown may have removed socket.
@@ -576,10 +587,11 @@ AUGASPP_API void
 engine::shutdown(mod_id cid, unsigned flags)
 {
     sockptr sock(impl_->socks_.get(cid));
-    connptr cptr(smartptr_cast<conn_base>(sock));
+    connptr conn(smartptr_cast<conn_base>(sock));
     chanptr chan(findchan(impl_->chans_, cid));
-    if (null != cptr) {
-        cptr->shutdown(chan, flags, impl_->now_);
+
+    if (null != conn) {
+        conn->shutdown(chan, flags, impl_->now_);
 
         // Forced shutdown: may be used on misbehaving clients.
 
@@ -651,28 +663,28 @@ AUGASPP_API void
 engine::send(mod_id cid, const void* buf, size_t len)
 {
     sockptr sock(impl_->socks_.get(cid));
-    connptr cptr(smartptr_cast<conn_base>(sock));
+    connptr conn(smartptr_cast<conn_base>(sock));
     chanptr chan(findchan(impl_->chans_, cid));
 
-    if (null == cptr || !sendable(*cptr))
+    if (null == conn || !sendable(*conn))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
                         "connection has been shutdown");
 
-    cptr->send(chan, buf, len, impl_->now_);
+    conn->send(chan, buf, len, impl_->now_);
 }
 
 AUGASPP_API void
 engine::sendv(mod_id cid, blobref blob)
 {
     sockptr sock(impl_->socks_.get(cid));
-    connptr cptr(smartptr_cast<conn_base>(sock));
+    connptr conn(smartptr_cast<conn_base>(sock));
     chanptr chan(findchan(impl_->chans_, cid));
 
-    if (null == cptr || !sendable(*cptr))
+    if (null == conn || !sendable(*conn))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
                         "connection has been shutdown");
 
-    cptr->sendv(chan, blob, impl_->now_);
+    conn->sendv(chan, blob, impl_->now_);
 }
 
 AUGASPP_API void
