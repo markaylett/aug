@@ -87,7 +87,7 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     retain_(impl);
 
-    if (!aug_readychan(handler, impl->id_, &impl->stream_, 0)) {
+    if (!aug_readychan(handler, &impl->chan_, 0)) {
         release_(impl);
         return NULL;
     }
@@ -223,7 +223,7 @@ create_(aug_mpool* mpool, unsigned id)
     return &impl->chan_;
 }
 
-static aug_bool (*cb_)(unsigned, aug_stream*, unsigned short) = NULL;
+static aug_bool (*cb_)(aug_chan*, unsigned short) = NULL;
 
 static void*
 chandler_cast_(aug_chandler* ob, const char* id)
@@ -252,24 +252,22 @@ chandler_clear_(aug_chandler* ob, unsigned id)
 }
 
 static void
-chandler_error_(aug_chandler* ob, unsigned id,
+chandler_error_(aug_chandler* ob, aug_chan* chan,
                 const struct aug_errinfo* errinfo)
 {
     aug_perrinfo(aug_tlx, "socket error", errinfo);
 }
 
 static aug_bool
-chandler_estab_(aug_chandler* ob, unsigned id, aug_stream* stream,
-                unsigned parent)
+chandler_estab_(aug_chandler* ob, aug_chan* chan, unsigned parent)
 {
     return AUG_TRUE;
 }
 
 static aug_bool
-chandler_ready_(aug_chandler* ob, unsigned id, aug_stream* stream,
-                unsigned short events)
+chandler_ready_(aug_chandler* ob, aug_chan* chan, unsigned short events)
 {
-    return cb_(id, stream, events);
+    return cb_(chan, events);
 }
 
 static const struct aug_chandlervtbl chandlervtbl_ = {
@@ -288,8 +286,9 @@ static int count_ = 0;
 static unsigned last_ = 0;
 
 static aug_bool
-stats_(unsigned id, aug_stream* stream, unsigned short events)
+stats_(aug_chan* chan, unsigned short events)
 {
+    const unsigned id = aug_getchanid(chan);
     if (3 < id)
         aug_die("invalid channel");
     ++count_;
@@ -298,8 +297,9 @@ stats_(unsigned id, aug_stream* stream, unsigned short events)
 }
 
 static aug_bool
-rm1_(unsigned id, aug_stream* stream, unsigned short events)
+rm1_(aug_chan* chan, unsigned short events)
 {
+    const unsigned id = aug_getchanid(chan);
     return 1 != id;
 }
 

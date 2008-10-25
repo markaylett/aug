@@ -104,26 +104,33 @@ conn_base::~conn_base() AUG_NOTHROW
 {
 }
 
-mod_handle&
-connected::do_get()
+connimpl::~connimpl() AUG_NOTHROW
 {
-    return sock_;
+    try {
+
+        // Only accepted connections should be notified of closure.  I.e. if
+        // the connection was rejected by session, then do not notify.
+
+        if (accepted_)
+            session_->closed(sock_);
+
+    } AUG_PERRINFOCATCH;
 }
 
-const mod_handle&
-connected::do_get() const
+connimpl::connimpl(const sessionptr& session, mod_handle& sock,
+                   buffer& buffer, rwtimer& rwtimer, bool accepted)
+    : session_(session),
+      sock_(sock),
+      buffer_(buffer),
+      rwtimer_(rwtimer),
+      state_(ESTABLISHED),
+      accepted_(accepted)
 {
-    return sock_;
-}
-
-const sessionptr&
-connected::do_session() const
-{
-    return session_;
+    gettimeofday(since_);
 }
 
 void
-connected::do_send(chanref chan, const void* buf, size_t len,
+connimpl::send(chanref chan, const void* buf, size_t len,
                    const timeval& now)
 {
     if (buffer_.empty()) {
@@ -138,7 +145,7 @@ connected::do_send(chanref chan, const void* buf, size_t len,
 }
 
 void
-connected::do_sendv(chanref chan, blobref blob, const timeval& now)
+connimpl::sendv(chanref chan, blobref blob, const timeval& now)
 {
     if (buffer_.empty()) {
 
@@ -152,22 +159,21 @@ connected::do_sendv(chanref chan, blobref blob, const timeval& now)
 }
 
 bool
-connected::do_accepted(const string& name, const timeval& now)
+connimpl::accepted(const string& name, const timeval& now)
 {
-    return close_ = session_->accepted(sock_, name.c_str());
+    return accepted_ = session_->accepted(sock_, name.c_str());
 }
 
 void
-connected::do_connected(const string& name, const timeval& now)
+connimpl::connected(const string& name, const timeval& now)
 {
     session_->connected(sock_, name.c_str());
 }
 
 bool
-connected::do_process(obref<aug_stream> stream, unsigned short events,
-                      const timeval& now)
+connimpl::process(chanref chan, unsigned short events, const timeval& now)
 {
-    chanptr chan(object_cast<aug_chan>(stream));
+    streamptr stream(object_cast<aug_stream>(chan));
 
     // FIXME: handle exceptional events?
 
@@ -260,7 +266,7 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
 }
 
 void
-connected::do_shutdown(chanref chan, unsigned flags, const timeval& now)
+connimpl::shutdown(chanref chan, unsigned flags, const timeval& now)
 {
     if (state_ < SHUTDOWN) {
         state_ = SHUTDOWN;
@@ -277,7 +283,7 @@ connected::do_shutdown(chanref chan, unsigned flags, const timeval& now)
 }
 
 void
-connected::do_teardown(const timeval& now)
+connimpl::teardown(const timeval& now)
 {
     if (state_ < TEARDOWN) {
         state_ = TEARDOWN;
@@ -286,13 +292,13 @@ connected::do_teardown(const timeval& now)
 }
 
 bool
-connected::do_authcert(const char* subject, const char* issuer)
+connimpl::authcert(const char* subject, const char* issuer)
 {
     return session_->authcert(sock_, subject, issuer);
 }
 
 string
-connected::do_peername(chanref chan) const
+connimpl::peername(chanref chan) const
 {
     string name;
 
@@ -301,30 +307,4 @@ connected::do_peername(chanref chan) const
         name = buf;
 
     return name;
-}
-
-sockstate
-connected::do_state() const
-{
-    return state_;
-}
-
-connected::~connected() AUG_NOTHROW
-{
-    try {
-        if (close_)
-            session_->closed(sock_);
-    } AUG_PERRINFOCATCH;
-}
-
-connected::connected(const sessionptr& session, mod_handle& sock,
-                     buffer& buffer, rwtimer& rwtimer, bool close)
-    : session_(session),
-      sock_(sock),
-      buffer_(buffer),
-      rwtimer_(rwtimer),
-      state_(ESTABLISHED),
-      close_(close)
-{
-    gettimeofday(since_);
 }

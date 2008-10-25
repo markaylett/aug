@@ -544,11 +544,6 @@ namespace aug {
 
 namespace #{elem.pkg} {
 
-    typedef aug::obref<#{elem.type.cname}> #{elem.name}ref;
-END
-        elem.each_method {|x| putinline elem, x}
-        puts <<END
-
     template <typename T>
     class #{elem.name} {
 
@@ -609,6 +604,31 @@ END
             return this->get();
         }
     };
+
+    typedef aug::obref<#{elem.type.cname}> #{elem.name}ref;
+    typedef aug::smartob<#{elem.type.cname}> #{elem.name}ptr;
+}
+#endif /* __cplusplus */
+
+END
+    end
+    def visit_quotincl(elem)
+    end
+    def visit_verbatim(elem)
+        puts elem.text.strip
+        puts
+    end
+end
+
+class CppVisitor
+    def visit_anglincl(elem)
+    end
+    def visit_comment(elem)
+    end
+    def visit_interface(elem)
+
+        elem.each_method {|x| putinline elem, x}
+        puts <<END
 
     template <typename T>
     class basic_#{elem.name} {
@@ -700,16 +720,11 @@ END
     };
 
     typedef aug::smartob<#{elem.type.cname}> #{elem.name}ptr;
-}
-#endif /* __cplusplus */
-
 END
     end
     def visit_quotincl(elem)
     end
     def visit_verbatim(elem)
-        puts elem.text.strip
-        puts
     end
 end
 
@@ -752,7 +767,17 @@ puts "/* Interface definitions. */"
 puts
 package.each_accept(DefnVisitor.new)
 
+puts <<EOD
+/* C++ definitions. */
+
+#if defined(__cplusplus)
+namespace aug {
+EOD
+package.each_accept(CppVisitor.new)
 puts <<END
+}
+#endif /* __cplusplus */
+
 #endif /* #{guard} */
 END
 

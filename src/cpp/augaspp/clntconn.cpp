@@ -10,6 +10,85 @@ AUG_RCSID("$Id$");
 using namespace aug;
 using namespace std;
 
+mod_handle&
+clntconn::do_get()
+{
+    return impl_.get();
+}
+
+const mod_handle&
+clntconn::do_get() const
+{
+    return impl_.get();
+}
+
+const sessionptr&
+clntconn::do_session() const
+{
+    return impl_.session();
+}
+
+void
+clntconn::do_send(chanref chan, const void* buf, size_t len,
+                  const timeval& now)
+{
+    impl_.send(chan, buf, len, now);
+}
+
+void
+clntconn::do_sendv(chanref chan, blobref blob, const timeval& now)
+{
+    impl_.sendv(chan, blob, now);
+}
+
+bool
+clntconn::do_accepted(const string& name, const timeval& now)
+{
+    return impl_.accepted(name, now);
+}
+
+void
+clntconn::do_connected(const string& name, const timeval& now)
+{
+    impl_.connected(name, now);
+}
+
+bool
+clntconn::do_process(chanref chan, unsigned short events, const timeval& now)
+{
+    return impl_.process(chan, events, now);
+}
+
+void
+clntconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
+{
+    impl_.shutdown(chan, flags, now);
+}
+
+void
+clntconn::do_teardown(const timeval& now)
+{
+    impl_.teardown(now);
+}
+
+bool
+clntconn::do_authcert(const char* subject, const char* issuer)
+{
+    return impl_.authcert(subject, issuer);
+}
+
+string
+clntconn::do_peername(chanref chan) const
+{
+    return impl_.peername(chan);
+}
+
+sockstate
+clntconn::do_state() const
+{
+    return impl_.state();
+}
+
 void
 clntconn::do_timercb(idref id, unsigned& ms)
 {
@@ -40,99 +119,18 @@ clntconn::do_cancelrwtimer(unsigned flags)
     return rwtimer_.cancelrwtimer(flags);
 }
 
-mod_handle&
-clntconn::do_get()
-{
-    return conn_.get();
-}
-
-const mod_handle&
-clntconn::do_get() const
-{
-    return conn_.get();
-}
-
-const sessionptr&
-clntconn::do_session() const
-{
-    return conn_.session();
-}
-
-void
-clntconn::do_send(chanref chan, const void* buf, size_t len,
-                  const timeval& now)
-{
-    conn_.send(chan, buf, len, now);
-}
-
-void
-clntconn::do_sendv(chanref chan, blobref blob, const timeval& now)
-{
-    conn_.sendv(chan, blob, now);
-}
-
-bool
-clntconn::do_accepted(const string& name, const timeval& now)
-{
-    return conn_.accepted(name, now);
-}
-
-void
-clntconn::do_connected(const string& name, const timeval& now)
-{
-    // BUG: workaround for bug in gcc version 3.4.4.
-
-    conn_base& r(conn_);
-    r.connected(name, now);
-}
-
-bool
-clntconn::do_process(obref<aug_stream> stream, unsigned short events,
-                     const timeval& now)
-{
-    return conn_.process(stream, events, now);
-}
-
-void
-clntconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
-{
-    conn_.shutdown(chan, flags, now);
-}
-
-void
-clntconn::do_teardown(const timeval& now)
-{
-    conn_.teardown(now);
-}
-
-bool
-clntconn::do_authcert(const char* subject, const char* issuer)
-{
-    return conn_.authcert(subject, issuer);
-}
-
-string
-clntconn::do_peername(chanref chan) const
-{
-    return conn_.peername(chan);
-}
-
-sockstate
-clntconn::do_state() const
-{
-    return conn_.state();
-}
-
 clntconn::~clntconn() AUG_NOTHROW
 {
 }
 
 clntconn::clntconn(mpoolref mpool, const sessionptr& session, void* user,
                    timers& timers, unsigned id)
-    : buffer_(mpool),
-      rwtimer_(session, sock_, timers),
-      conn_(session, sock_, buffer_, rwtimer_, true)
+    : impl_(session, sock_, buffer_, rwtimer_, true), // See comment.
+      buffer_(mpool),
+      rwtimer_(session, sock_, timers)
 {
+    // Client connections are implicitly accepted as the client is initiating.
+
     sock_.id_ = id;
     sock_.user_ = user;
 }

@@ -9,29 +9,12 @@
 
 namespace aug {
 
-    class clntconn : public rwtimer_base, public conn_base {
+    class clntconn : public conn_base, public rwtimer_base {
 
         mod_handle sock_;
+        aug::connimpl impl_;
         buffer buffer_;
         rwtimer rwtimer_;
-        aug::connected conn_;
-
-        // rwtimer_base.
-
-        void
-        do_timercb(idref id, unsigned& ms);
-
-        void
-        do_setrwtimer(unsigned ms, unsigned flags);
-
-        bool
-        do_resetrwtimer(unsigned ms, unsigned flags);
-
-        bool
-        do_resetrwtimer(unsigned flags);
-
-        bool
-        do_cancelrwtimer(unsigned flags);
 
         // conn_base.
 
@@ -58,8 +41,7 @@ namespace aug {
         do_connected(const std::string& name, const timeval& now);
 
         bool
-        do_process(obref<aug_stream> stream, unsigned short events,
-                   const timeval& now);
+        do_process(chanref chan, unsigned short events, const timeval& now);
 
         void
         do_shutdown(chanref chan, unsigned flags, const timeval& now);
@@ -75,6 +57,23 @@ namespace aug {
 
         sockstate
         do_state() const;
+
+        // rwtimer_base.
+
+        void
+        do_timercb(idref id, unsigned& ms);
+
+        void
+        do_setrwtimer(unsigned ms, unsigned flags);
+
+        bool
+        do_resetrwtimer(unsigned ms, unsigned flags);
+
+        bool
+        do_resetrwtimer(unsigned flags);
+
+        bool
+        do_cancelrwtimer(unsigned flags);
 
     public:
         ~clntconn() AUG_NOTHROW;

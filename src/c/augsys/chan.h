@@ -11,21 +11,19 @@
 #include "augext/chan.h"
 
 AUGSYS_API void
-aug_safeerror(aug_chan* chan, aug_chandler* handler, unsigned id,
-              struct aug_errinfo* errinfo);
+aug_clearerror(aug_chandler* handler, aug_chan* chan,
+               struct aug_errinfo* errinfo);
 
 AUGSYS_API aug_bool
-aug_safeestab(aug_chan* chan, aug_chandler* handler, unsigned id,
-              aug_stream* ob, unsigned parent);
+aug_clearestab(aug_chandler* handler, aug_chan* chan, unsigned parent);
 
 /**
  * Error-info is assumed to be set accordingly, prior to calling
- * aug_safeready().
+ * aug_clearready().
  */
 
 AUGSYS_API aug_bool
-aug_safeready(aug_chan* chan, aug_chandler* handler, unsigned id,
-              aug_stream* ob, unsigned short events);
+aug_clearready(aug_chandler* handler, aug_chan* chan, unsigned short events);
 
 AUGSYS_API aug_chan*
 aug_createfile(aug_mpool* mpool, const char* name, aug_muxer_t muxer,

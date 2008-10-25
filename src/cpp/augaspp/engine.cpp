@@ -118,6 +118,20 @@ namespace aug {
 
         typedef map<mod_id, sessiontimer> sessiontimers;
 
+        class scoped_assign {
+            chanptr& lhs_;
+        public:
+            ~scoped_assign()
+            {
+                lhs_ = null; // Release.
+            }
+            scoped_assign(chanptr& lhs, chanref rhs)
+                : lhs_(lhs)
+            {
+                lhs = object_retain(rhs);
+            }
+        };
+
         struct engineimpl : mpool_base {
 
             chandler<engineimpl> chandler_;
@@ -128,6 +142,10 @@ namespace aug {
             chans chans_;
             sessions sessions_;
             socks socks_;
+
+            // Current channel.
+
+            chanptr chan_;
 
             // Grace period on shutdown.
 
@@ -153,6 +171,7 @@ namespace aug {
                   cb_(cb),
                   muxer_(getmpool(aug_tlx)),
                   chans_(null),
+                  chan_(null),
                   grace_(timers_),
                   state_(STARTED)
             {
@@ -186,15 +205,15 @@ namespace aug {
                 socks_.erase(id);
             }
             void
-            errorchan_(unsigned id, const aug_errinfo& errinfo) AUG_NOTHROW
+            errorchan_(obref<aug_chan> chan, const aug_errinfo& errinfo) AUG_NOTHROW
             {
                 // FIXME: implement.
             }
             aug_bool
-            estabchan_(unsigned id, obref<aug_stream> stream,
-                       unsigned parent) AUG_NOTHROW
+            estabchan_(obref<aug_chan> chan, unsigned parent) AUG_NOTHROW
             {
-                chanptr chan(object_cast<aug_chan>(stream));
+                const unsigned id(getchanid(chan));
+                scoped_assign scoped(chan_, chan);
 
                 if (id == parent) {
 
@@ -220,8 +239,7 @@ namespace aug {
 
                 sockptr sock(socks_.get(parent));
                 connptr conn(new servconn(getmpool(aug_tlx), sock->session(),
-                                          user(*sock), timers_,
-                                          getchanid(chan)));
+                                          user(*sock), timers_, id));
                 scoped_insert si(socks_, conn);
 
                 // Connection has now been established.
@@ -240,9 +258,10 @@ namespace aug {
                 return AUG_TRUE;
             }
             aug_bool
-            readychan_(unsigned id, obref<aug_stream> stream,
+            readychan_(obref<aug_chan> chan,
                        unsigned short events) AUG_NOTHROW
             {
+                const unsigned id(getchanid(chan));
                 sockptr sock(socks_.get(id));
                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
@@ -252,7 +271,7 @@ namespace aug {
 
                 bool changed = false, threw = true;
                 try {
-                    changed = cptr->process(stream, events, now_);
+                    changed = cptr->process(chan, events, now_);
                     threw = false;
                 } catch (const block_exception&) {
 

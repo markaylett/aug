@@ -49,21 +49,22 @@ namespace {
                 wrchan_ = null;
         }
         void
-        errorchan_(unsigned id, const aug_errinfo& errinfo) AUG_NOTHROW
+        errorchan_(chanref chan, const aug_errinfo& errinfo) AUG_NOTHROW
         {
             aug_perrinfo(aug_tlx, "socket error", &errinfo);
             exit(1);
         }
         aug_bool
-        estabchan_(unsigned id, obref<aug_stream> stream,
-                   unsigned parent) AUG_NOTHROW
+        estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
         {
             return AUG_TRUE;
         }
         aug_bool
-        readychan_(unsigned id, obref<aug_stream> stream,
-                   unsigned short events) AUG_NOTHROW
+        readychan_(chanref chan, unsigned short events) AUG_NOTHROW
         {
+            const unsigned id(getchanid(chan));
+            streamptr stream(object_cast<aug_stream>(chan));
+
             if (id == rd_) {
                 char ch;
                 read(stream, &ch, 1);

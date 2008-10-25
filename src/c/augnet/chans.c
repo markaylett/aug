@@ -246,9 +246,11 @@ aug_processchans(aug_chans_t chans)
                       aug_getchanid(ob));
 
         /* Note: the current entry may be marked for removal during this
-           call. */
+           call.  Lock during call. */
 
+        aug_retain(it->ob_);
         ob = aug_processchan(ob, chans->handler_, &fork);
+        aug_release(it->ob_);
 
         if (fork) {
 

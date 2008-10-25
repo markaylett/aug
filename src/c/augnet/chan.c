@@ -11,7 +11,7 @@ AUG_RCSID("$Id$");
 #include "augnet/ssl.h"
 #include "augnet/tcpconnect.h"
 
-#include "augsys/chan.h"    /* aug_safeestab() */
+#include "augsys/chan.h"    /* aug_clearestab() */
 #include "augsys/sticky.h"
 #include "augsys/utility.h" /* aug_nextid() */
 #include "augsys/uio.h"     /* struct aug_iovsum */
@@ -48,8 +48,6 @@ static aug_chan*
 estabclient_(struct cimpl_* impl, aug_chandler* handler)
 {
     aug_sd sd = impl->sd_;
-    aug_stream* stream;
-    aug_bool ret;
 
     /* Ensure connection establishment happens only once. */
 
@@ -70,7 +68,7 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
                         impl->mask_);
 
     if (!impl->fwd_) {
-        aug_safeerror(&impl->chan_, handler, impl->id_, aug_tlerr);
+        aug_clearerror(handler, &impl->chan_, aug_tlerr);
         aug_sclose(sd);
         return NULL;
     }
@@ -78,13 +76,10 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
     /* Forward pointer has retained channel.  Retained channel owns socket
        descriptor. */
 
-    /* Notify of connection establishment. */
+    /* Notify of connection establishment.  Parent-id is the same as
+       channel-id for client connections. */
 
-    stream = aug_cast(impl->fwd_, aug_streamid);
-    ret = aug_safeestab(&impl->chan_, handler, impl->id_, stream, impl->id_);
-    aug_release(stream);
-
-    if (!ret) {
+    if (!aug_clearestab(handler, &impl->chan_, impl->id_)) {
 
         /* Forward pointer still has retained channel.  The forward pointer
            represents the new state, even if rejected.  It will be released on
@@ -101,7 +96,7 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
 }
 
 static aug_bool
-error_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_sd sd,
+error_(aug_chandler* handler, aug_chan* chan, aug_sd sd,
        unsigned short events)
 {
     /* Exceptions may include non-error exceptions, such as high priority
@@ -118,7 +113,7 @@ error_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_sd sd,
 
             /* Error occurred. */
 
-            aug_safeerror(chan, handler, id, &errinfo);
+            aug_clearerror(handler, chan, &errinfo);
             return AUG_TRUE;
         }
     }
@@ -192,6 +187,9 @@ static void
 cchan_retain_(aug_chan* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+
+    /* Not forwarded. */
+
     cretain_(impl);
 }
 
@@ -199,6 +197,9 @@ static void
 cchan_release_(aug_chan* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+
+    /* Not forwarded. */
+
     crelease_(impl);
 }
 
@@ -245,7 +246,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, impl->sd_, events))
+    if (error_(handler, &impl->chan_, impl->sd_, events))
         return NULL;
 
     if ((AUG_MDEVENTCONN & events)) {
@@ -261,7 +262,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         if (AUG_ISFAIL(aug_setmdeventmask(impl->muxer_, impl->sd_, 0))
             || AUG_BADSD == (impl->sd_ = aug_tryconnect(impl->conn_, &ep,
                                                         &impl->est_))) {
-            aug_safeerror(ob, handler, impl->id_, aug_tlerr);
+            aug_clearerror(handler, &impl->chan_, aug_tlerr);
             return NULL;
         }
 
@@ -450,7 +451,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, impl->sd_, events))
+    if (error_(handler, &impl->chan_, impl->sd_, events))
         return NULL;
 
     /* Assumption: server sockets do not have exceptional events. */
@@ -460,14 +461,12 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         aug_sd sd;
         struct aug_endpoint ep;
         aug_chan* chan;
-        aug_stream* stream;
         unsigned id;
-        aug_bool ret;
 
         if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
 
             if (!aug_acceptagain(aug_tlerr)) {
-                aug_safeerror(ob, handler, impl->id_, aug_tlerr);
+                aug_clearerror(handler, &impl->chan_, aug_tlerr);
                 return NULL;
             }
 
@@ -505,14 +504,9 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             goto done;
         }
 
-        stream = aug_cast(chan, aug_streamid);
-
         /* Notification of connection establishment. */
 
-        ret = aug_safeestab(ob, handler, id, stream, impl->id_);
-        aug_release(stream);
-
-        if (!ret) {
+        if (!aug_clearestab(handler, &impl->chan_, impl->id_)) {
 
             /* Rejected: socket will be closed on release. */
 
@@ -675,11 +669,10 @@ pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, impl->sticky_.md_, events))
+    if (error_(handler, &impl->chan_, impl->sticky_.md_, events))
         return NULL;
 
-    if (events && !aug_safeready(ob, handler, impl->id_, &impl->stream_,
-                                 events))
+    if (events && !aug_clearready(handler, &impl->chan_, events))
         return NULL;
 
     pretain_(impl);
