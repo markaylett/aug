@@ -16,28 +16,6 @@ socks::~socks() AUG_NOTHROW
 {
 }
 
-bool
-socks::send(mod_id cid, const void* buf, size_t len, const timeval& now)
-{
-    connptr cptr(smartptr_cast<conn_base>(get(cid)));
-    if (null == cptr || !sendable(*cptr))
-        return false;
-
-    cptr->send(buf, len, now);
-    return true;
-}
-
-bool
-socks::sendv(mod_id cid, blobref blob, const timeval& now)
-{
-    connptr cptr(smartptr_cast<conn_base>(get(cid)));
-    if (null == cptr || !sendable(*cptr))
-        return false;
-
-    cptr->sendv(blob, now);
-    return true;
-}
-
 void
 socks::clear()
 {

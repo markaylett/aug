@@ -104,100 +104,110 @@ conn_base::~conn_base() AUG_NOTHROW
 {
 }
 
-mod_handle&
-connected::do_get()
+connimpl::~connimpl() AUG_NOTHROW
 {
-    return sock_;
+    try {
+
+        // Only accepted connections should be notified of closure.  I.e. if
+        // the connection was rejected by session, then do not notify.
+
+        if (accepted_)
+            session_->closed(sock_);
+
+    } AUG_PERRINFOCATCH;
 }
 
-const mod_handle&
-connected::do_get() const
+connimpl::connimpl(const sessionptr& session, mod_handle& sock,
+                   buffer& buffer, rwtimer& rwtimer, bool accepted)
+    : session_(session),
+      sock_(sock),
+      buffer_(buffer),
+      rwtimer_(rwtimer),
+      state_(ESTABLISHED),
+      accepted_(accepted)
 {
-    return sock_;
-}
-
-const sessionptr&
-connected::do_session() const
-{
-    return session_;
-}
-
-chanptr
-connected::do_chan() const
-{
-    return chan_;
+    gettimeofday(since_);
 }
 
 void
-connected::do_send(const void* buf, size_t len, const timeval& now)
+connimpl::send(chanref chan, const void* buf, size_t len,
+                   const timeval& now)
 {
     if (buffer_.empty()) {
 
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setchanmask(chan_, AUG_MDEVENTRDWR);
+        setchanmask(chan, AUG_MDEVENTRDWR);
     }
 
     buffer_.append(buf, len);
 }
 
 void
-connected::do_sendv(blobref ref, const timeval& now)
+connimpl::sendv(chanref chan, blobref blob, const timeval& now)
 {
     if (buffer_.empty()) {
 
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setchanmask(chan_, AUG_MDEVENTRDWR);
+        setchanmask(chan, AUG_MDEVENTRDWR);
     }
 
-    buffer_.append(ref);
+    buffer_.append(blob);
 }
 
 bool
-connected::do_accepted(const string& name, const timeval& now)
+connimpl::accepted(const string& name, const timeval& now)
 {
-    return close_ = session_->accepted(sock_, name.c_str());
+    return accepted_ = session_->accepted(sock_, name.c_str());
 }
 
 void
-connected::do_connected(const string& name, const timeval& now)
+connimpl::connected(const string& name, const timeval& now)
 {
     session_->connected(sock_, name.c_str());
 }
 
 bool
-connected::do_process(obref<aug_stream> stream, unsigned short events,
-                      const timeval& now)
+connimpl::process(chanref chan, unsigned short events, const timeval& now)
 {
-    chan_ = object_cast<aug_chan>(stream);
+    streamptr stream(object_cast<aug_stream>(chan));
 
     // FIXME: handle exceptional events?
+
+    bool block(false);
 
     if (events & AUG_MDEVENTRD) {
 
         AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%u]", sock_.id_);
 
-        char buf[4096];
-        size_t size(read(stream, buf, sizeof(buf)));
-        if (0 == size) {
+        try {
+            char buf[4096];
+            size_t size(read(stream, buf, sizeof(buf)));
+            if (0 == size) {
 
-            // Connection closed.
+                // Connection closed.
 
-            AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%u]", sock_.id_);
-            state_ = CLOSED;
-            return true;
+                AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%u]",
+                              sock_.id_);
+                state_ = CLOSED;
+                return true;
+            }
+
+            // Data has been read: reset read timer.
+
+            rwtimer_.resetrwtimer(MOD_TIMRD);
+
+            // Notify module of new data.
+
+            session_->data(sock_, buf, size);
+
+        } catch (const block_exception&) {
+            // FIXME: temporary measure to ensure write events are serviced.
+            block = true;
         }
-
-        // Data has been read: reset read timer.
-
-        rwtimer_.resetrwtimer(MOD_TIMRD);
-
-        // Notify module of new data.
-
-        session_->data(sock_, buf, size);
     }
 
     if (events & AUG_MDEVENTWR) {
@@ -214,7 +224,7 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
 
             // No more (buffered) data to be written.
 
-            setchanmask(chan_, AUG_MDEVENTRD);
+            setchanmask(chan, AUG_MDEVENTRD);
 
             // If flagged for shutdown, send FIN and disable writes.
 
@@ -247,11 +257,16 @@ connected::do_process(obref<aug_stream> stream, unsigned short events,
             checkmaxwait(buffer_.size(), since_, now);
     }
 
+    // FIXME: see above.
+
+    if (block)
+        throw block_exception();
+
     return false;
 }
 
 void
-connected::do_shutdown(unsigned flags, const timeval& now)
+connimpl::shutdown(chanref chan, unsigned flags, const timeval& now)
 {
     if (state_ < SHUTDOWN) {
         state_ = SHUTDOWN;
@@ -259,7 +274,7 @@ connected::do_shutdown(unsigned flags, const timeval& now)
             aug_ctxinfo(aug_tlx,
                         "shutting connection: id=[%u], flags=[%u]",
                         sock_.id_, flags);
-            streamptr stream(object_cast<aug_stream>(chan_));
+            streamptr stream(object_cast<aug_stream>(chan));
             // FIXME: should be avoided if state_ set correctly.
 			if (null != stream)
 				aug::shutdown(stream);
@@ -268,7 +283,7 @@ connected::do_shutdown(unsigned flags, const timeval& now)
 }
 
 void
-connected::do_teardown(const timeval& now)
+connimpl::teardown(const timeval& now)
 {
     if (state_ < TEARDOWN) {
         state_ = TEARDOWN;
@@ -277,47 +292,19 @@ connected::do_teardown(const timeval& now)
 }
 
 bool
-connected::do_authcert(const char* subject, const char* issuer)
+connimpl::authcert(const char* subject, const char* issuer)
 {
     return session_->authcert(sock_, subject, issuer);
 }
 
 string
-connected::do_peername() const
+connimpl::peername(chanref chan) const
 {
     string name;
 
     char buf[AUG_MAXCHANNAMELEN + 1];
-    if (aug_getchanname(chan_.get(), buf, sizeof(buf)))
+    if (aug_getchanname(chan.get(), buf, sizeof(buf)))
         name = buf;
 
     return name;
-}
-
-sockstate
-connected::do_state() const
-{
-    return state_;
-}
-
-connected::~connected() AUG_NOTHROW
-{
-    try {
-        if (close_)
-            session_->closed(sock_);
-    } AUG_PERRINFOCATCH;
-}
-
-connected::connected(const sessionptr& session, mod_handle& sock,
-                     buffer& buffer, rwtimer& rwtimer,
-                     const chanptr& chan, bool close)
-    : session_(session),
-      sock_(sock),
-      buffer_(buffer),
-      rwtimer_(rwtimer),
-      chan_(chan),
-      state_(ESTABLISHED),
-      close_(close)
-{
-    gettimeofday(since_);
 }

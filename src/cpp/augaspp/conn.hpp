@@ -16,10 +16,11 @@ namespace aug {
     class conn_base : public sock_base {
 
         virtual void
-        do_send(const void* buf, size_t size, const timeval& now) = 0;
+        do_send(chanref chan, const void* buf, size_t size,
+                const timeval& now) = 0;
 
         virtual void
-        do_sendv(blobref ref, const timeval& now) = 0;
+        do_sendv(chanref chan, blobref blob, const timeval& now) = 0;
 
         /**
          * Notify of newly accepted connection.
@@ -41,11 +42,11 @@ namespace aug {
          */
 
         virtual bool
-        do_process(obref<aug_stream> stream, unsigned short events,
+        do_process(chanref chan, unsigned short events,
                    const timeval& now) = 0;
 
         virtual void
-        do_shutdown(unsigned flags, const timeval& now) = 0;
+        do_shutdown(chanref chan, unsigned flags, const timeval& now) = 0;
 
         /**
          * Initiate application-level teardown.
@@ -58,20 +59,20 @@ namespace aug {
         do_authcert(const char* subject, const char* issuer) = 0;
 
         virtual std::string
-        do_peername() const = 0;
+        do_peername(chanref chan) const = 0;
 
     public:
         ~conn_base() AUG_NOTHROW;
 
         void
-        send(const void* buf, size_t size, const timeval& now)
+        send(chanref chan, const void* buf, size_t size, const timeval& now)
         {
-            do_send(buf, size, now);
+            do_send(chan, buf, size, now);
         }
         void
-        sendv(blobref ref, const timeval& now)
+        sendv(chanref chan, blobref blob, const timeval& now)
         {
-            do_sendv(ref, now);
+            do_sendv(chan, blob, now);
         }
         bool
         accepted(const std::string& name, const timeval& now)
@@ -84,15 +85,14 @@ namespace aug {
             do_connected(name, now);
         }
         bool
-        process(obref<aug_stream> stream, unsigned short events,
-                const timeval& now)
+        process(chanref chan, unsigned short events, const timeval& now)
         {
-            return do_process(stream, events, now);
+            return do_process(chan, events, now);
         }
         void
-        shutdown(unsigned flags, const timeval& now)
+        shutdown(chanref chan, unsigned flags, const timeval& now)
         {
-            do_shutdown(flags, now);
+            do_shutdown(chan, flags, now);
         }
         void
         teardown(const timeval& now)
@@ -105,9 +105,9 @@ namespace aug {
             return do_authcert(subject, issuer);
         }
         std::string
-        peername() const
+        peername(chanref chan) const
         {
-            return do_peername();
+            return do_peername(chan);
         }
     };
 
@@ -119,15 +119,14 @@ namespace aug {
         return conn.state() < SHUTDOWN;
     }
 
-    class connected : public conn_base {
+    class connimpl {
 
         sessionptr session_;
         mod_handle& sock_;
         buffer& buffer_;
         rwtimer& rwtimer_;
-        chanptr chan_;
         sockstate state_;
-        bool close_;
+        bool accepted_;
 
         /**
          * Waiting for writability since.
@@ -135,55 +134,62 @@ namespace aug {
 
         timeval since_;
 
+    public:
+        ~connimpl() AUG_NOTHROW;
+
+        connimpl(const sessionptr& session, mod_handle& sock, buffer& buffer,
+                 rwtimer& rwtimer, bool accepted);
+
         mod_handle&
-        do_get();
+        get()
+        {
+            return sock_;
+        }
 
         const mod_handle&
-        do_get() const;
+        get() const
+        {
+            return sock_;
+        }
 
         const sessionptr&
-        do_session() const;
-
-        chanptr
-        do_chan() const;
-
-        void
-        do_send(const void* buf, size_t size, const timeval& now);
+        session() const
+        {
+            return session_;
+        }
 
         void
-        do_sendv(blobref ref, const timeval& now);
+        send(chanref chan, const void* buf, size_t size, const timeval& now);
+
+        void
+        sendv(chanref chan, blobref blob, const timeval& now);
 
         bool
-        do_accepted(const std::string& name, const timeval& now);
+        accepted(const std::string& name, const timeval& now);
 
         void
-        do_connected(const std::string& name, const timeval& now);
+        connected(const std::string& name, const timeval& now);
 
         bool
-        do_process(obref<aug_stream> stream, unsigned short events,
-                   const timeval& now);
+        process(chanref chan, unsigned short events, const timeval& now);
 
         void
-        do_shutdown(unsigned flags, const timeval& now);
+        shutdown(chanref chan, unsigned flags, const timeval& now);
 
         void
-        do_teardown(const timeval& now);
+        teardown(const timeval& now);
 
         bool
-        do_authcert(const char* subject, const char* issuer);
+        authcert(const char* subject, const char* issuer);
 
         std::string
-        do_peername() const;
+        peername(chanref chan) const;
 
         sockstate
-        do_state() const;
-
-    public:
-        ~connected() AUG_NOTHROW;
-
-        connected(const sessionptr& session, mod_handle& sock,
-                  buffer& buffer, rwtimer& rwtimer,
-                  const chanptr& chan, bool close);
+        state() const
+        {
+            return state_;
+        }
     };
 }
 

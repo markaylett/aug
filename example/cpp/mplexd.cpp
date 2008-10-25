@@ -155,13 +155,13 @@ namespace test {
 
     struct session {
 
-        chanref chan_;
+        chanptr chan_;
         timer timer_;
         buffer buffer_;
         int heartbeats_;
 
         session(const chanref& chan, timers& timers)
-            : chan_(chan),
+            : chan_(object_retain(chan)),
               timer_(timers, null),
               heartbeats_(0)
         {
@@ -239,25 +239,23 @@ namespace test {
             sessions_.erase(id);
         }
         void
-        errorchan_(unsigned id, const aug_errinfo& errinfo) AUG_NOTHROW
+        errorchan_(chanref chan, const aug_errinfo& errinfo) AUG_NOTHROW
         {
             // FIXME: implement.
         }
         aug_bool
-        estabchan_(unsigned id, obref<aug_stream> stream,
-                   unsigned parent) AUG_NOTHROW
+        estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
         {
-            chanptr ptr(object_cast<aug_chan>(stream));
             aug_ctxinfo(aug_tlx, "inserting connection");
-            sessions_.insert(make_pair(id, sessionptr
-                                       (new session(ptr, timers_))));
+            sessions_.insert(make_pair(getchanid(chan), sessionptr
+                                       (new session(chan, timers_))));
             return AUG_TRUE;
         }
         aug_bool
-        readychan_(unsigned id, obref<aug_stream> stream,
-                   unsigned short events) AUG_NOTHROW
+        readychan_(chanref chan, unsigned short events) AUG_NOTHROW
         {
-            chanptr ptr(object_cast<aug_chan>(stream));
+            const unsigned id(getchanid(chan));
+            streamptr stream(object_cast<aug_stream>(chan));
             sessionptr sess(sessions_[id]);
 
             if (events & AUG_MDEVENTRD) {
@@ -270,7 +268,7 @@ namespace test {
                     return AUG_FALSE;
                 }
 
-                setchanmask(ptr, AUG_MDEVENTRDWR);
+                setchanmask(chan, AUG_MDEVENTRDWR);
                 sess->timer_.cancel();
                 sess->heartbeats_ = 0;
             }
@@ -278,7 +276,7 @@ namespace test {
             if (events & AUG_MDEVENTWR) {
 
                 if (!sess->buffer_.writesome(stream)) {
-                    setchanmask(ptr, AUG_MDEVENTRD);
+                    setchanmask(chan, AUG_MDEVENTRD);
                     sess->timer_.reset(5000);
                 }
             }

@@ -25,9 +25,6 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
-        chanptr
-        do_chan() const;
-
         sockstate
         do_state() const;
 

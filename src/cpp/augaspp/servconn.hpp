@@ -9,12 +9,54 @@
 
 namespace aug {
 
-    class servconn : public rwtimer_base, public conn_base {
+    class servconn : public conn_base, public rwtimer_base {
 
         mod_handle sock_;
+        aug::connimpl impl_;
         buffer buffer_;
         rwtimer rwtimer_;
-        aug::connected conn_;
+
+        // conn_base.
+
+        mod_handle&
+        do_get();
+
+        const mod_handle&
+        do_get() const;
+
+        const sessionptr&
+        do_session() const;
+
+        void
+        do_send(chanref chan, const void* buf, size_t size,
+                const timeval& now);
+
+        void
+        do_sendv(chanref chan, blobref blob, const timeval& now);
+
+        bool
+        do_accepted(const std::string& name, const timeval& now);
+
+        void
+        do_connected(const std::string& name, const timeval& now);
+
+        bool
+        do_process(chanref chan, unsigned short events, const timeval& now);
+
+        void
+        do_shutdown(chanref chan, unsigned flags, const timeval& now);
+
+        void
+        do_teardown(const timeval& now);
+
+        bool
+        do_authcert(const char* subject, const char* issuer);
+
+        std::string
+        do_peername(chanref chan) const;
+
+        sockstate
+        do_state() const;
 
         // rwtimer_base.
 
@@ -33,56 +75,11 @@ namespace aug {
         bool
         do_cancelrwtimer(unsigned flags);
 
-        // conn_base.
-
-        mod_handle&
-        do_get();
-
-        const mod_handle&
-        do_get() const;
-
-        const sessionptr&
-        do_session() const;
-
-        chanptr
-        do_chan() const;
-
-        void
-        do_send(const void* buf, size_t size, const timeval& now);
-
-        void
-        do_sendv(blobref ref, const timeval& now);
-
-        bool
-        do_accepted(const std::string& name, const timeval& now);
-
-        void
-        do_connected(const std::string& name, const timeval& now);
-
-        bool
-        do_process(obref<aug_stream> stream, unsigned short events,
-                   const timeval& now);
-
-        void
-        do_shutdown(unsigned flags, const timeval& now);
-
-        void
-        do_teardown(const timeval& now);
-
-        bool
-        do_authcert(const char* subject, const char* issuer);
-
-        std::string
-        do_peername() const;
-
-        sockstate
-        do_state() const;
-
     public:
         ~servconn() AUG_NOTHROW;
 
         servconn(mpoolref mpool, const sessionptr& session, void* user,
-                 timers& timers, const chanptr& chan);
+                 timers& timers, unsigned id);
     };
 }
 

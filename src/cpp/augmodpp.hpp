@@ -390,14 +390,17 @@ namespace mod {
         void
         do_reconf()
         {
+            mod_writelog(MOD_LOGWARN, "do_reconf() not implemented");
         }
         void
         do_event(const char* from, const char* type, struct aug_object_* ob)
         {
+            mod_writelog(MOD_LOGWARN, "do_event() not implemented");
         }
         void
         do_closed(const handle& sock)
         {
+            mod_writelog(MOD_LOGWARN, "do_closed() not implemented");
         }
         void
         do_teardown(const handle& sock)
@@ -408,32 +411,39 @@ namespace mod {
         bool
         do_accepted(handle& sock, const char* name)
         {
+            mod_writelog(MOD_LOGWARN, "do_accepted() not implemented");
             return true;
         }
         void
         do_connected(handle& sock, const char* name)
         {
+            mod_writelog(MOD_LOGWARN, "do_connected() not implemented");
         }
         void
         do_data(const handle& sock, const void* buf, size_t size)
         {
+            mod_writelog(MOD_LOGWARN, "do_data() not implemented");
         }
         void
         do_rdexpire(const handle& sock, unsigned& ms)
         {
+            mod_writelog(MOD_LOGWARN, "do_rdexpire() not implemented");
         }
         void
         do_wrexpire(const handle& sock, unsigned& ms)
         {
+            mod_writelog(MOD_LOGWARN, "do_wrexpire() not implemented");
         }
         void
         do_expire(const handle& timer, unsigned& ms)
         {
+            mod_writelog(MOD_LOGWARN, "do_expire() not implemented");
         }
         bool
         do_authcert(const handle& sock, const char* subject,
                     const char* issuer)
         {
+            mod_writelog(MOD_LOGWARN, "do_authcert() not implemented");
             return true;
         }
     public:

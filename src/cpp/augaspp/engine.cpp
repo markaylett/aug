@@ -118,6 +118,20 @@ namespace aug {
 
         typedef map<mod_id, sessiontimer> sessiontimers;
 
+        class scoped_assign {
+            chanptr& lhs_;
+        public:
+            ~scoped_assign()
+            {
+                lhs_ = null; // Release.
+            }
+            scoped_assign(chanptr& lhs, chanref rhs)
+                : lhs_(lhs)
+            {
+                lhs = object_retain(rhs);
+            }
+        };
+
         struct engineimpl : mpool_base {
 
             chandler<engineimpl> chandler_;
@@ -128,6 +142,10 @@ namespace aug {
             chans chans_;
             sessions sessions_;
             socks socks_;
+
+            // Current channel.
+
+            chanptr chan_;
 
             // Grace period on shutdown.
 
@@ -153,6 +171,7 @@ namespace aug {
                   cb_(cb),
                   muxer_(getmpool(aug_tlx)),
                   chans_(null),
+                  chan_(null),
                   grace_(timers_),
                   state_(STARTED)
             {
@@ -186,14 +205,16 @@ namespace aug {
                 socks_.erase(id);
             }
             void
-            errorchan_(unsigned id, const aug_errinfo& errinfo) AUG_NOTHROW
+            errorchan_(obref<aug_chan> chan, const aug_errinfo& errinfo) AUG_NOTHROW
             {
                 // FIXME: implement.
             }
             aug_bool
-            estabchan_(unsigned id, obref<aug_stream> stream,
-                       unsigned parent) AUG_NOTHROW
+            estabchan_(obref<aug_chan> chan, unsigned parent) AUG_NOTHROW
             {
+                const unsigned id(getchanid(chan));
+                scoped_assign scoped(chan_, chan);
+
                 if (id == parent) {
 
                     // Was connecting, now established: notify module of
@@ -204,7 +225,7 @@ namespace aug {
 
                     // Connection has now been established.
 
-                    string name(conn->peername());
+                    string name(conn->peername(chan));
                     AUG_CTXDEBUG2(aug_tlx, "connected: name=[%s]",
                                   name.c_str());
 
@@ -217,14 +238,13 @@ namespace aug {
                 AUG_CTXDEBUG2(aug_tlx, "accepting connection");
 
                 sockptr sock(socks_.get(parent));
-                chanptr chan(object_cast<aug_chan>(stream));
                 connptr conn(new servconn(getmpool(aug_tlx), sock->session(),
-                                          user(*sock), timers_, chan));
+                                          user(*sock), timers_, id));
                 scoped_insert si(socks_, conn);
 
                 // Connection has now been established.
 
-                string name(conn->peername());
+                string name(conn->peername(chan));
                 AUG_CTXDEBUG2(aug_tlx,
                               "initialising connection: id=[%u], name=[%s]",
                               aug::id(*conn), name.c_str());
@@ -238,19 +258,25 @@ namespace aug {
                 return AUG_TRUE;
             }
             aug_bool
-            readychan_(unsigned id, obref<aug_stream> stream,
+            readychan_(obref<aug_chan> chan,
                        unsigned short events) AUG_NOTHROW
             {
+                const unsigned id(getchanid(chan));
                 sockptr sock(socks_.get(id));
                 connptr cptr(smartptr_cast<conn_base>(sock)); // Downcast.
 
-                AUG_CTXDEBUG2(aug_tlx, "processing sock: id=[%u]", id);
+                AUG_CTXDEBUG2(aug_tlx,
+                              "processing sock: id=[%u], events=[%u]",
+                              id, (unsigned)events);
 
                 bool changed = false, threw = true;
                 try {
-                    changed = cptr->process(stream, events, now_);
+                    changed = cptr->process(chan, events, now_);
                     threw = false;
                 } catch (const block_exception&) {
+
+                    AUG_CTXDEBUG2(aug_tlx, "operation would block: id=[%u]",
+                                  id);
 
                     // FIXME: shutdown may have removed socket.
 
@@ -551,8 +577,9 @@ engine::shutdown(mod_id cid, unsigned flags)
 {
     sockptr sock(impl_->socks_.get(cid));
     connptr cptr(smartptr_cast<conn_base>(sock));
+    chanptr chan(findchan(impl_->chans_, cid));
     if (null != cptr) {
-        cptr->shutdown(flags, impl_->now_);
+        cptr->shutdown(chan, flags, impl_->now_);
 
         // Forced shutdown: may be used on misbehaving clients.
 
@@ -577,7 +604,8 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     mpoolptr mpool(getmpool(aug_tlx));
     chanptr chan(createclient(mpool, host, port, impl_->muxer_,
                               ctx ? ctx->get() : 0));
-    connptr conn(new clntconn(mpool, session, user, impl_->timers_, chan));
+    connptr conn(new clntconn(mpool, session, user, impl_->timers_,
+                              getchanid(chan)));
 
     impl_->socks_.insert(conn);
     insertchan(impl_->chans_, chan);
@@ -622,17 +650,29 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
 AUGASPP_API void
 engine::send(mod_id cid, const void* buf, size_t len)
 {
-    if (!impl_->socks_.send(cid, buf, len, impl_->now_))
+    sockptr sock(impl_->socks_.get(cid));
+    connptr cptr(smartptr_cast<conn_base>(sock));
+    chanptr chan(findchan(impl_->chans_, cid));
+
+    if (null == cptr || !sendable(*cptr))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
                         "connection has been shutdown");
+
+    cptr->send(chan, buf, len, impl_->now_);
 }
 
 AUGASPP_API void
 engine::sendv(mod_id cid, blobref blob)
 {
-    if (!impl_->socks_.sendv(cid, blob, impl_->now_))
+    sockptr sock(impl_->socks_.get(cid));
+    connptr cptr(smartptr_cast<conn_base>(sock));
+    chanptr chan(findchan(impl_->chans_, cid));
+
+    if (null == cptr || !sendable(*cptr))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
                         "connection has been shutdown");
+
+    cptr->sendv(chan, blob, impl_->now_);
 }
 
 AUGASPP_API void

@@ -11,7 +11,7 @@ AUG_RCSID("$Id$");
 #include "augnet/ssl.h"
 #include "augnet/tcpconnect.h"
 
-#include "augsys/chan.h"    /* aug_safeestab() */
+#include "augsys/chan.h"    /* aug_clearestab() */
 #include "augsys/sticky.h"
 #include "augsys/utility.h" /* aug_nextid() */
 #include "augsys/uio.h"     /* struct aug_iovsum */
@@ -37,22 +37,28 @@ struct cimpl_ {
     struct ssl_ctx_st* sslctx_;
     aug_tcpconnect_t conn_;
     int est_;
+
+    /* Fowarding pointer is used to allow re-entrant calls through old
+       channel, before the new channel has fully replaced it. */
+
+    aug_chan* fwd_;
 };
 
 static aug_chan*
 estabclient_(struct cimpl_* impl, aug_chandler* handler)
 {
     aug_sd sd = impl->sd_;
-    aug_chan* chan;
-    aug_stream* stream;
-    aug_bool ret;
 
     /* Ensure connection establishment happens only once. */
 
     impl->sd_ = AUG_BADSD;
     impl->est_ = 0;
 
-    chan =
+    AUG_CTXDEBUG3(aug_tlx, "client established: mask=[%u]", impl->mask_);
+
+    /* Create forward pointer. */
+
+    impl->fwd_ =
 #if ENABLE_SSL
         impl->sslctx_ ?
         aug_createsslclient(impl->mpool_, impl->id_, impl->muxer_, sd,
@@ -61,34 +67,36 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
         aug_createplain(impl->mpool_, impl->id_, impl->muxer_, sd,
                         impl->mask_);
 
-    if (!chan) {
-        aug_safeerror(&impl->chan_, handler, impl->id_, aug_tlerr);
+    if (!impl->fwd_) {
+        aug_clearerror(handler, &impl->chan_, aug_tlerr);
         aug_sclose(sd);
         return NULL;
     }
 
-    /* Transfer event mask to established channel. */
+    /* Forward pointer has retained channel.  Retained channel owns socket
+       descriptor. */
 
-    stream = aug_cast(chan, aug_streamid);
+    /* Notify of connection establishment.  Parent-id is the same as
+       channel-id for client connections. */
 
-    /* Notification of connection establishment. */
+    if (!aug_clearestab(handler, &impl->chan_, impl->id_)) {
 
-    ret = aug_safeestab(&impl->chan_, handler, impl->id_, stream, impl->id_);
-    aug_release(stream);
+        /* Forward pointer still has retained channel.  The forward pointer
+           represents the new state, even if rejected.  It will be released on
+           destruction. */
 
-    if (!ret) {
-
-        /* Rejected: socket will be closed on release. */
-
-        aug_release(chan);
         return NULL;
     }
 
-    return chan;
+    /* Always retain before return.  Two refs for forward pointer and
+       return. */
+
+    aug_retain(impl->fwd_);
+    return impl->fwd_;
 }
 
 static aug_bool
-error_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_sd sd,
+error_(aug_chandler* handler, aug_chan* chan, aug_sd sd,
        unsigned short events)
 {
     /* Exceptions may include non-error exceptions, such as high priority
@@ -105,7 +113,7 @@ error_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_sd sd,
 
             /* Error occurred. */
 
-            aug_safeerror(chan, handler, id, &errinfo);
+            aug_clearerror(handler, chan, &errinfo);
             return AUG_TRUE;
         }
     }
@@ -116,9 +124,20 @@ error_(aug_chan* chan, aug_chandler* handler, unsigned id, aug_sd sd,
 static aug_result
 cclose_(struct cimpl_* impl)
 {
-    /* Nothing to close because handshake is not yet complete. */
+    aug_result result = aug_setmdeventmask(impl->muxer_, impl->sd_, 0);
 
-    return aug_setmdeventmask(impl->muxer_, impl->sd_, 0);
+    /* Exceptional case: close if handshake is complete, but creation of
+       forward pointer is still pending.  This means that conn_ has
+       relinquished ownership of the socket descriptor, but ownership has not
+       yet been transferred to the forward pointer. */
+
+    if (impl->est_) {
+
+        assert(!impl->fwd_);
+        aug_sclose(impl->sd_);
+    }
+
+    return result;
 }
 
 static void*
@@ -144,9 +163,10 @@ crelease_(struct cimpl_* impl)
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
         aug_mpool* mpool = impl->mpool_;
+        aug_destroytcpconnect(impl->conn_);
         if (AUG_BADSD != impl->sd_)
             cclose_(impl);
-        aug_destroytcpconnect(impl->conn_);
+        aug_safeassign(impl->fwd_, NULL);
         aug_freemem(mpool, impl);
         aug_release(mpool);
     }
@@ -156,6 +176,10 @@ static void*
 cchan_cast_(aug_chan* ob, const char* id)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+
+    if (impl->fwd_)
+        return aug_cast(impl->fwd_, id);
+
     return ccast_(impl, id);
 }
 
@@ -163,6 +187,9 @@ static void
 cchan_retain_(aug_chan* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+
+    /* Not forwarded. */
+
     cretain_(impl);
 }
 
@@ -170,6 +197,9 @@ static void
 cchan_release_(aug_chan* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+
+    /* Not forwarded. */
+
     crelease_(impl);
 }
 
@@ -177,8 +207,14 @@ static aug_result
 cchan_close_(aug_chan* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
-    aug_result result = cclose_(impl);
+    aug_result result;
+
+    if (impl->fwd_)
+        return aug_closechan(impl->fwd_);
+
+    result = cclose_(impl);
     impl->sd_ = AUG_BADSD;
+    impl->est_ = 0;
     return result;
 }
 
@@ -187,6 +223,14 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
     unsigned short events;
+
+    if (impl->fwd_) {
+
+        /* Added for completeness, although really not a valid case:
+           aug_processchan() should not be called on old channel object. */
+
+        return aug_processchan(impl->fwd_, handler, fork);
+    }
 
     /* Was connection established on construction? */
 
@@ -202,12 +246,15 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, impl->sd_, events))
+    if (error_(handler, &impl->chan_, impl->sd_, events))
         return NULL;
 
     if ((AUG_MDEVENTCONN & events)) {
 
         struct aug_endpoint ep;
+
+        AUG_CTXDEBUG3(aug_tlx, "connection events: events=[%u]",
+                      (unsigned)events);
 
         /* De-register existing descriptor from multiplexer, and attempt to
            establish connection. */
@@ -215,7 +262,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         if (AUG_ISFAIL(aug_setmdeventmask(impl->muxer_, impl->sd_, 0))
             || AUG_BADSD == (impl->sd_ = aug_tryconnect(impl->conn_, &ep,
                                                         &impl->est_))) {
-            aug_safeerror(ob, handler, impl->id_, aug_tlerr);
+            aug_clearerror(handler, &impl->chan_, aug_tlerr);
             return NULL;
         }
 
@@ -246,7 +293,12 @@ cchan_setmask_(aug_chan* ob, unsigned short mask)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
 
+    if (impl->fwd_)
+        return aug_setchanmask(impl->fwd_, mask);
+
     /* Mask will be set once the connection is established. */
+
+    AUG_CTXDEBUG3(aug_tlx, "set client mask: mask=[%u]", (unsigned)mask);
 
     impl->mask_ = mask;
     return AUG_SUCCESS;
@@ -256,6 +308,10 @@ static unsigned short
 cchan_getmask_(aug_chan* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+
+    if (impl->fwd_)
+        return aug_getchanmask(impl->fwd_);
+
     return impl->mask_;
 }
 
@@ -263,6 +319,10 @@ static unsigned
 cchan_getid_(aug_chan* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+
+    if (impl->fwd_)
+        return aug_getchanid(impl->fwd_);
+
     return impl->id_;
 }
 
@@ -270,6 +330,10 @@ static char*
 cchan_getname_(aug_chan* ob, char* dst, unsigned size)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+
+    if (impl->fwd_)
+        return aug_getchanname(impl->fwd_, dst, size);
+
     aug_strlcpy(dst, impl->name_, size);
     return dst;
 }
@@ -277,10 +341,14 @@ cchan_getname_(aug_chan* ob, char* dst, unsigned size)
 static aug_bool
 cchan_isready_(aug_chan* ob)
 {
+    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
+
+    if (impl->fwd_)
+        return aug_ischanready(impl->fwd_);
+
     /* The established flag may have been set on construction.  In which case,
        a process call is required to notify of establishment. */
 
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
     return impl->est_ ? AUG_TRUE : AUG_FALSE;
 }
 
@@ -383,7 +451,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, impl->sd_, events))
+    if (error_(handler, &impl->chan_, impl->sd_, events))
         return NULL;
 
     /* Assumption: server sockets do not have exceptional events. */
@@ -393,14 +461,12 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         aug_sd sd;
         struct aug_endpoint ep;
         aug_chan* chan;
-        aug_stream* stream;
         unsigned id;
-        aug_bool ret;
 
         if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
 
             if (!aug_acceptagain(aug_tlerr)) {
-                aug_safeerror(ob, handler, impl->id_, aug_tlerr);
+                aug_clearerror(handler, &impl->chan_, aug_tlerr);
                 return NULL;
             }
 
@@ -438,18 +504,9 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             goto done;
         }
 
-        /* Transfer event mask to established channel. */
-
-        aug_setchanmask(chan, impl->mask_);
-
-        stream = aug_cast(chan, aug_streamid);
-
         /* Notification of connection establishment. */
 
-        ret = aug_safeestab(ob, handler, id, stream, impl->id_);
-        aug_release(stream);
-
-        if (!ret) {
+        if (!aug_clearestab(handler, &impl->chan_, impl->id_)) {
 
             /* Rejected: socket will be closed on release. */
 
@@ -474,6 +531,8 @@ schan_setmask_(aug_chan* ob, unsigned short mask)
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
 
     /* Mask will be set for each subsequently accepted connection. */
+
+    AUG_CTXDEBUG3(aug_tlx, "set server mask: mask=[%u]", (unsigned)mask);
 
     impl->mask_ = mask;
     return AUG_SUCCESS;
@@ -610,11 +669,10 @@ pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, impl->sticky_.md_, events))
+    if (error_(handler, &impl->chan_, impl->sticky_.md_, events))
         return NULL;
 
-    if (events && !aug_safeready(ob, handler, impl->id_, &impl->stream_,
-                                 events))
+    if (events && !aug_clearready(handler, &impl->chan_, events))
         return NULL;
 
     pretain_(impl);
@@ -625,6 +683,7 @@ static aug_result
 pchan_setmask_(aug_chan* ob, unsigned short mask)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
+    AUG_CTXDEBUG3(aug_tlx, "set plain mask: mask=[%u]", (unsigned)mask);
     return aug_setsticky(&impl->sticky_, mask);
 }
 
@@ -796,6 +855,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
     impl->sslctx_ = sslctx;
     impl->conn_ = conn;
     impl->est_ = est;
+    impl->fwd_ = NULL;
 
     aug_retain(mpool);
     return &impl->chan_;

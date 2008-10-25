@@ -1,6 +1,5 @@
 <package name="aug" dir="augext">
 
-  <quotincl>augext/stream.h</quotincl>
   <quotincl>augtypes.h</quotincl>
 
   <verbatim>struct aug_errinfo;</verbatim>
@@ -16,19 +15,17 @@
     </method>
 
     <method name="error" type="void" qname="errorchan">
-      <param name="id" type="unsigned"/>
+      <param name="chan" type="aug_chan" object="true"/>
       <param name="errinfo" type="const struct aug_errinfo&" />
     </method>
 
     <method name="estab" type="aug_bool" qname="estabchan">
-      <param name="id" type="unsigned"/>
-      <param name="stream" type="aug_stream" object="true"/>
+      <param name="chan" type="aug_chan" object="true"/>
       <param name="parent" type="unsigned"/>
     </method>
 
     <method name="ready" type="aug_bool" qname="readychan">
-      <param name="id" type="unsigned"/>
-      <param name="stream" type="aug_stream" object="true"/>
+      <param name="chan" type="aug_chan" object="true"/>
       <param name="events" type="unsigned short"/>
     </method>
 

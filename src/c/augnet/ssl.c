@@ -9,7 +9,7 @@ AUG_RCSID("$Id$");
 
 #if ENABLE_SSL
 
-# include "augsys/chan.h"   /* aug_safeready() */
+# include "augsys/chan.h"   /* aug_clearready() */
 
 # include "augsys/socket.h" /* aug_shutdown() */
 # include "augsys/uio.h"
@@ -73,8 +73,8 @@ struct impl_ {
 };
 
 static aug_bool
-error_(aug_chan* chan, aug_chandler* handler, unsigned id,
-       unsigned short events, aug_sd sd)
+error_(aug_chandler* handler, aug_chan* chan, aug_sd sd,
+       unsigned short events)
 {
     /* Exceptions may include non-error exceptions, such as high priority
        data. */
@@ -90,7 +90,7 @@ error_(aug_chan* chan, aug_chandler* handler, unsigned id,
 
             /* Error occurred. */
 
-            aug_safeerror(chan, handler, id, &errinfo);
+            aug_clearerror(handler, chan, &errinfo);
             return AUG_TRUE;
         }
     }
@@ -494,7 +494,7 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* Close socket on error. */
 
-    if (error_(ob, handler, impl->id_, events, impl->sd_))
+    if (error_(handler, &impl->chan_, impl->sd_, events))
         return NULL;
 
     /* TODO: how should any remaining exceptional events be handled? */
@@ -549,7 +549,7 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     if (events) {
 
-        if (!aug_safeready(ob, handler, impl->id_, &impl->stream_, events)) {
+        if (!aug_clearready(handler, &impl->chan_, events)) {
 
             /* No need to update events if file is being removed - indicated
                by false return. */

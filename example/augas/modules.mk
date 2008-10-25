@@ -17,18 +17,18 @@ CXXMODULES = \
 	modserver
 
 modclient_OBJS = client.o
-modclient_LIBS = augutil augsys
+modclient_LIBS = augutil augsys augctx
 
 modcommand_OBJS = command.o
-modcommand_LIBS = augutil augsys
+modcommand_LIBS = augutil augsys augctx
 
 modhttp_OBJS = http.o
-modhttp_LIBS = augnet augutil augmar augsys
+modhttp_LIBS = augnet augutil augmar augsys augctx
 
 modminimal_OBJS = minimal.o
 
 modsched_OBJS = sched.o
-modsched_LIBS = augnet augutil augsys
+modsched_LIBS = augnet augutil augsys augctx
 
 modserver_OBJS = server.o
 

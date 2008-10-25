@@ -96,22 +96,25 @@ namespace {
             aug_ctxinfo(aug_tlx, "clear connection");
         }
         void
-        errorchan_(unsigned id, const aug_errinfo& errinfo) AUG_NOTHROW
+        errorchan_(chanref chan, const aug_errinfo& errinfo) AUG_NOTHROW
         {
             // FIXME: implement.
         }
         aug_bool
-        estabchan_(unsigned id, obref<aug_stream> stream,
-                   unsigned parent) AUG_NOTHROW
+        estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
         {
+            const unsigned id(getchanid(chan));
+
             aug_ctxinfo(aug_tlx, "id: %u", id);
             aug_ctxinfo(aug_tlx, "new connection");
             return AUG_TRUE;
         }
         aug_bool
-        readychan_(unsigned id, obref<aug_stream> stream,
-                   unsigned short events) AUG_NOTHROW
+        readychan_(chanref chan, unsigned short events) AUG_NOTHROW
         {
+            const unsigned id(getchanid(chan));
+            streamptr stream(object_cast<aug_stream>(chan));
+
             aug_ctxinfo(aug_tlx, "id: %u", id);
             if (events & AUG_MDEVENTRD) {
                 char buf[1024];

@@ -45,3 +45,5 @@ Migrate event queue to list-based channel.
 Replace enums with ints.
 
 Review FIXMEs.
+
+Optimize findchans() calls in augas engine.

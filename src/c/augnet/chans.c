@@ -183,6 +183,33 @@ aug_removechan(aug_chans_t chans, unsigned id)
     return AUG_SUCCESS;
 }
 
+AUGNET_API aug_chan*
+aug_findchan(aug_chans_t chans, unsigned id)
+{
+    /* Locate the matching entry. */
+
+    struct entry_* it;
+    AUG_FOREACH(it, &chans->head_) {
+
+        if (!it->ob_) {
+
+            /* Already marked for removal. */
+
+            AUG_CTXDEBUG3(aug_tlx, "ignoring trashed entry");
+            continue;
+        }
+
+        if (aug_getchanid(it->ob_) == id) {
+            aug_retain(it->ob_);
+            return it->ob_;
+        }
+    }
+
+    /* Not found. */
+
+    return NULL;
+}
+
 AUGNET_API void
 aug_processchans(aug_chans_t chans)
 {
@@ -219,9 +246,11 @@ aug_processchans(aug_chans_t chans)
                       aug_getchanid(ob));
 
         /* Note: the current entry may be marked for removal during this
-           call. */
+           call.  Lock during call. */
 
+        aug_retain(it->ob_);
         ob = aug_processchan(ob, chans->handler_, &fork);
+        aug_release(it->ob_);
 
         if (fork) {
 
