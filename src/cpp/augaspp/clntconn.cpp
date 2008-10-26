@@ -53,10 +53,10 @@ clntconn::do_connected(const string& name, const timeval& now)
     impl_.connected(name, now);
 }
 
-bool
+void
 clntconn::do_process(chanref chan, unsigned short events, const timeval& now)
 {
-    return impl_.process(chan, events, now);
+    impl_.process(chan, events, now);
 }
 
 void

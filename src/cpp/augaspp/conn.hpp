@@ -36,12 +36,9 @@ namespace aug {
 
         /**
          * Process events.
-         *
-         * @return Whether the connection state changed as a result of
-         * processing.
          */
 
-        virtual bool
+        virtual void
         do_process(chanref chan, unsigned short events,
                    const timeval& now) = 0;
 
@@ -84,10 +81,10 @@ namespace aug {
         {
             do_connected(name, now);
         }
-        bool
+        void
         process(chanref chan, unsigned short events, const timeval& now)
         {
-            return do_process(chan, events, now);
+            do_process(chan, events, now);
         }
         void
         shutdown(chanref chan, unsigned flags, const timeval& now)
@@ -170,7 +167,7 @@ namespace aug {
         void
         connected(const std::string& name, const timeval& now);
 
-        bool
+        void
         process(chanref chan, unsigned short events, const timeval& now);
 
         void

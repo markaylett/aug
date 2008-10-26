@@ -280,23 +280,13 @@ namespace aug {
                               "processing sock: id=[%u], events=[%u]",
                               id, (unsigned)events);
 
-                bool changed = false, threw = true;
+                bool threw = true;
                 try {
-                    changed = conn->process(chan, events, now_);
+                    conn->process(chan, events, now_);
                     threw = false;
-                } catch (const block_exception&) {
-
-                    AUG_CTXDEBUG2(aug_tlx, "operation would block: id=[%u]",
-                                  id);
-
-                    // FIXME: shutdown may have removed socket.
-
-                    return socks_.exists(id)
-                        ? AUG_TRUE : AUG_FALSE; // EWOULDBLOCK.
-
                 } AUG_PERRINFOCATCH;
 
-                // If an exception was thrown, "ok" will still have its
+                // If an exception was thrown, "threw" will still have its
                 // original value of false.
 
                 if (threw) {
@@ -307,12 +297,7 @@ namespace aug {
                     return AUG_FALSE;
                 }
 
-                if (changed && CLOSED == conn->state())
-                    return AUG_FALSE;
-
-                // FIXME: shutdown may have removed socket.
-
-                return socks_.exists(id) ? AUG_TRUE : AUG_FALSE;
+                return CLOSED != conn->state();
             }
             void
             teardown()
@@ -597,8 +582,12 @@ engine::shutdown(mod_id cid, unsigned flags)
 
         if (flags & MOD_SHUTNOW)
             impl_->socks_.erase(*sock);
-    } else
+    } else {
+
+        // Listener.
+
         impl_->socks_.erase(*sock);
+    }
 }
 
 AUGASPP_API mod_id

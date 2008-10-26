@@ -40,7 +40,7 @@ namespace aug {
         void
         do_connected(const std::string& name, const timeval& now);
 
-        bool
+        void
         do_process(chanref chan, unsigned short events, const timeval& now);
 
         void

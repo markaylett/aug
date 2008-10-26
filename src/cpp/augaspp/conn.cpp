@@ -170,14 +170,10 @@ connimpl::connected(const string& name, const timeval& now)
     session_->connected(sock_, name.c_str());
 }
 
-bool
+void
 connimpl::process(chanref chan, unsigned short events, const timeval& now)
 {
     streamptr stream(object_cast<aug_stream>(chan));
-
-    // FIXME: handle exceptional events?
-
-    bool block(false);
 
     if (events & AUG_MDEVENTRD) {
 
@@ -193,7 +189,7 @@ connimpl::process(chanref chan, unsigned short events, const timeval& now)
                 AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%u]",
                               sock_.id_);
                 state_ = CLOSED;
-                return true;
+                return;
             }
 
             // Data has been read: reset read timer.
@@ -205,8 +201,6 @@ connimpl::process(chanref chan, unsigned short events, const timeval& now)
             session_->data(sock_, buf, size);
 
         } catch (const block_exception&) {
-            // FIXME: temporary measure to ensure write events are serviced.
-            block = true;
         }
     }
 
@@ -256,29 +250,34 @@ connimpl::process(chanref chan, unsigned short events, const timeval& now)
         if (!buffer_.empty())
             checkmaxwait(buffer_.size(), since_, now);
     }
-
-    // FIXME: see above.
-
-    if (block)
-        throw block_exception();
-
-    return false;
 }
 
 void
 connimpl::shutdown(chanref chan, unsigned flags, const timeval& now)
 {
-    if (state_ < SHUTDOWN) {
+    if (SHUTDOWN <= state_)
+        return; // Already shutdown.
+
+    aug_ctxinfo(aug_tlx,
+                "shutting connection: id=[%u], flags=[%u]",
+                sock_.id_, flags);
+
+    streamptr stream(object_cast<aug_stream>(chan));
+
+    if (flags & MOD_SHUTNOW || null == stream) {
+
+        // Immediate closure or not a stream.
+
+        state_ = CLOSED;
+
+        closechan(chan);
+
+    } else {
+
         state_ = SHUTDOWN;
-        if (buffer_.empty() || flags & MOD_SHUTNOW) {
-            aug_ctxinfo(aug_tlx,
-                        "shutting connection: id=[%u], flags=[%u]",
-                        sock_.id_, flags);
-            streamptr stream(object_cast<aug_stream>(chan));
-            // FIXME: should be avoided if state_ set correctly.
-			if (null != stream)
-				aug::shutdown(stream);
-        }
+
+        if (buffer_.empty())
+            aug::shutdown(stream);
     }
 }
 
