@@ -47,27 +47,29 @@ socks::insert(const sockptr& sock)
 }
 
 void
-socks::teardown(const timeval& now)
+socks::teardown(chans& chans, const timeval& now)
 {
     // Ids are stored in reverse order using the greater<> predicate.
 
-    container::iterator it(socks_.begin()), end(socks_.end());
-    while (it != end) {
+    container::const_iterator it(socks_.begin()), end(socks_.end());
+    for (; it != end; ++it) {
 
         AUG_CTXDEBUG2(aug_tlx, "teardown: id=[%u]", it->first);
 
-        connptr cptr(smartptr_cast<conn_base>(it->second));
-        if (null != cptr) {
-            ++it;
-            try {
+        try {
+            connptr cptr(smartptr_cast<conn_base>(it->second));
+            if (null == cptr) {
+
+                // Not a stream.
+
+                chanptr chan(findchan(chans, it->first));
+                closechan(chan);
+
+            } else {
                 cptr->teardown(now);
-            } AUG_PERRINFOCATCH;
-            continue;
-        }
+            }
 
-        // Erase listener.
-
-        socks_.erase(it++);
+        } AUG_PERRINFOCATCH;
     }
 }
 

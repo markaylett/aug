@@ -12,6 +12,8 @@ struct timeval;
 
 namespace aug {
 
+    class chans;
+
     class socks {
 
         typedef std::map<mod_id, sockptr, std::greater<mod_id> > container;
@@ -43,7 +45,7 @@ namespace aug {
         insert(const sockptr& sock);
 
         void
-        teardown(const timeval& tv);
+        teardown(chans& chans, const timeval& tv);
 
         bool
         empty() const;

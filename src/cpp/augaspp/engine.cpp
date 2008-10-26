@@ -118,14 +118,14 @@ namespace aug {
 
         typedef map<mod_id, sessiontimer> sessiontimers;
 
-        class scoped_assign {
+        class scoped_current {
             chanptr& lhs_;
         public:
-            ~scoped_assign()
+            ~scoped_current()
             {
                 lhs_ = null; // Release.
             }
-            scoped_assign(chanptr& lhs, chanref rhs)
+            scoped_current(chanptr& lhs, chanref rhs)
                 : lhs_(lhs)
             {
                 lhs = object_retain(rhs);
@@ -145,7 +145,7 @@ namespace aug {
 
             // Current channel.
 
-            chanptr chan_;
+            chanptr current_;
 
             // Grace period on shutdown.
 
@@ -171,7 +171,7 @@ namespace aug {
                   cb_(cb),
                   muxer_(getmpool(aug_tlx)),
                   chans_(null),
-                  chan_(null),
+                  current_(null),
                   grace_(timers_),
                   state_(STARTED)
             {
@@ -209,6 +209,8 @@ namespace aug {
             void
             errorchan_(chanref chan, const aug_errinfo& errinfo) AUG_NOTHROW
             {
+                scoped_current current(current_, chan);
+
                 const unsigned id(getchanid(chan));
                 AUG_CTXDEBUG2(aug_tlx, "error channel: id=[%u]", id);
                 // FIXME: implement.
@@ -216,10 +218,10 @@ namespace aug {
             aug_bool
             estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
             {
+                scoped_current current(current_, chan);
+
                 const unsigned id(getchanid(chan));
                 AUG_CTXDEBUG2(aug_tlx, "established channel: id=[%u]", id);
-
-                scoped_assign scoped(chan_, chan);
 
                 if (id == parent) {
 
@@ -268,6 +270,8 @@ namespace aug {
             aug_bool
             readychan_(chanref chan, unsigned short events) AUG_NOTHROW
             {
+                scoped_current current(current_, chan);
+
                 const unsigned id(getchanid(chan));
                 AUG_CTXDEBUG2(aug_tlx, "readychannel: id=[%u]", id);
 
@@ -299,13 +303,23 @@ namespace aug {
 
                 return CLOSED != conn->state();
             }
+            chanptr
+            findchan(unsigned id)
+            {
+                // Avoid lookup if current channel.
+
+                if (null != current_ && id == getchanid(current_))
+                    return current_;
+
+                return aug::findchan(chans_, id);
+            }
             void
             teardown()
             {
                 if (STARTED == state_) {
 
                     state_ = TEARDOWN;
-                    socks_.teardown(now_);
+                    socks_.teardown(chans_, now_);
 
                     // Allow grace period before forcefully stopping the
                     // application.
@@ -518,7 +532,7 @@ engine::run(bool stoponerr)
         // When running in foreground, stop on error.
 
         if (stoponerr)
-            impl_->socks_.teardown(impl_->now_);
+            impl_->socks_.teardown(impl_->chans_, impl_->now_);
     }
 }
 
@@ -573,7 +587,7 @@ engine::shutdown(mod_id cid, unsigned flags)
 {
     sockptr sock(impl_->socks_.get(cid));
     connptr conn(smartptr_cast<conn_base>(sock));
-    chanptr chan(findchan(impl_->chans_, cid));
+    chanptr chan(impl_->findchan(cid));
 
     if (null != conn) {
         conn->shutdown(chan, flags, impl_->now_);
@@ -653,7 +667,7 @@ engine::send(mod_id cid, const void* buf, size_t len)
 {
     sockptr sock(impl_->socks_.get(cid));
     connptr conn(smartptr_cast<conn_base>(sock));
-    chanptr chan(findchan(impl_->chans_, cid));
+    chanptr chan(impl_->findchan(cid));
 
     if (null == conn || !sendable(*conn))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
@@ -667,7 +681,7 @@ engine::sendv(mod_id cid, blobref blob)
 {
     sockptr sock(impl_->socks_.get(cid));
     connptr conn(smartptr_cast<conn_base>(sock));
-    chanptr chan(findchan(impl_->chans_, cid));
+    chanptr chan(impl_->findchan(cid));
 
     if (null == conn || !sendable(*conn))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
