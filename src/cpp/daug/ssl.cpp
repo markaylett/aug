@@ -126,9 +126,6 @@ namespace {
         if (!preverify_ok) {
             aug_ctxwarn(aug_tlx, "verification failed: %s",
                         X509_verify_cert_error_string(x509_ctx->error));
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EAUTH,
-                           "verification failed: %s",
-                           X509_verify_cert_error_string(x509_ctx->error));
             return 0;
         }
 
@@ -142,7 +139,12 @@ namespace {
         aug_ssldata* data(static_cast<aug_ssldata*>(SSL_get_app_data(ssl)));
         assert(data);
 
-        return authchan(data->handler_, data->id_, subject, issuer) ? 1 : 0;
+        if (!authchan(data->handler_, data->id_, subject, issuer)) {
+            aug_ctxwarn(aug_tlx, "verification failed: rejected by session");
+            return 0;
+        }
+
+        return 1;
     }
 
     int

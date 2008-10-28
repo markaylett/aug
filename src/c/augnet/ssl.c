@@ -69,6 +69,7 @@ struct impl_ {
     SSL* ssl_;
     struct buf_ inbuf_, outbuf_;
     enum sslstate_ state_;
+    struct aug_errinfo errinfo_;
     int shutdown_;
 };
 
@@ -198,7 +199,7 @@ writebufv_(struct buf_* x, const struct iovec* iov, int size)
 }
 
 static aug_result
-shutwr_(struct impl_* impl)
+shutwr_(struct impl_* impl, struct aug_errinfo* errinfo)
 {
     int ret;
 
@@ -207,7 +208,7 @@ shutwr_(struct impl_* impl)
     aug_sshutdown(impl->sd_, SHUT_WR);
 
     if (ret < 0) {
-        aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
+        aug_setsslerrinfo(errinfo, __FILE__, __LINE__, ERR_get_error());
         return AUG_FAILERROR;
     }
     return AUG_SUCCESS;
@@ -367,7 +368,11 @@ readwrite_(struct impl_* impl, int rw)
             impl->state_ = RDWANTWR;
             goto done;
         default:
-            aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
+
+            /* Save error locally. */
+
+            aug_setsslerrinfo(&impl->errinfo_, __FILE__, __LINE__,
+                              ERR_get_error());
             impl->state_ = SSLERR;
             goto done;
         }
@@ -394,7 +399,11 @@ readwrite_(struct impl_* impl, int rw)
             impl->state_ = WRWANTRD;
             break;
         default:
-            aug_setsslerrinfo(aug_tlerr, __FILE__, __LINE__, ERR_get_error());
+
+            /* Save error locally. */
+
+            aug_setsslerrinfo(&impl->errinfo_, __FILE__, __LINE__,
+                              ERR_get_error());
             impl->state_ = SSLERR;
             break;
         }
@@ -403,8 +412,12 @@ readwrite_(struct impl_* impl, int rw)
            shutdown. */
 
         if (impl->shutdown_ && bufempty_(&impl->outbuf_)
-            && AUG_ISFAIL(shutwr_(impl)))
+            && AUG_ISFAIL(shutwr_(impl, &impl->errinfo_))) {
+
+            /* Save error locally. */
+
             impl->state_ = SSLERR;
+        }
     }
  done:
     return;
@@ -669,7 +682,7 @@ sshutdown_(aug_stream* ob)
     /* If the output buffer is not empty, the shutdown call will be delayed
        until the remaining data has been written. */
 
-    return bufempty_(&impl->outbuf_) ? shutwr_(impl) : AUG_SUCCESS;
+    return bufempty_(&impl->outbuf_) ? shutwr_(impl, aug_tlerr) : AUG_SUCCESS;
 }
 
 static aug_rsize
@@ -678,8 +691,15 @@ sread_(aug_stream* ob, void* buf, size_t size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     ssize_t ret;
 
-    if (SSLERR == impl->state_)
+    if (SSLERR == impl->state_) {
+
+        /* Restore saved error. */
+
+        aug_seterrinfo(aug_tlerr, impl->errinfo_.file_, impl->errinfo_.line_,
+                       impl->errinfo_.src_, impl->errinfo_.num_,
+                       impl->errinfo_.desc_);
         return AUG_FAILERROR;
+    }
 
     /* Only return end once all data has been read from buffer. */
 
@@ -706,8 +726,15 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     ssize_t ret;
 
-    if (SSLERR == impl->state_)
+    if (SSLERR == impl->state_) {
+
+        /* Restore saved error. */
+
+        aug_seterrinfo(aug_tlerr, impl->errinfo_.file_, impl->errinfo_.line_,
+                       impl->errinfo_.src_, impl->errinfo_.num_,
+                       impl->errinfo_.desc_);
         return AUG_FAILERROR;
+    }
 
     /* Only return end once all data has been read from buffer. */
 
