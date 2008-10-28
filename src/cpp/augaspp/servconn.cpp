@@ -29,6 +29,18 @@ servconn::do_session() const
 }
 
 void
+servconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
+{
+    impl_.shutdown(chan, flags, now);
+}
+
+sockstate
+servconn::do_state() const
+{
+    return impl_.state();
+}
+
+void
 servconn::do_send(chanref chan, const void* buf, size_t len,
                   const timeval& now)
 {
@@ -60,12 +72,6 @@ servconn::do_process(chanref chan, unsigned short events, const timeval& now)
 }
 
 void
-servconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
-{
-    impl_.shutdown(chan, flags, now);
-}
-
-void
 servconn::do_teardown(const timeval& now)
 {
     impl_.teardown(now);
@@ -81,12 +87,6 @@ string
 servconn::do_peername(chanref chan) const
 {
     return impl_.peername(chan);
-}
-
-sockstate
-servconn::do_state() const
-{
-    return impl_.state();
 }
 
 void

@@ -16,7 +16,7 @@ namespace aug {
         buffer buffer_;
         rwtimer rwtimer_;
 
-        // conn_base.
+        // object_base.
 
         mod_handle&
         do_get();
@@ -26,6 +26,16 @@ namespace aug {
 
         const sessionptr&
         do_session() const;
+
+        // sock_base.
+
+        void
+        do_shutdown(chanref chan, unsigned flags, const timeval& now);
+
+        sockstate
+        do_state() const;
+
+        // conn_base.
 
         void
         do_send(chanref chan, const void* buf, size_t size,
@@ -44,9 +54,6 @@ namespace aug {
         do_process(chanref chan, unsigned short events, const timeval& now);
 
         void
-        do_shutdown(chanref chan, unsigned flags, const timeval& now);
-
-        void
         do_teardown(const timeval& now);
 
         bool
@@ -54,9 +61,6 @@ namespace aug {
 
         std::string
         do_peername(chanref chan) const;
-
-        sockstate
-        do_state() const;
 
         // rwtimer_base.
 

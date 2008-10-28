@@ -62,7 +62,7 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
 #if ENABLE_SSL
         impl->sslctx_ ?
         aug_createsslclient(impl->mpool_, impl->id_, impl->muxer_, sd,
-                            impl->mask_, impl->sslctx_) :
+                            impl->mask_, handler, impl->sslctx_) :
 #endif /* ENABLE_SSL */
         aug_createplain(impl->mpool_, impl->id_, impl->muxer_, sd,
                         impl->mask_);
@@ -232,6 +232,11 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         return aug_processchan(impl->fwd_, handler, fork);
     }
 
+    /* Channel closed. */
+
+    if (AUG_BADSD == impl->sd_)
+        return NULL;
+
     /* Was connection established on construction? */
 
     if (impl->est_) {
@@ -346,6 +351,11 @@ cchan_isready_(aug_chan* ob)
     if (impl->fwd_)
         return aug_ischanready(impl->fwd_);
 
+    /* True if closed. */
+
+    if (AUG_BADSD == impl->sd_)
+        return AUG_TRUE;
+
     /* The established flag may have been set on construction.  In which case,
        a process call is required to notify of establishment. */
 
@@ -447,7 +457,14 @@ static aug_chan*
 schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
-    unsigned short events = aug_getmdevents(impl->muxer_, impl->sd_);
+    unsigned short events;
+
+    /* Channel closed. */
+
+    if (AUG_BADSD == impl->sd_)
+        return NULL;
+
+    events = aug_getmdevents(impl->muxer_, impl->sd_);
 
     /* Close socket on error. */
 
@@ -493,7 +510,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 #if ENABLE_SSL
             impl->sslctx_ ?
             aug_createsslserver(impl->mpool_, id, impl->muxer_, sd,
-                                impl->mask_, impl->sslctx_) :
+                                impl->mask_, handler, impl->sslctx_) :
 #endif /* ENABLE_SSL */
             aug_createplain(impl->mpool_, id, impl->muxer_, sd, impl->mask_);
 
@@ -567,7 +584,11 @@ schan_getname_(aug_chan* ob, char* dst, unsigned size)
 static aug_bool
 schan_isready_(aug_chan* ob)
 {
-    return AUG_FALSE;
+    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
+
+    /* True if closed. */
+
+    return AUG_BADSD == impl->sd_;
 }
 
 static const struct aug_chanvtbl schanvtbl_ = {
@@ -596,6 +617,9 @@ static aug_result
 pclose_(struct pimpl_* impl)
 {
     aug_sd sd = impl->sticky_.md_;
+
+    /* Descriptor will be reset to AUG_BADMD. */
+
     aug_termsticky(&impl->sticky_);
     return aug_sclose(sd);
 }
@@ -665,7 +689,14 @@ static aug_chan*
 pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
-    unsigned short events = aug_getsticky(&impl->sticky_);
+    unsigned short events;
+
+    /* Channel closed. */
+
+    if (AUG_BADMD == impl->sticky_.md_)
+        return NULL;
+
+    events = aug_getsticky(&impl->sticky_);
 
     /* Close socket on error. */
 
@@ -718,6 +749,12 @@ static aug_bool
 pchan_isready_(aug_chan* ob)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
+
+    /* True if closed. */
+
+    if (AUG_BADMD == impl->sticky_.md_)
+        return AUG_TRUE;
+
     return impl->sticky_.events_ ? AUG_TRUE : AUG_FALSE;
 }
 

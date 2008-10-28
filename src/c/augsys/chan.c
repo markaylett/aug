@@ -114,6 +114,11 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
 
+    /* Channel closed. */
+
+    if (AUG_BADFD == impl->fd_)
+        return NULL;
+
     if (!impl->init_) {
 
         /* Events will be zero on initial call.  This is used to signify
@@ -189,6 +194,12 @@ chan_isready_(aug_chan* ob)
        finalised in process() function. */
 
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
+
+    /* True if closed. */
+
+    if (AUG_BADFD == impl->fd_)
+        return AUG_TRUE;
+
     return !impl->init_;
 }
 

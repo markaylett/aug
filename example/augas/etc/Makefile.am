@@ -1,5 +1,6 @@
 EXTRA_DIST = \
 	cacert.pem \
+	certs.sh \
 	clientcert.pem \
 	clientkey.pem \
 	clientreq.pem \

@@ -258,8 +258,7 @@ connimpl::shutdown(chanref chan, unsigned flags, const timeval& now)
     if (SHUTDOWN <= state_)
         return; // Already shutdown.
 
-    aug_ctxinfo(aug_tlx,
-                "shutting connection: id=[%u], flags=[%u]",
+    aug_ctxinfo(aug_tlx, "shutting connection: id=[%u], flags=[%u]",
                 sock_.id_, flags);
 
     streamptr stream(object_cast<aug_stream>(chan));

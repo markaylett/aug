@@ -14,7 +14,9 @@ namespace aug {
 
         sessionptr session_;
         mod_handle sock_;
-        chanptr chan_;
+        sockstate state_;
+
+        // object_base.
 
         mod_handle&
         do_get();
@@ -25,13 +27,18 @@ namespace aug {
         const sessionptr&
         do_session() const;
 
+        // sock_base.
+
+        void
+        do_shutdown(chanref chan, unsigned flags, const timeval& now);
+
         sockstate
         do_state() const;
 
     public:
         ~listener() AUG_NOTHROW;
 
-        listener(const sessionptr& session, void* user, const chanptr& chan);
+        listener(const sessionptr& session, void* user, unsigned id);
     };
 
     typedef smartptr<listener> listenerptr;

@@ -197,6 +197,23 @@ namespace aug {
             release_() AUG_NOTHROW
             {
             }
+            aug_bool
+            authchan_(unsigned id, const char* subject,
+                      const char* issuer) AUG_NOTHROW
+            {
+                chanptr chan(aug::findchan(chans_, id));
+                assert(null != chan);
+                scoped_current current(current_, chan);
+
+                sockptr sock(socks_.get(id));
+                assert(null != sock);
+                connptr conn(smartptr_cast<conn_base>(sock)); // Downcast.
+                assert(null != conn);
+
+                AUG_CTXDEBUG2(aug_tlx, "auth channel: id=[%u], subject=[%s],"
+                              " issuer=[%s]", id, subject, issuer);
+                return conn->authcert(subject, issuer) ? AUG_TRUE : AUG_FALSE;
+            }
             void
             clearchan_(unsigned id) AUG_NOTHROW
             {
@@ -585,23 +602,10 @@ engine::dispatch(const char* sname, const char* to, const char* type,
 AUGASPP_API void
 engine::shutdown(mod_id cid, unsigned flags)
 {
-    sockptr sock(impl_->socks_.get(cid));
-    connptr conn(smartptr_cast<conn_base>(sock));
     chanptr chan(impl_->findchan(cid));
+    sockptr sock(impl_->socks_.get(cid));
 
-    if (null != conn) {
-        conn->shutdown(chan, flags, impl_->now_);
-
-        // Forced shutdown: may be used on misbehaving clients.
-
-        if (flags & MOD_SHUTNOW)
-            impl_->socks_.erase(*sock);
-    } else {
-
-        // Listener.
-
-        impl_->socks_.erase(*sock);
-    }
+    sock->shutdown(chan, flags, impl_->now_);
 }
 
 AUGASPP_API mod_id
@@ -655,7 +659,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     // Prepare state.
 
     sessionptr session(impl_->sessions_.getbyname(sname));
-    listenerptr conn(new listener(session, user, chan));
+    listenerptr conn(new listener(session, user, getchanid(chan)));
 
     impl_->socks_.insert(conn);
     insertchan(impl_->chans_, chan);
@@ -665,9 +669,9 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
 AUGASPP_API void
 engine::send(mod_id cid, const void* buf, size_t len)
 {
+    chanptr chan(impl_->findchan(cid));
     sockptr sock(impl_->socks_.get(cid));
     connptr conn(smartptr_cast<conn_base>(sock));
-    chanptr chan(impl_->findchan(cid));
 
     if (null == conn || !sendable(*conn))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
@@ -679,9 +683,9 @@ engine::send(mod_id cid, const void* buf, size_t len)
 AUGASPP_API void
 engine::sendv(mod_id cid, blobref blob)
 {
+    chanptr chan(impl_->findchan(cid));
     sockptr sock(impl_->socks_.get(cid));
     connptr conn(smartptr_cast<conn_base>(sock));
-    chanptr chan(impl_->findchan(cid));
 
     if (null == conn || !sendable(*conn))
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,

@@ -41,6 +41,12 @@ namespace {
             : wrchan_(null)
         {
         }
+        aug_bool
+        authchan_(unsigned id, const char* subject,
+                  const char* issuer) AUG_NOTHROW
+        {
+            return AUG_TRUE;
+        }
         void
         clearchan_(unsigned id) AUG_NOTHROW
         {

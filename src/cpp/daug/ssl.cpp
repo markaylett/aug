@@ -126,19 +126,23 @@ namespace {
         if (!preverify_ok) {
             aug_ctxwarn(aug_tlx, "verification failed: %s",
                         X509_verify_cert_error_string(x509_ctx->error));
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EAUTH,
+                           "verification failed: %s",
+                           X509_verify_cert_error_string(x509_ctx->error));
             return 0;
         }
 
         // Allow the associated module an opportunity to reject the
         // certificate: although the certificate has been verified by the CA,
-        // the module should determine whether, or not, it is fit for purpose.
+        // the module should determine whether it is fit for purpose.
 
         SSL* ssl(static_cast<SSL*>
                  (X509_STORE_CTX_get_ex_data
                   (x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx())));
-        conn_base* conn(static_cast<conn_base*>(SSL_get_app_data(ssl)));
+        aug_ssldata* data(static_cast<aug_ssldata*>(SSL_get_app_data(ssl)));
+        assert(data);
 
-        return conn->authcert(subject, issuer) ? 1 : 0;
+        return authchan(data->handler_, data->id_, subject, issuer) ? 1 : 0;
     }
 
     int

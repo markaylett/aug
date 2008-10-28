@@ -10,6 +10,12 @@
 
   <interface name="chandler">
 
+    <method name="auth" type="aug_bool" qname="authchan">
+      <param name="id" type="unsigned"/>
+      <param name="subject" type="const char*"/>
+      <param name="issuer" type="const char*"/>
+    </method>
+
     <method name="clear" type="void" qname="clearchan">
       <param name="id" type="unsigned"/>
     </method>

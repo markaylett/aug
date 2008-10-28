@@ -615,6 +615,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_AB023248AC6744B9B4E3ADCD6CE86F0F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_AB287BF11E5346F7B7A5169A62E5E9C9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2211,6 +2217,26 @@
             "TargetName" = "8:libaugsys.lib"
             "Tag" = "8:"
             "Folder" = "8:_9E7D976658F7456C89D72630A688CC17"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_AB023248AC6744B9B4E3ADCD6CE86F0F"
+            {
+            "SourcePath" = "8:..\\example\\augas\\etc\\certs.sh"
+            "TargetName" = "8:certs.sh"
+            "Tag" = "8:"
+            "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

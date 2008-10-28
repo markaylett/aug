@@ -42,9 +42,6 @@ namespace aug {
         do_process(chanref chan, unsigned short events,
                    const timeval& now) = 0;
 
-        virtual void
-        do_shutdown(chanref chan, unsigned flags, const timeval& now) = 0;
-
         /**
          * Initiate application-level teardown.
          */
@@ -85,11 +82,6 @@ namespace aug {
         process(chanref chan, unsigned short events, const timeval& now)
         {
             do_process(chan, events, now);
-        }
-        void
-        shutdown(chanref chan, unsigned flags, const timeval& now)
-        {
-            do_shutdown(chan, flags, now);
         }
         void
         teardown(const timeval& now)

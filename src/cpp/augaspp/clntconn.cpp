@@ -29,6 +29,18 @@ clntconn::do_session() const
 }
 
 void
+clntconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
+{
+    impl_.shutdown(chan, flags, now);
+}
+
+sockstate
+clntconn::do_state() const
+{
+    return impl_.state();
+}
+
+void
 clntconn::do_send(chanref chan, const void* buf, size_t len,
                   const timeval& now)
 {
@@ -60,12 +72,6 @@ clntconn::do_process(chanref chan, unsigned short events, const timeval& now)
 }
 
 void
-clntconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
-{
-    impl_.shutdown(chan, flags, now);
-}
-
-void
 clntconn::do_teardown(const timeval& now)
 {
     impl_.teardown(now);
@@ -81,12 +87,6 @@ string
 clntconn::do_peername(chanref chan) const
 {
     return impl_.peername(chan);
-}
-
-sockstate
-clntconn::do_state() const
-{
-    return impl_.state();
 }
 
 void

@@ -245,6 +245,13 @@ chandler_release_(aug_chandler* ob)
 {
 }
 
+static aug_bool
+chandler_auth_(aug_chandler* ob, unsigned id, const char* subject,
+               const char* issuer)
+{
+    return AUG_TRUE;
+}
+
 static void
 chandler_clear_(aug_chandler* ob, unsigned id)
 {
@@ -274,6 +281,7 @@ static const struct aug_chandlervtbl chandlervtbl_ = {
     chandler_cast_,
     chandler_retain_,
     chandler_release_,
+    chandler_auth_,
     chandler_clear_,
     chandler_error_,
     chandler_estab_,

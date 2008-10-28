@@ -38,7 +38,7 @@ build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
 subdir = example/augas/etc
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -185,6 +185,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
 	cacert.pem \
+	certs.sh \
 	clientcert.pem \
 	clientkey.pem \
 	clientreq.pem \
