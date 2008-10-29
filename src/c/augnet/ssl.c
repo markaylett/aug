@@ -332,6 +332,7 @@ static void
 readwrite_(struct impl_* impl, int rw)
 {
     ssize_t ret;
+    int err;
 
     if (rw & SSLREAD_) {
 
@@ -339,7 +340,8 @@ readwrite_(struct impl_* impl, int rw)
            perform SSL_do_handshake(). */
 
         ret = sslread_(impl->ssl_, &impl->inbuf_);
-        switch (SSL_get_error(impl->ssl_, ret)) {
+        err = SSL_get_error(impl->ssl_, ret);
+        switch (err) {
         case SSL_ERROR_NONE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: %ld bytes read to input buffer",
                           (long)ret);
@@ -351,14 +353,6 @@ readwrite_(struct impl_* impl, int rw)
             }
             impl->state_ = NORMAL;
             break;
-        case SSL_ERROR_ZERO_RETURN:
-            AUG_CTXDEBUG3(aug_tlx, "SSL: end of data");
-            if (!impl->shutdown_) {
-                AUG_CTXDEBUG3(aug_tlx, "SSL: shutting-down", ret);
-                SSL_shutdown(impl->ssl_);
-            }
-            impl->state_ = RDZERO;
-            goto done;
         case SSL_ERROR_WANT_READ:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants read");
             impl->state_ = RDWANTRD;
@@ -367,7 +361,37 @@ readwrite_(struct impl_* impl, int rw)
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants write");
             impl->state_ = RDWANTWR;
             goto done;
+        case SSL_ERROR_SYSCALL:
+            AUG_CTXDEBUG3(aug_tlx, "SSL: read syscall error", err);
+
+            /* Save error locally. */
+
+#if !defined(_WIN32)
+            aug_setposixerrinfo(&impl->errinfo_, __FILE__, __LINE__, errno);
+#else /* _WIN32 */
+            aug_setwin32errinfo(&impl->errinfo_, __FILE__, __LINE__,
+                                WSAGetLastError());
+#endif /* _WIN32 */
+
+            /* If system call error could not be obtained. */
+
+            if (0 == impl->errinfo_.num_) {
+                aug_seterrinfo(&impl->errinfo_, __FILE__, __LINE__, "aug",
+                               AUG_EIO, "ssl read syscall error");
+            }
+            impl->state_ = SSLERR;
+            goto done;
+        case SSL_ERROR_ZERO_RETURN:
+            AUG_CTXDEBUG3(aug_tlx, "SSL: end of data");
+            if (!impl->shutdown_) {
+                AUG_CTXDEBUG3(aug_tlx, "SSL: shutting-down", ret);
+                SSL_shutdown(impl->ssl_);
+            }
+            impl->state_ = RDZERO;
+            goto done;
         default:
+
+            AUG_CTXDEBUG3(aug_tlx, "SSL: error=[%d]", err);
 
             /* Save error locally. */
 
@@ -384,21 +408,44 @@ readwrite_(struct impl_* impl, int rw)
            will perform SSL_do_handshake(). */
 
         ret = sslwrite_(impl->ssl_, &impl->outbuf_);
-        switch (SSL_get_error(impl->ssl_, ret)) {
+        err = SSL_get_error(impl->ssl_, ret);
+        switch (err) {
         case SSL_ERROR_NONE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes written from output buffer",
                           ret);
             impl->state_ = NORMAL;
             break;
-        case SSL_ERROR_WANT_WRITE:
-            AUG_CTXDEBUG3(aug_tlx, "SSL: write wants write");
-            impl->state_ = WRWANTWR;
-            break;
         case SSL_ERROR_WANT_READ:
             AUG_CTXDEBUG3(aug_tlx, "SSL: write wants read");
             impl->state_ = WRWANTRD;
             break;
+        case SSL_ERROR_WANT_WRITE:
+            AUG_CTXDEBUG3(aug_tlx, "SSL: write wants write");
+            impl->state_ = WRWANTWR;
+            break;
+        case SSL_ERROR_SYSCALL:
+            AUG_CTXDEBUG3(aug_tlx, "SSL: write syscall error", err);
+
+            /* Save error locally. */
+
+#if !defined(_WIN32)
+            aug_setposixerrinfo(&impl->errinfo_, __FILE__, __LINE__, errno);
+#else /* _WIN32 */
+            aug_setwin32errinfo(&impl->errinfo_, __FILE__, __LINE__,
+                                WSAGetLastError());
+#endif /* _WIN32 */
+
+            /* If system call error could not be obtained. */
+
+            if (0 == impl->errinfo_.num_) {
+                aug_seterrinfo(&impl->errinfo_, __FILE__, __LINE__, "aug",
+                               AUG_EIO, "ssl write syscall error");
+            }
+            impl->state_ = SSLERR;
+            goto done;
         default:
+
+            AUG_CTXDEBUG3(aug_tlx, "SSL: error=[%d]", err);
 
             /* Save error locally. */
 
