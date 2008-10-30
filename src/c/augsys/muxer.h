@@ -52,6 +52,16 @@
    exception event.
 
    FIXME: is this safe for non-winsock clients?
+
+   All muxer implementations are assumed to be edge-triggered.
+
+   1     +----+    +----+    +----+
+         |    |    |    |    |    |
+         |    |    |    |    |    |
+   0 ----+    +----+    +----+    +----
+
+   horizontal: level
+   vertical:   edge
 */
 
 #define AUG_MDEVENTRD    0x1

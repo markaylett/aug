@@ -56,6 +56,8 @@ sessions::insert(const string& name, const sessionptr& session,
     sessions_[name] = session;
     if (!session->start()) {
 
+        AUG_CTXDEBUG2(aug_tlx, "session not started: [%s]", name.c_str());
+
         // TODO: leave if event posted.
 
         sessions_.erase(name); // stop() should not be called.

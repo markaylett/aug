@@ -756,8 +756,8 @@ start_(struct mod_session* session)
     session->user_ = local;
 
     if (local->start_) {
-        funcall1_(startid_, rb_str_new2(session->name_));
-        if (except_) {
+        if (Qfalse == funcall1_(startid_, rb_str_new2(session->name_))
+            || except_) {
             destroysession_(local);
             return -1;
         }

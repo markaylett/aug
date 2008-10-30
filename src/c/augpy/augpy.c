@@ -266,6 +266,9 @@ start_(struct mod_session* session)
             printerr_();
             destroyimport_(import);
             return -1;
+        } else if (x == Py_False) {
+            destroyimport_(import);
+            return -1;
         }
         Py_DECREF(x);
     }
