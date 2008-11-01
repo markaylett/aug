@@ -62,7 +62,7 @@ bool
 module::start(mod_session& session) const AUG_NOTHROW
 {
     AUG_CTXDEBUG2(aug_tlx, "start(): sname=[%s]", session.name_);
-    return MOD_OK == module_.start_(&session);
+    return MOD_TRUE == module_.start_(&session);
 }
 
 void
@@ -98,7 +98,7 @@ bool
 module::accepted(mod_handle& sock, const char* name) const AUG_NOTHROW
 {
     AUG_CTXDEBUG2(aug_tlx, "accept(): id=[%u], name=[%s]", sock.id_, name);
-    return MOD_OK == module_.accepted_(&sock, name);
+    return MOD_TRUE == module_.accepted_(&sock, name);
 }
 
 void
@@ -142,5 +142,5 @@ module::authcert(const mod_handle& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW
 {
     AUG_CTXDEBUG2(aug_tlx, "authcert(): id=[%u]", sock.id_);
-    return MOD_OK == module_.authcert_(&sock, subject, issuer);
+    return MOD_TRUE == module_.authcert_(&sock, subject, issuer);
 }

@@ -327,7 +327,7 @@ writelog_(VALUE self, VALUE level, VALUE msg)
 static VALUE
 reconfall_(VALUE self)
 {
-    if (-1 == mod_reconfall())
+    if (mod_reconfall() < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -336,7 +336,7 @@ reconfall_(VALUE self)
 static VALUE
 stopall_(VALUE self)
 {
-    if (-1 == mod_stopall())
+    if (mod_stopall() < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -362,7 +362,7 @@ post_(int argc, VALUE* argv, VALUE self)
     if (blob)
         aug_release(blob);
 
-    if (-1 == ret)
+    if (ret < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -387,7 +387,7 @@ dispatch_(int argc, VALUE* argv, VALUE self)
     if (blob)
         aug_release(blob);
 
-    if (-1 == ret)
+    if (ret < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -425,7 +425,7 @@ shutdown_(VALUE self, VALUE sock, VALUE flags)
 {
     int cid = checkid_(sock);
 
-    if (-1 == mod_shutdown(cid, NUM2UINT(flags)))
+    if (mod_shutdown(cid, NUM2UINT(flags)) < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -454,8 +454,8 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
 
     sock = register_(newhandle_(INT2FIX(0), user));
 
-    if (-1 == (cid = mod_tcpconnect(RSTRING(host)->ptr, RSTRING(serv)->ptr,
-                                    ptr, sock))) {
+    if ((cid = mod_tcpconnect(RSTRING(host)->ptr, RSTRING(serv)->ptr,
+                              ptr, sock)) < 0) {
         unregister_(sock);
         rb_raise(cerror_, mod_error());
     }
@@ -487,8 +487,8 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
 
     sock = register_(newhandle_(INT2FIX(0), user));
 
-    if (-1 == (cid = mod_tcplisten(RSTRING(host)->ptr, RSTRING(serv)->ptr,
-                                   ptr, sock))) {
+    if ((cid = mod_tcplisten(RSTRING(host)->ptr, RSTRING(serv)->ptr,
+                             ptr, sock)) < 0) {
         unregister_(sock);
         rb_raise(cerror_, mod_error());
     }
@@ -507,7 +507,7 @@ send_(VALUE self, VALUE sock, VALUE buf)
     ret = mod_sendv(cid, blob);
     aug_release(blob);
 
-    if (-1 == ret)
+    if (ret < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -518,7 +518,7 @@ setrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 {
     int cid = checkid_(sock);
 
-    if (-1 == mod_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags)))
+    if (mod_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags)) < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -532,9 +532,9 @@ resetrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
     /* Return false if no such timer. */
 
     switch (mod_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags))) {
-    case -1:
+    case MOD_FAILERROR:
         rb_raise(cerror_, mod_error());
-    case MOD_NONE:
+    case MOD_FAILNONE:
         return Qfalse;
     }
 
@@ -549,9 +549,9 @@ cancelrwtimer_(VALUE self, VALUE sock, VALUE flags)
     /* Return false if no such timer. */
 
     switch (mod_cancelrwtimer(cid, NUM2UINT(flags))) {
-    case -1:
+    case MOD_FAILERROR:
         rb_raise(cerror_, mod_error());
-    case MOD_NONE:
+    case MOD_FAILNONE:
         return Qfalse;
     }
 
@@ -576,7 +576,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
     tid = mod_settimer(ui, (aug_object*)blob);
     aug_release(blob);
 
-    if (-1 == tid)
+    if (tid < 0)
         rb_raise(cerror_, mod_error());
 
     rb_iv_set(timer, "@id", INT2FIX(tid));
@@ -591,9 +591,9 @@ resettimer_(VALUE self, VALUE timer, VALUE ms)
     /* Return false if no such timer. */
 
     switch (mod_resettimer(tid, NUM2UINT(ms))) {
-    case -1:
+    case MOD_FAILERROR:
         rb_raise(cerror_, mod_error());
-    case MOD_NONE:
+    case MOD_FAILNONE:
         return Qfalse;
     }
 
@@ -608,9 +608,9 @@ canceltimer_(VALUE self, VALUE timer)
     /* Return false if no such timer. */
 
     switch (mod_canceltimer(tid)) {
-    case -1:
+    case MOD_FAILERROR:
         rb_raise(cerror_, mod_error());
-    case MOD_NONE:
+    case MOD_FAILNONE:
         return Qfalse;
     }
 
@@ -746,12 +746,12 @@ stop_(void)
     destroysession_(session);
 }
 
-static int
+static mod_bool
 start_(struct mod_session* session)
 {
     struct session_* local;
     if (!(local = createsession_(session->name_)))
-        return -1;
+        return MOD_FALSE;
 
     session->user_ = local;
 
@@ -759,12 +759,12 @@ start_(struct mod_session* session)
         if (Qfalse == funcall1_(startid_, rb_str_new2(session->name_))
             || except_) {
             destroysession_(local);
-            return -1;
+            return MOD_FALSE;
         }
     }
 
     local->open_ = 1;
-    return 0;
+    return MOD_TRUE;
 }
 
 static void
@@ -841,7 +841,7 @@ teardown_(const struct mod_handle* sock)
         mod_shutdown(sock->id_, 0);
 }
 
-static int
+static mod_bool
 accepted_(struct mod_handle* sock, const char* name)
 {
     struct session_* session = mod_getsession()->user_;
@@ -859,10 +859,10 @@ accepted_(struct mod_handle* sock, const char* name)
     if (session->accepted_)
         if (Qfalse == funcall2_(acceptedid_, user, rb_str_new2(name))
             || except_)
-            return -1;
+            return MOD_FALSE;
 
     sock->user_ = register_(user);
-    return 0;
+    return MOD_TRUE;
 }
 
 static void
@@ -939,7 +939,7 @@ expire_(const struct mod_handle* timer, unsigned* ms)
     }
 }
 
-static int
+static mod_bool
 authcert_(const struct mod_handle* sock, const char* subject,
           const char* issuer)
 {
@@ -954,9 +954,9 @@ authcert_(const struct mod_handle* sock, const char* subject,
     if (session->authcert_)
         if (Qfalse == funcall3_(authcertid_, user, rb_str_new2(subject),
                                 rb_str_new2(issuer)) || except_)
-            return -1;
+            return MOD_FALSE;
 
-    return 0;
+    return MOD_TRUE;
 }
 
 static const struct mod_module module_ = {

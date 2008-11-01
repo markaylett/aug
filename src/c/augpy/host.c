@@ -37,7 +37,7 @@ reconfall_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, ":reconfall"))
         return NULL;
 
-    if (-1 == mod_reconfall()) {
+    if (mod_reconfall() < 0) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
     }
@@ -51,7 +51,7 @@ stopall_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, ":stopall"))
         return NULL;
 
-    if (-1 == mod_stopall()) {
+    if (mod_stopall() < 0) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
     }
@@ -88,7 +88,7 @@ post_(PyObject* self, PyObject* args)
     if (blob)
         aug_release(blob);
 
-    if (-1 == ret) {
+    if (ret < 0) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
@@ -129,7 +129,7 @@ dispatch_(PyObject* self, PyObject* args)
     if (blob)
         aug_release(blob);
 
-    if (-1 == ret) {
+    if (ret < 0) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
@@ -178,7 +178,7 @@ shutdown_(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "O!I:shutdown", type_, &sock, &flags))
         return NULL;
 
-    if (-1 == mod_shutdown(augpy_getid(sock), flags)) {
+    if (mod_shutdown(augpy_getid(sock), flags) < 0) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
     }
@@ -200,7 +200,7 @@ tcpconnect_(PyObject* self, PyObject* args)
     if (!(sock = augpy_createhandle(type_, 0, user)))
         return NULL;
 
-    if (-1 == (cid = mod_tcpconnect(host, serv, sslctx, sock))) {
+    if ((cid = mod_tcpconnect(host, serv, sslctx, sock)) < 0) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         Py_DECREF(sock);
         return NULL;
@@ -224,7 +224,7 @@ tcplisten_(PyObject* self, PyObject* args)
     if (!(sock = augpy_createhandle(type_, 0, user)))
         return NULL;
 
-    if (-1 == (lid = mod_tcplisten(host, serv, sslctx, sock))) {
+    if ((lid = mod_tcplisten(host, serv, sslctx, sock)) < 0) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         Py_DECREF(sock);
         return NULL;
@@ -260,7 +260,7 @@ send_(PyObject* self, PyObject* args)
     ret = mod_sendv(augpy_getid(sock), blob);
     aug_release(blob);
 
-    if (-1 == ret) {
+    if (ret < 0) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
     }
@@ -278,7 +278,7 @@ setrwtimer_(PyObject* self, PyObject* args)
                           type_, &sock, &ms, &flags))
         return NULL;
 
-    if (-1 == mod_setrwtimer(augpy_getid(sock), ms, flags)) {
+    if (mod_setrwtimer(augpy_getid(sock), ms, flags) < 0) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
     }
@@ -297,10 +297,10 @@ resetrwtimer_(PyObject* self, PyObject* args)
         return NULL;
 
     switch (mod_resetrwtimer(augpy_getid(sock), ms, flags)) {
-    case -1:
+    case MOD_FAILERROR:
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
-    case MOD_NONE:
+    case MOD_FAILNONE:
         return incret_(Py_False);
     }
 
@@ -317,10 +317,10 @@ cancelrwtimer_(PyObject* self, PyObject* args)
         return NULL;
 
     switch (mod_cancelrwtimer(augpy_getid(sock), flags)) {
-    case -1:
+    case MOD_FAILERROR:
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
-    case MOD_NONE:
+    case MOD_FAILNONE:
         return incret_(Py_False);
     }
 
@@ -353,7 +353,7 @@ settimer_(PyObject* self, PyObject* args)
     tid = mod_settimer(ms, (aug_object*)blob);
     aug_release(blob);
 
-    if (-1 == tid) {
+    if (tid < 0) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         Py_DECREF(timer);
         return NULL;
@@ -373,10 +373,10 @@ resettimer_(PyObject* self, PyObject* args)
         return NULL;
 
     switch (mod_resettimer(augpy_getid(timer), ms)) {
-    case -1:
+    case MOD_FAILERROR:
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
-    case MOD_NONE:
+    case MOD_FAILNONE:
         return incret_(Py_False);
     }
 
@@ -392,10 +392,10 @@ canceltimer_(PyObject* self, PyObject* args)
         return NULL;
 
     switch (mod_canceltimer(augpy_getid(timer))) {
-    case -1:
+    case MOD_FAILERROR:
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
-    case MOD_NONE:
+    case MOD_FAILNONE:
         return incret_(Py_False);
     }
 

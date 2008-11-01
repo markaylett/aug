@@ -10,11 +10,11 @@ stop_(void)
     mod_writelog(MOD_LOGINFO, "stop_()");
 }
 
-static int
+static mod_bool
 start_(struct mod_session* session)
 {
     mod_writelog(MOD_LOGINFO, "start_()");
-    return 0;
+    return MOD_TRUE;
 }
 
 static void
@@ -42,11 +42,11 @@ teardown_(const struct mod_handle* sock)
     mod_shutdown(sock->id_, 0);
 }
 
-static int
+static mod_bool
 accepted_(struct mod_handle* sock, const char* name)
 {
     mod_writelog(MOD_LOGINFO, "accepted_()");
-    return 0;
+    return MOD_TRUE;
 }
 
 static void
@@ -80,12 +80,12 @@ expire_(const struct mod_handle* timer, unsigned* ms)
     mod_writelog(MOD_LOGINFO, "expire_()");
 }
 
-static int
+static mod_bool
 authcert_(const struct mod_handle* sock, const char* subject,
           const char* issuer)
 {
     mod_writelog(MOD_LOGINFO, "authcert_()");
-    return 0;
+    return MOD_TRUE;
 }
 
 static const struct mod_module module_ = {

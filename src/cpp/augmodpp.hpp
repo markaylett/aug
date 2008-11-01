@@ -55,28 +55,28 @@ namespace mod {
     inline void
     reconfall()
     {
-        if (MOD_ERROR == mod_reconfall())
+        if (mod_reconfall() < 0)
             throw error(mod_error());
     }
 
     inline void
     stopall()
     {
-        if (MOD_ERROR == mod_stopall())
+        if (mod_stopall() < 0)
             throw error(mod_error());
     }
 
     inline void
     post(const char* to, const char* type, struct aug_object_* ob)
     {
-        if (MOD_ERROR == mod_post(to, type, ob))
+        if (mod_post(to, type, ob) < 0)
             throw error(mod_error());
     }
 
     inline void
     dispatch(const char* to, const char* type, struct aug_object_* ob)
     {
-        if (MOD_ERROR == mod_dispatch(to, type, ob))
+        if (mod_dispatch(to, type, ob) < 0)
             throw error(mod_error());
     }
 
@@ -95,7 +95,7 @@ namespace mod {
     inline void
     shutdown(mod_id sid, unsigned flags)
     {
-        if (MOD_ERROR == mod_shutdown(sid, flags))
+        if (mod_shutdown(sid, flags) < 0)
             throw error(mod_error());
     }
 
@@ -110,7 +110,7 @@ namespace mod {
                void* user = 0)
     {
         int ret(mod_tcpconnect(host, port, sslctx, user));
-        if (MOD_ERROR == ret)
+        if (ret < 0)
             throw error(mod_error());
         return static_cast<mod_id>(ret);
     }
@@ -120,7 +120,7 @@ namespace mod {
               void* user = 0)
     {
         int ret(mod_tcplisten(host, port, sslctx, user));
-        if (MOD_ERROR == ret)
+        if (ret < 0)
             throw error(mod_error());
         return static_cast<mod_id>(ret);
     }
@@ -128,7 +128,7 @@ namespace mod {
     inline void
     send(mod_id cid, const void* buf, size_t size)
     {
-        if (MOD_ERROR == mod_send(cid, buf, size))
+        if (mod_send(cid, buf, size) < 0)
             throw error(mod_error());
     }
 
@@ -141,7 +141,7 @@ namespace mod {
     inline void
     sendv(mod_id cid, struct aug_blob_* blob)
     {
-        if (MOD_ERROR == mod_sendv(cid, blob))
+        if (mod_sendv(cid, blob) < 0)
             throw error(mod_error());
     }
 
@@ -154,7 +154,7 @@ namespace mod {
     inline void
     setrwtimer(mod_id cid, unsigned ms, unsigned flags)
     {
-        if (MOD_ERROR == mod_setrwtimer(cid, ms, flags))
+        if (mod_setrwtimer(cid, ms, flags) < 0)
             throw error(mod_error());
     }
 
@@ -168,9 +168,9 @@ namespace mod {
     resetrwtimer(mod_id cid, unsigned ms, unsigned flags)
     {
         switch (mod_resetrwtimer(cid, ms, flags)) {
-        case MOD_ERROR:
+        case MOD_FAILERROR:
             throw error(mod_error());
-        case MOD_NONE:
+        case MOD_FAILNONE:
             return false;
         }
         return true;
@@ -186,9 +186,9 @@ namespace mod {
     cancelrwtimer(mod_id cid, unsigned flags)
     {
         switch (mod_cancelrwtimer(cid, flags)) {
-        case MOD_ERROR:
+        case MOD_FAILERROR:
             throw error(mod_error());
-        case MOD_NONE:
+        case MOD_FAILNONE:
             return false;
         }
         return true;
@@ -204,7 +204,7 @@ namespace mod {
     settimer(unsigned ms, struct aug_object_* ob)
     {
         int ret(mod_settimer(ms, ob));
-        if (MOD_ERROR == ret)
+        if (ret < 0)
             throw error(mod_error());
         return static_cast<mod_id>(ret);
     }
@@ -213,9 +213,9 @@ namespace mod {
     resettimer(mod_id tid, unsigned ms)
     {
         switch (mod_resettimer(tid, ms)) {
-        case MOD_ERROR:
+        case MOD_FAILERROR:
             throw error(mod_error());
-        case MOD_NONE:
+        case MOD_FAILNONE:
             return false;
         }
         return true;
@@ -231,9 +231,9 @@ namespace mod {
     canceltimer(mod_id tid)
     {
         switch (mod_canceltimer(tid)) {
-        case MOD_ERROR:
+        case MOD_FAILERROR:
             throw error(mod_error());
-        case MOD_NONE:
+        case MOD_FAILNONE:
             return false;
         }
         return true;
@@ -496,24 +496,24 @@ namespace mod {
         {
             return static_cast<session_base*>(getsession()->user_);
         }
-        static int
-        result(bool x)
+        static mod_bool
+        tobool(bool x)
         {
-            return x ? MOD_OK : MOD_ERROR;
+            return x ? MOD_TRUE : MOD_FALSE;
         }
         static void
         stop() MOD_NOTHROW
         {
             delete getbase();
         }
-        static int
+        static mod_bool
         start(mod_session* session) MOD_NOTHROW
         {
             try {
                 session->user_ = factory_->create(session->name_);
-                return result(getbase()->start(session->name_));
+                return tobool(getbase()->start(session->name_));
             } MOD_WRITELOGCATCH;
-            return MOD_ERROR;
+            return MOD_FALSE;
         }
         static void
         reconf() MOD_NOTHROW
@@ -544,14 +544,14 @@ namespace mod {
                 getbase()->teardown(handle(*sock));
             } MOD_WRITELOGCATCH;
         }
-        static int
+        static mod_bool
         accepted(mod_handle* sock, const char* name) MOD_NOTHROW
         {
             try {
                 handle h(*sock);
-                return result(getbase()->accepted(h, name));
+                return tobool(getbase()->accepted(h, name));
             } MOD_WRITELOGCATCH;
-            return MOD_ERROR;
+            return MOD_FALSE;
         }
         static void
         connected(mod_handle* sock, const char* name) MOD_NOTHROW
@@ -590,15 +590,15 @@ namespace mod {
                 getbase()->expire(handle(*timer), *ms);
             } MOD_WRITELOGCATCH;
         }
-        static int
+        static mod_bool
         authcert(const mod_handle* sock, const char* subject,
                  const char* issuer)
         {
             try {
                 handle h(*sock);
-                return result(getbase()->authcert(h, subject, issuer));
+                return tobool(getbase()->authcert(h, subject, issuer));
             } MOD_WRITELOGCATCH;
-            return MOD_ERROR;
+            return MOD_FALSE;
         }
 
     public:

@@ -249,12 +249,12 @@ stop_(void)
     destroyimport_(import);
 }
 
-static int
+static mod_bool
 start_(struct mod_session* session)
 {
     struct import_* import;
     if (!(import = createimport_(session->name_)))
-        return -1;
+        return MOD_FALSE;
 
     session->user_ = import;
 
@@ -265,16 +265,16 @@ start_(struct mod_session* session)
         if (!x) {
             printerr_();
             destroyimport_(import);
-            return -1;
+            return MOD_FALSE;
         } else if (x == Py_False) {
             destroyimport_(import);
-            return -1;
+            return MOD_FALSE;
         }
         Py_DECREF(x);
     }
 
     import->open_ = 1;
-    return 0;
+    return MOD_TRUE;
 }
 
 static void
@@ -397,12 +397,12 @@ teardown_(const struct mod_handle* sock)
         mod_shutdown(sock->id_, 0);
 }
 
-static int
+static mod_bool
 accepted_(struct mod_handle* sock, const char* name)
 {
     struct import_* import = mod_getsession()->user_;
     PyObject* x, * y;
-    int ret = 0;
+    mod_bool ret = MOD_TRUE;
     assert(import);
     assert(sock->user_);
 
@@ -415,7 +415,7 @@ accepted_(struct mod_handle* sock, const char* name)
         /* closed() will not be called if accepted() fails. */
 
         printerr_();
-        ret = -1;
+        ret = MOD_FALSE;
 
     } else if (import->accepted_) {
 
@@ -427,7 +427,7 @@ accepted_(struct mod_handle* sock, const char* name)
 
             printerr_();
             Py_DECREF(y);
-            return -1;
+            return MOD_FALSE;
         }
 
         if (z == Py_False) {
@@ -439,7 +439,7 @@ accepted_(struct mod_handle* sock, const char* name)
 
             Py_DECREF(y);
             y = NULL;
-            ret = -1;
+            ret = MOD_FALSE;
         }
 
         Py_DECREF(z);
@@ -583,12 +583,12 @@ expire_(const struct mod_handle* timer, unsigned* ms)
     }
 }
 
-static int
+static mod_bool
 authcert_(const struct mod_handle* sock, const char* subject,
           const char* issuer)
 {
     struct import_* import = mod_getsession()->user_;
-    int ret = 0;
+    mod_bool ret = MOD_TRUE;
     assert(import);
     assert(sock->user_);
 
@@ -599,11 +599,11 @@ authcert_(const struct mod_handle* sock, const char* subject,
                                             subject, issuer);
         if (y) {
             if (y == Py_False)
-                ret = -1;
+                ret = MOD_FALSE;
             Py_DECREF(y);
         } else {
             printerr_();
-            ret = -1;
+            ret = MOD_FALSE;
         }
     }
 

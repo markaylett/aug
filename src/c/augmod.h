@@ -97,30 +97,47 @@ enum mod_loglevel {
 /** @} */
 
 /**
- * @defgroup ModuleReturnCodes Return Codes
+ * @defgroup ModuleBool Boolean Values
  *
  * @ingroup Module
  *
  * @{
  */
 
+typedef int mod_bool;
+
+#define MOD_FALSE (0 != 0)
+#define MOD_TRUE  (0 == 0)
+
+/** @} */
+
+/**
+ * @defgroup ModuleResultCodes Result Codes
+ *
+ * @ingroup Module
+ *
+ * @{
+ */
+
+typedef int mod_result;
+
 /**
  * Success.
  */
 
-#define MOD_OK      0
+#define MOD_SUCCESS     0
 
 /**
- * Failure.
+ * Error.
  */
 
-#define MOD_ERROR (-1)
+#define MOD_FAILERROR (-1)
 
 /**
  * None, empty or null depending on context.
  */
 
-#define MOD_NONE  (-2)
+#define MOD_FAILNONE  (-2)
 
 /** @} */
 
@@ -204,7 +221,7 @@ struct mod_host {
      * @see stopall_().
      */
 
-    int (*reconfall_)(void);
+    mod_result (*reconfall_)(void);
 
     /**
      * Stop the host environment.
@@ -212,7 +229,7 @@ struct mod_host {
      * @see reconfall_().
      */
 
-    int (*stopall_)(void);
+    mod_result (*stopall_)(void);
 
     /**
      * Post an event to the event queue.
@@ -226,7 +243,8 @@ struct mod_host {
      * @see dispatch_()
      */
 
-    int (*post_)(const char* to, const char* type, struct aug_object_* ob);
+    mod_result (*post_)(const char* to, const char* type,
+                        struct aug_object_* ob);
 
     /**
      * The remaining functions are not thread-safe.
@@ -244,8 +262,8 @@ struct mod_host {
      * @see post_()
      */
 
-    int (*dispatch_)(const char* to, const char* type,
-                     struct aug_object_* ob);
+    mod_result (*dispatch_)(const char* to, const char* type,
+                            struct aug_object_* ob);
 
     /**
      * Read a configuration value.
@@ -277,7 +295,7 @@ struct mod_host {
      * connection - do not wait for pending writes.
      */
 
-    int (*shutdown_)(mod_id cid, unsigned flags);
+    mod_result (*shutdown_)(mod_id cid, unsigned flags);
 
     /**
      * Establish tcp connection.
@@ -310,6 +328,8 @@ struct mod_host {
      * @param sslctx Optional name of ssl context.
      *
      * @param user Optional user data.
+     *
+     * @return The listener id.
      */
 
     int (*tcplisten_)(const char* host, const char* port, const char* sslctx,
@@ -329,7 +349,7 @@ struct mod_host {
      * @param len Length of data buffer.
      */
 
-    int (*send_)(mod_id cid, const void* buf, size_t len);
+    mod_result (*send_)(mod_id cid, const void* buf, size_t len);
 
     /**
      * Send data to peer.
@@ -339,7 +359,7 @@ struct mod_host {
      * @param blob Blob data.
      */
 
-    int (*sendv_)(mod_id cid, struct aug_blob_* blob);
+    mod_result (*sendv_)(mod_id cid, struct aug_blob_* blob);
 
     /**
      * Set read/write timer.
@@ -351,7 +371,7 @@ struct mod_host {
      * @param flags @ref ModuleTimerFlags.
      */
 
-    int (*setrwtimer_)(mod_id cid, unsigned ms, unsigned flags);
+    mod_result (*setrwtimer_)(mod_id cid, unsigned ms, unsigned flags);
 
     /**
      * Reset read/write timer.
@@ -363,7 +383,7 @@ struct mod_host {
      * @param flags @ref ModuleTimerFlags.
      */
 
-    int (*resetrwtimer_)(mod_id cid, unsigned ms, unsigned flags);
+    mod_result (*resetrwtimer_)(mod_id cid, unsigned ms, unsigned flags);
 
     /**
      * Cancel read/write timer.
@@ -373,7 +393,7 @@ struct mod_host {
      * @param flags @ref ModuleTimerFlags.
      */
 
-    int (*cancelrwtimer_)(mod_id cid, unsigned flags);
+    mod_result (*cancelrwtimer_)(mod_id cid, unsigned flags);
 
     /**
      * Create new timer.
@@ -393,7 +413,7 @@ struct mod_host {
      * @param ms Timeout value in milliseconds.
      */
 
-    int (*resettimer_)(mod_id tid, unsigned ms);
+    mod_result (*resettimer_)(mod_id tid, unsigned ms);
 
     /**
      * Cancel timer.
@@ -401,7 +421,7 @@ struct mod_host {
      * @param tid Timer id.
      */
 
-    int (*canceltimer_)(mod_id tid);
+    mod_result (*canceltimer_)(mod_id tid);
 };
 
 /** @} */
@@ -409,9 +429,9 @@ struct mod_host {
 /**
  * @addtogroup Module
  *
- * Module functions of type int should return either #MOD_OK or #MOD_ERROR,
- * depending on the result.  For those functions associated with a connection,
- * a failure will result in the connection being closed.
+ * Module functions of type mod_bool should return either #MOD_TRUE or
+ * #MOD_FALSE, depending on the result.  For those functions associated with a
+ * connection, a false return will result in the connection being closed.
  *
  * @{
  */
@@ -424,7 +444,7 @@ struct mod_module {
      * The current session can be retrieved using mod_host::getsession_().
      * All resources associated with the session should be released in this
      * handler.  stop_() will only be called for a session if start_()
-     * returned #MOD_OK.
+     * returned #MOD_TRUE.
      */
 
     void (*stop_)(void);
@@ -435,10 +455,10 @@ struct mod_module {
      * User-state associated with the session may be assigned to
      * #mod_session::user_.
      *
-     * @return Either #MOD_OK or #MOD_ERROR.
+     * @return Either #MOD_TRUE or #MOD_FALSE.
      */
 
-    int (*start_)(struct mod_session* session);
+    mod_bool (*start_)(struct mod_session* session);
 
     /**
      * Re-configure request.
@@ -488,10 +508,10 @@ struct mod_module {
      *
      * @param name Peer address.
      *
-     * @return Either #MOD_OK or #MOD_ERROR.
+     * @return Either #MOD_TRUE or #MOD_FALSE.
      */
 
-    int (*accepted_)(struct mod_handle* sock, const char* name);
+    mod_bool (*accepted_)(struct mod_handle* sock, const char* name);
 
     /**
      * Completion of client connection handshake.
@@ -563,11 +583,11 @@ struct mod_module {
      *
      * @param issuer Certificate issuer.
      *
-     * @return Either #MOD_OK or #MOD_ERROR.
+     * @return Either #MOD_TRUE or #MOD_FALSE.
      */
 
-    int (*authcert_)(const struct mod_handle* sock, const char* subject,
-                     const char* issuer);
+    mod_bool (*authcert_)(const struct mod_handle* sock, const char* subject,
+                          const char* issuer);
 };
 
 /** @} */

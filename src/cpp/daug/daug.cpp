@@ -231,35 +231,35 @@ namespace {
 
     // Thread-safe.
 
-    int
+    mod_result
     reconfall_()
     {
         AUG_CTXDEBUG2(aug_tlx, "reconfall()");
         try {
             state_->engine_.reconfall();
-            return 0;
+            return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
     // Thread-safe.
 
-    int
+    mod_result
     stopall_()
     {
         AUG_CTXDEBUG2(aug_tlx, "stopall()");
         try {
             state_->engine_.stopall();
-            return 0;
+            return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
     // Thread-safe.
 
-    int
+    mod_result
     post_(const char* to, const char* type, aug_object* ob)
     {
         const char* sname = getsession()->name_;
@@ -267,13 +267,13 @@ namespace {
                       sname, to, type);
         try {
             state_->engine_.post(sname, to, type, ob);
-            return 0;
+            return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
-    int
+    mod_result
     dispatch_(const char* to, const char* type, aug_object* ob)
     {
         const char* sname = getsession()->name_;
@@ -281,10 +281,10 @@ namespace {
                       sname, to, type);
         try {
             state_->engine_.dispatch(sname, to, type, ob);
-            return 0;
+            return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
     const char*
@@ -319,16 +319,16 @@ namespace {
         return 0;
     }
 
-    int
+    mod_result
     shutdown_(mod_id cid, unsigned flags)
     {
         AUG_CTXDEBUG2(aug_tlx, "shutdown(): id=[%u], flags=[%u]", cid, flags);
         try {
             state_->engine_.shutdown(cid, flags);
-            return 0;
+            return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
     int
@@ -354,7 +354,7 @@ namespace {
                 .tcpconnect(sname, host, port, ptr, user);
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
     int
@@ -383,70 +383,70 @@ namespace {
                 .tcplisten(sname, host, port, ptr, user);
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
-    int
+    mod_result
     send_(mod_id cid, const void* buf, size_t len)
     {
         AUG_CTXDEBUG2(aug_tlx, "send(): id=[%u]", cid);
         try {
             state_->engine_.send(cid, buf, len);
-            return 0;
+            return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
-    int
+    mod_result
     sendv_(mod_id cid, aug_blob* blob)
     {
         AUG_CTXDEBUG2(aug_tlx, "sendv(): id=[%u]", cid);
         try {
             state_->engine_.sendv(cid, blob);
-            return 0;
+            return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
-    int
+    mod_result
     setrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
         AUG_CTXDEBUG2(aug_tlx, "setrwtimer(): id=[%u], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
             state_->engine_.setrwtimer(cid, ms, flags);
-            return 0;
+            return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
-    int
+    mod_result
     resetrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
         AUG_CTXDEBUG2(aug_tlx, "resetrwtimer(): id=[%u], ms=[%u], flags=[%x]",
                    cid, ms, flags);
         try {
             return state_->engine_.resetrwtimer(cid, ms, flags)
-                ? 0 : MOD_NONE;
+                ? MOD_SUCCESS : MOD_FAILNONE;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
-    int
+    mod_result
     cancelrwtimer_(mod_id cid, unsigned flags)
     {
         AUG_CTXDEBUG2(aug_tlx, "cancelrwtimer(): id=[%u], flags=[%x]",
                       cid, flags);
         try {
             return state_->engine_.cancelrwtimer(cid, flags)
-                ? 0 : MOD_NONE;
+                ? MOD_SUCCESS : MOD_FAILNONE;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
     int
@@ -458,29 +458,31 @@ namespace {
             return (int)state_->engine_.settimer(sname, ms, ob);
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
-    int
+    mod_result
     resettimer_(mod_id tid, unsigned ms)
     {
         AUG_CTXDEBUG2(aug_tlx, "resettimer(): id=[%u], ms=[%u]", tid, ms);
         try {
-            return state_->engine_.resettimer(tid, ms) ? 0 : MOD_NONE;
+            return state_->engine_.resettimer(tid, ms)
+                ? MOD_SUCCESS : MOD_FAILNONE;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
-    int
+    mod_result
     canceltimer_(mod_id tid)
     {
         AUG_CTXDEBUG2(aug_tlx, "canceltimer(): id=[%u]", tid);
         try {
-            return state_->engine_.canceltimer(tid) ? 0 : MOD_NONE;
+            return state_->engine_.canceltimer(tid)
+                ? MOD_SUCCESS : MOD_FAILNONE;
 
         } AUG_SETERRINFOCATCH;
-        return -1;
+        return MOD_FAILERROR;
     }
 
     const mod_host host_ = {

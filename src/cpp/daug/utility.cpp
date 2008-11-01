@@ -16,10 +16,10 @@ namespace {
     stop()
     {
     }
-    int
+    mod_bool
     start(mod_session* session)
     {
-        return 0;
+        return MOD_TRUE;
     }
     void
     reconf()
@@ -33,10 +33,10 @@ namespace {
     closed(const mod_handle* sock)
     {
     }
-    int
+    mod_bool
     accepted(mod_handle* sock, const char* name)
     {
-        return 0;
+        return MOD_TRUE;
     }
     void
     connected(mod_handle* sock, const char* name)
@@ -58,11 +58,11 @@ namespace {
     expire(const mod_handle* timer, unsigned* ms)
     {
     }
-    int
+    mod_bool
     authcert(const mod_handle* sock, const char* subject,
              const char* issuer)
     {
-        return 0;
+        return MOD_TRUE;
     }
 }
 
