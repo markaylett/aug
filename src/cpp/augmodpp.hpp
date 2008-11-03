@@ -307,6 +307,9 @@ namespace mod {
         do_data(const handle& sock, const void* buf, size_t size) = 0;
 
         virtual void
+        do_error(const handle& sock, const char* desc) = 0;
+
+        virtual void
         do_rdexpire(const handle& sock, unsigned& ms) = 0;
 
         virtual void
@@ -363,6 +366,11 @@ namespace mod {
         data(const handle& sock, const void* buf, size_t size)
         {
             do_data(sock, buf, size);
+        }
+        void
+        error(const handle& sock, const char* desc)
+        {
+            do_error(sock, desc);
         }
         void
         rdexpire(const handle& sock, unsigned& ms)
@@ -423,6 +431,11 @@ namespace mod {
         do_data(const handle& sock, const void* buf, size_t size)
         {
             mod_writelog(MOD_LOGWARN, "do_data() not implemented");
+        }
+        void
+        do_error(const handle& sock, const char* desc)
+        {
+            mod_writelog(MOD_LOGWARN, "do_error() not implemented");
         }
         void
         do_rdexpire(const handle& sock, unsigned& ms)
@@ -570,6 +583,13 @@ namespace mod {
             } MOD_WRITELOGCATCH;
         }
         static void
+        error(const mod_handle* sock, const char* desc) MOD_NOTHROW
+        {
+            try {
+                getbase()->error(handle(*sock), desc);
+            } MOD_WRITELOGCATCH;
+        }
+        static void
         rdexpire(const mod_handle* sock, unsigned* ms) MOD_NOTHROW
         {
             try {
@@ -615,6 +635,7 @@ namespace mod {
                 accepted,
                 connected,
                 data,
+                error,
                 rdexpire,
                 wrexpire,
                 expire,

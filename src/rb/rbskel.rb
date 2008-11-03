@@ -92,6 +92,9 @@ module RbSkel
             end
         end
     end
+    def self.error(sock, ms)
+        Log.debug("error(): #{sock}")
+    end
     def self.rdexpire(sock, ms)
         Log.debug("rdexpire(): #{sock}")
         AugRb.send(sock, "+OK hello\r\n")

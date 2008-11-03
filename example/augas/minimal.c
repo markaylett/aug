@@ -63,6 +63,11 @@ data_(const struct mod_handle* sock, const void* buf, size_t len)
 }
 
 static void
+error_(const struct mod_handle* sock, const char* desc)
+{
+}
+
+static void
 rdexpire_(const struct mod_handle* sock, unsigned* ms)
 {
     mod_writelog(MOD_LOGINFO, "rdexpire_()");
@@ -98,6 +103,7 @@ static const struct mod_module module_ = {
     accepted_,
     connected_,
     data_,
+    error_,
     rdexpire_,
     wrexpire_,
     expire_,

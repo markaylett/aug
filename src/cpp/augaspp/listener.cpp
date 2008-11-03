@@ -29,6 +29,12 @@ listener::do_session() const
 }
 
 void
+listener::do_error(const char* desc)
+{
+    return session_->error(sock_, desc);
+}
+
+void
 listener::do_shutdown(chanref chan, unsigned flags, const timeval& now)
 {
     if (SHUTDOWN <= state_)

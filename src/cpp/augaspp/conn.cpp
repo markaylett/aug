@@ -253,6 +253,12 @@ connimpl::process(chanref chan, unsigned short events, const timeval& now)
 }
 
 void
+connimpl::error(const char* desc)
+{
+    return session_->error(sock_, desc);
+}
+
+void
 connimpl::shutdown(chanref chan, unsigned flags, const timeval& now)
 {
     if (SHUTDOWN <= state_)

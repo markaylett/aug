@@ -22,6 +22,9 @@ namespace aug {
     class sock_base : public object_base {
 
         virtual void
+        do_error(const char* desc) = 0;
+
+        virtual void
         do_shutdown(chanref chan, unsigned flags, const timeval& now) = 0;
 
         virtual sockstate
@@ -30,6 +33,12 @@ namespace aug {
     public:
         virtual
         ~sock_base() AUG_NOTHROW;
+
+        void
+        error(const char* desc)
+        {
+            do_error(desc);
+        }
 
         void
         shutdown(chanref chan, unsigned flags, const timeval& now)

@@ -29,6 +29,12 @@ servconn::do_session() const
 }
 
 void
+servconn::do_error(const char* desc)
+{
+    impl_.error(desc);
+}
+
+void
 servconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
 {
     impl_.shutdown(chan, flags, now);

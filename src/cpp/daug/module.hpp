@@ -65,6 +65,9 @@ namespace daug {
              size_t size) const AUG_NOTHROW;
 
         void
+        error(const mod_handle& sock, const char* desc) const AUG_NOTHROW;
+
+        void
         rdexpire(const mod_handle& sock, unsigned& ms) const AUG_NOTHROW;
 
         void

@@ -24,6 +24,7 @@ struct import_ {
     PyObject* accepted_;
     PyObject* connected_;
     PyObject* data_;
+    PyObject* error_;
     PyObject* rdexpire_;
     PyObject* wrexpire_;
     PyObject* expire_;
@@ -146,6 +147,7 @@ destroyimport_(struct import_* import)
     Py_XDECREF(import->expire_);
     Py_XDECREF(import->wrexpire_);
     Py_XDECREF(import->rdexpire_);
+    Py_XDECREF(import->error_);
     Py_XDECREF(import->data_);
     Py_XDECREF(import->connected_);
     Py_XDECREF(import->accepted_);
@@ -181,6 +183,7 @@ createimport_(const char* sname)
     import->accepted_ = getmethod_(import->module_, "accepted");
     import->connected_ = getmethod_(import->module_, "connected");
     import->data_ = getmethod_(import->module_, "data");
+    import->error_ = getmethod_(import->module_, "error");
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
     import->expire_ = getmethod_(import->module_, "expire");
@@ -496,6 +499,25 @@ data_(const struct mod_handle* sock, const void* buf, size_t len)
 }
 
 static void
+error_(const struct mod_handle* sock, const char* desc)
+{
+    struct import_* import = mod_getsession()->user_;
+    assert(import);
+    assert(sock->user_);
+
+    if (import->error_) {
+
+        PyObject* x = sock->user_;
+        PyObject* y = PyObject_CallFunction(import->error_, "Os", x, desc);
+
+        if (y) {
+            Py_DECREF(y);
+        } else
+            printerr_();
+    }
+}
+
+static void
 rdexpire_(const struct mod_handle* sock, unsigned* ms)
 {
     struct import_* import = mod_getsession()->user_;
@@ -620,6 +642,7 @@ static const struct mod_module module_ = {
     accepted_,
     connected_,
     data_,
+    error_,
     rdexpire_,
     wrexpire_,
     expire_,

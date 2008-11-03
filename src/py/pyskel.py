@@ -94,6 +94,9 @@ def data(sock, buf):
         elif x != None:
             send(sock, x + "\r\n")
 
+def error(sock, desc):
+    log.debug("error(): %s" % sock)
+
 def rdexpire(sock, ms):
     log.debug("rdexpire(): %s" % sock)
     send(sock, "+OK hello\r\n")

@@ -780,6 +780,10 @@ namespace {
             }
         }
         void
+        do_error(const handle& sock, const char* desc)
+        {
+        }
+        void
         do_rdexpire(const handle& sock, unsigned& ms)
         {
             aug_ctxinfo(aug_tlx, "no data received for 30 seconds");

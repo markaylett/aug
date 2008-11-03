@@ -227,10 +227,14 @@ namespace aug {
             errorchan_(chanref chan, const aug_errinfo& errinfo) AUG_NOTHROW
             {
                 scoped_current current(current_, chan);
-
                 const unsigned id(getchanid(chan));
-                AUG_CTXDEBUG2(aug_tlx, "error channel: id=[%u]", id);
-                // FIXME: implement.
+
+                sockptr sock(socks_.get(id));
+                assert(null != sock);
+
+                AUG_CTXDEBUG2(aug_tlx, "error channel: id=[%u], desc=[%s]",
+                              id, errinfo.desc_);
+                return sock->error(errinfo.desc_);
             }
             aug_bool
             estabchan_(chanref chan, unsigned parent) AUG_NOTHROW

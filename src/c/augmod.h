@@ -542,6 +542,16 @@ struct mod_module {
                   size_t len);
 
     /**
+     * Connection error.
+     *
+     * @param sock The closed socket.
+     *
+     * @param desc Error description.
+     */
+
+    void (*error_)(const struct mod_handle* sock, const char* desc);
+
+    /**
      * Expiry of read timer.
      *
      * @param sock Socket descriptor.

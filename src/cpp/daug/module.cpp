@@ -117,6 +117,13 @@ module::data(const mod_handle& sock, const char* buf,
 }
 
 void
+module::error(const mod_handle& sock, const char* desc) const AUG_NOTHROW
+{
+    AUG_CTXDEBUG2(aug_tlx, "error(): id=[%u], desc=[%s]", sock.id_, desc);
+    module_.error_(&sock, desc);
+}
+
+void
 module::rdexpire(const mod_handle& sock, unsigned& ms) const AUG_NOTHROW
 {
     AUG_CTXDEBUG2(aug_tlx, "rdexpire(): id=[%u], ms=[%u]", sock.id_, ms);

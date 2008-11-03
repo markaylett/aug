@@ -47,6 +47,10 @@ namespace {
     {
     }
     void
+    error(const mod_handle* sock, const char* desc)
+    {
+    }
+    void
     rdexpire(const mod_handle* sock, unsigned* ms)
     {
     }
@@ -79,6 +83,7 @@ daug::setdefaults(mod_module& dst, const mod_module& src,
     dst.accepted_ = src.accepted_ ? src.accepted_ : accepted;
     dst.connected_ = src.connected_ ? src.connected_ : connected;
     dst.data_ = src.data_ ? src.data_ : data;
+    dst.error_ = src.error_ ? src.error_ : error;
     dst.rdexpire_ = src.rdexpire_ ? src.rdexpire_ : rdexpire;
     dst.wrexpire_ = src.wrexpire_ ? src.wrexpire_ : wrexpire;
     dst.expire_ = src.expire_ ? src.expire_ : expire;

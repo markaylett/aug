@@ -115,6 +115,13 @@ session::do_data(const mod_handle& sock, const char* buf,
 }
 
 void
+session::do_error(const mod_handle& sock, const char* desc) const AUG_NOTHROW
+{
+    scoped_frame frame(&session_);
+    module_->error(sock, desc);
+}
+
+void
 session::do_rdexpire(const mod_handle& sock,
                      unsigned& ms) const AUG_NOTHROW
 {

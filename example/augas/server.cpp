@@ -73,6 +73,10 @@ namespace {
             }
         }
         void
+        do_error(const handle& sock, const char* desc)
+        {
+        }
+        void
         do_rdexpire(const handle& sock, unsigned& ms)
         {
             writelog(MOD_LOGINFO, "no data received for 15 seconds");

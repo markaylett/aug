@@ -30,6 +30,9 @@ namespace aug {
         // sock_base.
 
         void
+        do_error(const char* desc);
+
+        void
         do_shutdown(chanref chan, unsigned flags, const timeval& now);
 
         sockstate

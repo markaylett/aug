@@ -29,6 +29,12 @@ clntconn::do_session() const
 }
 
 void
+clntconn::do_error(const char* desc)
+{
+    impl_.error(desc);
+}
+
+void
 clntconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
 {
     impl_.shutdown(chan, flags, now);

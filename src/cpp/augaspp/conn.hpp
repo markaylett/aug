@@ -163,6 +163,9 @@ namespace aug {
         process(chanref chan, unsigned short events, const timeval& now);
 
         void
+        error(const char* desc);
+
+        void
         shutdown(chanref chan, unsigned flags, const timeval& now);
 
         void

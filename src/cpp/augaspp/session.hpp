@@ -61,6 +61,10 @@ namespace aug {
                 size_t size) const AUG_NOTHROW = 0;
 
         virtual void
+        do_error(const mod_handle& sock,
+                 const char* desc) const AUG_NOTHROW = 0;
+
+        virtual void
         do_rdexpire(const mod_handle& sock,
                     unsigned& ms) const AUG_NOTHROW = 0;
 
@@ -136,6 +140,11 @@ namespace aug {
              size_t size) const AUG_NOTHROW
         {
             do_data(sock, buf, size);
+        }
+        void
+        error(const mod_handle& sock, const char* desc) const AUG_NOTHROW
+        {
+            do_error(sock, desc);
         }
         void
         rdexpire(const mod_handle& sock, unsigned& ms) const AUG_NOTHROW

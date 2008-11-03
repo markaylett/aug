@@ -24,6 +24,7 @@ struct session_ {
     int accepted_ : 1;
     int connected_ : 1;
     int data_ : 1;
+    int error_ : 1;
     int rdexpire_ : 1;
     int wrexpire_ : 1;
     int expire_ : 1;
@@ -34,8 +35,8 @@ struct session_ {
 /* Cache ids to avoid repeated lookups. */
 
 static ID stopid_, startid_, reconfid_, eventid_, closedid_,
-    teardownid_, acceptedid_, connectedid_, dataid_, rdexpireid_,
-    wrexpireid_, expireid_, authcertid_;
+    teardownid_, acceptedid_, connectedid_, dataid_, errorid_,
+    rdexpireid_, wrexpireid_, expireid_, authcertid_;
 
 static VALUE maugrb_, chandle_, cerror_;
 
@@ -304,6 +305,8 @@ createsession_(const char* sname)
         = rb_respond_to(session->module_, connectedid_) ? 1 : 0;
     session->data_
         = rb_respond_to(session->module_, dataid_) ? 1 : 0;
+    session->error_
+        = rb_respond_to(session->module_, errorid_) ? 1 : 0;
     session->rdexpire_
         = rb_respond_to(session->module_, rdexpireid_) ? 1 : 0;
     session->wrexpire_
@@ -670,6 +673,7 @@ initrb_(VALUE unused)
     acceptedid_= rb_intern("accepted");
     connectedid_= rb_intern("connected");
     dataid_= rb_intern("data");
+    errorid_= rb_intern("error");
     rdexpireid_= rb_intern("rdexpire");
     wrexpireid_= rb_intern("wrexpire");
     expireid_= rb_intern("expire");
@@ -892,6 +896,19 @@ data_(const struct mod_handle* sock, const void* buf, size_t len)
 }
 
 static void
+error_(const struct mod_handle* sock, const char* desc)
+{
+    struct session_* session = mod_getsession()->user_;
+    VALUE user;
+    assert(session);
+    assert(sock->user_);
+    user = *(VALUE*)sock->user_;
+
+    if (session->error_)
+        funcall2_(errorid_, user, rb_str_new2(desc));
+}
+
+static void
 rdexpire_(const struct mod_handle* sock, unsigned* ms)
 {
     struct session_* session = mod_getsession()->user_;
@@ -969,6 +986,7 @@ static const struct mod_module module_ = {
     accepted_,
     connected_,
     data_,
+    error_,
     rdexpire_,
     wrexpire_,
     expire_,
