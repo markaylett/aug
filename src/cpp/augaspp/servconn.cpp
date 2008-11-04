@@ -71,6 +71,12 @@ servconn::do_connected(const string& name, const timeval& now)
     impl_.connected(name, now);
 }
 
+bool
+servconn::do_auth(const char* subject, const char* issuer)
+{
+    return impl_.auth(subject, issuer);
+}
+
 void
 servconn::do_process(chanref chan, unsigned short events, const timeval& now)
 {
@@ -81,12 +87,6 @@ void
 servconn::do_teardown(const timeval& now)
 {
     impl_.teardown(now);
-}
-
-bool
-servconn::do_authcert(const char* subject, const char* issuer)
-{
-    return impl_.authcert(subject, issuer);
 }
 
 string

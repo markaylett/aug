@@ -28,13 +28,13 @@ module RbTest5
         sock.user = LineParser.new
         AugRb.send(@server, "hello, world!\n")
     end
-    def self.data(sock, buf)
-        Log.debug("data(): #{sock}")
+    def self.recv(sock, buf)
+        Log.debug("recv(): #{sock}")
         sock.user.parse(buf) do |line|
 
             Log.debug("line: #{line}")
             if line != "hello, world!"
-                Log.error("unexpected line from data()")
+                Log.error("unexpected line from recv()")
             end
 
             if sock == @server

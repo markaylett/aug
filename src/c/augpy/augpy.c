@@ -23,12 +23,12 @@ struct import_ {
     PyObject* teardown_;
     PyObject* accepted_;
     PyObject* connected_;
-    PyObject* data_;
+    PyObject* auth_;
+    PyObject* recv_;
     PyObject* error_;
     PyObject* rdexpire_;
     PyObject* wrexpire_;
     PyObject* expire_;
-    PyObject* authcert_;
     int open_;
 };
 
@@ -143,12 +143,12 @@ getmethod_(PyObject* module, const char* name)
 static void
 destroyimport_(struct import_* import)
 {
-    Py_XDECREF(import->authcert_);
     Py_XDECREF(import->expire_);
     Py_XDECREF(import->wrexpire_);
     Py_XDECREF(import->rdexpire_);
     Py_XDECREF(import->error_);
-    Py_XDECREF(import->data_);
+    Py_XDECREF(import->recv_);
+    Py_XDECREF(import->auth_);
     Py_XDECREF(import->connected_);
     Py_XDECREF(import->accepted_);
     Py_XDECREF(import->teardown_);
@@ -182,12 +182,12 @@ createimport_(const char* sname)
     import->teardown_ = getmethod_(import->module_, "teardown");
     import->accepted_ = getmethod_(import->module_, "accepted");
     import->connected_ = getmethod_(import->module_, "connected");
-    import->data_ = getmethod_(import->module_, "data");
+    import->auth_ = getmethod_(import->module_, "auth");
+    import->recv_ = getmethod_(import->module_, "recv");
     import->error_ = getmethod_(import->module_, "error");
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
     import->expire_ = getmethod_(import->module_, "expire");
-    import->authcert_ = getmethod_(import->module_, "authcert");
     import->open_ = 0;
 
     return import;
@@ -476,18 +476,44 @@ connected_(struct mod_handle* sock, const char* name)
     /* closed() will always be called, even if connected() fails. */
 }
 
+static mod_bool
+auth_(const struct mod_handle* sock, const char* subject, const char* issuer)
+{
+    struct import_* import = mod_getsession()->user_;
+    mod_bool ret = MOD_TRUE;
+    assert(import);
+    assert(sock->user_);
+
+    if (import->auth_) {
+
+        PyObject* x = sock->user_;
+        PyObject* y = PyObject_CallFunction(import->auth_, "Oss", x, subject,
+                                            issuer);
+        if (y) {
+            if (y == Py_False)
+                ret = MOD_FALSE;
+            Py_DECREF(y);
+        } else {
+            printerr_();
+            ret = MOD_FALSE;
+        }
+    }
+
+    return ret;
+}
+
 static void
-data_(const struct mod_handle* sock, const void* buf, size_t len)
+recv_(const struct mod_handle* sock, const void* buf, size_t len)
 {
     struct import_* import = mod_getsession()->user_;
     assert(import);
     assert(sock->user_);
 
-    if (import->data_) {
+    if (import->recv_) {
 
         PyObject* x = sock->user_;
         PyObject* y = PyBuffer_FromMemory((void*)buf, (int)len);
-        PyObject* z = PyObject_CallFunction(import->data_, "OO", x, y);
+        PyObject* z = PyObject_CallFunction(import->recv_, "OO", x, y);
 
         if (z) {
             Py_DECREF(z);
@@ -605,33 +631,6 @@ expire_(const struct mod_handle* timer, unsigned* ms)
     }
 }
 
-static mod_bool
-authcert_(const struct mod_handle* sock, const char* subject,
-          const char* issuer)
-{
-    struct import_* import = mod_getsession()->user_;
-    mod_bool ret = MOD_TRUE;
-    assert(import);
-    assert(sock->user_);
-
-    if (import->authcert_) {
-
-        PyObject* x = sock->user_;
-        PyObject* y = PyObject_CallFunction(import->authcert_, "Oss", x,
-                                            subject, issuer);
-        if (y) {
-            if (y == Py_False)
-                ret = MOD_FALSE;
-            Py_DECREF(y);
-        } else {
-            printerr_();
-            ret = MOD_FALSE;
-        }
-    }
-
-    return ret;
-}
-
 static const struct mod_module module_ = {
     stop_,
     start_,
@@ -641,12 +640,12 @@ static const struct mod_module module_ = {
     teardown_,
     accepted_,
     connected_,
-    data_,
+    auth_,
+    recv_,
     error_,
     rdexpire_,
     wrexpire_,
-    expire_,
-    authcert_
+    expire_
 };
 
 static const struct mod_module*

@@ -78,7 +78,7 @@ namespace {
         }
 
         void
-        do_data(const handle& sock, const void* buf, size_t size)
+        do_recv(const handle& sock, const void* buf, size_t size)
         {
             shellparser& parser(*sock.user<shellparser>());
             const char* ptr(static_cast<const char*>(buf));

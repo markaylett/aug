@@ -176,7 +176,7 @@ struct echo : basic_session {@/
   do_closed(const handle& sock);
 
   void
-  do_data(const handle& sock, const void* buf, size_t size);
+  do_recv(const handle& sock, const void* buf, size_t size);
 
   void
   do_rdexpire(const handle& sock, unsigned& ms);
@@ -233,15 +233,15 @@ echo::do_closed(const handle& sock)
   delete sock.user<string>();
 }
 
-@ |do_data()| is called whenever new data is received from a client.  The
+@ |do_recv()| is called whenever new data is received from a client.  The
 |tok| reference is bound to the |string| buffer used to store incomplete lines
-between calls to |do_data|.  The |tokenise()| function appends new data to the
+between calls to |do_recv|.  The |tokenise()| function appends new data to the
 back of |tok|.  Each complete line is processed by the |echoline| functor
 before |tok| is cleared.
 
 @<member...@>+=
 void
-echo::do_data(const handle& sock, const void* buf, size_t size)
+echo::do_recv(const handle& sock, const void* buf, size_t size)
 {
   string& tok(*sock.user<string>());
   tokenise(static_cast<const char*>(buf),

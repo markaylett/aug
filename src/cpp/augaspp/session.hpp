@@ -56,8 +56,12 @@ namespace aug {
         do_connected(mod_handle& sock,
                      const char* name) const AUG_NOTHROW = 0;
 
+        virtual bool
+        do_auth(const mod_handle& sock, const char* subject,
+                const char* issuer) const AUG_NOTHROW = 0;
+
         virtual void
-        do_data(const mod_handle& sock, const char* buf,
+        do_recv(const mod_handle& sock, const char* buf,
                 size_t size) const AUG_NOTHROW = 0;
 
         virtual void
@@ -75,10 +79,6 @@ namespace aug {
         virtual void
         do_expire(const mod_handle& timer,
                   unsigned& ms) const AUG_NOTHROW = 0;
-
-        virtual bool
-        do_authcert(const mod_handle& sock, const char* subject,
-                    const char* issuer) const AUG_NOTHROW = 0;
 
     public:
         virtual
@@ -135,11 +135,17 @@ namespace aug {
         {
             do_connected(sock, name);
         }
+        bool
+        auth(const mod_handle& sock, const char* subject,
+             const char* issuer) const AUG_NOTHROW
+        {
+            return do_auth(sock, subject, issuer);
+        }
         void
-        data(const mod_handle& sock, const char* buf,
+        recv(const mod_handle& sock, const char* buf,
              size_t size) const AUG_NOTHROW
         {
-            do_data(sock, buf, size);
+            do_recv(sock, buf, size);
         }
         void
         error(const mod_handle& sock, const char* desc) const AUG_NOTHROW
@@ -160,12 +166,6 @@ namespace aug {
         expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW
         {
             do_expire(timer, ms);
-        }
-        bool
-        authcert(const mod_handle& sock, const char* subject,
-                 const char* issuer) const AUG_NOTHROW
-        {
-            return do_authcert(sock, subject, issuer);
         }
         operator mod_session&() AUG_NOTHROW
         {

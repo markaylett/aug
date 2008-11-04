@@ -47,8 +47,12 @@ namespace daug {
         void
         do_connected(mod_handle& sock, const char* name) const AUG_NOTHROW;
 
+        bool
+        do_auth(const mod_handle& sock, const char* subject,
+                const char* issuer) const AUG_NOTHROW;
+
         void
-        do_data(const mod_handle& sock, const char* buf,
+        do_recv(const mod_handle& sock, const char* buf,
                 size_t size) const AUG_NOTHROW;
 
         void
@@ -64,10 +68,6 @@ namespace daug {
 
         void
         do_expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW;
-
-        bool
-        do_authcert(const mod_handle& sock, const char* subject,
-                    const char* issuer) const AUG_NOTHROW;
 
     public:
         ~session() AUG_NOTHROW;

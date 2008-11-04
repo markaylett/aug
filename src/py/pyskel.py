@@ -83,8 +83,8 @@ def accepted(sock, name):
 def connected(sock, name):
     log.debug("connected(): %s" % sock)
 
-def data(sock, buf):
-    log.debug("data(): %s" % sock)
+def recv(sock, buf):
+    log.debug("recv(): %s" % sock)
     global interp
     for line in sock.user.parse(str(buf)):
         x = interp.interpret(line)

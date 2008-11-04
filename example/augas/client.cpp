@@ -189,21 +189,20 @@ namespace {
             send_(sock);
             --s.tosend_;
         }
+        bool
+        do_auth(const handle& sock, const char* subject, const char* issuer)
+        {
+            mod_writelog(MOD_LOGINFO, "checking subject...");
+            return true;
+        }
         void
-        do_data(const handle& sock, const void* buf, size_t len)
+        do_recv(const handle& sock, const void* buf, size_t len)
         {
             bytes_ += len;
             state& s(*sock.user<state>());
             tokenise(static_cast<const char*>(buf),
                      static_cast<const char*>(buf) + len, s.tok_, '\n',
                      eachline(send_, sock, hires_, s.secs_));
-        }
-        bool
-        do_authcert(const handle& sock, const char* subject,
-                    const char* issuer)
-        {
-            mod_writelog(MOD_LOGINFO, "checking subject...");
-            return true;
         }
         ~bench() AUG_NOTHROW
         {

@@ -58,8 +58,14 @@ namespace {
             setrwtimer(sock, 15000, MOD_TIMRD);
             return true;
         }
+        bool
+        do_auth(const handle& sock, const char* subject, const char* issuer)
+        {
+            mod_writelog(MOD_LOGINFO, "checking subject...");
+            return true;
+        }
         void
-        do_data(const handle& sock, const void* buf, size_t len)
+        do_recv(const handle& sock, const void* buf, size_t len)
         {
             string& tok(*sock.user<string>());
             try {
@@ -81,13 +87,6 @@ namespace {
         {
             writelog(MOD_LOGINFO, "no data received for 15 seconds");
             shutdown(sock, 0);
-        }
-        bool
-        do_authcert(const handle& sock, const char* subject,
-                    const char* issuer)
-        {
-            mod_writelog(MOD_LOGINFO, "checking subject...");
-            return true;
         }
         static session_base*
         create(const char* sname)

@@ -212,7 +212,7 @@ namespace aug {
 
                 AUG_CTXDEBUG2(aug_tlx, "auth channel: id=[%u], subject=[%s],"
                               " issuer=[%s]", id, subject, issuer);
-                return conn->authcert(subject, issuer) ? AUG_TRUE : AUG_FALSE;
+                return conn->auth(subject, issuer) ? AUG_TRUE : AUG_FALSE;
             }
             void
             clearchan_(unsigned id) AUG_NOTHROW

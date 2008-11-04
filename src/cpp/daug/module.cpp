@@ -108,12 +108,20 @@ module::connected(mod_handle& sock, const char* name) const AUG_NOTHROW
     module_.connected_(&sock, name);
 }
 
+bool
+module::auth(const mod_handle& sock, const char* subject,
+             const char* issuer) const AUG_NOTHROW
+{
+    AUG_CTXDEBUG2(aug_tlx, "auth(): id=[%u]", sock.id_);
+    return MOD_TRUE == module_.auth_(&sock, subject, issuer);
+}
+
 void
-module::data(const mod_handle& sock, const char* buf,
+module::recv(const mod_handle& sock, const char* buf,
              size_t size) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "data(): id=[%u]", sock.id_);
-    module_.data_(&sock, buf, size);
+    AUG_CTXDEBUG2(aug_tlx, "recv(): id=[%u]", sock.id_);
+    module_.recv_(&sock, buf, size);
 }
 
 void
@@ -142,12 +150,4 @@ module::expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW
 {
     AUG_CTXDEBUG2(aug_tlx, "expire(): id=[%u], ms=[%u]", timer.id_, ms);
     module_.expire_(&timer, &ms);
-}
-
-bool
-module::authcert(const mod_handle& sock, const char* subject,
-                 const char* issuer) const AUG_NOTHROW
-{
-    AUG_CTXDEBUG2(aug_tlx, "authcert(): id=[%u]", sock.id_);
-    return MOD_TRUE == module_.authcert_(&sock, subject, issuer);
 }

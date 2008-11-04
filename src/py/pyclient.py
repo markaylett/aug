@@ -41,7 +41,7 @@ def connected(sock, name):
     log.info("client established, starting timer")
     sock.user = State(sock)
 
-def data(sock, buf):
+def recv(sock, buf):
     log.info("received by client: %s" % buf)
 
 def expire(timer, ms):

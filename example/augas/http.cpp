@@ -768,7 +768,7 @@ namespace {
             return true;
         }
         void
-        do_data(const handle& sock, const void* buf, size_t len)
+        do_recv(const handle& sock, const void* buf, size_t len)
         {
             marparser& parser(*sock.user<marparser>());
             try {

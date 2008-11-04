@@ -106,12 +106,20 @@ session::do_connected(mod_handle& sock, const char* name) const AUG_NOTHROW
     module_->connected(sock, name);
 }
 
+bool
+session::do_auth(const mod_handle& sock, const char* subject,
+                 const char* issuer) const AUG_NOTHROW
+{
+    scoped_frame frame(&session_);
+    return module_->auth(sock, subject, issuer);
+}
+
 void
-session::do_data(const mod_handle& sock, const char* buf,
+session::do_recv(const mod_handle& sock, const char* buf,
                  size_t size) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
-    module_->data(sock, buf, size);
+    module_->recv(sock, buf, size);
 }
 
 void
@@ -142,14 +150,6 @@ session::do_expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW
 {
     scoped_frame frame(&session_);
     module_->expire(timer, ms);
-}
-
-bool
-session::do_authcert(const mod_handle& sock, const char* subject,
-                     const char* issuer) const AUG_NOTHROW
-{
-    scoped_frame frame(&session_);
-    return module_->authcert(sock, subject, issuer);
 }
 
 session::~session() AUG_NOTHROW

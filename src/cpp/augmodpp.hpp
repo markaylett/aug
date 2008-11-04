@@ -303,8 +303,12 @@ namespace mod {
         virtual void
         do_connected(handle& sock, const char* name) = 0;
 
+        virtual bool
+        do_auth(const handle& sock, const char* subject,
+                const char* issuer) = 0;
+
         virtual void
-        do_data(const handle& sock, const void* buf, size_t size) = 0;
+        do_recv(const handle& sock, const void* buf, size_t size) = 0;
 
         virtual void
         do_error(const handle& sock, const char* desc) = 0;
@@ -317,10 +321,6 @@ namespace mod {
 
         virtual void
         do_expire(const handle& timer, unsigned& ms) = 0;
-
-        virtual bool
-        do_authcert(const handle& sock, const char* subject,
-                    const char* issuer) = 0;
 
     public:
         virtual
@@ -362,10 +362,15 @@ namespace mod {
         {
             do_connected(sock, name);
         }
-        void
-        data(const handle& sock, const void* buf, size_t size)
+        bool
+        auth(const handle& sock, const char* subject, const char* issuer)
         {
-            do_data(sock, buf, size);
+            return do_auth(sock, subject, issuer);
+        }
+        void
+        recv(const handle& sock, const void* buf, size_t size)
+        {
+            do_recv(sock, buf, size);
         }
         void
         error(const handle& sock, const char* desc)
@@ -386,11 +391,6 @@ namespace mod {
         expire(const handle& timer, unsigned& ms)
         {
             do_expire(timer, ms);
-        }
-        bool
-        authcert(const handle& sock, const char* subject, const char* issuer)
-        {
-            return do_authcert(sock, subject, issuer);
         }
     };
 
@@ -427,10 +427,16 @@ namespace mod {
         {
             mod_writelog(MOD_LOGWARN, "do_connected() not implemented");
         }
-        void
-        do_data(const handle& sock, const void* buf, size_t size)
+        bool
+        do_auth(const handle& sock, const char* subject, const char* issuer)
         {
-            mod_writelog(MOD_LOGWARN, "do_data() not implemented");
+            mod_writelog(MOD_LOGWARN, "do_auth() not implemented");
+            return true;
+        }
+        void
+        do_recv(const handle& sock, const void* buf, size_t size)
+        {
+            mod_writelog(MOD_LOGWARN, "do_recv() not implemented");
         }
         void
         do_error(const handle& sock, const char* desc)
@@ -452,13 +458,7 @@ namespace mod {
         {
             mod_writelog(MOD_LOGWARN, "do_expire() not implemented");
         }
-        bool
-        do_authcert(const handle& sock, const char* subject,
-                    const char* issuer)
-        {
-            mod_writelog(MOD_LOGWARN, "do_authcert() not implemented");
-            return true;
-        }
+
     public:
         virtual
         ~basic_session() MOD_NOTHROW
@@ -574,12 +574,21 @@ namespace mod {
                 getbase()->connected(h, name);
             } MOD_WRITELOGCATCH;
         }
+        static mod_bool
+        auth(const mod_handle* sock, const char* subject, const char* issuer)
+        {
+            try {
+                handle h(*sock);
+                return tobool(getbase()->auth(h, subject, issuer));
+            } MOD_WRITELOGCATCH;
+            return MOD_FALSE;
+        }
         static void
-        data(const mod_handle* sock, const void* buf,
+        recv(const mod_handle* sock, const void* buf,
              size_t size) MOD_NOTHROW
         {
             try {
-                getbase()->data(handle(*sock), buf, size);
+                getbase()->recv(handle(*sock), buf, size);
             } MOD_WRITELOGCATCH;
         }
         static void
@@ -610,16 +619,6 @@ namespace mod {
                 getbase()->expire(handle(*timer), *ms);
             } MOD_WRITELOGCATCH;
         }
-        static mod_bool
-        authcert(const mod_handle* sock, const char* subject,
-                 const char* issuer)
-        {
-            try {
-                handle h(*sock);
-                return tobool(getbase()->authcert(h, subject, issuer));
-            } MOD_WRITELOGCATCH;
-            return MOD_FALSE;
-        }
 
     public:
         static const mod_module*
@@ -634,12 +633,12 @@ namespace mod {
                 teardown,
                 accepted,
                 connected,
-                data,
+                auth,
+                recv,
                 error,
                 rdexpire,
                 wrexpire,
-                expire,
-                authcert
+                expire
             };
             try {
                 factory_ = new T(name);

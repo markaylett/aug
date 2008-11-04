@@ -529,6 +529,21 @@ struct mod_module {
     void (*connected_)(struct mod_handle* sock, const char* name);
 
     /**
+     * Authorisation of peer certificate.
+     *
+     * @param sock Socket descriptor.
+     *
+     * @param subject Certificate subject.
+     *
+     * @param issuer Certificate issuer.
+     *
+     * @return Either #MOD_TRUE or #MOD_FALSE.
+     */
+
+    mod_bool (*auth_)(const struct mod_handle* sock, const char* subject,
+                      const char* issuer);
+
+    /**
      * Inbound data.
      *
      * @param sock The socket on which the data was received.
@@ -538,8 +553,7 @@ struct mod_module {
      * @param len Length of data buffer.
      */
 
-    void (*data_)(const struct mod_handle* sock, const void* buf,
-                  size_t len);
+    void (*recv_)(const struct mod_handle* sock, const void* buf, size_t len);
 
     /**
      * Connection error.
@@ -583,21 +597,6 @@ struct mod_module {
      */
 
     void (*expire_)(const struct mod_handle* timer, unsigned* ms);
-
-    /**
-     * Authorisation of peer certificate.
-     *
-     * @param sock Socket descriptor.
-     *
-     * @param subject Certificate subject.
-     *
-     * @param issuer Certificate issuer.
-     *
-     * @return Either #MOD_TRUE or #MOD_FALSE.
-     */
-
-    mod_bool (*authcert_)(const struct mod_handle* sock, const char* subject,
-                          const char* issuer);
 };
 
 /** @} */

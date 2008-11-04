@@ -170,6 +170,12 @@ connimpl::connected(const string& name, const timeval& now)
     session_->connected(sock_, name.c_str());
 }
 
+bool
+connimpl::auth(const char* subject, const char* issuer)
+{
+    return session_->auth(sock_, subject, issuer);
+}
+
 void
 connimpl::process(chanref chan, unsigned short events, const timeval& now)
 {
@@ -198,7 +204,7 @@ connimpl::process(chanref chan, unsigned short events, const timeval& now)
 
             // Notify module of new data.
 
-            session_->data(sock_, buf, size);
+            session_->recv(sock_, buf, size);
 
         } catch (const block_exception&) {
         }
@@ -293,12 +299,6 @@ connimpl::teardown(const timeval& now)
         state_ = TEARDOWN;
         session_->teardown(sock_);
     }
-}
-
-bool
-connimpl::authcert(const char* subject, const char* issuer)
-{
-    return session_->authcert(sock_, subject, issuer);
 }
 
 string

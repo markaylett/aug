@@ -30,11 +30,11 @@ def connected(sock, name):
     sock.user = LineParser()
     send(server, "hello, world!\n")
 
-def data(sock, buf):
-    log.debug("data(): %s" % sock)
+def recv(sock, buf):
+    log.debug("recv(): %s" % sock)
     for line in sock.user.parse(str(buf)):
         if line != "hello, world!":
-            log.error("unexpected line from data()")
+            log.error("unexpected line from recv()")
         if sock == server:
             send(sock, line + "\n")
         else:

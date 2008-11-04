@@ -55,10 +55,17 @@ connected_(struct mod_handle* sock, const char* name)
     mod_writelog(MOD_LOGINFO, "connected_()");
 }
 
-static void
-data_(const struct mod_handle* sock, const void* buf, size_t len)
+static mod_bool
+auth_(const struct mod_handle* sock, const char* subject, const char* issuer)
 {
-    mod_writelog(MOD_LOGINFO, "data_()");
+    mod_writelog(MOD_LOGINFO, "auth_()");
+    return MOD_TRUE;
+}
+
+static void
+recv_(const struct mod_handle* sock, const void* buf, size_t len)
+{
+    mod_writelog(MOD_LOGINFO, "recv_()");
     mod_send(sock->id_, buf, len);
 }
 
@@ -85,14 +92,6 @@ expire_(const struct mod_handle* timer, unsigned* ms)
     mod_writelog(MOD_LOGINFO, "expire_()");
 }
 
-static mod_bool
-authcert_(const struct mod_handle* sock, const char* subject,
-          const char* issuer)
-{
-    mod_writelog(MOD_LOGINFO, "authcert_()");
-    return MOD_TRUE;
-}
-
 static const struct mod_module module_ = {
     stop_,
     start_,
@@ -102,12 +101,12 @@ static const struct mod_module module_ = {
     teardown_,
     accepted_,
     connected_,
-    data_,
+    auth_,
+    recv_,
     error_,
     rdexpire_,
     wrexpire_,
-    expire_,
-    authcert_
+    expire_
 };
 
 static const struct mod_module*

@@ -80,8 +80,8 @@ module RbSkel
     def self.connected(sock, name)
         Log.debug("connected(): #{sock}")
     end
-    def self.data(sock, buf)
-        Log.debug("data(): #{sock}")
+    def self.recv(sock, buf)
+        Log.debug("recv(): #{sock}")
         sock.user.parse(buf) do |line|
             x = @interp.interpret(line)
             if x == QUIT

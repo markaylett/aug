@@ -27,7 +27,7 @@ def accepted(sock, name):
 def connected(sock, name):
     log.info("proxy pair established")
 
-def data(sock, buf):
+def recv(sock, buf):
     # It is safe to send to a connection that has not been fully established.
     if pairs.has_key(sock):
         send(pairs[sock], buf)

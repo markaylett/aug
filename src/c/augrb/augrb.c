@@ -23,20 +23,20 @@ struct session_ {
     int teardown_ : 1;
     int accepted_ : 1;
     int connected_ : 1;
-    int data_ : 1;
+    int auth_ : 1;
+    int recv_ : 1;
     int error_ : 1;
     int rdexpire_ : 1;
     int wrexpire_ : 1;
     int expire_ : 1;
-    int authcert_ : 1;
     int open_;
 };
 
 /* Cache ids to avoid repeated lookups. */
 
 static ID stopid_, startid_, reconfid_, eventid_, closedid_,
-    teardownid_, acceptedid_, connectedid_, dataid_, errorid_,
-    rdexpireid_, wrexpireid_, expireid_, authcertid_;
+    teardownid_, acceptedid_, connectedid_, authid_, recvid_,
+    errorid_, rdexpireid_, wrexpireid_, expireid_;
 
 static VALUE maugrb_, chandle_, cerror_;
 
@@ -303,8 +303,10 @@ createsession_(const char* sname)
         = rb_respond_to(session->module_, acceptedid_) ? 1 : 0;
     session->connected_
         = rb_respond_to(session->module_, connectedid_) ? 1 : 0;
-    session->data_
-        = rb_respond_to(session->module_, dataid_) ? 1 : 0;
+    session->auth_
+        = rb_respond_to(session->module_, authid_) ? 1 : 0;
+    session->recv_
+        = rb_respond_to(session->module_, recvid_) ? 1 : 0;
     session->error_
         = rb_respond_to(session->module_, errorid_) ? 1 : 0;
     session->rdexpire_
@@ -313,8 +315,6 @@ createsession_(const char* sname)
         = rb_respond_to(session->module_, wrexpireid_) ? 1 : 0;
     session->expire_
         = rb_respond_to(session->module_, expireid_) ? 1 : 0;
-    session->authcert_
-        = rb_respond_to(session->module_, authcertid_) ? 1 : 0;
 
     session->open_ = 0;
     return session;
@@ -672,12 +672,12 @@ initrb_(VALUE unused)
     teardownid_= rb_intern("teardown");
     acceptedid_= rb_intern("accepted");
     connectedid_= rb_intern("connected");
-    dataid_= rb_intern("data");
+    authid_= rb_intern("auth");
+    recvid_= rb_intern("recv");
     errorid_= rb_intern("error");
     rdexpireid_= rb_intern("rdexpire");
     wrexpireid_= rb_intern("wrexpire");
     expireid_= rb_intern("expire");
-    authcertid_= rb_intern("authcert");
 
     maugrb_ = rb_define_module("AugRb");
     chandle_ = rb_define_class_under(maugrb_, "Handle", rb_cObject);
@@ -882,8 +882,8 @@ connected_(struct mod_handle* sock, const char* name)
         funcall2_(connectedid_, user, rb_str_new2(name));
 }
 
-static void
-data_(const struct mod_handle* sock, const void* buf, size_t len)
+static mod_bool
+auth_(const struct mod_handle* sock, const char* subject, const char* issuer)
 {
     struct session_* session = mod_getsession()->user_;
     VALUE user;
@@ -891,8 +891,27 @@ data_(const struct mod_handle* sock, const void* buf, size_t len)
     assert(sock->user_);
     user = *(VALUE*)sock->user_;
 
-    if (session->data_)
-        funcall2_(dataid_, user, rb_tainted_str_new(buf, (long)len));
+    /* Reject if function either returns false, or throws an exception. */
+
+    if (session->auth_)
+        if (Qfalse == funcall3_(authid_, user, rb_str_new2(subject),
+                                rb_str_new2(issuer)) || except_)
+            return MOD_FALSE;
+
+    return MOD_TRUE;
+}
+
+static void
+recv_(const struct mod_handle* sock, const void* buf, size_t len)
+{
+    struct session_* session = mod_getsession()->user_;
+    VALUE user;
+    assert(session);
+    assert(sock->user_);
+    user = *(VALUE*)sock->user_;
+
+    if (session->recv_)
+        funcall2_(recvid_, user, rb_tainted_str_new(buf, (long)len));
 }
 
 static void
@@ -956,26 +975,6 @@ expire_(const struct mod_handle* timer, unsigned* ms)
     }
 }
 
-static mod_bool
-authcert_(const struct mod_handle* sock, const char* subject,
-          const char* issuer)
-{
-    struct session_* session = mod_getsession()->user_;
-    VALUE user;
-    assert(session);
-    assert(sock->user_);
-    user = *(VALUE*)sock->user_;
-
-    /* Reject if function either returns false, or throws an exception. */
-
-    if (session->authcert_)
-        if (Qfalse == funcall3_(authcertid_, user, rb_str_new2(subject),
-                                rb_str_new2(issuer)) || except_)
-            return MOD_FALSE;
-
-    return MOD_TRUE;
-}
-
 static const struct mod_module module_ = {
     stop_,
     start_,
@@ -985,12 +984,12 @@ static const struct mod_module module_ = {
     teardown_,
     accepted_,
     connected_,
-    data_,
+    auth_,
+    recv_,
     error_,
     rdexpire_,
     wrexpire_,
-    expire_,
-    authcert_
+    expire_
 };
 
 static const struct mod_module*

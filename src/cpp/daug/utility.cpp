@@ -42,8 +42,13 @@ namespace {
     connected(mod_handle* sock, const char* name)
     {
     }
+    mod_bool
+    auth(const mod_handle* sock, const char* subject, const char* issuer)
+    {
+        return MOD_TRUE;
+    }
     void
-    data(const mod_handle* sock, const void* buf, size_t len)
+    recv(const mod_handle* sock, const void* buf, size_t len)
     {
     }
     void
@@ -62,12 +67,6 @@ namespace {
     expire(const mod_handle* timer, unsigned* ms)
     {
     }
-    mod_bool
-    authcert(const mod_handle* sock, const char* subject,
-             const char* issuer)
-    {
-        return MOD_TRUE;
-    }
 }
 
 void
@@ -82,10 +81,10 @@ daug::setdefaults(mod_module& dst, const mod_module& src,
     dst.teardown_ = src.teardown_ ? src.teardown_ : teardown;
     dst.accepted_ = src.accepted_ ? src.accepted_ : accepted;
     dst.connected_ = src.connected_ ? src.connected_ : connected;
-    dst.data_ = src.data_ ? src.data_ : data;
+    dst.auth_ = src.auth_ ? src.auth_ : auth;
+    dst.recv_ = src.recv_ ? src.recv_ : recv;
     dst.error_ = src.error_ ? src.error_ : error;
     dst.rdexpire_ = src.rdexpire_ ? src.rdexpire_ : rdexpire;
     dst.wrexpire_ = src.wrexpire_ ? src.wrexpire_ : wrexpire;
     dst.expire_ = src.expire_ ? src.expire_ : expire;
-    dst.authcert_ = src.authcert_ ? src.authcert_ : authcert;
 }

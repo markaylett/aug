@@ -53,14 +53,14 @@ namespace aug {
         void
         do_connected(const std::string& name, const timeval& now);
 
+        bool
+        do_auth(const char* subject, const char* issuer);
+
         void
         do_process(chanref chan, unsigned short events, const timeval& now);
 
         void
         do_teardown(const timeval& now);
-
-        bool
-        do_authcert(const char* subject, const char* issuer);
 
         std::string
         do_peername(chanref chan) const;

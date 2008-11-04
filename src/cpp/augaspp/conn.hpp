@@ -34,6 +34,9 @@ namespace aug {
         virtual void
         do_connected(const std::string& name, const timeval& now) = 0;
 
+        virtual bool
+        do_auth(const char* subject, const char* issuer) = 0;
+
         /**
          * Process events.
          */
@@ -48,9 +51,6 @@ namespace aug {
 
         virtual void
         do_teardown(const timeval& now) = 0;
-
-        virtual bool
-        do_authcert(const char* subject, const char* issuer) = 0;
 
         virtual std::string
         do_peername(chanref chan) const = 0;
@@ -78,6 +78,11 @@ namespace aug {
         {
             do_connected(name, now);
         }
+        bool
+        auth(const char* subject, const char* issuer)
+        {
+            return do_auth(subject, issuer);
+        }
         void
         process(chanref chan, unsigned short events, const timeval& now)
         {
@@ -87,11 +92,6 @@ namespace aug {
         teardown(const timeval& now)
         {
             do_teardown(now);
-        }
-        bool
-        authcert(const char* subject, const char* issuer)
-        {
-            return do_authcert(subject, issuer);
         }
         std::string
         peername(chanref chan) const
@@ -159,6 +159,9 @@ namespace aug {
         void
         connected(const std::string& name, const timeval& now);
 
+        bool
+        auth(const char* subject, const char* issuer);
+
         void
         process(chanref chan, unsigned short events, const timeval& now);
 
@@ -170,9 +173,6 @@ namespace aug {
 
         void
         teardown(const timeval& now);
-
-        bool
-        authcert(const char* subject, const char* issuer);
 
         std::string
         peername(chanref chan) const;

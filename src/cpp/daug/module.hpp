@@ -60,8 +60,12 @@ namespace daug {
         void
         connected(mod_handle& sock, const char* name) const AUG_NOTHROW;
 
+        bool
+        auth(const mod_handle& sock, const char* subject,
+             const char* issuer) const AUG_NOTHROW;
+
         void
-        data(const mod_handle& sock, const char* buf,
+        recv(const mod_handle& sock, const char* buf,
              size_t size) const AUG_NOTHROW;
 
         void
@@ -75,10 +79,6 @@ namespace daug {
 
         void
         expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW;
-
-        bool
-        authcert(const mod_handle& sock, const char* subject,
-                 const char* issuer) const AUG_NOTHROW;
     };
 
     typedef aug::smartptr<module> moduleptr;
