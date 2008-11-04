@@ -128,7 +128,7 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         /* In this case, id and parent-id are the same. */
 
-        if (!aug_clearestab(handler, &impl->chan_, impl->id_))
+        if (!aug_estabchan(handler, &impl->chan_, impl->id_))
             return NULL;
 
     } else {
@@ -141,7 +141,7 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         /* Assumption: error events cannot occur on plain files. */
 
-        if (events && !aug_clearready(handler, &impl->chan_, events))
+        if (events && !aug_readychan(handler, &impl->chan_, events))
             return NULL;
     }
 
@@ -317,36 +317,6 @@ static const struct aug_errvtbl errvtbl_ = {
     err_release_,
     err_copyerrinfo_
 };
-
-AUGSYS_API void
-aug_clearerror(aug_chandler* handler, aug_chan* chan,
-               struct aug_errinfo* errinfo)
-{
-    aug_clearerrinfo(aug_tlerr);
-    aug_errorchan(handler, chan, errinfo);
-}
-
-AUGSYS_API aug_bool
-aug_clearestab(aug_chandler* handler, aug_chan* chan, unsigned parent)
-{
-    /* The callback is not required to set errinfo when returning false.  The
-       errinfo record must therefore be cleared before the callback is made,
-       to avoid any confusion with previous errors. */
-
-    aug_clearerrinfo(aug_tlerr);
-    return aug_estabchan(handler, chan, parent);
-}
-
-AUGSYS_API aug_bool
-aug_clearready(aug_chandler* handler, aug_chan* chan, unsigned short events)
-{
-    /* The callback is not required to set errinfo when returning false.  The
-       errinfo record must therefore be cleared before the callback is made,
-       to avoid any confusion with previous errors. */
-
-    aug_clearerrinfo(aug_tlerr);
-    return aug_readychan(handler, chan, events);
-}
 
 AUGSYS_API aug_chan*
 aug_createfile(aug_mpool* mpool, const char* name, aug_muxer_t muxer,

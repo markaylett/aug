@@ -9,8 +9,6 @@ AUG_RCSID("$Id$");
 
 #if ENABLE_SSL
 
-# include "augsys/chan.h"   /* aug_clearready() */
-
 # include "augsys/socket.h" /* aug_shutdown() */
 # include "augsys/uio.h"
 
@@ -62,7 +60,7 @@ struct impl_ {
     aug_muxer_t muxer_;
     aug_sd sd_;
 
-    /* The event mask from the user's perspective. */
+    /* The event mask from the channel's perspective. */
 
     unsigned short mask_;
     struct aug_ssldata data_;
@@ -91,7 +89,7 @@ error_(aug_chandler* handler, aug_chan* chan, aug_sd sd,
 
             /* Error occurred. */
 
-            aug_clearerror(handler, chan, &errinfo);
+            aug_errorchan(handler, chan, &errinfo);
             return AUG_TRUE;
         }
     }
@@ -264,7 +262,7 @@ sslwrite_(SSL* ssl, struct buf_* x)
 }
 
 static int
-realmask_(struct impl_* impl)
+sslmask_(struct impl_* impl)
 {
     /* Calculate the real mask to be used by the muxer. */
 
@@ -296,11 +294,13 @@ realmask_(struct impl_* impl)
 }
 
 static unsigned short
-userevents_(struct impl_* impl)
+chanevents_(struct impl_* impl)
 {
     unsigned short events = 0;
 
-    /* End of data and errors are communicated via aug_read(). */
+    /* Channel is readable if there is either data in the input buffer, or a
+       state that needs communicating.  Note: end-of-data and errors are
+       communicated via aug_read(). */
 
     if ((impl->mask_ & AUG_MDEVENTRD)
         && (!bufempty_(&impl->inbuf_) || RDZERO == impl->state_
@@ -314,18 +314,14 @@ userevents_(struct impl_* impl)
 }
 
 static void
-updateevents_(struct impl_* impl)
+setsslmask_(struct impl_* impl)
 {
-    unsigned short real, user;
+    unsigned short mask = sslmask_(impl);
+    aug_setmdeventmask(impl->muxer_, impl->sd_, mask);
 
-    real = realmask_(impl);
-    user = userevents_(impl);
-
-    aug_setmdeventmask(impl->muxer_, impl->sd_, real);
-
-    AUG_CTXDEBUG3(aug_tlx, "SSL: events: id=[%u], realmask=[%u],"
-                  " usermask=[%u], userevents=[%u]", impl->data_.id_,
-                  (unsigned)real, (unsigned)impl->mask_, (unsigned)user);
+    AUG_CTXDEBUG3(aug_tlx,
+                  "SSL: events: id=[%u], sslmask=[%u], chanmask=[%u]",
+                  impl->data_.id_, (unsigned)mask, (unsigned)impl->mask_);
 }
 
 static void
@@ -346,8 +342,9 @@ readwrite_(struct impl_* impl, int rw)
             AUG_CTXDEBUG3(aug_tlx, "SSL: %ld bytes read to input buffer",
                           (long)ret);
             if ((ret = SSL_pending(impl->ssl_))) {
-                AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes pending for immediate"
-                              " read", ret);
+                AUG_CTXDEBUG3(aug_tlx,
+                              "SSL: %d bytes pending for immediate read",
+                              ret);
                 impl->state_ = RDPEND;
                 goto done;
             }
@@ -611,21 +608,23 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
     else
         AUG_CTXDEBUG3(aug_tlx, "SSL: readwrite_() skipped");
 
-    events = userevents_(impl);
-    AUG_CTXDEBUG3(aug_tlx, "SSL: userevents_(): id=[%u], events=[%u]",
+    events = chanevents_(impl);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: chanevents_(): id=[%u], events=[%u]",
                   impl->data_.id_, (unsigned)events);
 
     if (events) {
 
-        if (!aug_clearready(handler, &impl->chan_, events)) {
+        if (!aug_readychan(handler, &impl->chan_, events)) {
 
             /* No need to update events if file is being removed - indicated
                by false return. */
 
             return NULL;
         }
-        updateevents_(impl);
 
+        /* Update muxer's mask. */
+
+        setsslmask_(impl);
     }
 
     retain_(impl);
@@ -641,7 +640,7 @@ csetmask_(aug_chan* ob, unsigned short mask)
                   impl->data_.id_, (unsigned)mask);
 
     impl->mask_ = mask;
-    updateevents_(impl);
+    setsslmask_(impl);
     return AUG_SUCCESS;
 }
 
@@ -681,7 +680,7 @@ cisready_(aug_chan* ob)
     if (AUG_BADSD == impl->sd_)
         return AUG_TRUE;
 
-    return userevents_(impl)
+    return chanevents_(impl)
         || (RDPEND == impl->state_ && !buffull_(&impl->inbuf_));
 }
 
@@ -759,11 +758,11 @@ sread_(aug_stream* ob, void* buf, size_t size)
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
                                    EWOULDBLOCK);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user read from input buffer: id=[%u]",
+    AUG_CTXDEBUG3(aug_tlx, "SSL: chan read from input buffer: id=[%u]",
                   impl->data_.id_);
 
     ret = (ssize_t)readbuf_(&impl->inbuf_, buf, size);
-    updateevents_(impl);
+    setsslmask_(impl);
     return AUG_MKRESULT(ret);
 }
 
@@ -794,11 +793,11 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
                                    EWOULDBLOCK);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user readv from input buffer: id=[%u]",
+    AUG_CTXDEBUG3(aug_tlx, "SSL: chan readv from input buffer: id=[%u]",
                   impl->data_.id_);
 
     ret = (ssize_t)readbufv_(&impl->inbuf_, iov, size);
-    updateevents_(impl);
+    setsslmask_(impl);
     return AUG_MKRESULT(ret);
 }
 
@@ -822,11 +821,11 @@ swrite_(aug_stream* ob, const void* buf, size_t size)
                                    WSAESHUTDOWN);
 #endif /* _WIN32 */
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user write to output buffer: id=[%u]",
+    AUG_CTXDEBUG3(aug_tlx, "SSL: chan write to output buffer: id=[%u]",
                   impl->data_.id_);
 
     ret = (ssize_t)writebuf_(&impl->outbuf_, buf, size);
-    updateevents_(impl);
+    setsslmask_(impl);
     return AUG_MKRESULT(ret);
 }
 
@@ -850,11 +849,11 @@ swritev_(aug_stream* ob, const struct iovec* iov, int size)
                                    WSAESHUTDOWN);
 #endif /* _WIN32 */
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: user writev to output buffer: id=[%u]",
+    AUG_CTXDEBUG3(aug_tlx, "SSL: chan writev to output buffer: id=[%u]",
                   impl->data_.id_);
 
     ret = (ssize_t)writebufv_(&impl->outbuf_, iov, size);
-    updateevents_(impl);
+    setsslmask_(impl);
     return AUG_MKRESULT(ret);
 }
 
