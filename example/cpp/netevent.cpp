@@ -115,7 +115,7 @@ namespace {
         muxer mux(getmpool(aug_tlx));
         timers ts(getmpool(aug_tlx));
         session s(name, ref, ep, ts);
-        setmdeventmask(mux, ref, AUG_MDEVENTRD);
+        setmdeventmask(mux, ref, AUG_MDEVENTRDEX);
 
         timeval tv;
         unsigned ready(!0);

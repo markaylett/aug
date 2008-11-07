@@ -138,7 +138,7 @@ connimpl::send(chanref chan, const void* buf, size_t len,
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setchanmask(chan, AUG_MDEVENTRDWR);
+        setchanmask(chan, AUG_MDEVENTALL);
     }
 
     buffer_.append(buf, len);
@@ -152,7 +152,7 @@ connimpl::sendv(chanref chan, blobref blob, const timeval& now)
         // Set timestamp to record when data was first queued for write.
 
         since_ = now;
-        setchanmask(chan, AUG_MDEVENTRDWR);
+        setchanmask(chan, AUG_MDEVENTALL);
     }
 
     buffer_.append(blob);
@@ -224,7 +224,7 @@ connimpl::process(chanref chan, unsigned short events, const timeval& now)
 
             // No more (buffered) data to be written.
 
-            setchanmask(chan, AUG_MDEVENTRD);
+            setchanmask(chan, AUG_MDEVENTRDEX);
 
             // If flagged for shutdown, send FIN and disable writes.
 

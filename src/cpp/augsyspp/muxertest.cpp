@@ -18,8 +18,8 @@ main(int argc, char* argv[])
 
             autosds xy(socketpair(AF_UNIX, SOCK_STREAM, 0));
 
-            setmdeventmask(mux, xy[0], AUG_MDEVENTRD);
-            setmdeventmask(mux, xy[1], AUG_MDEVENTRD);
+            setmdeventmask(mux, xy[0], AUG_MDEVENTRDEX);
+            setmdeventmask(mux, xy[1], AUG_MDEVENTRDEX);
 
             setmdeventmask(mux, xy[1], 0);
             setmdeventmask(mux, xy[0], 0);

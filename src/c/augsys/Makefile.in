@@ -42,7 +42,7 @@ DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
 check_PROGRAMS = chantest$(EXEEXT) mcasttest$(EXEEXT) \
 	muxertest$(EXEEXT) sockaddrtest$(EXEEXT) sockettest$(EXEEXT) \
-	timetest$(EXEEXT) utilitytest$(EXEEXT)
+	stickytest$(EXEEXT) timetest$(EXEEXT) utilitytest$(EXEEXT)
 subdir = src/c/augsys
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -81,6 +81,9 @@ sockaddrtest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_sockettest_OBJECTS = sockettest.$(OBJEXT)
 sockettest_OBJECTS = $(am_sockettest_OBJECTS)
 sockettest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
+am_stickytest_OBJECTS = stickytest.$(OBJEXT)
+stickytest_OBJECTS = $(am_stickytest_OBJECTS)
+stickytest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
 am_timetest_OBJECTS = timetest.$(OBJEXT)
 timetest_OBJECTS = $(am_timetest_OBJECTS)
 timetest_DEPENDENCIES = $(top_builddir)/src/c/augsys/libaugsys.la
@@ -100,11 +103,13 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 SOURCES = $(libaugsys_la_SOURCES) $(chantest_SOURCES) \
 	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
 	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
-	$(timetest_SOURCES) $(utilitytest_SOURCES)
+	$(stickytest_SOURCES) $(timetest_SOURCES) \
+	$(utilitytest_SOURCES)
 DIST_SOURCES = $(libaugsys_la_SOURCES) $(chantest_SOURCES) \
 	$(mcasttest_SOURCES) $(muxertest_SOURCES) \
 	$(sockaddrtest_SOURCES) $(sockettest_SOURCES) \
-	$(timetest_SOURCES) $(utilitytest_SOURCES)
+	$(stickytest_SOURCES) $(timetest_SOURCES) \
+	$(utilitytest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -309,6 +314,7 @@ TESTS = \
 	muxertest \
 	sockaddrtest \
 	sockettest \
+	stickytest \
 	timetest \
 	utilitytest
 
@@ -330,6 +336,10 @@ sockaddrtest_LDADD = \
 
 sockettest_SOURCES = sockettest.c
 sockettest_LDADD = \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+stickytest_SOURCES = stickytest.c
+stickytest_LDADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 timetest_SOURCES = timetest.c
@@ -424,6 +434,9 @@ sockaddrtest$(EXEEXT): $(sockaddrtest_OBJECTS) $(sockaddrtest_DEPENDENCIES)
 sockettest$(EXEEXT): $(sockettest_OBJECTS) $(sockettest_DEPENDENCIES) 
 	@rm -f sockettest$(EXEEXT)
 	$(LINK) $(sockettest_LDFLAGS) $(sockettest_OBJECTS) $(sockettest_LDADD) $(LIBS)
+stickytest$(EXEEXT): $(stickytest_OBJECTS) $(stickytest_DEPENDENCIES) 
+	@rm -f stickytest$(EXEEXT)
+	$(LINK) $(stickytest_LDFLAGS) $(stickytest_OBJECTS) $(stickytest_LDADD) $(LIBS)
 timetest$(EXEEXT): $(timetest_OBJECTS) $(timetest_DEPENDENCIES) 
 	@rm -f timetest$(EXEEXT)
 	$(LINK) $(timetest_LDFLAGS) $(timetest_OBJECTS) $(timetest_LDADD) $(LIBS)
@@ -454,6 +467,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockettest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sticky.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stickytest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timetest.Po@am__quote@

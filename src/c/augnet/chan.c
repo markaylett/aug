@@ -754,7 +754,7 @@ pchan_isready_(aug_chan* ob)
     if (AUG_BADMD == impl->sticky_.md_)
         return AUG_TRUE;
 
-    return impl->sticky_.events_ ? AUG_TRUE : AUG_FALSE;
+    return aug_getsticky(&impl->sticky_) ? AUG_TRUE : AUG_FALSE;
 }
 
 static const struct aug_chanvtbl pchanvtbl_ = {
@@ -803,7 +803,8 @@ pstream_read_(aug_stream* ob, void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_sread(impl->sticky_.md_, buf, size);
-    aug_stickyrd(&impl->sticky_, rsize, size);
+    if (AUG_ISBLOCK(rsize))
+        aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
     return rsize;
 }
 
@@ -812,7 +813,8 @@ pstream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_sreadv(impl->sticky_.md_, iov, size);
-    aug_stickyrd(&impl->sticky_, rsize, aug_iovsum(iov, size));
+    if (AUG_ISBLOCK(rsize))
+        aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
     return rsize;
 }
 
@@ -821,7 +823,8 @@ pstream_write_(aug_stream* ob, const void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_swrite(impl->sticky_.md_, buf, size);
-    aug_stickywr(&impl->sticky_, rsize, size);
+    if (AUG_ISBLOCK(rsize))
+        aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
     return rsize;
 }
 
@@ -830,7 +833,8 @@ pstream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_swritev(impl->sticky_.md_, iov, size);
-    aug_stickywr(&impl->sticky_, rsize, aug_iovsum(iov, size));
+    if (AUG_ISBLOCK(rsize))
+        aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
     return rsize;
 }
 
@@ -887,7 +891,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 
     /* Default when established. */
 
-    impl->mask_ = AUG_MDEVENTRD;
+    impl->mask_ = AUG_MDEVENTRDEX;
     impl->sslctx_ = sslctx;
     impl->conn_ = conn;
     impl->est_ = est;
@@ -922,7 +926,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     /* A readable event will be delivered when a new connection is
        attempted. */
 
-    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTRD)))
+    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTRDEX)))
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct simpl_)))) {
@@ -938,14 +942,9 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     impl->muxer_ = muxer;
     impl->sd_ = sd;
 
-    /* Default mask for new connections.
+    /* Default mask for new connections. */
 
-       Sticky events used by plain sockets ensure that readability is always
-       set.  However, AUG_MDEVENTRD is still used both for safety and ssl
-       support.
-     */
-
-    impl->mask_ = AUG_MDEVENTRD;
+    impl->mask_ = AUG_MDEVENTRDEX;
     impl->sslctx_ = sslctx;
 
     aug_retain(mpool);

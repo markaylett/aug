@@ -23,9 +23,9 @@ namespace {
         setnonblock(sds[1], true);
         pair<chanptr, chanptr>
             p(make_pair(createplain(mpool, nextid(), muxer, sds[0],
-                                    AUG_MDEVENTRD),
+                                    AUG_MDEVENTRDEX),
                         createplain(mpool, nextid(), muxer, sds[1],
-                                    AUG_MDEVENTWR)));
+                                    AUG_MDEVENTALL)));
         sds.release();
         return p;
     }
@@ -85,13 +85,13 @@ namespace {
                     AUG_CTXDEBUG0(aug_tlx, "read character '%c'", ch);
                 } catch (const block_exception&) {
                     aug_ctxinfo(aug_tlx, "read blocked; need write");
-					setchanmask(wrchan_, AUG_MDEVENTWR);
+					setchanmask(wrchan_, AUG_MDEVENTALL);
                 }
             } else if (id == wr_) {
                 aug_ctxinfo(aug_tlx, "writer events: %u", (unsigned)events);
                 write(stream, ALPHABET, 26);
                 wrchan_ = object_cast<aug_chan>(stream);
-                setchanmask(wrchan_, 0);
+                setchanmask(wrchan_, AUG_MDEVENTRDEX);
             }
             return AUG_TRUE;
         }

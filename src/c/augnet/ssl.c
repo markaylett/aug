@@ -271,19 +271,19 @@ sslmask_(struct impl_* impl)
     switch (impl->state_) {
     case NORMAL:
         if (!bufempty_(&impl->outbuf_))
-            mask = AUG_MDEVENTRDWR;
+            mask = AUG_MDEVENTALL;
         else
-            mask = AUG_MDEVENTRD;
+            mask = AUG_MDEVENTRDEX;
         break;
     case RDPEND:
         break;
     case RDWANTRD:
     case WRWANTRD:
-        mask = AUG_MDEVENTRD;
+        mask = AUG_MDEVENTRDEX;
         break;
     case RDWANTWR:
     case WRWANTWR:
-        mask = AUG_MDEVENTWR;
+        mask = AUG_MDEVENTALL;
         break;
     case RDZERO:
     case SSLERR:
@@ -877,7 +877,7 @@ createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
     SSL* ssl;
     BIO* bio;
 
-    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTRDWR)))
+    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTALL)))
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct impl_)))) {

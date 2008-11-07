@@ -176,7 +176,7 @@ namespace test {
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
-                setchanmask(chan_, AUG_MDEVENTRDWR);
+                setchanmask(chan_, AUG_MDEVENTALL);
             } else {
                 streamptr strm(object_cast<aug_stream>(chan_));
                 shutdown(strm);
@@ -203,7 +203,7 @@ namespace test {
             chans tmp(getmpool(aug_tlx), chandler_);
             chans_.swap(tmp);
 
-            setmdeventmask(muxer_, aug_eventrd(), AUG_MDEVENTRD);
+            setmdeventmask(muxer_, aug_eventrd(), AUG_MDEVENTRDEX);
 
             aug_hostserv hostserv;
             parsehostserv(address_, hostserv);
@@ -264,7 +264,7 @@ namespace test {
             streamptr stream(object_cast<aug_stream>(chan));
             sessionptr sess(sessions_[id]);
 
-            if (events & AUG_MDEVENTRD) {
+            if (events & AUG_MDEVENTRDEX) {
 
                 AUG_CTXDEBUG2(aug_tlx, "handling read event '%d'", id);
 
@@ -274,7 +274,7 @@ namespace test {
                     return AUG_FALSE;
                 }
 
-                setchanmask(chan, AUG_MDEVENTRDWR);
+                setchanmask(chan, AUG_MDEVENTALL);
                 sess->timer_.cancel();
                 sess->heartbeats_ = 0;
             }
@@ -282,7 +282,7 @@ namespace test {
             if (events & AUG_MDEVENTWR) {
 
                 if (!sess->buffer_.writesome(stream)) {
-                    setchanmask(chan, AUG_MDEVENTRD);
+                    setchanmask(chan, AUG_MDEVENTRDEX);
                     sess->timer_.reset(5000);
                 }
             }
@@ -380,18 +380,25 @@ namespace test {
 
                 try {
 
-                    scoped_unblock unblock;
+                    ready = getreadychans(state_->chans_);
+                    if (ready) {
 
-                    if (state_->timers_.empty()) {
+                        // Channels ready so don't wait.
+
+                        pollmdevents(state_->muxer_);
+
+                    } else if (state_->timers_.empty()) {
 
                         // No timers so wait indefinitely.
 
+                        scoped_unblock unblock;
                         ready = waitmdevents(state_->muxer_);
 
                     } else {
 
                         // Wait upto next timer expiry.
 
+                        scoped_unblock unblock;
                         ready = waitmdevents(state_->muxer_, tv);
                     }
 

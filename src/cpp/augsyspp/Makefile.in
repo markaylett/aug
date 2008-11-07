@@ -40,7 +40,7 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-check_PROGRAMS = mplexertest$(EXEEXT) smartptrtest$(EXEEXT)
+check_PROGRAMS = muxertest$(EXEEXT) smartptrtest$(EXEEXT)
 subdir = src/cpp/augsyspp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
@@ -56,9 +56,9 @@ am_libaugsyspp_la_OBJECTS = config.lo dlfcn.lo endpoint.lo inetaddr.lo \
 	mcast.lo mmap.lo muxer.lo smartfd.lo smartptr.lo socket.lo \
 	string.lo time.lo types.lo unistd.lo utility.lo
 libaugsyspp_la_OBJECTS = $(am_libaugsyspp_la_OBJECTS)
-am_mplexertest_OBJECTS = mplexertest.$(OBJEXT)
-mplexertest_OBJECTS = $(am_mplexertest_OBJECTS)
-mplexertest_DEPENDENCIES =  \
+am_muxertest_OBJECTS = muxertest.$(OBJEXT)
+muxertest_OBJECTS = $(am_muxertest_OBJECTS)
+muxertest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_smartptrtest_OBJECTS = smartptrtest.$(OBJEXT)
@@ -76,9 +76,9 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugsyspp_la_SOURCES) $(mplexertest_SOURCES) \
+SOURCES = $(libaugsyspp_la_SOURCES) $(muxertest_SOURCES) \
 	$(smartptrtest_SOURCES)
-DIST_SOURCES = $(libaugsyspp_la_SOURCES) $(mplexertest_SOURCES) \
+DIST_SOURCES = $(libaugsyspp_la_SOURCES) $(muxertest_SOURCES) \
 	$(smartptrtest_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -266,11 +266,11 @@ libaugsyspp_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 TESTS = \
-	mplexertest \
+	muxertest \
 	smartptrtest
 
-mplexertest_SOURCES = mplexertest.cpp
-mplexertest_LDADD = \
+muxertest_SOURCES = muxertest.cpp
+muxertest_LDADD = \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
@@ -330,9 +330,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-mplexertest$(EXEEXT): $(mplexertest_OBJECTS) $(mplexertest_DEPENDENCIES) 
-	@rm -f mplexertest$(EXEEXT)
-	$(CXXLINK) $(mplexertest_LDFLAGS) $(mplexertest_OBJECTS) $(mplexertest_LDADD) $(LIBS)
+muxertest$(EXEEXT): $(muxertest_OBJECTS) $(muxertest_DEPENDENCIES) 
+	@rm -f muxertest$(EXEEXT)
+	$(CXXLINK) $(muxertest_LDFLAGS) $(muxertest_OBJECTS) $(muxertest_LDADD) $(LIBS)
 smartptrtest$(EXEEXT): $(smartptrtest_OBJECTS) $(smartptrtest_DEPENDENCIES) 
 	@rm -f smartptrtest$(EXEEXT)
 	$(CXXLINK) $(smartptrtest_LDFLAGS) $(smartptrtest_OBJECTS) $(smartptrtest_LDADD) $(LIBS)
@@ -349,8 +349,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inetaddr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mmap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplexertest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxertest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartfd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartptr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartptrtest.Po@am__quote@

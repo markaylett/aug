@@ -34,7 +34,7 @@ main(int argc, char* argv[])
         joinmcast(sfd, in, 4 == argc ? argv[3] : 0);
 
         muxer mux(getmpool(aug_tlx));
-        setmdeventmask(mux, sfd, AUG_MDEVENTRD);
+        setmdeventmask(mux, sfd, AUG_MDEVENTRDEX);
 
         // FIXME: implementation assumes a level-triggered interface, which it
         // is not.

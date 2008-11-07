@@ -44,15 +44,15 @@ libaugsyspp_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
 check_PROGRAMS = \
-	mplexertest \
+	muxertest \
 	smartptrtest
 
 TESTS = \
-	mplexertest \
+	muxertest \
 	smartptrtest
 
-mplexertest_SOURCES = mplexertest.cpp
-mplexertest_LDADD = \
+muxertest_SOURCES = muxertest.cpp
+muxertest_LDADD = \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 

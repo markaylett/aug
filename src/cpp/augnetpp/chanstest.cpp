@@ -23,9 +23,9 @@ namespace {
         setnonblock(sds[1], true);
         pair<chanptr, chanptr>
             p(make_pair(createplain(mpool, nextid(), muxer, sds[0],
-                                    AUG_MDEVENTRD | AUG_MDEVENTEX),
+                                    AUG_MDEVENTRDEX),
                         createplain(mpool, nextid(), muxer, sds[1],
-                                    AUG_MDEVENTWR | AUG_MDEVENTEX)));
+                                    AUG_MDEVENTALL)));
         sds.release();
         return p;
     }
@@ -80,11 +80,11 @@ namespace {
                     exit(1);
                 }
                 if ('Z' == ch && recv_ < 260)
-                    setchanmask(wrchan_, AUG_MDEVENTRDWR);
+                    setchanmask(wrchan_, AUG_MDEVENTALL);
             } else if (id == wr_) {
                 write(stream, ALPHABET, 26);
                 wrchan_ = object_cast<aug_chan>(stream);
-                setchanmask(wrchan_, AUG_MDEVENTRD);
+                setchanmask(wrchan_, AUG_MDEVENTRDEX);
             }
             return AUG_TRUE;
         }
@@ -111,7 +111,12 @@ main(int argc, char* argv[])
         insertchan(chans, xy.first);
 
         while (recv_ < 26 * 10) {
-            waitmdevents(mux);
+
+            if (0 < getreadychans(chans))
+                pollmdevents(mux);
+            else
+                waitmdevents(mux);
+
             processchans(chans);
         }
 

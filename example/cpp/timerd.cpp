@@ -182,7 +182,7 @@ namespace test {
             verify(aug_setsrvlogger("aug"));
 
             auto_ptr<state> ptr(new state());
-            setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRD);
+            setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRDEX);
             state_ = ptr;
             return AUG_SUCCESS;
         }

@@ -64,7 +64,7 @@ namespace {
             chans tmp(getmpool(aug_tlx), chandler_);
             chans_.swap(tmp);
 
-            setmdeventmask(muxer_, rd_, AUG_MDEVENTRD);
+            setmdeventmask(muxer_, rd_, AUG_MDEVENTRDEX);
 
             endpoint ep(null);
             autosd sd(tcpserver(host, serv, ep));
@@ -140,8 +140,22 @@ namespace {
             while (!quit_) {
 
                 try {
-                    scoped_unblock unblock;
-                    waitmdevents(muxer_);
+
+                    unsigned ready(getreadychans(chans_));
+                    if (ready) {
+
+                        // Some are ready so don't block.
+
+                        pollmdevents(muxer_);
+
+                    } else {
+
+                        // No timers so wait indefinitely.
+
+                        scoped_unblock unblock;
+                        waitmdevents(muxer_);
+                    }
+
                 } catch (const intr_exception&) {
                     continue;
                 }

@@ -180,7 +180,7 @@ namespace aug {
                 chans_.swap(tmp);
 
                 gettimeofday(now_);
-                setmdeventmask(muxer_, eventrd_, AUG_MDEVENTRD);
+                setmdeventmask(muxer_, eventrd_, AUG_MDEVENTRDEX);
             }
             smartob<aug_object>
             cast_(const char* id) AUG_NOTHROW
@@ -505,8 +505,6 @@ engine::run(bool stoponerr)
 
             try {
 
-                scoped_unblock unblock;
-
                 ready = getreadychans(impl_->chans_);
                 if (ready) {
 
@@ -518,12 +516,14 @@ engine::run(bool stoponerr)
 
                     // No timers so wait indefinitely.
 
+                    scoped_unblock unblock;
                     ready = waitmdevents(impl_->muxer_);
 
                 } else {
 
                     // Wait upto next timer expiry.
 
+                    scoped_unblock unblock;
                     ready = waitmdevents(impl_->muxer_, tv);
                 }
 

@@ -9,80 +9,118 @@ AUG_RCSID("$Id$");
 
 #include "augctx/base.h" /* aug_tlx */
 
+/* External events are sticky events that are visible to the outside world.
+   Externally visible events are always a subset of the current mask.  In
+   contrast, internal events are the set of all sticky events that have not
+   been cleared. */
+
+#define EXTERNAL_(x) ((x)->internal_ & (x)->mask_)
+
 AUGSYS_API aug_result
 aug_initsticky(struct aug_sticky* sticky, aug_muxer_t muxer, aug_md md,
                unsigned short mask)
 {
     sticky->muxer_ = muxer;
     sticky->md_ = md;
-    sticky->events_ = 0;
+    sticky->mask_ = 0;
+    sticky->internal_ = 0;
     return aug_setsticky(sticky, mask);
 }
 
 AUGSYS_API void
 aug_termsticky(struct aug_sticky* sticky)
 {
+    /* Clear muxer-mask on destruction. */
+
     aug_setmdeventmask(sticky->muxer_, sticky->md_, 0);
+
     sticky->muxer_ = NULL;
     sticky->md_ = AUG_BADMD;
-    sticky->events_ = 0;
+    sticky->mask_ = 0;
+    sticky->internal_ = 0;
+}
+
+AUGSYS_API aug_result
+aug_clearsticky(struct aug_sticky* sticky, unsigned short mask)
+{
+    /* Clear sticky events according to mask argument. */
+
+    sticky->internal_ &= ~mask;
+
+    /* Set muxer mask if no external events. */
+
+    if (sticky->mask_ && !EXTERNAL_(sticky)) {
+
+        /* Invariant: sticky events are zero when muxer-mask is set. */
+
+        aug_verify(aug_setmdeventmask(sticky->muxer_, sticky->md_,
+                                      sticky->mask_));
+    }
+
+    return AUG_SUCCESS;
 }
 
 AUGSYS_API aug_result
 aug_setsticky(struct aug_sticky* sticky, unsigned short mask)
 {
-    /* Remember original event mask before setting new. */
+    /* Sticky events in new mask. */
 
-    unsigned short orig = aug_getmdeventmask(sticky->muxer_, sticky->md_);
+    unsigned short events = mask & AUG_MDEVENTRDWR;
 
-    /* Always want exceptions and readability. */
+    /* Set sticky events that were not in the original mask.  This is done so
+       that explicitly cleared events are not set. */
 
-    aug_verify(aug_setmdeventmask(sticky->muxer_, sticky->md_,
-                                  AUG_MDEVENTRD | AUG_MDEVENTEX | mask));
+    sticky->internal_ |= (events & ~sticky->mask_);
 
-    /* Only read and write are sticky. */
+    /* Done using original mask; set new mask. */
 
-    orig &= AUG_MDEVENTRDWR;
-    mask &= AUG_MDEVENTRDWR;
+    sticky->mask_ = mask;
 
-    /* Remove events that are not in the new mask. */
+    /* Clear muxer mask if external events. */
 
-    sticky->events_ &= mask;
+    if (EXTERNAL_(sticky)) {
 
-    /* Add events that were not in the original. */
+        /* Invariant: muxer-mask is zero when sticky events are set. */
 
-    sticky->events_ |= (mask & ~orig);
+        mask = 0;
+    }
 
-    AUG_CTXDEBUG3(aug_tlx, "set sticky: mask=[%u], sticky=[%u]",
-                  (unsigned)mask, (unsigned)sticky->events_);
+    aug_verify(aug_setmdeventmask(sticky->muxer_, sticky->md_, mask));
+
     return AUG_SUCCESS;
-}
-
-AUGSYS_API void
-aug_stickyrd(struct aug_sticky* sticky, aug_rsize rsize, size_t expected)
-{
-    /* Unset sticky event when not all bytes are read. */
-
-    if (AUG_RESULT(rsize) != expected)
-        sticky->events_ &= ~AUG_MDEVENTRD;
-}
-
-AUGSYS_API void
-aug_stickywr(struct aug_sticky* sticky, aug_rsize rsize, size_t expected)
-{
-    /* Unset sticky event when not all bytes are read. */
-
-    if (AUG_RESULT(rsize) != expected)
-        sticky->events_ &= ~AUG_MDEVENTWR;
 }
 
 AUGSYS_API unsigned short
 aug_getsticky(struct aug_sticky* sticky)
 {
-    unsigned short events = aug_getmdevents(sticky->muxer_, sticky->md_);
+    unsigned short events;
 
-    /* Set sticky events. */
+    /* If the mask is zero, so too are the events. */
 
-    sticky->events_ |= (events & AUG_MDEVENTRDWR);
-    return sticky->events_ | events;
+    if (0 == sticky->mask_)
+        return 0;
+
+    events = EXTERNAL_(sticky);
+
+    /* Get muxer events if no external events. */
+
+    if (sticky->mask_ && !events) {
+
+        /* Get events from muxer. */
+
+        events = aug_getmdevents(sticky->muxer_, sticky->md_);
+
+        /* Save any sticky events. */
+
+        sticky->internal_ |= (events & AUG_MDEVENTRDWR);
+
+        /* If sticky events are now set, then clear muxer-mask.  The
+           muxer-mask will not be set again until all external sticky bits
+           have been cleared. */
+
+        if (EXTERNAL_(sticky))
+            aug_setmdeventmask(sticky->muxer_, sticky->md_, 0);
+    }
+
+    return events;
 }

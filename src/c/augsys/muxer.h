@@ -54,20 +54,13 @@
    FIXME: is this safe for non-winsock clients?
 
    All muxer implementations are assumed to be edge-triggered.
-
-   1     +----+    +----+    +----+
-         |    |    |    |    |    |
-         |    |    |    |    |    |
-   0 ----+    +----+    +----+    +----
-
-   horizontal: level
-   vertical:   edge
 */
 
 #define AUG_MDEVENTRD    0x1
 #define AUG_MDEVENTWR    0x2
 #define AUG_MDEVENTEX    0x4
 #define AUG_MDEVENTRDWR (AUG_MDEVENTRD   | AUG_MDEVENTWR)
+#define AUG_MDEVENTRDEX (AUG_MDEVENTRD   | AUG_MDEVENTEX)
 #define AUG_MDEVENTALL  (AUG_MDEVENTRDWR | AUG_MDEVENTEX)
 #define AUG_MDEVENTCONN (AUG_MDEVENTWR   | AUG_MDEVENTEX)
 

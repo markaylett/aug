@@ -733,7 +733,7 @@ namespace {
         muxer mux(getmpool(aug_tlx));
         timers ts(getmpool(aug_tlx));
         session s(node, ref, ep, ts);
-        setmdeventmask(mux, ref, AUG_MDEVENTRD);
+        setmdeventmask(mux, ref, AUG_MDEVENTRDEX);
 
         timeval tv;
         unsigned ready(!0);
@@ -744,13 +744,15 @@ namespace {
                         (int)tv.tv_sec, (int)tv.tv_usec);
 
             try {
+
                 ready = waitmdevents(mux, tv);
+
             } catch (const intr_exception&) {
                 ready = !0; // Not timeout.
                 continue;
             }
 
-            aug_ctxinfo(aug_tlx, "waitmdevents: %u", ready);
+            aug_ctxinfo(aug_tlx, "mdevents: %u", ready);
 
             if (ready) {
                 packet p;

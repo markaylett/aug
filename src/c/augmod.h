@@ -104,10 +104,19 @@ enum mod_loglevel {
  * @{
  */
 
+/**
+ * Boolean type.
+ *
+ * C++ enums are not guaranteed to have sizeof(int) so int is used instead.
+ *
+ * Do not use #AUG_TRUE in tests as any non-zero value is considered true.
+ *
+ */
+
 typedef int mod_bool;
 
-#define MOD_FALSE (0 != 0)
-#define MOD_TRUE  (0 == 0)
+#define MOD_FALSE 0
+#define MOD_TRUE  1
 
 /** @} */
 

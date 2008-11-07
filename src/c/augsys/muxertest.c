@@ -30,14 +30,14 @@ test(aug_muxer_t muxer, int n)
     iov[1].iov_base = MSG2_;
     iov[1].iov_len = sizeof(MSG2_);
 
-    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sv[0], AUG_MDEVENTRDWR))
-        || AUG_ISFAIL(aug_setmdeventmask(muxer, sv[1], AUG_MDEVENTRD))) {
+    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sv[0], AUG_MDEVENTALL))
+        || AUG_ISFAIL(aug_setmdeventmask(muxer, sv[1], AUG_MDEVENTRDEX))) {
         aug_perrinfo(aug_tlx, "aug_setmdeventmask() failed", NULL);
         exit(1);
     }
 
-    if (AUG_MDEVENTRDWR != aug_getmdeventmask(muxer, sv[0])
-        || AUG_MDEVENTRD != aug_getmdeventmask(muxer, sv[1])) {
+    if (AUG_MDEVENTALL != aug_getmdeventmask(muxer, sv[0])
+        || AUG_MDEVENTRDEX != aug_getmdeventmask(muxer, sv[1])) {
         aug_perrinfo(aug_tlx, "aug_getmdeventmask() failed", NULL);
         exit(1);
     }
