@@ -255,23 +255,16 @@ sslread_(SSL* ssl, struct buf_* x)
 
     const char* end = x->buf_ + sizeof(x->buf_);
     ssize_t n = (ssize_t)(end - x->wr_);
-    if (n) {
-        AUG_CTXDEBUG3(aug_tlx, "SSL: ssl read to input buffer");
-        n = SSL_read(ssl, x->wr_, n);
-        if (0 < n)
-            x->wr_ += n;
-    } else {
 
-        /* Input buffer is full, try handshake. */
-
-        AUG_CTXDEBUG3(aug_tlx, "SSL: handshake without read");
-        n = SSL_do_handshake(ssl);
-    }
+    AUG_CTXDEBUG3(aug_tlx, "SSL: ssl read to input buffer");
+    n = SSL_read(ssl, x->wr_, n);
+    if (0 < n)
+        x->wr_ += n;
     return n;
 }
 
 static ssize_t
-sslwrite_(SSL* ssl, struct buf_* x)
+sslwriteshake_(SSL* ssl, struct buf_* x)
 {
     /* Write bytes from buffer at read pointer. */
 
@@ -331,10 +324,9 @@ readwrite_(struct impl_* impl, unsigned short events)
     ssize_t ret;
     int err;
 
-    if (isread_(impl, events)) {
+    if (isread_(impl, events) && !buffull_(&impl->inbuf_)) {
 
-        /* Perform read operation.  If input buffer is full, sslread_() will
-           perform SSL_do_handshake(). */
+        /* Perform read operation. */
 
         ret = sslread_(impl->ssl_, &impl->inbuf_);
         err = SSL_get_error(impl->ssl_, ret);
@@ -346,21 +338,27 @@ readwrite_(struct impl_* impl, unsigned short events)
                 AUG_CTXDEBUG3(aug_tlx,
                               "SSL: %d bytes pending for immediate read",
                               ret);
+
+                /* Pending data for immediate read. */
+
                 impl->state_ = RDPEND;
-                goto done;
+                return;
             }
             impl->state_ = NORMAL;
+
+            /* Proceed with write. */
+
             break;
         case SSL_ERROR_WANT_READ:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants read");
             aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
             impl->state_ = RDWANTRD;
-            goto done;
+            return;
         case SSL_ERROR_WANT_WRITE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants write");
             aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
             impl->state_ = RDWANTWR;
-            goto done;
+            return;
         case SSL_ERROR_SYSCALL:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read syscall error", err);
 
@@ -380,7 +378,7 @@ readwrite_(struct impl_* impl, unsigned short events)
                                AUG_EIO, "ssl read syscall error");
             }
             impl->state_ = SSLERR;
-            goto done;
+            return;
         case SSL_ERROR_ZERO_RETURN:
             AUG_CTXDEBUG3(aug_tlx, "SSL: end of data");
             if (!impl->shutdown_) {
@@ -388,7 +386,7 @@ readwrite_(struct impl_* impl, unsigned short events)
                 SSL_shutdown(impl->ssl_);
             }
             impl->state_ = RDZERO;
-            goto done;
+            return;
         default:
 
             AUG_CTXDEBUG3(aug_tlx, "SSL: error=[%d]", err);
@@ -398,21 +396,33 @@ readwrite_(struct impl_* impl, unsigned short events)
             aug_setsslerrinfo(&impl->errinfo_, __FILE__, __LINE__,
                               ERR_get_error());
             impl->state_ = SSLERR;
-            goto done;
+            return;
         }
     }
 
     if (iswrite_(impl, events)) {
 
-        /* Perform write operation.  If output buffer is empty, sslwrite_()
-           will perform SSL_do_handshake(). */
+        /* Perform write operation.  If output buffer is empty,
+           sslwriteshake_() will perform SSL_do_handshake(). */
 
-        ret = sslwrite_(impl->ssl_, &impl->outbuf_);
+        ret = sslwriteshake_(impl->ssl_, &impl->outbuf_);
         err = SSL_get_error(impl->ssl_, ret);
         switch (err) {
         case SSL_ERROR_NONE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: %d bytes written from output buffer",
                           ret);
+
+            /* If shutdown is pending and output buffer is now empty, do
+               shutdown. */
+
+            if (impl->shutdown_ && bufempty_(&impl->outbuf_)
+                && AUG_ISFAIL(shutwr_(impl, &impl->errinfo_))) {
+
+                /* Save error locally. */
+
+                impl->state_ = SSLERR;
+            }
+
             impl->state_ = NORMAL;
             break;
         case SSL_ERROR_WANT_READ:
@@ -444,7 +454,7 @@ readwrite_(struct impl_* impl, unsigned short events)
                                AUG_EIO, "ssl write syscall error");
             }
             impl->state_ = SSLERR;
-            goto done;
+            break;
         default:
 
             AUG_CTXDEBUG3(aug_tlx, "SSL: error=[%d]", err);
@@ -456,20 +466,7 @@ readwrite_(struct impl_* impl, unsigned short events)
             impl->state_ = SSLERR;
             break;
         }
-
-        /* If shutdown is pending and output buffer is now empty, do
-           shutdown. */
-
-        if (impl->shutdown_ && bufempty_(&impl->outbuf_)
-            && AUG_ISFAIL(shutwr_(impl, &impl->errinfo_))) {
-
-            /* Save error locally. */
-
-            impl->state_ = SSLERR;
-        }
     }
- done:
-    return;
 }
 
 static aug_result
@@ -562,13 +559,21 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         return NULL;
 
     events = aug_getsticky(&impl->sticky_);
+    if (events & AUG_MDEVENTRD) {
+        char ch;
+        if (AUG_ISBLOCK(aug_recv(impl->sticky_.md_, &ch, 1, MSG_PEEK))) {
+            AUG_CTXDEBUG3(aug_tlx, "SSL: clearing blocked read");
+            aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
+            events &= ~AUG_MDEVENTRD;
+        }
+    }
 
     /* Close socket on error. */
 
     if (error_(handler, &impl->chan_, impl->sticky_.md_, events))
         return NULL;
 
-    /* TODO: how should any remaining exceptional events be handled? */
+    /* TODO: handle remaining exceptional events. */
 
     if (events)
         readwrite_(impl, events);
@@ -644,17 +649,12 @@ cisready_(aug_chan* ob)
     if (AUG_BADMD == impl->sticky_.md_)
         return AUG_TRUE;
 
-    /* Buffered data ready for processing. */
+    /* Channel-level events ready for processing. */
 
-    if (!bufempty_(&impl->inbuf_))
+    if (readyevents_(impl))
         return AUG_TRUE;
 
-    /* Wants write and output buffer not full. */
-
-    if (impl->wantwr_ && !buffull_(&impl->outbuf_))
-        return AUG_TRUE;
-
-    /* Otherwise, any SSL calls to be made. */
+    /* Or any SSL calls to be made. */
 
     events = aug_getsticky(&impl->sticky_);
     return isexcept_(impl, events)
@@ -865,8 +865,7 @@ createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
 
     /* Sticky event flags are used for edge-triggered interfaces. */
 
-    if (AUG_ISFAIL(aug_initsticky(&impl->sticky_, muxer, sd,
-                                  AUG_MDEVENTALL))) {
+    if (AUG_ISFAIL(aug_initsticky(&impl->sticky_, muxer, sd, 0))) {
         aug_freemem(mpool, impl);
         return NULL;
     }
@@ -885,8 +884,12 @@ createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
     impl->ssl_ = ssl;
     clearbuf_(&impl->inbuf_);
     clearbuf_(&impl->outbuf_);
-    impl->state_ = NORMAL;
+    impl->state_ = WRWANTWR;
     impl->shutdown_ = 0;
+
+    /* WRWANTWR state is used to initiate handshake. */
+
+    setmask_(impl);
 
     aug_retain(mpool);
     aug_retain(handler);
@@ -922,10 +925,6 @@ aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
     if (!impl)
         return NULL;
 
-    /* Write client-initiated handshake. */
-
-    impl->state_ = WRWANTWR;
-
     SSL_set_connect_state(impl->ssl_);
     return &impl->chan_;
 }
@@ -939,10 +938,6 @@ aug_createsslserver(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
                                     sslctx);
     if (!impl)
         return NULL;
-
-    /* Read client-initiated handshake. */
-
-    impl->state_ = RDWANTRD;
 
     SSL_set_accept_state(impl->ssl_);
     return &impl->chan_;
