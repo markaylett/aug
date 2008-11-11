@@ -186,7 +186,7 @@ connimpl::process(chanref chan, unsigned short events, const timeval& now)
         AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%u]", sock_.id_);
 
         try {
-            char buf[4096];
+            char buf[AUG_BUFSIZE];
             size_t size(read(stream, buf, sizeof(buf)));
             if (0 == size) {
 

@@ -107,7 +107,7 @@ main(int argc, char* argv[])
             return 1;
         }
 
-        if (AUG_ISFAIL(aug_readfix(stream, in, 4096))) {
+        if (AUG_ISFAIL(aug_readfix(stream, in, AUG_BUFSIZE))) {
             aug_perrinfo(aug_tlx, "aug_parsefix() failed", NULL);
             return 1;
         }
@@ -128,7 +128,7 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (AUG_ISFAIL(aug_readfix(stream, in, 4096))) {
+    if (AUG_ISFAIL(aug_readfix(stream, in, AUG_BUFSIZE))) {
         aug_perrinfo(aug_tlx, "aug_parsefix() failed", NULL);
         return 1;
     }

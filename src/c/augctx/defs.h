@@ -25,6 +25,10 @@
 # define offsetof(s, m) (size_t)&(((s*)0)->m)
 #endif /* !offsetof */
 
+#if !defined(AUG_BUFSIZE)
+# define AUG_BUFSIZE 4096
+#endif /* !AUG_BUFSIZE */
+
 #if !defined(AUG_MAXLINE)
 # define AUG_MAXLINE 1024
 #endif /* !AUG_MAXLINE */

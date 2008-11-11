@@ -109,7 +109,7 @@ namespace test {
         size_t begin_, end_;
     public:
         explicit
-        buffer(unsigned size = 4096)
+        buffer(unsigned size = AUG_BUFSIZE)
             : vec_(size),
               begin_(0),
               end_(0)
@@ -127,7 +127,7 @@ namespace test {
         bool
         readsome(streamref ref)
         {
-            char buf[4096];
+            char buf[AUG_BUFSIZE];
             size_t size(read(ref, buf, sizeof(buf) - 1));
             if (0 == size)
                 return false;

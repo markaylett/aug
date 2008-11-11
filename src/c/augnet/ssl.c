@@ -27,7 +27,7 @@ AUG_RCSID("$Id$");
 # include <string.h>        /* memcpy() */
 
 struct buf_ {
-    char buf_[4096];
+    char buf_[AUG_BUFSIZE];
     char* rd_, * wr_;
 };
 
