@@ -50,7 +50,7 @@ namespace {
         void
         clearchan_(unsigned id) AUG_NOTHROW
         {
-            aug_ctxinfo(aug_tlx, "clearing channel: %u", id);
+            aug_ctxinfo(aug_tlx, "clearing channel: id=[%u]", id);
             if (id == wr_)
                 wrchan_ = null;
         }
@@ -72,23 +72,25 @@ namespace {
             streamptr stream(object_cast<aug_stream>(chan));
 
             if (id == rd_) {
-                AUG_CTXDEBUG0(aug_tlx, "reader events: %u", (unsigned)events);
+                AUG_CTXDEBUG0(aug_tlx, "reader events [%s]",
+                              aug_eventlabel(events));
                 char ch;
                 try {
                     read(stream, &ch, 1);
                     const char expect('A' + recv_++ % 26);
                     if (ch != expect) {
-                        aug_ctxerror(aug_tlx, "unexpected character '%c'",
+                        aug_ctxerror(aug_tlx, "unexpected character [%c]",
                                      ch);
                         exit(1);
                     }
-                    AUG_CTXDEBUG0(aug_tlx, "read character '%c'", ch);
+                    AUG_CTXDEBUG0(aug_tlx, "read character [%c]", ch);
                 } catch (const block_exception&) {
                     aug_ctxinfo(aug_tlx, "read blocked; need write");
 					setchanwantwr(wrchan_, AUG_TRUE);
                 }
             } else if (id == wr_) {
-                aug_ctxinfo(aug_tlx, "writer events: %u", (unsigned)events);
+                aug_ctxinfo(aug_tlx, "writer events [%s]",
+                            aug_eventlabel(events));
                 write(stream, ALPHABET, 26);
                 wrchan_ = object_cast<aug_chan>(stream);
                 setchanwantwr(wrchan_, AUG_FALSE);

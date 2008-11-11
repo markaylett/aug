@@ -91,11 +91,6 @@ namespace {
         }
 
         void
-        do_error(const handle& sock, const char* desc)
-        {
-        }
-
-        void
         do_rdexpire(const handle& sock, unsigned& ms)
         {
             shutdown(sock, 0);

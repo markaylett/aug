@@ -81,6 +81,7 @@ namespace {
         void
         do_error(const handle& sock, const char* desc)
         {
+            writelog(MOD_LOGERROR, "server error: %s", desc);
         }
         void
         do_rdexpire(const handle& sock, unsigned& ms)

@@ -76,7 +76,7 @@ namespace {
                 read(stream, &ch, 1);
                 const char expect('A' + recv_++ % 26);
                 if (ch != expect) {
-                    aug_ctxerror(aug_tlx, "unexpected character '%c'", ch);
+                    aug_ctxerror(aug_tlx, "unexpected character [%c]", ch);
                     exit(1);
                 }
                 if ('Z' == ch && recv_ < 260)

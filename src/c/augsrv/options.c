@@ -88,7 +88,7 @@ tocommand_(const char* s)
     }
 
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                   AUG_MSG("invalid command '%s'"), s);
+                   AUG_MSG("invalid command [%s]"), s);
     return AUG_FAILERROR;
 }
 
@@ -130,7 +130,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         default:
             usage_();
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
-                           AUG_EINVAL, AUG_MSG("unknown option '%c'"),
+                           AUG_EINVAL, AUG_MSG("unknown option [%c]"),
                            aug_optopt);
             return AUG_FAILERROR;
         }

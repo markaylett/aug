@@ -30,7 +30,7 @@ handler_(aug_object* ob, const char* buf, size_t size)
     struct aug_fixstd_ fixstd;
 
     if (TESTLEN_ != size) {
-        fprintf(stderr, "invalid buffer size '%d', expected '%d'\n",
+        fprintf(stderr, "invalid buffer size [%d], expected [%d]\n",
                 (int)size, (int)TESTLEN_);
         exit(1);
     }

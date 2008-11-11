@@ -54,7 +54,7 @@ findif_(int af, unsigned ifindex,
             result = fn(arg, ifindex, it);
         else {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                           AUG_MSG("interface '%d' does not exist"),
+                           AUG_MSG("interface [%d] does not exist"),
                            (int)ifindex);
             result = AUG_FAILERROR;
         }
@@ -87,7 +87,7 @@ ifaddr_(void* arg, unsigned ifindex, PIP_ADAPTER_ADDRESSES adapter)
         }
 
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                   AUG_MSG("no address for interface '%d'"), (int)ifindex);
+                   AUG_MSG("no address for interface [%d]"), (int)ifindex);
     return AUG_FAILERROR;
 }
 
@@ -108,7 +108,7 @@ ifindex_(void* arg, unsigned ifindex, PIP_ADAPTER_ADDRESSES adapter)
         }
 
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                   AUG_MSG("no address for interface '%d'"), (int)ifindex);
+                   AUG_MSG("no address for interface [%d]"), (int)ifindex);
     return AUG_FAILERROR;
 }
 #endif /* HAVE_IPV6 */
@@ -119,7 +119,7 @@ getifaddr_(struct in_addr* addr, const char* ifname)
     unsigned ifindex = atoi(ifname);
     if (0 == ifindex) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid interface index '%s'"), ifname);
+                       AUG_MSG("invalid interface index [%s]"), ifname);
         return AUG_FAILERROR;
     }
     return findif_(AF_INET, ifindex, ifaddr_, addr);
@@ -132,7 +132,7 @@ getifindex_(DWORD* index, const char* ifname)
     unsigned ifindex = atoi(ifname);
     if (0 == ifindex) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid interface index '%s'"), ifname);
+                       AUG_MSG("invalid interface index [%s]"), ifname);
         return AUG_FAILERROR;
     }
     return findif_(AF_INET6, ifindex, ifindex_, index);

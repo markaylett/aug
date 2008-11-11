@@ -79,7 +79,7 @@ namespace test {
         readevent()
         {
             int fd(aug_eventrd());
-            AUG_CTXDEBUG2(aug_tlx, "checking event pipe '%d'", fd);
+            AUG_CTXDEBUG2(aug_tlx, "checking event pipe [%d]", fd);
 
             if (!getmdevents(state_->muxer_, fd))
                 return;

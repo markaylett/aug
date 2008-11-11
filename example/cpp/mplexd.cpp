@@ -266,11 +266,11 @@ namespace test {
 
             if (events & AUG_MDEVENTRDEX) {
 
-                AUG_CTXDEBUG2(aug_tlx, "handling read event '%d'", id);
+                AUG_CTXDEBUG2(aug_tlx, "handling read event [%d]", id);
 
                 if (!sess->buffer_.readsome(stream)) {
 
-                    aug_ctxinfo(aug_tlx, "closing connection '%d'", id);
+                    aug_ctxinfo(aug_tlx, "closing connection [%d]", id);
                     return AUG_FALSE;
                 }
 

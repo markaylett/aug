@@ -551,7 +551,7 @@ namespace {
         void
         recv(const packet& p, const endpoint& from)
         {
-            aug_ctxinfo(aug_tlx, "received: msgtype='%s', state='%s'",
+            aug_ctxinfo(aug_tlx, "received: msgtype=[%s], state=[%s]",
                         tostring(p.type_), tostring(state_));
 
             // The following message types can be handled in a uniform manner,
@@ -691,7 +691,7 @@ namespace {
         {
             if (idref(id) == hbwait_.id()) {
 
-                aug_ctxinfo(aug_tlx, "hbint timeout: state='%s'",
+                aug_ctxinfo(aug_tlx, "hbint timeout: state=[%s]",
                             tostring(state_));
 
                 // Candidates for master will still heartbeat as slaves.
@@ -706,7 +706,7 @@ namespace {
 
             } else if (idref(id) == mwait_.id()) {
 
-                aug_ctxinfo(aug_tlx, "wait timeout: state='%s'",
+                aug_ctxinfo(aug_tlx, "wait timeout: state=[%s]",
                             tostring(state_));
 
                 if (CANDID == state_) {

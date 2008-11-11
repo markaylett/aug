@@ -127,7 +127,7 @@ static void
 seterrinvalid_(const char* file, int line, char ch)
 {
     aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EPARSE,
-                   AUG_MSG("invalid character '%c'"), ch);
+                   AUG_MSG("invalid character [%c]"), ch);
 }
 
 static void

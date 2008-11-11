@@ -205,7 +205,7 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
     if (ord >= info->fields_) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("field '%d' does not exist"), (int)ord);
+                       AUG_MSG("field [%d] does not exist"), (int)ord);
         return AUG_FAILERROR;
     }
 
@@ -346,7 +346,7 @@ aug_valuebyname_(aug_seq_t seq, const struct aug_info_* info,
     if (inout == info->fields_) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("field '%s' does not exist"), name);
+                       AUG_MSG("field [%s] does not exist"), name);
         return NULL;
     }
 
@@ -369,7 +369,7 @@ aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, unsigned ord,
     if (ord >= info->fields_) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("field '%d' does not exist"), (int)ord);
+                       AUG_MSG("field [%d] does not exist"), (int)ord);
         return NULL;
     }
 

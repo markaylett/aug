@@ -254,6 +254,7 @@ aug_acceptagain(struct aug_errinfo* errinfo)
     case ENETUNREACH:
 #endif /* ENETUNREACH */
 
+    case EMFILE: /* Too many files. */
     case EWOULDBLOCK:
         return AUG_TRUE;
     }

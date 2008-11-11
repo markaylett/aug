@@ -63,7 +63,7 @@ send_(int fd, pid_t pid, int event)
         /* Invalid command. */
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid control command '%d'"), (int)event);
+                       AUG_MSG("invalid control command [%d]"), (int)event);
         return AUG_FAILERROR;
     }
     return AUG_SUCCESS;

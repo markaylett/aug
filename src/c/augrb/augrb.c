@@ -135,7 +135,7 @@ doloadmodule_(VALUE unused)
     char* lower = alloca(strlen(u_.sname_) + 1);
     lowercpy_(lower, u_.sname_);
 
-    mod_writelog(MOD_LOGINFO, "require '%s'", lower);
+    mod_writelog(MOD_LOGINFO, "require [%s]", lower);
 
     rb_require(lower);
     return rb_const_get(rb_cObject, rb_intern(u_.sname_));

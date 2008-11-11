@@ -130,7 +130,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid mdevent mask '%d'"), (int)mask);
+                       AUG_MSG("invalid mdevent mask [%d]"), (int)mask);
         return AUG_FAILERROR;
     }
 
@@ -283,7 +283,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 
     if (mask & ~AUG_MDEVENTALL) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid mdevent mask '%u'"), (unsigned)mask);
+                       AUG_MSG("invalid mdevent mask [%u]"), (unsigned)mask);
         return AUG_FAILERROR;
     }
 

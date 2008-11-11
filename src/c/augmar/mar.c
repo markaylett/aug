@@ -67,7 +67,7 @@ init_(aug_seq_t seq, struct aug_info_* info)
         if (VERNO != info->verno_) {
 
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                           AUG_MSG("invalid version number '%d'"),
+                           AUG_MSG("invalid version number [%d]"),
                            (int)info->verno_);
             return AUG_FAILERROR;
         }
@@ -408,7 +408,7 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
         break;
     default:
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid whence value '%d'"), (int)whence);
+                       AUG_MSG("invalid whence value [%d]"), (int)whence);
         return AUG_FAILERROR;
     }
 
@@ -417,7 +417,7 @@ aug_seekmar(aug_mar_t mar, off_t offset, int whence)
         /* Assertion? */
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ERANGE,
-                       AUG_MSG("negative file position '%d'"), (int)local);
+                       AUG_MSG("negative file position [%d]"), (int)local);
         return AUG_FAILERROR;
     }
 

@@ -204,6 +204,11 @@ namespace {
                      static_cast<const char*>(buf) + len, s.tok_, '\n',
                      eachline(send_, sock, hires_, s.secs_));
         }
+        void
+        do_error(const handle& sock, const char* desc)
+        {
+            writelog(MOD_LOGERROR, "client error: %s", desc);
+        }
         ~bench() AUG_NOTHROW
         {
         }

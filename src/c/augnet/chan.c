@@ -258,8 +258,8 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         struct aug_endpoint ep;
 
-        AUG_CTXDEBUG3(aug_tlx, "connection events: events=[%u]",
-                      (unsigned)events);
+        AUG_CTXDEBUG3(aug_tlx, "connection events: events=[%s]",
+                      aug_eventlabel(events));
 
         /* De-register existing descriptor from multiplexer, and attempt to
            establish connection. */

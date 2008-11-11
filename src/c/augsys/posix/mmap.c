@@ -42,7 +42,7 @@ toprot_(int* to, int from)
 
  fail:
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                   AUG_MSG("invalid protection flags '%d'"), (int)from);
+                   AUG_MSG("invalid protection flags [%d]"), (int)from);
     return AUG_FAILERROR;
 }
 
@@ -54,7 +54,7 @@ verify_(size_t size, size_t offset, size_t len)
 
     if (!size || size < (offset + len)) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid file map size '%d'"), (int)size);
+                       AUG_MSG("invalid file map size [%d]"), (int)size);
         return AUG_FAILERROR;
     }
 
@@ -62,7 +62,7 @@ verify_(size_t size, size_t offset, size_t len)
 
     if (offset && (offset % aug_granularity())) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid file map offset '%d'"), (int)offset);
+                       AUG_MSG("invalid file map offset [%d]"), (int)offset);
         return AUG_FAILERROR;
     }
 

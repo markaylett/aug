@@ -89,7 +89,7 @@ fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
     digits = (unsigned)(it - buf);
     if (MAX_DIGITS_ < digits) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("too many integer digits '%u'"), digits);
+                       AUG_MSG("too many integer digits [%u]"), digits);
         return AUG_FAILERROR;
     }
 
@@ -103,7 +103,7 @@ fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
 
         if (!isdigit(*it)) {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                           AUG_MSG("non-digit '%c' in integer"), *it);
+                           AUG_MSG("non-digit [%c] in integer"), *it);
             return AUG_FAILERROR;
         }
 
@@ -155,7 +155,7 @@ getsum_(const char* buf, size_t size)
 
     if (!isdigit(cu) || !isdigit(ct) || !isdigit(ch)) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("non-digit in checksum '%.3s'"),
+                       AUG_MSG("non-digit in checksum [%.3s]"),
                        buf + (size - 4));
         return AUG_FAILERROR;
     }
@@ -274,7 +274,7 @@ aug_finishfix(aug_fixstream_t stream)
 
         aug_clearxstr(stream->xstr_);
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
-                       AUG_MSG("fix stream not empty, '%d' bytes"),
+                       AUG_MSG("fix stream not empty, [%d] bytes"),
                        (int)size);
         result = AUG_FAILERROR;
 
@@ -389,7 +389,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     if (AUG_RESULT(sum1) != sum2) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("invalid checksum '%03d', expected '%03d'"),
+                       AUG_MSG("invalid checksum [%03d], expected [%03d]"),
                        AUG_RESULT(sum1), sum2);
         return AUG_FAILERROR;
     }
@@ -437,7 +437,7 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
             goto found;
 
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                   AUG_MSG("field '%d' delimiter not found"),
+                   AUG_MSG("field [%d] delimiter not found"),
                    (int)field->tag_);
     return AUG_FAILERROR;
  found:

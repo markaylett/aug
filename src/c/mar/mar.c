@@ -366,7 +366,7 @@ run_(int argc, char* argv[], const char* archivename)
         case 'h':
         case '?':
         default:
-            fprintf(stderr, "unexpected option '-%c'\n", aug_optopt);
+            fprintf(stderr, "unexpected option [-%c]\n", aug_optopt);
             goto fail;
         }
 
@@ -432,7 +432,7 @@ main(int argc, char* argv[])
             break;
         case '?':
         default:
-            fprintf(stderr, "unknown option `-%c'", aug_optopt);
+            fprintf(stderr, "unknown option [-%c]", aug_optopt);
             goto info;
         }
 
@@ -455,7 +455,7 @@ main(int argc, char* argv[])
     return 0;
 
  info:
-    fprintf(stderr, ": try `mar -h' for more information\n");
+    fprintf(stderr, ": try 'mar -h' for more information\n");
  fail:
     return 1;
 }
