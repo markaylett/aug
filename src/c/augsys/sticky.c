@@ -53,6 +53,10 @@ aug_clearsticky(struct aug_sticky* sticky, unsigned short mask)
 
         /* Invariant: sticky events are zero when muxer-mask is set. */
 
+        AUG_CTXDEBUG3(aug_tlx,
+                      "no sticky events, setting muxer-mask: mask=[%s]",
+                      aug_eventlabel(sticky->mask_));
+
         aug_verify(aug_setmdeventmask(sticky->muxer_, sticky->md_,
                                       sticky->mask_));
     }
@@ -78,7 +82,15 @@ aug_setsticky(struct aug_sticky* sticky, unsigned short mask)
 
     /* Clear muxer mask if external events. */
 
-    if (EXTERNAL_(sticky)) {
+    if (!EXTERNAL_(sticky)) {
+
+        AUG_CTXDEBUG3(aug_tlx,
+                      "no sticky events, setting muxer-mask: mask=[%s]",
+                      aug_eventlabel(mask));
+
+    } else {
+
+        AUG_CTXDEBUG3(aug_tlx, "sticky events, clearing muxer-mask");
 
         /* Invariant: muxer-mask is zero when sticky events are set. */
 
@@ -118,8 +130,13 @@ aug_getsticky(struct aug_sticky* sticky)
            muxer-mask will not be set again until all external sticky bits
            have been cleared. */
 
-        if (EXTERNAL_(sticky))
+        if (EXTERNAL_(sticky)) {
+
+            AUG_CTXDEBUG3(aug_tlx, "sticky events, clearing muxer-mask:"
+                          " muxer-events=[%s]", aug_eventlabel(events));
+
             aug_setmdeventmask(sticky->muxer_, sticky->md_, 0);
+        }
     }
 
     return events;

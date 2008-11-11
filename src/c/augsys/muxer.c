@@ -7,6 +7,17 @@
 
 AUG_RCSID("$Id$");
 
+static const char LABELS_[][4] = {
+    "___",
+    "R__",
+    "_W_",
+    "RW_",
+    "__X",
+    "R_X",
+    "_WX",
+    "RWX"
+};
+
 static const struct timeval NOWAIT_ = { 0, 0 };
 
 #if !defined(_WIN32)
@@ -19,4 +30,13 @@ AUGSYS_API aug_rint
 aug_pollmdevents(aug_muxer_t muxer)
 {
     return aug_waitmdevents(muxer, &NOWAIT_);
+}
+
+AUGSYS_API const char*
+aug_eventlabel(unsigned short events)
+{
+    if (sizeof(LABELS_) / sizeof(LABELS_[0]) <= (size_t)events)
+        events = 0;
+
+    return LABELS_[events];
 }

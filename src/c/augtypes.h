@@ -22,12 +22,15 @@
  * Boolean type.
  *
  * C++ enums are not guaranteed to have sizeof(int) so int is used instead.
+ *
+ * Do not use #AUG_TRUE in tests as any non-zero value is considered true.
+ *
  */
 
 typedef int aug_bool;
 
-#define AUG_FALSE (0 != 0)
-#define AUG_TRUE  (0 == 0)
+#define AUG_FALSE 0
+#define AUG_TRUE  1
 
 /** @} */
 

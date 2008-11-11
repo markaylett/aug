@@ -85,13 +85,13 @@ namespace {
                     AUG_CTXDEBUG0(aug_tlx, "read character '%c'", ch);
                 } catch (const block_exception&) {
                     aug_ctxinfo(aug_tlx, "read blocked; need write");
-					setchanmask(wrchan_, AUG_MDEVENTALL);
+					setchanwantwr(wrchan_, AUG_TRUE);
                 }
             } else if (id == wr_) {
                 aug_ctxinfo(aug_tlx, "writer events: %u", (unsigned)events);
                 write(stream, ALPHABET, 26);
                 wrchan_ = object_cast<aug_chan>(stream);
-                setchanmask(wrchan_, AUG_MDEVENTRDEX);
+                setchanwantwr(wrchan_, AUG_FALSE);
             }
             return AUG_TRUE;
         }

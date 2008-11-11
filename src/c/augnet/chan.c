@@ -32,7 +32,7 @@ struct cimpl_ {
     unsigned id_;
     aug_muxer_t muxer_;
     aug_sd sd_;
-    unsigned short mask_;
+    aug_bool wantwr_;
     struct ssl_ctx_st* sslctx_;
     aug_tcpconnect_t conn_;
     int est_;
@@ -53,7 +53,8 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
     impl->sd_ = AUG_BADSD;
     impl->est_ = 0;
 
-    AUG_CTXDEBUG3(aug_tlx, "client established: mask=[%u]", impl->mask_);
+    AUG_CTXDEBUG3(aug_tlx, "client established: write=[%d]",
+                  (int)impl->wantwr_);
 
     /* Create forward pointer. */
 
@@ -61,10 +62,10 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
 #if ENABLE_SSL
         impl->sslctx_ ?
         aug_createsslclient(impl->mpool_, impl->id_, impl->muxer_, sd,
-                            impl->mask_, handler, impl->sslctx_) :
+                            impl->wantwr_, handler, impl->sslctx_) :
 #endif /* ENABLE_SSL */
         aug_createplain(impl->mpool_, impl->id_, impl->muxer_, sd,
-                        impl->mask_);
+                        impl->wantwr_);
 
     if (!impl->fwd_) {
         aug_errorchan(handler, &impl->chan_, aug_tlerr);
@@ -293,30 +294,19 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 }
 
 static aug_result
-cchan_setmask_(aug_chan* ob, unsigned short mask)
+cchan_setwantwr_(aug_chan* ob, aug_bool wantwr)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
 
     if (impl->fwd_)
-        return aug_setchanmask(impl->fwd_, mask);
+        return aug_setchanwantwr(impl->fwd_, wantwr);
 
     /* Mask will be set once the connection is established. */
 
-    AUG_CTXDEBUG3(aug_tlx, "set client mask: mask=[%u]", (unsigned)mask);
+    AUG_CTXDEBUG3(aug_tlx, "set client wantwr: wr=[%d]", (int)wantwr);
 
-    impl->mask_ = mask;
+    impl->wantwr_ = wantwr;
     return AUG_SUCCESS;
-}
-
-static unsigned short
-cchan_getmask_(aug_chan* ob)
-{
-    struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
-
-    if (impl->fwd_)
-        return aug_getchanmask(impl->fwd_);
-
-    return impl->mask_;
 }
 
 static unsigned
@@ -367,8 +357,7 @@ static const struct aug_chanvtbl cchanvtbl_ = {
     cchan_release_,
     cchan_close_,
     cchan_process_,
-    cchan_setmask_,
-    cchan_getmask_,
+    cchan_setwantwr_,
     cchan_getid_,
     cchan_getname_,
     cchan_isready_
@@ -381,7 +370,7 @@ struct simpl_ {
     unsigned id_;
     aug_muxer_t muxer_;
     aug_sd sd_;
-    unsigned short mask_;
+    aug_bool wantwr_;
     struct ssl_ctx_st* sslctx_;
 };
 
@@ -509,9 +498,10 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 #if ENABLE_SSL
             impl->sslctx_ ?
             aug_createsslserver(impl->mpool_, id, impl->muxer_, sd,
-                                impl->mask_, handler, impl->sslctx_) :
+                                impl->wantwr_, handler, impl->sslctx_) :
 #endif /* ENABLE_SSL */
-            aug_createplain(impl->mpool_, id, impl->muxer_, sd, impl->mask_);
+            aug_createplain(impl->mpool_, id, impl->muxer_, sd,
+                            impl->wantwr_);
 
         if (!chan) {
             aug_ctxwarn(aug_tlx, "aug_createplain() or aug_createsslserver()"
@@ -542,23 +532,16 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 }
 
 static aug_result
-schan_setmask_(aug_chan* ob, unsigned short mask)
+schan_setwantwr_(aug_chan* ob, aug_bool wantwr)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
 
     /* Mask will be set for each subsequently accepted connection. */
 
-    AUG_CTXDEBUG3(aug_tlx, "set server mask: mask=[%u]", (unsigned)mask);
+    AUG_CTXDEBUG3(aug_tlx, "set server wantwr: wr=[%d]", (int)wantwr);
 
-    impl->mask_ = mask;
+    impl->wantwr_ = wantwr;
     return AUG_SUCCESS;
-}
-
-static unsigned short
-schan_getmask_(aug_chan* ob)
-{
-    struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
-    return impl->mask_;
 }
 
 static unsigned
@@ -596,8 +579,7 @@ static const struct aug_chanvtbl schanvtbl_ = {
     schan_release_,
     schan_close_,
     schan_process_,
-    schan_setmask_,
-    schan_getmask_,
+    schan_setwantwr_,
     schan_getid_,
     schan_getname_,
     schan_isready_
@@ -710,18 +692,12 @@ pchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 }
 
 static aug_result
-pchan_setmask_(aug_chan* ob, unsigned short mask)
+pchan_setwantwr_(aug_chan* ob, aug_bool wantwr)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
-    AUG_CTXDEBUG3(aug_tlx, "set plain mask: mask=[%u]", (unsigned)mask);
-    return aug_setsticky(&impl->sticky_, mask);
-}
-
-static unsigned short
-pchan_getmask_(aug_chan* ob)
-{
-    struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);
-    return aug_getmdeventmask(impl->sticky_.muxer_, impl->sticky_.md_);
+    AUG_CTXDEBUG3(aug_tlx, "set plain wantwr: wr=[%d]", (int)wantwr);
+    return aug_setsticky(&impl->sticky_, wantwr
+                         ? AUG_MDEVENTALL : AUG_MDEVENTRDEX);
 }
 
 static unsigned
@@ -763,8 +739,7 @@ static const struct aug_chanvtbl pchanvtbl_ = {
     pchan_release_,
     pchan_close_,
     pchan_process_,
-    pchan_setmask_,
-    pchan_getmask_,
+    pchan_setwantwr_,
     pchan_getid_,
     pchan_getname_,
     pchan_isready_
@@ -891,7 +866,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 
     /* Default when established. */
 
-    impl->mask_ = AUG_MDEVENTRDEX;
+    impl->wantwr_ = AUG_FALSE;
     impl->sslctx_ = sslctx;
     impl->conn_ = conn;
     impl->est_ = est;
@@ -944,7 +919,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
 
     /* Default mask for new connections. */
 
-    impl->mask_ = AUG_MDEVENTRDEX;
+    impl->wantwr_ = AUG_FALSE;
     impl->sslctx_ = sslctx;
 
     aug_retain(mpool);
@@ -953,7 +928,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
 
 AUGNET_API aug_chan*
 aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
-                unsigned short mask)
+                aug_bool wantwr)
 {
     struct pimpl_* impl = aug_allocmem(mpool, sizeof(struct pimpl_));
     if (!impl)
@@ -969,7 +944,8 @@ aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
 
     /* Sticky event flags are used for edge-triggered interfaces. */
 
-    if (AUG_ISFAIL(aug_initsticky(&impl->sticky_, muxer, sd, mask))) {
+    if (AUG_ISFAIL(aug_initsticky(&impl->sticky_, muxer, sd, wantwr
+                                  ? AUG_MDEVENTALL : AUG_MDEVENTRDEX))) {
         aug_freemem(mpool, impl);
         return NULL;
     }

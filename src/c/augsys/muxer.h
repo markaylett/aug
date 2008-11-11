@@ -128,4 +128,7 @@ aug_getmdevents(aug_muxer_t muxer, aug_md md);
 AUGSYS_API aug_result
 aug_muxerpipe(aug_md mds[2]);
 
+AUGSYS_API const char*
+aug_eventlabel(unsigned short events);
+
 #endif /* AUGSYS_MUXER_H */

@@ -52,6 +52,6 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
 
 AUGNET_API aug_chan*
 aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
-                unsigned short mask);
+                aug_bool wantwr);
 
 #endif /* AUGNET_CHAN_H */

@@ -80,11 +80,11 @@ namespace {
                     exit(1);
                 }
                 if ('Z' == ch && recv_ < 260)
-                    setchanmask(wrchan_, AUG_MDEVENTALL);
+                    setchanwantwr(wrchan_, AUG_TRUE);
             } else if (id == wr_) {
                 write(stream, ALPHABET, 26);
                 wrchan_ = object_cast<aug_chan>(stream);
-                setchanmask(wrchan_, AUG_MDEVENTRDEX);
+                setchanwantwr(wrchan_, AUG_FALSE);
             }
             return AUG_TRUE;
         }

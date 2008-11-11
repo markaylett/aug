@@ -48,11 +48,9 @@
       <param name="fork" type="aug_bool&"/>
     </method>
 
-    <method name="setmask" type="aug_result" qname="setchanmask">
-      <param name="mask" type="unsigned short"/>
+    <method name="setwantwr" type="aug_result" qname="setchanwantwr">
+      <param name="wantwr" type="aug_bool"/>
     </method>
-
-    <method name="getmask" type="unsigned short" qname="getchanmask"/>
 
     <method name="getid" type="unsigned" qname="getchanid"/>
 

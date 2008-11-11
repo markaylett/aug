@@ -176,7 +176,7 @@ namespace test {
             if (heartbeats_ < 3) {
                 buffer_.putsome("heartbeat\n", 10);
                 ++heartbeats_;
-                setchanmask(chan_, AUG_MDEVENTALL);
+                setchanwantwr(chan_, AUG_TRUE);
             } else {
                 streamptr strm(object_cast<aug_stream>(chan_));
                 shutdown(strm);
@@ -274,7 +274,7 @@ namespace test {
                     return AUG_FALSE;
                 }
 
-                setchanmask(chan, AUG_MDEVENTALL);
+                setchanwantwr(chan, AUG_TRUE);
                 sess->timer_.cancel();
                 sess->heartbeats_ = 0;
             }
@@ -282,7 +282,7 @@ namespace test {
             if (events & AUG_MDEVENTWR) {
 
                 if (!sess->buffer_.writesome(stream)) {
-                    setchanmask(chan, AUG_MDEVENTRDEX);
+                    setchanwantwr(chan, AUG_FALSE);
                     sess->timer_.reset(5000);
                 }
             }

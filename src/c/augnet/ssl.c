@@ -10,6 +10,7 @@ AUG_RCSID("$Id$");
 #if ENABLE_SSL
 
 # include "augsys/socket.h" /* aug_shutdown() */
+# include "augsys/sticky.h"
 # include "augsys/uio.h"
 
 # include "augctx/base.h"
@@ -24,9 +25,6 @@ AUG_RCSID("$Id$");
 
 # include <assert.h>
 # include <string.h>        /* memcpy() */
-
-# define SSLREAD_  0x01
-# define SSLWRITE_ 0x02
 
 struct buf_ {
     char buf_[4096];
@@ -57,12 +55,11 @@ struct impl_ {
     aug_stream stream_;
     int refs_;
     aug_mpool* mpool_;
-    aug_muxer_t muxer_;
-    aug_sd sd_;
+    struct aug_sticky sticky_;
 
     /* The event mask from the channel's perspective. */
 
-    unsigned short mask_;
+    aug_bool wantwr_;
     struct aug_ssldata data_;
     SSL* ssl_;
     struct buf_ inbuf_, outbuf_;
@@ -196,6 +193,45 @@ writebufv_(struct buf_* x, const struct iovec* iov, int size)
     return ret;
 }
 
+static int
+getmask_(struct impl_* impl)
+{
+    /* Calculate the real mask to be used by the muxer. */
+
+    return !bufempty_(&impl->outbuf_)
+        || RDWANTWR == impl->state_
+        || WRWANTWR == impl->state_
+        ? AUG_MDEVENTALL : AUG_MDEVENTRDEX;
+}
+
+static aug_bool
+isexcept_(struct impl_* impl, unsigned short events)
+{
+    /* Exceptional event or state. */
+
+    return (events & AUG_MDEVENTEX)
+        || RDZERO == impl->state_
+        || SSLERR == impl->state_
+        ? AUG_TRUE : AUG_FALSE;
+}
+
+static aug_bool
+isread_(struct impl_* impl, unsigned short events)
+{
+    return RDPEND == impl->state_
+        || ((events & AUG_MDEVENTRD) && WRWANTRD != impl->state_)
+        || ((events & AUG_MDEVENTWR) && RDWANTWR == impl->state_)
+        ? AUG_TRUE : AUG_FALSE;
+}
+
+static aug_bool
+iswrite_(struct impl_* impl, unsigned short events)
+{
+    return ((events & AUG_MDEVENTWR) && RDWANTWR != impl->state_)
+        || ((events & AUG_MDEVENTRD) && WRWANTRD == impl->state_)
+        ? AUG_TRUE : AUG_FALSE;
+}
+
 static aug_result
 shutwr_(struct impl_* impl, struct aug_errinfo* errinfo)
 {
@@ -203,7 +239,7 @@ shutwr_(struct impl_* impl, struct aug_errinfo* errinfo)
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: shutdown: id=[%u]", impl->data_.id_);
     ret = SSL_shutdown(impl->ssl_);
-    aug_sshutdown(impl->sd_, SHUT_WR);
+    aug_sshutdown(impl->sticky_.md_, SHUT_WR);
 
     if (ret < 0) {
         aug_setsslerrinfo(errinfo, __FILE__, __LINE__, ERR_get_error());
@@ -261,40 +297,8 @@ sslwrite_(SSL* ssl, struct buf_* x)
     return n;
 }
 
-static int
-sslmask_(struct impl_* impl)
-{
-    /* Calculate the real mask to be used by the muxer. */
-
-    unsigned short mask = 0;
-
-    switch (impl->state_) {
-    case NORMAL:
-        if (!bufempty_(&impl->outbuf_))
-            mask = AUG_MDEVENTALL;
-        else
-            mask = AUG_MDEVENTRDEX;
-        break;
-    case RDPEND:
-        break;
-    case RDWANTRD:
-    case WRWANTRD:
-        mask = AUG_MDEVENTRDEX;
-        break;
-    case RDWANTWR:
-    case WRWANTWR:
-        mask = AUG_MDEVENTALL;
-        break;
-    case RDZERO:
-    case SSLERR:
-        break;
-    }
-
-    return mask;
-}
-
 static unsigned short
-chanevents_(struct impl_* impl)
+readyevents_(struct impl_* impl)
 {
     unsigned short events = 0;
 
@@ -302,35 +306,32 @@ chanevents_(struct impl_* impl)
        state that needs communicating.  Note: end-of-data and errors are
        communicated via aug_read(). */
 
-    if ((impl->mask_ & AUG_MDEVENTRD)
-        && (!bufempty_(&impl->inbuf_) || RDZERO == impl->state_
-            || SSLERR == impl->state_))
+    if (!bufempty_(&impl->inbuf_) || RDZERO == impl->state_
+        || SSLERR == impl->state_)
         events |= AUG_MDEVENTRD;
 
-    if ((impl->mask_ & AUG_MDEVENTWR) && !buffull_(&impl->outbuf_))
+    if (impl->wantwr_ && !buffull_(&impl->outbuf_))
         events |= AUG_MDEVENTWR;
 
     return events;
 }
 
 static void
-setsslmask_(struct impl_* impl)
+setmask_(struct impl_* impl)
 {
-    unsigned short mask = sslmask_(impl);
-    aug_setmdeventmask(impl->muxer_, impl->sd_, mask);
+    unsigned short mask = getmask_(impl);
 
-    AUG_CTXDEBUG3(aug_tlx,
-                  "SSL: events: id=[%u], sslmask=[%u], chanmask=[%u]",
-                  impl->data_.id_, (unsigned)mask, (unsigned)impl->mask_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: set mask: mask=[%s]", aug_eventlabel(mask));
+    aug_setsticky(&impl->sticky_, mask);
 }
 
 static void
-readwrite_(struct impl_* impl, int rw)
+readwrite_(struct impl_* impl, unsigned short events)
 {
     ssize_t ret;
     int err;
 
-    if (rw & SSLREAD_) {
+    if (isread_(impl, events)) {
 
         /* Perform read operation.  If input buffer is full, sslread_() will
            perform SSL_do_handshake(). */
@@ -352,10 +353,12 @@ readwrite_(struct impl_* impl, int rw)
             break;
         case SSL_ERROR_WANT_READ:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants read");
+            aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
             impl->state_ = RDWANTRD;
             goto done;
         case SSL_ERROR_WANT_WRITE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants write");
+            aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
             impl->state_ = RDWANTWR;
             goto done;
         case SSL_ERROR_SYSCALL:
@@ -399,7 +402,7 @@ readwrite_(struct impl_* impl, int rw)
         }
     }
 
-    if (rw & SSLWRITE_) {
+    if (iswrite_(impl, events)) {
 
         /* Perform write operation.  If output buffer is empty, sslwrite_()
            will perform SSL_do_handshake(). */
@@ -414,10 +417,12 @@ readwrite_(struct impl_* impl, int rw)
             break;
         case SSL_ERROR_WANT_READ:
             AUG_CTXDEBUG3(aug_tlx, "SSL: write wants read");
+            aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
             impl->state_ = WRWANTRD;
             break;
         case SSL_ERROR_WANT_WRITE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: write wants write");
+            aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
             impl->state_ = WRWANTWR;
             break;
         case SSL_ERROR_SYSCALL:
@@ -470,10 +475,15 @@ readwrite_(struct impl_* impl, int rw)
 static aug_result
 close_(struct impl_* impl)
 {
+    aug_sd sd = impl->sticky_.md_;
+
     AUG_CTXDEBUG3(aug_tlx, "SSL: clearing io-event mask: id=[%u]",
                   impl->data_.id_);
-    aug_setmdeventmask(impl->muxer_, impl->sd_, 0);
-    return aug_sclose(impl->sd_);
+
+    /* Descriptor will be reset to AUG_BADMD. */
+
+    aug_termsticky(&impl->sticky_);
+    return aug_sclose(sd);
 }
 
 static void*
@@ -502,7 +512,7 @@ release_(struct impl_* impl)
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
         aug_mpool* mpool = impl->mpool_;
-        if (AUG_BADSD != impl->sd_)
+        if (AUG_BADMD != impl->sticky_.md_)
             close_(impl);
         SSL_free(impl->ssl_);
         aug_release(impl->data_.handler_);
@@ -536,11 +546,8 @@ static aug_result
 cclose_(aug_chan* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
-    aug_result result;
     AUG_CTXDEBUG3(aug_tlx, "SSL: closing file: id=[%u]", impl->data_.id_);
-    result = close_(impl);
-    impl->sd_ = AUG_BADSD;
-    return result;
+    return close_(impl);
 }
 
 static aug_chan*
@@ -548,71 +555,35 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
     unsigned short events;
-    int rw = 0;
 
     /* Channel closed. */
 
-    if (AUG_BADSD == impl->sd_)
+    if (AUG_BADMD == impl->sticky_.md_)
         return NULL;
 
-    events = aug_getmdevents(impl->muxer_, impl->sd_);
+    events = aug_getsticky(&impl->sticky_);
 
     /* Close socket on error. */
 
-    if (error_(handler, &impl->chan_, impl->sd_, events))
+    if (error_(handler, &impl->chan_, impl->sticky_.md_, events))
         return NULL;
 
     /* TODO: how should any remaining exceptional events be handled? */
 
-    /* Determine which SSL operations are to be performed. */
-
-    switch (impl->state_) {
-    case RDPEND:
-        if (!buffull_(&impl->inbuf_)) {
-
-            /* Data is available for immediate read to input buffer. */
-            break;
-        }
-
-        /* Fall through to normal case. */
-
-    case NORMAL:
-        if (events & AUG_MDEVENTRD)
-            rw = SSLREAD_;
-        if (events & AUG_MDEVENTWR)
-            rw |= SSLWRITE_;
-        break;
-    case RDWANTRD:
-        if (events & AUG_MDEVENTRD)
-            rw = SSLREAD_;
-        break;
-    case RDWANTWR:
-        if (events & AUG_MDEVENTWR)
-            rw = SSLREAD_;
-        break;
-    case WRWANTRD:
-        if (events & AUG_MDEVENTRD)
-            rw = SSLWRITE_;
-        break;
-    case WRWANTWR:
-        if (events & AUG_MDEVENTWR)
-            rw = SSLWRITE_;
-        break;
-    case RDZERO:
-    case SSLERR:
-        break;
-    }
-
-    if (rw)
-        readwrite_(impl, rw);
+    if (events)
+        readwrite_(impl, events);
     else
-        AUG_CTXDEBUG3(aug_tlx, "SSL: readwrite_() skipped");
+        AUG_CTXDEBUG3(aug_tlx, "SSL: readwrite_() skipped: state=[%u],"
+                      " sticky=[%s]", (unsigned)impl->state_,
+                      aug_eventlabel(events));
 
-    events = chanevents_(impl);
-    AUG_CTXDEBUG3(aug_tlx, "SSL: chanevents_(): id=[%u], events=[%u]",
-                  impl->data_.id_, (unsigned)events);
+    events = readyevents_(impl);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: readyevents_(): ready=[%s]",
+                  aug_eventlabel(events));
 
     if (events) {
+
+        /* Returns false if channel is to be removed. */
 
         if (!aug_readychan(handler, &impl->chan_, events)) {
 
@@ -621,34 +592,25 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
             return NULL;
         }
-
-        /* Update muxer's mask. */
-
-        setsslmask_(impl);
     }
 
+    /* Update muxer's mask. */
+
+    setmask_(impl);
     retain_(impl);
     return ob;
 }
 
 static aug_result
-csetmask_(aug_chan* ob, unsigned short mask)
+csetwantwr_(aug_chan* ob, aug_bool wantwr)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: setting event mask: id=[%u], mask=[%u]",
-                  impl->data_.id_, (unsigned)mask);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: set wantwr: id=[%u], wr=[%d]",
+                  impl->data_.id_, (int)wantwr);
 
-    impl->mask_ = mask;
-    setsslmask_(impl);
+    impl->wantwr_ = wantwr;
     return AUG_SUCCESS;
-}
-
-static unsigned short
-cgetmask_(aug_chan* ob)
-{
-    struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
-    return impl->mask_;
 }
 
 static unsigned
@@ -664,7 +626,8 @@ cgetname_(aug_chan* ob, char* dst, unsigned size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
     struct aug_endpoint ep;
 
-    if (!aug_getpeername(impl->sd_, &ep) || !aug_endpointntop(&ep, dst, size))
+    if (!aug_getpeername(impl->sticky_.md_, &ep)
+        || !aug_endpointntop(&ep, dst, size))
         return NULL;
 
     return dst;
@@ -674,14 +637,29 @@ static aug_bool
 cisready_(aug_chan* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
+    unsigned short events;
 
     /* True if closed. */
 
-    if (AUG_BADSD == impl->sd_)
+    if (AUG_BADMD == impl->sticky_.md_)
         return AUG_TRUE;
 
-    return chanevents_(impl)
-        || (RDPEND == impl->state_ && !buffull_(&impl->inbuf_));
+    /* Buffered data ready for processing. */
+
+    if (!bufempty_(&impl->inbuf_))
+        return AUG_TRUE;
+
+    /* Wants write and output buffer not full. */
+
+    if (impl->wantwr_ && !buffull_(&impl->outbuf_))
+        return AUG_TRUE;
+
+    /* Otherwise, any SSL calls to be made. */
+
+    events = aug_getsticky(&impl->sticky_);
+    return isexcept_(impl, events)
+        || isread_(impl, events)
+        || iswrite_(impl, events);
 }
 
 static const struct aug_chanvtbl cvtbl_ = {
@@ -690,8 +668,7 @@ static const struct aug_chanvtbl cvtbl_ = {
     crelease_,
     cclose_,
     cprocess_,
-    csetmask_,
-    cgetmask_,
+    csetwantwr_,
     cgetid_,
     cgetname_,
     cisready_
@@ -762,7 +739,7 @@ sread_(aug_stream* ob, void* buf, size_t size)
                   impl->data_.id_);
 
     ret = (ssize_t)readbuf_(&impl->inbuf_, buf, size);
-    setsslmask_(impl);
+    setmask_(impl);
     return AUG_MKRESULT(ret);
 }
 
@@ -797,7 +774,7 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
                   impl->data_.id_);
 
     ret = (ssize_t)readbufv_(&impl->inbuf_, iov, size);
-    setsslmask_(impl);
+    setmask_(impl);
     return AUG_MKRESULT(ret);
 }
 
@@ -825,7 +802,7 @@ swrite_(aug_stream* ob, const void* buf, size_t size)
                   impl->data_.id_);
 
     ret = (ssize_t)writebuf_(&impl->outbuf_, buf, size);
-    setsslmask_(impl);
+    setmask_(impl);
     return AUG_MKRESULT(ret);
 }
 
@@ -853,7 +830,7 @@ swritev_(aug_stream* ob, const struct iovec* iov, int size)
                   impl->data_.id_);
 
     ret = (ssize_t)writebufv_(&impl->outbuf_, iov, size);
-    setsslmask_(impl);
+    setmask_(impl);
     return AUG_MKRESULT(ret);
 }
 
@@ -870,20 +847,14 @@ static const struct aug_streamvtbl svtbl_ = {
 
 static struct impl_*
 createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
-           unsigned short mask, aug_chandler* handler,
-           struct ssl_ctx_st* sslctx)
+           aug_bool wantwr, aug_chandler* handler, struct ssl_ctx_st* sslctx)
 {
     struct impl_* impl;
     SSL* ssl;
     BIO* bio;
 
-    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTALL)))
+    if (!(impl = aug_allocmem(mpool, sizeof(struct impl_))))
         return NULL;
-
-    if (!(impl = aug_allocmem(mpool, sizeof(struct impl_)))) {
-        aug_setmdeventmask(muxer, sd, 0);
-        return NULL;
-    }
 
     impl->chan_.vtbl_ = &cvtbl_;
     impl->chan_.impl_ = NULL;
@@ -891,9 +862,16 @@ createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
     impl->stream_.impl_ = NULL;
     impl->refs_ = 1;
     impl->mpool_ = mpool;
-    impl->muxer_ = muxer;
-    impl->sd_ = sd;
-    impl->mask_ = mask;
+
+    /* Sticky event flags are used for edge-triggered interfaces. */
+
+    if (AUG_ISFAIL(aug_initsticky(&impl->sticky_, muxer, sd,
+                                  AUG_MDEVENTALL))) {
+        aug_freemem(mpool, impl);
+        return NULL;
+    }
+
+    impl->wantwr_ = wantwr;
     impl->data_.handler_ = handler;
     impl->data_.id_ = id;
 
@@ -936,10 +914,10 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 
 AUGNET_API aug_chan*
 aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
-                    aug_sd sd, unsigned short mask, aug_chandler* handler,
+                    aug_sd sd, aug_bool wantwr, aug_chandler* handler,
                     struct ssl_ctx_st* sslctx)
 {
-    struct impl_* impl = createssl_(mpool, id, muxer, sd, mask, handler,
+    struct impl_* impl = createssl_(mpool, id, muxer, sd, wantwr, handler,
                                     sslctx);
     if (!impl)
         return NULL;
@@ -954,10 +932,10 @@ aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
 
 AUGNET_API aug_chan*
 aug_createsslserver(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
-                    aug_sd sd, unsigned short mask, aug_chandler* handler,
+                    aug_sd sd, aug_bool wantwr, aug_chandler* handler,
                     struct ssl_ctx_st* sslctx)
 {
-    struct impl_* impl = createssl_(mpool, id, muxer, sd, mask, handler,
+    struct impl_* impl = createssl_(mpool, id, muxer, sd, wantwr, handler,
                                     sslctx);
     if (!impl)
         return NULL;
