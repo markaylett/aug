@@ -3,9 +3,9 @@
 
 AC_PREREQ(2.56)
 #AC_INIT([src/auglocal.h.in])
-AC_INIT([aug], [trunk], [mark@emantic.co.uk])
+AC_INIT([aug], [trunk], [mark.aylett@gmail.com])
 
-#AM_INIT_AUTOMAKE([aug], [trunk], [mark@emantic.co.uk])
+#AM_INIT_AUTOMAKE([aug], [trunk], [mark.aylett@gmail.com])
 AM_INIT_AUTOMAKE()
 AC_CONFIG_HEADER([src/auglocal.h])
 AM_MAINTAINER_MODE
