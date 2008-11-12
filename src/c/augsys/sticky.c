@@ -9,10 +9,10 @@ AUG_RCSID("$Id$");
 
 #include "augctx/base.h" /* aug_tlx */
 
-/* External events are sticky events that are visible to the outside world.
-   Externally visible events are always a subset of the current mask.  In
-   contrast, internal events are the set of all sticky events that have not
-   been cleared. */
+/* External events are the events visible to the outside world.  Externally
+   visible events are always a subset of the current mask.  In contrast,
+   internal events are the set of all sticky events that have not been
+   cleared. */
 
 #define EXTERNAL_(x) ((x)->internal_ & (x)->mask_)
 
@@ -80,7 +80,7 @@ aug_setsticky(struct aug_sticky* sticky, unsigned short mask)
 
     sticky->mask_ = mask;
 
-    /* Clear muxer mask if external events. */
+    /* Set muxer mask if there are no external events. */
 
     if (!EXTERNAL_(sticky)) {
 

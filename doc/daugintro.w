@@ -134,11 +134,12 @@ namespace {@/
 @ The \.{<augmodpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
 implementations.  Modules can also be written in standard \CEE/.  A \CEE/
 implementation would use the \.{<augmod.h>} header, instead.  For convenience,
-names are imported from the |mod| and |std| namespaces.
+names are imported from the |aug::mod| and |std| namespaces.
 
 @<include...@>=
 #define MOD_BUILD
-#include <modpp.hpp>@/
+#include <augmodpp.hpp>@/
+using namespace aug;@/
 using namespace mod;@/
 using namespace std;
 
@@ -169,11 +170,11 @@ struct echo : basic_session {@/
   bool
   do_start(const char* sname);
 
-  bool
-  do_accepted(handle& sock, const char* addr, unsigned short port);
-
   void
   do_closed(const handle& sock);
+
+  bool
+  do_accepted(handle& sock, const char* name);
 
   void
   do_recv(const handle& sock, const void* buf, size_t size);
@@ -215,7 +216,7 @@ no read activity has occurred on the |sock| handle for a period of 15 seconds
 
 @<member...@>+=
 bool
-echo::do_accepted(handle& sock, const char* addr, unsigned short port)
+echo::do_accepted(handle& sock, const char* name)
 {
   sock.setuser(new string());
   send(sock, "HELLO\r\n", 7);
