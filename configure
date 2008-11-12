@@ -6011,9 +6011,9 @@ echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&
     { echo "$as_me:$LINENO: WARNING: $ac_header: in the future, the compiler will take precedence" >&5
 echo "$as_me: WARNING: $ac_header: in the future, the compiler will take precedence" >&2;}
     ( cat <<\_ASBOX
-## --------------------------------- ##
+## ------------------------------------ ##
 ## Report this to mark.aylett@gmail.com ##
-## --------------------------------- ##
+## ------------------------------------ ##
 _ASBOX
      ) | sed "s/^/$as_me: WARNING:     /" >&2
     ;;
@@ -21562,9 +21562,9 @@ echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&
     { echo "$as_me:$LINENO: WARNING: $ac_header: in the future, the compiler will take precedence" >&5
 echo "$as_me: WARNING: $ac_header: in the future, the compiler will take precedence" >&2;}
     ( cat <<\_ASBOX
-## --------------------------------- ##
+## ------------------------------------ ##
 ## Report this to mark.aylett@gmail.com ##
-## --------------------------------- ##
+## ------------------------------------ ##
 _ASBOX
      ) | sed "s/^/$as_me: WARNING:     /" >&2
     ;;
