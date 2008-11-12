@@ -96,15 +96,9 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 }
 
 static aug_result
-chan_setmask_(aug_chan* ob, unsigned short mask)
+chan_setwantwr_(aug_chan* ob, aug_bool wantwr)
 {
     return AUG_SUCCESS;
-}
-
-static unsigned short
-chan_getmask_(aug_chan* ob)
-{
-    return 0;
 }
 
 static unsigned
@@ -133,8 +127,7 @@ static const struct aug_chanvtbl chanvtbl_ = {
     chan_release_,
     chan_close_,
     chan_process_,
-    chan_setmask_,
-    chan_getmask_,
+    chan_setwantwr_,
     chan_getid_,
     chan_getname_,
     chan_isready_

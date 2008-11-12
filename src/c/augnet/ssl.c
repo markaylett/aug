@@ -591,7 +591,10 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
     /* TODO: handle remaining exceptional events. */
 
-    if (events & AUG_MDEVENTRD) {
+    /* If neutral and read event is set, then test readability before entering
+       SSL_read() operation. */
+
+    if (NEUTRAL_ == impl->state_ && (events & AUG_MDEVENTRD)) {
 
         /* SSL_read() returns SSL_ERROR_WANT_READ if the operation would have
            blocked.  This results in a state of RDWANTRD_, which means that
