@@ -55,7 +55,6 @@ AUG_RCSID("$Id$");
 #define HEAD_SIZE_ (sizeof(HEAD_) - 1)
 #define TAIL_SIZE_ (sizeof(TAIL_) - 1)
 
-#define BUFSIZE_ 4096
 #define ENDOF_ (-2)
 
 /* Maximum number of digits in a 32 bit integer. */
@@ -177,7 +176,7 @@ aug_createfixstream(aug_mpool* mpool, size_t size, aug_fixcb_t cb,
     if (!(stream = aug_allocmem(mpool, sizeof(struct aug_fixstream_))))
         return NULL;
 
-    if (!(xstr = aug_createxstr(mpool, 0 == size ? BUFSIZE_ : size))) {
+    if (!(xstr = aug_createxstr(mpool, 0 == size ? AUG_BUFSIZE : size))) {
         aug_freemem(mpool, stream);
         return NULL;
     }

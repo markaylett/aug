@@ -26,29 +26,40 @@ AUG_RCSID("$Id$");
 # include <assert.h>
 # include <string.h>        /* memcpy() */
 
+/* Buffer-size should be reduced during testing. */
+
 struct buf_ {
     char buf_[AUG_BUFSIZE];
     char* rd_, * wr_;
 };
 
-enum sslstate_ {
-    NORMAL,
+/* States are composed of sub-states. */
 
-    /* Bytes stored in SSL buffer awaiting SSL_read(). */
+#define NEUTRAL_    0x01
+#define READ_       0x02
+#define WRITE_      0x04
+#define PENDRD_     0x08
+#define WANTRD_     0x10
+#define WANTWR_     0x20
 
-    RDPEND,
-    RDWANTRD,
-    RDWANTWR,
-    WRWANTRD,
-    WRWANTWR,
+/* End of data. */
 
-    /* End of data. */
+#define ENDOF_      0x40
+#define ERROR_      0x80
 
-    RDZERO,
-    SSLERR
-};
+/* Composite states. */
 
-/* FIXME: add sticky handling. */
+/* Bytes stored in SSL buffer awaiting SSL_read(). */
+
+#define RDPENDRD_  (READ_  | PENDRD_)
+#define RDWANTRD_  (READ_  | WANTRD_)
+#define RDWANTWR_  (READ_  | WANTWR_)
+#define WRWANTRD_  (WRITE_ | WANTRD_)
+#define WRWANTWR_  (WRITE_ | WANTWR_)
+
+/* WRWANTWR_ is also used to initiate the handshake. */
+
+#define HANDSHAKE_ (WRITE_ | WANTWR_)
 
 struct impl_ {
     aug_chan chan_;
@@ -57,15 +68,15 @@ struct impl_ {
     aug_mpool* mpool_;
     struct aug_sticky sticky_;
 
-    /* The event mask from the channel's perspective. */
+    /* User wants write. */
 
     aug_bool wantwr_;
     struct aug_ssldata data_;
     SSL* ssl_;
     struct buf_ inbuf_, outbuf_;
-    enum sslstate_ state_;
+    unsigned state_;
     struct aug_errinfo errinfo_;
-    int shutdown_;
+    aug_bool shutdown_;
 };
 
 static aug_bool
@@ -196,11 +207,11 @@ writebufv_(struct buf_* x, const struct iovec* iov, int size)
 static int
 getmask_(struct impl_* impl)
 {
-    /* Calculate the real mask to be used by the muxer. */
+    /* Add write bit if either the SSL layer wants write, or there is buffered
+       data to be written. */
 
-    return !bufempty_(&impl->outbuf_)
-        || RDWANTWR == impl->state_
-        || WRWANTWR == impl->state_
+    return (impl->state_ & WANTWR_)
+        || !bufempty_(&impl->outbuf_)
         ? AUG_MDEVENTALL : AUG_MDEVENTRDEX;
 }
 
@@ -209,26 +220,39 @@ isexcept_(struct impl_* impl, unsigned short events)
 {
     /* Exceptional event or state. */
 
-    return (events & AUG_MDEVENTEX)
-        || RDZERO == impl->state_
-        || SSLERR == impl->state_
+    return (impl->state_ & (ENDOF_ | ERROR_))
+        || (events & AUG_MDEVENTEX)
         ? AUG_TRUE : AUG_FALSE;
 }
 
 static aug_bool
 isread_(struct impl_* impl, unsigned short events)
 {
-    return RDPEND == impl->state_
-        || ((events & AUG_MDEVENTRD) && WRWANTRD != impl->state_)
-        || ((events & AUG_MDEVENTWR) && RDWANTWR == impl->state_)
+    /* Never read if blocked on write. */
+
+    if (impl->state_ & WRITE_)
+        return AUG_FALSE;
+
+    /* Only consume a write event if read has explicitly asked for it. */
+
+    return RDPENDRD_ == impl->state_
+        || (events & AUG_MDEVENTRD)
+        || ((events & AUG_MDEVENTWR) && RDWANTWR_ == impl->state_)
         ? AUG_TRUE : AUG_FALSE;
 }
 
 static aug_bool
 iswrite_(struct impl_* impl, unsigned short events)
 {
-    return ((events & AUG_MDEVENTWR) && RDWANTWR != impl->state_)
-        || ((events & AUG_MDEVENTRD) && WRWANTRD == impl->state_)
+    /* Never write if blocked on read. */
+
+    if (impl->state_ & READ_)
+        return AUG_FALSE;
+
+    /* Only consume a read event if write has explicitly asked for it. */
+
+    return (events & AUG_MDEVENTWR)
+        || ((events & AUG_MDEVENTRD) && WRWANTRD_ == impl->state_)
         ? AUG_TRUE : AUG_FALSE;
 }
 
@@ -295,12 +319,11 @@ readyevents_(struct impl_* impl)
 {
     unsigned short events = 0;
 
-    /* Channel is readable if there is either data in the input buffer, or a
-       state that needs communicating.  Note: end-of-data and errors are
-       communicated via aug_read(). */
+    /* Channel is readable if there is either a state that needs
+       communicating, or data in the input buffer.  Note: end-of-data and
+       errors are communicated to the user via aug_read(). */
 
-    if (!bufempty_(&impl->inbuf_) || RDZERO == impl->state_
-        || SSLERR == impl->state_)
+    if ((impl->state_ & (ENDOF_ | ERROR_)) || !bufempty_(&impl->inbuf_))
         events |= AUG_MDEVENTRD;
 
     if (impl->wantwr_ && !buffull_(&impl->outbuf_))
@@ -341,23 +364,24 @@ readwrite_(struct impl_* impl, unsigned short events)
 
                 /* Pending data for immediate read. */
 
-                impl->state_ = RDPEND;
+                impl->state_ = RDPENDRD_;
                 return;
             }
-            impl->state_ = NORMAL;
 
-            /* Proceed with write. */
+            /* Proceed with write when state is neutral. */
 
+            impl->state_ = NEUTRAL_;
             break;
+
         case SSL_ERROR_WANT_READ:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants read");
             aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
-            impl->state_ = RDWANTRD;
+            impl->state_ = RDWANTRD_;
             return;
         case SSL_ERROR_WANT_WRITE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read wants write");
             aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
-            impl->state_ = RDWANTWR;
+            impl->state_ = RDWANTWR_;
             return;
         case SSL_ERROR_SYSCALL:
             AUG_CTXDEBUG3(aug_tlx, "SSL: read syscall error", err);
@@ -377,7 +401,7 @@ readwrite_(struct impl_* impl, unsigned short events)
                 aug_seterrinfo(&impl->errinfo_, __FILE__, __LINE__, "aug",
                                AUG_EIO, "ssl read syscall error");
             }
-            impl->state_ = SSLERR;
+            impl->state_ = ERROR_;
             return;
         case SSL_ERROR_ZERO_RETURN:
             AUG_CTXDEBUG3(aug_tlx, "SSL: end of data");
@@ -385,7 +409,7 @@ readwrite_(struct impl_* impl, unsigned short events)
                 AUG_CTXDEBUG3(aug_tlx, "SSL: shutting-down", ret);
                 SSL_shutdown(impl->ssl_);
             }
-            impl->state_ = RDZERO;
+            impl->state_ = ENDOF_;
             return;
         default:
 
@@ -395,7 +419,7 @@ readwrite_(struct impl_* impl, unsigned short events)
 
             aug_setsslerrinfo(&impl->errinfo_, __FILE__, __LINE__,
                               ERR_get_error());
-            impl->state_ = SSLERR;
+            impl->state_ = ERROR_;
             return;
         }
     }
@@ -420,20 +444,20 @@ readwrite_(struct impl_* impl, unsigned short events)
 
                 /* Save error locally. */
 
-                impl->state_ = SSLERR;
+                impl->state_ = ERROR_;
             }
 
-            impl->state_ = NORMAL;
+            impl->state_ = NEUTRAL_;
             break;
         case SSL_ERROR_WANT_READ:
             AUG_CTXDEBUG3(aug_tlx, "SSL: write wants read");
             aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
-            impl->state_ = WRWANTRD;
+            impl->state_ = WRWANTRD_;
             break;
         case SSL_ERROR_WANT_WRITE:
             AUG_CTXDEBUG3(aug_tlx, "SSL: write wants write");
             aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
-            impl->state_ = WRWANTWR;
+            impl->state_ = WRWANTWR_;
             break;
         case SSL_ERROR_SYSCALL:
             AUG_CTXDEBUG3(aug_tlx, "SSL: write syscall error", err);
@@ -453,7 +477,7 @@ readwrite_(struct impl_* impl, unsigned short events)
                 aug_seterrinfo(&impl->errinfo_, __FILE__, __LINE__, "aug",
                                AUG_EIO, "ssl write syscall error");
             }
-            impl->state_ = SSLERR;
+            impl->state_ = ERROR_;
             break;
         default:
 
@@ -463,7 +487,7 @@ readwrite_(struct impl_* impl, unsigned short events)
 
             aug_setsslerrinfo(&impl->errinfo_, __FILE__, __LINE__,
                               ERR_get_error());
-            impl->state_ = SSLERR;
+            impl->state_ = ERROR_;
             break;
         }
     }
@@ -559,14 +583,6 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         return NULL;
 
     events = aug_getsticky(&impl->sticky_);
-    if (events & AUG_MDEVENTRD) {
-        char ch;
-        if (AUG_ISBLOCK(aug_recv(impl->sticky_.md_, &ch, 1, MSG_PEEK))) {
-            AUG_CTXDEBUG3(aug_tlx, "SSL: clearing blocked read");
-            aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
-            events &= ~AUG_MDEVENTRD;
-        }
-    }
 
     /* Close socket on error. */
 
@@ -574,6 +590,33 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         return NULL;
 
     /* TODO: handle remaining exceptional events. */
+
+    if (events & AUG_MDEVENTRD) {
+
+        /* SSL_read() returns SSL_ERROR_WANT_READ if the operation would have
+           blocked.  This results in a state of RDWANTRD_, which means that
+           the SSL_read() will be resumed once the socket becomes readable
+           again.
+
+           If the initial SSL_read() had been initiated by the AUG_MDEVENTRD
+           sticky bit, when the socket was not actually readable, then this
+           could inadvertently starve any writes, as they will not be serviced
+           until the SSL_read() operation is complete.
+
+           To work around this, MSG_PEEK is used to ensure that the socket is
+           readable before issuing an SSL_read(). */
+
+        char ch;
+        if (AUG_ISBLOCK(aug_recv(impl->sticky_.md_, &ch, 1, MSG_PEEK))) {
+
+            /* If the peek operation would have blocked, then clear the sticky
+               bit. */
+
+            AUG_CTXDEBUG3(aug_tlx, "SSL: clearing blocked read");
+            aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
+            events &= ~AUG_MDEVENTRD;
+        }
+    }
 
     if (events)
         readwrite_(impl, events);
@@ -700,7 +743,7 @@ sshutdown_(aug_stream* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
 
-    impl->shutdown_ = 1;
+    impl->shutdown_ = AUG_TRUE;
 
     /* If the output buffer is not empty, the shutdown call will be delayed
        until the remaining data has been written. */
@@ -714,7 +757,7 @@ sread_(aug_stream* ob, void* buf, size_t size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     ssize_t ret;
 
-    if (SSLERR == impl->state_) {
+    if (ERROR_ == impl->state_) {
 
         /* Restore saved error. */
 
@@ -726,8 +769,8 @@ sread_(aug_stream* ob, void* buf, size_t size)
 
     /* Only return end once all data has been read from buffer. */
 
-    if (RDZERO == impl->state_ && bufempty_(&impl->inbuf_))
-        return AUG_SUCCESS;
+    if (ENDOF_ == impl->state_ && bufempty_(&impl->inbuf_))
+        return AUG_MKRESULT(0);
 
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
@@ -749,7 +792,7 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, stream_, ob);
     ssize_t ret;
 
-    if (SSLERR == impl->state_) {
+    if (ERROR_ == impl->state_) {
 
         /* Restore saved error. */
 
@@ -761,8 +804,8 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
 
     /* Only return end once all data has been read from buffer. */
 
-    if (RDZERO == impl->state_ && bufempty_(&impl->inbuf_))
-        return AUG_SUCCESS;
+    if (ENDOF_ == impl->state_ && bufempty_(&impl->inbuf_))
+        return AUG_MKRESULT(0);
 
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
@@ -884,10 +927,10 @@ createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
     impl->ssl_ = ssl;
     clearbuf_(&impl->inbuf_);
     clearbuf_(&impl->outbuf_);
-    impl->state_ = WRWANTWR;
-    impl->shutdown_ = 0;
+    impl->state_ = HANDSHAKE_;
+    impl->shutdown_ = AUG_FALSE;
 
-    /* WRWANTWR state is used to initiate handshake. */
+    /* Initiate handshake mask. */
 
     setmask_(impl);
 
