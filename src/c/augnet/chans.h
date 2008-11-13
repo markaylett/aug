@@ -31,7 +31,7 @@ AUGNET_API aug_chans_t
 aug_createchans(aug_mpool* mpool, aug_chandler* handler);
 
 /**
- * Destroy @chans list.
+ * Destroy @a chans list.
  *
  * @param chans Channel list.
  */
