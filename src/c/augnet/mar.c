@@ -22,8 +22,7 @@ AUG_RCSID("$Id$");
 
 struct aug_marparser_ {
     aug_mpool* mpool_;
-    const struct aug_marhandler* handler_;
-    aug_object* ob_;
+    aug_marpool* marpool_;
     aug_httpparser_t http_;
     aug_xstr_t initial_;
     aug_mar_t mar_;
@@ -45,12 +44,11 @@ initial_(aug_object* ob, const char* initial)
     if (!parser->initial_)
         return AUG_FAILERROR; /* Allocation failed. */
 
-    if (!(parser->mar_ = parser->handler_->create_(parser->ob_, initial))) {
+    if (!(parser->mar_ = aug_getmar(parser->marpool_, initial))) {
         aug_destroyxstr(parser->initial_);
         parser->initial_ = NULL;
         return AUG_FAILERROR;
     }
-
     aug_xstrcpys(parser->initial_, initial);
     return AUG_SUCCESS;
 }
@@ -102,9 +100,8 @@ end_(aug_object* ob, int commit)
         if (!parser->initial_)
             return AUG_SUCCESS; /* Blank line. */
 
-        result = parser->handler_
-            ->message_(parser->ob_, aug_xstr(parser->initial_),
-                       parser->mar_);
+        result = aug_putmar(parser->marpool_, aug_xstr(parser->initial_),
+                            parser->mar_);
     } else
         result = AUG_SUCCESS;
 
@@ -135,25 +132,24 @@ destroy_(void* ptr)
     aug_marparser_t parser = ptr;
     aug_mpool* mpool = parser->mpool_;
 
-    if (parser->ob_)
-        aug_release(parser->ob_);
-
-    if (parser->http_)
-        aug_destroyhttpparser(parser->http_);
+    if (parser->mar_)
+        aug_releasemar(parser->mar_);
 
     if (parser->initial_)
         aug_destroyxstr(parser->initial_);
 
-    if (parser->mar_)
-        aug_releasemar(parser->mar_);
+    if (parser->http_)
+        aug_destroyhttpparser(parser->http_);
+
+    if (parser->marpool_)
+        aug_release(parser->marpool_);
 
     aug_freemem(mpool, parser);
     aug_release(mpool);
 }
 
 AUGNET_API aug_marparser_t
-aug_createmarparser(aug_mpool* mpool, unsigned size,
-                    const struct aug_marhandler* handler, aug_object* ob)
+aug_createmarparser(aug_mpool* mpool, aug_marpool* marpool, unsigned size)
 {
     aug_marparser_t parser = aug_allocmem(mpool,
                                           sizeof(struct aug_marparser_));
@@ -181,14 +177,13 @@ aug_createmarparser(aug_mpool* mpool, unsigned size,
     }
 
     parser->mpool_ = mpool;
-    parser->handler_ = handler;
-    parser->ob_ = ob;
+    parser->marpool_ = marpool;
     parser->http_ = http;
     parser->initial_ = NULL;
     parser->mar_ = NULL;
 
     aug_retain(mpool);
-    aug_retain(ob);
+    aug_retain(marpool);
     return parser;
 }
 

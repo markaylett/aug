@@ -196,6 +196,7 @@ EXTRA_DIST = \
 	err.xml \
 	iter.xml \
 	log.xml \
+	mar.xml \
 	mpool.xml \
 	msg.xml \
 	rpc.xml \
@@ -213,6 +214,7 @@ modinclude_HEADERS = \
 	err.h \
 	iter.h \
 	log.h \
+	mar.h \
 	mpool.h  \
 	msg.h \
 	rpc.h \
@@ -230,6 +232,7 @@ modinclude_HEADERS = \
 @ENABLE_RUBY_TRUE@	err.h \
 @ENABLE_RUBY_TRUE@	iter.h \
 @ENABLE_RUBY_TRUE@	log.h \
+@ENABLE_RUBY_TRUE@	mar.h  \
 @ENABLE_RUBY_TRUE@	mpool.h  \
 @ENABLE_RUBY_TRUE@	msg.h \
 @ENABLE_RUBY_TRUE@	rpc.h \

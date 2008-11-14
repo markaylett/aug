@@ -367,6 +367,15 @@ class CppFormat
             "aug::smartob<#{type.cname}>"
         elsif type.ref?
             type.cname + '&'
+        else
+            type.cname
+        end
+    end
+    def verify_type(type)
+        if type.object? then
+            "aug::smartob<#{type.cname}>"
+        elsif type.ref?
+            type.cname + '&'
         elsif type.cname == 'aug_result'
             'void'
         elsif type.cname == 'aug_rint'
@@ -427,7 +436,7 @@ def putinline(iface, method)
     end
     puts <<END
 
-    inline #{format.return_type(method.type)}
+    inline #{format.verify_type(method.type)}
     #{method.qname}(#{args})#{method.verify ? "" : " AUG_NOTHROW"}
     {
         #{format.creturn_expr(method.type, expr)};

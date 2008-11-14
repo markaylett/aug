@@ -6,128 +6,11 @@
 
 #include "augnetpp/config.hpp"
 
-#include "augutilpp/object.hpp"
-
 #include "augctxpp/exception.hpp"
 
 #include "augnet/mar.h"
 
-#include "augmar/mar.h"
-
-#include <memory> // auto_ptr<>
-
 namespace aug {
-
-    struct basic_marstatic {
-    protected:
-        ~basic_marstatic() AUG_NOTHROW
-        {
-        }
-    public:
-        static aug_mar_t
-        create(aug_object* ob, const char* initial)
-        {
-            mpoolptr mpool(getmpool(aug_tlx));
-            return aug_createmar(mpool.get());
-        }
-    };
-
-    struct basic_marnonstatic {
-    protected:
-        ~basic_marnonstatic() AUG_NOTHROW
-        {
-        }
-    public:
-        aug_mar_t
-        create(const char* initial)
-        {
-            mpoolptr mpool(getmpool(aug_tlx));
-            return aug_createmar(mpool.get());
-        }
-    };
-
-    namespace detail {
-
-        template <typename T>
-        class marstatic {
-
-            static aug_mar_t
-            create(aug_object* ob, const char* initial)
-            {
-                try {
-                    return T::create(ob, initial);
-                } AUG_SETERRINFOCATCH;
-                return 0;
-            }
-
-            static aug_result
-            message(aug_object* ob, const char* initial, aug_mar_t mar)
-            {
-                try {
-                    return T::message(ob, initial, mar);
-                } AUG_SETERRINFOCATCH;
-                return AUG_FAILERROR;
-            }
-
-        public:
-            static const aug_marhandler&
-            get()
-            {
-                static const aug_marhandler local = {
-                    create,
-                    message
-                };
-                return local;
-            }
-        };
-
-        template <typename T>
-        class marnonstatic {
-
-            static aug_mar_t
-            create(aug_object* ob, const char* initial)
-            {
-                try {
-                    return obtop<T*>(ob)->create(initial);
-                } AUG_SETERRINFOCATCH;
-                return 0;
-            }
-
-            static aug_result
-            message(aug_object* ob, const char* initial, aug_mar_t mar)
-            {
-                try {
-                    return obtop<T*>(ob)->message(initial, mar);
-                } AUG_SETERRINFOCATCH;
-                return AUG_FAILERROR;
-            }
-
-        public:
-            static const aug_marhandler&
-            get()
-            {
-                static const aug_marhandler local = {
-                    create,
-                    message
-                };
-                return local;
-            }
-        };
-    }
-
-    template <typename T>
-    const aug_marhandler&
-    marstatic()
-    {
-        return detail::marstatic<T>::get();
-    }
-
-    template <typename T>
-    const aug_marhandler&
-    marnonstatic()
-    {
-        return detail::marnonstatic<T>::get();
-    }
 
     class marparser {
 
@@ -150,35 +33,10 @@ namespace aug {
         {
         }
 
-        marparser(mpoolref mpool, unsigned size,
-                  const aug_marhandler& handler, objectref ob)
+        marparser(mpoolref mpool, marpoolref marpool, unsigned size)
+           : marparser_(aug_createmarparser(mpool.get(), marpool.get(), size))
         {
-            verify(marparser_
-                   = aug_createmarparser(mpool.get(), size, &handler,
-                                         ob.get()));
-        }
-
-        marparser(mpoolref mpool, unsigned size,
-                  const aug_marhandler& handler, const null_&)
-        {
-            verify(marparser_
-                   = aug_createmarparser(mpool.get(), size, &handler, 0));
-        }
-
-        template <typename T>
-        marparser(mpoolref mpool, unsigned size, T& x)
-        {
-            aug::smartob<aug_boxptr> ob(createboxptr(mpool, &x, 0));
-            verify(marparser_ = aug_createmarparser
-                   (mpool.get(), size, &marnonstatic<T>(), ob.base()));
-        }
-
-        template <typename T>
-        marparser(mpoolref mpool, unsigned size, std::auto_ptr<T>& x)
-        {
-            aug::smartob<aug_boxptr> ob(createboxptr(mpool, x));
-            verify(marparser_ = aug_createmarparser
-                   (mpool.get(), size, &marnonstatic<T>(), ob.base()));
+            verify(marparser_);
         }
 
         void

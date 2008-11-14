@@ -15,13 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_02E9A138FBC04B739F107E5E85B65993"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_05A7110D8AEE4A6CA1A09C7943B4703A"
+        "MsmKey" = "8:_08E46FDFE746483F9A9020FECCA8939A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -34,6 +28,12 @@
         "Entry"
         {
         "MsmKey" = "8:_0E2C01968F1E46AE8EE6B50268FBBC19"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0EFFD6A6E92643DEB3CD39A818959E4C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -75,13 +75,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_14D14FF831FB4AD883459EA688D20CFA"
+        "MsmKey" = "8:_19D9FF8299BD4198A2E6BB8BEE277031"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_19D9FF8299BD4198A2E6BB8BEE277031"
+        "MsmKey" = "8:_1C12DE195F9C4A8F8212A9ABC8DF7D12"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -100,12 +100,6 @@
         "Entry"
         {
         "MsmKey" = "8:_20D2BB850CAB49D38427D78338B64886"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_239955CF3F8B47EBAD0694F98D564902"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -130,6 +124,12 @@
         "Entry"
         {
         "MsmKey" = "8:_2BA44DF489104AB58C5C145BD2D1CA1A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2DB68ACA16A8494883F5E9415CB94083"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -189,12 +189,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_399B34F870AD4817B9008F3B7F9F48F5"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_3CFD807797304D7581D522BF9805E932"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -213,6 +207,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3E85E7F9CFBB449C959243123F33ECD4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3EF618CBC60247288C9ADCCEB0ED4EA8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -225,7 +225,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_49093C293A984D11837325899228376C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4949A76E3E3C4C45B7374520F10551EB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4ADC4D348B914840966AC5C0C0190C0B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -255,12 +267,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_54D6C2E1F74E424D9E0B9F7622671EF1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_5860DD303EE6400ABE0C19AAA1C6CD3B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -279,7 +285,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5EDED5B7FEAE45FCBBD0DCAA7595FDF5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5F1E6CE74ACC47FCA338574DAC8A8B66"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5F62398DCA8D45DDA2691C686559743D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -315,12 +333,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7168387160AF41D58861C3255B446E6F"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -333,6 +345,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_74A5E74114A64BD59205067450C04504"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_755FCF128217483B9DF88D140A27940C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -340,12 +358,6 @@
         "Entry"
         {
         "MsmKey" = "8:_77B95F3EE9E049DAB01D116543E00F74"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78AB2EA1675B43CFAEE23AD0D9BC1FE4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -371,12 +383,6 @@
         {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_B1B6C245021445DBB6D59AFF9971193C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
-        "OwnerKey" = "8:_9FA13E4FA02E4D63B69C102CA60BCD42"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -459,12 +465,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7E8CD0BB2FFB445EBE288B714545D7B8"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_87425CC478A5A151CF1D04E3028B3B07"
         "OwnerKey" = "8:_B1B6C245021445DBB6D59AFF9971193C"
         "MsmSig" = "8:_UNDEFINED"
@@ -483,12 +483,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_87EEC5FE16D34F839B73B9BD2A1DEFE2"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -496,12 +490,6 @@
         "Entry"
         {
         "MsmKey" = "8:_8C62ACFB11A543E4A3F1D06B866DAAD2"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8CBDA44C1C484715AEA21FF2AAF1047E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -585,6 +573,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A51F4134D6BF498EB422CFEBB64ECA18"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A77D5D0EF3DD417DB5D2DE836A58A521"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -645,12 +639,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B1EE9241DEEE46248011FD2643270A38"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_B3B199E877BC46E08FF60837512E8010"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -675,19 +663,31 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C14FA1EDDAF949D7B96BE6C83B3B8D86"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_C30F73F6BF1E452E8D7D696A1565394C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
+        "MsmKey" = "8:_C52BDB23F8B54D028FD4C34D9B98C4A2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_C5B867B693CC4BDA96629F65C1D4BC5F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C6D558D4D3534D609E285F2590F88071"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C6E4ED6EDE054FDD946535F67C69072D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -801,7 +801,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_EB41AF4F873B402F8D02A815384E141B"
+        "MsmKey" = "8:_E9439747F6FD4801A1954E0E875F43AF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -819,13 +819,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_F043286EEA554378B641CB1B40C4457E"
+        "MsmKey" = "8:_F26BA47A17B745D899CF825D5C033296"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_F26BA47A17B745D899CF825D5C033296"
+        "MsmKey" = "8:_F5EE5EDDD22A49249F2A1961063963E0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -911,30 +911,10 @@
         }
         "File"
         {
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_02E9A138FBC04B739F107E5E85B65993"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_08E46FDFE746483F9A9020FECCA8939A"
             {
-            "SourcePath" = "8:..\\src\\c\\augext\\mpool.h"
-            "TargetName" = "8:mpool.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_05A7110D8AEE4A6CA1A09C7943B4703A"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\clock.h"
-            "TargetName" = "8:clock.h"
+            "SourcePath" = "8:..\\src\\c\\augext\\chan.h"
+            "TargetName" = "8:chan.h"
             "Tag" = "8:"
             "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
@@ -977,6 +957,26 @@
             "TargetName" = "8:augctx.h"
             "Tag" = "8:"
             "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_0EFFD6A6E92643DEB3CD39A818959E4C"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\iter.h"
+            "TargetName" = "8:iter.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1051,12 +1051,12 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_14D14FF831FB4AD883459EA688D20CFA"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_19D9FF8299BD4198A2E6BB8BEE277031"
             {
-            "SourcePath" = "8:..\\src\\c\\augext\\stream.h"
-            "TargetName" = "8:stream.h"
+            "SourcePath" = "8:..\\src\\c\\augutil.h"
+            "TargetName" = "8:augutil.h"
             "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1071,12 +1071,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_19D9FF8299BD4198A2E6BB8BEE277031"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_1C12DE195F9C4A8F8212A9ABC8DF7D12"
             {
-            "SourcePath" = "8:..\\src\\c\\augutil.h"
-            "TargetName" = "8:augutil.h"
+            "SourcePath" = "8:..\\src\\c\\augext\\mpool.h"
+            "TargetName" = "8:mpool.h"
             "Tag" = "8:"
-            "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1117,26 +1117,6 @@
             "TargetName" = "8:libaugnet.lib"
             "Tag" = "8:"
             "Folder" = "8:_9E7D976658F7456C89D72630A688CC17"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_239955CF3F8B47EBAD0694F98D564902"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\chan.h"
-            "TargetName" = "8:chan.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1197,6 +1177,26 @@
             "TargetName" = "8:serverreq.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_2DB68ACA16A8494883F5E9415CB94083"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\seq.h"
+            "TargetName" = "8:seq.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1371,26 +1371,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_399B34F870AD4817B9008F3B7F9F48F5"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\log.h"
-            "TargetName" = "8:log.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_3CFD807797304D7581D522BF9805E932"
             {
             "SourcePath" = "8:stop.bat"
@@ -1451,6 +1431,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_3E85E7F9CFBB449C959243123F33ECD4"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\var.h"
+            "TargetName" = "8:var.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_3EF618CBC60247288C9ADCCEB0ED4EA8"
             {
             "SourcePath" = "8:..\\src\\cpp\\augmarpp.hpp"
@@ -1491,12 +1491,52 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_49093C293A984D11837325899228376C"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\log.h"
+            "TargetName" = "8:log.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_4949A76E3E3C4C45B7374520F10551EB"
             {
             "SourcePath" = "8:..\\etc\\daug.conf.default"
             "TargetName" = "8:daug.conf.default"
             "Tag" = "8:"
             "Folder" = "8:_E8043C07225A4289B091BD050510EBC9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_4ADC4D348B914840966AC5C0C0190C0B"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\stream.h"
+            "TargetName" = "8:stream.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1591,26 +1631,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_54D6C2E1F74E424D9E0B9F7622671EF1"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\boxptr.h"
-            "TargetName" = "8:boxptr.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_5860DD303EE6400ABE0C19AAA1C6CD3B"
             {
             "SourcePath" = "8:test.bat"
@@ -1651,12 +1671,52 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_5EDED5B7FEAE45FCBBD0DCAA7595FDF5"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\clock.h"
+            "TargetName" = "8:clock.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_5F1E6CE74ACC47FCA338574DAC8A8B66"
             {
             "SourcePath" = "8:lib\\libaugutil.lib"
             "TargetName" = "8:libaugutil.lib"
             "Tag" = "8:"
             "Folder" = "8:_9E7D976658F7456C89D72630A688CC17"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_5F62398DCA8D45DDA2691C686559743D"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\boxptr.h"
+            "TargetName" = "8:boxptr.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1711,12 +1771,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_7168387160AF41D58861C3255B446E6F"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_7344214EDBA74150A44549AF08E42762"
             {
-            "SourcePath" = "8:..\\src\\c\\augext\\rpc.h"
-            "TargetName" = "8:rpc.h"
+            "SourcePath" = "8:..\\src\\c\\augmar.h"
+            "TargetName" = "8:augmar.h"
             "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1731,12 +1791,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_7344214EDBA74150A44549AF08E42762"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_74A5E74114A64BD59205067450C04504"
             {
-            "SourcePath" = "8:..\\src\\c\\augmar.h"
-            "TargetName" = "8:augmar.h"
+            "SourcePath" = "8:..\\src\\c\\augext\\blob.h"
+            "TargetName" = "8:blob.h"
             "Tag" = "8:"
-            "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1791,26 +1851,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_78AB2EA1675B43CFAEE23AD0D9BC1FE4"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\blob.h"
-            "TargetName" = "8:blob.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_7E17F935CFEFD738A54EFDE06E9C4127"
             {
             "SourcePath" = "8:MSVCR71D.dll"
@@ -1829,26 +1869,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_7E8CD0BB2FFB445EBE288B714545D7B8"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\msg.h"
-            "TargetName" = "8:msg.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_87425CC478A5A151CF1D04E3028B3B07"
@@ -1871,52 +1891,12 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_87EEC5FE16D34F839B73B9BD2A1DEFE2"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\ctx.h"
-            "TargetName" = "8:ctx.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_8C62ACFB11A543E4A3F1D06B866DAAD2"
             {
             "SourcePath" = "8:..\\example\\augas\\htdocs\\aug.js"
             "TargetName" = "8:aug.js"
             "Tag" = "8:"
             "Folder" = "8:_D5DD57BD2ADF473396909242620CD520"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_8CBDA44C1C484715AEA21FF2AAF1047E"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\var.h"
-            "TargetName" = "8:var.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2131,6 +2111,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_A51F4134D6BF498EB422CFEBB64ECA18"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\rpc.h"
+            "TargetName" = "8:rpc.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_A77D5D0EF3DD417DB5D2DE836A58A521"
             {
             "SourcePath" = "8:..\\src\\augconfig.h"
@@ -2311,26 +2311,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_B1EE9241DEEE46248011FD2643270A38"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\boxint.h"
-            "TargetName" = "8:boxint.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_B3B199E877BC46E08FF60837512E8010"
             {
             "SourcePath" = "8:..\\example\\augas\\bench.R"
@@ -2391,26 +2371,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C14FA1EDDAF949D7B96BE6C83B3B8D86"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\seq.h"
-            "TargetName" = "8:seq.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_C30F73F6BF1E452E8D7D696A1565394C"
             {
             "SourcePath" = "8:..\\example\\augas\\etc\\clientcert.pem"
@@ -2431,12 +2391,72 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C52BDB23F8B54D028FD4C34D9B98C4A2"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\msg.h"
+            "TargetName" = "8:msg.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_C5B867B693CC4BDA96629F65C1D4BC5F"
             {
             "SourcePath" = "8:..\\src\\rb\\rbskel.rb"
             "TargetName" = "8:rbskel.rb"
             "Tag" = "8:"
             "Folder" = "8:_044DEE46FA8344DC969C338FEC2A788E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C6D558D4D3534D609E285F2590F88071"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\boxint.h"
+            "TargetName" = "8:boxint.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C6E4ED6EDE054FDD946535F67C69072D"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\err.h"
+            "TargetName" = "8:err.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2651,10 +2671,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_EB41AF4F873B402F8D02A815384E141B"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_E9439747F6FD4801A1954E0E875F43AF"
             {
-            "SourcePath" = "8:..\\src\\c\\augext\\iter.h"
-            "TargetName" = "8:iter.h"
+            "SourcePath" = "8:..\\src\\c\\augext\\mar.h"
+            "TargetName" = "8:mar.h"
             "Tag" = "8:"
             "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
@@ -2711,12 +2731,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_F043286EEA554378B641CB1B40C4457E"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_F26BA47A17B745D899CF825D5C033296"
             {
-            "SourcePath" = "8:..\\src\\c\\augext\\err.h"
-            "TargetName" = "8:err.h"
+            "SourcePath" = "8:lib\\libaugmar.lib"
+            "TargetName" = "8:libaugmar.lib"
             "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Folder" = "8:_9E7D976658F7456C89D72630A688CC17"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2731,12 +2751,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_F26BA47A17B745D899CF825D5C033296"
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_F5EE5EDDD22A49249F2A1961063963E0"
             {
-            "SourcePath" = "8:lib\\libaugmar.lib"
-            "TargetName" = "8:libaugmar.lib"
+            "SourcePath" = "8:..\\src\\c\\augext\\ctx.h"
+            "TargetName" = "8:ctx.h"
             "Tag" = "8:"
-            "Folder" = "8:_9E7D976658F7456C89D72630A688CC17"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

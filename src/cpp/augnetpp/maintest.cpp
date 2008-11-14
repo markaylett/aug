@@ -21,7 +21,7 @@ namespace {
         }
     };
 
-    struct httphandler {
+    struct httptest {
         aug_result
         initial(const char* value)
         {
@@ -49,9 +49,19 @@ namespace {
         }
     };
 
-    struct marhandler : basic_marnonstatic {
+    struct martest {
         aug_result
-        message(const char* initial, aug_mar_t mar)
+        delmar_(const char* initial) AUG_NOTHROW
+        {
+            return AUG_SUCCESS;
+        }
+        struct aug_mar_*
+        getmar_(const char* initial) AUG_NOTHROW
+        {
+            return 0;
+        }
+        aug_result
+        putmar_(const char* initial, struct aug_mar_* mar) AUG_NOTHROW
         {
             return AUG_SUCCESS;
         }
@@ -68,11 +78,11 @@ main(int argc, char* argv[])
         mpoolptr mp(getmpool(aug_tlx));
         base64 b64(mp, AUG_ENCODE64, cbs);
 
-        httphandler x;
+        httptest x;
         httpparser hparser(mp, 1024, x);
 
-        marhandler y;
-        marparser mparser(mp, 1024, y);
+        scoped_marpool<martest> y;
+        marparser mparser(mp, y, 1024);
 
         return 0;
 

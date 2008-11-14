@@ -12,30 +12,17 @@
 
 #include "augnet/config.h"
 
-#include "augmar/types.h"
-
 #include "augsys/types.h"
 
+#include "augext/mar.h"
 #include "augext/mpool.h"
 
-#include "augabi.h"
 #include "augtypes.h"
-
-struct aug_marhandler {
-    aug_mar_t (*create_)(aug_object*, const char*);
-    aug_result (*message_)(aug_object*, const char*, aug_mar_t);
-};
 
 typedef struct aug_marparser_* aug_marparser_t;
 
-/**
- * If aug_createmarparser() succeeds, aug_release() will be called from
- * aug_destroymarparser().
- */
-
 AUGNET_API aug_marparser_t
-aug_createmarparser(aug_mpool* mpool, unsigned size,
-                    const struct aug_marhandler* handler, aug_object* ob);
+aug_createmarparser(aug_mpool* mpool, aug_marpool* marpool, unsigned size);
 
 AUGNET_API void
 aug_destroymarparser(aug_marparser_t parser);

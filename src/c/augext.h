@@ -19,6 +19,7 @@
 #include "augext/err.h"
 #include "augext/iter.h"
 #include "augext/log.h"
+#include "augext/mar.h"
 #include "augext/mpool.h"
 #include "augext/msg.h"
 #include "augext/rpc.h"

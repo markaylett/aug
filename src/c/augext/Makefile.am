@@ -8,6 +8,7 @@ EXTRA_DIST = \
 	err.xml \
 	iter.xml \
 	log.xml \
+	mar.xml \
 	mpool.xml \
 	msg.xml \
 	rpc.xml \
@@ -25,6 +26,7 @@ modinclude_HEADERS = \
 	err.h \
 	iter.h \
 	log.h \
+	mar.h \
 	mpool.h  \
 	msg.h \
 	rpc.h \
@@ -43,6 +45,7 @@ BUILT_SOURCES = \
 	err.h \
 	iter.h \
 	log.h \
+	mar.h  \
 	mpool.h  \
 	msg.h \
 	rpc.h \
