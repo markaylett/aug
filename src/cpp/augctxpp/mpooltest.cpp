@@ -9,8 +9,8 @@ using namespace aug;
 using namespace std;
 
 namespace {
-    class foo : public mpool_base { };
-    class bar : public mpool_base { };
+    class foo : public mpool_ops { };
+    class bar : public mpool_ops { };
     class foobar : public foo, public bar { };
 }
 

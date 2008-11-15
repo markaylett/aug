@@ -12,7 +12,7 @@
 
 namespace aug {
 
-    class rwtimer_base : public mpool_base {
+    class rwtimer_base : public mpool_ops {
 
         virtual void
         do_timercb(idref id, unsigned& ms) = 0;

@@ -12,7 +12,7 @@
 
 namespace aug {
 
-    class object_base : public mpool_base {
+    class object_base : public mpool_ops {
     public:
         typedef mod_handle ctype;
     private:

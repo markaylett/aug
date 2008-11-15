@@ -175,7 +175,7 @@ namespace {
 
     typedef map<string, moduleptr> modules;
 
-    struct state : mpool_base {
+    struct state : mpool_ops {
 
         modules modules_;
 #if ENABLE_SSL

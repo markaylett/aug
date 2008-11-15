@@ -36,7 +36,7 @@ namespace {
         }
     };
 
-    aug::scoped_blob<helloblob> hello;
+    aug::scoped_blob_wrapper<helloblob> hello;
 
     void
     dosend(handle& sock)

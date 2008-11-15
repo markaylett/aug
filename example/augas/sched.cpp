@@ -251,7 +251,7 @@ namespace {
 
             // Dispatch is synchronous.
 
-            scoped_blob<sblob> blob(ss.str());
+            scoped_blob_wrapper<sblob> blob(ss.str());
             dispatch(from, "result", blob.base());
         }
         bool

@@ -551,7 +551,7 @@ namespace {
         send(id, message.str().c_str(), message.str().size());
     }
 
-    struct session : basic_marnonstatic {
+    struct session : marpool_base<session> {
         const string& realm_;
         mod_id id_;
         string sessid_;
@@ -567,8 +567,8 @@ namespace {
             nonce(id_, name_, nonce_);
             aug_ctxinfo(aug_tlx, "nonce: [%s]", nonce_);
         }
-        aug_result
-        message(const char* initial, aug_mar_t mar)
+        void
+        put(const char* initial, aug_mar_t mar)
         {
             static const char ROOT[] = "./htdocs";
 
@@ -676,7 +676,7 @@ namespace {
 
                         // Dispatch is synchronous.
 
-                        scoped_blob<sblob> blob
+                        scoped_blob_wrapper<sblob> blob
                             (urlpack(values.begin(), values.end()));
 
                         dispatch("httpclient", type.c_str(), blob.base());
@@ -706,12 +706,27 @@ namespace {
                 aug_ctxinfo(aug_tlx, "closing");
                 mod::shutdown(id_, 0);
             }
-
+        }
+        aug_result
+        delmar_(const char* initial) AUG_NOTHROW
+        {
+            return AUG_SUCCESS;
+        }
+        struct aug_mar_*
+        getmar_(const char* initial) AUG_NOTHROW
+        {
+            return 0;
+        }
+        aug_result
+        putmar_(const char* initial, struct aug_mar_* mar) AUG_NOTHROW
+        {
+            put(initial, mar);
             return AUG_SUCCESS;
         }
     };
 
     struct http : basic_session {
+
         string realm_;
         bool
         do_start(const char* sname)
@@ -758,8 +773,9 @@ namespace {
         bool
         do_accepted(handle& sock, const char* name)
         {
-            auto_ptr<session> sess(new session(realm_, sock.id(), name));
-            auto_ptr<marparser> parser(new marparser(getmpool(aug_tlx), 0,
+            marpoolptr sess(session::attach(new session(realm_, sock.id(),
+                                                        name)));
+            auto_ptr<marparser> parser(new marparser(getmpool(aug_tlx),
                                                      sess));
 
             sock.setuser(parser.get());

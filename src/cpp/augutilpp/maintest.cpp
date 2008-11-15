@@ -35,7 +35,7 @@ main(int argc, char* argv[])
 
         const string s("some test data");
 
-        smartob<aug_blob> smart(basic_blob<sblob>::create(s));
+        smartob<aug_blob> smart(blob_wrapper<sblob>::create(s));
         test(smart, s);
 
         if (null == smart)
@@ -45,7 +45,7 @@ main(int argc, char* argv[])
         if (null != smart)
             throw error("bad null inequality");
 
-        scoped_blob<sblob> scoped(s);
+        scoped_blob_wrapper<sblob> scoped(s);
         test(scoped, s);
 
     } catch (const exception& e) {

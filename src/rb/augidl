@@ -640,12 +640,97 @@ class CppVisitor
         puts <<END
 
     template <typename T>
-    class basic_#{elem.name} {
-        #{elem.name}<basic_#{elem.name}<T> > #{elem.name}_;
+    class #{elem.name}_base {
+        #{elem.name}<T> #{elem.name}_;
+        int refs_;
+    protected:
+        ~#{elem.name}_base()
+        {
+            /* Always deleted via derived, so no need to be virtual. */
+        }
+        #{elem.name}_base()
+            : refs_(1)
+        {
+            this->#{elem.name}_.reset(static_cast<T*>(this));
+        }
+    public:
+        aug::smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
+        {
+            if (aug::equalid<aug_object>(id) || aug::equalid<#{elem.type.cname}>(id))
+                return aug::object_retain<aug_object>(this->#{elem.name}_);
+            return null;
+        }
+        void
+        retain_() AUG_NOTHROW
+        {
+            assert(0 < this->refs_);
+            ++this->refs_;
+        }
+        void
+        release_() AUG_NOTHROW
+        {
+            assert(0 < this->refs_);
+            if (0 == --this->refs_)
+                delete static_cast<T*>(this);
+        }
+        static aug::smartob<#{elem.type.cname}>
+        attach(T* ptr)
+        {
+            return aug::object_attach<#{elem.type.cname}>(ptr->#{elem.name}_);
+        }
+    };
+
+    template <typename T>
+    class scoped_#{elem.name}_base {
+        #{elem.name}<T> #{elem.name}_;
+    protected:
+        ~scoped_#{elem.name}_base()
+        {
+        }
+        scoped_#{elem.name}_base()
+        {
+            this->#{elem.name}_.reset(static_cast<T*>(this));
+        }
+    public:
+        aug::smartob<aug_object>
+        cast_(const char* id) AUG_NOTHROW
+        {
+            if (aug::equalid<aug_object>(id) || aug::equalid<#{elem.type.cname}>(id))
+                return aug::object_retain<aug_object>(this->#{elem.name}_);
+            return null;
+        }
+        void
+        retain_() AUG_NOTHROW
+        {
+        }
+        void
+        release_() AUG_NOTHROW
+        {
+        }
+        aug_object*
+        base() AUG_NOTHROW
+        {
+            return aug::obref<aug_object>(this->#{elem.name}_).get();
+        }
+        #{elem.type.cname}*
+        get() AUG_NOTHROW
+        {
+            return this->#{elem.name}_.get();
+        }
+        operator aug::obref<#{elem.type.cname}>() AUG_NOTHROW
+        {
+            return this->#{elem.name}_;
+        }
+    };
+
+    template <typename T>
+    class #{elem.name}_wrapper {
+        #{elem.name}<#{elem.name}_wrapper<T> > #{elem.name}_;
         T impl_;
         int refs_;
         explicit
-        basic_#{elem.name}(const T& impl)
+        #{elem.name}_wrapper(const T& impl)
             : impl_(impl),
               refs_(1)
         {
@@ -678,18 +763,18 @@ END
         static aug::smartob<#{elem.type.cname}>
         create(const T& impl = T())
         {
-            basic_#{elem.name}* ptr(new basic_#{elem.name}(impl));
+            #{elem.name}_wrapper* ptr(new #{elem.name}_wrapper(impl));
             return aug::object_attach<#{elem.type.cname}>(ptr->#{elem.name}_);
         }
     };
 
     template <typename T>
-    class scoped_#{elem.name} {
-        #{elem.name}<scoped_#{elem.name}<T> > #{elem.name}_;
+    class scoped_#{elem.name}_wrapper {
+        #{elem.name}<scoped_#{elem.name}_wrapper<T> > #{elem.name}_;
         T impl_;
     public:
         explicit
-        scoped_#{elem.name}(const T& impl = T())
+        scoped_#{elem.name}_wrapper(const T& impl = T())
             : impl_(impl)
         {
             this->#{elem.name}_.reset(this);

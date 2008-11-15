@@ -17,7 +17,7 @@
 
 namespace daug {
 
-    class module : public aug::mpool_base {
+    class module : public aug::mpool_ops {
         const std::string name_;
         aug::dlib lib_;
         mod_termfn termfn_;

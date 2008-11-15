@@ -81,7 +81,7 @@ main(int argc, char* argv[])
         httptest x;
         httpparser hparser(mp, 1024, x);
 
-        scoped_marpool<martest> y;
+        scoped_marpool_wrapper<martest> y;
         marparser mparser(mp, y, 1024);
 
         return 0;

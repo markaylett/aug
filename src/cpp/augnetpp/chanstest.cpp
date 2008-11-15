@@ -99,7 +99,7 @@ main(int argc, char* argv[])
 
         mpoolptr mp(getmpool(aug_tlx));
 
-        scoped_chandler<test> chandler;
+        scoped_chandler_wrapper<test> chandler;
         muxer mux(mp);
         chans chans(mp, chandler);
         pair<chanptr, chanptr> xy(plainpair(mp, mux));

@@ -30,7 +30,7 @@ namespace aug {
         }
     };
 
-    class AUGASPP_API sslctx : public mpool_base {
+    class AUGASPP_API sslctx : public mpool_ops {
 
         ssl_ctx_st* const ctx_;
 

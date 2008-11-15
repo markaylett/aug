@@ -23,9 +23,9 @@ namespace aug {
         return object_attach<aug_mpool>(aug_createdlmalloc());
     }
 
-    class mpool_base {
+    class mpool_ops {
     protected:
-        ~mpool_base()
+        ~mpool_ops()
         {
         }
     public:

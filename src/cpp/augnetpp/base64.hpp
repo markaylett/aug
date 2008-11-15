@@ -155,7 +155,7 @@ namespace aug {
     inline std::ostream&
     filterbase64(std::ostream& os, std::istream& is, aug_base64mode mode)
     {
-        scoped_boxptr<simple_boxptr> ob(&os);
+        scoped_boxptr_wrapper<simple_boxptr> ob(&os);
         base64 b64(getmpool(aug_tlx), mode, base64cb<detail::base64os>, ob);
         char buf[AUG_MAXLINE];
         do {
@@ -171,7 +171,7 @@ namespace aug {
     filterbase64(const char* buf, size_t len, aug_base64mode mode)
     {
         std::string s;
-        scoped_boxptr<simple_boxptr> ob(&s);
+        scoped_boxptr_wrapper<simple_boxptr> ob(&s);
         base64 b64(getmpool(aug_tlx), mode, base64cb<detail::base64str>, ob);
         appendbase64(b64, buf, len);
         finishbase64(b64);

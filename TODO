@@ -51,3 +51,5 @@ Replace enums with ints.
 Review FIXMEs.
 
 Fix perl module.
+
+Generalise base template generation in augidl.

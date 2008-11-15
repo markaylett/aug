@@ -132,7 +132,7 @@ namespace aug {
             }
         };
 
-        struct engineimpl : mpool_base {
+        struct engineimpl : mpool_ops {
 
             chandler<engineimpl> chandler_;
             mdref eventrd_, eventwr_;

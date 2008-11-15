@@ -33,7 +33,7 @@ namespace aug {
         {
         }
 
-        marparser(mpoolref mpool, marpoolref marpool, unsigned size)
+        marparser(mpoolref mpool, marpoolref marpool, unsigned size = 0)
            : marparser_(aug_createmarparser(mpool.get(), marpool.get(), size))
         {
             verify(marparser_);
