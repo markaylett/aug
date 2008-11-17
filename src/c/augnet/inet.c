@@ -85,7 +85,7 @@ aug_tcpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
-        if (AUG_ISSUCCESS(aug_setreuseaddr(sd, 1))
+        if (AUG_ISSUCCESS(aug_setreuseaddr(sd, AUG_TRUE))
             && AUG_ISSUCCESS(aug_bind(sd, ep))
             && AUG_ISSUCCESS(aug_listen(sd, SOMAXCONN)))
             break; /* Success. */

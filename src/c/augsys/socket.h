@@ -222,10 +222,8 @@ aug_getaddrinfo(const char* host, const char* serv,
 AUGSYS_API aug_rint
 aug_getfamily(aug_sd sd);
 
-/* FIXME: change to aug_bool. */
-
 AUGSYS_API aug_result
-aug_setreuseaddr(aug_sd sd, int on);
+aug_setreuseaddr(aug_sd sd, aug_bool on);
 
 AUGSYS_API struct aug_endpoint*
 aug_getendpoint(const struct addrinfo* addr, struct aug_endpoint* ep);

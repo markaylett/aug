@@ -118,9 +118,11 @@ aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len)
 }
 
 AUGSYS_API aug_result
-aug_setreuseaddr(aug_sd sd, int on)
+aug_setreuseaddr(aug_sd sd, aug_bool on)
 {
-    return aug_setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+    int optval = on ? 1 : 0;
+    return aug_setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &optval,
+                          sizeof(optval));
 }
 
 AUGSYS_API struct aug_endpoint*

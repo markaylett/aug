@@ -202,8 +202,7 @@ namespace aug {
     inline void
     setreuseaddr(sdref ref, bool on)
     {
-        int value(on ? 1 : 0);
-        verify(aug_setreuseaddr(ref.get(), value));
+        verify(aug_setreuseaddr(ref.get(), on ? AUG_TRUE : AUG_FALSE));
     }
 
     inline aug_endpoint&
