@@ -18,6 +18,7 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
 
+#include <assert.h>
 #include <string.h>
 
 struct aug_marparser_ {
@@ -55,6 +56,9 @@ initial_(aug_httphandler* ob, const char* initial)
     struct aug_marparser_* parser
         = AUG_PODIMPL(struct aug_marparser_, httphandler_, ob);
 
+    assert(!parser->initial_);
+    assert(!parser->mar_);
+
     parser->initial_ = aug_createxstr(parser->mpool_, 0);
 
     if (!parser->initial_)
@@ -77,6 +81,9 @@ field_(aug_httphandler* ob, const char* name, const char* value)
 
     struct aug_field field;
 
+    assert(parser->initial_);
+    assert(parser->mar_);
+
     field.name_ = name;
     field.value_ = value;
     field.size_ = (unsigned)strlen(value);
@@ -90,6 +97,9 @@ csize_(aug_httphandler* ob, unsigned csize)
     struct aug_marparser_* parser
         = AUG_PODIMPL(struct aug_marparser_, httphandler_, ob);
 
+    assert(parser->initial_);
+    assert(parser->mar_);
+
     aug_verify(aug_truncatemar(parser->mar_, csize));
     aug_verify(aug_seekmar(parser->mar_, AUG_SET, 0));
 
@@ -101,6 +111,9 @@ cdata_(aug_httphandler* ob, const void* buf, unsigned len)
 {
     struct aug_marparser_* parser
         = AUG_PODIMPL(struct aug_marparser_, httphandler_, ob);
+
+    assert(parser->initial_);
+    assert(parser->mar_);
 
     /* Returns aug_rsize. */
 
