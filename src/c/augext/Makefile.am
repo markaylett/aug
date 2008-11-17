@@ -6,6 +6,7 @@ EXTRA_DIST = \
 	clock.xml \
 	ctx.xml \
 	err.xml \
+	http.xml \
 	iter.xml \
 	log.xml \
 	mar.xml \
@@ -24,10 +25,11 @@ modinclude_HEADERS = \
 	clock.h \
 	ctx.h \
 	err.h \
+	http.h \
 	iter.h \
 	log.h \
 	mar.h \
-	mpool.h  \
+	mpool.h \
 	msg.h \
 	rpc.h \
 	seq.h \
@@ -43,10 +45,11 @@ BUILT_SOURCES = \
 	clock.h \
 	ctx.h \
 	err.h \
+	http.h \
 	iter.h \
 	log.h \
-	mar.h  \
-	mpool.h  \
+	mar.h \
+	mpool.h \
 	msg.h \
 	rpc.h \
 	seq.h \

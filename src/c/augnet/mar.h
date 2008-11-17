@@ -12,12 +12,8 @@
 
 #include "augnet/config.h"
 
-#include "augsys/types.h"
-
 #include "augext/mar.h"
 #include "augext/mpool.h"
-
-#include "augtypes.h"
 
 typedef struct aug_marparser_* aug_marparser_t;
 

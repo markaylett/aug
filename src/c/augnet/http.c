@@ -9,7 +9,6 @@ AUG_RCSID("$Id$");
 
 #include "augutil/conv.h"
 #include "augutil/lexer.h"
-#include "augutil/types.h"
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
@@ -19,7 +18,7 @@ AUG_RCSID("$Id$");
 
 struct aug_httpparser_ {
     aug_mpool* mpool_;
-    const struct aug_httphandler* handler_;
+    aug_httphandler* handler_;
     aug_object* ob_;
     aug_lexer_t lexer_;
     char name_[AUG_MAXLINE];
@@ -38,8 +37,7 @@ initial_(aug_httpparser_t parser)
     /* Unless Content-Length is encountered, read body until end of stream is
        reached. */
 
-    return parser->handler_
-        ->initial_(parser->ob_, aug_lexertoken(parser->lexer_));
+    return aug_httpinitial(parser->handler_, aug_lexertoken(parser->lexer_));
 }
 
 static void
@@ -65,20 +63,20 @@ value_(aug_httpparser_t parser)
                 return AUG_FAILERROR;
 
             parser->csize_ = (int)csize;
-            return parser->handler_->csize_(parser->ob_, csize);
+            return aug_httpcsize(parser->handler_, csize);
         }
     }
 
-    return parser->handler_->field_(parser->ob_, parser->name_,
-                                    aug_lexertoken(parser->lexer_));
+    return aug_httpfield(parser->handler_, parser->name_,
+                         aug_lexertoken(parser->lexer_));
 }
 
 static aug_result
-end_(aug_httpparser_t parser, int commit)
+end_(aug_httpparser_t parser, aug_bool commit)
 {
     parser->state_ = INITIAL_;
     parser->csize_ = 0;
-    return parser->handler_->end_(parser->ob_, commit);
+    return aug_httpend(parser->handler_, commit);
 }
 
 static aug_result
@@ -174,7 +172,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
         parser->csize_ -= size;
 
-        aug_verify(parser->handler_->cdata_(parser->ob_, buf, size));
+        aug_verify(aug_httpcdata(parser->handler_, buf, size));
 
         /* Entire buffer consumed. */
 
@@ -184,7 +182,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
     /* Consume enough of the buffer to fulfil content. */
 
     if ((size = parser->csize_))
-        aug_verify(parser->handler_->cdata_(parser->ob_, buf, size));
+        aug_verify(aug_httpcdata(parser->handler_, buf, size));
 
     /* End of message (with commit). */
 
@@ -194,8 +192,8 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 }
 
 AUGNET_API aug_httpparser_t
-aug_createhttpparser(aug_mpool* mpool, unsigned size,
-                     const struct aug_httphandler* handler, aug_object* ob)
+aug_createhttpparser(aug_mpool* mpool, aug_httphandler* handler,
+                     unsigned size)
 {
     aug_httpparser_t parser;
     aug_lexer_t lexer;
@@ -210,14 +208,13 @@ aug_createhttpparser(aug_mpool* mpool, unsigned size,
 
     parser->mpool_ = mpool;
     parser->handler_ = handler;
-    if ((parser->ob_ = ob))
-        aug_retain(ob);
     parser->lexer_ = lexer;
     parser->name_[0] = '\0';
     parser->state_ = INITIAL_;
     parser->csize_ = 0;
 
     aug_retain(mpool);
+    aug_retain(handler);
     return parser;
 }
 
@@ -226,8 +223,7 @@ aug_destroyhttpparser(aug_httpparser_t parser)
 {
     aug_mpool* mpool = parser->mpool_;
     aug_destroylexer(parser->lexer_);
-    if (parser->ob_)
-        aug_release(parser->ob_);
+    aug_release(parser->handler_);
     aug_freemem(mpool, parser);
     aug_release(mpool);
 }

@@ -1,9 +1,7 @@
 Consistent use of aug_bool and aug_return.
 
 Migrate virtual classes to aug_object:
-aug_httphandler
 aug_mar
-aug_marhandler
 aug_service
 
 Use get/set naming convention.

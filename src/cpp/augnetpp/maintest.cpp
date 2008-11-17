@@ -23,27 +23,27 @@ namespace {
 
     struct httptest {
         aug_result
-        initial(const char* value)
+        httpinitial_(const char* value) AUG_NOTHROW
         {
             return AUG_SUCCESS;
         }
         aug_result
-        field(const char* name, const char* value)
+        httpfield_(const char* name, const char* value) AUG_NOTHROW
         {
             return AUG_SUCCESS;
         }
         aug_result
-        csize(unsigned csize)
+        httpcsize_(unsigned csize) AUG_NOTHROW
         {
             return AUG_SUCCESS;
         }
         aug_result
-        cdata(const void* cdata, unsigned csize)
+        httpcdata_(const void* cdata, unsigned csize) AUG_NOTHROW
         {
             return AUG_SUCCESS;
         }
         aug_result
-        end(bool commit)
+        httpend_(aug_bool commit) AUG_NOTHROW
         {
             return AUG_SUCCESS;
         }
@@ -78,8 +78,8 @@ main(int argc, char* argv[])
         mpoolptr mp(getmpool(aug_tlx));
         base64 b64(mp, AUG_ENCODE64, cbs);
 
-        httptest x;
-        httpparser hparser(mp, 1024, x);
+        scoped_httphandler_wrapper<httptest> x;
+        httpparser hparser(mp, x, 1024);
 
         scoped_marpool_wrapper<martest> y;
         marparser mparser(mp, y, 1024);

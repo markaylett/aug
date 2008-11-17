@@ -1,0 +1,31 @@
+<package name="aug" dir="augext">
+
+  <quotincl>augtypes.h</quotincl>
+
+  <interface name="httphandler">
+
+    <method name="initial" type="aug_result" qname="httpinitial">
+      <param name="value" type="const char*"/>
+    </method>
+
+    <method name="field" type="aug_result" qname="httpfield">
+      <param name="name" type="const char*"/>
+      <param name="value" type="const char*"/>
+    </method>
+
+    <method name="csize" type="aug_result" qname="httpcsize">
+      <param name="size" type="unsigned"/>
+    </method>
+
+    <method name="cdata" type="aug_result" qname="httpcdata">
+      <param name="buf" type="const void*"/>
+      <param name="len" type="unsigned"/>
+    </method>
+
+    <method name="end" type="aug_result" qname="httpend">
+      <param name="commit" type="aug_bool"/>
+    </method>
+
+  </interface>
+
+</package>

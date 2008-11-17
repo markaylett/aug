@@ -388,6 +388,12 @@
         "Entry"
         {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
+        "OwnerKey" = "8:_9FA13E4FA02E4D63B69C102CA60BCD42"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_93EE37E5DB3942548402A812FEA09E43"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -401,12 +407,6 @@
         {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_891F95BEF9DA472591A58F21F38A9B54"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
-        "OwnerKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -454,12 +454,6 @@
         "Entry"
         {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
-        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_13E6B1C83A89403A8E1502B4C933AEE7"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -490,6 +484,12 @@
         "Entry"
         {
         "MsmKey" = "8:_8C62ACFB11A543E4A3F1D06B866DAAD2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8D29AD7C23D741B3B1399236475C1F81"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -789,12 +789,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
-        "OwnerKey" = "8:_1453B804C0CA4BF78E08E278C85BC774"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_E865868FA75E4AE8BF4F54B0EFB5248B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -833,12 +827,6 @@
         {
         "MsmKey" = "8:_F7088C01FB79463CB66CAE492E54724B"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FB19068976255653AB1FDEF3D7FD105C"
-        "OwnerKey" = "8:_720D3E1937294BCABCF76E3132943BCD"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1911,6 +1899,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_8D29AD7C23D741B3B1399236475C1F81"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\http.h"
+            "TargetName" = "8:http.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_8ECAD86A0E394E05A1708B75E7DDA791"
             {
             "SourcePath" = "8:..\\example\\augas\\etc\\serverkey.pem"
@@ -2769,26 +2777,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_FB19068976255653AB1FDEF3D7FD105C"
-            {
-            "SourcePath" = "8:python24.dll"
-            "TargetName" = "8:python24.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_FB98207485BD4764B362E0034F849191"

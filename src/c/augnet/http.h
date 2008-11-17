@@ -12,20 +12,8 @@
 
 #include "augnet/config.h"
 
-#include "augsys/types.h"
-
+#include "augext/http.h"
 #include "augext/mpool.h"
-
-#include "augabi.h"
-#include "augtypes.h"
-
-struct aug_httphandler {
-    aug_result (*initial_)(aug_object*, const char*);
-    aug_result (*field_)(aug_object*, const char*, const char*);
-    aug_result (*csize_)(aug_object*, unsigned);
-    aug_result (*cdata_)(aug_object*, const void*, unsigned);
-    aug_result (*end_)(aug_object*, int);
-};
 
 typedef struct aug_httpparser_* aug_httpparser_t;
 
@@ -35,8 +23,8 @@ typedef struct aug_httpparser_* aug_httpparser_t;
  */
 
 AUGNET_API aug_httpparser_t
-aug_createhttpparser(aug_mpool* mpool, unsigned size,
-                     const struct aug_httphandler* handler, aug_object* ob);
+aug_createhttpparser(aug_mpool* mpool, aug_httphandler* handler,
+                     unsigned size);
 
 AUGNET_API void
 aug_destroyhttpparser(aug_httpparser_t parser);

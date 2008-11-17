@@ -17,46 +17,71 @@ static const char TEST_[] =
 "Host: localhost:8080\r\n"
 "Connection: Keep-Alive\r\n\r\n";
 
-static aug_result
-setinitial_(aug_object* ob, const char* value)
+static void*
+cast_(aug_httphandler* ob, const char* id)
 {
-    aug_ctxinfo(aug_tlx, "initial: %s", value);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_httphandlerid)) {
+        aug_retain(ob);
+        return ob;
+    }
+    return NULL;
+}
+
+static void
+retain_(aug_httphandler* ob)
+{
+}
+
+static void
+release_(aug_httphandler* ob)
+{
+}
+
+static aug_result
+initial_(aug_httphandler* ob, const char* initial)
+{
+    aug_ctxinfo(aug_tlx, "initial: %s", initial);
     return AUG_SUCCESS;
 }
 
 static aug_result
-setfield_(aug_object* ob, const char* name, const char* value)
+field_(aug_httphandler* ob, const char* name, const char* value)
 {
     aug_ctxinfo(aug_tlx, "field: %s=%s", name, value);
     return AUG_SUCCESS;
 }
 
 static aug_result
-setcsize_(aug_object* ob, unsigned size)
+csize_(aug_httphandler* ob, unsigned csize)
 {
-    aug_ctxinfo(aug_tlx, "size: %d", (int)size);
+    aug_ctxinfo(aug_tlx, "size: %d", (int)csize);
     return AUG_SUCCESS;
 }
 
 static aug_result
-cdata_(aug_object* ob, const void* buf, unsigned len)
+cdata_(aug_httphandler* ob, const void* buf, unsigned len)
 {
     return AUG_SUCCESS;
 }
 
 static aug_result
-end_(aug_object* ob, int commit)
+end_(aug_httphandler* ob, aug_bool commit)
 {
     return AUG_SUCCESS;
 }
 
-static const struct aug_httphandler handler_ = {
-    setinitial_,
-    setfield_,
-    setcsize_,
+static const struct aug_httphandlervtbl vtbl_ = {
+    cast_,
+    retain_,
+    release_,
+    initial_,
+    field_,
+    csize_,
     cdata_,
     end_
 };
+
+static aug_log httphandler_ = { &vtbl_, NULL };
 
 int
 main(int argc, char* argv[])
@@ -68,7 +93,7 @@ main(int argc, char* argv[])
         return 1;
 
     mpool = aug_getmpool(aug_tlx);
-    parser = aug_createhttpparser(mpool, 1024, &handler_, NULL);
+    parser = aug_createhttpparser(mpool, &httphandler_, 1024);
     aug_release(mpool);
 
     if (!parser) {
