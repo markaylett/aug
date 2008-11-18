@@ -22,7 +22,7 @@ namespace aug {
         template <typename T>
         class servicestatic {
             static const char*
-            getopt(void* arg, enum aug_option opt) AUG_NOTHROW
+            getopt(void* arg, int opt) AUG_NOTHROW
             {
                 try {
                     return T::getopt(arg, opt);
@@ -81,7 +81,7 @@ namespace aug {
         template <typename T>
         class servicenonstatic {
             static const char*
-            getopt(void* arg, enum aug_option opt) AUG_NOTHROW
+            getopt(void* arg, int opt) AUG_NOTHROW
             {
                 try {
                     return static_cast<T*>(arg)->getopt(opt);

@@ -70,21 +70,20 @@ namespace aug {
         {
         }
 
-        base64(mpoolref mpool, aug_base64mode mode, aug_base64cb_t cb,
+        base64(mpoolref mpool, int mode, aug_base64cb_t cb,
                aug::obref<aug_object> ob)
         {
             verify(base64_ = aug_createbase64(mpool.get(), mode, cb,
                                               ob.get()));
         }
 
-        base64(mpoolref mpool, aug_base64mode mode, aug_base64cb_t cb,
-               const null_&)
+        base64(mpoolref mpool, int mode, aug_base64cb_t cb, const null_&)
         {
             verify(base64_ = aug_createbase64(mpool.get(), mode, cb, 0));
         }
 
         template <typename T>
-        base64(mpoolref mpool, aug_base64mode mode, T& x)
+        base64(mpoolref mpool, int mode, T& x)
         {
             aug::smartob<aug_boxptr> ob(createboxptr(mpool, &x, 0));
             verify(base64_ = aug_createbase64
@@ -92,7 +91,7 @@ namespace aug {
         }
 
         template <typename T>
-        base64(mpoolref mpool, aug_base64mode mode, std::auto_ptr<T>& x)
+        base64(mpoolref mpool, int mode, std::auto_ptr<T>& x)
         {
             aug::smartob<aug_boxptr> ob(createboxptr(mpool, x));
             verify(base64_ = aug_createbase64
@@ -153,7 +152,7 @@ namespace aug {
     }
 
     inline std::ostream&
-    filterbase64(std::ostream& os, std::istream& is, aug_base64mode mode)
+    filterbase64(std::ostream& os, std::istream& is, int mode)
     {
         scoped_boxptr_wrapper<simple_boxptr> ob(&os);
         base64 b64(getmpool(aug_tlx), mode, base64cb<detail::base64os>, ob);
@@ -168,7 +167,7 @@ namespace aug {
     }
 
     inline std::string
-    filterbase64(const char* buf, size_t len, aug_base64mode mode)
+    filterbase64(const char* buf, size_t len, int mode)
     {
         std::string s;
         scoped_boxptr_wrapper<simple_boxptr> ob(&s);

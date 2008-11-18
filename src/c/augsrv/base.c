@@ -111,7 +111,7 @@ aug_setservice_(const struct aug_service* service, void* arg)
 }
 
 AUGSRV_API const char*
-aug_getserviceopt(enum aug_option opt)
+aug_getserviceopt(int opt)
 {
     assert(service_.getopt_);
     return service_.getopt_(arg_, opt);

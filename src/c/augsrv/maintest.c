@@ -13,7 +13,7 @@ static char conffile_[AUG_PATH_MAX + 1] = "";
 static int daemon_ = 0;
 
 static const char*
-getopt_(void* arg, enum aug_option opt)
+getopt_(void* arg, int opt)
 {
     switch (opt) {
     case AUG_OPTCONFFILE:

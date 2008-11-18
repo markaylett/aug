@@ -514,8 +514,8 @@ encodefinish_(aug_base64_t base64)
 }
 
 AUGNET_API aug_base64_t
-aug_createbase64(aug_mpool* mpool, enum aug_base64mode mode,
-                 aug_base64cb_t cb, aug_object* ob)
+aug_createbase64(aug_mpool* mpool, int mode, aug_base64cb_t cb,
+                 aug_object* ob)
 {
     aug_base64_t base64;
     if (!(base64 = aug_allocmem(mpool, sizeof(struct aug_base64_))))

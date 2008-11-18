@@ -330,7 +330,7 @@ namespace test {
         }
 
         const char*
-        getopt(enum aug_option opt)
+        getopt(int opt)
         {
             switch (opt) {
             case AUG_OPTCONFFILE:
