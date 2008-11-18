@@ -39,13 +39,13 @@ static void
 foreground_(void)
 {
     aug_result result;
-    if (AUG_ISFAIL(aug_initservice()))
-        die_("aug_initservice() failed");
+    if (AUG_ISFAIL(aug_initserv()))
+        die_("aug_initserv() failed");
 
-    result = aug_runservice();
-    aug_termservice();
+    result = aug_runserv();
+    aug_termserv();
     if (AUG_ISFAIL(result))
-        die_("aug_runservice() failed");
+        die_("aug_runserv() failed");
 }
 
 static void
@@ -133,10 +133,10 @@ aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
     }
 #endif /* !_WIN32 */
 
-    if (AUG_ISFAIL(aug_readserviceconf(*options.conffile_
-                                       ? options.conffile_ : NULL,
-                                       options.batch_, daemon)))
-        die_("aug_readserviceconf() failed");
+    if (AUG_ISFAIL(aug_readservconf(*options.conffile_
+                                    ? options.conffile_ : NULL,
+                                    options.batch_, daemon)))
+        die_("aug_readservconf() failed");
 
     switch (options.command_) {
     case AUG_CMDDEFAULT:

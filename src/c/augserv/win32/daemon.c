@@ -110,10 +110,10 @@ start_(DWORD argc, char** argv)
         goto done;
     }
 
-    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
-        aug_perrinfo(aug_tlx, "getserviceopt() failed", NULL);
+        aug_perrinfo(aug_tlx, "getservopt() failed", NULL);
         goto done;
     }
 
@@ -132,9 +132,9 @@ start_(DWORD argc, char** argv)
         goto done;
     }
 
-    if (AUG_ISFAIL(aug_readserviceconf(*options.conffile_
-                                       ? options.conffile_ : NULL, 0, 1))) {
-        aug_perrinfo(aug_tlx, "aug_readserviceconf() failed", NULL);
+    if (AUG_ISFAIL(aug_readservconf(*options.conffile_
+                                    ? options.conffile_ : NULL, 0, 1))) {
+        aug_perrinfo(aug_tlx, "aug_readservconf() failed", NULL);
         goto done;
     }
 
@@ -147,9 +147,9 @@ start_(DWORD argc, char** argv)
 
     setstatus_(SERVICE_START_PENDING);
 
-    if (AUG_ISFAIL(aug_initservice())) {
+    if (AUG_ISFAIL(aug_initserv())) {
 
-        aug_perrinfo(aug_tlx, "aug_initservice() failed", NULL);
+        aug_perrinfo(aug_tlx, "aug_initserv() failed", NULL);
         setstatus_(SERVICE_STOPPED);
         goto done;
     }
@@ -157,18 +157,18 @@ start_(DWORD argc, char** argv)
     aug_ctxnotice(aug_tlx, "daemon started");
     setstatus_(SERVICE_RUNNING);
 
-    if (AUG_ISFAIL(aug_runservice()))
-        aug_perrinfo(aug_tlx, "aug_runservice() failed", NULL);
+    if (AUG_ISFAIL(aug_runserv()))
+        aug_perrinfo(aug_tlx, "aug_runserv() failed", NULL);
 
     aug_ctxnotice(aug_tlx, "daemon stopped");
     setstatus_(SERVICE_STOPPED);
 
     /* This function will be called on the Service Manager's thread.  Given
-       that aug_initservice() and aug_runservice() have been called on this
-       thread, aug_termservice() is also called from this thread and not the
-       main thread. */
+       that aug_initserv() and aug_runserv() have been called on this thread,
+       aug_termserv() is also called from this thread and not the main
+       thread. */
 
-    /*aug_termservice();*/
+    /*aug_termserv();*/
 
  done:
 
@@ -188,7 +188,7 @@ aug_daemonise(void)
     };
     aug_result result;
 
-    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return AUG_FAILERROR;
@@ -220,6 +220,6 @@ aug_daemonise(void)
     /* Ensure writes performed on service thread are visible. */
 
     AUG_RMB();
-    aug_termservice();
+    aug_termserv();
     return result;
 }

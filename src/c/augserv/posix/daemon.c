@@ -189,7 +189,7 @@ aug_daemonise(void)
     const char* pidfile;
     aug_result result;
 
-    if (!(pidfile = aug_getserviceopt(AUG_OPTPIDFILE))) {
+    if (!(pidfile = aug_getservopt(AUG_OPTPIDFILE))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return AUG_FAILERROR;
@@ -198,10 +198,10 @@ aug_daemonise(void)
     if (AUG_ISFAIL(result = daemonise_())
         || AUG_ISFAIL(result = lockfile_(pidfile))
         || AUG_ISFAIL(result = closein_())
-        || AUG_ISFAIL(result = aug_initservice()))
+        || AUG_ISFAIL(result = aug_initserv()))
         return result;
 
-    result = aug_runservice();
-    aug_termservice();
+    result = aug_runserv();
+    aug_termserv();
     return result;
 }

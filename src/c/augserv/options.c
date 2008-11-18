@@ -25,9 +25,9 @@ AUG_RCSID("$Id$");
 static void
 usage_(void)
 {
-    const char* lname = aug_getserviceopt(AUG_OPTLONGNAME);
-    const char* program = aug_getserviceopt(AUG_OPTPROGRAM);
-    const char* email = aug_getserviceopt(AUG_OPTEMAIL);
+    const char* lname = aug_getservopt(AUG_OPTLONGNAME);
+    const char* program = aug_getservopt(AUG_OPTPROGRAM);
+    const char* email = aug_getservopt(AUG_OPTEMAIL);
 
     if (lname)
         aug_ctxinfo(aug_tlx, "%s\n", lname);

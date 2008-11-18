@@ -111,21 +111,21 @@ aug_setservice_(const struct aug_service* service, void* arg)
 }
 
 AUGSERV_API const char*
-aug_getserviceopt(int opt)
+aug_getservopt(int opt)
 {
     assert(service_.getopt_);
     return service_.getopt_(arg_, opt);
 }
 
 AUGSERV_API aug_result
-aug_readserviceconf(const char* conffile, int batch, int daemon)
+aug_readservconf(const char* conffile, int batch, int daemon)
 {
     assert(service_.readconf_);
     return service_.readconf_(arg_, conffile, batch, daemon);
 }
 
 AUGSERV_API aug_result
-aug_initservice(void)
+aug_initserv(void)
 {
     aug_result result;
     assert(service_.init_);
@@ -147,14 +147,14 @@ aug_initservice(void)
 }
 
 AUGSERV_API aug_result
-aug_runservice(void)
+aug_runserv(void)
 {
     assert(service_.run_);
     return service_.run_(arg_);
 }
 
 AUGSERV_API void
-aug_termservice(void)
+aug_termserv(void)
 {
     if (AUG_BADMD != mds_[0]) {
         assert(service_.term_);

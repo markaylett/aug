@@ -85,7 +85,7 @@ aug_control(int event)
     int fd;
     aug_result result;
 
-    if (!(pidfile = aug_getserviceopt(AUG_OPTPIDFILE))) {
+    if (!(pidfile = aug_getservopt(AUG_OPTPIDFILE))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
         return AUG_FAILERROR;

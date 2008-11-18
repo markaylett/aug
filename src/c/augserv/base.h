@@ -15,19 +15,19 @@ aug_setservice_(const struct aug_service* service, void* arg);
 #endif /* AUGSERV_BUILD */
 
 AUGSERV_API const char*
-aug_getserviceopt(int opt);
+aug_getservopt(int opt);
 
 AUGSERV_API aug_result
-aug_readserviceconf(const char* conffile, int batch, int daemon);
+aug_readservconf(const char* conffile, int batch, int daemon);
 
 AUGSERV_API aug_result
-aug_initservice(void);
+aug_initserv(void);
 
 AUGSERV_API aug_result
-aug_runservice(void);
+aug_runserv(void);
 
 AUGSERV_API void
-aug_termservice(void);
+aug_termserv(void);
 
 /**
  * Read-end of event pipe.

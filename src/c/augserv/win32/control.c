@@ -35,7 +35,7 @@ makepath_(void)
     char buf[AUG_PATH_MAX + 1];
     aug_xstr_t s;
 
-    if (!(program = aug_getserviceopt(AUG_OPTPROGRAM))) {
+    if (!(program = aug_getservopt(AUG_OPTPROGRAM))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPROGRAM' not set"));
         return NULL;
@@ -51,7 +51,7 @@ makepath_(void)
         || AUG_ISFAIL(aug_xstrcatc(s, '"')))
         goto fail;
 
-    if ((conffile = aug_getserviceopt(AUG_OPTCONFFILE))) {
+    if ((conffile = aug_getservopt(AUG_OPTCONFFILE))) {
 
         if (!aug_realpath(buf, conffile, sizeof(buf)))
             goto fail;
@@ -80,13 +80,13 @@ start_(SC_HANDLE scm)
         "-f", NULL
     };
 
-    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return AUG_FAILERROR;
     }
 
-    argv[1] = aug_getserviceopt(AUG_OPTCONFFILE);
+    argv[1] = aug_getservopt(AUG_OPTCONFFILE);
 
     if (!(serv = OpenService(scm, sname, SERVICE_START)))
         return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
@@ -123,7 +123,7 @@ control_(SC_HANDLE scm, int event)
     SERVICE_STATUS status;
     aug_result result;
 
-    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return AUG_FAILERROR;
@@ -151,13 +151,13 @@ install_(SC_HANDLE scm)
     SC_HANDLE serv;
     aug_result result;
 
-    if (!(lname = aug_getserviceopt(AUG_OPTLONGNAME))) {
+    if (!(lname = aug_getservopt(AUG_OPTLONGNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTLONGNAME' not set"));
         return AUG_FAILERROR;
     }
 
-    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return AUG_FAILERROR;
@@ -196,7 +196,7 @@ uninstall_(SC_HANDLE scm)
     SERVICE_STATUS status;
     aug_result result;
 
-    if (!(sname = aug_getserviceopt(AUG_OPTSHORTNAME))) {
+    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return AUG_FAILERROR;

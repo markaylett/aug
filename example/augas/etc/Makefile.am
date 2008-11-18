@@ -8,7 +8,8 @@ EXTRA_DIST = \
 	passwd.txt \
 	servercert.pem \
 	serverkey.pem \
-	serverreq.pem
+	serverreq.pem \
+	README
 
 exampledir = $(prefix)/example/augas/etc
 example_DATA = \
