@@ -22237,7 +22237,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile example/Makefile example/augas/Makefile example/augas/etc/Makefile example/augas/htdocs/Makefile example/cpp/Makefile src/Makefile src/c/Makefile src/c/augctx/Makefile src/c/augctx/posix/Makefile src/c/augctx/win32/Makefile src/c/augext/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augpy/Makefile src/c/augrb/Makefile src/c/augres/Makefile src/c/augas/Makefile src/c/augsrv/Makefile src/c/augsrv/posix/Makefile src/c/augsrv/win32/Makefile src/c/augsys/Makefile src/c/augsys/osx/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/augutil/posix/Makefile src/c/augutil/win32/Makefile src/c/htdigest/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augctxpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augaspp/Makefile src/cpp/augsrvpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/daug/Makefile src/cpp/daug/test/Makefile src/pl/Makefile src/py/Makefile src/rb/Makefile src/sh/Makefile vc7/Makefile"
+ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile example/Makefile example/augas/Makefile example/augas/etc/Makefile example/augas/htdocs/Makefile example/cpp/Makefile src/Makefile src/c/Makefile src/c/augctx/Makefile src/c/augctx/posix/Makefile src/c/augctx/win32/Makefile src/c/augext/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augpy/Makefile src/c/augrb/Makefile src/c/augres/Makefile src/c/augas/Makefile src/c/augserv/Makefile src/c/augserv/posix/Makefile src/c/augserv/win32/Makefile src/c/augsys/Makefile src/c/augsys/osx/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/augutil/posix/Makefile src/c/augutil/win32/Makefile src/c/htdigest/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augctxpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augaspp/Makefile src/cpp/augservpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/daug/Makefile src/cpp/daug/test/Makefile src/pl/Makefile src/py/Makefile src/rb/Makefile src/sh/Makefile vc7/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -22901,9 +22901,9 @@ do
     "src/c/augrb/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augrb/Makefile" ;;
     "src/c/augres/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augres/Makefile" ;;
     "src/c/augas/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augas/Makefile" ;;
-    "src/c/augsrv/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsrv/Makefile" ;;
-    "src/c/augsrv/posix/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsrv/posix/Makefile" ;;
-    "src/c/augsrv/win32/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsrv/win32/Makefile" ;;
+    "src/c/augserv/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augserv/Makefile" ;;
+    "src/c/augserv/posix/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augserv/posix/Makefile" ;;
+    "src/c/augserv/win32/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augserv/win32/Makefile" ;;
     "src/c/augsys/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsys/Makefile" ;;
     "src/c/augsys/osx/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsys/osx/Makefile" ;;
     "src/c/augsys/posix/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augsys/posix/Makefile" ;;
@@ -22918,7 +22918,7 @@ do
     "src/cpp/augmarpp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augmarpp/Makefile" ;;
     "src/cpp/augnetpp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augnetpp/Makefile" ;;
     "src/cpp/augaspp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augaspp/Makefile" ;;
-    "src/cpp/augsrvpp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augsrvpp/Makefile" ;;
+    "src/cpp/augservpp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augservpp/Makefile" ;;
     "src/cpp/augsyspp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augsyspp/Makefile" ;;
     "src/cpp/augutilpp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augutilpp/Makefile" ;;
     "src/cpp/daug/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/daug/Makefile" ;;

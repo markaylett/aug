@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augnet", "augnet.vcproj", "
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augsrv", "augsrv.vcproj", "{D71F12D2-E969-4A00-8173-FFA33C1B963E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augserv", "augserv.vcproj", "{D71F12D2-E969-4A00-8173-FFA33C1B963E}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -27,7 +27,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augnetpp", "augnetpp.vcproj
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augsrvpp", "augsrvpp.vcproj", "{CEEFFCE1-4011-4637-9ED8-9EE62654A792}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augservpp", "augservpp.vcproj", "{CEEFFCE1-4011-4637-9ED8-9EE62654A792}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject

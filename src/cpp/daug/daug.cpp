@@ -13,7 +13,7 @@ AUG_RCSID("$Id$");
  * application server.
  */
 
-#include "augsrvpp.hpp"
+#include "augservpp.hpp"
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"
 #include "augsyspp.hpp"
@@ -682,7 +682,7 @@ namespace {
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
 
-            setsrvlogger("daug");
+            setservlogger("daug");
 
             auto_ptr<state> s(new state(frobpass_));
 

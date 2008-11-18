@@ -12,7 +12,7 @@
  * @li augext.h
  * @li augmar.h
  * @li augnet.h
- * @li augsrv.h
+ * @li augserv.h
  * @li augsys.h
  * @li augutil.h
  *
@@ -42,7 +42,7 @@
 #include "augext.h"
 #include "augmar.h"
 #include "augnet.h"
-#include "augsrv.h"
+#include "augserv.h"
 #include "augsys.h"
 #include "augutil.h"
 

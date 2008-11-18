@@ -1401,8 +1401,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_3E6D139457CF460D8196B1DE8C30A4A6"
             {
-            "SourcePath" = "8:lib\\libaugsrv.lib"
-            "TargetName" = "8:libaugsrv.lib"
+            "SourcePath" = "8:lib\\libaugserv.lib"
+            "TargetName" = "8:libaugserv.lib"
             "Tag" = "8:"
             "Folder" = "8:_9E7D976658F7456C89D72630A688CC17"
             "Condition" = "8:"
@@ -2301,8 +2301,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_B05AFC2771E1485AA9F0206266B0FCF0"
             {
-            "SourcePath" = "8:..\\src\\cpp\\augsrvpp.hpp"
-            "TargetName" = "8:augsrvpp.hpp"
+            "SourcePath" = "8:..\\src\\cpp\\augservpp.hpp"
+            "TargetName" = "8:augservpp.hpp"
             "Tag" = "8:"
             "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
             "Condition" = "8:"
@@ -2621,8 +2621,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_E200ADC8D2554B0696E2B79710BB9184"
             {
-            "SourcePath" = "8:..\\src\\c\\augsrv.h"
-            "TargetName" = "8:augsrv.h"
+            "SourcePath" = "8:..\\src\\c\\augserv.h"
+            "TargetName" = "8:augserv.h"
             "Tag" = "8:"
             "Folder" = "8:_5E5D8A6D5D904345AEB5F68D66FF9128"
             "Condition" = "8:"
@@ -2890,7 +2890,7 @@
                             }
                             "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_33E7B770719D4A64B46D0A94CF89ACE3"
                             {
-                            "Name" = "8:augsrvpp"
+                            "Name" = "8:augservpp"
                             "AlwaysCreate" = "11:FALSE"
                             "Condition" = "8:"
                             "Transitive" = "11:FALSE"
@@ -3011,7 +3011,7 @@
                             }
                             "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_DE367EC30C2348049B7E57A24B09AEBA"
                             {
-                            "Name" = "8:augsrv"
+                            "Name" = "8:augserv"
                             "AlwaysCreate" = "11:FALSE"
                             "Condition" = "8:"
                             "Transitive" = "11:FALSE"
@@ -4279,7 +4279,7 @@
             }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_5ABDE34760FB4E5F989C4747CF5F86F1"
             {
-            "SourcePath" = "8:bin\\libaugsrv-1.dll"
+            "SourcePath" = "8:bin\\libaugserv-1.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"

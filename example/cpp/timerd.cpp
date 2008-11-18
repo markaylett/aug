@@ -1,7 +1,7 @@
 /* Copyright (c) 2004-2009, Mark Aylett <mark.aylett@gmail.com>
    See the file COPYING for copying permission.
 */
-#include "augsrvpp.hpp"
+#include "augservpp.hpp"
 #include "augutilpp.hpp"
 #include "augsyspp.hpp"
 #include "augctxpp.hpp"
@@ -179,7 +179,7 @@ namespace test {
         {
             aug_ctxinfo(aug_tlx, "initialising daemon process");
 
-            verify(aug_setsrvlogger("aug"));
+            verify(aug_setservlogger("aug"));
 
             auto_ptr<state> ptr(new state());
             setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRDEX);

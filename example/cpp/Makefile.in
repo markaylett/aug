@@ -63,7 +63,7 @@ am__heartbeat_SOURCES_DIST = heartbeat.cpp
 @ENABLE_MULTICAST_TRUE@am_heartbeat_OBJECTS = heartbeat.$(OBJEXT)
 heartbeat_OBJECTS = $(am_heartbeat_OBJECTS)
 am__DEPENDENCIES_1 = $(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augserv/libaugserv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
@@ -250,7 +250,7 @@ DEFAULT_INCLUDES = \
 
 AUGLIBS = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augsrv/libaugsrv.la \
+	$(top_builddir)/src/c/augserv/libaugserv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la

@@ -8,7 +8,7 @@ SUBDIRS = \
 	augrb \
 	augres \
 	augutil \
-	augsrv \
+	augserv \
 	augnet \
 	augas \
 	htdigest \
@@ -24,5 +24,5 @@ include_HEADERS = \
 	augsys.h \
 	augmar.h \
 	augutil.h \
-	augsrv.h \
+	augserv.h \
 	augnet.h

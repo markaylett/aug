@@ -130,7 +130,7 @@
 			Name="augnet"/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{D71F12D2-E969-4A00-8173-FFA33C1B963E}"
-			Name="augsrv"/>
+			Name="augserv"/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
 			Name="augsys"/>

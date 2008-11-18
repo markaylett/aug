@@ -14,7 +14,7 @@ AUG_RCSID("$Id$");
 #include "augaspp/socks.hpp"
 #include "augaspp/ssl.hpp"
 
-#include "augsrvpp/signal.hpp"
+#include "augservpp/signal.hpp"
 
 #include "augutilpp/timer.hpp"
 

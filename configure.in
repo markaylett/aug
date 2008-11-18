@@ -275,9 +275,9 @@ AC_CONFIG_FILES([Makefile
                  src/c/augrb/Makefile
                  src/c/augres/Makefile
                  src/c/augas/Makefile
-                 src/c/augsrv/Makefile
-                 src/c/augsrv/posix/Makefile
-                 src/c/augsrv/win32/Makefile
+                 src/c/augserv/Makefile
+                 src/c/augserv/posix/Makefile
+                 src/c/augserv/win32/Makefile
                  src/c/augsys/Makefile
                  src/c/augsys/osx/Makefile
                  src/c/augsys/posix/Makefile
@@ -292,7 +292,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augmarpp/Makefile
                  src/cpp/augnetpp/Makefile
                  src/cpp/augaspp/Makefile
-                 src/cpp/augsrvpp/Makefile
+                 src/cpp/augservpp/Makefile
                  src/cpp/augsyspp/Makefile
                  src/cpp/augutilpp/Makefile
                  src/cpp/daug/Makefile
