@@ -291,7 +291,7 @@ namespace test {
         }
     };
 
-    class service {
+    class service : public app_base<service> {
 
         auto_ptr<state> state_;
 
@@ -324,49 +324,7 @@ namespace test {
             }
         }
 
-    public:
-        ~service() AUG_NOTHROW
-        {
-        }
-
-        const char*
-        getopt(int opt)
-        {
-            switch (opt) {
-            case AUG_OPTCONFFILE:
-                return *conffile_ ? conffile_ : 0;
-            case AUG_OPTEMAIL:
-                return "Mark Aylett <mark.aylett@gmail.com>";
-            case AUG_OPTLONGNAME:
-                return "Multiplexer Daemon";
-            case AUG_OPTPIDFILE:
-                return pidfile_;
-            case AUG_OPTPROGRAM:
-                return program_;
-            case AUG_OPTSHORTNAME:
-                return "mplexd";
-            }
-            return 0;
-        }
-
-        aug_result
-        readconf(const char* conffile, bool batch, bool daemon)
-        {
-            test::readconf(conffile, batch, daemon);
-            return AUG_SUCCESS;
-        }
-
-        aug_result
-        init()
-        {
-            aug_ctxinfo(aug_tlx, "initialising daemon process");
-
-            setservlogger("aug");
-            state_.reset(new state());
-            return AUG_SUCCESS;
-        }
-
-        aug_result
+        void
         run()
         {
             timeval tv;
@@ -414,12 +372,67 @@ namespace test {
 
                 processchans(state_->chans_);
             }
+        }
+    public:
+        ~service() AUG_NOTHROW
+        {
+        }
 
-            return AUG_SUCCESS;
+        const char*
+        getappopt_(int opt) AUG_NOTHROW
+        {
+            switch (opt) {
+            case AUG_OPTCONFFILE:
+                return *conffile_ ? conffile_ : 0;
+            case AUG_OPTEMAIL:
+                return "Mark Aylett <mark.aylett@gmail.com>";
+            case AUG_OPTLONGNAME:
+                return "Multiplexer Daemon";
+            case AUG_OPTPIDFILE:
+                return pidfile_;
+            case AUG_OPTPROGRAM:
+                return program_;
+            case AUG_OPTSHORTNAME:
+                return "mplexd";
+            }
+            return 0;
+        }
+
+        aug_result
+        readappconf_(const char* conffile, aug_bool batch,
+                     aug_bool daemon) AUG_NOTHROW
+        {
+            try {
+                test::readconf(conffile, batch, daemon);
+                return AUG_SUCCESS;
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
+        }
+
+        aug_result
+        initapp_() AUG_NOTHROW
+        {
+            aug_ctxinfo(aug_tlx, "initialising daemon process");
+            try {
+                setservlogger("aug");
+                state_.reset(new state());
+                return AUG_SUCCESS;
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
+        }
+
+        aug_result
+        runapp_() AUG_NOTHROW
+        {
+            try {
+                run();
+                return AUG_SUCCESS;
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
         }
 
         void
-        term()
+        termapp_() AUG_NOTHROW
         {
             aug_ctxinfo(aug_tlx, "terminating daemon process");
             state_.reset();
@@ -436,7 +449,7 @@ main(int argc, char* argv[])
         autobasictlx();
         setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
-        service serv;
+        appptr serv(service::attach(new service()));
         program_ = argv[0];
 
         blocksignals();

@@ -1,4 +1,5 @@
 EXTRA_DIST = \
+	app.xml \
 	blob.xml \
 	boxint.xml \
 	boxptr.xml \
@@ -18,6 +19,7 @@ EXTRA_DIST = \
 
 modincludedir = $(includedir)/augext
 modinclude_HEADERS = \
+	app.h \
 	blob.h \
 	boxint.h \
 	boxptr.h \
@@ -38,6 +40,7 @@ modinclude_HEADERS = \
 
 if ENABLE_RUBY
 BUILT_SOURCES = \
+	app.h \
 	blob.h \
 	boxint.h \
 	boxptr.h \

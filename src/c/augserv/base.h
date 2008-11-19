@@ -5,13 +5,14 @@
 #define AUGSERV_BASE_H
 
 #include "augserv/config.h"
-#include "augserv/types.h"
 
 #include "augsys/types.h"
 
+#include "augext/app.h"
+
 #if defined(AUGSERV_BUILD)
 AUG_EXTERNC void
-aug_setservice_(const struct aug_service* service, void* arg);
+aug_setapp_(aug_app* app);
 #endif /* AUGSERV_BUILD */
 
 AUGSERV_API const char*

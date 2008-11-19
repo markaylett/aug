@@ -31,10 +31,12 @@ AUG_RCSID("$Id$");
 
    On Windows, the Service Manager calls the service entry point on a separate
    thread: automatic variables on the main thread's stack will not be visible
-   from the service thread. */
+   from the service thread.
 
-static struct aug_service service_ = { 0 };
-static void* arg_ = NULL;
+   FIXME: review.
+*/
+
+static aug_app* app_ = NULL;
 static aug_md mds_[2] = { AUG_BADMD, AUG_BADMD };
 
 /* closepipe_() should not be called from an atexit() handler: on Windows, the
@@ -104,31 +106,30 @@ openpipe_(void)
 }
 
 AUG_EXTERNC void
-aug_setservice_(const struct aug_service* service, void* arg)
+aug_setapp_(aug_app* app)
 {
-    memcpy(&service_, service, sizeof(service_));
-    arg_ = arg;
+    app_ = app;
 }
 
 AUGSERV_API const char*
 aug_getservopt(int opt)
 {
-    assert(service_.getopt_);
-    return service_.getopt_(arg_, opt);
+    assert(app_);
+    return aug_getappopt(app_, opt);
 }
 
 AUGSERV_API aug_result
 aug_readservconf(const char* conffile, int batch, int daemon)
 {
-    assert(service_.readconf_);
-    return service_.readconf_(arg_, conffile, batch, daemon);
+    assert(app_);
+    return aug_readappconf(app_, conffile, batch, daemon);
 }
 
 AUGSERV_API aug_result
 aug_initserv(void)
 {
     aug_result result;
-    assert(service_.init_);
+    assert(app_);
 
     if (AUG_ISFAIL(result = openpipe_()))
         return result;
@@ -138,7 +139,7 @@ aug_initserv(void)
 
     AUG_WMB();
 
-    if (AUG_ISFAIL(result = service_.init_(arg_))) {
+    if (AUG_ISFAIL(result = aug_initapp(app_))) {
         closepipe_();
         return result;
     }
@@ -149,16 +150,16 @@ aug_initserv(void)
 AUGSERV_API aug_result
 aug_runserv(void)
 {
-    assert(service_.run_);
-    return service_.run_(arg_);
+    assert(app_);
+    return aug_runapp(app_);
 }
 
 AUGSERV_API void
 aug_termserv(void)
 {
     if (AUG_BADMD != mds_[0]) {
-        assert(service_.term_);
-        service_.term_(arg_);
+        assert(app_);
+        aug_termapp(app_);
         closepipe_();
     }
 }

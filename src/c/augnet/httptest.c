@@ -81,7 +81,7 @@ static const struct aug_httphandlervtbl vtbl_ = {
     end_
 };
 
-static aug_log httphandler_ = { &vtbl_, NULL };
+static aug_httphandler httphandler_ = { &vtbl_, NULL };
 
 int
 main(int argc, char* argv[])

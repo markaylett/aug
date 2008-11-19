@@ -414,7 +414,7 @@ namespace {
     setrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
         AUG_CTXDEBUG2(aug_tlx, "setrwtimer(): id=[%u], ms=[%u], flags=[%x]",
-                   cid, ms, flags);
+                      cid, ms, flags);
         try {
             state_->engine_.setrwtimer(cid, ms, flags);
             return MOD_SUCCESS;
@@ -427,7 +427,7 @@ namespace {
     resetrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
         AUG_CTXDEBUG2(aug_tlx, "resetrwtimer(): id=[%u], ms=[%u], flags=[%x]",
-                   cid, ms, flags);
+                      cid, ms, flags);
         try {
             return state_->engine_.resetrwtimer(cid, ms, flags)
                 ? MOD_SUCCESS : MOD_FAILNONE;
@@ -603,7 +603,7 @@ namespace {
         state_->engine_.cancelinactive();
     }
 
-    class service {
+    class service : public app_base<service> {
         char frobpass_[AUG_MAXPASSWORD + 1];
     public:
         ~service() AUG_NOTHROW
@@ -615,7 +615,7 @@ namespace {
         }
 
         const char*
-        getopt(int opt)
+        getappopt_(int opt) AUG_NOTHROW
         {
             switch (opt) {
             case AUG_OPTCONFFILE:
@@ -635,98 +635,108 @@ namespace {
         }
 
         aug_result
-        readconf(const char* conffile, bool batch, bool daemon)
+        readappconf_(const char* conffile, aug_bool batch,
+                     aug_bool daemon) AUG_NOTHROW
         {
-            // The conffile is optional, if specified it will be an absolute
-            // path.
+            try {
 
-            if (conffile) {
+                // The conffile is optional, if specified it will be an
+                // absolute path.
 
-                AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]",
-                              conffile);
-                options_.read(conffile);
+                if (conffile) {
 
-                // Store the absolute path to service any reconf requests.
+                    AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]",
+                                  conffile);
+                    options_.read(conffile);
 
-                aug_strlcpy(conffile_, conffile, sizeof(conffile_));
-            }
+                    // Store the absolute path to service any reconf requests.
 
-            // Remember if daemonising or not.
+                    aug_strlcpy(conffile_, conffile, sizeof(conffile_));
+                }
 
-            daemon_ = daemon;
+                // Remember if daemonising or not.
 
-            // Once set, the run directory should not change.
+                daemon_ = daemon;
 
-            const char* rundir(options_.get("rundir", 0));
-            realpath(rundir_, rundir ? rundir : getcwd().c_str(),
-                     sizeof(rundir_));
+                // Once set, the run directory should not change.
 
-            reconf_();
+                const char* rundir(options_.get("rundir", 0));
+                realpath(rundir_, rundir ? rundir : getcwd().c_str(),
+                         sizeof(rundir_));
+
+                reconf_();
 
 #if ENABLE_SSL
-            // Password must be collected before process is detached from
-            // controlling terminal.
+                // Password must be collected before process is detached from
+                // controlling terminal.
 
-            if (!batch && options_.get("ssl.contexts", 0)) {
-                aug_getpass("Enter PEM pass phrase:", frobpass_,
-                            sizeof(frobpass_));
-                aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
-            }
+                if (!batch && options_.get("ssl.contexts", 0)) {
+                    aug_getpass("Enter PEM pass phrase:", frobpass_,
+                                sizeof(frobpass_));
+                    aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
+                }
 #endif // ENABLE_SSL
 
-            return AUG_SUCCESS;
+                return AUG_SUCCESS;
+
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
         }
 
         aug_result
-        init()
+        initapp_() AUG_NOTHROW
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
 
-            setservlogger("daug");
-
-            auto_ptr<state> s(new state(frobpass_));
-
-            // Assign state so that it is visible to callbacks during load_().
-
-            state_ = s;
+            auto_ptr<state> s;
             try {
 
-                // Load modules are start sessions.
+                setservlogger("daug");
 
+                s.reset(new state(frobpass_));
+
+                // Assign state so that it is visible to callbacks during
+                // load_().
+
+                state_ = s;
                 load_();
+                return AUG_SUCCESS;
 
-            } catch (...) {
+            } AUG_SETERRINFOCATCH;
 
-                // Ownership back to local for cleanup.
+            // Ownership back to local for cleanup.
 
-                s = state_;
-                s->engine_.clear();
-                throw;
-            }
+            s = state_;
+            s->engine_.clear();
 
-            return AUG_SUCCESS;
+            return AUG_FAILERROR;
         }
 
         aug_result
-        run()
+        runapp_() AUG_NOTHROW
         {
-            if (daemon_) {
+            try {
 
-                // Only set re-open timer when running as daemon.
+                if (daemon_) {
 
-                timer t(state_->timers_);
-                t.set(60000, timercb<reopencb_>, null);
+                    // Only set re-open timer when running as daemon.
 
-                state_->engine_.run(false); // Not stop on error.
+                    timer t(state_->timers_);
+                    t.set(60000, timercb<reopencb_>, null);
 
-            } else
-                state_->engine_.run(true);  // Stop on error.
+                    state_->engine_.run(false); // Not stop on error.
 
-            return AUG_SUCCESS;
+                } else
+                    state_->engine_.run(true);  // Stop on error.
+
+                return AUG_SUCCESS;
+
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
         }
 
         void
-        term()
+        termapp_() AUG_NOTHROW
         {
             AUG_CTXDEBUG2(aug_tlx, "terminating daemon process");
 
@@ -748,7 +758,7 @@ main(int argc, char* argv[])
 {
     try {
 
-         // Initialise aug libraries.
+        // Initialise aug libraries.
 
         scoped_init init(basictlx);
 
@@ -759,7 +769,7 @@ main(int argc, char* argv[])
         aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
 
         try {
-            service serv;
+            appptr serv(service::attach(new service()));
             program_ = argv[0];
 
             blocksignals();

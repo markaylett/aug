@@ -10,6 +10,7 @@
  * Extension interface library.
  */
 
+#include "augext/app.h"
 #include "augext/blob.h"
 #include "augext/boxint.h"
 #include "augext/boxptr.h"

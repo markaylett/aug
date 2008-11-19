@@ -1,7 +1,7 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
 noinst_PROGRAMS = \
-	mplexd \
+	muxerd \
 	profile \
 	tcpclient \
 	tcpserver \
@@ -22,9 +22,9 @@ AUGLIBS= \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
-mplexd_SOURCES = \
-	mplexd.cpp
-mplexd_LDADD = $(AUGLIBS)
+muxerd_SOURCES = \
+	muxerd.cpp
+muxerd_LDADD = $(AUGLIBS)
 
 profile_SOURCES = \
 	profile.cpp

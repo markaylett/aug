@@ -3,6 +3,7 @@
 */
 #include "augserv/base.h"
 #include "augserv/options.h"
+#include "augserv/types.h"
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"

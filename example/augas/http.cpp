@@ -720,8 +720,11 @@ namespace {
         aug_result
         putmar_(const char* initial, struct aug_mar_* mar) AUG_NOTHROW
         {
-            put(initial, mar);
-            return AUG_SUCCESS;
+            try {
+                put(initial, mar);
+                return AUG_SUCCESS;
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
         }
     };
 

@@ -12,8 +12,28 @@ static const char* program_;
 static char conffile_[AUG_PATH_MAX + 1] = "";
 static int daemon_ = 0;
 
+static void*
+cast_(aug_app* obj, const char* id)
+{
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_appid)) {
+        aug_retain(obj);
+        return obj;
+    }
+    return NULL;
+}
+
+static void
+retain_(aug_app* obj)
+{
+}
+
+static void
+release_(aug_app* obj)
+{
+}
+
 static const char*
-getopt_(void* arg, int opt)
+getopt_(aug_app* obj, int opt)
 {
     switch (opt) {
     case AUG_OPTCONFFILE:
@@ -33,7 +53,7 @@ getopt_(void* arg, int opt)
 }
 
 static aug_result
-config_(void* arg, const char* conffile, int batch, int daemon)
+readconf_(aug_app* obj, const char* conffile, aug_bool batch, aug_bool daemon)
 {
     if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
         return AUG_FAILERROR;
@@ -43,13 +63,13 @@ config_(void* arg, const char* conffile, int batch, int daemon)
 }
 
 static aug_result
-init_(void* arg)
+init_(aug_app* obj)
 {
     return AUG_SUCCESS;
 }
 
 static aug_result
-run_(void* arg)
+run_(aug_app* obj)
 {
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
@@ -71,25 +91,30 @@ run_(void* arg)
 }
 
 static void
-term_(void* arg)
+term_(aug_app* obj)
 {
 }
+
+static const struct aug_appvtbl vtbl_ = {
+    cast_,
+    retain_,
+    release_,
+    getopt_,
+    readconf_,
+    init_,
+    run_,
+    term_
+};
+
+static aug_app app_ = { &vtbl_, NULL };
 
 int
 main(int argc, char* argv[])
 {
-    struct aug_service service = {
-        getopt_,
-        config_,
-        init_,
-        run_,
-        term_
-    };
-
     program_ = argv[0];
 
     if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
-    return aug_main(argc, argv, &service, NULL);
+    return aug_main(argc, argv, &app_);
 }

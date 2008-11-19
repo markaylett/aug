@@ -1,0 +1,34 @@
+<package name="aug" dir="augext">
+
+  <quotincl>augtypes.h</quotincl>
+
+  <interface name="app">
+
+    Service callbacks.
+    
+    Called by the framework in the following order:
+
+    @li readconf
+    @li init
+    @li run
+    @li term
+
+    <method name="getopt" type="const char*" qname="getappopt">
+      <param name="opt" type="int"/>
+    </method>
+
+    <method name="readconf" type="aug_result" qname="readappconf">
+      <param name="conffile" type="const char*"/>
+      <param name="batch" type="aug_bool"/>
+      <param name="daemon" type="aug_bool"/>
+    </method>
+
+    <method name="init" type="aug_result" qname="initapp"/>
+
+    <method name="run" type="aug_result" qname="runapp"/>
+
+    <method name="term" type="void" qname="termapp"/>
+
+  </interface>
+
+</package>

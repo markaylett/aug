@@ -90,14 +90,14 @@ uninstall_(void)
 }
 
 AUGSERV_API int
-aug_main(int argc, char* argv[], const struct aug_service* service, void* arg)
+aug_main(int argc, char* argv[], aug_app* app)
 {
     struct aug_options options;
     int daemon = 0, jmpret = setjmp(mark_);
     if (jmpret)
         return jmpret;
 
-    aug_setservice_(service, arg);
+    aug_setapp_(app);
 
 #if defined(_WIN32)
 

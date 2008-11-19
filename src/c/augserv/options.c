@@ -7,7 +7,8 @@
 
 AUG_RCSID("$Id$");
 
-#include "augserv/base.h"    /* aug_basename() */
+#include "augserv/base.h"   /* aug_basename() */
+#include "augserv/types.h"
 
 #include "augutil/path.h"   /* aug_basename() */
 #include "augutil/getopt.h"

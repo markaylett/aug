@@ -3,6 +3,7 @@
 */
 #include "augserv/base.h"
 #include "augserv/options.h"
+#include "augserv/types.h"
 
 #include "augutil/path.h"
 #include "augutil/xstr.h"

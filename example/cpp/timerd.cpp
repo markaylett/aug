@@ -56,7 +56,7 @@ namespace test {
         return AUG_SUCCESS;
     }
 
-    class service {
+    class service : public app_base<service> {
 
         struct state {
             muxer muxer_;
@@ -123,71 +123,7 @@ namespace test {
             aug_ctxinfo(aug_tlx, "log level: %d", aug_loglevel());
         }
 
-    public:
-        ~service() AUG_NOTHROW
-        {
-        }
-
-        service()
-            : daemon_(false),
-              remain_(5)
-        {
-        }
-
-        const char*
-        getopt(int opt)
-        {
-            switch (opt) {
-            case AUG_OPTCONFFILE:
-                return *conffile_ ? conffile_ : 0;
-            case AUG_OPTEMAIL:
-                return "Mark Aylett <mark.aylett@gmail.com>";
-            case AUG_OPTLONGNAME:
-                return "Timer Daemon";
-            case AUG_OPTPIDFILE:
-                return pidfile_;
-            case AUG_OPTPROGRAM:
-                return program_;
-            case AUG_OPTSHORTNAME:
-                return "timerd";
-            }
-            return 0;
-        }
-
-        aug_result
-        readconf(const char* conffile, bool batch, bool daemon)
-        {
-            if (conffile) {
-                aug_ctxinfo(aug_tlx, "reading: %s", conffile);
-                aug::readconf(conffile, aug::confcb<confcb>, null);
-                aug_strlcpy(conffile_, conffile, sizeof(conffile_));
-            }
-
-            daemon_ = daemon;
-
-            // Use working directory as default.
-
-            if (!*rundir_)
-                realpath(rundir_, getcwd().c_str(), sizeof(rundir_));
-
-            reconf();
-            return AUG_SUCCESS;
-        }
-
-        aug_result
-        init()
-        {
-            aug_ctxinfo(aug_tlx, "initialising daemon process");
-
-            verify(aug_setservlogger("aug"));
-
-            auto_ptr<state> ptr(new state());
-            setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRDEX);
-            state_ = ptr;
-            return AUG_SUCCESS;
-        }
-
-        aug_result
+        void
         run()
         {
             timeval tv;
@@ -227,11 +163,95 @@ namespace test {
 
                 readevent();
             }
-            return AUG_SUCCESS;
+        }
+
+    public:
+        ~service() AUG_NOTHROW
+        {
+        }
+
+        service()
+            : daemon_(false),
+              remain_(5)
+        {
+        }
+
+        const char*
+        getappopt_(int opt) AUG_NOTHROW
+        {
+            switch (opt) {
+            case AUG_OPTCONFFILE:
+                return *conffile_ ? conffile_ : 0;
+            case AUG_OPTEMAIL:
+                return "Mark Aylett <mark.aylett@gmail.com>";
+            case AUG_OPTLONGNAME:
+                return "Timer Daemon";
+            case AUG_OPTPIDFILE:
+                return pidfile_;
+            case AUG_OPTPROGRAM:
+                return program_;
+            case AUG_OPTSHORTNAME:
+                return "timerd";
+            }
+            return 0;
+        }
+
+        aug_result
+        readappconf_(const char* conffile, aug_bool batch,
+                     aug_bool daemon) AUG_NOTHROW
+        {
+            try {
+
+                if (conffile) {
+                    aug_ctxinfo(aug_tlx, "reading: %s", conffile);
+                    aug::readconf(conffile, aug::confcb<confcb>, null);
+                    aug_strlcpy(conffile_, conffile, sizeof(conffile_));
+                }
+
+                daemon_ = daemon;
+
+                // Use working directory as default.
+
+                if (!*rundir_)
+                    realpath(rundir_, getcwd().c_str(), sizeof(rundir_));
+
+                reconf();
+                return AUG_SUCCESS;
+
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
+        }
+
+        aug_result
+        initapp_() AUG_NOTHROW
+        {
+            aug_ctxinfo(aug_tlx, "initialising daemon process");
+
+            try {
+
+                verify(aug_setservlogger("aug"));
+
+                auto_ptr<state> ptr(new state());
+                setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRDEX);
+                state_ = ptr;
+                return AUG_SUCCESS;
+
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
+        }
+
+        aug_result
+        runapp_() AUG_NOTHROW
+        {
+            try {
+                run();
+                return AUG_SUCCESS;
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
         }
 
         void
-        term()
+        termapp_() AUG_NOTHROW
         {
             aug_ctxinfo(aug_tlx, "terminating daemon process");
             state_.reset();
@@ -254,7 +274,7 @@ main(int argc, char* argv[])
     try {
 
         autobasictlx();
-		service serv;
+		appptr serv(service::attach(new service()));
 
         program_ = argv[0];
 
