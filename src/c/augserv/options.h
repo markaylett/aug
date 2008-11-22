@@ -25,11 +25,13 @@ enum aug_command {
 
 struct aug_options {
     char conffile_[AUG_PATH_MAX + 1];
-    int batch_;
+    aug_bool batch_;
     enum aug_command command_;
 };
 
 AUGSERV_API aug_result
 aug_readopts(struct aug_options* options, int argc, char* argv[]);
+
+#define AUG_CONFFILE(x) (*(x)->conffile_ ? (x)->conffile_ : NULL)
 
 #endif /* AUGSERV_OPTIONS_H */

@@ -1,0 +1,11 @@
+<package name="aug" dir="augext">
+
+  <quotincl>augtypes.h</quotincl>
+
+  <interface name="task">
+
+    <method name="run" type="aug_result" qname="runtask"/>
+
+  </interface>
+
+</package>

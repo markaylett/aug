@@ -20,12 +20,28 @@ namespace test {
     const char* program_;
 
     char conffile_[AUG_PATH_MAX + 1] = "";
+    bool daemon_(false);
+
     char rundir_[AUG_PATH_MAX + 1] = "";
     char pidfile_[AUG_PATH_MAX + 1] = "timerd.pid";
     char logfile_[AUG_PATH_MAX + 1] = "timerd.log";
 
+    void
+    reconf_()
+    {
+        aug::chdir(rundir_);
+
+        if (daemon_)
+            openlog(logfile_);
+
+        aug_ctxinfo(aug_tlx, "run directory: %s", rundir_);
+        aug_ctxinfo(aug_tlx, "pid file: %s", pidfile_);
+        aug_ctxinfo(aug_tlx, "log file: %s", logfile_);
+        aug_ctxinfo(aug_tlx, "log level: %d", aug_loglevel());
+    }
+
     aug_result
-    confcb(void* arg, const char* name, const char* value)
+    confcb_(void* arg, const char* name, const char* value)
     {
         if (0 == aug_strcasecmp(name, "loglevel")) {
 
@@ -56,7 +72,7 @@ namespace test {
         return AUG_SUCCESS;
     }
 
-    class service : public app_base<service> {
+    class impl : public task_base<impl>, public mpool_ops {
 
         struct state {
             muxer muxer_;
@@ -71,7 +87,6 @@ namespace test {
             }
         };
 
-        bool daemon_;
         int remain_;
         auto_ptr<state> state_;
 
@@ -95,9 +110,9 @@ namespace test {
                 aug_ctxinfo(aug_tlx, "received AUG_EVENTRECONF");
                 if (*conffile_) {
                     aug_ctxinfo(aug_tlx, "reading: %s", conffile_);
-                    aug::readconf(conffile_, aug::confcb<confcb>, null);
+                    aug::readconf(conffile_, aug::confcb<confcb_>, null);
                 }
-                reconf();
+                reconf_();
                 break;
             case AUG_EVENTSTATUS:
                 aug_ctxinfo(aug_tlx, "received AUG_EVENTSTATUS");
@@ -107,20 +122,6 @@ namespace test {
                 remain_ = 0;
                 break;
             }
-        }
-
-        void
-        reconf()
-        {
-            aug::chdir(rundir_);
-
-            if (daemon_)
-                openlog(logfile_);
-
-            aug_ctxinfo(aug_tlx, "run directory: %s", rundir_);
-            aug_ctxinfo(aug_tlx, "pid file: %s", pidfile_);
-            aug_ctxinfo(aug_tlx, "log file: %s", logfile_);
-            aug_ctxinfo(aug_tlx, "log level: %d", aug_loglevel());
         }
 
         void
@@ -166,82 +167,24 @@ namespace test {
         }
 
     public:
-        ~service() AUG_NOTHROW
+        ~impl() AUG_NOTHROW
         {
+            aug_ctxinfo(aug_tlx, "terminating daemon process");
+            state_.reset();
         }
 
-        service()
-            : daemon_(false),
-              remain_(5)
-        {
-        }
-
-        const char*
-        getappopt_(int opt) AUG_NOTHROW
-        {
-            switch (opt) {
-            case AUG_OPTCONFFILE:
-                return *conffile_ ? conffile_ : 0;
-            case AUG_OPTEMAIL:
-                return "Mark Aylett <mark.aylett@gmail.com>";
-            case AUG_OPTLONGNAME:
-                return "Timer Daemon";
-            case AUG_OPTPIDFILE:
-                return pidfile_;
-            case AUG_OPTPROGRAM:
-                return program_;
-            case AUG_OPTSHORTNAME:
-                return "timerd";
-            }
-            return 0;
-        }
-
-        aug_result
-        readappconf_(const char* conffile, aug_bool batch,
-                     aug_bool daemon) AUG_NOTHROW
-        {
-            try {
-
-                if (conffile) {
-                    aug_ctxinfo(aug_tlx, "reading: %s", conffile);
-                    aug::readconf(conffile, aug::confcb<confcb>, null);
-                    aug_strlcpy(conffile_, conffile, sizeof(conffile_));
-                }
-
-                daemon_ = daemon;
-
-                // Use working directory as default.
-
-                if (!*rundir_)
-                    realpath(rundir_, getcwd().c_str(), sizeof(rundir_));
-
-                reconf();
-                return AUG_SUCCESS;
-
-            } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
-        }
-
-        aug_result
-        initapp_() AUG_NOTHROW
+        impl()
+            : remain_(5)
         {
             aug_ctxinfo(aug_tlx, "initialising daemon process");
 
-            try {
-
-                verify(aug_setservlogger("aug"));
-
-                auto_ptr<state> ptr(new state());
-                setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRDEX);
-                state_ = ptr;
-                return AUG_SUCCESS;
-
-            } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
+            auto_ptr<state> ptr(new state());
+            setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRDEX);
+            state_ = ptr;
         }
 
         aug_result
-        runapp_() AUG_NOTHROW
+        runtask_() AUG_NOTHROW
         {
             try {
                 run();
@@ -251,18 +194,71 @@ namespace test {
         }
 
         void
-        termapp_() AUG_NOTHROW
-        {
-            aug_ctxinfo(aug_tlx, "terminating daemon process");
-            state_.reset();
-        }
-
-        void
         timercb(int id, unsigned& ms)
         {
             aug_ctxinfo(aug_tlx, "timer fired");
             --remain_;
         }
+    };
+
+    const char*
+    getopt_(int opt) AUG_NOTHROW
+    {
+        switch (opt) {
+        case AUG_OPTEMAIL:
+            return "Mark Aylett <mark.aylett@gmail.com>";
+        case AUG_OPTLONGNAME:
+            return "Timer Daemon";
+        case AUG_OPTPIDFILE:
+            return pidfile_;
+        case AUG_OPTPROGRAM:
+            return program_;
+        case AUG_OPTSHORTNAME:
+            return "timerd";
+        }
+        return 0;
+    }
+
+    aug_result
+    readconf_(const char* conffile, aug_bool batch,
+              aug_bool daemon) AUG_NOTHROW
+    {
+        try {
+
+            if (conffile) {
+                aug_ctxinfo(aug_tlx, "reading: %s", conffile);
+                aug::readconf(conffile, aug::confcb<confcb_>, null);
+                aug_strlcpy(conffile_, conffile, sizeof(conffile_));
+            }
+
+            daemon_ = daemon;
+
+            // Use working directory as default.
+
+            if (!*rundir_)
+                realpath(rundir_, getcwd().c_str(), sizeof(rundir_));
+
+            reconf_();
+            return AUG_SUCCESS;
+
+        } AUG_SETERRINFOCATCH;
+        return AUG_FAILERROR;
+    }
+
+    aug_task*
+    create_() AUG_NOTHROW
+    {
+        try {
+            setservlogger("aug");
+            return retget(impl::attach(new impl()));
+        } AUG_SETERRINFOCATCH;
+        return 0;
+    }
+
+    const aug_serv serv_ = {
+        getopt_,
+        readconf_,
+        create_
     };
 }
 
@@ -274,11 +270,10 @@ main(int argc, char* argv[])
     try {
 
         autobasictlx();
-		appptr serv(service::attach(new service()));
 
         program_ = argv[0];
 
-        return main(argc, argv, serv);
+        return main(argc, argv, serv_);
 
     } catch (const exception& e) {
         cerr << e.what() << endl;

@@ -13,9 +13,9 @@ static char conffile_[AUG_PATH_MAX + 1] = "";
 static int daemon_ = 0;
 
 static void*
-cast_(aug_app* obj, const char* id)
+cast_(aug_task* obj, const char* id)
 {
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_appid)) {
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_taskid)) {
         aug_retain(obj);
         return obj;
     }
@@ -23,53 +23,17 @@ cast_(aug_app* obj, const char* id)
 }
 
 static void
-retain_(aug_app* obj)
+retain_(aug_task* obj)
 {
 }
 
 static void
-release_(aug_app* obj)
+release_(aug_task* obj)
 {
-}
-
-static const char*
-getopt_(aug_app* obj, int opt)
-{
-    switch (opt) {
-    case AUG_OPTCONFFILE:
-        return *conffile_ ? conffile_ : NULL;
-    case AUG_OPTEMAIL:
-        return "Mark Aylett <mark.aylett@gmail.com>";
-    case AUG_OPTLONGNAME:
-        return "Test Program";
-    case AUG_OPTPIDFILE:
-        return "test.pid";
-    case AUG_OPTPROGRAM:
-        return program_;
-    case AUG_OPTSHORTNAME:
-        return "test";
-    }
-    return NULL;
 }
 
 static aug_result
-readconf_(aug_app* obj, const char* conffile, aug_bool batch, aug_bool daemon)
-{
-    if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
-        return AUG_FAILERROR;
-
-    daemon_ = daemon;
-    return AUG_SUCCESS;
-}
-
-static aug_result
-init_(aug_app* obj)
-{
-    return AUG_SUCCESS;
-}
-
-static aug_result
-run_(aug_app* obj)
+run_(aug_task* obj)
 {
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
@@ -90,23 +54,54 @@ run_(aug_app* obj)
     return AUG_SUCCESS;
 }
 
-static void
-term_(aug_app* obj)
-{
-}
-
-static const struct aug_appvtbl vtbl_ = {
+static const struct aug_taskvtbl vtbl_ = {
     cast_,
     retain_,
     release_,
-    getopt_,
-    readconf_,
-    init_,
-    run_,
-    term_
+    run_
 };
 
-static aug_app app_ = { &vtbl_, NULL };
+static aug_task task_ = { &vtbl_, NULL };
+
+static const char*
+getopt_(int opt)
+{
+    switch (opt) {
+    case AUG_OPTEMAIL:
+        return "Mark Aylett <mark.aylett@gmail.com>";
+    case AUG_OPTLONGNAME:
+        return "Test Program";
+    case AUG_OPTPIDFILE:
+        return "test.pid";
+    case AUG_OPTPROGRAM:
+        return program_;
+    case AUG_OPTSHORTNAME:
+        return "test";
+    }
+    return NULL;
+}
+
+static aug_result
+readconf_(const char* conffile, aug_bool batch, aug_bool daemon)
+{
+    if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
+        return AUG_FAILERROR;
+
+    daemon_ = daemon;
+    return AUG_SUCCESS;
+}
+
+static aug_task*
+create_(void)
+{
+    return &task_;
+}
+
+static const struct aug_serv serv_ = {
+    getopt_,
+    readconf_,
+    create_
+};
 
 int
 main(int argc, char* argv[])
@@ -116,5 +111,5 @@ main(int argc, char* argv[])
     if (AUG_ISFAIL(aug_autobasictlx()))
         return 1;
 
-    return aug_main(argc, argv, &app_);
+    return aug_main(argc, argv, &serv_);
 }

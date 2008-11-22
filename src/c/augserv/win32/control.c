@@ -30,9 +30,9 @@ createxstr_(size_t size)
 }
 
 static aug_xstr_t
-makepath_(void)
+makepath_(const char* conffile)
 {
-    const char* program, * conffile;
+    const char* program;
     char buf[AUG_PATH_MAX + 1];
     aug_xstr_t s;
 
@@ -52,7 +52,7 @@ makepath_(void)
         || AUG_ISFAIL(aug_xstrcatc(s, '"')))
         goto fail;
 
-    if ((conffile = aug_getservopt(AUG_OPTCONFFILE))) {
+    if (conffile) {
 
         if (!aug_realpath(buf, conffile, sizeof(buf)))
             goto fail;
@@ -71,7 +71,7 @@ makepath_(void)
 }
 
 static aug_result
-start_(SC_HANDLE scm)
+start_(SC_HANDLE scm, const struct aug_options* options)
 {
     const char* sname;
     SC_HANDLE serv;
@@ -81,13 +81,13 @@ start_(SC_HANDLE scm)
         "-f", NULL
     };
 
+    argv[1] = AUG_CONFFILE(options);
+
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return AUG_FAILERROR;
     }
-
-    argv[1] = aug_getservopt(AUG_OPTCONFFILE);
 
     if (!(serv = OpenService(scm, sname, SERVICE_START)))
         return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
@@ -145,18 +145,12 @@ control_(SC_HANDLE scm, int event)
 }
 
 static aug_result
-install_(SC_HANDLE scm)
+install_(SC_HANDLE scm, const struct aug_options* options)
 {
-    const char* lname, * sname;
+    const char* sname, * lname;
     aug_xstr_t path;
     SC_HANDLE serv;
     aug_result result;
-
-    if (!(lname = aug_getservopt(AUG_OPTLONGNAME))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTLONGNAME' not set"));
-        return AUG_FAILERROR;
-    }
 
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
@@ -164,7 +158,13 @@ install_(SC_HANDLE scm)
         return AUG_FAILERROR;
     }
 
-    if (!(path = makepath_()))
+    if (!(lname = aug_getservopt(AUG_OPTLONGNAME))) {
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTLONGNAME' not set"));
+        return AUG_FAILERROR;
+    }
+
+    if (!(path = makepath_(AUG_CONFFILE(options))))
         return AUG_FAILERROR;
 
     /* An alternative to running as "Local System" (the default), is to run as
@@ -226,7 +226,7 @@ uninstall_(SC_HANDLE scm)
 }
 
 AUGSERV_API aug_result
-aug_start(void)
+aug_start(const struct aug_options* options)
 {
     SC_HANDLE scm;
     aug_result result;
@@ -235,13 +235,13 @@ aug_start(void)
         return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                                    GetLastError());
 
-    result = start_(scm);
+    result = start_(scm, options);
     CloseServiceHandle(scm);
     return result;
 }
 
 AUGSERV_API aug_result
-aug_control(int event)
+aug_control(const struct aug_options* options, int event)
 {
     SC_HANDLE scm;
     aug_result result;
@@ -256,7 +256,7 @@ aug_control(int event)
 }
 
 AUGSERV_API aug_result
-aug_install(void)
+aug_install(const struct aug_options* options)
 {
     SC_HANDLE scm;
     aug_result result;
@@ -265,13 +265,13 @@ aug_install(void)
         return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                                    GetLastError());
 
-    result = install_(scm);
+    result = install_(scm, options);
     CloseServiceHandle(scm);
     return result;
 }
 
 AUGSERV_API aug_result
-aug_uninstall(void)
+aug_uninstall(const struct aug_options* options)
 {
     SC_HANDLE scm;
     aug_result result;

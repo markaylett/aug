@@ -8,6 +8,8 @@
 
 #include "augtypes.h"
 
+struct aug_options;
+
 /**
  * Called from aug_main().
  *
@@ -15,6 +17,6 @@
  */
 
 AUGSERV_API aug_result
-aug_daemonise(void);
+aug_daemonise(const struct aug_options* options);
 
 #endif /* AUGSERV_DAEMON_H */

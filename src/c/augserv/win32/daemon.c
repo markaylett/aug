@@ -6,6 +6,7 @@
 #include "augserv/types.h"
 
 #include "augutil/event.h"
+#include "augutil/log.h"
 #include "augutil/path.h"   /* aug_gethome(), aug_gettmp() */
 
 #include "augsys/barrier.h"
@@ -54,6 +55,9 @@ setstatus_(DWORD state)
 static void WINAPI
 handler_(DWORD code)
 {
+    /* Called on a separate thread from service_()'s, probably the main thread
+       doing the StartServiceCtrlDispatcher(). */
+
     /* FIXME: restore original status on failure to write event. */
 
     struct aug_event event = { 0, NULL };
@@ -76,7 +80,7 @@ handler_(DWORD code)
 }
 
 static void WINAPI
-start_(DWORD argc, char** argv)
+service_(DWORD argc, char** argv)
 {
     /* Service thread. */
 
@@ -95,6 +99,10 @@ start_(DWORD argc, char** argv)
         return;
     }
 
+    /* Install daemon logger prior to opening log file. */
+
+    aug_setlog(aug_tlx, aug_getdaemonlog());
+
     /* Fallback to tmp. */
 
     if (!aug_gethome(home, sizeof(home))
@@ -108,13 +116,6 @@ start_(DWORD argc, char** argv)
     if (!SetCurrentDirectory(home)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
         aug_perrinfo(aug_tlx, "SetCurrentDirectory() failed", NULL);
-        goto done;
-    }
-
-    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
-        aug_perrinfo(aug_tlx, "getservopt() failed", NULL);
         goto done;
     }
 
@@ -133,9 +134,16 @@ start_(DWORD argc, char** argv)
         goto done;
     }
 
-    if (AUG_ISFAIL(aug_readservconf(*options.conffile_
-                                    ? options.conffile_ : NULL, 0, 1))) {
+    if (AUG_ISFAIL(aug_readservconf(AUG_CONFFILE(&options), AUG_FALSE,
+                                    AUG_TRUE))) {
         aug_perrinfo(aug_tlx, "aug_readservconf() failed", NULL);
+        goto done;
+    }
+
+    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+        aug_perrinfo(aug_tlx, "getservopt() failed", NULL);
         goto done;
     }
 
@@ -169,7 +177,7 @@ start_(DWORD argc, char** argv)
        aug_termserv() is also called from this thread and not the main
        thread. */
 
-    /*aug_termserv();*/
+    aug_termserv();
 
  done:
 
@@ -180,11 +188,11 @@ start_(DWORD argc, char** argv)
 }
 
 AUGSERV_API aug_result
-aug_daemonise(void)
+aug_daemonise(const struct aug_options* options)
 {
     const char* sname;
     SERVICE_TABLE_ENTRY table[] = {
-        { NULL,  start_ },
+        { NULL,  service_ },
         { NULL, NULL }
     };
     aug_result result;
@@ -204,6 +212,11 @@ aug_daemonise(void)
 
     AUG_WMB();
 
+    /* StartServiceCtrlDispatcher() waits indefinitely for commands from the
+       SCM, and returns control to the process's main function only when all
+       the process' services have stopped, allowing the service process to
+       clean up resources before exiting. */
+
     if (StartServiceCtrlDispatcher(table)) {
 
         result = AUG_SUCCESS;
@@ -212,6 +225,14 @@ aug_daemonise(void)
 
         DWORD err = GetLastError();
         if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == err) {
+
+            /* Typically, this error indicates that the program is being run
+               as a console application rather than as a service.
+
+               If the program will be run as a console application for
+               debugging purposes, structure it such that service-specific
+               code is not called when this error is returned. */
+
             aug_clearerrinfo(aug_tlerr);
             result = AUG_FAILNONE;
         } else
@@ -221,6 +242,5 @@ aug_daemonise(void)
     /* Ensure writes performed on service thread are visible. */
 
     AUG_RMB();
-    aug_termserv();
     return result;
 }

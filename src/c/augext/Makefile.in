@@ -187,7 +187,6 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	app.xml \
 	blob.xml \
 	boxint.xml \
 	boxptr.xml \
@@ -203,11 +202,11 @@ EXTRA_DIST = \
 	msg.xml \
 	rpc.xml \
 	seq.xml \
-	stream.xml
+	stream.xml \
+	task.xml
 
 modincludedir = $(includedir)/augext
 modinclude_HEADERS = \
-	app.h \
 	blob.h \
 	boxint.h \
 	boxptr.h \
@@ -224,10 +223,10 @@ modinclude_HEADERS = \
 	rpc.h \
 	seq.h \
 	stream.h \
+	task.h \
 	var.h
 
 @ENABLE_RUBY_TRUE@BUILT_SOURCES = \
-@ENABLE_RUBY_TRUE@	app.h \
 @ENABLE_RUBY_TRUE@	blob.h \
 @ENABLE_RUBY_TRUE@	boxint.h \
 @ENABLE_RUBY_TRUE@	boxptr.h \
@@ -243,7 +242,8 @@ modinclude_HEADERS = \
 @ENABLE_RUBY_TRUE@	msg.h \
 @ENABLE_RUBY_TRUE@	rpc.h \
 @ENABLE_RUBY_TRUE@	seq.h \
-@ENABLE_RUBY_TRUE@	stream.h
+@ENABLE_RUBY_TRUE@	stream.h \
+@ENABLE_RUBY_TRUE@	task.h
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am

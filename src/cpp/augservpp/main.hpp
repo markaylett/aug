@@ -18,9 +18,9 @@ namespace aug {
      */
 
     inline int
-    main(int argc, char* argv[], appref app)
+    main(int argc, char* argv[], const struct aug_serv& serv)
     {
-        return aug_main(argc, argv, app.get());
+        return aug_main(argc, argv, &serv);
     }
 }
 

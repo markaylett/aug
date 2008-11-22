@@ -10,16 +10,18 @@
 
 #include "augtypes.h"
 
-AUGSERV_API aug_result
-aug_start(void);
+struct aug_options;
 
 AUGSERV_API aug_result
-aug_control(int event);
+aug_start(const struct aug_options* options);
 
 AUGSERV_API aug_result
-aug_install(void);
+aug_control(const struct aug_options* options, int event);
 
 AUGSERV_API aug_result
-aug_uninstall(void);
+aug_install(const struct aug_options* options);
+
+AUGSERV_API aug_result
+aug_uninstall(const struct aug_options* options);
 
 #endif /* AUGSERV_CONTROL_H */

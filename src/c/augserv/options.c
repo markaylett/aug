@@ -99,8 +99,11 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
     int ch;
     const char* conffile;
     aug_rint rint;
+
+    /* Defaults. */
+
     options->conffile_[0] = '\0';
-    options->batch_ = 0;
+    options->batch_ = AUG_FALSE;
 
     aug_optind = 1; /* Skip program name. */
     aug_opterr = 0;
@@ -108,7 +111,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
     while (EOF != (ch = aug_getopt(argc, argv, "fhp")))
         switch (ch) {
         case 'b':
-            options->batch_ = 1;
+            options->batch_ = AUG_TRUE;
             break;
         case 'f':
             if (aug_optind == argc || !(conffile = argv[aug_optind++])) {

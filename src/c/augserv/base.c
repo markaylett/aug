@@ -8,6 +8,7 @@
 AUG_RCSID("$Id$");
 
 #include "augserv/signal.h"
+#include "augserv/types.h"
 
 #include "augsys/barrier.h"
 #include "augsys/muxer.h"
@@ -19,6 +20,7 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 
 #include "augext/log.h"
+#include "augext/task.h"
 
 #include "augutil/event.h"  /* struct aug_event */
 
@@ -29,15 +31,12 @@ AUG_RCSID("$Id$");
 /* No protection is required around these statics: they are set once from
    aug_main().
 
-   On Windows, the Service Manager calls the service entry point on a separate
-   thread: automatic variables on the main thread's stack will not be visible
-   from the service thread.
+   Taking a copy of the service structure allows aug_setserv_() to be called
+   with an automatic variable pointer. */
 
-   FIXME: review.
-*/
-
-static aug_app* app_ = NULL;
+static struct aug_serv serv_ = { 0 };
 static aug_md mds_[2] = { AUG_BADMD, AUG_BADMD };
+static aug_task* task_ = 0;
 
 /* closepipe_() should not be called from an atexit() handler: on Windows, the
    pipe is implemented as a socket pair.  The c-runtime may terminate the
@@ -106,30 +105,31 @@ openpipe_(void)
 }
 
 AUG_EXTERNC void
-aug_setapp_(aug_app* app)
+aug_setserv_(const struct aug_serv* serv)
 {
-    app_ = app;
+    memcpy(&serv_, serv, sizeof(serv_));
 }
 
 AUGSERV_API const char*
 aug_getservopt(int opt)
 {
-    assert(app_);
-    return aug_getappopt(app_, opt);
+    assert(serv_.getopt_);
+    return (*serv_.getopt_)(opt);
 }
 
 AUGSERV_API aug_result
-aug_readservconf(const char* conffile, int batch, int daemon)
+aug_readservconf(const char* conffile, aug_bool batch, aug_bool daemon)
 {
-    assert(app_);
-    return aug_readappconf(app_, conffile, batch, daemon);
+    assert(serv_.readconf_);
+    return (*serv_.readconf_)(conffile, batch, daemon);
 }
 
 AUGSERV_API aug_result
 aug_initserv(void)
 {
     aug_result result;
-    assert(app_);
+    assert(serv_.create_);
+    assert(!task_);
 
     if (AUG_ISFAIL(result = openpipe_()))
         return result;
@@ -139,9 +139,9 @@ aug_initserv(void)
 
     AUG_WMB();
 
-    if (AUG_ISFAIL(result = aug_initapp(app_))) {
+    if (!(task_ = (*serv_.create_)())) {
         closepipe_();
-        return result;
+        return AUG_FAILERROR;
     }
 
     return AUG_SUCCESS;
@@ -150,16 +150,16 @@ aug_initserv(void)
 AUGSERV_API aug_result
 aug_runserv(void)
 {
-    assert(app_);
-    return aug_runapp(app_);
+    assert(task_);
+    return aug_runtask(task_);
 }
 
 AUGSERV_API void
 aug_termserv(void)
 {
     if (AUG_BADMD != mds_[0]) {
-        assert(app_);
-        aug_termapp(app_);
+        assert(task_);
+        aug_release(task_);
         closepipe_();
     }
 }

@@ -1,5 +1,4 @@
 EXTRA_DIST = \
-	app.xml \
 	blob.xml \
 	boxint.xml \
 	boxptr.xml \
@@ -15,11 +14,11 @@ EXTRA_DIST = \
 	msg.xml \
 	rpc.xml \
 	seq.xml \
-	stream.xml
+	stream.xml \
+	task.xml
 
 modincludedir = $(includedir)/augext
 modinclude_HEADERS = \
-	app.h \
 	blob.h \
 	boxint.h \
 	boxptr.h \
@@ -36,11 +35,11 @@ modinclude_HEADERS = \
 	rpc.h \
 	seq.h \
 	stream.h \
+	task.h \
 	var.h
 
 if ENABLE_RUBY
 BUILT_SOURCES = \
-	app.h \
 	blob.h \
 	boxint.h \
 	boxptr.h \
@@ -56,7 +55,8 @@ BUILT_SOURCES = \
 	msg.h \
 	rpc.h \
 	seq.h \
-	stream.h
+	stream.h \
+	task.h
 
 %.h: %.xml
 	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@

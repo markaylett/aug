@@ -12,19 +12,17 @@ AUG_RCSID("$Id$");
 #include "augserv/daemon.h"
 #include "augserv/options.h"
 
-#include "augutil/log.h"
-
 #include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h" /* GetStdHandle() */
 
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
 
-#include "augext/log.h"
-
 #include <assert.h>
 #include <setjmp.h>
 #include <stdlib.h>         /* EXIT_FAILURE */
+
+#define CONFFILE_(x) (*(x).confile_ ? (x).confile_ : NULL)
 
 static jmp_buf mark_;
 
@@ -36,9 +34,14 @@ die_(const char* s)
 }
 
 static void
-foreground_(void)
+foreground_(const struct aug_options* options)
 {
     aug_result result;
+
+    if (AUG_ISFAIL(aug_readservconf(AUG_CONFFILE(options), options->batch_,
+                                    AUG_FALSE)))
+        die_("aug_readservconf() failed");
+
     if (AUG_ISFAIL(aug_initserv()))
         die_("aug_initserv() failed");
 
@@ -48,56 +51,61 @@ foreground_(void)
         die_("aug_runserv() failed");
 }
 
-static void
-daemonise_(void)
+static aug_bool
+daemonise_(const struct aug_options* options)
 {
-    aug_result result = aug_daemonise();
+    aug_result result = aug_daemonise(options);
 
-    if (AUG_ISNONE(result))
-        foreground_();
-    else if (AUG_ISFAIL(result))
+    if (AUG_ISFAIL(result)) {
+
+        if (AUG_ISNONE(result))
+            return AUG_FALSE; /* Want foreground. */
+
         die_("aug_daemonise() failed");
+    }
+
+    return AUG_TRUE;
 }
 
 #if defined(_WIN32)
 static void
-start_(void)
+start_(const struct aug_options* options)
 {
-    if (AUG_ISFAIL(aug_start()))
+    if (AUG_ISFAIL(aug_start(options)))
         die_("aug_start() failed");
 }
 #endif /* _WIN32 */
 
 static void
-control_(int sig)
+control_(const struct aug_options* options, int sig)
 {
-    if (AUG_ISFAIL(aug_control(sig)))
+    if (AUG_ISFAIL(aug_control(options, sig)))
         die_("aug_control() failed");
 }
 
 static void
-install_(void)
+install_(const struct aug_options* options)
 {
-    if (AUG_ISFAIL(aug_install()))
+    if (AUG_ISFAIL(aug_install(options)))
         die_("aug_install() failed");
 }
 
 static void
-uninstall_(void)
+uninstall_(const struct aug_options* options)
 {
-    if (AUG_ISFAIL(aug_uninstall()))
+    if (AUG_ISFAIL(aug_uninstall(options)))
         die_("aug_uninstall() failed");
 }
 
 AUGSERV_API int
-aug_main(int argc, char* argv[], aug_app* app)
+aug_main(int argc, char* argv[], const struct aug_serv* serv)
 {
     struct aug_options options;
-    int daemon = 0, jmpret = setjmp(mark_);
+    int jmpret = setjmp(mark_);
     if (jmpret)
         return jmpret;
 
-    aug_setapp_(app);
+    aug_setserv_(serv);
 
 #if defined(_WIN32)
 
@@ -109,9 +117,10 @@ aug_main(int argc, char* argv[], aug_app* app)
         /* Note: aug_readopts() will be called from the main service
            function. */
 
-        aug_setlog(aug_tlx, aug_getdaemonlog());
-        daemonise_();
-        return EXIT_SUCCESS;
+        if (daemonise_(&options))
+            return EXIT_SUCCESS;
+
+        /* Fallthrough to run in foreground. */
     }
 #endif /* _WIN32 */
 
@@ -120,59 +129,44 @@ aug_main(int argc, char* argv[], aug_app* app)
         return EXIT_FAILURE;
     }
 
-    if (AUG_CMDEXIT == options.command_)
-        return EXIT_SUCCESS;
-
-#if !defined(_WIN32)
-    if (AUG_CMDSTART == options.command_) {
-
-        /* Install daemon logger prior to opening log file. */
-
-        aug_setlog(aug_tlx, aug_getdaemonlog());
-        daemon = 1;
-    }
-#endif /* !_WIN32 */
-
-    if (AUG_ISFAIL(aug_readservconf(*options.conffile_
-                                    ? options.conffile_ : NULL,
-                                    options.batch_, daemon)))
-        die_("aug_readservconf() failed");
-
     switch (options.command_) {
     case AUG_CMDDEFAULT:
-        foreground_();
+        foreground_(&options);
         break;
     case AUG_CMDEXIT:
-        assert(0);
+        return EXIT_SUCCESS;
     case AUG_CMDINSTALL:
         aug_ctxinfo(aug_tlx, "installing daemon process");
-        install_();
+        install_(&options);
         break;
     case AUG_CMDRECONF:
         aug_ctxinfo(aug_tlx, "re-configuring daemon process");
-        control_(AUG_EVENTRECONF);
+        control_(&options, AUG_EVENTRECONF);
         break;
     case AUG_CMDSTART:
 #if !defined(_WIN32)
-        daemonise_();
+        /* Install daemon logger prior to opening log file. */
+
+        aug_setlog(aug_tlx, aug_getdaemonlog());
+        daemonise_(&options);
 #else /* _WIN32 */
-        start_();
+        start_(&options);
 #endif /* _WIN32 */
         break;
     case AUG_CMDSTATUS:
         aug_ctxinfo(aug_tlx, "getting status of daemon process");
-        control_(AUG_EVENTSTATUS);
+        control_(&options, AUG_EVENTSTATUS);
         break;
     case AUG_CMDSTOP:
         aug_ctxinfo(aug_tlx, "stopping daemon process");
-        control_(AUG_EVENTSTOP);
+        control_(&options, AUG_EVENTSTOP);
         break;
     case AUG_CMDTEST:
-        foreground_();
+        foreground_(&options);
         break;
     case AUG_CMDUNINSTALL:
         aug_ctxinfo(aug_tlx, "uninstalling daemon process");
-        uninstall_();
+        uninstall_(&options);
         break;
     }
     return EXIT_SUCCESS;

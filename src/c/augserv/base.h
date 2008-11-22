@@ -8,18 +8,20 @@
 
 #include "augsys/types.h"
 
-#include "augext/app.h"
+#include "augtypes.h"
+
+struct aug_serv;
 
 #if defined(AUGSERV_BUILD)
 AUG_EXTERNC void
-aug_setapp_(aug_app* app);
+aug_setserv_(const struct aug_serv* serv);
 #endif /* AUGSERV_BUILD */
 
 AUGSERV_API const char*
 aug_getservopt(int opt);
 
 AUGSERV_API aug_result
-aug_readservconf(const char* conffile, int batch, int daemon);
+aug_readservconf(const char* conffile, aug_bool batch, aug_bool daemon);
 
 AUGSERV_API aug_result
 aug_initserv(void);

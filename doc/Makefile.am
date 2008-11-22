@@ -2,6 +2,7 @@ SUBDIRS = \
 	man
 
 EXTRA_DIST = \
+	augserv.html \
 	daug.txt \
 	daugintro.mk \
 	daugintro.w \

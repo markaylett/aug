@@ -26,8 +26,8 @@ namespace test {
 
     cstring conffile_= "";
     cstring rundir_ = "";
-    cstring pidfile_ = "mplexd.pid";
-    cstring logfile_ = "mplexd.log";
+    cstring pidfile_ = "muxerd.pid";
+    cstring logfile_ = "muxerd.log";
     cstring address_ = "0.0.0.0:44308";
 
     aug_result
@@ -186,7 +186,9 @@ namespace test {
 
     typedef smartptr<session> sessionptr;
 
-    struct state {
+    // TODO: combine task and chandler into single component.
+
+    struct state : mpool_ops {
 
         chandler<state> chandler_;
         map<unsigned, sessionptr> sessions_;
@@ -291,9 +293,9 @@ namespace test {
         }
     };
 
-    class service : public app_base<service> {
+    auto_ptr<state> state_;
 
-        auto_ptr<state> state_;
+    class impl : public task_base<impl>, public mpool_ops {
 
         void
         readevent()
@@ -374,55 +376,20 @@ namespace test {
             }
         }
     public:
-        ~service() AUG_NOTHROW
+        ~impl() AUG_NOTHROW
         {
+            aug_ctxinfo(aug_tlx, "terminating daemon process");
+            state_.reset();
         }
 
-        const char*
-        getappopt_(int opt) AUG_NOTHROW
-        {
-            switch (opt) {
-            case AUG_OPTCONFFILE:
-                return *conffile_ ? conffile_ : 0;
-            case AUG_OPTEMAIL:
-                return "Mark Aylett <mark.aylett@gmail.com>";
-            case AUG_OPTLONGNAME:
-                return "Multiplexer Daemon";
-            case AUG_OPTPIDFILE:
-                return pidfile_;
-            case AUG_OPTPROGRAM:
-                return program_;
-            case AUG_OPTSHORTNAME:
-                return "mplexd";
-            }
-            return 0;
-        }
-
-        aug_result
-        readappconf_(const char* conffile, aug_bool batch,
-                     aug_bool daemon) AUG_NOTHROW
-        {
-            try {
-                test::readconf(conffile, batch, daemon);
-                return AUG_SUCCESS;
-            } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
-        }
-
-        aug_result
-        initapp_() AUG_NOTHROW
+        impl()
         {
             aug_ctxinfo(aug_tlx, "initialising daemon process");
-            try {
-                setservlogger("aug");
-                state_.reset(new state());
-                return AUG_SUCCESS;
-            } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
+            state_.reset(new state());
         }
 
         aug_result
-        runapp_() AUG_NOTHROW
+        runtask_() AUG_NOTHROW
         {
             try {
                 run();
@@ -430,13 +397,51 @@ namespace test {
             } AUG_SETERRINFOCATCH;
             return AUG_FAILERROR;
         }
+    };
 
-        void
-        termapp_() AUG_NOTHROW
-        {
-            aug_ctxinfo(aug_tlx, "terminating daemon process");
-            state_.reset();
+    const char*
+    getopt_(int opt) AUG_NOTHROW
+    {
+        switch (opt) {
+        case AUG_OPTEMAIL:
+            return "Mark Aylett <mark.aylett@gmail.com>";
+        case AUG_OPTLONGNAME:
+            return "Multiplexer Daemon";
+        case AUG_OPTPIDFILE:
+            return pidfile_;
+        case AUG_OPTPROGRAM:
+            return program_;
+        case AUG_OPTSHORTNAME:
+            return "muxerd";
         }
+        return 0;
+    }
+
+    aug_result
+    readconf_(const char* conffile, aug_bool batch,
+                 aug_bool daemon) AUG_NOTHROW
+    {
+        try {
+            test::readconf(conffile, batch, daemon);
+            return AUG_SUCCESS;
+        } AUG_SETERRINFOCATCH;
+        return AUG_FAILERROR;
+    }
+
+    aug_task*
+    create_() AUG_NOTHROW
+    {
+        try {
+            setservlogger("aug");
+            return retget(impl::attach(new impl()));
+        } AUG_SETERRINFOCATCH;
+        return 0;
+    }
+
+    const aug_serv serv_ = {
+        getopt_,
+        readconf_,
+        create_
     };
 }
 
@@ -449,11 +454,10 @@ main(int argc, char* argv[])
         autobasictlx();
         setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
-        appptr serv(service::attach(new service()));
         program_ = argv[0];
 
         blocksignals();
-        return main(argc, argv, serv);
+        return main(argc, argv, serv_);
 
     } catch (const exception& e) {
         cerr << e.what() << endl;

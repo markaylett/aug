@@ -71,7 +71,7 @@ send_(int fd, pid_t pid, int event)
 }
 
 AUGSERV_API aug_result
-aug_start(void)
+aug_start(const struct aug_options* options)
 {
     aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                    AUG_MSG("aug_start() not supported"));
@@ -79,12 +79,15 @@ aug_start(void)
 }
 
 AUGSERV_API aug_result
-aug_control(int event)
+aug_control(const struct aug_options* options, int event)
 {
     const char* pidfile;
     struct flock fl;
     int fd;
     aug_result result;
+
+    aug_verify(aug_readservconf(AUG_CONFFILE(options), options->batch_,
+                                AUG_TRUE));
 
     if (!(pidfile = aug_getservopt(AUG_OPTPIDFILE))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
@@ -148,13 +151,13 @@ aug_control(int event)
 }
 
 AUGSERV_API aug_result
-aug_install(void)
+aug_install(const struct aug_options* options)
 {
     return AUG_SUCCESS;
 }
 
 AUGSERV_API aug_result
-aug_uninstall(void)
+aug_uninstall(const struct aug_options* options)
 {
     return AUG_SUCCESS;
 }

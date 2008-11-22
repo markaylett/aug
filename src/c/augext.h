@@ -10,7 +10,6 @@
  * Extension interface library.
  */
 
-#include "augext/app.h"
 #include "augext/blob.h"
 #include "augext/boxint.h"
 #include "augext/boxptr.h"
@@ -27,6 +26,7 @@
 #include "augext/rpc.h"
 #include "augext/seq.h"
 #include "augext/stream.h"
+#include "augext/task.h"
 #include "augext/var.h"
 
 #endif /* AUGEXT_H */

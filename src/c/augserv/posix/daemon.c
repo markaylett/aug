@@ -185,10 +185,17 @@ closein_(void)
 }
 
 AUGSERV_API aug_result
-aug_daemonise(void)
+aug_daemonise(const struct aug_options* options)
 {
     const char* pidfile;
     aug_result result;
+
+    /* Install daemon logger prior to opening log file. */
+
+    aug_setlog(aug_tlx, aug_getdaemonlog());
+
+    aug_verify(aug_readservconf(AUG_CONFFILE(options), options->batch_,
+                                AUG_TRUE));
 
     if (!(pidfile = aug_getservopt(AUG_OPTPIDFILE))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,

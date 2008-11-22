@@ -4,11 +4,12 @@
 #ifndef AUGSERV_TYPES_H
 #define AUGSERV_TYPES_H
 
+#include "augext/task.h"
+
 enum aug_option {
 
     /**
-     * The following options are required and must remain constant during the
-     * call to aug_main().
+     * The following options are required constants.
      */
 
     AUG_OPTLONGNAME = 1,
@@ -17,21 +18,21 @@ enum aug_option {
     AUG_OPTEMAIL,
 
     /**
-     * The remaining options must not change after aug_readservconf() has been
-     * called.
+     * Once aug_readservconf() has been called, the following options may also
+     * be requested.  Once requested, they should remain constant thereafter.
      */
-
-    /**
-     * Configuration file: optional (may be null).
-     */
-
-    AUG_OPTCONFFILE,
 
     /**
      * Pid file.
      */
 
     AUG_OPTPIDFILE
+};
+
+struct aug_serv {
+    const char* (*getopt_)(int);
+    aug_result (*readconf_)(const char*, aug_bool, aug_bool);
+    aug_task* (*create_)(void);
 };
 
 #endif /* AUGSERV_TYPES_H */

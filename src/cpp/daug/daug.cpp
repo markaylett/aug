@@ -31,7 +31,6 @@ AUG_RCSID("$Id$");
 #include <iomanip>
 #include <iostream>
 #include <map>
-#include <memory> // auto_ptr<>
 #include <sstream>
 
 #include <time.h>
@@ -57,37 +56,14 @@ namespace {
 
     const char* program_;
     cstring conffile_= "";
+    bool daemon_(false);
+
     cstring rundir_ = "";
     cstring logdir_ = "";
     options options_;
-    bool daemon_(false);
+    char frobpass_[AUG_MAXPASSWORD + 1] = "";
 
-    bool
-    withso_(const string& s)
-    {
-        string::size_type n(s.size());
-        return 3 < n
-            && '.' == s[n - 3]
-            && ('s' == s[n - 2] || 'S' == s[n - 2])
-            && ('o' == s[n - 1] || 'O' == s[n - 1]);
-    }
-
-    bool
-    withdll_(const string& s)
-    {
-        string::size_type n(s.size());
-        return 4 < n
-            && '.' == s[n - 4]
-            && ('d' == s[n - 3] || 'D' == s[n - 3])
-            && ('l' == s[n - 2] || 'L' == s[n - 2])
-            && ('l' == s[n - 1] || 'L' == s[n - 1]);
-    }
-
-    bool
-    withext_(const string& s)
-    {
-        return withso_(s) || withdll_(s);
-    }
+    typedef map<string, moduleptr> modules;
 
     void
     openlog_()
@@ -106,6 +82,15 @@ namespace {
         // Re-direct standard handles.
 
         openlog(makepath(logdir_, ss.str().c_str(), "log").c_str());
+    }
+
+    void
+    reopencb_(objectref ob, idref id, unsigned& ms)
+    {
+        // Called by timer when running as daemon.
+
+        AUG_CTXDEBUG2(aug_tlx, "re-opening log file");
+        openlog_();
     }
 
     void
@@ -150,13 +135,31 @@ namespace {
         aug_ctxinfo(aug_tlx, "rundir=[%s]", rundir_);
     }
 
-    void
-    reopencb_(objectref ob, idref id, unsigned& ms)
+    bool
+    withso_(const string& s)
     {
-        // Called by timer when running as daemon.
+        string::size_type n(s.size());
+        return 3 < n
+            && '.' == s[n - 3]
+            && ('s' == s[n - 2] || 'S' == s[n - 2])
+            && ('o' == s[n - 1] || 'O' == s[n - 1]);
+    }
 
-        AUG_CTXDEBUG2(aug_tlx, "re-opening log file");
-        openlog_();
+    bool
+    withdll_(const string& s)
+    {
+        string::size_type n(s.size());
+        return 4 < n
+            && '.' == s[n - 4]
+            && ('d' == s[n - 3] || 'D' == s[n - 3])
+            && ('l' == s[n - 2] || 'L' == s[n - 2])
+            && ('l' == s[n - 1] || 'L' == s[n - 1]);
+    }
+
+    bool
+    withext_(const string& s)
+    {
+        return withso_(s) || withdll_(s);
     }
 
     class enginecb : public enginecb_base {
@@ -173,10 +176,13 @@ namespace {
 
     } enginecb_;
 
-    typedef map<string, moduleptr> modules;
+    struct impl;
+    impl* impl_ = 0;
 
-    struct state : mpool_ops {
+    void
+    load_();
 
+    struct impl : task_base<impl>, mpool_ops {
         modules modules_;
 #if ENABLE_SSL
         sslctxs sslctxs_;
@@ -184,19 +190,68 @@ namespace {
         timers timers_;
         engine engine_;
 
+        ~impl() AUG_NOTHROW
+        {
+            AUG_CTXDEBUG2(aug_tlx, "terminating daemon process");
+
+            // Clear services first.
+
+            engine_.clear();
+
+            // Modules must be kept alive until remaining connections and
+            // timers have been destroyed: a destroy_() function may depend on
+            // a function implemented in a module.
+
+            impl_ = 0;
+        }
+
         explicit
-        state(char* frobpass)
+        impl(char* frobpass)
             : timers_(getmpool(aug_tlx)),
               engine_(aug_eventrd(), aug_eventwr(), timers_, enginecb_)
         {
+            AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
+
+            // Assign state so that it is visible to callbacks during load_().
+
+            impl_ = this;
+
+            try {
 #if ENABLE_SSL
-            initssl();
-            createsslctxs(sslctxs_, options_, frobpass);
+                initssl();
+                createsslctxs(sslctxs_, options_, frobpass);
 #endif // ENABLE_SSL
+                load_();
+            } catch (...) {
+                engine_.clear();
+                impl_ = 0;
+                throw;
+            }
+        }
+
+        aug_result
+        runtask_() AUG_NOTHROW
+        {
+            try {
+
+                if (daemon_) {
+
+                    // Only set re-open timer when running as daemon.
+
+                    timer t(timers_);
+                    t.set(60000, timercb<reopencb_>, null);
+
+                    engine_.run(false); // Not stop on error.
+
+                } else
+                    engine_.run(true);  // Stop on error.
+
+                return AUG_SUCCESS;
+
+            } AUG_SETERRINFOCATCH;
+            return AUG_FAILERROR;
         }
     };
-
-    auto_ptr<state> state_;
 
     // Thread-safe.
 
@@ -236,7 +291,7 @@ namespace {
     {
         AUG_CTXDEBUG2(aug_tlx, "reconfall()");
         try {
-            state_->engine_.reconfall();
+            impl_->engine_.reconfall();
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -250,7 +305,7 @@ namespace {
     {
         AUG_CTXDEBUG2(aug_tlx, "stopall()");
         try {
-            state_->engine_.stopall();
+            impl_->engine_.stopall();
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -266,7 +321,7 @@ namespace {
         AUG_CTXDEBUG2(aug_tlx, "post(): sname=[%s], to=[%s], type=[%s]",
                       sname, to, type);
         try {
-            state_->engine_.post(sname, to, type, ob);
+            impl_->engine_.post(sname, to, type, ob);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -280,7 +335,7 @@ namespace {
         AUG_CTXDEBUG2(aug_tlx, "dispatch(): sname=[%s], to=[%s], type=[%s]",
                       sname, to, type);
         try {
-            state_->engine_.dispatch(sname, to, type, ob);
+            impl_->engine_.dispatch(sname, to, type, ob);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -324,7 +379,7 @@ namespace {
     {
         AUG_CTXDEBUG2(aug_tlx, "shutdown(): id=[%u], flags=[%u]", cid, flags);
         try {
-            state_->engine_.shutdown(cid, flags);
+            impl_->engine_.shutdown(cid, flags);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -343,14 +398,14 @@ namespace {
             sslctx* ptr(0);
 #if ENABLE_SSL
             if (ctx) {
-                sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
-                if (it == state_->sslctxs_.end())
+                sslctxs::const_iterator it(impl_->sslctxs_.find(ctx));
+                if (it == impl_->sslctxs_.end())
                     throw daug_error(__FILE__, __LINE__, ESSLCTX,
                                      "SSL context [%s] not initialised", ctx);
                 ptr = it->second.get();
             }
 #endif // ENABLE_SSL
-            return (int)state_->engine_
+            return (int)impl_->engine_
                 .tcpconnect(sname, host, port, ptr, user);
 
         } AUG_SETERRINFOCATCH;
@@ -369,8 +424,8 @@ namespace {
             sslctx* ptr(0);
 #if ENABLE_SSL
             if (ctx) {
-                sslctxs::const_iterator it(state_->sslctxs_.find(ctx));
-                if (it == state_->sslctxs_.end())
+                sslctxs::const_iterator it(impl_->sslctxs_.find(ctx));
+                if (it == impl_->sslctxs_.end())
                     throw daug_error(__FILE__, __LINE__, ESSLCTX,
                                      "SSL context [%s] not initialised", ctx);
                 ptr = it->second.get();
@@ -379,7 +434,7 @@ namespace {
 
             // TODO: temporarily regain root privileges.
 
-            return (int)state_->engine_
+            return (int)impl_->engine_
                 .tcplisten(sname, host, port, ptr, user);
 
         } AUG_SETERRINFOCATCH;
@@ -391,7 +446,7 @@ namespace {
     {
         AUG_CTXDEBUG2(aug_tlx, "send(): id=[%u]", cid);
         try {
-            state_->engine_.send(cid, buf, len);
+            impl_->engine_.send(cid, buf, len);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -403,7 +458,7 @@ namespace {
     {
         AUG_CTXDEBUG2(aug_tlx, "sendv(): id=[%u]", cid);
         try {
-            state_->engine_.sendv(cid, blob);
+            impl_->engine_.sendv(cid, blob);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -416,7 +471,7 @@ namespace {
         AUG_CTXDEBUG2(aug_tlx, "setrwtimer(): id=[%u], ms=[%u], flags=[%x]",
                       cid, ms, flags);
         try {
-            state_->engine_.setrwtimer(cid, ms, flags);
+            impl_->engine_.setrwtimer(cid, ms, flags);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -429,7 +484,7 @@ namespace {
         AUG_CTXDEBUG2(aug_tlx, "resetrwtimer(): id=[%u], ms=[%u], flags=[%x]",
                       cid, ms, flags);
         try {
-            return state_->engine_.resetrwtimer(cid, ms, flags)
+            return impl_->engine_.resetrwtimer(cid, ms, flags)
                 ? MOD_SUCCESS : MOD_FAILNONE;
 
         } AUG_SETERRINFOCATCH;
@@ -442,7 +497,7 @@ namespace {
         AUG_CTXDEBUG2(aug_tlx, "cancelrwtimer(): id=[%u], flags=[%x]",
                       cid, flags);
         try {
-            return state_->engine_.cancelrwtimer(cid, flags)
+            return impl_->engine_.cancelrwtimer(cid, flags)
                 ? MOD_SUCCESS : MOD_FAILNONE;
 
         } AUG_SETERRINFOCATCH;
@@ -455,7 +510,7 @@ namespace {
         const char* sname = getsession()->name_;
         AUG_CTXDEBUG2(aug_tlx, "settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
-            return (int)state_->engine_.settimer(sname, ms, ob);
+            return (int)impl_->engine_.settimer(sname, ms, ob);
 
         } AUG_SETERRINFOCATCH;
         return MOD_FAILERROR;
@@ -466,7 +521,7 @@ namespace {
     {
         AUG_CTXDEBUG2(aug_tlx, "resettimer(): id=[%u], ms=[%u]", tid, ms);
         try {
-            return state_->engine_.resettimer(tid, ms)
+            return impl_->engine_.resettimer(tid, ms)
                 ? MOD_SUCCESS : MOD_FAILNONE;
 
         } AUG_SETERRINFOCATCH;
@@ -478,7 +533,7 @@ namespace {
     {
         AUG_CTXDEBUG2(aug_tlx, "canceltimer(): id=[%u]", tid);
         try {
-            return state_->engine_.canceltimer(tid)
+            return impl_->engine_.canceltimer(tid)
                 ? MOD_SUCCESS : MOD_FAILNONE;
 
         } AUG_SETERRINFOCATCH;
@@ -543,8 +598,8 @@ namespace {
                 const string base(string("session.").append(name));
                 value = options_.get(base + ".module");
 
-                modules::iterator it(state_->modules_.find(value));
-                if (it == state_->modules_.end()) {
+                modules::iterator it(impl_->modules_.find(value));
+                if (it == impl_->modules_.end()) {
 
                     // Module does not yet exist, so load now.
 
@@ -567,13 +622,13 @@ namespace {
                     aug::chdir(rundir_);
                     moduleptr module(new daug::module(value, path.c_str(),
                                                       host_, teardown_));
-                    it = state_->modules_
+                    it = impl_->modules_
                         .insert(make_pair(value, module)).first;
                 }
 
                 aug_ctxinfo(aug_tlx,
                             "creating session: name=[%s]", name.c_str());
-                state_->engine_.insert
+                impl_->engine_.insert
                     (name, sessionptr(new daug::session(it->second,
                                                         name.c_str())),
                      options_.get(base + ".groups", 0));
@@ -586,10 +641,10 @@ namespace {
             aug_ctxinfo(aug_tlx, "loading module: name=[%s]", DEFAULT_NAME);
             moduleptr module(new daug::module(DEFAULT_NAME, DEFAULT_MODULE,
                                               host_, teardown_));
-            state_->modules_[DEFAULT_NAME] = module;
+            impl_->modules_[DEFAULT_NAME] = module;
 
             aug_ctxinfo(aug_tlx, "creating session: name=[%s]", DEFAULT_NAME);
-            state_->engine_
+            impl_->engine_
                 .insert(DEFAULT_NAME,
                         sessionptr(new daug::session(module, DEFAULT_NAME)),
                         0);
@@ -600,156 +655,90 @@ namespace {
         // Sessions may create timers during start().  If start() subsequently
         // fails, these timers will need to be cancelled.
 
-        state_->engine_.cancelinactive();
+        impl_->engine_.cancelinactive();
     }
 
-    class service : public app_base<service> {
-        char frobpass_[AUG_MAXPASSWORD + 1];
-    public:
-        ~service() AUG_NOTHROW
-        {
+    const char*
+    getopt_(int opt) AUG_NOTHROW
+    {
+        switch (opt) {
+        case AUG_OPTEMAIL:
+            return PACKAGE_BUGREPORT;
+        case AUG_OPTLONGNAME:
+            return "aug application server";
+        case AUG_OPTPIDFILE:
+            return options_.get("pidfile", "daug.pid");
+        case AUG_OPTPROGRAM:
+            return program_;
+        case AUG_OPTSHORTNAME:
+            return "daug";
         }
-        service()
-        {
-            frobpass_[0] = '\0';
-        }
+        return 0;
+    }
 
-        const char*
-        getappopt_(int opt) AUG_NOTHROW
-        {
-            switch (opt) {
-            case AUG_OPTCONFFILE:
-                return *conffile_ ? conffile_ : 0;
-            case AUG_OPTEMAIL:
-                return PACKAGE_BUGREPORT;
-            case AUG_OPTLONGNAME:
-                return "aug application server";
-            case AUG_OPTPIDFILE:
-                return options_.get("pidfile", "daug.pid");
-            case AUG_OPTPROGRAM:
-                return program_;
-            case AUG_OPTSHORTNAME:
-                return "daug";
+    aug_result
+    readconf_(const char* conffile, aug_bool batch,
+              aug_bool daemon) AUG_NOTHROW
+    {
+        try {
+
+            // The conffile is optional, if specified it will be an absolute
+            // path.
+
+            if (conffile) {
+
+                AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]",
+                              conffile);
+                options_.read(conffile);
+
+                // Store the absolute path to service any reconf requests.
+
+                aug_strlcpy(conffile_, conffile, sizeof(conffile_));
             }
-            return 0;
-        }
 
-        aug_result
-        readappconf_(const char* conffile, aug_bool batch,
-                     aug_bool daemon) AUG_NOTHROW
-        {
-            try {
+            // Remember if daemonising or not.
 
-                // The conffile is optional, if specified it will be an
-                // absolute path.
+            daemon_ = daemon;
 
-                if (conffile) {
+            // Once set, the run directory should not change.
 
-                    AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]",
-                                  conffile);
-                    options_.read(conffile);
+            const char* rundir(options_.get("rundir", 0));
+            realpath(rundir_, rundir ? rundir : getcwd().c_str(),
+                     sizeof(rundir_));
 
-                    // Store the absolute path to service any reconf requests.
-
-                    aug_strlcpy(conffile_, conffile, sizeof(conffile_));
-                }
-
-                // Remember if daemonising or not.
-
-                daemon_ = daemon;
-
-                // Once set, the run directory should not change.
-
-                const char* rundir(options_.get("rundir", 0));
-                realpath(rundir_, rundir ? rundir : getcwd().c_str(),
-                         sizeof(rundir_));
-
-                reconf_();
+            reconf_();
 
 #if ENABLE_SSL
-                // Password must be collected before process is detached from
-                // controlling terminal.
+            // Password must be collected before process is detached from
+            // controlling terminal.
 
-                if (!batch && options_.get("ssl.contexts", 0)) {
-                    aug_getpass("Enter PEM pass phrase:", frobpass_,
-                                sizeof(frobpass_));
-                    aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
-                }
+            if (!batch && options_.get("ssl.contexts", 0)) {
+                aug_getpass("Enter PEM pass phrase:", frobpass_,
+                            sizeof(frobpass_));
+                aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
+            }
 #endif // ENABLE_SSL
 
-                return AUG_SUCCESS;
+            return AUG_SUCCESS;
 
-            } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
-        }
+        } AUG_SETERRINFOCATCH;
+        return AUG_FAILERROR;
+    }
 
-        aug_result
-        initapp_() AUG_NOTHROW
-        {
-            AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
+    aug_task*
+    create_() AUG_NOTHROW
+    {
+        try {
+            setservlogger("daug");
+            return retget(impl::attach(new impl(frobpass_)));
+        } AUG_SETERRINFOCATCH;
+        return 0;
+    }
 
-            auto_ptr<state> s;
-            try {
-
-                setservlogger("daug");
-
-                s.reset(new state(frobpass_));
-
-                // Assign state so that it is visible to callbacks during
-                // load_().
-
-                state_ = s;
-                load_();
-                return AUG_SUCCESS;
-
-            } AUG_SETERRINFOCATCH;
-
-            // Ownership back to local for cleanup.
-
-            s = state_;
-            s->engine_.clear();
-
-            return AUG_FAILERROR;
-        }
-
-        aug_result
-        runapp_() AUG_NOTHROW
-        {
-            try {
-
-                if (daemon_) {
-
-                    // Only set re-open timer when running as daemon.
-
-                    timer t(state_->timers_);
-                    t.set(60000, timercb<reopencb_>, null);
-
-                    state_->engine_.run(false); // Not stop on error.
-
-                } else
-                    state_->engine_.run(true);  // Stop on error.
-
-                return AUG_SUCCESS;
-
-            } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
-        }
-
-        void
-        termapp_() AUG_NOTHROW
-        {
-            AUG_CTXDEBUG2(aug_tlx, "terminating daemon process");
-
-            // Clear services first.
-
-            state_->engine_.clear();
-
-            // Modules must be kept alive until remaining connections and
-            // timers have been destroyed: a destroy_() function may depend on
-            // a function implemented in a module.
-
-            state_.reset();
-        }
+    const aug_serv serv_ = {
+        getopt_,
+        readconf_,
+        create_
     };
 }
 
@@ -769,11 +758,10 @@ main(int argc, char* argv[])
         aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
 
         try {
-            appptr serv(service::attach(new service()));
             program_ = argv[0];
 
             blocksignals();
-            return main(argc, argv, serv);
+            return main(argc, argv, serv_);
 
         } AUG_PERRINFOCATCH;
 
