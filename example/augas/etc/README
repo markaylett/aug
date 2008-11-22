@@ -1,0 +1,58 @@
+Country Name (2 letter code) [AU]:GB
+State or Province Name (full name) [Some-State]:Surrey
+Locality Name (eg, city) []:Camberley
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Dummy Company
+Organizational Unit Name (eg, section) []:IT
+Common Name (eg, YOUR name) []:CA Person
+Email Address []:ca@dummy
+
+country=[GB]
+state or province=[Surrey]
+organisation=[Dummy Company]
+organisational unit=[IT]
+
+CA.pl -newca
+
+Enter PEM pass phrase: test
+Common Name (eg, YOUR name) []:CA Person
+Email Address []:ca@dummy
+
+CA.pl -newreq
+
+Enter PEM pass phrase: test
+Common Name (eg, YOUR name) []:Server System
+Email Address []:server@dummy
+
+CA.pl -sign
+
+mv newcert.pem servercert.pem
+mv newkey.pem serverkey.pem
+mv newreq.pem serverreq.pem
+
+CA.pl -newreq
+
+Enter PEM pass phrase: test
+Common Name (eg, YOUR name) []:Client System
+Email Address []:client@dummy
+
+CA.pl -sign
+
+mv newcert.pem clientcert.pem
+mv newkey.pem clientkey.pem
+mv newreq.pem clientreq.pem
+
+cp demoCA/cacert.pem ./
+
+Export EFS keys and convert to pem:
+
+$ cipher /x cert.pfx
+$ openssl pkcs12 –in cert.pfx –nocerts –out clientkey.pem
+$ openssl pkcs12 –in cert.pfx –clcerts –nokeys –out clientcert.pem
+
+Export IE certs interactively:
+
+$ certmgr
+
+Or from the command line:
+
+$ certmgr -put -c -s my cert.cer
