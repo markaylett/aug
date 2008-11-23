@@ -19,7 +19,6 @@ enum aug_command {
     AUG_CMDSTART,
     AUG_CMDSTATUS,
     AUG_CMDSTOP,
-    AUG_CMDTEST,
     AUG_CMDUNINSTALL
 };
 
