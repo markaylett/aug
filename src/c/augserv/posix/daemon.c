@@ -94,7 +94,7 @@ writepid_(int fd)
 
     /* Resulting buffer will _not_ be null terminated. */
 
-    if (len != (snprintf(str, len, "%ld\n", (long)pid))) {
+    if (len != (snprintf(str, len + 1, "%ld\n", (long)pid))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EFORMAT,
                        AUG_MSG("pid formatting failed"));
         return AUG_FAILERROR;
