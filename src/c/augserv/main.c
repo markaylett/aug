@@ -161,9 +161,6 @@ aug_main(int argc, char* argv[], const struct aug_serv* serv)
         aug_ctxinfo(aug_tlx, "stopping daemon process");
         control_(&options, AUG_EVENTSTOP);
         break;
-    case AUG_CMDTEST:
-        foreground_(&options);
-        break;
     case AUG_CMDUNINSTALL:
         aug_ctxinfo(aug_tlx, "uninstalling daemon process");
         uninstall_(&options);

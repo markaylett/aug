@@ -47,7 +47,6 @@ usage_(void)
              "  start      start daemon\n"
              "  status     obtain daemon's status\n"
              "  stop       stop daemon\n"
-             "  test       run interactively\n"
              "  uninstall  uninstall program\n");
 
     if (email)
@@ -79,9 +78,6 @@ tocommand_(const char* s)
         if (0 == aug_strcasecmp(s + 1, "top"))
             return AUG_MKRESULT(AUG_CMDSTOP);
         break;
-    case 't':
-        if (0 == aug_strcasecmp(s + 1, "est"))
-            return AUG_MKRESULT(AUG_CMDTEST);
     case 'u':
         if (0 == aug_strcasecmp(s + 1, "ninstall"))
             return AUG_MKRESULT(AUG_CMDUNINSTALL);
