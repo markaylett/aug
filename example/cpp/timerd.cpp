@@ -231,7 +231,7 @@ namespace test {
                 aug_strlcpy(conffile_, conffile, sizeof(conffile_));
             }
 
-            daemon_ = daemon;
+            daemon_ = daemon ? true : false;;
 
             // Use working directory as default.
 

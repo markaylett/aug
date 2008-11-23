@@ -698,7 +698,7 @@ namespace {
 
             // Remember if daemonising or not.
 
-            daemon_ = daemon;
+            daemon_ = daemon ? true : false;
 
             // Once set, the run directory should not change.
 
