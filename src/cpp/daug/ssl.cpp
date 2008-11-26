@@ -184,7 +184,7 @@ daug::createsslctx(const string& name, const options& options,
     int depth(atoi(options.get(s + ".depth", "1")));
     int verify(atoi(options.get(s + ".verify", "1")));
 
-    sslctxptr ptr(new sslctx());
+    sslctxptr ptr(new (tlx) sslctx());
     SSL_CTX* ctx(ptr->get());
 
     // Load keys and certificates.

@@ -49,7 +49,7 @@ namespace {
         return s.erase(s.size() - 1);
     }
 
-    struct command : basic_session {
+    struct command : basic_session, mpool_ops {
 
         bool
         do_start(const char* sname)
@@ -65,7 +65,7 @@ namespace {
         bool
         do_accepted(handle& sock, const char* name)
         {
-            sock.setuser(new shellparser(getmpool(aug_tlx)));
+            sock.setuser(new (tlx) shellparser(getmpool(aug_tlx)));
             send(sock, "HELLO\r\n", 7);
             setrwtimer(sock, 15000, MOD_TIMRD);
             return true;
@@ -96,10 +96,14 @@ namespace {
             shutdown(sock, 0);
         }
 
+        ~command() MOD_NOTHROW
+        {
+        }
+
         static session_base*
         create(const char* sname)
         {
-            return 0 == strcmp(sname, "command") ? new command() : 0;
+            return 0 == strcmp(sname, "command") ? new (tlx) command() : 0;
         }
     };
 

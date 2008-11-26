@@ -15,7 +15,7 @@
 namespace aug {
 
     namespace detail {
-        class vecblob {
+        class vecblob : public mpool_ops {
             blob<vecblob> blob_;
             std::vector<char> vec_;
             size_t size_;
@@ -88,7 +88,7 @@ namespace aug {
         };
     }
 
-    class buffer {
+    class buffer : public mpool_ops {
         writer writer_;
         detail::vecblob blob_;
         bool reuse_;

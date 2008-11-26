@@ -10,7 +10,7 @@
 
 namespace daug {
 
-    class session : public aug::session_base {
+    class session : public aug::session_base, public aug::mpool_ops {
 
         moduleptr module_;
         mod_session session_;

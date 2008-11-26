@@ -21,7 +21,7 @@ namespace {
 
     const char MSG[] = "hello, world!\r\n";
 
-    struct helloblob {
+    struct helloblob : aug::mpool_ops {
         static const void*
         getblobdata_(size_t* size) AUG_NOTHROW
         {
@@ -75,7 +75,7 @@ namespace {
             os << it->first << ' ' << it->second * 1000.0 << endl;
     }
 
-    struct state {
+    struct state : aug::mpool_ops {
         string tok_;
         unsigned tosend_, torecv_;
         vector<double> secs_;
@@ -87,7 +87,7 @@ namespace {
         }
     };
 
-    struct eachline {
+    struct eachline : aug::mpool_ops {
         void (*fn_)(handle&);
         handle sock_;
         aug::hires* hires_;
@@ -113,7 +113,7 @@ namespace {
         }
     };
 
-    struct bench : basic_session {
+    struct bench : basic_session, aug::mpool_ops {
         void (*send_)(handle&);
         unsigned conns_, estab_, echos_;
         size_t bytes_;
@@ -151,7 +151,7 @@ namespace {
             mod_writelog(MOD_LOGINFO, "echos: %d", echos_);
 
             for (; estab_ < conns_; ++estab_)
-                tcpconnect(host, serv, sslctx, new state(echos_));
+                tcpconnect(host, serv, sslctx, new (aug::tlx) state(echos_));
             return true;
         }
         void
@@ -222,7 +222,7 @@ namespace {
         static session_base*
         create(const char* sname)
         {
-            return new bench();
+            return new (aug::tlx) bench();
         }
     };
 

@@ -8,7 +8,7 @@
 
 namespace aug {
 
-    class header {
+    class header : public mpool_ops {
     public:
         typedef aug::const_iterator const_iterator;
         typedef aug::const_reverse_iterator const_reverse_iterator;

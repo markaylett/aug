@@ -46,7 +46,7 @@ namespace aug {
         } AUG_SETERRINFOCATCH;
     }
 
-    class timers {
+    class timers : public mpool_ops {
 
         aug_timers_t timers_;
 
@@ -168,7 +168,7 @@ namespace aug {
                                   &next));
     }
 
-    class timer {
+    class timer : public mpool_ops {
 
         aug_timers_t timers_;
         idref ref_;

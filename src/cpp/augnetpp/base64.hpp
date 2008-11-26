@@ -49,7 +49,7 @@ namespace aug {
         return AUG_FAILERROR;
     }
 
-    class base64 {
+    class base64 : public mpool_ops {
 
         aug_base64_t base64_;
 

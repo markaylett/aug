@@ -104,7 +104,7 @@ namespace test {
         reconf();
     }
 
-    class buffer {
+    class buffer : public mpool_ops {
         vector<char> vec_;
         size_t begin_, end_;
     public:
@@ -153,7 +153,7 @@ namespace test {
         }
     };
 
-    struct session {
+    struct session : mpool_ops {
 
         chanptr chan_;
         timer timer_;
@@ -256,7 +256,7 @@ namespace test {
         {
             aug_ctxinfo(aug_tlx, "inserting connection");
             sessions_.insert(make_pair(getchanid(chan), sessionptr
-                                       (new session(chan, timers_))));
+                                       (new (tlx) session(chan, timers_))));
             return AUG_TRUE;
         }
         aug_bool
@@ -385,7 +385,7 @@ namespace test {
         impl()
         {
             aug_ctxinfo(aug_tlx, "initialising daemon process");
-            state_.reset(new state());
+            state_.reset(new (tlx) state());
         }
 
         aug_result
@@ -433,7 +433,7 @@ namespace test {
     {
         try {
             setservlogger("aug");
-            return retget(impl::attach(new impl()));
+            return retget(impl::attach(new (tlx) impl()));
         } AUG_SETERRINFOCATCH;
         return 0;
     }

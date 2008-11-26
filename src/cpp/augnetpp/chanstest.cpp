@@ -33,7 +33,7 @@ namespace {
     unsigned rd_, wr_;
     int recv_ = 0;
 
-    struct test {
+    struct test : mpool_ops {
 
         chanptr wrchan_;
 

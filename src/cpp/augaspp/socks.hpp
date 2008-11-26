@@ -14,7 +14,7 @@ namespace aug {
 
     class chans;
 
-    class socks {
+    class socks : public mpool_ops {
 
         typedef std::map<mod_id, sockptr, std::greater<mod_id> > container;
 

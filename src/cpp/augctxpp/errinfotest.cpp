@@ -9,7 +9,7 @@ using namespace aug;
 
 namespace {
 
-    class test : public ref_base {
+    class test : public ref_base, public mpool_ops {
         stream<test> stream_;
         err<test> err_;
         ~test() AUG_NOTHROW
@@ -41,7 +41,7 @@ namespace {
             return AUG_MKRESULT(size);
         }
         aug_rsize
-        readv_(const struct iovec* iov, int size) AUG_NOTHROW
+        readv_(const iovec* iov, int size) AUG_NOTHROW
         {
             return AUG_MKRESULT(size);
         }
@@ -51,12 +51,12 @@ namespace {
             return AUG_MKRESULT(size);
         }
         aug_rsize
-        writev_(const struct iovec* iov, int size) AUG_NOTHROW
+        writev_(const iovec* iov, int size) AUG_NOTHROW
         {
             return AUG_MKRESULT(size);
         }
         void
-        copyerrinfo_(struct aug_errinfo& dst) AUG_NOTHROW
+        copyerrinfo_(aug_errinfo& dst) AUG_NOTHROW
         {
             aug_seterrinfo(&dst, __FILE__, __LINE__, "aug", AUG_EASSERT,
                            "some error");
@@ -64,7 +64,7 @@ namespace {
         static smartob<aug_stream>
         create()
         {
-            test* ptr = new test();
+            test* ptr = new (tlx) test();
             return object_attach<aug_stream>(ptr->stream_);
         }
     };

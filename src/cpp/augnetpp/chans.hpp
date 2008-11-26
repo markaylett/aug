@@ -5,12 +5,13 @@
 #define AUGNETPP_CHANS_HPP
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augnet/chans.h"
 
 namespace aug {
 
-    class chans {
+    class chans : public mpool_ops {
 
         aug_chans_t chans_;
 

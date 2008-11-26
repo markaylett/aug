@@ -6,6 +6,8 @@
 
 #include "augsyspp/socket.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 namespace aug {
 
     inline aug_endpoint&
@@ -74,7 +76,7 @@ namespace aug {
         return ep.un_.all_.port_;
     }
 
-    class endpoint {
+    class endpoint : public mpool_ops {
     public:
         typedef aug_endpoint ctype;
     private:

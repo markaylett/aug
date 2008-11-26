@@ -5,12 +5,13 @@
 #define AUGNETPP_WRITER_HPP
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augnet/writer.h"
 
 namespace aug {
 
-    class writer {
+    class writer : public mpool_ops {
 
         aug_writer_t writer_;
 

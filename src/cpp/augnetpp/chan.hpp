@@ -21,7 +21,7 @@ namespace aug {
 
     inline chanptr
     createclient(mpoolref mpool, const char* host, const char* serv,
-                 aug_muxer_t muxer, struct ssl_ctx_st* sslctx = 0)
+                 aug_muxer_t muxer, ssl_ctx_st* sslctx = 0)
     {
         return object_attach<aug_chan>
             (verify(aug_createclient(mpool.get(), host, serv, muxer,
@@ -30,7 +30,7 @@ namespace aug {
 
     inline chanptr
     createserver(mpoolref mpool, aug_muxer_t muxer, sdref sd,
-                 struct ssl_ctx_st* sslctx = 0)
+                 ssl_ctx_st* sslctx = 0)
     {
         return object_attach<aug_chan>
             (verify(aug_createserver(mpool.get(), muxer, sd.get(), sslctx)));

@@ -37,7 +37,7 @@ namespace aug {
 
     inline aug_result
     perrinfo(ctxref ctx, const char* s,
-             const struct aug_errinfo& errinfo) AUG_NOTHROW
+             const aug_errinfo& errinfo) AUG_NOTHROW
     {
         return aug_perrinfo(ctx.get(), s, &errinfo);
     }

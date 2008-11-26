@@ -7,6 +7,7 @@
 #include "augsyspp/types.hpp"
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augsys/mmap.h"
 
@@ -30,7 +31,7 @@ namespace aug {
         return aug_mmapsize(&mm);
     }
 
-    class mmap {
+    class mmap : public mpool_ops {
     public:
         typedef aug_mmap ctype;
     private:

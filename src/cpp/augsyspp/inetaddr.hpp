@@ -6,6 +6,8 @@
 
 #include "augsyspp/socket.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 namespace aug {
 
     inline aug_inetaddr&
@@ -46,7 +48,7 @@ namespace aug {
         return addr.family_;
     }
 
-    class inetaddr {
+    class inetaddr : public mpool_ops {
     public:
         typedef aug_inetaddr ctype;
     private:

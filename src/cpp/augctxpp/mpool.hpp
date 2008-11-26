@@ -23,6 +23,8 @@ namespace aug {
         return object_attach<aug_mpool>(aug_createdlmalloc());
     }
 
+    const struct tlx_ { } tlx = tlx_();
+
     class mpool_ops {
     protected:
         ~mpool_ops()
@@ -30,14 +32,14 @@ namespace aug {
         }
     public:
 
-        // Normal overloads.
+        // Aug overloads.
 
 #if !defined(_MSC_VER)
         static void*
-        operator new(std::size_t size) throw(std::bad_alloc)
+        operator new(std::size_t size, const tlx_&) throw(std::bad_alloc)
 #else // _MSC_VER
         static void*
-        operator new(std::size_t size)
+        operator new(std::size_t size, const tlx_&)
 #endif // _MSC_VER
         {
             mpoolptr mpool(getmpool(aug_tlx));
@@ -58,14 +60,12 @@ namespace aug {
         static void*
         operator new(std::size_t size, const std::nothrow_t&) throw()
         {
-            mpoolptr mpool(getmpool(aug_tlx));
-            return aug_allocmem(mpool.get(), size);
+            return ::operator new(size, std::nothrow);
         }
         static void
         operator delete(void* ptr, const std::nothrow_t&) throw()
         {
-            mpoolptr mpool(getmpool(aug_tlx));
-            aug_freemem(mpool.get(), ptr);
+            ::operator delete(ptr, std::nothrow);
         }
 
         // Placement overloads.
@@ -81,14 +81,14 @@ namespace aug {
             ::operator delete(ptr, place);
         }
 
-        // Normal array overloads.
+        // Aug array overloads.
 
 #if !defined(_MSC_VER)
         static void*
-        operator new[](std::size_t size) throw(std::bad_alloc)
+        operator new[](std::size_t size, const tlx_&) throw(std::bad_alloc)
 #else // _MSC_VER
         static void*
-        operator new[](std::size_t size)
+        operator new[](std::size_t size, const tlx_&)
 #endif // _MSC_VER
         {
             mpoolptr mpool(getmpool(aug_tlx));
@@ -109,14 +109,12 @@ namespace aug {
         static void*
         operator new[](std::size_t size, const std::nothrow_t&) throw()
         {
-            mpoolptr mpool(getmpool(aug_tlx));
-            return aug_allocmem(mpool.get(), size);
+            return ::operator new[](size, std::nothrow);
         }
         static void
         operator delete[](void* ptr, const std::nothrow_t&) throw()
         {
-            mpoolptr mpool(getmpool(aug_tlx));
-            aug_freemem(mpool.get(), ptr);
+            ::operator delete[](ptr, std::nothrow);
         }
 
         // Placement array overloads.

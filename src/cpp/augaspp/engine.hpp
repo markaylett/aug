@@ -38,7 +38,7 @@ namespace aug {
         }
     };
 
-    class AUGASPP_API engine {
+    class AUGASPP_API engine : public mpool_ops {
 
         detail::engineimpl* const impl_;
 

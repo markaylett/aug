@@ -67,14 +67,14 @@ namespace mod {
     }
 
     inline void
-    post(const char* to, const char* type, struct aug_object_* ob)
+    post(const char* to, const char* type, aug_object_* ob)
     {
         if (mod_post(to, type, ob) < 0)
             throw error(mod_error());
     }
 
     inline void
-    dispatch(const char* to, const char* type, struct aug_object_* ob)
+    dispatch(const char* to, const char* type, aug_object_* ob)
     {
         if (mod_dispatch(to, type, ob) < 0)
             throw error(mod_error());
@@ -139,14 +139,14 @@ namespace mod {
     }
 
     inline void
-    sendv(mod_id cid, struct aug_blob_* blob)
+    sendv(mod_id cid, aug_blob_* blob)
     {
         if (mod_sendv(cid, blob) < 0)
             throw error(mod_error());
     }
 
     inline void
-    sendv(const mod_handle& conn, struct aug_blob_* blob)
+    sendv(const mod_handle& conn, aug_blob_* blob)
     {
         sendv(conn.id_, blob);
     }
@@ -201,7 +201,7 @@ namespace mod {
     }
 
     inline mod_id
-    settimer(unsigned ms, struct aug_object_* ob)
+    settimer(unsigned ms, aug_object_* ob)
     {
         int ret(mod_settimer(ms, ob));
         if (ret < 0)
@@ -288,8 +288,7 @@ namespace mod {
         do_reconf() = 0;
 
         virtual void
-        do_event(const char* from, const char* type,
-                 struct aug_object_* ob) = 0;
+        do_event(const char* from, const char* type, aug_object_* ob) = 0;
 
         virtual void
         do_closed(const handle& sock) = 0;
@@ -338,7 +337,7 @@ namespace mod {
             do_reconf();
         }
         void
-        event(const char* from, const char* type, struct aug_object_* ob)
+        event(const char* from, const char* type, aug_object_* ob)
         {
             do_event(from, type, ob);
         }
@@ -401,7 +400,7 @@ namespace mod {
             mod_writelog(MOD_LOGWARN, "do_reconf() not implemented");
         }
         void
-        do_event(const char* from, const char* type, struct aug_object_* ob)
+        do_event(const char* from, const char* type, aug_object_* ob)
         {
             mod_writelog(MOD_LOGWARN, "do_event() not implemented");
         }
@@ -536,8 +535,7 @@ namespace mod {
             } MOD_WRITELOGCATCH;
         }
         static void
-        event(const char* from, const char* type,
-              struct aug_object_* ob) MOD_NOTHROW
+        event(const char* from, const char* type, aug_object_* ob) MOD_NOTHROW
         {
             try {
                 getbase()->event(from, type, ob);

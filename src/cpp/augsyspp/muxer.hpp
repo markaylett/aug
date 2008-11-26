@@ -8,6 +8,7 @@
 #include "augsyspp/smartfd.hpp"
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augsys/muxer.h"
 
@@ -15,7 +16,7 @@
 
 namespace aug {
 
-    class muxer {
+    class muxer : public mpool_ops {
 
         aug_muxer_t muxer_;
 

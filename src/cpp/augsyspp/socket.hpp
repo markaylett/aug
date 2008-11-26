@@ -117,7 +117,7 @@ namespace aug {
     }
 
     inline size_t
-    readv(sdref ref, const struct iovec* iov, int size)
+    readv(sdref ref, const iovec* iov, int size)
     {
         return AUG_RESULT(verify(aug_sreadv(ref.get(), iov, size)));
     }
@@ -129,7 +129,7 @@ namespace aug {
     }
 
     inline size_t
-    writev(sdref ref, const struct iovec* iov, int size)
+    writev(sdref ref, const iovec* iov, int size)
     {
         return AUG_RESULT(verify(aug_swritev(ref.get(), iov, size)));
     }

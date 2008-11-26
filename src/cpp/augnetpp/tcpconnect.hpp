@@ -10,6 +10,7 @@
 #include "augsyspp/smartfd.hpp"
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augnet/tcpconnect.h"
 
@@ -17,7 +18,7 @@
 
 namespace aug {
 
-    class tcpconnect {
+    class tcpconnect : public mpool_ops {
 
         aug_tcpconnect_t conn_;
 

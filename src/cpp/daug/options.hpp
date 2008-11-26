@@ -9,9 +9,11 @@
 
 #include "augsyspp/config.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 namespace daug {
 
-    class options {
+    class options : public aug::mpool_ops {
         std::map<std::string, std::string> options_;
     public:
         ~options() AUG_NOTHROW;

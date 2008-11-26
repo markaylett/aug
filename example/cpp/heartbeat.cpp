@@ -471,7 +471,7 @@ namespace {
         return aug::sendto(ref, buf, sizeof(buf), 0, ep);
     }
 
-    class session {
+    class session : public mpool_ops {
         const char* const node_;
         sdref ref_;
         const endpoint& ep_;

@@ -31,6 +31,8 @@ using namespace std;
 
 namespace {
 
+    // Must not use mpool_ops.
+
     class msgevent : public ref_base {
         msg<msgevent> msg_;
         const string from_, to_, type_;
@@ -105,7 +107,7 @@ namespace aug {
         // Definition placed outside anonymous namespace to avoid compiler
         // warnings.
 
-        struct sessiontimer {
+        struct sessiontimer : mpool_ops {
             sessionptr session_;
             smartob<aug_object> ob_;
             sessiontimer(const sessionptr& session,
@@ -269,8 +271,9 @@ namespace aug {
                 AUG_CTXDEBUG2(aug_tlx, "accepting connection");
 
                 sockptr sock(socks_.get(parent));
-                connptr conn(new servconn(getmpool(aug_tlx), sock->session(),
-                                          user(*sock), timers_, id));
+                connptr conn(new (tlx) servconn(getmpool(aug_tlx),
+                                                sock->session(), user(*sock),
+                                                timers_, id));
                 scoped_insert si(socks_, conn);
 
                 // Connection has now been established.
@@ -438,7 +441,7 @@ engine::~engine() AUG_NOTHROW
 AUGASPP_API
 engine::engine(mdref eventrd, mdref eventwr, timers& timers,
                enginecb_base& cb)
-    : impl_(new detail::engineimpl(eventrd, eventwr, timers, cb))
+    : impl_(new (tlx) detail::engineimpl(eventrd, eventwr, timers, cb))
 {
 }
 
@@ -627,8 +630,8 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     mpoolptr mpool(getmpool(aug_tlx));
     chanptr chan(createclient(mpool, host, port, impl_->muxer_,
                               ctx ? ctx->get() : 0));
-    connptr conn(new clntconn(mpool, session, user, impl_->timers_,
-                              getchanid(chan)));
+    connptr conn(new (tlx) clntconn(mpool, session, user, impl_->timers_,
+                                    getchanid(chan)));
 
     impl_->socks_.insert(conn);
     insertchan(impl_->chans_, chan);
@@ -663,7 +666,7 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     // Prepare state.
 
     sessionptr session(impl_->sessions_.getbyname(sname));
-    listenerptr conn(new listener(session, user, getchanid(chan)));
+    listenerptr conn(new (tlx) listener(session, user, getchanid(chan)));
 
     impl_->socks_.insert(conn);
     insertchan(impl_->chans_, chan);

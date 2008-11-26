@@ -16,7 +16,7 @@
 
 namespace aug {
 
-    class AUGASPP_API session_base : public mpool_ops {
+    class AUGASPP_API session_base {
     public:
         typedef mod_session ctype;
     private:

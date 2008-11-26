@@ -74,7 +74,7 @@ namespace test {
 
     class impl : public task_base<impl>, public mpool_ops {
 
-        struct state {
+        struct state : mpool_ops {
             muxer muxer_;
             timers timers_;
             timer timer_;
@@ -178,7 +178,7 @@ namespace test {
         {
             aug_ctxinfo(aug_tlx, "initialising daemon process");
 
-            auto_ptr<state> ptr(new state());
+            auto_ptr<state> ptr(new (tlx) state());
             setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRDEX);
             state_ = ptr;
         }
@@ -250,7 +250,7 @@ namespace test {
     {
         try {
             setservlogger("aug");
-            return retget(impl::attach(new impl()));
+            return retget(impl::attach(new (tlx) impl()));
         } AUG_SETERRINFOCATCH;
         return 0;
     }

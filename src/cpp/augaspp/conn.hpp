@@ -108,7 +108,7 @@ namespace aug {
         return conn.state() < SHUTDOWN;
     }
 
-    class connimpl {
+    class connimpl : public mpool_ops {
 
         sessionptr session_;
         mod_handle& sock_;

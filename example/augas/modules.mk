@@ -31,6 +31,7 @@ modsched_OBJS = sched.o
 modsched_LIBS = augnet augutil augsys augctx
 
 modserver_OBJS = server.o
+modserver_LIBS = augctx
 
 all: all-aug
 

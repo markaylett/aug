@@ -6,11 +6,13 @@
 
 #include "augmarpp/mar.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 #include <iterator>
 
 namespace aug {
 
-    class const_iterator {
+    class const_iterator : public mpool_ops {
 
         friend unsigned
         toord(const const_iterator&);

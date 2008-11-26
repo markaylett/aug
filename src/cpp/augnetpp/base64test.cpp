@@ -30,7 +30,7 @@ namespace {
 
     typedef logic_error error;
 
-    struct test {
+    struct test : public mpool_ops {
         aug_result
         cb(const char* buf, size_t len)
         {

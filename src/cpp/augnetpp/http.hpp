@@ -7,12 +7,13 @@
 #include "augnetpp/config.hpp"
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augnet/http.h"
 
 namespace aug {
 
-    class httpparser {
+    class httpparser : public mpool_ops {
 
         aug_httpparser_t httpparser_;
 

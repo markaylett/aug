@@ -33,7 +33,7 @@ namespace {
         aug_unpacknetevent(&ev, buf);
     }
 
-    class netevent : aug_netevent {
+    class netevent : aug_netevent, public mpool_ops {
     public:
         netevent(const char* name, const char* addr, unsigned hbsec)
         {
@@ -71,7 +71,7 @@ namespace {
         }
     };
 
-    class session {
+    class session : public mpool_ops {
         const char* const name_;
         sdref ref_;
         const endpoint& ep_;

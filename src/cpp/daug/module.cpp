@@ -29,8 +29,7 @@ module::~module() AUG_NOTHROW
 }
 
 module::module(const string& name, const char* path,
-               const struct mod_host& host,
-               void (*teardown)(const mod_handle*))
+               const mod_host& host, void (*teardown)(const mod_handle*))
     : name_(name),
       lib_(getmpool(aug_tlx), path)
 {
@@ -42,7 +41,7 @@ module::module(const string& name, const char* path,
     // On success, mod_init() returns a table of function pointers.
 
     AUG_CTXDEBUG2(aug_tlx, "initialising module: name=[%s]", name_.c_str());
-    const struct mod_module* ptr(initfn(name_.c_str(), &host));
+    const mod_module* ptr(initfn(name_.c_str(), &host));
     if (!ptr)
         throw daug_error(__FILE__, __LINE__, EMODCALL, "mod_init() failed");
 

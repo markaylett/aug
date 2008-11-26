@@ -6,11 +6,13 @@
 
 #include "augutil/object.h"
 
+#include "augctxpp/mpool.hpp"
+
 #include <string>
 
 namespace aug {
 
-    struct simple_boxptr {
+    struct simple_boxptr : mpool_ops {
         void* p_;
         simple_boxptr(void* p)
             : p_(p)
@@ -23,7 +25,7 @@ namespace aug {
         }
     };
 
-    struct sblob {
+    struct sblob : mpool_ops {
         std::string s_;
         sblob(const std::string& s)
             : s_(s)

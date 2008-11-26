@@ -11,7 +11,7 @@
 
 namespace aug {
 
-    class shellparser {
+    class shellparser : public mpool_ops {
         lexer lexer_;
         std::deque<std::string> words_;
         bool

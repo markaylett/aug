@@ -7,12 +7,13 @@
 #include "augnetpp/config.hpp"
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augnet/mar.h"
 
 namespace aug {
 
-    class marparser {
+    class marparser : public mpool_ops {
 
         aug_marparser_t marparser_;
 

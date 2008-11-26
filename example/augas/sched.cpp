@@ -19,7 +19,7 @@ namespace {
 
     enum tmtz { TMLOCAL, TMUTC };
 
-    struct tmevent {
+    struct tmevent : mpool_ops {
         const mod_id id_;
         const string name_, spec_;
         const tmtz tz_;
@@ -89,7 +89,7 @@ namespace {
         string spec;
         while (is >> spec) {
 
-            tmeventptr ptr(new tmevent(name, spec, tz));
+            tmeventptr ptr(new (tlx) tmevent(name, spec, tz));
             if (aug_strtmspec(&ptr->tmspec_, spec.c_str()))
                 pushevent(q, now, ptr);
         }
@@ -155,7 +155,7 @@ namespace {
         return os;
     }
 
-    struct sched : basic_session {
+    struct sched : basic_session, mpool_ops {
         mod_id timer_;
         tmqueue queue_;
         void
@@ -223,7 +223,7 @@ namespace {
             timeval tv;
             gettimeofday(tv);
 
-            tmeventptr ptr(new tmevent(id, name, spec, tz));
+            tmeventptr ptr(new (tlx) tmevent(id, name, spec, tz));
             if (aug_strtmspec(&ptr->tmspec_, spec.c_str()))
                 pushevent(queue_, tv.tv_sec, ptr);
 
@@ -271,7 +271,7 @@ namespace {
             settimer(tv);
         }
         void
-        do_event(const char* from, const char* type, struct aug_object_* ob)
+        do_event(const char* from, const char* type, aug_object_* ob)
         {
             aug_ctxinfo(aug_tlx, "event [%s] triggered", type);
 
@@ -323,7 +323,7 @@ namespace {
         static session_base*
         create(const char* sname)
         {
-            return new sched();
+            return new (tlx) sched();
         }
     };
 

@@ -9,6 +9,7 @@
 #include "augsyspp/time.hpp"
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augutil/hires.h"
 
@@ -34,7 +35,7 @@ namespace aug {
         return elapsed(hires, secs);
     }
 
-    class hires {
+    class hires : public mpool_ops {
 
         aug_hires_t hires_;
 

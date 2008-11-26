@@ -30,7 +30,7 @@ namespace {
     const char STR2[] = STR2_;
     const unsigned STRLEN2(sizeof(STR2_) - 1);
 
-    const struct aug_field FIELDS[] = {
+    const aug_field FIELDS[] = {
         FIELD_("familyname", "Aylett"),
         FIELD_("givenname", "Mark"),
         FIELD_("gender", "Male")

@@ -16,5 +16,5 @@ module.augrb.path = $AUG_BUILDDIR/src/c/augrb/.libs/modaugrb
 module.augrb.rubypath = $AUG_SRCDIR/src/rb
 EOD
 
-$AUG_BUILDDIR/src/cpp/daug/daug -f tmp.$$ test
+$AUG_BUILDDIR/src/cpp/daug/daug -f tmp.$$
 rm -f tmp.$$

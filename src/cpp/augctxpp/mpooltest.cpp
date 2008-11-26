@@ -21,7 +21,8 @@ main(int argc, char* argv[])
 
         autobasictlx();
         for (int i(0); i < 1000; ++i)
-            delete new foobar();
+            delete new (tlx) foobar();
+        delete[] new (tlx) foobar[2];
         return 0;
 
     } AUG_PERRINFOCATCH;

@@ -18,5 +18,5 @@ module.augpy.path = $AUG_BUILDDIR/src/c/augpy/.libs/modaugpy
 module.augpy.pythonpath = $AUG_SRCDIR/src/py
 EOD
 
-$AUG_BUILDDIR/src/cpp/daug/daug -f tmp.$$ test
+$AUG_BUILDDIR/src/cpp/daug/daug -f tmp.$$
 rm -f tmp.$$

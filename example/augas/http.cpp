@@ -360,7 +360,7 @@ namespace {
         return u;
     }
 
-    class nodes {
+    class nodes : public mpool_ops {
         vector<string>* xs_;
     public:
         explicit
@@ -437,7 +437,7 @@ namespace {
         return type;
     }
 
-    class filecontent : public ref_base {
+    class filecontent : public ref_base, public mpool_ops {
         blob<filecontent> blob_;
         autofd sfd_;
         mmap mmap_;
@@ -473,7 +473,7 @@ namespace {
         static smartob<aug_blob>
         create(const char* path)
         {
-            filecontent* ptr = new filecontent(getmpool(aug_tlx), path);
+            filecontent* ptr = new (tlx) filecontent(getmpool(aug_tlx), path);
             return object_attach<aug_blob>(ptr->blob_);
         }
     };
@@ -551,7 +551,7 @@ namespace {
         send(id, message.str().c_str(), message.str().size());
     }
 
-    struct session : marpool_base<session> {
+    struct session : marpool_base<session>, mpool_ops {
         const string& realm_;
         mod_id id_;
         string sessid_;
@@ -712,13 +712,13 @@ namespace {
         {
             return AUG_SUCCESS;
         }
-        struct aug_mar_*
+        aug_mar_*
         getmar_(const char* initial) AUG_NOTHROW
         {
             return 0;
         }
         aug_result
-        putmar_(const char* initial, struct aug_mar_* mar) AUG_NOTHROW
+        putmar_(const char* initial, aug_mar_* mar) AUG_NOTHROW
         {
             try {
                 put(initial, mar);
@@ -728,7 +728,7 @@ namespace {
         }
     };
 
-    struct http : basic_session {
+    struct http : basic_session, mpool_ops {
 
         string realm_;
         bool
@@ -752,7 +752,7 @@ namespace {
             loadmimetypes();
         }
         void
-        do_event(const char* from, const char* type, struct aug_object_* ob)
+        do_event(const char* from, const char* type, aug_object_* ob)
         {
             smartob<aug_blob> blob(object_cast<aug_blob>(obptr(ob)));
             if (null != blob) {
@@ -776,10 +776,10 @@ namespace {
         bool
         do_accepted(handle& sock, const char* name)
         {
-            marpoolptr sess(session::attach(new session(realm_, sock.id(),
-                                                        name)));
-            auto_ptr<marparser> parser(new marparser(getmpool(aug_tlx),
-                                                     sess));
+            marpoolptr sess(session::attach(new (tlx) session
+                                            (realm_, sock.id(), name)));
+            auto_ptr<marparser> parser(new (tlx) marparser
+                                       (getmpool(aug_tlx), sess));
 
             sock.setuser(parser.get());
             setrwtimer(sock, 30000, MOD_TIMRD);
@@ -810,7 +810,7 @@ namespace {
         static session_base*
         create(const char* sname)
         {
-            return new http();
+            return new (tlx) http();
         }
     };
 

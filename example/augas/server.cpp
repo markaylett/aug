@@ -4,6 +4,8 @@
 #define MOD_BUILD
 #include "augmodpp.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 #include <map>
 
 namespace mod = aug::mod;
@@ -13,7 +15,7 @@ using namespace std;
 
 namespace {
 
-    struct eachline {
+    struct eachline : aug::mpool_ops {
         handle sock_;
         explicit
         eachline(const handle& sock)
@@ -31,7 +33,7 @@ namespace {
         }
     };
 
-    struct echo : basic_session {
+    struct echo : basic_session, aug::mpool_ops {
         bool
         do_start(const char* sname)
         {
@@ -92,7 +94,11 @@ namespace {
         static session_base*
         create(const char* sname)
         {
-            return new echo();
+            return new (aug::tlx) echo();
+        }
+
+        ~echo() MOD_NOTHROW
+        {
         }
     };
 

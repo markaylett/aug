@@ -12,7 +12,7 @@
 
 namespace aug {
 
-    class sessions {
+    class sessions : public mpool_ops {
 
         typedef std::multimap<std::string, sessionptr> groups;
 

@@ -8,6 +8,8 @@
 
 #include "augsyspp/types.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 #include "augsys/limits.h" // AUG_PATH_MAX
 
 #include "augctx/string.h" // aug_strlcpy
@@ -17,7 +19,7 @@
 namespace aug {
 
     template <typename file_policyT>
-    class swapfile {
+    class swapfile : public mpool_ops {
     public:
         typedef file_policyT file_policy_type;
 

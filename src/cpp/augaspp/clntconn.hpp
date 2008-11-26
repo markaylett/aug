@@ -9,7 +9,7 @@
 
 namespace aug {
 
-    class clntconn : public conn_base, public rwtimer_base {
+    class clntconn : public conn_base, public rwtimer_base, public mpool_ops {
 
         mod_handle sock_;
         aug::connimpl impl_;

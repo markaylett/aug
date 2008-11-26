@@ -29,7 +29,7 @@ namespace {
         }
     }
 
-    class server {
+    class server : public mpool_ops {
         chandler<server> chandler_;
         muxer muxer_;
         chans chans_;

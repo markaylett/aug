@@ -7,6 +7,7 @@
 #include "augutilpp/config.hpp"
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augutil/lexer.h"
 
@@ -15,7 +16,7 @@ namespace aug {
     const struct networds_ { } networds = networds_();
     const struct shellwords_ { } shellwords = shellwords_();
 
-    class lexer {
+    class lexer : public mpool_ops {
 
         aug_lexer_t lexer_;
 

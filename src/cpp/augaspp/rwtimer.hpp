@@ -12,7 +12,7 @@
 
 namespace aug {
 
-    class rwtimer_base : public mpool_ops {
+    class rwtimer_base {
 
         virtual void
         do_timercb(idref id, unsigned& ms) = 0;
@@ -62,7 +62,7 @@ namespace aug {
 
     typedef smartptr<rwtimer_base> rwtimerptr;
 
-    class rwtimer : public rwtimer_base {
+    class rwtimer : public rwtimer_base, public mpool_ops {
 
         sessionptr session_;
         const mod_handle& sock_;

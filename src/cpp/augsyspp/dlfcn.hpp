@@ -7,6 +7,8 @@
 #include "augctxpp/exception.hpp"
 #include "augctxpp/utility.hpp" // perrinfo()
 
+#include "augctxpp/mpool.hpp"
+
 #include "augnullpp.hpp"
 
 #include "augsys/dlfcn.h"
@@ -26,7 +28,7 @@ namespace aug {
         return (fnT)dlsym(dl, symbol);
     }
 
-    class dlib {
+    class dlib : public mpool_ops {
 
         aug_dlib_t dlib_;
 

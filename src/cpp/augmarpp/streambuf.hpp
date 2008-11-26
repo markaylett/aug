@@ -7,6 +7,8 @@
 #include "augmarpp/compat.hpp"
 #include "augmarpp/mar.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 #include "augctx/defs.h" // AUG_MAX
 
 #include <iostream>
@@ -42,7 +44,7 @@ namespace aug {
 
         template <typename charT,
                   typename char_traitsT = std::char_traits<charT> >
-        class buffer {
+        class buffer : public mpool_ops {
         public:
             typedef charT char_type;
 
@@ -134,7 +136,8 @@ namespace aug {
     template <typename charT,
               typename char_traitsT = std::char_traits<charT> >
     class basic_marstreambuf
-        : public std::basic_streambuf<charT, char_traitsT> {
+        : public std::basic_streambuf<charT, char_traitsT>,
+          public mpool_ops {
         typedef std::basic_streambuf<charT, char_traitsT> base_type;
     public:
         typedef charT char_type;

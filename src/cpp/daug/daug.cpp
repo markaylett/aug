@@ -162,7 +162,8 @@ namespace {
         return withso_(s) || withdll_(s);
     }
 
-    class enginecb : public enginecb_base {
+    class enginecb : public enginecb_base, public mpool_ops {
+
         void
         do_reconf()
         {
@@ -172,6 +173,11 @@ namespace {
                 options_.read(conffile_);
             }
             reconf_();
+        }
+
+    public:
+        ~enginecb() AUG_NOTHROW
+        {
         }
 
     } enginecb_;
@@ -620,8 +626,8 @@ namespace {
                     // intialisation.
 
                     aug::chdir(rundir_);
-                    moduleptr module(new daug::module(value, path.c_str(),
-                                                      host_, teardown_));
+                    moduleptr module(new (tlx) daug::module
+                                     (value, path.c_str(), host_, teardown_));
                     it = impl_->modules_
                         .insert(make_pair(value, module)).first;
                 }
@@ -629,8 +635,8 @@ namespace {
                 aug_ctxinfo(aug_tlx,
                             "creating session: name=[%s]", name.c_str());
                 impl_->engine_.insert
-                    (name, sessionptr(new daug::session(it->second,
-                                                        name.c_str())),
+                    (name, sessionptr(new (tlx) daug::session
+                                      (it->second, name.c_str())),
                      options_.get(base + ".groups", 0));
             }
 
@@ -639,15 +645,16 @@ namespace {
             // No session list: user reasonable defaults.
 
             aug_ctxinfo(aug_tlx, "loading module: name=[%s]", DEFAULT_NAME);
-            moduleptr module(new daug::module(DEFAULT_NAME, DEFAULT_MODULE,
-                                              host_, teardown_));
+            moduleptr module(new (tlx) daug::module
+                             (DEFAULT_NAME, DEFAULT_MODULE, host_,
+                              teardown_));
             impl_->modules_[DEFAULT_NAME] = module;
 
             aug_ctxinfo(aug_tlx, "creating session: name=[%s]", DEFAULT_NAME);
             impl_->engine_
                 .insert(DEFAULT_NAME,
-                        sessionptr(new daug::session(module, DEFAULT_NAME)),
-                        0);
+                        sessionptr(new (tlx) daug::session
+                                   (module, DEFAULT_NAME)), 0);
         }
 
         // A session is active once start() has returned true.
@@ -730,7 +737,7 @@ namespace {
     {
         try {
             setservlogger("daug");
-            return retget(impl::attach(new impl(frobpass_)));
+            return retget(impl::attach(new (tlx) impl(frobpass_)));
         } AUG_SETERRINFOCATCH;
         return 0;
     }
