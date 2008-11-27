@@ -108,7 +108,7 @@ main(int argc, char* argv[])
 {
     program_ = argv[0];
 
-    if (AUG_ISFAIL(aug_autobasictlx()))
+    if (!aug_autodltlx())
         return 1;
 
     return aug_main(argc, argv, &serv_);

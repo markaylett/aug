@@ -195,10 +195,9 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int loglevel)
 }
 
 AUGCTX_API aug_ctx*
-aug_createbasicctx(void)
+aug_createbasicctx(aug_mpool* mpool)
 {
     long tz;
-    aug_mpool* mpool;
     aug_clock* clock;
     aug_log* log;
     aug_ctx* ctx = NULL;
@@ -206,22 +205,17 @@ aug_createbasicctx(void)
     if (!aug_timezone(&tz))
         return NULL;
 
-    if (!(mpool = aug_createdlmalloc()))
+    if (!(clock = aug_createclock(mpool, tz)))
         return NULL;
 
-    if (!(clock = aug_createclock(mpool, tz)))
-        goto fail1;
-
-    if (!(log = aug_getstdlog()))
-        goto fail2;
+    if (!(log = aug_getstdlog())) {
+        aug_release(clock);
+        return NULL;
+    }
 
     ctx = aug_createctx(mpool, clock, log, aug_loglevel());
-
     aug_release(log);
- fail2:
     aug_release(clock);
- fail1:
-    aug_release(mpool);
     return ctx;
 }
 

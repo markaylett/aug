@@ -42,7 +42,7 @@ test(void)
 int
 main(int argc, char* argv[])
 {
-    if (AUG_ISFAIL(aug_autobasictlx()))
+    if (!aug_autodltlx())
         return 1;
     test();
     return 0;

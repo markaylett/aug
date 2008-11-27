@@ -16,7 +16,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        autobasictlx();
+        autodltlx();
 
         mpoolptr mp(getmpool(aug_tlx));
         endpoint ep(null);

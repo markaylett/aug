@@ -451,7 +451,7 @@ main(int argc, char* argv[])
     using namespace test;
 
     try {
-        autobasictlx();
+        autodltlx();
         setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
         program_ = argv[0];

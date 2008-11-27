@@ -51,7 +51,7 @@ static aug_log log_ = { &vtbl_, NULL };
 int
 main(int argc, char* argv[])
 {
-    if (AUG_ISFAIL(aug_autobasictlx()))
+    if (!aug_autodltlx())
         return 1;
 
     aug_setlog(aug_tlx, &log_);

@@ -76,7 +76,7 @@ main(int argc, char* argv[])
     aug_stream* in;
     int i;
 
-    if (AUG_ISFAIL(aug_autobasictlx()))
+    if (!(aug_autodltlx()))
         return 1;
 
     mpool = aug_getmpool(aug_tlx);

@@ -12,7 +12,7 @@ main(int argc, char* argv[])
     struct aug_field field;
     aug_mar_t mar;
 
-    if (AUG_ISFAIL(aug_autobasictlx()))
+    if (!aug_autodltlx())
         return 1;
 
     mpool = aug_getmpool(aug_tlx);

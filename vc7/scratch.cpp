@@ -8,7 +8,7 @@ main(int argc, char* argv[])
 {
     try {
 
-        autobasictlx();
+        autodltlx();
         return 0;
 
     } catch (const exception& e) {

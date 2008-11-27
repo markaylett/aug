@@ -25,10 +25,11 @@
  * A thread must ensure the thread-local context is set after calling
  * aug_init(), as many library functions will depend on it.
  *
- * @return Either @ref AUG_SUCCESS or @ref AUG_FAILERROR.
+ * @return Either @ref AUG_TRUE or @ref AUG_FALSE.  @ref TypesResult is not
+ * used because the error handler is not initialised at this point.
  */
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_init(void);
 
 /**
@@ -47,7 +48,7 @@ aug_init(void);
  * thread-local context is therefore unlikely to be available during execution
  * of these handlers.  If the handler exits the application, perhaps via an
  * abort(), then the atexit() handlers will be called from this thread, which
- * may include the atexit() handler installed by aug_autobasictlx().
+ * may include the atexit() handler installed by aug_autodltlx().
  */
 
 AUGCTX_API void
@@ -73,7 +74,7 @@ aug_settlx(aug_ctx* ctx);
  */
 
 AUGCTX_API aug_result
-aug_setbasictlx(void);
+aug_setbasictlx(aug_mpool* mpool);
 
 /**
  * Obtain reference to thread-local context.
@@ -112,15 +113,16 @@ AUGCTX_API struct aug_errinfo*
 aug_tlerr_(void);
 
 /**
- * Initialise with basic context.
+ * Initialise with Doug Lea context.
  *
- * Initialise and, if not set, set basic context using aug_setbasictlx().
+ * Initialise and, if not set, set Doug Lea context using aug_setbasictlx().
  *
- * @return See @ref TypesResult.
+ * @return Either @ref AUG_TRUE or @ref AUG_FALSE.  @ref TypesResult is not
+ * used because the error handler is not initialised at this point.
  */
 
-AUGCTX_API aug_result
-aug_initbasictlx(void);
+AUGCTX_API aug_bool
+aug_initdltlx(void);
 
 /**
  * Convenience wrapper for aug_init(), aug_createbasicctx() and aug_term().
@@ -128,10 +130,11 @@ aug_initbasictlx(void);
  * If one does not exist, a thread-local context is created using
  * aug_createbasicctx().  Library termination is scheduled using atexit().
  *
- * @return See @ref TypesResult.
+ * @return Either @ref AUG_TRUE or @ref AUG_FALSE.  @ref TypesResult is not
+ * used because the error handler is not initialised at this point.
  */
 
-AUGCTX_API aug_result
-aug_autobasictlx(void);
+AUGCTX_API aug_bool
+aug_autodltlx(void);
 
 #endif /* AUGCTX_BASE_H */

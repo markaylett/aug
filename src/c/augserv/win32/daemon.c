@@ -94,8 +94,8 @@ service_(DWORD argc, char** argv)
 
     AUG_RMB();
 
-    if (AUG_ISFAIL(aug_initbasictlx())) {
-        fprintf(stderr, "aug_initerrinfo() failed\n");
+    if (!aug_initdltlx()) {
+        fprintf(stderr, "aug_initdltlx() failed\n");
         return;
     }
 

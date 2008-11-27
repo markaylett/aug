@@ -8,6 +8,7 @@
 AUG_RCSID("$Id$");
 
 #include "augctx/lock.h"
+#include "augctx/mpool.h"
 #include "augctx/tls_.h"
 
 #include <assert.h>
@@ -31,7 +32,7 @@ gettls_(void)
     return aug_gettlsvalue_(tlskey_);
 }
 
-static aug_result
+static aug_bool
 inittls_(void)
 {
     /* Lock held. */
@@ -41,7 +42,8 @@ inittls_(void)
 
         /* TLS key must be initialised on first call. */
 
-        aug_verify(aug_createtlskey_(&tlskey_));
+        if (!aug_createtlskey_(&tlskey_))
+            return AUG_FALSE;
 
         init_ = AUG_TRUE;
         goto skip;
@@ -52,14 +54,15 @@ inittls_(void)
         /* First call on this thread. */
 
         if (!(tls = malloc(sizeof(struct tls_))))
-            return AUG_FAILERROR;
+            return AUG_FALSE;
 
         tls->refs_ = 0;
         tls->ctx_ = NULL;
         aug_settlsvalue_(tlskey_, tls);
     }
+
     ++tls->refs_;
-    return AUG_SUCCESS;
+    return AUG_TRUE;
 }
 
 static void
@@ -114,16 +117,16 @@ termtls_(void)
 
 #endif /* !ENABLE_THREADS */
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_init(void)
 {
-    aug_result result = aug_initlock_();
-    if (!AUG_ISFAIL(result)) {
+    aug_bool ok = aug_initlock_();
+    if (ok) {
         aug_lock();
-        result = inittls_();
+        ok = inittls_();
         aug_unlock();
     }
-    return result;
+    return ok;
 }
 
 AUGCTX_API void
@@ -146,9 +149,9 @@ aug_settlx(aug_ctx* ctx)
 }
 
 AUGCTX_API aug_result
-aug_setbasictlx(void)
+aug_setbasictlx(aug_mpool* mpool)
 {
-    aug_ctx* ctx = aug_createbasicctx();
+    aug_ctx* ctx = aug_createbasicctx(mpool);
     if (!ctx)
         return AUG_FAILERROR;
     aug_settlx(ctx);
@@ -180,29 +183,43 @@ aug_tlerr_(void)
     return aug_geterrinfo(aug_tlx_());
 }
 
-AUGCTX_API aug_result
-aug_initbasictlx(void)
+AUGCTX_API aug_bool
+aug_initdltlx(void)
 {
-    aug_result result = aug_init();
-    if (AUG_ISFAIL(result))
-        goto done;
+    aug_bool ok = aug_init();
 
-    if (!aug_tlx) {
-        result = aug_setbasictlx();
-        if (AUG_ISFAIL(result)) {
-            aug_term();
-            goto done;
+    if (ok && !aug_tlx) {
+
+        /* aug_init() succeeded, but thread-local context needs to be
+           created. */
+
+        aug_mpool* mpool = aug_createdlmalloc();
+
+        if (mpool) {
+
+            ok = !AUG_ISFAIL(aug_setbasictlx(mpool))
+                ? AUG_TRUE : AUG_FALSE;
+            aug_release(mpool);
+
+        } else {
+
+            /* Failed to create mpool. */
+
+            ok = AUG_FALSE;
         }
+
+        if (!ok)
+            aug_term();
     }
- done:
-    return result;
+
+    return ok;
 }
 
-AUGCTX_API aug_result
-aug_autobasictlx(void)
+AUGCTX_API aug_bool
+aug_autodltlx(void)
 {
-    aug_result result = aug_initbasictlx();
-    if (!AUG_ISFAIL(result))
+    aug_bool ok = aug_initdltlx();
+    if (ok)
         atexit(aug_term);
-    return result;
+    return ok;
 }

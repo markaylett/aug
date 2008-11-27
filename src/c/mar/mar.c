@@ -385,7 +385,7 @@ main(int argc, char* argv[])
     const char* archivename = NULL;
     aug_opterr = 0;
 
-    if (AUG_ISFAIL(aug_autobasictlx()))
+    if (!aug_autodltlx())
         return 1;
 
     AUG_INITLEAKDUMP();

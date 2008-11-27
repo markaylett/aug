@@ -4,18 +4,20 @@
 #ifndef AUGCTXPP_BASE_HPP
 #define AUGCTXPP_BASE_HPP
 
+#include "augctxpp/exception.hpp"
+
 #include "augctx/base.h"
 
 #include <stdexcept>
 
 namespace aug {
 
-    const struct basictlx_ { } basictlx = basictlx_();
+    const struct dltlx_ { } dltlx = dltlx_();
 
     inline void
     init()
     {
-        if (AUG_ISFAIL(aug_init()))
+        if (!aug_init())
             throw std::runtime_error("aug_init() failed");
     }
     inline void
@@ -24,16 +26,21 @@ namespace aug {
         aug_term();
     }
     inline void
-    initbasictlx()
+    setbasictlx(mpoolref mpool)
     {
-        if (AUG_ISFAIL(aug_initbasictlx()))
-            throw std::runtime_error("aug_initbasictlx() failed");
+        verify(aug_setbasictlx(mpool.get()));
     }
     inline void
-    autobasictlx()
+    initdltlx()
     {
-        if (AUG_ISFAIL(aug_autobasictlx()))
-            throw std::runtime_error("aug_autobasictlx() failed");
+        if (!aug_initdltlx())
+            throw std::runtime_error("aug_initdltlx() failed");
+    }
+    inline void
+    autodltlx()
+    {
+        if (!aug_autodltlx())
+            throw std::runtime_error("aug_autodltlx() failed");
     }
 
     class scoped_init {
@@ -54,9 +61,9 @@ namespace aug {
             init();
         }
         explicit
-        scoped_init(const basictlx_&)
+        scoped_init(const dltlx_&)
         {
-            initbasictlx();
+            initdltlx();
         }
     };
 }

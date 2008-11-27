@@ -13,7 +13,7 @@ main(int argc, char* argv[])
     struct aug_netevent event;
     char buf[AUG_NETEVENT_SIZE];
 
-    if (AUG_ISFAIL(aug_autobasictlx()))
+    if (!aug_autodltlx())
         return 1;
 
     event.proto_ = 1;

@@ -12,7 +12,7 @@ AUGCTX_API aug_ctx*
 aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level);
 
 AUGCTX_API aug_ctx*
-aug_createbasicctx(void);
+aug_createbasicctx(aug_mpool* mpool);
 
 /**
  * @defgroup Logging Logging

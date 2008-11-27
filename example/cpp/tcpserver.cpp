@@ -180,7 +180,7 @@ main(int argc, char* argv[])
 {
     try {
 
-        autobasictlx();
+        autodltlx();
         setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
         if (argc < 3) {

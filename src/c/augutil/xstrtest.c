@@ -15,7 +15,7 @@ main(int argc, char* argv[])
     const char* s;
     int i;
 
-    if (AUG_ISFAIL(aug_autobasictlx()))
+    if (!aug_autodltlx())
         return 1;
 
     mp = aug_getmpool(aug_tlx);

@@ -17,7 +17,7 @@ main(int argc, char* argv[])
 
     try {
 
-        autobasictlx();
+        autodltlx();
 
         if (argc < 3) {
             aug_ctxerror(aug_tlx, "usage: tcpclient <host> <serv>");

@@ -26,7 +26,7 @@ typedef pthread_key_t aug_tlskey_t;
 typedef DWORD aug_tlskey_t;
 #endif /* _WIN32 */
 
-AUG_EXTERNC aug_result
+AUG_EXTERNC aug_bool
 aug_createtlskey_(aug_tlskey_t* tlskey);
 
 AUG_EXTERNC void

@@ -17,7 +17,7 @@ AUG_RCSID("$Id$");
 
 /* Single-threaded stubs. */
 
-AUG_EXTERNC aug_result
+AUG_EXTERNC aug_bool
 aug_initlock_(void)
 {
     return AUG_TRUE;
