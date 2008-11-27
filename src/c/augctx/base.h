@@ -48,7 +48,7 @@ aug_init(void);
  * thread-local context is therefore unlikely to be available during execution
  * of these handlers.  If the handler exits the application, perhaps via an
  * abort(), then the atexit() handlers will be called from this thread, which
- * may include the atexit() handler installed by aug_autodltlx().
+ * may include the atexit() handler installed by aug_autotlx().
  */
 
 AUGCTX_API void
@@ -122,7 +122,7 @@ aug_tlerr_(void);
  */
 
 AUGCTX_API aug_bool
-aug_initdltlx(void);
+aug_inittlx(void);
 
 /**
  * Convenience wrapper for aug_init(), aug_createbasicctx() and aug_term().
@@ -135,6 +135,6 @@ aug_initdltlx(void);
  */
 
 AUGCTX_API aug_bool
-aug_autodltlx(void);
+aug_autotlx(void);
 
 #endif /* AUGCTX_BASE_H */

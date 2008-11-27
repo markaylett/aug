@@ -269,7 +269,7 @@ main(int argc, char* argv[])
 
     try {
 
-        autodltlx();
+        autotlx();
 
         program_ = argv[0];
 

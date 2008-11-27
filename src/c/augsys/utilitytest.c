@@ -12,7 +12,7 @@ int
 main(int argc, char* argv[])
 {
     char buf[64];
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
 
     strcpy(buf, TEST_);

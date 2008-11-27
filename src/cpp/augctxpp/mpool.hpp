@@ -4,6 +4,8 @@
 #ifndef AUGCTXPP_MPOOL_HPP
 #define AUGCTXPP_MPOOL_HPP
 
+#include "augctxpp/types.hpp"
+
 #include "augctx/base.h"
 #include "augctx/mpool.h"
 
@@ -22,8 +24,6 @@ namespace aug {
     {
         return object_attach<aug_mpool>(aug_createdlmalloc());
     }
-
-    const struct tlx_ { } tlx = tlx_();
 
     class mpool_ops {
     protected:

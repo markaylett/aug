@@ -151,7 +151,7 @@ main(int argc, char* argv[])
 
     try {
 
-        autodltlx();
+        autotlx();
         aug_setlog(aug_tlx, aug_getdaemonlog());
 
         timeval tv;

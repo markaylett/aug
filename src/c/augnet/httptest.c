@@ -89,7 +89,7 @@ main(int argc, char* argv[])
     aug_mpool* mpool;
     aug_httpparser_t parser;
 
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
 
     mpool = aug_getmpool(aug_tlx);

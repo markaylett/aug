@@ -21,8 +21,8 @@ main(int argc, char* argv[])
     aug_term();
     aug_term();
 
-    if (!aug_autodltlx()) {
-        fprintf(stderr, "aug_autodltlx() failed\n");
+    if (!aug_autotlx()) {
+        fprintf(stderr, "aug_autotlx() failed\n");
         return 1;
     }
 

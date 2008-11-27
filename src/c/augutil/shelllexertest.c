@@ -33,7 +33,7 @@ main(int argc, char* argv[])
 {
     aug_mpool* mpool;
     char ch;
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
 
     mpool = aug_getmpool(aug_tlx);

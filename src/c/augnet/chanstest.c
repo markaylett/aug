@@ -322,7 +322,7 @@ main(int argc, char* argv[])
     aug_chan* chan3;
     aug_chans_t chans;
 
-    aug_check(AUG_ISSUCCESS(aug_autodltlx()));
+    aug_check(aug_autotlx());
     aug_setloglevel(aug_tlx, AUG_LOGDEBUG0 + 3);
 
     mpool = aug_getmpool(aug_tlx);

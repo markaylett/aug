@@ -61,7 +61,7 @@ main(int argc, char* argv[])
     struct header_ h;
     char test[255];
 
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
 
     aug_ctxinfo(aug_tlx, "header=%d, status=%d", (int)sizeof(struct header_),

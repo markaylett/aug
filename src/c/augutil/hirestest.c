@@ -15,7 +15,7 @@ main(int argc, char* argv[])
     aug_hires_t hires;
     double start, stop;
 
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
 
     mpool = aug_getmpool(aug_tlx);

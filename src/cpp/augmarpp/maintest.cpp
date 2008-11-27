@@ -376,7 +376,7 @@ main(int argc, char* argv[])
     char dst[] = "dst.XXXXXX";
     char src[] = "src.XXXXXX";
 
-    if (!aug_autodltlx()) {
+    if (!aug_autotlx()) {
         cerr << "aug_atexitinit() failed\n";
         return 1;
     }

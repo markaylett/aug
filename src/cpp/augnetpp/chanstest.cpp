@@ -95,7 +95,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        autodltlx();
+        autotlx();
 
         mpoolptr mp(getmpool(aug_tlx));
 

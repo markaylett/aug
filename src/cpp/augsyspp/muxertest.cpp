@@ -11,7 +11,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        autodltlx();
+        autotlx();
         muxer mux(getmpool(aug_tlx));
 
         for (int i(0); i < 256; ++i) {

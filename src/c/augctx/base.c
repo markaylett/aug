@@ -98,11 +98,11 @@ gettls_(void)
     return &tls_;
 }
 
-static aug_result
+static aug_bool
 inittls_(void)
 {
     ++tls_.refs_;
-    return AUG_SUCCESS;
+    return AUG_TRUE;
 }
 
 static void
@@ -184,7 +184,7 @@ aug_tlerr_(void)
 }
 
 AUGCTX_API aug_bool
-aug_initdltlx(void)
+aug_inittlx(void)
 {
     aug_bool ok = aug_init();
 
@@ -216,9 +216,9 @@ aug_initdltlx(void)
 }
 
 AUGCTX_API aug_bool
-aug_autodltlx(void)
+aug_autotlx(void)
 {
-    aug_bool ok = aug_initdltlx();
+    aug_bool ok = aug_inittlx();
     if (ok)
         atexit(aug_term);
     return ok;

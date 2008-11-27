@@ -14,7 +14,7 @@ main(int argc, char* argv[])
 {
     struct addrinfo hints, * res, * save;
 
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
 
     bzero(&hints, sizeof(hints));

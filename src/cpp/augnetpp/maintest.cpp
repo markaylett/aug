@@ -72,7 +72,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        autodltlx();
+        autotlx();
 
         callbacks cbs;
         mpoolptr mp(getmpool(aug_tlx));

@@ -49,7 +49,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        autodltlx();
+        autotlx();
         test("x=\"aaa a\" 'b''bb' ccc\\\n xyz");
         test("");
     } catch (const exception& e) {

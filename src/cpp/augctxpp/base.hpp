@@ -12,8 +12,6 @@
 
 namespace aug {
 
-    const struct dltlx_ { } dltlx = dltlx_();
-
     inline void
     init()
     {
@@ -31,16 +29,16 @@ namespace aug {
         verify(aug_setbasictlx(mpool.get()));
     }
     inline void
-    initdltlx()
+    inittlx()
     {
-        if (!aug_initdltlx())
-            throw std::runtime_error("aug_initdltlx() failed");
+        if (!aug_inittlx())
+            throw std::runtime_error("aug_inittlx() failed");
     }
     inline void
-    autodltlx()
+    autotlx()
     {
-        if (!aug_autodltlx())
-            throw std::runtime_error("aug_autodltlx() failed");
+        if (!aug_autotlx())
+            throw std::runtime_error("aug_autotlx() failed");
     }
 
     class scoped_init {
@@ -61,9 +59,9 @@ namespace aug {
             init();
         }
         explicit
-        scoped_init(const dltlx_&)
+        scoped_init(const tlx_&)
         {
-            initdltlx();
+            inittlx();
         }
     };
 }

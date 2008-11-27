@@ -83,7 +83,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        autodltlx();
+        autotlx();
 
         bool b(true);
         b = verifyproxy(b);

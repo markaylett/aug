@@ -11,6 +11,8 @@
 
 namespace aug {
 
+    const struct tlx_ { } tlx = tlx_();
+
     // Helper functions for types that encapsulate c value types.
 
     template <typename T>

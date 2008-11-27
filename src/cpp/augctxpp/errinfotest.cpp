@@ -75,7 +75,7 @@ main(int argc, char* argv[])
 {
     try {
 
-        autodltlx();
+        autotlx();
         streamptr ptr(test::create());
         try {
             shutdown(ptr);

@@ -43,7 +43,7 @@ int
 main(int argc, char* argv[])
 {
     try {
-        autodltlx();
+        autotlx();
 
         if (filterbase64(DECODED, strlen(DECODED), AUG_ENCODE64) != ENCODED)
             throw error("encodebase64() failed");

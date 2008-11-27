@@ -87,7 +87,7 @@ main(int argc, char* argv[])
     aug_muxer_t muxer;
     aug_sd sv[2];
 
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
 
     mpool = aug_getmpool(aug_tlx);

@@ -68,7 +68,7 @@ main(int argc, char* argv[])
     aug_mpool* mpool;
     aug_base64_t encoder, decoder;
 
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
 
     mpool = aug_getmpool(aug_tlx);

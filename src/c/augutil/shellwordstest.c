@@ -45,7 +45,7 @@ main(int argc, char* argv[])
     struct aug_words st;
     int ch;
 
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
     aug_initshellwords(&st, 1, out_, NULL);
 

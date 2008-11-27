@@ -13,7 +13,7 @@ main(int argc, char* argv[])
     aug_sd sds[2];
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
-    if (!aug_autodltlx())
+    if (!aug_autotlx())
         return 1;
 
     if (AUG_ISFAIL(aug_muxerpipe(sds))) {
