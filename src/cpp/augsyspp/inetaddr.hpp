@@ -48,7 +48,7 @@ namespace aug {
         return addr.family_;
     }
 
-    class inetaddr : public mpool_ops {
+    class inetaddr {
     public:
         typedef aug_inetaddr ctype;
     private:

@@ -13,7 +13,8 @@ namespace aug {
 
     template <typename charT,
               typename char_traitsT = std::char_traits<charT> >
-    class basic_imarstream : public std::basic_istream<charT, char_traitsT> {
+    class basic_imarstream : public std::basic_istream<charT, char_traitsT>,
+                             public mpool_ops {
     public:
         typedef charT char_type;
         typedef char_traitsT char_traits_type;
@@ -60,7 +61,8 @@ namespace aug {
 
     template <typename charT,
               typename char_traitsT = std::char_traits<charT> >
-    class basic_omarstream : public std::basic_ostream<charT, char_traitsT> {
+    class basic_omarstream : public std::basic_ostream<charT, char_traitsT>,
+                             public mpool_ops {
     public:
         typedef charT char_type;
         typedef char_traitsT char_traits_type;
@@ -109,7 +111,8 @@ namespace aug {
     template <typename charT,
               typename char_traitsT = std::char_traits<charT> >
     class basic_iomarstream
-        : public std::basic_iostream<charT, char_traitsT> {
+        : public std::basic_iostream<charT, char_traitsT>,
+          public mpool_ops {
     public:
         typedef charT char_type;
         typedef char_traitsT char_traits_type;

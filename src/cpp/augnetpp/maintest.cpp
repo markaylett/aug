@@ -13,7 +13,7 @@ using namespace std;
 
 namespace {
 
-    struct callbacks : mpool_ops {
+    struct callbacks {
         aug_result
         base64cb(const char* buf, size_t len)
         {
@@ -21,7 +21,7 @@ namespace {
         }
     };
 
-    struct httptest : mpool_ops {
+    struct httptest {
         aug_result
         httpinitial_(const char* value) AUG_NOTHROW
         {
@@ -49,7 +49,7 @@ namespace {
         }
     };
 
-    struct martest : mpool_ops {
+    struct martest {
         aug_result
         delmar_(const char* initial) AUG_NOTHROW
         {

@@ -76,7 +76,7 @@ namespace aug {
         return ep.un_.all_.port_;
     }
 
-    class endpoint : public mpool_ops {
+    class endpoint {
     public:
         typedef aug_endpoint ctype;
     private:

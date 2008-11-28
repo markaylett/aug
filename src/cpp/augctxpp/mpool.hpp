@@ -48,6 +48,14 @@ namespace aug {
                 throw std::bad_alloc();
             return ptr;
         }
+
+        static void
+        operator delete(void* ptr, const tlx_&) throw()
+        {
+            mpoolptr mpool(getmpool(aug_tlx));
+            aug_freemem(mpool.get(), ptr);
+        }
+
         static void
         operator delete(void* ptr) throw()
         {
@@ -97,6 +105,14 @@ namespace aug {
                 throw std::bad_alloc();
             return ptr;
         }
+
+        static void
+        operator delete[](void* ptr, const tlx_&) throw()
+        {
+            mpoolptr mpool(getmpool(aug_tlx));
+            aug_freemem(mpool.get(), ptr);
+        }
+
         static void
         operator delete[](void* ptr) throw()
         {

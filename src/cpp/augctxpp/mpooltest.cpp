@@ -10,14 +10,38 @@ using namespace aug;
 using namespace std;
 
 namespace {
+
+    // Force any issues that may arise by deleting via base pointer.
+    // I.e. when destructor takes invisible "delete" argument.
+
     class foo : public mpool_ops {
         char pad_[11]; // Prime.
+    public:
+        virtual
+        ~foo() AUG_NOTHROW
+        {
+        }
     };
     class bar : public mpool_ops {
         char pad_[23]; // Prime.
+    public:
+        virtual
+        ~bar() AUG_NOTHROW
+        {
+        }
     };
     class foobar : public foo, public bar {
         char pad_[31]; // Prime.
+    public:
+        ~foobar() AUG_NOTHROW
+        {
+        }
+        explicit
+        foobar(bool err = false)
+        {
+            if (err)
+                throw runtime_error("bad foobar");
+        }
     };
 
     // Non-trivial allocation sequence.
@@ -63,6 +87,19 @@ main(int argc, char* argv[])
                 test();
 
             delete[] new (tlx) foobar[64];
+
+            bar* b = new (tlx) foobar();
+            delete b;
+
+            try {
+                // Throw on construction.
+                bar* b = new (tlx) foobar(true);
+                // Not reached.
+                delete b;
+            } catch (...) {
+                // Debug output should show if memory has been leaked.
+            }
+
             return 0;
 
         } AUG_PERRINFOCATCH;
