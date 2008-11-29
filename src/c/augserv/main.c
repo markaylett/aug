@@ -107,6 +107,11 @@ aug_main(int argc, char* argv[], const struct aug_serv* serv)
 
     aug_setserv_(serv);
 
+    if (AUG_ISFAIL(aug_readopts(&options, argc, argv))) {
+        aug_perrinfo(aug_tlx, "getreadopts() failed", NULL);
+        return EXIT_FAILURE;
+    }
+
 #if defined(_WIN32)
 
     /* Assume that if there is no stdin handle then the process is being
@@ -123,11 +128,6 @@ aug_main(int argc, char* argv[], const struct aug_serv* serv)
         /* Fallthrough to run in foreground. */
     }
 #endif /* _WIN32 */
-
-    if (AUG_ISFAIL(aug_readopts(&options, argc, argv))) {
-        aug_perrinfo(aug_tlx, "getreadopts() failed", NULL);
-        return EXIT_FAILURE;
-    }
 
     switch (options.command_) {
     case AUG_CMDDEFAULT:

@@ -29,6 +29,7 @@
 #define STATUS_  (OFFSET_ + AUG_EVENTSTATUS)
 #define STOP_    (OFFSET_ + AUG_EVENTSTOP)
 
+static struct aug_options options_;
 static SERVICE_STATUS_HANDLE ssh_;
 
 static aug_result
@@ -82,10 +83,12 @@ handler_(DWORD code)
 static void WINAPI
 service_(DWORD argc, char** argv)
 {
+    /* Arguments are unused: these are specified as "start parameters" in the
+       SCM. */
+
     /* Service thread. */
 
     const char* sname;
-    struct aug_options options;
     char home[AUG_PATH_MAX + 1];
 
 	/* DebugBreak(); */
@@ -119,12 +122,7 @@ service_(DWORD argc, char** argv)
         goto done;
     }
 
-    if (AUG_ISFAIL(aug_readopts(&options, argc, argv))) {
-        aug_perrinfo(aug_tlx, "getreadopts() failed", NULL);
-        goto done;
-    }
-
-    if (AUG_CMDDEFAULT != options.command_) {
+    if (AUG_CMDDEFAULT != options_.command_) {
 
         /* Commands other than AUG_CMDDEFAULT are invalid in this context. */
 
@@ -134,7 +132,7 @@ service_(DWORD argc, char** argv)
         goto done;
     }
 
-    if (AUG_ISFAIL(aug_readservconf(AUG_CONFFILE(&options), AUG_FALSE,
+    if (AUG_ISFAIL(aug_readservconf(AUG_CONFFILE(&options_), AUG_FALSE,
                                     AUG_TRUE))) {
         aug_perrinfo(aug_tlx, "aug_readservconf() failed", NULL);
         goto done;
@@ -196,6 +194,10 @@ aug_daemonise(const struct aug_options* options)
         { NULL, NULL }
     };
     aug_result result;
+
+    /* Make options available to service callback. */
+
+    memcpy(&options_, options, sizeof(options_));
 
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
