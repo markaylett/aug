@@ -19,6 +19,11 @@ Basic Installation
   6. To start the service, run the 'start.bat' file in the installation
      directory.
 
+     If the service fails to start, and no log file exists in the log
+     directory, try checking here:
+
+     C:\Documents and Settings\NetworkService\Local Settings\Temp
+
 FAQ
 ===
 

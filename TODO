@@ -2,7 +2,6 @@ Consistent use of aug_bool and aug_return.
 
 Migrate virtual classes to aug_object:
 aug_mar
-aug_service
 
 Use get/set naming convention.
 
@@ -38,8 +37,6 @@ Assume edge-triggered semantics, including EAGAIN.
 
 Add support for epoll().
 
-Replace EINTR checks with AUG_FAILINTR.
-
 Use aug_rsize instead of optional outputs in mar.
 
 Migrate event queue to list-based channel.
@@ -51,5 +48,3 @@ Review FIXMEs.
 Fix perl module.
 
 Generalise base template generation in augidl.
-
-Add more mpool_ops.

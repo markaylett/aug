@@ -197,8 +197,9 @@ aug_inittlx(void)
 
         if (mpool) {
 
-            ok = !AUG_ISFAIL(aug_setbasictlx(mpool))
-                ? AUG_TRUE : AUG_FALSE;
+            if (AUG_ISFAIL(aug_setbasictlx(mpool)))
+                ok = AUG_FALSE;
+
             aug_release(mpool);
 
         } else {
