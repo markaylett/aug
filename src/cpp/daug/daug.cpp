@@ -119,16 +119,22 @@ namespace {
         aug::chdir(rundir_);
         if (daemon_) {
 
-            aug::chdir(options_.get("logdir", "."));
+            const char* logdir(options_.get("logdir", 0));
+            if (logdir) {
 
-            // Cache real path so that the log file can be re-opened without
-            // having to change directories.
+                // If logdir is not specified, then keep logging to stdout.
 
-            realpath(logdir_, getcwd().c_str(), sizeof(logdir_));
+                aug::chdir(logdir);
 
-            // Re-opening the log file facilitates rolling.
+                // Cache real path so that the log file can be re-opened
+                // without having to change directories.
 
-            openlog_();
+                realpath(logdir_, getcwd().c_str(), sizeof(logdir_));
+
+                // Re-opening the log file facilitates rolling.
+
+                openlog_();
+            }
         }
 
         aug_ctxinfo(aug_tlx, "loglevel=[%d]", aug_getloglevel(aug_tlx));
@@ -244,8 +250,13 @@ namespace {
 
                     // Only set re-open timer when running as daemon.
 
-                    timer t(timers_);
-                    t.set(60000, timercb<reopencb_>, null);
+                    if (*logdir_) {
+
+                        // And only if not logging to stdout.
+
+                        timer t(timers_);
+                        t.set(60000, timercb<reopencb_>, null);
+                    }
 
                     engine_.run(false); // Not stop on error.
 
@@ -763,6 +774,7 @@ main(int argc, char* argv[])
         timeval tv;
         aug::gettimeofday(tv);
         aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
+        std::ios::sync_with_stdio();
 
         try {
             program_ = argv[0];

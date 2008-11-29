@@ -115,7 +115,10 @@ aug_main(int argc, char* argv[], const struct aug_serv* serv)
 #if defined(_WIN32)
 
     /* Assume that if there is no stdin handle then the process is being
-       started by the Service Control Manager. */
+       started by the Service Control Manager.
+
+       The arguments for Windows Services are specified after the "path to
+       executable" in the Service Control Manager. */
 
     if (!GetStdHandle(STD_INPUT_HANDLE)) {
 

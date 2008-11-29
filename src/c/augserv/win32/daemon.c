@@ -20,6 +20,9 @@
 #include "augext/log.h"
 
 #include <assert.h>
+#include <crtdbg.h>
+#include <fcntl.h>          /* _O_TEXT */
+#include <io.h>             /* _open_osfhandle() */
 #include <stdio.h>
 
 /* Users can define codes in the range 128 to 255. */
@@ -31,6 +34,67 @@
 
 static struct aug_options options_;
 static SERVICE_STATUS_HANDLE ssh_;
+static aug_bool console_ = AUG_FALSE;
+
+static aug_bool
+startconsole_(void)
+{
+	int fd;
+	FILE* fp;
+
+	HANDLE h;
+	CONSOLE_SCREEN_BUFFER_INFO info;
+
+	if (console_ || !AllocConsole())
+		return AUG_FALSE;
+
+	console_ = AUG_TRUE;
+	fflush(NULL);
+
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
+	info.dwSize.Y = 512;
+	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), info.dwSize);
+
+	h = GetStdHandle(STD_OUTPUT_HANDLE);
+	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
+    dup2(fd, 1);
+	fp = _fdopen(fd, "w");
+	*stdout = *fp;
+	setvbuf(stdout, NULL, _IONBF, 0);
+
+	h = GetStdHandle(STD_INPUT_HANDLE);
+	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
+    dup2(fd, 0);
+	fp = _fdopen(fd, "r");
+	*stdin = *fp;
+	setvbuf(stdin, NULL, _IONBF, 0);
+
+	h = GetStdHandle(STD_ERROR_HANDLE);
+	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
+    dup2(fd, 2);
+	fp = _fdopen(fd, "w");
+	*stderr = *fp;
+	setvbuf(stderr, NULL, _IONBF, 0);
+
+	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+	_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
+	return AUG_TRUE;
+}
+
+static aug_bool
+stopconsole_(void)
+{
+	if (!console_)
+		return AUG_FALSE;
+
+	console_ = AUG_FALSE;
+	FreeConsole();
+	return AUG_TRUE;
+}
 
 static aug_result
 setstatus_(DWORD state)
@@ -83,8 +147,8 @@ handler_(DWORD code)
 static void WINAPI
 service_(DWORD argc, char** argv)
 {
-    /* Arguments are unused: these are specified as "start parameters" in the
-       SCM. */
+    /* Arguments are unused: these are specified as the "start parameters" in
+       the Service Control Manager. */
 
     /* Service thread. */
 
@@ -97,8 +161,11 @@ service_(DWORD argc, char** argv)
 
     AUG_RMB();
 
+    startconsole_();
+
     if (!aug_inittlx()) {
         fprintf(stderr, "aug_inittlx() failed\n");
+        stopconsole_();
         return;
     }
 
@@ -183,6 +250,7 @@ service_(DWORD argc, char** argv)
 
     AUG_WMB();
     aug_term();
+    stopconsole_();
 }
 
 AUGSERV_API aug_result
