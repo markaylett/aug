@@ -119,22 +119,16 @@ namespace {
         aug::chdir(rundir_);
         if (daemon_) {
 
-            const char* logdir(options_.get("logdir", 0));
-            if (logdir) {
+            aug::chdir(options_.get("logdir", "."));
 
-                // If logdir is not specified, then keep logging to stdout.
+            // Cache real path so that the log file can be re-opened without
+            // having to change directories.
 
-                aug::chdir(logdir);
+            realpath(logdir_, getcwd().c_str(), sizeof(logdir_));
 
-                // Cache real path so that the log file can be re-opened
-                // without having to change directories.
+            // Re-opening the log file facilitates rolling.
 
-                realpath(logdir_, getcwd().c_str(), sizeof(logdir_));
-
-                // Re-opening the log file facilitates rolling.
-
-                openlog_();
-            }
+            openlog_();
         }
 
         aug_ctxinfo(aug_tlx, "loglevel=[%d]", aug_getloglevel(aug_tlx));
@@ -248,15 +242,10 @@ namespace {
 
                 if (daemon_) {
 
-                    // Only set re-open timer when running as daemon.
+                    // And only if not logging to stdout.
 
-                    if (*logdir_) {
-
-                        // And only if not logging to stdout.
-
-                        timer t(timers_);
-                        t.set(60000, timercb<reopencb_>, null);
-                    }
+                    timer t(timers_);
+                    t.set(60000, timercb<reopencb_>, null);
 
                     engine_.run(false); // Not stop on error.
 

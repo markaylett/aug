@@ -20,7 +20,9 @@
 #include "augext/log.h"
 
 #include <assert.h>
-#include <crtdbg.h>
+#if defined(_MSC_VER)
+# include <crtdbg.h>        /* _CrtSetReportMode() */
+#endif /* _MSC_VER */
 #include <fcntl.h>          /* _O_TEXT */
 #include <io.h>             /* _open_osfhandle() */
 #include <stdio.h>
@@ -34,10 +36,39 @@
 
 static struct aug_options options_;
 static SERVICE_STATUS_HANDLE ssh_;
-static aug_bool console_ = AUG_FALSE;
 
 static aug_bool
-startconsole_(void)
+interactive_(const char* sname)
+{
+    SC_HANDLE scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+    aug_bool ret = AUG_FALSE;
+
+    if (scm) {
+
+        SC_HANDLE serv = OpenService(scm, sname, SERVICE_QUERY_CONFIG);
+        if (serv) {
+
+            /* The MSDN example uses a buffer size of 4096. */
+
+            union {
+                QUERY_SERVICE_CONFIG config_;
+                char buf_[4096];
+            } u;
+			DWORD dw;
+
+            if (QueryServiceConfig(serv, &u.config_, sizeof(u.buf_), &dw)) {
+                if (u.config_.dwServiceType & SERVICE_INTERACTIVE_PROCESS)
+                    ret = AUG_TRUE;
+            }
+            CloseServiceHandle(serv);
+        }
+        CloseServiceHandle(scm);
+    }
+    return ret;
+}
+
+static aug_bool
+createconsole_(const char* sname)
 {
 	int fd;
 	FILE* fp;
@@ -45,22 +76,14 @@ startconsole_(void)
 	HANDLE h;
 	CONSOLE_SCREEN_BUFFER_INFO info;
 
-	if (console_ || !AllocConsole())
+	if (!interactive_(sname) || !AllocConsole())
 		return AUG_FALSE;
 
-	console_ = AUG_TRUE;
 	fflush(NULL);
 
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 	info.dwSize.Y = 512;
 	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), info.dwSize);
-
-	h = GetStdHandle(STD_OUTPUT_HANDLE);
-	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
-    dup2(fd, 1);
-	fp = _fdopen(fd, "w");
-	*stdout = *fp;
-	setvbuf(stdout, NULL, _IONBF, 0);
 
 	h = GetStdHandle(STD_INPUT_HANDLE);
 	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
@@ -69,6 +92,13 @@ startconsole_(void)
 	*stdin = *fp;
 	setvbuf(stdin, NULL, _IONBF, 0);
 
+	h = GetStdHandle(STD_OUTPUT_HANDLE);
+	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
+    dup2(fd, 1);
+	fp = _fdopen(fd, "w");
+	*stdout = *fp;
+	setvbuf(stdout, NULL, _IONBF, 0);
+
 	h = GetStdHandle(STD_ERROR_HANDLE);
 	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
     dup2(fd, 2);
@@ -76,23 +106,14 @@ startconsole_(void)
 	*stderr = *fp;
 	setvbuf(stderr, NULL, _IONBF, 0);
 
+#if defined(_MSC_VER)
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
-	return AUG_TRUE;
-}
-
-static aug_bool
-stopconsole_(void)
-{
-	if (!console_)
-		return AUG_FALSE;
-
-	console_ = AUG_FALSE;
-	FreeConsole();
+#endif /* _MSC_VER */
 	return AUG_TRUE;
 }
 
@@ -153,6 +174,7 @@ service_(DWORD argc, char** argv)
     /* Service thread. */
 
     const char* sname;
+    aug_bool daemon = AUG_TRUE;
     char home[AUG_PATH_MAX + 1];
 
 	/* DebugBreak(); */
@@ -161,13 +183,24 @@ service_(DWORD argc, char** argv)
 
     AUG_RMB();
 
-    startconsole_();
-
     if (!aug_inittlx()) {
         fprintf(stderr, "aug_inittlx() failed\n");
-        stopconsole_();
         return;
     }
+
+    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+        aug_perrinfo(aug_tlx, "getservopt() failed", NULL);
+        goto done;
+    }
+
+    /* Start console if interactive.  The console is opened before
+       aug_readservconf() is called to prevent any log files from begin
+       opened. */
+
+    if (createconsole_(sname))
+        daemon = AUG_FALSE;
 
     /* Install daemon logger prior to opening log file. */
 
@@ -200,15 +233,8 @@ service_(DWORD argc, char** argv)
     }
 
     if (AUG_ISFAIL(aug_readservconf(AUG_CONFFILE(&options_), AUG_FALSE,
-                                    AUG_TRUE))) {
+                                    daemon))) {
         aug_perrinfo(aug_tlx, "aug_readservconf() failed", NULL);
-        goto done;
-    }
-
-    if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
-        aug_perrinfo(aug_tlx, "getservopt() failed", NULL);
         goto done;
     }
 
@@ -250,7 +276,8 @@ service_(DWORD argc, char** argv)
 
     AUG_WMB();
     aug_term();
-    stopconsole_();
+    if (!daemon)
+        FreeConsole();
 }
 
 AUGSERV_API aug_result
