@@ -86,46 +86,44 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
-ECHO = @ECHO@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 ENABLE_MULTICAST_FALSE = @ENABLE_MULTICAST_FALSE@
 ENABLE_MULTICAST_TRUE = @ENABLE_MULTICAST_TRUE@
-ENABLE_PYTHON_FALSE = @ENABLE_PYTHON_FALSE@
-ENABLE_PYTHON_TRUE = @ENABLE_PYTHON_TRUE@
-ENABLE_RUBY_FALSE = @ENABLE_RUBY_FALSE@
-ENABLE_RUBY_TRUE = @ENABLE_RUBY_TRUE@
 ENABLE_SMP_FALSE = @ENABLE_SMP_FALSE@
 ENABLE_SMP_TRUE = @ENABLE_SMP_TRUE@
-ENABLE_SSL_FALSE = @ENABLE_SSL_FALSE@
-ENABLE_SSL_TRUE = @ENABLE_SSL_TRUE@
 ENABLE_STRICT_FALSE = @ENABLE_STRICT_FALSE@
 ENABLE_STRICT_TRUE = @ENABLE_STRICT_TRUE@
 ENABLE_THREADS_FALSE = @ENABLE_THREADS_FALSE@
 ENABLE_THREADS_TRUE = @ENABLE_THREADS_TRUE@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
+FGREP = @FGREP@
 GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OTOOL = @OTOOL@
+OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -139,9 +137,15 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WITH_PYTHON_FALSE = @WITH_PYTHON_FALSE@
+WITH_PYTHON_TRUE = @WITH_PYTHON_TRUE@
+WITH_RUBY_FALSE = @WITH_RUBY_FALSE@
+WITH_RUBY_TRUE = @WITH_RUBY_TRUE@
+WITH_SSL_FALSE = @WITH_SSL_FALSE@
+WITH_SSL_TRUE = @WITH_SSL_TRUE@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -175,6 +179,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -226,24 +231,24 @@ modinclude_HEADERS = \
 	task.h \
 	var.h
 
-@ENABLE_RUBY_TRUE@BUILT_SOURCES = \
-@ENABLE_RUBY_TRUE@	blob.h \
-@ENABLE_RUBY_TRUE@	boxint.h \
-@ENABLE_RUBY_TRUE@	boxptr.h \
-@ENABLE_RUBY_TRUE@	chan.h \
-@ENABLE_RUBY_TRUE@	clock.h \
-@ENABLE_RUBY_TRUE@	ctx.h \
-@ENABLE_RUBY_TRUE@	err.h \
-@ENABLE_RUBY_TRUE@	http.h \
-@ENABLE_RUBY_TRUE@	iter.h \
-@ENABLE_RUBY_TRUE@	log.h \
-@ENABLE_RUBY_TRUE@	mar.h \
-@ENABLE_RUBY_TRUE@	mpool.h \
-@ENABLE_RUBY_TRUE@	msg.h \
-@ENABLE_RUBY_TRUE@	rpc.h \
-@ENABLE_RUBY_TRUE@	seq.h \
-@ENABLE_RUBY_TRUE@	stream.h \
-@ENABLE_RUBY_TRUE@	task.h
+@WITH_RUBY_TRUE@BUILT_SOURCES = \
+@WITH_RUBY_TRUE@	blob.h \
+@WITH_RUBY_TRUE@	boxint.h \
+@WITH_RUBY_TRUE@	boxptr.h \
+@WITH_RUBY_TRUE@	chan.h \
+@WITH_RUBY_TRUE@	clock.h \
+@WITH_RUBY_TRUE@	ctx.h \
+@WITH_RUBY_TRUE@	err.h \
+@WITH_RUBY_TRUE@	http.h \
+@WITH_RUBY_TRUE@	iter.h \
+@WITH_RUBY_TRUE@	log.h \
+@WITH_RUBY_TRUE@	mar.h \
+@WITH_RUBY_TRUE@	mpool.h \
+@WITH_RUBY_TRUE@	msg.h \
+@WITH_RUBY_TRUE@	rpc.h \
+@WITH_RUBY_TRUE@	seq.h \
+@WITH_RUBY_TRUE@	stream.h \
+@WITH_RUBY_TRUE@	task.h
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -286,7 +291,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 
 distclean-libtool:
-	-rm -f libtool
+	-rm -f libtool config.lt
 uninstall-info-am:
 install-modincludeHEADERS: $(modinclude_HEADERS)
 	@$(NORMAL_INSTALL)
@@ -475,8 +480,8 @@ uninstall-am: uninstall-info-am uninstall-modincludeHEADERS
 	uninstall-modincludeHEADERS
 
 
-@ENABLE_RUBY_TRUE@%.h: %.xml
-@ENABLE_RUBY_TRUE@	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
+@WITH_RUBY_TRUE@%.h: %.xml
+@WITH_RUBY_TRUE@	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

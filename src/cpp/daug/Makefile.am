@@ -40,7 +40,7 @@ TESTS_ENVIRONMENT = \
 TESTS = \
 	maintest
 
-if ENABLE_PYTHON
+if WITH_PYTHON
 TESTS += \
 	test/pytest1 \
 	test/pytest2 \
@@ -51,7 +51,7 @@ TESTS += \
 	test/pytest7
 endif
 
-if ENABLE_RUBY
+if WITH_RUBY
 TESTS += \
 	test/rbtest1 \
 	test/rbtest2 \

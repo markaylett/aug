@@ -2,7 +2,7 @@ include $(top_srcdir)/src/c/lang.mk
 
 moddir = $(prefix)/mod
 
-if ENABLE_PYTHON
+if WITH_PYTHON
 PY_CFLAGS=`$(SHELL) $(top_srcdir)/src/sh/pyflags -c`
 PY_LDFLAGS=`$(SHELL) $(top_srcdir)/src/sh/pyflags -l`
 AM_CFLAGS = $(PY_CFLAGS)

@@ -14,7 +14,7 @@ EXTRA_DIST = \
 	pytest6.py \
 	pytest7.py
 
-if ENABLE_PYTHON
+if WITH_PYTHON
 pythondir = $(prefix)/python
 python_DATA = \
 	augutil.py \

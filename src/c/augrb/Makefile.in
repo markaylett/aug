@@ -59,9 +59,9 @@ modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
 modaugrb_la_DEPENDENCIES =
 am__modaugrb_la_SOURCES_DIST = augrb.c object.c
-@ENABLE_RUBY_TRUE@am_modaugrb_la_OBJECTS = augrb.lo object.lo
+@WITH_RUBY_TRUE@am_modaugrb_la_OBJECTS = augrb.lo object.lo
 modaugrb_la_OBJECTS = $(am_modaugrb_la_OBJECTS)
-@ENABLE_RUBY_TRUE@am_modaugrb_la_rpath = -rpath $(moddir)
+@WITH_RUBY_TRUE@am_modaugrb_la_rpath = -rpath $(moddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -104,46 +104,44 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
-ECHO = @ECHO@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 ENABLE_MULTICAST_FALSE = @ENABLE_MULTICAST_FALSE@
 ENABLE_MULTICAST_TRUE = @ENABLE_MULTICAST_TRUE@
-ENABLE_PYTHON_FALSE = @ENABLE_PYTHON_FALSE@
-ENABLE_PYTHON_TRUE = @ENABLE_PYTHON_TRUE@
-ENABLE_RUBY_FALSE = @ENABLE_RUBY_FALSE@
-ENABLE_RUBY_TRUE = @ENABLE_RUBY_TRUE@
 ENABLE_SMP_FALSE = @ENABLE_SMP_FALSE@
 ENABLE_SMP_TRUE = @ENABLE_SMP_TRUE@
-ENABLE_SSL_FALSE = @ENABLE_SSL_FALSE@
-ENABLE_SSL_TRUE = @ENABLE_SSL_TRUE@
 ENABLE_STRICT_FALSE = @ENABLE_STRICT_FALSE@
 ENABLE_STRICT_TRUE = @ENABLE_STRICT_TRUE@
 ENABLE_THREADS_FALSE = @ENABLE_THREADS_FALSE@
 ENABLE_THREADS_TRUE = @ENABLE_THREADS_TRUE@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
+FGREP = @FGREP@
 GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OTOOL = @OTOOL@
+OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -157,9 +155,15 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WITH_PYTHON_FALSE = @WITH_PYTHON_FALSE@
+WITH_PYTHON_TRUE = @WITH_PYTHON_TRUE@
+WITH_RUBY_FALSE = @WITH_RUBY_FALSE@
+WITH_RUBY_TRUE = @WITH_RUBY_TRUE@
+WITH_SSL_FALSE = @WITH_SSL_FALSE@
+WITH_SSL_TRUE = @WITH_SSL_TRUE@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -193,6 +197,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -209,19 +214,19 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/c
 
 moddir = $(prefix)/mod
-@ENABLE_RUBY_TRUE@RB_CFLAGS = `$(top_srcdir)/src/rb/rbflags -c`
-@ENABLE_RUBY_TRUE@RB_LDFLAGS = `$(top_srcdir)/src/rb/rbflags -l`
-@ENABLE_RUBY_TRUE@AM_CFLAGS = $(RB_CFLAGS)
-@ENABLE_RUBY_TRUE@noinst_HEADERS = \
-@ENABLE_RUBY_TRUE@	object.h
+@WITH_RUBY_TRUE@RB_CFLAGS = `$(top_srcdir)/src/rb/rbflags -c`
+@WITH_RUBY_TRUE@RB_LDFLAGS = `$(top_srcdir)/src/rb/rbflags -l`
+@WITH_RUBY_TRUE@AM_CFLAGS = $(RB_CFLAGS)
+@WITH_RUBY_TRUE@noinst_HEADERS = \
+@WITH_RUBY_TRUE@	object.h
 
-@ENABLE_RUBY_TRUE@mod_LTLIBRARIES = modaugrb.la
-@ENABLE_RUBY_TRUE@modaugrb_la_SOURCES = \
-@ENABLE_RUBY_TRUE@	augrb.c \
-@ENABLE_RUBY_TRUE@	object.c
+@WITH_RUBY_TRUE@mod_LTLIBRARIES = modaugrb.la
+@WITH_RUBY_TRUE@modaugrb_la_SOURCES = \
+@WITH_RUBY_TRUE@	augrb.c \
+@WITH_RUBY_TRUE@	object.c
 
-@ENABLE_RUBY_TRUE@modaugrb_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(RB_LDFLAGS)
-@ENABLE_RUBY_TRUE@modaugrb_la_LIBADD = 
+@WITH_RUBY_TRUE@modaugrb_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(RB_LDFLAGS)
+@WITH_RUBY_TRUE@modaugrb_la_LIBADD = 
 all: all-am
 
 .SUFFIXES:
@@ -322,7 +327,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 
 distclean-libtool:
-	-rm -f libtool
+	-rm -f libtool config.lt
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

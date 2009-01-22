@@ -190,9 +190,9 @@ namespace {
 
     struct impl : task_base<impl>, mpool_ops {
         modules modules_;
-#if ENABLE_SSL
+#if WITH_SSL
         sslctxs sslctxs_;
-#endif // ENABLE_SSL
+#endif // WITH_SSL
         timers timers_;
         engine engine_;
 
@@ -223,10 +223,10 @@ namespace {
             impl_ = this;
 
             try {
-#if ENABLE_SSL
+#if WITH_SSL
                 initssl();
                 createsslctxs(sslctxs_, options_, frobpass);
-#endif // ENABLE_SSL
+#endif // WITH_SSL
                 load_();
             } catch (...) {
                 engine_.clear();
@@ -402,7 +402,7 @@ namespace {
                       sname, host, port);
         try {
             sslctx* ptr(0);
-#if ENABLE_SSL
+#if WITH_SSL
             if (ctx) {
                 sslctxs::const_iterator it(impl_->sslctxs_.find(ctx));
                 if (it == impl_->sslctxs_.end())
@@ -410,7 +410,7 @@ namespace {
                                      "SSL context [%s] not initialised", ctx);
                 ptr = it->second.get();
             }
-#endif // ENABLE_SSL
+#endif // WITH_SSL
             return (int)impl_->engine_
                 .tcpconnect(sname, host, port, ptr, user);
 
@@ -428,7 +428,7 @@ namespace {
                       sname, host, port);
         try {
             sslctx* ptr(0);
-#if ENABLE_SSL
+#if WITH_SSL
             if (ctx) {
                 sslctxs::const_iterator it(impl_->sslctxs_.find(ctx));
                 if (it == impl_->sslctxs_.end())
@@ -436,7 +436,7 @@ namespace {
                                      "SSL context [%s] not initialised", ctx);
                 ptr = it->second.get();
             }
-#endif // ENABLE_SSL
+#endif // WITH_SSL
 
             // TODO: temporarily regain root privileges.
 
@@ -715,7 +715,7 @@ namespace {
 
             reconf_();
 
-#if ENABLE_SSL
+#if WITH_SSL
             // Password must be collected before process is detached from
             // controlling terminal.
 
@@ -724,7 +724,7 @@ namespace {
                             sizeof(frobpass_));
                 aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
             }
-#endif // ENABLE_SSL
+#endif // WITH_SSL
 
             return AUG_SUCCESS;
 

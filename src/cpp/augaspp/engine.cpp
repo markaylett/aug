@@ -619,11 +619,11 @@ AUGASPP_API mod_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
                    sslctx* ctx, void* user)
 {
-#if !ENABLE_SSL
+#if !WITH_SSL
     if (ctx)
         throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
                         AUG_MSG("ssl not supported"));
-#endif // !ENABLE_SSL
+#endif // !WITH_SSL
 
     sessionptr session(impl_->sessions_.getbyname(sname));
 
@@ -642,11 +642,11 @@ AUGASPP_API mod_id
 engine::tcplisten(const char* sname, const char* host, const char* port,
                   sslctx* ctx, void* user)
 {
-#if !ENABLE_SSL
+#if !WITH_SSL
     if (ctx)
         throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
                         AUG_MSG("ssl not supported"));
-#endif // !ENABLE_SSL
+#endif // !WITH_SSL
 
     // Bind listener socket.
 

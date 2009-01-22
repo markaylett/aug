@@ -59,10 +59,9 @@ modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
 modaugpy_la_DEPENDENCIES =
 am__modaugpy_la_SOURCES_DIST = augpy.c host.c object.c
-@ENABLE_PYTHON_TRUE@am_modaugpy_la_OBJECTS = augpy.lo host.lo \
-@ENABLE_PYTHON_TRUE@	object.lo
+@WITH_PYTHON_TRUE@am_modaugpy_la_OBJECTS = augpy.lo host.lo object.lo
 modaugpy_la_OBJECTS = $(am_modaugpy_la_OBJECTS)
-@ENABLE_PYTHON_TRUE@am_modaugpy_la_rpath = -rpath $(moddir)
+@WITH_PYTHON_TRUE@am_modaugpy_la_rpath = -rpath $(moddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -105,46 +104,44 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
-ECHO = @ECHO@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 ENABLE_MULTICAST_FALSE = @ENABLE_MULTICAST_FALSE@
 ENABLE_MULTICAST_TRUE = @ENABLE_MULTICAST_TRUE@
-ENABLE_PYTHON_FALSE = @ENABLE_PYTHON_FALSE@
-ENABLE_PYTHON_TRUE = @ENABLE_PYTHON_TRUE@
-ENABLE_RUBY_FALSE = @ENABLE_RUBY_FALSE@
-ENABLE_RUBY_TRUE = @ENABLE_RUBY_TRUE@
 ENABLE_SMP_FALSE = @ENABLE_SMP_FALSE@
 ENABLE_SMP_TRUE = @ENABLE_SMP_TRUE@
-ENABLE_SSL_FALSE = @ENABLE_SSL_FALSE@
-ENABLE_SSL_TRUE = @ENABLE_SSL_TRUE@
 ENABLE_STRICT_FALSE = @ENABLE_STRICT_FALSE@
 ENABLE_STRICT_TRUE = @ENABLE_STRICT_TRUE@
 ENABLE_THREADS_FALSE = @ENABLE_THREADS_FALSE@
 ENABLE_THREADS_TRUE = @ENABLE_THREADS_TRUE@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
+FGREP = @FGREP@
 GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OTOOL = @OTOOL@
+OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -158,9 +155,15 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WITH_PYTHON_FALSE = @WITH_PYTHON_FALSE@
+WITH_PYTHON_TRUE = @WITH_PYTHON_TRUE@
+WITH_RUBY_FALSE = @WITH_RUBY_FALSE@
+WITH_RUBY_TRUE = @WITH_RUBY_TRUE@
+WITH_SSL_FALSE = @WITH_SSL_FALSE@
+WITH_SSL_TRUE = @WITH_SSL_TRUE@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -194,6 +197,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -210,21 +214,21 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/c
 
 moddir = $(prefix)/mod
-@ENABLE_PYTHON_TRUE@PY_CFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -c`
-@ENABLE_PYTHON_TRUE@PY_LDFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -l`
-@ENABLE_PYTHON_TRUE@AM_CFLAGS = $(PY_CFLAGS)
-@ENABLE_PYTHON_TRUE@noinst_HEADERS = \
-@ENABLE_PYTHON_TRUE@	host.h \
-@ENABLE_PYTHON_TRUE@	object.h
+@WITH_PYTHON_TRUE@PY_CFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -c`
+@WITH_PYTHON_TRUE@PY_LDFLAGS = `$(SHELL) $(top_srcdir)/src/sh/pyflags -l`
+@WITH_PYTHON_TRUE@AM_CFLAGS = $(PY_CFLAGS)
+@WITH_PYTHON_TRUE@noinst_HEADERS = \
+@WITH_PYTHON_TRUE@	host.h \
+@WITH_PYTHON_TRUE@	object.h
 
-@ENABLE_PYTHON_TRUE@mod_LTLIBRARIES = modaugpy.la
-@ENABLE_PYTHON_TRUE@modaugpy_la_SOURCES = \
-@ENABLE_PYTHON_TRUE@	augpy.c \
-@ENABLE_PYTHON_TRUE@	host.c \
-@ENABLE_PYTHON_TRUE@	object.c
+@WITH_PYTHON_TRUE@mod_LTLIBRARIES = modaugpy.la
+@WITH_PYTHON_TRUE@modaugpy_la_SOURCES = \
+@WITH_PYTHON_TRUE@	augpy.c \
+@WITH_PYTHON_TRUE@	host.c \
+@WITH_PYTHON_TRUE@	object.c
 
-@ENABLE_PYTHON_TRUE@modaugpy_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
-@ENABLE_PYTHON_TRUE@modaugpy_la_LIBADD = 
+@WITH_PYTHON_TRUE@modaugpy_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
+@WITH_PYTHON_TRUE@modaugpy_la_LIBADD = 
 all: all-am
 
 .SUFFIXES:
@@ -326,7 +330,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 
 distclean-libtool:
-	-rm -f libtool
+	-rm -f libtool config.lt
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

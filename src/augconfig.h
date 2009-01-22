@@ -14,19 +14,9 @@
 #  define ENABLE_MULTICAST 1
 # endif /* !ENABLE_MULTICAST */
 
-# if !defined(ENABLE_PYTHON)
-#  define ENABLE_PYTHON 1
-# endif /* !ENABLE_PYTHON */
-
-/* #undef ENABLE_RUBY */
-
 # if !defined(ENABLE_SMP)
 #  define ENABLE_SMP 1
 # endif /* !ENABLE_SMP */
-
-# if !defined(ENABLE_SSL)
-#  define ENABLE_SSL 1
-# endif /* !ENABLE_SSL */
 
 # if !defined(ENABLE_STRICT)
 #  define ENABLE_STRICT 0
@@ -35,6 +25,16 @@
 # if !defined(ENABLE_THREADS)
 #  define ENABLE_THREADS 1
 # endif /* !ENABLE_THREADS */
+
+# if !defined(WITH_PYTHON)
+#  define WITH_PYTHON 1
+# endif /* !WITH_PYTHON */
+
+/* #undef WITH_RUBY */
+
+# if !defined(WITH_SSL)
+#  define WITH_SSL 1
+# endif /* !WITH_SSL */
 
 #endif /* !HAVE_CONFIG_H */
 

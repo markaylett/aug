@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#if ENABLE_SSL
+#if WITH_SSL
 
 # include "daug/options.hpp"
 
@@ -265,4 +265,4 @@ daug::createsslctxs(sslctxs& sslctxs, const options& options, char* frobpass)
     }
 }
 
-#endif // ENABLE_SSL
+#endif // WITH_SSL

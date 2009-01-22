@@ -80,12 +80,12 @@ my (
     $pedantic,
     $debug,
     $multicast,
-    $python,
-    $ruby,
     $smp,
-    $ssl,
     $strict,
     $threads,
+    $python,
+    $ruby,
+    $ssl,
     $libtype
     );
 
@@ -133,12 +133,12 @@ if ($CYGWIN_MINGW == $toolset) {
 $pedantic = valueask ("pedantic warnings", 'n');
 $debug = valueask ("debug build", 'n');
 $multicast = valueask ("multicast support", 'y');
-$python = valueask ("python support", 'n');
-$ruby = valueask ("ruby support", 'n');
 $smp = valueask ("smp support", 'y');
-$ssl = valueask ("ssl support", 'y');
 $strict = valueask ("strict types", 'n');
 $threads = valueask ("thread support", 'y');
+$python = valueask ("python support", 'n');
+$ruby = valueask ("ruby support", 'n');
+$ssl = valueask ("ssl support", 'y');
 $libtype = listask ("library type", $BOTH, \%LIBTYPE);
 
 my (
@@ -178,18 +178,26 @@ $options .= " \\\n\t--enable-maintainer-mode"
     if is $maintainer;
 $options .= " \\\n\t--disable-multicast"
     unless is $multicast;
-$options .= " \\\n\t--enable-python"
-    if is $python;
-$options .= " \\\n\t--enable-ruby"
-    if is $ruby;
 $options .= " \\\n\t--disable-smp"
     unless is $smp;
-$options .= " \\\n\t--disable-ssl"
-    unless is $ssl;
 $options .= " \\\n\t--enable-strict"
     if is $strict;
 $options .= " \\\n\t--disable-threads"
     unless is $threads;
+$options .= " \\\n\t--with-python"
+    if is $python;
+$options .= " \\\n\t--with-ruby"
+    if is $ruby;
+
+if (is $ssl) {
+    if (exists $ENV{OPENSSL_HOME}) {
+        my $s = $ENV{OPENSSL_HOME};
+        $s =~ s|\\|/|g;
+        $options .= " \\\n\t--with-ssl=$s";
+    }
+} else {
+    $options .= " \\\n\t--wthout-ssl"
+}
 
 if ($SHARED_ONLY == $libtype) {
     $options .= " \\\n\t--disable-static";

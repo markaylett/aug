@@ -38,7 +38,7 @@ modinclude_HEADERS = \
 	task.h \
 	var.h
 
-if ENABLE_RUBY
+if WITH_RUBY
 BUILT_SOURCES = \
 	blob.h \
 	boxint.h \

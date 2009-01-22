@@ -42,23 +42,23 @@ DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 bin_PROGRAMS = daug$(EXEEXT)
 check_PROGRAMS = maintest$(EXEEXT)
-@ENABLE_PYTHON_TRUE@am__append_1 = \
-@ENABLE_PYTHON_TRUE@	test/pytest1 \
-@ENABLE_PYTHON_TRUE@	test/pytest2 \
-@ENABLE_PYTHON_TRUE@	test/pytest3 \
-@ENABLE_PYTHON_TRUE@	test/pytest4 \
-@ENABLE_PYTHON_TRUE@	test/pytest5 \
-@ENABLE_PYTHON_TRUE@	test/pytest6 \
-@ENABLE_PYTHON_TRUE@	test/pytest7
+@WITH_PYTHON_TRUE@am__append_1 = \
+@WITH_PYTHON_TRUE@	test/pytest1 \
+@WITH_PYTHON_TRUE@	test/pytest2 \
+@WITH_PYTHON_TRUE@	test/pytest3 \
+@WITH_PYTHON_TRUE@	test/pytest4 \
+@WITH_PYTHON_TRUE@	test/pytest5 \
+@WITH_PYTHON_TRUE@	test/pytest6 \
+@WITH_PYTHON_TRUE@	test/pytest7
 
-@ENABLE_RUBY_TRUE@am__append_2 = \
-@ENABLE_RUBY_TRUE@	test/rbtest1 \
-@ENABLE_RUBY_TRUE@	test/rbtest2 \
-@ENABLE_RUBY_TRUE@	test/rbtest3 \
-@ENABLE_RUBY_TRUE@	test/rbtest4 \
-@ENABLE_RUBY_TRUE@	test/rbtest5 \
-@ENABLE_RUBY_TRUE@	test/rbtest6 \
-@ENABLE_RUBY_TRUE@	test/rbtest7
+@WITH_RUBY_TRUE@am__append_2 = \
+@WITH_RUBY_TRUE@	test/rbtest1 \
+@WITH_RUBY_TRUE@	test/rbtest2 \
+@WITH_RUBY_TRUE@	test/rbtest3 \
+@WITH_RUBY_TRUE@	test/rbtest4 \
+@WITH_RUBY_TRUE@	test/rbtest5 \
+@WITH_RUBY_TRUE@	test/rbtest6 \
+@WITH_RUBY_TRUE@	test/rbtest7
 
 subdir = src/cpp/daug
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -131,46 +131,44 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
-ECHO = @ECHO@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 ENABLE_MULTICAST_FALSE = @ENABLE_MULTICAST_FALSE@
 ENABLE_MULTICAST_TRUE = @ENABLE_MULTICAST_TRUE@
-ENABLE_PYTHON_FALSE = @ENABLE_PYTHON_FALSE@
-ENABLE_PYTHON_TRUE = @ENABLE_PYTHON_TRUE@
-ENABLE_RUBY_FALSE = @ENABLE_RUBY_FALSE@
-ENABLE_RUBY_TRUE = @ENABLE_RUBY_TRUE@
 ENABLE_SMP_FALSE = @ENABLE_SMP_FALSE@
 ENABLE_SMP_TRUE = @ENABLE_SMP_TRUE@
-ENABLE_SSL_FALSE = @ENABLE_SSL_FALSE@
-ENABLE_SSL_TRUE = @ENABLE_SSL_TRUE@
 ENABLE_STRICT_FALSE = @ENABLE_STRICT_FALSE@
 ENABLE_STRICT_TRUE = @ENABLE_STRICT_TRUE@
 ENABLE_THREADS_FALSE = @ENABLE_THREADS_FALSE@
 ENABLE_THREADS_TRUE = @ENABLE_THREADS_TRUE@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
+FGREP = @FGREP@
 GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OTOOL = @OTOOL@
+OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -184,9 +182,15 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WITH_PYTHON_FALSE = @WITH_PYTHON_FALSE@
+WITH_PYTHON_TRUE = @WITH_PYTHON_TRUE@
+WITH_RUBY_FALSE = @WITH_RUBY_FALSE@
+WITH_RUBY_TRUE = @WITH_RUBY_TRUE@
+WITH_SSL_FALSE = @WITH_SSL_FALSE@
+WITH_SSL_TRUE = @WITH_SSL_TRUE@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -220,6 +224,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -390,7 +395,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 
 distclean-libtool:
-	-rm -f libtool
+	-rm -f libtool config.lt
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd

@@ -59,11 +59,11 @@ estabclient_(struct cimpl_* impl, aug_chandler* handler)
     /* Create forward pointer. */
 
     impl->fwd_ =
-#if ENABLE_SSL
+#if WITH_SSL
         impl->sslctx_ ?
         aug_createsslclient(impl->mpool_, impl->id_, impl->muxer_, sd,
                             impl->wantwr_, handler, impl->sslctx_) :
-#endif /* ENABLE_SSL */
+#endif /* WITH_SSL */
         aug_createplain(impl->mpool_, impl->id_, impl->muxer_, sd,
                         impl->wantwr_);
 
@@ -495,11 +495,11 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 
         id = aug_nextid();
         chan =
-#if ENABLE_SSL
+#if WITH_SSL
             impl->sslctx_ ?
             aug_createsslserver(impl->mpool_, id, impl->muxer_, sd,
                                 impl->wantwr_, handler, impl->sslctx_) :
-#endif /* ENABLE_SSL */
+#endif /* WITH_SSL */
             aug_createplain(impl->mpool_, id, impl->muxer_, sd,
                             impl->wantwr_);
 

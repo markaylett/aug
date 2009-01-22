@@ -1,5 +1,8 @@
 /* src/auglocal.h.in.  Generated from configure.in by autoheader.  */
 
+/* Define if building universal (internal helper macro) */
+#undef AC_APPLE_UNIVERSAL_BUILD
+
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
    */
@@ -11,17 +14,8 @@
 /* Define to 1 for multicast support. */
 #undef ENABLE_MULTICAST
 
-/* Define to 1 for python support. */
-#undef ENABLE_PYTHON
-
-/* Define to 1 for ruby support. */
-#undef ENABLE_RUBY
-
 /* Define to 1 for smp support. */
 #undef ENABLE_SMP
-
-/* Define to 1 for ssl support. */
-#undef ENABLE_SSL
 
 /* Define to 1 for strict types. */
 #undef ENABLE_STRICT
@@ -93,6 +87,10 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
 /* Name of package */
 #undef PACKAGE
 
@@ -125,9 +123,26 @@
 /* Version number of package */
 #undef VERSION
 
-/* Define to 1 if your processor stores words with the most significant byte
-   first (like Motorola and SPARC, unlike Intel and VAX). */
-#undef WORDS_BIGENDIAN
+/* Define to 1 for python support. */
+#undef WITH_PYTHON
+
+/* Define to 1 for ruby support. */
+#undef WITH_RUBY
+
+/* Define to 1 for ssl support. */
+#undef WITH_SSL
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  undef WORDS_BIGENDIAN
+# endif
+#endif
 
 /* Define to the equivalent of __func__ */
 #undef __func__

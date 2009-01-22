@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#if ENABLE_SSL
+#if WITH_SSL
 
 # include "augsys/socket.h" /* aug_shutdown() */
 # include "augsys/sticky.h"
@@ -989,4 +989,4 @@ aug_createsslserver(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
     return &impl->chan_;
 }
 
-#endif /* ENABLE_SSL */
+#endif /* WITH_SSL */

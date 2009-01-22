@@ -7,7 +7,7 @@
 
 AUG_RCSID("$Id$");
 
-#if ENABLE_SSL
+#if WITH_SSL
 
 # include "augaspp/conn.hpp"
 
@@ -39,4 +39,4 @@ aug::initssl()
     SSL_load_error_strings();
 }
 
-#endif // ENABLE_SSL
+#endif // WITH_SSL

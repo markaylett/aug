@@ -17,7 +17,7 @@ EXTRA_DIST = \
 bin_SCRIPTS = \
 	augidl
 
-if ENABLE_RUBY
+if WITH_RUBY
 rubydir = $(prefix)/ruby
 ruby_DATA = \
 	augutil.rb \
