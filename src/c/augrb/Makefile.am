@@ -3,8 +3,6 @@ include $(top_srcdir)/src/c/lang.mk
 moddir = $(prefix)/mod
 
 if WITH_RUBY
-RB_CFLAGS=`$(top_srcdir)/src/rb/rbflags -c`
-RB_LDFLAGS=`$(top_srcdir)/src/rb/rbflags -l`
 AM_CFLAGS = $(RB_CFLAGS)
 
 noinst_HEADERS = \

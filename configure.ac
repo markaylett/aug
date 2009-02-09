@@ -8,6 +8,7 @@ AC_INIT([aug], [trunk], [mark.aylett@gmail.com])
 #AM_INIT_AUTOMAKE([aug], [trunk], [mark.aylett@gmail.com])
 AM_INIT_AUTOMAKE()
 AC_CONFIG_HEADER([src/auglocal.h])
+AC_CONFIG_MACRO_DIR([m4])
 AM_MAINTAINER_MODE
 
 # Checks for programs.
@@ -84,6 +85,10 @@ AC_ARG_WITH(python,
 AM_CONDITIONAL(WITH_PYTHON, test x$with_python = xyes)
 if test x$with_python = xyes; then
     AC_DEFINE(WITH_PYTHON, 1, [Define to 1 for python support.])
+    PY_CFLAGS=`$(SHELL) src/sh/pyflags -c`
+    AC_SUBST([PY_CFLAGS])
+    PY_LDFLAGS=`$(SHELL) src/sh/pyflags -l`
+    AC_SUBST([PY_LDFLAGS])
 fi
 
 AC_ARG_WITH(ruby,
@@ -97,6 +102,10 @@ AC_ARG_WITH(ruby,
 AM_CONDITIONAL(WITH_RUBY, test x$with_ruby = xyes)
 if test x$with_ruby = xyes; then
     AC_DEFINE(WITH_RUBY, 1, [Define to 1 for ruby support.])
+    RB_CFLAGS=`src/rb/rbflags -c`
+    AC_SUBST([RB_CFLAGS])
+    RB_LDFLAGS=`src/rb/rbflags -l`
+    AC_SUBST([RB_LDFLAGS])
 fi
 
 AC_ARG_WITH(ssl,
@@ -211,17 +220,17 @@ int accept(int, struct sockaddr*, size_t*);
 
 AC_MSG_CHECKING(for ipv6)
 AC_TRY_COMPILE([
-    # include <sys/types.h>
-    #if !defined(_WIN32)
-    # include <sys/socket.h>
-    # include <netinet/in.h>
-    # include <arpa/inet.h>
-    # include <netdb.h>
-    #else /* _WIN32 */
-    # include <winsock2.h>
-    # include <ws2tcpip.h>
-    #endif /* _WIN32 */
-    int x = IPV6_ADD_MEMBERSHIP;
+# include <sys/types.h>
+#if !defined(_WIN32)
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+#else /* _WIN32 */
+# include <winsock2.h>
+# include <ws2tcpip.h>
+#endif /* _WIN32 */
+int x = IPV6_ADD_MEMBERSHIP;
 ], [], [
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_IPV6, 1, [Define to 1 if you have ipv6 support.])

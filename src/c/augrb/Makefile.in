@@ -42,7 +42,7 @@ DIST_COMMON = $(am__noinst_HEADERS_DIST) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
 subdir = src/c/augrb
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -149,7 +149,11 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PY_CFLAGS = @PY_CFLAGS@
+PY_LDFLAGS = @PY_LDFLAGS@
 RANLIB = @RANLIB@
+RB_CFLAGS = @RB_CFLAGS@
+RB_LDFLAGS = @RB_LDFLAGS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -209,13 +213,12 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+ACLOCAL_AMFLAGS = -Im4
 DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src \
 	-I$(top_srcdir)/src/c
 
 moddir = $(prefix)/mod
-@WITH_RUBY_TRUE@RB_CFLAGS = `$(top_srcdir)/src/rb/rbflags -c`
-@WITH_RUBY_TRUE@RB_LDFLAGS = `$(top_srcdir)/src/rb/rbflags -l`
 @WITH_RUBY_TRUE@AM_CFLAGS = $(RB_CFLAGS)
 @WITH_RUBY_TRUE@noinst_HEADERS = \
 @WITH_RUBY_TRUE@	object.h
