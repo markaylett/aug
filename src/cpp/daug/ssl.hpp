@@ -7,6 +7,7 @@
 #include "augaspp/ssl.hpp"
 
 #include <map>
+#include <string>
 
 namespace daug {
 

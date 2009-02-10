@@ -10,6 +10,7 @@
 
 #include <algorithm> // swap()
 #include <cassert>
+#include <cstring>   // strcmp()
 
 #if !defined(AUG_NOTHROW)
 # if !defined(NDEBUG)

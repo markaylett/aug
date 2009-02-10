@@ -8,6 +8,7 @@
 
 #include "augctxpp/mpool.hpp"
 
+#include <memory> // std::auto_ptr<>
 #include <string>
 
 namespace aug {

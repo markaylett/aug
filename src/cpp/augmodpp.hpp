@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <typeinfo> // std::bad_cast
 #include <vector>
 #include <functional>
 
