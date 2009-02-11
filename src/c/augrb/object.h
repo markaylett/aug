@@ -14,6 +14,8 @@
 # if !defined(_MSC_VER)
 #  define _MSC_VER 1200
 # else /* _MSC_VER */
+#  undef _MSC_VER
+#  define _MSC_VER 1200
 #  pragma comment(lib, "msvcrt-ruby18.lib")
 # endif /* _MSC_VER */
 char*

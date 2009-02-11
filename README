@@ -8,8 +8,47 @@ MinGW Build:
    b) where unavailable, python, ruby and ssl support are disabled.
 3. Run the resulting config.sh, to configure.
 
+If "make check" is failing, try installing the package first to ensure that
+the DLLs are visible on your PATH.
+
+MSVC++ Build:
+
+Add the following vc++ directories:
+
+$(OPENSSL_HOME)\include
+$(PYTHON_HOME)\include
+$(RUBY_HOME)\lib\ruby\1.8\i386-mswin32
+
+$(OPENSSL_HOME)\lib\VC
+$(PYTHON_HOME)\libs
+$(RUBY_HOME)\lib
+
 Thread Safety Classifications
 
 thread-safe
 thread-compatible
 single-only
+
+Licenses
+
+aug - GNU General Public License Version 2
+
+dlmalloc - Public Domain.
+http://gee.cs.oswego.edu/pub/misc/malloc.c
+
+dlfcn - Open Source License.
+http://www.opensource.apple.com/darwinsource/WWDC2004/Libwrappers-14/dlcompat/dlfcn.c
+
+strlcpy (by Dan Cross)  - Public Domain.
+
+sys/queue.h - BSD License.
+http://fxr.watson.org/fxr/source/sys/queue.h
+
+openssl (optional) - OpenSSL License.
+http://www.openssl.org/source/license.html
+
+python (optional) - Python Software Foundation License Version 2:
+http://www.python.org/psf/license/
+
+ruby (optional) - Ruby License:
+http://www.ruby-lang.org/en/LICENSE.txt

@@ -85,9 +85,9 @@ AC_ARG_WITH(python,
 AM_CONDITIONAL(WITH_PYTHON, test x$with_python = xyes)
 if test x$with_python = xyes; then
     AC_DEFINE(WITH_PYTHON, 1, [Define to 1 for python support.])
-    PY_CFLAGS=`$(SHELL) src/sh/pyflags -c`
+    PY_CFLAGS=`src/sh/pyflags -c`
     AC_SUBST([PY_CFLAGS])
-    PY_LDFLAGS=`$(SHELL) src/sh/pyflags -l`
+    PY_LDFLAGS=`src/sh/pyflags -l`
     AC_SUBST([PY_LDFLAGS])
 fi
 
