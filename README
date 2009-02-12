@@ -1,4 +1,4 @@
-Please see http://aug.sourceforge.net for the latest documentation.
+Please see http://www.xofy.org/aug for the latest documentation.
 
 MinGW Build:
 
@@ -7,6 +7,11 @@ MinGW Build:
    a) "cygwin build for mingw host" is selected as the compiler toolset.
    b) where unavailable, python, ruby and ssl support are disabled.
 3. Run the resulting config.sh, to configure.
+
+$ cp c:/WINNT/system32/ssleay32.dll c:/WINNT/system32/libssleay32.dll 
+$ cd $OPENSSL_HOME/lib/MinGW/
+$ cp ssleay32.a libssleay32.a
+$ cp lib*.a /lib/mingw/
 
 If "make check" is failing, try installing the package first to ensure that
 the DLLs are visible on your PATH.
@@ -23,7 +28,7 @@ $(OPENSSL_HOME)\lib\VC
 $(PYTHON_HOME)\libs
 $(RUBY_HOME)\lib
 
-Thread Safety Classifications
+Thread-safety Classifications:
 
 thread-safe
 thread-compatible

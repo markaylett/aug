@@ -18,9 +18,8 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 LT_INIT([win32-dll])
-#LT_OUTPUT
-#AC_DIAGNOSE([obsolete],[AC_PROG_LIBTOOL: Remove this warning and the call to LT_OUTPUT if you do not need
-#libtool to exist before AC_OUTPUT.])
+
+# Multicast.
 
 AC_ARG_ENABLE(multicast,
 [  --enable-multicast      enable multicast support @<:@default=yes@:>@], [
@@ -36,6 +35,8 @@ if test x$enable_multicast = xyes; then
     AC_DEFINE(ENABLE_MULTICAST, 1, [Define to 1 for multicast support.])
 fi
 
+# SMP.
+
 AC_ARG_ENABLE(smp,
 [  --enable-smp            enable smp support @<:@default=yes@:>@], [
     case x$enableval in
@@ -49,6 +50,8 @@ AM_CONDITIONAL(ENABLE_SMP, test x$enable_smp = xyes)
 if test x$enable_smp = xyes; then
     AC_DEFINE(ENABLE_SMP, 1, [Define to 1 for smp support.])
 fi
+
+# Strict.
 
 AC_ARG_ENABLE(strict,
 [  --enable-strict         enable strict support @<:@default=no@:>@], [
@@ -64,6 +67,8 @@ if test x$enable_strict = xyes; then
     AC_DEFINE(ENABLE_STRICT, 1, [Define to 1 for strict types.])
 fi
 
+# Threads.
+
 AC_ARG_ENABLE(threads,
 [  --enable-threads        enable threads support @<:@default=yes@:>@], [
     case x$enableval in
@@ -77,6 +82,8 @@ AM_CONDITIONAL(ENABLE_THREADS, test x$enable_threads = xyes)
 if test x$enable_threads = xyes; then
     AC_DEFINE(ENABLE_THREADS, 1, [Define to 1 for threads support.])
 fi
+
+# Python.
 
 AC_ARG_WITH(python,
 [  --with-python           with python support @<:@default=no@:>@], [
@@ -96,6 +103,8 @@ if test x$with_python = xyes; then
     AC_SUBST([PY_LDFLAGS])
 fi
 
+# Ruby.
+
 AC_ARG_WITH(ruby,
 [  --with-ruby             with ruby support @<:@default=no@:>@], [
     case x$withval in
@@ -113,6 +122,8 @@ if test x$with_ruby = xyes; then
     RB_LDFLAGS=`src/rb/rbflags -l`
     AC_SUBST([RB_LDFLAGS])
 fi
+
+# SSL.
 
 AC_ARG_WITH(ssl,
 [  --with-ssl              with ssl support @<:@default=yes@:>@], [
@@ -151,11 +162,6 @@ case $host in
         CPPFLAGS="-mthreads $CPPFLAGS"
         LDFLAGS="-mthreads $LDFLAGS"
     fi
-
-    # cp c:/WINNT/system32/ssleay32.dll c:/WINNT/system32/libssleay32.dll 
-    # cd c:/OpenSSL/lib/MinGW/
-    # cp ssleay32.a libssleay32.a
-    # cp lib*.a /lib/mingw/
 
     if test x$with_ssl = xyes; then
         AC_SEARCH_LIBS(SSL_library_init, [ssleay32])

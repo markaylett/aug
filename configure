@@ -15614,9 +15614,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # Only expand once:
 
 
-#LT_OUTPUT
-#AC_DIAGNOSE([obsolete],[AC_PROG_LIBTOOL: Remove this warning and the call to LT_OUTPUT if you do not need
-#libtool to exist before AC_OUTPUT.])
+
+# Multicast.
 
 # Check whether --enable-multicast was given.
 if test "${enable_multicast+set}" = set; then
@@ -15652,6 +15651,8 @@ _ACEOF
 
 fi
 
+# SMP.
+
 # Check whether --enable-smp was given.
 if test "${enable_smp+set}" = set; then
   enableval=$enable_smp;
@@ -15685,6 +15686,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 fi
+
+# Strict.
 
 # Check whether --enable-strict was given.
 if test "${enable_strict+set}" = set; then
@@ -15720,6 +15723,8 @@ _ACEOF
 
 fi
 
+# Threads.
+
 # Check whether --enable-threads was given.
 if test "${enable_threads+set}" = set; then
   enableval=$enable_threads;
@@ -15753,6 +15758,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 fi
+
+# Python.
 
 
 # Check whether --with-python was given.
@@ -15793,6 +15800,8 @@ _ACEOF
 
 fi
 
+# Ruby.
+
 
 # Check whether --with-ruby was given.
 if test "${with_ruby+set}" = set; then
@@ -15831,6 +15840,8 @@ _ACEOF
     RB_LDFLAGS=`src/rb/rbflags -l`
 
 fi
+
+# SSL.
 
 
 # Check whether --with-ssl was given.
@@ -15888,11 +15899,6 @@ case $host in
         CPPFLAGS="-mthreads $CPPFLAGS"
         LDFLAGS="-mthreads $LDFLAGS"
     fi
-
-    # cp c:/WINNT/system32/ssleay32.dll c:/WINNT/system32/libssleay32.dll
-    # cd c:/OpenSSL/lib/MinGW/
-    # cp ssleay32.a libssleay32.a
-    # cp lib*.a /lib/mingw/
 
     if test x$with_ssl = xyes; then
         { $as_echo "$as_me:$LINENO: checking for library containing SSL_library_init" >&5
