@@ -1,11 +1,9 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.56)
-#AC_INIT([src/auglocal.h.in])
-AC_INIT([aug], [trunk], [mark.aylett@gmail.com])
+AC_PREREQ(2.63)
+AC_INIT([aug],[trunk],[mark.aylett@gmail.com])
 
-#AM_INIT_AUTOMAKE([aug], [trunk], [mark.aylett@gmail.com])
 AM_INIT_AUTOMAKE()
 AC_CONFIG_HEADER([src/auglocal.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -19,8 +17,10 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-AC_LIBTOOL_WIN32_DLL
-AM_PROG_LIBTOOL
+LT_INIT([win32-dll])
+#LT_OUTPUT
+#AC_DIAGNOSE([obsolete],[AC_PROG_LIBTOOL: Remove this warning and the call to LT_OUTPUT if you do not need
+#libtool to exist before AC_OUTPUT.])
 
 AC_ARG_ENABLE(multicast,
 [  --enable-multicast      enable multicast support @<:@default=yes@:>@], [
@@ -31,6 +31,7 @@ AC_ARG_ENABLE(multicast,
     esac
 ], [enable_multicast=yes])
 AM_CONDITIONAL(ENABLE_MULTICAST, test x$enable_multicast = xyes)
+
 if test x$enable_multicast = xyes; then
     AC_DEFINE(ENABLE_MULTICAST, 1, [Define to 1 for multicast support.])
 fi
@@ -44,6 +45,7 @@ AC_ARG_ENABLE(smp,
     esac
 ], [enable_smp=yes])
 AM_CONDITIONAL(ENABLE_SMP, test x$enable_smp = xyes)
+
 if test x$enable_smp = xyes; then
     AC_DEFINE(ENABLE_SMP, 1, [Define to 1 for smp support.])
 fi
@@ -56,6 +58,7 @@ AC_ARG_ENABLE(strict,
         *) AC_MSG_ERROR(bad value $enableval for --enable-strict);;
     esac
 ], [enable_strict=no])
+
 AM_CONDITIONAL(ENABLE_STRICT, test x$enable_strict = xyes)
 if test x$enable_strict = xyes; then
     AC_DEFINE(ENABLE_STRICT, 1, [Define to 1 for strict types.])
@@ -70,6 +73,7 @@ AC_ARG_ENABLE(threads,
     esac
 ], [enable_threads=yes])
 AM_CONDITIONAL(ENABLE_THREADS, test x$enable_threads = xyes)
+
 if test x$enable_threads = xyes; then
     AC_DEFINE(ENABLE_THREADS, 1, [Define to 1 for threads support.])
 fi
@@ -83,6 +87,7 @@ AC_ARG_WITH(python,
     esac
 ], [with_python=no])
 AM_CONDITIONAL(WITH_PYTHON, test x$with_python = xyes)
+
 if test x$with_python = xyes; then
     AC_DEFINE(WITH_PYTHON, 1, [Define to 1 for python support.])
     PY_CFLAGS=`src/sh/pyflags -c`
@@ -100,6 +105,7 @@ AC_ARG_WITH(ruby,
     esac
 ], [with_ruby=no])
 AM_CONDITIONAL(WITH_RUBY, test x$with_ruby = xyes)
+
 if test x$with_ruby = xyes; then
     AC_DEFINE(WITH_RUBY, 1, [Define to 1 for ruby support.])
     RB_CFLAGS=`src/rb/rbflags -c`
@@ -114,14 +120,14 @@ AC_ARG_WITH(ssl,
         xyes) with_ssl=yes;;
         xno)  with_ssl=no;;
         *)
-            CFLAGS="-I$withval/include $CFLAGS"
-            CXXFLAGS="-I$withval/include $CXXFLAGS"
+            CPPFLAGS="-I$withval/include $CPPFLAGS"
             LDFLAGS="-L$withval/lib $LDFLAGS"
-            withval=yes
+            with_ssl=yes
         ;;
     esac
 ], [with_ssl=yes])
 AM_CONDITIONAL(WITH_SSL, test x$with_ssl = xyes)
+
 if test x$with_ssl = xyes; then
     AC_DEFINE(WITH_SSL, 1, [Define to 1 for ssl support.])
 fi
@@ -131,8 +137,7 @@ fi
 LDFLAGS="-lm $LDFLAGS"
 
 if test x$enable_threads = xyes; then
-   CFLAGS="-D_MT -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS $CFLAGS"
-   CXXFLAGS="-D_MT -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS $CXXFLAGS"
+   CPPFLAGS="-D_MT -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS $CPPFLAGS"
 fi
 
 case $host in
@@ -143,8 +148,7 @@ case $host in
     fi
 
     if test x$enable_threads = xyes; then
-        CFLAGS="-mthreads $CFLAGS"
-        CXXFLAGS="-mthreads $CXXFLAGS"
+        CPPFLAGS="-mthreads $CPPFLAGS"
         LDFLAGS="-mthreads $LDFLAGS"
     fi
 
@@ -158,8 +162,7 @@ case $host in
         AC_SEARCH_LIBS(BIO_new, [eay32])
     fi
 
-    CFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 -D__USE_W32_SOCKETS $CFLAGS"
-    CXXFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 -D__USE_W32_SOCKETS $CXXFLAGS"
+    CPPFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 -D__USE_W32_SOCKETS $CPPFLAGS"
     LIBS="-Wl,-lws2_32 $LIBS"
 
     ;;
@@ -191,7 +194,7 @@ AC_CHECK_HEADERS([dlfcn.h sys/sockio.h openssl/err.h openssl/ssl.h])
 AC_C_BIGENDIAN
 
 AC_MSG_CHECKING(for socklen_t)
-AC_TRY_COMPILE([
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h>
 #if !defined(_WIN32)
 # include <sys/socket.h>
@@ -199,9 +202,12 @@ AC_TRY_COMPILE([
 #else /* _WIN32 */
 # include <winsock2.h>
 #endif /* _WIN32 */
-socklen_t x;
-], [], [AC_MSG_RESULT(yes)], [
-    AC_TRY_COMPILE([
+]], [[socklen_t x;]])], [result=yes], [result=no]);
+
+if test x$result = xyes; then
+    AC_MSG_RESULT(yes)
+else
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h>
 #if !defined(_WIN32)
 # include <sys/socket.h>
@@ -209,17 +215,19 @@ socklen_t x;
 # include <winsock2.h>
 #endif /* _WIN32 */
 int accept(int, struct sockaddr*, size_t*);
-    ], [], [
+]], [[]])], [result=yes], [result=no]);
+
+    if test x$result = xyes; then
         AC_MSG_RESULT(size_t)
         AC_DEFINE(socklen_t, size_t, [socklen_t size])
-    ], [
+    else
         AC_MSG_RESULT(int)
         AC_DEFINE(socklen_t, int, [socklen_t size])
-    ])
-])
+    fi
+fi
 
 AC_MSG_CHECKING(for ipv6)
-AC_TRY_COMPILE([
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 # include <sys/types.h>
 #if !defined(_WIN32)
 # include <sys/socket.h>
@@ -230,42 +238,47 @@ AC_TRY_COMPILE([
 # include <winsock2.h>
 # include <ws2tcpip.h>
 #endif /* _WIN32 */
-int x = IPV6_ADD_MEMBERSHIP;
-], [], [
+]], [[int x = IPV6_ADD_MEMBERSHIP;]])], [result=yes], [result=no]);
+
+if test x$result = xyes; then
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_IPV6, 1, [Define to 1 if you have ipv6 support.])
-], [
+else
 	AC_MSG_RESULT(no)
-])
+fi
 
 AC_MSG_CHECKING(whether the compiler supports __func__)
-AC_TRY_COMPILE([
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 const char*
 func()
 {
     return __func__;
 }
-], [], [
+]], [[]])], [result=yes], [result=no]);
+
+if test x$result = xyes; then
     AC_MSG_RESULT(yes)
-], [
+else
     AC_MSG_RESULT(no)
     AC_MSG_CHECKING(whether the compiler supports __FUNCTION__)
-    AC_TRY_COMPILE([
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 const char*
 func()
 {
     return __FUNCTION__;
 }
-    ], [], [
+]], [[]])], [result=yes], [result=no]);
+
+    if test x$result = xyes; then
         AC_MSG_RESULT(yes)
         AC_DEFINE(__func__, __FUNCTION__,
             [Define to the equivalent of __func__])
-    ], [
+    else
         AC_MSG_RESULT(no)
         AC_DEFINE(__func__, "unknown",
             [Define to the equivalent of __func__])
-    ])
-])
+    fi
+fi
 
 # Checks for library functions.
 AC_CHECK_FUNCS([bzero localtime_r poll strlcpy timegm])
