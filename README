@@ -59,22 +59,31 @@ Licenses
 
 aug - GNU General Public License Version 2
 
-dlmalloc - Public Domain.
+dlmalloc - Public Domain
 http://gee.cs.oswego.edu/pub/misc/malloc.c
 
-dlfcn - Open Source License.
+dlfcn - Open Source License
 http://www.opensource.apple.com/darwinsource/WWDC2004/Libwrappers-14/dlcompat/dlfcn.c
 
-strlcpy (by Dan Cross)  - Public Domain.
+gprof2dot.py - GNU Lesser General Public License (LGPL)
+http://freshmeat.net/projects/gprof2dot.py
 
-sys/queue.h - BSD License.
+htpasswd - Public Domain
+
+Portions of this software are based upon public domain software originally
+written at the National Center for Supercomputing Applications, University of
+Illinois, Urbana-Champaign.
+
+strlcpy (by Dan Cross) - Public Domain
+
+sys/queue.h - BSD License
 http://fxr.watson.org/fxr/source/sys/queue.h
 
-openssl (optional) - OpenSSL License.
+openssl (optional) - OpenSSL License
 http://www.openssl.org/source/license.html
 
-python (optional) - Python Software Foundation License Version 2:
+python (optional) - Python Software Foundation License Version 2
 http://www.python.org/psf/license/
 
-ruby (optional) - Ruby License:
+ruby (optional) - Ruby License
 http://www.ruby-lang.org/en/LICENSE.txt
