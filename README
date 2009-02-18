@@ -1,4 +1,4 @@
-Copyright (c) 2004-2009, Mark Aylett <mark.aylett@gmail.com>
+Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009 Mark Aylett <mark.aylett@gmail.com>
 
 This file is part of Aug written by Mark Aylett.
 
@@ -49,15 +49,51 @@ $(OPENSSL_HOME)\lib\VC
 $(PYTHON_HOME)\libs
 $(RUBY_HOME)\lib
 
-Thread-safety Classifications:
+FAQ
 
-thread-safe
-thread-compatible
-single-only
+1. What does the COPYING file contain?
 
-Licenses
+A verbatim copy of the following document:
 
-aug - GNU General Public License Version 2
+http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+
+2. Can the years on the license notice be summarised in a range, such as
+   2004-2009?
+
+Ideally, gnu.org want the years to be explicitly listed rather than in a
+range.  There is some confusion on why they want this, but it related to
+international laws.  They have a Berne copyright law, but not all countries
+have signed it.  So those at gnu.org convinced it is better to play it safe
+than be sorry.
+
+3. If I build with OpenSSL support, doesn't this break the GPL license
+   agreement?
+
+No.  The following exception has been added to the license agreement.
+
+"This program is released under the GPL with the additional exemption that
+compiling, linking, and/or using OpenSSL is allowed."
+
+4. Aug is targeted at MacOS, Windows, and Posix compliant systems.  Does it
+   depend on any non-free system?
+
+No.  Aug does not depend on any non-free systems.
+
+5. Are there any dependencies?  If so, provide the link to those dependencies
+   with the license that they use.
+
+Optional dependencies are:
+
+openssl (optional) - OpenSSL License
+http://www.openssl.org/source/license.html
+
+python (optional) - Python Software Foundation License Version 2
+http://www.python.org/psf/license/
+
+ruby (optional) - Ruby License
+http://www.ruby-lang.org/en/LICENSE.txt
+
+Aug also benefits from some third-party contributions:
 
 dlmalloc - Public Domain
 http://gee.cs.oswego.edu/pub/misc/malloc.c
@@ -78,12 +114,3 @@ strlcpy (by Dan Cross) - Public Domain
 
 sys/queue.h - BSD License
 http://fxr.watson.org/fxr/source/sys/queue.h
-
-openssl (optional) - OpenSSL License
-http://www.openssl.org/source/license.html
-
-python (optional) - Python Software Foundation License Version 2
-http://www.python.org/psf/license/
-
-ruby (optional) - Ruby License
-http://www.ruby-lang.org/en/LICENSE.txt
