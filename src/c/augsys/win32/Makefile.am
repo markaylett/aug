@@ -6,5 +6,4 @@ EXTRA_DIST = \
 	socket.c \
 	uio.c \
 	unistd.c \
-	utility.c \
-	iptypes_.h
+	utility.c

@@ -25,7 +25,7 @@
 #include "augctx/errinfo.h"
 
 #if defined(__GNUC__)
-# include "iptypes_.h"
+# include "iptypes.h"
 #endif /* __GNUC__ */
 #include <iphlpapi.h>
 

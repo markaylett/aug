@@ -84,33 +84,52 @@ No.  Aug does not depend on any non-free systems.
 
 Optional dependencies are:
 
-openssl (optional) - OpenSSL License
+OpenSSL (optional)
+License: OpenSSL License
 http://www.openssl.org/source/license.html
 
-python (optional) - Python Software Foundation License Version 2
+Python (optional)
+License: Python Software Foundation License Version 2
 http://www.python.org/psf/license/
 
-ruby (optional) - Ruby License
+Ruby (optional)
+License: Ruby License
 http://www.ruby-lang.org/en/LICENSE.txt
 
-Aug also benefits from some third-party contributions:
+Aug also benefits from the following third-party contributions:
 
-dlmalloc - Public Domain
+dlmalloc by Doug Lea
+License: Public Domain
 http://gee.cs.oswego.edu/pub/misc/malloc.c
 
-dlfcn - Open Source License
+dlfcn.c by Jorge Acereda and Peter O'Gorman
+License: Open Source License
 http://www.opensource.apple.com/darwinsource/WWDC2004/Libwrappers-14/dlcompat/dlfcn.c
 
-gprof2dot.py - GNU Lesser General Public License (LGPL)
+getopt.c by Henry Spencer
+License: Public Domain
+http://www.lysator.liu.se/c/henry
+
+gprof2dot.py by Jose Fonseca
+License: GNU Lesser General Public License (LGPL)
 http://freshmeat.net/projects/gprof2dot.py
 
-htpasswd - Public Domain
+htdigest.c by Alexei Kosut
+License: Public Domain
+http://web.mit.edu/course/other/compututor/apache_1.2.0/support/htdigest.c
 
-Portions of this software are based upon public domain software originally
-written at the National Center for Supercomputing Applications, University of
-Illinois, Urbana-Champaign.
+Note: portions of this software are based upon public domain software
+originally written at the National Center for Supercomputing Applications,
+University of Illinois, Urbana-Champaign.
 
-strlcpy (by Dan Cross) - Public Domain
+md5.c (by Colin Plumb)
+License: Public Domain
+http://cvsweb.xfree86.org/cvsweb/*checkout*/cvs/lib/md5.c?rev=1.1
 
-sys/queue.h - BSD License
+strlcpy.c (by Dan Cross)
+License: Public Domain
+http://unixpapa.com/incnote/string.html
+
+sys/queue.h
+License: BSD License
 http://fxr.watson.org/fxr/source/sys/queue.h
