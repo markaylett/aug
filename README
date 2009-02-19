@@ -21,115 +21,187 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 Please see http://www.xofy.org/aug for the latest documentation.
 
-MinGW Build:
+Daug MSI Installation
+=====================
+
+1. Run the MSI installer.  Before changing the destination folder from the
+   default, please read the Daug MSI FAQ, below.
+
+2. From the installation directory, copy the 'etc/daug.conf.default' file
+   to 'etc/daug.conf'.
+
+3. Change the 'etc/daug.conf' file as appropriate.  At least, the 'rundir'
+   option should be set to the absolute path of the installation directory.
+
+4. To run the example modules, copy the contents of 'example/augas/etc' and
+   'example/augas/htdocs' to the respective directories 'etc' and 'htdocs'.
+
+5. Run the 'install.bat' file in the installation directory: this will
+   register the service with the Service Control Manager.
+
+6. To start the service, run the 'start.bat' file in the installation
+   directory.
+
+   If the service fails to start, and no log file exists in the log
+   directory, try checking here:
+
+   C:\Documents and Settings\NetworkService\Local Settings\Temp
+
+Daug MSI FAQ
+============
+
+1. Why do I receive a 'The system cannot open the device or file specified.'
+   error when trying to install the MSI?
+
+   This error is often followed by:
+
+   The installer has encountered an unexpected error installing this package.
+   This may indicate a problem with this package.  The error code is 2755.
+
+   If you are using an encrypted file system, decrypt the MSI installer and
+   rerun.
+
+2. Why does the following message appear in the log file?
+
+   'import site' failed; use -v for traceback ImportError: No module named
+   traceback
+
+   If you are using an encrypted file system, recursively decrypt the
+   directory to which Python was installed.
+
+3. Why do I receive an 'Access Denied' error when attempting to start the
+   service?
+
+   By default the Service will be run using the system's 'Network Service'
+   account.  As with the 'Local System' account, access may be restricted to
+   certain areas of the file system.
+
+   This may occur when installing to destination directories other than the
+   default.
+
+   This issue can be resolved by either a) re-installing to a shared (common)
+   area of the file system, or b) running the service under an alternate
+   account.
+
+MinGW Build
+===========
 
 1. Verify that cygwin's mingw toolchain and w32api packages are installed.
+
 2. Run config.pl in the base directory, and ensure that:
+
    a) "cygwin build for mingw host" is selected as the compiler toolset.
+
    b) where unavailable, python, ruby and ssl support are disabled.
+
 3. Run the resulting config.sh, to configure.
 
-$ cp c:/WINNT/system32/ssleay32.dll c:/WINNT/system32/libssleay32.dll 
-$ cd $OPENSSL_HOME/lib/MinGW/
-$ cp ssleay32.a libssleay32.a
-$ cp lib*.a /lib/mingw/
+   $ cp c:/WINNT/system32/ssleay32.dll c:/WINNT/system32/libssleay32.dll 
+   $ cd $OPENSSL_HOME/lib/MinGW/
+   $ cp ssleay32.a libssleay32.a
+   $ cp lib*.a /lib/mingw/
 
-If "make check" is failing, try installing the package first to ensure that
-the DLLs are visible on your PATH.
+   If "make check" is failing, try installing the package first to ensure that
+   the DLLs are visible on your PATH.
 
-MSVC++ Build:
+MSVC++ Build
+============
 
-Add the following vc++ directories:
+1. Add the following include directories:
 
-$(OPENSSL_HOME)\include
-$(PYTHON_HOME)\include
-$(RUBY_HOME)\lib\ruby\1.8\i386-mswin32
+   $(OPENSSL_HOME)\include
+   $(PYTHON_HOME)\include
+   $(RUBY_HOME)\lib\ruby\1.8\i386-mswin32
 
-$(OPENSSL_HOME)\lib\VC
-$(PYTHON_HOME)\libs
-$(RUBY_HOME)\lib
+2. Add the following library directories:
 
-FAQ
+   $(OPENSSL_HOME)\lib\VC
+   $(PYTHON_HOME)\libs
+   $(RUBY_HOME)\lib
+
+License FAQ
+===========
 
 1. What does the COPYING file contain?
 
-A verbatim copy of the following document:
+   A verbatim copy of the following document:
 
-http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+   http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
 2. Can the years on the license notice be summarised in a range, such as
    2004-2009?
 
-Ideally, gnu.org want the years to be explicitly listed rather than in a
-range.  There is some confusion on why they want this, but it related to
-international laws.  They have a Berne copyright law, but not all countries
-have signed it.  So those at gnu.org convinced it is better to play it safe
-than be sorry.
+   Ideally, gnu.org want the years to be explicitly listed rather than in a
+   range.  There is some confusion on why they want this, but it related to
+   international laws.  They have a Berne copyright law, but not all countries
+   have signed it.  So those at gnu.org convinced it is better to play it safe
+   than be sorry.
 
 3. If I build with OpenSSL support, doesn't this break the GPL license
    agreement?
 
-No.  The following exception has been added to the license agreement.
+   No.  The following exception has been added to the license agreement.
 
-"This program is released under the GPL with the additional exemption that
-compiling, linking, and/or using OpenSSL is allowed."
+   "This program is released under the GPL with the additional exemption that
+   compiling, linking, and/or using OpenSSL is allowed."
 
 4. Aug is targeted at MacOS, Windows, and Posix compliant systems.  Does it
    depend on any non-free system?
 
-No.  Aug does not depend on any non-free systems.
+   No.  Aug does not depend on any non-free systems.
 
-5. Are there any dependencies?  If so, provide the link to those dependencies
-   with the license that they use.
+5. Does Aug have any other dependencies?
 
-Optional dependencies are:
+   Optional dependencies are:
 
-OpenSSL (optional)
-License: OpenSSL License
-http://www.openssl.org/source/license.html
+   OpenSSL
+   License: OpenSSL License
+   http://www.openssl.org/source/license.html
 
-Python (optional)
-License: Python Software Foundation License Version 2
-http://www.python.org/psf/license/
+   Python
+   License: Python Software Foundation License Version 2
+   http://www.python.org/psf/license/
 
-Ruby (optional)
-License: Ruby License
-http://www.ruby-lang.org/en/LICENSE.txt
+   Ruby
+   License: Ruby License
+   http://www.ruby-lang.org/en/LICENSE.txt
 
-Aug also benefits from the following third-party contributions:
+6. How about how about any source code contributions?
 
-dlmalloc by Doug Lea
-License: Public Domain
-http://gee.cs.oswego.edu/pub/misc/malloc.c
+   Aug also benefits from the following third-party contributions:
 
-dlfcn.c by Jorge Acereda and Peter O'Gorman
-License: Open Source License
-http://www.opensource.apple.com/darwinsource/WWDC2004/Libwrappers-14/dlcompat/dlfcn.c
+   dlmalloc by Doug Lea
+   License: Public Domain
+   http://gee.cs.oswego.edu/pub/misc/malloc.c
 
-getopt.c by Henry Spencer
-License: Public Domain
-http://www.lysator.liu.se/c/henry
+   dlfcn.c by Jorge Acereda and Peter O'Gorman
+   License: Open Source License
+   http://www.opensource.apple.com/darwinsource/WWDC2004/Libwrappers-14/dlcompat/dlfcn.c
 
-gprof2dot.py by Jose Fonseca
-License: GNU Lesser General Public License (LGPL)
-http://freshmeat.net/projects/gprof2dot.py
+   getopt.c by Henry Spencer
+   License: Public Domain
+   http://www.lysator.liu.se/c/henry
 
-htdigest.c by Alexei Kosut
-License: Public Domain
-http://web.mit.edu/course/other/compututor/apache_1.2.0/support/htdigest.c
+   gprof2dot.py by Jose Fonseca
+   License: GNU Lesser General Public License (LGPL)
+   http://freshmeat.net/projects/gprof2dot.py
 
-Note: portions of this software are based upon public domain software
-originally written at the National Center for Supercomputing Applications,
-University of Illinois, Urbana-Champaign.
+   htdigest.c by Alexei Kosut
+   License: Public Domain
+   http://web.mit.edu/course/other/compututor/apache_1.2.0/support/htdigest.c
 
-md5.c (by Colin Plumb)
-License: Public Domain
-http://cvsweb.xfree86.org/cvsweb/*checkout*/cvs/lib/md5.c?rev=1.1
+   Note: portions of this software are based upon public domain software
+   originally written at the National Center for Supercomputing Applications,
+   University of Illinois, Urbana-Champaign.
 
-strlcpy.c (by Dan Cross)
-License: Public Domain
-http://unixpapa.com/incnote/string.html
+   md5.c by Colin Plumb
+   License: Public Domain
+   http://cvsweb.xfree86.org/cvsweb/*checkout*/cvs/lib/md5.c?rev=1.1
 
-sys/queue.h
-License: BSD License
-http://fxr.watson.org/fxr/source/sys/queue.h
+   strlcpy.c by Dan Cross
+   License: Public Domain
+   http://unixpapa.com/incnote/string.html
+
+   sys/queue.h
+   License: BSD License
+   http://fxr.watson.org/fxr/source/sys/queue.h
