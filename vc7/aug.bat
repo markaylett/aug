@@ -1,3 +1,5 @@
+echo off
+
 rem Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009 Mark Aylett <mark.aylett@gmail.com>
 rem
 rem This file is part of Aug written by Mark Aylett.

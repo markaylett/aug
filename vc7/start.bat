@@ -1,3 +1,5 @@
+echo off
+
 rem Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009 Mark Aylett <mark.aylett@gmail.com>
 rem
 rem This file is part of Aug written by Mark Aylett.
@@ -19,6 +21,5 @@ rem You should have received a copy of the GNU General Public License along with
 rem this program; if not, write to the Free Software Foundation, Inc., 51
 rem Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-echo off
 bin\\daug.exe -f etc\\daug.conf start
 pause
