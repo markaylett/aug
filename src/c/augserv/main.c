@@ -31,6 +31,8 @@ AUG_RCSID("$Id$");
 #include "augserv/daemon.h"
 #include "augserv/options.h"
 
+#include "augutil/log.h"    /* aug_getdaemonlog() */
+
 #include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h" /* GetStdHandle() */
 
