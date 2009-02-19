@@ -51,8 +51,8 @@
  * @li augmod.h
  *
  * Tools within aug package are:
+ * @li @subpage augd
  * @li @subpage augidl
- * @li @subpage daug
  * @li @subpage htdigest
  * @li @subpage mar
  */

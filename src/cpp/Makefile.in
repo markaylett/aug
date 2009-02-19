@@ -211,7 +211,7 @@ SUBDIRS = \
 	augservpp \
 	augnetpp \
 	augaspp \
-	daug
+	augd
 
 include_HEADERS = \
 	augpp.hpp \

@@ -330,8 +330,8 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augservpp/Makefile
                  src/cpp/augsyspp/Makefile
                  src/cpp/augutilpp/Makefile
-                 src/cpp/daug/Makefile
-                 src/cpp/daug/test/Makefile
+                 src/cpp/augd/Makefile
+                 src/cpp/augd/test/Makefile
                  src/pl/Makefile
                  src/py/Makefile
                  src/rb/Makefile

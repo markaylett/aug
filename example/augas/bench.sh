@@ -43,7 +43,7 @@ session.bench.echos = 5000
 module.client.path = ./modclient
 EOF
 
-    $AUG_HOME/bin/daug -f $1.conf
+    $AUG_HOME/bin/augd -f $1.conf
     mv bench.dat $1.dat
     rm -f $1.conf
 }

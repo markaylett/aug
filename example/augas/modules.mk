@@ -38,14 +38,14 @@ all: all-aug
 clean: clean-aug
 
 bench: all
-	$(AUG_HOME)/bin/daug -f bench.conf test
+	$(AUG_HOME)/bin/augd -f bench.conf test
 
 gprof:
-	gprof $(AUG_HOME)/bin/daug gmon.out \
+	gprof $(AUG_HOME)/bin/augd gmon.out \
 	| ./gprof2dot.py | dot -Tpng -o gmon.png
 
 test: all
-	$(AUG_HOME)/bin/daug -f test.conf test
+	$(AUG_HOME)/bin/augd -f test.conf test
 
 %.png: %.dat
 	Rscript bench.R <$ $@

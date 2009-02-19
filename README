@@ -21,16 +21,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 Please see http://www.xofy.org/aug for the latest documentation.
 
-Daug MSI Installation
-=====================
+Aug MSI Installation
+====================
 
 1. Run the MSI installer.  Before changing the destination folder from the
-   default, please read the Daug MSI FAQ, below.
+   default, please read the Aug MSI FAQ, below.
 
-2. From the installation directory, copy the 'etc/daug.conf.default' file
-   to 'etc/daug.conf'.
+2. From the installation directory, copy the 'etc/augd.conf.default' file
+   to 'etc/augd.conf'.
 
-3. Change the 'etc/daug.conf' file as appropriate.  At least, the 'rundir'
+3. Change the 'etc/augd.conf' file as appropriate.  At least, the 'rundir'
    option should be set to the absolute path of the installation directory.
 
 4. To run the example modules, copy the contents of 'example/augas/etc' and
@@ -47,8 +47,8 @@ Daug MSI Installation
 
    C:\Documents and Settings\NetworkService\Local Settings\Temp
 
-Daug MSI FAQ
-============
+Aug MSI FAQ
+===========
 
 1. Why do I receive a 'The system cannot open the device or file specified.'
    error when trying to install the MSI?

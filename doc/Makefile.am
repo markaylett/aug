@@ -2,9 +2,9 @@ SUBDIRS = \
 	man
 
 EXTRA_DIST = \
+	augintro.mk \
+	augintro.w \
 	augserv.html \
-	daugintro.mk \
-	daugintro.w \
 	cvs-policy.txt \
 	cwebmac.tex \
 	Doxyfile
@@ -18,17 +18,17 @@ dotdepend:
 			| dot -Tgif >$$l.gif; \
 	done
 
-daugintro.pdf: daugintro.dvi
+augintro.pdf: augintro.dvi
 	dvipdfm $<
 
-daugintro.dvi: daugintro.tex
+augintro.dvi: augintro.tex
 	tex "\let\pdf+ \input $<"
 
-daugintro.tex: daugintro.w
+augintro.tex: augintro.w
 	cweave $<
 
-daugintro: daugintro.cpp
-	$(MAKE) -f daugintro.mk TOP_SRCDIR=$(top_srcdir)
+augintro: augintro.cpp
+	$(MAKE) -f augintro.mk TOP_SRCDIR=$(top_srcdir)
 
-daugintro.cpp: daugintro.w
+augintro.cpp: augintro.w
 	ctangle $< - $@
