@@ -2,7 +2,6 @@
 \datethis % print date on listing
 
 \def\AUG/{{\sc AUG}}
-\def\AUGD/{{\sc AUGD}}
 \def\CYGWIN/{{\sc CYGWIN}}
 \def\IPV6/{{\sc IPv6}}
 \def\GNU/{{\sc GNU}}
@@ -33,46 +32,57 @@
 
 @* Introduction.
 
-\AUGD/ is an open source, application server written in \CEE/\AM\CPLUSPLUS/.
-It is designed specifically at hosting TCP-based network servers.  \AUGD/ is
-operating system agnostic: it takes a balanced view of the world, does not
-favour one over another, and runs natively on all.  \AUGD/ is part of the
-wider \pdfURL{\AUG/ project} {http://aug.sourceforge.net}, which is available
-for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.  It also includes
-support for \IPV6/, \SSL/, \PYTHON/ and \RUBY/.
+\AUG/ is an event-driven network application server, licensed under the GNU
+General Public License (GPL).  \AUG/'s Module system makes it ideally suited
+to building heterogeneous Internet applications.  Python and Ruby Modules are
+bundled with the \AUG/ package.  The core system is written in portable
+\CEE/\AM\CPLUSPLUS/.  \AUG/ also supports \IPV6/ and \SSL/, and is available
+for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
 
 \yskip\noindent
 
-This document offers a brief introduction to building and installing \AUGD/
+This document offers a quick introduction to building and installing \AUG/
 Modules, along with a brief insight into the application server itself.  For
-further information, please visit the \pdfURL{\AUG/ home
-page}{http://aug.sourceforge.net} or email myself, \pdfURL{Mark
-Aylett}{mailto:mark@@emantic.co.uk}.
+further information, please visit the
+\pdfURL{\AUG/ project home page}{http://www.xofy.org/aug} or email myself,
+\pdfURL{Mark Aylett}{mailto:mark.aylett@@gmail.com}.
 
 @* Event Model.
 
-Well designed threading models can improve CPU utilisation on multi-processor
-machines.  Similar effects, however, are rarely acheived when threads are
-added either to ``simplify'' coding, or bypass blocking-API calls.  In such
-cases, complexity, resource contention and the risk of deadlocks may actually
-increase, and performance degrade.
+Carefully designed threading models can improve CPU utilisation on
+multi-processor machines.  Similar effects, however, are rarely acheived when
+ad hoc threads are used merely to ``simplify'' coding, or to enable
+concurrency on blocking calls.  In such cases, complexity, resource contention
+and the risk of deadlocks may actually increase, and performance degrade.
 
 \yskip\noindent
 
-Non-blocking I/O allows dedication of a single thread to de-multiplexing
-network events.  This ``event thread'' can be kept responsive by delegating
-CPU-intensive tasks to secondary threads.  Iteractions between the event
-thread and secondary threads can be confined to event queues, which minimises
-the possibility of deadlocks.  Similar, in fact, to a UI event model.
+Non-blocking APIs that support event multiplexing obviate the need for many
+threads.  Fewer context switches, locks, and fuller cache pipelines lead to
+greater efficiencies.  The downside is that multiplexing code often results in
+more complex state transistions.  In a sense, these transitions are the
+flattened interleavings of the multi-threaded model.
 
 \yskip\noindent
 
-Although highly efficient, managing the state transitions associated with a
-non-blocking model can be complex, and are best left to components specialised
-for such tasks.  The \AUGD/ application server uses an event model, such as
-the one above, to de-multiplex signal, socket, timer and user-event activity.
+Multiplexing code is best confined to specialised components dedicated to such
+purposes.  This is where \AUG/ comes in: the \AUG/ application server uses an
+event model, similar to the one described above, to multiplex signal, socket,
+timer and user-event activity.  Complexity is confined to the application
+server's internals, and Modules interact with the application server through a
+sanitised interface.
 
-@ \AUGD/ delegates event notifications to Modules and, in turn, Sessions.
+\yskip\noindent
+
+\AUG/ conducts all multiplexing activity on its event thread.  The event
+thread is kept responsive by delegating CPU-intensive tasks to worker threads.
+Iteractions between the event thread and worker threads are confined to event
+queues, which minimise the possibility of deadlocks.  This model is synonymous
+with the UI event thread model.
+
+@* Modules and Sessions.
+
+\AUG/ delegates event notifications to Modules and, in turn, Sessions.
 Modules are physical components, dynamically loaded into the application
 server at run-time.  Each Module manages one or more Sessions.  Modules and
 Sessions are wired together at configuration-time, not compile-time.
@@ -81,16 +91,18 @@ Sessions are wired together at configuration-time, not compile-time.
 
 All Module calls are dispatched from the event thread.  A Session can,
 therefore, either opt for a simple, single-threaded model, or a suitable
-alternative such as a thread-pool --- whenever possible, \AUGD/ avoids
-imposing artificial constraints on Module authors.
+alternative such as a thread-pool --- \AUG/'s flexible design avoids imposing
+artificial constraints on Module authors.
 
 \yskip\noindent
 
 The separation of physical Modules and logical Sessions allows Modules to
-adapt and extend the host environment viewed by Sessions.  The \.{augpy} and
-\.{augrb} Modules, for example, adapt the host environment to allow Sessions
-to be written in either \PYTHON/ or \RUBY/.  These language bindings are
-provided by Modules, and are unbeknown to the application server.
+adapt and extend the application server environment exposed to Sessions.  The
+\.{augpy} and \.{augrb} Modules, for example, adapt the host environment to
+offer a \PYTHON/ or \RUBY/ oriented view to their associated Sessions.  These
+language bindings are provided by Modules, and are unbeknown to the
+application server.  A HTTP Session written in \RUBY/, for example, would be
+managed by the \.{augrb} Module.
 
 \yskip\noindent
 
@@ -98,10 +110,10 @@ Modules also help to promote component, rather than source-level reuse:
 Sessions can interact with one-another by posting events to the event queue,
 allowing Sessions to bridge language boundaries.
 
-\yskip\noindent
+@* Administration.
 
 System administrators are presented with a uniform interface across all
-platforms.  Although, on \WINDOWS/, a d\ae monised \AUGD/ process takes the
+platforms.  Although, on \WINDOWS/, a d\ae monised \AUG/ process takes the
 form of an NT service, from a sys-admin perspective, the interface remains the
 same.  As with \LINUX/, the following command can be used to start the service
 from a command prompt:
@@ -134,7 +146,7 @@ namespace {@/
 @ The \.{<augmodpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
 implementations.  Modules can also be written in standard \CEE/.  A \CEE/
 implementation would use the \.{<augmod.h>} header, instead.  For convenience,
-names are imported from the |aug::mod| and |std| namespaces.
+names are imported from the |aug|, |mod| and |std| namespaces.
 
 @<include...@>=
 #define MOD_BUILD
@@ -150,7 +162,7 @@ argument.  Here, |basic_factory<>| is used to build a factory capable of
 creating |echo| sessions.
 
 \yskip\noindent
-\AUGD/ Modules are required to export two library functions, namely,
+\AUG/ Modules are required to export two library functions, namely,
 |mod_init()| and |mod_term()|.  The |MOD_ENTRYPOINTS| macro assists with the
 definition of these two export functions.
 
@@ -208,11 +220,11 @@ echo::do_start(const char* sname)
 
 @ The |do_accepted()| function is called when a new client connection is
 accepted.  The |setuser()| function binds an opaque, user-defined value to an
-\AUGD/ handle.  Here, a |string| buffer is assigned to track partial line data
+\AUG/ handle.  Here, a |string| buffer is assigned to track partial line data
 received from the client.  An initial, {\sc ``HELLO''} message is sent to the
 client.  The call to |setrwtimer()| establishes a timer that will expire when
 no read activity has occurred on the |sock| handle for a period of 15 seconds
---- \AUGD/ will automatically reset the timer whenever read activity occurs.
+--- \AUG/ will automatically reset the timer whenever read activity occurs.
 
 @<member...@>+=
 bool
@@ -252,7 +264,7 @@ echo::do_recv(const handle& sock, const void* buf, size_t size)
 @ Read-timer expiry is communicated using the |do_rdexpire()| function.  If no
 data arrives for 15 seconds, the connection is shutdown.  The |shutdown()|
 function sends a FIN packet after ensuring that all buffered data has been
-flushed.  \AUGD/ ensures that any buffered messages are flushed before
+flushed.  \AUG/ ensures that any buffered messages are flushed before
 performing the shutdown, and that any inflight messages sent by the client are
 delivered to the Session.
 
@@ -370,6 +382,6 @@ Finally, specify the path to the Module.  The file extension defaults to
 \yskip
 \yskip
 \yskip\noindent
-And, we're done.  Have fun!
+Enjoy!
 
 @* Index.
