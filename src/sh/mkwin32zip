@@ -31,9 +31,9 @@ mkimplib="$dir/src/sh/mkimplib"
     && $mkimplib ../bin/cygaug*)
 
 (cd $aug_home/bin \
-    && for f in libeay32.dll mingwm10.dll ssleay32.dll; do \
+    && for f in "$OPENSSL_HOME/bin/libeay32.dll" "$OPENSSL_HOME/bin/ssleay32.dll" /bin/mingwm10.dll; do \
     echo "copying $f..."; \
-    cp $HOME/bin/$f ./; done)
+    cp $f ./; done)
 
 basedir=$(basename $aug_home)
 (cd $aug_home/.. \
