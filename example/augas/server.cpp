@@ -24,6 +24,7 @@
 #include "augmodpp.hpp"
 
 #include "augctxpp/mpool.hpp"
+#include "augutilpp/string.hpp"
 
 #include <map>
 
@@ -44,8 +45,8 @@ namespace {
         void
         operator ()(std::string& tok)
         {
-            trim(tok);
-            transform(tok.begin(), tok.end(), tok.begin(), ucase);
+            aug::trim(tok);
+            transform(tok.begin(), tok.end(), tok.begin(), aug::ucase);
             tok += "\r\n";
 
             send(sock_, tok.c_str(), tok.size());

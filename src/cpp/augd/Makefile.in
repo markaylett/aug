@@ -41,7 +41,7 @@ LIBOBJDIR =
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 bin_PROGRAMS = augd$(EXEEXT)
-check_PROGRAMS = maintest$(EXEEXT)
+check_PROGRAMS =
 @WITH_PYTHON_TRUE@am__append_1 = \
 @WITH_PYTHON_TRUE@	test/pytest1 \
 @WITH_PYTHON_TRUE@	test/pytest2 \
@@ -80,9 +80,6 @@ augd_DEPENDENCIES = $(top_builddir)/src/cpp/augaspp/libaugaspp.la \
 	$(top_builddir)/src/c/augserv/libaugserv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la
-am_maintest_OBJECTS = maintest.$(OBJEXT)
-maintest_OBJECTS = $(am_maintest_OBJECTS)
-maintest_DEPENDENCIES =
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -93,8 +90,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(augd_SOURCES) $(maintest_SOURCES)
-DIST_SOURCES = $(augd_SOURCES) $(maintest_SOURCES)
+SOURCES = $(augd_SOURCES)
+DIST_SOURCES = $(augd_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -279,9 +276,7 @@ TESTS_ENVIRONMENT = \
 	AUG_BUILDDIR=$(top_builddir) \
 	AUG_SRCDIR=$(top_srcdir)
 
-TESTS = maintest $(am__append_1) $(am__append_2)
-maintest_SOURCES = maintest.cpp
-maintest_LDADD = 
+TESTS = $(am__append_1) $(am__append_2)
 all: all-recursive
 
 .SUFFIXES:
@@ -353,9 +348,6 @@ clean-checkPROGRAMS:
 augd$(EXEEXT): $(augd_OBJECTS) $(augd_DEPENDENCIES) 
 	@rm -f augd$(EXEEXT)
 	$(CXXLINK) $(augd_LDFLAGS) $(augd_OBJECTS) $(augd_LDADD) $(LIBS)
-maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES) 
-	@rm -f maintest$(EXEEXT)
-	$(CXXLINK) $(maintest_LDFLAGS) $(maintest_OBJECTS) $(maintest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -365,7 +357,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Po@am__quote@

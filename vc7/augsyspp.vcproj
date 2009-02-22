@@ -162,9 +162,6 @@
 				RelativePath="..\src\cpp\augsyspp\socket.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augsyspp\string.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augsyspp\time.cpp">
 			</File>
 			<File
@@ -210,9 +207,6 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\socket.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augsyspp\string.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augsyspp\time.hpp">

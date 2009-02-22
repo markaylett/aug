@@ -34,6 +34,7 @@
 #include "augutilpp/object.hpp"
 #include "augutilpp/path.hpp"
 #include "augutilpp/shellparser.hpp"
+#include "augutilpp/string.hpp"
 #include "augutilpp/timer.hpp"
 
 #endif // AUGUTILPP_HPP

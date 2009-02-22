@@ -138,6 +138,7 @@ is:
 
 @c
 @<include headers@>@;
+@<using declarations@>@;
 namespace {@/
 @<implement echo session@>@;
 }@/
@@ -145,12 +146,16 @@ namespace {@/
 
 @ The \.{<augmodpp.hpp>} header is provided to simplify \CPLUSPLUS/ Module
 implementations.  Modules can also be written in standard \CEE/.  A \CEE/
-implementation would use the \.{<augmod.h>} header, instead.  For convenience,
-names are imported from the |aug|, |mod| and |std| namespaces.
+implementation would use the \.{<augmod.h>} header, instead.
 
-@<include...@>=
+@<include...@>+=
 #define MOD_BUILD
 #include <augmodpp.hpp>@/
+
+@ For convenience, names are imported from the |aug|, |mod| and |std|
+namespaces.
+
+@<using...@>+=
 using namespace aug;@/
 using namespace mod;@/
 using namespace std;
@@ -310,9 +315,14 @@ appending a CR/LF pair.  This end-of-line sequence is common in text-based,
 network protocols such as \POP3/ and \SMTP/.
 
 @<prepare...@>=
-trim(line);
-transform(line.begin(), line.end(), line.begin(), ucase);
+aug::trim(line);
+transform(line.begin(), line.end(), line.begin(), aug::ucase);
 line += "\r\n";
+
+@ The \AUG/ libraries provide some standard string algorithms.
+
+@<include...@>+=
+#include <augutilpp/string.hpp>
 
 @* Build and Install.
 

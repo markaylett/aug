@@ -20,17 +20,20 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "augmodpp.hpp"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 
+#include "augutilpp/string.hpp"
+
 #include <iostream>
 
-using namespace aug::mod;
+using namespace aug;
 using namespace std;
 
 namespace {
+
+    typedef runtime_error error;
 
     const char DECODED[] = "\"hello, world!\"";
     const char ENCODED[] = "%22hello%2C+world!%22";

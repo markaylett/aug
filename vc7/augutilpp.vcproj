@@ -165,6 +165,9 @@
 				RelativePath="..\src\cpp\augutilpp\shellparser.cpp">
 			</File>
 			<File
+				RelativePath="..\src\cpp\augutilpp\string.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augutilpp\timer.cpp">
 			</File>
 		</Filter>
@@ -201,6 +204,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\shellparser.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augutilpp\string.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\timer.hpp">

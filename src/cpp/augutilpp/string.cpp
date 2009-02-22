@@ -20,5 +20,5 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#define AUGSYSPP_BUILD
-#include "augsyspp/string.hpp"
+#define AUGUTILPP_BUILD
+#include "augutilpp/string.hpp"

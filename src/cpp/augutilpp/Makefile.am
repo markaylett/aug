@@ -12,6 +12,7 @@ modinclude_HEADERS = \
 	object.hpp \
 	path.hpp \
 	shellparser.hpp \
+	string.hpp \
 	timer.hpp
 
 noinst_LTLIBRARIES = libaugutilpp.la
@@ -27,6 +28,7 @@ libaugutilpp_la_SOURCES = \
 	object.cpp \
 	path.cpp \
 	shellparser.cpp \
+	string.cpp \
 	timer.cpp
 
 libaugutilpp_la_LDFLAGS = \
@@ -39,11 +41,13 @@ libaugutilpp_la_LIBADD = \
 
 check_PROGRAMS = \
 	maintest \
-	shellparsertest
+	shellparsertest \
+	stringtest
 
 TESTS = \
 	maintest \
-	shellparsertest
+	shellparsertest \
+	stringtest
 
 maintest_SOURCES = maintest.cpp
 maintest_LDADD = \
@@ -58,3 +62,6 @@ shellparsertest_LDADD = \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
+
+stringtest_SOURCES = stringtest.cpp
+stringtest_LDADD =

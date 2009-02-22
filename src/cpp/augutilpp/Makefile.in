@@ -40,7 +40,8 @@ host_triplet = @host@
 LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-check_PROGRAMS = maintest$(EXEEXT) shellparsertest$(EXEEXT)
+check_PROGRAMS = maintest$(EXEEXT) shellparsertest$(EXEEXT) \
+	stringtest$(EXEEXT)
 subdir = src/cpp/augutilpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -56,7 +57,7 @@ libaugutilpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 am_libaugutilpp_la_OBJECTS = clock.lo config.lo conv.lo event.lo \
 	file.lo lexer.lo log.lo object.lo path.lo shellparser.lo \
-	timer.lo
+	string.lo timer.lo
 libaugutilpp_la_OBJECTS = $(am_libaugutilpp_la_OBJECTS)
 am_maintest_OBJECTS = maintest.$(OBJEXT)
 maintest_OBJECTS = $(am_maintest_OBJECTS)
@@ -72,6 +73,9 @@ shellparsertest_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
+am_stringtest_OBJECTS = stringtest.$(OBJEXT)
+stringtest_OBJECTS = $(am_stringtest_OBJECTS)
+stringtest_DEPENDENCIES =
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -83,9 +87,9 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libaugutilpp_la_SOURCES) $(maintest_SOURCES) \
-	$(shellparsertest_SOURCES)
+	$(shellparsertest_SOURCES) $(stringtest_SOURCES)
 DIST_SOURCES = $(libaugutilpp_la_SOURCES) $(maintest_SOURCES) \
-	$(shellparsertest_SOURCES)
+	$(shellparsertest_SOURCES) $(stringtest_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -251,6 +255,7 @@ modinclude_HEADERS = \
 	object.hpp \
 	path.hpp \
 	shellparser.hpp \
+	string.hpp \
 	timer.hpp
 
 noinst_LTLIBRARIES = libaugutilpp.la
@@ -265,6 +270,7 @@ libaugutilpp_la_SOURCES = \
 	object.cpp \
 	path.cpp \
 	shellparser.cpp \
+	string.cpp \
 	timer.cpp
 
 libaugutilpp_la_LDFLAGS = \
@@ -277,7 +283,8 @@ libaugutilpp_la_LIBADD = \
 
 TESTS = \
 	maintest \
-	shellparsertest
+	shellparsertest \
+	stringtest
 
 maintest_SOURCES = maintest.cpp
 maintest_LDADD = \
@@ -293,6 +300,8 @@ shellparsertest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
 
+stringtest_SOURCES = stringtest.cpp
+stringtest_LDADD = 
 all: all-am
 
 .SUFFIXES:
@@ -350,6 +359,9 @@ maintest$(EXEEXT): $(maintest_OBJECTS) $(maintest_DEPENDENCIES)
 shellparsertest$(EXEEXT): $(shellparsertest_OBJECTS) $(shellparsertest_DEPENDENCIES) 
 	@rm -f shellparsertest$(EXEEXT)
 	$(CXXLINK) $(shellparsertest_LDFLAGS) $(shellparsertest_OBJECTS) $(shellparsertest_LDADD) $(LIBS)
+stringtest$(EXEEXT): $(stringtest_OBJECTS) $(stringtest_DEPENDENCIES) 
+	@rm -f stringtest$(EXEEXT)
+	$(CXXLINK) $(stringtest_LDFLAGS) $(stringtest_OBJECTS) $(stringtest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -369,6 +381,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shellparser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shellparsertest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
 
 .cpp.o:

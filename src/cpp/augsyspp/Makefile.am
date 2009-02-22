@@ -12,7 +12,6 @@ modinclude_HEADERS = \
 	smartfd.hpp \
 	smartptr.hpp \
 	socket.hpp \
-	string.hpp \
 	time.hpp \
 	types.hpp \
 	unistd.hpp \
@@ -31,7 +30,6 @@ libaugsyspp_la_SOURCES = \
 	smartfd.cpp \
 	smartptr.cpp \
 	socket.cpp \
-	string.cpp \
 	time.cpp \
 	types.cpp \
 	unistd.cpp \

@@ -29,16 +29,14 @@ augd_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la
 
-check_PROGRAMS = \
-	maintest
+check_PROGRAMS =
 
 TESTS_ENVIRONMENT = \
 	AUG_LOGLEVEL=3 \
 	AUG_BUILDDIR=$(top_builddir) \
 	AUG_SRCDIR=$(top_srcdir)
 
-TESTS = \
-	maintest
+TESTS =
 
 if WITH_PYTHON
 TESTS += \
@@ -61,6 +59,3 @@ TESTS += \
 	test/rbtest6 \
 	test/rbtest7
 endif
-
-maintest_SOURCES = maintest.cpp
-maintest_LDADD =
