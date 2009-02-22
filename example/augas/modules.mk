@@ -41,8 +41,8 @@ bench: all
 	$(AUG_HOME)/bin/augd -f bench.conf test
 
 gprof:
-	gprof $(AUG_HOME)/bin/augd gmon.out \
-	| ./gprof2dot.py | dot -Tpng -o gmon.png
+	gprof $(AUG_HOME)/bin/augd gmon.out
+#	| ./gprof2dot.py | dot -Tpng -o gmon.png
 
 test: all
 	$(AUG_HOME)/bin/augd -f test.conf test

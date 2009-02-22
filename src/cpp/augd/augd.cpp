@@ -28,8 +28,7 @@ AUG_RCSID("$Id$");
 /**
  * @page augd
  *
- * augd - a cross between the Dachshund and the Pug!  And, of course, the aug
- * application server.
+ * augd - the aug application server.
  */
 
 #include "augservpp.hpp"

@@ -8,7 +8,6 @@ EXTRA_DIST = \
 	bench.conf \
 	bench.R \
 	bench.sh \
-	gprof2dot.py \
 	modules.mk \
 	test.conf
 
