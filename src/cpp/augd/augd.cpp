@@ -79,7 +79,7 @@ namespace {
     cstring rundir_ = "";
     cstring logdir_ = "";
     options options_;
-    char frobpass_[AUG_MAXPASSWORD + 1] = "";
+    char frobpass_[AUG_MAXPASSWORD] = "";
 
     typedef map<string, moduleptr> modules;
 
@@ -740,7 +740,7 @@ namespace {
             if (!batch && options_.get("ssl.contexts", 0)) {
                 aug_getpass("Enter PEM pass phrase:", frobpass_,
                             sizeof(frobpass_));
-                aug_memfrob(frobpass_, sizeof(frobpass_) - 1);
+                aug_memfrob(frobpass_, sizeof(frobpass_));
             }
 #endif // WITH_SSL
 

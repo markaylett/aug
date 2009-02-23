@@ -35,12 +35,12 @@ main(int argc, char* argv[])
         return 1;
 
     strcpy(buf, TEST_);
-    aug_memfrob(buf, sizeof(buf) - 1);
+    aug_memfrob(buf, sizeof(buf));
     if (buf[0] != ('s' ^ 42) || 0 == strcmp(buf, TEST_)) {
        fprintf(stderr, "unexpected frob value\n");
        return 1;
     }
-    aug_memfrob(buf, sizeof(buf) - 1);
+    aug_memfrob(buf, sizeof(buf));
     if (0 != strcmp(buf, TEST_)) {
        fprintf(stderr, "unexpected de-frob value\n");
        return 1;

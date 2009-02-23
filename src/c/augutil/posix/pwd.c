@@ -33,7 +33,9 @@ AUGUTIL_API char*
 aug_getpass(const char* prompt, char* buf, size_t len)
 {
     char* pass = getpass(prompt);
+    /* Copy to output buffer. */
     aug_strlcpy(buf, pass, len);
+    /* Zero static buffer. */
     if ((len = strlen(pass)))
         memset(pass, 0, len);
     return buf;
