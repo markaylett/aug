@@ -1,9 +1,9 @@
-include $(top_srcdir)/src/c/lang.mk
+include $(top_srcdir)/src/cpp/lang.mk
 
 bin_PROGRAMS = htdigest
 
 htdigest_SOURCES = \
-	htdigest.c
+	htdigest.cpp
 
 htdigest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la

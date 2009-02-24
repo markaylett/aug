@@ -11,7 +11,6 @@ SUBDIRS = \
 	augserv \
 	augnet \
 	augas \
-	htdigest \
 	mar
 
 include_HEADERS = \

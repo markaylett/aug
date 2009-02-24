@@ -320,7 +320,6 @@ AC_CONFIG_FILES([Makefile
                  src/c/augutil/Makefile
                  src/c/augutil/posix/Makefile
                  src/c/augutil/win32/Makefile
-                 src/c/htdigest/Makefile
                  src/c/mar/Makefile
                  src/cpp/Makefile
                  src/cpp/augctxpp/Makefile
@@ -332,6 +331,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augutilpp/Makefile
                  src/cpp/augd/Makefile
                  src/cpp/augd/test/Makefile
+                 src/cpp/htdigest/Makefile
                  src/pl/Makefile
                  src/py/Makefile
                  src/rb/Makefile

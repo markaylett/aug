@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;../src/c"
+				AdditionalIncludeDirectories="../src;../src/c;../src/cpp"
 				PreprocessorDefinitions="WIN32;_DEBUG;FD_SETSIZE=256"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -73,7 +73,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../src;../src/c"
+				AdditionalIncludeDirectories="../src;../src/c;../src/cpp"
 				PreprocessorDefinitions="WIN32;NDEBUG;FD_SETSIZE=256"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
@@ -128,7 +128,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\c\htdigest\htdigest.c">
+				RelativePath="..\src\cpp\htdigest\htdigest.cpp">
 			</File>
 		</Filter>
 		<Filter

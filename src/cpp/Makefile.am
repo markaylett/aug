@@ -7,7 +7,8 @@ SUBDIRS = \
 	augservpp \
 	augnetpp \
 	augaspp \
-	augd
+	augd \
+	htdigest
 
 include_HEADERS = \
 	augpp.hpp \

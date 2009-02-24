@@ -33,6 +33,8 @@
 
 #define AUG_MAXPASSWORD 128
 
+typedef char aug_pwd_t[AUG_MAXPASSWORD + 1];
+
 AUGUTIL_API char*
 aug_getpass(const char* prompt, char* buf, size_t len);
 

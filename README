@@ -216,14 +216,6 @@ License FAQ
    License: Public Domain
    http://www.lysator.liu.se/c/henry
 
-   htdigest.c by Alexei Kosut
-   License: Public Domain
-   http://web.mit.edu/course/other/compututor/apache_1.2.0/support/htdigest.c
-
-   Note: portions of this software are based upon public domain software
-   originally written at the National Center for Supercomputing Applications,
-   University of Illinois, Urbana-Champaign.
-
    md5.c by Colin Plumb
    License: Public Domain
    http://cvsweb.xfree86.org/cvsweb/*checkout*/cvs/lib/md5.c?rev=1.1
