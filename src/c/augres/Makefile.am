@@ -1,21 +1,24 @@
 EXTRA_DIST = \
-	MSG00001.bin \
-	augres.h \
-	augres.mc \
-	augres.rc
+	augres.mc
 
-dist_bin_SCRIPTS = \
+if AUG_WIN32
+
+bin_SCRIPTS = \
 	augres.dll
+CLEANFILES = \
+	$(bin_SCRIPTS) \
+	augres.h \
+	augres.o \
+	augres.rc \
+	MSG00001.bin
 
-uninstall-local:
-	rm -f $(DESTDIR)$(bindir)/augres.dll \
-	$(DESTDIR)$(etcdir)/augres.reg
-
-build: augres.o
-	dllwrap --dllname augres.dll --driver-name gcc augres.o
+augres.dll: augres.o
+	dllwrap --dllname augres.dll --driver-name gcc $<
 
 augres.o: augres.rc
-	windres -o augres.o augres.rc
+	windres -o augres.o $<
 
 augres.rc: augres.mc
-	mc augres.mc
+	windmc $<
+
+endif

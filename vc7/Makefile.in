@@ -55,6 +55,8 @@ AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
 AS = @AS@
+AUG_WIN32_FALSE = @AUG_WIN32_FALSE@
+AUG_WIN32_TRUE = @AUG_WIN32_TRUE@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -194,6 +196,7 @@ EXTRA_DIST = \
 	augnetpp.vcproj \
 	augpy.vcproj \
 	augrb.vcproj \
+	augres.vcproj \
 	augaspp.vcproj \
 	augserv.vcproj \
 	augservpp.vcproj \

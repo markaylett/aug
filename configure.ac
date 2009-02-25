@@ -154,6 +154,8 @@ fi
 case $host in
 *-*-cygwin*|*-*-mingw*)
 
+    AM_CONDITIONAL(AUG_WIN32, true)
+
     if test x$enable_multicast = xyes; then
         LIBS="-Wl,-liphlpapi $LIBS"
     fi
@@ -173,6 +175,8 @@ case $host in
 
     ;;
 *)
+    AM_CONDITIONAL(AUG_WIN32, false)
+
     if test x$enable_threads = xyes; then
         AC_SEARCH_LIBS(pthread_create, [pthread])
     fi

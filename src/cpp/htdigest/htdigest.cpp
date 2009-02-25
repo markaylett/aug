@@ -27,6 +27,7 @@ AUG_RCSID("$Id$");
 #include "augutilpp/string.hpp"
 #include "augutil/pwd.h"
 
+#include <cerrno>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>

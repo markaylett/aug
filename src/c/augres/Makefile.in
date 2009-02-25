@@ -38,8 +38,7 @@ build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
 subdir = src/c/augres
-DIST_COMMON = $(dist_bin_SCRIPTS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -48,8 +47,8 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/auglocal.h
 CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
-dist_binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(dist_bin_SCRIPTS)
+binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
+SCRIPTS = $(bin_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -60,6 +59,8 @@ AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
 AS = @AS@
+AUG_WIN32_FALSE = @AUG_WIN32_FALSE@
+AUG_WIN32_TRUE = @AUG_WIN32_TRUE@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -188,13 +189,17 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
-	MSG00001.bin \
-	augres.h \
-	augres.mc \
-	augres.rc
+	augres.mc
 
-dist_bin_SCRIPTS = \
-	augres.dll
+@AUG_WIN32_TRUE@bin_SCRIPTS = \
+@AUG_WIN32_TRUE@	augres.dll
+
+@AUG_WIN32_TRUE@CLEANFILES = \
+@AUG_WIN32_TRUE@	$(bin_SCRIPTS) \
+@AUG_WIN32_TRUE@	augres.h \
+@AUG_WIN32_TRUE@	augres.o \
+@AUG_WIN32_TRUE@	augres.rc \
+@AUG_WIN32_TRUE@	MSG00001.bin
 
 all: all-am
 
@@ -228,21 +233,21 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-install-dist_binSCRIPTS: $(dist_bin_SCRIPTS)
+install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
-	@list='$(dist_bin_SCRIPTS)'; for p in $$list; do \
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  if test -f $$d$$p; then \
 	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
-	    echo " $(dist_binSCRIPT_INSTALL) '$$d$$p' '$(DESTDIR)$(bindir)/$$f'"; \
-	    $(dist_binSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(bindir)/$$f"; \
+	    echo " $(binSCRIPT_INSTALL) '$$d$$p' '$(DESTDIR)$(bindir)/$$f'"; \
+	    $(binSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(bindir)/$$f"; \
 	  else :; fi; \
 	done
 
-uninstall-dist_binSCRIPTS:
+uninstall-binSCRIPTS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(dist_bin_SCRIPTS)'; for p in $$list; do \
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
 	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
@@ -315,6 +320,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -342,7 +348,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am: install-dist_binSCRIPTS
+install-exec-am: install-binSCRIPTS
 
 install-info: install-info-am
 
@@ -366,33 +372,27 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-dist_binSCRIPTS uninstall-info-am \
-	uninstall-local
+uninstall-am: uninstall-binSCRIPTS uninstall-info-am
 
 .PHONY: all all-am check check-am clean clean-generic clean-libtool \
 	distclean distclean-generic distclean-libtool distdir dvi \
 	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dist_binSCRIPTS \
-	install-exec install-exec-am install-info install-info-am \
-	install-man install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
-	ps ps-am uninstall uninstall-am uninstall-dist_binSCRIPTS \
-	uninstall-info-am uninstall-local
+	install-binSCRIPTS install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	uninstall uninstall-am uninstall-binSCRIPTS uninstall-info-am
 
 
-uninstall-local:
-	rm -f $(DESTDIR)$(bindir)/augres.dll \
-	$(DESTDIR)$(etcdir)/augres.reg
+@AUG_WIN32_TRUE@augres.dll: augres.o
+@AUG_WIN32_TRUE@	dllwrap --dllname augres.dll --driver-name gcc $<
 
-build: augres.o
-	dllwrap --dllname augres.dll --driver-name gcc augres.o
+@AUG_WIN32_TRUE@augres.o: augres.rc
+@AUG_WIN32_TRUE@	windres -o augres.o $<
 
-augres.o: augres.rc
-	windres -o augres.o augres.rc
-
-augres.rc: augres.mc
-	mc augres.mc
+@AUG_WIN32_TRUE@augres.rc: augres.mc
+@AUG_WIN32_TRUE@	windmc $<
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
