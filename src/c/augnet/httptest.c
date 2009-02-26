@@ -24,7 +24,7 @@
 #include "augsys.h"
 #include "augctx.h"
 
-static const char TEST_[] =
+static const char TEST1_[] =
 "GET / HTTP/1.1\r\n"
 "Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg,"
 " application/vnd.ms-excel, application/vnd.ms-powerpoint,"
@@ -35,6 +35,18 @@ static const char TEST_[] =
 " .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)\r\n"
 "Host: localhost:8080\r\n"
 "Connection: Keep-Alive\r\n\r\n";
+
+static const char TEST2_[] =
+"GET / HTTP/1.1\r\n"
+"Host: localhost:8080\r\n"
+"User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.6)"
+" Gecko/2009011913 Firefox/3.0.6\r\n"
+"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
+"Accept-Language: en-gb,en;q=0.5\r\n"
+"Accept-Encoding: gzip,deflate\r\n"
+"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n"
+"Keep-Alive: 300\r\n"
+"Connection: keep-alive\r\n\r\n";
 
 static void*
 cast_(aug_httphandler* ob, const char* id)
@@ -120,7 +132,17 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (AUG_ISFAIL(aug_appendhttp(parser, TEST_, sizeof(TEST_) - 1))) {
+    if (AUG_ISFAIL(aug_appendhttp(parser, TEST1_, sizeof(TEST1_) - 1))) {
+        aug_perrinfo(aug_tlx, "aug_appendhttp() failed", NULL);
+        goto fail;
+    }
+
+    if (AUG_ISFAIL(aug_finishhttp(parser))) {
+        aug_perrinfo(aug_tlx, "aug_finishhttp() failed", NULL);
+        goto fail;
+    }
+
+    if (AUG_ISFAIL(aug_appendhttp(parser, TEST2_, sizeof(TEST2_) - 1))) {
         aug_perrinfo(aug_tlx, "aug_appendhttp() failed", NULL);
         goto fail;
     }

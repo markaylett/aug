@@ -591,9 +591,19 @@ namespace {
         {
             static const char ROOT[] = "./htdocs";
 
-            if (sessid_.empty())
-                sessid_ = getsessid(id_, name_, static_cast<
-                                    const char*>(getfield(mar, "Cookie")));
+            if (sessid_.empty()) {
+
+                // TODO: Mar interface should be refactored to distinguish
+                // error and none exceptions.
+
+                const char* value = 0;
+                try {
+                    value = static_cast<const char*>
+                        (getfield(mar, "Cookie"));
+                } catch (...) {
+                }
+                sessid_ = getsessid(id_, name_, value);
+            }
 
             try {
 
@@ -729,17 +739,20 @@ namespace {
         aug_result
         delmar_(const char* initial) AUG_NOTHROW
         {
+            aug_ctxinfo(aug_tlx, "delete mar [%s]", initial);
             return AUG_SUCCESS;
         }
         aug_mar_*
         getmar_(const char* initial) AUG_NOTHROW
         {
-            return 0;
+            aug_ctxinfo(aug_tlx, "get mar [%s]", initial);
+            return aug_createmar(getmpool(aug_tlx).get());
         }
         aug_result
         putmar_(const char* initial, aug_mar_* mar) AUG_NOTHROW
         {
             try {
+                aug_ctxinfo(aug_tlx, "put mar [%s]", initial);
                 put(initial, mar);
                 return AUG_SUCCESS;
             } AUG_SETERRINFOCATCH;
