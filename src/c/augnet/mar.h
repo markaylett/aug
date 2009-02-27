@@ -37,7 +37,7 @@
 typedef struct aug_marparser_* aug_marparser_t;
 
 AUGNET_API aug_marparser_t
-aug_createmarparser(aug_mpool* mpool, aug_marpool* marpool, unsigned size);
+aug_createmarparser(aug_mpool* mpool, aug_marstore* marstore, unsigned size);
 
 AUGNET_API void
 aug_destroymarparser(aug_marparser_t parser);

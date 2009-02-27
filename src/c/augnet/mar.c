@@ -42,7 +42,7 @@ AUG_RCSID("$Id$");
 
 struct aug_marparser_ {
     aug_mpool* mpool_;
-    aug_marpool* marpool_;
+    aug_marstore* marstore_;
     aug_httphandler httphandler_;
     aug_httpparser_t http_;
     aug_xstr_t initial_;
@@ -83,7 +83,7 @@ initial_(aug_httphandler* ob, const char* initial)
     if (!parser->initial_)
         return AUG_FAILERROR; /* Allocation failed. */
 
-    if (!(parser->mar_ = aug_getmar(parser->marpool_, initial))) {
+    if (!(parser->mar_ = aug_getmar(parser->marstore_, initial))) {
         aug_destroyxstr(parser->initial_);
         parser->initial_ = NULL;
         return AUG_FAILERROR;
@@ -154,7 +154,7 @@ end_(aug_httphandler* ob, aug_bool commit)
         if (!parser->initial_)
             return AUG_SUCCESS; /* Blank line. */
 
-        result = aug_putmar(parser->marpool_, aug_xstr(parser->initial_),
+        result = aug_putmar(parser->marstore_, aug_xstr(parser->initial_),
                             parser->mar_);
     } else
         result = AUG_SUCCESS;
@@ -184,7 +184,7 @@ static const struct aug_httphandlervtbl vtbl_ = {
 };
 
 AUGNET_API aug_marparser_t
-aug_createmarparser(aug_mpool* mpool, aug_marpool* marpool, unsigned size)
+aug_createmarparser(aug_mpool* mpool, aug_marstore* marstore, unsigned size)
 {
     aug_marparser_t parser = aug_allocmem(mpool,
                                           sizeof(struct aug_marparser_));
@@ -192,7 +192,7 @@ aug_createmarparser(aug_mpool* mpool, aug_marpool* marpool, unsigned size)
         return NULL;
 
     parser->mpool_ = mpool;
-    parser->marpool_ = marpool;
+    parser->marstore_ = marstore;
     parser->httphandler_.vtbl_ = &vtbl_;
     parser->httphandler_.impl_ = NULL;
     parser->http_ = NULL;
@@ -206,7 +206,7 @@ aug_createmarparser(aug_mpool* mpool, aug_marpool* marpool, unsigned size)
     }
 
     aug_retain(mpool);
-    aug_retain(marpool);
+    aug_retain(marstore);
     return parser;
 }
 
@@ -222,7 +222,7 @@ aug_destroymarparser(aug_marparser_t parser)
         aug_destroyxstr(parser->initial_);
 
     aug_destroyhttpparser(parser->http_);
-    aug_release(parser->marpool_);
+    aug_release(parser->marstore_);
 
     aug_freemem(mpool, parser);
     aug_release(mpool);

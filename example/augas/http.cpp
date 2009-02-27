@@ -570,7 +570,7 @@ namespace {
         send(id, message.str().c_str(), message.str().size());
     }
 
-    struct session : marpool_base<session>, mpool_ops {
+    struct session : marstore_base<session>, mpool_ops {
         const string& realm_;
         mod_id id_;
         string sessid_;
@@ -589,11 +589,13 @@ namespace {
         void
         put(const char* initial, aug_mar_t mar)
         {
+            // TODO: externalise root directory path.
+
             static const char ROOT[] = "./htdocs";
 
             if (sessid_.empty()) {
 
-                // TODO: Mar interface should be refactored to distinguish
+                // TODO: mar interface should be refactored to distinguish
                 // error and none exceptions.
 
                 const char* value = 0;
@@ -808,8 +810,8 @@ namespace {
         bool
         do_accepted(handle& sock, const char* name)
         {
-            marpoolptr sess(session::attach(new (tlx) session
-                                            (realm_, sock.id(), name)));
+            marstoreptr sess(session::attach(new (tlx) session
+                                             (realm_, sock.id(), name)));
             auto_ptr<marparser> parser(new (tlx) marparser
                                        (getmpool(aug_tlx), sess));
 

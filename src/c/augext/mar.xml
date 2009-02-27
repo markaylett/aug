@@ -29,7 +29,7 @@
 struct aug_mar_;
   </verbatim>
 
-  <interface name="marpool">
+  <interface name="marstore">
 
     <method name="del" type="aug_result" qname="delmar">
       <param name="initial" type="const char*"/>

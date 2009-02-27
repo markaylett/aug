@@ -100,7 +100,7 @@ main(int argc, char* argv[])
         scoped_httphandler_wrapper<httptest> x;
         httpparser hparser(mp, x, 1024);
 
-        scoped_marpool_wrapper<martest> y;
+        scoped_marstore_wrapper<martest> y;
         marparser mparser(mp, y, 1024);
 
         return 0;
