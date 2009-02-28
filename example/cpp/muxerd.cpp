@@ -34,7 +34,6 @@
 #include <time.h>
 
 using namespace aug;
-using namespace aug;
 using namespace std;
 
 namespace test {
