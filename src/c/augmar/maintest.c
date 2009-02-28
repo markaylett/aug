@@ -41,12 +41,12 @@ main(int argc, char* argv[])
     field.name_ = "name";
     field.value_ = "Mark";
     field.size_ = 4;
-    aug_setfield(mar, &field, NULL);
+    aug_setfield(mar, &field);
 
     field.name_ = "age";
     field.value_ = "33";
     field.size_ = 2;
-    aug_setfield(mar, &field, NULL);
+    aug_setfield(mar, &field);
 
     aug_releasemar(mar);
     return 0;

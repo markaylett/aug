@@ -263,8 +263,8 @@ aug_removefields(aug_mar_t mar)
     return aug_removefields_(mar->seq_, &mar->info_);
 }
 
-AUGMAR_API aug_result
-aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord)
+AUGMAR_API aug_rint
+aug_setfield(aug_mar_t mar, const struct aug_field* field)
 {
     if (!WRITABLE_(mar)) {
 
@@ -272,7 +272,7 @@ aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord)
                        AUG_MSG("invalid archive handle"));
         return AUG_FAILERROR;
     }
-    return aug_setfield_(mar->seq_, &mar->info_, field, ord);
+    return aug_setfield_(mar->seq_, &mar->info_, field);
 }
 
 AUGMAR_API aug_result
@@ -287,8 +287,8 @@ aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size)
     return aug_setvalue_(mar->seq_, &mar->info_, ord, value, size);
 }
 
-AUGMAR_API aug_result
-aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord)
+AUGMAR_API aug_rint
+aug_unsetbyname(aug_mar_t mar, const char* name)
 {
     if (!WRITABLE_(mar)) {
 
@@ -296,7 +296,7 @@ aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord)
                        AUG_MSG("invalid archive handle"));
         return AUG_FAILERROR;
     }
-    return aug_unsetbyname_(mar->seq_, &mar->info_, name, ord);
+    return aug_unsetbyname_(mar->seq_, &mar->info_, name);
 }
 
 AUGMAR_API aug_result
@@ -311,32 +311,8 @@ aug_unsetbyord(aug_mar_t mar, unsigned ord)
     return aug_unsetbyord_(mar->seq_, &mar->info_, ord);
 }
 
-AUGMAR_API const void*
-aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size)
-{
-    if (!READABLE_(mar)) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return NULL;
-    }
-    return aug_valuebyname_(mar->seq_, &mar->info_, name, size);
-}
-
-AUGMAR_API const void*
-aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size)
-{
-    if (!READABLE_(mar)) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return NULL;
-    }
-    return aug_valuebyord_(mar->seq_, &mar->info_, ord, size);
-}
-
-AUGMAR_API aug_result
-aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord)
+AUGMAR_API aug_rint
+aug_valuebyname(aug_mar_t mar, const char* name, const void** value)
 {
     if (!READABLE_(mar)) {
 
@@ -344,7 +320,31 @@ aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord)
                        AUG_MSG("invalid archive handle"));
         return AUG_FAILERROR;
     }
-    return aug_getfield_(mar->seq_, &mar->info_, field, ord);
+    return aug_valuebyname_(mar->seq_, &mar->info_, name, value);
+}
+
+AUGMAR_API aug_rint
+aug_valuebyord(aug_mar_t mar, unsigned ord, const void** value)
+{
+    if (!READABLE_(mar)) {
+
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("invalid archive handle"));
+        return AUG_FAILERROR;
+    }
+    return aug_valuebyord_(mar->seq_, &mar->info_, ord, value);
+}
+
+AUGMAR_API aug_result
+aug_getfield(aug_mar_t mar, unsigned ord, struct aug_field* field)
+{
+    if (!READABLE_(mar)) {
+
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("invalid archive handle"));
+        return AUG_FAILERROR;
+    }
+    return aug_getfield_(mar->seq_, &mar->info_, ord, field);
 }
 
 AUGMAR_API unsigned
@@ -354,7 +354,7 @@ aug_getfields(aug_mar_t mar)
 }
 
 AUGMAR_API aug_result
-aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord)
+aug_ordtoname(aug_mar_t mar, unsigned ord, const char** name)
 {
     if (!READABLE_(mar)) {
 
@@ -362,11 +362,11 @@ aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord)
                        AUG_MSG("invalid archive handle"));
         return AUG_FAILERROR;
     }
-    return aug_ordtoname_(mar->seq_, &mar->info_, name, ord);
+    return aug_ordtoname_(mar->seq_, &mar->info_, ord, name);
 }
 
-AUGMAR_API aug_result
-aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name)
+AUGMAR_API aug_rint
+aug_nametoord(aug_mar_t mar, const char* name)
 {
     if (!READABLE_(mar)) {
 
@@ -374,7 +374,7 @@ aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name)
                        AUG_MSG("invalid archive handle"));
         return AUG_FAILERROR;
     }
-    return aug_nametoord_(mar->seq_, &mar->info_, ord, name);
+    return aug_nametoord_(mar->seq_, &mar->info_, name);
 }
 
 AUGMAR_API aug_result

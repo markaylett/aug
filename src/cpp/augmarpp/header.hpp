@@ -108,9 +108,9 @@ namespace aug {
             return aug::getfield(mar_, toord(it), s);
         }
         void
-        getfield(aug_field& f, const const_iterator& it) const
+        getfield(const const_iterator& it, aug_field& f) const
         {
-            aug::getfield(mar_, f, toord(it));
+          aug::getfield(mar_, toord(it), f);
         }
         const_iterator
         find(const char* name) const

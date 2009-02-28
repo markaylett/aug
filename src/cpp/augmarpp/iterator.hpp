@@ -65,9 +65,7 @@ namespace aug {
         reference
         operator *() const
         {
-            const char* name;
-            toname(ref_, name, ord_);
-            return name;
+            return toname(ref_, ord_);
         }
         const_iterator&
         operator ++()

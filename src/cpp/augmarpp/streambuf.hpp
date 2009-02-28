@@ -36,6 +36,13 @@ namespace aug {
 
     namespace detail {
 
+        template <typename charT>
+        inline std::streamsize
+        streamdiff(const charT* begin, const charT* end)
+        {
+            return static_cast<std::streamsize>(end - begin);
+        }
+
         class state {
         public:
             enum which { neutral, get, put };
@@ -233,7 +240,8 @@ namespace aug {
         std::streamsize
         pbacklen() const
         {
-            std::streamsize s(base_type::gptr() - base_type::eback());
+            std::streamsize s(detail::streamdiff(base_type::eback(),
+                                                 base_type::gptr()));
             return AUG_MIN(s, buffer_type::pbacksize);
         }
         int
@@ -243,7 +251,7 @@ namespace aug {
                 return 0;
 
             char_type* begin = base_type::pbase();
-            std::streamsize len(base_type::pptr() - begin);
+            std::streamsize len(detail::streamdiff(begin, base_type::pptr()));
             std::streamsize num(iowrite(begin, len));
 
             if (-1 == num)
@@ -378,8 +386,9 @@ namespace aug {
             if (!n || !setin())
                 return 0;
 
-            std::streamsize tot(0), len(base_type::egptr()
-                                        - base_type::gptr());
+            std::streamsize tot(0);
+            std::streamsize len(detail::streamdiff(base_type::gptr(),
+                                                   base_type::egptr()));
 
             // If any characters exist in get area then copy as required to
             // the output buffer.
@@ -424,7 +433,7 @@ namespace aug {
 
             // If any characters exist in get area then copy to output buffer.
 
-            len = base_type::egptr() - base_type::gptr();
+			len = detail::streamdiff(base_type::gptr(), base_type::egptr());
             if (0 < len) {
 
                 if (len > n)
@@ -443,8 +452,9 @@ namespace aug {
             if (!n || !setout())
                 return 0;
 
-            std::streamsize tot(0), len(base_type::epptr()
-                                        - base_type::pptr());
+            std::streamsize tot(0);
+            std::streamsize len(detail::streamdiff(base_type::pptr(),
+                                                   base_type::epptr()));
 
             // If any space exists in the put area then copy from input buffer
             // to put area as required.

@@ -145,16 +145,13 @@ aug_removefields(aug_mar_t mar);
  * @param field A field specifying the field name and a pointer to, and size
  * of, the field value.
  *
- * @param ord An optional output parameter, in which, the ordinal position of
- * the field will be set.
- *
- * @return See @ref TypesResult.
+ * @return See @ref TypesResult.  The ordinal field position on success.
  *
  * @see aug_setvalue().
  */
 
-AUGMAR_API aug_result
-aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord);
+AUGMAR_API aug_rint
+aug_setfield(aug_mar_t mar, const struct aug_field* field);
 
 /**
  * Set field value within message archive.
@@ -167,7 +164,7 @@ aug_setfield(aug_mar_t mar, const struct aug_field* field, unsigned* ord);
  *
  * @param size The size of the field value to be assigned.
  *
- * @return See @ref TypesResult.
+ * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_setfield().
  */
@@ -182,16 +179,14 @@ aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size);
  *
  * @param name The name of the field.
  *
- * @param ord An optional output parameter, in which, the ordinal position of
- * the field is set.
- *
- * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
+ * @return See @ref TypesResult.  The ordinal field position on success.
+ * #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_removefields(), aug_unsetbyord() and aug_ordtoname().
  */
 
-AUGMAR_API aug_result
-aug_unsetbyname(aug_mar_t mar, const char* name, unsigned* ord);
+AUGMAR_API aug_rint
+aug_unsetbyname(aug_mar_t mar, const char* name);
 
 /**
  * Unset field (by ordinal) within message archive.
@@ -215,17 +210,16 @@ aug_unsetbyord(aug_mar_t mar, unsigned ord);
  *
  * @param name The name of the field.
  *
- * @param size An optional output parameter, in which, the size of the field
- * value is set.
+ * @param value The output parameter, in which, the value will be set.
  *
- * @return A pointer to the field value or null on failure, in which case
- * errno can be used to determine the error.
+ * @return See @ref TypesResult.  The size of the field on success.
+ * #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_valuebyord(), aug_getfield() and aug_ordtoname().
  */
 
-AUGMAR_API const void*
-aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size);
+AUGMAR_API aug_rint
+aug_valuebyname(aug_mar_t mar, const char* name, const void** value);
 
 /**
  * Obtain field value (by ordinal) from message archive.
@@ -234,26 +228,25 @@ aug_valuebyname(aug_mar_t mar, const char* name, unsigned* size);
  *
  * @param ord The zero-based ordinal position of the field.
  *
- * @param size An optional output parameter, in which, the size of the field
- * value is set.
+ * @param value The output parameter, in which, the value will be set.
  *
- * @return A pointer to the field value or null on failure, in which case
- * errno can be used to determine the error.
+ * @return See @ref TypesResult.  The size of the field on success.
+ * #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_valuebyname(), aug_getfield() and aug_nametoord().
  */
 
-AUGMAR_API const void*
-aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size);
+AUGMAR_API aug_rint
+aug_valuebyord(aug_mar_t mar, unsigned ord, const void** value);
 
 /**
  * Obtain field from message archive.
  *
  * @param mar A handle to the message archive.
  *
- * @param field The output parameter in which, the field will be returned.
- *
  * @param ord The zero-based ordinal position of the field.
+ *
+ * @param field The output parameter in which, the field will be returned.
  *
  * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
@@ -261,7 +254,7 @@ aug_valuebyord(aug_mar_t mar, unsigned ord, unsigned* size);
  */
 
 AUGMAR_API aug_result
-aug_getfield(aug_mar_t mar, struct aug_field* field, unsigned ord);
+aug_getfield(aug_mar_t mar, unsigned ord, struct aug_field* field);
 
 /**
  * Obtain the number of fields contained within message archive.
@@ -281,9 +274,9 @@ aug_getfields(aug_mar_t mar);
  *
  * @param mar A handle to the message archive.
  *
- * @param name The output parameter, in which, the name will be returned.
- *
  * @param ord The zero-based ordinal position of the name to be returned.
+ *
+ * @param name The output parameter, in which, the name will be returned.
  *
  * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
@@ -291,25 +284,23 @@ aug_getfields(aug_mar_t mar);
  */
 
 AUGMAR_API aug_result
-aug_ordtoname(aug_mar_t mar, const char** name, unsigned ord);
+aug_ordtoname(aug_mar_t mar, unsigned ord, const char** name);
 
 /**
  * Obtain ordinal position from field name in message archive.
  *
  * @param mar A handle to the message archive.
  *
- * @param ord The output parameter, in which, the ordinal position will be
- * returned.
- *
  * @param name The name of the field.
  *
- * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
+ * @return See @ref TypesResult.  The ordinal field position on success.
+ * #AUG_FAILNONE if there is no matching field.
  *
  * @see aug_unsetbyord(), aug_valuebyord() and aug_ordtoname().
 */
 
-AUGMAR_API aug_result
-aug_nametoord(aug_mar_t mar, unsigned* ord, const char* name);
+AUGMAR_API aug_rint
+aug_nametoord(aug_mar_t mar, const char* name);
 
 /**
  * Insert file into body content of message archive.

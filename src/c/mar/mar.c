@@ -149,18 +149,12 @@ help_(void)
 static aug_result
 insert_(aug_mar_t mar, const char* filename)
 {
-    aug_result result;
-
     if (0 == strcmp(filename, "-")) {
-
-        result = aug_insertstream_(mar, stdin);
-
+        aug_verify(aug_insertstream_(mar, stdin));
     } else {
-
-        result = aug_insertmar(mar, filename);
+        aug_verify(aug_insertmar(mar, filename));
     }
-
-    return AUG_ISFAIL(result) ? result : AUG_SUCCESS;
+    return AUG_SUCCESS;
 }
 
 static aug_result
@@ -170,7 +164,7 @@ names_(aug_mar_t mar)
     for (i = 0; ; ++i) {
 
         const char* name;
-        aug_verify(aug_ordtoname(mar, &name, i));
+        aug_verify(aug_ordtoname(mar, i, &name));
 
         if (NULL == name)
             break;
@@ -198,7 +192,7 @@ list_(aug_mar_t mar)
 
         struct aug_field field;
 
-        aug_verify(aug_getfield(mar, &field, i));
+        aug_verify(aug_getfield(mar, i, &field));
 
         if (!field.value_)
             break;
@@ -218,12 +212,10 @@ static aug_result
 get_(aug_mar_t mar, const char* name)
 {
     const void* value;
-    unsigned size;
+    aug_rint ret = aug_valuebyname(mar, name, &value);
+    aug_verify(ret);
 
-    if (!(value = aug_valuebyname(mar, name, &size)))
-        return AUG_FAILERROR;
-
-    aug_verify(aug_writevalue_(stdout, value, size));
+    aug_verify(aug_writevalue_(stdout, value, AUG_RESULT(ret)));
 
     if (EOF == fflush(stdout))
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
@@ -252,7 +244,9 @@ set_(aug_mar_t mar, char* src)
         return fileset_(mar, src);
     }
 
-    return aug_setfield(mar, &field, NULL);
+    aug_verify(aug_setfield(mar, &field));
+
+    return AUG_SUCCESS;
 }
 
 static aug_result
@@ -261,7 +255,9 @@ unset_(aug_mar_t mar, const char* name)
     if (!FORCE_ && !aug_confirm_(UNSETTEXT_))
         return AUG_SUCCESS;
 
-    return aug_unsetbyname(mar, name, NULL);
+    aug_verify(aug_unsetbyname(mar, name));
+
+    return AUG_SUCCESS;
 }
 
 static aug_result

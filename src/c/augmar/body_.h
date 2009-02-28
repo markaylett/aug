@@ -28,7 +28,7 @@
 struct aug_info_;
 
 AUG_EXTERNC aug_result
-aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
+aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* cdata,
                 unsigned size);
 
 AUG_EXTERNC aug_result

@@ -30,39 +30,37 @@ struct aug_info_;
 AUG_EXTERNC aug_result
 aug_removefields_(aug_seq_t seq, struct aug_info_* info);
 
-AUG_EXTERNC aug_result
+AUG_EXTERNC aug_rint
 aug_setfield_(aug_seq_t seq, struct aug_info_* info,
-              const struct aug_field* field, unsigned* ord);
+              const struct aug_field* field);
 
 AUG_EXTERNC aug_result
 aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
               const void* value, unsigned size);
 
-AUG_EXTERNC aug_result
-aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
-                 unsigned* ord);
+AUG_EXTERNC aug_rint
+aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name);
 
 AUG_EXTERNC aug_result
 aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, unsigned ord);
 
-AUG_EXTERNC const void*
+AUG_EXTERNC aug_rint
 aug_valuebyname_(aug_seq_t seq, const struct aug_info_* info,
-                 const char* name, unsigned* size);
+                 const char* name, const void** value);
 
-AUG_EXTERNC const void*
+AUG_EXTERNC aug_rint
 aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, unsigned ord,
-                unsigned* size);
+                const void** value);
 
 AUG_EXTERNC aug_result
-aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
-              struct aug_field* field, unsigned ord);
+aug_getfield_(aug_seq_t seq, const struct aug_info_* info, unsigned ord,
+              struct aug_field* field);
 
 AUG_EXTERNC aug_result
-aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
-               unsigned ord);
+aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, unsigned ord,
+               const char** name);
 
-AUG_EXTERNC aug_result
-aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, unsigned* ord,
-               const char* name);
+AUG_EXTERNC aug_rint
+aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, const char* name);
 
 #endif /* AUGMAR_HEADER_H_ */

@@ -136,7 +136,7 @@ aug_streamset_(aug_mar_t mar, FILE* stream)
         /* Split name/value. */
 
         aug_verify(aug_atofield_(&field, buf));
-        aug_verify(aug_setfield(mar, &field, NULL));
+        aug_verify(aug_setfield(mar, &field));
     }
 
     return AUG_SUCCESS;

@@ -76,9 +76,7 @@ namespace aug {
     inline unsigned
     setfield(marref ref, const aug_field& f)
     {
-        unsigned ord;
-        verify(aug_setfield(ref.get(), &f, &ord));
-        return ord;
+        return AUG_RESULT(verify(aug_setfield(ref.get(), &f)));
     }
     inline void
     setfield(marref ref, unsigned ord, const void* cdata, unsigned size)
@@ -93,9 +91,7 @@ namespace aug {
     inline unsigned
     unsetfield(marref ref, const char* name)
     {
-        unsigned ord;
-        verify(aug_unsetbyname(ref.get(), name, &ord));
-        return ord;
+        return AUG_RESULT(verify(aug_unsetbyname(ref.get(), name)));
     }
     inline void
     unsetfield(marref ref, unsigned ord)
@@ -103,46 +99,72 @@ namespace aug {
         verify(aug_unsetbyord(ref.get(), ord));
     }
     inline const void*
-    getfield(marref ref, const char* name)
-    {
-        return verify(aug_valuebyname(ref.get(), name, 0));
-    }
-    inline const void*
     getfield(marref ref, const char* name, unsigned& size)
     {
-        return verify(aug_valuebyname(ref.get(), name, &size));
+        const void* cdata;
+        aug_rint rint(aug_valuebyname(ref.get(), name, &cdata));
+        if (AUG_ISNONE(rint))
+            return NULL;
+        verify(rint);
+        size = AUG_RESULT(rint);
+        return cdata;
+    }
+    inline const void*
+    getfield(marref ref, const char* name)
+    {
+        const void* cdata;
+        aug_rint rint(aug_valuebyname(ref.get(), name, &cdata));
+        if (AUG_ISNONE(rint))
+            return NULL;
+        verify(rint);
+        return cdata;
     }
     inline const void*
     getfield(marref ref, unsigned ord, unsigned& size)
     {
-        return verify(aug_valuebyord(ref.get(), ord, &size));
+        const void* cdata;
+        aug_rint rint(aug_valuebyord(ref.get(), ord, &cdata));
+        if (AUG_ISNONE(rint))
+            return NULL;
+        verify(rint);
+        size = AUG_RESULT(rint);
+        return cdata;
     }
     inline const void*
     getfield(marref ref, unsigned ord)
     {
-        return verify(aug_valuebyord(ref.get(), ord, 0));
+        const void* cdata;
+        aug_rint rint(aug_valuebyord(ref.get(), ord, &cdata));
+        if (AUG_ISNONE(rint))
+            return NULL;
+        verify(rint);
+        return cdata;
     }
-    inline void
-    getfield(marref ref, aug_field& f, unsigned ord)
+    inline bool
+    getfield(marref ref, unsigned ord, aug_field& f)
     {
-        verify(aug_getfield(ref.get(), &f, ord));
+        aug_result result(aug_getfield(ref.get(), ord, &f));
+        if (AUG_ISNONE(result))
+            return false;
+        verify(result);
+        return true;
     }
     inline unsigned
     getfields(marref ref)
     {
         return aug_getfields(ref.get());
     }
-    inline void
-    toname(marref ref, const char*& s, unsigned ord)
+    inline const char*
+    toname(marref ref, unsigned ord)
     {
-        verify(aug_ordtoname(ref.get(), &s, ord));
+        const char* name;
+        verify(aug_ordtoname(ref.get(), ord, &name));
+        return name;
     }
     inline unsigned
     toord(marref ref, const char* name)
     {
-        unsigned ord;
-        verify(aug_nametoord(ref.get(), &ord, name));
-        return ord;
+        return AUG_RESULT(verify(aug_nametoord(ref.get(), name)));
     }
     inline void
     insertmar(marref ref, const char* path)

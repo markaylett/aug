@@ -595,15 +595,8 @@ namespace {
 
             if (sessid_.empty()) {
 
-                // TODO: mar interface should be refactored to distinguish
-                // error and none exceptions.
-
-                const char* value = 0;
-                try {
-                    value = static_cast<const char*>
-                        (getfield(mar, "Cookie"));
-                } catch (...) {
-                }
+                const char* value(static_cast<const char*>
+                                  (getfield(mar, "Cookie")));
                 sessid_ = getsessid(id_, name_, value);
             }
 

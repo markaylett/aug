@@ -89,7 +89,7 @@ namespace {
         for (i = 0; FIELDS_SIZE > i; ++i) {
 
             aug::field field(null);
-            aug::getfield(ref, field, i);
+            aug::getfield(ref, i, field);
 
             if (!iequal(field.name(), FIELDS[i].name_))
                 throw error(__LINE__);
@@ -116,8 +116,7 @@ namespace {
 
         for (i = 0; FIELDS_SIZE > i; ++i) {
 
-            const char* name;
-            aug::toname(ref, name, i);
+            const char* name(aug::toname(ref, i));
 
             if (!iequal(name, FIELDS[i].name_))
                 throw error(__LINE__);
@@ -135,10 +134,8 @@ namespace {
         if (1 != ord)
             throw error(__LINE__);
 
-        try {
-            aug::getfield(ref, FIELDS[1].name_);
+        if (aug::getfield(ref, FIELDS[1].name_))
             throw error(__LINE__);
-        } catch (const errinfo_error&) { }
 
         aug::removefields(ref);
         if (0 != aug::getfields(ref))

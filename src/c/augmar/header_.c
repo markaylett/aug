@@ -130,7 +130,7 @@ aug_removefields_(aug_seq_t seq, struct aug_info_* info)
 
 AUG_EXTERNC aug_result
 aug_setfield_(aug_seq_t seq, struct aug_info_* info,
-              const struct aug_field* field, unsigned* ord)
+              const struct aug_field* field)
 {
     unsigned nsize, vsize, fsize, inout, offset, orig;
     char* ptr;
@@ -204,12 +204,7 @@ aug_setfield_(aug_seq_t seq, struct aug_info_* info,
 
     info->hsize_ += (int)fsize - (int)orig;
 
-    /* Set optional output parameter. */
-
-    if (ord)
-        *ord = inout;
-
-    return AUG_SUCCESS;
+    return AUG_MKRESULT(inout);
 }
 
 AUG_EXTERNC aug_result
@@ -221,12 +216,8 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
 
     assert(seq && info);
 
-    if (ord >= info->fields_) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("field [%d] does not exist"), (int)ord);
-        return AUG_FAILERROR;
-    }
+    if (ord >= info->fields_)
+        return AUG_FAILNONE;
 
     /* Add null terminator. */
 
@@ -272,9 +263,8 @@ aug_setvalue_(aug_seq_t seq, struct aug_info_* info, unsigned ord,
     return AUG_SUCCESS;
 }
 
-AUG_EXTERNC aug_result
-aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
-                 unsigned* ord)
+AUG_EXTERNC aug_rint
+aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name)
 {
     unsigned inout, offset, orig;
     char* ptr;
@@ -288,13 +278,8 @@ aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
     inout = info->fields_;
     offset = offsetbyname_(ptr, name, &inout);
 
-    if (inout == info->fields_) {
-
-        if (ord)
-            *ord = inout;
-        aug_clearerrinfo(aug_tlerr);
+    if (inout == info->fields_)
         return AUG_FAILNONE;
-    }
 
     orig = fieldsize_(ptr + offset);
     aug_verify(aug_setregion_(seq, AUG_HEADER + offset, orig));
@@ -305,12 +290,7 @@ aug_unsetbyname_(aug_seq_t seq, struct aug_info_* info, const char* name,
     --info->fields_;
     info->hsize_ -= orig;
 
-    /* Set optional output parameter. */
-
-    if (ord)
-        *ord = inout;
-
-    return AUG_SUCCESS;
+    return AUG_MKRESULT(inout);
 }
 
 AUG_EXTERNC aug_result
@@ -319,10 +299,8 @@ aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, unsigned ord)
     unsigned offset, orig;
     char* ptr;
 
-    if (ord >= info->fields_) {
-        aug_clearerrinfo(aug_tlerr);
+    if (ord >= info->fields_)
         return AUG_FAILNONE;
-    }
 
     aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
@@ -342,20 +320,19 @@ aug_unsetbyord_(aug_seq_t seq, struct aug_info_* info, unsigned ord)
     return AUG_SUCCESS;
 }
 
-AUG_EXTERNC const void*
+AUG_EXTERNC aug_rint
 aug_valuebyname_(aug_seq_t seq, const struct aug_info_* info,
-                 const char* name, unsigned* size)
+                 const char* name, const void** value)
 {
     unsigned inout;
     char* ptr;
 
     assert(seq && info && name);
 
-    if (AUG_ISFAIL(aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return NULL;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!(ptr = aug_seqaddr_(seq)))
-        return NULL;
+        return AUG_FAILERROR;
 
     /* Move pointer to required field. */
 
@@ -363,56 +340,53 @@ aug_valuebyname_(aug_seq_t seq, const struct aug_info_* info,
     ptr += offsetbyname_(ptr, name, &inout);
 
     if (inout == info->fields_) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("field [%s] does not exist"), name);
-        return NULL;
+        *value = NULL;
+        return AUG_FAILNONE;
     }
 
-    /* Set optional output parameter: minus null terminator. */
+    /* Set output parameter. */
 
-    if (size)
-        *size = vsize_(ptr) - 1;
+    *value = value_(ptr, nsize_(ptr));
 
-    return value_(ptr, nsize_(ptr));
+    /* Minus null terminator. */
+
+    return AUG_MKRESULT(vsize_(ptr) - 1);
 }
 
-AUG_EXTERNC const void*
+AUG_EXTERNC aug_rint
 aug_valuebyord_(aug_seq_t seq, const struct aug_info_* info, unsigned ord,
-                unsigned* size)
+                const void** value)
 {
     char* ptr;
 
     assert(seq && info);
 
     if (ord >= info->fields_) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
-                       AUG_MSG("field [%d] does not exist"), (int)ord);
-        return NULL;
+        *value = NULL;
+        return AUG_FAILNONE;
     }
 
-    if (AUG_ISFAIL(aug_setregion_(seq, AUG_HEADER, info->hsize_)))
-        return NULL;
+    aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
     if (!(ptr = aug_seqaddr_(seq)))
-        return NULL;
+        return AUG_FAILERROR;
 
     /* Move pointer to required field. */
 
     ptr += offsetbyord_(ptr, ord);
 
-    /* Set optional output parameter: minus null terminator. */
+    /* Set output parameter. */
 
-    if (size)
-        *size = vsize_(ptr) - 1;
+    *value = value_(ptr, nsize_(ptr));
 
-    return value_(ptr, nsize_(ptr));
+    /* Minus null terminator. */
+
+    return AUG_MKRESULT(vsize_(ptr) - 1);
 }
 
 AUG_EXTERNC aug_result
 aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
-              struct aug_field* field, unsigned ord)
+              unsigned ord, struct aug_field* field)
 {
     char* ptr;
 
@@ -424,7 +398,6 @@ aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
         field->value_ = NULL;
         field->size_ = 0;
 
-        aug_clearerrinfo(aug_tlerr);
         return AUG_FAILNONE;
     }
 
@@ -444,8 +417,8 @@ aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
 }
 
 AUG_EXTERNC aug_result
-aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
-               unsigned ord)
+aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, unsigned ord,
+               const char** name)
 {
     char* ptr;
 
@@ -453,8 +426,6 @@ aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
 
     if (ord >= info->fields_) {
         *name = NULL;
-
-        aug_clearerrinfo(aug_tlerr);
         return AUG_FAILNONE;
     }
 
@@ -467,9 +438,8 @@ aug_ordtoname_(aug_seq_t seq, const struct aug_info_* info, const char** name,
     return AUG_SUCCESS;
 }
 
-AUG_EXTERNC aug_result
-aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, unsigned* ord,
-               const char* name)
+AUG_EXTERNC aug_rint
+aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, const char* name)
 {
     char* ptr;
     unsigned inout;
@@ -484,15 +454,8 @@ aug_nametoord_(aug_seq_t seq, const struct aug_info_* info, unsigned* ord,
     inout = info->fields_;
     offsetbyname_(ptr, name, &inout);
 
-    /* Set optional output parameter. */
-
-    if (ord)
-        *ord = inout;
-
-    if (inout == info->fields_) {
-        aug_clearerrinfo(aug_tlerr);
+    if (inout == info->fields_)
         return AUG_FAILNONE;
-    }
 
-    return AUG_SUCCESS;
+    return AUG_MKRESULT(inout);
 }
