@@ -115,12 +115,18 @@ aug_openmfile_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
     aug_mfile_t mfile;
     assert(path);
 
+    /* Always want readability. */
+
+    flags |= AUG_RDONLY;
+
     /* Opening a file with the append flag set (where that file is to be
        memory mapped), does not seem to make much sense.  Therefore, the
        append flag if set is stripped off before the remaining flags are
        passed to the open file function. */
 
-    if (AUG_BADFD == (fd = aug_fopen(path, flags & ~AUG_APPEND, mode)))
+    flags &= ~AUG_APPEND;
+
+    if (AUG_BADFD == (fd = aug_fopen(path, flags, mode)))
         return NULL;
 
     if (AUG_ISFAIL(aug_fsize(fd, &size)))

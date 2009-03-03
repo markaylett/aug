@@ -49,7 +49,7 @@ AUG_RCSID("$Id$");
 #define STDINOPT_ 0x08
 #define WRITEOPT_ 0x10
 
-#define OPTIONS_ "cfg:hi:lnrs:tu:x:z"
+#define OPTIONS_ "cd:fg:hi:lnop:tx:z"
 
 #define CLEARTEXT_ "clear all fields"
 #define COMPACTTEXT_ "compact archive"
@@ -198,14 +198,12 @@ list_(aug_mar_t mar)
     for (i = 0; ; ++i) {
 
         struct aug_field field;
-
-        aug_verify(aug_getfield(mar, i, &field));
-
-        if (!field.value_)
+        aug_result result = aug_getfield(mar, i, &field);
+        if (AUG_ISNONE(result))
             break;
 
+        aug_verify(result);
         printf("%s=", field.name_);
-
         aug_verify(aug_writevalue_(stdout, field.value_, field.size_));
     }
 
@@ -222,11 +220,11 @@ names_(aug_mar_t mar)
     for (i = 0; ; ++i) {
 
         const char* name;
-        aug_verify(aug_fieldntop(mar, i, &name));
-
-        if (NULL == name)
+        aug_result result = aug_fieldntop(mar, i, &name);
+        if (AUG_ISNONE(result))
             break;
 
+        aug_verify(result);
         printf("%s\n", name);
     }
     if (EOF == fflush(stdout))
@@ -412,7 +410,7 @@ main(int argc, char* argv[])
     while (-1 != (ch = aug_getopt(argc, argv, OPTIONS_)))
         switch (ch) {
         case 'i':
-        case 's':
+        case 'p':
             if (0 == strcmp(aug_optarg, "-")) {
 
                 if (options_ & STDINOPT_) {
@@ -431,7 +429,6 @@ main(int argc, char* argv[])
             help_();
             return 0;
         case 'g':
-        case 'k':
         case 'l':
         case 'n':
         case 't':
@@ -439,8 +436,8 @@ main(int argc, char* argv[])
             options_ |= READOPT_;
             break;
         case 'c':
-        case 'r':
-        case 'u':
+        case 'd':
+        case 'o':
         case 'z':
             options_ |= WRITEOPT_;
             break;
