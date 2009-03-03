@@ -45,78 +45,63 @@ namespace aug {
         {
         }
         void
-        removefields()
+        clearfields()
         {
-            aug::removefields(mar_);
+            aug::clearfields(mar_);
         }
         const_iterator
-        setfield(const aug_field& f)
+        putfield(const aug_field& f)
         {
-            return const_iterator(mar_, aug::setfield(mar_, f));
+            return const_iterator(mar_, aug::putfield(mar_, f));
         }
         const_iterator
-        setfield(const const_iterator& it, const void* cdata, unsigned n)
+        putfield(const const_iterator& it, const void* cdata, unsigned n)
         {
-            aug::setfield(mar_, toord(it), cdata, n);
+            aug::putfield(mar_, distance(it), cdata, n);
             return it;
         }
         const_iterator
-        setfield(const const_iterator& it, const char* cdata)
+        putfield(const const_iterator& it, const char* cdata)
         {
-            aug::setfield(mar_, toord(it), cdata);
+            aug::putfield(mar_, distance(it), cdata);
             return it;
         }
         const_iterator
-        unsetfield(const char* name)
+        delfield(const const_iterator& it)
         {
-            return const_iterator(mar_, aug::unsetfield(mar_, name));
-        }
-        const_iterator
-        unsetfield(const const_iterator& it)
-        {
-            aug::unsetfield(mar_, toord(it));
+            aug::delfield(mar_, distance(it));
             return it;
-        }
-        const void*
-        getfield(const char* name) const
-        {
-            return aug::getfield(mar_, name);
-        }
-        const void*
-        getfield(const char* name, unsigned& n) const
-        {
-            return aug::getfield(mar_, name, n);
         }
         const void*
         getfield(const const_iterator& it) const
         {
-            return aug::getfield(mar_, toord(it));
+            return aug::getfield(mar_, distance(it));
         }
         const void*
         getfield(const const_iterator& it, unsigned& n) const
         {
-            return aug::getfield(mar_, toord(it), n);
+            return aug::getfield(mar_, distance(it), n);
         }
         const void*
         getfield(const const_reverse_iterator& it) const
         {
-            return aug::getfield(mar_, toord(it));
+            return aug::getfield(mar_, distance(it));
         }
         const void*
         getfield(const const_reverse_iterator& it, unsigned& s) const
         {
-            return aug::getfield(mar_, toord(it), s);
+            return aug::getfield(mar_, distance(it), s);
         }
         void
         getfield(const const_iterator& it, aug_field& f) const
         {
-          aug::getfield(mar_, toord(it), f);
+          aug::getfield(mar_, distance(it), f);
         }
         const_iterator
         find(const char* name) const
         {
             try {
-                return const_iterator(mar_, toord(mar_, name));
+                return const_iterator(mar_, fieldpton(mar_, name));
             } catch (const none_exception&) { }
             return end();
         }
@@ -148,7 +133,7 @@ namespace aug {
         size_type
         size() const
         {
-            return getfields(mar_);
+            return getfieldcount(mar_);
         }
     };
 }

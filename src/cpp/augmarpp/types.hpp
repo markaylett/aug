@@ -93,12 +93,12 @@ namespace aug {
         field(const char* s, const void* v, unsigned n)
         {
             setname(s);
-            setvalue(v, n);
+            putfieldn(v, n);
         }
         field(const char* s, const char* v)
         {
             setname(s);
-            setvalue(v);
+            putfieldn(v);
         }
         field&
         operator =(const null_&) AUG_NOTHROW
@@ -112,13 +112,13 @@ namespace aug {
             field_.name_ = s;
         }
         void
-        setvalue(const void* v, unsigned n)
+        putfieldn(const void* v, unsigned n)
         {
             field_.value_ = v;
             field_.size_ = n;
         }
         void
-        setvalue(const char* v)
+        putfieldn(const char* v)
         {
             field_.value_ = v;
             field_.size_ = (unsigned)strlen(v);

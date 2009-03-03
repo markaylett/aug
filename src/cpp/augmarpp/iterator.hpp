@@ -34,7 +34,7 @@ namespace aug {
     class const_iterator : public mpool_ops {
 
         friend unsigned
-        toord(const const_iterator&);
+        distance(const const_iterator&);
 
     public:
         typedef int difference_type;
@@ -49,23 +49,23 @@ namespace aug {
     private:
 
         marref ref_;
-        difference_type ord_;
+        difference_type n_;
 
         void
         move(difference_type diff)
         {
-            ord_ += diff;
+            n_ += diff;
         }
     public:
-        const_iterator(marref ref, unsigned ord)
+        const_iterator(marref ref, unsigned n)
             : ref_(ref),
-              ord_(static_cast<difference_type>(ord))
+              n_(static_cast<difference_type>(n))
         {
         }
         reference
         operator *() const
         {
-            return toname(ref_, ord_);
+            return fieldntop(ref_, n_);
         }
         const_iterator&
         operator ++()
@@ -108,17 +108,17 @@ namespace aug {
         reference
         operator [](difference_type diff)
         {
-            return *const_iterator(ref_, ord_ + diff);
+            return *const_iterator(ref_, n_ + diff);
         }
         bool
         operator ==(const const_iterator& rhs) const
         {
-            return ref_ == rhs.ref_ && ord_ == rhs.ord_;
+            return ref_ == rhs.ref_ && n_ == rhs.n_;
         }
         bool
         operator <(const const_iterator& rhs) const
         {
-            return ref_.get() < ref_.get() && ord_ < rhs.ord_;
+            return ref_.get() < ref_.get() && n_ < rhs.n_;
         }
     };
 
@@ -151,14 +151,14 @@ namespace aug {
 #endif // _MSC_VER < 1310
 
     inline unsigned
-    toord(const const_iterator& it)
+    distance(const const_iterator& it)
     {
-        return it.ord_;
+        return it.n_;
     }
     inline unsigned
-    toord(const const_reverse_iterator& it)
+    distance(const const_reverse_iterator& it)
     {
-        return toord(it.base()) - 1;
+        return distance(it.base()) - 1;
     }
     inline const_iterator
     operator +(const const_iterator& lhs,
@@ -177,8 +177,8 @@ namespace aug {
     inline const_iterator::difference_type
     operator -(const const_iterator& lhs, const const_iterator& rhs)
     {
-        return static_cast<const_iterator::difference_type>(toord(lhs)
-                                                            - toord(rhs));
+        return static_cast<const_iterator::difference_type>(distance(lhs)
+                                                            - distance(rhs));
     }
     inline bool
     operator !=(const const_iterator& lhs, const const_iterator& rhs)

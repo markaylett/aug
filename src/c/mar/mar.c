@@ -51,18 +51,18 @@ AUG_RCSID("$Id$");
 
 #define OPTIONS_ "cfg:hi:lnrs:tu:x:z"
 
+#define CLEARTEXT_ "clear all fields"
 #define COMPACTTEXT_ "compact archive"
+#define DELTEXT_ "delete field by name"
+#define EXTRACTTEXT_ "extract content data into file"
 #define FORCETEXT_ "no prompt for confirmation"
-#define GETTEXT_ "print field value by name"
+#define GETTEXT_ "get field value by name"
 #define HELPTEXT_ "display this help, then exit"
 #define INSERTTEXT_ "insert content data from file"
-#define NAMESTEXT_ "list all field names"
-#define SIZETEXT_ "print size of content data"
 #define LISTTEXT_ "list all fields"
-#define REMOVETEXT_ "remove all fields"
-#define SETTEXT_ "set field(s) from source"
-#define UNSETTEXT_ "unset field by name"
-#define EXTRACTTEXT_ "extract content data into file"
+#define NAMESTEXT_ "list all field names"
+#define PUTTEXT_ "put field(s) from source"
+#define SIZETEXT_ "print size of content data"
 #define ZEROTEXT_ "zero truncate content data"
 
 #define FORCE_ (FORCEOPT_ & options_)
@@ -97,6 +97,26 @@ fileset_(aug_mar_t mar, const char* filename)
 }
 
 static aug_result
+clear_(aug_mar_t mar)
+{
+    if (!FORCE_ && !aug_confirm_(CLEARTEXT_))
+        return AUG_SUCCESS;
+
+    return aug_clearfields(mar);
+}
+
+static aug_result
+del_(aug_mar_t mar, const char* name)
+{
+    if (!FORCE_ && !aug_confirm_(DELTEXT_))
+        return AUG_SUCCESS;
+
+    aug_verify(aug_delfieldp(mar, name));
+
+    return AUG_SUCCESS;
+}
+
+static aug_result
 extract_(aug_mar_t mar, const char* filename)
 {
     if (0 == strcmp(filename, "-")) {
@@ -117,6 +137,21 @@ extract_(aug_mar_t mar, const char* filename)
     return AUG_SUCCESS;
 }
 
+static aug_result
+get_(aug_mar_t mar, const char* name)
+{
+    const void* value;
+    aug_rint ret = aug_getfieldp(mar, name, &value);
+    aug_verify(ret);
+
+    aug_verify(aug_writevalue_(stdout, value, AUG_RESULT(ret)));
+
+    if (EOF == fflush(stdout))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+
+    return AUG_SUCCESS;
+}
+
 static void
 help_(void)
 {
@@ -124,17 +159,17 @@ help_(void)
        string constant. */
 
     static const char OPTIONHELP_[] =
-        "  -c           " COMPACTTEXT_ "\n"
+        "  -c           " CLEARTEXT_ "\n"
+        "  -d name      " DELTEXT_ "\n"
         "  -f           " FORCETEXT_ "\n"
         "  -g name      " GETTEXT_ "\n"
         "  -h           " HELPTEXT_ "\n"
         "  -i filename  " INSERTTEXT_ "\n"
         "  -l           " NAMESTEXT_ "\n"
         "  -n           " SIZETEXT_ "\n"
-        "  -r           " REMOVETEXT_ "\n"
-        "  -s source    " SETTEXT_ "\n"
+        "  -o           " COMPACTTEXT_ "\n"
+        "  -p source    " PUTTEXT_ "\n"
         "  -t           " LISTTEXT_ "\n"
-        "  -u name      " UNSETTEXT_ "\n"
         "  -x filename  " EXTRACTTEXT_ "\n"
         "  -z           " ZEROTEXT_ "\n";
 
@@ -145,7 +180,6 @@ help_(void)
            "\nreport bugs to <mark.aylett@gmail.com>\n", OPTIONHELP_);
 }
 
-
 static aug_result
 insert_(aug_mar_t mar, const char* filename)
 {
@@ -155,33 +189,6 @@ insert_(aug_mar_t mar, const char* filename)
         aug_verify(aug_insertmar(mar, filename));
     }
     return AUG_SUCCESS;
-}
-
-static aug_result
-names_(aug_mar_t mar)
-{
-    int i;
-    for (i = 0; ; ++i) {
-
-        const char* name;
-        aug_verify(aug_ordtoname(mar, i, &name));
-
-        if (NULL == name)
-            break;
-
-        printf("%s\n", name);
-    }
-    if (EOF == fflush(stdout))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-
-    return AUG_SUCCESS;
-}
-
-static void
-size_(aug_mar_t mar)
-{
-    unsigned size = aug_getcontentsize(mar);
-    printf("%u\n", size);
 }
 
 static aug_result
@@ -209,14 +216,19 @@ list_(aug_mar_t mar)
 }
 
 static aug_result
-get_(aug_mar_t mar, const char* name)
+names_(aug_mar_t mar)
 {
-    const void* value;
-    aug_rint ret = aug_valuebyname(mar, name, &value);
-    aug_verify(ret);
+    int i;
+    for (i = 0; ; ++i) {
 
-    aug_verify(aug_writevalue_(stdout, value, AUG_RESULT(ret)));
+        const char* name;
+        aug_verify(aug_fieldntop(mar, i, &name));
 
+        if (NULL == name)
+            break;
+
+        printf("%s\n", name);
+    }
     if (EOF == fflush(stdout))
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
@@ -224,16 +236,7 @@ get_(aug_mar_t mar, const char* name)
 }
 
 static aug_result
-remove_(aug_mar_t mar)
-{
-    if (!FORCE_ && !aug_confirm_(REMOVETEXT_))
-        return AUG_SUCCESS;
-
-    return aug_removefields(mar);
-}
-
-static aug_result
-set_(aug_mar_t mar, char* src)
+put_(aug_mar_t mar, char* src)
 {
     struct aug_field field;
 
@@ -244,20 +247,16 @@ set_(aug_mar_t mar, char* src)
         return fileset_(mar, src);
     }
 
-    aug_verify(aug_setfield(mar, &field));
+    aug_verify(aug_putfield(mar, &field));
 
     return AUG_SUCCESS;
 }
 
-static aug_result
-unset_(aug_mar_t mar, const char* name)
+static void
+size_(aug_mar_t mar)
 {
-    if (!FORCE_ && !aug_confirm_(UNSETTEXT_))
-        return AUG_SUCCESS;
-
-    aug_verify(aug_unsetbyname(mar, name));
-
-    return AUG_SUCCESS;
+    unsigned size = aug_getcontentsize(mar);
+    printf("%u\n", size);
 }
 
 static aug_result
@@ -314,8 +313,14 @@ run_(int argc, char* argv[], const char* archivename)
     while (-1 != (ch = aug_getopt(argc, argv, OPTIONS_)))
         switch (ch) {
         case 'c':
-            if (AUG_ISFAIL(aug_compactmar(mar))) {
-                aug_perrinfo(aug_tlx, "failed to " COMPACTTEXT_, NULL);
+            if (AUG_ISFAIL(clear_(mar))) {
+                aug_perrinfo(aug_tlx, "failed to " CLEARTEXT_, NULL);
+                goto fail;
+            }
+            break;
+        case 'd':
+            if (AUG_ISFAIL(del_(mar, aug_optarg))) {
+                aug_perrinfo(aug_tlx, "failed to " DELTEXT_, NULL);
                 goto fail;
             }
             break;
@@ -342,27 +347,21 @@ run_(int argc, char* argv[], const char* archivename)
         case 'n':
             size_(mar);
             break;
-        case 'r':
-            if (AUG_ISFAIL(remove_(mar))) {
-                aug_perrinfo(aug_tlx, "failed to " REMOVETEXT_, NULL);
+        case 'o':
+            if (AUG_ISFAIL(aug_compactmar(mar))) {
+                aug_perrinfo(aug_tlx, "failed to " COMPACTTEXT_, NULL);
                 goto fail;
             }
             break;
-        case 's':
-            if (AUG_ISFAIL(set_(mar, aug_optarg))) {
-                aug_perrinfo(aug_tlx, "failed to " SETTEXT_, NULL);
+        case 'p':
+            if (AUG_ISFAIL(put_(mar, aug_optarg))) {
+                aug_perrinfo(aug_tlx, "failed to " PUTTEXT_, NULL);
                 goto fail;
             }
             break;
         case 't':
             if (AUG_ISFAIL(list_(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " LISTTEXT_, NULL);
-                goto fail;
-            }
-            break;
-        case 'u':
-            if (AUG_ISFAIL(unset_(mar, aug_optarg))) {
-                aug_perrinfo(aug_tlx, "failed to " UNSETTEXT_, NULL);
                 goto fail;
             }
             break;

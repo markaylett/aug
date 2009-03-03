@@ -125,9 +125,9 @@ MinGW Build
 
    $ cd $OPENSSL_HOME/bin/
    $ cp ssleay32.dll libssleay32.dll
-   $ cd $OPENSSL_HOME/lib/MinGW/
+   $ cd $OPENSSL_HOME/lib/
+   $ cp MinGW/*.a ./
    $ cp ssleay32.a libssleay32.a
-   $ cp lib*.a /lib/mingw/
 
    If "make check" is failing, try installing the package first to ensure that
    the DLLs are visible on your PATH.

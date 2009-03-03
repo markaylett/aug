@@ -16,13 +16,20 @@ for manipulating \fBmar\fR files from the command line.
 .TP
 \fB\-c\fR
 
-Compact the message archive.
+Clear (delete) all fields, including the names, from the archive.  Use the
+\fB-f\fR option to suppress the confirmation prompt.
+
+.TP
+\fB\-d\fR \fIname\fR
+
+Delete the field specified by \fIname\fR from the archive.  Use the \fB-f\fR
+option to suppress the confirmation prompt.
 
 .TP
 \fB\-f\fR
 
 Do not prompt for confirmation when using one of the following delete-like
-operations; \fB-r\fR, \fB-u\fR or \fB-z\fR.
+operations; \fB-c\fR, \fB-d\fR or \fB-z\fR.
 
 .TP
 \fB\-g\fR \fIname\fR
@@ -53,37 +60,30 @@ the resulting names will be followed by a newline.
 Print the total length (in bytes) of the archive's body-content to stdout.
 
 .TP
-\fB\-r\fR
+\fB\-o\fR
 
-Remove (delete) all fields, including the names, from the archive.  Use the
-\fB-f\fR option to suppress the confirmation prompt.
+Compact the message archive.
 
 .TP
-\fB\-s\fR \fIsource\fR
+\fB\-p\fR \fIsource\fR
 
 Fields are set by specifying one of more name/value pairs.  Each name/value
 pair should be specified in the format "name=value", where the name and value
 part of the pair are delimited using the "=" character.  Any whitespace
 characters occurring either side of the delimiter are significant, and will
-not therefore be stripped when the pair is split.  The \fIsource\fR can
-either be a single name/value pair specified on the command line, or a
-filename.  If a filename is specified then name/value pairs will be read (one
-pair per line) from the file specified by filename.  If the filename
-specified is "-" then stdin will be used as the input stream.
+not therefore be stripped when the pair is split.  The \fIsource\fR can either
+be a single name/value pair specified on the command line, or a filename.  If
+a filename is specified then name/value pairs will be read (one pair per line)
+from the file specified by filename.  If the filename specified is "-" then
+stdin will be used as the input stream.
 
 .TP
 \fB\-t\fR
 
 List each field contained within the archive to stdout.  Each field is
 displayed as a name/value pair in the format "name=value", where the name and
-value part of the pair are delimited using the "=" character.  Each
-name/value pair will be followed by a newline.
-
-.TP
-\fB\-u\fR \fIname\fR
-
-Unset (delete) the field specified by \fIname\fR from the archive.  Use the
-\fB-f\fR option to suppress the confirmation prompt.
+value part of the pair are delimited using the "=" character.  Each name/value
+pair will be followed by a newline.
 
 .TP
 \fB\-x\fR \fIfilename\fR
@@ -95,8 +95,8 @@ used as the output stream.
 .TP
 \fB\-z\fR
 
-Zero truncate (delete) the archive's body-content.  Use the \fB-f\fR option
-to suppress the confirmation prompt.
+Zero truncate (delete) the archive's body-content.  Use the \fB-f\fR option to
+suppress the confirmation prompt.
 
 .SH EXAMPLES
 .PP
@@ -112,8 +112,8 @@ and then print the number of bytes stored to stdout:
 .ft R
 .PP
 
-Extract (a copy of) the the archive's body-content, and then zero truncate
-the body-content without prompting for confirmation:
+Extract (a copy of) the the archive's body-content, and then zero truncate the
+body-content without prompting for confirmation:
 
 .ft B
 .nf
@@ -129,29 +129,29 @@ fields to stdout:
 .ft B
 .nf
 
-    mar -s familyname=Aylett -s givenname=Mark -t archive.mar
+    mar -p familyname=Aylett -p givenname=Mark -t archive.mar
 .fi
 .ft R
 .PP
 
-Unset the field (with name "familyname") without prompting for confirmation,
+Delete the field (with name "familyname") without prompting for confirmation,
 and then list all remaining field names within the archive to stdout:
 
 .ft B
 .nf
 
-    mar -f -u familyname -n archive.mar
+    mar -f -d familyname -l archive.mar
 .fi
 .ft R
 .PP
 
-Print the field value (for the field with name "givenname") to stdout, and
-then remove (delete) all fields without prompting for confirmation:
+Get the field value (for the field with name "givenname") to stdout, and then
+clear (delete) all fields without prompting for confirmation:
 
 .ft B
 .nf
 
-    mar -g givenname -f -r archive.mar
+    mar -g givenname -f -c archive.mar
 .fi
 .ft R
 .SH AUTHOR

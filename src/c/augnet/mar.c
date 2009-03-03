@@ -107,7 +107,7 @@ field_(aug_httphandler* ob, const char* name, const char* value)
     field.value_ = value;
     field.size_ = (unsigned)strlen(value);
 
-    aug_verify(aug_setfield(parser->mar_, &field));
+    aug_verify(aug_putfield(parser->mar_, &field));
     return AUG_SUCCESS;
 }
 

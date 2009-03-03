@@ -56,8 +56,7 @@ aug_copymar(aug_mar_t dst, aug_mar_t src);
  *
  * @param mpool Memory pool.
  *
- * @return A handle to the newly created message archive or null on failure,
- * in which case errno can be used to determine the error.
+ * @return A handle to the newly created message archive or null on failure.
  *
  * @see aug_openmar() and aug_releasemar().
  */
@@ -77,8 +76,7 @@ aug_createmar(aug_mpool* mpool);
  * @param ... The permissions used to create a new file.  Required when the
  * #AUG_CREAT flag has been specified, otherwise ignored.
  *
- * @return A handle to the newly created message archive or null on failure,
- * in which case errno can be used to determine the error.
+ * @return A handle to the newly created message archive or null on failure.
  *
  * @see aug_createmar() and aug_releasemar().
  */
@@ -125,55 +123,35 @@ AUGMAR_API aug_result
 aug_compactmar(aug_mar_t mar);
 
 /**
- * Remove all fields contained within message archive.
+ * Clear all fields within message archive.
  *
  * @param mar A handle to the message archive.
  *
- * @return See @ref TypesResult.
+ * @return See @ref TypesResult.  The number of fields removed on success.
  *
- * @see aug_unsetbyname() and aug_unsetbyord().
- */
-
-AUGMAR_API aug_result
-aug_removefields(aug_mar_t mar);
-
-/**
- * Set field within message archive.
- *
- * @param mar A handle to the message archive.
- *
- * @param field A field specifying the field name and a pointer to, and size
- * of, the field value.
- *
- * @return See @ref TypesResult.  The ordinal field position on success.
- *
- * @see aug_setvalue().
+ * @see aug_delfieldn() and aug_delfieldp().
  */
 
 AUGMAR_API aug_rint
-aug_setfield(aug_mar_t mar, const struct aug_field* field);
+aug_clearfields(aug_mar_t mar);
 
 /**
- * Set field value within message archive.
+ * Delete field (by ordinal) within message archive.
  *
  * @param mar A handle to the message archive.
  *
- * @param ord The ordinal position of an existing field.
- *
- * @param value A pointer to the field value to be assigned.
- *
- * @param size The size of the field value to be assigned.
+ * @param n The ordinal position of the field.
  *
  * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
- * @see aug_setfield().
+ * @see aug_clearfields() and aug_fieldpton().
  */
 
 AUGMAR_API aug_result
-aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size);
+aug_delfieldn(aug_mar_t mar, unsigned n);
 
 /**
- * Unset field (by name) within message archive.
+ * Delete field (by name) within message archive.
  *
  * @param mar A handle to the message archive.
  *
@@ -182,26 +160,29 @@ aug_setvalue(aug_mar_t mar, unsigned ord, const void* value, unsigned size);
  * @return See @ref TypesResult.  The ordinal field position on success.
  * #AUG_FAILNONE if there is no matching field.
  *
- * @see aug_removefields(), aug_unsetbyord() and aug_ordtoname().
+ * @see aug_clearfields() and aug_fieldntop().
  */
 
 AUGMAR_API aug_rint
-aug_unsetbyname(aug_mar_t mar, const char* name);
+aug_delfieldp(aug_mar_t mar, const char* name);
 
 /**
- * Unset field (by ordinal) within message archive.
+ * Obtain field value (by ordinal) from message archive.
  *
  * @param mar A handle to the message archive.
  *
- * @param ord The ordinal position of the field.
+ * @param n The ordinal position of the field.
  *
- * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
+ * @param value The output parameter, in which, the value will be set.
  *
- * @see aug_removefields(), aug_unsetbyname() and aug_nametoord().
+ * @return See @ref TypesResult.  The size of the field on success.
+ * #AUG_FAILNONE if there is no matching field.
+ *
+ * @see aug_getfieldp(), aug_getfield() and aug_fieldpton().
  */
 
-AUGMAR_API aug_result
-aug_unsetbyord(aug_mar_t mar, unsigned ord);
+AUGMAR_API aug_rint
+aug_getfieldn(aug_mar_t mar, unsigned n, const void** value);
 
 /**
  * Obtain field value (by name) from message archive.
@@ -215,79 +196,104 @@ aug_unsetbyord(aug_mar_t mar, unsigned ord);
  * @return See @ref TypesResult.  The size of the field on success.
  * #AUG_FAILNONE if there is no matching field.
  *
- * @see aug_valuebyord(), aug_getfield() and aug_ordtoname().
+ * @see aug_getfieldn(), aug_getfield() and aug_fieldntop().
  */
 
 AUGMAR_API aug_rint
-aug_valuebyname(aug_mar_t mar, const char* name, const void** value);
-
-/**
- * Obtain field value (by ordinal) from message archive.
- *
- * @param mar A handle to the message archive.
- *
- * @param ord The zero-based ordinal position of the field.
- *
- * @param value The output parameter, in which, the value will be set.
- *
- * @return See @ref TypesResult.  The size of the field on success.
- * #AUG_FAILNONE if there is no matching field.
- *
- * @see aug_valuebyname(), aug_getfield() and aug_nametoord().
- */
-
-AUGMAR_API aug_rint
-aug_valuebyord(aug_mar_t mar, unsigned ord, const void** value);
+aug_getfieldp(aug_mar_t mar, const char* name, const void** value);
 
 /**
  * Obtain field from message archive.
  *
  * @param mar A handle to the message archive.
  *
- * @param ord The zero-based ordinal position of the field.
+ * @param n The ordinal position of the field.
  *
  * @param field The output parameter in which, the field will be returned.
  *
  * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
- * @see aug_valuebyname(), aug_valuebyord() and aug_getfields().
+ * @see aug_getfieldn() and aug_getfieldcount().
  */
 
 AUGMAR_API aug_result
-aug_getfield(aug_mar_t mar, unsigned ord, struct aug_field* field);
+aug_getfield(aug_mar_t mar, unsigned n, struct aug_field* field);
 
 /**
- * Obtain the number of fields contained within message archive.
+ * Set field value (by ordinal) within message archive.
  *
  * @param mar A handle to the message archive.
  *
- * @return See @ref TypesResult.
+ * @param n The ordinal position of an existing field.
  *
- * @see aug_getfield().
+ * @param value A pointer to the field value to be assigned.
+ *
+ * @param size The size of the field value to be assigned.
+ *
+ * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
+ *
+ * @see aug_putfieldp() and aug_putfield().
  */
 
-AUGMAR_API unsigned
-aug_getfields(aug_mar_t mar);
+AUGMAR_API aug_result
+aug_putfieldn(aug_mar_t mar, unsigned n, const void* value, unsigned size);
 
 /**
- * Obtain field name from ordinal position in message archive.
+ * Set field value (by name) within message archive.
  *
  * @param mar A handle to the message archive.
  *
- * @param ord The zero-based ordinal position of the name to be returned.
+ * @param name The name of an existing field.
+ *
+ * @param value A pointer to the field value to be assigned.
+ *
+ * @param size The size of the field value to be assigned.
+ *
+ * @return See @ref TypesResult.  The ordinal field position on success.
+ * #AUG_FAILNONE if there is no matching field.
+ *
+ * @see aug_putfieldn() and aug_putfield().
+ */
+
+AUGMAR_API aug_rint
+aug_putfieldp(aug_mar_t mar, const char* name, const void* value,
+              unsigned size);
+
+/**
+ * Set field within message archive.
+ *
+ * @param mar A handle to the message archive.
+ *
+ * @param field A field specifying the field name and a pointer to, and size
+ * of, the field value.
+ *
+ * @return See @ref TypesResult.  The ordinal field position on success.
+ *
+ * @see aug_putfieldn() and aug_putfieldp();
+ */
+
+AUGMAR_API aug_rint
+aug_putfield(aug_mar_t mar, const struct aug_field* field);
+
+/**
+ * Get field name from ordinal position in message archive.
+ *
+ * @param mar A handle to the message archive.
+ *
+ * @param n The ordinal position of the name to be returned.
  *
  * @param name The output parameter, in which, the name will be returned.
  *
  * @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
  *
- * @see aug_unsetbyname(), aug_valuebyname() and aug_nametoord().
+ * @see aug_delfieldp(), aug_getfieldp() and aug_fieldpton().
  */
 
 AUGMAR_API aug_result
-aug_ordtoname(aug_mar_t mar, unsigned ord, const char** name);
+aug_fieldntop(aug_mar_t mar, unsigned n, const char** name);
 
 /**
- * Obtain ordinal position from field name in message archive.
+ * Get ordinal position from field name in message archive.
  *
  * @param mar A handle to the message archive.
  *
@@ -296,11 +302,24 @@ aug_ordtoname(aug_mar_t mar, unsigned ord, const char** name);
  * @return See @ref TypesResult.  The ordinal field position on success.
  * #AUG_FAILNONE if there is no matching field.
  *
- * @see aug_unsetbyord(), aug_valuebyord() and aug_ordtoname().
+ * @see aug_delfieldn(), aug_getfieldn() and aug_fieldntop().
 */
 
 AUGMAR_API aug_rint
-aug_nametoord(aug_mar_t mar, const char* name);
+aug_fieldpton(aug_mar_t mar, const char* name);
+
+/**
+ * Gets the number of fields contained within message archive.
+ *
+ * @param mar A handle to the message archive.
+ *
+ * @return The number of fields.
+ *
+ * @see aug_getfieldn(), aug_getfieldp() and aug_getfield().
+ */
+
+AUGMAR_API unsigned
+aug_getfieldcount(aug_mar_t mar);
 
 /**
  * Insert file into body content of message archive.
@@ -417,8 +436,7 @@ aug_extractmar(aug_mar_t mar, const char* path);
  * @param size An optional output parameter, in which, the size of the content
  * is set.
  *
- * @return A pointer to the content or null on failure, in which case errno
- * can be used to determine the error.
+ * @return A pointer to the content or null on failure.
  *
  * @see aug_readmar(), aug_extractmar() and aug_getcontentsize().
  */

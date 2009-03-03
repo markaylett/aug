@@ -82,7 +82,7 @@ namespace {
     void
     checkheader(marref ref)
     {
-        if (FIELDS_SIZE != aug::getfields(ref))
+        if (FIELDS_SIZE != aug::getfieldcount(ref))
             throw error(__LINE__);
 
         unsigned i;
@@ -116,7 +116,7 @@ namespace {
 
         for (i = 0; FIELDS_SIZE > i; ++i) {
 
-            const char* name(aug::toname(ref, i));
+            const char* name(aug::fieldntop(ref, i));
 
             if (!iequal(name, FIELDS[i].name_))
                 throw error(__LINE__);
@@ -126,19 +126,19 @@ namespace {
     headertest(marref ref)
     {
         for (unsigned i(0); FIELDS_SIZE > i; ++i)
-            aug::setfield(ref, aug::field(FIELDS[i]));
+            aug::putfield(ref, aug::field(FIELDS[i]));
 
         checkheader(ref);
 
-        unsigned ord(aug::unsetfield(ref, FIELDS[1].name_));
-        if (1 != ord)
+        unsigned n(aug::delfield(ref, FIELDS[1].name_));
+        if (1 != n)
             throw error(__LINE__);
 
         if (aug::getfield(ref, FIELDS[1].name_))
             throw error(__LINE__);
 
-        aug::removefields(ref);
-        if (0 != aug::getfields(ref))
+        aug::clearfields(ref);
+        if (0 != aug::getfieldcount(ref))
             throw error(__LINE__);
     }
 
@@ -277,7 +277,7 @@ namespace {
     {
         aug::header header(ref);
         for (unsigned i(0); FIELDS_SIZE > i; ++i)
-            header.setfield(aug::field(FIELDS[i]));
+            header.putfield(aug::field(FIELDS[i]));
 
         checkheader(ref);
 
@@ -292,12 +292,12 @@ namespace {
             endR(header.rend());
         for (; itR != endR; ++itR) {
 
-            unsigned ord(aug::toord(itR));
-            if (!iequal(*itR, FIELDS[ord].name_))
+            unsigned n(aug::distance(itR));
+            if (!iequal(*itR, FIELDS[n].name_))
                 throw error(__LINE__);
 
-            if (0 != memcmp(header.getfield(itR), FIELDS[ord].value_,
-                            FIELDS[ord].size_))
+            if (0 != memcmp(header.getfield(itR), FIELDS[n].value_,
+                            FIELDS[n].size_))
                 throw error(__LINE__);
         }
 
