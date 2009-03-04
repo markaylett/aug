@@ -81,7 +81,7 @@ namespace aug {
     inline unsigned
     delfield(marref ref, const char* name)
     {
-        return verify(aug_delfieldp(ref.get(), name));
+        return AUG_RESULT(verify(aug_delfieldp(ref.get(), name)));
     }
     inline const void*
     getfield(marref ref, unsigned n, unsigned& size)

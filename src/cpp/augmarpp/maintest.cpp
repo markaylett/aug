@@ -103,7 +103,7 @@ namespace {
 
         for (i = 0; FIELDS_SIZE > i; ++i) {
 
-            unsigned size;
+            unsigned size = 0;
             const char* value = static_cast<
                 const char*>(aug::getfield(ref, FIELDS[i].name_, size));
 

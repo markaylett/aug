@@ -151,6 +151,7 @@ word_(aug_httpparser_t parser)
             parser->state_ = NAME_;
         break;
     default:
+        result = AUG_FAILERROR;
         assert(0);
     }
     return result;

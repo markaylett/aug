@@ -645,7 +645,7 @@ namespace {
                     end(header.end());
                 for (; it != end; ++it) {
 
-                    unsigned size;
+                    unsigned size = 0;
                     const char* value
                         (static_cast<const char*>(header.getfield(it, size)));
 
