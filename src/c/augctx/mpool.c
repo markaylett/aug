@@ -26,7 +26,11 @@
 
 AUG_RCSID("$Id$");
 
-#define DEBUG 1
+#if !defined(DEBUG)
+# define DEBUG 0
+#endif /* !DEBUG */
+
+#undef ONLY_MSPACES
 #define ONLY_MSPACES 1
 #include "malloc.c"
 
