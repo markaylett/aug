@@ -117,7 +117,10 @@ aug_openmfile_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
 
     /* Always want readability. */
 
-    flags |= AUG_RDONLY;
+    if (AUG_WRONLY == (flags & AUG_WRONLY)) {
+       flags &= ~AUG_WRONLY;
+       flags |= AUG_RDWR;
+    }
 
     /* Opening a file with the append flag set (where that file is to be
        memory mapped), does not seem to make much sense.  Therefore, the

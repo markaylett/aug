@@ -60,7 +60,7 @@ and the risk of deadlocks may actually increase, and performance degrade.
 Non-blocking APIs that support event multiplexing obviate the need for many
 threads.  Fewer context switches, locks, and fuller cache pipelines lead to
 greater efficiencies.  The downside is that multiplexing code often results in
-more complex state transistions.  In a sense, these transitions are the
+more complex state transitions.  In a sense, these transitions are the
 flattened interleavings of the multi-threaded model.
 
 \yskip\noindent
