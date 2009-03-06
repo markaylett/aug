@@ -35,35 +35,6 @@
 
 namespace aug {
 
-    class marref {
-        aug_mar_t mar_;
-    public:
-        marref(const null_&) AUG_NOTHROW
-            : mar_(0)
-        {
-        }
-        marref(aug_mar_t mar) AUG_NOTHROW
-            : mar_(mar)
-        {
-        }
-        aug_mar_t
-        get() const AUG_NOTHROW
-        {
-            return mar_;
-        }
-    };
-
-    inline bool
-    operator ==(marref lhs, marref rhs)
-    {
-        return lhs.get() == rhs.get();
-    }
-    inline bool
-    operator !=(marref lhs, marref rhs)
-    {
-        return lhs.get() != rhs.get();
-    }
-
     class field {
         aug_field field_;
         void
@@ -147,18 +118,6 @@ namespace aug {
             return field_;
         }
     };
-}
-
-inline bool
-isnull(aug_mar_t mar)
-{
-    return 0 == mar;
-}
-
-inline bool
-isnull(aug::marref ref)
-{
-    return 0 == ref.get();
 }
 
 inline bool

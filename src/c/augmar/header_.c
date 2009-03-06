@@ -199,7 +199,7 @@ aug_getfieldn_(aug_seq_t seq, const struct aug_info_* info, unsigned n,
 
     if (n >= info->fields_) {
         *value = NULL;
-        return AUG_FAILNONE;
+        return AUG_MKRESULT(0);
     }
 
     aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
@@ -241,7 +241,7 @@ aug_getfieldp_(aug_seq_t seq, const struct aug_info_* info,
 
     if (inout == info->fields_) {
         *value = NULL;
-        return AUG_FAILNONE;
+        return AUG_MKRESULT(0);
     }
 
     /* Set output parameter. */
@@ -267,7 +267,7 @@ aug_getfield_(aug_seq_t seq, const struct aug_info_* info,
         field->value_ = NULL;
         field->size_ = 0;
 
-        return AUG_FAILNONE;
+        return AUG_MKRESULT(0);
     }
 
     aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));

@@ -110,7 +110,7 @@ phrase_(aug_httpparser_t parser)
 
     /* End of message (with commit). */
 
-    return end_(parser, 1);
+    return end_(parser, AUG_TRUE);
 }
 
 static aug_result
@@ -206,7 +206,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
     /* End of message (with commit). */
 
-    aug_verify(end_(parser, 1));
+    aug_verify(end_(parser, AUG_TRUE));
 
     return AUG_MKRESULT(size);
 }
@@ -283,7 +283,7 @@ aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
 
     /* End of message (no commit). */
 
-    end_(parser, 0);
+    end_(parser, AUG_FALSE);
     return result;
 }
 
@@ -324,6 +324,6 @@ aug_finishhttp(aug_httpparser_t parser)
 
     /* End of message (no commit). */
 
-    end_(parser, 0);
+    end_(parser, AUG_FALSE);
     return result;
 }

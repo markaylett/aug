@@ -587,7 +587,7 @@ namespace {
             aug_ctxinfo(aug_tlx, "nonce: [%s]", nonce_);
         }
         void
-        put(const char* initial, aug_mar_t mar)
+        put(const char* initial, marref mar)
         {
             // TODO: externalise root directory path.
 
@@ -595,9 +595,10 @@ namespace {
 
             if (sessid_.empty()) {
 
-                const char* value(static_cast<const char*>
-                                  (getfield(mar, "Cookie")));
-                sessid_ = getsessid(id_, name_, value);
+                const void* value;
+                getfieldp(mar, "Cookie", value);
+                sessid_ = getsessid(id_, name_,
+                                    static_cast<const char*>(value));
             }
 
             try {
@@ -621,8 +622,11 @@ namespace {
 
                 if (r.method_ == "POST") {
 
-                    contenttype = static_cast<const char*>
-                        (getfield(mar, "Content-Type"));
+                    const void* value;
+                    getfieldp(mar, "Content-Type", value);
+                    if (!value)
+                        throw none_exception();
+                    contenttype = static_cast<const char*>(value);
 
                     unsigned size;
                     const void* ptr(aug::getcontent(mar, size));
@@ -723,10 +727,11 @@ namespace {
                 throw;
             }
 
-            unsigned size;
-            const char* value(static_cast<const char*>
-                              (getfield(mar, "Connection", size)));
-            if (value && size && aug_strcasestr(value, "close")) {
+            const void* value;
+            unsigned size(getfieldp(mar, "Connection", value));
+
+            if (value && size
+                && aug_strcasestr(static_cast<const char*>(value), "close")) {
                 aug_ctxinfo(aug_tlx, "closing");
                 mod::shutdown(id_, 0);
             }

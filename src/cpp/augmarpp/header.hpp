@@ -25,6 +25,8 @@
 
 #include "augmarpp/iterator.hpp"
 
+#include "augctxpp/exception.hpp"
+
 namespace aug {
 
     class header : public mpool_ops {
@@ -37,11 +39,11 @@ namespace aug {
         typedef const_iterator::reference const_reference;
         typedef const_iterator::size_type size_type;
     private:
-        smartmar mar_;
+        marptr mar_;
     public:
         explicit
         header(marref ref)
-            : mar_(smartmar::retain(ref.get()))
+            : mar_(object_retain(ref))
         {
         }
         void
@@ -57,45 +59,54 @@ namespace aug {
         const_iterator
         putfield(const const_iterator& it, const void* cdata, unsigned n)
         {
-            aug::putfield(mar_, distance(it), cdata, n);
+            aug::putfieldn(mar_, distance(it), cdata, n);
             return it;
         }
         const_iterator
         putfield(const const_iterator& it, const char* cdata)
         {
-            aug::putfield(mar_, distance(it), cdata);
+            aug::putfieldn(mar_, distance(it), cdata,
+                           static_cast<unsigned>(strlen(cdata)));
             return it;
         }
         const_iterator
         delfield(const const_iterator& it)
         {
-            aug::delfield(mar_, distance(it));
+            aug::delfieldn(mar_, distance(it));
             return it;
         }
         const void*
         getfield(const const_iterator& it) const
         {
-            return aug::getfield(mar_, distance(it));
+            const void* value;
+            aug::getfieldn(mar_, distance(it), value);
+            return value;
         }
         const void*
-        getfield(const const_iterator& it, unsigned& n) const
+        getfield(const const_iterator& it, unsigned& size) const
         {
-            return aug::getfield(mar_, distance(it), n);
+            const void* value;
+            size = aug::getfieldn(mar_, distance(it), value);
+            return value;
         }
         const void*
         getfield(const const_reverse_iterator& it) const
         {
-            return aug::getfield(mar_, distance(it));
+            const void* value;
+            aug::getfieldn(mar_, distance(it), value);
+            return value;
         }
         const void*
-        getfield(const const_reverse_iterator& it, unsigned& s) const
+        getfield(const const_reverse_iterator& it, unsigned& size) const
         {
-            return aug::getfield(mar_, distance(it), s);
+            const void* value;
+            size = aug::getfieldn(mar_, distance(it), value);
+            return value;
         }
         void
         getfield(const const_iterator& it, aug_field& f) const
         {
-          aug::getfield(mar_, distance(it), f);
+            aug::getfield(mar_, distance(it), f);
         }
         const_iterator
         find(const char* name) const

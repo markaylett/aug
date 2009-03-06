@@ -29,10 +29,8 @@
 #include "augmarpp/header.hpp"
 #include "augmarpp/iterator.hpp"
 #include "augmarpp/mar.hpp"
-#include "augmarpp/smartmar.hpp"
 #include "augmarpp/stream.hpp"
 #include "augmarpp/streambuf.hpp"
-#include "augmarpp/swapfile.hpp"
 #include "augmarpp/types.hpp"
 
 #endif // AUGMARPP_HPP

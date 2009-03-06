@@ -2,29 +2,25 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 modincludedir = $(includedir)/augmarpp
 modinclude_HEADERS = \
-	mar.hpp \
 	compat.hpp \
 	config.hpp \
 	header.hpp \
 	iterator.hpp \
-	smartmar.hpp \
+	mar.hpp \
 	stream.hpp \
 	streambuf.hpp \
-	swapfile.hpp \
 	types.hpp
 
 noinst_LTLIBRARIES = libaugmarpp.la
 
 libaugmarpp_la_SOURCES = \
-	mar.cpp \
 	compat.cpp \
 	config.cpp \
 	header.cpp \
 	iterator.cpp \
-	smartmar.cpp \
+	mar.cpp \
 	stream.cpp \
 	streambuf.cpp \
-	swapfile.cpp \
 	types.cpp
 
 libaugmarpp_la_LDFLAGS = \

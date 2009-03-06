@@ -150,16 +150,10 @@
 				RelativePath="..\src\cpp\augmarpp\mar.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augmarpp\smartmar.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augmarpp\stream.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augmarpp\streambuf.cpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augmarpp\swapfile.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augmarpp\types.cpp">
@@ -185,16 +179,10 @@
 				RelativePath="..\src\cpp\augmarpp\mar.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augmarpp\smartmar.hpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augmarpp\stream.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augmarpp\streambuf.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augmarpp\swapfile.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augmarpp\types.hpp">

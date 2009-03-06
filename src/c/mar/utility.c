@@ -81,7 +81,7 @@ aug_confirm_(const char* prompt)
 }
 
 AUG_EXTERNC aug_result
-aug_insertstream_(aug_mar_t mar, FILE* stream)
+aug_insertstream_(aug_mar* mar, FILE* stream)
 {
     char buf[AUG_MAXLINE];
     while (!feof(stream)) {
@@ -117,7 +117,7 @@ aug_readline_(char* buf, size_t size, FILE* stream)
 }
 
 AUG_EXTERNC aug_result
-aug_streamset_(aug_mar_t mar, FILE* stream)
+aug_streamset_(aug_mar* mar, FILE* stream)
 {
     char buf[AUG_MAXLINE];
     struct aug_field field;

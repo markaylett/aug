@@ -29,8 +29,20 @@
 #include "augext/stream.h"
 #include "augext/mpool.h"
 
+/**
+ * Create file stream.
+ *
+ * Does not take ownership of file handle.
+ */
+
 AUGSYS_API aug_stream*
 aug_createfstream(aug_mpool* mpool, aug_fd fd);
+
+/**
+ * Create socket stream.
+ *
+ * Does not take ownership of socket handle.
+ */
 
 AUGSYS_API aug_stream*
 aug_createsstream(aug_mpool* mpool, aug_sd sd);

@@ -54,9 +54,8 @@ libaugmarpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugmarpp_la_OBJECTS = mar.lo compat.lo config.lo header.lo \
-	iterator.lo smartmar.lo stream.lo streambuf.lo swapfile.lo \
-	types.lo
+am_libaugmarpp_la_OBJECTS = compat.lo config.lo header.lo iterator.lo \
+	mar.lo stream.lo streambuf.lo types.lo
 libaugmarpp_la_OBJECTS = $(am_libaugmarpp_la_OBJECTS)
 am_maintest_OBJECTS = maintest.$(OBJEXT)
 maintest_OBJECTS = $(am_maintest_OBJECTS)
@@ -232,28 +231,24 @@ DEFAULT_INCLUDES = \
 
 modincludedir = $(includedir)/augmarpp
 modinclude_HEADERS = \
-	mar.hpp \
 	compat.hpp \
 	config.hpp \
 	header.hpp \
 	iterator.hpp \
-	smartmar.hpp \
+	mar.hpp \
 	stream.hpp \
 	streambuf.hpp \
-	swapfile.hpp \
 	types.hpp
 
 noinst_LTLIBRARIES = libaugmarpp.la
 libaugmarpp_la_SOURCES = \
-	mar.cpp \
 	compat.cpp \
 	config.cpp \
 	header.cpp \
 	iterator.cpp \
-	smartmar.cpp \
+	mar.cpp \
 	stream.cpp \
 	streambuf.cpp \
-	swapfile.cpp \
 	types.cpp
 
 libaugmarpp_la_LDFLAGS = \
@@ -337,10 +332,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iterator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mar.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smartmar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streambuf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/swapfile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 
 .cpp.o:

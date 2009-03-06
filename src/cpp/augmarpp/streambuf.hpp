@@ -24,11 +24,14 @@
 #define AUGMARPP_STREAMBUF_HPP
 
 #include "augmarpp/compat.hpp"
-#include "augmarpp/mar.hpp"
 
 #include "augctxpp/mpool.hpp"
 
+#include "augmar/types.h"
+
 #include "augctx/defs.h" // AUG_MAX
+
+#include "augext/mar.h"
 
 #include <iostream>
 
@@ -179,7 +182,7 @@ namespace aug {
     private:
         typedef detail::buffer<char_type> buffer_type;
 
-        smartmar mar_;
+        marptr mar_;
         buffer_type buffer_;
         detail::state state_;
 
@@ -507,7 +510,7 @@ namespace aug {
         }
         basic_marstreambuf(marref ref, std::ios_base::openmode mode,
                            std::streamsize size)
-            : mar_(smartmar::retain(ref.get())),
+            : mar_(object_retain(ref)),
               buffer_(mode, size)
         {
             init();
@@ -524,7 +527,7 @@ namespace aug {
                 && AUG_ISFAIL(aug_syncmar(mar_.get())))
                 ret = -1;
 
-            aug_releasemar(mar_.get());
+            mar_ = null;
             return ret;
         }
         bool

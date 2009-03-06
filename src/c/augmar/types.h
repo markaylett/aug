@@ -35,12 +35,6 @@
 #include <stdarg.h>
 
 /**
- * The message archive handle type.
- */
-
-typedef struct aug_mar_* aug_mar_t;
-
-/**
  * The field structure.
  */
 

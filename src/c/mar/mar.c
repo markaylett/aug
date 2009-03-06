@@ -70,7 +70,7 @@ AUG_RCSID("$Id$");
 static unsigned options_ = 0;
 
 static aug_result
-fileset_(aug_mar_t mar, const char* filename)
+fileset_(aug_mar* mar, const char* filename)
 {
     if (0 == strcmp(filename, "-")) {
 
@@ -97,7 +97,7 @@ fileset_(aug_mar_t mar, const char* filename)
 }
 
 static aug_result
-clear_(aug_mar_t mar)
+clear_(aug_mar* mar)
 {
     if (!FORCE_ && !aug_confirm_(CLEARTEXT_))
         return AUG_SUCCESS;
@@ -106,7 +106,7 @@ clear_(aug_mar_t mar)
 }
 
 static aug_result
-del_(aug_mar_t mar, const char* name)
+del_(aug_mar* mar, const char* name)
 {
     if (!FORCE_ && !aug_confirm_(DELTEXT_))
         return AUG_SUCCESS;
@@ -117,7 +117,7 @@ del_(aug_mar_t mar, const char* name)
 }
 
 static aug_result
-extract_(aug_mar_t mar, const char* filename)
+extract_(aug_mar* mar, const char* filename)
 {
     if (0 == strcmp(filename, "-")) {
 
@@ -138,7 +138,7 @@ extract_(aug_mar_t mar, const char* filename)
 }
 
 static aug_result
-get_(aug_mar_t mar, const char* name)
+get_(aug_mar* mar, const char* name)
 {
     const void* value;
     aug_rint ret = aug_getfieldp(mar, name, &value);
@@ -181,7 +181,7 @@ help_(void)
 }
 
 static aug_result
-insert_(aug_mar_t mar, const char* filename)
+insert_(aug_mar* mar, const char* filename)
 {
     if (0 == strcmp(filename, "-")) {
         aug_verify(aug_insertstream_(mar, stdin));
@@ -192,14 +192,14 @@ insert_(aug_mar_t mar, const char* filename)
 }
 
 static aug_result
-list_(aug_mar_t mar)
+list_(aug_mar* mar)
 {
     int i;
     for (i = 0; ; ++i) {
 
         struct aug_field field;
         aug_result result = aug_getfield(mar, i, &field);
-        if (AUG_ISNONE(result))
+        if (!field.value_)
             break;
 
         aug_verify(result);
@@ -214,7 +214,7 @@ list_(aug_mar_t mar)
 }
 
 static aug_result
-names_(aug_mar_t mar)
+names_(aug_mar* mar)
 {
     int i;
     for (i = 0; ; ++i) {
@@ -234,7 +234,7 @@ names_(aug_mar_t mar)
 }
 
 static aug_result
-put_(aug_mar_t mar, char* src)
+put_(aug_mar* mar, char* src)
 {
     struct aug_field field;
 
@@ -251,14 +251,14 @@ put_(aug_mar_t mar, char* src)
 }
 
 static void
-size_(aug_mar_t mar)
+size_(aug_mar* mar)
 {
     unsigned size = aug_getcontentsize(mar);
     printf("%u\n", size);
 }
 
 static aug_result
-zero_(aug_mar_t mar)
+zero_(aug_mar* mar)
 {
     if (!FORCE_ && !aug_confirm_(ZEROTEXT_))
         return AUG_SUCCESS;
@@ -279,7 +279,7 @@ run_(int argc, char* argv[], const char* archivename)
     int flags = 0;
     mode_t mode = 0;
 
-    aug_mar_t mar;
+    aug_mar* mar;
     int ch;
 
     switch (options_ & (READOPT_ | WRITEOPT_)) {
@@ -382,11 +382,11 @@ run_(int argc, char* argv[], const char* archivename)
             goto fail;
         }
 
-    aug_releasemar(mar);
+    aug_release(mar);
     return AUG_SUCCESS;
 
  fail:
-    aug_releasemar(mar);
+    aug_release(mar);
     return AUG_FAILERROR;
 }
 

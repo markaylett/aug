@@ -26,8 +26,297 @@
   <quotincl>augtypes.h</quotincl>
 
   <verbatim>
-struct aug_mar_;
+struct aug_field;
   </verbatim>
+
+  <interface name="mar">
+
+    <method name="compact" type="aug_result" qname="compactmar">
+
+      Compact any unused space within message archive.
+
+      @return See @ref TypesResult.
+
+    </method>
+
+    <method name="clear" type="aug_rint" qname="clearfields">
+
+      Clear all fields within message archive.
+
+      @return See @ref TypesResult.  The number of fields removed on success.
+
+    </method>
+
+    <method name="deln" type="aug_result" qname="delfieldn">
+
+      Delete field (by ordinal) within message archive.
+
+      @param n The ordinal position of the field.
+
+      @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching
+      field.
+
+      <param name="n" type="unsigned"/>
+    </method>
+
+    <method name="delp" type="aug_rint" qname="delfieldp">
+
+      Delete field (by name) within message archive.
+
+      @param name The name of the field.
+
+      @return See @ref TypesResult.  The ordinal field position on success.
+      #AUG_FAILNONE if there is no matching field.
+
+      <param name="name" type="const char*"/>
+    </method>
+
+    <method name="getn" type="aug_rint" qname="getfieldn">
+
+      Obtain field value (by ordinal) from message archive.
+
+      @param n The ordinal position of the field.
+
+      @param value The output parameter, in which, the value will be set.  Set
+      to null if if there is no matching field.
+
+      @return See @ref TypesResult.  The size of the field on success.
+
+      <param name="n" type="unsigned"/>
+      <param name="value" type="const void*&"/>
+    </method>
+
+    <method name="getp" type="aug_rint" qname="getfieldp">
+
+      Obtain field value (by name) from message archive.
+
+      @param name The name of the field.
+
+      @param value The output parameter, in which, the value will be set.  Set
+      to null if if there is no matching field.
+
+      @return See @ref TypesResult.  The size of the field on success.
+
+      <param name="name" type="const char*"/>
+      <param name="value" type="const void*&"/>
+    </method>
+
+    <method name="get" type="aug_result" qname="getfield">
+
+      Obtain field from message archive.
+
+      @param n The ordinal position of the field.
+
+      @param field The output parameter, in which, the field will be returned.
+      The field's name and value will be set to null if if there is no
+      matching field.
+
+      @return See @ref TypesResult.
+
+      <param name="n" type="unsigned"/>
+      <param name="field" type="struct aug_field&"/>
+    </method>
+
+    <method name="putn" type="aug_result" qname="putfieldn">
+
+      Set field value (by ordinal) within message archive.
+
+      @param n The ordinal position of an existing field.
+
+      @param value A pointer to the field value to be assigned.
+
+      @param size The size of the field value to be assigned.
+
+      @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching
+      field.
+
+      <param name="n" type="unsigned"/>
+      <param name="value" type="const void*"/>
+      <param name="size" type="unsigned"/>
+    </method>
+
+    <method name="putp" type="aug_rint" qname="putfieldp">
+
+      Set field value (by name) within message archive.
+
+      @param name The name of an existing field.
+
+      @param value A pointer to the field value to be assigned.
+
+      @param size The size of the field value to be assigned.
+
+      @return See @ref TypesResult.  The ordinal field position on success.
+      #AUG_FAILNONE if there is no matching field.
+
+      <param name="name" type="const char*"/>
+      <param name="value" type="const void*"/>
+      <param name="size" type="unsigned"/>
+    </method>
+
+    <method name="put" type="aug_rint" qname="putfield">
+
+      Set field within message archive.
+
+      @param field A field specifying the field name and a pointer to, and
+      size of, the field value.
+
+      @return See @ref TypesResult.  The ordinal field position on success.
+
+      <param name="field" type="const struct aug_field&"/>
+    </method>
+
+    <method name="ntop" type="aug_result" qname="fieldntop">
+
+      Get field name from ordinal position in message archive.
+
+      @param n The ordinal position of the name to be returned.
+
+      @param name The output parameter, in which, the name will be returned.
+
+      @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching
+      field.
+
+      <param name="n" type="unsigned"/>
+      <param name="name" type="const char*&"/>
+    </method>
+
+    <method name="pton" type="aug_rint" qname="fieldpton">
+
+      Get ordinal position from field name in message archive.
+
+      @param name The name of the field.
+
+      @return See @ref TypesResult.  The ordinal field position on success.
+      #AUG_FAILNONE if there is no matching field.
+
+      <param name="name" type="const char*"/>
+    </method>
+
+    <method name="getcount" type="unsigned" qname="getfieldcount">
+
+      Gets the number of fields contained within message archive.
+
+      @return The number of fields.
+
+    </method>
+
+    <method name="insert" type="aug_result" qname="insertmar">
+
+      Insert file into body content of message archive.
+
+      @param path A path to the file from which the content is read.
+
+      @return See @ref TypesResult.
+
+      <param name="path" type="const char*"/>
+    </method>
+
+    <method name="seek" type="aug_rsize" qname="seekmar">
+
+      Reposition content offset within message archive.
+
+      @param offset The offset calculated according to @a whence.
+
+      @param whence The @ref SeekWhence directive.
+
+      @return See @ref TypesResult.  If positive, the resulting location
+      offset, in bytes, from the beginning of content.
+
+      <param name="offset" type="off_t"/>
+      <param name="whence" type="int"/>
+    </method>
+
+    <method name="setcontent" type="aug_result" qname="setcontent">
+
+      Set content within message archive.
+
+      @param cdata A pointer to the content to be copied.
+
+      @param size The size of the content to be copied.
+
+      @return See @ref TypesResult.
+
+      <param name="cdata" type="const void*"/>
+      <param name="size" type="unsigned"/>
+    </method>
+
+    <method name="sync" type="aug_result" qname="syncmar">
+      Flush message archive buffers.
+    </method>
+
+    <method name="truncate" type="aug_result" qname="truncatemar">
+
+      Truncate content within message archive.
+
+      @param size The size to which the content will be truncated.
+
+      @return See @ref TypesResult.
+
+      <param name="size" type="unsigned"/>
+    </method>
+
+    <method name="write" type="aug_rsize" qname="writemar">
+
+      Write content to message archive.
+
+      @param buf The buffer from which the content will be copied.
+
+      @param len The number of bytes to be written.
+
+      @return See @ref TypesResult.  If positive, the number of bytes actually
+      written.
+
+      <param name="buf" type="const void*"/>
+      <param name="len" type="unsigned"/>
+    </method>
+
+    <method name="extract" type="aug_result" qname="extractmar">
+
+      Extract content from message archive into file.
+
+      @param path A path to the file into which the content will be written.
+
+      @return See @ref TypesResult.
+
+      <param name="path" type="const char*"/>
+    </method>
+
+    <method name="getcontent" type="const void*" qname="getcontent">
+
+      Obtain content from message archive.
+
+      @param size An optional output parameter, in which, the size of the
+      content is set.
+
+      @return A pointer to the content or null on failure.
+
+      <param name="size" type="unsigned&"/>
+    </method>
+
+    <method name="read" type="aug_rsize" qname="readmar">
+
+      Read content from message archive.
+
+      @param buf The output buffer into which the content will be copied.
+
+      @param len The number of bytes to be read.
+
+      @return See @ref TypesResult.  If positive, the number of bytes actually
+      read; zero if end-of-file.
+
+      <param name="buf" type="void*"/>
+      <param name="len" type="unsigned"/>
+    </method>
+
+    <method name="getcontentsize" type="unsigned" qname="getcontentsize">
+
+      Obtain size of content within message archive.
+
+      @return Content size.
+
+    </method>
+
+  </interface>
 
   <interface name="marstore">
 

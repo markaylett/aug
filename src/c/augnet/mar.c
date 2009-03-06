@@ -46,7 +46,7 @@ struct aug_marparser_ {
     aug_httphandler httphandler_;
     aug_httpparser_t http_;
     aug_xstr_t initial_;
-    aug_mar_t mar_;
+    aug_mar* mar_;
 };
 
 static void*
@@ -166,7 +166,7 @@ end_(aug_httphandler* ob, aug_bool commit)
     }
 
     if (parser->mar_) {
-        aug_releasemar(parser->mar_);
+        aug_release(parser->mar_);
         parser->mar_ = NULL;
     }
 
@@ -217,7 +217,7 @@ aug_destroymarparser(aug_marparser_t parser)
     aug_mpool* mpool = parser->mpool_;
 
     if (parser->mar_)
-        aug_releasemar(parser->mar_);
+        aug_release(parser->mar_);
 
     if (parser->initial_)
         aug_destroyxstr(parser->initial_);

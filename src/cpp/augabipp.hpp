@@ -119,6 +119,20 @@ namespace aug {
         }
     };
 
+    template <typename T, typename U>
+    bool
+    operator ==(obref<T> lhs, obref<U> rhs)
+    {
+        return lhs.get() == rhs.get();
+    }
+
+    template <typename T, typename U>
+    bool
+    operator !=(obref<T> lhs, obref<U> rhs)
+    {
+        return lhs.get() == rhs.get();
+    }
+
     /**
      * Argument must not be null.
      */
@@ -240,6 +254,20 @@ namespace aug {
             return ref_;
         }
     };
+
+    template <typename T, typename U>
+    bool
+    operator ==(const smartob<T>& lhs, const smartob<U>& rhs)
+    {
+        return lhs.get() == rhs.get();
+    }
+
+    template <typename T, typename U>
+    bool
+    operator !=(const smartob<T>& lhs, const smartob<U>& rhs)
+    {
+        return lhs.get() == rhs.get();
+    }
 
     /**
      * Argument may be null.

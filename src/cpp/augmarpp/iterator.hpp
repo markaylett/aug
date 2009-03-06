@@ -23,9 +23,9 @@
 #ifndef AUGMARPP_ITERATOR_HPP
 #define AUGMARPP_ITERATOR_HPP
 
-#include "augmarpp/mar.hpp"
-
 #include "augctxpp/mpool.hpp"
+
+#include "augext/mar.h"
 
 #include <iterator>
 
@@ -65,7 +65,9 @@ namespace aug {
         reference
         operator *() const
         {
-            return fieldntop(ref_, n_);
+            reference ref;
+            fieldntop(ref_, n_, ref);
+            return ref;
         }
         const_iterator&
         operator ++()

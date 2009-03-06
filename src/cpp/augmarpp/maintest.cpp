@@ -24,6 +24,8 @@
 
 #include "augsyspp.hpp"
 
+#include "augctx/string.h"
+
 #include <fstream>
 #include <string>
 #include <strstream>
@@ -103,9 +105,8 @@ namespace {
 
         for (i = 0; FIELDS_SIZE > i; ++i) {
 
-            unsigned size = 0;
-            const char* value = static_cast<
-                const char*>(aug::getfield(ref, FIELDS[i].name_, size));
+            const void* value;
+            unsigned size(aug::getfieldp(ref, FIELDS[i].name_, value));
 
             if (size != FIELDS[i].size_)
                 throw error(__LINE__);
@@ -116,7 +117,8 @@ namespace {
 
         for (i = 0; FIELDS_SIZE > i; ++i) {
 
-            const char* name(aug::fieldntop(ref, i));
+            const char* name;
+            aug::fieldntop(ref, i, name);
 
             if (!iequal(name, FIELDS[i].name_))
                 throw error(__LINE__);
@@ -130,11 +132,13 @@ namespace {
 
         checkheader(ref);
 
-        unsigned n(aug::delfield(ref, FIELDS[1].name_));
+        unsigned n(aug::delfieldp(ref, FIELDS[1].name_));
         if (1 != n)
             throw error(__LINE__);
 
-        if (aug::getfield(ref, FIELDS[1].name_))
+        const void* value;
+        aug::getfieldp(ref, FIELDS[1].name_, value);
+        if (value)
             throw error(__LINE__);
 
         aug::clearfields(ref);
@@ -226,53 +230,6 @@ namespace {
     }
 
     void
-    copytest(marref ref)
-    {
-        aug::setcontent(ref, STR1);
-
-        mpoolptr mpool(getmpool(aug_tlx));
-        aug::smartmar dst(aug::createmar(mpool));
-        aug::copymar(dst, ref);
-
-        unsigned size;
-        const char* content = static_cast<
-            const char*>(aug::getcontent(dst, size));
-
-        if (size != STRLEN1)
-            throw error(__LINE__);
-
-        if (0 != memcmp(content, STR1, size))
-            throw error(__LINE__);
-    }
-    void
-    copytest(const char* dst, const char* src)
-    {
-        mpoolptr mpool(getmpool(aug_tlx));
-        copytest(aug::createmar(mpool));
-        copytest(aug::openmar(mpool, src, AUG_RDWR | AUG_CREAT, 0664));
-    }
-    void
-    opencopytest(const char* dst, const char* src)
-    {
-        mpoolptr mpool(getmpool(aug_tlx));
-        smartmar from(aug::openmar(mpool, src, AUG_RDWR | AUG_CREAT, 0664));
-        aug::setcontent(from, STR1);
-
-        smartmar to(aug::openmar(mpool, dst, AUG_RDWR | AUG_CREAT, 0664));
-        aug::copymar(to, from);
-
-        unsigned size;
-        const char* content = static_cast<
-            const char*>(aug::getcontent(to, size));
-
-        if (size != STRLEN1)
-            throw error(__LINE__);
-
-        if (0 != memcmp(content, STR1, size))
-            throw error(__LINE__);
-    }
-
-    void
     iteratortest(marref ref)
     {
         aug::header header(ref);
@@ -352,8 +309,6 @@ namespace {
         { "content functions", contenttest },
         { "insert function", inserttest },
         /* FIXME: { "extract function", extracttest }, */
-        { "copy function", copytest },
-        { "opencopy function", opencopytest },
         { "iterator class", iteratortest },
         { "stream class", streamtest }
     };

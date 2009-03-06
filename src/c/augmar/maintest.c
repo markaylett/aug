@@ -24,12 +24,14 @@
 #include "augmar.h"
 #include "augctx.h"
 
+#include <stdio.h>
+
 int
 main(int argc, char* argv[])
 {
     aug_mpool* mpool;
     struct aug_field field;
-    aug_mar_t mar;
+    aug_mar* mar;
 
     if (!aug_autotlx())
         return 1;
@@ -41,13 +43,15 @@ main(int argc, char* argv[])
     field.name_ = "name";
     field.value_ = "Mark";
     field.size_ = 4;
-    aug_putfield(mar, &field);
+    if (AUG_ISFAIL(aug_putfield(mar, &field)))
+        aug_die("aug_putfield() failed");
 
     field.name_ = "age";
     field.value_ = "33";
     field.size_ = 2;
-    aug_putfield(mar, &field);
+    if (AUG_ISFAIL(aug_putfield(mar, &field)))
+        aug_die("aug_putfield() failed");
 
-    aug_releasemar(mar);
+    aug_release(mar);
     return 0;
 }
