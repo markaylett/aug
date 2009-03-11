@@ -64,7 +64,7 @@ namespace augd {
         reconf() const AUG_NOTHROW;
 
         void
-        event(const char* from, const char* type,
+        event(mod_id id, const char* from, const char* type,
               aug::objectref ob) const AUG_NOTHROW;
 
         void

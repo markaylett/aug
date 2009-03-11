@@ -81,12 +81,13 @@ stopall_(PyObject* self, PyObject* args)
 static PyObject*
 post_(PyObject* self, PyObject* args)
 {
+    mod_id id;
     const char* to, * type;
     PyObject* user = NULL;
     aug_blob* blob = NULL;
     int ret;
 
-    if (!PyArg_ParseTuple(args, "ss|O:post", &to, &type, &user))
+    if (!PyArg_ParseTuple(args, "Iss|O:post", &id, &to, &type, &user))
         return NULL;
 
     if (user && user != Py_None) {
@@ -103,7 +104,7 @@ post_(PyObject* self, PyObject* args)
             return NULL;
     }
 
-    ret = mod_post(to, type, (aug_object*)blob);
+    ret = mod_post(id, to, type, (aug_object*)blob);
     if (blob)
         aug_release(blob);
 
@@ -122,12 +123,13 @@ post_(PyObject* self, PyObject* args)
 static PyObject*
 dispatch_(PyObject* self, PyObject* args)
 {
+    mod_id id;
     const char* to, * type;
     PyObject* user = NULL;
     aug_blob* blob = NULL;
     int ret;
 
-    if (!PyArg_ParseTuple(args, "ss|O:dispatch", &to, &type, &user))
+    if (!PyArg_ParseTuple(args, "Iss|O:dispatch", &id, &to, &type, &user))
         return NULL;
 
     if (user && user != Py_None) {
@@ -144,7 +146,7 @@ dispatch_(PyObject* self, PyObject* args)
             return NULL;
     }
 
-    ret = mod_dispatch(to, type, (aug_object*)blob);
+    ret = mod_dispatch(id, to, type, (aug_object*)blob);
     if (blob)
         aug_release(blob);
 

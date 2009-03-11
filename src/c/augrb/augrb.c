@@ -138,6 +138,13 @@ funcall3_(ID id, VALUE arg1, VALUE arg2, VALUE arg3)
     return funcall_(id, args);
 }
 
+static VALUE
+funcall4_(ID id, VALUE arg1, VALUE arg2, VALUE arg3, VALUE arg4)
+{
+    VALUE args = rb_ary_new3(4, arg1, arg2, arg3, arg4);
+    return funcall_(id, args);
+}
+
 static char*
 lowercpy_(char* dst, const char* src)
 {
@@ -201,11 +208,11 @@ checkhandle_(VALUE handle)
                  rb_obj_classname(handle));
 }
 
-static int
+static mod_id
 checkid_(VALUE handle)
 {
     checkhandle_(handle);
-    return FIX2INT(rb_iv_get(handle, "@id"));
+    return FIX2UINT(rb_iv_get(handle, "@id"));
 }
 
 static VALUE
@@ -239,12 +246,13 @@ sethandleuser_(VALUE self, VALUE user)
 static VALUE
 cmphandle_(VALUE self, VALUE other)
 {
-    int lhs, rhs, ret;
+    mod_id lhs, rhs;
+    int ret;
 
     checkhandle_(other);
 
-    lhs = FIX2INT(rb_iv_get(self, "@id"));
-    rhs = FIX2INT(rb_iv_get(other, "@id"));
+    lhs = FIX2UINT(rb_iv_get(self, "@id"));
+    rhs = FIX2UINT(rb_iv_get(other, "@id"));
 
     if (lhs < rhs)
         ret = -1;
@@ -266,8 +274,8 @@ static VALUE
 handlestr_(VALUE self)
 {
     char sz[64];
-    sprintf(sz, "#<AugRb::Handle:%lx,id=%d>", self,
-            FIX2INT(rb_iv_get(self, "@id")));
+    sprintf(sz, "#<AugRb::Handle:%lx,id=%u>", self,
+            FIX2UINT(rb_iv_get(self, "@id")));
     return rb_str_new2(sz);
 }
 
@@ -367,20 +375,22 @@ stopall_(VALUE self)
 static VALUE
 post_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE to, type, user;
+    VALUE id, to, type, user;
     aug_blob* blob = NULL;
     int ret;
 
-    rb_scan_args(argc, argv, "21", &to, &type, &user);
+    rb_scan_args(argc, argv, "31", &id, &to, &type, &user);
 
     /* Type-check now to ensure string operations succeed. */
 
+    Check_Type(id, T_FIXNUM);
     Check_Type(to, T_STRING);
     Check_Type(type, T_STRING);
 
     if (user != Qnil)
         blob = augrb_createblob(StringValue(user));
-    ret = mod_post(RSTRING(to)->ptr, RSTRING(type)->ptr, (aug_object*)blob);
+    ret = mod_post(FIX2UINT(id), RSTRING(to)->ptr, RSTRING(type)->ptr,
+                   (aug_object*)blob);
     if (blob)
         aug_release(blob);
 
@@ -393,19 +403,20 @@ post_(int argc, VALUE* argv, VALUE self)
 static VALUE
 dispatch_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE to, type, user;
+    VALUE id, to, type, user;
     aug_blob* blob = NULL;
     int ret;
 
-    rb_scan_args(argc, argv, "21", &to, &type, &user);
+    rb_scan_args(argc, argv, "31", &id, &to, &type, &user);
 
+    Check_Type(id, T_FIXNUM);
     Check_Type(to, T_STRING);
     Check_Type(type, T_STRING);
 
     if (user != Qnil)
         blob = augrb_createblob(StringValue(user));
-    ret = mod_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr,
-                        (aug_object*)blob);
+    ret = mod_dispatch(FIX2UINT(id), RSTRING(to)->ptr, RSTRING(type)->ptr,
+                       (aug_object*)blob);
     if (blob)
         aug_release(blob);
 
@@ -445,7 +456,7 @@ getsession_(VALUE self)
 static VALUE
 shutdown_(VALUE self, VALUE sock, VALUE flags)
 {
-    int cid = checkid_(sock);
+    mod_id cid = checkid_(sock);
 
     if (mod_shutdown(cid, NUM2UINT(flags)) < 0)
         rb_raise(cerror_, mod_error());
@@ -523,7 +534,7 @@ static VALUE
 send_(VALUE self, VALUE sock, VALUE buf)
 {
     aug_blob* blob;
-    int cid = checkid_(sock), ret;
+    mod_id cid = checkid_(sock), ret;
 
     blob = augrb_createblob(StringValue(buf));
     ret = mod_sendv(cid, blob);
@@ -538,7 +549,7 @@ send_(VALUE self, VALUE sock, VALUE buf)
 static VALUE
 setrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 {
-    int cid = checkid_(sock);
+    mod_id cid = checkid_(sock);
 
     if (mod_setrwtimer(cid, NUM2UINT(ms), NUM2UINT(flags)) < 0)
         rb_raise(cerror_, mod_error());
@@ -549,7 +560,7 @@ setrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 static VALUE
 resetrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 {
-    int cid = checkid_(sock);
+    mod_id cid = checkid_(sock);
 
     /* Return false if no such timer. */
 
@@ -566,7 +577,7 @@ resetrwtimer_(VALUE self, VALUE sock, VALUE ms, VALUE flags)
 static VALUE
 cancelrwtimer_(VALUE self, VALUE sock, VALUE flags)
 {
-    int cid = checkid_(sock);
+    mod_id cid = checkid_(sock);
 
     /* Return false if no such timer. */
 
@@ -608,7 +619,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
 static VALUE
 resettimer_(VALUE self, VALUE timer, VALUE ms)
 {
-    int tid = checkid_(timer);
+    mod_id tid = checkid_(timer);
 
     /* Return false if no such timer. */
 
@@ -625,7 +636,7 @@ resettimer_(VALUE self, VALUE timer, VALUE ms)
 static VALUE
 canceltimer_(VALUE self, VALUE timer)
 {
-    int tid = checkid_(timer);
+    mod_id tid = checkid_(timer);
 
     /* Return false if no such timer. */
 
@@ -801,7 +812,7 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, aug_object* ob)
+event_(mod_id id, const char* from, const char* type, aug_object* ob)
 {
     struct session_* session = mod_getsession()->user_;
     assert(session);
@@ -832,7 +843,8 @@ event_(const char* from, const char* type, aug_object* ob)
                 }
             }
         }
-        funcall3_(eventid_, rb_str_new2(from), rb_str_new2(type), x);
+        funcall4_(eventid_, INT2FIX(id), rb_str_new2(from),
+                  rb_str_new2(type), x);
     }
 }
 

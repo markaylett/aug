@@ -191,7 +191,7 @@ static int handles_ = 0;
 typedef struct {
     PyObject_HEAD
     char name_[MOD_MAXNAME + 1];
-    int id_;
+    mod_id id_;
     PyObject* user_;
 } handle_;
 
@@ -218,7 +218,7 @@ static void
 dealloc_(handle_* self)
 {
     --handles_;
-    mod_writelog(MOD_LOGDEBUG, "deallocated: <augpy.Handle at %p, id=%d>",
+    mod_writelog(MOD_LOGDEBUG, "deallocated: <augpy.Handle at %p, id=%u>",
                  (void*)self, self->id_);
 
     clear_(self);
@@ -241,7 +241,7 @@ compare_(handle_* lhs, handle_* rhs)
 static PyObject*
 repr_(handle_* self)
 {
-    return PyString_FromFormat("<augpy.Handle at %p, id=%d>",
+    return PyString_FromFormat("<augpy.Handle at %p, id=%u>",
                                (void*)self, self->id_);
 }
 
@@ -250,13 +250,13 @@ hash_(handle_* self)
 {
     /* Must not return -1. */
 
-    return -1 == self->id_ ? 0 : self->id_;
+    return self->id_;
 }
 
 static PyObject*
 str_(handle_* self)
 {
-    return PyString_FromFormat("%d", self->id_);
+    return PyString_FromFormat("%u", self->id_);
 }
 
 static int
@@ -280,7 +280,7 @@ init_(handle_* self, PyObject* args, PyObject* kwds)
 
     static char* kwlist[] = { "id", "user", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i|O", kwlist, &self->id_,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "I|O", kwlist, &self->id_,
                                      &user))
         return -1;
 
@@ -309,7 +309,7 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
     }
 
     ++handles_;
-    mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
+    mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%u>",
                  (void*)self, self->id_);
     return (PyObject*)self;
 }
@@ -317,7 +317,7 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
 static PyObject*
 getid_(handle_* self, void *closure)
 {
-    return Py_BuildValue("i", self->id_);
+    return Py_BuildValue("I", self->id_);
 }
 
 static PyGetSetDef getset_[] = {
@@ -381,7 +381,7 @@ augpy_createtype(void)
 }
 
 PyObject*
-augpy_createhandle(PyTypeObject* type, int id, PyObject* user)
+augpy_createhandle(PyTypeObject* type, mod_id id, PyObject* user)
 {
     handle_* self = PyObject_GC_New(handle_, type);
     if (!self)
@@ -395,19 +395,19 @@ augpy_createhandle(PyTypeObject* type, int id, PyObject* user)
     self->user_ = user;
 
     ++handles_;
-    mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
+    mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%u>",
                  (void*)self, self->id_);
     return (PyObject*)self;
 }
 
 void
-augpy_setid(PyObject* self, int id)
+augpy_setid(PyObject* self, mod_id id)
 {
     handle_* x = (handle_*)self;
     x->id_ = id;
 }
 
-int
+mod_id
 augpy_getid(PyObject* self)
 {
     handle_* x = (handle_*)self;

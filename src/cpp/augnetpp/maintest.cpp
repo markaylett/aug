@@ -42,7 +42,7 @@ namespace {
 
     struct httptest {
         aug_result
-        httpinitial_(const char* value) AUG_NOTHROW
+        httprequest_(const char* value) AUG_NOTHROW
         {
             return AUG_SUCCESS;
         }
@@ -70,17 +70,17 @@ namespace {
 
     struct martest {
         aug_result
-        delmar_(const char* initial) AUG_NOTHROW
+        delmar_(const char* request) AUG_NOTHROW
         {
             return AUG_SUCCESS;
         }
         aug_mar_*
-        getmar_(const char* initial) AUG_NOTHROW
+        getmar_(const char* request) AUG_NOTHROW
         {
             return 0;
         }
         aug_result
-        putmar_(const char* initial, aug_mar_* mar) AUG_NOTHROW
+        putmar_(const char* request, aug_mar_* mar) AUG_NOTHROW
         {
             return AUG_SUCCESS;
         }

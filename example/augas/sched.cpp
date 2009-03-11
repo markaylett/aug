@@ -186,7 +186,7 @@ namespace {
 
                 tmeventptr ptr(queue_.begin()->second);
                 queue_.erase(queue_.begin());
-                mod_post("schedclient", ptr->name_.c_str(), 0);
+                mod_post(0, "schedclient", ptr->name_.c_str(), 0);
                 pushevent(queue_, now, ptr);
             }
         }
@@ -271,7 +271,7 @@ namespace {
             // Dispatch is synchronous.
 
             scoped_blob_wrapper<sblob> blob(ss.str());
-            dispatch(from, "result", blob.base());
+            dispatch(0, from, "result", blob.base());
         }
         bool
         do_start(const char* sname)
@@ -290,7 +290,8 @@ namespace {
             settimer(tv);
         }
         void
-        do_event(const char* from, const char* type, aug_object_* ob)
+        do_event(mod_id id, const char* from, const char* type,
+                 aug_object_* ob)
         {
             aug_ctxinfo(aug_tlx, "event [%s] triggered", type);
 

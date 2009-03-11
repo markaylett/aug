@@ -43,7 +43,8 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, struct aug_object_* ob)
+event_(mod_id id, const char* from, const char* type,
+       struct aug_object_* ob)
 {
     mod_writelog(MOD_LOGINFO, "event_()");
 }

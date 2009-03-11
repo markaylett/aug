@@ -59,7 +59,7 @@ namespace aug {
         do_reconf() const AUG_NOTHROW = 0;
 
         virtual void
-        do_event(const char* from, const char* type,
+        do_event(mod_id id, const char* from, const char* type,
                  aug::objectref ob) const AUG_NOTHROW = 0;
 
         virtual void
@@ -129,10 +129,10 @@ namespace aug {
             return do_reconf();
         }
         void
-        event(const char* from, const char* type,
+        event(mod_id id, const char* from, const char* type,
               aug::objectref ob) const AUG_NOTHROW
         {
-            do_event(from, type, ob);
+            do_event(id, from, type, ob);
         }
         void
         closed(const mod_handle& sock) const AUG_NOTHROW

@@ -91,11 +91,12 @@ module::reconf() const AUG_NOTHROW
 }
 
 void
-module::event(const char* from, const char* type,
+module::event(mod_id id, const char* from, const char* type,
               objectref ob) const AUG_NOTHROW
 {
-    AUG_CTXDEBUG2(aug_tlx, "event(): from=[%s], type=[%s]", from, type);
-    module_.event_(from, type, ob.get());
+    AUG_CTXDEBUG2(aug_tlx, "event(): id=[%u], from=[%s], type=[%s]",
+                  id, from, type);
+    module_.event_(id, from, type, ob.get());
 }
 
 void

@@ -42,7 +42,7 @@ struct aug_httpparser_ {
     aug_lexer_t lexer_;
     char name_[AUG_MAXLINE];
     enum {
-        INITIAL_,
+        REQUEST_,
         NAME_,
         VALUE_,
         BODY_
@@ -51,12 +51,12 @@ struct aug_httpparser_ {
 };
 
 static aug_result
-initial_(aug_httpparser_t parser)
+request_(aug_httpparser_t parser)
 {
     /* Unless Content-Length is encountered, read body until end of stream is
        reached. */
 
-    return aug_httpinitial(parser->handler_, aug_lexertoken(parser->lexer_));
+    return aug_httprequest(parser->handler_, aug_lexertoken(parser->lexer_));
 }
 
 static void
@@ -93,7 +93,7 @@ value_(aug_httpparser_t parser)
 static aug_result
 end_(aug_httpparser_t parser, aug_bool commit)
 {
-    parser->state_ = INITIAL_;
+    parser->state_ = REQUEST_;
     parser->csize_ = 0;
     return aug_httpend(parser->handler_, commit);
 }
@@ -116,11 +116,11 @@ phrase_(aug_httpparser_t parser)
 static aug_result
 label_(aug_httpparser_t parser)
 {
-    /* No label on initial line. */
+    /* No label on request line. */
 
-    if (INITIAL_ == parser->state_) {
+    if (REQUEST_ == parser->state_) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                       AUG_MSG("missing initial line"));
+                       AUG_MSG("missing request line"));
         return AUG_FAILERROR;
     }
 
@@ -137,8 +137,8 @@ word_(aug_httpparser_t parser)
 {
     aug_result result;
     switch (parser->state_) {
-    case INITIAL_:
-        if (AUG_ISSUCCESS(result = initial_(parser)))
+    case REQUEST_:
+        if (AUG_ISSUCCESS(result = request_(parser)))
             parser->state_ = NAME_;
         break;
     case NAME_:
@@ -230,7 +230,7 @@ aug_createhttpparser(aug_mpool* mpool, aug_httphandler* handler,
     parser->handler_ = handler;
     parser->lexer_ = lexer;
     parser->name_[0] = '\0';
-    parser->state_ = INITIAL_;
+    parser->state_ = REQUEST_;
     parser->csize_ = 0;
 
     aug_retain(mpool);
@@ -311,7 +311,7 @@ aug_finishhttp(aug_httpparser_t parser)
         break;
     }
 
-    if (INITIAL_ != parser->state_) {
+    if (REQUEST_ != parser->state_) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("partial read of http message"));
         result = AUG_SUCCESS;

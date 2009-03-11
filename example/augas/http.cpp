@@ -163,7 +163,8 @@ namespace {
             map<string, string> pairs;
             splitlist(pairs, cookie, ';');
 
-            map<string, string>::const_iterator it(pairs.find("AUGSESSID"));
+            map<string, string>
+                ::const_iterator it(pairs.find("X-Aug-Session"));
 
             // Have session cookie and associated map entry.
 
@@ -508,7 +509,7 @@ namespace {
         stringstream header;
         header << "HTTP/1.1 200 OK\r\n"
                << "Date: " << utcdate() << "\r\n"
-               << "Set-Cookie: AUGSESSID=" << sessid << "\r\n"
+               << "Set-Cookie: AUG_SESSION_ID=" << sessid << "\r\n"
                << "Content-Type: " << mimetype(path) << "\r\n"
                << "Content-Length: " << (unsigned)size << "\r\n"
                << "\r\n";
@@ -534,7 +535,7 @@ namespace {
         message << "HTTP/1.1 200 OK\r\n"
                 << "Cache-Control: no-cache\r\n"
                 << "Date: " << utcdate() << "\r\n"
-                << "Set-Cookie: AUGSESSID=" << sessid << "\r\n"
+                << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n"
                 << "Content-Type: text/xml\r\n"
                 << "Content-Length: " << (unsigned)content.str().size()
                 << "\r\n\r\n"
@@ -556,7 +557,7 @@ namespace {
         message << "HTTP/1.1 " << status << ' ' << title << "\r\n"
                 << "Cache-Control: no-cache\r\n"
                 << "Date: " << utcdate() << "\r\n"
-                << "Set-Cookie: AUGSESSID=" << sessid << "\r\n";
+                << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n";
 
         fields::const_iterator it(fs.begin()), end(fs.end());
         for (; it != end; ++it)
@@ -587,7 +588,7 @@ namespace {
             aug_ctxinfo(aug_tlx, "nonce: [%s]", nonce_);
         }
         void
-        put(const char* initial, marref mar)
+        put(const char* request, marref mar)
         {
             // TODO: externalise root directory path.
 
@@ -597,16 +598,19 @@ namespace {
 
                 const void* value;
                 getfieldp(mar, "Cookie", value);
+
+                // Returned cookie may be null.
+
                 sessid_ = getsessid(id_, name_,
                                     static_cast<const char*>(value));
             }
 
             try {
 
-                aug_ctxinfo(aug_tlx, "%s", initial);
+                aug_ctxinfo(aug_tlx, "%s", request);
 
-                request r;
-                splitrequest(r, initial);
+				struct request r;
+                splitrequest(r, request);
                 aug_ctxinfo(aug_tlx, "method: [%s]", r.method_.c_str());
                 aug_ctxinfo(aug_tlx, "uri: [%s]", r.uri_.c_str());
                 aug_ctxinfo(aug_tlx, "version: [%s]", r.version_.c_str());
@@ -644,6 +648,8 @@ namespace {
                 } else
                     throw http_error(501, "Not Implemented");
 
+                // For each header field.
+
                 header header(mar);
                 header::const_iterator it(header.begin()),
                     end(header.end());
@@ -657,6 +663,8 @@ namespace {
 
                     if (0 == strcmp(*it, "Authorization")) {
 
+                        // Authenticate.
+
                         string x, y;
                         split2(value, value + size, x, y, ' ');
                         if (x == "Basic")
@@ -668,10 +676,14 @@ namespace {
                     }
                 }
 
+                // Split path into series of nodes.
+
                 u.path_ = urldecode(u.path_.begin(), u.path_.end());
                 vector<string> nodes(splitpath(u.path_));
 
                 if (!auth_) {
+
+                    // Request authentication.
 
                     stringstream ss;
                     ss << "Digest realm=\"" << realm_
@@ -704,15 +716,20 @@ namespace {
 
                         // Dispatch is synchronous.
 
+                        // TODO: make this asynchronous.
+
                         scoped_blob_wrapper<sblob> blob
                             (urlpack(values.begin(), values.end()));
 
-                        dispatch("httpclient", type.c_str(), blob.base());
+                        dispatch(0, "http-request", type.c_str(),
+                                 blob.base());
                     }
 
                     sendresult(id_, sessid_);
 
                 } else {
+
+                    // Static file system content.
 
                     string path(joinpath(ROOT, nodes));
                     aug_ctxinfo(aug_tlx, "path [%s]", path.c_str());
@@ -737,23 +754,23 @@ namespace {
             }
         }
         aug_result
-        delmar_(const char* initial) AUG_NOTHROW
+        delmar_(const char* request) AUG_NOTHROW
         {
-            aug_ctxinfo(aug_tlx, "delete mar [%s]", initial);
+            aug_ctxinfo(aug_tlx, "delete mar [%s]", request);
             return AUG_SUCCESS;
         }
         aug_mar_*
-        getmar_(const char* initial) AUG_NOTHROW
+        getmar_(const char* request) AUG_NOTHROW
         {
-            aug_ctxinfo(aug_tlx, "get mar [%s]", initial);
+            aug_ctxinfo(aug_tlx, "get mar [%s]", request);
             return aug_createmar(getmpool(aug_tlx).get());
         }
         aug_result
-        putmar_(const char* initial, aug_mar_* mar) AUG_NOTHROW
+        putmar_(const char* request, aug_mar_* mar) AUG_NOTHROW
         {
             try {
-                aug_ctxinfo(aug_tlx, "put mar [%s]", initial);
-                put(initial, mar);
+                aug_ctxinfo(aug_tlx, "put mar [%s]", request);
+                put(request, mar);
                 return AUG_SUCCESS;
             } AUG_SETERRINFOCATCH;
             return AUG_FAILERROR;
@@ -784,7 +801,8 @@ namespace {
             loadmimetypes();
         }
         void
-        do_event(const char* from, const char* type, aug_object_* ob)
+        do_event(mod_id id, const char* from, const char* type,
+                 aug_object_* ob)
         {
             smartob<aug_blob> blob(object_cast<aug_blob>(obptr(ob)));
             if (null != blob) {

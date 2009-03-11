@@ -69,9 +69,9 @@ release_(aug_httphandler* ob)
 }
 
 static aug_result
-initial_(aug_httphandler* ob, const char* initial)
+request_(aug_httphandler* ob, const char* request)
 {
-    aug_ctxinfo(aug_tlx, "initial: %s", initial);
+    aug_ctxinfo(aug_tlx, "request: %s", request);
     return AUG_SUCCESS;
 }
 
@@ -105,7 +105,7 @@ static const struct aug_httphandlervtbl vtbl_ = {
     cast_,
     retain_,
     release_,
-    initial_,
+    request_,
     field_,
     csize_,
     cdata_,

@@ -339,13 +339,14 @@ namespace {
     // Thread-safe.
 
     mod_result
-    post_(const char* to, const char* type, aug_object* ob)
+    post_(mod_id id, const char* to, const char* type, aug_object* ob)
     {
         const char* sname = getsession()->name_;
-        AUG_CTXDEBUG2(aug_tlx, "post(): sname=[%s], to=[%s], type=[%s]",
-                      sname, to, type);
+        AUG_CTXDEBUG2(aug_tlx,
+                      "post(): id=[%u], sname=[%s], to=[%s], type=[%s]",
+                      id, sname, to, type);
         try {
-            impl_->engine_.post(sname, to, type, ob);
+            impl_->engine_.post(id, sname, to, type, ob);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -353,13 +354,14 @@ namespace {
     }
 
     mod_result
-    dispatch_(const char* to, const char* type, aug_object* ob)
+    dispatch_(mod_id id, const char* to, const char* type, aug_object* ob)
     {
         const char* sname = getsession()->name_;
-        AUG_CTXDEBUG2(aug_tlx, "dispatch(): sname=[%s], to=[%s], type=[%s]",
-                      sname, to, type);
+        AUG_CTXDEBUG2(aug_tlx,
+                      "dispatch(): id=[%u], sname=[%s], to=[%s], type=[%s]",
+                      id, sname, to, type);
         try {
-            impl_->engine_.dispatch(sname, to, type, ob);
+            impl_->engine_.dispatch(id, sname, to, type, ob);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;

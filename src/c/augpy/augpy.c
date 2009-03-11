@@ -316,7 +316,7 @@ reconf_(void)
 }
 
 static void
-event_(const char* from, const char* type, aug_object* ob)
+event_(mod_id id, const char* from, const char* type, aug_object* ob)
 {
     struct import_* import = mod_getsession()->user_;
     assert(import);
@@ -331,8 +331,8 @@ event_(const char* from, const char* type, aug_object* ob)
             PyObject* x = augpy_getblob(ob);
             if (x) {
 
-                y = PyObject_CallFunction(import->event_, "ssO", from, type,
-                                          x);
+                y = PyObject_CallFunction(import->event_, "IssO", id, from,
+                                          type, x);
                 Py_DECREF(x);
                 goto done;
 
@@ -352,8 +352,8 @@ event_(const char* from, const char* type, aug_object* ob)
 
                         /* Blob data obtained. */
 
-                        y = PyObject_CallFunction(import->event_, "ssz#",
-                                                  from, type,
+                        y = PyObject_CallFunction(import->event_, "Issz#",
+                                                  id, from, type,
                                                   (const char*)data, size);
                         aug_release(blob);
                         goto done;
@@ -365,7 +365,7 @@ event_(const char* from, const char* type, aug_object* ob)
 
         /* Null or unsupported object type. */
 
-        y = PyObject_CallFunction(import->event_, "ssO", from, type,
+        y = PyObject_CallFunction(import->event_, "IssO", id, from, type,
                                   Py_None);
 
     done:

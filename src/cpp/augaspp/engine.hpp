@@ -94,14 +94,14 @@ namespace aug {
         stopall();
 
         void
-        post(const char* sname, const char* to, const char* type,
+        post(mod_id id, const char* sname, const char* to, const char* type,
              aug::objectref ob);
 
         // Thread-unsafe host interface.
 
         void
-        dispatch(const char* sname, const char* to, const char* type,
-                 aug::objectref ob);
+        dispatch(mod_id id, const char* sname, const char* to,
+                 const char* type, aug::objectref ob);
 
         void
         shutdown(mod_id cid, unsigned flags);

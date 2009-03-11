@@ -262,6 +262,8 @@ struct mod_host {
     /**
      * Post an event to the event queue.
      *
+     * @param id Originating id.
+     *
      * @param to Target session name.
      *
      * @param type Event type associated with @a ob.
@@ -271,7 +273,7 @@ struct mod_host {
      * @see dispatch_()
      */
 
-    mod_result (*post_)(const char* to, const char* type,
+    mod_result (*post_)(mod_id id, const char* to, const char* type,
                         struct aug_object_* ob);
 
     /**
@@ -280,6 +282,8 @@ struct mod_host {
 
     /**
      * Dispatch event to peer session.
+     *
+     * @param id Originating id.
      *
      * @param to Target session name.
      *
@@ -290,7 +294,7 @@ struct mod_host {
      * @see post_()
      */
 
-    mod_result (*dispatch_)(const char* to, const char* type,
+    mod_result (*dispatch_)(mod_id id, const char* to, const char* type,
                             struct aug_object_* ob);
 
     /**
@@ -500,6 +504,8 @@ struct mod_module {
     /**
      * Custom event notification.
      *
+     * @param id Originating id.
+     *
      * @param from Source session name.
      *
      * @param type Event type.
@@ -507,7 +513,7 @@ struct mod_module {
      * @param ob Object data.
      */
 
-    void (*event_)(const char* from, const char* type,
+    void (*event_)(mod_id id, const char* from, const char* type,
                    struct aug_object_* ob);
 
     /**

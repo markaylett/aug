@@ -51,7 +51,7 @@ namespace augd {
         do_reconf() const AUG_NOTHROW;
 
         void
-        do_event(const char* from, const char* type,
+        do_event(mod_id id, const char* from, const char* type,
                  aug::objectref ob) const AUG_NOTHROW;
 
         void

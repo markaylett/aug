@@ -27,7 +27,7 @@
 
   <interface name="httphandler">
 
-    <method name="initial" type="aug_result" qname="httpinitial">
+    <method name="request" type="aug_result" qname="httprequest">
       <param name="value" type="const char*"/>
     </method>
 

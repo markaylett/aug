@@ -76,16 +76,16 @@ namespace mod {
     }
 
     inline void
-    post(const char* to, const char* type, aug_object_* ob)
+    post(mod_id id, const char* to, const char* type, aug_object_* ob)
     {
-        if (mod_post(to, type, ob) < 0)
+        if (mod_post(id, to, type, ob) < 0)
             throw error(mod_error());
     }
 
     inline void
-    dispatch(const char* to, const char* type, aug_object_* ob)
+    dispatch(mod_id id, const char* to, const char* type, aug_object_* ob)
     {
-        if (mod_dispatch(to, type, ob) < 0)
+        if (mod_dispatch(id, to, type, ob) < 0)
             throw error(mod_error());
     }
 
@@ -297,7 +297,8 @@ namespace mod {
         do_reconf() = 0;
 
         virtual void
-        do_event(const char* from, const char* type, aug_object_* ob) = 0;
+        do_event(mod_id id, const char* from, const char* type,
+                 aug_object_* ob) = 0;
 
         virtual void
         do_closed(const handle& sock) = 0;
@@ -346,9 +347,9 @@ namespace mod {
             do_reconf();
         }
         void
-        event(const char* from, const char* type, aug_object_* ob)
+        event(mod_id id, const char* from, const char* type, aug_object_* ob)
         {
-            do_event(from, type, ob);
+            do_event(id, from, type, ob);
         }
         void
         closed(const handle& sock)
@@ -409,7 +410,8 @@ namespace mod {
             mod_writelog(MOD_LOGWARN, "do_reconf() not implemented");
         }
         void
-        do_event(const char* from, const char* type, aug_object_* ob)
+        do_event(mod_id id, const char* from, const char* type,
+                 aug_object_* ob)
         {
             mod_writelog(MOD_LOGWARN, "do_event() not implemented");
         }
@@ -544,10 +546,11 @@ namespace mod {
             } MOD_WRITELOGCATCH;
         }
         static void
-        event(const char* from, const char* type, aug_object_* ob) MOD_NOTHROW
+        event(mod_id id, const char* from, const char* type,
+              aug_object_* ob) MOD_NOTHROW
         {
             try {
-                getbase()->event(from, type, ob);
+                getbase()->event(id, from, type, ob);
             } MOD_WRITELOGCATCH;
         }
         static void

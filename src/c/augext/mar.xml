@@ -321,15 +321,15 @@ struct aug_field;
   <interface name="marstore">
 
     <method name="del" type="aug_result" qname="delmar">
-      <param name="initial" type="const char*"/>
+      <param name="request" type="const char*"/>
     </method>
 
     <method name="get" type="struct aug_mar_*" verify="true" qname="getmar">
-      <param name="initial" type="const char*"/>
+      <param name="request" type="const char*"/>
     </method>
 
     <method name="put" type="aug_result" qname="putmar">
-      <param name="initial" type="const char*"/>
+      <param name="request" type="const char*"/>
       <param name="mar" type="struct aug_mar_*"/>
     </method>
 

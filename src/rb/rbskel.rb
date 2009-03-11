@@ -30,8 +30,8 @@ include AugUtil
 # string error()
 # void reconfall()
 # void stopall()
-# void post(to, type, user)
-# void dispatch(to, type, user)
+# void post(id, to, type, user)
+# void dispatch(id, to, type, user)
 # string getenv(name, def)
 # string getsession()
 # void shutdown(sock, flags)
@@ -83,7 +83,7 @@ module RbSkel
     def self.reconf
         Log.debug("reconf()")
     end
-    def self.event(frm, type, user)
+    def self.event(id, frm, type, user)
         Log.debug("event()")
     end
     def self.closed(sock)

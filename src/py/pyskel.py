@@ -30,8 +30,8 @@ import log
 # string error()
 # void reconfall()
 # void stopall()
-# void post(to, type, user)
-# void dispatch(to, type, user)
+# void post(id, to, type, user)
+# void dispatch(id, to, type, user)
 # string getenv(name, def)
 # string getsession()
 # void shutdown(sock, flags)
@@ -86,7 +86,7 @@ def start(sname):
 def reconf():
     log.debug("reconf()")
 
-def event(frm, type, user):
+def event(id, frm, type, user):
     log.debug("event()")
 
 def closed(sock):

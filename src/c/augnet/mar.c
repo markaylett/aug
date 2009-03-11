@@ -45,7 +45,7 @@ struct aug_marparser_ {
     aug_marstore* marstore_;
     aug_httphandler httphandler_;
     aug_httpparser_t http_;
-    aug_xstr_t initial_;
+    aug_xstr_t request_;
     aug_mar* mar_;
 };
 
@@ -70,25 +70,25 @@ release_(aug_httphandler* ob)
 }
 
 static aug_result
-initial_(aug_httphandler* ob, const char* initial)
+request_(aug_httphandler* ob, const char* request)
 {
     struct aug_marparser_* parser
         = AUG_PODIMPL(struct aug_marparser_, httphandler_, ob);
 
-    assert(!parser->initial_);
+    assert(!parser->request_);
     assert(!parser->mar_);
 
-    parser->initial_ = aug_createxstr(parser->mpool_, 0);
+    parser->request_ = aug_createxstr(parser->mpool_, 0);
 
-    if (!parser->initial_)
+    if (!parser->request_)
         return AUG_FAILERROR; /* Allocation failed. */
 
-    if (!(parser->mar_ = aug_getmar(parser->marstore_, initial))) {
-        aug_destroyxstr(parser->initial_);
-        parser->initial_ = NULL;
+    if (!(parser->mar_ = aug_getmar(parser->marstore_, request))) {
+        aug_destroyxstr(parser->request_);
+        parser->request_ = NULL;
         return AUG_FAILERROR;
     }
-    aug_xstrcpys(parser->initial_, initial);
+    aug_xstrcpys(parser->request_, request);
     return AUG_SUCCESS;
 }
 
@@ -100,7 +100,7 @@ field_(aug_httphandler* ob, const char* name, const char* value)
 
     struct aug_field field;
 
-    assert(parser->initial_);
+    assert(parser->request_);
     assert(parser->mar_);
 
     field.name_ = name;
@@ -117,7 +117,7 @@ csize_(aug_httphandler* ob, unsigned csize)
     struct aug_marparser_* parser
         = AUG_PODIMPL(struct aug_marparser_, httphandler_, ob);
 
-    assert(parser->initial_);
+    assert(parser->request_);
     assert(parser->mar_);
 
     aug_verify(aug_truncatemar(parser->mar_, csize));
@@ -132,7 +132,7 @@ cdata_(aug_httphandler* ob, const void* buf, unsigned len)
     struct aug_marparser_* parser
         = AUG_PODIMPL(struct aug_marparser_, httphandler_, ob);
 
-    assert(parser->initial_);
+    assert(parser->request_);
     assert(parser->mar_);
 
     /* Returns aug_rsize. */
@@ -152,17 +152,17 @@ end_(aug_httphandler* ob, aug_bool commit)
 
     if (commit) {
 
-        if (!parser->initial_)
+        if (!parser->request_)
             return AUG_SUCCESS; /* Blank line. */
 
-        result = aug_putmar(parser->marstore_, aug_xstr(parser->initial_),
+        result = aug_putmar(parser->marstore_, aug_xstr(parser->request_),
                             parser->mar_);
     } else
         result = AUG_SUCCESS;
 
-    if (parser->initial_) {
-        aug_destroyxstr(parser->initial_);
-        parser->initial_ = NULL;
+    if (parser->request_) {
+        aug_destroyxstr(parser->request_);
+        parser->request_ = NULL;
     }
 
     if (parser->mar_) {
@@ -177,7 +177,7 @@ static const struct aug_httphandlervtbl vtbl_ = {
     cast_,
     retain_,
     release_,
-    initial_,
+    request_,
     field_,
     csize_,
     cdata_,
@@ -197,7 +197,7 @@ aug_createmarparser(aug_mpool* mpool, aug_marstore* marstore, unsigned size)
     parser->httphandler_.vtbl_ = &vtbl_;
     parser->httphandler_.impl_ = NULL;
     parser->http_ = NULL;
-    parser->initial_ = NULL;
+    parser->request_ = NULL;
     parser->mar_ = NULL;
 
     if (!(parser->http_ = aug_createhttpparser(mpool, &parser->httphandler_,
@@ -219,8 +219,8 @@ aug_destroymarparser(aug_marparser_t parser)
     if (parser->mar_)
         aug_release(parser->mar_);
 
-    if (parser->initial_)
-        aug_destroyxstr(parser->initial_);
+    if (parser->request_)
+        aug_destroyxstr(parser->request_);
 
     aug_destroyhttpparser(parser->http_);
     aug_release(parser->marstore_);

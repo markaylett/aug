@@ -54,10 +54,13 @@ namespace {
 
     class msgevent : public ref_base {
         msg<msgevent> msg_;
+        unsigned id_;
         const string from_, to_, type_;
         smartob<aug_object> payload_;
-        msgevent(const string& from, const string& to, const string& type)
-            : from_(from),
+        msgevent(unsigned id, const string& from, const string& to,
+                 const string& type)
+            : id_(id),
+              from_(from),
               to_(to),
               type_(type),
               payload_(null)
@@ -82,6 +85,11 @@ namespace {
         {
             payload_ = object_retain<aug_object>(payload);
         }
+        unsigned
+        getmsgid_() AUG_NOTHROW
+        {
+            return id_;
+        }
         const char*
         getmsgfrom_() AUG_NOTHROW
         {
@@ -103,12 +111,13 @@ namespace {
             return payload_;
         }
         static smartob<aug_msg>
-        create(const string& from, const string& to, const string& type)
+        create(unsigned id, const string& from, const string& to,
+               const string& type)
         {
             // Events can be posted between threads.  The event object is
             // allocated on the freestore to avoid use of aug_tlx.
 
-            msgevent* ptr = new msgevent(from, to, type);
+            msgevent* ptr = new msgevent(id, from, to, type);
             return object_attach<aug_msg>(ptr->msg_);
         }
     };
@@ -417,8 +426,8 @@ namespace aug {
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
                         for (; it != end; ++it)
-                            (*it)->event(getmsgfrom(msg), getmsgtype(msg),
-                                         payload);
+                            (*it)->event(getmsgid(msg), getmsgfrom(msg),
+                                         getmsgtype(msg), payload);
                     }
                 }
                 return true;
@@ -598,12 +607,12 @@ engine::stopall()
 }
 
 AUGASPP_API void
-engine::post(const char* sname, const char* to, const char* type,
+engine::post(mod_id id, const char* sname, const char* to, const char* type,
              objectref ob)
 {
     // Thread-safe.
 
-    smartob<aug_msg> msg(msgevent::create(sname, to, type));
+    smartob<aug_msg> msg(msgevent::create(id, sname, to, type));
     setmsgpayload(msg, ob);
     aug_event e;
     e.type_ = POSTEVENT_;
@@ -613,8 +622,8 @@ engine::post(const char* sname, const char* to, const char* type,
 }
 
 AUGASPP_API void
-engine::dispatch(const char* sname, const char* to, const char* type,
-                 objectref ob)
+engine::dispatch(mod_id id, const char* sname, const char* to,
+                 const char* type, objectref ob)
 {
     vector<sessionptr> sessions;
     impl_->sessions_.getbygroup(sessions, to);
@@ -622,7 +631,7 @@ engine::dispatch(const char* sname, const char* to, const char* type,
     vector<sessionptr>::const_iterator it(sessions.begin()),
         end(sessions.end());
     for (; it != end; ++it)
-        (*it)->event(sname, type, ob);
+        (*it)->event(id, sname, type, ob);
 }
 
 AUGASPP_API void

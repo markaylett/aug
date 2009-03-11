@@ -45,7 +45,7 @@ namespace {
     {
     }
     void
-    event(const char* from, const char* type, aug_object* ob)
+    event(mod_id id, const char* from, const char* type, aug_object* ob)
     {
     }
     void
