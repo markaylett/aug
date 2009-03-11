@@ -509,7 +509,7 @@ namespace {
         stringstream header;
         header << "HTTP/1.1 200 OK\r\n"
                << "Date: " << utcdate() << "\r\n"
-               << "Set-Cookie: AUG_SESSION_ID=" << sessid << "\r\n"
+               << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n"
                << "Content-Type: " << mimetype(path) << "\r\n"
                << "Content-Length: " << (unsigned)size << "\r\n"
                << "\r\n";
