@@ -56,7 +56,7 @@ namespace {
 
     string css_;
     map<string, string> mimetypes_;
-    map<string, time_t> sessids_;
+    map<mod_id, string> sessids_;
 
     void
     loadcss()
@@ -168,26 +168,13 @@ namespace {
 
             // Have session cookie and associated map entry.
 
-            if (it != pairs.end()
-                && sessids_.find(it->second) != sessids_.end())
+            if (it != pairs.end())
                 return it->second;
         }
 
-        // Create new session id.
+        // Theoretical possibility of collision.
 
-        string sessid;
-        do {
-
-            sessid = nonce(id, addr, base64);
-
-            // Loop while duplicate.
-
-        } while (sessids_.find(sessid) != sessids_.end());
-
-        // Note on duplicates.
-
-        sessids_[sessid] = 0;
-        return sessid;
+        return nonce(id, addr, base64);
     }
 
     void
@@ -518,28 +505,19 @@ namespace {
         sendv(id, blob.get());
     }
 
-    vector<string> results_;
-
     void
-    sendresult(mod_id id, const string& sessid)
+    sendresult(mod_id id, const string& sessid, const string& content)
     {
-        stringstream content;
-        content << "<result>";
-        vector<string>::const_iterator it(results_.begin()),
-            end(results_.end());
-        for (; it != end; ++it)
-            content << *it;
-        content << "</result>";
-
         stringstream message;
+
         message << "HTTP/1.1 200 OK\r\n"
                 << "Cache-Control: no-cache\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n"
                 << "Content-Type: text/xml\r\n"
-                << "Content-Length: " << (unsigned)content.str().size()
+                << "Content-Length: " << (unsigned)content.size()
                 << "\r\n\r\n"
-                << content.rdbuf();
+                << content;
 
         send(id, message.str().c_str(), message.str().size());
     }
@@ -603,6 +581,7 @@ namespace {
 
                 sessid_ = getsessid(id_, name_,
                                     static_cast<const char*>(value));
+                sessids_[id_] = sessid_;
             }
 
             try {
@@ -699,13 +678,12 @@ namespace {
                     nodes[0] = "http";
                     string type(jointype(nodes));
 
-                    results_.clear();
-
                     if (type == "http.reconf") {
 
                         reconfall();
-                        results_.push_back("<message type=\"info\">"
-                                           "re-configured</message>");
+                        sendresult(id_, sessid_,
+                                   "<result><message type=\"info\">"
+                                   "re-configured</message></result>");
 
                     } else {
 
@@ -716,16 +694,11 @@ namespace {
 
                         // Dispatch is synchronous.
 
-                        // TODO: make this asynchronous.
+                        const string s(urlpack(values.begin(), values.end()));
+                        blobptr blob(blob_wrapper<sblob>::create(s));
 
-                        scoped_blob_wrapper<sblob> blob
-                            (urlpack(values.begin(), values.end()));
-
-                        dispatch(0, "http-request", type.c_str(),
-                                 blob.base());
+                        post(id_, "http-request", type.c_str(), blob.base());
                     }
-
-                    sendresult(id_, sessid_);
 
                 } else {
 
@@ -810,7 +783,7 @@ namespace {
                 const void* data(getblobdata(blob, &size));
                 if (data) {
                     string xml(static_cast<const char*>(data), size);
-                    results_.push_back(xml);
+                    sendresult(id, sessids_[id], xml);
                 }
             }
         }
@@ -822,6 +795,10 @@ namespace {
                 auto_ptr<marparser> parser(sock.user<marparser>());
                 finishmar(*parser);
             }
+
+            // Remove association between session and connection.
+
+            sessids_.erase(sock.id());
         }
         bool
         do_accepted(handle& sock, const char* name)

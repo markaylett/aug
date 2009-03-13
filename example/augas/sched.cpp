@@ -158,7 +158,7 @@ namespace {
     {
         offset = AUG_MIN(offset, q.size());
 
-        os << "<events offset=\"" << offset
+        os << "<result><events offset=\"" << offset
            << "\" total=\"" << static_cast<unsigned>(q.size()) << "\">";
         tmqueue::const_iterator it(q.begin()), end(q.end());
         for (advance(it, offset); it != end && max_; ++it, --max_) {
@@ -170,7 +170,7 @@ namespace {
                << "\">" << tmstring(*aug_localtime(&it->first, &tm))
                << "</event>";
         }
-        os << "</events>";
+        os << "</events></result>";
         return os;
     }
 
@@ -186,7 +186,10 @@ namespace {
 
                 tmeventptr ptr(queue_.begin()->second);
                 queue_.erase(queue_.begin());
-                mod_post(0, "schedclient", ptr->name_.c_str(), 0);
+
+                // Inform interested modules of expired event.
+
+                mod_post(0, "sched-client", ptr->name_.c_str(), 0);
                 pushevent(queue_, now, ptr);
             }
         }
@@ -249,7 +252,8 @@ namespace {
             settimer(tv);
         }
         void
-        respond(const char* from, const char* type, const string& urlencoded)
+        respond(mod_id id, const char* from, const char* type,
+                const string& urlencoded)
         {
             map<string, string> params;
             urlunpack(urlencoded.begin(), urlencoded.end(),
@@ -267,11 +271,8 @@ namespace {
 
             stringstream ss;
             toxml(ss, queue_, offset, max_);
-
-            // Dispatch is synchronous.
-
-            scoped_blob_wrapper<sblob> blob(ss.str());
-            dispatch(0, from, "result", blob.base());
+            blobptr blob(blob_wrapper<sblob>::create(ss.str()));
+            dispatch(id, from, "result", blob.base());
         }
         bool
         do_start(const char* sname)
@@ -320,7 +321,7 @@ namespace {
                 writelog(MOD_LOGINFO, "%s=%s", jt->first.c_str(),
                          jt->second.c_str());
 
-            respond(from, type, fields["content"]);
+            respond(id, from, type, fields["content"]);
         }
         void
         do_expire(const handle& timer, unsigned& ms)
