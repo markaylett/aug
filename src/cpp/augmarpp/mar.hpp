@@ -27,6 +27,8 @@
 
 #include "augmar/mar.h"
 
+#include <string>
+
 namespace aug {
 
     inline marptr
@@ -52,14 +54,30 @@ namespace aug {
         putfieldn(ref, n, cdata, static_cast<unsigned>(strlen(cdata)));
     }
     inline void
+    putfieldn(marref ref, unsigned n, const std::string& cdata)
+    {
+        putfieldn(ref, n, cdata.data(), static_cast<unsigned>(cdata.size()));
+    }
+    inline void
     putfieldp(marref ref, const char* name, const char* cdata)
     {
         putfieldp(ref, name, cdata, static_cast<unsigned>(strlen(cdata)));
     }
     inline void
+    putfieldp(marref ref, const char* name, const std::string& cdata)
+    {
+        putfieldp(ref, name, cdata.data(),
+                  static_cast<unsigned>(cdata.size()));
+    }
+    inline void
     setcontent(marref ref, const char* data)
     {
         setcontent(ref, data, static_cast<unsigned>(strlen(data)));
+    }
+    inline void
+    setcontent(marref ref, const std::string& data)
+    {
+        setcontent(ref, data.data(), static_cast<unsigned>(data.size()));
     }
     inline const void*
     getcontent(marref ref)

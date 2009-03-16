@@ -21,32 +21,17 @@
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #define MOD_BUILD
+#include "file.hpp"
+
 #include "augmodpp.hpp"
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"
 #include "augmarpp.hpp"
 #include "augsyspp.hpp"
 
-#include <fstream>
 #include <map>
+#include <fstream>
 #include <sstream>
-
-#include <sys/stat.h>
-
-#if !defined(_WIN32)
-# define _stat stat
-# define _S_ISDIR S_ISDIR
-# define _S_ISREG S_ISREG
-# define _S_IREAD S_IROTH
-#else // _WIN32
-# define lstat _stat
-# if !defined(_S_ISDIR)
-#  define _S_ISDIR(mode) (((mode) & _S_IFDIR) == _S_IFDIR)
-# endif // !_S_ISDIR
-# if !defined(_S_ISREG)
-#  define _S_ISREG(mode) (((mode) & _S_IFREG) == _S_IFREG)
-# endif // !_S_ISREG
-#endif // _WIN32
 
 using namespace aug;
 using namespace mod;
@@ -55,8 +40,11 @@ using namespace std;
 namespace {
 
     string css_;
-    map<string, string> mimetypes_;
-    map<mod_id, string> sessids_;
+
+    // close/sessid.
+
+    typedef map<mod_id, pair<string, bool> > active;
+    active active_;
 
     void
     loadcss()
@@ -70,40 +58,6 @@ namespace {
             css_ = ss.str();
         } else
             css_.clear();
-    }
-
-    aug_result
-    confcb_(void* arg, const char* name, const char* value)
-    {
-        mimetypes_[name] = value;
-        return AUG_SUCCESS;
-    }
-
-    void
-    loadmimetypes()
-    {
-        mimetypes_.clear();
-
-        // Add some basic types.
-
-        mimetypes_["css"] = "text/css";
-        mimetypes_["gif"] = "image/gif";
-        mimetypes_["html"] = "text/html";
-        mimetypes_["htm"] = "text/html";
-        mimetypes_["jpeg"] = "image/jpeg";
-        mimetypes_["jpg"] = "image/jpeg";
-        mimetypes_["js"] = "application/x-javascript";
-        mimetypes_["png"] = "image/png";
-        mimetypes_["tif"] = "image/tiff";
-        mimetypes_["tiff"] = "image/tiff";
-        mimetypes_["txt"] = "text/plain";
-        mimetypes_["xml"] = "text/xml";
-
-        const char* mimetypes(mod::getenv("session.http.mimetypes"));
-        if (mimetypes) {
-            aug::chdir(mod::getenv("rundir"));
-            readconf(mimetypes, confcb<confcb_>, null);
-        }
     }
 
     const char*
@@ -177,60 +131,6 @@ namespace {
         return nonce(id, addr, base64);
     }
 
-    void
-    sethead(ostream& os, const string& title)
-    {
-        os << "<head><title>" << title << "</title>";
-        if (!css_.empty())
-            os << "<style type=\"text/css\">" << css_ << "</style>";
-        os << "</head>";
-    }
-
-    string
-    mimetype(const string& path)
-    {
-        string type("text/plain");
-
-        string::size_type pos(path.find_last_of('.'));
-        if (pos != string::npos) {
-            string ext(path.substr(pos + 1));
-            map<string, string>::const_iterator it(mimetypes_.find(ext));
-            if (it != mimetypes_.end())
-                type = it->second;
-        }
-
-        return type;
-    }
-
-    class http_error : public domain_error {
-        const int status_;
-    public:
-        http_error(int status, const string& title)
-            : domain_error(title),
-              status_(status)
-        {
-        }
-        int
-        status() const
-        {
-            return status_;
-        }
-    };
-
-    bool
-    lstat(const char* path, struct _stat& sb)
-    {
-        // lstat() is used so that the link, rather than the file it
-        // references, is stat()-ed.
-
-		if (-1 == ::lstat(path, &sb)) {
-            if (ENOENT != errno)
-                throw posix_error(__FILE__, __LINE__, errno);
-            return false;
-        }
-        return true;
-    }
-
     string
     utcdate()
     {
@@ -276,7 +176,7 @@ namespace {
         xy = filterbase64(encoded.data(), encoded.size(), AUG_DECODE64);
         split2(xy.begin(), xy.end(), x, y, ':');
 
-        aug_ctxinfo(aug_tlx, "authenticating user [%s]", x.c_str());
+        aug_ctxinfo(aug_tlx, "basic user authentication [%s]", x.c_str());
 
         string digest;
         if (!getpass(x, realm, digest))
@@ -295,7 +195,7 @@ namespace {
         map<string, string> pairs;
         splitlist(pairs, list, ',');
 
-        aug_ctxinfo(aug_tlx, "authenticating user [%s]",
+        aug_ctxinfo(aug_tlx, "digest user authentication [%s]",
                     pairs["username"].c_str());
 
         string digest;
@@ -367,186 +267,95 @@ namespace {
         return u;
     }
 
-    class nodes : public mpool_ops {
-        vector<string>* xs_;
-    public:
-        explicit
-        nodes(vector<string>& xs)
-            : xs_(&xs)
-        {
-        }
-        void
-        operator ()(string& x)
-        {
-            if (x == "..") {
-                if (xs_->empty())
-                    throw http_error(403, "Forbidden");
-                xs_->pop_back();
-            } else if (!x.empty() && x != ".")
-                xs_->push_back(x);
-        }
-    };
-
-    vector<string>
-    splitpath(const string& path)
-    {
-        vector<string> v;
-        splitn(path.begin(), path.end(), '/', nodes(v));
-        return v;
-    }
-
-    string
-    joinpath(const char* root, const vector<string>& nodes)
-    {
-        string path(root);
-        struct _stat sb;
-
-        vector<string>::const_iterator it(nodes.begin()), end(nodes.end());
-        for (; it != end; ++it) {
-            path += '/';
-            path += *it;
-
-            if (!lstat(path.c_str(), sb))
-                throw http_error(404, "Not Found");
-
-            // Do not follow symbolic links.
-
-            if (!_S_ISDIR(sb.st_mode) && !_S_ISREG(sb.st_mode))
-                throw http_error(403, "Forbidden");
-        }
-
-        // Use index.html if directory.
-
-        if (nodes.empty() || _S_ISDIR(sb.st_mode)) {
-            path += "/index.html";
-            if (!lstat(path.c_str(), sb))
-                throw http_error(404, "Not Found");
-        }
-
-        // Must be regular, world-readable file.
-
-        if (!_S_ISREG(sb.st_mode) || !(sb.st_mode & _S_IREAD))
-            throw http_error(403, "Forbidden");
-
-        return path;
-    }
-
-    string
-    jointype(const vector<string>& nodes)
-    {
-        string type;
-        vector<string>::const_iterator it(nodes.begin()), end(nodes.end());
-        for (; it != end; ++it) {
-            if (!type.empty())
-                type += '.';
-            type += *it;
-        }
-        return type;
-    }
-
-    class filecontent : public ref_base, public mpool_ops {
-        blob<filecontent> blob_;
-        autofd sfd_;
-        mmap mmap_;
-        ~filecontent() AUG_NOTHROW
-        {
-        }
-        filecontent(mpoolref mpool, const char* path)
-            : sfd_(aug::open(path, O_RDONLY)),
-              mmap_(mpool, sfd_, 0, 0, AUG_MMAPRD)
-        {
-            blob_.reset(this);
-        }
-    public:
-        smartob<aug_object>
-        cast_(const char* id) AUG_NOTHROW
-        {
-            if (equalid<aug_object>(id) || equalid<aug_blob>(id))
-                return object_retain<aug_object>(blob_);
-            return null;
-        }
-        const void*
-        getblobdata_(size_t* size) AUG_NOTHROW
-        {
-            if (size)
-                *size = mmap_.len();
-            return mmap_.addr();
-        }
-        size_t
-        getblobsize_() AUG_NOTHROW
-        {
-            return mmap_.len();
-        }
-        static smartob<aug_blob>
-        create(const char* path)
-        {
-            filecontent* ptr = new (tlx) filecontent(getmpool(aug_tlx), path);
-            return object_attach<aug_blob>(ptr->blob_);
-        }
-    };
-
-    typedef vector<pair<string, string> > fields;
-
     void
-    sendfile(mod_id id, const string& sessid, const string& path)
+    setstatus(ostream& os, int code, const string& status)
     {
-        smartob<aug_blob> blob(filecontent::create(path.c_str()));
-        size_t size(getblobsize(blob));
+        os << "<html><head><title>" << code << "&nbsp;"
+           << status << "</title>";
+        if (!css_.empty())
+            os << "<style type=\"text/css\">" << css_ << "</style>";
+        os << "</head><body><h1>" << status << "</h1></body></html>";
+    }
 
-        stringstream header;
-        header << "HTTP/1.1 200 OK\r\n"
-               << "Date: " << utcdate() << "\r\n"
-               << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n"
-               << "Content-Type: " << mimetype(path) << "\r\n"
-               << "Content-Length: " << (unsigned)size << "\r\n"
-               << "\r\n";
+    marptr
+    createstatus(int code, const string& status)
+    {
+        marptr mar(createmar(getmpool(aug_tlx)));
+        putfieldp(mar, "Cache-Control", "no-cache");
+        putfieldp(mar, "Content-Type", "text/html");
 
-        send(id, header.str().c_str(), header.str().size());
-        sendv(id, blob.get());
+        omarstream os(mar);
+        setstatus(os, code, status);
+        return mar;
     }
 
     void
-    sendresult(mod_id id, const string& sessid, const string& content)
+    respond(mod_id id, const string& sessid, int code, const string& status,
+            marref mar, bool close)
     {
         stringstream message;
 
-        message << "HTTP/1.1 200 OK\r\n"
-                << "Cache-Control: no-cache\r\n"
-                << "Date: " << utcdate() << "\r\n"
-                << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n"
-                << "Content-Type: text/xml\r\n"
-                << "Content-Length: " << (unsigned)content.size()
-                << "\r\n\r\n"
-                << content;
-
-        send(id, message.str().c_str(), message.str().size());
-    }
-
-    void
-    sendstatus(mod_id id, const string& sessid, int status,
-               const string& title, const fields& fs = fields())
-    {
-        stringstream content;
-        content << "<html>";
-        sethead(content, status + "&nbsp;" + title);
-        content << "<body><h1>" << title << "</h1></body></html>";
-
-        stringstream message;
-        message << "HTTP/1.1 " << status << ' ' << title << "\r\n"
-                << "Cache-Control: no-cache\r\n"
+        message << "HTTP/1.1 " << code << ' ' << status << "\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n";
 
-        fields::const_iterator it(fs.begin()), end(fs.end());
-        for (; it != end; ++it)
-            message << it->first << ": " << it->second << "\r\n";
+        header header(mar);
+        header::const_iterator it(header.begin()),
+            end(header.end());
+        for (; it != end; ++it) {
 
-        message << "Content-Type: text/html\r\n"
-                << "Content-Length: " << (unsigned)content.str().size()
-                << "\r\n\r\n"
-                << content.rdbuf();
+            unsigned size(0);
+            const char* value(static_cast<
+                              const char*>(header.getfield(it, size)));
+            message << *it << ": ";
+            message.write(value, size) << "\r\n";
+        }
+
+        unsigned size(getcontentsize(mar));
+        message << "Content-Length: " << size
+                << "\r\n\r\n";
+
+        message.write(static_cast<const char*>(getcontent(mar)), size);
+
+        // TODO: send as blob.
 
         send(id, message.str().c_str(), message.str().size());
+
+        if (close) {
+            aug_ctxinfo(aug_tlx, "closing");
+            mod::shutdown(id, 0);
+        }
+    }
+
+    void
+    respond(mod_id id, const string& sessid, int code, const string& status,
+            const string& mimetype, blobref blob, bool close)
+    {
+        const size_t size(getblobsize(blob));
+
+        stringstream message;
+        message << "HTTP/1.1 " << code << ' ' << status << "\r\n"
+                << "Date: " << utcdate() << "\r\n"
+                << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n"
+                << "Content-Type: " << mimetype << "\r\n"
+                << "Content-Length: " << static_cast<unsigned>(size)
+                << "\r\n\r\n";
+
+        send(id, message.str().c_str(), message.str().size());
+        sendv(id, blob.get());
+
+        if (close) {
+            aug_ctxinfo(aug_tlx, "closing");
+            mod::shutdown(id, 0);
+        }
+    }
+
+    void
+    respond(mod_id id, const string& sessid, int code, const string& status,
+            bool close)
+    {
+        marptr mar(createstatus(code, status));
+        respond(id, sessid, code, status, mar, close);
     }
 
     struct session : marstore_base<session>, mpool_ops {
@@ -581,8 +390,15 @@ namespace {
 
                 sessid_ = getsessid(id_, name_,
                                     static_cast<const char*>(value));
-                sessids_[id_] = sessid_;
             }
+
+            const void* value;
+            unsigned size(getfieldp(mar, "Connection", value));
+            const bool close(value && size
+                             && aug_strcasestr(static_cast<
+                                               const char*>(value), "close"));
+
+            active_[id_] = make_pair(sessid_, close);
 
             try {
 
@@ -601,30 +417,18 @@ namespace {
                 aug_ctxinfo(aug_tlx, "path: [%s]", u.path_.c_str());
                 aug_ctxinfo(aug_tlx, "query: [%s]", u.query_.c_str());
 
-                string contenttype, content;
-
-                if (r.method_ == "POST") {
-
-                    const void* value;
-                    getfieldp(mar, "Content-Type", value);
-                    if (!value)
-                        throw none_exception();
-                    contenttype = static_cast<const char*>(value);
-
-                    unsigned size;
-                    const void* ptr(aug::getcontent(mar, size));
-                    content = filterbase64(static_cast<const char*>(ptr),
-                                           size, AUG_ENCODE64);
-
-                } else if (r.method_ == "GET") {
+                if (r.method_ == "GET") {
 
                     if (!u.query_.empty()) {
-                        contenttype = "application/x-www-form-urlencoded";
-                        content = filterbase64(u.query_.data(),
-                                               u.query_.size(), AUG_ENCODE64);
+
+                        // Convert query to post.
+
+                        putfieldp(mar, "Content-Type",
+                                  "application/x-www-form-urlencoded");
+                        setcontent(mar, u.query_);
                     }
 
-                } else
+                } else if (r.method_ != "POST")
                     throw http_error(501, "Not Implemented");
 
                 // For each header field.
@@ -634,7 +438,7 @@ namespace {
                     end(header.end());
                 for (; it != end; ++it) {
 
-                    unsigned size = 0;
+                    unsigned size(0);
                     const char* value
                         (static_cast<const char*>(header.getfield(it, size)));
 
@@ -669,36 +473,17 @@ namespace {
                        << "\", qop=\"auth,auth-int\", nonce=\""
                        << nonce_ << "\"";
 
-                    fields fs;
-                    fs.push_back(make_pair("WWW-Authenticate", ss.str()));
-                    sendstatus(id_, sessid_, 401, "Unauthorized", fs);
+                    marptr resp(createstatus(401, "Unauthorized"));
+                    putfieldp(resp, "WWW-Authenticate", ss.str());
+                    respond(id_, sessid_, 401, "Unauthorized", resp, close);
 
                 } else if (!nodes.empty() && nodes[0] == "service") {
 
+                    // Example: service/reconf becomes http-reconf
+
                     nodes[0] = "http";
                     string type(jointype(nodes));
-
-                    if (type == "http.reconf") {
-
-                        reconfall();
-                        sendresult(id_, sessid_,
-                                   "<result><message type=\"info\">"
-                                   "re-configured</message></result>");
-
-                    } else {
-
-                        map<string, string> values;
-                        values["contenttype"] = contenttype;
-                        values["content"] = content;
-                        values["sessid"] = sessid_;
-
-                        // Dispatch is synchronous.
-
-                        const string s(urlpack(values.begin(), values.end()));
-                        blobptr blob(blob_wrapper<sblob>::create(s));
-
-                        post(id_, "http-request", type.c_str(), blob.base());
-                    }
+                    post(id_, "http-request", type.c_str(), mar.base());
 
                 } else {
 
@@ -706,41 +491,41 @@ namespace {
 
                     string path(joinpath(ROOT, nodes));
                     aug_ctxinfo(aug_tlx, "path [%s]", path.c_str());
-                    sendfile(id_, sessid_, path);
+
+                    blobptr blob(getfile(path.c_str()));
+                    respond(id_, sessid_, 200, "OK", mimetype(path), blob,
+                            close);
                 }
 
             } catch (const http_error& e) {
-                aug_ctxerror(aug_tlx, "%d: %s", e.status(), e.what());
-                sendstatus(id_, sessid_, e.status(), e.what());
+                aug_ctxerror(aug_tlx, "%d: %s", e.code(), e.what());
+                respond(id_, sessid_, e.code(), e.what(), close);
             } catch (const exception&) {
-                sendstatus(id_, sessid_, 500, "Internal Server Error");
+                respond(id_, sessid_, 500, "Internal Server Error", close);
                 throw;
-            }
-
-            const void* value;
-            unsigned size(getfieldp(mar, "Connection", value));
-
-            if (value && size
-                && aug_strcasestr(static_cast<const char*>(value), "close")) {
-                aug_ctxinfo(aug_tlx, "closing");
-                mod::shutdown(id_, 0);
             }
         }
         aug_result
         delmar_(const char* request) AUG_NOTHROW
         {
+            // TODO: implement pool.
+
             aug_ctxinfo(aug_tlx, "delete mar [%s]", request);
             return AUG_SUCCESS;
         }
         aug_mar_*
         getmar_(const char* request) AUG_NOTHROW
         {
+            // TODO: implement pool.
+
             aug_ctxinfo(aug_tlx, "get mar [%s]", request);
             return aug_createmar(getmpool(aug_tlx).get());
         }
         aug_result
         putmar_(const char* request, aug_mar_* mar) AUG_NOTHROW
         {
+            // TODO: implement pool.
+
             try {
                 aug_ctxinfo(aug_tlx, "put mar [%s]", request);
                 put(request, mar);
@@ -777,14 +562,12 @@ namespace {
         do_event(mod_id id, const char* from, const char* type,
                  aug_object_* ob)
         {
-            smartob<aug_blob> blob(object_cast<aug_blob>(obptr(ob)));
-            if (null != blob) {
-                size_t size;
-                const void* data(getblobdata(blob, &size));
-                if (data) {
-                    string xml(static_cast<const char*>(data), size);
-                    sendresult(id, sessids_[id], xml);
-                }
+            smartob<aug_mar> mar(object_cast<aug_mar>(obptr(ob)));
+            if (null != mar) {
+                active::const_iterator it(active_.find(id));
+                if (it != active_.end())
+                    respond(id, it->second.first, 200, "OK", mar,
+                            it->second.second);
             }
         }
         void
@@ -798,7 +581,7 @@ namespace {
 
             // Remove association between session and connection.
 
-            sessids_.erase(sock.id());
+            active_.erase(sock.id());
         }
         bool
         do_accepted(handle& sock, const char* name)

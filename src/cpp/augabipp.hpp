@@ -85,9 +85,14 @@ namespace aug {
         {
         }
         aug_object*
-        get() const AUG_NOTHROW
+        base() const AUG_NOTHROW
         {
             return static_cast<aug_object*>(ptr_);
+        }
+        aug_object*
+        get() const AUG_NOTHROW
+        {
+            return base();
         }
     };
 

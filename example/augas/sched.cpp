@@ -25,6 +25,7 @@
 
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"
+#include "augmarpp.hpp"
 #include "augsyspp.hpp"
 
 #include <map>
@@ -253,26 +254,38 @@ namespace {
         }
         void
         respond(mod_id id, const char* from, const char* type,
-                const string& urlencoded)
+                const char* content, unsigned size)
         {
             map<string, string> params;
-            urlunpack(urlencoded.begin(), urlencoded.end(),
+            urlunpack(content, content + size,
                       inserter(params, params.begin()));
 
-            if (0 == strcmp(type, "http.sched.delevent")) {
-                delevent(params);
-            } else if (0 == strcmp(type, "http.sched.putevent")) {
-                putevent(params);
-            } else if (0 != strcmp(type, "http.sched.events"))
-                return;
+            marptr mar(createmar(getmpool(aug_tlx)));
+            putfieldp(mar, "Cache-Control", "no-cache");
+            putfieldp(mar, "Content-Type", "text/xml");
 
-            unsigned offset(getvalue<unsigned>(params, "offset"));
-            unsigned max_(getvalue<unsigned>(params, "max"));
+            if (0 == strcmp(type, "http.reconf")) {
 
-            stringstream ss;
-            toxml(ss, queue_, offset, max_);
-            blobptr blob(blob_wrapper<sblob>::create(ss.str()));
-            dispatch(id, from, "result", blob.base());
+                reconfall();
+                setcontent(mar, "<message type=\"info\">"
+                           "re-configured</message>");
+            } else {
+
+                if (0 == strcmp(type, "http-sched-delevent")) {
+                    delevent(params);
+                } else if (0 == strcmp(type, "http-sched-putevent")) {
+                    putevent(params);
+                } else if (0 != strcmp(type, "http-sched-events"))
+                    return;
+
+                unsigned offset(getvalue<unsigned>(params, "offset"));
+                unsigned max_(getvalue<unsigned>(params, "max"));
+
+                omarstream os(mar);
+                toxml(os, queue_, offset, max_);
+            }
+
+            dispatch(id, from, "result", mar.base());
         }
         bool
         do_start(const char* sname)
@@ -296,32 +309,20 @@ namespace {
         {
             aug_ctxinfo(aug_tlx, "event [%s] triggered", type);
 
-            smartob<aug_blob> blob(object_cast<aug_blob>(obptr(ob)));
-            if (null == blob)
+            marptr mar(object_cast<aug_mar>(obptr(ob)));
+            if (null == mar)
                 return;
 
-            size_t size;
-            const char* encoded
-                (static_cast<const char*>(getblobdata(blob, &size)));
-            if (!encoded)
+            const void* value;
+            getfieldp(mar, "Content-Type", value);
+            if (!value || 0 != strcmp(static_cast<const char*>(value),
+                                      "application/x-www-form-urlencoded"))
                 return;
 
-            map<string, string> fields;
-            urlunpack(encoded, encoded + size,
-                      inserter(fields, fields.begin()));
-
-            map<string, string>::iterator it(fields.find("content"));
-            if (it != fields.end() && !it->second.empty())
-                it->second = filterbase64(it->second.data(),
-                                          it->second.size(), AUG_DECODE64);
-
-            map<string, string>::const_iterator jt(fields.begin()),
-                end(fields.end());
-            for (; jt != end; ++jt)
-                writelog(MOD_LOGINFO, "%s=%s", jt->first.c_str(),
-                         jt->second.c_str());
-
-            respond(id, from, type, fields["content"]);
+            unsigned size;
+            const char* content(static_cast<const char*>
+                                (aug::getcontent(mar, size)));
+            respond(id, from, type, content, size);
         }
         void
         do_expire(const handle& timer, unsigned& ms)

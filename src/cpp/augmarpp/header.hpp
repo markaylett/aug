@@ -27,6 +27,8 @@
 
 #include "augctxpp/exception.hpp"
 
+#include <string>
+
 namespace aug {
 
     class header : public mpool_ops {
@@ -67,6 +69,13 @@ namespace aug {
         {
             aug::putfieldn(mar_, distance(it), cdata,
                            static_cast<unsigned>(strlen(cdata)));
+            return it;
+        }
+        const_iterator
+        putfield(const const_iterator& it, const std::string& cdata)
+        {
+            aug::putfieldn(mar_, distance(it), cdata.data(),
+                           static_cast<unsigned>(cdata.size()));
             return it;
         }
         const_iterator

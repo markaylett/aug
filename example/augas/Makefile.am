@@ -21,6 +21,9 @@ example_DATA = \
 	sched.cpp \
 	server.cpp
 
+noinst_HEADERS = \
+	file.hpp
+
 moddir = $(prefix)/mod
 mod_LTLIBRARIES = \
 	modclient.la \
@@ -44,7 +47,9 @@ modcommand_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
-modhttp_la_SOURCES = http.cpp
+modhttp_la_SOURCES = \
+	file.cpp \
+	http.cpp
 modhttp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modhttp_la_LIBADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \

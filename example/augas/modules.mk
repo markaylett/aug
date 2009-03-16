@@ -22,7 +22,7 @@ modclient_LIBS = augutil augsys augctx
 modcommand_OBJS = command.o
 modcommand_LIBS = augutil augsys augctx
 
-modhttp_OBJS = http.o
+modhttp_OBJS = file.o http.o
 modhttp_LIBS = augnet augutil augmar augsys augctx
 
 modminimal_OBJS = minimal.o

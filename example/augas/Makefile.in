@@ -15,6 +15,7 @@
 @SET_MAKE@
 
 
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -38,8 +39,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/src/cpp/lang.mk
+DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
 subdir = example/augas
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -74,7 +75,7 @@ modhttp_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-am_modhttp_la_OBJECTS = http.lo
+am_modhttp_la_OBJECTS = file.lo http.lo
 modhttp_la_OBJECTS = $(am_modhttp_la_OBJECTS)
 modminimal_la_DEPENDENCIES =
 am_modminimal_la_OBJECTS = minimal.lo
@@ -120,6 +121,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 exampleDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(example_DATA)
+HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
@@ -288,6 +290,9 @@ example_DATA = \
 	sched.cpp \
 	server.cpp
 
+noinst_HEADERS = \
+	file.hpp
+
 moddir = $(prefix)/mod
 mod_LTLIBRARIES = \
 	modclient.la \
@@ -311,7 +316,10 @@ modcommand_la_LIBADD = \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
-modhttp_la_SOURCES = http.cpp
+modhttp_la_SOURCES = \
+	file.cpp \
+	http.cpp
+
 modhttp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modhttp_la_LIBADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -417,6 +425,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minimal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sched.Plo@am__quote@
@@ -668,7 +677,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(DATA)
+all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(moddir)" "$(DESTDIR)$(exampledir)"; do \
