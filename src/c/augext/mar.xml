@@ -281,18 +281,6 @@ struct aug_field;
       <param name="path" type="const char*"/>
     </method>
 
-    <method name="getcontent" type="const void*" qname="getcontent">
-
-      Obtain content from message archive.
-
-      @param size An optional output parameter, in which, the size of the
-      content is set.
-
-      @return A pointer to the content or null on failure.
-
-      <param name="size" type="unsigned&"/>
-    </method>
-
     <method name="read" type="aug_rsize" qname="readmar">
 
       Read content from message archive.
@@ -306,14 +294,6 @@ struct aug_field;
 
       <param name="buf" type="void*"/>
       <param name="len" type="unsigned"/>
-    </method>
-
-    <method name="getcontentsize" type="unsigned" qname="getcontentsize">
-
-      Obtain size of content within message archive.
-
-      @return Content size.
-
     </method>
 
   </interface>

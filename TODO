@@ -48,3 +48,5 @@ Review FIXMEs.
 Fix perl module.
 
 Generalise base template generation in augidl.
+
+Unify mar and stream interfaces.

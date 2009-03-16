@@ -73,10 +73,9 @@ namespace aug {
                 return 0;
             }
             const void*
-            getblobdata_(size_t* size) AUG_NOTHROW
+            getblobdata_(size_t& size) AUG_NOTHROW
             {
-                if (size)
-                    *size = size_;
+                size = size_;
                 return &vec_[0];
             }
             size_t

@@ -92,7 +92,7 @@ namespace aug {
         putfieldn(const char* v)
         {
             field_.value_ = v;
-            field_.size_ = (unsigned)strlen(v);
+            field_.size_ = static_cast<unsigned>(strlen(v));
         }
         operator aug_field&()
         {

@@ -35,6 +35,7 @@ AUG_RCSID("$Id$");
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
 
+#include "augext/blob.h"
 #include "augext/log.h"
 
 #include <assert.h>
@@ -107,6 +108,7 @@ init_(aug_seq_t seq, struct aug_info_* info)
 
 struct impl_ {
     aug_mar mar_;
+    aug_blob blob_;
     int refs_;
     aug_mpool* mpool_;
     aug_seq_t seq_;
@@ -137,33 +139,55 @@ destroy_(struct impl_* impl)
 }
 
 static void*
-cast_(aug_mar* obj, const char* id)
+cast_(struct impl_* impl, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_marid)) {
-        aug_retain(obj);
-        return obj;
+        aug_retain(&impl->mar_);
+        return &impl->mar_;
+    } else if (AUG_EQUALID(id, aug_blobid)) {
+        aug_retain(&impl->blob_);
+        return &impl->blob_;
     }
     return NULL;
 }
 
 static void
-retain_(aug_mar* obj)
+retain_(struct impl_* impl)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     assert(0 < impl->refs_);
     ++impl->refs_;
 }
 
 static void
-release_(aug_mar* obj)
+release_(struct impl_* impl)
 {
-    struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     assert(0 < impl->refs_);
     if (0 == --impl->refs_) {
         aug_mpool* mpool = impl->mpool_;
         destroy_(impl);
         aug_release(mpool);
     }
+}
+
+static void*
+mar_cast_(aug_mar* obj, const char* id)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
+    return cast_(impl, id);
+}
+
+static void
+mar_retain_(aug_mar* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
+    retain_(impl);
+}
+
+static void
+mar_release_(aug_mar* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
+    release_(impl);
 }
 
 static aug_result
@@ -474,7 +498,15 @@ extract_(aug_mar* obj, const char* path)
     const void* src;
     unsigned size;
 
-    if (!(src = aug_getcontent(obj, &size)))
+    if (!READABLE_(impl)) {
+
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("invalid archive handle"));
+        return AUG_FAILERROR;
+    }
+
+    size = impl->info_.bsize_;
+    if (!(src = aug_getcontent_(impl->seq_, &impl->info_)))
         return AUG_FAILERROR;
 
     mpool = aug_seqmpool_(impl->seq_);
@@ -500,21 +532,6 @@ extract_(aug_mar* obj, const char* path)
     return AUG_FAILERROR;
 }
 
-static const void*
-getcontent_(aug_mar* obj, unsigned* size)
-{
-    struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
-    if (!READABLE_(impl)) {
-
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return NULL;
-    }
-
-    *size = impl->info_.bsize_;
-    return aug_getcontent_(impl->seq_, &impl->info_);
-}
-
 static aug_rsize
 read_(aug_mar* obj, void* buf, unsigned len)
 {
@@ -535,17 +552,10 @@ read_(aug_mar* obj, void* buf, unsigned len)
     return rsize;
 }
 
-static unsigned
-getcontentsize_(aug_mar* obj)
-{
-    struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
-    return impl->info_.bsize_;
-}
-
-static const struct aug_marvtbl vtbl_ = {
-    cast_,
-    retain_,
-    release_,
+static const struct aug_marvtbl marvtbl_ = {
+    mar_cast_,
+    mar_retain_,
+    mar_release_,
     compact_,
     clear_,
     deln_,
@@ -566,9 +576,58 @@ static const struct aug_marvtbl vtbl_ = {
     truncate_,
     write_,
     extract_,
-    getcontent_,
     read_,
-    getcontentsize_
+};
+
+static void*
+blob_cast_(aug_blob* obj, const char* id)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, blob_, obj);
+    return cast_(impl, id);
+}
+
+static void
+blob_retain_(aug_blob* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, blob_, obj);
+    retain_(impl);
+}
+
+static void
+blob_release_(aug_blob* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, blob_, obj);
+    release_(impl);
+}
+
+static const void*
+getdata_(aug_blob* obj, size_t* size)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, blob_, obj);
+    if (!READABLE_(impl)) {
+
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("invalid archive handle"));
+        return NULL;
+    }
+
+    *size = impl->info_.bsize_;
+    return aug_getcontent_(impl->seq_, &impl->info_);
+}
+
+static size_t
+getsize_(aug_blob* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, blob_, obj);
+    return impl->info_.bsize_;
+}
+
+static const struct aug_blobvtbl blobvtbl_ = {
+    blob_cast_,
+    blob_retain_,
+    blob_release_,
+    getdata_,
+    getsize_
 };
 
 AUGMAR_API aug_mar*
@@ -588,8 +647,12 @@ aug_createmar(aug_mpool* mpool)
 
     impl = (struct impl_*)aug_seqtail_(seq);
 
-    impl->mar_.vtbl_ = &vtbl_;
+    impl->mar_.vtbl_ = &marvtbl_;
     impl->mar_.impl_ = NULL;
+
+    impl->blob_.vtbl_ = &blobvtbl_;
+    impl->blob_.impl_ = NULL;
+
     impl->refs_ = 1;
     impl->mpool_ = mpool;
 
@@ -632,8 +695,12 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
 
     impl = (struct impl_*)aug_seqtail_(seq);
 
-    impl->mar_.vtbl_ = &vtbl_;
+    impl->mar_.vtbl_ = &marvtbl_;
     impl->mar_.impl_ = NULL;
+
+    impl->blob_.vtbl_ = &blobvtbl_;
+    impl->blob_.impl_ = NULL;
+
     impl->refs_ = 1;
     impl->mpool_ = mpool;
 

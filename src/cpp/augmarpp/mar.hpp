@@ -79,12 +79,6 @@ namespace aug {
     {
         setcontent(ref, data.data(), static_cast<unsigned>(data.size()));
     }
-    inline const void*
-    getcontent(marref ref)
-    {
-        unsigned size;
-        return getcontent(ref, size);
-    }
 }
 
 #endif // AUGMARPP_MAR_HPP

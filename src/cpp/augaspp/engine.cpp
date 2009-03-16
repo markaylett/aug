@@ -334,7 +334,7 @@ namespace aug {
 
                 AUG_CTXDEBUG2(aug_tlx,
                               "processing sock: id=[%u], events=[%u]",
-                              id, (unsigned)events);
+                              id, static_cast<unsigned>(events));
 
                 bool threw = true;
                 try {

@@ -100,10 +100,9 @@ namespace {
             return null;
         }
         const void*
-        getblobdata_(size_t* size) AUG_NOTHROW
+        getblobdata_(size_t& size) AUG_NOTHROW
         {
-            if (size)
-                *size = mmap_.len();
+            size = mmap_.len();
             return mmap_.addr();
         }
         size_t
@@ -154,7 +153,7 @@ aug::jointype(const vector<string>& nodes)
     vector<string>::const_iterator it(nodes.begin()), end(nodes.end());
     for (; it != end; ++it) {
         if (!type.empty())
-            type += '-';
+            type += '/';
         type += *it;
     }
     return type;

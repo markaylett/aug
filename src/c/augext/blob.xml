@@ -25,9 +25,23 @@
 
   <interface name="blob">
     <method name="getdata" type="const void*" qname="getblobdata">
-      <param name="size" type="size_t*"/>
+
+      Get pointer to blob data.
+
+      @param size An optional output parameter, in which, the size of the
+      content is set.
+
+      @return A pointer to the content or null on failure.
+
+      <param name="size" type="size_t&"/>
     </method>
-    <method name="getsize" type="size_t" qname="getblobsize"/>
+    <method name="getsize" type="size_t" qname="getblobsize">
+
+      Get blob size.
+
+      @return Content size.
+
+    </method>
   </interface>
 
 </package>

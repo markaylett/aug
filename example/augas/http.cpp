@@ -76,17 +76,30 @@ namespace {
         unsigned char digest[16];
 
         aug_initmd5(&md5ctx);
-        aug_appendmd5(&md5ctx, (unsigned char*)&pid, sizeof(pid));
-        aug_appendmd5(&md5ctx, (unsigned char*)&id, sizeof(id));
-        aug_appendmd5(&md5ctx, (unsigned char*)addr.data(),
-                      (unsigned)addr.size());
-        aug_appendmd5(&md5ctx, (unsigned char*)&tv.tv_sec, sizeof(tv.tv_sec));
-        aug_appendmd5(&md5ctx, (unsigned char*)&tv.tv_usec,
+        aug_appendmd5(&md5ctx,
+                      reinterpret_cast<const unsigned char*>(&pid),
+                      sizeof(pid));
+        aug_appendmd5(&md5ctx,
+                      reinterpret_cast<const unsigned char*>(&id),
+                      sizeof(id));
+        aug_appendmd5(&md5ctx,
+                      reinterpret_cast<const unsigned char*>(addr.data()),
+                      static_cast<unsigned>(addr.size()));
+        aug_appendmd5(&md5ctx,
+                      reinterpret_cast<const unsigned char*>(&tv.tv_sec),
+                      sizeof(tv.tv_sec));
+        aug_appendmd5(&md5ctx,
+                      reinterpret_cast<const unsigned char*>(&tv.tv_usec),
                       sizeof(tv.tv_usec));
-        aug_appendmd5(&md5ctx, (unsigned char*)&rand, sizeof(rand));
+        aug_appendmd5(&md5ctx,
+                      reinterpret_cast<const unsigned char*>(&rand),
+                      sizeof(rand));
+
         if (salt)
-            aug_appendmd5(&md5ctx, (unsigned char*)salt,
-                          (unsigned)strlen(salt));
+            aug_appendmd5(&md5ctx,
+                          reinterpret_cast<const unsigned char*>(salt),
+                          static_cast<unsigned>(strlen(salt)));
+
         aug_finishmd5(digest, &md5ctx);
         aug_md5base64(digest, base64);
         return base64;
@@ -293,11 +306,15 @@ namespace {
     respond(mod_id id, const string& sessid, int code, const string& status,
             marref mar, bool close)
     {
-        stringstream message;
+        blobptr blob(object_cast<aug_blob>(mar));
+        const size_t size(getblobsize(blob));
 
+        stringstream message;
         message << "HTTP/1.1 " << code << ' ' << status << "\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n";
+
+        // Inject custom headers.
 
         header header(mar);
         header::const_iterator it(header.begin()),
@@ -311,15 +328,11 @@ namespace {
             message.write(value, size) << "\r\n";
         }
 
-        unsigned size(getcontentsize(mar));
-        message << "Content-Length: " << size
+        message << "Content-Length: " << static_cast<unsigned>(size)
                 << "\r\n\r\n";
 
-        message.write(static_cast<const char*>(getcontent(mar)), size);
-
-        // TODO: send as blob.
-
         send(id, message.str().c_str(), message.str().size());
+        sendv(id, blob.get());
 
         if (close) {
             aug_ctxinfo(aug_tlx, "closing");
@@ -477,15 +490,7 @@ namespace {
                     putfieldp(resp, "WWW-Authenticate", ss.str());
                     respond(id_, sessid_, 401, "Unauthorized", resp, close);
 
-                } else if (!nodes.empty() && nodes[0] == "service") {
-
-                    // Example: service/reconf becomes http-reconf
-
-                    nodes[0] = "http";
-                    string type(jointype(nodes));
-                    post(id_, "http-request", type.c_str(), mar.base());
-
-                } else {
+                } else if (nodes.empty() || nodes[0] != "service") {
 
                     // Static file system content.
 
@@ -495,6 +500,11 @@ namespace {
                     blobptr blob(getfile(path.c_str()));
                     respond(id_, sessid_, 200, "OK", mimetype(path), blob,
                             close);
+
+                } else {
+
+                    string path(jointype(nodes));
+                    post(id_, "http-request", path.c_str(), mar.base());
                 }
 
             } catch (const http_error& e) {

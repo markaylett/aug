@@ -42,10 +42,9 @@ namespace {
 
     struct helloblob : aug::mpool_ops {
         static const void*
-        getblobdata_(size_t* size) AUG_NOTHROW
+        getblobdata_(size_t& size) AUG_NOTHROW
         {
-            if (size)
-                *size = getblobsize_();
+            size = getblobsize_();
             return MSG;
         }
         static size_t

@@ -26,6 +26,8 @@
 
 #include "augctx/string.h"
 
+#include "augext/blob.h"
+
 #include <fstream>
 #include <string>
 #include <strstream>
@@ -158,10 +160,11 @@ namespace {
     contenttest(marref ref)
     {
         aug::setcontent(ref, STR1);
+        blobptr blob(object_cast<aug_blob>(ref));
 
-        unsigned size;
+        size_t size;
         const char* content = static_cast<
-            const char*>(aug::getcontent(ref, size));
+            const char*>(aug::getblobdata(blob, size));
 
         if (size != STRLEN1)
             throw error(__LINE__);
@@ -181,9 +184,11 @@ namespace {
     inserttest(marref ref, const char* src)
     {
         aug::insertmar(ref, src);
-        unsigned size;
+        blobptr blob(object_cast<aug_blob>(ref));
+
+        size_t size;
         const char* content = static_cast<
-            const char*>(aug::getcontent(ref, size));
+            const char*>(aug::getblobdata(blob, size));
 
         if (size != STRLEN1)
             throw error(__LINE__);
@@ -238,7 +243,8 @@ namespace {
 
         checkheader(ref);
 
-        if ((unsigned)(header.end() - header.begin()) != FIELDS_SIZE)
+        if (static_cast<unsigned>(header.end() - header.begin())
+            != FIELDS_SIZE)
             throw error(__LINE__);
 
         for (unsigned j(0); FIELDS_SIZE > j; ++j)

@@ -40,6 +40,8 @@ AUG_RCSID("$Id$");
 #include "augctx/errno.h"
 #include "augctx/utility.h" /* aug_perrinfo() */
 
+#include "augext/blob.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -121,14 +123,21 @@ extract_(aug_mar* mar, const char* filename)
 {
     if (0 == strcmp(filename, "-")) {
 
-        const void* body;
+        aug_blob* blob = aug_cast(mar, aug_blobid);
         unsigned size;
+        const void* body;
 
-        if (!(body = aug_getcontent(mar, &size)))
+        if (!(body = aug_getblobdata(blob, &size))) {
+            aug_release(blob);
             return AUG_FAILERROR;
+        }
 
-        if (size != fwrite(body, 1, size, stdout))
+        if (size != fwrite(body, 1, size, stdout)) {
+            aug_release(blob);
             return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        }
+
+        aug_release(blob);
 
     } else {
 
@@ -253,8 +262,11 @@ put_(aug_mar* mar, char* src)
 static void
 size_(aug_mar* mar)
 {
-    unsigned size = aug_getcontentsize(mar);
-    printf("%u\n", size);
+    aug_blob* blob = aug_cast(mar, aug_blobid);
+    size_t size = aug_getblobsize(blob);
+    aug_release(blob);
+
+    printf("%u\n", (unsigned)size);
 }
 
 static aug_result

@@ -253,9 +253,12 @@ namespace {
             settimer(tv);
         }
         void
-        respond(mod_id id, const char* from, const char* type,
-                const char* content, unsigned size)
+        respond(mod_id id, const char* from, const char* type, blobref blob)
         {
+            size_t size;
+            const char* content(static_cast<const char*>
+                                (aug::getblobdata(blob, size)));
+
             map<string, string> params;
             urlunpack(content, content + size,
                       inserter(params, params.begin()));
@@ -264,19 +267,21 @@ namespace {
             putfieldp(mar, "Cache-Control", "no-cache");
             putfieldp(mar, "Content-Type", "text/xml");
 
-            if (0 == strcmp(type, "http.reconf")) {
+            if (0 == strcmp(type, "service/reconf")) {
 
                 reconfall();
                 setcontent(mar, "<message type=\"info\">"
                            "re-configured</message>");
             } else {
 
-                if (0 == strcmp(type, "http-sched-delevent")) {
+                if (0 == strcmp(type, "service/sched/delevent")) {
                     delevent(params);
-                } else if (0 == strcmp(type, "http-sched-putevent")) {
+                } else if (0 == strcmp(type, "service/sched/putevent")) {
                     putevent(params);
-                } else if (0 != strcmp(type, "http-sched-events"))
+                } else if (0 != strcmp(type, "service/sched/events")) {
+                    aug_ctxwarn(aug_tlx, "event [%s] ignored", type);
                     return;
+                }
 
                 unsigned offset(getvalue<unsigned>(params, "offset"));
                 unsigned max_(getvalue<unsigned>(params, "max"));
@@ -319,10 +324,7 @@ namespace {
                                       "application/x-www-form-urlencoded"))
                 return;
 
-            unsigned size;
-            const char* content(static_cast<const char*>
-                                (aug::getcontent(mar, size)));
-            respond(id, from, type, content, size);
+            respond(id, from, type, object_cast<aug_blob>(mar));
         }
         void
         do_expire(const handle& timer, unsigned& ms)

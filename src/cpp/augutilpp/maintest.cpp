@@ -37,7 +37,7 @@ namespace {
     test(blobref blob, const string& s)
     {
         size_t size;
-        const void* data(getblobdata(blob, &size));
+        const void* data(getblobdata(blob, size));
 
         if (size != s.size())
             throw error("size mismatch");

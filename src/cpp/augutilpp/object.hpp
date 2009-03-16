@@ -52,10 +52,9 @@ namespace aug {
         {
         }
         const void*
-        getblobdata_(size_t* size)
+        getblobdata_(size_t& size)
         {
-            if (size)
-                *size = s_.size();
+            size = s_.size();
             return s_.data();
         }
         size_t
