@@ -15,7 +15,6 @@
 @SET_MAKE@
 
 
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -39,8 +38,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/src/cpp/lang.mk
 subdir = example/augas
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -70,13 +69,6 @@ modcommand_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 am_modcommand_la_OBJECTS = command.lo
 modcommand_la_OBJECTS = $(am_modcommand_la_OBJECTS)
-modhttp_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la \
-	$(top_builddir)/src/c/augctx/libaugctx.la
-am_modhttp_la_OBJECTS = file.lo http.lo
-modhttp_la_OBJECTS = $(am_modhttp_la_OBJECTS)
 modminimal_la_DEPENDENCIES =
 am_modminimal_la_OBJECTS = minimal.lo
 modminimal_la_OBJECTS = $(am_modminimal_la_OBJECTS)
@@ -108,11 +100,11 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(modclient_la_SOURCES) $(modcommand_la_SOURCES) \
-	$(modhttp_la_SOURCES) $(modminimal_la_SOURCES) \
-	$(modsched_la_SOURCES) $(modserver_la_SOURCES)
+	$(modminimal_la_SOURCES) $(modsched_la_SOURCES) \
+	$(modserver_la_SOURCES)
 DIST_SOURCES = $(modclient_la_SOURCES) $(modcommand_la_SOURCES) \
-	$(modhttp_la_SOURCES) $(modminimal_la_SOURCES) \
-	$(modsched_la_SOURCES) $(modserver_la_SOURCES)
+	$(modminimal_la_SOURCES) $(modsched_la_SOURCES) \
+	$(modserver_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -121,7 +113,6 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 exampleDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(example_DATA)
-HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
@@ -285,19 +276,14 @@ example_DATA = \
 	$(EXTRA_DIST) \
 	client.cpp \
 	command.cpp \
-	http.cpp \
 	minimal.c \
 	sched.cpp \
 	server.cpp
-
-noinst_HEADERS = \
-	file.hpp
 
 moddir = $(prefix)/mod
 mod_LTLIBRARIES = \
 	modclient.la \
 	modcommand.la \
-	modhttp.la \
 	modminimal.la \
 	modsched.la \
 	modserver.la
@@ -313,18 +299,6 @@ modcommand_la_SOURCES = command.cpp
 modcommand_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modcommand_la_LIBADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la \
-	$(top_builddir)/src/c/augctx/libaugctx.la
-
-modhttp_la_SOURCES = \
-	file.cpp \
-	http.cpp
-
-modhttp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
-modhttp_la_LIBADD = \
-	$(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
@@ -408,8 +382,6 @@ modclient.la: $(modclient_la_OBJECTS) $(modclient_la_DEPENDENCIES)
 	$(CXXLINK) -rpath $(moddir) $(modclient_la_LDFLAGS) $(modclient_la_OBJECTS) $(modclient_la_LIBADD) $(LIBS)
 modcommand.la: $(modcommand_la_OBJECTS) $(modcommand_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(moddir) $(modcommand_la_LDFLAGS) $(modcommand_la_OBJECTS) $(modcommand_la_LIBADD) $(LIBS)
-modhttp.la: $(modhttp_la_OBJECTS) $(modhttp_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(moddir) $(modhttp_la_LDFLAGS) $(modhttp_la_OBJECTS) $(modhttp_la_LIBADD) $(LIBS)
 modminimal.la: $(modminimal_la_OBJECTS) $(modminimal_la_DEPENDENCIES) 
 	$(LINK) -rpath $(moddir) $(modminimal_la_LDFLAGS) $(modminimal_la_OBJECTS) $(modminimal_la_LIBADD) $(LIBS)
 modsched.la: $(modsched_la_OBJECTS) $(modsched_la_DEPENDENCIES) 
@@ -425,8 +397,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minimal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sched.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
@@ -677,7 +647,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(moddir)" "$(DESTDIR)$(exampledir)"; do \

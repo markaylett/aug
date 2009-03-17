@@ -1,6 +1,7 @@
 SUBDIRS = \
 	c \
 	cpp \
+	mod \
 	pl \
 	py \
 	rb \

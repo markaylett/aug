@@ -141,10 +141,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\example\augas\file.cpp">
+				RelativePath="..\src\mod\http\file.cpp">
 			</File>
 			<File
-				RelativePath="..\example\augas\http.cpp">
+				RelativePath="..\src\mod\http\http.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -152,7 +152,7 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\example\augas\file.hpp">
+				RelativePath="..\src\mod\http\file.hpp">
 			</File>
 		</Filter>
 		<Filter

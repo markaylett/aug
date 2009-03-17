@@ -336,6 +336,8 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augd/Makefile
                  src/cpp/augd/test/Makefile
                  src/cpp/htdigest/Makefile
+                 src/mod/Makefile
+                 src/mod/http/Makefile
                  src/pl/Makefile
                  src/py/Makefile
                  src/rb/Makefile
