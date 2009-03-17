@@ -30,6 +30,7 @@
 #include "augsyspp.hpp"
 
 #include <map>
+#include <set>
 #include <fstream>
 #include <sstream>
 
@@ -40,6 +41,7 @@ using namespace std;
 namespace {
 
     string css_;
+    set<string> services_;
 
     // close/sessid.
 
@@ -58,6 +60,20 @@ namespace {
             css_ = ss.str();
         } else
             css_.clear();
+    }
+
+    void
+    loadservices()
+    {
+        const char* ls(mod::getenv("session.http.services"));
+        if (ls) {
+            istringstream is(ls);
+            set<string> services;
+            copy(istream_iterator<string>(is), istream_iterator<string>(),
+                 inserter(services, services.begin()));
+            services_.swap(services);
+        } else
+            services_.clear();
     }
 
     const char*
@@ -490,7 +506,15 @@ namespace {
                     putfieldp(resp, "WWW-Authenticate", ss.str());
                     respond(id_, sessid_, 401, "Unauthorized", resp, close);
 
-                } else if (nodes.empty() || nodes[0] != "service") {
+                    return;
+                }
+
+                string service(jointype(nodes));
+                if (services_.find(service) != services_.end()) {
+
+                    post(id_, "http-request", service.c_str(), mar.base());
+
+                } else {
 
                     // Static file system content.
 
@@ -500,11 +524,6 @@ namespace {
                     blobptr blob(getfile(path.c_str()));
                     respond(id_, sessid_, 200, "OK", mimetype(path), blob,
                             close);
-
-                } else {
-
-                    string path(jointype(nodes));
-                    post(id_, "http-request", path.c_str(), mar.base());
                 }
 
             } catch (const http_error& e) {
@@ -566,6 +585,7 @@ namespace {
         do_reconf()
         {
             loadcss();
+            loadservices();
             loadmimetypes();
         }
         void
