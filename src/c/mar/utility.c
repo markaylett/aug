@@ -84,12 +84,15 @@ AUG_EXTERNC aug_result
 aug_insertstream_(aug_mar* mar, FILE* stream)
 {
     char buf[AUG_MAXLINE];
-    while (!feof(stream)) {
-
+    do {
         size_t size = fread(buf, 1, sizeof(buf), stdin);
         if (size)
             aug_verify(aug_writemar(mar, buf, (unsigned)size));
-    }
+
+        if (ferror(stream))
+            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+
+    } while (!feof(stream));
     return AUG_SUCCESS;
 }
 

@@ -21,55 +21,20 @@
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "augutil.h"
-#include "augsys.h"
 #include "augctx.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-static char buf_[256];
-static unsigned i_ = 0;
-
-static void
-out_(void* arg, int what)
+static aug_result
+cb_(void* arg, const char* key, const char* value)
 {
-    switch (what) {
-    case AUG_TOKERROR:
-        assert(0);
-    case AUG_TOKPHRASE:
-        printf("\n");
-        break;
-    case AUG_TOKLABEL:
-        buf_[i_++] = '\0';
-        printf("'%s'=", buf_);
-        i_ = 0;
-        break;
-    case AUG_TOKWORD:
-        buf_[i_++] = '\0';
-        printf("[%s]", buf_);
-        i_ = 0;
-        break;
-    case AUG_TOKRTRIM:
-        assert(0);
-    default:
-        buf_[i_++] = what;
-        break;
-    }
+    printf("'%s'=[%s]\n", key, value);
+    return AUG_SUCCESS;
 }
 
 int
 main(int argc, char* argv[])
 {
-    struct aug_words st;
-    int ch;
-
     if (!aug_autotlx())
         return 1;
-    aug_initshellwords(&st, AUG_TRUE, out_, NULL);
-
-    while (EOF != (ch = getchar()))
-        aug_putshellwords(&st, ch);
-    aug_putshellwords(&st, '\n');
+    aug_check(AUG_ISSUCCESS(aug_freadconf(stdin, cb_, NULL)));
     return 0;
 }

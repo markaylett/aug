@@ -33,7 +33,25 @@
 
 #include "augtypes.h"
 
+#include <stdio.h>
+
 typedef aug_result (*aug_confcb_t)(void*, const char*, const char*);
+
+/**
+ * Read configuration file.
+ *
+ * A negative callback result (an exception) will cause aug_readconf() to exit
+ * with the same result.
+ *
+ * @param fp File handle to configuration file.
+ *
+ * @param cb Callback function called for each name/value pair.
+ *
+ * @param arg User specfied argument.
+ */
+
+AUGUTIL_API aug_result
+aug_freadconf(FILE* fp, aug_confcb_t cb, void* arg);
 
 /**
  * Read configuration file.

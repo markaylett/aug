@@ -1,4 +1,7 @@
 EXTRA_DIST = \
+	filetest.sh \
+	filetest.stdin \
+	filetest.stdout
 	networdstest.sh \
 	networdstest.stdin \
 	networdstest.stdout \
@@ -69,6 +72,7 @@ libaugutil_la_LIBADD = \
 
 check_PROGRAMS = \
 	eventtest \
+	filetest \
 	hirestest \
 	networdstest \
 	shelllexertest \
@@ -77,6 +81,7 @@ check_PROGRAMS = \
 
 TESTS = \
 	eventtest \
+	filetest.sh \
 	hirestest \
 	networdstest.sh \
 	shelllexertest.sh \
@@ -85,6 +90,10 @@ TESTS = \
 
 eventtest_SOURCES = eventtest.c
 eventtest_LDADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la
+
+filetest_SOURCES = filetest.c
+filetest_LDADD = \
 	$(top_builddir)/src/c/augutil/libaugutil.la
 
 hirestest_SOURCES = hirestest.c

@@ -1,0 +1,74 @@
+# -*- sh -*-
+# file tests
+
+# eatws tests
+
+key=\ begin\ with\ space
+key=\;begin\ with\ special
+
+key=line\ \
+con\
+tinu\
+ation.
+
+# bare tests
+
+key=bare-word.
+key=  trim\ leading\ space.
+key=\e\s\c\a\p\e\ \a\n\y.
+
+key=value
+key=ignore=second=delim
+
+# dquot tests
+
+key="double quoted."
+key=  "trim leading space."
+key="embedded
+ newline."
+key="join"" together."
+
+key="join"\
+" across"\
+" lines."
+
+key="escapes good for \"double quotes\" and\
+ line continuations."
+key="But otherwise \i\g\n\o\r\e\d\."
+
+key="continuation\
+ within\
+ double."
+
+# squot tests
+
+key='single quoted.'
+key=  'trim leading space.'
+key='embedded
+ newline.'
+key='join'' together.'
+
+key='join'\
+' across'\
+' lines.'
+
+key='escapes\ always\ insignificant.\'
+
+# comment tests
+
+key=comment\ after\ bare. # \"" \'' \\\ a comment
+key="comment after double." # \"" \'' \\\ a comment
+key='comment after single.' # \"" \'' \\\ a comment
+
+key=trailing\ comments\ ... # \"" \'' \\\ a comment
+key="should be..." # \"" \'' \\\ a comment
+key='ignored.' # \"" \'' \\\ a comment
+
+key=hash\ in\ bare#word\ is\ not\ comment.
+
+# other
+
+key=bare\
+" join"" double"\
+' join'' single'\
+\ join\ bare.

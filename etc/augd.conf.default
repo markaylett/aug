@@ -1,54 +1,54 @@
-rundir = c:/program files/aug
-logdir = log
-loglevel = 4
+rundir=c:/program files/aug
+logdir=log
+loglevel=4
 
-#ssl.contexts = foo bar
+#ssl.contexts=foo bar
 
-#ssl.context.foo.certfile = etc/foocert.pem
-#ssl.context.foo.keyfile = etc/fookey.pem
-#ssl.context.foo.password = test
-#ssl.context.foo.cafile = etc/cacert.pem
-#ssl.context.foo.verify = 1
+#ssl.context.foo.certfile=etc/foocert.pem
+#ssl.context.foo.keyfile=etc/fookey.pem
+#ssl.context.foo.password=test
+#ssl.context.foo.cafile=etc/cacert.pem
+#ssl.context.foo.verify=1
 
-#ssl.context.bar.certfile = etc/barcert.pem
-#ssl.context.bar.keyfile = etc/barkey.pem
-#ssl.context.bar.password = test
-#ssl.context.bar.cafile = etc/cacert.pem
-#ssl.context.bar.verify = 1
+#ssl.context.bar.certfile=etc/barcert.pem
+#ssl.context.bar.keyfile=etc/barkey.pem
+#ssl.context.bar.password=test
+#ssl.context.bar.cafile=etc/cacert.pem
+#ssl.context.bar.verify=1
 
-sessions = http sched pyskel pyecho pyproxy
+sessions=http sched pyskel pyecho pyproxy
 
-session.http.module = http
-session.http.serv = 8080
-session.http.css = htdocs/aug.css
-session.http.mimetypes = etc/mimetypes.conf
-session.http.passwd = etc/passwd.txt
-session.http.realm = testrealm@host.com
-session.http.salt = some random phrase
+session.http.module=http
+session.http.serv=8080
+session.http.css=htdocs/aug.css
+session.http.mimetypes=etc/mimetypes.conf
+session.http.passwd=etc/passwd.txt
+session.http.realm=testrealm@host.com
+session.http.salt=some random phrase
 
-session.sched.groups = http-request
-session.sched.module = sched
-session.sched.events = foo bar
-session.sched.event.foo.utc = 0M 30M
-session.sched.event.bar.local = 1m17d13H0M
+session.sched.groups=http-request
+session.sched.module=sched
+session.sched.events=foo bar
+session.sched.event.foo.utc=0M 30M
+session.sched.event.bar.local=1m17d13H0M
 
-session.pyskel.module = augpy
-session.pyskel.serv = 7000
+session.pyskel.module=augpy
+session.pyskel.serv=7000
 
-session.pyecho.module = augpy
-session.pyecho.serv = 7001
+session.pyecho.module=augpy
+session.pyecho.serv=7001
 
-session.pyproxy.module = augpy
-session.pyproxy.serv = 7002
-session.pyproxy.to = 7001
+session.pyproxy.module=augpy
+session.pyproxy.serv=7002
+session.pyproxy.to=7001
 
-session.pyclient.module = augpy
-session.pyclient.to = 7002
+session.pyclient.module=augpy
+session.pyclient.to=7002
 
-module.augpy.path = mod/modaugpy
-module.augpy.pythonpath = python
+module.augpy.path=mod/modaugpy
+module.augpy.pythonpath=python
 
-module.http.path = mod/modhttp
-module.sched.path = mod/modsched
-module.augskel.path = mod/modskel
-module.augskelpp.path = mod/modskelpp
+module.http.path=mod/modhttp
+module.sched.path=mod/modsched
+module.augskel.path=mod/modskel
+module.augskelpp.path=mod/modskelpp

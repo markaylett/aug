@@ -26,8 +26,10 @@
 #include "augutil/config.h"
 #include "augutil/types.h"
 
+#include "augtypes.h"
+
 AUGUTIL_API void
-aug_initshellwords(struct aug_words* st, int pairs,
+aug_initshellwords(struct aug_words* st, aug_bool pairs,
                    void (*out)(void*, int), void* arg);
 
 AUGUTIL_API void

@@ -61,16 +61,16 @@ word_(struct aug_words*, int);
 static void
 eatws_(struct aug_words* st, int ch)
 {
-    if (st->flags_ & AUG_WRDESCAPE) {
+    if (st->flags_ & AUG_WORDESCAPE) {
         /* Handle escape. */
-        st->flags_ &= ~AUG_WRDESCAPE;
+        st->flags_ &= ~AUG_WORDESCAPE;
         /* Begin word with literal. */
         st->out_(st->arg_, ch);
         st->fn_ = word_;
     } else {
         switch (ch) {
         case '\n':  /* New line. */
-            if (!(st->flags_ & AUG_WRDLABEL)) {
+            if (!(st->flags_ & AUG_WORDLABEL)) {
                 /* Label seen so possible continuation. */
                 st->fn_ = word_;
                 st->fn_(st, ch);
@@ -85,7 +85,7 @@ eatws_(struct aug_words* st, int ch)
             break;
         case '\\': /* Escape. */
             /* Begin escape. */
-            st->flags_ |= AUG_WRDESCAPE;
+            st->flags_ |= AUG_WORDESCAPE;
             break;
         default:   /* Else. */
             /* Begin word. */
@@ -99,9 +99,9 @@ eatws_(struct aug_words* st, int ch)
 static void
 word_(struct aug_words* st, int ch)
 {
-    if (st->flags_ & AUG_WRDNEWLINE) {
+    if (st->flags_ & AUG_WORDNEWLINE) {
         /* Handle newline. */
-        st->flags_ &= ~AUG_WRDNEWLINE;
+        st->flags_ &= ~AUG_WORDNEWLINE;
         switch (ch) {
         case '\n':  /* New line. */
             /* Two new lines. */
@@ -109,7 +109,7 @@ word_(struct aug_words* st, int ch)
             st->out_(st->arg_, AUG_TOKPHRASE);
             /* Begin new phrase. */
             st->fn_ = eatws_;
-            st->flags_ = AUG_WRDLABEL;
+            st->flags_ = AUG_WORDLABEL;
             break;
         case '\t':
         case '\v':
@@ -123,18 +123,18 @@ word_(struct aug_words* st, int ch)
         case '\\': /* Escape. */
             /* Begin new word. */
             st->out_(st->arg_, AUG_TOKWORD);
-            st->flags_ |= (AUG_WRDESCAPE | AUG_WRDLABEL);
+            st->flags_ |= (AUG_WORDESCAPE | AUG_WORDLABEL);
             break;
         default:
             st->out_(st->arg_, AUG_TOKWORD);
             /* Append to new word. */
             st->out_(st->arg_, ch);
-            st->flags_ |= AUG_WRDLABEL;
+            st->flags_ |= AUG_WORDLABEL;
             break;
         }
-    } else if (st->flags_ & AUG_WRDESCAPE) {
+    } else if (st->flags_ & AUG_WORDESCAPE) {
         /* Handle escape. */
-        st->flags_ &= ~AUG_WRDESCAPE;
+        st->flags_ &= ~AUG_WORDESCAPE;
         /* Literal. */
         st->out_(st->arg_, ch);
     } else {
@@ -143,19 +143,19 @@ word_(struct aug_words* st, int ch)
             /* Trim trailing whitespace. */
             st->out_(st->arg_, AUG_TOKRTRIM);
             /* Begin newline. */
-            st->flags_ |= AUG_WRDNEWLINE;
+            st->flags_ |= AUG_WORDNEWLINE;
             break;
         case '\\': /* Escape. */
             /* Begin escape. */
-            st->flags_ |= AUG_WRDESCAPE;
+            st->flags_ |= AUG_WORDESCAPE;
             break;
         default:   /* Else. */
-            if ((st->flags_ & AUG_WRDLABEL) && ':' == ch) {
+            if ((st->flags_ & AUG_WORDLABEL) && ':' == ch) {
                 /* Trim and label. */
                 st->out_(st->arg_, AUG_TOKRTRIM);
                 st->out_(st->arg_, AUG_TOKLABEL);
                 st->fn_ = eatws_;
-                st->flags_ &= ~AUG_WRDLABEL;
+                st->flags_ &= ~AUG_WORDLABEL;
             } else {
                 /* Append to word. */
                 st->out_(st->arg_, ch);
@@ -171,7 +171,7 @@ aug_initnetwords(struct aug_words* st, void (*out)(void*, int), void* arg)
     st->out_ = out;
     st->arg_ = arg;
     st->fn_ = eatws_;
-    st->flags_ = AUG_WRDLABEL;
+    st->flags_ = AUG_WORDLABEL;
 }
 
 AUGUTIL_API void

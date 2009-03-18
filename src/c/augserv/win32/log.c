@@ -150,8 +150,12 @@ aug_setservlogger(const char* sname)
     aug_mpool* mpool = aug_getmpool(aug_tlx);
     aug_log* inner = aug_getlog(aug_tlx);
     aug_log* outer = createservlog_(mpool, sname, inner);
-    if (!outer)
+
+    if (!outer) {
+        aug_release(inner);
+        aug_release(mpool);
         return AUG_FAILERROR;
+    }
 
     aug_setlog(aug_tlx, outer);
     aug_release(outer);

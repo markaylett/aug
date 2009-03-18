@@ -29,10 +29,10 @@
 #define AUG_TOKPHRASE (-4)
 #define AUG_TOKRTRIM  (-5)
 
-#define AUG_WRDESCAPE  0x01
-#define AUG_WRDLABEL   0x02
-#define AUG_WRDNEWLINE 0x04
-#define AUG_WRDPAIRS   0x08
+#define AUG_WORDESCAPE  0x01
+#define AUG_WORDLABEL   0x02
+#define AUG_WORDNEWLINE 0x04
+#define AUG_WORDPAIRS   0x08
 
 struct aug_words {
     void (*out_)(void*, int);

@@ -26,88 +26,175 @@
 
 AUG_RCSID("$Id$");
 
+#include "augutil/shellwords.h"
+#include "augutil/xstr.h"
+
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
-#include "augctx/errno.h"
 
-#include "augtypes.h" /* AUG_EPARSE */
+#include <assert.h>
 
-#include <ctype.h>
-#include <stdio.h>
-#include <string.h>
+struct state_ {
+    aug_confcb_t cb_;
+    void* arg_;
+    aug_xstr_t key_;
+    aug_xstr_t value_;
+    int last_;
+    aug_result result_;
+};
 
-#define SPACE_ "\t\v\f "
-
-static size_t
-rtrim_(const char* s, size_t n)
+static aug_result
+init_(struct state_* st, aug_confcb_t cb, void* arg)
 {
-    while (0 < n && isspace((int)s[n - 1]))
-        --n;
-    return n;
+    aug_mpool* mpool = aug_getmpool(aug_tlx);
+    aug_xstr_t key, value;
+
+    if (!(key = aug_createxstr(mpool, 64))) {
+        aug_release(mpool);
+        return AUG_FAILERROR;
+    }
+
+    value = aug_createxstr(mpool, 64);
+
+    /* Done with mpool regardless. */
+
+    aug_release(mpool);
+
+    if (!value) {
+        aug_destroyxstr(key);
+        return AUG_FAILERROR;
+    }
+
+    /* Commit. */
+
+    st->cb_ = cb;
+    st->arg_ = arg;
+    st->key_ = key;
+    st->value_ = value;
+    st->last_ = AUG_TOKPHRASE;
+    st->result_ = AUG_SUCCESS;
+
+    return AUG_SUCCESS;
+}
+
+static void
+term_(struct state_* st)
+{
+    aug_destroyxstr(st->key_);
+    aug_destroyxstr(st->value_);
+}
+
+static void
+out_(void* arg, int what)
+{
+    struct state_* st = arg;
+    aug_xstr_t tmp;
+
+    /* Bail on error. */
+
+    if (AUG_ISFAIL(st->result_))
+        return;
+
+    switch (what) {
+    case AUG_TOKERROR:
+        /* Invalid case. */
+        assert(0);
+    case AUG_TOKPHRASE:
+
+        /* Did this phrase contain anything significant? */
+
+        if (AUG_TOKPHRASE != st->last_) {
+
+            /* Key must not be empty. */
+
+            if (0 != aug_xstrlen(st->key_)) {
+
+                /* Callback with pair. */
+
+                st->result_ = st->cb_(st->arg_, aug_xstr(st->key_),
+                                      aug_xstr(st->value_));
+                aug_clearxstr(st->key_);
+                aug_clearxstr(st->value_);
+
+            } else {
+
+                aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
+                               AUG_ENULL, AUG_MSG("empty key"));
+                st->result_ = AUG_FAILERROR;
+            }
+        }
+        break;
+    case AUG_TOKLABEL:
+
+        /* Rotate strings so that token becomes key. */
+
+        tmp = st->key_;
+        st->key_ = st->value_;
+        st->value_ = tmp;
+
+        break;
+    case AUG_TOKWORD:
+        break;
+    case AUG_TOKRTRIM:
+        /* Invalid case. */
+        assert(0);
+    default:
+
+        /* Join next word. */
+
+        if (AUG_TOKWORD == st->last_)
+            aug_xstrcatc(st->value_, ' ');
+
+        /* Append character. */
+
+        aug_xstrcatc(st->value_, what);
+        break;
+    }
+    st->last_ = what;
+}
+
+AUGUTIL_API aug_result
+aug_freadconf(FILE* fp, aug_confcb_t cb, void* arg)
+{
+    struct state_ st;
+    struct aug_words words;
+    int ch;
+
+    aug_verify(init_(&st, cb, arg));
+
+    aug_initshellwords(&words, AUG_TRUE, out_, &st);
+
+    while (EOF != (ch = fgetc(fp))) {
+
+        aug_putshellwords(&words, ch);
+
+        /* Check for errors during callback. */
+
+        if (AUG_ISFAIL(st.result_))
+            goto done;
+    }
+
+    if (feof(fp))
+        aug_putshellwords(&words, '\n');
+    else /* Error. */
+        st.result_ =
+            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+
+ done:
+    term_(&st);
+    return st.result_;
 }
 
 AUGUTIL_API aug_result
 aug_readconf(const char* path, aug_confcb_t cb, void* arg)
 {
-    char buf[AUG_MAXLINE];
-    char* name;
-    const char* value;
-    aug_result result = AUG_SUCCESS;
-
     FILE* fp = fopen(path, "r");
-    if (!fp)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+    aug_result result;
+    if (fp) {
+        result = aug_freadconf(fp, cb, arg);
+        fclose(fp);
+    } else
+        result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-    while (fgets(buf, sizeof(buf), fp)) {
-
-        /* Trim trailing whitespace from the line. */
-
-        buf[rtrim_(buf, strlen(buf))] = '\0';
-
-        /* Trim leading whitespace from the line. */
-
-        name = buf + strspn(buf, SPACE_);
-
-        /* Ignore if either a blank line or comment line.  Note: because there
-           is no notion of an escape character, for simplicity, comments
-           cannot be placed after name/value pairs. */
-
-        if ('\0' == *name || '#' == *name)
-            continue;
-
-        /* Find the token separating the name and value - this is required. */
-
-        if (!(value = strchr(name, '='))) {
-
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                           AUG_MSG("missing token separator"));
-            result = AUG_FAILERROR;
-            break;
-        }
-
-        /* Trim trailing whitespace from the name - the name cannot be
-           blank. */
-
-        name[rtrim_(name, value - name)] = '\0';
-        if ('\0' == *name) {
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
-                           AUG_MSG("missing name part"));
-            result = AUG_FAILERROR;
-            break;
-        }
-
-        /* Skip past the separator. */
-
-        ++value;
-
-        /* Trim leading whitespace from the value. */
-
-        value += strspn(value, SPACE_);
-
-        if (AUG_ISFAIL(result = (*cb)(arg, name, value)))
-            break;
-    }
-
-    fclose(fp);
     return result;
 }
