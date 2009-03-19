@@ -81,6 +81,25 @@ namespace aug {
     {
         return verify(aug_readconf(path, confmemcb<T>, &x));
     }
+
+    inline aug_result
+    readconf(FILE* fp, aug_confcb_t cb, void* arg)
+    {
+        return verify(aug_freadconf(fp, cb, arg));
+    }
+
+    inline aug_result
+    readconf(FILE* fp, aug_confcb_t cb, const null_&)
+    {
+        return verify(aug_freadconf(fp, cb, 0));
+    }
+
+    template <typename T>
+    aug_result
+    readconf(FILE* fp, T& x)
+    {
+        return verify(aug_freadconf(fp, confmemcb<T>, &x));
+    }
 }
 
 #endif // AUGUTILPP_FILE_HPP

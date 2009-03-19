@@ -190,6 +190,7 @@ aug_readconf(const char* path, aug_confcb_t cb, void* arg)
 {
     FILE* fp = fopen(path, "r");
     aug_result result;
+
     if (fp) {
         result = aug_freadconf(fp, cb, arg);
         fclose(fp);
