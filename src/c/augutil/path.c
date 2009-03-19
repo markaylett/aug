@@ -124,12 +124,10 @@ aug_gettmp(char* dst, size_t size)
 }
 
 AUGUTIL_API char*
-aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
-             size_t size)
+aug_makepath(char* dst, const char* dir, const char* name, size_t size)
 {
     char* ptr = dst;
     size_t namelen = strlen(name);
-    size_t extlen = strlen(ext);
 
     /* The directory part is optional. */
 
@@ -137,12 +135,12 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
 
         size_t dirlen = strlen(dir);
 
-        /* Strip trailing separator from directory part. */
+        /* Trim trailing separator from directory part. */
 
         if (IS_DIRSEP_(dir[dirlen - 1]))
             --dirlen;
 
-        if (size < dirlen + namelen + extlen + 3) {
+        if (size < dirlen + namelen + 2) {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                            AUG_MSG("buffer size exceeded"));
             return NULL;
@@ -154,7 +152,7 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
         ptr[dirlen] = '/';
         ptr += dirlen + 1;
 
-    } else if (size < namelen + extlen + 2) {
+    } else if (size < namelen + 1) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
@@ -162,13 +160,7 @@ aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
 
     /* File name part. */
 
-    memcpy(ptr, name, namelen);
-    ptr[namelen] = '.';
-    ptr += namelen + 1;
-
-    /* Extension part. */
-
-    strcpy(ptr, ext);
+    strcpy(ptr, name);
     return dst;
 }
 

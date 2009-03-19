@@ -20,8 +20,8 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef AUGAS_EXCEPTION_HPP
-#define AUGAS_EXCEPTION_HPP
+#ifndef HTTP_EXCEPTION_HPP
+#define HTTP_EXCEPTION_HPP
 
 #include <stdexcept>
 
@@ -43,4 +43,4 @@ namespace aug {
     };
 }
 
-#endif // AUGAS_EXCEPTION_HPP
+#endif // HTTP_EXCEPTION_HPP

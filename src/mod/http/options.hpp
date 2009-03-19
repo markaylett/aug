@@ -20,26 +20,26 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef HTTP_FILE_HPP
-#define HTTP_FILE_HPP
+#ifndef MODHTTP_OPTIONS_HPP
+#define MODHTTP_OPTIONS_HPP
 
-#include "augext/blob.h"
-
-#include <vector>
+#include <map>
+#include <string>
 
 namespace aug {
 
-    blobptr
-    getfile(const char* path);
+    class options {
 
-    std::string
-    jointype(const std::vector<std::string>& nodes);
+        std::map<std::string, std::string> mimetypes_;
 
-    std::string
-    joinpath(const char* root, const std::vector<std::string>& nodes);
+    public:
 
-    std::vector<std::string>
-    splitpath(const std::string& path);
+        void
+        load();
+
+        std::string
+        mimetype(const std::string& path);
+    };
 }
 
-#endif // HTTP_FILE_HPP
+#endif // MODHTTP_OPTIONS_HPP

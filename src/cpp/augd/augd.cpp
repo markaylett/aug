@@ -95,11 +95,12 @@ namespace {
         ss << "augd-" << setfill('0')
            << setw(4) << tm.tm_year + 1900
            << setw(2) << tm.tm_mon + 1
-           << setw(2) << tm.tm_mday;
+           << setw(2) << tm.tm_mday
+           << ".log";
 
         // Re-direct standard handles.
 
-        openlog(makepath(logdir_, ss.str().c_str(), "log").c_str());
+        openlog(makepath(logdir_, ss.str().c_str()).c_str());
     }
 
     void

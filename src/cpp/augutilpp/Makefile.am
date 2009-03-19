@@ -41,16 +41,25 @@ libaugutilpp_la_LIBADD = \
 
 check_PROGRAMS = \
 	maintest \
+	pathtest \
 	shellparsertest \
 	stringtest
 
 TESTS = \
 	maintest \
+	pathtest \
 	shellparsertest \
 	stringtest
 
 maintest_SOURCES = maintest.cpp
 maintest_LDADD = \
+	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
+	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la
+
+pathtest_SOURCES = pathtest.cpp
+pathtest_LDADD = \
 	$(top_builddir)/src/cpp/augutilpp/libaugutilpp.la \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \

@@ -27,7 +27,6 @@
 #include <stdexcept>
 
 using namespace aug;
-using namespace aug;
 using namespace std;
 
 namespace {

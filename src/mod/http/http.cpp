@@ -24,6 +24,7 @@
 #include "file.hpp"
 
 #include "exception.hpp"
+#include "options.hpp"
 
 #include "augmodpp.hpp"
 #include "augnetpp.hpp"
@@ -42,6 +43,7 @@ using namespace std;
 
 namespace {
 
+    options options_;
     string css_;
     set<string> services_;
 
@@ -524,8 +526,8 @@ namespace {
                     aug_ctxinfo(aug_tlx, "path [%s]", path.c_str());
 
                     blobptr blob(getfile(path.c_str()));
-                    respond(id_, sessid_, 200, "OK", mimetype(path), blob,
-                            close);
+                    respond(id_, sessid_, 200, "OK", options_.mimetype(path),
+                            blob, close);
                 }
 
             } catch (const http_error& e) {
@@ -588,7 +590,7 @@ namespace {
         {
             loadcss();
             loadservices();
-            loadmimetypes();
+            options_.load();
         }
         void
         do_event(mod_id id, const char* from, const char* type,

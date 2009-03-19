@@ -149,6 +149,9 @@
 			<File
 				RelativePath="..\src\mod\http\http.cpp">
 			</File>
+			<File
+				RelativePath="..\src\mod\http\options.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -159,6 +162,9 @@
 			</File>
 			<File
 				RelativePath="..\src\mod\http\file.hpp">
+			</File>
+			<File
+				RelativePath="..\src\mod\http\options.hpp">
 			</File>
 		</Filter>
 		<Filter

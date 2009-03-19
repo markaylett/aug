@@ -55,17 +55,16 @@ namespace aug {
     }
 
     inline char*
-    makepath(char* dst, const char* dir, const char* name, const char* ext,
-             size_t size)
+    makepath(char* dst, const char* dir, const char* name, size_t size)
     {
-        return verify(aug_makepath(dst, dir, name, ext, size));
+        return verify(aug_makepath(dst, dir, name, size));
     }
 
     inline std::string
-    makepath(const char* dir, const char* name, const char* ext)
+    makepath(const char* dir, const char* name)
     {
         char buf[AUG_PATH_MAX + 1];
-        return makepath(buf, dir, name, ext, sizeof(buf));
+        return makepath(buf, dir, name, sizeof(buf));
     }
 
     inline char*

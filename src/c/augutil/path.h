@@ -54,8 +54,7 @@ AUGUTIL_API char*
 aug_getrundir(char* dst, size_t size);
 
 AUGUTIL_API char*
-aug_makepath(char* dst, const char* dir, const char* name, const char* ext,
-             size_t size);
+aug_makepath(char* dst, const char* dir, const char* name, size_t size);
 
 AUGUTIL_API char*
 aug_realpath(char* dst, const char* src, size_t size);

@@ -20,26 +20,35 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef HTTP_FILE_HPP
-#define HTTP_FILE_HPP
 
-#include "augext/blob.h"
+#include "augutilpp.hpp"
+#include "augctxpp.hpp"
 
-#include <vector>
+using namespace aug;
+using namespace std;
 
-namespace aug {
-
-    blobptr
-    getfile(const char* path);
-
-    std::string
-    jointype(const std::vector<std::string>& nodes);
-
-    std::string
-    joinpath(const char* root, const std::vector<std::string>& nodes);
-
-    std::vector<std::string>
-    splitpath(const std::string& path);
+namespace {
+    string
+    make(const char* dir, const char* name)
+    {
+        string s(makepath(dir, name));
+        aug_ctxinfo(aug_tlx, "%s", realpath(s.c_str()).c_str());
+        return s;
+    }
 }
 
-#endif // HTTP_FILE_HPP
+
+int
+main(int argc, char* argv[])
+{
+    try {
+        autotlx();
+        aug_check(make(0, "a") == "a");
+        aug_check(make("", "a") == "a");
+        aug_check(make("a", "b") == "a/b");
+        aug_check(make("a/", "b") == "a/b");
+        aug_check(make("a/b", "c/d") == "a/b/c/d");
+        return 0;
+    } AUG_PERRINFOCATCH;
+    return 1;
+}

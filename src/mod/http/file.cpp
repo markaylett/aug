@@ -33,8 +33,6 @@
 
 #include "augtypes.h"
 
-#include <map>
-
 #include <sys/stat.h>
 
 #if !defined(_WIN32)
@@ -57,8 +55,6 @@ using namespace mod;
 using namespace std;
 
 namespace {
-
-    map<string, string> mimetypes_;
 
     class nodes : public mpool_ops {
         vector<string>* xs_;
@@ -119,13 +115,6 @@ namespace {
             return object_attach<aug_blob>(ptr->blob_);
         }
     };
-
-    aug_result
-    confcb_(void* arg, const char* name, const char* value)
-    {
-        mimetypes_[name] = value;
-        return AUG_SUCCESS;
-    }
 
     bool
     lstat(const char* path, struct _stat& sb)
@@ -195,49 +184,6 @@ aug::joinpath(const char* root, const vector<string>& nodes)
         throw http_error(403, "Forbidden");
 
     return path;
-}
-
-void
-aug::loadmimetypes()
-{
-    mimetypes_.clear();
-
-    // Add some basic types.
-
-    mimetypes_["css"] = "text/css";
-    mimetypes_["gif"] = "image/gif";
-    mimetypes_["html"] = "text/html";
-    mimetypes_["htm"] = "text/html";
-    mimetypes_["jpeg"] = "image/jpeg";
-    mimetypes_["jpg"] = "image/jpeg";
-    mimetypes_["js"] = "application/x-javascript";
-    mimetypes_["png"] = "image/png";
-    mimetypes_["tif"] = "image/tiff";
-    mimetypes_["tiff"] = "image/tiff";
-    mimetypes_["txt"] = "text/plain";
-    mimetypes_["xml"] = "text/xml";
-
-    const char* mimetypes(mod::getenv("session.http.mimetypes"));
-    if (mimetypes) {
-        aug::chdir(mod::getenv("rundir"));
-        readconf(mimetypes, confcb<confcb_>, null);
-    }
-}
-
-string
-aug::mimetype(const string& path)
-{
-    string type("text/plain");
-
-    string::size_type pos(path.find_last_of('.'));
-    if (pos != string::npos) {
-        string ext(path.substr(pos + 1));
-        map<string, string>::const_iterator it(mimetypes_.find(ext));
-        if (it != mimetypes_.end())
-            type = it->second;
-    }
-
-    return type;
 }
 
 vector<string>

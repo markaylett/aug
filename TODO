@@ -1,8 +1,5 @@
 Consistent use of aug_bool and aug_return.
 
-Migrate virtual classes to aug_object:
-aug_mar
-
 Use get/set naming convention.
 
 Remove dead code from base libraries.
@@ -50,3 +47,5 @@ Fix perl module.
 Generalise base template generation in augidl.
 
 Unify mar and stream interfaces.
+
+Prefer makepath over chdir.

@@ -2,7 +2,8 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 noinst_HEADERS = \
 	exception.hpp \
-	file.hpp
+	file.hpp \
+	options.hpp
 
 moddir = $(prefix)/mod
 mod_LTLIBRARIES = \
@@ -11,7 +12,8 @@ mod_LTLIBRARIES = \
 modhttp_la_SOURCES = \
 	exception.cpp \
 	file.cpp \
-	http.cpp
+	http.cpp \
+	options.cpp
 modhttp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modhttp_la_LIBADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
