@@ -23,6 +23,8 @@
 #define MOD_BUILD
 #include "file.hpp"
 
+#include "exception.hpp"
+
 #include "augmodpp.hpp"
 #include "augnetpp.hpp"
 #include "augutilpp.hpp"

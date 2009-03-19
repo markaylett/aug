@@ -62,7 +62,7 @@ modhttp_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-am_modhttp_la_OBJECTS = file.lo http.lo
+am_modhttp_la_OBJECTS = exception.lo file.lo http.lo
 modhttp_la_OBJECTS = $(am_modhttp_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -224,6 +224,7 @@ DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src/cpp
 
 noinst_HEADERS = \
+	exception.hpp \
 	file.hpp
 
 moddir = $(prefix)/mod
@@ -231,6 +232,7 @@ mod_LTLIBRARIES = \
 	modhttp.la
 
 modhttp_la_SOURCES = \
+	exception.cpp \
 	file.cpp \
 	http.cpp
 
@@ -311,6 +313,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 

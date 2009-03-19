@@ -20,32 +20,27 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef AUGAS_FILE_HPP
-#define AUGAS_FILE_HPP
+#ifndef AUGAS_EXCEPTION_HPP
+#define AUGAS_EXCEPTION_HPP
 
-#include "augext/blob.h"
-
-#include <vector>
+#include <stdexcept>
 
 namespace aug {
 
-    blobptr
-    getfile(const char* path);
-
-    std::string
-    jointype(const std::vector<std::string>& nodes);
-
-    std::string
-    joinpath(const char* root, const std::vector<std::string>& nodes);
-
-    void
-    loadmimetypes();
-
-    std::string
-    mimetype(const std::string& path);
-
-    std::vector<std::string>
-    splitpath(const std::string& path);
+    class http_error : public std::domain_error {
+        const int code_;
+    public:
+        http_error(int code, const std::string& title)
+            : std::domain_error(title),
+              code_(code)
+        {
+        }
+        int
+        code() const
+        {
+            return code_;
+        }
+    };
 }
 
-#endif // AUGAS_FILE_HPP
+#endif // AUGAS_EXCEPTION_HPP
