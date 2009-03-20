@@ -27,27 +27,44 @@
 using namespace aug;
 using namespace std;
 
-namespace {
-    string
-    make(const char* dir, const char* name)
-    {
-        string s(makepath(dir, name));
-        aug_ctxinfo(aug_tlx, "%s", realpath(s.c_str()).c_str());
-        return s;
-    }
-}
-
-
 int
 main(int argc, char* argv[])
 {
     try {
         autotlx();
-        aug_check(make(0, "a") == "a");
-        aug_check(make("", "a") == "a");
-        aug_check(make("a", "b") == "a/b");
-        aug_check(make("a/", "b") == "a/b");
-        aug_check(make("a/b", "c/d") == "a/b/c/d");
+
+        // isabs()
+
+        aug_check(isabs("/"));
+        aug_check(!isabs("."));
+        aug_check(!isabs("a"));
+
+#if defined(_WIN32)
+        aug_check(isabs("\\"));
+        aug_check(isabs("C:/"));
+        aug_check(isabs("D:\\"));
+#endif // _WIN32
+
+        // abspath()
+
+        aug_check(abspath("/a", "/b") == "/b");
+        aug_check(abspath("/a", "b") == "/a/b");
+
+#if defined(_WIN32)
+        aug_check(abspath("C:/a", "D:/b") == "D:/b");
+        aug_check(abspath("C:\\a", "D:\\b") == "D:\\b");
+
+        aug_check(abspath("C:/a", "b") == "C:/a/b");
+        aug_check(abspath("C:\\a", "b") == "C:\\a/b");
+#endif // _WIN32
+
+        // joinpath()
+
+        aug_check(joinpath(0, "a") == "a");
+        aug_check(joinpath("", "a") == "a");
+        aug_check(joinpath("a", "b") == "a/b");
+        aug_check(joinpath("a/", "b") == "a/b");
+        aug_check(joinpath("a/b", "c/d") == "a/b/c/d");
         return 0;
     } AUG_PERRINFOCATCH;
     return 1;

@@ -24,21 +24,41 @@
 #define MODHTTP_OPTIONS_HPP
 
 #include <map>
+#include <set>
 #include <string>
 
 namespace aug {
 
     class options {
 
+        std::string css_;
         std::map<std::string, std::string> mimetypes_;
+        std::map<std::pair<std::string, std::string>, std::string> passwd_;
+        std::set<std::string> services_;
 
     public:
 
         void
         load();
 
+        const std::string&
+        css() const
+        {
+            return css_;
+        }
+
         std::string
-        mimetype(const std::string& path);
+        mimetype(const std::string& path) const;
+
+        bool
+        passwd(const std::string& user, const std::string& realm,
+               std::string& digest);
+
+        bool
+        service(const std::string& name) const
+        {
+            return services_.find(name) != services_.end();
+        }
     };
 }
 

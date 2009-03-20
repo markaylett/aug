@@ -54,17 +54,36 @@ namespace aug {
         return getcwd(buf, sizeof(buf));
     }
 
-    inline char*
-    makepath(char* dst, const char* dir, const char* name, size_t size)
+    inline bool
+    isabs(const char* path)
     {
-        return verify(aug_makepath(dst, dir, name, size));
+        return aug_isabs(path) ? true : false;
+    }
+
+    inline char*
+    abspath(char* dst, const char* dir, const char* path, size_t size)
+    {
+        return verify(aug_abspath(dst, dir, path, size));
     }
 
     inline std::string
-    makepath(const char* dir, const char* name)
+    abspath(const char* dir, const char* path)
     {
         char buf[AUG_PATH_MAX + 1];
-        return makepath(buf, dir, name, sizeof(buf));
+        return abspath(buf, dir, path, sizeof(buf));
+    }
+
+    inline char*
+    joinpath(char* dst, const char* dir, const char* path, size_t size)
+    {
+        return verify(aug_joinpath(dst, dir, path, size));
+    }
+
+    inline std::string
+    joinpath(const char* dir, const char* path)
+    {
+        char buf[AUG_PATH_MAX + 1];
+        return joinpath(buf, dir, path, sizeof(buf));
     }
 
     inline char*

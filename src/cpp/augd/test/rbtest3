@@ -25,18 +25,18 @@ AUG_BUILDDIR=${AUG_BUILDDIR:-../../..}
 AUG_SRCDIR=${AUG_SRCDIR:-../../..}
 
 cat <<EOD >tmp.$$
-rundir = .
-logdir = .
+rundir=.
+logdir=.
 
-RbTest3 = test value
+RbTest3=test value
 
-sessions = RbStop RbTest3
+sessions=RbStop RbTest3
 
-session.RbStop.module = augrb
-session.RbTest3.module = augrb
+session.RbStop.module=augrb
+session.RbTest3.module=augrb
 
-module.augrb.path = $AUG_BUILDDIR/src/c/augrb/.libs/modaugrb
-module.augrb.rubypath = $AUG_SRCDIR/src/rb
+module.augrb.path=$AUG_BUILDDIR/src/c/augrb/.libs/modaugrb
+module.augrb.rubypath=$AUG_SRCDIR/src/rb
 EOD
 
 $AUG_BUILDDIR/src/cpp/augd/augd -f tmp.$$

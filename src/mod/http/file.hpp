@@ -25,6 +25,7 @@
 
 #include "augext/blob.h"
 
+#include <string>
 #include <vector>
 
 namespace aug {

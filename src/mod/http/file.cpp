@@ -25,14 +25,15 @@
 
 #include "exception.hpp"
 
+#include "augutilpp/string.hpp"
+#include "augsyspp/mmap.hpp"
+#include "augsyspp/unistd.hpp"
+#include "augsyspp/smartfd.hpp"
+#include "augctxpp/mpool.hpp"
+
 #include "augmodpp.hpp"
-#include "augnetpp.hpp"
-#include "augutilpp.hpp"
-#include "augmarpp.hpp"
-#include "augsyspp.hpp"
 
-#include "augtypes.h"
-
+#include <fcntl.h>
 #include <sys/stat.h>
 
 #if !defined(_WIN32)

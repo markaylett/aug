@@ -73,7 +73,7 @@ namespace test {
 
             // Once set, the run directory should not change.
 
-            if (!*rundir_)
+            if ('\0' != *rundir_)
                 realpath(rundir_, value, sizeof(rundir_));
 
         } else {
@@ -92,10 +92,9 @@ namespace test {
     void
     reconf()
     {
-        aug::chdir(rundir_);
-
+        cstring path;
         if (daemon_)
-            openlog(logfile_);
+            openlog(abspath(path, rundir_, logfile_, sizeof(path)));
 
         aug_ctxinfo(aug_tlx, "run directory: %s", rundir_);
         aug_ctxinfo(aug_tlx, "pid file: %s", pidfile_);

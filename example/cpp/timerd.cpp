@@ -47,10 +47,9 @@ namespace test {
     void
     reconf_()
     {
-        aug::chdir(rundir_);
-
+        char path[AUG_PATH_MAX + 1];
         if (daemon_)
-            openlog(logfile_);
+            openlog(abspath(path, rundir_, logfile_, sizeof(path)));
 
         aug_ctxinfo(aug_tlx, "run directory: %s", rundir_);
         aug_ctxinfo(aug_tlx, "pid file: %s", pidfile_);

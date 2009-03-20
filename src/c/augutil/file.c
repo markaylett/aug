@@ -33,6 +33,7 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 
 #include <assert.h>
+#include <errno.h>
 
 struct state_ {
     aug_confcb_t cb_;

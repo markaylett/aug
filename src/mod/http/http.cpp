@@ -26,15 +26,24 @@
 #include "exception.hpp"
 #include "options.hpp"
 
+#include "augnetpp/base64.hpp"
+#include "augnetpp/mar.hpp"
+#include "augutilpp/string.hpp"
+#include "augmarpp/header.hpp"
+#include "augmarpp/mar.hpp"
+#include "augmarpp/stream.hpp"
+
 #include "augmodpp.hpp"
-#include "augnetpp.hpp"
-#include "augutilpp.hpp"
-#include "augmarpp.hpp"
-#include "augsyspp.hpp"
+
+#include "augnet/auth.h"
+#include "augutil/md5.h"
+#include "augutil/pwd.h"
+#include "augsys/unistd.h"
+#include "augsys/utility.h"
+#include "augctx/base.h"
+#include "augext/clock.h"
 
 #include <map>
-#include <set>
-#include <fstream>
 #include <sstream>
 
 using namespace aug;
@@ -44,41 +53,11 @@ using namespace std;
 namespace {
 
     options options_;
-    string css_;
-    set<string> services_;
 
     // close/sessid.
 
     typedef map<mod_id, pair<string, bool> > active;
     active active_;
-
-    void
-    loadcss()
-    {
-        const char* css(mod::getenv("session.http.css"));
-        if (css) {
-            aug::chdir(mod::getenv("rundir"));
-            ifstream fs(css);
-            stringstream ss;
-            ss << fs.rdbuf();
-            css_ = ss.str();
-        } else
-            css_.clear();
-    }
-
-    void
-    loadservices()
-    {
-        const char* ls(mod::getenv("session.http.services"));
-        if (ls) {
-            istringstream is(ls);
-            set<string> services;
-            copy(istream_iterator<string>(is), istream_iterator<string>(),
-                 inserter(services, services.begin()));
-            services_.swap(services);
-        } else
-            services_.clear();
-    }
 
     const char*
     nonce(mod_id id, const string& addr, aug_md5base64_t base64)
@@ -175,34 +154,6 @@ namespace {
     }
 
     bool
-    getpass(const string& user, const string& realm, string& digest)
-    {
-        const char* passwd(mod::getenv("session.http.passwd"));
-        if (!passwd)
-            return false;
-
-        aug::chdir(mod::getenv("rundir"));
-        ifstream fs(passwd);
-        string line;
-        while (getline(fs, line)) {
-
-            trim(line);
-            if (line.empty() || '#' == line[0])
-                continue;
-
-            vector<string> toks(splitn(line.begin(), line.end(), ':'));
-            if (3 != toks.size())
-                return false;
-
-            if (toks[0] == user && toks[1] == realm) {
-                digest = toks[2];
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool
     basicauth(const string& encoded, const string& realm)
     {
         string xy, x, y;
@@ -212,7 +163,7 @@ namespace {
         aug_ctxinfo(aug_tlx, "basic user authentication [%s]", x.c_str());
 
         string digest;
-        if (!getpass(x, realm, digest))
+        if (!options_.passwd(x, realm, digest))
             return false;
 
         aug_md5base64_t base64;
@@ -232,7 +183,7 @@ namespace {
                     pairs["username"].c_str());
 
         string digest;
-        if (!getpass(pairs["username"], pairs["realm"], digest))
+        if (!options_.passwd(pairs["username"], pairs["realm"], digest))
             return false;
 
         aug_md5base64_t ha1;
@@ -305,8 +256,8 @@ namespace {
     {
         os << "<html><head><title>" << code << "&nbsp;"
            << status << "</title>";
-        if (!css_.empty())
-            os << "<style type=\"text/css\">" << css_ << "</style>";
+        if (!options_.css().empty())
+            os << "<style type=\"text/css\">" << options_.css() << "</style>";
         os << "</head><body><h1>" << status << "</h1></body></html>";
     }
 
@@ -514,7 +465,7 @@ namespace {
                 }
 
                 string service(jointype(nodes));
-                if (services_.find(service) != services_.end()) {
+                if (options_.service(service)) {
 
                     post(id_, "http-request", service.c_str(), mar.base());
 
@@ -588,8 +539,6 @@ namespace {
         void
         do_reconf()
         {
-            loadcss();
-            loadservices();
             options_.load();
         }
         void

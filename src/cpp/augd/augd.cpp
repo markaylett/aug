@@ -100,7 +100,7 @@ namespace {
 
         // Re-direct standard handles.
 
-        openlog(makepath(logdir_, ss.str().c_str()).c_str());
+        openlog(joinpath(logdir_, ss.str().c_str()).c_str());
     }
 
     void
@@ -135,15 +135,10 @@ namespace {
         // Other config directories may be specified relative to the run
         // directory.
 
-        aug::chdir(rundir_);
         if (daemon_) {
 
-            aug::chdir(options_.get("logdir", "."));
-
-            // Cache real path so that the log file can be re-opened without
-            // having to change directories.
-
-            realpath(logdir_, getcwd().c_str(), sizeof(logdir_));
+            abspath(logdir_, rundir_, options_.get("logdir", "."),
+                    sizeof(logdir_));
 
             // Re-opening the log file facilitates rolling.
 
@@ -643,10 +638,6 @@ namespace {
                                 "loading module: name=[%s], path=[%s]",
                                 value.c_str(), path.c_str());
 
-                    // Module can assume to be in run directory during
-                    // intialisation.
-
-                    aug::chdir(rundir_);
                     moduleptr module(new (tlx) augd::module
                                      (value, path.c_str(), host_, teardown_));
                     it = impl_->modules_

@@ -263,7 +263,14 @@ target_alias = @target_alias@
 EXTRA_DIST = \
 	filetest.sh \
 	filetest.stdin \
-	filetest.stdout
+	filetest.stdout \
+	networdstest.sh \
+	networdstest.stdin \
+	networdstest.stdout \
+	shelllexertest.sh \
+	shellwordstest.sh \
+	shellwordstest.stdin \
+	shellwordstest.stdout
 
 ACLOCAL_AMFLAGS = -Im4
 DEFAULT_INCLUDES = \
@@ -889,13 +896,6 @@ uninstall-info: uninstall-info-recursive
 	uninstall-info-am uninstall-libLTLIBRARIES \
 	uninstall-modincludeHEADERS
 
-	networdstest.sh \
-	networdstest.stdin \
-	networdstest.stdout \
-	shelllexertest.sh \
-	shellwordstest.sh \
-	shellwordstest.stdin \
-	shellwordstest.stdout
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

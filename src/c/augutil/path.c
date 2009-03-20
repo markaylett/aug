@@ -123,11 +123,50 @@ aug_gettmp(char* dst, size_t size)
     return dst;
 }
 
+AUGUTIL_API aug_bool
+aug_isabs(const char* path)
+{
+    /* Absolute if path starts with root directory. */
+
+    if (IS_DIRSEP_(*path))
+        return AUG_TRUE;
+
+#if defined(_WIN32)
+
+    /* C:/ */
+    /* 012 */
+
+    if (isalpha(path[0]) && ':' == path[1] && IS_DIRSEP_(path[2]))
+        return AUG_TRUE;
+
+#endif /* _WIN32 */
+
+    /* Otherwise false. */
+
+    return AUG_FALSE;
+}
+
 AUGUTIL_API char*
-aug_makepath(char* dst, const char* dir, const char* name, size_t size)
+aug_abspath(char* dst, const char* dir, const char* path, size_t size)
+{
+    if (aug_isabs(path)) {
+
+        /* Already absolute. */
+
+        aug_strlcpy(dst, path, size);
+
+    } else {
+
+        dst = aug_joinpath(dst, dir, path, size);
+    }
+    return dst;
+}
+
+AUGUTIL_API char*
+aug_joinpath(char* dst, const char* dir, const char* path, size_t size)
 {
     char* ptr = dst;
-    size_t namelen = strlen(name);
+    size_t pathlen = strlen(path);
 
     /* The directory part is optional. */
 
@@ -140,7 +179,7 @@ aug_makepath(char* dst, const char* dir, const char* name, size_t size)
         if (IS_DIRSEP_(dir[dirlen - 1]))
             --dirlen;
 
-        if (size < dirlen + namelen + 2) {
+        if (size < dirlen + pathlen + 2) {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                            AUG_MSG("buffer size exceeded"));
             return NULL;
@@ -152,15 +191,16 @@ aug_makepath(char* dst, const char* dir, const char* name, size_t size)
         ptr[dirlen] = '/';
         ptr += dirlen + 1;
 
-    } else if (size < namelen + 1) {
+    } else if (size < pathlen + 1) {
+
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }
 
-    /* File name part. */
+    /* Append path. */
 
-    strcpy(ptr, name);
+    strcpy(ptr, path);
     return dst;
 }
 

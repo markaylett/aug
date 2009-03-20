@@ -25,16 +25,16 @@ AUG_BUILDDIR=${AUG_BUILDDIR:-../../..}
 AUG_SRCDIR=${AUG_SRCDIR:-../../..}
 
 cat <<EOD >tmp.$$
-rundir = .
-logdir = .
+rundir=.
+logdir=.
 
-sessions = pystop pytest1
+sessions=pystop pytest1
 
-session.pystop.module = augpy
-session.pytest1.module = augpy
+session.pystop.module=augpy
+session.pytest1.module=augpy
 
-module.augpy.path = $AUG_BUILDDIR/src/c/augpy/.libs/modaugpy
-module.augpy.pythonpath = $AUG_SRCDIR/src/py
+module.augpy.path=$AUG_BUILDDIR/src/c/augpy/.libs/modaugpy
+module.augpy.pythonpath=$AUG_SRCDIR/src/py
 EOD
 
 $AUG_BUILDDIR/src/cpp/augd/augd -f tmp.$$

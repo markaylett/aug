@@ -1,7 +1,7 @@
 EXTRA_DIST = \
 	filetest.sh \
 	filetest.stdin \
-	filetest.stdout
+	filetest.stdout \
 	networdstest.sh \
 	networdstest.stdin \
 	networdstest.stdout \

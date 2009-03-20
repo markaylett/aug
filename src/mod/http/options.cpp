@@ -25,16 +25,33 @@
 
 #include "augutilpp/file.hpp"
 #include "augutilpp/path.hpp"
+#include "augutilpp/string.hpp"
 
 #include "augmodpp.hpp"
 
-#include "augtypes.h"
+#include <fstream>
+#include <iterator>
+#include <sstream>
 
 using namespace aug;
 using namespace mod;
 using namespace std;
 
 namespace {
+
+    void
+    loadcss(string& css)
+    {
+        const char* s(mod::getenv("session.http.css"));
+        if (s) {
+            char path[AUG_PATH_MAX + 1];
+            abspath(path, mod::getenv("rundir"), s, sizeof(path));
+            ifstream fs(path);
+            stringstream ss;
+            ss << fs.rdbuf();
+            css = ss.str();
+        }
+    }
 
     aug_result
     mimecb(void* arg, const char* name, const char* value)
@@ -46,7 +63,7 @@ namespace {
     }
 
     void
-    setmimetypes(map<string, string>& mimetypes)
+    loadmimetypes(map<string, string>& mimetypes)
     {
         // Add some basic types.
 
@@ -65,8 +82,46 @@ namespace {
 
         const char* s(mod::getenv("session.http.mimetypes"));
         if (s) {
-            string path(makepath(mod::getenv("rundir"), s));
+            string path(abspath(mod::getenv("rundir"), s));
             readconf(path.c_str(), confcb<mimecb>, null);
+        }
+    }
+
+    void
+    loadpasswd(map<pair<string, string>, string>& passwd)
+    {
+        const char* s(mod::getenv("session.http.passwd"));
+        if (s) {
+
+            char path[AUG_PATH_MAX + 1];
+            abspath(path, mod::getenv("rundir"), s, sizeof(path));
+
+            ifstream fs(path);
+            string line;
+            while (getline(fs, line)) {
+
+                trim(line);
+                if (line.empty() || '#' == line[0])
+                    continue;
+
+                // username:realm:digest
+
+                vector<string> toks(splitn(line.begin(), line.end(), ':'));
+                if (3 == toks.size())
+                    passwd.insert(make_pair(make_pair(toks[0], toks[1]),
+                                            toks[2]));
+            }
+        }
+    }
+
+    void
+    loadservices(set<string>& services)
+    {
+        const char* s(mod::getenv("session.http.services"));
+        if (s) {
+            istringstream is(s);
+            copy(istream_iterator<string>(is), istream_iterator<string>(),
+                 inserter(services, services.begin()));
         }
     }
 }
@@ -74,16 +129,26 @@ namespace {
 void
 options::load()
 {
+    string css;
     map<string, string> mimetypes;
-    setmimetypes(mimetypes);
+    map<pair<string, string>, string> passwd;
+    set<string> services;
+
+    loadcss(css);
+    loadmimetypes(mimetypes);
+    loadpasswd(passwd);
+    loadservices(services);
 
     // Commit.
 
+    css_.swap(css);
     mimetypes_.swap(mimetypes);
+    passwd_.swap(passwd);
+    services_.swap(services);
 }
 
 string
-options::mimetype(const string& path)
+options::mimetype(const string& path) const
 {
     string type("text/plain");
 
@@ -98,4 +163,16 @@ options::mimetype(const string& path)
     }
 
     return type;
+}
+
+bool
+options::passwd(const string& user, const string& realm, string& digest)
+{
+    map<pair<string, string>, string>
+        ::const_iterator it(passwd_.find(make_pair(user, realm)));
+    if (it == passwd_.end())
+        return false;
+
+    digest = it->second;
+    return true;
 }
