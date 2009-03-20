@@ -46,6 +46,8 @@
 #include <map>
 #include <sstream>
 
+#include <time.h>
+
 using namespace aug;
 using namespace mod;
 using namespace std;
