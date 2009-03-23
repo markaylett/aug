@@ -25,7 +25,9 @@
 
 #include "exception.hpp"
 
+#include "augutilpp/path.hpp"
 #include "augutilpp/string.hpp"
+
 #include "augsyspp/mmap.hpp"
 #include "augsyspp/unistd.hpp"
 #include "augsyspp/smartfd.hpp"
@@ -152,9 +154,10 @@ aug::jointype(const vector<string>& nodes)
 }
 
 string
-aug::joinpath(const char* root, const vector<string>& nodes)
+aug::joinpath(const vector<string>& nodes)
 {
-    string path(root);
+    const char* s = mod::getenv("htdocs", "htdocs");
+    string path(abspath(mod::getenv("rundir"), s));
     struct _stat sb;
 
     vector<string>::const_iterator it(nodes.begin()), end(nodes.end());

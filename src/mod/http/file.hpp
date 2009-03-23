@@ -37,7 +37,7 @@ namespace aug {
     jointype(const std::vector<std::string>& nodes);
 
     std::string
-    joinpath(const char* root, const std::vector<std::string>& nodes);
+    joinpath(const std::vector<std::string>& nodes);
 
     std::vector<std::string>
     splitpath(const std::string& path);

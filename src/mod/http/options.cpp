@@ -83,7 +83,7 @@ namespace {
         const char* s(mod::getenv("session.http.mimetypes"));
         if (s) {
             string path(abspath(mod::getenv("rundir"), s));
-            readconf(path.c_str(), confcb<mimecb>, null);
+            readconf(path.c_str(), confcb<mimecb>, &mimetypes);
         }
     }
 

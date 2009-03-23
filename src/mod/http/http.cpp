@@ -365,8 +365,6 @@ namespace {
         {
             // TODO: externalise root directory path.
 
-            static const char ROOT[] = "./htdocs";
-
             if (sessid_.empty()) {
 
                 const void* value;
@@ -475,7 +473,7 @@ namespace {
 
                     // Static file system content.
 
-                    string path(joinpath(ROOT, nodes));
+                    string path(joinpath(nodes));
                     aug_ctxinfo(aug_tlx, "path [%s]", path.c_str());
 
                     blobptr blob(getfile(path.c_str()));
