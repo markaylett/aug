@@ -600,6 +600,17 @@ blob_release_(aug_blob* obj)
     release_(impl);
 }
 
+static const char*
+gettype_(aug_blob* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, blob_, obj);
+    const void* value;
+    if (!AUG_ISSUCCESS(aug_getfieldp_(impl->seq_, &impl->info_,
+                                      "Content-Type", &value)))
+        value = "application/octet-stream";
+    return value;
+}
+
 static const void*
 getdata_(aug_blob* obj, size_t* size)
 {
@@ -626,6 +637,7 @@ static const struct aug_blobvtbl blobvtbl_ = {
     blob_cast_,
     blob_retain_,
     blob_release_,
+    gettype_,
     getdata_,
     getsize_
 };

@@ -297,11 +297,15 @@ namespace {
             unsigned size(0);
             const char* value(static_cast<
                               const char*>(header.getfield(it, size)));
-            message << *it << ": ";
-            message.write(value, size) << "\r\n";
+            // Skip Content-Type.
+            if (0 != strcmp(*it, "Content-Type")) {
+                message << *it << ": ";
+                message.write(value, size) << "\r\n";
+            }
         }
 
-        message << "Content-Length: " << static_cast<unsigned>(size)
+        message << "Content-Type: " << getblobtype(blob) << "\r\n"
+                << "Content-Length: " << static_cast<unsigned>(size)
                 << "\r\n\r\n";
 
         send(id, message.str().c_str(), message.str().size());
@@ -315,7 +319,7 @@ namespace {
 
     void
     respond(mod_id id, const string& sessid, int code, const string& status,
-            const string& mimetype, blobref blob, bool close)
+            blobref blob, bool close)
     {
         const size_t size(getblobsize(blob));
 
@@ -323,7 +327,7 @@ namespace {
         message << "HTTP/1.1 " << code << ' ' << status << "\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n"
-                << "Content-Type: " << mimetype << "\r\n"
+                << "Content-Type: " << getblobtype(blob) << "\r\n"
                 << "Content-Length: " << static_cast<unsigned>(size)
                 << "\r\n\r\n";
 
@@ -476,9 +480,9 @@ namespace {
                     string path(joinpath(nodes));
                     aug_ctxinfo(aug_tlx, "path [%s]", path.c_str());
 
-                    blobptr blob(getfile(path.c_str()));
-                    respond(id_, sessid_, 200, "OK", options_.mimetype(path),
-                            blob, close);
+                    blobptr blob(getfile(options_.mimetype(path),
+                                         path.c_str()));
+                    respond(id_, sessid_, 200, "OK", blob, close);
                 }
 
             } catch (const http_error& e) {
@@ -545,12 +549,20 @@ namespace {
         do_event(mod_id id, const char* from, const char* type,
                  aug_object_* ob)
         {
-            smartob<aug_mar> mar(object_cast<aug_mar>(obptr(ob)));
-            if (null != mar) {
-                active::const_iterator it(active_.find(id));
-                if (it != active_.end())
+            active::const_iterator it(active_.find(id));
+            if (it != active_.end()) {
+
+                marptr mar(object_cast<aug_mar>(obptr(ob)));
+                if (null != mar) {
                     respond(id, it->second.first, 200, "OK", mar,
                             it->second.second);
+                } else {
+
+                    blobptr blob(object_cast<aug_blob>(obptr(ob)));
+                    if (null != blob)
+                        respond(id, it->second.first, 200, "OK", blob,
+                                it->second.second);
+                }
             }
         }
         void

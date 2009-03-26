@@ -31,7 +31,7 @@
 namespace aug {
 
     blobptr
-    getfile(const char* path);
+    getfile(const std::string& type, const char* path);
 
     std::string
     jointype(const std::vector<std::string>& nodes);

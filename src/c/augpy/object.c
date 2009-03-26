@@ -66,6 +66,12 @@ releaseblob_(aug_blob* ob)
     }
 }
 
+static const char*
+getblobtype_(aug_blob* ob)
+{
+    return "application/octet-stream";
+}
+
 static const void*
 getblobdata_(aug_blob* ob, size_t* size)
 {
@@ -96,6 +102,7 @@ static const struct aug_blobvtbl blobvtbl_ = {
     castblob_,
     retainblob_,
     releaseblob_,
+    getblobtype_,
     getblobdata_,
     getblobsize_
 };

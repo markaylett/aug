@@ -25,10 +25,6 @@
 
   <quotincl>augtypes.h</quotincl>
 
-  <verbatim>
-struct aug_field;
-  </verbatim>
-
   <interface name="mar">
 
     <method name="compact" type="aug_result" qname="compactmar">

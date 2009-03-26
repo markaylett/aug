@@ -51,6 +51,11 @@ namespace aug {
             : s_(s)
         {
         }
+        const char*
+        getblobtype_()
+        {
+            return "application/octet-stream";
+        }
         const void*
         getblobdata_(size_t& size)
         {

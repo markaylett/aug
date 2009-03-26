@@ -24,6 +24,11 @@
 <package name="aug" dir="augext">
 
   <interface name="blob">
+
+    <method name="gettype" type="const char*" qname="getblobtype">
+      @return The blob's mime-type.
+    </method>
+
     <method name="getdata" type="const void*" qname="getblobdata">
 
       Get pointer to blob data.

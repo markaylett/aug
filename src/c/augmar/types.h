@@ -35,25 +35,6 @@
 #include <stdarg.h>
 
 /**
- * The field structure.
- */
-
-struct aug_field {
-    /**
-     * The field name.
-     */
-    const char* name_;
-    /**
-     * A pointer to the field's value.
-     */
-    const void* value_;
-    /**
-     * The size of the field's value.
-     */
-    unsigned size_;
-};
-
-/**
  * @defgroup OpenFlags Open Flags
  *
  * @ingroup Constants

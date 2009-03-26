@@ -60,6 +60,25 @@ typedef int aug_bool;
 typedef unsigned aug_len_t;
 
 /**
+ * The field structure.
+ */
+
+struct aug_field {
+    /**
+     * The field name.
+     */
+    const char* name_;
+    /**
+     * A pointer to the field's value.
+     */
+    const void* value_;
+    /**
+     * The size of the field's value.
+     */
+    unsigned size_;
+};
+
+/**
  * @defgroup TypesResult Result Codes
  *
  * @ingroup Types

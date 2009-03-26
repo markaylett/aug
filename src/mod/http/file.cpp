@@ -81,13 +81,15 @@ namespace {
 
     class filecontent : public ref_base, public mpool_ops {
         blob<filecontent> blob_;
+        const string type_;
         autofd sfd_;
         mmap mmap_;
         ~filecontent() AUG_NOTHROW
         {
         }
-        filecontent(mpoolref mpool, const char* path)
-            : sfd_(aug::open(path, O_RDONLY)),
+        filecontent(mpoolref mpool, const string& type, const char* path)
+            : type_(type),
+              sfd_(aug::open(path, O_RDONLY)),
               mmap_(mpool, sfd_, 0, 0, AUG_MMAPRD)
         {
             blob_.reset(this);
@@ -99,6 +101,11 @@ namespace {
             if (equalid<aug_object>(id) || equalid<aug_blob>(id))
                 return object_retain<aug_object>(blob_);
             return null;
+        }
+        const char*
+        getblobtype_()
+        {
+            return type_.c_str();
         }
         const void*
         getblobdata_(size_t& size) AUG_NOTHROW
@@ -112,9 +119,10 @@ namespace {
             return mmap_.len();
         }
         static smartob<aug_blob>
-        create(const char* path)
+        create(const string& type, const char* path)
         {
-            filecontent* ptr = new (tlx) filecontent(getmpool(aug_tlx), path);
+            filecontent* ptr
+                = new (tlx) filecontent(getmpool(aug_tlx), type, path);
             return object_attach<aug_blob>(ptr->blob_);
         }
     };
@@ -135,9 +143,9 @@ namespace {
 }
 
 blobptr
-aug::getfile(const char* path)
+aug::getfile(const string& type, const char* path)
 {
-    return filecontent::create(path);
+    return filecontent::create(type, path);
 }
 
 string

@@ -23,11 +23,13 @@
 
 <package name="aug" dir="augext">
 
+  <quotincl>augtypes.h</quotincl>
+
   <verbatim>struct aug_var;</verbatim>
 
   <interface name="iter">
-    <method name="getlast" type="int" qname="getiterlast"/>
-    <method name="getnext" type="int" qname="getiternext"/>
+    <method name="islast" type="aug_bool" qname="isiterlast"/>
+    <method name="next" type="void" qname="nextiter"/>
     <method name="getkey" type="aug_result" qname="getiterkey">
       <param name="var" type="struct aug_var&"/>
     </method>

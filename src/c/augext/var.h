@@ -37,9 +37,7 @@ enum aug_vartype {
     AUG_VTINT64,
     AUG_VTBOOL,
     AUG_VTDOUBLE,
-    AUG_VTTIME,
     AUG_VTOBJECT,
-    AUG_VTSTRING,
     AUG_VTBLOB,
     AUG_VTSEQ
 };
@@ -51,7 +49,6 @@ struct aug_var {
         int32_t i32_;
         int64_t i64_;
         double dbl_;
-        time_t utc_;
         aug_object* ob_;
         aug_blob* blob_;
         aug_seq* seq_;
@@ -63,9 +60,7 @@ struct aug_var {
 #define AUG_VARINT64(x) ((x)->u_.i64_)
 #define AUG_VARBOOL(x) ((x)->u_.int_)
 #define AUG_VARDOUBLE(x) ((x)->u_.dbl_)
-#define AUG_VARTIME(x) ((x)->u_.utc_)
 #define AUG_VAROBJECT(x) ((x)->u_.ob_)
-#define AUG_VARSTRING(x) ((x)->u_.blob_)
 #define AUG_VARBLOB(x) ((x)->u_.blob_)
 #define AUG_VARSEQ(x) ((x)->u_.seq_)
 

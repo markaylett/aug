@@ -72,6 +72,11 @@ namespace aug {
                     size_ = 0;
                 return 0;
             }
+            const char*
+            getblobtype_()
+            {
+                return "application/octet-stream";
+            }
             const void*
             getblobdata_(size_t& size) AUG_NOTHROW
             {

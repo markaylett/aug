@@ -41,6 +41,11 @@ namespace {
     const char MSG[] = "hello, world!\r\n";
 
     struct helloblob : aug::mpool_ops {
+        const char*
+        getblobtype_()
+        {
+            return "application/octet-stream";
+        }
         static const void*
         getblobdata_(size_t& size) AUG_NOTHROW
         {
