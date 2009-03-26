@@ -297,7 +297,9 @@ namespace {
             unsigned size(0);
             const char* value(static_cast<
                               const char*>(header.getfield(it, size)));
-            // Skip Content-Type.
+
+            // Skip Content-Type - specified in blob.
+
             if (0 != strcmp(*it, "Content-Type")) {
                 message << *it << ": ";
                 message.write(value, size) << "\r\n";
@@ -323,11 +325,14 @@ namespace {
     {
         const size_t size(getblobsize(blob));
 
+        // Assume no-cache for blobs.
+
         stringstream message;
         message << "HTTP/1.1 " << code << ' ' << status << "\r\n"
                 << "Date: " << utcdate() << "\r\n"
                 << "Set-Cookie: X-Aug-Session=" << sessid << "\r\n"
-                << "Content-Type: " << getblobtype(blob) << "\r\n"
+                   "Cache-Control: no-cache\r\n"
+                   "Content-Type: " << getblobtype(blob) << "\r\n"
                 << "Content-Length: " << static_cast<unsigned>(size)
                 << "\r\n\r\n";
 
