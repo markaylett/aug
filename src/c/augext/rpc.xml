@@ -23,11 +23,11 @@
 
 <package name="aug" dir="augext">
 
-  <quotincl>augext/seq.h</quotincl>
+  <quotincl>augext/array.h</quotincl>
 
   <interface name="rpc">
     <method name="getmethod" type="const char*" qname="getrpcmethod"/>
-    <method name="getargs" type="aug_seq" object="true" qname="getrpcargs"/>
+    <method name="getargs" type="aug_array" object="true" qname="getrpcargs"/>
   </interface>
 
 </package>

@@ -38,13 +38,14 @@ AUG_RCSID("$Id$");
 #endif /* _WIN32 */
 
 static void*
-resize_(aug_seq_t seq, struct aug_info_* info, unsigned bsize, int trunct)
+resize_(aug_seq_t seq, struct aug_info_* info, unsigned bsize,
+        aug_bool trunc)
 {
     char* addr;
     if (AUG_ISFAIL(aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_)))
         return NULL;
 
-    if (info->bsize_ == bsize || (info->bsize_ > bsize && !trunct))
+    if (info->bsize_ == bsize || (info->bsize_ > bsize && !trunc))
         return aug_seqaddr_(seq);
 
     if (!(addr = aug_resizeseq_(seq, bsize)))
@@ -61,7 +62,7 @@ AUG_EXTERNC aug_result
 aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
                 unsigned size)
 {
-    char* addr = resize_(seq, info, size, 1);
+    char* addr = resize_(seq, info, size, AUG_TRUE);
     if (!addr)
         return AUG_FAILERROR;
 
@@ -72,14 +73,14 @@ aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
 AUG_EXTERNC aug_result
 aug_truncate_(aug_seq_t seq, struct aug_info_* info, unsigned size)
 {
-    return resize_(seq, info, size, 1) ? AUG_SUCCESS : AUG_FAILERROR;
+    return resize_(seq, info, size, AUG_TRUE) ? AUG_SUCCESS : AUG_FAILERROR;
 }
 
 AUG_EXTERNC aug_rsize
 aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
            const void* buf, unsigned len)
 {
-    char* addr = resize_(seq, info, offset + len, 0);
+    char* addr = resize_(seq, info, offset + len, AUG_FALSE);
     if (!addr)
         return AUG_FAILERROR;
 

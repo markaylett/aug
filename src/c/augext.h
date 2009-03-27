@@ -29,6 +29,7 @@
  * Extension interface library.
  */
 
+#include "augext/array.h"
 #include "augext/blob.h"
 #include "augext/boxint.h"
 #include "augext/boxptr.h"
@@ -37,13 +38,11 @@
 #include "augext/ctx.h"
 #include "augext/err.h"
 #include "augext/http.h"
-#include "augext/iter.h"
 #include "augext/log.h"
 #include "augext/mar.h"
 #include "augext/mpool.h"
 #include "augext/msg.h"
 #include "augext/rpc.h"
-#include "augext/seq.h"
 #include "augext/stream.h"
 #include "augext/task.h"
 #include "augext/var.h"

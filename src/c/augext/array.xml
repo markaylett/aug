@@ -23,41 +23,39 @@
 
 <package name="aug" dir="augext">
 
-  <quotincl>augext/iter.h</quotincl>
+  <quotincl>augtypes.h</quotincl>
 
-  <interface name="seq">
+  <verbatim>struct aug_var;</verbatim>
 
-    Read-only, base interface for all container types.  Suitable for both
-    sequential and associative containers.
+  <interface name="array">
 
-    <method name="getvalue" type="aug_result" qname="getseqvalue">
+    Read-only array interface.
 
-      Get item specified by @a key.
+    <method name="gettype" type="aug_rint" qname="getarraytype">
+
+      Get type at index @a n.
+
+      @param n Array index.
+
+      @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
+
+      <param name="n" type="unsigned"/>
+    </method>
+
+    <method name="getvalue" type="aug_result" qname="getarrayvalue">
+
+      Get value at index @a n.
+
+      @param n Array index.
 
       @param value Output value.
 
-      @param key Value's key.
+      @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
 
-      @return See @ref TypesResult.
-
+      <param name="n" type="unsigned"/>
       <param name="value" type="struct aug_var&"/>
-      <param name="key" type="const struct aug_var&"/>
     </method>
-    <method name="getfirst" type="aug_iter" object="true" qname="getseqfirst">
-
-      Get first item.
-
-      @return Iterator, or NULL on error.
-
-    </method>
-    <method name="isempty" type="int" qname="isseqempty">
-
-      Is empty test.
-
-      @return True if empty.
-
-    </method>
-    <method name="getsize" type="unsigned" qname="getseqsize">
+    <method name="getsize" type="unsigned" qname="getarraysize">
 
       Get number of items.
 

@@ -198,6 +198,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 EXTRA_DIST = \
+	array.xml \
 	blob.xml \
 	boxint.xml \
 	boxptr.xml \
@@ -206,18 +207,17 @@ EXTRA_DIST = \
 	ctx.xml \
 	err.xml \
 	http.xml \
-	iter.xml \
 	log.xml \
 	mar.xml \
 	mpool.xml \
 	msg.xml \
 	rpc.xml \
-	seq.xml \
 	stream.xml \
 	task.xml
 
 modincludedir = $(includedir)/augext
 modinclude_HEADERS = \
+	array.h \
 	blob.h \
 	boxint.h \
 	boxptr.h \
@@ -226,18 +226,17 @@ modinclude_HEADERS = \
 	ctx.h \
 	err.h \
 	http.h \
-	iter.h \
 	log.h \
 	mar.h \
 	mpool.h \
 	msg.h \
 	rpc.h \
-	seq.h \
 	stream.h \
 	task.h \
 	var.h
 
 @WITH_RUBY_TRUE@BUILT_SOURCES = \
+@WITH_RUBY_TRUE@	array.h \
 @WITH_RUBY_TRUE@	blob.h \
 @WITH_RUBY_TRUE@	boxint.h \
 @WITH_RUBY_TRUE@	boxptr.h \
@@ -246,13 +245,11 @@ modinclude_HEADERS = \
 @WITH_RUBY_TRUE@	ctx.h \
 @WITH_RUBY_TRUE@	err.h \
 @WITH_RUBY_TRUE@	http.h \
-@WITH_RUBY_TRUE@	iter.h \
 @WITH_RUBY_TRUE@	log.h \
 @WITH_RUBY_TRUE@	mar.h \
 @WITH_RUBY_TRUE@	mpool.h \
 @WITH_RUBY_TRUE@	msg.h \
 @WITH_RUBY_TRUE@	rpc.h \
-@WITH_RUBY_TRUE@	seq.h \
 @WITH_RUBY_TRUE@	stream.h \
 @WITH_RUBY_TRUE@	task.h
 

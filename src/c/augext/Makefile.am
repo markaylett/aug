@@ -1,4 +1,5 @@
 EXTRA_DIST = \
+	array.xml \
 	blob.xml \
 	boxint.xml \
 	boxptr.xml \
@@ -7,18 +8,17 @@ EXTRA_DIST = \
 	ctx.xml \
 	err.xml \
 	http.xml \
-	iter.xml \
 	log.xml \
 	mar.xml \
 	mpool.xml \
 	msg.xml \
 	rpc.xml \
-	seq.xml \
 	stream.xml \
 	task.xml
 
 modincludedir = $(includedir)/augext
 modinclude_HEADERS = \
+	array.h \
 	blob.h \
 	boxint.h \
 	boxptr.h \
@@ -27,19 +27,18 @@ modinclude_HEADERS = \
 	ctx.h \
 	err.h \
 	http.h \
-	iter.h \
 	log.h \
 	mar.h \
 	mpool.h \
 	msg.h \
 	rpc.h \
-	seq.h \
 	stream.h \
 	task.h \
 	var.h
 
 if WITH_RUBY
 BUILT_SOURCES = \
+	array.h \
 	blob.h \
 	boxint.h \
 	boxptr.h \
@@ -48,13 +47,11 @@ BUILT_SOURCES = \
 	ctx.h \
 	err.h \
 	http.h \
-	iter.h \
 	log.h \
 	mar.h \
 	mpool.h \
 	msg.h \
 	rpc.h \
-	seq.h \
 	stream.h \
 	task.h
 

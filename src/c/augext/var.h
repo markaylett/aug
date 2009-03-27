@@ -25,44 +25,49 @@
 
 #include "augconfig.h"
 
+#include "augext/array.h"
 #include "augext/blob.h"
-#include "augext/seq.h"
 
 #include <time.h>
 
 enum aug_vartype {
     AUG_VTNULL,
-    AUG_VTINT,
     AUG_VTINT32,
     AUG_VTINT64,
-    AUG_VTBOOL,
     AUG_VTDOUBLE,
+    AUG_VTBOOL,
     AUG_VTOBJECT,
+    AUG_VTARRAY,
     AUG_VTBLOB,
-    AUG_VTSEQ
+
+    /**
+     * String is actually a blob that is guaranteed to be null terminated.
+     */
+
+    AUG_VTSTRING
 };
 
 struct aug_var {
     enum aug_vartype type_;
     union {
-        int int_;
         int32_t i32_;
         int64_t i64_;
         double dbl_;
+        aug_bool bool_;
         aug_object* ob_;
+        aug_array* array_;
         aug_blob* blob_;
-        aug_seq* seq_;
     } u_;
 };
 
-#define AUG_VARINT(x) ((x)->u_.int_)
 #define AUG_VARINT32(x) ((x)->u_.i32_)
 #define AUG_VARINT64(x) ((x)->u_.i64_)
-#define AUG_VARBOOL(x) ((x)->u_.int_)
 #define AUG_VARDOUBLE(x) ((x)->u_.dbl_)
+#define AUG_VARBOOL(x) ((x)->u_.bool_)
 #define AUG_VAROBJECT(x) ((x)->u_.ob_)
+#define AUG_VARARRAY(x) ((x)->u_.array_)
 #define AUG_VARBLOB(x) ((x)->u_.blob_)
-#define AUG_VARSEQ(x) ((x)->u_.seq_)
+#define AUG_VARSTRING(x) ((x)->u_.blob_)
 
 #define AUG_RETAINVAR(x) \
 do { \
