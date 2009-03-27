@@ -33,12 +33,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0EFFD6A6E92643DEB3CD39A818959E4C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -130,12 +124,6 @@
         "Entry"
         {
         "MsmKey" = "8:_2BA44DF489104AB58C5C145BD2D1CA1A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_2DB68ACA16A8494883F5E9415CB94083"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -485,6 +473,12 @@
         {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_13E6B1C83A89403A8E1502B4C933AEE7"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_853287A896F24059B95D329948D4B6B6"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1013,26 +1007,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_0EFFD6A6E92643DEB3CD39A818959E4C"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\iter.h"
-            "TargetName" = "8:iter.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_1040750E744432A8009F0754577BB289"
             {
             "SourcePath" = "8:python25.dll"
@@ -1239,26 +1213,6 @@
             "TargetName" = "8:serverreq.pem"
             "Tag" = "8:"
             "Folder" = "8:_D23077110041428BA2CF82B2E531E609"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_2DB68ACA16A8494883F5E9415CB94083"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\seq.h"
-            "TargetName" = "8:seq.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1951,6 +1905,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{A582A373-4685-4296-BEFE-614B80A702C3}:_853287A896F24059B95D329948D4B6B6"
+            {
+            "SourcePath" = "8:..\\src\\c\\augext\\array.h"
+            "TargetName" = "8:array.h"
+            "Tag" = "8:"
+            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_8C62ACFB11A543E4A3F1D06B866DAAD2"
