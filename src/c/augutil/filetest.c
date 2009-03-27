@@ -23,6 +23,8 @@
 #include "augutil.h"
 #include "augctx.h"
 
+#include <stdlib.h> /* exit() */
+
 static aug_result
 cb_(void* arg, const char* key, const char* value)
 {
