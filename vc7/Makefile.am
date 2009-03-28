@@ -4,6 +4,7 @@ EXTRA_DIST = \
 	augctx.vcproj \
 	augctxpp.vcproj \
 	augd.vcproj \
+	aught.vcproj \
 	augmar.vcproj \
 	augmarpp.vcproj \
 	augnet.vcproj \
@@ -22,7 +23,6 @@ EXTRA_DIST = \
 	command.vcproj \
 	example.vcproj \
 	htdigest.vcproj \
-	http.vcproj \
 	mar.vcproj \
 	minimal.vcproj \
 	sched.vcproj \
