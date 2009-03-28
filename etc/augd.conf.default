@@ -18,13 +18,20 @@ loglevel=4
 
 sessions=http sched pyskel pyecho pyproxy
 
-session.http.module=http
+session.http.module=aught
 session.http.serv=8080
 session.http.css=htdocs/aug.css
 session.http.mimetypes=etc/mimetypes.conf
 session.http.passwd=etc/passwd.txt
 session.http.realm=testrealm@host.com
 session.http.salt=some random phrase
+session.http.services=\
+  service/reconf\
+  service/sched/delevent\
+  service/sched/putevent\
+  service/sched/putevent\
+  service/sched/events\
+  service/xmlrpc/test
 
 session.sched.groups=http-request
 session.sched.module=sched
@@ -48,6 +55,6 @@ session.pyclient.to=7002
 module.augpy.path=mod/modaugpy
 module.augpy.pythonpath=python
 
-module.http.path=mod/modaught
+module.aught.path=mod/modaught
 module.sched.path=mod/modsched
 module.augskel.path=mod/modskel
