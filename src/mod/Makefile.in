@@ -200,7 +200,8 @@ to_host_path_cmd = @to_host_path_cmd@
 to_tool_path_cmd = @to_tool_path_cmd@
 SUBDIRS = \
 	aught \
-	augpy
+	augpy \
+	augrb
 
 all: all-recursive
 
@@ -510,7 +511,6 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
 	uninstall uninstall-am uninstall-info-am
 
-	augrb
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

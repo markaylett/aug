@@ -1,4 +1,4 @@
 SUBDIRS = \
 	aught \
-	augpy
+	augpy \
 	augrb
