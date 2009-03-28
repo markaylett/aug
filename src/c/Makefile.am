@@ -4,8 +4,6 @@ SUBDIRS = \
 	augctx \
 	augsys \
 	augmar \
-	augpy \
-	augrb \
 	augres \
 	augutil \
 	augserv \

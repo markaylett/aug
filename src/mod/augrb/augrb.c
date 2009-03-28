@@ -28,7 +28,7 @@ AUG_RCSID("$Id$");
 #include <assert.h>
 #include <ctype.h>        /* tolower() */
 
-#include "augrb/object.h" /* Redefines _MSC_VER. */
+#include "object.h" /* Redefines _MSC_VER. */
 
 /* The bit fields indicate those functions implemented by the session. */
 

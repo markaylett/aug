@@ -1,2 +1,4 @@
 SUBDIRS = \
-	http
+	aught \
+	augpy
+	augrb

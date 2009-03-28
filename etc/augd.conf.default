@@ -48,7 +48,6 @@ session.pyclient.to=7002
 module.augpy.path=mod/modaugpy
 module.augpy.pythonpath=python
 
-module.http.path=mod/modhttp
+module.http.path=mod/modaught
 module.sched.path=mod/modsched
 module.augskel.path=mod/modskel
-module.augskelpp.path=mod/modskelpp

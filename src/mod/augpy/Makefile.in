@@ -38,9 +38,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 LIBOBJDIR =
-DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/src/cpp/lang.mk
-subdir = src/mod/http
+DIST_COMMON = $(am__noinst_HEADERS_DIST) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(top_srcdir)/src/c/lang.mk
+subdir = src/mod/augpy
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -57,25 +57,24 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(moddir)"
 modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
-modhttp_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la \
-	$(top_builddir)/src/c/augctx/libaugctx.la
-am_modhttp_la_OBJECTS = exception.lo file.lo http.lo options.lo
-modhttp_la_OBJECTS = $(am_modhttp_la_OBJECTS)
+modaugpy_la_DEPENDENCIES =
+am__modaugpy_la_SOURCES_DIST = augpy.c host.c object.c
+@WITH_PYTHON_TRUE@am_modaugpy_la_OBJECTS = augpy.lo host.lo object.lo
+modaugpy_la_OBJECTS = $(am_modaugpy_la_OBJECTS)
+@WITH_PYTHON_TRUE@am_modaugpy_la_rpath = -rpath $(moddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CXXFLAGS) $(CXXFLAGS)
-CXXLD = $(CXX)
-CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(modhttp_la_SOURCES)
-DIST_SOURCES = $(modhttp_la_SOURCES)
+	$(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+SOURCES = $(modaugpy_la_SOURCES)
+DIST_SOURCES = $(am__modaugpy_la_SOURCES_DIST)
+am__noinst_HEADERS_DIST = host.h object.h
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -86,6 +85,7 @@ AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
+AR_FLAGS = @AR_FLAGS@
 AS = @AS@
 AUG_WIN32_FALSE = @AUG_WIN32_FALSE@
 AUG_WIN32_TRUE = @AUG_WIN32_TRUE@
@@ -135,6 +135,8 @@ LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
+LT_AR = @LT_AR@
+LT_ARFLAGS = @LT_ARFLAGS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
@@ -168,6 +170,7 @@ WITH_RUBY_FALSE = @WITH_RUBY_FALSE@
 WITH_RUBY_TRUE = @WITH_RUBY_TRUE@
 WITH_SSL_FALSE = @WITH_SSL_FALSE@
 WITH_SSL_TRUE = @WITH_SSL_TRUE@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
@@ -204,7 +207,6 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
-lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -216,41 +218,32 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-SUFFIXES = .cpp .hpp .idl
+to_host_path_cmd = @to_host_path_cmd@
+to_tool_path_cmd = @to_tool_path_cmd@
 ACLOCAL_AMFLAGS = -Im4
 DEFAULT_INCLUDES = \
 	-I$(top_srcdir)/src \
-	-I$(top_srcdir)/src/c \
-	-I$(top_srcdir)/src/cpp
-
-noinst_HEADERS = \
-	exception.hpp \
-	file.hpp \
-	options.hpp
+	-I$(top_srcdir)/src/c
 
 moddir = $(prefix)/mod
-mod_LTLIBRARIES = \
-	modhttp.la
+@WITH_PYTHON_TRUE@AM_CFLAGS = $(PY_CFLAGS)
+@WITH_PYTHON_TRUE@noinst_HEADERS = \
+@WITH_PYTHON_TRUE@	host.h \
+@WITH_PYTHON_TRUE@	object.h
 
-modhttp_la_SOURCES = \
-	exception.cpp \
-	file.cpp \
-	http.cpp \
-	options.cpp
+@WITH_PYTHON_TRUE@mod_LTLIBRARIES = modaugpy.la
+@WITH_PYTHON_TRUE@modaugpy_la_SOURCES = \
+@WITH_PYTHON_TRUE@	augpy.c \
+@WITH_PYTHON_TRUE@	host.c \
+@WITH_PYTHON_TRUE@	object.c
 
-modhttp_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
-modhttp_la_LIBADD = \
-	$(top_builddir)/src/c/augnet/libaugnet.la \
-	$(top_builddir)/src/c/augutil/libaugutil.la \
-	$(top_builddir)/src/c/augmar/libaugmar.la \
-	$(top_builddir)/src/c/augsys/libaugsys.la \
-	$(top_builddir)/src/c/augctx/libaugctx.la
-
+@WITH_PYTHON_TRUE@modaugpy_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined $(PY_LDFLAGS)
+@WITH_PYTHON_TRUE@modaugpy_la_LIBADD = 
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .hpp .idl .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/src/cpp/lang.mk $(am__configure_deps)
+.SUFFIXES: .c .lo .o .obj
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/src/c/lang.mk $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -259,9 +252,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/mod/http/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/mod/augpy/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  src/mod/http/Makefile
+	  $(AUTOMAKE) --foreign  src/mod/augpy/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -306,8 +299,8 @@ clean-modLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-modhttp.la: $(modhttp_la_OBJECTS) $(modhttp_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(moddir) $(modhttp_la_LDFLAGS) $(modhttp_la_OBJECTS) $(modhttp_la_LIBADD) $(LIBS)
+modaugpy.la: $(modaugpy_la_OBJECTS) $(modaugpy_la_DEPENDENCIES) 
+	$(LINK) $(am_modaugpy_la_rpath) $(modaugpy_la_LDFLAGS) $(modaugpy_la_OBJECTS) $(modaugpy_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -315,31 +308,30 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augpy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/host.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 
-.cpp.o:
-@am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
+.c.o:
+@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c $<
 
-.cpp.obj:
-@am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+.c.obj:
+@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
-.cpp.lo:
-@am__fastdepCXX_TRUE@	if $(LTCXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+.c.lo:
+@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -400,7 +392,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../../../src/cpp
+	$(mkdir_p) $(distdir)/../../../src/c
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

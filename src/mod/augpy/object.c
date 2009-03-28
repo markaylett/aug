@@ -21,7 +21,7 @@
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #define MOD_BUILD
-#include "augpy/object.h"
+#include "object.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");

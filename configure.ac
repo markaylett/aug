@@ -310,8 +310,6 @@ AC_CONFIG_FILES([Makefile
                  src/c/augext/Makefile
                  src/c/augmar/Makefile
                  src/c/augnet/Makefile
-                 src/c/augpy/Makefile
-                 src/c/augrb/Makefile
                  src/c/augres/Makefile
                  src/c/augas/Makefile
                  src/c/augserv/Makefile
@@ -337,7 +335,9 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augd/test/Makefile
                  src/cpp/htdigest/Makefile
                  src/mod/Makefile
-                 src/mod/http/Makefile
+                 src/mod/aught/Makefile
+                 src/mod/augpy/Makefile
+                 src/mod/augrb/Makefile
                  src/pl/Makefile
                  src/py/Makefile
                  src/rb/Makefile

@@ -20,5 +20,27 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#define MOD_BUILD
-#include "exception.hpp"
+#ifndef AUGHT_FILE_HPP
+#define AUGHT_FILE_HPP
+
+#include "augext/blob.h"
+
+#include <string>
+#include <vector>
+
+namespace aug {
+
+    blobptr
+    getfile(const std::string& type, const char* path);
+
+    std::string
+    jointype(const std::vector<std::string>& nodes);
+
+    std::string
+    joinpath(const std::vector<std::string>& nodes);
+
+    std::vector<std::string>
+    splitpath(const std::string& path);
+}
+
+#endif // AUGHT_FILE_HPP

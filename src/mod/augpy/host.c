@@ -21,12 +21,12 @@
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #define MOD_BUILD
-#include "augpy/host.h"
+#include "host.h"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
 
-#include "augpy/object.h"
+#include "object.h"
 
 static PyTypeObject* type_ = NULL;
 

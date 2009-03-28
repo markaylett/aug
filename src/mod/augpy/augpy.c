@@ -25,8 +25,8 @@
 
 AUG_RCSID("$Id$");
 
-#include "augpy/host.h"
-#include "augpy/object.h"
+#include "host.h"
+#include "object.h"
 
 #if defined(_WIN32)
 # include <direct.h>

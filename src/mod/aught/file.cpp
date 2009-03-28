@@ -22,6 +22,9 @@
 */
 #define MOD_BUILD
 #include "file.hpp"
+#include "augctx/defs.h"
+
+AUG_RCSID("$Id$");
 
 #include "exception.hpp"
 

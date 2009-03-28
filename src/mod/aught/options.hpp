@@ -20,27 +20,46 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef HTTP_FILE_HPP
-#define HTTP_FILE_HPP
+#ifndef AUGHT_OPTIONS_HPP
+#define AUGHT_OPTIONS_HPP
 
-#include "augext/blob.h"
-
+#include <map>
+#include <set>
 #include <string>
-#include <vector>
 
 namespace aug {
 
-    blobptr
-    getfile(const std::string& type, const char* path);
+    class options {
 
-    std::string
-    jointype(const std::vector<std::string>& nodes);
+        std::string css_;
+        std::map<std::string, std::string> mimetypes_;
+        std::map<std::pair<std::string, std::string>, std::string> passwd_;
+        std::set<std::string> services_;
 
-    std::string
-    joinpath(const std::vector<std::string>& nodes);
+    public:
 
-    std::vector<std::string>
-    splitpath(const std::string& path);
+        void
+        load();
+
+        const std::string&
+        css() const
+        {
+            return css_;
+        }
+
+        std::string
+        mimetype(const std::string& path) const;
+
+        bool
+        passwd(const std::string& user, const std::string& realm,
+               std::string& digest);
+
+        bool
+        service(const std::string& name) const
+        {
+            return services_.find(name) != services_.end();
+        }
+    };
 }
 
-#endif // HTTP_FILE_HPP
+#endif // AUGHT_OPTIONS_HPP

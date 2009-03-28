@@ -122,14 +122,20 @@
 			ReferencedProjectIdentifier="{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}"
 			Name="augaspp"/>
 		<ProjectReference
+			ReferencedProjectIdentifier="{92F25AEF-8262-45A5-9181-FADF6170743C}"
+			Name="aught"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
+			Name="augpy"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{AB4EA74B-84B3-4ED6-88FA-49151967A19D}"
+			Name="augrb"/>
+		<ProjectReference
 			ReferencedProjectIdentifier="{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}"
 			Name="client"/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{00693485-BCE3-4FCA-910E-3D2A2099F756}"
 			Name="command"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{92F25AEF-8262-45A5-9181-FADF6170743C}"
-			Name="http"/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{E980D9AD-ACCD-4D21-A2E1-24E00913F725}"
 			Name="minimal"/>

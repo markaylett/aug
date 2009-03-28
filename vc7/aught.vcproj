@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="http"
+	Name="aught"
 	ProjectGUID="{92F25AEF-8262-45A5-9181-FADF6170743C}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -13,7 +13,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="mod"
-			IntermediateDirectory="debug/http"
+			IntermediateDirectory="debug/aught"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -68,7 +68,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="mod"
-			IntermediateDirectory="release/http"
+			IntermediateDirectory="release/aught"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -141,16 +141,16 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\mod\http\exception.cpp">
+				RelativePath="..\src\mod\aught\exception.cpp">
 			</File>
 			<File
-				RelativePath="..\src\mod\http\file.cpp">
+				RelativePath="..\src\mod\aught\file.cpp">
 			</File>
 			<File
-				RelativePath="..\src\mod\http\http.cpp">
+				RelativePath="..\src\mod\aught\aught.cpp">
 			</File>
 			<File
-				RelativePath="..\src\mod\http\options.cpp">
+				RelativePath="..\src\mod\aught\options.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -158,13 +158,13 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\mod\http\exception.hpp">
+				RelativePath="..\src\mod\aught\exception.hpp">
 			</File>
 			<File
-				RelativePath="..\src\mod\http\file.hpp">
+				RelativePath="..\src\mod\aught\file.hpp">
 			</File>
 			<File
-				RelativePath="..\src\mod\http\options.hpp">
+				RelativePath="..\src\mod\aught\options.hpp">
 			</File>
 		</Filter>
 		<Filter

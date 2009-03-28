@@ -22,6 +22,9 @@
 */
 #define MOD_BUILD
 #include "options.hpp"
+#include "augctx/defs.h"
+
+AUG_RCSID("$Id$");
 
 #include "augutilpp/file.hpp"
 #include "augutilpp/path.hpp"

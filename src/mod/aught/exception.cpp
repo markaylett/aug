@@ -20,46 +20,11 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef MODHTTP_OPTIONS_HPP
-#define MODHTTP_OPTIONS_HPP
+#define MOD_BUILD
+#include "exception.hpp"
+#include "augctx/defs.h"
 
-#include <map>
-#include <set>
-#include <string>
+AUG_RCSID("$Id$");
 
-namespace aug {
 
-    class options {
 
-        std::string css_;
-        std::map<std::string, std::string> mimetypes_;
-        std::map<std::pair<std::string, std::string>, std::string> passwd_;
-        std::set<std::string> services_;
-
-    public:
-
-        void
-        load();
-
-        const std::string&
-        css() const
-        {
-            return css_;
-        }
-
-        std::string
-        mimetype(const std::string& path) const;
-
-        bool
-        passwd(const std::string& user, const std::string& realm,
-               std::string& digest);
-
-        bool
-        service(const std::string& name) const
-        {
-            return services_.find(name) != services_.end();
-        }
-    };
-}
-
-#endif // MODHTTP_OPTIONS_HPP

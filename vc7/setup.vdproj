@@ -3980,7 +3980,7 @@
             }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_1453B804C0CA4BF78E08E278C85BC774"
             {
-            "SourcePath" = "8:mod\\modhttp.dll"
+            "SourcePath" = "8:mod\\modaught.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
