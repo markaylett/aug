@@ -31,17 +31,6 @@
 
     Read-only array interface.
 
-    <method name="gettype" type="aug_rint" qname="getarraytype">
-
-      Get type at index @a n.
-
-      @param n Array index.
-
-      @return See @ref TypesResult.  #AUG_FAILNONE if there is no matching field.
-
-      <param name="n" type="unsigned"/>
-    </method>
-
     <method name="getvalue" type="aug_result" qname="getarrayvalue">
 
       Get value at index @a n.
