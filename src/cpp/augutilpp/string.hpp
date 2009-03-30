@@ -228,7 +228,7 @@ namespace aug {
 
     template <typename T, typename U>
     U
-    urlencode(T it, T end, U dst)
+    encodeurl(T it, T end, U dst)
     {
         for (; it != end; ++it, ++dst)
 
@@ -261,41 +261,41 @@ namespace aug {
 
     template <typename T>
     std::string
-    urlencode(T it, T end)
+    encodeurl(T it, T end)
     {
         std::string s;
-        urlencode(it, end, std::back_inserter(s));
+        encodeurl(it, end, std::back_inserter(s));
         return s;
     }
 
     template <typename T, typename U>
     U
-    urlpack(T it, T end, U dst)
+    packurl(T it, T end, U dst)
     {
         for (bool first(true); it != end; ++it) {
             if (first)
                 first = false;
             else
                 *dst++ = '&';
-            urlencode(it->first.begin(), it->first.end(), dst);
+            encodeurl(it->first.begin(), it->first.end(), dst);
             *dst++ = '=';
-            urlencode(it->second.begin(), it->second.end(), dst);
+            encodeurl(it->second.begin(), it->second.end(), dst);
         }
         return dst;
     }
 
     template <typename T>
     std::string
-    urlpack(T it, T end)
+    packurl(T it, T end)
     {
         std::string s;
-        urlpack(it, end, std::back_inserter(s));
+        packurl(it, end, std::back_inserter(s));
         return s;
     }
 
     template <typename T, typename U>
     U
-    urldecode(T it, T end, U dst)
+    decodeurl(T it, T end, U dst)
     {
         for (; it != end; ++it, ++dst)
             switch (*it) {
@@ -320,10 +320,10 @@ namespace aug {
 
     template <typename T>
     std::string
-    urldecode(T it, T end)
+    decodeurl(T it, T end)
     {
         std::string s;
-        urldecode(it, end, std::back_inserter(s));
+        decodeurl(it, end, std::back_inserter(s));
         return s;
     }
 
@@ -341,8 +341,8 @@ namespace aug {
             {
                 std::pair<std::string, std::string> xy;
                 split2(s.begin(), s.end(), xy.first, xy.second, '=');
-                xy.first = urldecode(xy.first.begin(), xy.first.end());
-                xy.second = urldecode(xy.second.begin(), xy.second.end());
+                xy.first = decodeurl(xy.first.begin(), xy.first.end());
+                xy.second = decodeurl(xy.second.begin(), xy.second.end());
                 *it_++ = xy;
             }
         };
@@ -356,14 +356,14 @@ namespace aug {
 
     template <typename T, typename U>
     U
-    urlunpack(T it, T end, U dst)
+    unpackurl(T it, T end, U dst)
     {
         return splitn(it, end, '&', detail::makeurlpairs(dst)).it_;
     }
 
     template <typename T>
     std::vector<std::pair<std::string, std::string> >
-    urlunpack(T it, T end)
+    unpackurl(T it, T end)
     {
         std::vector<std::pair<std::string, std::string> > v;
         splitn(it, end, '&',

@@ -260,7 +260,7 @@ namespace {
                                 (aug::getblobdata(blob, size)));
 
             map<string, string> params;
-            urlunpack(content, content + size,
+            unpackurl(content, content + size,
                       inserter(params, params.begin()));
 
             marptr mar(createmar(getmpool(aug_tlx)));

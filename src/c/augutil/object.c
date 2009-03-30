@@ -29,7 +29,17 @@ AUG_RCSID("$Id$");
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
 
+#include "augext/var.h"
+
 #include <string.h>
+
+#if !defined(_WIN32)
+# if HAVE_ALLOCA_H
+#  include <alloca.h>
+# endif /* HAVE_ALLOCA_H */
+#else /* _WIN32 */
+# include <malloc.h> /* alloca() */
+#endif /* _WIN32 */
 
 struct boxintimpl_ {
     aug_boxint boxint_;
@@ -287,4 +297,146 @@ aug_createblob(aug_mpool* mpool, const void* buf, size_t len)
 
     aug_retain(mpool);
     return &impl->blob_;
+}
+
+AUGUTIL_API aug_result
+aug_vunpackargs(aug_array* array, const char* sig, va_list args)
+{
+    unsigned argc, i = 0;
+    struct aug_var* unwind = NULL;
+    const char* type = NULL;
+
+    /* Unless the array is empty, create a cache of unpacked arguments so that
+       they can be released on failure. */
+
+    if (0 < (argc = aug_getarraysize(array)))
+        unwind = alloca(sizeof(struct aug_var) * argc);
+
+    /* For each argument in the array. */
+
+    while (i < argc) {
+
+        struct aug_var* var = &unwind[i];
+        if (AUG_ISFAIL(aug_getarrayvalue(array, i, var)))
+            goto fail;
+
+        /* Now that this argument has been unpacked, ensure that it is unwound
+           (released) on failure. */
+
+        ++i;
+
+        /* Verify type against signature. */
+
+        switch (*sig++) {
+        case '\0':
+
+            /* End of signature, so too many arguments. */
+
+            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                           AUG_MSG("too many arguments"));
+            goto fail;
+        case 'v':
+
+            /* No type verification. */
+
+            *va_arg(args, struct aug_var*) = *var;
+            break;
+        case 'i':
+            if (AUG_VTINT32 != var->type_) {
+                type = "int32";
+                goto fail;
+            }
+            *va_arg(args, int32_t*) = AUG_VARINT32(var);
+            break;
+        case 'l':
+            if (AUG_VTINT64 != var->type_) {
+                type = "int64";
+                goto fail;
+            }
+            *va_arg(args, int64_t*) = AUG_VARINT64(var);
+            break;
+        case 'd':
+            if (AUG_VTDOUBLE != var->type_) {
+                type = "double";
+                goto fail;
+            }
+            *va_arg(args, double*) = AUG_VARDOUBLE(var);
+            break;
+        case 'b':
+            if (AUG_VTBOOL != var->type_) {
+                type = "bool";
+                goto fail;
+            }
+            *va_arg(args, aug_bool*) = AUG_VARBOOL(var);
+            break;
+        case 'O':
+            if (AUG_VTOBJECT != var->type_) {
+                type = "object";
+                goto fail;
+            }
+            *va_arg(args, aug_object**) = AUG_VAROBJECT(var);
+            break;
+        case 'A':
+            if (AUG_VTARRAY != var->type_) {
+                type = "array";
+                goto fail;
+            }
+            *va_arg(args, aug_array**) = AUG_VARARRAY(var);
+            break;
+        case 'B':
+            if (AUG_VTBLOB != var->type_) {
+                type = "blob";
+                goto fail;
+            }
+            *va_arg(args, aug_blob**) = AUG_VARBLOB(var);
+            break;
+        case 'S':
+            if (AUG_VTSTRING != var->type_) {
+                type = "string";
+                goto fail;
+            }
+            *va_arg(args, aug_blob**) = AUG_VARSTRING(var);
+            break;
+        }
+    }
+
+    /* Success if the end of the signature has been reached. */
+
+    if ('\0' == *sig)
+        return AUG_SUCCESS;
+
+    /* Fallthrough: Not end of signature, so too few arguments. */
+
+    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                   AUG_MSG("not enough arguments"));
+
+ fail:
+
+    /* Argument type error.  Type specified in switch. */
+
+    if (type)
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("argument %d: expected %s"), i, type);
+
+    if (unwind) {
+
+        /* Unwind those that were unpacked. */
+
+        unsigned j = 0;
+        for (; j < i; ++j)
+            AUG_RELEASEVAR(&unwind[j]);
+    }
+
+    return AUG_FAILERROR;
+}
+
+AUGUTIL_API aug_result
+aug_unpackargs(aug_array* array, const char* sig, ...)
+{
+    aug_result result;
+    va_list args;
+    va_start(args, sig);
+    result = aug_vunpackargs(array, sig, args);
+    va_end(args);
+    return result;
 }

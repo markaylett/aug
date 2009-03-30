@@ -31,10 +31,13 @@
 
 #include "augutil/config.h"
 
+#include "augext/array.h"
 #include "augext/blob.h"
 #include "augext/boxint.h"
 #include "augext/boxptr.h"
 #include "augext/mpool.h"
+
+#include <stdarg.h>
 
 /**
  * Create object wrapper for integer.
@@ -90,5 +93,35 @@ aug_obtop(aug_object* ob);
 
 AUGUTIL_API aug_blob*
 aug_createblob(aug_mpool* mpool, const void* buf, size_t len);
+
+/**
+ * v - struct aug_var**;
+ * i - int32_t*;
+ * l - int64_t*;
+ * d - double*;
+ * b - aug_bool*;
+ * O - aug_object**;
+ * A - aug_array**;
+ * B - aug_blob**;
+ * S - aug_blob**;
+ */
+
+AUGUTIL_API aug_result
+aug_vunpackargs(aug_array* array, const char* sig, va_list args);
+
+/**
+ * v - struct aug_var**;
+ * i - int32_t*;
+ * l - int64_t*;
+ * d - double*;
+ * b - aug_bool*;
+ * O - aug_object**;
+ * A - aug_array**;
+ * B - aug_blob**;
+ * S - aug_blob**;
+ */
+
+AUGUTIL_API aug_result
+aug_unpackargs(aug_array* array, const char* sig, ...);
 
 #endif /* AUGUTIL_OBJECT_H */

@@ -458,7 +458,7 @@ namespace {
 
                 // Split path into series of nodes.
 
-                u.path_ = urldecode(u.path_.begin(), u.path_.end());
+                u.path_ = decodeurl(u.path_.begin(), u.path_.end());
                 vector<string> nodes(splitpath(u.path_));
 
                 if (!auth_) {

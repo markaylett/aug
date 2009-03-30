@@ -43,17 +43,17 @@ namespace {
     const char UNTRIMMED[] = "\t  hello, world!  \r\n";
 
     void
-    urlencodetest()
+    encodeurltest()
     {
-        if (urlencode(DECODED, DECODED + strlen(DECODED)) != ENCODED)
-            throw error("urlencode() failed");
+        if (encodeurl(DECODED, DECODED + strlen(DECODED)) != ENCODED)
+            throw error("encodeurl() failed");
     }
 
     void
-    urldecodetest()
+    decodeurltest()
     {
-        if (urldecode(ENCODED, ENCODED + strlen(ENCODED)) != DECODED)
-            throw error("urldecode() failed");
+        if (decodeurl(ENCODED, ENCODED + strlen(ENCODED)) != DECODED)
+            throw error("decodeurl() failed");
     }
 
     void
@@ -130,8 +130,8 @@ int
 main(int argc, char* argv[])
 {
     try {
-        urlencodetest();
-        urldecodetest();
+        encodeurltest();
+        decodeurltest();
         ltrimtest();
         rtrimtest();
         trimtest();

@@ -218,7 +218,7 @@ if (is $ssl) {
         $options .= " \\\n\t--with-ssl=$s";
     }
 } else {
-    $options .= " \\\n\t--wthout-ssl"
+    $options .= " \\\n\t--without-ssl"
 }
 
 if ($SHARED_ONLY == $libtype) {
