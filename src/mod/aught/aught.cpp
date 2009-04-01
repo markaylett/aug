@@ -414,19 +414,16 @@ namespace {
                 aug_ctxinfo(aug_tlx, "path: [%s]", u.path_.c_str());
                 aug_ctxinfo(aug_tlx, "query: [%s]", u.query_.c_str());
 
-                if (r.method_ == "GET") {
+                const void* override;
+                getfieldp(mar, "X-HTTP-Method-Override", override);
 
-                    if (!u.query_.empty()) {
+                // Update method if it has been overridden.
 
-                        // Convert query to post.
-
-                        putfieldp(mar, "Content-Type",
-                                  "application/x-www-form-urlencoded");
-                        setcontent(mar, u.query_);
-                    }
-
-                } else if (r.method_ != "POST")
-                    throw http_error(501, "Not Implemented");
+                if (override) {
+                    r.method_ = static_cast<const char*>(override);
+                    aug_ctxinfo(aug_tlx, "method override: [%s]",
+                                r.method_.c_str());
+                }
 
                 // For each header field.
 
@@ -480,9 +477,27 @@ namespace {
                 string service(jointype(nodes));
                 if (options_.service(service)) {
 
+                    if (!u.query_.empty() && r.method_ != "POST") {
+
+                        // Set content to be url-encoded query.
+
+                        // Note: this is not done for the post method to avoid
+                        // overwriting existing content.
+
+                        putfieldp(mar, "Content-Type",
+                                  "application/x-www-form-urlencoded");
+                        setcontent(mar, u.query_);
+                    }
+
+                    // Ensure that method header is always set to facilitate
+                    // REST-ful interfaces.
+
+                    putfieldp(mar, "X-HTTP-Method-Override",
+                              r.method_.c_str());
+
                     post(id_, "http-request", service.c_str(), mar.base());
 
-                } else {
+                } else if (r.method_ == "GET") {
 
                     // Static file system content.
 
@@ -492,7 +507,9 @@ namespace {
                     blobptr blob(getfile(options_.mimetype(path),
                                          path.c_str()));
                     respond(id_, sessid_, 200, "OK", blob, close);
-                }
+
+                } else if (r.method_ != "POST")
+                    throw http_error(501, "Not Implemented");
 
             } catch (const http_error& e) {
                 aug_ctxerror(aug_tlx, "%d: %s", e.code(), e.what());
