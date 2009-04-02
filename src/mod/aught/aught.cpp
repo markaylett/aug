@@ -556,13 +556,31 @@ namespace {
         do_start(const char* sname)
         {
             aug_ctxinfo(aug_tlx, "starting...");
-            const char* serv(mod::getenv("session.http.serv"));
-            const char* realm(mod::getenv("session.http.realm"));
-            if (!serv || !realm)
+
+            const char* realm(mod::getenv("session.http.realm", "aug"));
+            if (!realm)
                 return false;
+
+            const char* serv(mod::getenv("session.http.serv", "8080"));
+
+            writelog(MOD_LOGINFO, "serv: %s", serv);
+            writelog(MOD_LOGINFO, "realm: %s", realm);
 
             realm_ = realm;
             tcplisten("0.0.0.0", serv);
+
+            const char* sslctx(mod::getenv("session.http.sslcontext"));
+            if (sslctx) {
+
+                const char* sslserv(mod::getenv("session.http.sslserv",
+                                                "8443"));
+
+                writelog(MOD_LOGINFO, "sslserv: %s", sslserv);
+                writelog(MOD_LOGINFO, "sslcontext: %s", sslctx);
+
+                tcplisten("0.0.0.0", sslserv, sslctx);
+            }
+
             do_reconf();
             return true;
         }

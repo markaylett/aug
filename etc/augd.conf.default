@@ -2,19 +2,12 @@ rundir=c:/program files/aug
 logdir=log
 loglevel=4
 
-#ssl.contexts=foo bar
+ssl.contexts=server
 
-#ssl.context.foo.certfile=etc/foocert.pem
-#ssl.context.foo.keyfile=etc/fookey.pem
-#ssl.context.foo.password=test
-#ssl.context.foo.cafile=etc/cacert.pem
-#ssl.context.foo.verify=1
-
-#ssl.context.bar.certfile=etc/barcert.pem
-#ssl.context.bar.keyfile=etc/barkey.pem
-#ssl.context.bar.password=test
-#ssl.context.bar.cafile=etc/cacert.pem
-#ssl.context.bar.verify=1
+ssl.context.server.certfile=etc/servercert.pem
+ssl.context.server.keyfile=etc/serverkey.pem
+ssl.context.server.cafile=etc/cacert.pem
+ssl.context.server.verify=0
 
 sessions=http sched pyskel pyecho pyproxy
 
@@ -32,6 +25,9 @@ session.http.services=\
   service/sched/putevent\
   service/sched/events\
   service/xmlrpc/test
+
+session.http.sslserv=8443
+session.http.sslcontext=server
 
 session.sched.groups=http-request
 session.sched.module=sched

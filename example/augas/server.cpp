@@ -58,8 +58,8 @@ namespace {
         do_start(const char* sname)
         {
             writelog(MOD_LOGINFO, "starting...");
-            const char* serv = mod::getenv("session.echo.serv");
-            const char* sslctx = mod::getenv("session.echo.sslcontext", 0);
+            const char* serv(mod::getenv("session.echo.serv"));
+            const char* sslctx(mod::getenv("session.echo.sslcontext"));
             if (!serv)
                 return false;
             if (sslctx)
