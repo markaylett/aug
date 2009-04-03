@@ -21,7 +21,11 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-./shellwordstest <shellwordstest.stdin | egrep -v '^[[:space:]]*$' | sed '/\r/d' >tmp.$$
+AUG_SRCDIR=${AUG_SRCDIR:-../../..}
+dir=$AUG_SRCDIR/src/c/augutil
+
+./shellwordstest <$dir/shellwordstest.stdin \
+    | egrep -v '^[[:space:]]*$' | sed '/\r/d' >tmp.$$
 cmp -s tmp.$$ shellwordstest.stdout
 ret=$?
 rm -f tmp.$$

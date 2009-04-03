@@ -79,6 +79,11 @@ check_PROGRAMS = \
 	shellwordstest \
 	xstrtest
 
+TESTS_ENVIRONMENT = \
+	AUG_LOGLEVEL=3 \
+	AUG_BUILDDIR=$(top_builddir) \
+	AUG_SRCDIR=$(top_srcdir)
+
 TESTS = \
 	eventtest \
 	filetest.sh \

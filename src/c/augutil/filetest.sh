@@ -21,7 +21,11 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-./filetest <filetest.stdin | egrep -v '^[[:space:]]*$' | sed '/\r/d' >tmp.$$
+AUG_SRCDIR=${AUG_SRCDIR:-../../..}
+dir=$AUG_SRCDIR/src/c/augutil
+
+./filetest <$dir/filetest.stdin \
+    | egrep -v '^[[:space:]]*$' | sed '/\r/d' >tmp.$$
 cmp -s tmp.$$ filetest.stdout
 ret=$?
 rm -f tmp.$$
