@@ -27,6 +27,12 @@
 #include <stdio.h>
 #include <stdlib.h> /* exit() */
 
+static void
+clean(void)
+{
+    remove("chantest.txt");
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -39,7 +45,8 @@ main(int argc, char* argv[])
     if (!aug_autotlx())
         return 1;
 
-    fd = aug_fopen("filetest.txt", O_CREAT | O_TRUNC | O_RDWR, 0666);
+    fd = aug_fopen("chantest.txt", O_CREAT | O_TRUNC | O_RDWR, 0666);
+    atexit(clean);
     aug_check(AUG_BADFD != fd);
 
     mpool = aug_getmpool(aug_tlx);

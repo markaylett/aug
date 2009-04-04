@@ -26,7 +26,7 @@ dir=$AUG_SRCDIR/src/c/augutil
 
 ./filetest <$dir/filetest.stdin \
     | egrep -v '^[[:space:]]*$' | sed '/\r/d' >tmp.$$
-cmp -s tmp.$$ filetest.stdout
+cmp -s tmp.$$ $dir/filetest.stdout
 ret=$?
 rm -f tmp.$$
 exit $ret

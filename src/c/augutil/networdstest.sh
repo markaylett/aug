@@ -26,7 +26,7 @@ dir=$AUG_SRCDIR/src/c/augutil
 
 ./networdstest <$dir/networdstest.stdin \
     | sed '/\r/d' >tmp.$$
-cmp -s tmp.$$ networdstest.stdout
+cmp -s tmp.$$ $dir/networdstest.stdout
 ret=$?
 rm -f tmp.$$
 exit $ret

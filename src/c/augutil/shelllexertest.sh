@@ -26,7 +26,7 @@ dir=$AUG_SRCDIR/src/c/augutil
 
 ./shelllexertest <$dir/shellwordstest.stdin \
     | egrep -v '^[[:space:]]*$' | sed '/\r/d' >tmp.$$
-cmp -s tmp.$$ shellwordstest.stdout
+cmp -s tmp.$$ $dir/shellwordstest.stdout
 ret=$?
 rm -f tmp.$$
 exit $ret
