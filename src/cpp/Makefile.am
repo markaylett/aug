@@ -6,6 +6,7 @@ SUBDIRS = \
 	augutilpp \
 	augservpp \
 	augnetpp \
+	augsubpp \
 	augaspp \
 	augd \
 	htdigest

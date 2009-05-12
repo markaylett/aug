@@ -15,6 +15,7 @@ EXTRA_DIST = \
 	augaspp.vcproj \
 	augserv.vcproj \
 	augservpp.vcproj \
+	augsubpp.vcproj \
 	augsys.vcproj \
 	augsyspp.vcproj \
 	augutil.vcproj \

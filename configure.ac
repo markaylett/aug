@@ -327,6 +327,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augctxpp/Makefile
                  src/cpp/augmarpp/Makefile
                  src/cpp/augnetpp/Makefile
+                 src/cpp/augsubpp/Makefile
                  src/cpp/augaspp/Makefile
                  src/cpp/augservpp/Makefile
                  src/cpp/augsyspp/Makefile

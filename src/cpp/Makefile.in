@@ -74,7 +74,6 @@ AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
-AR_FLAGS = @AR_FLAGS@
 AS = @AS@
 AUG_WIN32_FALSE = @AUG_WIN32_FALSE@
 AUG_WIN32_TRUE = @AUG_WIN32_TRUE@
@@ -124,8 +123,6 @@ LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
-LT_AR = @LT_AR@
-LT_ARFLAGS = @LT_ARFLAGS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
@@ -159,7 +156,6 @@ WITH_RUBY_FALSE = @WITH_RUBY_FALSE@
 WITH_RUBY_TRUE = @WITH_RUBY_TRUE@
 WITH_SSL_FALSE = @WITH_SSL_FALSE@
 WITH_SSL_TRUE = @WITH_SSL_TRUE@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
@@ -208,7 +204,6 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 to_host_path_cmd = @to_host_path_cmd@
-to_tool_path_cmd = @to_tool_path_cmd@
 EXTRA_DIST = lang.mk
 SUBDIRS = \
 	augctxpp \
@@ -217,6 +212,7 @@ SUBDIRS = \
 	augutilpp \
 	augservpp \
 	augnetpp \
+	augsubpp \
 	augaspp \
 	augd \
 	htdigest
@@ -231,7 +227,8 @@ include_HEADERS = \
 	augmarpp.hpp \
 	augutilpp.hpp \
 	augservpp.hpp \
-	augnetpp.hpp
+	augnetpp.hpp \
+	augsubpp.hpp
 
 all: all-recursive
 
