@@ -227,8 +227,7 @@ include_HEADERS = \
 	augmarpp.hpp \
 	augutilpp.hpp \
 	augservpp.hpp \
-	augnetpp.hpp \
-	augsubpp.hpp
+	augnetpp.hpp
 
 all: all-recursive
 

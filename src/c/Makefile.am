@@ -8,7 +8,6 @@ SUBDIRS = \
 	augutil \
 	augserv \
 	augnet \
-	augas \
 	mar
 
 include_HEADERS = \

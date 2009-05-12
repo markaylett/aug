@@ -228,7 +228,8 @@ libaugsubpp_la_SOURCES = \
 	config.cpp
 
 libaugsubpp_la_LDFLAGS = \
-	-no-undefined
+	-no-undefined \
+	-version-info 1:0:0
 
 libaugsubpp_la_LIBADD = 
 all: all-am

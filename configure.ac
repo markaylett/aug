@@ -311,7 +311,6 @@ AC_CONFIG_FILES([Makefile
                  src/c/augmar/Makefile
                  src/c/augnet/Makefile
                  src/c/augres/Makefile
-                 src/c/augas/Makefile
                  src/c/augserv/Makefile
                  src/c/augserv/posix/Makefile
                  src/c/augserv/win32/Makefile
