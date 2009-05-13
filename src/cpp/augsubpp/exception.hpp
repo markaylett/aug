@@ -20,8 +20,19 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#define AUGSUBPP_BUILD
-#include "augsubpp/config.hpp"
-#include "augctx/defs.h"
+#ifndef AUGSUBPP_EXCEPTION_HPP
+#define AUGSUBPP_EXCEPTION_HPP
 
-AUG_RCSID("$Id$");
+#include "augsubpp/config.hpp"
+
+#include <exception>
+
+namespace aug {
+
+    class AUGSUBPP_API invalid_path : public std::exception {
+        const char*
+        what() const throw();
+    };
+}
+
+#endif // AUGSUBPP_EXCEPTION_HPP

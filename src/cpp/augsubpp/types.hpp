@@ -20,8 +20,31 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#define AUGSUBPP_BUILD
-#include "augsubpp/config.hpp"
-#include "augctx/defs.h"
+#ifndef AUGSUBPP_TYPES_HPP
+#define AUGSUBPP_TYPES_HPP
 
-AUG_RCSID("$Id$");
+#include "augsubpp/config.hpp"
+
+#include <string>
+#include <vector>
+
+namespace aug {
+
+    typedef std::vector<std::string> path;
+    typedef path::const_iterator path_iterator;
+
+    enum match {
+        SUBNOTHING,
+        SUBTRANSIT,
+        SUBINCLUDE,
+        SUBEXCLUDE
+    };
+
+    enum nodetype {
+        SUBNAME,
+        SUBRECUR,
+        SUBWILD
+    };
+}
+
+#endif // AUGSUBPP_TYPES_HPP

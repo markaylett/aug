@@ -35,7 +35,6 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				IgnoreImportLibrary="TRUE"
 				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -43,7 +42,7 @@
 				SubSystem="2"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
-				ImportLibrary=""/>
+				ImportLibrary="lib/lib$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -87,7 +86,6 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				IgnoreImportLibrary="TRUE"
 				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -95,7 +93,7 @@
 				SubSystem="2"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
-				ImportLibrary=""/>
+				ImportLibrary="lib/lib$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -119,6 +117,9 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}"
+			Name="augctx"/>
 	</References>
 	<Files>
 		<Filter
@@ -126,7 +127,49 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath="..\src\cpp\augsubpp\base.cpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsubpp\config.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\exception.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\factory.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\inner.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\inverse.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\names.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\node.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\outer.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\query.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\recur.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\typed.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\types.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\utility.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\wild.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -134,7 +177,49 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath="..\src\cpp\augsubpp\base.hpp">
+			</File>
+			<File
 				RelativePath="..\src\cpp\augsubpp\config.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\exception.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\factory.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\inner.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\inverse.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\names.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\node.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\outer.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\query.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\recur.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\typed.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\types.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\utility.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augsubpp\wild.hpp">
 			</File>
 		</Filter>
 		<Filter

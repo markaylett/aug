@@ -20,8 +20,37 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#define AUGSUBPP_BUILD
-#include "augsubpp/config.hpp"
-#include "augctx/defs.h"
+#ifndef AUGSUBPP_QUERY_HPP
+#define AUGSUBPP_QUERY_HPP
 
-AUG_RCSID("$Id$");
+#include "augsubpp/node.hpp"
+
+namespace aug {
+
+    class AUGSUBPP_API query_base : public node_base {
+    protected:
+        virtual match
+        do_query(path_iterator pit, path_iterator pend) const = 0;
+
+        virtual bool
+        do_isdead() const = 0;
+
+    public:
+        ~query_base() AUG_NOTHROW;
+
+        match
+        query(path_iterator pit, path_iterator pend) const
+        {
+            return do_query(pit, pend);
+        }
+        bool
+        isdead() const
+        {
+            return do_isdead();
+        }
+    };
+
+    typedef smartptr<query_base> queryptr;
+}
+
+#endif // AUGSUBPP_QUERY_HPP

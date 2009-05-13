@@ -35,7 +35,6 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				IgnoreImportLibrary="FALSE"
 				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -87,7 +86,6 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				IgnoreImportLibrary="FALSE"
 				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"

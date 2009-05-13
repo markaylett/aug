@@ -20,8 +20,28 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#define AUGSUBPP_BUILD
-#include "augsubpp/config.hpp"
-#include "augctx/defs.h"
+#ifndef AUGSUBPP_BASE_HPP
+#define AUGSUBPP_BASE_HPP
 
-AUG_RCSID("$Id$");
+#include "augsubpp/factory.hpp"
+#include "augsubpp/inner.hpp"
+#include "augsubpp/outer.hpp"
+
+namespace aug {
+
+    class AUGSUBPP_API factory : public factory_base {
+    protected:
+
+        innerptr
+        do_createinner() const;
+
+        outerptr
+        do_createouter() const;
+
+    public:
+
+        ~factory() AUG_NOTHROW;
+    };
+}
+
+#endif // AUGSUBPP_BASE_HPP

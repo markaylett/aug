@@ -20,8 +20,30 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#define AUGSUBPP_BUILD
-#include "augsubpp/config.hpp"
-#include "augctx/defs.h"
+#ifndef AUGSUBPP_TYPED_HPP
+#define AUGSUBPP_TYPED_HPP
 
-AUG_RCSID("$Id$");
+#include "augsubpp/inner.hpp"
+
+namespace aug {
+
+    class AUGSUBPP_API typed_base : public inner_base {
+    protected:
+
+        virtual nodetype
+        do_type() const = 0;
+
+    public:
+        ~typed_base() AUG_NOTHROW;
+
+        nodetype
+        type() const
+        {
+            return do_type();
+        }
+    };
+
+    typedef smartptr<typed_base> typedptr;
+}
+
+#endif // AUGSUBPP_TYPED_HPP

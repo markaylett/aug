@@ -20,8 +20,38 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#define AUGSUBPP_BUILD
-#include "augsubpp/config.hpp"
-#include "augctx/defs.h"
+#ifndef AUGSUBPP_UTILITY_HPP
+#define AUGSUBPP_UTILITY_HPP
 
-AUG_RCSID("$Id$");
+#include "augsubpp/types.hpp"
+
+namespace aug {
+
+    class AUGSUBPP_API node_base;
+    class AUGSUBPP_API inner_base;
+
+    AUGSUBPP_API unsigned
+    exdepth(const node_base& node);
+
+    AUGSUBPP_API match
+    foldmatch(match l, match r);
+
+    AUGSUBPP_API nodetype
+    tonodetype(const std::string& value);
+
+    AUGSUBPP_API void
+    erasenode(const std::string& head, path_iterator pit,
+              path_iterator pend, inner_base& node);
+
+    AUGSUBPP_API void
+    erasenode(const std::string& s, inner_base& node);
+
+    AUGSUBPP_API void
+    insertnode(const std::string& head, path_iterator pit,
+               path_iterator pend, inner_base& node);
+
+    AUGSUBPP_API void
+    insertnode(const std::string& s, inner_base& node);
+}
+
+#endif // AUGSUBPP_UTILITY_HPP

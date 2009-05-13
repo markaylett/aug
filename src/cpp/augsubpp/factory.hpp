@@ -20,8 +20,41 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#define AUGSUBPP_BUILD
-#include "augsubpp/config.hpp"
-#include "augctx/defs.h"
+#ifndef AUGSUBPP_FACTORY_HPP
+#define AUGSUBPP_FACTORY_HPP
 
-AUG_RCSID("$Id$");
+#include "augsubpp/inner.hpp"
+#include "augsubpp/outer.hpp"
+
+namespace aug {
+
+    class AUGSUBPP_API factory_base {
+    protected:
+
+        // The returned nodes may retain a reference to the factory, so
+        // factory must outlive them.
+
+        virtual innerptr
+        do_createinner() const = 0;
+
+        virtual outerptr
+        do_createouter() const = 0;
+
+    public:
+        virtual
+        ~factory_base() AUG_NOTHROW;
+
+        innerptr
+        createinner() const
+        {
+            return do_createinner();
+        }
+        outerptr
+        createouter() const
+        {
+            return do_createouter();
+        }
+    };
+}
+
+#endif // AUGSUBPP_FACTORY_HPP

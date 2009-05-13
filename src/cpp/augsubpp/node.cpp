@@ -21,7 +21,14 @@
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #define AUGSUBPP_BUILD
-#include "augsubpp/config.hpp"
+#include "augsubpp/node.hpp"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
+
+using namespace aug;
+
+AUGSUBPP_API
+node_base::~node_base() AUG_NOTHROW
+{
+}
