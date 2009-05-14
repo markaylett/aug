@@ -72,7 +72,7 @@ namespace aug {
         }
         void
         insertname(const std::string& name, path_iterator pit,
-                    path_iterator pend)
+                   path_iterator pend)
         {
             do_insertname(name, pit, pend);
         }
@@ -98,7 +98,7 @@ namespace aug {
         }
         void
         erasename(const std::string& name, path_iterator pit,
-                   path_iterator pend)
+                  path_iterator pend)
         {
             do_erasename(name, pit, pend);
         }

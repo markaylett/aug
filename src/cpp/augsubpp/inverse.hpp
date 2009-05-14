@@ -51,7 +51,7 @@ namespace aug {
 
         void
         do_insertname(const std::string& name, path_iterator pit,
-                       path_iterator pend)
+                      path_iterator pend)
         {
             baseT::do_erasename(name, pit, pend);
         }
@@ -82,7 +82,7 @@ namespace aug {
 
         void
         do_erasename(const std::string& name, path_iterator pit,
-                      path_iterator pend)
+                     path_iterator pend)
         {
             baseT::do_insertname(name, pit, pend);
         }

@@ -82,7 +82,7 @@ aug::tonodetype(const string& value)
 
 AUGSUBPP_API void
 aug::erasenode(const string& head, path_iterator pit, path_iterator pend,
-                inner_base& node)
+               inner_base& node)
 {
     switch (tonodetype(head)) {
     case SUBNAME:
