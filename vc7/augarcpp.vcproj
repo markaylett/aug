@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="augd"
-	ProjectGUID="{E905FF28-F95F-4125-B153-C67B96CD0C65}"
+	Name="augarcpp"
+	ProjectGUID="{8DFF25C5-503A-46B3-BDCD-C100E58F96C5}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -13,8 +13,8 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="debug/augd"
-			ConfigurationType="1"
+			IntermediateDirectory="debug/augarcpp"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
@@ -35,15 +35,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/augd.exe"
+				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/augd.pdb"
-				SubSystem="1"
+				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName)-1.pdb"
+				SubSystem="2"
 				OptimizeReferences="0"
-				EnableCOMDATFolding="0"/>
+				EnableCOMDATFolding="0"
+				ImportLibrary="lib/lib$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -68,8 +67,8 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="bin"
-			IntermediateDirectory="release/augd"
-			ConfigurationType="1"
+			IntermediateDirectory="release/augarcpp"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
@@ -87,14 +86,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/augd.exe"
+				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="TRUE"
-				SubSystem="1"
+				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName)-1.pdb"
+				SubSystem="2"
 				OptimizeReferences="0"
-				EnableCOMDATFolding="0"/>
+				EnableCOMDATFolding="0"
+				ImportLibrary="lib/lib$(ProjectName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -119,35 +118,8 @@
 	</Configurations>
 	<References>
 		<ProjectReference
-			ReferencedProjectIdentifier="{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}"
-			Name="augaspp"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{92F25AEF-8262-45A5-9181-FADF6170743C}"
-			Name="aught"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{B44E153E-2BED-4EFE-9DA5-2B6E93C46835}"
-			Name="augpy"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{AB4EA74B-84B3-4ED6-88FA-49151967A19D}"
-			Name="augrb"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{8DFF25C5-503A-46B3-BDCD-C100E58F96C5}"
-			Name="augarcpp"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}"
-			Name="client"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{00693485-BCE3-4FCA-910E-3D2A2099F756}"
-			Name="command"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{E980D9AD-ACCD-4D21-A2E1-24E00913F725}"
-			Name="minimal"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{FE74FB7E-310F-4636-9BAE-BE543CACBF21}"
-			Name="sched"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{D29B4A1B-FFCD-464D-B2AD-010A9536E58D}"
-			Name="server"/>
+			ReferencedProjectIdentifier="{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}"
+			Name="augctx"/>
 	</References>
 	<Files>
 		<Filter
@@ -155,49 +127,49 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\cpp\augd\augd.cpp">
+				RelativePath="..\src\cpp\augarcpp\base.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\exception.cpp">
+				RelativePath="..\src\cpp\augarcpp\config.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\module.cpp">
+				RelativePath="..\src\cpp\augarcpp\exception.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\options.cpp">
+				RelativePath="..\src\cpp\augarcpp\factory.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\session.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
+				RelativePath="..\src\cpp\augarcpp\inner.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\ssl.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
+				RelativePath="..\src\cpp\augarcpp\inverse.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\utility.cpp">
+				RelativePath="..\src\cpp\augarcpp\names.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\node.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\outer.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\query.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\recur.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\typed.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\types.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\utility.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\wild.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -205,22 +177,49 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\cpp\augd\exception.hpp">
+				RelativePath="..\src\cpp\augarcpp\base.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\module.hpp">
+				RelativePath="..\src\cpp\augarcpp\config.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\options.hpp">
+				RelativePath="..\src\cpp\augarcpp\exception.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\session.hpp">
+				RelativePath="..\src\cpp\augarcpp\factory.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\ssl.hpp">
+				RelativePath="..\src\cpp\augarcpp\inner.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augd\utility.hpp">
+				RelativePath="..\src\cpp\augarcpp\inverse.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\names.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\node.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\outer.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\query.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\recur.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\typed.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\types.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\utility.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augarcpp\wild.hpp">
 			</File>
 		</Filter>
 		<Filter

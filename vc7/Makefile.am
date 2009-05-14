@@ -1,6 +1,8 @@
 EXTRA_DIST = \
 	aug.bat \
 	aug.sln \
+	augarc.vcproj \
+	augarcpp.vcproj \
 	augctx.vcproj \
 	augctxpp.vcproj \
 	augd.vcproj \
@@ -15,7 +17,6 @@ EXTRA_DIST = \
 	augaspp.vcproj \
 	augserv.vcproj \
 	augservpp.vcproj \
-	augsubpp.vcproj \
 	augsys.vcproj \
 	augsyspp.vcproj \
 	augutil.vcproj \

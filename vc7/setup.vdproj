@@ -327,6 +327,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_69DBD8970F9B4E92B1B860429728BDE4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_6B55CE6DC02A4B12A8E22BB349A7F8B1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -382,13 +388,19 @@
         "Entry"
         {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
-        "OwnerKey" = "8:_C49CC0CC122E4808AAA298A2C97E0F3C"
+        "OwnerKey" = "8:_69DBD8970F9B4E92B1B860429728BDE4"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
         "OwnerKey" = "8:_F7088C01FB79463CB66CAE492E54724B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7E17F935CFEFD738A54EFDE06E9C4127"
+        "OwnerKey" = "8:_C49CC0CC122E4808AAA298A2C97E0F3C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -815,6 +827,12 @@
         {
         "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
         "OwnerKey" = "8:_0F8F486EA4F5473EAD4416415411A5E0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E51B7F09FD3E16341F06F2FB71C520EB"
+        "OwnerKey" = "8:_69DBD8970F9B4E92B1B860429728BDE4"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1833,8 +1851,8 @@
             }
             "{A582A373-4685-4296-BEFE-614B80A702C3}:_6ED7A40C6ABF4E6891F8CBD00FA94090"
             {
-            "SourcePath" = "8:lib\\libaugsubpp.lib"
-            "TargetName" = "8:libaugsubpp.lib"
+            "SourcePath" = "8:lib\\libaugarcpp.lib"
+            "TargetName" = "8:libaugarcpp.lib"
             "Tag" = "8:"
             "Folder" = "8:_9E7D976658F7456C89D72630A688CC17"
             "Condition" = "8:"
@@ -3058,6 +3076,17 @@
                             "Condition" = "8:"
                             "Transitive" = "11:FALSE"
                             "Property" = "8:_5AA57961D623425F9FB67F73AB692B39"
+                                "Folders"
+                                {
+                                }
+                            }
+                            "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_60C3F9B7E42646FD8DFD58A337A5FFF3"
+                            {
+                            "Name" = "8:augarcpp"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_FAFF58C874184D7D97D9B7A947685F1E"
                                 "Folders"
                                 {
                                 }
@@ -4569,6 +4598,34 @@
                 {
                 }
             }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_69DBD8970F9B4E92B1B860429728BDE4"
+            {
+            "SourcePath" = "8:mod\\modaugarc.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{5F61ED77-5C3A-43F0-8BC8-1A84DB703822}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_6AB039B5891A428494408D62773AEF0C"
             {
             "SourcePath" = "8:"
@@ -5144,7 +5201,7 @@
             }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_C49CC0CC122E4808AAA298A2C97E0F3C"
             {
-            "SourcePath" = "8:bin\\libaugsubpp-1.dll"
+            "SourcePath" = "8:bin\\libaugarcpp-1.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A29D53DA2F6D4B56ACE57462A5E1AA42"
@@ -5257,6 +5314,34 @@
                 {
                 }
             }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_D6EDBBDD267C486197E99D38672096B6"
+            {
+            "SourcePath" = "8:"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_60C3F9B7E42646FD8DFD58A337A5FFF3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:SourceFiles"
+            "OutputProjectGuid" = "8:{8DFF25C5-503A-46B3-BDCD-C100E58F96C5}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_DA88A118910841B78A65836C19928269"
             {
             "SourcePath" = "8:"
@@ -5280,6 +5365,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Symbols"
             "OutputProjectGuid" = "8:{739652B6-6DE1-4EFE-BA3F-1675B801218F}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_DC7DCBF94E434F9EB0A549E309C054C9"
+            {
+            "SourcePath" = "8:"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Symbols"
+            "OutputProjectGuid" = "8:{5F61ED77-5C3A-43F0-8BC8-1A84DB703822}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {

@@ -326,15 +326,16 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augctxpp/Makefile
                  src/cpp/augmarpp/Makefile
                  src/cpp/augnetpp/Makefile
-                 src/cpp/augsubpp/Makefile
-                 src/cpp/augaspp/Makefile
                  src/cpp/augservpp/Makefile
                  src/cpp/augsyspp/Makefile
                  src/cpp/augutilpp/Makefile
+                 src/cpp/augarcpp/Makefile
+                 src/cpp/augaspp/Makefile
                  src/cpp/augd/Makefile
                  src/cpp/augd/test/Makefile
                  src/cpp/htdigest/Makefile
                  src/mod/Makefile
+                 src/mod/augarc/Makefile
                  src/mod/aught/Makefile
                  src/mod/augpy/Makefile
                  src/mod/augrb/Makefile
