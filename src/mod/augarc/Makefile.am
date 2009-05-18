@@ -12,4 +12,6 @@ modaugarc_la_SOURCES = \
 modaugarc_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modaugarc_la_LIBADD = \
 	$(top_builddir)/src/cpp/augarcpp/libaugarcpp.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la

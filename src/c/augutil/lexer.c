@@ -111,7 +111,7 @@ aug_createnetlexer(aug_mpool* mpool, size_t size)
 }
 
 AUGUTIL_API aug_lexer_t
-aug_createshelllexer(aug_mpool* mpool, size_t size, int pairs)
+aug_createshelllexer(aug_mpool* mpool, size_t size, aug_bool pairs)
 {
     aug_lexer_t lexer = createlexer_(mpool, size);
     if (lexer) {

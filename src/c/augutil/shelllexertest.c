@@ -56,7 +56,7 @@ main(int argc, char* argv[])
         return 1;
 
     mpool = aug_getmpool(aug_tlx);
-    lexer_ = aug_createshelllexer(mpool, 0, 1);
+    lexer_ = aug_createshelllexer(mpool, 0, AUG_TRUE);
     aug_release(mpool);
 
     assert(lexer_);

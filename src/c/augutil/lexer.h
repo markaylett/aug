@@ -35,6 +35,8 @@
 
 #include "augext/mpool.h"
 
+#include "augtypes.h" /* aug_bool */
+
 #define AUG_LEXLABEL  0x01
 #define AUG_LEXWORD   0x02
 #define AUG_LEXPHRASE 0x04
@@ -47,7 +49,7 @@ AUGUTIL_API aug_lexer_t
 aug_createnetlexer(aug_mpool* mpool, size_t size);
 
 AUGUTIL_API aug_lexer_t
-aug_createshelllexer(aug_mpool* mpool, size_t size, int pairs);
+aug_createshelllexer(aug_mpool* mpool, size_t size, aug_bool pairs);
 
 AUGUTIL_API void
 aug_destroylexer(aug_lexer_t lexer);

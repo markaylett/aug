@@ -26,13 +26,14 @@
 
 AUG_RCSID("$Id$");
 
+#include "augarcpp/factory.hpp"
+#include "augarcpp/inner.hpp"
 #include "augarcpp/names.hpp"
+#include "augarcpp/recur.hpp"
+#include "augarcpp/utility.hpp"
 
 using namespace aug;
 using namespace std;
-
-#include "augarcpp/recur.hpp"
-#include "augarcpp/utility.hpp"
 
 namespace {
 
@@ -382,21 +383,32 @@ namespace {
         }
 
     };
-}
 
-AUGARCPP_API innerptr
-factory::do_createinner() const
-{
-    return innerptr(new inner(*this));
+    class factory : public factory_base {
+    protected:
+
+        innerptr
+        do_createinner() const
+        {
+            return innerptr(new inner(*this));
+        }
+
+        outerptr
+        do_createouter() const
+        {
+            return outerptr(new outer(*this));
+        }
+
+    public:
+
+        ~factory() AUG_NOTHROW
+        {
+        }
+    } factory_;
 }
 
 AUGARCPP_API outerptr
-factory::do_createouter() const
+aug::createroot()
 {
-    return outerptr(new outer(*this));
-}
-
-AUGARCPP_API
-factory::~factory() AUG_NOTHROW
-{
+    return factory_.createouter();
 }

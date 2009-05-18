@@ -23,25 +23,14 @@
 #ifndef AUGARCPP_BASE_HPP
 #define AUGARCPP_BASE_HPP
 
-#include "augarcpp/factory.hpp"
-#include "augarcpp/inner.hpp"
 #include "augarcpp/outer.hpp"
 
 namespace aug {
 
-    class AUGARCPP_API factory : public factory_base {
-    protected:
+    typedef outerptr rootptr;
 
-        innerptr
-        do_createinner() const;
-
-        outerptr
-        do_createouter() const;
-
-    public:
-
-        ~factory() AUG_NOTHROW;
-    };
+    AUGARCPP_API rootptr
+    createroot();
 }
 
 #endif // AUGARCPP_BASE_HPP

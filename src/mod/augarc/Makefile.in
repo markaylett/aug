@@ -59,6 +59,8 @@ modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
 modaugarc_la_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augarcpp/libaugarcpp.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 am_modaugarc_la_OBJECTS = augarc.lo
 modaugarc_la_OBJECTS = $(am_modaugarc_la_OBJECTS)
@@ -232,6 +234,8 @@ modaugarc_la_SOURCES = \
 modaugarc_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modaugarc_la_LIBADD = \
 	$(top_builddir)/src/cpp/augarcpp/libaugarcpp.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 all: all-am

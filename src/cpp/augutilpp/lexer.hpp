@@ -63,8 +63,8 @@ namespace aug {
 
         lexer(mpoolref mpool, unsigned size, const shellwords_&, bool pairs)
         {
-            verify(lexer_ = aug_createshelllexer(mpool.get(), size,
-                                                 pairs ? 1 : 0));
+            verify(lexer_ = aug_createshelllexer(mpool.get(), size, pairs
+                                                 ? AUG_TRUE : AUG_FALSE));
         }
 
         void
