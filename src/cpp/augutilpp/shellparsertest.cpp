@@ -37,14 +37,33 @@ namespace {
 
     typedef logic_error error;
 
+    struct tostring : unary_function<pair<string, string>, string> {
+        result_type
+        operator ()(const argument_type& p)
+        {
+            string s(p.first);
+            if (!p.second.empty()) {
+                s += '=';
+                s += p.second;
+            }
+            return s;
+        }
+    };
+
     string
     join(shellparser& parser)
     {
-        deque<string> words;
+        shellpairs pairs;
+        parser.reset(pairs);
+
+        vector<string> words;
+        transform(pairs.begin(), pairs.end(), back_inserter(words),
+                  tostring());
+
         stringstream ss;
-        parser.reset(words);
         copy(words.begin(), words.end(),
              ostream_iterator<string>(ss, "]["));
+
         string s(ss.str());
         // Insert before erase for empty strings.
         s.insert(0, "[");

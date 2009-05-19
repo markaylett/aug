@@ -30,14 +30,26 @@
 
 namespace aug {
 
+    typedef std::deque<std::pair<std::string, std::string> > shellpairs;
+
     class shellparser : public mpool_ops {
         lexer lexer_;
-        std::deque<std::string> words_;
+        std::string first_;
+        shellpairs pairs_;
         bool
         consume(unsigned flags)
         {
-            if ((flags & (AUG_LEXLABEL | AUG_LEXWORD)))
-                words_.push_back(lexertoken(lexer_));
+            if ((flags & AUG_LEXLABEL))
+                first_ = lexertoken(lexer_);
+            else if ((flags & AUG_LEXWORD)) {
+                if (first_.empty())
+                    pairs_.push_back(make_pair(lexertoken(lexer_),
+                                               std::string()));
+                else {
+                    pairs_.push_back(make_pair(first_, lexertoken(lexer_)));
+                    first_.clear();
+                }
+            }
             return (flags & AUG_LEXPHRASE) ? true : false;
         }
     public:
@@ -57,10 +69,10 @@ namespace aug {
             return consume(finishlexer(lexer_));
         }
         void
-        reset(std::deque<std::string>& words)
+        reset(shellpairs& pairs)
         {
-            words.swap(words_);
-            words_.clear();
+            pairs_.swap(pairs);
+            pairs_.clear();
         }
     };
 
@@ -79,9 +91,9 @@ namespace aug {
     }
 
     inline void
-    resetshell(shellparser& parser, std::deque<std::string>& words)
+    resetshell(shellparser& parser, shellpairs& pairs)
     {
-        parser.reset(words);
+        parser.reset(pairs);
     }
 }
 

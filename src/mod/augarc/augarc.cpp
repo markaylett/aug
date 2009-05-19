@@ -36,7 +36,7 @@ namespace {
 
     map<mod_id, rootptr> socks_;
 
-    typedef deque<string>::const_iterator word_iterator;
+    typedef shellpairs::const_iterator pair_iterator;
 
     rootptr
     getroot(mod_id id)
@@ -48,50 +48,54 @@ namespace {
     }
 
     void
-    sendall(mod_id id, const string& path)
+    sendall(mod_id id, const pair<string, string>& p)
     {
         string s("* ");
-        s += path;
+        s += p.first;
+        if (!p.second.empty()) {
+            s += '=';
+            s += p.second;
+        }
         s += "\r\n";
 
         map<mod_id, rootptr>::const_iterator it(socks_.begin()),
             end(socks_.end());
         for (; it != end; ++it) {
-            if (it->first != id && it->second->ismatch(path))
+            if (it->first != id && it->second->ismatch(p.first))
                 send(it->first, s.c_str(), s.size());
         }
     }
 
     void
-    publish(mod_id id, word_iterator it, word_iterator end)
+    publish(mod_id id, pair_iterator it, pair_iterator end)
     {
         if (it == end)
             throw invalid_argument("missing arguments");
         do {
-            sendall(id, *it++);
-        } while (it != end);
+            sendall(id, *it);
+        } while (++it != end);
     }
 
     void
-    subscribe(mod_id id, word_iterator it, word_iterator end)
+    subscribe(mod_id id, pair_iterator it, pair_iterator end)
     {
         if (it == end)
             throw invalid_argument("missing arguments");
         rootptr root(getroot(id));
         do {
-            root->insert(*it++);
-        } while (it != end);
+            root->insert(it->first);
+        } while (++it != end);
     }
 
     void
-    unsubscribe(mod_id id, word_iterator it, word_iterator end)
+    unsubscribe(mod_id id, pair_iterator it, pair_iterator end)
     {
         if (it == end)
             throw invalid_argument("missing arguments");
         rootptr root(getroot(id));
         do {
-            root->erase(*it++);
-        } while (it != end);
+            root->erase(it->first);
+        } while (++it != end);
     }
 
     // PUB
@@ -99,8 +103,8 @@ namespace {
     // UNS
 
     string
-    interpret(mod_id id, const string& cmd, word_iterator it,
-              word_iterator end, bool& quit)
+    interpret(mod_id id, const string& cmd, pair_iterator it,
+              pair_iterator end, bool& quit)
     {
         string s("+OK");
         try {
@@ -122,12 +126,12 @@ namespace {
     }
 
     string
-    interpret(mod_id id, const deque<string>& words, bool& quit)
+    interpret(mod_id id, const shellpairs& pairs, bool& quit)
     {
-        assert(!words.empty());
-        string cmd(words.front());
+        assert(!pairs.empty());
+        string cmd(pairs.front().first);
         transform(cmd.begin(), cmd.end(), cmd.begin(), aug::ucase);
-        return interpret(id, cmd, words.begin() + 1, words.end(), quit);
+        return interpret(id, cmd, pairs.begin() + 1, pairs.end(), quit);
     }
 
     struct arc : basic_session, mpool_ops {
@@ -146,7 +150,7 @@ namespace {
         bool
         do_accepted(handle& sock, const char* name)
         {
-            sock.setuser(new (tlx) shellparser(getmpool(aug_tlx)));
+            sock.setuser(new (tlx) shellparser(getmpool(aug_tlx), true));
             send(sock, "+OK hello\r\n", 11);
             setrwtimer(sock, 120000, MOD_TIMRD);
             return true;
@@ -169,13 +173,13 @@ namespace {
 
                 if (parser.append(ptr[i])) {
 
-                    deque<string> words;
-                    parser.reset(words);
+                    shellpairs pairs;
+                    parser.reset(pairs);
 
-                    if (!words.empty()) {
+                    if (!pairs.empty()) {
 
                         bool quit(false);
-                        string s(interpret(sock.id(), words, quit));
+                        string s(interpret(sock.id(), pairs, quit));
                         s += "\r\n";
                         send(sock, s.c_str(), s.size());
 

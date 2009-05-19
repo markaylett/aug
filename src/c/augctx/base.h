@@ -134,7 +134,8 @@ aug_tlerr_(void);
 /**
  * Initialise with basic context.
  *
- * Initialise and, if not set, set basic context using aug_setbasictlx().
+ * Initialise and set, if not already set, basic context using
+ * aug_setbasictlx().
  *
  * @return Either @ref AUG_TRUE or @ref AUG_FALSE.  @ref TypesResult is not
  * used because the error handler is not initialised at this point.
