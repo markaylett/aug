@@ -61,7 +61,7 @@ namespace {
     };
 
     typedef smartptr<tmevent> tmeventptr;
-    typedef multimap<time_t, tmeventptr> tmqueue;
+    typedef multimap<aug_time, tmeventptr> tmqueue;
 
     string
     tmstring(const tm& local)
@@ -72,7 +72,7 @@ namespace {
     }
 
     void
-    pushevent(tmqueue& q, time_t now, const tmeventptr& ptr)
+    pushevent(tmqueue& q, aug_time now, const tmeventptr& ptr)
     {
         tm tm;
         if (TMUTC == ptr->tz_) {
@@ -96,7 +96,7 @@ namespace {
     }
 
     void
-    pushevent(tmqueue& q, time_t now, const string& name, tmtz tz)
+    pushevent(tmqueue& q, aug_time now, const string& name, tmtz tz)
     {
         const char* tmspecs
             (mod::getenv(string("session.sched.event.").append(name)
@@ -116,7 +116,7 @@ namespace {
     }
 
     void
-    pushevents(tmqueue& q, time_t now)
+    pushevents(tmqueue& q, aug_time now)
     {
         const char* events(mod::getenv("session.sched.events"));
         if (!events)
@@ -142,13 +142,13 @@ namespace {
     }
 
     unsigned
-    timerms(const tmqueue& q, const timeval& tv)
+    timerms(const tmqueue& q, const aug_timeval& tv)
     {
         if (q.empty())
             return 0;
 
         tmqueue::const_iterator next(q.begin());
-        timeval expiry = { next->first, 0 };
+        aug_timeval expiry = { next->first, 0 };
         tvsub(expiry, tv);
         unsigned ms(tvtoms(expiry));
         return ms < 60000 ? ms : 60000;
@@ -179,9 +179,9 @@ namespace {
         mod_id timer_;
         tmqueue queue_;
         void
-        checkexpired(const timeval& tv)
+        checkexpired(const aug_timeval& tv)
         {
-            time_t now(tv.tv_sec);
+            aug_time now(tv.tv_sec);
 
             while (!queue_.empty() && queue_.begin()->first <= now) {
 
@@ -195,7 +195,7 @@ namespace {
             }
         }
         void
-        settimer(const timeval& tv)
+        settimer(const aug_timeval& tv)
         {
             checkexpired(tv);
 
@@ -219,7 +219,7 @@ namespace {
             aug_ctxinfo(aug_tlx, "deleting event: id=[%u]", id);
             eraseevent(queue_, id);
 
-            timeval tv;
+            aug_timeval tv;
             gettimeofday(tv);
             settimer(tv);
         }
@@ -243,7 +243,7 @@ namespace {
             if (getvalue<string>(params, "tz") == "local")
                 tz = TMLOCAL;
 
-            timeval tv;
+            aug_timeval tv;
             gettimeofday(tv);
 
             tmeventptr ptr(new (tlx) tmevent(id, name, spec, tz));
@@ -301,7 +301,7 @@ namespace {
         void
         do_reconf()
         {
-            timeval tv;
+            aug_timeval tv;
             gettimeofday(tv);
 
             queue_.clear();
@@ -329,7 +329,7 @@ namespace {
         void
         do_expire(const handle& timer, unsigned& ms)
         {
-            timeval tv;
+            aug_timeval tv;
             gettimeofday(tv);
 
             checkexpired(tv);

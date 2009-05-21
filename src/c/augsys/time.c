@@ -31,14 +31,14 @@ AUG_RCSID("$Id$");
 #include "augctx/errno.h"
 #include "augctx/utility.h" /* aug_timezone() */
 
-AUGSYS_API time_t
+AUGSYS_API aug_time
 aug_timegm(struct tm* tm)
 {
-    time_t ret;
+    time_t gmt;
 
 #if HAVE_TIMEGM
 
-    if ((time_t)-1 == (ret = timegm(tm)))
+    if ((time_t)-1 == (gmt = timegm(tm)))
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
 
@@ -55,34 +55,35 @@ aug_timegm(struct tm* tm)
     gm.tm_year = tm->tm_year;
     gm.tm_isdst = 0; /* No daylight adjustment. */
 
-    if ((time_t)-1 == (ret = mktime(&gm))) {
+    if ((time_t)-1 == (gmt = mktime(&gm))) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
-        return ret;
+        return gmt;
     }
 
     /* mktime() assumes localtime; adjust for gmt. */
 
-    ret -= *aug_timezone(&tz);
+    gmt -= *aug_timezone(&tz);
 
 #endif /* !HAVE_TIMEGM */
 
-    return ret;
+    return (aug_time)gmt;
 }
 
-AUGSYS_API time_t
+AUGSYS_API aug_time
 aug_timelocal(struct tm* tm)
 {
-    time_t ret = mktime(tm);
-    if (ret == (time_t)-1)
+    time_t gmt = mktime(tm);
+    if (gmt == (time_t)-1)
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
-    return ret;
+    return (aug_time)gmt;
 }
 
 AUGSYS_API struct tm*
-aug_gmtime(const time_t* clock, struct tm* res)
+aug_gmtime(const aug_time* clock, struct tm* res)
 {
+    time_t gmt = *clock;
     struct tm* ret;
 
     /* Although there is no documented failure condition for the gmtime_r
@@ -93,7 +94,7 @@ aug_gmtime(const time_t* clock, struct tm* res)
 
 #if HAVE_LOCALTIME_R
 
-    if (!(ret = gmtime_r(clock, res)))
+    if (!(ret = gmtime_r(&gmt, res)))
         goto fail;
 
 #elif defined(_WIN32)
@@ -101,7 +102,7 @@ aug_gmtime(const time_t* clock, struct tm* res)
     /* Note: On windows, the gmtime function is implemented using thread-local
        storage - making it thread safe (but not re-entrant). */
 
-    if (!(ret = gmtime(clock)))
+    if (!(ret = gmtime(&gmt)))
         goto fail;
 
     memcpy(res, ret, sizeof(*res));
@@ -119,8 +120,9 @@ aug_gmtime(const time_t* clock, struct tm* res)
 }
 
 AUGSYS_API struct tm*
-aug_localtime(const time_t* clock, struct tm* res)
+aug_localtime(const aug_time* clock, struct tm* res)
 {
+    time_t gmt = *clock;
     struct tm* ret;
 
     /* Although there is no documented failure condition for the localtime_r
@@ -131,7 +133,7 @@ aug_localtime(const time_t* clock, struct tm* res)
 
 #if HAVE_LOCALTIME_R
 
-    if (!(ret = localtime_r(clock, res)))
+    if (!(ret = localtime_r(&gmt, res)))
         goto fail;
 
 #elif defined(_WIN32)
@@ -139,7 +141,7 @@ aug_localtime(const time_t* clock, struct tm* res)
     /* Note: On windows, the localtime function is implemented using
        thread-local storage - making it thread safe (but not re-entrant). */
 
-    if (!(ret = localtime(clock)))
+    if (!(ret = localtime(&gmt)))
         goto fail;
 
     memcpy(res, ret, sizeof(*res));
@@ -156,8 +158,8 @@ aug_localtime(const time_t* clock, struct tm* res)
     return NULL;
 }
 
-AUGSYS_API struct timeval*
-aug_mstotv(struct timeval* tv, unsigned ms)
+AUGSYS_API struct aug_timeval*
+aug_mstotv(unsigned ms, struct aug_timeval* tv)
 {
     tv->tv_sec = ms / 1000;
     tv->tv_usec = (ms % 1000) * 1000;
@@ -165,15 +167,15 @@ aug_mstotv(struct timeval* tv, unsigned ms)
 }
 
 AUGSYS_API unsigned
-aug_tvtoms(const struct timeval* tv)
+aug_tvtoms(const struct aug_timeval* tv)
 {
     unsigned ms = tv->tv_sec * 1000;
     ms += (tv->tv_usec + 500) / 1000;
     return ms;
 }
 
-AUGSYS_API struct timeval*
-aug_tvadd(struct timeval* dst, const struct timeval* src)
+AUGSYS_API struct aug_timeval*
+aug_tvadd(struct aug_timeval* dst, const struct aug_timeval* src)
 {
     dst->tv_sec += src->tv_sec;
     dst->tv_usec += src->tv_usec;
@@ -185,8 +187,8 @@ aug_tvadd(struct timeval* dst, const struct timeval* src)
     return dst;
 }
 
-AUGSYS_API struct timeval*
-aug_tvsub(struct timeval* dst, const struct timeval* src)
+AUGSYS_API struct aug_timeval*
+aug_tvsub(struct aug_timeval* dst, const struct aug_timeval* src)
 {
     dst->tv_sec -= src->tv_sec;
     dst->tv_usec -= src->tv_usec;

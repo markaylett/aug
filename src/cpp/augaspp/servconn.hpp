@@ -52,7 +52,7 @@ namespace aug {
         do_error(const char* desc);
 
         void
-        do_shutdown(chanref chan, unsigned flags, const timeval& now);
+        do_shutdown(chanref chan, unsigned flags, const aug_timeval& now);
 
         sockstate
         do_state() const;
@@ -61,25 +61,26 @@ namespace aug {
 
         void
         do_send(chanref chan, const void* buf, size_t size,
-                const timeval& now);
+                const aug_timeval& now);
 
         void
-        do_sendv(chanref chan, blobref blob, const timeval& now);
+        do_sendv(chanref chan, blobref blob, const aug_timeval& now);
 
         bool
-        do_accepted(const std::string& name, const timeval& now);
+        do_accepted(const std::string& name, const aug_timeval& now);
 
         void
-        do_connected(const std::string& name, const timeval& now);
+        do_connected(const std::string& name, const aug_timeval& now);
 
         bool
         do_auth(const char* subject, const char* issuer);
 
         void
-        do_process(chanref chan, unsigned short events, const timeval& now);
+        do_process(chanref chan, unsigned short events,
+                   const aug_timeval& now);
 
         void
-        do_teardown(const timeval& now);
+        do_teardown(const aug_timeval& now);
 
         std::string
         do_peername(chanref chan) const;

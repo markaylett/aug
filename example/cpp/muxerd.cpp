@@ -346,7 +346,7 @@ namespace test {
         void
         run()
         {
-            timeval tv;
+            aug_timeval tv;
 
             aug_ctxinfo(aug_tlx, "running daemon process");
 

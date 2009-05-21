@@ -37,7 +37,7 @@ static const char LABELS_[][4] = {
     "RWX"
 };
 
-static const struct timeval NOWAIT_ = { 0, 0 };
+static const struct aug_timeval NOWAIT_ = { 0, 0 };
 
 #if !defined(_WIN32)
 # include "augsys/posix/muxer.c"

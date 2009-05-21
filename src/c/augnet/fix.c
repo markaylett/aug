@@ -165,7 +165,7 @@ static aug_rsize
 getsum_(const char* buf, size_t size)
 {
     char cu, ct, ch;
-    aug_len_t sum;
+    aug_len sum;
 
     cu = buf[size - 2]; /* Units. */
     ct = buf[size - 3]; /* Tens. */
@@ -308,7 +308,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 {
     const char* ptr = buf;
     aug_rsize sum1;
-    aug_len_t sum2;
+    aug_len sum2;
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
        ^^
@@ -415,7 +415,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     return AUG_SUCCESS;
 }
 
-AUGNET_API aug_len_t
+AUGNET_API aug_len
 aug_checksum(const char* buf, size_t size)
 {
     const char* end = buf + size;
@@ -460,7 +460,7 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
     return AUG_FAILERROR;
  found:
 
-    field->size_ = (aug_len_t)(it - field->value_);
+    field->size_ = (aug_len)(it - field->value_);
 
     /* Return number of bytes consumed. */
 

@@ -31,7 +31,7 @@
 struct aug_hires_ {
     aug_mpool* mpool_;
     aug_clock* clock_;
-    struct timeval start_;
+    struct aug_timeval start_;
 };
 
 AUGUTIL_API aug_hires_t
@@ -86,7 +86,7 @@ aug_resethires(aug_hires_t hires)
 AUGUTIL_API double*
 aug_elapsed(aug_hires_t hires, double* sec)
 {
-    struct timeval now;
+    struct aug_timeval now;
     if (AUG_ISFAIL(aug_gettimeofday(hires->clock_, &now)))
         return NULL;
     aug_tvsub(&now, &hires->start_);

@@ -185,7 +185,7 @@ namespace aug {
 
             sessiontimers sessiontimers_;
 
-            timeval now_;
+            aug_timeval now_;
 
             enum {
                 STARTED,
@@ -531,7 +531,7 @@ engine::run(bool stoponerr)
 
             AUG_CTXDEBUG2(aug_tlx, "processing timers");
 
-            timeval tv;
+            aug_timeval tv;
             processexpired(impl_->timers_, 0 == ready, tv);
 
             try {

@@ -52,7 +52,7 @@ namespace aug {
         do_error(const char* desc);
 
         void
-        do_shutdown(chanref chan, unsigned flags, const timeval& now);
+        do_shutdown(chanref chan, unsigned flags, const aug_timeval& now);
 
         sockstate
         do_state() const;

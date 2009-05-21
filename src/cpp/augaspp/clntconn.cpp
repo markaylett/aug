@@ -54,7 +54,7 @@ clntconn::do_error(const char* desc)
 }
 
 void
-clntconn::do_shutdown(chanref chan, unsigned flags, const timeval& now)
+clntconn::do_shutdown(chanref chan, unsigned flags, const aug_timeval& now)
 {
     impl_.shutdown(chan, flags, now);
 }
@@ -67,25 +67,25 @@ clntconn::do_state() const
 
 void
 clntconn::do_send(chanref chan, const void* buf, size_t len,
-                  const timeval& now)
+                  const aug_timeval& now)
 {
     impl_.send(chan, buf, len, now);
 }
 
 void
-clntconn::do_sendv(chanref chan, blobref blob, const timeval& now)
+clntconn::do_sendv(chanref chan, blobref blob, const aug_timeval& now)
 {
     impl_.sendv(chan, blob, now);
 }
 
 bool
-clntconn::do_accepted(const string& name, const timeval& now)
+clntconn::do_accepted(const string& name, const aug_timeval& now)
 {
     return impl_.accepted(name, now);
 }
 
 void
-clntconn::do_connected(const string& name, const timeval& now)
+clntconn::do_connected(const string& name, const aug_timeval& now)
 {
     impl_.connected(name, now);
 }
@@ -97,13 +97,14 @@ clntconn::do_auth(const char* subject, const char* issuer)
 }
 
 void
-clntconn::do_process(chanref chan, unsigned short events, const timeval& now)
+clntconn::do_process(chanref chan, unsigned short events,
+                     const aug_timeval& now)
 {
     impl_.process(chan, events, now);
 }
 
 void
-clntconn::do_teardown(const timeval& now)
+clntconn::do_teardown(const aug_timeval& now)
 {
     impl_.teardown(now);
 }

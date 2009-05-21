@@ -83,7 +83,7 @@
 #define AUG_MDEVENTALL  (AUG_MDEVENTRDWR | AUG_MDEVENTEX)
 #define AUG_MDEVENTCONN (AUG_MDEVENTWR   | AUG_MDEVENTEX)
 
-struct timeval;
+struct aug_timeval;
 
 typedef struct aug_muxer_* aug_muxer_t;
 
@@ -112,7 +112,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
  */
 
 AUGSYS_API aug_rint
-aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout);
+aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout);
 
 /**
  * Poll events without waiting.

@@ -27,7 +27,7 @@
 
 #include <map>
 
-struct timeval;
+struct aug_timeval;
 
 namespace aug {
 
@@ -64,7 +64,7 @@ namespace aug {
         insert(const sockptr& sock);
 
         void
-        teardown(chans& chans, const timeval& tv);
+        teardown(chans& chans, const aug_timeval& tv);
 
         bool
         empty() const;

@@ -87,7 +87,8 @@ aug_settlx(aug_ctx* ctx);
 /**
  * Set thread-local with basic context.
  *
- * Use aug_createbasicctx() to create context, and assign to thread-local.
+ * Use aug_createbasicctx() to create a context, and assign it to the
+ * thread-local.
  *
  * @return See @ref TypesResult.
  */

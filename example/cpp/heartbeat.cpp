@@ -499,7 +499,7 @@ namespace {
         unsigned mwaitms_;
         timer mwait_;
         bool mseen_;
-        timeval mlast_;
+        aug_timeval mlast_;
         endpoint slave_;
 
         void
@@ -687,7 +687,7 @@ namespace {
                 // it should ask the candidate to stand-down.
 
                 if (mseen_) {
-                    timeval tv;
+                    aug_timeval tv;
                     gettimeofday(tv);
                     unsigned ms(tvtoms(tvsub(tv, mlast_)));
                     if (ms < HB_MS) {
@@ -754,7 +754,7 @@ namespace {
         session s(node, ref, ep, ts);
         setmdeventmask(mux, ref, AUG_MDEVENTRDEX);
 
-        timeval tv;
+        aug_timeval tv;
         unsigned ready(!0);
         while (!stop_) {
 
@@ -796,7 +796,7 @@ main(int argc, char* argv[])
         autotlx();
         aug_setlog(aug_tlx, aug_getdaemonlog());
 
-        timeval tv;
+        aug_timeval tv;
         aug::gettimeofday(tv);
         aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
 

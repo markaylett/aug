@@ -56,9 +56,9 @@ using namespace std;
 namespace {
 
     unsigned
-    diffms(const timeval& before, const timeval& after)
+    diffms(const aug_timeval& before, const aug_timeval& after)
     {
-        timeval diff(after);
+        aug_timeval diff(after);
         return tvtoms(tvsub(diff, before));
     }
 
@@ -72,7 +72,8 @@ namespace {
     // contents of the buffer cannot be cleared in a timely fashion.
 
     void
-    checkmaxwait(size_t size, const timeval& since, const timeval& now)
+    checkmaxwait(size_t size, const aug_timeval& since,
+                 const aug_timeval& now)
     {
         unsigned ms(diffms(since, now));
 
@@ -87,22 +88,22 @@ namespace {
     }
 
     void
-    checkmaxtime(size_t n, size_t size, const timeval& since,
-                 const timeval& now)
+    checkmaxtime(size_t n, size_t size, const aug_timeval& since,
+                 const aug_timeval& now)
     {
-        // How long has is taken to perform this write.
+        // How long has is taken to perform this write?
 
         unsigned ms(diffms(since, now));
         if (0 == ms)
             return;
 
-        // What does that equate to per ms.
+        // What does that equate to per ms?
 
         unsigned perms(static_cast<unsigned>(n) / ms);
         if (0 == perms)
             return;
 
-        // How long, therefore, will it take to clear buffer.
+        // How long, therefore, will it take to clear buffer?
 
         unsigned estms(static_cast<unsigned>(size) / perms);
         if (0 == estms)
@@ -150,7 +151,7 @@ connimpl::connimpl(const sessionptr& session, mod_handle& sock,
 
 void
 connimpl::send(chanref chan, const void* buf, size_t len,
-                   const timeval& now)
+               const aug_timeval& now)
 {
     if (buffer_.empty()) {
 
@@ -164,7 +165,7 @@ connimpl::send(chanref chan, const void* buf, size_t len,
 }
 
 void
-connimpl::sendv(chanref chan, blobref blob, const timeval& now)
+connimpl::sendv(chanref chan, blobref blob, const aug_timeval& now)
 {
     if (buffer_.empty()) {
 
@@ -178,13 +179,13 @@ connimpl::sendv(chanref chan, blobref blob, const timeval& now)
 }
 
 bool
-connimpl::accepted(const string& name, const timeval& now)
+connimpl::accepted(const string& name, const aug_timeval& now)
 {
     return accepted_ = session_->accepted(sock_, name.c_str());
 }
 
 void
-connimpl::connected(const string& name, const timeval& now)
+connimpl::connected(const string& name, const aug_timeval& now)
 {
     session_->connected(sock_, name.c_str());
 }
@@ -196,7 +197,7 @@ connimpl::auth(const char* subject, const char* issuer)
 }
 
 void
-connimpl::process(chanref chan, unsigned short events, const timeval& now)
+connimpl::process(chanref chan, unsigned short events, const aug_timeval& now)
 {
     streamptr stream(object_cast<aug_stream>(chan));
 
@@ -284,7 +285,7 @@ connimpl::error(const char* desc)
 }
 
 void
-connimpl::shutdown(chanref chan, unsigned flags, const timeval& now)
+connimpl::shutdown(chanref chan, unsigned flags, const aug_timeval& now)
 {
     if (SHUTDOWN <= state_)
         return; // Already shutdown.
@@ -312,7 +313,7 @@ connimpl::shutdown(chanref chan, unsigned flags, const timeval& now)
 }
 
 void
-connimpl::teardown(const timeval& now)
+connimpl::teardown(const aug_timeval& now)
 {
     if (state_ < TEARDOWN) {
         state_ = TEARDOWN;

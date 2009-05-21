@@ -54,7 +54,7 @@ listener::do_error(const char* desc)
 }
 
 void
-listener::do_shutdown(chanref chan, unsigned flags, const timeval& now)
+listener::do_shutdown(chanref chan, unsigned flags, const aug_timeval& now)
 {
     if (SHUTDOWN <= state_)
         return; // Already shutdown.

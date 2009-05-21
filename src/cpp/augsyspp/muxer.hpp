@@ -98,7 +98,7 @@ namespace aug {
      */
 
     inline unsigned
-    waitmdevents(aug_muxer_t muxer, const timeval& timeout)
+    waitmdevents(aug_muxer_t muxer, const aug_timeval& timeout)
     {
         return AUG_RESULT(verify(aug_waitmdevents(muxer, &timeout)));
     }

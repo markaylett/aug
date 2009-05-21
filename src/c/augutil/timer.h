@@ -36,8 +36,6 @@
 #include "augabi.h"
 #include "augtypes.h"
 
-struct timeval;
-
 typedef void (*aug_timercb_t)(aug_object*, int, unsigned*);
 
 typedef struct aug_timers_* aug_timers_t;
@@ -138,6 +136,7 @@ aug_timersempty(aug_timers_t timers);
  */
 
 AUGUTIL_API aug_result
-aug_processexpired(aug_timers_t timers, aug_bool force, struct timeval* next);
+aug_processexpired(aug_timers_t timers, aug_bool force,
+                   struct aug_timeval* next);
 
 #endif /* AUGUTIL_TIMER_H */

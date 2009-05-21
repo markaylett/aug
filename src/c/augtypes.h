@@ -57,7 +57,36 @@ typedef int aug_bool;
  * Equivalent to socklen_t.
  */
 
-typedef unsigned aug_len_t;
+typedef unsigned aug_len;
+
+/**
+ * Equivalent to suseconds_t.
+ */
+
+typedef long aug_suseconds;
+
+/**
+ * Equivalent to time_t.
+ */
+
+typedef long aug_time;
+
+/**
+ * Portable timeval definition to ensure standard layout across compilers.
+ * The original member names have been maintained to allow use with existing
+ * macros.
+ */
+
+struct aug_timeval {
+    /**
+     * Whole seconds.
+     */
+    aug_time tv_sec;
+    /**
+     * Fractional seconds to microsecond accuracy.
+     */
+    aug_suseconds tv_usec;
+};
 
 /**
  * The field structure.

@@ -181,7 +181,7 @@ namespace aug {
     }
 
     inline void
-    processexpired(aug_timers_t timers, bool force, timeval& next)
+    processexpired(aug_timers_t timers, bool force, aug_timeval& next)
     {
         verify(aug_processexpired(timers, force ? AUG_TRUE : AUG_FALSE,
                                   &next));

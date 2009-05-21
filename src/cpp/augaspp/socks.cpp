@@ -66,7 +66,7 @@ socks::insert(const sockptr& sock)
 }
 
 void
-socks::teardown(chans& chans, const timeval& now)
+socks::teardown(chans& chans, const aug_timeval& now)
 {
     // Ids are stored in reverse order using the greater<> predicate.
 

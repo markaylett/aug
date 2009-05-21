@@ -70,7 +70,7 @@ namespace {
     {
         pid_t pid(getpid());
 
-        timeval tv;
+        aug_timeval tv;
         clockptr clock(getclock(aug_tlx));
         gettimeofday(clock, tv);
 

@@ -42,7 +42,7 @@ struct timer_ {
     AUG_ENTRY(timer_);
     int id_;
     unsigned ms_;
-    struct timeval tv_;
+    struct aug_timeval tv_;
     aug_timercb_t cb_;
     aug_object* ob_;
 };
@@ -98,9 +98,9 @@ inserttimer_(struct timers_* timers, struct timer_* timer)
 }
 
 static aug_result
-setexpiry_(struct timeval* tv, unsigned ms)
+setexpiry_(struct aug_timeval* tv, unsigned ms)
 {
-    struct timeval local;
+    struct aug_timeval local;
     aug_clock* clock = aug_getclock(aug_tlx);
     aug_result result = aug_gettimeofday(clock, tv);
     aug_release(clock);
@@ -108,7 +108,7 @@ setexpiry_(struct timeval* tv, unsigned ms)
     if (AUG_ISFAIL(result))
         return result;
 
-    aug_tvadd(tv, aug_mstotv(&local, ms));
+    aug_tvadd(tv, aug_mstotv(ms, &local));
     return AUG_SUCCESS;
 }
 
@@ -147,7 +147,7 @@ AUGUTIL_API aug_rint
 aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
              aug_object* ob)
 {
-    struct timeval tv;
+    struct aug_timeval tv;
     struct timer_* timer;
 
     if (id <= 0)
@@ -243,9 +243,10 @@ aug_timersempty(aug_timers_t timers)
 }
 
 AUGUTIL_API aug_result
-aug_processexpired(aug_timers_t timers, aug_bool force, struct timeval* next)
+aug_processexpired(aug_timers_t timers, aug_bool force,
+                   struct aug_timeval* next)
 {
-    struct timeval now;
+    struct aug_timeval now;
     struct timer_* it;
 
     if ((it = AUG_FIRST(&timers->timers_))) {

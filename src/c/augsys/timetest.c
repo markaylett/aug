@@ -31,7 +31,7 @@ test(void)
 {
     aug_clock* clock;
     long tz;
-    time_t in, out;
+    aug_time in, out;
     struct tm tm;
     time(&in);
 

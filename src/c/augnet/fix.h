@@ -42,7 +42,7 @@ typedef unsigned aug_fixtag_t;
 struct aug_fixfield_ {
     aug_fixtag_t tag_;
     const char* value_;
-    aug_len_t size_;
+    aug_len size_;
 };
 
 struct aug_fixstd_ {
@@ -76,7 +76,7 @@ aug_finishfix(aug_fixstream_t stream);
 AUGNET_API aug_result
 aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size);
 
-AUGNET_API aug_len_t
+AUGNET_API aug_len
 aug_checksum(const char* buf, size_t size);
 
 AUGNET_API aug_rsize

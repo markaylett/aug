@@ -72,7 +72,7 @@ static const char* LABELS_[] = {
 static aug_rsize
 localtime_(struct tm* res)
 {
-    struct timeval tv;
+    struct aug_timeval tv;
     aug_clock* clock = aug_getclock(aug_tlx);
     aug_result result = aug_gettimeofday(clock, &tv);
     aug_release(clock);

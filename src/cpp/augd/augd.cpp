@@ -772,7 +772,7 @@ main(int argc, char* argv[])
 
         // Seed random number generator.
 
-        timeval tv;
+        aug_timeval tv;
         aug::gettimeofday(tv);
         aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
         std::ios::sync_with_stdio();

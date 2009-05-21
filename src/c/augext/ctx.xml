@@ -36,6 +36,7 @@
     </method>
 
     <method name="setloglevel" type="int" qname="setloglevel">
+      @return The previous log level.
       <param name="level" type="int"/>
     </method>
 

@@ -150,10 +150,14 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 }
 
 AUGSYS_API aug_rint
-aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
+aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
 {
+    struct timeval tv;
     int ret;
+
     muxer->out_ = muxer->in_;
+    tv.tv_sec = timeout->tv_sec;
+    tv.tv_usec = timeout->tv_usec;
 
     if (0 == muxer->bits_) {
         Sleep(timeout ? aug_tvtoms(timeout) : INFINITE);
@@ -164,7 +168,7 @@ aug_waitmdevents(aug_muxer_t muxer, const struct timeval* timeout)
 
     if (SOCKET_ERROR ==
         (ret = select(-1, &muxer->out_.rd_, &muxer->out_.wr_,
-                      &muxer->out_.ex_, timeout)))
+                      &muxer->out_.ex_, &tv)))
         return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                                    WSAGetLastError());
 

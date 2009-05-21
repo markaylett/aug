@@ -36,10 +36,10 @@ namespace aug {
 
         virtual void
         do_send(chanref chan, const void* buf, size_t size,
-                const timeval& now) = 0;
+                const aug_timeval& now) = 0;
 
         virtual void
-        do_sendv(chanref chan, blobref blob, const timeval& now) = 0;
+        do_sendv(chanref chan, blobref blob, const aug_timeval& now) = 0;
 
         /**
          * Notify of newly accepted connection.
@@ -48,10 +48,10 @@ namespace aug {
          */
 
         virtual bool
-        do_accepted(const std::string& name, const timeval& now) = 0;
+        do_accepted(const std::string& name, const aug_timeval& now) = 0;
 
         virtual void
-        do_connected(const std::string& name, const timeval& now) = 0;
+        do_connected(const std::string& name, const aug_timeval& now) = 0;
 
         virtual bool
         do_auth(const char* subject, const char* issuer) = 0;
@@ -62,14 +62,14 @@ namespace aug {
 
         virtual void
         do_process(chanref chan, unsigned short events,
-                   const timeval& now) = 0;
+                   const aug_timeval& now) = 0;
 
         /**
          * Initiate application-level teardown.
          */
 
         virtual void
-        do_teardown(const timeval& now) = 0;
+        do_teardown(const aug_timeval& now) = 0;
 
         virtual std::string
         do_peername(chanref chan) const = 0;
@@ -78,22 +78,23 @@ namespace aug {
         ~conn_base() AUG_NOTHROW;
 
         void
-        send(chanref chan, const void* buf, size_t size, const timeval& now)
+        send(chanref chan, const void* buf, size_t size,
+             const aug_timeval& now)
         {
             do_send(chan, buf, size, now);
         }
         void
-        sendv(chanref chan, blobref blob, const timeval& now)
+        sendv(chanref chan, blobref blob, const aug_timeval& now)
         {
             do_sendv(chan, blob, now);
         }
         bool
-        accepted(const std::string& name, const timeval& now)
+        accepted(const std::string& name, const aug_timeval& now)
         {
             return do_accepted(name, now);
         }
         void
-        connected(const std::string& name, const timeval& now)
+        connected(const std::string& name, const aug_timeval& now)
         {
             do_connected(name, now);
         }
@@ -103,12 +104,12 @@ namespace aug {
             return do_auth(subject, issuer);
         }
         void
-        process(chanref chan, unsigned short events, const timeval& now)
+        process(chanref chan, unsigned short events, const aug_timeval& now)
         {
             do_process(chan, events, now);
         }
         void
-        teardown(const timeval& now)
+        teardown(const aug_timeval& now)
         {
             do_teardown(now);
         }
@@ -140,7 +141,7 @@ namespace aug {
          * Waiting for writability since.
          */
 
-        timeval since_;
+        aug_timeval since_;
 
     public:
         ~connimpl() AUG_NOTHROW;
@@ -167,31 +168,32 @@ namespace aug {
         }
 
         void
-        send(chanref chan, const void* buf, size_t size, const timeval& now);
+        send(chanref chan, const void* buf, size_t size,
+             const aug_timeval& now);
 
         void
-        sendv(chanref chan, blobref blob, const timeval& now);
+        sendv(chanref chan, blobref blob, const aug_timeval& now);
 
         bool
-        accepted(const std::string& name, const timeval& now);
+        accepted(const std::string& name, const aug_timeval& now);
 
         void
-        connected(const std::string& name, const timeval& now);
+        connected(const std::string& name, const aug_timeval& now);
 
         bool
         auth(const char* subject, const char* issuer);
 
         void
-        process(chanref chan, unsigned short events, const timeval& now);
+        process(chanref chan, unsigned short events, const aug_timeval& now);
 
         void
         error(const char* desc);
 
         void
-        shutdown(chanref chan, unsigned flags, const timeval& now);
+        shutdown(chanref chan, unsigned flags, const aug_timeval& now);
 
         void
-        teardown(const timeval& now);
+        teardown(const aug_timeval& now);
 
         std::string
         peername(chanref chan) const;

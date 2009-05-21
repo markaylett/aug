@@ -136,7 +136,7 @@ namespace {
         session s(name, ref, ep, ts);
         setmdeventmask(mux, ref, AUG_MDEVENTRDEX);
 
-        timeval tv;
+        aug_timeval tv;
         unsigned ready(!0);
         while (!stop_) {
 
@@ -173,7 +173,7 @@ main(int argc, char* argv[])
         autotlx();
         aug_setlog(aug_tlx, aug_getdaemonlog());
 
-        timeval tv;
+        aug_timeval tv;
         aug::gettimeofday(tv);
 
         if (argc < 4) {

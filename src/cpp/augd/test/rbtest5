@@ -33,7 +33,7 @@ sessions=RbStop RbTest5
 session.RbStop.module=augrb
 session.RbTest5.module=augrb
 
-module.augrb.path=$AUG_BUILDDIR/src/c/augrb/.libs/modaugrb
+module.augrb.path=$AUG_BUILDDIR/src/mod/augrb/.libs/modaugrb
 module.augrb.rubypath=$AUG_SRCDIR/src/rb
 EOD
 

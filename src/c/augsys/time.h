@@ -31,6 +31,8 @@
 
 #include "augsys/config.h"
 
+#include "augtypes.h"
+
 #if !defined(_REENTRANT)
 # define _REENTRANT
 #endif /* _REENTRANT */
@@ -51,28 +53,28 @@ struct timezone {
  * variable.  It should not, therefore, be considered thread-safe.
  */
 
-AUGSYS_API time_t
+AUGSYS_API aug_time
 aug_timegm(struct tm* tm);
 
-AUGSYS_API time_t
+AUGSYS_API aug_time
 aug_timelocal(struct tm* tm);
 
 AUGSYS_API struct tm*
-aug_gmtime(const time_t* clock, struct tm* res);
+aug_gmtime(const aug_time* clock, struct tm* res);
 
 AUGSYS_API struct tm*
-aug_localtime(const time_t* clock, struct tm* res);
+aug_localtime(const aug_time* clock, struct tm* res);
 
-AUGSYS_API struct timeval*
-aug_mstotv(struct timeval* tv, unsigned ms);
+AUGSYS_API struct aug_timeval*
+aug_mstotv(unsigned ms, struct aug_timeval* tv);
 
 AUGSYS_API unsigned
-aug_tvtoms(const struct timeval* tv);
+aug_tvtoms(const struct aug_timeval* tv);
 
-AUGSYS_API struct timeval*
-aug_tvadd(struct timeval* dst, const struct timeval* src);
+AUGSYS_API struct aug_timeval*
+aug_tvadd(struct aug_timeval* dst, const struct aug_timeval* src);
 
-AUGSYS_API struct timeval*
-aug_tvsub(struct timeval* dst, const struct timeval* src);
+AUGSYS_API struct aug_timeval*
+aug_tvsub(struct aug_timeval* dst, const struct aug_timeval* src);
 
 #endif /* AUGSYS_TIME_H */

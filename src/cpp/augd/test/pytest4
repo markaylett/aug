@@ -33,7 +33,7 @@ sessions=pystop pytest4
 session.pystop.module=augpy
 session.pytest4.module=augpy
 
-module.augpy.path=$AUG_BUILDDIR/src/c/augpy/.libs/modaugpy
+module.augpy.path=$AUG_BUILDDIR/src/mod/augpy/.libs/modaugpy
 module.augpy.pythonpath=$AUG_SRCDIR/src/py
 EOD
 

@@ -44,7 +44,7 @@ namespace aug {
         do_error(const char* desc) = 0;
 
         virtual void
-        do_shutdown(chanref chan, unsigned flags, const timeval& now) = 0;
+        do_shutdown(chanref chan, unsigned flags, const aug_timeval& now) = 0;
 
         virtual sockstate
         do_state() const = 0;
@@ -60,7 +60,7 @@ namespace aug {
         }
 
         void
-        shutdown(chanref chan, unsigned flags, const timeval& now)
+        shutdown(chanref chan, unsigned flags, const aug_timeval& now)
         {
             do_shutdown(chan, flags, now);
         }

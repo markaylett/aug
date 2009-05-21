@@ -29,15 +29,15 @@
 
 namespace aug {
 
-    inline timeval&
-    gettimeofday(timeval& tv)
+    inline aug_timeval&
+    gettimeofday(aug_timeval& tv)
     {
         gettimeofday(getclock(aug_tlx), tv);
         return tv;
     }
 
     inline tm&
-    gmtime(const time_t& clock, tm& res)
+    gmtime(const aug_time& clock, tm& res)
     {
         return *verify(aug_gmtime(&clock, &res));
     }
@@ -49,7 +49,7 @@ namespace aug {
     }
 
     inline tm&
-    localtime(const time_t& clock, tm& res)
+    localtime(const aug_time& clock, tm& res)
     {
         return *verify(aug_localtime(&clock, &res));
     }
@@ -60,26 +60,26 @@ namespace aug {
         return localtime(time(0), res);
     }
 
-    inline timeval&
-    mstotv(timeval& tv, unsigned ms)
+    inline aug_timeval&
+    mstotv(unsigned ms, aug_timeval& tv)
     {
-        return *aug_mstotv(&tv, ms);
+        return *aug_mstotv(ms, &tv);
     }
 
     inline unsigned
-    tvtoms(const timeval& tv)
+    tvtoms(const aug_timeval& tv)
     {
         return aug_tvtoms(&tv);
     }
 
-    inline timeval&
-    tvadd(timeval& dst, const timeval& src)
+    inline aug_timeval&
+    tvadd(aug_timeval& dst, const aug_timeval& src)
     {
         return *aug_tvadd(&dst, &src);
     }
 
-    inline timeval&
-    tvsub(timeval& dst, const timeval& src)
+    inline aug_timeval&
+    tvsub(aug_timeval& dst, const aug_timeval& src)
     {
         return *aug_tvsub(&dst, &src);
     }

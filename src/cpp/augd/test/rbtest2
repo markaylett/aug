@@ -35,7 +35,7 @@ session.RbStop.module=augrb
 session.RbTest2.groups=group1 group2
 session.RbTest2.module=augrb
 
-module.augrb.path=$AUG_BUILDDIR/src/c/augrb/.libs/modaugrb
+module.augrb.path=$AUG_BUILDDIR/src/mod/augrb/.libs/modaugrb
 module.augrb.rubypath=$AUG_SRCDIR/src/rb
 EOD
 
