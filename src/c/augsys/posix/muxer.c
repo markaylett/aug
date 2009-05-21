@@ -332,15 +332,26 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
 {
-    struct timeval tv;
     int ret;
 
     muxer->out_ = muxer->in_;
-    tv.tv_sec = timeout.tv_sec;
-    tv.tv_usec = timeout.tv_usec;
 
-    if (-1 == (ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_,
-                            &muxer->out_.wr_, &muxer->out_.ex_, &tv)))
+    if (timeout) {
+
+        struct timeval tv;
+        tv.tv_sec = timeout->tv_sec;
+        tv.tv_usec = timeout->tv_usec;
+
+        ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_, &muxer->out_.wr_,
+                     &muxer->out_.ex_, &tv);
+
+    } else {
+
+        ret = select(muxer->maxfd_ + 1, &muxer->out_.rd_, &muxer->out_.wr_,
+                     &muxer->out_.ex_, NULL);
+    }
+
+    if (-1 == ret)
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     return AUG_MKRESULT(ret);

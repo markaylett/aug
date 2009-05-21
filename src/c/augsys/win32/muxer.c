@@ -152,23 +152,33 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 AUGSYS_API aug_rint
 aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
 {
-    struct timeval tv;
     int ret;
 
     muxer->out_ = muxer->in_;
-    tv.tv_sec = timeout->tv_sec;
-    tv.tv_usec = timeout->tv_usec;
 
     if (0 == muxer->bits_) {
         Sleep(timeout ? aug_tvtoms(timeout) : INFINITE);
         return AUG_SUCCESS;
     }
 
+    if (timeout) {
+
+        struct timeval tv;
+        tv.tv_sec = timeout->tv_sec;
+        tv.tv_usec = timeout->tv_usec;
+
+        ret = select(-1, &muxer->out_.rd_, &muxer->out_.wr_,
+                     &muxer->out_.ex_, &tv);
+
+    } else {
+
+        ret = select(-1, &muxer->out_.rd_, &muxer->out_.wr_,
+                     &muxer->out_.ex_, NULL);
+    }
+
     /* Note: WinSock ignores the nfds argument. */
 
-    if (SOCKET_ERROR ==
-        (ret = select(-1, &muxer->out_.rd_, &muxer->out_.wr_,
-                      &muxer->out_.ex_, &tv)))
+    if (SOCKET_ERROR == ret)
         return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                                    WSAGetLastError());
 

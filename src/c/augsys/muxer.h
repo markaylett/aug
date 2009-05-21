@@ -99,6 +99,8 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask);
 /**
  * Wait for events.
  *
+ * @param muxer The muxer instance.
+ *
  * @param timeout Optional timeout value; a null timeout causes the function
  * to block until an event occurs.
  *

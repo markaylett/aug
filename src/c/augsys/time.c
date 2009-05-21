@@ -58,7 +58,7 @@ aug_timegm(struct tm* tm)
     if ((time_t)-1 == (gmt = mktime(&gm))) {
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
-        return gmt;
+        return (aug_time)gmt;
     }
 
     /* mktime() assumes localtime; adjust for gmt. */
