@@ -33,7 +33,7 @@
  */
 
 /**
- * @page augidl
+ * @page augabi
  *
  * Tool for creating interfaces from XML.
  */

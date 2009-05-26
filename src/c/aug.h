@@ -52,7 +52,7 @@
  *
  * Tools within aug package are:
  * @li @subpage augd
- * @li @subpage augidl
+ * @li @subpage augabi
  * @li @subpage htdigest
  * @li @subpage mar
  */

@@ -126,7 +126,8 @@ aug_pollmdevents(aug_muxer_t muxer);
 /**
  * Get event mask associated with descriptor.
  *
- * @param Descriptor.
+ * @param muxer The multiplexer.
+ * @param md The descriptor.
  */
 
 AUGSYS_API unsigned short
@@ -136,7 +137,7 @@ aug_getmdeventmask(aug_muxer_t muxer, aug_md md);
  * Return events set for @a md.
  *
  * @param muxer The multiplexer.
- * @param md A multiplexer-managed descriptor.
+ * @param md The descriptor.
  *
  * @return Events set.
  */

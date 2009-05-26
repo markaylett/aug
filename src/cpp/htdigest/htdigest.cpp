@@ -24,6 +24,12 @@
 
 AUG_RCSID("$Id$");
 
+/**
+ * @page htdigest
+ *
+ * A GPL alternative to the Apache htdigest program.
+ */
+
 #include "augutilpp/string.hpp"
 #include "augutil/pwd.h"
 
