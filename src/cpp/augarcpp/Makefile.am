@@ -41,4 +41,5 @@ libaugarcpp_la_LDFLAGS = \
 	-no-undefined \
 	-version-info 1:0:0
 
-libaugarcpp_la_LIBADD =
+libaugarcpp_la_LIBADD = \
+	$(top_builddir)/src/c/augctx/libaugctx.la

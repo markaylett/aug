@@ -57,7 +57,9 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(moddir)"
 modLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(mod_LTLIBRARIES)
-modaught_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
+modaught_la_DEPENDENCIES =  \
+	$(top_builddir)/src/cpp/augarcpp/libaugarcpp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
@@ -240,6 +242,7 @@ modaught_la_SOURCES = \
 
 modaught_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modaught_la_LIBADD = \
+	$(top_builddir)/src/cpp/augarcpp/libaugarcpp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \

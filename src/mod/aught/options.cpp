@@ -118,13 +118,13 @@ namespace {
     }
 
     void
-    loadservices(set<string>& services)
+    loadservices(outer_base& outer)
     {
         const char* s(mod::getenv("session.http.services"));
         if (s) {
             istringstream is(s);
             copy(istream_iterator<string>(is), istream_iterator<string>(),
-                 inserter(services, services.begin()));
+                 outer_inserter(outer));
         }
     }
 }
@@ -135,12 +135,12 @@ options::load()
     string css;
     map<string, string> mimetypes;
     map<pair<string, string>, string> passwd;
-    set<string> services;
+    rootptr services(createroot());
 
     loadcss(css);
     loadmimetypes(mimetypes);
     loadpasswd(passwd);
-    loadservices(services);
+    loadservices(*services);
 
     // Commit.
 

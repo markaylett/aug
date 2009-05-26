@@ -48,7 +48,7 @@ namespace {
     }
 
     void
-    sendall(mod_id id, const pair<string, string>& p)
+    sendother(mod_id id, const pair<string, string>& p)
     {
         string s("* ");
         s += p.first;
@@ -72,7 +72,7 @@ namespace {
         if (it == end)
             throw invalid_argument("missing arguments");
         do {
-            sendall(id, *it);
+            sendother(id, *it);
         } while (++it != end);
     }
 
@@ -100,7 +100,7 @@ namespace {
 
     // PUB
     // SUB
-    // UNS
+    // UNSUB
 
     string
     interpret(mod_id id, const string& cmd, pair_iterator it,

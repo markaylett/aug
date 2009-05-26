@@ -456,7 +456,15 @@ namespace {
                 // Split path into series of nodes.
 
                 u.path_ = decodeurl(u.path_.begin(), u.path_.end());
-                vector<string> nodes(splitpath(u.path_));
+                path nodes;
+                try {
+                    nodes = splitpath(u.path_);
+                } catch (const underflow_error&) {
+
+                    // Attempt to access root directory's parent.
+
+                    throw http_error(403, "Forbidden");
+                }
 
                 if (!auth_) {
 

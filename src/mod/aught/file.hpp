@@ -38,9 +38,6 @@ namespace aug {
 
     std::string
     joinpath(const std::vector<std::string>& nodes);
-
-    std::vector<std::string>
-    splitpath(const std::string& path);
 }
 
 #endif // AUGHT_FILE_HPP

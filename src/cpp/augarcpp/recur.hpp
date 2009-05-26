@@ -30,7 +30,7 @@
 
 namespace aug {
 
-    class recur : public typed_base {
+    class recur : public typed_base, public mpool_ops {
         match match_;
         inverse<names> exnames_;
         inverse<wild> exwild_;

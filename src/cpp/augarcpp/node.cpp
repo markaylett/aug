@@ -26,7 +26,45 @@
 
 AUG_RCSID("$Id$");
 
+#include "augutilpp/string.hpp"
+
+#include "augctxpp/mpool.hpp"
+
+#include <stdexcept>
+
 using namespace aug;
+using namespace std;
+
+namespace {
+
+    class nodes {
+        path* path_;
+    public:
+        explicit
+        nodes(path& p)
+            : path_(&p)
+        {
+        }
+        void
+        operator ()(string& name)
+        {
+            if (name == "..") {
+                if (path_->empty())
+                    throw underflow_error("path underflow");
+                path_->pop_back();
+            } else if (!name.empty() && name != ".")
+                path_->push_back(name);
+        }
+    };
+}
+
+AUGARCPP_API path
+aug::splitpath(const string& s)
+{
+    path p;
+    splitn(s.begin(), s.end(), '/', nodes(p));
+    return p;
+}
 
 AUGARCPP_API
 node_base::~node_base() AUG_NOTHROW

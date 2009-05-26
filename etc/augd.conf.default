@@ -20,11 +20,8 @@ session.http.realm=testrealm@host.com
 session.http.salt=some random phrase
 session.http.services=\
   service/reconf\
-  service/sched/delevent\
-  service/sched/putevent\
-  service/sched/putevent\
-  service/sched/events\
-  service/xmlrpc/test
+  service/sched/-\
+  service/xmlrpc/-
 
 session.http.sslserv=8443
 session.http.sslcontext=server

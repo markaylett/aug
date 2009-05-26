@@ -30,7 +30,7 @@
 
 namespace aug {
 
-    class wild : public typed_base {
+    class wild : public typed_base, public mpool_ops {
 
         match match_;
         const innerptr wildchild_;

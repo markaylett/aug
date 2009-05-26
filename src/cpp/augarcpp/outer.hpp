@@ -25,6 +25,8 @@
 
 #include "augarcpp/query.hpp"
 
+#include <iterator>
+
 namespace aug {
 
     class AUGARCPP_API outer_base : public query_base {
@@ -78,6 +80,41 @@ namespace aug {
     };
 
     typedef smartptr<outer_base> outerptr;
+
+    class outer_inserter
+        : public std::iterator<std::output_iterator_tag, void, void, void,
+                               void>
+    {
+        outer_base* outer_;
+    public:
+        typedef outer_base container_type;
+        explicit
+        outer_inserter(outer_base& outer)
+            : outer_(&outer)
+        {
+        }
+        outer_inserter&
+        operator =(const std::string& path)
+        {
+            outer_->insert(path);
+            return *this;
+        }
+        outer_inserter&
+        operator *()
+        {
+            return *this;
+        }
+        outer_inserter&
+        operator++()
+        {
+            return *this;
+        }
+        outer_inserter&
+        operator ++(int)
+        {
+            return *this;
+        }
+    };
 }
 
 #endif // AUGARCPP_OUTER_HPP

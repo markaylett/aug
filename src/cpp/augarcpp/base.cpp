@@ -37,7 +37,7 @@ using namespace std;
 
 namespace {
 
-    class inner : public inner_base {
+    class inner : public inner_base, public mpool_ops {
         const factory_base& factory_;
         names names_;
         typedptr special_;
@@ -119,7 +119,7 @@ namespace {
             names_.insertrecur();
             // Promotion from wildcard to recursive.
             if (null == special_ || ARCRECUR != special_->type())
-                special_.reset(new recur(factory_));
+                special_.reset(new (tlx) recur(factory_));
             special_->insertrecur();
         }
 
@@ -129,7 +129,7 @@ namespace {
             names_.insertwild();
             // Promotion from wildcard to recursive.
             if (null == special_)
-                special_.reset(new wild(factory_));
+                special_.reset(new (tlx) wild(factory_));
             special_->insertwild();
         }
 
@@ -139,7 +139,7 @@ namespace {
             names_.insertwild(pit, pend);
             // Promotion from wildcard to recursive.
             if (null == special_)
-                special_.reset(new wild(factory_));
+                special_.reset(new (tlx) wild(factory_));
             special_->insertwild(pit, pend);
         }
 
@@ -384,19 +384,19 @@ namespace {
 
     };
 
-    class factory : public factory_base {
+    class factory : public factory_base, public mpool_ops {
     protected:
 
         innerptr
         do_createinner() const
         {
-            return innerptr(new inner(*this));
+            return innerptr(new (tlx) inner(*this));
         }
 
         outerptr
         do_createouter() const
         {
-            return outerptr(new outer(*this));
+            return outerptr(new (tlx) outer(*this));
         }
 
     public:

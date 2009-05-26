@@ -25,18 +25,17 @@
 
 #include "augarcpp/types.hpp"
 
-#include "augutilpp/string.hpp"
 #include "augsyspp/smartptr.hpp"
 
 #include <iostream>
 
 namespace aug {
 
-    inline path
-    splitpath(const std::string& s)
-    {
-        return splitn(s.begin(), s.end(), '/');
-    }
+    // Split and normalise path.  An underflow_error will be thrown if the
+    // path specifies a parent of the root directory, such as "..".
+
+    AUGARCPP_API path
+    splitpath(const std::string& s);
 
     class AUGARCPP_API node_base {
     protected:

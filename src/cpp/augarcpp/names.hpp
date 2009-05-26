@@ -26,13 +26,15 @@
 #include "augarcpp/outer.hpp"
 #include "augarcpp/typed.hpp"
 
+#include "augctxpp/mpool.hpp"
+
 #include <map>
 
 namespace aug {
 
     class AUGARCPP_API factory_base;
 
-    class names : public typed_base {
+    class names : public typed_base, public mpool_ops {
 
         typedef std::map<std::string, outerptr> nodes;
 

@@ -123,6 +123,12 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout);
 AUGSYS_API aug_rint
 aug_pollmdevents(aug_muxer_t muxer);
 
+/**
+ * Get event mask associated with descriptor.
+ *
+ * @param Descriptor.
+ */
+
 AUGSYS_API unsigned short
 aug_getmdeventmask(aug_muxer_t muxer, aug_md md);
 
@@ -148,6 +154,12 @@ aug_getmdevents(aug_muxer_t muxer, aug_md md);
 
 AUGSYS_API aug_result
 aug_muxerpipe(aug_md mds[2]);
+
+/**
+ * Get printable string from event mask.
+ *
+ * @param events Event mask.
+ */
 
 AUGSYS_API const char*
 aug_eventlabel(unsigned short events);

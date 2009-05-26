@@ -17,6 +17,7 @@ modaught_la_SOURCES = \
 	options.cpp
 modaught_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modaught_la_LIBADD = \
+	$(top_builddir)/src/cpp/augarcpp/libaugarcpp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \

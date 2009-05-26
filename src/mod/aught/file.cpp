@@ -29,7 +29,6 @@ AUG_RCSID("$Id$");
 #include "exception.hpp"
 
 #include "augutilpp/path.hpp"
-#include "augutilpp/string.hpp"
 
 #include "augsyspp/mmap.hpp"
 #include "augsyspp/unistd.hpp"
@@ -62,26 +61,6 @@ using namespace mod;
 using namespace std;
 
 namespace {
-
-    class nodes : public mpool_ops {
-        vector<string>* xs_;
-    public:
-        explicit
-        nodes(vector<string>& xs)
-            : xs_(&xs)
-        {
-        }
-        void
-        operator ()(string& x)
-        {
-            if (x == "..") {
-                if (xs_->empty())
-                    throw http_error(403, "Forbidden");
-                xs_->pop_back();
-            } else if (!x.empty() && x != ".")
-                xs_->push_back(x);
-        }
-    };
 
     class filecontent : public ref_base, public mpool_ops {
         blob<filecontent> blob_;
@@ -201,12 +180,3 @@ aug::joinpath(const vector<string>& nodes)
 
     return path;
 }
-
-vector<string>
-aug::splitpath(const string& path)
-{
-    vector<string> v;
-    splitn(path.begin(), path.end(), '/', nodes(v));
-    return v;
-}
-
