@@ -138,9 +138,6 @@
 				RelativePath="..\src\c\augmar\config.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augmar\flags_.c">
-			</File>
-			<File
 				RelativePath="..\src\c\augmar\format_.c">
 			</File>
 			<File
@@ -171,9 +168,6 @@
 			</File>
 			<File
 				RelativePath="..\src\c\augmar\config.h">
-			</File>
-			<File
-				RelativePath="..\src\c\augmar\flags_.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augmar\format_.h">

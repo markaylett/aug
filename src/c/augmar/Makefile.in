@@ -61,7 +61,7 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugmar_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugmar_la_OBJECTS = config.lo mar.lo types.lo body_.lo flags_.lo \
+am_libaugmar_la_OBJECTS = config.lo mar.lo types.lo body_.lo \
 	format_.lo header_.lo info_.lo mfile_.lo seq_.lo
 libaugmar_la_OBJECTS = $(am_libaugmar_la_OBJECTS)
 am_maintest_OBJECTS = maintest.$(OBJEXT)
@@ -233,7 +233,6 @@ modinclude_HEADERS = \
 
 noinst_HEADERS = \
 	body_.h \
-	flags_.h \
 	format_.h \
 	header_.h \
 	info_.h \
@@ -246,7 +245,6 @@ libaugmar_la_SOURCES = \
 	mar.c \
 	types.c \
 	body_.c \
-	flags_.c \
 	format_.c \
 	header_.c \
 	info_.c \
@@ -347,7 +345,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/body_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flags_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/format_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/header_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/info_.Plo@am__quote@
