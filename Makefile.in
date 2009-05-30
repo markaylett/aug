@@ -209,10 +209,11 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 to_host_path_cmd = @to_host_path_cmd@
 SUBDIRS = \
-	etc \
 	doc \
+	etc \
 	src \
 	example \
+	test \
 	vc7
 
 EXTRA_DIST = \

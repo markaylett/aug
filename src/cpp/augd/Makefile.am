@@ -1,8 +1,5 @@
 include $(top_srcdir)/src/cpp/lang.mk
 
-SUBDIRS = \
-	test
-
 noinst_HEADERS = \
 	exception.hpp \
 	module.hpp \
@@ -28,34 +25,3 @@ augd_LDADD = \
 	$(top_builddir)/src/c/augserv/libaugserv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la
-
-check_PROGRAMS =
-
-TESTS_ENVIRONMENT = \
-	AUG_LOGLEVEL=3 \
-	AUG_BUILDDIR=$(top_builddir) \
-	AUG_SRCDIR=$(top_srcdir)
-
-TESTS =
-
-if WITH_PYTHON
-TESTS += \
-	test/pytest1 \
-	test/pytest2 \
-	test/pytest3 \
-	test/pytest4 \
-	test/pytest5 \
-	test/pytest6 \
-	test/pytest7
-endif
-
-if WITH_RUBY
-TESTS += \
-	test/rbtest1 \
-	test/rbtest2 \
-	test/rbtest3 \
-	test/rbtest4 \
-	test/rbtest5 \
-	test/rbtest6 \
-	test/rbtest7
-endif

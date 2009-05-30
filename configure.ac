@@ -297,11 +297,6 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  doc/man/Makefile
                  etc/Makefile
-                 example/Makefile
-                 example/augas/Makefile
-                 example/augas/etc/Makefile
-                 example/augas/htdocs/Makefile
-                 example/cpp/Makefile
                  src/Makefile
                  src/c/Makefile
                  src/c/augctx/Makefile
@@ -332,7 +327,6 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augarcpp/Makefile
                  src/cpp/augaspp/Makefile
                  src/cpp/augd/Makefile
-                 src/cpp/augd/test/Makefile
                  src/cpp/htdigest/Makefile
                  src/mod/Makefile
                  src/mod/augarc/Makefile
@@ -343,5 +337,11 @@ AC_CONFIG_FILES([Makefile
                  src/py/Makefile
                  src/rb/Makefile
                  src/sh/Makefile
+                 example/Makefile
+                 example/augas/Makefile
+                 example/augas/etc/Makefile
+                 example/augas/htdocs/Makefile
+                 example/cpp/Makefile
+                 test/Makefile
                  vc7/Makefile])
 AC_OUTPUT

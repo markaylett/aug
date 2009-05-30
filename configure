@@ -18287,7 +18287,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile example/Makefile example/augas/Makefile example/augas/etc/Makefile example/augas/htdocs/Makefile example/cpp/Makefile src/Makefile src/c/Makefile src/c/augctx/Makefile src/c/augctx/posix/Makefile src/c/augctx/win32/Makefile src/c/augext/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augres/Makefile src/c/augserv/Makefile src/c/augserv/posix/Makefile src/c/augserv/win32/Makefile src/c/augsys/Makefile src/c/augsys/osx/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/augutil/posix/Makefile src/c/augutil/win32/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augctxpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augservpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/augarcpp/Makefile src/cpp/augaspp/Makefile src/cpp/augd/Makefile src/cpp/augd/test/Makefile src/cpp/htdigest/Makefile src/mod/Makefile src/mod/augarc/Makefile src/mod/aught/Makefile src/mod/augpy/Makefile src/mod/augrb/Makefile src/pl/Makefile src/py/Makefile src/rb/Makefile src/sh/Makefile vc7/Makefile"
+ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile etc/Makefile src/Makefile src/c/Makefile src/c/augctx/Makefile src/c/augctx/posix/Makefile src/c/augctx/win32/Makefile src/c/augext/Makefile src/c/augmar/Makefile src/c/augnet/Makefile src/c/augres/Makefile src/c/augserv/Makefile src/c/augserv/posix/Makefile src/c/augserv/win32/Makefile src/c/augsys/Makefile src/c/augsys/osx/Makefile src/c/augsys/posix/Makefile src/c/augsys/win32/Makefile src/c/augutil/Makefile src/c/augutil/posix/Makefile src/c/augutil/win32/Makefile src/c/mar/Makefile src/cpp/Makefile src/cpp/augctxpp/Makefile src/cpp/augmarpp/Makefile src/cpp/augnetpp/Makefile src/cpp/augservpp/Makefile src/cpp/augsyspp/Makefile src/cpp/augutilpp/Makefile src/cpp/augarcpp/Makefile src/cpp/augaspp/Makefile src/cpp/augd/Makefile src/cpp/htdigest/Makefile src/mod/Makefile src/mod/augarc/Makefile src/mod/aught/Makefile src/mod/augpy/Makefile src/mod/augrb/Makefile src/pl/Makefile src/py/Makefile src/rb/Makefile src/sh/Makefile example/Makefile example/augas/Makefile example/augas/etc/Makefile example/augas/htdocs/Makefile example/cpp/Makefile test/Makefile vc7/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19358,11 +19358,6 @@ do
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "doc/man/Makefile") CONFIG_FILES="$CONFIG_FILES doc/man/Makefile" ;;
     "etc/Makefile") CONFIG_FILES="$CONFIG_FILES etc/Makefile" ;;
-    "example/Makefile") CONFIG_FILES="$CONFIG_FILES example/Makefile" ;;
-    "example/augas/Makefile") CONFIG_FILES="$CONFIG_FILES example/augas/Makefile" ;;
-    "example/augas/etc/Makefile") CONFIG_FILES="$CONFIG_FILES example/augas/etc/Makefile" ;;
-    "example/augas/htdocs/Makefile") CONFIG_FILES="$CONFIG_FILES example/augas/htdocs/Makefile" ;;
-    "example/cpp/Makefile") CONFIG_FILES="$CONFIG_FILES example/cpp/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/c/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/Makefile" ;;
     "src/c/augctx/Makefile") CONFIG_FILES="$CONFIG_FILES src/c/augctx/Makefile" ;;
@@ -19393,7 +19388,6 @@ do
     "src/cpp/augarcpp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augarcpp/Makefile" ;;
     "src/cpp/augaspp/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augaspp/Makefile" ;;
     "src/cpp/augd/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augd/Makefile" ;;
-    "src/cpp/augd/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/augd/test/Makefile" ;;
     "src/cpp/htdigest/Makefile") CONFIG_FILES="$CONFIG_FILES src/cpp/htdigest/Makefile" ;;
     "src/mod/Makefile") CONFIG_FILES="$CONFIG_FILES src/mod/Makefile" ;;
     "src/mod/augarc/Makefile") CONFIG_FILES="$CONFIG_FILES src/mod/augarc/Makefile" ;;
@@ -19404,6 +19398,12 @@ do
     "src/py/Makefile") CONFIG_FILES="$CONFIG_FILES src/py/Makefile" ;;
     "src/rb/Makefile") CONFIG_FILES="$CONFIG_FILES src/rb/Makefile" ;;
     "src/sh/Makefile") CONFIG_FILES="$CONFIG_FILES src/sh/Makefile" ;;
+    "example/Makefile") CONFIG_FILES="$CONFIG_FILES example/Makefile" ;;
+    "example/augas/Makefile") CONFIG_FILES="$CONFIG_FILES example/augas/Makefile" ;;
+    "example/augas/etc/Makefile") CONFIG_FILES="$CONFIG_FILES example/augas/etc/Makefile" ;;
+    "example/augas/htdocs/Makefile") CONFIG_FILES="$CONFIG_FILES example/augas/htdocs/Makefile" ;;
+    "example/cpp/Makefile") CONFIG_FILES="$CONFIG_FILES example/cpp/Makefile" ;;
+    "test/Makefile") CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
     "vc7/Makefile") CONFIG_FILES="$CONFIG_FILES vc7/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

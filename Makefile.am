@@ -1,8 +1,9 @@
 SUBDIRS = \
-	etc \
 	doc \
+	etc \
 	src \
 	example \
+	test \
 	vc7
 
 EXTRA_DIST = \
