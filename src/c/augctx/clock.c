@@ -81,8 +81,8 @@ gettimeofday_(aug_clock* obj, struct aug_timeval* tv)
 {
 #if !defined(_WIN32)
     /* FIXME: policy for setting errinfo? */
-    struct aug_timeval local;
-    if (-1 == gettimeofday(&local, NULL))
+    struct timeval local;
+    if (gettimeofday(&local, NULL) < 0)
         return AUG_FAILERROR;
     tv->tv_sec = (aug_time)local.tv_sec;
     tv->tv_usec = (aug_suseconds)local.tv_usec;
