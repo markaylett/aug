@@ -32,6 +32,25 @@
 
 namespace aug {
 
+
+    inline unsigned
+    appendlexer(aug_lexer_t lexer, char ch)
+    {
+        return aug_appendlexer(lexer, ch);
+    }
+
+    inline unsigned
+    finishlexer(aug_lexer_t lexer)
+    {
+        return aug_finishlexer(lexer);
+    }
+
+    inline const char*
+    lexertoken(aug_lexer_t lexer)
+    {
+        return aug_lexertoken(lexer);
+    }
+
     const struct networds_ { } networds = networds_();
     const struct shellwords_ { } shellwords = shellwords_();
 
@@ -90,24 +109,12 @@ namespace aug {
     {
         lhs.swap(rhs);
     }
+}
 
-    inline unsigned
-    appendlexer(aug_lexer_t lexer, char ch)
-    {
-        return aug_appendlexer(lexer, ch);
-    }
-
-    inline unsigned
-    finishlexer(aug_lexer_t lexer)
-    {
-        return aug_finishlexer(lexer);
-    }
-
-    inline const char*
-    lexertoken(aug_lexer_t lexer)
-    {
-        return aug_lexertoken(lexer);
-    }
+inline bool
+isnull(aug_lexer_t lexer)
+{
+    return !lexer;
 }
 
 #endif // AUGUTILPP_LEXER_HPP

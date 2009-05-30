@@ -2,11 +2,11 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 modincludedir = $(includedir)/augutilpp
 modinclude_HEADERS = \
-	clock.hpp \
 	config.hpp \
 	conv.hpp \
 	event.hpp \
 	file.hpp \
+	hires.hpp \
 	lexer.hpp \
 	log.hpp \
 	object.hpp \
@@ -18,11 +18,11 @@ modinclude_HEADERS = \
 noinst_LTLIBRARIES = libaugutilpp.la
 
 libaugutilpp_la_SOURCES = \
-	clock.cpp \
 	config.cpp \
 	conv.cpp \
 	event.cpp \
 	file.cpp \
+	hires.cpp \
 	lexer.cpp \
 	log.cpp \
 	object.cpp \

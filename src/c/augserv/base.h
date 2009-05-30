@@ -25,6 +25,8 @@
 
 #include "augserv/config.h"
 
+#include "augutil/event.h" /* aug_events_t */
+
 #include "augsys/types.h"
 
 #include "augtypes.h"
@@ -51,18 +53,7 @@ aug_runserv(void);
 AUGSERV_API void
 aug_termserv(void);
 
-/**
- * Read-end of event pipe.
- */
-
-AUGSERV_API aug_md
-aug_eventrd(void);
-
-/**
- * Write-end of event pipe.
- */
-
-AUGSERV_API aug_md
-aug_eventwr(void);
+AUGSERV_API aug_events_t
+aug_events(void);
 
 #endif /* AUGSERV_BASE_H */

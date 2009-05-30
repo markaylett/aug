@@ -150,7 +150,7 @@ servconn::~servconn() AUG_NOTHROW
 }
 
 servconn::servconn(mpoolref mpool, const sessionptr& session, void* user,
-                   timers& timers, unsigned id)
+                   aug_timers_t timers, unsigned id)
     : impl_(session, sock_, buffer_, rwtimer_, false), // See comment.
       buffer_(mpool),
       rwtimer_(session, sock_, timers)

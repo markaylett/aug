@@ -228,7 +228,7 @@ namespace {
         explicit
         impl(char* frobpass)
             : timers_(getmpool(aug_tlx)),
-              engine_(aug_eventrd(), aug_eventwr(), timers_, enginecb_)
+              engine_(aug_events(), timers_, enginecb_)
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
 
@@ -780,7 +780,7 @@ main(int argc, char* argv[])
         try {
             program_ = argv[0];
 
-            blocksignals();
+            sigblock();
             return main(argc, argv, serv_);
 
         } AUG_PERRINFOCATCH;

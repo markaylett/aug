@@ -135,9 +135,6 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\src\cpp\augutilpp\clock.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augutilpp\config.cpp">
 			</File>
 			<File
@@ -148,6 +145,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\file.cpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augutilpp\hires.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\lexer.cpp">
@@ -176,9 +176,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\src\cpp\augutilpp\clock.hpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augutilpp\config.hpp">
 			</File>
 			<File
@@ -189,6 +186,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\file.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augutilpp\hires.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augutilpp\lexer.hpp">

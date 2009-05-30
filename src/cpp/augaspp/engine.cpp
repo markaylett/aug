@@ -165,8 +165,8 @@ namespace aug {
         struct engineimpl : mpool_ops {
 
             chandler<engineimpl> chandler_;
-            mdref eventrd_, eventwr_;
-            timers& timers_;
+            aug_events_t events_;
+            aug_timers_t timers_;
             enginecb_base& cb_;
             muxer muxer_;
             chans chans_;
@@ -193,10 +193,9 @@ namespace aug {
                 STOPPED
             } state_;
 
-            engineimpl(mdref eventrd, mdref eventwr, timers& timers,
+            engineimpl(aug_events_t events, aug_timers_t timers,
                        enginecb_base& cb)
-                : eventrd_(eventrd),
-                  eventwr_(eventwr),
+                : events_(events),
                   timers_(timers),
                   cb_(cb),
                   muxer_(getmpool(aug_tlx)),
@@ -210,7 +209,7 @@ namespace aug {
                 chans_.swap(tmp);
 
                 gettimeofday(now_);
-                setmdeventmask(muxer_, eventrd_, AUG_MDEVENTRDEX);
+                setmdeventmask(muxer_, eventsmd(events_), AUG_MDEVENTRDEX);
             }
             smartob<aug_object>
             cast_(const char* id) AUG_NOTHROW
@@ -382,7 +381,7 @@ namespace aug {
                                &engineimpl::stopcb>, ob);
                 }
             }
-            bool
+            void
             readevent()
             {
                 AUG_CTXDEBUG2(aug_tlx, "reading event");
@@ -390,7 +389,7 @@ namespace aug {
                 // Sticky events not required for fixed length blocking read.
 
                 pair<int, smartob<aug_object> >
-                    event(aug::readevent(eventrd_));
+                    event(aug::readevent(events_));
 
                 switch (event.first) {
                 case AUG_EVENTRECONF:
@@ -430,7 +429,6 @@ namespace aug {
                                          getmsgtype(msg), payload);
                     }
                 }
-                return true;
             }
             void
             timercb(idref id, unsigned& ms)
@@ -467,9 +465,8 @@ engine::~engine() AUG_NOTHROW
 }
 
 AUGASPP_API
-engine::engine(mdref eventrd, mdref eventwr, timers& timers,
-               enginecb_base& cb)
-    : impl_(new (tlx) detail::engineimpl(eventrd, eventwr, timers, cb))
+engine::engine(aug_events_t events, aug_timers_t timers, enginecb_base& cb)
+    : impl_(new (tlx) detail::engineimpl(events, timers, cb))
 {
 }
 
@@ -543,18 +540,18 @@ engine::run(bool stoponerr)
 
                     pollmdevents(impl_->muxer_);
 
-                } else if (impl_->timers_.empty()) {
+                } else if (aug_timersempty(impl_->timers_)) {
 
                     // No timers so wait indefinitely.
 
-                    scoped_unblock unblock;
+                    scoped_sigunblock unblock;
                     ready = waitmdevents(impl_->muxer_);
 
                 } else {
 
                     // Wait upto next timer expiry.
 
-                    scoped_unblock unblock;
+                    scoped_sigunblock unblock;
                     ready = waitmdevents(impl_->muxer_, tv);
                 }
 
@@ -569,10 +566,16 @@ engine::run(bool stoponerr)
 
             AUG_CTXDEBUG2(aug_tlx, "processing events");
 
-            // Sticky events not required for fixed length blocking read.
+            if (getmdevents(impl_->muxer_, eventsmd(impl_->events_)))
+                try {
 
-            if (getmdevents(impl_->muxer_, impl_->eventrd_))
-                impl_->readevent();
+                    // Read events until operation would block.
+
+                    for (;;)
+                        impl_->readevent();
+
+                } catch (const block_exception&) {
+                }
 
             AUG_CTXDEBUG2(aug_tlx, "processing files");
 
@@ -594,7 +597,7 @@ engine::reconfall()
     // Thread-safe.
 
     aug_event e = { AUG_EVENTRECONF, 0 };
-    writeevent(impl_->eventwr_, e);
+    writeevent(impl_->events_, e);
 }
 
 AUGASPP_API void
@@ -603,7 +606,7 @@ engine::stopall()
     // Thread-safe.
 
     aug_event e = { AUG_EVENTSTOP, 0 };
-    writeevent(impl_->eventwr_, e);
+    writeevent(impl_->events_, e);
 }
 
 AUGASPP_API void
@@ -618,7 +621,7 @@ engine::post(mod_id id, const char* sname, const char* to, const char* type,
     e.type_ = POSTEVENT_;
     e.ob_ = msg.base();
 
-    writeevent(impl_->eventwr_, e);
+    writeevent(impl_->events_, e);
 }
 
 AUGASPP_API void

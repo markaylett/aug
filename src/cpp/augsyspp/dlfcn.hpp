@@ -107,6 +107,12 @@ namespace aug {
             return *this;
         }
 
+        void
+        swap(dlib& rhs) AUG_NOTHROW
+        {
+            std::swap(dlib_, rhs.dlib_);
+        }
+
         operator aug_dlib_t()
         {
             return dlib_;
@@ -121,9 +127,9 @@ namespace aug {
 }
 
 inline bool
-isnull(aug_dlib_t dl)
+isnull(aug_dlib_t dlib)
 {
-    return 0 == dl;
+    return !dlib;
 }
 
 #endif // AUGSYSPP_DLFCN_HPP

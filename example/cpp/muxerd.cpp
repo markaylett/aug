@@ -222,7 +222,7 @@ namespace test {
             chans tmp(getmpool(aug_tlx), chandler_);
             chans_.swap(tmp);
 
-            setmdeventmask(muxer_, aug_eventrd(), AUG_MDEVENTRDEX);
+            setmdeventmask(muxer_, eventsmd(), AUG_MDEVENTRDEX);
 
             aug_hostserv hostserv;
             parsehostserv(address_, hostserv);
@@ -322,7 +322,7 @@ namespace test {
             // Sticky events not required for fixed length blocking read.
 
             pair<int, smartob<aug_object> >
-                event(aug::readevent(aug_eventrd()));
+                event(aug::readevent(aug_events()));
 
             switch (event.first) {
             case AUG_EVENTRECONF:
@@ -368,14 +368,14 @@ namespace test {
 
                         // No timers so wait indefinitely.
 
-                        scoped_unblock unblock;
+                        scoped_sigunblock unblock;
                         ready = waitmdevents(state_->muxer_);
 
                     } else {
 
                         // Wait upto next timer expiry.
 
-                        scoped_unblock unblock;
+                        scoped_sigunblock unblock;
                         ready = waitmdevents(state_->muxer_, tv);
                     }
 
@@ -384,10 +384,16 @@ namespace test {
                     continue;
                 }
 
-                // Sticky events not required for fixed length blocking read.
+                if (getmdevents(state_->muxer_, eventsmd()))
+                    try {
 
-                if (getmdevents(state_->muxer_, aug_eventrd()))
-                    readevent();
+                        // Read events until operation would block.
+
+                        for (;;)
+                            readevent();
+
+                    } catch (const block_exception&) {
+                    }
 
                 processchans(state_->chans_);
             }
@@ -473,7 +479,7 @@ main(int argc, char* argv[])
 
         program_ = argv[0];
 
-        blocksignals();
+        sigblock();
         return main(argc, argv, serv_);
 
     } catch (const exception& e) {

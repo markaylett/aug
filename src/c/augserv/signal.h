@@ -27,13 +27,17 @@
 
 #include "augtypes.h"
 
+/**
+ * Install signal handler.  A null handler will restore the defaults.
+ */
+
 AUGSERV_API aug_result
 aug_setsighandler(void (*handler)(int));
 
 AUGSERV_API aug_result
-aug_blocksignals(void);
+aug_sigblock(void);
 
 AUGSERV_API aug_result
-aug_unblocksignals(void);
+aug_sigunblock(void);
 
 #endif /* AUGSERV_SIGNAL_H */

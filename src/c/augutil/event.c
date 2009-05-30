@@ -26,13 +26,15 @@
 
 AUG_RCSID("$Id$");
 
+#include "augutil/list.h"
 #include "augutil/object.h"
 
-#include "augsys/barrier.h"
 #include "augsys/muxer.h"
 
+#include "augctx/base.h"
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
+#include "augctx/lock.h"
 #include "augctx/mpool.h" /* aug_getcrtmalloc() */
 
 #include <errno.h>
@@ -43,48 +45,178 @@ AUG_RCSID("$Id$");
 # define SIGUSR1 10
 #endif /* _WIN32 */
 
-static aug_result
-readall_(aug_md md, char* buf, size_t n)
+/* A pipe is used to interrupt the muxer.  Atomicity is ensured by only
+   writing a single byte to the pipe for each queued event.  The actual events
+   are maintained in a separate list.  The event itself cannot be written to
+   the pipe because this would cause problems if ever the pipe were to become
+   full.  In this scenario, a partial event could be written with no chance of
+   recovery when the muxer is serviced on the same thread. */
+
+struct event_ {
+    AUG_ENTRY(event_);
+    int type_;
+    aug_object* ob_;
+};
+
+AUG_HEAD(list_, event_);
+
+struct aug_events_ {
+    aug_mpool* mpool_;
+    aug_md mds_[2];
+    struct list_ events_;
+};
+
+static struct event_*
+createevent_(int type, aug_object* ob)
 {
-    /* Ensure all bytes are read and ignore any interrupts. */
+    aug_mpool* mpool = aug_getcrtmalloc();
+    struct event_* event = aug_allocmem(mpool, sizeof(struct event_));
+    aug_release(mpool);
 
-    while (0 != n) {
-
-        aug_result result = aug_mread(md, buf, n);
-        if (AUG_ISFAIL(result)) {
-
-            if (AUG_ISINTR(result))
-                continue;
-
-            return result;
-        }
-        buf += AUG_RESULT(result), n -= AUG_RESULT(result);
+    if (event) {
+        event->type_ = type;
+        if ((event->ob_ = ob))
+            aug_retain(ob);
     }
-    return AUG_SUCCESS;
+    return event;
 }
 
 static aug_result
-writeall_(aug_md md, const char* buf, size_t n)
+readone_(aug_md md)
 {
-    /* Ensure all bytes are written and ignore any interrupts. */
+    char ch;
+    aug_result result;
 
-    while (0 != n) {
+    while (AUG_ISINTR(result = aug_mread(md, &ch, 1)))
+        ;
 
-        aug_result result = aug_mwrite(md, buf, n);
-        if (AUG_ISFAIL(result)) {
+    return result;
+}
 
-            if (AUG_ISINTR(result))
-                continue;
+static aug_result
+writeone_(aug_md md)
+{
+    char ch = 1;
+    aug_result result;
 
-            return result;
-        }
-        buf += AUG_RESULT(result), n -= AUG_RESULT(result);
+    while (AUG_ISINTR(result = aug_mwrite(md, &ch, 1)))
+        ;
+
+    return result;
+}
+
+static void
+destroyevent_(struct event_* event)
+{
+    aug_mpool* mpool = aug_getcrtmalloc();
+    if (event->ob_)
+        aug_release(event->ob_);
+    aug_freemem(mpool, event);
+    aug_release(mpool);
+}
+
+AUGUTIL_API aug_events_t
+aug_createevents(aug_mpool* mpool)
+{
+    aug_events_t events = aug_allocmem(mpool, sizeof(struct aug_events_));
+    if (!events)
+        return NULL;
+
+    events->mpool_ = mpool;
+    if (AUG_ISFAIL(aug_muxerpipe(events->mds_))) {
+        aug_freemem(mpool, events);
+        return NULL;
     }
-    return AUG_SUCCESS;
+    AUG_INIT(&events->events_);
+
+    aug_retain(mpool);
+    return events;
+}
+
+AUGUTIL_API void
+aug_destroyevents(aug_events_t events)
+{
+    aug_mpool* mpool = events->mpool_;
+    struct event_* it;
+
+    while ((it = AUG_FIRST(&events->events_))) {
+        AUG_REMOVE_HEAD(&events->events_);
+        destroyevent_(it);
+    }
+
+    if (AUG_ISFAIL(aug_mclose(events->mds_[0]))
+        || AUG_ISFAIL(aug_mclose(events->mds_[1])))
+        aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
+
+    aug_freemem(mpool, events);
+    aug_release(mpool);
+}
+
+AUGUTIL_API aug_result
+aug_readevent(aug_events_t events, struct aug_event* event)
+{
+    struct event_* local;
+    aug_result result;
+
+    aug_lock();
+
+    /* Non-blocking. */
+
+    result = readone_(events->mds_[0]);
+
+    if (AUG_ISFAIL(result)) {
+        aug_unlock();
+        return result;
+    }
+
+    local = AUG_FIRST(&events->events_);
+    AUG_REMOVE_HEAD(&events->events_);
+
+    aug_unlock();
+
+    /* Set output. */
+
+    event->type_ = local->type_;
+    if ((event->ob_ = local->ob_))
+        aug_retain(event->ob_);
+
+    destroyevent_(local);
+    return result;
+}
+
+AUGUTIL_API aug_result
+aug_writeevent(aug_events_t events, const struct aug_event* event)
+{
+    struct event_* local = createevent_(event->type_, event->ob_);
+    aug_result result;
+
+    if (!local)
+        return AUG_FAILERROR;
+
+    aug_lock();
+
+    /* Non-blocking. */
+
+    result = writeone_(events->mds_[1]);
+
+    if (AUG_ISFAIL(result))
+        destroyevent_(local);
+    else
+        AUG_INSERT_TAIL(&events->events_, local);
+
+    aug_unlock();
+
+    return result;
+}
+
+AUGUTIL_API aug_md
+aug_eventsmd(aug_events_t events)
+{
+    return events->mds_[0];
 }
 
 AUGUTIL_API struct aug_event*
-aug_setsigevent(struct aug_event* event, int sig)
+aug_sigtoevent(int sig, struct aug_event* event)
 {
     /* Must use standard c-malloc to ensure safety from signal handler;
        aug_tlx may not have been initialised on signal handler's thread. */
@@ -106,41 +238,5 @@ aug_setsigevent(struct aug_event* event, int sig)
     }
     event->ob_ = (aug_object*)aug_createboxint(mpool, sig, NULL);
     aug_release(mpool);
-    return event;
-}
-
-AUGUTIL_API struct aug_event*
-aug_readevent(aug_md md, struct aug_event* event)
-{
-    if (AUG_ISFAIL(readall_(md, (char*)event, sizeof(*event))))
-        return NULL;
-
-    /* Ensure writes are visible: ensure that any components of the event
-       object are read from main memory. */
-
-    AUG_RMB();
-
-    return event;
-}
-
-AUGUTIL_API const struct aug_event*
-aug_writeevent(aug_md md, const struct aug_event* event)
-{
-    /* Flush pending writes to main memory: ensure that the event object is
-       visible to other threads. */
-
-    AUG_WMB();
-
-    /* Must increment before write. */
-
-    if (event->ob_)
-        aug_retain(event->ob_);
-
-    if (AUG_ISFAIL(writeall_(md, (const char*)event, sizeof(*event)))) {
-        if (event->ob_)
-            aug_release(event->ob_);
-        return NULL;
-    }
-
     return event;
 }

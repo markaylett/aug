@@ -25,10 +25,10 @@
 
 #include "augutil.h"
 
-#include "augutilpp/clock.hpp"
 #include "augutilpp/conv.hpp"
 #include "augutilpp/event.hpp"
 #include "augutilpp/file.hpp"
+#include "augutilpp/hires.hpp"
 #include "augutilpp/lexer.hpp"
 #include "augutilpp/log.hpp"
 #include "augutilpp/object.hpp"

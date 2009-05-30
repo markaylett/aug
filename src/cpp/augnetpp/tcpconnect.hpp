@@ -37,6 +37,26 @@
 
 namespace aug {
 
+    inline autosd
+    tryconnect(aug_tcpconnect_t conn, aug_endpoint& ep, bool& est)
+    {
+        int local;
+        sdref ref(aug_tryconnect(conn, &ep, &local));
+        if (null == ref)
+            throwerror();
+
+        // When established, aug_tryconnect() will release ownership of the
+        // returned socket descriptor - it will not call aug_sclose() on it.
+
+        if (local) {
+            est = true;
+            return autosd(ref, close);
+        }
+
+        est = false;
+        return autosd(ref, 0);
+    }
+
     class tcpconnect : public mpool_ops {
 
         aug_tcpconnect_t conn_;
@@ -87,26 +107,12 @@ namespace aug {
     {
         lhs.swap(rhs);
     }
+}
 
-    inline autosd
-    tryconnect(aug_tcpconnect_t conn, aug_endpoint& ep, bool& est)
-    {
-        int local;
-        sdref ref(aug_tryconnect(conn, &ep, &local));
-        if (null == ref)
-            throwerror();
-
-        // When established, aug_tryconnect() will release ownership of the
-        // returned socket descriptor - it will not call aug_sclose() on it.
-
-        if (local) {
-            est = true;
-            return autosd(ref, close);
-        }
-
-        est = false;
-        return autosd(ref, 0);
-    }
+inline bool
+isnull(aug_tcpconnect_t tcpconnect)
+{
+    return !tcpconnect;
 }
 
 #endif // AUGNETPP_TCPCONNECT_HPP

@@ -36,8 +36,8 @@ struct aug_dlib_ {
 AUGSYS_API aug_result
 aug_dlclose(aug_dlib_t dlib)
 {
-    aug_result result = AUG_SUCCESS;
     aug_mpool* mpool = dlib->mpool_;
+    aug_result result = AUG_SUCCESS;
 
     if (!FreeLibrary(dlib->handle_)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());

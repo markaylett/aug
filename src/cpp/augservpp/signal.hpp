@@ -39,54 +39,76 @@ namespace aug {
     }
 
     inline void
-    blocksignals()
+    sigblock()
     {
-        verify(aug_blocksignals());
+        verify(aug_sigblock());
     }
 
     inline void
-    unblocksignals()
+    sigunblock()
     {
-        verify(aug_unblocksignals());
+        verify(aug_sigunblock());
     }
 
-    class scoped_block {
+    class scoped_sighandler {
 
-        scoped_block(const scoped_block& rhs);
+        scoped_sighandler(const scoped_sighandler& rhs);
 
-        scoped_block&
-        operator =(const scoped_block& rhs);
+        scoped_sighandler&
+        operator =(const scoped_sighandler& rhs);
 
     public:
-        ~scoped_block() AUG_NOTHROW
+        ~scoped_sighandler() AUG_NOTHROW
         {
-            if (AUG_ISFAIL(aug_unblocksignals()))
-                perrinfo(aug_tlx, "aug_unblocksignals() failed");
+            // Restore default handlers.
+
+            if (AUG_ISFAIL(aug_setsighandler(0)))
+                perrinfo(aug_tlx, "aug_setsighandler() failed");
         }
 
-        scoped_block()
+        scoped_sighandler(void (*handler)(int))
         {
-            blocksignals();
+            setsighandler(handler);
         }
     };
 
-    class scoped_unblock {
+    class scoped_sigblock {
 
-        scoped_unblock(const scoped_unblock& rhs);
+        scoped_sigblock(const scoped_sigblock& rhs);
 
-        scoped_unblock&
-        operator =(const scoped_unblock& rhs);
+        scoped_sigblock&
+        operator =(const scoped_sigblock& rhs);
 
     public:
-        ~scoped_unblock() AUG_NOTHROW
+        ~scoped_sigblock() AUG_NOTHROW
         {
-            if (AUG_ISFAIL(aug_blocksignals()))
-                perrinfo(aug_tlx, "aug_blocksignals() failed");
+            if (AUG_ISFAIL(aug_sigunblock()))
+                perrinfo(aug_tlx, "aug_sigunblock() failed");
         }
 
-        scoped_unblock()
+        scoped_sigblock()
         {
-            unblocksignals();
+            sigblock();
+        }
+    };
+
+    class scoped_sigunblock {
+
+        scoped_sigunblock(const scoped_sigunblock& rhs);
+
+        scoped_sigunblock&
+        operator =(const scoped_sigunblock& rhs);
+
+    public:
+        ~scoped_sigunblock() AUG_NOTHROW
+        {
+            if (AUG_ISFAIL(aug_sigblock()))
+                perrinfo(aug_tlx, "aug_sigblock() failed");
+        }
+
+        scoped_sigunblock()
+        {
+            sigunblock();
         }
     };
 }

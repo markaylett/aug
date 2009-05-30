@@ -166,6 +166,8 @@ handler_(DWORD code)
     /* FIXME: restore original status on failure to write event. */
 
     struct aug_event event = { 0, NULL };
+    aug_result result;
+
     switch (code) {
     case RECONF_:
         event.type_ = AUG_EVENTRECONF;
@@ -180,7 +182,10 @@ handler_(DWORD code)
         event.type_ = AUG_EVENTSTOP;
         break;
     }
-    if (!aug_writeevent(aug_eventwr(), &event))
+
+    result = aug_writeevent(aug_events(), &event);
+
+    if (AUG_ISFAIL(result) && !AUG_ISBLOCK(result))
         abort();
 }
 

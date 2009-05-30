@@ -374,5 +374,20 @@ aug_getmdevents(aug_muxer_t muxer, aug_md md)
 AUGSYS_API aug_result
 aug_muxerpipe(aug_md mds[2])
 {
-    return aug_fpipe(mds);
+    aug_fd fds[2];
+    aug_result result;
+
+    if (AUG_ISFAIL(result = aug_fpipe(fds)))
+        return result;
+
+    if (AUG_ISFAIL(result = aug_fsetnonblock(fds[0], AUG_TRUE))
+        || AUG_ISFAIL(result = aug_fsetnonblock(fds[1], AUG_TRUE))) {
+        aug_fclose(fds[0]);
+        aug_fclose(fds[1]);
+        return result;
+    }
+
+    mds[0] = fds[0];
+    mds[1] = fds[1];
+    return AUG_SUCCESS;
 }

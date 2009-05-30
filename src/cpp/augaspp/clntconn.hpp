@@ -106,7 +106,7 @@ namespace aug {
         ~clntconn() AUG_NOTHROW;
 
         clntconn(mpoolref mpool, const sessionptr& session, void* user,
-                 timers& timers, unsigned id);
+                 aug_timers_t timers, unsigned id);
     };
 }
 

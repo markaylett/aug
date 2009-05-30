@@ -200,5 +200,20 @@ aug_getmdevents(aug_muxer_t muxer, aug_md md)
 AUGSYS_API aug_result
 aug_muxerpipe(aug_md mds[2])
 {
-    return aug_socketpair(AF_UNIX, SOCK_STREAM, 0, mds);
+    aug_md sds[2];
+    aug_result result;
+
+    if (AUG_ISFAIL(result = aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sds)))
+        return result;
+
+    if (AUG_ISFAIL(result = aug_ssetnonblock(sds[0], AUG_TRUE))
+        || AUG_ISFAIL(result = aug_ssetnonblock(sds[1], AUG_TRUE))) {
+        aug_sclose(sds[0]);
+        aug_sclose(sds[1]);
+        return result;
+    }
+
+    mds[0] = sds[0];
+    mds[1] = sds[1];
+    return AUG_SUCCESS;
 }

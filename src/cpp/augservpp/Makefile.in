@@ -55,7 +55,8 @@ libaugservpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augserv/libaugserv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugservpp_la_OBJECTS = config.lo log.lo main.lo signal.lo
+am_libaugservpp_la_OBJECTS = base.lo config.lo log.lo main.lo \
+	signal.lo
 libaugservpp_la_OBJECTS = $(am_libaugservpp_la_OBJECTS)
 am_maintest_OBJECTS = maintest.$(OBJEXT)
 maintest_OBJECTS = $(am_maintest_OBJECTS)
@@ -236,6 +237,7 @@ DEFAULT_INCLUDES = \
 
 modincludedir = $(includedir)/augservpp
 modinclude_HEADERS = \
+	base.hpp \
 	config.hpp \
 	log.hpp \
 	main.hpp \
@@ -243,6 +245,7 @@ modinclude_HEADERS = \
 
 noinst_LTLIBRARIES = libaugservpp.la
 libaugservpp_la_SOURCES = \
+	base.cpp \
 	config.cpp \
 	log.cpp \
 	main.cpp \
@@ -329,6 +332,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Plo@am__quote@

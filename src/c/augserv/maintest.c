@@ -56,13 +56,8 @@ run_(aug_task* obj)
 {
     struct aug_event in = { 1, 0 }, out = { !1, 0 };
 
-    /* Sticky events not required for fixed length blocking read. */
-
-    if (!aug_writeevent(aug_eventwr(), &in))
-        return AUG_FAILERROR;
-
-    if (!aug_readevent(aug_eventrd(), &out))
-        return AUG_FAILERROR;
+    aug_verify(aug_writeevent(aug_events(), &in));
+    aug_verify(aug_readevent(aug_events(), &out));
 
     if (in.type_ != out.type_) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,

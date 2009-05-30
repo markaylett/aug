@@ -55,8 +55,8 @@ libaugutilpp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/cpp/augsyspp/libaugsyspp.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-am_libaugutilpp_la_OBJECTS = clock.lo config.lo conv.lo event.lo \
-	file.lo lexer.lo log.lo object.lo path.lo shellparser.lo \
+am_libaugutilpp_la_OBJECTS = config.lo conv.lo event.lo file.lo \
+	hires.lo lexer.lo log.lo object.lo path.lo shellparser.lo \
 	string.lo timer.lo
 libaugutilpp_la_OBJECTS = $(am_libaugutilpp_la_OBJECTS)
 am_maintest_OBJECTS = maintest.$(OBJEXT)
@@ -256,11 +256,11 @@ DEFAULT_INCLUDES = \
 
 modincludedir = $(includedir)/augutilpp
 modinclude_HEADERS = \
-	clock.hpp \
 	config.hpp \
 	conv.hpp \
 	event.hpp \
 	file.hpp \
+	hires.hpp \
 	lexer.hpp \
 	log.hpp \
 	object.hpp \
@@ -271,11 +271,11 @@ modinclude_HEADERS = \
 
 noinst_LTLIBRARIES = libaugutilpp.la
 libaugutilpp_la_SOURCES = \
-	clock.cpp \
 	config.cpp \
 	conv.cpp \
 	event.cpp \
 	file.cpp \
+	hires.cpp \
 	lexer.cpp \
 	log.cpp \
 	object.cpp \
@@ -391,11 +391,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hires.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maintest.Po@am__quote@

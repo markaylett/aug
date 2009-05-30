@@ -41,8 +41,6 @@ AUG_RCSID("$Id$");
 #include "augext/log.h"
 #include "augext/task.h"
 
-#include "augutil/event.h"  /* struct aug_event */
-
 #include <assert.h>
 #include <stdlib.h>         /* NULL */
 #include <string.h>         /* memcpy() */
@@ -54,26 +52,24 @@ AUG_RCSID("$Id$");
    with an automatic variable pointer. */
 
 static struct aug_serv serv_ = { 0 };
-static aug_md mds_[2] = { AUG_BADMD, AUG_BADMD };
+static aug_events_t events_ = NULL;
 static aug_task* task_ = 0;
 
-/* closepipe_() should not be called from an atexit() handler: on Windows, the
-   pipe is implemented as a socket pair.  The c-runtime may terminate the
-   Winsock layer prior to calling the cleanup function. */
+/* destroyevents_() should not be called from an atexit() handler: on Windows,
+   the event pipe is implemented as a socket pair.  The c-runtime may
+   terminate the Winsock layer prior to calling the cleanup function. */
 
 static void
-closepipe_(void)
+destroyevents_(void)
 {
-    if (AUG_BADMD != mds_[0])
-        if (AUG_ISFAIL(aug_mclose(mds_[0])))
-            aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
+    if (events_) {
 
-    if (AUG_BADMD != mds_[1])
-        if (AUG_ISFAIL(aug_mclose(mds_[1])))
-            aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
+        /* Always restore default signal handlers before destroying events. */
 
-    mds_[0] = AUG_BADMD;
-    mds_[1] = AUG_BADMD;
+        aug_setsighandler(0);
+        aug_destroyevents(events_);
+        events_ = NULL;
+    }
 }
 
 /* On Windows, signal handlers are not called on the main thread.  The main
@@ -83,7 +79,12 @@ static void
 sighandler_(int sig)
 {
     struct aug_event event;
-    if (!aug_writeevent(mds_[1], aug_setsigevent(&event, sig)))
+    aug_result result = aug_writeevent(events_, aug_sigtoevent(sig, &event));
+
+    /* The signal is ignored if the write fails with EAGAIN/EWOULDBLOCK.  This
+       could happen if the event pipe is full.  What else can one do? */
+
+    if (AUG_ISFAIL(result) && !AUG_ISBLOCK(result))
         abort();
 }
 
@@ -92,28 +93,32 @@ static BOOL WINAPI
 ctrlhandler_(DWORD ctrl)
 {
     struct aug_event event = { AUG_EVENTSTOP, NULL };
-    if (!aug_writeevent(mds_[1], &event))
+    aug_result result = aug_writeevent(events_, &event);
+
+    if (AUG_ISFAIL(result) && !AUG_ISBLOCK(result))
         abort();
+
     return TRUE;
 }
 #endif /* _WIN32 */
 
 static aug_result
-openpipe_(void)
+createevents_(void)
 {
-    aug_md mds[2];
+    aug_mpool* mpool;
     aug_result result;
 
-    assert(AUG_BADMD == mds_[0] && AUG_BADMD == mds_[1]);
+    assert(!events_);
 
-    if (AUG_ISFAIL(result = aug_muxerpipe(mds)))
-        return result;
+    mpool = aug_getmpool(aug_tlx);
+    events_ = aug_createevents(mpool);
+    aug_release(mpool);
 
-    mds_[0] = mds[0];
-    mds_[1] = mds[1];
+    if (!events_)
+        return AUG_FAILERROR;
 
     if (AUG_ISFAIL(result = aug_setsighandler(sighandler_))) {
-        closepipe_();
+        destroyevents_();
         return result;
     }
 
@@ -150,7 +155,7 @@ aug_initserv(void)
     assert(serv_.create_);
     assert(!task_);
 
-    if (AUG_ISFAIL(result = openpipe_()))
+    if (AUG_ISFAIL(result = createevents_()))
         return result;
 
     /* Flush pending writes to main memory: when init_() is called, the
@@ -159,7 +164,7 @@ aug_initserv(void)
     AUG_WMB();
 
     if (!(task_ = (*serv_.create_)())) {
-        closepipe_();
+        destroyevents_();
         return AUG_FAILERROR;
     }
 
@@ -176,21 +181,15 @@ aug_runserv(void)
 AUGSERV_API void
 aug_termserv(void)
 {
-    if (AUG_BADMD != mds_[0]) {
+    if (events_) {
         assert(task_);
         aug_release(task_);
-        closepipe_();
+        destroyevents_();
     }
 }
 
-AUGSERV_API aug_md
-aug_eventrd(void)
+AUGSERV_API aug_events_t
+aug_events(void)
 {
-    return mds_[0];
-}
-
-AUGSERV_API aug_md
-aug_eventwr(void)
-{
-    return mds_[1];
+    return events_;
 }

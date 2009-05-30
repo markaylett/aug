@@ -49,11 +49,11 @@ struct buf_ {
     aug_blob* blob_;
 };
 
-AUG_HEAD(bufs_, buf_);
+AUG_HEAD(list_, buf_);
 
 struct aug_writer_ {
     aug_mpool* mpool_;
-    struct bufs_ bufs_;
+    struct list_ list_;
     size_t part_;
     unsigned size_;
 };
@@ -84,9 +84,9 @@ popbufs_(aug_writer_t writer, const struct iovec* iov, size_t num)
 {
     while (num && (size_t)iov->iov_len <= num) {
 
-        struct buf_* it = AUG_FIRST(&writer->bufs_);
+        struct buf_* it = AUG_FIRST(&writer->list_);
         assert(it);
-        AUG_REMOVE_HEAD(&writer->bufs_);
+        AUG_REMOVE_HEAD(&writer->list_);
 
         destroybuf_(writer->mpool_, it);
 
@@ -107,7 +107,7 @@ aug_createwriter(aug_mpool* mpool)
         return NULL;
 
     writer->mpool_ = mpool;
-    AUG_INIT(&writer->bufs_);
+    AUG_INIT(&writer->list_);
     writer->part_ = 0;
     writer->size_ = 0;
 
@@ -123,8 +123,8 @@ aug_destroywriter(aug_writer_t writer)
 
     /* Destroy in single batch to avoid multiple calls to aug_lock(). */
 
-    while ((it = AUG_FIRST(&writer->bufs_))) {
-        AUG_REMOVE_HEAD(&writer->bufs_);
+    while ((it = AUG_FIRST(&writer->list_))) {
+        AUG_REMOVE_HEAD(&writer->list_);
         destroybuf_(mpool, it);
     }
 
@@ -140,7 +140,7 @@ aug_appendwriter(aug_writer_t writer, aug_blob* blob)
     if (!(buf = createbuf_(writer->mpool_, blob)))
         return AUG_FAILERROR;
 
-    AUG_INSERT_TAIL(&writer->bufs_, buf);
+    AUG_INSERT_TAIL(&writer->list_, buf);
     ++writer->size_;
     return AUG_SUCCESS;
 }
@@ -148,7 +148,7 @@ aug_appendwriter(aug_writer_t writer, aug_blob* blob)
 AUGNET_API aug_bool
 aug_writerempty(aug_writer_t writer)
 {
-    return AUG_EMPTY(&writer->bufs_);
+    return AUG_EMPTY(&writer->list_);
 }
 
 AUGNET_API aug_rsize
@@ -157,7 +157,7 @@ aug_writersize(aug_writer_t writer)
     struct buf_* it;
     size_t size = 0;
 
-    AUG_FOREACH(it, &writer->bufs_) {
+    AUG_FOREACH(it, &writer->list_) {
 
         size_t len;
         if (!aug_getblobdata(it->blob_, &len)) {
@@ -191,7 +191,7 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
     /* Map each buffer to an entry in the iov table. */
 
     i = 0;
-    AUG_FOREACH(it, &writer->bufs_) {
+    AUG_FOREACH(it, &writer->list_) {
 
         if (!(iov[i].iov_base = (void*)aug_getblobdata(it->blob_, &len))) {
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EDOMAIN,

@@ -20,26 +20,22 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include <signal.h>
+#ifndef AUGSERVPP_BASE_HPP
+#define AUGSERVPP_BASE_HPP
 
-AUGSERV_API aug_result
-aug_setsighandler(void (*handler)(int))
-{
-    if (!handler)
-        handler = SIG_DFL;
-    signal(SIGINT, handler);
-    signal(SIGTERM, handler);
-    return AUG_SUCCESS;
+#include "augservpp/config.hpp"
+
+#include "augsyspp/types.hpp"
+
+#include "augserv/base.h"
+
+namespace aug {
+
+    inline mdref
+    eventsmd()
+    {
+        return aug_eventsmd(aug_events());
+    }
 }
 
-AUGSERV_API aug_result
-aug_sigblock(void)
-{
-    return AUG_SUCCESS;
-}
-
-AUGSERV_API aug_result
-aug_sigunblock(void)
-{
-    return AUG_SUCCESS;
-}
+#endif // AUGSERVPP_BASE_HPP

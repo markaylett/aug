@@ -65,64 +65,6 @@ namespace aug {
         } AUG_SETERRINFOCATCH;
     }
 
-    class timers : public mpool_ops {
-
-        aug_timers_t timers_;
-
-        timers(const timers&);
-
-        timers&
-        operator =(const timers&);
-
-    public:
-        ~timers() AUG_NOTHROW
-        {
-            if (timers_)
-                aug_destroytimers(timers_);
-        }
-
-        timers(const null_&) AUG_NOTHROW
-           : timers_(0)
-        {
-        }
-
-        explicit
-        timers(mpoolref mpool)
-            : timers_(aug_createtimers(mpool.get()))
-        {
-            verify(timers_);
-        }
-
-        void
-        swap(timers& rhs) AUG_NOTHROW
-        {
-            std::swap(timers_, rhs.timers_);
-        }
-
-        operator aug_timers_t()
-        {
-            return timers_;
-        }
-
-        aug_timers_t
-        get()
-        {
-            return timers_;
-        }
-
-        bool
-        empty() const
-        {
-            return aug_timersempty(timers_) ? true : false;
-        }
-    };
-
-    inline void
-    swap(timers& lhs, timers& rhs) AUG_NOTHROW
-    {
-        lhs.swap(rhs);
-    }
-
     inline int
     settimer(aug_timers_t timers, idref ref, unsigned ms, aug_timercb_t cb,
              aug::objectref ob)
@@ -185,6 +127,70 @@ namespace aug {
     {
         verify(aug_processexpired(timers, force ? AUG_TRUE : AUG_FALSE,
                                   &next));
+    }
+
+    inline bool
+    empty(aug_timers_t timers)
+    {
+        return aug_timersempty(timers) ? true : false;
+    }
+
+    class timers : public mpool_ops {
+
+        aug_timers_t timers_;
+
+        timers(const timers&);
+
+        timers&
+        operator =(const timers&);
+
+    public:
+        ~timers() AUG_NOTHROW
+        {
+            if (timers_)
+                aug_destroytimers(timers_);
+        }
+
+        timers(const null_&) AUG_NOTHROW
+           : timers_(0)
+        {
+        }
+
+        explicit
+        timers(mpoolref mpool)
+            : timers_(aug_createtimers(mpool.get()))
+        {
+            verify(timers_);
+        }
+
+        void
+        swap(timers& rhs) AUG_NOTHROW
+        {
+            std::swap(timers_, rhs.timers_);
+        }
+
+        operator aug_timers_t()
+        {
+            return timers_;
+        }
+
+        aug_timers_t
+        get()
+        {
+            return timers_;
+        }
+
+        bool
+        empty() const
+        {
+            return aug::empty(timers_);
+        }
+    };
+
+    inline void
+    swap(timers& lhs, timers& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
     }
 
     class timer : public mpool_ops {
@@ -291,9 +297,15 @@ namespace aug {
 }
 
 inline bool
-isnull(const aug::timer& t)
+isnull(aug_timers_t timers)
 {
-    return null == t.id();
+    return !timers;
+}
+
+inline bool
+isnull(const aug::timer& timer)
+{
+    return null == timer.id();
 }
 
 #endif // AUGUTILPP_TIMER_HPP

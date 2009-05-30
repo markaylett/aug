@@ -35,6 +35,50 @@
 
 namespace aug {
 
+    inline void
+    setmdeventmask(aug_muxer_t muxer, mdref ref, unsigned short mask)
+    {
+        verify(aug_setmdeventmask(muxer, ref.get(), mask));
+    }
+
+    /**
+     * Throws intr_exception if the system call was interrupted.
+     */
+
+    inline unsigned
+    waitmdevents(aug_muxer_t muxer, const aug_timeval& timeout)
+    {
+        return AUG_RESULT(verify(aug_waitmdevents(muxer, &timeout)));
+    }
+
+    /**
+     * Throws intr_exception if the system call was interrupted.
+     */
+
+    inline unsigned
+    waitmdevents(aug_muxer_t muxer)
+    {
+        return AUG_RESULT(verify(aug_waitmdevents(muxer, 0)));
+    }
+
+    inline unsigned
+    pollmdevents(aug_muxer_t muxer)
+    {
+        return AUG_RESULT(verify(aug_pollmdevents(muxer)));
+    }
+
+    inline unsigned short
+    getmdeventmask(aug_muxer_t muxer, mdref ref)
+    {
+        return aug_getmdeventmask(muxer, ref.get());
+    }
+
+    inline unsigned short
+    getmdevents(aug_muxer_t muxer, mdref ref)
+    {
+        return aug_getmdevents(muxer, ref.get());
+    }
+
     class muxer : public mpool_ops {
 
         aug_muxer_t muxer_;
@@ -87,50 +131,6 @@ namespace aug {
         lhs.swap(rhs);
     }
 
-    inline void
-    setmdeventmask(aug_muxer_t muxer, mdref ref, unsigned short mask)
-    {
-        verify(aug_setmdeventmask(muxer, ref.get(), mask));
-    }
-
-    /**
-     * Throws intr_exception if the system call was interrupted.
-     */
-
-    inline unsigned
-    waitmdevents(aug_muxer_t muxer, const aug_timeval& timeout)
-    {
-        return AUG_RESULT(verify(aug_waitmdevents(muxer, &timeout)));
-    }
-
-    /**
-     * Throws intr_exception if the system call was interrupted.
-     */
-
-    inline unsigned
-    waitmdevents(aug_muxer_t muxer)
-    {
-        return AUG_RESULT(verify(aug_waitmdevents(muxer, 0)));
-    }
-
-    inline unsigned
-    pollmdevents(aug_muxer_t muxer)
-    {
-        return AUG_RESULT(verify(aug_pollmdevents(muxer)));
-    }
-
-    inline unsigned short
-    getmdeventmask(aug_muxer_t muxer, mdref ref)
-    {
-        return aug_getmdeventmask(muxer, ref.get());
-    }
-
-    inline unsigned short
-    getmdevents(aug_muxer_t muxer, mdref ref)
-    {
-        return aug_getmdevents(muxer, ref.get());
-    }
-
     inline automds
     muxerpipe()
     {
@@ -138,6 +138,12 @@ namespace aug {
         verify(aug_muxerpipe(mds));
         return automds(mds[0], mds[1], close);
     }
+}
+
+inline bool
+isnull(aug_muxer_t muxer)
+{
+    return !muxer;
 }
 
 #endif // AUGSYSPP_MUXER_HPP

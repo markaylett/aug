@@ -29,43 +29,71 @@
 int
 main(int argc, char* argv[])
 {
-    aug_sd sds[2];
-    struct aug_event in = { 1, 0 }, out = { !1, 0 };
+    aug_mpool* mpool;
+    aug_events_t events;
+    int in, out;
 
     if (!aug_autotlx())
         return 1;
 
-    if (AUG_ISFAIL(aug_muxerpipe(sds))) {
-        aug_perrinfo(aug_tlx, "aug_term() failed", NULL);
+    mpool = aug_getmpool(aug_tlx);
+    events = aug_createevents(mpool);
+    aug_release(mpool);
+
+    if (!events) {
+        aug_perrinfo(aug_tlx, "aug_createevents() failed", NULL);
         return 1;
     }
 
-    /* Sticky events not required for fixed length blocking read. */
+    for (in = 1;; ++in) {
 
-    if (!aug_writeevent(sds[1], &in)) {
-        aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
+        struct aug_event event;
+        aug_result result;
+
+        event.type_ = in;
+        event.ob_ = NULL;
+
+        if (AUG_ISFAIL(result = aug_writeevent(events, &event))) {
+
+            if (AUG_ISBLOCK(result))
+                break;
+
+            aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
+            goto fail;
+        }
+    }
+
+    for (out = 1;; ++out) {
+
+        struct aug_event event;
+        aug_result result = aug_readevent(events, &event);
+
+        if (AUG_ISFAIL(result)) {
+
+            if (AUG_ISBLOCK(result))
+                break;
+
+            aug_perrinfo(aug_tlx, "aug_readevent() failed", NULL);
+            goto fail;
+        }
+
+        if (event.type_ != out) {
+            fprintf(stderr, "unexpected event type from aug_readevent()\n");
+            goto fail;
+        }
+    }
+
+    /* Where 16 is some arbitrary choice for the minimum number of events. */
+
+    if (in < 16 || in != out) {
+        fprintf(stderr, "event count mismatch\n");
         goto fail;
     }
 
-    if (!aug_readevent(sds[0], &out)) {
-        aug_perrinfo(aug_tlx, "aug_readevent() failed", NULL);
-        goto fail;
-    }
-
-    if (in.type_ != out.type_) {
-        fprintf(stderr, "unexpected event type from aug_readevent()\n");
-        goto fail;
-    }
-
-    if (AUG_ISFAIL(aug_sclose(sds[0])) || AUG_ISFAIL(aug_sclose(sds[1]))) {
-        aug_perrinfo(aug_tlx, "aug_close() failed", NULL);
-        return 1;
-    }
-
+    aug_destroyevents(events);
     return 0;
 
  fail:
-    aug_sclose(sds[0]);
-    aug_sclose(sds[1]);
+    aug_destroyevents(events);
     return 1;
 }

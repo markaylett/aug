@@ -32,6 +32,19 @@
 
 namespace aug {
 
+
+    inline void
+    appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
+    {
+        verify(aug_appendhttp(parser, buf, size));
+    }
+
+    inline void
+    finishhttp(aug_httpparser_t parser)
+    {
+        verify(aug_finishhttp(parser));
+    }
+
     class httpparser : public mpool_ops {
 
         aug_httpparser_t httpparser_;
@@ -84,18 +97,12 @@ namespace aug {
     {
         lhs.swap(rhs);
     }
+}
 
-    inline void
-    appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
-    {
-        verify(aug_appendhttp(parser, buf, size));
-    }
-
-    inline void
-    finishhttp(aug_httpparser_t parser)
-    {
-        verify(aug_finishhttp(parser));
-    }
+inline bool
+isnull(aug_httpparser_t httpparser)
+{
+    return !httpparser;
 }
 
 #endif // AUGNETPP_HTTP_HPP

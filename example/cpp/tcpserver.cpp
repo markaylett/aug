@@ -33,14 +33,16 @@ using namespace std;
 
 namespace {
 
-    automd rd_(null), wr_(null);
+    events events_(null);
 
     void
     sighandler(int sig)
     {
         aug_event event;
         try {
-            writeevent(wr_, setsigevent(event, sig));
+            writeevent(events_, sigtoevent(sig, event));
+        } catch (const block_exception&) {
+            // Event pipe is full.
         } catch (...) {
             // On Windows, signal handlers are not called on the main thread.
             // The main thread's context will, therefore, be unavailble.
@@ -58,7 +60,7 @@ namespace {
         {
             // Sticky events not required for fixed length blocking read.
 
-            pair<int, smartob<aug_object> > event(aug::readevent(rd_));
+            pair<int, smartob<aug_object> > event(aug::readevent(events_));
 
             switch (event.first) {
             case AUG_EVENTRECONF:
@@ -83,7 +85,7 @@ namespace {
             chans tmp(getmpool(aug_tlx), chandler_);
             chans_.swap(tmp);
 
-            setmdeventmask(muxer_, rd_, AUG_MDEVENTRDEX);
+            setmdeventmask(muxer_, eventsmd(), AUG_MDEVENTRDEX);
 
             endpoint ep(null);
             autosd sd(tcpserver(host, serv, ep));
@@ -171,7 +173,7 @@ namespace {
 
                         // No timers so wait indefinitely.
 
-                        scoped_unblock unblock;
+                        scoped_sigunblock unblock;
                         waitmdevents(muxer_);
                     }
 
@@ -181,7 +183,7 @@ namespace {
 
                 // Sticky events not required for fixed length blocking read.
 
-                if (getmdevents(muxer_, rd_))
+                if (getmdevents(muxer_, eventsmd()))
                     readevent();
 
                 aug_ctxinfo(aug_tlx, "before");
@@ -207,13 +209,11 @@ main(int argc, char* argv[])
             return 1;
         }
 
-        autosds sds(muxerpipe());
-        rd_ = sds[0];
-        wr_ = sds[1];
+        events local(getmpool(aug_tlx));
+        events_.swap(local);
 
-        setsighandler(sighandler);
-
-        scoped_block block;
+        scoped_sighandler handler(sighandler);
+        scoped_sigblock block;
         server serv(argv[1], argv[2]);
 
         serv.run();

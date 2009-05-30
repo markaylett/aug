@@ -20,8 +20,8 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef AUGUTILPP_CLOCK_HPP
-#define AUGUTILPP_CLOCK_HPP
+#ifndef AUGUTILPP_HIRES_HPP
+#define AUGUTILPP_HIRES_HPP
 
 #include "augutilpp/config.hpp"
 
@@ -107,4 +107,10 @@ namespace aug {
     }
 }
 
-#endif // AUGUTILPP_CLOCK_HPP
+inline bool
+isnull(aug_hires_t hires)
+{
+    return !hires;
+}
+
+#endif // AUGUTILPP_HIRES_HPP

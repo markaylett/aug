@@ -34,13 +34,13 @@
 
 static const struct {
     int sig_;
-    int dfl_;
+    aug_bool dfl_;
 } handlers_[] = {
-    { SIGHUP, 0 },
-    { SIGINT, 0 },
-    { SIGUSR1, 0 },
-    { SIGPIPE, 1 },
-    { SIGTERM, 0 }
+    { SIGHUP,  AUG_FALSE },
+    { SIGINT,  AUG_FALSE },
+    { SIGUSR1, AUG_FALSE },
+    { SIGPIPE, AUG_TRUE  },
+    { SIGTERM, AUG_FALSE }
 };
 
 static void
@@ -59,6 +59,9 @@ aug_setsighandler(void (*handler)(int))
 {
     int i;
     struct sigaction sa;
+    if (!handler)
+        handler = SIG_DFL;
+
     bzero(&sa, sizeof(sa));
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
@@ -72,7 +75,7 @@ aug_setsighandler(void (*handler)(int))
 }
 
 AUGSERV_API aug_result
-aug_blocksignals(void)
+aug_sigblock(void)
 {
     sigset_t set;
     sigfillset(&set);
@@ -98,7 +101,7 @@ aug_blocksignals(void)
 }
 
 AUGSERV_API aug_result
-aug_unblocksignals(void)
+aug_sigunblock(void)
 {
     sigset_t set;
     sigemptyset(&set);

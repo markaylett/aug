@@ -33,7 +33,10 @@
 
 #include "augsys/types.h"
 
+#include "augext/mpool.h"
+
 #include "augabi.h"
+#include "augtypes.h"
 
 #define AUG_EVENTRECONF 1
 #define AUG_EVENTSTATUS 2
@@ -52,6 +55,36 @@ struct aug_event {
     aug_object* ob_;
 };
 
+typedef struct aug_events_* aug_events_t;
+
+AUGUTIL_API aug_events_t
+aug_createevents(aug_mpool* mpool);
+
+AUGUTIL_API void
+aug_destroyevents(aug_events_t events);
+
+/**
+ * Read event.
+ *
+ * @return See @ref TypesResult.  #AUG_FAILBLOCK if there are no more events.
+ */
+
+AUGUTIL_API aug_result
+aug_readevent(aug_events_t events, struct aug_event* event);
+
+/**
+ * Write event.
+ *
+ * @return See @ref TypesResult.  #AUG_FAILBLOCK if the underlying event
+ * buffer is full.
+ */
+
+AUGUTIL_API aug_result
+aug_writeevent(aug_events_t events, const struct aug_event* event);
+
+AUGUTIL_API aug_md
+aug_eventsmd(aug_events_t events);
+
 /**
  * This function simplifies the mapping of signals to events.  Some signals
  * have cannonical mappings to specific events types.  For example, #SIGHUP
@@ -60,12 +93,6 @@ struct aug_event {
  */
 
 AUGUTIL_API struct aug_event*
-aug_setsigevent(struct aug_event* event, int sig);
-
-AUGUTIL_API struct aug_event*
-aug_readevent(aug_md md, struct aug_event* event);
-
-AUGUTIL_API const struct aug_event*
-aug_writeevent(aug_md md, const struct aug_event* event);
+aug_sigtoevent(int sig, struct aug_event* event);
 
 #endif /* AUGUTIL_EVENT_H */

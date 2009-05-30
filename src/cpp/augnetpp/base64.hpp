@@ -68,6 +68,18 @@ namespace aug {
         return AUG_FAILERROR;
     }
 
+    inline void
+    appendbase64(aug_base64_t base64, const char* buf, size_t size)
+    {
+        verify(aug_appendbase64(base64, buf, size));
+    }
+
+    inline void
+    finishbase64(aug_base64_t base64)
+    {
+        verify(aug_finishbase64(base64));
+    }
+
     class base64 : public mpool_ops {
 
         aug_base64_t base64_;
@@ -141,18 +153,6 @@ namespace aug {
         lhs.swap(rhs);
     }
 
-    inline void
-    appendbase64(aug_base64_t base64, const char* buf, size_t size)
-    {
-        verify(aug_appendbase64(base64, buf, size));
-    }
-
-    inline void
-    finishbase64(aug_base64_t base64)
-    {
-        verify(aug_finishbase64(base64));
-    }
-
     namespace detail {
         inline aug_result
         base64os(objectref ob, const char* buf, size_t len)
@@ -195,6 +195,12 @@ namespace aug {
         finishbase64(b64);
         return s;
     }
+}
+
+inline bool
+isnull(aug_base64_t base64)
+{
+    return !base64;
 }
 
 #endif // AUGNETPP_BASE64_HPP

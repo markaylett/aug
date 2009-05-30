@@ -107,7 +107,7 @@ namespace aug {
         ~rwtimer() AUG_NOTHROW;
 
         rwtimer(const sessionptr& session, const mod_handle& sock,
-                timers& timers);
+                aug_timers_t timers);
     };
 }
 

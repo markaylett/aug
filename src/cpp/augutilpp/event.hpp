@@ -28,6 +28,7 @@
 #include "augsyspp/types.hpp"
 
 #include "augctxpp/exception.hpp"
+#include "augctxpp/mpool.hpp"
 
 #include "augabipp.hpp"
 
@@ -37,33 +38,97 @@
 
 namespace aug {
 
-    inline aug_event&
-    setsigevent(aug_event& event, int sig)
-    {
-        return *aug_setsigevent(&event, sig);
-    }
-
     inline std::pair<int, aug::smartob<aug_object> >
-    readevent(mdref ref)
+    readevent(aug_events_t events)
     {
         aug_event event;
-        verify(aug_readevent(ref.get(), &event));
+        verify(aug_readevent(events, &event));
         return std::make_pair(event.type_,
                               aug::object_attach(aug::obptr(event.ob_)));
     }
 
-    inline const aug_event&
-    writeevent(mdref ref, const aug_event& event)
+    inline void
+    writeevent(aug_events_t events, const aug_event& event)
     {
-        return *verify(aug_writeevent(ref.get(), &event));
+        verify(aug_writeevent(events, &event));
     }
 
     inline void
-    writeevent(mdref ref, int type, aug::obref<aug_object> ob)
+    writeevent(aug_events_t events, int type, aug::obref<aug_object> ob)
     {
         aug_event event = { type, ob.get() };
-        writeevent(ref, event);
+        writeevent(events, event);
     }
+
+    inline mdref
+    eventsmd(aug_events_t events)
+    {
+        return aug_eventsmd(events);
+    }
+
+    class events : public mpool_ops {
+
+        aug_events_t events_;
+
+        events(const events&);
+
+        events&
+        operator =(const events&);
+
+    public:
+        ~events() AUG_NOTHROW
+        {
+            if (events_)
+                aug_destroyevents(events_);
+        }
+
+        events(const null_&) AUG_NOTHROW
+           : events_(0)
+        {
+        }
+
+        explicit
+        events(mpoolref mpool)
+            : events_(aug_createevents(mpool.get()))
+        {
+            verify(events_);
+        }
+
+        void
+        swap(events& rhs) AUG_NOTHROW
+        {
+            std::swap(events_, rhs.events_);
+        }
+
+        operator aug_events_t()
+        {
+            return events_;
+        }
+
+        aug_events_t
+        get()
+        {
+            return events_;
+        }
+    };
+
+    inline void
+    swap(events& lhs, events& rhs) AUG_NOTHROW
+    {
+        lhs.swap(rhs);
+    }
+
+    inline aug_event&
+    sigtoevent(int sig, aug_event& event)
+    {
+        return *aug_sigtoevent(sig, &event);
+    }
+}
+
+inline bool
+isnull(aug_events_t events)
+{
+    return !events;
 }
 
 #endif // AUGUTILPP_EVENT_HPP

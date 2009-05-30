@@ -20,26 +20,5 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include <signal.h>
-
-AUGSERV_API aug_result
-aug_setsighandler(void (*handler)(int))
-{
-    if (!handler)
-        handler = SIG_DFL;
-    signal(SIGINT, handler);
-    signal(SIGTERM, handler);
-    return AUG_SUCCESS;
-}
-
-AUGSERV_API aug_result
-aug_sigblock(void)
-{
-    return AUG_SUCCESS;
-}
-
-AUGSERV_API aug_result
-aug_sigunblock(void)
-{
-    return AUG_SUCCESS;
-}
+#define AUGUTILPP_BUILD
+#include "augutilpp/hires.hpp"

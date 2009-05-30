@@ -40,12 +40,12 @@ struct entry_ {
     aug_chan* ob_;
 };
 
-AUG_HEAD(head_, entry_);
+AUG_HEAD(list_, entry_);
 
 struct aug_chans_ {
     aug_mpool* mpool_;
     aug_chandler* handler_;
-    struct head_ head_;
+    struct list_ list_;
     unsigned size_;
     int locks_;
 };
@@ -84,14 +84,14 @@ trash_(aug_chans_t chans)
 
     /* Moved all trashed items to trash list. */
 
-    prev = &AUG_FIRST(&chans->head_);
+    prev = &AUG_FIRST(&chans->list_);
     while ((it = *prev)) {
 
         if (!it->ob_) {
 
             AUG_CTXDEBUG3(aug_tlx, "removing trashed entry");
 
-            AUG_REMOVE_PREVPTR(it, prev, &chans->head_);
+            AUG_REMOVE_PREVPTR(it, prev, &chans->list_);
             aug_freemem(chans->mpool_, it);
 
         } else
@@ -108,7 +108,7 @@ aug_createchans(aug_mpool* mpool, aug_chandler* handler)
 
     chans->mpool_ = mpool;
     chans->handler_ = handler;
-    AUG_INIT(&chans->head_);
+    AUG_INIT(&chans->list_);
     chans->size_ = 0;
     chans->locks_ = 0;
 
@@ -126,8 +126,8 @@ aug_destroychans(aug_chans_t chans)
 
     assert(0 == chans->locks_);
 
-    while ((it = AUG_FIRST(&chans->head_))) {
-        AUG_REMOVE_HEAD(&chans->head_);
+    while ((it = AUG_FIRST(&chans->list_))) {
+        AUG_REMOVE_HEAD(&chans->list_);
         if (it->ob_)
             release_(chans, it);
         aug_freemem(mpool, it);
@@ -150,7 +150,7 @@ aug_insertchan(aug_chans_t chans, aug_chan* ob)
     entry->ob_ = ob;
     aug_retain(ob);
 
-    AUG_INSERT_HEAD(&chans->head_, entry);
+    AUG_INSERT_HEAD(&chans->list_, entry);
     ++chans->size_;
     return AUG_SUCCESS;
 }
@@ -161,7 +161,7 @@ aug_removechan(aug_chans_t chans, unsigned id)
     /* Locate the matching entry. */
 
     struct entry_* it;
-    AUG_FOREACH(it, &chans->head_) {
+    AUG_FOREACH(it, &chans->list_) {
 
         if (!it->ob_) {
 
@@ -195,7 +195,7 @@ aug_removechan(aug_chans_t chans, unsigned id)
         AUG_CTXDEBUG3(aug_tlx, "channels unlocked: immediate removal");
 
         release_(chans, it);
-        AUG_REMOVE(&chans->head_, it, entry_);
+        AUG_REMOVE(&chans->list_, it, entry_);
         aug_freemem(chans->mpool_, it);
     }
 
@@ -208,7 +208,7 @@ aug_findchan(aug_chans_t chans, unsigned id)
     /* Locate the matching entry. */
 
     struct entry_* it;
-    AUG_FOREACH(it, &chans->head_) {
+    AUG_FOREACH(it, &chans->list_) {
 
         if (!it->ob_) {
 
@@ -243,13 +243,13 @@ aug_processchans(aug_chans_t chans)
            calls to avoid having the same entries processed twice by outer
            iterations. */
 
-        if ((it = AUG_FIRST(&chans->head_))) {
-            AUG_REMOVE_HEAD(&chans->head_);
-            AUG_INSERT_TAIL(&chans->head_, it);
+        if ((it = AUG_FIRST(&chans->list_))) {
+            AUG_REMOVE_HEAD(&chans->list_);
+            AUG_INSERT_TAIL(&chans->list_, it);
         }
     }
 
-    AUG_FOREACH(it, &chans->head_) {
+    AUG_FOREACH(it, &chans->list_) {
 
         aug_chan* ob = it->ob_;
         aug_bool fork = AUG_FALSE;
@@ -334,7 +334,7 @@ aug_dumpchans(aug_chans_t chans)
     aug_ctxinfo(aug_tlx, "dumping channels: size=[%u], locks=[%d]",
                 chans->size_, chans->locks_);
 
-    AUG_FOREACH(it, &chans->head_) {
+    AUG_FOREACH(it, &chans->list_) {
 
         if (it->ob_)
             aug_ctxinfo(aug_tlx, "active: entry=[%p], id=[%u]", it,
@@ -355,7 +355,7 @@ aug_getreadychans(aug_chans_t chans)
 {
     unsigned ready = 0;
     struct entry_* it;
-    AUG_FOREACH(it, &chans->head_) {
+    AUG_FOREACH(it, &chans->list_) {
 
         if (it->ob_ && aug_ischanready(it->ob_))
             ++ready;

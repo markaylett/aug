@@ -2,6 +2,7 @@ include $(top_srcdir)/src/cpp/lang.mk
 
 modincludedir = $(includedir)/augservpp
 modinclude_HEADERS = \
+	base.hpp \
 	config.hpp \
 	log.hpp \
 	main.hpp \
@@ -10,6 +11,7 @@ modinclude_HEADERS = \
 noinst_LTLIBRARIES = libaugservpp.la
 
 libaugservpp_la_SOURCES = \
+	base.cpp \
 	config.cpp \
 	log.cpp \
 	main.cpp \

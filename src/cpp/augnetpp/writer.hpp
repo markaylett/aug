@@ -30,6 +30,24 @@
 
 namespace aug {
 
+    inline void
+    appendwriter(aug_writer_t writer, blobref ref)
+    {
+        verify(aug_appendwriter(writer, ref.get()));
+    }
+
+    inline size_t
+    writesome(aug_writer_t writer, streamref ref)
+    {
+        return AUG_RESULT(verify(aug_writesome(writer, ref.get())));
+    }
+
+    inline bool
+    empty(aug_writer_t writer)
+    {
+        return aug_writerempty(writer) ? true : false;
+    }
+
     class writer : public mpool_ops {
 
         aug_writer_t writer_;
@@ -78,7 +96,7 @@ namespace aug {
         bool
         empty() const
         {
-            return aug_writerempty(writer_) ? true : false;
+            return aug::empty(writer_);
         }
 
         size_t
@@ -93,18 +111,12 @@ namespace aug {
     {
         lhs.swap(rhs);
     }
+}
 
-    inline void
-    appendwriter(aug_writer_t writer, blobref ref)
-    {
-        verify(aug_appendwriter(writer, ref.get()));
-    }
-
-    inline size_t
-    writesome(aug_writer_t writer, streamref ref)
-    {
-        return AUG_RESULT(verify(aug_writesome(writer, ref.get())));
-    }
+inline bool
+isnull(aug_writer_t writer)
+{
+    return !writer;
 }
 
 #endif // AUGNETPP_WRITER_HPP

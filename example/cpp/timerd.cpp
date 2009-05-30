@@ -110,17 +110,19 @@ namespace test {
         void
         readevent()
         {
-            int fd(aug_eventrd());
-            AUG_CTXDEBUG2(aug_tlx, "checking event pipe [%d]", fd);
+            mdref md(eventsmd());
 
-            if (!getmdevents(state_->muxer_, fd))
+            AUG_CTXDEBUG2(aug_tlx, "checking event pipe [%d]", md.get());
+
+            if (!getmdevents(state_->muxer_, md))
                 return;
 
             AUG_CTXDEBUG2(aug_tlx, "reading event");
 
             // Sticky events not required for fixed length blocking read.
 
-            pair<int, smartob<aug_object> > event(aug::readevent(fd));
+            pair<int, smartob<aug_object> >
+                event(aug::readevent(aug_events()));
 
             switch (event.first) {
             case AUG_EVENTRECONF:
@@ -157,7 +159,7 @@ namespace test {
 
                 try {
 
-                    scoped_unblock unblock;
+                    scoped_sigunblock unblock;
 
                     if (state_->timers_.empty()) {
 
@@ -196,7 +198,7 @@ namespace test {
             aug_ctxinfo(aug_tlx, "initialising daemon process");
 
             auto_ptr<state> ptr(new (tlx) state());
-            setmdeventmask(ptr->muxer_, aug_eventrd(), AUG_MDEVENTRDEX);
+            setmdeventmask(ptr->muxer_, eventsmd(), AUG_MDEVENTRDEX);
             state_ = ptr;
         }
 

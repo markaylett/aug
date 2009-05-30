@@ -25,6 +25,7 @@
 
 #include "augserv.h"
 
+#include "augservpp/base.hpp"
 #include "augservpp/log.hpp"
 #include "augservpp/main.hpp"
 #include "augservpp/signal.hpp"

@@ -27,6 +27,9 @@
 
 #include "augsyspp/types.hpp"
 
+#include "augutil/event.h"
+#include "augutil/timer.h"
+
 #include "augext/blob.h"
 
 #include "augmod.h"
@@ -36,7 +39,6 @@
 namespace aug {
 
     class AUGASPP_API sslctx;
-    class timers;
 
     namespace detail {
         struct engineimpl;
@@ -69,8 +71,7 @@ namespace aug {
     public:
         ~engine() AUG_NOTHROW;
 
-        engine(mdref eventrd, mdref eventwr, timers& timers,
-               enginecb_base& cb);
+        engine(aug_events_t events, aug_timers_t timers, enginecb_base& cb);
 
         void
         clear();

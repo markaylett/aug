@@ -32,6 +32,18 @@
 
 namespace aug {
 
+    inline void
+    appendmar(aug_marparser_t parser, const char* buf, unsigned size)
+    {
+        verify(aug_appendmar(parser, buf, size));
+    }
+
+    inline void
+    finishmar(aug_marparser_t parser)
+    {
+        verify(aug_finishmar(parser));
+    }
+
     class marparser : public mpool_ops {
 
         aug_marparser_t marparser_;
@@ -83,18 +95,12 @@ namespace aug {
     {
         lhs.swap(rhs);
     }
+}
 
-    inline void
-    appendmar(aug_marparser_t parser, const char* buf, unsigned size)
-    {
-        verify(aug_appendmar(parser, buf, size));
-    }
-
-    inline void
-    finishmar(aug_marparser_t parser)
-    {
-        verify(aug_finishmar(parser));
-    }
+inline bool
+isnull(aug_marparser_t marparser)
+{
+    return !marparser;
 }
 
 #endif // AUGNETPP_MAR_HPP
