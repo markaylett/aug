@@ -408,7 +408,7 @@ namespace {
         return MOD_FAILERROR;
     }
 
-    int
+    mod_rint
     tcpconnect_(const char* host, const char* port, const char* ctx,
                 void* user)
     {
@@ -427,14 +427,14 @@ namespace {
                 ptr = it->second.get();
             }
 #endif // WITH_SSL
-            return (int)impl_->engine_
+            return (mod_rint)impl_->engine_
                 .tcpconnect(sname, host, port, ptr, user);
 
         } AUG_SETERRINFOCATCH;
         return MOD_FAILERROR;
     }
 
-    int
+    mod_rint
     tcplisten_(const char* host, const char* port, const char* ctx,
                void* user)
     {
@@ -456,7 +456,7 @@ namespace {
 
             // TODO: temporarily regain root privileges.
 
-            return (int)impl_->engine_
+            return (mod_rint)impl_->engine_
                 .tcplisten(sname, host, port, ptr, user);
 
         } AUG_SETERRINFOCATCH;
@@ -526,13 +526,13 @@ namespace {
         return MOD_FAILERROR;
     }
 
-    int
+    mod_rint
     settimer_(unsigned ms, aug_object* ob)
     {
         const char* sname = getsession()->name_;
         AUG_CTXDEBUG2(aug_tlx, "settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
-            return (int)impl_->engine_.settimer(sname, ms, ob);
+            return (mod_rint)impl_->engine_.settimer(sname, ms, ob);
 
         } AUG_SETERRINFOCATCH;
         return MOD_FAILERROR;

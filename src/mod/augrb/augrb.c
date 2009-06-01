@@ -377,7 +377,7 @@ post_(int argc, VALUE* argv, VALUE self)
 {
     VALUE id, to, type, user;
     aug_blob* blob = NULL;
-    int ret;
+    mod_result result;
 
     rb_scan_args(argc, argv, "31", &id, &to, &type, &user);
 
@@ -389,12 +389,12 @@ post_(int argc, VALUE* argv, VALUE self)
 
     if (user != Qnil)
         blob = augrb_createblob(StringValue(user));
-    ret = mod_post(FIX2UINT(id), RSTRING(to)->ptr, RSTRING(type)->ptr,
-                   (aug_object*)blob);
+    result = mod_post(FIX2UINT(id), RSTRING(to)->ptr, RSTRING(type)->ptr,
+                      (aug_object*)blob);
     if (blob)
         aug_release(blob);
 
-    if (ret < 0)
+    if (result < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -405,7 +405,7 @@ dispatch_(int argc, VALUE* argv, VALUE self)
 {
     VALUE id, to, type, user;
     aug_blob* blob = NULL;
-    int ret;
+    mod_result result;
 
     rb_scan_args(argc, argv, "31", &id, &to, &type, &user);
 
@@ -415,12 +415,12 @@ dispatch_(int argc, VALUE* argv, VALUE self)
 
     if (user != Qnil)
         blob = augrb_createblob(StringValue(user));
-    ret = mod_dispatch(FIX2UINT(id), RSTRING(to)->ptr, RSTRING(type)->ptr,
-                       (aug_object*)blob);
+    result = mod_dispatch(FIX2UINT(id), RSTRING(to)->ptr, RSTRING(type)->ptr,
+                          (aug_object*)blob);
     if (blob)
         aug_release(blob);
 
-    if (ret < 0)
+    if (result < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -470,7 +470,7 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
     VALUE host, serv, sslctx, user;
     const char* ptr;
     VALUE* sock;
-    int cid;
+    mod_rint cid;
 
     rb_scan_args(argc, argv, "22", &host, &serv, &sslctx, &user);
 
@@ -503,7 +503,7 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
     VALUE host, serv, sslctx, user;
     const char* ptr;
     VALUE* sock;
-    int cid;
+    mod_rint cid;
 
     rb_scan_args(argc, argv, "22", &host, &serv, &sslctx, &user);
 
@@ -534,13 +534,14 @@ static VALUE
 send_(VALUE self, VALUE sock, VALUE buf)
 {
     aug_blob* blob;
-    mod_id cid = checkid_(sock), ret;
+    mod_id cid = checkid_(sock);
+    mod_result result;
 
     blob = augrb_createblob(StringValue(buf));
-    ret = mod_sendv(cid, blob);
+    result = mod_sendv(cid, blob);
     aug_release(blob);
 
-    if (ret < 0)
+    if (result < 0)
         rb_raise(cerror_, mod_error());
 
     return Qnil;
@@ -598,7 +599,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
 
     unsigned ui;
     aug_blob* blob;
-    int tid;
+    mod_rint tid;
 
     rb_scan_args(argc, argv, "11", &ms, &user);
 

@@ -65,7 +65,7 @@ namespace aug {
         } AUG_SETERRINFOCATCH;
     }
 
-    inline int
+    inline unsigned
     settimer(aug_timers_t timers, idref ref, unsigned ms, aug_timercb_t cb,
              aug::objectref ob)
     {
@@ -73,7 +73,7 @@ namespace aug {
                                               ob.get())));
     }
 
-    inline int
+    inline unsigned
     settimer(aug_timers_t timers, idref ref, unsigned ms, aug_timercb_t cb,
              const null_&)
     {
@@ -81,7 +81,7 @@ namespace aug {
     }
 
     template <typename T>
-    int
+    unsigned
     settimer(aug_timers_t timers, idref ref, unsigned ms, T& x)
     {
         aug::smartob<aug_boxptr> ob(createboxptr(getmpool(aug_tlx), &x, 0));
@@ -90,7 +90,7 @@ namespace aug {
     }
 
     template <typename T>
-    int
+    unsigned
     settimer(aug_timers_t timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
     {
         aug::smartob<aug_boxptr> ob(createboxptr(getmpool(aug_tlx), x));

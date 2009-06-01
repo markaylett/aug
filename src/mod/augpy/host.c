@@ -85,7 +85,7 @@ post_(PyObject* self, PyObject* args)
     const char* to, * type;
     PyObject* user = NULL;
     aug_blob* blob = NULL;
-    int ret;
+    mod_result result;
 
     if (!PyArg_ParseTuple(args, "Iss|O:post", &id, &to, &type, &user))
         return NULL;
@@ -104,11 +104,11 @@ post_(PyObject* self, PyObject* args)
             return NULL;
     }
 
-    ret = mod_post(id, to, type, (aug_object*)blob);
+    result = mod_post(id, to, type, (aug_object*)blob);
     if (blob)
         aug_release(blob);
 
-    if (ret < 0) {
+    if (result < 0) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
@@ -127,7 +127,7 @@ dispatch_(PyObject* self, PyObject* args)
     const char* to, * type;
     PyObject* user = NULL;
     aug_blob* blob = NULL;
-    int ret;
+    mod_result result;
 
     if (!PyArg_ParseTuple(args, "Iss|O:dispatch", &id, &to, &type, &user))
         return NULL;
@@ -146,11 +146,11 @@ dispatch_(PyObject* self, PyObject* args)
             return NULL;
     }
 
-    ret = mod_dispatch(id, to, type, (aug_object*)blob);
+    result = mod_dispatch(id, to, type, (aug_object*)blob);
     if (blob)
         aug_release(blob);
 
-    if (ret < 0) {
+    if (result < 0) {
 
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
@@ -212,7 +212,7 @@ tcpconnect_(PyObject* self, PyObject* args)
 {
     const char* host, * serv, * sslctx = NULL;
     PyObject* user = NULL, * sock;
-    int cid;
+    mod_rint cid;
 
     if (!PyArg_ParseTuple(args, "ss|zO:tcpconnect", &host, &serv, &sslctx,
                           &user))
@@ -227,7 +227,7 @@ tcpconnect_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    augpy_setid(sock, cid);
+    augpy_setid(sock, (mod_id)cid);
     return incret_(sock);
 }
 
@@ -236,7 +236,7 @@ tcplisten_(PyObject* self, PyObject* args)
 {
     const char* host, * serv, * sslctx = NULL;
     PyObject* user = NULL, * sock;
-    int lid;
+    mod_rint lid;
 
     if (!PyArg_ParseTuple(args, "ss|zO:tcplisten", &host, &serv, &sslctx,
                           &user))
@@ -251,7 +251,7 @@ tcplisten_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    augpy_setid(sock, lid);
+    augpy_setid(sock, (mod_id)lid);
     return incret_(sock);
 }
 
@@ -260,7 +260,7 @@ send_(PyObject* self, PyObject* args)
 {
     PyObject* sock, * buf;
     aug_blob* blob;
-    int ret;
+    mod_result result;
 
     if (!PyArg_ParseTuple(args, "O!O:send", type_, &sock, &buf))
         return NULL;
@@ -278,10 +278,10 @@ send_(PyObject* self, PyObject* args)
 
     /* mod_sendv() takes ownership. */
 
-    ret = mod_sendv(augpy_getid(sock), blob);
+    result = mod_sendv(augpy_getid(sock), blob);
     aug_release(blob);
 
-    if (ret < 0) {
+    if (result < 0) {
         PyErr_SetString(PyExc_RuntimeError, mod_error());
         return NULL;
     }
@@ -354,7 +354,7 @@ settimer_(PyObject* self, PyObject* args)
     unsigned ms;
     PyObject* user = NULL, * timer;
     aug_blob* blob;
-    int tid;
+    mod_rint tid;
 
     if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &user))
         return NULL;
@@ -380,7 +380,7 @@ settimer_(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    augpy_setid(timer, tid);
+    augpy_setid(timer, (mod_id)tid);
     return timer; /* Ref already held; no need to retain_(). */
 }
 

@@ -118,20 +118,20 @@ namespace mod {
     tcpconnect(const char* host, const char* port, const char* sslctx = 0,
                void* user = 0)
     {
-        int ret(mod_tcpconnect(host, port, sslctx, user));
-        if (ret < 0)
+        mod_rint result(mod_tcpconnect(host, port, sslctx, user));
+        if (result < 0)
             throw error(mod_error());
-        return static_cast<mod_id>(ret);
+        return static_cast<mod_id>(result);
     }
 
     inline mod_id
     tcplisten(const char* host, const char* port, const char* sslctx = 0,
               void* user = 0)
     {
-        int ret(mod_tcplisten(host, port, sslctx, user));
-        if (ret < 0)
+        mod_rint result(mod_tcplisten(host, port, sslctx, user));
+        if (result < 0)
             throw error(mod_error());
-        return static_cast<mod_id>(ret);
+        return static_cast<mod_id>(result);
     }
 
     inline void
@@ -212,10 +212,10 @@ namespace mod {
     inline mod_id
     settimer(unsigned ms, aug_object_* ob)
     {
-        int ret(mod_settimer(ms, ob));
-        if (ret < 0)
+        mod_rint result(mod_settimer(ms, ob));
+        if (result < 0)
             throw error(mod_error());
-        return static_cast<mod_id>(ret);
+        return static_cast<mod_id>(result);
     }
 
     inline bool

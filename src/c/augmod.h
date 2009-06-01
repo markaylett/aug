@@ -147,7 +147,17 @@ typedef int mod_bool;
  * @{
  */
 
+/**
+ * Result type.
+ */
+
 typedef int mod_result;
+
+/**
+ * Integer result type.
+ */
+
+typedef int mod_rint;
 
 /**
  * Success.
@@ -347,8 +357,8 @@ struct mod_host {
      * @return The connection id.
      */
 
-    int (*tcpconnect_)(const char* host, const char* port, const char* sslctx,
-                       void* user);
+    mod_rint (*tcpconnect_)(const char* host, const char* port,
+                            const char* sslctx, void* user);
 
     /**
      * Bind tcp listener socket.
@@ -364,8 +374,8 @@ struct mod_host {
      * @return The listener id.
      */
 
-    int (*tcplisten_)(const char* host, const char* port, const char* sslctx,
-                      void* user);
+    mod_rint (*tcplisten_)(const char* host, const char* port,
+                           const char* sslctx, void* user);
 
     /**
      * Send data to peer.
@@ -435,7 +445,7 @@ struct mod_host {
      * @param ob Optional object data.
      */
 
-    int (*settimer_)(unsigned ms, struct aug_object_* ob);
+    mod_rint (*settimer_)(unsigned ms, struct aug_object_* ob);
 
     /**
      * Reset timer.
