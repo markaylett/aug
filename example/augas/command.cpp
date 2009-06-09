@@ -87,65 +87,133 @@ namespace {
         return s.erase(s.size() - 1);
     }
 
-    struct command : basic_session, mpool_ops {
-
-        bool
-        do_start(const char* sname)
+    class parser : public boxptr_base<parser>, public mpool_ops {
+        shellparser impl_;
+        explicit
+        parser(mpoolref mpool, bool pairs)
+            : impl_(mpool, pairs)
         {
-            writelog(MOD_LOGINFO, "starting session [%s]", sname);
+        }
+    public:
+        ~parser() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        void*
+        unboxptr_() AUG_NOTHROW
+        {
+            return &impl_;
+        }
+        static boxptrptr
+        create(mpoolref mpool, bool pairs = false)
+        {
+            return attach(new (tlx) parser(mpool, pairs));
+        }
+    };
+
+    class command : public basic_session<command>, public mpool_ops {
+        const string sname_;
+        explicit
+        command(const string& sname)
+            : sname_(sname)
+        {
+        }
+    public:
+        ~command() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        mod_bool
+        start()
+        {
+            writelog(MOD_LOGINFO, "starting session [%s]", sname_.c_str());
             const char* serv= mod::getenv("session.command.serv");
             if (!serv)
-                return false;
+                return MOD_FALSE;
             tcplisten("0.0.0.0", serv);
-            return true;
+            return MOD_TRUE;
         }
-
-        bool
-        do_accepted(handle& sock, const char* name)
+        void
+        stop()
         {
-            sock.setuser(new (tlx) shellparser(getmpool(aug_tlx)));
+        }
+        void
+        reconf()
+        {
+        }
+        void
+        event(const char* from, const char* type, mod_id id, objectref ob)
+        {
+        }
+        void
+        closed(mod_handle& sock)
+        {
+            aug_assign(sock.ob_, 0);
+        }
+        void
+        teardown(mod_handle& sock)
+        {
+            mod::shutdown(sock, 0);
+        }
+        mod_bool
+        accepted(mod_handle& sock, const char* name)
+        {
+            boxptrptr bp(parser::create(getmpool(aug_tlx), true));
+            aug_assign(sock.ob_, bp.base());
+
             send(sock, "HELLO\r\n", 7);
             setrwtimer(sock, 15000, MOD_TIMRD);
-            return true;
+            return MOD_TRUE;
         }
-
         void
-        do_closed(const handle& sock)
+        connected(mod_handle& sock, const char* name)
         {
-            delete sock.user<shellparser>();
         }
-
-        void
-        do_recv(const handle& sock, const void* buf, size_t size)
+        mod_bool
+        auth(mod_handle& sock, const char* subject, const char* issuer)
         {
-            shellparser& parser(*sock.user<shellparser>());
+            return MOD_TRUE;
+        }
+        void
+        recv(mod_handle& sock, const void* buf, size_t len)
+        {
+            shellparser* parser(obtop<shellparser>(sock.ob_));
             const char* ptr(static_cast<const char*>(buf));
-            for (size_t i(0); i < size; ++i)
-                if (parser.append(ptr[i])) {
-                    string s(join(parser));
+
+            for (size_t i(0); i < len; ++i)
+                if (parser->append(ptr[i])) {
+                    string s(join(*parser));
                     s += "\r\n";
                     send(sock, s.c_str(), s.size());
                 }
         }
-
         void
-        do_rdexpire(const handle& sock, unsigned& ms)
+        error(mod_handle& sock, const char* desc)
+        {
+        }
+        void
+        rdexpire(mod_handle& sock, unsigned& ms)
         {
             shutdown(sock, 0);
         }
-
-        ~command() MOD_NOTHROW
+        void
+        wrexpire(mod_handle& sock, unsigned& ms)
         {
         }
-
-        static session_base*
+        void
+        expire(mod_handle& timer, unsigned& ms)
+        {
+        }
+        static sessionptr
         create(const char* sname)
         {
-            return 0 == strcmp(sname, "command") ? new (tlx) command() : 0;
+            return 0 == strcmp(sname, "command")
+                ? attach(new (tlx) command(sname))
+                : null;
         }
     };
 
     typedef basic_module<basic_factory<command> > module;
 }
 
-MOD_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term, module::create)

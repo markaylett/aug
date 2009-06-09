@@ -658,6 +658,10 @@ class CppVisitor
     end
     def visit_interface(elem)
 
+        puts <<END
+namespace #{elem.pkg} {
+END
+
         elem.each_method {|x| putinline elem, x}
         puts <<END
 
@@ -836,6 +840,7 @@ END
     };
 
     typedef aug::smartob<#{elem.type.cname}> #{elem.name}ptr;
+}
 END
     end
     def visit_quotincl(elem)
@@ -887,11 +892,9 @@ puts <<EOD
 /* C++ definitions. */
 
 #if defined(__cplusplus)
-namespace aug {
 EOD
 package.each_accept(CppVisitor.new)
 puts <<END
-}
 #endif /* __cplusplus */
 
 #endif /* #{guard} */

@@ -38,7 +38,7 @@ namespace aug {
             blob<vecblob> blob_;
             std::vector<char> vec_;
             size_t size_;
-            unsigned refs_;
+            int refs_;
         public:
             explicit
             vecblob(size_t size)

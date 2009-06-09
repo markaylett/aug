@@ -24,11 +24,12 @@
 #include "augmodpp.hpp"
 
 #include "augctxpp/mpool.hpp"
+#include "augutilpp/object.hpp"
 #include "augutilpp/string.hpp"
 
-#include <map>
+#include "augext/boxptr.h"
 
-namespace mod = aug::mod;
+#include <map>
 
 using namespace mod;
 using namespace std;
@@ -36,9 +37,9 @@ using namespace std;
 namespace {
 
     struct eachline : aug::mpool_ops {
-        handle sock_;
+        const mod_handle& sock_;
         explicit
-        eachline(const handle& sock)
+        eachline(const mod_handle& sock)
             : sock_(sock)
         {
         }
@@ -53,46 +54,100 @@ namespace {
         }
     };
 
-    struct echo : basic_session, aug::mpool_ops {
-        bool
-        do_start(const char* sname)
+    class token : public aug::boxptr_base<token>, public aug::mpool_ops {
+        string impl_;
+    public:
+        ~token() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        void*
+        unboxptr_() AUG_NOTHROW
+        {
+            return &impl_;
+        }
+        static aug::boxptrptr
+        create()
+        {
+            return attach(new (aug::tlx) token());
+        }
+    };
+
+    class echo : public basic_session<echo>, public aug::mpool_ops {
+        const string sname_;
+        explicit
+        echo(const string& sname)
+            : sname_(sname)
+        {
+        }
+    public:
+        ~echo() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        mod_bool
+        start()
         {
             writelog(MOD_LOGINFO, "starting...");
             const char* serv(mod::getenv("session.echo.serv"));
             const char* sslctx(mod::getenv("session.echo.sslcontext"));
             if (!serv)
-                return false;
+                return MOD_FALSE;
             if (sslctx)
                 writelog(MOD_LOGINFO, "sslcontext: %s", sslctx);
 
             tcplisten("0.0.0.0", serv, sslctx);
-            return true;
+            return MOD_TRUE;
         }
         void
-        do_closed(const handle& sock)
+        stop()
         {
-            delete sock.user<string>();
         }
-        bool
-        do_accepted(handle& sock, const char* name)
+        void
+        reconf()
         {
-            sock.setuser(new string());
+        }
+        void
+        event(const char* from, const char* type, mod_id id,
+              aug::objectref ob)
+        {
+        }
+        void
+        closed(mod_handle& sock)
+        {
+            aug_assign(sock.ob_, 0);
+        }
+        void
+        teardown(mod_handle& sock)
+        {
+            mod::shutdown(sock, 0);
+        }
+        mod_bool
+        accepted(mod_handle& sock, const char* name)
+        {
+            aug::boxptrptr bp(token::create());
+            aug_assign(sock.ob_, bp.base());
+
             setrwtimer(sock, 15000, MOD_TIMRD);
-            return true;
+            return MOD_TRUE;
         }
-        bool
-        do_auth(const handle& sock, const char* subject, const char* issuer)
+        void
+        connected(mod_handle& sock, const char* name)
+        {
+        }
+        mod_bool
+        auth(mod_handle& sock, const char* subject, const char* issuer)
         {
             mod_writelog(MOD_LOGINFO, "checking subject...");
-            return true;
+            return MOD_TRUE;
         }
         void
-        do_recv(const handle& sock, const void* buf, size_t len)
+        recv(mod_handle& sock, const void* buf, size_t len)
         {
-            string& tok(*sock.user<string>());
+            string* tok(aug::obtop<string>(sock.ob_));
             try {
                 tokenise(static_cast<const char*>(buf),
-                         static_cast<const char*>(buf) + len, tok, '\n',
+                         static_cast<const char*>(buf) + len, *tok, '\n',
                          eachline(sock));
             } catch (...) {
                 mod_writelog(MOD_LOGINFO, "shutting now...");
@@ -101,28 +156,32 @@ namespace {
             }
         }
         void
-        do_error(const handle& sock, const char* desc)
+        error(mod_handle& sock, const char* desc)
         {
             writelog(MOD_LOGERROR, "server error: %s", desc);
         }
         void
-        do_rdexpire(const handle& sock, unsigned& ms)
+        rdexpire(mod_handle& sock, unsigned& ms)
         {
             writelog(MOD_LOGINFO, "no data received for 15 seconds");
             shutdown(sock, 0);
         }
-        static session_base*
+        void
+        wrexpire(mod_handle& sock, unsigned& ms)
+        {
+        }
+        void
+        expire(mod_handle& timer, unsigned& ms)
+        {
+        }
+        static sessionptr
         create(const char* sname)
         {
-            return new (aug::tlx) echo();
-        }
-
-        ~echo() MOD_NOTHROW
-        {
+            return attach(new (aug::tlx) echo(sname));
         }
     };
 
     typedef basic_module<basic_factory<echo> > module;
 }
 
-MOD_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term, module::create)

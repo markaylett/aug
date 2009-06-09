@@ -260,6 +260,8 @@ namespace aug {
         }
     };
 
+    typedef smartob<aug_object> objectptr;
+
     template <typename T, typename U>
     bool
     operator ==(const smartob<T>& lhs, const smartob<U>& rhs)

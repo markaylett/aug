@@ -27,7 +27,7 @@ from augutil import *
 import log
 
 # void writelog(level, msg)
-# string error()
+# string geterror()
 # void reconfall()
 # void stopall()
 # void post(id, to, type, user)
@@ -86,7 +86,7 @@ def start(sname):
 def reconf():
     log.debug("reconf()")
 
-def event(id, frm, type, user):
+def event(frm, type, id, user):
     log.debug("event()")
 
 def closed(sock):

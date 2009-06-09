@@ -28,6 +28,8 @@ using namespace aug;
 
 namespace {
 
+    // Multiple interfaces.
+
     class test : public ref_base, public mpool_ops {
         stream<test> stream_;
         err<test> err_;

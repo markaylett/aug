@@ -78,7 +78,9 @@ modsched_la_DEPENDENCIES = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 am_modsched_la_OBJECTS = sched.lo
 modsched_la_OBJECTS = $(am_modsched_la_OBJECTS)
-modserver_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
+modserver_la_DEPENDENCIES =  \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augctx/libaugctx.la
 am_modserver_la_OBJECTS = server.lo
 modserver_la_OBJECTS = $(am_modserver_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -316,6 +318,7 @@ modsched_la_LIBADD = \
 modserver_la_SOURCES = server.cpp
 modserver_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modserver_la_LIBADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
 all: all-recursive

@@ -39,7 +39,7 @@ namespace aug {
         {
         }
         void*
-        getboxptr_() const
+        unboxptr_() const
         {
             return p_;
         }
@@ -105,10 +105,10 @@ namespace aug {
     }
 
     template <typename T>
-    T
+    T*
     obtop(obref<aug_object> ob)
     {
-        return static_cast<T>(aug_obtop(ob.get()));
+        return static_cast<T*>(aug_obtop(ob.get()));
     }
 
     inline smartob<aug_blob>

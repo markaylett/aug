@@ -105,8 +105,8 @@ namespace aug {
     public:
         ~servconn() AUG_NOTHROW;
 
-        servconn(mpoolref mpool, const sessionptr& session, void* user,
-                 aug_timers_t timers, unsigned id);
+        servconn(mpoolref mpool, const sessionptr& session,
+                 aug_timers_t timers, unsigned id, objectref ob);
     };
 }
 

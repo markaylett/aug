@@ -5,8 +5,7 @@ noinst_HEADERS = \
 	module.hpp \
 	options.hpp \
 	session.hpp \
-	ssl.hpp \
-	utility.hpp
+	ssl.hpp
 
 bin_PROGRAMS = augd
 
@@ -16,8 +15,7 @@ augd_SOURCES = \
 	module.cpp \
 	options.cpp \
 	session.cpp \
-	ssl.cpp \
-	utility.cpp
+	ssl.cpp
 
 augd_LDADD = \
 	$(top_builddir)/src/cpp/augaspp/libaugaspp.la \

@@ -23,7 +23,7 @@
 #ifndef AUGASPP_SOCK_HPP
 #define AUGASPP_SOCK_HPP
 
-#include "augaspp/object.hpp"
+#include "augaspp/handle.hpp"
 
 #include "augext/chan.h"
 
@@ -38,7 +38,7 @@ namespace aug {
         CLOSED
     };
 
-    class sock_base : public object_base {
+    class sock_base : public handle_base {
 
         virtual void
         do_error(const char* desc) = 0;

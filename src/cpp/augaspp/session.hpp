@@ -36,82 +36,67 @@
 namespace aug {
 
     class AUGASPP_API session_base {
-    public:
-        typedef mod_session ctype;
-    private:
 
-        virtual mod_session&
-        do_get() AUG_NOTHROW = 0;
+        virtual const char*
+        do_name() const AUG_NOTHROW = 0;
 
-        virtual const mod_session&
-        do_get() const AUG_NOTHROW = 0;
-
-        virtual bool
+        virtual mod_bool
         do_active() const AUG_NOTHROW = 0;
 
         // Sessions should be active during calls to start().  If start()
         // fails they should be made inactive.
 
-        virtual bool
+        virtual mod_bool
         do_start() AUG_NOTHROW = 0;
 
         virtual void
         do_reconf() const AUG_NOTHROW = 0;
 
         virtual void
-        do_event(mod_id id, const char* from, const char* type,
-                 aug::objectref ob) const AUG_NOTHROW = 0;
+        do_event(const char* from, const char* type, mod_id id,
+                 objectref ob) const AUG_NOTHROW = 0;
 
         virtual void
-        do_closed(const mod_handle& sock) const AUG_NOTHROW = 0;
+        do_closed(mod_handle& sock) const AUG_NOTHROW = 0;
 
         virtual void
-        do_teardown(const mod_handle& sock) const AUG_NOTHROW = 0;
+        do_teardown(mod_handle& sock) const AUG_NOTHROW = 0;
 
-        virtual bool
+        virtual mod_bool
         do_accepted(mod_handle& sock, const char* name) const AUG_NOTHROW = 0;
 
         virtual void
         do_connected(mod_handle& sock,
                      const char* name) const AUG_NOTHROW = 0;
 
-        virtual bool
-        do_auth(const mod_handle& sock, const char* subject,
+        virtual mod_bool
+        do_auth(mod_handle& sock, const char* subject,
                 const char* issuer) const AUG_NOTHROW = 0;
 
         virtual void
-        do_recv(const mod_handle& sock, const char* buf,
+        do_recv(mod_handle& sock, const char* buf,
                 size_t size) const AUG_NOTHROW = 0;
 
         virtual void
-        do_error(const mod_handle& sock,
-                 const char* desc) const AUG_NOTHROW = 0;
+        do_error(mod_handle& sock, const char* desc) const AUG_NOTHROW = 0;
 
         virtual void
-        do_rdexpire(const mod_handle& sock,
-                    unsigned& ms) const AUG_NOTHROW = 0;
+        do_rdexpire(mod_handle& sock, unsigned& ms) const AUG_NOTHROW = 0;
 
         virtual void
-        do_wrexpire(const mod_handle& sock,
-                    unsigned& ms) const AUG_NOTHROW = 0;
+        do_wrexpire(mod_handle& sock, unsigned& ms) const AUG_NOTHROW = 0;
 
         virtual void
-        do_expire(const mod_handle& timer,
-                  unsigned& ms) const AUG_NOTHROW = 0;
+        do_expire(mod_handle& timer, unsigned& ms) const AUG_NOTHROW = 0;
 
     public:
         virtual
         ~session_base() AUG_NOTHROW;
 
-        mod_session&
-        get() AUG_NOTHROW
+        const char*
+        name() const AUG_NOTHROW
         {
-            return do_get();
-        }
-        const mod_session&
-        get() const AUG_NOTHROW
-        {
-            return do_get();
+            return do_name();
         }
         bool
         active() const AUG_NOTHROW
@@ -129,18 +114,18 @@ namespace aug {
             return do_reconf();
         }
         void
-        event(mod_id id, const char* from, const char* type,
-              aug::objectref ob) const AUG_NOTHROW
+        event(const char* from, const char* type, mod_id id,
+              objectref ob) const AUG_NOTHROW
         {
-            do_event(id, from, type, ob);
+            do_event(from, type, id, ob);
         }
         void
-        closed(const mod_handle& sock) const AUG_NOTHROW
+        closed(mod_handle& sock) const AUG_NOTHROW
         {
             do_closed(sock);
         }
         void
-        teardown(const mod_handle& sock) const AUG_NOTHROW
+        teardown(mod_handle& sock) const AUG_NOTHROW
         {
             do_teardown(sock);
         }
@@ -155,44 +140,35 @@ namespace aug {
             do_connected(sock, name);
         }
         bool
-        auth(const mod_handle& sock, const char* subject,
+        auth(mod_handle& sock, const char* subject,
              const char* issuer) const AUG_NOTHROW
         {
             return do_auth(sock, subject, issuer);
         }
         void
-        recv(const mod_handle& sock, const char* buf,
-             size_t size) const AUG_NOTHROW
+        recv(mod_handle& sock, const char* buf, size_t size) const AUG_NOTHROW
         {
             do_recv(sock, buf, size);
         }
         void
-        error(const mod_handle& sock, const char* desc) const AUG_NOTHROW
+        error(mod_handle& sock, const char* desc) const AUG_NOTHROW
         {
             do_error(sock, desc);
         }
         void
-        rdexpire(const mod_handle& sock, unsigned& ms) const AUG_NOTHROW
+        rdexpire(mod_handle& sock, unsigned& ms) const AUG_NOTHROW
         {
             do_rdexpire(sock, ms);
         }
         void
-        wrexpire(const mod_handle& sock, unsigned& ms) const AUG_NOTHROW
+        wrexpire(mod_handle& sock, unsigned& ms) const AUG_NOTHROW
         {
             do_wrexpire(sock, ms);
         }
         void
-        expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW
+        expire(mod_handle& timer, unsigned& ms) const AUG_NOTHROW
         {
             do_expire(timer, ms);
-        }
-        operator mod_session&() AUG_NOTHROW
-        {
-            return do_get();
-        }
-        operator const mod_session&() const AUG_NOTHROW
-        {
-            return do_get();
         }
     };
 

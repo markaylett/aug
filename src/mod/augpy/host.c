@@ -57,7 +57,7 @@ reconfall_(PyObject* self, PyObject* args)
         return NULL;
 
     if (mod_reconfall() < 0) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
@@ -71,7 +71,7 @@ stopall_(PyObject* self, PyObject* args)
         return NULL;
 
     if (mod_stopall() < 0) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
@@ -86,6 +86,8 @@ post_(PyObject* self, PyObject* args)
     PyObject* user = NULL;
     aug_blob* blob = NULL;
     mod_result result;
+
+    /* The object's reference count is not increased. */
 
     if (!PyArg_ParseTuple(args, "Iss|O:post", &id, &to, &type, &user))
         return NULL;
@@ -104,7 +106,7 @@ post_(PyObject* self, PyObject* args)
             return NULL;
     }
 
-    result = mod_post(id, to, type, (aug_object*)blob);
+    result = mod_post(to, type, id, (aug_object*)blob);
     if (blob)
         aug_release(blob);
 
@@ -113,7 +115,7 @@ post_(PyObject* self, PyObject* args)
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
 
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
@@ -128,6 +130,8 @@ dispatch_(PyObject* self, PyObject* args)
     PyObject* user = NULL;
     aug_blob* blob = NULL;
     mod_result result;
+
+    /* The object's reference count is not increased. */
 
     if (!PyArg_ParseTuple(args, "Iss|O:dispatch", &id, &to, &type, &user))
         return NULL;
@@ -146,7 +150,7 @@ dispatch_(PyObject* self, PyObject* args)
             return NULL;
     }
 
-    result = mod_dispatch(id, to, type, (aug_object*)blob);
+    result = mod_dispatch(to, type, id, (aug_object*)blob);
     if (blob)
         aug_release(blob);
 
@@ -155,7 +159,7 @@ dispatch_(PyObject* self, PyObject* args)
         /* Examples show that PyExc_RuntimeError does not need to be
            Py_INCREF()-ed. */
 
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
@@ -168,6 +172,8 @@ getenv_(PyObject* self, PyObject* args)
     const char* name, * value;
     PyObject* def = Py_None;
 
+    /* The object's reference count is not increased. */
+
     if (!PyArg_ParseTuple(args, "s|O:getenv", &name, &def))
         return NULL;
 
@@ -178,29 +184,18 @@ getenv_(PyObject* self, PyObject* args)
 }
 
 static PyObject*
-getsession_(PyObject* self, PyObject* args)
-{
-    const struct mod_session* session;
-
-    if (!PyArg_ParseTuple(args, ":getsession"))
-        return NULL;
-
-    if (!(session = mod_getsession()))
-        return incret_(Py_None);
-
-    return Py_BuildValue("s", session->name_);
-}
-
-static PyObject*
 shutdown_(PyObject* self, PyObject* args)
 {
     PyObject* sock;
     unsigned flags;
+
+    /* The object's reference count is not increased. */
+
     if (!PyArg_ParseTuple(args, "O!I:shutdown", type_, &sock, &flags))
         return NULL;
 
     if (mod_shutdown(augpy_getid(sock), flags) < 0) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
@@ -212,23 +207,31 @@ tcpconnect_(PyObject* self, PyObject* args)
 {
     const char* host, * serv, * sslctx = NULL;
     PyObject* user = NULL, * sock;
+    augpy_box* box;
     mod_rint cid;
+
+    /* The object's reference count is not increased. */
 
     if (!PyArg_ParseTuple(args, "ss|zO:tcpconnect", &host, &serv, &sslctx,
                           &user))
         return NULL;
 
-    if (!(sock = augpy_createhandle(type_, 0, user)))
+    if (!(box = augpy_boxhandle(type_, 0, user)))
         return NULL;
 
-    if ((cid = mod_tcpconnect(host, serv, sslctx, sock)) < 0) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
-        Py_DECREF(sock);
+    /* mod_tcpconnect() takes ownership. */
+
+    cid = mod_tcpconnect(host, serv, sslctx, (aug_object*)box);
+    aug_release(box);
+
+    if (cid < 0) {
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
+    sock = box->vtbl_->unbox_(box);
     augpy_setid(sock, (mod_id)cid);
-    return incret_(sock);
+    return sock;
 }
 
 static PyObject*
@@ -236,23 +239,31 @@ tcplisten_(PyObject* self, PyObject* args)
 {
     const char* host, * serv, * sslctx = NULL;
     PyObject* user = NULL, * sock;
+    augpy_box* box;
     mod_rint lid;
+
+    /* The object's reference count is not increased. */
 
     if (!PyArg_ParseTuple(args, "ss|zO:tcplisten", &host, &serv, &sslctx,
                           &user))
         return NULL;
 
-    if (!(sock = augpy_createhandle(type_, 0, user)))
+    if (!(box = augpy_boxhandle(type_, 0, user)))
         return NULL;
 
-    if ((lid = mod_tcplisten(host, serv, sslctx, sock)) < 0) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
-        Py_DECREF(sock);
+    /* mod_tcplisten() takes ownership. */
+
+    lid = mod_tcplisten(host, serv, sslctx, (aug_object*)box);
+    aug_release(box);
+
+    if (lid < 0) {
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
+    sock = box->vtbl_->unbox_(box);
     augpy_setid(sock, (mod_id)lid);
-    return incret_(sock);
+    return sock;
 }
 
 static PyObject*
@@ -261,6 +272,8 @@ send_(PyObject* self, PyObject* args)
     PyObject* sock, * buf;
     aug_blob* blob;
     mod_result result;
+
+    /* The object's reference count is not increased. */
 
     if (!PyArg_ParseTuple(args, "O!O:send", type_, &sock, &buf))
         return NULL;
@@ -282,7 +295,7 @@ send_(PyObject* self, PyObject* args)
     aug_release(blob);
 
     if (result < 0) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
@@ -295,12 +308,14 @@ setrwtimer_(PyObject* self, PyObject* args)
     PyObject* sock;
     unsigned ms, flags;
 
+    /* The object's reference count is not increased. */
+
     if (!PyArg_ParseTuple(args, "O!II:setrwtimer",
                           type_, &sock, &ms, &flags))
         return NULL;
 
     if (mod_setrwtimer(augpy_getid(sock), ms, flags) < 0) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
@@ -313,13 +328,15 @@ resetrwtimer_(PyObject* self, PyObject* args)
     PyObject* sock;
     unsigned ms, flags;
 
+    /* The object's reference count is not increased. */
+
     if (!PyArg_ParseTuple(args, "O!II:resetrwtimer",
                           type_, &sock, &ms, &flags))
         return NULL;
 
     switch (mod_resetrwtimer(augpy_getid(sock), ms, flags)) {
     case MOD_FAILERROR:
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     case MOD_FAILNONE:
         return incret_(Py_False);
@@ -333,13 +350,16 @@ cancelrwtimer_(PyObject* self, PyObject* args)
 {
     PyObject* sock;
     unsigned flags;
+
+    /* The object's reference count is not increased. */
+
     if (!PyArg_ParseTuple(args, "O!I:cancelrwtimer",
                           type_, &sock, &flags))
         return NULL;
 
     switch (mod_cancelrwtimer(augpy_getid(sock), flags)) {
     case MOD_FAILERROR:
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     case MOD_FAILNONE:
         return incret_(Py_False);
@@ -353,35 +373,30 @@ settimer_(PyObject* self, PyObject* args)
 {
     unsigned ms;
     PyObject* user = NULL, * timer;
-    aug_blob* blob;
+    augpy_box* box;
     mod_rint tid;
+
+    /* The object's reference count is not increased. */
 
     if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &user))
         return NULL;
 
-    if (!(timer = augpy_createhandle(type_, 0, user)))
+    if (!(box = augpy_boxhandle(type_, 0, user)))
         return NULL;
-
-    /* Both blob and this function hold reference to sock. */
-
-    if (!(blob = augpy_createblob(timer))) {
-        Py_DECREF(timer);
-        return NULL;
-    }
 
     /* mod_settimer() takes ownership. */
 
-    tid = mod_settimer(ms, (aug_object*)blob);
-    aug_release(blob);
+    tid = mod_settimer(ms, (aug_object*)box);
+    aug_release(box);
 
     if (tid < 0) {
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
-        Py_DECREF(timer);
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     }
 
+    timer = box->vtbl_->unbox_(box);
     augpy_setid(timer, (mod_id)tid);
-    return timer; /* Ref already held; no need to retain_(). */
+    return timer;
 }
 
 static PyObject*
@@ -390,12 +405,14 @@ resettimer_(PyObject* self, PyObject* args)
     PyObject* timer;
     unsigned ms;
 
+    /* The object's reference count is not increased. */
+
     if (!PyArg_ParseTuple(args, "O!I:resettimer", type_, &timer, &ms))
         return NULL;
 
     switch (mod_resettimer(augpy_getid(timer), ms)) {
     case MOD_FAILERROR:
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     case MOD_FAILNONE:
         return incret_(Py_False);
@@ -409,12 +426,14 @@ canceltimer_(PyObject* self, PyObject* args)
 {
     PyObject* timer;
 
+    /* The object's reference count is not increased. */
+
     if (!PyArg_ParseTuple(args, "O!:canceltimer", type_, &timer))
         return NULL;
 
     switch (mod_canceltimer(augpy_getid(timer))) {
     case MOD_FAILERROR:
-        PyErr_SetString(PyExc_RuntimeError, mod_error());
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
         return NULL;
     case MOD_FAILNONE:
         return incret_(Py_False);
@@ -446,10 +465,6 @@ static PyMethodDef methods_[] = {
     },
     {
         "getenv", getenv_, METH_VARARGS,
-        "TODO"
-    },
-    {
-        "getsession", getsession_, METH_VARARGS,
         "TODO"
     },
     {

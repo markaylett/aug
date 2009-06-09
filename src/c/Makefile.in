@@ -204,7 +204,10 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 to_host_path_cmd = @to_host_path_cmd@
-EXTRA_DIST = lang.mk
+EXTRA_DIST = \
+	augses.xml \
+	lang.mk
+
 SUBDIRS = \
 	augext \
 	augctx \
@@ -219,6 +222,7 @@ SUBDIRS = \
 include_HEADERS = \
 	aug.h \
 	augabi.h \
+	augses.h \
 	augmod.h \
 	augtypes.h \
 	augext.h \
@@ -229,7 +233,11 @@ include_HEADERS = \
 	augserv.h \
 	augnet.h
 
-all: all-recursive
+@WITH_RUBY_TRUE@BUILT_SOURCES = \
+@WITH_RUBY_TRUE@	augses.h
+
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -464,14 +472,16 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-recursive
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-recursive
 all-am: Makefile $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: install-recursive
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
@@ -495,6 +505,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-recursive
 
 clean-am: clean-generic clean-libtool mostlyclean-am
@@ -559,6 +570,9 @@ uninstall-info: uninstall-info-recursive
 	uninstall uninstall-am uninstall-includeHEADERS \
 	uninstall-info-am
 
+
+@WITH_RUBY_TRUE@%.h: %.xml
+@WITH_RUBY_TRUE@	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

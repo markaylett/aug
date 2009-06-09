@@ -1,0 +1,219 @@
+<!--
+  Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009 Mark Aylett <mark.aylett@gmail.com>
+
+  This file is part of Aug written by Mark Aylett.
+
+  Aug is released under the GPL with the additional exemption that compiling,
+  linking, and/or using OpenSSL is allowed.
+
+  Aug is free software; you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation; either version 2 of the License, or (at your option) any later
+  version.
+
+  Aug is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  details.
+
+  You should have received a copy of the GNU General Public License along with
+  this program; if not, write to the Free Software Foundation, Inc., 51
+  Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+
+<package name="mod">
+
+  <quotincl>augmod.h</quotincl>
+
+  <interface name="session">
+
+    Session functions of type mod_bool should return either #MOD_TRUE or
+    #MOD_FALSE, depending on the result.  For those functions associated with
+    a connection, a false return will result in the connection being closed.
+
+    <method name="start" type="mod_bool" qname="start">
+
+      Start session.
+
+      Non-trivial resource acquisition and construction.  Two-phase
+      construction is required to allow callbacks during the method
+      invocation.
+
+      @return Either #MOD_TRUE or #MOD_FALSE.
+
+    </method>
+
+    <method name="stop" type="void" qname="stop">
+
+      Stop session.
+
+      All resources associated with the session should be released.  stop()
+      will only be called for a session if start() returned #MOD_TRUE.
+
+    </method>
+
+    <method name="reconf" type="void" qname="reconf">
+
+      Re-configure request.
+
+      Called in response to a #AUG_EVENTRECONF event, which are raise in
+      response to either a #SIGHUP, or a call to mod_host::reconfall_().
+
+    </method>
+
+    <method name="event" type="void" qname="event">
+
+      Custom event notification.
+
+      @param from Source session name.
+
+      @param type Event type.
+
+      @param id Event descriptor.
+
+      @param ob Optional object data.
+
+      <param name="from" type="const char*"/>
+      <param name="type" type="const char*"/>
+      <param name="id" type="mod_id"/>
+      <param name="ob" type="aug_object" object="true"/>
+    </method>
+
+    <method name="closed" type="void" qname="closed">
+
+      Connection closure.
+
+      @param sock The closed socket.
+
+      <param name="sock" type="struct mod_handle&"/>
+    </method>
+
+    <method name="teardown" type="void" qname="teardown">
+
+      Teardown request.
+
+      @param sock Socket descriptor.
+
+      <param name="sock" type="struct mod_handle&"/>
+    </method>
+
+    <method name="accepted" type="mod_bool" qname="accepted">
+
+      Acceptance of socket connection.
+
+      This function is called when a new connection is accepted on a listener
+      socket.
+
+      @param sock Socket descriptor.
+
+      @param name Peer address.
+
+      @return Either #MOD_TRUE or #MOD_FALSE.
+
+      <param name="sock" type="struct mod_handle&"/>
+      <param name="name" type="const char*"/>
+    </method>
+
+    <method name="connected" type="void" qname="connected">
+
+      Completion of client connection handshake.
+
+      This function is called when a connection, initiated by a call to
+      mod_host::tcpconnect_(), becomes established.
+
+      @param sock Socket descriptor.
+
+      @param name Peer address.
+
+      @see mod_host::tcpconnect_().
+
+      <param name="sock" type="struct mod_handle&"/>
+      <param name="name" type="const char*"/>
+    </method>
+
+    <method name="auth" type="mod_bool" qname="auth">
+
+      Authorisation of peer certificate.
+
+      @param sock Socket descriptor.
+
+      @param subject Certificate subject.
+
+      @param issuer Certificate issuer.
+
+      @return Either #MOD_TRUE or #MOD_FALSE.
+
+      <param name="sock" type="struct mod_handle&"/>
+      <param name="subject" type="const char*"/>
+      <param name="issuer" type="const char*"/>
+    </method>
+
+    <method name="recv" type="void" qname="recv">
+
+      Inbound data.
+
+      @param sock The socket on which the data was received.
+
+      @param buf Data buffer.  May not be null terminated.
+
+      @param len Length of data buffer.
+
+      <param name="sock" type="struct mod_handle&"/>
+      <param name="buf" type="const void*"/>
+      <param name="len" type="size_t"/>
+    </method>
+
+    <method name="error" type="void" qname="error">
+
+      Connection error.
+
+      @param sock The closed socket.
+
+      @param desc Error description.
+
+      <param name="sock" type="struct mod_handle&"/>
+      <param name="desc" type="const char*"/>
+    </method>
+
+    <method name="rdexpire" type="void" qname="rdexpire">
+
+      Expiry of read timer.
+
+      @param sock Socket descriptor.
+
+      @param ms The current timeout value.  The callee may modify @a ms to
+      specify a new value; a value of zero will cancel the timer.
+
+      <param name="sock" type="struct mod_handle&"/>
+      <param name="ms" type="unsigned&"/>
+    </method>
+
+    <method name="wrexpire" type="void" qname="wrexpire">
+
+      Expiry of write timer.
+
+      @param sock Socket descriptor.
+
+      @param ms The current timeout value.  The callee may modify @a ms to
+      specify a new value; a value of zero will cancel the timer.
+
+      <param name="sock" type="struct mod_handle&"/>
+      <param name="ms" type="unsigned&"/>
+    </method>
+
+    <method name="expire" type="void" qname="expire">
+
+      Timer expiry.
+
+      @param timer Timer handle.
+
+      @param ms The current timeout value.  The callee may modify @a ms to
+      specify a new value; a value of zero will cancel the timer.
+
+      <param name="timer" type="struct mod_handle&"/>
+      <param name="ms" type="unsigned&"/>
+    </method>
+
+  </interface>
+
+</package>

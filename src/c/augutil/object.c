@@ -80,7 +80,7 @@ releaseboxint_(aug_boxint* ob)
 }
 
 static int
-getboxint_(aug_boxint* ob)
+unboxint_(aug_boxint* ob)
 {
     struct boxintimpl_* impl = AUG_PODIMPL(struct boxintimpl_, boxint_, ob);
     return impl->i_;
@@ -90,7 +90,7 @@ static const struct aug_boxintvtbl boxintvtbl_ = {
     castboxint_,
     retainboxint_,
     releaseboxint_,
-    getboxint_
+    unboxint_
 };
 
 struct boxptrimpl_ {
@@ -132,7 +132,7 @@ releaseboxptr_(aug_boxptr* ob)
 }
 
 static void*
-getboxptr_(aug_boxptr* ob)
+unboxptr_(aug_boxptr* ob)
 {
     struct boxptrimpl_* impl = AUG_PODIMPL(struct boxptrimpl_, boxptr_, ob);
     return impl->p_;
@@ -142,7 +142,7 @@ static const struct aug_boxptrvtbl boxptrvtbl_ = {
     castboxptr_,
     retainboxptr_,
     releaseboxptr_,
-    getboxptr_
+    unboxptr_
 };
 
 
@@ -239,7 +239,7 @@ aug_obtoi(aug_object* ob)
     int i;
     aug_boxint* tmp;
     if (ob && (tmp = aug_cast(ob, aug_boxintid))) {
-        i = aug_getboxint(tmp);
+        i = aug_unboxint(tmp);
         aug_release(tmp);
     } else
         i = 0;
@@ -272,7 +272,7 @@ aug_obtop(aug_object* ob)
     void* p;
     aug_boxptr* tmp;
     if (ob && (tmp = aug_cast(ob, aug_boxptrid))) {
-        p = aug_getboxptr(tmp);
+        p = aug_unboxptr(tmp);
         aug_release(tmp);
     } else
         p = NULL;

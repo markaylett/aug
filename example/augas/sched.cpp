@@ -175,7 +175,8 @@ namespace {
         return os;
     }
 
-    struct sched : basic_session, mpool_ops {
+    class sched : public basic_session<sched>, public mpool_ops {
+        const string sname_;
         mod_id timer_;
         tmqueue queue_;
         void
@@ -190,7 +191,7 @@ namespace {
 
                 // Inform interested modules of expired event.
 
-                mod_post(0, "sched-client", ptr->name_.c_str(), 0);
+                mod_post("sched-client", ptr->name_.c_str(), 0, 0);
                 pushevent(queue_, now, ptr);
             }
         }
@@ -204,7 +205,7 @@ namespace {
                 if (timer_)
                     resettimer(timer_, ms);
                 else
-                    timer_ = mod::settimer(ms, 0);
+                    timer_ = mod::settimer(ms, null);
                 aug_ctxinfo(aug_tlx, "next expiry in %d ms", ms);
             } else if (timer_) {
                 canceltimer(timer_);
@@ -290,16 +291,31 @@ namespace {
                 toxml(os, queue_, offset, max_);
             }
 
-            dispatch(id, from, "result", mar.base());
+            dispatch(from, "result", id, mar.base());
         }
-        bool
-        do_start(const char* sname)
+        explicit
+        sched(const string& sname)
+            : sname_(sname),
+              timer_(0)
         {
-            do_reconf();
-            return true;
+        }
+    public:
+        ~sched() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        mod_bool
+        start()
+        {
+            reconf();
+            return MOD_TRUE;
         }
         void
-        do_reconf()
+        stop()
+        {
+        }
+        void
+        reconf()
         {
             aug_timeval tv;
             gettimeofday(tv);
@@ -309,12 +325,11 @@ namespace {
             settimer(tv);
         }
         void
-        do_event(mod_id id, const char* from, const char* type,
-                 aug_object_* ob)
+        event(const char* from, const char* type, mod_id id, objectref ob)
         {
             aug_ctxinfo(aug_tlx, "event [%s] triggered", type);
 
-            marptr mar(object_cast<aug_mar>(obptr(ob)));
+            marptr mar(object_cast<aug_mar>(ob));
             if (null == mar)
                 return;
 
@@ -327,7 +342,47 @@ namespace {
             respond(id, from, type, object_cast<aug_blob>(mar));
         }
         void
-        do_expire(const handle& timer, unsigned& ms)
+        closed(mod_handle& sock)
+        {
+            aug_assign(sock.ob_, 0);
+        }
+        void
+        teardown(mod_handle& sock)
+        {
+            mod::shutdown(sock, 0);
+        }
+        mod_bool
+        accepted(mod_handle& sock, const char* name)
+        {
+            return MOD_TRUE;
+        }
+        void
+        connected(mod_handle& sock, const char* name)
+        {
+        }
+        mod_bool
+        auth(mod_handle& sock, const char* subject, const char* issuer)
+        {
+            return MOD_TRUE;
+        }
+        void
+        recv(mod_handle& sock, const void* buf, size_t len)
+        {
+        }
+        void
+        error(mod_handle& sock, const char* desc)
+        {
+        }
+        void
+        rdexpire(mod_handle& sock, unsigned& ms)
+        {
+        }
+        void
+        wrexpire(mod_handle& sock, unsigned& ms)
+        {
+        }
+        void
+        expire(mod_handle& timer, unsigned& ms)
         {
             aug_timeval tv;
             gettimeofday(tv);
@@ -337,21 +392,14 @@ namespace {
             ms = timerms(queue_, tv);
             aug_ctxinfo(aug_tlx, "next expiry in %d ms", ms);
         }
-        ~sched() AUG_NOTHROW
-        {
-        }
-        sched()
-            : timer_(0)
-        {
-        }
-        static session_base*
+        static sessionptr
         create(const char* sname)
         {
-            return new (tlx) sched();
+            return attach(new (tlx) sched(sname));
         }
     };
 
     typedef basic_module<basic_factory<sched> > module;
 }
 
-MOD_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term, module::create)

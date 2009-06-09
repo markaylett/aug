@@ -24,6 +24,7 @@
 #define AUGRB_OBJECT_H
 
 #include "augmod.h"
+#include "augses.h"
 #include "augext/blob.h"
 
 #if !defined(_WIN32)
@@ -43,17 +44,26 @@ rb_w32_getcwd(char* buffer, int size);
 
 #include <ruby.h>
 
-AUG_INTERFACE(augrb_blob);
+AUG_INTERFACE(augrb_box);
 
-struct augrb_blobvtbl {
-    AUG_VTBL(augrb_blob);
-    VALUE (*get_)(augrb_blob*);
+struct augrb_boxvtbl {
+    AUG_VTBL(augrb_box);
+    VALUE (*unbox_)(augrb_box*);
 };
 
+augrb_box*
+augrb_createbox(VALUE rbob);
+
 aug_blob*
-augrb_createblob(VALUE rbobj);
+augrb_createblob(VALUE rbob);
 
 VALUE
-augrb_getblob(aug_object* ob);
+augrb_obtorb(aug_object* ob);
+
+VALUE
+augrb_createhandle(mod_id id, VALUE rbob);
+
+augrb_box*
+augrb_boxhandle(mod_id id, VALUE rbob);
 
 #endif /* AUGRB_OBJECT_H */

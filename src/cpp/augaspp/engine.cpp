@@ -45,15 +45,13 @@ AUG_RCSID("$Id$");
 #define POSTEVENT_ (AUG_EVENTUSER - 1)
 
 using namespace aug;
-using namespace aug;
 using namespace std;
 
 namespace {
 
     // Must not use mpool_ops.
 
-    class msgevent : public ref_base {
-        msg<msgevent> msg_;
+    class msgevent : public msg_base<msgevent> {
         unsigned id_;
         const string from_, to_, type_;
         smartob<aug_object> payload_;
@@ -65,20 +63,11 @@ namespace {
               type_(type),
               payload_(null)
         {
-            msg_.reset(this);
         }
-    protected:
+    public:
         ~msgevent() AUG_NOTHROW
         {
             // Deleted from base.
-        }
-    public:
-        smartob<aug_object>
-        cast_(const char* id) AUG_NOTHROW
-        {
-            if (equalid<aug_object>(id) || equalid<aug_msg>(id))
-                return object_retain<aug_object>(msg_);
-            return null;
         }
         void
         setmsgpayload_(objectref payload) AUG_NOTHROW
@@ -118,7 +107,7 @@ namespace {
             // allocated on the freestore to avoid use of aug_tlx.
 
             msgevent* ptr = new msgevent(id, from, to, type);
-            return object_attach<aug_msg>(ptr->msg_);
+            return attach(ptr);
         }
     };
 }
@@ -138,10 +127,9 @@ namespace aug {
         struct sessiontimer : mpool_ops {
             sessionptr session_;
             smartob<aug_object> ob_;
-            sessiontimer(const sessionptr& session,
-                         const smartob<aug_object>& ob)
+            sessiontimer(const sessionptr& session, objectref ob)
                 : session_(session),
-                  ob_(ob)
+                  ob_(object_retain(ob))
             {
             }
         };
@@ -299,8 +287,8 @@ namespace aug {
 
                 sockptr sock(socks_.get(parent));
                 connptr conn(new (tlx) servconn(getmpool(aug_tlx),
-                                                sock->session(), user(*sock),
-                                                timers_, id));
+                                                sock->session(), timers_, id,
+                                                sock->ob()));
                 scoped_insert si(socks_, conn);
 
                 // Connection has now been established.
@@ -308,7 +296,7 @@ namespace aug {
                 string name(conn->peername(chan));
                 AUG_CTXDEBUG2(aug_tlx,
                               "initialising connection: id=[%u], name=[%s]",
-                              aug::id(*conn), name.c_str());
+                              conn->id(), name.c_str());
 
                 // Session may reject the connection by returning false.
 
@@ -425,8 +413,8 @@ namespace aug {
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
                         for (; it != end; ++it)
-                            (*it)->event(getmsgid(msg), getmsgfrom(msg),
-                                         getmsgtype(msg), payload);
+                            (*it)->event(getmsgfrom(msg), getmsgtype(msg),
+                                         getmsgid(msg), payload);
                     }
                 }
             }
@@ -610,7 +598,7 @@ engine::stopall()
 }
 
 AUGASPP_API void
-engine::post(mod_id id, const char* sname, const char* to, const char* type,
+engine::post(const char* sname, const char* to, const char* type, mod_id id,
              objectref ob)
 {
     // Thread-safe.
@@ -625,8 +613,8 @@ engine::post(mod_id id, const char* sname, const char* to, const char* type,
 }
 
 AUGASPP_API void
-engine::dispatch(mod_id id, const char* sname, const char* to,
-                 const char* type, objectref ob)
+engine::dispatch(const char* sname, const char* to, const char* type,
+                 mod_id id, objectref ob)
 {
     vector<sessionptr> sessions;
     impl_->sessions_.getbygroup(sessions, to);
@@ -634,7 +622,7 @@ engine::dispatch(mod_id id, const char* sname, const char* to,
     vector<sessionptr>::const_iterator it(sessions.begin()),
         end(sessions.end());
     for (; it != end; ++it)
-        (*it)->event(id, sname, type, ob);
+        (*it)->event(sname, type, id, ob);
 }
 
 AUGASPP_API void
@@ -648,7 +636,7 @@ engine::shutdown(mod_id cid, unsigned flags)
 
 AUGASPP_API mod_id
 engine::tcpconnect(const char* sname, const char* host, const char* port,
-                   sslctx* ctx, void* user)
+                   sslctx* ctx, objectref ob)
 {
 #if !WITH_SSL
     if (ctx)
@@ -661,17 +649,17 @@ engine::tcpconnect(const char* sname, const char* host, const char* port,
     mpoolptr mpool(getmpool(aug_tlx));
     chanptr chan(createclient(mpool, host, port, impl_->muxer_,
                               ctx ? ctx->get() : 0));
-    connptr conn(new (tlx) clntconn(mpool, session, user, impl_->timers_,
-                                    getchanid(chan)));
+    connptr conn(new (tlx) clntconn(mpool, session, impl_->timers_,
+                                    getchanid(chan), ob));
 
     impl_->socks_.insert(conn);
     insertchan(impl_->chans_, chan);
-    return id(*conn);
+    return conn->id();
 }
 
 AUGASPP_API mod_id
 engine::tcplisten(const char* sname, const char* host, const char* port,
-                  sslctx* ctx, void* user)
+                  sslctx* ctx, objectref ob)
 {
 #if !WITH_SSL
     if (ctx)
@@ -697,11 +685,11 @@ engine::tcplisten(const char* sname, const char* host, const char* port,
     // Prepare state.
 
     sessionptr session(impl_->sessions_.getbyname(sname));
-    listenerptr conn(new (tlx) listener(session, user, getchanid(chan)));
+    listenerptr conn(new (tlx) listener(session, getchanid(chan), ob));
 
     impl_->socks_.insert(conn);
     insertchan(impl_->chans_, chan);
-    return id(*conn);
+    return conn->id();
 }
 
 AUGASPP_API void
@@ -777,8 +765,7 @@ engine::settimer(const char* sname, unsigned ms, objectref ob)
 
     // Insert after settimer() has succeeded.
 
-    detail::sessiontimer timer(impl_->sessions_.getbyname(sname),
-                               smartob<aug_object>::retain(ob));
+    detail::sessiontimer timer(impl_->sessions_.getbyname(sname), ob);
     impl_->sessiontimers_.insert(make_pair(id, timer));
     return id;
 }

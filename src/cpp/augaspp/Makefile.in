@@ -65,7 +65,7 @@ libaugaspp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugaspp_la_OBJECTS = buffer.lo clntconn.lo config.lo conn.lo \
-	engine.lo listener.lo object.lo rwtimer.lo servconn.lo \
+	engine.lo handle.lo listener.lo rwtimer.lo servconn.lo \
 	session.lo sessions.lo ssl.lo sock.lo socks.lo
 libaugaspp_la_OBJECTS = $(am_libaugaspp_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -235,8 +235,8 @@ modinclude_HEADERS = \
 	config.hpp \
 	conn.hpp \
 	engine.hpp \
+	handle.hpp \
 	listener.hpp \
-	object.hpp \
 	rwtimer.hpp \
 	servconn.hpp \
 	session.hpp \
@@ -252,8 +252,8 @@ libaugaspp_la_SOURCES = \
 	config.cpp \
 	conn.cpp \
 	engine.cpp \
+	handle.cpp \
 	listener.cpp \
-	object.cpp \
 	rwtimer.cpp \
 	servconn.cpp \
 	session.cpp \
@@ -348,8 +348,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/handle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rwtimer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servconn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Plo@am__quote@

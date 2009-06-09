@@ -128,7 +128,7 @@ rwtimer::~rwtimer() AUG_NOTHROW
 {
 }
 
-rwtimer::rwtimer(const sessionptr& session, const mod_handle& sock,
+rwtimer::rwtimer(const sessionptr& session, mod_handle& sock,
                  aug_timers_t timers)
     : session_(session),
       sock_(sock),

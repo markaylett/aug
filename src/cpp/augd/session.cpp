@@ -28,11 +28,10 @@ AUG_RCSID("$Id$");
 
 #include "augsys.h"
 
-#include "augctx/string.h"
+#include "augctx/string.h" // aug_strlcpy()
 
 #include <stack>
 
-using namespace aug;
 using namespace aug;
 using namespace augd;
 using namespace std;
@@ -41,7 +40,7 @@ namespace {
 
     // A stack is maintained so that the calling session is always known.
 
-    stack<const mod_session*> stack_;
+    stack<const session_base*> stack_;
 
     struct scoped_frame {
         ~scoped_frame() AUG_NOTHROW
@@ -49,146 +48,140 @@ namespace {
             stack_.pop();
         }
         explicit
-        scoped_frame(const mod_session* session)
+        scoped_frame(const session_base* session)
         {
             stack_.push(session);
         }
     };
 }
 
-mod_session&
-session::do_get() AUG_NOTHROW
+const char*
+session::do_name() const AUG_NOTHROW
 {
-    return session_;
+    return name_;
 }
 
-const mod_session&
-session::do_get() const AUG_NOTHROW
-{
-    return session_;
-}
-
-bool
+mod_bool
 session::do_active() const AUG_NOTHROW
 {
     return active_;
 }
 
-bool
+mod_bool
 session::do_start() AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    active_ = true; // Functions may be called during initialisation.
-    return active_ = module_->start(session_);
+    scoped_frame frame(this);
+    active_ = MOD_TRUE; // Functions may be called during initialisation.
+    return active_ = mod::start(session_);
 }
 
 void
 session::do_reconf() const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->reconf();
+    scoped_frame frame(this);
+    mod::reconf(session_);
 }
 
 void
-session::do_event(mod_id id, const char* from, const char* type,
+session::do_event(const char* from, const char* type, mod_id id,
                   objectref ob) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->event(id, from, type, ob);
+    scoped_frame frame(this);
+    mod::event(session_, from, type, id, ob);
 }
 
 void
-session::do_closed(const mod_handle& sock) const AUG_NOTHROW
+session::do_closed(mod_handle& sock) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->closed(sock);
+    scoped_frame frame(this);
+    mod::closed(session_, sock);
 }
 
 void
-session::do_teardown(const mod_handle& sock) const AUG_NOTHROW
+session::do_teardown(mod_handle& sock) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->teardown(sock);
+    scoped_frame frame(this);
+    mod::teardown(session_, sock);
 }
 
-bool
+mod_bool
 session::do_accepted(mod_handle& sock, const char* name) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    return module_->accepted(sock, name);
+    scoped_frame frame(this);
+    return mod::accepted(session_, sock, name);
 }
 
 void
 session::do_connected(mod_handle& sock, const char* name) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->connected(sock, name);
+    scoped_frame frame(this);
+    mod::connected(session_, sock, name);
 }
 
-bool
-session::do_auth(const mod_handle& sock, const char* subject,
+mod_bool
+session::do_auth(mod_handle& sock, const char* subject,
                  const char* issuer) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    return module_->auth(sock, subject, issuer);
+    scoped_frame frame(this);
+    return mod::auth(session_, sock, subject, issuer);
 }
 
 void
-session::do_recv(const mod_handle& sock, const char* buf,
+session::do_recv(mod_handle& sock, const char* buf,
                  size_t size) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->recv(sock, buf, size);
+    scoped_frame frame(this);
+    mod::recv(session_, sock, buf, size);
 }
 
 void
-session::do_error(const mod_handle& sock, const char* desc) const AUG_NOTHROW
+session::do_error(mod_handle& sock, const char* desc) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->error(sock, desc);
+    scoped_frame frame(this);
+    mod::error(session_, sock, desc);
 }
 
 void
-session::do_rdexpire(const mod_handle& sock,
-                     unsigned& ms) const AUG_NOTHROW
+session::do_rdexpire(mod_handle& sock, unsigned& ms) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->rdexpire(sock, ms);
+    scoped_frame frame(this);
+    mod::rdexpire(session_, sock, ms);
 }
 
 void
-session::do_wrexpire(const mod_handle& sock,
-                     unsigned& ms) const AUG_NOTHROW
+session::do_wrexpire(mod_handle& sock, unsigned& ms) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->wrexpire(sock, ms);
+    scoped_frame frame(this);
+    mod::wrexpire(session_, sock, ms);
 }
 
 void
-session::do_expire(const mod_handle& timer, unsigned& ms) const AUG_NOTHROW
+session::do_expire(mod_handle& timer, unsigned& ms) const AUG_NOTHROW
 {
-    scoped_frame frame(&session_);
-    module_->expire(timer, ms);
+    scoped_frame frame(this);
+    mod::expire(session_, timer, ms);
 }
 
 session::~session() AUG_NOTHROW
 {
     if (active_) {
-        scoped_frame frame(&session_);
-        module_->stop(); // AUG_NOTHROW
+        scoped_frame frame(this);
+        mod::stop(session_); // AUG_NOTHROW
+        session_ = null;
     }
 }
 
-session::session(const moduleptr& module, const char* name)
+session::session(const char* name, const moduleptr& module)
     : module_(module),
-      active_(false)
+      session_(module->create(name)),
+      active_(MOD_FALSE)
 {
-    aug_strlcpy(session_.name_, name, sizeof(session_.name_));
-    session_.user_ = 0;
+    aug_strlcpy(name_, name, sizeof(name_));
 }
 
-const mod_session*
+const session_base&
 augd::getsession()
 {
-    return stack_.empty() ? 0 : stack_.top();
+    assert(!stack_.empty());
+    return *stack_.top();
 }

@@ -147,10 +147,11 @@ clntconn::do_cancelrwtimer(unsigned flags)
 
 clntconn::~clntconn() AUG_NOTHROW
 {
+    aug_assign(sock_.ob_, 0);
 }
 
-clntconn::clntconn(mpoolref mpool, const sessionptr& session, void* user,
-                   aug_timers_t timers, unsigned id)
+clntconn::clntconn(mpoolref mpool, const sessionptr& session,
+                   aug_timers_t timers, unsigned id, objectref ob)
     : impl_(session, sock_, buffer_, rwtimer_, true), // See comment.
       buffer_(mpool),
       rwtimer_(session, sock_, timers)
@@ -158,5 +159,5 @@ clntconn::clntconn(mpoolref mpool, const sessionptr& session, void* user,
     // Client connections are implicitly accepted as the client is initiating.
 
     sock_.id_ = id;
-    sock_.user_ = user;
+    aug_assign(sock_.ob_, ob.get());
 }

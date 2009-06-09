@@ -31,7 +31,6 @@ AUG_RCSID("$Id$");
 #include <string>
 
 using namespace aug;
-using namespace aug;
 using namespace std;
 
 buffer::~buffer() AUG_NOTHROW

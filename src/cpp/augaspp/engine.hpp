@@ -95,25 +95,25 @@ namespace aug {
         stopall();
 
         void
-        post(mod_id id, const char* sname, const char* to, const char* type,
-             aug::objectref ob);
+        post(const char* sname, const char* to, const char* type, mod_id id,
+             objectref ob);
 
         // Thread-unsafe host interface.
 
         void
-        dispatch(mod_id id, const char* sname, const char* to,
-                 const char* type, aug::objectref ob);
+        dispatch(const char* sname, const char* to, const char* type,
+                 mod_id id, objectref ob);
 
         void
         shutdown(mod_id cid, unsigned flags);
 
         mod_id
         tcpconnect(const char* sname, const char* host, const char* port,
-                   sslctx* ctx, void* user);
+                   sslctx* ctx, objectref ob);
 
         mod_id
         tcplisten(const char* sname, const char* host, const char* port,
-                  sslctx* ctx, void* user);
+                  sslctx* ctx, objectref ob);
 
         void
         send(mod_id cid, const void* buf, size_t len);
@@ -131,7 +131,7 @@ namespace aug {
         cancelrwtimer(mod_id cid, unsigned flags);
 
         mod_id
-        settimer(const char* sname, unsigned ms, aug::objectref ob);
+        settimer(const char* sname, unsigned ms, objectref ob);
 
         bool
         resettimer(mod_id tid, unsigned ms);

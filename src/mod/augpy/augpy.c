@@ -28,14 +28,16 @@ AUG_RCSID("$Id$");
 #include "host.h"
 #include "object.h"
 
+#include "augses.h"
+
 #if defined(_WIN32)
 # include <direct.h>
 #endif /* _WIN32 */
 
 struct import_ {
     PyObject* module_;
-    PyObject* stop_;
     PyObject* start_;
+    PyObject* stop_;
     PyObject* reconf_;
     PyObject* event_;
     PyObject* closed_;
@@ -48,7 +50,7 @@ struct import_ {
     PyObject* rdexpire_;
     PyObject* wrexpire_;
     PyObject* expire_;
-    int open_;
+    mod_bool open_;
 };
 
 static PyObject* augpy_ = NULL;
@@ -127,9 +129,9 @@ printerr_(void)
 
         mod_writelog(MOD_LOGERROR, "%s", PyString_AsString(message));
 
-        Py_DECREF(message);
-        Py_DECREF(empty);
         Py_DECREF(list);
+        Py_DECREF(empty);
+        Py_DECREF(message);
 
         Py_DECREF(module);
 
@@ -160,7 +162,7 @@ getmethod_(PyObject* module, const char* name)
 }
 
 static void
-destroyimport_(struct import_* import)
+termimport_(struct import_* import)
 {
     Py_XDECREF(import->expire_);
     Py_XDECREF(import->wrexpire_);
@@ -174,27 +176,22 @@ destroyimport_(struct import_* import)
     Py_XDECREF(import->closed_);
     Py_XDECREF(import->event_);
     Py_XDECREF(import->reconf_);
-    Py_XDECREF(import->start_);
     Py_XDECREF(import->stop_);
+    Py_XDECREF(import->start_);
 
     Py_XDECREF(import->module_);
-    free(import);
 }
 
-static struct import_*
-createimport_(const char* sname)
+static mod_bool
+initimport_(struct import_* import, const char* sname)
 {
-    struct import_* import = calloc(1, sizeof(struct import_));
-    if (!import)
-        return NULL;
-
     if (!(import->module_ = PyImport_ImportModule((char*)sname))) {
         printerr_();
-        goto fail;
+        return MOD_FALSE;
     }
 
-    import->stop_ = getmethod_(import->module_, "stop");
     import->start_ = getmethod_(import->module_, "start");
+    import->stop_ = getmethod_(import->module_, "stop");
     import->reconf_ = getmethod_(import->module_, "reconf");
     import->event_ = getmethod_(import->module_, "event");
     import->closed_ = getmethod_(import->module_, "closed");
@@ -207,13 +204,9 @@ createimport_(const char* sname)
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
     import->expire_ = getmethod_(import->module_, "expire");
-    import->open_ = 0;
+    import->open_ = MOD_FALSE;
 
-    return import;
-
- fail:
-    destroyimport_(import);
-    return NULL;
+    return MOD_TRUE;
 }
 
 static void
@@ -232,7 +225,7 @@ termpy_(void)
     mod_writelog(level, "allocated objects: %d", objects);
 }
 
-static int
+static mod_bool
 initpy_(void)
 {
     mod_writelog(MOD_LOGDEBUG, "initialising python interpreter");
@@ -246,18 +239,83 @@ initpy_(void)
 
     if (!(augpy_ = augpy_createhost(type_)))
         goto fail;
-    return 0;
+    return MOD_TRUE;
 
  fail:
     termpy_();
-    return -1;
+    return MOD_FALSE;
+}
+
+struct impl_ {
+    mod_session session_;
+    int refs_;
+    char name_[MOD_MAXNAME + 1];
+    struct import_ import_;
+};
+
+static void*
+cast_(mod_session* ob, const char* id)
+{
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, mod_sessionid)) {
+        aug_retain(ob);
+        return ob;
+    }
+    return NULL;
 }
 
 static void
-stop_(void)
+retain_(mod_session* ob)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    ++impl->refs_;
+}
+
+static void
+release_(mod_session* ob)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    if (0 == --impl->refs_) {
+        termimport_(&impl->import_);
+        free(impl);
+    }
+}
+
+static mod_bool
+start_(mod_session* ob)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    if (import->start_) {
+
+        PyObject* x = PyObject_CallFunction(import->start_, "s", impl->name_);
+        if (!x) {
+
+            printerr_();
+            return MOD_FALSE;
+
+        } else if (x == Py_False) {
+
+            /* Treat Py_False like any other object with respect to reference
+               counts. */
+
+            Py_DECREF(x);
+            return MOD_FALSE;
+        }
+        Py_DECREF(x);
+    }
+
+    /* Default. */
+
+    import->open_ = MOD_TRUE;
+    return MOD_TRUE;
+}
+
+static void
+stop_(mod_session* ob)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
 
     if (import->open_ && import->stop_) {
 
@@ -267,43 +325,13 @@ stop_(void)
         } else
             printerr_();
     }
-
-    destroyimport_(import);
-}
-
-static mod_bool
-start_(struct mod_session* session)
-{
-    struct import_* import;
-    if (!(import = createimport_(session->name_)))
-        return MOD_FALSE;
-
-    session->user_ = import;
-
-    if (import->start_) {
-
-        PyObject* x = PyObject_CallFunction(import->start_, "s",
-                                            session->name_);
-        if (!x) {
-            printerr_();
-            destroyimport_(import);
-            return MOD_FALSE;
-        } else if (x == Py_False) {
-            destroyimport_(import);
-            return MOD_FALSE;
-        }
-        Py_DECREF(x);
-    }
-
-    import->open_ = 1;
-    return MOD_TRUE;
 }
 
 static void
-reconf_(void)
+reconf_(mod_session* ob)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
 
     if (import->reconf_) {
 
@@ -316,23 +344,24 @@ reconf_(void)
 }
 
 static void
-event_(mod_id id, const char* from, const char* type, aug_object* ob)
+event_(mod_session* ob_, const char* from, const char* type, mod_id id,
+       aug_object* ob)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob_);
+    struct import_* import = &impl->import_;
 
     if (import->event_) {
 
         PyObject* y;
         if (ob) {
 
-            /* Preference is augpy_blob type. */
+            /* Preference is augpy_boxpy type. */
 
-            PyObject* x = augpy_getblob(ob);
+            PyObject* x = augpy_obtopy(ob);
             if (x) {
 
-                y = PyObject_CallFunction(import->event_, "IssO", id, from,
-                                          type, x);
+                y = PyObject_CallFunction(import->event_, "ssIO", from, type,
+                                          id, x);
                 Py_DECREF(x);
                 goto done;
 
@@ -352,8 +381,8 @@ event_(mod_id id, const char* from, const char* type, aug_object* ob)
 
                         /* Blob data obtained. */
 
-                        y = PyObject_CallFunction(import->event_, "Issz#",
-                                                  id, from, type,
+                        y = PyObject_CallFunction(import->event_, "ssIz#",
+                                                  from, type, id,
                                                   (const char*)data, size);
                         aug_release(blob);
                         goto done;
@@ -365,8 +394,8 @@ event_(mod_id id, const char* from, const char* type, aug_object* ob)
 
         /* Null or unsupported object type. */
 
-        y = PyObject_CallFunction(import->event_, "IssO", id, from, type,
-                                  Py_None);
+        y = PyObject_CallFunction(import->event_, "ssIO", from, type,
+                                  id, Py_None);
 
     done:
         if (y) {
@@ -374,41 +403,44 @@ event_(mod_id id, const char* from, const char* type, aug_object* ob)
         } else
             printerr_();
     }
-
-    /* x will be Py_DECREF()-ed by destroy_(). */
 }
 
 static void
-closed_(const struct mod_handle* sock)
+closed_(mod_session* ob, struct mod_handle* sock)
 {
-    struct import_* import = mod_getsession()->user_;
-    PyObject* x = sock->user_;
-    assert(import);
-    assert(x);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    assert(sock->ob_);
 
     if (import->closed_) {
 
+        PyObject* x = augpy_obtopy(sock->ob_);
         PyObject* y = PyObject_CallFunction(import->closed_, "O", x);
+        Py_DECREF(x);
+
         if (y) {
             Py_DECREF(y);
         } else
             printerr_();
     }
 
-    Py_DECREF(x);
+    aug_assign(sock->ob_, NULL);
 }
 
 static void
-teardown_(const struct mod_handle* sock)
+teardown_(mod_session* ob, struct mod_handle* sock)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
-    assert(sock->user_);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    assert(sock->ob_);
 
     if (import->teardown_) {
 
-        PyObject* x = sock->user_;
+        PyObject* x = augpy_obtopy(sock->ob_);
         PyObject* y = PyObject_CallFunction(import->teardown_, "O", x);
+        Py_DECREF(x);
 
         if (y) {
             Py_DECREF(y);
@@ -420,36 +452,42 @@ teardown_(const struct mod_handle* sock)
 }
 
 static mod_bool
-accepted_(struct mod_handle* sock, const char* name)
+accepted_(mod_session* ob, struct mod_handle* sock, const char* name)
 {
-    struct import_* import = mod_getsession()->user_;
-    PyObject* x, * y;
-    mod_bool ret = MOD_TRUE;
-    assert(import);
-    assert(sock->user_);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
 
-    x = augpy_getuser(sock->user_);
-    y = augpy_createhandle(type_, sock->id_, x);
+    PyObject* x;
+    augpy_box* box;
+    mod_bool ret = MOD_TRUE;
+
+    assert(sock->ob_);
+
+    x = augpy_obtopy(sock->ob_);
+    box = augpy_boxhandle(type_, sock->id_, x);
     Py_DECREF(x);
 
-    if (!y) {
+    if (!box) {
 
         /* closed() will not be called if accepted() fails. */
 
         printerr_();
-        ret = MOD_FALSE;
+        return MOD_FALSE;
+    }
 
-    } else if (import->accepted_) {
+    if (import->accepted_) {
 
+        PyObject* y = box->vtbl_->unbox_(box);
         PyObject* z = PyObject_CallFunction(import->accepted_, "Os", y, name);
+        Py_DECREF(y);
 
         if (!z) {
 
             /* closed() will not be called if accepted() fails. */
 
             printerr_();
-            Py_DECREF(y);
-            return MOD_FALSE;
+            ret = MOD_FALSE;
+            goto done;
         }
 
         if (z == Py_False) {
@@ -459,9 +497,9 @@ accepted_(struct mod_handle* sock, const char* name)
 
             /* closed() will not be called if accepted() fails. */
 
-            Py_DECREF(y);
-            y = NULL;
+            Py_DECREF(z);
             ret = MOD_FALSE;
+            goto done;
         }
 
         Py_DECREF(z);
@@ -469,22 +507,26 @@ accepted_(struct mod_handle* sock, const char* name)
 
     /* The original user data is still retained by the listener. */
 
-    sock->user_ = y;
+    aug_assign(sock->ob_, (aug_object*)box);
+ done:
+    aug_release(box);
     return ret;
 }
 
 static void
-connected_(struct mod_handle* sock, const char* name)
+connected_(mod_session* ob, struct mod_handle* sock, const char* name)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
-    assert(sock->user_);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    assert(sock->ob_);
 
     if (import->connected_) {
 
-        PyObject* x = sock->user_;
+        PyObject* x = augpy_obtopy(sock->ob_);
         PyObject* y = PyObject_CallFunction(import->connected_, "Os", x,
                                             name);
+        Py_DECREF(x);
 
         if (y) {
             Py_DECREF(y);
@@ -496,18 +538,23 @@ connected_(struct mod_handle* sock, const char* name)
 }
 
 static mod_bool
-auth_(const struct mod_handle* sock, const char* subject, const char* issuer)
+auth_(mod_session* ob, struct mod_handle* sock, const char* subject,
+      const char* issuer)
 {
-    struct import_* import = mod_getsession()->user_;
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
     mod_bool ret = MOD_TRUE;
-    assert(import);
-    assert(sock->user_);
+
+    assert(sock->ob_);
 
     if (import->auth_) {
 
-        PyObject* x = sock->user_;
+        PyObject* x = augpy_obtopy(sock->ob_);
         PyObject* y = PyObject_CallFunction(import->auth_, "Oss", x, subject,
                                             issuer);
+        Py_DECREF(x);
+
         if (y) {
             if (y == Py_False)
                 ret = MOD_FALSE;
@@ -522,38 +569,41 @@ auth_(const struct mod_handle* sock, const char* subject, const char* issuer)
 }
 
 static void
-recv_(const struct mod_handle* sock, const void* buf, size_t len)
+recv_(mod_session* ob, struct mod_handle* sock, const void* buf, size_t len)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
-    assert(sock->user_);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    assert(sock->ob_);
 
     if (import->recv_) {
 
-        PyObject* x = sock->user_;
+        PyObject* x = augpy_obtopy(sock->ob_);
         PyObject* y = PyBuffer_FromMemory((void*)buf, (int)len);
         PyObject* z = PyObject_CallFunction(import->recv_, "OO", x, y);
+        Py_DECREF(x);
+        Py_DECREF(y);
 
         if (z) {
             Py_DECREF(z);
         } else
             printerr_();
-
-        Py_DECREF(y);
     }
 }
 
 static void
-error_(const struct mod_handle* sock, const char* desc)
+error_(mod_session* ob, struct mod_handle* sock, const char* desc)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
-    assert(sock->user_);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    assert(sock->ob_);
 
     if (import->error_) {
 
-        PyObject* x = sock->user_;
+        PyObject* x = augpy_obtopy(sock->ob_);
         PyObject* y = PyObject_CallFunction(import->error_, "Os", x, desc);
+        Py_DECREF(x);
 
         if (y) {
             Py_DECREF(y);
@@ -563,17 +613,20 @@ error_(const struct mod_handle* sock, const char* desc)
 }
 
 static void
-rdexpire_(const struct mod_handle* sock, unsigned* ms)
+rdexpire_(mod_session* ob, struct mod_handle* sock, unsigned* ms)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
-    assert(sock->user_);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    assert(sock->ob_);
 
     if (import->rdexpire_) {
 
-        PyObject* x = sock->user_;
+        PyObject* x = augpy_obtopy(sock->ob_);
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->rdexpire_, "OO", x, y);
+        Py_DECREF(x);
+        Py_DECREF(y);
 
         if (z) {
             if (PyInt_Check(z)) {
@@ -584,23 +637,24 @@ rdexpire_(const struct mod_handle* sock, unsigned* ms)
             Py_DECREF(z);
         } else
             printerr_();
-
-        Py_DECREF(y);
     }
 }
 
 static void
-wrexpire_(const struct mod_handle* sock, unsigned* ms)
+wrexpire_(mod_session* ob, struct mod_handle* sock, unsigned* ms)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
-    assert(sock->user_);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    assert(sock->ob_);
 
     if (import->wrexpire_) {
 
-        PyObject* x = sock->user_;
+        PyObject* x = augpy_obtopy(sock->ob_);
         PyObject* y = PyInt_FromLong(*ms);
         PyObject* z = PyObject_CallFunction(import->wrexpire_, "OO", x, y);
+        Py_DECREF(x);
+        Py_DECREF(y);
 
         if (z) {
             if (PyInt_Check(z)) {
@@ -611,30 +665,29 @@ wrexpire_(const struct mod_handle* sock, unsigned* ms)
             Py_DECREF(z);
         } else
             printerr_();
-
-        Py_DECREF(y);
     }
 }
 
 static void
-expire_(const struct mod_handle* timer, unsigned* ms)
+expire_(mod_session* ob, struct mod_handle* timer, unsigned* ms)
 {
-    struct import_* import = mod_getsession()->user_;
-    assert(import);
-    assert(timer->user_);
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    assert(timer->ob_);
 
     if (import->expire_) {
 
         PyObject* x, * y, * z;
-        if (!(x = augpy_getblob((aug_object*)timer->user_))) {
+        if (!(x = augpy_obtopy(timer->ob_))) {
             x = Py_None;
             Py_INCREF(x);
         }
 
         y = PyInt_FromLong(*ms);
         z = PyObject_CallFunction(import->expire_, "OO", x, y);
-        Py_DECREF(y);
         Py_DECREF(x);
+        Py_DECREF(y);
 
         if (z) {
             if (PyInt_Check(z)) {
@@ -645,14 +698,15 @@ expire_(const struct mod_handle* timer, unsigned* ms)
             Py_DECREF(z);
         } else
             printerr_();
-
-        /* x will be Py_DECREF()-ed by destroy_() when *ms == 0. */
     }
 }
 
-static const struct mod_module module_ = {
-    stop_,
+static const struct mod_sessionvtbl vtbl_ = {
+    cast_,
+    retain_,
+    release_,
     start_,
+    stop_,
     reconf_,
     event_,
     closed_,
@@ -667,15 +721,11 @@ static const struct mod_module module_ = {
     expire_
 };
 
-static const struct mod_module*
+static mod_bool
 init_(const char* name)
 {
     mod_writelog(MOD_LOGINFO, "initialising augpy module");
-
-    if (initpy_() < 0)
-        return NULL;
-
-    return &module_;
+    return initpy_();
 }
 
 static void
@@ -685,4 +735,26 @@ term_(void)
     termpy_();
 }
 
-MOD_ENTRYPOINTS(init_, term_)
+static mod_session*
+create_(const char* sname)
+{
+    struct impl_* impl = malloc(sizeof(struct impl_));
+    if (!impl)
+        return NULL;
+
+    impl->session_.vtbl_ = &vtbl_;
+    impl->session_.impl_ = NULL;
+    impl->refs_ = 1;
+
+    strncpy(impl->name_, sname, sizeof(impl->name_));
+    impl->name_[MOD_MAXNAME] = '\0';
+
+    if (!initimport_(&impl->import_, sname)) {
+        free(impl);
+        return NULL;
+    }
+
+    return &impl->session_;
+}
+
+MOD_ENTRYPOINTS(init_, term_, create_)

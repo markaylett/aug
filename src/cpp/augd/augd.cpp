@@ -44,7 +44,6 @@ AUG_RCSID("$Id$");
 #include "augd/options.hpp"
 #include "augd/session.hpp"
 #include "augd/ssl.hpp"
-#include "augd/utility.hpp"
 
 #include <iomanip>
 #include <iostream>
@@ -53,7 +52,6 @@ AUG_RCSID("$Id$");
 
 #include <time.h>
 
-using namespace aug;
 using namespace aug;
 using namespace augd;
 using namespace std;
@@ -299,7 +297,7 @@ namespace {
     // Thread-safe.
 
     const char*
-    error_()
+    geterror_()
     {
         return aug_tlerr->desc_;
     }
@@ -335,14 +333,14 @@ namespace {
     // Thread-safe.
 
     mod_result
-    post_(mod_id id, const char* to, const char* type, aug_object* ob)
+    post_(const char* to, const char* type, mod_id id, aug_object* ob)
     {
-        const char* sname = getsession()->name_;
+        const char* sname(getsession().name());
         AUG_CTXDEBUG2(aug_tlx,
-                      "post(): id=[%u], sname=[%s], to=[%s], type=[%s]",
-                      id, sname, to, type);
+                      "post(): sname=[%s], to=[%s], type=[%s], id=[%u]",
+                      sname, to, type, id);
         try {
-            impl_->engine_.post(id, sname, to, type, ob);
+            impl_->engine_.post(sname, to, type, id, ob);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -350,14 +348,14 @@ namespace {
     }
 
     mod_result
-    dispatch_(mod_id id, const char* to, const char* type, aug_object* ob)
+    dispatch_(const char* to, const char* type, mod_id id, aug_object* ob)
     {
-        const char* sname = getsession()->name_;
+        const char* sname(getsession().name());
         AUG_CTXDEBUG2(aug_tlx,
-                      "dispatch(): id=[%u], sname=[%s], to=[%s], type=[%s]",
-                      id, sname, to, type);
+                      "dispatch(): sname=[%s], to=[%s], type=[%s], id=[%u]",
+                      sname, to, type, id);
         try {
-            impl_->engine_.dispatch(id, sname, to, type, ob);
+            impl_->engine_.dispatch(sname, to, type, id, ob);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;
@@ -387,15 +385,6 @@ namespace {
         return 0;
     }
 
-    const mod_session*
-    getsession_()
-    {
-        try {
-            return getsession();
-        } AUG_SETERRINFOCATCH;
-        return 0;
-    }
-
     mod_result
     shutdown_(mod_id cid, unsigned flags)
     {
@@ -410,9 +399,9 @@ namespace {
 
     mod_rint
     tcpconnect_(const char* host, const char* port, const char* ctx,
-                void* user)
+                aug_object* ob)
     {
-        const char* sname = getsession()->name_;
+        const char* sname(getsession().name());
         AUG_CTXDEBUG2(aug_tlx,
                       "tcpconnect(): sname=[%s], host=[%s], port=[%s]",
                       sname, host, port);
@@ -428,7 +417,7 @@ namespace {
             }
 #endif // WITH_SSL
             return (mod_rint)impl_->engine_
-                .tcpconnect(sname, host, port, ptr, user);
+                .tcpconnect(sname, host, port, ptr, ob);
 
         } AUG_SETERRINFOCATCH;
         return MOD_FAILERROR;
@@ -436,9 +425,9 @@ namespace {
 
     mod_rint
     tcplisten_(const char* host, const char* port, const char* ctx,
-               void* user)
+               aug_object* ob)
     {
-        const char* sname = getsession()->name_;
+        const char* sname(getsession().name());
         AUG_CTXDEBUG2(aug_tlx,
                       "tcplisten(): sname=[%s], host=[%s], port=[%s]",
                       sname, host, port);
@@ -457,7 +446,7 @@ namespace {
             // TODO: temporarily regain root privileges.
 
             return (mod_rint)impl_->engine_
-                .tcplisten(sname, host, port, ptr, user);
+                .tcplisten(sname, host, port, ptr, ob);
 
         } AUG_SETERRINFOCATCH;
         return MOD_FAILERROR;
@@ -529,7 +518,7 @@ namespace {
     mod_rint
     settimer_(unsigned ms, aug_object* ob)
     {
-        const char* sname = getsession()->name_;
+        const char* sname(getsession().name());
         AUG_CTXDEBUG2(aug_tlx, "settimer(): sname=[%s], ms=[%u]", sname, ms);
         try {
             return (mod_rint)impl_->engine_.settimer(sname, ms, ob);
@@ -565,13 +554,12 @@ namespace {
     const mod_host host_ = {
         writelog_,
         vwritelog_,
-        error_,
+        geterror_,
         reconfall_,
         stopall_,
         post_,
         dispatch_,
         getenv_,
-        getsession_,
         shutdown_,
         tcpconnect_,
         tcplisten_,
@@ -584,15 +572,6 @@ namespace {
         resettimer_,
         canceltimer_
     };
-
-    void
-    teardown_(const mod_handle* sock)
-    {
-        // Teardown is a protocol-level shutdown.
-
-        aug_ctxinfo(aug_tlx, "teardown defaulting to shutdown");
-        shutdown_(sock->id_, 0);
-    }
 
     void
     load_()
@@ -638,8 +617,9 @@ namespace {
                                 "loading module: name=[%s], path=[%s]",
                                 value.c_str(), path.c_str());
 
-                    moduleptr module(new (tlx) augd::module
-                                     (value, path.c_str(), host_, teardown_));
+                    moduleptr module(new (tlx)
+                                     augd::module(value.c_str(), path.c_str(),
+                                                  host_));
                     it = impl_->modules_
                         .insert(make_pair(value, module)).first;
                 }
@@ -648,25 +628,24 @@ namespace {
                             "creating session: name=[%s]", name.c_str());
                 impl_->engine_.insert
                     (name, sessionptr(new (tlx) augd::session
-                                      (it->second, name.c_str())),
+                                      (name.c_str(), it->second)),
                      options_.get(base + ".groups", 0));
             }
 
         } else {
 
-            // No session list: user reasonable defaults.
+            // No session list: use reasonable defaults.
 
             aug_ctxinfo(aug_tlx, "loading module: name=[%s]", DEFAULT_NAME);
-            moduleptr module(new (tlx) augd::module
-                             (DEFAULT_NAME, DEFAULT_MODULE, host_,
-                              teardown_));
+            moduleptr module(new (tlx) augd::module(DEFAULT_NAME,
+                                                    DEFAULT_MODULE, host_));
             impl_->modules_[DEFAULT_NAME] = module;
 
             aug_ctxinfo(aug_tlx, "creating session: name=[%s]", DEFAULT_NAME);
             impl_->engine_
                 .insert(DEFAULT_NAME,
                         sessionptr(new (tlx) augd::session
-                                   (module, DEFAULT_NAME)), 0);
+                                   (DEFAULT_NAME, module)), 0);
         }
 
         // A session is active once start() has returned true.

@@ -32,7 +32,7 @@ module RbTest2
         AugRb.dispatch(0, "group1", "foo", 101.to_s)
         AugRb.post(0, sname, "nil", nil)
     end 
-    def self.event(id, frm, type, user)
+    def self.event(frm, type, id, user)
         Log.debug("event(): #{user}")
         if type == "foo"
             if user.to_i != 101

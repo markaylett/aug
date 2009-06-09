@@ -53,6 +53,7 @@
 #endif /* MOD_BUILD */
 
 struct aug_blob_;
+struct mod_session_;
 
 /**
  * @defgroup ModuleLogLevel Log Level
@@ -183,11 +184,6 @@ typedef int mod_rint;
 
 typedef unsigned mod_id;
 
-struct mod_session {
-    char name_[MOD_MAXNAME + 1];
-    void* user_;
-};
-
 /**
  * Both sockets and timers are represented by handles.  For timer handles,
  * #mod_handle::user_ will be of type @ref aug_object.
@@ -197,7 +193,7 @@ struct mod_session {
 
 struct mod_handle {
     mod_id id_;
-    void* user_;
+    aug_object* ob_;
 };
 
 /**
@@ -251,7 +247,7 @@ struct mod_host {
      * @return The error description.
      */
 
-    const char* (*error_)(void);
+    const char* (*geterror_)(void);
 
     /**
      * Re-configure the host and all loaded modules.
@@ -283,7 +279,7 @@ struct mod_host {
      * @see dispatch_()
      */
 
-    mod_result (*post_)(mod_id id, const char* to, const char* type,
+    mod_result (*post_)(const char* to, const char* type, mod_id id,
                         struct aug_object_* ob);
 
     /**
@@ -304,7 +300,7 @@ struct mod_host {
      * @see post_()
      */
 
-    mod_result (*dispatch_)(mod_id id, const char* to, const char* type,
+    mod_result (*dispatch_)(const char* to, const char* type, mod_id id,
                             struct aug_object_* ob);
 
     /**
@@ -321,12 +317,6 @@ struct mod_host {
      */
 
     const char* (*getenv_)(const char* name, const char* def);
-
-    /**
-     * Get the active session.
-     */
-
-    const struct mod_session* (*getsession_)(void);
 
     /**
      * Shutdown the connection.
@@ -351,14 +341,14 @@ struct mod_host {
      *
      * @param sslctx Optional name of ssl context.
      *
-     * @param user Optional user data to be associated with the resulting
+     * @param ob Optional user data to be associated with the resulting
      * connection.
      *
      * @return The connection id.
      */
 
     mod_rint (*tcpconnect_)(const char* host, const char* port,
-                            const char* sslctx, void* user);
+                            const char* sslctx, aug_object* ob);
 
     /**
      * Bind tcp listener socket.
@@ -369,13 +359,13 @@ struct mod_host {
      *
      * @param sslctx Optional name of ssl context.
      *
-     * @param user Optional user data.
+     * @param ob Optional user data.
      *
      * @return The listener id.
      */
 
     mod_rint (*tcplisten_)(const char* host, const char* port,
-                           const char* sslctx, void* user);
+                           const char* sslctx, aug_object* ob);
 
     /**
      * Send data to peer.
@@ -445,7 +435,7 @@ struct mod_host {
      * @param ob Optional object data.
      */
 
-    mod_rint (*settimer_)(unsigned ms, struct aug_object_* ob);
+    mod_rint (*settimer_)(unsigned ms, aug_object* ob);
 
     /**
      * Reset timer.
@@ -468,183 +458,6 @@ struct mod_host {
 
 /** @} */
 
-/**
- * @addtogroup Module
- *
- * Module functions of type mod_bool should return either #MOD_TRUE or
- * #MOD_FALSE, depending on the result.  For those functions associated with a
- * connection, a false return will result in the connection being closed.
- *
- * @{
- */
-
-struct mod_module {
-
-    /**
-     * Stop session.
-     *
-     * The current session can be retrieved using mod_host::getsession_().
-     * All resources associated with the session should be released in this
-     * handler.  stop_() will only be called for a session if start_()
-     * returned #MOD_TRUE.
-     */
-
-    void (*stop_)(void);
-
-    /**
-     * Start session.
-     *
-     * User-state associated with the session may be assigned to
-     * #mod_session::user_.
-     *
-     * @return Either #MOD_TRUE or #MOD_FALSE.
-     */
-
-    mod_bool (*start_)(struct mod_session* session);
-
-    /**
-     * Re-configure request.
-     *
-     * Called in response to a #AUG_EVENTRECONF event, which are raise in
-     * response to either a #SIGHUP, or a call to mod_host::reconfall_().
-     */
-
-    void (*reconf_)(void);
-
-    /**
-     * Custom event notification.
-     *
-     * @param id Originating id.
-     *
-     * @param from Source session name.
-     *
-     * @param type Event type.
-     *
-     * @param ob Object data.
-     */
-
-    void (*event_)(mod_id id, const char* from, const char* type,
-                   struct aug_object_* ob);
-
-    /**
-     * Connection closure.
-     *
-     * @param sock The closed socket.
-     */
-
-    void (*closed_)(const struct mod_handle* sock);
-
-    /**
-     * Teardown request.
-     *
-     * @param sock Socket descriptor.
-     */
-
-    void (*teardown_)(const struct mod_handle* sock);
-
-    /**
-     * Acceptance of socket connection.
-     *
-     * This function is called when a new connection is accepted on a listener
-     * socket.
-     *
-     * @param sock Socket descriptor.
-     *
-     * @param name Peer address.
-     *
-     * @return Either #MOD_TRUE or #MOD_FALSE.
-     */
-
-    mod_bool (*accepted_)(struct mod_handle* sock, const char* name);
-
-    /**
-     * Completion of client connection handshake.
-     *
-     * This function is called when a connection, initiated by a call to
-     * mod_host::tcpconnect_(), becomes established.
-     *
-     * @param sock Socket descriptor.
-     *
-     * @param name Peer address.
-     *
-     * @see mod_host::tcpconnect_().
-     */
-
-    void (*connected_)(struct mod_handle* sock, const char* name);
-
-    /**
-     * Authorisation of peer certificate.
-     *
-     * @param sock Socket descriptor.
-     *
-     * @param subject Certificate subject.
-     *
-     * @param issuer Certificate issuer.
-     *
-     * @return Either #MOD_TRUE or #MOD_FALSE.
-     */
-
-    mod_bool (*auth_)(const struct mod_handle* sock, const char* subject,
-                      const char* issuer);
-
-    /**
-     * Inbound data.
-     *
-     * @param sock The socket on which the data was received.
-     *
-     * @param buf Data buffer.  May not be null terminated.
-     *
-     * @param len Length of data buffer.
-     */
-
-    void (*recv_)(const struct mod_handle* sock, const void* buf, size_t len);
-
-    /**
-     * Connection error.
-     *
-     * @param sock The closed socket.
-     *
-     * @param desc Error description.
-     */
-
-    void (*error_)(const struct mod_handle* sock, const char* desc);
-
-    /**
-     * Expiry of read timer.
-     *
-     * @param sock Socket descriptor.
-     *
-     * @param ms The current timeout value.  The callee may modify @a ms to
-     * specify a new value; a value of zero will cancel the timer.
-     */
-
-    void (*rdexpire_)(const struct mod_handle* sock, unsigned* ms);
-
-    /**
-     * Expiry of write timer.
-     *
-     * @param sock Socket descriptor.
-     *
-     * @param ms The current timeout value.  The callee may modify @a ms to
-     * specify a new value; a value of zero will cancel the timer.
-     */
-
-    void (*wrexpire_)(const struct mod_handle* sock, unsigned* ms);
-
-    /**
-     * Timer expiry.
-     *
-     * @param timer Timer handle.
-     *
-     * @param ms The current timeout value.  The callee may modify @a ms to
-     * specify a new value; a value of zero will cancel the timer.
-     */
-
-    void (*expire_)(const struct mod_handle* timer, unsigned* ms);
-};
-
-/** @} */
-
 MOD_EXTERNC const struct mod_host*
 mod_gethost(void);
 
@@ -655,7 +468,7 @@ mod_gethost(void);
 
 #define mod_writelog      (mod_gethost()->writelog_)
 #define mod_vwritelog     (mod_gethost()->vwritelog_)
-#define mod_error         (mod_gethost()->error_)
+#define mod_geterror      (mod_gethost()->geterror_)
 #define mod_reconfall     (mod_gethost()->reconfall_)
 #define mod_stopall       (mod_gethost()->stopall_)
 #define mod_post          (mod_gethost()->post_)
@@ -679,18 +492,18 @@ mod_gethost(void);
  * null on failure.
  */
 
-#define MOD_ENTRYPOINTS(init, term)                                 \
+#define MOD_ENTRYPOINTS(init, term, create)                         \
     static const struct mod_host* host_ = NULL;                     \
     MOD_EXTERNC const struct mod_host*                              \
     mod_gethost(void)                                               \
     {                                                               \
         return host_;                                               \
     }                                                               \
-    MOD_API const struct mod_module*                                \
+    MOD_API mod_bool                                                \
     mod_init(const char* name, const struct mod_host* host)         \
     {                                                               \
         if (host_)                                                  \
-            return NULL;                                            \
+            return MOD_FALSE;                                       \
         host_ = host;                                               \
         return init(name);                                          \
     }                                                               \
@@ -699,10 +512,17 @@ mod_gethost(void);
     {                                                               \
         term();                                                     \
         host_ = NULL;                                               \
-    }
+    }                                                               \
+    MOD_API struct mod_session_*                                    \
+    mod_create(const char* name)                                    \
+    {                                                               \
+        return create(name);                                        \
+    }                                                               \
 
 typedef void (*mod_termfn)(void);
-typedef const struct mod_module*
+typedef mod_bool
 (*mod_initfn)(const char*, const struct mod_host*);
+typedef struct mod_session_*
+(*mod_createfn)(const char*);
 
 #endif /* AUGMOD_H */

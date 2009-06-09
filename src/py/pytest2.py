@@ -32,7 +32,7 @@ def start(sname):
     dispatch(0, "group1", "foo", str(101))
     post(0, sname, "none", None)
 
-def event(id, frm, type, user):
+def event(frm, type, id, user):
     log.debug("event(): %s" % user)
     if type == "foo":
         if int(user) != 101:

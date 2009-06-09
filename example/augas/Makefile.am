@@ -57,4 +57,5 @@ modsched_la_LIBADD = \
 modserver_la_SOURCES = server.cpp
 modserver_la_LDFLAGS = -module -export-dynamic -avoid-version -no-undefined
 modserver_la_LIBADD = \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la

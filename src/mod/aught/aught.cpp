@@ -176,6 +176,7 @@ namespace {
         if (digest != aug_digestpass(x.c_str(), realm.c_str(), y.c_str(),
                                      base64))
             return false;
+
         return true;
     }
 
@@ -357,14 +358,14 @@ namespace {
         respond(id, sessid, code, status, mar, close);
     }
 
-    struct session : marstore_base<session>, mpool_ops {
+    class store : public marstore_base<store>, public mpool_ops {
         const string& realm_;
         mod_id id_;
         string sessid_;
         const string name_;
         aug_md5base64_t nonce_;
         bool auth_;
-        session(const string& realm, mod_id id, const string& name)
+        store(const string& realm, mod_id id, const string& name)
             : realm_(realm),
               id_(id),
               name_(name),
@@ -372,6 +373,11 @@ namespace {
         {
             nonce(id_, name_, nonce_);
             aug_ctxinfo(aug_tlx, "nonce: [%s]", nonce_);
+        }
+    public:
+        ~store() MOD_NOTHROW
+        {
+            // Deleted from base.
         }
         void
         put(const char* request, marref mar)
@@ -503,7 +509,7 @@ namespace {
                     putfieldp(mar, "X-HTTP-Method-Override",
                               r.method_.c_str());
 
-                    post(id_, "http-request", service.c_str(), mar.base());
+                    post("http-request", service.c_str(), id_, mar.base());
 
                 } else if (r.method_ == "GET") {
 
@@ -555,19 +561,59 @@ namespace {
             } AUG_SETERRINFOCATCH;
             return AUG_FAILERROR;
         }
+        static marstoreptr
+        create(const string& realm, mod_id id, const string& name)
+        {
+            return attach(new (tlx) store(realm, id, name));
+        }
     };
 
-    struct http : basic_session, mpool_ops {
+    class parser : public boxptr_base<parser>, public mpool_ops {
+        marparser impl_;
+        explicit
+        parser(mpoolref mpool, marstoreref marstore, unsigned size)
+            : impl_(mpool, marstore, size)
+        {
+        }
+    public:
+        ~parser() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        void*
+        unboxptr_() AUG_NOTHROW
+        {
+            return &impl_;
+        }
+        static boxptrptr
+        create(mpoolref mpool, marstoreref marstore, unsigned size = 0)
+        {
+            return attach(new (tlx) parser(mpool, marstore, size));
+        }
+    };
 
+    class http : public basic_session<http>, public mpool_ops {
+        const string sname_;
         string realm_;
-        bool
-        do_start(const char* sname)
+
+        explicit
+        http(const string& sname)
+            : sname_(sname)
+        {
+        }
+    public:
+        ~http() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        mod_bool
+        start()
         {
             aug_ctxinfo(aug_tlx, "starting...");
 
             const char* realm(mod::getenv("session.http.realm", "aug"));
             if (!realm)
-                return false;
+                return MOD_FALSE;
 
             const char* serv(mod::getenv("session.http.serv", "8080"));
 
@@ -589,28 +635,31 @@ namespace {
                 tcplisten("0.0.0.0", sslserv, sslctx);
             }
 
-            do_reconf();
-            return true;
+            reconf();
+            return MOD_TRUE;
         }
         void
-        do_reconf()
+        stop()
+        {
+        }
+        void
+        reconf()
         {
             options_.load();
         }
         void
-        do_event(mod_id id, const char* from, const char* type,
-                 aug_object_* ob)
+        event(const char* from, const char* type, mod_id id, objectref ob)
         {
             active::const_iterator it(active_.find(id));
             if (it != active_.end()) {
 
-                marptr mar(object_cast<aug_mar>(obptr(ob)));
+                marptr mar(object_cast<aug_mar>(ob));
                 if (null != mar) {
                     respond(id, it->second.first, 200, "OK", mar,
                             it->second.second);
                 } else {
 
-                    blobptr blob(object_cast<aug_blob>(obptr(ob)));
+                    blobptr blob(object_cast<aug_blob>(ob));
                     if (null != blob)
                         respond(id, it->second.first, 200, "OK", blob,
                                 it->second.second);
@@ -618,37 +667,48 @@ namespace {
             }
         }
         void
-        do_closed(const handle& sock)
+        closed(mod_handle& sock)
         {
             aug_ctxinfo(aug_tlx, "closed");
-            if (sock.user()) {
-                auto_ptr<marparser> parser(sock.user<marparser>());
+            marparser* parser(obtop<marparser>(sock.ob_));
+            if (parser)
                 finishmar(*parser);
-            }
 
             // Remove association between session and connection.
 
-            active_.erase(sock.id());
-        }
-        bool
-        do_accepted(handle& sock, const char* name)
-        {
-            marstoreptr sess(session::attach(new (tlx) session
-                                             (realm_, sock.id(), name)));
-            auto_ptr<marparser> parser(new (tlx) marparser
-                                       (getmpool(aug_tlx), sess));
-
-            sock.setuser(parser.get());
-            setrwtimer(sock, 30000, MOD_TIMRD);
-            parser.release();
-            return true;
+            aug_assign(sock.ob_, 0);
+            active_.erase(sock.id_);
         }
         void
-        do_recv(const handle& sock, const void* buf, size_t len)
+        teardown(mod_handle& sock)
         {
-            marparser& parser(*sock.user<marparser>());
+            mod::shutdown(sock, 0);
+        }
+        mod_bool
+        accepted(mod_handle& sock, const char* name)
+        {
+            marstoreptr sp(store::create(realm_, sock.id_, name));
+            boxptrptr bp(parser::create(getmpool(aug_tlx), sp));
+            aug_assign(sock.ob_, bp.base());
+
+            setrwtimer(sock, 30000, MOD_TIMRD);
+            return MOD_TRUE;
+        }
+        void
+        connected(mod_handle& sock, const char* name)
+        {
+        }
+        mod_bool
+        auth(mod_handle& sock, const char* subject, const char* issuer)
+        {
+            return MOD_TRUE;
+        }
+        void
+        recv(mod_handle& sock, const void* buf, size_t len)
+        {
+            marparser* parser(obtop<marparser>(sock.ob_));
             try {
-                appendmar(parser, static_cast<const char*>(buf),
+                appendmar(*parser, static_cast<const char*>(buf),
                           static_cast<unsigned>(len));
             } catch (...) {
                 mod::shutdown(sock, 1);
@@ -656,22 +716,31 @@ namespace {
             }
         }
         void
-        do_rdexpire(const handle& sock, unsigned& ms)
+        error(mod_handle& sock, const char* desc)
+        {
+        }
+        void
+        rdexpire(mod_handle& sock, unsigned& ms)
         {
             aug_ctxinfo(aug_tlx, "no data received for 30 seconds");
             shutdown(sock, 0);
         }
-        ~http() AUG_NOTHROW
+        void
+        wrexpire(mod_handle& sock, unsigned& ms)
         {
         }
-        static session_base*
+        void
+        expire(mod_handle& timer, unsigned& ms)
+        {
+        }
+        static sessionptr
         create(const char* sname)
         {
-            return new (tlx) http();
+            return attach(new (tlx) http(sname));
         }
     };
 
     typedef basic_module<basic_factory<http> > module;
 }
 
-MOD_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term, module::create)

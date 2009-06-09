@@ -185,7 +185,7 @@ crelease_(struct cimpl_* impl)
         aug_destroytcpconnect(impl->conn_);
         if (AUG_BADSD != impl->sd_)
             cclose_(impl);
-        aug_safeassign(impl->fwd_, NULL);
+        aug_assign(impl->fwd_, NULL);
         aug_freemem(mpool, impl);
         aug_release(mpool);
     }

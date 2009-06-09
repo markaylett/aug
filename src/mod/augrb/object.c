@@ -26,10 +26,42 @@
 
 AUG_RCSID("$Id$");
 
+/* VALUE-based var handling. */
+
+static void
+unregister_(VALUE* ptr)
+{
+    *ptr = Qnil; /* Belt and braces. */
+    rb_gc_unregister_address(ptr);
+    free(ptr);
+}
+
+static VALUE*
+register_(VALUE value)
+{
+    VALUE* ptr = malloc(sizeof(VALUE));
+    assert(ptr);
+    *ptr = value;
+
+    /* Prevent garbage collection. */
+
+    rb_gc_register_address(ptr);
+    return ptr;
+}
+
+static VALUE
+newhandle_(VALUE id, VALUE user)
+{
+    VALUE argv[2];
+    argv[0] = id;
+    argv[1] = user;
+    return rb_class_new_instance(2, argv, chandle_);
+}
+
 struct blobimpl_ {
     aug_blob blob_;
     augrb_blob rbblob_;
-    unsigned refs_;
+    int refs_;
     VALUE rbob_;
 };
 

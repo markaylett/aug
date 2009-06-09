@@ -52,7 +52,7 @@ namespace aug {
     timermemcb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            (obtop<T*>(user)->*U)(id, *ms);
+            (obtop<T>(user)->*U)(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
@@ -61,7 +61,7 @@ namespace aug {
     timermemcb(aug_object* ob, int id, unsigned* ms) AUG_NOTHROW
     {
         try {
-            obtop<T*>(ob)->timercb(id, *ms);
+            obtop<T>(ob)->timercb(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 

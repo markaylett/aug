@@ -1,4 +1,7 @@
-EXTRA_DIST = lang.mk
+EXTRA_DIST = \
+	augses.xml \
+	lang.mk
+
 SUBDIRS = \
 	augext \
 	augctx \
@@ -13,6 +16,7 @@ SUBDIRS = \
 include_HEADERS = \
 	aug.h \
 	augabi.h \
+	augses.h \
 	augmod.h \
 	augtypes.h \
 	augext.h \
@@ -22,3 +26,11 @@ include_HEADERS = \
 	augutil.h \
 	augserv.h \
 	augnet.h
+
+if WITH_RUBY
+BUILT_SOURCES = \
+	augses.h
+
+%.h: %.xml
+	$(top_srcdir)/src/rb/augidl -n $@ <$< >$@
+endif

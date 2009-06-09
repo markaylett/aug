@@ -54,15 +54,15 @@ socks::erase(mod_id id)
 void
 socks::erase(const sock_base& sock)
 {
-    AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%u]", id(sock));
-    socks_.erase(id(sock));
+    AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%u]", sock.id());
+    socks_.erase(sock.id());
 }
 
 void
 socks::insert(const sockptr& sock)
 {
-    AUG_CTXDEBUG2(aug_tlx, "adding sock: id=[%u]", id(*sock));
-    socks_.insert(make_pair(id(*sock), sock));
+    AUG_CTXDEBUG2(aug_tlx, "adding sock: id=[%u]", sock->id());
+    socks_.insert(make_pair(sock->id(), sock));
 }
 
 void

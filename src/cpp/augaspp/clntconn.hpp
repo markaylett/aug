@@ -105,8 +105,8 @@ namespace aug {
     public:
         ~clntconn() AUG_NOTHROW;
 
-        clntconn(mpoolref mpool, const sessionptr& session, void* user,
-                 aug_timers_t timers, unsigned id);
+        clntconn(mpoolref mpool, const sessionptr& session,
+                 aug_timers_t timers, unsigned id, objectref ob);
     };
 }
 

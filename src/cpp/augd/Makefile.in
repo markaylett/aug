@@ -53,8 +53,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_augd_OBJECTS = augd.$(OBJEXT) exception.$(OBJEXT) module.$(OBJEXT) \
-	options.$(OBJEXT) session.$(OBJEXT) ssl.$(OBJEXT) \
-	utility.$(OBJEXT)
+	options.$(OBJEXT) session.$(OBJEXT) ssl.$(OBJEXT)
 augd_OBJECTS = $(am_augd_OBJECTS)
 augd_DEPENDENCIES = $(top_builddir)/src/cpp/augaspp/libaugaspp.la \
 	$(top_builddir)/src/c/augnet/libaugnet.la \
@@ -225,8 +224,7 @@ noinst_HEADERS = \
 	module.hpp \
 	options.hpp \
 	session.hpp \
-	ssl.hpp \
-	utility.hpp
+	ssl.hpp
 
 augd_SOURCES = \
 	augd.cpp \
@@ -234,8 +232,7 @@ augd_SOURCES = \
 	module.cpp \
 	options.cpp \
 	session.cpp \
-	ssl.cpp \
-	utility.cpp
+	ssl.cpp
 
 augd_LDADD = \
 	$(top_builddir)/src/cpp/augaspp/libaugaspp.la \
@@ -321,7 +318,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

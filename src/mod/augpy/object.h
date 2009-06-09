@@ -1,3 +1,4 @@
+
 /*
   Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009 Mark Aylett <mark.aylett@gmail.com>
 
@@ -32,24 +33,30 @@
 
 #include <Python.h>
 
-AUG_INTERFACE(augpy_blob);
+AUG_INTERFACE(augpy_box);
 
-struct augpy_blobvtbl {
-    AUG_VTBL(augpy_blob);
-    PyObject* (*get_)(augpy_blob*);
+struct augpy_boxvtbl {
+    AUG_VTBL(augpy_box);
+    PyObject* (*unbox_)(augpy_box*);
 };
+
+augpy_box*
+augpy_createbox(PyObject* pyob);
 
 aug_blob*
 augpy_createblob(PyObject* pyob);
 
 PyObject*
-augpy_getblob(aug_object* ob);
+augpy_obtopy(aug_object* ob);
 
 PyTypeObject*
 augpy_createtype(void);
 
 PyObject*
 augpy_createhandle(PyTypeObject* type, mod_id id, PyObject* user);
+
+augpy_box*
+augpy_boxhandle(PyTypeObject* type, mod_id id, PyObject* user);
 
 void
 augpy_setid(PyObject* self, mod_id id);

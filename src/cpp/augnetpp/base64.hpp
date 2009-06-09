@@ -53,7 +53,7 @@ namespace aug {
     base64memcb(aug_object* ob, const char* buf, size_t len) AUG_NOTHROW
     {
         try {
-            return (obtop<T*>(ob)->*U)(buf, len);
+            return (obtop<T>(ob)->*U)(buf, len);
         } AUG_SETERRINFOCATCH;
         return AUG_FAILERROR;
     }
@@ -63,7 +63,7 @@ namespace aug {
     base64memcb(aug_object* ob, const char* buf, size_t len) AUG_NOTHROW
     {
         try {
-            return obtop<T*>(ob)->base64cb(buf, len);
+            return obtop<T>(ob)->base64cb(buf, len);
         } AUG_SETERRINFOCATCH;
         return AUG_FAILERROR;
     }
@@ -157,14 +157,14 @@ namespace aug {
         inline aug_result
         base64os(objectref ob, const char* buf, size_t len)
         {
-            std::ostream& os(*obtop<std::ostream*>(ob));
+            std::ostream& os(*obtop<std::ostream>(ob));
 			os.write(buf, static_cast<std::streamsize>(len));
             return AUG_SUCCESS;
         }
         inline aug_result
         base64str(objectref ob, const char* buf, size_t len)
         {
-            std::string& str(*obtop<std::string*>(ob));
+            std::string& str(*obtop<std::string>(ob));
             str.append(buf, static_cast<std::streamsize>(len));
             return AUG_SUCCESS;
         }

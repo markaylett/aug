@@ -7,8 +7,8 @@ modinclude_HEADERS = \
 	config.hpp \
 	conn.hpp \
 	engine.hpp \
+	handle.hpp \
 	listener.hpp \
-	object.hpp \
 	rwtimer.hpp \
 	servconn.hpp \
 	session.hpp \
@@ -25,8 +25,8 @@ libaugaspp_la_SOURCES = \
 	config.cpp \
 	conn.cpp \
 	engine.cpp \
+	handle.cpp \
 	listener.cpp \
-	object.cpp \
 	rwtimer.cpp \
 	servconn.cpp \
 	session.cpp \

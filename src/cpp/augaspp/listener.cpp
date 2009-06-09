@@ -77,12 +77,13 @@ listener::~listener() AUG_NOTHROW
     try {
         session_->closed(sock_);
     } AUG_PERRINFOCATCH;
+    aug_assign(sock_.ob_, 0);
 }
 
-listener::listener(const sessionptr& session, void* user, unsigned id)
+listener::listener(const sessionptr& session, unsigned id, objectref ob)
     : session_(session),
       state_(LISTENING)
 {
     sock_.id_ = id;
-    sock_.user_ = user;
+    aug_assign(sock_.ob_, ob.get());
 }

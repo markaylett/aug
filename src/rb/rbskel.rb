@@ -27,7 +27,7 @@ require 'log'
 include AugUtil
 
 # void writelog(level, msg)
-# string error()
+# string geterror()
 # void reconfall()
 # void stopall()
 # void post(id, to, type, user)
@@ -83,7 +83,7 @@ module RbSkel
     def self.reconf
         Log.debug("reconf()")
     end
-    def self.event(id, frm, type, user)
+    def self.event(frm, type, id, user)
         Log.debug("event()")
     end
     def self.closed(sock)

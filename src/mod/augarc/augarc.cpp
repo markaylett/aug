@@ -134,52 +134,111 @@ namespace {
         return interpret(id, cmd, pairs.begin() + 1, pairs.end(), quit);
     }
 
-    struct arc : basic_session, mpool_ops {
-
-        bool
-        do_start(const char* sname)
+    class parser : public boxptr_base<parser>, public mpool_ops {
+        shellparser impl_;
+        explicit
+        parser(mpoolref mpool, bool pairs)
+            : impl_(mpool, pairs)
         {
-            writelog(MOD_LOGINFO, "starting session [%s]", sname);
+        }
+    public:
+        ~parser() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        void*
+        unboxptr_() AUG_NOTHROW
+        {
+            return &impl_;
+        }
+        static boxptrptr
+        create(mpoolref mpool, bool pairs = false)
+        {
+            return attach(new (tlx) parser(mpool, pairs));
+        }
+    };
+
+    class arc : public basic_session<arc>, public mpool_ops {
+        const string sname_;
+        explicit
+        arc(const string& sname)
+            : sname_(sname)
+        {
+        }
+    public:
+        ~arc() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        mod_bool
+        start()
+        {
+            writelog(MOD_LOGINFO, "starting session [%s]", sname_.c_str());
             const char* serv= mod::getenv("session.arc.serv");
             if (!serv)
-                return false;
+                return MOD_FALSE;
             tcplisten("0.0.0.0", serv);
-            return true;
+            return MOD_TRUE;
         }
-
-        bool
-        do_accepted(handle& sock, const char* name)
+        void
+        stop()
         {
-            sock.setuser(new (tlx) shellparser(getmpool(aug_tlx), true));
+        }
+        void
+        reconf()
+        {
+        }
+        void
+        event(const char* from, const char* type, mod_id id, objectref ob)
+        {
+        }
+        void
+        closed(mod_handle& sock)
+        {
+            aug_assign(sock.ob_, 0);
+            socks_.erase(sock.id_);
+        }
+        void
+        teardown(mod_handle& sock)
+        {
+            mod::shutdown(sock, 0);
+        }
+        mod_bool
+        accepted(mod_handle& sock, const char* name)
+        {
+            boxptrptr bp(parser::create(getmpool(aug_tlx), true));
+            aug_assign(sock.ob_, bp.base());
+
             send(sock, "+OK hello\r\n", 11);
             setrwtimer(sock, 120000, MOD_TIMRD);
-            return true;
+            return MOD_TRUE;
         }
-
         void
-        do_closed(const handle& sock)
+        connected(mod_handle& sock, const char* name)
         {
-            socks_.erase(sock.id());
-            delete sock.user<shellparser>();
         }
-
-        void
-        do_recv(const handle& sock, const void* buf, size_t size)
+        mod_bool
+        auth(mod_handle& sock, const char* subject, const char* issuer)
         {
-            shellparser& parser(*sock.user<shellparser>());
+            return MOD_TRUE;
+        }
+        void
+        recv(mod_handle& sock, const void* buf, size_t len)
+        {
+            shellparser* parser(obtop<shellparser>(sock.ob_));
             const char* ptr(static_cast<const char*>(buf));
 
-            for (size_t i(0); i < size; ++i) {
+            for (size_t i(0); i < len; ++i) {
 
-                if (parser.append(ptr[i])) {
+                if (parser->append(ptr[i])) {
 
                     shellpairs pairs;
-                    parser.reset(pairs);
+                    parser->reset(pairs);
 
                     if (!pairs.empty()) {
 
                         bool quit(false);
-                        string s(interpret(sock.id(), pairs, quit));
+                        string s(interpret(sock.id_, pairs, quit));
                         s += "\r\n";
                         send(sock, s.c_str(), s.size());
 
@@ -191,25 +250,33 @@ namespace {
                 }
             }
         }
-
         void
-        do_rdexpire(const handle& sock, unsigned& ms)
+        error(mod_handle& sock, const char* desc)
+        {
+        }
+        void
+        rdexpire(mod_handle& sock, unsigned& ms)
         {
             shutdown(sock, 0);
         }
-
-        ~arc() MOD_NOTHROW
+        void
+        wrexpire(mod_handle& sock, unsigned& ms)
         {
         }
-
-        static session_base*
+        void
+        expire(mod_handle& timer, unsigned& ms)
+        {
+        }
+        static sessionptr
         create(const char* sname)
         {
-            return 0 == strcmp(sname, "arc") ? new (tlx) arc() : 0;
+            return 0 == strcmp(sname, "arc")
+                ? attach(new (tlx) arc(sname))
+                : null;
         }
     };
 
     typedef basic_module<basic_factory<arc> > module;
 }
 
-MOD_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term, module::create)

@@ -31,8 +31,6 @@
 #include <fstream>
 #include <memory> // auto_ptr<>
 
-namespace mod = aug::mod;
-
 using namespace mod;
 using namespace std;
 
@@ -62,13 +60,13 @@ namespace {
     aug::scoped_blob_wrapper<helloblob> hello;
 
     void
-    dosend(handle& sock)
+    dosend(const mod_handle& sock)
     {
         send(sock, MSG, sizeof(MSG) - 1);
     }
 
     void
-    dosendv(handle& sock)
+    dosendv(const mod_handle& sock)
     {
         sendv(sock, hello.get());
     }
@@ -98,7 +96,7 @@ namespace {
             os << it->first << ' ' << it->second * 1000.0 << endl;
     }
 
-    struct state : aug::mpool_ops {
+    struct state {
         string tok_;
         unsigned tosend_, torecv_;
         vector<double> secs_;
@@ -110,40 +108,80 @@ namespace {
         }
     };
 
+    class statebox : public aug::boxptr_base<statebox>,
+                     public aug::mpool_ops {
+        state state_;
+        explicit
+        statebox(int echos)
+            : state_(echos)
+        {
+        }
+    public:
+        ~statebox() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        void*
+        unboxptr_() AUG_NOTHROW
+        {
+            return &state_;
+        }
+        static aug::boxptrptr
+        create(int echos)
+        {
+            return attach(new (aug::tlx) statebox(echos));
+        }
+    };
+
     struct eachline : aug::mpool_ops {
-        void (*fn_)(handle&);
-        handle sock_;
         aug::hires* hires_;
         vector<double>& secs_;
+        void (*fn_)(const mod_handle&);
+        const mod_handle& sock_;
         explicit
-        eachline(void (*fn)(handle&), const handle& sock,
-                 aug::hires& hires, vector<double>& secs)
-            : fn_(fn),
-              sock_(sock),
-              hires_(&hires),
-              secs_(secs)
+        eachline(aug::hires& hires, vector<double>& secs,
+                 void (*fn)(const mod_handle&), const mod_handle& sock)
+            : hires_(&hires),
+              secs_(secs),
+              fn_(fn),
+              sock_(sock)
         {
         }
         void
         operator ()(std::string& tok)
         {
-            state& s(*sock_.user<state>());
+            state* s(aug::obtop<state>(sock_.ob_));
             secs_.push_back(elapsed(*hires_));
-            if (0 == --s.torecv_)
+            if (0 == --s->torecv_)
                 shutdown(sock_, 0);
-            else if (0 < s.tosend_--)
+            else if (0 < s->tosend_--)
                 fn_(sock_);
         }
     };
 
-    struct bench : basic_session, aug::mpool_ops {
-        void (*send_)(handle&);
+    class bench : public basic_session<bench>, public aug::mpool_ops {
+        const string sname_;
+        void (*send_)(const mod_handle&);
         unsigned conns_, estab_, echos_;
         size_t bytes_;
         aug::hires hires_;
         map<double, double> xy_;
-        bool
-        do_start(const char* sname)
+        explicit
+        bench(const string& sname)
+            : sname_(sname),
+              conns_(0),
+              estab_(0),
+              bytes_(0),
+              hires_(aug::getmpool(aug_tlx))
+        {
+        }
+    public:
+        ~bench() MOD_NOTHROW
+        {
+            // Deleted from base.
+        }
+        mod_bool
+        start()
         {
             writelog(MOD_LOGINFO, "starting...");
 
@@ -157,7 +195,7 @@ namespace {
 
             const char* serv = mod::getenv("session.bench.serv");
             if (!serv)
-                return false;
+                return MOD_FALSE;
 
             const char* host = mod::getenv("session.bench.host",
                                            "localhost");
@@ -173,14 +211,33 @@ namespace {
             mod_writelog(MOD_LOGINFO, "conns: %d", conns_);
             mod_writelog(MOD_LOGINFO, "echos: %d", echos_);
 
-            for (; estab_ < conns_; ++estab_)
-                tcpconnect(host, serv, sslctx, new (aug::tlx) state(echos_));
-            return true;
+            for (; estab_ < conns_; ++estab_) {
+                aug::boxptrptr bp(statebox::create(echos_));
+                tcpconnect(host, serv, sslctx, bp);
+            }
+            return MOD_TRUE;
         }
         void
-        do_closed(const handle& sock)
+        stop()
         {
-            auto_ptr<state> s(sock.user<state>());
+        }
+        void
+        reconf()
+        {
+        }
+        void
+        event(const char* from, const char* type, mod_id id,
+              aug::objectref ob)
+        {
+        }
+        void
+        closed(mod_handle& sock)
+        {
+            // Scoped retain.
+            aug::objectptr ob(object_retain(aug::obptr(sock.ob_)));
+            aug_assign(sock.ob_, 0);
+
+            state* s(aug::obtop<state>(sock.ob_));
             pushxy(xy_, s->secs_);
             if (0 < --estab_) {
                 mod_writelog(MOD_LOGINFO, "%d established", estab_);
@@ -205,51 +262,63 @@ namespace {
             writexy(xy_);
         }
         void
-        do_connected(handle& sock, const char* name)
+        teardown(mod_handle& sock)
         {
-            state& s(*sock.user<state>());
-            s.secs_.push_back(elapsed(hires_));
-            send_(sock);
-            --s.tosend_;
+            mod::shutdown(sock, 0);
         }
-        bool
-        do_auth(const handle& sock, const char* subject, const char* issuer)
+        mod_bool
+        accepted(mod_handle& sock, const char* name)
+        {
+            return MOD_TRUE;
+        }
+        void
+        connected(mod_handle& sock, const char* name)
+        {
+            state* s(aug::obtop<state>(sock.ob_));
+            s->secs_.push_back(elapsed(hires_));
+            send_(sock);
+            --s->tosend_;
+        }
+        mod_bool
+        auth(mod_handle& sock, const char* subject, const char* issuer)
         {
             mod_writelog(MOD_LOGINFO, "checking subject...");
-            return true;
+            return MOD_TRUE;
         }
         void
-        do_recv(const handle& sock, const void* buf, size_t len)
+        recv(mod_handle& sock, const void* buf, size_t len)
         {
             bytes_ += len;
-            state& s(*sock.user<state>());
+            state* s(aug::obtop<state>(sock.ob_));
             tokenise(static_cast<const char*>(buf),
-                     static_cast<const char*>(buf) + len, s.tok_, '\n',
-                     eachline(send_, sock, hires_, s.secs_));
+                     static_cast<const char*>(buf) + len, s->tok_, '\n',
+                     eachline(hires_, s->secs_, send_, sock));
         }
         void
-        do_error(const handle& sock, const char* desc)
+        error(mod_handle& sock, const char* desc)
         {
             writelog(MOD_LOGERROR, "client error: %s", desc);
         }
-        ~bench() AUG_NOTHROW
+        void
+        rdexpire(mod_handle& sock, unsigned& ms)
         {
         }
-        bench()
-            : conns_(0),
-              estab_(0),
-              bytes_(0),
-              hires_(aug::getmpool(aug_tlx))
+        void
+        wrexpire(mod_handle& sock, unsigned& ms)
         {
         }
-        static session_base*
+        void
+        expire(mod_handle& timer, unsigned& ms)
+        {
+        }
+        static sessionptr
         create(const char* sname)
         {
-            return new (aug::tlx) bench();
+            return attach(new (aug::tlx) bench(sname));
         }
     };
 
     typedef basic_module<basic_factory<bench> > module;
 }
 
-MOD_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term, module::create)

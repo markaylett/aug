@@ -20,18 +20,20 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef AUGASPP_OBJECT_HPP
-#define AUGASPP_OBJECT_HPP
+#ifndef AUGASPP_HANDLE_HPP
+#define AUGASPP_HANDLE_HPP
 
 #include "augaspp/session.hpp"
 
 #include "augctxpp/mpool.hpp"
 
+#include "augabipp.hpp"
+
 #include "augmod.h"
 
 namespace aug {
 
-    class object_base {
+    class handle_base {
     public:
         typedef mod_handle ctype;
     private:
@@ -47,7 +49,7 @@ namespace aug {
 
     public:
         virtual
-        ~object_base() AUG_NOTHROW;
+        ~handle_base() AUG_NOTHROW;
 
         mod_handle&
         get()
@@ -64,6 +66,16 @@ namespace aug {
         {
             return do_session();
         }
+        mod_id
+        id() const
+        {
+            return get().id_;
+        }
+        objectptr
+        ob() const
+        {
+            return object_retain(obptr(get().ob_));
+        }
         operator mod_handle&()
         {
             return do_get();
@@ -74,19 +86,7 @@ namespace aug {
         }
     };
 
-    typedef smartptr<object_base> objectptr;
-
-    inline mod_id
-    id(const mod_handle& ref)
-    {
-        return ref.id_;
-    }
-
-    inline void*
-    user(const mod_handle& ref)
-    {
-        return ref.user_;
-    }
+    typedef smartptr<handle_base> handleptr;
 }
 
-#endif // AUGASPP_OBJECT_HPP
+#endif // AUGASPP_HANDLE_HPP

@@ -62,28 +62,19 @@ using namespace std;
 
 namespace {
 
-    class filecontent : public ref_base, public mpool_ops {
-        blob<filecontent> blob_;
+    class filecontent : public blob_base<filecontent>, public mpool_ops {
         const string type_;
         autofd sfd_;
         mmap mmap_;
-        ~filecontent() AUG_NOTHROW
-        {
-        }
         filecontent(mpoolref mpool, const string& type, const char* path)
             : type_(type),
               sfd_(aug::open(path, O_RDONLY)),
               mmap_(mpool, sfd_, 0, 0, AUG_MMAPRD)
         {
-            blob_.reset(this);
         }
     public:
-        smartob<aug_object>
-        cast_(const char* id) AUG_NOTHROW
+        ~filecontent() AUG_NOTHROW
         {
-            if (equalid<aug_object>(id) || equalid<aug_blob>(id))
-                return object_retain<aug_object>(blob_);
-            return null;
         }
         const char*
         getblobtype_()
@@ -101,12 +92,12 @@ namespace {
         {
             return mmap_.len();
         }
-        static smartob<aug_blob>
+        static blobptr
         create(const string& type, const char* path)
         {
             filecontent* ptr
                 = new (tlx) filecontent(getmpool(aug_tlx), type, path);
-            return object_attach<aug_blob>(ptr->blob_);
+            return attach(ptr);
         }
     };
 

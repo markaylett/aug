@@ -20,17 +20,14 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef AUGD_UTILITY_HPP
-#define AUGD_UTILITY_HPP
+#define AUGASPP_BUILD
+#include "augaspp/handle.hpp"
+#include "augctx/defs.h"
 
-struct mod_module;
-struct mod_handle;
+AUG_RCSID("$Id$");
 
-namespace augd {
+using namespace aug;
 
-    void
-    setdefaults(mod_module& dst, const mod_module& src,
-                void (*teardown)(const mod_handle*));
+handle_base::~handle_base() AUG_NOTHROW
+{
 }
-
-#endif // AUGD_UTILITY_HPP

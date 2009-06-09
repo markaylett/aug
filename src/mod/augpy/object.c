@@ -28,10 +28,78 @@ AUG_RCSID("$Id$");
 
 #include <structmember.h>
 
+struct boximpl_ {
+    augpy_box box_;
+    int refs_;
+    PyObject* pyob_;
+};
+
+static void*
+castbox_(augpy_box* ob, const char* id)
+{
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augpy_boxid)) {
+        aug_retain(ob);
+        return ob;
+    }
+    return NULL;
+}
+
+static void
+retainbox_(augpy_box* ob)
+{
+    struct boximpl_* impl = AUG_PODIMPL(struct boximpl_, box_, ob);
+    ++impl->refs_;
+}
+
+static void
+releasebox_(augpy_box* ob)
+{
+    struct boximpl_* impl = AUG_PODIMPL(struct boximpl_, box_, ob);
+    if (0 == --impl->refs_) {
+        Py_DECREF(impl->pyob_);
+        free(impl);
+    }
+}
+
+static PyObject*
+unbox_(augpy_box* ob)
+{
+    struct boximpl_* impl = AUG_PODIMPL(struct boximpl_, box_, ob);
+    Py_INCREF(impl->pyob_);
+    return impl->pyob_;
+}
+
+static const struct augpy_boxvtbl boxvtbl_ = {
+    castbox_,
+    retainbox_,
+    releasebox_,
+    unbox_
+};
+
+augpy_box*
+augpy_createbox(PyObject* pyob)
+{
+    struct boximpl_* impl = malloc(sizeof(struct boximpl_));
+    if (!impl)
+        return NULL;
+
+    if (!pyob)
+        pyob = Py_None;
+
+    impl->box_.vtbl_ = &boxvtbl_;
+    impl->box_.impl_ = NULL;
+
+    impl->refs_ = 1;
+    impl->pyob_ = pyob;
+
+    Py_INCREF(impl->pyob_);
+    return &impl->box_;
+}
+
 struct blobimpl_ {
     aug_blob blob_;
-    augpy_blob pyblob_;
-    unsigned refs_;
+    augpy_box box_;
+    int refs_;
     PyObject* pyob_;
 };
 
@@ -42,9 +110,9 @@ castblob_(aug_blob* ob, const char* id)
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
         aug_retain(&impl->blob_);
         return &impl->blob_;
-    } else if (AUG_EQUALID(id, augpy_blobid)) {
-        aug_retain(&impl->pyblob_);
-        return &impl->pyblob_;
+    } else if (AUG_EQUALID(id, augpy_boxid)) {
+        aug_retain(&impl->box_);
+        return &impl->box_;
     }
     return NULL;
 }
@@ -108,12 +176,12 @@ static const struct aug_blobvtbl blobvtbl_ = {
 };
 
 static void*
-castpyblob_(augpy_blob* ob, const char* id)
+castboxblob_(augpy_box* ob, const char* id)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augpy_blobid)) {
-        aug_retain(&impl->pyblob_);
-        return &impl->pyblob_;
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, box_, ob);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augpy_boxid)) {
+        aug_retain(&impl->box_);
+        return &impl->box_;
     } else if (AUG_EQUALID(id, aug_blobid)) {
         aug_retain(&impl->blob_);
         return &impl->blob_;
@@ -122,16 +190,16 @@ castpyblob_(augpy_blob* ob, const char* id)
 }
 
 static void
-retainpyblob_(augpy_blob* ob)
+retainboxblob_(augpy_box* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, box_, ob);
     ++impl->refs_;
 }
 
 static void
-releasepyblob_(augpy_blob* ob)
+releaseboxblob_(augpy_box* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, box_, ob);
     if (0 == --impl->refs_) {
         Py_DECREF(impl->pyob_);
         free(impl);
@@ -139,18 +207,18 @@ releasepyblob_(augpy_blob* ob)
 }
 
 static PyObject*
-getpyblob_(augpy_blob* ob)
+unboxblob_(augpy_box* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, pyblob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, box_, ob);
     Py_INCREF(impl->pyob_);
     return impl->pyob_;
 }
 
-static const struct augpy_blobvtbl pyblobvtbl_ = {
-    castpyblob_,
-    retainpyblob_,
-    releasepyblob_,
-    getpyblob_
+static const struct augpy_boxvtbl boxblobvtbl_ = {
+    castboxblob_,
+    retainboxblob_,
+    releaseboxblob_,
+    unboxblob_
 };
 
 aug_blob*
@@ -166,8 +234,8 @@ augpy_createblob(PyObject* pyob)
     impl->blob_.vtbl_ = &blobvtbl_;
     impl->blob_.impl_ = NULL;
 
-    impl->pyblob_.vtbl_ = &pyblobvtbl_;
-    impl->pyblob_.impl_ = NULL;
+    impl->box_.vtbl_ = &boxblobvtbl_;
+    impl->box_.impl_ = NULL;
 
     impl->refs_ = 1;
     impl->pyob_ = pyob;
@@ -177,17 +245,16 @@ augpy_createblob(PyObject* pyob)
 }
 
 PyObject*
-augpy_getblob(aug_object* ob)
+augpy_obtopy(aug_object* ob)
 {
-    PyObject* pyob = NULL;
-    if (ob) {
-        augpy_blob* blob = aug_cast(ob, augpy_blobid);
-        if (blob) {
-            pyob = blob->vtbl_->get_(blob);
-            aug_release(blob);
-        }
-    }
-    return pyob;
+    PyObject* py;
+    augpy_box* tmp;
+    if (ob && (tmp = aug_cast(ob, augpy_boxid))) {
+        py = tmp->vtbl_->unbox_(tmp);
+        aug_release(tmp);
+    } else
+        py = NULL;
+    return py;
 }
 
 /* Implementation note: always reassign members before decrementing reference
@@ -405,6 +472,18 @@ augpy_createhandle(PyTypeObject* type, mod_id id, PyObject* user)
     mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%u>",
                  (void*)self, self->id_);
     return (PyObject*)self;
+}
+
+augpy_box*
+augpy_boxhandle(PyTypeObject* type, mod_id id, PyObject* user)
+{
+    PyObject* pyob = augpy_createhandle(type, id, user);
+    augpy_box* box = NULL;
+    if (pyob) {
+        box = augpy_createbox(pyob);
+        Py_DECREF(pyob);
+    }
+    return box;
 }
 
 void
