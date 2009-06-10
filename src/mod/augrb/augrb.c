@@ -255,6 +255,15 @@ handlestr_(VALUE self)
     return rb_str_new2(sz);
 }
 
+static VALUE
+newhandle_(mod_id id, VALUE rbob)
+{
+    VALUE argv[2];
+    argv[0] = INT2FIX(id);
+    argv[1] = rbob;
+    return rb_class_new_instance(2, argv, chandle_);
+}
+
 static void
 termimport_(struct import_* import)
 {
@@ -439,7 +448,7 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
         ptr = RSTRING(sslctx)->ptr;
     }
 
-    box = augrb_boxhandle(0, user);
+    box = augrb_createbox(newhandle_(0, user));
     cid = mod_tcpconnect(RSTRING(host)->ptr, RSTRING(serv)->ptr, ptr,
                          (aug_object*)box);
     aug_release(box);
@@ -448,7 +457,7 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
         rb_raise(cerror_, mod_geterror());
 
     sock = box->vtbl_->unbox_(box);
-    rb_iv_set(sock, "@id", INT2FIX(cid));
+    rb_iv_set(sock, "@id", INT2FIX((mod_id)cid));
     return sock;
 }
 
@@ -474,7 +483,7 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
         ptr = RSTRING(sslctx)->ptr;
     }
 
-    box = augrb_boxhandle(0, user);
+    box = augrb_createbox(newhandle_(0, user));
     cid = mod_tcplisten(RSTRING(host)->ptr, RSTRING(serv)->ptr, ptr,
                         (aug_object*)box);
     aug_release(box);
@@ -483,7 +492,7 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
         rb_raise(cerror_, mod_geterror());
 
     sock = box->vtbl_->unbox_(box);
-    rb_iv_set(sock, "@id", INT2FIX(cid));
+    rb_iv_set(sock, "@id", INT2FIX((mod_id)cid));
     return sock;
 }
 
@@ -562,7 +571,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
 
     ui = NUM2UINT(ms);
 
-    box = augrb_boxhandle(0, user);
+    box = augrb_createbox(newhandle_(0, user));
     tid = mod_settimer(ui, (aug_object*)box);
     aug_release(box);
 
@@ -570,7 +579,7 @@ settimer_(int argc, VALUE* argv, VALUE self)
         rb_raise(cerror_, mod_geterror());
 
     timer = box->vtbl_->unbox_(box);
-    rb_iv_set(timer, "@id", INT2FIX(tid));
+    rb_iv_set(timer, "@id", INT2FIX((mod_id)tid));
     return timer;
 }
 
@@ -876,8 +885,9 @@ accepted_(mod_session* ob, struct mod_handle* sock, const char* name)
 
     /* On entry, sock->user_ is user data belonging to listener. */
 
-    box = augrb_boxhandle(sock->id_, rb_iv_get(augrb_obtorb(sock->ob_),
-                                               "@user"));
+    box = augrb_createbox(newhandle_(sock->id_,
+                                     rb_iv_get(augrb_obtorb(sock->ob_),
+                                               "@user")));
 
     /* Reject if function either returns false, or throws an exception. */
 

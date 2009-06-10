@@ -78,7 +78,7 @@ servconn::do_sendv(chanref chan, blobref blob, const aug_timeval& now)
     impl_.sendv(chan, blob, now);
 }
 
-bool
+mod_bool
 servconn::do_accepted(const string& name, const aug_timeval& now)
 {
     return impl_.accepted(name, now);
@@ -90,7 +90,7 @@ servconn::do_connected(const string& name, const aug_timeval& now)
     impl_.connected(name, now);
 }
 
-bool
+mod_bool
 servconn::do_auth(const char* subject, const char* issuer)
 {
     return impl_.auth(subject, issuer);

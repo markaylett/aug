@@ -26,41 +26,79 @@
 
 AUG_RCSID("$Id$");
 
-/* VALUE-based var handling. */
+struct boximpl_ {
+    augrb_box box_;
+    int refs_;
+    VALUE rbob_;
+};
 
-static void
-unregister_(VALUE* ptr)
+static void*
+castbox_(augrb_box* ob, const char* id)
 {
-    *ptr = Qnil; /* Belt and braces. */
-    rb_gc_unregister_address(ptr);
-    free(ptr);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augrb_boxid)) {
+        aug_retain(ob);
+        return ob;
+    }
+    return NULL;
 }
 
-static VALUE*
-register_(VALUE value)
+static void
+retainbox_(augrb_box* ob)
 {
-    VALUE* ptr = malloc(sizeof(VALUE));
-    assert(ptr);
-    *ptr = value;
+    struct boximpl_* impl = AUG_PODIMPL(struct boximpl_, box_, ob);
+    ++impl->refs_;
+}
 
-    /* Prevent garbage collection. */
-
-    rb_gc_register_address(ptr);
-    return ptr;
+static void
+releasebox_(augrb_box* ob)
+{
+    struct boximpl_* impl = AUG_PODIMPL(struct boximpl_, box_, ob);
+    if (0 == --impl->refs_) {
+        impl->rbob_ = Qnil; /* Belt and braces. */
+        rb_gc_unregister_address(&impl->rbob_);
+        free(impl);
+    }
 }
 
 static VALUE
-newhandle_(VALUE id, VALUE user)
+unbox_(augrb_box* ob)
 {
-    VALUE argv[2];
-    argv[0] = id;
-    argv[1] = user;
-    return rb_class_new_instance(2, argv, chandle_);
+    struct boximpl_* impl = AUG_PODIMPL(struct boximpl_, box_, ob);
+    return impl->rbob_;
+}
+
+static const struct augrb_boxvtbl boxvtbl_ = {
+    castbox_,
+    retainbox_,
+    releasebox_,
+    unbox_
+};
+
+augrb_box*
+augrb_createbox(VALUE rbob)
+{
+    struct boximpl_* impl = malloc(sizeof(struct boximpl_));
+    if (!impl)
+        return NULL;
+
+    if (!rbob)
+        rbob = Qnil;
+
+    impl->box_.vtbl_ = &boxvtbl_;
+    impl->box_.impl_ = NULL;
+
+    impl->refs_ = 1;
+    impl->rbob_ = rbob;
+
+    /* Prevent garbage collection. */
+
+    rb_gc_register_address(&impl->rbob_);
+    return &impl->box_;
 }
 
 struct blobimpl_ {
     aug_blob blob_;
-    augrb_blob rbblob_;
+    augrb_box box_;
     int refs_;
     VALUE rbob_;
 };
@@ -72,9 +110,9 @@ castblob_(aug_blob* ob, const char* id)
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_blobid)) {
         aug_retain(&impl->blob_);
         return &impl->blob_;
-    } else if (AUG_EQUALID(id, augrb_blobid)) {
-        aug_retain(&impl->rbblob_);
-        return &impl->rbblob_;
+    } else if (AUG_EQUALID(id, augrb_boxid)) {
+        aug_retain(&impl->box_);
+        return &impl->box_;
     }
     return NULL;
 }
@@ -129,12 +167,12 @@ static const struct aug_blobvtbl blobvtbl_ = {
 };
 
 static void*
-castrbblob_(augrb_blob* ob, const char* id)
+castboxblob_(augrb_box* ob, const char* id)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
-    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augrb_blobid)) {
-        aug_retain(&impl->rbblob_);
-        return &impl->rbblob_;
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, box_, ob);
+    if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, augrb_boxid)) {
+        aug_retain(&impl->box_);
+        return &impl->box_;
     } else if (AUG_EQUALID(id, aug_blobid)) {
         aug_retain(&impl->blob_);
         return &impl->blob_;
@@ -143,16 +181,16 @@ castrbblob_(augrb_blob* ob, const char* id)
 }
 
 static void
-retainrbblob_(augrb_blob* ob)
+retainboxblob_(augrb_box* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, box_, ob);
     ++impl->refs_;
 }
 
 static void
-releaserbblob_(augrb_blob* ob)
+releaseboxblob_(augrb_box* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, box_, ob);
     if (0 == --impl->refs_) {
         impl->rbob_ = Qnil; /* Belt and braces. */
         rb_gc_unregister_address(&impl->rbob_);
@@ -161,17 +199,17 @@ releaserbblob_(augrb_blob* ob)
 }
 
 static VALUE
-getrbblob_(augrb_blob* ob)
+unboxblob_(augrb_box* ob)
 {
-    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, rbblob_, ob);
+    struct blobimpl_* impl = AUG_PODIMPL(struct blobimpl_, box_, ob);
     return impl->rbob_;
 }
 
-static const struct augrb_blobvtbl rbblobvtbl_ = {
-    castrbblob_,
-    retainrbblob_,
-    releaserbblob_,
-    getrbblob_
+static const struct augrb_boxvtbl boxblobvtbl_ = {
+    castboxblob_,
+    retainboxblob_,
+    releaseboxblob_,
+    unboxblob_
 };
 
 aug_blob*
@@ -187,8 +225,8 @@ augrb_createblob(VALUE rbob)
     impl->blob_.vtbl_ = &blobvtbl_;
     impl->blob_.impl_ = NULL;
 
-    impl->rbblob_.vtbl_ = &rbblobvtbl_;
-    impl->rbblob_.impl_ = NULL;
+    impl->box_.vtbl_ = &boxblobvtbl_;
+    impl->box_.impl_ = NULL;
 
     impl->refs_ = 1;
     impl->rbob_ = rbob;
@@ -200,13 +238,13 @@ augrb_createblob(VALUE rbob)
 }
 
 VALUE
-augrb_getblob(aug_object* ob)
+augrb_obtorb(aug_object* ob)
 {
     VALUE rbob = Qnil;
     if (ob) {
-        augrb_blob* blob = aug_cast(ob, augrb_blobid);
+        augrb_box* blob = aug_cast(ob, augrb_boxid);
         if (blob) {
-            rbob = blob->vtbl_->get_(blob);
+            rbob = blob->vtbl_->unbox_(blob);
             aug_release(blob);
         }
     }

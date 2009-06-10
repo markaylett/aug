@@ -138,7 +138,7 @@ connimpl::~connimpl() AUG_NOTHROW
 }
 
 connimpl::connimpl(const sessionptr& session, mod_handle& sock,
-                   buffer& buffer, rwtimer& rwtimer, bool accepted)
+                   buffer& buffer, rwtimer& rwtimer, mod_bool accepted)
     : session_(session),
       sock_(sock),
       buffer_(buffer),
@@ -178,7 +178,7 @@ connimpl::sendv(chanref chan, blobref blob, const aug_timeval& now)
     buffer_.append(blob);
 }
 
-bool
+mod_bool
 connimpl::accepted(const string& name, const aug_timeval& now)
 {
     return accepted_ = session_->accepted(sock_, name.c_str());
@@ -190,7 +190,7 @@ connimpl::connected(const string& name, const aug_timeval& now)
     session_->connected(sock_, name.c_str());
 }
 
-bool
+mod_bool
 connimpl::auth(const char* subject, const char* issuer)
 {
     return session_->auth(sock_, subject, issuer);

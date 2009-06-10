@@ -66,13 +66,13 @@ namespace aug {
         void
         do_sendv(chanref chan, blobref blob, const aug_timeval& now);
 
-        bool
+        mod_bool
         do_accepted(const std::string& name, const aug_timeval& now);
 
         void
         do_connected(const std::string& name, const aug_timeval& now);
 
-        bool
+        mod_bool
         do_auth(const char* subject, const char* issuer);
 
         void

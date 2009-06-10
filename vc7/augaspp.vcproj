@@ -157,10 +157,10 @@
 				RelativePath="..\src\cpp\augaspp\engine.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augaspp\listener.cpp">
+				RelativePath="..\src\cpp\augaspp\handle.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augaspp\object.cpp">
+				RelativePath="..\src\cpp\augaspp\listener.cpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augaspp\rwtimer.cpp">
@@ -204,10 +204,10 @@
 				RelativePath="..\src\cpp\augaspp\engine.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augaspp\listener.hpp">
+				RelativePath="..\src\cpp\augaspp\handle.hpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augaspp\object.hpp">
+				RelativePath="..\src\cpp\augaspp\listener.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augaspp\rwtimer.hpp">

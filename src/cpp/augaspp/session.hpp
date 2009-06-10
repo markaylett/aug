@@ -98,12 +98,12 @@ namespace aug {
         {
             return do_name();
         }
-        bool
+        mod_bool
         active() const AUG_NOTHROW
         {
             return do_active();
         }
-        bool
+        mod_bool
         start() AUG_NOTHROW
         {
             return do_start();
@@ -129,7 +129,7 @@ namespace aug {
         {
             do_teardown(sock);
         }
-        bool
+        mod_bool
         accepted(mod_handle& sock, const char* name) const AUG_NOTHROW
         {
             return do_accepted(sock, name);
@@ -139,7 +139,7 @@ namespace aug {
         {
             do_connected(sock, name);
         }
-        bool
+        mod_bool
         auth(mod_handle& sock, const char* subject,
              const char* issuer) const AUG_NOTHROW
         {

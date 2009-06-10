@@ -47,13 +47,13 @@ namespace aug {
          * @return Whether the new connection should be kept.
          */
 
-        virtual bool
+        virtual mod_bool
         do_accepted(const std::string& name, const aug_timeval& now) = 0;
 
         virtual void
         do_connected(const std::string& name, const aug_timeval& now) = 0;
 
-        virtual bool
+        virtual mod_bool
         do_auth(const char* subject, const char* issuer) = 0;
 
         /**
@@ -88,7 +88,7 @@ namespace aug {
         {
             do_sendv(chan, blob, now);
         }
-        bool
+        mod_bool
         accepted(const std::string& name, const aug_timeval& now)
         {
             return do_accepted(name, now);
@@ -98,7 +98,7 @@ namespace aug {
         {
             do_connected(name, now);
         }
-        bool
+        mod_bool
         auth(const char* subject, const char* issuer)
         {
             return do_auth(subject, issuer);
@@ -135,7 +135,7 @@ namespace aug {
         buffer& buffer_;
         rwtimer& rwtimer_;
         sockstate state_;
-        bool accepted_;
+        mod_bool accepted_;
 
         /**
          * Waiting for writability since.
@@ -147,7 +147,7 @@ namespace aug {
         ~connimpl() AUG_NOTHROW;
 
         connimpl(const sessionptr& session, mod_handle& sock, buffer& buffer,
-                 rwtimer& rwtimer, bool accepted);
+                 rwtimer& rwtimer, mod_bool accepted);
 
         mod_handle&
         get()
@@ -174,13 +174,13 @@ namespace aug {
         void
         sendv(chanref chan, blobref blob, const aug_timeval& now);
 
-        bool
+        mod_bool
         accepted(const std::string& name, const aug_timeval& now);
 
         void
         connected(const std::string& name, const aug_timeval& now);
 
-        bool
+        mod_bool
         auth(const char* subject, const char* issuer);
 
         void

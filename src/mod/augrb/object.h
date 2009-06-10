@@ -60,10 +60,4 @@ augrb_createblob(VALUE rbob);
 VALUE
 augrb_obtorb(aug_object* ob);
 
-VALUE
-augrb_createhandle(mod_id id, VALUE rbob);
-
-augrb_box*
-augrb_boxhandle(mod_id id, VALUE rbob);
-
 #endif /* AUGRB_OBJECT_H */

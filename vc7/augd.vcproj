@@ -119,6 +119,9 @@
 	</Configurations>
 	<References>
 		<ProjectReference
+			ReferencedProjectIdentifier="{8DFF25C5-503A-46B3-BDCD-C100E58F96C5}"
+			Name="augarcpp"/>
+		<ProjectReference
 			ReferencedProjectIdentifier="{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}"
 			Name="augaspp"/>
 		<ProjectReference
@@ -130,9 +133,6 @@
 		<ProjectReference
 			ReferencedProjectIdentifier="{AB4EA74B-84B3-4ED6-88FA-49151967A19D}"
 			Name="augrb"/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{8DFF25C5-503A-46B3-BDCD-C100E58F96C5}"
-			Name="augarcpp"/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{2C3E2C18-8F1E-4D40-8B8A-53B442EE2539}"
 			Name="client"/>
@@ -196,9 +196,6 @@
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath="..\src\cpp\augd\utility.cpp">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -218,9 +215,6 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augd\ssl.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augd\utility.hpp">
 			</File>
 		</Filter>
 		<Filter
