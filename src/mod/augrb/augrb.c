@@ -89,10 +89,8 @@ dorescue_(VALUE unused, VALUE except)
 static VALUE
 protect_(VALUE (*body)(), VALUE args)
 {
-    VALUE ret;
     except_ = MOD_FALSE;
-    ret = rb_rescue2(body, args, dorescue_, Qnil, rb_eException, (VALUE)0);
-    return ret;
+    return rb_rescue2(body, args, dorescue_, Qnil, rb_eException, (VALUE)0);
 }
 
 static VALUE
@@ -275,8 +273,6 @@ initimport_(struct import_* import, const char* sname)
 {
     VALUE module;
 
-    /* Do this first - more likely to fail than malloc(). */
-
     u_.sname_ = sname;
     module = loadmodule_(sname);
 
@@ -348,17 +344,17 @@ stopall_(VALUE self)
 static VALUE
 post_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE id, to, type, user;
+    VALUE to, type, id, user;
     aug_blob* blob = NULL;
     mod_result result;
 
-    rb_scan_args(argc, argv, "31", &id, &to, &type, &user);
+    rb_scan_args(argc, argv, "31", &to, &type, &id, &user);
 
     /* Type-check now to ensure string operations succeed. */
 
-    Check_Type(id, T_FIXNUM);
     Check_Type(to, T_STRING);
     Check_Type(type, T_STRING);
+    Check_Type(id, T_FIXNUM);
 
     if (user != Qnil)
         blob = augrb_createblob(StringValue(user));

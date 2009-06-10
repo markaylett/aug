@@ -35,5 +35,6 @@ EXTRA_DIST = \
 	start.bat \
 	stop.bat \
 	test.bat \
+	test.conf \
 	uninstall.bat \
 	scratch.cpp
