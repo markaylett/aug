@@ -32,18 +32,18 @@ def start(sname):
     dispatch("group1", "foo", 0, str(101))
     post(sname, "none", 0, None)
 
-def event(frm, type, id, user):
-    log.debug("event(): %s" % user)
+def event(frm, type, id, ob):
+    log.debug("event(): %s" % ob)
     if type == "foo":
-        if int(user) != 101:
-            log.error("unexpected user data")
+        if int(ob) != 101:
+            log.error("unexpected ob data")
         dispatch(frm, "bar", 0, buffer("202"))
     elif type == "bar":
-        if int(user) != 202:
-            log.error("unexpected user data")
+        if int(ob) != 202:
+            log.error("unexpected ob data")
     elif type == "none":
-        if user is not None:
-            log.error("unexpected user data")
+        if ob is not None:
+            log.error("unexpected ob data")
         stopall()
     else:
         log.error("unexpected type")

@@ -34,12 +34,12 @@ module RbTest1
         if o.id != 101
             Log.error("object returned unexpected id")
         end
-        if o.user != "our object"
-            Log.error("object returned unexpected user")
+        if o.ob != "our object"
+            Log.error("object returned unexpected ob")
         end
-        o.user = "new user"
-        if o.user != "new user"
-            Log.error("object returned unexpected user")
+        o.ob = "new ob"
+        if o.ob != "new ob"
+            Log.error("object returned unexpected ob")
         end
         if o != AugRb::Handle.new(101, nil)
             Log.error("comparison operator failed")

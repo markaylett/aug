@@ -33,8 +33,8 @@ module RbTest4
     end
     def self.expire(timer, ms)
         Log.debug("expire(): #{timer}")
-        if timer.user != "our timer"
-            Log.error("unexpected user in expire()")
+        if timer.ob != "our timer"
+            Log.error("unexpected ob in expire()")
         end
         AugRb.stopall
     end

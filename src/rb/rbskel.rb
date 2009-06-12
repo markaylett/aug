@@ -30,18 +30,18 @@ include AugUtil
 # string geterror()
 # void reconfall()
 # void stopall()
-# void post(to, type, id, user)
-# void dispatch(to, type, id, user)
+# void post(to, type, id, ob)
+# void dispatch(to, type, id, ob)
 # string getenv(name, def)
 # string getsession()
 # void shutdown(sock, flags)
-# unsigned tcpconnect(host, serv, sslctx, user)
-# unsigned tcplisten(host, serv, sslctx, user)
+# unsigned tcpconnect(host, serv, sslctx, ob)
+# unsigned tcplisten(host, serv, sslctx, ob)
 # void send(sock, buffer buf)
 # void setrwtimer(sock, ms, flags)
 # void resetrwtimer(sock, ms, flags)
 # void cancelrwtimer(sock, flags)
-# unsigned settimer(ms, user)
+# unsigned settimer(ms, ob)
 # bool resettimer(timer, ms)
 # bool canceltimer(timer)
 
@@ -83,7 +83,7 @@ module RbSkel
     def self.reconf
         Log.debug("reconf()")
     end
-    def self.event(frm, type, id, user)
+    def self.event(frm, type, id, ob)
         Log.debug("event()")
     end
     def self.closed(sock)
@@ -95,7 +95,7 @@ module RbSkel
     end
     def self.accepted(sock, name)
         Log.info("accepted(): #{sock}")
-        sock.user = LineParser.new
+        sock.ob = LineParser.new
         AugRb.setrwtimer(sock, 15000, AugRb::TIMRD)
         AugRb.send(sock, "+OK hello\r\n")
     end
@@ -104,7 +104,7 @@ module RbSkel
     end
     def self.recv(sock, buf)
         Log.debug("recv(): #{sock}")
-        sock.user.parse(buf) do |line|
+        sock.ob.parse(buf) do |line|
             x = @interp.interpret(line)
             if x == QUIT
                 AugRb.send(sock, "+OK goodbye\r\n")

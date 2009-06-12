@@ -33,6 +33,6 @@ def start(sname):
 
 def expire(timer, ms):
     log.debug("expire(): %s" % timer)
-    if timer.user != "our timer":
-        log.error("unexpected user in expire()")
+    if timer.ob != "our timer":
+        log.error("unexpected ob in expire()")
     stopall()

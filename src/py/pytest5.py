@@ -42,18 +42,18 @@ def closed(sock):
 def accepted(sock, name):
     global server
     log.debug("accepted(): %s" % sock)
-    sock.user = LineParser()
+    sock.ob = LineParser()
     server = sock
 
 def connected(sock, name):
     global server
     log.debug("connected(): %s" % sock)
-    sock.user = LineParser()
+    sock.ob = LineParser()
     send(server, "hello, world!\n")
 
 def recv(sock, buf):
     log.debug("recv(): %s" % sock)
-    for line in sock.user.parse(str(buf)):
+    for line in sock.ob.parse(str(buf)):
         if line != "hello, world!":
             log.error("unexpected line from recv()")
         if sock == server:

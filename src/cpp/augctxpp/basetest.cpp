@@ -1,4 +1,3 @@
-
 /*
   Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009 Mark Aylett <mark.aylett@gmail.com>
 
@@ -21,56 +20,23 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef AUGPY_OBJECT_H
-#define AUGPY_OBJECT_H
+#include "augctxpp.hpp"
 
-#if defined(_WIN32)
-# undef _DEBUG
-#endif /* _WIN32 */
+#include <iostream>
 
-#include "augmod.h"
-#include "augext/blob.h"
-
-#include <Python.h>
-
-AUG_INTERFACE(augpy_box);
-
-struct augpy_boxvtbl {
-    AUG_VTBL(augpy_box);
-    PyObject* (*unbox_)(augpy_box*);
-};
-
-augpy_box*
-augpy_createbox(PyObject* pyob);
-
-aug_blob*
-augpy_createblob(PyObject* pyob);
-
-PyObject*
-augpy_obtopy(aug_object* ob);
-
-PyTypeObject*
-augpy_createtype(void);
-
-PyObject*
-augpy_createhandle(PyTypeObject* type, mod_id id, PyObject* ob);
-
-augpy_box*
-augpy_boxhandle(PyTypeObject* type, mod_id id, PyObject* ob);
-
-void
-augpy_setid(PyObject* self, mod_id id);
-
-mod_id
-augpy_getid(PyObject* self);
-
-void
-augpy_setob(PyObject* self, PyObject* ob);
-
-PyObject*
-augpy_getob(PyObject* self);
+using namespace aug;
+using namespace std;
 
 int
-augpy_handles(void);
+main(int argc, char* argv[])
+{
+    try {
 
-#endif /* AUGPY_OBJECT_H */
+        scoped_init scoped(tlx);
+        return 0;
+
+    } catch (const exception& e) {
+        cerr << "error: " << e.what() << endl;
+    }
+    return 1;
+}

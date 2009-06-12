@@ -83,6 +83,17 @@ static const struct aug_logvtbl vtbl_ = {
 
 static aug_log stdlog_ = { &vtbl_, NULL };
 
+AUGCTX_API aug_result
+aug_writelog(aug_log* log, int level, const char* format, ...)
+{
+    aug_result result;
+    va_list args;
+    va_start(args, format);
+    result = aug_vwritelog(log, level, format, args);
+    va_end(args);
+    return result;
+}
+
 AUGCTX_API aug_log*
 aug_getstdlog(void)
 {

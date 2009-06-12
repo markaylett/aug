@@ -266,12 +266,12 @@ typedef struct {
     PyObject_HEAD
     char name_[MOD_MAXNAME + 1];
     mod_id id_;
-    PyObject* user_;
+    PyObject* ob_;
 } handle_;
 
 static PyMemberDef members_[] = {
     {
-        "user", T_OBJECT_EX, offsetof(handle_, user_), 0, "TODO"
+        "ob", T_OBJECT_EX, offsetof(handle_, ob_), 0, "TODO"
     },
     { NULL }
 };
@@ -281,8 +281,8 @@ clear_(handle_* self)
 {
     PyObject* tmp;
 
-    tmp = self->user_;
-    self->user_ = NULL;
+    tmp = self->ob_;
+    self->ob_ = NULL;
     Py_DECREF(tmp);
 
     return 0;
@@ -338,8 +338,8 @@ traverse_(handle_* self, visitproc visit, void* arg)
 {
     int ret;
 
-    if (self->user_) {
-        ret = visit(self->user_, arg);
+    if (self->ob_) {
+        ret = visit(self->ob_, arg);
         if (ret != 0)
             return ret;
     }
@@ -350,18 +350,18 @@ traverse_(handle_* self, visitproc visit, void* arg)
 static int
 init_(handle_* self, PyObject* args, PyObject* kwds)
 {
-    PyObject* user = NULL, * tmp;
+    PyObject* ob = NULL, * tmp;
 
-    static char* kwlist[] = { "id", "user", NULL };
+    static char* kwlist[] = { "id", "ob", NULL };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "I|O", kwlist, &self->id_,
-                                     &user))
+                                     &ob))
         return -1;
 
-    if (user) {
-        tmp = self->user_;
-        Py_INCREF(user);
-        self->user_ = user;
+    if (ob) {
+        tmp = self->ob_;
+        Py_INCREF(ob);
+        self->ob_ = ob;
         Py_DECREF(tmp);
     }
 
@@ -379,7 +379,7 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
         self->id_ = 0;
 
         Py_INCREF(Py_None);
-        self->user_ = Py_None;
+        self->ob_ = Py_None;
     }
 
     ++handles_;
@@ -455,7 +455,7 @@ augpy_createtype(void)
 }
 
 PyObject*
-augpy_createhandle(PyTypeObject* type, mod_id id, PyObject* user)
+augpy_createhandle(PyTypeObject* type, mod_id id, PyObject* ob)
 {
     handle_* self = PyObject_GC_New(handle_, type);
     if (!self)
@@ -463,10 +463,10 @@ augpy_createhandle(PyTypeObject* type, mod_id id, PyObject* user)
 
     self->id_ = id;
 
-    if (!user)
-        user = Py_None;
-    Py_INCREF(user);
-    self->user_ = user;
+    if (!ob)
+        ob = Py_None;
+    Py_INCREF(ob);
+    self->ob_ = ob;
 
     ++handles_;
     mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%u>",
@@ -475,9 +475,9 @@ augpy_createhandle(PyTypeObject* type, mod_id id, PyObject* user)
 }
 
 augpy_box*
-augpy_boxhandle(PyTypeObject* type, mod_id id, PyObject* user)
+augpy_boxhandle(PyTypeObject* type, mod_id id, PyObject* ob)
 {
-    PyObject* pyob = augpy_createhandle(type, id, user);
+    PyObject* pyob = augpy_createhandle(type, id, ob);
     augpy_box* box = NULL;
     if (pyob) {
         box = augpy_createbox(pyob);
@@ -501,21 +501,21 @@ augpy_getid(PyObject* self)
 }
 
 void
-augpy_setuser(PyObject* self, PyObject* user)
+augpy_setob(PyObject* self, PyObject* ob)
 {
     handle_* x = (handle_*)self;
-    PyObject* tmp = x->user_;
-    Py_INCREF(user);
-    x->user_ = user;
+    PyObject* tmp = x->ob_;
+    Py_INCREF(ob);
+    x->ob_ = ob;
     Py_DECREF(tmp);
 }
 
 PyObject*
-augpy_getuser(PyObject* self)
+augpy_getob(PyObject* self)
 {
     handle_* x = (handle_*)self;
-    Py_INCREF(x->user_);
-    return x->user_;
+    Py_INCREF(x->ob_);
+    return x->ob_;
 }
 
 int

@@ -196,11 +196,11 @@ checkid_(VALUE handle)
 }
 
 static VALUE
-inithandle_(VALUE self, VALUE id, VALUE user)
+inithandle_(VALUE self, VALUE id, VALUE ob)
 {
     Check_Type(id, T_FIXNUM);
     rb_iv_set(self, "@id", id);
-    rb_iv_set(self, "@user", user);
+    rb_iv_set(self, "@ob", ob);
     return self;
 }
 
@@ -211,15 +211,15 @@ handleid_(VALUE self)
 }
 
 static VALUE
-handleuser_(VALUE self)
+handleob_(VALUE self)
 {
-    return rb_iv_get(self, "@user");
+    return rb_iv_get(self, "@ob");
 }
 
 static VALUE
-sethandleuser_(VALUE self, VALUE user)
+sethandleob_(VALUE self, VALUE ob)
 {
-    rb_iv_set(self, "@user", user);
+    rb_iv_set(self, "@ob", ob);
     return self;
 }
 
@@ -349,11 +349,11 @@ stopall_(VALUE self)
 static VALUE
 post_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE to, type, id, user;
+    VALUE to, type, id, ob;
     aug_blob* blob = NULL;
     mod_result result;
 
-    rb_scan_args(argc, argv, "31", &to, &type, &id, &user);
+    rb_scan_args(argc, argv, "31", &to, &type, &id, &ob);
 
     /* Type-check now to ensure string operations succeed. */
 
@@ -361,8 +361,8 @@ post_(int argc, VALUE* argv, VALUE self)
     Check_Type(type, T_STRING);
     Check_Type(id, T_FIXNUM);
 
-    if (user != Qnil)
-        blob = augrb_createblob(StringValue(user));
+    if (ob != Qnil)
+        blob = augrb_createblob(StringValue(ob));
     result = mod_post(RSTRING(to)->ptr, RSTRING(type)->ptr, FIX2UINT(id),
                       (aug_object*)blob);
     if (blob)
@@ -377,18 +377,18 @@ post_(int argc, VALUE* argv, VALUE self)
 static VALUE
 dispatch_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE to, type, id, user;
+    VALUE to, type, id, ob;
     aug_blob* blob = NULL;
     mod_result result;
 
-    rb_scan_args(argc, argv, "31", &to, &type, &id, &user);
+    rb_scan_args(argc, argv, "31", &to, &type, &id, &ob);
 
     Check_Type(to, T_STRING);
     Check_Type(type, T_STRING);
     Check_Type(id, T_FIXNUM);
 
-    if (user != Qnil)
-        blob = augrb_createblob(StringValue(user));
+    if (ob != Qnil)
+        blob = augrb_createblob(StringValue(ob));
     result = mod_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr, FIX2UINT(id),
                           (aug_object*)blob);
     if (blob)
@@ -430,13 +430,13 @@ shutdown_(VALUE self, VALUE sock, VALUE flags)
 static VALUE
 tcpconnect_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE host, serv, sslctx, user;
+    VALUE host, serv, sslctx, ob;
     const char* ptr;
     augrb_box* box;
     mod_rint cid;
     VALUE sock;
 
-    rb_scan_args(argc, argv, "22", &host, &serv, &sslctx, &user);
+    rb_scan_args(argc, argv, "22", &host, &serv, &sslctx, &ob);
 
     /* Type-check now to ensure string operations succeed. */
 
@@ -449,7 +449,7 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
         ptr = RSTRING(sslctx)->ptr;
     }
 
-    box = augrb_createbox(newhandle_(0, user));
+    box = augrb_createbox(newhandle_(0, ob));
     cid = mod_tcpconnect(RSTRING(host)->ptr, RSTRING(serv)->ptr, ptr,
                          (aug_object*)box);
     aug_release(box);
@@ -465,13 +465,13 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
 static VALUE
 tcplisten_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE host, serv, sslctx, user;
+    VALUE host, serv, sslctx, ob;
     const char* ptr;
     augrb_box* box;
     mod_rint cid;
     VALUE sock;
 
-    rb_scan_args(argc, argv, "22", &host, &serv, &sslctx, &user);
+    rb_scan_args(argc, argv, "22", &host, &serv, &sslctx, &ob);
 
     /* Type-check now to ensure string operations succeed. */
 
@@ -484,7 +484,7 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
         ptr = RSTRING(sslctx)->ptr;
     }
 
-    box = augrb_createbox(newhandle_(0, user));
+    box = augrb_createbox(newhandle_(0, ob));
     cid = mod_tcplisten(RSTRING(host)->ptr, RSTRING(serv)->ptr, ptr,
                         (aug_object*)box);
     aug_release(box);
@@ -562,17 +562,17 @@ cancelrwtimer_(VALUE self, VALUE sock, VALUE flags)
 static VALUE
 settimer_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE ms, user;
+    VALUE ms, ob;
     unsigned ui;
     augrb_box* box;
     mod_rint tid;
     VALUE timer;
 
-    rb_scan_args(argc, argv, "11", &ms, &user);
+    rb_scan_args(argc, argv, "11", &ms, &ob);
 
     ui = NUM2UINT(ms);
 
-    box = augrb_createbox(newhandle_(0, user));
+    box = augrb_createbox(newhandle_(0, ob));
     tid = mod_settimer(ui, (aug_object*)box);
     aug_release(box);
 
@@ -709,8 +709,8 @@ initrb_(VALUE unused)
 
     rb_define_method(chandle_, "initialize", inithandle_, 2);
     rb_define_method(chandle_, "id", handleid_, 0);
-    rb_define_method(chandle_, "user", handleuser_, 0);
-    rb_define_method(chandle_, "user=", sethandleuser_, 1);
+    rb_define_method(chandle_, "ob", handleob_, 0);
+    rb_define_method(chandle_, "ob=", sethandleob_, 1);
 
     rb_define_method(chandle_, "<=>", cmphandle_, 1);
     rb_define_method(chandle_, "hash", handlehash_, 0);
@@ -890,18 +890,18 @@ accepted_(mod_session* ob, struct mod_handle* sock, const char* name)
 
     assert(sock->ob_);
 
-    /* On entry, sock->user_ is user data belonging to listener. */
+    /* On entry, sock->ob_ is user data belonging to listener. */
 
     box = augrb_createbox(newhandle_(sock->id_,
                                      rb_iv_get(augrb_obtorb(sock->ob_),
-                                               "@user")));
+                                               "@ob")));
 
     /* Reject if function either returns false, or throws an exception. */
 
     if (import->accepted_) {
 
-        VALUE user = box->vtbl_->unbox_(box);
-        if (Qfalse == funcall2_(import->module_, acceptedid_, user,
+        VALUE ob = box->vtbl_->unbox_(box);
+        if (Qfalse == funcall2_(import->module_, acceptedid_, ob,
                                 rb_str_new2(name))
             || except_) {
             ret = MOD_FALSE;

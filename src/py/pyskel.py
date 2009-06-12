@@ -30,18 +30,18 @@ import log
 # string geterror()
 # void reconfall()
 # void stopall()
-# void post(to, type, id, user)
-# void dispatch(to, type, id, user)
+# void post(to, type, id, ob)
+# void dispatch(to, type, id, ob)
 # string getenv(name, def)
 # string getsession()
 # void shutdown(sock, flags)
-# unsigned tcpconnect(host, serv, sslctx, user)
-# unsigned tcplisten(host, serv, sslctx, user)
+# unsigned tcpconnect(host, serv, sslctx, ob)
+# unsigned tcplisten(host, serv, sslctx, ob)
 # void send(sock, buffer buf)
 # void setrwtimer(sock, ms, flags)
 # void resetrwtimer(sock, ms, flags)
 # void cancelrwtimer(sock, flags)
-# unsigned settimer(ms, user)
+# unsigned settimer(ms, ob)
 # bool resettimer(timer, ms)
 # bool canceltimer(timer)
 
@@ -86,7 +86,7 @@ def start(sname):
 def reconf():
     log.debug("reconf()")
 
-def event(frm, type, id, user):
+def event(frm, type, id, ob):
     log.debug("event()")
 
 def closed(sock):
@@ -98,7 +98,7 @@ def teardown(sock):
 
 def accepted(sock, name):
     log.info("accepted(): %s" % sock)
-    sock.user = LineParser()
+    sock.ob = LineParser()
     setrwtimer(sock, 15000, TIMRD)
     send(sock, "+OK hello\r\n")
 
@@ -108,7 +108,7 @@ def connected(sock, name):
 def recv(sock, buf):
     log.debug("recv(): %s" % sock)
     global interp
-    for line in sock.user.parse(str(buf)):
+    for line in sock.ob.parse(str(buf)):
         x = interp.interpret(line)
         if x == Quit:
             send(sock, "+OK goodbye\r\n")

@@ -33,11 +33,11 @@ def start(sname):
     log.debug("str(): %s" % o)
     if o.id != 101:
         log.error("object returned unexpected id")
-    if o.user != "our object":
-        log.error("object returned unexpected user")
-    o.user = "new user"
-    if o.user != "new user":
-        log.error("object returned unexpected user")
+    if o.ob != "our object":
+        log.error("object returned unexpected ob")
+    o.ob = "new ob"
+    if o.ob != "new ob":
+        log.error("object returned unexpected ob")
     if o != Handle(101, None):
         log.error("comparison operator failed")
     stopall()

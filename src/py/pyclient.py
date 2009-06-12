@@ -55,16 +55,16 @@ def start(sname):
         tcpconnect("localhost", getenv("session.pyclient.to"), None, None)
 
 def closed(sock):
-    if sock.user != None:
-        sock.user.cancel()
+    if sock.ob != None:
+        sock.ob.cancel()
 
 def connected(sock, name):
     log.info("client established, starting timer")
-    sock.user = State(sock)
+    sock.ob = State(sock)
 
 def recv(sock, buf):
     log.info("received by client: %s" % buf)
 
 def expire(timer, ms):
     log.info("timer expired")
-    return timer.user.expire()
+    return timer.ob.expire()

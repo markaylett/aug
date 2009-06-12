@@ -83,18 +83,18 @@ post_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
     mod_id id;
-    PyObject* user = NULL;
+    PyObject* ob = NULL;
     aug_blob* blob = NULL;
     mod_result result;
 
     /* The object's reference count is not increased. */
 
-    if (!PyArg_ParseTuple(args, "ssI|O:post", &to, &type, &id, &user))
+    if (!PyArg_ParseTuple(args, "ssI|O:post", &to, &type, &id, &ob))
         return NULL;
 
-    if (user && user != Py_None) {
+    if (ob && ob != Py_None) {
 
-        if (!PyObject_CheckReadBuffer(user)) {
+        if (!PyObject_CheckReadBuffer(ob)) {
 
             PyErr_SetString(PyExc_TypeError,
                             "post() argument 3 must be string or"
@@ -102,7 +102,7 @@ post_(PyObject* self, PyObject* args)
             return NULL;
         }
 
-        if (!(blob = augpy_createblob(user)))
+        if (!(blob = augpy_createblob(ob)))
             return NULL;
     }
 
@@ -127,18 +127,18 @@ dispatch_(PyObject* self, PyObject* args)
 {
     const char* to, * type;
     mod_id id;
-    PyObject* user = NULL;
+    PyObject* ob = NULL;
     aug_blob* blob = NULL;
     mod_result result;
 
     /* The object's reference count is not increased. */
 
-    if (!PyArg_ParseTuple(args, "ssI|O:dispatch", &to, &type, &id, &user))
+    if (!PyArg_ParseTuple(args, "ssI|O:dispatch", &to, &type, &id, &ob))
         return NULL;
 
-    if (user && user != Py_None) {
+    if (ob && ob != Py_None) {
 
-        if (!PyObject_CheckReadBuffer(user)) {
+        if (!PyObject_CheckReadBuffer(ob)) {
 
             PyErr_SetString(PyExc_TypeError,
                             "dispatch() argument 3 must be string or"
@@ -146,7 +146,7 @@ dispatch_(PyObject* self, PyObject* args)
             return NULL;
         }
 
-        if (!(blob = augpy_createblob(user)))
+        if (!(blob = augpy_createblob(ob)))
             return NULL;
     }
 
@@ -206,17 +206,17 @@ static PyObject*
 tcpconnect_(PyObject* self, PyObject* args)
 {
     const char* host, * serv, * sslctx = NULL;
-    PyObject* user = NULL, * sock;
+    PyObject* ob = NULL, * sock;
     augpy_box* box;
     mod_rint cid;
 
     /* The object's reference count is not increased. */
 
     if (!PyArg_ParseTuple(args, "ss|zO:tcpconnect", &host, &serv, &sslctx,
-                          &user))
+                          &ob))
         return NULL;
 
-    if (!(box = augpy_boxhandle(type_, 0, user)))
+    if (!(box = augpy_boxhandle(type_, 0, ob)))
         return NULL;
 
     /* mod_tcpconnect() takes ownership. */
@@ -238,17 +238,17 @@ static PyObject*
 tcplisten_(PyObject* self, PyObject* args)
 {
     const char* host, * serv, * sslctx = NULL;
-    PyObject* user = NULL, * sock;
+    PyObject* ob = NULL, * sock;
     augpy_box* box;
     mod_rint lid;
 
     /* The object's reference count is not increased. */
 
     if (!PyArg_ParseTuple(args, "ss|zO:tcplisten", &host, &serv, &sslctx,
-                          &user))
+                          &ob))
         return NULL;
 
-    if (!(box = augpy_boxhandle(type_, 0, user)))
+    if (!(box = augpy_boxhandle(type_, 0, ob)))
         return NULL;
 
     /* mod_tcplisten() takes ownership. */
@@ -372,16 +372,16 @@ static PyObject*
 settimer_(PyObject* self, PyObject* args)
 {
     unsigned ms;
-    PyObject* user = NULL, * timer;
+    PyObject* ob = NULL, * timer;
     augpy_box* box;
     mod_rint tid;
 
     /* The object's reference count is not increased. */
 
-    if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &user))
+    if (!PyArg_ParseTuple(args, "I|O:settimer", &ms, &ob))
         return NULL;
 
-    if (!(box = augpy_boxhandle(type_, 0, user)))
+    if (!(box = augpy_boxhandle(type_, 0, ob)))
         return NULL;
 
     /* mod_settimer() takes ownership. */

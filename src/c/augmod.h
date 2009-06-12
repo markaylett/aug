@@ -186,7 +186,7 @@ typedef unsigned mod_id;
 
 /**
  * Both sockets and timers are represented by handles.  For timer handles,
- * #mod_handle::user_ will be of type @ref aug_object.
+ * #mod_handle::ob_ will be of type @ref aug_object.
  *
  * @see settimer_()
  */

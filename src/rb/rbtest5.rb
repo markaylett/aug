@@ -41,17 +41,17 @@ module RbTest5
     end
     def self.accepted(sock, name)
         Log.debug("accepted(): #{sock}")
-        sock.user = LineParser.new
+        sock.ob = LineParser.new
         @server = sock
     end
     def self.connected(sock, name)
         Log.debug("connected(): #{sock}")
-        sock.user = LineParser.new
+        sock.ob = LineParser.new
         AugRb.send(@server, "hello, world!\n")
     end
     def self.recv(sock, buf)
         Log.debug("recv(): #{sock}")
-        sock.user.parse(buf) do |line|
+        sock.ob.parse(buf) do |line|
 
             Log.debug("line: #{line}")
             if line != "hello, world!"

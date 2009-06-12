@@ -78,6 +78,7 @@ release_(aug_ctx* obj)
         aug_mpool* mpool = impl->mpool_;
         aug_clock* clock = impl->clock_;
         aug_log* log = impl->log_;
+        aug_writelog(log, AUG_LOGINFO, "destroying context object");
         aug_freemem(mpool, impl);
         aug_release(log);
         aug_release(clock);

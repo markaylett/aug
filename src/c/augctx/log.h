@@ -28,6 +28,13 @@
 #include "augext/log.h"
 
 /**
+ * Convenience wrapper around aug_vwritelog().
+ */
+
+AUGCTX_API aug_result
+aug_writelog(aug_log* log, int level, const char* format, ...);
+
+/**
  * The standard logger.
  *
  * @return An interface to the standard logger.
