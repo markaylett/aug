@@ -26,7 +26,7 @@
 #include <stdlib.h> /* exit() */
 
 static aug_result
-cb_(void* arg, const char* key, const char* value)
+cb_(const char* key, const char* value, void* arg)
 {
     printf("'%s'=[%s]\n", key, value);
     return AUG_SUCCESS;

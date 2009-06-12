@@ -36,7 +36,7 @@ using namespace std;
 
 namespace {
     aug_result
-    cb(void* arg, const char* name, const char* value)
+    cb(const char* name, const char* value, void* arg)
     {
         map<string, string>& x(*static_cast<map<string, string>*>(arg));
         x[name] = value;

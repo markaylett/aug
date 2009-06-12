@@ -162,7 +162,7 @@ flush_(aug_base64_t base64)
     size_t pos = base64->pos_;
     base64->pos_ = 0;
     base64->buf_[pos] = '\0';
-    return base64->cb_(base64->ob_, base64->buf_, pos);
+    return base64->cb_(base64->buf_, pos, base64->ob_);
 }
 
 static aug_result

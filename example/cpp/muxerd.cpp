@@ -49,7 +49,7 @@ namespace test {
     cstring address_ = "0.0.0.0:44308";
 
     aug_result
-    confcb(void* arg, const char* name, const char* value)
+    confcb(const char* name, const char* value, void* arg)
     {
         if (0 == aug_strcasecmp(name, "address")) {
 

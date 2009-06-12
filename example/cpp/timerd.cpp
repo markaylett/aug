@@ -58,7 +58,7 @@ namespace test {
     }
 
     aug_result
-    confcb_(void* arg, const char* name, const char* value)
+    confcb_(const char* name, const char* value, void* arg)
     {
         if (0 == aug_strcasecmp(name, "loglevel")) {
 

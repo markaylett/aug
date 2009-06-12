@@ -277,7 +277,7 @@ aug_processexpired(aug_timers_t timers, aug_bool force,
 
             AUG_REMOVE_HEAD(&timers->list_);
 
-            (*it->cb_)(it->ob_, it->id_, &it->ms_);
+            (*it->cb_)(it->id_, &it->ms_, it->ob_);
             if (it->ms_) {
 
                 /* Update expiry time and insert. */

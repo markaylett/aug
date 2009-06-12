@@ -38,19 +38,19 @@
 
 namespace aug {
 
-    template <aug_result (*T)(objectref, const char*, size_t)>
+    template <aug_result (*T)(const char*, size_t, objectref)>
     aug_result
-    base64cb(aug_object* ob, const char* buf, size_t len) AUG_NOTHROW
+    base64cb(const char* buf, size_t len, aug_object* ob) AUG_NOTHROW
     {
         try {
-            return T(ob, buf, len);
+            return T(buf, len, ob);
         } AUG_SETERRINFOCATCH;
         return AUG_FAILERROR;
     }
 
     template <typename T, aug_result (T::*U)(const char*, size_t)>
     aug_result
-    base64memcb(aug_object* ob, const char* buf, size_t len) AUG_NOTHROW
+    base64memcb(const char* buf, size_t len, aug_object* ob) AUG_NOTHROW
     {
         try {
             return (obtop<T>(ob)->*U)(buf, len);
@@ -60,7 +60,7 @@ namespace aug {
 
     template <typename T>
     aug_result
-    base64memcb(aug_object* ob, const char* buf, size_t len) AUG_NOTHROW
+    base64memcb(const char* buf, size_t len, aug_object* ob) AUG_NOTHROW
     {
         try {
             return obtop<T>(ob)->base64cb(buf, len);
@@ -155,14 +155,14 @@ namespace aug {
 
     namespace detail {
         inline aug_result
-        base64os(objectref ob, const char* buf, size_t len)
+        base64os(const char* buf, size_t len, objectref ob)
         {
             std::ostream& os(*obtop<std::ostream>(ob));
 			os.write(buf, static_cast<std::streamsize>(len));
             return AUG_SUCCESS;
         }
         inline aug_result
-        base64str(objectref ob, const char* buf, size_t len)
+        base64str(const char* buf, size_t len, objectref ob)
         {
             std::string& str(*obtop<std::string>(ob));
             str.append(buf, static_cast<std::streamsize>(len));

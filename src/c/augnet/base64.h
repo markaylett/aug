@@ -38,7 +38,7 @@
 #include "augabi.h"
 #include "augtypes.h"
 
-typedef aug_result (*aug_base64cb_t)(aug_object*, const char*, size_t);
+typedef aug_result (*aug_base64cb_t)(const char*, size_t, aug_object*);
 
 typedef struct aug_base64_* aug_base64_t;
 

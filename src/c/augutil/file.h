@@ -35,7 +35,7 @@
 
 #include <stdio.h>
 
-typedef aug_result (*aug_confcb_t)(void*, const char*, const char*);
+typedef aug_result (*aug_confcb_t)(const char*, const char*, void*);
 
 /**
  * Read configuration file.

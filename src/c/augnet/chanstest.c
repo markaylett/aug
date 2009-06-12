@@ -235,7 +235,7 @@ create_(aug_mpool* mpool, unsigned id)
     return &impl->chan_;
 }
 
-static aug_bool (*cb_)(aug_chan*, unsigned short) = NULL;
+static aug_bool (*cb_)(unsigned short, aug_chan*) = NULL;
 
 static void*
 chandler_cast_(aug_chandler* ob, const char* id)

@@ -112,8 +112,8 @@ out_(void* arg, int what)
 
                 /* Callback with pair. */
 
-                st->result_ = st->cb_(st->arg_, aug_xstr(st->key_),
-                                      aug_xstr(st->value_));
+                st->result_ = st->cb_(aug_xstr(st->key_),
+                                      aug_xstr(st->value_), st->arg_);
                 aug_clearxstr(st->key_);
                 aug_clearxstr(st->value_);
 

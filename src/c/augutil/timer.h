@@ -36,7 +36,7 @@
 #include "augabi.h"
 #include "augtypes.h"
 
-typedef void (*aug_timercb_t)(aug_object*, int, unsigned*);
+typedef void (*aug_timercb_t)(int, unsigned*, aug_object*);
 
 typedef struct aug_timers_* aug_timers_t;
 

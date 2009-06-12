@@ -38,27 +38,27 @@
 
 namespace aug {
 
-    template <void (*T)(aug::objectref, idref, unsigned&)>
+    template <void (*T)(idref, unsigned&, aug::objectref)>
     void
-    timercb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
+    timercb(int id, unsigned* ms, aug_object* ob) AUG_NOTHROW
     {
         try {
-            T(user, id, *ms);
+            T(id, *ms, ob);
         } AUG_SETERRINFOCATCH;
     }
 
     template <typename T, void (T::*U)(idref, unsigned&)>
     void
-    timermemcb(aug_object* user, int id, unsigned* ms) AUG_NOTHROW
+    timermemcb(int id, unsigned* ms, aug_object* ob) AUG_NOTHROW
     {
         try {
-            (obtop<T>(user)->*U)(id, *ms);
+            (obtop<T>(ob)->*U)(id, *ms);
         } AUG_SETERRINFOCATCH;
     }
 
     template <typename T>
     void
-    timermemcb(aug_object* ob, int id, unsigned* ms) AUG_NOTHROW
+    timermemcb(int id, unsigned* ms, aug_object* ob) AUG_NOTHROW
     {
         try {
             obtop<T>(ob)->timercb(id, *ms);
@@ -232,7 +232,7 @@ namespace aug {
         }
 
         void
-        set(unsigned ms, aug_timercb_t cb, aug::objectref ob)
+        set(unsigned ms, aug_timercb_t cb, objectref ob)
         {
             ref_ = settimer(timers_, ref_, ms, cb, ob);
         }

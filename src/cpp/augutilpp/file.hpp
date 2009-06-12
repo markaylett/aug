@@ -33,19 +33,19 @@
 
 namespace aug {
 
-    template <aug_result (*T)(void*, const char*, const char*)>
+    template <aug_result (*T)(const char*, const char*, void*)>
     aug_result
-    confcb(void* arg, const char* name, const char* value) AUG_NOTHROW
+    confcb(const char* name, const char* value, void* arg) AUG_NOTHROW
     {
         try {
-            return T(arg, name, value);
+            return T(name, value, arg);
         } AUG_SETERRINFOCATCH;
         return AUG_FAILERROR;
     }
 
     template <typename T, aug_result (T::*U)(const char*, const char*)>
     aug_result
-    confmemcb(void* arg, const char* name, const char* value) AUG_NOTHROW
+    confmemcb(const char* name, const char* value, void* arg) AUG_NOTHROW
     {
         try {
             return (static_cast<T*>(arg)->*U)(name, value);
@@ -55,7 +55,7 @@ namespace aug {
 
     template <typename T>
     aug_result
-    confmemcb(void* arg, const char* name, const char* value) AUG_NOTHROW
+    confmemcb(const char* name, const char* value, void* arg) AUG_NOTHROW
     {
         try {
             return static_cast<T*>(arg)->confcb(name, value);

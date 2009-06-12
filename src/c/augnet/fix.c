@@ -264,7 +264,7 @@ aug_readfix(aug_fixstream_t stream, aug_stream* src, size_t size)
         if (blen < stream->mlen_)
             break;
 
-        stream->cb_(stream->ob_, ptr, stream->mlen_);
+        stream->cb_(ptr, stream->mlen_, stream->ob_);
         blen -= stream->mlen_;
         stream->mlen_ = 0;
 

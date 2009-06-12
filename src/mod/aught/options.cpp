@@ -57,7 +57,7 @@ namespace {
     }
 
     aug_result
-    mimecb(void* arg, const char* name, const char* value)
+    mimecb(const char* name, const char* value, void* arg)
     {
         map<string, string>& mimetypes
             (*static_cast<map<string, string>*>(arg));

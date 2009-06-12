@@ -51,7 +51,7 @@ struct aug_fixstd_ {
     size_t size_;
 };
 
-typedef void (*aug_fixcb_t)(aug_object*, const char*, size_t);
+typedef void (*aug_fixcb_t)(const char*, size_t, aug_object*);
 
 typedef struct aug_fixstream_* aug_fixstream_t;
 

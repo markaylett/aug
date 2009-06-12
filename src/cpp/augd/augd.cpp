@@ -102,7 +102,7 @@ namespace {
     }
 
     void
-    reopencb_(objectref ob, idref id, unsigned& ms)
+    reopencb_(idref id, unsigned& ms, objectref ob)
     {
         // Called by timer when running as daemon.
 
