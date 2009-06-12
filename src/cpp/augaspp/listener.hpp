@@ -32,7 +32,7 @@ namespace aug {
     class listener : public sock_base, public mpool_ops {
 
         sessionptr session_;
-        mod_handle sock_;
+        handle sock_;
         sockstate state_;
 
         // object_base.

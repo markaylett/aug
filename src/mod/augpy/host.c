@@ -81,15 +81,15 @@ stopall_(PyObject* self, PyObject* args)
 static PyObject*
 post_(PyObject* self, PyObject* args)
 {
-    mod_id id;
     const char* to, * type;
+    mod_id id;
     PyObject* user = NULL;
     aug_blob* blob = NULL;
     mod_result result;
 
     /* The object's reference count is not increased. */
 
-    if (!PyArg_ParseTuple(args, "Iss|O:post", &id, &to, &type, &user))
+    if (!PyArg_ParseTuple(args, "ssI|O:post", &to, &type, &id, &user))
         return NULL;
 
     if (user && user != Py_None) {
@@ -125,15 +125,15 @@ post_(PyObject* self, PyObject* args)
 static PyObject*
 dispatch_(PyObject* self, PyObject* args)
 {
-    mod_id id;
     const char* to, * type;
+    mod_id id;
     PyObject* user = NULL;
     aug_blob* blob = NULL;
     mod_result result;
 
     /* The object's reference count is not increased. */
 
-    if (!PyArg_ParseTuple(args, "Iss|O:dispatch", &id, &to, &type, &user))
+    if (!PyArg_ParseTuple(args, "ssI|O:dispatch", &to, &type, &id, &user))
         return NULL;
 
     if (user && user != Py_None) {

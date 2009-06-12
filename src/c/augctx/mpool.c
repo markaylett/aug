@@ -26,8 +26,14 @@
 
 AUG_RCSID("$Id$");
 
+/* Set dlmalloc's debug symbol. */
+
 #if !defined(DEBUG)
-# define DEBUG 0
+# if !defined(NDEBUG)
+#  define DEBUG 1
+# else /* NDEBUG */
+#  define DEBUG 0
+# endif /* NDEBUG */
 #endif /* !DEBUG */
 
 #undef ONLY_MSPACES

@@ -57,7 +57,9 @@ static ID stopid_, startid_, reconfid_, eventid_, closedid_,
     teardownid_, acceptedid_, connectedid_, authid_, recvid_,
     errorid_, rdexpireid_, wrexpireid_, expireid_;
 
-static VALUE maugrb_, chandle_, cerror_;
+static VALUE maugrb_ = Qnil;
+static VALUE chandle_ = Qnil;
+static VALUE cerror_ = Qnil;
 
 /* True if exception was thrown during last call to protect_(). */
 
@@ -69,13 +71,16 @@ static union {
 
     /* See funcall_(). */
 
-    ID id_;
+    struct {
+        VALUE module_;
+        ID id_;
+    } fun_;
 
     /* See loadmodule_(). */
 
     const char* sname_;
 
-} u_;
+} cb_;
 
 static VALUE
 dorescue_(VALUE unused, VALUE except)
@@ -94,52 +99,53 @@ protect_(VALUE (*body)(), VALUE args)
 }
 
 static VALUE
-dofuncall_(VALUE module, VALUE args)
+dofuncall_(VALUE args)
 {
     return Qnil == args
-        ? rb_funcall(module, u_.id_, 0)
-        : rb_apply(module, u_.id_, args);
+        ? rb_funcall(cb_.fun_.module_, cb_.fun_.id_, 0)
+        : rb_apply(cb_.fun_.module_, cb_.fun_.id_, args);
 }
 
 static VALUE
-funcall_(ID id, VALUE args)
+funcall_(VALUE module, ID id, VALUE args)
 {
-    u_.id_ = id;
+    cb_.fun_.module_ = module;
+    cb_.fun_.id_ = id;
     return protect_(dofuncall_, args);
 }
 
 static VALUE
-funcall0_(ID id)
+funcall0_(VALUE module, ID id)
 {
-    return funcall_(id, Qnil);
+    return funcall_(module, id, Qnil);
 }
 
 static VALUE
-funcall1_(ID id, VALUE arg1)
+funcall1_(VALUE module, ID id, VALUE arg1)
 {
     VALUE args = rb_ary_new3(1, arg1);
-    return funcall_(id, args);
+    return funcall_(module, id, args);
 }
 
 static VALUE
-funcall2_(ID id, VALUE arg1, VALUE arg2)
+funcall2_(VALUE module, ID id, VALUE arg1, VALUE arg2)
 {
     VALUE args = rb_ary_new3(2, arg1, arg2);
-    return funcall_(id, args);
+    return funcall_(module, id, args);
 }
 
 static VALUE
-funcall3_(ID id, VALUE arg1, VALUE arg2, VALUE arg3)
+funcall3_(VALUE module, ID id, VALUE arg1, VALUE arg2, VALUE arg3)
 {
     VALUE args = rb_ary_new3(3, arg1, arg2, arg3);
-    return funcall_(id, args);
+    return funcall_(module, id, args);
 }
 
 static VALUE
-funcall4_(ID id, VALUE arg1, VALUE arg2, VALUE arg3, VALUE arg4)
+funcall4_(VALUE module, ID id, VALUE arg1, VALUE arg2, VALUE arg3, VALUE arg4)
 {
     VALUE args = rb_ary_new3(4, arg1, arg2, arg3, arg4);
-    return funcall_(id, args);
+    return funcall_(module, id, args);
 }
 
 static char*
@@ -155,19 +161,19 @@ lowercpy_(char* dst, const char* src)
 static VALUE
 doloadmodule_(VALUE unused)
 {
-    char* lower = alloca(strlen(u_.sname_) + 1);
-    lowercpy_(lower, u_.sname_);
+    char* lower = alloca(strlen(cb_.sname_) + 1);
+    lowercpy_(lower, cb_.sname_);
 
     mod_writelog(MOD_LOGINFO, "require [%s]", lower);
 
     rb_require(lower);
-    return rb_const_get(rb_cObject, rb_intern(u_.sname_));
+    return rb_const_get(rb_cObject, rb_intern(cb_.sname_));
 }
 
 static VALUE
 loadmodule_(const char* sname)
 {
-    u_.sname_ = sname;
+    cb_.sname_ = sname;
     return protect_(doloadmodule_, Qnil);
 }
 
@@ -265,21 +271,20 @@ newhandle_(mod_id id, VALUE rbob)
 static void
 termimport_(struct import_* import)
 {
+    rb_gc_unregister_address(&import->module_);
+
     /* Garbage collector takes care of rest. */
 }
 
 static mod_bool
 initimport_(struct import_* import, const char* sname)
 {
-    VALUE module;
-
-    u_.sname_ = sname;
-    module = loadmodule_(sname);
-
+    VALUE module = loadmodule_(sname);
     if (except_)
         return MOD_FALSE;
 
     import->module_ = module;
+    rb_gc_register_address(&import->module_);
 
     /* Determine which functions the session has implemented. */
 
@@ -372,15 +377,15 @@ post_(int argc, VALUE* argv, VALUE self)
 static VALUE
 dispatch_(int argc, VALUE* argv, VALUE self)
 {
-    VALUE id, to, type, user;
+    VALUE to, type, id, user;
     aug_blob* blob = NULL;
     mod_result result;
 
-    rb_scan_args(argc, argv, "31", &id, &to, &type, &user);
+    rb_scan_args(argc, argv, "31", &to, &type, &id, &user);
 
-    Check_Type(id, T_FIXNUM);
     Check_Type(to, T_STRING);
     Check_Type(type, T_STRING);
+    Check_Type(id, T_FIXNUM);
 
     if (user != Qnil)
         blob = augrb_createblob(StringValue(user));
@@ -673,8 +678,13 @@ initrb_(VALUE unused)
     expireid_= rb_intern("expire");
 
     maugrb_ = rb_define_module("AugRb");
+    rb_gc_register_address(&maugrb_);
+
     chandle_ = rb_define_class_under(maugrb_, "Handle", rb_cObject);
+    rb_gc_register_address(&chandle_);
+
     cerror_ = rb_define_class_under(maugrb_, "Error", rb_eStandardError);
+    rb_gc_register_address(&cerror_);
 
     /* Logger constants. */
 
@@ -772,7 +782,8 @@ start_(mod_session* ob)
 
     if (import->start_) {
 
-        if (Qfalse == funcall1_(startid_, rb_str_new2(impl->name_))
+        if (Qfalse == funcall1_(import->module_, startid_,
+                                rb_str_new2(impl->name_))
             || except_)
             return MOD_FALSE;
     }
@@ -788,7 +799,7 @@ stop_(mod_session* ob)
     struct import_* import = &impl->import_;
 
     if (import->open_ && import->stop_)
-        funcall0_(stopid_);
+        funcall0_(import->module_, stopid_);
 }
 
 static void
@@ -798,7 +809,7 @@ reconf_(mod_session* ob)
     struct import_* import = &impl->import_;
 
     if (import->reconf_)
-        funcall0_(reconfid_);
+        funcall0_(import->module_, reconfid_);
 }
 
 static void
@@ -834,7 +845,7 @@ event_(mod_session* ob_, const char* from, const char* type, mod_id id,
                 }
             }
         }
-        funcall4_(eventid_, INT2FIX(id), rb_str_new2(from),
+        funcall4_(import->module_, eventid_, INT2FIX(id), rb_str_new2(from),
                   rb_str_new2(type), x);
     }
 }
@@ -848,7 +859,7 @@ closed_(mod_session* ob, struct mod_handle* sock)
     assert(sock->ob_);
 
     if (import->closed_) {
-        funcall1_(closedid_, augrb_obtorb(sock->ob_));
+        funcall1_(import->module_, closedid_, augrb_obtorb(sock->ob_));
     }
 
     aug_assign(sock->ob_, NULL);
@@ -863,7 +874,7 @@ teardown_(mod_session* ob, struct mod_handle* sock)
     assert(sock->ob_);
 
     if (import->teardown_)
-        funcall1_(teardownid_, augrb_obtorb(sock->ob_));
+        funcall1_(import->module_, teardownid_, augrb_obtorb(sock->ob_));
     else
         mod_shutdown(sock->id_, 0);
 }
@@ -890,7 +901,8 @@ accepted_(mod_session* ob, struct mod_handle* sock, const char* name)
     if (import->accepted_) {
 
         VALUE user = box->vtbl_->unbox_(box);
-        if (Qfalse == funcall2_(acceptedid_, user, rb_str_new2(name))
+        if (Qfalse == funcall2_(import->module_, acceptedid_, user,
+                                rb_str_new2(name))
             || except_) {
             ret = MOD_FALSE;
             goto done;
@@ -912,7 +924,8 @@ connected_(mod_session* ob, struct mod_handle* sock, const char* name)
     assert(sock->ob_);
 
     if (import->connected_)
-        funcall2_(connectedid_, augrb_obtorb(sock->ob_), rb_str_new2(name));
+        funcall2_(import->module_, connectedid_, augrb_obtorb(sock->ob_),
+                  rb_str_new2(name));
 }
 
 static mod_bool
@@ -927,7 +940,8 @@ auth_(mod_session* ob, struct mod_handle* sock, const char* subject,
     /* Reject if function either returns false, or throws an exception. */
 
     if (import->auth_)
-        if (Qfalse == funcall3_(authid_, augrb_obtorb(sock->ob_),
+        if (Qfalse == funcall3_(import->module_, authid_,
+                                augrb_obtorb(sock->ob_),
                                 rb_str_new2(subject), rb_str_new2(issuer))
             || except_)
             return MOD_FALSE;
@@ -944,7 +958,7 @@ recv_(mod_session* ob, struct mod_handle* sock, const void* buf, size_t len)
     assert(sock->ob_);
 
     if (import->recv_)
-        funcall2_(recvid_, augrb_obtorb(sock->ob_),
+        funcall2_(import->module_, recvid_, augrb_obtorb(sock->ob_),
                   rb_tainted_str_new(buf, (long)len));
 }
 
@@ -957,7 +971,8 @@ error_(mod_session* ob, struct mod_handle* sock, const char* desc)
     assert(sock->ob_);
 
     if (import->error_)
-        funcall2_(errorid_, augrb_obtorb(sock->ob_), rb_str_new2(desc));
+        funcall2_(import->module_, errorid_, augrb_obtorb(sock->ob_),
+                  rb_str_new2(desc));
 }
 
 static void
@@ -969,8 +984,8 @@ rdexpire_(mod_session* ob, struct mod_handle* sock, unsigned* ms)
     assert(sock->ob_);
 
     if (import->rdexpire_) {
-        VALUE ret = funcall2_(rdexpireid_, augrb_obtorb(sock->ob_),
-                              INT2FIX(*ms));
+        VALUE ret = funcall2_(import->module_, rdexpireid_,
+                              augrb_obtorb(sock->ob_), INT2FIX(*ms));
         if (!except_ && FIXNUM_P(ret))
             *ms = FIX2UINT(ret);
     }
@@ -985,8 +1000,8 @@ wrexpire_(mod_session* ob, struct mod_handle* sock, unsigned* ms)
     assert(sock->ob_);
 
     if (import->wrexpire_) {
-        VALUE ret = funcall2_(wrexpireid_, augrb_obtorb(sock->ob_),
-                              INT2FIX(*ms));
+        VALUE ret = funcall2_(import->module_, wrexpireid_,
+                              augrb_obtorb(sock->ob_), INT2FIX(*ms));
         if (!except_ && FIXNUM_P(ret))
             *ms = FIX2UINT(ret);
     }
@@ -1001,8 +1016,8 @@ expire_(mod_session* ob, struct mod_handle* timer, unsigned* ms)
     assert(timer->ob_);
 
     if (import->expire_) {
-        VALUE ret = funcall2_(expireid_, augrb_obtorb(timer->ob_),
-                              INT2FIX(*ms));
+        VALUE ret = funcall2_(import->module_, expireid_,
+                              augrb_obtorb(timer->ob_), INT2FIX(*ms));
         if (!except_ && FIXNUM_P(ret))
             *ms = FIX2UINT(ret);
     }
@@ -1052,6 +1067,16 @@ static void
 term_(void)
 {
     mod_writelog(MOD_LOGINFO, "terminating augrb module");
+
+    /* Release globals for collection. */
+
+    if (Qnil != maugrb_)
+        rb_gc_unregister_address(&maugrb_);
+    if (Qnil != chandle_)
+        rb_gc_unregister_address(&chandle_);
+    if (Qnil != cerror_)
+        rb_gc_unregister_address(&cerror_);
+
     ruby_finalize();
 }
 

@@ -130,7 +130,7 @@ namespace aug {
 
     class connimpl : public mpool_ops {
 
-        sessionptr session_;
+        session_base& session_;
         mod_handle& sock_;
         buffer& buffer_;
         rwtimer& rwtimer_;
@@ -146,7 +146,7 @@ namespace aug {
     public:
         ~connimpl() AUG_NOTHROW;
 
-        connimpl(const sessionptr& session, mod_handle& sock, buffer& buffer,
+        connimpl(session_base& session, mod_handle& sock, buffer& buffer,
                  rwtimer& rwtimer, mod_bool accepted);
 
         mod_handle&
@@ -159,12 +159,6 @@ namespace aug {
         get() const
         {
             return sock_;
-        }
-
-        const sessionptr&
-        session() const
-        {
-            return session_;
         }
 
         void

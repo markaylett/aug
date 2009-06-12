@@ -87,6 +87,57 @@ namespace aug {
     };
 
     typedef smartptr<handle_base> handleptr;
+
+    class handle {
+
+        mod_handle handle_;
+
+        handle(const handle& rhs);
+
+        handle&
+        operator =(const handle& rhs);
+
+    public:
+        ~handle() AUG_NOTHROW
+        {
+            aug_assign(handle_.ob_, 0);
+        }
+        handle(unsigned id, objectref ob)
+        {
+            handle_.id_ = id;
+            handle_.ob_ = ob.get();
+            if (handle_.ob_)
+                aug_retain(handle_.ob_);
+        }
+        mod_handle&
+        get()
+        {
+            return handle_;
+        }
+        const mod_handle&
+        get() const
+        {
+            return handle_;
+        }
+        mod_id
+        id() const
+        {
+            return handle_.id_;
+        }
+        objectptr
+        ob() const
+        {
+            return object_retain(obptr(handle_.ob_));
+        }
+        operator mod_handle&()
+        {
+            return get();
+        }
+        operator const mod_handle&() const
+        {
+            return get();
+        }
+    };
 }
 
 #endif // AUGASPP_HANDLE_HPP

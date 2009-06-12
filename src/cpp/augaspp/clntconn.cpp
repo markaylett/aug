@@ -44,7 +44,7 @@ clntconn::do_get() const
 const sessionptr&
 clntconn::do_session() const
 {
-    return impl_.session();
+    return session_;
 }
 
 void
@@ -147,17 +147,15 @@ clntconn::do_cancelrwtimer(unsigned flags)
 
 clntconn::~clntconn() AUG_NOTHROW
 {
-    aug_assign(sock_.ob_, 0);
 }
 
 clntconn::clntconn(mpoolref mpool, const sessionptr& session,
                    aug_timers_t timers, unsigned id, objectref ob)
-    : impl_(session, sock_, buffer_, rwtimer_, true), // See comment.
+    : session_(session),
+      sock_(id, ob),
       buffer_(mpool),
-      rwtimer_(session, sock_, timers)
+      rwtimer_(*session, sock_, timers),
+      impl_(*session, sock_, buffer_, rwtimer_, true) // See comment.
 {
     // Client connections are implicitly accepted as the client is initiating.
-
-    sock_.id_ = id;
-    aug_assign(sock_.ob_, ob.get());
 }

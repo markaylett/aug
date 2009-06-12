@@ -29,15 +29,15 @@ def stop():
 
 def start(sname):
     log.debug("start(): %s" % sname)
-    dispatch(0, "group1", "foo", str(101))
-    post(0, sname, "none", None)
+    dispatch("group1", "foo", 0, str(101))
+    post(sname, "none", 0, None)
 
 def event(frm, type, id, user):
     log.debug("event(): %s" % user)
     if type == "foo":
         if int(user) != 101:
             log.error("unexpected user data")
-        dispatch(0, frm, "bar", buffer("202"))
+        dispatch(frm, "bar", 0, buffer("202"))
     elif type == "bar":
         if int(user) != 202:
             log.error("unexpected user data")

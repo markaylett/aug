@@ -30,10 +30,11 @@ namespace aug {
 
     class servconn : public conn_base, public rwtimer_base, public mpool_ops {
 
-        mod_handle sock_;
-        aug::connimpl impl_;
+        sessionptr session_;
+        handle sock_;
         buffer buffer_;
         rwtimer rwtimer_;
+        aug::connimpl impl_;
 
         // object_base.
 

@@ -132,12 +132,12 @@ connimpl::~connimpl() AUG_NOTHROW
         // the connection was rejected by session, then do not notify.
 
         if (accepted_)
-            session_->closed(sock_);
+            session_.closed(sock_);
 
     } AUG_PERRINFOCATCH;
 }
 
-connimpl::connimpl(const sessionptr& session, mod_handle& sock,
+connimpl::connimpl(session_base& session, mod_handle& sock,
                    buffer& buffer, rwtimer& rwtimer, mod_bool accepted)
     : session_(session),
       sock_(sock),
@@ -181,19 +181,19 @@ connimpl::sendv(chanref chan, blobref blob, const aug_timeval& now)
 mod_bool
 connimpl::accepted(const string& name, const aug_timeval& now)
 {
-    return accepted_ = session_->accepted(sock_, name.c_str());
+    return accepted_ = session_.accepted(sock_, name.c_str());
 }
 
 void
 connimpl::connected(const string& name, const aug_timeval& now)
 {
-    session_->connected(sock_, name.c_str());
+    session_.connected(sock_, name.c_str());
 }
 
 mod_bool
 connimpl::auth(const char* subject, const char* issuer)
 {
-    return session_->auth(sock_, subject, issuer);
+    return session_.auth(sock_, subject, issuer);
 }
 
 void
@@ -224,7 +224,7 @@ connimpl::process(chanref chan, unsigned short events, const aug_timeval& now)
 
             // Notify module of new data.
 
-            session_->recv(sock_, buf, size);
+            session_.recv(sock_, buf, size);
 
         } catch (const block_exception&) {
         }
@@ -281,7 +281,7 @@ connimpl::process(chanref chan, unsigned short events, const aug_timeval& now)
 void
 connimpl::error(const char* desc)
 {
-    return session_->error(sock_, desc);
+    return session_.error(sock_, desc);
 }
 
 void
@@ -317,7 +317,7 @@ connimpl::teardown(const aug_timeval& now)
 {
     if (state_ < TEARDOWN) {
         state_ = TEARDOWN;
-        session_->teardown(sock_);
+        session_.teardown(sock_);
     }
 }
 

@@ -29,8 +29,8 @@ module RbTest2
     end
     def self.start(sname)
         Log.debug("start(): #{sname}")
-        AugRb.dispatch(0, "group1", "foo", 101.to_s)
-        AugRb.post(0, sname, "nil", nil)
+        AugRb.dispatch("group1", "foo", 0, 101.to_s)
+        AugRb.post(sname, "nil", 0, nil)
     end 
     def self.event(frm, type, id, user)
         Log.debug("event(): #{user}")
@@ -38,7 +38,7 @@ module RbTest2
             if user.to_i != 101
                 Log.error("unexpected user data")
             end
-            AugRb.dispatch(0, frm, "bar", "202")
+            AugRb.dispatch(frm, "bar", 0, "202")
         elsif type == "bar"
             if user.to_i != 202
                 Log.error("unexpected user data")

@@ -44,7 +44,7 @@ servconn::do_get() const
 const sessionptr&
 servconn::do_session() const
 {
-    return impl_.session();
+    return session_;
 }
 
 void
@@ -147,17 +147,15 @@ servconn::do_cancelrwtimer(unsigned flags)
 
 servconn::~servconn() AUG_NOTHROW
 {
-    aug_assign(sock_.ob_, 0);
 }
 
 servconn::servconn(mpoolref mpool, const sessionptr& session,
                    aug_timers_t timers, unsigned id, objectref ob)
-    : impl_(session, sock_, buffer_, rwtimer_, false), // See comment.
+    : session_(session),
+      sock_(id, ob),
       buffer_(mpool),
-      rwtimer_(session, sock_, timers)
+      rwtimer_(*session, sock_, timers),
+      impl_(*session, sock_, buffer_, rwtimer_, false) // See comment.
 {
     // New server connection: needs session acceptance.
-
-    sock_.id_ = id;
-    aug_assign(sock_.ob_, ob.get());
 }

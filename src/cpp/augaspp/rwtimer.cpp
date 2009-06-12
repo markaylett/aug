@@ -40,10 +40,10 @@ rwtimer::do_timercb(idref id, unsigned& ms)
 {
     if (rdtimer_.id() == id) {
         AUG_CTXDEBUG2(aug_tlx, "read timer expiry");
-        session_->rdexpire(sock_, ms);
+        session_.rdexpire(sock_, ms);
     } else if (wrtimer_.id() == id) {
         AUG_CTXDEBUG2(aug_tlx, "write timer expiry");
-        session_->wrexpire(sock_, ms);
+        session_.wrexpire(sock_, ms);
     } else
         assert(0);
 }
@@ -128,7 +128,7 @@ rwtimer::~rwtimer() AUG_NOTHROW
 {
 }
 
-rwtimer::rwtimer(const sessionptr& session, mod_handle& sock,
+rwtimer::rwtimer(session_base& session, mod_handle& sock,
                  aug_timers_t timers)
     : session_(session),
       sock_(sock),
