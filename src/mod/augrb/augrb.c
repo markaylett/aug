@@ -845,8 +845,8 @@ event_(mod_session* ob_, const char* from, const char* type, mod_id id,
                 }
             }
         }
-        funcall4_(import->module_, eventid_, INT2FIX(id), rb_str_new2(from),
-                  rb_str_new2(type), x);
+        funcall4_(import->module_, eventid_, rb_str_new2(from),
+                  rb_str_new2(type), INT2FIX(id), x);
     }
 }
 
