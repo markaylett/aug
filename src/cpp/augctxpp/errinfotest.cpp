@@ -42,7 +42,7 @@ namespace {
             err_.reset(this);
         }
     public:
-        smartob<aug_object>
+        objectptr
         cast_(const char* id) AUG_NOTHROW
         {
             if (equalid<aug_object>(id) || equalid<aug_stream>(id))
@@ -82,7 +82,7 @@ namespace {
             aug_seterrinfo(&dst, __FILE__, __LINE__, "aug", AUG_EASSERT,
                            "some error");
         }
-        static smartob<aug_stream>
+        static streamptr
         create()
         {
             test* ptr = new (tlx) test();

@@ -60,7 +60,7 @@ namespace {
         {
             // Sticky events not required for fixed length blocking read.
 
-            pair<int, smartob<aug_object> > event(aug::readevent(events_));
+            pair<int, objectptr> event(aug::readevent(events_));
 
             switch (event.first) {
             case AUG_EVENTRECONF:
@@ -96,7 +96,7 @@ namespace {
 
             insertchan(chans_, ob);
         }
-        smartob<aug_object>
+        objectptr
         cast_(const char* id) AUG_NOTHROW
         {
             if (equalid<aug_object>(id) || equalid<aug_chandler>(id))

@@ -48,7 +48,7 @@ namespace aug {
             {
                 blob_.reset(this);
             }
-            aug::smartob<aug_object>
+            objectptr
             cast_(const char* id) AUG_NOTHROW
             {
                 if (aug::equalid<aug_object>(id)

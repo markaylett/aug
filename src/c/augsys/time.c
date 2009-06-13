@@ -30,6 +30,7 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 #include "augctx/errno.h"
 
+#if !HAVE_TIMEGM
 static long
 timezone_(void)
 {
@@ -38,6 +39,7 @@ timezone_(void)
     aug_release(clock);
 	return tz;
 }
+#endif /* !HAVE_TIMEGM */
 
 AUGSYS_API aug_time
 aug_timegm(struct tm* tm)

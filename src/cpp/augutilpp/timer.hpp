@@ -84,7 +84,7 @@ namespace aug {
     unsigned
     settimer(aug_timers_t timers, idref ref, unsigned ms, T& x)
     {
-        aug::smartob<aug_boxptr> ob(createboxptr(getmpool(aug_tlx), &x, 0));
+        boxptrptr ob(createboxptr(getmpool(aug_tlx), &x, 0));
         return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms,
                                               timermemcb<T>, ob.base())));
     }
@@ -93,7 +93,7 @@ namespace aug {
     unsigned
     settimer(aug_timers_t timers, idref ref, unsigned ms, std::auto_ptr<T>& x)
     {
-        aug::smartob<aug_boxptr> ob(createboxptr(getmpool(aug_tlx), x));
+        boxptrptr ob(createboxptr(getmpool(aug_tlx), x));
         return AUG_RESULT(verify(aug_settimer(timers, ref.get(), ms,
                                               timermemcb<T>, ob.base())));
     }

@@ -53,7 +53,7 @@ main(int argc, char* argv[])
 
         const string s("some test data");
 
-        smartob<aug_blob> smart(blob_wrapper<sblob>::create(s));
+        blobptr smart(blob_wrapper<sblob>::create(s));
         test(smart, s);
 
         if (null == smart)

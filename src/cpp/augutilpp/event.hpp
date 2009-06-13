@@ -38,7 +38,7 @@
 
 namespace aug {
 
-    inline std::pair<int, aug::smartob<aug_object> >
+    inline std::pair<int, objectptr>
     readevent(aug_events_t events)
     {
         aug_event event;
@@ -54,7 +54,7 @@ namespace aug {
     }
 
     inline void
-    writeevent(aug_events_t events, int type, aug::obref<aug_object> ob)
+    writeevent(aug_events_t events, int type, objectref ob)
     {
         aug_event event = { type, ob.get() };
         writeevent(events, event);

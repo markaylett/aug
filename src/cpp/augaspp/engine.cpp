@@ -54,7 +54,7 @@ namespace {
     class msgevent : public msg_base<msgevent> {
         unsigned id_;
         const string from_, to_, type_;
-        smartob<aug_object> payload_;
+        objectptr payload_;
         msgevent(unsigned id, const string& from, const string& to,
                  const string& type)
             : id_(id),
@@ -99,7 +99,7 @@ namespace {
         {
             return payload_;
         }
-        static smartob<aug_msg>
+        static msgptr
         create(unsigned id, const string& from, const string& to,
                const string& type)
         {
@@ -126,7 +126,7 @@ namespace aug {
 
         struct sessiontimer : mpool_ops {
             sessionptr session_;
-            smartob<aug_object> ob_;
+            objectptr ob_;
             sessiontimer(const sessionptr& session, objectref ob)
                 : session_(session),
                   ob_(object_retain(ob))
@@ -199,7 +199,7 @@ namespace aug {
                 gettimeofday(now_);
                 setmdeventmask(muxer_, eventsmd(events_), AUG_MDEVENTRDEX);
             }
-            smartob<aug_object>
+            objectptr
             cast_(const char* id) AUG_NOTHROW
             {
                 if (equalid<aug_object>(id) || equalid<aug_chandler>(id))
@@ -363,8 +363,8 @@ namespace aug {
                     // Allow grace period before forcefully stopping the
                     // application.
 
-                    smartob<aug_boxptr> ob
-                        (createboxptr(aug_getmpool(aug_tlx), this, 0));
+                    boxptrptr ob(createboxptr(aug_getmpool(aug_tlx), this,
+                                              0));
                     grace_.set(15000, timermemcb<engineimpl,
                                &engineimpl::stopcb>, ob);
                 }
@@ -376,8 +376,7 @@ namespace aug {
 
                 // Sticky events not required for fixed length blocking read.
 
-                pair<int, smartob<aug_object> >
-                    event(aug::readevent(events_));
+                pair<int, objectptr> event(aug::readevent(events_));
 
                 switch (event.first) {
                 case AUG_EVENTRECONF:
@@ -402,13 +401,12 @@ namespace aug {
                 case POSTEVENT_:
                     AUG_CTXDEBUG2(aug_tlx, "received POSTEVENT_");
                     {
-                        smartob<aug_msg> msg
-                            (object_cast<aug_msg>(event.second));
+                        msgptr msg(object_cast<aug_msg>(event.second));
 
                         vector<sessionptr> sessions;
                         sessions_.getbygroup(sessions, getmsgto(msg));
 
-                        smartob<aug_object> payload(getmsgpayload(msg));
+                        objectptr payload(getmsgpayload(msg));
                         vector<sessionptr>
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
@@ -603,7 +601,7 @@ engine::post(const char* sname, const char* to, const char* type, mod_id id,
 {
     // Thread-safe.
 
-    smartob<aug_msg> msg(msgevent::create(id, sname, to, type));
+    msgptr msg(msgevent::create(id, sname, to, type));
     setmsgpayload(msg, ob);
     aug_event e;
     e.type_ = POSTEVENT_;
@@ -758,7 +756,7 @@ AUGASPP_API mod_id
 engine::settimer(const char* sname, unsigned ms, objectref ob)
 {
     mod_id id(aug_nextid());
-    smartob<aug_boxptr> local(createboxptr(getmpool(aug_tlx), impl_, 0));
+    boxptrptr local(createboxptr(getmpool(aug_tlx), impl_, 0));
 
     aug::settimer(impl_->timers_, id, ms, timermemcb<detail::engineimpl,
                   &detail::engineimpl::timercb>, local);

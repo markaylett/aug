@@ -121,8 +121,7 @@ namespace test {
 
             // Sticky events not required for fixed length blocking read.
 
-            pair<int, smartob<aug_object> >
-                event(aug::readevent(aug_events()));
+            pair<int, objectptr> event(aug::readevent(aug_events()));
 
             switch (event.first) {
             case AUG_EVENTRECONF:

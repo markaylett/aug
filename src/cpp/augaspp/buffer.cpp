@@ -75,7 +75,7 @@ buffer::append(const void* buf, size_t len)
         // External blobs are being written so the buffer will need to be
         // converted to a blob.
 
-        smartob<aug_blob> blob(createblob(getmpool(aug_tlx), buf, len));
+        blobptr blob(createblob(getmpool(aug_tlx), buf, len));
         appendwriter(writer_, blob);
     }
 
