@@ -113,7 +113,7 @@ namespace {
         {
         }
         void
-        timercb(int id, unsigned& ms)
+        timercb(aug_id id, unsigned& ms)
         {
             if (idref(id) == hbwait_.id()) {
 

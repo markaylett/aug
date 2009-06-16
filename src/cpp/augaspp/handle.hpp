@@ -102,7 +102,7 @@ namespace aug {
         {
             aug_assign(handle_.ob_, 0);
         }
-        handle(unsigned id, objectref ob)
+        handle(aug_id id, objectref ob)
         {
             handle_.id_ = id;
             handle_.ob_ = ob.get();

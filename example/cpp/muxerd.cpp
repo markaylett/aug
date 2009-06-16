@@ -185,7 +185,7 @@ namespace test {
             timer_.set(5000, *this);
         }
         void
-        timercb(int id, unsigned& ms)
+        timercb(aug_id id, unsigned& ms)
         {
             ms = 0; // Cancel.
 
@@ -252,13 +252,13 @@ namespace test {
         {
         }
         aug_bool
-        authchan_(unsigned id, const char* subject,
+        authchan_(aug_id id, const char* subject,
                   const char* issuer) AUG_NOTHROW
         {
             return AUG_TRUE;
         }
         void
-        clearchan_(unsigned id) AUG_NOTHROW
+        clearchan_(aug_id id) AUG_NOTHROW
         {
             aug_ctxinfo(aug_tlx, "clearing connection");
             sessions_.erase(id);
@@ -279,7 +279,7 @@ namespace test {
         aug_bool
         readychan_(chanref chan, unsigned short events) AUG_NOTHROW
         {
-            const unsigned id(getchanid(chan));
+            const aug_id id(getchanid(chan));
             streamptr stream(object_cast<aug_stream>(chan));
             sessionptr sess(sessions_[id]);
 

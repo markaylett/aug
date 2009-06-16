@@ -60,7 +60,7 @@ namespace aug {
     public:
         ~listener() AUG_NOTHROW;
 
-        listener(const sessionptr& session, unsigned id, objectref ob);
+        listener(const sessionptr& session, aug_id id, objectref ob);
     };
 
     typedef smartptr<listener> listenerptr;

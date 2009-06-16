@@ -80,7 +80,7 @@ aug_insertchan(aug_chans_t chans, aug_chan* ob);
  */
 
 AUGNET_API aug_result
-aug_removechan(aug_chans_t chans, unsigned id);
+aug_removechan(aug_chans_t chans, aug_id id);
 
 /**
  * Find first matching @a id in @a chans list.
@@ -92,7 +92,7 @@ aug_removechan(aug_chans_t chans, unsigned id);
  */
 
 AUGNET_API aug_chan*
-aug_findchan(aug_chans_t chans, unsigned id);
+aug_findchan(aug_chans_t chans, aug_id id);
 
 /**
  * Process each channel.

@@ -46,7 +46,8 @@ socks::erase(mod_id id)
 {
     container::iterator it(socks_.find(id));
     if (it != socks_.end()) {
-        AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%u]", id);
+        AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%d]",
+                      static_cast<int>(id));
         socks_.erase(it);
     }
 }
@@ -54,14 +55,16 @@ socks::erase(mod_id id)
 void
 socks::erase(const sock_base& sock)
 {
-    AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%u]", sock.id());
+    AUG_CTXDEBUG2(aug_tlx, "removing sock: id=[%d]",
+                  static_cast<int>(sock.id()));
     socks_.erase(sock.id());
 }
 
 void
 socks::insert(const sockptr& sock)
 {
-    AUG_CTXDEBUG2(aug_tlx, "adding sock: id=[%u]", sock->id());
+    AUG_CTXDEBUG2(aug_tlx, "adding sock: id=[%d]",
+                  static_cast<int>(sock->id()));
     socks_.insert(make_pair(sock->id(), sock));
 }
 
@@ -73,7 +76,8 @@ socks::teardown(chans& chans, const aug_timeval& now)
     container::const_iterator it(socks_.begin()), end(socks_.end());
     for (; it != end; ++it) {
 
-        AUG_CTXDEBUG2(aug_tlx, "teardown: id=[%u]", it->first);
+        AUG_CTXDEBUG2(aug_tlx, "teardown: id=[%d]",
+                      static_cast<int>(it->first));
 
         try {
             connptr cptr(smartptr_cast<conn_base>(it->second));
@@ -110,6 +114,7 @@ socks::get(mod_id id) const
     container::const_iterator it(socks_.find(id));
     if (it == socks_.end())
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                        AUG_MSG("sock not found: id=[%u]"), id);
+                        AUG_MSG("sock not found: id=[%d]"),
+                        static_cast<int>(id));
     return it->second;
 }

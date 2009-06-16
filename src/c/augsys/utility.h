@@ -44,12 +44,13 @@ aug_memfrob(void* dst, size_t size);
 /**
  * Get next process-unique id.
  *
- * Thread-safe.  Cannot fail.  Will loop when #INT_MAX is reached.
+ * Thread-safe.  Cannot fail.  Will loop when #INT_MAX is reached.  Guarantees
+ * the following relationship: 0 < id <= #INT_MAX.
  *
  * @return Next id.
  */
 
-AUGSYS_API unsigned
+AUGSYS_API aug_id
 aug_nextid(void);
 
 AUGSYS_API long

@@ -34,13 +34,13 @@
   <interface name="chandler">
 
     <method name="auth" type="aug_bool" qname="authchan">
-      <param name="id" type="unsigned"/>
+      <param name="id" type="aug_id"/>
       <param name="subject" type="const char*"/>
       <param name="issuer" type="const char*"/>
     </method>
 
     <method name="clear" type="void" qname="clearchan">
-      <param name="id" type="unsigned"/>
+      <param name="id" type="aug_id"/>
     </method>
 
     <method name="error" type="void" qname="errorchan">
@@ -50,7 +50,7 @@
 
     <method name="estab" type="aug_bool" qname="estabchan">
       <param name="chan" type="aug_chan" object="true"/>
-      <param name="parent" type="unsigned"/>
+      <param name="parent" type="aug_id"/>
     </method>
 
     <method name="ready" type="aug_bool" qname="readychan">
@@ -75,7 +75,7 @@
       <param name="wantwr" type="aug_bool"/>
     </method>
 
-    <method name="getid" type="unsigned" qname="getchanid"/>
+    <method name="getid" type="aug_id" qname="getchanid"/>
 
     <method name="getname" type="char*" verify="true" qname="getchanname">
       <param name="dst" type="char*"/>

@@ -59,8 +59,8 @@ listener::do_shutdown(chanref chan, unsigned flags, const aug_timeval& now)
     if (SHUTDOWN <= state_)
         return; // Already shutdown.
 
-    aug_ctxinfo(aug_tlx, "shutting listener: id=[%u], flags=[%u]",
-                sock_.id(), flags);
+    aug_ctxinfo(aug_tlx, "shutting listener: id=[%d], flags=[%u]",
+                static_cast<int>(sock_.id()), flags);
 
     state_ = CLOSED;
     closechan(chan);
@@ -79,7 +79,7 @@ listener::~listener() AUG_NOTHROW
     } AUG_PERRINFOCATCH;
 }
 
-listener::listener(const sessionptr& session, unsigned id, objectref ob)
+listener::listener(const sessionptr& session, aug_id id, objectref ob)
     : session_(session),
       sock_(id, ob),
       state_(LISTENING)

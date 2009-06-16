@@ -112,13 +112,13 @@ namespace {
         {
         }
         aug_bool
-        authchan_(unsigned id, const char* subject,
+        authchan_(aug_id id, const char* subject,
                   const char* issuer) AUG_NOTHROW
         {
             return AUG_TRUE;
         }
         void
-        clearchan_(unsigned id) AUG_NOTHROW
+        clearchan_(aug_id id) AUG_NOTHROW
         {
             aug_ctxinfo(aug_tlx, "clear connection");
         }
@@ -130,19 +130,19 @@ namespace {
         aug_bool
         estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
         {
-            const unsigned id(getchanid(chan));
+            const aug_id id(getchanid(chan));
 
-            aug_ctxinfo(aug_tlx, "id: %u", id);
+            aug_ctxinfo(aug_tlx, "id: %d", (int)id);
             aug_ctxinfo(aug_tlx, "new connection");
             return AUG_TRUE;
         }
         aug_bool
         readychan_(chanref chan, unsigned short events) AUG_NOTHROW
         {
-            const unsigned id(getchanid(chan));
+            const aug_id id(getchanid(chan));
             streamptr stream(object_cast<aug_stream>(chan));
 
-            aug_ctxinfo(aug_tlx, "id: %u", id);
+            aug_ctxinfo(aug_tlx, "id: %d", (int)id);
             if (events & AUG_MDEVENTRD) {
                 char buf[1024];
                 ssize_t n = read(stream, buf, sizeof(buf) - 1);

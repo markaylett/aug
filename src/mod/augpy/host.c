@@ -89,7 +89,7 @@ post_(PyObject* self, PyObject* args)
 
     /* The object's reference count is not increased. */
 
-    if (!PyArg_ParseTuple(args, "ssI|O:post", &to, &type, &id, &ob))
+    if (!PyArg_ParseTuple(args, "ssi|O:post", &to, &type, &id, &ob))
         return NULL;
 
     if (ob && ob != Py_None) {
@@ -133,7 +133,7 @@ dispatch_(PyObject* self, PyObject* args)
 
     /* The object's reference count is not increased. */
 
-    if (!PyArg_ParseTuple(args, "ssI|O:dispatch", &to, &type, &id, &ob))
+    if (!PyArg_ParseTuple(args, "ssi|O:dispatch", &to, &type, &id, &ob))
         return NULL;
 
     if (ob && ob != Py_None) {

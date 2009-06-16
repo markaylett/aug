@@ -119,14 +119,14 @@ namespace aug {
     }
 
     struct id_traits {
-        typedef int ref;
+        typedef aug_id ref;
         static int
         bad() AUG_NOTHROW
         {
             return -1;
         }
         static int
-        compare(int lhs, int rhs) AUG_NOTHROW
+        compare(aug_id lhs, aug_id rhs) AUG_NOTHROW
         {
             if (lhs < rhs)
                 return -1;

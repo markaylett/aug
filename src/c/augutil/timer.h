@@ -36,7 +36,7 @@
 #include "augabi.h"
 #include "augtypes.h"
 
-typedef void (*aug_timercb_t)(int, unsigned*, aug_object*);
+typedef void (*aug_timercb_t)(aug_id, unsigned*, aug_object*);
 
 typedef struct aug_timers_* aug_timers_t;
 
@@ -69,7 +69,7 @@ aug_destroytimers(aug_timers_t timers);
  */
 
 AUGUTIL_API aug_rint
-aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
+aug_settimer(aug_timers_t timers, aug_id id, unsigned ms, aug_timercb_t cb,
              aug_object* ob);
 
 /**
@@ -85,7 +85,7 @@ aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
  */
 
 AUGUTIL_API aug_result
-aug_resettimer(aug_timers_t timers, int id, unsigned ms);
+aug_resettimer(aug_timers_t timers, aug_id id, unsigned ms);
 
 /**
  * Cancel timer.
@@ -98,7 +98,7 @@ aug_resettimer(aug_timers_t timers, int id, unsigned ms);
  */
 
 AUGUTIL_API aug_result
-aug_canceltimer(aug_timers_t timers, int id);
+aug_canceltimer(aug_timers_t timers, aug_id id);
 
 /**
  * Check whether timer has expired.
@@ -111,7 +111,7 @@ aug_canceltimer(aug_timers_t timers, int id);
  */
 
 AUGUTIL_API aug_bool
-aug_expired(aug_timers_t timers, int id);
+aug_expired(aug_timers_t timers, aug_id id);
 
 AUGUTIL_API aug_bool
 aug_timersempty(aug_timers_t timers);

@@ -61,15 +61,16 @@ namespace {
         {
         }
         aug_bool
-        authchan_(unsigned id, const char* subject,
+        authchan_(aug_id id, const char* subject,
                   const char* issuer) AUG_NOTHROW
         {
             return AUG_TRUE;
         }
         void
-        clearchan_(unsigned id) AUG_NOTHROW
+        clearchan_(aug_id id) AUG_NOTHROW
         {
-            aug_ctxinfo(aug_tlx, "clearing channel: %u", id);
+            aug_ctxinfo(aug_tlx, "clearing channel: %d",
+                        static_cast<int>(id));
             if (id == wr_)
                 wrchan_ = null;
         }
@@ -87,7 +88,7 @@ namespace {
         aug_bool
         readychan_(chanref chan, unsigned short events) AUG_NOTHROW
         {
-            const unsigned id(getchanid(chan));
+            const aug_id id(getchanid(chan));
             streamptr stream(object_cast<aug_stream>(chan));
 
             if (id == rd_) {

@@ -52,10 +52,10 @@ namespace {
     // Must not use mpool_ops.
 
     class msgevent : public msg_base<msgevent> {
-        unsigned id_;
+        aug_id id_;
         const string from_, to_, type_;
         objectptr payload_;
-        msgevent(unsigned id, const string& from, const string& to,
+        msgevent(aug_id id, const string& from, const string& to,
                  const string& type)
             : id_(id),
               from_(from),
@@ -100,7 +100,7 @@ namespace {
             return payload_;
         }
         static msgptr
-        create(unsigned id, const string& from, const string& to,
+        create(aug_id id, const string& from, const string& to,
                const string& type)
         {
             // Events can be posted between threads.  The event object is
@@ -215,7 +215,7 @@ namespace aug {
             {
             }
             aug_bool
-            authchan_(unsigned id, const char* subject,
+            authchan_(aug_id id, const char* subject,
                       const char* issuer) AUG_NOTHROW
             {
                 chanptr chan(aug::findchan(chans_, id));
@@ -227,14 +227,16 @@ namespace aug {
                 connptr conn(smartptr_cast<conn_base>(sock)); // Downcast.
                 assert(null != conn);
 
-                AUG_CTXDEBUG2(aug_tlx, "auth channel: id=[%u], subject=[%s],"
-                              " issuer=[%s]", id, subject, issuer);
+                AUG_CTXDEBUG2(aug_tlx, "auth channel: id=[%d], subject=[%s],"
+                              " issuer=[%s]", static_cast<int>(id), subject,
+                              issuer);
                 return conn->auth(subject, issuer) ? AUG_TRUE : AUG_FALSE;
             }
             void
-            clearchan_(unsigned id) AUG_NOTHROW
+            clearchan_(aug_id id) AUG_NOTHROW
             {
-                AUG_CTXDEBUG2(aug_tlx, "clear channel: id=[%u]", id);
+                AUG_CTXDEBUG2(aug_tlx, "clear channel: id=[%d]",
+                              static_cast<int>(id));
 
                 // FIXME: listener will not exist after teardown.
 
@@ -244,13 +246,13 @@ namespace aug {
             errorchan_(chanref chan, const aug_errinfo& errinfo) AUG_NOTHROW
             {
                 scoped_current current(current_, chan);
-                const unsigned id(getchanid(chan));
+                const aug_id id(getchanid(chan));
 
                 sockptr sock(socks_.get(id));
                 assert(null != sock);
 
-                AUG_CTXDEBUG2(aug_tlx, "error channel: id=[%u], desc=[%s]",
-                              id, errinfo.desc_);
+                AUG_CTXDEBUG2(aug_tlx, "error channel: id=[%d], desc=[%s]",
+                              static_cast<int>(id), errinfo.desc_);
                 return sock->error(errinfo.desc_);
             }
             aug_bool
@@ -258,8 +260,9 @@ namespace aug {
             {
                 scoped_current current(current_, chan);
 
-                const unsigned id(getchanid(chan));
-                AUG_CTXDEBUG2(aug_tlx, "established channel: id=[%u]", id);
+                const aug_id id(getchanid(chan));
+                AUG_CTXDEBUG2(aug_tlx, "established channel: id=[%d]",
+                              static_cast<int>(id));
 
                 if (id == parent) {
 
@@ -295,8 +298,8 @@ namespace aug {
 
                 string name(conn->peername(chan));
                 AUG_CTXDEBUG2(aug_tlx,
-                              "initialising connection: id=[%u], name=[%s]",
-                              conn->id(), name.c_str());
+                              "initialising connection: id=[%d], name=[%s]",
+                              static_cast<int>(conn->id()), name.c_str());
 
                 // Session may reject the connection by returning false.
 
@@ -311,8 +314,9 @@ namespace aug {
             {
                 scoped_current current(current_, chan);
 
-                const unsigned id(getchanid(chan));
-                AUG_CTXDEBUG2(aug_tlx, "readychannel: id=[%u]", id);
+                const aug_id id(getchanid(chan));
+                AUG_CTXDEBUG2(aug_tlx, "readychannel: id=[%d]",
+                              static_cast<int>(id));
 
                 sockptr sock(socks_.get(id));
                 assert(null != sock);
@@ -320,8 +324,9 @@ namespace aug {
                 assert(null != conn);
 
                 AUG_CTXDEBUG2(aug_tlx,
-                              "processing sock: id=[%u], events=[%u]",
-                              id, static_cast<unsigned>(events));
+                              "processing sock: id=[%d], events=[%u]",
+                              static_cast<int>(id),
+                              static_cast<unsigned>(events));
 
                 bool threw = true;
                 try {
@@ -343,7 +348,7 @@ namespace aug {
                 return CLOSED != conn->state();
             }
             chanptr
-            findchan(unsigned id)
+            findchan(aug_id id)
             {
                 // Avoid lookup if current channel.
 
@@ -725,7 +730,8 @@ engine::setrwtimer(mod_id cid, unsigned ms, unsigned flags)
                        rwtimer_base>(impl_->socks_.get(cid)));
     if (null == rwtimer)
         throw aug_error(__FILE__, __LINE__, AUG_EEXIST,
-                        "connection not found: id=[%u]", cid);
+                        "connection not found: id=[%d]",
+                        static_cast<int>(cid));
     rwtimer->setrwtimer(ms, flags);
 }
 
@@ -736,7 +742,8 @@ engine::resetrwtimer(mod_id cid, unsigned ms, unsigned flags)
                        rwtimer_base>(impl_->socks_.get(cid)));
     if (null == rwtimer)
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                        "connection not found: id=[%u]", cid);
+                        "connection not found: id=[%d]",
+                        static_cast<int>(cid));
 
     return rwtimer->resetrwtimer(ms, flags);
 }
@@ -748,7 +755,8 @@ engine::cancelrwtimer(mod_id cid, unsigned flags)
                        rwtimer_base>(impl_->socks_.get(cid)));
     if (null == rwtimer)
         throw aug_error(__FILE__, __LINE__, AUG_ESTATE,
-                        "connection not found: id=[%u]", cid);
+                        "connection not found: id=[%d]",
+                        static_cast<int>(cid));
     return rwtimer->cancelrwtimer(flags);
 }
 

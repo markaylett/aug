@@ -54,6 +54,13 @@ typedef int aug_bool;
 /** @} */
 
 /**
+ * Descriptor type.  Negative values may have special meanings, such as -1 to
+ * mean bad descriptor.
+ */
+
+typedef int aug_id;
+
+/**
  * Equivalent to socklen_t.
  */
 

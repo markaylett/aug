@@ -337,8 +337,8 @@ namespace {
     {
         const char* sname(getsession().name());
         AUG_CTXDEBUG2(aug_tlx,
-                      "post(): sname=[%s], to=[%s], type=[%s], id=[%u]",
-                      sname, to, type, id);
+                      "post(): sname=[%s], to=[%s], type=[%s], id=[%d]",
+                      sname, to, type, static_cast<int>(id));
         try {
             impl_->engine_.post(sname, to, type, id, ob);
             return MOD_SUCCESS;
@@ -352,8 +352,8 @@ namespace {
     {
         const char* sname(getsession().name());
         AUG_CTXDEBUG2(aug_tlx,
-                      "dispatch(): sname=[%s], to=[%s], type=[%s], id=[%u]",
-                      sname, to, type, id);
+                      "dispatch(): sname=[%s], to=[%s], type=[%s], id=[%d]",
+                      sname, to, type, static_cast<int>(id));
         try {
             impl_->engine_.dispatch(sname, to, type, id, ob);
             return MOD_SUCCESS;
@@ -388,7 +388,8 @@ namespace {
     mod_result
     shutdown_(mod_id cid, unsigned flags)
     {
-        AUG_CTXDEBUG2(aug_tlx, "shutdown(): id=[%u], flags=[%u]", cid, flags);
+        AUG_CTXDEBUG2(aug_tlx, "shutdown(): id=[%d], flags=[%u]",
+                      static_cast<int>(cid), flags);
         try {
             impl_->engine_.shutdown(cid, flags);
             return MOD_SUCCESS;
@@ -455,7 +456,7 @@ namespace {
     mod_result
     send_(mod_id cid, const void* buf, size_t len)
     {
-        AUG_CTXDEBUG2(aug_tlx, "send(): id=[%u]", cid);
+        AUG_CTXDEBUG2(aug_tlx, "send(): id=[%d]", static_cast<int>(cid));
         try {
             impl_->engine_.send(cid, buf, len);
             return MOD_SUCCESS;
@@ -467,7 +468,7 @@ namespace {
     mod_result
     sendv_(mod_id cid, aug_blob* blob)
     {
-        AUG_CTXDEBUG2(aug_tlx, "sendv(): id=[%u]", cid);
+        AUG_CTXDEBUG2(aug_tlx, "sendv(): id=[%d]", static_cast<int>(cid));
         try {
             impl_->engine_.sendv(cid, blob);
             return MOD_SUCCESS;
@@ -479,8 +480,8 @@ namespace {
     mod_result
     setrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
-        AUG_CTXDEBUG2(aug_tlx, "setrwtimer(): id=[%u], ms=[%u], flags=[%x]",
-                      cid, ms, flags);
+        AUG_CTXDEBUG2(aug_tlx, "setrwtimer(): id=[%d], ms=[%u], flags=[%x]",
+                      static_cast<int>(cid), ms, flags);
         try {
             impl_->engine_.setrwtimer(cid, ms, flags);
             return MOD_SUCCESS;
@@ -492,8 +493,8 @@ namespace {
     mod_result
     resetrwtimer_(mod_id cid, unsigned ms, unsigned flags)
     {
-        AUG_CTXDEBUG2(aug_tlx, "resetrwtimer(): id=[%u], ms=[%u], flags=[%x]",
-                      cid, ms, flags);
+        AUG_CTXDEBUG2(aug_tlx, "resetrwtimer(): id=[%d], ms=[%u], flags=[%x]",
+                      static_cast<int>(cid), ms, flags);
         try {
             return impl_->engine_.resetrwtimer(cid, ms, flags)
                 ? MOD_SUCCESS : MOD_FAILNONE;
@@ -505,8 +506,8 @@ namespace {
     mod_result
     cancelrwtimer_(mod_id cid, unsigned flags)
     {
-        AUG_CTXDEBUG2(aug_tlx, "cancelrwtimer(): id=[%u], flags=[%x]",
-                      cid, flags);
+        AUG_CTXDEBUG2(aug_tlx, "cancelrwtimer(): id=[%d], flags=[%x]",
+                      static_cast<int>(cid), flags);
         try {
             return impl_->engine_.cancelrwtimer(cid, flags)
                 ? MOD_SUCCESS : MOD_FAILNONE;
@@ -530,7 +531,8 @@ namespace {
     mod_result
     resettimer_(mod_id tid, unsigned ms)
     {
-        AUG_CTXDEBUG2(aug_tlx, "resettimer(): id=[%u], ms=[%u]", tid, ms);
+        AUG_CTXDEBUG2(aug_tlx, "resettimer(): id=[%d], ms=[%u]",
+                      static_cast<int>(tid), ms);
         try {
             return impl_->engine_.resettimer(tid, ms)
                 ? MOD_SUCCESS : MOD_FAILNONE;
@@ -542,7 +544,8 @@ namespace {
     mod_result
     canceltimer_(mod_id tid)
     {
-        AUG_CTXDEBUG2(aug_tlx, "canceltimer(): id=[%u]", tid);
+        AUG_CTXDEBUG2(aug_tlx, "canceltimer(): id=[%d]",
+                      static_cast<int>(tid));
         try {
             return impl_->engine_.canceltimer(tid)
                 ? MOD_SUCCESS : MOD_FAILNONE;

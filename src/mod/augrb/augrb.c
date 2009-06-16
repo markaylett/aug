@@ -192,7 +192,7 @@ static mod_id
 checkid_(VALUE handle)
 {
     checkhandle_(handle);
-    return FIX2UINT(rb_iv_get(handle, "@id"));
+    return FIX2INT(rb_iv_get(handle, "@id"));
 }
 
 static VALUE
@@ -231,8 +231,8 @@ cmphandle_(VALUE self, VALUE other)
 
     checkhandle_(other);
 
-    lhs = FIX2UINT(rb_iv_get(self, "@id"));
-    rhs = FIX2UINT(rb_iv_get(other, "@id"));
+    lhs = FIX2INT(rb_iv_get(self, "@id"));
+    rhs = FIX2INT(rb_iv_get(other, "@id"));
 
     if (lhs < rhs)
         ret = -1;
@@ -254,8 +254,8 @@ static VALUE
 handlestr_(VALUE self)
 {
     char sz[64];
-    sprintf(sz, "#<AugRb::Handle:%lx,id=%u>", self,
-            FIX2UINT(rb_iv_get(self, "@id")));
+    sprintf(sz, "#<AugRb::Handle:%lx,id=%d>", self,
+            FIX2INT(rb_iv_get(self, "@id")));
     return rb_str_new2(sz);
 }
 
@@ -363,7 +363,7 @@ post_(int argc, VALUE* argv, VALUE self)
 
     if (ob != Qnil)
         blob = augrb_createblob(StringValue(ob));
-    result = mod_post(RSTRING(to)->ptr, RSTRING(type)->ptr, FIX2UINT(id),
+    result = mod_post(RSTRING(to)->ptr, RSTRING(type)->ptr, FIX2INT(id),
                       (aug_object*)blob);
     if (blob)
         aug_release(blob);
@@ -389,7 +389,7 @@ dispatch_(int argc, VALUE* argv, VALUE self)
 
     if (ob != Qnil)
         blob = augrb_createblob(StringValue(ob));
-    result = mod_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr, FIX2UINT(id),
+    result = mod_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr, FIX2INT(id),
                           (aug_object*)blob);
     if (blob)
         aug_release(blob);

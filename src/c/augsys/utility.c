@@ -45,11 +45,11 @@ aug_memfrob(void* dst, size_t size)
     return dst;
 }
 
-AUGSYS_API unsigned
+AUGSYS_API aug_id
 aug_nextid(void)
 {
-    static unsigned id_ = 1;
-    unsigned id;
+    static aug_id id_ = 1;
+    aug_id id;
 
     aug_lock();
     if (id_ == INT_MAX) {

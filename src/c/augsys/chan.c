@@ -47,7 +47,7 @@ struct impl_ {
     int refs_;
     aug_mpool* mpool_;
     char name_[AUG_MAXCHANNAMELEN + 1];
-    unsigned id_;
+    aug_id id_;
     aug_muxer_t muxer_;
     aug_fd fd_;
     aug_bool init_;

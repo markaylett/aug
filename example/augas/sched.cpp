@@ -217,7 +217,7 @@ namespace {
         {
             mod_id id(getvalue<mod_id>(params, "id"));
 
-            aug_ctxinfo(aug_tlx, "deleting event: id=[%u]", id);
+            aug_ctxinfo(aug_tlx, "deleting event: id=[%d]", (int)id);
             eraseevent(queue_, id);
 
             aug_timeval tv;
@@ -230,7 +230,7 @@ namespace {
             mod_id id(getvalue<mod_id>(params, "id"));
 
             if (id) {
-                aug_ctxinfo(aug_tlx, "updating event: id=[%u]", id);
+                aug_ctxinfo(aug_tlx, "updating event: id=[%d]", (int)id);
                 eraseevent(queue_, id);
             } else {
                 aug_ctxinfo(aug_tlx, "inserting new event");

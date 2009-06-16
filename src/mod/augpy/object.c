@@ -292,8 +292,8 @@ static void
 dealloc_(handle_* self)
 {
     --handles_;
-    mod_writelog(MOD_LOGDEBUG, "deallocated: <augpy.Handle at %p, id=%u>",
-                 (void*)self, self->id_);
+    mod_writelog(MOD_LOGDEBUG, "deallocated: <augpy.Handle at %p, id=%d>",
+                 (void*)self, (int)self->id_);
 
     clear_(self);
     self->ob_type->tp_free((PyObject*)self);
@@ -315,8 +315,8 @@ compare_(handle_* lhs, handle_* rhs)
 static PyObject*
 repr_(handle_* self)
 {
-    return PyString_FromFormat("<augpy.Handle at %p, id=%u>",
-                               (void*)self, self->id_);
+    return PyString_FromFormat("<augpy.Handle at %p, id=%d>",
+                               (void*)self, (int)self->id_);
 }
 
 static long
@@ -324,13 +324,13 @@ hash_(handle_* self)
 {
     /* Must not return -1. */
 
-    return self->id_;
+    return -1 == self->id_ ? 0 : self->id_;
 }
 
 static PyObject*
 str_(handle_* self)
 {
-    return PyString_FromFormat("%u", self->id_);
+    return PyString_FromFormat("%d", (int)self->id_);
 }
 
 static int
@@ -354,7 +354,7 @@ init_(handle_* self, PyObject* args, PyObject* kwds)
 
     static char* kwlist[] = { "id", "ob", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "I|O", kwlist, &self->id_,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i|O", kwlist, &self->id_,
                                      &ob))
         return -1;
 
@@ -383,15 +383,15 @@ new_(PyTypeObject* type, PyObject* args, PyObject* kwds)
     }
 
     ++handles_;
-    mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%u>",
-                 (void*)self, self->id_);
+    mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
+                 (void*)self, (int)self->id_);
     return (PyObject*)self;
 }
 
 static PyObject*
 getid_(handle_* self, void *closure)
 {
-    return Py_BuildValue("I", self->id_);
+    return Py_BuildValue("i", self->id_);
 }
 
 static PyGetSetDef getset_[] = {
@@ -469,8 +469,8 @@ augpy_createhandle(PyTypeObject* type, mod_id id, PyObject* ob)
     self->ob_ = ob;
 
     ++handles_;
-    mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%u>",
-                 (void*)self, self->id_);
+    mod_writelog(MOD_LOGDEBUG, "allocated: <augpy.Handle at %p, id=%d>",
+                 (void*)self, (int)self->id_);
     return (PyObject*)self;
 }
 

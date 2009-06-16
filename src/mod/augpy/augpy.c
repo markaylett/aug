@@ -360,7 +360,7 @@ event_(mod_session* ob_, const char* from, const char* type, mod_id id,
             PyObject* x = augpy_obtopy(ob);
             if (x) {
 
-                y = PyObject_CallFunction(import->event_, "ssIO", from, type,
+                y = PyObject_CallFunction(import->event_, "ssiO", from, type,
                                           id, x);
                 Py_DECREF(x);
                 goto done;
@@ -381,7 +381,7 @@ event_(mod_session* ob_, const char* from, const char* type, mod_id id,
 
                         /* Blob data obtained. */
 
-                        y = PyObject_CallFunction(import->event_, "ssIz#",
+                        y = PyObject_CallFunction(import->event_, "ssiz#",
                                                   from, type, id,
                                                   (const char*)data, size);
                         aug_release(blob);
@@ -394,7 +394,7 @@ event_(mod_session* ob_, const char* from, const char* type, mod_id id,
 
         /* Null or unsupported object type. */
 
-        y = PyObject_CallFunction(import->event_, "ssIO", from, type,
+        y = PyObject_CallFunction(import->event_, "ssiO", from, type,
                                   id, Py_None);
 
     done:

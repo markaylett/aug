@@ -41,7 +41,7 @@ struct ssl_ctx_st;
 
 struct aug_ssldata {
     aug_chandler* handler_;
-    unsigned id_;
+    aug_id id_;
 };
 
 AUGNET_API void
@@ -59,7 +59,7 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
  */
 
 AUGNET_API aug_chan*
-aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
+aug_createsslclient(aug_mpool* mpool, aug_id id, aug_muxer_t muxer,
                     aug_sd sd, aug_bool wantwr, aug_chandler* handler,
                     struct ssl_ctx_st* sslctx);
 
@@ -74,7 +74,7 @@ aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
  */
 
 AUGNET_API aug_chan*
-aug_createsslserver(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
+aug_createsslserver(aug_mpool* mpool, aug_id id, aug_muxer_t muxer,
                     aug_sd sd, aug_bool wantwr, aug_chandler* handler,
                     struct ssl_ctx_st* sslctx);
 

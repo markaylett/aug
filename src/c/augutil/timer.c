@@ -40,7 +40,7 @@ AUG_RCSID("$Id$");
 
 struct timer_ {
     AUG_ENTRY(timer_);
-    int id_;
+    aug_id id_;
     unsigned ms_;
     struct aug_timeval tv_;
     aug_timercb_t cb_;
@@ -142,7 +142,7 @@ aug_destroytimers(aug_timers_t timers)
 }
 
 AUGUTIL_API aug_rint
-aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
+aug_settimer(aug_timers_t timers, aug_id id, unsigned ms, aug_timercb_t cb,
              aug_object* ob)
 {
     struct aug_timeval tv;
@@ -169,7 +169,7 @@ aug_settimer(aug_timers_t timers, int id, unsigned ms, aug_timercb_t cb,
 }
 
 AUGUTIL_API aug_result
-aug_resettimer(aug_timers_t timers, int id, unsigned ms)
+aug_resettimer(aug_timers_t timers, aug_id id, unsigned ms)
 {
     struct timer_* it, ** prev;
 
@@ -202,7 +202,7 @@ aug_resettimer(aug_timers_t timers, int id, unsigned ms)
 }
 
 AUGUTIL_API aug_result
-aug_canceltimer(aug_timers_t timers, int id)
+aug_canceltimer(aug_timers_t timers, aug_id id)
 {
     struct timer_* it, ** prev;
 
@@ -224,7 +224,7 @@ aug_canceltimer(aug_timers_t timers, int id)
 }
 
 AUGUTIL_API aug_bool
-aug_expired(aug_timers_t timers, int id)
+aug_expired(aug_timers_t timers, aug_id id)
 {
     struct timer_* it;
     AUG_FOREACH(it, &timers->list_)

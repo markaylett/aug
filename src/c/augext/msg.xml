@@ -27,7 +27,7 @@
     <method name="setpayload" type="void" qname="setmsgpayload">
       <param name="payload" type="aug_object" object="true"/>
     </method>
-    <method name="getid" type="unsigned" qname="getmsgid"/>
+    <method name="getid" type="aug_id" qname="getmsgid"/>
     <method name="getfrom" type="const char*" qname="getmsgfrom"/>
     <method name="getto" type="const char*" qname="getmsgto"/>
     <method name="gettype" type="const char*" qname="getmsgtype"/>

@@ -56,7 +56,7 @@ namespace aug {
     }
 
     inline chanptr
-    createplain(mpoolref mpool, unsigned id, aug_muxer_t muxer, sdref sd,
+    createplain(mpoolref mpool, aug_id id, aug_muxer_t muxer, sdref sd,
                 unsigned short mask)
     {
         return object_attach<aug_chan>

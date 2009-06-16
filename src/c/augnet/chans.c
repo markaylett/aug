@@ -54,9 +54,9 @@ static void
 release_(aug_chans_t chans, struct entry_* it)
 {
     aug_chan* ob = it->ob_;
-    unsigned id = aug_getchanid(ob);
+    aug_id id = aug_getchanid(ob);
 
-    AUG_CTXDEBUG3(aug_tlx, "releasing channel: %u", id);
+    AUG_CTXDEBUG3(aug_tlx, "releasing channel: %d", (int)id);
     --chans->size_;
     it->ob_ = NULL;
 
@@ -145,7 +145,7 @@ aug_insertchan(aug_chans_t chans, aug_chan* ob)
     if (!entry)
         return AUG_FAILERROR;
 
-    AUG_CTXDEBUG3(aug_tlx, "retaining channel: %u", aug_getchanid(ob));
+    AUG_CTXDEBUG3(aug_tlx, "retaining channel: %d", (int)aug_getchanid(ob));
 
     entry->ob_ = ob;
     aug_retain(ob);
@@ -156,7 +156,7 @@ aug_insertchan(aug_chans_t chans, aug_chan* ob)
 }
 
 AUGNET_API aug_result
-aug_removechan(aug_chans_t chans, unsigned id)
+aug_removechan(aug_chans_t chans, aug_id id)
 {
     /* Locate the matching entry. */
 
@@ -203,7 +203,7 @@ aug_removechan(aug_chans_t chans, unsigned id)
 }
 
 AUGNET_API aug_chan*
-aug_findchan(aug_chans_t chans, unsigned id)
+aug_findchan(aug_chans_t chans, aug_id id)
 {
     /* Locate the matching entry. */
 
@@ -261,8 +261,8 @@ aug_processchans(aug_chans_t chans)
             continue;
         }
 
-        AUG_CTXDEBUG3(aug_tlx, "processing channel: entry=[%p], id=[%u]", it,
-                      aug_getchanid(ob));
+        AUG_CTXDEBUG3(aug_tlx, "processing channel: entry=[%p], id=[%d]", it,
+                      (int)aug_getchanid(ob));
 
         /* Note: the current entry may be marked for removal during this
            call.  Lock during call. */
@@ -273,8 +273,8 @@ aug_processchans(aug_chans_t chans)
 
         if (fork) {
 
-            AUG_CTXDEBUG3(aug_tlx, "forking new channel: id=[%u]",
-                          aug_getchanid(ob));
+            AUG_CTXDEBUG3(aug_tlx, "forking new channel: id=[%d]",
+                          (int)aug_getchanid(ob));
 
             /* The forked channel is inserted at the head of the list, this
                avoids visitation of the new channel during the current
@@ -303,9 +303,9 @@ aug_processchans(aug_chans_t chans)
 
         if (!it->ob_) {
 
-            unsigned id = aug_getchanid(ob);
+            aug_id id = aug_getchanid(ob);
 
-            AUG_CTXDEBUG3(aug_tlx, "releasing channel: %u", id);
+            AUG_CTXDEBUG3(aug_tlx, "releasing channel: %d", (int)id);
             --chans->size_;
 
             /* Notify after entry has been removed. */
@@ -337,8 +337,8 @@ aug_dumpchans(aug_chans_t chans)
     AUG_FOREACH(it, &chans->list_) {
 
         if (it->ob_)
-            aug_ctxinfo(aug_tlx, "active: entry=[%p], id=[%u]", it,
-                        aug_getchanid(it->ob_));
+            aug_ctxinfo(aug_tlx, "active: entry=[%p], id=[%d]", it,
+                        (int)aug_getchanid(it->ob_));
         else
             aug_ctxinfo(aug_tlx, "trash: entry=[%p]", it);
     }

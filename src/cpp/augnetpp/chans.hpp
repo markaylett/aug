@@ -37,13 +37,13 @@ namespace aug {
     }
 
     inline void
-    removechan(aug_chans_t chans, unsigned id)
+    removechan(aug_chans_t chans, aug_id id)
     {
         verify(aug_removechan(chans, id));
     }
 
     inline chanptr
-    findchan(aug_chans_t chans, unsigned id)
+    findchan(aug_chans_t chans, aug_id id)
     {
         return object_attach<aug_chan>(aug_findchan(chans, id));
     }

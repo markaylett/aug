@@ -212,7 +212,7 @@ namespace test {
         }
 
         void
-        timercb(int id, unsigned& ms)
+        timercb(aug_id id, unsigned& ms)
         {
             aug_ctxinfo(aug_tlx, "timer fired");
             --remain_;

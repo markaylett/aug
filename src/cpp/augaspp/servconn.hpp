@@ -107,7 +107,7 @@ namespace aug {
         ~servconn() AUG_NOTHROW;
 
         servconn(mpoolref mpool, const sessionptr& session,
-                 aug_timers_t timers, unsigned id, objectref ob);
+                 aug_timers_t timers, aug_id id, objectref ob);
     };
 }
 

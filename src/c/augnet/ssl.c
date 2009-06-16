@@ -280,7 +280,7 @@ shutwr_(struct impl_* impl, struct aug_errinfo* errinfo)
 {
     int ret;
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: shutdown: id=[%u]", impl->data_.id_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: shutdown: id=[%d]", (int)impl->data_.id_);
     ret = SSL_shutdown(impl->ssl_);
     aug_sshutdown(impl->sticky_.md_, SHUT_WR);
 
@@ -517,8 +517,8 @@ close_(struct impl_* impl)
 {
     aug_sd sd = impl->sticky_.md_;
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: clearing io-event mask: id=[%u]",
-                  impl->data_.id_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: clearing io-event mask: id=[%d]",
+                  (int)impl->data_.id_);
 
     /* Descriptor will be reset to AUG_BADMD. */
 
@@ -586,7 +586,8 @@ static aug_result
 cclose_(aug_chan* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
-    AUG_CTXDEBUG3(aug_tlx, "SSL: closing file: id=[%u]", impl->data_.id_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: closing file: id=[%d]",
+                  (int)impl->data_.id_);
     return close_(impl);
 }
 
@@ -676,8 +677,8 @@ csetwantwr_(aug_chan* ob, aug_bool wantwr)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: set wantwr: id=[%u], wr=[%d]",
-                  impl->data_.id_, (int)wantwr);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: set wantwr: id=[%d], wr=[%d]",
+                  (int)impl->data_.id_, (int)wantwr);
 
     impl->wantwr_ = wantwr;
     return AUG_SUCCESS;
@@ -800,8 +801,8 @@ sread_(aug_stream* ob, void* buf, size_t size)
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
                                    EWOULDBLOCK);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: chan read from input buffer: id=[%u]",
-                  impl->data_.id_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: chan read from input buffer: id=[%d]",
+                  (int)impl->data_.id_);
 
     ret = (ssize_t)readbuf_(&impl->inbuf_, buf, size);
     setmask_(impl);
@@ -835,8 +836,8 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
                                    EWOULDBLOCK);
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: chan readv from input buffer: id=[%u]",
-                  impl->data_.id_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: chan readv from input buffer: id=[%d]",
+                  (int)impl->data_.id_);
 
     ret = (ssize_t)readbufv_(&impl->inbuf_, iov, size);
     setmask_(impl);
@@ -863,8 +864,8 @@ swrite_(aug_stream* ob, const void* buf, size_t size)
                                    WSAESHUTDOWN);
 #endif /* _WIN32 */
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: chan write to output buffer: id=[%u]",
-                  impl->data_.id_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: chan write to output buffer: id=[%d]",
+                  (int)impl->data_.id_);
 
     ret = (ssize_t)writebuf_(&impl->outbuf_, buf, size);
     setmask_(impl);
@@ -891,8 +892,8 @@ swritev_(aug_stream* ob, const struct iovec* iov, int size)
                                    WSAESHUTDOWN);
 #endif /* _WIN32 */
 
-    AUG_CTXDEBUG3(aug_tlx, "SSL: chan writev to output buffer: id=[%u]",
-                  impl->data_.id_);
+    AUG_CTXDEBUG3(aug_tlx, "SSL: chan writev to output buffer: id=[%d]",
+                  (int)impl->data_.id_);
 
     ret = (ssize_t)writebufv_(&impl->outbuf_, iov, size);
     setmask_(impl);
@@ -911,7 +912,7 @@ static const struct aug_streamvtbl svtbl_ = {
 };
 
 static struct impl_*
-createssl_(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
+createssl_(aug_mpool* mpool, aug_id id, aug_muxer_t muxer, aug_sd sd,
            aug_bool wantwr, aug_chandler* handler, struct ssl_ctx_st* sslctx)
 {
     struct impl_* impl;
@@ -981,7 +982,7 @@ aug_setsslerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 }
 
 AUGNET_API aug_chan*
-aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
+aug_createsslclient(aug_mpool* mpool, aug_id id, aug_muxer_t muxer,
                     aug_sd sd, aug_bool wantwr, aug_chandler* handler,
                     struct ssl_ctx_st* sslctx)
 {
@@ -995,7 +996,7 @@ aug_createsslclient(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
 }
 
 AUGNET_API aug_chan*
-aug_createsslserver(aug_mpool* mpool, unsigned id, aug_muxer_t muxer,
+aug_createsslserver(aug_mpool* mpool, aug_id id, aug_muxer_t muxer,
                     aug_sd sd, aug_bool wantwr, aug_chandler* handler,
                     struct ssl_ctx_st* sslctx)
 {

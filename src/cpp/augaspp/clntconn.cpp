@@ -150,7 +150,7 @@ clntconn::~clntconn() AUG_NOTHROW
 }
 
 clntconn::clntconn(mpoolref mpool, const sessionptr& session,
-                   aug_timers_t timers, unsigned id, objectref ob)
+                   aug_timers_t timers, aug_id id, objectref ob)
     : session_(session),
       sock_(id, ob),
       buffer_(mpool),

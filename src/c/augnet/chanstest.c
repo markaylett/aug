@@ -34,7 +34,7 @@ struct impl_ {
     aug_stream stream_;
     int refs_;
     aug_mpool* mpool_;
-    unsigned id_;
+    aug_id id_;
 };
 
 static void*
@@ -215,7 +215,7 @@ static const struct aug_streamvtbl streamvtbl_ = {
 };
 
 static aug_chan*
-create_(aug_mpool* mpool, unsigned id)
+create_(aug_mpool* mpool, aug_id id)
 {
     struct impl_* impl = aug_allocmem(mpool, sizeof(struct impl_));
     if (!impl)
@@ -258,16 +258,16 @@ chandler_release_(aug_chandler* ob)
 }
 
 static aug_bool
-chandler_auth_(aug_chandler* ob, unsigned id, const char* subject,
+chandler_auth_(aug_chandler* ob, aug_id id, const char* subject,
                const char* issuer)
 {
     return AUG_TRUE;
 }
 
 static void
-chandler_clear_(aug_chandler* ob, unsigned id)
+chandler_clear_(aug_chandler* ob, aug_id id)
 {
-    aug_ctxinfo(aug_tlx, "clearing id: %u", id);
+    aug_ctxinfo(aug_tlx, "clearing id: %d", (int)id);
 }
 
 static void
@@ -308,7 +308,7 @@ static unsigned last_ = 0;
 static aug_bool
 stats_(aug_chan* chan, unsigned short events)
 {
-    const unsigned id = aug_getchanid(chan);
+    const aug_id id = aug_getchanid(chan);
     if (3 < id)
         aug_die("invalid channel");
     ++count_;
@@ -319,7 +319,7 @@ stats_(aug_chan* chan, unsigned short events)
 static aug_bool
 rm1_(aug_chan* chan, unsigned short events)
 {
-    const unsigned id = aug_getchanid(chan);
+    const aug_id id = aug_getchanid(chan);
     return 1 != id;
 }
 

@@ -48,7 +48,7 @@ struct cimpl_ {
     int refs_;
     aug_mpool* mpool_;
     char name_[AUG_MAXCHANNAMELEN + 1];
-    unsigned id_;
+    aug_id id_;
     aug_muxer_t muxer_;
     aug_sd sd_;
     aug_bool wantwr_;
@@ -386,7 +386,7 @@ struct simpl_ {
     aug_chan chan_;
     int refs_;
     aug_mpool* mpool_;
-    unsigned id_;
+    aug_id id_;
     aug_muxer_t muxer_;
     aug_sd sd_;
     aug_bool wantwr_;
@@ -485,7 +485,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         aug_sd sd;
         struct aug_endpoint ep;
         aug_chan* chan;
-        unsigned id;
+        aug_id id;
 
         if (AUG_BADSD == (sd = aug_accept(impl->sd_, &ep))) {
 
@@ -609,7 +609,7 @@ struct pimpl_ {
     aug_stream stream_;
     int refs_;
     aug_mpool* mpool_;
-    unsigned id_;
+    aug_id id_;
     struct aug_sticky sticky_;
 };
 
@@ -946,7 +946,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
 }
 
 AUGNET_API aug_chan*
-aug_createplain(aug_mpool* mpool, unsigned id, aug_muxer_t muxer, aug_sd sd,
+aug_createplain(aug_mpool* mpool, aug_id id, aug_muxer_t muxer, aug_sd sd,
                 aug_bool wantwr)
 {
     struct pimpl_* impl = aug_allocmem(mpool, sizeof(struct pimpl_));

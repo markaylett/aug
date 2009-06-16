@@ -203,7 +203,8 @@ connimpl::process(chanref chan, unsigned short events, const aug_timeval& now)
 
     if (events & AUG_MDEVENTRD) {
 
-        AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%u]", sock_.id_);
+        AUG_CTXDEBUG2(aug_tlx, "handling read event: id=[%d]",
+                      static_cast<int>(sock_.id_));
 
         try {
             char buf[AUG_BUFSIZE];
@@ -212,8 +213,8 @@ connimpl::process(chanref chan, unsigned short events, const aug_timeval& now)
 
                 // Connection closed.
 
-                AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%u]",
-                              sock_.id_);
+                AUG_CTXDEBUG2(aug_tlx, "closing connection: id=[%d]",
+                              static_cast<int>(sock_.id_));
                 state_ = CLOSED;
                 return;
             }
@@ -232,7 +233,8 @@ connimpl::process(chanref chan, unsigned short events, const aug_timeval& now)
 
     if (events & AUG_MDEVENTWR) {
 
-        AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%u]", sock_.id_);
+        AUG_CTXDEBUG2(aug_tlx, "handling write event: id=[%d]",
+                      static_cast<int>(sock_.id_));
 
         size_t n(buffer_.writesome(stream));
 
@@ -290,8 +292,8 @@ connimpl::shutdown(chanref chan, unsigned flags, const aug_timeval& now)
     if (SHUTDOWN <= state_)
         return; // Already shutdown.
 
-    aug_ctxinfo(aug_tlx, "shutting connection: id=[%u], flags=[%u]",
-                sock_.id_, flags);
+    aug_ctxinfo(aug_tlx, "shutting connection: id=[%d], flags=[%u]",
+                static_cast<int>(sock_.id_), flags);
 
     streamptr stream(object_cast<aug_stream>(chan));
 

@@ -182,7 +182,7 @@ typedef int mod_rint;
 
 #define MOD_MAXNAME     63
 
-typedef unsigned mod_id;
+typedef int mod_id;
 
 /**
  * Both sockets and timers are represented by handles.  For timer handles,
