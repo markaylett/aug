@@ -328,7 +328,7 @@ cchan_setwantwr_(aug_chan* ob, aug_bool wantwr)
     return AUG_SUCCESS;
 }
 
-static unsigned
+static aug_id
 cchan_getid_(aug_chan* ob)
 {
     struct cimpl_* impl = AUG_PODIMPL(struct cimpl_, chan_, ob);
@@ -563,7 +563,7 @@ schan_setwantwr_(aug_chan* ob, aug_bool wantwr)
     return AUG_SUCCESS;
 }
 
-static unsigned
+static aug_id
 schan_getid_(aug_chan* ob)
 {
     struct simpl_* impl = AUG_PODIMPL(struct simpl_, chan_, ob);
@@ -719,7 +719,7 @@ pchan_setwantwr_(aug_chan* ob, aug_bool wantwr)
                          ? AUG_MDEVENTALL : AUG_MDEVENTRDEX);
 }
 
-static unsigned
+static aug_id
 pchan_getid_(aug_chan* ob)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, chan_, ob);

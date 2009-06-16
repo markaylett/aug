@@ -182,7 +182,7 @@ chan_setwantwr_(aug_chan* ob, aug_bool wantwr)
 #endif /* _WIN32 */
 }
 
-static unsigned
+static aug_id
 chan_getid_(aug_chan* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);

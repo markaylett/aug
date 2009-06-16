@@ -49,7 +49,7 @@ namespace {
         return p;
     }
 
-    unsigned rd_, wr_;
+    aug_id rd_, wr_;
     int recv_ = 0;
 
     struct test : mpool_ops {
@@ -80,7 +80,7 @@ namespace {
             exit(1);
         }
         aug_bool
-        estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
+        estabchan_(chanref chan, unsigned aug_id) AUG_NOTHROW
         {
             return AUG_TRUE;
         }

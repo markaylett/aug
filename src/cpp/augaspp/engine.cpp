@@ -256,7 +256,7 @@ namespace aug {
                 return sock->error(errinfo.desc_);
             }
             aug_bool
-            estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
+            estabchan_(chanref chan, aug_id parent) AUG_NOTHROW
             {
                 scoped_current current(current_, chan);
 

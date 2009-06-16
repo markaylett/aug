@@ -269,7 +269,7 @@ namespace test {
             // FIXME: implement.
         }
         aug_bool
-        estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
+        estabchan_(chanref chan, aug_id parent) AUG_NOTHROW
         {
             aug_ctxinfo(aug_tlx, "inserting connection");
             sessions_.insert(make_pair(getchanid(chan), sessionptr

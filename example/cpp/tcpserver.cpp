@@ -128,7 +128,7 @@ namespace {
             // FIXME: implement.
         }
         aug_bool
-        estabchan_(chanref chan, unsigned parent) AUG_NOTHROW
+        estabchan_(chanref chan, aug_id parent) AUG_NOTHROW
         {
             const aug_id id(getchanid(chan));
 

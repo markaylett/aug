@@ -120,7 +120,7 @@ chan_setwantwr_(aug_chan* ob, aug_bool wantwr)
     return AUG_SUCCESS;
 }
 
-static unsigned
+static aug_id
 chan_getid_(aug_chan* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
@@ -235,7 +235,7 @@ create_(aug_mpool* mpool, aug_id id)
     return &impl->chan_;
 }
 
-static aug_bool (*cb_)(unsigned short, aug_chan*) = NULL;
+static aug_bool (*cb_)(aug_chan*, unsigned short) = NULL;
 
 static void*
 chandler_cast_(aug_chandler* ob, const char* id)
@@ -278,7 +278,7 @@ chandler_error_(aug_chandler* ob, aug_chan* chan,
 }
 
 static aug_bool
-chandler_estab_(aug_chandler* ob, aug_chan* chan, unsigned parent)
+chandler_estab_(aug_chandler* ob, aug_chan* chan, aug_id parent)
 {
     return AUG_TRUE;
 }
@@ -303,7 +303,7 @@ static const struct aug_chandlervtbl chandlervtbl_ = {
 static aug_chandler chandler_ = { &chandlervtbl_, NULL };
 
 static int count_ = 0;
-static unsigned last_ = 0;
+static aug_id last_ = 0;
 
 static aug_bool
 stats_(aug_chan* chan, unsigned short events)

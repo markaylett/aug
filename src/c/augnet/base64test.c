@@ -30,14 +30,14 @@ static char encoded_[1024];
 static char decoded_[1024];
 
 static aug_result
-encode_(aug_object* ob, const char* buf, size_t len)
+encode_(const char* buf, size_t len, aug_object* ob)
 {
     strcat(encoded_, buf);
     return AUG_SUCCESS;
 }
 
 static aug_result
-decode_(aug_object* ob, const char* buf, size_t len)
+decode_(const char* buf, size_t len, aug_object* ob)
 {
     strcat(decoded_, buf);
     return AUG_SUCCESS;

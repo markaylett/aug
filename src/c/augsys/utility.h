@@ -26,6 +26,8 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
+#include "augtypes.h"
+
 /**
  * Scramble or unscramble @a dst buffer.
  *

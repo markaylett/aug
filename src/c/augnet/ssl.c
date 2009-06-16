@@ -684,7 +684,7 @@ csetwantwr_(aug_chan* ob, aug_bool wantwr)
     return AUG_SUCCESS;
 }
 
-static unsigned
+static aug_id
 cgetid_(aug_chan* ob)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, chan_, ob);
