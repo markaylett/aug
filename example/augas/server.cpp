@@ -57,7 +57,7 @@ namespace {
     class token : public aug::boxptr_base<token>, public aug::mpool_ops {
         string impl_;
     public:
-        ~token() MOD_NOTHROW
+        ~token() AUG_NOTHROW
         {
             // Deleted from base.
         }
@@ -81,7 +81,7 @@ namespace {
         {
         }
     public:
-        ~echo() MOD_NOTHROW
+        ~echo() AUG_NOTHROW
         {
             // Deleted from base.
         }
@@ -138,7 +138,7 @@ namespace {
         mod_bool
         auth(mod_handle& sock, const char* subject, const char* issuer)
         {
-            mod_writelog(MOD_LOGINFO, "checking subject...");
+            writelog(MOD_LOGINFO, "checking subject...");
             return MOD_TRUE;
         }
         void
@@ -150,7 +150,7 @@ namespace {
                          static_cast<const char*>(buf) + len, *tok, '\n',
                          eachline(sock));
             } catch (...) {
-                mod_writelog(MOD_LOGINFO, "shutting now...");
+                writelog(MOD_LOGINFO, "shutting now...");
                 shutdown(sock, 1);
                 throw;
             }

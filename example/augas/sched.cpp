@@ -300,7 +300,7 @@ namespace {
         {
         }
     public:
-        ~sched() MOD_NOTHROW
+        ~sched() AUG_NOTHROW
         {
             // Deleted from base.
         }

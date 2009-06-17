@@ -375,7 +375,7 @@ namespace {
             aug_ctxinfo(aug_tlx, "nonce: [%s]", nonce_);
         }
     public:
-        ~store() MOD_NOTHROW
+        ~store() AUG_NOTHROW
         {
             // Deleted from base.
         }
@@ -576,7 +576,7 @@ namespace {
         {
         }
     public:
-        ~parser() MOD_NOTHROW
+        ~parser() AUG_NOTHROW
         {
             // Deleted from base.
         }
@@ -602,7 +602,7 @@ namespace {
         {
         }
     public:
-        ~http() MOD_NOTHROW
+        ~http() AUG_NOTHROW
         {
             // Deleted from base.
         }

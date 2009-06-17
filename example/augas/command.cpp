@@ -95,7 +95,7 @@ namespace {
         {
         }
     public:
-        ~parser() MOD_NOTHROW
+        ~parser() AUG_NOTHROW
         {
             // Deleted from base.
         }
@@ -119,7 +119,7 @@ namespace {
         {
         }
     public:
-        ~command() MOD_NOTHROW
+        ~command() AUG_NOTHROW
         {
             // Deleted from base.
         }

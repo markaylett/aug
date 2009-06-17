@@ -23,8 +23,6 @@
 #ifndef AUGEXT_VAR_H
 #define AUGEXT_VAR_H
 
-#include "augconfig.h"
-
 #include "augext/array.h"
 #include "augext/blob.h"
 

@@ -28,12 +28,6 @@
 
 #include <stdexcept>
 
-#if !defined(NDEBUG)
-# define MOD_NOTHROW throw()
-#else /* NDEBUG */
-# define MOD_NOTHROW
-#endif /* NDEBUG */
-
 #define MOD_WRITELOGCATCH                                   \
     catch (const std::exception& e) {                       \
         mod_writelog(MOD_LOGERROR,                          \
@@ -45,7 +39,7 @@
 namespace mod {
 
     inline void
-    writelog(int level, const char* format, ...)
+    writelog(int level, const char* format, ...) AUG_NOTHROW
     {
         va_list args;
         va_start(args, format);
@@ -54,7 +48,7 @@ namespace mod {
     }
 
     inline void
-    vwritelog(int level, const char* format, va_list args)
+    vwritelog(int level, const char* format, va_list args) AUG_NOTHROW
     {
         mod_vwritelog(level, format, args);
     }
@@ -281,16 +275,16 @@ namespace mod {
     class basic_module {
     public:
         static mod_bool
-        init(const char* name) MOD_NOTHROW
+        init(const char* name) AUG_NOTHROW
         {
             return MOD_TRUE;
         }
         static void
-        term() MOD_NOTHROW
+        term() AUG_NOTHROW
         {
         }
         static mod_session*
-        create(const char* name) MOD_NOTHROW
+        create(const char* name) AUG_NOTHROW
         {
             return retget(factoryT::create(name));
         }
@@ -299,12 +293,12 @@ namespace mod {
     template <typename T>
     class basic_session : public session_base<T> {
     public:
-        ~basic_session() MOD_NOTHROW
+        ~basic_session() AUG_NOTHROW
         {
             // Deleted from base.
         }
         mod_bool
-        start_() MOD_NOTHROW
+        start_() AUG_NOTHROW
         {
             try {
                 return static_cast<T*>(this)->start();
@@ -312,14 +306,14 @@ namespace mod {
             return MOD_FALSE;
         }
         void
-        stop_() MOD_NOTHROW
+        stop_() AUG_NOTHROW
         {
             try {
                 return static_cast<T*>(this)->stop();
             } MOD_WRITELOGCATCH;
         }
         void
-        reconf_() MOD_NOTHROW
+        reconf_() AUG_NOTHROW
         {
             try {
                 return static_cast<T*>(this)->reconf();
@@ -327,28 +321,28 @@ namespace mod {
         }
         void
         event_(const char* from, const char* type, mod_id id,
-               aug::objectref ob = null) MOD_NOTHROW
+               aug::objectref ob = null) AUG_NOTHROW
         {
             try {
                 static_cast<T*>(this)->event(from, type, id, ob.get());
             } MOD_WRITELOGCATCH;
         }
         void
-        closed_(mod_handle& sock) MOD_NOTHROW
+        closed_(mod_handle& sock) AUG_NOTHROW
         {
             try {
                 static_cast<T*>(this)->closed(sock);
             } MOD_WRITELOGCATCH;
         }
         void
-        teardown_(mod_handle& sock) MOD_NOTHROW
+        teardown_(mod_handle& sock) AUG_NOTHROW
         {
             try {
                 static_cast<T*>(this)->teardown(sock);
             } MOD_WRITELOGCATCH;
         }
         mod_bool
-        accepted_(mod_handle& sock, const char* name) MOD_NOTHROW
+        accepted_(mod_handle& sock, const char* name) AUG_NOTHROW
         {
             try {
                 return static_cast<T*>(this)->accepted(sock, name);
@@ -356,7 +350,7 @@ namespace mod {
             return MOD_FALSE;
         }
         void
-        connected_(mod_handle& sock, const char* name) MOD_NOTHROW
+        connected_(mod_handle& sock, const char* name) AUG_NOTHROW
         {
             try {
                 static_cast<T*>(this)->connected(sock, name);
@@ -364,7 +358,7 @@ namespace mod {
         }
         mod_bool
         auth_(mod_handle& sock, const char* subject,
-              const char* issuer) MOD_NOTHROW
+              const char* issuer) AUG_NOTHROW
         {
             try {
                 return static_cast<T*>(this)->auth(sock, subject, issuer);
@@ -373,35 +367,35 @@ namespace mod {
         }
         void
         recv_(mod_handle& sock, const void* buf,
-              size_t len) MOD_NOTHROW
+              size_t len) AUG_NOTHROW
         {
             try {
                 static_cast<T*>(this)->recv(sock, buf, len);
             } MOD_WRITELOGCATCH;
         }
         void
-        error_(mod_handle& sock, const char* desc) MOD_NOTHROW
+        error_(mod_handle& sock, const char* desc) AUG_NOTHROW
         {
             try {
                 static_cast<T*>(this)->error(sock, desc);
             } MOD_WRITELOGCATCH;
         }
         void
-        rdexpire_(mod_handle& sock, unsigned& ms) MOD_NOTHROW
+        rdexpire_(mod_handle& sock, unsigned& ms) AUG_NOTHROW
         {
             try {
                 static_cast<T*>(this)->rdexpire(sock, ms);
             } MOD_WRITELOGCATCH;
         }
         void
-        wrexpire_(mod_handle& sock, unsigned& ms) MOD_NOTHROW
+        wrexpire_(mod_handle& sock, unsigned& ms) AUG_NOTHROW
         {
             try {
                 static_cast<T*>(this)->wrexpire(sock, ms);
             } MOD_WRITELOGCATCH;
         }
         void
-        expire_(mod_handle& timer, unsigned& ms) MOD_NOTHROW
+        expire_(mod_handle& timer, unsigned& ms) AUG_NOTHROW
         {
             try {
                 static_cast<T*>(this)->expire(timer, ms);

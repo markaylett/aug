@@ -31,14 +31,6 @@
 #include <cassert>
 #include <cstring>   // strcmp()
 
-#if !defined(AUG_NOTHROW)
-# if !defined(NDEBUG)
-#  define AUG_NOTHROW throw()
-# else /* NDEBUG */
-#  define AUG_NOTHROW
-# endif /* NDEBUG */
-#endif /* !AUG_NOTHROW */
-
 #define AUG_OBJECTASSERT(T) \
         do { (void)sizeof(aug::object_traits<T>::vtbl); } while (0)
 

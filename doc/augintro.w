@@ -156,7 +156,6 @@ implementation would use the \.{<augmod.h>} header, instead.
 namespaces.
 
 @<using...@>+=
-using namespace aug;@/
 using namespace mod;@/
 using namespace std;
 
@@ -173,7 +172,7 @@ definition of these two export functions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echo> > module;@/
-MOD_ENTRYPOINTS(module::init, module::term)
+MOD_ENTRYPOINTS(module::init, module::term, module::create)
 
 @ The |echoline| functor handles each line received from the client.
 \CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
@@ -183,25 +182,63 @@ virtual functions that have been overriden in this example.
 
 @<implement...@>=
 @<echoline functor@>@;
-struct echo : basic_session {@/
-  bool
-  do_start(const char* sname);
+@<token object@>@;
+  class echo : public basic_session<echo> {
+    const string sname_;
+    explicit
+    echo(const string& sname)
+      : sname_(sname)
+    {
+    }
+  public:
+    ~echo() AUG_NOTHROW
+    {
+    }
+    mod_bool
+    start();
 
-  void
-  do_closed(const handle& sock);
+    void
+    stop();
 
-  bool
-  do_accepted(handle& sock, const char* name);
+    void
+    reconf();
 
-  void
-  do_recv(const handle& sock, const void* buf, size_t size);
+    void
+    event(const char* from, const char* type, mod_id id, aug::objectref ob);
 
-  void
-  do_rdexpire(const handle& sock, unsigned& ms);
+    void
+    closed(mod_handle& sock);
 
-  static session_base*
-  create(const char* sname);
-};@/
+    void
+    teardown(mod_handle& sock);
+
+    mod_bool
+    accepted(mod_handle& sock, const char* name);
+
+    void
+    connected(mod_handle& sock, const char* name);
+
+    mod_bool
+    auth(mod_handle& sock, const char* subject, const char* issuer);
+
+    void
+    recv(mod_handle& sock, const void* buf, size_t len);
+
+    void
+    error(mod_handle& sock, const char* desc);
+
+    void
+    rdexpire(mod_handle& sock, unsigned& ms);
+
+    void
+    wrexpire(mod_handle& sock, unsigned& ms);
+
+    void
+    expire(mod_handle& timer, unsigned& ms);
+
+    static sessionptr
+    create(const char* sname);
+  };
 @<member functions@>
 
 @ The |do_start()| virtual function is called to start the Session.  This is
@@ -212,15 +249,61 @@ configuration file and environment table, |false| is returned and the Session
 deactivated.
 
 @<member...@>+=
-bool
-echo::do_start(const char* sname)
+mod_bool
+echo::start()
 {
-  writelog(MOD_LOGINFO, "starting session [%s]", sname);
-  const char* serv = mod::getenv("session.echo.serv");
+  writelog(MOD_LOGINFO, "starting...");
+  const char* serv(mod::getenv("session.echo.serv"));
+  const char* sslctx(mod::getenv("session.echo.sslcontext"));
   if (!serv)
-    return false;
-  tcplisten("0.0.0.0", serv);
-  return true;
+    return MOD_FALSE;
+  if (sslctx)
+    writelog(MOD_LOGINFO, "sslcontext: %s", sslctx);
+  tcplisten("0.0.0.0", serv, sslctx);
+  return MOD_TRUE;
+}
+
+@ TODO
+
+@<member...@>+=
+void
+echo::stop()
+{
+}
+
+@ TODO
+
+@<member...@>+=
+void
+echo::reconf()
+{
+}
+
+@ TODO
+
+@<member...@>+=
+void
+echo::event(const char* from, const char* type, mod_id id, aug::objectref ob)
+{
+}
+
+@ When a connection is closed, the |string| buffer associated with the socket
+handle is deleted.
+
+@<member...@>+=
+void
+echo::closed(mod_handle& sock)
+{
+  aug_assign(sock.ob_, 0);
+}
+
+@ TODO
+
+@<member...@>+=
+void
+echo::teardown(mod_handle& sock)
+{
+  mod::shutdown(sock, 0);
 }
 
 @ The |do_accepted()| function is called when a new client connection is
@@ -232,23 +315,33 @@ no read activity has occurred on the |sock| handle for a period of 15 seconds
 --- \AUG/ will automatically reset the timer whenever read activity occurs.
 
 @<member...@>+=
-bool
-echo::do_accepted(handle& sock, const char* name)
+mod_bool
+echo::accepted(mod_handle& sock, const char* name)
 {
-  sock.setuser(new string());
+  aug::boxptrptr bp(token::create());
+  aug_assign(sock.ob_, bp.base());
+
   send(sock, "HELLO\r\n", 7);
   setrwtimer(sock, 15000, MOD_TIMRD);
-  return true;
+  return MOD_TRUE;
 }
 
-@ When a connection is closed, the |string| buffer associated with the socket
-handle is deleted.
+@ TODO
 
 @<member...@>+=
 void
-echo::do_closed(const handle& sock)
+echo::connected(mod_handle& sock, const char* name)
 {
-  delete sock.user<string>();
+}
+
+@ TODO
+
+@<member...@>+=
+mod_bool
+echo::auth(mod_handle& sock, const char* subject, const char* issuer)
+{
+  writelog(MOD_LOGINFO, "checking subject...");
+  return MOD_TRUE;
 }
 
 @ |do_recv()| is called whenever new data is received from a client.  The
@@ -259,11 +352,27 @@ before |tok| is cleared.
 
 @<member...@>+=
 void
-echo::do_recv(const handle& sock, const void* buf, size_t size)
+echo::recv(mod_handle& sock, const void* buf, size_t len)
 {
-  string& tok(*sock.user<string>());
-  tokenise(static_cast<const char*>(buf),
-    static_cast<const char*>(buf) + size, tok, '\n', echoline(sock));
+  string* tok(gettoken(sock.ob_));
+  try {
+    aug::tokenise(static_cast<const char*>(buf),
+      static_cast<const char*>(buf) + len, *tok, '\n',
+      eachline(sock));
+  } catch (...) {
+    mod_writelog(MOD_LOGINFO, "shutting now...");
+    shutdown(sock, 1);
+    throw;
+  }
+}
+
+@ TODO
+
+@<member...@>+=
+void
+echo::error(mod_handle& sock, const char* desc)
+{
+  writelog(MOD_LOGERROR, "server error: %s", desc);
 }
 
 @ Read-timer expiry is communicated using the |do_rdexpire()| function.  If no
@@ -275,39 +384,92 @@ delivered to the Session.
 
 @<member...@>+=
 void
-echo::do_rdexpire(const handle& sock, unsigned& ms)
+echo::rdexpire(mod_handle& sock, unsigned& ms)
 {
+  writelog(MOD_LOGINFO, "no data received for 15 seconds");
   shutdown(sock, 0);
+}
+
+@ TODO
+
+@<member...@>+=
+void
+echo::wrexpire(mod_handle& sock, unsigned& ms)
+{
+}
+
+@ TODO
+
+@<member...@>+=
+void
+echo::expire(mod_handle& timer, unsigned& ms)
+{
 }
 
 @ The |basic_factory| template requires that Session classes define a static
 |create()| function.
 
 @<member...@>+=
-session_base*
+sessionptr
 echo::create(const char* sname)
 {
-  return 0 == strcmp(sname, "echo") ? new echo() : 0;
+  return attach(new echo(sname));
 }
 
 @ Each time the |echoline| functor is called, a response is prepared and sent
 to the client associated with the |sock_| handle.
 
 @<echoline...@>=
-struct echoline {
-  handle sock_;
-  explicit
-  echoline(const handle& sock)
-    : sock_(sock)
-  {
-  }
-  void
-  operator ()(string& line)
-  {
-    @<prepare response@>@;
-    send(sock_, line.c_str(), line.size());
-  }
-};
+  struct eachline {
+    const mod_handle& sock_;
+    explicit
+    eachline(const mod_handle& sock)
+      : sock_(sock)
+    {
+    }
+    void
+    operator ()(string& tok)
+    {
+      @<prepare response@>@;
+      send(sock_, tok.c_str(), tok.size());
+    }
+  };
+
+@ TODO
+
+@<token...@>+=
+  class token : public aug::boxptr_base<token> {
+    string impl_;
+  public:
+    ~token() AUG_NOTHROW
+    {
+    }
+    void*
+    unboxptr_() AUG_NOTHROW
+    {
+      return &impl_;
+    }
+    static aug::boxptrptr
+    create()
+    {
+      return attach(new token());
+    }
+  };
+
+@ TODO
+
+@<token...@>+=
+string*
+gettoken(aug::objectref ob)
+{
+  aug::boxptrptr box(aug::object_cast<aug_boxptr>(ob));
+  return null == box ? 0 : static_cast<string*>(unboxptr(box));
+}
+
+@ TODO
+
+@<include...@>+=
+#include <augext/boxptr.h>@/
 
 @ White-space, including any carriage-returns, are trimmed from the input
 line.  Then, the response is prepared by converting the line to upper-case and
@@ -315,9 +477,9 @@ appending a CR/LF pair.  This end-of-line sequence is common in text-based,
 network protocols such as \POP3/ and \SMTP/.
 
 @<prepare...@>=
-aug::trim(line);
-transform(line.begin(), line.end(), line.begin(), aug::ucase);
-line += "\r\n";
+aug::trim(tok);
+transform(tok.begin(), tok.end(), tok.begin(), aug::ucase);
+tok += "\r\n";
 
 @ The \AUG/ libraries provide some standard string algorithms.
 

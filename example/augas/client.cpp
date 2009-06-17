@@ -117,7 +117,7 @@ namespace {
         {
         }
     public:
-        ~statebox() MOD_NOTHROW
+        ~statebox() AUG_NOTHROW
         {
             // Deleted from base.
         }
@@ -176,7 +176,7 @@ namespace {
         {
         }
     public:
-        ~bench() MOD_NOTHROW
+        ~bench() AUG_NOTHROW
         {
             // Deleted from base.
         }
@@ -187,10 +187,10 @@ namespace {
 
             if (atoi(mod::getenv("session.bench.sendv", "1"))) {
                 send_ = dosendv;
-                mod_writelog(MOD_LOGINFO, "sendv: yes");
+                writelog(MOD_LOGINFO, "sendv: yes");
             } else {
                 send_ = dosend;
-                mod_writelog(MOD_LOGINFO, "sendv: no");
+                writelog(MOD_LOGINFO, "sendv: no");
             }
 
             const char* serv = mod::getenv("session.bench.serv");
@@ -204,12 +204,12 @@ namespace {
             conns_ = atoi(mod::getenv("session.bench.conns", "100"));
             echos_ = atoi(mod::getenv("session.bench.echos", "1000"));
 
-            mod_writelog(MOD_LOGINFO, "host: %s", host);
-            mod_writelog(MOD_LOGINFO, "serv: %s", serv);
+            writelog(MOD_LOGINFO, "host: %s", host);
+            writelog(MOD_LOGINFO, "serv: %s", serv);
             if (sslctx)
                 writelog(MOD_LOGINFO, "sslcontext: %s", sslctx);
-            mod_writelog(MOD_LOGINFO, "conns: %d", conns_);
-            mod_writelog(MOD_LOGINFO, "echos: %d", echos_);
+            writelog(MOD_LOGINFO, "conns: %d", conns_);
+            writelog(MOD_LOGINFO, "echos: %d", echos_);
 
             for (; estab_ < conns_; ++estab_) {
                 aug::boxptrptr bp(statebox::create(echos_));
@@ -240,22 +240,22 @@ namespace {
             state* s(aug::obtop<state>(sock.ob_));
             pushxy(xy_, s->secs_);
             if (0 < --estab_) {
-                mod_writelog(MOD_LOGINFO, "%d established", estab_);
+                writelog(MOD_LOGINFO, "%d established", estab_);
                 return;
             }
 
             double ms(elapsed(hires_) * 1000.0);
 
-            mod_writelog(MOD_LOGINFO, "total time: %f ms", ms);
+            writelog(MOD_LOGINFO, "total time: %f ms", ms);
 
             ms /= static_cast<double>(conns_);
-            mod_writelog(MOD_LOGINFO, "time per conn: %f ms", ms);
+            writelog(MOD_LOGINFO, "time per conn: %f ms", ms);
 
             ms /= static_cast<double>(echos_);
-            mod_writelog(MOD_LOGINFO, "echos per sec: %f", 1000.0 / ms);
+            writelog(MOD_LOGINFO, "echos per sec: %f", 1000.0 / ms);
 
             double k(static_cast<double>(bytes_) / 1024.00);
-            mod_writelog(MOD_LOGINFO, "total size: %f k", k);
+            writelog(MOD_LOGINFO, "total size: %f k", k);
 
             stopall();
 
@@ -282,7 +282,7 @@ namespace {
         mod_bool
         auth(mod_handle& sock, const char* subject, const char* issuer)
         {
-            mod_writelog(MOD_LOGINFO, "checking subject...");
+            writelog(MOD_LOGINFO, "checking subject...");
             return MOD_TRUE;
         }
         void

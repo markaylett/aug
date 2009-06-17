@@ -41,6 +41,8 @@ namespace {
     rootptr
     getroot(mod_id id)
     {
+        // Lazy creation.
+
         map<mod_id, rootptr>::iterator it(socks_.find(id));
         if (it == socks_.end())
             it = socks_.insert(make_pair(id, createroot())).first;
@@ -61,6 +63,9 @@ namespace {
         map<mod_id, rootptr>::const_iterator it(socks_.begin()),
             end(socks_.end());
         for (; it != end; ++it) {
+
+            // All matching except this.
+
             if (it->first != id && it->second->ismatch(p.first))
                 send(it->first, s.c_str(), s.size());
         }
@@ -142,7 +147,7 @@ namespace {
         {
         }
     public:
-        ~parser() MOD_NOTHROW
+        ~parser() AUG_NOTHROW
         {
             // Deleted from base.
         }
@@ -166,7 +171,7 @@ namespace {
         {
         }
     public:
-        ~arc() MOD_NOTHROW
+        ~arc() AUG_NOTHROW
         {
             // Deleted from base.
         }

@@ -38,6 +38,8 @@
  * Tool for creating interfaces from XML.
  */
 
+#include "augconfig.h"
+
 #include <stddef.h>
 #include <sys/types.h> /* size_t */
 
