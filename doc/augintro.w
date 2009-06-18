@@ -32,7 +32,7 @@
 
 @* Introduction.
 
-\AUG/ is an event-driven network application server, licensed under the GNU
+\AUG/ is an event-driven network application-server, licensed under the GNU
 General Public License (GPL).  \AUG/'s Module system makes it ideally suited
 to building heterogeneous Internet applications.  Python and Ruby Modules are
 bundled with the \AUG/ package.  The core system is written in portable
@@ -41,11 +41,11 @@ for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
 
 \yskip\noindent
 
-This document offers a quick introduction to building and installing \AUG/
-Modules, along with a brief insight into the application server itself.  For
-further information, please visit the
-\pdfURL{\AUG/ project home page}{http://www.xofy.org/aug} or email myself,
-\pdfURL{Mark Aylett}{mailto:mark.aylett@@gmail.com}.
+This document offers a introduction to building and installing \AUG/ Modules,
+along with a brief insight into the application-server itself.  For further
+information, please visit the \pdfURL{\AUG/ project home
+page}{http://www.xofy.org/aug} or email myself, \pdfURL{Mark
+Aylett}{mailto:mark.aylett@@gmail.com}.
 
 @* Event Model.
 
@@ -66,11 +66,11 @@ flattened interleavings of the multi-threaded model.
 \yskip\noindent
 
 Multiplexing code is best confined to specialised components dedicated to such
-purposes.  This is where \AUG/ comes in: the \AUG/ application server uses an
+purposes.  This is where \AUG/ comes in: the \AUG/ application-server uses an
 event model, similar to the one described above, to multiplex signal, socket,
-timer and user-event activity.  Complexity is confined to the application
-server's internals, and Modules interact with the application server through a
-sanitised interface.
+timer and user-event activity.  Complexity is confined to the
+application-server's internals, and Modules interact with the
+application-server through a sanitised interface.
 
 \yskip\noindent
 
@@ -83,9 +83,10 @@ with the UI event thread model.
 @* Modules and Sessions.
 
 \AUG/ delegates event notifications to Modules and, in turn, Sessions.
-Modules are physical components, dynamically loaded into the application
-server at run-time.  Each Module manages one or more Sessions.  Modules and
-Sessions are wired together at configuration-time, not compile-time.
+Modules are physical components, dynamically loaded into the
+application-server at run-time.  Each Module manages one or more Sessions.
+Modules and Sessions are wired together at configuration-time, not
+compile-time.
 
 \yskip\noindent
 
@@ -97,11 +98,11 @@ artificial constraints on Module authors.
 \yskip\noindent
 
 The separation of physical Modules and logical Sessions allows Modules to
-adapt and extend the application server environment exposed to Sessions.  The
+adapt and extend the application-server environment exposed to Sessions.  The
 \.{augpy} and \.{augrb} Modules, for example, adapt the host environment to
 offer a \PYTHON/ or \RUBY/ oriented view to their associated Sessions.  These
 language bindings are provided by Modules, and are unbeknown to the
-application server.  A HTTP Session written in \RUBY/, for example, would be
+application-server.  A HTTP Session written in \RUBY/, for example, would be
 managed by the \.{augrb} Module.
 
 \yskip\noindent
@@ -140,6 +141,7 @@ is:
 @<include headers@>@;
 @<using declarations@>@;
 namespace {@/
+@<token object@>@;
 @<implement echo session@>@;
 }@/
 @<declare export table@>
@@ -152,37 +154,96 @@ implementation would use the \.{<augmod.h>} header, instead.
 #define MOD_BUILD
 #include <augmodpp.hpp>@/
 
-@ For convenience, names are imported from the |aug|, |mod| and |std|
-namespaces.
+@ For convenience, names are imported from the |mod| and |std| namespaces.
 
 @<using...@>+=
 using namespace mod;@/
 using namespace std;
 
-@ Session types (|echo| in this example) are fed into a class template which
-assists with the \CEE/ to \CPLUSPLUS/ translation.  |basic_module<>| delegates
-the task of creating Sessions to a factory object, specified as a template
-argument.  Here, |basic_factory<>| is used to build a factory capable of
-creating |echo| sessions.
+@ \AUG/ defines an Application Binary Interface (ABI) for passing referenced
+counted objects between components.  These components may be authored in
+either \CEE/ or \CPLUSPLUS/, use different compilers, even different versions
+of the same compiler.
 
 \yskip\noindent
-\AUG/ Modules are required to export two library functions, namely,
-|mod_init()| and |mod_term()|.  The |MOD_ENTRYPOINTS| macro assists with the
-definition of these two export functions.
+
+@ Interfaces are defined using a simple XML schema.  Interfaces are then
+translated to ABI definitions using the \.{augidl} script.  It is often
+useful, for example, to box a plain pointer into an object so that it can be
+passed between components.  The interface definition for this |boxptr| would
+be something like:
+
+@<token...@>+=
+/*
+<package name="aug" dir="augext">
+  <interface name="boxptr">
+    <method name="unboxptr" type="void*" qname="unboxptr"/>
+  </interface>
+</package>
+*/
+
+@ The generated code can then be included in the module.
+
+@<include...@>+=
+#include <augext/boxptr.h>@/
+
+@ Using the facilities provided by this header file, a |boxptr| implementation
+can be defined that is composed of a |string|.  Notice that the |unboxptr_()|
+member function provides the implementation behind the |unboxptr()| method
+defined in the XML.
+
+@<token...@>+=
+  class token : public aug::boxptr_base<token> {
+    string impl_;
+  public:
+    ~token() AUG_NOTHROW
+    {
+    }
+    void*
+    unboxptr_() AUG_NOTHROW
+    {
+      return &impl_;
+    }
+    static aug::boxptrptr
+    create()
+    {
+      return attach(new token());
+    }
+  };
+
+@ A convenience function is defined to downcast from a base object, and return
+the unboxed pointer.
+
+@<token...@>+=
+string*
+unboxtoken(aug::objectref ob)
+{
+  aug::boxptrptr box(aug::object_cast<aug_boxptr>(ob));
+  return null == box ? 0 : static_cast<string*>(unboxptr(box));
+}
+
+@ Class templates are using to bind the Module implementation to the export
+table.  In this example, the Module is configured with a single Session type.
+|basic_module<>| delegates the task of creating Sessions to a factory type.
+|basic_factory<>| builds a factory capable of creating |echo| Sessions.
+
+\yskip\noindent
+\AUG/ Modules are required to export three library functions, namely,
+|mod_init()|, |mod_term()| and |mod_create()|.  The |MOD_ENTRYPOINTS| macro
+assists with the definition of these three export functions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echo> > module;@/
 MOD_ENTRYPOINTS(module::init, module::term, module::create)
 
 @ The |echoline| functor handles each line received from the client.
-\CPLUSPLUS/ Sessions implement the |session_base| interface.  Stub
-implementations for most of |session_base|'s pure virtual functions are
-provided by the |basic_session| class.  The following definition shows the
-virtual functions that have been overriden in this example.
+\CPLUSPLUS/ Sessions can use the generated |basic_session| template.  Session
+functions of type |mod_bool| should return either |MOD_TRUE| or |MOD_FALSE|,
+depending on the result.  For those functions associated with a connection, a
+false return will result in the connection being closed.
 
 @<implement...@>=
 @<echoline functor@>@;
-@<token object@>@;
   class echo : public basic_session<echo> {
     const string sname_;
     explicit
@@ -241,12 +302,15 @@ virtual functions that have been overriden in this example.
   };
 @<member functions@>
 
-@ The |do_start()| virtual function is called to start the Session.  This is
-where Session initialisation is performed.  In this case, a TCP listener is
-bound to a port which is read from the configuration file using the |getenv()|
-function.  If the ``session.echo.serv'' property is missing from both the
-configuration file and environment table, |false| is returned and the Session
-deactivated.
+@ The |start()| function is called to start the Session.  This is where any
+non-trivial resource acquisition and construction takes place.  The two-phase
+construction is required to allow callbacks during the function call.
+
+\yskip\noindent
+In this example, a TCP listener is bound to a port which is read from the
+configuration file using the |getenv()| function.  If the
+``session.echo.serv'' property is missing from both the configuration file and
+environment table, |MOD_FALSE| is returned and the Session deactivated.
 
 @<member...@>+=
 mod_bool
@@ -263,7 +327,9 @@ echo::start()
   return MOD_TRUE;
 }
 
-@ TODO
+@ The |stop()| function is only called for a session whose |start()| function
+returned |MOD_TRUE|.  There is no need to explicity close the listener socket
+as this will be done prior to |stop()| being called.
 
 @<member...@>+=
 void
@@ -271,7 +337,10 @@ echo::stop()
 {
 }
 
-@ TODO
+@ The |reconf()| handler is intended for Session's that wish to implement
+|SIGHUP|-style reconfiguration requests.  The function is called in response
+to a |AUG_EVENTRECONF| event.  These events are raised either in response to
+either a |SIGHUP|, or a call to |reconfall()|.
 
 @<member...@>+=
 void
@@ -279,7 +348,9 @@ echo::reconf()
 {
 }
 
-@ TODO
+@ As mentioned earlier in this document, custom events can be passed between
+sessions.  The |event()| function is called when a custom event is delivered
+to a Session.
 
 @<member...@>+=
 void
@@ -287,8 +358,8 @@ echo::event(const char* from, const char* type, mod_id id, aug::objectref ob)
 {
 }
 
-@ When a connection is closed, the |string| buffer associated with the socket
-handle is deleted.
+@ When TCP connection is closed, the |token| reference associated with the
+socket handle is released.
 
 @<member...@>+=
 void
@@ -297,7 +368,10 @@ echo::closed(mod_handle& sock)
   aug_assign(sock.ob_, 0);
 }
 
-@ TODO
+@ The |teardown()| function is called when the application-server is
+terminating.  The function allows an application-level shutdown to take place
+before any connections are forcibly closed.  Here the socket should is simply
+shutdown.
 
 @<member...@>+=
 void
@@ -306,13 +380,13 @@ echo::teardown(mod_handle& sock)
   mod::shutdown(sock, 0);
 }
 
-@ The |do_accepted()| function is called when a new client connection is
-accepted.  The |setuser()| function binds an opaque, user-defined value to an
-\AUG/ handle.  Here, a |string| buffer is assigned to track partial line data
-received from the client.  An initial, {\sc ``HELLO''} message is sent to the
-client.  The call to |setrwtimer()| establishes a timer that will expire when
-no read activity has occurred on the |sock| handle for a period of 15 seconds
---- \AUG/ will automatically reset the timer whenever read activity occurs.
+@ The |accepted()| function is called when a new connection is established on
+the listener socket.  A new |token| object is bound to the socket.  The
+|token| object is user to track partial line data received from the client.
+An initial, {\sc ``HELLO''} message is sent to the client.  The call to
+|setrwtimer()| establishes a timer that will expire when no read activity has
+occurred on the |sock| handle for a period of 15 seconds --- \AUG/ will
+automatically reset the timer whenever read activity occurs.
 
 @<member...@>+=
 mod_bool
@@ -326,7 +400,8 @@ echo::accepted(mod_handle& sock, const char* name)
   return MOD_TRUE;
 }
 
-@ TODO
+@ This function is called when a connection, initiated by a call to
+|tcpconnect()|, becomes established.
 
 @<member...@>+=
 void
@@ -334,19 +409,18 @@ echo::connected(mod_handle& sock, const char* name)
 {
 }
 
-@ TODO
+@ Authorisation of peer certificate.
 
 @<member...@>+=
 mod_bool
 echo::auth(mod_handle& sock, const char* subject, const char* issuer)
 {
-  writelog(MOD_LOGINFO, "checking subject...");
   return MOD_TRUE;
 }
 
-@ |do_recv()| is called whenever new data is received from a client.  The
-|tok| reference is bound to the |string| buffer used to store incomplete lines
-between calls to |do_recv|.  The |tokenise()| function appends new data to the
+@ |recv()| is called whenever new data is received from a client.  The |tok|
+reference is bound to the |string| buffer used to store incomplete lines
+between calls to |recv|.  The |tokenise()| function appends new data to the
 back of |tok|.  Each complete line is processed by the |echoline| functor
 before |tok| is cleared.
 
@@ -354,7 +428,7 @@ before |tok| is cleared.
 void
 echo::recv(mod_handle& sock, const void* buf, size_t len)
 {
-  string* tok(gettoken(sock.ob_));
+  string* tok(unboxtoken(sock.ob_));
   try {
     aug::tokenise(static_cast<const char*>(buf),
       static_cast<const char*>(buf) + len, *tok, '\n',
@@ -366,7 +440,7 @@ echo::recv(mod_handle& sock, const void* buf, size_t len)
   }
 }
 
-@ TODO
+@ Socket-level errors are communicated to the Session via the |error()| call.
 
 @<member...@>+=
 void
@@ -375,7 +449,7 @@ echo::error(mod_handle& sock, const char* desc)
   writelog(MOD_LOGERROR, "server error: %s", desc);
 }
 
-@ Read-timer expiry is communicated using the |do_rdexpire()| function.  If no
+@ Read-timer expiry is communicated using the |rdexpire()| function.  If no
 data arrives for 15 seconds, the connection is shutdown.  The |shutdown()|
 function sends a FIN packet after ensuring that all buffered data has been
 flushed.  \AUG/ ensures that any buffered messages are flushed before
@@ -390,7 +464,8 @@ echo::rdexpire(mod_handle& sock, unsigned& ms)
   shutdown(sock, 0);
 }
 
-@ TODO
+@ Write-timers can also be scheduled, in which case, expiry would be notified
+using the |wrexpire()| function.
 
 @<member...@>+=
 void
@@ -398,7 +473,8 @@ echo::wrexpire(mod_handle& sock, unsigned& ms)
 {
 }
 
-@ TODO
+@ In addition to read and write timers, abitrary timers can also be set using
+|settimer()|.
 
 @<member...@>+=
 void
@@ -434,42 +510,6 @@ to the client associated with the |sock_| handle.
       send(sock_, tok.c_str(), tok.size());
     }
   };
-
-@ TODO
-
-@<token...@>+=
-  class token : public aug::boxptr_base<token> {
-    string impl_;
-  public:
-    ~token() AUG_NOTHROW
-    {
-    }
-    void*
-    unboxptr_() AUG_NOTHROW
-    {
-      return &impl_;
-    }
-    static aug::boxptrptr
-    create()
-    {
-      return attach(new token());
-    }
-  };
-
-@ TODO
-
-@<token...@>+=
-string*
-gettoken(aug::objectref ob)
-{
-  aug::boxptrptr box(aug::object_cast<aug_boxptr>(ob));
-  return null == box ? 0 : static_cast<string*>(unboxptr(box));
-}
-
-@ TODO
-
-@<include...@>+=
-#include <augext/boxptr.h>@/
 
 @ White-space, including any carriage-returns, are trimmed from the input
 line.  Then, the response is prepared by converting the line to upper-case and

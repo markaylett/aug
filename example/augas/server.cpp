@@ -138,7 +138,6 @@ namespace {
         mod_bool
         auth(mod_handle& sock, const char* subject, const char* issuer)
         {
-            writelog(MOD_LOGINFO, "checking subject...");
             return MOD_TRUE;
         }
         void
