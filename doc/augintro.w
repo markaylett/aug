@@ -3,7 +3,9 @@
 
 \def\ABI/{{\sc ABI}}
 \def\AUG/{{\sc AUG}}
+\def\CRLF/{{\sc CRLF}}
 \def\CYGWIN/{{\sc CYGWIN}}
+\def\FIN/{{\sc FIN}}
 \def\IPV6/{{\sc IPv6}}
 \def\GNU/{{\sc GNU}}
 \def\LINUX/{{\sc LINUX}}
@@ -26,15 +28,18 @@
 @s boxptr int
 @s boxptr_base int
 @s boxptrptr int
+@s eachline int
 @s echo int
-@s echoline int
+@s error normal
 @s mod int
 @s mod_bool int
 @s mod_handle int
 @s mod_id int
 @s object int
+@s object_cast make_pair
 @s objectref int
 @s sessionptr int
+@s static_cast make_pair
 @s std int
 @s string int
 @s token int
@@ -244,14 +249,14 @@ the unboxed pointer.
 
 @<token...@>+=
 string*
-unboxtoken(objectref ob)@;
-{@/
-  boxptrptr box = object_cast<aug_boxptr>(ob);@;
-  return null == box ? 0 : static_cast<string*>(unboxptr(box));@;
+unboxtoken(objectref ob)
+{
+  boxptrptr box = object_cast<aug_boxptr>(ob);
+  return null == box ? 0 : static_cast<string*>(unboxptr(box));
 }
 
-@ Each time the |eachline| functor is called, a response is prepared and sent
-to the client associated with the |sock_| handle.
+@ Each call to the |eachline| functor prepares a response and sends it to the
+client associated with the |sock_| handle.
 
 @<eachline...@>=
   struct eachline {@/
@@ -275,35 +280,38 @@ to the client associated with the |sock_| handle.
 #include <augutilpp/string.hpp>
 
 @ White-space, including any carriage-returns, are trimmed from the input
-line.  Then, the response is prepared by converting the line to upper-case and
-appending a CR/LF pair.  This end-of-line sequence is common in text-based,
-network protocols such as \POP3/ and \SMTP/.
+line.  The response is then prepared by converting the line to upper-case and
+appending a \CRLF/ pair.  This end-of-line sequence is chosen because it is
+common with text-based protocols such as \POP3/ and \SMTP/.
 
 @<prepare...@>=
 trim(tok);
 transform(tok.begin(), tok.end(), tok.begin(), ucase);
 tok += "\r\n";
 
-@ Class templates are using to bind the Module implementation to the export
-table.  In this example, the Module is configured with a single Session type.
-|basic_module<>| delegates the task of creating Sessions to a factory type.
-|basic_factory<>| builds a factory capable of creating |echo| Sessions.
+@ \AUG/ Modules are required to export three library functions, namely,
+|mod_init()|, |mod_term()| and |mod_create()|.  The |MOD_ENTRYPOINTS| macro
+assists with the definition of these three export functions.
 
 \yskip\noindent
 
-\AUG/ Modules are required to export three library functions, namely,
-|mod_init()|, |mod_term()| and |mod_create()|.  The |MOD_ENTRYPOINTS| macro
-assists with the definition of these three export functions.
+Class templates are used to bind the Module implementation to the dynamic
+library's export table.  In this example, the Module is configured with a
+single Session type, |echo|.  |basic_module<>| delegates the task of creating
+Sessions to a factory type.  |basic_factory<>| builds a factory capable of
+creating |echo| Sessions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echo> > module;@/
 MOD_ENTRYPOINTS(module::init, module::term, module::create)
 
-@ The |eachline| functor handles each line received from the client.
-\CPLUSPLUS/ Sessions can use the generated |basic_session| template.  Session
-functions of type |mod_bool| should return either |MOD_TRUE| or |MOD_FALSE|,
-depending on the result.  For those functions associated with a connection, a
-false return will result in the connection being closed.
+@* Echo Session.
+
+\CPLUSPLUS/ Sessions are normally derived from the |basic_session| template.
+
+@ Session functions of type |mod_bool| return either |MOD_TRUE| or
+|MOD_FALSE|.  For those functions associated with a connection, a false return
+will result in the connection being closed.
 
 @<echo...@>=
   class echo : public basic_session<echo> {@/
@@ -366,12 +374,12 @@ false return will result in the connection being closed.
 
 @ The |start()| function is called to start the Session.  This is where any
 non-trivial resource acquisition and construction takes place.  The two-phase
-construction is required to allow callbacks during the function call.
+construction is required to allow callbacks during the |start()| call.
 
 \yskip\noindent
 
 In this example, a TCP listener is bound to a port which is read from the
-configuration file using the |getenv()| function.  If the
+configuration file using the |mod::getenv()| function.  If the
 ``session.echo.serv'' property is missing from both the configuration file and
 environment table, |MOD_FALSE| is returned and the Session deactivated.
 
@@ -391,8 +399,8 @@ echo::start()
 }
 
 @ The |stop()| function is only called for a session whose |start()| function
-returned |MOD_TRUE|.  There is no need to explicity close the listener socket
-as this will be done prior to |stop()| being called.
+returned |MOD_TRUE|.  There is no need to explicity close the listener socket,
+as this will be done prior to the |stop()| call.
 
 @<member...@>+=
 void
@@ -401,9 +409,10 @@ echo::stop()
 }
 
 @ The |reconf()| handler is intended for Session's that wish to implement
-|SIGHUP|-style reconfiguration requests.  The function is called in response
-to a |AUG_EVENTRECONF| event.  These events are raised either in response to
-either a |SIGHUP|, or a call to |reconfall()|.
+|SIGHUP|-style reconfiguration requests.  The function is actually called in
+response to either a |SIGHUP| interrupt, or an explicit call to |reconfall()|.
+On Windows, |SIGHUP| equivalents are sent to the application-server via the
+Service Manager.
 
 @<member...@>+=
 void
@@ -412,7 +421,7 @@ echo::reconf()
 }
 
 @ As mentioned earlier in this document, custom events can be passed between
-sessions.  The |event()| function is called when a custom event is delivered
+Sessions.  The |event()| function is called when a custom event is delivered
 to a Session.
 
 @<member...@>+=
@@ -422,7 +431,7 @@ echo::event(const char* from, const char* type, mod_id id, objectref ob)
 }
 
 @ When a connection is closed, the |token| reference associated with the
-socket handle is released.
+|sock| handle is released.
 
 @<member...@>+=
 void
@@ -472,8 +481,8 @@ echo::connected(mod_handle& sock, const char* name)
 {
 }
 
-@ When \SSL/ sockets are used, authorisation of the peer certificate is
-delegated to the Session.
+@ When \SSL/ sockets are used, authorisation of the peer certificate can be
+conducted by the Session.
 
 @<member...@>+=
 mod_bool
@@ -482,11 +491,11 @@ echo::auth(mod_handle& sock, const char* subject, const char* issuer)
   return MOD_TRUE;
 }
 
-@ |recv()| is called when new data is received on a socket.  The |token|
-reference is bound to the |string| buffer used to store incomplete lines
-between |recv()| calls.  The |tokenise()| function appends new data to the
-back of |tok|.  Each complete line is processed by the |eachline| functor
-before |tok| is cleared.
+@ |recv()| is called when new data is received on a socket.  The Object
+reference contains the |token| buffer used to store incomplete lines between
+|recv()| calls.  The |tokenise()| function appends new data to the back of
+|tok|.  Each complete line is processed by the |eachline| functor before |tok|
+is cleared.
 
 @<member...@>+=
 void
@@ -509,7 +518,7 @@ echo::error(mod_handle& sock, const char* desc)
 
 @ Read-timer expiry is communicated using the |rdexpire()| function.  If no
 data arrives for 15 seconds, the connection is shutdown.  The |shutdown()|
-function sends a FIN packet after ensuring that all buffered data has been
+function sends a \FIN/ packet after ensuring that all buffered data has been
 flushed.  \AUG/ ensures that any buffered messages are flushed before
 performing the shutdown, and that any inflight messages sent by the client are
 delivered to the Session.
