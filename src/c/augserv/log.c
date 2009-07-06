@@ -65,22 +65,34 @@ redirectout_(int fd)
         return AUG_FAILERROR;
 #else /* _WIN32 */
     fflush(NULL);
-#endif /*_WIN32 */
+#endif /* _WIN32 */
 
     /* Duplicate stdout descriptor so that it can be restored on failure. */
 
+#if !defined(_WIN32)
     if (-1 == (old = dup(STDOUT_FILENO)))
+#else /* _WIN32 */
+    if (-1 == (old = _dup(STDOUT_FILENO)))
+#endif /* _WIN32 */
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     /* Assumption: If dup2 fails for any reason, the original descriptor's
        state will remain unchanged. */
 
+#if !defined(_WIN32)
     if (-1 == dup2(fd, STDOUT_FILENO)) {
+#else /* _WIN32 */
+    if (-1 == _dup2(fd, STDOUT_FILENO)) {
+#endif /* _WIN32 */
         result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         goto done;
     }
 
+#if !defined(_WIN32)
     if (-1 == dup2(fd, STDERR_FILENO)) {
+#else /* _WIN32 */
+    if (-1 == _dup2(fd, STDERR_FILENO)) {
+#endif /* _WIN32 */
 
         result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
@@ -96,7 +108,11 @@ redirectout_(int fd)
     result = AUG_SUCCESS;
 
  done:
+#if !defined(_WIN32)
     if (-1 == close(old))
+#else /* _WIN32 */
+    if (-1 == _close(old))
+#endif /* _WIN32 */
         aug_ctxerror(aug_tlx, "close() failed");
 
     return result;

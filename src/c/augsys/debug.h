@@ -27,10 +27,11 @@
 
 #if defined(_MSC_VER) && !defined(NDEBUG)
 
+# define _CRTDBG_MAP_ALLOC
+
 # include <malloc.h>
 # include <stdlib.h>
 
-# define _CRTDBG_MAP_ALLOC
 # include <crtdbg.h>
 
 #endif /* _MSC_VER && !NDEBUG */

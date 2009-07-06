@@ -70,7 +70,11 @@ aug_basename(const char* path)
 AUGUTIL_API aug_result
 aug_chdir(const char* path)
 {
+#if !defined(_WIN32)
     if (-1 == chdir(path))
+#else /* _WIN32 */
+    if (-1 == _chdir(path))
+#endif /* _WIN32 */
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     return AUG_SUCCESS;
@@ -82,7 +86,7 @@ aug_getcwd(char* dst, size_t size)
 #if !defined(_WIN32)
     if (!getcwd(dst, size)) {
 #else /* _WIN32 */
-    if (!getcwd(dst, (int)size)) {
+    if (!_getcwd(dst, (int)size)) {
 #endif /* _WIN32 */
         aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
         return NULL;

@@ -68,8 +68,11 @@ namespace {
     const char*
     nonce(mod_id id, const string& addr, aug_md5base64_t base64)
     {
+#if !defined(_WIN32)
         pid_t pid(getpid());
-
+#else // _WIN32
+        pid_t pid(_getpid());
+#endif // _WIN32
         aug_timeval tv;
         clockptr clock(getclock(aug_tlx));
         gettimeofday(clock, tv);

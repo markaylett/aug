@@ -106,21 +106,21 @@ createconsole_(const char* sname)
 
 	h = GetStdHandle(STD_INPUT_HANDLE);
 	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
-    dup2(fd, 0);
+    _dup2(fd, 0);
 	fp = _fdopen(fd, "r");
 	*stdin = *fp;
 	setvbuf(stdin, NULL, _IONBF, 0);
 
 	h = GetStdHandle(STD_OUTPUT_HANDLE);
 	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
-    dup2(fd, 1);
+    _dup2(fd, 1);
 	fp = _fdopen(fd, "w");
 	*stdout = *fp;
 	setvbuf(stdout, NULL, _IONBF, 0);
 
 	h = GetStdHandle(STD_ERROR_HANDLE);
 	fd = _open_osfhandle((intptr_t)h, _O_TEXT);
-    dup2(fd, 2);
+    _dup2(fd, 2);
 	fp = _fdopen(fd, "w");
 	*stderr = *fp;
 	setvbuf(stderr, NULL, _IONBF, 0);
