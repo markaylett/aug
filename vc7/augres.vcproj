@@ -21,7 +21,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../src;../src/c"
-				PreprocessorDefinitions="WIN32;_DEBUG;FD_SETSIZE=256"
+				PreprocessorDefinitions="WIN32;_DEBUG;FD_SETSIZE=256;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -29,7 +29,6 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="TRUE"
-				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -77,13 +76,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../src;../src/c"
-				PreprocessorDefinitions="WIN32;NDEBUG;FD_SETSIZE=256"
+				PreprocessorDefinitions="WIN32;NDEBUG;FD_SETSIZE=256;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="TRUE"
-				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
