@@ -98,7 +98,11 @@ redirectout_(int fd)
 
         /* Restore the original descriptor. */
 
+#if !defined(_WIN32)
         if (-1 == dup2(old, STDOUT_FILENO))
+#else /* _WIN32 */
+        if (-1 == _dup2(old, STDOUT_FILENO))
+#endif /* _WIN32 */
             aug_ctxerror(aug_tlx, "dup2() failed");
         goto done;
     }
@@ -124,12 +128,21 @@ aug_openlog(const char* path)
     int fd;
     aug_result result;
 
-    if (-1 == (fd = open(path, O_APPEND | O_CREAT | O_WRONLY, 0640)))
+#if !defined(_WIN32)
+    if (-1 == (fd = open(path,
+#else /* _WIN32 */
+    if (-1 == (fd = _open(path,
+#endif /* _WIN32 */
+                          O_APPEND | O_CREAT | O_WRONLY, 0640)))
         return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
     result = redirectout_(fd);
 
+#if !defined(_WIN32)
     if (-1 == close(fd))
+#else /* _WIN32 */
+    if (-1 == _close(fd))
+#endif /* _WIN32 */
         aug_ctxerror(aug_tlx, "close() failed");
 
     return result;
