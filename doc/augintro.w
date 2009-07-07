@@ -19,6 +19,7 @@
 \def\SMTP/{{\sc SMTP}}
 \def\SSL/{{\sc SSL}}
 \def\WINDOWS/{{\sc WINDOWS}}
+\def\XML/{{\sc XML}}
 
 @s aug int
 @s aug_boxptr int
@@ -137,11 +138,11 @@ the same compiler.
 
 \yskip\noindent
 
-Interfaces are defined using a simple XML schema.  It is often useful, for
+Interfaces are defined using a simple \XML/ schema.  It is often useful, for
 example, to box a plain pointer into an Object so that it can be passed
-between Sessions.  This allows the pointee's lifetime to managed automatically
-by the Object.  The interface definition for this |boxptr| might be something
-like:
+between Sessions.  This allows the pointee's lifetime to be managed
+automatically by the Object.  A example interface definition for a |boxptr|
+follows.
 
 \yskip
 \.{<package name="aug" dir="augext">}
@@ -156,7 +157,8 @@ like:
 
 \yskip\noindent
 
-Interfaces can be translated to ABI definitions using the \.{augidl} script.
+Interfaces can be translated to a suitable ABI definition using the \.{augidl}
+script.
 
 \yskip\noindent
 
@@ -222,8 +224,8 @@ in the module.
 #include <augext/boxptr.h>@/
 
 @ Using the facilities in the |boxptr| header file, an implementation is
-defined which boxes a |string|.  The |unboxptr_()| member function provides
-the implementation behind the |unboxptr()| method.
+defined to box a |string|.  The |unboxptr_()| member function provides the
+implementation behind the |unboxptr()| method.
 
 @<token...@>+=
   class token : public boxptr_base<token> {@/
@@ -245,7 +247,7 @@ the implementation behind the |unboxptr()| method.
   };
 
 @ A convenience function is defined to downcast from a base Object, and return
-the unboxed pointer.
+the ``unboxed'' pointer.
 
 @<token...@>+=
 string*
@@ -255,8 +257,8 @@ unboxtoken(objectref ob)
   return null == box ? 0 : static_cast<string*>(unboxptr(box));
 }
 
-@ Each call to the |eachline| functor prepares a response and sends it to the
-client associated with the |sock_| handle.
+@ A call to the |eachline| functor prepares a response and sends it back to
+the originating client.
 
 @<eachline...@>=
   struct eachline {@/
@@ -281,25 +283,25 @@ client associated with the |sock_| handle.
 
 @ White-space, including any carriage-returns, are trimmed from the input
 line.  The response is then prepared by converting the line to upper-case and
-appending a \CRLF/ pair.  This end-of-line sequence is chosen because it is
-common with text-based protocols such as \POP3/ and \SMTP/.
+appending a \CRLF/ pair.  This end-of-line sequence is chosen because of its
+ubiquitous use in Internet protocols such as \POP3/ and \SMTP/.
 
 @<prepare...@>=
 trim(tok);
 transform(tok.begin(), tok.end(), tok.begin(), ucase);
 tok += "\r\n";
 
-@ \AUG/ Modules are required to export three library functions, namely,
-|mod_init()|, |mod_term()| and |mod_create()|.  The |MOD_ENTRYPOINTS| macro
-assists with the definition of these three export functions.
+@ \AUG/ Modules are required to export three library functions: |mod_init()|,
+|mod_term()| and |mod_create()|.  The |MOD_ENTRYPOINTS| macro assists with the
+definition of these export functions.
 
 \yskip\noindent
 
-Class templates are used to bind the Module implementation to the dynamic
-library's export table.  In this example, the Module is configured with a
-single Session type, |echo|.  |basic_module<>| delegates the task of creating
-Sessions to a factory type.  |basic_factory<>| builds a factory capable of
-creating |echo| Sessions.
+Class templates are used to bind the Module implementation to the library's
+export table.  In this example, the Module is configured with a single Session
+type, |echo|.  |basic_module<>| delegates the task of creating Sessions to a
+factory type.  |basic_factory<>| builds a factory capable of creating |echo|
+Sessions.
 
 @<declare...@>=
 typedef basic_module<basic_factory<echo> > module;@/
@@ -310,8 +312,8 @@ MOD_ENTRYPOINTS(module::init, module::term, module::create)
 \CPLUSPLUS/ Sessions are normally derived from the |basic_session| template.
 
 @ Session functions of type |mod_bool| return either |MOD_TRUE| or
-|MOD_FALSE|.  For those functions associated with a connection, a false return
-will result in the connection being closed.
+|MOD_FALSE|.  For those functions associated with a connection, a |MOD_FALSE|
+return will result in the connection being closed.
 
 @<echo...@>=
   class echo : public basic_session<echo> {@/
@@ -381,7 +383,8 @@ construction is required to allow callbacks during the |start()| call.
 In this example, a TCP listener is bound to a port which is read from the
 configuration file using the |mod::getenv()| function.  If the
 ``session.echo.serv'' property is missing from both the configuration file and
-environment table, |MOD_FALSE| is returned and the Session deactivated.
+environment table, |MOD_FALSE| is returned and the Session deactivated.  The
+simplicity of \SSL/ Sessions is also demonstrated.
 
 @<member...@>+=
 mod_bool
@@ -400,7 +403,7 @@ echo::start()
 
 @ The |stop()| function is only called for a session whose |start()| function
 returned |MOD_TRUE|.  There is no need to explicity close the listener socket,
-as this will be done prior to the |stop()| call.
+as this will be done prior to |stop()| being call.
 
 @<member...@>+=
 void
@@ -408,10 +411,10 @@ echo::stop()
 {
 }
 
-@ The |reconf()| handler is intended for Session's that wish to implement
-|SIGHUP|-style reconfiguration requests.  The function is actually called in
-response to either a |SIGHUP| interrupt, or an explicit call to |reconfall()|.
-On Windows, |SIGHUP| equivalents are sent to the application-server via the
+@ The |reconf()| handler is intended for Session's that wish to implement a
+|SIGHUP|-style reconfiguration.  The function is actually called in response
+to either a |SIGHUP| interrupt, or an explicit call to |reconfall()|.  On
+Windows, |SIGHUP| equivalents are sent to the application-server via the
 Service Manager.
 
 @<member...@>+=
