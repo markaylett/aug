@@ -66,12 +66,12 @@ torw_(int from)
 static aug_result
 init_(aug_seq_t seq, struct aug_info_* info)
 {
-    static const aug_verno_t VERNO = 2U;
+    static const aug_verno_t VERNO = 3U;
     unsigned size = aug_seqsize_(seq);
 
     /* An existing archive will be at least as big as the minimum size. */
 
-    if (AUG_LEADER_SIZE <= size) {
+    if (AUG_LEADERSIZE <= size) {
 
         aug_verify(aug_info_(seq, info));
 
@@ -90,16 +90,17 @@ init_(aug_seq_t seq, struct aug_info_* info)
 
         aug_verify(aug_setregion_(seq, 0, size));
 
-        if (!(ptr = aug_resizeseq_(seq, AUG_LEADER_SIZE)))
+        if (!(ptr = aug_resizeseq_(seq, AUG_LEADERSIZE)))
             return AUG_FAILERROR;
 
-        aug_encodeverno(ptr + AUG_VERNO_OFFSET,
+        memcpy(ptr + AUG_MAGICOFF, AUG_MAGIC, sizeof(aug_magic_t));
+        aug_encodeverno(ptr + AUG_VERNOOFF,
                         (aug_verno_t)(info->verno_ = VERNO));
-        aug_encodefields(ptr + AUG_FIELDS_OFFSET,
+        aug_encodefields(ptr + AUG_FIELDSOFF,
                          (aug_fields_t)(info->fields_ = 0));
-        aug_encodehsize(ptr + AUG_HSIZE_OFFSET,
+        aug_encodehsize(ptr + AUG_HSIZEOFF,
                         (aug_hsize_t)(info->hsize_ = 0));
-        aug_encodebsize(ptr + AUG_BSIZE_OFFSET,
+        aug_encodebsize(ptr + AUG_BSIZEOFF,
                         (aug_bsize_t)(info->bsize_ = 0));
     }
 

@@ -86,7 +86,7 @@ aug_verifypacket(const struct aug_packet* packet)
 AUGNET_API char*
 aug_encodepacket(char* buf, const struct aug_packet* pkt)
 {
-    strcpy(buf + AUG_PKTMAGICOFF, MAGIC_);
+    memcpy(buf + AUG_PKTMAGICOFF, MAGIC_, AUG_PKTMAGICSIZE);
 
     /* Standard header fields. */
 
@@ -96,16 +96,12 @@ aug_encodepacket(char* buf, const struct aug_packet* pkt)
     packstring_(buf + AUG_PKTADDROFF, pkt->addr_, AUG_PKTADDRLEN);
 
     switch (pkt->type_) {
+    case AUG_PKTOPEN:
+    case AUG_PKTCLOSE:
     case AUG_PKTHBEAT:
+    case AUG_PKTLOST:
         /* Zero-pad content. */
-        memset(buf + AUG_PKTCONTENTOFF, 0, AUG_PKTCONTENTLEN);
-        break;
-    case AUG_PKTRESET:
-        aug_encode32(buf + AUG_PKTCONTENTOFF,
-                     (uint32_t)pkt->content_.reset_.next_);
-        /* Zero-pad content. */
-        memset(buf + AUG_PKTCONTENTOFF + sizeof(uint32_t), 0,
-               AUG_PKTCONTENTLEN - sizeof(uint32_t));
+        memset(buf + AUG_PKTBODYOFF, 0, AUG_PKTBODYSIZE);
         break;
     case AUG_PKTEVENT:
         packstring_(buf + AUG_PKTMETHODOFF, pkt->content_.event_.method_,
@@ -115,8 +111,8 @@ aug_encodepacket(char* buf, const struct aug_packet* pkt)
         /* Packet full.  No need to zero-pad. */
         break;
     default:
-        /* Use extension content. */
-        memcpy(buf + AUG_PKTCONTENTOFF, pkt->content_.ext_,
+        /* Use extension body. */
+        memcpy(buf + AUG_PKTBODYOFF, pkt->content_.ext_,
                sizeof(pkt->content_.ext_));
         break;
     }
@@ -126,7 +122,7 @@ aug_encodepacket(char* buf, const struct aug_packet* pkt)
 AUGNET_API struct aug_packet*
 aug_decodepacket(struct aug_packet* pkt, const char* buf)
 {
-    if (0 != memcmp(buf, MAGIC_, AUG_PKTMAGICLEN)) {
+    if (0 != memcmp(buf + AUG_PKTMAGICOFF, MAGIC_, AUG_PKTMAGICSIZE)) {
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid packet header"));
         return NULL;
@@ -140,11 +136,11 @@ aug_decodepacket(struct aug_packet* pkt, const char* buf)
     unpackstring_(pkt->addr_, buf + AUG_PKTADDROFF, AUG_PKTADDRLEN);
 
     switch (pkt->type_) {
+    case AUG_PKTOPEN:
+    case AUG_PKTCLOSE:
     case AUG_PKTHBEAT:
+    case AUG_PKTLOST:
         /* Header only. */
-        break;
-    case AUG_PKTRESET:
-        pkt->content_.reset_.next_ = aug_decode32(buf + AUG_PKTCONTENTOFF);
         break;
     case AUG_PKTEVENT:
         unpackstring_(pkt->content_.event_.method_, buf + AUG_PKTMETHODOFF,
@@ -153,8 +149,8 @@ aug_decodepacket(struct aug_packet* pkt, const char* buf)
                       AUG_PKTURILEN);
         break;
     default:
-        /* Use extension content. */
-        memcpy(pkt->content_.ext_, buf + AUG_PKTCONTENTOFF,
+        /* Use extension body. */
+        memcpy(pkt->content_.ext_, buf + AUG_PKTBODYOFF,
                sizeof(pkt->content_.ext_));
         break;
     }

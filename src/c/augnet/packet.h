@@ -45,14 +45,14 @@
  * @{
  */
 
-#define AUG_PKTMAGICLEN   4
-#define AUG_PKTVERLEN     sizeof(uint16_t)
-#define AUG_PKTTYPELEN    sizeof(uint16_t)
-#define AUG_PKTSEQLEN     sizeof(uint32_t)
-#define AUG_PKTADDRLEN    AUG_MAXHOSTSERVLEN
-#define AUG_PKTCONTENTLEN 376
-#define AUG_PKTMETHODLEN  64
-#define AUG_PKTURILEN     (AUG_PKTCONTENTLEN - AUG_PKTMETHODLEN)
+#define AUG_PKTMAGICSIZE 4
+#define AUG_PKTVERSIZE   sizeof(uint16_t)
+#define AUG_PKTTYPESIZE  sizeof(uint16_t)
+#define AUG_PKTSEQSIZE   sizeof(uint32_t)
+#define AUG_PKTADDRLEN   AUG_MAXHOSTSERVLEN
+#define AUG_PKTBODYSIZE  376
+#define AUG_PKTMETHODLEN 64
+#define AUG_PKTURILEN    (AUG_PKTBODYSIZE - AUG_PKTMETHODLEN)
 
 /** @} */
 
@@ -64,24 +64,22 @@
  * @{
  */
 
-#define AUG_PKTMAGICOFF    0
-#define AUG_PKTVEROFF     (AUG_PKTMAGICOFF + AUG_PKTMAGICLEN)
-#define AUG_PKTTYPEOFF    (AUG_PKTVEROFF + AUG_PKTVERLEN)
-#define AUG_PKTSEQOFF     (AUG_PKTTYPEOFF + AUG_PKTTYPELEN)
-#define AUG_PKTADDROFF    (AUG_PKTSEQOFF + AUG_PKTSEQLEN)
-#define AUG_PKTCONTENTOFF (AUG_PKTADDROFF + AUG_PKTADDRLEN)
-#define AUG_PKTMETHODOFF   AUG_PKTCONTENTOFF
-#define AUG_PKTURIOFF     (AUG_PKTMETHODOFF + AUG_PKTMETHODLEN)
+#define AUG_PKTMAGICOFF   0
+#define AUG_PKTVEROFF    (AUG_PKTMAGICOFF + AUG_PKTMAGICSIZE)
+#define AUG_PKTTYPEOFF   (AUG_PKTVEROFF + AUG_PKTVERSIZE)
+#define AUG_PKTSEQOFF    (AUG_PKTTYPEOFF + AUG_PKTTYPESIZE)
+#define AUG_PKTADDROFF   (AUG_PKTSEQOFF + AUG_PKTSEQSIZE)
+#define AUG_PKTBODYOFF   (AUG_PKTADDROFF + AUG_PKTADDRLEN)
+#define AUG_PKTMETHODOFF  AUG_PKTBODYOFF
+#define AUG_PKTURIOFF    (AUG_PKTMETHODOFF + AUG_PKTMETHODLEN)
 
 /** @} */
 
-/**
- * The #aug_packet::type_ value for heartbeats.
- */
-
-#define AUG_PKTHBEAT 1
-#define AUG_PKTRESET 2
-#define AUG_PKTEVENT 3
+#define AUG_PKTOPEN  1
+#define AUG_PKTCLOSE 2
+#define AUG_PKTHBEAT 3
+#define AUG_PKTLOST  4
+#define AUG_PKTEVENT 5
 
 /**
  * Packet structure.
@@ -92,13 +90,10 @@ struct aug_packet {
     char addr_[AUG_PKTADDRLEN + 1];
     union {
         struct {
-            unsigned next_;
-        } reset_;
-        struct {
             char method_[AUG_PKTMETHODLEN + 1];
             char uri_[AUG_PKTURILEN + 1];
         } event_;
-        char ext_[AUG_PKTCONTENTLEN];
+        char ext_[AUG_PKTBODYSIZE];
     } content_;
 };
 

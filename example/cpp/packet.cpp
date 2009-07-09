@@ -53,6 +53,16 @@ namespace {
     }
 
     class packet : aug_packet, public mpool_ops {
+        size_t
+        sendhead(sdref ref, unsigned type, const endpoint& ep)
+        {
+            type_ = type;
+            ++seq_;
+
+            char buf[AUG_PACKETSIZE];
+            aug_encodepacket(buf, static_cast<aug_packet*>(this));
+            return aug::sendto(ref, buf, sizeof(buf), 0, ep);
+        }
     public:
         explicit
         packet(const char* addr)
@@ -63,40 +73,34 @@ namespace {
             aug_strlcpy(addr_, addr, sizeof(addr_));
         }
         size_t
-        sendhbeat(sdref ref, const endpoint& ep)
+        sendopen(sdref ref, const endpoint& ep)
         {
-            type_ = AUG_PKTHBEAT;
-            ++seq_;
-
-            char buf[AUG_PACKETSIZE];
-            aug_encodepacket(buf, static_cast<aug_packet*>(this));
-            return aug::sendto(ref, buf, sizeof(buf), 0, ep);
+            return sendhead(ref, AUG_PKTOPEN, ep);
         }
         size_t
-        sendreset(sdref ref, unsigned next, const endpoint& ep)
+        sendclose(sdref ref, const endpoint& ep)
         {
-            type_ = AUG_PKTRESET;
-            ++seq_;
-            content_.reset_.next_ = next;
-
-            char buf[AUG_PACKETSIZE];
-            aug_encodepacket(buf, static_cast<aug_packet*>(this));
-            return aug::sendto(ref, buf, sizeof(buf), 0, ep);
+            return sendhead(ref, AUG_PKTCLOSE, ep);
+        }
+        size_t
+        sendhbeat(sdref ref, const endpoint& ep)
+        {
+            return sendhead(ref, AUG_PKTHBEAT, ep);
+        }
+        size_t
+        sendlost(sdref ref, const endpoint& ep)
+        {
+            return sendhead(ref, AUG_PKTLOST, ep);
         }
         size_t
         sendevent(sdref ref, const char* method, const char* uri,
                   const endpoint& ep)
         {
-            type_ = AUG_PKTEVENT;
-            ++seq_;
             aug_strlcpy(content_.event_.method_, method,
                         sizeof(content_.event_.method_));
             aug_strlcpy(content_.event_.uri_, uri,
                         sizeof(content_.event_.uri_));
-
-            char buf[AUG_PACKETSIZE];
-            aug_encodepacket(buf, static_cast<aug_packet*>(this));
-            return aug::sendto(ref, buf, sizeof(buf), 0, ep);
+            return sendhead(ref, AUG_PKTEVENT, ep);
         }
     };
 

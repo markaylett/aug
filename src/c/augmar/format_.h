@@ -28,6 +28,8 @@
 
 #include "augsys/endian.h"
 
+typedef char aug_magic_t[4];
+
 typedef uint16_t aug_verno_t;
 #define aug_encodeverno aug_encode16
 #define aug_decodeverno aug_decode16
@@ -35,43 +37,46 @@ typedef uint16_t aug_verno_t;
 typedef uint16_t aug_fields_t;
 #define aug_encodefields aug_encode16
 #define aug_decodefields aug_decode16
-#define AUG_FIELDS_MAX UINT16_MAX
+#define AUG_MAXFIELDS UINT16_MAX
 
 typedef uint32_t aug_hsize_t;
 #define aug_encodehsize aug_encode32
 #define aug_decodehsize aug_decode32
-#define AUG_HSIZE_MAX UINT32_MAX
+#define AUG_MAXHSIZE UINT32_MAX
 
 typedef uint32_t aug_bsize_t;
 #define aug_encodebsize aug_encode32
 #define aug_decodebsize aug_decode32
-#define AUG_BSIZE_MAX UINT32_MAX
+#define AUG_MAXBSIZE UINT32_MAX
 
 typedef uint16_t aug_nsize_t;
 #define aug_encodensize aug_encode16
 #define aug_decodensize aug_decode16
-#define AUG_NSIZE_MAX UINT16_MAX
+#define AUG_MAXNSIZE UINT16_MAX
 
 typedef uint16_t aug_vsize_t;
 #define aug_encodevsize aug_encode16
 #define aug_decodevsize aug_decode16
-#define AUG_VSIZE_MAX UINT16_MAX
+#define AUG_MAXVSIZE UINT16_MAX
 
 #define AUG_LEADER 0
-#define AUG_VERNO_OFFSET 0
-#define AUG_FIELDS_OFFSET (AUG_VERNO_OFFSET + sizeof(aug_verno_t))
-#define AUG_HSIZE_OFFSET (AUG_FIELDS_OFFSET + sizeof(aug_fields_t))
-#define AUG_BSIZE_OFFSET (AUG_HSIZE_OFFSET + sizeof(aug_hsize_t))
-#define AUG_LEADER_SIZE (AUG_BSIZE_OFFSET + sizeof(aug_bsize_t))
+#define AUG_MAGICOFF 0
+#define AUG_VERNOOFF (AUG_MAGICOFF + sizeof(aug_magic_t))
+#define AUG_FIELDSOFF (AUG_VERNOOFF + sizeof(aug_verno_t))
+#define AUG_HSIZEOFF (AUG_FIELDSOFF + sizeof(aug_fields_t))
+#define AUG_BSIZEOFF (AUG_HSIZEOFF + sizeof(aug_hsize_t))
+#define AUG_LEADERSIZE (AUG_BSIZEOFF + sizeof(aug_bsize_t))
 
-#define AUG_HEADER AUG_LEADER_SIZE
+#define AUG_HEADER AUG_LEADERSIZE
 
-#define AUG_NSIZE_OFFSET 0
-#define AUG_VSIZE_OFFSET (AUG_NSIZE_OFFSET + sizeof(aug_nsize_t))
-#define AUG_NAME_OFFSET (AUG_VSIZE_OFFSET + sizeof(aug_vsize_t))
-#define AUG_VALUE_OFFSET(nsize) (AUG_NAME_OFFSET + (nsize))
-#define AUG_FIELD_SIZE(nsize, vsize) (AUG_VALUE_OFFSET(nsize) + (vsize))
+#define AUG_NSIZEOFF 0
+#define AUG_VSIZEOFF (AUG_NSIZEOFF + sizeof(aug_nsize_t))
+#define AUG_NAMEOFF (AUG_VSIZEOFF + sizeof(aug_vsize_t))
+#define AUG_VALUEOFF(nsize) (AUG_NAMEOFF + (nsize))
+#define AUG_FIELDSIZE(nsize, vsize) (AUG_VALUEOFF(nsize) + (vsize))
 
 #define AUG_BODY(hsize) (AUG_HEADER + hsize)
+
+#define AUG_MAGIC "mar"
 
 #endif /* AUGMAR_FORMAT_H_ */

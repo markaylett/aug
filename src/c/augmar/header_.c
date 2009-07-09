@@ -39,37 +39,37 @@ AUG_RCSID("$Id$");
 static void
 setnsize_(const void* field, aug_nsize_t nsize)
 {
-    aug_encodensize((char*)field + AUG_NSIZE_OFFSET, nsize);
+    aug_encodensize((char*)field + AUG_NSIZEOFF, nsize);
 }
 
 static unsigned
 nsize_(const void* field)
 {
-    return aug_decodensize((char*)field + AUG_NSIZE_OFFSET);
+    return aug_decodensize((char*)field + AUG_NSIZEOFF);
 }
 
 static void
 setvsize_(const void* field, aug_vsize_t vsize)
 {
-    aug_encodevsize((char*)field + AUG_VSIZE_OFFSET, vsize);
+    aug_encodevsize((char*)field + AUG_VSIZEOFF, vsize);
 }
 
 static unsigned
 vsize_(const void* field)
 {
-    return aug_decodevsize((char*)field + AUG_VSIZE_OFFSET);
+    return aug_decodevsize((char*)field + AUG_VSIZEOFF);
 }
 
 static const char*
 name_(void* field)
 {
-    return (const char*)field + AUG_NAME_OFFSET;
+    return (const char*)field + AUG_NAMEOFF;
 }
 
 static void*
 value_(void* field, unsigned nsize)
 {
-    return (char*)field + AUG_VALUE_OFFSET(nsize);
+    return (char*)field + AUG_VALUEOFF(nsize);
 }
 
 static unsigned
@@ -77,7 +77,7 @@ fieldsize_(const void* field)
 {
     unsigned nsize = nsize_(field);
     unsigned vsize = vsize_(field);
-    return AUG_FIELD_SIZE(nsize, vsize);
+    return AUG_FIELDSIZE(nsize, vsize);
 }
 
 static unsigned
@@ -301,7 +301,7 @@ aug_putfieldn_(aug_seq_t seq, struct aug_info_* info, unsigned n,
 
     vsize = size + 1;
 
-    if (AUG_VSIZE_MAX < vsize) {
+    if (AUG_MAXVSIZE < vsize) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("maximum field-value size exceeded"));
@@ -320,20 +320,20 @@ aug_putfieldn_(aug_seq_t seq, struct aug_info_* info, unsigned n,
     orig = vsize_(ptr);
 
     aug_verify(aug_setregion_(seq, AUG_HEADER + offset,
-                              AUG_FIELD_SIZE(nsize, orig)));
+                              AUG_FIELDSIZE(nsize, orig)));
 
-    if (!(ptr = aug_resizeseq_(seq, AUG_FIELD_SIZE(nsize, vsize))))
+    if (!(ptr = aug_resizeseq_(seq, AUG_FIELDSIZE(nsize, vsize))))
         return AUG_FAILERROR;
 
     /* Set field value. */
 
     setvsize_(ptr, (aug_vsize_t)vsize);
     if (size)
-        memcpy(ptr + AUG_VALUE_OFFSET(nsize), value, size);
+        memcpy(ptr + AUG_VALUEOFF(nsize), value, size);
 
     /* Always null terminate. */
 
-    ptr[AUG_VALUE_OFFSET(nsize) + size] = '\0';
+    ptr[AUG_VALUEOFF(nsize) + size] = '\0';
 
     /* Add difference between old and new value size to header size. */
 
@@ -360,21 +360,21 @@ aug_putfieldp_(aug_seq_t seq, struct aug_info_* info, const char* name,
     nsize = (unsigned)strlen(name) + 1;
     vsize = size + 1; /* Add null terminator. */
 
-    if (AUG_NSIZE_MAX < nsize) {
+    if (AUG_MAXNSIZE < nsize) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("maximum field-name size exceeded"));
         return AUG_FAILERROR;
     }
 
-    if (AUG_VSIZE_MAX < vsize) {
+    if (AUG_MAXVSIZE < vsize) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("maximum field-value size exceeded"));
         return AUG_FAILERROR;
     }
 
-    fsize = AUG_FIELD_SIZE(nsize, vsize);
+    fsize = AUG_FIELDSIZE(nsize, vsize);
 
     aug_verify(aug_setregion_(seq, AUG_HEADER, info->hsize_));
 
@@ -396,17 +396,17 @@ aug_putfieldp_(aug_seq_t seq, struct aug_info_* info, const char* name,
     /* Set field name. */
 
     setnsize_(ptr, (aug_nsize_t)nsize);
-    memcpy(ptr + AUG_NAME_OFFSET, name, nsize);
+    memcpy(ptr + AUG_NAMEOFF, name, nsize);
 
     /* Set field value */
 
     setvsize_(ptr, (aug_vsize_t)vsize);
     if (size)
-        memcpy(ptr + AUG_VALUE_OFFSET(nsize), value, size);
+        memcpy(ptr + AUG_VALUEOFF(nsize), value, size);
 
     /* Always null terminate. */
 
-    ptr[AUG_VALUE_OFFSET(nsize) + size] = '\0';
+    ptr[AUG_VALUEOFF(nsize) + size] = '\0';
 
     /* If new field then increment field count. */
 
