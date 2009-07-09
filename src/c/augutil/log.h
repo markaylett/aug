@@ -31,7 +31,9 @@
 
 #include "augutil/config.h"
 
+#include "augext/clock.h"
 #include "augext/log.h"
+#include "augext/mpool.h"
 
 /**
  * Get textual description of log label.
@@ -51,6 +53,8 @@ aug_loglabel(int level);
  *
  * @param n In: size of @a buf.  Out: total number of characters copied
  *
+ * @param clock Clock for timestamps.
+ *
  * @param level Log level.
  *
  * @param format Printf-style format.
@@ -61,23 +65,28 @@ aug_loglabel(int level);
  */
 
 AUGUTIL_API aug_result
-aug_vformatlog(char* buf, size_t* n, int level, const char* format,
-               va_list args);
+aug_vformatlog(char* buf, size_t* n, aug_clock* clock, int level,
+               const char* format, va_list args);
 
 /**
  * @see aug_vformatlog().
  */
 
 AUGUTIL_API aug_result
-aug_formatlog(char* buf, size_t* n, int level, const char* format, ...);
+aug_formatlog(char* buf, size_t* n, aug_clock* clock, int level,
+              const char* format, ...);
 
 /**
- * The daemon logger.
+ * Create a daemon logger.
+ *
+ * @param mpool Memory pool.
+ *
+ * @param clock Clock for timestamps.
  *
  * @return An interface to the daemon logger.
  */
 
 AUGUTIL_API aug_log*
-aug_getdaemonlog(void);
+aug_createdaemonlog(aug_mpool* mpool, aug_clock* clock);
 
 #endif /* AUGUTIL_LOG_H */

@@ -70,15 +70,10 @@ static const char* LABELS_[] = {
 };
 
 static aug_rsize
-localtime_(struct tm* res)
+localtime_(aug_clock* clock, struct tm* res)
 {
     struct aug_timeval tv;
-    aug_clock* clock = aug_getclock(aug_tlx);
-    aug_result result = aug_gettimeofday(clock, &tv);
-    aug_release(clock);
-
-    if (AUG_ISFAIL(result))
-        return result;
+    aug_verify(aug_gettimeofday(clock, &tv));
 
     if (!aug_localtime(&tv.tv_sec, res))
         return AUG_FAILERROR;
@@ -109,33 +104,52 @@ writeall_(int fd, const char* buf, size_t n)
     return AUG_SUCCESS;
 }
 
+struct impl_ {
+    aug_log log_;
+    int refs_;
+    aug_mpool* mpool_;
+    aug_clock* clock_;
+};
+
 static void*
-cast_(aug_log* obj, const char* id)
+cast_(aug_log* ob, const char* id)
 {
     if (AUG_EQUALID(id, aug_objectid) || AUG_EQUALID(id, aug_logid)) {
-        aug_retain(obj);
-        return obj;
+        aug_retain(ob);
+        return ob;
     }
     return NULL;
 }
 
 static void
-retain_(aug_log* obj)
+retain_(aug_log* ob)
 {
+    struct impl_* impl = AUG_PODIMPL(struct impl_, log_, ob);
+    ++impl->refs_;
 }
 
 static void
-release_(aug_log* obj)
+release_(aug_log* ob)
 {
+    struct impl_* impl = AUG_PODIMPL(struct impl_, log_, ob);
+    if (0 == --impl->refs_) {
+        aug_mpool* mpool = impl->mpool_;
+        aug_clock* clock = impl->clock_;
+        aug_freemem(mpool, impl);
+        aug_release(clock);
+        aug_release(mpool);
+    }
 }
 
 static aug_result
-vwritelog_(aug_log* obj, int level, const char* format, va_list args)
+vwritelog_(aug_log* ob, int level, const char* format, va_list args)
 {
+    struct impl_* impl = AUG_PODIMPL(struct impl_, log_, ob);
+
     char buf[AUG_MAXLINE];
     size_t n = sizeof(buf);
 
-    aug_verify(aug_vformatlog(buf, &n, level, format, args));
+    aug_verify(aug_vformatlog(buf, &n, impl->clock_, level, format, args));
 
 #if defined(_WIN32) && !defined(NDEBUG)
     aug_lock();
@@ -156,8 +170,6 @@ static const struct aug_logvtbl vtbl_ = {
     vwritelog_
 };
 
-static aug_log daemonlog_ = { &vtbl_, NULL };
-
 AUGUTIL_API const char*
 aug_loglabel(int level)
 {
@@ -168,8 +180,8 @@ aug_loglabel(int level)
 }
 
 AUGUTIL_API aug_result
-aug_vformatlog(char* buf, size_t* n, int level, const char* format,
-               va_list args)
+aug_vformatlog(char* buf, size_t* n, aug_clock* clock, int level,
+               const char* format, va_list args)
 {
     size_t size;
     struct tm tm;
@@ -181,7 +193,7 @@ aug_vformatlog(char* buf, size_t* n, int level, const char* format,
     assert(buf && n && *n && format);
     size = *n;
 
-    if (AUG_ISFAIL(ms = localtime_(&tm)))
+    if (AUG_ISFAIL(ms = localtime_(clock, &tm)))
         return ms;
 
     /* The return value from the strftime() function is either a) the number
@@ -228,20 +240,33 @@ aug_vformatlog(char* buf, size_t* n, int level, const char* format,
 }
 
 AUGUTIL_API aug_result
-aug_formatlog(char* buf, size_t* n, int level, const char* format, ...)
+aug_formatlog(char* buf, size_t* n, aug_clock* clock, int level,
+              const char* format, ...)
 {
     aug_result result;
     va_list args;
 
     va_start(args, format);
-    result = aug_vformatlog(buf, n, level, format, args);
+    result = aug_vformatlog(buf, n, clock, level, format, args);
     va_end(args);
 
     return result;
 }
 
 AUGUTIL_API aug_log*
-aug_getdaemonlog(void)
+aug_createdaemonlog(aug_mpool* mpool, aug_clock* clock)
 {
-    return &daemonlog_;
+    struct impl_* impl = aug_allocmem(mpool, sizeof(struct impl_));
+    if (!impl)
+        return NULL;
+
+    impl->log_.vtbl_ = &vtbl_;
+    impl->log_.impl_ = NULL;
+    impl->refs_ = 1;
+    impl->mpool_ = mpool;
+    impl->clock_ = clock;
+
+    aug_retain(mpool);
+    aug_retain(clock);
+    return &impl->log_;
 }
