@@ -98,7 +98,7 @@ namespace test {
         public:
             state()
                 : muxer_(getmpool(aug_tlx)),
-                  timers_(getmpool(aug_tlx)),
+                  timers_(getmpool(aug_tlx), getclock(aug_tlx)),
                   timer_(timers_, null)
             {
             }

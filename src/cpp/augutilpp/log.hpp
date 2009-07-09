@@ -36,44 +36,60 @@
 namespace aug {
 
     inline void
-    vformatlog(char* buf, size_t& n, int logLevel, const char* format,
-               va_list args)
+    vformatlog(char* buf, size_t& n, clockref clock, int level,
+               const char* format, va_list args)
     {
-        verify(aug_vformatlog(buf, &n, logLevel, format, args));
+        verify(aug_vformatlog(buf, &n, clock.get(), level, format, args));
     }
 
     inline void
-    formatlog(char* buf, size_t& n, int logLevel, const char* format, ...)
+    formatlog(char* buf, size_t& n, clockref clock, int level,
+              const char* format, ...)
     {
         va_list args;
         va_start(args, format);
-        aug_result result(aug_vformatlog(buf, &n, logLevel, format, args));
+        aug_result result(aug_vformatlog(buf, &n, clock.get(), level, format,
+                                         args));
         va_end(args);
         verify(result);
     }
 
     inline std::string
-    vformatlog(int logLevel, const char* format, va_list args)
+    vformatlog(clockref clock, int level, const char* format, va_list args)
     {
         char buf[AUG_MAXLINE];
         size_t n(sizeof(buf));
-        vformatlog(buf, n, logLevel, format, args);
+        vformatlog(buf, n, clock, level, format, args);
         return std::string(buf, n);
     }
 
     inline std::string
-    formatlog(int logLevel, const char* format, ...)
+    formatlog(clockref clock, int level, const char* format, ...)
     {
         char buf[AUG_MAXLINE];
         size_t n(sizeof(buf));
 
         va_list args;
         va_start(args, format);
-        aug_result result(aug_vformatlog(buf, &n, logLevel, format, args));
+        aug_result result(aug_vformatlog(buf, &n, clock.get(), level, format,
+                                         args));
         va_end(args);
         verify(result);
 
         return std::string(buf, n);
+    }
+
+    inline logptr
+    createdaemonlog(mpoolref mpool, clockref clock)
+    {
+        return object_attach<aug_log>
+            (aug_createdaemonlog(mpool.get(), clock.get()));
+    }
+
+    inline void
+    setdaemonlog(ctxref ctx)
+    {
+        verify(aug_setdaemonlog(ctx.get()));
     }
 }
 

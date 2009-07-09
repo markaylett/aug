@@ -51,6 +51,7 @@ AUG_HEAD(list_, timer_);
 
 struct aug_timers_ {
     aug_mpool* mpool_;
+    aug_clock* clock_;
     struct list_ list_;
 };
 
@@ -98,31 +99,27 @@ inserttimer_(struct list_* list, struct timer_* timer)
 }
 
 static aug_result
-setexpiry_(struct aug_timeval* tv, unsigned ms)
+setexpiry_(aug_clock* clock, struct aug_timeval* tv, unsigned ms)
 {
     struct aug_timeval local;
-    aug_clock* clock = aug_getclock(aug_tlx);
-    aug_result result = aug_gettimeofday(clock, tv);
-    aug_release(clock);
-
-    if (AUG_ISFAIL(result))
-        return result;
-
+    aug_verify(aug_gettimeofday(clock, tv));
     aug_tvadd(tv, aug_mstotv(ms, &local));
     return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_timers_t
-aug_createtimers(aug_mpool* mpool)
+aug_createtimers(aug_mpool* mpool, aug_clock* clock)
 {
     aug_timers_t timers = aug_allocmem(mpool, sizeof(struct aug_timers_));
     if (!timers)
         return NULL;
 
     timers->mpool_ = mpool;
+    timers->clock_ = clock;
     AUG_INIT(&timers->list_);
 
     aug_retain(mpool);
+    aug_retain(clock);
     return timers;
 }
 
@@ -130,6 +127,7 @@ AUGUTIL_API void
 aug_destroytimers(aug_timers_t timers)
 {
     aug_mpool* mpool = timers->mpool_;
+    aug_clock* clock = timers->clock_;
     struct timer_* it;
 
     while ((it = AUG_FIRST(&timers->list_))) {
@@ -138,6 +136,7 @@ aug_destroytimers(aug_timers_t timers)
     }
 
     aug_freemem(mpool, timers);
+    aug_release(clock);
     aug_release(mpool);
 }
 
@@ -153,7 +152,7 @@ aug_settimer(aug_timers_t timers, aug_id id, unsigned ms, aug_timercb_t cb,
     else
         aug_canceltimer(timers, id);
 
-    aug_verify(setexpiry_(&tv, ms));
+    aug_verify(setexpiry_(timers->clock_, &tv, ms));
 
     if (!(timer = createtimer_(timers->mpool_, ob)))
         return AUG_FAILERROR;
@@ -184,7 +183,8 @@ aug_resettimer(aug_timers_t timers, aug_id id, unsigned ms)
             if (ms) /* May be zero. */
                 it->ms_ = ms;
 
-            if (AUG_ISFAIL(result = setexpiry_(&it->tv_, it->ms_))) {
+            if (AUG_ISFAIL(result = setexpiry_(timers->clock_, &it->tv_,
+                                               it->ms_))) {
 
                 destroytimer_(timers->mpool_, it);
                 return result;
@@ -251,12 +251,7 @@ aug_processexpired(aug_timers_t timers, aug_bool force,
 
         /* Current time. */
 
-        aug_clock* clock = aug_getclock(aug_tlx);
-        aug_result result = aug_gettimeofday(clock, &now);
-        aug_release(clock);
-
-        if (AUG_ISFAIL(result))
-            return result;
+        aug_verify(aug_gettimeofday(timers->clock_, &now));
 
         /* Force, at least, the first timer to expire. */
 
@@ -282,7 +277,7 @@ aug_processexpired(aug_timers_t timers, aug_bool force,
 
                 /* Update expiry time and insert. */
 
-                if (AUG_ISFAIL(setexpiry_(&it->tv_, it->ms_)))
+                if (AUG_ISFAIL(setexpiry_(timers->clock_, &it->tv_, it->ms_)))
                     aug_perrinfo(aug_tlx, "expiry_() failed", NULL);
                 else
                     inserttimer_(&timers->list_, it);

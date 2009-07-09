@@ -225,7 +225,7 @@ namespace {
 
         explicit
         impl(char* frobpass)
-            : timers_(getmpool(aug_tlx)),
+            : timers_(getmpool(aug_tlx), getclock(aug_tlx)),
               engine_(aug_events(), timers_, enginecb_)
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");

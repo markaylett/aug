@@ -156,9 +156,8 @@ namespace aug {
         {
         }
 
-        explicit
-        timers(mpoolref mpool)
-            : timers_(aug_createtimers(mpool.get()))
+        timers(mpoolref mpool, clockref clock)
+            : timers_(aug_createtimers(mpool.get(), clock.get()))
         {
             verify(timers_);
         }

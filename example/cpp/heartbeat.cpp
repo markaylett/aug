@@ -750,7 +750,7 @@ namespace {
         // is not.
 
         muxer mux(getmpool(aug_tlx));
-        timers ts(getmpool(aug_tlx));
+        timers ts(getmpool(aug_tlx), getclock(aug_tlx));
         session s(node, ref, ep, ts);
         setmdeventmask(mux, ref, AUG_MDEVENTRDEX);
 
@@ -794,7 +794,7 @@ main(int argc, char* argv[])
     try {
 
         autotlx();
-        aug_setlog(aug_tlx, aug_getdaemonlog());
+        setdaemonlog(aug_tlx);
 
         aug_timeval tv;
         aug::gettimeofday(tv);

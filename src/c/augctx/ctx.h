@@ -27,6 +27,10 @@
 
 #include "augext/ctx.h"
 
+/**
+ * Neither @a clock nor @a log should reference the thread-local context.
+ */
+
 AUGCTX_API aug_ctx*
 aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level);
 

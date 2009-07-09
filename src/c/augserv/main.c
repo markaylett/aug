@@ -31,7 +31,7 @@ AUG_RCSID("$Id$");
 #include "augserv/daemon.h"
 #include "augserv/options.h"
 
-#include "augutil/log.h"    /* aug_getdaemonlog() */
+#include "augutil/log.h"    /* aug_setdaemonlog() */
 
 #include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h" /* GetStdHandle() */
@@ -171,7 +171,7 @@ aug_main(int argc, char* argv[], const struct aug_serv* serv)
 #if !defined(_WIN32)
         /* Install daemon logger prior to opening log file. */
 
-        aug_setlog(aug_tlx, aug_getdaemonlog());
+        aug_setdaemonlog(aug_tlx);
         daemonise_(&options);
 #else /* _WIN32 */
         start_(&options);

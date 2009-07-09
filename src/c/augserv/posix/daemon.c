@@ -211,7 +211,7 @@ aug_daemonise(const struct aug_options* options)
 
     /* Install daemon logger prior to opening log file. */
 
-    aug_setlog(aug_tlx, aug_getdaemonlog());
+    aug_setdaemonlog(aug_tlx);
 
     aug_verify(aug_readservconf(AUG_CONFFILE(options), options->batch_,
                                 AUG_TRUE));

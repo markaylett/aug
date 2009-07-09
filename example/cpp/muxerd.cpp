@@ -215,7 +215,7 @@ namespace test {
 
         state()
             : muxer_(getmpool(aug_tlx)),
-              timers_(getmpool(aug_tlx)),
+              timers_(getmpool(aug_tlx), getclock(aug_tlx)),
               chans_(null)
         {
             chandler_.reset(this);

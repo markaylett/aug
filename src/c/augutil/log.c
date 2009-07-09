@@ -270,3 +270,17 @@ aug_createdaemonlog(aug_mpool* mpool, aug_clock* clock)
     aug_retain(clock);
     return &impl->log_;
 }
+
+AUGUTIL_API aug_result
+aug_setdaemonlog(aug_ctx* ctx)
+{
+    aug_mpool* mpool = aug_getmpool(ctx);
+    aug_clock* clock = aug_getclock(ctx);
+    aug_log* log = aug_createdaemonlog(mpool, clock);
+    aug_release(clock);
+    aug_release(mpool);
+    if (!log)
+        return AUG_FAILERROR;
+    aug_setlog(ctx, log);
+    return AUG_SUCCESS;
+}

@@ -31,9 +31,7 @@
 
 #include "augutil/config.h"
 
-#include "augext/clock.h"
-#include "augext/log.h"
-#include "augext/mpool.h"
+#include "augext/ctx.h"
 
 /**
  * Get textual description of log label.
@@ -88,5 +86,12 @@ aug_formatlog(char* buf, size_t* n, aug_clock* clock, int level,
 
 AUGUTIL_API aug_log*
 aug_createdaemonlog(aug_mpool* mpool, aug_clock* clock);
+
+/**
+ * Configure context object to use daemon logger.
+ */
+
+AUGUTIL_API aug_result
+aug_setdaemonlog(aug_ctx* ctx);
 
 #endif /* AUGUTIL_LOG_H */

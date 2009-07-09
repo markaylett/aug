@@ -31,6 +31,7 @@
 
 #include "augutil/config.h"
 
+#include "augext/clock.h"
 #include "augext/mpool.h"
 
 #include "augabi.h"
@@ -41,7 +42,7 @@ typedef void (*aug_timercb_t)(aug_id, unsigned*, aug_object*);
 typedef struct aug_timers_* aug_timers_t;
 
 AUGUTIL_API aug_timers_t
-aug_createtimers(aug_mpool* mpool);
+aug_createtimers(aug_mpool* mpool, aug_clock* clock);
 
 AUGUTIL_API void
 aug_destroytimers(aug_timers_t timers);
