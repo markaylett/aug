@@ -12,7 +12,7 @@ noinst_PROGRAMS += \
 	heartbeat \
 	mcastrecv \
 	mcastsend \
-	netevent
+	packet
 endif
 
 AUGLIBS= \
@@ -55,7 +55,7 @@ mcastsend_SOURCES = \
 	mcastsend.cpp
 mcastsend_LDADD = $(AUGLIBS)
 
-netevent_SOURCES = \
-	netevent.cpp
-netevent_LDADD = $(AUGLIBS)
+packet_SOURCES = \
+	packet.cpp
+packet_LDADD = $(AUGLIBS)
 endif

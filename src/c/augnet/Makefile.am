@@ -11,7 +11,7 @@ modinclude_HEADERS = \
 	http.h \
 	inet.h \
 	mar.h \
-	netevent.h \
+	packet.h \
 	ssl.h \
 	tcpconnect.h \
 	writer.h
@@ -30,7 +30,7 @@ libaugnet_la_SOURCES = \
 	http.c \
 	inet.c \
 	mar.c \
-	netevent.c \
+	packet.c \
 	ssl.c \
 	tcpconnect.c \
 	writer.c
@@ -51,14 +51,14 @@ check_PROGRAMS = \
 	chanstest \
 	fixtest \
 	httptest \
-	neteventtest
+	packettest
 TESTS = \
 	chanstest \
 	base64test \
 	chanstest \
 	fixtest \
 	httptest \
-	neteventtest
+	packettest
 
 base64test_SOURCES = base64test.c
 base64test_LDADD = \
@@ -77,6 +77,6 @@ httptest_SOURCES = httptest.c
 httptest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la
 
-neteventtest_SOURCES = neteventtest.c
-neteventtest_LDADD = \
+packettest_SOURCES = packettest.c
+packettest_LDADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la

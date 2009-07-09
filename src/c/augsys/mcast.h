@@ -39,7 +39,7 @@
  */
 
 #if !defined(AUG_PACKETSIZE)
-# define AUG_PACKETSIZE 512
+# define AUG_PACKETSIZE 516
 #endif /* !AUG_PACKETSIZE */
 
 AUGSYS_API aug_result

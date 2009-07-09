@@ -32,7 +32,7 @@
 using namespace aug;
 using namespace std;
 
-// netevent test 239.1.1.1 1000 3
+// packet 239.1.1.1 1000 3
 
 namespace {
 
@@ -45,53 +45,62 @@ namespace {
     }
 
     void
-    recvfrom(sdref ref, aug_netevent& ev, endpoint& ep)
+    recvfrom(sdref ref, aug_packet& pkt, endpoint& ep)
     {
-        char buf[AUG_NETEVENT_SIZE];
+        char buf[AUG_PACKETSIZE];
         aug::recvfrom(ref, buf, sizeof(buf), 0, ep);
-        aug_unpacknetevent(&ev, buf);
+        aug_decodepacket(&pkt, buf);
     }
 
-    class netevent : aug_netevent, public mpool_ops {
+    class packet : aug_packet, public mpool_ops {
     public:
-        netevent(const char* name, const char* addr, unsigned hbsec)
+        explicit
+        packet(const char* addr)
         {
-            proto_ = 1;
-            aug_strlcpy(name_, name, sizeof(name_));
+            ver_ = 1;
+            type_ = 0;
+            seq_ = 0;
             aug_strlcpy(addr_, addr, sizeof(addr_));
-            type_ = state_ = seq_ = 0;
-            hbsec_ = hbsec;
-            weight_ = load_ = 0;
-        }
-        void
-        setstate(unsigned state)
-        {
-            state_ = state;
-        }
-        void
-        setweight(unsigned weight)
-        {
-            weight_ = weight;
-        }
-        void
-        setload(unsigned load)
-        {
-            load_ = load;
         }
         size_t
-        sendto(sdref ref, int type, const endpoint& ep)
+        sendhbeat(sdref ref, const endpoint& ep)
         {
-            type_ = type;
+            type_ = AUG_PKTHBEAT;
             ++seq_;
 
-            char buf[AUG_NETEVENT_SIZE];
-            aug_packnetevent(buf, static_cast<aug_netevent*>(this));
+            char buf[AUG_PACKETSIZE];
+            aug_encodepacket(buf, static_cast<aug_packet*>(this));
+            return aug::sendto(ref, buf, sizeof(buf), 0, ep);
+        }
+        size_t
+        sendreset(sdref ref, unsigned next, const endpoint& ep)
+        {
+            type_ = AUG_PKTRESET;
+            ++seq_;
+            content_.reset_.next_ = next;
+
+            char buf[AUG_PACKETSIZE];
+            aug_encodepacket(buf, static_cast<aug_packet*>(this));
+            return aug::sendto(ref, buf, sizeof(buf), 0, ep);
+        }
+        size_t
+        sendevent(sdref ref, const char* method, const char* uri,
+                  const endpoint& ep)
+        {
+            type_ = AUG_PKTEVENT;
+            ++seq_;
+            aug_strlcpy(content_.event_.method_, method,
+                        sizeof(content_.event_.method_));
+            aug_strlcpy(content_.event_.uri_, uri,
+                        sizeof(content_.event_.uri_));
+
+            char buf[AUG_PACKETSIZE];
+            aug_encodepacket(buf, static_cast<aug_packet*>(this));
             return aug::sendto(ref, buf, sizeof(buf), 0, ep);
         }
     };
 
     class session : public mpool_ops {
-        const char* const name_;
         sdref ref_;
         const endpoint& ep_;
         timer hbwait_;
@@ -100,17 +109,18 @@ namespace {
         ~session() AUG_NOTHROW
         {
         }
-        session(const char* name, sdref ref, const endpoint& ep, timers& ts)
-            : name_(name),
-              ref_(ref),
+        session(sdref ref, const endpoint& ep, timers& ts)
+            : ref_(ref),
               ep_(ep),
               hbwait_(ts, null)
         {
             hbwait_.set(2000, *this);
         }
         void
-        recvd(const aug_netevent& ev, const endpoint& from)
+        recvd(const aug_packet& pkt, const endpoint& from)
         {
+            aug_ctxinfo(aug_tlx, "recv: type=[%u], seq=[%u]", pkt.type_,
+                        pkt.seq_);
         }
         void
         timercb(aug_id id, unsigned& ms)
@@ -118,14 +128,14 @@ namespace {
             if (idref(id) == hbwait_.id()) {
 
                 aug_ctxinfo(aug_tlx, "hbint timeout");
-                netevent event("test", "test", 2);
-                event.sendto(ref_, 1, ep_);
+                packet pkt("test");
+                pkt.sendhbeat(ref_, ep_);
             }
         }
     };
 
     void
-    run(const char* name, sdref ref, const endpoint& ep)
+    run(sdref ref, const endpoint& ep)
     {
         endpoint addr(null);
         getsockname(ref, addr);
@@ -133,7 +143,7 @@ namespace {
 
         muxer mux(getmpool(aug_tlx));
         timers ts(getmpool(aug_tlx));
-        session s(name, ref, ep, ts);
+        session sess(ref, ep, ts);
         setmdeventmask(mux, ref, AUG_MDEVENTRDEX);
 
         aug_timeval tv;
@@ -154,10 +164,10 @@ namespace {
             aug_ctxinfo(aug_tlx, "waitmdevents: %u", ready);
 
             if (ready) {
-                aug_netevent ev;
+                aug_packet pkt;
                 endpoint from(null);
-                recvfrom(ref, ev, from);
-                s.recvd(ev, from);
+                recvfrom(ref, pkt, from);
+                sess.recvd(pkt, from);
             }
         }
     }
@@ -176,29 +186,29 @@ main(int argc, char* argv[])
         aug_timeval tv;
         aug::gettimeofday(tv);
 
-        if (argc < 4) {
+        if (argc < 3) {
             aug_ctxerror(aug_tlx,
-                         "usage: heartbeat <name> <mcast> <serv> [ifname]");
+                         "usage: heartbeat <mcast> <serv> [ifname]");
             return 1;
         }
 
-        inetaddr in(argv[2]);
+        inetaddr in(argv[1]);
         autosd sfd(aug::socket(family(in), SOCK_DGRAM));
         setreuseaddr(sfd, true);
 
         // Set outgoing multicast interface.
 
-        if (5 == argc)
-            setmcastif(sfd, argv[4]);
+        if (4 == argc)
+            setmcastif(sfd, argv[3]);
 
         // Don't receive packets from self.
 
-        endpoint ep(inetany(family(in)), htons(atoi(argv[3])));
+        endpoint ep(inetany(family(in)), htons(atoi(argv[2])));
         aug::bind(sfd, ep);
 
-        joinmcast(sfd, in, 5 == argc ? argv[4] : 0);
+        joinmcast(sfd, in, 4 == argc ? argv[3] : 0);
         setinetaddr(ep, in);
-        run(argv[1], sfd, ep);
+        run(sfd, ep);
         return 0;
 
     } catch (const exception& e) {

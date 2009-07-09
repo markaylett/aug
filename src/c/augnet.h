@@ -37,7 +37,7 @@
 #include "augnet/http.h"
 #include "augnet/inet.h"
 #include "augnet/mar.h"
-#include "augnet/netevent.h"
+#include "augnet/packet.h"
 #include "augnet/ssl.h"
 #include "augnet/tcpconnect.h"
 #include "augnet/writer.h"

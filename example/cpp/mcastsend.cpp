@@ -36,15 +36,12 @@ static unsigned seq_ = 0;
 static char*
 heartbeat_(char* buf)
 {
-    aug_netevent event;
-    event.proto_ = 1;
-    strcpy(event.name_, "test");
-    event.state_ = 1;
-    event.seq_ = ++seq_;
-    event.hbsec_ = 1;
-    event.weight_ = 1;
-    event.type_ = 1;
-    aug_packnetevent(buf, &event);
+    aug_packet pkt;
+    pkt.ver_ = 1;
+    pkt.type_ = AUG_PKTHBEAT;
+    pkt.seq_ = ++seq_;
+    strcpy(pkt.addr_, "");
+    aug_encodepacket(buf, &pkt);
     return buf;
 }
 
@@ -67,7 +64,7 @@ main(int argc, char* argv[])
 
         endpoint ep(in, htons(atoi(argv[2])));
 
-        char event[AUG_NETEVENT_SIZE];
+        char event[AUG_PACKETSIZE];
         for (int i(0); i < 3; ++i) {
             heartbeat_(event);
             sendto(sfd, event, sizeof(event), 0, ep);

@@ -66,14 +66,14 @@ main(int argc, char* argv[])
                 continue; // While interrupted.
             }
 
-            char buf[AUG_NETEVENT_SIZE];
+            char buf[AUG_PACKETSIZE];
             size_t size(read(sfd, buf, sizeof(buf)));
 
-            aug_netevent event;
-            aug_unpacknetevent(&event, buf);
+            aug_packet pkt;
+            aug_decodepacket(&pkt, buf);
 
-            aug_ctxinfo(aug_tlx, "recv: name=[%s], seq=[%d]", event.name_,
-                        event.seq_);
+            aug_ctxinfo(aug_tlx, "recv: type=[%u], seq=[%u]", pkt.type_,
+                        pkt.seq_);
         }
         return 0;
 

@@ -163,7 +163,7 @@
 				RelativePath="..\src\c\augnet\mar.c">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\netevent.c">
+				RelativePath="..\src\c\augnet\packet.c">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\ssl.c">
@@ -207,7 +207,7 @@
 				RelativePath="..\src\c\augnet\mar.h">
 			</File>
 			<File
-				RelativePath="..\src\c\augnet\netevent.h">
+				RelativePath="..\src\c\augnet\packet.h">
 			</File>
 			<File
 				RelativePath="..\src\c\augnet\ssl.h">

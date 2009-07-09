@@ -45,7 +45,7 @@ noinst_PROGRAMS = muxerd$(EXEEXT) profile$(EXEEXT) tcpclient$(EXEEXT) \
 @ENABLE_MULTICAST_TRUE@	heartbeat \
 @ENABLE_MULTICAST_TRUE@	mcastrecv \
 @ENABLE_MULTICAST_TRUE@	mcastsend \
-@ENABLE_MULTICAST_TRUE@	netevent
+@ENABLE_MULTICAST_TRUE@	packet
 
 subdir = example/cpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -57,7 +57,7 @@ CONFIG_HEADER = $(top_builddir)/src/auglocal.h
 CONFIG_CLEAN_FILES =
 @ENABLE_MULTICAST_TRUE@am__EXEEXT_1 = heartbeat$(EXEEXT) \
 @ENABLE_MULTICAST_TRUE@	mcastrecv$(EXEEXT) mcastsend$(EXEEXT) \
-@ENABLE_MULTICAST_TRUE@	netevent$(EXEEXT)
+@ENABLE_MULTICAST_TRUE@	packet$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am__heartbeat_SOURCES_DIST = heartbeat.cpp
 @ENABLE_MULTICAST_TRUE@am_heartbeat_OBJECTS = heartbeat.$(OBJEXT)
@@ -79,10 +79,10 @@ mcastsend_OBJECTS = $(am_mcastsend_OBJECTS)
 am_muxerd_OBJECTS = muxerd.$(OBJEXT)
 muxerd_OBJECTS = $(am_muxerd_OBJECTS)
 muxerd_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__netevent_SOURCES_DIST = netevent.cpp
-@ENABLE_MULTICAST_TRUE@am_netevent_OBJECTS = netevent.$(OBJEXT)
-netevent_OBJECTS = $(am_netevent_OBJECTS)
-@ENABLE_MULTICAST_TRUE@netevent_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__packet_SOURCES_DIST = packet.cpp
+@ENABLE_MULTICAST_TRUE@am_packet_OBJECTS = packet.$(OBJEXT)
+packet_OBJECTS = $(am_packet_OBJECTS)
+@ENABLE_MULTICAST_TRUE@packet_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_profile_OBJECTS = profile.$(OBJEXT)
 profile_OBJECTS = $(am_profile_OBJECTS)
 profile_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -106,12 +106,12 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
-	$(mcastsend_SOURCES) $(muxerd_SOURCES) $(netevent_SOURCES) \
+	$(mcastsend_SOURCES) $(muxerd_SOURCES) $(packet_SOURCES) \
 	$(profile_SOURCES) $(tcpclient_SOURCES) $(tcpserver_SOURCES) \
 	$(timerd_SOURCES)
 DIST_SOURCES = $(am__heartbeat_SOURCES_DIST) \
 	$(am__mcastrecv_SOURCES_DIST) $(am__mcastsend_SOURCES_DIST) \
-	$(muxerd_SOURCES) $(am__netevent_SOURCES_DIST) \
+	$(muxerd_SOURCES) $(am__packet_SOURCES_DIST) \
 	$(profile_SOURCES) $(tcpclient_SOURCES) $(tcpserver_SOURCES) \
 	$(timerd_SOURCES)
 ETAGS = etags
@@ -299,10 +299,10 @@ timerd_LDADD = $(AUGLIBS)
 @ENABLE_MULTICAST_TRUE@	mcastsend.cpp
 
 @ENABLE_MULTICAST_TRUE@mcastsend_LDADD = $(AUGLIBS)
-@ENABLE_MULTICAST_TRUE@netevent_SOURCES = \
-@ENABLE_MULTICAST_TRUE@	netevent.cpp
+@ENABLE_MULTICAST_TRUE@packet_SOURCES = \
+@ENABLE_MULTICAST_TRUE@	packet.cpp
 
-@ENABLE_MULTICAST_TRUE@netevent_LDADD = $(AUGLIBS)
+@ENABLE_MULTICAST_TRUE@packet_LDADD = $(AUGLIBS)
 all: all-am
 
 .SUFFIXES:
@@ -355,9 +355,9 @@ mcastsend$(EXEEXT): $(mcastsend_OBJECTS) $(mcastsend_DEPENDENCIES)
 muxerd$(EXEEXT): $(muxerd_OBJECTS) $(muxerd_DEPENDENCIES) 
 	@rm -f muxerd$(EXEEXT)
 	$(CXXLINK) $(muxerd_LDFLAGS) $(muxerd_OBJECTS) $(muxerd_LDADD) $(LIBS)
-netevent$(EXEEXT): $(netevent_OBJECTS) $(netevent_DEPENDENCIES) 
-	@rm -f netevent$(EXEEXT)
-	$(CXXLINK) $(netevent_LDFLAGS) $(netevent_OBJECTS) $(netevent_LDADD) $(LIBS)
+packet$(EXEEXT): $(packet_OBJECTS) $(packet_DEPENDENCIES) 
+	@rm -f packet$(EXEEXT)
+	$(CXXLINK) $(packet_LDFLAGS) $(packet_OBJECTS) $(packet_LDADD) $(LIBS)
 profile$(EXEEXT): $(profile_OBJECTS) $(profile_DEPENDENCIES) 
 	@rm -f profile$(EXEEXT)
 	$(CXXLINK) $(profile_LDFLAGS) $(profile_OBJECTS) $(profile_LDADD) $(LIBS)
@@ -381,7 +381,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastrecv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastsend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxerd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netevent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/packet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/profile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpclient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpserver.Po@am__quote@
