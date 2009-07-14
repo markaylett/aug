@@ -35,9 +35,9 @@ main(int argc, char* argv[])
     if (!aug_autotlx())
         return 1;
 
-    pkt.ver_ = 101;
+    pkt.seqno_ = 202;
+    pkt.verno_ = 101;
     pkt.type_ = AUG_PKTEVENT;
-    pkt.seq_ = 202;
 
     strcpy(pkt.addr_, "127.0.0.1:1972");
     strcpy(pkt.content_.event_.method_, "stale");
@@ -47,18 +47,18 @@ main(int argc, char* argv[])
     memset(&pkt, 0, sizeof(pkt));
     aug_decodepacket(&pkt, buf);
 
-    if (101 != pkt.ver_) {
-        fprintf(stderr, "unexpected version [%d]\n", pkt.ver_);
+    if (202 != pkt.seqno_) {
+        fprintf(stderr, "unexpected sequence [%d]\n", pkt.seqno_);
+        return 1;
+    }
+
+    if (101 != pkt.verno_) {
+        fprintf(stderr, "unexpected version [%d]\n", pkt.verno_);
         return 1;
     }
 
     if (AUG_PKTEVENT != pkt.type_) {
         fprintf(stderr, "unexpected type [%d]\n", pkt.type_);
-        return 1;
-    }
-
-    if (202 != pkt.seq_) {
-        fprintf(stderr, "unexpected seq [%d]\n", pkt.seq_);
         return 1;
     }
 

@@ -36,6 +36,178 @@ using namespace std;
 
 namespace {
 
+    struct window_exception : std::exception { };
+
+    struct duplicate_exception : window_exception {
+        const char*
+        what() const throw()
+        {
+            return "aug::duplicate_exception";
+        }
+    };
+
+    struct maxwindow_exception : window_exception {
+        const char*
+        what() const throw()
+        {
+            return "aug::maxwindow_exception";
+        }
+    };
+
+    struct timeout_exception : window_exception {
+        const char*
+        what() const throw()
+        {
+            return "aug::timeout_exception";
+        }
+    };
+
+    typedef unsigned long seqno_t;
+
+    class window {
+        struct message {
+            char buf_[AUG_PACKETSIZE];
+            aug_timeval tv_;
+        };
+        const unsigned size_;
+        message* const ring_;
+        seqno_t begin_, end_;
+        bool seed_;
+        static void
+        clear(message& m)
+        {
+            m.tv_.tv_sec = 0;
+        }
+        static bool
+        empty(const message& m)
+        {
+            return 0 == m.tv_.tv_sec;
+        }
+    public:
+        ~window() AUG_NOTHROW
+        {
+            delete[] ring_;
+        }
+        explicit
+        window(unsigned size)
+            : size_(size),
+              ring_(new message[size]),
+              begin_(1),
+              end_(1),
+              seed_(true)
+        {
+        }
+        char*
+        insert(seqno_t seq, const aug_timeval& tv)
+        {
+            if (seed_) {
+                begin_ = seq;
+                end_ = seq + 1;
+                seed_ = false;
+            } else {
+                const long diff(seq - begin_);
+                if (diff < 0)
+                    throw duplicate_exception();
+                if (size_ <= static_cast<seqno_t>(diff))
+                    throw maxwindow_exception();
+                if (end_ <= seq) {
+                    for (seqno_t i(end_); i < seq; ++i)
+                        clear(ring_[i]);
+                    end_ = seq + 1;
+                }
+            }
+            message& m(ring_[seq % size_]);
+            m.tv_.tv_sec = tv.tv_sec;
+            m.tv_.tv_usec = tv.tv_usec;
+            return m.buf_;
+        }
+        bool
+        next(aug_packet& pkt, aug_timeval& tv)
+        {
+            if (empty())
+                return false;
+            message& m(ring_[++begin_ % size_]);
+            aug_decodepacket(&pkt, m.buf_);
+            tv.tv_sec = m.tv_.tv_sec;
+            tv.tv_usec = m.tv_.tv_usec;
+            clear(m);
+            return true;
+        }
+        void
+        skip()
+        {
+            if (begin_ != end_ && !seed_)
+                ++begin_;
+        }
+        bool
+        empty() const
+        {
+            return begin_ == end_ || empty(ring_[begin_ % size_]);
+        }
+    };
+
+    class expirywindow {
+        clockptr clock_;
+        window window_;
+        aug_timeval timeout_;
+        aug_timeval expiry_;
+    public:
+        explicit
+        expirywindow(clockref clock, unsigned size, unsigned timeout)
+            : clock_(object_retain(clock)),
+              window_(size)
+        {
+            // 20% tolerance.
+            mstotv(timeout + timeout / 5, timeout_);
+
+            gettimeofday(clock, expiry_);
+            tvadd(expiry_, timeout_);
+        }
+        void
+        insert(const char* src)
+        {
+            unsigned seqno;
+            verify(aug_decodeseqno(&seqno, src));
+
+            aug_timeval tv;
+            gettimeofday(clock_, tv);
+            char* dst(window_.insert(seqno, tv));
+            memcpy(dst, src, AUG_PACKETSIZE);
+        }
+        bool
+        next(aug_packet& pkt)
+        {
+            aug_timeval tv;
+            if (window_.empty()) {
+                gettimeofday(clock_, tv);
+                if (timercmp(&expiry_, &tv, <=)) {
+                    // Expiry time has passed.
+                    window_.skip();
+                    // Advance expiry time.
+                    tvadd(expiry_, timeout_);
+                    throw timeout_exception();
+                }
+                return false;
+            }
+            window_.next(pkt, tv);
+            tvadd(tv, timeout_);
+            if (timercmp(&expiry_, &tv, <)) {
+                // Advance expiry time.
+                expiry_.tv_sec = tv.tv_sec;
+                expiry_.tv_usec = tv.tv_usec;
+            }
+            return true;
+        }
+        unsigned
+        expiry() const
+        {
+            // Milliseconds to expiry.
+            aug_timeval tv;
+            gettimeofday(clock_, tv);
+            return AUG_MIN(tvtoms(tvsub(tv, expiry_)), 0);
+        }
+    };
+
     volatile bool stop_ = false;
 
     void
@@ -44,20 +216,12 @@ namespace {
         stop_ = true;
     }
 
-    void
-    recvfrom(sdref ref, aug_packet& pkt, endpoint& ep)
-    {
-        char buf[AUG_PACKETSIZE];
-        aug::recvfrom(ref, buf, sizeof(buf), 0, ep);
-        aug_decodepacket(&pkt, buf);
-    }
-
     class packet : aug_packet, public mpool_ops {
         size_t
         sendhead(sdref ref, unsigned type, const endpoint& ep)
         {
             type_ = type;
-            ++seq_;
+            ++seqno_;
 
             char buf[AUG_PACKETSIZE];
             aug_encodepacket(buf, static_cast<aug_packet*>(this));
@@ -67,9 +231,9 @@ namespace {
         explicit
         packet(const char* addr)
         {
-            ver_ = 1;
+            verno_ = 1;
             type_ = 0;
-            seq_ = 0;
+            seqno_ = 0;
             aug_strlcpy(addr_, addr, sizeof(addr_));
         }
         size_t
@@ -107,7 +271,9 @@ namespace {
     class session : public mpool_ops {
         sdref ref_;
         const endpoint& ep_;
-        timer hbwait_;
+        expirywindow window_;
+        timer rdwait_;
+        timer wrwait_;
 
     public:
         ~session() AUG_NOTHROW
@@ -116,25 +282,44 @@ namespace {
         session(sdref ref, const endpoint& ep, timers& ts)
             : ref_(ref),
               ep_(ep),
-              hbwait_(ts, null)
+              window_(getclock(aug_tlx), 8, 2000),
+              rdwait_(ts, null),
+              wrwait_(ts, null)
         {
-            hbwait_.set(2000, *this);
+            rdwait_.set(window_.expiry(), *this);
+            wrwait_.set(2000, *this);
         }
         void
-        recvd(const aug_packet& pkt, const endpoint& from)
+        recv(sdref ref)
         {
-            aug_ctxinfo(aug_tlx, "recv: type=[%u], seq=[%u]", pkt.type_,
-                        pkt.seq_);
+            char buf[AUG_PACKETSIZE];
+            endpoint from(null);
+            recvfrom(ref, buf, sizeof(buf), 0, from);
+            window_.insert(buf);
         }
         void
         timercb(aug_id id, unsigned& ms)
         {
-            if (idref(id) == hbwait_.id()) {
+            if (idref(id) == wrwait_.id()) {
 
                 aug_ctxinfo(aug_tlx, "hbint timeout");
                 packet pkt("test");
                 pkt.sendhbeat(ref_, ep_);
             }
+        }
+        void
+        process()
+        {
+            try {
+                aug_packet pkt;
+                while (window_.next(pkt)) {
+                    aug_ctxinfo(aug_tlx, "recv: seqno=[%u], type=[%u]",
+                                pkt.seqno_, pkt.type_);
+                }
+            } catch (const window_exception& e) {
+                aug_ctxerror(aug_tlx, "error: %s", e.what());
+            }
+            rdwait_.set(window_.expiry(), *this);
         }
     };
 
@@ -167,12 +352,10 @@ namespace {
 
             aug_ctxinfo(aug_tlx, "waitmdevents: %u", ready);
 
-            if (ready) {
-                aug_packet pkt;
-                endpoint from(null);
-                recvfrom(ref, pkt, from);
-                sess.recvd(pkt, from);
-            }
+            if (ready)
+                sess.recv(ref);
+
+            sess.process();
         }
     }
 }
@@ -188,7 +371,7 @@ main(int argc, char* argv[])
         setdaemonlog(aug_tlx);
 
         aug_timeval tv;
-        aug::gettimeofday(tv);
+        aug::gettimeofday(getclock(aug_tlx), tv);
 
         if (argc < 3) {
             aug_ctxerror(aug_tlx,

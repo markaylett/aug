@@ -221,7 +221,7 @@ namespace {
             eraseevent(queue_, id);
 
             aug_timeval tv;
-            gettimeofday(tv);
+            gettimeofday(getclock(aug_tlx), tv);
             settimer(tv);
         }
         void
@@ -245,7 +245,7 @@ namespace {
                 tz = TMLOCAL;
 
             aug_timeval tv;
-            gettimeofday(tv);
+            gettimeofday(getclock(aug_tlx), tv);
 
             tmeventptr ptr(new (tlx) tmevent(id, name, spec, tz));
             if (aug_strtmspec(&ptr->tmspec_, spec.c_str()))
@@ -318,7 +318,7 @@ namespace {
         reconf()
         {
             aug_timeval tv;
-            gettimeofday(tv);
+            gettimeofday(getclock(aug_tlx), tv);
 
             queue_.clear();
             pushevents(queue_, tv.tv_sec);
@@ -385,7 +385,7 @@ namespace {
         expire(mod_handle& timer, unsigned& ms)
         {
             aug_timeval tv;
-            gettimeofday(tv);
+            gettimeofday(getclock(aug_tlx), tv);
 
             checkexpired(tv);
 

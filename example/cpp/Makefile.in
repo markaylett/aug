@@ -42,7 +42,6 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 noinst_PROGRAMS = muxerd$(EXEEXT) profile$(EXEEXT) tcpclient$(EXEEXT) \
 	tcpserver$(EXEEXT) timerd$(EXEEXT) $(am__EXEEXT_1)
 @ENABLE_MULTICAST_TRUE@am__append_1 = \
-@ENABLE_MULTICAST_TRUE@	heartbeat \
 @ENABLE_MULTICAST_TRUE@	mcastrecv \
 @ENABLE_MULTICAST_TRUE@	mcastsend \
 @ENABLE_MULTICAST_TRUE@	packet
@@ -55,22 +54,17 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/auglocal.h
 CONFIG_CLEAN_FILES =
-@ENABLE_MULTICAST_TRUE@am__EXEEXT_1 = heartbeat$(EXEEXT) \
-@ENABLE_MULTICAST_TRUE@	mcastrecv$(EXEEXT) mcastsend$(EXEEXT) \
-@ENABLE_MULTICAST_TRUE@	packet$(EXEEXT)
+@ENABLE_MULTICAST_TRUE@am__EXEEXT_1 = mcastrecv$(EXEEXT) \
+@ENABLE_MULTICAST_TRUE@	mcastsend$(EXEEXT) packet$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
-am__heartbeat_SOURCES_DIST = heartbeat.cpp
-@ENABLE_MULTICAST_TRUE@am_heartbeat_OBJECTS = heartbeat.$(OBJEXT)
-heartbeat_OBJECTS = $(am_heartbeat_OBJECTS)
+am__mcastrecv_SOURCES_DIST = mcastrecv.cpp
+@ENABLE_MULTICAST_TRUE@am_mcastrecv_OBJECTS = mcastrecv.$(OBJEXT)
+mcastrecv_OBJECTS = $(am_mcastrecv_OBJECTS)
 am__DEPENDENCIES_1 = $(top_builddir)/src/c/augnet/libaugnet.la \
 	$(top_builddir)/src/c/augserv/libaugserv.la \
 	$(top_builddir)/src/c/augutil/libaugutil.la \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la
-@ENABLE_MULTICAST_TRUE@heartbeat_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__mcastrecv_SOURCES_DIST = mcastrecv.cpp
-@ENABLE_MULTICAST_TRUE@am_mcastrecv_OBJECTS = mcastrecv.$(OBJEXT)
-mcastrecv_OBJECTS = $(am_mcastrecv_OBJECTS)
 @ENABLE_MULTICAST_TRUE@mcastrecv_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__mcastsend_SOURCES_DIST = mcastsend.cpp
 @ENABLE_MULTICAST_TRUE@am_mcastsend_OBJECTS = mcastsend.$(OBJEXT)
@@ -105,15 +99,13 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(heartbeat_SOURCES) $(mcastrecv_SOURCES) \
-	$(mcastsend_SOURCES) $(muxerd_SOURCES) $(packet_SOURCES) \
-	$(profile_SOURCES) $(tcpclient_SOURCES) $(tcpserver_SOURCES) \
-	$(timerd_SOURCES)
-DIST_SOURCES = $(am__heartbeat_SOURCES_DIST) \
-	$(am__mcastrecv_SOURCES_DIST) $(am__mcastsend_SOURCES_DIST) \
-	$(muxerd_SOURCES) $(am__packet_SOURCES_DIST) \
-	$(profile_SOURCES) $(tcpclient_SOURCES) $(tcpserver_SOURCES) \
-	$(timerd_SOURCES)
+SOURCES = $(mcastrecv_SOURCES) $(mcastsend_SOURCES) $(muxerd_SOURCES) \
+	$(packet_SOURCES) $(profile_SOURCES) $(tcpclient_SOURCES) \
+	$(tcpserver_SOURCES) $(timerd_SOURCES)
+DIST_SOURCES = $(am__mcastrecv_SOURCES_DIST) \
+	$(am__mcastsend_SOURCES_DIST) $(muxerd_SOURCES) \
+	$(am__packet_SOURCES_DIST) $(profile_SOURCES) \
+	$(tcpclient_SOURCES) $(tcpserver_SOURCES) $(timerd_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -287,10 +279,6 @@ timerd_SOURCES = \
 	timerd.cpp
 
 timerd_LDADD = $(AUGLIBS)
-@ENABLE_MULTICAST_TRUE@heartbeat_SOURCES = \
-@ENABLE_MULTICAST_TRUE@	heartbeat.cpp
-
-@ENABLE_MULTICAST_TRUE@heartbeat_LDADD = $(AUGLIBS)
 @ENABLE_MULTICAST_TRUE@mcastrecv_SOURCES = \
 @ENABLE_MULTICAST_TRUE@	mcastrecv.cpp
 
@@ -343,9 +331,6 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-heartbeat$(EXEEXT): $(heartbeat_OBJECTS) $(heartbeat_DEPENDENCIES) 
-	@rm -f heartbeat$(EXEEXT)
-	$(CXXLINK) $(heartbeat_LDFLAGS) $(heartbeat_OBJECTS) $(heartbeat_LDADD) $(LIBS)
 mcastrecv$(EXEEXT): $(mcastrecv_OBJECTS) $(mcastrecv_DEPENDENCIES) 
 	@rm -f mcastrecv$(EXEEXT)
 	$(CXXLINK) $(mcastrecv_LDFLAGS) $(mcastrecv_OBJECTS) $(mcastrecv_LDADD) $(LIBS)
@@ -377,7 +362,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/heartbeat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastrecv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcastsend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/muxerd.Po@am__quote@

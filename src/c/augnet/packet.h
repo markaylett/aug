@@ -45,13 +45,13 @@
  * @{
  */
 
-#define AUG_PKTMAGICSIZE 4
-#define AUG_PKTVERSIZE   sizeof(uint16_t)
-#define AUG_PKTTYPESIZE  sizeof(uint16_t)
-#define AUG_PKTSEQSIZE   sizeof(uint32_t)
-#define AUG_PKTADDRLEN   AUG_MAXHOSTSERVLEN
-#define AUG_PKTBODYSIZE  376
-#define AUG_PKTMETHODLEN 64
+#define AUG_PKTMAGICSIZE  4
+#define AUG_PKTSEQNOSIZE  sizeof(uint32_t)
+#define AUG_PKTVERNOSIZE  sizeof(uint16_t)
+#define AUG_PKTTYPESIZE   sizeof(uint16_t)
+#define AUG_PKTADDRLEN    AUG_MAXHOSTSERVLEN
+#define AUG_PKTBODYSIZE   376
+#define AUG_PKTMETHODLEN  64
 #define AUG_PKTURILEN    (AUG_PKTBODYSIZE - AUG_PKTMETHODLEN)
 
 /** @} */
@@ -65,10 +65,10 @@
  */
 
 #define AUG_PKTMAGICOFF   0
-#define AUG_PKTVEROFF    (AUG_PKTMAGICOFF + AUG_PKTMAGICSIZE)
-#define AUG_PKTTYPEOFF   (AUG_PKTVEROFF + AUG_PKTVERSIZE)
-#define AUG_PKTSEQOFF    (AUG_PKTTYPEOFF + AUG_PKTTYPESIZE)
-#define AUG_PKTADDROFF   (AUG_PKTSEQOFF + AUG_PKTSEQSIZE)
+#define AUG_PKTSEQNOOFF  (AUG_PKTMAGICOFF + AUG_PKTMAGICSIZE)
+#define AUG_PKTVERNOOFF  (AUG_PKTSEQNOOFF + AUG_PKTSEQNOSIZE)
+#define AUG_PKTTYPEOFF   (AUG_PKTVERNOOFF + AUG_PKTVERNOSIZE)
+#define AUG_PKTADDROFF   (AUG_PKTTYPEOFF + AUG_PKTTYPESIZE)
 #define AUG_PKTBODYOFF   (AUG_PKTADDROFF + AUG_PKTADDRLEN)
 #define AUG_PKTMETHODOFF  AUG_PKTBODYOFF
 #define AUG_PKTURIOFF    (AUG_PKTMETHODOFF + AUG_PKTMETHODLEN)
@@ -86,7 +86,7 @@
  */
 
 struct aug_packet {
-    unsigned ver_, type_, seq_;
+    unsigned seqno_, verno_, type_;
     char addr_[AUG_PKTADDRLEN + 1];
     union {
         struct {
@@ -131,5 +131,18 @@ aug_encodepacket(char* buf, const struct aug_packet* pkt);
 
 AUGNET_API struct aug_packet*
 aug_decodepacket(struct aug_packet* pkt, const char* buf);
+
+/**
+ * Decode network buffer's sequence number only.
+ *
+ * @param seqno Output sequence number.
+ *
+ * @param buf Input network buffer.
+ *
+ * @return @a seqno, or null on error.
+ */
+
+AUGNET_API unsigned*
+aug_decodeseqno(unsigned* seqno, const char* buf);
 
 #endif /* AUGNET_PACKET_H */

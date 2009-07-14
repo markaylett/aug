@@ -72,8 +72,8 @@ main(int argc, char* argv[])
             aug_packet pkt;
             aug_decodepacket(&pkt, buf);
 
-            aug_ctxinfo(aug_tlx, "recv: type=[%u], seq=[%u]", pkt.type_,
-                        pkt.seq_);
+            aug_ctxinfo(aug_tlx, "recv: seqno=[%u], type=[%u]", pkt.seqno_,
+                        pkt.type_);
         }
         return 0;
 

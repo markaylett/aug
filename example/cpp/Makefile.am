@@ -9,7 +9,6 @@ noinst_PROGRAMS = \
 
 if ENABLE_MULTICAST
 noinst_PROGRAMS += \
-	heartbeat \
 	mcastrecv \
 	mcastsend \
 	packet
@@ -43,10 +42,6 @@ timerd_SOURCES = \
 timerd_LDADD = $(AUGLIBS)
 
 if ENABLE_MULTICAST
-heartbeat_SOURCES = \
-	heartbeat.cpp
-heartbeat_LDADD = $(AUGLIBS)
-
 mcastrecv_SOURCES = \
 	mcastrecv.cpp
 mcastrecv_LDADD = $(AUGLIBS)

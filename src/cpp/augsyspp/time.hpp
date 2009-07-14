@@ -29,11 +29,16 @@
 
 namespace aug {
 
-    inline aug_timeval&
-    gettimeofday(aug_timeval& tv)
+    inline aug_time
+    timegm(tm& res)
     {
-        gettimeofday(getclock(aug_tlx), tv);
-        return tv;
+        return verify(aug_timegm(&res));
+    }
+
+    inline aug_time
+    timelocal(tm& res)
+    {
+        return verify(aug_timelocal(&res));
     }
 
     inline tm&
@@ -45,7 +50,7 @@ namespace aug {
     inline tm&
     gmtime(tm& res)
     {
-        return gmtime(static_cast<aug_time>(time(0)), res);
+        return gmtime(time(0), res);
     }
 
     inline tm&
@@ -57,7 +62,7 @@ namespace aug {
     inline tm&
     localtime(tm& res)
     {
-        return localtime(static_cast<aug_time>(time(0)), res);
+        return localtime(time(0), res);
     }
 
     inline aug_timeval&

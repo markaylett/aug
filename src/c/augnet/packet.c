@@ -52,7 +52,7 @@ unpackstring_(char* dst, const char* src, size_t size)
 AUGNET_API aug_result
 aug_verifypacket(const struct aug_packet* packet)
 {
-    if (UINT16_MAX < packet->ver_) {
+    if (UINT16_MAX < packet->verno_) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("maximum packet version exceeded"));
@@ -66,7 +66,7 @@ aug_verifypacket(const struct aug_packet* packet)
         return AUG_FAILERROR;
     }
 
-    if (UINT32_MAX < packet->seq_) {
+    if (UINT32_MAX < packet->seqno_) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("maximum packet sequence exceeded"));
@@ -90,9 +90,9 @@ aug_encodepacket(char* buf, const struct aug_packet* pkt)
 
     /* Standard header fields. */
 
-    aug_encode16(buf + AUG_PKTVEROFF, (uint16_t)pkt->ver_);
+    aug_encode32(buf + AUG_PKTSEQNOOFF, (uint32_t)pkt->seqno_);
+    aug_encode16(buf + AUG_PKTVERNOOFF, (uint16_t)pkt->verno_);
     aug_encode16(buf + AUG_PKTTYPEOFF, (uint16_t)pkt->type_);
-    aug_encode32(buf + AUG_PKTSEQOFF, (uint32_t)pkt->seq_);
     packstring_(buf + AUG_PKTADDROFF, pkt->addr_, AUG_PKTADDRLEN);
 
     switch (pkt->type_) {
@@ -130,9 +130,9 @@ aug_decodepacket(struct aug_packet* pkt, const char* buf)
 
     /* Standard header fields. */
 
-    pkt->ver_ = aug_decode16(buf + AUG_PKTVEROFF);
+    pkt->seqno_ = aug_decode32(buf + AUG_PKTSEQNOOFF);
+    pkt->verno_ = aug_decode16(buf + AUG_PKTVERNOOFF);
     pkt->type_ = aug_decode16(buf + AUG_PKTTYPEOFF);
-    pkt->seq_ = aug_decode32(buf + AUG_PKTSEQOFF);
     unpackstring_(pkt->addr_, buf + AUG_PKTADDROFF, AUG_PKTADDRLEN);
 
     switch (pkt->type_) {
@@ -155,4 +155,17 @@ aug_decodepacket(struct aug_packet* pkt, const char* buf)
         break;
     }
     return pkt;
+}
+
+AUGNET_API unsigned*
+aug_decodeseqno(unsigned* seqno, const char* buf)
+{
+    if (0 != memcmp(buf + AUG_PKTMAGICOFF, MAGIC_, AUG_PKTMAGICSIZE)) {
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                       AUG_MSG("invalid packet header"));
+        return NULL;
+    }
+
+    *seqno = aug_decode32(buf + AUG_PKTSEQNOOFF);
+    return seqno;
 }

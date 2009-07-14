@@ -196,7 +196,7 @@ namespace aug {
                 chans tmp(getmpool(aug_tlx), chandler_);
                 chans_.swap(tmp);
 
-                gettimeofday(now_);
+                gettimeofday(getclock(aug_tlx), now_);
                 setmdeventmask(muxer_, eventsmd(events_), AUG_MDEVENTRDEX);
             }
             objectptr
@@ -553,7 +553,7 @@ engine::run(bool stoponerr)
 
             // Update timestamp after waiting.
 
-            gettimeofday(impl_->now_);
+            gettimeofday(getclock(aug_tlx), impl_->now_);
 
             AUG_CTXDEBUG2(aug_tlx, "processing events");
 

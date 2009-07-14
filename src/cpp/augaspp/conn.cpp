@@ -146,7 +146,7 @@ connimpl::connimpl(session_base& session, mod_handle& sock,
       state_(ESTABLISHED),
       accepted_(accepted)
 {
-    gettimeofday(since_);
+    gettimeofday(getclock(aug_tlx), since_);
 }
 
 void

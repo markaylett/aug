@@ -37,9 +37,9 @@ static char*
 heartbeat_(char* buf)
 {
     aug_packet pkt;
-    pkt.ver_ = 1;
+    pkt.seqno_ = ++seq_;
+    pkt.verno_ = 1;
     pkt.type_ = AUG_PKTHBEAT;
-    pkt.seq_ = ++seq_;
     strcpy(pkt.addr_, "");
     aug_encodepacket(buf, &pkt);
     return buf;
