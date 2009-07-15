@@ -37,11 +37,14 @@ static char*
 heartbeat_(char* buf)
 {
     aug_packet pkt;
+    pkt.proto_ = 1;
+    aug_strlcpy(pkt.chan_, "mcastsend", sizeof(pkt.chan_));
     pkt.seqno_ = ++seq_;
     pkt.verno_ = 1;
-    pkt.type_ = AUG_PKTHBEAT;
-    strcpy(pkt.addr_, "");
-    aug_encodepacket(buf, &pkt);
+    pkt.time_ = time(0) * 1000;
+    pkt.flags_ = 0;
+    pkt.type_ = 1;
+    aug_encodepacket(&pkt, buf);
     return buf;
 }
 

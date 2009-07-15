@@ -66,7 +66,7 @@ torw_(int from)
 static aug_result
 init_(aug_seq_t seq, struct aug_info_* info)
 {
-    static const aug_verno_t VERNO = 3U;
+    static const aug_proto_t PROTO = 3U;
     unsigned size = aug_seqsize_(seq);
 
     /* An existing archive will be at least as big as the minimum size. */
@@ -77,11 +77,11 @@ init_(aug_seq_t seq, struct aug_info_* info)
 
         /* Verify version number embedded within header. */
 
-        if (VERNO != info->verno_) {
+        if (PROTO != info->proto_) {
 
             aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                           AUG_MSG("invalid version number [%d]"),
-                           (int)info->verno_);
+                           AUG_MSG("invalid protocol number [%d]"),
+                           (int)info->proto_);
             return AUG_FAILERROR;
         }
     } else {
@@ -94,8 +94,8 @@ init_(aug_seq_t seq, struct aug_info_* info)
             return AUG_FAILERROR;
 
         memcpy(ptr + AUG_MAGICOFF, AUG_MAGIC, sizeof(aug_magic_t));
-        aug_encodeverno(ptr + AUG_VERNOOFF,
-                        (aug_verno_t)(info->verno_ = VERNO));
+        aug_encodeproto(ptr + AUG_PROTOOFF,
+                        (aug_proto_t)(info->proto_ = PROTO));
         aug_encodefields(ptr + AUG_FIELDSOFF,
                          (aug_fields_t)(info->fields_ = 0));
         aug_encodehsize(ptr + AUG_HSIZEOFF,

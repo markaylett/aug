@@ -45,7 +45,7 @@ aug_setinfo_(aug_seq_t seq, const struct aug_info_* info)
         return AUG_FAILERROR;
 
     memcpy(addr + AUG_MAGICOFF, AUG_MAGIC, sizeof(aug_magic_t));
-    aug_encodeverno(addr + AUG_VERNOOFF, (aug_verno_t)info->verno_);
+    aug_encodeproto(addr + AUG_PROTOOFF, (aug_proto_t)info->proto_);
     aug_encodefields(addr + AUG_FIELDSOFF, (aug_fields_t)info->fields_);
     aug_encodehsize(addr + AUG_HSIZEOFF, (aug_hsize_t)info->hsize_);
     aug_encodebsize(addr + AUG_BSIZEOFF, (aug_bsize_t)info->bsize_);
@@ -70,7 +70,7 @@ aug_info_(aug_seq_t seq, struct aug_info_* info)
         return AUG_FAILERROR;
     }
 
-    info->verno_ = aug_decodeverno(addr + AUG_VERNOOFF);
+    info->proto_ = aug_decodeproto(addr + AUG_PROTOOFF);
     info->fields_ = aug_decodefields(addr + AUG_FIELDSOFF);
     info->hsize_ = aug_decodehsize(addr + AUG_HSIZEOFF);
     info->bsize_ = aug_decodebsize(addr + AUG_BSIZEOFF);

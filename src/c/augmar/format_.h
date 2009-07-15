@@ -30,9 +30,9 @@
 
 typedef char aug_magic_t[4];
 
-typedef uint16_t aug_verno_t;
-#define aug_encodeverno aug_encode16
-#define aug_decodeverno aug_decode16
+typedef uint16_t aug_proto_t;
+#define aug_encodeproto aug_encode16
+#define aug_decodeproto aug_decode16
 
 typedef uint16_t aug_fields_t;
 #define aug_encodefields aug_encode16
@@ -61,8 +61,8 @@ typedef uint16_t aug_vsize_t;
 
 #define AUG_LEADER 0
 #define AUG_MAGICOFF 0
-#define AUG_VERNOOFF (AUG_MAGICOFF + sizeof(aug_magic_t))
-#define AUG_FIELDSOFF (AUG_VERNOOFF + sizeof(aug_verno_t))
+#define AUG_PROTOOFF (AUG_MAGICOFF + sizeof(aug_magic_t))
+#define AUG_FIELDSOFF (AUG_PROTOOFF + sizeof(aug_proto_t))
 #define AUG_HSIZEOFF (AUG_FIELDSOFF + sizeof(aug_fields_t))
 #define AUG_BSIZEOFF (AUG_HSIZEOFF + sizeof(aug_hsize_t))
 #define AUG_LEADERSIZE (AUG_BSIZEOFF + sizeof(aug_bsize_t))

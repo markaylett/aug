@@ -66,7 +66,7 @@ namespace {
 
     class window {
         struct message {
-            char buf_[AUG_PACKETSIZE];
+            aug_packet pkt_;
             aug_timeval tv_;
         };
         const unsigned size_;
@@ -97,29 +97,30 @@ namespace {
               seed_(true)
         {
         }
-        char*
-        insert(seqno_t seq, const aug_timeval& tv)
+        void
+        insert(const aug_packet& pkt, const aug_timeval& tv)
         {
+            seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
             if (seed_) {
-                begin_ = seq;
-                end_ = seq + 1;
+                begin_ = seqno;
+                end_ = seqno + 1;
                 seed_ = false;
             } else {
-                const long diff(seq - begin_);
+                const long diff(seqno - begin_);
                 if (diff < 0)
                     throw duplicate_exception();
                 if (size_ <= static_cast<seqno_t>(diff))
                     throw maxwindow_exception();
-                if (end_ <= seq) {
-                    for (seqno_t i(end_); i < seq; ++i)
+                if (end_ <= seqno) {
+                    for (seqno_t i(end_); i < seqno; ++i)
                         clear(ring_[i]);
-                    end_ = seq + 1;
+                    end_ = seqno + 1;
                 }
             }
-            message& m(ring_[seq % size_]);
+            message& m(ring_[seqno % size_]);
+            memcpy(&m.pkt_, &pkt, sizeof(m.pkt_));
             m.tv_.tv_sec = tv.tv_sec;
             m.tv_.tv_usec = tv.tv_usec;
-            return m.buf_;
         }
         bool
         next(aug_packet& pkt, aug_timeval& tv)
@@ -127,7 +128,7 @@ namespace {
             if (empty())
                 return false;
             message& m(ring_[++begin_ % size_]);
-            aug_decodepacket(&pkt, m.buf_);
+            memcpy(&pkt, &m.pkt_, sizeof(pkt));
             tv.tv_sec = m.tv_.tv_sec;
             tv.tv_usec = m.tv_.tv_usec;
             clear(m);
@@ -164,15 +165,11 @@ namespace {
             tvadd(expiry_, timeout_);
         }
         void
-        insert(const char* src)
+        insert(const aug_packet& pkt)
         {
-            unsigned seqno;
-            verify(aug_decodeseqno(&seqno, src));
-
             aug_timeval tv;
             gettimeofday(clock_, tv);
-            char* dst(window_.insert(seqno, tv));
-            memcpy(dst, src, AUG_PACKETSIZE);
+            window_.insert(pkt, tv);
         }
         bool
         next(aug_packet& pkt)
@@ -220,51 +217,39 @@ namespace {
         size_t
         sendhead(sdref ref, unsigned type, const endpoint& ep)
         {
-            type_ = type;
             ++seqno_;
+            verno_ = 1;
+            time_ = static_cast<uint64_t>(time(0) * 1000);
+            flags_ = 0;
+            type_ = static_cast<uint16_t>(type);
 
             char buf[AUG_PACKETSIZE];
-            aug_encodepacket(buf, static_cast<aug_packet*>(this));
+            aug_encodepacket(static_cast<aug_packet*>(this), buf);
             return aug::sendto(ref, buf, sizeof(buf), 0, ep);
         }
     public:
         explicit
-        packet(const char* addr)
+        packet(const char* chan)
         {
-            verno_ = 1;
-            type_ = 0;
+            proto_ = 1;
+            aug_strlcpy(chan_, chan, sizeof(chan_));
             seqno_ = 0;
-            aug_strlcpy(addr_, addr, sizeof(addr_));
-        }
-        size_t
-        sendopen(sdref ref, const endpoint& ep)
-        {
-            return sendhead(ref, AUG_PKTOPEN, ep);
-        }
-        size_t
-        sendclose(sdref ref, const endpoint& ep)
-        {
-            return sendhead(ref, AUG_PKTCLOSE, ep);
+            verno_ = 0;
+            time_ = 0;
+            flags_ = 0;
+            type_ = 0;
         }
         size_t
         sendhbeat(sdref ref, const endpoint& ep)
         {
-            return sendhead(ref, AUG_PKTHBEAT, ep);
+            return sendhead(ref, 1, ep);
         }
         size_t
-        sendlost(sdref ref, const endpoint& ep)
-        {
-            return sendhead(ref, AUG_PKTLOST, ep);
-        }
-        size_t
-        sendevent(sdref ref, const char* method, const char* uri,
+        sendevent(sdref ref, const char* data,
                   const endpoint& ep)
         {
-            aug_strlcpy(content_.event_.method_, method,
-                        sizeof(content_.event_.method_));
-            aug_strlcpy(content_.event_.uri_, uri,
-                        sizeof(content_.event_.uri_));
-            return sendhead(ref, AUG_PKTEVENT, ep);
+            aug_strlcpy(data_, data, sizeof(data_));
+            return sendhead(ref, 2, ep);
         }
     };
 
@@ -295,7 +280,9 @@ namespace {
             char buf[AUG_PACKETSIZE];
             endpoint from(null);
             recvfrom(ref, buf, sizeof(buf), 0, from);
-            window_.insert(buf);
+            aug_packet pkt;
+            verify(aug_decodepacket(buf, &pkt));
+            window_.insert(pkt);
         }
         void
         timercb(aug_id id, unsigned& ms)

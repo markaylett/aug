@@ -70,10 +70,11 @@ main(int argc, char* argv[])
             size_t size(read(sfd, buf, sizeof(buf)));
 
             aug_packet pkt;
-            aug_decodepacket(&pkt, buf);
+            aug_decodepacket(buf, &pkt);
 
-            aug_ctxinfo(aug_tlx, "recv: seqno=[%u], type=[%u]", pkt.seqno_,
-                        pkt.type_);
+            aug_ctxinfo(aug_tlx, "recv: seqno=[%u], type=[%u]",
+                        static_cast<unsigned>(pkt.seqno_),
+                        static_cast<unsigned>(pkt.type_));
         }
         return 0;
 

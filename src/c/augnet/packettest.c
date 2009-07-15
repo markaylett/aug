@@ -31,50 +31,61 @@ main(int argc, char* argv[])
 {
     struct aug_packet pkt;
     char buf[AUG_PACKETSIZE];
+    aug_time now = time(0) * 1000;
 
     if (!aug_autotlx())
         return 1;
 
-    pkt.seqno_ = 202;
-    pkt.verno_ = 101;
-    pkt.type_ = AUG_PKTEVENT;
+    pkt.proto_ = 1;
+    strcpy(pkt.chan_, "127.0.0.1:1972");
+    pkt.seqno_ = 101;
+    pkt.verno_ = 202;
+    pkt.time_ = now;
+    pkt.flags_ = 0;
+    pkt.type_ = 2;
+    strcpy(pkt.data_, "stale event://www.xofy.org/aug");
 
-    strcpy(pkt.addr_, "127.0.0.1:1972");
-    strcpy(pkt.content_.event_.method_, "stale");
-    strcpy(pkt.content_.event_.uri_, "event://www.xofy.org/aug");
-
-    aug_encodepacket(buf, &pkt);
+    aug_encodepacket(&pkt, buf);
     memset(&pkt, 0, sizeof(pkt));
-    aug_decodepacket(&pkt, buf);
+    aug_decodepacket(buf, &pkt);
 
-    if (202 != pkt.seqno_) {
-        fprintf(stderr, "unexpected sequence [%d]\n", pkt.seqno_);
+    if (1 != pkt.proto_) {
+        fprintf(stderr, "unexpected protocol [%d]\n", (int)pkt.proto_);
         return 1;
     }
 
-    if (101 != pkt.verno_) {
-        fprintf(stderr, "unexpected version [%d]\n", pkt.verno_);
+    if (0 != strcmp(pkt.chan_, "127.0.0.1:1972")) {
+        fprintf(stderr, "unexpected channel name [%s]\n", pkt.chan_);
         return 1;
     }
 
-    if (AUG_PKTEVENT != pkt.type_) {
-        fprintf(stderr, "unexpected type [%d]\n", pkt.type_);
+    if (101 != pkt.seqno_) {
+        fprintf(stderr, "unexpected sequence [%d]\n", (int)pkt.seqno_);
         return 1;
     }
 
-    if (0 != strcmp(pkt.addr_, "127.0.0.1:1972")) {
-        fprintf(stderr, "unexpected addr [%s]\n", pkt.addr_);
+    if (202 != pkt.verno_) {
+        fprintf(stderr, "unexpected version [%d]\n", (int)pkt.verno_);
         return 1;
     }
 
-    if (0 != strcmp(pkt.content_.event_.method_, "stale")) {
-        fprintf(stderr, "unexpected method [%s]\n",
-                pkt.content_.event_.method_);
+    if (now != pkt.time_) {
+        fprintf(stderr, "unexpected time [%u]\n", (unsigned)pkt.time_);
         return 1;
     }
 
-    if (0 != strcmp(pkt.content_.event_.uri_, "event://www.xofy.org/aug")) {
-        fprintf(stderr, "unexpected uri [%s]\n", pkt.content_.event_.uri_);
+    if (0 != pkt.flags_) {
+        fprintf(stderr, "unexpected flags [%d]\n", (int)pkt.flags_);
+        return 1;
+    }
+
+    if (2 != pkt.type_) {
+        fprintf(stderr, "unexpected type [%d]\n", (int)pkt.type_);
+        return 1;
+    }
+
+    if (0 != strcmp(pkt.data_, "stale event://www.xofy.org/aug")) {
+        fprintf(stderr, "unexpected data [%s]\n", pkt.data_);
         return 1;
     }
 

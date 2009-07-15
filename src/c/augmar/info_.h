@@ -26,7 +26,7 @@
 #include "augmar/seq_.h"
 
 struct aug_info_ {
-    unsigned verno_, fields_, hsize_, bsize_;
+    unsigned proto_, fields_, hsize_, bsize_;
 };
 
 AUG_EXTERNC aug_result

@@ -42,17 +42,28 @@
  *
  * @ingroup Packet
  *
+ *   4: magic
+ *   2: proto
+ * 128: chan
+ *   4: seqno
+ *   4: verno
+ *   8: time
+ *   2: flags
+ *   2: type
+ * 362: data
+ *
  * @{
  */
 
-#define AUG_PKTMAGICSIZE  4
-#define AUG_PKTSEQNOSIZE  sizeof(uint32_t)
-#define AUG_PKTVERNOSIZE  sizeof(uint16_t)
-#define AUG_PKTTYPESIZE   sizeof(uint16_t)
-#define AUG_PKTADDRLEN    AUG_MAXHOSTSERVLEN
-#define AUG_PKTBODYSIZE   376
-#define AUG_PKTMETHODLEN  64
-#define AUG_PKTURILEN    (AUG_PKTBODYSIZE - AUG_PKTMETHODLEN)
+#define AUG_PKTMAGICSIZE 4
+#define AUG_PKTPROTOSIZE sizeof(uint16_t)
+#define AUG_PKTCHANLEN   AUG_MAXADDRLEN
+#define AUG_PKTSEQNOSIZE sizeof(uint32_t)
+#define AUG_PKTVERNOSIZE sizeof(uint32_t)
+#define AUG_PKTTIMESIZE  sizeof(uint64_t)
+#define AUG_PKTFLAGSSIZE sizeof(uint16_t)
+#define AUG_PKTTYPESIZE  sizeof(uint16_t)
+#define AUG_PKTDATASIZE  362
 
 /** @} */
 
@@ -64,37 +75,29 @@
  * @{
  */
 
-#define AUG_PKTMAGICOFF   0
-#define AUG_PKTSEQNOOFF  (AUG_PKTMAGICOFF + AUG_PKTMAGICSIZE)
+#define AUG_PKTMAGICOFF  0
+#define AUG_PKTPROTOOFF  (AUG_PKTMAGICOFF + AUG_PKTMAGICSIZE)
+#define AUG_PKTCHANOFF   (AUG_PKTPROTOOFF + AUG_PKTPROTOSIZE)
+#define AUG_PKTSEQNOOFF  (AUG_PKTCHANOFF + AUG_PKTCHANLEN)
 #define AUG_PKTVERNOOFF  (AUG_PKTSEQNOOFF + AUG_PKTSEQNOSIZE)
-#define AUG_PKTTYPEOFF   (AUG_PKTVERNOOFF + AUG_PKTVERNOSIZE)
-#define AUG_PKTADDROFF   (AUG_PKTTYPEOFF + AUG_PKTTYPESIZE)
-#define AUG_PKTBODYOFF   (AUG_PKTADDROFF + AUG_PKTADDRLEN)
-#define AUG_PKTMETHODOFF  AUG_PKTBODYOFF
-#define AUG_PKTURIOFF    (AUG_PKTMETHODOFF + AUG_PKTMETHODLEN)
+#define AUG_PKTTIMEOFF   (AUG_PKTVERNOOFF + AUG_PKTVERNOSIZE)
+#define AUG_PKTFLAGSOFF  (AUG_PKTTIMEOFF + AUG_PKTTIMESIZE)
+#define AUG_PKTTYPEOFF   (AUG_PKTFLAGSOFF + AUG_PKTFLAGSSIZE)
+#define AUG_PKTDATAOFF   (AUG_PKTTYPEOFF + AUG_PKTTYPESIZE)
 
 /** @} */
-
-#define AUG_PKTOPEN  1
-#define AUG_PKTCLOSE 2
-#define AUG_PKTHBEAT 3
-#define AUG_PKTLOST  4
-#define AUG_PKTEVENT 5
 
 /**
  * Packet structure.
  */
 
 struct aug_packet {
-    unsigned seqno_, verno_, type_;
-    char addr_[AUG_PKTADDRLEN + 1];
-    union {
-        struct {
-            char method_[AUG_PKTMETHODLEN + 1];
-            char uri_[AUG_PKTURILEN + 1];
-        } event_;
-        char ext_[AUG_PKTBODYSIZE];
-    } content_;
+    uint16_t proto_;
+    char chan_[AUG_PKTCHANLEN + 1];
+    uint32_t seqno_, verno_;
+    uint64_t time_;
+    uint16_t flags_, type_;
+    char data_[AUG_PKTDATASIZE];
 };
 
 /**
@@ -109,40 +112,27 @@ aug_verifypacket(const struct aug_packet* packet);
 /**
  * Encode packet into network buffer.
  *
- * @param buf Output buffer.  Must be at least #AUG_PACKETSIZE in length.
- *
  * @param packet Input packet object.
+ *
+ * @param buf Output buffer.  Must be at least #AUG_PACKETSIZE in length.
  *
  * @return @a buf, or null on error.
  */
 
 AUGNET_API char*
-aug_encodepacket(char* buf, const struct aug_packet* pkt);
+aug_encodepacket(const struct aug_packet* pkt, char* buf);
 
 /**
  * Decode network buffer into packet.
  *
- * @param packet Output packet.
- *
  * @param buf Input network buffer.
+ *
+ * @param packet Output packet.
  *
  * @return @a pkt, or null on error.
  */
 
 AUGNET_API struct aug_packet*
-aug_decodepacket(struct aug_packet* pkt, const char* buf);
-
-/**
- * Decode network buffer's sequence number only.
- *
- * @param seqno Output sequence number.
- *
- * @param buf Input network buffer.
- *
- * @return @a seqno, or null on error.
- */
-
-AUGNET_API unsigned*
-aug_decodeseqno(unsigned* seqno, const char* buf);
+aug_decodepacket(const char* buf, struct aug_packet* pkt);
 
 #endif /* AUGNET_PACKET_H */
