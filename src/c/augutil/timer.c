@@ -38,6 +38,13 @@ AUG_RCSID("$Id$");
 #include <assert.h>
 #include <stdlib.h>
 
+/* Number of milliseconds added when comparing times to compensate for clock
+   inaccuracies on the local system.  This value should be sufficient to
+   reduce early timer expiry and rapid rescheduling.  So expiry will occur if
+   timer is within epsilon of current time. */
+
+#define EPSILONMS_ 5
+
 struct timer_ {
     AUG_ENTRY(timer_);
     aug_id id_;
@@ -105,6 +112,16 @@ setexpiry_(aug_clock* clock, struct aug_timeval* tv, unsigned ms)
     aug_verify(aug_gettimeofday(clock, tv));
     aug_tvadd(tv, aug_mstotv(ms, &local));
     return AUG_SUCCESS;
+}
+
+static aug_bool
+expiry_(const struct aug_timeval* now, const struct aug_timeval* tv)
+{
+  struct aug_timeval local;
+  local.tv_sec = 0;
+  local.tv_usec = EPSILONMS_ * 1000;
+  aug_tvadd(&local, now);
+  return timercmp(&local, tv, <) ? AUG_TRUE : AUG_FALSE;
 }
 
 AUGUTIL_API aug_timers_t
@@ -264,7 +281,7 @@ aug_processexpired(aug_timers_t timers, aug_bool force,
 
             /* Has this timer expired? */
 
-            if (timercmp(&now, &it->tv_, <))
+          if (expiry_(&now, &it->tv_))
                 break;
 
             /* Remove expired timer to prevent a new one from being

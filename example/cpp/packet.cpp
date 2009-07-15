@@ -32,25 +32,25 @@
 using namespace aug;
 using namespace std;
 
-// packet 239.1.1.1 1000 3
+// packet 239.1.1.1 17172 3
 
 namespace {
 
     struct window_exception : std::exception { };
 
-    struct duplicate_exception : window_exception {
+    struct discard_exception : window_exception {
         const char*
         what() const throw()
         {
-            return "aug::duplicate_exception";
+            return "aug::discard_exception";
         }
     };
 
-    struct maxwindow_exception : window_exception {
+    struct backlog_exception : window_exception {
         const char*
         what() const throw()
         {
-            return "aug::maxwindow_exception";
+            return "aug::backlog_exception";
         }
     };
 
@@ -65,6 +65,7 @@ namespace {
     typedef unsigned long seqno_t;
 
     class window {
+        enum state { SEED, SYNC, READY };
         struct message {
             aug_packet pkt_;
             aug_timeval tv_;
@@ -72,7 +73,7 @@ namespace {
         const unsigned size_;
         message* const ring_;
         seqno_t begin_, end_;
-        bool seed_;
+        state state_;
         static void
         clear(message& m)
         {
@@ -94,23 +95,32 @@ namespace {
               ring_(new message[size]),
               begin_(1),
               end_(1),
-              seed_(true)
+              state_(SEED)
         {
         }
         void
         insert(const aug_packet& pkt, const aug_timeval& tv)
         {
-            seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
-            if (seed_) {
+            aug_ctxinfo(aug_tlx, "insert: seqno=[%u]",
+                        static_cast<unsigned>(pkt.seqno_));
+            const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
+            if (SEED == state_) {
+                const seqno_t off((size_ - 1) / 2);
                 begin_ = seqno;
+                if (off < seqno)
+                  begin_ -= off;
+                aug_ctxinfo(aug_tlx, "seed: offset=[%u], begin=[%u]",
+                            static_cast<unsigned>(off),
+                            static_cast<unsigned>(begin_));
                 end_ = seqno + 1;
-                seed_ = false;
+                state_ = SYNC;
+            //} else if (SYNC == state_) {
             } else {
                 const long diff(seqno - begin_);
                 if (diff < 0)
-                    throw duplicate_exception();
+                    throw discard_exception();
                 if (size_ <= static_cast<seqno_t>(diff))
-                    throw maxwindow_exception();
+                    throw backlog_exception();
                 if (end_ <= seqno) {
                     for (seqno_t i(end_); i < seqno; ++i)
                         clear(ring_[i]);
@@ -127,7 +137,7 @@ namespace {
         {
             if (empty())
                 return false;
-            message& m(ring_[++begin_ % size_]);
+            message& m(ring_[begin_++ % size_]);
             memcpy(&pkt, &m.pkt_, sizeof(pkt));
             tv.tv_sec = m.tv_.tv_sec;
             tv.tv_usec = m.tv_.tv_usec;
@@ -135,15 +145,29 @@ namespace {
             return true;
         }
         void
-        skip()
+        drop()
         {
-            if (begin_ != end_ && !seed_)
+            if (begin_ != end_ && empty(ring_[begin_ % size_]))
                 ++begin_;
+        }
+        void
+        trim()
+        {
+            while (begin_ != end_ && empty(ring_[begin_ % size_]))
+                ++begin_;
+            aug_ctxinfo(aug_tlx, "trim: begin=[%u]",
+                        static_cast<unsigned>(begin_));
+            state_ = READY;
         }
         bool
         empty() const
         {
             return begin_ == end_ || empty(ring_[begin_ % size_]);
+        }
+        bool
+        ready() const
+        {
+            return READY == state_;
         }
     };
 
@@ -178,13 +202,19 @@ namespace {
             if (window_.empty()) {
                 gettimeofday(clock_, tv);
                 if (timercmp(&expiry_, &tv, <=)) {
-                    // Expiry time has passed.
-                    window_.skip();
                     // Advance expiry time.
                     tvadd(expiry_, timeout_);
-                    throw timeout_exception();
-                }
-                return false;
+                    if (window_.ready()) {
+                        // Expiry time has passed.
+                        window_.drop();
+                        throw timeout_exception();
+                    } else {
+                        window_.trim();
+                        if (window_.empty())
+                            return false;
+                    }
+                } else
+                    return false;
             }
             window_.next(pkt, tv);
             tvadd(tv, timeout_);
@@ -233,7 +263,7 @@ namespace {
         {
             proto_ = 1;
             aug_strlcpy(chan_, chan, sizeof(chan_));
-            seqno_ = 0;
+            seqno_ = 100;
             verno_ = 0;
             time_ = 0;
             flags_ = 0;
@@ -259,6 +289,7 @@ namespace {
         expirywindow window_;
         timer rdwait_;
         timer wrwait_;
+        packet out_;
 
     public:
         ~session() AUG_NOTHROW
@@ -269,10 +300,11 @@ namespace {
               ep_(ep),
               window_(getclock(aug_tlx), 8, 2000),
               rdwait_(ts, null),
-              wrwait_(ts, null)
+              wrwait_(ts, null),
+              out_("test")
         {
             rdwait_.set(window_.expiry(), *this);
-            wrwait_.set(2000, *this);
+            wrwait_.set(1500, *this);
         }
         void
         recv(sdref ref)
@@ -289,9 +321,8 @@ namespace {
         {
             if (idref(id) == wrwait_.id()) {
 
-                aug_ctxinfo(aug_tlx, "hbint timeout");
-                packet pkt("test");
-                pkt.sendhbeat(ref_, ep_);
+                aug_ctxinfo(aug_tlx, "wrwait timeout");
+                out_.sendhbeat(ref_, ep_);
             }
         }
         void
@@ -300,8 +331,9 @@ namespace {
             try {
                 aug_packet pkt;
                 while (window_.next(pkt)) {
-                    aug_ctxinfo(aug_tlx, "recv: seqno=[%u], type=[%u]",
-                                pkt.seqno_, pkt.type_);
+                  aug_ctxinfo(aug_tlx, "next: seqno=[%u], type=[%u]",
+                              static_cast<unsigned>(pkt.seqno_),
+                              static_cast<unsigned>(pkt.type_));
                 }
             } catch (const window_exception& e) {
                 aug_ctxerror(aug_tlx, "error: %s", e.what());
@@ -327,8 +359,9 @@ namespace {
         while (!stop_) {
 
             processexpired(ts, 0 == ready, tv);
-            aug_ctxinfo(aug_tlx, "timeout in: tv_sec=%d, tv_usec=%d",
-                        (int)tv.tv_sec, (int)tv.tv_usec);
+            aug_ctxinfo(aug_tlx, "hbeat in: tv_sec=%d, tv_usec=%d",
+                        static_cast<int>(tv.tv_sec),
+                        static_cast<int>(tv.tv_usec));
 
             try {
                 ready = waitmdevents(mux, tv);
