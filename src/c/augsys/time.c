@@ -199,12 +199,20 @@ aug_tvadd(struct aug_timeval* dst, const struct aug_timeval* src)
 AUGSYS_API struct aug_timeval*
 aug_tvsub(struct aug_timeval* dst, const struct aug_timeval* src)
 {
-    dst->tv_sec -= src->tv_sec;
-    dst->tv_usec -= src->tv_usec;
+    if (timercmp(dst, src, <)) {
 
-    if (dst->tv_usec < 0) {
-        --dst->tv_sec;
-        dst->tv_usec += 1000000;
+        dst->tv_sec = 0;
+        dst->tv_usec = 0;
+
+    } else {
+
+        dst->tv_sec -= src->tv_sec;
+        dst->tv_usec -= src->tv_usec;
+
+        if (dst->tv_usec < 0) {
+            --dst->tv_sec;
+            dst->tv_usec += 1000000;
+        }
     }
     return dst;
 }

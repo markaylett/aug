@@ -74,6 +74,11 @@ aug_tvtoms(const struct aug_timeval* tv);
 AUGSYS_API struct aug_timeval*
 aug_tvadd(struct aug_timeval* dst, const struct aug_timeval* src);
 
+/**
+ * Subtract @a src from @a dst.  If @a dst is greater than @a src, then the
+ * result is zero.
+ */
+
 AUGSYS_API struct aug_timeval*
 aug_tvsub(struct aug_timeval* dst, const struct aug_timeval* src);
 

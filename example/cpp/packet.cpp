@@ -105,27 +105,41 @@ namespace {
                         static_cast<unsigned>(pkt.seqno_));
             const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
             if (SEED == state_) {
-                const seqno_t off((size_ - 1) / 2);
-                begin_ = seqno;
-                if (off < seqno)
-                  begin_ -= off;
-                aug_ctxinfo(aug_tlx, "seed: offset=[%u], begin=[%u]",
-                            static_cast<unsigned>(off),
+                const seqno_t inset((size_ - 1) / 2);
+                if (seqno <= inset)
+                    begin_ = seqno;
+                else
+                    begin_ = seqno - inset;
+                aug_ctxinfo(aug_tlx, "seed: inset=[%u], begin=[%u]",
+                            static_cast<unsigned>(inset),
                             static_cast<unsigned>(begin_));
-                end_ = seqno + 1;
+                end_ = begin_;
                 state_ = SYNC;
-            //} else if (SYNC == state_) {
             } else {
                 const long diff(seqno - begin_);
                 if (diff < 0)
                     throw discard_exception();
-                if (size_ <= static_cast<seqno_t>(diff))
-                    throw backlog_exception();
-                if (end_ <= seqno) {
-                    for (seqno_t i(end_); i < seqno; ++i)
-                        clear(ring_[i]);
-                    end_ = seqno + 1;
+                if (size_ <= static_cast<seqno_t>(diff)) {
+                    if (SYNC == state_) {
+                        aug_ctxcrit(aug_tlx,
+                                    "backlog: diff=[%u], begin=[%u]",
+                                    static_cast<unsigned>(diff),
+                                    static_cast<unsigned>(begin_));
+                        do {
+                            aug_ctxinfo(aug_tlx, "freeing");
+                            ++begin_;
+                        } while (size_ <= seqno - begin_);
+                    } else
+                        throw backlog_exception();
                 }
+            }
+            if (end_ <= seqno) {
+                for (seqno_t i(end_); i < seqno; ++i) {
+                    aug_ctxcrit(aug_tlx, "clear: i=[%u]",
+                                static_cast<unsigned>(i));
+                    clear(ring_[i % size_]);
+                }
+                end_ = seqno + 1;
             }
             message& m(ring_[seqno % size_]);
             memcpy(&m.pkt_, &pkt, sizeof(m.pkt_));
@@ -137,6 +151,7 @@ namespace {
         {
             if (empty())
                 return false;
+            state_ = READY;
             message& m(ring_[begin_++ % size_]);
             memcpy(&pkt, &m.pkt_, sizeof(pkt));
             tv.tv_sec = m.tv_.tv_sec;
@@ -157,7 +172,6 @@ namespace {
                 ++begin_;
             aug_ctxinfo(aug_tlx, "trim: begin=[%u]",
                         static_cast<unsigned>(begin_));
-            state_ = READY;
         }
         bool
         empty() const
@@ -210,8 +224,10 @@ namespace {
                         throw timeout_exception();
                     } else {
                         window_.trim();
-                        if (window_.empty())
+                        if (window_.empty()) {
+                            // Not seeded.
                             return false;
+                        }
                     }
                 } else
                     return false;
@@ -229,9 +245,17 @@ namespace {
         expiry() const
         {
             // Milliseconds to expiry.
-            aug_timeval tv;
-            gettimeofday(clock_, tv);
-            return AUG_MIN(tvtoms(tvsub(tv, expiry_)), 0);
+            aug_timeval tv, now;
+            tv.tv_sec = expiry_.tv_sec;
+            tv.tv_usec = expiry_.tv_usec;
+            gettimeofday(clock_, now);
+            const unsigned ms(tvtoms(tvsub(tv, now)));
+            aug_ctxinfo(aug_tlx, "expiry: tv_sec=[%d], ms=[%u]",
+                        static_cast<int>(tv.tv_sec),
+                        static_cast<unsigned>(ms));
+            if (0 == ms)
+                exit(0);
+            return ms;
         }
     };
 
@@ -298,13 +322,13 @@ namespace {
         session(sdref ref, const endpoint& ep, timers& ts)
             : ref_(ref),
               ep_(ep),
-              window_(getclock(aug_tlx), 8, 2000),
+              window_(getclock(aug_tlx), 8, 3000),
               rdwait_(ts, null),
               wrwait_(ts, null),
               out_("test")
         {
             rdwait_.set(window_.expiry(), *this);
-            wrwait_.set(1500, *this);
+            wrwait_.set(200, *this);
         }
         void
         recv(sdref ref)
@@ -323,6 +347,10 @@ namespace {
 
                 aug_ctxinfo(aug_tlx, "wrwait timeout");
                 out_.sendhbeat(ref_, ep_);
+            } else if (idref(id) == rdwait_.id()) {
+
+                aug_ctxinfo(aug_tlx, "rdwait timeout");
+                process();
             }
         }
         void
@@ -375,7 +403,8 @@ namespace {
             if (ready)
                 sess.recv(ref);
 
-            sess.process();
+            if (0 == aug_rand() % 7)
+                sess.process();
         }
     }
 }
@@ -391,11 +420,12 @@ main(int argc, char* argv[])
         setdaemonlog(aug_tlx);
 
         aug_timeval tv;
-        aug::gettimeofday(getclock(aug_tlx), tv);
+        gettimeofday(getclock(aug_tlx), tv);
+        aug::srand(getpid() ^ tv.tv_sec ^ tv.tv_usec);
 
         if (argc < 3) {
             aug_ctxerror(aug_tlx,
-                         "usage: heartbeat <mcast> <serv> [ifname]");
+                         "usage: packet <mcast> <serv> [ifname]");
             return 1;
         }
 
