@@ -31,6 +31,7 @@ AUG_RCSID("$Id$");
 #include "augctx/errinfo.h"
 
 #include <assert.h>
+#include <string.h> /* memcpy() */
 
 AUG_EXTERNC aug_result
 aug_setinfo_(aug_seq_t seq, const struct aug_info_* info)

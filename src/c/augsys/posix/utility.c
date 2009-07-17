@@ -31,7 +31,7 @@ aug_irand(void)
 {
     /* RAND_MAX is assumed to be at least INT_MAX. */
 
-    return (int)(random() % INT_MAX)
+    return (int)(random() % INT_MAX);
 }
 
 AUGSYS_API void
