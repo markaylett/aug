@@ -37,14 +37,51 @@ using namespace std;
 
 namespace {
 
+    const int ORDERING[] = {
+    //  1   2   3
+    //  1   2   3
+        0,  0,  0,
+    //  1   3   2
+    //  1   2   3
+        0,  1, -1,
+    //  2   1   3
+    //  1   2   3
+        1, -1,  0,
+    //  2   3   1
+    //  1   2   3
+        1,  1, -2,
+    //  3   1   2
+    //  1   2   3
+        2, -1, -1,
+    //  3   2   1
+    //  1   2   3
+        2,  0, -2
+    };
+
+    uint32_t
+    nextseq(unsigned base)
+    {
+        static unsigned i(1 + (aug_irand() % 6) * 3);
+        const unsigned j(i++);
+        return static_cast<uint32_t>(base + j + ORDERING[j % 18]);
+    }
+
+    bool
+    tvbefore(const aug_timeval& lhs, const aug_timeval& rhs)
+    {
+        aug_timeval local = { 0, 5000 };
+        tvadd(local, lhs);
+        return timercmp(&rhs, &local, <) ? true : false;
+    }
+
     string
-    tmstring(const aug_timeval& tv)
+    tvstring(const aug_timeval& tv)
     {
         struct tm local;
         aug_localtime(&tv.tv_sec, &local);
 
         char buf[256];
-        strftime(buf, sizeof(buf), "%b %d %H:%M:%S", &local);
+        strftime(buf, sizeof(buf), "%H:%M:%S", &local);
 
         stringstream ss;
         ss << buf << '.' << (tv.tv_usec / 1000);
@@ -92,11 +129,11 @@ namespace {
         }
     };
 
-    struct backlog_exception : window_exception {
+    struct overflow_exception : window_exception {
         const char*
         what() const throw()
         {
-            return "aug::backlog_exception";
+            return "aug::overflow_exception";
         }
     };
 
@@ -147,7 +184,7 @@ namespace {
         void
         insert(const aug_packet& pkt, const aug_timeval& tv)
         {
-            aug_ctxinfo(aug_tlx, "insert: seqno=[%u]",
+            aug_ctxinfo(aug_tlx, "inserting message [%u]",
                         static_cast<unsigned>(pkt.seqno_));
             const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
             if (SEED == state_) {
@@ -156,33 +193,30 @@ namespace {
                     begin_ = seqno;
                 else
                     begin_ = seqno - inset;
-                aug_ctxinfo(aug_tlx, "seed: inset=[%u], begin=[%u]",
+                aug_ctxinfo(aug_tlx, "seed at offset [%u] from [%u]",
                             static_cast<unsigned>(inset),
                             static_cast<unsigned>(begin_));
                 end_ = begin_;
                 state_ = SYNC;
             } else {
-                const long diff(seqno - begin_);
+                long diff(seqno - begin_);
                 if (diff < 0)
                     throw discard_exception();
-                if (size_ <= static_cast<seqno_t>(diff)) {
+                diff -= size_;
+                if (0 < diff) {
                     if (SYNC == state_) {
-                        aug_ctxinfo(aug_tlx,
-                                    "backlog: diff=[%u], begin=[%u]",
+                        aug_ctxcrit(aug_tlx,
+                                    "overflow by [%u] from [%u]",
                                     static_cast<unsigned>(diff),
                                     static_cast<unsigned>(begin_));
-                        do {
-                            aug_ctxinfo(aug_tlx, "freeing: begin=[%u]",
-                                        static_cast<unsigned>(begin_));
-                            ++begin_;
-                        } while (size_ <= seqno - begin_);
+                        begin_ += static_cast<seqno_t>(diff);
                     } else
-                        throw backlog_exception();
+                        throw overflow_exception();
                 }
             }
             if (end_ <= seqno) {
                 for (seqno_t i(end_); i < seqno; ++i) {
-                    aug_ctxinfo(aug_tlx, "clear: i=[%u]",
+                    aug_ctxinfo(aug_tlx, "clear intermediate [%u]",
                                 static_cast<unsigned>(i));
                     clear(ring_[i % size_]);
                 }
@@ -198,7 +232,7 @@ namespace {
         {
             if (empty())
                 return false;
-            state_ = READY;
+            //state_ = READY;
             message& m(ring_[begin_++ % size_]);
             memcpy(&pkt, &m.pkt_, sizeof(pkt));
             tv.tv_sec = m.tv_.tv_sec;
@@ -217,7 +251,7 @@ namespace {
         {
             while (begin_ != end_ && empty(ring_[begin_ % size_]))
                 ++begin_;
-            aug_ctxinfo(aug_tlx, "trim: begin=[%u]",
+            aug_ctxinfo(aug_tlx, "trimmed to [%u]",
                         static_cast<unsigned>(begin_));
         }
         bool
@@ -231,16 +265,6 @@ namespace {
             return READY == state_;
         }
     };
-
-    static aug_bool
-    expired_(const struct aug_timeval* now, const struct aug_timeval* tv)
-    {
-        struct aug_timeval local;
-        local.tv_sec = 0;
-        local.tv_usec = 5000;
-        aug_tvadd(&local, now);
-        return timercmp(tv, &local, <) ? AUG_TRUE : AUG_FALSE;
-    }
 
     class expirywindow {
         clockptr clock_;
@@ -258,9 +282,8 @@ namespace {
 
             gettimeofday(clock, expiry_);
             tvadd(expiry_, timeout_);
-
-            aug_ctxinfo(aug_tlx, "initial expiry: %s",
-                        tmstring(expiry_).c_str());
+            aug_ctxinfo(aug_tlx, "initial expiry [%s]",
+                        tvstring(expiry_).c_str());
         }
         void
         insert(const aug_packet& pkt)
@@ -275,11 +298,11 @@ namespace {
             aug_timeval tv;
             if (window_.empty()) {
                 gettimeofday(clock_, tv);
-                if (expired_(&tv, &expiry_)) {
+                if (tvbefore(tv, expiry_)) {
                     // Advance expiry time.
                     tvadd(expiry_, timeout_);
-                    aug_ctxinfo(aug_tlx, "advance timer: %s",
-                                tmstring(expiry_).c_str());
+                    aug_ctxinfo(aug_tlx, "moved expiry [%s]",
+                                tvstring(expiry_).c_str());
                     if (window_.ready()) {
                         // Expiry time has passed.
                         window_.drop();
@@ -300,8 +323,8 @@ namespace {
                 // Advance expiry time.
                 expiry_.tv_sec = tv.tv_sec;
                 expiry_.tv_usec = tv.tv_usec;
-                aug_ctxinfo(aug_tlx, "replace expiry: %s",
-                            tmstring(expiry_).c_str());
+                aug_ctxinfo(aug_tlx, "set expiry [%s]",
+                            tvstring(expiry_).c_str());
             }
             return true;
         }
@@ -313,12 +336,7 @@ namespace {
             tv.tv_sec = expiry_.tv_sec;
             tv.tv_usec = expiry_.tv_usec;
             gettimeofday(clock_, now);
-            const unsigned ms(tvtoms(tvsub(tv, now)));
-            aug_ctxinfo(aug_tlx, "timeout at: %s",
-                        tmstring(expiry_).c_str());
-            if (0 == ms)
-                throw logic_error("zero timeout");
-            return ms;
+            return tvtoms(tvsub(tv, now));
         }
     };
 
@@ -328,35 +346,6 @@ namespace {
     sigcatch(int sig)
     {
         stop_ = true;
-    }
-
-    const int ORDERING[] = {
-    //  1   2   3
-    //  1   2   3
-        0,  0,  0,
-    //  1   3   2
-    //  1   2   3
-        0,  1, -1,
-    //  2   1   3
-    //  1   2   3
-        1, -1,  0,
-    //  2   3   1
-    //  1   2   3
-        1,  1, -2,
-    //  3   1   2
-    //  1   2   3
-        2, -1, -1,
-    //  3   2   1
-    //  1   2   3
-        2,  0, -2
-    };
-
-    uint32_t
-    nextseq(unsigned base)
-    {
-        static unsigned i(1 + (aug_irand() % 6) * 3);
-        const unsigned j(i++);
-        return static_cast<uint32_t>(base + j + ORDERING[j % 18]);
     }
 
     class packet : aug_packet, public mpool_ops {
@@ -397,6 +386,11 @@ namespace {
             aug_strlcpy(data_, data, sizeof(data_));
             return sendhead(ref, 2, ep);
         }
+        seqno_t
+        seqno() const
+        {
+            return seqno_;
+        }
     };
 
     class session : public mpool_ops {
@@ -415,7 +409,7 @@ namespace {
         session(sdref ref, const endpoint& ep, timers& ts)
             : ref_(ref),
               ep_(ep),
-              window_(getclock(aug_tlx), 8, 2000),
+              window_(getclock(aug_tlx), 8, 20000),
               rdwait_(ts, null),
               wrwait_(ts, null),
               out_("test")
@@ -438,14 +432,16 @@ namespace {
         {
             if (idref(id) == wrwait_.id()) {
 
-                aug_ctxinfo(aug_tlx, "wrwait: sendhbeat");
                 out_.sendhbeat(ref_, ep_);
-                double d(gauss_() * 400.0 + 600.0);
+                aug_ctxinfo(aug_tlx, "send message [%u]",
+                            static_cast<unsigned>(out_.seqno()));
+                const double d(gauss_() * 400.0 + 600.0);
                 ms = static_cast<unsigned>(AUG_MAX(d, 1.0));
-                aug_ctxinfo(aug_tlx, "next hearbeat in %u ms", ms);
+                aug_ctxinfo(aug_tlx, "next message in %u ms", ms);
+
             } else if (idref(id) == rdwait_.id()) {
 
-                aug_ctxinfo(aug_tlx, "rdwait: process");
+                aug_ctxinfo(aug_tlx, "process timer");
                 try {
                     process();
                 } catch (const window_exception& e) {
@@ -459,9 +455,8 @@ namespace {
         {
             aug_packet pkt;
             while (window_.next(pkt)) {
-                aug_ctxinfo(aug_tlx, "message: seqno=[%u], type=[%u]",
-                            static_cast<unsigned>(pkt.seqno_),
-                            static_cast<unsigned>(pkt.type_));
+                aug_ctxinfo(aug_tlx, "recv message [%u]",
+                            static_cast<unsigned>(pkt.seqno_));
             }
         }
         void
@@ -476,7 +471,7 @@ namespace {
     {
         endpoint addr(null);
         getsockname(ref, addr);
-        aug_ctxinfo(aug_tlx, "bound to: [%s]", endpointntop(addr).c_str());
+        aug_ctxinfo(aug_tlx, "bound to [%s]", endpointntop(addr).c_str());
 
         muxer mux(getmpool(aug_tlx));
         timers ts(getmpool(aug_tlx), getclock(aug_tlx));
@@ -487,11 +482,9 @@ namespace {
         unsigned ready(!0);
         while (!stop_) {
 
-            aug_ctxinfo(aug_tlx, "processexpired");
             processexpired(ts, 0 == ready, tv);
 
             try {
-                aug_ctxinfo(aug_tlx, "waitmdevents");
                 ready = waitmdevents(mux, tv);
             } catch (const intr_exception&) {
                 ready = !0; // Not timeout.
@@ -506,7 +499,7 @@ namespace {
                 }
             } catch (const discard_exception& e) {
                 aug_ctxerror(aug_tlx, "%s", e.what());
-            } catch (const backlog_exception& e) {
+            } catch (const overflow_exception& e) {
                 aug_ctxerror(aug_tlx, "%s", e.what());
                 break;
             }
@@ -523,6 +516,7 @@ main(int argc, char* argv[])
 
         autotlx();
         setdaemonlog(aug_tlx);
+        setloglevel(aug_tlx, 99);
 
         aug_timeval tv;
         gettimeofday(getclock(aug_tlx), tv);
