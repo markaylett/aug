@@ -61,3 +61,9 @@ aug_nextid(void)
 
     return id;
 }
+
+AUGSYS_API double
+aug_drand(void)
+{
+    return aug_irand() / ((double)INT_MAX + 1.0);
+}

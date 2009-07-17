@@ -27,7 +27,7 @@
 
 #include "augctxpp/exception.hpp"
 
-#include "augsys/utility.h" // aug_rand()
+#include "augsys/utility.h" // aug_irand()
 
 namespace aug {
 
@@ -43,16 +43,22 @@ namespace aug {
         return aug_nextid();
     }
 
+    inline double
+    drand(void)
+    {
+        return aug_drand();
+    }
+
     /**
-     * Get random number.
+     * Get random integer between zero and #INT_MAX.
      *
      * @return Next random number.
      */
 
-    inline long
-    rand(void)
+    inline int
+    irand(void)
     {
-        return aug_rand();
+        return aug_irand();
     }
 
     /**

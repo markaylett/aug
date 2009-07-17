@@ -55,8 +55,15 @@ aug_memfrob(void* dst, size_t size);
 AUGSYS_API aug_id
 aug_nextid(void);
 
-AUGSYS_API long
-aug_rand(void);
+AUGSYS_API double
+aug_drand(void);
+
+/**
+ * Random integer between zero and #INT_MAX.
+ */
+
+AUGSYS_API int
+aug_irand(void);
 
 AUGSYS_API void
 aug_srand(unsigned seed);

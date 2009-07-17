@@ -26,10 +26,12 @@
 # include <pthread.h>
 #endif /* ENABLE_THREADS */
 
-AUGSYS_API long
-aug_rand(void)
+AUGSYS_API int
+aug_irand(void)
 {
-    return (long)random();
+    /* RAND_MAX is assumed to be at least INT_MAX. */
+
+    return (int)(random() % INT_MAX)
 }
 
 AUGSYS_API void

@@ -26,6 +26,7 @@
 #include "augsyspp.hpp"
 #include "augctxpp.hpp"
 
+#include <cmath>
 #include <csignal>
 #include <iostream>
 
@@ -35,6 +36,37 @@ using namespace std;
 // packet 239.1.1.1 17172 3
 
 namespace {
+
+    class gaussian {
+        bool empty_;
+        double y2_;
+    public:
+        gaussian()
+            : empty_(true)
+        {
+        }
+        double
+        operator ()()
+        {
+            double y1;
+            if (empty_) {
+                double x1, x2, w;
+                do {
+                    x1 = 2.0 * drand() - 1.0;
+                    x2 = 2.0 * drand() - 1.0;
+                    w = x1 * x1 + x2 * x2;
+                } while (1.0 <= w);
+                w = sqrt((-2.0 * std::log(w)) / w);
+                y1 = x1 * w;
+                y2_ = x2 * w;
+                empty_ = false;
+            } else {
+                y1 = y2_;
+                empty_ = true;
+            }
+            return y1;
+        }
+    };
 
     struct window_exception : std::exception { };
 
@@ -267,11 +299,40 @@ namespace {
         stop_ = true;
     }
 
+    const int ORDERING[] = {
+    //  1   2   3
+    //  1   2   3
+        0,  0,  0,
+    //  1   3   2
+    //  1   2   3
+        0,  1, -1,
+    //  2   1   3
+    //  1   2   3
+        1, -1,  0,
+    //  2   3   1
+    //  1   2   3
+        1,  1, -2,
+    //  3   1   2
+    //  1   2   3
+        2, -1, -1,
+    //  3   2   1
+    //  1   2   3
+        2,  0, -2
+    };
+
+    uint32_t
+    nextseq(unsigned base)
+    {
+        static unsigned i(0);
+        const unsigned j(i++);
+        return static_cast<uint32_t>(base + j + ORDERING[j % 18]);
+    }
+
     class packet : aug_packet, public mpool_ops {
         size_t
         sendhead(sdref ref, unsigned type, const endpoint& ep)
         {
-            ++seqno_;
+            seqno_ = nextseq(100);
             verno_ = 1;
             time_ = static_cast<uint64_t>(time(0) * 1000);
             flags_ = 0;
@@ -287,7 +348,7 @@ namespace {
         {
             proto_ = 1;
             aug_strlcpy(chan_, chan, sizeof(chan_));
-            seqno_ = 100;
+            seqno_ = 0;
             verno_ = 0;
             time_ = 0;
             flags_ = 0;
@@ -313,6 +374,7 @@ namespace {
         expirywindow window_;
         timer rdwait_;
         timer wrwait_;
+        gaussian gauss_;
         packet out_;
 
     public:
@@ -322,13 +384,13 @@ namespace {
         session(sdref ref, const endpoint& ep, timers& ts)
             : ref_(ref),
               ep_(ep),
-              window_(getclock(aug_tlx), 8, 3000),
+              window_(getclock(aug_tlx), 8, 2000),
               rdwait_(ts, null),
               wrwait_(ts, null),
               out_("test")
         {
             rdwait_.set(window_.expiry(), *this);
-            wrwait_.set(200, *this);
+            wrwait_.set(1000, *this);
         }
         void
         recv(sdref ref)
@@ -347,6 +409,7 @@ namespace {
 
                 aug_ctxinfo(aug_tlx, "wrwait timeout");
                 out_.sendhbeat(ref_, ep_);
+                ms = static_cast<unsigned>(gauss_() * 200.0 + 500.0);
             } else if (idref(id) == rdwait_.id()) {
 
                 aug_ctxinfo(aug_tlx, "rdwait timeout");
@@ -403,8 +466,7 @@ namespace {
             if (ready)
                 sess.recv(ref);
 
-            if (0 == aug_rand() % 7)
-                sess.process();
+            sess.process();
         }
     }
 }

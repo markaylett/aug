@@ -77,7 +77,7 @@ namespace {
         clockptr clock(getclock(aug_tlx));
         gettimeofday(clock, tv);
 
-        long rand(aug_rand());
+        int rand(aug_irand());
         const char* salt(mod::getenv("session.http.salt"));
 
         aug_md5context md5ctx;

@@ -24,10 +24,10 @@
 
 #include <stdlib.h>
 
-AUGSYS_API long
-aug_rand(void)
+AUGSYS_API int
+aug_irand(void)
 {
-    return (long)rand();
+    return ((rand() << 16) | rand()) % INT_MAX;
 }
 
 AUGSYS_API void
