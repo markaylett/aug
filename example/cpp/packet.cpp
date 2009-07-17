@@ -37,9 +37,23 @@ using namespace std;
 
 namespace {
 
+    string
+    tmstring(const aug_timeval& tv)
+    {
+        struct tm local;
+        aug_localtime(&tv.tv_sec, &local);
+
+        char buf[256];
+        strftime(buf, sizeof(buf), "%b %d %H:%M:%S", &local);
+
+        stringstream ss;
+        ss << buf << '.' << (tv.tv_usec / 1000);
+        return ss.str();
+    }
+
     class gaussian {
-        bool empty_;
         double y2_;
+        bool empty_;
     public:
         gaussian()
             : empty_(true)
@@ -153,12 +167,13 @@ namespace {
                     throw discard_exception();
                 if (size_ <= static_cast<seqno_t>(diff)) {
                     if (SYNC == state_) {
-                        aug_ctxcrit(aug_tlx,
+                        aug_ctxinfo(aug_tlx,
                                     "backlog: diff=[%u], begin=[%u]",
                                     static_cast<unsigned>(diff),
                                     static_cast<unsigned>(begin_));
                         do {
-                            aug_ctxinfo(aug_tlx, "freeing");
+                            aug_ctxinfo(aug_tlx, "freeing: begin=[%u]",
+                                        static_cast<unsigned>(begin_));
                             ++begin_;
                         } while (size_ <= seqno - begin_);
                     } else
@@ -167,7 +182,7 @@ namespace {
             }
             if (end_ <= seqno) {
                 for (seqno_t i(end_); i < seqno; ++i) {
-                    aug_ctxcrit(aug_tlx, "clear: i=[%u]",
+                    aug_ctxinfo(aug_tlx, "clear: i=[%u]",
                                 static_cast<unsigned>(i));
                     clear(ring_[i % size_]);
                 }
@@ -217,6 +232,16 @@ namespace {
         }
     };
 
+    static aug_bool
+    expired_(const struct aug_timeval* now, const struct aug_timeval* tv)
+    {
+        struct aug_timeval local;
+        local.tv_sec = 0;
+        local.tv_usec = 5000;
+        aug_tvadd(&local, now);
+        return timercmp(tv, &local, <) ? AUG_TRUE : AUG_FALSE;
+    }
+
     class expirywindow {
         clockptr clock_;
         window window_;
@@ -233,6 +258,9 @@ namespace {
 
             gettimeofday(clock, expiry_);
             tvadd(expiry_, timeout_);
+
+            aug_ctxinfo(aug_tlx, "initial expiry: %s",
+                        tmstring(expiry_).c_str());
         }
         void
         insert(const aug_packet& pkt)
@@ -247,9 +275,11 @@ namespace {
             aug_timeval tv;
             if (window_.empty()) {
                 gettimeofday(clock_, tv);
-                if (timercmp(&expiry_, &tv, <=)) {
+                if (expired_(&tv, &expiry_)) {
                     // Advance expiry time.
                     tvadd(expiry_, timeout_);
+                    aug_ctxinfo(aug_tlx, "advance timer: %s",
+                                tmstring(expiry_).c_str());
                     if (window_.ready()) {
                         // Expiry time has passed.
                         window_.drop();
@@ -270,6 +300,8 @@ namespace {
                 // Advance expiry time.
                 expiry_.tv_sec = tv.tv_sec;
                 expiry_.tv_usec = tv.tv_usec;
+                aug_ctxinfo(aug_tlx, "replace expiry: %s",
+                            tmstring(expiry_).c_str());
             }
             return true;
         }
@@ -282,11 +314,10 @@ namespace {
             tv.tv_usec = expiry_.tv_usec;
             gettimeofday(clock_, now);
             const unsigned ms(tvtoms(tvsub(tv, now)));
-            aug_ctxinfo(aug_tlx, "expiry: tv_sec=[%d], ms=[%u]",
-                        static_cast<int>(tv.tv_sec),
-                        static_cast<unsigned>(ms));
+            aug_ctxinfo(aug_tlx, "timeout at: %s",
+                        tmstring(expiry_).c_str());
             if (0 == ms)
-                exit(0);
+                throw logic_error("zero timeout");
             return ms;
         }
     };
@@ -323,7 +354,7 @@ namespace {
     uint32_t
     nextseq(unsigned base)
     {
-        static unsigned i(0);
+        static unsigned i(1 + (aug_irand() % 6) * 3);
         const unsigned j(i++);
         return static_cast<uint32_t>(base + j + ORDERING[j % 18]);
     }
@@ -407,28 +438,35 @@ namespace {
         {
             if (idref(id) == wrwait_.id()) {
 
-                aug_ctxinfo(aug_tlx, "wrwait timeout");
+                aug_ctxinfo(aug_tlx, "wrwait: sendhbeat");
                 out_.sendhbeat(ref_, ep_);
-                ms = static_cast<unsigned>(gauss_() * 200.0 + 500.0);
+                double d(gauss_() * 400.0 + 600.0);
+                ms = static_cast<unsigned>(AUG_MAX(d, 1.0));
+                aug_ctxinfo(aug_tlx, "next hearbeat in %u ms", ms);
             } else if (idref(id) == rdwait_.id()) {
 
-                aug_ctxinfo(aug_tlx, "rdwait timeout");
-                process();
+                aug_ctxinfo(aug_tlx, "rdwait: process");
+                try {
+                    process();
+                } catch (const window_exception& e) {
+                    aug_ctxerror(aug_tlx, "error: %s", e.what());
+                }
+                ms = window_.expiry();
             }
         }
         void
         process()
         {
-            try {
-                aug_packet pkt;
-                while (window_.next(pkt)) {
-                  aug_ctxinfo(aug_tlx, "next: seqno=[%u], type=[%u]",
-                              static_cast<unsigned>(pkt.seqno_),
-                              static_cast<unsigned>(pkt.type_));
-                }
-            } catch (const window_exception& e) {
-                aug_ctxerror(aug_tlx, "error: %s", e.what());
+            aug_packet pkt;
+            while (window_.next(pkt)) {
+                aug_ctxinfo(aug_tlx, "message: seqno=[%u], type=[%u]",
+                            static_cast<unsigned>(pkt.seqno_),
+                            static_cast<unsigned>(pkt.type_));
             }
+        }
+        void
+        setexpiry()
+        {
             rdwait_.set(window_.expiry(), *this);
         }
     };
@@ -449,24 +487,29 @@ namespace {
         unsigned ready(!0);
         while (!stop_) {
 
+            aug_ctxinfo(aug_tlx, "processexpired");
             processexpired(ts, 0 == ready, tv);
-            aug_ctxinfo(aug_tlx, "hbeat in: tv_sec=%d, tv_usec=%d",
-                        static_cast<int>(tv.tv_sec),
-                        static_cast<int>(tv.tv_usec));
 
             try {
+                aug_ctxinfo(aug_tlx, "waitmdevents");
                 ready = waitmdevents(mux, tv);
             } catch (const intr_exception&) {
                 ready = !0; // Not timeout.
                 continue;
             }
 
-            aug_ctxinfo(aug_tlx, "waitmdevents: %u", ready);
-
-            if (ready)
-                sess.recv(ref);
-
-            sess.process();
+            try {
+                if (ready) {
+                    sess.recv(ref);
+                    sess.process();
+                    sess.setexpiry();
+                }
+            } catch (const discard_exception& e) {
+                aug_ctxerror(aug_tlx, "%s", e.what());
+            } catch (const backlog_exception& e) {
+                aug_ctxerror(aug_tlx, "%s", e.what());
+                break;
+            }
         }
     }
 }

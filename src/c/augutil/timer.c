@@ -115,13 +115,13 @@ setexpiry_(aug_clock* clock, struct aug_timeval* tv, unsigned ms)
 }
 
 static aug_bool
-expiry_(const struct aug_timeval* now, const struct aug_timeval* tv)
+expired_(const struct aug_timeval* now, const struct aug_timeval* tv)
 {
-  struct aug_timeval local;
-  local.tv_sec = 0;
-  local.tv_usec = EPSILONMS_ * 1000;
-  aug_tvadd(&local, now);
-  return timercmp(&local, tv, <) ? AUG_TRUE : AUG_FALSE;
+    struct aug_timeval local;
+    local.tv_sec = 0;
+    local.tv_usec = EPSILONMS_ * 1000;
+    aug_tvadd(&local, now);
+    return timercmp(tv, &local, <) ? AUG_TRUE : AUG_FALSE;
 }
 
 AUGUTIL_API aug_timers_t
@@ -281,7 +281,7 @@ aug_processexpired(aug_timers_t timers, aug_bool force,
 
             /* Has this timer expired? */
 
-          if (expiry_(&now, &it->tv_))
+            if (!expired_(&now, &it->tv_))
                 break;
 
             /* Remove expired timer to prevent a new one from being
