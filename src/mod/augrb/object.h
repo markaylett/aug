@@ -42,6 +42,13 @@ char*
 rb_w32_getcwd(char* buffer, int size);
 #endif /* _WIN32 */
 
+#undef PACKAGE
+#undef PACKAGE_BUGREPORT
+#undef PACKAGE_NAME
+#undef PACKAGE_STRING
+#undef PACKAGE_TARNAME
+#undef PACKAGE_VERSION
+
 #include <ruby.h>
 
 AUG_INTERFACE(augrb_box);
