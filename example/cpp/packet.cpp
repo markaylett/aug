@@ -61,7 +61,7 @@ namespace {
     uint32_t
     nextseq(unsigned base)
     {
-        static unsigned i(1 + (aug_irand() % 6) * 3);
+        static unsigned i((aug_irand() % 6) * 3);
         const unsigned j(i++);
         return static_cast<uint32_t>(base + j + ORDERING[j % 18]);
     }
@@ -184,7 +184,7 @@ namespace {
         void
         insert(const aug_packet& pkt, const aug_timeval& tv)
         {
-            aug_ctxinfo(aug_tlx, "inserting message [%u]",
+            aug_ctxinfo(aug_tlx, "insert message [%u]",
                         static_cast<unsigned>(pkt.seqno_));
             const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
             if (SEED == state_) {
@@ -202,13 +202,18 @@ namespace {
                 long diff(seqno - begin_);
                 if (diff < 0)
                     throw discard_exception();
-                diff -= size_;
+                diff -= size_ - 1;
                 if (0 < diff) {
                     if (SYNC == state_) {
-                        aug_ctxcrit(aug_tlx,
+                        aug_ctxinfo(aug_tlx,
                                     "overflow by [%u] from [%u]",
                                     static_cast<unsigned>(diff),
                                     static_cast<unsigned>(begin_));
+                        do {
+                            aug_ctxinfo(aug_tlx, "clear lead [%u]",
+                                        static_cast<unsigned>(begin_));
+                            clear(ring_[begin_++ % size_]);
+                        } while (0 < --diff);
                         begin_ += static_cast<seqno_t>(diff);
                     } else
                         throw overflow_exception();
@@ -216,7 +221,7 @@ namespace {
             }
             if (end_ <= seqno) {
                 for (seqno_t i(end_); i < seqno; ++i) {
-                    aug_ctxinfo(aug_tlx, "clear intermediate [%u]",
+                    aug_ctxinfo(aug_tlx, "clear gap [%u]",
                                 static_cast<unsigned>(i));
                     clear(ring_[i % size_]);
                 }
@@ -232,7 +237,7 @@ namespace {
         {
             if (empty())
                 return false;
-            //state_ = READY;
+            state_ = READY;
             message& m(ring_[begin_++ % size_]);
             memcpy(&pkt, &m.pkt_, sizeof(pkt));
             tv.tv_sec = m.tv_.tv_sec;
@@ -263,6 +268,42 @@ namespace {
         ready() const
         {
             return READY == state_;
+        }
+        void
+        print(ostream& os) const
+        {
+            // Produce condensed sequence description:
+            //
+            // - gap
+            // + got
+            //
+            // Example:
+            //
+            // 11--+-++:READY
+            //
+            // This describes a window from 11 to 17 inclusive.
+
+            os << begin_;
+            for (seqno_t i(begin_); i < end_; ++i)
+                os << (empty(ring_[i % size_]) ? '-' : '+');
+            switch (state_) {
+            case SEED:
+                os << ":SEED";
+                break;
+            case SYNC:
+                os << ":SYNC";
+                break;
+            case READY:
+                os << ":READY";
+                break;
+            }
+        }
+        string
+        str() const
+        {
+            stringstream ss;
+            print(ss);
+            return ss.str();
         }
     };
 
@@ -338,6 +379,19 @@ namespace {
             gettimeofday(clock_, now);
             return tvtoms(tvsub(tv, now));
         }
+        void
+        print(ostream& os) const
+        {
+            window_.print(os);
+            os << ' '  << tvstring(expiry_);
+        }
+        string
+        str() const
+        {
+            stringstream ss;
+            print(ss);
+            return ss.str();
+        }
     };
 
     volatile bool stop_ = false;
@@ -409,7 +463,7 @@ namespace {
         session(sdref ref, const endpoint& ep, timers& ts)
             : ref_(ref),
               ep_(ep),
-              window_(getclock(aug_tlx), 8, 20000),
+              window_(getclock(aug_tlx), 8, 2000),
               rdwait_(ts, null),
               wrwait_(ts, null),
               out_("test")
@@ -437,7 +491,7 @@ namespace {
                             static_cast<unsigned>(out_.seqno()));
                 const double d(gauss_() * 400.0 + 600.0);
                 ms = static_cast<unsigned>(AUG_MAX(d, 1.0));
-                aug_ctxinfo(aug_tlx, "next message in %u ms", ms);
+                aug_ctxinfo(aug_tlx, "next send in %u ms", ms);
 
             } else if (idref(id) == rdwait_.id()) {
 
@@ -458,6 +512,7 @@ namespace {
                 aug_ctxinfo(aug_tlx, "recv message [%u]",
                             static_cast<unsigned>(pkt.seqno_));
             }
+            aug_ctxinfo(aug_tlx, "%s", window_.str().c_str());
         }
         void
         setexpiry()
