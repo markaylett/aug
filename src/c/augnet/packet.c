@@ -70,7 +70,6 @@ aug_encodepacket(const struct aug_packet* pkt, char* buf)
     aug_encode16(buf + AUG_PKTPROTOOFF, pkt->proto_);
     packstring_(buf + AUG_PKTCHANOFF, pkt->chan_, AUG_PKTCHANLEN);
     aug_encode32(buf + AUG_PKTSEQNOOFF, pkt->seqno_);
-    aug_encode32(buf + AUG_PKTVERNOOFF, pkt->verno_);
     aug_encode64(buf + AUG_PKTTIMEOFF, pkt->time_);
     aug_encode16(buf + AUG_PKTFLAGSOFF, pkt->flags_);
     aug_encode16(buf + AUG_PKTTYPEOFF, pkt->type_);
@@ -91,7 +90,6 @@ aug_decodepacket(const char* buf, struct aug_packet* pkt)
     pkt->proto_ = aug_decode16(buf + AUG_PKTPROTOOFF);
     unpackstring_(pkt->chan_, buf + AUG_PKTCHANOFF, AUG_PKTCHANLEN);
     pkt->seqno_ = aug_decode32(buf + AUG_PKTSEQNOOFF);
-    pkt->verno_ = aug_decode32(buf + AUG_PKTVERNOOFF);
     pkt->time_ = aug_decode64(buf + AUG_PKTTIMEOFF);
     pkt->flags_ = aug_decode16(buf + AUG_PKTFLAGSOFF);
     pkt->type_ = aug_decode16(buf + AUG_PKTTYPEOFF);

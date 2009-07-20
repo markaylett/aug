@@ -46,7 +46,6 @@
  *   2: proto
  * 128: chan
  *   4: seqno
- *   4: verno
  *   8: time
  *   2: flags
  *   2: type
@@ -59,7 +58,6 @@
 #define AUG_PKTPROTOSIZE sizeof(uint16_t)
 #define AUG_PKTCHANLEN   AUG_MAXADDRLEN
 #define AUG_PKTSEQNOSIZE sizeof(uint32_t)
-#define AUG_PKTVERNOSIZE sizeof(uint32_t)
 #define AUG_PKTTIMESIZE  sizeof(uint64_t)
 #define AUG_PKTFLAGSSIZE sizeof(uint16_t)
 #define AUG_PKTTYPESIZE  sizeof(uint16_t)
@@ -79,8 +77,7 @@
 #define AUG_PKTPROTOOFF  (AUG_PKTMAGICOFF + AUG_PKTMAGICSIZE)
 #define AUG_PKTCHANOFF   (AUG_PKTPROTOOFF + AUG_PKTPROTOSIZE)
 #define AUG_PKTSEQNOOFF  (AUG_PKTCHANOFF + AUG_PKTCHANLEN)
-#define AUG_PKTVERNOOFF  (AUG_PKTSEQNOOFF + AUG_PKTSEQNOSIZE)
-#define AUG_PKTTIMEOFF   (AUG_PKTVERNOOFF + AUG_PKTVERNOSIZE)
+#define AUG_PKTTIMEOFF   (AUG_PKTSEQNOOFF + AUG_PKTSEQNOSIZE)
 #define AUG_PKTFLAGSOFF  (AUG_PKTTIMEOFF + AUG_PKTTIMESIZE)
 #define AUG_PKTTYPEOFF   (AUG_PKTFLAGSOFF + AUG_PKTFLAGSSIZE)
 #define AUG_PKTDATAOFF   (AUG_PKTTYPEOFF + AUG_PKTTYPESIZE)
@@ -94,7 +91,7 @@
 struct aug_packet {
     uint16_t proto_;
     char chan_[AUG_PKTCHANLEN + 1];
-    uint32_t seqno_, verno_;
+    uint32_t seqno_;
     uint64_t time_;
     uint16_t flags_, type_;
     char data_[AUG_PKTDATASIZE];

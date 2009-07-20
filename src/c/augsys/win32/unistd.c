@@ -54,7 +54,7 @@ access_(DWORD* dst, int src)
 static DWORD
 create_(int flags)
 {
-    DWORD create;
+    DWORD create = 0;
     switch (flags & (_O_CREAT | _O_EXCL | _O_TRUNC)) {
     case _O_CREAT | _O_TRUNC:
         create = CREATE_ALWAYS;

@@ -40,7 +40,6 @@ heartbeat_(char* buf)
     pkt.proto_ = 1;
     aug_strlcpy(pkt.chan_, "mcastsend", sizeof(pkt.chan_));
     pkt.seqno_ = ++seq_;
-    pkt.verno_ = 1;
     pkt.time_ = time(0) * 1000;
     pkt.flags_ = 0;
     pkt.type_ = 1;

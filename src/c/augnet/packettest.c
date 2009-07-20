@@ -39,7 +39,6 @@ main(int argc, char* argv[])
     pkt.proto_ = 1;
     strcpy(pkt.chan_, "127.0.0.1:1972");
     pkt.seqno_ = 101;
-    pkt.verno_ = 202;
     pkt.time_ = now;
     pkt.flags_ = 0;
     pkt.type_ = 2;
@@ -64,10 +63,6 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (202 != pkt.verno_) {
-        fprintf(stderr, "unexpected version [%d]\n", (int)pkt.verno_);
-        return 1;
-    }
 
     if (now != pkt.time_) {
         fprintf(stderr, "unexpected time [%u]\n", (unsigned)pkt.time_);

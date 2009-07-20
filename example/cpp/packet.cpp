@@ -121,11 +121,11 @@ namespace {
 
     struct window_exception : std::exception { };
 
-    struct discard_exception : window_exception {
+    struct underflow_exception : window_exception {
         const char*
         what() const throw()
         {
-            return "aug::discard_exception";
+            return "aug::underflow_exception";
         }
     };
 
@@ -148,7 +148,14 @@ namespace {
     typedef unsigned long seqno_t;
 
     class window {
-        enum state { SEED, SYNC, READY };
+        enum state {
+            // First packet pending.
+            START,
+            // Initial packet ordering.
+            PRIME,
+            // Fully initialised state.
+            READY
+        };
         struct message {
             aug_packet pkt_;
             aug_timeval tv_;
@@ -178,7 +185,7 @@ namespace {
               ring_(new message[size]),
               begin_(1),
               end_(1),
-              state_(SEED)
+              state_(START)
         {
         }
         void
@@ -187,39 +194,58 @@ namespace {
             aug_ctxinfo(aug_tlx, "insert message [%u]",
                         static_cast<unsigned>(pkt.seqno_));
             const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
-            if (SEED == state_) {
+            if (START == state_) {
+                // To seed the first packet, choose an initial insertion point
+                // half way through the window.  This allows some space before
+                // the first item to deal with out of order conditions.  This
+                // can occur, for example, where the first packet is received
+                // out of order, so that the next packet actually has a lower
+                // sequence number.
                 const seqno_t inset((size_ - 1) / 2);
-                if (seqno <= inset)
-                    begin_ = seqno;
-                else
+                if (inset < seqno) {
                     begin_ = seqno - inset;
-                aug_ctxinfo(aug_tlx, "seed at offset [%u] from [%u]",
-                            static_cast<unsigned>(inset),
-                            static_cast<unsigned>(begin_));
+                } else {
+                    // Seed with the actual sequence number if it is less than
+                    // the insertion point.
+                    begin_ = seqno;
+                }
+                aug_ctxinfo(aug_tlx, "seed from [%u] at offset [%u]",
+                            static_cast<unsigned>(begin_),
+                            static_cast<unsigned>(inset));
                 end_ = begin_;
-                state_ = SYNC;
+                state_ = PRIME;
             } else {
+                // Discard any packets that fall to the left of the window.
+                // In most cases, these can be dismissed as duplicates.
                 long diff(seqno - begin_);
                 if (diff < 0)
-                    throw discard_exception();
+                    throw underflow_exception();
                 diff -= size_ - 1;
                 if (0 < diff) {
-                    if (SYNC == state_) {
-                        aug_ctxinfo(aug_tlx,
-                                    "overflow by [%u] from [%u]",
-                                    static_cast<unsigned>(diff),
-                                    static_cast<unsigned>(begin_));
-                        do {
-                            aug_ctxinfo(aug_tlx, "clear lead [%u]",
-                                        static_cast<unsigned>(begin_));
-                            clear(ring_[begin_++ % size_]);
-                        } while (0 < --diff);
-                        begin_ += static_cast<seqno_t>(diff);
-                    } else
+                    // When fully initialised, discard any packets that exceed
+                    // the maximum window size.
+                    if (ready())
                         throw overflow_exception();
+                    // Otherwise this is the PRIME state.  The PRIME state
+                    // exists after the first packet has been received, but
+                    // before sync() has been called.  While in this state, it
+                    // is safe to discard packets from the left of the window
+                    // to make space on the right.
+                    aug_ctxinfo(aug_tlx,
+                                "overflow by [%u] from [%u]",
+                                static_cast<unsigned>(diff),
+                                static_cast<unsigned>(begin_));
+                    // Drop sufficient packets to allow insert.
+                    do {
+                        aug_ctxinfo(aug_tlx, "clear lead [%u]",
+                                    static_cast<unsigned>(begin_));
+                        clear(ring_[begin_++ % size_]);
+                    } while (0 < --diff);
+                    begin_ += static_cast<seqno_t>(diff);
                 }
             }
             if (end_ <= seqno) {
+                // Clear gaps between the previous and latest packet.
                 for (seqno_t i(end_); i < seqno; ++i) {
                     aug_ctxinfo(aug_tlx, "clear gap [%u]",
                                 static_cast<unsigned>(i));
@@ -237,73 +263,68 @@ namespace {
         {
             if (empty())
                 return false;
-            state_ = READY;
+            // Next message to output arguments.
             message& m(ring_[begin_++ % size_]);
             memcpy(&pkt, &m.pkt_, sizeof(pkt));
             tv.tv_sec = m.tv_.tv_sec;
             tv.tv_usec = m.tv_.tv_usec;
+            // Clear consumed.
             clear(m);
             return true;
         }
         void
         drop()
         {
-            if (begin_ != end_ && empty(ring_[begin_ % size_]))
-                ++begin_;
-        }
-        void
-        trim()
-        {
-            while (begin_ != end_ && empty(ring_[begin_ % size_]))
-                ++begin_;
-            aug_ctxinfo(aug_tlx, "trimmed to [%u]",
-                        static_cast<unsigned>(begin_));
-        }
-        bool
-        empty() const
-        {
-            return begin_ == end_ || empty(ring_[begin_ % size_]);
-        }
-        bool
-        ready() const
-        {
-            return READY == state_;
+            // Drop the first packet from the left of the window.
+            if (begin_ != end_)
+                clear(ring_[begin_++ % size_]);
         }
         void
         print(ostream& os) const
         {
-            // Produce condensed sequence description:
+            // To describe a window from 100 to 107 inclusive:
             //
-            // - gap
-            // + got
+            // 100---+++-+:SYNC
             //
-            // Example:
-            //
-            // 11--+-++:READY
-            //
-            // This describes a window from 11 to 17 inclusive.
+            // Where '-' is a gap;
+            // and '+' is a message.
 
             os << begin_;
             for (seqno_t i(begin_); i < end_; ++i)
                 os << (empty(ring_[i % size_]) ? '-' : '+');
             switch (state_) {
-            case SEED:
-                os << ":SEED";
+            case START:
+                os << ":START";
                 break;
-            case SYNC:
-                os << ":SYNC";
+            case PRIME:
+                os << ":PRIME";
                 break;
             case READY:
                 os << ":READY";
                 break;
             }
         }
-        string
-        str() const
+        void
+        sync()
         {
-            stringstream ss;
-            print(ss);
-            return ss.str();
+            // Flush any space to the left of the window.
+            while (begin_ != end_ && empty(ring_[begin_ % size_]))
+                ++begin_;
+            aug_ctxinfo(aug_tlx, "sync to [%u]",
+                        static_cast<unsigned>(begin_));
+            state_ = READY;
+        }
+        bool
+        empty() const
+        {
+            return begin_ == end_
+                || empty(ring_[begin_ % size_])
+                || !ready();
+        }
+        bool
+        ready() const
+        {
+            return READY == state_;
         }
     };
 
@@ -345,21 +366,28 @@ namespace {
                     aug_ctxinfo(aug_tlx, "moved expiry [%s]",
                                 tvstring(expiry_).c_str());
                     if (window_.ready()) {
-                        // Expiry time has passed.
+                        // Drop timed-out packet from the window.
                         window_.drop();
                         throw timeout_exception();
                     } else {
-                        window_.trim();
+                        // Move a ready state.
+                        window_.sync();
                         if (window_.empty()) {
-                            // Not seeded.
+                            // No packet received.
                             return false;
                         }
                     }
-                } else
+                } else {
+                    // Timer has not expired.
                     return false;
+                }
             }
+            // Get the next packet.
             window_.next(pkt, tv);
+            // Add the timeout value to the time it was received.
             tvadd(tv, timeout_);
+            // Update the timer if this time is before the current expiry
+            // time.
             if (timercmp(&expiry_, &tv, <)) {
                 // Advance expiry time.
                 expiry_.tv_sec = tv.tv_sec;
@@ -368,6 +396,12 @@ namespace {
                             tvstring(expiry_).c_str());
             }
             return true;
+        }
+        void
+        print(ostream& os) const
+        {
+            window_.print(os);
+            os << ' '  << tvstring(expiry_);
         }
         unsigned
         expiry() const
@@ -378,19 +412,6 @@ namespace {
             tv.tv_usec = expiry_.tv_usec;
             gettimeofday(clock_, now);
             return tvtoms(tvsub(tv, now));
-        }
-        void
-        print(ostream& os) const
-        {
-            window_.print(os);
-            os << ' '  << tvstring(expiry_);
-        }
-        string
-        str() const
-        {
-            stringstream ss;
-            print(ss);
-            return ss.str();
         }
     };
 
@@ -407,7 +428,6 @@ namespace {
         sendhead(sdref ref, unsigned type, const endpoint& ep)
         {
             seqno_ = nextseq(100);
-            verno_ = 1;
             time_ = static_cast<uint64_t>(time(0) * 1000);
             flags_ = 0;
             type_ = static_cast<uint16_t>(type);
@@ -423,7 +443,6 @@ namespace {
             proto_ = 1;
             aug_strlcpy(chan_, chan, sizeof(chan_));
             seqno_ = 0;
-            verno_ = 0;
             time_ = 0;
             flags_ = 0;
             type_ = 0;
@@ -476,7 +495,8 @@ namespace {
         {
             char buf[AUG_PACKETSIZE];
             endpoint from(null);
-            recvfrom(ref, buf, sizeof(buf), 0, from);
+            if (AUG_PACKETSIZE != recvfrom(ref, buf, sizeof(buf), 0, from))
+                throw domain_error("bad packet");
             aug_packet pkt;
             verify(aug_decodepacket(buf, &pkt));
             window_.insert(pkt);
@@ -512,7 +532,9 @@ namespace {
                 aug_ctxinfo(aug_tlx, "recv message [%u]",
                             static_cast<unsigned>(pkt.seqno_));
             }
-            aug_ctxinfo(aug_tlx, "%s", window_.str().c_str());
+            stringstream ss;
+            window_.print(ss);
+            aug_ctxinfo(aug_tlx, "%s", ss.str().c_str());
         }
         void
         setexpiry()
@@ -548,11 +570,15 @@ namespace {
 
             try {
                 if (ready) {
-                    sess.recv(ref);
+                    try {
+                        for (;;)
+                            sess.recv(ref);
+                    } catch (const block_exception& e) {
+                    }
                     sess.process();
                     sess.setexpiry();
                 }
-            } catch (const discard_exception& e) {
+            } catch (const underflow_exception& e) {
                 aug_ctxerror(aug_tlx, "%s", e.what());
             } catch (const overflow_exception& e) {
                 aug_ctxerror(aug_tlx, "%s", e.what());
@@ -585,6 +611,7 @@ main(int argc, char* argv[])
 
         inetaddr in(argv[1]);
         autosd sfd(aug::socket(family(in), SOCK_DGRAM));
+        setnonblock(sfd, true);
         setreuseaddr(sfd, true);
 
         // Set outgoing multicast interface.
