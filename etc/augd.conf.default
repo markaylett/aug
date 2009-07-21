@@ -2,6 +2,12 @@ rundir=c:/program files/aug
 logdir=log
 loglevel=4
 
+cluster.node=augd
+cluster.multicast=239.1.1.1
+cluster.serv=17172
+cluster.types=1
+cluster.type.1=heartbeat
+
 ssl.contexts=server
 
 ssl.context.server.certfile=etc/servercert.pem
