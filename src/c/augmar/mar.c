@@ -94,14 +94,14 @@ init_(aug_seq_t seq, struct aug_info_* info)
             return AUG_FAILERROR;
 
         memcpy(ptr + AUG_MAGICOFF, AUG_MAGIC, sizeof(aug_magic_t));
-        aug_encodeproto(ptr + AUG_PROTOOFF,
-                        (aug_proto_t)(info->proto_ = PROTO));
-        aug_encodefields(ptr + AUG_FIELDSOFF,
-                         (aug_fields_t)(info->fields_ = 0));
-        aug_encodehsize(ptr + AUG_HSIZEOFF,
-                        (aug_hsize_t)(info->hsize_ = 0));
-        aug_encodebsize(ptr + AUG_BSIZEOFF,
-                        (aug_bsize_t)(info->bsize_ = 0));
+        aug_encodeproto((aug_proto_t)(info->proto_ = PROTO),
+                        ptr + AUG_PROTOOFF);
+        aug_encodefields((aug_fields_t)(info->fields_ = 0),
+                         ptr + AUG_FIELDSOFF);
+        aug_encodehsize((aug_hsize_t)(info->hsize_ = 0),
+                        ptr + AUG_HSIZEOFF);
+        aug_encodebsize((aug_bsize_t)(info->bsize_ = 0),
+                        ptr + AUG_BSIZEOFF);
     }
 
     return AUG_SUCCESS;

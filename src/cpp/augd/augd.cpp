@@ -135,7 +135,7 @@ namespace {
 
         if (daemon_) {
 
-            abspath(logdir_, rundir_, options_.get("logdir", "."),
+            abspath(rundir_, options_.get("logdir", "."), logdir_,
                     sizeof(logdir_));
 
             // Re-opening the log file facilitates rolling.
@@ -704,7 +704,7 @@ namespace {
             // Once set, the run directory should not change.
 
             const char* rundir(options_.get("rundir", 0));
-            realpath(rundir_, rundir ? rundir : getcwd().c_str(),
+            realpath(rundir ? rundir : getcwd().c_str(), rundir_,
                      sizeof(rundir_));
 
             reconf_();

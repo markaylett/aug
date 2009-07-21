@@ -64,7 +64,7 @@ makepath_(const char* conffile)
     if (!(s = createxstr_(sizeof(buf))))
         return NULL;
 
-    if (!aug_realpath(buf, program, sizeof(buf)))
+    if (!aug_realpath(program, buf, sizeof(buf)))
         goto fail;
 
     if (AUG_ISFAIL(aug_xstrcatc(s, '"')) || AUG_ISFAIL(aug_xstrcats(s, buf))
@@ -73,7 +73,7 @@ makepath_(const char* conffile)
 
     if (conffile) {
 
-        if (!aug_realpath(buf, conffile, sizeof(buf)))
+        if (!aug_realpath(conffile, buf, sizeof(buf)))
             goto fail;
 
         if (AUG_ISFAIL(aug_xstrcats(s, " -f \""))
@@ -117,7 +117,7 @@ start_(SC_HANDLE scm, const struct aug_options* options)
         /* Specify absolute path to configuration file. */
 
         char buf[AUG_PATH_MAX + 1];
-        if (!(argv[1] = aug_realpath(buf, argv[1], sizeof(buf)))) {
+        if (!(argv[1] = aug_realpath(argv[1], buf, sizeof(buf)))) {
             result = AUG_FAILERROR;
             goto done;
         }

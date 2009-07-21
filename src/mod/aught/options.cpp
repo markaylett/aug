@@ -48,7 +48,7 @@ namespace {
         const char* s(mod::getenv("session.http.css"));
         if (s) {
             char path[AUG_PATH_MAX + 1];
-            abspath(path, mod::getenv("rundir"), s, sizeof(path));
+            abspath(mod::getenv("rundir"), s, path, sizeof(path));
             ifstream fs(path);
             stringstream ss;
             ss << fs.rdbuf();
@@ -97,7 +97,7 @@ namespace {
         if (s) {
 
             char path[AUG_PATH_MAX + 1];
-            abspath(path, mod::getenv("rundir"), s, sizeof(path));
+            abspath(mod::getenv("rundir"), s, path, sizeof(path));
 
             ifstream fs(path);
             string line;

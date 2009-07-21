@@ -98,7 +98,7 @@ getopt_(int opt)
 static aug_result
 readconf_(const char* conffile, aug_bool batch, aug_bool daemon)
 {
-    if (conffile && !aug_realpath(conffile_, conffile, sizeof(conffile_)))
+    if (conffile && !aug_realpath(conffile, conffile_, sizeof(conffile_)))
         return AUG_FAILERROR;
 
     daemon_ = daemon;

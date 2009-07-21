@@ -34,7 +34,7 @@ AUG_RCSID("$Id$");
 #include <stdlib.h> /* strtoul() */
 
 AUGUTIL_API unsigned long*
-aug_strtoul(unsigned long* dst, const char* src, int base)
+aug_strtoul(const char* src, unsigned long* dst, int base)
 {
     char* end;
     unsigned long ul;
@@ -65,10 +65,10 @@ aug_strtoul(unsigned long* dst, const char* src, int base)
 }
 
 AUGUTIL_API unsigned*
-aug_strtoui(unsigned* dst, const char* src, int base)
+aug_strtoui(const char* src, unsigned* dst, int base)
 {
     unsigned long ul;
-    if (!aug_strtoul(&ul, src, base))
+    if (!aug_strtoul(src, &ul, base))
         return NULL;
 
     if (UINT_MAX < ul) {
@@ -85,10 +85,10 @@ aug_strtoui(unsigned* dst, const char* src, int base)
 }
 
 AUGUTIL_API unsigned short*
-aug_strtous(unsigned short* dst, const char* src, int base)
+aug_strtous(const char* src, unsigned short* dst, int base)
 {
     unsigned long ul;
-    if (!aug_strtoul(&ul, src, base))
+    if (!aug_strtoul(src, &ul, base))
         return NULL;
 
     if (USHRT_MAX < ul) {

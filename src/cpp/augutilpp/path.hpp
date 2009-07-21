@@ -61,42 +61,42 @@ namespace aug {
     }
 
     inline char*
-    abspath(char* dst, const char* dir, const char* path, size_t size)
+    abspath(const char* dir, const char* path, char* dst, size_t size)
     {
-        return verify(aug_abspath(dst, dir, path, size));
+        return verify(aug_abspath(dir, path, dst, size));
     }
 
     inline std::string
     abspath(const char* dir, const char* path)
     {
         char buf[AUG_PATH_MAX + 1];
-        return abspath(buf, dir, path, sizeof(buf));
+        return abspath(dir, path, buf, sizeof(buf));
     }
 
     inline char*
-    joinpath(char* dst, const char* dir, const char* path, size_t size)
+    joinpath(const char* dir, const char* path, char* dst, size_t size)
     {
-        return verify(aug_joinpath(dst, dir, path, size));
+        return verify(aug_joinpath(dir, path, dst, size));
     }
 
     inline std::string
     joinpath(const char* dir, const char* path)
     {
         char buf[AUG_PATH_MAX + 1];
-        return joinpath(buf, dir, path, sizeof(buf));
+        return joinpath(dir, path, buf, sizeof(buf));
     }
 
     inline char*
-    realpath(char* dst, const char* src, size_t size)
+    realpath(const char* src, char* dst, size_t size)
     {
-        return verify(aug_realpath(dst, src, size));
+        return verify(aug_realpath(src, dst, size));
     }
 
     inline std::string
     realpath(const char* path)
     {
         char buf[AUG_PATH_MAX + 1];
-        return realpath(buf, path, sizeof(buf));
+        return realpath(path, buf, sizeof(buf));
     }
 }
 

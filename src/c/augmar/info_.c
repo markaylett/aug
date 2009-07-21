@@ -46,10 +46,10 @@ aug_setinfo_(aug_seq_t seq, const struct aug_info_* info)
         return AUG_FAILERROR;
 
     memcpy(addr + AUG_MAGICOFF, AUG_MAGIC, sizeof(aug_magic_t));
-    aug_encodeproto(addr + AUG_PROTOOFF, (aug_proto_t)info->proto_);
-    aug_encodefields(addr + AUG_FIELDSOFF, (aug_fields_t)info->fields_);
-    aug_encodehsize(addr + AUG_HSIZEOFF, (aug_hsize_t)info->hsize_);
-    aug_encodebsize(addr + AUG_BSIZEOFF, (aug_bsize_t)info->bsize_);
+    aug_encodeproto((aug_proto_t)info->proto_, addr + AUG_PROTOOFF);
+    aug_encodefields((aug_fields_t)info->fields_, addr + AUG_FIELDSOFF);
+    aug_encodehsize((aug_hsize_t)info->hsize_, addr + AUG_HSIZEOFF);
+    aug_encodebsize((aug_bsize_t)info->bsize_, addr + AUG_BSIZEOFF);
 
     return AUG_SUCCESS;
 }

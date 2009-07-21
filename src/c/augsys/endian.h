@@ -69,12 +69,12 @@ AUGSYS_API uint64_t
 aug_decode64(const char* ptr);
 
 AUGSYS_API void
-aug_encode16(char* ptr, uint16_t i);
+aug_encode16(uint16_t i, char* ptr);
 
 AUGSYS_API void
-aug_encode32(char* ptr, uint32_t i);
+aug_encode32(uint32_t i, char* ptr);
 
 AUGSYS_API void
-aug_encode64(char* ptr, uint64_t i);
+aug_encode64(uint64_t i, char* ptr);
 
 #endif /* AUGSYS_ENDIAN_H */

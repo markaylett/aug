@@ -135,7 +135,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
                                AUG_EINVAL, AUG_MSG("missing path argument"));
                 return AUG_FAILERROR;
             }
-            if (!aug_realpath(options->conffile_, conffile,
+            if (!aug_realpath(conffile, options->conffile_,
                               sizeof(options->conffile_))) {
                 usage_();
                 return AUG_FAILERROR;

@@ -36,7 +36,7 @@ AUG_EXTERNC void
 aug_destroyseq_(aug_seq_t seq);
 
 AUG_EXTERNC aug_result
-aug_copyseq_(aug_seq_t dst, aug_seq_t src);
+aug_copyseq_(aug_seq_t src, aug_seq_t dst);
 
 AUG_EXTERNC aug_seq_t
 aug_createseq_(aug_mpool* mpool, unsigned tail);

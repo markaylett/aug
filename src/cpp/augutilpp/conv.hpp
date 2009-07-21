@@ -37,7 +37,7 @@ namespace aug {
     strtoul(const char* src, int base)
     {
         unsigned long ul;
-        verify(aug_strtoul(&ul, src, base));
+        verify(aug_strtoul(src, &ul, base));
         return ul;
     }
 
@@ -45,7 +45,7 @@ namespace aug {
     strtoui(const char* src, int base)
     {
         unsigned ui;
-        verify(aug_strtoui(&ui, src, base));
+        verify(aug_strtoui(src, &ui, base));
         return ui;
     }
 
@@ -53,7 +53,7 @@ namespace aug {
     strtous(const char* src, int base)
     {
         unsigned short us;
-        verify(aug_strtous(&us, src, base));
+        verify(aug_strtous(src, &us, base));
         return us;
     }
 }

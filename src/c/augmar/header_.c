@@ -39,7 +39,7 @@ AUG_RCSID("$Id$");
 static void
 setnsize_(const void* field, aug_nsize_t nsize)
 {
-    aug_encodensize((char*)field + AUG_NSIZEOFF, nsize);
+    aug_encodensize(nsize, (char*)field + AUG_NSIZEOFF);
 }
 
 static unsigned
@@ -51,7 +51,7 @@ nsize_(const void* field)
 static void
 setvsize_(const void* field, aug_vsize_t vsize)
 {
-    aug_encodevsize((char*)field + AUG_VSIZEOFF, vsize);
+    aug_encodevsize(vsize, (char*)field + AUG_VSIZEOFF);
 }
 
 static unsigned

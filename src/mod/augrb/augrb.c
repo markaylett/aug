@@ -149,7 +149,7 @@ funcall4_(VALUE module, ID id, VALUE arg1, VALUE arg2, VALUE arg3, VALUE arg4)
 }
 
 static char*
-lowercpy_(char* dst, const char* src)
+lowercpy_(const char* src, char* dst)
 {
     char* it;
     for (it = dst; '\0' != *src; ++it, ++src)
@@ -162,7 +162,7 @@ static VALUE
 doloadmodule_(VALUE unused)
 {
     char* lower = alloca(strlen(cb_.sname_) + 1);
-    lowercpy_(lower, cb_.sname_);
+    lowercpy_(cb_.sname_, lower);
 
     mod_writelog(MOD_LOGINFO, "require [%s]", lower);
 

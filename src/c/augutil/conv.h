@@ -32,12 +32,12 @@
 #include "augutil/config.h"
 
 AUGUTIL_API unsigned long*
-aug_strtoul(unsigned long* dst, const char* src, int base);
+aug_strtoul(const char* src, unsigned long* dst, int base);
 
 AUGUTIL_API unsigned*
-aug_strtoui(unsigned* dst, const char* src, int base);
+aug_strtoui(const char* src, unsigned* dst, int base);
 
 AUGUTIL_API unsigned short*
-aug_strtous(unsigned short* dst, const char* src, int base);
+aug_strtous(const char* src, unsigned short* dst, int base);
 
 #endif /* AUGUTIL_CONV_H */

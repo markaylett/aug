@@ -49,7 +49,7 @@ namespace test {
     {
         char path[AUG_PATH_MAX + 1];
         if (daemon_)
-            openlog(abspath(path, rundir_, logfile_, sizeof(path)));
+            openlog(abspath(rundir_, logfile_, path, sizeof(path)));
 
         aug_ctxinfo(aug_tlx, "run directory: %s", rundir_);
         aug_ctxinfo(aug_tlx, "pid file: %s", pidfile_);
@@ -79,7 +79,7 @@ namespace test {
             // Once set, the run directory should not change.
 
             if (!*rundir_)
-                realpath(rundir_, value, sizeof(rundir_));
+                realpath(value, rundir_, sizeof(rundir_));
 
         } else {
 
@@ -254,7 +254,7 @@ namespace test {
             // Use working directory as default.
 
             if (!*rundir_)
-                realpath(rundir_, getcwd().c_str(), sizeof(rundir_));
+                realpath(getcwd().c_str(), rundir_, sizeof(rundir_));
 
             reconf_();
             return AUG_SUCCESS;

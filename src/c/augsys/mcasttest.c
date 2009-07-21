@@ -61,7 +61,7 @@ struct status_ {
 };
 
 static void
-fixedcpy_(char* dst, const char* src, size_t size)
+fixedcpy_(const char* src, char* dst, size_t size)
 {
     size_t i = aug_strlcpy(dst, src, size) + 1;
 	if (i < size)
@@ -69,9 +69,9 @@ fixedcpy_(char* dst, const char* src, size_t size)
 }
 
 static void
-write_(char* dst, const struct header_* src)
+write_(const struct header_* src, char* dst)
 {
-    fixedcpy_(dst, src->group_, sizeof(src->group_));
+    fixedcpy_(src->group_, dst, sizeof(src->group_));
 }
 
 int
@@ -86,6 +86,6 @@ main(int argc, char* argv[])
     aug_ctxinfo(aug_tlx, "header=%d, status=%d", (int)sizeof(struct header_),
                 (int)sizeof(struct status_));
     strcpy(h.group_, "test");
-    write_(test, &h);
+    write_(&h, test);
     return 0;
 }

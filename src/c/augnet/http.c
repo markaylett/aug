@@ -78,7 +78,7 @@ value_(aug_httpparser_t parser)
     case 'c':
         if (0 == aug_strcasecmp(parser->name_ + 1, "ontent-Length")) {
 
-            if (!aug_strtoui(&csize, aug_lexertoken(parser->lexer_), 10))
+            if (!aug_strtoui(aug_lexertoken(parser->lexer_), &csize, 10))
                 return AUG_FAILERROR;
 
             parser->csize_ = (int)csize;

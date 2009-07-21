@@ -151,7 +151,7 @@ aug_isabs(const char* path)
 }
 
 AUGUTIL_API char*
-aug_abspath(char* dst, const char* dir, const char* path, size_t size)
+aug_abspath(const char* dir, const char* path, char* dst, size_t size)
 {
     if (aug_isabs(path)) {
 
@@ -161,13 +161,13 @@ aug_abspath(char* dst, const char* dir, const char* path, size_t size)
 
     } else {
 
-        dst = aug_joinpath(dst, dir, path, size);
+        dst = aug_joinpath(dir, path, dst, size);
     }
     return dst;
 }
 
 AUGUTIL_API char*
-aug_joinpath(char* dst, const char* dir, const char* path, size_t size)
+aug_joinpath(const char* dir, const char* path, char* dst, size_t size)
 {
     char* ptr = dst;
     size_t pathlen = strlen(path);
@@ -209,7 +209,7 @@ aug_joinpath(char* dst, const char* dir, const char* path, size_t size)
 }
 
 AUGUTIL_API char*
-aug_realpath(char* dst, const char* src, size_t size)
+aug_realpath(const char* src, char* dst, size_t size)
 {
 #if !defined(_WIN32)
     int pathmax;

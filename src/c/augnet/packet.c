@@ -35,7 +35,7 @@ AUG_RCSID("$Id$");
 #define MAGIC_ "aug"
 
 static void
-packstring_(char* dst, const char* src, size_t size)
+packstring_(const char* src, char* dst, size_t size)
 {
     size_t len = strlen(src);
     memcpy(dst, src, len);
@@ -67,12 +67,12 @@ aug_encodepacket(const struct aug_packet* pkt, char* buf)
 {
     memcpy(buf + AUG_PKTMAGICOFF, MAGIC_, AUG_PKTMAGICSIZE);
 
-    aug_encode16(buf + AUG_PKTPROTOOFF, pkt->proto_);
-    packstring_(buf + AUG_PKTCHANOFF, pkt->chan_, AUG_PKTCHANLEN);
-    aug_encode32(buf + AUG_PKTSEQNOOFF, pkt->seqno_);
-    aug_encode64(buf + AUG_PKTTIMEOFF, pkt->time_);
-    aug_encode16(buf + AUG_PKTFLAGSOFF, pkt->flags_);
-    aug_encode16(buf + AUG_PKTTYPEOFF, pkt->type_);
+    aug_encode16(pkt->proto_, buf + AUG_PKTPROTOOFF);
+    packstring_(pkt->chan_, buf + AUG_PKTCHANOFF, AUG_PKTCHANLEN);
+    aug_encode32(pkt->seqno_, buf + AUG_PKTSEQNOOFF);
+    aug_encode64(pkt->time_, buf + AUG_PKTTIMEOFF);
+    aug_encode16(pkt->flags_, buf + AUG_PKTFLAGSOFF);
+    aug_encode16(pkt->type_, buf + AUG_PKTTYPEOFF);
 
     memcpy(buf + AUG_PKTDATAOFF, pkt->data_, sizeof(pkt->data_));
     return buf;

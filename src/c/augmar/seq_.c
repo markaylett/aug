@@ -250,7 +250,7 @@ aug_destroyseq_(aug_seq_t seq)
 }
 
 AUG_EXTERNC aug_result
-aug_copyseq_(aug_seq_t dst, aug_seq_t src)
+aug_copyseq_(aug_seq_t src, aug_seq_t dst)
 {
     unsigned size = aug_seqsize_(src);
     void* addr;

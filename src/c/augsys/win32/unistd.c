@@ -28,7 +28,7 @@
 #include <fcntl.h>
 
 static DWORD*
-access_(DWORD* dst, int src)
+access_(int src, DWORD* dst)
 {
     DWORD access;
     switch(src & (_O_RDONLY | _O_WRONLY | _O_RDWR)) {
@@ -108,7 +108,7 @@ aug_vfopen(const char* path, int flags, va_list args)
     SECURITY_ATTRIBUTES sa;
     HANDLE h;
 
-    if (!access_(&access, flags)) {
+    if (!access_(flags, &access)) {
         aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                             ERROR_NOT_SUPPORTED);
         return INVALID_HANDLE_VALUE;

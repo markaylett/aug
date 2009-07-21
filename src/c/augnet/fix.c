@@ -89,7 +89,7 @@ struct aug_fixstream_ {
 };
 
 static aug_rsize
-fixtoui_(unsigned* dst, const char* buf, size_t size, char delim)
+fixtoui_(const char* buf, unsigned* dst, size_t size, char delim)
 {
     const char* it, * end = buf + size;
     unsigned digits, fact, value;
@@ -151,7 +151,7 @@ getsize_(const char* buf, size_t size)
     /* The beginning of the body length value is located immediately after the
        standard leader. */
 
-    if (AUG_RESULT(rsize = fixtoui_(&value, buf + HEAD_SIZE_, size,
+    if (AUG_RESULT(rsize = fixtoui_(buf + HEAD_SIZE_, &value, size,
                                     *SOH_)) <= 0)
         return rsize;
 
@@ -434,7 +434,7 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
 
     /* Extract tag value from buffer. */
 
-    if (AUG_ISFAIL(digits = fixtoui_(&tag, buf, size, '=')))
+    if (AUG_ISFAIL(digits = fixtoui_(buf, &tag, size, '=')))
         return digits;
 
     if (0 == AUG_RESULT(digits)) {
