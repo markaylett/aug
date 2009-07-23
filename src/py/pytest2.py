@@ -29,7 +29,7 @@ def stop():
 
 def start(sname):
     log.debug("start(): %s" % sname)
-    dispatch("group1", "foo", 0, str(101))
+    dispatch("topic1", "foo", 0, str(101))
     post(sname, "none", 0, None)
 
 def event(frm, type, id, ob):

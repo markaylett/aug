@@ -442,6 +442,25 @@ canceltimer_(PyObject* self, PyObject* args)
     return incret_(Py_True);
 }
 
+static PyObject*
+emit_(PyObject* self, PyObject* args)
+{
+    const char* type;
+    const char* buf;
+    int len;
+    mod_result result;
+
+    if (!PyArg_ParseTuple(args, "s|z#:emit", type, &buf, &len))
+        return NULL;
+
+    if (mod_emit(type, buf, len) < 0) {
+        PyErr_SetString(PyExc_RuntimeError, mod_geterror());
+        return NULL;
+    }
+
+    return incret_(Py_None);
+}
+
 static PyMethodDef methods_[] = {
     {
         "writelog", writelog_, METH_VARARGS,
@@ -505,6 +524,10 @@ static PyMethodDef methods_[] = {
     },
     {
         "canceltimer", canceltimer_, METH_VARARGS,
+        "TODO"
+    },
+    {
+        "emit", emit_, METH_VARARGS,
         "TODO"
     },
     { NULL }

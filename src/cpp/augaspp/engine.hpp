@@ -78,7 +78,7 @@ namespace aug {
 
         void
         insert(const std::string& name, const sessionptr& session,
-               const char* groups);
+               const char* topics);
 
         void
         cancelinactive();
@@ -138,6 +138,9 @@ namespace aug {
 
         bool
         canceltimer(mod_id tid);
+
+        void
+        emit(const char* node, const char* type, const void* buf, size_t len);
 
         bool
         stopping() const;

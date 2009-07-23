@@ -40,8 +40,7 @@ sessions::~sessions() AUG_NOTHROW
 void
 sessions::clear()
 {
-    tmpgroups_.clear();
-    groups_.clear();
+    topics_.clear();
 
     // TODO: erase the sessions in reverse order to which they were added.
 
@@ -50,24 +49,36 @@ sessions::clear()
 
 void
 sessions::insert(const string& name, const sessionptr& session,
-                 const char* groups)
+                 const char* topics)
 {
     // The session's start() function may callback into the host.  All state
     // will, therefore, need to be configured prior to calling start().  If
     // start() fails then any state changes will need to be rolled-back.  The
-    // tmpgroups_ container is used to store the groups that need to be
+    // tmptopics_ container is used to store the topics that need to be
     // removed on failure.
 
-    // The implementation is simplified by adding the session name as a group.
+    struct scoped_topics {
+        multimap<string, sessionptr>& tmp_;
+        ~scoped_topics()
+        {
+            tmp_.clear();
+        }
+        scoped_topics(multimap<string, sessionptr>& tmp)
+            : tmp_(tmp)
+        {
+        }
+    } tmp(tmptopics_);
 
-    tmpgroups_.insert(make_pair(name, session));
+    // The implementation is simplified by adding the session name as a topic.
 
-    if (groups) {
+    tmptopics_.insert(make_pair(name, session));
 
-        istringstream is(groups);
+    if (topics) {
+
+        istringstream is(topics);
         string name;
         while (is >> name)
-            tmpgroups_.insert(make_pair(name, session));
+            tmptopics_.insert(make_pair(name, session));
     }
 
     // Insert prior to calling open().
@@ -77,14 +88,14 @@ sessions::insert(const string& name, const sessionptr& session,
 
         AUG_CTXDEBUG2(aug_tlx, "session not started: [%s]", name.c_str());
 
-        // TODO: leave if event posted.
+        // TODO: keep this session in an inactive state rather then remove it.
+        // This is required as blobs may assume the existence of their
+        // originating session.
 
         sessions_.erase(name); // stop() should not be called.
 
     } else
-        groups_.insert(tmpgroups_.begin(), tmpgroups_.end());
-
-    tmpgroups_.clear();
+        topics_.insert(tmptopics_.begin(), tmptopics_.end());
 }
 
 void
@@ -94,6 +105,15 @@ sessions::reconf() const
         end(sessions_.end());
     for (; it != end; ++it)
         it->second->reconf();
+}
+
+void
+sessions::getsessions(std::vector<sessionptr>& sessions) const
+{
+    map<string, sessionptr>::const_iterator it(sessions_.begin()),
+        end(sessions_.end());
+    for (; it != end; ++it)
+        sessions.push_back(it->second);
 }
 
 sessionptr
@@ -108,17 +128,17 @@ sessions::getbyname(const string& name) const
 }
 
 void
-sessions::getbygroup(vector<sessionptr>& sessions, const string& group) const
+sessions::getbytopic(vector<sessionptr>& sessions, const string& topic) const
 {
-    pair<groups::const_iterator,
-        groups::const_iterator> its(groups_.equal_range(group));
+    pair<topics::const_iterator,
+        topics::const_iterator> its(topics_.equal_range(topic));
 
     for (; its.first != its.second; ++its.first)
         sessions.push_back(its.first->second);
 
-    // Include any groups in the temporary container.
+    // Include any topics in the temporary container.
 
-    its = tmpgroups_.equal_range(group);
+    its = tmptopics_.equal_range(topic);
 
     for (; its.first != its.second; ++its.first)
         sessions.push_back(its.first->second);

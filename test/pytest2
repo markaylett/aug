@@ -30,11 +30,17 @@ cat <<EOD >tmp.$$
 rundir=.
 logdir=.
 
+cluster.node=augd
+cluster.multicast=239.1.1.1
+cluster.serv=17172
+cluster.types=1
+cluster.type.1=heartbeat
+
 sessions=pystop pytest2
 
 session.pystop.module=augpy
 
-session.pytest2.groups=group1 group2
+session.pytest2.topics=topic1 topic2
 session.pytest2.module=augpy
 
 module.augpy.path=$AUG_BUILDDIR/src/mod/augpy/.libs/modaugpy

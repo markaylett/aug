@@ -91,6 +91,10 @@ aug_createboxptr(aug_mpool* mpool, void* p, void (*destroy)(void*));
 AUGUTIL_API void*
 aug_obtop(aug_object* ob);
 
+/**
+ * Create a blob with a copy of @a buf.
+ */
+
 AUGUTIL_API aug_blob*
 aug_createblob(aug_mpool* mpool, const void* buf, size_t len);
 

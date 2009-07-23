@@ -124,6 +124,38 @@ namespace {
         if (2 != toks.size() || toks[0] != "one" || toks[1] != "two")
             throw error("splitn() failed");
     }
+
+    enum scheme {
+        NONE,
+        FTP,
+        HTTP
+    };
+
+    pair<scheme, string>
+    splituri(const string& uri)
+    {
+        string x, y;
+        scheme s(NONE);
+        if (split2(uri.begin(), uri.end(), x, y, ':')) {
+            if (x == "ftp")
+                s = FTP;
+            else if (x == "http")
+                s = HTTP;
+            else
+                throw error("invalid scheme");
+        } else
+            y = uri;
+        return make_pair(s, y);
+    }
+
+    void
+    split2test()
+    {
+        if (NONE != splituri("/foo").first
+            || FTP != splituri("ftp://foo").first
+            || HTTP != splituri("http://foo").first)
+        throw error("split2() failed");
+    }
 }
 
 int
@@ -138,6 +170,7 @@ main(int argc, char* argv[])
         copyiftest();
         tokenisetest();
         splitntest();
+        split2test();
         return 0;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;

@@ -242,6 +242,13 @@ namespace mod {
         return resettimer(timer.id_, ms);
     }
 
+    inline void
+    emit(const char* type, const void* buf, size_t size)
+    {
+        if (mod_emit(type, buf, size) < 0)
+            throw std::runtime_error(mod_geterror());
+    }
+
     struct nil {
         static sessionptr
         create(const char* sname)

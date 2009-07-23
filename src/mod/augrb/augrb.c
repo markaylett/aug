@@ -361,7 +361,7 @@ post_(int argc, VALUE* argv, VALUE self)
     Check_Type(type, T_STRING);
     Check_Type(id, T_FIXNUM);
 
-    if (ob != Qnil)
+    if (Qnil != ob)
         blob = augrb_createblob(StringValue(ob));
     result = mod_post(RSTRING(to)->ptr, RSTRING(type)->ptr, FIX2INT(id),
                       (aug_object*)blob);
@@ -387,7 +387,7 @@ dispatch_(int argc, VALUE* argv, VALUE self)
     Check_Type(type, T_STRING);
     Check_Type(id, T_FIXNUM);
 
-    if (ob != Qnil)
+    if (Qnil != ob)
         blob = augrb_createblob(StringValue(ob));
     result = mod_dispatch(RSTRING(to)->ptr, RSTRING(type)->ptr, FIX2INT(id),
                           (aug_object*)blob);
@@ -442,7 +442,7 @@ tcpconnect_(int argc, VALUE* argv, VALUE self)
 
     Check_Type(host, T_STRING);
     serv = StringValue(serv);
-    if (sslctx == Qnil)
+    if (Qnil == sslctx)
         ptr = NULL;
     else {
         Check_Type(sslctx, T_STRING);
@@ -477,7 +477,7 @@ tcplisten_(int argc, VALUE* argv, VALUE self)
 
     Check_Type(host, T_STRING);
     serv = StringValue(serv);
-    if (sslctx == Qnil)
+    if (Qnil == sslctx)
         ptr = NULL;
     else {
         Check_Type(sslctx, T_STRING);
@@ -618,6 +618,28 @@ canceltimer_(VALUE self, VALUE timer)
     return Qtrue;
 }
 
+static VALUE
+emit_(int argc, VALUE* argv, VALUE self)
+{
+    VALUE type, buf;
+    mod_result result;
+
+    rb_scan_args(argc, argv, "11", &type, &buf);
+
+    if (Qnil == buf) {
+        result = mod_emit(RSTRING(type)->ptr, NULL, 0);
+    } else {
+        buf = StringValue(buf);
+        result = mod_emit(RSTRING(type)->ptr, RSTRING(buf)->ptr,
+                          RSTRING(buf)->len);
+    }
+
+    if (result < 0)
+        rb_raise(cerror_, mod_geterror());
+
+    return Qnil;
+}
+
 static void
 setpath_(void)
 {
@@ -736,6 +758,7 @@ initrb_(VALUE unused)
     rb_define_module_function(maugrb_, "settimer", settimer_, -1);
     rb_define_module_function(maugrb_, "resettimer", resettimer_, 2);
     rb_define_module_function(maugrb_, "canceltimer", canceltimer_, 1);
+    rb_define_module_function(maugrb_, "emit", emit_, -1);
 
     return Qnil;
 }

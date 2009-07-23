@@ -49,6 +49,62 @@ using namespace std;
 
 namespace {
 
+    enum scheme {
+        NONE,
+        NODE,
+        TOPIC
+    };
+
+    pair<scheme, string>
+    splituri(const string& uri)
+    {
+        string x, y;
+        scheme s(NONE);
+        if (split2(uri.begin(), uri.end(), x, y, ':')) {
+            if (x == "node")
+                s = NODE;
+            else if (x == "topic")
+                s = TOPIC;
+            else
+                throw aug_error(__FILE__, __LINE__, AUG_EINVAL,
+                                AUG_MSG("invalid scheme"));
+        } else
+            y = uri;
+        return make_pair(s, y);
+    }
+
+    string
+    getnode(const string& s)
+    {
+        pair<scheme, string> uri(splituri(s));
+        switch (uri.first) {
+        case NONE:
+            uri.second = s;
+        case NODE:
+            break;
+        default:
+            throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
+                            AUG_MSG("scheme not supported"));
+        }
+        return uri.second;
+    }
+
+    string
+    gettopic(const string& s)
+    {
+        pair<scheme, string> uri(splituri(s));
+        switch (uri.first) {
+        case NONE:
+            uri.second = s;
+        case TOPIC:
+            break;
+        default:
+            throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
+                            AUG_MSG("scheme not supported"));
+        }
+        return uri.second;
+    }
+
     // Must not use mpool_ops.
 
     class msgevent : public msg_base<msgevent> {
@@ -408,15 +464,20 @@ namespace aug {
                     {
                         msgptr msg(object_cast<aug_msg>(event.second));
 
+                        // Add uri scheme to topic name.
+
+                        string from("topic:");
+                        from += getmsgfrom(msg);
+
                         vector<sessionptr> sessions;
-                        sessions_.getbygroup(sessions, getmsgto(msg));
+                        sessions_.getbytopic(sessions, getmsgto(msg));
 
                         objectptr payload(getmsgpayload(msg));
                         vector<sessionptr>
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
                         for (; it != end; ++it)
-                            (*it)->event(getmsgfrom(msg), getmsgtype(msg),
+                            (*it)->event(from.c_str(), getmsgtype(msg),
                                          getmsgid(msg), payload);
                     }
                 }
@@ -480,9 +541,9 @@ engine::clear()
 
 AUGASPP_API void
 engine::insert(const string& name, const sessionptr& session,
-               const char* groups)
+               const char* topics)
 {
-    impl_->sessions_.insert(name, session, groups);
+    impl_->sessions_.insert(name, session, topics);
 }
 
 AUGASPP_API void
@@ -606,7 +667,10 @@ engine::post(const char* sname, const char* to, const char* type, mod_id id,
 {
     // Thread-safe.
 
-    msgptr msg(msgevent::create(id, sname, to, type));
+    // The 'to' descriptor must either be a topic name or a topic uri.  Remove
+    // uri scheme if present.
+
+    msgptr msg(msgevent::create(id, sname, gettopic(to), type));
     setmsgpayload(msg, ob);
     aug_event e;
     e.type_ = POSTEVENT_;
@@ -619,13 +683,22 @@ AUGASPP_API void
 engine::dispatch(const char* sname, const char* to, const char* type,
                  mod_id id, objectref ob)
 {
+    // Add uri scheme to session name.
+
+    string from("topic:");
+    from += sname;
+
     vector<sessionptr> sessions;
-    impl_->sessions_.getbygroup(sessions, to);
+
+    // The 'to' descriptor must either be a topic name or a topic uri.  Remove
+    // uri scheme if present.
+
+    impl_->sessions_.getbytopic(sessions, gettopic(to));
 
     vector<sessionptr>::const_iterator it(sessions.begin()),
         end(sessions.end());
     for (; it != end; ++it)
-        (*it)->event(sname, type, id, ob);
+        (*it)->event(from.c_str(), type, id, ob);
 }
 
 AUGASPP_API void
@@ -804,6 +877,25 @@ engine::canceltimer(mod_id tid)
         return false;
     }
     return true;
+}
+
+AUGASPP_API void
+engine::emit(const char* node, const char* type, const void* buf, size_t len)
+{
+    blobptr blob(createblob(getmpool(aug_tlx), buf, len));
+
+    // Add uri scheme to session name.
+
+    string from("node:");
+    from += node;
+
+    vector<sessionptr> sessions;
+    impl_->sessions_.getsessions(sessions);
+
+    vector<sessionptr>::const_iterator it(sessions.begin()),
+        end(sessions.end());
+    for (; it != end; ++it)
+        (*it)->event(from.c_str(), type, 0, blob);
 }
 
 AUGASPP_API bool

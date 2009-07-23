@@ -30,6 +30,12 @@ cat <<EOD >tmp.$$
 rundir=.
 logdir=.
 
+cluster.node=augd
+cluster.multicast=239.1.1.1
+cluster.serv=17172
+cluster.types=1
+cluster.type.1=heartbeat
+
 sessions=RbStop RbTest4
 
 session.RbStop.module=augrb

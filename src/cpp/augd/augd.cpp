@@ -554,6 +554,19 @@ namespace {
         return MOD_FAILERROR;
     }
 
+    mod_result
+    emit_(const char* type, const void* buf, size_t len)
+    {
+        AUG_CTXDEBUG2(aug_tlx, "emit(): type=[%s]", type);
+        try {
+            impl_->engine_.emit(options_.get("cluster.node", "augd"),
+                                type, buf, len);
+            return MOD_SUCCESS;
+
+        } AUG_SETERRINFOCATCH;
+        return MOD_FAILERROR;
+    }
+
     const mod_host host_ = {
         writelog_,
         vwritelog_,
@@ -573,7 +586,8 @@ namespace {
         cancelrwtimer_,
         settimer_,
         resettimer_,
-        canceltimer_
+        canceltimer_,
+        emit_
     };
 
     void
@@ -632,7 +646,7 @@ namespace {
                 impl_->engine_.insert
                     (name, sessionptr(new (tlx) augd::session
                                       (name.c_str(), it->second)),
-                     options_.get(base + ".groups", 0));
+                     options_.get(base + ".topics", 0));
             }
 
         } else {

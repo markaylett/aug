@@ -29,7 +29,7 @@ module RbTest2
     end
     def self.start(sname)
         Log.debug("start(): #{sname}")
-        AugRb.dispatch("group1", "foo", 0, 101.to_s)
+        AugRb.dispatch("topic1", "foo", 0, 101.to_s)
         AugRb.post(sname, "nil", 0, nil)
     end 
     def self.event(frm, type, id, ob)

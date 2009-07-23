@@ -32,7 +32,7 @@ session.http.services=\
 session.http.sslserv=8443
 session.http.sslcontext=server
 
-session.sched.groups=http-request
+session.sched.topics=http-request
 session.sched.module=sched
 session.sched.events=foo bar
 session.sched.event.foo.utc=0M 30M

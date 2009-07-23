@@ -44,6 +44,8 @@ include AugUtil
 # unsigned settimer(ms, ob)
 # bool resettimer(timer, ms)
 # bool canceltimer(timer)
+# void send(type, buffer buf)
+# void emit(type, buf)
 
 class Handler
     def initialize

@@ -33,10 +33,10 @@ namespace aug {
 
     class sessions : public mpool_ops {
 
-        typedef std::multimap<std::string, sessionptr> groups;
+        typedef std::multimap<std::string, sessionptr> topics;
 
         std::map<std::string, sessionptr> sessions_;
-        groups groups_, tmpgroups_;
+        topics topics_, tmptopics_;
 
         sessions(const sessions& rhs);
 
@@ -54,17 +54,20 @@ namespace aug {
 
         void
         insert(const std::string& name, const sessionptr& session,
-               const char* groups);
+               const char* topics);
 
         void
         reconf() const;
+
+        void
+        getsessions(std::vector<sessionptr>& sessions) const;
 
         sessionptr
         getbyname(const std::string& name) const;
 
         void
-        getbygroup(std::vector<sessionptr>& sessions,
-                   const std::string& group) const;
+        getbytopic(std::vector<sessionptr>& sessions,
+                   const std::string& topic) const;
     };
 }
 

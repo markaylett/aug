@@ -454,6 +454,18 @@ struct mod_host {
      */
 
     mod_result (*canceltimer_)(mod_id tid);
+
+    /**
+     * Emit message from node to cluster.
+     *
+     * @param type Message type.
+     *
+     * @param buf Data buffer.
+     *
+     * @param len Length of data buffer.
+     */
+
+    mod_result (*emit_)(const char* type, const void* buf, size_t len);
 };
 
 /** @} */
@@ -471,10 +483,10 @@ mod_gethost(void);
 #define mod_geterror      (mod_gethost()->geterror_)
 #define mod_reconfall     (mod_gethost()->reconfall_)
 #define mod_stopall       (mod_gethost()->stopall_)
+#define mod_mcast         (mod_gethost()->mcast_)
 #define mod_post          (mod_gethost()->post_)
 #define mod_dispatch      (mod_gethost()->dispatch_)
 #define mod_getenv        (mod_gethost()->getenv_)
-#define mod_getsession    (mod_gethost()->getsession_)
 #define mod_shutdown      (mod_gethost()->shutdown_)
 #define mod_tcpconnect    (mod_gethost()->tcpconnect_)
 #define mod_tcplisten     (mod_gethost()->tcplisten_)
@@ -486,6 +498,7 @@ mod_gethost(void);
 #define mod_settimer      (mod_gethost()->settimer_)
 #define mod_resettimer    (mod_gethost()->resettimer_)
 #define mod_canceltimer   (mod_gethost()->canceltimer_)
+#define mod_emit          (mod_gethost()->emit_)
 
 /**
  * This macro defines the module's entry points.  mod_init() should return
