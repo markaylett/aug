@@ -106,6 +106,11 @@ namespace aug {
         ready() const;
     };
 
+#if defined(_MSC_VER)
+# pragma warning(push)
+# pragma warning(disable:4251)
+#endif // _MSC_VER
+
     class AUGASPP_API expirywindow {
         clockptr clock_;
         window window_;
@@ -127,6 +132,10 @@ namespace aug {
         unsigned
         expiry() const;
     };
+
+#if defined(_MSC_VER)
+# pragma warning(pop)
+#endif // _MSC_VER
 }
 
 #endif // AUGASPP_WINDOW_HPP
