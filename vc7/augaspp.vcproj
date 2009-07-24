@@ -181,6 +181,9 @@
 			<File
 				RelativePath="..\src\cpp\augaspp\ssl.cpp">
 			</File>
+			<File
+				RelativePath="..\src\cpp\augaspp\window.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -227,6 +230,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augaspp\ssl.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augaspp\window.hpp">
 			</File>
 		</Filter>
 		<Filter

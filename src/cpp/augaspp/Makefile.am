@@ -13,9 +13,10 @@ modinclude_HEADERS = \
 	servconn.hpp \
 	session.hpp \
 	sessions.hpp \
-	ssl.hpp \
 	sock.hpp \
-	socks.hpp
+	socks.hpp \
+	ssl.hpp \
+	window.hpp
 
 lib_LTLIBRARIES = libaugaspp.la
 
@@ -31,9 +32,10 @@ libaugaspp_la_SOURCES = \
 	servconn.cpp \
 	session.cpp \
 	sessions.cpp \
-	ssl.cpp \
 	sock.cpp \
-	socks.cpp
+	socks.cpp \
+	ssl.cpp \
+	window.cpp
 
 libaugaspp_la_LDFLAGS = \
 	-no-undefined \

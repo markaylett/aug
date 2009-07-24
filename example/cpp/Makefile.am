@@ -52,5 +52,6 @@ mcastsend_LDADD = $(AUGLIBS)
 
 packet_SOURCES = \
 	packet.cpp
-packet_LDADD = $(AUGLIBS)
+packet_LDADD = $(AUGLIBS) \
+	$(top_builddir)/src/cpp/augaspp/libaugaspp.la
 endif

@@ -76,7 +76,8 @@ muxerd_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__packet_SOURCES_DIST = packet.cpp
 @ENABLE_MULTICAST_TRUE@am_packet_OBJECTS = packet.$(OBJEXT)
 packet_OBJECTS = $(am_packet_OBJECTS)
-@ENABLE_MULTICAST_TRUE@packet_DEPENDENCIES = $(am__DEPENDENCIES_1)
+@ENABLE_MULTICAST_TRUE@packet_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+@ENABLE_MULTICAST_TRUE@	$(top_builddir)/src/cpp/augaspp/libaugaspp.la
 am_profile_OBJECTS = profile.$(OBJEXT)
 profile_OBJECTS = $(am_profile_OBJECTS)
 profile_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -290,7 +291,9 @@ timerd_LDADD = $(AUGLIBS)
 @ENABLE_MULTICAST_TRUE@packet_SOURCES = \
 @ENABLE_MULTICAST_TRUE@	packet.cpp
 
-@ENABLE_MULTICAST_TRUE@packet_LDADD = $(AUGLIBS)
+@ENABLE_MULTICAST_TRUE@packet_LDADD = $(AUGLIBS) \
+@ENABLE_MULTICAST_TRUE@	$(top_builddir)/src/cpp/augaspp/libaugaspp.la
+
 all: all-am
 
 .SUFFIXES:
