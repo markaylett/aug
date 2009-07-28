@@ -153,7 +153,7 @@ namespace {
     class session : public mpool_ops {
         sdref ref_;
         const endpoint& ep_;
-        expirywindow window_;
+        cluster cluster_;
         timer rdwait_;
         timer wrwait_;
         gaussian gauss_;
@@ -166,12 +166,12 @@ namespace {
         session(sdref ref, const endpoint& ep, timers& ts)
             : ref_(ref),
               ep_(ep),
-              window_(getclock(aug_tlx), 8, 2000),
+              cluster_(getclock(aug_tlx), 8, 2000),
               rdwait_(ts, null),
               wrwait_(ts, null),
               out_("test")
         {
-            rdwait_.set(window_.expiry(), *this);
+            rdwait_.set(cluster_.expiry(), *this);
             wrwait_.set(1000, *this);
         }
         void
@@ -184,7 +184,7 @@ namespace {
                                 AUG_MSG("bad packet size"));
             aug_packet pkt;
             verify(aug_decodepacket(buf, &pkt));
-            window_.insert(pkt);
+            cluster_.insert(pkt);
         }
         void
         timercb(aug_id id, unsigned& ms)
@@ -201,30 +201,26 @@ namespace {
             } else if (idref(id) == rdwait_.id()) {
 
                 aug_ctxinfo(aug_tlx, "process timer");
-                try {
-                    process();
-                } catch (const window_exception& e) {
-                    aug_ctxerror(aug_tlx, "error: %s", e.what());
-                }
-                ms = window_.expiry();
+                process();
+                ms = cluster_.expiry();
             }
         }
         void
         process()
         {
             aug_packet pkt;
-            while (window_.next(pkt)) {
+            while (cluster_.next(pkt)) {
                 aug_ctxinfo(aug_tlx, "recv message [%u]",
                             static_cast<unsigned>(pkt.seqno_));
             }
             stringstream ss;
-            window_.print(ss);
+            cluster_.print(ss);
             aug_ctxinfo(aug_tlx, "%s", ss.str().c_str());
         }
         void
         setexpiry()
         {
-            rdwait_.set(window_.expiry(), *this);
+            rdwait_.set(cluster_.expiry(), *this);
         }
     };
 
@@ -263,7 +259,7 @@ namespace {
                     sess.process();
                     sess.setexpiry();
                 }
-            } catch (const discard_exception& e) {
+            } catch (const exception& e) {
                 aug_ctxerror(aug_tlx, "%s", e.what());
             }
         }

@@ -25,100 +25,35 @@
 
 #include "augaspp/config.hpp"
 
-#include "augnet/packet.h"
+#include "augctxpp/mpool.hpp"
 
-#include "augctx/base.h"
+#include "augnet/packet.h"
 
 #include "augext/clock.h"
 
-#include <exception>
 #include <iosfwd>
 
 namespace aug {
 
-    struct AUGASPP_API window_exception : std::exception {
-        ~window_exception() AUG_NOTHROW;
-    };
-
-    struct AUGASPP_API discard_exception : window_exception {
-        ~discard_exception() AUG_NOTHROW;
-        const char*
-        what() const throw();
-    };
-
-    struct AUGASPP_API timeout_exception : window_exception {
-        ~timeout_exception() AUG_NOTHROW;
-        const char*
-        what() const throw();
-    };
-
     typedef unsigned long seqno_t;
 
-    class AUGASPP_API window {
-        struct message {
-            aug_packet pkt_;
-            aug_timeval tv_;
-        };
-        enum state {
-            // First packet pending.
-            START,
-            // Initial packet ordering.
-            PRIME,
-            // Fully initialised state.
-            READY
-        };
-        const unsigned size_;
-        message* const ring_;
-        seqno_t begin_, end_;
-        state state_;
+    namespace detail {
+        struct clusterimpl;
+    }
 
-        static void
-        clear(message& m);
+    class AUGASPP_API cluster : public mpool_ops {
 
-        static bool
-        empty(const message& m);
+        detail::clusterimpl* const impl_;
+
+        cluster(const cluster& rhs);
+
+        cluster&
+        operator =(const cluster& rhs);
 
     public:
-        ~window() AUG_NOTHROW;
+        ~cluster() AUG_NOTHROW;
 
-        explicit
-        window(unsigned size);
-
-        void
-        insert(const aug_packet& pkt, const aug_timeval& tv);
-
-        bool
-        next(aug_packet& pkt, aug_timeval& tv);
-
-        void
-        drop();
-
-        void
-        print(std::ostream& os) const;
-
-        void
-        sync();
-
-        bool
-        empty() const;
-
-        bool
-        ready() const;
-    };
-
-#if defined(_MSC_VER)
-# pragma warning(push)
-# pragma warning(disable:4251)
-#endif // _MSC_VER
-
-    class AUGASPP_API expirywindow {
-        clockptr clock_;
-        window window_;
-        aug_timeval timeout_;
-        aug_timeval expiry_;
-    public:
-        explicit
-        expirywindow(clockref clock, unsigned size, unsigned timeout);
+        cluster(clockref clock, unsigned wsize, unsigned timeout);
 
         void
         insert(const aug_packet& pkt);
@@ -132,10 +67,6 @@ namespace aug {
         unsigned
         expiry() const;
     };
-
-#if defined(_MSC_VER)
-# pragma warning(pop)
-#endif // _MSC_VER
 }
 
 #endif // AUGASPP_WINDOW_HPP
