@@ -20,8 +20,8 @@
   this program; if not, write to the Free Software Foundation, Inc., 51
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef AUGASPP_WINDOW_HPP
-#define AUGASPP_WINDOW_HPP
+#ifndef AUGASPP_CLUSTER_HPP
+#define AUGASPP_CLUSTER_HPP
 
 #include "augaspp/config.hpp"
 
@@ -55,7 +55,7 @@ namespace aug {
 
         cluster(clockref clock, unsigned wsize, unsigned timeout);
 
-        void
+        bool
         insert(const aug_packet& pkt);
 
         bool
@@ -69,4 +69,4 @@ namespace aug {
     };
 }
 
-#endif // AUGASPP_WINDOW_HPP
+#endif // AUGASPP_CLUSTER_HPP

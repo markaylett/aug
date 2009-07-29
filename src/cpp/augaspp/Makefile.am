@@ -4,6 +4,7 @@ modincludedir = $(includedir)/augaspp
 modinclude_HEADERS = \
 	buffer.hpp \
 	clntconn.hpp \
+	cluster.hpp \
 	config.hpp \
 	conn.hpp \
 	engine.hpp \
@@ -15,14 +16,14 @@ modinclude_HEADERS = \
 	sessions.hpp \
 	sock.hpp \
 	socks.hpp \
-	ssl.hpp \
-	window.hpp
+	ssl.hpp
 
 lib_LTLIBRARIES = libaugaspp.la
 
 libaugaspp_la_SOURCES = \
 	buffer.cpp \
 	clntconn.cpp \
+	cluster.cpp \
 	config.cpp \
 	conn.cpp \
 	engine.cpp \
@@ -34,8 +35,7 @@ libaugaspp_la_SOURCES = \
 	sessions.cpp \
 	sock.cpp \
 	socks.cpp \
-	ssl.cpp \
-	window.cpp
+	ssl.cpp
 
 libaugaspp_la_LDFLAGS = \
 	-no-undefined \
