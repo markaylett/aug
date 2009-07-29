@@ -32,6 +32,7 @@ AUG_RCSID("$Id$");
 #include "augctxpp/exception.hpp"
 
 #include <iostream>
+#include <limits>
 #include <map>
 #include <queue>
 #include <sstream>
@@ -109,21 +110,20 @@ namespace {
         aug_timeval tv_;
     };
 
-    enum wstate {
+    enum state {
         // First packet pending.
-        START,
+        RESET,
         // Initial packet ordering.
         PRIME,
         // Fully initialised state.
-        READY,
-        RESET
+        READY
     };
 
     class window {
         const unsigned size_;
         message* const ring_;
         seqno_t begin_, end_;
-        wstate state_;
+        state state_;
 
         static void
         clear(message& m)
@@ -148,7 +148,7 @@ namespace {
               ring_(new message[size]),
               begin_(1),
               end_(1),
-              state_(START)
+              state_(RESET)
         {
         }
 
@@ -170,11 +170,6 @@ namespace {
             const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
 
             if (RESET == state_) {
-
-                begin_ = end_ = seqno;
-                state_ = READY;
-
-            } else if (START == state_) {
 
                 // To seed the first packet, choose an initial insertion point
                 // half way through the window.  This allows some space before
@@ -217,7 +212,7 @@ namespace {
                     // When fully initialised, discard any packets that exceed
                     // the maximum window size.
 
-                    if (READY == state_)
+                    if (ready())
                         throw overflow_exception();
 
                     // Otherwise this is the PRIME state.  The PRIME state
@@ -278,9 +273,10 @@ namespace {
         }
 
         void
-        reset()
+        reset(const aug_packet& pkt, const aug_timeval& tv)
         {
             state_ = RESET;
+            insert(pkt, tv);
         }
 
         void
@@ -309,17 +305,14 @@ namespace {
             for (seqno_t i(begin_); i < end_; ++i)
                 os << (empty(ring_[i % size_]) ? '-' : '+');
             switch (state_) {
-            case START:
-                os << ":START";
+            case RESET:
+                os << ":RESET";
                 break;
             case PRIME:
                 os << ":PRIME";
                 break;
             case READY:
                 os << ":READY";
-                break;
-            case RESET:
-                os << ":RESET";
                 break;
             }
         }
@@ -329,13 +322,13 @@ namespace {
         {
             return begin_ == end_
                 || empty(ring_[begin_ % size_])
-                || READY != state_;
+                || !ready();
         }
 
-        wstate
-        state() const
+        bool
+        ready() const
         {
-            return state_;
+            return READY == state_;
         }
     };
 
@@ -362,13 +355,7 @@ namespace {
         void
         insert(const aug_packet& pkt, const aug_timeval& now)
         {
-            const wstate state(window_.state());
             window_.insert(pkt, now);
-            if (RESET == state) {
-                expiry_.tv_sec = now.tv_sec;
-                expiry_.tv_usec = now.tv_usec;
-                tvadd(expiry_, timeout_);
-            }
         }
 
         bool
@@ -386,7 +373,7 @@ namespace {
                     AUG_CTXDEBUG2(aug_tlx, "moved expiry [%s]",
                                   tvstring(expiry_).c_str());
 
-                    if (READY == window_.state()) {
+                    if (window_.ready()) {
 
                         // Drop timed-out packet from the window.
 
@@ -435,9 +422,13 @@ namespace {
         }
 
         void
-        reset()
+        reset(const aug_packet& pkt, const aug_timeval& now)
         {
-            window_.reset();
+            expiry_.tv_sec = now.tv_sec;
+            expiry_.tv_usec = now.tv_usec;
+            tvadd(expiry_, timeout_);
+
+            window_.reset(pkt, now);
         }
 
         void
@@ -450,9 +441,6 @@ namespace {
         unsigned
         expiry(const aug_timeval& now) const
         {
-            if (RESET == window_.state())
-                return numeric_limits<unsigned>::max();
-
             // Milliseconds to expiry.
 
             aug_timeval tv = { expiry_.tv_sec, expiry_.tv_usec };
@@ -490,16 +478,17 @@ namespace aug {
                 aug_timeval now;
                 gettimeofday(clock_, now);
 
-                map<string, nodeptr>::const_iterator
+                map<string, nodeptr>::iterator
                     it(nodes_.begin()), end(nodes_.end());
-                for (; it != end; ++it) {
+                while (it != end) {
                     try {
                         aug_packet out;
                         while (it->second->next(out, now))
                             pending_.push(out);
+                        ++it;
                     } catch (const timeout_exception& e) {
-                        aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
-                        it->second->reset();
+                        aug_ctxwarn(aug_tlx, "erasing: %s", e.what());
+                        nodes_.erase(it++);
                     }
                 }
             }
@@ -540,8 +529,7 @@ cluster::insert(const aug_packet& pkt)
         it->second->insert(pkt, now);
     } catch (const overflow_exception& e) {
         aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
-        it->second->reset();
-        it->second->insert(pkt, now);
+        it->second->reset(pkt, now);
     } catch (const underflow_exception&) {
         return false;
     }
@@ -551,8 +539,8 @@ cluster::insert(const aug_packet& pkt)
         while (it->second->next(out, now))
             impl_->pending_.push(out);
     } catch (const timeout_exception& e) {
-        aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
-        it->second->reset();
+        aug_ctxwarn(aug_tlx, "erasing: %s", e.what());
+        impl_->nodes_.erase(it);
     }
     return true;
 }
