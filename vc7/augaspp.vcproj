@@ -146,9 +146,6 @@
 				RelativePath="..\src\cpp\augaspp\clntconn.cpp">
 			</File>
 			<File
-				RelativePath="..\src\cpp\augaspp\cluster.cpp">
-			</File>
-			<File
 				RelativePath="..\src\cpp\augaspp\config.cpp">
 			</File>
 			<File
@@ -184,6 +181,9 @@
 			<File
 				RelativePath="..\src\cpp\augaspp\ssl.cpp">
 			</File>
+			<File
+				RelativePath="..\src\cpp\augaspp\window.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -194,9 +194,6 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augaspp\clntconn.hpp">
-			</File>
-			<File
-				RelativePath="..\src\cpp\augaspp\cluster.hpp">
 			</File>
 			<File
 				RelativePath="..\src\cpp\augaspp\config.hpp">
@@ -233,6 +230,9 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\augaspp\ssl.hpp">
+			</File>
+			<File
+				RelativePath="..\src\cpp\augaspp\window.hpp">
 			</File>
 		</Filter>
 		<Filter

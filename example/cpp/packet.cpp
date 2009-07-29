@@ -26,7 +26,7 @@
 #include "augsyspp.hpp"
 #include "augctxpp.hpp"
 
-#include "augaspp/cluster.hpp"
+#include "augaspp/window.hpp"
 
 #include <cmath>
 #include <csignal>

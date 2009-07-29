@@ -21,7 +21,7 @@
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #define AUGASPP_BUILD
-#include "augaspp/cluster.hpp"
+#include "augaspp/window.hpp"
 #include "augctx/defs.h"
 
 AUG_RCSID("$Id$");
@@ -109,21 +109,20 @@ namespace {
         aug_timeval tv_;
     };
 
-    enum wstate {
+    enum state {
         // First packet pending.
         START,
         // Initial packet ordering.
         PRIME,
         // Fully initialised state.
-        READY,
-        RESET
+        READY
     };
 
     class window {
         const unsigned size_;
         message* const ring_;
         seqno_t begin_, end_;
-        wstate state_;
+        state state_;
 
         static void
         clear(message& m)
@@ -169,12 +168,7 @@ namespace {
 
             const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
 
-            if (RESET == state_) {
-
-                begin_ = end_ = seqno;
-                state_ = READY;
-
-            } else if (START == state_) {
+            if (START == state_) {
 
                 // To seed the first packet, choose an initial insertion point
                 // half way through the window.  This allows some space before
@@ -217,7 +211,7 @@ namespace {
                     // When fully initialised, discard any packets that exceed
                     // the maximum window size.
 
-                    if (READY == state_)
+                    if (ready())
                         throw overflow_exception();
 
                     // Otherwise this is the PRIME state.  The PRIME state
@@ -278,9 +272,11 @@ namespace {
         }
 
         void
-        reset()
+        reset(const aug_packet& pkt, const aug_timeval& tv)
         {
-            state_ = RESET;
+            const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
+            begin_ = end_ = seqno;
+            insert(pkt, tv);
         }
 
         void
@@ -318,9 +314,6 @@ namespace {
             case READY:
                 os << ":READY";
                 break;
-            case RESET:
-                os << ":RESET";
-                break;
             }
         }
 
@@ -329,30 +322,30 @@ namespace {
         {
             return begin_ == end_
                 || empty(ring_[begin_ % size_])
-                || READY != state_;
+                || !ready();
         }
 
-        wstate
-        state() const
+        bool
+        ready() const
         {
-            return state_;
+            return READY == state_;
         }
     };
 
-    class node {
+    class expirywindow {
         window window_;
         aug_timeval timeout_;
         aug_timeval expiry_;
     public:
-        node(unsigned size, const aug_timeval& now, unsigned timeout)
+        expirywindow(unsigned size, const aug_timeval& now, unsigned timeout)
             : window_(size)
         {
+            expiry_.tv_sec = now.tv_sec;
+            expiry_.tv_usec = now.tv_usec;
+
             // 20% tolerance.
 
             mstotv(timeout + timeout / 5, timeout_);
-
-            expiry_.tv_sec = now.tv_sec;
-            expiry_.tv_usec = now.tv_usec;
             tvadd(expiry_, timeout_);
 
             AUG_CTXDEBUG2(aug_tlx, "initial expiry [%s]",
@@ -362,13 +355,7 @@ namespace {
         void
         insert(const aug_packet& pkt, const aug_timeval& now)
         {
-            const wstate state(window_.state());
             window_.insert(pkt, now);
-            if (RESET == state) {
-                expiry_.tv_sec = now.tv_sec;
-                expiry_.tv_usec = now.tv_usec;
-                tvadd(expiry_, timeout_);
-            }
         }
 
         bool
@@ -386,7 +373,7 @@ namespace {
                     AUG_CTXDEBUG2(aug_tlx, "moved expiry [%s]",
                                   tvstring(expiry_).c_str());
 
-                    if (READY == window_.state()) {
+                    if (window_.ready()) {
 
                         // Drop timed-out packet from the window.
 
@@ -435,9 +422,9 @@ namespace {
         }
 
         void
-        reset()
+        reset(const aug_packet& pkt, const aug_timeval& now)
         {
-            window_.reset();
+            window_.reset(pkt, now);
         }
 
         void
@@ -450,9 +437,6 @@ namespace {
         unsigned
         expiry(const aug_timeval& now) const
         {
-            if (RESET == window_.state())
-                return numeric_limits<unsigned>::max();
-
             // Milliseconds to expiry.
 
             aug_timeval tv = { expiry_.tv_sec, expiry_.tv_usec };
@@ -461,7 +445,7 @@ namespace {
     };
 
 
-    typedef smartptr<node> nodeptr;
+    typedef smartptr<expirywindow> expirywindowptr;
 }
 
 namespace aug {
@@ -473,7 +457,7 @@ namespace aug {
             clockptr clock_;
             const unsigned size_;
             const unsigned timeout_;
-            map<string, nodeptr> nodes_;
+            map<string, expirywindowptr> chans_;
             queue<aug_packet> pending_;
 
             clusterimpl(clockref clock, unsigned size,
@@ -490,16 +474,17 @@ namespace aug {
                 aug_timeval now;
                 gettimeofday(clock_, now);
 
-                map<string, nodeptr>::const_iterator
-                    it(nodes_.begin()), end(nodes_.end());
-                for (; it != end; ++it) {
+                map<string, expirywindowptr>::iterator
+                    it(chans_.begin()), end(chans_.end());
+                while (it != end) {
                     try {
                         aug_packet out;
                         while (it->second->next(out, now))
                             pending_.push(out);
+                        ++it;
                     } catch (const timeout_exception& e) {
-                        aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
-                        it->second->reset();
+                        aug_ctxerror(aug_tlx, "erasing: %s", e.what());
+                        chans_.erase(it++);
                     }
                 }
             }
@@ -519,31 +504,26 @@ cluster::cluster(clockref clock, unsigned wsize, unsigned timeout)
 {
 }
 
-AUGASPP_API bool
+AUGASPP_API void
 cluster::insert(const aug_packet& pkt)
 {
     aug_timeval now;
     gettimeofday(impl_->clock_, now);
 
     const string key(pkt.chan_, sizeof(pkt.chan_));
-    map<string, nodeptr>::iterator it(impl_->nodes_.find(key));
-    if (it == impl_->nodes_.end()) {
-
-        // Create new node.
-
-        it = impl_->nodes_.insert
-            (make_pair(key, nodeptr
-                       (new node(impl_->size_, now, impl_->timeout_)))).first;
+    map<string, expirywindowptr>::iterator it(impl_->chans_.find(key));
+    if (it == impl_->chans_.end()) {
+        it = impl_->chans_.insert
+            (make_pair(key, expirywindowptr
+                       (new expirywindow(impl_->size_, now,
+                                         impl_->timeout_)))).first;
     }
 
     try {
         it->second->insert(pkt, now);
     } catch (const overflow_exception& e) {
         aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
-        it->second->reset();
-        it->second->insert(pkt, now);
-    } catch (const underflow_exception&) {
-        return false;
+        it->second->reset(pkt, now);
     }
 
     try {
@@ -551,10 +531,9 @@ cluster::insert(const aug_packet& pkt)
         while (it->second->next(out, now))
             impl_->pending_.push(out);
     } catch (const timeout_exception& e) {
-        aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
-        it->second->reset();
+        aug_ctxerror(aug_tlx, "erasing: %s", e.what());
+        impl_->chans_.erase(it);
     }
-    return true;
 }
 
 AUGASPP_API bool
@@ -573,8 +552,8 @@ cluster::next(aug_packet& pkt)
 AUGASPP_API void
 cluster::print(ostream& os) const
 {
-    map<string, nodeptr>::const_iterator
-        it(impl_->nodes_.begin()), end(impl_->nodes_.end());
+    map<string, expirywindowptr>::const_iterator
+        it(impl_->chans_.begin()), end(impl_->chans_.end());
     for (; it != end; ++it) {
         it->second->print(os);
         os << endl;
@@ -588,8 +567,8 @@ cluster::expiry() const
     gettimeofday(impl_->clock_, now);
 
     unsigned min(numeric_limits<unsigned>::max());
-    map<string, nodeptr>::const_iterator
-        it(impl_->nodes_.begin()), end(impl_->nodes_.end());
+    map<string, expirywindowptr>::const_iterator
+        it(impl_->chans_.begin()), end(impl_->chans_.end());
     for (; it != end; ++it) {
         const unsigned ms(it->second->expiry(now));
         if (ms < min)

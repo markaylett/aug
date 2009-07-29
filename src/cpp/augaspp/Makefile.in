@@ -64,9 +64,9 @@ libaugaspp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugaspp_la_OBJECTS = buffer.lo clntconn.lo cluster.lo config.lo \
-	conn.lo engine.lo handle.lo listener.lo rwtimer.lo servconn.lo \
-	session.lo sessions.lo sock.lo socks.lo ssl.lo
+am_libaugaspp_la_OBJECTS = buffer.lo clntconn.lo config.lo conn.lo \
+	engine.lo handle.lo listener.lo rwtimer.lo servconn.lo \
+	session.lo sessions.lo sock.lo socks.lo ssl.lo window.lo
 libaugaspp_la_OBJECTS = $(am_libaugaspp_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -232,7 +232,6 @@ modincludedir = $(includedir)/augaspp
 modinclude_HEADERS = \
 	buffer.hpp \
 	clntconn.hpp \
-	cluster.hpp \
 	config.hpp \
 	conn.hpp \
 	engine.hpp \
@@ -244,13 +243,13 @@ modinclude_HEADERS = \
 	sessions.hpp \
 	sock.hpp \
 	socks.hpp \
-	ssl.hpp
+	ssl.hpp \
+	window.hpp
 
 lib_LTLIBRARIES = libaugaspp.la
 libaugaspp_la_SOURCES = \
 	buffer.cpp \
 	clntconn.cpp \
-	cluster.cpp \
 	config.cpp \
 	conn.cpp \
 	engine.cpp \
@@ -262,7 +261,8 @@ libaugaspp_la_SOURCES = \
 	sessions.cpp \
 	sock.cpp \
 	socks.cpp \
-	ssl.cpp
+	ssl.cpp \
+	window.cpp
 
 libaugaspp_la_LDFLAGS = \
 	-no-undefined \
@@ -347,7 +347,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clntconn.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cluster.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine.Plo@am__quote@
@@ -360,6 +359,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/window.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
