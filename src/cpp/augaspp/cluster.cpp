@@ -114,7 +114,7 @@ namespace {
         // First packet pending.
         RESET,
         // Initial packet ordering.
-        PRIME,
+        SYNC,
         // Fully initialised state.
         READY
     };
@@ -162,6 +162,18 @@ namespace {
         }
 
         void
+        flush()
+        {
+            // Flush any space to the left of the window.
+
+            while (begin_ != end_ && empty(ring_[begin_ % size_]))
+                ++begin_;
+            aug_ctxinfo(aug_tlx, "flush to [%u]",
+                        static_cast<unsigned>(begin_));
+            state_ = READY;
+        }
+
+        void
         insert(const aug_packet& pkt, const aug_timeval& tv)
         {
             AUG_CTXDEBUG2(aug_tlx, "insert message [%u]",
@@ -194,7 +206,7 @@ namespace {
                               static_cast<unsigned>(inset));
 
                 end_ = begin_;
-                state_ = PRIME;
+                state_ = SYNC;
 
             } else {
 
@@ -215,12 +227,12 @@ namespace {
                     if (ready())
                         throw overflow_exception();
 
-                    // Otherwise this is the PRIME state.  The PRIME state
+                    // Otherwise this is the SYNC state.  The SYNC state
                     // exists after the first packet has been received, but
-                    // before sync() has been called.  While in this state, it
-                    // is safe to discard packets from the left of the window
-                    // to make space on the right, because none have been
-                    // consumed.
+                    // before flush() has been called.  While in this state,
+                    // it is safe to discard packets from the left of the
+                    // window to make space on the right, because none have
+                    // been consumed.
 
                     aug_ctxwarn(aug_tlx, "overflow by [%u] from [%u]",
                                 static_cast<unsigned>(diff),
@@ -280,18 +292,6 @@ namespace {
         }
 
         void
-        sync()
-        {
-            // Flush any space to the left of the window.
-
-            while (begin_ != end_ && empty(ring_[begin_ % size_]))
-                ++begin_;
-            aug_ctxinfo(aug_tlx, "sync to [%u]",
-                        static_cast<unsigned>(begin_));
-            state_ = READY;
-        }
-
-        void
         print(ostream& os) const
         {
             // To describe a window from 100 to 107 inclusive:
@@ -308,8 +308,8 @@ namespace {
             case RESET:
                 os << ":RESET";
                 break;
-            case PRIME:
-                os << ":PRIME";
+            case SYNC:
+                os << ":SYNC";
                 break;
             case READY:
                 os << ":READY";
@@ -384,7 +384,7 @@ namespace {
 
                         // Move a ready state.
 
-                        window_.sync();
+                        window_.flush();
                         if (window_.empty()) {
 
                             // No packet received.
