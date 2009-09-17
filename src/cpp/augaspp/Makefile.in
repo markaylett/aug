@@ -66,7 +66,7 @@ libaugaspp_la_DEPENDENCIES =  \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 am_libaugaspp_la_OBJECTS = buffer.lo clntconn.lo cluster.lo config.lo \
 	conn.lo engine.lo handle.lo listener.lo rwtimer.lo servconn.lo \
-	session.lo sessions.lo sock.lo socks.lo ssl.lo
+	session.lo sessions.lo sock.lo socks.lo ssl.lo types.lo
 libaugaspp_la_OBJECTS = $(am_libaugaspp_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -155,6 +155,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PY_CFLAGS = @PY_CFLAGS@
@@ -244,7 +245,8 @@ modinclude_HEADERS = \
 	sessions.hpp \
 	sock.hpp \
 	socks.hpp \
-	ssl.hpp
+	ssl.hpp \
+	types.hpp
 
 lib_LTLIBRARIES = libaugaspp.la
 libaugaspp_la_SOURCES = \
@@ -262,7 +264,8 @@ libaugaspp_la_SOURCES = \
 	sessions.cpp \
 	sock.cpp \
 	socks.cpp \
-	ssl.cpp
+	ssl.cpp \
+	types.cpp
 
 libaugaspp_la_LDFLAGS = \
 	-no-undefined \
@@ -360,6 +363,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
