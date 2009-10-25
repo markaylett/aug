@@ -113,6 +113,8 @@ namespace {
     void
     reconf_()
     {
+        // Config file is optional.
+
         if (*conffile_) {
             AUG_CTXDEBUG2(aug_tlx, "reading config-file: path=[%s]",
                           conffile_);
@@ -229,6 +231,27 @@ namespace {
               engine_(aug_events(), timers_, enginecb_)
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
+
+            // Cluster types set once on startup.
+
+            // Obtain list of types from config.  Default is null.
+
+            const char* value(options_.get("cluster.types", 0));
+            if (value) {
+
+                // For each id...
+
+                istringstream is(value);
+                unsigned id;
+                while (is >> id) {
+
+                    // Obtain type associated with id.
+
+                    stringstream ss;
+                    ss << "cluster.type." << id;
+                    engine_.insert(id, options_.get(ss.str()));
+                }
+            }
 
             // Assign state so that it is visible to callbacks during load_().
 
@@ -593,7 +616,7 @@ namespace {
     void
     load_()
     {
-        // Called from init().
+        // Called during task initialisation.
 
         AUG_CTXDEBUG2(aug_tlx, "loading sessions");
 

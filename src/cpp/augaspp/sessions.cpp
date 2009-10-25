@@ -51,11 +51,11 @@ void
 sessions::insert(const string& name, const sessionptr& session,
                  const char* topics)
 {
-    // The session's start() function may callback into the host.  All state
-    // will, therefore, need to be configured prior to calling start().  If
-    // start() fails then any state changes will need to be rolled-back.  The
-    // tmptopics_ container is used to store the topics that need to be
-    // removed on failure.
+    // A session's start() function may callback into the host.  All
+    // initialisation will, therefore, need to be conducted prior to calling
+    // start().  If start() fails, then any state changes will be rolled-back.
+    // The tmptopics_ container is used to store the topics that need to be
+    // unwound on failure.
 
     struct scoped_topics {
         multimap<string, sessionptr>& tmp_;

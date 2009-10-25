@@ -49,6 +49,13 @@ namespace aug {
 
         void
         insert(unsigned id, const std::string& name);
+
+        bool
+        getbyid(unsigned id, std::string& name) const;
+
+        bool
+        getbyname(const std::string& name, unsigned& id) const;
+
     };
 }
 

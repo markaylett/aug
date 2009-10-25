@@ -32,6 +32,7 @@ AUG_RCSID("$Id$");
 #include "augaspp/sessions.hpp"
 #include "augaspp/socks.hpp"
 #include "augaspp/ssl.hpp"
+#include "augaspp/types.hpp"
 
 #include "augservpp/signal.hpp"
 
@@ -214,6 +215,7 @@ namespace aug {
             enginecb_base& cb_;
             muxer muxer_;
             chans chans_;
+            types types_;
             sessions sessions_;
             socks socks_;
 
@@ -540,6 +542,12 @@ engine::clear()
 }
 
 AUGASPP_API void
+engine::insert(unsigned id, const std::string& name)
+{
+    impl_->types_.insert(id, name);
+}
+
+AUGASPP_API void
 engine::insert(const string& name, const sessionptr& session,
                const char* topics)
 {
@@ -636,7 +644,7 @@ engine::run(bool stoponerr)
 
         } AUG_PERRINFOCATCH;
 
-        // When running in foreground, stop on error.
+        // Stop on error only when running in foreground.
 
         if (stoponerr)
             impl_->socks_.teardown(impl_->chans_, impl_->now_);

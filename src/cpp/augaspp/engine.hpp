@@ -77,6 +77,9 @@ namespace aug {
         clear();
 
         void
+        insert(unsigned id, const std::string& name);
+
+        void
         insert(const std::string& name, const sessionptr& session,
                const char* topics);
 

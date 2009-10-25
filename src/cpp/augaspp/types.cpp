@@ -32,3 +32,30 @@ using namespace std;
 types::~types() AUG_NOTHROW
 {
 }
+
+void
+types::insert(unsigned id, const std::string& name)
+{
+    byid_.insert(make_pair(id, name));
+    byname_.insert(make_pair(name, id));
+}
+
+bool
+types::getbyid(unsigned id, string& name) const
+{
+    const map<unsigned, string>::const_iterator it(byid_.find(id));
+    if (it == byid_.end())
+        return false;
+    name = it->second;
+    return true;
+}
+
+bool
+types::getbyname(const string& name, unsigned& id) const
+{
+    const map<string, unsigned>::const_iterator it(byname_.find(name));
+    if (it == byname_.end())
+        return false;
+    id = it->second;
+    return true;
+}

@@ -37,6 +37,14 @@ AUG_RCSID("$Id$");
 #include <queue>
 #include <sstream>
 
+#if defined(min)
+# undef min
+#endif // min
+
+#if defined(max)
+# undef max
+#endif // max
+
 using namespace aug;
 using namespace std;
 
