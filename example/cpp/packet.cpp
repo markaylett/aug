@@ -264,6 +264,32 @@ namespace {
             }
         }
     }
+
+    autosd
+    mcastsd(const char* addr, unsigned short port, const char* ifname,
+            endpoint& ep)
+    {
+        inetaddr in(addr);
+
+        autosd sfd(aug::socket(family(in), SOCK_DGRAM));
+        setnonblock(sfd, true);
+        setreuseaddr(sfd, true);
+
+        // Set outgoing multicast interface.
+
+        if (ifname)
+            setmcastif(sfd, ifname);
+
+        endpoint any(inetany(family(in)), htons(port));
+        aug::bind(sfd, any);
+
+        joinmcast(sfd, in, ifname);
+
+        setfamily(ep, family(in));
+        setport(ep, htons(port));
+        setinetaddr(ep, in);
+        return sfd;
+    }
 }
 
 int
@@ -283,27 +309,14 @@ main(int argc, char* argv[])
 
         if (argc < 3) {
             aug_ctxerror(aug_tlx,
-                         "usage: packet <mcast> <serv> [ifname]");
+                         "usage: packet <mcast> <port> [ifname]");
             return 1;
         }
 
-        inetaddr in(argv[1]);
-        autosd sfd(aug::socket(family(in), SOCK_DGRAM));
-        setnonblock(sfd, true);
-        setreuseaddr(sfd, true);
-
-        // Set outgoing multicast interface.
-
-        if (4 == argc)
-            setmcastif(sfd, argv[3]);
-
-        // Don't receive packets from self.
-
-        endpoint ep(inetany(family(in)), htons(atoi(argv[2])));
-        aug::bind(sfd, ep);
-
-        joinmcast(sfd, in, 4 == argc ? argv[3] : 0);
-        setinetaddr(ep, in);
+        endpoint ep(null);
+        autosd sfd(mcastsd(argv[1],
+                           static_cast<unsigned short>(atoi(argv[2])),
+                           4 == argc ? argv[3] : 0, ep));
         run(sfd, ep);
         return 0;
 
