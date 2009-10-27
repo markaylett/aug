@@ -168,95 +168,6 @@ namespace {
             return attach(ptr);
         }
     };
-
-    class receiver : public mpool_ops {
-        sdref ref_;
-        const endpoint& ep_;
-        cluster cluster_;
-        timer rdwait_;
-
-        void
-        flush()
-        {
-            aug_packet pkt;
-            while (cluster_.next(pkt)) {
-                aug_ctxinfo(aug_tlx, "recv message [%u]",
-                            static_cast<unsigned>(pkt.seqno_));
-            }
-            stringstream ss;
-            cluster_.print(ss);
-            aug_ctxinfo(aug_tlx, "%s", ss.str().c_str());
-        }
-        void
-        recv()
-        {
-            char buf[AUG_PACKETSIZE];
-            endpoint from(null);
-            if (AUG_PACKETSIZE != recvfrom(ref_, buf, sizeof(buf), 0, from))
-                throw aug_error(__FILE__, __LINE__, AUG_EIO,
-                                AUG_MSG("bad packet size"));
-            aug_packet pkt;
-            verify(aug_decodepacket(buf, &pkt));
-            cluster_.insert(pkt);
-        }
-
-    public:
-        ~receiver() AUG_NOTHROW
-        {
-        }
-        receiver(sdref ref, const endpoint& ep, timers& ts)
-            : ref_(ref),
-              ep_(ep),
-              cluster_(getclock(aug_tlx), 8, 2000),
-              rdwait_(ts, null)
-        {
-            rdwait_.set(cluster_.expiry(), *this);
-        }
-        void
-        timercb(aug_id id, unsigned& ms)
-        {
-            aug_ctxinfo(aug_tlx, "process timer");
-            process();
-            ms = cluster_.expiry();
-        }
-        void
-        process()
-        {
-            try {
-                for (;;)
-                    recv();
-            } catch (const block_exception& e) {
-            }
-            flush();
-            rdwait_.set(cluster_.expiry(), *this);
-        }
-    };
-
-    autosd
-    mcastsd(const char* addr, unsigned short port, const char* ifname,
-            endpoint& ep)
-    {
-        inetaddr in(addr);
-
-        autosd sfd(aug::socket(family(in), SOCK_DGRAM));
-        setnonblock(sfd, true);
-        setreuseaddr(sfd, true);
-
-        // Set outgoing multicast interface.
-
-        if (ifname)
-            setmcastif(sfd, ifname);
-
-        const endpoint any(inetany(family(in)), htons(port));
-        aug::bind(sfd, any);
-
-        joinmcast(sfd, in, ifname);
-
-        setfamily(ep, family(in));
-        setport(ep, htons(port));
-        setinetaddr(ep, in);
-        return sfd;
-    }
 }
 
 AUGASPP_API
@@ -688,6 +599,36 @@ engine::clear()
     // FIXME: erase the sessions in reverse order to which they were added.
 
     impl_->sessions_.clear();
+}
+
+AUGASPP_API void
+engine::join(const char* addr, unsigned short port, const char* ifname)
+{
+    inetaddr in(addr);
+
+    autosd sd(aug::socket(family(in), SOCK_DGRAM));
+    setnonblock(sd, true);
+    setreuseaddr(sd, true);
+
+    // Set outgoing multicast interface.
+
+    if (ifname)
+        setmcastif(sd, ifname);
+
+    const endpoint any(inetany(family(in)), htons(port));
+    aug::bind(sd, any);
+
+    joinmcast(sd, in, ifname);
+
+    setfamily(impl_->mcastep_, family(in));
+    setport(impl_->mcastep_, htons(port));
+    setinetaddr(impl_->mcastep_, in);
+
+    impl_->mcastsd_ = sd;
+
+    // TODO: is this needed?
+
+    impl_->mwait_.set(impl_->cluster_.expiry(), *impl_);
 }
 
 AUGASPP_API void
