@@ -27,6 +27,7 @@
 AUG_RCSID("$Id$");
 
 #include "augaspp/clntconn.hpp"
+#include "augaspp/cluster.hpp"
 #include "augaspp/listener.hpp"
 #include "augaspp/servconn.hpp"
 #include "augaspp/sessions.hpp"
@@ -167,6 +168,95 @@ namespace {
             return attach(ptr);
         }
     };
+
+    class receiver : public mpool_ops {
+        sdref ref_;
+        const endpoint& ep_;
+        cluster cluster_;
+        timer rdwait_;
+
+        void
+        flush()
+        {
+            aug_packet pkt;
+            while (cluster_.next(pkt)) {
+                aug_ctxinfo(aug_tlx, "recv message [%u]",
+                            static_cast<unsigned>(pkt.seqno_));
+            }
+            stringstream ss;
+            cluster_.print(ss);
+            aug_ctxinfo(aug_tlx, "%s", ss.str().c_str());
+        }
+        void
+        recv()
+        {
+            char buf[AUG_PACKETSIZE];
+            endpoint from(null);
+            if (AUG_PACKETSIZE != recvfrom(ref_, buf, sizeof(buf), 0, from))
+                throw aug_error(__FILE__, __LINE__, AUG_EIO,
+                                AUG_MSG("bad packet size"));
+            aug_packet pkt;
+            verify(aug_decodepacket(buf, &pkt));
+            cluster_.insert(pkt);
+        }
+
+    public:
+        ~receiver() AUG_NOTHROW
+        {
+        }
+        receiver(sdref ref, const endpoint& ep, timers& ts)
+            : ref_(ref),
+              ep_(ep),
+              cluster_(getclock(aug_tlx), 8, 2000),
+              rdwait_(ts, null)
+        {
+            rdwait_.set(cluster_.expiry(), *this);
+        }
+        void
+        timercb(aug_id id, unsigned& ms)
+        {
+            aug_ctxinfo(aug_tlx, "process timer");
+            process();
+            ms = cluster_.expiry();
+        }
+        void
+        process()
+        {
+            try {
+                for (;;)
+                    recv();
+            } catch (const block_exception& e) {
+            }
+            flush();
+            rdwait_.set(cluster_.expiry(), *this);
+        }
+    };
+
+    autosd
+    mcastsd(const char* addr, unsigned short port, const char* ifname,
+            endpoint& ep)
+    {
+        inetaddr in(addr);
+
+        autosd sfd(aug::socket(family(in), SOCK_DGRAM));
+        setnonblock(sfd, true);
+        setreuseaddr(sfd, true);
+
+        // Set outgoing multicast interface.
+
+        if (ifname)
+            setmcastif(sfd, ifname);
+
+        const endpoint any(inetany(family(in)), htons(port));
+        aug::bind(sfd, any);
+
+        joinmcast(sfd, in, ifname);
+
+        setfamily(ep, family(in));
+        setport(ep, htons(port));
+        setinetaddr(ep, in);
+        return sfd;
+    }
 }
 
 AUGASPP_API
@@ -210,12 +300,11 @@ namespace aug {
         struct engineimpl : mpool_ops {
 
             chandler<engineimpl> chandler_;
+            aug_muxer_t muxer_;
             aug_events_t events_;
             aug_timers_t timers_;
             enginecb_base& cb_;
-            muxer muxer_;
             chans chans_;
-            types types_;
             sessions sessions_;
             socks socks_;
 
@@ -239,16 +328,26 @@ namespace aug {
                 STOPPED
             } state_;
 
-            engineimpl(aug_events_t events, aug_timers_t timers,
-                       enginecb_base& cb)
-                : events_(events),
+            types types_;
+            autosd mcastsd_;
+            endpoint mcastep_;
+            cluster cluster_;
+            timer mwait_;
+
+            engineimpl(aug_muxer_t muxer, aug_events_t events,
+                       aug_timers_t timers, enginecb_base& cb)
+                : muxer_(muxer),
+                  events_(events),
                   timers_(timers),
                   cb_(cb),
-                  muxer_(getmpool(aug_tlx)),
                   chans_(null),
                   current_(null),
                   grace_(timers_),
-                  state_(STARTED)
+                  state_(STARTED),
+                  mcastsd_(null),
+                  mcastep_(null),
+                  cluster_(getclock(aug_tlx), 8, 2000),
+                  mwait_(timers, null)
             {
                 chandler_.reset(this);
                 chans tmp(getmpool(aug_tlx), chandler_);
@@ -487,16 +586,26 @@ namespace aug {
             void
             timercb(idref id, unsigned& ms)
             {
-                AUG_CTXDEBUG2(aug_tlx, "custom timer expiry");
+                if (id == mwait_.id()) {
 
-                sessiontimers::iterator it(sessiontimers_.find(id.get()));
-                mod_handle timer = { id.get(), it->second.ob_.get() };
-                it->second.session_->expire(timer, ms);
+                    aug_ctxinfo(aug_tlx, "process cluster timer");
+                    mprocess();
+                    ms = cluster_.expiry();
 
-                if (0 == ms) {
-                    AUG_CTXDEBUG2(aug_tlx,
-                                  "removing timer: ms has been set to zero");
-                    sessiontimers_.erase(it);
+                } else {
+
+                    AUG_CTXDEBUG2(aug_tlx, "custom timer expiry");
+
+                    sessiontimers::iterator it(sessiontimers_.find(id.get()));
+                    mod_handle timer = { id.get(), it->second.ob_.get() };
+                    it->second.session_->expire(timer, ms);
+
+                    if (0 == ms) {
+                        AUG_CTXDEBUG2(aug_tlx,
+                                      "removing timer:"
+                                      " ms has been set to zero");
+                        sessiontimers_.erase(it);
+                    }
                 }
             }
             void
@@ -507,6 +616,45 @@ namespace aug {
 
                 aug_ctxinfo(aug_tlx, "giving-up, closing connections");
                 state_ = STOPPED;
+            }
+
+            // Multicast.
+
+            void
+            mflush()
+            {
+                aug_packet pkt;
+                while (cluster_.next(pkt)) {
+                    aug_ctxinfo(aug_tlx, "mrecv message [%u]",
+                                static_cast<unsigned>(pkt.seqno_));
+                }
+                stringstream ss;
+                cluster_.print(ss);
+                aug_ctxinfo(aug_tlx, "%s", ss.str().c_str());
+            }
+            void
+            mrecv()
+            {
+                char buf[AUG_PACKETSIZE];
+                endpoint from(null);
+                if (AUG_PACKETSIZE
+                    != recvfrom(mcastsd_, buf, sizeof(buf), 0, from))
+                    throw aug_error(__FILE__, __LINE__, AUG_EIO,
+                                    AUG_MSG("bad packet size"));
+                aug_packet pkt;
+                verify(aug_decodepacket(buf, &pkt));
+                cluster_.insert(pkt);
+            }
+            void
+            mprocess()
+            {
+                try {
+                    for (;;)
+                        mrecv();
+                } catch (const block_exception& e) {
+                }
+                mflush();
+                mwait_.set(cluster_.expiry(), *this);
             }
         };
     }
@@ -519,8 +667,9 @@ engine::~engine() AUG_NOTHROW
 }
 
 AUGASPP_API
-engine::engine(aug_events_t events, aug_timers_t timers, enginecb_base& cb)
-    : impl_(new (tlx) detail::engineimpl(events, timers, cb))
+engine::engine(aug_muxer_t muxer, aug_events_t events, aug_timers_t timers,
+               enginecb_base& cb)
+    : impl_(new (tlx) detail::engineimpl(muxer, events, timers, cb))
 {
 }
 
@@ -542,16 +691,16 @@ engine::clear()
 }
 
 AUGASPP_API void
-engine::insert(unsigned id, const std::string& name)
-{
-    impl_->types_.insert(id, name);
-}
-
-AUGASPP_API void
 engine::insert(const string& name, const sessionptr& session,
                const char* topics)
 {
     impl_->sessions_.insert(name, session, topics);
+}
+
+AUGASPP_API void
+engine::insert(unsigned id, const std::string& name)
+{
+    impl_->types_.insert(id, name);
 }
 
 AUGASPP_API void

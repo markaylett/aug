@@ -207,6 +207,7 @@ namespace {
 #if WITH_SSL
         sslctxs sslctxs_;
 #endif // WITH_SSL
+        muxer muxer_;
         timers timers_;
         engine engine_;
 
@@ -227,8 +228,9 @@ namespace {
 
         explicit
         impl(char* frobpass)
-            : timers_(getmpool(aug_tlx), getclock(aug_tlx)),
-              engine_(aug_events(), timers_, enginecb_)
+            : muxer_(getmpool(aug_tlx)),
+              timers_(getmpool(aug_tlx), getclock(aug_tlx)),
+              engine_(muxer_, aug_events(), timers_, enginecb_)
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
 

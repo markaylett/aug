@@ -30,6 +30,8 @@
 #include "augutil/event.h"
 #include "augutil/timer.h"
 
+#include "augsys/muxer.h"
+
 #include "augext/blob.h"
 
 #include "augmod.h"
@@ -71,17 +73,18 @@ namespace aug {
     public:
         ~engine() AUG_NOTHROW;
 
-        engine(aug_events_t events, aug_timers_t timers, enginecb_base& cb);
+        engine(aug_muxer_t muxer, aug_events_t events, aug_timers_t timers,
+               enginecb_base& cb);
 
         void
         clear();
 
         void
-        insert(unsigned id, const std::string& name);
-
-        void
         insert(const std::string& name, const sessionptr& session,
                const char* topics);
+
+        void
+        insert(unsigned id, const std::string& name);
 
         void
         cancelinactive();

@@ -150,7 +150,7 @@ namespace {
         }
     };
 
-    class session : public mpool_ops {
+    class receiver : public mpool_ops {
         sdref ref_;
         const endpoint& ep_;
         cluster cluster_;
@@ -159,11 +159,36 @@ namespace {
         gaussian gauss_;
         packet out_;
 
+        void
+        flush()
+        {
+            aug_packet pkt;
+            while (cluster_.next(pkt)) {
+                aug_ctxinfo(aug_tlx, "recv message [%u]",
+                            static_cast<unsigned>(pkt.seqno_));
+            }
+            stringstream ss;
+            cluster_.print(ss);
+            aug_ctxinfo(aug_tlx, "%s", ss.str().c_str());
+        }
+        void
+        recv()
+        {
+            char buf[AUG_PACKETSIZE];
+            endpoint from(null);
+            if (AUG_PACKETSIZE != recvfrom(ref_, buf, sizeof(buf), 0, from))
+                throw aug_error(__FILE__, __LINE__, AUG_EIO,
+                                AUG_MSG("bad packet size"));
+            aug_packet pkt;
+            verify(aug_decodepacket(buf, &pkt));
+            cluster_.insert(pkt);
+        }
+
     public:
-        ~session() AUG_NOTHROW
+        ~receiver() AUG_NOTHROW
         {
         }
-        session(sdref ref, const endpoint& ep, timers& ts)
+        receiver(sdref ref, const endpoint& ep, timers& ts)
             : ref_(ref),
               ep_(ep),
               cluster_(getclock(aug_tlx), 8, 2000),
@@ -173,18 +198,6 @@ namespace {
         {
             rdwait_.set(cluster_.expiry(), *this);
             wrwait_.set(1000, *this);
-        }
-        void
-        recv(sdref ref)
-        {
-            char buf[AUG_PACKETSIZE];
-            endpoint from(null);
-            if (AUG_PACKETSIZE != recvfrom(ref, buf, sizeof(buf), 0, from))
-                throw aug_error(__FILE__, __LINE__, AUG_EIO,
-                                AUG_MSG("bad packet size"));
-            aug_packet pkt;
-            verify(aug_decodepacket(buf, &pkt));
-            cluster_.insert(pkt);
         }
         void
         timercb(aug_id id, unsigned& ms)
@@ -208,62 +221,15 @@ namespace {
         void
         process()
         {
-            aug_packet pkt;
-            while (cluster_.next(pkt)) {
-                aug_ctxinfo(aug_tlx, "recv message [%u]",
-                            static_cast<unsigned>(pkt.seqno_));
+            try {
+                for (;;)
+                    recv();
+            } catch (const block_exception& e) {
             }
-            stringstream ss;
-            cluster_.print(ss);
-            aug_ctxinfo(aug_tlx, "%s", ss.str().c_str());
-        }
-        void
-        setexpiry()
-        {
+            flush();
             rdwait_.set(cluster_.expiry(), *this);
         }
     };
-
-    void
-    run(sdref ref, const endpoint& ep)
-    {
-        endpoint addr(null);
-        getsockname(ref, addr);
-        aug_ctxinfo(aug_tlx, "bound to [%s]", endpointntop(addr).c_str());
-
-        muxer mux(getmpool(aug_tlx));
-        timers ts(getmpool(aug_tlx), getclock(aug_tlx));
-        session sess(ref, ep, ts);
-        setmdeventmask(mux, ref, AUG_MDEVENTRDEX);
-
-        aug_timeval tv;
-        unsigned ready(!0);
-        while (!stop_) {
-
-            processexpired(ts, 0 == ready, tv);
-
-            try {
-                ready = waitmdevents(mux, tv);
-            } catch (const intr_exception&) {
-                ready = !0; // Not timeout.
-                continue;
-            }
-
-            try {
-                if (ready) {
-                    try {
-                        for (;;)
-                            sess.recv(ref);
-                    } catch (const block_exception& e) {
-                    }
-                    sess.process();
-                    sess.setexpiry();
-                }
-            } catch (const exception& e) {
-                aug_ctxerror(aug_tlx, "%s", e.what());
-            }
-        }
-    }
 
     autosd
     mcastsd(const char* addr, unsigned short port, const char* ifname,
@@ -280,7 +246,7 @@ namespace {
         if (ifname)
             setmcastif(sfd, ifname);
 
-        endpoint any(inetany(family(in)), htons(port));
+        const endpoint any(inetany(family(in)), htons(port));
         aug::bind(sfd, any);
 
         joinmcast(sfd, in, ifname);
@@ -289,6 +255,41 @@ namespace {
         setport(ep, htons(port));
         setinetaddr(ep, in);
         return sfd;
+    }
+
+    void
+    run(sdref ref, const endpoint& ep)
+    {
+        endpoint addr(null);
+        getsockname(ref, addr);
+        aug_ctxinfo(aug_tlx, "bound to [%s]", endpointntop(addr).c_str());
+
+        muxer mux(getmpool(aug_tlx));
+        timers ts(getmpool(aug_tlx), getclock(aug_tlx));
+
+        receiver mrecv(ref, ep, ts);
+        setmdeventmask(mux, ref, AUG_MDEVENTRDEX);
+
+        aug_timeval tv;
+        unsigned ready(!0);
+        while (!stop_) {
+
+            processexpired(ts, 0 == ready, tv);
+
+            try {
+                ready = waitmdevents(mux, tv);
+            } catch (const intr_exception&) {
+                ready = !0; // Not timeout.
+                continue;
+            }
+
+            try {
+                if (ready)
+                    mrecv.process();
+            } catch (const exception& e) {
+                aug_ctxerror(aug_tlx, "%s", e.what());
+            }
+        }
     }
 }
 
