@@ -260,6 +260,13 @@ namespace {
             impl_ = this;
 
             try {
+                const char* mcast(options_.get("cluster.mcast", 0));
+                const char* port(options_.get("cluster.port", 0));
+                const char* ifname(options_.get("cluster.ifname", 0));
+                if (mcast && port)
+                    engine_.join(mcast,
+                                 static_cast<unsigned short>(atoi(port)),
+                                 ifname);
 #if WITH_SSL
                 initssl();
                 createsslctxs(sslctxs_, options_, frobpass);

@@ -500,7 +500,7 @@ namespace aug {
                 if (id == mwait_.id()) {
 
                     aug_ctxinfo(aug_tlx, "process cluster timer");
-                    mprocess();
+                    mflush();
                     ms = cluster_.expiry();
 
                 } else {
@@ -536,7 +536,7 @@ namespace aug {
             {
                 aug_packet pkt;
                 while (cluster_.next(pkt)) {
-                    aug_ctxinfo(aug_tlx, "mrecv message [%u]",
+                    aug_ctxinfo(aug_tlx, "mflush message [%u]",
                                 static_cast<unsigned>(pkt.seqno_));
                 }
                 stringstream ss;
@@ -623,6 +623,8 @@ engine::join(const char* addr, unsigned short port, const char* ifname)
     setfamily(impl_->mcastep_, family(in));
     setport(impl_->mcastep_, htons(port));
     setinetaddr(impl_->mcastep_, in);
+
+    setmdeventmask(impl_->muxer_, sd, AUG_MDEVENTRDEX);
 
     impl_->mcastsd_ = sd;
 
@@ -713,6 +715,11 @@ engine::run(bool stoponerr)
             // Update timestamp after waiting.
 
             gettimeofday(getclock(aug_tlx), impl_->now_);
+
+            AUG_CTXDEBUG2(aug_tlx, "processing multicast");
+
+            if (getmdevents(impl_->muxer_, impl_->mcastsd_))
+                impl_->mprocess();
 
             AUG_CTXDEBUG2(aug_tlx, "processing events");
 

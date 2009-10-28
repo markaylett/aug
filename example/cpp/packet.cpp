@@ -214,7 +214,7 @@ namespace {
             } else if (idref(id) == rdwait_.id()) {
 
                 aug_ctxinfo(aug_tlx, "process timer");
-                process();
+                flush();
                 ms = cluster_.expiry();
             }
         }
