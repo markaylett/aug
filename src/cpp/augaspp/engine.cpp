@@ -45,6 +45,7 @@ AUG_RCSID("$Id$");
 #include <queue>
 
 #define POSTEVENT_ (AUG_EVENTUSER - 1)
+#define LOGCLUSTER_ 0
 
 using namespace aug;
 using namespace std;
@@ -69,7 +70,7 @@ namespace {
                 s = TOPIC;
             else
                 throw aug_error(__FILE__, __LINE__, AUG_EINVAL,
-                                AUG_MSG("invalid scheme"));
+                                AUG_MSG("invalid scheme '%s'"), x.c_str());
         } else
             y = uri;
         return make_pair(s, y);
@@ -208,6 +209,52 @@ namespace aug {
             }
         };
 
+        class packet : aug_packet, public mpool_ops {
+            size_t
+            sendhead(sdref ref, unsigned type, const endpoint& ep)
+            {
+                // TODO: increment after send.
+                ++seqno_;
+                time_ = static_cast<uint64_t>(time(0) * 1000);
+                flags_ = 0;
+                type_ = static_cast<uint16_t>(type);
+
+                char buf[AUG_PACKETSIZE];
+                aug_encodepacket(static_cast<aug_packet*>(this), buf);
+                return aug::sendto(ref, buf, sizeof(buf), 0, ep);
+            }
+        public:
+            packet()
+            {
+                proto_ = 1;
+                chan_[0] = '\0';
+                seqno_ = 0;
+                time_ = 0;
+                flags_ = 0;
+                type_ = 0;
+            }
+            size_t
+            emit(sdref ref, unsigned type, const void* buf, size_t len,
+                 const endpoint& ep)
+            {
+                // Truncate to max data size (less length).
+                len = AUG_MIN(len, sizeof(data_) - 4);
+                // Data prefixed with length.
+                aug_encode32(len, data_);
+                memcpy(data_ + 4, buf, len);
+                // Data plus length.
+                len += 4;
+                // Zero pad.
+                memset(data_ + len, 0, sizeof(data_) - len);
+                return sendhead(ref, type, ep);
+            }
+            void
+            setnode(const char* node)
+            {
+                aug_strlcpy(chan_, node, sizeof(chan_));
+            }
+        };
+
         struct engineimpl : mpool_ops {
 
             chandler<engineimpl> chandler_;
@@ -239,11 +286,14 @@ namespace aug {
                 STOPPED
             } state_;
 
+#if ENABLE_MULTICAST
             types types_;
+            packet mpacket_;
             autosd mcastsd_;
             endpoint mcastep_;
             cluster cluster_;
             timer mwait_;
+#endif // ENABLE_MULTICAST
 
             engineimpl(aug_muxer_t muxer, aug_events_t events,
                        aug_timers_t timers, enginecb_base& cb)
@@ -254,11 +304,14 @@ namespace aug {
                   chans_(null),
                   current_(null),
                   grace_(timers_),
-                  state_(STARTED),
+                  state_(STARTED)
+#if ENABLE_MULTICAST
+                ,
                   mcastsd_(null),
                   mcastep_(null),
                   cluster_(getclock(aug_tlx), 8, 2000),
                   mwait_(timers, null)
+#endif // ENABLE_MULTICAST
             {
                 chandler_.reset(this);
                 chans tmp(getmpool(aug_tlx), chandler_);
@@ -497,14 +550,16 @@ namespace aug {
             void
             timercb(idref id, unsigned& ms)
             {
+#if ENABLE_MULTICAST
                 if (id == mwait_.id()) {
 
                     aug_ctxinfo(aug_tlx, "process cluster timer");
                     mflush();
                     ms = cluster_.expiry();
 
-                } else {
-
+                } else
+#endif // ENABLE_MULTICAST
+                {
                     AUG_CTXDEBUG2(aug_tlx, "custom timer expiry");
 
                     sessiontimers::iterator it(sessiontimers_.find(id.get()));
@@ -529,19 +584,41 @@ namespace aug {
                 state_ = STOPPED;
             }
 
-            // Multicast.
-
+#if ENABLE_MULTICAST
             void
             mflush()
             {
                 aug_packet pkt;
                 while (cluster_.next(pkt)) {
+
                     aug_ctxinfo(aug_tlx, "mflush message [%u]",
                                 static_cast<unsigned>(pkt.seqno_));
+
+                    string type;
+                    if (!types_.getbyid(pkt.type_, type))
+                        continue;
+                    const uint32_t len(aug_decode32(pkt.data_));
+                    blobptr blob(createblob(getmpool(aug_tlx), pkt.data_ + 4,
+                                            len));
+
+                    // Add uri scheme to session name.
+
+                    string from("node:");
+                    from += pkt.chan_;
+
+                    vector<sessionptr> sessions;
+                    sessions_.getsessions(sessions);
+
+                    vector<sessionptr>::const_iterator it(sessions.begin()),
+                        end(sessions.end());
+                    for (; it != end; ++it)
+                        (*it)->event(from.c_str(), type.c_str(), 0, blob);
                 }
+# if LOGCLUSTER_
                 stringstream ss;
                 cluster_.print(ss);
                 aug_ctxinfo(aug_tlx, "%s", ss.str().c_str());
+# endif // LOGCLUSTER_
             }
             void
             mrecv()
@@ -562,11 +639,12 @@ namespace aug {
                 try {
                     for (;;)
                         mrecv();
-                } catch (const block_exception& e) {
+                } catch (const block_exception&) {
                 }
                 mflush();
                 mwait_.set(cluster_.expiry(), *this);
             }
+#endif // ENABLE_MULTICAST
         };
     }
 }
@@ -602,8 +680,10 @@ engine::clear()
 }
 
 AUGASPP_API void
-engine::join(const char* addr, unsigned short port, const char* ifname)
+engine::join(const char* node, const char* addr, unsigned short port,
+             const char* ifname)
 {
+#if ENABLE_MULTICAST
     inetaddr in(addr);
 
     autosd sd(aug::socket(family(in), SOCK_DGRAM));
@@ -624,13 +704,15 @@ engine::join(const char* addr, unsigned short port, const char* ifname)
     setport(impl_->mcastep_, htons(port));
     setinetaddr(impl_->mcastep_, in);
 
-    setmdeventmask(impl_->muxer_, sd, AUG_MDEVENTRDEX);
-
-    impl_->mcastsd_ = sd;
-
     // TODO: is this needed?
 
     impl_->mwait_.set(impl_->cluster_.expiry(), *impl_);
+
+    impl_->mpacket_.setnode(node);
+
+	setmdeventmask(impl_->muxer_, sd, AUG_MDEVENTRDEX);
+    impl_->mcastsd_ = sd;
+#endif // ENABLE_MULTICAST
 }
 
 AUGASPP_API void
@@ -643,7 +725,9 @@ engine::insert(const string& name, const sessionptr& session,
 AUGASPP_API void
 engine::insert(unsigned id, const std::string& name)
 {
+#if ENABLE_MULTICAST
     impl_->types_.insert(id, name);
+#endif // ENABLE_MULTICAST
 }
 
 AUGASPP_API void
@@ -716,10 +800,12 @@ engine::run(bool stoponerr)
 
             gettimeofday(getclock(aug_tlx), impl_->now_);
 
+#if ENABLE_MULTICAST
             AUG_CTXDEBUG2(aug_tlx, "processing multicast");
 
             if (getmdevents(impl_->muxer_, impl_->mcastsd_))
                 impl_->mprocess();
+#endif // ENABLE_MULTICAST
 
             AUG_CTXDEBUG2(aug_tlx, "processing events");
 
@@ -985,14 +1071,20 @@ engine::canceltimer(mod_id tid)
 }
 
 AUGASPP_API void
-engine::emit(const char* node, const char* type, const void* buf, size_t len)
+engine::emit(const char* type, const void* buf, size_t len)
 {
+#if ENABLE_MULTICAST
+	auto_ptr<int> p;
+    unsigned id;
+    if (impl_->types_.getbyname(type, id))
+        impl_->mpacket_.emit(impl_->mcastsd_, id, buf, len, impl_->mcastep_);
+#else // !ENABLE_MULTICAST
     blobptr blob(createblob(getmpool(aug_tlx), buf, len));
 
     // Add uri scheme to session name.
 
     string from("node:");
-    from += node;
+    from += "augd";//node;
 
     vector<sessionptr> sessions;
     impl_->sessions_.getsessions(sessions);
@@ -1001,6 +1093,7 @@ engine::emit(const char* node, const char* type, const void* buf, size_t len)
         end(sessions.end());
     for (; it != end; ++it)
         (*it)->event(from.c_str(), type, 0, blob);
+#endif // ENABLE_MULTICAST
 }
 
 AUGASPP_API bool

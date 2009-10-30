@@ -260,13 +260,22 @@ namespace {
             impl_ = this;
 
             try {
+
+                // Required options.
+
                 const char* mcast(options_.get("cluster.mcast", 0));
                 const char* port(options_.get("cluster.port", 0));
-                const char* ifname(options_.get("cluster.ifname", 0));
-                if (mcast && port)
-                    engine_.join(mcast,
+
+                if (mcast && port) {
+
+                    // Optional.
+
+                    const char* node(options_.get("cluster.node", "augd"));
+                    const char* ifname(options_.get("cluster.ifname", 0));
+                    engine_.join(node, mcast,
                                  static_cast<unsigned short>(atoi(port)),
                                  ifname);
+                }
 #if WITH_SSL
                 initssl();
                 createsslctxs(sslctxs_, options_, frobpass);
@@ -591,8 +600,7 @@ namespace {
     {
         AUG_CTXDEBUG2(aug_tlx, "emit(): type=[%s]", type);
         try {
-            impl_->engine_.emit(options_.get("cluster.node", "augd"),
-                                type, buf, len);
+            impl_->engine_.emit(type, buf, len);
             return MOD_SUCCESS;
 
         } AUG_SETERRINFOCATCH;

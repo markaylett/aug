@@ -80,7 +80,8 @@ namespace aug {
         clear();
 
         void
-        join(const char* addr, unsigned short port, const char* ifname);
+        join(const char* node, const char* addr, unsigned short port,
+             const char* ifname);
 
         void
         insert(const std::string& name, const sessionptr& session,
@@ -149,7 +150,7 @@ namespace aug {
         canceltimer(mod_id tid);
 
         void
-        emit(const char* node, const char* type, const void* buf, size_t len);
+        emit(const char* type, const void* buf, size_t len);
 
         bool
         stopping() const;
