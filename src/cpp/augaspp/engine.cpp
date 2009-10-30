@@ -224,10 +224,11 @@ namespace aug {
                 return aug::sendto(ref, buf, sizeof(buf), 0, ep);
             }
         public:
-            packet()
+            explicit
+            packet(const char* node)
             {
                 proto_ = 1;
-                chan_[0] = '\0';
+                aug_strlcpy(chan_, node, sizeof(chan_));
                 seqno_ = 0;
                 time_ = 0;
                 flags_ = 0;
@@ -247,11 +248,6 @@ namespace aug {
                 // Zero pad.
                 memset(data_ + len, 0, sizeof(data_) - len);
                 return sendhead(ref, type, ep);
-            }
-            void
-            setnode(const char* node)
-            {
-                aug_strlcpy(chan_, node, sizeof(chan_));
             }
         };
 
@@ -293,10 +289,13 @@ namespace aug {
             endpoint mcastep_;
             cluster cluster_;
             timer mwait_;
-#endif // ENABLE_MULTICAST
+#else // !ENABLE_MULTICAST
+            const string node_;
+#endif // !ENABLE_MULTICAST
 
-            engineimpl(aug_muxer_t muxer, aug_events_t events,
-                       aug_timers_t timers, enginecb_base& cb)
+            engineimpl(const char* node, aug_muxer_t muxer,
+                       aug_events_t events, aug_timers_t timers,
+                       enginecb_base& cb)
                 : muxer_(muxer),
                   events_(events),
                   timers_(timers),
@@ -304,14 +303,16 @@ namespace aug {
                   chans_(null),
                   current_(null),
                   grace_(timers_),
-                  state_(STARTED)
+                  state_(STARTED),
 #if ENABLE_MULTICAST
-                ,
+                  mpacket_(node),
                   mcastsd_(null),
                   mcastep_(null),
                   cluster_(getclock(aug_tlx), 8, 2000),
                   mwait_(timers, null)
-#endif // ENABLE_MULTICAST
+#else // !ENABLE_MULTICAST
+                  node_(node)
+#endif // !ENABLE_MULTICAST
             {
                 chandler_.reset(this);
                 chans tmp(getmpool(aug_tlx), chandler_);
@@ -656,9 +657,9 @@ engine::~engine() AUG_NOTHROW
 }
 
 AUGASPP_API
-engine::engine(aug_muxer_t muxer, aug_events_t events, aug_timers_t timers,
-               enginecb_base& cb)
-    : impl_(new (tlx) detail::engineimpl(muxer, events, timers, cb))
+engine::engine(const char* node, aug_muxer_t muxer, aug_events_t events,
+               aug_timers_t timers, enginecb_base& cb)
+    : impl_(new (tlx) detail::engineimpl(node, muxer, events, timers, cb))
 {
 }
 
@@ -680,8 +681,7 @@ engine::clear()
 }
 
 AUGASPP_API void
-engine::join(const char* node, const char* addr, unsigned short port,
-             const char* ifname)
+engine::join(const char* addr, unsigned short port, const char* ifname)
 {
 #if ENABLE_MULTICAST
     inetaddr in(addr);
@@ -707,8 +707,6 @@ engine::join(const char* node, const char* addr, unsigned short port,
     // TODO: is this needed?
 
     impl_->mwait_.set(impl_->cluster_.expiry(), *impl_);
-
-    impl_->mpacket_.setnode(node);
 
 	setmdeventmask(impl_->muxer_, sd, AUG_MDEVENTRDEX);
     impl_->mcastsd_ = sd;
@@ -1084,7 +1082,7 @@ engine::emit(const char* type, const void* buf, size_t len)
     // Add uri scheme to session name.
 
     string from("node:");
-    from += "augd";//node;
+    from += impl_->node_;
 
     vector<sessionptr> sessions;
     impl_->sessions_.getsessions(sessions);
@@ -1093,7 +1091,7 @@ engine::emit(const char* type, const void* buf, size_t len)
         end(sessions.end());
     for (; it != end; ++it)
         (*it)->event(from.c_str(), type, 0, blob);
-#endif // ENABLE_MULTICAST
+#endif // !ENABLE_MULTICAST
 }
 
 AUGASPP_API bool

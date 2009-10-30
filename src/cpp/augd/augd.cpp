@@ -230,7 +230,8 @@ namespace {
         impl(char* frobpass)
             : muxer_(getmpool(aug_tlx)),
               timers_(getmpool(aug_tlx), getclock(aug_tlx)),
-              engine_(muxer_, aug_events(), timers_, enginecb_)
+              engine_(options_.get("cluster.node", "augd"), muxer_,
+                      aug_events(), timers_, enginecb_)
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
 
@@ -270,9 +271,8 @@ namespace {
 
                     // Optional.
 
-                    const char* node(options_.get("cluster.node", "augd"));
                     const char* ifname(options_.get("cluster.ifname", 0));
-                    engine_.join(node, mcast,
+                    engine_.join(mcast,
                                  static_cast<unsigned short>(atoi(port)),
                                  ifname);
                 }

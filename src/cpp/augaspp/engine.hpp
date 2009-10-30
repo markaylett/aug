@@ -73,15 +73,14 @@ namespace aug {
     public:
         ~engine() AUG_NOTHROW;
 
-        engine(aug_muxer_t muxer, aug_events_t events, aug_timers_t timers,
-               enginecb_base& cb);
+        engine(const char* node, aug_muxer_t muxer, aug_events_t events,
+               aug_timers_t timers, enginecb_base& cb);
 
         void
         clear();
 
         void
-        join(const char* node, const char* addr, unsigned short port,
-             const char* ifname);
+        join(const char* addr, unsigned short port, const char* ifname);
 
         void
         insert(const std::string& name, const sessionptr& session,
