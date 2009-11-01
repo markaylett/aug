@@ -216,7 +216,6 @@ namespace aug {
                 // TODO: increment after send.
                 ++seqno_;
                 time_ = static_cast<uint64_t>(time(0) * 1000);
-                flags_ = 0;
                 type_ = static_cast<uint16_t>(type);
 
                 char buf[AUG_PACKETSIZE];
@@ -228,25 +227,18 @@ namespace aug {
             packet(const char* node)
             {
                 proto_ = 1;
-                aug_strlcpy(chan_, node, sizeof(chan_));
+                aug_strlcpy(node_, node, sizeof(node_));
                 seqno_ = 0;
                 time_ = 0;
-                flags_ = 0;
                 type_ = 0;
+                size_ = 0;
             }
             size_t
             emit(sdref ref, unsigned type, const void* buf, size_t len,
                  const endpoint& ep)
             {
-                // Truncate to max data size (less length).
-                len = AUG_MIN(len, sizeof(data_) - 4);
-                // Data prefixed with length.
-                aug_encode32(len, data_);
-                memcpy(data_ + 4, buf, len);
-                // Data plus length.
-                len += 4;
-                // Zero pad.
-                memset(data_ + len, 0, sizeof(data_) - len);
+                len = AUG_MIN(len, sizeof(data_));
+                memcpy(data_, buf, len);
                 return sendhead(ref, type, ep);
             }
         };
@@ -295,7 +287,7 @@ namespace aug {
 
             engineimpl(const char* node, aug_muxer_t muxer,
                        aug_events_t events, aug_timers_t timers,
-                       enginecb_base& cb)
+                       enginecb_base& cb, unsigned timeout)
                 : muxer_(muxer),
                   events_(events),
                   timers_(timers),
@@ -308,7 +300,7 @@ namespace aug {
                   mpacket_(node),
                   mcastsd_(null),
                   mcastep_(null),
-                  cluster_(getclock(aug_tlx), 8, 2000),
+                  cluster_(getclock(aug_tlx), 8, timeout),
                   mwait_(timers, null)
 #else // !ENABLE_MULTICAST
                   node_(node)
@@ -598,14 +590,13 @@ namespace aug {
                     string type;
                     if (!types_.getbyid(pkt.type_, type))
                         continue;
-                    const uint32_t len(aug_decode32(pkt.data_));
-                    blobptr blob(createblob(getmpool(aug_tlx), pkt.data_ + 4,
-                                            len));
+                    blobptr blob(createblob(getmpool(aug_tlx), pkt.data_,
+                                            pkt.size_));
 
                     // Add uri scheme to session name.
 
                     string from("node:");
-                    from += pkt.chan_;
+                    from += pkt.node_;
 
                     vector<sessionptr> sessions;
                     sessions_.getsessions(sessions);
@@ -658,8 +649,9 @@ engine::~engine() AUG_NOTHROW
 
 AUGASPP_API
 engine::engine(const char* node, aug_muxer_t muxer, aug_events_t events,
-               aug_timers_t timers, enginecb_base& cb)
-    : impl_(new (tlx) detail::engineimpl(node, muxer, events, timers, cb))
+               aug_timers_t timers, enginecb_base& cb, unsigned timeout)
+    : impl_(new (tlx) detail::engineimpl(node, muxer, events, timers, cb,
+                                         timeout))
 {
 }
 
@@ -1072,7 +1064,6 @@ AUGASPP_API void
 engine::emit(const char* type, const void* buf, size_t len)
 {
 #if ENABLE_MULTICAST
-	auto_ptr<int> p;
     unsigned id;
     if (impl_->types_.getbyname(type, id))
         impl_->mpacket_.emit(impl_->mcastsd_, id, buf, len, impl_->mcastep_);

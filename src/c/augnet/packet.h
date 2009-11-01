@@ -44,24 +44,24 @@
  *
  *   4: magic
  *   2: proto
- * 128: chan
+ * 128: node
  *   4: seqno
  *   8: time
- *   2: flags
  *   2: type
- * 362: data
+ *   2: size
+ * 360: data
  *
  * @{
  */
 
 #define AUG_PKTMAGICSIZE 4
 #define AUG_PKTPROTOSIZE sizeof(uint16_t)
-#define AUG_PKTCHANLEN   AUG_MAXADDRLEN
+#define AUG_PKTNODELEN   AUG_MAXADDRLEN
 #define AUG_PKTSEQNOSIZE sizeof(uint32_t)
 #define AUG_PKTTIMESIZE  sizeof(uint64_t)
-#define AUG_PKTFLAGSSIZE sizeof(uint16_t)
 #define AUG_PKTTYPESIZE  sizeof(uint16_t)
-#define AUG_PKTDATASIZE  362
+#define AUG_PKTSIZESIZE  sizeof(uint16_t)
+#define AUG_PKTDATASIZE  360
 
 /** @} */
 
@@ -75,12 +75,12 @@
 
 #define AUG_PKTMAGICOFF  0
 #define AUG_PKTPROTOOFF  (AUG_PKTMAGICOFF + AUG_PKTMAGICSIZE)
-#define AUG_PKTCHANOFF   (AUG_PKTPROTOOFF + AUG_PKTPROTOSIZE)
-#define AUG_PKTSEQNOOFF  (AUG_PKTCHANOFF + AUG_PKTCHANLEN)
+#define AUG_PKTNODEOFF   (AUG_PKTPROTOOFF + AUG_PKTPROTOSIZE)
+#define AUG_PKTSEQNOOFF  (AUG_PKTNODEOFF + AUG_PKTNODELEN)
 #define AUG_PKTTIMEOFF   (AUG_PKTSEQNOOFF + AUG_PKTSEQNOSIZE)
-#define AUG_PKTFLAGSOFF  (AUG_PKTTIMEOFF + AUG_PKTTIMESIZE)
-#define AUG_PKTTYPEOFF   (AUG_PKTFLAGSOFF + AUG_PKTFLAGSSIZE)
-#define AUG_PKTDATAOFF   (AUG_PKTTYPEOFF + AUG_PKTTYPESIZE)
+#define AUG_PKTTYPEOFF   (AUG_PKTTIMEOFF + AUG_PKTTIMESIZE)
+#define AUG_PKTSIZEOFF   (AUG_PKTTYPEOFF + AUG_PKTTYPESIZE)
+#define AUG_PKTDATAOFF   (AUG_PKTSIZEOFF + AUG_PKTSIZESIZE)
 
 /** @} */
 
@@ -90,10 +90,10 @@
 
 struct aug_packet {
     uint16_t proto_;
-    char chan_[AUG_PKTCHANLEN + 1];
+    char node_[AUG_PKTNODELEN + 1];
     uint32_t seqno_;
     uint64_t time_;
-    uint16_t flags_, type_;
+    uint16_t type_, size_;
     char data_[AUG_PKTDATASIZE];
 };
 

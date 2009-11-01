@@ -52,10 +52,10 @@ unpackstring_(char* dst, const char* src, size_t size)
 AUGNET_API aug_result
 aug_verifypacket(const struct aug_packet* packet)
 {
-    if ('\0' == packet->chan_[0]) {
+    if ('\0' == packet->node_[0]) {
 
         aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
-                       AUG_MSG("empty channel name"));
+                       AUG_MSG("empty node name"));
         return AUG_FAILERROR;
     }
 
@@ -65,16 +65,23 @@ aug_verifypacket(const struct aug_packet* packet)
 AUGNET_API char*
 aug_encodepacket(const struct aug_packet* pkt, char* buf)
 {
+    uint16_t size;
+
     memcpy(buf + AUG_PKTMAGICOFF, MAGIC_, AUG_PKTMAGICSIZE);
 
     aug_encode16(pkt->proto_, buf + AUG_PKTPROTOOFF);
-    packstring_(pkt->chan_, buf + AUG_PKTCHANOFF, AUG_PKTCHANLEN);
+    packstring_(pkt->node_, buf + AUG_PKTNODEOFF, AUG_PKTNODELEN);
     aug_encode32(pkt->seqno_, buf + AUG_PKTSEQNOOFF);
     aug_encode64(pkt->time_, buf + AUG_PKTTIMEOFF);
-    aug_encode16(pkt->flags_, buf + AUG_PKTFLAGSOFF);
     aug_encode16(pkt->type_, buf + AUG_PKTTYPEOFF);
 
-    memcpy(buf + AUG_PKTDATAOFF, pkt->data_, sizeof(pkt->data_));
+    size = AUG_MIN(pkt->size_, sizeof(pkt->data_));
+    aug_encode16(size, buf + AUG_PKTSIZEOFF);
+
+    memcpy(buf + AUG_PKTDATAOFF, pkt->data_, size);
+    /* Zero pad. */
+    if (size < sizeof(pkt->data_))
+        memset(buf + size, 0, sizeof(pkt->data_) - size);
     return buf;
 }
 
@@ -88,12 +95,15 @@ aug_decodepacket(const char* buf, struct aug_packet* pkt)
     }
 
     pkt->proto_ = aug_decode16(buf + AUG_PKTPROTOOFF);
-    unpackstring_(pkt->chan_, buf + AUG_PKTCHANOFF, AUG_PKTCHANLEN);
+    unpackstring_(pkt->node_, buf + AUG_PKTNODEOFF, AUG_PKTNODELEN);
     pkt->seqno_ = aug_decode32(buf + AUG_PKTSEQNOOFF);
     pkt->time_ = aug_decode64(buf + AUG_PKTTIMEOFF);
-    pkt->flags_ = aug_decode16(buf + AUG_PKTFLAGSOFF);
     pkt->type_ = aug_decode16(buf + AUG_PKTTYPEOFF);
 
+    /* Be defensize with data from wire. */
+
+    pkt->size_ = AUG_MIN(aug_decode16(buf + AUG_PKTSIZEOFF),
+                         sizeof(pkt->data_));
     memcpy(pkt->data_, buf + AUG_PKTDATAOFF, sizeof(pkt->data_));
     return pkt;
 }

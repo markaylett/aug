@@ -221,6 +221,10 @@ namespace {
                 // Discard any packets that fall to the left of the window.
                 // In most cases, these can be dismissed as duplicates.
 
+                // TODO: This could also happen when a node resets its
+                // sequence numbers - perhaps when it is restarted.  Is there
+                // a way to detect this condition?
+
                 long diff(seqno - begin_);
                 if (diff < 0)
                     throw underflow_exception();;
@@ -522,7 +526,7 @@ cluster::insert(const aug_packet& pkt)
     aug_timeval now;
     gettimeofday(impl_->clock_, now);
 
-    const string key(pkt.chan_, sizeof(pkt.chan_));
+    const string key(pkt.node_, sizeof(pkt.node_));
     map<string, nodeptr>::iterator it(impl_->nodes_.find(key));
     if (it == impl_->nodes_.end()) {
 

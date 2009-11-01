@@ -38,11 +38,11 @@ heartbeat_(char* buf)
 {
     aug_packet pkt;
     pkt.proto_ = 1;
-    aug_strlcpy(pkt.chan_, "mcastsend", sizeof(pkt.chan_));
+    aug_strlcpy(pkt.node_, "mcastsend", sizeof(pkt.node_));
     pkt.seqno_ = ++seq_;
     pkt.time_ = time(0) * 1000;
-    pkt.flags_ = 0;
     pkt.type_ = 1;
+    pkt.size_ = 0;
     aug_encodepacket(&pkt, buf);
     return buf;
 }

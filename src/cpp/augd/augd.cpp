@@ -231,7 +231,8 @@ namespace {
             : muxer_(getmpool(aug_tlx)),
               timers_(getmpool(aug_tlx), getclock(aug_tlx)),
               engine_(options_.get("cluster.node", "augd"), muxer_,
-                      aug_events(), timers_, enginecb_)
+                      aug_events(), timers_, enginecb_,
+                      strtoui(options_.get("cluster.timeout", "2000"), 10))
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
 

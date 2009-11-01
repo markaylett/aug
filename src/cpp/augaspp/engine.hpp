@@ -74,7 +74,7 @@ namespace aug {
         ~engine() AUG_NOTHROW;
 
         engine(const char* node, aug_muxer_t muxer, aug_events_t events,
-               aug_timers_t timers, enginecb_base& cb);
+               aug_timers_t timers, enginecb_base& cb, unsigned timeout);
 
         void
         clear();
