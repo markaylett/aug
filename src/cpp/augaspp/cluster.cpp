@@ -297,10 +297,9 @@ namespace {
         }
 
         void
-        reset(const aug_packet& pkt, const aug_timeval& tv)
+        reset()
         {
             state_ = RESET;
-            insert(pkt, tv);
         }
 
         void
@@ -434,13 +433,13 @@ namespace {
         }
 
         void
-        reset(const aug_packet& pkt, const aug_timeval& now)
+        reset(const aug_timeval& now)
         {
             expiry_.tv_sec = now.tv_sec;
             expiry_.tv_usec = now.tv_usec;
             tvadd(expiry_, timeout_);
 
-            window_.reset(pkt, now);
+            window_.reset();
         }
 
         void
@@ -535,42 +534,53 @@ cluster::insert(const aug_packet& pkt)
         it = impl_->nodes_.insert
             (make_pair(key, nodeptr
                        (new node(impl_->size_, now, impl_->timeout_)))).first;
-    }
 
-    if (AUG_PKTRESET == pkt.type_) {
+    } else if (AUG_PKTRESET == pkt.type_) {
 
         // Explicit reset packet.
 
         // Note: any packets sent after the reset packet that are received
         // out-of-order will be lost.  The timeout mechanism will handle the
-        // recovery.
+        // subsequent recovery.
 
-        it->second->reset(pkt, now);
-
-    } else {
-
-        try {
-            it->second->insert(pkt, now);
-        } catch (const overflow_exception& e) {
-            aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
-            it->second->reset(pkt, now);
-        } catch (const underflow_exception&) {
-            return false;
-        }
+        it->second->reset(now);
     }
 
+    try {
+        it->second->insert(pkt, now);
+    } catch (const overflow_exception& e) {
+        aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
+        it->second->reset(now);
+        it->second->insert(pkt, now);
+    } catch (const underflow_exception&) {
+        return false;
+    }
+
+    bool erase = false;
     try {
         aug_packet out;
         while (it->second->next(out, now)) {
 
-            // Includes session-level messages.
+            // Including session-level messages.
 
             impl_->pending_.push(out);
+
+            // True when last packet is fin.
+
+            erase = AUG_PKTFIN == out.type_;
         }
     } catch (const timeout_exception& e) {
-        aug_ctxwarn(aug_tlx, "erasing: %s", e.what());
-        impl_->nodes_.erase(it);
+
+        aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
+
+        // Force erase.
+
+        erase = true;
     }
+
+    if (erase)
+        impl_->nodes_.erase(it);
+
     return true;
 }
 

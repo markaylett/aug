@@ -112,7 +112,6 @@ namespace {
         sendhead(sdref ref, unsigned type, const endpoint& ep)
         {
             seqno_ = nextseq(100);
-            time_ = static_cast<uint64_t>(time(0) * 1000);
             type_ = static_cast<uint16_t>(type);
 
             char buf[AUG_PACKETSIZE];
@@ -126,7 +125,6 @@ namespace {
             proto_ = 1;
             aug_strlcpy(node_, node, sizeof(node_));
             seqno_ = 0;
-            time_ = 0;
             type_ = 0;
             size_ = 0;
         }
