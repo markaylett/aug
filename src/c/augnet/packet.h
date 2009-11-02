@@ -85,6 +85,21 @@
 /** @} */
 
 /**
+ * @defgroup PacketTypes Packet Types
+ *
+ * @ingroup Packet
+ *
+ * @{
+ */
+
+#define AUG_PKTRESET 0
+#define AUG_PKTFIN   1
+#define AUG_PKTHBEAT 2
+#define AUG_PKTUSER  0x10
+
+/** @} */
+
+/**
  * Packet structure.
  */
 

@@ -537,19 +537,36 @@ cluster::insert(const aug_packet& pkt)
                        (new node(impl_->size_, now, impl_->timeout_)))).first;
     }
 
-    try {
-        it->second->insert(pkt, now);
-    } catch (const overflow_exception& e) {
-        aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
+    if (AUG_PKTRESET == pkt.type_) {
+
+        // Explicit reset packet.
+
+        // Note: any packets sent after the reset packet that are received
+        // out-of-order will be lost.  The timeout mechanism will handle the
+        // recovery.
+
         it->second->reset(pkt, now);
-    } catch (const underflow_exception&) {
-        return false;
+
+    } else {
+
+        try {
+            it->second->insert(pkt, now);
+        } catch (const overflow_exception& e) {
+            aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
+            it->second->reset(pkt, now);
+        } catch (const underflow_exception&) {
+            return false;
+        }
     }
 
     try {
         aug_packet out;
-        while (it->second->next(out, now))
+        while (it->second->next(out, now)) {
+
+            // Includes session-level messages.
+
             impl_->pending_.push(out);
+        }
     } catch (const timeout_exception& e) {
         aug_ctxwarn(aug_tlx, "erasing: %s", e.what());
         impl_->nodes_.erase(it);
