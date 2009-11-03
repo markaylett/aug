@@ -209,35 +209,27 @@ namespace aug {
             }
         };
 
-        class packet : aug_packet, public mpool_ops {
-            size_t
-            sendhead(sdref ref, unsigned type, const endpoint& ep)
-            {
-                // TODO: increment after send.
-                ++seqno_;
-                type_ = static_cast<uint16_t>(type);
-
-                char buf[AUG_PACKETSIZE];
-                aug_encodepacket(static_cast<aug_packet*>(this), buf);
-                return aug::sendto(ref, buf, sizeof(buf), 0, ep);
-            }
+        class packet : public mpool_ops {
+            char node_[AUG_PKTNODELEN + 1];
+            seqno_t seqno_;
         public:
             explicit
             packet(const char* node)
             {
-                proto_ = 1;
                 aug_strlcpy(node_, node, sizeof(node_));
                 seqno_ = 0;
-                type_ = 0;
-                size_ = 0;
             }
             size_t
-            emit(sdref ref, unsigned type, const void* buf, size_t len,
+            emit(sdref ref, unsigned type, const void* data, unsigned size,
                  const endpoint& ep)
             {
-                len = AUG_MIN(len, sizeof(data_));
-                memcpy(data_, buf, len);
-                return sendhead(ref, type, ep);
+                struct aug_packet pkt;
+                size = AUG_MIN(size, sizeof(pkt.data_));
+                aug_setpacket(node_, ++seqno_, type, data, size, &pkt);
+
+                char buf[AUG_PACKETSIZE];
+                aug_encodepacket(&pkt, buf);
+                return aug::sendto(ref, buf, sizeof(buf), 0, ep);
             }
         };
 

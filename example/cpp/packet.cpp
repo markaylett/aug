@@ -107,38 +107,26 @@ namespace {
         stop_ = true;
     }
 
-    class packet : aug_packet, public mpool_ops {
-        size_t
-        sendhead(sdref ref, unsigned type, const endpoint& ep)
-        {
-            seqno_ = nextseq(100);
-            type_ = static_cast<uint16_t>(type);
-
-            char buf[AUG_PACKETSIZE];
-            aug_encodepacket(static_cast<aug_packet*>(this), buf);
-            return aug::sendto(ref, buf, sizeof(buf), 0, ep);
-        }
+    class packet : public mpool_ops {
+        char node_[AUG_PKTNODELEN + 1];
+        seqno_t seqno_;
     public:
         explicit
         packet(const char* node)
         {
-            proto_ = 1;
             aug_strlcpy(node_, node, sizeof(node_));
             seqno_ = 0;
-            type_ = 0;
-            size_ = 0;
         }
         size_t
         sendhbeat(sdref ref, const endpoint& ep)
         {
-            return sendhead(ref, 1, ep);
-        }
-        size_t
-        sendevent(sdref ref, const char* data,
-                  const endpoint& ep)
-        {
-            aug_strlcpy(data_, data, sizeof(data_));
-            return sendhead(ref, 2, ep);
+            struct aug_packet pkt;
+            seqno_ = nextseq(100);
+            aug_setpacket(node_, seqno_, AUG_PKTHBEAT, 0, 0, &pkt);
+
+            char buf[AUG_PACKETSIZE];
+            aug_encodepacket(&pkt, buf);
+            return aug::sendto(ref, buf, sizeof(buf), 0, ep);
         }
         seqno_t
         seqno() const

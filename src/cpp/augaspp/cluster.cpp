@@ -191,22 +191,32 @@ namespace {
 
             if (RESET == state_) {
 
-                // To seed the first packet, choose an initial insertion point
-                // half way through the window.  This allows some space before
-                // the first item to deal with out of order conditions.  This
-                // can occur, for example, where the first packet is received
-                // out of order, so that the next packet actually has a lower
-                // sequence number.
-
-                const seqno_t inset((size_ - 1) / 2);
-                if (inset < seqno) {
-                    begin_ = seqno - inset;
-                } else {
-
-                    // Seed with the actual sequence number if it is less than
-                    // the insertion point.
+                if (AUG_PKTRESET == pkt.type_) {
 
                     begin_ = seqno;
+                    state_ = READY;
+
+                } else {
+
+                    // To seed the first packet, choose an initial insertion
+                    // point half way through the window.  This allows some
+                    // space before the first item to deal with out of order
+                    // conditions.  This can occur, for example, where the
+                    // first packet is received out of order, so that the next
+                    // packet actually has a lower sequence number.
+
+                    const seqno_t inset((size_ - 1) / 2);
+                    if (seqno <= inset) {
+
+                        // Seed with the actual sequence number when the
+                        // sequence number is less than the insertion point.
+
+                        begin_ = seqno;
+
+                    } else
+                        begin_ = seqno - inset;
+
+                    state_ = SYNC;
                 }
 
                 AUG_CTXDEBUG2(aug_tlx, "seed from [%u] at offset [%u]",
@@ -214,7 +224,6 @@ namespace {
                               static_cast<unsigned>(inset));
 
                 end_ = begin_;
-                state_ = SYNC;
 
             } else {
 
@@ -492,13 +501,35 @@ namespace aug {
                 map<string, nodeptr>::iterator
                     it(nodes_.begin()), end(nodes_.end());
                 while (it != end) {
+                    aug_packet out;
                     try {
-                        aug_packet out;
-                        while (it->second->next(out, now))
+                        bool fin = false;
+                        while (it->second->next(out, now)) {
+
+                            // Including session-level messages.
+
                             pending_.push(out);
-                        ++it;
+
+                            // Fin is always last.
+
+                            if (AUG_PKTFIN == out.type_) {
+                                nodes_.erase(it++);
+                                fin = true;
+                                break;
+                            }
+                        }
+                        if (!fin)
+                            ++it;
                     } catch (const timeout_exception& e) {
-                        aug_ctxwarn(aug_tlx, "erasing: %s", e.what());
+
+                        aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
+
+                        // Synthetic fin packet.
+
+                        aug_setpacket(it->first.c_str(), 0, AUG_PKTFIN, 0, 0,
+                                      &out);
+                        pending_.push(out);
+
                         nodes_.erase(it++);
                     }
                 }
@@ -535,6 +566,17 @@ cluster::insert(const aug_packet& pkt)
             (make_pair(key, nodeptr
                        (new node(impl_->size_, now, impl_->timeout_)))).first;
 
+
+        if (AUG_PKTRESET != pkt.type_) {
+
+            // Synthetic reset packet.
+
+            // If the missing reset is subsequently received out of order, it
+            // will be dismissed as a duplicate.
+
+            aug_setpacket(it->first.c_str(), 0, AUG_PKTRESET, 0, 0, &out);
+        }
+
     } else if (AUG_PKTRESET == pkt.type_) {
 
         // Explicit reset packet.
@@ -557,29 +599,32 @@ cluster::insert(const aug_packet& pkt)
     }
 
     bool erase = false;
+    aug_packet out;
     try {
-        aug_packet out;
         while (it->second->next(out, now)) {
 
             // Including session-level messages.
 
             impl_->pending_.push(out);
 
-            // True when last packet is fin.
+            // Fin is always last.
 
-            erase = AUG_PKTFIN == out.type_;
+            if (AUG_PKTFIN == out.type_) {
+                impl_->nodes_.erase(it);
+                break;
+            }
         }
     } catch (const timeout_exception& e) {
 
         aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
 
-        // Force erase.
+        // Synthetic fin packet.
 
-        erase = true;
-    }
+        aug_setpacket(it->first.c_str(), 0, AUG_PKTFIN, 0, 0, &out);
+        impl_->pending_.push(out);
 
-    if (erase)
         impl_->nodes_.erase(it);
+    }
 
     return true;
 }

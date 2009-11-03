@@ -29,6 +29,7 @@ AUG_RCSID("$Id$");
 #include "augsys/endian.h"
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
+#include "augctx/string.h"
 
 #include <string.h>
 
@@ -53,6 +54,14 @@ AUGNET_API struct aug_packet*
 aug_setpacket(const char* node, unsigned seqno, unsigned type,
               const void* data, unsigned size, struct aug_packet* pkt)
 {
+    size = AUG_MIN(size, sizeof(pkt->data_));
+    pkt->proto_ = 1;
+    aug_strlcpy(pkt->node_, node, sizeof(pkt->node_));
+    pkt->seqno_ = (uint32_t)seqno;
+    pkt->type_ = (uint16_t)type;
+    pkt->size_ = (uint16_t)AUG_MIN(size, sizeof(pkt->data_));
+    if (size)
+        memcpy(pkt->data_, data, size);
     return pkt;
 }
 

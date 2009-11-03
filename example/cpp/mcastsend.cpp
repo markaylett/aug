@@ -31,19 +31,14 @@
 using namespace aug;
 using namespace std;
 
-static unsigned seq_ = 0;
+static unsigned seqno_ = 0;
 
 static char*
 heartbeat_(char* buf)
 {
     aug_packet pkt;
-    pkt.proto_ = 1;
-    aug_strlcpy(pkt.node_, "mcastsend", sizeof(pkt.node_));
-    pkt.seqno_ = ++seq_;
-    pkt.type_ = 1;
-    pkt.size_ = 0;
-    aug_encodepacket(&pkt, buf);
-    return buf;
+    aug_setpacket("mcastsend", ++seqno_, AUG_PKTHBEAT, 0, 0, &pkt);
+    return aug_encodepacket(&pkt, buf);
 }
 
 int
