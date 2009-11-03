@@ -29,9 +29,9 @@ modsched_LIBS = augnet augutil augmar augsys augctx
 modserver_OBJS = server.o
 modserver_LIBS = augctx
 
-all: all-aug
+all: all-base
 
-clean: clean-aug
+clean: clean-base
 
 bench: all
 	$(AUG_HOME)/bin/augd -f bench.conf test

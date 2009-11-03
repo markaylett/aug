@@ -576,9 +576,9 @@ Here is the complete \.{Makefile}:
 
 \.{modsample\_OBJS = modsample.o}
 
-\.{all: all-aug}
+\.{all: all-base}
 
-\.{clean: clean-aug}
+\.{clean: clean-base}
 
 \.{include \$(AUG\_HOME)/etc/aug.mk}
 
@@ -600,9 +600,9 @@ Each Module can specify a list of |OBJS|, |LDFLAGS| and |LIBS|:
 Finally, include the template makefile:
 
 \yskip
-\.{all: all-aug}
+\.{all: all-base}
 
-\.{clean: clean-aug}
+\.{clean: clean-base}
 
 \.{include \$(AUG\_HOME)/etc/aug.mk}
 

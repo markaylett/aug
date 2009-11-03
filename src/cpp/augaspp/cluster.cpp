@@ -184,6 +184,11 @@ namespace {
         void
         insert(const aug_packet& pkt, const aug_timeval& tv)
         {
+            if (AUG_PKTRESET == pkt.type_) {
+                reset(pkt, tv);
+                return;
+            }
+
             AUG_CTXDEBUG2(aug_tlx, "insert message [%u]",
                           static_cast<unsigned>(pkt.seqno_));
 
@@ -191,39 +196,30 @@ namespace {
 
             if (RESET == state_) {
 
-                if (AUG_PKTRESET == pkt.type_) {
+                // To seed the first packet, choose an initial insertion point
+                // half way through the window.  This allows some space before
+                // the first item to deal with out of order conditions.  This
+                // can occur, for example, where the first packet is received
+                // out of order, so that the next packet actually has a lower
+                // sequence number.
+
+                const seqno_t inset((size_ - 1) / 2);
+                if (seqno <= inset) {
+
+                    // Seed with the actual sequence number when the
+                    // sequence number is less than the insertion point.
 
                     begin_ = seqno;
-                    state_ = READY;
 
-                } else {
-
-                    // To seed the first packet, choose an initial insertion
-                    // point half way through the window.  This allows some
-                    // space before the first item to deal with out of order
-                    // conditions.  This can occur, for example, where the
-                    // first packet is received out of order, so that the next
-                    // packet actually has a lower sequence number.
-
-                    const seqno_t inset((size_ - 1) / 2);
-                    if (seqno <= inset) {
-
-                        // Seed with the actual sequence number when the
-                        // sequence number is less than the insertion point.
-
-                        begin_ = seqno;
-
-                    } else
-                        begin_ = seqno - inset;
-
-                    state_ = SYNC;
-                }
+                } else
+                    begin_ = seqno - inset;
 
                 AUG_CTXDEBUG2(aug_tlx, "seed from [%u] at offset [%u]",
                               static_cast<unsigned>(begin_),
                               static_cast<unsigned>(inset));
 
                 end_ = begin_;
+                state_ = SYNC;
 
             } else {
 
@@ -303,6 +299,24 @@ namespace {
 
             clear(m);
             return true;
+        }
+
+        void
+        reset(const aug_packet& pkt, const aug_timeval& tv)
+        {
+            AUG_CTXDEBUG2(aug_tlx, "reset message [%u]",
+                          static_cast<unsigned>(pkt.seqno_));
+
+            const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
+
+            begin_ = seqno;
+            end_ = seqno + 1;
+            state_ = READY;
+
+            message& m(ring_[seqno % size_]);
+            memcpy(&m.pkt_, &pkt, sizeof(m.pkt_));
+            m.tv_.tv_sec = tv.tv_sec;
+            m.tv_.tv_usec = tv.tv_usec;
         }
 
         void
@@ -402,7 +416,7 @@ namespace {
 
                     } else {
 
-                        // Move a ready state.
+                        // Move to a ready state.
 
                         window_.flush();
                         if (window_.empty()) {
@@ -467,7 +481,6 @@ namespace {
             return tvtoms(tvsub(tv, now));
         }
     };
-
 
     typedef smartptr<node> nodeptr;
 }
@@ -565,17 +578,6 @@ cluster::insert(const aug_packet& pkt)
         it = impl_->nodes_.insert
             (make_pair(key, nodeptr
                        (new node(impl_->size_, now, impl_->timeout_)))).first;
-
-
-        if (AUG_PKTRESET != pkt.type_) {
-
-            // Synthetic reset packet.
-
-            // If the missing reset is subsequently received out of order, it
-            // will be dismissed as a duplicate.
-
-            aug_setpacket(it->first.c_str(), 0, AUG_PKTRESET, 0, 0, &out);
-        }
 
     } else if (AUG_PKTRESET == pkt.type_) {
 

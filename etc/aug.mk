@@ -3,13 +3,27 @@
 
 # Standard tools.
 
+ifndef AR
 AR := ar
+endif
+ifndef CC
 CC := gcc
+endif
+ifndef CXX
 CXX := g++
+endif
+ifndef INSTALL
 INSTALL := install
+endif
+ifndef MKDIR
 MKDIR := mkdir
+endif
+ifndef RM
 RM := rm
+endif
+ifndef SHELL
 SHELL := sh
+endif
 
 INSTALLDIRS += bin include lib mod
 
@@ -417,24 +431,24 @@ $(foreach x,$(INSTALLDIRS),$(eval \
 
 .PHONY: all clean install uninstall check
 
-.PHONY: all-aug
-all-aug: all-subdirs $(targets_)
+.PHONY: all-base
+all-base: all-subdirs $(targets_)
 
-.PHONY: clean-aug
-clean-aug: clean-subdirs
+.PHONY: clean-base
+clean-base: clean-subdirs
 	$(RM) -f $(bins_) $(libs_) $(mods_) \
 	$(dll_cxxcrt_) $(clean_) $(objs_) $(deps_) *~
 
-.PHONY: install-aug
-install-aug: install-subdirs $(INSTALLDIRS:%=install-%)
+.PHONY: install-base
+install-base: install-subdirs $(INSTALLDIRS:%=install-%)
 
-.PHONY: uninstall-aug
-uninstall-aug: uninstall-subdirs $(INSTALLDIRS:%=uninstall-%)
+.PHONY: uninstall-base
+uninstall-base: uninstall-subdirs $(INSTALLDIRS:%=uninstall-%)
 
 #### Unit Tests ####
 
-.PHONY: check-aug
-check-aug: check-subdirs $(TESTS)
+.PHONY: check-base
+check-base: check-subdirs $(TESTS)
 	@all=0; failed=0; \
 	list='$(TESTS)'; \
 	if test -n "$$list"; then \

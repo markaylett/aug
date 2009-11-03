@@ -9,8 +9,8 @@ CXXMODULES = augintro
 
 augintro_OBJS = augintro.o
 
-all: all-aug
+all: all-base
 
-clean: clean-aug
+clean: clean-base
 
 include $(TOP_SRCDIR)/etc/aug.mk
