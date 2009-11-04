@@ -99,7 +99,7 @@ aug_encodepacket(const struct aug_packet* pkt, char* buf)
     memcpy(buf + AUG_PKTDATAOFF, pkt->data_, size);
     /* Zero pad. */
     if (size < sizeof(pkt->data_))
-        memset(buf + size, 0, sizeof(pkt->data_) - size);
+        memset(buf + AUG_PKTDATAOFF + size, 0, sizeof(pkt->data_) - size);
     return buf;
 }
 

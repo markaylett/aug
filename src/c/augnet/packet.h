@@ -49,7 +49,7 @@
  *   8: seqno
  *   2: type
  *   2: size
- * 370: buf
+ * 366: buf
  *
  * @{
  */
@@ -61,7 +61,7 @@
 #define AUG_PKTSEQNOSIZE sizeof(uint64_t)
 #define AUG_PKTTYPESIZE  sizeof(uint16_t)
 #define AUG_PKTSIZESIZE  sizeof(uint16_t)
-#define AUG_PKTDATASIZE  370
+#define AUG_PKTDATASIZE  366
 
 /** @} */
 

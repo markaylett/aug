@@ -545,7 +545,7 @@ cluster::insert(const aug_packet& pkt)
                        (new node(impl_->size_, now, impl_->timeout_)))).first;
 
         aug_setpacket(key.second.c_str(), key.first,
-                      0, AUG_PKTFIN, 0, 0, &out);
+                      0, AUG_PKTRESET, 0, 0, &out);
         impl_->pending_.push(out);
     }
 

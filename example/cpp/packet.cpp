@@ -151,6 +151,8 @@ namespace {
         {
             aug_packet pkt;
             while (cluster_.next(pkt)) {
+                if (AUG_PKTRESET == pkt.type_ || AUG_PKTFIN == pkt.type_)
+                    continue;
                 aug_ctxinfo(aug_tlx, "recv message [%u]",
                             static_cast<unsigned>(pkt.seqno_));
             }
