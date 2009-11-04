@@ -151,10 +151,20 @@ namespace {
         {
             aug_packet pkt;
             while (cluster_.next(pkt)) {
-                if (AUG_PKTRESET == pkt.type_ || AUG_PKTFIN == pkt.type_)
-                    continue;
-                aug_ctxinfo(aug_tlx, "recv message [%u]",
-                            static_cast<unsigned>(pkt.seqno_));
+                switch (pkt.type_) {
+                case AUG_PKTRESET:
+                    aug_ctxinfo(aug_tlx, "reset message [%u]",
+                                static_cast<unsigned>(pkt.seqno_));
+                    break;
+                case AUG_PKTFIN:
+                    aug_ctxinfo(aug_tlx, "fin message [%u]",
+                                static_cast<unsigned>(pkt.seqno_));
+                    break;
+                default:
+                    aug_ctxinfo(aug_tlx, "user message [%u]",
+                                static_cast<unsigned>(pkt.seqno_));
+                    break;
+                }
             }
             stringstream ss;
             cluster_.print(ss);
@@ -213,7 +223,7 @@ namespace {
             try {
                 for (;;)
                     recv();
-            } catch (const block_exception& e) {
+            } catch (const block_exception&) {
             }
             flush();
             rdwait_.set(cluster_.expiry(), *this);

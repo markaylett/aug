@@ -51,16 +51,16 @@ unpackstring_(char* dst, const char* src, size_t size)
 }
 
 AUGNET_API struct aug_packet*
-aug_setpacket(const char* node, unsigned sess, aug_seqno_t seqno,
-              unsigned type, const void* data, unsigned size,
+aug_setpacket(const char* node, unsigned sess, unsigned type,
+              aug_seqno_t seqno, const void* data, unsigned size,
               struct aug_packet* pkt)
 {
     size = AUG_MIN(size, sizeof(pkt->data_));
     pkt->proto_ = 1;
     aug_strlcpy(pkt->node_, node, sizeof(pkt->node_));
     pkt->sess_ = sess;
-    pkt->seqno_ = seqno;
     pkt->type_ = type;
+    pkt->seqno_ = seqno;
     pkt->size_ = AUG_MIN(size, sizeof(pkt->data_));
     if (size)
         memcpy(pkt->data_, data, size);
@@ -90,8 +90,8 @@ aug_encodepacket(const struct aug_packet* pkt, char* buf)
     aug_encode16(pkt->proto_, buf + AUG_PKTPROTOOFF);
     packstring_(pkt->node_, buf + AUG_PKTNODEOFF, AUG_PKTNODELEN);
     aug_encode32(pkt->sess_, buf + AUG_PKTSESSOFF);
-    aug_encode64(pkt->seqno_, buf + AUG_PKTSEQNOOFF);
     aug_encode16(pkt->type_, buf + AUG_PKTTYPEOFF);
+    aug_encode64(pkt->seqno_, buf + AUG_PKTSEQNOOFF);
 
     size = AUG_MIN(pkt->size_, sizeof(pkt->data_));
     aug_encode16(size, buf + AUG_PKTSIZEOFF);
@@ -115,8 +115,8 @@ aug_decodepacket(const char* buf, struct aug_packet* pkt)
     pkt->proto_ = aug_decode16(buf + AUG_PKTPROTOOFF);
     unpackstring_(pkt->node_, buf + AUG_PKTNODEOFF, AUG_PKTNODELEN);
     pkt->sess_ = aug_decode32(buf + AUG_PKTSESSOFF);
-    pkt->seqno_ = (aug_seqno_t)aug_decode64(buf + AUG_PKTSEQNOOFF);
     pkt->type_ = aug_decode16(buf + AUG_PKTTYPEOFF);
+    pkt->seqno_ = (aug_seqno_t)aug_decode64(buf + AUG_PKTSEQNOOFF);
 
     /* Be defensive with data from wire. */
 

@@ -494,6 +494,7 @@ namespace aug {
                     try {
                         while (it->second->next(out, now))
                             pending_.push(out);
+                        ++it;
                     } catch (const timeout_exception& e) {
 
                         aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
