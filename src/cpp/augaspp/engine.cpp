@@ -211,12 +211,14 @@ namespace aug {
 
         class packet : public mpool_ops {
             char node_[AUG_PKTNODELEN + 1];
-            seqno_t seqno_;
+            unsigned sess_;
+            aug_seqno_t seqno_;
         public:
             explicit
             packet(const char* node)
             {
                 aug_strlcpy(node_, node, sizeof(node_));
+                sess_ = getpid();
                 seqno_ = 0;
             }
             size_t
@@ -225,7 +227,7 @@ namespace aug {
             {
                 struct aug_packet pkt;
                 size = AUG_MIN(size, sizeof(pkt.data_));
-                aug_setpacket(node_, ++seqno_, type, data, size, &pkt);
+                aug_setpacket(node_, sess_, ++seqno_, type, data, size, &pkt);
 
                 char buf[AUG_PACKETSIZE];
                 aug_encodepacket(&pkt, buf);

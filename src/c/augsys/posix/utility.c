@@ -46,6 +46,6 @@ aug_threadid(void)
 #if ENABLE_THREADS
     return (unsigned)pthread_self();
 #else /* !ENABLE_THREADS */
-    return 0;
+    return getpid();
 #endif /* !ENABLE_THREADS */
 }

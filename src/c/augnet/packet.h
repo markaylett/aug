@@ -45,10 +45,11 @@
  *   4: magic
  *   2: proto
  * 128: node
- *   4: seqno
+ *   4: sess
+ *   8: seqno
  *   2: type
  *   2: size
- * 374: buf
+ * 370: buf
  *
  * @{
  */
@@ -56,10 +57,11 @@
 #define AUG_PKTMAGICSIZE 4
 #define AUG_PKTPROTOSIZE sizeof(uint16_t)
 #define AUG_PKTNODELEN   AUG_MAXADDRLEN
-#define AUG_PKTSEQNOSIZE sizeof(uint32_t)
+#define AUG_PKTSESSSIZE  sizeof(uint32_t)
+#define AUG_PKTSEQNOSIZE sizeof(uint64_t)
 #define AUG_PKTTYPESIZE  sizeof(uint16_t)
 #define AUG_PKTSIZESIZE  sizeof(uint16_t)
-#define AUG_PKTDATASIZE  374
+#define AUG_PKTDATASIZE  370
 
 /** @} */
 
@@ -74,7 +76,8 @@
 #define AUG_PKTMAGICOFF  0
 #define AUG_PKTPROTOOFF  (AUG_PKTMAGICOFF + AUG_PKTMAGICSIZE)
 #define AUG_PKTNODEOFF   (AUG_PKTPROTOOFF + AUG_PKTPROTOSIZE)
-#define AUG_PKTSEQNOOFF  (AUG_PKTNODEOFF + AUG_PKTNODELEN)
+#define AUG_PKTSESSOFF   (AUG_PKTNODEOFF + AUG_PKTNODELEN)
+#define AUG_PKTSEQNOOFF  (AUG_PKTSESSOFF + AUG_PKTSESSSIZE)
 #define AUG_PKTTYPEOFF   (AUG_PKTSEQNOOFF + AUG_PKTSEQNOSIZE)
 #define AUG_PKTSIZEOFF   (AUG_PKTTYPEOFF + AUG_PKTTYPESIZE)
 #define AUG_PKTDATAOFF   (AUG_PKTSIZEOFF + AUG_PKTSIZESIZE)
@@ -96,21 +99,25 @@
 
 /** @} */
 
+typedef unsigned long aug_seqno_t;
+
 /**
  * Packet structure.
  */
 
 struct aug_packet {
-    uint16_t proto_;
+    unsigned proto_;
     char node_[AUG_PKTNODELEN + 1];
-    uint32_t seqno_;
-    uint16_t type_, size_;
+    unsigned sess_;
+    aug_seqno_t seqno_;
+    unsigned type_, size_;
     char data_[AUG_PKTDATASIZE];
 };
 
 AUGNET_API struct aug_packet*
-aug_setpacket(const char* node, unsigned seqno, unsigned type,
-              const void* data, unsigned size, struct aug_packet* pkt);
+aug_setpacket(const char* node, unsigned sess, aug_seqno_t seqno,
+              unsigned type, const void* data, unsigned size,
+              struct aug_packet* pkt);
 
 /**
  * Verify that packet elements do not exceed limits.

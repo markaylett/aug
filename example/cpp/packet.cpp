@@ -109,12 +109,14 @@ namespace {
 
     class packet : public mpool_ops {
         char node_[AUG_PKTNODELEN + 1];
-        seqno_t seqno_;
+        unsigned sess_;
+        aug_seqno_t seqno_;
     public:
         explicit
         packet(const char* node)
         {
             aug_strlcpy(node_, node, sizeof(node_));
+            sess_ = getpid();
             seqno_ = 0;
         }
         size_t
@@ -122,13 +124,13 @@ namespace {
         {
             struct aug_packet pkt;
             seqno_ = nextseq(100);
-            aug_setpacket(node_, seqno_, AUG_PKTHBEAT, 0, 0, &pkt);
+            aug_setpacket(node_, sess_, seqno_, AUG_PKTHBEAT, 0, 0, &pkt);
 
             char buf[AUG_PACKETSIZE];
             aug_encodepacket(&pkt, buf);
             return aug::sendto(ref, buf, sizeof(buf), 0, ep);
         }
-        seqno_t
+        aug_seqno_t
         seqno() const
         {
             return seqno_;

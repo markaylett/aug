@@ -42,6 +42,6 @@ aug_threadid(void)
 #if ENABLE_THREADS
     return (unsigned)GetCurrentThreadId();
 #else /* !ENABLE_THREADS */
-    return 0;
+    return GetCurrentProcessId();
 #endif /* !ENABLE_THREADS */
 }

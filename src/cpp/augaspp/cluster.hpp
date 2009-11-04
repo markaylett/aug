@@ -35,8 +35,6 @@
 
 namespace aug {
 
-    typedef unsigned long seqno_t;
-
     namespace detail {
         struct clusterimpl;
     }

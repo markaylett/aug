@@ -130,7 +130,7 @@ namespace {
     class window {
         const unsigned size_;
         message* const ring_;
-        seqno_t begin_, end_;
+        aug_seqno_t begin_, end_;
         state state_;
 
         static void
@@ -184,15 +184,10 @@ namespace {
         void
         insert(const aug_packet& pkt, const aug_timeval& tv)
         {
-            if (AUG_PKTRESET == pkt.type_) {
-                reset(pkt, tv);
-                return;
-            }
-
             AUG_CTXDEBUG2(aug_tlx, "insert message [%u]",
                           static_cast<unsigned>(pkt.seqno_));
 
-            const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
+            const aug_seqno_t seqno(static_cast<aug_seqno_t>(pkt.seqno_));
 
             if (RESET == state_) {
 
@@ -203,11 +198,13 @@ namespace {
                 // out of order, so that the next packet actually has a lower
                 // sequence number.
 
-                const seqno_t inset((size_ - 1) / 2);
+                const aug_seqno_t inset((size_ - 1) / 2);
                 if (seqno <= inset) {
 
-                    // Seed with the actual sequence number when the
-                    // sequence number is less than the insertion point.
+                    // Seed with the actual sequence number when the sequence
+                    // number is less than the insertion point.  Sequence
+                    // number one, for example, would always be inserted at
+                    // position one.
 
                     begin_ = seqno;
 
@@ -225,10 +222,6 @@ namespace {
 
                 // Discard any packets that fall to the left of the window.
                 // In most cases, these can be dismissed as duplicates.
-
-                // TODO: This could also happen when a node resets its
-                // sequence numbers - perhaps when it is restarted.  Is there
-                // a way to detect this condition?
 
                 long diff(seqno - begin_);
                 if (diff < 0)
@@ -262,14 +255,14 @@ namespace {
                                       static_cast<unsigned>(begin_));
                         clear(ring_[begin_++ % size_]);
                     } while (0 < --diff);
-                    begin_ += static_cast<seqno_t>(diff);
+                    begin_ += static_cast<aug_seqno_t>(diff);
                 }
             }
             if (end_ <= seqno) {
 
                 // Clear gaps between the previous and latest packet.
 
-                for (seqno_t i(end_); i < seqno; ++i) {
+                for (aug_seqno_t i(end_); i < seqno; ++i) {
                     AUG_CTXDEBUG2(aug_tlx, "clear gap [%u]",
                                   static_cast<unsigned>(i));
                     clear(ring_[i % size_]);
@@ -302,24 +295,6 @@ namespace {
         }
 
         void
-        reset(const aug_packet& pkt, const aug_timeval& tv)
-        {
-            AUG_CTXDEBUG2(aug_tlx, "reset message [%u]",
-                          static_cast<unsigned>(pkt.seqno_));
-
-            const seqno_t seqno(static_cast<seqno_t>(pkt.seqno_));
-
-            begin_ = seqno;
-            end_ = seqno + 1;
-            state_ = READY;
-
-            message& m(ring_[seqno % size_]);
-            memcpy(&m.pkt_, &pkt, sizeof(m.pkt_));
-            m.tv_.tv_sec = tv.tv_sec;
-            m.tv_.tv_usec = tv.tv_usec;
-        }
-
-        void
         reset()
         {
             state_ = RESET;
@@ -336,7 +311,7 @@ namespace {
             // and '+' is a message.
 
             os << begin_;
-            for (seqno_t i(begin_); i < end_; ++i)
+            for (aug_seqno_t i(begin_); i < end_; ++i)
                 os << (empty(ring_[i % size_]) ? '-' : '+');
             switch (state_) {
             case RESET:
@@ -371,7 +346,8 @@ namespace {
         aug_timeval timeout_;
         aug_timeval expiry_;
     public:
-        node(unsigned size, const aug_timeval& now, unsigned timeout)
+        node(unsigned size, const aug_timeval& now,
+             unsigned timeout)
             : window_(size)
         {
             // 20% tolerance.
@@ -494,7 +470,7 @@ namespace aug {
             clockptr clock_;
             const unsigned size_;
             const unsigned timeout_;
-            map<string, nodeptr> nodes_;
+            map<pair<unsigned, string>, nodeptr> nodes_;
             queue<aug_packet> pending_;
 
             clusterimpl(clockref clock, unsigned size,
@@ -511,35 +487,21 @@ namespace aug {
                 aug_timeval now;
                 gettimeofday(clock_, now);
 
-                map<string, nodeptr>::iterator
+                map<pair<unsigned, string>, nodeptr>::iterator
                     it(nodes_.begin()), end(nodes_.end());
                 while (it != end) {
                     aug_packet out;
                     try {
-                        bool fin = false;
-                        while (it->second->next(out, now)) {
-
-                            // Including session-level messages.
-
+                        while (it->second->next(out, now))
                             pending_.push(out);
-
-                            // Fin is always last.
-
-                            if (AUG_PKTFIN == out.type_) {
-                                nodes_.erase(it++);
-                                fin = true;
-                                break;
-                            }
-                        }
-                        if (!fin)
-                            ++it;
                     } catch (const timeout_exception& e) {
 
                         aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
 
                         // Synthetic fin packet.
 
-                        aug_setpacket(it->first.c_str(), 0, AUG_PKTFIN, 0, 0,
+                        aug_setpacket(it->first.second.c_str(),
+                                      it->first.first, 0, AUG_PKTFIN, 0, 0,
                                       &out);
                         pending_.push(out);
 
@@ -568,9 +530,12 @@ cluster::insert(const aug_packet& pkt)
 {
     aug_timeval now;
     gettimeofday(impl_->clock_, now);
+    aug_packet out;
 
-    const string key(pkt.node_, sizeof(pkt.node_));
-    map<string, nodeptr>::iterator it(impl_->nodes_.find(key));
+    const pair<unsigned, string> key
+        (pkt.sess_, string(pkt.node_, sizeof(pkt.node_)));
+    map<pair<unsigned, string>, nodeptr>
+        ::iterator it(impl_->nodes_.find(key));
     if (it == impl_->nodes_.end()) {
 
         // Create new node.
@@ -579,15 +544,9 @@ cluster::insert(const aug_packet& pkt)
             (make_pair(key, nodeptr
                        (new node(impl_->size_, now, impl_->timeout_)))).first;
 
-    } else if (AUG_PKTRESET == pkt.type_) {
-
-        // Explicit reset packet.
-
-        // Note: any packets sent after the reset packet that are received
-        // out-of-order will be lost.  The timeout mechanism will handle the
-        // subsequent recovery.
-
-        it->second->reset(now);
+        aug_setpacket(key.second.c_str(), key.first,
+                      0, AUG_PKTFIN, 0, 0, &out);
+        impl_->pending_.push(out);
     }
 
     try {
@@ -600,29 +559,17 @@ cluster::insert(const aug_packet& pkt)
         return false;
     }
 
-    bool erase = false;
-    aug_packet out;
     try {
-        while (it->second->next(out, now)) {
-
-            // Including session-level messages.
-
+        while (it->second->next(out, now))
             impl_->pending_.push(out);
-
-            // Fin is always last.
-
-            if (AUG_PKTFIN == out.type_) {
-                impl_->nodes_.erase(it);
-                break;
-            }
-        }
     } catch (const timeout_exception& e) {
 
         aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
 
         // Synthetic fin packet.
 
-        aug_setpacket(it->first.c_str(), 0, AUG_PKTFIN, 0, 0, &out);
+        aug_setpacket(key.second.c_str(), key.first,
+                      0, AUG_PKTFIN, 0, 0, &out);
         impl_->pending_.push(out);
 
         impl_->nodes_.erase(it);
@@ -647,7 +594,7 @@ cluster::next(aug_packet& pkt)
 AUGASPP_API void
 cluster::print(ostream& os) const
 {
-    map<string, nodeptr>::const_iterator
+    map<pair<unsigned, string>, nodeptr>::const_iterator
         it(impl_->nodes_.begin()), end(impl_->nodes_.end());
     for (; it != end; ++it) {
         it->second->print(os);
@@ -662,7 +609,7 @@ cluster::expiry() const
     gettimeofday(impl_->clock_, now);
 
     unsigned min(numeric_limits<unsigned>::max());
-    map<string, nodeptr>::const_iterator
+    map<pair<unsigned, string>, nodeptr>::const_iterator
         it(impl_->nodes_.begin()), end(impl_->nodes_.end());
     for (; it != end; ++it) {
         const unsigned ms(it->second->expiry(now));
