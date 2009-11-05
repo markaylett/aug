@@ -87,9 +87,6 @@ namespace aug {
                const char* topics);
 
         void
-        insert(unsigned id, const std::string& name);
-
-        void
         cancelinactive();
 
         void

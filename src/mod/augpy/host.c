@@ -445,11 +445,11 @@ canceltimer_(PyObject* self, PyObject* args)
 static PyObject*
 emit_(PyObject* self, PyObject* args)
 {
-    const char* type;
+    unsigned short type;
     const char* buf;
     int len;
 
-    if (!PyArg_ParseTuple(args, "s|z#:emit", &type, &buf, &len))
+    if (!PyArg_ParseTuple(args, "H|z#:emit", &type, &buf, &len))
         return NULL;
 
     if (mod_emit(type, buf, len) < 0) {

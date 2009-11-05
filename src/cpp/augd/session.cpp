@@ -135,6 +135,14 @@ session::do_recv(mod_handle& sock, const char* buf,
 }
 
 void
+session::do_mrecv(const char* node, unsigned sess, unsigned short type,
+                  const void* buf, size_t len) const AUG_NOTHROW
+{
+    scoped_frame frame(this);
+    mod::mrecv(session_, node, sess, type, buf, len);
+}
+
+void
 session::do_error(mod_handle& sock, const char* desc) const AUG_NOTHROW
 {
     scoped_frame frame(this);

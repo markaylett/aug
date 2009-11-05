@@ -46,6 +46,7 @@ struct import_ {
     PyObject* connected_;
     PyObject* auth_;
     PyObject* recv_;
+    PyObject* mrecv_;
     PyObject* error_;
     PyObject* rdexpire_;
     PyObject* wrexpire_;
@@ -169,6 +170,7 @@ termimport_(struct import_* import)
     Py_XDECREF(import->rdexpire_);
     Py_XDECREF(import->error_);
     Py_XDECREF(import->recv_);
+    Py_XDECREF(import->mrecv_);
     Py_XDECREF(import->auth_);
     Py_XDECREF(import->connected_);
     Py_XDECREF(import->accepted_);
@@ -200,6 +202,7 @@ initimport_(struct import_* import, const char* sname)
     import->connected_ = getmethod_(import->module_, "connected");
     import->auth_ = getmethod_(import->module_, "auth");
     import->recv_ = getmethod_(import->module_, "recv");
+    import->mrecv_ = getmethod_(import->module_, "mrecv");
     import->error_ = getmethod_(import->module_, "error");
     import->rdexpire_ = getmethod_(import->module_, "rdexpire");
     import->wrexpire_ = getmethod_(import->module_, "wrexpire");
@@ -595,6 +598,21 @@ static void
 mrecv_(mod_session* ob, const char* node, unsigned sess, unsigned short type,
        const void* buf, size_t len)
 {
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    if (import->mrecv_) {
+
+        PyObject* x = PyBuffer_FromMemory((void*)buf, (int)len);
+        PyObject* y = PyObject_CallFunction(import->recv_, "sIHO", node,
+                                            sess, type, x);
+        Py_DECREF(x);
+
+        if (y) {
+            Py_DECREF(y);
+        } else
+            printerr_();
+    }
 }
 
 static void

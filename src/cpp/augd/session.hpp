@@ -73,6 +73,10 @@ namespace augd {
                 size_t size) const AUG_NOTHROW;
 
         void
+        do_mrecv(const char* node, unsigned sess, unsigned short type,
+                 const void* buf, size_t len) const AUG_NOTHROW;
+
+        void
         do_error(mod_handle& sock, const char* desc) const AUG_NOTHROW;
 
         void

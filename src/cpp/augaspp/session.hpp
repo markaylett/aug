@@ -78,6 +78,10 @@ namespace aug {
                 size_t size) const AUG_NOTHROW = 0;
 
         virtual void
+        do_mrecv(const char* node, unsigned sess, unsigned short type,
+                 const void* buf, size_t len) const AUG_NOTHROW = 0;
+
+        virtual void
         do_error(mod_handle& sock, const char* desc) const AUG_NOTHROW = 0;
 
         virtual void
@@ -149,6 +153,12 @@ namespace aug {
         recv(mod_handle& sock, const char* buf, size_t size) const AUG_NOTHROW
         {
             do_recv(sock, buf, size);
+        }
+        void
+        mrecv(const char* node, unsigned sess, unsigned short type,
+              const void* buf, size_t len) const AUG_NOTHROW
+        {
+            do_mrecv(node, sess, type, buf, len);
         }
         void
         error(mod_handle& sock, const char* desc) const AUG_NOTHROW

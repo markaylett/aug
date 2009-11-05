@@ -210,14 +210,14 @@ namespace aug {
 
         class packet : public mpool_ops {
             char node_[AUG_PKTNODELEN + 1];
-            unsigned sess_;
+            const unsigned sess_;
             aug_seqno_t seqno_;
         public:
             explicit
             packet(const char* node)
+                : sess_(getpid())
             {
                 aug_strlcpy(node_, node, sizeof(node_));
-                sess_ = getpid();
                 seqno_ = 0;
             }
             size_t
@@ -274,6 +274,7 @@ namespace aug {
             timer mwait_;
 #else // !ENABLE_MULTICAST
             const string node_;
+            const unsigned sess_;
 #endif // !ENABLE_MULTICAST
 
             engineimpl(const char* node, aug_muxer_t muxer,
@@ -294,7 +295,8 @@ namespace aug {
                   cluster_(getclock(aug_tlx), 8, timeout),
                   mwait_(timers, null)
 #else // !ENABLE_MULTICAST
-                  node_(node)
+                  node_(node),
+                  sess_(getpid())
 #endif // !ENABLE_MULTICAST
             {
                 chandler_.reset(this);
@@ -694,14 +696,6 @@ engine::insert(const string& name, const sessionptr& session,
 }
 
 AUGASPP_API void
-engine::insert(unsigned id, const std::string& name)
-{
-#if ENABLE_MULTICAST
-    impl_->types_.insert(id, name);
-#endif // ENABLE_MULTICAST
-}
-
-AUGASPP_API void
 engine::cancelinactive()
 {
     // Remove any timers allocated to sessions that could not be opened.
@@ -1053,7 +1047,7 @@ engine::emit(unsigned short type, const void* buf, size_t len)
     vector<sessionptr>::const_iterator it(sessions.begin()),
         end(sessions.end());
     for (; it != end; ++it)
-        (*it)->mrecv(impl->node_, impl->sess_, type, buf, len);
+        (*it)->mrecv(impl_->node_.c_str(), impl_->sess_, type, buf, len);
 #endif // !ENABLE_MULTICAST
 }
 

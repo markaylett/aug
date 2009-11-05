@@ -44,6 +44,7 @@ struct import_ {
     int connected_ : 1;
     int auth_ : 1;
     int recv_ : 1;
+    int mrecv_ : 1;
     int error_ : 1;
     int rdexpire_ : 1;
     int wrexpire_ : 1;
@@ -55,7 +56,7 @@ struct import_ {
 
 static ID stopid_, startid_, reconfid_, eventid_, closedid_,
     teardownid_, acceptedid_, connectedid_, authid_, recvid_,
-    errorid_, rdexpireid_, wrexpireid_, expireid_;
+    mrecvid_, errorid_, rdexpireid_, wrexpireid_, expireid_;
 
 static VALUE maugrb_ = Qnil;
 static VALUE chandle_ = Qnil;
@@ -308,6 +309,8 @@ initimport_(struct import_* import, const char* sname)
         = rb_respond_to(import->module_, authid_) ? 1 : 0;
     import->recv_
         = rb_respond_to(import->module_, recvid_) ? 1 : 0;
+    import->mrecv_
+        = rb_respond_to(import->module_, mrecvid_) ? 1 : 0;
     import->error_
         = rb_respond_to(import->module_, errorid_) ? 1 : 0;
     import->rdexpire_
@@ -627,10 +630,10 @@ emit_(int argc, VALUE* argv, VALUE self)
     rb_scan_args(argc, argv, "11", &type, &buf);
 
     if (Qnil == buf) {
-        result = mod_emit(RSTRING(type)->ptr, NULL, 0);
+        result = mod_emit(NUM2UINT(type), NULL, 0);
     } else {
         buf = StringValue(buf);
-        result = mod_emit(RSTRING(type)->ptr, RSTRING(buf)->ptr,
+        result = mod_emit(NUM2UINT(type), RSTRING(buf)->ptr,
                           RSTRING(buf)->len);
     }
 
@@ -694,6 +697,7 @@ initrb_(VALUE unused)
     connectedid_= rb_intern("connected");
     authid_= rb_intern("auth");
     recvid_= rb_intern("recv");
+    mrecvid_= rb_intern("mrecv");
     errorid_= rb_intern("error");
     rdexpireid_= rb_intern("rdexpire");
     wrexpireid_= rb_intern("wrexpire");
@@ -986,6 +990,19 @@ recv_(mod_session* ob, struct mod_handle* sock, const void* buf, size_t len)
 }
 
 static void
+mrecv_(mod_session* ob, const char* node, unsigned sess, unsigned short type,
+       const void* buf, size_t len)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    struct import_* import = &impl->import_;
+
+    if (import->mrecv_)
+        funcall4_(import->module_, mrecvid_, rb_str_new2(node),
+                  INT2FIX(sess), INT2FIX((unsigned)type),
+                  rb_tainted_str_new(buf, (long)len));
+}
+
+static void
 error_(mod_session* ob, struct mod_handle* sock, const char* desc)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
@@ -1028,12 +1045,6 @@ wrexpire_(mod_session* ob, struct mod_handle* sock, unsigned* ms)
         if (!except_ && FIXNUM_P(ret))
             *ms = FIX2UINT(ret);
     }
-}
-
-static void
-mrecv_(mod_session* ob, const char* node, unsigned sess, unsigned short type,
-       const void* buf, size_t len)
-{
 }
 
 static void
