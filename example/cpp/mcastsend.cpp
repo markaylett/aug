@@ -38,7 +38,7 @@ static char*
 heartbeat_(char* buf)
 {
     aug_packet pkt;
-    aug_setpacket("mcastsend", sess_, ++seqno_, AUG_PKTHBEAT, 0, 0, &pkt);
+    aug_setpacket("mcastsend", sess_, AUG_PKTHBEAT, ++seqno_, 0, 0, &pkt);
     return aug_encodepacket(&pkt, buf);
 }
 

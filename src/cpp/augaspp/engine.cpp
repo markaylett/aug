@@ -227,7 +227,8 @@ namespace aug {
             {
                 struct aug_packet pkt;
                 size = AUG_MIN(size, sizeof(pkt.data_));
-                aug_setpacket(node_, sess_, ++seqno_, type, data, size, &pkt);
+                aug_setpacket(node_, sess_, AUG_PKTUSER + type, ++seqno_,
+                              data, size, &pkt);
 
                 char buf[AUG_PACKETSIZE];
                 aug_encodepacket(&pkt, buf);

@@ -502,7 +502,7 @@ namespace aug {
                         // Synthetic fin packet.
 
                         aug_setpacket(it->first.second.c_str(),
-                                      it->first.first, 0, AUG_PKTFIN, 0, 0,
+                                      it->first.first, AUG_PKTFIN, 0, 0, 0,
                                       &out);
                         pending_.push(out);
 
@@ -546,7 +546,7 @@ cluster::insert(const aug_packet& pkt)
                        (new node(impl_->size_, now, impl_->timeout_)))).first;
 
         aug_setpacket(key.second.c_str(), key.first,
-                      0, AUG_PKTRESET, 0, 0, &out);
+                      AUG_PKTRESET, 0, 0, 0, &out);
         impl_->pending_.push(out);
     }
 
@@ -554,6 +554,11 @@ cluster::insert(const aug_packet& pkt)
         it->second->insert(pkt, now);
     } catch (const overflow_exception& e) {
         aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
+
+        aug_setpacket(key.second.c_str(), key.first,
+                      AUG_PKTGAP, 0, 0, 0, &out);
+        impl_->pending_.push(out);
+
         it->second->reset(now);
         it->second->insert(pkt, now);
     } catch (const underflow_exception&) {
@@ -570,7 +575,7 @@ cluster::insert(const aug_packet& pkt)
         // Synthetic fin packet.
 
         aug_setpacket(key.second.c_str(), key.first,
-                      0, AUG_PKTFIN, 0, 0, &out);
+                      AUG_PKTFIN, 0, 0, 0, &out);
         impl_->pending_.push(out);
 
         impl_->nodes_.erase(it);

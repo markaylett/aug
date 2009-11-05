@@ -124,7 +124,7 @@ namespace {
         {
             struct aug_packet pkt;
             seqno_ = nextseq(100);
-            aug_setpacket(node_, sess_, seqno_, AUG_PKTHBEAT, 0, 0, &pkt);
+            aug_setpacket(node_, sess_, AUG_PKTHBEAT, seqno_, 0, 0, &pkt);
 
             char buf[AUG_PACKETSIZE];
             aug_encodepacket(&pkt, buf);
