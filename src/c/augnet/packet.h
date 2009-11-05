@@ -92,11 +92,11 @@
  * @{
  */
 
-#define AUG_PKTRESET   1
-#define AUG_PKTFIN     2
-#define AUG_PKTGAP     3
-#define AUG_PKTHBEAT   4
-#define AUG_PKTUSER 0x10
+#define AUG_PKTUP     1
+#define AUG_PKTDOWN   2
+#define AUG_PKTGAP    3
+#define AUG_PKTHBEAT 16
+#define AUG_PKTUSER  17
 
 /** @} */
 

@@ -180,6 +180,46 @@ typedef int mod_rint;
 
 /** @} */
 
+/**
+ * @defgroup ModulePacketTypes Packet Types
+ *
+ * @ingroup Module
+ *
+ * @{
+ */
+
+/**
+ * Node is up.
+ */
+
+#define AUG_PKTUP      1
+
+/**
+ * Node is down.
+ */
+
+#define AUG_PKTDOWN    2
+
+/**
+ * Sequence number gap.
+ */
+
+#define AUG_PKTGAP     3
+
+/**
+ * Node heartbeat.
+ */
+
+#define AUG_PKTHBEAT  16
+
+/**
+ * User-defined type.
+ */
+
+#define AUG_PKTUSER   17
+
+/** @} */
+
 #define MOD_MAXNAME     63
 
 typedef int mod_id;

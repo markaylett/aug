@@ -163,6 +163,27 @@
       <param name="len" type="size_t"/>
     </method>
 
+    <method name="mrecv" type="void" qname="mrecv">
+
+      Inbound cluster packet.
+
+      @param node Originating node.
+
+      @param sess Node's session identifier.
+
+      @param type Packet type.
+
+      @param buf Data buffer.  May not be null terminated.
+
+      @param len Length of data buffer.
+
+      <param name="node" type="const char*"/>
+      <param name="sess" type="unsigned"/>
+      <param name="type" type="unsigned"/>
+      <param name="buf" type="const void*"/>
+      <param name="len" type="size_t"/>
+    </method>
+
     <method name="error" type="void" qname="error">
 
       Connection error.
