@@ -152,12 +152,16 @@ namespace {
             aug_packet pkt;
             while (cluster_.next(pkt)) {
                 switch (pkt.type_) {
-                case AUG_PKTRESET:
-                    aug_ctxinfo(aug_tlx, "reset message [%u]",
+                case AUG_PKTUP:
+                    aug_ctxinfo(aug_tlx, "up message [%u]",
                                 static_cast<unsigned>(pkt.seqno_));
                     break;
-                case AUG_PKTFIN:
-                    aug_ctxinfo(aug_tlx, "fin message [%u]",
+                case AUG_PKTDOWN:
+                    aug_ctxinfo(aug_tlx, "down message [%u]",
+                                static_cast<unsigned>(pkt.seqno_));
+                    break;
+                case AUG_PKTGAP:
+                    aug_ctxinfo(aug_tlx, "gap message [%u]",
                                 static_cast<unsigned>(pkt.seqno_));
                     break;
                 default:

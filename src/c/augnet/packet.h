@@ -110,14 +110,14 @@ struct aug_packet {
     unsigned proto_;
     char node_[AUG_PKTNODELEN + 1];
     unsigned sess_;
-    unsigned type_;
+    unsigned short type_;
     aug_seqno_t seqno_;
     unsigned size_;
     char data_[AUG_PKTDATASIZE];
 };
 
 AUGNET_API struct aug_packet*
-aug_setpacket(const char* node, unsigned sess, unsigned type,
+aug_setpacket(const char* node, unsigned sess, unsigned short type,
               aug_seqno_t seqno, const void* data, unsigned size,
               struct aug_packet* pkt);
 

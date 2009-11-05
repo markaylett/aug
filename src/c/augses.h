@@ -54,7 +54,7 @@ struct mod_sessionvtbl {
     void (*connected_)(mod_session*, struct mod_handle*, const char*);
     mod_bool (*auth_)(mod_session*, struct mod_handle*, const char*, const char*);
     void (*recv_)(mod_session*, struct mod_handle*, const void*, size_t);
-    void (*mrecv_)(mod_session*, const char*, unsigned, unsigned, const void*, size_t);
+    void (*mrecv_)(mod_session*, const char*, unsigned, unsigned short, const void*, size_t);
     void (*error_)(mod_session*, struct mod_handle*, const char*);
     void (*rdexpire_)(mod_session*, struct mod_handle*, unsigned*);
     void (*wrexpire_)(mod_session*, struct mod_handle*, unsigned*);
@@ -319,7 +319,7 @@ namespace mod {
             static_cast<T*>(this_->impl_)->recv_(*sock, buf, len);
         }
         static void
-        mrecv_(mod_session* this_, const char* node, unsigned sess, unsigned type, const void* buf, size_t len) AUG_NOTHROW
+        mrecv_(mod_session* this_, const char* node, unsigned sess, unsigned short type, const void* buf, size_t len) AUG_NOTHROW
         {
             static_cast<T*>(this_->impl_)->mrecv_(node, sess, type, buf, len);
         }
@@ -462,7 +462,7 @@ namespace mod {
     }
 
     inline void
-    mrecv(aug::obref<mod_session> this_, const char* node, unsigned sess, unsigned type, const void* buf, size_t len) AUG_NOTHROW
+    mrecv(aug::obref<mod_session> this_, const char* node, unsigned sess, unsigned short type, const void* buf, size_t len) AUG_NOTHROW
     {
         this_.get()->vtbl_->mrecv_(this_.get(), node, sess, type, buf, len);
     }
@@ -660,7 +660,7 @@ namespace mod {
             this->impl_.recv_(sock, buf, len);
         }
         void
-        mrecv_(const char* node, unsigned sess, unsigned type, const void* buf, size_t len) AUG_NOTHROW
+        mrecv_(const char* node, unsigned sess, unsigned short type, const void* buf, size_t len) AUG_NOTHROW
         {
             this->impl_.mrecv_(node, sess, type, buf, len);
         }
@@ -769,7 +769,7 @@ namespace mod {
             this->impl_.recv_(sock, buf, len);
         }
         void
-        mrecv_(const char* node, unsigned sess, unsigned type, const void* buf, size_t len) AUG_NOTHROW
+        mrecv_(const char* node, unsigned sess, unsigned short type, const void* buf, size_t len) AUG_NOTHROW
         {
             this->impl_.mrecv_(node, sess, type, buf, len);
         }

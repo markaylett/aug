@@ -236,27 +236,6 @@ namespace {
         {
             AUG_CTXDEBUG2(aug_tlx, "initialising daemon process");
 
-            // Cluster types set once on startup.
-
-            // Obtain list of types from config.  Default is null.
-
-            const char* value(options_.get("cluster.types", 0));
-            if (value) {
-
-                // For each id...
-
-                istringstream is(value);
-                unsigned id;
-                while (is >> id) {
-
-                    // Obtain type associated with id.
-
-                    stringstream ss;
-                    ss << "cluster.type." << id;
-                    engine_.insert(id, options_.get(ss.str()));
-                }
-            }
-
             // Assign state so that it is visible to callbacks during load_().
 
             impl_ = this;
@@ -597,9 +576,9 @@ namespace {
     }
 
     mod_result
-    emit_(const char* type, const void* buf, size_t len)
+    emit_(unsigned short type, const void* buf, size_t len)
     {
-        AUG_CTXDEBUG2(aug_tlx, "emit(): type=[%s]", type);
+        AUG_CTXDEBUG2(aug_tlx, "emit(): type=[%u]", (unsigned)type);
         try {
             impl_->engine_.emit(type, buf, len);
             return MOD_SUCCESS;

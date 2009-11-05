@@ -155,6 +155,11 @@ namespace {
             }
         }
         void
+        mrecv(const char* node, unsigned sess, unsigned short type,
+              const void* buf, size_t len)
+        {
+        }
+        void
         error(mod_handle& sock, const char* desc)
         {
             writelog(MOD_LOGERROR, "server error: %s", desc);

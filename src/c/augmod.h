@@ -505,7 +505,7 @@ struct mod_host {
      * @param len Length of data buffer.
      */
 
-    mod_result (*emit_)(const char* type, const void* buf, size_t len);
+    mod_result (*emit_)(unsigned short type, const void* buf, size_t len);
 };
 
 /** @} */

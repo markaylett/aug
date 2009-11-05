@@ -243,7 +243,7 @@ namespace mod {
     }
 
     inline void
-    emit(const char* type, const void* buf, size_t size)
+    emit(unsigned short type, const void* buf, size_t size)
     {
         if (mod_emit(type, buf, size) < 0)
             throw std::runtime_error(mod_geterror());
@@ -378,6 +378,14 @@ namespace mod {
         {
             try {
                 static_cast<T*>(this)->recv(sock, buf, len);
+            } MOD_WRITELOGCATCH;
+        }
+        void
+        mrecv_(const char* node, unsigned sess, unsigned short type,
+               const void* buf, size_t len) AUG_NOTHROW
+        {
+            try {
+                static_cast<T*>(this)->mrecv(node, sess, type, buf, len);
             } MOD_WRITELOGCATCH;
         }
         void

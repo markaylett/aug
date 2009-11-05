@@ -1031,6 +1031,12 @@ wrexpire_(mod_session* ob, struct mod_handle* sock, unsigned* ms)
 }
 
 static void
+mrecv_(mod_session* ob, const char* node, unsigned sess, unsigned short type,
+       const void* buf, size_t len)
+{
+}
+
+static void
 expire_(mod_session* ob, struct mod_handle* timer, unsigned* ms)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
@@ -1060,6 +1066,7 @@ static const struct mod_sessionvtbl vtbl_ = {
     connected_,
     auth_,
     recv_,
+    mrecv_,
     error_,
     rdexpire_,
     wrexpire_,

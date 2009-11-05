@@ -135,6 +135,14 @@ recv_(mod_session* ob, struct mod_handle* sock, const void* buf, size_t len)
 }
 
 static void
+mrecv_(mod_session* ob, const char* node, unsigned sess, unsigned short type,
+       const void* buf, size_t len)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
+    mod_writelog(MOD_LOGINFO, "%s: mrecv_()", impl->name_);
+}
+
+static void
 error_(mod_session* ob, struct mod_handle* sock, const char* desc)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
@@ -176,6 +184,7 @@ static const struct mod_sessionvtbl vtbl_ = {
     connected_,
     auth_,
     recv_,
+    mrecv_,
     error_,
     rdexpire_,
     wrexpire_,

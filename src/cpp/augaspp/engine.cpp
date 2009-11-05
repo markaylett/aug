@@ -33,7 +33,6 @@ AUG_RCSID("$Id$");
 #include "augaspp/sessions.hpp"
 #include "augaspp/socks.hpp"
 #include "augaspp/ssl.hpp"
-#include "augaspp/types.hpp"
 
 #include "augservpp/signal.hpp"
 
@@ -222,8 +221,8 @@ namespace aug {
                 seqno_ = 0;
             }
             size_t
-            emit(sdref ref, unsigned type, const void* data, unsigned size,
-                 const endpoint& ep)
+            emit(sdref ref, unsigned short type, const void* data,
+                 unsigned size, const endpoint& ep)
             {
                 struct aug_packet pkt;
                 size = AUG_MIN(size, sizeof(pkt.data_));
@@ -268,7 +267,6 @@ namespace aug {
             } state_;
 
 #if ENABLE_MULTICAST
-            types types_;
             packet mpacket_;
             autosd mcastsd_;
             endpoint mcastep_;
@@ -580,24 +578,14 @@ namespace aug {
                     aug_ctxinfo(aug_tlx, "mflush message [%u]",
                                 static_cast<unsigned>(pkt.seqno_));
 
-                    string type;
-                    if (!types_.getbyid(pkt.type_, type))
-                        continue;
-                    blobptr blob(createblob(getmpool(aug_tlx), pkt.data_,
-                                            pkt.size_));
-
-                    // Add uri scheme to session name.
-
-                    string from("node:");
-                    from += pkt.node_;
-
                     vector<sessionptr> sessions;
                     sessions_.getsessions(sessions);
 
                     vector<sessionptr>::const_iterator it(sessions.begin()),
                         end(sessions.end());
                     for (; it != end; ++it)
-                        (*it)->event(from.c_str(), type.c_str(), 0, blob);
+                        (*it)->mrecv(pkt.node_, pkt.sess_, pkt.type_,
+                                     pkt.data_, pkt.size_);
                 }
 # if LOGCLUSTER_
                 stringstream ss;
@@ -1054,27 +1042,18 @@ engine::canceltimer(mod_id tid)
 }
 
 AUGASPP_API void
-engine::emit(const char* type, const void* buf, size_t len)
+engine::emit(unsigned short type, const void* buf, size_t len)
 {
 #if ENABLE_MULTICAST
-    unsigned id;
-    if (impl_->types_.getbyname(type, id))
-        impl_->mpacket_.emit(impl_->mcastsd_, id, buf, len, impl_->mcastep_);
+    impl_->mpacket_.emit(impl_->mcastsd_, type, buf, len, impl_->mcastep_);
 #else // !ENABLE_MULTICAST
-    blobptr blob(createblob(getmpool(aug_tlx), buf, len));
-
-    // Add uri scheme to session name.
-
-    string from("node:");
-    from += impl_->node_;
-
     vector<sessionptr> sessions;
     impl_->sessions_.getsessions(sessions);
 
     vector<sessionptr>::const_iterator it(sessions.begin()),
         end(sessions.end());
     for (; it != end; ++it)
-        (*it)->event(from.c_str(), type, 0, blob);
+        (*it)->mrecv(impl->node_, impl->sess_, type, buf, len);
 #endif // !ENABLE_MULTICAST
 }
 

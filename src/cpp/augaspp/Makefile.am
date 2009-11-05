@@ -16,8 +16,7 @@ modinclude_HEADERS = \
 	sessions.hpp \
 	sock.hpp \
 	socks.hpp \
-	ssl.hpp \
-	types.hpp
+	ssl.hpp
 
 lib_LTLIBRARIES = libaugaspp.la
 
@@ -36,8 +35,7 @@ libaugaspp_la_SOURCES = \
 	sessions.cpp \
 	sock.cpp \
 	socks.cpp \
-	ssl.cpp \
-	types.cpp
+	ssl.cpp
 
 libaugaspp_la_LDFLAGS = \
 	-no-undefined \

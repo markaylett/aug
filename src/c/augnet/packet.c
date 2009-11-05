@@ -51,7 +51,7 @@ unpackstring_(char* dst, const char* src, size_t size)
 }
 
 AUGNET_API struct aug_packet*
-aug_setpacket(const char* node, unsigned sess, unsigned type,
+aug_setpacket(const char* node, unsigned sess, unsigned short type,
               aug_seqno_t seqno, const void* data, unsigned size,
               struct aug_packet* pkt)
 {
