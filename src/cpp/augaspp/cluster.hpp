@@ -51,7 +51,7 @@ namespace aug {
     public:
         ~cluster() AUG_NOTHROW;
 
-        cluster(clockref clock, unsigned wsize, unsigned timeout);
+        cluster(clockref clock, unsigned wsize, unsigned hbint);
 
         bool
         insert(const aug_packet& pkt);

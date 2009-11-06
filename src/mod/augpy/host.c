@@ -556,5 +556,12 @@ augpy_createhost(PyTypeObject* type)
 
     PyModule_AddIntConstant(host, "SHUTNOW", MOD_SHUTNOW);
 
+    PyModule_AddIntConstant(host, "PKTUP", MOD_PKTUP);
+    PyModule_AddIntConstant(host, "PKTDOWN", MOD_PKTDOWN);
+    PyModule_AddIntConstant(host, "PKTGAP", MOD_PKTGAP);
+    PyModule_AddIntConstant(host, "PKTBASE", MOD_PKTBASE);
+    PyModule_AddIntConstant(host, "PKTHBEAT", MOD_PKTHBEAT);
+    PyModule_AddIntConstant(host, "PKTUSER", MOD_PKTUSER);
+
     return host;
 }

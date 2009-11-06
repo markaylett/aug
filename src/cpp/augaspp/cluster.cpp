@@ -346,13 +346,12 @@ namespace {
         aug_timeval timeout_;
         aug_timeval expiry_;
     public:
-        node(unsigned size, const aug_timeval& now,
-             unsigned timeout)
+        node(unsigned size, const aug_timeval& now, unsigned hbint)
             : window_(size)
         {
-            // 20% tolerance.
+            // 50% tolerance.
 
-            mstotv(timeout + timeout / 5, timeout_);
+            mstotv(hbint + hbint / 2, timeout_);
 
             expiry_.tv_sec = now.tv_sec;
             expiry_.tv_usec = now.tv_usec;
@@ -468,16 +467,15 @@ namespace aug {
         struct clusterimpl : mpool_ops {
 
             clockptr clock_;
-            const unsigned size_;
-            const unsigned timeout_;
+            const unsigned wsize_;
+            const unsigned hbint_;
             map<pair<unsigned, string>, nodeptr> nodes_;
             queue<aug_packet> pending_;
 
-            clusterimpl(clockref clock, unsigned size,
-                        unsigned timeout)
+            clusterimpl(clockref clock, unsigned wsize, unsigned hbint)
                 : clock_(object_retain(clock)),
-                  size_(size),
-                  timeout_(timeout)
+                  wsize_(wsize),
+                  hbint_(hbint)
             {
             }
 
@@ -519,8 +517,8 @@ cluster::~cluster() AUG_NOTHROW
 }
 
 AUGASPP_API
-cluster::cluster(clockref clock, unsigned wsize, unsigned timeout)
-    : impl_(new (tlx) detail::clusterimpl(clock, wsize, timeout))
+cluster::cluster(clockref clock, unsigned wsize, unsigned hbint)
+    : impl_(new (tlx) detail::clusterimpl(clock, wsize, hbint))
 {
 }
 
@@ -541,7 +539,7 @@ cluster::insert(const aug_packet& pkt)
 
         it = impl_->nodes_.insert
             (make_pair(key, nodeptr
-                       (new node(impl_->size_, now, impl_->timeout_)))).first;
+                       (new node(impl_->wsize_, now, impl_->hbint_)))).first;
 
         aug_setpacket(key.second.c_str(), key.first, AUG_PKTUP, 0, 0, 0,
                       &out);

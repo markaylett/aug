@@ -45,6 +45,7 @@ AUG_RCSID("$Id$");
 
 #define POSTEVENT_ (AUG_EVENTUSER - 1)
 #define LOGCLUSTER_ 0
+#define WSIZE_      8
 
 using namespace aug;
 using namespace std;
@@ -225,9 +226,9 @@ namespace aug {
                  unsigned size, const endpoint& ep)
             {
                 struct aug_packet pkt;
+                type = AUG_MIN(type, AUG_PKTBASE);
                 size = AUG_MIN(size, sizeof(pkt.data_));
-                aug_setpacket(node_, sess_, AUG_PKTUSER + type, ++seqno_,
-                              data, size, &pkt);
+                aug_setpacket(node_, sess_, type, ++seqno_, data, size, &pkt);
 
                 char buf[AUG_PACKETSIZE];
                 aug_encodepacket(&pkt, buf);
@@ -279,7 +280,7 @@ namespace aug {
 
             engineimpl(const char* node, aug_muxer_t muxer,
                        aug_events_t events, aug_timers_t timers,
-                       enginecb_base& cb, unsigned timeout)
+                       enginecb_base& cb, unsigned hbint)
                 : muxer_(muxer),
                   events_(events),
                   timers_(timers),
@@ -292,7 +293,7 @@ namespace aug {
                   mpacket_(node),
                   mcastsd_(null),
                   mcastep_(null),
-                  cluster_(getclock(aug_tlx), 8, timeout),
+                  cluster_(getclock(aug_tlx), WSIZE_, hbint),
                   mwait_(timers, null)
 #else // !ENABLE_MULTICAST
                   node_(node),
@@ -606,6 +607,9 @@ namespace aug {
                                     AUG_MSG("bad packet size"));
                 aug_packet pkt;
                 verify(aug_decodepacket(buf, &pkt));
+                /* Be defensive with data from wire.  Types below AUG_PKTBASE
+                   are reserved for internal use only. */
+                pkt.type_ = AUG_MIN(pkt.type_, AUG_PKTBASE);
                 cluster_.insert(pkt);
             }
             void
@@ -632,9 +636,9 @@ engine::~engine() AUG_NOTHROW
 
 AUGASPP_API
 engine::engine(const char* node, aug_muxer_t muxer, aug_events_t events,
-               aug_timers_t timers, enginecb_base& cb, unsigned timeout)
+               aug_timers_t timers, enginecb_base& cb, unsigned hbint)
     : impl_(new (tlx) detail::engineimpl(node, muxer, events, timers, cb,
-                                         timeout))
+                                         hbint))
 {
 }
 
@@ -678,8 +682,6 @@ engine::join(const char* addr, unsigned short port, const char* ifname)
     setfamily(impl_->mcastep_, family(in));
     setport(impl_->mcastep_, htons(port));
     setinetaddr(impl_->mcastep_, in);
-
-    // TODO: is this needed?
 
     impl_->mwait_.set(impl_->cluster_.expiry(), *impl_);
 
