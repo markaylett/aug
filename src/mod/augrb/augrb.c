@@ -996,10 +996,11 @@ mrecv_(mod_session* ob, const char* node, unsigned sess, unsigned short type,
     struct impl_* impl = AUG_PODIMPL(struct impl_, session_, ob);
     struct import_* import = &impl->import_;
 
-    if (import->mrecv_)
+    if (import->mrecv_) {
+        VALUE value = buf ? rb_tainted_str_new(buf, (long)len) : Qnil;
         funcall4_(import->module_, mrecvid_, rb_str_new2(node),
-                  INT2FIX(sess), INT2FIX((unsigned)type),
-                  rb_tainted_str_new(buf, (long)len));
+                  INT2FIX(sess), INT2FIX((unsigned)type), value);
+    }
 }
 
 static void

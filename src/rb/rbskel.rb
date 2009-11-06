@@ -116,6 +116,9 @@ module RbSkel
             end
         end
     end
+    def self.mrecv(node, sess, type, buf)
+        Log.debug("mrecv(): #{node}")
+    end
     def self.error(sock, ms)
         Log.debug("error(): #{sock}")
     end

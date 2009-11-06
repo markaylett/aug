@@ -603,9 +603,16 @@ mrecv_(mod_session* ob, const char* node, unsigned sess, unsigned short type,
 
     if (import->mrecv_) {
 
-        PyObject* x = PyBuffer_FromMemory((void*)buf, (int)len);
-        PyObject* y = PyObject_CallFunction(import->recv_, "sIHO", node,
-                                            sess, type, x);
+        PyObject* x, * y;
+        if (buf) {
+            x = PyBuffer_FromMemory((void*)buf, (int)len);
+        } else {
+            x = Py_None;
+            Py_INCREF(x);
+        }
+
+        y = PyObject_CallFunction(import->mrecv_, "sIHO",
+                                  node, sess, type, x);
         Py_DECREF(x);
 
         if (y) {

@@ -118,6 +118,9 @@ def recv(sock, buf):
         elif x != None:
             send(sock, x + "\r\n")
 
+def mrecv(node, sess, type, buf):
+    log.debug("mrecv(): %s" % node)
+
 def error(sock, desc):
     log.debug("error(): %s" % sock)
 
