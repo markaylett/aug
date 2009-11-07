@@ -215,6 +215,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 # include <unistd.h>
 #else /* _WIN32 */
 # include <winsock2.h>
+# include <ws2tcpip.h>
 #endif /* _WIN32 */
 ]], [[socklen_t x;]])], [result=yes], [result=no]);
 

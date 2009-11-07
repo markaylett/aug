@@ -15935,6 +15935,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 # include <unistd.h>
 #else /* _WIN32 */
 # include <winsock2.h>
+# include <ws2tcpip.h>
 #endif /* _WIN32 */
 
 int
