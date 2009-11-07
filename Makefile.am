@@ -4,7 +4,8 @@ SUBDIRS = \
 	src \
 	example \
 	test \
-	vc7
+	vc7 \
+	vc9
 
 EXTRA_DIST = \
 	config.pl \

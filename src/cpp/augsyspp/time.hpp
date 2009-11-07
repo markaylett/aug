@@ -50,7 +50,7 @@ namespace aug {
     inline tm&
     gmtime(tm& res)
     {
-        return gmtime(time(0), res);
+        return gmtime(static_cast<aug_time>(time(0)), res);
     }
 
     inline tm&
@@ -62,7 +62,7 @@ namespace aug {
     inline tm&
     localtime(tm& res)
     {
-        return localtime(time(0), res);
+        return localtime(static_cast<aug_time>(time(0)), res);
     }
 
     inline aug_timeval&

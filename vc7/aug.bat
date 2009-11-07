@@ -22,5 +22,18 @@ rem this program; if not, write to the Free Software Foundation, Inc., 51
 rem Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 call "%VS71COMNTOOLS%vsvars32.bat"
-devenv.com aug.sln /rebuild Debug /project setup
-devenv.com aug.sln /rebuild Release /project setup
+
+set PATH=%OPENSSL_HOME%\bin;%PATH%
+set INCLUDE=%OPENSSL_HOME%\include;%INCLUDE%
+set LIB=%OPENSSL_HOME%\lib\VC;%LIB%
+
+set PATH=%PYTHON_HOME%;%PATH%
+set INCLUDE=%PYTHON_HOME%\include;%INCLUDE%
+set LIB=%PYTHON_HOME%\libs;%LIB%
+
+set PATH=%RUBY_HOME%\bin;%PATH%
+set INCLUDE=%RUBY_HOME%\lib\ruby\1.8\i386-mswin32;%INCLUDE%
+set LIB=%RUBY_HOME%\lib;%LIB%
+
+devenv.com aug.sln /rebuild Debug /project setup /useenv
+devenv.com aug.sln /rebuild Release /project setup /useenv

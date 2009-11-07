@@ -61,6 +61,10 @@
 # include <inttypes.h>
 #else /* _MSC_VER */
 
+/* C4996: function was declared deprecated */
+
+# pragma warning(disable : 4996)
+
 # if !defined(HAVE_IPV6)
 #  define HAVE_IPV6 1
 # endif /* !HAVE_IPV6 */

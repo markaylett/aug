@@ -343,5 +343,6 @@ AC_CONFIG_FILES([Makefile
                  example/augas/htdocs/Makefile
                  example/cpp/Makefile
                  test/Makefile
-                 vc7/Makefile])
+                 vc7/Makefile
+                 vc9/Makefile])
 AC_OUTPUT
