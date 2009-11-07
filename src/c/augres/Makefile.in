@@ -190,7 +190,9 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 to_host_path_cmd = @to_host_path_cmd@
 EXTRA_DIST = \
-	augres.mc
+	augres.mc \
+	augres.rc \
+	MSG00001.bin
 
 @AUG_WIN32_TRUE@bin_SCRIPTS = \
 @AUG_WIN32_TRUE@	augres.dll
@@ -198,9 +200,7 @@ EXTRA_DIST = \
 @AUG_WIN32_TRUE@CLEANFILES = \
 @AUG_WIN32_TRUE@	$(bin_SCRIPTS) \
 @AUG_WIN32_TRUE@	augres.h \
-@AUG_WIN32_TRUE@	augres.o \
-@AUG_WIN32_TRUE@	augres.rc \
-@AUG_WIN32_TRUE@	MSG00001.bin
+@AUG_WIN32_TRUE@	augres.o
 
 all: all-am
 
