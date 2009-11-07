@@ -13,12 +13,12 @@ CLEANFILES = \
 	augres.o
 
 augres.dll: augres.o
-	dllwrap --dllname augres.dll --driver-name gcc $<
+	$(DLLWRAP) --as $(AS) --dllname augres.dll --driver-name $(CC) $<
 
 augres.o: augres.rc
-	windres -o augres.o $<
+	$(WINDRES) -o augres.o $<
 
 augres.rc: augres.mc
-	windmc $<
+	$(WINDRC) $<
 
 endif

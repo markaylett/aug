@@ -170,6 +170,10 @@ case $host in
         AC_SEARCH_LIBS(BIO_new, [eay32])
     fi
 
+    AC_CHECK_TOOL(DLLWRAP, dllwrap, dllwrap)
+    AC_CHECK_TOOL(WINDMS, windmc, windmc)
+    AC_CHECK_TOOL(WINDRES, windres, windres)
+
     CPPFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 -D__USE_W32_SOCKETS $CPPFLAGS"
     LIBS="-Wl,-lws2_32 $LIBS"
 

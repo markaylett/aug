@@ -26,10 +26,10 @@ AUG_RCSID("$Id$");
 #define    putc    fputc
 #endif    /* lint */
 
-char    *aug_optarg;    /* Global argument pointer. */
-int    aug_optind = 0;    /* Global argv index. */
-int    aug_opterr = 1;    /* for compatibility, should error be printed? */
-int    aug_optopt;    /* for compatibility, option character checked */
+static char    *optarg;    /* Global argument pointer. */
+static int    optind = 0;    /* Global argv index. */
+static int    opterr = 1;    /* for compatibility, should error be printed? */
+static int    optopt;    /* for compatibility, option character checked */
 
 static char    *scan = NULL;    /* Private scan pointer. */
 static const char    *prog = "amnesia";
@@ -43,13 +43,37 @@ badopt(
        int ch
        )
 {
-    if (aug_opterr) {
+    if (opterr) {
         fputs(prog, stderr);
         fputs(mess, stderr);
         (void) putc(ch, stderr);
         (void) putc('\n', stderr);
     }
     return ('?');
+}
+
+AUGUTIL_API char*
+aug_optarg_(void)
+{
+    return optarg;
+}
+
+AUGUTIL_API int*
+aug_optind_(void)
+{
+    return &optind;
+}
+
+AUGUTIL_API int*
+aug_optopt_(void)
+{
+    return &optopt;
+}
+
+AUGUTIL_API int*
+aug_opterr_(void)
+{
+    return &opterr;
 }
 
 AUGUTIL_API int
@@ -63,30 +87,30 @@ aug_getopt(
     register const char *place;
 
     prog = argv[0];
-    aug_optarg = NULL;
+    optarg = NULL;
 
-    if (aug_optind == 0) {
+    if (optind == 0) {
         scan = NULL;
-        aug_optind++;
+        optind++;
     }
 
     if (scan == NULL || *scan == '\0') {
-        if (aug_optind >= argc
-            || argv[aug_optind][0] != '-'
-            || argv[aug_optind][1] == '\0') {
+        if (optind >= argc
+            || argv[optind][0] != '-'
+            || argv[optind][1] == '\0') {
             return (EOF);
         }
-        if (argv[aug_optind][1] == '-'
-            && argv[aug_optind][2] == '\0') {
-            aug_optind++;
+        if (argv[optind][1] == '-'
+            && argv[optind][2] == '\0') {
+            optind++;
             return (EOF);
         }
 
-        scan = argv[aug_optind++]+1;
+        scan = argv[optind++]+1;
     }
 
     c = *scan++;
-    aug_optopt = c & 0377;
+    optopt = c & 0377;
     for (place = optstring; place != NULL && *place != '\0'; ++place)
         if (*place == c)
             break;
@@ -98,12 +122,12 @@ aug_getopt(
     place++;
     if (*place == ':') {
         if (*scan != '\0') {
-            aug_optarg = scan;
+            optarg = scan;
             scan = NULL;
-        } else if (aug_optind >= argc) {
+        } else if (optind >= argc) {
             return (badopt(": option requires argument -", c));
         } else {
-            aug_optarg = argv[aug_optind++];
+            optarg = argv[optind++];
         }
     }
 

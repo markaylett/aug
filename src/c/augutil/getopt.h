@@ -32,10 +32,22 @@
 
 #include "augutil/config.h"
 
-AUGUTIL_API char* aug_optarg;
-AUGUTIL_API int aug_optind;
-AUGUTIL_API int aug_optopt;
-AUGUTIL_API int aug_opterr;
+#define aug_optarg aug_optarg_()
+#define aug_optind (*aug_optind_())
+#define aug_opterr (*aug_opterr_())
+#define aug_optopt (*aug_optopt_())
+
+AUGUTIL_API char*
+aug_optarg_(void);
+
+AUGUTIL_API int*
+aug_optind_(void);
+
+AUGUTIL_API int*
+aug_opterr_(void);
+
+AUGUTIL_API int*
+aug_optopt_(void);
 
 AUGUTIL_API int
 aug_getopt(int argc, char** argv, const char* optstring);
