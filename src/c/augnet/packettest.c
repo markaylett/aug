@@ -26,60 +26,62 @@
 
 #include <stdio.h>
 
+static const char DATA[] = "stale event://www.xofy.org/aug";
+
 int
 main(int argc, char* argv[])
 {
     struct aug_packet pkt;
     char buf[AUG_PACKETSIZE];
-    aug_time now = time(0) * 1000;
 
     if (!aug_autotlx())
         return 1;
 
-    pkt.proto_ = 1;
-    strcpy(pkt.chan_, "127.0.0.1:1972");
-    pkt.seqno_ = 101;
-    pkt.time_ = now;
-    pkt.flags_ = 0;
-    pkt.type_ = 2;
-    strcpy(pkt.data_, "stale event://www.xofy.org/aug");
+    aug_setpacket("augd", 101, 202, 303, DATA, sizeof(DATA), &pkt);
 
     aug_encodepacket(&pkt, buf);
     memset(&pkt, 0, sizeof(pkt));
     aug_decodepacket(buf, &pkt);
+
+    /*
+    unsigned sess_;
+    unsigned short type_;
+    aug_seqno_t seqno_;
+    unsigned size_;
+    char data_[AUG_PKTDATASIZE];
+     */
 
     if (1 != pkt.proto_) {
         fprintf(stderr, "unexpected protocol [%d]\n", (int)pkt.proto_);
         return 1;
     }
 
-    if (0 != strcmp(pkt.chan_, "127.0.0.1:1972")) {
-        fprintf(stderr, "unexpected channel name [%s]\n", pkt.chan_);
+    if (0 != strcmp(pkt.node_, "augd")) {
+        fprintf(stderr, "unexpected node name [%s]\n", pkt.node_);
         return 1;
     }
 
-    if (101 != pkt.seqno_) {
+    if (101 != pkt.sess_) {
+        fprintf(stderr, "unexpected time [%u]\n", (unsigned)pkt.sess_);
+        return 1;
+    }
+
+    if (202 != pkt.type_) {
+        fprintf(stderr, "unexpected type [%u]\n", (unsigned)pkt.type_);
+        return 1;
+    }
+
+    if (303 != pkt.seqno_) {
         fprintf(stderr, "unexpected sequence [%d]\n", (int)pkt.seqno_);
         return 1;
     }
 
-
-    if (now != pkt.time_) {
-        fprintf(stderr, "unexpected time [%u]\n", (unsigned)pkt.time_);
+    if (sizeof(DATA) != pkt.size_) {
+        fprintf(stderr, "unexpected size [%d]\n", (int)pkt.size_);
         return 1;
     }
 
-    if (0 != pkt.flags_) {
-        fprintf(stderr, "unexpected flags [%d]\n", (int)pkt.flags_);
-        return 1;
-    }
-
-    if (2 != pkt.type_) {
-        fprintf(stderr, "unexpected type [%d]\n", (int)pkt.type_);
-        return 1;
-    }
-
-    if (0 != strcmp(pkt.data_, "stale event://www.xofy.org/aug")) {
+    if (0 != strcmp(pkt.data_, DATA)) {
         fprintf(stderr, "unexpected data [%s]\n", pkt.data_);
         return 1;
     }

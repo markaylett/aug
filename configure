@@ -603,6 +603,9 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 ALLOCA
+WINDRES
+WINDMS
+DLLWRAP
 AUG_WIN32_FALSE
 AUG_WIN32_TRUE
 WITH_SSL_FALSE
@@ -5064,13 +5067,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5067: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5070: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5070: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5073: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5073: output\"" >&5)
+  (eval echo "\"\$as_me:5076: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6464,7 +6467,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6467 "configure"' > conftest.$ac_ext
+  echo '#line 6470 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8125,11 +8128,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8128: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8131: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8132: \$? = $ac_status" >&5
+   echo "$as_me:8135: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8464,11 +8467,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8467: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8470: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8471: \$? = $ac_status" >&5
+   echo "$as_me:8474: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8569,11 +8572,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8572: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8575: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8576: \$? = $ac_status" >&5
+   echo "$as_me:8579: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8624,11 +8627,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8627: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8630: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8631: \$? = $ac_status" >&5
+   echo "$as_me:8634: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11090,7 +11093,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11093 "configure"
+#line 11096 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11186,7 +11189,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11189 "configure"
+#line 11192 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13293,11 +13296,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13296: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13299: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13300: \$? = $ac_status" >&5
+   echo "$as_me:13303: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13392,11 +13395,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13395: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13398: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13399: \$? = $ac_status" >&5
+   echo "$as_me:13402: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13444,11 +13447,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13447: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13450: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13451: \$? = $ac_status" >&5
+   echo "$as_me:13454: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14791,6 +14794,283 @@ if test "$ac_res" != no; then :
 fi
 
     fi
+
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}dllwrap", so it can be a program name with args.
+set dummy ${ac_tool_prefix}dllwrap; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_DLLWRAP+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$DLLWRAP"; then
+  ac_cv_prog_DLLWRAP="$DLLWRAP" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_DLLWRAP="${ac_tool_prefix}dllwrap"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+DLLWRAP=$ac_cv_prog_DLLWRAP
+if test -n "$DLLWRAP"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DLLWRAP" >&5
+$as_echo "$DLLWRAP" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_prog_DLLWRAP"; then
+  ac_ct_DLLWRAP=$DLLWRAP
+  # Extract the first word of "dllwrap", so it can be a program name with args.
+set dummy dllwrap; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_ac_ct_DLLWRAP+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$ac_ct_DLLWRAP"; then
+  ac_cv_prog_ac_ct_DLLWRAP="$ac_ct_DLLWRAP" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_DLLWRAP="dllwrap"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_DLLWRAP=$ac_cv_prog_ac_ct_DLLWRAP
+if test -n "$ac_ct_DLLWRAP"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_DLLWRAP" >&5
+$as_echo "$ac_ct_DLLWRAP" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_ct_DLLWRAP" = x; then
+    DLLWRAP="dllwrap"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    DLLWRAP=$ac_ct_DLLWRAP
+  fi
+else
+  DLLWRAP="$ac_cv_prog_DLLWRAP"
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}windmc", so it can be a program name with args.
+set dummy ${ac_tool_prefix}windmc; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_WINDMS+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$WINDMS"; then
+  ac_cv_prog_WINDMS="$WINDMS" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_WINDMS="${ac_tool_prefix}windmc"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+WINDMS=$ac_cv_prog_WINDMS
+if test -n "$WINDMS"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $WINDMS" >&5
+$as_echo "$WINDMS" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_prog_WINDMS"; then
+  ac_ct_WINDMS=$WINDMS
+  # Extract the first word of "windmc", so it can be a program name with args.
+set dummy windmc; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_ac_ct_WINDMS+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$ac_ct_WINDMS"; then
+  ac_cv_prog_ac_ct_WINDMS="$ac_ct_WINDMS" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_WINDMS="windmc"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_WINDMS=$ac_cv_prog_ac_ct_WINDMS
+if test -n "$ac_ct_WINDMS"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_WINDMS" >&5
+$as_echo "$ac_ct_WINDMS" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_ct_WINDMS" = x; then
+    WINDMS="windmc"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    WINDMS=$ac_ct_WINDMS
+  fi
+else
+  WINDMS="$ac_cv_prog_WINDMS"
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}windres", so it can be a program name with args.
+set dummy ${ac_tool_prefix}windres; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_WINDRES+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$WINDRES"; then
+  ac_cv_prog_WINDRES="$WINDRES" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_WINDRES="${ac_tool_prefix}windres"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+WINDRES=$ac_cv_prog_WINDRES
+if test -n "$WINDRES"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $WINDRES" >&5
+$as_echo "$WINDRES" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_prog_WINDRES"; then
+  ac_ct_WINDRES=$WINDRES
+  # Extract the first word of "windres", so it can be a program name with args.
+set dummy windres; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_ac_ct_WINDRES+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$ac_ct_WINDRES"; then
+  ac_cv_prog_ac_ct_WINDRES="$ac_ct_WINDRES" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_WINDRES="windres"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_WINDRES=$ac_cv_prog_ac_ct_WINDRES
+if test -n "$ac_ct_WINDRES"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_WINDRES" >&5
+$as_echo "$ac_ct_WINDRES" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_ct_WINDRES" = x; then
+    WINDRES="windres"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    WINDRES=$ac_ct_WINDRES
+  fi
+else
+  WINDRES="$ac_cv_prog_WINDRES"
+fi
+
 
     CPPFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 -D__USE_W32_SOCKETS $CPPFLAGS"
     LIBS="-Wl,-lws2_32 $LIBS"
