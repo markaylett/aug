@@ -27,8 +27,8 @@
 
 namespace aug {
 
-    class AUGARCPP_API node_base;
-    class AUGARCPP_API inner_base;
+    class inner_base;
+    class node_base;
 
     AUGARCPP_API unsigned
     exdepth(const node_base& node);

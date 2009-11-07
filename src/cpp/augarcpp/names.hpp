@@ -32,7 +32,7 @@
 
 namespace aug {
 
-    class AUGARCPP_API factory_base;
+    class factory_base;
 
     class names : public typed_base, public mpool_ops {
 

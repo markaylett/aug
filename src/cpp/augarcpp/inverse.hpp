@@ -27,7 +27,7 @@
 
 namespace aug {
 
-    class AUGARCPP_API factory_base;
+    class factory_base;
 
     template <typename baseT>
     class inverse : public baseT {
