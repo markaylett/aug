@@ -228,11 +228,15 @@ namespace aug {
                 struct aug_packet pkt;
                 type = AUG_MIN(type, AUG_PKTBASE);
                 size = AUG_MIN(size, sizeof(pkt.data_));
-                aug_setpacket(node_, sess_, type, ++seqno_, data, size, &pkt);
+                aug_setpacket(node_, sess_, type, seqno_ + 1, data, size,
+                              &pkt);
 
                 char buf[AUG_PACKETSIZE];
                 aug_encodepacket(&pkt, buf);
-                return aug::sendto(ref, buf, sizeof(buf), 0, ep);
+                const size_t n(aug::sendto(ref, buf, sizeof(buf), 0, ep));
+                // Increment once sent.
+                ++seqno_;
+                return n;
             }
         };
 
@@ -243,6 +247,7 @@ namespace aug {
             aug_events_t events_;
             aug_timers_t timers_;
             enginecb_base& cb_;
+            const unsigned hbint_;
             chans chans_;
             sessions sessions_;
             socks socks_;
@@ -273,6 +278,7 @@ namespace aug {
             endpoint mcastep_;
             cluster cluster_;
             timer mwait_;
+            timer mhbeat_;
 #else // !ENABLE_MULTICAST
             const string node_;
             const unsigned sess_;
@@ -285,6 +291,7 @@ namespace aug {
                   events_(events),
                   timers_(timers),
                   cb_(cb),
+                  hbint_(hbint),
                   chans_(null),
                   current_(null),
                   grace_(timers_),
@@ -294,7 +301,8 @@ namespace aug {
                   mcastsd_(null),
                   mcastep_(null),
                   cluster_(getclock(aug_tlx), WSIZE_, hbint),
-                  mwait_(timers, null)
+                  mwait_(timers, null),
+                  mhbeat_(timers, null)
 #else // !ENABLE_MULTICAST
                   node_(node),
                   sess_(getpid())
@@ -480,6 +488,9 @@ namespace aug {
                                               0));
                     grace_.set(15000, timermemcb<engineimpl,
                                &engineimpl::stopcb>, ob);
+
+                    mhbeat_.cancel();
+                    emit(AUG_PKTDOWN, 0, 0);
                 }
             }
             void
@@ -544,6 +555,14 @@ namespace aug {
                     mflush();
                     ms = cluster_.expiry();
 
+                } else if (id == mhbeat_.id()) {
+
+                    if (STARTED == state_) {
+                        aug_ctxinfo(aug_tlx, "cluster heartbeat timer");
+                        mpacket_.emit(mcastsd_, AUG_PKTHBEAT, 0, 0, mcastep_);
+                        ms = hbint_;
+                    }
+
                 } else
 #endif // ENABLE_MULTICAST
                 {
@@ -570,7 +589,22 @@ namespace aug {
                 aug_ctxinfo(aug_tlx, "giving-up, closing connections");
                 state_ = STOPPED;
             }
+            void
+            emit(unsigned short type, const void* buf, size_t len)
+            {
+#if ENABLE_MULTICAST
+                mpacket_.emit(mcastsd_, type, buf, len, mcastep_);
+                mhbeat_.reset(hbint_);
+#else // !ENABLE_MULTICAST
+                vector<sessionptr> sessions;
+                sessions_.getsessions(sessions);
 
+                vector<sessionptr>::const_iterator it(sessions.begin()),
+                    end(sessions.end());
+                for (; it != end; ++it)
+                    (*it)->mrecv(node_.c_str(), sess_, type, buf, len);
+#endif // !ENABLE_MULTICAST
+            }
 #if ENABLE_MULTICAST
             void
             mflush()
@@ -621,7 +655,7 @@ namespace aug {
                 } catch (const block_exception&) {
                 }
                 mflush();
-                mwait_.set(cluster_.expiry(), *this);
+                mwait_.reset(cluster_.expiry());
             }
 #endif // ENABLE_MULTICAST
         };
@@ -663,6 +697,7 @@ AUGASPP_API void
 engine::join(const char* addr, unsigned short port, const char* ifname)
 {
 #if ENABLE_MULTICAST
+
     inetaddr in(addr);
 
     autosd sd(aug::socket(family(in), SOCK_DGRAM));
@@ -684,10 +719,14 @@ engine::join(const char* addr, unsigned short port, const char* ifname)
     setinetaddr(impl_->mcastep_, in);
 
     impl_->mwait_.set(impl_->cluster_.expiry(), *impl_);
+    impl_->mhbeat_.set(impl_->hbint_, *impl_);
 
 	setmdeventmask(impl_->muxer_, sd, AUG_MDEVENTRDEX);
     impl_->mcastsd_ = sd;
+
 #endif // ENABLE_MULTICAST
+
+    impl_->emit(AUG_PKTUP, 0, 0);
 }
 
 AUGASPP_API void
@@ -1040,17 +1079,7 @@ engine::canceltimer(mod_id tid)
 AUGASPP_API void
 engine::emit(unsigned short type, const void* buf, size_t len)
 {
-#if ENABLE_MULTICAST
-    impl_->mpacket_.emit(impl_->mcastsd_, type, buf, len, impl_->mcastep_);
-#else // !ENABLE_MULTICAST
-    vector<sessionptr> sessions;
-    impl_->sessions_.getsessions(sessions);
-
-    vector<sessionptr>::const_iterator it(sessions.begin()),
-        end(sessions.end());
-    for (; it != end; ++it)
-        (*it)->mrecv(impl_->node_.c_str(), impl_->sess_, type, buf, len);
-#endif // !ENABLE_MULTICAST
+    impl_->emit(type, buf, len);
 }
 
 AUGASPP_API bool
