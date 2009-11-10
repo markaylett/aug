@@ -53,62 +53,6 @@ using namespace std;
 
 namespace {
 
-    enum scheme {
-        NONE,
-        NODE,
-        TOPIC
-    };
-
-    pair<scheme, string>
-    splituri(const string& uri)
-    {
-        string x, y;
-        scheme s(NONE);
-        if (split2(uri.begin(), uri.end(), x, y, ':')) {
-            if (x == "node")
-                s = NODE;
-            else if (x == "topic")
-                s = TOPIC;
-            else
-                throw aug_error(__FILE__, __LINE__, AUG_EINVAL,
-                                AUG_MSG("invalid scheme '%s'"), x.c_str());
-        } else
-            y = uri;
-        return make_pair(s, y);
-    }
-
-    string
-    getnode(const string& s)
-    {
-        pair<scheme, string> uri(splituri(s));
-        switch (uri.first) {
-        case NONE:
-            uri.second = s;
-        case NODE:
-            break;
-        default:
-            throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
-                            AUG_MSG("scheme not supported"));
-        }
-        return uri.second;
-    }
-
-    string
-    gettopic(const string& s)
-    {
-        pair<scheme, string> uri(splituri(s));
-        switch (uri.first) {
-        case NONE:
-            uri.second = s;
-        case TOPIC:
-            break;
-        default:
-            throw aug_error(__FILE__, __LINE__, AUG_ESUPPORT,
-                            AUG_MSG("scheme not supported"));
-        }
-        return uri.second;
-    }
-
     // Must not use mpool_ops.
 
     class msgevent : public msg_base<msgevent> {
@@ -530,10 +474,7 @@ namespace aug {
                     {
                         msgptr msg(object_cast<aug_msg>(event.second));
 
-                        // Add uri scheme to topic name.
-
-                        string from("topic:");
-                        from += getmsgfrom(msg);
+                        const char* from(getmsgfrom(msg));
 
                         vector<sessionptr> sessions;
                         sessions_.getbytopic(sessions, getmsgto(msg));
@@ -543,7 +484,7 @@ namespace aug {
                             ::const_iterator it(sessions.begin()),
                             end(sessions.end());
                         for (; it != end; ++it)
-                            (*it)->event(from.c_str(), getmsgtype(msg),
+                            (*it)->event(from, getmsgtype(msg),
                                          getmsgid(msg), payload);
                     }
                 }
@@ -597,8 +538,13 @@ namespace aug {
             {
 #if ENABLE_MULTICAST
                 packet_.emit(mcastsd_, type, buf, len, mcastep_);
+                // Any write supplants heartbeat.
                 wrtimer_.reset(hbint_);
 #else // !ENABLE_MULTICAST
+                // Ignore heartbeats.
+                if (AUG_PKTHBEAT == type)
+                    return;
+
                 // Loop back to application.
                 vector<sessionptr> sessions;
                 sessions_.getsessions(sessions);
@@ -615,6 +561,10 @@ namespace aug {
             {
                 aug_packet pkt;
                 while (cluster_.next(pkt)) {
+
+                    // Ignore heartbeats.
+                    if (AUG_PKTHBEAT == pkt.type_)
+                        return;
 
                     aug_ctxinfo(aug_tlx, "mflush message [%u]",
                                 static_cast<unsigned>(pkt.seqno_));
@@ -868,10 +818,7 @@ engine::post(const char* sname, const char* to, const char* type, mod_id id,
 {
     // Thread-safe.
 
-    // The 'to' descriptor must either be a topic name or a topic uri.  Remove
-    // uri scheme if present.
-
-    msgptr msg(msgevent::create(id, sname, gettopic(to), type));
+    msgptr msg(msgevent::create(id, sname, to, type));
     setmsgpayload(msg, ob);
     aug_event e;
     e.type_ = POSTEVENT_;
@@ -884,22 +831,14 @@ AUGASPP_API void
 engine::dispatch(const char* sname, const char* to, const char* type,
                  mod_id id, objectref ob)
 {
-    // Add uri scheme to session name.
-
-    string from("topic:");
-    from += sname;
-
     vector<sessionptr> sessions;
 
-    // The 'to' descriptor must either be a topic name or a topic uri.  Remove
-    // uri scheme if present.
-
-    impl_->sessions_.getbytopic(sessions, gettopic(to));
+    impl_->sessions_.getbytopic(sessions, to);
 
     vector<sessionptr>::const_iterator it(sessions.begin()),
         end(sessions.end());
     for (; it != end; ++it)
-        (*it)->event(from.c_str(), type, id, ob);
+        (*it)->event(sname, type, id, ob);
 }
 
 AUGASPP_API void
