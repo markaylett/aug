@@ -141,8 +141,8 @@ namespace {
         sdref ref_;
         const endpoint& ep_;
         cluster cluster_;
-        timer rdwait_;
-        timer wrwait_;
+        timer rdtimer_;
+        timer wrtimer_;
         gaussian gauss_;
         packet out_;
 
@@ -195,17 +195,17 @@ namespace {
             : ref_(ref),
               ep_(ep),
               cluster_(getclock(aug_tlx), 8, 2000),
-              rdwait_(ts, null),
-              wrwait_(ts, null),
+              rdtimer_(ts, null),
+              wrtimer_(ts, null),
               out_("test")
         {
-            rdwait_.set(cluster_.expiry(), *this);
-            wrwait_.set(1000, *this);
+            rdtimer_.set(cluster_.expiry(), *this);
+            wrtimer_.set(1000, *this);
         }
         void
         timercb(aug_id id, unsigned& ms)
         {
-            if (idref(id) == wrwait_.id()) {
+            if (idref(id) == wrtimer_.id()) {
 
                 out_.sendhbeat(ref_, ep_);
                 aug_ctxinfo(aug_tlx, "send message [%u]",
@@ -214,7 +214,7 @@ namespace {
                 ms = static_cast<unsigned>(AUG_MAX(d, 1.0));
                 aug_ctxinfo(aug_tlx, "next send in %u ms", ms);
 
-            } else if (idref(id) == rdwait_.id()) {
+            } else if (idref(id) == rdtimer_.id()) {
 
                 aug_ctxinfo(aug_tlx, "process timer");
                 flush();
@@ -230,7 +230,7 @@ namespace {
             } catch (const block_exception&) {
             }
             flush();
-            rdwait_.set(cluster_.expiry(), *this);
+            rdtimer_.set(cluster_.expiry(), *this);
         }
     };
 

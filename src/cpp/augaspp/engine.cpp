@@ -43,9 +43,10 @@ AUG_RCSID("$Id$");
 #include <map>
 #include <queue>
 
+#define GRACE_  15000
 #define POSTEVENT_ (AUG_EVENTUSER - 1)
-#define LOGCLUSTER_ 0
-#define WSIZE_      8
+#define LOGCLUSTER_ 1
+#define WSIZE_      256
 
 using namespace aug;
 using namespace std;
@@ -273,12 +274,12 @@ namespace aug {
             } state_;
 
 #if ENABLE_MULTICAST
-            packet mpacket_;
+            packet packet_;
             autosd mcastsd_;
             endpoint mcastep_;
             cluster cluster_;
-            timer mwait_;
-            timer mhbeat_;
+            timer rdtimer_;
+            timer wrtimer_;
 #else // !ENABLE_MULTICAST
             const string node_;
             const unsigned sess_;
@@ -297,12 +298,12 @@ namespace aug {
                   grace_(timers_),
                   state_(STARTED),
 #if ENABLE_MULTICAST
-                  mpacket_(node),
+                  packet_(node),
                   mcastsd_(null),
                   mcastep_(null),
                   cluster_(getclock(aug_tlx), WSIZE_, hbint),
-                  mwait_(timers, null),
-                  mhbeat_(timers, null)
+                  rdtimer_(timers, null),
+                  wrtimer_(timers, null)
 #else // !ENABLE_MULTICAST
                   node_(node),
                   sess_(getpid())
@@ -486,10 +487,12 @@ namespace aug {
 
                     boxptrptr ob(createboxptr(aug_getmpool(aug_tlx), this,
                                               0));
-                    grace_.set(15000, timermemcb<engineimpl,
+                    grace_.set(GRACE_, timermemcb<engineimpl,
                                &engineimpl::stopcb>, ob);
-
-                    mhbeat_.cancel();
+#if ENABLE_MULTICAST
+                    // Stop heartbeat.
+                    wrtimer_.cancel();
+#endif // ENABLE_MULTICAST
                     emit(AUG_PKTDOWN, 0, 0);
                 }
             }
@@ -549,17 +552,17 @@ namespace aug {
             timercb(idref id, unsigned& ms)
             {
 #if ENABLE_MULTICAST
-                if (id == mwait_.id()) {
+                if (id == rdtimer_.id()) {
 
                     aug_ctxinfo(aug_tlx, "process cluster timer");
                     mflush();
                     ms = cluster_.expiry();
 
-                } else if (id == mhbeat_.id()) {
+                } else if (id == wrtimer_.id()) {
 
                     if (STARTED == state_) {
                         aug_ctxinfo(aug_tlx, "cluster heartbeat timer");
-                        mpacket_.emit(mcastsd_, AUG_PKTHBEAT, 0, 0, mcastep_);
+                        packet_.emit(mcastsd_, AUG_PKTHBEAT, 0, 0, mcastep_);
                         ms = hbint_;
                     }
 
@@ -593,9 +596,10 @@ namespace aug {
             emit(unsigned short type, const void* buf, size_t len)
             {
 #if ENABLE_MULTICAST
-                mpacket_.emit(mcastsd_, type, buf, len, mcastep_);
-                mhbeat_.reset(hbint_);
+                packet_.emit(mcastsd_, type, buf, len, mcastep_);
+                wrtimer_.reset(hbint_);
 #else // !ENABLE_MULTICAST
+                // Loop back to application.
                 vector<sessionptr> sessions;
                 sessions_.getsessions(sessions);
 
@@ -655,7 +659,7 @@ namespace aug {
                 } catch (const block_exception&) {
                 }
                 mflush();
-                mwait_.reset(cluster_.expiry());
+                rdtimer_.reset(cluster_.expiry());
             }
 #endif // ENABLE_MULTICAST
         };
@@ -718,8 +722,8 @@ engine::join(const char* addr, unsigned short port, const char* ifname)
     setport(impl_->mcastep_, htons(port));
     setinetaddr(impl_->mcastep_, in);
 
-    impl_->mwait_.set(impl_->cluster_.expiry(), *impl_);
-    impl_->mhbeat_.set(impl_->hbint_, *impl_);
+    impl_->rdtimer_.set(impl_->cluster_.expiry(), *impl_);
+    impl_->wrtimer_.set(impl_->hbint_, *impl_);
 
 	setmdeventmask(impl_->muxer_, sd, AUG_MDEVENTRDEX);
     impl_->mcastsd_ = sd;
