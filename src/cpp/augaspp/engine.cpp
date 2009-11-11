@@ -179,7 +179,7 @@ namespace aug {
                 char buf[AUG_PACKETSIZE];
                 aug_encodepacket(&pkt, buf);
                 const size_t n(aug::sendto(ref, buf, sizeof(buf), 0, ep));
-                // Increment once sent.
+                // Increment here because send may throw.
                 ++seqno_;
                 return n;
             }
@@ -495,14 +495,16 @@ namespace aug {
 #if ENABLE_MULTICAST
                 if (id == rdtimer_.id()) {
 
-                    aug_ctxinfo(aug_tlx, "process cluster timer");
+                    aug_ctxinfo(aug_tlx, "cluster read timer");
                     mflush();
                     ms = cluster_.expiry();
 
                 } else if (id == wrtimer_.id()) {
 
+                    aug_ctxinfo(aug_tlx, "cluster write timer");
+
                     if (STARTED == state_) {
-                        aug_ctxinfo(aug_tlx, "cluster heartbeat timer");
+                        // Only send heartbeat if node is not shutting down.
                         packet_.emit(mcastsd_, AUG_PKTHBEAT, 0, 0, mcastep_);
                         ms = hbint_;
                     }
@@ -595,8 +597,8 @@ namespace aug {
                                     AUG_MSG("bad packet size"));
                 aug_packet pkt;
                 verify(aug_decodepacket(buf, &pkt));
-                /* Be defensive with data from wire.  Types below AUG_PKTBASE
-                   are reserved for internal use only. */
+                // Be defensive with data from wire.  Types below AUG_PKTBASE
+                // are reserved for internal use only.
                 pkt.type_ = AUG_MIN(pkt.type_, AUG_PKTBASE);
                 cluster_.insert(pkt);
             }
