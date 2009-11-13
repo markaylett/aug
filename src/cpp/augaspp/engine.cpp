@@ -650,7 +650,8 @@ engine::clear()
 }
 
 AUGASPP_API void
-engine::join(const char* addr, unsigned short port, const char* ifname)
+engine::join(const char* addr, unsigned short port, int ttl,
+             const char* ifname)
 {
 #if ENABLE_MULTICAST
 
@@ -658,7 +659,12 @@ engine::join(const char* addr, unsigned short port, const char* ifname)
 
     autosd sd(aug::socket(family(in), SOCK_DGRAM));
     setnonblock(sd, true);
+    // Reuse port.
     setreuseaddr(sd, true);
+    // Loopback.
+    setmcastloop(sd, true);
+    // TTL.
+    setmcastttl(sd, ttl);
 
     // Set outgoing multicast interface.
 

@@ -249,12 +249,13 @@ namespace {
 
                 if (mcast && port) {
 
-                    // Optional.
+                    // Defaults to 1.
+                    const int ttl(atoi(options_.get("cluster.ttl", "1")));
 
+                    // Interface is optional.
                     const char* ifname(options_.get("cluster.ifname", 0));
-                    engine_.join(mcast,
-                                 static_cast<unsigned short>(atoi(port)),
-                                 ifname);
+
+                    engine_.join(mcast, strtous(port, 10), ttl, ifname);
                 }
 #if WITH_SSL
                 initssl();

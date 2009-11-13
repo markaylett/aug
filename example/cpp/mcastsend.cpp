@@ -64,7 +64,7 @@ main(int argc, char* argv[])
         endpoint ep(in, htons(atoi(argv[2])));
 
         char event[AUG_PACKETSIZE];
-        for (int i(0); i < 3; ++i) {
+        for (int i(0); i < 10; ++i) {
             heartbeat_(event);
             sendto(sfd, event, sizeof(event), 0, ep);
             aug_msleep(1000);

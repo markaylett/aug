@@ -241,6 +241,11 @@ aug_getaddrinfo(const char* host, const char* serv,
 AUGSYS_API aug_rint
 aug_getfamily(aug_sd sd);
 
+/**
+ * True to reuse socket address.  If the socket is a multicast socket, then
+ * this has the same effect as #SO_REUSEPORT.
+ */
+
 AUGSYS_API aug_result
 aug_setreuseaddr(aug_sd sd, aug_bool on);
 

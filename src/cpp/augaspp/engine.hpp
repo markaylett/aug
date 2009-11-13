@@ -80,7 +80,8 @@ namespace aug {
         clear();
 
         void
-        join(const char* addr, unsigned short port, const char* ifname);
+        join(const char* addr, unsigned short port, int ttl,
+             const char* ifname);
 
         void
         insert(const std::string& name, const sessionptr& session,

@@ -45,7 +45,11 @@ main(int argc, char* argv[])
 
         inetaddr in(argv[1]);
         autosd sfd(aug::socket(family(in), SOCK_DGRAM));
+
+        // Reuse port.
         setreuseaddr(sfd, true);
+        // Loopback.
+        setmcastloop(sfd, true);
 
         endpoint ep(inetany(family(in)), htons(atoi(argv[2])));
         aug::bind(sfd, ep);
