@@ -156,12 +156,12 @@ namespace aug {
 
         class packet : public mpool_ops {
             char node_[AUG_PKTNODELEN + 1];
-            const unsigned sess_;
+            const unsigned inst_;
             aug_seqno_t seqno_;
         public:
             explicit
             packet(const char* node)
-                : sess_(getpid())
+                : inst_(getpid())
             {
                 aug_strlcpy(node_, node, sizeof(node_));
                 seqno_ = 0;
@@ -173,7 +173,7 @@ namespace aug {
                 struct aug_packet pkt;
                 type = AUG_MIN(type, AUG_PKTBASE);
                 size = AUG_MIN(size, sizeof(pkt.data_));
-                aug_setpacket(node_, sess_, type, seqno_ + 1, data, size,
+                aug_setpacket(node_, inst_, type, seqno_ + 1, data, size,
                               &pkt);
 
                 char buf[AUG_PACKETSIZE];
@@ -226,7 +226,7 @@ namespace aug {
             timer wrtimer_;
 #else // !ENABLE_MULTICAST
             const string node_;
-            const unsigned sess_;
+            const unsigned inst_;
 #endif // !ENABLE_MULTICAST
 
             engineimpl(const char* node, aug_muxer_t muxer,
@@ -250,7 +250,7 @@ namespace aug {
                   wrtimer_(timers, null)
 #else // !ENABLE_MULTICAST
                   node_(node),
-                  sess_(getpid())
+                  inst_(getpid())
 #endif // !ENABLE_MULTICAST
             {
                 chandler_.reset(this);
@@ -554,7 +554,7 @@ namespace aug {
                 vector<sessionptr>::const_iterator it(sessions.begin()),
                     end(sessions.end());
                 for (; it != end; ++it)
-                    (*it)->mrecv(node_.c_str(), sess_, type, buf, len);
+                    (*it)->mrecv(node_.c_str(), inst_, type, buf, len);
 #endif // !ENABLE_MULTICAST
             }
 #if ENABLE_MULTICAST
@@ -577,7 +577,7 @@ namespace aug {
                     vector<sessionptr>::const_iterator it(sessions.begin()),
                         end(sessions.end());
                     for (; it != end; ++it)
-                        (*it)->mrecv(pkt.node_, pkt.sess_, pkt.type_,
+                        (*it)->mrecv(pkt.node_, pkt.inst_, pkt.type_,
                                      pkt.data_, pkt.size_);
                 }
 # if LOGCLUSTER_

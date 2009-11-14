@@ -31,14 +31,14 @@
 using namespace aug;
 using namespace std;
 
-static unsigned sess_;
+static unsigned inst_;
 static unsigned seqno_ = 0;
 
 static char*
 heartbeat_(char* buf)
 {
     aug_packet pkt;
-    aug_setpacket("mcastsend", sess_, AUG_PKTHBEAT, ++seqno_, 0, 0, &pkt);
+    aug_setpacket("mcastsend", inst_, AUG_PKTHBEAT, ++seqno_, 0, 0, &pkt);
     return aug_encodepacket(&pkt, buf);
 }
 
@@ -54,7 +54,7 @@ main(int argc, char* argv[])
             return 1;
         }
 
-        sess_ = getpid();
+        inst_ = getpid();
 
         inetaddr in(argv[1]);
         autosd sfd(aug::socket(family(in), SOCK_DGRAM));

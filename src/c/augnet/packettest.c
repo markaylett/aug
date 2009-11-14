@@ -43,26 +43,18 @@ main(int argc, char* argv[])
     memset(&pkt, 0, sizeof(pkt));
     aug_decodepacket(buf, &pkt);
 
-    /*
-    unsigned sess_;
-    unsigned short type_;
-    aug_seqno_t seqno_;
-    unsigned size_;
-    char data_[AUG_PKTDATASIZE];
-     */
-
     if (1 != pkt.proto_) {
         fprintf(stderr, "unexpected protocol [%d]\n", (int)pkt.proto_);
         return 1;
     }
 
     if (0 != strcmp(pkt.node_, "augd")) {
-        fprintf(stderr, "unexpected node name [%s]\n", pkt.node_);
+        fprintf(stderr, "unexpected node [%s]\n", pkt.node_);
         return 1;
     }
 
-    if (101 != pkt.sess_) {
-        fprintf(stderr, "unexpected time [%u]\n", (unsigned)pkt.sess_);
+    if (101 != pkt.inst_) {
+        fprintf(stderr, "unexpected instance [%u]\n", (unsigned)pkt.inst_);
         return 1;
     }
 

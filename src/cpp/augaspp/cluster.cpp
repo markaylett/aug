@@ -530,7 +530,7 @@ cluster::insert(const aug_packet& pkt)
     aug_packet out;
 
     const pair<unsigned, string> key
-        (pkt.sess_, string(pkt.node_, sizeof(pkt.node_)));
+        (pkt.inst_, string(pkt.node_, sizeof(pkt.node_)));
     map<pair<unsigned, string>, nodeptr>
         ::iterator it(impl_->nodes_.find(key));
     if (it == impl_->nodes_.end()) {
