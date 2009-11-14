@@ -75,15 +75,9 @@ namespace {
     }
 
     struct window_exception : std::exception {
-        ~window_exception() AUG_NOTHROW
-        {
-        }
     };
 
     struct overflow_exception : window_exception {
-        ~overflow_exception() AUG_NOTHROW
-        {
-        }
         const char*
         what() const throw()
         {
@@ -92,9 +86,6 @@ namespace {
     };
 
     struct timeout_exception : window_exception {
-        ~timeout_exception() AUG_NOTHROW
-        {
-        }
         const char*
         what() const throw()
         {
@@ -103,9 +94,6 @@ namespace {
     };
 
     struct underflow_exception : window_exception {
-        ~underflow_exception() AUG_NOTHROW
-        {
-        }
         const char*
         what() const throw()
         {
