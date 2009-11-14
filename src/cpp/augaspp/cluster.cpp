@@ -613,7 +613,8 @@ cluster::expiry() const
         it(impl_->nodes_.begin()), end(impl_->nodes_.end());
     for (; it != end; ++it) {
         const unsigned ms(it->second->expiry(now));
-        if (ms < min)
+        // Ignore zero expiries.
+        if (0 < ms && ms < min)
             min = ms;
     }
     return min;

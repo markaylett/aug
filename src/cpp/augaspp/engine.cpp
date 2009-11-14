@@ -498,6 +498,7 @@ namespace aug {
                     aug_ctxinfo(aug_tlx, "cluster read timer");
                     mflush();
                     ms = cluster_.expiry();
+                    aug_ctxinfo(aug_tlx, "next expiry: %u", ms);
 
                 } else if (id == wrtimer_.id()) {
 
