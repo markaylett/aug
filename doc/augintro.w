@@ -358,6 +358,10 @@ return will result in the connection being closed.
     recv(mod_handle& sock, const void* buf, size_t len);
 
     void
+    mrecv(const char* node, unsigned sess, unsigned short type,
+          const void* buf, size_t len);
+
+    void
     error(mod_handle& sock, const char* desc);
 
     void
@@ -508,6 +512,15 @@ echo::recv(mod_handle& sock, const void* buf, size_t len)
   tokenise(static_cast<const char*>(buf),
     static_cast<const char*>(buf) + len, *tok, '\n',
     eachline(sock));
+}
+
+@ |mrecv()| receives notifications from other nodes in the cluster.
+
+@<member...@>+=
+void
+echo::mrecv(const char* node, unsigned sess, unsigned short type,
+            const void* buf, size_t len)
+{
 }
 
 @ Socket-level errors are communicated to the Session via the |error()| call.
