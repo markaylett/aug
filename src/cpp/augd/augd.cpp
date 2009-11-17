@@ -242,7 +242,7 @@ namespace {
 
             try {
 
-                // Required options.
+                // Optional.
 
                 const char* mcast(options_.get("cluster.mcast", 0));
                 const char* port(options_.get("cluster.port", 0));

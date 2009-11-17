@@ -31,8 +31,10 @@ rundir=.
 logdir=.
 
 cluster.node=augd
-cluster.multicast=239.1.1.1
-cluster.serv=17172
+#cluster.mcast=239.1.1.1
+#cluster.portpp=17172
+#cluster.ifname=3
+#cluster.ifname=eth0
 
 sessions=pystop pytest5
 

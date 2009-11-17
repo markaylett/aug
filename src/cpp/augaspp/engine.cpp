@@ -434,8 +434,10 @@ namespace aug {
                     grace_.set(GRACE_, timermemcb<engineimpl,
                                &engineimpl::stopcb>, ob);
 #if ENABLE_MULTICAST
-                    // Stop heartbeat.
-                    wrtimer_.cancel();
+                    if (null != wrtimer_) {
+                        // Stop heartbeat.
+                        wrtimer_.cancel();
+                    }
 #endif // ENABLE_MULTICAST
                     emit(AUG_PKTDOWN, 0, 0);
                 }
@@ -540,9 +542,11 @@ namespace aug {
             emit(unsigned short type, const void* buf, size_t len)
             {
 #if ENABLE_MULTICAST
-                packet_.emit(mcastsd_, type, buf, len, mcastep_);
-                // Any write supplants heartbeat.
-                wrtimer_.reset(hbint_);
+                if (null != mcastsd_) {
+                    packet_.emit(mcastsd_, type, buf, len, mcastep_);
+                    // Any write supplants heartbeat.
+                    wrtimer_.reset(hbint_);
+                }
 #else // !ENABLE_MULTICAST
                 // Ignore heartbeats.
                 if (AUG_PKTHBEAT == type)
@@ -770,10 +774,13 @@ engine::run(bool stoponerr)
             gettimeofday(getclock(aug_tlx), impl_->now_);
 
 #if ENABLE_MULTICAST
-            AUG_CTXDEBUG2(aug_tlx, "processing multicast");
+            if (null != impl_->mcastsd_) {
 
-            if (getmdevents(impl_->muxer_, impl_->mcastsd_))
-                impl_->mprocess();
+                AUG_CTXDEBUG2(aug_tlx, "processing multicast");
+
+                if (getmdevents(impl_->muxer_, impl_->mcastsd_))
+                    impl_->mprocess();
+            }
 #endif // ENABLE_MULTICAST
 
             AUG_CTXDEBUG2(aug_tlx, "processing events");
