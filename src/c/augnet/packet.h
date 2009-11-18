@@ -92,13 +92,11 @@
  * @{
  */
 
+#define AUG_PKTGAP    0
 #define AUG_PKTUP     1
 #define AUG_PKTDOWN   2
-#define AUG_PKTGAP    3
-
-#define AUG_PKTBASE  16
-#define AUG_PKTHBEAT (AUG_PKTBASE + 0)
-#define AUG_PKTUSER  (AUG_PKTBASE + 1)
+#define AUG_PKTHBEAT  3
+#define AUG_PKTUSER   4
 
 /** @} */
 

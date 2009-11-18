@@ -733,13 +733,11 @@ initrb_(VALUE unused)
 
     /* Packet constants. */
 
+    rb_define_const(maugrb_, "PKTGAP", INT2FIX(MOD_PKTGAP));
     rb_define_const(maugrb_, "PKTUP", INT2FIX(MOD_PKTUP));
     rb_define_const(maugrb_, "PKTDOWN", INT2FIX(MOD_PKTDOWN));
-    rb_define_const(maugrb_, "PKTGAP", INT2FIX(MOD_PKTGAP));
-    rb_define_const(maugrb_, "PKTBASE", INT2FIX(MOD_PKTBASE));
     rb_define_const(maugrb_, "PKTHBEAT", INT2FIX(MOD_PKTHBEAT));
     rb_define_const(maugrb_, "PKTUSER", INT2FIX(MOD_PKTUSER));
-
 
     /* Object methods. */
 

@@ -189,41 +189,34 @@ typedef int mod_rint;
  */
 
 /**
+ * Sequence number gap.
+ */
+
+#define MOD_PKTGAP   0
+
+/**
  * Node is up.
  */
 
-#define MOD_PKTUP     1
+#define MOD_PKTUP    1
 
 /**
  * Node is down.
  */
 
-#define MOD_PKTDOWN   2
-
-/**
- * Sequence number gap.
- */
-
-#define MOD_PKTGAP    3
-
-/**
- * The base offset of all messages sent over the wire.
- */
-
-#define MOD_PKTBASE  16
+#define MOD_PKTDOWN  2
 
 /**
  * Node heartbeat.
  */
 
-#define MOD_PKTHBEAT (MOD_PKTBASE + 0)
+#define MOD_PKTHBEAT 3
 
 /**
  * User-defined type.
  */
 
-#define MOD_PKTUSER  (MOD_PKTBASE + 1)
-
+#define MOD_PKTUSER  4
 
 /** @} */
 

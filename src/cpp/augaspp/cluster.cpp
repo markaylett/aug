@@ -333,9 +333,11 @@ namespace {
         window window_;
         aug_timeval timeout_;
         aug_timeval expiry_;
+        unsigned down_;
     public:
         node(unsigned size, const aug_timeval& now, unsigned hbint)
-            : window_(size)
+            : window_(size),
+              down_(false)
         {
             // 50% tolerance.
 
@@ -398,6 +400,8 @@ namespace {
             // Get the next packet.
 
             window_.next(pkt, tv);
+            if (AUG_PKTDOWN == pkt.type_)
+                down_ = true;
 
             // Add the timeout value to the time it was received.
 
@@ -443,6 +447,12 @@ namespace {
             aug_timeval tv = { expiry_.tv_sec, expiry_.tv_usec };
             return tvtoms(tvsub(tv, now));
         }
+
+        bool
+        down() const
+        {
+            return down_;
+        }
     };
 
     typedef smartptr<node> nodeptr;
@@ -485,10 +495,13 @@ namespace aug {
 
                         aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
 
-                        aug_setpacket(it->first.second.c_str(),
-                                      it->first.first, AUG_PKTDOWN, 0, 0, 0,
-                                      &out);
-                        pending_.push(out);
+                        if (!it->second->down()) {
+
+                            aug_setpacket(it->first.second.c_str(),
+                                          it->first.first, AUG_PKTDOWN,
+                                          0, 0, 0, &out);
+                            pending_.push(out);
+                        }
 
                         nodes_.erase(it++);
                     }
@@ -513,6 +526,8 @@ cluster::cluster(clockref clock, unsigned wsize, unsigned hbint)
 AUGASPP_API bool
 cluster::insert(const aug_packet& pkt)
 {
+    assert(AUG_PKTGAP != pkt.type_);
+
     aug_timeval now;
     gettimeofday(impl_->clock_, now);
     aug_packet out;
@@ -561,9 +576,12 @@ cluster::insert(const aug_packet& pkt)
 
         aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
 
-        aug_setpacket(key.second.c_str(), key.first, AUG_PKTDOWN, 0, 0, 0,
-                      &out);
-        impl_->pending_.push(out);
+        if (!it->second->down()) {
+
+            aug_setpacket(key.second.c_str(), key.first, AUG_PKTDOWN, 0, 0, 0,
+                          &out);
+            impl_->pending_.push(out);
+        }
 
         impl_->nodes_.erase(it);
     }

@@ -53,6 +53,21 @@ using namespace std;
 
 namespace {
 
+    size_t
+    sendall(sdref ref, const char* buf, size_t len, int flags,
+            const aug_endpoint& ep)
+    {
+        // Giveup after three attempts.
+
+        size_t n(0);
+        for (unsigned i(0); i < 3; ++i) {
+            n += aug::sendto(ref, buf + n, len - n, 0, ep);
+            if (n == len)
+                break;
+        }
+        return n;
+    }
+
     // Must not use mpool_ops.
 
     class msgevent : public msg_base<msgevent> {
@@ -166,10 +181,17 @@ namespace aug {
                 aug_strlcpy(node_, node, sizeof(node_));
                 seqno_ = 0;
             }
-            size_t
+            void
             emit(sdref ref, unsigned short type, const void* data,
                  unsigned size, const endpoint& ep)
             {
+                // Gap messages are reserved for internal use only.
+
+                if (AUG_PKTGAP == type) {
+                    aug_ctxwarn(aug_tlx, "internal gap discarded");
+                    return;
+                }
+
                 struct aug_packet pkt;
                 size = AUG_MIN(size, sizeof(pkt.data_));
                 aug_setpacket(node_, inst_, type, seqno_ + 1, data, size,
@@ -177,10 +199,16 @@ namespace aug {
 
                 char buf[AUG_PACKETSIZE];
                 aug_encodepacket(&pkt, buf);
-                const size_t n(aug::sendto(ref, buf, sizeof(buf), 0, ep));
+
+                const size_t n(sendall(ref, buf, sizeof(buf), 0, ep));
+
+                if (n < sizeof(buf))
+                    aug_ctxwarn(aug_tlx, "partial packet send: bytes=[%u]",
+                                static_cast<unsigned>(n));
+
                 // Increment here because send may throw.
+
                 ++seqno_;
-                return n;
             }
         };
 
@@ -544,7 +572,7 @@ namespace aug {
                 if (null != mcastsd_) {
                     packet_.emit(mcastsd_, type, buf, len, mcastep_);
                     // Any write supplants heartbeat.
-                    if (null != wrtimer_)
+                    if (STARTED == state_)
                         wrtimer_.reset(hbint_);
                 }
 #else // !ENABLE_MULTICAST
@@ -600,13 +628,19 @@ namespace aug {
             {
                 char buf[AUG_PACKETSIZE];
                 endpoint from(null);
-                if (AUG_PACKETSIZE
-                    != recvfrom(mcastsd_, buf, sizeof(buf), 0, from))
-                    throw aug_error(__FILE__, __LINE__, AUG_EIO,
-                                    AUG_MSG("bad packet size"));
-                aug_packet pkt;
-                verify(aug_decodepacket(buf, &pkt));
-                cluster_.insert(pkt);
+                const size_t n(recvfrom(mcastsd_, buf, sizeof(buf), 0, from));
+                if (n == sizeof(buf)) {
+                    aug_packet pkt;
+                    verify(aug_decodepacket(buf, &pkt));
+                    if (AUG_PKTGAP != pkt.type_)
+                        cluster_.insert(pkt);
+                    else
+                        aug_ctxwarn(aug_tlx,
+                                    "external gap disgarded: node=[%s]",
+                                    pkt.node_);
+                } else
+                    aug_ctxwarn(aug_tlx, "partial packet recv: bytes=[%u]",
+                                static_cast<unsigned>(n));
             }
             void
             mprocess()
@@ -1039,8 +1073,10 @@ engine::canceltimer(mod_id tid)
 AUGASPP_API void
 engine::emit(unsigned short type, const void* buf, size_t len)
 {
-    type = AUG_MAX(type, AUG_PKTBASE);
-    impl_->emit(type, buf, len);
+    if (AUG_PKTUSER <= type)
+        impl_->emit(type, buf, len);
+    else
+        aug_ctxwarn(aug_tlx, "internal message discarded");
 }
 
 AUGASPP_API bool
