@@ -529,9 +529,14 @@ cluster::insert(const aug_packet& pkt)
             (make_pair(key, nodeptr
                        (new node(impl_->wsize_, now, impl_->hbint_)))).first;
 
-        aug_setpacket(key.second.c_str(), key.first, AUG_PKTUP, 0, 0, 0,
-                      &out);
-        impl_->pending_.push(out);
+        if (AUG_PKTUP != pkt.type_) {
+
+            // Synthetic up message.
+
+            aug_setpacket(key.second.c_str(), key.first, AUG_PKTUP, 0, 0, 0,
+                          &out);
+            impl_->pending_.push(out);
+        }
     }
 
     try {

@@ -579,7 +579,9 @@ namespace {
     mod_result
     emit_(unsigned short type, const void* buf, size_t len)
     {
-        AUG_CTXDEBUG2(aug_tlx, "emit(): type=[%u]", (unsigned)type);
+        AUG_CTXDEBUG2(aug_tlx, "emit(): type=[%u], len=[%u]",
+                      static_cast<unsigned>(type),
+                      static_cast<unsigned>(len));
         try {
             impl_->engine_.emit(type, buf, len);
             return MOD_SUCCESS;

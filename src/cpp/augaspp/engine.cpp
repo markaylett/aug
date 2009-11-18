@@ -171,7 +171,6 @@ namespace aug {
                  unsigned size, const endpoint& ep)
             {
                 struct aug_packet pkt;
-                type = AUG_MIN(type, AUG_PKTBASE);
                 size = AUG_MIN(size, sizeof(pkt.data_));
                 aug_setpacket(node_, inst_, type, seqno_ + 1, data, size,
                               &pkt);
@@ -545,7 +544,8 @@ namespace aug {
                 if (null != mcastsd_) {
                     packet_.emit(mcastsd_, type, buf, len, mcastep_);
                     // Any write supplants heartbeat.
-                    wrtimer_.reset(hbint_);
+                    if (null != wrtimer_)
+                        wrtimer_.reset(hbint_);
                 }
 #else // !ENABLE_MULTICAST
                 // Ignore heartbeats.
@@ -571,10 +571,14 @@ namespace aug {
 
                     // Ignore heartbeats.
                     if (AUG_PKTHBEAT == pkt.type_)
-                        return;
+                        continue;
 
-                    aug_ctxinfo(aug_tlx, "mflush message [%u]",
-                                static_cast<unsigned>(pkt.seqno_));
+                    aug_ctxinfo(aug_tlx, "mflush: node=[%s], inst=[%u],"
+                                " type=[%u], seqno=[%lu], size=[%u]",
+                                pkt.node_, static_cast<unsigned>(pkt.inst_),
+                                static_cast<unsigned>(pkt.type_),
+                                static_cast<unsigned long>(pkt.seqno_),
+                                static_cast<unsigned>(pkt.size_));
 
                     vector<sessionptr> sessions;
                     sessions_.getsessions(sessions);
@@ -602,9 +606,6 @@ namespace aug {
                                     AUG_MSG("bad packet size"));
                 aug_packet pkt;
                 verify(aug_decodepacket(buf, &pkt));
-                // Be defensive with data from wire.  Types below AUG_PKTBASE
-                // are reserved for internal use only.
-                pkt.type_ = AUG_MIN(pkt.type_, AUG_PKTBASE);
                 cluster_.insert(pkt);
             }
             void
@@ -1038,6 +1039,7 @@ engine::canceltimer(mod_id tid)
 AUGASPP_API void
 engine::emit(unsigned short type, const void* buf, size_t len)
 {
+    type = AUG_MAX(type, AUG_PKTBASE);
     impl_->emit(type, buf, len);
 }
 
