@@ -400,6 +400,10 @@ namespace {
             // Get the next packet.
 
             window_.next(pkt, tv);
+
+            // The node is considered down once the down packet has been fed
+            // back to the client.
+
             if (AUG_PKTDOWN == pkt.type_)
                 down_ = true;
 
@@ -455,6 +459,46 @@ namespace {
         }
     };
 
+    void
+    pushall(node& node, queue<aug_packet>& pending, const aug_timeval& now)
+    {
+        aug_packet out;
+
+        if (!node.down()) {
+
+            while (node.next(out, now)) {
+
+                // This may include the down packet.
+
+                pending.push(out);
+
+                // If transitioned to down.
+
+                if (node.down()) {
+
+                    while (node.next(out, now))
+                        ; // Discard packets after down.
+                    break;
+                }
+            }
+        } else {
+
+            while (node.next(out, now))
+                ; // Discard packets after down.
+        }
+    }
+
+    void
+    pushpacket(const string& node, unsigned inst, unsigned short type,
+               queue<aug_packet>& pending)
+    {
+        // Synthetic packet.
+
+        aug_packet out;
+        aug_setpacket(node.c_str(), inst, type, 0, 0, 0, &out);
+        pending.push(out);
+    }
+
     typedef smartptr<node> nodeptr;
 }
 
@@ -486,26 +530,22 @@ namespace aug {
                 map<pair<unsigned, string>, nodeptr>::iterator
                     it(nodes_.begin()), end(nodes_.end());
                 while (it != end) {
-                    aug_packet out;
+
                     try {
-                        if (!it->second->down())
-                            while (it->second->next(out, now))
-                                pending_.push(out);
-                        // May have transitioned from up to down.
-                        if (it->second->down())
-                            while (it->second->next(out, now))
-                                ;
+
+                        pushall(*it->second, pending_, now);
                         ++it;
+
                     } catch (const timeout_exception& e) {
 
                         aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
 
                         if (!it->second->down()) {
 
-                            aug_setpacket(it->first.second.c_str(),
-                                          it->first.first, AUG_PKTDOWN,
-                                          0, 0, 0, &out);
-                            pending_.push(out);
+                            // Synthetic down packet if none received.
+
+                            pushpacket(it->first.second, it->first.first,
+                                       AUG_PKTDOWN, pending_);
                         }
 
                         nodes_.erase(it++);
@@ -535,7 +575,7 @@ cluster::insert(const aug_packet& pkt)
 
     aug_timeval now;
     gettimeofday(impl_->clock_, now);
-    aug_packet out;
+    //aug_packet out;
 
     const pair<unsigned, string> key
         (pkt.inst_, string(pkt.node_, sizeof(pkt.node_)));
@@ -553,44 +593,38 @@ cluster::insert(const aug_packet& pkt)
 
             // Synthetic up message.
 
-            aug_setpacket(key.second.c_str(), key.first, AUG_PKTUP, 0, 0, 0,
-                          &out);
-            impl_->pending_.push(out);
+            pushpacket(key.second, key.first, AUG_PKTUP, impl_->pending_);
         }
     }
 
     try {
+
         it->second->insert(pkt, now);
+
     } catch (const overflow_exception& e) {
+
         aug_ctxwarn(aug_tlx, "resetting: %s", e.what());
-
-        aug_setpacket(key.second.c_str(), key.first, AUG_PKTGAP, 0, 0, 0,
-                      &out);
-        impl_->pending_.push(out);
-
+        pushpacket(key.second, key.first, AUG_PKTGAP, impl_->pending_);
         it->second->reset(now);
         it->second->insert(pkt, now);
+
     } catch (const underflow_exception&) {
         return false;
     }
 
     try {
-        if (!it->second->down())
-            while (it->second->next(out, now))
-                impl_->pending_.push(out);
-        // May have transitioned from up to down.
-        if (it->second->down())
-            while (it->second->next(out, now))
-                ;
+
+        pushall(*it->second, impl_->pending_, now);
+
     } catch (const timeout_exception& e) {
 
         aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
 
         if (!it->second->down()) {
 
-            aug_setpacket(key.second.c_str(), key.first, AUG_PKTDOWN, 0, 0, 0,
-                          &out);
-            impl_->pending_.push(out);
+            // Synthetic down packet if none received.
+
+            pushpacket(key.second, key.first, AUG_PKTDOWN, impl_->pending_);
         }
 
         impl_->nodes_.erase(it);
