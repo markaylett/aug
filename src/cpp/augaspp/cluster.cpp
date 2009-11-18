@@ -333,7 +333,7 @@ namespace {
         window window_;
         aug_timeval timeout_;
         aug_timeval expiry_;
-        unsigned down_;
+        bool down_;
     public:
         node(unsigned size, const aug_timeval& now, unsigned hbint)
             : window_(size),
@@ -488,8 +488,13 @@ namespace aug {
                 while (it != end) {
                     aug_packet out;
                     try {
-                        while (it->second->next(out, now))
-                            pending_.push(out);
+                        if (!it->second->down())
+                            while (it->second->next(out, now))
+                                pending_.push(out);
+                        // May have transitioned from up to down.
+                        if (it->second->down())
+                            while (it->second->next(out, now))
+                                ;
                         ++it;
                     } catch (const timeout_exception& e) {
 
@@ -570,8 +575,13 @@ cluster::insert(const aug_packet& pkt)
     }
 
     try {
-        while (it->second->next(out, now))
-            impl_->pending_.push(out);
+        if (!it->second->down())
+            while (it->second->next(out, now))
+                impl_->pending_.push(out);
+        // May have transitioned from up to down.
+        if (it->second->down())
+            while (it->second->next(out, now))
+                ;
     } catch (const timeout_exception& e) {
 
         aug_ctxwarn(aug_tlx, "timeout: %s", e.what());
