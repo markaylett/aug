@@ -237,7 +237,7 @@ namespace {
             aug::objectptr ob(object_retain(aug::obptr(sock.ob_)));
             aug_assign(sock.ob_, 0);
 
-            state* s(aug::obtop<state>(sock.ob_));
+            state* s(aug::obtop<state>(ob));
             pushxy(xy_, s->secs_);
             if (0 < --estab_) {
                 writelog(MOD_LOGINFO, "%d established", estab_);

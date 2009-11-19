@@ -43,9 +43,9 @@ AUG_RCSID("$Id$");
 #include <map>
 #include <queue>
 
-#define GRACE_  15000
+#define GRACE_      15000
 #define POSTEVENT_ (AUG_EVENTUSER - 1)
-#define LOGCLUSTER_ 1
+#define LOGCLUSTER_ 0
 #define WSIZE_      256
 
 using namespace aug;
@@ -533,7 +533,7 @@ namespace aug {
 
                     aug_ctxinfo(aug_tlx, "cluster write timer");
 
-                    if (STARTED == state_) {
+                    if (null != mcastsd_) {
                         // Only send heartbeat if node is not shutting down.
                         packet_.emit(mcastsd_, AUG_PKTHBEAT, 0, 0, mcastep_);
                         ms = hbint_;

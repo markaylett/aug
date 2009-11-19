@@ -27,21 +27,21 @@ modsched_OBJS = sched.o
 modsched_LIBS = augnet augutil augmar augsys augctx
 
 modserver_OBJS = server.o
-modserver_LIBS = augctx
+modserver_LIBS = augutil augctx
 
 all: all-base
 
 clean: clean-base
 
 bench: all
-	$(AUG_HOME)/bin/augd -f bench.conf test
+	$(AUG_HOME)/bin/augd -f bench.conf
 
 gprof:
 	gprof $(AUG_HOME)/bin/augd gmon.out
 #	| ./gprof2dot.py | dot -Tpng -o gmon.png
 
 test: all
-	$(AUG_HOME)/bin/augd -f test.conf test
+	$(AUG_HOME)/bin/augd -f test.conf
 
 %.png: %.dat
 	Rscript bench.R <$ $@
