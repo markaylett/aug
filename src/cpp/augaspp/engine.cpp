@@ -524,14 +524,14 @@ namespace aug {
 #if ENABLE_MULTICAST
                 if (id == rdtimer_.id()) {
 
-                    aug_ctxinfo(aug_tlx, "cluster read timer");
+                    AUG_CTXDEBUG2(aug_tlx, "cluster read expiry");
                     mflush();
                     ms = cluster_.expiry();
                     aug_ctxinfo(aug_tlx, "next expiry: %u", ms);
 
                 } else if (id == wrtimer_.id()) {
 
-                    aug_ctxinfo(aug_tlx, "cluster write timer");
+                    AUG_CTXDEBUG2(aug_tlx, "cluster write expiry");
 
                     if (null != mcastsd_) {
                         // Only send heartbeat if node is not shutting down.
