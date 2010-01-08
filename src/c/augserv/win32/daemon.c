@@ -205,7 +205,7 @@ service_(DWORD argc, char** argv)
 
     /* Ensure writes performed on main thread are visible. */
 
-    AUG_RMB();
+    aug_rmb();
 
     if (!aug_inittlx()) {
         fprintf(stderr, "aug_inittlx() failed\n");
@@ -298,7 +298,7 @@ service_(DWORD argc, char** argv)
 
     /* Flush pending writes to main memory. */
 
-    AUG_WMB();
+    aug_wmb();
     aug_term();
     if (!daemon)
         FreeConsole();
@@ -331,7 +331,7 @@ aug_daemonise(const struct aug_options* options)
 
     /* Flush pending writes to main memory. */
 
-    AUG_WMB();
+    aug_wmb();
 
     /* StartServiceCtrlDispatcher() waits indefinitely for commands from the
        SCM, and returns control to the process's main function only when all
@@ -362,6 +362,6 @@ aug_daemonise(const struct aug_options* options)
 
     /* Ensure writes performed on service thread are visible. */
 
-    AUG_RMB();
+    aug_rmb();
     return result;
 }

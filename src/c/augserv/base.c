@@ -161,7 +161,7 @@ aug_initserv(void)
     /* Flush pending writes to main memory: when init_() is called, the
        gaurantee of interactions exclusively with the main thread are lost. */
 
-    AUG_WMB();
+    aug_wmb();
 
     if (!(task_ = (*serv_.create_)())) {
         destroyevents_();
