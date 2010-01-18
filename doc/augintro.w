@@ -1,5 +1,28 @@
-\nocon % omit table of contents
-\datethis % print date on listing
+% Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009 Mark Aylett \.{<}mark.aylett\.{@@}gmail.com\.{>}
+
+% This file is part of Aug written by Mark Aylett.
+
+% Aug is released under the GPL with the additional exemption that compiling,
+% linking, and/or using OpenSSL is allowed.
+
+% Aug is free software; you can redistribute it and/or modify it under the
+% terms of the GNU General Public License as published by the Free Software
+% Foundation; either version 2 of the License, or (at your option) any later
+% version.
+
+% Aug is distributed in the hope that it will be useful, but WITHOUT ANY
+% WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+% FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+% details.
+
+% You should have received a copy of the GNU General Public License along with
+% this program; if not, write to the Free Software Foundation, Inc., 51
+% Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+\datethis
+
+\def\title{AUG MODULES (Version 1.0)}
+\def\marayl{\pdfURL{Mark Aylett}{mailto:mark.aylett@@gmail.com}}
 
 \def\ABI/{{\sc ABI}}
 \def\AUG/{{\sc AUG}}
@@ -20,6 +43,40 @@
 \def\SSL/{{\sc SSL}}
 \def\WINDOWS/{{\sc WINDOWS}}
 \def\XML/{{\sc XML}}
+
+\centerline{\titlefont Aug Modules}
+\vskip 15pt
+
+\centerline{(Version 1.0)}
+\bigskip\noindent
+
+Copyright \copyright\ 2004, 2005, 2006, 2007, 2008, 2009 \marayl
+\bigskip\noindent
+
+This file is part of \AUG/ written by \marayl.
+\smallskip\noindent
+
+\AUG/ is released under the GPL with the additional exemption that compiling,
+linking, and/or using OpenSSL is allowed.
+\smallskip\noindent
+
+\AUG/ is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+\smallskip\noindent
+
+\AUG/ is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+details.
+\smallskip\noindent
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 51
+Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+\pageno=\contentspagenumber \advance\pageno by 1
 
 @s aug int
 @s aug_boxptr int
@@ -61,8 +118,7 @@ for \LINUX/, \WINDOWS/ and other \POSIX/-compliant systems.
 This document offers a introduction to building and installing \AUG/ Modules,
 along with a brief insight into the application-server itself.  For further
 information, please visit the \pdfURL{\AUG/ project home
-page}{http://www.xofy.org/aug} or email me, \pdfURL{Mark
-Aylett}{mailto:mark.aylett@@gmail.com}.
+page}{http://www.xofy.org/aug} or email me, \marayl.
 
 @* Event Model.
 
