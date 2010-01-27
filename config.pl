@@ -53,7 +53,7 @@ sub trim {
 }
 
 sub is {
-    my $s = lc (shift);
+    my $s = lc(shift);
     return ($s eq '1'
             || $s eq 'y'
             || $s eq 'yes'
@@ -77,7 +77,7 @@ sub valueask {
 sub listask {
     my ($prompt, $default, $pairs) = @_;
     print "\n";
-    foreach my $name (sort (keys %$pairs)) {
+    foreach my $name (sort(keys %$pairs)) {
         if ($name eq $default) {
             print "[$name]\t$pairs->{$name}\n";
         } else {
@@ -87,7 +87,7 @@ sub listask {
     print "\n";
     my $answer;
     do {
-        $answer = valueask ($prompt, $default);
+        $answer = valueask($prompt, $default);
         # Loop while bad answer.
     } while (!exists $pairs->{$answer});
     return $answer;
@@ -138,30 +138,30 @@ $| = 1;
 
 # Collect the input.
 
-$prefix = valueask ("prefix directory", $prefix);
+$prefix = valueask("prefix directory", $prefix);
 $prefix =~ s{^~([^/]*)}
 {
     $1 ? (getpwnam($1))[7]
         : ($ENV{HOME} || $ENV{LOGDIR} || (getpwuid($>))[7])
     }ex;
 
-$toolset = listask ("compiler toolset", $toolset, \%TOOLSET);
-$maintainer = valueask ("maintainer mode", 'n');
+$toolset = listask("compiler toolset", $toolset, \%TOOLSET);
+$maintainer = valueask("maintainer mode", 'n');
 if ($CYGWIN_MINGW == $toolset) {
     $gcc = 'y';
 } else {
-    $gcc = valueask ("GCC compiler", 'y');
+    $gcc = valueask("GCC compiler", 'y');
 }
-$pedantic = valueask ("pedantic warnings", 'n');
-$debug = valueask ("debug build", 'n');
-$multicast = valueask ("multicast support", 'y');
-$smp = valueask ("smp support", 'y');
-$strict = valueask ("strict types", 'n');
-$threads = valueask ("thread support", 'y');
-$python = valueask ("python support", 'n');
-$ruby = valueask ("ruby support", 'n');
-$ssl = valueask ("ssl support", 'y');
-$libtype = listask ("library type", $BOTH, \%LIBTYPE);
+$pedantic = valueask("pedantic warnings", 'n');
+$debug = valueask("debug build", 'n');
+$multicast = valueask("multicast support", 'y');
+$smp = valueask("smp support", 'y');
+$strict = valueask("strict types", 'n');
+$threads = valueask("thread support", 'y');
+$python = valueask("python support", 'n');
+$ruby = valueask("ruby support", 'n');
+$ssl = valueask("ssl support", 'y');
+$libtype = listask("library type", $BOTH, \%LIBTYPE);
 
 my (
     $flags,
@@ -171,9 +171,10 @@ my (
     );
 
 if (is $gcc) {
-    my $gprof = valueask ("gprof build", 'n');
-    $flags = '-march=i686 -msse2';
-    $flags .= (is $gprof) ? '-pg' : '';
+    my $pentium = valueask("pentium build", 'y');
+    my $gprof = valueask("gprof build", 'n');
+    $flags = (is $pentium) ? '-march=i586 -msse2' : '';
+    $flags .= (is $gprof) ? ' -pg' : '';
     $flags .= (is $debug) ? ' -ggdb' : ' -O3 -DNDEBUG';
     $flags .= ' -Wno-long-long -fno-strict-aliasing -Wno-unused-value';
     $cflags = "$flags";
@@ -190,7 +191,7 @@ if (is $gcc) {
 
 # Write script.
 
-open (FILE, ">$CONFIG")
+open(FILE, ">$CONFIG")
     or die "open() failed: $!\n";
 
 print FILE "#!/bin/sh\n\n";
