@@ -172,7 +172,8 @@ my (
 
 if (is $gcc) {
     my $gprof = valueask ("gprof build", 'n');
-    $flags = (is $gprof) ? '-pg' : '';
+    $flags = '-march=i686 -msse2';
+    $flags .= (is $gprof) ? '-pg' : '';
     $flags .= (is $debug) ? ' -ggdb' : ' -O3 -DNDEBUG';
     $flags .= ' -Wno-long-long -fno-strict-aliasing -Wno-unused-value';
     $cflags = "$flags";
