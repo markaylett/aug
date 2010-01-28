@@ -29,12 +29,12 @@ AUG_RCSID("$Id$");
 #include "augserv/signal.h"
 #include "augserv/types.h"
 
-#include "augsys/barrier.h"
 #include "augsys/muxer.h"
 #include "augsys/unistd.h"  /* aug_fclose() */
 #include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h"
 
+#include "augctx/atomic.h"
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
 

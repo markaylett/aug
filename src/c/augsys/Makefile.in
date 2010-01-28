@@ -61,7 +61,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugsys_la_OBJECTS = barrier.lo chan.lo config.lo debug.lo \
+am_libaugsys_la_OBJECTS = chan.lo config.lo debug.lo \
 	dlfcn.lo endian.lo limits.lo mcast.lo mmap.lo muxer.lo \
 	sticky.lo socket.lo stream.lo time.lo types.lo uio.lo \
 	unistd.lo utility.lo windows.lo
@@ -276,7 +276,6 @@ SUBDIRS = \
 
 modincludedir = $(includedir)/augsys
 modinclude_HEADERS = \
-	barrier.h \
 	chan.h \
 	config.h \
 	debug.h \
@@ -299,7 +298,6 @@ modinclude_HEADERS = \
 
 lib_LTLIBRARIES = libaugsys.la
 libaugsys_la_SOURCES = \
-	barrier.c \
 	chan.c \
 	config.c \
 	debug.c \
@@ -468,7 +466,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/barrier.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chantest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@

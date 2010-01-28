@@ -28,11 +28,11 @@
 #include "augutil/log.h"
 #include "augutil/path.h"   /* aug_gethome(), aug_gettmp() */
 
-#include "augsys/barrier.h"
 #include "augsys/limits.h"
 #include "augsys/utility.h" /* aug_perrinfo() */
 #include "augsys/windows.h"
 
+#include "augctx/atomic.h"
 #include "augctx/base.h"
 #include "augctx/errinfo.h"
 

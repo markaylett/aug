@@ -614,8 +614,6 @@ prevented from re-ordering instructions.
 @<gcc ia64 barriers@>@/
 #  elif defined(__alpha__)
 @<gcc alpha barriers@>@/
-#  elif defined(__PPC__)
-@<gcc ppc barriers@>@/
 #  elif defined(__sparc__)
 @<gcc sparc barriers@>@/
 #  elif __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)
@@ -672,12 +670,6 @@ is available on Pentium class machines.
 @<gcc alpha bar...@>=
 #   define aug_mb()  __asm__ __volatile__("mb":::"memory")
 #   define aug_wmb() __asm__ __volatile__("wmb":::"memory")
-
-@ Power PC memory barriers.
-
-@<gcc ppc bar...@>=
-#   define aug_mb()  __asm__ __volatile__("sync":::"memory")
-#   define aug_wmb() __asm__ __volatile__("eieio":::"memory")
 
 @ Sparc memory barriers.
 
