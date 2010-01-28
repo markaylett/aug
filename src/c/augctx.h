@@ -27,6 +27,7 @@
  * @file augctx.h
  */
 
+#include "augctx/atomic.h"
 #include "augctx/base.h"
 #include "augctx/clock.h"
 #include "augctx/config.h"

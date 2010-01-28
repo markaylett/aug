@@ -41,8 +41,8 @@ LIBOBJDIR =
 DIST_COMMON = $(modinclude_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/c/lang.mk
-check_PROGRAMS = basetest$(EXEEXT) errinfotest$(EXEEXT) \
-	logtest$(EXEEXT)
+check_PROGRAMS = atomictest$(EXEEXT) basetest$(EXEEXT) \
+	errinfotest$(EXEEXT) logtest$(EXEEXT)
 subdir = src/c/augctx
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -61,10 +61,13 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugctx_la_DEPENDENCIES =
-am_libaugctx_la_OBJECTS = base.lo clock.lo config.lo ctx.lo defs.lo \
-	errinfo.lo errno.lo lock.lo log.lo mpool.lo string.lo \
+am_libaugctx_la_OBJECTS = atomic.lo base.lo clock.lo config.lo ctx.lo \
+	defs.lo errinfo.lo errno.lo lock.lo log.lo mpool.lo string.lo \
 	utility.lo tls_.lo
 libaugctx_la_OBJECTS = $(am_libaugctx_la_OBJECTS)
+am_atomictest_OBJECTS = atomictest.$(OBJEXT)
+atomictest_OBJECTS = $(am_atomictest_OBJECTS)
+atomictest_LDADD = $(LDADD)
 am_basetest_OBJECTS = basetest.$(OBJEXT)
 basetest_OBJECTS = $(am_basetest_OBJECTS)
 basetest_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
@@ -84,10 +87,10 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES) \
-	$(errinfotest_SOURCES) $(logtest_SOURCES)
-DIST_SOURCES = $(libaugctx_la_SOURCES) $(basetest_SOURCES) \
-	$(errinfotest_SOURCES) $(logtest_SOURCES)
+SOURCES = $(libaugctx_la_SOURCES) $(atomictest_SOURCES) \
+	$(basetest_SOURCES) $(errinfotest_SOURCES) $(logtest_SOURCES)
+DIST_SOURCES = $(libaugctx_la_SOURCES) $(atomictest_SOURCES) \
+	$(basetest_SOURCES) $(errinfotest_SOURCES) $(logtest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -186,6 +189,8 @@ STRIP = @STRIP@
 VERSION = @VERSION@
 WINDMS = @WINDMS@
 WINDRES = @WINDRES@
+WITH_CWEB_FALSE = @WITH_CWEB_FALSE@
+WITH_CWEB_TRUE = @WITH_CWEB_TRUE@
 WITH_PYTHON_FALSE = @WITH_PYTHON_FALSE@
 WITH_PYTHON_TRUE = @WITH_PYTHON_TRUE@
 WITH_RUBY_FALSE = @WITH_RUBY_FALSE@
@@ -255,6 +260,7 @@ EXTRA_DIST = \
 
 modincludedir = $(includedir)/augctx
 modinclude_HEADERS = \
+	atomic.h \
 	base.h \
 	clock.h \
 	config.h \
@@ -273,6 +279,7 @@ noinst_HEADERS = \
 
 lib_LTLIBRARIES = libaugctx.la
 libaugctx_la_SOURCES = \
+	atomic.c \
 	base.c \
 	clock.c \
 	config.c \
@@ -293,10 +300,12 @@ libaugctx_la_LDFLAGS = \
 
 libaugctx_la_LIBADD = 
 TESTS = \
+	atomictest \
 	basetest \
 	errinfotest \
 	logtest
 
+atomictest_SOURCES = atomictest.c
 basetest_SOURCES = basetest.c
 basetest_LDADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
@@ -309,7 +318,13 @@ logtest_SOURCES = logtest.c
 logtest_LDADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
 
-all: all-recursive
+@WITH_CWEB_TRUE@BUILT_SOURCES = \
+@WITH_CWEB_TRUE@	atomic.h \
+@WITH_CWEB_TRUE@	atomic.c \
+@WITH_CWEB_TRUE@	atomictest.c
+
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -378,6 +393,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+atomictest$(EXEEXT): $(atomictest_OBJECTS) $(atomictest_DEPENDENCIES) 
+	@rm -f atomictest$(EXEEXT)
+	$(LINK) $(atomictest_LDFLAGS) $(atomictest_OBJECTS) $(atomictest_LDADD) $(LIBS)
 basetest$(EXEEXT): $(basetest_OBJECTS) $(basetest_DEPENDENCIES) 
 	@rm -f basetest$(EXEEXT)
 	$(LINK) $(basetest_LDFLAGS) $(basetest_OBJECTS) $(basetest_LDADD) $(LIBS)
@@ -394,6 +412,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atomic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atomictest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/basetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock.Plo@am__quote@
@@ -710,14 +730,16 @@ distdir: $(DISTFILES)
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-recursive
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-recursive
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: install-recursive
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
@@ -741,6 +763,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-recursive
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -812,6 +835,13 @@ uninstall-info: uninstall-info-recursive
 	uninstall-info-am uninstall-libLTLIBRARIES \
 	uninstall-modincludeHEADERS
 
+
+@WITH_CWEB_TRUE@atomic.h atomic.c atomictest.c: $(top_srcdir)/doc/atomic.w
+@WITH_CWEB_TRUE@	ctangle $< - atomictest.c
+@WITH_CWEB_TRUE@	@sed -s 's/HAVE_AUGCTX_CONFIG_H 0/HAVE_AUGCTX_CONFIG_H 1/g' <atomic.h >tmp.$$$$ && mv tmp.$$$$ atomic.h
+@WITH_CWEB_TRUE@	@cat $(top_srcdir)/doc/notice.txt atomic.h | sed -e 's/\s$$//g' >tmp.$$$$ && mv tmp.$$$$ atomic.h
+@WITH_CWEB_TRUE@	@cat $(top_srcdir)/doc/notice.txt atomic.c | sed -e 's/\s$$//g' >tmp.$$$$ && mv tmp.$$$$ atomic.c
+@WITH_CWEB_TRUE@	@cat $(top_srcdir)/doc/notice.txt atomictest.c | sed -e 's/\s$$//g' >tmp.$$$$ && mv tmp.$$$$ atomictest.c
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

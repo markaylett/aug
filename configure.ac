@@ -83,6 +83,18 @@ if test x$enable_threads = xyes; then
     AC_DEFINE(ENABLE_THREADS, 1, [Define to 1 for threads support.])
 fi
 
+# CWeb.
+
+AC_ARG_WITH(cweb,
+[  --with-cweb             with cweb support @<:@default=no@:>@], [
+    case x$withval in
+        xyes) with_cweb=yes;;
+        xno)  with_cweb=no;;
+        *) AC_MSG_ERROR(bad value $withval for --with-cweb);;
+    esac
+], [with_cweb=no])
+AM_CONDITIONAL(WITH_CWEB, test x$with_cweb = xyes)
+
 # Python.
 
 AC_ARG_WITH(python,

@@ -68,8 +68,8 @@ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 \pageno=\contentspagenumber \advance\pageno by 1
 
-@s AUG_API extern
-@s AUG_BUILD extern
+@s AUGCTX_API extern
+@s AUGCTX_BUILD extern
 @s AUG_EXTERNC extern
 
 @s int32_t int
@@ -111,12 +111,12 @@ file, which makes a trivial addition to any existing project.
 declarations for the atomic functions.
 
 @(atomic.h@>=
-#ifndef AUG_ATOMIC_H
-#define AUG_ATOMIC_H
+#ifndef AUGCTX_ATOMIC_H
+#define AUGCTX_ATOMIC_H
 @<preamble@>@/
 @<memory barriers@>@/
 @<declarations@>@/
-#endif /* |AUG_ATOMIC_H| */
+#endif /* |AUGCTX_ATOMIC_H| */
 
 @* Function Declarations. The \\{volatile} qualifier suppresses certain
 compiler optimizations.  In particular, it prevents a compiler from either
@@ -128,10 +128,10 @@ is equivalent to a volatile read in \Java/, which happens before any read that
 occurs later in the program order.
 
 @<decl...@>+=
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_acq32(volatile int32_t* ptr);@/
 
-AUG_API void*
+AUGCTX_API void*
 aug_acqptr(void* volatile* ptr);
 
 @ The |aug_rel32()| and |aug_relptr()| functions have \\{write-release}
@@ -139,10 +139,10 @@ semantics. This is equivalent to a volatile write in \Java/, which happens
 after any write that occurs earlier in the program order.
 
 @<decl...@>+=
-AUG_API void
+AUGCTX_API void
 aug_rel32(volatile int32_t* ptr, int32_t val);@/
 
-AUG_API void
+AUGCTX_API void
 aug_relptr(void* volatile* ptr, void* val);
 
 @ The \\{compare-and-set} functions assign |newval| to |*ptr| if, and only if,
@@ -152,27 +152,27 @@ These functions generate a full memory barrier -- meaning no memory references
 will be re-ordered across the operation.
 
 @<decl...@>+=
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_cas32(volatile int32_t* ptr, int32_t oldval, int32_t newval);@/
 
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_casptr(void* volatile* ptr, void* oldval, void* newval);
 
 @ The \\{test-and-swap} functions assign |val| to |*ptr|, and return the
 previous value. These functions generate a read memory barrier.
 
 @<decl...@>+=
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_tas32(volatile int32_t* ptr, int32_t val);@/
 
-AUG_API void*
+AUGCTX_API void*
 aug_tasptr(void* volatile* ptr, void* val);
 
 @ The |aug_add32()| function increments |*ptr| by |delta|, and returns the
 previous value.  This function generates a full memory barrier.
 
 @<decl...@>+=
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_add32(volatile int32_t* ptr, int32_t delta);
 
 @* Test Program. The test program serves to illustrate several common
@@ -235,10 +235,10 @@ are used in preference to hand-crafted assembly.  Assembly is provided for the
 \x86/ architecture, as a last resort, where there is no suitable alternative.
 
 @<atomic.c@>=
-#define AUG_BUILD
-#ifndef AUG_ATOMIC_H
+#define AUGCTX_BUILD
+#ifndef AUGCTX_ATOMIC_H
 # include "atomic.h"
-#endif /* |AUG_ATOMIC_H| */
+#endif /* |AUGCTX_ATOMIC_H| */
 @<general definitions@>@/
 #if defined(__APPLE__) && defined(__MACH__)
 @<osx definitions@>@/
@@ -256,7 +256,7 @@ are used in preference to hand-crafted assembly.  Assembly is provided for the
 @ The read barrier ensures that |*ptr| is read before all subsequent reads.
 
 @<general...@>+=
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_acq32(volatile int32_t* ptr)
 {
     int32_t val = *ptr;
@@ -264,7 +264,7 @@ aug_acq32(volatile int32_t* ptr)
     return val;
 }
 
-AUG_API void*
+AUGCTX_API void*
 aug_acqptr(void* volatile* ptr)
 {
     void* val = *ptr;
@@ -275,14 +275,14 @@ aug_acqptr(void* volatile* ptr)
 @ The write barrier ensures that |*ptr| is written after all previous writes.
 
 @<general...@>+=
-AUG_API void
+AUGCTX_API void
 aug_rel32(volatile int32_t* ptr, int32_t val)
 {
     aug_wmb();
     *ptr = val;
 }
 
-AUG_API void
+AUGCTX_API void
 aug_relptr(void* volatile* ptr, void* val)
 {
     aug_wmb();
@@ -293,19 +293,19 @@ aug_relptr(void* volatile* ptr, void* val)
 simulated using a \\{compare-and-test}.
 
 @<osx def...@>=
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_cas32(volatile int32_t* ptr, int32_t oldval, int32_t newval)
 {
     return OSAtomicCompareAndSwap32Barrier(oldval, newval, ptr);
 }
 
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_casptr(void* volatile* ptr, void* oldval, void* newval)
 {
     return OSAtomicCompareAndSwapPtrBarrier(oldval, newval, ptr);
 }
 
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_tas32(volatile int32_t* ptr, int32_t val)
 {
     int32_t oldval;
@@ -315,7 +315,7 @@ aug_tas32(volatile int32_t* ptr, int32_t val)
     return oldval;
 }
 
-AUG_API void*
+AUGCTX_API void*
 aug_tasptr(void* volatile* ptr, void* val)
 {
     void* oldval;
@@ -325,7 +325,7 @@ aug_tasptr(void* volatile* ptr, void* val)
     return oldval;
 }
 
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_add32(volatile int32_t* ptr, int32_t delta)
 {
     return OSAtomicAdd32Barrier(delta, ptr) - delta;
@@ -339,19 +339,19 @@ For this reason, \GCC/'s |__sync_lock_test_and_set()| atomic builtin is only
 used on the \x86/ platform, which is known to have a complete implementation.
 
 @<gcc41 def...@>=
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_cas32(volatile int32_t* ptr, int32_t oldval, int32_t newval)
 {
     return __sync_bool_compare_and_swap(ptr, oldval, newval);
 }
 
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_casptr(void* volatile* ptr, void* oldval, void* newval)
 {
     return __sync_bool_compare_and_swap(ptr, oldval, newval);
 }
 
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_tas32(volatile int32_t* ptr, int32_t val)
 {
 #if defined(__i486__) || defined(__i586__) || defined(__i686__) \
@@ -366,7 +366,7 @@ aug_tas32(volatile int32_t* ptr, int32_t val)
 #endif
 }
 
-AUG_API void*
+AUGCTX_API void*
 aug_tasptr(void* volatile* ptr, void* val)
 {
 #if defined(__i486__) || defined(__i586__) || defined(__i686__) \
@@ -381,7 +381,7 @@ aug_tasptr(void* volatile* ptr, void* val)
 #endif
 }
 
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_add32(volatile int32_t* ptr, int32_t delta)
 {
 	return  __sync_fetch_and_add(ptr, delta);
@@ -391,14 +391,14 @@ aug_add32(volatile int32_t* ptr, int32_t delta)
 of \GCC/.
 
 @<gcc x86 def...@>=
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_cas32(volatile int32_t* ptr, int32_t oldval, int32_t newval)
 {
     @<cmpxchgl asm@>@;
     return oldval;
 }
 
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_casptr(void* volatile* ptr, void* oldval, void* newval)
 {
 #if defined(__i486__) || defined(__i586__) || defined(__i686__)
@@ -409,14 +409,14 @@ aug_casptr(void* volatile* ptr, void* oldval, void* newval)
     return (aug_bool_t) oldval;
 }
 
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_tas32(volatile int32_t* ptr, int32_t val)
 {
     @<xchgl asm@>@;
     return val;
 }
 
-AUG_API void*
+AUGCTX_API void*
 aug_tasptr(void* volatile* ptr, void* val)
 {
 #if defined(__i486__) || defined(__i586__) || defined(__i686__)
@@ -427,7 +427,7 @@ aug_tasptr(void* volatile* ptr, void* val)
     return val;
 }
 
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_add32(volatile int32_t* ptr, int32_t val)
 {
     @<xaddl asm@>@;
@@ -446,25 +446,25 @@ generates warnings. These warnings are disabled during the call.
 @<win32 def...@>=
 #include <windows.h>
 
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_cas32(volatile int32_t* ptr, int32_t oldval, int32_t newval)
 {
 	return oldval == InterlockedCompareExchange((volatile long*) ptr, newval, oldval);
 }
 
-AUG_API aug_bool_t
+AUGCTX_API aug_bool_t
 aug_casptr(void* volatile* ptr, void* oldval, void* newval)
 {
 	return oldval == InterlockedCompareExchangePointer(ptr, newval, oldval);
 }
 
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_tas32(volatile int32_t* ptr, int32_t val)
 {
 	return InterlockedExchange((volatile long*) ptr, val);
 }
 
-AUG_API void*
+AUGCTX_API void*
 aug_tasptr(void* volatile* ptr, void* val)
 {
     @<disable warnings@>@;
@@ -472,7 +472,7 @@ aug_tasptr(void* volatile* ptr, void* val)
     @<enable warnings@>@;
 }
 
-AUG_API int32_t
+AUGCTX_API int32_t
 aug_add32(volatile int32_t* ptr, int32_t delta)
 {
 	return InterlockedExchangeAdd((volatile long*) ptr, delta);
@@ -701,60 +701,68 @@ is available on Pentium class machines.
 # endif /* |_MSC_VER >= 1400| */
 # define aug_wmb() _WriteBarrier()
 
-@* Header Preamble. Configuration, linkage and intrinsics.
+@* Header Preamble. Configuration, linkage and intrinsics. The
+|HAVE_AUGCTX_CONFIG_H| symbol should be zero when used outside of the \AUG/
+libraries.
 
 @<pream...@>=
+#define HAVE_AUGCTX_CONFIG_H 0
+#if HAVE_AUGCTX_CONFIG_H
+# include "augctx/config.h"
+#else /* |!HAVE_AUGCTX_CONFIG_H| */
 @<options@>@/
 @<linkage@>@/
+#endif /* |!HAVE_AUGCTX_CONFIG_H| */
 #if defined(_MSC_VER)
 @<msc intrinsics@>@/
 #endif /* |_MSC_VER| */
 @<standard integer types@>@/
 
 @ When SMP is disabled, the memory barrier macros will simply prevent compiler
-re-ordering.
+re-ordering.  When building a shared library, |AUGCTX_SHARED| should be
+defined to ensure the creation of a dynamic symbol table.
 
 @<options@>=
-#if !defined(ENABLE_SMP)
-# define ENABLE_SMP 1
-#endif /* |!ENABLE_SMP| */
+# if !defined(ENABLE_SMP)
+#  define ENABLE_SMP 1
+# endif /* |!ENABLE_SMP| */
 
-#if !defined(AUG_SHARED)
-# if defined(DLL_EXPORT) || defined(_WINDLL)
-#  define AUG_SHARED
-# endif /* |DLL_EXPORT || _WINDLL| */
-#endif /* |!AUG_SHARED| */
+# if !defined(AUGCTX_SHARED)
+#  if defined(DLL_EXPORT) || defined(_WINDLL)
+#   define AUGCTX_SHARED
+#  endif /* |DLL_EXPORT || _WINDLL| */
+# endif /* |!AUGCTX_SHARED| */
 
-@ When building a shared library, |AUG_SHARED| should be defined to ensure the
-creation of a dynamic symbol table.
+@ The linkage definitions ensure correct linkage in accordance with
+ |AUGCTX_SHARED|.
 
 @<linkage@>=
-#if !defined(__cplusplus)
-# define AUG_EXTERNC extern
-#else /* |__cplusplus| */
-# define AUG_EXTERNC extern "C"
-#endif /* |__cplusplus| */
+# if !defined(__cplusplus)
+#  define AUG_EXTERNC extern
+# else /* |__cplusplus| */
+#  define AUG_EXTERNC extern "C"
+# endif /* |__cplusplus| */
 
-#if defined(__CYGWIN__) || defined(__MINGW32__)
-# define AUG_EXPORT __attribute__ ((dllexport))
-# define AUG_IMPORT __attribute__ ((dllimport))
-#elif defined(_MSC_VER)
-# define AUG_EXPORT __declspec(dllexport)
-# define AUG_IMPORT __declspec(dllimport)
-#else /* |!__CYGWIN__ && !__MINGW__ && !__MSC_VER| */
-# define AUG_EXPORT
-# define AUG_IMPORT
-#endif /* |!__CYGWIN__ && !__MINGW__ && !__MSC_VER| */
+# if defined(__CYGWIN__) || defined(__MINGW32__)
+#  define AUG_EXPORT __attribute__ ((dllexport))
+#  define AUG_IMPORT __attribute__ ((dllimport))
+# elif defined(_MSC_VER)
+#  define AUG_EXPORT __declspec(dllexport)
+#  define AUG_IMPORT __declspec(dllimport)
+# else /* |!__CYGWIN__ && !__MINGW__ && !__MSC_VER| */
+#  define AUG_EXPORT
+#  define AUG_IMPORT
+# endif /* |!__CYGWIN__ && !__MINGW__ && !__MSC_VER| */
 
-#if !defined(AUG_SHARED)
-# define AUG_API AUG_EXTERNC
-#else /* |AUG_SHARED| */
-# if !defined(AUG_BUILD)
-#  define AUG_API AUG_EXTERNC AUG_IMPORT
-# else /* |AUG_BUILD| */
-#  define AUG_API AUG_EXTERNC AUG_EXPORT
-# endif /* |AUG_BUILD| */
-#endif /* |AUG_SHARED| */
+# if !defined(AUGCTX_SHARED)
+#  define AUGCTX_API AUG_EXTERNC
+# else /* |AUGCTX_SHARED| */
+#  if !defined(AUGCTX_BUILD)
+#   define AUGCTX_API AUG_EXTERNC AUG_IMPORT
+#  else /* |AUGCTX_BUILD| */
+#   define AUGCTX_API AUG_EXTERNC AUG_EXPORT
+#  endif /* |AUGCTX_BUILD| */
+# endif /* |AUGCTX_SHARED| */
 
 @ Note that |_InterlockedCompareExchangePointer()| is only available on 64 bit
 architectures, and |_ReadBarrier()| for 64 bit compilers. See \.{intrin.h} for

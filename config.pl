@@ -105,6 +105,7 @@ my (
     $smp,
     $strict,
     $threads,
+    $cweb,
     $python,
     $ruby,
     $ssl,
@@ -158,6 +159,7 @@ $multicast = valueask("multicast support", 'y');
 $smp = valueask("smp support", 'y');
 $strict = valueask("strict types", 'n');
 $threads = valueask("thread support", 'y');
+$cweb = valueask("cweb support", 'n');
 $python = valueask("python support", 'n');
 $ruby = valueask("ruby support", 'n');
 $ssl = valueask("ssl support", 'y');
@@ -171,9 +173,9 @@ my (
     );
 
 if (is $gcc) {
-    my $pentium = valueask("pentium build", 'y');
+    my $pentium = valueask("pentium-pro build", 'y');
     my $gprof = valueask("gprof build", 'n');
-    $flags = (is $pentium) ? '-march=i586 -msse2' : '';
+    $flags = (is $pentium) ? '-march=i686 -msse2' : '';
     $flags .= (is $gprof) ? ' -pg' : '';
     $flags .= (is $debug) ? ' -ggdb' : ' -O3 -DNDEBUG';
     $flags .= ' -Wno-long-long -fno-strict-aliasing -Wno-unused-value';
@@ -208,6 +210,8 @@ $options .= " \\\n\t--enable-strict"
     if is $strict;
 $options .= " \\\n\t--disable-threads"
     unless is $threads;
+$options .= " \\\n\t--with-cweb"
+    if is $cweb;
 $options .= " \\\n\t--with-python"
     if is $python;
 $options .= " \\\n\t--with-ruby"
