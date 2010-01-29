@@ -25,15 +25,15 @@
 
 #ifndef AUGCTX_ATOMIC_H
 #define AUGCTX_ATOMIC_H
-/*38:*/
-#line 708 "../../../doc/atomic.w"
+/*37:*/
+#line 700 "../../../doc/atomic.w"
 
 #define HAVE_AUGCTX_CONFIG_H 1
 #if HAVE_AUGCTX_CONFIG_H
 # include "augctx/config.h"
 #else
-/*39:*/
-#line 725 "../../../doc/atomic.w"
+/*38:*/
+#line 717 "../../../doc/atomic.w"
 
 # if !defined(ENABLE_SMP)
 #  define ENABLE_SMP 1
@@ -45,11 +45,11 @@
 #  endif
 # endif
 
-/*:39*/
-#line 713 "../../../doc/atomic.w"
+/*:38*/
+#line 705 "../../../doc/atomic.w"
 
-/*40:*/
-#line 739 "../../../doc/atomic.w"
+/*39:*/
+#line 731 "../../../doc/atomic.w"
 
 # if !defined(__cplusplus)
 #  define AUG_EXTERNC extern
@@ -78,13 +78,13 @@
 #  endif
 # endif
 
-/*:40*/
-#line 714 "../../../doc/atomic.w"
+/*:39*/
+#line 706 "../../../doc/atomic.w"
 
 #endif
 #if defined(_MSC_VER)
-/*41:*/
-#line 771 "../../../doc/atomic.w"
+/*40:*/
+#line 763 "../../../doc/atomic.w"
 
 # if _MSC_VER >= 1400
 #  include <intrin.h>
@@ -111,12 +111,12 @@ AUG_EXTERNC long _InterlockedExchangeAdd(long volatile*,long);
 # define InterlockedExchange _InterlockedExchange
 # define InterlockedExchangeAdd _InterlockedExchangeAdd
 
-/*:41*/
-#line 717 "../../../doc/atomic.w"
+/*:40*/
+#line 709 "../../../doc/atomic.w"
 
 #endif
-/*42:*/
-#line 800 "../../../doc/atomic.w"
+/*41:*/
+#line 792 "../../../doc/atomic.w"
 
 typedef int aug_bool_t;
 #if !defined(_MSC_VER)
@@ -126,11 +126,11 @@ typedef __int32 int32_t;
 typedef __int64 int64_t;
 #endif
 
-/*:42*/
-#line 719 "../../../doc/atomic.w"
+/*:41*/
+#line 711 "../../../doc/atomic.w"
 
 
-/*:38*/
+/*:37*/
 #line 116 "../../../doc/atomic.w"
 
 /*28:*/
@@ -138,7 +138,7 @@ typedef __int64 int64_t;
 
 #if defined(__APPLE__) && defined(__MACH__)
 /*29:*/
-#line 647 "../../../doc/atomic.w"
+#line 645 "../../../doc/atomic.w"
 
 # include <libkern/OSAtomic.h>
 # define aug_mb() OSMemoryBarrier()
@@ -153,7 +153,7 @@ typedef __int64 int64_t;
 # else
 #  if defined(__SSE2__) || defined(__i586__) || defined(__i686__) || defined(__x86_64__)
 /*30:*/
-#line 654 "../../../doc/atomic.w"
+#line 652 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__("mfence":::"memory")
 #   define aug_rmb() __asm__ __volatile__("lfence":::"memory")
@@ -164,7 +164,7 @@ typedef __int64 int64_t;
 
 #  elif defined(__i386__) || defined(__i486__)
 /*31:*/
-#line 661 "../../../doc/atomic.w"
+#line 659 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__("lock; addl $0,0(%%esp)":::"memory")
 #   define aug_wmb() __asm__ __volatile__("":::"memory")
@@ -174,7 +174,7 @@ typedef __int64 int64_t;
 
 #  elif defined(__ia64__)
 /*32:*/
-#line 667 "../../../doc/atomic.w"
+#line 665 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__("mf":::"memory")
 
@@ -183,7 +183,7 @@ typedef __int64 int64_t;
 
 #  elif defined(__alpha__)
 /*33:*/
-#line 672 "../../../doc/atomic.w"
+#line 670 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__("mb":::"memory")
 #   define aug_wmb() __asm__ __volatile__("wmb":::"memory")
@@ -191,44 +191,34 @@ typedef __int64 int64_t;
 /*:33*/
 #line 616 "../../../doc/atomic.w"
 
-#  elif defined(__PPC__)
-/*34:*/
-#line 678 "../../../doc/atomic.w"
-
-#   define aug_mb()  __asm__ __volatile__("sync":::"memory")
-#   define aug_wmb() __asm__ __volatile__("eieio":::"memory")
-
-/*:34*/
-#line 618 "../../../doc/atomic.w"
-
 #  elif defined(__sparc__)
-/*35:*/
-#line 684 "../../../doc/atomic.w"
+/*34:*/
+#line 676 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__(
 "membar #LoadLoad | #LoadStore | #StoreStore | #StoreLoad":::"memory")
 #   define aug_rmb() __asm__ __volatile__("membar #LoadLoad":::"memory")
 #   define aug_wmb() __asm__ __volatile__("membar #StoreStore":::"memory")
 
-/*:35*/
-#line 620 "../../../doc/atomic.w"
+/*:34*/
+#line 618 "../../../doc/atomic.w"
 
 #  elif __GNUC__ >  4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)
-/*36:*/
-#line 692 "../../../doc/atomic.w"
+/*35:*/
+#line 684 "../../../doc/atomic.w"
 
 #   define aug_mb()  __sync_synchronize()
 
-/*:36*/
-#line 622 "../../../doc/atomic.w"
+/*:35*/
+#line 620 "../../../doc/atomic.w"
 
 #  else
 #   error No implementation
 #  endif
 # endif
 #elif defined(_MSC_VER)
-/*37:*/
-#line 697 "../../../doc/atomic.w"
+/*36:*/
+#line 689 "../../../doc/atomic.w"
 
 # define aug_mb()  _ReadWriteBarrier()
 # if _MSC_VER >= 1400
@@ -236,8 +226,8 @@ typedef __int64 int64_t;
 # endif
 # define aug_wmb() _WriteBarrier()
 
-/*:37*/
-#line 628 "../../../doc/atomic.w"
+/*:36*/
+#line 626 "../../../doc/atomic.w"
 
 #else
 # error No implementation

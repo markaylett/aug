@@ -73,7 +73,9 @@ AUGUTIL_API aug_result
 aug_readevent(aug_events_t events, struct aug_event* event);
 
 /**
- * Write event.
+ * Write event.  This call is thread-safe.  Events can be used to marshal data
+ * to sessions from foreign threads.  Events can also be written from signal
+ * handlers.
  *
  * @return See @ref TypesResult.  #AUG_FAILBLOCK if the underlying event
  * buffer is full.
