@@ -158,7 +158,7 @@ AUGCTX_API void
 aug_settlx(aug_ctx* ctx)
 {
     struct tls_* tls = gettls_();
-    assert(0 < tls->refs_);
+    assert(tls && 0 < tls->refs_);
     /* Retain before release - avoiding issues with self assignment. */
     if (ctx)
         aug_retain(ctx);
@@ -182,6 +182,8 @@ AUGCTX_API aug_ctx*
 aug_gettlx(void)
 {
     struct tls_* tls = gettls_();
+    if (!tls)
+        return NULL;
     assert(0 < tls->refs_);
     if (tls->ctx_)
         aug_retain(tls->ctx_);
@@ -192,14 +194,20 @@ AUGCTX_API aug_ctx*
 aug_tlx_(void)
 {
     struct tls_* tls = gettls_();
-    assert(tls && 0 < tls->refs_);
+    if (!tls)
+        return NULL;
+    assert(0 < tls->refs_);
     return tls->ctx_;
 }
 
 AUGCTX_API struct aug_errinfo*
 aug_tlerr_(void)
 {
-    return aug_geterrinfo(aug_tlx_());
+    struct tls_* tls = gettls_();
+    if (!tls)
+        return NULL;
+    assert(0 < tls->refs_);
+    return aug_geterrinfo(tls->ctx_);
 }
 
 AUGCTX_API aug_bool

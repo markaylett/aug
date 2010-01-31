@@ -49,82 +49,82 @@ AUG_RCSID("$Id$");
 # define SIGUSR1 10
 #endif /* _WIN32 */
 
-#define WAITER_ ((void*)1)
+#define WAKEUP_ ((void*)1)
 
-struct event_ {
-    struct event_* next_;
+struct link_ {
+    struct link_* next_;
     int type_;
     aug_object* ob_;
 };
 
 static void
-destroyevent_(struct event_* event)
+destroylink_(struct link_* link)
 {
     aug_mpool* mpool = aug_getcrtmalloc();
-    if (event->ob_)
-        aug_release(event->ob_);
-    aug_freemem(mpool, event);
+    if (link->ob_)
+        aug_release(link->ob_);
+    aug_freemem(mpool, link);
     aug_release(mpool);
 }
 
-static struct event_*
-createevent_(int type, aug_object* ob)
+static struct link_*
+createlink_(int type, aug_object* ob)
 {
     /* Must use standard c-malloc to ensure safety from signal handler;
        aug_tlx may not have been initialised on signal handler's thread. */
 
     aug_mpool* mpool = aug_getcrtmalloc();
-    struct event_* event = aug_allocmem(mpool, sizeof(struct event_));
+    struct link_* link = aug_allocmem(mpool, sizeof(struct link_));
     aug_release(mpool);
 
-    if (event) {
-        event->type_ = type;
-        if ((event->ob_ = ob))
+    if (link) {
+        link->type_ = type;
+        if ((link->ob_ = ob))
             aug_retain(ob);
     }
-    return event;
+    return link;
 }
 
 static void
-pushevent_(struct event_** head, struct event_* event)
+pushlink_(struct link_** head, struct link_* link)
 {
-    event->next_ = *head;
-    *head = event;
+    link->next_ = *head;
+    *head = link;
 }
 
-static struct event_*
-popevent_(struct event_** head)
+static struct link_*
+poplink_(struct link_** head)
 {
-    struct event_* event = *head;
-    if (event)
-        *head = event->next_;
-    return event;
+    struct link_* link = *head;
+    if (link)
+        *head = link->next_;
+    return link;
 }
 
 static void
-reverse_(struct event_** head)
+reverse_(struct link_** head)
 {
-    struct event_* revd = NULL;
-    struct event_* event;
-    while ((event = popevent_(head)))
-        pushevent_(&revd, event);
+    struct link_* revd = NULL;
+    struct link_* link;
+    while ((link = poplink_(head)))
+        pushlink_(&revd, link);
     *head = revd;
 }
 
 static aug_rsize
-flush_(aug_md md, size_t len)
+flush_(aug_md md, unsigned wakeups)
 {
-    void* buf = alloca(len);
+    void* buf = alloca(wakeups);
     aug_rsize rsize;
 
-    while (AUG_ISINTR(rsize = aug_mread(md, buf, len)))
+    while (AUG_ISINTR(rsize = aug_mread(md, buf, (size_t)wakeups)))
         ;
 
     return rsize;
 }
 
-static aug_rsize
-writeone_(aug_md md)
+static aug_result
+wakeup_(aug_md md)
 {
     const char ch = 1;
     aug_rsize rsize;
@@ -132,48 +132,66 @@ writeone_(aug_md md)
     while (AUG_ISINTR(rsize = aug_mwrite(md, &ch, 1)))
         ;
 
-    return rsize;
-}
+    if (AUG_ISFAIL(rsize) || 0 == AUG_RESULT(rsize)) {
 
-/* A pipe is used to interrupt the muxer.  Atomicity is ensured by only
-   writing a single byte to the pipe for each queued event.  The actual events
-   are maintained in a separate list.  The event itself cannot be written to
-   the pipe because this would cause problems if ever the pipe were to become
-   full.  In this scenario, a partial event could be written with no chance of
-   recovery when the muxer is serviced on the same thread. */
+        /* If called from a thread where the context has not been initialised,
+           the this call simply has no effect. */
+
+        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
+                       AUG_MSG("failed to wakeup reader"));
+        return AUG_FAILERROR;
+    }
+
+    return AUG_SUCCESS;
+}
 
 struct aug_events_ {
     aug_mpool* mpool_;
     aug_md mds_[2];
     void* head_;
-    struct event_* store_;
-    unsigned waiters_;
+    struct link_* store_;
+    unsigned wakeups_;
 };
 
-static void
-pushcasptr_(aug_events_t events, struct event_* event)
+static aug_result
+pushcasptr_(aug_events_t events, struct link_* link)
 {
-    struct event_* next;
+    struct link_* next;
     do {
         next = aug_acqptr(&events->head_);
-        event->next_ = next == WAITER_ ? NULL : next;
-    } while (!aug_casptr(&events->head_, next, event));
-    if (next == WAITER_)
-        writeone_(events->mds_[1]);
+        link->next_ = next == WAKEUP_ ? NULL : next;
+    } while (!aug_casptr(&events->head_, next, link));
+
+    if (next != WAKEUP_)
+        return AUG_SUCCESS;
+
+    return wakeup_(events->mds_[1]);
 }
 
-static struct event_*
+static struct link_*
 loadcasptr_(aug_events_t events)
 {
-    struct event_* stack;
+    struct link_* stack;
     for (;;) {
         stack = aug_acqptr(&events->head_);
         if (stack) {
-            if (aug_casptr(&events->head_, stack, NULL))
+            if (aug_casptr(&events->head_, stack, NULL)) {
+                if (0 < events->wakeups_) {
+                    aug_rsize rsize = flush_(events->mds_[0],
+                                             events->wakeups_);
+                    if (!AUG_ISFAIL(rsize))
+                        events->wakeups_ -= AUG_RESULT(rsize);
+                }
                 break;
+            }
+            /* Modification detected. */
         } else {
-            if (aug_casptr(&events->head_, NULL, WAITER_))
+            if (aug_casptr(&events->head_, NULL, WAKEUP_)) {
+                /* Null head replaced with wakeup. */
+                ++events->wakeups_;
                 break;
+            }
+            /* Modification detected. */
         }
     }
     return stack;
@@ -193,7 +211,7 @@ aug_createevents(aug_mpool* mpool)
     }
     events->head_ = NULL;
     events->store_ = NULL;
-    events->waiters_ = 0;
+    events->wakeups_ = 0;
 
     aug_retain(mpool);
     return events;
@@ -203,13 +221,16 @@ AUGUTIL_API void
 aug_destroyevents(aug_events_t events)
 {
     aug_mpool* mpool = events->mpool_;
-    struct event_* event;
+    struct link_* link;
 
-    while ((event = popevent_(&events->store_)))
-        destroyevent_(event);
+    while ((link = poplink_(&events->store_)))
+        destroylink_(link);
 
-    while ((event = popevent_((struct event_**)&events->head_)))
-        destroyevent_(event);
+    /* Head can be accessed like a regular stack during destruction, because
+       it is assumed that aug_writeevent() will not be called. */
+
+    while ((link = poplink_((struct link_**)&events->head_)))
+        destroylink_(link);
 
     if (AUG_ISFAIL(aug_mclose(events->mds_[0]))
         || AUG_ISFAIL(aug_mclose(events->mds_[1])))
@@ -222,14 +243,14 @@ aug_destroyevents(aug_events_t events)
 AUGUTIL_API aug_result
 aug_readevent(aug_events_t events, struct aug_event* event)
 {
-    struct event_* next;
+    struct link_* next;
 
     /* Consume from store if not empty. */
 
-    next = popevent_((struct event_**)&events->head_);
+    next = poplink_(&events->store_);
     if (!next) {
 
-        /* Populate store from shared stack. */
+        /* Otherwise populate store from shared stack. */
 
         events->store_ = loadcasptr_(events);
         reverse_(&events->store_);
@@ -241,24 +262,17 @@ aug_readevent(aug_events_t events, struct aug_event* event)
     if ((event->ob_ = next->ob_))
         aug_retain(event->ob_);
 
-    destroyevent_(next);
+    destroylink_(next);
     return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_result
 aug_writeevent(aug_events_t events, const struct aug_event* event)
 {
-    struct event_* next = createevent_(event->type_, event->ob_);
-    aug_result result;
-
+    struct link_* next = createlink_(event->type_, event->ob_);
     if (!next)
         return AUG_FAILERROR;
-
-    /* Non-blocking. */
-
-    result = writeone_(events->mds_[1]);
-
-    return result;
+    return pushcasptr_(events, next);
 }
 
 AUGUTIL_API aug_md

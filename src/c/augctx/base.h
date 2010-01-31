@@ -97,7 +97,8 @@ AUGCTX_API aug_result
 aug_setbasictlx(aug_mpool* mpool);
 
 /**
- * Obtain reference to thread-local context.
+ * Obtain reference to thread-local context.  Null is returned if no
+ * thread-local context exists.
  *
  * The caller must release the reference when finished with it.
  *
@@ -111,13 +112,13 @@ aug_gettlx(void);
 
 /**
  * Obtain reference to thread-local context, without retaining a reference to
- * it.
+ * it.  Null is returned if no thread-local context exists.
  *
  * The returned reference is not retained.  The caller must _not_, therefore,
  * release it.  This function can also be used to test the existence of a
  * thread-local context.
  *
- * @return A borrowed context reference.
+ * @return A borrowed context reference or null.
  */
 
 #define aug_tlx aug_tlx_()
@@ -126,6 +127,13 @@ AUGCTX_API aug_ctx*
 aug_tlx_(void);
 
 /** @} */
+
+/**
+ * Obtain thread-local error.  Null is returned if no thread-local context
+ * exists.
+ *
+ * @return The thread-local error or null.
+ */
 
 #define aug_tlerr aug_tlerr_()
 

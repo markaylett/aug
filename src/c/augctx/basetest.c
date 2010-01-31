@@ -28,6 +28,16 @@
 int
 main(int argc, char* argv[])
 {
+    if (NULL != aug_tlx) {
+        fprintf(stderr, "thread-local context not null\n");
+        return 1;
+    }
+
+    if (NULL != aug_tlerr) {
+        fprintf(stderr, "thread-local error not null\n");
+        return 1;
+    }
+
     /* Ensure that the initialisation functions can be called multiple
        times. */
 

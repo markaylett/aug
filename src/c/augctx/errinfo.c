@@ -45,6 +45,8 @@ static void
 seterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
             const char* src, int num, const char* desc)
 {
+    if (!errinfo)
+        return;
     aug_strlcpy(errinfo->file_, file, sizeof(errinfo->file_));
     errinfo->line_ = line;
     aug_strlcpy(errinfo->src_, src, sizeof(errinfo->src_));
@@ -57,6 +59,8 @@ vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
              const char* src, int num, const char* format, va_list args)
 {
     int ret;
+    if (!errinfo)
+        return;
 
     aug_strlcpy(errinfo->file_, file, sizeof(errinfo->file_));
     errinfo->line_ = line;
@@ -76,6 +80,9 @@ vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
 AUGCTX_API void
 aug_clearerrinfo(struct aug_errinfo* errinfo)
 {
+    if (!errinfo)
+        return;
+
     errinfo->file_[0] = '\0';
     errinfo->line_ = 0;
     errinfo->src_[0] = '\0';
@@ -87,6 +94,9 @@ AUGCTX_API void
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                 const char* src, int num, const char* format, va_list args)
 {
+    if (!errinfo)
+        return;
+
     if (!num) {
         aug_clearerrinfo(errinfo);
         return;
@@ -100,6 +110,8 @@ aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                const char* src, int num, const char* format, ...)
 {
     va_list args;
+    if (!errinfo)
+        return;
 
     if (!num) {
         aug_clearerrinfo(errinfo);
@@ -115,6 +127,9 @@ AUGCTX_API aug_result
 aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     int num)
 {
+    if (!errinfo)
+        return AUG_SUCCESS;
+
     if (!num) {
         aug_clearerrinfo(errinfo);
         return AUG_SUCCESS;
@@ -140,6 +155,8 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
 {
     char desc[AUG_MAXLINE];
     DWORD i;
+    if (!errinfo)
+        return AUG_SUCCESS;
 
     if (!num) {
         aug_clearerrinfo(errinfo);
@@ -180,6 +197,9 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
 AUGCTX_API int
 aug_errno(const struct aug_errinfo* errinfo)
 {
+    if (!errinfo)
+        return 0;
+
     if (0 == aug_strncasecmp(errinfo->src_, "posix", sizeof(errinfo->src_)))
         return errinfo->num_;
 

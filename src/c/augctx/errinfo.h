@@ -37,18 +37,32 @@ struct aug_errinfo {
     char desc_[512];
 };
 
+/**
+ * No effect if errinfo is null.
+ */
+
 AUGCTX_API void
 aug_clearerrinfo(struct aug_errinfo* errinfo);
+
+/**
+ * No effect if errinfo is null.
+ */
 
 AUGCTX_API void
 aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                 const char* src, int num, const char* format, va_list args);
+
+/**
+ * No effect if errinfo is null.
+ */
 
 AUGCTX_API void
 aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                const char* src, int num, const char* format, ...);
 
 /**
+ * No effect if errinfo is null.
+ *
  * @return Exception code or zero.
  */
 
@@ -59,6 +73,8 @@ aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
 #if defined(_WIN32)
 
 /**
+ * No effect if errinfo is null.
+ *
  * @return Exception code or zero.
  */
 
@@ -68,7 +84,7 @@ aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
 #endif /* _WIN32 */
 
 /**
- * Get equivalent errno value.
+ * Get equivalent errno value.  No effect if errinfo is null.
  *
  * @param errinfo Error info.
  *
