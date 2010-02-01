@@ -129,10 +129,13 @@ wakeup_(aug_md md)
     const char ch = 1;
     aug_rsize rsize;
 
+    /* aug_mwrite() can be called from threads where no context has been
+       initialised, but no errinfo structure will be populated on error. */
+
     while (AUG_ISINTR(rsize = aug_mwrite(md, &ch, 1)))
         ;
 
-    if (AUG_ISFAIL(rsize) || 0 == AUG_RESULT(rsize)) {
+    if (AUG_ISFAIL(rsize) || 1 != AUG_RESULT(rsize)) {
 
         /* If called from a thread where the context has not been initialised,
            the this call simply has no effect. */
@@ -159,26 +162,47 @@ pushcasptr_(aug_events_t events, struct link_* link)
     struct link_* next;
     do {
         next = aug_acqptr(&events->head_);
+        /* Ignore wakeup marker when setting next pointer. */
         link->next_ = next == WAKEUP_ ? NULL : next;
+        /* Until the link's next pointer is set correctly. */
     } while (!aug_casptr(&events->head_, next, link));
 
     if (next != WAKEUP_)
         return AUG_SUCCESS;
 
+    /* Wakeup marker was set, so wakeup consumer. */
     return wakeup_(events->mds_[1]);
 }
 
 static struct link_*
 loadcasptr_(aug_events_t events)
 {
-    struct link_* stack;
+    struct link_* head;
     for (;;) {
-        stack = aug_acqptr(&events->head_);
-        if (stack) {
-            if (aug_casptr(&events->head_, stack, NULL)) {
+        head = aug_acqptr(&events->head_);
+        if (head) {
+            /* Defensive: return null if consumer has already published wakeup
+            marker. This should only happen if consumer has read more than
+            once without polling file descriptor for readability, and no event
+            was available on each occasion. */
+            if (WAKEUP_ == head) {
+                head = NULL;
+                break;
+            }
+            if (aug_casptr(&events->head_, head, NULL)) {
+                /* Head replaced with null. Local head now holds stack. */
                 if (0 < events->wakeups_) {
+                    /* Flush each wakeup written by producer. */
                     aug_rsize rsize = flush_(events->mds_[0],
                                              events->wakeups_);
+                    /* Reduce size by number read. The result may be zero as
+                       the publisher is not gauranteed to have written by this
+                       stage.
+
+                       TODO: this component can recover from transient read
+                       failures, but successive ones may cause the thread to
+                       spin.
+                    */
                     if (!AUG_ISFAIL(rsize))
                         events->wakeups_ -= AUG_RESULT(rsize);
                 }
@@ -187,14 +211,16 @@ loadcasptr_(aug_events_t events)
             /* Modification detected. */
         } else {
             if (aug_casptr(&events->head_, NULL, WAKEUP_)) {
-                /* Null head replaced with wakeup. */
+                /* Null head replaced with wakeup. Consumer should now proceed
+                   to wait on descriptor readability. */
                 ++events->wakeups_;
                 break;
             }
             /* Modification detected. */
         }
     }
-    return stack;
+    /* Either producer stack or null. */
+    return head;
 }
 
 AUGUTIL_API aug_events_t
@@ -240,7 +266,7 @@ aug_destroyevents(aug_events_t events)
     aug_release(mpool);
 }
 
-AUGUTIL_API aug_result
+AUGUTIL_API struct aug_event*
 aug_readevent(aug_events_t events, struct aug_event* event)
 {
     struct link_* next;
@@ -253,7 +279,13 @@ aug_readevent(aug_events_t events, struct aug_event* event)
         /* Otherwise populate store from shared stack. */
 
         events->store_ = loadcasptr_(events);
+        if (!events->store_)
+            return NULL;
+
+        /* Reverse the stack so that it effectively becomes a queue. */
+
         reverse_(&events->store_);
+        next = poplink_(&events->store_);
     }
 
     /* Set output. */
@@ -263,16 +295,14 @@ aug_readevent(aug_events_t events, struct aug_event* event)
         aug_retain(event->ob_);
 
     destroylink_(next);
-    return AUG_SUCCESS;
+    return event;
 }
 
 AUGUTIL_API aug_result
 aug_writeevent(aug_events_t events, const struct aug_event* event)
 {
     struct link_* next = createlink_(event->type_, event->ob_);
-    if (!next)
-        return AUG_FAILERROR;
-    return pushcasptr_(events, next);
+    return next ? pushcasptr_(events, next) : AUG_FAILERROR;
 }
 
 AUGUTIL_API aug_md

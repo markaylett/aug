@@ -64,18 +64,19 @@ AUGUTIL_API void
 aug_destroyevents(aug_events_t events);
 
 /**
- * Read event.
+ * Read next event.
  *
- * @return See @ref TypesResult.  #AUG_FAILBLOCK if there are no more events.
+ * @return Null if there are no more events.
  */
 
-AUGUTIL_API aug_result
+AUGUTIL_API struct aug_event*
 aug_readevent(aug_events_t events, struct aug_event* event);
 
 /**
  * Write event.  This call is thread-safe.  Events can be used to marshal data
  * to sessions from foreign threads.  Events can also be written from signal
- * handlers.
+ * handlers.  If this function is called from a thread where no context has
+ * been initialised, then no errinfo structure will be populated on error.
  *
  * @return See @ref TypesResult.  #AUG_FAILBLOCK if the underlying event
  * buffer is full.
