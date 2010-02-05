@@ -130,7 +130,8 @@ wakeup_(aug_md md)
     aug_rsize rsize;
 
     /* aug_mwrite() can be called from threads where no context has been
-       initialised, but no errinfo structure will be populated on error. */
+       initialised, but the errinfo structure will not be populated on
+       error. */
 
     while (AUG_ISINTR(rsize = aug_mwrite(md, &ch, 1)))
         ;
@@ -164,9 +165,10 @@ pushcasptr_(aug_events_t events, struct link_* link)
         next = aug_acqptr(&events->head_);
         /* Ignore wakeup marker when setting next pointer. */
         link->next_ = next == WAKEUP_ ? NULL : next;
-        /* Until the link's next pointer is set correctly. */
+        /* Until there is no concurrent modification. */
     } while (!aug_casptr(&events->head_, next, link));
 
+    /* Done if not asked to wakeup. */
     if (next != WAKEUP_)
         return AUG_SUCCESS;
 
@@ -181,23 +183,24 @@ loadcasptr_(aug_events_t events)
     for (;;) {
         head = aug_acqptr(&events->head_);
         if (head) {
-            /* Defensive: return null if consumer has already published wakeup
-            marker. This should only happen if consumer has read more than
-            once without polling file descriptor for readability, and no event
-            was available on each occasion. */
+            /* Defensive: return null if wakeup marker has already been
+            published. This should only happen if consumer has read more than
+            once without polling the event descriptor for readability -- and
+            no event was available on each occasion. */
             if (WAKEUP_ == head) {
                 head = NULL;
                 break;
             }
+            /* Replace head with null. */
             if (aug_casptr(&events->head_, head, NULL)) {
-                /* Head replaced with null. Local head now holds stack. */
+                /* Local head now holds stack. */
                 if (0 < events->wakeups_) {
-                    /* Flush each wakeup written by producer. */
+                    /* Flush each wakeup written by producers. */
                     aug_rsize rsize = flush_(events->mds_[0],
                                              events->wakeups_);
-                    /* Reduce size by number read. The result may be zero as
-                       the publisher is not gauranteed to have written by this
-                       stage.
+                    /* Reduce wakeups by number read. The result may be zero
+                       as the publisher is not gauranteed to have written at
+                       this stage.
 
                        TODO: this component can recover from transient read
                        failures, but successive ones may cause the thread to
@@ -208,16 +211,16 @@ loadcasptr_(aug_events_t events)
                 }
                 break;
             }
-            /* Modification detected. */
         } else {
+            /* Replace null head with wakeup marker. */
             if (aug_casptr(&events->head_, NULL, WAKEUP_)) {
-                /* Null head replaced with wakeup. Consumer should now proceed
-                   to wait on descriptor readability. */
+                /* Consumer should now proceed to wait on event descriptor
+                   readability. */
                 ++events->wakeups_;
                 break;
             }
-            /* Modification detected. */
         }
+        /* Modification detected, so continue. */
     }
     /* Either producer stack or null. */
     return head;
@@ -279,8 +282,10 @@ aug_readevent(aug_events_t events, struct aug_event* event)
         /* Otherwise populate store from shared stack. */
 
         events->store_ = loadcasptr_(events);
-        if (!events->store_)
+        if (!events->store_) {
+            /* Wakeup marker will have been written. */
             return NULL;
+        }
 
         /* Reverse the stack so that it effectively becomes a queue. */
 
@@ -288,7 +293,7 @@ aug_readevent(aug_events_t events, struct aug_event* event)
         next = poplink_(&events->store_);
     }
 
-    /* Set output. */
+    /* Set output event. */
 
     event->type_ = next->type_;
     if ((event->ob_ = next->ob_))
