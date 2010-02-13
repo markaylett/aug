@@ -120,7 +120,8 @@ flush_(aug_md md, unsigned wakeups)
     while (AUG_ISINTR(rsize = aug_mread(md, buf, (size_t)wakeups)))
         ;
 
-    return rsize;
+    /* Zero or more. */
+    return AUG_ISBLOCK(rsize) ? AUG_ZERO : rsize;
 }
 
 static aug_result
@@ -130,8 +131,8 @@ wakeup_(aug_md md)
     aug_rsize rsize;
 
     /* aug_mwrite() can be called from threads where no context has been
-       initialised, but the errinfo structure will not be populated on
-       error. */
+       initialised, the only caveat being that the errinfo structure will not
+       be populated on error. */
 
     while (AUG_ISINTR(rsize = aug_mwrite(md, &ch, 1)))
         ;
@@ -152,8 +153,8 @@ wakeup_(aug_md md)
 struct aug_events_ {
     aug_mpool* mpool_;
     aug_md mds_[2];
-    void* head_;
-    struct link_* store_;
+    void* shared_;
+    struct link_* local_;
     unsigned wakeups_;
 };
 
@@ -162,11 +163,11 @@ pushcasptr_(aug_events_t events, struct link_* link)
 {
     struct link_* next;
     do {
-        next = aug_acqptr(&events->head_);
-        /* Ignore wakeup marker when setting next pointer. */
+        next = aug_acqptr(&events->shared_);
+        /* Ignore wakeup marker when setting link's next pointer. */
         link->next_ = next == WAKEUP_ ? NULL : next;
         /* Until there is no concurrent modification. */
-    } while (!aug_casptr(&events->head_, next, link));
+    } while (!aug_casptr(&events->shared_, next, link));
 
     /* Done if not asked to wakeup. */
     if (next != WAKEUP_)
@@ -176,44 +177,42 @@ pushcasptr_(aug_events_t events, struct link_* link)
     return wakeup_(events->mds_[1]);
 }
 
-static struct link_*
-loadcasptr_(aug_events_t events)
+static aug_result
+loadcasptr_(aug_events_t events, struct link_** head)
 {
-    struct link_* head;
     for (;;) {
-        head = aug_acqptr(&events->head_);
+        *head = aug_acqptr(&events->shared_);
         if (head) {
             /* Defensive: return null if wakeup marker has already been
-            published. This should only happen if consumer has read more than
-            once without polling the event descriptor for readability -- and
-            no event was available on each occasion. */
-            if (WAKEUP_ == head) {
-                head = NULL;
+            published by this (the only) consumer. This should only happen if
+            consumer has read more than once without polling the event
+            descriptor for readability -- and no event was available on each
+            occasion. */
+            if (WAKEUP_ == *head) {
+                *head = NULL;
                 break;
             }
             /* Replace head with null. */
-            if (aug_casptr(&events->head_, head, NULL)) {
-                /* Local head now holds stack. */
+            if (aug_casptr(&events->shared_, *head, NULL)) {
+                /* Shread stack has now been transferred to head. */
                 if (0 < events->wakeups_) {
                     /* Flush each wakeup written by producers. */
                     aug_rsize rsize = flush_(events->mds_[0],
                                              events->wakeups_);
-                    /* Reduce wakeups by number read. The result may be zero
-                       as the publisher is not gauranteed to have written at
-                       this stage.
-
-                       TODO: this component can recover from transient read
-                       failures, but successive ones may cause the thread to
-                       spin.
+                    if (AUG_ISFAIL(rsize))
+                        return AUG_FAILERROR;
+                    /* Reduce wakeups by actual number read. The result may be
+                       zero as the publisher is not gauranteed to have written
+                       by this time.
                     */
-                    if (!AUG_ISFAIL(rsize))
-                        events->wakeups_ -= AUG_RESULT(rsize);
+                    events->wakeups_ -= AUG_RESULT(rsize);
                 }
                 break;
             }
         } else {
-            /* Replace null head with wakeup marker. */
-            if (aug_casptr(&events->head_, NULL, WAKEUP_)) {
+            /* Replace null head with wakeup marker, indicating that the
+               consumer will wait until woken. */
+            if (aug_casptr(&events->shared_, NULL, WAKEUP_)) {
                 /* Consumer should now proceed to wait on event descriptor
                    readability. */
                 ++events->wakeups_;
@@ -222,8 +221,8 @@ loadcasptr_(aug_events_t events)
         }
         /* Modification detected, so continue. */
     }
-    /* Either producer stack or null. */
-    return head;
+    /* Head is either shared stack or null. */
+    return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_events_t
@@ -238,8 +237,8 @@ aug_createevents(aug_mpool* mpool)
         aug_freemem(mpool, events);
         return NULL;
     }
-    events->head_ = NULL;
-    events->store_ = NULL;
+    events->shared_ = NULL;
+    events->local_ = NULL;
     events->wakeups_ = 0;
 
     aug_retain(mpool);
@@ -252,13 +251,13 @@ aug_destroyevents(aug_events_t events)
     aug_mpool* mpool = events->mpool_;
     struct link_* link;
 
-    while ((link = poplink_(&events->store_)))
+    while ((link = poplink_(&events->local_)))
         destroylink_(link);
 
     /* Head can be accessed like a regular stack during destruction, because
        it is assumed that aug_writeevent() will not be called. */
 
-    while ((link = poplink_((struct link_**)&events->head_)))
+    while ((link = poplink_((struct link_**)&events->shared_)))
         destroylink_(link);
 
     if (AUG_ISFAIL(aug_mclose(events->mds_[0]))
@@ -269,28 +268,28 @@ aug_destroyevents(aug_events_t events)
     aug_release(mpool);
 }
 
-AUGUTIL_API struct aug_event*
+AUGUTIL_API aug_result
 aug_readevent(aug_events_t events, struct aug_event* event)
 {
     struct link_* next;
 
-    /* Consume from store if not empty. */
+    /* Consume from local stack if not empty. */
 
-    next = poplink_(&events->store_);
+    next = poplink_(&events->local_);
     if (!next) {
 
-        /* Otherwise populate store from shared stack. */
+        /* Otherwise populate local from shared stack. */
 
-        events->store_ = loadcasptr_(events);
-        if (!events->store_) {
-            /* Wakeup marker will have been written. */
-            return NULL;
+        aug_verify(loadcasptr_(events, &events->local_));
+        if (!events->local_) {
+            /* Wakeup marker has already been written. */
+            return AUG_FAILBLOCK;
         }
 
         /* Reverse the stack so that it effectively becomes a queue. */
 
-        reverse_(&events->store_);
-        next = poplink_(&events->store_);
+        reverse_(&events->local_);
+        next = poplink_(&events->local_);
     }
 
     /* Set output event. */
@@ -300,7 +299,7 @@ aug_readevent(aug_events_t events, struct aug_event* event)
         aug_retain(event->ob_);
 
     destroylink_(next);
-    return event;
+    return AUG_SUCCESS;
 }
 
 AUGUTIL_API aug_result

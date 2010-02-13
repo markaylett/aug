@@ -66,10 +66,11 @@ aug_destroyevents(aug_events_t events);
 /**
  * Read next event.
  *
- * @return Null if there are no more events.
+ *
+ * @return See @ref TypesResult.  #AUG_FAILBLOCK if no events are available.
  */
 
-AUGUTIL_API struct aug_event*
+AUGUTIL_API aug_result
 aug_readevent(aug_events_t events, struct aug_event* event);
 
 /**
