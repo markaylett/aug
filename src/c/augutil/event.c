@@ -237,7 +237,8 @@ aug_createevents(aug_mpool* mpool)
         aug_freemem(mpool, events);
         return NULL;
     }
-    events->shared_ = NULL;
+    /* Always wakeup on first event. */
+    events->shared_ = WAKEUP_;
     events->local_ = NULL;
     events->wakeups_ = 0;
 
