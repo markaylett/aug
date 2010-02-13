@@ -45,7 +45,7 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    for (in = 1;; ++in) {
+    for (in = 1; in <= 1000; ++in) {
 
         struct aug_event event;
         aug_result result;
