@@ -61,10 +61,10 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(modincludedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libaugsys_la_DEPENDENCIES = $(top_builddir)/src/c/augctx/libaugctx.la
-am_libaugsys_la_OBJECTS = chan.lo config.lo debug.lo \
-	dlfcn.lo endian.lo limits.lo mcast.lo mmap.lo muxer.lo \
-	sticky.lo socket.lo stream.lo time.lo types.lo uio.lo \
-	unistd.lo utility.lo windows.lo
+am_libaugsys_la_OBJECTS = chan.lo config.lo debug.lo dlfcn.lo \
+	endian.lo limits.lo mcast.lo mmap.lo muxer.lo sticky.lo \
+	socket.lo stream.lo time.lo types.lo uio.lo unistd.lo \
+	utility.lo windows.lo
 libaugsys_la_OBJECTS = $(am_libaugsys_la_OBJECTS)
 am_chantest_OBJECTS = chantest.$(OBJEXT)
 chantest_OBJECTS = $(am_chantest_OBJECTS)
