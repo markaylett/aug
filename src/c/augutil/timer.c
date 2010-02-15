@@ -198,7 +198,7 @@ aug_resettimer(aug_timers_t timers, aug_id id, unsigned ms)
             if (ms) /* May be zero. */
                 it->ms_ = ms;
 
-            if (AUG_ISFAIL(result = setexpiry_(timers->clock_, &it->tv_,
+            if (aug_isfail(result = setexpiry_(timers->clock_, &it->tv_,
                                                it->ms_))) {
 
                 destroytimer_(timers->mpool_, it);
@@ -292,7 +292,7 @@ aug_processexpired(aug_timers_t timers, aug_bool force,
 
                 /* Update expiry time and insert. */
 
-                if (AUG_ISFAIL(setexpiry_(timers->clock_, &it->tv_, it->ms_)))
+                if (aug_isfail(setexpiry_(timers->clock_, &it->tv_, it->ms_)))
                     aug_perrinfo(aug_tlx, "expiry_() failed", NULL);
                 else
                     inserttimer_(&timers->list_, it);

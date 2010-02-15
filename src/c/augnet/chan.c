@@ -283,7 +283,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         /* De-register existing descriptor from multiplexer, and attempt to
            establish connection. */
 
-        if (AUG_ISFAIL(aug_setmdeventmask(impl->muxer_, impl->sd_, 0))
+        if (aug_isfail(aug_setmdeventmask(impl->muxer_, impl->sd_, 0))
             || AUG_BADSD == (impl->sd_ = aug_tryconnect(impl->conn_, &ep,
                                                         &impl->est_))) {
             aug_errorchan(handler, &impl->chan_, aug_tlerr);
@@ -498,14 +498,14 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             goto done;
         }
 
-        if (AUG_ISFAIL(aug_setnodelay(sd, AUG_TRUE))) {
+        if (aug_isfail(aug_setnodelay(sd, AUG_TRUE))) {
             aug_ctxwarn(aug_tlx, "aug_setnodelay() failed: %s",
                         aug_tlerr->desc_);
             aug_sclose(sd);
             goto done;
         }
 
-        if (AUG_ISFAIL(aug_ssetnonblock(sd, AUG_TRUE))) {
+        if (aug_isfail(aug_ssetnonblock(sd, AUG_TRUE))) {
             aug_ctxwarn(aug_tlx, "aug_ssetnonblock() failed: %s",
                         aug_tlerr->desc_);
             aug_sclose(sd);
@@ -797,7 +797,7 @@ pstream_read_(aug_stream* ob, void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_sread(impl->sticky_.md_, buf, size);
-    if (AUG_ISBLOCK(rsize))
+    if (aug_isblock(rsize))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
     return rsize;
 }
@@ -807,7 +807,7 @@ pstream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_sreadv(impl->sticky_.md_, iov, size);
-    if (AUG_ISBLOCK(rsize))
+    if (aug_isblock(rsize))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
     return rsize;
 }
@@ -817,7 +817,7 @@ pstream_write_(aug_stream* ob, const void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_swrite(impl->sticky_.md_, buf, size);
-    if (AUG_ISBLOCK(rsize))
+    if (aug_isblock(rsize))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
     return rsize;
 }
@@ -827,7 +827,7 @@ pstream_writev_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_swritev(impl->sticky_.md_, iov, size);
-    if (AUG_ISBLOCK(rsize))
+    if (aug_isblock(rsize))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTWR);
     return rsize;
 }
@@ -867,7 +867,7 @@ aug_createclient(aug_mpool* mpool, const char* host, const char* serv,
 
         /* Set mask to poll for connection establishment. */
 
-        if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTCONN)))
+        if (aug_isfail(aug_setmdeventmask(muxer, sd, AUG_MDEVENTCONN)))
             goto fail2;
     }
 
@@ -920,7 +920,7 @@ aug_createserver(aug_mpool* mpool, aug_muxer_t muxer, aug_sd sd,
     /* A readable event will be delivered when a new connection is
        attempted. */
 
-    if (AUG_ISFAIL(aug_setmdeventmask(muxer, sd, AUG_MDEVENTRDEX)))
+    if (aug_isfail(aug_setmdeventmask(muxer, sd, AUG_MDEVENTRDEX)))
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct simpl_)))) {
@@ -963,7 +963,7 @@ aug_createplain(aug_mpool* mpool, aug_id id, aug_muxer_t muxer, aug_sd sd,
 
     /* Sticky event flags are used for edge-triggered interfaces. */
 
-    if (AUG_ISFAIL(aug_initsticky(&impl->sticky_, muxer, sd, wantwr
+    if (aug_isfail(aug_initsticky(&impl->sticky_, muxer, sd, wantwr
                                   ? AUG_MDEVENTALL : AUG_MDEVENTRDEX))) {
         aug_freemem(mpool, impl);
         return NULL;

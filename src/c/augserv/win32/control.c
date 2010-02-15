@@ -67,8 +67,8 @@ makepath_(const char* conffile)
     if (!aug_realpath(program, buf, sizeof(buf)))
         goto fail;
 
-    if (AUG_ISFAIL(aug_xstrcatc(s, '"')) || AUG_ISFAIL(aug_xstrcats(s, buf))
-        || AUG_ISFAIL(aug_xstrcatc(s, '"')))
+    if (aug_isfail(aug_xstrcatc(s, '"')) || aug_isfail(aug_xstrcats(s, buf))
+        || aug_isfail(aug_xstrcatc(s, '"')))
         goto fail;
 
     if (conffile) {
@@ -76,9 +76,9 @@ makepath_(const char* conffile)
         if (!aug_realpath(conffile, buf, sizeof(buf)))
             goto fail;
 
-        if (AUG_ISFAIL(aug_xstrcats(s, " -f \""))
-            || AUG_ISFAIL(aug_xstrcats(s, buf))
-            || AUG_ISFAIL(aug_xstrcatc(s, '"')))
+        if (aug_isfail(aug_xstrcats(s, " -f \""))
+            || aug_isfail(aug_xstrcats(s, buf))
+            || aug_isfail(aug_xstrcatc(s, '"')))
             goto fail;
     }
 
@@ -236,7 +236,7 @@ uninstall_(SC_HANDLE scm)
             result = aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
     }
 
-    if (!DeleteService(serv) && AUG_ISSUCCESS(result))
+    if (!DeleteService(serv) && aug_issuccess(result))
         result = aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
                                      GetLastError());
 

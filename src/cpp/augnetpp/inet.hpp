@@ -93,7 +93,7 @@ namespace aug {
     established(sdref ref)
     {
         aug_result result(aug_established(ref.get()));
-        if (AUG_ISNONE(result))
+        if (aug_isnone(result))
             return false;
         verify(result); // Possible error.
         return true;

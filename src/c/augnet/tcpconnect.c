@@ -55,7 +55,7 @@ aug_createtcpconnect(aug_mpool* mpool, const char* host, const char* serv)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
+    if (aug_isfail(aug_getaddrinfo(host, serv, &hints, &res)))
         return NULL;
 
     if (!(conn  = aug_allocmem(mpool, sizeof(struct aug_tcpconnect_)))) {
@@ -117,9 +117,9 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 
         aug_result result = aug_established(sd);
 
-        if (AUG_ISFAIL(result)) {
+        if (aug_isfail(result)) {
 
-            if (AUG_ISNONE(result)) {
+            if (aug_isnone(result)) {
 
                 /* Not established. */
 
@@ -127,7 +127,7 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 
                     /* Try next address. */
 
-                    if (AUG_ISFAIL(aug_sclose(sd)))
+                    if (aug_isfail(aug_sclose(sd)))
                         return AUG_BADSD;
 
                 } else {
@@ -170,14 +170,14 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
         if (AUG_BADSD == sd)
             continue; /* Ignore this one. */
 
-        if (AUG_ISFAIL(aug_ssetnonblock(sd, AUG_TRUE))) {
+        if (aug_isfail(aug_ssetnonblock(sd, AUG_TRUE))) {
             aug_sclose(sd);
             return AUG_BADSD;
         }
 
         aug_getendpoint(conn->res_, ep);
 
-        if (AUG_ISSUCCESS(aug_connect(sd, ep))) {
+        if (aug_issuccess(aug_connect(sd, ep))) {
 
             /* Immediate establishment. */
 
@@ -196,7 +196,7 @@ aug_tryconnect(aug_tcpconnect_t conn, struct aug_endpoint* ep, int* est)
 
         /* Failed for other reason. */
 
-        if (AUG_ISFAIL(aug_sclose(sd))) /* Ignore this one. */
+        if (aug_isfail(aug_sclose(sd))) /* Ignore this one. */
             return AUG_BADSD;
 
     } while ((conn->res_ = conn->res_->ai_next));

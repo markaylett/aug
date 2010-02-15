@@ -459,7 +459,7 @@ readwrite_(struct impl_* impl, unsigned short events)
                shutdown. */
 
             if (impl->shutdown_ && bufempty_(&impl->outbuf_)
-                && AUG_ISFAIL(shutwr_(impl, &impl->errinfo_))) {
+                && aug_isfail(shutwr_(impl, &impl->errinfo_))) {
 
                 /* Save error locally. */
 
@@ -630,7 +630,7 @@ cprocess_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
            readable before issuing an SSL_read(). */
 
         char ch;
-        if (AUG_ISBLOCK(aug_recv(impl->sticky_.md_, &ch, 1, MSG_PEEK))) {
+        if (aug_isblock(aug_recv(impl->sticky_.md_, &ch, 1, MSG_PEEK))) {
 
             /* If the peek operation would have blocked, then clear the sticky
                bit. */
@@ -931,7 +931,7 @@ createssl_(aug_mpool* mpool, aug_id id, aug_muxer_t muxer, aug_sd sd,
 
     /* Sticky event flags are used for edge-triggered interfaces. */
 
-    if (AUG_ISFAIL(aug_initsticky(&impl->sticky_, muxer, sd, 0))) {
+    if (aug_isfail(aug_initsticky(&impl->sticky_, muxer, sd, 0))) {
         aug_freemem(mpool, impl);
         return NULL;
     }

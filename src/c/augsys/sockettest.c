@@ -38,7 +38,7 @@ main(int argc, char* argv[])
     if (!aug_autotlx())
         return 1;
 
-    if (AUG_ISFAIL(aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv))) {
+    if (aug_isfail(aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sv))) {
         aug_perrinfo(aug_tlx, "aug_socketpair() failed", NULL);
         return 1;
     }
@@ -48,12 +48,12 @@ main(int argc, char* argv[])
     iov[1].iov_base = MSG2_;
     iov[1].iov_len = sizeof(MSG2_);
 
-    if (AUG_ISFAIL(aug_swritev(sv[0], iov, 2))) {
+    if (aug_isfail(aug_swritev(sv[0], iov, 2))) {
         aug_perrinfo(aug_tlx, "aug_writev() failed", NULL);
         return 1;
     }
 
-    if (AUG_ISFAIL(aug_sread(sv[1], buf, iov[0].iov_len + iov[1].iov_len))) {
+    if (aug_isfail(aug_sread(sv[1], buf, iov[0].iov_len + iov[1].iov_len))) {
         aug_perrinfo(aug_tlx, "aug_read() failed", NULL);
         return 1;
     }

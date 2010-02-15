@@ -192,7 +192,7 @@ resizemfile_(aug_seq_t seq, unsigned size, unsigned tail)
         memmove((char*)addr + (size - tail),
                 (char*)addr + (len - tail), tail);
 
-        if (AUG_ISFAIL(aug_truncatemfile_(mfileseq->mfile_, size)))
+        if (aug_isfail(aug_truncatemfile_(mfileseq->mfile_, size)))
             return NULL;
     }
     return addr;

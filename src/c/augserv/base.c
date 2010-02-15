@@ -84,7 +84,7 @@ sighandler_(int sig)
     /* The signal is ignored if the write fails with EAGAIN/EWOULDBLOCK.  This
        could happen if the event pipe is full.  What else can one do? */
 
-    if (AUG_ISFAIL(result) && !AUG_ISBLOCK(result))
+    if (aug_isfail(result) && !aug_isblock(result))
         abort();
 }
 
@@ -95,7 +95,7 @@ ctrlhandler_(DWORD ctrl)
     struct aug_event event = { AUG_EVENTSTOP, NULL };
     aug_result result = aug_writeevent(events_, &event);
 
-    if (AUG_ISFAIL(result) && !AUG_ISBLOCK(result))
+    if (aug_isfail(result) && !aug_isblock(result))
         abort();
 
     return TRUE;
@@ -117,7 +117,7 @@ createevents_(void)
     if (!events_)
         return AUG_FAILERROR;
 
-    if (AUG_ISFAIL(result = aug_setsighandler(sighandler_))) {
+    if (aug_isfail(result = aug_setsighandler(sighandler_))) {
         destroyevents_();
         return result;
     }
@@ -155,7 +155,7 @@ aug_initserv(void)
     assert(serv_.create_);
     assert(!task_);
 
-    if (AUG_ISFAIL(result = createevents_()))
+    if (aug_isfail(result = createevents_()))
         return result;
 
     /* Flush pending writes to main memory: when init_() is called, the

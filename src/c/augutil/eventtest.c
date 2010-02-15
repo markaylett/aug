@@ -53,9 +53,9 @@ main(int argc, char* argv[])
         event.type_ = in;
         event.ob_ = NULL;
 
-        if (AUG_ISFAIL(result = aug_writeevent(events, &event))) {
+        if (aug_isfail(result = aug_writeevent(events, &event))) {
 
-            if (AUG_ISBLOCK(result))
+            if (aug_isblock(result))
                 break;
 
             aug_perrinfo(aug_tlx, "aug_writeevent() failed", NULL);
@@ -68,9 +68,9 @@ main(int argc, char* argv[])
         struct aug_event event;
         aug_result result = aug_readevent(events, &event);
 
-        if (AUG_ISFAIL(result)) {
+        if (aug_isfail(result)) {
 
-            if (AUG_ISBLOCK(result))
+            if (aug_isblock(result))
                 break;
 
             aug_perrinfo(aug_tlx, "aug_readevent() failed", NULL);

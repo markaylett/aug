@@ -188,16 +188,16 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     DWORD prot, access;
     size_t size;
 
-    if (AUG_ISFAIL(toprot_(&prot, flags)))
+    if (aug_isfail(toprot_(&prot, flags)))
         return NULL;
 
-    if (AUG_ISFAIL(toaccess_(&access, flags)))
+    if (aug_isfail(toaccess_(&access, flags)))
         return NULL;
 
-    if (AUG_ISFAIL(aug_fsize(fd, &size)))
+    if (aug_isfail(aug_fsize(fd, &size)))
         return NULL;
 
-    if (AUG_ISFAIL(verify_(size, offset, len)))
+    if (aug_isfail(verify_(size, offset, len)))
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct impl_))))
@@ -212,7 +212,7 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     impl->size_ = size;
     impl->mapping_ = INVALID_HANDLE_VALUE;
 
-    if (AUG_ISFAIL(createmmap_(impl, offset, len))) {
+    if (aug_isfail(createmmap_(impl, offset, len))) {
         aug_freemem(mpool, impl);
         return NULL;
     }

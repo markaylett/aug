@@ -193,7 +193,7 @@ aug_vformatlog(char* buf, size_t* n, aug_clock* clock, int level,
     assert(buf && n && *n && format);
     size = *n;
 
-    if (AUG_ISFAIL(ms = localtime_(clock, &tm)))
+    if (aug_isfail(ms = localtime_(clock, &tm)))
         return ms;
 
     /* The return value from the strftime() function is either a) the number

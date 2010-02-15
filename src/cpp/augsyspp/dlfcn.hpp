@@ -61,7 +61,7 @@ namespace aug {
         {
             aug_dlib_t prev(dlib_);
             dlib_ = dl;
-            if (prev && AUG_ISFAIL(aug_dlclose(prev)))
+            if (prev && aug_isfail(aug_dlclose(prev)))
                 perrinfo(aug_tlx, "aug_dlclose() failed");
         }
 

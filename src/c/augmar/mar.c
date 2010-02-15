@@ -127,11 +127,11 @@ destroy_(struct impl_* impl)
            fail. */
 
         struct aug_info_ local;
-        if (AUG_ISFAIL(aug_info_(impl->seq_, &local)))
+        if (aug_isfail(aug_info_(impl->seq_, &local)))
             goto done;
 
         if (0 != memcmp(&local, &impl->info_, sizeof(local))
-            && AUG_ISFAIL(aug_setinfo_(impl->seq_, &impl->info_)))
+            && aug_isfail(aug_setinfo_(impl->seq_, &impl->info_)))
             goto done;
     }
 
@@ -380,7 +380,7 @@ insert_(aug_mar* obj, const char* path)
             return AUG_FAILERROR;
         }
 
-        if (AUG_ISFAIL(result = aug_setcontent(obj, addr, size))) {
+        if (aug_isfail(result = aug_setcontent(obj, addr, size))) {
             aug_closemfile_(mfile);
             return result;
         }
@@ -478,11 +478,11 @@ write_(aug_mar* obj, const void* buf, unsigned len)
 
         assert(AUG_APPEND == (impl->flags_ & AUG_APPEND));
 
-        if (AUG_ISFAIL(rsize = aug_seekmar(obj, 0, AUG_END)))
+        if (aug_isfail(rsize = aug_seekmar(obj, 0, AUG_END)))
             return rsize;
     }
 
-    if (AUG_ISSUCCESS(rsize = aug_write_(impl->seq_, &impl->info_,
+    if (aug_issuccess(rsize = aug_write_(impl->seq_, &impl->info_,
                                          impl->offset_, buf, len)))
         impl->offset_ += AUG_RESULT(rsize);
 
@@ -546,7 +546,7 @@ read_(aug_mar* obj, void* buf, unsigned len)
         return AUG_FAILERROR;
     }
 
-    if (AUG_ISSUCCESS(rsize = aug_read_(impl->seq_, &impl->info_,
+    if (aug_issuccess(rsize = aug_read_(impl->seq_, &impl->info_,
                                         impl->offset_, buf, len)))
         impl->offset_ += AUG_RESULT(rsize);
 
@@ -606,7 +606,7 @@ gettype_(aug_blob* obj)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, blob_, obj);
     const void* value;
-    if (!AUG_ISSUCCESS(aug_getfieldp_(impl->seq_, &impl->info_,
+    if (!aug_issuccess(aug_getfieldp_(impl->seq_, &impl->info_,
                                       "Content-Type", &value)))
         value = "application/octet-stream";
     return value;
@@ -653,7 +653,7 @@ aug_createmar(aug_mpool* mpool)
     if (!(seq = aug_createseq_(mpool, sizeof(struct impl_))))
         return NULL;
 
-    if (AUG_ISFAIL(init_(seq, &info))) {
+    if (aug_isfail(init_(seq, &info))) {
         aug_destroyseq_(seq);
         return NULL;
     }
@@ -701,7 +701,7 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
                              sizeof(struct impl_))))
         return NULL;
 
-    if (AUG_ISFAIL(init_(seq, &info))) {
+    if (aug_isfail(init_(seq, &info))) {
         aug_destroyseq_(seq);
         return NULL;
     }
@@ -729,7 +729,7 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
     if (flags & AUG_TRUNC) {
 
         assert(AUG_TRUNC == (flags & AUG_TRUNC));
-        if (AUG_ISFAIL(aug_truncatemar(&impl->mar_, 0))) {
+        if (aug_isfail(aug_truncatemar(&impl->mar_, 0))) {
             aug_release(&impl->mar_);
             return NULL;
         }

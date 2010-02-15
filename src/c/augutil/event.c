@@ -117,11 +117,11 @@ flush_(aug_md md, unsigned wakeups)
     void* buf = alloca(wakeups);
     aug_rsize rsize;
 
-    while (AUG_ISINTR(rsize = aug_mread(md, buf, (size_t)wakeups)))
+    while (aug_isintr(rsize = aug_mread(md, buf, (size_t)wakeups)))
         ;
 
     /* Zero or more. */
-    return AUG_ISBLOCK(rsize) ? AUG_ZERO : rsize;
+    return aug_isblock(rsize) ? AUG_ZERO : rsize;
 }
 
 static aug_result
@@ -134,10 +134,10 @@ wakeup_(aug_md md)
        initialised, the only caveat being that the errinfo structure will not
        be populated on error. */
 
-    while (AUG_ISINTR(rsize = aug_mwrite(md, &ch, 1)))
+    while (aug_isintr(rsize = aug_mwrite(md, &ch, 1)))
         ;
 
-    if (AUG_ISFAIL(rsize) || 1 != AUG_RESULT(rsize)) {
+    if (aug_isfail(rsize) || 1 != AUG_RESULT(rsize)) {
 
         /* If called from a thread where the context has not been initialised,
            the this call simply has no effect. */
@@ -199,7 +199,7 @@ loadcasptr_(aug_events_t events, struct link_** head)
                     /* Flush each wakeup written by producers. */
                     aug_rsize rsize = flush_(events->mds_[0],
                                              events->wakeups_);
-                    if (AUG_ISFAIL(rsize))
+                    if (aug_isfail(rsize))
                         return AUG_FAILERROR;
                     /* Reduce wakeups by actual number read. The result may be
                        zero as the publisher is not gauranteed to have written
@@ -233,7 +233,7 @@ aug_createevents(aug_mpool* mpool)
         return NULL;
 
     events->mpool_ = mpool;
-    if (AUG_ISFAIL(aug_muxerpipe(events->mds_))) {
+    if (aug_isfail(aug_muxerpipe(events->mds_))) {
         aug_freemem(mpool, events);
         return NULL;
     }
@@ -261,8 +261,8 @@ aug_destroyevents(aug_events_t events)
     while ((link = poplink_((struct link_**)&events->shared_)))
         destroylink_(link);
 
-    if (AUG_ISFAIL(aug_mclose(events->mds_[0]))
-        || AUG_ISFAIL(aug_mclose(events->mds_[1])))
+    if (aug_isfail(aug_mclose(events->mds_[0]))
+        || aug_isfail(aug_mclose(events->mds_[1])))
         aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
 
     aug_freemem(mpool, events);

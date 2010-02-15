@@ -151,7 +151,7 @@ aug_setmcastif(aug_sd sd, const char* ifname)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (AUG_ISFAIL(af = aug_getfamily(sd)))
+    if (aug_isfail(af = aug_getfamily(sd)))
         return af;
 
     switch (AUG_RESULT(af)) {
@@ -184,7 +184,7 @@ aug_setmcastloop(aug_sd sd, aug_bool on)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (AUG_ISFAIL(af = aug_getfamily(sd)))
+    if (aug_isfail(af = aug_getfamily(sd)))
         return af;
 
     switch (AUG_RESULT(af)) {
@@ -214,7 +214,7 @@ aug_setmcastttl(aug_sd sd, int ttl)
 #endif /* HAVE_IPV6 */
     } un;
 
-    if (AUG_ISFAIL(af = aug_getfamily(sd)))
+    if (aug_isfail(af = aug_getfamily(sd)))
         return af;
 
     switch (AUG_RESULT(af)) {

@@ -132,22 +132,22 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (AUG_ISFAIL(aug_appendhttp(parser, TEST1_, sizeof(TEST1_) - 1))) {
+    if (aug_isfail(aug_appendhttp(parser, TEST1_, sizeof(TEST1_) - 1))) {
         aug_perrinfo(aug_tlx, "aug_appendhttp() failed", NULL);
         goto fail;
     }
 
-    if (AUG_ISFAIL(aug_finishhttp(parser))) {
+    if (aug_isfail(aug_finishhttp(parser))) {
         aug_perrinfo(aug_tlx, "aug_finishhttp() failed", NULL);
         goto fail;
     }
 
-    if (AUG_ISFAIL(aug_appendhttp(parser, TEST2_, sizeof(TEST2_) - 1))) {
+    if (aug_isfail(aug_appendhttp(parser, TEST2_, sizeof(TEST2_) - 1))) {
         aug_perrinfo(aug_tlx, "aug_appendhttp() failed", NULL);
         goto fail;
     }
 
-    if (AUG_ISFAIL(aug_finishhttp(parser))) {
+    if (aug_isfail(aug_finishhttp(parser))) {
         aug_perrinfo(aug_tlx, "aug_finishhttp() failed", NULL);
         goto fail;
     }

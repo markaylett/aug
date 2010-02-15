@@ -247,7 +247,7 @@ aug_readfix(aug_fixstream_t stream, aug_stream* src, size_t size)
 
     for (;;) {
 
-        if (AUG_ISFAIL(mlen = getsize_(ptr, size)))
+        if (aug_isfail(mlen = getsize_(ptr, size)))
             return mlen;
 
         /* Not enough of the message has been read to determine the total
@@ -398,7 +398,7 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     /* Get sum contained within message. */
 
-    if (AUG_ISFAIL(sum1 = getsum_(buf, size)))
+    if (aug_isfail(sum1 = getsum_(buf, size)))
         return sum1;
 
     /* Calculate message checksum. */
@@ -434,7 +434,7 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
 
     /* Extract tag value from buffer. */
 
-    if (AUG_ISFAIL(digits = fixtoui_(buf, &tag, size, '=')))
+    if (aug_isfail(digits = fixtoui_(buf, &tag, size, '=')))
         return digits;
 
     if (0 == AUG_RESULT(digits)) {

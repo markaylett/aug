@@ -185,18 +185,18 @@ typedef ssize_t aug_rsize;
 #define AUG_FAILINTR  AUG_MKRESULT(-3) /* EINTR, WSAEINTR */
 #define AUG_FAILBLOCK AUG_MKRESULT(-4) /* EWOULDBLOCK, WSAEWOULDBLOCK */
 
-#define AUG_ISFAIL(x)    (AUG_RESULT(x) < 0)
-#define AUG_ISSUCCESS(x) (!AUG_ISFAIL(x))
+#define aug_isfail(x)    (AUG_RESULT(x) < 0)
+#define aug_issuccess(x) (!aug_isfail(x))
 
-#define AUG_ISERROR(x)  (-1 == AUG_RESULT(x))
-#define AUG_ISNONE(x)   (-2 == AUG_RESULT(x))
-#define AUG_ISINTR(x)   (-3 == AUG_RESULT(x))
-#define AUG_ISBLOCK(x)  (-4 == AUG_RESULT(x))
+#define aug_iserror(x)  (-1 == AUG_RESULT(x))
+#define aug_isnone(x)   (-2 == AUG_RESULT(x))
+#define aug_isintr(x)   (-3 == AUG_RESULT(x))
+#define aug_isblock(x)  (-4 == AUG_RESULT(x))
 
 #define aug_verify(x)                                                   \
     do {                                                                \
         aug_result aug_tmp;                                             \
-        if (AUG_ISFAIL(aug_tmp = (x)))                                  \
+        if (aug_isfail(aug_tmp = (x)))                                  \
             return aug_tmp;                                             \
     } while (0)
 

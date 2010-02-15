@@ -86,7 +86,7 @@ fileset_(aug_mar* mar, const char* filename)
         if (!(stream = fopen(filename, "r")))
             return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
 
-        if (AUG_ISFAIL(result = aug_streamset_(mar, stream))) {
+        if (aug_isfail(result = aug_streamset_(mar, stream))) {
             fclose(stream);
             return AUG_FAILERROR;
         }
@@ -230,7 +230,7 @@ names_(aug_mar* mar)
 
         const char* name;
         aug_result result = aug_fieldntop(mar, i, &name);
-        if (AUG_ISNONE(result))
+        if (aug_isnone(result))
             break;
 
         aug_verify(result);
@@ -247,7 +247,7 @@ put_(aug_mar* mar, char* src)
 {
     struct aug_field field;
 
-    if (AUG_ISFAIL(aug_atofield_(&field, src))) {
+    if (aug_isfail(aug_atofield_(&field, src))) {
 
         /* Not a pair, so assume file name. */
 
@@ -323,13 +323,13 @@ run_(int argc, char* argv[], const char* archivename)
     while (-1 != (ch = aug_getopt(argc, argv, OPTIONS_)))
         switch (ch) {
         case 'c':
-            if (AUG_ISFAIL(clear_(mar))) {
+            if (aug_isfail(clear_(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " CLEARTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'd':
-            if (AUG_ISFAIL(del_(mar, aug_optarg))) {
+            if (aug_isfail(del_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " DELTEXT_, NULL);
                 goto fail;
             }
@@ -337,19 +337,19 @@ run_(int argc, char* argv[], const char* archivename)
         case 'f':
             break;
         case 'g':
-            if (AUG_ISFAIL(get_(mar, aug_optarg))) {
+            if (aug_isfail(get_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " GETTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'i':
-            if (AUG_ISFAIL(insert_(mar, aug_optarg))) {
+            if (aug_isfail(insert_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " INSERTTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'l':
-            if (AUG_ISFAIL(names_(mar))) {
+            if (aug_isfail(names_(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " NAMESTEXT_, NULL);
                 goto fail;
             }
@@ -358,31 +358,31 @@ run_(int argc, char* argv[], const char* archivename)
             size_(mar);
             break;
         case 'o':
-            if (AUG_ISFAIL(aug_compactmar(mar))) {
+            if (aug_isfail(aug_compactmar(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " COMPACTTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'p':
-            if (AUG_ISFAIL(put_(mar, aug_optarg))) {
+            if (aug_isfail(put_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " PUTTEXT_, NULL);
                 goto fail;
             }
             break;
         case 't':
-            if (AUG_ISFAIL(list_(mar))) {
+            if (aug_isfail(list_(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " LISTTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'x':
-            if (AUG_ISFAIL(extract_(mar, aug_optarg))) {
+            if (aug_isfail(extract_(mar, aug_optarg))) {
                 aug_perrinfo(aug_tlx, "failed to " EXTRACTTEXT_, NULL);
                 goto fail;
             }
             break;
         case 'z':
-            if (AUG_ISFAIL(zero_(mar))) {
+            if (aug_isfail(zero_(mar))) {
                 aug_perrinfo(aug_tlx, "failed to " ZEROTEXT_, NULL);
                 goto fail;
             }
@@ -472,7 +472,7 @@ main(int argc, char* argv[])
     archivename = argv[aug_optind];
     aug_optind = 0;
 
-    if (AUG_ISFAIL(run_(argc, argv, archivename)))
+    if (aug_isfail(run_(argc, argv, archivename)))
         goto fail;
 
     return 0;

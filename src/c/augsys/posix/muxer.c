@@ -124,7 +124,7 @@ aug_createmuxer(aug_mpool* mpool)
     muxer->pollfds_ = NULL;
     muxer->nfds_ = muxer->size_ = 0;
 
-    if (AUG_ISFAIL(resize_(muxer, INIT_SIZE_))) {
+    if (aug_isfail(resize_(muxer, INIT_SIZE_))) {
         aug_freemem(mpool, muxer);
         return NULL;
     }
@@ -377,11 +377,11 @@ aug_muxerpipe(aug_md mds[2])
     aug_fd fds[2];
     aug_result result;
 
-    if (AUG_ISFAIL(result = aug_fpipe(fds)))
+    if (aug_isfail(result = aug_fpipe(fds)))
         return result;
 
-    if (AUG_ISFAIL(result = aug_fsetnonblock(fds[0], AUG_TRUE))
-        || AUG_ISFAIL(result = aug_fsetnonblock(fds[1], AUG_TRUE))) {
+    if (aug_isfail(result = aug_fsetnonblock(fds[0], AUG_TRUE))
+        || aug_isfail(result = aug_fsetnonblock(fds[1], AUG_TRUE))) {
         aug_fclose(fds[0]);
         aug_fclose(fds[1]);
         return result;

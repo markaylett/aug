@@ -291,9 +291,9 @@ decodeappend_(aug_base64_t base64, const char* src, size_t len)
     int i = 0, out;
     aug_chunk_t chunk = { 0 }; /* Suppress warnings. */
 
-    if (AUG_ISFAIL(align = decodealign_(base64, src, len))) {
+    if (aug_isfail(align = decodealign_(base64, src, len))) {
 
-        if (AUG_ISNONE(align))
+        if (aug_isnone(align))
             return AUG_SUCCESS;
 
         return align;
@@ -466,9 +466,9 @@ encodeappend_(aug_base64_t base64, const char* src, size_t len)
     size_t whole, i;
     unsigned part;
 
-    if (AUG_ISFAIL(align = encodealign_(base64, src, len))) {
+    if (aug_isfail(align = encodealign_(base64, src, len))) {
 
-        if (AUG_ISNONE(align))
+        if (aug_isnone(align))
             return AUG_SUCCESS;
 
         return align;

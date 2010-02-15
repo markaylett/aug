@@ -93,7 +93,7 @@ out_(void* arg, int what)
 
     /* Bail on error. */
 
-    if (AUG_ISFAIL(st->result_))
+    if (aug_isfail(st->result_))
         return;
 
     switch (what) {
@@ -171,7 +171,7 @@ aug_freadconf(FILE* fp, aug_confcb_t cb, void* arg)
 
         /* Check for errors during callback. */
 
-        if (AUG_ISFAIL(st.result_))
+        if (aug_isfail(st.result_))
             goto done;
     }
 

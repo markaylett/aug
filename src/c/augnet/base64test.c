@@ -47,11 +47,11 @@ static aug_result
 testencode_(aug_base64_t encoder, const char* in, const char* out)
 {
     encoded_[0] = '\0';
-    if (AUG_ISFAIL(aug_appendbase64(encoder, in, strlen(in)))) {
+    if (aug_isfail(aug_appendbase64(encoder, in, strlen(in)))) {
         aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
         return AUG_FAILERROR;
     }
-    if (AUG_ISFAIL(aug_finishbase64(encoder))) {
+    if (aug_isfail(aug_finishbase64(encoder))) {
         aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
         return AUG_FAILERROR;
     }
@@ -66,11 +66,11 @@ static aug_result
 testdecode_(aug_base64_t decoder, const char* in, const char* out)
 {
     decoded_[0] = '\0';
-    if (AUG_ISFAIL(aug_appendbase64(decoder, in, strlen(in)))) {
+    if (aug_isfail(aug_appendbase64(decoder, in, strlen(in)))) {
         aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
         return AUG_FAILERROR;
     }
-    if (AUG_ISFAIL(aug_finishbase64(decoder))) {
+    if (aug_isfail(aug_finishbase64(decoder))) {
         aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
         return AUG_FAILERROR;
     }
@@ -105,22 +105,22 @@ main(int argc, char* argv[])
         goto fail1;
     }
 
-    if (AUG_ISFAIL(testencode_(encoder, "apples", "YXBwbGVz")))
+    if (aug_isfail(testencode_(encoder, "apples", "YXBwbGVz")))
         goto fail2;
 
-    if (AUG_ISFAIL(testdecode_(decoder, "YXBwbGVz", "apples")))
+    if (aug_isfail(testdecode_(decoder, "YXBwbGVz", "apples")))
         goto fail2;
 
-    if (AUG_ISFAIL(testencode_(encoder, "oranges", "b3Jhbmdlcw==")))
+    if (aug_isfail(testencode_(encoder, "oranges", "b3Jhbmdlcw==")))
         goto fail2;
 
-    if (AUG_ISFAIL(testdecode_(decoder, "b3Jhbmdlcw==", "oranges")))
+    if (aug_isfail(testdecode_(decoder, "b3Jhbmdlcw==", "oranges")))
         goto fail2;
 
-    if (AUG_ISFAIL(testencode_(encoder, "pears", "cGVhcnM=")))
+    if (aug_isfail(testencode_(encoder, "pears", "cGVhcnM=")))
         goto fail2;
 
-    if (AUG_ISFAIL(testdecode_(decoder, "cGVhcnM=", "pears")))
+    if (aug_isfail(testdecode_(decoder, "cGVhcnM=", "pears")))
         goto fail2;
 
     aug_destroybase64(decoder);

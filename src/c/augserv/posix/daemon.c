@@ -153,9 +153,9 @@ lockfile_(const char* path)
 
     /* Attempt to obtain exclusive lock. */
 
-    if (AUG_ISFAIL(result = flock_(&fl, fd, F_SETLK, F_WRLCK))) {
+    if (aug_isfail(result = flock_(&fl, fd, F_SETLK, F_WRLCK))) {
 
-        if (AUG_ISBLOCK(result)) {
+        if (aug_isblock(result)) {
 
             /* EWOULDBLOCK indicates that another process has locked the
                file. */
@@ -173,7 +173,7 @@ lockfile_(const char* path)
         goto fail;
     }
 
-    if (AUG_ISFAIL(result = writepid_(fd)))
+    if (aug_isfail(result = writepid_(fd)))
         goto fail;
 
     /* Success: do not close the file - this would release the lock. */
@@ -222,10 +222,10 @@ aug_daemonise(const struct aug_options* options)
         return AUG_FAILERROR;
     }
 
-    if (AUG_ISFAIL(result = daemonise_())
-        || AUG_ISFAIL(result = lockfile_(pidfile))
-        || AUG_ISFAIL(result = closein_())
-        || AUG_ISFAIL(result = aug_initserv()))
+    if (aug_isfail(result = daemonise_())
+        || aug_isfail(result = lockfile_(pidfile))
+        || aug_isfail(result = closein_())
+        || aug_isfail(result = aug_initserv()))
         return result;
 
     result = aug_runserv();

@@ -159,7 +159,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         options->command_ = AUG_CMDDEFAULT;
         break;
     case 1:
-        if (AUG_ISFAIL(rint = tocommand_(argv[aug_optind]))) {
+        if (aug_isfail(rint = tocommand_(argv[aug_optind]))) {
             usage_();
             return rint;
         }

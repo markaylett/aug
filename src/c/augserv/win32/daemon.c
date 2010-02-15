@@ -185,7 +185,7 @@ handler_(DWORD code)
 
     result = aug_writeevent(aug_events(), &event);
 
-    if (AUG_ISFAIL(result) && !AUG_ISBLOCK(result))
+    if (aug_isfail(result) && !aug_isblock(result))
         abort();
 }
 
@@ -256,7 +256,7 @@ service_(DWORD argc, char** argv)
         goto done;
     }
 
-    if (AUG_ISFAIL(aug_readservconf(AUG_CONFFILE(&options_), AUG_FALSE,
+    if (aug_isfail(aug_readservconf(AUG_CONFFILE(&options_), AUG_FALSE,
                                     daemon))) {
         aug_perrinfo(aug_tlx, "aug_readservconf() failed", NULL);
         goto done;
@@ -271,7 +271,7 @@ service_(DWORD argc, char** argv)
 
     setstatus_(SERVICE_START_PENDING);
 
-    if (AUG_ISFAIL(aug_initserv())) {
+    if (aug_isfail(aug_initserv())) {
 
         aug_perrinfo(aug_tlx, "aug_initserv() failed", NULL);
         setstatus_(SERVICE_STOPPED);
@@ -281,7 +281,7 @@ service_(DWORD argc, char** argv)
     aug_ctxnotice(aug_tlx, "daemon started");
     setstatus_(SERVICE_RUNNING);
 
-    if (AUG_ISFAIL(aug_runserv()))
+    if (aug_isfail(aug_runserv()))
         aug_perrinfo(aug_tlx, "aug_runserv() failed", NULL);
 
     aug_ctxnotice(aug_tlx, "daemon stopped");

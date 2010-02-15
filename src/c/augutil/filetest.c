@@ -37,6 +37,6 @@ main(int argc, char* argv[])
 {
     if (!aug_autotlx())
         return 1;
-    aug_check(AUG_ISSUCCESS(aug_freadconf(stdin, cb_, NULL)));
+    aug_check(aug_issuccess(aug_freadconf(stdin, cb_, NULL)));
     return 0;
 }

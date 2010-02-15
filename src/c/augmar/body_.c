@@ -42,7 +42,7 @@ resize_(aug_seq_t seq, struct aug_info_* info, unsigned bsize,
         aug_bool trunc)
 {
     char* addr;
-    if (AUG_ISFAIL(aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_)))
+    if (aug_isfail(aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_)))
         return NULL;
 
     if (info->bsize_ == bsize || (info->bsize_ > bsize && !trunc))
@@ -91,7 +91,7 @@ aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
 AUG_EXTERNC const void*
 aug_getcontent_(aug_seq_t seq, const struct aug_info_* info)
 {
-    if (AUG_ISFAIL(aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_)))
+    if (aug_isfail(aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_)))
         return NULL;
 
     return aug_seqaddr_(seq);

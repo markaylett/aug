@@ -59,16 +59,16 @@ foreground_(const struct aug_options* options)
 {
     aug_result result;
 
-    if (AUG_ISFAIL(aug_readservconf(AUG_CONFFILE(options), options->batch_,
+    if (aug_isfail(aug_readservconf(AUG_CONFFILE(options), options->batch_,
                                     AUG_FALSE)))
         die_("aug_readservconf() failed");
 
-    if (AUG_ISFAIL(aug_initserv()))
+    if (aug_isfail(aug_initserv()))
         die_("aug_initserv() failed");
 
     result = aug_runserv();
     aug_termserv();
-    if (AUG_ISFAIL(result))
+    if (aug_isfail(result))
         die_("aug_runserv() failed");
 }
 
@@ -77,9 +77,9 @@ daemonise_(const struct aug_options* options)
 {
     aug_result result = aug_daemonise(options);
 
-    if (AUG_ISFAIL(result)) {
+    if (aug_isfail(result)) {
 
-        if (AUG_ISNONE(result))
+        if (aug_isnone(result))
             return AUG_FALSE; /* Want foreground. */
 
         die_("aug_daemonise() failed");
@@ -92,7 +92,7 @@ daemonise_(const struct aug_options* options)
 static void
 start_(const struct aug_options* options)
 {
-    if (AUG_ISFAIL(aug_start(options)))
+    if (aug_isfail(aug_start(options)))
         die_("aug_start() failed");
 }
 #endif /* _WIN32 */
@@ -100,21 +100,21 @@ start_(const struct aug_options* options)
 static void
 control_(const struct aug_options* options, int sig)
 {
-    if (AUG_ISFAIL(aug_control(options, sig)))
+    if (aug_isfail(aug_control(options, sig)))
         die_("aug_control() failed");
 }
 
 static void
 install_(const struct aug_options* options)
 {
-    if (AUG_ISFAIL(aug_install(options)))
+    if (aug_isfail(aug_install(options)))
         die_("aug_install() failed");
 }
 
 static void
 uninstall_(const struct aug_options* options)
 {
-    if (AUG_ISFAIL(aug_uninstall(options)))
+    if (aug_isfail(aug_uninstall(options)))
         die_("aug_uninstall() failed");
 }
 
@@ -128,7 +128,7 @@ aug_main(int argc, char* argv[], const struct aug_serv* serv)
 
     aug_setserv_(serv);
 
-    if (AUG_ISFAIL(aug_readopts(&options, argc, argv))) {
+    if (aug_isfail(aug_readopts(&options, argc, argv))) {
         aug_perrinfo(aug_tlx, "getreadopts() failed", NULL);
         return EXIT_FAILURE;
     }

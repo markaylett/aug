@@ -256,16 +256,16 @@ namespace aug {
             static bool
             error(T result)
             {
-                if (AUG_ISSUCCESS(result))
+                if (aug_issuccess(result))
                     return false;
 
-                if (AUG_ISNONE(result))
+                if (aug_isnone(result))
                     throw none_exception();
 
-                if (AUG_ISINTR(result))
+                if (aug_isintr(result))
                     throw intr_exception();
 
-                if (AUG_ISBLOCK(result))
+                if (aug_isblock(result))
                     throw block_exception();
 
                 return true;

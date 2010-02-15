@@ -55,7 +55,7 @@ aug_tcpclient(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
+    if (aug_isfail(aug_getaddrinfo(host, serv, &hints, &res)))
         return AUG_BADSD;
 
     save = res;
@@ -67,7 +67,7 @@ aug_tcpclient(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
-        if (!AUG_ISFAIL(aug_connect(sd, ep)))
+        if (!aug_isfail(aug_connect(sd, ep)))
             break; /* Success. */
 
         /* Try next if aug_connect() failed. */
@@ -92,7 +92,7 @@ aug_tcpserver(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
+    if (aug_isfail(aug_getaddrinfo(host, serv, &hints, &res)))
         return AUG_BADSD;
 
     save = res;
@@ -104,9 +104,9 @@ aug_tcpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
-        if (AUG_ISSUCCESS(aug_setreuseaddr(sd, AUG_TRUE))
-            && AUG_ISSUCCESS(aug_bind(sd, ep))
-            && AUG_ISSUCCESS(aug_listen(sd, SOMAXCONN)))
+        if (aug_issuccess(aug_setreuseaddr(sd, AUG_TRUE))
+            && aug_issuccess(aug_bind(sd, ep))
+            && aug_issuccess(aug_listen(sd, SOMAXCONN)))
             break; /* Success. */
 
         /* Try next if failed. */
@@ -131,7 +131,7 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep,
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
 
-    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
+    if (aug_isfail(aug_getaddrinfo(host, serv, &hints, &res)))
         return AUG_BADSD;
 
     save = res;
@@ -143,7 +143,7 @@ aug_udpclient(const char* host, const char* serv, struct aug_endpoint* ep,
 
         aug_getendpoint(res, ep);
 
-        if (!connect || AUG_ISSUCCESS(aug_connect(sd, ep)))
+        if (!connect || aug_issuccess(aug_connect(sd, ep)))
             break; /* Success. */
 
         /* Try next if aug_connect() failed. */
@@ -168,7 +168,7 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
 
-    if (AUG_ISFAIL(aug_getaddrinfo(host, serv, &hints, &res)))
+    if (aug_isfail(aug_getaddrinfo(host, serv, &hints, &res)))
         return AUG_BADSD;
 
     save = res;
@@ -180,7 +180,7 @@ aug_udpserver(const char* host, const char* serv, struct aug_endpoint* ep)
 
         aug_getendpoint(res, ep);
 
-        if (AUG_ISSUCCESS(aug_bind(sd, ep)))
+        if (aug_issuccess(aug_bind(sd, ep)))
             break; /* Success. */
 
         /* Try next if aug_bind() failed. */

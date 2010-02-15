@@ -138,7 +138,7 @@ word_(aug_httpparser_t parser)
     aug_result result;
     switch (parser->state_) {
     case REQUEST_:
-        if (AUG_ISSUCCESS(result = request_(parser)))
+        if (aug_issuccess(result = request_(parser)))
             parser->state_ = NAME_;
         break;
     case NAME_:
@@ -147,7 +147,7 @@ word_(aug_httpparser_t parser)
         result = AUG_FAILERROR;
         break;
     case VALUE_:
-        if (AUG_ISSUCCESS(result = value_(parser)))
+        if (aug_issuccess(result = value_(parser)))
             parser->state_ = NAME_;
         break;
     default:
@@ -261,7 +261,7 @@ aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
 
     for (;;) {
 
-        if (AUG_ISFAIL(result = header_(parser, buf, size)))
+        if (aug_isfail(result = header_(parser, buf, size)))
             break;
 
         if (AUG_RESULT(result) == size)
@@ -271,7 +271,7 @@ aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
         size -= AUG_RESULT(result);
 
     body:
-        if (AUG_ISFAIL(result = body_(parser, buf, size)))
+        if (aug_isfail(result = body_(parser, buf, size)))
             break;
 
         if (AUG_RESULT(result) == size)
@@ -293,20 +293,20 @@ aug_finishhttp(aug_httpparser_t parser)
     aug_result result;
     switch (aug_finishlexer(parser->lexer_)) {
     case AUG_LEXLABEL:
-        if (AUG_ISFAIL(result = label_(parser)))
+        if (aug_isfail(result = label_(parser)))
             goto fail;
         break;
     case AUG_LEXWORD:
-        if (AUG_ISFAIL(result = word_(parser)))
+        if (aug_isfail(result = word_(parser)))
             goto fail;
         break;
     case AUG_LEXWORD | AUG_LEXPHRASE:
-        if (AUG_ISFAIL(result = word_(parser))
-            || AUG_ISFAIL(result = phrase_(parser)))
+        if (aug_isfail(result = word_(parser))
+            || aug_isfail(result = phrase_(parser)))
             goto fail;
         break;
     case AUG_LEXPHRASE:
-        if (AUG_ISFAIL(result = phrase_(parser)))
+        if (aug_isfail(result = phrase_(parser)))
             goto fail;
         break;
     }

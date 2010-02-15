@@ -128,9 +128,9 @@ aug_streamset_(aug_mar* mar, FILE* stream)
     for (;;) {
 
         aug_rsize rsize = aug_readline_(buf, sizeof(buf), stream);
-        if (AUG_ISFAIL(rsize)) {
+        if (aug_isfail(rsize)) {
 
-            if (AUG_ISNONE(rsize))
+            if (aug_isnone(rsize))
                 break;
 
             return rsize;

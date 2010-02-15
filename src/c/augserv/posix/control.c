@@ -127,12 +127,12 @@ aug_control(const struct aug_options* options, int event)
 
     /* Attempt to obtain shared lock. */
 
-    if (AUG_ISFAIL(flock_(&fl, fd, F_SETLK, F_RDLCK))) {
+    if (aug_isfail(flock_(&fl, fd, F_SETLK, F_RDLCK))) {
 
         /* As expected, the daemon process has an exclusive lock on the pid
            file.  Use F_GETLK to obtain the pid of the daemon process. */
 
-        if (AUG_ISSUCCESS(result = flock_(&fl, fd, F_GETLK, F_RDLCK))) {
+        if (aug_issuccess(result = flock_(&fl, fd, F_GETLK, F_RDLCK))) {
 
             /* Although a lock-manager allows locking over NFS, the returned
                pid is probably zero because it could be the pid of a process

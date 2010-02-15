@@ -248,10 +248,10 @@ aug_xstrread(aug_xstr_t xstr, aug_stream* src, size_t size)
 {
     aug_rsize rsize = reserve_(xstr, xstr->len_ + size);
 
-	if (AUG_ISFAIL(rsize))
+	if (aug_isfail(rsize))
 		return rsize;
 
-    if (AUG_ISFAIL(rsize = aug_read(src, xstr->ptr_ + xstr->len_, size)))
+    if (aug_isfail(rsize = aug_read(src, xstr->ptr_ + xstr->len_, size)))
         return rsize;
 
 	xstr->len_ += AUG_RESULT(rsize);
