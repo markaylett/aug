@@ -234,8 +234,8 @@ if ($SHARED_ONLY == $libtype) {
 }
 
 if ($CYGWIN_MINGW == $toolset) {
-    print FILE "CC='gcc -mno-cygwin'; export CC\n";
-    print FILE "CXX='g++ -mno-cygwin'; export CXX\n";
+    print FILE "CC='gcc-3 -mno-cygwin'; export CC\n";
+    print FILE "CXX='g++-3 -mno-cygwin'; export CXX\n";
 } elsif (2 == $toolset) {
     $options .= " \\\n\t--build=i586-pc-linux-gnu";
     $options .= " \\\n\t--host=i586-mingw32msvc";
