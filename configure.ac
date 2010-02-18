@@ -143,6 +143,7 @@ AC_ARG_WITH(ssl,
         xyes) with_ssl=yes;;
         xno)  with_ssl=no;;
         *)
+            CFLAGS="-I$withval/include $CFLAGS"
             CPPFLAGS="-I$withval/include $CPPFLAGS"
             LDFLAGS="-L$withval/lib $LDFLAGS"
             with_ssl=yes

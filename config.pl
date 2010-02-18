@@ -33,7 +33,7 @@ my %TOOLSET = (
                $LINUX_MINGW => 'linux build for mingw host',
                $MINGW => 'mingw build',
                $CYGWIN => 'cygwin build',
-               $CYGWIN_MINGW => 'cygwin build for mingw host',
+               $CYGWIN_MINGW => 'cygwin build for mingw host (gcc-3)',
                $OTHER => 'other (posix)'
                );
 
@@ -114,12 +114,7 @@ my (
 
 $win32 = (exists $ENV{OS} && $ENV{OS} =~ /windows/i);
 
-if (defined $ENV{AUG_HOME}) {
-    $prefix = $ENV{AUG_HOME};
-    $prefix =~ s!\\!/!g;
-} else {
-    $prefix = $win32 ? 'c:/aug' : $ENV{HOME};
-}
+$prefix = $win32 ? '/toolset' : $ENV{HOME};
 
 if ($win32) {
 
@@ -197,7 +192,17 @@ open(FILE, ">$CONFIG")
     or die "open() failed: $!\n";
 
 print FILE "#!/bin/sh\n\n";
-print FILE "AUG_HOME='$prefix'; export AUG_HOME\n";
+print FILE "AUG_HOME=$prefix/aug; export AUG_HOME\n";
+
+if ($win32) {
+    print FILE <<EOD;
+OPENSSL_HOME=$prefix/openssl; export OPENSSL_HOME
+OPENSSL_CONF=\$OPENSSL_HOME/bin/openssl.cfg; export OPENSSL_CONF
+PYTHON_HOME=$prefix/python; export PYTHON_HOME
+RUBY_HOME=$prefix/ruby; export RUBY_HOME
+PATH=\$OPENSSL_HOME/bin:\$PYTHON_HOME:\$RUBY_HOME/bin:/usr/bin:/usr/bin; export PATH
+EOD
+}
 
 $options = "--prefix=\$AUG_HOME";
 $options .= " \\\n\t--enable-maintainer-mode"
@@ -218,7 +223,9 @@ $options .= " \\\n\t--with-ruby"
     if is $ruby;
 
 if (is $ssl) {
-    if (exists $ENV{OPENSSL_HOME}) {
+    if ($win32) {
+        $options .= " \\\n\t--with-ssl=$prefix/openssl";
+    } elsif (exists $ENV{OPENSSL_HOME}) {
         my $s = $ENV{OPENSSL_HOME};
         $s =~ s|\\|/|g;
         $options .= " \\\n\t--with-ssl=$s";
@@ -236,6 +243,14 @@ if ($SHARED_ONLY == $libtype) {
 if ($CYGWIN_MINGW == $toolset) {
     print FILE "CC='gcc-3 -mno-cygwin'; export CC\n";
     print FILE "CXX='g++-3 -mno-cygwin'; export CXX\n";
+} elsif ($MINGW == $toolset) {
+    print FILE <<EOD;
+MINGW_HOME=$prefix/mingw; export MINGW_HOME
+PATH=\$MINGW_HOME/bin:\$PATH; export PATH
+CC=\$MINGW_HOME/bin/gcc; export CC
+CXX=\$MINGW_HOME/bin/g++; export CXX
+LD=\$MINGW_HOME/bin/ld; export LD
+EOD
 } elsif (2 == $toolset) {
     $options .= " \\\n\t--build=i586-pc-linux-gnu";
     $options .= " \\\n\t--host=i586-mingw32msvc";
