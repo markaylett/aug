@@ -196,11 +196,15 @@ print FILE "AUG_HOME=$prefix/aug; export AUG_HOME\n";
 
 if ($win32) {
     print FILE <<EOD;
-OPENSSL_HOME=$prefix/openssl; export OPENSSL_HOME
-OPENSSL_CONF=\$OPENSSL_HOME/bin/openssl.cfg; export OPENSSL_CONF
-PYTHON_HOME=$prefix/python; export PYTHON_HOME
-RUBY_HOME=$prefix/ruby; export RUBY_HOME
-PATH=\$OPENSSL_HOME/bin:\$PYTHON_HOME:\$RUBY_HOME/bin:/usr/bin:/usr/bin; export PATH
+
+GRAPHVIZ_HOME=/toolset/graphviz
+MIKTEX_HOME=/toolset/miktex/miktex
+OPENSSL_HOME=/toolset/openssl
+OPENSSL_CONF=\$OPENSSL_HOME/bin/openssl.cfg
+PYTHON_HOME=/toolset/python
+RUBY_HOME=/toolset/ruby
+PATH=\$HOME/bin:/toolset/bin:\$GRAPHVIZ_HOME/bin:\$MIKTEX_HOME/bin:\$OPENSSL_HOME/bin:\$PYTHON_HOME:\$RUBY_HOME/bin:/usr/bin:/usr/bin; export PATH
+export GRAPHVIZ_HOME MIKTEX_HOME OPENSSL_CONF OPENSSL_HOME PYTHON_HOME RUBY_HOME
 EOD
 }
 
