@@ -13,12 +13,12 @@ CLEANFILES = \
 	augres.o
 
 augres.dll: augres.o
-	$(DLLWRAP) --as $(AS) --dllname augres.dll --driver-name $(CC) $<
+	TMPDIR=c:/temp $(DLLWRAP) --as $(AS) --dllname augres.dll --driver-name $(CC) $<
 
 augres.o: augres.rc
-	$(WINDRES) -o augres.o $<
+	TMPDIR=c:/temp $(WINDRES) -o augres.o $<
 
 augres.rc: augres.mc
-	$(WINDRC) $<
+	TMPDIR=c:/temp $(WINDRC) $<
 
 endif

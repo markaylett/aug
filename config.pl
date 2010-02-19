@@ -227,9 +227,7 @@ $options .= " \\\n\t--with-ruby"
     if is $ruby;
 
 if (is $ssl) {
-    if ($win32) {
-        $options .= " \\\n\t--with-ssl=$prefix/openssl";
-    } elsif (exists $ENV{OPENSSL_HOME}) {
+    if (exists $ENV{OPENSSL_HOME}) {
         my $s = $ENV{OPENSSL_HOME};
         $s =~ s|\\|/|g;
         $options .= " \\\n\t--with-ssl=$s";
@@ -248,13 +246,11 @@ if ($CYGWIN_MINGW == $toolset) {
     print FILE "CC='gcc-3 -mno-cygwin'; export CC\n";
     print FILE "CXX='g++-3 -mno-cygwin'; export CXX\n";
 } elsif ($MINGW == $toolset) {
-    print FILE <<EOD;
-MINGW_HOME=$prefix/mingw; export MINGW_HOME
-PATH=\$MINGW_HOME/bin:\$PATH; export PATH
-CC=\$MINGW_HOME/bin/gcc; export CC
-CXX=\$MINGW_HOME/bin/g++; export CXX
-LD=\$MINGW_HOME/bin/ld; export LD
-EOD
+    print FILE "MINGW_HOME=$prefix/mingw; export MINGW_HOME\n";
+    print FILE "PATH=\$MINGW_HOME/bin:\$PATH; export PATH\n";
+    $options .= " \\\n\t--disable-dependency-tracking";
+    $options .= " \\\n\t--build=i686-pc-cygwin";
+    $options .= " \\\n\t--host=mingw32";
 } elsif (2 == $toolset) {
     $options .= " \\\n\t--build=i586-pc-linux-gnu";
     $options .= " \\\n\t--host=i586-mingw32msvc";

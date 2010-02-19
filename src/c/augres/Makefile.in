@@ -392,13 +392,13 @@ uninstall-am: uninstall-binSCRIPTS uninstall-info-am
 
 
 @AUG_WIN32_TRUE@augres.dll: augres.o
-@AUG_WIN32_TRUE@	$(DLLWRAP) --as $(AS) --dllname augres.dll --driver-name $(CC) $<
+@AUG_WIN32_TRUE@	TMPDIR=c:/temp $(DLLWRAP) --as $(AS) --dllname augres.dll --driver-name $(CC) $<
 
 @AUG_WIN32_TRUE@augres.o: augres.rc
-@AUG_WIN32_TRUE@	$(WINDRES) -o augres.o $<
+@AUG_WIN32_TRUE@	TMPDIR=c:/temp $(WINDRES) -o augres.o $<
 
 @AUG_WIN32_TRUE@augres.rc: augres.mc
-@AUG_WIN32_TRUE@	$(WINDRC) $<
+@AUG_WIN32_TRUE@	TMPDIR=c:/temp $(WINDRC) $<
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
