@@ -45,6 +45,15 @@ my %LIBTYPE = (
                $STATIC_ONLY => 'static only'
                );
 
+sub cygpath {
+    my $s = shift;
+    if (-x '/usr/bin/cygpath') {
+        $s = `/usr/bin/cygpath -m $s`;
+        chomp $s;
+    }
+    return $s;
+}
+
 sub trim {
     my $s = shift;
     $s =~ s/^\s+//;
@@ -114,7 +123,7 @@ my (
 
 $win32 = (exists $ENV{OS} && $ENV{OS} =~ /windows/i);
 
-$prefix = $win32 ? '/toolset' : $ENV{HOME};
+$prefix = $win32 ? 'c:/usr/aug' : $ENV{HOME};
 
 if ($win32) {
 
@@ -140,7 +149,7 @@ $prefix =~ s{^~([^/]*)}
     $1 ? (getpwnam($1))[7]
         : ($ENV{HOME} || $ENV{LOGDIR} || (getpwuid($>))[7])
     }ex;
-
+$prefix = cygpath($prefix);
 $toolset = listask("compiler toolset", $toolset, \%TOOLSET);
 $maintainer = valueask("maintainer mode", 'n');
 if ($CYGWIN_MINGW == $toolset) {
@@ -192,11 +201,9 @@ open(FILE, ">$CONFIG")
     or die "open() failed: $!\n";
 
 print FILE "#!/bin/sh\n\n";
-print FILE "AUG_HOME=$prefix/aug; export AUG_HOME\n";
 
 if ($win32) {
     print FILE <<EOD;
-
 GRAPHVIZ_HOME=/toolset/graphviz
 MIKTEX_HOME=/toolset/miktex/miktex
 OPENSSL_HOME=/toolset/openssl
@@ -208,7 +215,9 @@ export GRAPHVIZ_HOME MIKTEX_HOME OPENSSL_CONF OPENSSL_HOME PYTHON_HOME RUBY_HOME
 EOD
 }
 
-$options = "--prefix=\$AUG_HOME";
+my $s = cygpath($ENV{OPENSSL_HOME});
+
+$options = "--prefix=$prefix";
 $options .= " \\\n\t--enable-maintainer-mode"
     if is $maintainer;
 $options .= " \\\n\t--disable-multicast"
@@ -229,7 +238,9 @@ $options .= " \\\n\t--with-ruby"
 if (is $ssl) {
     if (exists $ENV{OPENSSL_HOME}) {
         my $s = $ENV{OPENSSL_HOME};
-        $s =~ s|\\|/|g;
+        # Escape backslashes.
+        $s =~ s/\\/\\\\/g;
+        $s = cygpath($s);
         $options .= " \\\n\t--with-ssl=$s";
     }
 } else {
@@ -245,8 +256,9 @@ if ($SHARED_ONLY == $libtype) {
 if ($CYGWIN_MINGW == $toolset) {
     print FILE "CC='gcc-3 -mno-cygwin'; export CC\n";
     print FILE "CXX='g++-3 -mno-cygwin'; export CXX\n";
+    $options .= " \\\n\t--disable-dependency-tracking";
 } elsif ($MINGW == $toolset) {
-    print FILE "MINGW_HOME=$prefix/mingw; export MINGW_HOME\n";
+    print FILE "MINGW_HOME=/toolset/mingw; export MINGW_HOME\n";
     print FILE "PATH=\$MINGW_HOME/bin:\$PATH; export PATH\n";
     $options .= " \\\n\t--disable-dependency-tracking";
     $options .= " \\\n\t--build=i686-pc-cygwin";

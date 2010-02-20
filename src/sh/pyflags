@@ -56,8 +56,8 @@ if [ -z "$win32" ]; then
     libdir="`echo $bindir | sed -e 's/bin/lib/'`"
 else
     version="`python -c 'import sys; print "%c%c" % (sys.version[0], sys.version[2])' | tr -d '\015'`"
-    incdir="$bindir/include"
-    libdir="$bindir/libs"
+    incdir="`cygpath -m $bindir/include`"
+    libdir="`cygpath -m $bindir/libs`"
 fi
 
 cflags="-I$incdir"

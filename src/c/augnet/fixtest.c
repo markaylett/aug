@@ -83,6 +83,7 @@ handler_(const char* buf, size_t size, aug_object* ob)
         fixstd.size_ -= AUG_RESULT(rsize);
     }
 
+    fprintf(stderr, "%s\n", buf);
     ++received_;
 }
 

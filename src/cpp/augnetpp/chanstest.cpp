@@ -93,7 +93,11 @@ namespace {
 
             if (id == rd_) {
                 char ch;
-                read(stream, &ch, 1);
+                try {
+                    read(stream, &ch, 1);
+                } catch (const block_exception&) {
+                    return AUG_TRUE;
+                }
                 const char expect('A' + recv_++ % 26);
                 if (ch != expect) {
                     aug_ctxerror(aug_tlx, "unexpected character [%c]", ch);

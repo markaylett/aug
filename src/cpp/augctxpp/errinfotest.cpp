@@ -24,7 +24,10 @@
 
 #include "augext.h"
 
+#include <cstdio>
+
 using namespace aug;
+using namespace std;
 
 namespace {
 

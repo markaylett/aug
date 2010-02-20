@@ -40,7 +40,11 @@ unless copt || lopt
   copt, lopt = true, true
 end
 
-bindir = File.dirname(%x{which ruby})
+if expand('target_os') == 'mswin32'
+    bindir = File.dirname(%x{which ruby | xargs cygpath -m})
+else
+    bindir = File.dirname(%x{which ruby})
+end
 libdir = File.join(File.dirname(bindir), 'lib')
 
 args = []

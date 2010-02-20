@@ -23,8 +23,8 @@
 
 set -e
 
-AUG_BUILDDIR=${AUG_BUILDDIR:-../../..}
-AUG_SRCDIR=${AUG_SRCDIR:-../../..}
+AUG_BUILDDIR=${AUG_BUILDDIR:-..}
+AUG_SRCDIR=${AUG_SRCDIR:-..}
 
 cat <<EOD >tmp.$$
 rundir=.
