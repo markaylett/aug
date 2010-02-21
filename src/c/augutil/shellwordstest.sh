@@ -21,6 +21,8 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+set -e
+
 AUG_SRCDIR=${AUG_SRCDIR:-../../..}
 dir=$AUG_SRCDIR/src/c/augutil
 

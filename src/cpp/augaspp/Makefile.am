@@ -48,3 +48,17 @@ libaugaspp_la_LIBADD = \
 	$(top_builddir)/src/c/augmar/libaugmar.la \
 	$(top_builddir)/src/c/augsys/libaugsys.la \
 	$(top_builddir)/src/c/augctx/libaugctx.la
+
+check_PROGRAMS = \
+	linktest
+
+TESTS = \
+	linktest
+
+linktest_SOURCES = linktest.cpp
+linktest_LDADD = \
+	$(top_builddir)/src/cpp/augaspp/libaugaspp.la \
+	$(top_builddir)/src/c/augnet/libaugnet.la \
+	$(top_builddir)/src/c/augserv/libaugserv.la \
+	$(top_builddir)/src/c/augutil/libaugutil.la \
+	$(top_builddir)/src/c/augmar/libaugmar.la
