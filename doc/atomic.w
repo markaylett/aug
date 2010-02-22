@@ -31,6 +31,7 @@
 \def\LINUX/{{\sc LINUX}}
 \def\MSVC/{{\sc MSVC}}
 \def\OSX/{{\sc OSX}}
+\def\SSE2/{{\sc SSE2}}
 \def\WINDOWS/{{\sc WINDOWS}}
 \def\x86/{{\sc x86}}
 
@@ -606,10 +607,10 @@ prevented from re-ordering instructions.
 /* |Prevent compiler re-ordering.| */
 #  define aug_mb() __asm__ __volatile__("":::"memory")
 # else /* |ENABLE_SMP| */
-#  if defined(__SSE2__) || defined(__i586__) || defined(__i686__) || defined(__x86_64__)
-@<gcc sse2 i586 barriers@>@/
-#  elif defined(__i386__) || defined(__i486__)
-@<gcc i386 barriers@>@/
+#  if defined(__SSE2__) || defined(__x86_64__)
+@<gcc sse2 barriers@>@/
+#  elif defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__)
+@<gcc x86 barriers@>@/
 #  elif defined(__ia64__)
 @<gcc ia64 barriers@>@/
 #  elif defined(__alpha__)
@@ -646,17 +647,17 @@ prevented from re-ordering instructions.
 # include <libkern/OSAtomic.h>
 # define aug_mb() OSMemoryBarrier()
 
-@ \\{fence} instructions were introduced with the SSE2 instruction set, which
-is available on Pentium class machines.
+@ \\{fence} instructions were introduced with the \SSE2/ instruction set,
+which is available on Pentium 4 class machines.
 
-@<gcc sse2 i586 bar...@>=
+@<gcc sse2 bar...@>=
 #   define aug_mb()  __asm__ __volatile__("mfence":::"memory")
 #   define aug_rmb() __asm__ __volatile__("lfence":::"memory")
 #   define aug_wmb() __asm__ __volatile__("sfence":::"memory")
 
-@ i386 memory barriers.
+@ \x86/ memory barriers.
 
-@<gcc i386 bar...@>=
+@<gcc x86 bar...@>=
 #   define aug_mb()  __asm__ __volatile__("lock; addl $0,0(%%esp)":::"memory")
 #   define aug_wmb() __asm__ __volatile__("":::"memory")
 

@@ -21,19 +21,19 @@
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*3:*/
-#line 113 "../../../doc/atomic.w"
+#line 114 "../../../doc/atomic.w"
 
 #ifndef AUGCTX_ATOMIC_H
 #define AUGCTX_ATOMIC_H
 /*37:*/
-#line 700 "../../../doc/atomic.w"
+#line 701 "../../../doc/atomic.w"
 
 #define HAVE_AUGCTX_CONFIG_H 1
 #if HAVE_AUGCTX_CONFIG_H
 # include "augctx/config.h"
 #else
 /*38:*/
-#line 717 "../../../doc/atomic.w"
+#line 718 "../../../doc/atomic.w"
 
 # if !defined(ENABLE_SMP)
 #  define ENABLE_SMP 1
@@ -46,10 +46,10 @@
 # endif
 
 /*:38*/
-#line 705 "../../../doc/atomic.w"
+#line 706 "../../../doc/atomic.w"
 
 /*39:*/
-#line 731 "../../../doc/atomic.w"
+#line 732 "../../../doc/atomic.w"
 
 # if !defined(__cplusplus)
 #  define AUG_EXTERNC extern
@@ -79,12 +79,12 @@
 # endif
 
 /*:39*/
-#line 706 "../../../doc/atomic.w"
+#line 707 "../../../doc/atomic.w"
 
 #endif
 #if defined(_MSC_VER)
 /*40:*/
-#line 763 "../../../doc/atomic.w"
+#line 764 "../../../doc/atomic.w"
 
 # if _MSC_VER >= 1400
 #  include <intrin.h>
@@ -112,11 +112,11 @@ AUG_EXTERNC long _InterlockedExchangeAdd(long volatile*,long);
 # define InterlockedExchangeAdd _InterlockedExchangeAdd
 
 /*:40*/
-#line 709 "../../../doc/atomic.w"
+#line 710 "../../../doc/atomic.w"
 
 #endif
 /*41:*/
-#line 792 "../../../doc/atomic.w"
+#line 793 "../../../doc/atomic.w"
 
 typedef int aug_bool_t;
 #if !defined(_MSC_VER)
@@ -127,73 +127,73 @@ typedef __int64 int64_t;
 #endif
 
 /*:41*/
-#line 711 "../../../doc/atomic.w"
+#line 712 "../../../doc/atomic.w"
 
 
 /*:37*/
-#line 116 "../../../doc/atomic.w"
+#line 117 "../../../doc/atomic.w"
 
 /*28:*/
-#line 601 "../../../doc/atomic.w"
+#line 602 "../../../doc/atomic.w"
 
 #if defined(__APPLE__) && defined(__MACH__)
 /*29:*/
-#line 645 "../../../doc/atomic.w"
+#line 646 "../../../doc/atomic.w"
 
 # include <libkern/OSAtomic.h>
 # define aug_mb() OSMemoryBarrier()
 
 /*:29*/
-#line 603 "../../../doc/atomic.w"
+#line 604 "../../../doc/atomic.w"
 
 #elif defined(__GNUC__)
 # if !ENABLE_SMP
 
 #  define aug_mb() __asm__ __volatile__("":::"memory")
 # else
-#  if defined(__SSE2__) || defined(__i586__) || defined(__i686__) || defined(__x86_64__)
+#  if defined(__SSE2__) || defined(__x86_64__)
 /*30:*/
-#line 652 "../../../doc/atomic.w"
+#line 653 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__("mfence":::"memory")
 #   define aug_rmb() __asm__ __volatile__("lfence":::"memory")
 #   define aug_wmb() __asm__ __volatile__("sfence":::"memory")
 
 /*:30*/
-#line 610 "../../../doc/atomic.w"
+#line 611 "../../../doc/atomic.w"
 
-#  elif defined(__i386__) || defined(__i486__)
+#  elif defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__)
 /*31:*/
-#line 659 "../../../doc/atomic.w"
+#line 660 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__("lock; addl $0,0(%%esp)":::"memory")
 #   define aug_wmb() __asm__ __volatile__("":::"memory")
 
 /*:31*/
-#line 612 "../../../doc/atomic.w"
+#line 613 "../../../doc/atomic.w"
 
 #  elif defined(__ia64__)
 /*32:*/
-#line 665 "../../../doc/atomic.w"
+#line 666 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__("mf":::"memory")
 
 /*:32*/
-#line 614 "../../../doc/atomic.w"
+#line 615 "../../../doc/atomic.w"
 
 #  elif defined(__alpha__)
 /*33:*/
-#line 670 "../../../doc/atomic.w"
+#line 671 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__("mb":::"memory")
 #   define aug_wmb() __asm__ __volatile__("wmb":::"memory")
 
 /*:33*/
-#line 616 "../../../doc/atomic.w"
+#line 617 "../../../doc/atomic.w"
 
 #  elif defined(__sparc__)
 /*34:*/
-#line 676 "../../../doc/atomic.w"
+#line 677 "../../../doc/atomic.w"
 
 #   define aug_mb()  __asm__ __volatile__(
 "membar #LoadLoad | #LoadStore | #StoreStore | #StoreLoad":::"memory")
@@ -201,16 +201,16 @@ typedef __int64 int64_t;
 #   define aug_wmb() __asm__ __volatile__("membar #StoreStore":::"memory")
 
 /*:34*/
-#line 618 "../../../doc/atomic.w"
+#line 619 "../../../doc/atomic.w"
 
 #  elif __GNUC__ >  4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)
 /*35:*/
-#line 684 "../../../doc/atomic.w"
+#line 685 "../../../doc/atomic.w"
 
 #   define aug_mb()  __sync_synchronize()
 
 /*:35*/
-#line 620 "../../../doc/atomic.w"
+#line 621 "../../../doc/atomic.w"
 
 #  else
 #   error No implementation
@@ -218,7 +218,7 @@ typedef __int64 int64_t;
 # endif
 #elif defined(_MSC_VER)
 /*36:*/
-#line 689 "../../../doc/atomic.w"
+#line 690 "../../../doc/atomic.w"
 
 # define aug_mb()  _ReadWriteBarrier()
 # if _MSC_VER >= 1400
@@ -227,7 +227,7 @@ typedef __int64 int64_t;
 # define aug_wmb() _WriteBarrier()
 
 /*:36*/
-#line 626 "../../../doc/atomic.w"
+#line 627 "../../../doc/atomic.w"
 
 #else
 # error No implementation
@@ -246,10 +246,10 @@ typedef __int64 int64_t;
 #endif
 
 /*:28*/
-#line 117 "../../../doc/atomic.w"
+#line 118 "../../../doc/atomic.w"
 
 /*5:*/
-#line 130 "../../../doc/atomic.w"
+#line 131 "../../../doc/atomic.w"
 
 AUGCTX_API int32_t
 aug_acq32(volatile int32_t*ptr);
@@ -258,7 +258,7 @@ AUGCTX_API void*
 aug_acqptr(void*volatile*ptr);
 
 /*:5*//*6:*/
-#line 141 "../../../doc/atomic.w"
+#line 142 "../../../doc/atomic.w"
 
 AUGCTX_API void
 aug_rel32(volatile int32_t*ptr,int32_t val);
@@ -267,7 +267,7 @@ AUGCTX_API void
 aug_relptr(void*volatile*ptr,void*val);
 
 /*:6*//*7:*/
-#line 154 "../../../doc/atomic.w"
+#line 155 "../../../doc/atomic.w"
 
 AUGCTX_API aug_bool_t
 aug_cas32(volatile int32_t*ptr,int32_t oldval,int32_t newval);
@@ -276,7 +276,7 @@ AUGCTX_API aug_bool_t
 aug_casptr(void*volatile*ptr,void*oldval,void*newval);
 
 /*:7*//*8:*/
-#line 164 "../../../doc/atomic.w"
+#line 165 "../../../doc/atomic.w"
 
 AUGCTX_API int32_t
 aug_tas32(volatile int32_t*ptr,int32_t val);
@@ -285,13 +285,13 @@ AUGCTX_API void*
 aug_tasptr(void*volatile*ptr,void*val);
 
 /*:8*//*9:*/
-#line 174 "../../../doc/atomic.w"
+#line 175 "../../../doc/atomic.w"
 
 AUGCTX_API int32_t
 aug_add32(volatile int32_t*ptr,int32_t delta);
 
 /*:9*/
-#line 118 "../../../doc/atomic.w"
+#line 119 "../../../doc/atomic.w"
 
 #endif
 

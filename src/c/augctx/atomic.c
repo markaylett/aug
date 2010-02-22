@@ -21,14 +21,14 @@
   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*13:*/
-#line 237 "../../../doc/atomic.w"
+#line 238 "../../../doc/atomic.w"
 
 #define AUGCTX_BUILD
 #ifndef AUGCTX_ATOMIC_H
 # include "atomic.h"
 #endif
 /*14:*/
-#line 258 "../../../doc/atomic.w"
+#line 259 "../../../doc/atomic.w"
 
 AUGCTX_API int32_t
 aug_acq32(volatile int32_t*ptr)
@@ -47,7 +47,7 @@ return val;
 }
 
 /*:14*//*15:*/
-#line 277 "../../../doc/atomic.w"
+#line 278 "../../../doc/atomic.w"
 
 AUGCTX_API void
 aug_rel32(volatile int32_t*ptr,int32_t val)
@@ -64,11 +64,11 @@ aug_wmb();
 }
 
 /*:15*/
-#line 242 "../../../doc/atomic.w"
+#line 243 "../../../doc/atomic.w"
 
 #if defined(__APPLE__) && defined(__MACH__)
 /*16:*/
-#line 295 "../../../doc/atomic.w"
+#line 296 "../../../doc/atomic.w"
 
 AUGCTX_API aug_bool_t
 aug_cas32(volatile int32_t*ptr,int32_t oldval,int32_t newval)
@@ -109,11 +109,11 @@ return OSAtomicAdd32Barrier(delta,ptr)-delta;
 }
 
 /*:16*/
-#line 244 "../../../doc/atomic.w"
+#line 245 "../../../doc/atomic.w"
 
 #elif defined(__GNUC__) && (__GNUC__ >  4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1))
 /*17:*/
-#line 341 "../../../doc/atomic.w"
+#line 342 "../../../doc/atomic.w"
 
 AUGCTX_API aug_bool_t
 aug_cas32(volatile int32_t*ptr,int32_t oldval,int32_t newval)
@@ -164,18 +164,18 @@ return __sync_fetch_and_add(ptr,delta);
 }
 
 /*:17*/
-#line 246 "../../../doc/atomic.w"
+#line 247 "../../../doc/atomic.w"
 
 #elif defined(__GNUC__) && (defined(__i486__) || defined(__i586__) \
  || defined(__i686__) || defined(__x86_64__) || defined(__amd64__))
 /*18:*/
-#line 393 "../../../doc/atomic.w"
+#line 394 "../../../doc/atomic.w"
 
 AUGCTX_API aug_bool_t
 aug_cas32(volatile int32_t*ptr,int32_t oldval,int32_t newval)
 {
 /*23:*/
-#line 534 "../../../doc/atomic.w"
+#line 535 "../../../doc/atomic.w"
 
 __asm__ __volatile__(
 "lock\n\t"
@@ -188,7 +188,7 @@ __asm__ __volatile__(
 );
 
 /*:23*/
-#line 397 "../../../doc/atomic.w"
+#line 398 "../../../doc/atomic.w"
 
 return oldval;
 }
@@ -198,7 +198,7 @@ aug_casptr(void*volatile*ptr,void*oldval,void*newval)
 {
 #if defined(__i486__) || defined(__i586__) || defined(__i686__)
 /*23:*/
-#line 534 "../../../doc/atomic.w"
+#line 535 "../../../doc/atomic.w"
 
 __asm__ __volatile__(
 "lock\n\t"
@@ -211,11 +211,11 @@ __asm__ __volatile__(
 );
 
 /*:23*/
-#line 405 "../../../doc/atomic.w"
+#line 406 "../../../doc/atomic.w"
 
 #else
 /*24:*/
-#line 547 "../../../doc/atomic.w"
+#line 548 "../../../doc/atomic.w"
 
 __asm__ __volatile__(
 "lock\n\t"
@@ -228,7 +228,7 @@ __asm__ __volatile__(
 );
 
 /*:24*/
-#line 407 "../../../doc/atomic.w"
+#line 408 "../../../doc/atomic.w"
 
 #endif
 return(aug_bool_t)oldval;
@@ -238,7 +238,7 @@ AUGCTX_API int32_t
 aug_tas32(volatile int32_t*ptr,int32_t val)
 {
 /*25:*/
-#line 562 "../../../doc/atomic.w"
+#line 563 "../../../doc/atomic.w"
 
 __asm__ __volatile__(
 "lock\n\t"
@@ -249,7 +249,7 @@ __asm__ __volatile__(
 );
 
 /*:25*/
-#line 415 "../../../doc/atomic.w"
+#line 416 "../../../doc/atomic.w"
 
 return val;
 }
@@ -259,7 +259,7 @@ aug_tasptr(void*volatile*ptr,void*val)
 {
 #if defined(__i486__) || defined(__i586__) || defined(__i686__)
 /*25:*/
-#line 562 "../../../doc/atomic.w"
+#line 563 "../../../doc/atomic.w"
 
 __asm__ __volatile__(
 "lock\n\t"
@@ -270,11 +270,11 @@ __asm__ __volatile__(
 );
 
 /*:25*/
-#line 423 "../../../doc/atomic.w"
+#line 424 "../../../doc/atomic.w"
 
 #else
 /*26:*/
-#line 573 "../../../doc/atomic.w"
+#line 574 "../../../doc/atomic.w"
 
 __asm__ __volatile__(
 "lock\n\t"
@@ -285,7 +285,7 @@ __asm__ __volatile__(
 );
 
 /*:26*/
-#line 425 "../../../doc/atomic.w"
+#line 426 "../../../doc/atomic.w"
 
 #endif
 return val;
@@ -295,7 +295,7 @@ AUGCTX_API int32_t
 aug_add32(volatile int32_t*ptr,int32_t val)
 {
 /*27:*/
-#line 587 "../../../doc/atomic.w"
+#line 588 "../../../doc/atomic.w"
 
 __asm__ __volatile__(
 "lock\n\t"
@@ -306,17 +306,17 @@ __asm__ __volatile__(
 );
 
 /*:27*/
-#line 433 "../../../doc/atomic.w"
+#line 434 "../../../doc/atomic.w"
 
 return val;
 }
 
 /*:18*/
-#line 249 "../../../doc/atomic.w"
+#line 250 "../../../doc/atomic.w"
 
 #elif defined(_WIN32)
 /*19:*/
-#line 446 "../../../doc/atomic.w"
+#line 447 "../../../doc/atomic.w"
 
 #include <windows.h>
 
@@ -342,7 +342,7 @@ AUGCTX_API void*
 aug_tasptr(void*volatile*ptr,void*val)
 {
 /*20:*/
-#line 483 "../../../doc/atomic.w"
+#line 484 "../../../doc/atomic.w"
 
 #if defined(_MSC_VER)
 # pragma warning(push)
@@ -350,18 +350,18 @@ aug_tasptr(void*volatile*ptr,void*val)
 #endif
 
 /*:20*/
-#line 470 "../../../doc/atomic.w"
+#line 471 "../../../doc/atomic.w"
 
 return InterlockedExchangePointer((volatile long*)ptr,val);
 /*21:*/
-#line 491 "../../../doc/atomic.w"
+#line 492 "../../../doc/atomic.w"
 
 #if defined(_MSC_VER)
 # pragma warning(pop)
 #endif
 
 /*:21*/
-#line 472 "../../../doc/atomic.w"
+#line 473 "../../../doc/atomic.w"
 
 }
 
@@ -372,7 +372,7 @@ return InterlockedExchangeAdd((volatile long*)ptr,delta);
 }
 
 /*:19*/
-#line 251 "../../../doc/atomic.w"
+#line 252 "../../../doc/atomic.w"
 
 #else
 # error No implementation

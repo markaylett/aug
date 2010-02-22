@@ -177,9 +177,10 @@ my (
     );
 
 if (is $gcc) {
-    my $pentium = valueask("pentium-pro build", 'y');
+    my $sse2 = valueask("sse2 extensions", 'y');
     my $gprof = valueask("gprof build", 'n');
-    $flags = (is $pentium) ? '-march=i686 -msse2' : '';
+    $flags = '-march=i686';
+    $flags = (is $sse2) ? ' -msse2' : '';
     $flags .= (is $gprof) ? ' -pg' : '';
     $flags .= (is $debug) ? ' -ggdb' : ' -O3 -DNDEBUG';
     $flags .= ' -Wno-long-long -fno-strict-aliasing -Wno-unused-value';
