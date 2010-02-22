@@ -180,7 +180,7 @@ if (is $gcc) {
     my $sse2 = valueask("sse2 extensions", 'y');
     my $gprof = valueask("gprof build", 'n');
     $flags = '-march=i686';
-    $flags = (is $sse2) ? ' -msse2' : '';
+    $flags .= (is $sse2) ? ' -msse2' : '';
     $flags .= (is $gprof) ? ' -pg' : '';
     $flags .= (is $debug) ? ' -ggdb' : ' -O3 -DNDEBUG';
     $flags .= ' -Wno-long-long -fno-strict-aliasing -Wno-unused-value';
