@@ -17,9 +17,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="bin"
+			OutputDirectory="lib"
 			IntermediateDirectory="debug/augaspp"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			CharacterSet="2"
 			>
 			<Tool
@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../src;../src/c;../src/cpp"
-				PreprocessorDefinitions="WIN32;_DEBUG;FD_SETSIZE=256;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;FD_SETSIZE=256;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,17 +61,8 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName)-1.pdb"
-				SubSystem="2"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="lib/lib$(ProjectName).lib"
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/lib$(ProjectName)-1.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -97,9 +88,9 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="bin"
+			OutputDirectory="lib"
 			IntermediateDirectory="release/augaspp"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			CharacterSet="2"
 			>
 			<Tool
@@ -120,7 +111,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../src;../src/c;../src/cpp"
-				PreprocessorDefinitions="WIN32;NDEBUG;FD_SETSIZE=256;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;FD_SETSIZE=256;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
@@ -138,17 +129,8 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/lib$(ProjectName)-1.dll"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/lib$(ProjectName)-1.pdb"
-				SubSystem="2"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="lib/lib$(ProjectName).lib"
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/lib$(ProjectName)-1.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -174,24 +156,6 @@
 		</Configuration>
 	</Configurations>
 	<References>
-		<ProjectReference
-			ReferencedProjectIdentifier="{BD1B38D0-918A-43C1-8A14-B3C334B8F1DA}"
-		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{01150DDF-A141-4B5B-A4FB-81FD65C964C5}"
-		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{A6131AD7-FF69-436D-B4D2-0076969FC276}"
-		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{D71F12D2-E969-4A00-8173-FFA33C1B963E}"
-		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{05AC1AD9-2273-4F34-AEC8-F3CBD265FA36}"
-		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{63BEF71A-3B15-494E-89B0-3CCDBF48B4E0}"
-		/>
 	</References>
 	<Files>
 		<Filter

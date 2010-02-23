@@ -188,7 +188,7 @@ case $host in
     AC_CHECK_TOOL(WINDRES, windres, windres)
 
     CPPFLAGS="-DWINVER=0x0501 -DFD_SETSIZE=256 -D__USE_W32_SOCKETS $CPPFLAGS"
-    LIBS="-Wl,-lws2_32 $LIBS"
+    LIBS="-Wl,-lws2_32 -lws2_32 $LIBS"
 
     ;;
 *)

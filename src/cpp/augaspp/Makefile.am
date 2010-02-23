@@ -18,7 +18,7 @@ modinclude_HEADERS = \
 	socks.hpp \
 	ssl.hpp
 
-lib_LTLIBRARIES = libaugaspp.la
+noinst_LTLIBRARIES = libaugaspp.la
 
 libaugaspp_la_SOURCES = \
 	buffer.cpp \
@@ -38,8 +38,7 @@ libaugaspp_la_SOURCES = \
 	ssl.cpp
 
 libaugaspp_la_LDFLAGS = \
-	-no-undefined \
-	-version-info 1:0:0
+	-no-undefined
 
 libaugaspp_la_LIBADD = \
 	$(top_builddir)/src/c/augnet/libaugnet.la \

@@ -261,6 +261,7 @@ if ($CYGWIN_MINGW == $toolset) {
 } elsif ($MINGW == $toolset) {
     print FILE "MINGW_HOME=/toolset/mingw; export MINGW_HOME\n";
     print FILE "PATH=\$MINGW_HOME/bin:\$PATH; export PATH\n";
+    print FILE "MAKE=mingw32-make; export MAKE\n";
     $options .= " \\\n\t--disable-dependency-tracking";
     $options .= " \\\n\t--build=i686-pc-cygwin";
     $options .= " \\\n\t--host=mingw32";

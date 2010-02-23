@@ -25,9 +25,12 @@
 
 #include "augconfig.h"
 
-#if defined(DLL_EXPORT) || defined(_WINDLL)
-# define AUGARCPP_SHARED
-#endif // DLL_EXPORT || _WINDLL
+// Only c-libraries are shared.
+#if !defined(__cplusplus)
+ #if defined(DLL_EXPORT) || defined(_WINDLL)
+ # define AUGARCPP_SHARED
+ #endif // DLL_EXPORT || _WINDLL
+#endif // !__cplusplus
 
 #if !defined(AUGARCPP_SHARED)
 # define AUGARCPP_API

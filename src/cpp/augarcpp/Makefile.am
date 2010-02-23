@@ -18,7 +18,7 @@ modinclude_HEADERS = \
 	utility.hpp \
 	wild.hpp
 
-lib_LTLIBRARIES = libaugarcpp.la
+noinst_LTLIBRARIES = libaugarcpp.la
 
 libaugarcpp_la_SOURCES = \
 	base.cpp \
@@ -38,8 +38,7 @@ libaugarcpp_la_SOURCES = \
 	wild.cpp
 
 libaugarcpp_la_LDFLAGS = \
-	-no-undefined \
-	-version-info 1:0:0
+	-no-undefined
 
 libaugarcpp_la_LIBADD = \
 	$(top_builddir)/src/c/augctx/libaugctx.la
