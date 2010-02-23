@@ -15,7 +15,7 @@ ssl.context.server.keyfile=etc/serverkey.pem
 ssl.context.server.cafile=etc/cacert.pem
 ssl.context.server.verify=0
 
-sessions=http sched arc pyskel pyecho pyproxy
+sessions=http sched sub pyskel pyecho pyproxy
 
 session.http.module=aught
 session.http.serv=8080
@@ -38,8 +38,8 @@ session.sched.events=foo bar
 session.sched.event.foo.utc=0M 30M
 session.sched.event.bar.local=1m17d13H0M
 
-session.arc.module=augarc
-session.arc.serv=7005
+session.sub.module=augsub
+session.sub.serv=7005
 
 session.pyskel.module=augpy
 session.pyskel.serv=7000
@@ -60,4 +60,4 @@ module.augpy.pythonpath=python
 module.aught.path=mod/modaught
 module.sched.path=mod/modsched
 module.augskel.path=mod/modskel
-module.augarc.path=mod/modaugarc
+module.augsub.path=mod/modaugsub

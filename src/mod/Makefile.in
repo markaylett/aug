@@ -200,10 +200,10 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 to_host_path_cmd = @to_host_path_cmd@
 SUBDIRS = \
-	augarc \
 	aught \
 	augpy \
-	augrb
+	augrb \
+	augsub
 
 all: all-recursive
 

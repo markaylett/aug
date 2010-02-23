@@ -1,8 +1,7 @@
 EXTRA_DIST = \
 	aug.bat \
 	aug.sln \
-	augarc.vcproj \
-	augarcpp.vcproj \
+	augaspp.vcproj \
 	augctx.vcproj \
 	augctxpp.vcproj \
 	augd.vcproj \
@@ -14,9 +13,10 @@ EXTRA_DIST = \
 	augpy.vcproj \
 	augrb.vcproj \
 	augres.vcproj \
-	augaspp.vcproj \
 	augserv.vcproj \
 	augservpp.vcproj \
+	augsub.vcproj \
+	augsubpp.vcproj \
 	augsys.vcproj \
 	augsyspp.vcproj \
 	augutil.vcproj \
@@ -25,16 +25,16 @@ EXTRA_DIST = \
 	command.vcproj \
 	example.vcproj \
 	htdigest.vcproj \
+	install.bat \
 	mar.vcproj \
 	minimal.vcproj \
+	reconf.bat \
 	sched.vcproj \
+	scratch.cpp \
 	server.vcproj \
 	setup.vdproj \
-	install.bat \
-	reconf.bat \
 	start.bat \
 	stop.bat \
 	test.bat \
 	test.conf \
-	uninstall.bat \
-	scratch.cpp
+	uninstall.bat

@@ -118,7 +118,7 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{8DFF25C5-503A-46B3-BDCD-C100E58F96C5}"
-			Name="augarcpp"/>
+			Name="augsubpp"/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{D9FAFBA4-1C9B-4341-823F-8D7A750E03C8}"
 			Name="augaspp"/>

@@ -52,9 +52,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augctxpp", "augctxpp.vcproj
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augres", "augres.vcproj", "{62E04EFE-0599-4441-B01D-F4CA9328386F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augarcpp", "augarcpp.vcproj", "{8DFF25C5-503A-46B3-BDCD-C100E58F96C5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augsubpp", "augsubpp.vcproj", "{8DFF25C5-503A-46B3-BDCD-C100E58F96C5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augarc", "augarc.vcproj", "{5F61ED77-5C3A-43F0-8BC8-1A84DB703822}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "augsub", "augsub.vcproj", "{5F61ED77-5C3A-43F0-8BC8-1A84DB703822}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

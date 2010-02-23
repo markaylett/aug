@@ -1,6 +1,6 @@
 SUBDIRS = \
-	augarc \
 	aught \
 	augpy \
-	augrb
+	augrb \
+	augsub
 

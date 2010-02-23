@@ -193,8 +193,7 @@ to_host_path_cmd = @to_host_path_cmd@
 EXTRA_DIST = \
 	aug.bat \
 	aug.sln \
-	augarc.vcproj \
-	augarcpp.vcproj \
+	augaspp.vcproj \
 	augctx.vcproj \
 	augctxpp.vcproj \
 	augd.vcproj \
@@ -206,9 +205,10 @@ EXTRA_DIST = \
 	augpy.vcproj \
 	augrb.vcproj \
 	augres.vcproj \
-	augaspp.vcproj \
 	augserv.vcproj \
 	augservpp.vcproj \
+	augsub.vcproj \
+	augsubpp.vcproj \
 	augsys.vcproj \
 	augsyspp.vcproj \
 	augutil.vcproj \
@@ -217,18 +217,18 @@ EXTRA_DIST = \
 	command.vcproj \
 	example.vcproj \
 	htdigest.vcproj \
+	install.bat \
 	mar.vcproj \
 	minimal.vcproj \
-	sched.vcproj \
-	server.vcproj \
-	install.bat \
 	reconf.bat \
+	sched.vcproj \
+	scratch.cpp \
+	server.vcproj \
 	start.bat \
 	stop.bat \
 	test.bat \
 	test.conf \
-	uninstall.bat \
-	scratch.cpp
+	uninstall.bat
 
 all: all-am
 

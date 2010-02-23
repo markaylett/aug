@@ -1,6 +1,5 @@
 EXTRA_DIST = lang.mk
 SUBDIRS = \
-	augarcpp \
 	augctxpp \
 	augsyspp \
 	augmarpp \
@@ -8,6 +7,7 @@ SUBDIRS = \
 	augservpp \
 	augnetpp \
 	augaspp \
+	augsubpp \
 	augd \
 	htdigest
 

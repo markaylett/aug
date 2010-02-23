@@ -212,7 +212,6 @@ target_alias = @target_alias@
 to_host_path_cmd = @to_host_path_cmd@
 EXTRA_DIST = lang.mk
 SUBDIRS = \
-	augarcpp \
 	augctxpp \
 	augsyspp \
 	augmarpp \
@@ -220,6 +219,7 @@ SUBDIRS = \
 	augservpp \
 	augnetpp \
 	augaspp \
+	augsubpp \
 	augd \
 	htdigest
 

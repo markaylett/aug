@@ -3008,7 +3008,7 @@
                             }
                             "{F27BD5C5-A65D-4608-96D4-7C5DA1F76302}:_60C3F9B7E42646FD8DFD58A337A5FFF3"
                             {
-                            "Name" = "8:augarcpp"
+                            "Name" = "8:augsubpp"
                             "AlwaysCreate" = "11:FALSE"
                             "Condition" = "8:"
                             "Transitive" = "11:FALSE"
@@ -4498,7 +4498,7 @@
             }
             "{8062640A-2EEE-46E9-AB67-688E9A886E9F}:_69DBD8970F9B4E92B1B860429728BDE4"
             {
-            "SourcePath" = "8:mod\\modaugarc.dll"
+            "SourcePath" = "8:mod\\modaugsub.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_0A56689C8E9D472A823ECE14BB0E848C"

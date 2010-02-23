@@ -342,15 +342,15 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/augservpp/Makefile
                  src/cpp/augsyspp/Makefile
                  src/cpp/augutilpp/Makefile
-                 src/cpp/augarcpp/Makefile
                  src/cpp/augaspp/Makefile
+                 src/cpp/augsubpp/Makefile
                  src/cpp/augd/Makefile
                  src/cpp/htdigest/Makefile
                  src/mod/Makefile
-                 src/mod/augarc/Makefile
                  src/mod/aught/Makefile
                  src/mod/augpy/Makefile
                  src/mod/augrb/Makefile
+                 src/mod/augsub/Makefile
                  src/pl/Makefile
                  src/py/Makefile
                  src/rb/Makefile
