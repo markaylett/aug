@@ -723,12 +723,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C6E4ED6EDE054FDD946535F67C69072D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_CEBE541179C0463CA953C31AB7A66F81"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2559,26 +2553,6 @@
             {
             "SourcePath" = "8:..\\src\\c\\augext\\boxint.h"
             "TargetName" = "8:boxint.h"
-            "Tag" = "8:"
-            "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{A582A373-4685-4296-BEFE-614B80A702C3}:_C6E4ED6EDE054FDD946535F67C69072D"
-            {
-            "SourcePath" = "8:..\\src\\c\\augext\\err.h"
-            "TargetName" = "8:err.h"
             "Tag" = "8:"
             "Folder" = "8:_D8935A79B6A5475A8DD7FAE7A553D3D9"
             "Condition" = "8:"

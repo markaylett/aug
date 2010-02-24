@@ -79,12 +79,6 @@ namespace {
         {
             return AUG_MKRESULT(size);
         }
-        void
-        copyerrinfo_(aug_errinfo& dst) AUG_NOTHROW
-        {
-            aug_seterrinfo(&dst, __FILE__, __LINE__, "aug", AUG_EASSERT,
-                           "some error");
-        }
         static streamptr
         create()
         {

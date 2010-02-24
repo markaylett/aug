@@ -28,9 +28,7 @@
 
 #include "augctx/base.h"
 
-#include "augext/err.h"
-
-#include <cstring>          // memcpy()
+#include <cstring> // memcpy()
 #include <exception>
 
 namespace aug {
@@ -56,14 +54,6 @@ namespace aug {
         what() const throw() // required by gcc.
         {
             return "aug::block_exception";
-        }
-    };
-
-    struct endof_exception : std::exception {
-        const char*
-        what() const throw() // required by gcc.
-        {
-            return "aug::endof_exception";
         }
     };
 
@@ -276,9 +266,6 @@ namespace aug {
                 if (aug_isblock(result))
                     throw block_exception();
 
-                if (aug_isendof(result))
-                    throw endof_exception();
-
                 return true;
             }
         };
@@ -308,23 +295,6 @@ namespace aug {
     {
         if (detail::result_traits<T>::error(result))
             throwerror();
-        return result;
-    }
-
-    template <typename T, typename U>
-    T
-    verify(T result, obref<U> src)
-    {
-        if (detail::result_traits<T>::error(result)) {
-
-            errptr ptr(object_cast<aug_err>(src));
-            if (null == ptr)
-                throwerror();
-
-            aug_errinfo errinfo;
-            copyerrinfo(ptr, errinfo);
-            throwerror(errinfo);
-        }
         return result;
     }
 }
