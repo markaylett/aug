@@ -365,9 +365,9 @@ namespace aug {
 
     // Prototype for error verification.
 
-    template <typename T, typename U>
+    template <typename T>
     T
-    verify(T result, obref<U> src);
+    verify(T result);
 }
 
 template <typename T>
