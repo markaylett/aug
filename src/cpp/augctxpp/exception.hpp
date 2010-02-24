@@ -59,6 +59,14 @@ namespace aug {
         }
     };
 
+    struct endof_exception : std::exception {
+        const char*
+        what() const throw() // required by gcc.
+        {
+            return "aug::endof_exception";
+        }
+    };
+
     class errinfo_error : public std::exception {
     public:
         typedef aug_errinfo ctype;
@@ -267,6 +275,9 @@ namespace aug {
 
                 if (aug_isblock(result))
                     throw block_exception();
+
+                if (aug_isendof(result))
+                    throw endof_exception();
 
                 return true;
             }

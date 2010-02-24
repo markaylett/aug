@@ -152,7 +152,7 @@ seterrinvalid_(const char* file, int line, char ch)
 static void
 seterralign_(const char* file, int line)
 {
-    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EENDOF,
+    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EPARSE,
                    AUG_MSG("misaligned base64 sequence"));
 }
 
