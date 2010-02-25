@@ -29,13 +29,13 @@
 
 namespace aug {
 
-    inline aug_time
+    inline aug_rlong
     timegm(tm& res)
     {
         return verify(aug_timegm(&res));
     }
 
-    inline aug_time
+    inline aug_rlong
     timelocal(tm& res)
     {
         return verify(aug_timelocal(&res));

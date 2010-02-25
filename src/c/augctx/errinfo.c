@@ -45,8 +45,6 @@ static void
 seterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
             const char* src, int num, const char* desc)
 {
-    if (!errinfo)
-        return;
     aug_strlcpy(errinfo->file_, file, sizeof(errinfo->file_));
     errinfo->line_ = line;
     aug_strlcpy(errinfo->src_, src, sizeof(errinfo->src_));
@@ -59,8 +57,6 @@ vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
              const char* src, int num, const char* format, va_list args)
 {
     int ret;
-    if (!errinfo)
-        return;
 
     aug_strlcpy(errinfo->file_, file, sizeof(errinfo->file_));
     errinfo->line_ = line;
@@ -97,7 +93,7 @@ aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     if (!errinfo)
         return;
 
-    if (!num) {
+    if (0 == num) {
         aug_clearerrinfo(errinfo);
         return;
     }
@@ -113,7 +109,7 @@ aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
     if (!errinfo)
         return;
 
-    if (!num) {
+    if (0 == num) {
         aug_clearerrinfo(errinfo);
         return;
     }
@@ -127,19 +123,15 @@ AUGCTX_API aug_result
 aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     int num)
 {
-    if (!errinfo)
-        return AUG_SUCCESS;
-
-    if (!num) {
-        aug_clearerrinfo(errinfo);
-        return AUG_SUCCESS;
-    }
-
-    seterrinfo_(errinfo, file, line, "posix", num, strerror(num));
+    if (errinfo)
+        seterrinfo_(errinfo, file, line, "posix", num, strerror(num));
 
     /* Map to exception code. */
 
     switch (num) {
+    case 0:
+        aug_clearerrinfo(errinfo);
+        return AUG_SUCCESS;
     case EINTR:
         return AUG_FAILINTR;
     case EWOULDBLOCK:
@@ -153,38 +145,35 @@ AUGCTX_API aug_result
 aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
                     unsigned long num)
 {
-    char desc[AUG_MAXLINE];
-    DWORD i;
-    if (!errinfo)
-        return AUG_SUCCESS;
+    if (errinfo) {
 
-    if (!num) {
-        aug_clearerrinfo(errinfo);
-        return AUG_SUCCESS;
+        char desc[AUG_MAXLINE];
+        DWORD i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, num,
+                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                desc, sizeof(desc), NULL);
+
+        /* Remove trailing whitespace. */
+
+        while (i && isspace(desc[i - 1]))
+            --i;
+
+        /* Remove trailing full-stop. */
+
+        if (i && '.' == desc[i - 1])
+            --i;
+
+        desc[i] = '\0';
+
+        seterrinfo_(errinfo, file, line, "win32", (int)num,
+                    i ? desc : AUG_MSG("no description available"));
     }
-
-    i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, num,
-                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                      desc, sizeof(desc), NULL);
-
-    /* Remove trailing whitespace. */
-
-    while (i && isspace(desc[i - 1]))
-        --i;
-
-    /* Remove trailing full-stop. */
-
-    if (i && '.' == desc[i - 1])
-        --i;
-
-    desc[i] = '\0';
-
-    seterrinfo_(errinfo, file, line, "win32", (int)num,
-                i ? desc : AUG_MSG("no description available"));
 
     /* Map to exception code. */
 
     switch (num) {
+    case 0:
+        aug_clearerrinfo(errinfo);
+        return AUG_SUCCESS;
     case WSAEINTR:
         return AUG_FAILINTR;
     case WSAEWOULDBLOCK:

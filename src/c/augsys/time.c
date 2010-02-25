@@ -41,7 +41,7 @@ timezone_(void)
 }
 #endif /* !HAVE_TIMEGM */
 
-AUGSYS_API aug_time
+AUGSYS_API aug_rlong
 aug_timegm(struct tm* tm)
 {
     time_t gmt;
@@ -64,11 +64,9 @@ aug_timegm(struct tm* tm)
     gm.tm_year = tm->tm_year;
     gm.tm_isdst = 0; /* No daylight adjustment. */
 
-    if ((time_t)-1 == (gmt = mktime(&gm))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
-                            ? EINVAL : errno);
-        return (aug_time)gmt;
-    }
+    if ((time_t)-1 == (gmt = mktime(&gm)))
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
+                                   ? EINVAL : errno);
 
     /* mktime() assumes localtime; adjust for gmt. */
 
@@ -76,17 +74,17 @@ aug_timegm(struct tm* tm)
 
 #endif /* !HAVE_TIMEGM */
 
-    return (aug_time)gmt;
+    return AUG_MKRESULT(gmt);
 }
 
-AUGSYS_API aug_time
+AUGSYS_API aug_rlong
 aug_timelocal(struct tm* tm)
 {
     time_t gmt = mktime(tm);
     if (gmt == (time_t)-1)
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
-                            ? EINVAL : errno);
-    return (aug_time)gmt;
+        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
+                                   ? EINVAL : errno);
+    return AUG_MKRESULT(gmt);
 }
 
 AUGSYS_API struct tm*

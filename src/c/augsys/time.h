@@ -53,10 +53,10 @@ struct timezone {
  * variable.  It should not, therefore, be considered thread-safe.
  */
 
-AUGSYS_API aug_time
+AUGSYS_API aug_rlong
 aug_timegm(struct tm* tm);
 
-AUGSYS_API aug_time
+AUGSYS_API aug_rlong
 aug_timelocal(struct tm* tm);
 
 AUGSYS_API struct tm*

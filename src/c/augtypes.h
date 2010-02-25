@@ -145,6 +145,7 @@ struct aug_strict_ {
 
 typedef struct aug_strict_ aug_result;
 typedef struct aug_strict_ aug_rint;
+typedef struct aug_strict_ aug_rlong;
 typedef struct aug_strict_ aug_rsize;
 
 static inline aug_result
@@ -166,6 +167,7 @@ aug_mkresult_(long val)
 
 typedef int aug_result;
 typedef int aug_rint;
+typedef long aug_rlong;
 typedef ssize_t aug_rsize;
 
 # define AUG_MKRESULT(x) (x)
