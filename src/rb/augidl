@@ -365,12 +365,8 @@ class CppFormat
             "return aug::object_attach<#{type.cname}>(#{expr})";
         elsif type.ref? then
             "return *#{expr}"
-        elsif type.cname =~ /^(void|aug_result)$/ then
+        elsif type.cname =~ /^void$/ then
             expr
-        elsif type.cname == 'aug_rint' then
-            "return static_cast<unsigned>(AUG_RESULT(#{expr}))"
-        elsif type.cname == 'aug_rsize' then
-            "return static_cast<size_t>(AUG_RESULT(#{expr}))"
         else
             "return #{expr}"
         end
@@ -398,12 +394,6 @@ class CppFormat
             "aug::smartob<#{type.cname}>"
         elsif type.ref?
             type.cname + '&'
-        elsif type.cname == 'aug_result'
-            'void'
-        elsif type.cname == 'aug_rint'
-            'unsigned'
-        elsif type.cname == 'aug_rsize'
-            'size_t'
         else
             type.cname
         end
