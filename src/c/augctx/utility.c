@@ -37,11 +37,11 @@ AUG_RCSID("$Id$");
 # define vsnprintf _vsnprintf
 #endif /* _WIN32 */
 
-AUGCTX_API int
+AUGCTX_API unsigned
 aug_loglevel(void)
 {
     const char* s = getenv("AUG_LOGLEVEL");
-    return s ? atoi(s) : 4; /* AUG_LOGINFO */
+    return s ? (unsigned)atoi(s) : 4; /* AUG_LOGINFO */
 }
 
 #if !defined(_WIN32)

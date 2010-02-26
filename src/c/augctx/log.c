@@ -55,7 +55,7 @@ release_(aug_log* obj)
 }
 
 static aug_result
-vwritelog_(aug_log* obj, int level, const char* format, va_list args)
+vwritelog_(aug_log* obj, unsigned level, const char* format, va_list args)
 {
     char buf[AUG_MAXLINE];
     FILE* file = level > AUG_LOGWARN ? stdout : stderr;
@@ -84,7 +84,7 @@ static const struct aug_logvtbl vtbl_ = {
 static aug_log stdlog_ = { &vtbl_, NULL };
 
 AUGCTX_API aug_result
-aug_writelog(aug_log* log, int level, const char* format, ...)
+aug_writelog(aug_log* log, unsigned level, const char* format, ...)
 {
     aug_result result;
     va_list args;

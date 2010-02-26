@@ -39,7 +39,7 @@
 namespace mod {
 
     inline void
-    writelog(int level, const char* format, ...) AUG_NOTHROW
+    writelog(unsigned level, const char* format, ...) AUG_NOTHROW
     {
         va_list args;
         va_start(args, format);
@@ -48,7 +48,7 @@ namespace mod {
     }
 
     inline void
-    vwritelog(int level, const char* format, va_list args) AUG_NOTHROW
+    vwritelog(unsigned level, const char* format, va_list args) AUG_NOTHROW
     {
         mod_vwritelog(level, format, args);
     }

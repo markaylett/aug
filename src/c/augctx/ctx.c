@@ -47,7 +47,8 @@ struct impl_ {
     aug_mpool* mpool_;
     aug_clock* clock_;
     aug_log* log_;
-    int loglevel_;
+    unsigned loglevel_;
+    unsigned except_;
     struct aug_errinfo errinfo_;
 };
 
@@ -100,13 +101,20 @@ setlog_(aug_ctx* obj, aug_log* log)
     impl->log_ = log;
 }
 
-static int
-setloglevel_(aug_ctx* obj, int level)
+static unsigned
+setloglevel_(aug_ctx* obj, unsigned level)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
-    int prev = impl->loglevel_;
+    unsigned prev = impl->loglevel_;
     impl->loglevel_ = level;
     return prev;
+}
+
+static void
+setexcept_(aug_ctx* obj, unsigned except)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
+    impl->except_ = except;
 }
 
 static aug_mpool*
@@ -133,11 +141,18 @@ getlog_(aug_ctx* obj)
     return impl->log_;
 }
 
-static int
+static unsigned
 getloglevel_(aug_ctx* obj)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
     return impl->loglevel_;
+}
+
+static unsigned
+getexcept_(aug_ctx* obj)
+{
+    struct impl_* impl = AUG_PODIMPL(struct impl_, ctx_, obj);
+    return impl->except_;
 }
 
 static struct aug_errinfo*
@@ -153,15 +168,17 @@ static const struct aug_ctxvtbl vtbl_ = {
     release_,
     setlog_,
     setloglevel_,
+    setexcept_,
     getmpool_,
     getclock_,
     getlog_,
     getloglevel_,
+    getexcept_,
     geterrinfo_
 };
 
 static aug_result
-vctxlog_(aug_ctx* ctx, int level, const char* format, va_list args)
+vctxlog_(aug_ctx* ctx, unsigned level, const char* format, va_list args)
 {
     aug_result result = AUG_SUCCESS;
     assert(ctx);
@@ -176,7 +193,8 @@ vctxlog_(aug_ctx* ctx, int level, const char* format, va_list args)
 }
 
 AUGCTX_API aug_ctx*
-aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int loglevel)
+aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log,
+              unsigned loglevel)
 {
     struct impl_* impl;
     assert(mpool);
@@ -206,6 +224,7 @@ aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int loglevel)
     impl->clock_ = clock;
     impl->log_ = log;
     impl->loglevel_ = loglevel;
+    impl->except_ = 0;
     memset(&impl->errinfo_, 0, sizeof(impl->errinfo_));
 
     aug_retain(mpool);
@@ -240,13 +259,13 @@ aug_createbasicctx(aug_mpool* mpool)
 }
 
 AUGCTX_API aug_result
-aug_vctxlog(aug_ctx* ctx, int level, const char* format, va_list args)
+aug_vctxlog(aug_ctx* ctx, unsigned level, const char* format, va_list args)
 {
     return vctxlog_(ctx, level, format, args);
 }
 
 AUGCTX_API aug_result
-aug_ctxlog(aug_ctx* ctx, int level, const char* format, ...)
+aug_ctxlog(aug_ctx* ctx, unsigned level, const char* format, ...)
 {
     aug_result result;
     va_list args;

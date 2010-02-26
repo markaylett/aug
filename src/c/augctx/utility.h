@@ -46,7 +46,7 @@ aug_die_(__FILE__, __LINE__, what)
  * @return The log-level.
  */
 
-AUGCTX_API int
+AUGCTX_API unsigned
 aug_loglevel(void);
 
 /**

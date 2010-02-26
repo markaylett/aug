@@ -40,10 +40,10 @@ incret_(PyObject* x)
 static PyObject*
 writelog_(PyObject* self, PyObject* args)
 {
-    int level;
+    unsigned level;
     const char* msg;
 
-    if (!PyArg_ParseTuple(args, "is:writelog", &level, &msg))
+    if (!PyArg_ParseTuple(args, "Is:writelog", &level, &msg))
         return NULL;
 
     mod_writelog(level, "%s", msg);

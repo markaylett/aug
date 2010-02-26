@@ -41,7 +41,7 @@ enum aug_loglevel {
   <interface name="log">
 
     <method name="vwrite" type="aug_result">
-      <param name="level" type="int"/>
+      <param name="level" type="unsigned"/>
       <param name="format" type="const char*"/>
       <param name="args" type="va_list"/>
     </method>

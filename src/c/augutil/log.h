@@ -42,7 +42,7 @@
  */
 
 AUGUTIL_API const char*
-aug_loglabel(int level);
+aug_loglabel(unsigned level);
 
 /**
  * Format log string.
@@ -63,7 +63,7 @@ aug_loglabel(int level);
  */
 
 AUGUTIL_API aug_result
-aug_vformatlog(char* buf, size_t* n, aug_clock* clock, int level,
+aug_vformatlog(char* buf, size_t* n, aug_clock* clock, unsigned level,
                const char* format, va_list args);
 
 /**
@@ -71,7 +71,7 @@ aug_vformatlog(char* buf, size_t* n, aug_clock* clock, int level,
  */
 
 AUGUTIL_API aug_result
-aug_formatlog(char* buf, size_t* n, aug_clock* clock, int level,
+aug_formatlog(char* buf, size_t* n, aug_clock* clock, unsigned level,
               const char* format, ...);
 
 /**

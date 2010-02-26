@@ -327,7 +327,7 @@ initimport_(struct import_* import, const char* sname)
 static VALUE
 writelog_(VALUE self, VALUE level, VALUE msg)
 {
-    mod_writelog(NUM2INT(level), StringValuePtr(msg));
+    mod_writelog(NUM2UINT(level), StringValuePtr(msg));
     return Qnil;
 }
 

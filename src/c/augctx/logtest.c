@@ -52,7 +52,7 @@ release_(aug_log* obj)
 }
 
 static aug_result
-vwritelog_(aug_log* obj, int level, const char* format, va_list args)
+vwritelog_(aug_log* obj, unsigned level, const char* format, va_list args)
 {
     logged_ = 1;
     return AUG_SUCCESS;

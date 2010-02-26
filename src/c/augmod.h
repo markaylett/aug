@@ -262,7 +262,7 @@ struct mod_host {
      * @see #mod_loglevel, vwritelog_().
      */
 
-    void (*writelog_)(int level, const char* format, ...);
+    void (*writelog_)(unsigned level, const char* format, ...);
 
     /**
      * Write message to the application server's log.
@@ -276,7 +276,7 @@ struct mod_host {
      * @see #mod_loglevel, writelog_().
      */
 
-    void (*vwritelog_)(int level, const char* format, va_list args);
+    void (*vwritelog_)(unsigned level, const char* format, va_list args);
 
     /**
      * Get description for the last host error.

@@ -32,7 +32,7 @@
  */
 
 AUGCTX_API aug_result
-aug_writelog(aug_log* log, int level, const char* format, ...);
+aug_writelog(aug_log* log, unsigned level, const char* format, ...);
 
 /**
  * The standard logger.

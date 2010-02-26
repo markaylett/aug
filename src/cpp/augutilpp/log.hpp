@@ -36,14 +36,14 @@
 namespace aug {
 
     inline void
-    vformatlog(char* buf, size_t& n, clockref clock, int level,
+    vformatlog(char* buf, size_t& n, clockref clock, unsigned level,
                const char* format, va_list args)
     {
         verify(aug_vformatlog(buf, &n, clock.get(), level, format, args));
     }
 
     inline void
-    formatlog(char* buf, size_t& n, clockref clock, int level,
+    formatlog(char* buf, size_t& n, clockref clock, unsigned level,
               const char* format, ...)
     {
         va_list args;
@@ -55,7 +55,8 @@ namespace aug {
     }
 
     inline std::string
-    vformatlog(clockref clock, int level, const char* format, va_list args)
+    vformatlog(clockref clock, unsigned level, const char* format,
+               va_list args)
     {
         char buf[AUG_MAXLINE];
         size_t n(sizeof(buf));
@@ -64,7 +65,7 @@ namespace aug {
     }
 
     inline std::string
-    formatlog(clockref clock, int level, const char* format, ...)
+    formatlog(clockref clock, unsigned level, const char* format, ...)
     {
         char buf[AUG_MAXLINE];
         size_t n(sizeof(buf));

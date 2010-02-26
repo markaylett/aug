@@ -32,7 +32,8 @@
  */
 
 AUGCTX_API aug_ctx*
-aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log, int level);
+aug_createctx(aug_mpool* mpool, aug_clock* clock, aug_log* log,
+              unsigned level);
 
 AUGCTX_API aug_ctx*
 aug_createbasicctx(aug_mpool* mpool);
@@ -49,10 +50,10 @@ aug_createbasicctx(aug_mpool* mpool);
  */
 
 AUGCTX_API aug_result
-aug_vctxlog(aug_ctx* ctx, int level, const char* format, va_list args);
+aug_vctxlog(aug_ctx* ctx, unsigned level, const char* format, va_list args);
 
 AUGCTX_API aug_result
-aug_ctxlog(aug_ctx* ctx, int level, const char* format, ...);
+aug_ctxlog(aug_ctx* ctx, unsigned level, const char* format, ...);
 
 /** @} */
 

@@ -145,7 +145,7 @@ namespace {
             openlog_();
         }
 
-        aug_ctxinfo(aug_tlx, "loglevel=[%d]", aug_getloglevel(aug_tlx));
+        aug_ctxinfo(aug_tlx, "loglevel=[%u]", aug_getloglevel(aug_tlx));
         aug_ctxinfo(aug_tlx, "rundir=[%s]", rundir_);
     }
 
@@ -296,7 +296,7 @@ namespace {
     // Thread-safe.
 
     void
-    writelog_(int level, const char* format, ...)
+    writelog_(unsigned level, const char* format, ...)
     {
         // Cannot throw.
 
@@ -309,7 +309,7 @@ namespace {
     // Thread-safe.
 
     void
-    vwritelog_(int level, const char* format, va_list args)
+    vwritelog_(unsigned level, const char* format, va_list args)
     {
         // Cannot throw.
 
