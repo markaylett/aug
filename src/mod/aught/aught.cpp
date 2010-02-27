@@ -542,7 +542,7 @@ namespace {
             // TODO: implement pool.
 
             aug_ctxinfo(aug_tlx, "delete mar [%s]", request);
-            return AUG_SUCCESS;
+            return 0;
         }
         aug_mar_*
         getmar_(const char* request) AUG_NOTHROW
@@ -560,9 +560,9 @@ namespace {
             try {
                 aug_ctxinfo(aug_tlx, "put mar [%s]", request);
                 put(request, mar);
-                return AUG_SUCCESS;
+                return 0;
             } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
+            return -1;
         }
         static marstoreptr
         create(const string& realm, mod_id id, const string& name)

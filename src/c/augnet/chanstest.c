@@ -94,7 +94,7 @@ chan_release_(aug_chan* ob)
 static aug_result
 chan_close_(aug_chan* ob)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_chan*
@@ -117,7 +117,7 @@ chan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
 static aug_result
 chan_setwantwr_(aug_chan* ob, aug_bool wantwr)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_id
@@ -176,7 +176,7 @@ stream_release_(aug_stream* ob)
 static aug_result
 stream_shutdown_(aug_stream* ob)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_rsize

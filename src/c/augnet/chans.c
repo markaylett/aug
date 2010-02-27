@@ -143,7 +143,7 @@ aug_insertchan(aug_chans_t chans, aug_chan* ob)
 {
     struct entry_* entry = aug_allocmem(chans->mpool_, sizeof(struct entry_));
     if (!entry)
-        return AUG_FAILERROR;
+        return -1;
 
     AUG_CTXDEBUG3(aug_tlx, "retaining channel: %d", (int)aug_getchanid(ob));
 
@@ -152,7 +152,7 @@ aug_insertchan(aug_chans_t chans, aug_chan* ob)
 
     AUG_INSERT_HEAD(&chans->list_, entry);
     ++chans->size_;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGNET_API aug_result
@@ -199,7 +199,7 @@ aug_removechan(aug_chans_t chans, aug_id id)
         aug_freemem(chans->mpool_, it);
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGNET_API aug_chan*

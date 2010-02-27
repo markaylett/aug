@@ -72,33 +72,33 @@ static aug_result
 request_(aug_httphandler* ob, const char* request)
 {
     aug_ctxinfo(aug_tlx, "request: %s", request);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
 field_(aug_httphandler* ob, const char* name, const char* value)
 {
     aug_ctxinfo(aug_tlx, "field: %s=%s", name, value);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
 csize_(aug_httphandler* ob, unsigned csize)
 {
     aug_ctxinfo(aug_tlx, "size: %d", (int)csize);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
 cdata_(aug_httphandler* ob, const void* buf, unsigned len)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
 end_(aug_httphandler* ob, aug_bool commit)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static const struct aug_httphandlervtbl vtbl_ = {

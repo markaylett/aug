@@ -81,15 +81,15 @@ request_(aug_httphandler* ob, const char* request)
     parser->request_ = aug_createxstr(parser->mpool_, 0);
 
     if (!parser->request_)
-        return AUG_FAILERROR; /* Allocation failed. */
+        return -1; /* Allocation failed. */
 
     if (!(parser->mar_ = aug_getmar(parser->marstore_, request))) {
         aug_destroyxstr(parser->request_);
         parser->request_ = NULL;
-        return AUG_FAILERROR;
+        return -1;
     }
     aug_xstrcpys(parser->request_, request);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -108,7 +108,7 @@ field_(aug_httphandler* ob, const char* name, const char* value)
     field.size_ = (unsigned)strlen(value);
 
     aug_verify(aug_putfield(parser->mar_, &field));
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -123,7 +123,7 @@ csize_(aug_httphandler* ob, unsigned csize)
     aug_verify(aug_truncatemar(parser->mar_, csize));
     aug_verify(aug_seekmar(parser->mar_, AUG_SET, 0));
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -139,7 +139,7 @@ cdata_(aug_httphandler* ob, const void* buf, unsigned len)
 
     aug_verify(aug_writemar(parser->mar_, buf, len));
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -153,12 +153,12 @@ end_(aug_httphandler* ob, aug_bool commit)
     if (commit) {
 
         if (!parser->request_)
-            return AUG_SUCCESS; /* Blank line. */
+            return 0; /* Blank line. */
 
         result = aug_putmar(parser->marstore_, aug_xstr(parser->request_),
                             parser->mar_);
     } else
-        result = AUG_SUCCESS;
+        result = 0;
 
     if (parser->request_) {
         aug_destroyxstr(parser->request_);

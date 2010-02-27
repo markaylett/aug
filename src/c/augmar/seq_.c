@@ -119,7 +119,7 @@ resizemem_(aug_seq_t seq, unsigned size, unsigned tail)
 static aug_result
 syncmem_(aug_seq_t seq)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static void*
@@ -192,7 +192,7 @@ resizemfile_(aug_seq_t seq, unsigned size, unsigned tail)
         memmove((char*)addr + (size - tail),
                 (char*)addr + (len - tail), tail);
 
-        if (aug_isfail(aug_truncatemfile_(mfileseq->mfile_, size)))
+        if (aug_truncatemfile_(mfileseq->mfile_, size) < 0)
             return NULL;
     }
     return addr;
@@ -255,14 +255,13 @@ aug_copyseq_(aug_seq_t src, aug_seq_t dst)
     unsigned size = aug_seqsize_(src);
     void* addr;
 
-    aug_verify(aug_setregion_(src, 0, size));
-    aug_verify(aug_setregion_(dst, 0, aug_seqsize_(dst)));
-
-    if (!(addr = aug_resizeseq_(dst, size)))
-        return AUG_FAILERROR;
+    if (aug_setregion_(src, 0, size) < 0
+        || aug_setregion_(dst, 0, aug_seqsize_(dst)) < 0
+        || !(addr = aug_resizeseq_(dst, size)))
+        return -1;
 
     memcpy(addr, aug_seqaddr_(src), size);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUG_EXTERNC aug_seq_t
@@ -335,14 +334,14 @@ aug_setregion_(aug_seq_t seq, unsigned offset, unsigned len)
     unsigned total = (*seq->impl_->size_)(seq);
     if (total < (offset + len)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ERANGE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ERANGE,
                        AUG_MSG("sequence overrun by %d bytes"),
                        (int)((offset + len) - total));
-        return AUG_FAILERROR;
+        return -1;
     }
     seq->offset_ = offset;
     seq->len_ = len;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUG_EXTERNC aug_result

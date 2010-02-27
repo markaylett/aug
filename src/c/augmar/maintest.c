@@ -44,13 +44,13 @@ main(int argc, char* argv[])
     field.name_ = "name";
     field.value_ = "Mark";
     field.size_ = 4;
-    if (aug_isfail(aug_putfield(mar, &field)))
+    if (aug_putfield(mar, &field) < 0)
         aug_die("aug_putfield() failed");
 
     field.name_ = "age";
     field.value_ = "33";
     field.size_ = 2;
-    if (aug_isfail(aug_putfield(mar, &field)))
+    if (aug_putfield(mar, &field) < 0)
         aug_die("aug_putfield() failed");
 
     aug_release(mar);

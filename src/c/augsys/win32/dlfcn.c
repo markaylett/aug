@@ -37,11 +37,11 @@ AUGSYS_API aug_result
 aug_dlclose(aug_dlib_t dlib)
 {
     aug_mpool* mpool = dlib->mpool_;
-    aug_result result = AUG_SUCCESS;
+    aug_result result = 0;
 
     if (!FreeLibrary(dlib->handle_)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        result = AUG_FAILERROR;
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        result = -1;
     }
 
     aug_freemem(mpool, dlib);
@@ -60,7 +60,7 @@ aug_dlopen(aug_mpool* mpool, const char* path)
         return NULL;
 
     if (!(handle = LoadLibrary(path))) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
         aug_freemem(mpool, dlib);
         return NULL;
     }
@@ -84,7 +84,7 @@ aug_dlsym(aug_dlib_t dlib, const char* symbol)
     } local;
 
     if (!(local.in_ = GetProcAddress(dlib->handle_, symbol))) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
         return NULL;
     }
 

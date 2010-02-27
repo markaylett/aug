@@ -625,8 +625,6 @@ WITH_CWEB_FALSE
 WITH_CWEB_TRUE
 ENABLE_THREADS_FALSE
 ENABLE_THREADS_TRUE
-ENABLE_STRICT_FALSE
-ENABLE_STRICT_TRUE
 ENABLE_SMP_FALSE
 ENABLE_SMP_TRUE
 ENABLE_MULTICAST_FALSE
@@ -759,7 +757,6 @@ with_gnu_ld
 enable_libtool_lock
 enable_multicast
 enable_smp
-enable_strict
 enable_threads
 with_cweb
 with_python
@@ -1409,7 +1406,6 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-multicast      enable multicast support [default=yes]
   --enable-smp            enable smp support [default=yes]
-  --enable-strict         enable strict support [default=no]
   --enable-threads        enable threads support [default=yes]
 
 Optional Packages:
@@ -14633,38 +14629,6 @@ $as_echo "#define ENABLE_SMP 1" >>confdefs.h
 
 fi
 
-# Strict.
-
-# Check whether --enable-strict was given.
-if test "${enable_strict+set}" = set; then :
-  enableval=$enable_strict;
-    case x$enableval in
-        xyes) enable_strict=yes;;
-        xno)  enable_strict=no;;
-        *) as_fn_error "bad value $enableval for --enable-strict" "$LINENO" 5;;
-    esac
-
-else
-  enable_strict=no
-fi
-
-
-
-
-if test x$enable_strict = xyes; then
-  ENABLE_STRICT_TRUE=
-  ENABLE_STRICT_FALSE='#'
-else
-  ENABLE_STRICT_TRUE='#'
-  ENABLE_STRICT_FALSE=
-fi
-
-if test x$enable_strict = xyes; then
-
-$as_echo "#define ENABLE_STRICT 1" >>confdefs.h
-
-fi
-
 # Threads.
 
 # Check whether --enable-threads was given.
@@ -16436,10 +16400,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_SMP_TRUE}" && test -z "${ENABLE_SMP_FALSE}"; then
   as_fn_error "conditional \"ENABLE_SMP\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ENABLE_STRICT_TRUE}" && test -z "${ENABLE_STRICT_FALSE}"; then
-  as_fn_error "conditional \"ENABLE_STRICT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_THREADS_TRUE}" && test -z "${ENABLE_THREADS_FALSE}"; then

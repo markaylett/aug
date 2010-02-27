@@ -27,7 +27,7 @@
 int
 main(int argc, char* argv[])
 {
-    aug_setposixerrinfo(aug_tlerr, __FILE__, 101, EINVAL);
+    aug_setposixerror(aug_tlx, __FILE__, 101, EINVAL);
 
     if (aug_errno(aug_tlerr)) {
         fprintf(stderr, "non-zero errno before init\n");
@@ -36,7 +36,7 @@ main(int argc, char* argv[])
 
     aug_autotlx();
 
-    aug_setposixerrinfo(aug_tlerr, __FILE__, 101, EINVAL);
+    aug_setposixerror(aug_tlx, __FILE__, 101, EINVAL);
 
     if (0 != strcmp(aug_tlerr->file_, __FILE__)) {
         fprintf(stderr, "unexpected aug_errfile value: %s\n",

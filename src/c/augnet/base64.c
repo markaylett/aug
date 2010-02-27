@@ -145,14 +145,14 @@ typedef int aug_chunk_t[4];
 static void
 seterrinvalid_(const char* file, int line, char ch)
 {
-    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EPARSE,
+    aug_setctxerror(aug_tlx, file, line, "aug", AUG_EPARSE,
                    AUG_MSG("invalid character [%c]"), ch);
 }
 
 static void
 seterralign_(const char* file, int line)
 {
-    aug_seterrinfo(aug_tlerr, file, line, "aug", AUG_EPARSE,
+    aug_setctxerror(aug_tlx, file, line, "aug", AUG_EPARSE,
                    AUG_MSG("misaligned base64 sequence"));
 }
 
@@ -171,10 +171,11 @@ putch_(aug_base64_t base64, char ch)
     /* Add character to buffer.  Flush first if buffer space is exhausted. */
 
     if (sizeof(base64->buf_) - 1 <= base64->pos_ + 1)
-        aug_verify(flush_(base64));
+        if (flush_(base64) < 0)
+            return -1;
 
     base64->buf_[base64->pos_++] = ch;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_rsize
@@ -182,12 +183,12 @@ decodealign_(aug_base64_t base64, const char* src, size_t len)
 {
     /* This function will return one of the following:
 
-       a) The number of characters consumed in the alignment.
+       a) the number of characters consumed in the alignment;
 
-       b) AUG_FAILNONE if the alignment could not be perform due to lack of
-          available characters in the source buffer.
+       b) AUG_EXNONE if the alignment could not be perform due to lack of
+          available characters in the source buffer;
 
-       c) AUG_FAILERROR on error.
+       c) -1 on error.
     */
 
     char in;
@@ -206,7 +207,7 @@ decodealign_(aug_base64_t base64, const char* src, size_t len)
         chunk[0] = save[0];
         break;
     default:
-        return AUG_ZERO;
+        return 0;
     }
 
     /* Attempt to read remaining characters required to complete the
@@ -216,17 +217,17 @@ decodealign_(aug_base64_t base64, const char* src, size_t len)
     switch (base64->saved_) {
     case 1:
         if (!len--)
-            return AUG_FAILNONE;
+            goto none;
 
         in = *src++;
         switch (out = DECODE_(in)) {
         case END_:
             seterralign_(__FILE__, __LINE__);
-            return AUG_FAILERROR;
+            return -1;
 
         case INV_:
             seterrinvalid_(__FILE__, __LINE__, in);
-            return AUG_FAILERROR;
+            return -1;
         }
 
         save[1] = chunk[1] = out;
@@ -236,18 +237,19 @@ decodealign_(aug_base64_t base64, const char* src, size_t len)
 
     case 2:
         if (!len--)
-            return AUG_FAILNONE;
+            goto none;
 
         in = *src++;
         switch (out = DECODE_(in)) {
         case END_:
-            aug_verify(putch_(base64, DECODE0_(chunk[0], chunk[1])));
+            if (putch_(base64, DECODE0_(chunk[0], chunk[1])) < 0)
+                goto fail;
             base64->saved_ = 0;
-            return AUG_FAILNONE;
+            goto none;
 
         case INV_:
             seterrinvalid_(__FILE__, __LINE__, in);
-            return AUG_FAILERROR;
+            return -1;
         }
 
         save[2] = chunk[2] = out;
@@ -257,30 +259,37 @@ decodealign_(aug_base64_t base64, const char* src, size_t len)
 
     case 3:
         if (!len--)
-            return AUG_FAILNONE;
+            goto none;
 
         in = *src++;
         switch (out = DECODE_(in)) {
         case END_:
-            aug_verify(putch_(base64, DECODE0_(chunk[0], chunk[1])));
-            aug_verify(putch_(base64, DECODE1_(chunk[1], chunk[2])));
+            if (putch_(base64, DECODE0_(chunk[0], chunk[1])) < 0
+                || putch_(base64, DECODE1_(chunk[1], chunk[2])) < 0)
+                goto fail;
             base64->saved_ = 0;
-            return AUG_FAILNONE;
+            goto none;
 
         case INV_:
             seterrinvalid_(__FILE__, __LINE__, in);
-            return AUG_FAILERROR;
+            goto fail;
         }
 
         chunk[3] = out;
     }
 
-    aug_verify(putch_(base64, DECODE0_(chunk[0], chunk[1])));
-    aug_verify(putch_(base64, DECODE1_(chunk[1],  chunk[2])));
-    aug_verify(putch_(base64, DECODE2_(chunk[2], chunk[3])));
-    base64->saved_ = 0;
+    if (putch_(base64, DECODE0_(chunk[0], chunk[1])) < 0
+        || putch_(base64, DECODE1_(chunk[1],  chunk[2])) < 0
+        || putch_(base64, DECODE2_(chunk[2], chunk[3])) < 0)
+        goto fail;
 
-    return AUG_MKRESULT(align);
+    base64->saved_ = 0;
+    return align;
+
+ none:
+    aug_setexcept(aug_tlx, AUG_EXNONE);
+ fail:
+    return -1;
 }
 
 static aug_result
@@ -291,16 +300,16 @@ decodeappend_(aug_base64_t base64, const char* src, size_t len)
     int i = 0, out;
     aug_chunk_t chunk = { 0 }; /* Suppress warnings. */
 
-    if (aug_isfail(align = decodealign_(base64, src, len))) {
+    if ((align = decodealign_(base64, src, len)) < 0) {
 
-        if (aug_isnone(align))
-            return AUG_SUCCESS;
+        if (AUG_EXNONE == aug_getexcept(aug_tlx))
+            return 0;
 
-        return align;
+        goto fail;
     }
 
-    src += AUG_RESULT(align);
-    len -= AUG_RESULT(align);
+    src += align;
+    len -= align;
 
     while (len--) {
 
@@ -308,10 +317,10 @@ decodeappend_(aug_base64_t base64, const char* src, size_t len)
         switch (out = DECODE_(in)) {
         case END_:
             seterralign_(__FILE__, __LINE__);
-            return AUG_FAILERROR;
+            goto fail;
         case INV_:
             seterrinvalid_(__FILE__, __LINE__, in);
-            return AUG_FAILERROR;
+            goto fail;
         }
 
         chunk[0] = out;
@@ -322,10 +331,10 @@ decodeappend_(aug_base64_t base64, const char* src, size_t len)
         switch (out = DECODE_(in)) {
         case END_:
             seterralign_(__FILE__, __LINE__);
-            return AUG_FAILERROR;
+            goto fail;
         case INV_:
             seterrinvalid_(__FILE__, __LINE__, in);
-            return AUG_FAILERROR;
+            goto fail;
         }
 
         chunk[1] = out;
@@ -335,12 +344,13 @@ decodeappend_(aug_base64_t base64, const char* src, size_t len)
         in = src[i++];
         switch (out = DECODE_(in)) {
         case END_:
-            aug_verify(putch_(base64, DECODE0_(chunk[0], chunk[1])));
-            return AUG_SUCCESS;
+            if (putch_(base64, DECODE0_(chunk[0], chunk[1])) < 0)
+                goto fail;
+            return 0;
 
         case INV_:
             seterrinvalid_(__FILE__, __LINE__, in);
-            return AUG_FAILERROR;
+            goto fail;
         }
 
         chunk[2] = out;
@@ -350,22 +360,24 @@ decodeappend_(aug_base64_t base64, const char* src, size_t len)
         in = src[i++];
         switch (out = DECODE_(in)) {
         case END_:
-            aug_verify(putch_(base64, DECODE0_(chunk[0], chunk[1])));
-            aug_verify(putch_(base64, DECODE1_(chunk[1], chunk[2])));
-            return AUG_SUCCESS;
+            if (putch_(base64, DECODE0_(chunk[0], chunk[1])) < 0
+                || putch_(base64, DECODE1_(chunk[1], chunk[2])) < 0)
+                goto fail;
+            return 0;
 
         case INV_:
             seterrinvalid_(__FILE__, __LINE__, in);
-            return AUG_FAILERROR;
+            goto fail;
         }
 
         chunk[3] = out;
 
-        aug_verify(putch_(base64, DECODE0_(chunk[0], chunk[1])));
-        aug_verify(putch_(base64, DECODE1_(chunk[1], chunk[2])));
-        aug_verify(putch_(base64, DECODE2_(chunk[2], chunk[3])));
+        if (putch_(base64, DECODE0_(chunk[0], chunk[1])) < 0
+            || putch_(base64, DECODE1_(chunk[1], chunk[2])) < 0
+            || putch_(base64, DECODE2_(chunk[2], chunk[3])) < 0)
+            goto fail;
     }
-    return AUG_SUCCESS;
+    return 0;
 
  save:
     switch (base64->saved_ = i % 4) {
@@ -376,13 +388,16 @@ decodeappend_(aug_base64_t base64, const char* src, size_t len)
     case 1:
         base64->save_[0] = chunk[0];
     }
-    return AUG_SUCCESS;
+    return 0;
+
+ fail:
+    return -1;
 }
 
 static aug_result
 decodefinish_(aug_base64_t base64)
 {
-    return base64->pos_ ? flush_(base64) : AUG_SUCCESS;
+    return base64->pos_ ? flush_(base64) : 0;
 }
 
 static aug_result
@@ -391,7 +406,8 @@ putchunk_(aug_base64_t base64, aug_chunk_t chunk)
     /* Flush if buffer overflow. */
 
     if (sizeof(base64->buf_) <= base64->pos_ + 4)
-        aug_verify(flush_(base64));
+        if (flush_(base64) < 0)
+            return -1;
 
     /* Copy chunk to buffer. */
 
@@ -400,7 +416,7 @@ putchunk_(aug_base64_t base64, aug_chunk_t chunk)
     base64->buf_[base64->pos_ + 2] = chunk[2];
     base64->buf_[base64->pos_ + 3] = chunk[3];
     base64->pos_ += 4;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_rsize
@@ -408,12 +424,12 @@ encodealign_(aug_base64_t base64, const char* src, size_t len)
 {
     /* This function will return one of the following:
 
-       a) The number of characters consumed in the alignment.
+       a) the number of characters consumed in the alignment;
 
-       b) AUG_FAILNONE if the alignment could not be perform due to lack of
-       available characters in the source buffer.
+       b) AUG_EXNONE if the alignment could not be perform due to lack of
+       available characters in the source buffer;
 
-       c) AUG_FAILERROR on error.
+       c) -1 on error.
     */
 
     const int* save = base64->save_;
@@ -422,7 +438,7 @@ encodealign_(aug_base64_t base64, const char* src, size_t len)
     switch (base64->saved_) {
     case 2:
         if (!len)
-            return AUG_FAILNONE;
+            goto none;
 
         chunk[0] = ENCODE0_(save[0]);
         chunk[1] = ENCODE1_(save[0], save[1]);
@@ -430,19 +446,20 @@ encodealign_(aug_base64_t base64, const char* src, size_t len)
         chunk[3] = ENCODE3_(src[0]);
 
         base64->saved_ = 0;
-        aug_verify(putchunk_(base64, chunk));
+        if (putchunk_(base64, chunk) < 0)
+            goto fail;
 
-        return AUG_MKRESULT(1);
+        return 1;
 
     case 1:
         switch (len) {
         case 0:
-            return AUG_FAILNONE;
+            goto none;
 
         case 1:
             base64->save_[1] = src[0];
             base64->saved_ = 2;
-            return AUG_FAILNONE;
+            goto none;
 
         default:
             chunk[0] = ENCODE0_(save[0]);
@@ -451,12 +468,18 @@ encodealign_(aug_base64_t base64, const char* src, size_t len)
             chunk[3] = ENCODE3_(src[1]);
 
             base64->saved_ = 0;
-            aug_verify(putchunk_(base64, chunk));
+            if (putchunk_(base64, chunk) < 0)
+                goto fail;
 
-            return AUG_MKRESULT(2);
+            return 2;
         }
     }
-    return AUG_ZERO;
+    return 0;
+
+ none:
+    aug_setexcept(aug_tlx, AUG_EXNONE);
+ fail:
+    return -1;
 }
 
 static aug_result
@@ -466,16 +489,16 @@ encodeappend_(aug_base64_t base64, const char* src, size_t len)
     size_t whole, i;
     unsigned part;
 
-    if (aug_isfail(align = encodealign_(base64, src, len))) {
+    if ((align = encodealign_(base64, src, len)) < 0) {
 
-        if (aug_isnone(align))
-            return AUG_SUCCESS;
+        if (AUG_EXNONE == aug_getexcept(aug_tlx))
+            return 0;
 
-        return align;
+        return -1;
     }
 
-    src += AUG_RESULT(align);
-    len -= AUG_RESULT(align);
+    src += align;
+    len -= align;
 
     /* For each aligned chunk. */
 
@@ -488,7 +511,8 @@ encodeappend_(aug_base64_t base64, const char* src, size_t len)
         chunk[2] = ENCODE2_(src[1], src[2]);
         chunk[3] = ENCODE3_(src[2]);
 
-        aug_verify(putchunk_(base64, chunk));
+        if (putchunk_(base64, chunk) < 0)
+            return -1;
     }
 
     switch (part) {
@@ -499,7 +523,7 @@ encodeappend_(aug_base64_t base64, const char* src, size_t len)
         base64->save_[0] = src[0];
         base64->saved_ = part;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -516,7 +540,8 @@ encodefinish_(aug_base64_t base64)
         chunk[3] = '=';
 
         base64->saved_ = 0;
-        aug_verify(putchunk_(base64, chunk));
+        if (putchunk_(base64, chunk) < 0)
+            return -1;
         break;
 
     case 1:
@@ -526,10 +551,11 @@ encodefinish_(aug_base64_t base64)
         chunk[3] = '=';
 
         base64->saved_ = 0;
-        aug_verify(putchunk_(base64, chunk));
+        if (putchunk_(base64, chunk) < 0)
+            return -1;
         break;
     }
-    return base64->pos_ ? flush_(base64) : AUG_SUCCESS;
+    return base64->pos_ ? flush_(base64) : 0;
 }
 
 AUGNET_API aug_base64_t

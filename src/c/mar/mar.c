@@ -84,25 +84,25 @@ fileset_(aug_mar* mar, const char* filename)
         aug_result result;
 
         if (!(stream = fopen(filename, "r")))
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
         if (aug_isfail(result = aug_streamset_(mar, stream))) {
             fclose(stream);
-            return AUG_FAILERROR;
+            return -1;
         }
 
         if (0 != fclose(stream))
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
 clear_(aug_mar* mar)
 {
     if (!FORCE_ && !aug_confirm_(CLEARTEXT_))
-        return AUG_SUCCESS;
+        return 0;
 
     return aug_clearfields(mar);
 }
@@ -111,11 +111,11 @@ static aug_result
 del_(aug_mar* mar, const char* name)
 {
     if (!FORCE_ && !aug_confirm_(DELTEXT_))
-        return AUG_SUCCESS;
+        return 0;
 
     aug_verify(aug_delfieldp(mar, name));
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -129,12 +129,12 @@ extract_(aug_mar* mar, const char* filename)
 
         if (!(body = aug_getblobdata(blob, &size))) {
             aug_release(blob);
-            return AUG_FAILERROR;
+            return -1;
         }
 
         if (size != fwrite(body, 1, size, stdout)) {
             aug_release(blob);
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         }
 
         aug_release(blob);
@@ -143,7 +143,7 @@ extract_(aug_mar* mar, const char* filename)
 
         aug_verify(aug_extractmar(mar, filename));
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -156,9 +156,9 @@ get_(aug_mar* mar, const char* name)
     aug_verify(aug_writevalue_(stdout, value, AUG_RESULT(ret)));
 
     if (EOF == fflush(stdout))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static void
@@ -197,7 +197,7 @@ insert_(aug_mar* mar, const char* filename)
     } else {
         aug_verify(aug_insertmar(mar, filename));
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -217,9 +217,9 @@ list_(aug_mar* mar)
     }
 
     if (EOF == fflush(stdout))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -237,9 +237,9 @@ names_(aug_mar* mar)
         printf("%s\n", name);
     }
     if (EOF == fflush(stdout))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -256,7 +256,7 @@ put_(aug_mar* mar, char* src)
 
     aug_verify(aug_putfield(mar, &field));
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static void
@@ -273,7 +273,7 @@ static aug_result
 zero_(aug_mar* mar)
 {
     if (!FORCE_ && !aug_confirm_(ZEROTEXT_))
-        return AUG_SUCCESS;
+        return 0;
 
     return aug_truncatemar(mar, 0);
 }
@@ -317,7 +317,7 @@ run_(int argc, char* argv[], const char* archivename)
 
     if (!mar) {
         aug_perrinfo(aug_tlx, "aug_openmar() failed", NULL);
-        return AUG_FAILERROR;
+        return -1;
     }
 
     while (-1 != (ch = aug_getopt(argc, argv, OPTIONS_)))
@@ -395,11 +395,11 @@ run_(int argc, char* argv[], const char* archivename)
         }
 
     aug_release(mar);
-    return AUG_SUCCESS;
+    return 0;
 
  fail:
     aug_release(mar);
-    return AUG_FAILERROR;
+    return -1;
 }
 
 int

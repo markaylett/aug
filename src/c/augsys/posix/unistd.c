@@ -32,10 +32,10 @@ AUGSYS_API aug_result
 aug_fclose(aug_fd fd)
 {
     if (-1 == close(fd)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILERROR;
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_result
@@ -43,8 +43,8 @@ aug_fsetnonblock(aug_fd fd, aug_bool on)
 {
     int flags = fcntl(fd, F_GETFL);
     if (-1 == flags) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILERROR;
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
     }
 
     if (on)
@@ -53,11 +53,11 @@ aug_fsetnonblock(aug_fd fd, aug_bool on)
         flags &= ~O_NONBLOCK;
 
     if (-1 == fcntl(fd, F_SETFL, flags)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILERROR;
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_fd
@@ -72,7 +72,7 @@ aug_vfopen(const char* path, int flags, va_list args)
         mode = 0;
 
     if (-1 == (fd = open(path, flags, mode))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return -1;
     }
     return fd;
@@ -93,10 +93,10 @@ AUGSYS_API aug_result
 aug_fpipe(aug_fd fds[2])
 {
     if (-1 == pipe(fds)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILERROR;
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_rsize
@@ -104,9 +104,9 @@ aug_fread(aug_fd fd, void* buf, size_t size)
 {
     ssize_t ret;
     if (-1 == (ret = read(fd, buf, size)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_MKRESULT(ret);
+    return ret;
 }
 
 AUGSYS_API aug_rsize
@@ -114,29 +114,29 @@ aug_fwrite(aug_fd fd, const void* buf, size_t size)
 {
     ssize_t ret;
     if (-1 == (ret = write(fd, buf, size)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_MKRESULT(ret);
+    return ret;
 }
 
 AUGSYS_API aug_result
 aug_fsync(aug_fd fd)
 {
     if (-1 == fsync(fd)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILERROR;
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_result
 aug_ftruncate(aug_fd fd, off_t size)
 {
     if (-1 == ftruncate(fd, size)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILERROR;
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_result
@@ -144,12 +144,12 @@ aug_fsize(aug_fd fd, size_t* size)
 {
     struct stat s;
     if (-1 == fstat(fd, &s)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
-        return AUG_FAILERROR;
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
     }
 
     *size = s.st_size;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API void

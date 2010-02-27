@@ -83,7 +83,7 @@ namespace test {
             throw runtime_error("option not supported");
         }
 
-        return AUG_SUCCESS;
+        return 0;
     }
 
     bool daemon_(false);
@@ -415,7 +415,7 @@ namespace test {
         {
             try {
                 run();
-                return AUG_SUCCESS;
+                return 0;
             } AUG_SETERRINFOCATCH;
             return AUG_FAILERROR;
         }
@@ -445,7 +445,7 @@ namespace test {
     {
         try {
             test::readconf(conffile, batch, daemon);
-            return AUG_SUCCESS;
+            return 0;
         } AUG_SETERRINFOCATCH;
         return AUG_FAILERROR;
     }

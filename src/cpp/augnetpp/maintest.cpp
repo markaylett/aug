@@ -36,7 +36,7 @@ namespace {
         aug_result
         base64cb(const char* buf, size_t len)
         {
-            return AUG_SUCCESS;
+            return 0;
         }
     };
 
@@ -44,27 +44,27 @@ namespace {
         aug_result
         httprequest_(const char* value) AUG_NOTHROW
         {
-            return AUG_SUCCESS;
+            return 0;
         }
         aug_result
         httpfield_(const char* name, const char* value) AUG_NOTHROW
         {
-            return AUG_SUCCESS;
+            return 0;
         }
         aug_result
         httpcsize_(unsigned csize) AUG_NOTHROW
         {
-            return AUG_SUCCESS;
+            return 0;
         }
         aug_result
         httpcdata_(const void* cdata, unsigned csize) AUG_NOTHROW
         {
-            return AUG_SUCCESS;
+            return 0;
         }
         aug_result
         httpend_(aug_bool commit) AUG_NOTHROW
         {
-            return AUG_SUCCESS;
+            return 0;
         }
     };
 
@@ -72,7 +72,7 @@ namespace {
         aug_result
         delmar_(const char* request) AUG_NOTHROW
         {
-            return AUG_SUCCESS;
+            return 0;
         }
         aug_mar_*
         getmar_(const char* request) AUG_NOTHROW
@@ -82,7 +82,7 @@ namespace {
         aug_result
         putmar_(const char* request, aug_mar_* mar) AUG_NOTHROW
         {
-            return AUG_SUCCESS;
+            return 0;
         }
     };
 }

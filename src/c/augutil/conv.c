@@ -44,14 +44,14 @@ aug_strtoul(const char* src, unsigned long* dst, int base)
 
     if (0 != errno) {
 
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         dst = NULL;
 
     } else if ('\0' != *end) {
 
         /* The string was only partially processed. */
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
                        AUG_EPARSE, AUG_MSG("partial conversion"));
         dst = NULL;
 
@@ -75,7 +75,7 @@ aug_strtoui(const char* src, unsigned* dst, int base)
 
         /* Bounds exceeded for target type. */
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
                        AUG_ELIMIT, AUG_MSG("max integer value exceeded"));
         return NULL;
     }
@@ -95,7 +95,7 @@ aug_strtous(const char* src, unsigned short* dst, int base)
 
         /* Bounds exceeded for target type. */
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
                        AUG_ELIMIT, AUG_MSG("max integer value exceeded"));
         return NULL;
     }

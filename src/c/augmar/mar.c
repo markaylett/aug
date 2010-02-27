@@ -73,25 +73,25 @@ init_(aug_seq_t seq, struct aug_info_* info)
 
     if (AUG_LEADERSIZE <= size) {
 
-        aug_verify(aug_info_(seq, info));
+        if (aug_info_(seq, info) < 0)
+            return -1;
 
         /* Verify version number embedded within header. */
 
         if (PROTO != info->proto_) {
 
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                           AUG_MSG("invalid protocol number [%d]"),
-                           (int)info->proto_);
-            return AUG_FAILERROR;
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                            AUG_MSG("invalid protocol number [%d]"),
+                            (int)info->proto_);
+            return -1;
         }
     } else {
 
         char* ptr;
 
-        aug_verify(aug_setregion_(seq, 0, size));
-
-        if (!(ptr = aug_resizeseq_(seq, AUG_LEADERSIZE)))
-            return AUG_FAILERROR;
+        if (aug_setregion_(seq, 0, size) < 0
+            || !(ptr = aug_resizeseq_(seq, AUG_LEADERSIZE)))
+            return -1;
 
         memcpy(ptr + AUG_MAGICOFF, AUG_MAGIC, sizeof(aug_magic_t));
         aug_encodeproto((aug_proto_t)(info->proto_ = PROTO),
@@ -104,7 +104,7 @@ init_(aug_seq_t seq, struct aug_info_* info)
                         ptr + AUG_BSIZEOFF);
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 struct impl_ {
@@ -127,11 +127,11 @@ destroy_(struct impl_* impl)
            fail. */
 
         struct aug_info_ local;
-        if (aug_isfail(aug_info_(impl->seq_, &local)))
+        if (aug_info_(impl->seq_, &local) < 0)
             goto done;
 
         if (0 != memcmp(&local, &impl->info_, sizeof(local))
-            && aug_isfail(aug_setinfo_(impl->seq_, &impl->info_)))
+            && aug_setinfo_(impl->seq_, &impl->info_) < 0)
             goto done;
     }
 
@@ -197,11 +197,11 @@ compact_(aug_mar* obj)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
-    return AUG_SUCCESS; /* Not implemented. */
+    return 0; /* Not implemented. */
 }
 
 static aug_rint
@@ -210,9 +210,9 @@ clear_(aug_mar* obj)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_clearfields_(impl->seq_, &impl->info_);
 }
@@ -223,9 +223,9 @@ deln_(aug_mar* obj, unsigned n)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_delfieldn_(impl->seq_, &impl->info_, n);
 }
@@ -236,9 +236,9 @@ delp_(aug_mar* obj, const char* name)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_delfieldp_(impl->seq_, &impl->info_, name);
 }
@@ -249,9 +249,9 @@ getn_(aug_mar* obj, unsigned n, const void** value)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!READABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_getfieldn_(impl->seq_, &impl->info_, n, value);
 }
@@ -262,9 +262,9 @@ getp_(aug_mar* obj, const char* name, const void** value)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!READABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_getfieldp_(impl->seq_, &impl->info_, name, value);
 }
@@ -275,9 +275,9 @@ get_(aug_mar* obj, unsigned n, struct aug_field* field)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!READABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_getfield_(impl->seq_, &impl->info_, n, field);
 }
@@ -288,9 +288,9 @@ putn_(aug_mar* obj, unsigned n, const void* value, unsigned size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_putfieldn_(impl->seq_, &impl->info_, n, value, size);
 }
@@ -301,9 +301,9 @@ putp_(aug_mar* obj, const char* name, const void* value, unsigned size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_putfieldp_(impl->seq_, &impl->info_, name, value, size);
 }
@@ -314,9 +314,9 @@ put_(aug_mar* obj, const struct aug_field* field)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_putfieldp_(impl->seq_, &impl->info_, field->name_,
                           field->value_, field->size_);
@@ -328,9 +328,9 @@ ntop_(aug_mar* obj, unsigned n, const char** name)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!READABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_fieldntop_(impl->seq_, &impl->info_, n, name);
 }
@@ -341,9 +341,9 @@ pton_(aug_mar* obj, const char* name)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!READABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_fieldpton_(impl->seq_, &impl->info_, name);
 }
@@ -369,20 +369,14 @@ insert_(aug_mar* obj, const char* path)
     aug_release(mpool);
 
     if (!mfile)
-        return AUG_FAILERROR;
+        return -1;
 
     if (0 != (size = aug_mfileresvd_(mfile))) {
 
-        aug_result result;
-
-        if (!(addr = aug_mapmfile_(mfile, size))) {
+        if (!(addr = aug_mapmfile_(mfile, size))
+            || aug_setcontent(obj, addr, size) < 0) {
             aug_closemfile_(mfile);
-            return AUG_FAILERROR;
-        }
-
-        if (aug_isfail(result = aug_setcontent(obj, addr, size))) {
-            aug_closemfile_(mfile);
-            return result;
+            return -1;
         }
     }
 
@@ -406,22 +400,22 @@ seek_(aug_mar* obj, off_t offset, int whence)
         local = (off_t)(impl->info_.bsize_ + offset);
         break;
     default:
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid whence value [%d]"), (int)whence);
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid whence value [%d]"), (int)whence);
+        return -1;
     }
 
     if (local < 0) {
 
         /* Assertion? */
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ERANGE,
-                       AUG_MSG("negative file position [%d]"), (int)local);
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ERANGE,
+                        AUG_MSG("negative file position [%d]"), (int)local);
+        return -1;
     }
 
     impl->offset_ = local;
-    return AUG_MKRESULT(local);
+    return local;
 }
 
 static aug_result
@@ -430,9 +424,9 @@ setcontent_(aug_mar* obj, const void* cdata, unsigned size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
     return aug_setcontent_(impl->seq_, &impl->info_, cdata, size);
 }
@@ -450,9 +444,9 @@ truncate_(aug_mar* obj, unsigned size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, mar_, obj);
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
 
     /* In keeping with the semantics of ftruncate, this function does not
@@ -469,22 +463,22 @@ write_(aug_mar* obj, const void* buf, unsigned len)
 
     if (!WRITABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
 
     if (impl->flags_ & AUG_APPEND) {
 
         assert(AUG_APPEND == (impl->flags_ & AUG_APPEND));
 
-        if (aug_isfail(rsize = aug_seekmar(obj, 0, AUG_END)))
-            return rsize;
+        if ((rsize = aug_seekmar(obj, 0, AUG_END)) < 0)
+            return -1;
     }
 
-    if (aug_issuccess(rsize = aug_write_(impl->seq_, &impl->info_,
-                                         impl->offset_, buf, len)))
-        impl->offset_ += AUG_RESULT(rsize);
+    if (0 < (rsize = aug_write_(impl->seq_, &impl->info_,
+                                impl->offset_, buf, len)))
+        impl->offset_ += rsize;
 
     return rsize;
 }
@@ -501,14 +495,14 @@ extract_(aug_mar* obj, const char* path)
 
     if (!READABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
 
     size = impl->info_.bsize_;
     if (!(src = aug_getcontent_(impl->seq_, &impl->info_)))
-        return AUG_FAILERROR;
+        return -1;
 
     mpool = aug_seqmpool_(impl->seq_);
     mfile = aug_openmfile_(mpool, path, AUG_WRONLY | AUG_CREAT | AUG_TRUNC,
@@ -516,7 +510,7 @@ extract_(aug_mar* obj, const char* path)
     aug_release(mpool);
 
     if (!mfile)
-        return AUG_FAILERROR;
+        return -1;
 
     if (size) {
 
@@ -530,7 +524,7 @@ extract_(aug_mar* obj, const char* path)
 
  fail:
     aug_closemfile_(mfile);
-    return AUG_FAILERROR;
+    return -1;
 }
 
 static aug_rsize
@@ -541,9 +535,9 @@ read_(aug_mar* obj, void* buf, unsigned len)
 
     if (!READABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
+        return -1;
     }
 
     if (aug_issuccess(rsize = aug_read_(impl->seq_, &impl->info_,
@@ -618,8 +612,8 @@ getdata_(aug_blob* obj, size_t* size)
     struct impl_* impl = AUG_PODIMPL(struct impl_, blob_, obj);
     if (!READABLE_(impl)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid archive handle"));
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid archive handle"));
         return NULL;
     }
 
@@ -653,7 +647,7 @@ aug_createmar(aug_mpool* mpool)
     if (!(seq = aug_createseq_(mpool, sizeof(struct impl_))))
         return NULL;
 
-    if (aug_isfail(init_(seq, &info))) {
+    if (init_(seq, &info) < 0) {
         aug_destroyseq_(seq);
         return NULL;
     }
@@ -701,7 +695,7 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
                              sizeof(struct impl_))))
         return NULL;
 
-    if (aug_isfail(init_(seq, &info))) {
+    if (init_(seq, &info) < 0) {
         aug_destroyseq_(seq);
         return NULL;
     }
@@ -729,7 +723,7 @@ aug_openmar(aug_mpool* mpool, const char* path, int flags, ...)
     if (flags & AUG_TRUNC) {
 
         assert(AUG_TRUNC == (flags & AUG_TRUNC));
-        if (aug_isfail(aug_truncatemar(&impl->mar_, 0))) {
+        if (aug_truncatemar(&impl->mar_, 0) < 0) {
             aug_release(&impl->mar_);
             return NULL;
         }

@@ -31,7 +31,7 @@
  * Convenience wrapper around aug_vwritelog().
  */
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_writelog(aug_log* log, unsigned level, const char* format, ...);
 
 /**

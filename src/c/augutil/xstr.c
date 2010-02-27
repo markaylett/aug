@@ -60,7 +60,7 @@ resize_(aug_xstr_t xstr, size_t size)
 
         char* ptr = aug_allocmem(xstr->mpool_, size + 1);
         if (!ptr)
-            return AUG_FAILERROR;
+            return -1;
 
         /* Copy existing content from local to dynamic. */
 
@@ -73,11 +73,11 @@ resize_(aug_xstr_t xstr, size_t size)
 
         char* ptr = aug_reallocmem(xstr->mpool_, xstr->ptr_, size + 1);
         if (!ptr)
-            return AUG_FAILERROR;
+            return -1;
     }
 
 	xstr->size_ = size;
-	return AUG_SUCCESS;
+	return 0;
 }
 
 static aug_result
@@ -85,7 +85,7 @@ reserve_(aug_xstr_t xstr, size_t size)
 {
 	size_t min;
 	if (size <= AVAIL_(xstr))
-		return AUG_SUCCESS;
+		return 0;
 
     /* Grow string. */
 
@@ -101,7 +101,7 @@ static aug_result
 xstrcat_(aug_xstr_t xstr, const aug_xstr_t src, size_t len)
 {
 	if (!len)
-		return AUG_SUCCESS;
+		return 0;
 
 	aug_verify(reserve_(xstr, xstr->len_ + len));
 
@@ -109,7 +109,7 @@ xstrcat_(aug_xstr_t xstr, const aug_xstr_t src, size_t len)
 
 	memmove(xstr->ptr_ + xstr->len_, src->ptr_, len);
 	xstr->len_ += len;
-	return AUG_SUCCESS;
+	return 0;
 }
 
 AUGUTIL_API aug_xstr_t
@@ -150,7 +150,7 @@ aug_clearxstrn(aug_xstr_t xstr, size_t len)
 {
     if (len < xstr->len_)
         xstr->len_ = len;
-	return AUG_SUCCESS;
+	return 0;
 }
 
 AUGUTIL_API aug_result
@@ -163,7 +163,7 @@ AUGUTIL_API aug_result
 aug_xstrcatsn(aug_xstr_t xstr, const char* src, size_t len)
 {
 	if (!len)
-		return AUG_SUCCESS;
+		return 0;
 
 	aug_verify(reserve_(xstr, xstr->len_ + len));
 
@@ -171,7 +171,7 @@ aug_xstrcatsn(aug_xstr_t xstr, const char* src, size_t len)
 
 	memmove(xstr->ptr_ + xstr->len_, src, len);
 	xstr->len_ += len;
-	return AUG_SUCCESS;
+	return 0;
 }
 
 AUGUTIL_API aug_result
@@ -221,7 +221,7 @@ aug_xstrcatcn(aug_xstr_t xstr, char ch, size_t num)
 		memset(xstr->ptr_ + xstr->len_, ch, num);
 
 	xstr->len_ += num;
-	return AUG_SUCCESS;
+	return 0;
 }
 
 AUGUTIL_API aug_result

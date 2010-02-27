@@ -57,27 +57,27 @@ namespace {
         aug_result
         shutdown_() AUG_NOTHROW
         {
-            return AUG_FAILERROR;
+            return -1;
         }
         aug_rsize
         read_(void* buf, size_t size) AUG_NOTHROW
         {
-            return AUG_MKRESULT(size);
+            return size;
         }
         aug_rsize
         readv_(const iovec* iov, int size) AUG_NOTHROW
         {
-            return AUG_MKRESULT(size);
+            return size;
         }
         aug_rsize
         write_(const void* buf, size_t size) AUG_NOTHROW
         {
-            return AUG_MKRESULT(size);
+            return size;
         }
         aug_rsize
         writev_(const iovec* iov, int size) AUG_NOTHROW
         {
-            return AUG_MKRESULT(size);
+            return size;
         }
         static streamptr
         create()

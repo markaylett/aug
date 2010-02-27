@@ -74,7 +74,7 @@ fstream_release_(aug_stream* ob)
 static aug_result
 fstream_shutdown_(aug_stream* ob)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_rsize

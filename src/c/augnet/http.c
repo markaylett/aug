@@ -79,7 +79,7 @@ value_(aug_httpparser_t parser)
         if (0 == aug_strcasecmp(parser->name_ + 1, "ontent-Length")) {
 
             if (!aug_strtoui(aug_lexertoken(parser->lexer_), &csize, 10))
-                return AUG_FAILERROR;
+                return -1;
 
             parser->csize_ = (int)csize;
             return aug_httpcsize(parser->handler_, csize);
@@ -105,7 +105,7 @@ phrase_(aug_httpparser_t parser)
 
     if (parser->csize_) {
         parser->state_ = BODY_;
-        return AUG_SUCCESS;
+        return 0;
     }
 
     /* End of message (with commit). */
@@ -119,9 +119,9 @@ label_(aug_httpparser_t parser)
     /* No label on request line. */
 
     if (REQUEST_ == parser->state_) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing request line"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     name_(parser);
@@ -129,7 +129,7 @@ label_(aug_httpparser_t parser)
     /* The field's value follows its name. */
 
     parser->state_ = VALUE_;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -142,16 +142,16 @@ word_(aug_httpparser_t parser)
             parser->state_ = NAME_;
         break;
     case NAME_:
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing field name"));
-        result = AUG_FAILERROR;
+        result = -1;
         break;
     case VALUE_:
         if (aug_issuccess(result = value_(parser)))
             parser->state_ = NAME_;
         break;
     default:
-        result = AUG_FAILERROR;
+        result = -1;
         assert(0);
     }
     return result;
@@ -180,7 +180,7 @@ header_(aug_httpparser_t parser, const char* ptr, unsigned size)
         }
     }
  done:
-    return AUG_MKRESULT(i);
+    return i;
 }
 
 static aug_rsize
@@ -196,7 +196,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
         /* Entire buffer consumed. */
 
-        return AUG_MKRESULT(size);
+        return size;
     }
 
     /* Consume enough of the buffer to fulfil content. */
@@ -208,7 +208,7 @@ body_(aug_httpparser_t parser, const char* buf, unsigned size)
 
     aug_verify(end_(parser, AUG_TRUE));
 
-    return AUG_MKRESULT(size);
+    return size;
 }
 
 AUGNET_API aug_httpparser_t
@@ -265,7 +265,7 @@ aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
             break;
 
         if (AUG_RESULT(result) == size)
-            return AUG_SUCCESS;
+            return 0;
 
         buf += AUG_RESULT(result);
         size -= AUG_RESULT(result);
@@ -275,7 +275,7 @@ aug_appendhttp(aug_httpparser_t parser, const char* buf, unsigned size)
             break;
 
         if (AUG_RESULT(result) == size)
-            return AUG_SUCCESS;
+            return 0;
 
         buf += AUG_RESULT(result);
         size -= AUG_RESULT(result);
@@ -312,13 +312,13 @@ aug_finishhttp(aug_httpparser_t parser)
     }
 
     if (REQUEST_ != parser->state_) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("partial read of http message"));
-        result = AUG_SUCCESS;
+        result = 0;
         goto fail;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 
  fail:
 

@@ -60,12 +60,12 @@ run_(aug_task* obj)
     aug_verify(aug_readevent(aug_events(), &out));
 
     if (in.type_ != out.type_) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
                        AUG_MSG("unexpected event type from aug_readevent()"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static const struct aug_taskvtbl vtbl_ = {
@@ -99,10 +99,10 @@ static aug_result
 readconf_(const char* conffile, aug_bool batch, aug_bool daemon)
 {
     if (conffile && !aug_realpath(conffile, conffile_, sizeof(conffile_)))
-        return AUG_FAILERROR;
+        return -1;
 
     daemon_ = daemon;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_task*

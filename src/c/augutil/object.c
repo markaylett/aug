@@ -332,7 +332,7 @@ aug_vunpackargs(aug_array* array, const char* sig, va_list args)
 
             /* End of signature, so too many arguments. */
 
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                            AUG_MSG("too many arguments"));
             goto fail;
         case 'v':
@@ -403,11 +403,11 @@ aug_vunpackargs(aug_array* array, const char* sig, va_list args)
     /* Success if the end of the signature has been reached. */
 
     if ('\0' == *sig)
-        return AUG_SUCCESS;
+        return 0;
 
     /* Fallthrough: Not end of signature, so too few arguments. */
 
-    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+    aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                    AUG_MSG("not enough arguments"));
 
  fail:
@@ -415,7 +415,7 @@ aug_vunpackargs(aug_array* array, const char* sig, va_list args)
     /* Argument type error.  Type specified in switch. */
 
     if (type)
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("argument %d: expected %s"), i, type);
 
     if (unwind) {
@@ -427,7 +427,7 @@ aug_vunpackargs(aug_array* array, const char* sig, va_list args)
             AUG_RELEASEVAR(&unwind[j]);
     }
 
-    return AUG_FAILERROR;
+    return -1;
 }
 
 AUGUTIL_API aug_result

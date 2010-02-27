@@ -69,9 +69,9 @@ aug_setsighandler(void (*handler)(int))
     for (i = 0; i < sizeof(handlers_) / sizeof(handlers_[0]); ++i) {
         sethandler_(&sa, handlers_[i].dfl_ ? SIG_DFL : handler);
         if (-1 == sigaction(handlers_[i].sig_, &sa, NULL))
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSERV_API aug_result
@@ -90,14 +90,14 @@ aug_sigblock(void)
 
 #if ENABLE_THREADS
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
 #else /* !ENABLE_THREADS */
     if (-1 == sigprocmask(SIG_SETMASK, &set, NULL))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 #endif /* !ENABLE_THREADS */
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSERV_API aug_result
@@ -107,10 +107,10 @@ aug_sigunblock(void)
     sigemptyset(&set);
 #if ENABLE_THREADS
     if (0 != (errno = pthread_sigmask(SIG_SETMASK, &set, NULL)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 #else /* !ENABLE_THREADS */
     if (-1 == sigprocmask(SIG_SETMASK, &set, NULL))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 #endif /* !ENABLE_THREADS */
-    return AUG_SUCCESS;
+    return 0;
 }

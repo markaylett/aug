@@ -111,7 +111,7 @@ setexpiry_(aug_clock* clock, struct aug_timeval* tv, unsigned ms)
     struct aug_timeval local;
     aug_verify(aug_gettimeofday(clock, tv));
     aug_tvadd(tv, aug_mstotv(ms, &local));
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_bool
@@ -170,7 +170,7 @@ aug_settimer(aug_timers_t timers, aug_id id, unsigned ms, aug_timercb_t cb,
     aug_verify(setexpiry_(timers->clock_, &tv, ms));
 
     if (!(timer = createtimer_(timers->mpool_, ob)))
-        return AUG_FAILERROR;
+        return -1;
 
     timer->id_ = id;
     timer->ms_ = ms;
@@ -179,7 +179,7 @@ aug_settimer(aug_timers_t timers, aug_id id, unsigned ms, aug_timercb_t cb,
     timer->cb_ = cb;
 
     inserttimer_(&timers->list_, timer);
-    return AUG_MKRESULT(id);
+    return id;
 }
 
 AUGUTIL_API aug_result
@@ -206,7 +206,7 @@ aug_resettimer(aug_timers_t timers, aug_id id, unsigned ms)
             }
 
             inserttimer_(&timers->list_, it);
-            return AUG_SUCCESS;
+            return 0;
 
         } else
             prev = &AUG_NEXT(it);
@@ -228,7 +228,7 @@ aug_canceltimer(aug_timers_t timers, aug_id id)
 
             AUG_REMOVE_PREVPTR(it, prev, &timers->list_);
             destroytimer_(timers->mpool_, it);
-            return AUG_SUCCESS;
+            return 0;
 
         } else
             prev = &AUG_NEXT(it);
@@ -320,5 +320,5 @@ aug_processexpired(aug_timers_t timers, aug_bool force,
             aug_tvsub(next, &now);
         }
     }
-    return AUG_SUCCESS;
+    return 0;
 }

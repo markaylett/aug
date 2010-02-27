@@ -42,7 +42,7 @@ resize_(aug_seq_t seq, struct aug_info_* info, unsigned bsize,
         aug_bool trunc)
 {
     char* addr;
-    if (aug_isfail(aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_)))
+    if (aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_) < 0)
         return NULL;
 
     if (info->bsize_ == bsize || (info->bsize_ > bsize && !trunc))
@@ -64,16 +64,16 @@ aug_setcontent_(aug_seq_t seq, struct aug_info_* info, const void* data,
 {
     char* addr = resize_(seq, info, size, AUG_TRUE);
     if (!addr)
-        return AUG_FAILERROR;
+        return -1;
 
     memcpy(addr, data, size);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUG_EXTERNC aug_result
 aug_truncate_(aug_seq_t seq, struct aug_info_* info, unsigned size)
 {
-    return resize_(seq, info, size, AUG_TRUE) ? AUG_SUCCESS : AUG_FAILERROR;
+    return resize_(seq, info, size, AUG_TRUE) ? 0 : -1;
 }
 
 AUG_EXTERNC aug_rsize
@@ -82,16 +82,16 @@ aug_write_(aug_seq_t seq, struct aug_info_* info, unsigned offset,
 {
     char* addr = resize_(seq, info, offset + len, AUG_FALSE);
     if (!addr)
-        return AUG_FAILERROR;
+        return -1;
 
     memcpy(addr + offset, buf, len);
-    return AUG_MKRESULT(len);
+    return len;
 }
 
 AUG_EXTERNC const void*
 aug_getcontent_(aug_seq_t seq, const struct aug_info_* info)
 {
-    if (aug_isfail(aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_)))
+    if (aug_setregion_(seq, AUG_BODY(info->hsize_), info->bsize_) < 0)
         return NULL;
 
     return aug_seqaddr_(seq);
@@ -108,15 +108,15 @@ aug_read_(aug_seq_t seq, const struct aug_info_* info, unsigned offset,
        end of file. */
 
     if (0 == len || bsize <= offset)
-        return AUG_SUCCESS;
+        return 0;
 
     bsize -= offset;
     if (bsize < len)
         len = bsize;
 
     if (!(addr = aug_getcontent_(seq, info)))
-        return AUG_FAILERROR;
+        return -1;
 
     memcpy(buf, addr + offset, len);
-    return AUG_MKRESULT(len);
+    return len;
 }

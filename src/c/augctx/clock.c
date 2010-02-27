@@ -83,7 +83,7 @@ gettimeofday_(aug_clock* obj, struct aug_timeval* tv)
     /* FIXME: policy for setting errinfo? */
     struct timeval local;
     if (gettimeofday(&local, NULL) < 0)
-        return AUG_FAILERROR;
+        return -1;
     tv->tv_sec = (aug_time)local.tv_sec;
     tv->tv_usec = (aug_suseconds)local.tv_usec;
 #else /* _WIN32 */
@@ -92,7 +92,7 @@ gettimeofday_(aug_clock* obj, struct aug_timeval* tv)
     tv->tv_sec = (aug_time)tb.time;
     tv->tv_usec = (aug_suseconds)(tb.millitm * 1000);
 #endif /* _WIN32 */
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static long

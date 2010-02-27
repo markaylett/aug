@@ -105,12 +105,12 @@ resize_(aug_muxer_t muxer, size_t size)
     struct pollfd* ptr = aug_reallocmem(muxer->mpool_, muxer->pollfds_,
                                         sizeof(struct pollfd) * size);
     if (!ptr)
-        return AUG_FAILERROR;
+        return -1;
 
     initpollfds_(ptr + muxer->size_, size - muxer->size_);
     muxer->pollfds_ = ptr;
     muxer->size_ = size;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_muxer_t
@@ -148,9 +148,9 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
     struct pollfd* ptr;
 
     if (mask & ~AUG_MDEVENTALL) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid mdevent mask [%d]"), (int)mask);
-        return AUG_FAILERROR;
+        return -1;
     }
 
     if (muxer->size_ <= md)
@@ -176,7 +176,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
             muxer->nfds_ = md + 1;
         }
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_rint
@@ -189,9 +189,9 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
     ms = timeout ? aug_tvtoms(timeout) : -1;
 
     if (-1 == (ret = poll(muxer->pollfds_, muxer->nfds_, ms)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_MKRESULT(ret);
+    return ret;
 }
 
 AUGSYS_API unsigned short
@@ -298,12 +298,12 @@ AUGSYS_API aug_result
 aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
     if (FD_SETSIZE <= md)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EMFILE);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EMFILE);
 
     if (mask & ~AUG_MDEVENTALL) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid mdevent mask [%u]"), (unsigned)mask);
-        return AUG_FAILERROR;
+        return -1;
     }
 
     setmdevents_(&muxer->in_, md, mask);
@@ -326,7 +326,7 @@ aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
         muxer->maxfd_ = md;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_rint
@@ -352,9 +352,9 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
     }
 
     if (-1 == ret)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_MKRESULT(ret);
+    return ret;
 }
 
 AUGSYS_API unsigned short
@@ -389,5 +389,5 @@ aug_muxerpipe(aug_md mds[2])
 
     mds[0] = fds[0];
     mds[1] = fds[1];
-    return AUG_SUCCESS;
+    return 0;
 }

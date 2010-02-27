@@ -58,7 +58,7 @@ daemonise_(void)
     case 0:
         break;
     case -1:
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
     default:
         /* Use system version of exit to avoid flushing standard
            streams. */
@@ -69,7 +69,7 @@ daemonise_(void)
        leader. */
 
     if (-1 == setsid())
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
     /* Forking again ensures that the daemon process is not a session leader,
        and therefore cannot regain access to a controlling terminal. */
@@ -78,7 +78,7 @@ daemonise_(void)
     case 0:
         break;
     case -1:
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
     default:
         /* Use system version of exit to avoid flushing standard streams. */
         _exit(0);
@@ -93,7 +93,7 @@ daemonise_(void)
        descriptors (2) open. */
 
     closeall_(3 + 2);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 size_t
@@ -109,20 +109,20 @@ writepid_(int fd)
     size_t len = digits_(pid) + 1; /* One for newline. */
     char* str = alloca(sizeof(char) * (len + 1));
     if (!str)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, ENOMEM);
 
     /* Resulting buffer will _not_ be null terminated. */
 
     if (len != (snprintf(str, len + 1, "%ld\n", (long)pid))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EFORMAT,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EFORMAT,
                        AUG_MSG("pid formatting failed"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     if (len != write(fd, str, len) || -1 == fsync(fd))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -136,9 +136,9 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_len = 0;
 
     if (-1 == fcntl(fd, cmd, fl))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -149,7 +149,7 @@ lockfile_(const char* path)
     aug_result result;
 
     if (-1 == (fd = open(path, O_CREAT | O_WRONLY, 0640)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
     /* Attempt to obtain exclusive lock. */
 
@@ -160,7 +160,7 @@ lockfile_(const char* path)
             /* EWOULDBLOCK indicates that another process has locked the
                file. */
 
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EEXIST,
                            AUG_MSG("pidfile still in use: %s"), path);
         }
         goto fail;
@@ -169,7 +169,7 @@ lockfile_(const char* path)
     /* Truncate any existing pid value. */
 
     if (-1 == ftruncate(fd, 0)) {
-        result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        result = aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         goto fail;
     }
 
@@ -178,7 +178,7 @@ lockfile_(const char* path)
 
     /* Success: do not close the file - this would release the lock. */
 
-    return AUG_SUCCESS;
+    return 0;
 
  fail:
     close(fd);
@@ -192,12 +192,12 @@ closein_(void)
     aug_result result;
 
 	if (-1 == (fd = open("/dev/null", O_RDONLY)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
     if (-1 == dup2(fd, STDIN_FILENO))
-        result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        result = aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
     else
-        result = AUG_SUCCESS;
+        result = 0;
 
     close(fd);
     return result;
@@ -217,9 +217,9 @@ aug_daemonise(const struct aug_options* options)
                                 AUG_TRUE));
 
     if (!(pidfile = aug_getservopt(AUG_OPTPIDFILE))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     if (aug_isfail(result = daemonise_())

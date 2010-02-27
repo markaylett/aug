@@ -126,7 +126,7 @@ error_(aug_chandler* handler, aug_chan* chan, aug_sd sd,
         /* Set socket-level error if one exists. */
 
         struct aug_errinfo errinfo;
-        aug_setsockerrinfo(&errinfo, __FILE__, __LINE__, sd);
+        aug_setsockerrinfo_(&errinfo, __FILE__, __LINE__, sd);
 
         if (errinfo.num_) {
 
@@ -283,7 +283,7 @@ cchan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
         /* De-register existing descriptor from multiplexer, and attempt to
            establish connection. */
 
-        if (aug_isfail(aug_setmdeventmask(impl->muxer_, impl->sd_, 0))
+        if (aug_setmdeventmask(impl->muxer_, impl->sd_, 0) < 0
             || AUG_BADSD == (impl->sd_ = aug_tryconnect(impl->conn_, &ep,
                                                         &impl->est_))) {
             aug_errorchan(handler, &impl->chan_, aug_tlerr);
@@ -325,7 +325,7 @@ cchan_setwantwr_(aug_chan* ob, aug_bool wantwr)
     AUG_CTXDEBUG3(aug_tlx, "set client wantwr: wr=[%d]", (int)wantwr);
 
     impl->wantwr_ = wantwr;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_id
@@ -560,7 +560,7 @@ schan_setwantwr_(aug_chan* ob, aug_bool wantwr)
     AUG_CTXDEBUG3(aug_tlx, "set server wantwr: wr=[%d]", (int)wantwr);
 
     impl->wantwr_ = wantwr;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_id
@@ -797,7 +797,7 @@ pstream_read_(aug_stream* ob, void* buf, size_t size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_sread(impl->sticky_.md_, buf, size);
-    if (aug_isblock(rsize))
+    if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
     return rsize;
 }

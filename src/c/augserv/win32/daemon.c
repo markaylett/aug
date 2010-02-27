@@ -151,10 +151,10 @@ setstatus_(DWORD state)
     status.dwWaitHint = 0;
 
     if (!SetServiceStatus(ssh_, &status)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILERROR;
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static void WINAPI
@@ -213,7 +213,7 @@ service_(DWORD argc, char** argv)
     }
 
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         aug_perrinfo(aug_tlx, "getservopt() failed", NULL);
         goto done;
@@ -241,7 +241,7 @@ service_(DWORD argc, char** argv)
     /* Move away from system32. */
 
     if (!SetCurrentDirectory(home)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
         aug_perrinfo(aug_tlx, "SetCurrentDirectory() failed", NULL);
         goto done;
     }
@@ -250,7 +250,7 @@ service_(DWORD argc, char** argv)
 
         /* Commands other than AUG_CMDDEFAULT are invalid in this context. */
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("unexpected command value"));
         aug_perrinfo(aug_tlx, "invalid options", NULL);
         goto done;
@@ -264,7 +264,7 @@ service_(DWORD argc, char** argv)
 
     if (!(ssh_ = RegisterServiceCtrlHandler(sname, handler_))) {
 
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
         aug_perrinfo(aug_tlx, "RegisterServiceCtrlHandler() failed", NULL);
         goto done;
     }
@@ -319,9 +319,9 @@ aug_daemonise(const struct aug_options* options)
     memcpy(&options_, options, sizeof(options_));
 
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     table[0].lpServiceName = (char*)sname;
@@ -340,7 +340,7 @@ aug_daemonise(const struct aug_options* options)
 
     if (StartServiceCtrlDispatcher(table)) {
 
-        result = AUG_SUCCESS;
+        result = 0;
 
     } else {
 
@@ -357,7 +357,7 @@ aug_daemonise(const struct aug_options* options)
             aug_clearerrinfo(aug_tlerr);
             result = AUG_FAILNONE;
         } else
-            result = aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
+            result = aug_setwin32error(aug_tlx, __FILE__, __LINE__, err);
     }
 
     /* Ensure writes performed on service thread are visible. */

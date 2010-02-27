@@ -43,9 +43,9 @@ aug_atofield_(struct aug_field* field, char* src)
 
     if (NULL == value) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("empty value part"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     size = value - src;
@@ -54,7 +54,7 @@ aug_atofield_(struct aug_field* field, char* src)
     field->name_ = src;
     field->value_ = ++value;
     field->size_ = (unsigned)strlen(value);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUG_EXTERNC aug_bool
@@ -90,10 +90,10 @@ aug_insertstream_(aug_mar* mar, FILE* stream)
             aug_verify(aug_writemar(mar, buf, (unsigned)size));
 
         if (ferror(stream))
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
     } while (!feof(stream));
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUG_EXTERNC aug_rsize
@@ -105,18 +105,18 @@ aug_readline_(char* buf, size_t size, FILE* stream)
         if (feof(stream))
             return AUG_FAILNONE;
 
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
     }
 
     if (!(p = strchr(buf, '\n'))) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("newline character expected"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     *p = '\0';
-    return AUG_MKRESULT((ssize_t)(p - buf));
+    return (ssize_t)(p - buf);
 }
 
 AUG_EXTERNC aug_result
@@ -142,7 +142,7 @@ aug_streamset_(aug_mar* mar, FILE* stream)
         aug_verify(aug_putfield(mar, &field));
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUG_EXTERNC aug_result
@@ -150,7 +150,7 @@ aug_writevalue_(FILE* stream, const void* value, size_t size)
 {
     if (size != fwrite(value, 1, size, stream)
         || 1 != fwrite(&NL_, 1, 1, stream))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_SUCCESS;
+    return 0;
 }

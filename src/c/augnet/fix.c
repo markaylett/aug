@@ -106,9 +106,9 @@ fixtoui_(const char* buf, unsigned* dst, size_t size, char delim)
 
     digits = (unsigned)(it - buf);
     if (MAX_DIGITS_ < digits) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("too many integer digits [%u]"), digits);
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* Given the string "1234", the integer value would be calculated as
@@ -120,16 +120,16 @@ fixtoui_(const char* buf, unsigned* dst, size_t size, char delim)
     for (fact = 1, value = 0; it-- != buf; fact *= 10) {
 
         if (!isdigit(*it)) {
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                            AUG_MSG("non-digit [%c] in integer"), *it);
-            return AUG_FAILERROR;
+            return -1;
         }
 
         value += (*it - '0') * fact;
     }
 
     *dst = value;
-    return AUG_MKRESULT(digits);
+    return digits;
 }
 
 static aug_rsize
@@ -157,8 +157,8 @@ getsize_(const char* buf, size_t size)
 
     /* Return the total number of bytes in the message. */
 
-    return AUG_MKRESULT(HEAD_SIZE_ + AUG_RESULT(rsize) + sizeof(*SOH_)
-                        + value + TAIL_SIZE_);
+    return HEAD_SIZE_ + AUG_RESULT(rsize) + sizeof(*SOH_)
+        + value + TAIL_SIZE_;
 }
 
 static aug_rsize
@@ -172,17 +172,17 @@ getsum_(const char* buf, size_t size)
     ch = buf[size - 4]; /* Hundreds. */
 
     if (!isdigit(cu) || !isdigit(ct) || !isdigit(ch)) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("non-digit in checksum [%.3s]"),
                        buf + (size - 4));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     sum = cu - '0';
     sum += (ct - '0') * 10;
     sum += (ch - '0') * 100;
 
-    return AUG_MKRESULT(sum);
+    return sum;
 }
 
 AUGNET_API aug_fixstream_t
@@ -291,13 +291,13 @@ aug_finishfix(aug_fixstream_t stream)
     if (size) {
 
         aug_clearxstr(stream->xstr_);
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
                        AUG_MSG("fix stream not empty, [%d] bytes"),
                        (int)size);
-        result = AUG_FAILERROR;
+        result = -1;
 
     } else
-        result = AUG_SUCCESS;
+        result = 0;
 
     stream->mlen_ = 0;
     return result;
@@ -315,9 +315,9 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     */
 
     if (0 != memcmp(ptr, BEGINSTRING_PREFIX_, BEGINSTRING_PREFIX_SIZE_)) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("invalid beginstring tag"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
@@ -334,9 +334,9 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
 
     ptr += AUG_FIXVERLEN;
     if (*SOH_ != *ptr++) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("beginstring field delimiter not found"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
@@ -344,9 +344,9 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     */
 
     if (0 != memcmp(ptr, BODYLENGTH_PREFIX_, BODYLENGTH_PREFIX_SIZE_)) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("invalid bodylength tag"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
@@ -377,9 +377,9 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     */
 
     if (0 != memcmp(ptr, CHECKSUM_PREFIX_, CHECKSUM_PREFIX_SIZE_)) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("invalid checksum tag"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
@@ -387,9 +387,9 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     */
 
     if (*SOH_ != buf[size - 1]) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("checksum field delimiter not found"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* 8=FIX.4.2^9=5^35=D^10=181^
@@ -406,13 +406,13 @@ aug_checkfix(struct aug_fixstd_* fixstd, const char* buf, size_t size)
     sum2 = aug_checksum(buf, size - TAIL_SIZE_);
 
     if (AUG_RESULT(sum1) != sum2) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("invalid checksum [%03d], expected [%03d]"),
                        AUG_RESULT(sum1), sum2);
-        return AUG_FAILERROR;
+        return -1;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGNET_API aug_len
@@ -438,9 +438,9 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
         return digits;
 
     if (0 == AUG_RESULT(digits)) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("tag not found"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     field->tag_ = tag;
@@ -454,15 +454,15 @@ aug_fixfield(struct aug_fixfield_* field, const char* buf, size_t size)
         if (*it == *SOH_)
             goto found;
 
-    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+    aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                    AUG_MSG("field [%d] delimiter not found"),
                    (int)field->tag_);
-    return AUG_FAILERROR;
+    return -1;
  found:
 
     field->size_ = (aug_len)(it - field->value_);
 
     /* Return number of bytes consumed. */
 
-    return AUG_MKRESULT((ssize_t)((it - buf) + sizeof(*SOH_)));
+    return (ssize_t)((it - buf) + sizeof(*SOH_));
 }

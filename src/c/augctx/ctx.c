@@ -180,7 +180,7 @@ static const struct aug_ctxvtbl vtbl_ = {
 static aug_result
 vctxlog_(aug_ctx* ctx, unsigned level, const char* format, va_list args)
 {
-    aug_result result = AUG_SUCCESS;
+    aug_result result = 0;
     assert(ctx);
     if (level <= aug_getloglevel(ctx)) {
         aug_log* log = aug_getlog(ctx);
@@ -383,7 +383,7 @@ aug_perrinfo(aug_ctx* ctx, const char* s, const struct aug_errinfo* errinfo)
 
     if (0 == errinfo->num_) {
         aug_ctxerror(ctx, "%s: no description available", s);
-        return AUG_SUCCESS;
+        return 0;
     }
 
     for (file = errinfo->file_; ; ++file)

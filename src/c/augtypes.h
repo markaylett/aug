@@ -137,75 +137,39 @@ struct aug_field {
  * AUG_FAILBLOCK.
  */
 
-#if ENABLE_STRICT
-
-struct aug_strict_ {
-    long val_;
-};
-
-typedef struct aug_strict_ aug_result;
-typedef struct aug_strict_ aug_rint;
-typedef struct aug_strict_ aug_rlong;
-typedef struct aug_strict_ aug_rsize;
-
-static inline aug_result
-aug_mkresult_(long val)
-{
-    aug_result x;
-    x.val_ = val;
-    return x;
-}
-
-# define AUG_MKRESULT(x) aug_mkresult_(x)
-# define AUG_RESULT(x)   (x).val_
-
-#else /* !ENABLE_STRICT */
-
 # if HAVE_SYS_TYPES_H
 #  include <sys/types.h> /* ssize_t */
 # endif /* HAVE_SYS_TYPES_H */
 
 typedef int aug_result;
+
 typedef int aug_rint;
 typedef long aug_rlong;
 typedef ssize_t aug_rsize;
-
-# define AUG_MKRESULT(x) (x)
-# define AUG_RESULT(x)   (x)
-
-#endif /* !ENABLE_STRICT */
-
-#define AUG_SUCCESS   AUG_MKRESULT( 0)
-#define AUG_FAILERROR AUG_MKRESULT(-1)
-
-#define AUG_ZERO      AUG_SUCCESS
-
-/* Non-error exceptions.  aug_clearerrinfo() should be called before returning
-   athese .*/
-
-#define AUG_FAILNONE  AUG_MKRESULT(-2) /* ENOENT */
-#define AUG_FAILINTR  AUG_MKRESULT(-3) /* EINTR, WSAEINTR */
-#define AUG_FAILBLOCK AUG_MKRESULT(-4) /* EWOULDBLOCK, WSAEWOULDBLOCK */
-
-#define aug_isfail(x)    (AUG_RESULT(x) < 0)
-#define aug_issuccess(x) (!aug_isfail(x))
-
-#define aug_iserror(x)  (-1 == AUG_RESULT(x))
-#define aug_isnone(x)   (-2 == AUG_RESULT(x))
-#define aug_isintr(x)   (-3 == AUG_RESULT(x))
-#define aug_isblock(x)  (-4 == AUG_RESULT(x))
-
-#define aug_verify(x)                                                   \
-    do {                                                                \
-        aug_result aug_tmp;                                             \
-        if (aug_isfail(aug_tmp = (x)))                                  \
-            return aug_tmp;                                             \
-    } while (0)
 
 /** @} */
 
 /**
  * @defgroup TypesException Exception Codes
+ *
+ * @ingroup Types
+ *
+ * Standard exceptions.  aug_clearerrinfo() should be called before returning
+ * these.
+ *
+ * @{
+ */
+
+#define AUG_EXERROR   1
+#define AUG_EXNONE    2 /* ENOENT */
+#define AUG_EXINTR    3 /* EINTR, WSAEINTR */
+#define AUG_EXBLOCK   4 /* EWOULDBLOCK, WSAEWOULDBLOCK */
+#define AUG_EXTIMEOUT 5
+
+/** @} */
+
+/**
+ * @defgroup TypesError Error Codes
  *
  * @ingroup Types
  *

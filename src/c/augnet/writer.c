@@ -138,11 +138,11 @@ aug_appendwriter(aug_writer_t writer, aug_blob* blob)
     struct buf_* buf;
     assert(blob);
     if (!(buf = createbuf_(writer->mpool_, blob)))
-        return AUG_FAILERROR;
+        return -1;
 
     AUG_INSERT_TAIL(&writer->list_, buf);
     ++writer->size_;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGNET_API aug_bool
@@ -161,15 +161,15 @@ aug_writersize(aug_writer_t writer)
 
         size_t len;
         if (!aug_getblobdata(it->blob_, &len)) {
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
                            AUG_MSG("failed conversion from var to buffer"));
-            return AUG_FAILERROR;
+            return -1;
         }
 
         size += len;
     }
 
-    return AUG_MKRESULT((ssize_t)size);
+    return (ssize_t)size;
 }
 
 AUGNET_API aug_rsize
@@ -194,9 +194,9 @@ aug_writesome(aug_writer_t writer, aug_stream* stream)
     AUG_FOREACH(it, &writer->list_) {
 
         if (!(iov[i].iov_base = (void*)aug_getblobdata(it->blob_, &len))) {
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EDOMAIN,
                            AUG_MSG("failed conversion from var to buffer"));
-            return AUG_FAILERROR;
+            return -1;
         }
 
         iov[i].iov_len = (int)len;

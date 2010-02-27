@@ -89,7 +89,7 @@ release_(aug_log* obj)
     }
 }
 
-static aug_result
+static aug_bool
 vwritelog_(aug_log* obj, unsigned level, const char* format, va_list args)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, log_, obj);
@@ -127,7 +127,7 @@ createservlog_(aug_mpool* mpool, const char* sname, aug_log* inner)
         return NULL;
 
     if (!(handle = RegisterEventSource(NULL, sname))) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
         aug_freemem(mpool, impl);
         return NULL;
     }
@@ -154,12 +154,12 @@ aug_setservlogger(const char* sname)
     if (!outer) {
         aug_release(inner);
         aug_release(mpool);
-        return AUG_FAILERROR;
+        return -1;
     }
 
     aug_setlog(aug_tlx, outer);
     aug_release(outer);
     aug_release(inner);
     aug_release(mpool);
-    return AUG_SUCCESS;
+    return 0;
 }

@@ -49,7 +49,7 @@ aug_timegm(struct tm* tm)
 #if HAVE_TIMEGM
 
     if ((time_t)-1 == (gmt = timegm(tm)))
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, 0 == errno
                             ? EINVAL : errno);
 
 #else /* !HAVE_TIMEGM */
@@ -64,9 +64,11 @@ aug_timegm(struct tm* tm)
     gm.tm_year = tm->tm_year;
     gm.tm_isdst = 0; /* No daylight adjustment. */
 
-    if ((time_t)-1 == (gmt = mktime(&gm)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
-                                   ? EINVAL : errno);
+    if ((time_t)-1 == (gmt = mktime(&gm))) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__,
+                          0 == errno ? EINVAL : errno);
+        return -1;
+    }
 
     /* mktime() assumes localtime; adjust for gmt. */
 
@@ -74,17 +76,19 @@ aug_timegm(struct tm* tm)
 
 #endif /* !HAVE_TIMEGM */
 
-    return AUG_MKRESULT(gmt);
+    return gmt;
 }
 
 AUGSYS_API aug_rlong
 aug_timelocal(struct tm* tm)
 {
     time_t gmt = mktime(tm);
-    if (gmt == (time_t)-1)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
-                                   ? EINVAL : errno);
-    return AUG_MKRESULT(gmt);
+    if (gmt == (time_t)-1) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__,
+                          0 == errno ? EINVAL : errno);
+        return -1;
+    }
+    return gmt;
 }
 
 AUGSYS_API struct tm*
@@ -121,8 +125,8 @@ aug_gmtime(const aug_time* clock, struct tm* res)
     return res;
 
  fail:
-    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
-                        ? EINVAL : errno);
+    aug_setposixerror(aug_tlx, __FILE__, __LINE__,
+                      0 == errno ? EINVAL : errno);
     return NULL;
 }
 
@@ -160,8 +164,8 @@ aug_localtime(const aug_time* clock, struct tm* res)
     return res;
 
  fail:
-    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, 0 == errno
-                        ? EINVAL : errno);
+    aug_setposixerror(aug_tlx, __FILE__, __LINE__,
+                      0 == errno ? EINVAL : errno);
     return NULL;
 }
 

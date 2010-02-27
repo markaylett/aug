@@ -29,7 +29,7 @@ static aug_result
 cb_(const char* key, const char* value, void* arg)
 {
     printf("'%s'=[%s]\n", key, value);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 int

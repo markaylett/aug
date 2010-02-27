@@ -111,7 +111,7 @@ main(int argc, char* argv[])
         if (!b)
             throw error("returned bool differs from original");
 
-        aug_result r(AUG_MKRESULT(101));
+        aug_result r(101);
         r = verifyproxy(r);
         if (RESULT_ != which_)
             throw error("failed to call result template");

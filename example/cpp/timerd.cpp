@@ -86,7 +86,7 @@ namespace test {
             throw runtime_error("option not supported");
         }
 
-        return AUG_SUCCESS;
+        return 0;
     }
 
     class impl : public task_base<impl>, public mpool_ops {
@@ -206,7 +206,7 @@ namespace test {
         {
             try {
                 run();
-                return AUG_SUCCESS;
+                return 0;
             } AUG_SETERRINFOCATCH;
             return AUG_FAILERROR;
         }
@@ -257,7 +257,7 @@ namespace test {
                 realpath(getcwd().c_str(), rundir_, sizeof(rundir_));
 
             reconf_();
-            return AUG_SUCCESS;
+            return 0;
 
         } AUG_SETERRINFOCATCH;
         return AUG_FAILERROR;

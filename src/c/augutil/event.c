@@ -142,12 +142,12 @@ wakeup_(aug_md md)
         /* If called from a thread where the context has not been initialised,
            the this call simply has no effect. */
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
                        AUG_MSG("failed to wakeup reader"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 struct aug_events_ {
@@ -171,7 +171,7 @@ pushcasptr_(aug_events_t events, struct link_* link)
 
     /* Done if not asked to wakeup. */
     if (next != WAKEUP_)
-        return AUG_SUCCESS;
+        return 0;
 
     /* Wakeup marker was set, so wakeup consumer. */
     return wakeup_(events->mds_[1]);
@@ -200,7 +200,7 @@ loadcasptr_(aug_events_t events, struct link_** head)
                     aug_rsize rsize = flush_(events->mds_[0],
                                              events->wakeups_);
                     if (aug_isfail(rsize))
-                        return AUG_FAILERROR;
+                        return -1;
                     /* Reduce wakeups by actual number read. The result may be
                        zero as the publisher is not gauranteed to have written
                        by this time.
@@ -222,7 +222,7 @@ loadcasptr_(aug_events_t events, struct link_** head)
         /* Modification detected, so continue. */
     }
     /* Head is either shared stack or null. */
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGUTIL_API aug_events_t
@@ -300,14 +300,14 @@ aug_readevent(aug_events_t events, struct aug_event* event)
         aug_retain(event->ob_);
 
     destroylink_(next);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGUTIL_API aug_result
 aug_writeevent(aug_events_t events, const struct aug_event* event)
 {
     struct link_* next = createlink_(event->type_, event->ob_);
-    return next ? pushcasptr_(events, next) : AUG_FAILERROR;
+    return next ? pushcasptr_(events, next) : -1;
 }
 
 AUGUTIL_API aug_md

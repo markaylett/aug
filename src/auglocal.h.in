@@ -17,9 +17,6 @@
 /* Define to 1 for smp support. */
 #undef ENABLE_SMP
 
-/* Define to 1 for strict types. */
-#undef ENABLE_STRICT
-
 /* Define to 1 for threads support. */
 #undef ENABLE_THREADS
 

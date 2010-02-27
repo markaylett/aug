@@ -40,10 +40,9 @@ aug_setinfo_(aug_seq_t seq, const struct aug_info_* info)
 
     assert(seq && info);
 
-    aug_verify(aug_setregion_(seq, 0, AUG_LEADERSIZE));
-
-    if (!(addr = (char*)aug_seqaddr_(seq)))
-        return AUG_FAILERROR;
+    if (aug_setregion_(seq, 0, AUG_LEADERSIZE) < 0
+        || !(addr = (char*)aug_seqaddr_(seq)))
+        return -1;
 
     memcpy(addr + AUG_MAGICOFF, AUG_MAGIC, sizeof(aug_magic_t));
     aug_encodeproto((aug_proto_t)info->proto_, addr + AUG_PROTOOFF);
@@ -51,7 +50,7 @@ aug_setinfo_(aug_seq_t seq, const struct aug_info_* info)
     aug_encodehsize((aug_hsize_t)info->hsize_, addr + AUG_HSIZEOFF);
     aug_encodebsize((aug_bsize_t)info->bsize_, addr + AUG_BSIZEOFF);
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUG_EXTERNC aug_result
@@ -60,15 +59,14 @@ aug_info_(aug_seq_t seq, struct aug_info_* info)
     char* addr;
     assert(seq && info);
 
-    aug_verify(aug_setregion_(seq, 0, AUG_LEADERSIZE));
-
-    if (!(addr = (char*)aug_seqaddr_(seq)))
-        return AUG_FAILERROR;
+    if (aug_setregion_(seq, 0, AUG_LEADERSIZE) < 0
+        || !(addr = (char*)aug_seqaddr_(seq)))
+        return -1;
 
     if (0 != memcmp(addr + AUG_MAGICOFF, AUG_MAGIC, sizeof(aug_magic_t))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid mar header"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid mar header"));
+        return -1;
     }
 
     info->proto_ = aug_decodeproto(addr + AUG_PROTOOFF);
@@ -76,5 +74,5 @@ aug_info_(aug_seq_t seq, struct aug_info_* info)
     info->hsize_ = aug_decodehsize(addr + AUG_HSIZEOFF);
     info->bsize_ = aug_decodebsize(addr + AUG_BSIZEOFF);
 
-    return AUG_SUCCESS;
+    return 0;
 }

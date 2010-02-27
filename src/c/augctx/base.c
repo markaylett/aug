@@ -172,10 +172,10 @@ aug_setbasictlx(aug_mpool* mpool)
 {
     aug_ctx* ctx = aug_createbasicctx(mpool);
     if (!ctx)
-        return AUG_FAILERROR;
+        return -1;
     aug_settlx(ctx);
     aug_release(ctx);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGCTX_API aug_ctx*
@@ -224,7 +224,7 @@ aug_inittlx(void)
 
         if (mpool) {
 
-            if (aug_isfail(aug_setbasictlx(mpool)))
+            if (aug_setbasictlx(mpool) < 0)
                 ok = AUG_FALSE;
 
             aug_release(mpool);

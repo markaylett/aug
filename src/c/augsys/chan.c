@@ -171,9 +171,9 @@ chan_setwantwr_(aug_chan* ob, aug_bool wantwr)
     return aug_setmdeventmask(impl->muxer_, impl->fd_,
                               wantwr ? AUG_MDEVENTALL : AUG_MDEVENTRDEX);
 #else /* _WIN32 */
-    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
-                   AUG_MSG("aug_setmdeventmask() not supported"));
-    return AUG_FAILERROR;
+    aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
+                    AUG_MSG("aug_setmdeventmask() not supported"));
+    return -1;
 #endif /* _WIN32 */
 }
 
@@ -243,7 +243,7 @@ stream_release_(aug_stream* ob)
 static aug_result
 stream_shutdown_(aug_stream* ob)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_rsize

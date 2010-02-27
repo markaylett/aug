@@ -31,11 +31,11 @@ AUG_RCSID("$Id$");
 
 #if !defined(_WIN32)
 # define SETAFNOSUPPORT_() \
-    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT)
+    aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT)
 # include "augsys/posix/socket.c"
 #else /* _WIN32 */
 # define SETAFNOSUPPORT_() \
-    aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEAFNOSUPPORT)
+    aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAEAFNOSUPPORT)
 # include "augsys/win32/socket.c"
 # define snprintf _snprintf
 #endif /* _WIN32 */
@@ -116,9 +116,9 @@ aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len)
 #endif /* HAVE_IPV6 */
     default:
 #if !defined(_WIN32)
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
 #else /* _WIN32 */
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEAFNOSUPPORT);
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAEAFNOSUPPORT);
 #endif /* _WIN32 */
         return NULL;
     }
@@ -129,7 +129,7 @@ aug_endpointntop(const struct aug_endpoint* src, char* dst, socklen_t len)
     AUG_SNTRUNCF(dst, len, ret);
 
     if (ret < 0) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;
     }
 
@@ -295,9 +295,15 @@ aug_getsockerr(aug_sd sd)
     return err;
 }
 
-AUGSYS_API aug_result
-aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                   aug_sd sd)
+AUGSYS_API void
+aug_setsockerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                    aug_sd sd)
 {
-    return aug_setposixerrinfo(errinfo, file, line, aug_getsockerr(sd));
+    aug_setposixerrinfo_(errinfo, file, line, aug_getsockerr(sd));
+}
+
+AUGSYS_API void
+aug_setsockerror(aug_ctx* ctx, const char* file, int line, aug_sd sd)
+{
+    aug_setposixerror(ctx, file, line, aug_getsockerr(sd));
 }

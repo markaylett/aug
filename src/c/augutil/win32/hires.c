@@ -43,7 +43,7 @@ aug_createhires(aug_mpool* mpool)
 
     if (!QueryPerformanceFrequency(&hires->freq_)
         || !QueryPerformanceCounter(&hires->start_)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
         aug_freemem(mpool, hires);
         return NULL;
     }
@@ -64,10 +64,10 @@ AUGUTIL_API aug_result
 aug_resethires(aug_hires_t hires)
 {
     if (!QueryPerformanceCounter(&hires->start_)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
-        return AUG_FAILERROR;
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGUTIL_API double*
@@ -75,7 +75,7 @@ aug_elapsed(aug_hires_t hires, double* sec)
 {
     LARGE_INTEGER now;
     if (!QueryPerformanceCounter(&now)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
         return NULL;
     }
 

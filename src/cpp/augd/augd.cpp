@@ -286,10 +286,10 @@ namespace {
                 } else
                     engine_.run(true);  // Stop on error.
 
-                return AUG_SUCCESS;
+                return 0;
 
             } AUG_SETERRINFOCATCH;
-            return AUG_FAILERROR;
+            return -1;
         }
     };
 
@@ -757,10 +757,10 @@ namespace {
             }
 #endif // WITH_SSL
 
-            return AUG_SUCCESS;
+            return 0;
 
         } AUG_SETERRINFOCATCH;
-        return AUG_FAILERROR;
+        return -1;
     }
 
     aug_task*

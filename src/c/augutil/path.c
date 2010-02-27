@@ -75,9 +75,9 @@ aug_chdir(const char* path)
 #else /* _WIN32 */
     if (-1 == _chdir(path))
 #endif /* _WIN32 */
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGUTIL_API char*
@@ -88,7 +88,7 @@ aug_getcwd(char* dst, size_t size)
 #else /* _WIN32 */
     if (!_getcwd(dst, (int)size)) {
 #endif /* _WIN32 */
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;
     }
     return dst;
@@ -103,7 +103,7 @@ aug_gethome(char* dst, size_t size)
         home = getenv("APPDATA");
 #endif /* _WIN32 */
     if (!home) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EEXIST,
                        AUG_MSG("failed to determine home directory"));
         return NULL;
     }
@@ -119,7 +119,7 @@ aug_gettmp(char* dst, size_t size)
 #else /* _WIN32 */
     char buf[MAX_PATH + 1]; /* Ensure required buffer space. */
     if (0 == GetTempPath(sizeof(buf), buf)) {
-        aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, GetLastError());
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
         return NULL;
     }
     aug_strlcpy(dst, buf, size);
@@ -184,7 +184,7 @@ aug_joinpath(const char* dir, const char* path, char* dst, size_t size)
             --dirlen;
 
         if (size < dirlen + pathlen + 2) {
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                            AUG_MSG("buffer size exceeded"));
             return NULL;
         }
@@ -197,7 +197,7 @@ aug_joinpath(const char* dir, const char* path, char* dst, size_t size)
 
     } else if (size < pathlen + 1) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }
@@ -219,22 +219,22 @@ aug_realpath(const char* src, char* dst, size_t size)
        of realpath().  Verify that this is indeed the case. */
 
     if (-1 == (pathmax = pathconf(src, _PC_PATH_MAX))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;
     }
 
     if (!(buf = alloca(pathmax + 1))) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, ENOMEM);
         return NULL;
     }
 
     if (!realpath(src, buf)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;
     }
 
     if (size <= strlen(buf)) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ELIMIT,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ELIMIT,
                        AUG_MSG("buffer size exceeded"));
         return NULL;
     }
@@ -243,7 +243,7 @@ aug_realpath(const char* src, char* dst, size_t size)
     return dst;
 #else /* _WIN32 */
     if (!_fullpath(dst, src, size)) {
-        aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         return NULL;
     }
     return dst;

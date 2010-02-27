@@ -54,7 +54,7 @@ release_(aug_log* obj)
 {
 }
 
-static aug_result
+static aug_bool
 vwritelog_(aug_log* obj, unsigned level, const char* format, va_list args)
 {
     char buf[AUG_MAXLINE];
@@ -67,11 +67,11 @@ vwritelog_(aug_log* obj, unsigned level, const char* format, va_list args)
     AUG_SNTRUNCF(buf, sizeof(buf), ret);
 
     if (ret < 0)
-        return AUG_FAILERROR;
+        return AUG_FALSE;
 
     fprintf(file, "%s\n", buf);
     fflush(file);
-    return AUG_SUCCESS;
+    return AUG_TRUE;
 }
 
 static const struct aug_logvtbl vtbl_ = {
@@ -83,10 +83,10 @@ static const struct aug_logvtbl vtbl_ = {
 
 static aug_log stdlog_ = { &vtbl_, NULL };
 
-AUGCTX_API aug_result
+AUGCTX_API aug_bool
 aug_writelog(aug_log* log, unsigned level, const char* format, ...)
 {
-    aug_result result;
+    aug_bool result;
     va_list args;
     va_start(args, format);
     result = aug_vwritelog(log, level, format, args);

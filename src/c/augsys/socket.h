@@ -32,6 +32,8 @@
 #include "augsys/config.h"
 #include "augsys/types.h"
 
+#include "augext/ctx.h"
+
 #include "augtypes.h"
 
 #if !defined(_WIN32)
@@ -179,7 +181,7 @@ aug_swritev(aug_sd sd, const struct iovec* iov, int size);
  * #SOL_SOCKET/#SO_ERROR.  I.e. on return, optval will contain the equivalent
  * errno value.
  *
- * Further, #SOL_SOCKET/#SO_ERROR will always return #AUG_SUCCESS, with any
+ * Further, #SOL_SOCKET/#SO_ERROR will always return #0, with any
  * errno value stored in optval.  The getsockerr() function is designed to
  * re-enforce these semantics.
  */
@@ -282,8 +284,11 @@ aug_acceptagain(struct aug_errinfo* errinfo);
 AUGSYS_API int
 aug_getsockerr(aug_sd sd);
 
-AUGSYS_API aug_result
-aug_setsockerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                   aug_sd sd);
+AUGSYS_API void
+aug_setsockerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                    aug_sd sd);
+
+AUGSYS_API void
+aug_setsockerror(aug_ctx* ctx, const char* file, int line, aug_sd sd);
 
 #endif /* AUGSYS_SOCKET_H */

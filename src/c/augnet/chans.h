@@ -76,7 +76,7 @@ aug_insertchan(aug_chans_t chans, aug_chan* ob);
  * @param chans Channel list.
  * @param id Channel to be removed.
  *
- * @return Either @ref AUG_SUCCESS or @ref AUG_FAILNONE.
+ * @return Either @ref 0 or @ref AUG_FAILNONE.
  */
 
 AUGNET_API aug_result

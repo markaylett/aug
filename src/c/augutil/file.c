@@ -52,7 +52,7 @@ init_(struct state_* st, aug_confcb_t cb, void* arg)
 
     if (!(key = aug_createxstr(mpool, 64))) {
         aug_release(mpool);
-        return AUG_FAILERROR;
+        return -1;
     }
 
     value = aug_createxstr(mpool, 64);
@@ -63,7 +63,7 @@ init_(struct state_* st, aug_confcb_t cb, void* arg)
 
     if (!value) {
         aug_destroyxstr(key);
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* Commit. */
@@ -73,9 +73,9 @@ init_(struct state_* st, aug_confcb_t cb, void* arg)
     st->key_ = key;
     st->value_ = value;
     st->last_ = AUG_TOKPHRASE;
-    st->result_ = AUG_SUCCESS;
+    st->result_ = 0;
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static void
@@ -119,9 +119,9 @@ out_(void* arg, int what)
 
             } else {
 
-                aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
+                aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",
                                AUG_ENULL, AUG_MSG("empty key"));
-                st->result_ = AUG_FAILERROR;
+                st->result_ = -1;
             }
         }
         break;
@@ -179,7 +179,7 @@ aug_freadconf(FILE* fp, aug_confcb_t cb, void* arg)
         aug_putshellwords(&words, '\n');
     else /* Error. */
         st.result_ =
-            aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
  done:
     term_(&st);
@@ -196,7 +196,7 @@ aug_readconf(const char* path, aug_confcb_t cb, void* arg)
         result = aug_freadconf(fp, cb, arg);
         fclose(fp);
     } else
-        result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        result = aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
     return result;
 }

@@ -64,7 +64,7 @@ aug_xstrcats(aug_xstr_t xstr, const char* src);
  * @param xstr Destination string.
  * @param src Source string.
  *
- * @return Either @ref AUG_SUCCESS or @ref AUG_FAILERROR.
+ * @return Either @ref 0 or @ref -1.
  */
 
 AUGUTIL_API aug_result
@@ -82,7 +82,7 @@ aug_xstrcpys(aug_xstr_t xstr, const char* src);
  * @param xstr Destination string.
  * @param src Source string.
  *
- * @return Either @ref AUG_SUCCESS or @ref AUG_FAILERROR.
+ * @return Either @ref 0 or @ref -1.
  */
 
 AUGUTIL_API aug_result

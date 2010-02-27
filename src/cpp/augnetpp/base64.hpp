@@ -45,7 +45,7 @@ namespace aug {
         try {
             return T(buf, len, ob);
         } AUG_SETERRINFOCATCH;
-        return AUG_FAILERROR;
+        return -1;
     }
 
     template <typename T, aug_result (T::*U)(const char*, size_t)>
@@ -55,7 +55,7 @@ namespace aug {
         try {
             return (obtop<T>(ob)->*U)(buf, len);
         } AUG_SETERRINFOCATCH;
-        return AUG_FAILERROR;
+        return -1;
     }
 
     template <typename T>
@@ -65,7 +65,7 @@ namespace aug {
         try {
             return obtop<T>(ob)->base64cb(buf, len);
         } AUG_SETERRINFOCATCH;
-        return AUG_FAILERROR;
+        return -1;
     }
 
     inline void
@@ -158,14 +158,14 @@ namespace aug {
         {
             std::ostream& os(*obtop<std::ostream>(ob));
 			os.write(buf, static_cast<std::streamsize>(len));
-            return AUG_SUCCESS;
+            return 0;
         }
         inline aug_result
         base64str(const char* buf, size_t len, objectref ob)
         {
             std::string& str(*obtop<std::string>(ob));
             str.append(buf, static_cast<std::streamsize>(len));
-            return AUG_SUCCESS;
+            return 0;
         }
     }
 

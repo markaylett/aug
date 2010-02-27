@@ -42,18 +42,18 @@ struct aug_dlib_ {
 static void
 seterrinfo_(const char* file, int line)
 {
-    aug_seterrinfo(aug_tlerr, file, line, "dlfcn", 1, dlerror());
+    aug_setctxerror(aug_tlx, file, line, "dlfcn", 1, dlerror());
 }
 
 AUGSYS_API aug_result
 aug_dlclose(aug_dlib_t dlib)
 {
-    aug_result result = AUG_SUCCESS;
+    aug_result result = 0;
     aug_mpool* mpool = dlib->mpool_;
 
     if (0 != dlclose(dlib->handle_)) {
         seterrinfo_(__FILE__, __LINE__);
-        result = AUG_FAILERROR;
+        result = -1;
     }
 
     aug_freemem(mpool, dlib);

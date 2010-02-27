@@ -51,22 +51,6 @@ if test x$enable_smp = xyes; then
     AC_DEFINE(ENABLE_SMP, 1, [Define to 1 for smp support.])
 fi
 
-# Strict.
-
-AC_ARG_ENABLE(strict,
-[  --enable-strict         enable strict support @<:@default=no@:>@], [
-    case x$enableval in
-        xyes) enable_strict=yes;;
-        xno)  enable_strict=no;;
-        *) AC_MSG_ERROR(bad value $enableval for --enable-strict);;
-    esac
-], [enable_strict=no])
-
-AM_CONDITIONAL(ENABLE_STRICT, test x$enable_strict = xyes)
-if test x$enable_strict = xyes; then
-    AC_DEFINE(ENABLE_STRICT, 1, [Define to 1 for strict types.])
-fi
-
 # Threads.
 
 AC_ARG_ENABLE(threads,

@@ -40,7 +40,7 @@ namespace {
     {
         map<string, string>& x(*static_cast<map<string, string>*>(arg));
         x[name] = value;
-        return AUG_SUCCESS;
+        return 0;
     }
 }
 

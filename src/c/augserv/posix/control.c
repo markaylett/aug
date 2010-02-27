@@ -48,9 +48,9 @@ flock_(struct flock* fl, int fd, int cmd, int type)
     fl->l_len = 0;
 
     if (-1 == fcntl(fd, cmd, fl))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -61,15 +61,15 @@ send_(int fd, pid_t pid, int event)
     switch (event) {
     case AUG_EVENTRECONF:
         if (-1 == kill(pid, SIGHUP))
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         break;
     case AUG_EVENTSTATUS:
         if (-1 == kill(pid, SIGUSR1))
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         break;
     case AUG_EVENTSTOP:
         if (-1 == kill(pid, SIGTERM))
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
         /* Wait for daemon process to release lock. */
 
@@ -82,19 +82,19 @@ send_(int fd, pid_t pid, int event)
 
         /* Invalid command. */
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid control command [%d]"), (int)event);
-        return AUG_FAILERROR;
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSERV_API aug_result
 aug_start(const struct aug_options* options)
 {
-    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
+    aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ESUPPORT,
                    AUG_MSG("aug_start() not supported"));
-    return AUG_FAILERROR;
+    return -1;
 }
 
 AUGSERV_API aug_result
@@ -109,21 +109,21 @@ aug_control(const struct aug_options* options, int event)
                                 AUG_TRUE));
 
     if (!(pidfile = aug_getservopt(AUG_OPTPIDFILE))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("option 'AUG_OPTPIDFILE' not set"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* Check for existence of file. */
 
     if (-1 == access(pidfile, F_OK)) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EEXIST,
                        AUG_MSG("pidfile does not exist: %s"), pidfile);
-        return AUG_FAILERROR;
+        return -1;
     }
 
 	if (-1 == (fd = open(pidfile, O_RDONLY)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
     /* Attempt to obtain shared lock. */
 
@@ -140,9 +140,9 @@ aug_control(const struct aug_options* options, int event)
 
             if (0 == fl.l_pid) {
 
-                aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EIO,
+                aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
                                AUG_MSG("lockfile on NFS mount: %s"), pidfile);
-                result = AUG_FAILERROR;
+                result = -1;
 
             } else
                 result = send_(fd, fl.l_pid, event);
@@ -155,13 +155,13 @@ aug_control(const struct aug_options* options, int event)
            running. */
 
         if (-1 == unlink(pidfile)) {
-            result = aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+            result = aug_setposixerror(aug_tlx, __FILE__, __LINE__,
                                          errno);
         } else {
 
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EEXIST,
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EEXIST,
                            AUG_MSG("server process is not running"));
-            result = AUG_FAILERROR;
+            result = -1;
         }
     }
 
@@ -172,11 +172,11 @@ aug_control(const struct aug_options* options, int event)
 AUGSERV_API aug_result
 aug_install(const struct aug_options* options)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSERV_API aug_result
 aug_uninstall(const struct aug_options* options)
 {
-    return AUG_SUCCESS;
+    return 0;
 }

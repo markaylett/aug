@@ -136,17 +136,19 @@ aug_destroymuxer(aug_muxer_t muxer)
 AUGSYS_API aug_result
 aug_setmdeventmask(aug_muxer_t muxer, aug_md md, unsigned short mask)
 {
-    if (FD_SETSIZE == muxer->out_.rd_.fd_count)
-        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, WSAEMFILE);
+    if (FD_SETSIZE == muxer->out_.rd_.fd_count) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAEMFILE);
+        return -1;
+    }
 
     if (mask & ~AUG_MDEVENTALL) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid mdevent mask"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid mdevent mask"));
+        return -1;
     }
 
     muxer->bits_ += setmdevents_(&muxer->in_, md, mask);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_rint
@@ -158,7 +160,7 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
 
     if (0 == muxer->bits_) {
         Sleep(timeout ? aug_tvtoms(timeout) : INFINITE);
-        return AUG_SUCCESS;
+        return 0;
     }
 
     if (timeout) {
@@ -178,11 +180,12 @@ aug_waitmdevents(aug_muxer_t muxer, const struct aug_timeval* timeout)
 
     /* Note: WinSock ignores the nfds argument. */
 
-    if (SOCKET_ERROR == ret)
-        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
-                                   WSAGetLastError());
+    if (SOCKET_ERROR == ret) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAGetLastError());
+        return -1;
+    }
 
-    return AUG_MKRESULT(ret);
+    return ret;
 }
 
 AUGSYS_API unsigned short
@@ -201,19 +204,18 @@ AUGSYS_API aug_result
 aug_muxerpipe(aug_md mds[2])
 {
     aug_md sds[2];
-    aug_result result;
 
-    if (aug_isfail(result = aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sds)))
-        return result;
+    if (aug_socketpair(AF_UNIX, SOCK_STREAM, 0, sds) < 0)
+        return -1;
 
-    if (aug_isfail(result = aug_ssetnonblock(sds[0], AUG_TRUE))
-        || aug_isfail(result = aug_ssetnonblock(sds[1], AUG_TRUE))) {
+    if (aug_ssetnonblock(sds[0], AUG_TRUE) < 0
+        || aug_ssetnonblock(sds[1], AUG_TRUE) < 0) {
         aug_sclose(sds[0]);
         aug_sclose(sds[1]);
-        return result;
+        return -1;
     }
 
     mds[0] = sds[0];
     mds[1] = sds[1];
-    return AUG_SUCCESS;
+    return 0;
 }

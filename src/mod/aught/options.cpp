@@ -62,7 +62,7 @@ namespace {
         map<string, string>& mimetypes
             (*static_cast<map<string, string>*>(arg));
         mimetypes[name] = value;
-        return AUG_SUCCESS;
+        return 0;
     }
 
     void

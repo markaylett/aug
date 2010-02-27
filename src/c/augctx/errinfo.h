@@ -25,6 +25,8 @@
 
 #include "augctx/config.h"
 
+#include "augext/ctx.h"
+
 #include "augtypes.h" /* aug_bool */
 
 #include <stdarg.h>
@@ -42,33 +44,46 @@ struct aug_errinfo {
  */
 
 AUGCTX_API void
-aug_clearerrinfo(struct aug_errinfo* errinfo);
+aug_clearerrinfo_(struct aug_errinfo* errinfo);
+
+AUGCTX_API void
+aug_clearctxerror(aug_ctx* ctx);
 
 /**
  * No effect if errinfo is null.
  */
 
 AUGCTX_API void
-aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                const char* src, int num, const char* format, va_list args);
+aug_vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                 const char* src, int num, const char* format, va_list args);
+
+AUGCTX_API void
+aug_vsetctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
+                 int num, const char* format, va_list args);
 
 /**
  * No effect if errinfo is null.
  */
 
 AUGCTX_API void
-aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-               const char* src, int num, const char* format, ...);
+aug_seterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                const char* src, int num, const char* format, ...);
 
+AUGCTX_API void
+aug_setctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
+                int num, const char* format, ...);
 /**
  * No effect if errinfo is null.
  *
  * @return Exception code or zero.
  */
 
-AUGCTX_API aug_result
-aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                    int num);
+AUGCTX_API unsigned
+aug_setposixerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                     int num);
+
+AUGCTX_API void
+aug_setposixerror(aug_ctx* ctx, const char* file, int line, int num);
 
 #if defined(_WIN32)
 
@@ -78,9 +93,14 @@ aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
  * @return Exception code or zero.
  */
 
-AUGCTX_API aug_result
-aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                    unsigned long num);
+AUGCTX_API unsigned
+aug_setwin32errinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                     unsigned long num);
+
+AUGCTX_API void
+aug_setwin32error(aug_ctx* ctx, const char* file, int line,
+                  unsigned long num);
+
 #endif /* _WIN32 */
 
 /**

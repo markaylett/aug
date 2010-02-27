@@ -112,7 +112,6 @@ my (
     $debug,
     $multicast,
     $smp,
-    $strict,
     $threads,
     $cweb,
     $python,
@@ -161,7 +160,6 @@ $pedantic = valueask("pedantic warnings", 'n');
 $debug = valueask("debug build", 'n');
 $multicast = valueask("multicast support", 'y');
 $smp = valueask("smp support", 'y');
-$strict = valueask("strict types", 'n');
 $threads = valueask("thread support", 'y');
 $cweb = valueask("cweb support", 'n');
 $python = valueask("python support", 'n');
@@ -225,8 +223,6 @@ $options .= " \\\n\t--disable-multicast"
     unless is $multicast;
 $options .= " \\\n\t--disable-smp"
     unless is $smp;
-$options .= " \\\n\t--enable-strict"
-    if is $strict;
 $options .= " \\\n\t--disable-threads"
     unless is $threads;
 $options .= " \\\n\t--with-cweb"

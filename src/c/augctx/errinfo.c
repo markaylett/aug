@@ -76,9 +76,6 @@ vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
 AUGCTX_API void
 aug_clearerrinfo(struct aug_errinfo* errinfo)
 {
-    if (!errinfo)
-        return;
-
     errinfo->file_[0] = '\0';
     errinfo->line_ = 0;
     errinfo->src_[0] = '\0';
@@ -87,108 +84,127 @@ aug_clearerrinfo(struct aug_errinfo* errinfo)
 }
 
 AUGCTX_API void
-aug_vseterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                const char* src, int num, const char* format, va_list args)
+aug_clearctxerror(aug_ctx* ctx)
 {
-    if (!errinfo)
-        return;
-
-    if (0 == num) {
-        aug_clearerrinfo(errinfo);
-        return;
+    if (ctx) {
+        aug_setexcept(ctx, AUG_EXERROR);
+        aug_clearerrinfo(aug_geterrinfo(ctx));
     }
+}
 
+AUGCTX_API void
+aug_vseterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                 const char* src, int num, const char* format, va_list args)
+{
     vseterrinfo_(errinfo, file, line, src, num, format, args);
 }
 
 AUGCTX_API void
-aug_seterrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-               const char* src, int num, const char* format, ...)
+aug_vsetctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
+                 int num, const char* format, va_list args)
+{
+    if (ctx) {
+        aug_setexcept(ctx, AUG_EXERROR);
+        vseterrinfo_(aug_geterrinfo(ctx), file, line, src, num, format, args);
+    }
+}
+
+AUGCTX_API void
+aug_seterrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                const char* src, int num, const char* format, ...)
 {
     va_list args;
-    if (!errinfo)
-        return;
-
-    if (0 == num) {
-        aug_clearerrinfo(errinfo);
-        return;
-    }
-
     va_start(args, format);
     vseterrinfo_(errinfo, file, line, src, num, format, args);
     va_end(args);
 }
 
-AUGCTX_API aug_result
-aug_setposixerrinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                    int num)
+AUGCTX_API void
+aug_setctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
+                int num, const char* format, ...)
 {
-    if (errinfo)
-        seterrinfo_(errinfo, file, line, "posix", num, strerror(num));
+    if (ctx) {
+        va_list args;
+        aug_setexcept(ctx, AUG_EXERROR);
+        va_start(args, format);
+        vseterrinfo_(aug_geterrinfo(ctx), file, line, src, num, format, args);
+        va_end(args);
+    }
+}
+
+AUGCTX_API unsigned
+aug_setposixerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                     int num)
+{
+    seterrinfo_(errinfo, file, line, "posix", num, strerror(num));
 
     /* Map to exception code. */
 
     switch (num) {
-    case 0:
-        aug_clearerrinfo(errinfo);
-        return AUG_SUCCESS;
     case EINTR:
-        return AUG_FAILINTR;
+        return AUG_EXINTR;
     case EWOULDBLOCK:
-        return AUG_FAILBLOCK;
+        return AUG_EXBLOCK;
     }
-    return AUG_FAILERROR;
+    return AUG_EXERROR;
+}
+
+AUGCTX_API void
+aug_setposixerror(aug_ctx* ctx, const char* file, int line, int num)
+{
+    if (ctx)
+        aug_setexcept(ctx, aug_setposixerrinfo_(aug_geterrinfo(ctx),
+                                                file, line, num));
 }
 
 #if defined(_WIN32)
-AUGCTX_API aug_result
-aug_setwin32errinfo(struct aug_errinfo* errinfo, const char* file, int line,
-                    unsigned long num)
+AUGCTX_API unsigned
+aug_setwin32errinfo_(struct aug_errinfo* errinfo, const char* file, int line,
+                     unsigned long num)
 {
-    if (errinfo) {
+    char desc[AUG_MAXLINE];
+    DWORD i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, num,
+                            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), desc,
+                            sizeof(desc), NULL);
 
-        char desc[AUG_MAXLINE];
-        DWORD i = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, num,
-                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                desc, sizeof(desc), NULL);
+    /* Remove trailing whitespace. */
 
-        /* Remove trailing whitespace. */
+    while (i && isspace(desc[i - 1]))
+        --i;
 
-        while (i && isspace(desc[i - 1]))
-            --i;
+    /* Remove trailing full-stop. */
 
-        /* Remove trailing full-stop. */
+    if (i && '.' == desc[i - 1])
+        --i;
 
-        if (i && '.' == desc[i - 1])
-            --i;
+    desc[i] = '\0';
 
-        desc[i] = '\0';
-
-        seterrinfo_(errinfo, file, line, "win32", (int)num,
-                    i ? desc : AUG_MSG("no description available"));
-    }
+    seterrinfo_(errinfo, file, line, "win32", (int)num,
+                i ? desc : AUG_MSG("no description available"));
 
     /* Map to exception code. */
 
     switch (num) {
-    case 0:
-        aug_clearerrinfo(errinfo);
-        return AUG_SUCCESS;
     case WSAEINTR:
-        return AUG_FAILINTR;
+        return AUG_EXINTR;
     case WSAEWOULDBLOCK:
-        return AUG_FAILBLOCK;
+        return AUG_EXBLOCK;
     }
-    return AUG_FAILERROR;
+    return AUG_EXERROR;
+}
+
+AUGCTX_API void
+aug_setwin32error(aug_ctx* ctx, const char* file, int line, unsigned long num)
+{
+    if (ctx)
+        aug_setexcept(ctx, aug_setwin32errinfo_(aug_geterrinfo(ctx),
+                                                file, line, num));
 }
 #endif /* _WIN32 */
 
 AUGCTX_API int
 aug_errno(const struct aug_errinfo* errinfo)
 {
-    if (!errinfo)
-        return 0;
-
     if (0 == aug_strncasecmp(errinfo->src_, "posix", sizeof(errinfo->src_)))
         return errinfo->num_;
 

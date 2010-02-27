@@ -115,7 +115,7 @@ createevents_(void)
     aug_release(mpool);
 
     if (!events_)
-        return AUG_FAILERROR;
+        return -1;
 
     if (aug_isfail(result = aug_setsighandler(sighandler_))) {
         destroyevents_();
@@ -125,7 +125,7 @@ createevents_(void)
 #if defined(_WIN32)
     SetConsoleCtrlHandler(ctrlhandler_, TRUE);
 #endif /* _WIN32 */
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUG_EXTERNC void
@@ -165,10 +165,10 @@ aug_initserv(void)
 
     if (!(task_ = (*serv_.create_)())) {
         destroyevents_();
-        return AUG_FAILERROR;
+        return -1;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSERV_API aug_result

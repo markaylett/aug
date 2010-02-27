@@ -205,7 +205,7 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     /* Locate host and serv separator. */
 
     if (!(serv = strrchr(dst->data_, ':'))) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing separator [%s]"), src);
         return NULL;
     }
@@ -217,13 +217,13 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     /* Ensure host and serv parts exists. */
 
     if (!len) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing host part [%s]"), src);
         return NULL;
     }
 
     if ('\0' == *++serv) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                        AUG_MSG("missing service part [%s]"), src);
         return NULL;
     }
@@ -234,7 +234,7 @@ aug_parsehostserv(const char* src, struct aug_hostserv* dst)
     if ('[' == dst->data_[0]) {
 
         if (']' != dst->data_[len - 1]) {
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPARSE,
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPARSE,
                            AUG_MSG("unmatched brackets [%s]"), src);
             return NULL;
         }
@@ -265,12 +265,12 @@ aug_established(aug_sd sd)
     if (!aug_getpeername(sd, &ep)) {
 
         if (ENOTCONN != aug_errno(aug_tlerr))
-            return AUG_FAILERROR;
+            return -1;
 
         /* ENOTCONN */
 
         aug_clearerrinfo(aug_tlerr);
         return AUG_FAILNONE;
     }
-    return AUG_SUCCESS;
+    return 0;
 }

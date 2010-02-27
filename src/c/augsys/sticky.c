@@ -76,11 +76,12 @@ aug_clearsticky(struct aug_sticky* sticky, unsigned short mask)
                       "no sticky events, setting muxer-mask: mask=[%s]",
                       aug_eventlabel(sticky->mask_));
 
-        aug_verify(aug_setmdeventmask(sticky->muxer_, sticky->md_,
-                                      sticky->mask_));
+        if (aug_setmdeventmask(sticky->muxer_, sticky->md_,
+                               sticky->mask_) < 0)
+            return -1;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API aug_result
@@ -116,9 +117,10 @@ aug_setsticky(struct aug_sticky* sticky, unsigned short mask)
         mask = 0;
     }
 
-    aug_verify(aug_setmdeventmask(sticky->muxer_, sticky->md_, mask));
+    if (aug_setmdeventmask(sticky->muxer_, sticky->md_, mask) < 0)
+        return -1;
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API unsigned short

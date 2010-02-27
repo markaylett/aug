@@ -72,12 +72,12 @@ aug_verifypacket(const struct aug_packet* packet)
 {
     if ('\0' == packet->node_[0]) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_ENULL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_ENULL,
                        AUG_MSG("empty node name"));
-        return AUG_FAILERROR;
+        return -1;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGNET_API char*
@@ -107,7 +107,7 @@ AUGNET_API struct aug_packet*
 aug_decodepacket(const char* buf, struct aug_packet* pkt)
 {
     if (0 != memcmp(buf + AUG_PKTMAGICOFF, MAGIC_, AUG_PKTMAGICSIZE)) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
                        AUG_MSG("invalid packet header"));
         return NULL;
     }

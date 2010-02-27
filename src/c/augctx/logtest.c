@@ -51,11 +51,11 @@ release_(aug_log* obj)
 {
 }
 
-static aug_result
+static aug_bool
 vwritelog_(aug_log* obj, unsigned level, const char* format, va_list args)
 {
     logged_ = 1;
-    return AUG_SUCCESS;
+    return AUG_TRUE;
 }
 
 static const struct aug_logvtbl vtbl_ = {

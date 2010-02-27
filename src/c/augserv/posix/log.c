@@ -23,5 +23,5 @@
 AUGSERV_API aug_result
 aug_setservlogger(const char* sname)
 {
-    return AUG_SUCCESS;
+    return 0;
 }

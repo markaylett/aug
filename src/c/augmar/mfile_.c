@@ -90,8 +90,8 @@ aug_closemfile_(aug_mfile_t mfile)
 
         if (mfile->resvd_ > mfile->size_) {
 
-            if (aug_isfail(result = aug_ftruncate(mfile->fd_,
-                                                  (off_t)mfile->size_))) {
+            if ((result = aug_ftruncate(mfile->fd_,
+                                        (off_t)mfile->size_)) < 0) {
                 aug_fclose(mfile->fd_);
                 goto last;
             }
@@ -132,7 +132,7 @@ aug_openmfile_(aug_mpool* mpool, const char* path, int flags, mode_t mode,
     if (AUG_BADFD == (fd = aug_fopen(path, flags, mode)))
         return NULL;
 
-    if (aug_isfail(aug_fsize(fd, &size)))
+    if (aug_fsize(fd, &size) < 0)
         return NULL;
 
     if (!(mfile = aug_allocmem(mpool, sizeof(struct aug_mfile_) + tail)))
@@ -170,13 +170,13 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 
         if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-            aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",
-                           AUG_EPERM, AUG_MSG("file is not writable"));
+            aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPERM,
+                            AUG_MSG("file is not writable"));
             return NULL;
         }
 
         resvd = reserve_(size);
-        if (aug_isfail(aug_ftruncate(mfile->fd_, resvd - mfile->size_)))
+        if (aug_ftruncate(mfile->fd_, resvd - mfile->size_) < 0)
             return NULL;
 
         mfile->resvd_ = resvd;
@@ -184,7 +184,7 @@ aug_mapmfile_(aug_mfile_t mfile, unsigned size)
 
     if (mfile->mmap_) {
 
-        if (aug_isfail(aug_remmap(mfile->mmap_, 0, size))) {
+        if (aug_remmap(mfile->mmap_, 0, size) < 0) {
 
             aug_destroymmap(mfile->mmap_);
             mfile->mmap_ = NULL;
@@ -221,12 +221,12 @@ aug_truncatemfile_(aug_mfile_t mfile, unsigned size)
     assert(mfile);
     if (!(mfile->flags_ & AUG_MMAPWR)) {
 
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EPERM,
-                       AUG_MSG("file is not writable"));
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EPERM,
+                        AUG_MSG("file is not writable"));
+        return -1;
     }
     mfile->size_ = size;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUG_EXTERNC void*

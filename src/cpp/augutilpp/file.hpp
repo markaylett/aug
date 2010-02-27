@@ -40,7 +40,7 @@ namespace aug {
         try {
             return T(name, value, arg);
         } AUG_SETERRINFOCATCH;
-        return AUG_FAILERROR;
+        return -1;
     }
 
     template <typename T, aug_result (T::*U)(const char*, const char*)>
@@ -50,7 +50,7 @@ namespace aug {
         try {
             return (static_cast<T*>(arg)->*U)(name, value);
         } AUG_SETERRINFOCATCH;
-        return AUG_FAILERROR;
+        return -1;
     }
 
     template <typename T>
@@ -60,7 +60,7 @@ namespace aug {
         try {
             return static_cast<T*>(arg)->confcb(name, value);
         } AUG_SETERRINFOCATCH;
-        return AUG_FAILERROR;
+        return -1;
     }
 
     inline aug_result

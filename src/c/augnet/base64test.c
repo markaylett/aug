@@ -33,14 +33,14 @@ static aug_result
 encode_(const char* buf, size_t len, aug_object* ob)
 {
     strcat(encoded_, buf);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
 decode_(const char* buf, size_t len, aug_object* ob)
 {
     strcat(decoded_, buf);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -49,17 +49,17 @@ testencode_(aug_base64_t encoder, const char* in, const char* out)
     encoded_[0] = '\0';
     if (aug_isfail(aug_appendbase64(encoder, in, strlen(in)))) {
         aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
-        return AUG_FAILERROR;
+        return -1;
     }
     if (aug_isfail(aug_finishbase64(encoder))) {
         aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
-        return AUG_FAILERROR;
+        return -1;
     }
     if (0 != strcmp(encoded_, out)) {
         fprintf(stderr, "unexpected encoding: %s\n", encoded_);
-        return AUG_FAILERROR;
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -68,17 +68,17 @@ testdecode_(aug_base64_t decoder, const char* in, const char* out)
     decoded_[0] = '\0';
     if (aug_isfail(aug_appendbase64(decoder, in, strlen(in)))) {
         aug_perrinfo(aug_tlx, "aug_appendbase64() failed", NULL);
-        return AUG_FAILERROR;
+        return -1;
     }
     if (aug_isfail(aug_finishbase64(decoder))) {
         aug_perrinfo(aug_tlx, "aug_endbase64() failed", NULL);
-        return AUG_FAILERROR;
+        return -1;
     }
     if (0 != strcmp(decoded_, out)) {
         fprintf(stderr, "unexpected decoding: %s\n", decoded_);
-        return AUG_FAILERROR;
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 int

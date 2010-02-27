@@ -57,6 +57,14 @@ namespace aug {
         }
     };
 
+    struct timeout_exception : std::exception {
+        const char*
+        what() const throw() // required by gcc.
+        {
+            return "aug::timeout_exception";
+        }
+    };
+
     class errinfo_error : public std::exception {
     public:
         typedef aug_errinfo ctype;
@@ -247,33 +255,38 @@ namespace aug {
         throwerror(*aug_tlerr);
     }
 
+    inline void
+    throwexcept()
+    {
+        switch (getexcept(aug_tlx)) {
+        case AUG_EXERROR:
+            throwerror();
+        case AUG_EXNONE:
+            throw none_exception();
+        case AUG_EXINTR:
+            throw intr_exception();
+        case AUG_EXBLOCK:
+            throw block_exception();
+        case AUG_EXTIMEOUT:
+            throw timeout_exception();
+        };
+    }
+
     namespace detail {
 
         template <typename T>
         struct result_traits {
             static bool
-            error(T result)
+            isexcept(T result)
             {
-                if (aug_issuccess(result))
-                    return false;
-
-                if (aug_isnone(result))
-                    throw none_exception();
-
-                if (aug_isintr(result))
-                    throw intr_exception();
-
-                if (aug_isblock(result))
-                    throw block_exception();
-
-                return true;
+                return result < 0;
             }
         };
 
         template <typename T>
         struct result_traits<T*> {
             static bool
-            error(T* result)
+            isexcept(T* result)
             {
                 return 0 == result;
             }
@@ -282,7 +295,7 @@ namespace aug {
         template <>
         struct result_traits<bool> {
             static bool
-            error(bool result)
+            isexcept(bool result)
             {
                 return !result;
             }
@@ -293,8 +306,8 @@ namespace aug {
     T
     verify(T result)
     {
-        if (detail::result_traits<T>::error(result))
-            throwerror();
+        if (detail::result_traits<T>::isexcept(result))
+            throwexcept();
         return result;
     }
 }
@@ -307,11 +320,11 @@ namespace aug {
         e.errinfo(*aug_tlerr);                                          \
         aug_perrinfo(aug_tlx, "aug::errinfo_error", &e.errinfo());      \
     } catch (const std::exception& e) {                                 \
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",            \
                        AUG_EEXCEPT, e.what());                          \
         aug_perrinfo(aug_tlx, "std::exception", NULL);                  \
     } catch (...) {                                                     \
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",            \
                        AUG_EEXCEPT, "no description available");        \
         aug_perrinfo(aug_tlx, "unknown", NULL);                         \
     } do { } while (0)
@@ -320,10 +333,10 @@ namespace aug {
     catch (const aug::errinfo_error& e) {                               \
         e.errinfo(*aug_tlerr);                                          \
     } catch (const std::exception& e) {                                 \
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",            \
                        AUG_EEXCEPT, e.what());                          \
     } catch (...) {                                                     \
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug",            \
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug",            \
                        AUG_EEXCEPT, "no description available");        \
     } do { } while (0)
 

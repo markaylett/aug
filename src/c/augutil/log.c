@@ -76,12 +76,12 @@ localtime_(aug_clock* clock, struct tm* res)
     aug_verify(aug_gettimeofday(clock, &tv));
 
     if (!aug_localtime(&tv.tv_sec, res))
-        return AUG_FAILERROR;
+        return -1;
 
-    return AUG_MKRESULT(tv.tv_usec / 1000);
+    return tv.tv_usec / 1000;
 }
 
-static aug_result
+static aug_bool
 writeall_(int fd, const char* buf, size_t n)
 {
     /* Ensure all bytes are written and ignore any interrupts. */
@@ -97,11 +97,11 @@ writeall_(int fd, const char* buf, size_t n)
             if (EINTR == errno)
                 continue;
 
-            return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+            return AUG_FALSE;
         }
         buf += ret, n -= ret;
     }
-    return AUG_SUCCESS;
+    return AUG_TRUE;
 }
 
 struct impl_ {
@@ -141,7 +141,7 @@ release_(aug_log* ob)
     }
 }
 
-static aug_result
+static aug_bool
 vwritelog_(aug_log* ob, unsigned level, const char* format, va_list args)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, log_, ob);
@@ -218,7 +218,7 @@ aug_vformatlog(char* buf, size_t* n, aug_clock* clock, unsigned level,
     AUG_SNTRUNCF(buf, size, ret);
 
     if (ret < 0)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
     buf += ret, size -= ret;
 
@@ -226,7 +226,7 @@ aug_vformatlog(char* buf, size_t* n, aug_clock* clock, unsigned level,
     AUG_SNTRUNCF(buf, size, ret);
 
     if (ret < 0)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
  done:
 
@@ -236,7 +236,7 @@ aug_vformatlog(char* buf, size_t* n, aug_clock* clock, unsigned level,
     /* Set output parameter to be total number of characters copied. */
 
     *n -= size;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGUTIL_API aug_result
@@ -280,7 +280,7 @@ aug_setdaemonlog(aug_ctx* ctx)
     aug_release(clock);
     aug_release(mpool);
     if (!log)
-        return AUG_FAILERROR;
+        return -1;
     aug_setlog(ctx, log);
-    return AUG_SUCCESS;
+    return 0;
 }

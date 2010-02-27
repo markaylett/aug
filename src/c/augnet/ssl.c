@@ -93,7 +93,7 @@ struct impl_ {
     struct aug_ssldata data_;
     SSL* ssl_;
     struct buf_ inbuf_, outbuf_;
-    unsigned state_;
+    unsigned state_, except_;
     struct aug_errinfo errinfo_;
     aug_bool shutdown_;
 };
@@ -286,9 +286,9 @@ shutwr_(struct impl_* impl, struct aug_errinfo* errinfo)
 
     if (ret < 0) {
         aug_setsslerrinfo(errinfo, __FILE__, __LINE__, ERR_get_error());
-        return AUG_FAILERROR;
+        return -1;
     }
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static ssize_t
@@ -408,10 +408,10 @@ readwrite_(struct impl_* impl, unsigned short events)
             /* Save error locally. */
 
 #if !defined(_WIN32)
-            aug_setposixerrinfo(&impl->errinfo_, __FILE__, __LINE__, errno);
+            aug_setposixerrinfo_(&impl->errinfo_, __FILE__, __LINE__, errno);
 #else /* _WIN32 */
-            aug_setwin32errinfo(&impl->errinfo_, __FILE__, __LINE__,
-                                WSAGetLastError());
+            aug_setwin32errinfo_(&impl->errinfo_, __FILE__, __LINE__,
+                                 WSAGetLastError());
 #endif /* _WIN32 */
 
             /* If system call error could not be obtained. */
@@ -483,11 +483,13 @@ readwrite_(struct impl_* impl, unsigned short events)
 
             /* Save error locally. */
 
+            impl->except_ =
 #if !defined(_WIN32)
-            aug_setposixerrinfo(&impl->errinfo_, __FILE__, __LINE__, errno);
+                aug_setposixerrinfo(&impl->errinfo_, __FILE__, __LINE__,
+                                    errno);
 #else /* _WIN32 */
-            aug_setwin32errinfo(&impl->errinfo_, __FILE__, __LINE__,
-                                WSAGetLastError());
+                aug_setwin32errinfo(&impl->errinfo_, __FILE__, __LINE__,
+                                    WSAGetLastError());
 #endif /* _WIN32 */
 
             /* If system call error could not be obtained. */
@@ -681,7 +683,7 @@ csetwantwr_(aug_chan* ob, aug_bool wantwr)
                   (int)impl->data_.id_, (int)wantwr);
 
     impl->wantwr_ = wantwr;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_id
@@ -771,7 +773,7 @@ sshutdown_(aug_stream* ob)
     /* If the output buffer is not empty, the shutdown call will be delayed
        until the remaining data has been written. */
 
-    return bufempty_(&impl->outbuf_) ? shutwr_(impl, aug_tlerr) : AUG_SUCCESS;
+    return bufempty_(&impl->outbuf_) ? shutwr_(impl, aug_tlerr) : 0;
 }
 
 static aug_rsize
@@ -784,10 +786,10 @@ sread_(aug_stream* ob, void* buf, size_t size)
 
         /* Restore saved error. */
 
-        aug_seterrinfo(aug_tlerr, impl->errinfo_.file_, impl->errinfo_.line_,
+        aug_setctxerror(aug_tlx, impl->errinfo_.file_, impl->errinfo_.line_,
                        impl->errinfo_.src_, impl->errinfo_.num_,
                        impl->errinfo_.desc_);
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* Only return end once all data has been read from buffer. */
@@ -798,7 +800,7 @@ sread_(aug_stream* ob, void* buf, size_t size)
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
     if (bufempty_(&impl->inbuf_))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__,
                                    EWOULDBLOCK);
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: chan read from input buffer: id=[%d]",
@@ -806,7 +808,7 @@ sread_(aug_stream* ob, void* buf, size_t size)
 
     ret = (ssize_t)readbuf_(&impl->inbuf_, buf, size);
     setmask_(impl);
-    return AUG_MKRESULT(ret);
+    return ret;
 }
 
 static aug_rsize
@@ -819,21 +821,21 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
 
         /* Restore saved error. */
 
-        aug_seterrinfo(aug_tlerr, impl->errinfo_.file_, impl->errinfo_.line_,
+        aug_setctxerror(aug_tlx, impl->errinfo_.file_, impl->errinfo_.line_,
                        impl->errinfo_.src_, impl->errinfo_.num_,
                        impl->errinfo_.desc_);
-        return AUG_FAILERROR;
+        return -1;
     }
 
     /* Only return end once all data has been read from buffer. */
 
     if (ENDOF_ == impl->state_ && bufempty_(&impl->inbuf_))
-        return AUG_MKRESULT(0);
+        return 0;
 
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
     if (bufempty_(&impl->inbuf_))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__,
                                    EWOULDBLOCK);
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: chan readv from input buffer: id=[%d]",
@@ -841,7 +843,7 @@ sreadv_(aug_stream* ob, const struct iovec* iov, int size)
 
     ret = (ssize_t)readbufv_(&impl->inbuf_, iov, size);
     setmask_(impl);
-    return AUG_MKRESULT(ret);
+    return ret;
 }
 
 static aug_rsize
@@ -853,23 +855,24 @@ swrite_(aug_stream* ob, const void* buf, size_t size)
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
     if (buffull_(&impl->outbuf_))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__,
                                    EWOULDBLOCK);
 
-    if (impl->shutdown_)
+    if (impl->shutdown_) {
 #if !defined(_WIN32)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, ESHUTDOWN);
 #else /* _WIN32 */
-        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
-                                   WSAESHUTDOWN);
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAESHUTDOWN);
 #endif /* _WIN32 */
+        return -1;
+    }
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: chan write to output buffer: id=[%d]",
                   (int)impl->data_.id_);
 
     ret = (ssize_t)writebuf_(&impl->outbuf_, buf, size);
     setmask_(impl);
-    return AUG_MKRESULT(ret);
+    return ret;
 }
 
 static aug_rsize
@@ -881,23 +884,24 @@ swritev_(aug_stream* ob, const struct iovec* iov, int size)
     /* Fail with EWOULDBLOCK is non-blocking operation would have blocked. */
 
     if (buffull_(&impl->outbuf_))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__,
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__,
                                    EWOULDBLOCK);
 
-    if (impl->shutdown_)
+    if (impl->shutdown_) {
 #if !defined(_WIN32)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ESHUTDOWN);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, ESHUTDOWN);
 #else /* _WIN32 */
-        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
-                                   WSAESHUTDOWN);
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, WSAESHUTDOWN);
 #endif /* _WIN32 */
+        return -1;
+    }
 
     AUG_CTXDEBUG3(aug_tlx, "SSL: chan writev to output buffer: id=[%d]",
                   (int)impl->data_.id_);
 
     ret = (ssize_t)writebufv_(&impl->outbuf_, iov, size);
     setmask_(impl);
-    return AUG_MKRESULT(ret);
+    return ret;
 }
 
 static const struct aug_streamvtbl svtbl_ = {
@@ -951,6 +955,8 @@ createssl_(aug_mpool* mpool, aug_id id, aug_muxer_t muxer, aug_sd sd,
     clearbuf_(&impl->inbuf_);
     clearbuf_(&impl->outbuf_);
     impl->state_ = HANDSHAKE_;
+    impl->except_ = 0;
+    aug_clearerrinfo_(&impl->errinfo_);
     impl->shutdown_ = AUG_FALSE;
 
     /* Initiate handshake mask. */

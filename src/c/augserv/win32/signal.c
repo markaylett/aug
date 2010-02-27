@@ -29,17 +29,17 @@ aug_setsighandler(void (*handler)(int))
         handler = SIG_DFL;
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSERV_API aug_result
 aug_sigblock(void)
 {
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSERV_API aug_result
 aug_sigunblock(void)
 {
-    return AUG_SUCCESS;
+    return 0;
 }

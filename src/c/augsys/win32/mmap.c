@@ -54,12 +54,12 @@ toaccess_(DWORD* to, int from)
         access |= FILE_MAP_WRITE;
 
     *to = access;
-    return AUG_SUCCESS;
+    return 0;
 
  fail:
-    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                   AUG_MSG("invalid access flags [%d]"), (int)from);
-    return AUG_FAILERROR;
+    aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                    AUG_MSG("invalid access flags [%d]"), (int)from);
+    return -1;
 }
 
 static aug_result
@@ -78,12 +78,12 @@ toprot_(DWORD* to, int from)
         prot = PAGE_READONLY;
 
     *to = prot;
-    return AUG_SUCCESS;
+    return 0;
 
  fail:
-    aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                   AUG_MSG("invalid protection flags [%d]"), (int)from);
-    return AUG_FAILERROR;
+    aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                    AUG_MSG("invalid protection flags [%d]"), (int)from);
+    return -1;
 }
 
 static aug_result
@@ -93,20 +93,20 @@ verify_(size_t size, size_t offset, size_t len)
        should not be greater than the file size. */
 
     if (!size || size < (offset + len)) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid file map size [%d]"), (int)size);
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid file map size [%d]"), (int)size);
+        return -1;
     }
 
     /* The offset, if specified, must occur on an allocation size boundary. */
 
     if (offset && (offset % aug_granularity())) {
-        aug_seterrinfo(aug_tlerr, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("invalid file map offset [%d]"), (int)offset);
-        return AUG_FAILERROR;
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
+                        AUG_MSG("invalid file map offset [%d]"), (int)offset);
+        return -1;
     }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
@@ -116,8 +116,10 @@ createmmap_(impl_t impl, size_t offset, size_t len)
     HANDLE mapping;
     DWORD err;
 
-    if (AUG_BADFD == impl->fd_)
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EBADF);
+    if (AUG_BADFD == impl->fd_) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, EBADF);
+        return -1;
+    }
 
     if (!len)
         len = impl->size_ - offset;
@@ -143,13 +145,14 @@ createmmap_(impl_t impl, size_t offset, size_t len)
     impl->mmap_.len_ = len;
     impl->mapping_ = mapping;
 
-    return AUG_SUCCESS;
+    return 0;
 
  fail2:
     if (INVALID_HANDLE_VALUE == impl->mapping_)
         CloseHandle(mapping);
  fail1:
-    return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
+    aug_setwin32error(aug_tlx, __FILE__, __LINE__, err);
+    return -1;
 }
 
 static aug_result
@@ -164,10 +167,12 @@ destroymmap_(impl_t impl)
         && !err)
         err = GetLastError();
 
-    if (err)
-        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__, err);
+    if (err) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, err);
+        return -1;
+    }
 
-    return AUG_SUCCESS;
+    return 0;
 }
 
 AUGSYS_API void
@@ -188,16 +193,16 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     DWORD prot, access;
     size_t size;
 
-    if (aug_isfail(toprot_(&prot, flags)))
+    if (toprot_(&prot, flags) < 0)
         return NULL;
 
-    if (aug_isfail(toaccess_(&access, flags)))
+    if (toaccess_(&access, flags) < 0)
         return NULL;
 
-    if (aug_isfail(aug_fsize(fd, &size)))
+    if (aug_fsize(fd, &size) < 0)
         return NULL;
 
-    if (aug_isfail(verify_(size, offset, len)))
+    if (verify_(size, offset, len) < 0)
         return NULL;
 
     if (!(impl = aug_allocmem(mpool, sizeof(struct impl_))))
@@ -212,7 +217,7 @@ aug_createmmap(aug_mpool* mpool, aug_fd fd, size_t offset, size_t len,
     impl->size_ = size;
     impl->mapping_ = INVALID_HANDLE_VALUE;
 
-    if (aug_isfail(createmmap_(impl, offset, len))) {
+    if (createmmap_(impl, offset, len) < 0) {
         aug_freemem(mpool, impl);
         return NULL;
     }
@@ -228,24 +233,31 @@ aug_remmap(struct aug_mmap* mm, size_t offset, size_t len)
 
     impl->mmap_.addr_ = NULL;
 
-    if (addr && !UnmapViewOfFile(addr))
-        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
-                                   GetLastError());
+    if (addr && !UnmapViewOfFile(addr)) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        goto fail;
+    }
 
     if (impl->size_ < (offset + len)) {
 
         HANDLE mapping = impl->mapping_;
         impl->mapping_ = INVALID_HANDLE_VALUE;
 
-        if (INVALID_HANDLE_VALUE != mapping && !CloseHandle(mapping))
-            return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
-                                       GetLastError());
+        if (INVALID_HANDLE_VALUE != mapping && !CloseHandle(mapping)) {
+            aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+            goto fail;
+        }
 
-        aug_verify(aug_fsize(impl->fd_, &impl->size_));
+        if (aug_fsize(impl->fd_, &impl->size_) < 0)
+            goto fail;
     }
 
-    aug_verify(verify_(impl->size_, offset, len));
+    if (verify_(impl->size_, offset, len) < 0)
+        goto fail;
     return createmmap_(impl, offset, len);
+
+ fail:
+    return -1;
 }
 
 AUGSYS_API aug_result
@@ -253,10 +265,11 @@ aug_syncmmap(const struct aug_mmap* mm)
 {
     impl_t impl = (impl_t)mm;
 
-    if (!FlushViewOfFile(impl->mmap_.addr_, impl->mmap_.len_))
-        return aug_setwin32errinfo(aug_tlerr, __FILE__, __LINE__,
-                                   GetLastError());
-    return AUG_SUCCESS;
+    if (!FlushViewOfFile(impl->mmap_.addr_, impl->mmap_.len_)) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        return -1;
+    }
+    return 0;
 }
 
 AUGSYS_API size_t

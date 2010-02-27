@@ -53,7 +53,7 @@ namespace {
         aug_result
         cb(const char* buf, size_t len)
         {
-            return AUG_SUCCESS;
+            return 0;
         }
     };
 }

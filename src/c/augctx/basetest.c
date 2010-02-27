@@ -55,7 +55,7 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENOMEM);
+    aug_setposixerror(aug_tlx, __FILE__, __LINE__, ENOMEM);
     aug_perrinfo(aug_tlx, "operation failed", NULL);
     return 0;
 }

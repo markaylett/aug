@@ -42,18 +42,18 @@ getifaddr_(aug_sd sd, struct in_addr* addr, const char* ifname)
     aug_strlcpy(ifreq.ifr_name, ifname, sizeof(ifreq.ifr_name));
 
     if (-1 == ioctl(sd, SIOCGIFADDR, &ifreq))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, errno);
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
     addr->s_addr = ((struct sockaddr_in*)&ifreq.ifr_addr)->sin_addr.s_addr;
-    return AUG_SUCCESS;
+    return 0;
 }
 
 static aug_result
 getifindex_(unsigned* index, const char* ifname)
 {
     if (!(*index = if_nametoindex(ifname)))
-        return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, ENODEV);
-    return AUG_SUCCESS;
+        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, ENODEV);
+    return 0;
 }
 
 AUGSYS_API aug_result
@@ -95,7 +95,7 @@ aug_joinmcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
+    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
 }
 
 AUGSYS_API aug_result
@@ -137,7 +137,7 @@ aug_leavemcast(aug_sd sd, const struct aug_inetaddr* addr, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
+    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
 }
 
 AUGSYS_API aug_result
@@ -170,7 +170,7 @@ aug_setmcastif(aug_sd sd, const char* ifname)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
+    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
 }
 
 AUGSYS_API aug_result
@@ -200,7 +200,7 @@ aug_setmcastloop(aug_sd sd, aug_bool on)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
+    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
 }
 
 AUGSYS_API aug_result
@@ -230,5 +230,5 @@ aug_setmcastttl(aug_sd sd, int ttl)
 #endif /* HAVE_IPV6 */
     }
 
-    return aug_setposixerrinfo(aug_tlerr, __FILE__, __LINE__, EAFNOSUPPORT);
+    return aug_setposixerror(aug_tlx, __FILE__, __LINE__, EAFNOSUPPORT);
 }
