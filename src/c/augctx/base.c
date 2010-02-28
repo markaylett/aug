@@ -29,9 +29,11 @@ AUG_RCSID("$Id$");
 #include "augctx/lock.h"
 #include "augctx/mpool.h"
 #include "augctx/tls_.h"
+#include "augctx/utility.h" /* aug_check() */
 
 #include <assert.h>
-#include <stdlib.h> /* malloc() */
+#include <stdio.h>
+#include <stdlib.h>         /* abort(), malloc() */
 
 struct tls_ {
     int refs_;
@@ -182,8 +184,12 @@ AUGCTX_API aug_ctx*
 aug_gettlx(void)
 {
     struct tls_* tls = gettls_();
-    if (!tls)
-        return NULL;
+    if (!tls) {
+        /* Lazy. */
+        aug_check(aug_autotlx());
+        tls = gettls_();
+        aug_check(tls);
+    }
     assert(0 < tls->refs_);
     if (tls->ctx_)
         aug_retain(tls->ctx_);
@@ -194,8 +200,12 @@ AUGCTX_API aug_ctx*
 aug_tlx_(void)
 {
     struct tls_* tls = gettls_();
-    if (!tls)
-        return NULL;
+    if (!tls) {
+        /* Lazy. */
+        aug_check(aug_autotlx());
+        tls = gettls_();
+        aug_check(tls);
+    }
     assert(0 < tls->refs_);
     return tls->ctx_;
 }
@@ -204,8 +214,12 @@ AUGCTX_API struct aug_errinfo*
 aug_tlerr_(void)
 {
     struct tls_* tls = gettls_();
-    if (!tls)
-        return NULL;
+    if (!tls) {
+        /* Lazy. */
+        aug_check(AUG_TRUE == aug_autotlx());
+        tls = gettls_();
+        aug_check(tls);
+    }
     assert(0 < tls->refs_);
     return aug_geterrinfo(tls->ctx_);
 }

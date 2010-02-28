@@ -540,9 +540,9 @@ read_(aug_mar* obj, void* buf, unsigned len)
         return -1;
     }
 
-    if (aug_issuccess(rsize = aug_read_(impl->seq_, &impl->info_,
-                                        impl->offset_, buf, len)))
-        impl->offset_ += AUG_RESULT(rsize);
+    if (0 < (rsize = aug_read_(impl->seq_, &impl->info_,
+                               impl->offset_, buf, len)))
+        impl->offset_ += rsize;
 
     return rsize;
 }
@@ -600,8 +600,8 @@ gettype_(aug_blob* obj)
 {
     struct impl_* impl = AUG_PODIMPL(struct impl_, blob_, obj);
     const void* value;
-    if (!aug_issuccess(aug_getfieldp_(impl->seq_, &impl->info_,
-                                      "Content-Type", &value)))
+    if (aug_getfieldp_(impl->seq_, &impl->info_, "Content-Type", &value) < 0
+        || !value)
         value = "application/octet-stream";
     return value;
 }

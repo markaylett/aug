@@ -74,7 +74,14 @@ redirectout_(int fd)
 #else /* _WIN32 */
     if (-1 == (old = _dup(STDOUT_FILENO)))
 #endif /* _WIN32 */
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
+
+    /* Assume failure. */
+
+    result = -1;
 
     /* Assumption: If dup2 fails for any reason, the original descriptor's
        state will remain unchanged. */
@@ -84,7 +91,7 @@ redirectout_(int fd)
 #else /* _WIN32 */
     if (-1 == _dup2(fd, STDOUT_FILENO)) {
 #endif /* _WIN32 */
-        result = aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
         goto done;
     }
 
@@ -94,7 +101,7 @@ redirectout_(int fd)
     if (-1 == _dup2(fd, STDERR_FILENO)) {
 #endif /* _WIN32 */
 
-        result = aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
 
         /* Restore the original descriptor. */
 
@@ -113,9 +120,9 @@ redirectout_(int fd)
 
  done:
 #if !defined(_WIN32)
-    if (-1 == close(old))
+    if (close(old) < 0)
 #else /* _WIN32 */
-    if (-1 == _close(old))
+    if (_close(old) < 0)
 #endif /* _WIN32 */
         aug_ctxerror(aug_tlx, "close() failed");
 
@@ -129,12 +136,14 @@ aug_openlog(const char* path)
     aug_result result;
 
 #if !defined(_WIN32)
-    if (-1 == (fd = open(path,
+    if ((fd = open(path,
 #else /* _WIN32 */
-    if (-1 == (fd = _open(path,
+    if ((fd = _open(path,
 #endif /* _WIN32 */
-                          O_APPEND | O_CREAT | O_WRONLY, 0640)))
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+                          O_APPEND | O_CREAT | O_WRONLY, 0640)) < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 
     result = redirectout_(fd);
 

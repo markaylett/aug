@@ -27,13 +27,6 @@
 int
 main(int argc, char* argv[])
 {
-    aug_setposixerror(aug_tlx, __FILE__, 101, EINVAL);
-
-    if (aug_errno(aug_tlerr)) {
-        fprintf(stderr, "non-zero errno before init\n");
-        return 1;
-    }
-
     aug_autotlx();
 
     aug_setposixerror(aug_tlx, __FILE__, 101, EINVAL);

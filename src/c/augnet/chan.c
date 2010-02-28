@@ -498,7 +498,7 @@ schan_process_(aug_chan* ob, aug_chandler* handler, aug_bool* fork)
             goto done;
         }
 
-        if (aug_isfail(aug_setnodelay(sd, AUG_TRUE))) {
+        if (aug_setnodelay(sd, AUG_TRUE) < 0) {
             aug_ctxwarn(aug_tlx, "aug_setnodelay() failed: %s",
                         aug_tlerr->desc_);
             aug_sclose(sd);
@@ -807,7 +807,7 @@ pstream_readv_(aug_stream* ob, const struct iovec* iov, int size)
 {
     struct pimpl_* impl = AUG_PODIMPL(struct pimpl_, stream_, ob);
     aug_rsize rsize = aug_sreadv(impl->sticky_.md_, iov, size);
-    if (aug_isblock(rsize))
+    if (rsize < 0 && AUG_EXBLOCK == aug_getexcept(aug_tlx))
         aug_clearsticky(&impl->sticky_, AUG_MDEVENTRD);
     return rsize;
 }

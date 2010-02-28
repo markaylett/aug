@@ -166,7 +166,6 @@ handler_(DWORD code)
     /* FIXME: restore original status on failure to write event. */
 
     struct aug_event event = { 0, NULL };
-    aug_result result;
 
     switch (code) {
     case RECONF_:
@@ -183,9 +182,8 @@ handler_(DWORD code)
         break;
     }
 
-    result = aug_writeevent(aug_events(), &event);
-
-    if (aug_isfail(result) && !aug_isblock(result))
+    if (aug_writeevent(aug_events(), &event) < 0
+        && AUG_EXBLOCK != aug_getexcept(aug_tlx))
         abort();
 }
 
@@ -256,8 +254,7 @@ service_(DWORD argc, char** argv)
         goto done;
     }
 
-    if (aug_isfail(aug_readservconf(AUG_CONFFILE(&options_), AUG_FALSE,
-                                    daemon))) {
+    if (aug_readservconf(AUG_CONFFILE(&options_), AUG_FALSE, daemon) < 0) {
         aug_perrinfo(aug_tlx, "aug_readservconf() failed", NULL);
         goto done;
     }
@@ -271,7 +268,7 @@ service_(DWORD argc, char** argv)
 
     setstatus_(SERVICE_START_PENDING);
 
-    if (aug_isfail(aug_initserv())) {
+    if (aug_initserv() < 0) {
 
         aug_perrinfo(aug_tlx, "aug_initserv() failed", NULL);
         setstatus_(SERVICE_STOPPED);
@@ -281,7 +278,7 @@ service_(DWORD argc, char** argv)
     aug_ctxnotice(aug_tlx, "daemon started");
     setstatus_(SERVICE_RUNNING);
 
-    if (aug_isfail(aug_runserv()))
+    if (aug_runserv() < 0)
         aug_perrinfo(aug_tlx, "aug_runserv() failed", NULL);
 
     aug_ctxnotice(aug_tlx, "daemon stopped");
@@ -347,17 +344,18 @@ aug_daemonise(const struct aug_options* options)
         DWORD err = GetLastError();
         if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == err) {
 
-            /* Typically, this error indicates that the program is being run
-               as a console application rather than as a service.
+            /* This error typically indicates that the program is being run as
+               a console application rather than as a service.
 
                If the program will be run as a console application for
                debugging purposes, structure it such that service-specific
                code is not called when this error is returned. */
 
-            aug_clearerrinfo(aug_tlerr);
-            result = AUG_FAILNONE;
+            aug_setexcept(aug_tlx, AUG_EXNONE);
         } else
-            result = aug_setwin32error(aug_tlx, __FILE__, __LINE__, err);
+            aug_setwin32error(aug_tlx, __FILE__, __LINE__, err);
+
+        result = -1;
     }
 
     /* Ensure writes performed on service thread are visible. */

@@ -86,10 +86,8 @@ aug_clearerrinfo(struct aug_errinfo* errinfo)
 AUGCTX_API void
 aug_clearctxerror(aug_ctx* ctx)
 {
-    if (ctx) {
-        aug_setexcept(ctx, AUG_EXERROR);
-        aug_clearerrinfo(aug_geterrinfo(ctx));
-    }
+    aug_setexcept(ctx, AUG_EXERROR);
+    aug_clearerrinfo(aug_geterrinfo(ctx));
 }
 
 AUGCTX_API void
@@ -103,10 +101,8 @@ AUGCTX_API void
 aug_vsetctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
                  int num, const char* format, va_list args)
 {
-    if (ctx) {
-        aug_setexcept(ctx, AUG_EXERROR);
-        vseterrinfo_(aug_geterrinfo(ctx), file, line, src, num, format, args);
-    }
+    aug_setexcept(ctx, AUG_EXERROR);
+    vseterrinfo_(aug_geterrinfo(ctx), file, line, src, num, format, args);
 }
 
 AUGCTX_API void
@@ -123,13 +119,11 @@ AUGCTX_API void
 aug_setctxerror(aug_ctx* ctx, const char* file, int line, const char* src,
                 int num, const char* format, ...)
 {
-    if (ctx) {
-        va_list args;
-        aug_setexcept(ctx, AUG_EXERROR);
-        va_start(args, format);
-        vseterrinfo_(aug_geterrinfo(ctx), file, line, src, num, format, args);
-        va_end(args);
-    }
+    va_list args;
+    aug_setexcept(ctx, AUG_EXERROR);
+    va_start(args, format);
+    vseterrinfo_(aug_geterrinfo(ctx), file, line, src, num, format, args);
+    va_end(args);
 }
 
 AUGCTX_API unsigned
@@ -152,9 +146,8 @@ aug_setposixerrinfo_(struct aug_errinfo* errinfo, const char* file, int line,
 AUGCTX_API void
 aug_setposixerror(aug_ctx* ctx, const char* file, int line, int num)
 {
-    if (ctx)
-        aug_setexcept(ctx, aug_setposixerrinfo_(aug_geterrinfo(ctx),
-                                                file, line, num));
+    aug_setexcept(ctx, aug_setposixerrinfo_(aug_geterrinfo(ctx),
+                                            file, line, num));
 }
 
 #if defined(_WIN32)
@@ -196,9 +189,8 @@ aug_setwin32errinfo_(struct aug_errinfo* errinfo, const char* file, int line,
 AUGCTX_API void
 aug_setwin32error(aug_ctx* ctx, const char* file, int line, unsigned long num)
 {
-    if (ctx)
-        aug_setexcept(ctx, aug_setwin32errinfo_(aug_geterrinfo(ctx),
-                                                file, line, num));
+    aug_setexcept(ctx, aug_setwin32errinfo_(aug_geterrinfo(ctx),
+                                            file, line, num));
 }
 #endif /* _WIN32 */
 

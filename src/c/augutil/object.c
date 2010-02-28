@@ -317,7 +317,7 @@ aug_vunpackargs(aug_array* array, const char* sig, va_list args)
     while (i < argc) {
 
         struct aug_var* var = &unwind[i];
-        if (aug_isfail(aug_getarrayvalue(array, i, var)))
+        if (aug_getarrayvalue(array, i, var) < 0)
             goto fail;
 
         /* Now that this argument has been unpacked, ensure that it is unwound

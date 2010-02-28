@@ -103,7 +103,8 @@ xstrcat_(aug_xstr_t xstr, const aug_xstr_t src, size_t len)
 	if (!len)
 		return 0;
 
-	aug_verify(reserve_(xstr, xstr->len_ + len));
+	if (reserve_(xstr, xstr->len_ + len) < 0)
+        return -1;
 
     /* Allow copy from overlapping region. */
 
@@ -165,7 +166,8 @@ aug_xstrcatsn(aug_xstr_t xstr, const char* src, size_t len)
 	if (!len)
 		return 0;
 
-	aug_verify(reserve_(xstr, xstr->len_ + len));
+	if (reserve_(xstr, xstr->len_ + len) < 0)
+        return -1;
 
     /* Allow copy from overlapping region. */
 
@@ -189,7 +191,8 @@ aug_xstrcat(aug_xstr_t xstr, const aug_xstr_t src)
 AUGUTIL_API aug_result
 aug_xstrcpysn(aug_xstr_t xstr, const char* src, size_t len)
 {
-    aug_verify(aug_clearxstr(xstr));
+    if (aug_clearxstr(xstr) < 0)
+        return -1;
 	return aug_xstrcatsn(xstr, src, len);
 }
 
@@ -205,7 +208,8 @@ aug_xstrcpy(aug_xstr_t xstr, const aug_xstr_t src)
     /* Preserve length prior to resetting. */
 
     size_t len = src->len_;
-    aug_verify(aug_clearxstr(xstr));
+    if (aug_clearxstr(xstr) < 0)
+        return -1;
 
 	return xstrcat_(xstr, src, len);
 }
@@ -213,7 +217,8 @@ aug_xstrcpy(aug_xstr_t xstr, const aug_xstr_t src)
 AUGUTIL_API aug_result
 aug_xstrcatcn(aug_xstr_t xstr, char ch, size_t num)
 {
-    aug_verify(reserve_(xstr, xstr->len_ + num));
+    if (reserve_(xstr, xstr->len_ + num) < 0)
+        return -1;
 
 	if (1 == num)
         xstr->ptr_[xstr->len_] = ch;
@@ -233,7 +238,8 @@ aug_xstrcatc(aug_xstr_t xstr, char ch)
 AUGUTIL_API aug_result
 aug_xstrcpycn(aug_xstr_t xstr, char ch, size_t num)
 {
-    aug_verify(aug_clearxstr(xstr));
+    if (aug_clearxstr(xstr) < 0)
+        return -1;
 	return aug_xstrcatcn(xstr, ch, num);
 }
 
@@ -248,13 +254,11 @@ aug_xstrread(aug_xstr_t xstr, aug_stream* src, size_t size)
 {
     aug_rsize rsize = reserve_(xstr, xstr->len_ + size);
 
-	if (aug_isfail(rsize))
-		return rsize;
+    if (rsize < 0
+        || (rsize = aug_read(src, xstr->ptr_ + xstr->len_, size)) < 0)
+        return -1;
 
-    if (aug_isfail(rsize = aug_read(src, xstr->ptr_ + xstr->len_, size)))
-        return rsize;
-
-	xstr->len_ += AUG_RESULT(rsize);
+	xstr->len_ += rsize;
 	return rsize;
 }
 

@@ -73,9 +73,8 @@ static aug_rsize
 localtime_(aug_clock* clock, struct tm* res)
 {
     struct aug_timeval tv;
-    aug_verify(aug_gettimeofday(clock, &tv));
-
-    if (!aug_localtime(&tv.tv_sec, res))
+    if (aug_gettimeofday(clock, &tv) < 0
+        || !aug_localtime(&tv.tv_sec, res))
         return -1;
 
     return tv.tv_usec / 1000;
@@ -149,7 +148,8 @@ vwritelog_(aug_log* ob, unsigned level, const char* format, va_list args)
     char buf[AUG_MAXLINE];
     size_t n = sizeof(buf);
 
-    aug_verify(aug_vformatlog(buf, &n, impl->clock_, level, format, args));
+    if (aug_vformatlog(buf, &n, impl->clock_, level, format, args) < 0)
+        return AUG_FALSE;
 
 #if defined(_WIN32) && !defined(NDEBUG)
     aug_lock();
@@ -193,7 +193,7 @@ aug_vformatlog(char* buf, size_t* n, aug_clock* clock, unsigned level,
     assert(buf && n && *n && format);
     size = *n;
 
-    if (aug_isfail(ms = localtime_(clock, &tm)))
+    if ((ms = localtime_(clock, &tm)) < 0)
         return ms;
 
     /* The return value from the strftime() function is either a) the number
@@ -208,25 +208,29 @@ aug_vformatlog(char* buf, size_t* n, aug_clock* clock, unsigned level,
     /* Null termination is _not_ guaranteed by snprintf(). */
 
 #if ENABLE_THREADS
-    ret = snprintf(buf, size, ".%03d %08x %-6s ", (int)AUG_RESULT(ms),
+    ret = snprintf(buf, size, ".%03u %08x %-6s ", (unsigned)ms,
                    aug_threadid(), aug_loglabel(level));
 #else /* !ENABLE_THREADS */
-    ret = snprintf(buf, size, ".%03d %-6s ", (int)AUG_RESULT(ms),
+    ret = snprintf(buf, size, ".%03u %-6s ", (unsigned)ms,
                    aug_loglabel(level));
 #endif /* !ENABLE_THREADS */
 
     AUG_SNTRUNCF(buf, size, ret);
 
-    if (ret < 0)
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    if (ret < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 
     buf += ret, size -= ret;
 
     ret = vsnprintf(buf, size, format, args);
     AUG_SNTRUNCF(buf, size, ret);
 
-    if (ret < 0)
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    if (ret < 0) {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
 
  done:
 

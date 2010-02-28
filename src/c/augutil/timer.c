@@ -109,7 +109,8 @@ static aug_result
 setexpiry_(aug_clock* clock, struct aug_timeval* tv, unsigned ms)
 {
     struct aug_timeval local;
-    aug_verify(aug_gettimeofday(clock, tv));
+    if (aug_gettimeofday(clock, tv) < 0)
+        return -1;
     aug_tvadd(tv, aug_mstotv(ms, &local));
     return 0;
 }
@@ -167,9 +168,8 @@ aug_settimer(aug_timers_t timers, aug_id id, unsigned ms, aug_timercb_t cb,
     else
         aug_canceltimer(timers, id);
 
-    aug_verify(setexpiry_(timers->clock_, &tv, ms));
-
-    if (!(timer = createtimer_(timers->mpool_, ob)))
+    if (setexpiry_(timers->clock_, &tv, ms) < 0
+        || !(timer = createtimer_(timers->mpool_, ob)))
         return -1;
 
     timer->id_ = id;
@@ -192,17 +192,14 @@ aug_resettimer(aug_timers_t timers, aug_id id, unsigned ms)
 
         if (it->id_ == id) {
 
-            aug_result result;
-
             AUG_REMOVE_PREVPTR(it, prev, &timers->list_);
             if (ms) /* May be zero. */
                 it->ms_ = ms;
 
-            if (aug_isfail(result = setexpiry_(timers->clock_, &it->tv_,
-                                               it->ms_))) {
+            if (setexpiry_(timers->clock_, &it->tv_, it->ms_) < 0) {
 
                 destroytimer_(timers->mpool_, it);
-                return result;
+                return -1;
             }
 
             inserttimer_(&timers->list_, it);
@@ -212,8 +209,8 @@ aug_resettimer(aug_timers_t timers, aug_id id, unsigned ms)
             prev = &AUG_NEXT(it);
     }
 
-    aug_clearerrinfo(aug_tlerr);
-    return AUG_FAILNONE;
+    aug_setexcept(aug_tlx, AUG_EXNONE);
+    return -1;
 }
 
 AUGUTIL_API aug_result
@@ -234,8 +231,8 @@ aug_canceltimer(aug_timers_t timers, aug_id id)
             prev = &AUG_NEXT(it);
     }
 
-    aug_clearerrinfo(aug_tlerr);
-    return AUG_FAILNONE;
+    aug_setexcept(aug_tlx, AUG_EXNONE);
+    return -1;
 }
 
 AUGUTIL_API aug_bool
@@ -266,7 +263,8 @@ aug_processexpired(aug_timers_t timers, aug_bool force,
 
         /* Current time. */
 
-        aug_verify(aug_gettimeofday(timers->clock_, &now));
+        if (aug_gettimeofday(timers->clock_, &now) < 0)
+            return -1;
 
         /* Force, at least, the first timer to expire. */
 
@@ -292,7 +290,7 @@ aug_processexpired(aug_timers_t timers, aug_bool force,
 
                 /* Update expiry time and insert. */
 
-                if (aug_isfail(setexpiry_(timers->clock_, &it->tv_, it->ms_)))
+                if (setexpiry_(timers->clock_, &it->tv_, it->ms_) < 0)
                     aug_perrinfo(aug_tlx, "expiry_() failed", NULL);
                 else
                     inserttimer_(&timers->list_, it);

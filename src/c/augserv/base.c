@@ -84,7 +84,7 @@ sighandler_(int sig)
     /* The signal is ignored if the write fails with EAGAIN/EWOULDBLOCK.  This
        could happen if the event pipe is full.  What else can one do? */
 
-    if (aug_isfail(result) && !aug_isblock(result))
+    if (result < 0 && AUG_EXBLOCK != aug_getexcept(aug_tlx))
         abort();
 }
 
@@ -95,7 +95,7 @@ ctrlhandler_(DWORD ctrl)
     struct aug_event event = { AUG_EVENTSTOP, NULL };
     aug_result result = aug_writeevent(events_, &event);
 
-    if (aug_isfail(result) && !aug_isblock(result))
+    if (result < 0 && AUG_EXBLOCK != aug_getexcept(aug_tlx))
         abort();
 
     return TRUE;
@@ -106,7 +106,6 @@ static aug_result
 createevents_(void)
 {
     aug_mpool* mpool;
-    aug_result result;
 
     assert(!events_);
 
@@ -117,9 +116,9 @@ createevents_(void)
     if (!events_)
         return -1;
 
-    if (aug_isfail(result = aug_setsighandler(sighandler_))) {
+    if (aug_setsighandler(sighandler_) < 0) {
         destroyevents_();
-        return result;
+        return -1;
     }
 
 #if defined(_WIN32)
@@ -151,12 +150,11 @@ aug_readservconf(const char* conffile, aug_bool batch, aug_bool daemon)
 AUGSERV_API aug_result
 aug_initserv(void)
 {
-    aug_result result;
     assert(serv_.create_);
     assert(!task_);
 
-    if (aug_isfail(result = createevents_()))
-        return result;
+    if (createevents_() < 0)
+        return -1;
 
     /* Flush pending writes to main memory: when init_() is called, the
        gaurantee of interactions exclusively with the main thread are lost. */

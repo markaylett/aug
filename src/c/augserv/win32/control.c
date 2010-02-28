@@ -67,8 +67,8 @@ makepath_(const char* conffile)
     if (!aug_realpath(program, buf, sizeof(buf)))
         goto fail;
 
-    if (aug_isfail(aug_xstrcatc(s, '"')) || aug_isfail(aug_xstrcats(s, buf))
-        || aug_isfail(aug_xstrcatc(s, '"')))
+    if (aug_xstrcatc(s, '"') < 0 || aug_xstrcats(s, buf) < 0
+        || aug_xstrcatc(s, '"') < 0)
         goto fail;
 
     if (conffile) {
@@ -76,9 +76,8 @@ makepath_(const char* conffile)
         if (!aug_realpath(conffile, buf, sizeof(buf)))
             goto fail;
 
-        if (aug_isfail(aug_xstrcats(s, " -f \""))
-            || aug_isfail(aug_xstrcats(s, buf))
-            || aug_isfail(aug_xstrcatc(s, '"')))
+        if (aug_xstrcats(s, " -f \"") < 0 || aug_xstrcats(s, buf) < 0
+            || aug_xstrcatc(s, '"') < 0)
             goto fail;
     }
 
@@ -152,19 +151,21 @@ control_(SC_HANDLE scm, int event)
 
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
 
-    if (!(serv = OpenService(scm, sname, SERVICE_USER_DEFINED_CONTROL)))
-        return aug_setwin32error(aug_tlx, __FILE__, __LINE__,
-                                   GetLastError());
+    if (!(serv = OpenService(scm, sname, SERVICE_USER_DEFINED_CONTROL))) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        return -1;
+    }
 
     if (ControlService(serv, OFFSET_ + event, &status))
         result = 0;
-    else
-        result = aug_setwin32error(aug_tlx, __FILE__, __LINE__,
-                                     GetLastError());
+    else {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        result = -1;
+    }
 
     CloseServiceHandle(serv);
     return result;
@@ -202,8 +203,8 @@ install_(SC_HANDLE scm, const struct aug_options* options)
                                aug_xstr(path), NULL, NULL, NULL,
                                "NT Authority\\NetworkService", NULL))) {
 
-        result = aug_setwin32error(aug_tlx, __FILE__, __LINE__,
-                                     GetLastError());
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        result = -1;
         goto done;
     }
 
@@ -225,13 +226,14 @@ uninstall_(SC_HANDLE scm)
 
     if (!(sname = aug_getservopt(AUG_OPTSHORTNAME))) {
         aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EINVAL,
-                       AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
+                        AUG_MSG("option 'AUG_OPTSHORTNAME' not set"));
         return -1;
     }
 
-    if (!(serv = OpenService(scm, sname, SERVICE_STOP | DELETE)))
-        return aug_setwin32error(aug_tlx, __FILE__, __LINE__,
-                                   GetLastError());
+    if (!(serv = OpenService(scm, sname, SERVICE_STOP | DELETE))) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        return -1;
+    }
 
     /* Assume success. */
 
@@ -239,13 +241,16 @@ uninstall_(SC_HANDLE scm)
 
     if (!ControlService(serv, SERVICE_CONTROL_STOP, &status)) {
         DWORD err = GetLastError();
-        if (ERROR_SERVICE_NOT_ACTIVE != err)
-            result = aug_setwin32error(aug_tlx, __FILE__, __LINE__, err);
+        if (ERROR_SERVICE_NOT_ACTIVE != err) {
+            aug_setwin32error(aug_tlx, __FILE__, __LINE__, err);
+            result = -1;
+        }
     }
 
-    if (!DeleteService(serv) && aug_issuccess(result))
-        result = aug_setwin32error(aug_tlx, __FILE__, __LINE__,
-                                     GetLastError());
+    if (!DeleteService(serv) && 0 <= result) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        result = -1;
+    }
 
     CloseServiceHandle(serv);
     return result;
@@ -257,9 +262,10 @@ aug_start(const struct aug_options* options)
     SC_HANDLE scm;
     aug_result result;
 
-    if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS)))
-        return aug_setwin32error(aug_tlx, __FILE__, __LINE__,
-                                   GetLastError());
+    if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        return -1;
+    }
 
     result = start_(scm, options);
     CloseServiceHandle(scm);
@@ -272,9 +278,10 @@ aug_control(const struct aug_options* options, int event)
     SC_HANDLE scm;
     aug_result result;
 
-    if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS)))
-        return aug_setwin32error(aug_tlx, __FILE__, __LINE__,
-                                   GetLastError());
+    if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        return -1;
+    }
 
     result = control_(scm, event);
     CloseServiceHandle(scm);
@@ -287,9 +294,10 @@ aug_install(const struct aug_options* options)
     SC_HANDLE scm;
     aug_result result;
 
-    if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS)))
-        return aug_setwin32error(aug_tlx, __FILE__, __LINE__,
-                                   GetLastError());
+    if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        return -1;
+    }
 
     result = install_(scm, options);
     CloseServiceHandle(scm);
@@ -302,9 +310,10 @@ aug_uninstall(const struct aug_options* options)
     SC_HANDLE scm;
     aug_result result;
 
-    if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS)))
-        return aug_setwin32error(aug_tlx, __FILE__, __LINE__,
-                                   GetLastError());
+    if (!(scm = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS))) {
+        aug_setwin32error(aug_tlx, __FILE__, __LINE__, GetLastError());
+        return -1;
+    }
 
     result = uninstall_(scm);
     CloseServiceHandle(scm);

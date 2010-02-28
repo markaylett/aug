@@ -70,8 +70,7 @@ destroylink_(struct link_* link)
 static struct link_*
 createlink_(int type, aug_object* ob)
 {
-    /* Must use standard c-malloc to ensure safety from signal handler;
-       aug_tlx may not have been initialised on signal handler's thread. */
+    /* Must use standard c-malloc to ensure safety from different threads. */
 
     aug_mpool* mpool = aug_getcrtmalloc();
     struct link_* link = aug_allocmem(mpool, sizeof(struct link_));
@@ -117,11 +116,28 @@ flush_(aug_md md, unsigned wakeups)
     void* buf = alloca(wakeups);
     aug_rsize rsize;
 
-    while (aug_isintr(rsize = aug_mread(md, buf, (size_t)wakeups)))
-        ;
+    for (;;) {
+        if ((rsize = aug_mread(md, buf, (size_t)wakeups) < 0))
+            switch (aug_getexcept(aug_tlx)) {
+            case AUG_EXINTR:
+                /* Continue if interrupted. */
+                continue;
+            case AUG_EXBLOCK:
+                /* No wakeups if would block. */
+                return 0;
+            };
+        break;
+    }
 
-    /* Zero or more. */
-    return aug_isblock(rsize) ? AUG_ZERO : rsize;
+    /* File closed. */
+
+    if (0 == rsize) {
+        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
+                        AUG_MSG("event pipe closed"));
+        return -1;
+    }
+
+    return rsize;
 }
 
 static aug_result
@@ -130,24 +146,11 @@ wakeup_(aug_md md)
     const char ch = 1;
     aug_rsize rsize;
 
-    /* aug_mwrite() can be called from threads where no context has been
-       initialised, the only caveat being that the errinfo structure will not
-       be populated on error. */
-
-    while (aug_isintr(rsize = aug_mwrite(md, &ch, 1)))
+    while ((rsize = aug_mwrite(md, &ch, 1)) < 0
+           && AUG_EXINTR == aug_getexcept(aug_tlx))
         ;
 
-    if (aug_isfail(rsize) || 1 != AUG_RESULT(rsize)) {
-
-        /* If called from a thread where the context has not been initialised,
-           the this call simply has no effect. */
-
-        aug_setctxerror(aug_tlx, __FILE__, __LINE__, "aug", AUG_EIO,
-                       AUG_MSG("failed to wakeup reader"));
-        return -1;
-    }
-
-    return 0;
+    return rsize < 0 ? -1 : 0;
 }
 
 struct aug_events_ {
@@ -199,13 +202,13 @@ loadcasptr_(aug_events_t events, struct link_** head)
                     /* Flush each wakeup written by producers. */
                     aug_rsize rsize = flush_(events->mds_[0],
                                              events->wakeups_);
-                    if (aug_isfail(rsize))
+                    if (rsize < 0)
                         return -1;
                     /* Reduce wakeups by actual number read. The result may be
                        zero as the publisher is not gauranteed to have written
                        by this time.
                     */
-                    events->wakeups_ -= AUG_RESULT(rsize);
+                    events->wakeups_ -= rsize;
                 }
                 break;
             }
@@ -233,7 +236,7 @@ aug_createevents(aug_mpool* mpool)
         return NULL;
 
     events->mpool_ = mpool;
-    if (aug_isfail(aug_muxerpipe(events->mds_))) {
+    if (aug_muxerpipe(events->mds_) < 0) {
         aug_freemem(mpool, events);
         return NULL;
     }
@@ -261,8 +264,8 @@ aug_destroyevents(aug_events_t events)
     while ((link = poplink_((struct link_**)&events->shared_)))
         destroylink_(link);
 
-    if (aug_isfail(aug_mclose(events->mds_[0]))
-        || aug_isfail(aug_mclose(events->mds_[1])))
+    if (aug_mclose(events->mds_[0]) < 0
+        || aug_mclose(events->mds_[1]) < 0)
         aug_perrinfo(aug_tlx, "aug_mclose() failed", NULL);
 
     aug_freemem(mpool, events);
@@ -281,10 +284,12 @@ aug_readevent(aug_events_t events, struct aug_event* event)
 
         /* Otherwise populate local from shared stack. */
 
-        aug_verify(loadcasptr_(events, &events->local_));
+        if (loadcasptr_(events, &events->local_) < 0)
+            return -1;
         if (!events->local_) {
             /* Wakeup marker has already been written. */
-            return AUG_FAILBLOCK;
+            aug_setexcept(aug_tlx, AUG_EXBLOCK);
+            return -1;
         }
 
         /* Reverse the stack so that it effectively becomes a queue. */

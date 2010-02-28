@@ -113,7 +113,7 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
 {
     int ch;
     const char* conffile;
-    aug_rint rint;
+    aug_rint command;
 
     /* Defaults. */
 
@@ -159,11 +159,11 @@ aug_readopts(struct aug_options* options, int argc, char* argv[])
         options->command_ = AUG_CMDDEFAULT;
         break;
     case 1:
-        if (aug_isfail(rint = tocommand_(argv[aug_optind]))) {
+        if ((command = tocommand_(argv[aug_optind])) < 0) {
             usage_();
-            return rint;
+            return -1;
         }
-        options->command_ = AUG_RESULT(rint);
+        options->command_ = command;
         break;
     default:
         usage_();

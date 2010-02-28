@@ -93,7 +93,7 @@ out_(void* arg, int what)
 
     /* Bail on error. */
 
-    if (aug_isfail(st->result_))
+    if (st->result_ < 0)
         return;
 
     switch (what) {
@@ -161,7 +161,8 @@ aug_freadconf(FILE* fp, aug_confcb_t cb, void* arg)
     struct aug_words words;
     int ch;
 
-    aug_verify(init_(&st, cb, arg));
+    if (init_(&st, cb, arg) < 0)
+        return -1;
 
     aug_initshellwords(&words, AUG_TRUE, out_, &st);
 
@@ -171,15 +172,16 @@ aug_freadconf(FILE* fp, aug_confcb_t cb, void* arg)
 
         /* Check for errors during callback. */
 
-        if (aug_isfail(st.result_))
+        if (st.result_ < 0)
             goto done;
     }
 
     if (feof(fp))
         aug_putshellwords(&words, '\n');
-    else /* Error. */
-        st.result_ =
-            aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    else {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        st.result_ = -1;
+    }
 
  done:
     term_(&st);
@@ -195,8 +197,10 @@ aug_readconf(const char* path, aug_confcb_t cb, void* arg)
     if (fp) {
         result = aug_freadconf(fp, cb, arg);
         fclose(fp);
-    } else
-        result = aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+    } else {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        result = -1;
+    }
 
     return result;
 }

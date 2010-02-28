@@ -28,12 +28,14 @@
 int
 main(int argc, char* argv[])
 {
-    if (NULL != aug_tlx) {
+    /* Lazy initialisation supported. */
+
+    if (NULL == aug_tlx) {
         fprintf(stderr, "thread-local context not null\n");
         return 1;
     }
 
-    if (NULL != aug_tlerr) {
+    if (NULL == aug_tlerr) {
         fprintf(stderr, "thread-local error not null\n");
         return 1;
     }
@@ -49,11 +51,6 @@ main(int argc, char* argv[])
     aug_term();
     aug_term();
     aug_term();
-
-    if (!aug_autotlx()) {
-        fprintf(stderr, "aug_autotlx() failed\n");
-        return 1;
-    }
 
     aug_setposixerror(aug_tlx, __FILE__, __LINE__, ENOMEM);
     aug_perrinfo(aug_tlx, "operation failed", NULL);

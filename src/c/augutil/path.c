@@ -71,12 +71,14 @@ AUGUTIL_API aug_result
 aug_chdir(const char* path)
 {
 #if !defined(_WIN32)
-    if (-1 == chdir(path))
+    if (chdir(path) < 0)
 #else /* _WIN32 */
-    if (-1 == _chdir(path))
+    if (_chdir(path) < 0)
 #endif /* _WIN32 */
-        return aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
-
+    {
+        aug_setposixerror(aug_tlx, __FILE__, __LINE__, errno);
+        return -1;
+    }
     return 0;
 }
 
